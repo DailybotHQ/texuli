@@ -1,0 +1,16 @@
+{
+  "description": "A color outside hex and numeric oklch (a CSS injection attempt).",
+  "expect": [["invalid-value", "$.color.brand.seed"]],
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "acme",
+    "version": "1.0.0",
+    "name": "Acme",
+    "color": {
+      "brand": {
+        "seed": "red;}</style>"
+      }
+    }
+  }
+}

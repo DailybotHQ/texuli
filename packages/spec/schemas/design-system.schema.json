@@ -1,0 +1,3520 @@
+{
+  "$defs": {
+    "accessibility": {
+      "additionalProperties": false,
+      "description": "Accessibility targets: contrast, minimum target size and the focus style.",
+      "properties": {
+        "contrast": {
+          "enum": ["AA", "AAA"],
+          "type": "string"
+        },
+        "focus": {
+          "enum": ["ring", "outline", "glow", "inset"],
+          "type": "string"
+        },
+        "focusOffset": {
+          "maximum": 8,
+          "minimum": 0,
+          "type": "number"
+        },
+        "focusWidth": {
+          "maximum": 6,
+          "minimum": 1,
+          "type": "number"
+        },
+        "targetMin": {
+          "maximum": 64,
+          "minimum": 24,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "asset": {
+      "description": "At most 32768 bytes inline; data URLs need developer trust.",
+      "pattern": "^(?:(?:\\.?\\/)?(?:[A-Za-z0-9_-][A-Za-z0-9_.-]*\\/)*[A-Za-z0-9_-][A-Za-z0-9_.-]*\\.(?:png|jpe?g|gif|webp|avif|svg|ico)|data:image\\/(?:png|jpeg|gif|webp|avif);base64,[A-Za-z0-9+/]+={0,2})$",
+      "type": "string"
+    },
+    "assets": {
+      "additionalProperties": false,
+      "description": "Brand assets: logos and the favicon.",
+      "properties": {
+        "favicon": {
+          "description": "At most 8192 bytes inline; data URLs need developer trust.",
+          "pattern": "^(?:(?:\\.?\\/)?(?:[A-Za-z0-9_-][A-Za-z0-9_.-]*\\/)*[A-Za-z0-9_-][A-Za-z0-9_.-]*\\.(?:png|jpe?g|gif|webp|avif|svg|ico)|data:image\\/(?:png|jpeg|gif|webp|avif);base64,[A-Za-z0-9+/]+={0,2})$",
+          "type": "string"
+        },
+        "logo": {
+          "$ref": "#/$defs/assetsLogo"
+        }
+      },
+      "type": "object"
+    },
+    "assetsLogo": {
+      "additionalProperties": false,
+      "properties": {
+        "dark": {
+          "$ref": "#/$defs/asset"
+        },
+        "light": {
+          "$ref": "#/$defs/asset"
+        },
+        "mark": {
+          "$ref": "#/$defs/asset"
+        },
+        "wordmark": {
+          "$ref": "#/$defs/asset"
+        }
+      },
+      "type": "object"
+    },
+    "borderStep": {
+      "description": "A border width step.",
+      "enum": ["none", "thin", "thick"],
+      "type": "string"
+    },
+    "color": {
+      "additionalProperties": false,
+      "description": "Color: brand seeds, exact pins, explicit role pins per mode, modes, data viz per mode and status colors.",
+      "properties": {
+        "brand": {
+          "$ref": "#/$defs/colorBrand"
+        },
+        "dataViz": {
+          "$ref": "#/$defs/colorDataViz"
+        },
+        "modes": {
+          "description": "Unique items.",
+          "items": {
+            "enum": ["light", "dark"],
+            "type": "string"
+          },
+          "maxItems": 2,
+          "minItems": 1,
+          "type": "array"
+        },
+        "pin": {
+          "$ref": "#/$defs/colorPin"
+        },
+        "roles": {
+          "$ref": "#/$defs/colorRoles"
+        },
+        "status": {
+          "$ref": "#/$defs/colorStatus"
+        }
+      },
+      "type": "object"
+    },
+    "colorBrand": {
+      "additionalProperties": false,
+      "properties": {
+        "accent": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "neutral": {
+          "enum": ["zinc", "slate", "stone", "gray", "warm", "cool", "tinted"],
+          "type": "string"
+        },
+        "secondary": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "seed": {
+          "$ref": "#/$defs/colorValue"
+        }
+      },
+      "required": ["seed"],
+      "type": "object"
+    },
+    "colorDataViz": {
+      "additionalProperties": false,
+      "properties": {
+        "cvdSafe": {
+          "type": "boolean"
+        },
+        "dark": {
+          "$ref": "#/$defs/dataVizPalette"
+        },
+        "light": {
+          "$ref": "#/$defs/dataVizPalette"
+        }
+      },
+      "type": "object"
+    },
+    "colorPin": {
+      "additionalProperties": false,
+      "properties": {
+        "accent": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "destructive": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "info": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "primary": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "secondary": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "success": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "warning": {
+          "$ref": "#/$defs/colorValue"
+        }
+      },
+      "type": "object"
+    },
+    "colorRoles": {
+      "additionalProperties": false,
+      "properties": {
+        "dark": {
+          "$ref": "#/$defs/roleMap"
+        },
+        "light": {
+          "$ref": "#/$defs/roleMap"
+        }
+      },
+      "type": "object"
+    },
+    "colorStatus": {
+      "additionalProperties": false,
+      "properties": {
+        "danger": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "info": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "neutral": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "success": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "warning": {
+          "$ref": "#/$defs/colorValue"
+        }
+      },
+      "type": "object"
+    },
+    "colorValue": {
+      "description": "A color: #rgb, #rrggbb, #rrggbbaa or a numeric oklch(L C H[ / A]).",
+      "maxLength": 64,
+      "pattern": "^(?:#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})|oklch\\((?:\\d{1,3}(?:\\.\\d{1,6})?|\\.\\d{1,6})%? (?:\\d{1,3}(?:\\.\\d{1,6})?|\\.\\d{1,6}) (?:\\d{1,3}(?:\\.\\d{1,6})?|\\.\\d{1,6})(?: \\/ (?:\\d{1,3}(?:\\.\\d{1,6})?|\\.\\d{1,6})%?)?\\))$",
+      "type": "string"
+    },
+    "components": {
+      "additionalProperties": false,
+      "description": "Component tokens (the token registry, z-index left out) and defaults (variant and size), per component.",
+      "properties": {
+        "accordion": {
+          "$ref": "#/$defs/componentsAccordion"
+        },
+        "alert": {
+          "$ref": "#/$defs/componentsAlert"
+        },
+        "aspect-ratio": {
+          "$ref": "#/$defs/componentsAspectRatio"
+        },
+        "avatar": {
+          "$ref": "#/$defs/componentsAvatar"
+        },
+        "badge": {
+          "$ref": "#/$defs/componentsBadge"
+        },
+        "board": {
+          "$ref": "#/$defs/componentsBoard"
+        },
+        "breadcrumb": {
+          "$ref": "#/$defs/componentsBreadcrumb"
+        },
+        "button": {
+          "$ref": "#/$defs/componentsButton"
+        },
+        "canvas-toolbar": {
+          "$ref": "#/$defs/componentsCanvasToolbar"
+        },
+        "card": {
+          "$ref": "#/$defs/componentsCard"
+        },
+        "carousel": {
+          "$ref": "#/$defs/componentsCarousel"
+        },
+        "chart-frame": {
+          "$ref": "#/$defs/componentsChartFrame"
+        },
+        "chat-bubble": {
+          "$ref": "#/$defs/componentsChatBubble"
+        },
+        "chat-composer": {
+          "$ref": "#/$defs/componentsChatComposer"
+        },
+        "chip": {
+          "$ref": "#/$defs/componentsChip"
+        },
+        "choice": {
+          "$ref": "#/$defs/componentsChoice"
+        },
+        "code": {
+          "$ref": "#/$defs/componentsCode"
+        },
+        "color-picker": {
+          "$ref": "#/$defs/componentsColorPicker"
+        },
+        "combobox": {
+          "$ref": "#/$defs/componentsCombobox"
+        },
+        "command": {
+          "$ref": "#/$defs/componentsCommand"
+        },
+        "copy-button": {
+          "$ref": "#/$defs/componentsCopyButton"
+        },
+        "data-grid": {
+          "$ref": "#/$defs/componentsDataGrid"
+        },
+        "date": {
+          "$ref": "#/$defs/componentsDate"
+        },
+        "dialog": {
+          "$ref": "#/$defs/componentsDialog"
+        },
+        "empty": {
+          "$ref": "#/$defs/componentsEmpty"
+        },
+        "field": {
+          "$ref": "#/$defs/componentsField"
+        },
+        "file-upload": {
+          "$ref": "#/$defs/componentsFileUpload"
+        },
+        "forms": {
+          "$ref": "#/$defs/componentsForms"
+        },
+        "icon": {
+          "$ref": "#/$defs/componentsIcon"
+        },
+        "icon-button": {
+          "$ref": "#/$defs/componentsIconButton"
+        },
+        "input": {
+          "$ref": "#/$defs/componentsInput"
+        },
+        "kbd": {
+          "$ref": "#/$defs/componentsKbd"
+        },
+        "label": {
+          "$ref": "#/$defs/componentsLabel"
+        },
+        "menu": {
+          "$ref": "#/$defs/componentsMenu"
+        },
+        "navigation": {
+          "$ref": "#/$defs/componentsNavigation"
+        },
+        "number-field": {
+          "$ref": "#/$defs/componentsNumberField"
+        },
+        "pagination": {
+          "$ref": "#/$defs/componentsPagination"
+        },
+        "pin-input": {
+          "$ref": "#/$defs/componentsPinInput"
+        },
+        "popover": {
+          "$ref": "#/$defs/componentsPopover"
+        },
+        "progress": {
+          "$ref": "#/$defs/componentsProgress"
+        },
+        "radio-group": {
+          "$ref": "#/$defs/componentsRadioGroup"
+        },
+        "rating": {
+          "$ref": "#/$defs/componentsRating"
+        },
+        "resizable": {
+          "$ref": "#/$defs/componentsResizable"
+        },
+        "resizable-handle": {
+          "$ref": "#/$defs/componentsResizableHandle"
+        },
+        "scroll-area": {
+          "$ref": "#/$defs/componentsScrollArea"
+        },
+        "select": {
+          "$ref": "#/$defs/componentsSelect"
+        },
+        "separator": {
+          "$ref": "#/$defs/componentsSeparator"
+        },
+        "sheet": {
+          "$ref": "#/$defs/componentsSheet"
+        },
+        "sidebar": {
+          "$ref": "#/$defs/componentsSidebar"
+        },
+        "skeleton": {
+          "$ref": "#/$defs/componentsSkeleton"
+        },
+        "slider": {
+          "$ref": "#/$defs/componentsSlider"
+        },
+        "spinner": {
+          "$ref": "#/$defs/componentsSpinner"
+        },
+        "spreadsheet": {
+          "$ref": "#/$defs/componentsSpreadsheet"
+        },
+        "stat": {
+          "$ref": "#/$defs/componentsStat"
+        },
+        "stepper": {
+          "$ref": "#/$defs/componentsStepper"
+        },
+        "table": {
+          "$ref": "#/$defs/componentsTable"
+        },
+        "tabs": {
+          "$ref": "#/$defs/componentsTabs"
+        },
+        "tag": {
+          "$ref": "#/$defs/componentsTag"
+        },
+        "tags-input": {
+          "$ref": "#/$defs/componentsTagsInput"
+        },
+        "timeline": {
+          "$ref": "#/$defs/componentsTimeline"
+        },
+        "toast": {
+          "$ref": "#/$defs/componentsToast"
+        },
+        "toggle": {
+          "$ref": "#/$defs/componentsToggle"
+        },
+        "toggle-group": {
+          "$ref": "#/$defs/componentsToggleGroup"
+        },
+        "toolbar": {
+          "$ref": "#/$defs/componentsToolbar"
+        },
+        "tooltip": {
+          "$ref": "#/$defs/componentsTooltip"
+        },
+        "tree": {
+          "$ref": "#/$defs/componentsTree"
+        },
+        "workflow-node": {
+          "$ref": "#/$defs/componentsWorkflowNode"
+        }
+      },
+      "type": "object"
+    },
+    "componentsAccordion": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsAccordionDefaults"
+        },
+        "disabled-opacity": {
+          "$ref": "#/$defs/opacityStep"
+        },
+        "trigger-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "trigger-font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "trigger-gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "trigger-padding-block": {
+          "$ref": "#/$defs/dimension"
+        }
+      },
+      "type": "object"
+    },
+    "componentsAccordionDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "variant": {
+          "enum": ["default", "bordered"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsAlert": {
+      "additionalProperties": false,
+      "properties": {
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "icon-size": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-block": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-inline": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsAspectRatio": {
+      "additionalProperties": false,
+      "properties": {
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsAvatar": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsAvatarDefaults"
+        },
+        "font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "size-lg": {
+          "$ref": "#/$defs/dimension"
+        },
+        "size-md": {
+          "$ref": "#/$defs/dimension"
+        },
+        "size-sm": {
+          "$ref": "#/$defs/dimension"
+        },
+        "size-xs": {
+          "$ref": "#/$defs/dimension"
+        }
+      },
+      "type": "object"
+    },
+    "componentsAvatarDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["xs", "sm", "md", "lg"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsBadge": {
+      "additionalProperties": false,
+      "properties": {
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsBadgeDefaults"
+        },
+        "font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "line-height": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "padding-block": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-inline": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsBadgeDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "variant": {
+          "enum": [
+            "default",
+            "secondary",
+            "outline",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsBoard": {
+      "additionalProperties": false,
+      "properties": {
+        "card-elevation": {
+          "$ref": "#/$defs/elevationLevel"
+        },
+        "card-radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "column-gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "column-padding": {
+          "$ref": "#/$defs/dimension"
+        },
+        "column-radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsBreadcrumb": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsBreadcrumbDefaults"
+        }
+      },
+      "type": "object"
+    },
+    "componentsBreadcrumbDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsButton": {
+      "additionalProperties": false,
+      "properties": {
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsButtonDefaults"
+        },
+        "disabled-opacity": {
+          "$ref": "#/$defs/opacityStep"
+        },
+        "elevation": {
+          "$ref": "#/$defs/elevationLevel"
+        },
+        "font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "font-size-lg": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "font-size-sm": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "height-lg": {
+          "$ref": "#/$defs/dimension"
+        },
+        "height-md": {
+          "$ref": "#/$defs/dimension"
+        },
+        "height-sm": {
+          "$ref": "#/$defs/dimension"
+        },
+        "height-touch": {
+          "$ref": "#/$defs/dimension"
+        },
+        "icon-size": {
+          "$ref": "#/$defs/dimension"
+        },
+        "line-height": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "padding-inline-lg": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-inline-md": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-inline-sm": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsButtonDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg", "icon"],
+          "type": "string"
+        },
+        "variant": {
+          "enum": ["default", "secondary", "outline", "ghost", "destructive", "link"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsCanvasToolbar": {
+      "additionalProperties": false,
+      "properties": {
+        "button-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "button-radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding": {
+          "$ref": "#/$defs/dimension"
+        }
+      },
+      "type": "object"
+    },
+    "componentsCard": {
+      "additionalProperties": false,
+      "properties": {
+        "background": {
+          "$ref": "#/$defs/roleName"
+        },
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsCardDefaults"
+        },
+        "description-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "elevation": {
+          "$ref": "#/$defs/elevationLevel"
+        },
+        "padding-block": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-inline": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "title-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "title-font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "title-line-height": {
+          "$ref": "#/$defs/typeRoleName"
+        }
+      },
+      "type": "object"
+    },
+    "componentsCardDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "variant": {
+          "enum": ["elevated", "flat"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsCarousel": {
+      "additionalProperties": false,
+      "properties": {
+        "fallback-padding": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsChartFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "title-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        }
+      },
+      "type": "object"
+    },
+    "componentsChatBubble": {
+      "additionalProperties": false,
+      "properties": {
+        "padding-block": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-inline": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "tail-radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsChatComposer": {
+      "additionalProperties": false,
+      "properties": {
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsChip": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsChipDefaults"
+        }
+      },
+      "type": "object"
+    },
+    "componentsChipDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "variant": {
+          "enum": [
+            "default",
+            "secondary",
+            "outline",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsChoice": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsChoiceDefaults"
+        },
+        "description-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "disabled-opacity": {
+          "$ref": "#/$defs/opacityStep"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "label-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "label-font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "switch-gap": {
+          "$ref": "#/$defs/dimension"
+        }
+      },
+      "type": "object"
+    },
+    "componentsChoiceDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsCode": {
+      "additionalProperties": false,
+      "properties": {
+        "block-border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "block-line-height": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "block-padding-block": {
+          "$ref": "#/$defs/dimension"
+        },
+        "block-padding-inline": {
+          "$ref": "#/$defs/dimension"
+        },
+        "block-radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsCodeDefaults"
+        },
+        "font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        }
+      },
+      "type": "object"
+    },
+    "componentsCodeDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "variant": {
+          "enum": ["inline", "block"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsColorPicker": {
+      "additionalProperties": false,
+      "properties": {
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "swatch-radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "swatch-size": {
+          "$ref": "#/$defs/dimension"
+        }
+      },
+      "type": "object"
+    },
+    "componentsCombobox": {
+      "additionalProperties": false,
+      "properties": {
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsComboboxDefaults"
+        },
+        "font-size-lg": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "font-size-md": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "font-size-sm": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "height-lg": {
+          "$ref": "#/$defs/dimension"
+        },
+        "height-md": {
+          "$ref": "#/$defs/dimension"
+        },
+        "height-sm": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsComboboxDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg"],
+          "type": "string"
+        },
+        "variant": {
+          "enum": ["outline", "soft"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsCommand": {
+      "additionalProperties": false,
+      "properties": {
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsCommandDefaults"
+        },
+        "font-size-lg": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "font-size-md": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "font-size-sm": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "input-gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "input-padding-inline": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsCommandDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg"],
+          "type": "string"
+        },
+        "variant": {
+          "enum": ["outline", "soft"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsCopyButton": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsCopyButtonDefaults"
+        }
+      },
+      "type": "object"
+    },
+    "componentsCopyButtonDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsDataGrid": {
+      "additionalProperties": false,
+      "properties": {
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "pager-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsDate": {
+      "additionalProperties": false,
+      "properties": {
+        "control-border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "control-radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsDateDefaults"
+        },
+        "description-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "label-font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "panel-elevation": {
+          "$ref": "#/$defs/elevationLevel"
+        },
+        "panel-padding": {
+          "$ref": "#/$defs/dimension"
+        },
+        "panel-radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsDateDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsDialog": {
+      "additionalProperties": false,
+      "properties": {
+        "alert-padding": {
+          "$ref": "#/$defs/dimension"
+        },
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsDialogDefaults"
+        },
+        "elevation": {
+          "$ref": "#/$defs/elevationLevel"
+        },
+        "font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "line-height": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "scrim-opacity": {
+          "$ref": "#/$defs/opacityStep"
+        },
+        "title-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "title-font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "title-line-height": {
+          "$ref": "#/$defs/typeRoleName"
+        }
+      },
+      "type": "object"
+    },
+    "componentsDialogDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg", "xl"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsEmpty": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsEmptyDefaults"
+        },
+        "description-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-block": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-inline": {
+          "$ref": "#/$defs/dimension"
+        },
+        "title-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "title-font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        }
+      },
+      "type": "object"
+    },
+    "componentsEmptyDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsField": {
+      "additionalProperties": false,
+      "properties": {
+        "description-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "description-line-height": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "label-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "label-font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "label-line-height": {
+          "$ref": "#/$defs/typeRoleName"
+        }
+      },
+      "type": "object"
+    },
+    "componentsFileUpload": {
+      "additionalProperties": false,
+      "properties": {
+        "browse-height": {
+          "$ref": "#/$defs/dimension"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsFileUploadDefaults"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "zone-border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "zone-padding-block": {
+          "$ref": "#/$defs/dimension"
+        },
+        "zone-padding-inline": {
+          "$ref": "#/$defs/dimension"
+        },
+        "zone-radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsFileUploadDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "variant": {
+          "enum": ["default", "compact"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsForms": {
+      "additionalProperties": false,
+      "properties": {
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        }
+      },
+      "type": "object"
+    },
+    "componentsIcon": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsIconDefaults"
+        },
+        "size-lg": {
+          "$ref": "#/$defs/dimension"
+        },
+        "size-md": {
+          "$ref": "#/$defs/dimension"
+        },
+        "size-sm": {
+          "$ref": "#/$defs/dimension"
+        },
+        "size-xs": {
+          "$ref": "#/$defs/dimension"
+        },
+        "stroke-width": {
+          "$ref": "#/$defs/strokeWidth"
+        }
+      },
+      "type": "object"
+    },
+    "componentsIconButton": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsIconButtonDefaults"
+        }
+      },
+      "type": "object"
+    },
+    "componentsIconButtonDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg", "icon"],
+          "type": "string"
+        },
+        "variant": {
+          "enum": ["default", "secondary", "outline", "ghost", "destructive", "link"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsIconDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["xs", "sm", "md", "lg"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsInput": {
+      "additionalProperties": false,
+      "properties": {
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "disabled-opacity": {
+          "$ref": "#/$defs/opacityStep"
+        },
+        "elevation": {
+          "$ref": "#/$defs/elevationLevel"
+        },
+        "font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "font-size-touch": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "height": {
+          "$ref": "#/$defs/dimension"
+        },
+        "height-touch": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-block": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-inline": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "textarea-padding-block": {
+          "$ref": "#/$defs/dimension"
+        }
+      },
+      "type": "object"
+    },
+    "componentsKbd": {
+      "additionalProperties": false,
+      "properties": {
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "min-size": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-block": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsLabel": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsLabelDefaults"
+        }
+      },
+      "type": "object"
+    },
+    "componentsLabelDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsMenu": {
+      "additionalProperties": false,
+      "properties": {
+        "content-elevation": {
+          "$ref": "#/$defs/elevationLevel"
+        },
+        "content-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "content-padding-block": {
+          "$ref": "#/$defs/dimension"
+        },
+        "content-radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsMenuDefaults"
+        },
+        "trigger-border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "trigger-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "trigger-font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "trigger-height-lg": {
+          "$ref": "#/$defs/dimension"
+        },
+        "trigger-height-md": {
+          "$ref": "#/$defs/dimension"
+        },
+        "trigger-height-sm": {
+          "$ref": "#/$defs/dimension"
+        },
+        "trigger-radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsMenuDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg"],
+          "type": "string"
+        },
+        "variant": {
+          "enum": ["default", "soft"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsNavigation": {
+      "additionalProperties": false,
+      "properties": {
+        "chevron-opacity": {
+          "$ref": "#/$defs/opacityStep"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsNavigationDefaults"
+        },
+        "font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "list-gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "trigger-radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsNavigationDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsNumberField": {
+      "additionalProperties": false,
+      "properties": {
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsNumberFieldDefaults"
+        },
+        "padding-block": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-inline": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "stepper-size": {
+          "$ref": "#/$defs/dimension"
+        }
+      },
+      "type": "object"
+    },
+    "componentsNumberFieldDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsPagination": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsPaginationDefaults"
+        }
+      },
+      "type": "object"
+    },
+    "componentsPaginationDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg"],
+          "type": "string"
+        },
+        "variant": {
+          "enum": ["outline", "soft"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsPinInput": {
+      "additionalProperties": false,
+      "properties": {
+        "cell-block-size": {
+          "$ref": "#/$defs/dimension"
+        },
+        "cell-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "cell-inline-size": {
+          "$ref": "#/$defs/dimension"
+        },
+        "cell-radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsPinInputDefaults"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        }
+      },
+      "type": "object"
+    },
+    "componentsPinInputDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsPopover": {
+      "additionalProperties": false,
+      "properties": {
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsPopoverDefaults"
+        },
+        "elevation": {
+          "$ref": "#/$defs/elevationLevel"
+        },
+        "font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "padding-block": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-inline": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "title-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "title-font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "title-line-height": {
+          "$ref": "#/$defs/typeRoleName"
+        }
+      },
+      "type": "object"
+    },
+    "componentsPopoverDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg"],
+          "type": "string"
+        },
+        "variant": {
+          "enum": ["elevated", "flat"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsProgress": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsProgressDefaults"
+        },
+        "font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "track-height-lg": {
+          "$ref": "#/$defs/dimension"
+        },
+        "track-height-md": {
+          "$ref": "#/$defs/dimension"
+        },
+        "track-height-sm": {
+          "$ref": "#/$defs/dimension"
+        }
+      },
+      "type": "object"
+    },
+    "componentsProgressDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsRadioGroup": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsRadioGroupDefaults"
+        }
+      },
+      "type": "object"
+    },
+    "componentsRadioGroupDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md"],
+          "type": "string"
+        },
+        "variant": {
+          "enum": ["default", "card"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsRating": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsRatingDefaults"
+        },
+        "label-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "label-font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "star-radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "stars-gap": {
+          "$ref": "#/$defs/dimension"
+        }
+      },
+      "type": "object"
+    },
+    "componentsRatingDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsResizable": {
+      "additionalProperties": false,
+      "properties": {
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsResizableDefaults"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsResizableDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "variant": {
+          "enum": ["plain", "bordered"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsResizableHandle": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsResizableHandleDefaults"
+        }
+      },
+      "type": "object"
+    },
+    "componentsResizableHandleDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsScrollArea": {
+      "additionalProperties": false,
+      "properties": {
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsScrollAreaDefaults"
+        },
+        "padding": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "scrollbar-radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "scrollbar-size": {
+          "$ref": "#/$defs/dimension"
+        },
+        "thumb-min-size": {
+          "$ref": "#/$defs/dimension"
+        }
+      },
+      "type": "object"
+    },
+    "componentsScrollAreaDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsSelect": {
+      "additionalProperties": false,
+      "properties": {
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "chevron-opacity": {
+          "$ref": "#/$defs/opacityStep"
+        },
+        "chevron-size": {
+          "$ref": "#/$defs/dimension"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsSelectDefaults"
+        },
+        "font-size-lg": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "font-size-md": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "font-size-sm": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "height-lg": {
+          "$ref": "#/$defs/dimension"
+        },
+        "height-md": {
+          "$ref": "#/$defs/dimension"
+        },
+        "height-sm": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-inline-lg": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-inline-md": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-inline-sm": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsSelectDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg"],
+          "type": "string"
+        },
+        "variant": {
+          "enum": ["outline", "soft"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsSeparator": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsSeparatorDefaults"
+        },
+        "thickness": {
+          "$ref": "#/$defs/borderStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsSeparatorDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "variant": {
+          "enum": ["default", "subtle", "strong"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsSheet": {
+      "additionalProperties": false,
+      "properties": {
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsSheetDefaults"
+        },
+        "elevation": {
+          "$ref": "#/$defs/elevationLevel"
+        },
+        "font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "line-height": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "padding": {
+          "$ref": "#/$defs/dimension"
+        },
+        "scrim-opacity": {
+          "$ref": "#/$defs/opacityStep"
+        },
+        "title-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "title-font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "title-line-height": {
+          "$ref": "#/$defs/typeRoleName"
+        }
+      },
+      "type": "object"
+    },
+    "componentsSheetDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg", "xl"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsSidebar": {
+      "additionalProperties": false,
+      "properties": {
+        "body-gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "body-padding-block": {
+          "$ref": "#/$defs/dimension"
+        },
+        "body-padding-inline": {
+          "$ref": "#/$defs/dimension"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsSidebarDefaults"
+        },
+        "font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "header-gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "header-padding-inline": {
+          "$ref": "#/$defs/dimension"
+        },
+        "inset-radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsSidebarDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "variant": {
+          "enum": ["default", "inset"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsSkeleton": {
+      "additionalProperties": false,
+      "properties": {
+        "circle-size": {
+          "$ref": "#/$defs/dimension"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsSkeletonDefaults"
+        },
+        "height-lg": {
+          "$ref": "#/$defs/dimension"
+        },
+        "height-md": {
+          "$ref": "#/$defs/dimension"
+        },
+        "height-sm": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsSkeletonDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsSlider": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsSliderDefaults"
+        },
+        "disabled-opacity": {
+          "$ref": "#/$defs/opacityStep"
+        },
+        "thumb-border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "thumb-elevation": {
+          "$ref": "#/$defs/elevationLevel"
+        }
+      },
+      "type": "object"
+    },
+    "componentsSliderDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsSpinner": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsSpinnerDefaults"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsSpinnerDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsSpreadsheet": {
+      "additionalProperties": false,
+      "properties": {
+        "bar-radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "tab-padding-inline": {
+          "$ref": "#/$defs/dimension"
+        },
+        "tab-radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsStat": {
+      "additionalProperties": false,
+      "properties": {
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsStatDefaults"
+        },
+        "elevation": {
+          "$ref": "#/$defs/elevationLevel"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "icon-radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "icon-size": {
+          "$ref": "#/$defs/dimension"
+        },
+        "label-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "label-font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "padding": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "value-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "value-font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        }
+      },
+      "type": "object"
+    },
+    "componentsStatDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "variant": {
+          "enum": ["elevated", "flat"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsStepper": {
+      "additionalProperties": false,
+      "properties": {
+        "check-size": {
+          "$ref": "#/$defs/dimension"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "marker-border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "marker-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "marker-font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "marker-radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "marker-size": {
+          "$ref": "#/$defs/dimension"
+        },
+        "trigger-radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsTable": {
+      "additionalProperties": false,
+      "properties": {
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "head-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "head-font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsTabs": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsTabsDefaults"
+        },
+        "disabled-opacity": {
+          "$ref": "#/$defs/opacityStep"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "list-gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "list-radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "trigger-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "trigger-font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "trigger-gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "trigger-height-touch": {
+          "$ref": "#/$defs/dimension"
+        }
+      },
+      "type": "object"
+    },
+    "componentsTabsDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "variant": {
+          "enum": ["line", "pills", "enclosed"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsTag": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsTagDefaults"
+        }
+      },
+      "type": "object"
+    },
+    "componentsTagDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "variant": {
+          "enum": [
+            "default",
+            "secondary",
+            "outline",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsTagsInput": {
+      "additionalProperties": false,
+      "properties": {
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "disabled-opacity": {
+          "$ref": "#/$defs/opacityStep"
+        },
+        "elevation": {
+          "$ref": "#/$defs/elevationLevel"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "height": {
+          "$ref": "#/$defs/dimension"
+        },
+        "height-touch": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-inline": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "tag-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "tag-radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsTimeline": {
+      "additionalProperties": false,
+      "properties": {
+        "marker-radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "marker-size": {
+          "$ref": "#/$defs/dimension"
+        },
+        "time-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "time-font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        }
+      },
+      "type": "object"
+    },
+    "componentsToast": {
+      "additionalProperties": false,
+      "properties": {
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "elevation": {
+          "$ref": "#/$defs/elevationLevel"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "icon-size": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-block": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "title-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "title-font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        }
+      },
+      "type": "object"
+    },
+    "componentsToggle": {
+      "additionalProperties": false,
+      "properties": {
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsToggleDefaults"
+        },
+        "disabled-opacity": {
+          "$ref": "#/$defs/opacityStep"
+        },
+        "font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "height-lg": {
+          "$ref": "#/$defs/dimension"
+        },
+        "height-md": {
+          "$ref": "#/$defs/dimension"
+        },
+        "height-sm": {
+          "$ref": "#/$defs/dimension"
+        },
+        "line-height": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "padding-inline-lg": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-inline-md": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-inline-sm": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsToggleDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg"],
+          "type": "string"
+        },
+        "variant": {
+          "enum": ["default", "outline"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsToggleGroup": {
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/componentsToggleGroupDefaults"
+        }
+      },
+      "type": "object"
+    },
+    "componentsToggleGroupDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md", "lg"],
+          "type": "string"
+        },
+        "variant": {
+          "enum": ["default", "outline"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsToolbar": {
+      "additionalProperties": false,
+      "properties": {
+        "border-width": {
+          "$ref": "#/$defs/borderStep"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsToolbarDefaults"
+        },
+        "disabled-opacity": {
+          "$ref": "#/$defs/opacityStep"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "item-font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "item-font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "item-height-sm": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsToolbarDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "enum": ["sm", "md"],
+          "type": "string"
+        },
+        "variant": {
+          "enum": ["default", "outline", "ghost"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsTooltip": {
+      "additionalProperties": false,
+      "properties": {
+        "elevation": {
+          "$ref": "#/$defs/elevationLevel"
+        },
+        "font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "font-weight": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "line-height": {
+          "$ref": "#/$defs/typeRoleName"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "componentsTree": {
+      "additionalProperties": false,
+      "properties": {
+        "checkbox-radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "checkbox-size": {
+          "$ref": "#/$defs/dimension"
+        },
+        "defaults": {
+          "$ref": "#/$defs/componentsTreeDefaults"
+        },
+        "gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        },
+        "row-gap": {
+          "$ref": "#/$defs/dimension"
+        },
+        "row-padding-block": {
+          "$ref": "#/$defs/dimension"
+        }
+      },
+      "type": "object"
+    },
+    "componentsTreeDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "variant": {
+          "enum": ["default", "bordered"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "componentsWorkflowNode": {
+      "additionalProperties": false,
+      "properties": {
+        "elevation": {
+          "$ref": "#/$defs/elevationLevel"
+        },
+        "padding-block": {
+          "$ref": "#/$defs/dimension"
+        },
+        "padding-inline": {
+          "$ref": "#/$defs/dimension"
+        },
+        "radius": {
+          "$ref": "#/$defs/radiusStep"
+        }
+      },
+      "type": "object"
+    },
+    "dataVizPalette": {
+      "additionalProperties": false,
+      "description": "One mode’s chart palette: 8 categorical, 9 sequential and 9 diverging colors.",
+      "properties": {
+        "axis": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "categorical": {
+          "items": {
+            "$ref": "#/$defs/colorValue"
+          },
+          "maxItems": 8,
+          "minItems": 8,
+          "type": "array"
+        },
+        "diverging": {
+          "items": {
+            "$ref": "#/$defs/colorValue"
+          },
+          "maxItems": 9,
+          "minItems": 9,
+          "type": "array"
+        },
+        "grid": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "sequential": {
+          "items": {
+            "$ref": "#/$defs/colorValue"
+          },
+          "maxItems": 9,
+          "minItems": 9,
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "dimension": {
+      "description": "A space, control, icon or target size step.",
+      "enum": [
+        "space-0",
+        "space-1",
+        "space-2",
+        "space-3",
+        "space-4",
+        "space-5",
+        "space-6",
+        "space-7",
+        "space-8",
+        "space-9",
+        "space-10",
+        "space-11",
+        "space-12",
+        "control-xs",
+        "control-sm",
+        "control-md",
+        "control-lg",
+        "icon-xs",
+        "icon-sm",
+        "icon-md",
+        "icon-lg",
+        "target-min",
+        "target-touch"
+      ],
+      "type": "string"
+    },
+    "elevation": {
+      "additionalProperties": false,
+      "description": "Elevation style.",
+      "properties": {
+        "style": {
+          "enum": ["flat", "soft", "crisp", "glow", "layered"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "elevationLevel": {
+      "description": "An elevation level.",
+      "maximum": 5,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "fontFamily": {
+      "additionalProperties": false,
+      "description": "A family stack (1 to 8 names, quoted by the compiler) and its font files.",
+      "properties": {
+        "files": {
+          "items": {
+            "$ref": "#/$defs/fontFile"
+          },
+          "maxItems": 8,
+          "type": "array"
+        },
+        "stack": {
+          "items": {
+            "maxLength": 33,
+            "pattern": "^-?[A-Za-z0-9][A-Za-z0-9 _.-]{0,31}$",
+            "type": "string"
+          },
+          "maxItems": 8,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": ["stack"],
+      "type": "object"
+    },
+    "fontFile": {
+      "additionalProperties": false,
+      "description": "A self-hosted font file: a same-origin relative path (.woff2, .woff, .ttf, .otf), or at developer trust a base64 data:font URL of at most 131072 bytes.",
+      "properties": {
+        "display": {
+          "enum": ["swap", "fallback", "optional", "block", "auto"],
+          "type": "string"
+        },
+        "preload": {
+          "type": "boolean"
+        },
+        "src": {
+          "description": "At most 131072 bytes inline; data URLs need developer trust.",
+          "pattern": "^(?:(?:\\.?\\/)?(?:[A-Za-z0-9_-][A-Za-z0-9_.-]*\\/)*[A-Za-z0-9_-][A-Za-z0-9_.-]*\\.(?:woff2?|ttf|otf)|data:font\\/(?:woff2?|ttf|otf);base64,[A-Za-z0-9+/]+={0,2})$",
+          "type": "string"
+        },
+        "style": {
+          "enum": ["normal", "italic"],
+          "type": "string"
+        },
+        "weight": {
+          "maxLength": 7,
+          "pattern": "^[1-9]00(?: [1-9]00)?$",
+          "type": "string"
+        }
+      },
+      "required": ["src"],
+      "type": "object"
+    },
+    "icons": {
+      "additionalProperties": false,
+      "description": "Icon style, stroke and sizes (px).",
+      "properties": {
+        "size": {
+          "$ref": "#/$defs/iconsSize"
+        },
+        "stroke": {
+          "maximum": 3,
+          "minimum": 0.5,
+          "type": "number"
+        },
+        "style": {
+          "enum": ["outline", "filled"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "iconsSize": {
+      "additionalProperties": false,
+      "properties": {
+        "lg": {
+          "maximum": 64,
+          "minimum": 8,
+          "type": "number"
+        },
+        "md": {
+          "maximum": 64,
+          "minimum": 8,
+          "type": "number"
+        },
+        "sm": {
+          "maximum": 64,
+          "minimum": 8,
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "issue": {
+      "additionalProperties": false,
+      "description": "One design-system issue: a stable code, a JSON path from $, a message and an optional hint.",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/issueCode"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "required": ["code", "path", "message"],
+      "type": "object"
+    },
+    "issueCode": {
+      "description": "Every stable design-system code; aa-text, aa-focus and target-size are raised by the compiler.",
+      "enum": [
+        "unknown-key",
+        "invalid-type",
+        "invalid-value",
+        "required",
+        "format-version",
+        "extends-range",
+        "extends-cycle",
+        "extends-depth",
+        "url-refused",
+        "inline-bytes",
+        "aa-text",
+        "aa-focus",
+        "target-size"
+      ],
+      "type": "string"
+    },
+    "layout": {
+      "additionalProperties": false,
+      "description": "Layout widths, breakpoints and the grid (px).",
+      "properties": {
+        "breakpoints": {
+          "$ref": "#/$defs/layoutBreakpoints"
+        },
+        "contentMax": {
+          "maximum": 2560,
+          "minimum": 320,
+          "type": "integer"
+        },
+        "grid": {
+          "$ref": "#/$defs/layoutGrid"
+        },
+        "wideMax": {
+          "maximum": 2560,
+          "minimum": 320,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "layoutBreakpoints": {
+      "additionalProperties": false,
+      "properties": {
+        "lg": {
+          "maximum": 2560,
+          "minimum": 320,
+          "type": "integer"
+        },
+        "md": {
+          "maximum": 2560,
+          "minimum": 320,
+          "type": "integer"
+        },
+        "sm": {
+          "maximum": 2560,
+          "minimum": 320,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "layoutGrid": {
+      "additionalProperties": false,
+      "properties": {
+        "columns": {
+          "$ref": "#/$defs/layoutGridColumns"
+        },
+        "gutter": {
+          "$ref": "#/$defs/layoutGridGutter"
+        }
+      },
+      "type": "object"
+    },
+    "layoutGridColumns": {
+      "additionalProperties": false,
+      "properties": {
+        "base": {
+          "maximum": 24,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "lg": {
+          "maximum": 24,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "md": {
+          "maximum": 24,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "sm": {
+          "maximum": 24,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "layoutGridGutter": {
+      "additionalProperties": false,
+      "properties": {
+        "base": {
+          "$ref": "#/$defs/spaceStep"
+        },
+        "lg": {
+          "$ref": "#/$defs/spaceStep"
+        },
+        "md": {
+          "$ref": "#/$defs/spaceStep"
+        },
+        "sm": {
+          "$ref": "#/$defs/spaceStep"
+        }
+      },
+      "type": "object"
+    },
+    "motion": {
+      "additionalProperties": false,
+      "description": "Motion personality, durations (ms) and a named easing.",
+      "properties": {
+        "durations": {
+          "$ref": "#/$defs/motionDurations"
+        },
+        "easing": {
+          "enum": ["standard", "emphasized", "enter", "exit", "linear"],
+          "type": "string"
+        },
+        "personality": {
+          "enum": ["none", "subtle", "standard", "expressive"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "motionDurations": {
+      "additionalProperties": false,
+      "properties": {
+        "base": {
+          "maximum": 2000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "fast": {
+          "maximum": 2000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "slow": {
+          "maximum": 2000,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "opacityStep": {
+      "description": "An opacity step.",
+      "enum": ["disabled", "muted", "scrim"],
+      "type": "string"
+    },
+    "radiusStep": {
+      "description": "A shape radius step.",
+      "enum": ["none", "xs", "sm", "md", "lg", "xl", "full"],
+      "type": "string"
+    },
+    "roleMap": {
+      "additionalProperties": false,
+      "description": "Explicit role pins for one mode: checked by the compiler, never moved (ADR-022).",
+      "properties": {
+        "accent": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "accentForeground": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "background": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "border": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "borderStrong": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "canvas": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "destructive": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "destructiveForeground": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "destructiveSoft": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "destructiveSoftForeground": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "elevated": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "elevatedForeground": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "foreground": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "info": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "infoForeground": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "infoSoft": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "infoSoftForeground": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "input": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "link": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "linkVisited": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "muted": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "mutedForeground": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "overlay": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "primary": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "primaryForeground": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "primarySoft": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "primarySoftForeground": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "ring": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "scrim": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "secondary": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "secondaryForeground": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "selection": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "selectionForeground": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "shadow": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "sidebar": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "sidebarBorder": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "sidebarForeground": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "sidebarPrimary": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "subtle": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "subtleForeground": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "success": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "successForeground": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "successSoft": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "successSoftForeground": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "surface": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "surfaceForeground": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "warning": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "warningForeground": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "warningSoft": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "warningSoftForeground": {
+          "$ref": "#/$defs/colorValue"
+        }
+      },
+      "type": "object"
+    },
+    "roleName": {
+      "description": "A semantic color role of the token contract.",
+      "enum": [
+        "background",
+        "foreground",
+        "surface",
+        "surfaceForeground",
+        "elevated",
+        "elevatedForeground",
+        "muted",
+        "mutedForeground",
+        "subtle",
+        "subtleForeground",
+        "border",
+        "borderStrong",
+        "input",
+        "ring",
+        "primary",
+        "primaryForeground",
+        "primarySoft",
+        "primarySoftForeground",
+        "secondary",
+        "secondaryForeground",
+        "accent",
+        "accentForeground",
+        "destructive",
+        "destructiveForeground",
+        "destructiveSoft",
+        "destructiveSoftForeground",
+        "success",
+        "successForeground",
+        "successSoft",
+        "successSoftForeground",
+        "warning",
+        "warningForeground",
+        "warningSoft",
+        "warningSoftForeground",
+        "info",
+        "infoForeground",
+        "infoSoft",
+        "infoSoftForeground",
+        "sidebar",
+        "sidebarForeground",
+        "sidebarBorder",
+        "sidebarPrimary",
+        "overlay",
+        "scrim",
+        "shadow",
+        "link",
+        "linkVisited",
+        "selection",
+        "selectionForeground",
+        "canvas"
+      ],
+      "type": "string"
+    },
+    "shape": {
+      "additionalProperties": false,
+      "description": "Shape: radius (px), radius scale and border width (px).",
+      "properties": {
+        "borderWidth": {
+          "maximum": 4,
+          "minimum": 0,
+          "type": "number"
+        },
+        "radius": {
+          "maximum": 48,
+          "minimum": 0,
+          "type": "number"
+        },
+        "radiusScale": {
+          "maximum": 4,
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "space": {
+      "additionalProperties": false,
+      "description": "Space: the base unit (px) and the density multiplier.",
+      "properties": {
+        "base": {
+          "maximum": 8,
+          "minimum": 2,
+          "type": "number"
+        },
+        "density": {
+          "maximum": 1.25,
+          "minimum": 0.75,
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "spaceStep": {
+      "description": "A space step.",
+      "enum": [
+        "space-0",
+        "space-1",
+        "space-2",
+        "space-3",
+        "space-4",
+        "space-5",
+        "space-6",
+        "space-7",
+        "space-8",
+        "space-9",
+        "space-10",
+        "space-11",
+        "space-12"
+      ],
+      "type": "string"
+    },
+    "strokeWidth": {
+      "description": "A stroke width in px.",
+      "maximum": 4,
+      "minimum": 0.5,
+      "type": "number"
+    },
+    "surface": {
+      "additionalProperties": false,
+      "description": "Surface style and glass settings.",
+      "properties": {
+        "glass": {
+          "$ref": "#/$defs/surfaceGlass"
+        },
+        "style": {
+          "enum": ["solid", "glass"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "surfaceGlass": {
+      "additionalProperties": false,
+      "properties": {
+        "alpha": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "blur": {
+          "maximum": 64,
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "typeRole": {
+      "additionalProperties": false,
+      "description": "A type role: family, size (px), weight, line height and tracking (em).",
+      "properties": {
+        "family": {
+          "enum": ["sans", "heading", "mono", "serif"],
+          "type": "string"
+        },
+        "line": {
+          "maximum": 2.5,
+          "minimum": 1,
+          "type": "number"
+        },
+        "size": {
+          "maximum": 128,
+          "minimum": 8,
+          "type": "number"
+        },
+        "tracking": {
+          "maximum": 0.2,
+          "minimum": -0.1,
+          "type": "number"
+        },
+        "weight": {
+          "maximum": 900,
+          "minimum": 100,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "typeRoleName": {
+      "description": "A type role name.",
+      "enum": ["display", "title", "heading", "body", "label", "caption", "code"],
+      "type": "string"
+    },
+    "typography": {
+      "additionalProperties": false,
+      "description": "Typography: family stacks with font files, the scale and the type roles.",
+      "properties": {
+        "families": {
+          "$ref": "#/$defs/typographyFamilies"
+        },
+        "roles": {
+          "$ref": "#/$defs/typographyRoles"
+        },
+        "scale": {
+          "$ref": "#/$defs/typographyScale"
+        }
+      },
+      "type": "object"
+    },
+    "typographyFamilies": {
+      "additionalProperties": false,
+      "properties": {
+        "heading": {
+          "$ref": "#/$defs/fontFamily"
+        },
+        "mono": {
+          "$ref": "#/$defs/fontFamily"
+        },
+        "sans": {
+          "$ref": "#/$defs/fontFamily"
+        },
+        "serif": {
+          "$ref": "#/$defs/fontFamily"
+        }
+      },
+      "type": "object"
+    },
+    "typographyRoles": {
+      "additionalProperties": false,
+      "properties": {
+        "body": {
+          "$ref": "#/$defs/typeRole"
+        },
+        "caption": {
+          "$ref": "#/$defs/typeRole"
+        },
+        "code": {
+          "$ref": "#/$defs/typeRole"
+        },
+        "display": {
+          "$ref": "#/$defs/typeRole"
+        },
+        "heading": {
+          "$ref": "#/$defs/typeRole"
+        },
+        "label": {
+          "$ref": "#/$defs/typeRole"
+        },
+        "title": {
+          "$ref": "#/$defs/typeRole"
+        }
+      },
+      "type": "object"
+    },
+    "typographyScale": {
+      "additionalProperties": false,
+      "properties": {
+        "base": {
+          "maximum": 24,
+          "minimum": 12,
+          "type": "number"
+        },
+        "ratio": {
+          "maximum": 1.618,
+          "minimum": 1.05,
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "variant": {
+      "additionalProperties": false,
+      "description": "A named variant (high-contrast, compact, seasonal): a closed partial document of sections, orthogonal to mode.",
+      "properties": {
+        "accessibility": {
+          "$ref": "#/$defs/accessibility"
+        },
+        "assets": {
+          "$ref": "#/$defs/assets"
+        },
+        "color": {
+          "$ref": "#/$defs/color"
+        },
+        "components": {
+          "$ref": "#/$defs/components"
+        },
+        "elevation": {
+          "$ref": "#/$defs/elevation"
+        },
+        "icons": {
+          "$ref": "#/$defs/icons"
+        },
+        "layout": {
+          "$ref": "#/$defs/layout"
+        },
+        "motion": {
+          "$ref": "#/$defs/motion"
+        },
+        "shape": {
+          "$ref": "#/$defs/shape"
+        },
+        "space": {
+          "$ref": "#/$defs/space"
+        },
+        "surface": {
+          "$ref": "#/$defs/surface"
+        },
+        "typography": {
+          "$ref": "#/$defs/typography"
+        },
+        "voice": {
+          "$ref": "#/$defs/voice"
+        }
+      },
+      "type": "object"
+    },
+    "voice": {
+      "additionalProperties": false,
+      "description": "Voice data: tone words, a lexicon (at most 200 entries) and guidelines.",
+      "properties": {
+        "guidelines": {
+          "items": {
+            "maxLength": 200,
+            "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f؜‎‏‪-‮⁦-⁩]*$",
+            "type": "string"
+          },
+          "maxItems": 12,
+          "type": "array"
+        },
+        "lexicon": {
+          "additionalProperties": {
+            "maxLength": 64,
+            "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f؜‎‏‪-‮⁦-⁩]*$",
+            "type": "string"
+          },
+          "description": "At most 200 entries; keys match ^[a-z][a-z0-9-]{0,47}$ and are never __proto__, constructor or prototype.",
+          "type": "object"
+        },
+        "tone": {
+          "description": "Unique items.",
+          "items": {
+            "maxLength": 32,
+            "pattern": "^[a-z][a-z-]{0,31}$",
+            "type": "string"
+          },
+          "maxItems": 8,
+          "type": "array"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "$id": "https://texuli.example/spec/schemas/design-system.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A Texuli design system (ADR-021, formatVersion 1): one closed JSON document a company or an agent writes once and every Texuli surface follows. Data only: colors are hex or numeric oklch, lengths are numbers in px, fonts and assets are same-origin relative paths or capped data URLs, and nothing reaches CSS that the token contract’s css-safe checks would refuse. Generated from @texuli/spec/design-system’s vocabulary by scripts/design-system-schema.ts; validateDesignSystem enforces the rules the dialect cannot express.",
+  "properties": {
+    "accessibility": {
+      "$ref": "#/$defs/accessibility"
+    },
+    "assets": {
+      "$ref": "#/$defs/assets"
+    },
+    "color": {
+      "$ref": "#/$defs/color"
+    },
+    "components": {
+      "$ref": "#/$defs/components"
+    },
+    "description": {
+      "maxLength": 500,
+      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f؜‎‏‪-‮⁦-⁩]*$",
+      "type": "string"
+    },
+    "elevation": {
+      "$ref": "#/$defs/elevation"
+    },
+    "extends": {
+      "description": "texuli:<theme> or an exact id@x.y.z; never a range, a URL or a path. Cycles and chains deeper than 4 are refused.",
+      "pattern": "^(?:texuli:[a-z][a-z0-9]*(?:-[a-z0-9]+)*|[a-z][a-z0-9]*(?:-[a-z0-9]+)*@(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?)$",
+      "type": "string"
+    },
+    "format": {
+      "const": "texuli/design-system"
+    },
+    "formatVersion": {
+      "const": 1
+    },
+    "icons": {
+      "$ref": "#/$defs/icons"
+    },
+    "id": {
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+      "type": "string"
+    },
+    "layout": {
+      "$ref": "#/$defs/layout"
+    },
+    "license": {
+      "maxLength": 80,
+      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f؜‎‏‪-‮⁦-⁩]*$",
+      "type": "string"
+    },
+    "motion": {
+      "$ref": "#/$defs/motion"
+    },
+    "name": {
+      "maxLength": 80,
+      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f؜‎‏‪-‮⁦-⁩]*$",
+      "type": "string"
+    },
+    "owner": {
+      "maxLength": 80,
+      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f؜‎‏‪-‮⁦-⁩]*$",
+      "type": "string"
+    },
+    "shape": {
+      "$ref": "#/$defs/shape"
+    },
+    "space": {
+      "$ref": "#/$defs/space"
+    },
+    "surface": {
+      "$ref": "#/$defs/surface"
+    },
+    "tags": {
+      "description": "Unique items.",
+      "items": {
+        "maxLength": 32,
+        "pattern": "^[a-z0-9][a-z0-9-]{0,31}$",
+        "type": "string"
+      },
+      "maxItems": 16,
+      "type": "array"
+    },
+    "typography": {
+      "$ref": "#/$defs/typography"
+    },
+    "variants": {
+      "additionalProperties": {
+        "$ref": "#/$defs/variant"
+      },
+      "description": "At most 16 entries; keys match ^[a-z][a-z0-9-]{0,47}$ and are never __proto__, constructor or prototype.",
+      "type": "object"
+    },
+    "version": {
+      "maxLength": 64,
+      "pattern": "^(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$",
+      "type": "string"
+    },
+    "voice": {
+      "$ref": "#/$defs/voice"
+    }
+  },
+  "required": ["format", "formatVersion", "id", "version", "name"],
+  "title": "DesignSystem",
+  "type": "object"
+}

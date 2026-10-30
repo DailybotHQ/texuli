@@ -1,0 +1,433 @@
+{
+  "format": "texuli/design-system",
+  "formatVersion": 1,
+  "id": "acme",
+  "version": "2.1.0",
+  "name": "Acme",
+  "description": "The fictional Acme brand: every section of the design-system document.",
+  "owner": "Acme Design",
+  "license": "MIT",
+  "tags": ["fintech", "example"],
+  "extends": "texuli:violet",
+  "color": {
+    "brand": {
+      "seed": "#4f46e5",
+      "secondary": "#0ea5e9",
+      "accent": "#f59e0b",
+      "neutral": "slate"
+    },
+    "pin": {
+      "primary": "#4f46e5",
+      "destructive": "#d92d20",
+      "success": "#079455"
+    },
+    "roles": {
+      "light": {
+        "background": "#ffffff",
+        "foreground": "#ffffff",
+        "surface": "#ffffff",
+        "surfaceForeground": "#111827",
+        "elevated": "#ffffff",
+        "elevatedForeground": "#111827",
+        "muted": "#f3f4f6",
+        "mutedForeground": "#4b5563",
+        "subtle": "#ffffff",
+        "subtleForeground": "#111827",
+        "border": "#e5e7eb",
+        "borderStrong": "#9ca3af",
+        "input": "#ffffff",
+        "ring": "#4f46e5",
+        "primary": "#4f46e5",
+        "primaryForeground": "#ffffff",
+        "primarySoft": "#ffffff",
+        "primarySoftForeground": "#111827",
+        "secondary": "#ffffff",
+        "secondaryForeground": "#111827",
+        "accent": "#ffffff",
+        "accentForeground": "#111827",
+        "destructive": "#d92d20",
+        "destructiveForeground": "#ffffff",
+        "destructiveSoft": "#ffffff",
+        "destructiveSoftForeground": "#111827",
+        "success": "#079455",
+        "successForeground": "#ffffff",
+        "successSoft": "#ffffff",
+        "successSoftForeground": "#111827",
+        "warning": "#b54708",
+        "warningForeground": "#ffffff",
+        "warningSoft": "#ffffff",
+        "warningSoftForeground": "#111827",
+        "info": "#0e7490",
+        "infoForeground": "#ffffff",
+        "infoSoft": "#ffffff",
+        "infoSoftForeground": "#111827",
+        "sidebar": "#ffffff",
+        "sidebarForeground": "#111827",
+        "sidebarBorder": "#ffffff",
+        "sidebarPrimary": "#4f46e5",
+        "overlay": "#11182766",
+        "scrim": "#11182799",
+        "shadow": "#1118271a",
+        "link": "#4338ca",
+        "linkVisited": "#ffffff",
+        "selection": "#ffffff",
+        "selectionForeground": "#111827",
+        "canvas": "#f9fafb"
+      },
+      "dark": {
+        "background": "#111827",
+        "foreground": "#111827",
+        "surface": "#111827",
+        "surfaceForeground": "#f9fafb",
+        "elevated": "#111827",
+        "elevatedForeground": "#f9fafb",
+        "muted": "#111827",
+        "mutedForeground": "#f9fafb",
+        "subtle": "#111827",
+        "subtleForeground": "#f9fafb",
+        "border": "#374151",
+        "borderStrong": "#6b7280",
+        "input": "#111827",
+        "ring": "oklch(0.72 0.16 277)",
+        "primary": "oklch(0.72 0.16 277)",
+        "primaryForeground": "#111827",
+        "primarySoft": "#111827",
+        "primarySoftForeground": "#f9fafb",
+        "secondary": "#111827",
+        "secondaryForeground": "#f9fafb",
+        "accent": "#111827",
+        "accentForeground": "#f9fafb",
+        "destructive": "#111827",
+        "destructiveForeground": "#f9fafb",
+        "destructiveSoft": "#111827",
+        "destructiveSoftForeground": "#f9fafb",
+        "success": "#111827",
+        "successForeground": "#f9fafb",
+        "successSoft": "#111827",
+        "successSoftForeground": "#f9fafb",
+        "warning": "#111827",
+        "warningForeground": "#f9fafb",
+        "warningSoft": "#111827",
+        "warningSoftForeground": "#f9fafb",
+        "info": "#111827",
+        "infoForeground": "#f9fafb",
+        "infoSoft": "#111827",
+        "infoSoftForeground": "#f9fafb",
+        "sidebar": "#111827",
+        "sidebarForeground": "#f9fafb",
+        "sidebarBorder": "#111827",
+        "sidebarPrimary": "#111827",
+        "overlay": "#00000099",
+        "scrim": "#000000b3",
+        "shadow": "#00000066",
+        "link": "#a5b4fc",
+        "linkVisited": "#111827",
+        "selection": "#111827",
+        "selectionForeground": "#f9fafb",
+        "canvas": "#111827"
+      }
+    },
+    "modes": ["light", "dark"],
+    "dataViz": {
+      "light": {
+        "categorical": [
+          "#4f46e5",
+          "#0ea5e9",
+          "#f59e0b",
+          "#10b981",
+          "#ef4444",
+          "#8b5cf6",
+          "#ec4899",
+          "#64748b"
+        ],
+        "sequential": [
+          "#eef2ff",
+          "#e0e7ff",
+          "#c7d2fe",
+          "#a5b4fc",
+          "#818cf8",
+          "#6366f1",
+          "#4f46e5",
+          "#4338ca",
+          "#3730a3"
+        ],
+        "diverging": [
+          "#b91c1c",
+          "#dc2626",
+          "#f87171",
+          "#fecaca",
+          "#f5f5f5",
+          "#bfdbfe",
+          "#60a5fa",
+          "#2563eb",
+          "#1d4ed8"
+        ],
+        "grid": "#e5e7eb",
+        "axis": "#6b7280"
+      },
+      "dark": {
+        "categorical": [
+          "#4f46e5",
+          "#0ea5e9",
+          "#f59e0b",
+          "#10b981",
+          "#ef4444",
+          "#8b5cf6",
+          "#ec4899",
+          "#64748b"
+        ],
+        "sequential": [
+          "#eef2ff",
+          "#e0e7ff",
+          "#c7d2fe",
+          "#a5b4fc",
+          "#818cf8",
+          "#6366f1",
+          "#4f46e5",
+          "#4338ca",
+          "#3730a3"
+        ],
+        "diverging": [
+          "#b91c1c",
+          "#dc2626",
+          "#f87171",
+          "#fecaca",
+          "#f5f5f5",
+          "#bfdbfe",
+          "#60a5fa",
+          "#2563eb",
+          "#1d4ed8"
+        ],
+        "grid": "#374151",
+        "axis": "#9ca3af"
+      },
+      "cvdSafe": true
+    },
+    "status": {
+      "success": "#079455",
+      "warning": "#b54708",
+      "danger": "#d92d20",
+      "info": "#0e7490",
+      "neutral": "#64748b"
+    }
+  },
+  "typography": {
+    "families": {
+      "sans": {
+        "stack": ["Acme Sans", "system-ui", "sans-serif"],
+        "files": [
+          {
+            "src": "fonts/acme-sans.woff2",
+            "weight": "100 900",
+            "style": "normal",
+            "display": "swap",
+            "preload": true
+          }
+        ]
+      },
+      "heading": {
+        "stack": ["Acme Display", "Acme Sans", "system-ui"],
+        "files": [
+          {
+            "src": "fonts/acme-display.woff2",
+            "weight": "100 900",
+            "style": "normal",
+            "display": "swap",
+            "preload": true
+          }
+        ]
+      },
+      "mono": {
+        "stack": ["Acme Mono", "ui-monospace", "monospace"]
+      },
+      "serif": {
+        "stack": ["Georgia", "serif"]
+      }
+    },
+    "scale": {
+      "base": 16,
+      "ratio": 1.2
+    },
+    "roles": {
+      "display": {
+        "family": "heading",
+        "size": 48,
+        "weight": 700,
+        "line": 1.1,
+        "tracking": -0.02
+      },
+      "title": {
+        "family": "heading",
+        "size": 30,
+        "weight": 650,
+        "line": 1.2
+      },
+      "heading": {
+        "family": "heading",
+        "size": 20,
+        "weight": 600,
+        "line": 1.3
+      },
+      "body": {
+        "family": "sans",
+        "size": 16,
+        "weight": 400,
+        "line": 1.5
+      },
+      "label": {
+        "family": "sans",
+        "size": 14,
+        "weight": 500,
+        "line": 1.4
+      },
+      "caption": {
+        "family": "sans",
+        "size": 12,
+        "weight": 400,
+        "line": 1.4,
+        "tracking": 0.01
+      },
+      "code": {
+        "family": "mono",
+        "size": 14,
+        "weight": 400,
+        "line": 1.6
+      }
+    }
+  },
+  "shape": {
+    "radius": 8,
+    "radiusScale": 1,
+    "borderWidth": 1
+  },
+  "space": {
+    "base": 4,
+    "density": 1
+  },
+  "elevation": {
+    "style": "soft"
+  },
+  "surface": {
+    "style": "glass",
+    "glass": {
+      "alpha": 0.72,
+      "blur": 16
+    }
+  },
+  "motion": {
+    "personality": "standard",
+    "durations": {
+      "fast": 120,
+      "base": 200,
+      "slow": 320
+    },
+    "easing": "emphasized"
+  },
+  "layout": {
+    "contentMax": 1120,
+    "wideMax": 1440,
+    "breakpoints": {
+      "sm": 640,
+      "md": 960,
+      "lg": 1280
+    },
+    "grid": {
+      "columns": {
+        "base": 4,
+        "sm": 8,
+        "md": 12,
+        "lg": 12
+      },
+      "gutter": {
+        "base": "space-4",
+        "sm": "space-4",
+        "md": "space-6",
+        "lg": "space-8"
+      }
+    }
+  },
+  "icons": {
+    "style": "outline",
+    "stroke": 1.75,
+    "size": {
+      "sm": 16,
+      "md": 20,
+      "lg": 24
+    }
+  },
+  "components": {
+    "button": {
+      "radius": "full",
+      "height-md": "control-md",
+      "font-weight": "label",
+      "elevation": 1,
+      "disabled-opacity": "disabled",
+      "defaults": {
+        "variant": "default",
+        "size": "md"
+      }
+    },
+    "icon-button": {
+      "defaults": {
+        "variant": "ghost",
+        "size": "icon"
+      }
+    },
+    "card": {
+      "radius": "xl",
+      "background": "surface",
+      "border-width": "thin",
+      "defaults": {
+        "variant": "flat"
+      }
+    },
+    "icon": {
+      "stroke-width": 1.5
+    }
+  },
+  "assets": {
+    "logo": {
+      "light": "assets/logo.svg",
+      "dark": "assets/logo-dark.svg",
+      "mark": "./assets/mark.svg",
+      "wordmark": "/assets/wordmark.png"
+    },
+    "favicon": "assets/favicon.ico"
+  },
+  "voice": {
+    "tone": ["clear", "warm"],
+    "lexicon": {
+      "workspace": "team space",
+      "board": "canvas"
+    },
+    "guidelines": ["Write in the second person.", "Prefer short sentences."]
+  },
+  "accessibility": {
+    "contrast": "AA",
+    "targetMin": 24,
+    "focus": "ring",
+    "focusWidth": 2,
+    "focusOffset": 2
+  },
+  "variants": {
+    "high-contrast": {
+      "accessibility": {
+        "contrast": "AAA",
+        "focus": "outline",
+        "focusWidth": 3
+      }
+    },
+    "compact": {
+      "space": {
+        "density": 0.8
+      }
+    },
+    "holiday": {
+      "color": {
+        "brand": {
+          "seed": "#b91c1c"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "description": "A number where the vocabulary wants a string.",
+  "expect": [["invalid-type", "$.name"]],
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "acme",
+    "version": "1.0.0",
+    "name": 42,
+    "color": {
+      "brand": {
+        "seed": "#4f46e5"
+      }
+    }
+  }
+}

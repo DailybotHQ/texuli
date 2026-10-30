@@ -54,6 +54,12 @@
       "specDigest": "497df4d3b0c67d53483163ebd9bd73733b52caf5f8e2966478f1cf860e6f9d9d",
       "change": "minor",
       "summary": "Additive: catalog projection refresh (PLAN_011 T-gaps-87-95: button pending note and the gap props that reach manifests; T-gaps-96-98: cartesian xKind and locale); stamp-only migration 0.8.0→0.9.0"
+    },
+    {
+      "specVersion": "0.10.0",
+      "specDigest": "4831b17eba9c64ff5e0ba80281502aac1af69a86ee8f89aa6c301f4057680530",
+      "change": "minor",
+      "summary": "Additive (PLAN_011 T-ds-spec, ADR-021): the design-system document schema (schemas/design-system.schema.json, format texuli/design-system, formatVersion 1; generated from the @texuli/spec/design-system vocabulary, with TypeScript and Kotlin types), its fixtures under fixtures/design-systems/, and $defs.designSystemReference in the blueprint schema (not yet carried by the envelope); stamp-only migration 0.9.0→0.10.0"
     }
   ]
 }

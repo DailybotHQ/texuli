@@ -29,7 +29,7 @@ const doc = (golden.tree as { props: { doc: Record<string, unknown> } }).props.d
 describe('spec 0.7.0: node keys', () => {
   it('accepts unique well-formed keys and refuses repeats and malformed keys', () => {
     // Spec 0.7.0 introduced keys; later minors keep them.
-    expect(['0.7.0', '0.8.0', '0.9.0']).toContain(SPEC_VERSION);
+    expect(['0.7.0', '0.8.0', '0.9.0', '0.10.0']).toContain(SPEC_VERSION);
     const leaf = (key: string) => ({
       key,
       id: 'blocks-text',

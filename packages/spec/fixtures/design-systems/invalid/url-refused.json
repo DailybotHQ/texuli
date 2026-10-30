@@ -1,0 +1,28 @@
+{
+  "description": "A remote font host: fonts and assets are same-origin or inline only.",
+  "expect": [["url-refused", "$.typography.families.sans.files[0].src"]],
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "acme",
+    "version": "1.0.0",
+    "name": "Acme",
+    "color": {
+      "brand": {
+        "seed": "#4f46e5"
+      }
+    },
+    "typography": {
+      "families": {
+        "sans": {
+          "stack": ["Acme Sans"],
+          "files": [
+            {
+              "src": "https://fonts.example/acme.woff2"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

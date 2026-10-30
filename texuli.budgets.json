@@ -1024,6 +1024,10 @@
       "gzip": 3136,
       "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the data-source binding shapes and their check against host descriptors (spec 0.8.0, ADR-015). Measured 2,964 B."
     },
+    "@texuli/spec/design-system": {
+      "gzip": 7360,
+      "note": "PLAN_011 T-ds-spec (lead approval, 2026-10-30): new row at measured + 4% for the design-system document contract (ADR-021, spec 0.10.0): validateDesignSystem with JSON paths, the patch check and pure merge, migrate and the blueprint reference check, over the closed vocabulary table. Over the 4 KB architecture target: the table alone is about 4,029 B gzip (364 component token keys for 67 components, the defaults lists and the 50 semantic roles), and moving patch and migrate to a /patch subpath would save only about 470 B. Measured 7,072 B."
+    },
     "@texuli/charts/cartesian": {
       "gzip": 14656,
       "cssGzip": 832,
