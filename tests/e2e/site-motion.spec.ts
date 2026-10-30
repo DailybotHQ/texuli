@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test';
+import { MOTION_ADOPTERS } from '../../apps/website/src/components/motion-site/adopters.ts';
 import { axeViolations, polishProblems, serveDist, settle } from './support/site.ts';
 
 /*
@@ -356,7 +357,7 @@ test('every preset, every moving component, the spring lab and the deck levels',
   await gallery.getByRole('button', { name: 'When does the beta open?' }).click();
   await expect(gallery.getByText('Next week, for every fictional pilot team.')).toBeVisible();
   await expect.poll(() => animations(page), { timeout: 15_000 }).toBeGreaterThan(before);
-  await expect(page.locator('[data-motion-adopters] tbody tr')).toHaveCount(30);
+  await expect(page.locator('[data-motion-adopters] tbody tr')).toHaveCount(MOTION_ADOPTERS.length);
 
   // The spring lab: the solver answers the sliders, and Play runs the spring.
   await hydrated(page, '[data-motion-spring-lab]');
