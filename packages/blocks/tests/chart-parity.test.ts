@@ -170,18 +170,24 @@ describe('cartesian and matrix extras', () => {
   ];
   const withProps = (kind: string, props: unknown) =>
     chartBlock(kind, { ...FIXTURES[kind as ChartKind], props });
-  it('accepts annotations, renderer, interactive and fullDomain on cartesian kinds, and 2 related cases', async () => {
-    // accepts annotations, renderer, interactive and fullDomain on cartesian kinds
+  it('accepts annotations, renderer, interactive, fullDomain, xKind and locale on cartesian kinds, and 2 related cases', async () => {
+    // accepts annotations, renderer, interactive, fullDomain, xKind and locale on cartesian kinds
     await (async () => {
       const block = withProps('line', {
         annotations,
         renderer: 'svg',
         interactive: false,
         fullDomain: [0, 10],
+        xKind: 'category',
+        locale: 'en-US',
       });
       const parsed = safeParseBlock(block);
       expect(parsed.issues).toEqual([]);
-      expect(parsed.data).toMatchObject({ props: { renderer: 'svg', interactive: false } });
+      expect(parsed.data).toMatchObject({
+        props: { renderer: 'svg', interactive: false, xKind: 'category', locale: 'en-US' },
+      });
+      // G97: an unknown x-axis kind is refused like any closed-set value.
+      expect(safeParseBlock(withProps('line', { xKind: 'calendar' })).issues).not.toEqual([]);
       render(DataBlockView, { props: { block } });
       expect(await screen.findAllByText('Fictional line')).not.toHaveLength(0);
       expect(document.querySelector('.tx-block-chart-error')).toBeNull();

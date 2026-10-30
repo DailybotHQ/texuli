@@ -29,6 +29,8 @@ export const CONTENT_PROP_NAMES = {
     'fullDomain',
     'visibleDomain',
     'annotations',
+    'xKind',
+    'locale',
   ],
   'charts-bar': [
     'title',
@@ -41,6 +43,8 @@ export const CONTENT_PROP_NAMES = {
     'fullDomain',
     'visibleDomain',
     'annotations',
+    'xKind',
+    'locale',
   ],
   'charts-cartesian': [
     'kind',
@@ -54,6 +58,8 @@ export const CONTENT_PROP_NAMES = {
     'fullDomain',
     'visibleDomain',
     'annotations',
+    'xKind',
+    'locale',
   ],
   'charts-combo': [
     'title',
@@ -66,6 +72,8 @@ export const CONTENT_PROP_NAMES = {
     'fullDomain',
     'visibleDomain',
     'annotations',
+    'xKind',
+    'locale',
   ],
   'charts-line': [
     'title',
@@ -78,6 +86,8 @@ export const CONTENT_PROP_NAMES = {
     'fullDomain',
     'visibleDomain',
     'annotations',
+    'xKind',
+    'locale',
   ],
   'charts-stacked-bar': [
     'title',
@@ -90,6 +100,8 @@ export const CONTENT_PROP_NAMES = {
     'fullDomain',
     'visibleDomain',
     'annotations',
+    'xKind',
+    'locale',
   ],
   'charts-bullet': ['label', 'description', 'value', 'max', 'target', 'ranges', 'format', 'labels'],
   'charts-gauge': [
