@@ -24,7 +24,7 @@
     "kind": "request",
     "label": "Revenue dashboard requested in chat"
   },
-  "spec": "0.8.0",
+  "spec": "0.9.0",
   "state": {
     "region": {
       "type": "enum",

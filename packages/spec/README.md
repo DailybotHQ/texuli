@@ -107,7 +107,7 @@ import { type Schema, type SpecCatalog, validateBlueprint } from '@texuli/spec';
 import { migrateBlueprint } from '@texuli/spec/migrate';
 import { validateWorkflowGraph } from '@texuli/spec/workflow';
 
-const migrated = migrateBlueprint(blueprint); // 0.2.0 → … → 0.7.0 → 0.8.0; never throws
+const migrated = migrateBlueprint(blueprint); // 0.2.0 → … → 0.8.0 → 0.9.0; never throws
 const result = validateBlueprint(migrated.blueprint, {
   blueprintSchema: blueprintSchemaJson as Schema,
   catalog: componentsJson as SpecCatalog,
@@ -274,8 +274,13 @@ written for (`spec`; omitted means 0.2.0). `migrateBlueprint`
 (`@texuli/spec/migrate`) brings an
 envelope up to the current spec with pure, per-version steps
 (`src/migrations/`: `0.2.0 → 0.3.0`, `0.3.0 → 0.4.0`, `0.4.0 → 0.5.0`,
-`0.5.0 → 0.6.0`, `0.6.0 → 0.7.0` and `0.7.0 → 0.8.0`, each of which only
-stamps `spec`); a compatible version range is planned, not built.
+`0.5.0 → 0.6.0`, `0.6.0 → 0.7.0`, `0.7.0 → 0.8.0` and `0.8.0 → 0.9.0`,
+each of which only stamps `spec`); a compatible version range is planned,
+not built. The workspace is at spec `0.9.0` (digest
+`2e8a5c134c52af5b3d89a3f4c3291e3979760b06f21eba9f34d22ca57f876906`), an
+additive catalog projection refresh for the 0.9.0 release (PLAN_011
+T-gaps-87-95); it is in development on the release branch and ships only
+with `@texuli/spec@0.9.0`, which is not on npm yet.
 `@texuli/spec@0.8.0` carries spec `0.8.0` (digest
 `f6b6388280d247eb9c3106a925111f35b90d1ec3b59c23652542f06a9f103daf`), which
 adds data-source bindings, forms, canvases, dashboards and spreadsheets;
