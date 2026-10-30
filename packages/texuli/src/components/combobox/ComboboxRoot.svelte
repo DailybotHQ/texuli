@@ -7,6 +7,7 @@ import type { Snippet } from 'svelte';
 import { type ClassValue } from '../../internal/cx.ts';
 import { type ComboboxSize, type ComboboxVariant, comboboxRootClass } from './variants.ts';
 import './combobox.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = PrimitiveRootProps & {
   children?: Snippet;
@@ -15,14 +16,15 @@ type Props = PrimitiveRootProps & {
   class?: ClassValue;
 };
 
+const txDefaults = designDefaults('combobox');
 let {
   children,
   multiple = false,
   open = $bindable(false),
   value = $bindable(),
   inputValue = $bindable(),
-  size = 'md',
-  variant = 'outline',
+  size = txDefaults().size ?? 'md',
+  variant = txDefaults().variant ?? 'outline',
   class: className,
   ...rest
 }: Props = $props();

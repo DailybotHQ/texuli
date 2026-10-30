@@ -7,7 +7,9 @@ import { cx } from '../../internal/cx.ts';
 import type { TreeViewProps } from './props.ts';
 import { type TreeDensity, type TreeVariant, treeViewClass } from './variants.ts';
 import './tree.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
+const txDefaults = designDefaults('tree');
 let {
   items,
   expanded = $bindable<string[]>([]),
@@ -23,7 +25,7 @@ let {
   onExpandedChange,
   onSelectedChange,
   label: labelProp,
-  variant = 'default',
+  variant = txDefaults().variant ?? 'default',
   density = 'default',
   item,
   class: className,

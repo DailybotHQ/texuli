@@ -3,6 +3,7 @@ import { Splitter } from '@texuli/primitives/splitter';
 import type { HTMLAttributes } from 'svelte/elements';
 import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 import { type ResizableHandleSize, resizableHandleClass } from './variants.ts';
 
 /**
@@ -23,11 +24,12 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'class' | 'role'>
   ref?: HTMLElement | null;
 };
 
+const txDefaults = designDefaults('resizable-handle');
 let {
   label: labelProp,
   disabled = false,
   withGrip = true,
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   class: className,
   ref = $bindable(null),
   ...rest

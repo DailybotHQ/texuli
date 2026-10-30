@@ -23,6 +23,7 @@ import {
   dialogTitleClass,
 } from './variants.ts';
 import './dialog.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type TriggerSnippet = Snippet<[{ props: Record<string, unknown> }]>;
 
@@ -80,11 +81,12 @@ type OwnProps = {
 /** Extra attributes (`data-*`, `aria-*`, `id`, handlers…) land on the dialog content element. */
 type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'role'>;
 
+const txDefaults = designDefaults('dialog');
 let {
   open = $bindable(false),
   title,
   description,
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   trigger,
   footer,
   children,

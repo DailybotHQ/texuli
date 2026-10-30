@@ -9,6 +9,7 @@ import {
   progressClass,
 } from './variants.ts';
 import './feedback.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** Current value; `null` is indeterminate. */
@@ -33,6 +34,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
 const CIRCLE_R = 42;
 const CIRCUMFERENCE = 2 * Math.PI * CIRCLE_R;
 
+const txDefaults = designDefaults('progress');
 let {
   value = 0,
   max = 100,
@@ -41,7 +43,7 @@ let {
   ariaLabel,
   showValue = false,
   tone = 'primary',
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   shape = 'linear',
   loadingLabel: loadingLabelProp,
   class: className,

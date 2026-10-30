@@ -80,6 +80,11 @@
       "svelte": "./src/components/date/index.ts",
       "default": "./src/components/date/index.ts"
     },
+    "./defaults": {
+      "types": "./src/defaults/index.ts",
+      "svelte": "./src/defaults/index.ts",
+      "default": "./src/defaults/index.ts"
+    },
     "./dialog": {
       "types": "./src/components/dialog/index.ts",
       "svelte": "./src/components/dialog/index.ts",

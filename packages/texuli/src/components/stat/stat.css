@@ -1,24 +1,31 @@
 /**
  * Stat and KPI — metric tiles on the token contract.
  * @layer tx.components so consumer utilities in later layers can override.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
+ * Kept literals: the -0.025em value tracking, the 0.875rem delta icon, the
+ * 1.75rem sparkline minimum, the skeleton bar sizes, the 0.55 pulse opacity
+ * and the 12rem KPI track are tuned geometry.
  */
 @layer tx.components {
   .tx-stat {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--tx-stat-gap, var(--tx-space-2));
     min-inline-size: 0;
-    padding-inline: 1.25rem;
-    padding-block: 1.25rem;
-    border-radius: var(--tx-radius-xl, 0.75rem);
-    border: 1px solid var(--tx-border, currentColor);
+    padding-inline: var(--tx-stat-padding, var(--tx-space-5));
+    padding-block: var(--tx-stat-padding, var(--tx-space-5));
+    border-radius: var(--tx-stat-radius, var(--tx-shape-radius-xl));
+    border: var(--tx-stat-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-border, currentColor);
     background-color: var(--tx-surface, Canvas);
     color: var(--tx-surface-foreground, CanvasText);
-    box-shadow: var(--tx-shadow-soft, 0 1px 2px color-mix(in srgb, CanvasText 8%, transparent));
+    box-shadow: var(--tx-stat-elevation, var(--tx-elevation-1));
   }
 
   .tx-stat--flat {
-    box-shadow: none;
+    box-shadow: var(--tx-elevation-0);
   }
 
   .tx-stat--interactive {
@@ -38,13 +45,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.5rem;
+    gap: var(--tx-space-2);
   }
 
   .tx-stat__label {
     margin: 0;
-    font-size: var(--tx-font-size-sm, 0.875rem);
-    font-weight: var(--tx-font-weight-medium, 500);
+    font-size: var(--tx-stat-label-font-size, var(--tx-type-label-size));
+    font-weight: var(--tx-stat-label-font-weight, var(--tx-type-label-weight));
     color: var(--tx-muted-foreground, GrayText);
   }
 
@@ -66,23 +73,23 @@
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    inline-size: 2rem;
-    block-size: 2rem;
-    border-radius: var(--tx-radius-md, 0.375rem);
+    inline-size: var(--tx-stat-icon-size, var(--tx-size-control-sm));
+    block-size: var(--tx-stat-icon-size, var(--tx-size-control-sm));
+    border-radius: var(--tx-stat-icon-radius, var(--tx-shape-radius-md));
     background-color: var(--tx-muted, Canvas);
     color: var(--tx-muted-foreground, GrayText);
   }
 
   .tx-stat__icon :where(svg) {
-    inline-size: 1rem;
-    block-size: 1rem;
+    inline-size: var(--tx-size-icon-sm);
+    block-size: var(--tx-size-icon-sm);
   }
 
   .tx-stat__value {
     margin: 0;
     font-family: var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif));
-    font-size: var(--tx-font-size-2xl, 1.5rem);
-    font-weight: var(--tx-font-weight-heading, 600);
+    font-size: var(--tx-stat-value-font-size, var(--tx-type-title-size));
+    font-weight: var(--tx-stat-value-font-weight, var(--tx-type-heading-weight));
     letter-spacing: -0.025em;
     font-variant-numeric: tabular-nums;
     color: var(--tx-foreground, CanvasText);
@@ -96,14 +103,14 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.25rem 0.5rem;
-    font-size: var(--tx-font-size-xs, 0.75rem);
+    gap: var(--tx-space-1) var(--tx-space-2);
+    font-size: var(--tx-type-caption-size);
   }
 
   .tx-stat__delta {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: var(--tx-space-1);
     font-weight: var(--tx-font-weight-medium, 500);
     font-variant-numeric: tabular-nums;
   }
@@ -133,13 +140,13 @@
 
   .tx-stat__spark {
     display: block;
-    margin-block-start: 0.25rem;
+    margin-block-start: var(--tx-space-1);
     inline-size: 100%;
     min-block-size: 1.75rem;
   }
 
   .tx-stat__skeleton {
-    border-radius: var(--tx-radius-md, 0.375rem);
+    border-radius: var(--tx-stat-icon-radius, var(--tx-shape-radius-md));
     background-color: var(--tx-muted, Canvas);
   }
 
@@ -171,13 +178,13 @@
 
   .tx-kpi-row {
     display: grid;
-    gap: 0.75rem;
+    gap: var(--tx-space-3);
     grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--tx-kpi-row-min, 12rem)), 1fr));
   }
 
   @media (min-width: 40rem) {
     .tx-kpi-row {
-      gap: 1rem;
+      gap: var(--tx-space-4);
     }
   }
 

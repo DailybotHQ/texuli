@@ -4,6 +4,7 @@ import type { ComponentProps, Snippet } from 'svelte';
 import { type ClassValue } from '../../internal/cx.ts';
 import { type MenuSize, type MenuVariant, menuTriggerClass } from './variants.ts';
 import './menus.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = ComponentProps<typeof MenubarPrimitive.Trigger> & {
   children?: Snippet;
@@ -12,11 +13,12 @@ type Props = ComponentProps<typeof MenubarPrimitive.Trigger> & {
   variant?: MenuVariant;
 };
 
+const txDefaults = designDefaults('menu');
 let {
   children,
   class: className,
-  size = 'md',
-  variant = 'default',
+  size = txDefaults().size ?? 'md',
+  variant = txDefaults().variant ?? 'default',
   ref = $bindable(null),
   ...rest
 }: Props = $props();

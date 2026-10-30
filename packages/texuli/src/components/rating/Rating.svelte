@@ -16,6 +16,7 @@ import {
 } from './rating.ts';
 import { type RatingSize, type RatingTone, ratingClass } from './variants.ts';
 import './rating.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 /**
  * Star rating. As an input it is a radio group (APG): one Tab stop, arrow
@@ -51,6 +52,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   labels?: Partial<RatingLabels>;
 };
 
+const txDefaults = designDefaults('rating');
 let {
   value = $bindable(0),
   onValueChange,
@@ -62,7 +64,7 @@ let {
   disabled = false,
   required = false,
   name,
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   tone = 'warning',
   showValue = false,
   hideLabel = false,

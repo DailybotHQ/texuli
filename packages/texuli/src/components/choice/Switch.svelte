@@ -5,6 +5,7 @@ import { joinIds, splitControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { type ChoiceSize, switchControlClass } from './variants.ts';
 import './choice.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = {
   checked?: boolean;
@@ -25,6 +26,7 @@ type Props = {
 
 const uid = $props.id();
 
+const txDefaults = designDefaults('choice');
 let {
   checked = $bindable(false),
   defaultChecked = false,
@@ -35,7 +37,7 @@ let {
   id = `tx-switch-${uid}`,
   label,
   description,
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   onCheckedChange,
   class: className,
   ref = $bindable(null),

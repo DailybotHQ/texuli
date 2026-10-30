@@ -6,6 +6,7 @@ import { type ClassValue, cx } from '../../internal/cx.ts';
 import { getFieldLabelContext } from '../field/context.ts';
 import { type DateSize, dateFieldClass } from './variants.ts';
 import './date.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 /**
  * A styled time field on the owned TimeField: hour and minute spinbuttons
@@ -52,6 +53,7 @@ type Props = OwnProps &
     ref?: HTMLElement | null;
   };
 
+const txDefaults = designDefaults('date');
 let {
   label,
   hideLabel = false,
@@ -66,7 +68,7 @@ let {
   disabled = false,
   required = false,
   name,
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   labels,
   class: className,
   ref = $bindable(null),

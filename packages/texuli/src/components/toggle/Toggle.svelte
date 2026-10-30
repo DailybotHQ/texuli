@@ -6,6 +6,7 @@ import { type ClassValue, cx } from '../../internal/cx.ts';
 import type { RefProp } from '../../internal/ref.ts';
 import { type ToggleSize, type ToggleVariant, toggleClass } from './variants.ts';
 import './toggle.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = {
   pressed?: boolean;
@@ -25,13 +26,14 @@ type Props = {
   'disabled' | 'class' | 'children' | 'id' | 'type' | 'aria-pressed' | 'value'
 >;
 
+const txDefaults = designDefaults('toggle');
 let {
   pressed = $bindable(undefined),
   defaultPressed = false,
   onPressedChange,
   disabled = false,
-  variant = 'default',
-  size = 'md',
+  variant = txDefaults().variant ?? 'default',
+  size = txDefaults().size ?? 'md',
   class: className,
   children,
   id,

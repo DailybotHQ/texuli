@@ -6,6 +6,7 @@ import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue } from '../../internal/cx.ts';
 import { type CommandSize, type CommandVariant, commandRootClass } from './variants.ts';
 import './command.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** The rendered root element (bindable). */
@@ -28,10 +29,11 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   class?: ClassValue;
 };
 
+const txDefaults = designDefaults('command');
 let {
   children,
-  size = 'md',
-  variant = 'outline',
+  size = txDefaults().size ?? 'md',
+  variant = txDefaults().variant ?? 'outline',
   label: labelProp,
   loading = false,
   loop = true,

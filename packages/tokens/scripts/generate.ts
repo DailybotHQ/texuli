@@ -2,18 +2,35 @@
  * Regenerate the token contract v2 surfaces:
  *   pnpm exec tsx packages/tokens/scripts/generate.ts          (write)
  *   pnpm exec tsx packages/tokens/scripts/generate.ts --check  (fail on drift)
+ * Outputs: the base.css token-defaults block, renames.json, docs/tokens-components.md and the Tokens section of
+ * every texuli component page (packages/texuli/docs/ui-<subpath>.md).
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { renderRenamesJson, renderTokenTablesDoc } from './render.ts';
+import {
+  componentDocPath,
+  componentDocSubpaths,
+  renderRenamesJson,
+  renderTokenTablesDoc,
+  replaceTokenDefaultsBlock,
+  withComponentTokensSection,
+} from './render.ts';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 const outputs: Record<string, string> = {
+  'src/css/base.css': replaceTokenDefaultsBlock(
+    readFileSync(join(ROOT, 'src/css/base.css'), 'utf8')
+  ),
   'src/renames/renames.json': renderRenamesJson(),
   'docs/tokens-components.md': renderTokenTablesDoc(),
 };
+// Each texuli component page carries a generated Tokens section.
+for (const subpath of componentDocSubpaths()) {
+  const path = `../texuli/docs/${componentDocPath(subpath)}`;
+  outputs[path] = withComponentTokensSection(readFileSync(join(ROOT, path), 'utf8'), subpath);
+}
 
 const check = process.argv.includes('--check');
 const drift: string[] = [];

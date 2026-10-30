@@ -9,6 +9,7 @@ import CalendarIcon from './CalendarIcon.svelte';
 import type { DateLabels } from './labels.ts';
 import { type DateSize, dateFieldClass } from './variants.ts';
 import './date.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 /**
  * A styled date picker: a segmented date field, a calendar button and a
@@ -59,6 +60,7 @@ type Props = OwnProps &
     ref?: HTMLElement | null;
   };
 
+const txDefaults = designDefaults('date');
 let {
   label,
   hideLabel = false,
@@ -78,7 +80,7 @@ let {
   disabled = false,
   required = false,
   name,
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   labels,
   class: className,
   controlClass,

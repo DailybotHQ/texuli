@@ -6,6 +6,7 @@ import { type ClassValue, cx } from '../../internal/cx.ts';
 import type { RefProp } from '../../internal/ref.ts';
 import { type NumberPinSize, numberFieldClass } from './variants.ts';
 import './number-pin.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'class' | 'value'> & {
   class?: ClassValue;
@@ -32,8 +33,9 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'class' | 'value'
   children?: Snippet;
 };
 
+const txDefaults = designDefaults('number-field');
 let {
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   class: className,
   value = $bindable(),
   ref = $bindable(null),

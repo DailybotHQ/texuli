@@ -13,6 +13,7 @@ import {
   trendWord,
 } from './trend.ts';
 import './stat.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
   /** The rendered root element (bindable). */
@@ -48,6 +49,7 @@ const statClass = variants({
   defaultVariants: { variant: 'elevated' },
 });
 
+const txDefaults = designDefaults('stat');
 let {
   label,
   value,
@@ -57,7 +59,7 @@ let {
   hint,
   icon,
   sparkline,
-  variant = 'elevated',
+  variant = txDefaults().variant ?? 'elevated',
   class: className,
   ref = $bindable(null),
   ...rest

@@ -12,12 +12,14 @@ import { cx } from '../../internal/cx.ts';
 import type { ScrollAreaProps } from './props.ts';
 import { type ScrollAreaSize, scrollAreaVariants } from './variants.ts';
 import './scroll-area.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
+const txDefaults = designDefaults('scroll-area');
 let {
   label,
   type = 'auto',
   dir = 'ltr',
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   class: className,
   children,
   ref = $bindable(null),

@@ -2,13 +2,21 @@
  * Table — scroll wrapper, density, plain / striped / grid rows, sticky header,
  * selected rows, numeric cells and container-driven stacking.
  * @layer tx.components so consumer utilities can override.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar: one registry fallback) or system tokens
+ * (systemVar: plain reads of the defaults base.css declares).
+ * Kept literals: the per-density cell paddings stay in --tx-table-pad-block
+ * and --tx-table-pad-inline (already multiplied by --tx-density), the 1.4 line
+ * height, the 3px selected-row edge, the 6rem stacked label column and the
+ * container-query widths are table geometry.
  */
 @layer tx.components {
   .tx-table-wrap {
     container: tx-table / inline-size;
     overflow: auto;
-    border: var(--tx-border-width, 1px) solid var(--tx-border, currentColor);
-    border-radius: var(--tx-radius-xl, 0.75rem);
+    border: var(--tx-table-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-border, currentColor);
+    border-radius: var(--tx-table-radius, var(--tx-shape-radius-xl));
     background-color: var(--tx-surface, Canvas);
     color: var(--tx-surface-foreground, CanvasText);
   }
@@ -24,7 +32,7 @@
     inline-size: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-size: var(--tx-table-font-size, var(--tx-font-size-sm));
     line-height: 1.4;
   }
 
@@ -40,7 +48,7 @@
 
   .tx-table__caption {
     caption-side: top;
-    padding-block: 0.75rem 0.25rem;
+    padding-block: var(--tx-space-3) var(--tx-space-1);
     padding-inline: var(--tx-table-pad-inline);
     text-align: start;
     font-weight: var(--tx-font-weight-medium, 500);
@@ -64,14 +72,15 @@
     padding-inline: calc(var(--tx-table-pad-inline) * var(--tx-density, 1));
     text-align: start;
     vertical-align: middle;
-    border-block-end: var(--tx-border-width, 1px) solid var(--tx-border, currentColor);
+    border-block-end: var(--tx-table-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-border, currentColor);
   }
 
   .tx-table__head {
     background-color: var(--tx-muted, Canvas);
     color: var(--tx-muted-foreground, CanvasText);
-    font-size: var(--tx-font-size-xs, 0.75rem);
-    font-weight: var(--tx-font-weight-medium, 500);
+    font-size: var(--tx-table-head-font-size, var(--tx-type-caption-size));
+    font-weight: var(--tx-table-head-font-weight, var(--tx-type-label-weight));
     white-space: nowrap;
   }
 
@@ -83,7 +92,8 @@
   }
 
   .tx-table__footer :is(.tx-table__head, .tx-table__cell) {
-    border-block-start: var(--tx-border-width, 1px) solid var(--tx-border-strong, currentColor);
+    border-block-start: var(--tx-table-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-border-strong, currentColor);
     border-block-end: 0;
     font-weight: var(--tx-font-weight-medium, 500);
   }
@@ -105,7 +115,8 @@
   }
 
   .tx-table--grid :is(.tx-table__head, .tx-table__cell) + :is(.tx-table__head, .tx-table__cell) {
-    border-inline-start: var(--tx-border-width, 1px) solid var(--tx-border, currentColor);
+    border-inline-start: var(--tx-table-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-border, currentColor);
   }
 
   .tx-table__body .tx-table__row:last-child > :is(.tx-table__head, .tx-table__cell) {
@@ -123,7 +134,7 @@
   }
 
   .tx-table__empty {
-    padding-block: 2rem;
+    padding-block: var(--tx-space-8);
     text-align: center;
     color: var(--tx-muted-foreground, CanvasText);
   }
@@ -160,7 +171,8 @@
       white-space: nowrap;
     }
     .tx-table--stack-sm :is(.tx-table__body, .tx-table__footer) .tx-table__row {
-      border-block-end: var(--tx-border-width, 1px) solid var(--tx-border, currentColor);
+      border-block-end: var(--tx-table-border-width, var(--tx-border-width-thin)) solid
+        var(--tx-border, currentColor);
       padding-block: calc(var(--tx-table-pad-block) * 0.5);
     }
     .tx-table--stack-sm
@@ -168,7 +180,7 @@
       :is(.tx-table__head, .tx-table__cell) {
       display: grid;
       grid-template-columns: minmax(6rem, 40%) 1fr;
-      gap: 0.75rem;
+      gap: var(--tx-space-3);
       border: 0;
       padding-block: calc(var(--tx-table-pad-block) * 0.5);
       text-align: start;
@@ -211,7 +223,8 @@
       white-space: nowrap;
     }
     .tx-table--stack-md :is(.tx-table__body, .tx-table__footer) .tx-table__row {
-      border-block-end: var(--tx-border-width, 1px) solid var(--tx-border, currentColor);
+      border-block-end: var(--tx-table-border-width, var(--tx-border-width-thin)) solid
+        var(--tx-border, currentColor);
       padding-block: calc(var(--tx-table-pad-block) * 0.5);
     }
     .tx-table--stack-md
@@ -219,7 +232,7 @@
       :is(.tx-table__head, .tx-table__cell) {
       display: grid;
       grid-template-columns: minmax(6rem, 40%) 1fr;
-      gap: 0.75rem;
+      gap: var(--tx-space-3);
       border: 0;
       padding-block: calc(var(--tx-table-pad-block) * 0.5);
       text-align: start;

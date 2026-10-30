@@ -9,6 +9,7 @@ import Sidebar from './Sidebar.svelte';
 import type { SidebarItem, SidebarSection } from './types.ts';
 import { appNavClass, type SidebarVariant } from './variants.ts';
 import './sidebar.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** The rendered root element (bindable). */
@@ -40,12 +41,13 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
 
 type DrawerComponent = typeof import('./AppNavDrawer.svelte')['default'];
 
+const txDefaults = designDefaults('sidebar');
 let {
   items,
   sections,
   collapsed = $bindable(false),
   collapsible = true,
-  variant = 'default',
+  variant = txDefaults().variant ?? 'default',
   header,
   footer,
   itemIcon,

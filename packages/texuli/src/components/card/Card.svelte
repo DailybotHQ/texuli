@@ -4,6 +4,7 @@ import type { HTMLAnchorAttributes, HTMLAttributes } from 'svelte/elements';
 import { cx } from '../../internal/cx.ts';
 import { type CardVariant, cardClass } from './variants.ts';
 import './card.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = HTMLAttributes<HTMLElement> & {
   /** Visual elevation. */
@@ -30,8 +31,9 @@ type Props = HTMLAttributes<HTMLElement> & {
   ref?: HTMLElement | null;
 };
 
+const txDefaults = designDefaults('card');
 let {
-  variant = 'elevated',
+  variant = txDefaults().variant ?? 'elevated',
   href,
   hrefTrust = 'developer',
   linkLabel,

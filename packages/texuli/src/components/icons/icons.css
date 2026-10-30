@@ -1,12 +1,40 @@
 /**
  * Built-in icon chrome. Live in `@layer tx.components` so consumer CSS wins.
  * Side-effect import from `iconClass` keeps recipe-only usage styled.
- * Pixel size still comes from the SVG width/height attributes on Icon.
+ * The SVG width, height and stroke-width attributes keep the default look
+ * without CSS; these zero-specificity rules let the icon tokens restyle them,
+ * and any component rule that sizes an icon (a button's icon size) still wins.
+ * The stroke token applies to icons at the default stroke (`stroke-width="2"`);
+ * any other `strokeWidth` keeps its own stroke.
  */
 @layer tx.components {
   .tx-icon {
     display: inline-block;
     flex-shrink: 0;
     vertical-align: middle;
+  }
+
+  :where(.tx-icon[stroke-width="2"]) {
+    stroke-width: var(--tx-icon-stroke-width, var(--tx-icon-stroke));
+  }
+
+  :where(.tx-icon--xs) {
+    inline-size: var(--tx-icon-size-xs, var(--tx-size-icon-xs));
+    block-size: var(--tx-icon-size-xs, var(--tx-size-icon-xs));
+  }
+
+  :where(.tx-icon--sm) {
+    inline-size: var(--tx-icon-size-sm, var(--tx-size-icon-sm));
+    block-size: var(--tx-icon-size-sm, var(--tx-size-icon-sm));
+  }
+
+  :where(.tx-icon--md) {
+    inline-size: var(--tx-icon-size-md, var(--tx-size-icon-md));
+    block-size: var(--tx-icon-size-md, var(--tx-size-icon-md));
+  }
+
+  :where(.tx-icon--lg) {
+    inline-size: var(--tx-icon-size-lg, var(--tx-size-icon-lg));
+    block-size: var(--tx-icon-size-lg, var(--tx-size-icon-lg));
   }
 }

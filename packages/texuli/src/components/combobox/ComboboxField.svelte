@@ -5,6 +5,7 @@ import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
 import { type ComboboxSize, type ComboboxVariant, comboboxFieldClass } from './variants.ts';
 import './combobox.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** The rendered root element (bindable). */
@@ -18,10 +19,11 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   class?: ClassValue;
 };
 
+const txDefaults = designDefaults('combobox');
 let {
   children,
-  size = 'md',
-  variant = 'outline',
+  size = txDefaults().size ?? 'md',
+  variant = txDefaults().variant ?? 'outline',
   open = undefined,
   disabled = false,
   class: className,

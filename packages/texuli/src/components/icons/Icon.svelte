@@ -2,6 +2,7 @@
 import { createAttachmentKey } from 'svelte/attachments';
 import type { SVGAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 import { ICON_SIZES, iconClass } from './icon-variants.ts';
 import { iconPath, isIconName } from './icons.ts';
 import type { IconComponentProps, IconRef, IconSize } from './types.ts';
@@ -19,9 +20,10 @@ type Props = Omit<SVGAttributes<SVGSVGElement>, 'class' | 'color'> & {
   label?: string;
 };
 
+const txDefaults = designDefaults('icon');
 let {
   icon,
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   strokeWidth = 2,
   color = undefined,
   label,

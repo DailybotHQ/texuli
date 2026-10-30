@@ -238,7 +238,7 @@ describe('no-flash cache and bootstrap', () => {
     vars: { '--tx-background': '#101820', '--tx-primary': '#33aacc' },
     reducedMotion: true,
     surface: 'glass',
-    components: { button: 'pill', card: 'bordered', focusRing: 'outline' },
+    components: { button: 'pill', card: 'bordered', focusRing: 'outline', input: 'compact' },
   };
 
   describe('no-flash cache', () => {
@@ -306,6 +306,7 @@ describe('no-flash cache and bootstrap', () => {
           txButtonStyle: 'pill',
           txCardStyle: 'bordered',
           txFocusRingStyle: 'outline',
+          txInputStyle: 'compact',
           txMode: 'dark',
         });
         expect(documentRoot.classes.has('dark')).toBe(true);

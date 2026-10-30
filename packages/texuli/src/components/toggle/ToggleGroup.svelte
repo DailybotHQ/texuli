@@ -7,6 +7,7 @@ import { type ClassValue } from '../../internal/cx.ts';
 import { TOGGLE_GROUP_STYLE } from './style-context.ts';
 import { type ToggleSize, type ToggleVariant, toggleGroupClass } from './variants.ts';
 import './toggle.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Orientation = 'horizontal' | 'vertical';
 type GroupType = 'single' | 'multiple';
@@ -45,6 +46,7 @@ type OwnProps = {
 /** Extra attributes (`data-*`, `aria-*`, handlers…) land on the group element. */
 type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'role'>;
 
+const txDefaults = designDefaults('toggle-group');
 let {
   type = 'single',
   value = $bindable(undefined),
@@ -55,8 +57,8 @@ let {
   orientation = 'horizontal',
   rovingFocus = true,
   wrap = false,
-  variant = 'default',
-  size = 'md',
+  variant = txDefaults().variant ?? 'default',
+  size = txDefaults().size ?? 'md',
   class: className,
   children,
   'aria-label': ariaLabel,

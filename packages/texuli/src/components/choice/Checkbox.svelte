@@ -5,6 +5,7 @@ import { joinIds, splitRequiredControlProps } from '../../internal/control-props
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { type ChoiceSize, choiceControlClass } from './variants.ts';
 import './choice.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = {
   /** Controlled checked state (`bind:checked`). */
@@ -30,6 +31,7 @@ type Props = {
 
 const uid = $props.id();
 
+const txDefaults = designDefaults('choice');
 let {
   checked = $bindable(false),
   defaultChecked = false,
@@ -42,7 +44,7 @@ let {
   id = `tx-checkbox-${uid}`,
   label,
   description,
-  size = 'md',
+  size = txDefaults().size ?? 'md',
   onCheckedChange,
   onIndeterminateChange,
   class: className,

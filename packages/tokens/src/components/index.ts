@@ -4,16 +4,12 @@
  * guard adoption runs against component CSS, and a JSON Schema of the closed
  * vocabulary (`{ [component]: { [key]: string } }`) for design systems and agents.
  *
- * Component tokens are fallback-only: no stylesheet declares them, so they cost
- * nothing until a theme, design system or host sets them on its scope.
+ * Component tokens are never declared, so they cost nothing until a theme,
+ * design system or host sets them on its scope; every read falls back, one
+ * level deep, to its registry default (system tokens `base.css` declares).
  */
 
-import {
-  closingParen,
-  expandTokenRefs,
-  FALLBACK_SYSTEM_TOKENS,
-  systemVar,
-} from '../system/fallback.ts';
+import { BASE_SYSTEM_TOKENS, closingParen, systemVar } from '../system/base.ts';
 import { COMPONENT_TOKEN_FAMILIES, COMPONENT_TOKENS, findComponentToken } from './registry.ts';
 
 export {
@@ -27,11 +23,11 @@ export {
   isComponentTokenName,
 } from './registry.ts';
 
-/** The read fallback of one component token: its default with fallback-only system refs expanded. */
+/** The read fallback of one component token: its registry default (system or theme refs, no nested fallbacks). */
 export function componentTokenFallback(component: string, key: string): string {
   const entry = findComponentToken(component, key);
   if (!entry) throw new RangeError(`Unknown component token ${component}.${key}`);
-  return expandTokenRefs(entry.default);
+  return entry.default;
 }
 
 /**
@@ -49,7 +45,7 @@ export function componentTokenFallbacks(): Record<string, string> {
   );
 }
 
-/** One read of a fallback-only token that does not carry the registry fallback. */
+/** One read of a component or base system token that is not in its exact read form. */
 export interface TokenReadIssue {
   readonly token: string;
   readonly found: string;
@@ -65,14 +61,15 @@ const normalize = (text: string) =>
     .trim();
 
 /**
- * Check every `var()` read of a component token or a fallback-only system
- * token in a stylesheet (or Svelte/TS source): each must equal `componentVar`
- * / `systemVar` exactly (whitespace aside), so the fallback never drifts from
- * the registry. Returns the mismatches; an empty list means the source is clean.
+ * Check every `var()` read of a component token or a base system token in a
+ * stylesheet (or Svelte/TS source): each must equal `componentVar` /
+ * `systemVar` exactly (whitespace aside): a component read carries its one
+ * registry fallback, a system read carries none. Returns the mismatches; an
+ * empty list means the source is clean.
  */
 export function checkTokenReads(source: string): TokenReadIssue[] {
   const expected = new Map<string, string>(Object.entries(componentTokenFallbacks()));
-  for (const token of FALLBACK_SYSTEM_TOKENS) expected.set(token.name, systemVar(token.name));
+  for (const token of BASE_SYSTEM_TOKENS) expected.set(token.name, systemVar(token.name));
   const issues: TokenReadIssue[] = [];
   const pattern = /var\(\s*(--tx-[a-z0-9-]+)/g;
   for (const match of source.matchAll(pattern)) {

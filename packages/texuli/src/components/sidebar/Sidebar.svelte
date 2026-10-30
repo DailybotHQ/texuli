@@ -15,6 +15,7 @@ import {
   sidebarToggleClass,
 } from './variants.ts';
 import './sidebar.css';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
   /** The rendered root element (bindable). */
@@ -45,13 +46,14 @@ type Props = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
   class?: ClassValue;
 };
 
+const txDefaults = designDefaults('sidebar');
 let {
   items,
   sections,
   collapsed = $bindable(false),
   collapsible = true,
   drawer = false,
-  variant = 'default',
+  variant = txDefaults().variant ?? 'default',
   header,
   footer,
   itemIcon,
