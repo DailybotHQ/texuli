@@ -448,6 +448,12 @@ importers:
         specifier: 0.9.0
         version: link:../texuli
 
+  packages/mcp:
+    dependencies:
+      '@texuli/tools':
+        specifier: 0.9.0
+        version: link:../tools
+
   packages/media:
     dependencies:
       '@texuli/core':

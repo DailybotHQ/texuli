@@ -125,9 +125,12 @@ describe('site copy honesty', () => {
     // (the 0.8 line while 0.9.0 is in development), @texuli/forms,
     // @texuli/canvas and @texuli/sheets included (first published in 0.8.0).
     // Their manifests carry that line or the version in development. Not on
-    // npm: the private 0.0.0 examples workspace.
+    // npm: the private 0.0.0 examples workspace, and @texuli/mcp, first
+    // published with 0.9.0 (ADR-019), so copy may still say it is not on npm.
     const line = releaseLine();
+    const firstInDevelopment = new Set(['mcp']);
     const published = readdirSync(join(siteRoot, '..', '..', 'packages')).filter((dir) => {
+      if (firstInDevelopment.has(dir)) return false;
       try {
         const pkg = JSON.parse(
           readFileSync(join(siteRoot, '..', '..', 'packages', dir, 'package.json'), 'utf8')

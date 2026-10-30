@@ -558,6 +558,8 @@ export interface CommandContext {
   bins: Set<string>;
   setupFlags: Set<string>;
   cli: Set<string>;
+  /** Workspace packages that publish a `bin`: `npx -y <package>` runs it. */
+  binPackages?: Set<string>;
 }
 
 export function commandContext(repoRoot: string): CommandContext {
@@ -568,6 +570,7 @@ export function commandContext(repoRoot: string): CommandContext {
   // Binaries the workspace packages publish (`bin`): what a consumer's
   // `npx <bin>` runs after installing that package, so they are real.
   const publishedBins = new Set<string>();
+  const binPackages = new Set<string>();
   for (const parent of ['packages', 'apps']) {
     const dir = join(repoRoot, parent);
     if (!existsSync(dir)) continue;
@@ -578,6 +581,7 @@ export function commandContext(repoRoot: string): CommandContext {
       packageScripts.set(String(pkg.name), new Set(Object.keys((pkg.scripts as object) ?? {})));
       if (pkg.bin && typeof pkg.bin === 'object') {
         for (const bin of Object.keys(pkg.bin)) publishedBins.add(bin);
+        binPackages.add(String(pkg.name));
       }
     }
   }
@@ -592,6 +596,7 @@ export function commandContext(repoRoot: string): CommandContext {
       existsSync(setup) ? (readFileSync(setup, 'utf8').match(/--[a-z][a-z-]*/g) ?? []) : []
     ),
     cli: cliCommands(repoRoot),
+    binPackages,
   };
 }
 
@@ -705,6 +710,9 @@ export function checkCommand(line: string, ctx: CommandContext): string[] {
       return [];
     }
     case 'npx':
+      // `npx -y @texuli/mcp`: the package's own bin, as MCP hosts document it.
+      if ((second === '-y' || second === '--yes') && third && ctx.binPackages?.has(third))
+        return [];
       return second && ctx.bins.has(second)
         ? pathsExist(
             ctx,

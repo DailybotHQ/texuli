@@ -82,10 +82,12 @@ llms helpers.
 `npx texuli-llms --out <dir>` writes `llms.txt`, `llms-full.txt` and
 one Markdown page per catalog component from the published manifests.
 
-Not shipped in this package: the read-only MCP server exists in the
-repository source, but has no export and no published command yet (the
-`texuli-mcp` binary and a remote endpoint are planned for `0.9.0`; neither
-exists today). In the source, it speaks MCP `2025-11-25` (negotiating the
+In development for `0.9.0`, not in any published version: the read-only
+MCP server, exported as `@texuli/tools/mcp` and started with `texuli mcp`
+(stdio). MCP hosts install it with `npx -y @texuli/mcp`, the thin
+`@texuli/mcp` package first published in `0.9.0`; host setup is in its
+[README](https://github.com/DailybotHQ/texuli/blob/main/packages/mcp/README.md).
+A remote endpoint at texuli.com is planned. The server speaks MCP `2025-11-25` (negotiating the
 three earlier versions) through a transport-independent handler: tools with
 output schemas and structured results, resources (the catalog, component
 manifests and pages, themes, the deck and document schemas), prompts

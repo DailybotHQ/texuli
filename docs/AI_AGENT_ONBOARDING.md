@@ -10,7 +10,7 @@ verified baseline before you change anything.
    planned. Most packages exist in source with tests; the editor, the
    native twin and the agent service are in development. Describe only what
    the table says exists.
-3. [`ARCHITECTURE.md`](ARCHITECTURE.md): the down-only layers L0 to L8.
+3. [`ARCHITECTURE.md`](ARCHITECTURE.md): the down-only layers L0 to L9.
 4. The README of the module you will touch (every package, `apps/website`,
    `apps/agent` and `native/` has one; [docs/README](README.md) lists them).
 
