@@ -66,7 +66,7 @@ export function siteLlmsSections(siteUrl: string): SiteLlmsSection[] {
           title: 'What’s new',
           href: abs('/whats-new/'),
           description:
-            'Every package and capability of 0.6.0, 0.7.0 and 0.8.0 (all on npm; 0.8.0 is current) and of 0.9.0 (in development), with demos.',
+            'Every package and capability of 0.6.0, 0.7.0, 0.8.0 and 0.9.0 (all on npm; 0.9.0 is current), with demos.',
         },
         {
           title: 'Skill',
@@ -139,7 +139,7 @@ export function siteLlmsSections(siteUrl: string): SiteLlmsSection[] {
           title: 'OpenAPI description',
           href: abs('/openapi.json'),
           description:
-            'OpenAPI 3.1 for the read-only JSON API under /api/v1/ and POST /mcp (in development until 0.9.0).',
+            'OpenAPI 3.1 for the read-only JSON API under /api/v1/ and POST /mcp (since 0.9.0).',
         },
         {
           title: 'API index',

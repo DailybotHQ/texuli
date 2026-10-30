@@ -3,9 +3,9 @@
 **Package:** `@texuli/tools` · **Import:** `@texuli/tools/ops` · **Path:**
 `src/ops/` · **Decision:** [ADR-017](../../../docs/DECISIONS.md#adr-017-one-operations-registry-texulitoolsops-for-every-agent-surface)
 
-> **Status: in development, not released.** The `./ops` subpath exists in the
-> repository source and is planned for `@texuli/tools` `0.9.0`; no published
-> version has it yet. The tables under [Operations](#operations) are
+> **Status: released in `0.9.0`.** The `./ops` subpath ships in
+> `@texuli/tools` from `0.9.0` (pre-1.0; under 0.x a new minor may break).
+> The tables under [Operations](#operations) are
 > generated from the registry by `scripts/generate-surfaces.ts`, and
 > `pnpm check:surfaces` fails when they drift; edit the operations, not the
 > tables.

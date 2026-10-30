@@ -8,7 +8,7 @@
  * the repository file it cites: a claim's `sources` phrases appear word for
  * word in both the cited file and this module's copy. Every agent surface
  * is a real file or page served by this site, and the install line states
- * the release truth from `docs/RELEASE.md`: 0.8.0 is out (`latest` and
+ * the release truth from `docs/RELEASE.md`: 0.9.0 is out (`latest` and
  * `next` both name it), it is pre-1.0, and nothing stable is yet.
  */
 
@@ -126,7 +126,7 @@ export const WEB_AGENTS_SURFACES: readonly AgentsSurface[] = [
     label: 'MCP server card',
     description:
       'Describes the read-only Texuli MCP server: local over stdio (npx -y @texuli/mcp) and ' +
-      'hosted at https://texuli.com/mcp, both new in 0.9.0, which is in development.',
+      'hosted at https://texuli.com/mcp, both new in 0.9.0.',
   },
   {
     href: '/skill/',
@@ -139,7 +139,7 @@ export const WEB_AGENTS_SURFACES: readonly AgentsSurface[] = [
 export const WEB_AGENTS_INSTALL = {
   command: 'pnpm add texuli',
   note:
-    'Installs 0.8.0, a pre-1.0 release: under 0.x a new minor may contain breaking ' +
+    'Installs 0.9.0, a pre-1.0 release: under 0.x a new minor may contain breaking ' +
     'changes, so pin the version. 1.0.0 will be the first stable release.',
 } as const;
 

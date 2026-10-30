@@ -266,9 +266,9 @@ pending note and the gap props that reach the manifests), which moved the
 catalog hash in `catalog/components.json` and with it the spec digest. The
 envelope shape, the `$defs` and the diagnostic codes are unchanged; the
 `spec` enum gains `0.9.0`, and every committed golden and invalid fixture
-is stamped `0.9.0`. Spec 0.9.0 is in development on `release/0.9.0`; it
-ships only with `@texuli/spec@0.9.0` (npm has spec `0.8.0` in
-`@texuli/spec@0.8.0`).
+is stamped `0.9.0`. Spec 0.9.0 ships in `@texuli/spec@0.9.0` (digest
+`497df4d3b0c67d53483163ebd9bd73733b52caf5f8e2966478f1cf860e6f9d9d`; the
+cartesian charts' `xKind` and `locale`, G97, reached the projection too).
 
 ## Named slots and conditions
 

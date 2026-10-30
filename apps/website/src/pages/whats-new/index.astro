@@ -5,9 +5,9 @@ import { documentFromMarkdown } from '@texuli/document/markdown';
 import { SHEET_FUNCTION_NAMES } from '@texuli/sheets/formula';
 /**
  * /whats-new/ — every new package and capability of 0.6.0 to 0.9.0 in one
- * place, grouped by release with its honest status: 0.6.0, 0.7.0 and 0.8.0
- * are published on npm, 0.8.0 is the current release, and 0.9.0 is in
- * development (the release line in docs/RELEASE.md). Each feature has a
+ * place, grouped by release with its honest status: 0.6.0 to 0.9.0 are
+ * published on npm, and 0.9.0 is the current release (the release line in
+ * docs/RELEASE.md). Each feature has a
  * small live demo (a lazy island, client:visible) or a static preview the
  * packages build at build time, and a link to the page that shows it in
  * full.
@@ -84,17 +84,16 @@ const releaseFeatures = RELEASES.map((release) => ({
 
 <BaseLayout
   title="What’s new"
-  description="Every new Texuli package and capability of 0.6.0, 0.7.0 and 0.8.0, and 0.9.0 in development, with a demo or preview each: motion, live generation, documents, forms, the canvas, spreadsheets, dashboards, output, i18n, and the MCP server, the agent-ready site and design tokens v2."
+  description="Every new Texuli package and capability of 0.6.0, 0.7.0, 0.8.0 and 0.9.0, with a demo or preview each: motion, live generation, documents, forms, the canvas, spreadsheets, dashboards, output, i18n, and the MCP server, the agent-ready site and design tokens v2."
 >
   <div class="hub" data-tx-whats-new="">
     <header class="hub__hero">
-      <p class="hub__eyebrow">0.6.0, 0.7.0 and 0.8.0 on npm · 0.8.0 is current · 0.9.0 in development</p>
+      <p class="hub__eyebrow">0.6.0 to 0.9.0 on npm · 0.9.0 is current</p>
       <h1>What’s new in Texuli</h1>
       <p class="hub__lead">
         Every package and capability added since 0.5.0, each with a small demo or a preview and a link
-        to its full page. <code>0.8.0</code> is the current release on npm (pre-1.0, not a stable
-        release); the packages it publishes for the first time are still in development. <code>0.9.0</code>
-        is in development on its release branch.
+        to its full page. <code>0.9.0</code> is the current release on npm (pre-1.0, not a stable
+        release); the packages first published in 0.7.0 to 0.9.0 are still in development.
       </p>
       <nav class="hub__toc" aria-label="Releases on this page">
         <ul>

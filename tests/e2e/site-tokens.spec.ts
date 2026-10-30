@@ -62,7 +62,8 @@ test('/tokens/: every system family and token, the defaults vocabulary', async (
   await page.goto(`${origin()}/tokens/`);
   await settle(page);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Design tokens');
-  await expect(page.locator('[data-tokens-status]')).toContainText('in development');
+  // Released with 0.9.0: the in-development status line is gone.
+  await expect(page.locator('[data-tokens-status]')).toHaveCount(0);
   await expect(page.locator('[data-tokens-count-system]')).toHaveText(String(SYSTEM_TOKENS.length));
   await expect(page.locator('[data-tokens-family]')).toHaveCount(SYSTEM_TOKEN_FAMILIES.length);
   await expect(page.locator('[data-tokens-family] tbody tr')).toHaveCount(SYSTEM_TOKENS.length);

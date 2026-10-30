@@ -3,7 +3,7 @@
 **Package:** `@texuli/mcp` · **Subpath:** `.` · **Bin:** `texuli-mcp` ·
 **Decision:** [ADR-019](../../../docs/DECISIONS.md#adr-019-the-texulimcp-package-and-its-binary)
 
-> **Status: in development.** First published in `0.9.0` (not on npm yet).
+> **Status: in development (pre-1.0).** On npm since `0.9.0`, its first release.
 
 `@texuli/mcp` is a thin package: the protocol handler, the stdio transport,
 the operations registry, the resources and the prompts live in

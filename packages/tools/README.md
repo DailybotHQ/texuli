@@ -10,9 +10,9 @@ catalog trees in any host, Svelte or not. A golden set of interface tasks
 with an offline scorer measures how well an agent builds with the catalog.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.8.1`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.9.0`) may contain breaking
-> changes, so pin the exact version or use `^0.8.0`, which accepts only 0.8.x.
+> published to npm as `0.9.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.10.0`) may contain breaking
+> changes, so pin the exact version or use `^0.9.0`, which accepts only 0.9.x.
 
 ## Install
 
@@ -82,21 +82,20 @@ llms helpers.
 `npx texuli-llms --out <dir>` writes `llms.txt`, `llms-full.txt` and
 one Markdown page per catalog component from the published manifests.
 
-In development for `0.9.0`, not in any published version: the read-only
-MCP server, exported as `@texuli/tools/mcp` and started with `texuli mcp`
-(stdio). MCP hosts install it with `npx -y @texuli/mcp`, the thin
-`@texuli/mcp` package first published in `0.9.0`; host setup is in its
+New in `0.9.0`: the read-only MCP server, exported as `@texuli/tools/mcp`
+and started with `texuli mcp` (stdio). MCP hosts install it with
+`npx -y @texuli/mcp`, the thin `@texuli/mcp` package first published in
+`0.9.0`; host setup is in its
 [README](https://github.com/DailybotHQ/texuli/blob/main/packages/mcp/README.md).
-The remote endpoint `https://texuli.com/mcp` (`functions/mcp.ts`, `edge`
-operations only) is in the repository and goes live when release 0.9.0
-deploys from `main`. The server speaks MCP `2025-11-25` (negotiating the
+The remote endpoint `https://texuli.com/mcp` (`functions/mcp.ts`, the
+`edge` and `site` operations) is live with texuli.com. The server speaks MCP `2025-11-25` (negotiating the
 three earlier versions) through a transport-independent handler: tools with
 output schemas and structured results, resources (the catalog, component
 manifests and pages, themes, the deck and document schemas), prompts
 (`build-ui`, `theme-blueprint`, `convert-deck`) and completions; see
 [mcp.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/mcp.md).
-Its tools come from an operations registry (`./ops`, in development and
-planned for `0.9.0`, not in any published version): one declaration per
+Its tools come from an operations registry (`./ops`, new in `0.9.0`): one
+declaration per
 operation (`catalog.search`, `component.get`, `blueprint.validate`,
 `theme.preview`, `deck.run` …)
 with JSON Schema input and output, limits and examples; see

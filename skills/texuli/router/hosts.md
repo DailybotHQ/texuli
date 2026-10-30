@@ -46,8 +46,8 @@ same tools:
 
 | Server | How a host connects | Tools | Status |
 | --- | --- | --- | --- |
-| Local, stdio | `npx -y @texuli/mcp` (bin `texuli-mcp`); offline once installed | every operation | `@texuli/mcp` is new in `0.9.0` (in development, not on npm yet) |
-| Remote, Streamable HTTP | `https://texuli.com/mcp` (POST JSON-RPC, no key) | the edge operations (not `document.export`) | Live once release `0.9.0` is deployed from `main`; CI compares its tool list with the registry after every deploy |
+| Local, stdio | `npx -y @texuli/mcp` (bin `texuli-mcp`); offline once installed | every operation | `@texuli/mcp` is on npm from `0.9.0` (in development) |
+| Remote, Streamable HTTP | `https://texuli.com/mcp` (POST JSON-RPC, no key) | the edge operations (not `document.export`) and the `site` tools | Live from `0.9.0`; CI compares its tool list with the registry after every deploy |
 
 Claude Code, for example:
 

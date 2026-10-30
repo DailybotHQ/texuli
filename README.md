@@ -37,12 +37,12 @@ the same pieces are safe to hand to a machine.
 ![The Texuli website](docs/assets/screenshots/homepage.png)
 
 > **Status: in development, pre-1.0.** The screenshot above is the
-> texuli.com website, which deploys from `main` to Cloudflare Pages. The 25
-> published packages are released on npm in the 0.8 line: 16 at `0.8.0`, plus patch releases (`@texuli/slides` `0.8.2`; `0.8.1` for `@texuli/data`, `@texuli/blocks`, `@texuli/catalog`, `@texuli/pages`, `@texuli/player`, `@texuli/sheets`, `@texuli/tools` and `@texuli/astro`) (published by CI with
-> provenance; `latest` and `next` point to the newest), including the first
-> release of `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets`. It is not a stable
-> release: under 0.x a new minor may contain breaking changes, and 1.0.0 will
-> be the first stable release. `0.9.0` is in development and not on npm yet.
+> texuli.com website, which deploys from `main` to Cloudflare Pages. The 26
+> published packages are released on npm in the 0.9 line, every one at
+> `0.9.0` (published by CI with provenance; `latest` and `next` point to
+> the newest), including the first release of `@texuli/mcp`. It is not a
+> stable release: under 0.x a new minor may contain breaking changes, and
+> 1.0.0 will be the first stable release.
 > The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
 
 </div>
@@ -164,7 +164,7 @@ Texuli is designed to be built *by* agents as much as by people.
 | **Agent catalog** | A declarative catalog of components and props. An agent emits catalog nodes; the renderer turns them into real components | [Catalog](packages/catalog/README.md) |
 | **No HTML sinks** | Never `{@html}`, `innerHTML`, `eval` or `new Function` on props, content or agent output. Structure is trusted; markup never is | [Security](docs/SECURITY.md) |
 | **Two-tier URL policy** | Every link and media source passes `safeHref` / `safeMediaSrc`: `developer` for app-authored props, `untrusted` for agent and user content | [URL policy](docs/SECURITY.md) |
-| **MCP server** | Every operation of one registry as an MCP tool: local over stdio (`npx -y @texuli/mcp`) and remote over Streamable HTTP at `https://texuli.com/mcp` (the edge operations, read-only, no key); the same operations run as `texuli <group> <verb>`. New in `0.9.0`, in development: not on npm yet, and the remote goes live when release 0.9.0 deploys from `main` | [MCP](packages/mcp/README.md) · [Tools](packages/tools/docs/mcp.md) |
+| **MCP server** | Every operation of one registry as an MCP tool: local over stdio (`npx -y @texuli/mcp`) and remote over Streamable HTTP at `https://texuli.com/mcp` (the edge and site operations, read-only, no key); the same operations run as `texuli <group> <verb>`. New in `0.9.0`; `@texuli/mcp` is in development | [MCP](packages/mcp/README.md) · [Tools](packages/tools/docs/mcp.md) |
 | **LLM docs & A2UI** | Docs generated for LLM consumption and an A2UI adapter for agent-to-UI flows | [Tools](packages/tools/README.md) |
 
 Inside the repository, [AGENTS.md](AGENTS.md) is the single entry point for
@@ -192,11 +192,11 @@ every verified command.
 
 ## Honest boundaries
 
-- **No stable release yet.** The 25 published packages are on npm in the
-  0.8 line, a pre-1.0 release (`npm install texuli`; `latest` and `next` both
-  point to it). Under 0.x a new minor (`0.9.0`, in development) may contain
-  breaking changes, so pin the exact version or use `^0.8.0`; 1.0.0 will be
-  the first stable release.
+- **No stable release yet.** The 26 published packages are on npm in the
+  0.9 line, a pre-1.0 release (`npm install texuli`; `latest` and `next` both
+  point to it). Under 0.x a new minor (`0.10.0`) may contain breaking
+  changes, so pin the exact version or use `^0.9.0`; 1.0.0 will be the
+  first stable release.
   The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
 - **texuli.com deploys from `main`** (Cloudflare Pages). Run it locally with
   `pnpm dev`.

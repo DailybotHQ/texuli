@@ -1,9 +1,8 @@
 # texuli.com public API and developer portal
 
-PLAN_011 T-ar-api. **Status:** in development on `release/0.9.0`; live on
-texuli.com once 0.9.0 is published and deployed from `main`
-(`API_RELEASE_STATUS` in `src/lib/api-surface.ts` is the one switch the
-release flips).
+PLAN_011 T-ar-api. **Status:** released in 0.9.0 and served by texuli.com,
+deployed from `main` (`API_RELEASE_STATUS` in `src/lib/api-surface.ts` is
+`released`; the portal and the API index follow it).
 
 ## Purpose
 

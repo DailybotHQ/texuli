@@ -1252,8 +1252,8 @@ reflect this decision.
 
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
-  developer may override this decision. **Status: planned** (release
-  0.9.0); nothing below is shipped yet.
+  developer may override this decision. **Status: shipped** in release
+  0.9.0.
 - **Context:** `@texuli/tools` exposes the library to agents through seven
   read-only MCP tools (`packages/tools/src/mcp/server.ts`: `catalog`,
   `component`, `validate`, `example`, `theme`, `deck`, `document`), a CLI
@@ -1334,9 +1334,9 @@ reflect this decision.
 
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
-  developer may override this decision. **Status: planned** (release
-  0.9.0 for library operations, the site operations with the agent-ready
-  website work of the same plan); nothing below is shipped yet.
+  developer may override this decision. **Status: shipped** in release
+  0.9.0 (the library operations and the site operations); live at
+  `https://texuli.com/mcp`.
 - **Context:** many MCP hosts accept only a URL, and an agent on a phone or
   in a hosted IDE cannot run a local binary. texuli.com already runs
   Cloudflare Pages Functions (`functions/_middleware.ts` serves Markdown
@@ -1436,10 +1436,9 @@ reflect this decision.
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
   developer may override this decision, and the layer below is an
-  exception the developer confirms. **Status: in development:**
-  `packages/mcp`, `texuli mcp`, the L9 entry and the consumer test exist
-  in the repository (T-mcp-local); first published in release 0.9.0, not
-  on npm yet.
+  exception the developer confirms. **Status: shipped:** `@texuli/mcp`
+  is first published in release 0.9.0 (in development, pre-1.0), with
+  `texuli mcp`, the L9 entry and the consumer test (T-mcp-local).
 - **Context:** the stdio server exists in `packages/tools/src/mcp` with no
   published binary. Every MCP host documents a one-word install of the
   form "npx -y" plus a package name, and `@texuli/tools` is a library
@@ -1501,9 +1500,11 @@ reflect this decision.
 
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
-  developer may override this decision. **Status: planned** (the families
-  in release 0.9.0, adoption across packages and the component tier in
-  0.10.0); nothing below is shipped yet.
+  developer may override this decision. **Status: shipped** in release
+  0.9.0: the families, the component tier and their adoption across the
+  styled packages (moved forward from 0.10.0; see the amendments below).
+  Data-viz tokens stay per theme, and components inside decks keep their
+  literals, until the 0.10.0 design-system work.
 - **Context:** `@texuli/tokens` has a strong color engine (OKLCH seeds with
   AA guarantees, 210 seed-defined themes, a validated `Theme`), but a
   design system cannot reach most of the UI. Tier-3 component hooks are
@@ -1728,9 +1729,9 @@ reflect this decision.
 
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
-  developer may override this decision. **Status: planned** (scoping and
-  portals with the 0.10.0 adoption work, the runtime in 0.10.0); nothing
-  below is shipped yet.
+  developer may override this decision. **Status: partly shipped:**
+  scoping (`[data-tx-scope]`) and scoped portals shipped in release 0.9.0;
+  the design-system runtime is planned for 0.10.0.
 - **Context:** `applyTheme` already writes `--tx-*` properties on an
   element through the CSSOM, and the no-flash script replays a cached,
   filtered variable map before first paint (it rejects `var(`, `url(` and

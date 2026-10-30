@@ -59,7 +59,8 @@ test('the tables match the registry and the server card', async ({ page }) => {
   await expect(page.locator('[data-mcp-remote]')).toHaveText(MCP_SERVER_DATA.remote.url);
   await expect(page.locator('[data-mcp-local]')).toHaveText(MCP_SERVER_DATA.local.launch);
   await expect(page.locator('[data-mcp-version]')).toHaveText(MCP_SERVER_DATA.version);
-  await expect(page.locator('[data-mcp-status]')).toContainText('In development');
+  // Released with 0.9.0: the in-development status line is gone.
+  await expect(page.locator('[data-mcp-status]')).toHaveCount(0);
 
   // Tools: the count equals the registry, and each runtime group its own share.
   const tools = MCP_SERVER_DATA.tools;

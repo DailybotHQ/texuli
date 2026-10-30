@@ -11,7 +11,7 @@ What Texuli is and where to begin.
 - [Texuli](https://texuli.com/): The product landing.
 - [Introduction](https://texuli.com/guides/): The docs home and reading order.
 - [Getting started](https://texuli.com/guides/getting-started/)
-- [What’s new](https://texuli.com/whats-new/): Every package and capability of 0.6.0, 0.7.0 and 0.8.0 (all on npm; 0.8.0 is current) and of 0.9.0 (in development), with demos.
+- [What’s new](https://texuli.com/whats-new/): Every package and capability of 0.6.0, 0.7.0, 0.8.0 and 0.9.0 (all on npm; 0.9.0 is current), with demos.
 - [Skill](https://texuli.com/skill/): The distributable agent skill for building with Texuli.
 
 ## Platform
@@ -104,7 +104,7 @@ Machine-readable documentation served as static files.
 - [Catalog llms.txt](https://texuli.com/llms/llms.txt): The agent-facing component index.
 - [Catalog llms-full.txt](https://texuli.com/llms/llms-full.txt): Every component doc in one file.
 - [Catalog JSON](https://texuli.com/catalog/catalog.json): The full catalog manifest as JSON.
-- [OpenAPI description](https://texuli.com/openapi.json): OpenAPI 3.1 for the read-only JSON API under /api/v1/ and POST /mcp (in development until 0.9.0).
+- [OpenAPI description](https://texuli.com/openapi.json): OpenAPI 3.1 for the read-only JSON API under /api/v1/ and POST /mcp (since 0.9.0).
 - [API index](https://texuli.com/api/index.json): Every JSON endpoint (the versioned /api/v1/ URLs) with its operationId, the limits and the versioning policy.
 
 ## Tools

@@ -10,9 +10,9 @@ model for pages, navigation, metadata and a sitemap. Use Texuli's Svelte
 components as islands wherever a page needs interaction.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.8.1`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.9.0`) may contain breaking
-> changes, so pin the exact version or use `^0.8.0`, which accepts only 0.8.x.
+> published to npm as `0.9.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.10.0`) may contain breaking
+> changes, so pin the exact version or use `^0.9.0`, which accepts only 0.9.x.
 
 ## Install
 
