@@ -196,6 +196,7 @@ export {
   type FieldControl,
   FieldError,
   type FieldErrorMap,
+  type FieldLabelContext,
   type FieldOrientation,
   Form,
   fieldErrorClass,
@@ -203,11 +204,13 @@ export {
   fieldRootClass,
   formClass,
   formDataToRecord,
+  getFieldLabelContext,
   isValidErrorMap,
   Label,
   labelClass,
   setNativeCustomValidity,
   toFieldErrorMap,
+  useFieldLabel,
   type ValidateResult,
 } from './components/field/index.ts';
 export {

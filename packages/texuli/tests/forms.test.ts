@@ -36,6 +36,7 @@ import CodeHarness from './fixtures/CodeHarness.svelte';
 import ComboboxHarness from './fixtures/ComboboxHarness.svelte';
 import Fixture from './fixtures/ControlAriaFixture.svelte';
 import CopyButtonHarness from './fixtures/CopyButtonHarness.svelte';
+import FieldLabelHarness from './fixtures/FieldLabelHarness.svelte';
 import FileUploadHarness from './fixtures/FileUploadHarness.svelte';
 import FormControlsHarness from './fixtures/FormControlsHarness.svelte';
 import IconButtonHarness from './fixtures/IconButtonHarness.svelte';
@@ -126,6 +127,26 @@ describe('control-aria', () => {
       expect(control.getAttribute('aria-describedby') ?? '').toContain('probe-desc');
       expect(control.getAttribute('data-probe')).toBe('control');
     });
+  });
+});
+
+describe('field label context (G91)', () => {
+  afterEach(cleanup);
+
+  it('exports useFieldLabel and getFieldLabelContext from texuli/field', async () => {
+    const field = (await import('../src/components/field/index.ts')) as Record<string, unknown>;
+    const root = (await import('../src/index.ts')) as Record<string, unknown>;
+    for (const name of ['useFieldLabel', 'getFieldLabelContext']) {
+      expect(typeof field[name], name).toBe('function');
+      expect(root[name], name).toBe(field[name]);
+    }
+  });
+
+  it('names a custom control group from the Field label, and nothing outside a Field', () => {
+    render(FieldLabelHarness);
+    const [inside, outside] = screen.getAllByTestId('custom-group');
+    expect(within(document.body).getByRole('group', { name: 'Priority' })).toBe(inside);
+    expect(outside?.hasAttribute('aria-labelledby')).toBe(false);
   });
 });
 
