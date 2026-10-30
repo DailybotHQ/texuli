@@ -1436,8 +1436,10 @@ reflect this decision.
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
   developer may override this decision, and the layer below is an
-  exception the developer confirms. **Status: planned** (first published
-  in release 0.9.0); nothing below is shipped yet.
+  exception the developer confirms. **Status: in development:**
+  `packages/mcp`, `texuli mcp`, the L9 entry and the consumer test exist
+  in the repository (T-mcp-local); first published in release 0.9.0, not
+  on npm yet.
 - **Context:** the stdio server exists in `packages/tools/src/mcp` with no
   published binary. Every MCP host documents a one-word install of the
   form "npx -y" plus a package name, and `@texuli/tools` is a library
