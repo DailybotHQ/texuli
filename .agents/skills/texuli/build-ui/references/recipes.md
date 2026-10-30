@@ -105,8 +105,8 @@ captions/chapters → export only if the brief asks (media export docs).
 ## 6. Drag and drop: sortable lists, groups and boards
 
 **Brief shape:** reorder a list; move cards between columns; copy from a
-palette; reparent in a tree. `@texuli/drag` is in development and not on
-npm, so this runs in a Texuli workspace.
+palette; reparent in a tree. `@texuli/drag` is in development and on npm
+as `0.9.0`.
 
 | Need | Prefer |
 | --- | --- |
@@ -159,7 +159,7 @@ the behavior scenario `tests/behavior/scenarios/sortable.spec.ts`.
 
 **Brief shape:** an automation, approval or pipeline the person edits as
 nodes and edges, or a read-only diagram of one. `@texuli/workflows` is in
-development and on npm as `0.8.0`.
+development and on npm as `0.9.0`.
 
 ```svelte
 <script lang="ts">

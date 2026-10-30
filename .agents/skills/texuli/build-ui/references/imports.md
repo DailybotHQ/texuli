@@ -76,11 +76,31 @@ Never `@texuli/core` root barrel for app code.
 | Dates | `@texuli/date` (`CalendarDate`, Gregorian only) |
 | Class helpers from those packages | `texuli/cx` only |
 
+## New in 0.9.0
+
+These APIs ship in `0.9.0`, the first release of `@texuli/mcp`; the 0.8
+line does not have them. Use them with `^0.9.0`.
+
+| Need | Use |
+| --- | --- |
+| Restyle components from a design system | Component tokens (`--tx-<component>-<key>`, listed in `@texuli/tokens/components`) and system tokens (`@texuli/tokens/system`) set on a `[data-tx-scope]` element; import `@texuli/tokens/base.css` |
+| Default variants and sizes | `setDesignDefaults` and `getDesignDefaults` (`texuli/defaults`); an explicit prop always wins |
+| Overlays that keep a themed subtree's tokens | Nothing to do: `Dialog.Portal`, `AlertDialog.Portal` and `Portal` follow the nearest `[data-tx-scope]` (`createScopedPortal` in `@texuli/core/portal`) |
+| A time x-axis on a chart | `xKind="time"`, `formatX` and `locale` on the cartesian charts (`@texuli/charts/cartesian`) |
+| Keyboard rows in a table grid | `DataGrid` `mode="table"` with `rowFocusable` (Enter and Space), `searchPredicate`, a numbered pager |
+| Field label context in your own control | `useFieldLabel` and `getFieldLabelContext` (`texuli/field`) |
+| Compose event handlers | `composeHandlers` and `chainHandlers` (`texuli`, `@texuli/primitives`) |
+| Every operation from code or a shell | `@texuli/tools/ops` (`invoke`), `texuli <group> <verb>`, and the MCP servers ([`../../router/hosts.md`](../../router/hosts.md#mcp)) |
+
+Behavior changes to expect in `0.9.0` are in
+[`../../upgrade/SKILL.md`](../../upgrade/SKILL.md) and `docs/RELEASE.md` in
+the Texuli repository ("0.9.0").
+
 ## New in 0.8.0
 
 These APIs ship in `0.8.0`, the first release of `@texuli/forms`,
 `@texuli/canvas` and `@texuli/sheets`; `0.7.0` does not have them. Use them
-with `^0.8.0`. The three packages are in development (pre-1.0).
+with `^0.8.0` or later. The three packages are in development (pre-1.0).
 
 | Need | Use |
 | --- | --- |
