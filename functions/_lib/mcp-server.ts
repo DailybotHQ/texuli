@@ -11,9 +11,6 @@
  * it lands. `functions/` is not a workspace package, so the layer guard does
  * not apply here, and the website's own sources stay free of this import.
  */
-import serverCard from '../../apps/website/public/.well-known/mcp/server-card.json' with {
-  type: 'json',
-};
 import { buildBotEventRequest, buildMcpEventBody } from '../../apps/website/src/lib/bot-events.ts';
 import { createMcpHandler } from '../../packages/tools/src/mcp/handler.ts';
 import { MCP_SUPPORTED_PROTOCOL_VERSIONS } from '../../packages/tools/src/mcp/protocol.ts';
@@ -45,7 +42,6 @@ const deps: McpEndpointDeps = {
   supportedVersions: MCP_SUPPORTED_PROTOCOL_VERSIONS,
   limiter: createTokenBucket(MCP_RATE_POLICY),
   knownOperations: servedNames,
-  serverCard,
 };
 
 /**

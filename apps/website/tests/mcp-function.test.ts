@@ -493,7 +493,7 @@ describe('the time guard', () => {
 });
 
 describe('GET, OPTIONS and other methods', () => {
-  it('answers GET with 405, Allow and a docs pointer; agents get the server card', async () => {
+  it('answers GET with 405, Allow and a docs pointer to the server card, for browsers and agents alike', async () => {
     const browser = await call({ method: 'GET' });
     expect(browser.status).toBe(405);
     expect(browser.headers.get('allow')).toBe('POST, OPTIONS');
@@ -503,10 +503,12 @@ describe('GET, OPTIONS and other methods', () => {
     expect(problem.serverCard).toBe('/.well-known/mcp/server-card.json');
     expectSecurityHeaders(browser, 'GET');
 
+    // The Function bundles no copy of the card (Cloudflare's Functions build
+    // rejects JSON import attributes); agents follow the pointer instead.
     const agent = await call({ method: 'GET', headers: { 'user-agent': 'curl/8.4.0' } });
     expect(agent.status).toBe(405);
-    expect(agent.headers.get('content-type')).toBe('application/json');
-    expect((await agent.json()).serverInfo.name).toBe('texuli');
+    expect(agent.headers.get('content-type')).toBe('application/problem+json');
+    expect((await agent.json()).serverCard).toBe('/.well-known/mcp/server-card.json');
 
     for (const method of ['PUT', 'DELETE', 'PATCH']) {
       const response = await call({ method, body: method === 'PUT' ? '{}' : null });
