@@ -247,7 +247,7 @@ onMount(() => {
     text-align: start;
     background: var(--tx-surface, var(--tx-background));
     border: 1px solid var(--tx-border);
-    border-radius: var(--tx-radius, 0.625rem);
+    border-radius: var(--tx-shape-radius-lg);
     font: inherit;
     cursor: pointer;
   }
@@ -272,7 +272,7 @@ onMount(() => {
     aspect-ratio: var(--tx-deck-aspect-ratio, 16 / 9);
     background: var(--tx-muted, var(--tx-background));
     border: 1px dashed var(--tx-border);
-    border-radius: calc(var(--tx-radius, 0.625rem) * 0.75);
+    border-radius: calc(var(--tx-shape-radius-lg) * 0.75);
   }
 
   .tx-deck-overview__caption {

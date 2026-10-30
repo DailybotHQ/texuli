@@ -387,7 +387,7 @@ onMount(() => {
     padding-block: 0.25rem;
     padding-inline: 0.375rem;
     line-height: 1.2;
-    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-size: var(--tx-type-label-size);
   }
 
   .tx-deck-chrome-tool[data-labelled] {

@@ -106,7 +106,7 @@ onMount(() => {
     aspect-ratio: var(--tx-deck-preview-ratio, 16 / 9);
     background: var(--tx-muted, var(--tx-background));
     border: 1px solid var(--tx-border);
-    border-radius: calc(var(--tx-radius, 0.625rem) * 0.75);
+    border-radius: calc(var(--tx-shape-radius-lg) * 0.75);
   }
 
   .tx-deck-preview__canvas {
