@@ -8,44 +8,52 @@ additive: nothing existing is renamed or removed.
 
 - **System tokens:** 151 in 11 families
   (space, size, type, elevation, shape, layer, opacity, layout, icon, status, data-viz).
-  123 are read with their default as the fallback; the
+  123 are declared in `@texuli/tokens/base.css`; the
   28 data-viz tokens are emitted per theme.
 - **Component tokens:** 335 for 48 components
-  (`@texuli/tokens/components`), all fallback-only.
+  (`@texuli/tokens/components`), never declared.
 - **Renames:** 0 (`@texuli/tokens/renames.json`, schema
   `TOKEN_RENAMES_JSON_SCHEMA`).
 
-## The fallback model
+## The base model: one fallback level
 
-Token contract v2 adds **0 B of eager CSS**: `@texuli/tokens/base.css` declares
-none of these tokens. Every read carries the registry default as its fallback:
+`@texuli/tokens/base.css` declares every system token default once, inside
+`@layer tx.base` on each token scope (`:where(:root, [data-tx-theme], [data-tx-scope])`),
+so derived defaults (space steps, radius steps, type roles) resolve against the
+nearest theme and its `--tx-density`. Reads then carry at most one fallback:
 
-- **System tokens:** `systemVar(name)` from `@texuli/tokens/system`, for example
-  `var(--tx-z-modal, 60)` or `var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem))`.
-- **Component tokens:** `componentVar(component, key)` from
-  `@texuli/tokens/components`, for example `var(--tx-button-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))`.
+- **System tokens** read plain: `systemVar(name)` from `@texuli/tokens/system`, for
+  example `var(--tx-z-modal)` or `var(--tx-space-4)`.
+- **Component tokens** are never declared (0 B until a design system sets one)
+  and fall back to their registry default: `componentVar(component, key)` from
+  `@texuli/tokens/components`, for example `var(--tx-button-radius, var(--tx-shape-radius-lg))`.
   `componentTokenFallbacks()` maps every component token to its expression.
 
-So a token exists on a page only when a theme, a design system or the host
-sets it, and a derived default (space steps, radius steps, type roles)
-resolves where it is read, against the nearest theme. **Design systems set
-tokens on their scope** (the element that carries `data-tx-theme` or
-`data-tx-scope`), never globally, so two design systems can share a page.
+**Why not fallback-only:** an earlier draft declared nothing and repeated the
+whole default chain in every read (`var(--tx-space-4, calc(var(--tx-space-unit,
+calc(0.25rem * var(--tx-density, 1))) * 4))`). Measured after adoption, those
+chains added about 5.5 KB gzip to the `texuli` CSS and pushed several entries
+over budget, far more than the system defaults cost once in `base.css`.
+
+**Design systems set tokens on their scope** (the element that carries
+`data-tx-theme` or `data-tx-scope`), never globally, so two design systems can
+share a page.
 
 `checkTokenReads(source)` (`@texuli/tokens/components`) is the drift guard:
-every `var()` read of a system or component token must equal `systemVar` /
-`componentVar` exactly. `tests/token-contract-v2.test.ts` runs it over every
-component stylesheet in the repository.
+every `var()` read of a base system token or a component token must equal
+`systemVar` / `componentVar` exactly. `tests/token-contract-v2.test.ts` runs it
+over every component stylesheet in the repository.
 
 ## Status
 
-- **Shipped in this package:** the families, the registry, the read helpers
-  and guard, `@texuli/tokens/data-viz`
+- **Shipped in this package:** the families and their `base.css` defaults,
+  the registry, the read helpers and guard, `@texuli/tokens/data-viz`
   (complete chart tokens for any theme) and the rename list.
 - **Adopted in `texuli`:** every styled component stylesheet reads its
   component tokens (all of them), and the other sizes, spaces, radii,
   shadows and z-indexes read system tokens where a step matches; layouts
-  and the sortable primitive read system tokens. Each stylesheet lists the
+  read system tokens (the headless sortable primitive keeps its 24px target
+  literal: it cannot assume `base.css`). Each stylesheet lists the
   literals it keeps and why. The tier-3 hooks set component tokens
   (`data-tx-button-style`, `data-tx-card-style`, `data-tx-input-style`,
   `data-tx-focus-ring-style`), and `setDesignDefaults` (`texuli/defaults`)
@@ -79,20 +87,20 @@ The 0.25rem spacing scale, scaled by `--tx-density`.
 
 | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- |
-| `--tx-space-unit` | `calc(0.25rem * var(--tx-density, 1))` | The 0.25rem step, scaled by the theme density. | `var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1)))` |
-| `--tx-space-0` | `0px` | No space. | `var(--tx-space-0, 0px)` |
-| `--tx-space-1` | `calc(var(--tx-space-unit) * 1)` | 0.25rem at density 1. | `var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1))` |
-| `--tx-space-2` | `calc(var(--tx-space-unit) * 2)` | 0.5rem at density 1. | `var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2))` |
-| `--tx-space-3` | `calc(var(--tx-space-unit) * 3)` | 0.75rem at density 1. | `var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3))` |
-| `--tx-space-4` | `calc(var(--tx-space-unit) * 4)` | 1rem at density 1. | `var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4))` |
-| `--tx-space-5` | `calc(var(--tx-space-unit) * 5)` | 1.25rem at density 1. | `var(--tx-space-5, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5))` |
-| `--tx-space-6` | `calc(var(--tx-space-unit) * 6)` | 1.5rem at density 1. | `var(--tx-space-6, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 6))` |
-| `--tx-space-7` | `calc(var(--tx-space-unit) * 7)` | 1.75rem at density 1. | `var(--tx-space-7, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 7))` |
-| `--tx-space-8` | `calc(var(--tx-space-unit) * 8)` | 2rem at density 1. | `var(--tx-space-8, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 8))` |
-| `--tx-space-9` | `calc(var(--tx-space-unit) * 9)` | 2.25rem at density 1. | `var(--tx-space-9, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 9))` |
-| `--tx-space-10` | `calc(var(--tx-space-unit) * 10)` | 2.5rem at density 1. | `var(--tx-space-10, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 10))` |
-| `--tx-space-11` | `calc(var(--tx-space-unit) * 11)` | 2.75rem at density 1. | `var(--tx-space-11, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 11))` |
-| `--tx-space-12` | `calc(var(--tx-space-unit) * 12)` | 3rem at density 1. | `var(--tx-space-12, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 12))` |
+| `--tx-space-unit` | `calc(0.25rem * var(--tx-density, 1))` | The 0.25rem step, scaled by the theme density. | `var(--tx-space-unit)` |
+| `--tx-space-0` | `0px` | No space. | `var(--tx-space-0)` |
+| `--tx-space-1` | `calc(var(--tx-space-unit) * 1)` | 0.25rem at density 1. | `var(--tx-space-1)` |
+| `--tx-space-2` | `calc(var(--tx-space-unit) * 2)` | 0.5rem at density 1. | `var(--tx-space-2)` |
+| `--tx-space-3` | `calc(var(--tx-space-unit) * 3)` | 0.75rem at density 1. | `var(--tx-space-3)` |
+| `--tx-space-4` | `calc(var(--tx-space-unit) * 4)` | 1rem at density 1. | `var(--tx-space-4)` |
+| `--tx-space-5` | `calc(var(--tx-space-unit) * 5)` | 1.25rem at density 1. | `var(--tx-space-5)` |
+| `--tx-space-6` | `calc(var(--tx-space-unit) * 6)` | 1.5rem at density 1. | `var(--tx-space-6)` |
+| `--tx-space-7` | `calc(var(--tx-space-unit) * 7)` | 1.75rem at density 1. | `var(--tx-space-7)` |
+| `--tx-space-8` | `calc(var(--tx-space-unit) * 8)` | 2rem at density 1. | `var(--tx-space-8)` |
+| `--tx-space-9` | `calc(var(--tx-space-unit) * 9)` | 2.25rem at density 1. | `var(--tx-space-9)` |
+| `--tx-space-10` | `calc(var(--tx-space-unit) * 10)` | 2.5rem at density 1. | `var(--tx-space-10)` |
+| `--tx-space-11` | `calc(var(--tx-space-unit) * 11)` | 2.75rem at density 1. | `var(--tx-space-11)` |
+| `--tx-space-12` | `calc(var(--tx-space-unit) * 12)` | 3rem at density 1. | `var(--tx-space-12)` |
 
 ### Size (`size`)
 
@@ -100,16 +108,16 @@ Control heights, icon sizes and interactive targets.
 
 | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- |
-| `--tx-size-control-xs` | `1.75rem` | Compact control height (toolbar small buttons). | `var(--tx-size-control-xs, 1.75rem)` |
-| `--tx-size-control-sm` | `2rem` | Small control height (button, select, toggle sm). | `var(--tx-size-control-sm, 2rem)` |
-| `--tx-size-control-md` | `2.25rem` | Default control height (button, input, select md). | `var(--tx-size-control-md, 2.25rem)` |
-| `--tx-size-control-lg` | `2.75rem` | Large control height (button, select, toggle lg). | `var(--tx-size-control-lg, 2.75rem)` |
-| `--tx-size-icon-xs` | `0.75rem` | Extra small icon (12 px, Icon size xs). | `var(--tx-size-icon-xs, 0.75rem)` |
-| `--tx-size-icon-sm` | `1rem` | Small icon (16 px, Icon size sm, icons inside buttons). | `var(--tx-size-icon-sm, 1rem)` |
-| `--tx-size-icon-md` | `1.25rem` | Default icon (20 px, Icon size md, alert and toast icons). | `var(--tx-size-icon-md, 1.25rem)` |
-| `--tx-size-icon-lg` | `1.5rem` | Large icon (24 px, Icon size lg). | `var(--tx-size-icon-lg, 1.5rem)` |
-| `--tx-size-target-min` | `24px` | The smallest interactive target anywhere (WCAG 2.2). | `var(--tx-size-target-min, 24px)` |
-| `--tx-size-target-touch` | `max(2.75rem, 44px)` | The interactive target below 640 px (button sm, md and icon on small screens). | `var(--tx-size-target-touch, max(2.75rem, 44px))` |
+| `--tx-size-control-xs` | `1.75rem` | Compact control height (toolbar small buttons). | `var(--tx-size-control-xs)` |
+| `--tx-size-control-sm` | `2rem` | Small control height (button, select, toggle sm). | `var(--tx-size-control-sm)` |
+| `--tx-size-control-md` | `2.25rem` | Default control height (button, input, select md). | `var(--tx-size-control-md)` |
+| `--tx-size-control-lg` | `2.75rem` | Large control height (button, select, toggle lg). | `var(--tx-size-control-lg)` |
+| `--tx-size-icon-xs` | `0.75rem` | Extra small icon (12 px, Icon size xs). | `var(--tx-size-icon-xs)` |
+| `--tx-size-icon-sm` | `1rem` | Small icon (16 px, Icon size sm, icons inside buttons). | `var(--tx-size-icon-sm)` |
+| `--tx-size-icon-md` | `1.25rem` | Default icon (20 px, Icon size md, alert and toast icons). | `var(--tx-size-icon-md)` |
+| `--tx-size-icon-lg` | `1.5rem` | Large icon (24 px, Icon size lg). | `var(--tx-size-icon-lg)` |
+| `--tx-size-target-min` | `24px` | The smallest interactive target anywhere (WCAG 2.2). | `var(--tx-size-target-min)` |
+| `--tx-size-target-touch` | `max(2.75rem, 44px)` | The interactive target below 640 px (button sm, md and icon on small screens). | `var(--tx-size-target-touch)` |
 
 ### Type roles (`type`)
 
@@ -117,41 +125,41 @@ Family, size, line height, weight and tracking per role, mapped from the theme t
 
 | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- |
-| `--tx-type-display-family` | `var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif))` | Hero and display text. Font family. | `var(--tx-type-display-family, var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif)))` |
-| `--tx-type-display-size` | `var(--tx-font-size-4xl, 2.25rem)` | Hero and display text. Font size. | `var(--tx-type-display-size, var(--tx-font-size-4xl, 2.25rem))` |
-| `--tx-type-display-line` | `1.1` | Hero and display text. Line height. | `var(--tx-type-display-line, 1.1)` |
-| `--tx-type-display-weight` | `var(--tx-font-weight-bold, 700)` | Hero and display text. Font weight. | `var(--tx-type-display-weight, var(--tx-font-weight-bold, 700))` |
-| `--tx-type-display-tracking` | `var(--tx-letter-spacing-heading, 0)` | Hero and display text. Letter spacing. | `var(--tx-type-display-tracking, var(--tx-letter-spacing-heading, 0))` |
-| `--tx-type-title-family` | `var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif))` | Page titles and KPI values. Font family. | `var(--tx-type-title-family, var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif)))` |
-| `--tx-type-title-size` | `var(--tx-font-size-2xl, 1.5rem)` | Page titles and KPI values. Font size. | `var(--tx-type-title-size, var(--tx-font-size-2xl, 1.5rem))` |
-| `--tx-type-title-line` | `1.2` | Page titles and KPI values. Line height. | `var(--tx-type-title-line, 1.2)` |
-| `--tx-type-title-weight` | `var(--tx-font-weight-heading, 600)` | Page titles and KPI values. Font weight. | `var(--tx-type-title-weight, var(--tx-font-weight-heading, 600))` |
-| `--tx-type-title-tracking` | `var(--tx-letter-spacing-heading, 0)` | Page titles and KPI values. Letter spacing. | `var(--tx-type-title-tracking, var(--tx-letter-spacing-heading, 0))` |
-| `--tx-type-heading-family` | `var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif))` | Dialog, sheet and section headings. Font family. | `var(--tx-type-heading-family, var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif)))` |
-| `--tx-type-heading-size` | `var(--tx-font-size-lg, 1.125rem)` | Dialog, sheet and section headings. Font size. | `var(--tx-type-heading-size, var(--tx-font-size-lg, 1.125rem))` |
-| `--tx-type-heading-line` | `1.3` | Dialog, sheet and section headings. Line height. | `var(--tx-type-heading-line, 1.3)` |
-| `--tx-type-heading-weight` | `var(--tx-font-weight-heading, 600)` | Dialog, sheet and section headings. Font weight. | `var(--tx-type-heading-weight, var(--tx-font-weight-heading, 600))` |
-| `--tx-type-heading-tracking` | `var(--tx-letter-spacing-heading, 0)` | Dialog, sheet and section headings. Letter spacing. | `var(--tx-type-heading-tracking, var(--tx-letter-spacing-heading, 0))` |
-| `--tx-type-body-family` | `var(--tx-font-sans, system-ui, sans-serif)` | Running text. Font family. | `var(--tx-type-body-family, var(--tx-font-sans, system-ui, sans-serif))` |
-| `--tx-type-body-size` | `var(--tx-font-size-base, 1rem)` | Running text. Font size. | `var(--tx-type-body-size, var(--tx-font-size-base, 1rem))` |
-| `--tx-type-body-line` | `1.5` | Running text. Line height. | `var(--tx-type-body-line, 1.5)` |
-| `--tx-type-body-weight` | `var(--tx-font-weight-body, 400)` | Running text. Font weight. | `var(--tx-type-body-weight, var(--tx-font-weight-body, 400))` |
-| `--tx-type-body-tracking` | `var(--tx-letter-spacing-body, 0)` | Running text. Letter spacing. | `var(--tx-type-body-tracking, var(--tx-letter-spacing-body, 0))` |
-| `--tx-type-label-family` | `var(--tx-font-sans, system-ui, sans-serif)` | Control labels and button text. Font family. | `var(--tx-type-label-family, var(--tx-font-sans, system-ui, sans-serif))` |
-| `--tx-type-label-size` | `var(--tx-font-size-sm, 0.875rem)` | Control labels and button text. Font size. | `var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem))` |
-| `--tx-type-label-line` | `1.25` | Control labels and button text. Line height. | `var(--tx-type-label-line, 1.25)` |
-| `--tx-type-label-weight` | `var(--tx-font-weight-medium, 500)` | Control labels and button text. Font weight. | `var(--tx-type-label-weight, var(--tx-font-weight-medium, 500))` |
-| `--tx-type-label-tracking` | `var(--tx-letter-spacing-body, 0)` | Control labels and button text. Letter spacing. | `var(--tx-type-label-tracking, var(--tx-letter-spacing-body, 0))` |
-| `--tx-type-caption-family` | `var(--tx-font-sans, system-ui, sans-serif)` | Descriptions, hints and captions. Font family. | `var(--tx-type-caption-family, var(--tx-font-sans, system-ui, sans-serif))` |
-| `--tx-type-caption-size` | `var(--tx-font-size-xs, 0.75rem)` | Descriptions, hints and captions. Font size. | `var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem))` |
-| `--tx-type-caption-line` | `1.35` | Descriptions, hints and captions. Line height. | `var(--tx-type-caption-line, 1.35)` |
-| `--tx-type-caption-weight` | `var(--tx-font-weight-body, 400)` | Descriptions, hints and captions. Font weight. | `var(--tx-type-caption-weight, var(--tx-font-weight-body, 400))` |
-| `--tx-type-caption-tracking` | `var(--tx-letter-spacing-body, 0)` | Descriptions, hints and captions. Letter spacing. | `var(--tx-type-caption-tracking, var(--tx-letter-spacing-body, 0))` |
-| `--tx-type-code-family` | `var(--tx-font-mono, ui-monospace, monospace)` | Inline and block code. Font family. | `var(--tx-type-code-family, var(--tx-font-mono, ui-monospace, monospace))` |
-| `--tx-type-code-size` | `0.875em` | Inline and block code. Font size. | `var(--tx-type-code-size, 0.875em)` |
-| `--tx-type-code-line` | `1.5` | Inline and block code. Line height. | `var(--tx-type-code-line, 1.5)` |
-| `--tx-type-code-weight` | `var(--tx-font-weight-body, 400)` | Inline and block code. Font weight. | `var(--tx-type-code-weight, var(--tx-font-weight-body, 400))` |
-| `--tx-type-code-tracking` | `0` | Inline and block code. Letter spacing. | `var(--tx-type-code-tracking, 0)` |
+| `--tx-type-display-family` | `var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif))` | Hero and display text. Font family. | `var(--tx-type-display-family)` |
+| `--tx-type-display-size` | `var(--tx-font-size-4xl, 2.25rem)` | Hero and display text. Font size. | `var(--tx-type-display-size)` |
+| `--tx-type-display-line` | `1.1` | Hero and display text. Line height. | `var(--tx-type-display-line)` |
+| `--tx-type-display-weight` | `var(--tx-font-weight-bold, 700)` | Hero and display text. Font weight. | `var(--tx-type-display-weight)` |
+| `--tx-type-display-tracking` | `var(--tx-letter-spacing-heading, 0)` | Hero and display text. Letter spacing. | `var(--tx-type-display-tracking)` |
+| `--tx-type-title-family` | `var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif))` | Page titles and KPI values. Font family. | `var(--tx-type-title-family)` |
+| `--tx-type-title-size` | `var(--tx-font-size-2xl, 1.5rem)` | Page titles and KPI values. Font size. | `var(--tx-type-title-size)` |
+| `--tx-type-title-line` | `1.2` | Page titles and KPI values. Line height. | `var(--tx-type-title-line)` |
+| `--tx-type-title-weight` | `var(--tx-font-weight-heading, 600)` | Page titles and KPI values. Font weight. | `var(--tx-type-title-weight)` |
+| `--tx-type-title-tracking` | `var(--tx-letter-spacing-heading, 0)` | Page titles and KPI values. Letter spacing. | `var(--tx-type-title-tracking)` |
+| `--tx-type-heading-family` | `var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif))` | Dialog, sheet and section headings. Font family. | `var(--tx-type-heading-family)` |
+| `--tx-type-heading-size` | `var(--tx-font-size-lg, 1.125rem)` | Dialog, sheet and section headings. Font size. | `var(--tx-type-heading-size)` |
+| `--tx-type-heading-line` | `1.3` | Dialog, sheet and section headings. Line height. | `var(--tx-type-heading-line)` |
+| `--tx-type-heading-weight` | `var(--tx-font-weight-heading, 600)` | Dialog, sheet and section headings. Font weight. | `var(--tx-type-heading-weight)` |
+| `--tx-type-heading-tracking` | `var(--tx-letter-spacing-heading, 0)` | Dialog, sheet and section headings. Letter spacing. | `var(--tx-type-heading-tracking)` |
+| `--tx-type-body-family` | `var(--tx-font-sans, system-ui, sans-serif)` | Running text. Font family. | `var(--tx-type-body-family)` |
+| `--tx-type-body-size` | `var(--tx-font-size-base, 1rem)` | Running text. Font size. | `var(--tx-type-body-size)` |
+| `--tx-type-body-line` | `1.5` | Running text. Line height. | `var(--tx-type-body-line)` |
+| `--tx-type-body-weight` | `var(--tx-font-weight-body, 400)` | Running text. Font weight. | `var(--tx-type-body-weight)` |
+| `--tx-type-body-tracking` | `var(--tx-letter-spacing-body, 0)` | Running text. Letter spacing. | `var(--tx-type-body-tracking)` |
+| `--tx-type-label-family` | `var(--tx-font-sans, system-ui, sans-serif)` | Control labels and button text. Font family. | `var(--tx-type-label-family)` |
+| `--tx-type-label-size` | `var(--tx-font-size-sm, 0.875rem)` | Control labels and button text. Font size. | `var(--tx-type-label-size)` |
+| `--tx-type-label-line` | `1.25` | Control labels and button text. Line height. | `var(--tx-type-label-line)` |
+| `--tx-type-label-weight` | `var(--tx-font-weight-medium, 500)` | Control labels and button text. Font weight. | `var(--tx-type-label-weight)` |
+| `--tx-type-label-tracking` | `var(--tx-letter-spacing-body, 0)` | Control labels and button text. Letter spacing. | `var(--tx-type-label-tracking)` |
+| `--tx-type-caption-family` | `var(--tx-font-sans, system-ui, sans-serif)` | Descriptions, hints and captions. Font family. | `var(--tx-type-caption-family)` |
+| `--tx-type-caption-size` | `var(--tx-font-size-xs, 0.75rem)` | Descriptions, hints and captions. Font size. | `var(--tx-type-caption-size)` |
+| `--tx-type-caption-line` | `1.35` | Descriptions, hints and captions. Line height. | `var(--tx-type-caption-line)` |
+| `--tx-type-caption-weight` | `var(--tx-font-weight-body, 400)` | Descriptions, hints and captions. Font weight. | `var(--tx-type-caption-weight)` |
+| `--tx-type-caption-tracking` | `var(--tx-letter-spacing-body, 0)` | Descriptions, hints and captions. Letter spacing. | `var(--tx-type-caption-tracking)` |
+| `--tx-type-code-family` | `var(--tx-font-mono, ui-monospace, monospace)` | Inline and block code. Font family. | `var(--tx-type-code-family)` |
+| `--tx-type-code-size` | `0.875em` | Inline and block code. Font size. | `var(--tx-type-code-size)` |
+| `--tx-type-code-line` | `1.5` | Inline and block code. Line height. | `var(--tx-type-code-line)` |
+| `--tx-type-code-weight` | `var(--tx-font-weight-body, 400)` | Inline and block code. Font weight. | `var(--tx-type-code-weight)` |
+| `--tx-type-code-tracking` | `0` | Inline and block code. Letter spacing. | `var(--tx-type-code-tracking)` |
 
 ### Elevation (`elevation`)
 
@@ -159,14 +167,14 @@ A six-step shadow ladder over the theme soft and float shadows, plus glass.
 
 | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- |
-| `--tx-elevation-0` | `none` | Flush with the surface. | `var(--tx-elevation-0, none)` |
-| `--tx-elevation-1` | `var(--tx-shadow-soft, none)` | Resting surfaces: cards, inputs, stats. | `var(--tx-elevation-1, var(--tx-shadow-soft, none))` |
-| `--tx-elevation-2` | `var(--tx-shadow-soft, none)` | Raised controls: slider thumbs, active tabs. | `var(--tx-elevation-2, var(--tx-shadow-soft, none))` |
-| `--tx-elevation-3` | `var(--tx-shadow-float, none)` | Floating layers: menus, popovers, tooltips. | `var(--tx-elevation-3, var(--tx-shadow-float, none))` |
-| `--tx-elevation-4` | `var(--tx-shadow-float, none)` | Modal layers: dialogs and sheets. | `var(--tx-elevation-4, var(--tx-shadow-float, none))` |
-| `--tx-elevation-5` | `var(--tx-shadow-float, none)` | Notifications: toasts. | `var(--tx-elevation-5, var(--tx-shadow-float, none))` |
-| `--tx-surface-glass-alpha` | `var(--tx-glass-opacity, 82%)` | Glass surface fill opacity. | `var(--tx-surface-glass-alpha, var(--tx-glass-opacity, 82%))` |
-| `--tx-surface-glass-blur` | `var(--tx-glass-blur, 16px)` | Glass surface backdrop blur. | `var(--tx-surface-glass-blur, var(--tx-glass-blur, 16px))` |
+| `--tx-elevation-0` | `none` | Flush with the surface. | `var(--tx-elevation-0)` |
+| `--tx-elevation-1` | `var(--tx-shadow-soft, none)` | Resting surfaces: cards, inputs, stats. | `var(--tx-elevation-1)` |
+| `--tx-elevation-2` | `var(--tx-shadow-soft, none)` | Raised controls: slider thumbs, active tabs. | `var(--tx-elevation-2)` |
+| `--tx-elevation-3` | `var(--tx-shadow-float, none)` | Floating layers: menus, popovers, tooltips. | `var(--tx-elevation-3)` |
+| `--tx-elevation-4` | `var(--tx-shadow-float, none)` | Modal layers: dialogs and sheets. | `var(--tx-elevation-4)` |
+| `--tx-elevation-5` | `var(--tx-shadow-float, none)` | Notifications: toasts. | `var(--tx-elevation-5)` |
+| `--tx-surface-glass-alpha` | `var(--tx-glass-opacity, 82%)` | Glass surface fill opacity. | `var(--tx-surface-glass-alpha)` |
+| `--tx-surface-glass-blur` | `var(--tx-glass-blur, 16px)` | Glass surface backdrop blur. | `var(--tx-surface-glass-blur)` |
 
 ### Shape (`shape`)
 
@@ -174,15 +182,15 @@ The radius scale derived from `--tx-radius` and the radius scale, and border wid
 
 | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- |
-| `--tx-shape-radius-none` | `0px` | Square corners. | `var(--tx-shape-radius-none, 0px)` |
-| `--tx-shape-radius-xs` | `max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-6, 6px))` | The theme radius minus 6 px times the radius scale. | `var(--tx-shape-radius-xs, max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-6, 6px)))` |
-| `--tx-shape-radius-sm` | `max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-4, 4px))` | The theme radius minus 4 px times the radius scale. | `var(--tx-shape-radius-sm, max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-4, 4px)))` |
-| `--tx-shape-radius-md` | `max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px))` | The theme radius minus 2 px times the radius scale. | `var(--tx-shape-radius-md, max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px)))` |
-| `--tx-shape-radius-lg` | `var(--tx-radius, 0.625rem)` | The theme radius. | `var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))` |
-| `--tx-shape-radius-xl` | `calc(var(--tx-radius, 0.625rem) + var(--tx-radius-step-4, 4px))` | The theme radius plus 4 px times the radius scale. | `var(--tx-shape-radius-xl, calc(var(--tx-radius, 0.625rem) + var(--tx-radius-step-4, 4px)))` |
-| `--tx-shape-radius-full` | `9999px` | Pill and circle corners. | `var(--tx-shape-radius-full, 9999px)` |
-| `--tx-border-width-thin` | `var(--tx-border-width, 1px)` | Hairline borders. | `var(--tx-border-width-thin, var(--tx-border-width, 1px))` |
-| `--tx-border-width-thick` | `calc(var(--tx-border-width, 1px) * 2)` | Emphasis borders (drop zones, slider thumbs). | `var(--tx-border-width-thick, calc(var(--tx-border-width, 1px) * 2))` |
+| `--tx-shape-radius-none` | `0px` | Square corners. | `var(--tx-shape-radius-none)` |
+| `--tx-shape-radius-xs` | `max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-6, 6px))` | The theme radius minus 6 px times the radius scale. | `var(--tx-shape-radius-xs)` |
+| `--tx-shape-radius-sm` | `max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-4, 4px))` | The theme radius minus 4 px times the radius scale. | `var(--tx-shape-radius-sm)` |
+| `--tx-shape-radius-md` | `max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px))` | The theme radius minus 2 px times the radius scale. | `var(--tx-shape-radius-md)` |
+| `--tx-shape-radius-lg` | `var(--tx-radius, 0.625rem)` | The theme radius. | `var(--tx-shape-radius-lg)` |
+| `--tx-shape-radius-xl` | `calc(var(--tx-radius, 0.625rem) + var(--tx-radius-step-4, 4px))` | The theme radius plus 4 px times the radius scale. | `var(--tx-shape-radius-xl)` |
+| `--tx-shape-radius-full` | `9999px` | Pill and circle corners. | `var(--tx-shape-radius-full)` |
+| `--tx-border-width-thin` | `var(--tx-border-width, 1px)` | Hairline borders. | `var(--tx-border-width-thin)` |
+| `--tx-border-width-thick` | `calc(var(--tx-border-width, 1px) * 2)` | Emphasis borders (drop zones, slider thumbs). | `var(--tx-border-width-thick)` |
 
 ### Layers (`layer`)
 
@@ -190,14 +198,14 @@ Stacking order for sticky chrome, popovers, overlays, dialogs and toasts.
 
 | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- |
-| `--tx-z-base` | `0` | In-flow content. | `var(--tx-z-base, 0)` |
-| `--tx-z-sticky` | `40` | Sticky chrome and navigation menus. | `var(--tx-z-sticky, 40)` |
-| `--tx-z-popover` | `50` | Popovers, menus, selects, comboboxes, date panels. | `var(--tx-z-popover, 50)` |
-| `--tx-z-tooltip` | `50` | Tooltips. | `var(--tx-z-tooltip, 50)` |
-| `--tx-z-overlay` | `60` | Sheets, drawers and their scrims. | `var(--tx-z-overlay, 60)` |
-| `--tx-z-modal` | `60` | Dialogs and alert dialogs. | `var(--tx-z-modal, 60)` |
-| `--tx-z-toast` | `60` | The toast viewport. | `var(--tx-z-toast, 60)` |
-| `--tx-z-top` | `70` | Skip links and shell chrome above every layer. | `var(--tx-z-top, 70)` |
+| `--tx-z-base` | `0` | In-flow content. | `var(--tx-z-base)` |
+| `--tx-z-sticky` | `40` | Sticky chrome and navigation menus. | `var(--tx-z-sticky)` |
+| `--tx-z-popover` | `50` | Popovers, menus, selects, comboboxes, date panels. | `var(--tx-z-popover)` |
+| `--tx-z-tooltip` | `50` | Tooltips. | `var(--tx-z-tooltip)` |
+| `--tx-z-overlay` | `60` | Sheets, drawers and their scrims. | `var(--tx-z-overlay)` |
+| `--tx-z-modal` | `60` | Dialogs and alert dialogs. | `var(--tx-z-modal)` |
+| `--tx-z-toast` | `60` | The toast viewport. | `var(--tx-z-toast)` |
+| `--tx-z-top` | `70` | Skip links and shell chrome above every layer. | `var(--tx-z-top)` |
 
 ### Opacity (`opacity`)
 
@@ -205,9 +213,9 @@ Disabled, muted and scrim opacities.
 
 | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- |
-| `--tx-opacity-disabled` | `0.5` | Disabled controls. | `var(--tx-opacity-disabled, 0.5)` |
-| `--tx-opacity-muted` | `0.7` | Decorative icons such as select and menu chevrons. | `var(--tx-opacity-muted, 0.7)` |
-| `--tx-opacity-scrim` | `45%` | Foreground mix of the dialog and sheet scrim. | `var(--tx-opacity-scrim, 45%)` |
+| `--tx-opacity-disabled` | `0.5` | Disabled controls. | `var(--tx-opacity-disabled)` |
+| `--tx-opacity-muted` | `0.7` | Decorative icons such as select and menu chevrons. | `var(--tx-opacity-muted)` |
+| `--tx-opacity-scrim` | `45%` | Foreground mix of the dialog and sheet scrim. | `var(--tx-opacity-scrim)` |
 
 ### Layout (`layout`)
 
@@ -215,20 +223,20 @@ Content widths, container breakpoints, grid columns and gutters. CSS cannot read
 
 | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- |
-| `--tx-layout-content-max` | `72ch` | Readable prose width (content layouts). | `var(--tx-layout-content-max, 72ch)` |
-| `--tx-layout-wide-max` | `80rem` | Wide page sections (marketing layouts). | `var(--tx-layout-wide-max, 80rem)` |
-| `--tx-layout-full-max` | `100%` | Full-bleed sections. | `var(--tx-layout-full-max, 100%)` |
-| `--tx-layout-breakpoint-sm` | `36rem` | Small container breakpoint (2 grid columns). | `var(--tx-layout-breakpoint-sm, 36rem)` |
-| `--tx-layout-breakpoint-md` | `56rem` | Medium container breakpoint (3 grid columns). | `var(--tx-layout-breakpoint-md, 56rem)` |
-| `--tx-layout-breakpoint-lg` | `72rem` | Large container breakpoint (4 grid columns). | `var(--tx-layout-breakpoint-lg, 72rem)` |
-| `--tx-layout-grid-columns-base` | `1` | Grid columns at the base breakpoint. | `var(--tx-layout-grid-columns-base, 1)` |
-| `--tx-layout-grid-columns-sm` | `2` | Grid columns at the sm breakpoint. | `var(--tx-layout-grid-columns-sm, 2)` |
-| `--tx-layout-grid-columns-md` | `3` | Grid columns at the md breakpoint. | `var(--tx-layout-grid-columns-md, 3)` |
-| `--tx-layout-grid-columns-lg` | `4` | Grid columns at the lg breakpoint. | `var(--tx-layout-grid-columns-lg, 4)` |
-| `--tx-layout-grid-gutter-base` | `var(--tx-space-4)` | Grid gutter at the base breakpoint. | `var(--tx-layout-grid-gutter-base, var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)))` |
-| `--tx-layout-grid-gutter-sm` | `var(--tx-space-4)` | Grid gutter at the sm breakpoint. | `var(--tx-layout-grid-gutter-sm, var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)))` |
-| `--tx-layout-grid-gutter-md` | `var(--tx-space-4)` | Grid gutter at the md breakpoint. | `var(--tx-layout-grid-gutter-md, var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)))` |
-| `--tx-layout-grid-gutter-lg` | `var(--tx-space-4)` | Grid gutter at the lg breakpoint. | `var(--tx-layout-grid-gutter-lg, var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)))` |
+| `--tx-layout-content-max` | `72ch` | Readable prose width (content layouts). | `var(--tx-layout-content-max)` |
+| `--tx-layout-wide-max` | `80rem` | Wide page sections (marketing layouts). | `var(--tx-layout-wide-max)` |
+| `--tx-layout-full-max` | `100%` | Full-bleed sections. | `var(--tx-layout-full-max)` |
+| `--tx-layout-breakpoint-sm` | `36rem` | Small container breakpoint (2 grid columns). | `var(--tx-layout-breakpoint-sm)` |
+| `--tx-layout-breakpoint-md` | `56rem` | Medium container breakpoint (3 grid columns). | `var(--tx-layout-breakpoint-md)` |
+| `--tx-layout-breakpoint-lg` | `72rem` | Large container breakpoint (4 grid columns). | `var(--tx-layout-breakpoint-lg)` |
+| `--tx-layout-grid-columns-base` | `1` | Grid columns at the base breakpoint. | `var(--tx-layout-grid-columns-base)` |
+| `--tx-layout-grid-columns-sm` | `2` | Grid columns at the sm breakpoint. | `var(--tx-layout-grid-columns-sm)` |
+| `--tx-layout-grid-columns-md` | `3` | Grid columns at the md breakpoint. | `var(--tx-layout-grid-columns-md)` |
+| `--tx-layout-grid-columns-lg` | `4` | Grid columns at the lg breakpoint. | `var(--tx-layout-grid-columns-lg)` |
+| `--tx-layout-grid-gutter-base` | `var(--tx-space-4)` | Grid gutter at the base breakpoint. | `var(--tx-layout-grid-gutter-base)` |
+| `--tx-layout-grid-gutter-sm` | `var(--tx-space-4)` | Grid gutter at the sm breakpoint. | `var(--tx-layout-grid-gutter-sm)` |
+| `--tx-layout-grid-gutter-md` | `var(--tx-space-4)` | Grid gutter at the md breakpoint. | `var(--tx-layout-grid-gutter-md)` |
+| `--tx-layout-grid-gutter-lg` | `var(--tx-space-4)` | Grid gutter at the lg breakpoint. | `var(--tx-layout-grid-gutter-lg)` |
 
 ### Icons (`icon`)
 
@@ -236,8 +244,8 @@ Icon stroke and style.
 
 | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- |
-| `--tx-icon-stroke` | `2` | Icon stroke width (the Icon component default). | `var(--tx-icon-stroke, 2)` |
-| `--tx-icon-style` | `outline` | Icon style: outline or filled. | `var(--tx-icon-style, outline)` |
+| `--tx-icon-stroke` | `2` | Icon stroke width (the Icon component default). | `var(--tx-icon-stroke)` |
+| `--tx-icon-style` | `outline` | Icon style: outline or filled. | `var(--tx-icon-style)` |
 
 ### Status (`status`)
 
@@ -245,26 +253,26 @@ One status set over the semantic roles, shared by badges, alerts, toasts and cha
 
 | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- |
-| `--tx-status-success` | `var(--tx-success)` | The success fill (badges, alerts, charts). | `var(--tx-status-success, var(--tx-success))` |
-| `--tx-status-success-foreground` | `var(--tx-success-foreground)` | Text on the success fill. | `var(--tx-status-success-foreground, var(--tx-success-foreground))` |
-| `--tx-status-success-soft` | `var(--tx-success-soft)` | The soft success fill. | `var(--tx-status-success-soft, var(--tx-success-soft))` |
-| `--tx-status-success-soft-foreground` | `var(--tx-success-soft-foreground)` | Text on the soft success fill. | `var(--tx-status-success-soft-foreground, var(--tx-success-soft-foreground))` |
-| `--tx-status-warning` | `var(--tx-warning)` | The warning fill (badges, alerts, charts). | `var(--tx-status-warning, var(--tx-warning))` |
-| `--tx-status-warning-foreground` | `var(--tx-warning-foreground)` | Text on the warning fill. | `var(--tx-status-warning-foreground, var(--tx-warning-foreground))` |
-| `--tx-status-warning-soft` | `var(--tx-warning-soft)` | The soft warning fill. | `var(--tx-status-warning-soft, var(--tx-warning-soft))` |
-| `--tx-status-warning-soft-foreground` | `var(--tx-warning-soft-foreground)` | Text on the soft warning fill. | `var(--tx-status-warning-soft-foreground, var(--tx-warning-soft-foreground))` |
-| `--tx-status-danger` | `var(--tx-destructive)` | The danger fill (badges, alerts, charts). | `var(--tx-status-danger, var(--tx-destructive))` |
-| `--tx-status-danger-foreground` | `var(--tx-destructive-foreground)` | Text on the danger fill. | `var(--tx-status-danger-foreground, var(--tx-destructive-foreground))` |
-| `--tx-status-danger-soft` | `var(--tx-destructive-soft)` | The soft danger fill. | `var(--tx-status-danger-soft, var(--tx-destructive-soft))` |
-| `--tx-status-danger-soft-foreground` | `var(--tx-destructive-soft-foreground)` | Text on the soft danger fill. | `var(--tx-status-danger-soft-foreground, var(--tx-destructive-soft-foreground))` |
-| `--tx-status-info` | `var(--tx-info)` | The info fill (badges, alerts, charts). | `var(--tx-status-info, var(--tx-info))` |
-| `--tx-status-info-foreground` | `var(--tx-info-foreground)` | Text on the info fill. | `var(--tx-status-info-foreground, var(--tx-info-foreground))` |
-| `--tx-status-info-soft` | `var(--tx-info-soft)` | The soft info fill. | `var(--tx-status-info-soft, var(--tx-info-soft))` |
-| `--tx-status-info-soft-foreground` | `var(--tx-info-soft-foreground)` | Text on the soft info fill. | `var(--tx-status-info-soft-foreground, var(--tx-info-soft-foreground))` |
-| `--tx-status-neutral` | `var(--tx-secondary)` | The neutral fill (badges, alerts, charts). | `var(--tx-status-neutral, var(--tx-secondary))` |
-| `--tx-status-neutral-foreground` | `var(--tx-secondary-foreground)` | Text on the neutral fill. | `var(--tx-status-neutral-foreground, var(--tx-secondary-foreground))` |
-| `--tx-status-neutral-soft` | `var(--tx-muted)` | The soft neutral fill. | `var(--tx-status-neutral-soft, var(--tx-muted))` |
-| `--tx-status-neutral-soft-foreground` | `var(--tx-muted-foreground)` | Text on the soft neutral fill. | `var(--tx-status-neutral-soft-foreground, var(--tx-muted-foreground))` |
+| `--tx-status-success` | `var(--tx-success)` | The success fill (badges, alerts, charts). | `var(--tx-status-success)` |
+| `--tx-status-success-foreground` | `var(--tx-success-foreground)` | Text on the success fill. | `var(--tx-status-success-foreground)` |
+| `--tx-status-success-soft` | `var(--tx-success-soft)` | The soft success fill. | `var(--tx-status-success-soft)` |
+| `--tx-status-success-soft-foreground` | `var(--tx-success-soft-foreground)` | Text on the soft success fill. | `var(--tx-status-success-soft-foreground)` |
+| `--tx-status-warning` | `var(--tx-warning)` | The warning fill (badges, alerts, charts). | `var(--tx-status-warning)` |
+| `--tx-status-warning-foreground` | `var(--tx-warning-foreground)` | Text on the warning fill. | `var(--tx-status-warning-foreground)` |
+| `--tx-status-warning-soft` | `var(--tx-warning-soft)` | The soft warning fill. | `var(--tx-status-warning-soft)` |
+| `--tx-status-warning-soft-foreground` | `var(--tx-warning-soft-foreground)` | Text on the soft warning fill. | `var(--tx-status-warning-soft-foreground)` |
+| `--tx-status-danger` | `var(--tx-destructive)` | The danger fill (badges, alerts, charts). | `var(--tx-status-danger)` |
+| `--tx-status-danger-foreground` | `var(--tx-destructive-foreground)` | Text on the danger fill. | `var(--tx-status-danger-foreground)` |
+| `--tx-status-danger-soft` | `var(--tx-destructive-soft)` | The soft danger fill. | `var(--tx-status-danger-soft)` |
+| `--tx-status-danger-soft-foreground` | `var(--tx-destructive-soft-foreground)` | Text on the soft danger fill. | `var(--tx-status-danger-soft-foreground)` |
+| `--tx-status-info` | `var(--tx-info)` | The info fill (badges, alerts, charts). | `var(--tx-status-info)` |
+| `--tx-status-info-foreground` | `var(--tx-info-foreground)` | Text on the info fill. | `var(--tx-status-info-foreground)` |
+| `--tx-status-info-soft` | `var(--tx-info-soft)` | The soft info fill. | `var(--tx-status-info-soft)` |
+| `--tx-status-info-soft-foreground` | `var(--tx-info-soft-foreground)` | Text on the soft info fill. | `var(--tx-status-info-soft-foreground)` |
+| `--tx-status-neutral` | `var(--tx-secondary)` | The neutral fill (badges, alerts, charts). | `var(--tx-status-neutral)` |
+| `--tx-status-neutral-foreground` | `var(--tx-secondary-foreground)` | Text on the neutral fill. | `var(--tx-status-neutral-foreground)` |
+| `--tx-status-neutral-soft` | `var(--tx-muted)` | The soft neutral fill. | `var(--tx-status-neutral-soft)` |
+| `--tx-status-neutral-soft-foreground` | `var(--tx-muted-foreground)` | Text on the soft neutral fill. | `var(--tx-status-neutral-soft-foreground)` |
 
 ### Data-viz (`data-viz`)
 
@@ -310,573 +318,573 @@ A design system sets `components.<component>.<key>`; CSS reads it with the
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `radius` | `--tx-alert-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-alert-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `border-width` | `--tx-alert-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-alert-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `padding-block` | `--tx-alert-padding-block` | `var(--tx-space-3)` | Block padding. | `var(--tx-alert-padding-block, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `padding-inline` | `--tx-alert-padding-inline` | `calc(var(--tx-space-unit) * 3.5)` | Inline padding. | `var(--tx-alert-padding-inline, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3.5))` |
-| `gap` | `--tx-alert-gap` | `var(--tx-space-2)` | Gap between icon and content. | `var(--tx-alert-gap, var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)))` |
-| `font-size` | `--tx-alert-font-size` | `var(--tx-type-label-size)` | Body font size. | `var(--tx-alert-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
-| `icon-size` | `--tx-alert-icon-size` | `var(--tx-size-icon-md)` | Status icon size. | `var(--tx-alert-icon-size, var(--tx-size-icon-md, 1.25rem))` |
+| `radius` | `--tx-alert-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-alert-radius, var(--tx-shape-radius-lg))` |
+| `border-width` | `--tx-alert-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-alert-border-width, var(--tx-border-width-thin))` |
+| `padding-block` | `--tx-alert-padding-block` | `var(--tx-space-3)` | Block padding. | `var(--tx-alert-padding-block, var(--tx-space-3))` |
+| `padding-inline` | `--tx-alert-padding-inline` | `calc(var(--tx-space-unit) * 3.5)` | Inline padding. | `var(--tx-alert-padding-inline, calc(var(--tx-space-unit) * 3.5))` |
+| `gap` | `--tx-alert-gap` | `var(--tx-space-2)` | Gap between icon and content. | `var(--tx-alert-gap, var(--tx-space-2))` |
+| `font-size` | `--tx-alert-font-size` | `var(--tx-type-label-size)` | Body font size. | `var(--tx-alert-font-size, var(--tx-type-label-size))` |
+| `icon-size` | `--tx-alert-icon-size` | `var(--tx-size-icon-md)` | Status icon size. | `var(--tx-alert-icon-size, var(--tx-size-icon-md))` |
 
 ### Avatar (`avatar`, `texuli/avatar`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `size-xs` | `--tx-avatar-size-xs` | `var(--tx-size-icon-md)` | Extra small avatar size. | `var(--tx-avatar-size-xs, var(--tx-size-icon-md, 1.25rem))` |
-| `size-sm` | `--tx-avatar-size-sm` | `var(--tx-size-control-xs)` | Small avatar size. | `var(--tx-avatar-size-sm, var(--tx-size-control-xs, 1.75rem))` |
-| `size-md` | `--tx-avatar-size-md` | `var(--tx-size-control-md)` | Default avatar size. | `var(--tx-avatar-size-md, var(--tx-size-control-md, 2.25rem))` |
-| `size-lg` | `--tx-avatar-size-lg` | `var(--tx-space-12)` | Large avatar size. | `var(--tx-avatar-size-lg, var(--tx-space-12, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 12)))` |
-| `radius` | `--tx-avatar-radius` | `var(--tx-shape-radius-full)` | Corner radius. | `var(--tx-avatar-radius, var(--tx-shape-radius-full, 9999px))` |
-| `font-weight` | `--tx-avatar-font-weight` | `var(--tx-type-heading-weight)` | Initials font weight. | `var(--tx-avatar-font-weight, var(--tx-type-heading-weight, var(--tx-font-weight-heading, 600)))` |
+| `size-xs` | `--tx-avatar-size-xs` | `var(--tx-size-icon-md)` | Extra small avatar size. | `var(--tx-avatar-size-xs, var(--tx-size-icon-md))` |
+| `size-sm` | `--tx-avatar-size-sm` | `var(--tx-size-control-xs)` | Small avatar size. | `var(--tx-avatar-size-sm, var(--tx-size-control-xs))` |
+| `size-md` | `--tx-avatar-size-md` | `var(--tx-size-control-md)` | Default avatar size. | `var(--tx-avatar-size-md, var(--tx-size-control-md))` |
+| `size-lg` | `--tx-avatar-size-lg` | `var(--tx-space-12)` | Large avatar size. | `var(--tx-avatar-size-lg, var(--tx-space-12))` |
+| `radius` | `--tx-avatar-radius` | `var(--tx-shape-radius-full)` | Corner radius. | `var(--tx-avatar-radius, var(--tx-shape-radius-full))` |
+| `font-weight` | `--tx-avatar-font-weight` | `var(--tx-type-heading-weight)` | Initials font weight. | `var(--tx-avatar-font-weight, var(--tx-type-heading-weight))` |
 
 ### Badge, tag and chip (`badge`, `texuli/badge`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `radius` | `--tx-badge-radius` | `var(--tx-shape-radius-full)` | Corner radius. | `var(--tx-badge-radius, var(--tx-shape-radius-full, 9999px))` |
-| `padding-block` | `--tx-badge-padding-block` | `calc(var(--tx-space-unit) * 0.5)` | Block padding. | `var(--tx-badge-padding-block, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5))` |
-| `padding-inline` | `--tx-badge-padding-inline` | `var(--tx-space-2)` | Inline padding. | `var(--tx-badge-padding-inline, var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)))` |
-| `gap` | `--tx-badge-gap` | `var(--tx-space-1)` | Gap between icon and text. | `var(--tx-badge-gap, var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)))` |
-| `font-size` | `--tx-badge-font-size` | `var(--tx-type-caption-size)` | Font size. | `var(--tx-badge-font-size, var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem)))` |
-| `font-weight` | `--tx-badge-font-weight` | `var(--tx-type-label-weight)` | Font weight. | `var(--tx-badge-font-weight, var(--tx-type-label-weight, var(--tx-font-weight-medium, 500)))` |
-| `line-height` | `--tx-badge-line-height` | `var(--tx-type-label-line)` | Line height. | `var(--tx-badge-line-height, var(--tx-type-label-line, 1.25))` |
-| `border-width` | `--tx-badge-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-badge-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
+| `radius` | `--tx-badge-radius` | `var(--tx-shape-radius-full)` | Corner radius. | `var(--tx-badge-radius, var(--tx-shape-radius-full))` |
+| `padding-block` | `--tx-badge-padding-block` | `calc(var(--tx-space-unit) * 0.5)` | Block padding. | `var(--tx-badge-padding-block, calc(var(--tx-space-unit) * 0.5))` |
+| `padding-inline` | `--tx-badge-padding-inline` | `var(--tx-space-2)` | Inline padding. | `var(--tx-badge-padding-inline, var(--tx-space-2))` |
+| `gap` | `--tx-badge-gap` | `var(--tx-space-1)` | Gap between icon and text. | `var(--tx-badge-gap, var(--tx-space-1))` |
+| `font-size` | `--tx-badge-font-size` | `var(--tx-type-caption-size)` | Font size. | `var(--tx-badge-font-size, var(--tx-type-caption-size))` |
+| `font-weight` | `--tx-badge-font-weight` | `var(--tx-type-label-weight)` | Font weight. | `var(--tx-badge-font-weight, var(--tx-type-label-weight))` |
+| `line-height` | `--tx-badge-line-height` | `var(--tx-type-label-line)` | Line height. | `var(--tx-badge-line-height, var(--tx-type-label-line))` |
+| `border-width` | `--tx-badge-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-badge-border-width, var(--tx-border-width-thin))` |
 
 ### Button (`button`, `texuli/button`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `height-sm` | `--tx-button-height-sm` | `var(--tx-size-control-sm)` | Small size height. | `var(--tx-button-height-sm, var(--tx-size-control-sm, 2rem))` |
-| `height-md` | `--tx-button-height-md` | `var(--tx-size-control-md)` | Default size height. | `var(--tx-button-height-md, var(--tx-size-control-md, 2.25rem))` |
-| `height-lg` | `--tx-button-height-lg` | `var(--tx-size-control-lg)` | Large size height. | `var(--tx-button-height-lg, var(--tx-size-control-lg, 2.75rem))` |
-| `height-touch` | `--tx-button-height-touch` | `var(--tx-size-target-touch)` | Height of sm, md and icon buttons below 640 px. | `var(--tx-button-height-touch, var(--tx-size-target-touch, max(2.75rem, 44px)))` |
-| `padding-inline-sm` | `--tx-button-padding-inline-sm` | `var(--tx-space-3)` | Small size inline padding. | `var(--tx-button-padding-inline-sm, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `padding-inline-md` | `--tx-button-padding-inline-md` | `var(--tx-space-4)` | Default size inline padding. | `var(--tx-button-padding-inline-md, var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)))` |
-| `padding-inline-lg` | `--tx-button-padding-inline-lg` | `var(--tx-space-6)` | Large size inline padding. | `var(--tx-button-padding-inline-lg, var(--tx-space-6, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 6)))` |
-| `gap` | `--tx-button-gap` | `var(--tx-space-2)` | Gap between icon and label. | `var(--tx-button-gap, var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)))` |
-| `radius` | `--tx-button-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-button-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `font-size` | `--tx-button-font-size` | `var(--tx-type-label-size)` | Default size font size. | `var(--tx-button-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
-| `font-size-sm` | `--tx-button-font-size-sm` | `var(--tx-type-caption-size)` | Small size font size. | `var(--tx-button-font-size-sm, var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem)))` |
-| `font-size-lg` | `--tx-button-font-size-lg` | `var(--tx-type-body-size)` | Large size font size. | `var(--tx-button-font-size-lg, var(--tx-type-body-size, var(--tx-font-size-base, 1rem)))` |
-| `font-weight` | `--tx-button-font-weight` | `var(--tx-type-label-weight)` | Font weight. | `var(--tx-button-font-weight, var(--tx-type-label-weight, var(--tx-font-weight-medium, 500)))` |
-| `line-height` | `--tx-button-line-height` | `var(--tx-type-label-line)` | Line height. | `var(--tx-button-line-height, var(--tx-type-label-line, 1.25))` |
-| `icon-size` | `--tx-button-icon-size` | `var(--tx-size-icon-sm)` | Icon size inside the button. | `var(--tx-button-icon-size, var(--tx-size-icon-sm, 1rem))` |
-| `border-width` | `--tx-button-border-width` | `var(--tx-border-width-thin)` | Outline variant border width. | `var(--tx-button-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `elevation` | `--tx-button-elevation` | `var(--tx-elevation-1)` | Shadow of the default, outline and destructive variants. | `var(--tx-button-elevation, var(--tx-elevation-1, var(--tx-shadow-soft, none)))` |
-| `disabled-opacity` | `--tx-button-disabled-opacity` | `var(--tx-opacity-disabled)` | Opacity when disabled. | `var(--tx-button-disabled-opacity, var(--tx-opacity-disabled, 0.5))` |
+| `height-sm` | `--tx-button-height-sm` | `var(--tx-size-control-sm)` | Small size height. | `var(--tx-button-height-sm, var(--tx-size-control-sm))` |
+| `height-md` | `--tx-button-height-md` | `var(--tx-size-control-md)` | Default size height. | `var(--tx-button-height-md, var(--tx-size-control-md))` |
+| `height-lg` | `--tx-button-height-lg` | `var(--tx-size-control-lg)` | Large size height. | `var(--tx-button-height-lg, var(--tx-size-control-lg))` |
+| `height-touch` | `--tx-button-height-touch` | `var(--tx-size-target-touch)` | Height of sm, md and icon buttons below 640 px. | `var(--tx-button-height-touch, var(--tx-size-target-touch))` |
+| `padding-inline-sm` | `--tx-button-padding-inline-sm` | `var(--tx-space-3)` | Small size inline padding. | `var(--tx-button-padding-inline-sm, var(--tx-space-3))` |
+| `padding-inline-md` | `--tx-button-padding-inline-md` | `var(--tx-space-4)` | Default size inline padding. | `var(--tx-button-padding-inline-md, var(--tx-space-4))` |
+| `padding-inline-lg` | `--tx-button-padding-inline-lg` | `var(--tx-space-6)` | Large size inline padding. | `var(--tx-button-padding-inline-lg, var(--tx-space-6))` |
+| `gap` | `--tx-button-gap` | `var(--tx-space-2)` | Gap between icon and label. | `var(--tx-button-gap, var(--tx-space-2))` |
+| `radius` | `--tx-button-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-button-radius, var(--tx-shape-radius-lg))` |
+| `font-size` | `--tx-button-font-size` | `var(--tx-type-label-size)` | Default size font size. | `var(--tx-button-font-size, var(--tx-type-label-size))` |
+| `font-size-sm` | `--tx-button-font-size-sm` | `var(--tx-type-caption-size)` | Small size font size. | `var(--tx-button-font-size-sm, var(--tx-type-caption-size))` |
+| `font-size-lg` | `--tx-button-font-size-lg` | `var(--tx-type-body-size)` | Large size font size. | `var(--tx-button-font-size-lg, var(--tx-type-body-size))` |
+| `font-weight` | `--tx-button-font-weight` | `var(--tx-type-label-weight)` | Font weight. | `var(--tx-button-font-weight, var(--tx-type-label-weight))` |
+| `line-height` | `--tx-button-line-height` | `var(--tx-type-label-line)` | Line height. | `var(--tx-button-line-height, var(--tx-type-label-line))` |
+| `icon-size` | `--tx-button-icon-size` | `var(--tx-size-icon-sm)` | Icon size inside the button. | `var(--tx-button-icon-size, var(--tx-size-icon-sm))` |
+| `border-width` | `--tx-button-border-width` | `var(--tx-border-width-thin)` | Outline variant border width. | `var(--tx-button-border-width, var(--tx-border-width-thin))` |
+| `elevation` | `--tx-button-elevation` | `var(--tx-elevation-1)` | Shadow of the default, outline and destructive variants. | `var(--tx-button-elevation, var(--tx-elevation-1))` |
+| `disabled-opacity` | `--tx-button-disabled-opacity` | `var(--tx-opacity-disabled)` | Opacity when disabled. | `var(--tx-button-disabled-opacity, var(--tx-opacity-disabled))` |
 
 ### Card (`card`, `texuli/card`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `radius` | `--tx-card-radius` | `var(--tx-shape-radius-xl)` | Corner radius. | `var(--tx-card-radius, var(--tx-shape-radius-xl, calc(var(--tx-radius, 0.625rem) + var(--tx-radius-step-4, 4px))))` |
-| `border-width` | `--tx-card-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-card-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `elevation` | `--tx-card-elevation` | `var(--tx-elevation-1)` | Shadow. | `var(--tx-card-elevation, var(--tx-elevation-1, var(--tx-shadow-soft, none)))` |
-| `padding-inline` | `--tx-card-padding-inline` | `var(--tx-space-5)` | Header, content and footer inline padding. | `var(--tx-card-padding-inline, var(--tx-space-5, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5)))` |
-| `padding-block` | `--tx-card-padding-block` | `var(--tx-space-5)` | Block padding at the card edges (header top, last section bottom). | `var(--tx-card-padding-block, var(--tx-space-5, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5)))` |
+| `radius` | `--tx-card-radius` | `var(--tx-shape-radius-xl)` | Corner radius. | `var(--tx-card-radius, var(--tx-shape-radius-xl))` |
+| `border-width` | `--tx-card-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-card-border-width, var(--tx-border-width-thin))` |
+| `elevation` | `--tx-card-elevation` | `var(--tx-elevation-1)` | Shadow. | `var(--tx-card-elevation, var(--tx-elevation-1))` |
+| `padding-inline` | `--tx-card-padding-inline` | `var(--tx-space-5)` | Header, content and footer inline padding. | `var(--tx-card-padding-inline, var(--tx-space-5))` |
+| `padding-block` | `--tx-card-padding-block` | `var(--tx-space-5)` | Block padding at the card edges (header top, last section bottom). | `var(--tx-card-padding-block, var(--tx-space-5))` |
 | `background` | `--tx-card-background` | `var(--tx-surface)` | Surface fill (the glass hook mixes it with transparency). | `var(--tx-card-background, var(--tx-surface))` |
 | `title-font-size` | `--tx-card-title-font-size` | `var(--tx-font-size-base)` | Title font size. | `var(--tx-card-title-font-size, var(--tx-font-size-base))` |
-| `title-font-weight` | `--tx-card-title-font-weight` | `var(--tx-type-heading-weight)` | Title font weight. | `var(--tx-card-title-font-weight, var(--tx-type-heading-weight, var(--tx-font-weight-heading, 600)))` |
-| `title-line-height` | `--tx-card-title-line-height` | `var(--tx-type-label-line)` | Title line height. | `var(--tx-card-title-line-height, var(--tx-type-label-line, 1.25))` |
-| `description-font-size` | `--tx-card-description-font-size` | `var(--tx-type-label-size)` | Description font size. | `var(--tx-card-description-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
+| `title-font-weight` | `--tx-card-title-font-weight` | `var(--tx-type-heading-weight)` | Title font weight. | `var(--tx-card-title-font-weight, var(--tx-type-heading-weight))` |
+| `title-line-height` | `--tx-card-title-line-height` | `var(--tx-type-label-line)` | Title line height. | `var(--tx-card-title-line-height, var(--tx-type-label-line))` |
+| `description-font-size` | `--tx-card-description-font-size` | `var(--tx-type-label-size)` | Description font size. | `var(--tx-card-description-font-size, var(--tx-type-label-size))` |
 
 ### Carousel (`carousel`, `texuli/carousel`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `radius` | `--tx-carousel-radius` | `var(--tx-shape-radius-lg)` | Corner radius of the carousel and viewport. | `var(--tx-carousel-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `fallback-padding` | `--tx-carousel-fallback-padding` | `var(--tx-space-4)` | Padding of the no-slides fallback. | `var(--tx-carousel-fallback-padding, var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)))` |
+| `radius` | `--tx-carousel-radius` | `var(--tx-shape-radius-lg)` | Corner radius of the carousel and viewport. | `var(--tx-carousel-radius, var(--tx-shape-radius-lg))` |
+| `fallback-padding` | `--tx-carousel-fallback-padding` | `var(--tx-space-4)` | Padding of the no-slides fallback. | `var(--tx-carousel-fallback-padding, var(--tx-space-4))` |
 
 ### Checkbox, radio and switch (`choice`, `texuli/choice`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `gap` | `--tx-choice-gap` | `calc(var(--tx-space-unit) * 2.5)` | Gap between control and copy. | `var(--tx-choice-gap, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2.5))` |
-| `switch-gap` | `--tx-choice-switch-gap` | `var(--tx-space-4)` | Gap between switch and copy. | `var(--tx-choice-switch-gap, var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)))` |
-| `label-font-size` | `--tx-choice-label-font-size` | `var(--tx-type-label-size)` | Label font size. | `var(--tx-choice-label-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
-| `label-font-weight` | `--tx-choice-label-font-weight` | `var(--tx-type-label-weight)` | Label font weight. | `var(--tx-choice-label-font-weight, var(--tx-type-label-weight, var(--tx-font-weight-medium, 500)))` |
-| `description-font-size` | `--tx-choice-description-font-size` | `var(--tx-type-caption-size)` | Description font size. | `var(--tx-choice-description-font-size, var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem)))` |
-| `disabled-opacity` | `--tx-choice-disabled-opacity` | `var(--tx-opacity-disabled)` | Opacity of a disabled control. | `var(--tx-choice-disabled-opacity, var(--tx-opacity-disabled, 0.5))` |
+| `gap` | `--tx-choice-gap` | `calc(var(--tx-space-unit) * 2.5)` | Gap between control and copy. | `var(--tx-choice-gap, calc(var(--tx-space-unit) * 2.5))` |
+| `switch-gap` | `--tx-choice-switch-gap` | `var(--tx-space-4)` | Gap between switch and copy. | `var(--tx-choice-switch-gap, var(--tx-space-4))` |
+| `label-font-size` | `--tx-choice-label-font-size` | `var(--tx-type-label-size)` | Label font size. | `var(--tx-choice-label-font-size, var(--tx-type-label-size))` |
+| `label-font-weight` | `--tx-choice-label-font-weight` | `var(--tx-type-label-weight)` | Label font weight. | `var(--tx-choice-label-font-weight, var(--tx-type-label-weight))` |
+| `description-font-size` | `--tx-choice-description-font-size` | `var(--tx-type-caption-size)` | Description font size. | `var(--tx-choice-description-font-size, var(--tx-type-caption-size))` |
+| `disabled-opacity` | `--tx-choice-disabled-opacity` | `var(--tx-opacity-disabled)` | Opacity of a disabled control. | `var(--tx-choice-disabled-opacity, var(--tx-opacity-disabled))` |
 
 ### Combobox (`combobox`, `texuli/combobox`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `height-sm` | `--tx-combobox-height-sm` | `var(--tx-size-control-sm)` | Small size height. | `var(--tx-combobox-height-sm, var(--tx-size-control-sm, 2rem))` |
-| `height-md` | `--tx-combobox-height-md` | `var(--tx-size-control-md)` | Default size height. | `var(--tx-combobox-height-md, var(--tx-size-control-md, 2.25rem))` |
-| `height-lg` | `--tx-combobox-height-lg` | `var(--tx-size-control-lg)` | Large size height. | `var(--tx-combobox-height-lg, var(--tx-size-control-lg, 2.75rem))` |
-| `radius` | `--tx-combobox-radius` | `var(--tx-shape-radius-lg)` | Field corner radius. | `var(--tx-combobox-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `border-width` | `--tx-combobox-border-width` | `var(--tx-border-width-thin)` | Field border width. | `var(--tx-combobox-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `font-size-sm` | `--tx-combobox-font-size-sm` | `var(--tx-type-caption-size)` | Small size font size. | `var(--tx-combobox-font-size-sm, var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem)))` |
-| `font-size-md` | `--tx-combobox-font-size-md` | `var(--tx-type-label-size)` | Default size font size. | `var(--tx-combobox-font-size-md, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
-| `font-size-lg` | `--tx-combobox-font-size-lg` | `var(--tx-type-body-size)` | Large size font size. | `var(--tx-combobox-font-size-lg, var(--tx-type-body-size, var(--tx-font-size-base, 1rem)))` |
+| `height-sm` | `--tx-combobox-height-sm` | `var(--tx-size-control-sm)` | Small size height. | `var(--tx-combobox-height-sm, var(--tx-size-control-sm))` |
+| `height-md` | `--tx-combobox-height-md` | `var(--tx-size-control-md)` | Default size height. | `var(--tx-combobox-height-md, var(--tx-size-control-md))` |
+| `height-lg` | `--tx-combobox-height-lg` | `var(--tx-size-control-lg)` | Large size height. | `var(--tx-combobox-height-lg, var(--tx-size-control-lg))` |
+| `radius` | `--tx-combobox-radius` | `var(--tx-shape-radius-lg)` | Field corner radius. | `var(--tx-combobox-radius, var(--tx-shape-radius-lg))` |
+| `border-width` | `--tx-combobox-border-width` | `var(--tx-border-width-thin)` | Field border width. | `var(--tx-combobox-border-width, var(--tx-border-width-thin))` |
+| `font-size-sm` | `--tx-combobox-font-size-sm` | `var(--tx-type-caption-size)` | Small size font size. | `var(--tx-combobox-font-size-sm, var(--tx-type-caption-size))` |
+| `font-size-md` | `--tx-combobox-font-size-md` | `var(--tx-type-label-size)` | Default size font size. | `var(--tx-combobox-font-size-md, var(--tx-type-label-size))` |
+| `font-size-lg` | `--tx-combobox-font-size-lg` | `var(--tx-type-body-size)` | Large size font size. | `var(--tx-combobox-font-size-lg, var(--tx-type-body-size))` |
 
 ### Command palette (`command`, `texuli/command`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `radius` | `--tx-command-radius` | `var(--tx-shape-radius-xl)` | Corner radius. | `var(--tx-command-radius, var(--tx-shape-radius-xl, calc(var(--tx-radius, 0.625rem) + var(--tx-radius-step-4, 4px))))` |
-| `border-width` | `--tx-command-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-command-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `font-size-sm` | `--tx-command-font-size-sm` | `var(--tx-type-caption-size)` | Small size font size. | `var(--tx-command-font-size-sm, var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem)))` |
-| `font-size-md` | `--tx-command-font-size-md` | `var(--tx-type-label-size)` | Default size font size. | `var(--tx-command-font-size-md, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
-| `font-size-lg` | `--tx-command-font-size-lg` | `var(--tx-type-body-size)` | Large size font size. | `var(--tx-command-font-size-lg, var(--tx-type-body-size, var(--tx-font-size-base, 1rem)))` |
-| `input-gap` | `--tx-command-input-gap` | `var(--tx-space-3)` | Gap inside the input row. | `var(--tx-command-input-gap, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `input-padding-inline` | `--tx-command-input-padding-inline` | `var(--tx-space-4)` | Inline padding of the input row. | `var(--tx-command-input-padding-inline, var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)))` |
+| `radius` | `--tx-command-radius` | `var(--tx-shape-radius-xl)` | Corner radius. | `var(--tx-command-radius, var(--tx-shape-radius-xl))` |
+| `border-width` | `--tx-command-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-command-border-width, var(--tx-border-width-thin))` |
+| `font-size-sm` | `--tx-command-font-size-sm` | `var(--tx-type-caption-size)` | Small size font size. | `var(--tx-command-font-size-sm, var(--tx-type-caption-size))` |
+| `font-size-md` | `--tx-command-font-size-md` | `var(--tx-type-label-size)` | Default size font size. | `var(--tx-command-font-size-md, var(--tx-type-label-size))` |
+| `font-size-lg` | `--tx-command-font-size-lg` | `var(--tx-type-body-size)` | Large size font size. | `var(--tx-command-font-size-lg, var(--tx-type-body-size))` |
+| `input-gap` | `--tx-command-input-gap` | `var(--tx-space-3)` | Gap inside the input row. | `var(--tx-command-input-gap, var(--tx-space-3))` |
+| `input-padding-inline` | `--tx-command-input-padding-inline` | `var(--tx-space-4)` | Inline padding of the input row. | `var(--tx-command-input-padding-inline, var(--tx-space-4))` |
 
 ### Date field and picker (`date`, `texuli/date`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `font-size` | `--tx-date-font-size` | `var(--tx-type-label-size)` | Font size. | `var(--tx-date-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
-| `label-font-weight` | `--tx-date-label-font-weight` | `var(--tx-type-label-weight)` | Label font weight. | `var(--tx-date-label-font-weight, var(--tx-type-label-weight, var(--tx-font-weight-medium, 500)))` |
-| `control-radius` | `--tx-date-control-radius` | `var(--tx-shape-radius-lg)` | Control corner radius. | `var(--tx-date-control-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `control-border-width` | `--tx-date-control-border-width` | `var(--tx-border-width-thin)` | Control border width. | `var(--tx-date-control-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `panel-z-index` | `--tx-date-panel-z-index` | `var(--tx-z-popover)` | Calendar panel stacking. | `var(--tx-date-panel-z-index, var(--tx-z-popover, 50))` |
-| `panel-padding` | `--tx-date-panel-padding` | `var(--tx-space-3)` | Calendar panel padding. | `var(--tx-date-panel-padding, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `panel-radius` | `--tx-date-panel-radius` | `var(--tx-shape-radius-xl)` | Calendar panel corner radius. | `var(--tx-date-panel-radius, var(--tx-shape-radius-xl, calc(var(--tx-radius, 0.625rem) + var(--tx-radius-step-4, 4px))))` |
-| `panel-elevation` | `--tx-date-panel-elevation` | `var(--tx-elevation-3)` | Calendar panel shadow. | `var(--tx-date-panel-elevation, var(--tx-elevation-3, var(--tx-shadow-float, none)))` |
-| `description-font-size` | `--tx-date-description-font-size` | `var(--tx-type-caption-size)` | Description and error font size. | `var(--tx-date-description-font-size, var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem)))` |
+| `font-size` | `--tx-date-font-size` | `var(--tx-type-label-size)` | Font size. | `var(--tx-date-font-size, var(--tx-type-label-size))` |
+| `label-font-weight` | `--tx-date-label-font-weight` | `var(--tx-type-label-weight)` | Label font weight. | `var(--tx-date-label-font-weight, var(--tx-type-label-weight))` |
+| `control-radius` | `--tx-date-control-radius` | `var(--tx-shape-radius-lg)` | Control corner radius. | `var(--tx-date-control-radius, var(--tx-shape-radius-lg))` |
+| `control-border-width` | `--tx-date-control-border-width` | `var(--tx-border-width-thin)` | Control border width. | `var(--tx-date-control-border-width, var(--tx-border-width-thin))` |
+| `panel-z-index` | `--tx-date-panel-z-index` | `var(--tx-z-popover)` | Calendar panel stacking. | `var(--tx-date-panel-z-index, var(--tx-z-popover))` |
+| `panel-padding` | `--tx-date-panel-padding` | `var(--tx-space-3)` | Calendar panel padding. | `var(--tx-date-panel-padding, var(--tx-space-3))` |
+| `panel-radius` | `--tx-date-panel-radius` | `var(--tx-shape-radius-xl)` | Calendar panel corner radius. | `var(--tx-date-panel-radius, var(--tx-shape-radius-xl))` |
+| `panel-elevation` | `--tx-date-panel-elevation` | `var(--tx-elevation-3)` | Calendar panel shadow. | `var(--tx-date-panel-elevation, var(--tx-elevation-3))` |
+| `description-font-size` | `--tx-date-description-font-size` | `var(--tx-type-caption-size)` | Description and error font size. | `var(--tx-date-description-font-size, var(--tx-type-caption-size))` |
 
 ### Dialog and alert dialog (`dialog`, `texuli/dialog`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `z-index` | `--tx-dialog-z-index` | `var(--tx-z-modal)` | Stacking. | `var(--tx-dialog-z-index, var(--tx-z-modal, 60))` |
-| `radius` | `--tx-dialog-radius` | `var(--tx-shape-radius-xl)` | Corner radius. | `var(--tx-dialog-radius, var(--tx-shape-radius-xl, calc(var(--tx-radius, 0.625rem) + var(--tx-radius-step-4, 4px))))` |
-| `border-width` | `--tx-dialog-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-dialog-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `elevation` | `--tx-dialog-elevation` | `var(--tx-elevation-4)` | Shadow. | `var(--tx-dialog-elevation, var(--tx-elevation-4, var(--tx-shadow-float, none)))` |
+| `z-index` | `--tx-dialog-z-index` | `var(--tx-z-modal)` | Stacking. | `var(--tx-dialog-z-index, var(--tx-z-modal))` |
+| `radius` | `--tx-dialog-radius` | `var(--tx-shape-radius-xl)` | Corner radius. | `var(--tx-dialog-radius, var(--tx-shape-radius-xl))` |
+| `border-width` | `--tx-dialog-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-dialog-border-width, var(--tx-border-width-thin))` |
+| `elevation` | `--tx-dialog-elevation` | `var(--tx-elevation-4)` | Shadow. | `var(--tx-dialog-elevation, var(--tx-elevation-4))` |
 | `font-size` | `--tx-dialog-font-size` | `var(--tx-font-size-sm)` | Body font size. | `var(--tx-dialog-font-size, var(--tx-font-size-sm))` |
-| `line-height` | `--tx-dialog-line-height` | `var(--tx-type-body-line)` | Body line height. | `var(--tx-dialog-line-height, var(--tx-type-body-line, 1.5))` |
-| `title-font-size` | `--tx-dialog-title-font-size` | `var(--tx-type-heading-size)` | Title font size. | `var(--tx-dialog-title-font-size, var(--tx-type-heading-size, var(--tx-font-size-lg, 1.125rem)))` |
-| `title-font-weight` | `--tx-dialog-title-font-weight` | `var(--tx-type-heading-weight)` | Title font weight. | `var(--tx-dialog-title-font-weight, var(--tx-type-heading-weight, var(--tx-font-weight-heading, 600)))` |
-| `title-line-height` | `--tx-dialog-title-line-height` | `var(--tx-type-heading-line)` | Title line height. | `var(--tx-dialog-title-line-height, var(--tx-type-heading-line, 1.3))` |
-| `alert-padding` | `--tx-dialog-alert-padding` | `var(--tx-space-5)` | Alert dialog padding. | `var(--tx-dialog-alert-padding, var(--tx-space-5, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5)))` |
-| `scrim-opacity` | `--tx-dialog-scrim-opacity` | `var(--tx-opacity-scrim)` | Foreground mix of the overlay scrim. | `var(--tx-dialog-scrim-opacity, var(--tx-opacity-scrim, 45%))` |
+| `line-height` | `--tx-dialog-line-height` | `var(--tx-type-body-line)` | Body line height. | `var(--tx-dialog-line-height, var(--tx-type-body-line))` |
+| `title-font-size` | `--tx-dialog-title-font-size` | `var(--tx-type-heading-size)` | Title font size. | `var(--tx-dialog-title-font-size, var(--tx-type-heading-size))` |
+| `title-font-weight` | `--tx-dialog-title-font-weight` | `var(--tx-type-heading-weight)` | Title font weight. | `var(--tx-dialog-title-font-weight, var(--tx-type-heading-weight))` |
+| `title-line-height` | `--tx-dialog-title-line-height` | `var(--tx-type-heading-line)` | Title line height. | `var(--tx-dialog-title-line-height, var(--tx-type-heading-line))` |
+| `alert-padding` | `--tx-dialog-alert-padding` | `var(--tx-space-5)` | Alert dialog padding. | `var(--tx-dialog-alert-padding, var(--tx-space-5))` |
+| `scrim-opacity` | `--tx-dialog-scrim-opacity` | `var(--tx-opacity-scrim)` | Foreground mix of the overlay scrim. | `var(--tx-dialog-scrim-opacity, var(--tx-opacity-scrim))` |
 
 ### Empty state (`empty`, `texuli/empty`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `gap` | `--tx-empty-gap` | `var(--tx-space-3)` | Default size gap. | `var(--tx-empty-gap, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `padding-inline` | `--tx-empty-padding-inline` | `var(--tx-space-6)` | Default size inline padding. | `var(--tx-empty-padding-inline, var(--tx-space-6, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 6)))` |
-| `padding-block` | `--tx-empty-padding-block` | `calc(var(--tx-space-unit) * 14)` | Default size block padding. | `var(--tx-empty-padding-block, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 14))` |
+| `gap` | `--tx-empty-gap` | `var(--tx-space-3)` | Default size gap. | `var(--tx-empty-gap, var(--tx-space-3))` |
+| `padding-inline` | `--tx-empty-padding-inline` | `var(--tx-space-6)` | Default size inline padding. | `var(--tx-empty-padding-inline, var(--tx-space-6))` |
+| `padding-block` | `--tx-empty-padding-block` | `calc(var(--tx-space-unit) * 14)` | Default size block padding. | `var(--tx-empty-padding-block, calc(var(--tx-space-unit) * 14))` |
 | `title-font-size` | `--tx-empty-title-font-size` | `var(--tx-font-size-base)` | Title font size. | `var(--tx-empty-title-font-size, var(--tx-font-size-base))` |
-| `title-font-weight` | `--tx-empty-title-font-weight` | `var(--tx-type-heading-weight)` | Title font weight. | `var(--tx-empty-title-font-weight, var(--tx-type-heading-weight, var(--tx-font-weight-heading, 600)))` |
-| `description-font-size` | `--tx-empty-description-font-size` | `var(--tx-type-label-size)` | Description font size. | `var(--tx-empty-description-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
+| `title-font-weight` | `--tx-empty-title-font-weight` | `var(--tx-type-heading-weight)` | Title font weight. | `var(--tx-empty-title-font-weight, var(--tx-type-heading-weight))` |
+| `description-font-size` | `--tx-empty-description-font-size` | `var(--tx-type-label-size)` | Description font size. | `var(--tx-empty-description-font-size, var(--tx-type-label-size))` |
 
 ### Field label and description (`field`, `texuli/field`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `gap` | `--tx-field-gap` | `calc(var(--tx-space-unit) * 1.5)` | Gap between label, control and description. | `var(--tx-field-gap, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1.5))` |
-| `label-font-size` | `--tx-field-label-font-size` | `var(--tx-type-label-size)` | Label font size. | `var(--tx-field-label-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
-| `label-font-weight` | `--tx-field-label-font-weight` | `var(--tx-type-label-weight)` | Label font weight. | `var(--tx-field-label-font-weight, var(--tx-type-label-weight, var(--tx-font-weight-medium, 500)))` |
-| `label-line-height` | `--tx-field-label-line-height` | `var(--tx-type-label-line)` | Label line height. | `var(--tx-field-label-line-height, var(--tx-type-label-line, 1.25))` |
-| `description-font-size` | `--tx-field-description-font-size` | `var(--tx-type-caption-size)` | Description font size. | `var(--tx-field-description-font-size, var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem)))` |
-| `description-line-height` | `--tx-field-description-line-height` | `var(--tx-type-caption-line)` | Description line height. | `var(--tx-field-description-line-height, var(--tx-type-caption-line, 1.35))` |
+| `gap` | `--tx-field-gap` | `calc(var(--tx-space-unit) * 1.5)` | Gap between label, control and description. | `var(--tx-field-gap, calc(var(--tx-space-unit) * 1.5))` |
+| `label-font-size` | `--tx-field-label-font-size` | `var(--tx-type-label-size)` | Label font size. | `var(--tx-field-label-font-size, var(--tx-type-label-size))` |
+| `label-font-weight` | `--tx-field-label-font-weight` | `var(--tx-type-label-weight)` | Label font weight. | `var(--tx-field-label-font-weight, var(--tx-type-label-weight))` |
+| `label-line-height` | `--tx-field-label-line-height` | `var(--tx-type-label-line)` | Label line height. | `var(--tx-field-label-line-height, var(--tx-type-label-line))` |
+| `description-font-size` | `--tx-field-description-font-size` | `var(--tx-type-caption-size)` | Description font size. | `var(--tx-field-description-font-size, var(--tx-type-caption-size))` |
+| `description-line-height` | `--tx-field-description-line-height` | `var(--tx-type-caption-line)` | Description line height. | `var(--tx-field-description-line-height, var(--tx-type-caption-line))` |
 
 ### File upload (`file-upload`, `texuli/file-upload`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `gap` | `--tx-file-upload-gap` | `var(--tx-space-3)` | Gap between the zone and the list. | `var(--tx-file-upload-gap, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `zone-padding-block` | `--tx-file-upload-zone-padding-block` | `var(--tx-space-6)` | Drop zone block padding. | `var(--tx-file-upload-zone-padding-block, var(--tx-space-6, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 6)))` |
-| `zone-padding-inline` | `--tx-file-upload-zone-padding-inline` | `var(--tx-space-4)` | Drop zone inline padding. | `var(--tx-file-upload-zone-padding-inline, var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)))` |
-| `zone-border-width` | `--tx-file-upload-zone-border-width` | `var(--tx-border-width-thick)` | Drop zone dashed border width. | `var(--tx-file-upload-zone-border-width, var(--tx-border-width-thick, calc(var(--tx-border-width, 1px) * 2)))` |
-| `zone-radius` | `--tx-file-upload-zone-radius` | `var(--tx-shape-radius-lg)` | Drop zone corner radius. | `var(--tx-file-upload-zone-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `browse-height` | `--tx-file-upload-browse-height` | `var(--tx-size-control-md)` | Browse button height. | `var(--tx-file-upload-browse-height, var(--tx-size-control-md, 2.25rem))` |
+| `gap` | `--tx-file-upload-gap` | `var(--tx-space-3)` | Gap between the zone and the list. | `var(--tx-file-upload-gap, var(--tx-space-3))` |
+| `zone-padding-block` | `--tx-file-upload-zone-padding-block` | `var(--tx-space-6)` | Drop zone block padding. | `var(--tx-file-upload-zone-padding-block, var(--tx-space-6))` |
+| `zone-padding-inline` | `--tx-file-upload-zone-padding-inline` | `var(--tx-space-4)` | Drop zone inline padding. | `var(--tx-file-upload-zone-padding-inline, var(--tx-space-4))` |
+| `zone-border-width` | `--tx-file-upload-zone-border-width` | `var(--tx-border-width-thick)` | Drop zone dashed border width. | `var(--tx-file-upload-zone-border-width, var(--tx-border-width-thick))` |
+| `zone-radius` | `--tx-file-upload-zone-radius` | `var(--tx-shape-radius-lg)` | Drop zone corner radius. | `var(--tx-file-upload-zone-radius, var(--tx-shape-radius-lg))` |
+| `browse-height` | `--tx-file-upload-browse-height` | `var(--tx-size-control-md)` | Browse button height. | `var(--tx-file-upload-browse-height, var(--tx-size-control-md))` |
 
 ### Icon (`icon`, `texuli/icons`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `size-xs` | `--tx-icon-size-xs` | `var(--tx-size-icon-xs)` | Size xs. | `var(--tx-icon-size-xs, var(--tx-size-icon-xs, 0.75rem))` |
-| `size-sm` | `--tx-icon-size-sm` | `var(--tx-size-icon-sm)` | Size sm. | `var(--tx-icon-size-sm, var(--tx-size-icon-sm, 1rem))` |
-| `size-md` | `--tx-icon-size-md` | `var(--tx-size-icon-md)` | Size md (the default). | `var(--tx-icon-size-md, var(--tx-size-icon-md, 1.25rem))` |
-| `size-lg` | `--tx-icon-size-lg` | `var(--tx-size-icon-lg)` | Size lg. | `var(--tx-icon-size-lg, var(--tx-size-icon-lg, 1.5rem))` |
-| `stroke-width` | `--tx-icon-stroke-width` | `var(--tx-icon-stroke)` | Stroke width. | `var(--tx-icon-stroke-width, var(--tx-icon-stroke, 2))` |
+| `size-xs` | `--tx-icon-size-xs` | `var(--tx-size-icon-xs)` | Size xs. | `var(--tx-icon-size-xs, var(--tx-size-icon-xs))` |
+| `size-sm` | `--tx-icon-size-sm` | `var(--tx-size-icon-sm)` | Size sm. | `var(--tx-icon-size-sm, var(--tx-size-icon-sm))` |
+| `size-md` | `--tx-icon-size-md` | `var(--tx-size-icon-md)` | Size md (the default). | `var(--tx-icon-size-md, var(--tx-size-icon-md))` |
+| `size-lg` | `--tx-icon-size-lg` | `var(--tx-size-icon-lg)` | Size lg. | `var(--tx-icon-size-lg, var(--tx-size-icon-lg))` |
+| `stroke-width` | `--tx-icon-stroke-width` | `var(--tx-icon-stroke)` | Stroke width. | `var(--tx-icon-stroke-width, var(--tx-icon-stroke))` |
 
 ### Input and textarea (`input`, `texuli/input`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `height` | `--tx-input-height` | `var(--tx-size-control-md)` | Input height from 640 px. | `var(--tx-input-height, var(--tx-size-control-md, 2.25rem))` |
-| `height-touch` | `--tx-input-height-touch` | `var(--tx-size-control-lg)` | Input minimum height below 640 px. | `var(--tx-input-height-touch, var(--tx-size-control-lg, 2.75rem))` |
-| `padding-block` | `--tx-input-padding-block` | `var(--tx-space-1)` | Input block padding. | `var(--tx-input-padding-block, var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)))` |
-| `padding-inline` | `--tx-input-padding-inline` | `var(--tx-space-3)` | Inline padding. | `var(--tx-input-padding-inline, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `radius` | `--tx-input-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-input-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `border-width` | `--tx-input-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-input-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `elevation` | `--tx-input-elevation` | `var(--tx-elevation-1)` | Shadow. | `var(--tx-input-elevation, var(--tx-elevation-1, var(--tx-shadow-soft, none)))` |
+| `height` | `--tx-input-height` | `var(--tx-size-control-md)` | Input height from 640 px. | `var(--tx-input-height, var(--tx-size-control-md))` |
+| `height-touch` | `--tx-input-height-touch` | `var(--tx-size-control-lg)` | Input minimum height below 640 px. | `var(--tx-input-height-touch, var(--tx-size-control-lg))` |
+| `padding-block` | `--tx-input-padding-block` | `var(--tx-space-1)` | Input block padding. | `var(--tx-input-padding-block, var(--tx-space-1))` |
+| `padding-inline` | `--tx-input-padding-inline` | `var(--tx-space-3)` | Inline padding. | `var(--tx-input-padding-inline, var(--tx-space-3))` |
+| `radius` | `--tx-input-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-input-radius, var(--tx-shape-radius-lg))` |
+| `border-width` | `--tx-input-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-input-border-width, var(--tx-border-width-thin))` |
+| `elevation` | `--tx-input-elevation` | `var(--tx-elevation-1)` | Shadow. | `var(--tx-input-elevation, var(--tx-elevation-1))` |
 | `font-size` | `--tx-input-font-size` | `var(--tx-font-size-sm)` | Font size from 640 px. | `var(--tx-input-font-size, var(--tx-font-size-sm))` |
 | `font-size-touch` | `--tx-input-font-size-touch` | `var(--tx-font-size-base)` | Font size below 640 px (avoids zoom on focus). | `var(--tx-input-font-size-touch, var(--tx-font-size-base))` |
-| `font-weight` | `--tx-input-font-weight` | `var(--tx-type-body-weight)` | Font weight. | `var(--tx-input-font-weight, var(--tx-type-body-weight, var(--tx-font-weight-body, 400)))` |
-| `textarea-padding-block` | `--tx-input-textarea-padding-block` | `var(--tx-space-2)` | Textarea block padding. | `var(--tx-input-textarea-padding-block, var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)))` |
-| `disabled-opacity` | `--tx-input-disabled-opacity` | `var(--tx-opacity-disabled)` | Opacity when disabled. | `var(--tx-input-disabled-opacity, var(--tx-opacity-disabled, 0.5))` |
+| `font-weight` | `--tx-input-font-weight` | `var(--tx-type-body-weight)` | Font weight. | `var(--tx-input-font-weight, var(--tx-type-body-weight))` |
+| `textarea-padding-block` | `--tx-input-textarea-padding-block` | `var(--tx-space-2)` | Textarea block padding. | `var(--tx-input-textarea-padding-block, var(--tx-space-2))` |
+| `disabled-opacity` | `--tx-input-disabled-opacity` | `var(--tx-opacity-disabled)` | Opacity when disabled. | `var(--tx-input-disabled-opacity, var(--tx-opacity-disabled))` |
 
 ### Keyboard key (`kbd`, `texuli/kbd-code`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `min-size` | `--tx-kbd-min-size` | `var(--tx-size-icon-md)` | Minimum inline and block size. | `var(--tx-kbd-min-size, var(--tx-size-icon-md, 1.25rem))` |
-| `padding-block` | `--tx-kbd-padding-block` | `calc(var(--tx-space-unit) * 0.5)` | Block padding. | `var(--tx-kbd-padding-block, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5))` |
-| `radius` | `--tx-kbd-radius` | `calc(var(--tx-shape-radius-lg) * 0.4)` | Corner radius. | `var(--tx-kbd-radius, calc(var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)) * 0.4))` |
-| `border-width` | `--tx-kbd-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-kbd-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `font-weight` | `--tx-kbd-font-weight` | `var(--tx-type-label-weight)` | Font weight. | `var(--tx-kbd-font-weight, var(--tx-type-label-weight, var(--tx-font-weight-medium, 500)))` |
+| `min-size` | `--tx-kbd-min-size` | `var(--tx-size-icon-md)` | Minimum inline and block size. | `var(--tx-kbd-min-size, var(--tx-size-icon-md))` |
+| `padding-block` | `--tx-kbd-padding-block` | `calc(var(--tx-space-unit) * 0.5)` | Block padding. | `var(--tx-kbd-padding-block, calc(var(--tx-space-unit) * 0.5))` |
+| `radius` | `--tx-kbd-radius` | `calc(var(--tx-shape-radius-lg) * 0.4)` | Corner radius. | `var(--tx-kbd-radius, calc(var(--tx-shape-radius-lg) * 0.4))` |
+| `border-width` | `--tx-kbd-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-kbd-border-width, var(--tx-border-width-thin))` |
+| `font-weight` | `--tx-kbd-font-weight` | `var(--tx-type-label-weight)` | Font weight. | `var(--tx-kbd-font-weight, var(--tx-type-label-weight))` |
 
 ### Code (`code`, `texuli/kbd-code`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `font-size` | `--tx-code-font-size` | `var(--tx-type-code-size)` | Font size relative to the surrounding text. | `var(--tx-code-font-size, var(--tx-type-code-size, 0.875em))` |
-| `font-weight` | `--tx-code-font-weight` | `var(--tx-type-code-weight)` | Font weight. | `var(--tx-code-font-weight, var(--tx-type-code-weight, var(--tx-font-weight-body, 400)))` |
-| `block-padding-block` | `--tx-code-block-padding-block` | `var(--tx-space-3)` | Code block block padding. | `var(--tx-code-block-padding-block, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `block-padding-inline` | `--tx-code-block-padding-inline` | `var(--tx-space-4)` | Code block inline padding. | `var(--tx-code-block-padding-inline, var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)))` |
-| `block-radius` | `--tx-code-block-radius` | `var(--tx-shape-radius-lg)` | Code block corner radius. | `var(--tx-code-block-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `block-line-height` | `--tx-code-block-line-height` | `var(--tx-type-code-line)` | Code block line height. | `var(--tx-code-block-line-height, var(--tx-type-code-line, 1.5))` |
-| `block-border-width` | `--tx-code-block-border-width` | `var(--tx-border-width-thin)` | Code block border width. | `var(--tx-code-block-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
+| `font-size` | `--tx-code-font-size` | `var(--tx-type-code-size)` | Font size relative to the surrounding text. | `var(--tx-code-font-size, var(--tx-type-code-size))` |
+| `font-weight` | `--tx-code-font-weight` | `var(--tx-type-code-weight)` | Font weight. | `var(--tx-code-font-weight, var(--tx-type-code-weight))` |
+| `block-padding-block` | `--tx-code-block-padding-block` | `var(--tx-space-3)` | Code block block padding. | `var(--tx-code-block-padding-block, var(--tx-space-3))` |
+| `block-padding-inline` | `--tx-code-block-padding-inline` | `var(--tx-space-4)` | Code block inline padding. | `var(--tx-code-block-padding-inline, var(--tx-space-4))` |
+| `block-radius` | `--tx-code-block-radius` | `var(--tx-shape-radius-lg)` | Code block corner radius. | `var(--tx-code-block-radius, var(--tx-shape-radius-lg))` |
+| `block-line-height` | `--tx-code-block-line-height` | `var(--tx-type-code-line)` | Code block line height. | `var(--tx-code-block-line-height, var(--tx-type-code-line))` |
+| `block-border-width` | `--tx-code-block-border-width` | `var(--tx-border-width-thin)` | Code block border width. | `var(--tx-code-block-border-width, var(--tx-border-width-thin))` |
 
 ### Menus (`menu`, `texuli/menus`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `trigger-height-sm` | `--tx-menu-trigger-height-sm` | `var(--tx-size-control-sm)` | Small size height. | `var(--tx-menu-trigger-height-sm, var(--tx-size-control-sm, 2rem))` |
-| `trigger-height-md` | `--tx-menu-trigger-height-md` | `var(--tx-size-control-md)` | Default size height. | `var(--tx-menu-trigger-height-md, var(--tx-size-control-md, 2.25rem))` |
-| `trigger-height-lg` | `--tx-menu-trigger-height-lg` | `var(--tx-size-control-lg)` | Large size height. | `var(--tx-menu-trigger-height-lg, var(--tx-size-control-lg, 2.75rem))` |
-| `trigger-radius` | `--tx-menu-trigger-radius` | `var(--tx-shape-radius-lg)` | Trigger corner radius. | `var(--tx-menu-trigger-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `trigger-border-width` | `--tx-menu-trigger-border-width` | `var(--tx-border-width-thin)` | Trigger border width. | `var(--tx-menu-trigger-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `trigger-font-size` | `--tx-menu-trigger-font-size` | `var(--tx-type-label-size)` | Trigger font size. | `var(--tx-menu-trigger-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
-| `trigger-font-weight` | `--tx-menu-trigger-font-weight` | `var(--tx-type-label-weight)` | Trigger font weight. | `var(--tx-menu-trigger-font-weight, var(--tx-type-label-weight, var(--tx-font-weight-medium, 500)))` |
-| `content-z-index` | `--tx-menu-content-z-index` | `var(--tx-z-popover)` | Menu stacking. | `var(--tx-menu-content-z-index, var(--tx-z-popover, 50))` |
-| `content-padding-block` | `--tx-menu-content-padding-block` | `var(--tx-space-1)` | Menu block padding. | `var(--tx-menu-content-padding-block, var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)))` |
-| `content-radius` | `--tx-menu-content-radius` | `var(--tx-shape-radius-lg)` | Menu corner radius. | `var(--tx-menu-content-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `content-elevation` | `--tx-menu-content-elevation` | `var(--tx-elevation-3)` | Menu shadow. | `var(--tx-menu-content-elevation, var(--tx-elevation-3, var(--tx-shadow-float, none)))` |
-| `content-font-size` | `--tx-menu-content-font-size` | `var(--tx-type-label-size)` | Menu font size. | `var(--tx-menu-content-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
+| `trigger-height-sm` | `--tx-menu-trigger-height-sm` | `var(--tx-size-control-sm)` | Small size height. | `var(--tx-menu-trigger-height-sm, var(--tx-size-control-sm))` |
+| `trigger-height-md` | `--tx-menu-trigger-height-md` | `var(--tx-size-control-md)` | Default size height. | `var(--tx-menu-trigger-height-md, var(--tx-size-control-md))` |
+| `trigger-height-lg` | `--tx-menu-trigger-height-lg` | `var(--tx-size-control-lg)` | Large size height. | `var(--tx-menu-trigger-height-lg, var(--tx-size-control-lg))` |
+| `trigger-radius` | `--tx-menu-trigger-radius` | `var(--tx-shape-radius-lg)` | Trigger corner radius. | `var(--tx-menu-trigger-radius, var(--tx-shape-radius-lg))` |
+| `trigger-border-width` | `--tx-menu-trigger-border-width` | `var(--tx-border-width-thin)` | Trigger border width. | `var(--tx-menu-trigger-border-width, var(--tx-border-width-thin))` |
+| `trigger-font-size` | `--tx-menu-trigger-font-size` | `var(--tx-type-label-size)` | Trigger font size. | `var(--tx-menu-trigger-font-size, var(--tx-type-label-size))` |
+| `trigger-font-weight` | `--tx-menu-trigger-font-weight` | `var(--tx-type-label-weight)` | Trigger font weight. | `var(--tx-menu-trigger-font-weight, var(--tx-type-label-weight))` |
+| `content-z-index` | `--tx-menu-content-z-index` | `var(--tx-z-popover)` | Menu stacking. | `var(--tx-menu-content-z-index, var(--tx-z-popover))` |
+| `content-padding-block` | `--tx-menu-content-padding-block` | `var(--tx-space-1)` | Menu block padding. | `var(--tx-menu-content-padding-block, var(--tx-space-1))` |
+| `content-radius` | `--tx-menu-content-radius` | `var(--tx-shape-radius-lg)` | Menu corner radius. | `var(--tx-menu-content-radius, var(--tx-shape-radius-lg))` |
+| `content-elevation` | `--tx-menu-content-elevation` | `var(--tx-elevation-3)` | Menu shadow. | `var(--tx-menu-content-elevation, var(--tx-elevation-3))` |
+| `content-font-size` | `--tx-menu-content-font-size` | `var(--tx-type-label-size)` | Menu font size. | `var(--tx-menu-content-font-size, var(--tx-type-label-size))` |
 
 ### Navigation menu (`navigation`, `texuli/navigation`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `z-index` | `--tx-navigation-z-index` | `var(--tx-z-sticky)` | Stacking. | `var(--tx-navigation-z-index, var(--tx-z-sticky, 40))` |
-| `font-size` | `--tx-navigation-font-size` | `var(--tx-type-label-size)` | Default size font size. | `var(--tx-navigation-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
-| `list-gap` | `--tx-navigation-list-gap` | `var(--tx-space-1)` | Gap between items. | `var(--tx-navigation-list-gap, var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)))` |
-| `trigger-radius` | `--tx-navigation-trigger-radius` | `var(--tx-shape-radius-md)` | Trigger and link corner radius. | `var(--tx-navigation-trigger-radius, var(--tx-shape-radius-md, max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px))))` |
-| `chevron-opacity` | `--tx-navigation-chevron-opacity` | `var(--tx-opacity-muted)` | Trigger chevron opacity. | `var(--tx-navigation-chevron-opacity, var(--tx-opacity-muted, 0.7))` |
+| `z-index` | `--tx-navigation-z-index` | `var(--tx-z-sticky)` | Stacking. | `var(--tx-navigation-z-index, var(--tx-z-sticky))` |
+| `font-size` | `--tx-navigation-font-size` | `var(--tx-type-label-size)` | Default size font size. | `var(--tx-navigation-font-size, var(--tx-type-label-size))` |
+| `list-gap` | `--tx-navigation-list-gap` | `var(--tx-space-1)` | Gap between items. | `var(--tx-navigation-list-gap, var(--tx-space-1))` |
+| `trigger-radius` | `--tx-navigation-trigger-radius` | `var(--tx-shape-radius-md)` | Trigger and link corner radius. | `var(--tx-navigation-trigger-radius, var(--tx-shape-radius-md))` |
+| `chevron-opacity` | `--tx-navigation-chevron-opacity` | `var(--tx-opacity-muted)` | Trigger chevron opacity. | `var(--tx-navigation-chevron-opacity, var(--tx-opacity-muted))` |
 
 ### Number field (`number-field`, `texuli/number-pin`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `radius` | `--tx-number-field-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-number-field-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `border-width` | `--tx-number-field-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-number-field-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `padding-block` | `--tx-number-field-padding-block` | `var(--tx-space-2)` | Input block padding. | `var(--tx-number-field-padding-block, var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)))` |
-| `padding-inline` | `--tx-number-field-padding-inline` | `var(--tx-space-3)` | Input inline padding. | `var(--tx-number-field-padding-inline, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `stepper-size` | `--tx-number-field-stepper-size` | `var(--tx-size-control-md)` | Stepper button minimum inline size. | `var(--tx-number-field-stepper-size, var(--tx-size-control-md, 2.25rem))` |
+| `radius` | `--tx-number-field-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-number-field-radius, var(--tx-shape-radius-lg))` |
+| `border-width` | `--tx-number-field-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-number-field-border-width, var(--tx-border-width-thin))` |
+| `padding-block` | `--tx-number-field-padding-block` | `var(--tx-space-2)` | Input block padding. | `var(--tx-number-field-padding-block, var(--tx-space-2))` |
+| `padding-inline` | `--tx-number-field-padding-inline` | `var(--tx-space-3)` | Input inline padding. | `var(--tx-number-field-padding-inline, var(--tx-space-3))` |
+| `stepper-size` | `--tx-number-field-stepper-size` | `var(--tx-size-control-md)` | Stepper button minimum inline size. | `var(--tx-number-field-stepper-size, var(--tx-size-control-md))` |
 
 ### PIN input (`pin-input`, `texuli/number-pin`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `gap` | `--tx-pin-input-gap` | `var(--tx-space-2)` | Gap between cells. | `var(--tx-pin-input-gap, var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)))` |
-| `cell-inline-size` | `--tx-pin-input-cell-inline-size` | `var(--tx-size-control-lg)` | Cell inline size. | `var(--tx-pin-input-cell-inline-size, var(--tx-size-control-lg, 2.75rem))` |
-| `cell-block-size` | `--tx-pin-input-cell-block-size` | `var(--tx-space-12)` | Cell block size. | `var(--tx-pin-input-cell-block-size, var(--tx-space-12, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 12)))` |
-| `cell-radius` | `--tx-pin-input-cell-radius` | `var(--tx-shape-radius-lg)` | Cell corner radius. | `var(--tx-pin-input-cell-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `cell-font-size` | `--tx-pin-input-cell-font-size` | `var(--tx-type-heading-size)` | Cell font size. | `var(--tx-pin-input-cell-font-size, var(--tx-type-heading-size, var(--tx-font-size-lg, 1.125rem)))` |
+| `gap` | `--tx-pin-input-gap` | `var(--tx-space-2)` | Gap between cells. | `var(--tx-pin-input-gap, var(--tx-space-2))` |
+| `cell-inline-size` | `--tx-pin-input-cell-inline-size` | `var(--tx-size-control-lg)` | Cell inline size. | `var(--tx-pin-input-cell-inline-size, var(--tx-size-control-lg))` |
+| `cell-block-size` | `--tx-pin-input-cell-block-size` | `var(--tx-space-12)` | Cell block size. | `var(--tx-pin-input-cell-block-size, var(--tx-space-12))` |
+| `cell-radius` | `--tx-pin-input-cell-radius` | `var(--tx-shape-radius-lg)` | Cell corner radius. | `var(--tx-pin-input-cell-radius, var(--tx-shape-radius-lg))` |
+| `cell-font-size` | `--tx-pin-input-cell-font-size` | `var(--tx-type-heading-size)` | Cell font size. | `var(--tx-pin-input-cell-font-size, var(--tx-type-heading-size))` |
 
 ### Popover and hover card (`popover`, `texuli/popover`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `z-index` | `--tx-popover-z-index` | `var(--tx-z-popover)` | Stacking. | `var(--tx-popover-z-index, var(--tx-z-popover, 50))` |
-| `padding-block` | `--tx-popover-padding-block` | `var(--tx-space-3)` | Default size block padding. | `var(--tx-popover-padding-block, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `padding-inline` | `--tx-popover-padding-inline` | `calc(var(--tx-space-unit) * 3.5)` | Default size inline padding. | `var(--tx-popover-padding-inline, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3.5))` |
-| `radius` | `--tx-popover-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-popover-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `border-width` | `--tx-popover-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-popover-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `elevation` | `--tx-popover-elevation` | `var(--tx-elevation-3)` | Shadow. | `var(--tx-popover-elevation, var(--tx-elevation-3, var(--tx-shadow-float, none)))` |
-| `font-size` | `--tx-popover-font-size` | `var(--tx-type-label-size)` | Font size. | `var(--tx-popover-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
+| `z-index` | `--tx-popover-z-index` | `var(--tx-z-popover)` | Stacking. | `var(--tx-popover-z-index, var(--tx-z-popover))` |
+| `padding-block` | `--tx-popover-padding-block` | `var(--tx-space-3)` | Default size block padding. | `var(--tx-popover-padding-block, var(--tx-space-3))` |
+| `padding-inline` | `--tx-popover-padding-inline` | `calc(var(--tx-space-unit) * 3.5)` | Default size inline padding. | `var(--tx-popover-padding-inline, calc(var(--tx-space-unit) * 3.5))` |
+| `radius` | `--tx-popover-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-popover-radius, var(--tx-shape-radius-lg))` |
+| `border-width` | `--tx-popover-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-popover-border-width, var(--tx-border-width-thin))` |
+| `elevation` | `--tx-popover-elevation` | `var(--tx-elevation-3)` | Shadow. | `var(--tx-popover-elevation, var(--tx-elevation-3))` |
+| `font-size` | `--tx-popover-font-size` | `var(--tx-type-label-size)` | Font size. | `var(--tx-popover-font-size, var(--tx-type-label-size))` |
 | `title-font-size` | `--tx-popover-title-font-size` | `var(--tx-font-size-base)` | Title font size. | `var(--tx-popover-title-font-size, var(--tx-font-size-base))` |
-| `title-font-weight` | `--tx-popover-title-font-weight` | `var(--tx-type-heading-weight)` | Title font weight. | `var(--tx-popover-title-font-weight, var(--tx-type-heading-weight, var(--tx-font-weight-heading, 600)))` |
-| `title-line-height` | `--tx-popover-title-line-height` | `var(--tx-type-heading-line)` | Title line height. | `var(--tx-popover-title-line-height, var(--tx-type-heading-line, 1.3))` |
+| `title-font-weight` | `--tx-popover-title-font-weight` | `var(--tx-type-heading-weight)` | Title font weight. | `var(--tx-popover-title-font-weight, var(--tx-type-heading-weight))` |
+| `title-line-height` | `--tx-popover-title-line-height` | `var(--tx-type-heading-line)` | Title line height. | `var(--tx-popover-title-line-height, var(--tx-type-heading-line))` |
 
 ### Progress (`progress`, `texuli/feedback`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `gap` | `--tx-progress-gap` | `calc(var(--tx-space-unit) * 1.5)` | Gap between header and track. | `var(--tx-progress-gap, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1.5))` |
-| `font-size` | `--tx-progress-font-size` | `var(--tx-type-label-size)` | Header font size. | `var(--tx-progress-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
-| `radius` | `--tx-progress-radius` | `var(--tx-shape-radius-full)` | Track corner radius. | `var(--tx-progress-radius, var(--tx-shape-radius-full, 9999px))` |
-| `track-height-sm` | `--tx-progress-track-height-sm` | `calc(var(--tx-space-unit) * 1.5)` | Small track height. | `var(--tx-progress-track-height-sm, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1.5))` |
-| `track-height-md` | `--tx-progress-track-height-md` | `calc(var(--tx-space-unit) * 2.5)` | Default track height. | `var(--tx-progress-track-height-md, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2.5))` |
-| `track-height-lg` | `--tx-progress-track-height-lg` | `calc(var(--tx-space-unit) * 3.5)` | Large track height. | `var(--tx-progress-track-height-lg, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3.5))` |
+| `gap` | `--tx-progress-gap` | `calc(var(--tx-space-unit) * 1.5)` | Gap between header and track. | `var(--tx-progress-gap, calc(var(--tx-space-unit) * 1.5))` |
+| `font-size` | `--tx-progress-font-size` | `var(--tx-type-label-size)` | Header font size. | `var(--tx-progress-font-size, var(--tx-type-label-size))` |
+| `radius` | `--tx-progress-radius` | `var(--tx-shape-radius-full)` | Track corner radius. | `var(--tx-progress-radius, var(--tx-shape-radius-full))` |
+| `track-height-sm` | `--tx-progress-track-height-sm` | `calc(var(--tx-space-unit) * 1.5)` | Small track height. | `var(--tx-progress-track-height-sm, calc(var(--tx-space-unit) * 1.5))` |
+| `track-height-md` | `--tx-progress-track-height-md` | `calc(var(--tx-space-unit) * 2.5)` | Default track height. | `var(--tx-progress-track-height-md, calc(var(--tx-space-unit) * 2.5))` |
+| `track-height-lg` | `--tx-progress-track-height-lg` | `calc(var(--tx-space-unit) * 3.5)` | Large track height. | `var(--tx-progress-track-height-lg, calc(var(--tx-space-unit) * 3.5))` |
 
 ### Rating (`rating`, `texuli/rating`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `stars-gap` | `--tx-rating-stars-gap` | `calc(var(--tx-space-unit) * 0.5)` | Gap between stars. | `var(--tx-rating-stars-gap, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5))` |
-| `label-font-size` | `--tx-rating-label-font-size` | `var(--tx-type-label-size)` | Label font size. | `var(--tx-rating-label-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
-| `label-font-weight` | `--tx-rating-label-font-weight` | `var(--tx-type-label-weight)` | Label font weight. | `var(--tx-rating-label-font-weight, var(--tx-type-label-weight, var(--tx-font-weight-medium, 500)))` |
-| `star-radius` | `--tx-rating-star-radius` | `var(--tx-shape-radius-lg)` | Star focus box corner radius. | `var(--tx-rating-star-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
+| `stars-gap` | `--tx-rating-stars-gap` | `calc(var(--tx-space-unit) * 0.5)` | Gap between stars. | `var(--tx-rating-stars-gap, calc(var(--tx-space-unit) * 0.5))` |
+| `label-font-size` | `--tx-rating-label-font-size` | `var(--tx-type-label-size)` | Label font size. | `var(--tx-rating-label-font-size, var(--tx-type-label-size))` |
+| `label-font-weight` | `--tx-rating-label-font-weight` | `var(--tx-type-label-weight)` | Label font weight. | `var(--tx-rating-label-font-weight, var(--tx-type-label-weight))` |
+| `star-radius` | `--tx-rating-star-radius` | `var(--tx-shape-radius-lg)` | Star focus box corner radius. | `var(--tx-rating-star-radius, var(--tx-shape-radius-lg))` |
 
 ### Resizable panels (`resizable`, `texuli/resizable`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `radius` | `--tx-resizable-radius` | `var(--tx-shape-radius-xl)` | Bordered group corner radius. | `var(--tx-resizable-radius, var(--tx-shape-radius-xl, calc(var(--tx-radius, 0.625rem) + var(--tx-radius-step-4, 4px))))` |
-| `border-width` | `--tx-resizable-border-width` | `var(--tx-border-width-thin)` | Bordered group border width. | `var(--tx-resizable-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
+| `radius` | `--tx-resizable-radius` | `var(--tx-shape-radius-xl)` | Bordered group corner radius. | `var(--tx-resizable-radius, var(--tx-shape-radius-xl))` |
+| `border-width` | `--tx-resizable-border-width` | `var(--tx-border-width-thin)` | Bordered group border width. | `var(--tx-resizable-border-width, var(--tx-border-width-thin))` |
 
 ### Scroll area (`scroll-area`, `texuli/scroll-area`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `radius` | `--tx-scroll-area-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-scroll-area-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `border-width` | `--tx-scroll-area-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-scroll-area-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `padding` | `--tx-scroll-area-padding` | `var(--tx-space-3)` | Viewport padding. | `var(--tx-scroll-area-padding, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `scrollbar-size` | `--tx-scroll-area-scrollbar-size` | `calc(var(--tx-space-unit) * 2.5)` | Scrollbar thickness. | `var(--tx-scroll-area-scrollbar-size, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2.5))` |
-| `scrollbar-radius` | `--tx-scroll-area-scrollbar-radius` | `var(--tx-shape-radius-full)` | Scrollbar corner radius. | `var(--tx-scroll-area-scrollbar-radius, var(--tx-shape-radius-full, 9999px))` |
-| `thumb-min-size` | `--tx-scroll-area-thumb-min-size` | `var(--tx-space-4)` | Minimum thumb length. | `var(--tx-scroll-area-thumb-min-size, var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)))` |
+| `radius` | `--tx-scroll-area-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-scroll-area-radius, var(--tx-shape-radius-lg))` |
+| `border-width` | `--tx-scroll-area-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-scroll-area-border-width, var(--tx-border-width-thin))` |
+| `padding` | `--tx-scroll-area-padding` | `var(--tx-space-3)` | Viewport padding. | `var(--tx-scroll-area-padding, var(--tx-space-3))` |
+| `scrollbar-size` | `--tx-scroll-area-scrollbar-size` | `calc(var(--tx-space-unit) * 2.5)` | Scrollbar thickness. | `var(--tx-scroll-area-scrollbar-size, calc(var(--tx-space-unit) * 2.5))` |
+| `scrollbar-radius` | `--tx-scroll-area-scrollbar-radius` | `var(--tx-shape-radius-full)` | Scrollbar corner radius. | `var(--tx-scroll-area-scrollbar-radius, var(--tx-shape-radius-full))` |
+| `thumb-min-size` | `--tx-scroll-area-thumb-min-size` | `var(--tx-space-4)` | Minimum thumb length. | `var(--tx-scroll-area-thumb-min-size, var(--tx-space-4))` |
 
 ### Select (`select`, `texuli/select`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `height-sm` | `--tx-select-height-sm` | `var(--tx-size-control-sm)` | Small size height. | `var(--tx-select-height-sm, var(--tx-size-control-sm, 2rem))` |
-| `height-md` | `--tx-select-height-md` | `var(--tx-size-control-md)` | Default size height. | `var(--tx-select-height-md, var(--tx-size-control-md, 2.25rem))` |
-| `height-lg` | `--tx-select-height-lg` | `var(--tx-size-control-lg)` | Large size height. | `var(--tx-select-height-lg, var(--tx-size-control-lg, 2.75rem))` |
-| `padding-inline-sm` | `--tx-select-padding-inline-sm` | `var(--tx-space-2)` | Small size inline padding. | `var(--tx-select-padding-inline-sm, var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)))` |
-| `padding-inline-md` | `--tx-select-padding-inline-md` | `var(--tx-space-3)` | Default size inline padding. | `var(--tx-select-padding-inline-md, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `padding-inline-lg` | `--tx-select-padding-inline-lg` | `calc(var(--tx-space-unit) * 3.5)` | Large size inline padding. | `var(--tx-select-padding-inline-lg, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3.5))` |
-| `gap` | `--tx-select-gap` | `var(--tx-space-2)` | Gap between value and chevron. | `var(--tx-select-gap, var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)))` |
-| `radius` | `--tx-select-radius` | `var(--tx-shape-radius-lg)` | Trigger corner radius. | `var(--tx-select-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `border-width` | `--tx-select-border-width` | `var(--tx-border-width-thin)` | Trigger border width. | `var(--tx-select-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `font-size-sm` | `--tx-select-font-size-sm` | `var(--tx-type-caption-size)` | Small size font size. | `var(--tx-select-font-size-sm, var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem)))` |
-| `font-size-md` | `--tx-select-font-size-md` | `var(--tx-type-label-size)` | Default size font size. | `var(--tx-select-font-size-md, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
-| `font-size-lg` | `--tx-select-font-size-lg` | `var(--tx-type-body-size)` | Large size font size. | `var(--tx-select-font-size-lg, var(--tx-type-body-size, var(--tx-font-size-base, 1rem)))` |
-| `font-weight` | `--tx-select-font-weight` | `var(--tx-type-body-weight)` | Trigger font weight. | `var(--tx-select-font-weight, var(--tx-type-body-weight, var(--tx-font-weight-body, 400)))` |
-| `chevron-size` | `--tx-select-chevron-size` | `var(--tx-size-icon-sm)` | Chevron size. | `var(--tx-select-chevron-size, var(--tx-size-icon-sm, 1rem))` |
-| `chevron-opacity` | `--tx-select-chevron-opacity` | `var(--tx-opacity-muted)` | Chevron opacity. | `var(--tx-select-chevron-opacity, var(--tx-opacity-muted, 0.7))` |
+| `height-sm` | `--tx-select-height-sm` | `var(--tx-size-control-sm)` | Small size height. | `var(--tx-select-height-sm, var(--tx-size-control-sm))` |
+| `height-md` | `--tx-select-height-md` | `var(--tx-size-control-md)` | Default size height. | `var(--tx-select-height-md, var(--tx-size-control-md))` |
+| `height-lg` | `--tx-select-height-lg` | `var(--tx-size-control-lg)` | Large size height. | `var(--tx-select-height-lg, var(--tx-size-control-lg))` |
+| `padding-inline-sm` | `--tx-select-padding-inline-sm` | `var(--tx-space-2)` | Small size inline padding. | `var(--tx-select-padding-inline-sm, var(--tx-space-2))` |
+| `padding-inline-md` | `--tx-select-padding-inline-md` | `var(--tx-space-3)` | Default size inline padding. | `var(--tx-select-padding-inline-md, var(--tx-space-3))` |
+| `padding-inline-lg` | `--tx-select-padding-inline-lg` | `calc(var(--tx-space-unit) * 3.5)` | Large size inline padding. | `var(--tx-select-padding-inline-lg, calc(var(--tx-space-unit) * 3.5))` |
+| `gap` | `--tx-select-gap` | `var(--tx-space-2)` | Gap between value and chevron. | `var(--tx-select-gap, var(--tx-space-2))` |
+| `radius` | `--tx-select-radius` | `var(--tx-shape-radius-lg)` | Trigger corner radius. | `var(--tx-select-radius, var(--tx-shape-radius-lg))` |
+| `border-width` | `--tx-select-border-width` | `var(--tx-border-width-thin)` | Trigger border width. | `var(--tx-select-border-width, var(--tx-border-width-thin))` |
+| `font-size-sm` | `--tx-select-font-size-sm` | `var(--tx-type-caption-size)` | Small size font size. | `var(--tx-select-font-size-sm, var(--tx-type-caption-size))` |
+| `font-size-md` | `--tx-select-font-size-md` | `var(--tx-type-label-size)` | Default size font size. | `var(--tx-select-font-size-md, var(--tx-type-label-size))` |
+| `font-size-lg` | `--tx-select-font-size-lg` | `var(--tx-type-body-size)` | Large size font size. | `var(--tx-select-font-size-lg, var(--tx-type-body-size))` |
+| `font-weight` | `--tx-select-font-weight` | `var(--tx-type-body-weight)` | Trigger font weight. | `var(--tx-select-font-weight, var(--tx-type-body-weight))` |
+| `chevron-size` | `--tx-select-chevron-size` | `var(--tx-size-icon-sm)` | Chevron size. | `var(--tx-select-chevron-size, var(--tx-size-icon-sm))` |
+| `chevron-opacity` | `--tx-select-chevron-opacity` | `var(--tx-opacity-muted)` | Chevron opacity. | `var(--tx-select-chevron-opacity, var(--tx-opacity-muted))` |
 
 ### Separator (`separator`, `texuli/separator-aspect`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `thickness` | `--tx-separator-thickness` | `var(--tx-border-width-thin)` | Line thickness. | `var(--tx-separator-thickness, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
+| `thickness` | `--tx-separator-thickness` | `var(--tx-border-width-thin)` | Line thickness. | `var(--tx-separator-thickness, var(--tx-border-width-thin))` |
 
 ### Aspect ratio (`aspect-ratio`, `texuli/separator-aspect`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `radius` | `--tx-aspect-ratio-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-aspect-ratio-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
+| `radius` | `--tx-aspect-ratio-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-aspect-ratio-radius, var(--tx-shape-radius-lg))` |
 
 ### Sheet, drawer and detail panel (`sheet`, `texuli/sheet`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `z-index` | `--tx-sheet-z-index` | `var(--tx-z-overlay)` | Stacking. | `var(--tx-sheet-z-index, var(--tx-z-overlay, 60))` |
-| `gap` | `--tx-sheet-gap` | `var(--tx-space-4)` | Gap between header, body and footer. | `var(--tx-sheet-gap, var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)))` |
-| `padding` | `--tx-sheet-padding` | `var(--tx-space-5)` | Padding. | `var(--tx-sheet-padding, var(--tx-space-5, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5)))` |
-| `border-width` | `--tx-sheet-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-sheet-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `elevation` | `--tx-sheet-elevation` | `var(--tx-elevation-4)` | Shadow. | `var(--tx-sheet-elevation, var(--tx-elevation-4, var(--tx-shadow-float, none)))` |
+| `z-index` | `--tx-sheet-z-index` | `var(--tx-z-overlay)` | Stacking. | `var(--tx-sheet-z-index, var(--tx-z-overlay))` |
+| `gap` | `--tx-sheet-gap` | `var(--tx-space-4)` | Gap between header, body and footer. | `var(--tx-sheet-gap, var(--tx-space-4))` |
+| `padding` | `--tx-sheet-padding` | `var(--tx-space-5)` | Padding. | `var(--tx-sheet-padding, var(--tx-space-5))` |
+| `border-width` | `--tx-sheet-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-sheet-border-width, var(--tx-border-width-thin))` |
+| `elevation` | `--tx-sheet-elevation` | `var(--tx-elevation-4)` | Shadow. | `var(--tx-sheet-elevation, var(--tx-elevation-4))` |
 | `font-size` | `--tx-sheet-font-size` | `var(--tx-font-size-sm)` | Body font size. | `var(--tx-sheet-font-size, var(--tx-font-size-sm))` |
-| `line-height` | `--tx-sheet-line-height` | `var(--tx-type-body-line)` | Body line height. | `var(--tx-sheet-line-height, var(--tx-type-body-line, 1.5))` |
-| `title-font-size` | `--tx-sheet-title-font-size` | `var(--tx-type-heading-size)` | Title font size. | `var(--tx-sheet-title-font-size, var(--tx-type-heading-size, var(--tx-font-size-lg, 1.125rem)))` |
-| `title-font-weight` | `--tx-sheet-title-font-weight` | `var(--tx-type-heading-weight)` | Title font weight. | `var(--tx-sheet-title-font-weight, var(--tx-type-heading-weight, var(--tx-font-weight-heading, 600)))` |
-| `title-line-height` | `--tx-sheet-title-line-height` | `var(--tx-type-heading-line)` | Title line height. | `var(--tx-sheet-title-line-height, var(--tx-type-heading-line, 1.3))` |
-| `scrim-opacity` | `--tx-sheet-scrim-opacity` | `var(--tx-opacity-scrim)` | Foreground mix of the overlay scrim. | `var(--tx-sheet-scrim-opacity, var(--tx-opacity-scrim, 45%))` |
+| `line-height` | `--tx-sheet-line-height` | `var(--tx-type-body-line)` | Body line height. | `var(--tx-sheet-line-height, var(--tx-type-body-line))` |
+| `title-font-size` | `--tx-sheet-title-font-size` | `var(--tx-type-heading-size)` | Title font size. | `var(--tx-sheet-title-font-size, var(--tx-type-heading-size))` |
+| `title-font-weight` | `--tx-sheet-title-font-weight` | `var(--tx-type-heading-weight)` | Title font weight. | `var(--tx-sheet-title-font-weight, var(--tx-type-heading-weight))` |
+| `title-line-height` | `--tx-sheet-title-line-height` | `var(--tx-type-heading-line)` | Title line height. | `var(--tx-sheet-title-line-height, var(--tx-type-heading-line))` |
+| `scrim-opacity` | `--tx-sheet-scrim-opacity` | `var(--tx-opacity-scrim)` | Foreground mix of the overlay scrim. | `var(--tx-sheet-scrim-opacity, var(--tx-opacity-scrim))` |
 
 ### Sidebar (`sidebar`, `texuli/sidebar`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
 | `font-size` | `--tx-sidebar-font-size` | `var(--tx-font-size-sm)` | Font size. | `var(--tx-sidebar-font-size, var(--tx-font-size-sm))` |
-| `inset-radius` | `--tx-sidebar-inset-radius` | `var(--tx-shape-radius-lg)` | Inset variant corner radius. | `var(--tx-sidebar-inset-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `header-padding-inline` | `--tx-sidebar-header-padding-inline` | `var(--tx-space-3)` | Header inline padding. | `var(--tx-sidebar-header-padding-inline, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `header-gap` | `--tx-sidebar-header-gap` | `var(--tx-space-2)` | Header gap. | `var(--tx-sidebar-header-gap, var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)))` |
-| `body-gap` | `--tx-sidebar-body-gap` | `var(--tx-space-4)` | Gap between sections. | `var(--tx-sidebar-body-gap, var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)))` |
-| `body-padding-block` | `--tx-sidebar-body-padding-block` | `var(--tx-space-3)` | Body block padding. | `var(--tx-sidebar-body-padding-block, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `body-padding-inline` | `--tx-sidebar-body-padding-inline` | `var(--tx-space-2)` | Body inline padding. | `var(--tx-sidebar-body-padding-inline, var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)))` |
+| `inset-radius` | `--tx-sidebar-inset-radius` | `var(--tx-shape-radius-lg)` | Inset variant corner radius. | `var(--tx-sidebar-inset-radius, var(--tx-shape-radius-lg))` |
+| `header-padding-inline` | `--tx-sidebar-header-padding-inline` | `var(--tx-space-3)` | Header inline padding. | `var(--tx-sidebar-header-padding-inline, var(--tx-space-3))` |
+| `header-gap` | `--tx-sidebar-header-gap` | `var(--tx-space-2)` | Header gap. | `var(--tx-sidebar-header-gap, var(--tx-space-2))` |
+| `body-gap` | `--tx-sidebar-body-gap` | `var(--tx-space-4)` | Gap between sections. | `var(--tx-sidebar-body-gap, var(--tx-space-4))` |
+| `body-padding-block` | `--tx-sidebar-body-padding-block` | `var(--tx-space-3)` | Body block padding. | `var(--tx-sidebar-body-padding-block, var(--tx-space-3))` |
+| `body-padding-inline` | `--tx-sidebar-body-padding-inline` | `var(--tx-space-2)` | Body inline padding. | `var(--tx-sidebar-body-padding-inline, var(--tx-space-2))` |
 
 ### Skeleton (`skeleton`, `texuli/feedback`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `radius` | `--tx-skeleton-radius` | `var(--tx-shape-radius-md)` | Corner radius. | `var(--tx-skeleton-radius, var(--tx-shape-radius-md, max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px))))` |
-| `height-sm` | `--tx-skeleton-height-sm` | `var(--tx-space-3)` | Small line height. | `var(--tx-skeleton-height-sm, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `height-md` | `--tx-skeleton-height-md` | `var(--tx-space-4)` | Default line height. | `var(--tx-skeleton-height-md, var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)))` |
-| `height-lg` | `--tx-skeleton-height-lg` | `var(--tx-space-6)` | Large line height. | `var(--tx-skeleton-height-lg, var(--tx-space-6, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 6)))` |
-| `circle-size` | `--tx-skeleton-circle-size` | `var(--tx-space-10)` | Circle size. | `var(--tx-skeleton-circle-size, var(--tx-space-10, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 10)))` |
+| `radius` | `--tx-skeleton-radius` | `var(--tx-shape-radius-md)` | Corner radius. | `var(--tx-skeleton-radius, var(--tx-shape-radius-md))` |
+| `height-sm` | `--tx-skeleton-height-sm` | `var(--tx-space-3)` | Small line height. | `var(--tx-skeleton-height-sm, var(--tx-space-3))` |
+| `height-md` | `--tx-skeleton-height-md` | `var(--tx-space-4)` | Default line height. | `var(--tx-skeleton-height-md, var(--tx-space-4))` |
+| `height-lg` | `--tx-skeleton-height-lg` | `var(--tx-space-6)` | Large line height. | `var(--tx-skeleton-height-lg, var(--tx-space-6))` |
+| `circle-size` | `--tx-skeleton-circle-size` | `var(--tx-space-10)` | Circle size. | `var(--tx-skeleton-circle-size, var(--tx-space-10))` |
 
 ### Slider (`slider`, `texuli/slider`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `thumb-border-width` | `--tx-slider-thumb-border-width` | `var(--tx-border-width-thick)` | Thumb border width. | `var(--tx-slider-thumb-border-width, var(--tx-border-width-thick, calc(var(--tx-border-width, 1px) * 2)))` |
-| `thumb-elevation` | `--tx-slider-thumb-elevation` | `var(--tx-elevation-2)` | Thumb shadow. | `var(--tx-slider-thumb-elevation, var(--tx-elevation-2, var(--tx-shadow-soft, none)))` |
-| `disabled-opacity` | `--tx-slider-disabled-opacity` | `var(--tx-opacity-disabled)` | Opacity when disabled. | `var(--tx-slider-disabled-opacity, var(--tx-opacity-disabled, 0.5))` |
+| `thumb-border-width` | `--tx-slider-thumb-border-width` | `var(--tx-border-width-thick)` | Thumb border width. | `var(--tx-slider-thumb-border-width, var(--tx-border-width-thick))` |
+| `thumb-elevation` | `--tx-slider-thumb-elevation` | `var(--tx-elevation-2)` | Thumb shadow. | `var(--tx-slider-thumb-elevation, var(--tx-elevation-2))` |
+| `disabled-opacity` | `--tx-slider-disabled-opacity` | `var(--tx-opacity-disabled)` | Opacity when disabled. | `var(--tx-slider-disabled-opacity, var(--tx-opacity-disabled))` |
 
 ### Spinner (`spinner`, `texuli/feedback`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `radius` | `--tx-spinner-radius` | `var(--tx-shape-radius-full)` | Corner radius. | `var(--tx-spinner-radius, var(--tx-shape-radius-full, 9999px))` |
+| `radius` | `--tx-spinner-radius` | `var(--tx-shape-radius-full)` | Corner radius. | `var(--tx-spinner-radius, var(--tx-shape-radius-full))` |
 
 ### Stat and KPI (`stat`, `texuli/stat`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `gap` | `--tx-stat-gap` | `var(--tx-space-2)` | Gap between rows. | `var(--tx-stat-gap, var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)))` |
-| `padding` | `--tx-stat-padding` | `var(--tx-space-5)` | Padding. | `var(--tx-stat-padding, var(--tx-space-5, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 5)))` |
-| `radius` | `--tx-stat-radius` | `var(--tx-shape-radius-xl)` | Corner radius. | `var(--tx-stat-radius, var(--tx-shape-radius-xl, calc(var(--tx-radius, 0.625rem) + var(--tx-radius-step-4, 4px))))` |
-| `border-width` | `--tx-stat-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-stat-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `elevation` | `--tx-stat-elevation` | `var(--tx-elevation-1)` | Shadow. | `var(--tx-stat-elevation, var(--tx-elevation-1, var(--tx-shadow-soft, none)))` |
-| `label-font-size` | `--tx-stat-label-font-size` | `var(--tx-type-label-size)` | Label font size. | `var(--tx-stat-label-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
-| `label-font-weight` | `--tx-stat-label-font-weight` | `var(--tx-type-label-weight)` | Label font weight. | `var(--tx-stat-label-font-weight, var(--tx-type-label-weight, var(--tx-font-weight-medium, 500)))` |
-| `value-font-size` | `--tx-stat-value-font-size` | `var(--tx-type-title-size)` | Value font size. | `var(--tx-stat-value-font-size, var(--tx-type-title-size, var(--tx-font-size-2xl, 1.5rem)))` |
-| `value-font-weight` | `--tx-stat-value-font-weight` | `var(--tx-type-heading-weight)` | Value font weight. | `var(--tx-stat-value-font-weight, var(--tx-type-heading-weight, var(--tx-font-weight-heading, 600)))` |
-| `icon-size` | `--tx-stat-icon-size` | `var(--tx-size-control-sm)` | Icon box size. | `var(--tx-stat-icon-size, var(--tx-size-control-sm, 2rem))` |
-| `icon-radius` | `--tx-stat-icon-radius` | `var(--tx-shape-radius-md)` | Icon box corner radius. | `var(--tx-stat-icon-radius, var(--tx-shape-radius-md, max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px))))` |
+| `gap` | `--tx-stat-gap` | `var(--tx-space-2)` | Gap between rows. | `var(--tx-stat-gap, var(--tx-space-2))` |
+| `padding` | `--tx-stat-padding` | `var(--tx-space-5)` | Padding. | `var(--tx-stat-padding, var(--tx-space-5))` |
+| `radius` | `--tx-stat-radius` | `var(--tx-shape-radius-xl)` | Corner radius. | `var(--tx-stat-radius, var(--tx-shape-radius-xl))` |
+| `border-width` | `--tx-stat-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-stat-border-width, var(--tx-border-width-thin))` |
+| `elevation` | `--tx-stat-elevation` | `var(--tx-elevation-1)` | Shadow. | `var(--tx-stat-elevation, var(--tx-elevation-1))` |
+| `label-font-size` | `--tx-stat-label-font-size` | `var(--tx-type-label-size)` | Label font size. | `var(--tx-stat-label-font-size, var(--tx-type-label-size))` |
+| `label-font-weight` | `--tx-stat-label-font-weight` | `var(--tx-type-label-weight)` | Label font weight. | `var(--tx-stat-label-font-weight, var(--tx-type-label-weight))` |
+| `value-font-size` | `--tx-stat-value-font-size` | `var(--tx-type-title-size)` | Value font size. | `var(--tx-stat-value-font-size, var(--tx-type-title-size))` |
+| `value-font-weight` | `--tx-stat-value-font-weight` | `var(--tx-type-heading-weight)` | Value font weight. | `var(--tx-stat-value-font-weight, var(--tx-type-heading-weight))` |
+| `icon-size` | `--tx-stat-icon-size` | `var(--tx-size-control-sm)` | Icon box size. | `var(--tx-stat-icon-size, var(--tx-size-control-sm))` |
+| `icon-radius` | `--tx-stat-icon-radius` | `var(--tx-shape-radius-md)` | Icon box corner radius. | `var(--tx-stat-icon-radius, var(--tx-shape-radius-md))` |
 
 ### Stepper (`stepper`, `texuli/stepper`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `gap` | `--tx-stepper-gap` | `var(--tx-space-3)` | Gap between marker and body. | `var(--tx-stepper-gap, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `trigger-radius` | `--tx-stepper-trigger-radius` | `var(--tx-shape-radius-md)` | Trigger corner radius. | `var(--tx-stepper-trigger-radius, var(--tx-shape-radius-md, max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px))))` |
-| `marker-size` | `--tx-stepper-marker-size` | `var(--tx-size-control-sm)` | Marker size. | `var(--tx-stepper-marker-size, var(--tx-size-control-sm, 2rem))` |
-| `marker-radius` | `--tx-stepper-marker-radius` | `var(--tx-shape-radius-full)` | Marker corner radius. | `var(--tx-stepper-marker-radius, var(--tx-shape-radius-full, 9999px))` |
-| `marker-border-width` | `--tx-stepper-marker-border-width` | `var(--tx-border-width-thin)` | Marker border width. | `var(--tx-stepper-marker-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `marker-font-size` | `--tx-stepper-marker-font-size` | `var(--tx-type-caption-size)` | Marker font size. | `var(--tx-stepper-marker-font-size, var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem)))` |
-| `marker-font-weight` | `--tx-stepper-marker-font-weight` | `var(--tx-type-heading-weight)` | Marker font weight. | `var(--tx-stepper-marker-font-weight, var(--tx-type-heading-weight, var(--tx-font-weight-heading, 600)))` |
-| `check-size` | `--tx-stepper-check-size` | `var(--tx-size-icon-sm)` | Completed check icon size. | `var(--tx-stepper-check-size, var(--tx-size-icon-sm, 1rem))` |
+| `gap` | `--tx-stepper-gap` | `var(--tx-space-3)` | Gap between marker and body. | `var(--tx-stepper-gap, var(--tx-space-3))` |
+| `trigger-radius` | `--tx-stepper-trigger-radius` | `var(--tx-shape-radius-md)` | Trigger corner radius. | `var(--tx-stepper-trigger-radius, var(--tx-shape-radius-md))` |
+| `marker-size` | `--tx-stepper-marker-size` | `var(--tx-size-control-sm)` | Marker size. | `var(--tx-stepper-marker-size, var(--tx-size-control-sm))` |
+| `marker-radius` | `--tx-stepper-marker-radius` | `var(--tx-shape-radius-full)` | Marker corner radius. | `var(--tx-stepper-marker-radius, var(--tx-shape-radius-full))` |
+| `marker-border-width` | `--tx-stepper-marker-border-width` | `var(--tx-border-width-thin)` | Marker border width. | `var(--tx-stepper-marker-border-width, var(--tx-border-width-thin))` |
+| `marker-font-size` | `--tx-stepper-marker-font-size` | `var(--tx-type-caption-size)` | Marker font size. | `var(--tx-stepper-marker-font-size, var(--tx-type-caption-size))` |
+| `marker-font-weight` | `--tx-stepper-marker-font-weight` | `var(--tx-type-heading-weight)` | Marker font weight. | `var(--tx-stepper-marker-font-weight, var(--tx-type-heading-weight))` |
+| `check-size` | `--tx-stepper-check-size` | `var(--tx-size-icon-sm)` | Completed check icon size. | `var(--tx-stepper-check-size, var(--tx-size-icon-sm))` |
 
 ### Table (`table`, `texuli/table`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `radius` | `--tx-table-radius` | `var(--tx-shape-radius-xl)` | Wrapper corner radius. | `var(--tx-table-radius, var(--tx-shape-radius-xl, calc(var(--tx-radius, 0.625rem) + var(--tx-radius-step-4, 4px))))` |
-| `border-width` | `--tx-table-border-width` | `var(--tx-border-width-thin)` | Wrapper border width. | `var(--tx-table-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
+| `radius` | `--tx-table-radius` | `var(--tx-shape-radius-xl)` | Wrapper corner radius. | `var(--tx-table-radius, var(--tx-shape-radius-xl))` |
+| `border-width` | `--tx-table-border-width` | `var(--tx-border-width-thin)` | Wrapper border width. | `var(--tx-table-border-width, var(--tx-border-width-thin))` |
 | `font-size` | `--tx-table-font-size` | `var(--tx-font-size-sm)` | Font size. | `var(--tx-table-font-size, var(--tx-font-size-sm))` |
-| `head-font-size` | `--tx-table-head-font-size` | `var(--tx-type-caption-size)` | Header cell font size. | `var(--tx-table-head-font-size, var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem)))` |
-| `head-font-weight` | `--tx-table-head-font-weight` | `var(--tx-type-label-weight)` | Header cell font weight. | `var(--tx-table-head-font-weight, var(--tx-type-label-weight, var(--tx-font-weight-medium, 500)))` |
+| `head-font-size` | `--tx-table-head-font-size` | `var(--tx-type-caption-size)` | Header cell font size. | `var(--tx-table-head-font-size, var(--tx-type-caption-size))` |
+| `head-font-weight` | `--tx-table-head-font-weight` | `var(--tx-type-label-weight)` | Header cell font weight. | `var(--tx-table-head-font-weight, var(--tx-type-label-weight))` |
 
 ### Tabs (`tabs`, `texuli/tabs-accordion`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `gap` | `--tx-tabs-gap` | `var(--tx-space-3)` | Gap between list and panel. | `var(--tx-tabs-gap, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `list-gap` | `--tx-tabs-list-gap` | `var(--tx-space-1)` | Gap between triggers. | `var(--tx-tabs-list-gap, var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)))` |
-| `list-radius` | `--tx-tabs-list-radius` | `var(--tx-shape-radius-lg)` | Pills and enclosed list corner radius. | `var(--tx-tabs-list-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `trigger-gap` | `--tx-tabs-trigger-gap` | `var(--tx-space-2)` | Gap inside a trigger. | `var(--tx-tabs-trigger-gap, var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)))` |
-| `trigger-height-touch` | `--tx-tabs-trigger-height-touch` | `var(--tx-size-control-lg)` | Trigger minimum height below 640 px. | `var(--tx-tabs-trigger-height-touch, var(--tx-size-control-lg, 2.75rem))` |
-| `trigger-font-size` | `--tx-tabs-trigger-font-size` | `var(--tx-type-label-size)` | Trigger font size. | `var(--tx-tabs-trigger-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
-| `trigger-font-weight` | `--tx-tabs-trigger-font-weight` | `var(--tx-type-label-weight)` | Trigger font weight. | `var(--tx-tabs-trigger-font-weight, var(--tx-type-label-weight, var(--tx-font-weight-medium, 500)))` |
-| `disabled-opacity` | `--tx-tabs-disabled-opacity` | `var(--tx-opacity-disabled)` | Disabled trigger opacity. | `var(--tx-tabs-disabled-opacity, var(--tx-opacity-disabled, 0.5))` |
+| `gap` | `--tx-tabs-gap` | `var(--tx-space-3)` | Gap between list and panel. | `var(--tx-tabs-gap, var(--tx-space-3))` |
+| `list-gap` | `--tx-tabs-list-gap` | `var(--tx-space-1)` | Gap between triggers. | `var(--tx-tabs-list-gap, var(--tx-space-1))` |
+| `list-radius` | `--tx-tabs-list-radius` | `var(--tx-shape-radius-lg)` | Pills and enclosed list corner radius. | `var(--tx-tabs-list-radius, var(--tx-shape-radius-lg))` |
+| `trigger-gap` | `--tx-tabs-trigger-gap` | `var(--tx-space-2)` | Gap inside a trigger. | `var(--tx-tabs-trigger-gap, var(--tx-space-2))` |
+| `trigger-height-touch` | `--tx-tabs-trigger-height-touch` | `var(--tx-size-control-lg)` | Trigger minimum height below 640 px. | `var(--tx-tabs-trigger-height-touch, var(--tx-size-control-lg))` |
+| `trigger-font-size` | `--tx-tabs-trigger-font-size` | `var(--tx-type-label-size)` | Trigger font size. | `var(--tx-tabs-trigger-font-size, var(--tx-type-label-size))` |
+| `trigger-font-weight` | `--tx-tabs-trigger-font-weight` | `var(--tx-type-label-weight)` | Trigger font weight. | `var(--tx-tabs-trigger-font-weight, var(--tx-type-label-weight))` |
+| `disabled-opacity` | `--tx-tabs-disabled-opacity` | `var(--tx-opacity-disabled)` | Disabled trigger opacity. | `var(--tx-tabs-disabled-opacity, var(--tx-opacity-disabled))` |
 
 ### Accordion and collapsible (`accordion`, `texuli/tabs-accordion`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `trigger-gap` | `--tx-accordion-trigger-gap` | `var(--tx-space-4)` | Gap inside a trigger. | `var(--tx-accordion-trigger-gap, var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)))` |
-| `trigger-padding-block` | `--tx-accordion-trigger-padding-block` | `var(--tx-space-3)` | Trigger block padding. | `var(--tx-accordion-trigger-padding-block, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `trigger-font-size` | `--tx-accordion-trigger-font-size` | `var(--tx-type-label-size)` | Trigger font size. | `var(--tx-accordion-trigger-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
-| `trigger-font-weight` | `--tx-accordion-trigger-font-weight` | `var(--tx-type-label-weight)` | Trigger font weight. | `var(--tx-accordion-trigger-font-weight, var(--tx-type-label-weight, var(--tx-font-weight-medium, 500)))` |
-| `disabled-opacity` | `--tx-accordion-disabled-opacity` | `var(--tx-opacity-disabled)` | Disabled trigger opacity. | `var(--tx-accordion-disabled-opacity, var(--tx-opacity-disabled, 0.5))` |
+| `trigger-gap` | `--tx-accordion-trigger-gap` | `var(--tx-space-4)` | Gap inside a trigger. | `var(--tx-accordion-trigger-gap, var(--tx-space-4))` |
+| `trigger-padding-block` | `--tx-accordion-trigger-padding-block` | `var(--tx-space-3)` | Trigger block padding. | `var(--tx-accordion-trigger-padding-block, var(--tx-space-3))` |
+| `trigger-font-size` | `--tx-accordion-trigger-font-size` | `var(--tx-type-label-size)` | Trigger font size. | `var(--tx-accordion-trigger-font-size, var(--tx-type-label-size))` |
+| `trigger-font-weight` | `--tx-accordion-trigger-font-weight` | `var(--tx-type-label-weight)` | Trigger font weight. | `var(--tx-accordion-trigger-font-weight, var(--tx-type-label-weight))` |
+| `disabled-opacity` | `--tx-accordion-disabled-opacity` | `var(--tx-opacity-disabled)` | Disabled trigger opacity. | `var(--tx-accordion-disabled-opacity, var(--tx-opacity-disabled))` |
 
 ### Tags input (`tags-input`, `texuli/tags-color`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `height` | `--tx-tags-input-height` | `var(--tx-size-control-md)` | Minimum height from 640 px. | `var(--tx-tags-input-height, var(--tx-size-control-md, 2.25rem))` |
-| `height-touch` | `--tx-tags-input-height-touch` | `var(--tx-size-control-lg)` | Minimum height below 640 px. | `var(--tx-tags-input-height-touch, var(--tx-size-control-lg, 2.75rem))` |
-| `gap` | `--tx-tags-input-gap` | `calc(var(--tx-space-unit) * 1.5)` | Gap between tags. | `var(--tx-tags-input-gap, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1.5))` |
-| `padding-inline` | `--tx-tags-input-padding-inline` | `var(--tx-space-2)` | Inline padding. | `var(--tx-tags-input-padding-inline, var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)))` |
-| `radius` | `--tx-tags-input-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-tags-input-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `border-width` | `--tx-tags-input-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-tags-input-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `elevation` | `--tx-tags-input-elevation` | `var(--tx-elevation-1)` | Shadow. | `var(--tx-tags-input-elevation, var(--tx-elevation-1, var(--tx-shadow-soft, none)))` |
-| `tag-radius` | `--tx-tags-input-tag-radius` | `var(--tx-shape-radius-full)` | Tag corner radius. | `var(--tx-tags-input-tag-radius, var(--tx-shape-radius-full, 9999px))` |
-| `tag-font-size` | `--tx-tags-input-tag-font-size` | `var(--tx-type-label-size)` | Tag font size. | `var(--tx-tags-input-tag-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
-| `disabled-opacity` | `--tx-tags-input-disabled-opacity` | `var(--tx-opacity-disabled)` | Opacity when disabled. | `var(--tx-tags-input-disabled-opacity, var(--tx-opacity-disabled, 0.5))` |
+| `height` | `--tx-tags-input-height` | `var(--tx-size-control-md)` | Minimum height from 640 px. | `var(--tx-tags-input-height, var(--tx-size-control-md))` |
+| `height-touch` | `--tx-tags-input-height-touch` | `var(--tx-size-control-lg)` | Minimum height below 640 px. | `var(--tx-tags-input-height-touch, var(--tx-size-control-lg))` |
+| `gap` | `--tx-tags-input-gap` | `calc(var(--tx-space-unit) * 1.5)` | Gap between tags. | `var(--tx-tags-input-gap, calc(var(--tx-space-unit) * 1.5))` |
+| `padding-inline` | `--tx-tags-input-padding-inline` | `var(--tx-space-2)` | Inline padding. | `var(--tx-tags-input-padding-inline, var(--tx-space-2))` |
+| `radius` | `--tx-tags-input-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-tags-input-radius, var(--tx-shape-radius-lg))` |
+| `border-width` | `--tx-tags-input-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-tags-input-border-width, var(--tx-border-width-thin))` |
+| `elevation` | `--tx-tags-input-elevation` | `var(--tx-elevation-1)` | Shadow. | `var(--tx-tags-input-elevation, var(--tx-elevation-1))` |
+| `tag-radius` | `--tx-tags-input-tag-radius` | `var(--tx-shape-radius-full)` | Tag corner radius. | `var(--tx-tags-input-tag-radius, var(--tx-shape-radius-full))` |
+| `tag-font-size` | `--tx-tags-input-tag-font-size` | `var(--tx-type-label-size)` | Tag font size. | `var(--tx-tags-input-tag-font-size, var(--tx-type-label-size))` |
+| `disabled-opacity` | `--tx-tags-input-disabled-opacity` | `var(--tx-opacity-disabled)` | Opacity when disabled. | `var(--tx-tags-input-disabled-opacity, var(--tx-opacity-disabled))` |
 
 ### Color picker (`color-picker`, `texuli/tags-color`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `gap` | `--tx-color-picker-gap` | `var(--tx-space-3)` | Gap between parts. | `var(--tx-color-picker-gap, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `swatch-size` | `--tx-color-picker-swatch-size` | `var(--tx-size-icon-lg)` | Preset swatch size. | `var(--tx-color-picker-swatch-size, var(--tx-size-icon-lg, 1.5rem))` |
-| `swatch-radius` | `--tx-color-picker-swatch-radius` | `var(--tx-shape-radius-sm)` | Preset swatch corner radius. | `var(--tx-color-picker-swatch-radius, var(--tx-shape-radius-sm, max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-4, 4px))))` |
+| `gap` | `--tx-color-picker-gap` | `var(--tx-space-3)` | Gap between parts. | `var(--tx-color-picker-gap, var(--tx-space-3))` |
+| `swatch-size` | `--tx-color-picker-swatch-size` | `var(--tx-size-icon-lg)` | Preset swatch size. | `var(--tx-color-picker-swatch-size, var(--tx-size-icon-lg))` |
+| `swatch-radius` | `--tx-color-picker-swatch-radius` | `var(--tx-shape-radius-sm)` | Preset swatch corner radius. | `var(--tx-color-picker-swatch-radius, var(--tx-shape-radius-sm))` |
 
 ### Timeline (`timeline`, `texuli/timeline`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `marker-size` | `--tx-timeline-marker-size` | `var(--tx-size-icon-sm)` | Marker size. | `var(--tx-timeline-marker-size, var(--tx-size-icon-sm, 1rem))` |
-| `marker-radius` | `--tx-timeline-marker-radius` | `var(--tx-shape-radius-full)` | Marker corner radius. | `var(--tx-timeline-marker-radius, var(--tx-shape-radius-full, 9999px))` |
-| `time-font-size` | `--tx-timeline-time-font-size` | `var(--tx-type-caption-size)` | Time font size. | `var(--tx-timeline-time-font-size, var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem)))` |
-| `time-font-weight` | `--tx-timeline-time-font-weight` | `var(--tx-type-label-weight)` | Time font weight. | `var(--tx-timeline-time-font-weight, var(--tx-type-label-weight, var(--tx-font-weight-medium, 500)))` |
+| `marker-size` | `--tx-timeline-marker-size` | `var(--tx-size-icon-sm)` | Marker size. | `var(--tx-timeline-marker-size, var(--tx-size-icon-sm))` |
+| `marker-radius` | `--tx-timeline-marker-radius` | `var(--tx-shape-radius-full)` | Marker corner radius. | `var(--tx-timeline-marker-radius, var(--tx-shape-radius-full))` |
+| `time-font-size` | `--tx-timeline-time-font-size` | `var(--tx-type-caption-size)` | Time font size. | `var(--tx-timeline-time-font-size, var(--tx-type-caption-size))` |
+| `time-font-weight` | `--tx-timeline-time-font-weight` | `var(--tx-type-label-weight)` | Time font weight. | `var(--tx-timeline-time-font-weight, var(--tx-type-label-weight))` |
 
 ### Toast (`toast`, `texuli/toast`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `z-index` | `--tx-toast-z-index` | `var(--tx-z-toast)` | Viewport stacking. | `var(--tx-toast-z-index, var(--tx-z-toast, 60))` |
-| `gap` | `--tx-toast-gap` | `var(--tx-space-3)` | Gap between icon, body and actions. | `var(--tx-toast-gap, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `padding-block` | `--tx-toast-padding-block` | `var(--tx-space-3)` | Block padding. | `var(--tx-toast-padding-block, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `radius` | `--tx-toast-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-toast-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `border-width` | `--tx-toast-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-toast-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `elevation` | `--tx-toast-elevation` | `var(--tx-elevation-5)` | Shadow. | `var(--tx-toast-elevation, var(--tx-elevation-5, var(--tx-shadow-float, none)))` |
-| `icon-size` | `--tx-toast-icon-size` | `var(--tx-size-icon-md)` | Status icon size. | `var(--tx-toast-icon-size, var(--tx-size-icon-md, 1.25rem))` |
-| `title-font-size` | `--tx-toast-title-font-size` | `var(--tx-type-label-size)` | Title font size. | `var(--tx-toast-title-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
-| `title-font-weight` | `--tx-toast-title-font-weight` | `var(--tx-type-label-weight)` | Title font weight. | `var(--tx-toast-title-font-weight, var(--tx-type-label-weight, var(--tx-font-weight-medium, 500)))` |
+| `z-index` | `--tx-toast-z-index` | `var(--tx-z-toast)` | Viewport stacking. | `var(--tx-toast-z-index, var(--tx-z-toast))` |
+| `gap` | `--tx-toast-gap` | `var(--tx-space-3)` | Gap between icon, body and actions. | `var(--tx-toast-gap, var(--tx-space-3))` |
+| `padding-block` | `--tx-toast-padding-block` | `var(--tx-space-3)` | Block padding. | `var(--tx-toast-padding-block, var(--tx-space-3))` |
+| `radius` | `--tx-toast-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-toast-radius, var(--tx-shape-radius-lg))` |
+| `border-width` | `--tx-toast-border-width` | `var(--tx-border-width-thin)` | Border width. | `var(--tx-toast-border-width, var(--tx-border-width-thin))` |
+| `elevation` | `--tx-toast-elevation` | `var(--tx-elevation-5)` | Shadow. | `var(--tx-toast-elevation, var(--tx-elevation-5))` |
+| `icon-size` | `--tx-toast-icon-size` | `var(--tx-size-icon-md)` | Status icon size. | `var(--tx-toast-icon-size, var(--tx-size-icon-md))` |
+| `title-font-size` | `--tx-toast-title-font-size` | `var(--tx-type-label-size)` | Title font size. | `var(--tx-toast-title-font-size, var(--tx-type-label-size))` |
+| `title-font-weight` | `--tx-toast-title-font-weight` | `var(--tx-type-label-weight)` | Title font weight. | `var(--tx-toast-title-font-weight, var(--tx-type-label-weight))` |
 
 ### Toggle and toggle group (`toggle`, `texuli/toggle`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `height-sm` | `--tx-toggle-height-sm` | `var(--tx-size-control-sm)` | Small size height. | `var(--tx-toggle-height-sm, var(--tx-size-control-sm, 2rem))` |
-| `height-md` | `--tx-toggle-height-md` | `var(--tx-size-control-md)` | Default size height. | `var(--tx-toggle-height-md, var(--tx-size-control-md, 2.25rem))` |
-| `height-lg` | `--tx-toggle-height-lg` | `var(--tx-size-control-lg)` | Large size height. | `var(--tx-toggle-height-lg, var(--tx-size-control-lg, 2.75rem))` |
-| `padding-inline-sm` | `--tx-toggle-padding-inline-sm` | `var(--tx-space-2)` | Small size inline padding. | `var(--tx-toggle-padding-inline-sm, var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)))` |
-| `padding-inline-md` | `--tx-toggle-padding-inline-md` | `var(--tx-space-3)` | Default size inline padding. | `var(--tx-toggle-padding-inline-md, var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)))` |
-| `padding-inline-lg` | `--tx-toggle-padding-inline-lg` | `var(--tx-space-4)` | Large size inline padding. | `var(--tx-toggle-padding-inline-lg, var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4)))` |
-| `gap` | `--tx-toggle-gap` | `calc(var(--tx-space-unit) * 1.5)` | Gap between icon and label. | `var(--tx-toggle-gap, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1.5))` |
-| `radius` | `--tx-toggle-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-toggle-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `border-width` | `--tx-toggle-border-width` | `var(--tx-border-width-thin)` | Outline variant border width. | `var(--tx-toggle-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `font-size` | `--tx-toggle-font-size` | `var(--tx-type-label-size)` | Font size. | `var(--tx-toggle-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
-| `font-weight` | `--tx-toggle-font-weight` | `var(--tx-type-label-weight)` | Font weight. | `var(--tx-toggle-font-weight, var(--tx-type-label-weight, var(--tx-font-weight-medium, 500)))` |
-| `line-height` | `--tx-toggle-line-height` | `var(--tx-type-label-line)` | Line height. | `var(--tx-toggle-line-height, var(--tx-type-label-line, 1.25))` |
-| `disabled-opacity` | `--tx-toggle-disabled-opacity` | `var(--tx-opacity-disabled)` | Opacity when disabled. | `var(--tx-toggle-disabled-opacity, var(--tx-opacity-disabled, 0.5))` |
+| `height-sm` | `--tx-toggle-height-sm` | `var(--tx-size-control-sm)` | Small size height. | `var(--tx-toggle-height-sm, var(--tx-size-control-sm))` |
+| `height-md` | `--tx-toggle-height-md` | `var(--tx-size-control-md)` | Default size height. | `var(--tx-toggle-height-md, var(--tx-size-control-md))` |
+| `height-lg` | `--tx-toggle-height-lg` | `var(--tx-size-control-lg)` | Large size height. | `var(--tx-toggle-height-lg, var(--tx-size-control-lg))` |
+| `padding-inline-sm` | `--tx-toggle-padding-inline-sm` | `var(--tx-space-2)` | Small size inline padding. | `var(--tx-toggle-padding-inline-sm, var(--tx-space-2))` |
+| `padding-inline-md` | `--tx-toggle-padding-inline-md` | `var(--tx-space-3)` | Default size inline padding. | `var(--tx-toggle-padding-inline-md, var(--tx-space-3))` |
+| `padding-inline-lg` | `--tx-toggle-padding-inline-lg` | `var(--tx-space-4)` | Large size inline padding. | `var(--tx-toggle-padding-inline-lg, var(--tx-space-4))` |
+| `gap` | `--tx-toggle-gap` | `calc(var(--tx-space-unit) * 1.5)` | Gap between icon and label. | `var(--tx-toggle-gap, calc(var(--tx-space-unit) * 1.5))` |
+| `radius` | `--tx-toggle-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-toggle-radius, var(--tx-shape-radius-lg))` |
+| `border-width` | `--tx-toggle-border-width` | `var(--tx-border-width-thin)` | Outline variant border width. | `var(--tx-toggle-border-width, var(--tx-border-width-thin))` |
+| `font-size` | `--tx-toggle-font-size` | `var(--tx-type-label-size)` | Font size. | `var(--tx-toggle-font-size, var(--tx-type-label-size))` |
+| `font-weight` | `--tx-toggle-font-weight` | `var(--tx-type-label-weight)` | Font weight. | `var(--tx-toggle-font-weight, var(--tx-type-label-weight))` |
+| `line-height` | `--tx-toggle-line-height` | `var(--tx-type-label-line)` | Line height. | `var(--tx-toggle-line-height, var(--tx-type-label-line))` |
+| `disabled-opacity` | `--tx-toggle-disabled-opacity` | `var(--tx-opacity-disabled)` | Opacity when disabled. | `var(--tx-toggle-disabled-opacity, var(--tx-opacity-disabled))` |
 
 ### Toolbar (`toolbar`, `texuli/toolbar`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `gap` | `--tx-toolbar-gap` | `var(--tx-space-1)` | Gap between items. | `var(--tx-toolbar-gap, var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)))` |
-| `padding` | `--tx-toolbar-padding` | `var(--tx-space-1)` | Padding. | `var(--tx-toolbar-padding, var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)))` |
-| `radius` | `--tx-toolbar-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-toolbar-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `border-width` | `--tx-toolbar-border-width` | `var(--tx-border-width-thin)` | Outline variant border width. | `var(--tx-toolbar-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))` |
-| `item-height-sm` | `--tx-toolbar-item-height-sm` | `var(--tx-size-control-xs)` | Small item height. | `var(--tx-toolbar-item-height-sm, var(--tx-size-control-xs, 1.75rem))` |
-| `item-font-size` | `--tx-toolbar-item-font-size` | `var(--tx-type-label-size)` | Item font size. | `var(--tx-toolbar-item-font-size, var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem)))` |
-| `item-font-weight` | `--tx-toolbar-item-font-weight` | `var(--tx-type-label-weight)` | Item font weight. | `var(--tx-toolbar-item-font-weight, var(--tx-type-label-weight, var(--tx-font-weight-medium, 500)))` |
-| `disabled-opacity` | `--tx-toolbar-disabled-opacity` | `var(--tx-opacity-disabled)` | Disabled item opacity. | `var(--tx-toolbar-disabled-opacity, var(--tx-opacity-disabled, 0.5))` |
+| `gap` | `--tx-toolbar-gap` | `var(--tx-space-1)` | Gap between items. | `var(--tx-toolbar-gap, var(--tx-space-1))` |
+| `padding` | `--tx-toolbar-padding` | `var(--tx-space-1)` | Padding. | `var(--tx-toolbar-padding, var(--tx-space-1))` |
+| `radius` | `--tx-toolbar-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-toolbar-radius, var(--tx-shape-radius-lg))` |
+| `border-width` | `--tx-toolbar-border-width` | `var(--tx-border-width-thin)` | Outline variant border width. | `var(--tx-toolbar-border-width, var(--tx-border-width-thin))` |
+| `item-height-sm` | `--tx-toolbar-item-height-sm` | `var(--tx-size-control-xs)` | Small item height. | `var(--tx-toolbar-item-height-sm, var(--tx-size-control-xs))` |
+| `item-font-size` | `--tx-toolbar-item-font-size` | `var(--tx-type-label-size)` | Item font size. | `var(--tx-toolbar-item-font-size, var(--tx-type-label-size))` |
+| `item-font-weight` | `--tx-toolbar-item-font-weight` | `var(--tx-type-label-weight)` | Item font weight. | `var(--tx-toolbar-item-font-weight, var(--tx-type-label-weight))` |
+| `disabled-opacity` | `--tx-toolbar-disabled-opacity` | `var(--tx-opacity-disabled)` | Disabled item opacity. | `var(--tx-toolbar-disabled-opacity, var(--tx-opacity-disabled))` |
 
 ### Tooltip (`tooltip`, `texuli/tooltip`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `z-index` | `--tx-tooltip-z-index` | `var(--tx-z-tooltip)` | Stacking. | `var(--tx-tooltip-z-index, var(--tx-z-tooltip, 50))` |
-| `radius` | `--tx-tooltip-radius` | `calc(var(--tx-shape-radius-lg) * 0.55)` | Corner radius. | `var(--tx-tooltip-radius, calc(var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)) * 0.55))` |
-| `font-size` | `--tx-tooltip-font-size` | `var(--tx-type-caption-size)` | Font size. | `var(--tx-tooltip-font-size, var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem)))` |
-| `font-weight` | `--tx-tooltip-font-weight` | `var(--tx-type-label-weight)` | Font weight. | `var(--tx-tooltip-font-weight, var(--tx-type-label-weight, var(--tx-font-weight-medium, 500)))` |
-| `line-height` | `--tx-tooltip-line-height` | `var(--tx-type-caption-line)` | Line height. | `var(--tx-tooltip-line-height, var(--tx-type-caption-line, 1.35))` |
-| `elevation` | `--tx-tooltip-elevation` | `var(--tx-elevation-3)` | Shadow. | `var(--tx-tooltip-elevation, var(--tx-elevation-3, var(--tx-shadow-float, none)))` |
+| `z-index` | `--tx-tooltip-z-index` | `var(--tx-z-tooltip)` | Stacking. | `var(--tx-tooltip-z-index, var(--tx-z-tooltip))` |
+| `radius` | `--tx-tooltip-radius` | `calc(var(--tx-shape-radius-lg) * 0.55)` | Corner radius. | `var(--tx-tooltip-radius, calc(var(--tx-shape-radius-lg) * 0.55))` |
+| `font-size` | `--tx-tooltip-font-size` | `var(--tx-type-caption-size)` | Font size. | `var(--tx-tooltip-font-size, var(--tx-type-caption-size))` |
+| `font-weight` | `--tx-tooltip-font-weight` | `var(--tx-type-label-weight)` | Font weight. | `var(--tx-tooltip-font-weight, var(--tx-type-label-weight))` |
+| `line-height` | `--tx-tooltip-line-height` | `var(--tx-type-caption-line)` | Line height. | `var(--tx-tooltip-line-height, var(--tx-type-caption-line))` |
+| `elevation` | `--tx-tooltip-elevation` | `var(--tx-elevation-3)` | Shadow. | `var(--tx-tooltip-elevation, var(--tx-elevation-3))` |
 
 ### Tree (`tree`, `texuli/tree`)
 
 | Key | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- | --- |
-| `gap` | `--tx-tree-gap` | `calc(var(--tx-space-unit) * 0.5)` | Gap between rows. | `var(--tx-tree-gap, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5))` |
-| `padding` | `--tx-tree-padding` | `var(--tx-space-1)` | Padding. | `var(--tx-tree-padding, var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)))` |
-| `radius` | `--tx-tree-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-tree-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)))` |
-| `row-gap` | `--tx-tree-row-gap` | `var(--tx-space-2)` | Gap inside a row. | `var(--tx-tree-row-gap, var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)))` |
-| `row-padding-block` | `--tx-tree-row-padding-block` | `var(--tx-space-1)` | Row block padding. | `var(--tx-tree-row-padding-block, var(--tx-space-1, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 1)))` |
-| `checkbox-size` | `--tx-tree-checkbox-size` | `var(--tx-size-icon-sm)` | Checkbox size. | `var(--tx-tree-checkbox-size, var(--tx-size-icon-sm, 1rem))` |
-| `checkbox-radius` | `--tx-tree-checkbox-radius` | `var(--tx-shape-radius-xs)` | Checkbox corner radius. | `var(--tx-tree-checkbox-radius, var(--tx-shape-radius-xs, max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-6, 6px))))` |
+| `gap` | `--tx-tree-gap` | `calc(var(--tx-space-unit) * 0.5)` | Gap between rows. | `var(--tx-tree-gap, calc(var(--tx-space-unit) * 0.5))` |
+| `padding` | `--tx-tree-padding` | `var(--tx-space-1)` | Padding. | `var(--tx-tree-padding, var(--tx-space-1))` |
+| `radius` | `--tx-tree-radius` | `var(--tx-shape-radius-lg)` | Corner radius. | `var(--tx-tree-radius, var(--tx-shape-radius-lg))` |
+| `row-gap` | `--tx-tree-row-gap` | `var(--tx-space-2)` | Gap inside a row. | `var(--tx-tree-row-gap, var(--tx-space-2))` |
+| `row-padding-block` | `--tx-tree-row-padding-block` | `var(--tx-space-1)` | Row block padding. | `var(--tx-tree-row-padding-block, var(--tx-space-1))` |
+| `checkbox-size` | `--tx-tree-checkbox-size` | `var(--tx-size-icon-sm)` | Checkbox size. | `var(--tx-tree-checkbox-size, var(--tx-size-icon-sm))` |
+| `checkbox-radius` | `--tx-tree-checkbox-radius` | `var(--tx-shape-radius-xs)` | Checkbox corner radius. | `var(--tx-tree-checkbox-radius, var(--tx-shape-radius-xs))` |

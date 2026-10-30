@@ -5,8 +5,9 @@
  * declares component tokens: the default is the fallback every read carries
  * (`componentVar('button', 'radius')`), so a component token exists on a page
  * only when a theme, design system or host sets it on its scope. Defaults equal
- * what each component renders today under the visual-baseline theme; component
- * CSS adopts them in a later task.
+ * what each component rendered before adoption under the visual-baseline
+ * theme; they reference system tokens `base.css` declares, so a read has one
+ * fallback level.
  */
 
 /** One component token. */

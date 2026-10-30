@@ -1,7 +1,6 @@
 <script lang="ts">
 import type { SVGAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 import Icon from './Icon.svelte';
 import type { IconComponent, IconSize } from './types.ts';
 
@@ -22,15 +21,13 @@ type Props = OwnProps &
 
 let {
   icon,
-  size: sizeProp,
-  strokeWidth,
+  size = 'md',
+  strokeWidth = 2,
   label,
   class: className,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('icon');
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 </script>
 
 <Icon bind:ref {...rest} icon={icon} {size} {strokeWidth} {label} class={className} />

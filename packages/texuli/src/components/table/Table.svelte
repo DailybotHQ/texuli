@@ -5,7 +5,6 @@ import { setTableContext } from './context.ts';
 import { fillStackLabels, isScrollable } from './labels.ts';
 import { type TableDensity, type TableStack, type TableVariant, tableClass } from './variants.ts';
 import './table.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 
 type Props = HTMLTableAttributes & {
   /** The `<table>` element (bindable). */
@@ -35,7 +34,7 @@ type Props = HTMLTableAttributes & {
 };
 
 let {
-  variant: variantProp,
+  variant = 'plain',
   density = 'default',
   stack = 'never',
   stickyHeader = false,
@@ -48,8 +47,6 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('table');
-const variant = $derived(withDefault(variantProp, txDefaults().variant, 'plain'));
 
 function bindRef(node: HTMLTableElement): () => void {
   ref = node;

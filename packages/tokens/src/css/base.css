@@ -143,6 +143,150 @@
     --tx-motion-spring-bouncy-duration: 844ms;
   }
 
+  /*
+   * Token contract v2 (ADR-020): the system token defaults, generated from
+   * @texuli/tokens/system. Declared on every token scope so derived tokens
+   * (space, radius and type steps) follow the nearest theme. Component tokens
+   * are not declared: their reads fall back to these.
+   */
+  /* @generated token-defaults: start (packages/tokens/scripts/generate.ts) */
+  :where(:root, [data-tx-theme], [data-tx-scope]) {
+    /* Space */
+    --tx-space-unit: calc(0.25rem * var(--tx-density, 1));
+    --tx-space-0: 0px;
+    --tx-space-1: calc(var(--tx-space-unit) * 1);
+    --tx-space-2: calc(var(--tx-space-unit) * 2);
+    --tx-space-3: calc(var(--tx-space-unit) * 3);
+    --tx-space-4: calc(var(--tx-space-unit) * 4);
+    --tx-space-5: calc(var(--tx-space-unit) * 5);
+    --tx-space-6: calc(var(--tx-space-unit) * 6);
+    --tx-space-7: calc(var(--tx-space-unit) * 7);
+    --tx-space-8: calc(var(--tx-space-unit) * 8);
+    --tx-space-9: calc(var(--tx-space-unit) * 9);
+    --tx-space-10: calc(var(--tx-space-unit) * 10);
+    --tx-space-11: calc(var(--tx-space-unit) * 11);
+    --tx-space-12: calc(var(--tx-space-unit) * 12);
+    /* Size */
+    --tx-size-control-xs: 1.75rem;
+    --tx-size-control-sm: 2rem;
+    --tx-size-control-md: 2.25rem;
+    --tx-size-control-lg: 2.75rem;
+    --tx-size-icon-xs: 0.75rem;
+    --tx-size-icon-sm: 1rem;
+    --tx-size-icon-md: 1.25rem;
+    --tx-size-icon-lg: 1.5rem;
+    --tx-size-target-min: 24px;
+    --tx-size-target-touch: max(2.75rem, 44px);
+    /* Type roles */
+    --tx-type-display-family: var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif));
+    --tx-type-display-size: var(--tx-font-size-4xl, 2.25rem);
+    --tx-type-display-line: 1.1;
+    --tx-type-display-weight: var(--tx-font-weight-bold, 700);
+    --tx-type-display-tracking: var(--tx-letter-spacing-heading, 0);
+    --tx-type-title-family: var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif));
+    --tx-type-title-size: var(--tx-font-size-2xl, 1.5rem);
+    --tx-type-title-line: 1.2;
+    --tx-type-title-weight: var(--tx-font-weight-heading, 600);
+    --tx-type-title-tracking: var(--tx-letter-spacing-heading, 0);
+    --tx-type-heading-family: var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif));
+    --tx-type-heading-size: var(--tx-font-size-lg, 1.125rem);
+    --tx-type-heading-line: 1.3;
+    --tx-type-heading-weight: var(--tx-font-weight-heading, 600);
+    --tx-type-heading-tracking: var(--tx-letter-spacing-heading, 0);
+    --tx-type-body-family: var(--tx-font-sans, system-ui, sans-serif);
+    --tx-type-body-size: var(--tx-font-size-base, 1rem);
+    --tx-type-body-line: 1.5;
+    --tx-type-body-weight: var(--tx-font-weight-body, 400);
+    --tx-type-body-tracking: var(--tx-letter-spacing-body, 0);
+    --tx-type-label-family: var(--tx-font-sans, system-ui, sans-serif);
+    --tx-type-label-size: var(--tx-font-size-sm, 0.875rem);
+    --tx-type-label-line: 1.25;
+    --tx-type-label-weight: var(--tx-font-weight-medium, 500);
+    --tx-type-label-tracking: var(--tx-letter-spacing-body, 0);
+    --tx-type-caption-family: var(--tx-font-sans, system-ui, sans-serif);
+    --tx-type-caption-size: var(--tx-font-size-xs, 0.75rem);
+    --tx-type-caption-line: 1.35;
+    --tx-type-caption-weight: var(--tx-font-weight-body, 400);
+    --tx-type-caption-tracking: var(--tx-letter-spacing-body, 0);
+    --tx-type-code-family: var(--tx-font-mono, ui-monospace, monospace);
+    --tx-type-code-size: 0.875em;
+    --tx-type-code-line: 1.5;
+    --tx-type-code-weight: var(--tx-font-weight-body, 400);
+    --tx-type-code-tracking: 0;
+    /* Elevation */
+    --tx-elevation-0: none;
+    --tx-elevation-1: var(--tx-shadow-soft, none);
+    --tx-elevation-2: var(--tx-shadow-soft, none);
+    --tx-elevation-3: var(--tx-shadow-float, none);
+    --tx-elevation-4: var(--tx-shadow-float, none);
+    --tx-elevation-5: var(--tx-shadow-float, none);
+    --tx-surface-glass-alpha: var(--tx-glass-opacity, 82%);
+    --tx-surface-glass-blur: var(--tx-glass-blur, 16px);
+    /* Shape */
+    --tx-shape-radius-none: 0px;
+    --tx-shape-radius-xs: max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-6, 6px));
+    --tx-shape-radius-sm: max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-4, 4px));
+    --tx-shape-radius-md: max(0px, var(--tx-radius, 0.625rem) - var(--tx-radius-step-2, 2px));
+    --tx-shape-radius-lg: var(--tx-radius, 0.625rem);
+    --tx-shape-radius-xl: calc(var(--tx-radius, 0.625rem) + var(--tx-radius-step-4, 4px));
+    --tx-shape-radius-full: 9999px;
+    --tx-border-width-thin: var(--tx-border-width, 1px);
+    --tx-border-width-thick: calc(var(--tx-border-width, 1px) * 2);
+    /* Layers */
+    --tx-z-base: 0;
+    --tx-z-sticky: 40;
+    --tx-z-popover: 50;
+    --tx-z-tooltip: 50;
+    --tx-z-overlay: 60;
+    --tx-z-modal: 60;
+    --tx-z-toast: 60;
+    --tx-z-top: 70;
+    /* Opacity */
+    --tx-opacity-disabled: 0.5;
+    --tx-opacity-muted: 0.7;
+    --tx-opacity-scrim: 45%;
+    /* Layout */
+    --tx-layout-content-max: 72ch;
+    --tx-layout-wide-max: 80rem;
+    --tx-layout-full-max: 100%;
+    --tx-layout-breakpoint-sm: 36rem;
+    --tx-layout-breakpoint-md: 56rem;
+    --tx-layout-breakpoint-lg: 72rem;
+    --tx-layout-grid-columns-base: 1;
+    --tx-layout-grid-columns-sm: 2;
+    --tx-layout-grid-columns-md: 3;
+    --tx-layout-grid-columns-lg: 4;
+    --tx-layout-grid-gutter-base: var(--tx-space-4);
+    --tx-layout-grid-gutter-sm: var(--tx-space-4);
+    --tx-layout-grid-gutter-md: var(--tx-space-4);
+    --tx-layout-grid-gutter-lg: var(--tx-space-4);
+    /* Icons */
+    --tx-icon-stroke: 2;
+    --tx-icon-style: outline;
+    /* Status */
+    --tx-status-success: var(--tx-success);
+    --tx-status-success-foreground: var(--tx-success-foreground);
+    --tx-status-success-soft: var(--tx-success-soft);
+    --tx-status-success-soft-foreground: var(--tx-success-soft-foreground);
+    --tx-status-warning: var(--tx-warning);
+    --tx-status-warning-foreground: var(--tx-warning-foreground);
+    --tx-status-warning-soft: var(--tx-warning-soft);
+    --tx-status-warning-soft-foreground: var(--tx-warning-soft-foreground);
+    --tx-status-danger: var(--tx-destructive);
+    --tx-status-danger-foreground: var(--tx-destructive-foreground);
+    --tx-status-danger-soft: var(--tx-destructive-soft);
+    --tx-status-danger-soft-foreground: var(--tx-destructive-soft-foreground);
+    --tx-status-info: var(--tx-info);
+    --tx-status-info-foreground: var(--tx-info-foreground);
+    --tx-status-info-soft: var(--tx-info-soft);
+    --tx-status-info-soft-foreground: var(--tx-info-soft-foreground);
+    --tx-status-neutral: var(--tx-secondary);
+    --tx-status-neutral-foreground: var(--tx-secondary-foreground);
+    --tx-status-neutral-soft: var(--tx-muted);
+    --tx-status-neutral-soft-foreground: var(--tx-muted-foreground);
+  }
+  /* @generated token-defaults: end */
+
   :root:dir(rtl),
   :dir(rtl) {
     --tx-safe-area-inline-start: var(--tx-safe-right);

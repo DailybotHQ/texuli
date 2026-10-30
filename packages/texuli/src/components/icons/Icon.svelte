@@ -2,7 +2,6 @@
 import { createAttachmentKey } from 'svelte/attachments';
 import type { SVGAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
 import { ICON_SIZES, iconClass } from './icon-variants.ts';
 import { iconPath, isIconName } from './icons.ts';
 import type { IconComponentProps, IconRef, IconSize } from './types.ts';
@@ -22,8 +21,8 @@ type Props = Omit<SVGAttributes<SVGSVGElement>, 'class' | 'color'> & {
 
 let {
   icon,
-  size: sizeProp,
-  strokeWidth,
+  size = 'md',
+  strokeWidth = 2,
   color = undefined,
   label,
   class: className,
@@ -34,13 +33,8 @@ let {
   /** The rendered `<svg>` (bindable). */
   ref?: SVGSVGElement | null;
 } = $props();
-const txDefaults = designDefaults('icon');
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 
 const pixelSize = $derived(ICON_SIZES[size]);
-/** An explicit `strokeWidth` wins over the `--tx-icon-stroke-width` token (icons.css). */
-const strokeAttr = $derived(strokeWidth ?? 2);
-const strokeMark = $derived(strokeWidth === undefined ? undefined : 'custom');
 const name = $derived(typeof icon === 'string' && isIconName(icon) ? icon : undefined);
 const component = $derived(typeof icon === 'function' ? icon : undefined);
 const path = $derived(name ? iconPath(name) : undefined);
@@ -70,8 +64,7 @@ const glyphProps = $derived({
   [refKey]: bindGlyph,
   class: classes,
   size: pixelSize,
-  strokeWidth: strokeAttr,
-  'data-tx-icon-stroke': strokeMark,
+  strokeWidth,
   ...(glyphColor !== undefined ? { color: glyphColor } : {}),
   focusable: 'false' as const,
   'aria-hidden': accessibleName ? undefined : ('true' as const),
@@ -81,7 +74,6 @@ const glyphProps = $derived({
 } satisfies IconComponentProps & {
   class?: ClassValue;
   'data-tx-icon'?: string;
-  'data-tx-icon-stroke'?: string;
 });
 </script>
 
@@ -94,8 +86,7 @@ const glyphProps = $derived({
     viewBox="0 0 24 24"
     fill="none"
     stroke={glyphColor ?? 'currentColor'}
-    stroke-width={strokeAttr}
-    data-tx-icon-stroke={strokeMark}
+    stroke-width={strokeWidth}
     stroke-linecap="round"
     stroke-linejoin="round"
     focusable="false"
