@@ -145,7 +145,7 @@ access after `pnpm install`. Browser commands need `TEXULI_E2E_PORT=<port>`
 | Agent service tests (not in `pnpm test`) | `pnpm --filter @texuli/agent exec vitest run` | `… vitest run tests/<file>.test.ts` |
 | Docs links and commands | `pnpm check:docs` | — |
 | Layer guard | `pnpm check:layers` | — |
-| Fast full gate | `pnpm check` (lint, typecheck, test, layers) | — |
+| Fast full gate | `pnpm check` (lint, typecheck, test, layers, surfaces) | — |
 | Behavior suite (primitives) | `pnpm exec playwright test tests/behavior` | `… tests/behavior/scenarios/<primitive>.spec.ts` |
 | Browser checks | `pnpm test:e2e` | `pnpm exec playwright test <spec> [--project chromium]` |
 | Visual regression | `pnpm visual` (`pnpm visual:update` to rebaseline) | `pnpm visual -g <example-id>` |
@@ -153,6 +153,7 @@ access after `pnpm install`. Browser commands need `TEXULI_E2E_PORT=<port>`
 | Packaging (no publish) | `pnpm verify:packages` | `pnpm verify:packages --filter <dirs>` |
 | Perf limits (opt-in) | `pnpm test:perf` | — |
 | Agent skill | `pnpm check:skill` | — |
+| Agent surfaces (server card, llms Tools, ops docs) | `pnpm check:surfaces` | `pnpm exec tsx scripts/generate-surfaces.ts` (rewrite) |
 | Website build | `pnpm build` (then `tests/e2e/site-*.spec.ts`) | — |
 | Native twin (JDK 21, not in `pnpm check`) | `./native/gradlew -p native check` | — |
 | Repository conformance (read-only) | `bash .agents/skills/deepworkplan/verify/conformance.sh --repo-only` | — |

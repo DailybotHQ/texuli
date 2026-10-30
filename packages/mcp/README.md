@@ -72,9 +72,14 @@ hosts that cannot start `npx` directly take `"command": "cmd"` with
 **Already using `@texuli/tools`?** `npx texuli mcp` runs the same server
 from that package; no second install is needed.
 
-**Remote (planned until deployed):** a read-only remote endpoint at
-`https://texuli.com/mcp` (Streamable HTTP, `edge` operations only) is
-planned. It is not deployed yet, so do not configure it today.
+**Remote (live once deployed):** a read-only remote endpoint at
+`https://texuli.com/mcp` (stateless Streamable HTTP, `edge` operations
+only; no key) is in the repository (`functions/mcp.ts`) and goes live when
+release 0.9.0 deploys from `main`. Until then it answers with the site's
+404, so do not configure it yet. After each deploy, the CI job
+`mcp-remote-smoke` checks that its `tools/list` matches the registry. The
+server card at `https://texuli.com/.well-known/mcp/server-card.json` lists
+both transports and every tool.
 
 ## What it serves
 
