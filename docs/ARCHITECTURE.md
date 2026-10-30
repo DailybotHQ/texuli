@@ -44,6 +44,7 @@ packages in lower layers.
 | L8 | `@texuli/astro` | Astro integration, site helpers and content layouts | blocks, core, tokens |
 | L8 | `@texuli/slides` | The Svelte 5 presentation stage on `@texuli/deck` (canvas, routes, chrome, overview, presenter window, the 21 layouts, backgrounds, the component registry), print and PPTX export, and the model v1 subpaths kept from `0.3.0`; in development | blocks, catalog, deck, media, player, tokens |
 | L8 | `@texuli/pages` | In development (on npm from `0.7.0`): the block document editor and reader on `@texuli/document`: text through `@texuli/editor`, a slash menu, block selection and drag on `@texuli/drag`, nested pages, resizable columns and live embeds painted by the player (`editor`, `reader`), the paged view and print (`paged`), Markdown, DOCX and PDF export (`export`), collaboration with comments, suggestions, version history and presence (`collab`), and the document host that lets the player paint agent documents (`host`) | blocks, core, document, drag, editor, player, primitives, tokens, texuli |
+| L9 | `@texuli/mcp` | In development (first published in `0.9.0`): the local MCP server for agent hosts: the bin `texuli-mcp` (`npx -y @texuli/mcp`) and `startTexuliMcp` serve the stdio server of `@texuli/tools` with every `edge` and `node` operation; pinned exactly to `@texuli/tools` and published right after it (ADR-019) | tools |
 
 Not layers, because they consume the library:
 - **`@texuli/examples`** (private) is the examples registry. Every component
@@ -61,8 +62,8 @@ Not layers, because they consume the library:
   website (see [The website](#the-website)).
 
 `@texuli/examples` is never packed (`NEVER_PACKED` in
-`scripts/packages.ts`); `pnpm verify:packages` packs the other 25, and all
-25 are released on npm as `0.8.0`, the first release of `@texuli/forms`,
+`scripts/packages.ts`); `pnpm verify:packages` packs the other 26. 25 of
+them are released on npm as `0.8.0`, the first release of `@texuli/forms`,
 `@texuli/canvas` and `@texuli/sheets` (new in PLAN_010; the previous
 release, `0.7.0`, had 22 packages);
 `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/editor`,
@@ -72,6 +73,7 @@ and sit in the `publish.yml` wave order ahead of their dependents
 ([RELEASE](RELEASE.md)).
 
 ```text
+L9  mcp (the local MCP server bin, over tools)
 L8  tools · astro · slides · pages
 L7  player
 L6  catalog
@@ -141,7 +143,8 @@ cap in `texuli.budgets.json` (`pnpm size`).
 | `@texuli/workflows` (private, in development) | `.`, `model`, `layout`, `spec-adapter`, `editor`, `viewer`, `inspector` |
 | `texuli` (private) | `.`, `alert`, `avatar`, `badge`, `button`, `card`, `carousel`, `choice`, `combobox`, `command`, `cx`, `date`, `dialog`, `empty`, `feedback`, `field`, `file-upload`, `icons`, `icons/lucide`, `input`, `kbd-code`, `layouts/app`, `layouts/app/dual-sidebar`, `layouts/app/master-detail`, `layouts/app/rail`, `layouts/app/sidebar`, `layouts/app/split-view`, `layouts/app/top-nav`, `layouts/auth-settings`, `layouts/auth-settings/register`, `layouts/content`, `layouts/content/blog`, `layouts/content/docs`, `layouts/content/editorial`, `layouts/dashboard`, `layouts/dashboard/register`, `layouts/host`, `layouts/host/chrome`, `layouts/host/drawer`, `layouts/marketing`, `layouts/marketing/entry`, `layouts/marketing/landing`, `layouts/marketing/pricing`, `layouts/marketing/register`, `layouts/marketing/section`, `layouts/mobile`, `layouts/mobile/register`, `layouts/shells`, `menus`, `motion`, `navigation`, `number-pin`, `popover`, `rating`, `resizable`, `scroll-area`, `select`, `separator-aspect`, `sheet`, `sidebar`, `slider`, `stat`, `stepper`, `table`, `tabs-accordion`, `tags-color`, `timeline`, `toast`, `toggle`, `toolbar`, `tooltip`, `tree` |
 | `@texuli/tokens` (private) | `.`, `aa-gate`, `aa-gate/components`, `base.css`, `build`, `contract`, `css`, `forced-colors`, `forced-colors.css`, `generator`, `library`, `library-expand`, `modes`, `motion`, `no-flash`, `palette`, `style-presets`, `tailwind`, `tailwind/preset.css` |
-| `@texuli/tools` (private) | `.`, `a2ui`, `cli-add`, `cli-init`, `cli-update`, `llms`, `elements`, `golden`, `deck`, `document`, `email`, `print`, `ops` (the operations registry, ADR-017) |
+| `@texuli/tools` (private) | `.`, `a2ui`, `cli-add`, `cli-init`, `cli-update`, `llms`, `elements`, `golden`, `deck`, `document`, `email`, `print`, `ops` (the operations registry, ADR-017), `mcp` (the MCP protocol layer, its stdio transport and `runMcpCli`) |
+| `@texuli/mcp` (private, in development) | `.` (`startTexuliMcp`, `runTexuliMcpCli`, `TEXULI_MCP_VERSION`; the bin `texuli-mcp`) |
 
 This inventory is checked against each package's `package.json` `exports`;
 each package's README and `docs/*.md` describe its subpaths
@@ -214,11 +217,13 @@ agent output (JSON) ─► @texuli/spec migrate + validate (closed vocabulary, s
 - `texuli-llms` (LLM-readable docs);
 - the A2UI adapter;
 - custom elements;
-- the local stdio MCP server (`packages/tools/src/mcp`, tested in
-  `packages/tools/tests/mcp.test.ts`; no published binary yet).
+- the local stdio MCP server (`packages/tools/src/mcp`, exported as
+  `@texuli/tools/mcp`), which `texuli mcp` and the `texuli-mcp` bin of
+  `@texuli/mcp` (L9, first published in `0.9.0`) both run; tested in
+  `packages/tools/tests/mcp-protocol.test.ts`, `mcp-cli.test.ts` and the
+  consumer test `tests/consumers/mcp.spec.ts`.
 
-One operations registry behind all of these, a published MCP binary and a
-remote MCP endpoint at texuli.com are planned; see
+A remote MCP endpoint at texuli.com is planned; see
 [Planned (PLAN_011)](#planned-plan011).
 
 ## Decks: engine and stage
@@ -310,11 +315,8 @@ the layer table, `LAYERS` in `scripts/check-layers.ts` and the package
 subpaths table above only when it lands, and each release needs the
 developer's GO.
 
-New packages:
-
-| Planned layer | Package | Subpaths | What it will hold | Will depend on | Release wave | Decision |
-| --- | --- | --- | --- | --- | --- | --- |
-| L9 (a new top layer: an L8 package cannot depend on `@texuli/tools`, also L8, under the same-layer rule; the developer confirms the exception) | `@texuli/mcp` | `.` and the bin `texuli-mcp` | planned (PLAN_011): a thin package whose bin runs the local stdio MCP server from `@texuli/tools` with every `edge` and `node` operation; version pinned exactly to `@texuli/tools` and published in the same wave | tools | 0.9.0 | [ADR-019](DECISIONS.md#adr-019-the-texulimcp-package-and-its-binary) |
+New packages: none left. `@texuli/mcp` (ADR-019) landed at L9 and is in
+the layer table.
 
 New subpaths in existing packages:
 

@@ -45,6 +45,7 @@ project overview.
 | `@texuli/data` | [packages/data/README.md](../packages/data/README.md): Data views: grid, tree, board, calendar, timeline, map, activity and files. |
 | `@texuli/examples` | [packages/examples/README.md](../packages/examples/README.md): The examples registry every component writes once for tests, visuals and the website (private). |
 | `@texuli/forms` | [packages/forms/README.md](../packages/forms/README.md): In development, first on npm as `0.8.0`: schema-driven forms (closed form schema, conditions, steps, drafts, `SchemaForm`, player form host). |
+| `@texuli/mcp` | [packages/mcp/README.md](../packages/mcp/README.md): In development, first published in `0.9.0` (not on npm yet): the local MCP server for agent hosts (`npx -y @texuli/mcp`, bin `texuli-mcp`) over `@texuli/tools`, with copy-paste setup for Claude Code, Cursor, VS Code, Windsurf and Codex. |
 | `@texuli/media` | [packages/media/README.md](../packages/media/README.md): Media: images, galleries, video, audio and layered compositions. |
 | `@texuli/pages` | [packages/pages/README.md](../packages/pages/README.md): In development, on npm as `0.8.0` (first published as `0.7.0`): the block document editor and reader on `@texuli/document` (paged view, export, collaboration, document host). |
 | `@texuli/player` | [packages/player/README.md](../packages/player/README.md): Svelte paint runtime for validated Texuli catalog blueprints. |
@@ -356,6 +357,12 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [schema-form](../packages/forms/docs/schema-form.md) | `SchemaForm` (`@texuli/forms`) |
 | [styles](../packages/forms/docs/styles.md) | Stylesheet (`@texuli/forms/styles.css`) |
 
+### `@texuli/mcp` (`packages/mcp/docs/`)
+
+| Doc | Title |
+| --- | --- |
+| [server](../packages/mcp/docs/server.md) | The server entry and the `texuli-mcp` bin (in development) |
+
 ### `@texuli/media` (`packages/media/docs/`)
 
 | Doc | Title |
@@ -574,7 +581,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [email](../packages/tools/docs/email.md) | Email from blueprints (new in `0.8.0`) |
 | [golden](../packages/tools/docs/golden.md) | Agent golden set and scorer |
 | [llms](../packages/tools/docs/llms.md) | llms.txt and agent docs bundle |
-| [mcp](../packages/tools/docs/mcp.md) | The MCP protocol layer: tools, resources, prompts, completions (in development) |
+| [mcp](../packages/tools/docs/mcp.md) | The MCP protocol layer and the local door (`texuli mcp`, `@texuli/mcp`): tools, resources, prompts, completions (in development) |
 | [ops](../packages/tools/docs/ops.md) | The operations registry behind the MCP tools and CLI commands (ADR-017) |
 | [print](../packages/tools/docs/print.md) | Print and PDF of blueprints (new in `0.8.0`) |
 

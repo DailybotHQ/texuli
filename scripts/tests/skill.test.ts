@@ -418,6 +418,10 @@ describe('commands, CLI references and snippets', () => {
       'npx biome check scripts/check-skill.ts',
       // A bin a workspace package publishes is what a consumer's npx runs.
       'npx texuli-init theme list',
+      // MCP hosts document `npx -y <package>`, which runs the package's bin.
+      'npx -y @texuli/mcp',
+      'npx --yes @texuli/mcp --help',
+      'texuli mcp',
       './skills/texuli/setup.sh --verify --expect-version 0.1.0',
       './texuli/setup.sh --verify --dir ./texuli --sums ./SHA256SUMS',
       'git merge --no-edit dev',
@@ -437,6 +441,8 @@ describe('commands, CLI references and snippets', () => {
         ['pnpm vitest run packages/nope/tests/missing.test.ts', /does not exist/],
         ['pnpm exec tsx scripts/missing.ts', /does not exist/],
         ['npx cowsay hi', /would download/],
+        ['npx -y cowsay', /would download/],
+        ['npx -y @texuli/core', /would download/],
         ['./skills/texuli/setup.sh --frobnicate', /no --frobnicate option/],
         ['git push origin main', /remote/],
         ['git remote add origin x', /remote/],

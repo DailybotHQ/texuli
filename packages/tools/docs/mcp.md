@@ -1,16 +1,48 @@
 # MCP protocol layer
 
-**Package:** `@texuli/tools` · **Path:** `src/mcp/` (no package export yet) ·
+**Package:** `@texuli/tools` · **Subpath:** `@texuli/tools/mcp` (`src/mcp/`) ·
 **Decisions:** [ADR-017](../../../docs/DECISIONS.md#adr-017-one-operations-registry-texulitoolsops-for-every-agent-surface),
-[ADR-018](../../../docs/DECISIONS.md#adr-018-the-remote-mcp-on-pages-functions)
+[ADR-018](../../../docs/DECISIONS.md#adr-018-the-remote-mcp-on-pages-functions),
+[ADR-019](../../../docs/DECISIONS.md#adr-019-the-texulimcp-package-and-its-binary)
 
-> **Status: in development, not released.** The protocol layer exists in the
-> repository source and is planned for `@texuli/tools` `0.9.0`. There is no
-> published command or package export for it yet: the `texuli-mcp` binary
-> is a later task of the same plan. The remote endpoint for texuli.com is in
-> the repository (see [The remote door](#the-remote-door)) but is not
-> deployed until release 0.9.0 merges to `main`. Today the protocol runs
-> from a checkout with `pnpm exec tsx packages/tools/src/mcp/stdio.ts`.
+> **Status: in development, not released.** The protocol layer, the
+> `@texuli/tools/mcp` export, `texuli mcp` and the `@texuli/mcp` package
+> are new in `0.9.0`, which is in development and not on npm yet. The
+> remote endpoint for texuli.com is in the repository (see
+> [The remote door](#the-remote-door)) but is not deployed until release
+> 0.9.0 merges to `main`.
+
+## The local door
+
+Two commands start the same stdio server (`runMcpCli`): every `edge` and
+`node` operation, the resources, the prompts and the completions below.
+
+| Command | Package | For |
+| --- | --- | --- |
+| `npx -y @texuli/mcp` (bin `texuli-mcp`) | `@texuli/mcp` (L9) | MCP hosts: the one-word install they document |
+| `npx texuli mcp` | `@texuli/tools` | Projects that already have the tools CLI |
+
+Host setup (Claude Code, Cursor, VS Code, Windsurf, Codex, generic stdio
+hosts) is in the [`@texuli/mcp` README](../../mcp/README.md). From a
+checkout, `pnpm exec tsx packages/mcp/src/bin.ts` runs it before `0.9.0` is
+on npm.
+
+- **Flags:** `--help` and `--version` print to stdout and exit; any other
+  argument is refused on stderr with exit code 1, without starting the
+  server. With no argument the server reads stdin until it closes, then
+  exits with code 0.
+- **stdout carries only JSON-RPC**; usage errors go to stderr.
+- **Local writes:** no operation writes files today. Any operation that
+  will (`ds.save`, deck and document file outputs) must write through the
+  local write policy in `src/internal/local-write.ts`
+  (`resolveLocalWritePath`, `writeLocalFile`): an explicit path that
+  resolves inside the working directory and is not the directory itself;
+  absolute paths only when they already point inside it; `..` escapes, NUL
+  bytes, over-long paths and symlinked components (the target included)
+  refused with a stable code (`path-required`, `path-invalid`,
+  `outside-working-directory`, `not-a-file`, `symlink`); and a new file
+  (`exists` otherwise) unless `overwrite` is set. The `texuli document --out`
+  CLI flag keeps its own rule (a new file at the path the user typed).
 
 `createMcpHandler` turns the [operations registry](ops.md) into an MCP
 server. It is transport-independent and edge-safe (no Node built-ins): one
@@ -20,7 +52,7 @@ HTTP endpoint ([The remote door](#the-remote-door)) uses the same handler in
 stateless mode.
 
 ```ts
-import { createMcpHandler } from './src/mcp/index.ts'; // repository source; no export yet
+import { createMcpHandler } from '@texuli/tools/mcp';
 
 const local = createMcpHandler({ mode: 'stateful' }); // stdio: edge + node operations
 const remote = createMcpHandler({ mode: 'stateless', runtimes: ['edge'] }); // HTTP
@@ -227,6 +259,11 @@ MCP-Protocol-Version: 2025-11-25
 
 ## Tests
 
+`packages/tools/tests/mcp-cli.test.ts` covers `runMcpCli` and `texuli mcp`,
+`local-write.test.ts` the write policy, `packages/mcp/tests/mcp.test.ts` the
+`@texuli/mcp` entry, and `tests/consumers/mcp.spec.ts` spawns the packed
+`texuli-mcp` bin from a clean install (handshake, `tools/list`,
+`catalog.search`, exit on stdin close).
 `packages/tools/tests/mcp-protocol.test.ts` is the conformance suite: every
 method, every JSON-RPC and operation error code, the four versions, cursors,
 oversized stdio lines and operation inputs, stateless and stateful handlers,
