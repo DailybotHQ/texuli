@@ -744,6 +744,67 @@ const TODAY: Record<string, [string | null, Record<string, string>]> = {
       'checkbox-radius': 'var(--tx-radius-xs, 0.125rem)',
     },
   ],
+  // Domain packages (T-adopt-domain).
+  'data-grid': [
+    'packages/data/src/grid-core/grid-core.css',
+    { gap: '0.5rem', radius: 'var(--tx-radius, 0.5rem)', 'pager-font-size': SM },
+  ],
+  board: [
+    'packages/data/src/board/Board.svelte',
+    {
+      'column-gap': '1rem',
+      'column-radius': 'var(--tx-radius-lg, 0.75rem)',
+      'column-padding': '0.75rem',
+      'card-radius': 'var(--tx-radius-md, 0.5rem)',
+      'card-elevation':
+        'var(--tx-shadow-soft, 0 1px 2px color-mix(in srgb, CanvasText 10%, transparent))',
+    },
+  ],
+  'chart-frame': [
+    'packages/charts/src/cartesian/CartesianChart.svelte',
+    { 'title-font-size': '1rem' },
+  ],
+  'chat-bubble': [
+    'packages/chat/src/thread/MessageList.svelte',
+    {
+      radius: '1rem',
+      'tail-radius': '0.25rem',
+      'padding-block': '0.5rem',
+      'padding-inline': '0.875rem',
+    },
+  ],
+  'chat-composer': [
+    'packages/chat/src/composer/Composer.svelte',
+    { radius: 'var(--tx-radius, 0.75rem)', padding: '0.75rem', gap: '0.5rem' },
+  ],
+  'canvas-toolbar': [
+    'packages/canvas/src/editor/CanvasToolbar.svelte',
+    {
+      gap: '0.25rem',
+      padding: '0.375rem',
+      'button-radius': 'var(--tx-radius-md, 0.375rem)',
+      'button-font-size': '1rem',
+    },
+  ],
+  'workflow-node': [
+    'packages/workflows/src/editor/CanvasNode.svelte',
+    {
+      'padding-block': '0.5rem',
+      'padding-inline': '0.75rem',
+      radius: 'var(--tx-radius-md, 0.5rem)',
+      elevation: SOFT,
+    },
+  ],
+  spreadsheet: [
+    'packages/sheets/src/view/sheet-view.css',
+    {
+      gap: '0.5rem',
+      'tab-radius': 'var(--tx-radius, 0.5rem)',
+      'tab-padding-inline': '0.75rem',
+      'bar-radius': 'calc(var(--tx-radius, 0.5rem) * 0.75)',
+    },
+  ],
+  forms: ['packages/forms/src/styles.css', { gap: '1.25rem' }],
 };
 
 /**
@@ -891,8 +952,35 @@ describe('token contract v2: component registry', () => {
       .map((key) => key.slice(2))
       .filter((key) => key && !['cx', 'defaults', 'motion', 'icons/lucide'].includes(key))
       .filter((key) => !key.startsWith('layouts'));
-    const subpaths = new Set(COMPONENT_TOKEN_FAMILIES.map((f) => f.subpath));
+    const subpaths = new Set(
+      COMPONENT_TOKEN_FAMILIES.filter((f) => f.package === 'texuli').map((f) => f.subpath)
+    );
     expect(exports.length).toBe(41);
+    // Domain families name a real export of their package.
+    const domain = COMPONENT_TOKEN_FAMILIES.filter((f) => f.package !== 'texuli');
+    expect(domain.map((f) => f.component)).toEqual([
+      'data-grid',
+      'board',
+      'chart-frame',
+      'chat-bubble',
+      'chat-composer',
+      'canvas-toolbar',
+      'workflow-node',
+      'spreadsheet',
+      'forms',
+    ]);
+    for (const f of domain) {
+      const dir = f.package.replace('@texuli/', '');
+      const pkg = JSON.parse(read(`packages/${dir}/package.json`)) as {
+        name: string;
+        exports: Record<string, unknown>;
+      };
+      expect(pkg.name).toBe(f.package);
+      expect(
+        pkg.exports[f.subpath === '.' ? '.' : `./${f.subpath}`],
+        `${f.package}/${f.subpath}`
+      ).toBeTruthy();
+    }
     expect(exports.filter((key) => !subpaths.has(key))).toEqual([]);
     expect([...subpaths].filter((key) => !exports.includes(key))).toEqual([]);
 
@@ -906,6 +994,12 @@ describe('token contract v2: component registry', () => {
       expect(isSystemTokenName(token.token), token.token).toBe(false);
     }
     expect(getComponentTokens('button').length).toBe(18);
+    expect(getComponentTokens('chat-bubble').map((t) => t.key)).toEqual([
+      'radius',
+      'tail-radius',
+      'padding-block',
+      'padding-inline',
+    ]);
     expect(getComponentTokens('nope')).toEqual([]);
     expect(findComponentToken('button', 'radius')?.default).toBe('var(--tx-shape-radius-lg)');
     expect(isComponentTokenName('--tx-card-radius')).toBe(true);
