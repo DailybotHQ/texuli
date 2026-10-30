@@ -21,6 +21,7 @@ export default defineConfig({
       'packages/*/tests/**/*.test.ts',
       'apps/website/tests/**/*.test.ts',
       'scripts/tests/**/*.test.ts',
+      'tests/agent-evals/**/*.test.ts',
       ...(perfRun ? ['tests/perf/**/*.test.ts'] : []),
     ],
     ...(perfRun ? { fileParallelism: false } : {}),

@@ -15,6 +15,7 @@ import {
 } from '@texuli/catalog/validate';
 import { validateDocument } from '@texuli/document/schema';
 import { checkFamilyBlock } from '../internal/static-draft.ts';
+import { loadBlockShapes } from './block-shapes-loader.ts';
 import { loadOpsCatalog } from './catalog.ts';
 import { defineOperation } from './registry.ts';
 import type { Operation } from './types.ts';
@@ -88,6 +89,7 @@ export const blueprintValidate: Operation = defineOperation({
     properties: {
       draft: {
         type: ['object', 'array'],
+        maxItems: MAX_NODES,
         description: `The blueprint: a catalog tree { id, props, children }, an array of trees, or a texuli-blueprint envelope (format, version, id, catalog hash from catalog.search, status, createdAt, updatedAt, generator, tree). At most ${MAX_NODES} nodes. schema-form, canvas and spreadsheet nodes and data-source bindings are refused: this server has no validator for them.`,
       },
       tier: {
@@ -140,7 +142,7 @@ export const blueprintValidate: Operation = defineOperation({
     { title: 'A hostile card with a script link', input: { draft: INVALID_DRAFT } },
   ],
   async handler(input) {
-    const { catalog, hash } = await viewOfCatalog();
+    const [{ catalog, hash }] = await Promise.all([viewOfCatalog(), loadBlockShapes()]);
     const tier = input.tier === 'developer' ? 'developer' : 'untrusted';
     const result: DraftValidation = validateDraft(input.draft, {
       catalog,

@@ -8,6 +8,7 @@ import {
   MCP_PROTOCOL_VERSION,
   runMcpStdio,
 } from '../src/mcp/index.ts';
+import { TEXULI_OPERATIONS } from '../src/ops/index.ts';
 import { scenario } from './scenario.ts';
 
 type Response = {
@@ -88,6 +89,8 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
         'component.get',
         'example.search',
         'blueprint.validate',
+        'block.list',
+        'block.schema',
         'theme.search',
         'theme.get',
         'theme.preview',
@@ -103,7 +106,7 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
         'theme',
       ]);
       const described = tools as unknown as { name: string; description: string }[];
-      for (const legacy of described.slice(11)) {
+      for (const legacy of described.slice(TEXULI_OPERATIONS.length)) {
         expect(legacy.description, legacy.name).toMatch(/^Deprecated alias of [a-z]+\.[a-z-]+/u);
       }
       expect(tools.every(({ annotations }) => annotations.readOnlyHint === true)).toBe(true);
@@ -227,7 +230,7 @@ it('reports tool and protocol errors and speaks newline-delimited JSON-RPC on st
       ) as { version: string };
       expect(messages[0]?.result?.serverInfo).toEqual({ name: 'texuli', version });
       expect(version).not.toBe('0.0.0');
-      expect(messages[1]?.result?.tools).toHaveLength(18);
+      expect(messages[1]?.result?.tools).toHaveLength(20);
     }
   );
 });
