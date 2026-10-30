@@ -16,7 +16,7 @@ import {
 } from './rating.ts';
 import { type RatingSize, type RatingTone, ratingClass } from './variants.ts';
 import './rating.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 /**
  * Star rating. As an input it is a radio group (APG): one Tab stop, arrow
@@ -52,6 +52,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   labels?: Partial<RatingLabels>;
 };
 
+const txDefaults = designDefaults('rating');
 let {
   value = $bindable(0),
   onValueChange,
@@ -63,7 +64,7 @@ let {
   disabled = false,
   required = false,
   name,
-  size: sizeProp,
+  size = txDefaults().size ?? 'md',
   tone = 'warning',
   showValue = false,
   hideLabel = false,
@@ -73,8 +74,6 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('rating');
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 const msg = useMessages();
 
 // Input mode: aria-* and data-* name and wire the radio group (the control);

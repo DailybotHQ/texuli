@@ -2,7 +2,7 @@
 import type { HTMLAttributes } from 'svelte/elements';
 import { type FeedbackSize, type FeedbackTone, spinnerClass } from './variants.ts';
 import './feedback.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLSpanElement>, 'children'> & {
   /** The rendered root element (bindable). */
@@ -16,16 +16,15 @@ type Props = Omit<HTMLAttributes<HTMLSpanElement>, 'children'> & {
   tone?: FeedbackTone;
 };
 
+const txDefaults = designDefaults('spinner');
 let {
   label,
-  size: sizeProp,
+  size = txDefaults().size ?? 'md',
   tone = 'primary',
   class: className,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('spinner');
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 
 const classes = $derived(
   spinnerClass({

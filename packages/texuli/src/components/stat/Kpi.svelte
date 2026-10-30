@@ -8,7 +8,7 @@ import { formatKpi, type KpiUnit, kpiDelta } from './format.ts';
 import TrendIcon from './TrendIcon.svelte';
 import { type PositiveDirection, resolveTrend, trendToneClass, trendWord } from './trend.ts';
 import './stat.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
   /** The rendered root element (bindable). */
@@ -45,6 +45,7 @@ const statClass = variants({
   defaultVariants: { variant: 'elevated' },
 });
 
+const txDefaults = designDefaults('stat');
 let {
   label,
   value,
@@ -58,13 +59,11 @@ let {
   hrefTrust = 'developer',
   loading = false,
   empty = false,
-  variant: variantProp,
+  variant = txDefaults().variant ?? 'elevated',
   class: className,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('stat');
-const variant = $derived(withDefault(variantProp, txDefaults().variant, 'elevated'));
 
 const uid = $props.id();
 const change = $derived(kpiDelta(value, previous, unit, currency));

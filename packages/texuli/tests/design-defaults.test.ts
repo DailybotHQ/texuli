@@ -35,7 +35,6 @@ import { SEPARATOR_VARIANTS } from '../src/components/separator-aspect/index.ts'
 import { SHEET_SIZES } from '../src/components/sheet/index.ts';
 import { SIDEBAR_VARIANTS } from '../src/components/sidebar/index.ts';
 import { SLIDER_SIZES } from '../src/components/slider/index.ts';
-import { TABLE_VARIANTS } from '../src/components/table/index.ts';
 import { ACCORDION_VARIANTS, TABS_VARIANTS } from '../src/components/tabs-accordion/index.ts';
 import { TOGGLE_SIZES, TOGGLE_VARIANTS } from '../src/components/toggle/index.ts';
 import { TOOLBAR_SIZES, TOOLBAR_VARIANTS } from '../src/components/toolbar/index.ts';
@@ -74,7 +73,7 @@ function wiredComponents(): { file: string; id: string; fallbacks: Record<string
       if (!id) continue;
       const fallbacks: Record<string, string> = {};
       for (const match of source.matchAll(
-        /const (variant|size) = \$derived\(withDefault\(\1Prop, txDefaults\(\)\.\1, '([^']+)'\)\);/g
+        /\b(variant|size) = txDefaults\(\)\.\1 \?\? '([^']+)',/g
       )) {
         fallbacks[match[1] as string] = match[2] as string;
       }
@@ -136,7 +135,6 @@ describe('design defaults: the closed vocabulary', () => {
       slider: { size: SLIDER_SIZES },
       spinner: { size: FEEDBACK_SIZES },
       stat: { variant: CARD_VARIANTS },
-      table: { variant: TABLE_VARIANTS },
       tabs: { variant: TABS_VARIANTS },
       tag: { variant: BADGE_VARIANTS },
       toggle: { variant: TOGGLE_VARIANTS, size: TOGGLE_SIZES },
@@ -148,14 +146,13 @@ describe('design defaults: the closed vocabulary', () => {
     expect([...DESIGN_DEFAULTS_COMPONENTS]).toEqual(Object.keys(expected));
     expect(isDesignDefaultsComponent('button')).toBe(true);
     expect(isDesignDefaultsComponent('nope')).toBe(false);
-    for (const name of ['setDesignDefaults', 'getDesignDefaults', 'validateDesignDefaults']) {
-      expect(typeof (root as Record<string, unknown>)[name], name).toBe('function');
-    }
+    // The defaults live on their own subpath (texuli/defaults), not in the root barrel.
+    expect((root as Record<string, unknown>).setDesignDefaults).toBeUndefined();
   });
 
   it('every component with a variant or size prop reads its defaults, with the prop’s old fallback', () => {
     const wired = wiredComponents();
-    expect(wired.length).toBe(71);
+    expect(wired.length).toBe(70);
     for (const { file, id, fallbacks } of wired) {
       const props = Object.keys(fallbacks);
       expect(props.length, file).toBeGreaterThan(0);
@@ -166,9 +163,11 @@ describe('design defaults: the closed vocabulary', () => {
     }
     // Every vocabulary entry has at least one component that reads it.
     expect(new Set(wired.map((entry) => entry.id))).toEqual(new Set(DESIGN_DEFAULTS_COMPONENTS));
-    // No styled component keeps a literal variant or size default in its props.
+    // No styled component keeps a literal variant or size default in its props,
+    // except Table (planned: its read would push @texuli/data/grid-editing over its cap).
     for (const dir of readdirSync(SRC)) {
       for (const name of readdirSync(join(SRC, dir)).filter((n) => n.endsWith('.svelte'))) {
+        if (`${dir}/${name}` === 'table/Table.svelte') continue;
         const source = readFileSync(join(SRC, dir, name), 'utf8');
         const props = source.slice(source.lastIndexOf('let {', source.indexOf('$props()')));
         expect(props.slice(0, props.indexOf('$props()')), `${dir}/${name}`).not.toMatch(
@@ -329,7 +328,7 @@ describe('design defaults: components', () => {
       }
     }
     expect(checked).toBeGreaterThan(80);
-    expect(families.size).toBe(33);
+    expect(families.size).toBe(32);
     // About 350 mounts: generous under a loaded machine (about 0.5 s alone).
   }, 60_000);
 

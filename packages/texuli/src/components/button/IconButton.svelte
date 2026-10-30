@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 import Button from './Button.svelte';
 import type { ButtonSize, ButtonVariant } from './button-variants.ts';
 
@@ -22,18 +22,16 @@ type IconButtonProps = HTMLButtonAttributes &
     ref?: HTMLElement | null;
   };
 
+const txDefaults = designDefaults('icon-button');
 let {
   label,
-  variant: variantProp,
-  size: sizeProp,
+  variant = txDefaults().variant ?? 'ghost',
+  size = txDefaults().size ?? 'icon',
   loading = false,
   children,
   ref = $bindable(null),
   ...rest
 }: IconButtonProps = $props();
-const txDefaults = designDefaults('icon-button');
-const variant = $derived(withDefault(variantProp, txDefaults().variant, 'ghost'));
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'icon'));
 </script>
 
 <Button

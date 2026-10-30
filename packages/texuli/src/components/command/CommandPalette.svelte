@@ -25,7 +25,7 @@ import CommandRoot from './CommandRoot.svelte';
 import type { CommandItemData, CommandPaletteSearch, CommandPaletteSelect } from './types.ts';
 import { type CommandSize, type CommandVariant, commandPaletteClass } from './variants.ts';
 import './command.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /**
@@ -71,6 +71,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   class?: ClassValue;
 };
 
+const txDefaults = designDefaults('command');
 let {
   open = $bindable(false),
   onOpenChange,
@@ -87,8 +88,8 @@ let {
   recentEmptyLabel: recentEmptyLabelProp,
   loadingLabel: loadingLabelProp,
   errorLabel: errorLabelProp,
-  size: sizeProp,
-  variant: variantProp,
+  size = txDefaults().size ?? 'md',
+  variant = txDefaults().variant ?? 'outline',
   class: className,
   mode = 'top-layer',
   container = null,
@@ -97,9 +98,6 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('command');
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
-const variant = $derived(withDefault(variantProp, txDefaults().variant, 'outline'));
 const msg = useMessages();
 const placeholder = $derived(
   placeholderProp ?? msg('texuli.command-palette.placeholder', 'Search pages, people, and actions…')

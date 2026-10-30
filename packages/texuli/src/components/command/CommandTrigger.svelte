@@ -4,7 +4,7 @@ import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue } from '../../internal/cx.ts';
 import { type CommandSize, type CommandVariant, commandTriggerClass } from './variants.ts';
 import './command.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLButtonAttributes, 'children'> & {
   /** The rendered root element (bindable). */
@@ -27,11 +27,12 @@ type Props = Omit<HTMLButtonAttributes, 'children'> & {
   children?: import('svelte').Snippet;
 };
 
+const txDefaults = designDefaults('command');
 let {
   label: labelProp,
   keys = ['⌘', 'K'],
-  size: sizeProp,
-  variant: variantProp,
+  size = txDefaults().size ?? 'md',
+  variant = txDefaults().variant ?? 'outline',
   icon = false,
   collapse = 'never',
   type = 'button',
@@ -40,9 +41,6 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('command');
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
-const variant = $derived(withDefault(variantProp, txDefaults().variant, 'outline'));
 const msg = useMessages();
 const label = $derived(labelProp ?? msg('texuli.command-trigger.label', 'Search commands…'));
 

@@ -2,7 +2,7 @@
 import { Trigger as PrimitiveTrigger } from '@texuli/primitives/select';
 import type { ComponentProps, Snippet } from 'svelte';
 import { type ClassValue } from '../../internal/cx.ts';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 import { type SelectSize, type SelectVariant, selectTriggerClass } from './variants.ts';
 
 type Props = ComponentProps<typeof PrimitiveTrigger> & {
@@ -12,17 +12,15 @@ type Props = ComponentProps<typeof PrimitiveTrigger> & {
   variant?: SelectVariant;
 };
 
+const txDefaults = designDefaults('select');
 let {
   children,
   class: className,
-  size: sizeProp,
-  variant: variantProp,
+  size = txDefaults().size ?? 'md',
+  variant = txDefaults().variant ?? 'outline',
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('select');
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
-const variant = $derived(withDefault(variantProp, txDefaults().variant, 'outline'));
 
 const classes = $derived(
   selectTriggerClass({

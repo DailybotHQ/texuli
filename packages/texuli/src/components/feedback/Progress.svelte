@@ -9,7 +9,7 @@ import {
   progressClass,
 } from './variants.ts';
 import './feedback.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** Current value; `null` is indeterminate. */
@@ -34,6 +34,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
 const CIRCLE_R = 42;
 const CIRCUMFERENCE = 2 * Math.PI * CIRCLE_R;
 
+const txDefaults = designDefaults('progress');
 let {
   value = 0,
   max = 100,
@@ -42,15 +43,13 @@ let {
   ariaLabel,
   showValue = false,
   tone = 'primary',
-  size: sizeProp,
+  size = txDefaults().size ?? 'md',
   shape = 'linear',
   loadingLabel: loadingLabelProp,
   class: className,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('progress');
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 const msg = useMessages();
 const loadingLabel = $derived(loadingLabelProp ?? msg('texuli.progress.loading-label', 'Loading'));
 

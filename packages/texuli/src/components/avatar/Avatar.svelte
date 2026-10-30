@@ -16,7 +16,7 @@ import {
   avatarStatusClass,
 } from './variants.ts';
 import './avatar.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** Display name used for initials, tone and the default accessible name. */
@@ -50,13 +50,14 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   ref?: HTMLElement | null;
 };
 
+const txDefaults = designDefaults('avatar');
 let {
   name,
   src = null,
   srcTrust = 'untrusted',
   srcset,
   sizes,
-  size: sizeProp,
+  size = txDefaults().size ?? 'md',
   status,
   decorative = false,
   delayMs = 0,
@@ -67,8 +68,6 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('avatar');
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 
 const statusLabel = $derived(
   status === 'online'

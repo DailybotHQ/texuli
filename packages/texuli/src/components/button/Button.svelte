@@ -4,7 +4,7 @@ import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { type ButtonSize, type ButtonVariant, buttonVariants } from './button-variants.ts';
 import './button.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type ButtonProps = HTMLButtonAttributes &
   HTMLAnchorAttributes & {
@@ -33,10 +33,11 @@ type ButtonProps = HTMLButtonAttributes &
     ref?: HTMLElement | null;
   };
 
+const txDefaults = designDefaults('button');
 let {
   class: className,
-  variant: variantProp,
-  size: sizeProp,
+  variant = txDefaults().variant ?? 'default',
+  size = txDefaults().size ?? 'md',
   href = undefined,
   hrefTrust = 'developer',
   type = 'button',
@@ -50,9 +51,6 @@ let {
   ref = $bindable(null),
   ...rest
 }: ButtonProps = $props();
-const txDefaults = designDefaults('button');
-const variant = $derived(withDefault(variantProp, txDefaults().variant, 'default'));
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 
 let pending = $state(false);
 const busy = $derived(Boolean(loading) || pending);

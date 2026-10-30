@@ -5,7 +5,7 @@ import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
 import { type ComboboxSize, type ComboboxVariant, comboboxFieldClass } from './variants.ts';
 import './combobox.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** The rendered root element (bindable). */
@@ -19,19 +19,17 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   class?: ClassValue;
 };
 
+const txDefaults = designDefaults('combobox');
 let {
   children,
-  size: sizeProp,
-  variant: variantProp,
+  size = txDefaults().size ?? 'md',
+  variant = txDefaults().variant ?? 'outline',
   open = undefined,
   disabled = false,
   class: className,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('combobox');
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
-const variant = $derived(withDefault(variantProp, txDefaults().variant, 'outline'));
 
 const context = getComboboxContext();
 

@@ -12,20 +12,19 @@ import { cx } from '../../internal/cx.ts';
 import type { ScrollAreaProps } from './props.ts';
 import { type ScrollAreaSize, scrollAreaVariants } from './variants.ts';
 import './scroll-area.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
+const txDefaults = designDefaults('scroll-area');
 let {
   label,
   type = 'auto',
   dir = 'ltr',
-  size: sizeProp,
+  size = txDefaults().size ?? 'md',
   class: className,
   children,
   ref = $bindable(null),
   ...attributes
 }: ScrollAreaProps = $props();
-const txDefaults = designDefaults('scroll-area');
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 
 function bindRef(node: HTMLElement): () => void {
   ref = node;

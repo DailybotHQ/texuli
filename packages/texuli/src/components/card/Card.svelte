@@ -4,7 +4,7 @@ import type { HTMLAnchorAttributes, HTMLAttributes } from 'svelte/elements';
 import { cx } from '../../internal/cx.ts';
 import { type CardVariant, cardClass } from './variants.ts';
 import './card.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = HTMLAttributes<HTMLElement> & {
   /** Visual elevation. */
@@ -31,8 +31,9 @@ type Props = HTMLAttributes<HTMLElement> & {
   ref?: HTMLElement | null;
 };
 
+const txDefaults = designDefaults('card');
 let {
-  variant: variantProp,
+  variant = txDefaults().variant ?? 'elevated',
   href,
   hrefTrust = 'developer',
   linkLabel,
@@ -44,8 +45,6 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('card');
-const variant = $derived(withDefault(variantProp, txDefaults().variant, 'elevated'));
 
 const safe = $derived(href === undefined ? undefined : safeHref(href, hrefTrust));
 const interactive = $derived(Boolean(safe));

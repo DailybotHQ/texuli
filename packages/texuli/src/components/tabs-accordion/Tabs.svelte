@@ -15,7 +15,7 @@ import {
   tabsTriggerClass,
 } from './variants.ts';
 import './tabs-accordion.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type OwnProps = {
   items: readonly TabItem[];
@@ -46,12 +46,13 @@ type OwnProps = {
 /** Extra attributes (`data-*`, `aria-*`, `id`, handlers…) land on the root element. */
 type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps>;
 
+const txDefaults = designDefaults('tabs');
 let {
   items,
   value = $bindable(''),
   onValueChange,
   label,
-  variant: variantProp,
+  variant = txDefaults().variant ?? 'line',
   orientation = 'horizontal',
   activationMode = 'automatic',
   loop = false,
@@ -64,8 +65,6 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('tabs');
-const variant = $derived(withDefault(variantProp, txDefaults().variant, 'line'));
 
 const indicatorMotion = createIndicatorMotion({
   motion: () => motion,

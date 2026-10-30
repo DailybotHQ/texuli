@@ -7,6 +7,10 @@
  * The lists are literal here, not imported from each family's variants
  * module, so this module pulls no component CSS; `tests/design-defaults.test.ts`
  * checks every list equals the family's exported constant.
+ *
+ * Not covered yet (planned): `Table` keeps its built-in `plain` default; the
+ * read would push `@texuli/data/grid-editing` (which bundles it) over its
+ * size cap.
  */
 
 export const DESIGN_DEFAULTS_VOCABULARY = {
@@ -77,7 +81,6 @@ export const DESIGN_DEFAULTS_VOCABULARY = {
   slider: { size: ['sm', 'md', 'lg'] },
   spinner: { size: ['sm', 'md', 'lg'] },
   stat: { variant: ['elevated', 'flat'] },
-  table: { variant: ['plain', 'striped', 'grid'] },
   tabs: { variant: ['line', 'pills', 'enclosed'] },
   tag: {
     variant: [

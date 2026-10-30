@@ -7,7 +7,7 @@ import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
 import { type SeparatorOrientation, type SeparatorVariant, separatorClass } from './variants.ts';
 import './separator-aspect.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'role'> & {
   /** Default `horizontal`. */
@@ -24,16 +24,15 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'role'> & {
   class?: ClassValue;
 };
 
+const txDefaults = designDefaults('separator');
 let {
   orientation = 'horizontal',
   decorative = true,
-  variant: variantProp,
+  variant = txDefaults().variant ?? 'default',
   ref = $bindable(null),
   class: className,
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('separator');
-const variant = $derived(withDefault(variantProp, txDefaults().variant, 'default'));
 
 const classes = $derived(
   separatorClass({

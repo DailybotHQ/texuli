@@ -12,7 +12,7 @@ import {
   radioGroupClass,
 } from './variants.ts';
 import './choice.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** The rendered root element (bindable). */
@@ -32,6 +32,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   children?: Snippet;
 };
 
+const txDefaults = designDefaults('radio-group');
 let {
   value = $bindable(''),
   onValueChange,
@@ -40,8 +41,8 @@ let {
   disabled = false,
   readonly = false,
   orientation = 'vertical',
-  variant: variantProp,
-  size: sizeProp,
+  variant = txDefaults().variant ?? 'default',
+  size = txDefaults().size ?? 'md',
   items,
   loop = true,
   class: className,
@@ -49,9 +50,6 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('radio-group');
-const variant = $derived(withDefault(variantProp, txDefaults().variant, 'default'));
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 
 function bindRef(node: HTMLElement): () => void {
   ref = node;

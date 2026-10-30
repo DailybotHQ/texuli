@@ -11,7 +11,7 @@ import {
   popoverContentClass,
 } from './variants.ts';
 import './popover.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = ComponentProps<typeof PrimitiveContent> & {
   children?: Snippet;
@@ -26,19 +26,17 @@ type Props = ComponentProps<typeof PrimitiveContent> & {
   motion?: MotionProp;
 };
 
+const txDefaults = designDefaults('popover');
 let {
   children,
   class: className,
-  variant: variantProp,
-  size: sizeProp,
+  variant = txDefaults().variant ?? 'elevated',
+  size = txDefaults().size ?? 'md',
   arrow = true,
   motion,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('popover');
-const variant = $derived(withDefault(variantProp, txDefaults().variant, 'elevated'));
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 
 const overlayMotion = createOverlayMotion({
   motion: () => motion,

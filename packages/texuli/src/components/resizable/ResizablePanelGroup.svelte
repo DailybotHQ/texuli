@@ -9,7 +9,7 @@ import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue } from '../../internal/cx.ts';
 import { type ResizableVariant, resizableGroupClass } from './variants.ts';
 import './resizable.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 /**
  * A styled group of resizable panels (the APG window splitter, from
@@ -35,17 +35,16 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'class'> & {
   children?: Snippet;
 };
 
+const txDefaults = designDefaults('resizable');
 let {
   direction = 'horizontal',
   layout = $bindable(),
-  variant: variantProp,
+  variant = txDefaults().variant ?? 'plain',
   class: className,
   ref = $bindable(null),
   children,
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('resizable');
-const variant = $derived(withDefault(variantProp, txDefaults().variant, 'plain'));
 </script>
 
 <Splitter.Root

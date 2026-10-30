@@ -3,7 +3,7 @@ import type { HTMLLabelAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { labelClass } from './variants.ts';
 import './field.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = HTMLLabelAttributes & {
   /** Visual required marker (set `required` on the control for semantics). */
@@ -16,17 +16,16 @@ type Props = HTMLLabelAttributes & {
   ref?: HTMLElement | null;
 };
 
+const txDefaults = designDefaults('label');
 let {
   ref = $bindable(null),
   required = false,
-  size: sizeProp,
+  size = txDefaults().size ?? 'md',
   srOnly = false,
   class: className,
   children,
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('label');
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 
 const classes = $derived(cx(labelClass({ size }), srOnly && 'tx-label--sr', className));
 </script>

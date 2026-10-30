@@ -3,7 +3,7 @@ import type { HTMLAttributes } from 'svelte/elements';
 import { useMessages } from '../../i18n/use-messages.ts';
 import { type BadgeVariant, tagClass } from './variants.ts';
 import './badge.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = HTMLAttributes<HTMLSpanElement> & {
   /** Visible label (required word; never color alone). */
@@ -25,18 +25,17 @@ type Props = HTMLAttributes<HTMLSpanElement> & {
   ref?: HTMLElement | null;
 };
 
+const txDefaults = designDefaults('tag');
 let {
   ref = $bindable(null),
   label,
-  variant: variantProp,
+  variant = txDefaults().variant ?? 'secondary',
   removeLabel: removeLabelProp,
   onRemove,
   disabled = false,
   class: className,
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('tag');
-const variant = $derived(withDefault(variantProp, txDefaults().variant, 'secondary'));
 const msg = useMessages();
 const removeLabel = $derived(removeLabelProp ?? msg('texuli.tag.remove-label', 'Remove {label}'));
 

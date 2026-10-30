@@ -16,7 +16,7 @@ import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { type DateSize, dateCalendarClass } from './variants.ts';
 import './date.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 /**
  * A styled calendar on the owned APG Calendar: a heading with previous and
@@ -75,6 +75,7 @@ type Props = OwnProps &
     ref?: HTMLElement | null;
   };
 
+const txDefaults = designDefaults('date');
 let {
   value = $bindable(null),
   onValueChange,
@@ -94,7 +95,7 @@ let {
   tooLongLabel = DEFAULT_DATE_PICKER_LABELS.tooLong,
   disabled = false,
   readOnly = false,
-  size: sizeProp,
+  size = txDefaults().size ?? 'md',
   previousLabel: previousLabelProp,
   nextLabel: nextLabelProp,
   label,
@@ -102,8 +103,6 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('date');
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 const msg = useMessages();
 const previousLabel = $derived(
   previousLabelProp ?? msg('texuli.calendar.previous-label', 'Previous month')

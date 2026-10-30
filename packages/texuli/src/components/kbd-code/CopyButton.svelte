@@ -5,7 +5,7 @@ import { type ClassValue } from '../../internal/cx.ts';
 import { type ClipboardLike, copyText } from './copy-text.ts';
 import { type CopyButtonSize, copyButtonClass } from './variants.ts';
 import './kbd-code.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = HTMLButtonAttributes & {
   /** The rendered root element (bindable). */
@@ -29,12 +29,13 @@ type Props = HTMLButtonAttributes & {
   children?: import('svelte').Snippet;
 };
 
+const txDefaults = designDefaults('copy-button');
 let {
   value,
   label: labelProp,
   copiedLabel: copiedLabelProp,
   feedbackMs = 1500,
-  size: sizeProp,
+  size = txDefaults().size ?? 'md',
   clipboard = undefined,
   onCopy,
   onCopyError,
@@ -45,8 +46,6 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('copy-button');
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 const msg = useMessages();
 const label = $derived(labelProp ?? msg('texuli.copy-button.label', 'Copy'));
 const copiedLabel = $derived(copiedLabelProp ?? msg('texuli.copy-button.copied-label', 'Copied'));

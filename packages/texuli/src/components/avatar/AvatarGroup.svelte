@@ -6,7 +6,7 @@ import Avatar from './Avatar.svelte';
 import type { AvatarGroupItem } from './types.ts';
 import { type AvatarSize, type AvatarStatus, avatarGroupClass } from './variants.ts';
 import './avatar.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** The rendered root element (bindable). */
@@ -23,18 +23,17 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   class?: ClassValue;
 };
 
+const txDefaults = designDefaults('avatar');
 let {
   items,
   max,
-  size: sizeProp,
+  size = txDefaults().size ?? 'md',
   label,
   overflowLabel = '+{n}',
   class: className,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('avatar');
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 
 const limit = $derived(max !== undefined && max > 0 ? Math.floor(max) : items.length);
 const visible = $derived(items.slice(0, Math.max(0, limit)));

@@ -23,7 +23,7 @@ import {
   dialogTitleClass,
 } from './variants.ts';
 import './dialog.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type TriggerSnippet = Snippet<[{ props: Record<string, unknown> }]>;
 
@@ -81,11 +81,12 @@ type OwnProps = {
 /** Extra attributes (`data-*`, `aria-*`, `id`, handlers…) land on the dialog content element. */
 type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'role'>;
 
+const txDefaults = designDefaults('dialog');
 let {
   open = $bindable(false),
   title,
   description,
-  size: sizeProp,
+  size = txDefaults().size ?? 'md',
   trigger,
   footer,
   children,
@@ -103,8 +104,6 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('dialog');
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 const msg = useMessages();
 const closeLabel = $derived(closeLabelProp ?? msg('texuli.dialog.close-label', 'Close'));
 

@@ -13,7 +13,7 @@ import {
   trendWord,
 } from './trend.ts';
 import './stat.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
   /** The rendered root element (bindable). */
@@ -49,6 +49,7 @@ const statClass = variants({
   defaultVariants: { variant: 'elevated' },
 });
 
+const txDefaults = designDefaults('stat');
 let {
   label,
   value,
@@ -58,13 +59,11 @@ let {
   hint,
   icon,
   sparkline,
-  variant: variantProp,
+  variant = txDefaults().variant ?? 'elevated',
   class: className,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('stat');
-const variant = $derived(withDefault(variantProp, txDefaults().variant, 'elevated'));
 
 const resolvedTrend = $derived(resolveTrend(delta, trend));
 const deltaText = $derived(formatDelta(delta));

@@ -15,7 +15,7 @@ import {
   type NavSize,
 } from './variants.ts';
 import './navigation.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type OwnProps = {
   items: readonly BreadcrumbItem[];
@@ -37,10 +37,11 @@ type OwnProps = {
 /** Extra attributes (`data-*`, `aria-*`, `id`, handlers…) land on the root element. */
 type Props = OwnProps & Omit<HTMLAttributes<HTMLElement>, keyof OwnProps | 'children'>;
 
+const txDefaults = designDefaults('breadcrumb');
 let {
   items,
   label: labelProp,
-  size: sizeProp,
+  size = txDefaults().size ?? 'md',
   separatorLabel: separatorLabelProp,
   separator,
   maxItems = 0,
@@ -49,8 +50,6 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('breadcrumb');
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 const msg = useMessages();
 const label = $derived(labelProp ?? msg('texuli.breadcrumb.label', 'Breadcrumb'));
 const separatorLabel = $derived(

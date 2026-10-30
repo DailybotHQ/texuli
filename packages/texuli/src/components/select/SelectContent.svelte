@@ -4,7 +4,7 @@ import type { ComponentProps, Snippet } from 'svelte';
 import { type ClassValue } from '../../internal/cx.ts';
 import { type SelectSize, selectContentClass } from './variants.ts';
 import './select.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = ComponentProps<typeof PrimitiveContent> & {
   children?: Snippet;
@@ -12,15 +12,14 @@ type Props = ComponentProps<typeof PrimitiveContent> & {
   size?: SelectSize;
 };
 
+const txDefaults = designDefaults('select');
 let {
   children,
   class: className,
-  size: sizeProp,
+  size = txDefaults().size ?? 'md',
   ref = $bindable(null),
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('select');
-const size = $derived(withDefault(sizeProp, txDefaults().size, 'md'));
 
 const classes = $derived(
   selectContentClass({
