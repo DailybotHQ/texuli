@@ -129,21 +129,41 @@ function pricingTree(ctx: SessionContext, options: PricingOptions = {}): Json {
         id: 'blocks-data',
         props: {
           ...data,
-          block: options.table ?? {
-            type: 'table',
-            caption: 'Compare plans',
-            columns: [
-              { id: 'feature', label: 'Feature' },
-              ...PLANS.map((plan) => ({ id: plan.name.toLowerCase(), label: plan.name })),
-            ],
-            rows: [
-              { feature: 'Boards', free: 3, team: 'Unlimited', business: 'Unlimited' },
-              { feature: 'Weekly digests', free: 'No', team: 'Yes', business: 'Yes' },
-            ],
-          },
+          block: options.table ?? protocolTable(ctx),
         },
       },
     ],
+  };
+}
+
+/**
+ * The comparison table, written only from what block.list and block.schema
+ * returned: the type blocks-data renders, the required column fields, the
+ * cell types a row accepts and the optional caption.
+ */
+function protocolTable(ctx: SessionContext): Json {
+  const types = ctx.data('blocks of blocks-data').blocks.map((block: Json) => block.type);
+  expect(types).toContain('table');
+  const { schema, shape } = ctx.data('block table');
+  const column = schema.properties.columns.items;
+  expect(column.required, shape).toEqual(['id', 'label']);
+  const row = schema.properties.rows.items;
+  expect(row.$comment, shape).toMatch(/ids declared elsewhere/u);
+  expect(row.additionalProperties.type).toEqual(expect.arrayContaining(['string', 'number']));
+  expect(schema.required).toEqual(expect.arrayContaining(['type', 'columns', 'rows']));
+  const columns = [
+    { id: 'feature', label: 'Feature' },
+    ...PLANS.map((plan) => ({ id: plan.name.toLowerCase(), label: plan.name })),
+  ];
+  const rows = [
+    ['Boards', 3, 'Unlimited', 'Unlimited'],
+    ['Weekly digests', 'No', 'Yes', 'Yes'],
+  ].map((cells) => Object.fromEntries(columns.map((item, index) => [item.id, cells[index]])));
+  return {
+    type: 'table',
+    ...(schema.properties.caption ? { caption: 'Compare plans' } : {}),
+    columns,
+    rows,
   };
 }
 
@@ -226,6 +246,24 @@ const pricingPage: Session = {
         },
       })
     ),
+    // The table block's shape comes from the protocol, not from guessing.
+    {
+      label: 'blocks of blocks-data',
+      method: 'tools/call',
+      params: call('block.list', { component: 'blocks-data' }),
+    },
+    {
+      label: 'block table',
+      method: 'tools/call',
+      params: call('block.schema', { type: 'table' }),
+      expect(result) {
+        expect(result.structuredContent).toMatchObject({
+          type: 'table',
+          component: 'blocks-data',
+          usableInBlueprint: true,
+        });
+      },
+    },
     validateStep('validate', pricingTree, (output) => {
       expect(output.diagnostics).toEqual([]);
       expect(output).toMatchObject({ valid: true, status: 'valid', tier: 'untrusted' });
@@ -284,7 +322,10 @@ const pricingPage: Session = {
         expect(output.valid).toBe(false);
         expect(codes(output)).toEqual(['block-schema']);
         expect(output.diagnostics[0]).toMatchObject({ id: 'blocks-data', path: '0.children.2' });
+        // The diagnostic names the expected shape, so the agent can repair it from the message.
         expect(output.diagnostics[0].message).toMatch(/columns\.0/u);
+        expect(output.diagnostics[0].message).toContain('{ id: string, label: string }');
+        expect(output.diagnostics[0].message).toContain('block.schema');
       }
     ),
   ],
@@ -603,6 +644,11 @@ const discovery: Session = {
       method: 'tools/call',
       params: call('catalog.search', { limit: 1 }),
     },
+    {
+      label: 'block types',
+      method: 'tools/call',
+      params: call('block.list', {}),
+    },
     { label: 'prompts', method: 'prompts/list' },
     {
       label: 'build-ui',
@@ -718,6 +764,18 @@ const discovery: Session = {
       .result('templates')
       .resourceTemplates.map((item: Json) => item.uriTemplate);
     for (const uri of texuliUris(buildUi)) expect([...templates, ...uris], uri).toContain(uri);
+
+    // Every blocks-* component in the catalog has block types an agent can read shapes for.
+    const blockTypes = ctx.data('block types').blocks;
+    expect(ctx.data('block types').total).toBe(blockTypes.length);
+    const blockComponents = ids.filter((id: string) => id.startsWith('blocks-'));
+    expect(blockComponents.length).toBeGreaterThan(0);
+    for (const id of blockComponents)
+      expect(
+        blockTypes.some((block: Json) => block.component === id),
+        id
+      ).toBe(true);
+    expect(named).toEqual(expect.arrayContaining(['block.list', 'block.schema']));
 
     const component = JSON.parse(ctx.result('read completed').contents[0].text);
     expect(ids).toContain(component.id);
