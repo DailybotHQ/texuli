@@ -5,9 +5,11 @@
  * compile time by the SEO integration (`/og/<page>.png`), plus env-gated
  * search-engine verification metas (rendered only when the owner's token
  * exists). `noindex` keeps a page (the 404) out of search results and the
- * sitemap.
+ * sitemap. Every page also links the agentic resource discovery catalog
+ * (`rel="ai-catalog"`), the same target as its `Link` response header.
  */
 import { ANALYTICS } from '../../lib/constances';
+import { DISCOVERY_PATHS } from './agent-discovery.ts';
 import {
   absoluteUrl,
   normalizePagePath,
@@ -31,6 +33,8 @@ const base = import.meta.env.BASE_URL;
 const pagePath = normalizePagePath(Astro.url.pathname, base);
 const canonical = site ? absoluteUrl(site, base, pagePath) : undefined;
 const image = site && !noindex ? absoluteUrl(site, base, ogImageFile(pagePath)) : undefined;
+// Root-relative (plus the base): a few bytes on every page, same target as the header.
+const aiCatalog = `${base.replace(/\/$/, '')}${DISCOVERY_PATHS.aiCatalog}`;
 const locale = lang.replace('-', '_');
 // Env-gated (constances.ts): empty tokens render no meta at all.
 const { google, bing } = ANALYTICS.verification;
@@ -38,6 +42,7 @@ const { google, bing } = ANALYTICS.verification;
 
 {canonical && !noindex && <link rel="canonical" href={canonical} />}
 {noindex && <meta name="robots" content="noindex" />}
+<link rel="ai-catalog" href={aiCatalog} />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content={siteName} />
 <meta property="og:locale" content={locale === 'en' ? 'en_US' : locale} />

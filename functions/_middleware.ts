@@ -16,6 +16,10 @@
  * Function (T-mcp-remote).
  */
 
+import {
+  discoveryLinks,
+  formatLinkHeader,
+} from '../apps/website/src/components/seo/agent-discovery.ts';
 import { agentProblem, isAgentRequest } from '../apps/website/src/lib/agent-request.ts';
 import {
   type BotEventName,
@@ -60,6 +64,15 @@ function sendBotEvent(context: Context, event: BotEventName, pathname: string): 
   if (context.waitUntil) context.waitUntil(send);
 }
 
+/**
+ * The discovery `Link` value of a Markdown twin this middleware builds:
+ * `_headers` never applies to a Function response (SECURITY S-2), so the
+ * twin carries the same targets as its HTML page, minus `service-desc`
+ * (only the build knows whether `/openapi.json` exists; the API catalog
+ * names it) and minus the twin itself.
+ */
+const TWIN_LINK = formatLinkHeader(discoveryLinks({ openapi: false }));
+
 /** The well-known alias of the remote MCP endpoint (`/mcp` is functions/mcp.ts). */
 const MCP_WELL_KNOWN = '/.well-known/mcp';
 
@@ -100,7 +113,10 @@ export const onRequest = async (context: Context): Promise<Response> => {
       // fetch itself is the event, whatever fetched it.
       const twinEvent = botEventFor(userAgent, true);
       if (twinEvent) sendBotEvent(context, twinEvent, url.pathname);
-      return new Response(response.body, { status: 200, headers: decision.headers });
+      return new Response(response.body, {
+        status: 200,
+        headers: { ...decision.headers, link: TWIN_LINK },
+      });
     }
   }
   const response = await context.next();

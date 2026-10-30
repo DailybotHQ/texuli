@@ -35,7 +35,7 @@ test('the built site passes the SEO and AEO audits, and every internal link reso
   expect(seo.findings.filter((finding) => finding.severity === 'critical')).toEqual([]);
   const aeo = auditAeo(collectAeo(DIST));
   expect(aeo.summary.surface.twins).toBeGreaterThan(50);
-  expect(aeo.summary.surface.wellKnownFiles).toBe(4);
+  expect(aeo.summary.surface.wellKnownFiles).toBe(8);
   expect(aeo.findings.filter((finding) => finding.severity === 'critical')).toEqual([]);
 
   // Same-origin links: a file, a directory page or an `.html` page in dist.

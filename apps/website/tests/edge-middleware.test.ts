@@ -231,12 +231,26 @@ describe('Markdown twins: negotiation and rendition', () => {
 });
 
 describe('robots variants for strict parsers', () => {
-  it('leaves the shipped policy byte-identical and its invariants intact', () => {
+  it('strips only the non-standard lines of the shipped policy and keeps its invariants', () => {
     const shipped = buildRobots('https://texuli.com/sitemap.xml');
-    expect(stripDirectivesForStrictParsers(shipped)).toBe(shipped);
-    expect(shipped).toContain('User-agent: *\nAllow: /');
-    expect(shipped).toMatch(/^Sitemap: /m);
-    expect(shipped).toContain('User-agent: GPTBot');
+    const stripped = stripDirectivesForStrictParsers(shipped);
+    // PLAN_011 T-ar-discovery: the shipped policy now carries both directives.
+    expect(shipped).toMatch(/^Content-Signal: /m);
+    expect(shipped).toMatch(/^Agentmap: /m);
+    expect(stripped).not.toMatch(/^(Content-Signal|Agentmap):/m);
+    expect(
+      stripped.split('\n').filter((line) => !/^(Content-Signal|Agentmap):/.test(line))
+    ).toEqual(stripped.split('\n'));
+    expect(stripped).toContain('User-agent: *\nAllow: /');
+    expect(stripped).toMatch(/^Sitemap: /m);
+    expect(stripped).toContain('User-agent: GPTBot\nAllow: /');
+    expect(
+      shipped
+        .split('\n')
+        .filter((line) => !/^(Content-Signal|Agentmap):/.test(line))
+        .join('\n')
+        .replace(/\n{3,}/g, '\n\n')
+    ).toBe(stripped);
   });
 
   it('strips Content-Signal and Agentmap lines and collapses the gaps they leave', () => {
@@ -328,6 +342,11 @@ describe('the middleware: twins, host headers, agent 404', () => {
     expect(response.headers.get('content-type')).toBe('text/markdown; charset=utf-8');
     expect(response.headers.get('vary')).toBe('Accept');
     expect(response.headers.get('x-content-negotiation')).toBe('markdown');
+    // A Function response gets no _headers rule, so the twin carries the
+    // discovery Link itself (PLAN_011 T-ar-discovery).
+    expect(response.headers.get('link')).toBe(
+      '</.well-known/api-catalog>; rel="api-catalog", </llms.txt>; rel="describedby", </.well-known/ai-catalog.json>; rel="ai-catalog"'
+    );
     expect(await response.text()).toBe('# Twin\n# Twin\n# Twin\n');
 
     const missing = makeContext('/guides/theming/', 'text/markdown', {});

@@ -382,14 +382,17 @@ export function auditSite({ pages, sitemap, robots, readAsset }, config = AUDIT_
       findings.push(
         finding('critical', 'Robots', '(dist)', 'a Disallow exists (the policy is allow-all)')
       );
-    if (/^Content-Signal:/m.test(robots))
+    // A Content-Signal line belongs to a User-agent group; outside one no
+    // crawler reads it (PLAN_011 T-ar-discovery ships it in every group).
+    const strayed = robots.split(/\n\s*\n/).some((block) => {
+      const lines = block.split('\n').map((line) => line.trim());
+      const signal = lines.findIndex((line) => /^Content-Signal:/i.test(line));
+      const agent = lines.findIndex((line) => /^User-agent:/i.test(line));
+      return signal !== -1 && (agent === -1 || agent > signal);
+    });
+    if (strayed)
       findings.push(
-        finding(
-          'critical',
-          'Robots',
-          '(dist)',
-          'a static Content-Signal line (per-UA variants are the middleware rewrite, T-28)'
-        )
+        finding('critical', 'Robots', '(dist)', 'a Content-Signal line outside a User-agent group')
       );
     const groups = [...robots.matchAll(/^User-agent: /gm)].length;
     if (groups < 11)

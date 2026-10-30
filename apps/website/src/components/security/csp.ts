@@ -8,6 +8,7 @@
  * apply one of the two artifacts.
  */
 import { createHash } from 'node:crypto';
+import { existsSync } from 'node:fs';
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,6 +16,13 @@ import type { AstroIntegration } from 'astro';
 import { agentEndpoint } from '../agent-chat/client.ts';
 import { markdownTwinFor } from '../docs/markdown-negotiation.ts';
 import { isDocsPath } from '../foundation/nav-data.ts';
+import {
+  DISCOVERY_PATHS,
+  discoveryHeaderRules,
+  discoveryLinks,
+  formatLinkHeader,
+  twinCandidate,
+} from '../seo/agent-discovery.ts';
 
 const INLINE_SCRIPT = /<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi;
 const INLINE_STYLE = /<style\b[^>]*>([\s\S]*?)<\/style\s*>/gi;
@@ -50,6 +58,21 @@ export interface PageSources {
 export function varyHeaderLine(route: string): string {
   const page = route.endsWith('/index.html') ? route.slice(0, -'index.html'.length) : route;
   return isDocsPath(page) && markdownTwinFor(page) ? '\n  Vary: Accept' : '';
+}
+
+/**
+ * The `Link` line of a page's `_headers` rule (PLAN_011 T-ar-discovery):
+ * the discovery links every HTML page carries, plus the page's Markdown
+ * twin when the build wrote one. `exists` answers for a root-relative path
+ * in the finished build (`/openapi.json`, `/guides/theming.md`).
+ */
+export function linkHeaderLine(route: string, exists: (path: string) => boolean): string {
+  const candidate = twinCandidate(route);
+  const twin = candidate && exists(candidate) ? candidate : undefined;
+  const value = formatLinkHeader(
+    discoveryLinks({ openapi: exists(DISCOVERY_PATHS.openapi), twin })
+  );
+  return `\n  Link: ${value}`;
 }
 
 /** The deduplicated inline sources of one finished HTML document. */
@@ -223,6 +246,7 @@ export function cspIntegration(): AstroIntegration {
         const out = fileURLToPath(dir);
         const files = await htmlFiles(out);
         const rules: string[] = [];
+        const builtFile = (path: string) => existsSync(join(out, path.slice(1)));
         const manifestPages: CspManifestPage[] = [];
         const reportEndpoint = cspReportEndpoint(process.env.PUBLIC_TEXULI_CSP_REPORT_URL);
         const reporting = reportEndpoint
@@ -237,7 +261,7 @@ export function cspIntegration(): AstroIntegration {
           });
           const reportOnly = reportOnlyPolicy(policy, reportEndpoint);
           const rule = (path: string) =>
-            `${path}\n  Content-Security-Policy: ${policy}\n  Content-Security-Policy-Report-Only: ${reportOnly}${reporting}${varyHeaderLine(path)}`;
+            `${path}\n  Content-Security-Policy: ${policy}\n  Content-Security-Policy-Report-Only: ${reportOnly}${reporting}${varyHeaderLine(path)}${linkHeaderLine(path, builtFile)}`;
           rules.push(rule(route));
           manifestPages.push({
             route,
@@ -265,7 +289,12 @@ export function cspIntegration(): AstroIntegration {
             });
           }
         }
-        await writeFile(join(out, '_headers'), `${rules.sort().join('\n\n')}\n`);
+        // The discovery files (content types, CORS on the public JSON) follow
+        // the page rules; their paths never match an HTML route.
+        await writeFile(
+          join(out, '_headers'),
+          `${[...rules.sort(), ...discoveryHeaderRules()].join('\n\n')}\n`
+        );
         await writeFile(
           join(out, 'csp-manifest.json'),
           buildCspManifest(manifestPages, reportEndpoint)
