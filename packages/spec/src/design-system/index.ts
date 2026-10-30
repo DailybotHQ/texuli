@@ -4,7 +4,7 @@
  * `validateDesignSystem` with JSON paths, `DesignSystemPatch` with its check
  * and pure merge, `migrateDesignSystem` and the blueprint reference check.
  * Framework-free and dependency-free; the compiler lives in
- * `@texuli/tokens` (planned).
+ * `@texuli/tokens/design-system/compile`.
  */
 
 export type * from '../../generated/typescript/design-system.ts';
