@@ -24,7 +24,8 @@ export interface StaticDiagnostic {
 }
 
 let familyCheck: ReturnType<typeof createFamilyBlockCheck> | undefined;
-function checkFamilyBlock(block: unknown, id: string) {
+/** The deep schema check of every `blocks-*` family, shared with `blueprint.validate`. */
+export function checkFamilyBlock(block: unknown, id: string) {
   familyCheck ??= createFamilyBlockCheck({
     'blocks-code': checkCodeBlock,
     'blocks-data': checkDataBlock,

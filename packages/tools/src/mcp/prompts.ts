@@ -24,7 +24,7 @@ export const buildUiPrompt: McpPrompt = {
   name: 'build-ui',
   title: 'Build an interface from a brief',
   description:
-    'Turn a brief into a Texuli catalog tree (a blueprint draft) by reading the component catalog, picking components by useWhen and dontUseWhen, composing with worked examples and checking every prop against its manifest. Returns the step-by-step loop with the brief filled in.',
+    'Turn a brief into a validated Texuli catalog tree (a blueprint draft): read the component catalog, pick components by useWhen and dontUseWhen, compose from worked examples, and validate with blueprint.validate until it passes. Returns the step-by-step loop with the brief filled in.',
   arguments: [
     {
       name: 'brief',
@@ -64,9 +64,9 @@ Follow this loop and show your work at each step.
 1. Catalog. Call \`catalog.search\` with words from the brief and tier "${tier}" (limit 20). Search several times with different words; each result has an id, a summary and the tiers that may emit it. texuli://catalog is the whole catalog in one read.
 2. Pick. For each candidate, call \`component.get\` (or read texuli://component/{id}) and keep it only when its useWhen fits the brief and no dontUseWhen matches. Prefer one layout host and a short list of leaf components over many nested one-offs. If the brief needs something the catalog does not have, say so instead of inventing an id.
 3. Compose. Call \`example.search\` with each picked componentId and copy the example props as a starting point. Write one catalog tree: { "id": "<component id>", "props": { … }, "children": [ … ] }. Every prop name and value must match the manifest props (names, kinds, required, enums).
-4. Validate. Re-read each manifest and check every node: a known id that the ${tier} tier may emit, only declared props, every required prop present, enum values in range, text as plain strings. There is no blueprint validation tool on this server yet: hand the tree to the host, which validates it with validateDraft from @texuli/catalog/validate at the untrusted tier before painting it. Fix every diagnostic it returns and validate again.
+4. Validate. Call \`blueprint.validate\` with { "draft": <your tree>, "tier": "${tier}" }. The root must be one frame (layout-page, layout-doc, layout-deck, document, canvas or data-dashboard); pass "fragment": true only for a partial tree. Read every diagnostic: its code, check and path say what to fix (an unknown or tier-denied id, an undeclared prop, a sink such as a javascript: link, a block schema, the grammar). Fix them and call \`blueprint.validate\` again until valid is true with no error diagnostics. Never deliver a tree that has not passed.
 5. Style. ${theme}
-6. Deliver the tree as JSON, the component ids you used with the reason for each, and the theme id.
+6. Deliver the validated tree as JSON, the component ids you used with the reason for each, and the theme id. The host validates it again before painting; nothing activates it but the owner.
 
 ${RULES}`),
       ],

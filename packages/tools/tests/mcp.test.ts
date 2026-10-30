@@ -87,6 +87,7 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
         'catalog.validate',
         'component.get',
         'example.search',
+        'blueprint.validate',
         'theme.search',
         'theme.get',
         'theme.preview',
@@ -102,7 +103,7 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
         'theme',
       ]);
       const described = tools as unknown as { name: string; description: string }[];
-      for (const legacy of described.slice(10)) {
+      for (const legacy of described.slice(11)) {
         expect(legacy.description, legacy.name).toMatch(/^Deprecated alias of [a-z]+\.[a-z-]+/u);
       }
       expect(tools.every(({ annotations }) => annotations.readOnlyHint === true)).toBe(true);
@@ -226,7 +227,7 @@ it('reports tool and protocol errors and speaks newline-delimited JSON-RPC on st
       ) as { version: string };
       expect(messages[0]?.result?.serverInfo).toEqual({ name: 'texuli', version });
       expect(version).not.toBe('0.0.0');
-      expect(messages[1]?.result?.tools).toHaveLength(17);
+      expect(messages[1]?.result?.tools).toHaveLength(18);
     }
   );
 });

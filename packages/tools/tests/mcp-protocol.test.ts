@@ -588,6 +588,14 @@ it('lists and renders the workflow prompts with arguments an agent can complete'
           expect(known, `${prompt.name}: ${uri}`).toBe(true);
         }
       }
+      const buildUi = await rpc(handle, 'prompts/get', {
+        name: 'build-ui',
+        arguments: { brief: 'A form' },
+      });
+      const buildText = ((buildUi.result?.messages ?? []) as { content: { text: string } }[])[0]
+        ?.content.text;
+      expect(buildText).toContain('`blueprint.validate`');
+      expect(buildText).not.toMatch(/no blueprint validation tool/iu);
       const minimal = await rpc(handle, 'prompts/get', {
         name: 'build-ui',
         arguments: { brief: 'A form' },

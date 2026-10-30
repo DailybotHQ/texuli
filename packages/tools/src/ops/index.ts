@@ -6,6 +6,7 @@
  * input and output and returns stable error codes. Framework-free.
  */
 import { TEXULI_ALIASES } from './aliases.ts';
+import { blueprintValidate } from './blueprint.ts';
 import { catalogSearch, catalogValidate, componentGet, exampleSearch } from './catalog.ts';
 import { deckRun } from './deck.ts';
 import { documentExport, documentRun } from './document.ts';
@@ -65,6 +66,7 @@ export const TEXULI_OPERATIONS: readonly Operation[] = Object.freeze([
   catalogValidate,
   componentGet,
   exampleSearch,
+  blueprintValidate,
   themeSearch,
   themeGet,
   themePreview,

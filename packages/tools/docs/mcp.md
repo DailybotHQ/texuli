@@ -121,9 +121,11 @@ over-2,048-character URI is `-32602`.
   is scoped to the component pages, which are computed from the catalog the
   handler already holds. Reading the site's Markdown twins is planned as the
   `site` operations of ADR-018.
-- **`texuli://schema/blueprint`:** the blueprint schema lives in
-  `@texuli/spec`, which `@texuli/tools` does not depend on yet (adding it
-  needs a lockfile change).
+- **`texuli://schema/blueprint`:** the blueprint JSON Schema lives only in
+  `@texuli/spec` (`schemas/blueprint.schema.json`); `@texuli/catalog` exports
+  no copy of it, and `@texuli/tools` does not depend on `@texuli/spec` yet
+  (adding it needs a lockfile change). An agent checks a blueprint with the
+  `blueprint.validate` tool instead.
 - **`texuli://design-system/{id}`** and the design-system schema: they come
   with design systems (Part B of the plan). The template is omitted, not
   registered empty, so an agent never sees a resource that cannot be read.
@@ -132,15 +134,15 @@ over-2,048-character URI is `-32602`.
 
 | Prompt | Arguments | The loop |
 | --- | --- | --- |
-| `build-ui` | `brief` (required), `tier` (`untrusted` or `developer`), `theme` | `catalog.search` → `component.get` (keep by useWhen, drop by dontUseWhen) → `example.search` → compose a catalog tree → check props against the manifests; the host validates with `validateDraft` |
+| `build-ui` | `brief` (required), `tier` (`untrusted` or `developer`), `theme` | `catalog.search` → `component.get` (keep by useWhen, drop by dontUseWhen) → `example.search` → compose a catalog tree → `blueprint.validate` until `valid` is true |
 | `theme-blueprint` | `brief` (required), `mode` (`light` or `dark`), `theme` | `theme.search` → shortlist → `theme.preview` (keep `aa.pass`) → `theme.get` → how the host applies it |
 | `convert-deck` | `direction` (required: `from-markdown` or `to-markdown`), `source` | `deck.run` capabilities and layouts → convert → lint until no errors → round-trip check |
 
 The texts follow the skill's loops (`skills/texuli/build-ui`, `themes` and
 the deck reference). Each names only real operations and served resources;
 the suite checks that. `create-design-system` comes with design systems
-(planned). There is no blueprint validation operation yet, so `build-ui`
-says so and hands validation to the host. `prompts/get` refuses an unknown
+(planned). `build-ui` validates through the `blueprint.validate` tool, so
+an agent can finish the loop through the protocol alone. `prompts/get` refuses an unknown
 prompt, a missing required argument, an unknown argument, a non-string value,
 a value outside its enum and a value over its length cap (10,000 characters,
 or 2,000,000 for `source`) with `-32602`.

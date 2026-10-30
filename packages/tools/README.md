@@ -93,7 +93,8 @@ manifests and pages, themes, the deck and document schemas), prompts
 [mcp.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/mcp.md).
 Its tools come from an operations registry (`./ops`, in development and
 planned for `0.9.0`, not in any published version): one declaration per
-operation (`catalog.search`, `component.get`, `theme.preview`, `deck.run` …)
+operation (`catalog.search`, `component.get`, `blueprint.validate`,
+`theme.preview`, `deck.run` …)
 with JSON Schema input and output, limits and examples; see
 [ops.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md).
 
