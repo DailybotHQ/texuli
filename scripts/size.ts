@@ -113,6 +113,39 @@ export async function discoverEntries(
   return entries;
 }
 
+/**
+ * Cloudflare Pages Functions measured like an entry (`functions/<route>.ts`,
+ * id `functions/<route>`). Each is built the same way as a package subpath;
+ * the gzip number is the Function's initial JavaScript, and chunks it loads
+ * with `import()` are reported as lazy. Cloudflare's own bundler does not
+ * split, so the deployed worker is about the initial plus the lazy size.
+ */
+export const FUNCTION_ROUTES: readonly string[] = Object.freeze(['mcp']);
+
+/** The Function entries that exist under `<root>/functions`. */
+export async function discoverFunctionEntries(
+  root: string,
+  routes: readonly string[] = FUNCTION_ROUTES
+): Promise<SizeEntry[]> {
+  const entries: SizeEntry[] = [];
+  for (const route of routes) {
+    const file = join(root, 'functions', `${route}.ts`);
+    try {
+      await readFile(file);
+    } catch {
+      continue;
+    }
+    entries.push({
+      id: `functions/${route}`,
+      packageName: 'functions',
+      subpath: `./${route}`,
+      file,
+      css: false,
+    });
+  }
+  return entries;
+}
+
 /** `{ "types": …, "default": … }` as a whole `exports` value (no subpath keys). */
 function isConditionMap(value: unknown): boolean {
   return (
@@ -609,9 +642,10 @@ export async function runSize(options: SizeOptions = {}): Promise<SizeRun> {
     await writeFile(budgetsPath, `${JSON.stringify(budgets, null, 2)}\n`);
   }
 
-  const entries = (await discoverEntries(root, budgets.ignore)).filter(
-    (entry) => !options.filter || entry.id.includes(options.filter)
-  );
+  const entries = [
+    ...(await discoverEntries(root, budgets.ignore)),
+    ...(await discoverFunctionEntries(root)),
+  ].filter((entry) => !options.filter || entry.id.includes(options.filter));
   const measured = await mapLimit(entries, options.concurrency ?? 4, async (entry) => ({
     id: entry.id,
     measure: await measureEntry(entry),

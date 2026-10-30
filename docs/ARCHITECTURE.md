@@ -332,7 +332,7 @@ Edge and site files:
 
 | File | What it will hold | Release wave | Decision |
 | --- | --- | --- | --- |
-| `functions/mcp.ts` (planned, PLAN_011) | The remote MCP at texuli.com: stateless Streamable HTTP (`POST`, JSON responses, no session) at `/mcp` and `/.well-known/mcp`, serving only the registry's `edge` and `site` operations, with body, batch, item and time caps, Origin and Host checks, its own security headers, a per-isolate rate limit, and no fetch, storage or secrets; the site also registers WebMCP tools in the page | 0.9.0 | [ADR-018](DECISIONS.md#adr-018-the-remote-mcp-on-pages-functions) |
+| `functions/mcp.ts` (in the repository, not deployed; `site` operations and WebMCP planned, PLAN_011) | The remote MCP at texuli.com: stateless Streamable HTTP (`POST`, JSON responses, no session) at `/mcp` and `/.well-known/mcp`, serving only the registry's `edge` operations (and the planned `site` operations), with body, batch, item and time caps, Origin and Host checks, its own security headers, a per-isolate rate limit, and no fetch, storage or secrets; the site also registers WebMCP tools in the page | 0.9.0 | [ADR-018](DECISIONS.md#adr-018-the-remote-mcp-on-pages-functions) |
 
 ## The website
 
@@ -347,7 +347,7 @@ static site with `client:visible` islands:
 - SEO with compile-time social images.
 
 It imports the workspace packages directly, so a broken component breaks
-`pnpm build`. Two Cloudflare Pages Functions in the repository-root
+`pnpm build`. Cloudflare Pages Functions in the repository-root
 `functions/` run beside the static output:
 - `_middleware.ts` serves Markdown twins of docs pages on an explicit
   `text/markdown` preference, a stripped `robots.txt` to audit tools and a
@@ -356,6 +356,10 @@ It imports the workspace packages directly, so a broken component breaks
   (CSP, and `Vary: Accept` on negotiable docs pages) survive;
 - `api/umami/[[path]].ts` is the same-origin Umami analytics proxy, off
   until the owner provisions it.
+- `mcp.ts` is the remote MCP endpoint for `/mcp` (the middleware routes
+  `/.well-known/mcp` to the same server): `edge` operations only, with its
+  own limits and headers ([SECURITY](SECURITY.md#21-remote-mcp-endpoint)).
+  It is in the repository for release 0.9.0 and not deployed yet.
 
 The pure decisions live in `apps/website/src/lib/` and are tested in
 `apps/website/tests/` ([SECURITY](SECURITY.md#15-website-edge-functions-and-analytics)). Per-route budgets live in

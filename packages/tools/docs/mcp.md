@@ -8,8 +8,9 @@
 > **Status: in development, not released.** The protocol layer, the
 > `@texuli/tools/mcp` export, `texuli mcp` and the `@texuli/mcp` package
 > are new in `0.9.0`, which is in development and not on npm yet. The
-> remote endpoint at texuli.com is a later task of the same plan; nothing
-> here is deployed.
+> remote endpoint for texuli.com is in the repository (see
+> [The remote door](#the-remote-door)) but is not deployed until release
+> 0.9.0 merges to `main`.
 
 ## The local door
 
@@ -46,8 +47,9 @@ on npm.
 `createMcpHandler` turns the [operations registry](ops.md) into an MCP
 server. It is transport-independent and edge-safe (no Node built-ins): one
 JSON-RPC message in, one response out, or nothing for a notification. The
-stdio transport (`runMcpStdio`, `src/mcp/stdio.ts`) uses it, and the planned
-HTTP endpoint will use the same handler in stateless mode.
+stdio transport (`runMcpStdio`, `src/mcp/stdio.ts`) uses it, and the remote
+HTTP endpoint ([The remote door](#the-remote-door)) uses the same handler in
+stateless mode.
 
 ```ts
 import { createMcpHandler } from '@texuli/tools/mcp';
@@ -214,6 +216,46 @@ The stdio transport refuses a message over 2 MiB before parsing it. Each
 operation then enforces its own `limits.inputBytes`, item caps and time
 budget (`input-too-large`, `timeout`). Names are capped at 256 characters,
 URIs at 2,048 and cursors at 512.
+
+## The remote door
+
+`functions/mcp.ts` is a Cloudflare Pages Function that serves this handler
+over stateless Streamable HTTP at `https://texuli.com/mcp`, and the site
+middleware answers `/.well-known/mcp` with the same server
+([ADR-018](../../../docs/DECISIONS.md#adr-018-the-remote-mcp-on-pages-functions)).
+**It is not deployed yet:** it goes live when release 0.9.0 merges to
+`main`. Until then, the URL below answers with the site's 404.
+
+```text
+POST https://texuli.com/mcp
+Content-Type: application/json
+Accept: application/json, text/event-stream
+MCP-Protocol-Version: 2025-11-25
+
+{"jsonrpc":"2.0","id":1,"method":"tools/list"}
+```
+
+- **What it serves:** `createMcpHandler({ mode: 'stateless', runtimes:
+  ['edge'] })`, so every tool, resource, prompt and completion above except
+  the `node` operations (`document.export`: PDF and DOCX), which are not
+  listed and answer `runtime-unavailable`. No handshake is required; send
+  `initialize` if the host wants one. The protocol version comes from the
+  `MCP-Protocol-Version` header (an unsupported one is `400`).
+- **Responses:** JSON only, no SSE stream and no `Mcp-Session-Id`. A
+  notification gets `202`. A batch of up to 10 messages gets an array of
+  the responses to its requests. `GET` gets `405` with a pointer here (an
+  agent user agent gets the server card); `OPTIONS` answers CORS.
+- **Limits:** a body of at most 256 KB (`413`), at most 10 messages per
+  batch, each operation's own caps, a 5 s guard per message (a `tools/call`
+  past it is an `isError` result with code `timeout`), and a best-effort
+  per-client rate limit of 60 messages per minute (`429` with
+  `Retry-After`; every answer carries `RateLimit-Policy` and `RateLimit`).
+- **Browsers:** a request with an `Origin` header must come from
+  texuli.com, a texuli.pages.dev preview or localhost; server-side agents
+  send no `Origin` and are allowed.
+- **Security:** its headers, Host check, counters and the optional
+  Cloudflare rule are in
+  [SECURITY section 21](../../../docs/SECURITY.md#21-remote-mcp-endpoint).
 
 ## Tests
 

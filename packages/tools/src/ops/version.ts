@@ -1,9 +1,9 @@
-import manifest from '../../package.json' with { type: 'json' };
-
 /**
- * The `@texuli/tools` version, read from its package manifest at build time
- * (the published `dist/ops/version.js` sits at the same depth, so it reads
- * the published `package.json`). Every door reports it, e.g. the MCP
- * `serverInfo.version`.
+ * The `@texuli/tools` version that every door reports (e.g. the MCP
+ * `serverInfo.version`). A plain constant rather than a JSON import: import
+ * attributes (`with { type: 'json' }`) are not supported by every bundler
+ * that builds the remote MCP (Cloudflare Pages' Functions build), and a
+ * plain JSON import breaks Node ESM. `tests/ops.test.ts` fails when this
+ * drifts from `packages/tools/package.json`.
  */
-export const TOOLS_VERSION: string = manifest.version;
+export const TOOLS_VERSION = '0.9.0';
