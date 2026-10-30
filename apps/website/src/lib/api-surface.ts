@@ -9,13 +9,13 @@
  *
  * texuli.com is static: every resource is a file the build writes. The
  * files the site's own pages fetch keep their paths (`/theme-catalog.json`
- * …); the build copies each one, byte for byte, under the versioned prefix
- * `/api/v1/`, and writes `/api/index.json` and `/api/health.json`. When
- * Pages Functions run, the middleware answers every `/api/` request: it
- * adds `X-API-Version` and the rate-limit fields, enforces the limit and
- * answers misses with RFC 9457 problem details. When they do not, the
- * `_headers` rule from {@link apiHeaderRules} still gives the files their
- * version header and CORS.
+ * …), and the build writes `/api/index.json` and `/api/health.json`. The
+ * versioned `/api/v1/` paths are not files: the middleware, which answers
+ * every `/api/` request on Cloudflare Pages, maps each one to its source
+ * file ({@link aliasSource}) and reads it from `env.ASSETS`, then adds
+ * `X-API-Version` and the rate-limit fields, enforces the limit and
+ * answers misses with RFC 9457 problem details. Without Functions only the
+ * static files exist, with the `_headers` rule from {@link apiHeaderRules}.
  */
 
 /**
@@ -78,7 +78,7 @@ export interface ApiResource {
   summary: string;
   /** The unversioned path the build writes (`{id}` for a path parameter). */
   path: string;
-  /** The versioned alias, the same bytes. */
+  /** The versioned alias, the same bytes (served by the middleware, not a file). */
   alias: string;
   /** The operationId of the unversioned path; the alias appends `V1`. */
   operationId: string;
@@ -95,8 +95,9 @@ const theme = { name: 'id', description: 'A library theme id, as listed by listT
 
 /**
  * Every resource, in the order the index, the OpenAPI document and the
- * portal list them. A new JSON file the site serves joins here, and the
- * build copies it under `/api/v1/`, describes it and checks it is built.
+ * portal list them. A new JSON file the site serves joins here: the
+ * middleware serves it under `/api/v1/`, and the build describes it and
+ * checks its source file is built.
  */
 export const API_RESOURCES: readonly ApiResource[] = Object.freeze([
   {
@@ -205,26 +206,29 @@ export function fillPath(template: string, value?: string): string {
   return value === undefined ? template : template.replace(/\{[a-z]+\}/, value);
 }
 
+/** A path parameter value: lowercase words joined by single hyphens. */
+const PARAMETER_VALUE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
 /**
- * The `/api/v1/` copies the build writes: alias path → source path, for
- * every resource (a parameterized one once per value in `values`).
+ * The built file an `/api/v1/` alias reads, or null when the path is not an
+ * alias of any resource. The aliases are never written into `dist`: the
+ * middleware maps each one to its source file and reads it from
+ * `env.ASSETS` (the same deployment, not a network fetch). A path
+ * parameter must be a plain id; anything else (dots, slashes, encoded
+ * bytes, upper case) maps to nothing, so no alias can name another file.
  */
-export function aliasCopies(
-  values: Readonly<Record<string, readonly string[]>>
-): { alias: string; source: string }[] {
-  const copies: { alias: string; source: string }[] = [];
+export function aliasSource(pathname: string): string | null {
   for (const resource of API_RESOURCES) {
     if (!resource.parameter) {
-      copies.push({ alias: resource.alias, source: resource.path });
+      if (pathname === resource.alias) return resource.path;
       continue;
     }
-    for (const value of values[resource.key] ?? [])
-      copies.push({
-        alias: fillPath(resource.alias, value),
-        source: fillPath(resource.path, value),
-      });
+    const [before, after] = resource.alias.split(/\{[a-z]+\}/) as [string, string];
+    if (!pathname.startsWith(before) || !pathname.endsWith(after)) continue;
+    const value = pathname.slice(before.length, pathname.length - after.length);
+    if (PARAMETER_VALUE.test(value)) return fillPath(resource.path, value);
   }
-  return copies;
+  return null;
 }
 
 /**
@@ -243,12 +247,16 @@ export function isApiPath(pathname: string): boolean {
 }
 
 /**
- * The file a directory-style API URL means: `/api` and `/api/` are the
- * index, as are `/api/v1` and `/api/v1/`. Any other path is itself.
+ * The built file an `/api/` URL reads: `/api`, `/api/`, `/api/v1` and
+ * `/api/v1/` are the index; an `/api/v1/` path is its alias's source file
+ * ({@link aliasSource}), or null when it names no resource (answered 404
+ * without touching the asset store); any other path is itself (the static
+ * `/api/index.json` and `/api/health.json`).
  */
-export function apiAssetPath(pathname: string): string {
+export function apiAssetPath(pathname: string): string | null {
   if (pathname === '/api' || pathname === '/api/') return API_PATHS.index;
-  if (pathname === API_PREFIX || pathname === `${API_PREFIX}/`) return `${API_PREFIX}/index.json`;
+  if (pathname === API_PREFIX || pathname === `${API_PREFIX}/`) return API_PATHS.index;
+  if (pathname.startsWith(`${API_PREFIX}/`)) return aliasSource(pathname);
   return pathname;
 }
 

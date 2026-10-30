@@ -134,7 +134,7 @@ export function webApiJsonLd(description: string) {
         potentialAction: {
           '@type': 'ConsumeAction',
           target: [
-            { '@type': 'EntryPoint', urlTemplate: `${SITE_URL}/api/v1/index.json` },
+            { '@type': 'EntryPoint', urlTemplate: `${SITE_URL}/api/index.json` },
             { '@type': 'EntryPoint', urlTemplate: `${SITE_URL}/mcp`, httpMethod: 'POST' },
           ],
         },

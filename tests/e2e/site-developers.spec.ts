@@ -25,9 +25,10 @@ import {
  *    real middleware; outside links only to the repository and npm);
  * 2. /openapi.json parses, describes POST /mcp, and passes the structural
  *    check against `dist` (every described path is built);
- * 3. /api/v1/ answers through the real middleware (`functions/_middleware.ts`)
- *    with X-API-Version and the RateLimit fields, a miss is problem+json,
- *    and the static `_headers` rule alone still gives X-API-Version.
+ * 3. /api/v1/ answers through the real middleware (`functions/_middleware.ts`),
+ *    which maps each alias to its source file in `dist` (no alias file is
+ *    built), with X-API-Version and the RateLimit fields; a miss is
+ *    problem+json; the static API files keep the `_headers` rule.
  *
  * A local server cannot run Cloudflare Pages Functions, so the HTTP checks
  * call `onRequest` in front of `dist`, with the `_headers` rules (exact
@@ -241,7 +242,7 @@ test('/api/v1/ answers through the middleware with X-API-Version and the rate-li
     expect(response.headers.get('ratelimit')).toMatch(/^"api";r=\d+;t=\d+$/);
     expect(response.headers.get('content-type')).toBe('application/json; charset=utf-8');
     const body = await response.text();
-    // The alias is the site file, byte for byte.
+    // The alias is the site file, byte for byte, read through the mapping.
     expect(body, resource.alias).toBe(readFileSync(join(DIST, resource.path.slice(1)), 'utf8'));
     JSON.parse(body);
   }
@@ -266,13 +267,18 @@ test('/api/v1/ answers through the middleware with X-API-Version and the rate-li
   expect(write.status).toBe(405);
 });
 
-test('without the middleware, the _headers rule still gives /api/ files X-API-Version and CORS', () => {
-  const response = asset(new Request(`${SITE}/api/v1/catalog.json`));
-  expect(response.status).toBe(200);
-  expect(response.headers.get('x-api-version')).toBe(API_VERSION);
-  expect(response.headers.get('access-control-allow-origin')).toBe('*');
-  // A static rule cannot count requests: no rate-limit fields here.
-  expect(response.headers.get('ratelimit')).toBeNull();
+test('the aliases exist only through the middleware; the static API files keep the _headers rule', () => {
+  // The build writes no alias file: the middleware reads each alias's source.
+  expect(existsSync(join(DIST, 'api', 'v1'))).toBe(false);
+  expect(asset(new Request(`${SITE}/api/v1/catalog.json`)).status).toBe(404);
+  for (const path of ['/api/index.json', '/api/health.json']) {
+    const response = asset(new Request(`${SITE}${path}`));
+    expect(response.status, path).toBe(200);
+    expect(response.headers.get('x-api-version'), path).toBe(API_VERSION);
+    expect(response.headers.get('access-control-allow-origin'), path).toBe('*');
+    // A static rule cannot count requests: no rate-limit fields here.
+    expect(response.headers.get('ratelimit'), path).toBeNull();
+  }
 });
 
 test('the built ARD catalog lists the npm packages', async () => {

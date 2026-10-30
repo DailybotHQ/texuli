@@ -7,6 +7,8 @@
  * middleware route, the ARD and API catalogs, and the WebAPI JSON-LD. The
  * built files are checked by tests/e2e/site-developers.spec.ts.
  */
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { TOOLS_VERSION, texuliOps } from '@texuli/tools/ops';
 import { describe, expect, it } from 'vitest';
 import { createApiLimiter, handleApiRequest } from '../../../functions/_lib/api-endpoint.ts';
@@ -19,11 +21,12 @@ import {
   API_RATE_LIMIT,
   API_RESOURCES,
   API_VERSION,
-  aliasCopies,
   aliasOperationId,
+  aliasSource,
   apiAssetPath,
   apiHeaderRules,
   apiProblem,
+  fillPath,
   isApiPath,
   problemInstance,
 } from '../src/lib/api-surface.ts';
@@ -94,21 +97,30 @@ describe('the API surface (api-surface.ts)', () => {
     expect(API_VERSION).toBe(TOOLS_VERSION);
   });
 
-  it('copies every resource under /api/v1/, a parameterized one per value', () => {
-    const copies = aliasCopies({ theme: ['ocean', 'volt-green'] });
-    expect(copies).toContainEqual({
-      alias: '/api/v1/catalog.json',
-      source: '/catalog/catalog.json',
-    });
-    expect(copies).toContainEqual({ alias: '/api/v1/twins.json', source: '/md-manifest.json' });
-    expect(copies).toContainEqual({
-      alias: '/api/v1/themes/volt-green.json',
-      source: '/theme-data/volt-green.json',
-    });
-    expect(copies).toHaveLength(API_RESOURCES.length + 1);
-    for (const copy of copies) expect(copy.alias.startsWith('/api/v1/')).toBe(true);
-    // No parameter values: the parameterized resource is skipped, not invented.
-    expect(aliasCopies({}).some((copy) => copy.alias.includes('{'))).toBe(false);
+  it('maps every /api/v1/ alias to its source file, a parameter only when it is a plain id', () => {
+    for (const resource of API_RESOURCES) {
+      const value = resource.parameter ? 'volt-green' : undefined;
+      expect(aliasSource(fillPath(resource.alias, value)), resource.alias).toBe(
+        fillPath(resource.path, value)
+      );
+    }
+    expect(aliasSource('/api/v1/index.json')).toBe('/api/index.json');
+    expect(aliasSource('/api/v1/twins.json')).toBe('/md-manifest.json');
+    expect(aliasSource('/api/v1/themes/ocean.json')).toBe('/theme-data/ocean.json');
+    // Hostile or unknown ids map to nothing: no alias can name another file.
+    for (const path of [
+      '/api/v1/themes/../../_headers.json',
+      '/api/v1/themes/a/b.json',
+      '/api/v1/themes/.json',
+      '/api/v1/themes/Ocean.json',
+      '/api/v1/themes/ocean%2F..json',
+      '/api/v1/themes/-ocean.json',
+      '/api/v1/themes/ocean.json.json',
+      '/api/v1/nope.json',
+      '/api/v1/catalog.json/',
+      '/api/catalog.json',
+    ])
+      expect(aliasSource(path), path).toBeNull();
   });
 
   it('routes /api paths to the envelope, never the analytics proxy', () => {
@@ -118,9 +130,11 @@ describe('the API surface (api-surface.ts)', () => {
       expect(isApiPath(path), path).toBe(false);
     expect(apiAssetPath('/api')).toBe('/api/index.json');
     expect(apiAssetPath('/api/')).toBe('/api/index.json');
-    expect(apiAssetPath('/api/v1')).toBe('/api/v1/index.json');
-    expect(apiAssetPath('/api/v1/')).toBe('/api/v1/index.json');
-    expect(apiAssetPath('/api/v1/themes.json')).toBe('/api/v1/themes.json');
+    expect(apiAssetPath('/api/v1')).toBe('/api/index.json');
+    expect(apiAssetPath('/api/v1/')).toBe('/api/index.json');
+    expect(apiAssetPath('/api/v1/themes.json')).toBe('/theme-catalog.json');
+    expect(apiAssetPath('/api/v1/nope.json')).toBeNull();
+    expect(apiAssetPath('/api/health.json')).toBe('/api/health.json');
   });
 
   it('builds RFC 9457 problems with a typed error object', () => {
@@ -236,6 +250,32 @@ describe('the OpenAPI document (openapi.ts)', () => {
     expect(checkOpenApi(grown as unknown as Record<string, unknown>, allBuilt)).toEqual([]);
   });
 
+  it('accepts an /api/v1/ alias only when its source file is built (no alias file needed)', () => {
+    // A build with the site files, the static API files and no alias file at all.
+    const built = new Set([
+      ...API_RESOURCES.filter((resource) => !resource.parameter).map((resource) => resource.path),
+      '/theme-data/ocean.json',
+    ]);
+    const options = { ...allBuilt, exists: (path: string) => built.has(path) };
+    expect(checkOpenApi(doc as unknown as Record<string, unknown>, options)).toEqual([]);
+    for (const path of built) expect(path.startsWith('/api/v1/')).toBe(false);
+    built.delete('/md-manifest.json');
+    expect(checkOpenApi(doc as unknown as Record<string, unknown>, options)).toEqual([
+      '/api/v1/twins.json: /api/v1/twins.json reads /md-manifest.json, which is not built',
+      '/md-manifest.json: /md-manifest.json is not built',
+    ]);
+    // A described alias that maps to no resource is refused.
+    const stray = structuredClone(doc) as unknown as Doc;
+    stray.paths['/api/v1/stray.json'] = structuredClone(
+      stray.paths['/api/v1/twins.json']
+    ) as Record<string, Operation>;
+    (stray.paths['/api/v1/stray.json']?.get as Operation).operationId = 'getStray';
+    built.add('/md-manifest.json');
+    expect(checkOpenApi(stray as unknown as Record<string, unknown>, options)).toEqual([
+      '/api/v1/stray.json: /api/v1/stray.json is not an alias of any resource',
+    ]);
+  });
+
   it('reports duplicate operationIds, unresolved refs, untyped 2xx and unbuilt paths', () => {
     const broken = structuredClone(doc) as unknown as Doc;
     const catalog = broken.paths['/catalog/catalog.json']?.get as Operation;
@@ -247,14 +287,14 @@ describe('the OpenAPI document (openapi.ts)', () => {
     (health.responses['200'] as { content: unknown }).content = {};
     const problems = checkOpenApi(broken as unknown as Record<string, unknown>, {
       ...allBuilt,
-      exists: (path) => path !== '/api/v1/themes/ocean.json',
+      exists: (path) => path !== '/theme-data/ocean.json',
     });
     expect(problems).toEqual(
       expect.arrayContaining([
         'get /catalog/catalog.json: duplicate operationId getCatalogV1',
         'unresolved $ref #/components/schemas/Nope',
         'get /api/health.json: no application/json schema on its 2xx response',
-        '/api/v1/themes/{id}.json: /api/v1/themes/ocean.json is not built',
+        '/api/v1/themes/{id}.json: /api/v1/themes/ocean.json reads /theme-data/ocean.json, which is not built',
       ])
     );
     expect(
@@ -283,10 +323,11 @@ describe('the OpenAPI document (openapi.ts)', () => {
 // ---------------------------------------------------------------------------
 // The edge envelope
 
+/** The static files: no /api/v1/ alias is a file. */
 const FILES: Record<string, string> = {
   '/api/index.json': '{"name":"index"}',
-  '/api/v1/index.json': '{"name":"index v1"}',
-  '/api/v1/catalog.json': '{"entries":[]}',
+  '/catalog/catalog.json': '{"entries":[]}',
+  '/theme-data/ocean.json': '{"id":"ocean"}',
 };
 
 function deps(options: { capacity?: number; throws?: boolean } = {}) {
@@ -318,9 +359,11 @@ function deps(options: { capacity?: number; throws?: boolean } = {}) {
 const request = (path: string, init: RequestInit = {}) => new Request(`${ORIGIN}${path}`, init);
 
 describe('the /api/ envelope (functions/_lib/api-endpoint.ts)', () => {
-  it('serves a file as JSON with the version, rate-limit, CORS and security headers', async () => {
-    const { deps: d } = deps();
+  it('serves an alias from its source file with the version, rate-limit, CORS and security headers', async () => {
+    const { deps: d, fetched } = deps();
     const response = await handleApiRequest(request('/api/v1/catalog.json'), d);
+    // The alias is read from the site file through the asset store.
+    expect(fetched.map((entry) => entry.path)).toEqual(['/catalog/catalog.json']);
     expect(response.status).toBe(200);
     expect(await response.text()).toBe('{"entries":[]}');
     const h = response.headers;
@@ -351,8 +394,10 @@ describe('the /api/ envelope (functions/_lib/api-endpoint.ts)', () => {
     for (const [path, body] of [
       ['/api', '{"name":"index"}'],
       ['/api/', '{"name":"index"}'],
-      ['/api/v1', '{"name":"index v1"}'],
-      ['/api/v1/', '{"name":"index v1"}'],
+      ['/api/v1', '{"name":"index"}'],
+      ['/api/v1/', '{"name":"index"}'],
+      ['/api/v1/index.json', '{"name":"index"}'],
+      ['/api/v1/themes/ocean.json', '{"id":"ocean"}'],
     ] as const) {
       const response = await handleApiRequest(request(path), d);
       expect(await response.text(), path).toBe(body);
@@ -360,7 +405,7 @@ describe('the /api/ envelope (functions/_lib/api-endpoint.ts)', () => {
   });
 
   it('answers a miss with problem+json, never the HTML 404, for every client', async () => {
-    const { deps: d } = deps();
+    const { deps: d, fetched } = deps();
     for (const path of ['/api/nope', '/api/v1/themes/../../etc/passwd', '/api/v1/%00.json']) {
       const response = await handleApiRequest(request(path), d);
       expect(response.status, path).toBe(404);
@@ -371,6 +416,9 @@ describe('the /api/ envelope (functions/_lib/api-endpoint.ts)', () => {
       // biome-ignore lint/suspicious/noControlCharactersInRegex: asserting their absence.
       expect(body.instance).not.toMatch(/[\u0000-\u001f]/);
     }
+    // Unmapped /api/v1/ paths never reach the asset store; other /api/ paths
+    // (the traversal is normalized by URL parsing to /api/etc/passwd) are looked up and miss.
+    expect(fetched.map((entry) => entry.path)).toEqual(['/api/nope', '/api/etc/passwd']);
   });
 
   it('refuses writes with 405 and Allow, and answers a CORS preflight', async () => {
@@ -491,6 +539,21 @@ describe('the catalogs and the JSON-LD', () => {
     expect(links).toContainEqual(
       expect.objectContaining({ rel: 'status', href: `${ORIGIN}/api/health.json` })
     );
+  });
+
+  it('static discovery documents link only built files, never a Function-only /api/v1/ alias', () => {
+    const llms = readFileSync(
+      fileURLToPath(new URL('../public/llms.txt', import.meta.url)),
+      'utf8'
+    );
+    const documents = [
+      JSON.stringify(apiCatalog({ origin: ORIGIN, openapi: true })),
+      JSON.stringify(aiCatalog({ origin: ORIGIN, openapi: true })),
+      llms,
+      JSON.stringify(webApiJsonLd('x')),
+    ];
+    for (const text of documents) expect(text).not.toMatch(/https:\/\/texuli\.com\/api\/v1\//);
+    expect(llms).toContain('(https://texuli.com/api/index.json)');
   });
 
   it('describes the API as a WebAPI on /developers/', () => {

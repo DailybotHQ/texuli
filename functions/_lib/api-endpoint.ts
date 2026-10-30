@@ -6,7 +6,9 @@
  * `/api/…` request here before any other shaping.
  *
  * The resources are files the build writes (`src/lib/api-surface.ts`).
- * This envelope adds what a static file cannot carry: the per-client token
+ * The `/api/v1/` aliases are not: each maps to its source file
+ * (`aliasSource`), read from `env.ASSETS` (the same deployment, no network
+ * fetch). This envelope also adds what a static file cannot carry: the per-client token
  * bucket of the remote MCP (`createTokenBucket` in `mcp-endpoint.ts`,
  * policy `"api";q=300;w=60`) with its `RateLimit-Policy` and `RateLimit`
  * fields and a `429` with `Retry-After`, RFC 9457 problem details for
@@ -104,9 +106,13 @@ export async function handleApiRequest(request: Request, deps: ApiEndpointDeps):
     const value = request.headers.get(name);
     if (value !== null) forwarded.set(name, value);
   }
+  // An /api/v1/ alias is not a file: it reads its source file. A path that
+  // maps to nothing is a miss without touching the asset store.
+  const assetPath = apiAssetPath(url.pathname);
+  if (assetPath === null) return problem('resource_not_found', url, method, limits);
   let asset: Response;
   try {
-    asset = await deps.fetchAsset(apiAssetPath(url.pathname), forwarded);
+    asset = await deps.fetchAsset(assetPath, forwarded);
   } catch {
     return problem('internal_error', url, method, limits);
   }

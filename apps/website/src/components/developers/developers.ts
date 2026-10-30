@@ -30,7 +30,7 @@ export const PATHS = API_PATHS;
 export const PREFIX = API_PREFIX;
 export const VERSIONING = API_VERSIONING;
 
-/** One endpoint row: the versioned path first, the site file it copies second. */
+/** One endpoint row: the versioned path first, the site file it reads second. */
 export interface EndpointRow {
   key: string;
   title: string;
@@ -91,9 +91,9 @@ export const AGENT_FILES = [
     note: 'every endpoint above and POST /mcp',
   },
   {
-    href: `${API_PREFIX}/index.json`,
+    href: API_PATHS.index,
     label: 'API index',
-    note: 'the endpoints with their operationIds, as JSON',
+    note: `the ${API_PREFIX}/ endpoints with their operationIds, as JSON`,
   },
   { href: DISCOVERY_PATHS.llms, label: 'llms.txt', note: 'the site guide for language models' },
   {
@@ -102,9 +102,9 @@ export const AGENT_FILES = [
     note: 'every component doc in one file',
   },
   {
-    href: `${API_PREFIX}/twins.json`,
+    href: '/md-manifest.json',
     label: 'Markdown twins manifest',
-    note: 'every page and its .md twin (or send Accept: text/markdown to a page URL)',
+    note: `every page and its .md twin, versioned at ${API_PREFIX}/twins.json (or send Accept: text/markdown to a page URL)`,
   },
   { href: DISCOVERY_PATHS.skill, label: 'The Texuli skill', note: 'install it in a coding agent' },
   { href: DISCOVERY_PATHS.apiCatalog, label: 'API catalog', note: 'RFC 9727 linkset' },

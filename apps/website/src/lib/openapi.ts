@@ -6,7 +6,8 @@
  * `@texuli/tools` registry, examples read from the built files) and writes
  * the documents into `dist/`; {@link checkOpenApi} then fails the build if
  * an operationId repeats, a `$ref` does not resolve or a described path is
- * not built. Nothing here is hand-copied into `public/`.
+ * not served (a file path must be built; an `/api/v1/` alias must map to a
+ * built source file, which the middleware reads). Nothing here is hand-copied into `public/`.
  *
  * Shared pieces (the problem model, the rate-limit and version headers, the
  * JSON-RPC envelope) are written once and referenced by every operation, so
@@ -23,6 +24,7 @@ import {
   API_VERSIONING,
   type ApiResource,
   aliasOperationId,
+  aliasSource,
   apiProblem,
 } from './api-surface.ts';
 
@@ -677,7 +679,7 @@ export function buildOpenApi(facts: OpenApiFacts): Record<string, unknown> {
       description: [
         `**${API_RELEASE_STATUS.note}**`,
         '',
-        'texuli.com is a static site on Cloudflare Pages: every GET endpoint is a file the build writes, fronted by an edge middleware. The endpoints under /api/v1/ are the same bytes as the files the site fetches, under a versioned prefix.',
+        'texuli.com is a static site on Cloudflare Pages: every GET endpoint is a file the build writes, fronted by an edge middleware. The endpoints under /api/v1/ are served by that middleware: each reads the file the site itself fetches, byte for byte, under a versioned prefix.',
         '',
         '## Authentication',
         '',
@@ -820,7 +822,9 @@ export interface OpenApiCheckOptions {
 /**
  * The structural problems of a document: duplicate or missing operationIds,
  * operations without a typed 2xx JSON schema, unresolved `$ref`s, and
- * described paths the build does not serve. An empty list passes.
+ * described paths the build does not serve: a file path must exist, and an
+ * `/api/v1/` alias must map (`aliasSource`) to a file that exists. An empty
+ * list passes.
  */
 export function checkOpenApi(
   document: Record<string, unknown>,
@@ -851,8 +855,19 @@ export function checkOpenApi(
       ? options.expand(path).map((value) => path.replace(/\{[a-z]+\}/i, value))
       : [path];
     if (concrete.length === 0) problems.push(`${path}: no parameter values to check`);
-    for (const candidate of concrete)
-      if (!options.exists(candidate)) problems.push(`${path}: ${candidate} is not built`);
+    for (const candidate of concrete) {
+      // An /api/v1/ alias is served by the middleware from its source file:
+      // it passes when the mapping names a file the build holds.
+      const alias = candidate.startsWith(`${API_PREFIX}/`);
+      const file = alias ? aliasSource(candidate) : candidate;
+      if (file === null) problems.push(`${path}: ${candidate} is not an alias of any resource`);
+      else if (!options.exists(file))
+        problems.push(
+          alias
+            ? `${path}: ${candidate} reads ${file}, which is not built`
+            : `${path}: ${candidate} is not built`
+        );
+    }
   }
   for (const pointer of new Set(collectRefs(document)))
     if (resolvePointer(document, pointer) === undefined)

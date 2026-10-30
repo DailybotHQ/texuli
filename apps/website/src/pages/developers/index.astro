@@ -82,9 +82,9 @@ curl -sI ${SITE_ORIGIN}${PATHS.health}`}</code></pre>
 
   <h2 id="endpoints">Endpoints</h2>
   <p>
-    Each endpoint is a file the build writes. The <code>{PREFIX}/</code> path is the same bytes
-    as the file the site itself fetches; pin the versioned path, because the site file follows the
-    site.
+    Each endpoint reads a file the build writes: the edge serves a <code>{PREFIX}/</code> path
+    from the file the site itself fetches, byte for byte. Pin the versioned path, because the site
+    file follows the site.
   </p>
   <div class="table-wrap" role="region" aria-label="Endpoints" tabindex="0">
     <table data-api-endpoints>

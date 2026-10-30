@@ -142,9 +142,9 @@ export function siteLlmsSections(siteUrl: string): SiteLlmsSection[] {
         },
         {
           title: 'API index',
-          href: abs('/api/v1/index.json'),
+          href: abs('/api/index.json'),
           description:
-            'Every JSON endpoint with its operationId, the limits and the versioning policy.',
+            'Every JSON endpoint (the versioned /api/v1/ URLs) with its operationId, the limits and the versioning policy.',
         },
       ],
     },

@@ -256,7 +256,9 @@ export function apiCatalog(facts: Pick<DiscoveryFacts, 'origin' | 'openapi'>): u
     },
     {
       rel: 'item',
-      href: at(`${API_PREFIX}/index.json`),
+      // The static index (built everywhere); it lists the /api/v1/ URLs,
+      // which only the middleware serves.
+      href: at(API_PATHS.index),
       type: JSON_TYPE,
       title: 'API index: every endpoint with its operationId',
     },

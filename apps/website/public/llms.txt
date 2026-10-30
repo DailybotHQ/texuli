@@ -102,7 +102,7 @@ Machine-readable documentation served as static files.
 - [Catalog llms-full.txt](https://texuli.com/llms/llms-full.txt): Every component doc in one file.
 - [Catalog JSON](https://texuli.com/catalog/catalog.json): The full catalog manifest as JSON.
 - [OpenAPI description](https://texuli.com/openapi.json): OpenAPI 3.1 for the read-only JSON API under /api/v1/ and POST /mcp (in development until 0.9.0).
-- [API index](https://texuli.com/api/v1/index.json): Every JSON endpoint with its operationId, the limits and the versioning policy.
+- [API index](https://texuli.com/api/index.json): Every JSON endpoint (the versioned /api/v1/ URLs) with its operationId, the limits and the versioning policy.
 
 ## Tools
 

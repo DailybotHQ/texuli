@@ -1,30 +1,31 @@
 /**
  * Build integration for the public JSON API (PLAN_011 T-ar-api). After
- * `astro build`, and after the Markdown twins (whose `md-manifest.json` it
- * copies), it writes into `dist/`:
+ * `astro build`, and after the Markdown twins (whose `md-manifest.json` the
+ * examples read), it writes into `dist/`:
  *
  * - `/api/index.json` and `/api/health.json`;
- * - every `/api/v1/` alias, byte for byte the site file it names
- *   (`src/lib/api-surface.ts`, `aliasCopies`);
  * - `/openapi.json` (`src/lib/openapi.ts`), with examples read from the
  *   built files and the MCP tools from the `@texuli/tools` registry (every
  *   operation the remote door serves, so a new one appears without an
  *   edit here).
  *
- * Then it runs `checkOpenApi` over the finished build and fails it on a
- * duplicate operationId, an unresolved `$ref` or a described path that is
- * not built. Runs before the agent discovery integration (which advertises
- * `service-desc` only when `/openapi.json` exists) and the CSP integration
- * (which writes the `_headers` rules from `apiHeaderRules`).
+ * The `/api/v1/` aliases are not written: the middleware maps each one to
+ * its source file and reads it from `env.ASSETS`
+ * (`functions/_lib/api-endpoint.ts`). Then it runs `checkOpenApi` over the
+ * finished build and fails it on a duplicate operationId, an unresolved
+ * `$ref`, a described file that is not built or an alias whose source file
+ * is not built. Runs before the agent discovery integration (which
+ * advertises `service-desc` only when `/openapi.json` exists) and the CSP
+ * integration (which writes the `_headers` rules from `apiHeaderRules`).
  */
 import { existsSync, statSync } from 'node:fs';
-import { copyFile, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { TOOLS_VERSION, texuliOps } from '@texuli/tools/ops';
 import type { AstroIntegration } from 'astro';
 import { MCP_SERVER_DATA } from '../components/mcp-server/mcp-server-data.ts';
-import { API_PATHS, API_PREFIX, aliasCopies } from '../lib/api-surface.ts';
+import { API_PATHS, API_PREFIX } from '../lib/api-surface.ts';
 import { MCP_BATCH_MAX, MCP_BODY_MAX, MCP_RATE_LIMIT } from '../lib/mcp-limits.ts';
 import {
   apiEndpoints,
@@ -142,12 +143,6 @@ export function apiSurfaceIntegration(): AstroIntegration {
           )
         );
         const themeIds = await builtThemeIds(out);
-        const copies = aliasCopies({ theme: themeIds });
-        for (const copy of copies) {
-          const target = join(out, copy.alias.slice(1));
-          await mkdir(dirname(target), { recursive: true });
-          await copyFile(join(out, copy.source.slice(1)), target);
-        }
         const document = buildOpenApi(facts);
         await write(API_PATHS.openapi, json(document));
         const problems = checkOpenApi(document, {
@@ -162,7 +157,7 @@ export function apiSurfaceIntegration(): AstroIntegration {
           throw new Error(`/openapi.json does not match the build:\n- ${problems.join('\n- ')}`);
         const operations = Object.keys(document.paths as object).length;
         logger.info(
-          `/openapi.json written (${operations} paths, ${facts.operations.length} MCP tools); ${copies.length} ${API_PREFIX}/ aliases, ${API_PATHS.index} and ${API_PATHS.health}.`
+          `/openapi.json written (${operations} paths, ${facts.operations.length} MCP tools), ${API_PATHS.index} and ${API_PATHS.health}; the ${API_PREFIX}/ aliases are served by the middleware from their source files (none written).`
         );
       },
     },
