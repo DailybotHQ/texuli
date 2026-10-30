@@ -429,6 +429,13 @@
     background: var(--tx-surface, Canvas);
   }
 
+  /* `stickyFooterUnstyled`: the snippet draws its own footer (G95). */
+  .tx-mobile-frame__footer[data-unstyled] {
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+
   /* A footer snippet that renders nothing leaves no strip (G68). */
   .tx-mobile-frame__footer[data-empty],
   .tx-mobile-frame__footer:empty {

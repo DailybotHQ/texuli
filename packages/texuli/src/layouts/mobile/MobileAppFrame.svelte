@@ -22,6 +22,13 @@ type OwnProps = {
    * strip is hidden (`hidden`, `data-empty`).
    */
   stickyFooter?: Snippet;
+  /**
+   * Drop the footer strip's padding, top border and background, so the
+   * `stickyFooter` snippet draws its own footer. It keeps its place (between
+   * the screen and the bottom nav, outside the scroll region) and still hides
+   * while it renders nothing. Default `false`.
+   */
+  stickyFooterUnstyled?: boolean;
   children: Snippet;
   /** The skip link's text. Default "Skip to content". */
   skipLabel?: string;
@@ -43,6 +50,7 @@ let {
   header,
   bottomNav,
   stickyFooter,
+  stickyFooterUnstyled = false,
   children,
   skipLabel: skipLabelProp,
   mainId,
@@ -128,6 +136,7 @@ function focusScreen(event: MouseEvent): void {
       class="tx-mobile-frame__footer"
       data-tx-mobile-frame-footer=""
       data-empty={footerEmpty ? '' : undefined}
+      data-unstyled={stickyFooterUnstyled ? '' : undefined}
       hidden={footerEmpty}
     >{@render stickyFooter()}</div>
   {/if}
