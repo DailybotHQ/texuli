@@ -524,8 +524,8 @@
       "note": "FIX-port-compact: buildLibraryTheme without defineTheme in prod path. Measured ~5.71 KiB. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 5,904 B + 4% headroom so platform drift does not flip it. PLAN_010 T-release-060 (2026-10-29): 6144 -> 6080 B, tightened to measured + 4% (measured 5,843 B)."
     },
     "@texuli/tokens/contract": {
-      "gzip": 7616,
-      "note": "FIX-tokens-entry-weight: roles, var names, validateTheme/defineTheme. Measured 7,288 B. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 7,347 B + 4% headroom so platform drift does not flip it. PLAN_010 T-release-060 (2026-10-29): 7680 -> 7616 B, tightened to measured + 4% (measured 7,288 B)."
+      "gzip": 8192,
+      "note": "FIX-tokens-entry-weight: roles, var names, validateTheme/defineTheme. Measured 7,288 B. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 7,347 B + 4% headroom so platform drift does not flip it. PLAN_010 T-release-060 (2026-10-29): 7680 -> 7616 B, tightened to measured + 4% (measured 7,288 B). PLAN_011 T-tokens-v2 (ADR-020): 7616 -> 8192 B, measured + 4% after THEME_JSON_SCHEMA lists the token contract v2 system vocabulary (definitions.systemTokens, 151 names); measured 7,874 B."
     },
     "@texuli/tokens/css": {
       "gzip": 6111,
@@ -542,6 +542,27 @@
     "@texuli/tokens/palette": {
       "gzip": 4352,
       "note": "FIX-tokens-palette-subpath: OKLCH/contrast/scale/chart derivation only; no library port/expand. Measured 4,283 B (pnpm size)."
+    },
+    "@texuli/tokens/base.css": {
+      "gzip": 64,
+      "cssGzip": 4928,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new exact row (was the @texuli/tokens/* default, which caps JS only); measured 0 B gzip and 4,723 B CSS gzip with the token contract v2 system families (123 defaults) and component token defaults (333), cap = measured + 4% rounded up to 64 B. Before this task: about 1.64 KiB CSS gzip (pnpm size)."
+    },
+    "@texuli/tokens/components": {
+      "gzip": 4736,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new row for the component token registry (48 components covering the 41 styled texuli subpaths, 333 tokens) and its JSON Schema; measured 4,523 B, cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/tokens/data-viz": {
+      "gzip": 4032,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new row for complete chart tokens for any theme (deriveChartTokens over the palette); measured 3,838 B, cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/tokens/renames": {
+      "gzip": 448,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new row for the machine-readable rename list and its JSON Schema (empty list); measured 424 B, cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/tokens/system": {
+      "gzip": 4160,
+      "note": "PLAN_011 T-tokens-v2 (ADR-020): new row for the token contract v2 system families with defaults and descriptions; measured 3,993 B, cap = measured + 4% rounded up to 64 B."
     },
     "texuli": {
       "gzip": 217920,
@@ -751,8 +772,8 @@
     },
     "@texuli/astro/styles.css": {
       "gzip": 64,
-      "cssGzip": 2624,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 0 B gzip, 1,985 B CSS, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): CSS 2112 -> 2624 B, measured + 4% after the @texuli/tokens motion custom properties in base.css (ADR-013) and the 0s reduced-motion resets (G78); measured 2,488 B."
+      "cssGzip": 5760,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 0 B gzip, 1,985 B CSS, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): CSS 2112 -> 2624 B, measured + 4% after the @texuli/tokens motion custom properties in base.css (ADR-013) and the 0s reduced-motion resets (G78); measured 2,488 B. PLAN_011 T-tokens-v2 (ADR-020): CSS 2624 -> 5760 B, measured + 4% after @texuli/tokens/base.css declares the token contract v2 system families and component token defaults; measured 5,515 B."
     },
     "@texuli/astro/layouts/ContentLayout": {
       "gzip": 64,
@@ -964,8 +985,8 @@
     },
     "@texuli/slides/styles.css": {
       "gzip": 64,
-      "cssGzip": 5440,
-      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 4,741 B CSS gzip on the final PLAN_008 stage, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): CSS 4931 -> 5632 B, measured + 4% after the @texuli/tokens motion custom properties in base.css (ADR-013) and the 0s reduced-motion resets (G78); measured 5,411 B. PLAN_010 T-release-060 (2026-10-29): CSS 5632 -> 5440 B, tightened to measured + 4% (measured 5,216 B)."
+      "cssGzip": 8576,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 4,741 B CSS gzip on the final PLAN_008 stage, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): CSS 4931 -> 5632 B, measured + 4% after the @texuli/tokens motion custom properties in base.css (ADR-013) and the 0s reduced-motion resets (G78); measured 5,411 B. PLAN_010 T-release-060 (2026-10-29): CSS 5632 -> 5440 B, tightened to measured + 4% (measured 5,216 B). PLAN_011 T-tokens-v2 (ADR-020): CSS 5440 -> 8576 B, measured + 4% after @texuli/tokens/base.css declares the token contract v2 system families and component token defaults; measured 8,186 B."
     },
     "@texuli/spec/motion": {
       "gzip": 960,
