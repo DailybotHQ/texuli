@@ -15,6 +15,13 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.3.3] — 2026-10-30
+
+### Changes
+
+- chore(deps): patch releases for G86 (data 0.8.1 and its exact-pin dependents)
+- fix(data): load list motion lazily, release @texuli/data 0.8.1
+
 ## [0.3.2] — 2026-10-30
 
 ### Changes
