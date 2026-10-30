@@ -6,18 +6,34 @@
 @layer tx.components {
   .tx-file-upload {
     display: grid;
-    gap: 0.75rem;
+    gap: var(
+      --tx-file-upload-gap,
+      var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3))
+    );
     max-inline-size: 36rem;
   }
 
   .tx-file-upload__zone {
     display: grid;
-    gap: 0.5rem;
+    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
     justify-items: center;
-    padding-block: 1.5rem;
-    padding-inline: 1rem;
-    border: 2px dashed var(--tx-border, ButtonBorder);
-    border-radius: var(--tx-radius, 0.625rem);
+    padding-block: var(
+      --tx-file-upload-zone-padding-block,
+      var(--tx-space-6, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 6))
+    );
+    padding-inline: var(
+      --tx-file-upload-zone-padding-inline,
+      var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4))
+    );
+    border: var(
+        --tx-file-upload-zone-border-width,
+        var(--tx-border-width-thick, calc(var(--tx-border-width, 1px) * 2))
+      )
+      dashed var(--tx-border, ButtonBorder);
+    border-radius: var(
+      --tx-file-upload-zone-radius,
+      var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))
+    );
     background: var(--tx-surface, Canvas);
     color: var(--tx-foreground, CanvasText);
     text-align: center;
@@ -27,8 +43,14 @@
   }
 
   .tx-file-upload--compact .tx-file-upload__zone {
-    padding-block: 0.75rem;
-    padding-inline: 0.75rem;
+    padding-block: var(
+      --tx-space-3,
+      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
+    );
+    padding-inline: var(
+      --tx-space-3,
+      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
+    );
     justify-items: start;
     text-align: start;
   }
@@ -74,15 +96,19 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-block-size: 2.25rem;
+    min-block-size: var(--tx-file-upload-browse-height, var(--tx-size-control-md, 2.25rem));
     padding-inline: 0.85rem;
-    border: 1px solid var(--tx-input, var(--tx-border, ButtonBorder));
-    border-radius: calc(var(--tx-radius, 0.625rem) * 0.7);
+    border: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid
+      var(--tx-input, var(--tx-border, ButtonBorder));
+    border-radius: calc(
+      var(--tx-file-upload-zone-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))) *
+      0.7
+    );
     background: var(--tx-background, Canvas);
     color: inherit;
     font: inherit;
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem));
+    font-weight: var(--tx-type-label-weight, var(--tx-font-weight-medium, 500));
     cursor: pointer;
   }
 
@@ -108,7 +134,7 @@
     margin: 0;
     padding: 0;
     display: grid;
-    gap: 0.5rem;
+    gap: var(--tx-space-2, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2));
   }
 
   .tx-file-upload__item {
@@ -117,8 +143,12 @@
     gap: 0.65rem;
     align-items: center;
     padding: 0.55rem 0.65rem;
-    border: 1px solid var(--tx-border, ButtonBorder);
-    border-radius: calc(var(--tx-radius, 0.625rem) * 0.7);
+    border: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid
+      var(--tx-border, ButtonBorder);
+    border-radius: calc(
+      var(--tx-file-upload-zone-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))) *
+      0.7
+    );
     background: var(--tx-elevated, var(--tx-surface, Canvas));
   }
 
@@ -127,9 +157,18 @@
   }
 
   .tx-file-upload__preview {
-    inline-size: 2.5rem;
-    block-size: 2.5rem;
-    border-radius: calc(var(--tx-radius, 0.625rem) * 0.4);
+    inline-size: var(
+      --tx-space-10,
+      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 10)
+    );
+    block-size: var(
+      --tx-space-10,
+      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 10)
+    );
+    border-radius: calc(
+      var(--tx-file-upload-zone-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))) *
+      0.4
+    );
     object-fit: cover;
     background: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
   }
@@ -150,8 +189,8 @@
 
   .tx-file-upload__name {
     margin: 0;
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: var(--tx-type-label-size, var(--tx-font-size-sm, 0.875rem));
+    font-weight: var(--tx-type-label-weight, var(--tx-font-weight-medium, 500));
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -159,7 +198,7 @@
 
   .tx-file-upload__size {
     margin: 0;
-    font-size: 0.75rem;
+    font-size: var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem));
     color: var(--tx-muted-foreground, CanvasText);
   }
 
@@ -169,7 +208,7 @@
 
   .tx-file-upload__progress-track {
     block-size: 0.35rem;
-    border-radius: 999px;
+    border-radius: var(--tx-shape-radius-full, 9999px);
     background: var(--tx-muted, color-mix(in srgb, CanvasText 10%, Canvas));
     overflow: hidden;
   }
@@ -188,8 +227,12 @@
   .tx-file-upload__zone [role="alert"] {
     margin: 0;
     padding: 0.65rem 0.75rem;
-    border: 1px solid var(--tx-destructive, Mark);
-    border-radius: calc(var(--tx-radius, 0.625rem) * 0.6);
+    border: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid
+      var(--tx-destructive, Mark);
+    border-radius: calc(
+      var(--tx-file-upload-zone-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))) *
+      0.6
+    );
     background: color-mix(in srgb, var(--tx-destructive, Mark) 8%, var(--tx-surface, Canvas));
     color: var(--tx-foreground, CanvasText);
     font-size: 0.8125rem;
@@ -203,10 +246,14 @@
   }
 
   .tx-file-upload__remove {
-    min-block-size: 2rem;
-    min-inline-size: 2rem;
-    border: 1px solid var(--tx-border, ButtonBorder);
-    border-radius: calc(var(--tx-radius, 0.625rem) * 0.5);
+    min-block-size: var(--tx-size-control-sm, 2rem);
+    min-inline-size: var(--tx-size-control-sm, 2rem);
+    border: var(--tx-border-width-thin, var(--tx-border-width, 1px)) solid
+      var(--tx-border, ButtonBorder);
+    border-radius: calc(
+      var(--tx-file-upload-zone-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))) *
+      0.5
+    );
     background: transparent;
     color: inherit;
     cursor: pointer;
