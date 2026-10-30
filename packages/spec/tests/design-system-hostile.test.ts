@@ -198,9 +198,9 @@ describe('Unicode tricks in identifiers', () => {
     const tricks = [
       'аcme', // Cyrillic a
       'ａcme', // full-width a
-      'ac‍me', // zero-width joiner
-      'acme‮', // RLO
-      '⁦acme', // LRI
+      'ac\u200dme', // zero-width joiner
+      'acme\u202e', // RLO
+      '\u2066acme', // LRI
       'acme\u0000',
       'café', // NFD
       'café', // NFC
@@ -220,8 +220,10 @@ describe('Unicode tricks in identifiers', () => {
       ]);
     }
     // Free text keeps emoji and joiners but refuses control and bidi characters.
-    expect(validateDesignSystem({ ...minimal, name: 'Acme \u{1f468}‍\u{1f4bb}' }).ok).toBe(true);
-    for (const bad of ['Acme‮emcA', 'Acme\n', 'Acme\u0085', 'Acme⁩'])
+    expect(validateDesignSystem({ ...minimal, name: 'Acme \u{1f468}\u200d\u{1f4bb}' }).ok).toBe(
+      true
+    );
+    for (const bad of ['Acme\u202eemcA', 'Acme\n', 'Acme\u0085', 'Acme\u2069'])
       expect(codes(validateDesignSystem({ ...minimal, name: bad })), JSON.stringify(bad)).toEqual([
         ['invalid-value', '$.name'],
       ]);

@@ -3382,7 +3382,7 @@
         "guidelines": {
           "items": {
             "maxLength": 200,
-            "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f؜‎‏‪-‮⁦-⁩]*$",
+            "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f؜\\u200e\\u200f\\u202a-\\u202e\\u2066-\\u2069]*$",
             "type": "string"
           },
           "maxItems": 12,
@@ -3391,7 +3391,7 @@
         "lexicon": {
           "additionalProperties": {
             "maxLength": 64,
-            "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f؜‎‏‪-‮⁦-⁩]*$",
+            "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f؜\\u200e\\u200f\\u202a-\\u202e\\u2066-\\u2069]*$",
             "type": "string"
           },
           "description": "At most 200 entries; keys match ^[a-z][a-z0-9-]{0,47}$ and are never __proto__, constructor or prototype.",
@@ -3430,7 +3430,7 @@
     },
     "description": {
       "maxLength": 500,
-      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f؜‎‏‪-‮⁦-⁩]*$",
+      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f؜\\u200e\\u200f\\u202a-\\u202e\\u2066-\\u2069]*$",
       "type": "string"
     },
     "elevation": {
@@ -3460,7 +3460,7 @@
     },
     "license": {
       "maxLength": 80,
-      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f؜‎‏‪-‮⁦-⁩]*$",
+      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f؜\\u200e\\u200f\\u202a-\\u202e\\u2066-\\u2069]*$",
       "type": "string"
     },
     "motion": {
@@ -3468,12 +3468,12 @@
     },
     "name": {
       "maxLength": 80,
-      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f؜‎‏‪-‮⁦-⁩]*$",
+      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f؜\\u200e\\u200f\\u202a-\\u202e\\u2066-\\u2069]*$",
       "type": "string"
     },
     "owner": {
       "maxLength": 80,
-      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f؜‎‏‪-‮⁦-⁩]*$",
+      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f؜\\u200e\\u200f\\u202a-\\u202e\\u2066-\\u2069]*$",
       "type": "string"
     },
     "shape": {

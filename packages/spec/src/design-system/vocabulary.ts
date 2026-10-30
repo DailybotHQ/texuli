@@ -84,7 +84,7 @@ export const DS_PATTERNS = {
   image: new RegExp(`^${PATH}(?:png|jpe?g|gif|webp|avif|svg|ico)$`),
   font: new RegExp(`^${PATH}(?:woff2?|ttf|otf)$`),
   // biome-ignore lint/suspicious/noControlCharactersInRegex: text refuses control and bidi characters
-  text: /^[^\u0000-\u001f\u007f-\u009f؜‎‏‪-‮⁦-⁩]*$/,
+  text: /^[^\u0000-\u001f\u007f-\u009f؜\u200e\u200f\u202a-\u202e\u2066-\u2069]*$/,
   key: /^[a-z][a-z0-9-]{0,47}$/,
 };
 

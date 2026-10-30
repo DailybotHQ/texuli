@@ -57,7 +57,7 @@
     },
     {
       "specVersion": "0.10.0",
-      "specDigest": "4831b17eba9c64ff5e0ba80281502aac1af69a86ee8f89aa6c301f4057680530",
+      "specDigest": "0a10e9ff369432effc1d9ca3323be6607b3c2400acacbc3043301c882cd29799",
       "change": "minor",
       "summary": "Additive (PLAN_011 T-ds-spec, ADR-021): the design-system document schema (schemas/design-system.schema.json, format texuli/design-system, formatVersion 1; generated from the @texuli/spec/design-system vocabulary, with TypeScript and Kotlin types), its fixtures under fixtures/design-systems/, and $defs.designSystemReference in the blueprint schema (not yet carried by the envelope); stamp-only migration 0.9.0→0.10.0"
     }

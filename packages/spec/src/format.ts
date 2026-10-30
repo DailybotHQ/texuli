@@ -11,7 +11,17 @@ export const LINE_WIDTH = 100;
  */
 export function formatJson(value: unknown): string {
   // Round-trip through canonical JSON: sorted keys, undefined dropped.
-  return `${print(JSON.parse(canonicalJson(value)), 0, '', 0)}\n`;
+  return escapeInvisible(`${print(JSON.parse(canonicalJson(value)), 0, '', 0)}\n`);
+}
+
+/**
+ * Invisible and bidi control characters as `\u` escapes (the same JSON
+ * value): the repository's Trojan Source check refuses them literally in
+ * committed files.
+ */
+const INVISIBLE = /[\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]/g;
+function escapeInvisible(text: string): string {
+  return text.replace(INVISIBLE, (ch) => `\\u${ch.charCodeAt(0).toString(16).padStart(4, '0')}`);
 }
 
 function isScalar(value: unknown): boolean {
