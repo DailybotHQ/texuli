@@ -22,6 +22,8 @@ export interface DataGridLabels {
   pagination: (caption: string) => string;
   previousPage: string;
   nextPage: string;
+  /** Names a page button of the numbered pager (its visible text is the number). */
+  page: (page: number) => string;
   /** The pager's position (a polite live region). */
   pageOf: (page: number, pageCount: number) => string;
 }
@@ -42,6 +44,7 @@ export const DEFAULT_DATA_GRID_LABELS: Readonly<DataGridLabels> = /* @__PURE__ *
   pagination: (caption: string) => `${caption} pages`,
   previousPage: 'Previous page',
   nextPage: 'Next page',
+  page: (page: number) => `Page ${page}`,
   pageOf: (page: number, pageCount: number) => `Page ${page} of ${pageCount}`,
 });
 

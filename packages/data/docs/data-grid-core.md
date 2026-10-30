@@ -41,6 +41,7 @@
 | `cell` | none | Snippet `(row, column)` for custom cell content; default is the column's text |
 | `empty`, `loading` | none, `false` | Empty snippet, called with `{ query, filtered }` (the search text, and whether rows exist but none matched) so it can say "No results for …"; `loading` shows a row and sets `aria-busy` |
 | `pageSize`, `page` | `0` (off), `1` | Client paging: `pageSize` rows per page and `bind:page` (from 1, kept in range as rows change). `onPageChange`. A pager (Previous, "Page N of M" as a polite live region, Next) renders in a `nav` named by `labels.pagination(caption)` when there is more than one page |
+| `pager` | `compact` | `numbered`: a button per page between Previous and Next (the first, the last, the current page and its neighbors, with `…` gaps), named `labels.page(n)` (`Page 3`) and `aria-current="page"` on the current one (filled, not color alone); "Page N of M" stays as a visually hidden polite live region |
 | `rowClass` | none | `(row) => class` for a body row (status tints, emphasis); pair a color with text, since a class is visual only |
 | `filters`, `toolbar` | none | Snippets in the toolbar row: `filters` after the search field, `toolbar` at its end (export, create…). The toolbar renders when any of `searchable`, `filters` or `toolbar` is set |
 | `bulkActions` | none | Snippet shown while rows are selected (`selectable`): it receives `{ selected, rows, clear }` (every selected id and row, on every page, and a function that clears the selection), inside a group named by `labels.bulkActions` |

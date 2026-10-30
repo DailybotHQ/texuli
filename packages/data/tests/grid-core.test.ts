@@ -769,3 +769,53 @@ describe('DataGrid search predicate (G92 stretch)', () => {
     expect(screen.queryByText('harbor notes')).toBeNull();
   });
 });
+
+describe('DataGrid numbered pager (G92 stretch)', () => {
+  afterEach(cleanup);
+
+  type Item = { id: string; name: string };
+  const items: Item[] = Array.from({ length: 30 }, (_, index) => ({
+    id: `i${index + 1}`,
+    name: `Item ${index + 1}`,
+  }));
+  const itemColumns: DataGridColumn<Item>[] = [{ key: 'name', header: 'Name', type: 'text' }];
+
+  it('pager="numbered" renders page buttons with aria-current and ellipses', async () => {
+    const pages: number[] = [];
+    render(DataGrid<Item>, {
+      props: {
+        rows: items,
+        columns: itemColumns,
+        getRowId: (item: Item) => item.id,
+        caption: 'Items',
+        pageSize: 3,
+        pager: 'numbered',
+        onPageChange: (page: number) => pages.push(page),
+      },
+    });
+    const pager = screen.getByRole('navigation', { name: 'Items pages' });
+    const pageButtons = () =>
+      within(pager)
+        .getAllByRole('button')
+        .map((button) => button.textContent?.trim());
+    expect(pageButtons()).toEqual(['Previous page', '1', '2', '10', 'Next page']);
+    expect(within(pager).getByRole('button', { name: 'Page 1' }).getAttribute('aria-current')).toBe(
+      'page'
+    );
+    // The position stays announced, as with the compact pager.
+    expect(within(pager).getByText('Page 1 of 10')).toBeTruthy();
+    await fireEvent.click(within(pager).getByRole('button', { name: 'Page 2' }));
+    expect(pages).toEqual([2]);
+    expect(pageButtons()).toEqual(['Previous page', '1', '2', '3', '10', 'Next page']);
+    await fireEvent.click(within(pager).getByRole('button', { name: 'Page 10' }));
+    expect(pageButtons()).toEqual(['Previous page', '1', '9', '10', 'Next page']);
+    expect(pager.querySelectorAll('[data-tx-page-gap]').length).toBe(1);
+    expect(screen.getByText('Item 30')).toBeTruthy();
+    expect(
+      within(pager).getByRole('button', { name: 'Page 10' }).getAttribute('aria-current')
+    ).toBe('page');
+    expect(within(pager).getByRole('button', { name: 'Page 1' }).hasAttribute('aria-current')).toBe(
+      false
+    );
+  });
+});

@@ -1,4 +1,5 @@
 <script lang="ts" generics="T">
+import { getPageTokens } from '@texuli/primitives/pagination';
 import type { Snippet } from 'svelte';
 import { tick, untrack } from 'svelte';
 import { type ClassValue, cx } from 'texuli/cx';
@@ -114,6 +115,13 @@ interface Props {
   /** The current page, from 1 (`bind:page`); kept in range as rows change. */
   page?: number;
   onPageChange?: (page: number) => void;
+  /**
+   * `compact` (default): Previous, "Page N of M", Next. `numbered`: a button
+   * per page (the first, the last and the current one's neighbors, with
+   * gaps), the current one `aria-current="page"`; the position stays
+   * announced.
+   */
+  pager?: 'compact' | 'numbered';
   loading?: boolean;
   /** Caps the height (a plain CSS length) so the body scrolls under a sticky header. */
   maxBlockSize?: string;
@@ -170,6 +178,7 @@ let {
   pageSize = 0,
   page = $bindable(1),
   onPageChange,
+  pager = 'compact',
   loading = false,
   maxBlockSize,
   density = 'default',
@@ -667,7 +676,24 @@ function handleFocusIn(event: FocusEvent): void {
   {#if pageSize > 0 && pageCount > 1}
     <nav class="tx-data-grid__pager" aria-label={text.pagination(caption)}>
       {@render pageButton(currentPage - 1, text.previousPage)}
-      <span aria-live="polite">{text.pageOf(currentPage, pageCount)}</span>
+      {#if pager === 'numbered'}
+        {#each getPageTokens(currentPage, pageCount) as token (token)}
+          {#if typeof token === 'number'}
+            <button
+              type="button"
+              class="tx-data-grid__page tx-data-grid__page--number"
+              aria-label={text.page(token)}
+              aria-current={token === currentPage ? 'page' : undefined}
+              onclick={() => setPage(token)}>{token}</button
+            >
+          {:else}
+            <span class="tx-data-grid__page-gap" data-tx-page-gap aria-hidden="true">…</span>
+          {/if}
+        {/each}
+      {/if}
+      <span class={pager === 'numbered' ? 'tx-data-grid__sr-only' : undefined} aria-live="polite"
+        >{text.pageOf(currentPage, pageCount)}</span
+      >
       {@render pageButton(currentPage + 1, text.nextPage)}
     </nav>
   {/if}
