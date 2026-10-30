@@ -6,6 +6,8 @@
  * Consumer classes are merged last by callers so cascade layers still win.
  */
 import type { ClassValue as SvelteClassValue } from 'svelte/elements';
+// The focus ring hook (data-tx-focus-ring-style) loads with every styled component.
+import './focus-ring.css';
 
 /** Svelte's class attribute type — re-exported so components and consumers share one name. */
 export type ClassValue = SvelteClassValue;

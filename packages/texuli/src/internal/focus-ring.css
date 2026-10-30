@@ -1,0 +1,27 @@
+/**
+ * Tier-3 focus ring hook. `data-tx-focus-ring-style` on any ancestor (the
+ * no-flash script and the Astro integration write it on <html>) sets the focus
+ * ring tokens on the focused element, which every Texuli focus rule reads
+ * (`outline: var(--tx-focus-ring-width) solid var(--tx-ring)`,
+ * `outline-offset: var(--tx-focus-ring-offset)`):
+ * - `ring` (and no attribute): the theme ring, unchanged;
+ * - `outline`: the ring hugs the element (offset 0);
+ * - `inset`: the ring is drawn inside the element;
+ * - `glow`: the ring hugs the element and a soft halo of the ring color surrounds it.
+ * Loaded with `cx`, which every styled component imports, so the hook works
+ * wherever a Texuli component renders.
+ */
+@layer tx.components {
+  :where([data-tx-focus-ring-style="outline"], [data-tx-focus-ring-style="glow"]) :focus-visible {
+    --tx-focus-ring-offset: 0px;
+  }
+
+  :where([data-tx-focus-ring-style="inset"]) :focus-visible {
+    --tx-focus-ring-offset: calc(var(--tx-focus-ring-width, 2px) * -1);
+  }
+
+  [data-tx-focus-ring-style="glow"] :focus-visible {
+    box-shadow: 0 0 0 calc(var(--tx-focus-ring-width, 2px) * 2)
+      color-mix(in srgb, var(--tx-ring, Highlight) 35%, transparent);
+  }
+}
