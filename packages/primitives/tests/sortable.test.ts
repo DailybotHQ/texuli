@@ -223,3 +223,14 @@ describe('Sortable binding', () => {
     expect(events.at(-1)?.type).toBe('cancel');
   });
 });
+
+describe('sortable handle target', () => {
+  it('reads the system target size token with its 24px fallback', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const source = readFileSync(join(__dirname, '../src/sortable/SortableHandle.svelte'), 'utf8');
+    for (const property of ['min-inline-size', 'min-block-size']) {
+      expect(source).toContain(`${property}: var(--tx-size-target-min, 24px);`);
+    }
+  });
+});
