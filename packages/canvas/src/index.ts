@@ -8,4 +8,4 @@ export * from './model/index.ts';
 export { CanvasViewer } from './viewer/index.ts';
 
 /** The package version (first published as `0.8.0`). */
-export const CANVAS_PACKAGE_VERSION = '0.8.0';
+export const CANVAS_PACKAGE_VERSION = '0.9.0';
