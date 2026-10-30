@@ -659,8 +659,8 @@
       "note": "PLAN_010 T-motion-adopt (ADR-013): new subpath; the motion prop contract, MotionProvider and the static seams (the runtime on @texuli/core/motion loads lazily, about 5.3 KiB gzip). Measured 1,867 B gzip, cap = measured + 4% rounded up to 64 B."
     },
     "texuli/toast": {
-      "gzip": 12672,
-      "note": "Styled component over the floating primitive(s) toast: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_010 T-release-060 (2026-10-29): 20480 -> 12672 B, tightened to measured + 4% (measured 12,135 B)."
+      "gzip": 13248,
+      "note": "Styled component over the floating primitive(s) toast: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_010 T-release-060 (2026-10-29): 20480 -> 12672 B, tightened to measured + 4% (measured 12,135 B). PLAN_011 T-scope-portals (2026-10-30): the toast bundles the scoped portal resolution through the overlay engine; CI on Linux measured 12,681 B; cap = measured + 4% rounded up to 64 B."
     },
     "texuli/tooltip": {
       "gzip": 15808,
