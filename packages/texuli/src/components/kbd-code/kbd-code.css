@@ -8,28 +8,41 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.125rem;
-    min-inline-size: 1.25rem;
-    min-block-size: 1.25rem;
+    gap: calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5);
+    min-inline-size: var(--tx-kbd-min-size, var(--tx-size-icon-md, 1.25rem));
+    min-block-size: var(--tx-kbd-min-size, var(--tx-size-icon-md, 1.25rem));
     margin: 0;
-    padding-block: 0.125rem;
+    padding-block: var(
+      --tx-kbd-padding-block,
+      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 0.5)
+    );
     padding-inline: 0.35rem;
-    border-radius: calc(var(--tx-radius, 0.625rem) * 0.4);
-    border: 1px solid var(--tx-border, ButtonBorder);
+    border-radius: var(
+      --tx-kbd-radius,
+      calc(var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem)) * 0.4)
+    );
+    border: var(--tx-kbd-border-width, var(--tx-border-width-thin, var(--tx-border-width, 1px)))
+      solid var(--tx-border, ButtonBorder);
     border-block-end-width: 2px;
     background-color: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
     color: var(--tx-muted-foreground, CanvasText);
     font-family: var(--tx-font-mono, ui-monospace, monospace);
     font-size: 0.7rem;
-    font-weight: 500;
+    font-weight: var(
+      --tx-kbd-font-weight,
+      var(--tx-type-label-weight, var(--tx-font-weight-medium, 500))
+    );
     line-height: 1;
     white-space: nowrap;
   }
 
   .tx-code {
     font-family: var(--tx-font-mono, ui-monospace, monospace);
-    font-size: 0.875em;
-    font-weight: 400;
+    font-size: var(--tx-code-font-size, var(--tx-type-code-size, 0.875em));
+    font-weight: var(
+      --tx-code-font-weight,
+      var(--tx-type-code-weight, var(--tx-font-weight-body, 400))
+    );
     color: var(--tx-foreground, CanvasText);
   }
 
@@ -37,7 +50,10 @@
     display: inline;
     padding-block: 0.1em;
     padding-inline: 0.35em;
-    border-radius: calc(var(--tx-radius, 0.625rem) * 0.35);
+    border-radius: calc(
+      var(--tx-code-block-radius, var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))) *
+      0.35
+    );
     background-color: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
     color: var(--tx-foreground, CanvasText);
     word-break: break-word;
@@ -45,17 +61,33 @@
 
   .tx-code--block {
     display: block;
-    margin-block: 0.5rem;
+    margin-block: var(
+      --tx-space-2,
+      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
+    );
     margin-inline: 0;
-    padding-block: 0.75rem;
-    padding-inline: 1rem;
+    padding-block: var(
+      --tx-code-block-padding-block,
+      var(--tx-space-3, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3))
+    );
+    padding-inline: var(
+      --tx-code-block-padding-inline,
+      var(--tx-space-4, calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 4))
+    );
     overflow-x: auto;
-    border-radius: var(--tx-radius, 0.625rem);
-    border: 1px solid var(--tx-border, ButtonBorder);
+    border-radius: var(
+      --tx-code-block-radius,
+      var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem))
+    );
+    border: var(
+        --tx-code-block-border-width,
+        var(--tx-border-width-thin, var(--tx-border-width, 1px))
+      )
+      solid var(--tx-border, ButtonBorder);
     background-color: var(--tx-surface, Canvas);
     color: var(--tx-foreground, CanvasText);
     font-size: 0.8125rem;
-    line-height: 1.5;
+    line-height: var(--tx-code-block-line-height, var(--tx-type-code-line, 1.5));
     white-space: pre;
     tab-size: 2;
   }
@@ -73,15 +105,15 @@
     gap: 0.35rem;
     margin: 0;
     border-style: solid;
-    border-width: 1px;
+    border-width: var(--tx-border-width-thin, var(--tx-border-width, 1px));
     border-color: var(--tx-input, var(--tx-border, ButtonBorder));
-    border-radius: var(--tx-radius, 0.625rem);
+    border-radius: var(--tx-shape-radius-lg, var(--tx-radius, 0.625rem));
     background-color: var(--tx-surface, Canvas);
     color: var(--tx-foreground, CanvasText);
     font-family: inherit;
     font-size: 0.8125rem;
-    font-weight: 500;
-    line-height: 1.25;
+    font-weight: var(--tx-type-label-weight, var(--tx-font-weight-medium, 500));
+    line-height: var(--tx-type-label-line, 1.25);
     cursor: pointer;
     transition-property: color, background-color, border-color, opacity;
     transition-duration: var(--tx-motion-base, 200ms);
@@ -98,21 +130,27 @@
   }
 
   .tx-copy-button:disabled {
-    opacity: 0.5;
+    opacity: var(--tx-opacity-disabled, 0.5);
     cursor: not-allowed;
   }
 
   .tx-copy-button--sm {
-    min-block-size: 1.75rem;
+    min-block-size: var(--tx-size-control-xs, 1.75rem);
     padding-block: 0.15rem;
-    padding-inline: 0.5rem;
-    font-size: 0.75rem;
+    padding-inline: var(
+      --tx-space-2,
+      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 2)
+    );
+    font-size: var(--tx-type-caption-size, var(--tx-font-size-xs, 0.75rem));
   }
 
   .tx-copy-button--md {
-    min-block-size: 2.25rem;
+    min-block-size: var(--tx-size-control-md, 2.25rem);
     padding-block: 0.35rem;
-    padding-inline: 0.75rem;
+    padding-inline: var(
+      --tx-space-3,
+      calc(var(--tx-space-unit, calc(0.25rem * var(--tx-density, 1))) * 3)
+    );
   }
 
   .tx-copy-button[data-state="copied"] {
@@ -121,8 +159,8 @@
   }
 
   .tx-copy-button__icon {
-    inline-size: 1rem;
-    block-size: 1rem;
+    inline-size: var(--tx-size-icon-sm, 1rem);
+    block-size: var(--tx-size-icon-sm, 1rem);
     flex-shrink: 0;
   }
 
