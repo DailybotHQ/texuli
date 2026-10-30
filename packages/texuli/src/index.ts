@@ -617,6 +617,8 @@ export {
   TEXULI_MESSAGES_EN,
   useMessages,
 } from './i18n/index.ts';
+// The "caller first" handler order of every component (docs/STANDARDS.md), also in `texuli/cx`.
+export { chainHandlers, composeHandlers } from './internal/handlers.ts';
 export {
   AUTH_SETTINGS_LAYOUTS,
   AuthSplitHostLayout,

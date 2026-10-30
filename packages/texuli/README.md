@@ -113,6 +113,12 @@ the initial chunk.
 
 `texuli/cx` exports `cx` (class composition) and `variants` (typed variant
 recipes), so you can extend components without `clsx` or `tailwind-merge`.
+It also exports `composeHandlers` and `chainHandlers` (also from `texuli`),
+the "caller first" handler order every component follows, for parts you
+build yourself: `composeHandlers(callerHandler, own)` runs the caller's
+handler, then `own` unless the caller called `event.preventDefault()`;
+`chainHandlers(callerHandler, own)` always runs `own` (focus tracking, drag
+state). A `callerHandler` that is not a function is ignored.
 
 `texuli/motion` holds the motion prop contract and `MotionProvider` (new in
 `0.6.0`): overlays, toasts, tabs, accordions and the
