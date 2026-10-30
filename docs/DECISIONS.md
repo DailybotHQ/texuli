@@ -1721,6 +1721,30 @@ reflect this decision.
     guarantees hold), snapshot determinism and a compile-time bound in
     the opt-in perf suite.
   - **Forced colors** keep today's behavior; the system colors win there.
+  - **As built (T-ds-compiler, 2026-10-30; `release/0.10.0`, not on npm),
+    where it refines the plan:**
+    - The pairs are the generator's `THEME_CONTRAST_PAIRS` plus the status
+      set. Non-text boundaries (strong border, input) at 3:1 report as
+      `aa-text`; the focus ring pairs report as `aa-focus`, and so does a
+      `focusWidth` below 2 px (the closed code list has no separate
+      boundary code).
+    - Targets: the system control heights are derived, so the solver lifts
+      them to `targetMin` and reports it; only sizes the document pins on a
+      component are refused with `target-size`.
+    - `compileDesignSystem` is synchronous and its variables are concrete
+      (no `var()`), as ADR-023 requires. `extends: "texuli:<id>"` loads the
+      library lazily, so it resolves through the asynchronous
+      `resolveDesignSystem` (or a synchronous resolver that returns the
+      `Theme`).
+    - `@texuli/tokens/design-system/validate` measures 9,850 B gz, not
+      4 KB: the spec's validator alone is 7.1 KB (see the T-ds-spec
+      decision); the compiler entry measures 30,780 B gz with the library
+      themes in lazy chunks.
+    - The zero-drift bridge is exact: compiling `fromTheme(theme)` equals
+      `themeVariables(theme)` on every shared variable for all 210 library
+      themes, after normalizing two library source strings to their CSS
+      canonical form (`SFMono-Regular` unquoted, a `0px` radius as `0`),
+      which changes no pixel.
 - **Reverse when:** a measured, legitimate case cannot meet a guarantee
   (then add a named, reported waiver field in a `formatVersion` minor that
   the conformance run still flags; never a silent pass).

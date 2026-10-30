@@ -17,7 +17,7 @@ export interface FontPairing {
 }
 
 const system = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-const mono = 'ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace';
+const mono = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 
 export const FONT_CATALOG = [
   {

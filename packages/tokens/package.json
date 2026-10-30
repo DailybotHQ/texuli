@@ -36,6 +36,8 @@
     "./contract": "./src/contract/index.ts",
     "./css": "./src/css/index.ts",
     "./data-viz": "./src/data-viz/index.ts",
+    "./design-system/compile": "./src/design-system/compile.ts",
+    "./design-system/validate": "./src/design-system/validate.ts",
     "./forced-colors": "./src/forced-colors/index.ts",
     "./forced-colors.css": "./src/forced-colors/forced-colors.css",
     "./generator": "./src/generator/index.ts",
@@ -54,5 +56,8 @@
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@texuli/spec": "0.10.0"
   }
 }

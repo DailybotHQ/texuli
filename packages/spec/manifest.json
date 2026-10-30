@@ -3,7 +3,7 @@
   "files": {
     "catalog/capabilities.json": "e1f07ed6c12437094d75c358f96a842f6344788549a804a8ba0ede2d3977767e",
     "catalog/components.json": "b3ee63e46eb51c7554ebae1894bf8346781759c667cca91ffb07a305da561cf8",
-    "fixtures/design-systems/acme.json": "208f014f0450d446b0df49adaf1ec32aa89fa009f5bb1916f250151cf0f3c6f7",
+    "fixtures/design-systems/acme.json": "44775f838b1f49c6e9249499f1cc1389b1be914aa546019e104af39f61d6a9bd",
     "fixtures/design-systems/invalid/extends-cycle.json": "64ed3a6f116ce9c8ce88890681828e4d482a3076773f1d60194194d42bae8775",
     "fixtures/design-systems/invalid/extends-depth.json": "72fc9fd178920f99d917d41e056a3f9230c7374bf716078f3d73641370fe590a",
     "fixtures/design-systems/invalid/extends-range.json": "ca99f7517ef772ff6318157f3ecf9e217a7b642765b7d4ca0958619d83b69568",

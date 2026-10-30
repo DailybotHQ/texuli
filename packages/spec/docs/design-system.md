@@ -2,10 +2,12 @@
 
 > **Status: in development for `0.10.0`, not on npm.** Spec `0.10.0` and
 > the `@texuli/spec/design-system` subpath exist on the `release/0.10.0`
-> branch; they ship only with `@texuli/spec@0.10.0`. The compiler, the
-> runtime (`apply`), the importers and emitters, the `ds.*` operations and
-> `texuli ds check` are **planned** (later PLAN_011 tasks, ADR-021 to
-> ADR-023). Nothing here compiles a design system into CSS yet.
+> branch; they ship only with `@texuli/spec@0.10.0`. The compiler is
+> `@texuli/tokens/design-system/compile` on the same branch
+> ([design-system-compiler.md](../../tokens/docs/design-system-compiler.md));
+> the runtime (`apply`), the importers and emitters, the `ds.*` operations
+> and `texuli ds check` are **planned** (later PLAN_011 tasks, ADR-021 to
+> ADR-023).
 
 A design system describes a brand once, as one closed JSON document that
 a company or an agent writes, and every Texuli surface follows
@@ -95,7 +97,7 @@ of `@texuli/core` at the same trust.
 | `extends-depth` | With `resolve`, a chain longer than 4 |
 | `url-refused` | A remote URL or scheme, `//`, traversal, an SVG or wrong media type, any data URL at `untrusted` |
 | `inline-bytes` | A data URL over its cap, or over the 256 KiB total |
-| `aa-text`, `aa-focus`, `target-size` | Reserved for the compiler ([ADR-022](../../../docs/DECISIONS.md#adr-022-design-system-guarantees-enforced-never-reported)); never raised by the spec |
+| `aa-text`, `aa-focus`, `target-size` | Raised by the compiler in `@texuli/tokens` ([ADR-022](../../../docs/DECISIONS.md#adr-022-design-system-guarantees-enforced-never-reported)); never by the spec |
 
 Paths start at `$`; keys that are not identifiers are quoted
 (`$.components["icon-button"].radius`). Issues stop at `maxErrors`
