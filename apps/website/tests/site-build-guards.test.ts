@@ -33,6 +33,12 @@ import { tmpdir } from 'node:os';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { createMcpHandler } from '../../../packages/tools/src/mcp/handler.ts';
+import {
+  MCP_PROTOCOL_VERSION,
+  MCP_SUPPORTED_PROTOCOL_VERSIONS,
+} from '../../../packages/tools/src/mcp/protocol.ts';
+import { TOOLS_VERSION, texuliOps } from '../../../packages/tools/src/ops/index.ts';
 import {
   ANALYTICS_TRUSTED_TYPES_POLICY,
   pagePolicy,
@@ -414,17 +420,20 @@ describe('agent discovery files (public/.well-known, public/llms.txt)', () => {
       readFileSync(fileURLToPath(new URL(`../public/.well-known/${path}`, import.meta.url)), 'utf8')
     );
 
-  it('describe only real surfaces: unique entries, texuli.com or npm URLs, the shipped stdio tools', () => {
+  it('describe only real surfaces: unique entries, texuli.com or npm URLs, the registry tools on both MCP transports', async () => {
     const aiCatalog = read('ai-catalog.json') as {
       host: { displayName: string; documentationUrl: string };
       entries: { identifier: string; url: string }[];
     };
     const apiCatalog = read('api-catalog') as { linkset: { links: { href: string }[] }[] };
     const card = read('mcp/server-card.json') as {
-      serverInfo: { name: string };
-      transport: { stdio: { launch: string } };
+      serverInfo: { name: string; version: string };
+      protocolVersion: string;
+      protocolVersions: string[];
+      transport: { stdio: { launch: string }; streamableHttp: { url: string } };
       capabilities: string[];
-      tools: string[];
+      tools: { name: string; title: string; description: string; remote: boolean }[];
+      deprecatedTools: { name: string; remote: boolean }[];
     };
     expect(aiCatalog.host.displayName).toBe('Texuli');
     // T-100 P1-4: /docs/ was advertised but has no route.
@@ -437,13 +446,35 @@ describe('agent discovery files (public/.well-known, public/llms.txt)', () => {
       ...apiCatalog.linkset.flatMap((set) => set.links.map((link) => link.href)),
     ])
       expect(url).toMatch(/^https:\/\/(texuli\.com\/|www\.npmjs\.com\/)/);
+    // The card is generated from the operations registry (pnpm check:surfaces):
+    // compare with the registry and the handler, never with literals.
     expect(card.serverInfo.name).toBe('texuli');
-    expect(new Set(card.tools)).toEqual(
-      new Set(['catalog', 'component', 'validate', 'example', 'theme'])
+    expect(card.serverInfo.version).toBe(TOOLS_VERSION);
+    expect(card.protocolVersion).toBe(MCP_PROTOCOL_VERSION);
+    expect(card.protocolVersions).toEqual([...MCP_SUPPORTED_PROTOCOL_VERSIONS]);
+    expect(card.tools.map((tool) => tool.name)).toEqual(texuliOps.list().map((op) => op.name));
+    for (const tool of card.tools) {
+      expect(tool.title, tool.name).toBe(texuliOps.get(tool.name)?.title);
+      expect(tool.description, tool.name).toBe(texuliOps.get(tool.name)?.summary);
+    }
+    expect(card.deprecatedTools.map((alias) => alias.name)).toEqual(
+      texuliOps.aliases().map((alias) => alias.name)
     );
+    expect(card.capabilities.every((name) => typeof name === 'string')).toBe(true);
     expect(card.capabilities).toContain('tools');
-    expect(card.transport.stdio.launch).toContain('tsx src/mcp/stdio.ts');
-    expect(JSON.stringify(card)).not.toContain('"streamableHttp"');
+    expect(card.transport.stdio.launch).toBe('npx -y @texuli/mcp');
+    // The remote endpoint (functions/mcp.ts) is the Streamable HTTP door; the
+    // card's remote flags match what its edge handler lists.
+    expect(card.transport.streamableHttp.url).toBe('https://texuli.com/mcp');
+    const listed = (await createMcpHandler({ mode: 'stateless', runtimes: ['edge'] })({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/list',
+    })) as unknown as { result: { tools: { name: string }[] } };
+    expect([
+      ...card.tools.filter((tool) => tool.remote).map((tool) => tool.name),
+      ...card.deprecatedTools.filter((alias) => alias.remote).map((alias) => alias.name),
+    ]).toEqual(listed.result.tools.map((tool) => tool.name));
 
     // The root llms.txt (generated from the nav; its drift check is in
     // scripts/tests/site-loaders.test.ts) has a section per site area.
@@ -452,9 +483,21 @@ describe('agent discovery files (public/.well-known, public/llms.txt)', () => {
       'utf8'
     );
     expect(llms.startsWith('# Texuli\n\n> ')).toBe(true);
-    for (const area of ['Guides', 'Components', 'Primitives', 'Themes', 'Agents', 'Project'])
+    for (const area of [
+      'Guides',
+      'Components',
+      'Primitives',
+      'Themes',
+      'Agents',
+      'Project',
+      'Tools',
+    ])
       expect(llms, area).toContain(`## ${area}\n`);
     expect(llms.match(/^- \[[^\]]+\]\(https:\/\/texuli\.com[^)]*\)/gm)?.length).toBeGreaterThan(30);
+    // The Tools section names every registry operation.
+    const tools = llms.slice(llms.indexOf('## Tools\n'));
+    for (const operation of texuliOps.list())
+      expect(tools, operation.name).toContain(`- [${operation.name}](`);
   });
 });
 
