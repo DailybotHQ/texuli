@@ -621,7 +621,11 @@ importers:
         specifier: ^5.57.2
         version: 5.57.2
 
-  packages/tokens: {}
+  packages/tokens:
+    dependencies:
+      '@texuli/spec':
+        specifier: 0.10.0
+        version: link:../spec
 
   packages/tools:
     dependencies:
