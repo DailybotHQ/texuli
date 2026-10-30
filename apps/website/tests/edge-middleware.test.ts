@@ -443,6 +443,30 @@ describe('the middleware: twins, host headers, agent 404', () => {
     expect(await response.text()).toBe('# Home\n');
     expect(direct.fetches).toEqual([]);
 
+    // Extensionless discovery files get their declared type: Pages guesses
+    // application/octet-stream and _headers cannot override it (T-ar-score).
+    for (const [path, type] of [
+      ['/.well-known/oauth-protected-resource', 'application/json'],
+      ['/.well-known/oauth-authorization-server', 'application/json'],
+      ['/.well-known/api-catalog', 'application/linkset+json'],
+    ] as const) {
+      const file = makeContext(path, null, {}, 'curl/8.4.0');
+      file.next.mockImplementationOnce(
+        async () =>
+          new Response('{}', {
+            status: 200,
+            headers: {
+              'content-type': 'application/octet-stream',
+              'access-control-allow-origin': '*',
+            },
+          })
+      );
+      const answered = await onRequest(file.context);
+      expect(answered.headers.get('content-type'), path).toBe(type);
+      expect(answered.headers.get('x-content-type-options'), path).toBe('nosniff');
+      expect(answered.headers.get('access-control-allow-origin'), path).toBe('*');
+    }
+
     // A 304 for a cached twin passes through untouched.
     const cached = makeContext('/guides/theming.md', null, {});
     const notModified = new Response(null, { status: 304 });
