@@ -6,7 +6,8 @@
 > released on npm in the 0.8 line: 16 at `0.8.0`, plus patch releases (`@texuli/slides` `0.8.2`; `0.8.1` for `@texuli/data`, `@texuli/blocks`, `@texuli/catalog`, `@texuli/pages`, `@texuli/player`, `@texuli/sheets`, `@texuli/tools` and `@texuli/astro`) (dist-tags
 > `latest` and `next`; published by CI from verified tarballs, with signed
 > provenance), including the first release of `@texuli/forms`,
-> `@texuli/canvas` and `@texuli/sheets`; texuli.com deploys
+> `@texuli/canvas` and `@texuli/sheets`; `0.9.0` is in development and not
+> on npm yet ([RELEASE](RELEASE.md)); texuli.com deploys
 > from `main` to Cloudflare Pages. The
 > implementation itself is substantial: every layer from L0 texels to L8
 > tools exists in source with tests, all in this private workspace. The
@@ -155,7 +156,8 @@ closed, documented catalog that can be validated before anything renders.
 - The implementation is pre-1.0. All 25 published packages are on npm in the 0.8 line (see [RELEASE](RELEASE.md))
   (published by CI with provenance; `latest` and `next` both point to it; not
   a stable release: under 0.x a new minor may contain breaking changes, and
-  1.0.0 will be the first stable release), and the
+  1.0.0 will be the first stable release); `0.9.0` is in development on the
+  release branch and not on npm, and the
   workspace packages stay `private: true`. texuli.com deploys from `main` to
   Cloudflare Pages. The repository's remote is
   `https://github.com/DailybotHQ/texuli.git` (`git remote -v`), and GitHub

@@ -15,6 +15,7 @@ import { csvToSheet, sheetToCsv } from '@texuli/sheets/csv';
 import { SHEET_FUNCTION_NAMES } from '@texuli/sheets/formula';
 import { checkSheetDraft, createWorkbook, displayValue, validateSheet } from '@texuli/sheets/model';
 import { describe, expect, it } from 'vitest';
+import { isLineVersion } from '../../../scripts/release-line.ts';
 import {
   AGENT_SHEET_BLUEPRINT,
   HOSTILE_SHEET_BLUEPRINT,
@@ -61,9 +62,9 @@ describe('sheets page: copy and safety', () => {
       version: string;
       private?: boolean;
     };
-    // First published in 0.8.0 (the copy names that release); the package
-    // itself is on the 0.8 line (0.8.1, a G86 exact-pin patch release).
-    expect(pkg.version).toMatch(/^0\.8\.\d+$/);
+    // First published in 0.8.0 (the copy names that release); the manifest
+    // carries a version of the release line in docs/RELEASE.md.
+    expect(isLineVersion(pkg.version), pkg.version).toBe(true);
     expect(pkg.private).toBe(true);
     expect(SHEETS_RELEASE).toBe('0.8.0');
     expect(SHEETS_STATUS).toBe('In development, on npm from 0.8.0, a pre-1.0 release.');

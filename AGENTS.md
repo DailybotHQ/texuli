@@ -30,7 +30,9 @@ published for the first time in `0.8.0` (the previous release, `0.7.0`, had
 22 packages), and `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`,
 `@texuli/editor`, `@texuli/document`, `@texuli/pages`, `@texuli/forms`,
 `@texuli/canvas` and `@texuli/sheets` are still in development
-([RELEASE](docs/RELEASE.md)). Workspace packages stay
+([RELEASE](docs/RELEASE.md)). The workspace manifests are at `0.9.0`, which
+is in development on the `release/0.9.0` branch and not on npm yet; only the
+merge of that branch to `main` publishes it. Workspace packages stay
 `private: true`, and no stable release is out (1.0.0 will be the first; under
 0.x a new minor may break; see [RELEASE](docs/RELEASE.md)),
 and texuli.com deploys from `main` to Cloudflare Pages, with the Pages
@@ -211,6 +213,8 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     `@texuli/deck`, `@texuli/editor`, `@texuli/document`, `@texuli/pages`,
     `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` are still in
     development, and the blueprint spec in `@texuli/spec@0.8.0` is `0.8.0`.
+    The manifests say `0.9.0`: 0.9.0 is in development, not on npm, so copy
+    names the 0.8 line for installs (the release line in docs/RELEASE.md).
     `@texuli/examples`, the apps and `native/` publish nothing. 0.8.0 is a
     pre-1.0 release, not stable (1.0.0 will be the first
     stable release; `latest` tracks the newest release). texuli.com

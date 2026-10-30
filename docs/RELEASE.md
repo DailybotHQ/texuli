@@ -5,7 +5,15 @@ the intended process; it does not publish packages or grant release authority.
 
 ## Current npm status
 
-All 25 published packages are on npm in the 0.8 line. `0.8.0` was the
+<!-- The release line: the single source of truth for "what npm has" and
+"what the manifests are working toward". scripts/release-line.ts parses
+the next line; tests and honesty checks read it from there. Change it only
+when a publish lands (published) or a new version opens (in development). -->
+Release line: published `0.8` · in development `0.9.0`
+
+All 25 published packages are on npm in the 0.8 line. The workspace
+manifests are at `0.9.0`, which is in development on the release branch and
+not on npm (see "0.9.0 (in development)" below). `0.8.0` was the
 release of all 25 (owner GO 2026-10-29), and 16 are still at `0.8.0`.
 Patch releases since: `@texuli/slides` `0.8.2`, and `0.8.1` for
 `@texuli/data`, `@texuli/blocks`, `@texuli/catalog`, `@texuli/pages`,
@@ -35,6 +43,27 @@ published version.
   `scripts/packages.ts`).
 - The apps (`apps/website`, `apps/agent`) and the native twin (`native/`)
   publish nothing.
+
+### 0.9.0 (in development)
+
+Since PR #17, every merge to `main` publishes any package version npm does
+not have yet. A minor that changes the agent catalog regenerates
+`@texuli/spec` and needs a spec package bump, and the exact internal pins
+make every dependent follow, so `0.9.0` cannot land on `main` piece by
+piece without publishing half a release. PLAN_011 therefore integrates on
+the branch `release/0.9.0`:
+
+- `0.9.0` is opened once on that branch: all 25 published packages move to
+  `0.9.0` and every internal pin to exactly `0.9.0`. The blueprint spec
+  format stays `0.8.0` until a catalog change needs a new one.
+- Feature work merges into `release/0.9.0`, not `main`. Nothing on the
+  branch is published.
+- Only the final merge of `release/0.9.0` into `main`, after the
+  developer's GO, publishes `0.9.0`. That merge also moves the release line
+  above to published `0.9` with nothing in development.
+- Until then npm has the 0.8 line, the install instructions (README, the
+  skill, the website) name the 0.8 line, and fixes that must ship before
+  `0.9.0` go to `main` as `0.8.x` patch releases.
 
 ### 0.8.x patch releases (G86)
 
@@ -1111,7 +1140,8 @@ version.
 
 Task 172 made every published dependency an intentional semver range: the
 published package manifests pin internal `@texuli/*` dependencies to exact
-versions (for `0.8.0`, every internal pin is exactly `0.8.0`; compatibility
+versions (for `0.8.0`, every internal pin is exactly `0.8.0`, and on the
+`release/0.9.0` branch every one is exactly `0.9.0`; compatibility
 between Texuli packages is exact, per "Independent package versions" above), while the private development
 manifests (`apps/website`, `apps/agent`, `packages/examples`) keep the
 pnpm `workspace:` protocol. The release packer enforces that boundary

@@ -9,6 +9,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { isLineVersion, releaseLine } from '../../../scripts/release-line.ts';
 import { NAV_GROUPS } from '../src/components/foundation/site.ts';
 import { WEB_HERO_NEWS } from '../src/components/sections/web/web-hero-content.ts';
 import { FEATURES, RELEASES } from '../src/components/whats-new/features.ts';
@@ -71,15 +72,20 @@ describe('whats-new hub', () => {
     expect(byId['0.7.0']?.published).toBe(true);
     expect(byId['0.7.0']?.status).toContain('Published on npm as 0.7.0');
     expect(byId['0.8.0']?.published).toBe(true);
-    expect(byId['0.8.0']?.status).toContain('Published on npm as 0.8.0, the current release');
-    // The published packages are on the 0.8 line (0.8.0, or a 0.8.x patch
-    // release such as @texuli/sheets 0.8.1), the three packages 0.8.0
-    // publishes for the first time included.
+    // The current release is the first of the published line in
+    // docs/RELEASE.md (a version in development is not on the page as
+    // published).
+    const line = releaseLine();
+    const current = `${line.published}.0`;
+    expect(byId[current]?.status).toContain(`Published on npm as ${current}, the current release`);
+    if (line.development) expect(byId[line.development]?.published ?? false).toBe(false);
+    // The manifests carry a version of the release line, the three packages
+    // 0.8.0 publishes for the first time included.
     for (const name of ['forms', 'canvas', 'sheets', 'document']) {
       const pkg = JSON.parse(readFileSync(resolve(`packages/${name}/package.json`), 'utf8')) as {
         version: string;
       };
-      expect(pkg.version, name).toMatch(/^0\.8\.\d+$/);
+      expect(isLineVersion(pkg.version, line), `${name} ${pkg.version}`).toBe(true);
     }
     for (const release of RELEASES)
       expect(`${release.title} ${release.status} ${release.summary}`).not.toMatch(
