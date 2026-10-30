@@ -65,6 +65,15 @@ const BROWSER_ROUTES = [
   // PLAN_010 T-site-070: lazy document and live-generation islands; their large modules load after hydration.
   '/documents-page/',
   '/live-generation/',
+  // PLAN_010 T-site-features: lazy form and canvas islands; the editor, sync and player load after hydration.
+  '/forms-page/',
+  '/canvas-page/',
+  // PLAN_010 T-site-080: lazy sheet, dashboard, output and hub islands; the player, the email and
+  // print writers and the sheet host load after hydration.
+  '/sheets-page/',
+  '/dashboards-page/',
+  '/output-page/',
+  '/whats-new/',
 ] as const;
 
 const kb = (bytes: number) => Math.round((bytes / 1024) * 10) / 10;

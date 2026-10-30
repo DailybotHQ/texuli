@@ -28,7 +28,8 @@ const doc = (golden.tree as { props: { doc: Record<string, unknown> } }).props.d
 
 describe('spec 0.7.0: node keys', () => {
   it('accepts unique well-formed keys and refuses repeats and malformed keys', () => {
-    expect(SPEC_VERSION).toBe('0.7.0');
+    // Spec 0.7.0 introduced keys; later minors keep them.
+    expect(['0.7.0', '0.8.0']).toContain(SPEC_VERSION);
     const leaf = (key: string) => ({
       key,
       id: 'blocks-text',
@@ -147,10 +148,10 @@ describe('spec 0.7.0: documents', () => {
 
   it('migrates a 0.6.0 envelope by stamping spec only', () => {
     const input = { ...golden, spec: '0.6.0', tree: { id: 'layout-doc', props: { title: 'A' } } };
-    const result = migrateBlueprint(input);
+    const result = migrateBlueprint(input, '0.7.0');
     expect(result.applied).toEqual(['0.6.0->0.7.0']);
     expect(result.blueprint).toEqual({ ...input, spec: '0.7.0' });
     expect((result.blueprint as { tree: unknown }).tree).toBe(input.tree);
-    expect(migrateBlueprint(result.blueprint).applied).toEqual([]);
+    expect(migrateBlueprint(result.blueprint, '0.7.0').applied).toEqual([]);
   });
 });

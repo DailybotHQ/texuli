@@ -1,6 +1,6 @@
 # Texuli — full agent docs
 
-> Complete catalog documentation generated from manifests (163 components).
+> Complete catalog documentation generated from manifests (168 components).
 
 ---
 
@@ -1215,6 +1215,111 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 - [`alert`](components/alert.md)
 - [`banner`](components/banner.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Canvas
+
+> A whiteboard or diagram as data: shapes, sticky notes, text, frames, groups and connectors on an infinite canvas.
+
+- **id:** `canvas`
+- **package:** `@texuli/canvas`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `canvas`
+
+### Use when
+
+- Sketch a flow, a map of ideas, a retro board or an architecture diagram people can keep editing
+- Lay out sticky notes in frames and connect shapes with arrows
+
+### Don't use when
+
+- A workflow with typed ports that runs: use workflow-graph
+- A chart of data: use a chart family
+- Prose: use document
+
+### Accessibility
+
+- Painted as an image named by the canvas title, with every shape and connector listed as text in reading order
+- Text is data, never HTML; image refs pass the URL policy at the host tier
+- Styles are a closed palette of theme tokens, never raw CSS
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `canvas` | object | yes | — | — | A Texuli canvas: { format: "texuli-canvas", formatVersion: 1, meta: { title }, shapes, connectors }. Shapes: rect, ellipse, diamond, line, arrow, path (points), text, sticky, image ({ ref, alt }), frame ({ title, children }) and group ({ children }), each with an id and x, y, width, height. Connectors: { id, from: { shape }, to: { shape }, routing: straight \| elbow \| curved, text }. |
+| `label` | string | no | untrusted | — | Accessible name; defaults to the canvas title. |
+
+### Examples
+
+#### Decision flow (`decision`)
+
+```json
+{
+  "canvas": {
+    "format": "texuli-canvas",
+    "formatVersion": 1,
+    "meta": {
+      "title": "Release decision"
+    },
+    "shapes": [
+      {
+        "id": "ask",
+        "type": "ellipse",
+        "x": 0,
+        "y": 0,
+        "width": 160,
+        "height": 72,
+        "text": "Ready to ship?"
+      },
+      {
+        "id": "ship",
+        "type": "rect",
+        "x": 240,
+        "y": 0,
+        "width": 160,
+        "height": 72,
+        "text": "Ship on example.com"
+      },
+      {
+        "id": "idea",
+        "type": "sticky",
+        "x": 0,
+        "y": 120,
+        "width": 160,
+        "height": 120,
+        "text": "Ask the beta testers",
+        "color": "yellow"
+      }
+    ],
+    "connectors": [
+      {
+        "id": "yes",
+        "from": {
+          "shape": "ask"
+        },
+        "to": {
+          "shape": "ship"
+        },
+        "routing": "curved",
+        "text": "yes"
+      }
+    ]
+  }
+}
+```
+
+### Related
+
+- [`document`](components/document.md)
+- [`workflow-graph`](components/workflow-graph.md)
 
 ---
 
@@ -3657,6 +3762,131 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 - [`data-grid`](components/data-grid.md)
 - [`charts-heatmap`](components/charts-heatmap.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Dashboard
+
+> A widget grid people can rearrange: data-dashboard-widget children on columns and rows, moved and resized by drag or keyboard, reflowing on narrow screens.
+
+- **id:** `data-dashboard`
+- **package:** `@texuli/data`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `data`
+
+### Use when
+
+- An overview of several views (KPIs, charts, grids bound to host data sources) people arrange themselves
+- A home or operations screen whose layout should persist per person
+
+### Don't use when
+
+- A fixed grid of cards: use layout-grid
+- One chart or one table: paint it on its own
+
+### Accessibility
+
+- A named region whose widgets are a list in reading order (row, then column), whatever order they were written in
+- Each widget has a move handle and a resize handle: Space or Enter picks up, arrows move or resize one column or row, Space or Enter drops, Escape cancels; every step is announced with its column, row and size
+- A click on a handle opens an arrange toolbar, so nothing needs a drag (WCAG 2.5.7); handles are at least 24 by 24 px
+- Widgets glide to their new cell only when motion is allowed; reduced motion commits at once
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | untrusted | — | Accessible name of the view. |
+| `columns` | number | no | — | `12` | Columns of the widest grid (1 to 24). Narrower screens reflow onto at most 6 columns from 640 px and one column below. |
+| `density` | enum(compact | default | comfortable) | no | — | — | — |
+| `gap` | enum(none | small | medium | large) | no | — | — | — |
+| `editable` | boolean | no | — | `false` | Shows the move and resize handles. |
+| `compaction` | enum(vertical | none) | no | — | `"vertical"` | "vertical" floats widgets up to close gaps; "none" keeps gaps. |
+| `layout` | array | no | — | — | The saved layout of the widest grid: one {id, x, y, w, h} per widget, id matching a widget's widgetId. Bind it to a list state, or read it from a host data source, to persist what people arrange; without it the widgets' own place props lay out the grid. |
+| `children` | slot | no | — | — | data-dashboard-widget nodes only (at most 200). |
+
+### Examples
+
+#### Operations overview (`operations`)
+
+```json
+{
+  "label": "Operations",
+  "columns": 12,
+  "editable": true
+}
+```
+
+### Related
+
+- [`data-dashboard-widget`](components/data-dashboard-widget.md)
+- [`layout-grid`](components/layout-grid.md)
+- [`data-grid`](components/data-grid.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Dashboard widget
+
+> One titled widget of a data-dashboard, placed on the grid; its child is any content node, such as a chart, a KPI or a grid bound to a host data source.
+
+- **id:** `data-dashboard-widget`
+- **package:** `@texuli/data`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `data`
+
+### Use when
+
+- A tile of a data-dashboard
+
+### Don't use when
+
+- Anywhere outside a data-dashboard: use layout-card
+
+### Accessibility
+
+- Its title is a heading, and it names the widget's move and resize handles
+- Its content is ordinary catalog nodes: no HTML, and data only from host-registered sources
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `widgetId` | string | yes | — | — | Stable id, unique in the dashboard: letters, digits, "-" and "_", at most 64 characters. The key of this widget in every saved layout. |
+| `title` | string | yes | untrusted | — | Visible title; also names the handles. |
+| `place` | object | no | — | — | Where the widget starts on the widest grid when the dashboard has no saved layout for it: {x, y, w, h} in columns and rows, with optional minW, minH, maxW, maxH and locked. Without x and y it takes the first free slot. |
+| `children` | slot | no | — | — | The widget content. |
+
+### Examples
+
+#### Revenue tile (`revenue`)
+
+```json
+{
+  "widgetId": "revenue",
+  "title": "Revenue",
+  "place": {
+    "x": 0,
+    "y": 0,
+    "w": 4,
+    "h": 2
+  }
+}
+```
+
+### Related
+
+- [`data-dashboard`](components/data-dashboard.md)
 
 ---
 
@@ -8200,6 +8430,111 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 ---
 
+# Schema form
+
+> A whole form as data: typed fields in sections or steps, conditional logic, named formats and cross-field rules, painted with texuli controls; submitting proposes one action intent to the host.
+
+- **id:** `schema-form`
+- **package:** `@texuli/forms`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `schema-forms`
+
+### Use when
+
+- Collect structured answers: registrations, requests, surveys, intake and settings
+- A multi-step flow with per-step validation, or fields that appear, become required or become editable from earlier answers
+
+### Don't use when
+
+- One or two values for an action: use action-form with form-field
+- Payment, passwords or one-time codes: use a host-region
+- A filter bar over data: use control-filter or data-filter-builder
+
+### Accessibility
+
+- A form landmark named by its title; every control is a texuli control with a visible label, its description and its error linked
+- Errors are announced, an error summary takes focus and links to each field; each new step heading takes focus and is announced
+- Keyboard-complete: native order, Enter moves to the next step or submits; reduced motion makes step transitions instant
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `schema` | object | yes | — | — | The form: { title, description?, submitLabel?, fields \| sections \| steps, rules? }. Field types: text, textarea, number, email, url, date, time, select, multiselect, checkbox, radio, switch, slider, file (host-handled), tags. Rules: required, minLength, maxLength, min, max, step, minItems, maxItems, a named format (email, url, phone, postal-code…, never a pattern) and validator (a name the host registered). when.show / require / enable are expressions over earlier fields; rules[] are cross-field expressions that fail when false. |
+| `action` | string | yes | — | — | The action name the host receives with the submitted values. |
+| `label` | string | no | untrusted | — | Accessible name; defaults to the form title. |
+
+### Examples
+
+#### Access request (`request`)
+
+```json
+{
+  "action": "request-access",
+  "schema": {
+    "title": "Request access",
+    "submitLabel": "Send request",
+    "fields": [
+      {
+        "name": "email",
+        "type": "email",
+        "label": "Work email",
+        "required": true
+      },
+      {
+        "name": "team",
+        "type": "select",
+        "label": "Team",
+        "required": true,
+        "options": [
+          {
+            "value": "design",
+            "label": "Design"
+          },
+          {
+            "value": "engineering",
+            "label": "Engineering"
+          }
+        ]
+      },
+      {
+        "name": "reason",
+        "type": "textarea",
+        "label": "Why do you need access?",
+        "maxLength": 500,
+        "when": {
+          "require": {
+            "op": "eq",
+            "left": {
+              "op": "field",
+              "name": "team"
+            },
+            "right": {
+              "op": "str",
+              "value": "engineering"
+            }
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
+### Related
+
+- [`action-form`](components/action-form.md)
+- [`form-field`](components/form-field.md)
+- [`layout-wizard`](components/layout-wizard.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
 # ScreenOutlet
 
 > Stable screen mount point that survives layout switches.
@@ -9025,6 +9360,98 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 ### Related
 
 - [`layout-dual-sidebar`](components/layout-dual-sidebar.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Spreadsheet
+
+> A spreadsheet as data: tabs of cells holding numbers, text, booleans and formulas that recalculate.
+
+- **id:** `spreadsheet`
+- **package:** `@texuli/sheets`
+- **tier:** `content`
+- **agent emittable:** yes
+- **emit:** developer, untrusted
+- **group:** `sheets`
+
+### Use when
+
+- A budget, an estimate, a price list or a tracker whose totals people keep editing
+- Numbers that depend on other numbers through formulas (SUM, IF, VLOOKUP, DATE…)
+
+### Don't use when
+
+- Read-only records with typed columns, sorting and search: use data-grid
+- A chart of values: use a chart family
+- A form people fill in once: use schema-form
+
+### Accessibility
+
+- Painted as an APG grid with column letters, row numbers and one tab stop
+- Values are text, never HTML; formulas are a closed language with no references built from text and no network
+- A formula error shows its code in the cell (#DIV/0!, #REF!, #CYCLE!…)
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `sheet` | object | yes | — | — | A Texuli sheet: { format: "texuli-sheet", formatVersion: 1, meta: { title }, sheets: [{ id, name, rows, columns, cells }] }. cells maps A1 addresses ("B3") to a number, a boolean, text, or a formula that starts with "=" ("=SUM(B1:B2)", "=IF(C2>100, \"high\", \"low\")", "=Rates!A1*B2"). About 50 functions: SUM, AVERAGE, MIN, MAX, COUNT, COUNTA, ROUND, SUMIF, COUNTIF, IF, IFS, AND, OR, IFERROR, CONCAT, LEFT, TEXT, INDEX, MATCH, VLOOKUP, XLOOKUP, DATE, TODAY and more. No INDIRECT, OFFSET or RAND. Dates are "YYYY-MM-DD" text. Text that must start with "=" is written "'=…". At most 16 sheets, 10,000 rows, 256 columns and 100,000 cells. |
+| `label` | string | no | untrusted | — | Accessible name; defaults to the sheet title. |
+
+### Examples
+
+#### Team offsite budget (`budget`)
+
+```json
+{
+  "sheet": {
+    "format": "texuli-sheet",
+    "formatVersion": 1,
+    "meta": {
+      "title": "Team offsite budget"
+    },
+    "sheets": [
+      {
+        "id": "costs",
+        "name": "Costs",
+        "rows": 8,
+        "columns": 4,
+        "cells": {
+          "A1": "Item",
+          "B1": "Unit cost",
+          "C1": "Quantity",
+          "D1": "Total",
+          "A2": "Venue",
+          "B2": 1200,
+          "C2": 1,
+          "D2": "=B2*C2",
+          "A3": "Lunch",
+          "B3": 18.5,
+          "C3": 24,
+          "D3": "=B3*C3",
+          "A4": "Coffee",
+          "B4": 3.25,
+          "C4": 48,
+          "D4": "=B4*C4",
+          "A6": "Total",
+          "D6": "=SUM(D2:D4)",
+          "A7": "Over budget?",
+          "D7": "=IF(D6>2000, \"yes\", \"no\")"
+        }
+      }
+    ]
+  }
+}
+```
+
+### Related
+
+- [`data-grid`](components/data-grid.md)
+- [`document`](components/document.md)
 
 ---
 

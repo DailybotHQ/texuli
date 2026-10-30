@@ -2,6 +2,7 @@
 import { type HrefTrust, safeHref } from '@texuli/core/url-policy';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue } from '../../internal/cx.ts';
 import type { BreadcrumbItem } from './types.ts';
 import {
@@ -37,9 +38,9 @@ type Props = OwnProps & Omit<HTMLAttributes<HTMLElement>, keyof OwnProps | 'chil
 
 let {
   items,
-  label = 'Breadcrumb',
+  label: labelProp,
   size = 'md',
-  separatorLabel = 'Separator',
+  separatorLabel: separatorLabelProp,
   separator,
   maxItems = 0,
   hrefTrust = 'developer',
@@ -47,6 +48,11 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('texuli.breadcrumb.label', 'Breadcrumb'));
+const separatorLabel = $derived(
+  separatorLabelProp ?? msg('texuli.breadcrumb.separator-label', 'Separator')
+);
 
 function bindRef(node: HTMLElement): () => void {
   ref = node;

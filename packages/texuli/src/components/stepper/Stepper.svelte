@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import type { StepperOrientation, StepperStep, StepperStepState } from './types.ts';
 import { stepperClass } from './variants.ts';
@@ -30,11 +31,13 @@ let {
   completed,
   orientation = 'horizontal',
   onStepClick,
-  label = 'Progress',
+  label: labelProp,
   class: className,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('texuli.stepper.label', 'Progress'));
 
 function bindRef(node: HTMLElement): () => void {
   ref = node;

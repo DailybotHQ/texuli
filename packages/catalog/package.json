@@ -1,6 +1,6 @@
 {
   "name": "@texuli/catalog",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "description": "The agent catalog and the renderer with no HTML sinks.",
   "keywords": [
@@ -65,9 +65,17 @@
       "types": "./src/manifests/data/index.ts",
       "default": "./src/manifests/data/index.ts"
     },
+    "./manifests/canvas": {
+      "types": "./src/manifests/canvas/index.ts",
+      "default": "./src/manifests/canvas/index.ts"
+    },
     "./manifests/documents": {
       "types": "./src/manifests/documents/index.ts",
       "default": "./src/manifests/documents/index.ts"
+    },
+    "./manifests/sheets": {
+      "types": "./src/manifests/sheets/index.ts",
+      "default": "./src/manifests/sheets/index.ts"
     },
     "./manifests/display": {
       "types": "./src/manifests/display/index.ts",
@@ -80,6 +88,10 @@
     "./manifests/layouts": {
       "types": "./src/manifests/layouts/index.ts",
       "default": "./src/manifests/layouts/index.ts"
+    },
+    "./manifests/schema-forms": {
+      "types": "./src/manifests/schema-forms/index.ts",
+      "default": "./src/manifests/schema-forms/index.ts"
     },
     "./manifests/overlays": {
       "types": "./src/manifests/overlays/index.ts",
@@ -138,13 +150,13 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/blocks": "0.7.0",
-    "@texuli/charts": "0.7.0",
-    "@texuli/core": "0.7.0",
-    "@texuli/data": "0.7.0",
-    "@texuli/media": "0.7.0",
-    "@texuli/spec": "0.7.0",
-    "texuli": "0.7.0"
+    "@texuli/blocks": "0.8.0",
+    "@texuli/charts": "0.8.0",
+    "@texuli/core": "0.8.0",
+    "@texuli/data": "0.8.0",
+    "@texuli/media": "0.8.0",
+    "@texuli/spec": "0.8.0",
+    "texuli": "0.8.0"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

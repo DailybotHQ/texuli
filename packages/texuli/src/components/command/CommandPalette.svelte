@@ -11,6 +11,7 @@ import {
 } from '@texuli/primitives/dialog';
 import { onMount } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue } from '../../internal/cx.ts';
 import CommandEmpty from './CommandEmpty.svelte';
 import CommandGroup from './CommandGroup.svelte';
@@ -76,15 +77,15 @@ let {
   onSelect,
   recentItems = [],
   debounceMs = 150,
-  placeholder = 'Search pages, people, and actions…',
+  placeholder: placeholderProp,
   shortcut = true,
-  recentLabel = 'Recent',
-  title = 'Command palette',
-  description = 'Search or choose a recent action. Use the arrow keys to move and Enter to select.',
-  emptyLabel = 'No results found.',
-  recentEmptyLabel = 'No recent items.',
-  loadingLabel = 'Searching…',
-  errorLabel = 'Search is unavailable. Try again.',
+  recentLabel: recentLabelProp,
+  title: titleProp,
+  description: descriptionProp,
+  emptyLabel: emptyLabelProp,
+  recentEmptyLabel: recentEmptyLabelProp,
+  loadingLabel: loadingLabelProp,
+  errorLabel: errorLabelProp,
   size = 'md',
   variant = 'outline',
   class: className,
@@ -95,6 +96,33 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const placeholder = $derived(
+  placeholderProp ?? msg('texuli.command-palette.placeholder', 'Search pages, people, and actions…')
+);
+const recentLabel = $derived(
+  recentLabelProp ?? msg('texuli.command-palette.recent-label', 'Recent')
+);
+const title = $derived(titleProp ?? msg('texuli.command-palette.title', 'Command palette'));
+const description = $derived(
+  descriptionProp ??
+    msg(
+      'texuli.command-palette.description',
+      'Search or choose a recent action. Use the arrow keys to move and Enter to select.'
+    )
+);
+const emptyLabel = $derived(
+  emptyLabelProp ?? msg('texuli.command-palette.empty-label', 'No results found.')
+);
+const recentEmptyLabel = $derived(
+  recentEmptyLabelProp ?? msg('texuli.command-palette.recent-empty-label', 'No recent items.')
+);
+const loadingLabel = $derived(
+  loadingLabelProp ?? msg('texuli.command-palette.loading-label', 'Searching…')
+);
+const errorLabel = $derived(
+  errorLabelProp ?? msg('texuli.command-palette.error-label', 'Search is unavailable. Try again.')
+);
 
 let query = $state('');
 let results = $state<CommandItemData[]>([]);
@@ -120,7 +148,9 @@ const visibleItems = $derived(query.trim() ? results : [...recentItems]);
 const groupedItems = $derived.by(() => {
   const groups = new Map<string, CommandItemData[]>();
   for (const item of visibleItems) {
-    const group = query.trim() ? (item.group ?? 'Results') : recentLabel;
+    const group = query.trim()
+      ? (item.group ?? msg('texuli.command-palette.results', 'Results'))
+      : recentLabel;
     const current = groups.get(group) ?? [];
     current.push(item);
     groups.set(group, current);

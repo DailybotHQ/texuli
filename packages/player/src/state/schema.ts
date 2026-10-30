@@ -80,7 +80,9 @@ export interface StateIssue {
     | 'action-binding'
     | 'host-binding'
     | 'binding'
-    | 'action';
+    | 'action'
+    | 'source'
+    | 'unknown-source';
   path: string;
   message: string;
 }

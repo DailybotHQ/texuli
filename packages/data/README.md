@@ -9,10 +9,10 @@ own, in Node or behind a view of your own. It is part of
 Svelte 5 component library by Dailybot, Inc., for teams building
 data-heavy product screens.
 
-> **Status: 0.x release.** `@texuli/data` is published on npm as `0.7.0`, a
+> **Status: 0.x release.** `@texuli/data` is published on npm as `0.8.0`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
-> minor (`0.8.0`) may contain breaking changes, so pin the exact version or
-> use `^0.7.0`, which accepts only 0.7.x.
+> minor (`0.9.0`) may contain breaking changes, so pin the exact version or
+> use `^0.8.0`, which accepts only 0.8.x.
 
 ## Install
 
@@ -78,6 +78,7 @@ visible and announced string is translatable through `labels`.
 | `@texuli/data/grid-editing` | `EditableDataGrid`: inline cell editors, validation, undo and redo, TSV clipboard |
 | `@texuli/data/tree-view` | `TreeDataView`: outline and file-tree view with lazy children, drag reorder and checkboxes |
 | `@texuli/data/board` | `Board`: columns and swimlanes with WIP limits, keyboard moves, column footers and heading levels |
+| `@texuli/data/dashboard` | `Dashboard` and `DashboardWidget`: a widget grid moved and resized by pointer, keyboard or an arrange toolbar, with breakpoints and a saved layout (new in `0.8.0`; [docs](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-dashboard.md)) |
 | `@texuli/data/calendar/view` | `CalendarView`: month, time-grid and agenda views with move and reschedule |
 | `@texuli/data/timeline` | `TimelineView`: virtualized Gantt timeline with dependencies, zoom and critical path |
 | `@texuli/data/map` | `MapView`: an offline, fictional vector basemap with markers, clusters, routes and fences |
@@ -94,13 +95,14 @@ visible and announced string is translatable through `labels`.
 | `@texuli/data/grid` | Windowing, column state, multi-sort, grouping, a validated filter AST and saved views |
 | `@texuli/data/tree` | Flattening with ARIA level and position, cycle-safe moves, indent and outdent |
 | `@texuli/data/board/engine` | Fractional rank keys, grouping, WIP limits and move validation |
+| `@texuli/data/dashboard/engine` | Dashboard layout math: packing, collision, moves, resizes, keyboard steps, breakpoints and persistence, bounded on hostile input (new in `0.8.0`; [docs](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-dashboard-engine.md)) |
 | `@texuli/data/calendar` | Dates in an explicit IANA zone, an RFC 5545 recurrence subset, overlap layout and rescheduling, with no date library |
 | `@texuli/data/timeline/engine` | Working-day calendars, dependencies with lag, critical path and cascading moves |
 | `@texuli/data/geo` | The offline map engine: Web Mercator views, clustering, geofences, distances and routes |
 | `@texuli/data/activity/engine` | Mention tokens, day groups, change summaries, threads, reactions and inbox read state |
 | `@texuli/data/files/engine` | Natural-order children, breadcrumbs, name and move checks, deterministic thumbnails |
 
-The package root, `@texuli/data`, re-exports the main views and helpers.
+The package root, `@texuli/data`, re-exports the main views and helpers. The dashboard is subpath-only.
 
 ## Key guarantees
 
@@ -120,6 +122,17 @@ The package root, `@texuli/data`, re-exports the main views and helpers.
 - **Your rules stay yours.** Board and calendar moves are validated in the
   engine, but persisting them, and enforcing authorization and hard limits,
   belongs to your application.
+
+- **Host data sources in generated views (new in `0.8.0`).**
+  In a blueprint, the grid's rows, the board's items, the tree view's items,
+  the calendar's events, the file browser's entries, the timeline's tasks and
+  the notification inbox's items may read a host-registered data source
+  (`@texuli/core/data-source`): the source's filter is this package's grid
+  filter model, and `@texuli/player` shows loading, empty and error states
+  around the view, pages, and saves edits optimistically. A board move is
+  saved through the board's async `onMove`: the card moves at once and goes
+  back, announced, when the save fails
+  ([player data sources](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/data-sources.md)).
 
 **Known limit:** fence editing on the map is not implemented yet; fences are
 drawn and listed only.

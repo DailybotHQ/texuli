@@ -1,4 +1,5 @@
 <script lang="ts">
+import { useMessages } from '../../i18n/use-messages.ts';
 /**
  * Icon rail layout: a narrow primary nav of icons (tooltips + accessible names).
  * Expands to labeled items at wide widths. Host falls back to mobile-tabs below minWidth.
@@ -30,10 +31,12 @@ let {
   path,
   options,
   skipLabel,
-  railLabel = 'Main',
+  railLabel: railLabelProp,
   expanded = false,
   class: className,
 }: Props = $props();
+const msg = useMessages();
+const railLabel = $derived(railLabelProp ?? msg('texuli.rail-layout.rail-label', 'Main'));
 
 const uid = $props.id();
 const mainId = `${uid}-main`;

@@ -1,6 +1,6 @@
 {
   "name": "@texuli/core",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "description": "Texels: framework-free behavior and policy that every Texuli component is built from.",
   "keywords": [
@@ -27,6 +27,7 @@
     ".": "./src/index.ts",
     "./announcer": "./src/announcer/index.ts",
     "./controllable": "./src/controllable/controllable-state.ts",
+    "./data-source": "./src/data-source/index.ts",
     "./dir-locale": "./src/dir-locale/dir-locale.ts",
     "./dismiss": "./src/dismiss/index.ts",
     "./editor-history": "./src/editor/history.ts",
@@ -35,8 +36,10 @@
     "./editor-model": "./src/editor/model.ts",
     "./editor-transforms": "./src/editor/edit.ts",
     "./env": "./src/env/index.ts",
+    "./expression": "./src/expression/index.ts",
     "./focus-scope": "./src/focus-scope/index.ts",
     "./form-bridge": "./src/form-bridge/form-bridge.ts",
+    "./i18n": "./src/i18n/index.ts",
     "./ids": "./src/ids/ids.ts",
     "./inert": "./src/inert/index.ts",
     "./keyboard": "./src/keyboard/index.ts",

@@ -39,5 +39,9 @@ class LayoutWidgetsTest {
         assertEquals(BindingStatus.PLACEHOLDER, NativeRegistry.status("layout-sidebar"))
         // Spec 0.7.0 documents validate natively but paint as a visible placeholder (planned).
         assertEquals(BindingStatus.PLACEHOLDER, NativeRegistry.status("document"))
+        // Spec 0.8.0 forms validate natively but paint as a visible placeholder (planned).
+        assertEquals(BindingStatus.PLACEHOLDER, NativeRegistry.status("schema-form"))
+        // Spec 0.8.0 canvases validate natively but paint as a visible placeholder (planned).
+        assertEquals(BindingStatus.PLACEHOLDER, NativeRegistry.status("canvas"))
     }
 }

@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { cx } from '../../internal/cx.ts';
 import { Button } from '../button/index.ts';
 import './empty.css';
@@ -17,15 +18,18 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'title'> & {
 };
 
 let {
-  title = 'Something went wrong',
+  title: titleProp,
   message,
   onRetry,
-  retryLabel = 'Try again',
+  retryLabel: retryLabelProp,
   action,
   class: className,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const title = $derived(titleProp ?? msg('texuli.error-state.title', 'Something went wrong'));
+const retryLabel = $derived(retryLabelProp ?? msg('texuli.error-state.retry-label', 'Try again'));
 </script>
 
 <div

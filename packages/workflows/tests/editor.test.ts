@@ -6,6 +6,7 @@ import {
   canvasCommand,
   connectCandidates,
   connectCommand,
+  edgeCurve,
   formatLabel,
   nearestInDirection,
   portPlacements,
@@ -138,6 +139,16 @@ const settle = async () => {
 };
 
 describe('pure editor helpers', () => {
+  it('draws edges with the side-aware curve shared through @texuli/drag/graph', () => {
+    // Byte-identical to the curve the editor drew before the math moved to drag.
+    expect(edgeCurve({ x: 0, y: 0 }, 'right', { x: 100, y: 50 }, 'left')).toBe(
+      'M0 0C44.7 0 55.3 50 100 50'
+    );
+    expect(edgeCurve({ x: 10.04, y: 0 }, 'bottom', { x: 10.04, y: 200 }, 'top')).toBe(
+      'M10 0C10 80 10 120 10 200'
+    );
+  });
+
   it('maps the graph keyboard model, flipping left and right in RTL', () => {
     expect(canvasCommand({ key: 'ArrowRight' })).toEqual({ kind: 'focus', direction: 'right' });
     expect(canvasCommand({ key: 'ArrowRight' }, 'rtl')).toEqual({

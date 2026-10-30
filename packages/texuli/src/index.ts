@@ -609,6 +609,12 @@ export {
   type VisibleTreeNode,
 } from './components/tree/index.ts';
 export {
+  getI18nContext,
+  setI18nContext,
+  TEXULI_MESSAGES_EN,
+  useMessages,
+} from './i18n/index.ts';
+export {
   AUTH_SETTINGS_LAYOUTS,
   AuthSplitHostLayout,
   AuthSplitLayout,

@@ -22,7 +22,7 @@ fixtures are not part of the npm package.
 
 | Path | What it holds |
 | --- | --- |
-| `schemas/` | The normative JSON schemas: `blueprint` (envelope v1, local state, flow and the node tree), `catalog`, `diagnostics`, `manifest`, `workflow` (workflow graphs), and from 0.7.0 `document`, `@texuli/document`'s JSON Schema export pinned by digest (`EXTERNAL_SCHEMAS`: not in the dialect, no projection; `packages/catalog/tests/validate-document.test.ts` keeps it equal to `documentJsonSchema()`) |
+| `schemas/` | The normative JSON schemas: `blueprint` (envelope v1, local state, flow and the node tree), `catalog`, `diagnostics`, `manifest`, `workflow` (workflow graphs), and from 0.7.0 `document`, `@texuli/document`'s JSON Schema export pinned by digest (`EXTERNAL_SCHEMAS`: not in the dialect, no projection; `packages/catalog/tests/validate-document.test.ts` keeps it equal to `documentJsonSchema()`), and from 0.8.0 `canvas`, `@texuli/canvas`'s export pinned the same way (`packages/catalog/tests/validate-canvas.test.ts` keeps it equal to `canvasJsonSchema()`; the blueprint's `$defs.canvas` checks a `canvas` node's envelope) |
 | `catalog/components.json` | The closed vocabulary, projected from the built catalog: id, label, summary, group, placement (`app`/`content`), emit tiers, capability and props |
 | `catalog/capabilities.json` | Reviewed capability claims. Empty: no id is audited portable yet, so every capability is `unknown` (ADR-003) |
 | `fixtures/golden/` | Ten blueprints that must validate (fictional data): a report, a dashboard, a proactive deck and a report with a named slot and a `when` condition (0.2.0 envelopes), and five 0.3.0 interfaces: `app-dashboard` (filters bound to state), `mobile-flow` (flow views, forms, `flowGo`), `sortable-board` (reorder groups, locked, clone, `on.move`), `workflow-builder` (an edit-mode `workflow-graph` bound to state) and `lego` (layouts, a data board, charts, media, blocks, a sortable palette and outline, and a workflow editor in one tree). `@texuli/player`'s `golden.test.ts` and `lego.test.ts` paint them |
@@ -228,6 +228,35 @@ stamps `spec` only.
   `document-patch-op` invalid fixtures. The Kotlin twin decodes and refuses
   the same; painting documents natively is planned (a visible placeholder).
 
+## Spec 0.8.0: forms (T-forms)
+
+ADR-012 and ADR-015; additive, so the `0.7.0 → 0.8.0` migration stamps
+`spec` only. (Spec 0.8.0 ships in `@texuli/spec@0.8.0`; the other
+additions of the wave are described with their tasks.)
+
+- **The expression AST.** `$defs.expression` is the closed AST of
+  `@texuli/core/expression`: the `numberFormula` and `condition` ops plus
+  `str`, `bool`, `null`, `field`, `mod`, `neg`, `concat` and `call` (a
+  function of the closed table), and the `ref` and `range` nodes reserved
+  for dialects (the planned sheets formulas; refused in forms). Structural
+  shape only: which members each op needs, the function table and arity,
+  1,000 nodes and depth 32 are the runtime parser's.
+- **Forms.** The agent-emittable `schema-form` catalog id takes a required
+  `schema` prop whose property schema is `{ "$ref": "#/$defs/formSchema" }`
+  (`SPEC_PROP_REFS` gains `formSchema`), with `$defs.formField` (15 closed
+  types; named `format`s; `validator` names; no `pattern` member),
+  `formOption`, `formSection`, `formStep`, `formWhen` (`show`, `require`,
+  `enable` expressions), `formVisibility`, `formLink`, `formMessages` and
+  `formRule` (cross-field expressions). Members per type, ranges, unique
+  names, links through the URL policy and the conditions' field references
+  belong to `@texuli/forms/model`, which `validateDraft` runs through the
+  host's `checkForm`.
+- **Fixtures.** The `form-registration` golden (three steps, sections,
+  conditions, a cross-field rule) and the `form-pattern`,
+  `form-field-type`, `form-format` and `form-expression-op` invalid
+  fixtures. The Kotlin twin decodes the shape and applies the list caps;
+  painting forms natively is planned (a visible placeholder).
+
 ## Named slots and conditions
 
 A node may carry `slot` (audit G04: the parent's named slot, a string such as
@@ -309,8 +338,8 @@ A dialect subset (`type`, `properties`, `required`, `additionalProperties`,
 `items`, `enum`, string, number and array bounds; no `pattern`, for regex
 parity across targets). Objects are closed unless `additionalProperties`
 gives a map. `$ref` names one of `binding`, `reorder`, `action`,
-`eventMap`, `condition` (blueprint `$defs`) or `workflowGraph` (the
-workflow root). A value that does not match reports its first issue as
+`eventMap`, `condition`, `document` (from 0.7.0), `formSchema` (from 0.8.0)
+(blueprint `$defs`) or `workflowGraph` (the workflow root). A value that does not match reports its first issue as
 `prop-type`; a `workflowGraph` prop validated without the workflow schema
 or the workflow validator fails closed with `prop-type`.
 

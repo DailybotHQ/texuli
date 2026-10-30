@@ -37,10 +37,10 @@ the same pieces are safe to hand to a machine.
 ![The Texuli website](docs/assets/screenshots/homepage.png)
 
 > **Status: in development, pre-1.0.** The screenshot above is the
-> texuli.com website, which deploys from `main` to Cloudflare Pages. The 22
-> published packages are released on npm as `0.7.0` (published by CI with
+> texuli.com website, which deploys from `main` to Cloudflare Pages. The 25
+> published packages are released on npm as `0.8.0` (published by CI with
 > provenance; `latest` and `next` both point to it), including the first
-> release of `@texuli/document` and `@texuli/pages`. It is not a stable
+> release of `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets`. It is not a stable
 > release: under 0.x a new minor may contain breaking changes, and 1.0.0 will
 > be the first stable release. The workspace packages stay `private: true`
 > ([RELEASE](docs/RELEASE.md)).
@@ -95,13 +95,14 @@ Every layer is a package with one job, and every dependency points down only
 | L0 | [`@texuli/deck`](packages/deck/README.md) | The framework-free deck engine: deck model v2 from JSON or Markdown, layouts, navigation and lint (in development) |
 | L0 | [`@texuli/spec`](packages/spec/README.md) | The schema-first blueprint contract, with TypeScript and Kotlin projections |
 | L1 | [`@texuli/primitives`](packages/primitives/README.md) | 41 owned headless primitives, one subpath each, held to the APG patterns |
+| L1 | [`@texuli/document`](packages/document/README.md) | The framework-free block document engine: model, operations, Markdown, pagination, DOCX and PDF, CRDT sync (in development) |
 | L2 | [`@texuli/tokens`](packages/tokens/README.md) | The OKLCH theme engine, the `--tx-*` token contract, 200+ themes, compiled CSS |
 | L3 | [`texuli`](packages/texuli/README.md) | Styled components, icons, layouts and app shells |
-| L4 | [`@texuli/data`](packages/data/README.md) · [`@texuli/charts`](packages/charts/README.md) · [`@texuli/media`](packages/media/README.md) · [`@texuli/chat`](packages/chat/README.md) · [`@texuli/workflows`](packages/workflows/README.md) · [`@texuli/editor`](packages/editor/README.md) | Domain packages: data views, every chart family, media, chat, workflow graphs (in development), the rich text editor (in development) |
-| L5 | [`@texuli/blocks`](packages/blocks/README.md) | Content blocks for pages, documents and slides |
+| L4 | [`@texuli/data`](packages/data/README.md) · [`@texuli/charts`](packages/charts/README.md) · [`@texuli/media`](packages/media/README.md) · [`@texuli/chat`](packages/chat/README.md) · [`@texuli/workflows`](packages/workflows/README.md) · [`@texuli/editor`](packages/editor/README.md) · [`@texuli/forms`](packages/forms/README.md) · [`@texuli/canvas`](packages/canvas/README.md) | Domain packages: data views, every chart family, media, chat, workflow graphs (in development), the rich text editor (in development), schema-driven forms (in development), the infinite canvas (in development) |
+| L5 | [`@texuli/blocks`](packages/blocks/README.md) · [`@texuli/sheets`](packages/sheets/README.md) | Content blocks for pages, documents and slides; spreadsheets with an owned formula engine (in development) |
 | L6 | [`@texuli/catalog`](packages/catalog/README.md) | The agent catalog and its sink-free renderer |
 | L7 | [`@texuli/player`](packages/player/README.md) | The runtime that paints validated blueprints |
-| L8 | [`@texuli/tools`](packages/tools/README.md) · [`@texuli/astro`](packages/astro/README.md) · [`@texuli/slides`](packages/slides/README.md) | The copy-in CLI, LLM docs, the A2UI adapter, custom elements, the MCP server; the Astro integration; the slide stage on `@texuli/deck` |
+| L8 | [`@texuli/tools`](packages/tools/README.md) · [`@texuli/astro`](packages/astro/README.md) · [`@texuli/slides`](packages/slides/README.md) · [`@texuli/pages`](packages/pages/README.md) | The copy-in CLI, LLM docs, the A2UI adapter, custom elements, the MCP server; the Astro integration; the slide stage on `@texuli/deck`; the block document editor and reader (in development) |
 
 The layer graph is enforced, not aspirational: `pnpm check:layers` fails any
 import that points up.
@@ -191,10 +192,10 @@ every verified command.
 
 ## Honest boundaries
 
-- **No stable release yet.** The 22 published packages are on npm as
-  `0.7.0`, a pre-1.0 release (`npm install texuli`; `latest` and `next` both
-  point to it). Under 0.x a new minor (`0.8.0`) may contain breaking changes,
-  so pin the exact version or use `^0.7.0`; 1.0.0 will be the first stable
+- **No stable release yet.** The 25 published packages are on npm as
+  `0.8.0`, a pre-1.0 release (`npm install texuli`; `latest` and `next` both
+  point to it). Under 0.x a new minor (`0.9.0`) may contain breaking changes,
+  so pin the exact version or use `^0.8.0`; 1.0.0 will be the first stable
   release.
   The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
 - **texuli.com deploys from `main`** (Cloudflare Pages). Run it locally with

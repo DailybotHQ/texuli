@@ -12,10 +12,10 @@ import { Slider } from '../../src/components/slider/index.ts';
 import { ColorPicker, TagsInput } from '../../src/components/tags-color/index.ts';
 
 /** One form control inside a Field that spreads `control.props` on it. */
-let { control }: { control: string } = $props();
+let { control, required = false }: { control: string; required?: boolean } = $props();
 </script>
 
-<Field label="Contact" description="Help text" error="Fix this" id="field-ctl">
+<Field label="Contact" description="Help text" error="Fix this" id="field-ctl" {required}>
   {#snippet children(c)}
     {#if control === 'Input'}
       <Input {...c.props} />
@@ -32,7 +32,7 @@ let { control }: { control: string } = $props();
     {:else if control === 'RadioGroup'}
       <RadioGroup {...c.props}><Radio value="a" label="A" /><Radio value="b" label="B" /></RadioGroup>
     {:else if control === 'Slider'}
-      <Slider value={40} {...c.props} />
+      <Slider value={40} name="level" {...c.props} />
     {:else if control === 'TagsInput'}
       <TagsInput value={['a']} {...c.props} />
     {:else if control === 'ColorPicker'}

@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import './mobile.css';
 
@@ -38,13 +39,17 @@ let {
   bottomNav,
   stickyFooter,
   children,
-  skipLabel = 'Skip to content',
+  skipLabel: skipLabelProp,
   mainId,
   mainElement = 'main',
   resetScrollOnNavigate = true,
   class: className,
   mainClass,
 }: Props = $props();
+const msg = useMessages();
+const skipLabel = $derived(
+  skipLabelProp ?? msg('texuli.mobile-app-frame.skip-label', 'Skip to content')
+);
 
 const uid = $props.id();
 const screenId = $derived(mainId ?? `${uid}-main`);

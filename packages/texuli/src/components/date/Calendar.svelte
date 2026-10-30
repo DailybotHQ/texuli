@@ -12,6 +12,7 @@ import {
   toCalendarDate,
 } from '@texuli/primitives/date-picker';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { type DateSize, dateCalendarClass } from './variants.ts';
 import './date.css';
@@ -93,13 +94,18 @@ let {
   disabled = false,
   readOnly = false,
   size = 'md',
-  previousLabel = 'Previous month',
-  nextLabel = 'Next month',
+  previousLabel: previousLabelProp,
+  nextLabel: nextLabelProp,
   label,
   class: className,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const previousLabel = $derived(
+  previousLabelProp ?? msg('texuli.calendar.previous-label', 'Previous month')
+);
+const nextLabel = $derived(nextLabelProp ?? msg('texuli.calendar.next-label', 'Next month'));
 
 const selected = $derived(toCalendarDate(value));
 const min = $derived(toCalendarDate(minValue));

@@ -1,0 +1,343 @@
+---
+import { parseCatalog, pseudoLocalize } from '@texuli/core/i18n';
+import { PRIMITIVES_MESSAGES_EN } from '@texuli/primitives';
+import { EMAIL_BLOCK_TYPES, EMAIL_COMPONENT_IDS, renderEmail } from '@texuli/tools/email';
+import { blueprintToDocument } from '@texuli/tools/print';
+import { TEXULI_MESSAGES_EN } from 'texuli';
+/**
+ * /output-page/ — multi-target output (new in 0.8.0): one
+ * blueprint as an email (@texuli/tools/email; the rendered email is a
+ * static file shown in a sandboxed frame, its source and plain text live
+ * in an island), as print and PDF (the player's print mode and
+ * @texuli/tools/print), and component labels from the i18n message
+ * catalog with a live locale switch. The tables are computed by the
+ * packages at build time; the demos are lazy islands (client:visible).
+ */
+import FeaturePage from '../../components/feature-site/FeaturePage.astro';
+import { withBase } from '../../components/foundation/site.ts';
+import GuideCode from '../../components/guides/GuideCode.astro';
+import {
+  EMAIL_OPTIONS,
+  OUTPUT_DRAFTS,
+  WEEKLY_DIGEST,
+} from '../../components/output-site/drafts.ts';
+import EmailFrame from '../../components/output-site/EmailFrame.svelte';
+import EmailLab from '../../components/output-site/EmailLab.svelte';
+import I18nDemo from '../../components/output-site/I18nDemo.svelte';
+import PrintDemo from '../../components/output-site/PrintDemo.svelte';
+import {
+  HOSTILE_CATALOG_JSON,
+  OUTPUT_DOCS,
+  OUTPUT_PIECES,
+  OUTPUT_RELEASE,
+  OUTPUT_RULES,
+  OUTPUT_SECTIONS,
+} from '../../components/output-site/page.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const section = (id: string) => {
+  const entry = OUTPUT_SECTIONS.find((candidate) => candidate.id === id);
+  if (!entry) throw new Error(`Unknown output section ${id}`);
+  return entry;
+};
+
+const previewHref = withBase(import.meta.env.BASE_URL, '/output-page/preview/');
+
+const outcomes = OUTPUT_DRAFTS.map((draft) => {
+  const result = renderEmail(draft.draft, EMAIL_OPTIONS);
+  return {
+    id: draft.id,
+    label: draft.label,
+    ok: result.ok,
+    size: result.html.length,
+    diagnostics: result.diagnostics.map(
+      (entry) => `${entry.severity} ${entry.code}: ${entry.message}`
+    ),
+  };
+});
+
+const mapped = blueprintToDocument(WEEKLY_DIGEST, { title: 'Harbor weekly digest' });
+const mappedBlocks = mapped.ok ? mapped.document.blocks.map((entry) => entry.type) : [];
+const mappedCounts = [...new Set(mappedBlocks)].map((type) => ({
+  type,
+  count: mappedBlocks.filter((candidate) => candidate === type).length,
+}));
+
+const namespaces = (messages: Readonly<Record<string, unknown>>) => {
+  const counts = new Map<string, number>();
+  for (const id of Object.keys(messages)) {
+    const name = id.split('.').slice(0, 2).join('.');
+    counts.set(name, (counts.get(name) ?? 0) + 1);
+  }
+  return counts;
+};
+const texuliCounts = namespaces(TEXULI_MESSAGES_EN.messages);
+const primitiveCounts = namespaces(PRIMITIVES_MESSAGES_EN.messages);
+const totalMessages =
+  Object.keys(TEXULI_MESSAGES_EN.messages).length +
+  Object.keys(PRIMITIVES_MESSAGES_EN.messages).length;
+const hostile = parseCatalog(JSON.parse(HOSTILE_CATALOG_JSON));
+const pseudoSamples = ['Close', 'Next page', 'Remove {label}'].map((text) => ({
+  text,
+  pseudo: pseudoLocalize(text),
+}));
+
+const emailSnippet = `import { renderEmail } from '@texuli/tools/email';
+
+const { ok, html, text, diagnostics } = renderEmail(agentDraft, {
+  preheader: 'Orders up 12%',
+  baseUrl: 'https://example.com/',
+});
+if (ok) await mailer.send({ html, text }); // your mail service`;
+
+const printSnippet = `import { renderBlueprintPdf } from '@texuli/tools/print';
+
+const pdf = await renderBlueprintPdf(agentDraft, {
+  page: { size: 'a4', orientation: 'portrait' },
+});
+if (pdf.ok) downloadBlob(new Blob([pdf.bytes], { type: pdf.mime }), 'digest.pdf');
+
+<Player blueprint={agentDraft} print />`;
+
+const i18nSnippet = `import { createI18n } from '@texuli/core/i18n';
+import { setI18nContext } from 'texuli';
+
+const i18n = createI18n({
+  locale: 'en',
+  loaders: { 'pt-BR': () => import('./locales/pt-BR.ts') }, // loads only when active
+});
+setI18nContext(i18n); // in the root component's script
+await i18n.setLocale('pt-BR');`;
+---
+
+<BaseLayout
+  title="Multi-target output"
+  description="One Texuli blueprint, many targets (new in 0.8.0): email-safe HTML with a plain-text part, print mode and PDF, and every component label from one i18n message catalog with lazy locales and a pseudo-locale."
+>
+  <FeaturePage
+    name="output"
+    eyebrow={`@texuli/tools/email · @texuli/tools/print · @texuli/core/i18n · new in ${OUTPUT_RELEASE}`}
+    title="One blueprint: a page, an email, a PDF, in any language"
+    pieces={OUTPUT_PIECES}
+    piecesLabel="The pieces of multi-target output"
+    sections={OUTPUT_SECTIONS}
+  >
+    <Fragment slot="lead">
+      <p>
+        The same validated blueprint that paints in the player becomes an email that mail clients
+        render, a print-ready page and a PDF, and every label the components show comes from one
+        message catalog. These targets are on npm from <code>{OUTPUT_RELEASE}</code>, a pre-1.0
+        release; the previous release, <code>0.7.0</code>, is without them.
+      </p>
+    </Fragment>
+
+    <section class="fx-section" id="email" aria-labelledby="email-title">
+      <h2 id="email-title">{section('email').title}</h2>
+      <p>{section('email').summary}</p>
+      <div class="fx-pair">
+        <div class="fx-panel">
+          <h3>The weekly digest as an email</h3>
+          <EmailFrame client:visible
+            src={previewHref}
+            title="Email preview: Harbor weekly digest (sandboxed, no scripts)"
+            tall
+          />
+          <p class="fx-note">
+            Written by <code>renderEmail</code> when this page was built, served as its own file and
+            shown on request in a frame with every sandbox restriction on.
+          </p>
+        </div>
+        <div class="fx-panel">
+          <h3>Render it yourself</h3>
+          <EmailLab client:visible />
+        </div>
+      </div>
+      <div class="fx-table-wrap" role="region" aria-label="What each draft became" tabindex="0">
+        <table class="fx-table" data-output-outcomes="">
+          <caption>The three drafts, rendered at build time</caption>
+          <thead>
+            <tr>
+              <th scope="col">Draft</th>
+              <th scope="col">Outcome</th>
+              <th scope="col">Diagnostics</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              outcomes.map((row) => (
+                <tr data-output-outcome={row.id}>
+                  <th scope="row">{row.label}</th>
+                  <td>{row.ok ? `Email of ${row.size.toLocaleString('en')} characters` : 'Refused: nothing written'}</td>
+                  <td>
+                    <ul class="fx-list">
+                      {row.diagnostics.map((line) => (
+                        <li>
+                          <code>{line}</code>
+                        </li>
+                      ))}
+                    </ul>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="fx-pair">
+        <div class="fx-panel">
+          <h3>Ids that paint in email ({EMAIL_COMPONENT_IDS.length})</h3>
+          <p class="fx-note">
+            {EMAIL_COMPONENT_IDS.map((id, index) => (
+              <>
+                {index > 0 ? ', ' : ''}
+                <code>{id}</code>
+              </>
+            ))}
+          </p>
+        </div>
+        <div class="fx-panel">
+          <h3>Block types inside them ({EMAIL_BLOCK_TYPES.length})</h3>
+          <p class="fx-note">
+            {EMAIL_BLOCK_TYPES.map((type, index) => (
+              <>
+                {index > 0 ? ', ' : ''}
+                <code>{type}</code>
+              </>
+            ))}
+          </p>
+        </div>
+      </div>
+      <p class="fx-note">
+        Anything else (charts, diagrams, maps, interactive blocks) falls back to its text. Planned: a
+        dark-mode rule set in the head of the email (today it declares <code>color-scheme: light</code>)
+        and an email envelope profile in a later spec minor.
+      </p>
+    </section>
+
+    <section class="fx-section" id="print" aria-labelledby="print-title">
+      <h2 id="print-title">{section('print').title}</h2>
+      <p>{section('print').summary}</p>
+      <PrintDemo client:visible />
+      <div class="fx-pair">
+        <div class="fx-table-wrap" role="region" aria-label="The digest as document blocks" tabindex="0">
+          <table class="fx-table" data-output-mapped="">
+            <caption>blueprintToDocument: {mappedBlocks.length} document blocks</caption>
+            <thead>
+              <tr>
+                <th scope="col">Block type</th>
+                <th scope="col">Count</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                mappedCounts.map((row) => (
+                  <tr>
+                    <th scope="row">
+                      <code>{row.type}</code>
+                    </th>
+                    <td>{row.count}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="fx-panel">
+          <p class="fx-note">
+            Diagnostics of the mapping: {mapped.diagnostics.map((entry) => entry.message).join(' ') || 'none'}
+          </p>
+          <GuideCode code={printSnippet} label="Print and PDF in code" lang="ts" />
+        </div>
+      </div>
+    </section>
+
+    <section class="fx-section" id="i18n" aria-labelledby="i18n-title">
+      <h2 id="i18n-title">{section('i18n').title}</h2>
+      <p>{section('i18n').summary}</p>
+      <I18nDemo client:visible />
+      <div class="fx-pair">
+        <div class="fx-table-wrap" role="region" aria-label="Message ids by component" tabindex="0">
+          <table class="fx-table" data-output-catalog="">
+            <caption>{totalMessages} English labels, by component</caption>
+            <thead>
+              <tr>
+                <th scope="col">Namespace</th>
+                <th scope="col">Labels</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                [...texuliCounts, ...primitiveCounts].map(([name, count]) => (
+                  <tr>
+                    <th scope="row">
+                      <code>{name}</code>
+                    </th>
+                    <td>{count}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="fx-panel">
+          <h3>A translation file from outside</h3>
+          <p class="fx-note">
+            <code>parseCatalog</code> kept {Object.keys(hostile.catalog?.messages ?? {}).length} messages and
+            dropped {hostile.issues.length}:
+          </p>
+          <ul class="fx-list" data-output-catalog-issues="">
+            {
+              hostile.issues.map((issue) => (
+                <li>
+                  <code>{issue.id.length > 40 ? `${issue.id.slice(0, 40)}…` : issue.id}</code>: {issue.message}
+                </li>
+              ))
+            }
+          </ul>
+          <h3>The pseudo-locale</h3>
+          <ul class="fx-list">
+            {
+              pseudoSamples.map((row) => (
+                <li>
+                  {row.text} → <span lang="en-XA">{row.pseudo}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <GuideCode code={i18nSnippet} label="A catalog in context" lang="ts" />
+        </div>
+      </div>
+    </section>
+
+    <section class="fx-section" id="safety" aria-labelledby="safety-title">
+      <h2 id="safety-title">{section('safety').title}</h2>
+      <p>{section('safety').summary}</p>
+      <ul class="fx-rules">
+        {
+          OUTPUT_RULES.map((rule) => (
+            <li>
+              <h3>{rule.title}</h3>
+              <p>{rule.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <GuideCode code={emailSnippet} label="Email in code" lang="ts" />
+    </section>
+
+    <section class="fx-section" id="package-docs" aria-labelledby="package-docs-title">
+      <h2 id="package-docs-title">Package docs</h2>
+      <p>The site does not render the package docs yet. Read them in the repository:</p>
+      <ul class="fx-list">
+        {
+          OUTPUT_DOCS.map((doc) => (
+            <li>
+              {doc.label}: <code>{doc.path}</code>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </FeaturePage>
+</BaseLayout>
+

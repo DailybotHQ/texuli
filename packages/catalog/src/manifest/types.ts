@@ -137,6 +137,12 @@ export interface CatalogManifest {
   events?: readonly CatalogEventName[];
   /** Props a node may two-way `bind` to a state variable; each a portable, data prop. */
   bindable?: readonly string[];
+  /**
+   * Array props a node may read from a host data source (spec 0.8.0,
+   * ADR-015): `{"$source": name, "query": {...}}`. Each names an array prop
+   * whose items are rows.
+   */
+  sourceable?: readonly string[];
   deprecated?: CatalogDeprecation;
 }
 

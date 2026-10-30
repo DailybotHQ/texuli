@@ -1,0 +1,56 @@
+{
+  "$comment": "Must fail spec validation with exactly these diagnostic codes, in order. Spec 0.8.0 (ADR-015), validated against fixtures/sources.json: the query uses an operator the field does not allow (assignee allows eq only).",
+  "expect": ["source"],
+  "blueprint": {
+    "format": "texuli-blueprint",
+    "version": 1,
+    "id": "source-operator",
+    "catalog": "48d6231182dcdb62ed2c8816ff3f620ae9b9683612403dc7e3db00ad85ad893a",
+    "status": "draft",
+    "createdAt": "2026-10-29T09:00:00Z",
+    "updatedAt": "2026-10-29T09:00:00Z",
+    "generator": {
+      "kind": "agent",
+      "name": "Harbor assistant",
+      "model": "example-model"
+    },
+    "tier": "untrusted",
+    "profile": "web",
+    "trigger": {
+      "kind": "request",
+      "label": "Ticket triage requested in chat"
+    },
+    "spec": "0.8.0",
+    "tree": {
+      "id": "layout-page",
+      "props": {
+        "title": "Tickets"
+      },
+      "children": [
+        {
+          "id": "data-grid",
+          "props": {
+            "caption": "Tickets",
+            "columns": [
+              {
+                "id": "title",
+                "header": "Title"
+              }
+            ],
+            "rows": {
+              "$source": "tickets",
+              "query": {
+                "filter": {
+                  "type": "condition",
+                  "field": "assignee",
+                  "operator": "contains",
+                  "value": "a"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

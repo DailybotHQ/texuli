@@ -159,6 +159,16 @@ export const SLIDE_COMPONENT_EXCLUSIONS: Readonly<Record<string, string>> = Obje
     'A container of catalog child nodes: use `three-column-cards` or `blocks-structure` cards.',
   document:
     'A whole document (spec 0.7.0): the player paints it only through a host `documentHost` (`@texuli/pages/host`), which the slides stage does not carry; put text on a slide with a layout or the blocks families.',
+  canvas:
+    'A whole canvas (spec 0.8.0): the player paints it only through a host `canvasHost` (`@texuli/canvas/host`), which the slides stage does not carry; draw a diagram on a slide with the blocks diagram family.',
+  'schema-form':
+    'A form as data (spec 0.8.0): the player paints it only through a host `formHost` (`@texuli/forms/host`), and its submit proposes an app action; a slide stage carries neither, so collect answers in the app, not on a slide.',
+  spreadsheet:
+    'A sheet as data (spec 0.8.0): the player paints it only through a host `sheetHost` (`@texuli/sheets/host`), which the slides stage does not carry; show figures on a slide with `blocks-data` tables or a chart.',
+  'data-dashboard':
+    'A dashboard (spec 0.8.0) is an application surface of widget child nodes with its own grid layout and edit mode: a component item has no children; lay out figures with a slide layout, `blocks-structure` or the chart components.',
+  'data-dashboard-widget':
+    'A dashboard widget frames catalog child nodes inside `data-dashboard` only: a component item has no children; use `blocks-structure` cards or `three-column-cards` on a slide.',
 });
 
 /** Whole catalog groups the player has no painter for, with their ids and the reason. */

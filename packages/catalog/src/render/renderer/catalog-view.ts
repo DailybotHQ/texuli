@@ -61,5 +61,6 @@ function specFromEntry(entry: CatalogEntry): RenderComponentSpec {
     emit: entry.emit,
     ...(entry.events ? { events: entry.events } : {}),
     ...(entry.bindable ? { bindable: entry.bindable } : {}),
+    ...(entry.sourceable ? { sourceable: entry.sourceable } : {}),
   };
 }

@@ -8,16 +8,20 @@
  */
 import { AppearanceSwitcher } from '@texuli/astro/appearance';
 import { TextBlockView } from '@texuli/blocks/text/renderers';
+import type { CanvasDocument } from '@texuli/canvas/model';
+import { CanvasViewer } from '@texuli/canvas/viewer';
 import { LineChart } from '@texuli/charts/cartesian';
 import { type ChatMessage, ChatThread } from '@texuli/chat';
 import type { TexuliDocument } from '@texuli/document/model';
 import { RichTextEditor } from '@texuli/editor/editor';
 import { markdownToDocument } from '@texuli/editor/markdown';
+import { SchemaForm, validateFormSchema } from '@texuli/forms';
 import { Image } from '@texuli/media/image';
 import { PageReader } from '@texuli/pages/reader';
 import { Player } from '@texuli/player';
 import '@texuli/player/styles.css';
 import '@texuli/slides/styles.css';
+import { type SheetDocument, SheetView } from '@texuli/sheets';
 import { DeckStage } from '@texuli/slides/stage';
 import { applyWorkflowOps, createWorkflow, defineNodeTypes } from '@texuli/workflows/model';
 import { WorkflowViewer } from '@texuli/workflows/viewer';
@@ -93,6 +97,42 @@ const blueprint = {
     },
   ],
 };
+const board: CanvasDocument = {
+  format: 'texuli-canvas',
+  formatVersion: 1,
+  meta: { title: 'Consumer canvas' },
+  shapes: [
+    {
+      id: 'note',
+      type: 'sticky',
+      x: 0,
+      y: 0,
+      width: 160,
+      height: 120,
+      text: 'Consumer canvas note',
+    },
+  ],
+  connectors: [],
+};
+const consumerForm = validateFormSchema({
+  title: 'Consumer form',
+  submitLabel: 'Send',
+  fields: [{ name: 'email', type: 'email', label: 'Consumer form email', required: true }],
+});
+const sheet: SheetDocument = {
+  format: 'texuli-sheet',
+  formatVersion: 1,
+  meta: { title: 'Consumer sheet' },
+  sheets: [
+    {
+      id: 'main',
+      name: 'Main',
+      rows: 3,
+      columns: 2,
+      cells: { A1: 'Consumer sheet total', A2: 2, A3: 3, B1: '=SUM(A2:A3)' },
+    },
+  ],
+};
 /** A 1×1 PNG: app-authored, so the developer tier accepts it, and nothing is fetched. */
 const pixel =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -110,6 +150,9 @@ const deck = {
   <section data-render="@texuli/blocks">
     <TextBlockView block={{ type: 'heading', level: 2, text: 'Consumer block heading' }} />
   </section>
+  <section data-render="@texuli/canvas">
+    <CanvasViewer canvas={board} />
+  </section>
   <section data-render="@texuli/charts">
     <LineChart title="Consumer chart" description="Sign-ups rose in February." {series} />
   </section>
@@ -119,6 +162,11 @@ const deck = {
   <section data-render="@texuli/editor">
     <RichTextEditor value={doc} label="Consumer editor" />
   </section>
+  <section data-render="@texuli/forms">
+    {#if consumerForm.ok}
+      <SchemaForm form={consumerForm.form} onSubmit={async () => ({ ok: true })} />
+    {/if}
+  </section>
   <section data-render="@texuli/media">
     <Image src={pixel} trust="developer" alt="Consumer image" width={160} height={90} />
   </section>
@@ -127,6 +175,9 @@ const deck = {
   </section>
   <section data-render="@texuli/player">
     <Player {blueprint} label="Consumer player" />
+  </section>
+  <section data-render="@texuli/sheets">
+    <SheetView {sheet} readonly label="Consumer sheet" />
   </section>
   <section data-render="@texuli/slides">
     <DeckStage {deck} syncHash={false} />

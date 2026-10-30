@@ -1,5 +1,5 @@
 {
-  "catalogHash": "c6bd7047eba3e1f32e9ed74097c390a58416cf4260267c8958e0ea70821abf35",
+  "catalogHash": "598075e391ed95dcba46e120d2fbb706e8ff67d0d5bdeb3c0741f334f439b264",
   "components": [
     {
       "capability": "web-only",
@@ -869,6 +869,29 @@
         }
       ],
       "summary": "Emphasized documentation-style tip with a strong start edge."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "canvas",
+      "id": "canvas",
+      "label": "Canvas",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "object",
+          "name": "canvas",
+          "required": true,
+          "schema": {
+            "$ref": "#/$defs/canvas"
+          }
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        }
+      ],
+      "summary": "A whiteboard or diagram as data: shapes, sticky notes, text, frames, groups and connectors on an infinite canvas."
     },
     {
       "capability": "web-only",
@@ -2768,6 +2791,7 @@
           }
         }
       ],
+      "sourceable": ["items"],
       "summary": "A kanban board: cards in columns (and optional swimlanes), moved by drag, keyboard or a move menu, with work-in-progress limits."
     },
     {
@@ -2850,6 +2874,7 @@
           "name": "view"
         }
       ],
+      "sourceable": ["events"],
       "summary": "Events on a month, week, day or agenda view; people open, and when allowed move, events."
     },
     {
@@ -2950,6 +2975,203 @@
     },
     {
       "bindable": ["layout"],
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "events": ["change"],
+      "group": "data",
+      "id": "data-dashboard",
+      "label": "Dashboard",
+      "placement": "content",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "kind": "number",
+          "name": "columns"
+        },
+        {
+          "enumValues": ["vertical", "none"],
+          "kind": "enum",
+          "name": "compaction"
+        },
+        {
+          "enumValues": ["compact", "default", "comfortable"],
+          "kind": "enum",
+          "name": "density"
+        },
+        {
+          "kind": "boolean",
+          "name": "editable"
+        },
+        {
+          "enumValues": ["none", "small", "medium", "large"],
+          "kind": "enum",
+          "name": "gap"
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "array",
+          "name": "layout",
+          "schema": {
+            "items": {
+              "properties": {
+                "h": {
+                  "description": "Height in rows.",
+                  "maximum": 48,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "locked": {
+                  "description": "A locked widget never moves or resizes.",
+                  "type": "boolean"
+                },
+                "maxH": {
+                  "maximum": 48,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "maxW": {
+                  "maximum": 24,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "minH": {
+                  "maximum": 48,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "minW": {
+                  "maximum": 24,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "w": {
+                  "description": "Width in columns.",
+                  "maximum": 24,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "x": {
+                  "description": "First column, from 0 (the inline start).",
+                  "maximum": 23,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "y": {
+                  "description": "First row, from 0.",
+                  "maximum": 4096,
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              },
+              "required": ["id"],
+              "type": "object"
+            },
+            "maxItems": 200,
+            "type": "array"
+          }
+        }
+      ],
+      "sourceable": ["layout"],
+      "summary": "A widget grid people can rearrange: data-dashboard-widget children on columns and rows, moved and resized by drag or keyboard, reflowing on narrow screens."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "data",
+      "id": "data-dashboard-widget",
+      "label": "Dashboard widget",
+      "placement": "content",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "kind": "object",
+          "name": "place",
+          "schema": {
+            "properties": {
+              "h": {
+                "description": "Height in rows.",
+                "maximum": 48,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "locked": {
+                "description": "A locked widget never moves or resizes.",
+                "type": "boolean"
+              },
+              "maxH": {
+                "maximum": 48,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "maxW": {
+                "maximum": 24,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "minH": {
+                "maximum": 48,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "minW": {
+                "maximum": 24,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "w": {
+                "description": "Width in columns.",
+                "maximum": 24,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "x": {
+                "description": "First column, from 0 (the inline start).",
+                "maximum": 23,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "y": {
+                "description": "First row, from 0.",
+                "maximum": 4096,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          }
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "widgetId",
+          "required": true
+        }
+      ],
+      "summary": "One titled widget of a data-dashboard, placed on the grid; its child is any content node, such as a chart, a KPI or a grid bound to a host data source."
+    },
+    {
+      "bindable": ["layout"],
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "events": ["change", "select"],
@@ -3021,6 +3243,7 @@
           "name": "layout"
         }
       ],
+      "sourceable": ["entries"],
       "summary": "Folders and files in a grid or list with breadcrumbs, selection and type previews."
     },
     {
@@ -3178,6 +3401,7 @@
           "name": "selectable"
         }
       ],
+      "sourceable": ["rows"],
       "summary": "A sortable, searchable grid of rows and typed columns; virtualized for long lists."
     },
     {
@@ -3321,6 +3545,7 @@
           "name": "timeZone"
         }
       ],
+      "sourceable": ["items"],
       "summary": "Notifications, newest first, with unread state, mark read and unread, mark all read and an unread view."
     },
     {
@@ -3424,6 +3649,7 @@
           "name": "zoom"
         }
       ],
+      "sourceable": ["tasks"],
       "summary": "Tasks as bars over days, weeks, months or quarters, with dependencies and progress."
     },
     {
@@ -3484,6 +3710,7 @@
           "required": true
         }
       ],
+      "sourceable": ["items"],
       "summary": "A hierarchy of items people expand, select and reorder or re-parent by drag or keyboard."
     },
     {
@@ -6550,6 +6777,35 @@
       "summary": "Dialog on large screens, drawer/sheet on small screens."
     },
     {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "events": ["submit"],
+      "group": "schema-forms",
+      "id": "schema-form",
+      "label": "Schema form",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "action",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "object",
+          "name": "schema",
+          "required": true,
+          "schema": {
+            "$ref": "#/$defs/formSchema"
+          }
+        }
+      ],
+      "summary": "A whole form as data: typed fields in sections or steps, conditional logic, named formats and cross-field rules, painted with texuli controls; submitting proposes one action intent to the host."
+    },
+    {
       "capability": "web-only",
       "emit": [],
       "group": "layouts",
@@ -7064,6 +7320,29 @@
         }
       ],
       "summary": "Master-detail split with list and detail panes."
+    },
+    {
+      "capability": "unknown",
+      "emit": ["developer", "untrusted"],
+      "group": "sheets",
+      "id": "spreadsheet",
+      "label": "Spreadsheet",
+      "placement": "content",
+      "props": [
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "object",
+          "name": "sheet",
+          "required": true,
+          "schema": {
+            "$ref": "#/$defs/sheet"
+          }
+        }
+      ],
+      "summary": "A spreadsheet as data: tabs of cells holding numbers, text, booleans and formulas that recalculate."
     },
     {
       "capability": "web-only",

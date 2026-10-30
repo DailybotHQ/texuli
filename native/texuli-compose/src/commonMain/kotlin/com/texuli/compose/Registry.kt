@@ -23,6 +23,13 @@ object NativeRegistry {
         "blocks-data",
         "media-image",
         "blocks-media",
+        // 0.8.0 (ADR-016): the composition layouts and the code and structure families.
+        "layout-stack",
+        "layout-row",
+        "layout-split",
+        "layout-tile",
+        "blocks-code",
+        "blocks-structure",
     ) + compactCharts
 
     fun status(id: String): BindingStatus =

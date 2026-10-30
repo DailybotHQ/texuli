@@ -8,7 +8,7 @@
  * the repository file it cites: a claim's `sources` phrases appear word for
  * word in both the cited file and this module's copy. Every agent surface
  * is a real file or page served by this site, and the install line states
- * the release truth from `docs/RELEASE.md`: 0.7.0 is out (`latest` and
+ * the release truth from `docs/RELEASE.md`: 0.8.0 is out (`latest` and
  * `next` both name it), it is pre-1.0, and nothing stable is yet.
  */
 
@@ -139,7 +139,7 @@ export const WEB_AGENTS_SURFACES: readonly AgentsSurface[] = [
 export const WEB_AGENTS_INSTALL = {
   command: 'pnpm add texuli',
   note:
-    'Installs 0.7.0, a pre-1.0 release: under 0.x a new minor may contain breaking ' +
+    'Installs 0.8.0, a pre-1.0 release: under 0.x a new minor may contain breaking ' +
     'changes, so pin the version. 1.0.0 will be the first stable release.',
 } as const;
 

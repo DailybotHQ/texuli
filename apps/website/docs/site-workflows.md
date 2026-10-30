@@ -2,7 +2,7 @@
 
 **App:** `apps/website`
 **Paths:** `/workflows-page/` (editor and viewer) · `/workflows-page/json/` (JSON live preview)
-**Package:** `@texuli/workflows` (in development, on npm as `0.7.0`)
+**Package:** `@texuli/workflows` (in development, on npm as `0.8.0`)
 **Tests:** `apps/website/tests/site-drag.test.ts`, `apps/website/tests/site-drag-json.test.ts`,
 `tests/e2e/site-drag-workflows.spec.ts`
 

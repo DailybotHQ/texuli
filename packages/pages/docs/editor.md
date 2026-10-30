@@ -171,6 +171,9 @@ replace a default).
 - Text selection across rows, multi-block selection and copy of blocks.
 - Comments, suggestions, history and presence ship in `@texuli/pages/collab`
   (`CollabEditor`); the paged view and export are `paged` and `export`.
-- Sheet and canvas embeds show their reference until those packages ship.
+- Sheet and canvas embeds show their typed reference; painting them through
+  `@texuli/sheets` and `@texuli/canvas` is planned. Embedded players get no
+  `formHost`, `canvasHost` or sheet host, so a component embed holding a
+  `schema-form`, `canvas` or `spreadsheet` node is refused rather than painted.
 - Editing a callout's tone, a code block's language and an embed's payload
   from the UI.

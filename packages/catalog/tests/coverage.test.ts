@@ -133,6 +133,8 @@ describe('catalog coverage gate', () => {
       'data-board',
       'data-calendar',
       'data-cohort-table',
+      'data-dashboard',
+      'data-dashboard-widget',
       'data-files',
       'data-filter-builder',
       'data-grid',

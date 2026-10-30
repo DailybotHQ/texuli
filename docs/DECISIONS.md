@@ -216,7 +216,7 @@ reflect this decision.
   `io.github.dailybothq` — a GitHub-account namespace, verifiable without a
   domain.
 - **Choice:** `com.texuli`, artifacts `texuli-spec` and `texuli-compose`,
-  versions tracking the npm release line they mirror (`0.7.0`).
+  versions tracking the npm release line they mirror (`0.8.0`).
 - **Why:** texuli.com is owned and deployed, so the Central Portal can verify
   the namespace by DNS, and the group matches the Kotlin package names the
   sources already use (`com.texuli.spec.runtime`, `com.texuli.compose`).
@@ -573,6 +573,19 @@ reflect this decision.
   same subpath; adopting a third-party CRDT needs a new supply-chain
   decision.
 
+- **Addendum (2026-10-29, PLAN_010 T-canvas, 0.8.0): the canvas on the shared
+  sync and graph geometry.** `@texuli/canvas/sync` binds the canvas to this
+  subpath as planned (shapes are tree nodes whose sibling order is the
+  z-order, geometry and style are registers, shape text is a sequence; the
+  projection is validated by the canvas schema).
+  The side-aware edge curve (`sideCurveControls`, `sideCurvePath`) moved
+  from `@texuli/workflows` down to `@texuli/drag/graph`, so canvas
+  connectors and workflow edges route on one geometry instead of two
+  copies; `@texuli/workflows` re-uses it unchanged (its tests still pass),
+  and the `@texuli/drag/graph` cap grew to measured + 4%. Reverse by moving
+  the curve back up if the two editors need different routing; the canvas
+  would then carry its own copy.
+
 ## ADR-011: Document packages: `@texuli/document` (L1 engine) and `@texuli/pages` (L8 editor)
 
 - **Date:** 2026-10-28 · **Ratification:** decided by the PLAN_010
@@ -689,6 +702,46 @@ reflect this decision.
   framework part out instead.
 
 - **Addendum (2026-10-29, PLAN_010 T-doc-collab): `@texuli/document/collab`.** The document-to-CRDT binding (projection, diff, commit, comments, suggestions, versions and presence for documents) is its own subpath, `collab`, next to `sync`: ADR-010 keeps `sync` free of any other `@texuli/document` import so canvas, sheets and dashboards can reuse it, and the binding needs the model, ops and schema. `@texuli/pages/collab` is its UI.
+
+- **Addendum (2026-10-29, PLAN_010 0.8.0): host seams for canvases and
+  forms.** The `documentHost` pattern is the rule for every engine the
+  player could import but should not load eagerly:
+  - **`canvasHost`** (T-canvas). `@texuli/canvas` is L4, below the player,
+    so a direct import was allowed, but the canvas validator alone is about
+    10 KB gzip and would sit in the player's first-load chunk for every
+    blueprint. The player injects the host's `checkCanvas` into
+    `validateDraft` and hands a valid `canvas` root to `present`;
+    `@texuli/canvas/host` (`createCanvasPlayerHost`) mounts the viewer
+    lazily. Without a host a canvas is refused (`canvas-unchecked`).
+  - **Shape style is `paint`.** A canvas shape's fill, stroke, stroke
+    width, dash and opacity live in a field named `paint`, not `style`: the catalog's sink
+    scan (`@texuli/catalog/validate` sinks and the hostile render run)
+    refuses any `style`, `styles`, `class` or `className` key anywhere in
+    agent props, which is what keeps CSS out of agent output. Renaming the
+    field keeps that rule absolute instead of adding an exception for
+    canvases; the values are still closed (colors of the closed palette or
+    `none`, bounded numbers, a closed dash set), never CSS.
+  - **`formHost`** (0.8.0 integration). The first forms painter imported
+    `@texuli/forms` from the player (lazily, behind the `schema-form`
+    loader), which made `@texuli/forms` a runtime dependency of the player.
+    That broke packing (the player pinned the forms `0.0.0` placeholder,
+    which the packer refuses while forms is unreleased) and tied every
+    player release to the forms package. Options: (a) let the packer accept
+    `0.0.0` workspace dependencies until forms ships, (b) keep the
+    dependency and publish forms first, (c) a host seam. Chosen: (c),
+    `formHost` (`FormPlayerHost`): the player injects the host's `checkForm`
+    and its `validators` names into `validateDraft`, renders an element per
+    valid `schema-form` node and hands it to `present` with a `submit` that
+    proposes the node's action through `onAction`. `@texuli/forms/host`
+    (`createFormPlayerHost({ validators, labels })`) mounts `SchemaForm`
+    lazily. Without a host a form is refused (`form-unchecked`). The player
+    no longer depends on `@texuli/forms` at all, its first load carries no
+    form code, and the packer rule (no `0.0.0` in packed ranges) stays
+    strict. Unlike documents and canvases, forms may appear anywhere in the
+    tree, so the seam is per node, not per root. Reverse when the forms
+    engine is small enough for the player's first load and is released:
+    then the player may paint `schema-form` itself again behind its lazy
+    loader, keeping `formHost` as an override.
 
 ## ADR-012: Spec evolution: one additive minor per release wave
 
@@ -1045,6 +1098,48 @@ reflect this decision.
   (then add them as a new ADR with a dynamic dependency model and its own
   bounds); never open the language to code.
 
+- **Addendum (2026-10-29, PLAN_010 T-data-sources, 0.8.0): source filters
+  use the grid filter model, not the expression AST.** This ADR planned
+  data-source filters "as the condition AST over `field` operands". The
+  implementation (`@texuli/core/data-source`, `@texuli/spec/source`) uses
+  the `@texuli/data` grid filter model instead: `{ type: 'group', op:
+  'and' | 'or', children }` over `{ type: 'condition', field, operator,
+  value }`, with exactly the grid's `FILTER_OPERATORS`. Why: a source
+  filter is a query a host adapter must translate to its own store (SQL,
+  REST parameters, an in-memory list), and an and/or tree of
+  field-operator-value conditions maps onto every store, while a general
+  expression (arithmetic, function calls, nested comparisons between
+  fields) does not and would have to be refused piecemeal. The grid, the
+  filter builder and the source query now share one shape, so a filter a
+  user builds in the grid travels to the source unchanged. The limits stay
+  ADR-015's: operators the field allows, values that fit the field's type,
+  6 levels and 64 nodes measured without recursion, and nothing ever
+  concatenated into a URL or query string. Expressions remain the language
+  for conditions, computed values and rules (forms, `when`). Reverse when a
+  host needs computed predicates in a source query: add them as a closed
+  `expression` member of the query, evaluated by the adapter's own engine,
+  never by turning the filter into code.
+
+- **Addendum (2026-10-29, PLAN_010 T-sheets, 0.8.0): the
+  catalog id of a spreadsheet is `spreadsheet`, not `sheet`.** Agents emit a
+  sheet as a `spreadsheet` node whose `sheet` prop holds the
+  `@texuli/sheets` format (`$defs.sheet` in spec 0.8.0). The natural id
+  `sheet` is already taken: it is the texuli `Sheet` overlay (a drawer) in
+  the catalog's `overlays` group, and catalog ids are one flat namespace,
+  so reusing it would make one id mean two components (and break every
+  draft, manifest and llms page that names the drawer). `validateDraft`
+  checks each `spreadsheet` node under its `sheets` check with the host's
+  `checkSheet` (`checkSheetDraft` from `@texuli/sheets/model`, which parses
+  every formula at draft time) and refuses it without one
+  (`sheet-unchecked`). The player paints it through a `sheetHost` seam
+  (`createSheetPlayerHost` from `@texuli/sheets/host`), like `canvasHost`
+  and `formHost`, so the formula engine stays out of the player's first
+  chunk and the player (L7) never imports `@texuli/sheets` (L5). Native
+  painting of sheets is planned (the twin validates the sheet's envelope
+  and paints a placeholder). Reverse when the drawer is renamed in a
+  breaking minor; then `sheet` could become an alias, never a second
+  meaning.
+
 ## ADR-016: Static output targets and i18n
 
 - **Date:** 2026-10-28 · **Ratification:** decided by the PLAN_010
@@ -1140,3 +1235,15 @@ reflect this decision.
   becomes available and passes the CSP and security matrix (then swap a
   writer behind its subpath), or a single static-output package becomes
   possible without a layer conflict.
+
+- **Note (2026-10-29, PLAN_010 T-targets, 0.8.0): email dark
+  mode is planned.** The decision above planned a head rule set with "a
+  dark-mode media query". The `@texuli/core/markup` builders have no
+  `<style>` element (deliberately: a style sheet is free text, and the
+  builders accept only typed, escaped nodes), so `@texuli/tools/email`
+  inlines typed styles only and the output declares `color-scheme: light`.
+  A host can render a dark variant with `mode: 'dark'`, which resolves the
+  theme's dark palette into the inline styles. A `prefers-color-scheme`
+  rule set in the head is planned; it needs a typed, closed `<style>`
+  builder (selectors and properties from an allowlist, values escaped)
+  before it can ship.

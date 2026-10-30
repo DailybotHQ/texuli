@@ -40,6 +40,14 @@ export {
   paintAnnouncement,
   selectionAnnouncement,
 } from './announcements.ts';
+export {
+  CANVAS_HOST_PACKAGE,
+  type CanvasPlayerHost,
+  type CanvasPlayerHostRequest,
+  canvasRoot,
+  type DraftCanvasCheck,
+  isCanvasTree,
+} from './canvas-host.ts';
 export { createPlayerCatalog } from './catalog.ts';
 export {
   CHAT_DISPLAY_MANIFESTS,
@@ -111,6 +119,14 @@ export {
   flowActionManifest,
   flowViewManifest,
 } from './flow-manifests.ts';
+export {
+  type DraftFormCheck,
+  FORM_HOST_PACKAGE,
+  type FormPlayerHost,
+  type FormPlayerHostRequest,
+  type FormPlayerSubmitResult,
+} from './form-host.ts';
+export { formActionValues } from './form-values.ts';
 export {
   HOST_CHROME_IDS,
   isHostChromeId,
@@ -195,6 +211,12 @@ export {
   type SelectionMode,
   type SelectionState,
 } from './selection.ts';
+export {
+  type DraftSheetCheck,
+  SHEET_HOST_PACKAGE,
+  type SheetPlayerHost,
+  type SheetPlayerHostRequest,
+} from './sheet-host.ts';
 export {
   DEFAULT_LOAD_TIMEOUT_MS,
   type PlayerSkeletonFamily,

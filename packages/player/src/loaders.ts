@@ -27,6 +27,11 @@ export const PLAYER_LOADERS: Readonly<Record<string, PlayerLoader>> = Object.fre
   'layout-deck': async () => (await import('./layouts/ContentLayout.svelte')).default,
   'deck-slide': async () => (await import('./layouts/ContentLayout.svelte')).default,
   document: async () => (await import('./layouts/DocumentFallback.svelte')).default,
+  canvas: async () => (await import('./layouts/CanvasFallback.svelte')).default,
+  // Spec 0.8.0 (ADR-015): a form as data, painted through the host's formHost (@texuli/forms/host).
+  'schema-form': async () => (await import('./painters/SchemaFormPainter.svelte')).default,
+  // Spec 0.8.0 (ADR-015): a sheet as data, painted through the host's sheetHost (@texuli/sheets/host).
+  spreadsheet: async () => (await import('./painters/SpreadsheetPainter.svelte')).default,
   'blocks-text': async () =>
     (await import('@texuli/blocks/text')).loadTextFamily().then((m) => m.default),
   'blocks-data': async () =>
@@ -87,6 +92,10 @@ export const PLAYER_LOADERS: Readonly<Record<string, PlayerLoader>> = Object.fre
     (await import('./painters/DataNotificationInboxPainter.svelte')).default,
   'data-filter-builder': async () =>
     (await import('./painters/DataFilterBuilderPainter.svelte')).default,
+  // Spec 0.8.0: a widget grid as data (@texuli/data/dashboard).
+  'data-dashboard': async () => (await import('./painters/DataDashboardPainter.svelte')).default,
+  'data-dashboard-widget': async () =>
+    (await import('./painters/DataDashboardWidgetPainter.svelte')).default,
   'chat-thread': async () => (await import('@texuli/chat')).ChatThreadDisplay,
   'chat-message': async () => (await import('@texuli/chat')).ChatMessageDisplay,
   'sortable-list': async () => (await import('./painters/SortableListPainter.svelte')).default,

@@ -2,6 +2,7 @@
 import { getAnnouncer } from '@texuli/core/announcer';
 import { Empty as PrimitiveEmpty } from '@texuli/primitives/combobox';
 import type { ComponentProps, Snippet } from 'svelte';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue } from '../../internal/cx.ts';
 import { comboboxEmptyClass } from './variants.ts';
 import './combobox.css';
@@ -16,10 +17,12 @@ type Props = ComponentProps<typeof PrimitiveEmpty> & {
 let {
   children,
   class: className,
-  announce = 'No results',
+  announce: announceProp,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const announce = $derived(announceProp ?? msg('texuli.combobox-empty.announce', 'No results'));
 
 const classes = $derived(
   comboboxEmptyClass({

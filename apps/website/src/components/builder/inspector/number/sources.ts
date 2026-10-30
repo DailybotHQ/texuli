@@ -97,6 +97,14 @@ const PAINT_HINTS: Readonly<Record<string, Readonly<Record<string, NumberHints>>
       source: 'notification inbox heading (h2 to h6)',
     },
   },
+  // clampColumns (data/dashboard/engine) keeps 1 to DASHBOARD_LIMITS.columns (24); 12 otherwise.
+  'data-dashboard': {
+    columns: {
+      bounds: { min: 1, max: 24, integer: true },
+      default: 12,
+      source: 'dashboard grid columns',
+    },
+  },
   // intrinsicSize (media/image) keeps safe integers from 1 to IMAGE_LIMITS.dimension.
   'media-image': {
     width: { bounds: { min: 1, max: 16_384, integer: true }, source: 'image intrinsic size' },

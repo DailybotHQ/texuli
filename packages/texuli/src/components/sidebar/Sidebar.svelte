@@ -2,6 +2,7 @@
 import { type HrefTrust, safeHref } from '@texuli/core/url-policy';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue } from '../../internal/cx.ts';
 import { VisuallyHidden } from '../separator-aspect/index.ts';
 import { Tooltip } from '../tooltip/index.ts';
@@ -55,14 +56,22 @@ let {
   footer,
   itemIcon,
   showIcons = true,
-  label = 'Main',
-  collapseLabel = 'Collapse sidebar',
-  expandLabel = 'Expand sidebar',
+  label: labelProp,
+  collapseLabel: collapseLabelProp,
+  expandLabel: expandLabelProp,
   hrefTrust = 'developer',
   class: className,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('texuli.sidebar.label', 'Main'));
+const collapseLabel = $derived(
+  collapseLabelProp ?? msg('texuli.sidebar.collapse-label', 'Collapse sidebar')
+);
+const expandLabel = $derived(
+  expandLabelProp ?? msg('texuli.sidebar.expand-label', 'Expand sidebar')
+);
 
 const isCollapsed = $derived(Boolean(collapsed) && !drawer);
 const uid = $props.id();

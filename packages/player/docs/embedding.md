@@ -1,6 +1,6 @@
 # Embedding the player
 
-**Package:** `@texuli/player` (on npm as `0.7.0`, a pre-1.0 release; no
+**Package:** `@texuli/player` (on npm as `0.8.0`, a pre-1.0 release; no
 stable 1.0.0 yet)
 
 How to put a validated catalog blueprint on a page: quick start, the props a
@@ -70,8 +70,12 @@ Every option belongs to the host. A blueprint can set none of them.
 | `landmarks` | `true` | `false` stops layout painters from emitting `<main>`; pass it when the player sits inside your own landmark |
 | `motion` | `'auto'` | `auto` follows `prefers-reduced-motion`; `reduce` stops motion inside the player |
 | `chrome` | `true` | `false` paints no frame chrome: no label heading, status, trust badge, skip link or end anchor (`data-tx-player-chrome="off"`). For a host that already frames the content and states its trust itself, such as a slide (see [Frameless and deck hosts](#frameless-and-deck-hosts)) |
+| `print` | `false` | Print mode (ADR-016; new in 0.8.0): a static paint (`data-tx-player-print`) with an inert surface, motion off, and no skip link, retry button or composer; the print styles (no page break inside frames, tables, figures and code, headings kept with what follows) also preview on screen. The player enters print mode on its own between the browser's `beforeprint` and `afterprint` events, so the browser's "Save as PDF" prints the static form. For a headless PDF see `@texuli/tools/print` |
 | `deckHost` | `null` | A `DeckPlayerHost` that presents a validated `layout-deck` blueprint on a stage instead of the document flow (see [Frameless and deck hosts](#frameless-and-deck-hosts)) |
 | `documentHost` | `null` | A `DocumentPlayerHost` (spec 0.7.0): its `checkDocument` validates `document` nodes, and its `present` paints a valid `document` root. Without one a document blueprint is refused (see [Document hosts](#document-hosts)) |
+| `canvasHost` | `null` | A `CanvasPlayerHost` (spec 0.8.0): its `checkCanvas` validates `canvas` nodes, and its `present` paints a valid `canvas` root. Without one a canvas blueprint is refused (see [Canvas hosts](#canvas-hosts)) |
+| `formHost` | `null` | A `FormPlayerHost` (spec 0.8.0): its `checkForm` validates `schema-form` nodes (with its `validators` names), and its `present` paints each valid one. Without one a form blueprint is refused (see [Forms](#forms)) |
+| `sheetHost` | `null` | A `SheetPlayerHost` (spec 0.8.0; new in 0.8.0): its `checkSheet` validates `spreadsheet` nodes (every formula parsed), and its `present` paints each valid one in place. Without one a spreadsheet blueprint is refused (see [Sheet hosts](#sheet-hosts)) |
 | `selectable`, `selection`, `onSelectionChange` | `false`, —, — | Frame selection for a builder-style preview ([Selection](reference.md#selection-builder-preview)) |
 | `view`, `onFlowChange` | — | The flow view and its transitions ([Views and flows](reference.md#views-and-flows-g09)) |
 | `onAction` | — | Answers action-form intents with `confirmed` or `rejected`; without it, actions are unavailable ([Action surface](reference.md#action-surface-and-receipts-g17)) |
@@ -310,6 +314,136 @@ is too large for its eager chunk, so both come from the host through
 Tests: `packages/player/tests/document-host.test.ts` (the seam, a hostile
 document never presented, the preview notice, keyed streaming) and
 `packages/pages/tests/host.test.ts` (the real reader in the player).
+
+
+## Canvas hosts
+
+New in `0.8.0` (spec 0.8.0, ADR-012). A `canvas`
+blueprint is one node whose `canvas` prop is a Texuli canvas. The player
+(L7) could import `@texuli/canvas` (L4), but the canvas validator stays out
+of its first-load chunk, so, as for documents, the host supplies both
+through `canvasHost` (`CanvasPlayerHost`):
+
+```svelte
+<script lang="ts">
+  import { createCanvasPlayerHost } from '@texuli/canvas/host';
+  import { Player } from '@texuli/player';
+  let { draft } = $props();
+  const canvasHost = createCanvasPlayerHost();
+</script>
+
+<Player blueprint={draft} label="Agent canvas" {canvasHost} />
+```
+
+- **`checkCanvas`** (a `DraftCanvasCheck`) joins validation at the
+  player's `tier`, in `validateDraft` and the streaming node checks.
+  Without a `canvasHost` every `canvas` node fails with `canvas-unchecked`
+  and nothing of the canvas paints.
+- **`present`** receives a `CanvasPlayerHostRequest` once the draft is
+  valid and its single root is a `canvas` (`canvasRoot`): the node's
+  `canvas`, its `label` as `canvasLabel`, its `key`, the host-chosen `tier`,
+  and live getters for the frame `label`, `active` and the empty `target`
+  (`data-tx-player-canvas-host-surface`). It may return a cleanup.
+  `createCanvasPlayerHost` validates again and mounts the read-only
+  `CanvasViewer`, loaded on first use.
+- `isCanvasTree` detects a canvas node and `CANVAS_HOST_PACKAGE` names the
+  package that owns the viewer. Under `invalidPolicy="preview"` with no
+  host, a `canvas` node paints a titled notice (`canvasNeedsHost`), never
+  its shapes.
+
+## Forms
+
+A `schema-form` node (spec 0.8.0, ADR-015) is a form as data. The player
+does not depend on `@texuli/forms`: like documents and canvases, a form
+paints through a host seam, `formHost` (`FormPlayerHost`), so the form
+engine stays out of the player's first-load chunk and the player ships
+without the forms package. `@texuli/forms/host` supplies the adapter:
+
+```svelte
+<script lang="ts">
+  import { createFormPlayerHost } from '@texuli/forms/host';
+  import { Player } from '@texuli/player';
+  const formHost = createFormPlayerHost({ validators: { 'company-email': checkCompanyEmail } });
+</script>
+
+<Player blueprint={draft} label="Agent form" {formHost} onAction={answer} />
+```
+
+- **Validation.** The host's `checkForm` (`checkFormDraft`) joins
+  `validateDraft` at the player's tier, with the host's `validators` names:
+  a field may name only those. Without a `formHost` every `schema-form`
+  node fails with `form-unchecked`, the invalid notice shows, and nothing
+  of the form paints.
+- **Painting.** Each valid `schema-form` node renders an element
+  (`data-tx-player-schema-form="<action>"`) and hands it to the host's
+  `present` (`FormPlayerHostRequest`: `schema`, `action`, `formLabel`,
+  `tier`, the live `active`, `labels` and `target`, and `submit`). The
+  adapter validates the schema again at that tier and mounts `SchemaForm`,
+  loaded on first use; the cleanup unmounts it.
+- **Submitting.** `submit(values)` proposes the node's `action` intent
+  through `onAction`, like `action-form`, with the values of the visible,
+  enabled fields; once confirmed the node's `submit` event runs its
+  `on.submit` actions. Action values are scalars, so a list answer
+  (multiselect, tags) travels as JSON array text (`'["a11y","forms"]'`)
+  and a file answer as the JSON list of its file names: the player has no
+  upload channel (uploads through a host seam are planned). A refused,
+  failed or unavailable action resolves `{ ok: false, message }`, which the
+  form shows in its error summary, keeping the answers.
+- **Helpers.** `formActionValues(values)` is the value mapping above;
+  `FORM_HOST_PACKAGE` names the package that owns the adapter.
+- **Native.** The Kotlin twin validates the schema's shape and paints a
+  visible placeholder (planned).
+
+Tests: `packages/player/tests/schema-form.test.ts` (the golden paints
+through the forms adapter, validation before painting, host validator
+names, the action intent, refusals, no host) and the golden and streaming
+suites.
+
+## Sheet hosts
+
+New in `0.8.0` (spec 0.8.0, ADR-015). A `spreadsheet`
+node is a sheet as data: its `sheet` prop holds tabs of cells and formulas
+in the closed sheet grammar (the id is `spreadsheet` because `sheet` is the
+texuli `Sheet` drawer). The player (L7) does not import `@texuli/sheets`
+(L5): the formula engine and the sheet view stay out of its first-load
+chunk, so, as for canvases and forms, the host supplies both through
+`sheetHost` (`SheetPlayerHost`):
+
+```svelte
+<script lang="ts">
+  import { createSheetPlayerHost } from '@texuli/sheets/host';
+  import { Player } from '@texuli/player';
+  let { draft } = $props();
+  const sheetHost = createSheetPlayerHost({ now: () => Date.now() });
+</script>
+
+<Player blueprint={draft} label="Agent sheet" {sheetHost} />
+```
+
+- **`checkSheet`** (a `DraftSheetCheck`) joins validation at the player's
+  `tier`, in `validateDraft` and the streaming node checks; the adapter's
+  check runs `validateSheet`, which parses every formula. Without a
+  `sheetHost` every `spreadsheet` node fails with `sheet-unchecked`, the
+  invalid notice shows, and nothing of the sheet paints; a bad formula
+  fails with `sheet-schema`.
+- **`present`** receives a `SheetPlayerHostRequest` for each valid
+  `spreadsheet` node, wherever it sits in the tree: the node's `sheet`, its
+  `label` as `sheetLabel`, the host-chosen `tier`, and live getters for the
+  frame `label`, `active` and the empty `target`
+  (`data-tx-player-spreadsheet`). It may return a cleanup, which the player
+  runs when the node, its sheet, the tier or the host changes, and on
+  destroy. `createSheetPlayerHost` validates again and mounts a read-only
+  `SheetView` (an APG grid), loaded on first use; `editable: true` lets
+  people edit the painted copy (edits stay in the view).
+- `SHEET_HOST_PACKAGE` names the package that owns the view. Under
+  `invalidPolicy="preview"` with no host, a `spreadsheet` node paints a
+  titled notice (`sheetNeedsHost`), never its cells.
+- **Native.** Painting spreadsheets in the Kotlin twin is planned.
+
+Tests: `packages/player/tests/sheet-host.test.ts` (a recording host, the
+real `@texuli/sheets/host` adapter with computed totals, refusal without a
+host and of bad formulas, the preview notice) and
+`packages/player/tests/examples-paint.test.ts`.
 
 ## Limits
 

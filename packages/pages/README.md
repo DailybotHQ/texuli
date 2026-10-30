@@ -11,11 +11,11 @@ Every edit is a `@texuli/document` operation in one op log, so undo, redo,
 persistence and sync share one history.
 
 > **Status: in development (pre-1.0).** `@texuli/pages` is published on npm
-> as `0.7.0`, with provenance (its first release, with `@texuli/document`;
+> as `0.8.0`, with provenance (first published as `0.7.0`, with `@texuli/document`;
 > built in PLAN_010, ADR-011 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
-> Under 0.x a new minor (`0.8.0`) may contain breaking changes, so pin the
-> exact version or use `^0.7.0`, which accepts only 0.7.x
+> Under 0.x a new minor (`0.9.0`) may contain breaking changes, so pin the
+> exact version or use `^0.8.0`, which accepts only 0.8.x
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 It sits on layer L8, above the player, because it paints any catalog
@@ -100,8 +100,11 @@ Keep the document in `$state.raw`: every change is a new immutable value.
 - **Embeds:** `component` and `deck` embeds paint through `@texuli/player`
   at the untrusted tier (the player loads on first use); a payload that
   fails validation shows a refusal. Decks present on a stage when the host
-  passes `deckHost` (the player's seam). `sheet` and `canvas` embeds stay
-  typed references until their packages ship.
+  passes `deckHost` (the player's seam). `sheet` and `canvas` embeds are
+  typed references today (painting them through `@texuli/sheets` and
+  `@texuli/canvas` is planned). Embedded players get no `formHost`,
+  `canvasHost` or sheet host, so a component embed holding a
+  `schema-form`, `canvas` or `spreadsheet` node is refused rather than painted.
 - **Undo and redo** replay the document op log (typing in one block within
   a second is one step); undos are log entries too.
 - **Motion:** inserts, removes and reorders glide (FLIP) on the shared

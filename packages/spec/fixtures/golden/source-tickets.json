@@ -1,0 +1,122 @@
+{
+  "format": "texuli-blueprint",
+  "version": 1,
+  "id": "source-tickets-triage",
+  "catalog": "48d6231182dcdb62ed2c8816ff3f620ae9b9683612403dc7e3db00ad85ad893a",
+  "status": "draft",
+  "createdAt": "2026-10-29T09:00:00Z",
+  "updatedAt": "2026-10-29T09:00:00Z",
+  "generator": {
+    "kind": "agent",
+    "name": "Harbor assistant",
+    "model": "example-model"
+  },
+  "tier": "untrusted",
+  "profile": "web",
+  "trigger": {
+    "kind": "request",
+    "label": "Ticket triage requested in chat"
+  },
+  "spec": "0.8.0",
+  "tree": {
+    "id": "layout-page",
+    "props": {
+      "title": "Ticket triage",
+      "description": "Open and in-progress tickets from the team's tracker."
+    },
+    "children": [
+      {
+        "key": "open-tickets",
+        "id": "data-grid",
+        "props": {
+          "caption": "Open tickets by points",
+          "columns": [
+            {
+              "id": "title",
+              "header": "Title"
+            },
+            {
+              "id": "status",
+              "header": "Status"
+            },
+            {
+              "id": "points",
+              "header": "Points",
+              "kind": "number",
+              "align": "end",
+              "sortable": true
+            }
+          ],
+          "rows": {
+            "$source": "tickets",
+            "query": {
+              "fields": ["title", "status", "points"],
+              "filter": {
+                "type": "group",
+                "op": "and",
+                "children": [
+                  {
+                    "type": "condition",
+                    "field": "status",
+                    "operator": "in",
+                    "value": ["open", "doing"]
+                  },
+                  {
+                    "type": "condition",
+                    "field": "points",
+                    "operator": "between",
+                    "value": [1, 13]
+                  }
+                ]
+              },
+              "sort": [
+                {
+                  "field": "points",
+                  "direction": "desc"
+                }
+              ],
+              "pageSize": 25
+            }
+          },
+          "searchable": true
+        }
+      },
+      {
+        "key": "ticket-board",
+        "id": "data-board",
+        "props": {
+          "label": "Tickets by status",
+          "columns": [
+            {
+              "id": "open",
+              "title": "Open"
+            },
+            {
+              "id": "doing",
+              "title": "Doing"
+            },
+            {
+              "id": "done",
+              "title": "Done"
+            }
+          ],
+          "items": {
+            "$source": "tickets",
+            "query": {
+              "fields": ["title", "status"],
+              "sort": [
+                {
+                  "field": "title"
+                }
+              ],
+              "pageSize": 50
+            },
+            "map": {
+              "column": "status"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

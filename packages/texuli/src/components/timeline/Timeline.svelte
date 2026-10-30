@@ -1,7 +1,9 @@
 <script lang="ts">
+import { localizeLabels } from '@texuli/core/i18n';
 import type { HrefTrust } from '@texuli/core/url-policy';
 import { type Snippet, setContext } from 'svelte';
 import type { HTMLOlAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import TimelineItem from './TimelineItem.svelte';
 import {
   DEFAULT_TIMELINE_MESSAGES,
@@ -42,13 +44,17 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
 
 const context: TimelineContext = $state({
   messages: { ...DEFAULT_TIMELINE_MESSAGES },
   hrefTrust: 'developer',
 });
 $effect.pre(() => {
-  context.messages = { ...DEFAULT_TIMELINE_MESSAGES, ...stringsOnly(overrides) };
+  context.messages = {
+    ...localizeLabels(msg, 'texuli.timeline', DEFAULT_TIMELINE_MESSAGES),
+    ...stringsOnly(overrides),
+  };
   context.hrefTrust = hrefTrust;
 });
 setContext(TIMELINE_CONTEXT, context);

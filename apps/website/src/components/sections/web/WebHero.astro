@@ -22,6 +22,7 @@ import {
   WEB_HERO_GRID_CAPTION,
   WEB_HERO_GRID_LINKS,
   WEB_HERO_IDS,
+  WEB_HERO_NEWS,
   WEB_HERO_PROOF_LABEL,
   WEB_HERO_SUB,
   WEB_HERO_TITLE,
@@ -42,6 +43,9 @@ const resolveHref = (href: string): string | undefined => {
 
 <section class="web-hero" aria-labelledby={WEB_HERO_IDS.hero} data-tx-web-hero="">
   <div class="web-hero__copy">
+    <p class="web-hero__news">
+      <a href={resolveHref(WEB_HERO_NEWS.href)} data-tx-hero-news="">{WEB_HERO_NEWS.label}</a>
+    </p>
     <p class="web-hero__eyebrow">{WEB_HERO_EYEBROW}</p>
     <h1 id={WEB_HERO_IDS.hero}>{WEB_HERO_TITLE}</h1>
     <p class="web-hero__sub">{WEB_HERO_SUB}</p>
@@ -123,6 +127,25 @@ const resolveHref = (href: string): string | undefined => {
     display: grid;
     gap: 1rem;
     max-inline-size: 36rem;
+  }
+  .web-hero__news {
+    margin: 0;
+  }
+  .web-hero__news a {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 999px;
+    background: var(--tx-surface, Canvas);
+    color: var(--tx-foreground, CanvasText);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+  .web-hero__news a:focus-visible {
+    outline: 2px solid var(--tx-ring, Highlight);
+    outline-offset: 2px;
   }
   .web-hero__eyebrow {
     margin: 0;

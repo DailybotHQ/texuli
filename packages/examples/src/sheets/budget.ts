@@ -1,0 +1,62 @@
+import type { SheetDocument } from '@texuli/sheets/model';
+
+/** A fictional team offsite budget: two tabs, formulas across them, one lookup. */
+export function offsiteBudget(): SheetDocument {
+  return {
+    format: 'texuli-sheet',
+    formatVersion: 1,
+    meta: { title: 'Team offsite budget' },
+    sheets: [
+      {
+        id: 'costs',
+        name: 'Costs',
+        rows: 12,
+        columns: 5,
+        cells: {
+          A1: 'Item',
+          B1: 'Unit cost',
+          C1: 'Quantity',
+          D1: 'Total',
+          E1: 'Category',
+          A2: 'Venue',
+          B2: 1200,
+          C2: 1,
+          D2: '=B2*C2',
+          E2: 'Place',
+          A3: 'Lunch',
+          B3: 18.5,
+          C3: 24,
+          D3: '=B3*C3',
+          E3: 'Food',
+          A4: 'Coffee',
+          B4: 3.25,
+          C4: 48,
+          D4: '=B4*C4',
+          E4: 'Food',
+          A5: 'Train tickets',
+          B5: 42,
+          C5: 12,
+          D5: '=B5*C5',
+          E5: 'Travel',
+          A7: 'Total',
+          D7: '=SUM(D2:D5)',
+          A8: 'Food',
+          D8: '=SUMIF(E2:E5, "Food", D2:D5)',
+          A9: 'Budget',
+          D9: '=Limits!B1',
+          A10: 'Left',
+          D10: '=D9-D7',
+          A11: 'Status',
+          D11: '=IF(D10<0, "over budget", "within budget")',
+        },
+      },
+      {
+        id: 'limits',
+        name: 'Limits',
+        rows: 4,
+        columns: 2,
+        cells: { A1: 'Budget', B1: 2500, A2: 'Approved on', B2: '2026-11-02' },
+      },
+    ],
+  };
+}

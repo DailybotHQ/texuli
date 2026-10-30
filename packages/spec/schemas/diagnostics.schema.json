@@ -63,7 +63,9 @@
         "action",
         "unknown-event",
         "workflow",
-        "duplicate-key"
+        "duplicate-key",
+        "source",
+        "unknown-source"
       ]
     },
     "warning": {

@@ -22,6 +22,9 @@ const FORM_EXAMPLES = [
   'texuli-file-upload',
   'texuli-tags-color',
   'texuli-toggle',
+  // @texuli/forms (spec 0.8.0): schema-driven forms painted with the controls above.
+  'forms-registration',
+  'forms-fields',
 ] as const;
 
 type FixtureId = (typeof FORM_EXAMPLES)[number];
@@ -110,6 +113,25 @@ test('forced colors, 320px reflow, keyboard and listbox width', async ({ page })
       problems.push(...(await axeProblems(page, id, 'forced colors')));
     }
     await page.emulateMedia({ forcedColors: 'none' });
+  });
+
+  await test.step('forms-registration: Enter checks the step, focuses the summary, then the next step', async () => {
+    await gotoFixture(page, 'forms-registration', 'light');
+    const host = page.locator('[data-example="forms-registration"]');
+    const name = host.getByRole('textbox', { name: /Full name/ });
+    await name.focus();
+    await page.keyboard.press('Enter');
+    const summary = host.locator('.tx-forms__summary');
+    await expect(summary).toBeFocused();
+    await expect(summary).toContainText('2 answers need attention.');
+    await host.getByRole('link', { name: /Full name/ }).press('Enter');
+    await expect(name).toBeFocused();
+    await page.keyboard.type('Ada Example');
+    await page.keyboard.press('Tab');
+    await page.keyboard.type('ada@example.com');
+    await page.keyboard.press('Enter');
+    await expect(host.getByRole('heading', { name: 'Attendance' })).toBeFocused();
+    problems.push(...(await axeProblems(page, 'forms-registration', 'step 2')));
   });
 
   await test.step('texuli-field labels associate and Tab reaches the control', async () => {

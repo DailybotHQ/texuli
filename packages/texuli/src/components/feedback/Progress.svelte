@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Progress as ProgressPrimitive } from '@texuli/primitives/progress';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import {
   type FeedbackSize,
   type FeedbackTone,
@@ -42,11 +43,13 @@ let {
   tone = 'primary',
   size = 'md',
   shape = 'linear',
-  loadingLabel = 'Loading',
+  loadingLabel: loadingLabelProp,
   class: className,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const loadingLabel = $derived(loadingLabelProp ?? msg('texuli.progress.loading-label', 'Loading'));
 
 const uid = $props.id();
 const labelId = `tx-progress-label-${uid}`;

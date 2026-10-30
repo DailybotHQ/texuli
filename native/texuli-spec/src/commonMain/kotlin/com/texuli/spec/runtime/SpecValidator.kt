@@ -55,6 +55,8 @@ fun validateBlueprint(
     envelope: BlueprintEnvelope,
     components: List<SpecComponent> = SpecVocabulary.components,
     catalogHash: String? = null,
+    /** The host's data sources (spec 0.8.0); without them every `$source` binding is refused. */
+    sources: List<SourceDescriptor>? = null,
 ): SpecValidation {
     val out = ArrayList<SpecDiagnostic>()
     if (catalogHash != null && envelope.catalog != catalogHash) {
@@ -73,6 +75,7 @@ fun validateBlueprint(
         state,
         flow,
         warnings,
+        sources,
     )
     return SpecValidation(ok = out.isEmpty(), diagnostics = out, warnings = warnings.ifEmpty { null })
 }
@@ -258,8 +261,9 @@ internal class NodeContext(
     val flow: SpecFlowInfo?,
     val insideForm: Boolean,
     val out: MutableList<SpecDiagnostic>,
+    val sources: List<SourceDescriptor>? = null,
 ) {
-    fun withOut(other: MutableList<SpecDiagnostic>) = NodeContext(id, state, flow, insideForm, other)
+    fun withOut(other: MutableList<SpecDiagnostic>) = NodeContext(id, state, flow, insideForm, other, sources)
 
     fun fail(code: SpecDiagnosticCode, path: String, message: String) {
         out += SpecDiagnostic(code, path, message, id)
@@ -275,6 +279,7 @@ fun validateTree(
     state: Map<String, SpecStateVariable> = emptyMap(),
     flow: SpecFlowInfo? = null,
     warnings: MutableList<SpecWarning>? = null,
+    sources: List<SourceDescriptor>? = null,
 ): List<SpecDiagnostic> {
     val byId = components.associateBy { it.id }
     val out = ArrayList<SpecDiagnostic>()
@@ -309,7 +314,7 @@ fun validateTree(
                     node.id,
                 )
             }
-            val context = NodeContext(node.id, state, flow, insideForm, out)
+            val context = NodeContext(node.id, state, flow, insideForm, out, sources)
             val props = node.props ?: emptyMap()
             val bind = node.bind ?: emptyMap()
             checkProps(props, bind, component, "$here.props", context)
@@ -425,6 +430,10 @@ private fun checkProps(
             )
             continue
         }
+        if (isSourceBinding(value)) {
+            checkPropSource(value as JsonValue.Obj, prop, component, here, context)
+            continue
+        }
         if (isBindingShaped(value)) {
             checkPropBinding(value as JsonValue.Obj, prop, here, context)
             continue
@@ -451,6 +460,22 @@ private fun checkProps(
         if (prop.required == true && prop.extension == null && prop.name !in given && prop.name !in bind) {
             out += SpecDiagnostic(SpecDiagnosticCode.MISSING_REQUIRED, "$path.${prop.name}", "\"$id\" needs \"${prop.name}\".", id)
         }
+    }
+}
+
+/**
+ * A whole prop read from a host data source (spec 0.8.0): a sourceable prop,
+ * then the binding's shape and meaning against the host's sources (refused
+ * without them), as in TypeScript.
+ */
+private fun checkPropSource(value: JsonValue.Obj, prop: SpecProp, component: SpecComponent, path: String, context: NodeContext) {
+    if (prop.name !in component.sourceable.orEmpty()) {
+        context.fail(SpecDiagnosticCode.SOURCE, path, "\"${prop.name}\" of \"${component.id}\" cannot read a data source.")
+        return
+    }
+    val itemFields = prop.schema?.items?.properties?.keys?.toList()
+    for (issue in checkSourceBinding(value, context.sources, itemFields)) {
+        context.fail(issue.code, "$path${issue.at}", issue.message)
     }
 }
 
@@ -484,6 +509,10 @@ private fun walkOpaque(value: JsonValue, path: String, depth: Int, context: Node
     when (value) {
         is JsonValue.Arr -> value.items.forEachIndexed { index, item -> walkOpaque(item, "$path[$index]", depth + 1, context) }
         is JsonValue.Obj -> {
+            if (isSourceBinding(value)) {
+                context.fail(SpecDiagnosticCode.SOURCE, path, "A data-source binding reads only a whole top-level prop.")
+                return
+            }
             if (isBindingShaped(value)) {
                 nestedBinding(value, path, context, null)
                 return

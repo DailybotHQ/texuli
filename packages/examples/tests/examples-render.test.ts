@@ -314,4 +314,16 @@ describe('example renders', () => {
       )
     );
   });
+
+  it('canvas: the editor paints an application region and a shape tree; the viewer lists the structure', async () => {
+    const editor = await renderExample('canvas-editor', 'canvas/CanvasEditor');
+    expect(editor.getByRole('application').getAttribute('aria-label')).toBe('Canvas: Launch retro');
+    expect(editor.getAllByRole('treeitem').length).toBe(11);
+    expect(editor.container.querySelectorAll('[data-tx-connector]')).toHaveLength(3);
+    const viewer = await renderExample('canvas-viewer', 'canvas/CanvasViewer');
+    expect(viewer.getByRole('img', { name: 'Launch retro' })).toBeTruthy();
+    expect(viewer.container.querySelector('figcaption')?.textContent).toContain(
+      'Connector from Urgent? (Diamond) to Fix this week (Rectangle): yes'
+    );
+  });
 });

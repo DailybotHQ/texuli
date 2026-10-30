@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { Component } from 'svelte';
-import { getPlayerLabels } from './context.ts';
+import { getPlayerLabels, getPlayerSources } from './context.ts';
 import type { PlayerNodeError } from './errors.ts';
 import { isContentLayoutId } from './layouts/outline.ts';
 import MotionFrame from './motion/MotionFrame.svelte';
@@ -8,6 +8,7 @@ import NodePlaceholder from './NodePlaceholder.svelte';
 import Self from './PlayerNode.svelte';
 import SlottedPaint from './SlottedPaint.svelte';
 import { groupSlots } from './slots.ts';
+import SourceFrame from './sources/SourceFrame.svelte';
 import type { PlayerPaintNode } from './types.ts';
 
 let {
@@ -16,6 +17,18 @@ let {
 }: { node: PlayerPaintNode; onNodeError?: (error: PlayerNodeError) => void } = $props();
 
 const labels = getPlayerLabels();
+// Spec 0.8.0: a node reading a host data source paints inside its source frame.
+const sources = getPlayerSources();
+const sourceBound = $derived(node.kind === 'component' && sources?.status(node.path) != null);
+
+/** The bound node's name for its loading and error messages. */
+function sourceLabel(props: Readonly<Record<string, unknown>>, id: string): string {
+  for (const key of ['caption', 'label', 'title']) {
+    const value = props[key];
+    if (typeof value === 'string' && value.trim() !== '') return value;
+  }
+  return id;
+}
 // Named slots (audit G04): most nodes have none and paint on the direct path.
 const slots = $derived(node.kind === 'component' ? groupSlots(node.children) : null);
 
@@ -94,6 +107,15 @@ function onBoundaryError(error: unknown): void {
       {@render painted()}
     {/if}
   {/snippet}
+  {#snippet sourced()}
+    {#if sourceBound}
+      <SourceFrame path={node.path} label={sourceLabel(node.props, node.id)}>
+        {@render framed()}
+      </SourceFrame>
+    {:else}
+      {@render framed()}
+    {/if}
+  {/snippet}
   {#if node.motion}
     <!-- Spec 0.6.0 motion: a box-less wrapper the motion runtime animates. -->
     <MotionFrame
@@ -102,9 +124,9 @@ function onBoundaryError(error: unknown): void {
       delay={node.motionDelay}
       leaving={node.leaving === true}
     >
-      {@render framed()}
+      {@render sourced()}
     </MotionFrame>
   {:else}
-    {@render framed()}
+    {@render sourced()}
   {/if}
 {/if}

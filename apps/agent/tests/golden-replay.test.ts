@@ -45,6 +45,9 @@ describe('golden conversations through the service loop', () => {
         blocks: 'pass',
         // Spec 0.7.0: no document in this draft and no document check passed by the service.
         documents: 'pass', // the host document validator is wired (spec 0.7.0)
+        forms: 'pass', // the forms validator is wired (spec 0.8.0)
+        canvases: 'pass', // the canvas validator is wired (spec 0.8.0)
+        sheets: 'pass', // the sheet validator is wired (spec 0.8.0)
         grammar: 'pass',
         root: 'pass',
         interaction: 'pass',

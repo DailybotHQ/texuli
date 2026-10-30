@@ -210,14 +210,19 @@ export const WHY_KMP_EXCERPTS: WhyKmpExcerpt[] = [
  * \`motionLevel\` is the level spec 0.6.0 motion plays at
  * (\`resolveMotionLevel(host, envelope.motion?.level, reducedMotion)\`);
  * \`NONE\` paints every node at once.
+ *
+ * \`messages\` is the label catalog (ADR-016, the \`@texuli/core/i18n\` format):
+ * the renderer's own words (placeholders, table and code names) resolve
+ * through it, with English defaults.
  */
 @Composable
 fun BlueprintView(
     plan: List<PlanNode>,
     onIntent: (TexuliIntent) -> Unit = {},
     motionLevel: BlueprintMotionLevel = BlueprintMotionLevel.FULL,
+    messages: TexuliMessages = TexuliMessages(),
 ) {
-    CompositionLocalProvider(LocalMotionLevel provides motionLevel) {
+    CompositionLocalProvider(LocalMotionLevel provides motionLevel, LocalTexuliMessages provides messages) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             plan.forEachIndexed { index, node -> PlanNodeView(node, "$index", onIntent) }
         }

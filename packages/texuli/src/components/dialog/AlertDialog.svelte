@@ -6,6 +6,7 @@ import type { PortalTarget } from '@texuli/core/portal';
 import * as AlertDialogPrimitive from '@texuli/primitives/alert-dialog';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue } from '../../internal/cx.ts';
 import type { MotionProp } from '../../motion/contract.ts';
 import { createOverlayMotion } from '../../motion/seam.ts';
@@ -87,15 +88,15 @@ let {
   open = $bindable(false),
   title,
   description,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  confirmLabel: confirmLabelProp,
+  cancelLabel: cancelLabelProp,
   destructive = false,
   onConfirm,
   onCancel,
   trigger,
   children,
   class: className,
-  errorFallback = 'The action failed. Please try again.',
+  errorFallback: errorFallbackProp,
   onOpenChange,
   portal,
   stack,
@@ -107,6 +108,15 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const confirmLabel = $derived(
+  confirmLabelProp ?? msg('texuli.alert-dialog.confirm-label', 'Confirm')
+);
+const cancelLabel = $derived(cancelLabelProp ?? msg('texuli.alert-dialog.cancel-label', 'Cancel'));
+const errorFallback = $derived(
+  errorFallbackProp ??
+    msg('texuli.alert-dialog.error-fallback', 'The action failed. Please try again.')
+);
 
 const panelMotion = createOverlayMotion({
   motion: () => motion,

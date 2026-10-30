@@ -6,6 +6,7 @@ import { checkMapBlock } from '@texuli/blocks/map/engine';
 import { checkMediaBlock } from '@texuli/blocks/media/engine';
 import { checkStructureBlock } from '@texuli/blocks/structure/engine';
 import { checkTextBlock } from '@texuli/blocks/text/engine';
+import { validateCanvas } from '@texuli/canvas/model';
 import type { Catalog } from '@texuli/catalog/build';
 import type { BlueprintEnvelope } from '@texuli/catalog/envelope';
 import { createEnvelope, createValidationReceipt } from '@texuli/catalog/envelope';
@@ -16,13 +17,18 @@ import {
   renderCatalogFromBuild,
 } from '@texuli/catalog/render/renderer';
 import {
+  type DraftCanvasCheck,
   type DraftDocumentCheck,
+  type DraftFormCheck,
+  type DraftSheetCheck,
   type DraftValidation,
   type ValidateDraftOptions,
   validateDraft,
 } from '@texuli/catalog/validate';
 import { createFamilyBlockCheck, diagramFamilyCheck } from '@texuli/catalog/validate/blocks';
 import { validateDocument } from '@texuli/document/schema';
+import { checkFormDraft } from '@texuli/forms/model';
+import { checkSheetDraft } from '@texuli/sheets/model';
 import {
   createMemoryTokenUsageStore,
   DEFAULT_TOKEN_BUDGETS,
@@ -84,6 +90,45 @@ export const checkDocumentDraft: DraftDocumentCheck = (doc, tier) => {
   }));
   return result.ok ? { ok: true, document: result.document, issues } : { ok: false, issues };
 };
+
+/**
+ * The host form validator for `schema-form` nodes (spec 0.8.0, ADR-015):
+ * `checkFormDraft` from `@texuli/forms/model` (`validateFormSchema` at the
+ * draft's tier, always `untrusted` here). The service knows no host
+ * validators, so it does not restrict `validator` names: the host that
+ * paints the draft checks them against its own (`@texuli/forms/host`
+ * refuses a name it did not register). The same check runs for each
+ * streamed node and for the final `validateDraft`.
+ */
+export const checkFormSchemaDraft: DraftFormCheck = (schema, tier, validators) =>
+  checkFormDraft(schema, tier, validators);
+
+/**
+ * The host canvas validator for `canvas` nodes (spec 0.8.0, ADR-012):
+ * `validateCanvas` from `@texuli/canvas/model` at the draft's tier, the
+ * same check as `checkCanvasDraft` in `@texuli/canvas/host` without the
+ * viewer's Svelte mount (the worker paints nothing). Warnings do not
+ * refuse; every error does.
+ */
+export const checkCanvasSchemaDraft: DraftCanvasCheck = (canvas, tier) => {
+  const result = validateCanvas(canvas, { trust: tier });
+  const issues = result.issues.map((issue) => ({
+    code: issue.code,
+    path: issue.jsonPath,
+    message: issue.message,
+    severity: issue.severity === 'warning' ? ('warning' as const) : ('error' as const),
+  }));
+  return result.ok ? { ok: true, canvas: result.canvas, issues } : { ok: false, issues };
+};
+
+/**
+ * The host sheet validator for `spreadsheet` nodes (spec 0.8.0, ADR-015):
+ * `checkSheetDraft` from `@texuli/sheets/model` (`validateSheet`: closed
+ * members, the caps, text safety, and every formula parsed with the sheet
+ * grammar), so agent formulas are refused at draft time. Sheets are data at
+ * every tier; the worker paints nothing.
+ */
+export const checkSheetSchemaDraft: DraftSheetCheck = (sheet, tier) => checkSheetDraft(sheet, tier);
 
 let familyEngines: ReturnType<typeof createFamilyBlockCheck> | undefined;
 // The factory runs on first use instead of at module init: an init-time
@@ -250,6 +295,13 @@ export function createAgentService(config: AgentConfig): AgentService {
     checkBlock: (block, id) => checkFamilyBlock(block, id),
     // Documents (spec 0.7.0): without the host validator every `document` node is refused.
     checkDocument: checkDocumentDraft,
+    // Forms, canvases and sheets (spec 0.8.0): checked by their engines' validators.
+    checkForm: checkFormSchemaDraft,
+    checkCanvas: checkCanvasSchemaDraft,
+    checkSheet: checkSheetSchemaDraft,
+    // Data sources (spec 0.8.0): the service holds no source registry, so it
+    // passes no `sources` and every `{"$source": …}` binding is refused, in
+    // the stream and in the final validation alike (as in validateDraft).
   };
   const gate = (input: unknown): DraftValidation => validateDraft(input, gateOptions);
 

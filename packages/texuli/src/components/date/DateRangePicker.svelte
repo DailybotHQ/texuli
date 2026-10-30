@@ -1,4 +1,5 @@
 <script lang="ts">
+import { localizeLabels } from '@texuli/core/i18n';
 import type { CalendarDate } from '@texuli/primitives/calendar';
 import {
   type DateInvalidHandler,
@@ -8,12 +9,18 @@ import {
   rangeLimit,
 } from '@texuli/primitives/date-picker';
 import type { HTMLAttributes } from 'svelte/elements';
-import { joinIds, splitControlProps } from '../../internal/control-props.ts';
+import { useMessages } from '../../i18n/use-messages.ts';
+import { joinIds, splitRequiredControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { getFieldLabelContext } from '../field/context.ts';
 import CalendarIcon from './CalendarIcon.svelte';
 import type { DateLabels } from './labels.ts';
-import { type DateRangePreset, dateRangePresets, matchingPreset } from './presets.ts';
+import {
+  type DateRangePreset,
+  DEFAULT_DATE_RANGE_PRESET_LABELS,
+  dateRangePresets,
+  matchingPreset,
+} from './presets.ts';
 import { type DateSize, dateFieldClass } from './variants.ts';
 import './date.css';
 
@@ -101,8 +108,12 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
 
-const split = $derived(splitControlProps(rest));
+const split = $derived(splitRequiredControlProps(rest));
+// `aria-required` (a Field's control props) is not allowed on a group or a
+// slider thumb: it becomes native `required` on the segment or form inputs.
+const isRequired = $derived(required || split.required);
 const field = getFieldLabelContext();
 const showLabel = $derived(!hideLabel && !field);
 
@@ -115,7 +126,14 @@ const describedBy = $derived(
 );
 const presetList = $derived(
   (presets === true
-    ? dateRangePresets(today, labels?.presetLabels)
+    ? dateRangePresets(today, {
+        ...localizeLabels(
+          msg,
+          'texuli.date-range-picker.presets',
+          DEFAULT_DATE_RANGE_PRESET_LABELS
+        ),
+        ...labels?.presetLabels,
+      })
     : presets === false
       ? []
       : [...presets]
@@ -142,7 +160,7 @@ function choose(preset: DateRangePreset): void {
   data-invalid={error ? 'true' : undefined}
   data-disabled={disabled ? 'true' : undefined}
 >
-  {#if showLabel}<span class="tx-date__label" aria-hidden="true">{label}{#if required}<span class="tx-date__required"> *</span>{/if}</span>{/if}
+  {#if showLabel}<span class="tx-date__label" aria-hidden="true">{label}{#if isRequired}<span class="tx-date__required"> *</span>{/if}</span>{/if}
   <Primitive.Root
     bind:value
     bind:open
@@ -165,7 +183,7 @@ function choose(preset: DateRangePreset): void {
       aria-labelledby={(split.control['aria-labelledby'] as string | undefined) ?? field?.labelId}
         class="tx-date__field"
         {label}
-        {required}
+        required={isRequired}
         {...startName ? { startName } : {}}
         {...endName ? { endName } : {}}
         aria-describedby={joinIds(describedBy, split.control['aria-describedby'] as string | undefined)}
@@ -177,7 +195,7 @@ function choose(preset: DateRangePreset): void {
       <div class="tx-date__range-layout">
         {#if presetList.length > 0}
           <div class="tx-date__presets" role="group" aria-labelledby={presetsId}>
-            <p id={presetsId} class="tx-date__presets-title">{labels?.presets ?? 'Quick ranges'}</p>
+            <p id={presetsId} class="tx-date__presets-title">{labels?.presets ?? msg('texuli.date-range-picker.quick-ranges', 'Quick ranges')}</p>
             {#each presetList as preset (preset.id)}
               <button
                 type="button"

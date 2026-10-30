@@ -16,7 +16,7 @@
     },
     "tier": "untrusted",
     "profile": "web",
-    "spec": "0.7.0",
+    "spec": "0.8.0",
     "provenance": [
       {
         "at": "2026-10-29T09:05:00Z",

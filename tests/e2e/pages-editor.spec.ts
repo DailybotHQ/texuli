@@ -137,11 +137,17 @@ test.describe('pages editor', () => {
     page,
   }) => {
     await open(page);
-    const chart = page.locator('[data-sortable-item="chart"] figure');
+    // The embed's own figure: the chart it paints is a figure of its own
+    // (figure.part-whole, nested inside the embed's player).
+    const chart = page.locator('[data-sortable-item="chart"] figure.tx-pages-embed');
     await expect(chart).toHaveAttribute('data-state', 'painted', { timeout: 30_000 });
     await expect(chart.locator('[data-tx-player]')).toBeVisible();
+    await expect(
+      chart.getByRole('figure', { name: /Tickets by channel/ }),
+      'the player paints the donut inside the embed'
+    ).toBeVisible({ timeout: 30_000 });
     await expect(chart).toContainText('Untrusted content');
-    const bad = page.locator('[data-sortable-item="bad"] figure');
+    const bad = page.locator('[data-sortable-item="bad"] figure.tx-pages-embed');
     await expect(bad).toHaveAttribute('data-state', 'refused', { timeout: 30_000 });
     await expect(bad).toContainText('This embed was refused');
     await page.getByRole('button', { name: 'Open page Roadmap' }).click();
@@ -164,11 +170,12 @@ test.describe('pages editor', () => {
     test(`passes axe with the slash menu open and embeds painted (${mode})`, async ({ page }) => {
       if (mode === 'forced colors') await page.emulateMedia({ forcedColors: 'active' });
       await open(page, mode === 'dark' ? '?mode=dark' : '');
-      await expect(page.locator('[data-sortable-item="chart"] figure')).toHaveAttribute(
-        'data-state',
-        'painted',
-        { timeout: 30_000 }
-      );
+      const chart = page.locator('[data-sortable-item="chart"] figure.tx-pages-embed');
+      await expect(chart).toHaveAttribute('data-state', 'painted', { timeout: 30_000 });
+      // Scan the painted chart, not the player's loading state.
+      await expect(chart.getByRole('figure', { name: /Tickets by channel/ })).toBeVisible({
+        timeout: 30_000,
+      });
       const scan = async (label: string) => {
         // WCAG rules, as the other editor sweeps: an embedded component's own
         // heading level does not follow the document outline (best practice

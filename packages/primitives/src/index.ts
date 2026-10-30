@@ -104,6 +104,12 @@ export {
   validateFiles,
 } from './file-drop/index.ts';
 export {
+  getI18nContext,
+  PRIMITIVES_MESSAGES_EN,
+  setI18nContext,
+  useMessages,
+} from './i18n/index.ts';
+export {
   controlAttributes,
   Field,
   type FieldContextValue,

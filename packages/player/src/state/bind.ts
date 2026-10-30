@@ -1,6 +1,12 @@
 import { ENVELOPE_FORMAT } from '@texuli/catalog/envelope';
 import { DEFAULT_TREE_LIMITS } from '@texuli/catalog/render/limits';
 import { DRAFT_TEXT_ALLOWANCE } from '@texuli/catalog/validate';
+import {
+  checkSourceBinding,
+  isSourceBinding,
+  type SpecSourceDescriptor,
+} from '@texuli/spec/source';
+import { sourceShape } from '../sources/shapes.ts';
 import { type FlowDeclaration, parseFlowDeclaration } from './flow.ts';
 import {
   parseStateDeclarations,
@@ -125,6 +131,14 @@ function resolveValue(
     );
   }
   if (!isBag(value)) return value;
+  if (isSourceBinding(value)) {
+    issues.push({
+      code: 'source',
+      path,
+      message: 'A data-source binding reads only a whole top-level prop.',
+    });
+    return value;
+  }
   const name = bindingName(value);
   if (name !== null) {
     if (Object.hasOwn(snapshot, name)) return snapshot[name];
@@ -154,6 +168,18 @@ export interface NodeInteraction {
   on?: Readonly<Record<string, readonly unknown[]>>;
   /** For a `reorder` container: the bound list variable and its reorder options. */
   reorder?: Readonly<Record<string, unknown>> & { list: string };
+  /** Props read from a host data source (spec 0.8.0): prop → the checked binding. */
+  sources?: Readonly<Record<string, Readonly<Record<string, unknown>>>>;
+}
+
+/**
+ * The host's data sources as the resolver sees them (spec 0.8.0): their
+ * descriptors, to check each `$source` binding, and the items a bound prop
+ * shows now (an empty list until its rows arrive).
+ */
+export interface SourceResolver {
+  readonly descriptors: readonly SpecSourceDescriptor[];
+  rows(path: string, prop: string, binding: Readonly<Record<string, unknown>>): readonly unknown[];
 }
 
 export interface ResolveOptions {
@@ -163,6 +189,10 @@ export interface ResolveOptions {
   bindable?: (id: string) => readonly string[] | undefined;
   /** Whether a variable may be written (declared and not host-bound). */
   writable?: (name: string) => boolean;
+  /** Sourceable props by catalog id (`$source` on anything else is refused). */
+  sourceable?: (id: string) => readonly string[] | undefined;
+  /** The host's data sources. Without them every `$source` binding is refused. */
+  sources?: SourceResolver;
 }
 
 interface ResolveContext {
@@ -185,6 +215,25 @@ function dataValue(value: unknown, options: ResolveOptions): unknown {
     : null;
 }
 
+/** Why a `$source` prop cannot read its source; empty when it can. Fails closed. */
+function sourceIssues(
+  id: string,
+  prop: string,
+  binding: Record<string, unknown>,
+  options: ResolveOptions
+): StateIssue[] {
+  const shape = sourceShape(id, prop);
+  if (!shape || !(options.sourceable?.(id) ?? []).includes(prop)) {
+    return [
+      { code: 'source', path: '', message: `"${prop}" of "${id}" cannot read a data source.` },
+    ];
+  }
+  return checkSourceBinding(binding, {
+    ...(options.sources ? { sources: options.sources.descriptors } : {}),
+    itemFields: shape.fields,
+  }).map((issue) => ({ code: issue.code, path: issue.at, message: issue.message }));
+}
+
 function resolveNode(node: unknown, path: string, depth: number, context: ResolveContext): unknown {
   // Shape problems are `validateDraft`'s to report; only props are rewritten.
   if (!isBag(node) || depth > DEFAULT_TREE_LIMITS.maxDepth + 1) return node;
@@ -195,6 +244,7 @@ function resolveNode(node: unknown, path: string, depth: number, context: Resolv
     bind?: Record<string, string>;
     on?: Record<string, readonly unknown[]>;
     reorder?: NodeInteraction['reorder'];
+    sources?: Record<string, Readonly<Record<string, unknown>>>;
   } = {
     id: typeof node.id === 'string' ? node.id : '',
   };
@@ -203,8 +253,22 @@ function resolveNode(node: unknown, path: string, depth: number, context: Resolv
     for (const [key, entry] of Object.entries(node.props)) {
       const here = `${path}.props.${key}`;
       let value: unknown;
-      const data = dataValue(entry, options);
-      if (data !== undefined) {
+      const data = isSourceBinding(entry) ? undefined : dataValue(entry, options);
+      if (isSourceBinding(entry)) {
+        // Spec 0.8.0: a whole sourceable prop shows the rows the host's source returned.
+        const problems = sourceIssues(interaction.id, key, entry, options);
+        if (problems.length > 0) {
+          for (const problem of problems)
+            issues.push({ ...problem, path: `${here}${problem.path}` });
+          value = [];
+        } else {
+          value = options.sources?.rows(path, key, entry) ?? [];
+          interaction.sources = {
+            ...(interaction.sources ?? {}),
+            [key]: Object.freeze({ ...entry }),
+          };
+        }
+      } else if (data !== undefined) {
         // `$data`: a whole top-level scalar from the host; absent data leaves the prop out.
         if (data === null) continue;
         value = data;
@@ -281,7 +345,7 @@ function resolveNode(node: unknown, path: string, depth: number, context: Resolv
     }
     interaction.on = Object.freeze(on);
   }
-  if (interaction.bind || interaction.on || interaction.reorder) {
+  if (interaction.bind || interaction.on || interaction.reorder || interaction.sources) {
     context.interactions.set(path, Object.freeze(interaction));
   }
   if (Array.isArray(node.children)) {

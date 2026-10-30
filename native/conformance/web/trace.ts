@@ -18,7 +18,9 @@ import { discoverManifestGroups } from '@texuli/catalog/build/node';
 import { formulaConditions } from '@texuli/catalog/render/conditions';
 import { renderCatalogFromBuild } from '@texuli/catalog/render/renderer';
 import { validateDraft } from '@texuli/catalog/validate';
+import { checkCanvasDraft } from '../../../packages/canvas/src/host/index.ts';
 import { validateDocument } from '../../../packages/document/src/schema/index.ts';
+import { checkFormDraft } from '../../../packages/forms/src/model/index.ts';
 import { formatJson } from '../../../packages/spec/src/format.ts';
 import { type Rule, semantics, traceNode } from './trace-rules.ts';
 
@@ -71,6 +73,10 @@ export function semanticRulesKotlin(): string {
 
 const build = await buildCatalog(await discoverManifestGroups());
 const catalog = renderCatalogFromBuild(build.catalog);
+// The fixture host's data sources (spec 0.8.0): the source golden's bindings are checked against them.
+const sources = JSON.parse(
+  readFileSync(join(REPO, 'packages/spec/fixtures/sources.json'), 'utf8')
+).sources;
 const write = process.argv.includes('--write');
 const drift: string[] = [];
 const goldens = readdirSync(GOLDEN)
@@ -96,6 +102,11 @@ for (const file of goldens) {
       }));
       return result.ok ? { ok: true, document: result.document, issues } : { ok: false, issues };
     },
+    sources,
+    // The form golden (spec 0.8.0) is checked with the forms validator, as a host does.
+    checkForm: checkFormDraft,
+    // The canvas golden (spec 0.8.0) is checked with the canvas engine, as a host does.
+    checkCanvas: checkCanvasDraft,
   });
   if (!validation.ok) {
     console.error(`${name}: the golden does not validate on the web target`);

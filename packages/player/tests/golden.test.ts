@@ -10,8 +10,11 @@ import { validateWorkflowGraph } from '@texuli/spec/workflow';
 import { tick } from 'svelte';
 import { describe, expect, it, vi } from 'vitest';
 import Player from '../src/Player.svelte';
+import { checkCanvas, testCanvasHost } from './canvas-host.ts';
 import { CATALOG_GROUPS } from './catalog-groups.ts';
 import { checkDocument, testDocumentHost } from './document-host.ts';
+import { checkForm, testFormHost } from './form-host.ts';
+import { FIXTURE_SOURCES, testSourceHost } from './source-host.ts';
 
 /**
  * The spec golden blueprints are complete JSON interfaces. Each one validates
@@ -29,6 +32,8 @@ const documents = {
   catalog: read(join(SPEC, 'catalog/components.json')),
   workflowSchema: read(join(SPEC, 'schemas/workflow.schema.json')),
   validateWorkflowGraph,
+  // The fixture host's data sources (spec 0.8.0).
+  sources: FIXTURE_SOURCES,
 } as Parameters<typeof validateBlueprint>[1];
 const catalog = renderCatalogFromBuild((await buildCatalog(CATALOG_GROUPS)).catalog);
 const files = readdirSync(GOLDEN)
@@ -95,6 +100,11 @@ describe('the spec goldens', () => {
           conditions: formulaConditions,
           conditionInputs: { closed: 38, blocked: 2 },
           checkDocument,
+          // A canvas golden is checked with the canvas validator (spec 0.8.0).
+          checkCanvas,
+          // A form golden is checked with the forms validator (spec 0.8.0).
+          checkForm,
+          sources: FIXTURE_SOURCES,
         });
         expect(draft.ok).toBe(true);
         expect(draft.diagnostics).toEqual([]);
@@ -108,7 +118,13 @@ describe('the spec goldens', () => {
 
       it('paints with no placeholder and no error', { timeout: 30_000 }, async () => {
         // A document golden paints through a document host (spec 0.7.0).
-        const { container, errors } = paint(envelope, { documentHost: testDocumentHost().host });
+        // A source golden reads the fixture host's sources (spec 0.8.0).
+        const { container, errors } = paint(envelope, {
+          documentHost: testDocumentHost().host,
+          canvasHost: testCanvasHost().host,
+          formHost: testFormHost(),
+          sourceRegistry: testSourceHost().registry,
+        });
         await painted(container);
         expect(errors).toEqual([]);
       });

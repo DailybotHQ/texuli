@@ -10,7 +10,7 @@ drag and an agent's move. It is part of [Texuli](https://texuli.com),
 by Dailybot, Inc.
 
 > **Status: in development (pre-1.0).** `@texuli/drag` is on npm as
-> `0.7.0`, with provenance (first published as `0.3.0` on 2026-10-28). It
+> `0.8.0`, with provenance (first published as `0.3.0` on 2026-10-28). It
 > powers `@texuli/primitives/sortable`, the `@texuli/data` board, tree view,
 > calendar, timeline and column moves, and `@texuli/workflows`. Those
 > integrations ship from `0.4.0`; `@texuli/primitives` and `@texuli/data`
@@ -69,7 +69,7 @@ auto-scroll included).
 | `@texuli/drag/auto-scroll` | Edge zones and a speed curve, on a frame loop you supply | 671 B |
 | `@texuli/drag/gesture` | A pointer tracker: capture with a document fallback, a 4 px threshold, `pointercancel` as cancel, optional long-press | 1.22 KiB |
 | `@texuli/drag/spatial` | Canvas pan and zoom transforms, free placement, snapping and alignment guides, marquee, resize with bounds and aspect ratio | 1.64 KiB |
-| `@texuli/drag/graph` | Port hit-testing, edge hit areas and connection rules (direction, self, type, duplicate, capacity, cycle) | 1.42 KiB |
+| `@texuli/drag/graph` | Port hit-testing, edge hit areas, connection rules (direction, self, type, duplicate, capacity, cycle) and the side-aware edge curve (`sideCurveControls`, `sideCurvePath`) shared by `@texuli/workflows` and `@texuli/canvas` | 1.59 KiB |
 | `@texuli/drag/messages` | `DragMessages` templates and `resolveDragMessages()` / `formatDragMessage()` | 963 B |
 | `@texuli/drag/testing` | Test helpers: fake frames and timers, measured lists, pointer events | 1.01 KiB |
 

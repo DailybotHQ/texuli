@@ -1,0 +1,71 @@
+/**
+ * The sheet view: tabs, a formula bar and the editable grid.
+ * @layer tx.components so consumer utilities can override.
+ */
+@layer tx.components {
+  .tx-sheets-view {
+    display: grid;
+    gap: 0.5rem;
+    min-inline-size: 0;
+  }
+
+  .tx-sheets-view__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .tx-sheets-view__tab {
+    min-block-size: var(--tx-target-size, 2.25rem);
+    padding-inline: 0.75rem;
+    border: var(--tx-border-width, 1px) solid var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-surface, Canvas);
+    color: var(--tx-foreground, CanvasText);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .tx-sheets-view__tab[aria-pressed="true"] {
+    border-color: var(--tx-primary, Highlight);
+    font-weight: 600;
+  }
+
+  .tx-sheets-view__tab:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: 2px;
+  }
+
+  .tx-sheets-view__bar {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    min-block-size: 1.75rem;
+    padding-block: 0.25rem;
+    padding-inline: 0.5rem;
+    border: var(--tx-border-width, 1px) solid var(--tx-border, CanvasText);
+    border-radius: calc(var(--tx-radius, 0.5rem) * 0.75);
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+
+  .tx-sheets-view__address {
+    min-inline-size: 3.5rem;
+    font-weight: 600;
+  }
+
+  .tx-sheets-view__input {
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+    white-space: pre-wrap;
+  }
+
+  .tx-sheets-view [data-tx-edit-cell] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (forced-colors: active) {
+    .tx-sheets-view__tab[aria-pressed="true"] {
+      border-color: Highlight;
+    }
+  }
+}

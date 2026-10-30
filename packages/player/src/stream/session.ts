@@ -10,7 +10,7 @@ import {
   createBlueprintAssembler,
   type StreamError,
 } from '@texuli/spec/stream';
-import { type StatefulSplit, splitStatefulBlueprint } from '../state/bind.ts';
+import { type SourceResolver, type StatefulSplit, splitStatefulBlueprint } from '../state/bind.ts';
 import { playerResolveOptions, resolveSplitBlueprint } from '../state/resolve.ts';
 import { initialSnapshot, type StateSnapshot } from '../state/schema.ts';
 import {
@@ -79,6 +79,15 @@ export interface StreamSessionOptions {
   /** Bindable props by catalog id, as the player resolves `bind`. */
   bindable: (id: string) => readonly string[] | undefined;
   dataSources?: Readonly<Record<string, unknown>>;
+  /**
+   * Data sources (spec 0.8.0): sourceable props by catalog id and the host's
+   * descriptors. While streaming a bound prop resolves to an empty list; the
+   * rows load once the complete draft paints.
+   */
+  sources?: {
+    sourceable: (id: string) => readonly string[] | undefined;
+    resolver?: SourceResolver | undefined;
+  };
   /** Byte budget of the stream. Default the validator's text cap. */
   maxBytes?: number;
   maxDepth?: number;
@@ -194,7 +203,7 @@ export function createStreamSession(options: StreamSessionOptions): StreamSessio
     const resolved = resolveSplitBlueprint(
       split,
       values,
-      playerResolveOptions(split, options.bindable, options.dataSources)
+      playerResolveOptions(split, options.bindable, options.dataSources, options.sources)
     );
     return { blueprint: resolved.blueprint, issues: resolved.issues };
   }

@@ -1,0 +1,168 @@
+/*
+ * @texuli/forms: layout for SchemaForm. Controls are texuli components and
+ * bring their own styles; this sheet only arranges them. Tokens only,
+ * logical properties only, system colors in forced-colors mode.
+ */
+.tx-forms {
+  display: grid;
+  gap: var(--tx-forms-gap, 1.25rem);
+  max-inline-size: var(--tx-forms-max-inline-size, 40rem);
+  color: var(--tx-foreground, CanvasText);
+}
+
+.tx-forms__title {
+  margin: 0;
+  font-size: 1.375rem;
+  line-height: 1.3;
+}
+
+.tx-forms__description,
+.tx-forms__step-description,
+.tx-forms__section-description {
+  margin: 0;
+  color: var(--tx-muted-foreground, GrayText);
+}
+
+.tx-forms__step,
+.tx-forms__section {
+  display: grid;
+  gap: var(--tx-forms-gap, 1.25rem);
+  min-inline-size: 0;
+}
+
+.tx-forms__step-title {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.tx-forms__step-title:focus-visible,
+.tx-forms__summary:focus-visible,
+.tx-forms__done:focus-visible {
+  outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+  outline-offset: 2px;
+}
+
+fieldset.tx-forms__section,
+fieldset.tx-forms__group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.tx-forms__section-title,
+.tx-forms__legend {
+  padding: 0;
+  margin-block-end: 0.5rem;
+  font-weight: 600;
+}
+
+.tx-forms__section-title {
+  font-size: 1rem;
+}
+
+.tx-forms__legend {
+  font-size: 0.875rem;
+}
+
+.tx-forms__group {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.tx-forms__choices {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.tx-forms__required {
+  color: var(--tx-destructive, var(--tx-danger, CanvasText));
+}
+
+.tx-forms__field--toggle {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.tx-forms__pending,
+.tx-forms__draft,
+.tx-forms__link {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--tx-muted-foreground, GrayText);
+}
+
+.tx-forms__link a {
+  color: var(--tx-link, LinkText);
+}
+
+.tx-forms__summary {
+  display: grid;
+  gap: 0.5rem;
+  padding-block: 0.875rem;
+  padding-inline: 1rem;
+  border: var(--tx-border-width, 1px) solid var(--tx-destructive, var(--tx-danger, CanvasText));
+  border-inline-start-width: 4px;
+  border-radius: var(--tx-radius-sm, 0.375rem);
+  background: var(--tx-surface, Canvas);
+}
+
+.tx-forms__summary-title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.tx-forms__summary p {
+  margin: 0;
+}
+
+.tx-forms__summary-list {
+  margin: 0;
+  padding-inline-start: 1.25rem;
+}
+
+.tx-forms__summary-list a {
+  color: var(--tx-link, LinkText);
+}
+
+.tx-forms__done {
+  margin: 0;
+  padding-block: 0.75rem;
+  padding-inline: 1rem;
+  border: var(--tx-border-width, 1px) solid var(--tx-success, var(--tx-border, CanvasText));
+  border-radius: var(--tx-radius-sm, 0.375rem);
+}
+
+.tx-forms__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tx-forms__draft {
+  margin-inline-start: auto;
+}
+
+.tx-forms__visually-hidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (forced-colors: active) {
+  .tx-forms__summary,
+  .tx-forms__done {
+    border-color: CanvasText;
+  }
+  .tx-forms__step-title:focus-visible,
+  .tx-forms__summary:focus-visible,
+  .tx-forms__done:focus-visible {
+    outline-color: Highlight;
+  }
+}

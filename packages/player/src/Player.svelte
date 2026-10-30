@@ -9,6 +9,7 @@ import {
 import { formulaConditions } from '@texuli/catalog/render/conditions';
 import type { RenderCatalog, RenderTier } from '@texuli/catalog/render/renderer';
 import type { ValidateDraftOptions } from '@texuli/catalog/validate';
+import type { SourceLoader, SourceRegistry } from '@texuli/core/data-source';
 import { type Component, type Snippet, tick, untrack } from 'svelte';
 import './player.css';
 import { createActionAccess } from './action-access.ts';
@@ -20,21 +21,26 @@ import {
   selectionAnnouncement,
 } from './announcements.ts';
 import { checkFamilyBlock } from './block-check.ts';
+import { type CanvasPlayerHost, canvasRoot } from './canvas-host.ts';
 import { createPlayerCatalog } from './catalog.ts';
 import { sameConditionInputs, stateConditionInputs } from './conditions.ts';
 import {
   setPlayerActionAccess,
   setPlayerFlowAccess,
+  setPlayerFormHost,
   setPlayerHostRegions,
   setPlayerInteraction,
   setPlayerLabels,
   setPlayerLandmarks,
+  setPlayerSheetHost,
+  setPlayerSources,
   setPlayerStateAccess,
 } from './context.ts';
 import { type DeckPlayerHost, isLayoutDeckTree } from './deck-host.ts';
 import { type DocumentPlayerHost, documentRoot } from './document-host.ts';
 import type { PlayerDiagnosticsEvent, PlayerSize } from './embed/types.ts';
 import type { PlayerNodeError, PlayerNodeErrorPhase } from './errors.ts';
+import type { FormPlayerHost } from './form-host.ts';
 import { withoutHostChrome, withoutHostChromeLoaders } from './host-chrome.ts';
 import { applyHostData, type DataSources } from './host-data.ts';
 import { handleSurfaceKeydown, normalizeTabOrder } from './keyboard.ts';
@@ -72,8 +78,10 @@ import {
   selectablePaths,
   siblingPaths,
 } from './selection.ts';
+import type { SheetPlayerHost } from './sheet-host.ts';
 import { DEFAULT_LOAD_TIMEOUT_MS, skeletonFamily, withLoadTimeout } from './skeletons.ts';
-import { type ResolveOptions, splitStatefulBlueprint } from './state/bind.ts';
+import type { SourceViewEvent, SourceViews } from './sources/views.ts';
+import { type ResolveOptions, type SourceResolver, splitStatefulBlueprint } from './state/bind.ts';
 import { nextFlowView } from './state/flow.ts';
 import { type EventDetail, moveListItem, runActions } from './state/reducers.ts';
 import {
@@ -215,6 +223,16 @@ type Props = {
    */
   chrome?: boolean;
   /**
+   * Print mode (ADR-016): a static, printable paint. The surface is inert,
+   * motion is off, the skip link, retry button and composer are hidden,
+   * and the print styles (page breaks kept out of frames, tables, figures
+   * and code; headings kept with what follows) apply on screen too, as a
+   * preview. The player also enters print mode on its own between the
+   * browser's `beforeprint` and `afterprint` events, so "Save as PDF"
+   * from the browser prints the static form. Default `false`.
+   */
+  print?: boolean;
+  /**
    * Optional host seam for `layout-deck` roots. When set and the validated
    * tree is a deck, the player calls the host instead of painting the deck
    * as a document. The player (L7) cannot import `@texuli/slides` (L8); the
@@ -230,6 +248,46 @@ type Props = {
    * mounts.
    */
   documentHost?: DocumentPlayerHost | null;
+  /**
+   * Host seam for `canvas` roots (spec 0.8.0): its `checkCanvas` joins
+   * validation, and a valid canvas root is handed to its `present` instead
+   * of being painted. Without one a canvas blueprint is refused
+   * (`canvas-unchecked`). `@texuli/canvas/host` supplies the adapter, which
+   * keeps the canvas engine out of the player's first-load chunk. Read when
+   * the player mounts.
+   */
+  canvasHost?: CanvasPlayerHost | null;
+  /**
+   * Host seam for `schema-form` nodes (spec 0.8.0, ADR-015): its
+   * `checkForm` (with its `validators` names) joins validation, and each
+   * valid `schema-form` node hands its schema to its `present`, with a
+   * submit that proposes the node's action. Without one a `schema-form`
+   * blueprint is refused (`form-unchecked`). `@texuli/forms/host` supplies
+   * the adapter, which keeps the form engine out of the player's first-load
+   * chunk. Read when the player mounts.
+   */
+  formHost?: FormPlayerHost | null;
+  /**
+   * Host seam for `spreadsheet` nodes (spec 0.8.0, ADR-015): its
+   * `checkSheet` joins validation (every formula is parsed at draft time),
+   * and each valid `spreadsheet` node hands its sheet to its `present`.
+   * Without one a `spreadsheet` blueprint is refused (`sheet-unchecked`).
+   * `@texuli/sheets/host` supplies the adapter, which keeps the formula
+   * engine out of the player's first-load chunk. Read when the player mounts.
+   */
+  sheetHost?: SheetPlayerHost | null;
+  /**
+   * The host's data sources (spec 0.8.0, ADR-015): a registry from
+   * `@texuli/core/data-source`. A blueprint prop
+   * `{"$source": name, "query": {...}}` is checked against its descriptors
+   * and shows the rows its adapter returns, with loading, empty and error
+   * states, paging, and optimistic edits written back through the source.
+   * Without a registry (or `sourceLoader`) every source binding is refused.
+   * The player never fetches: only the host's adapters reach data.
+   */
+  sourceRegistry?: SourceRegistry | null;
+  /** A shared loader (cache and in-flight reads across players); its registry is used. */
+  sourceLoader?: SourceLoader | null;
 };
 
 let {
@@ -268,8 +326,14 @@ let {
   dataSources,
   landmarks = true,
   chrome = true,
+  print = false,
   deckHost = null,
   documentHost = null,
+  canvasHost = null,
+  formHost = null,
+  sheetHost = null,
+  sourceRegistry = null,
+  sourceLoader = null,
 }: Props = $props();
 
 // The user's reduced-motion preference, followed live.
@@ -287,7 +351,25 @@ $effect(() => {
   media.addEventListener?.('change', update);
   return () => media.removeEventListener?.('change', update);
 });
-let reducedMotion = $derived(motion === 'reduce' || prefersReducedMotion);
+// Print mode (ADR-016): the prop, or the browser's print dialog while it is open.
+let browserPrinting = $state(false);
+$effect(() => {
+  if (typeof window === 'undefined' || typeof window.addEventListener !== 'function') return;
+  const before = () => {
+    browserPrinting = true;
+  };
+  const after = () => {
+    browserPrinting = false;
+  };
+  window.addEventListener('beforeprint', before);
+  window.addEventListener('afterprint', after);
+  return () => {
+    window.removeEventListener('beforeprint', before);
+    window.removeEventListener('afterprint', after);
+  };
+});
+let printing = $derived(print || browserPrinting);
+let reducedMotion = $derived(motion === 'reduce' || prefersReducedMotion || printing);
 
 const skipTargetId = $props.id();
 let surface = $state<HTMLElement | null>(null);
@@ -485,8 +567,28 @@ $effect.pre(() => {
   }
 });
 // What bind, on and reorder name, read by the resolver: bindable props come from the catalog.
+// Spec 0.8.0 data sources: the host's descriptors check each binding; the views
+// (loaded lazily, only with a registry) hold the rows each bound prop shows.
+let sourceViews = $state.raw<SourceViews | null>(null);
+let sourceVersion = $state(0);
+const NO_ROWS: readonly unknown[] = Object.freeze([]);
+let sourceDescriptors = $derived((sourceLoader?.registry ?? sourceRegistry)?.describe() ?? null);
+let sourceResolver = $derived<SourceResolver | undefined>(
+  sourceDescriptors
+    ? {
+        descriptors: sourceDescriptors,
+        rows: (path, prop, binding) => {
+          void sourceVersion;
+          return sourceViews?.items(path, prop, binding) ?? NO_ROWS;
+        },
+      }
+    : undefined
+);
 let resolveOptions = $derived<ResolveOptions>(
-  playerResolveOptions(split, (id) => catalog.get(id)?.bindable, dataSources)
+  playerResolveOptions(split, (id) => catalog.get(id)?.bindable, dataSources, {
+    sourceable: (id) => catalog.get(id)?.sourceable,
+    resolver: sourceResolver,
+  })
 );
 // State-only controls must each name a declared variable of the type they write.
 // Flow nodes must name declared views and events (G09).
@@ -618,6 +720,11 @@ function insideHostRegion(target: EventTarget | null): boolean {
   return target instanceof Element && target.closest('[data-tx-player-host-region]') !== null;
 }
 
+// Forms (spec 0.8.0): `schema-form` nodes paint through the host's form seam.
+setPlayerFormHost(() => ({ host: formHost, tier, active }));
+// Sheets (spec 0.8.0): `spreadsheet` nodes paint through the host's sheet seam.
+setPlayerSheetHost(() => ({ host: sheetHost, tier, active, label }));
+
 // Action forms (G17) propose intents to the host through this and get receipts.
 setPlayerActionAccess(
   createActionAccess({
@@ -738,6 +845,113 @@ function planMove(fromPath: string, item: string, toPath: string, index: number)
   return moved.ok ? { source, lists: moved.lists } : null;
 }
 
+// ── Data sources (spec 0.8.0, ADR-015) ──────────────────────
+// The runtime (core loader and collections) loads only when the host passes a
+// registry or a loader; the player itself never fetches.
+$effect(() => {
+  const registry = sourceRegistry;
+  const loader = sourceLoader;
+  if (!registry && !loader) {
+    sourceViews = null;
+    return;
+  }
+  let stopped = false;
+  let created: SourceViews | null = null;
+  void import('./sources/views.ts').then(({ createSourceViews }) => {
+    if (stopped) return;
+    created = createSourceViews({
+      loader,
+      registry,
+      onChange: () => {
+        sourceVersion += 1;
+      },
+      onEvent: announceSourceEvent,
+      errorMessages: () => resolvedLabels.sourceErrors,
+    });
+    sourceViews = created;
+  });
+  return () => {
+    stopped = true;
+    created?.destroy();
+    sourceViews = null;
+  };
+});
+
+// Keep one view per bound prop of the painted tree; a streamed draft loads nothing until complete.
+$effect(() => {
+  const views = sourceViews;
+  const found = interactions;
+  if (!views || !armed) return;
+  const refs: {
+    path: string;
+    prop: string;
+    id: string;
+    binding: Readonly<Record<string, unknown>>;
+  }[] = [];
+  for (const [path, interaction] of found) {
+    for (const [prop, binding] of Object.entries(interaction.sources ?? {})) {
+      refs.push({ path, prop, id: interaction.id, binding });
+    }
+  }
+  untrack(() => views.sync(refs));
+});
+
+/** A bound node's caption or label, for its announcements. */
+function sourceNodeLabel(path: string): string {
+  const root = resolved.blueprint;
+  let node: unknown =
+    root && typeof root === 'object' && 'tree' in root ? (root as { tree: unknown }).tree : root;
+  const steps = path.split('.');
+  if (Array.isArray(node)) node = node[Number(steps[0])];
+  for (let i = 1; i + 1 < steps.length; i += 2) {
+    const children = (node as { children?: unknown } | null)?.children;
+    node = Array.isArray(children) ? children[Number(steps[i + 1])] : undefined;
+  }
+  const props = (node as { props?: Record<string, unknown> } | undefined)?.props ?? {};
+  for (const key of ['caption', 'label', 'title']) {
+    const value = props[key];
+    if (typeof value === 'string' && value.trim() !== '') return value;
+  }
+  return resolvedLabels.loading;
+}
+
+function announceSourceEvent(event: SourceViewEvent): void {
+  if (event.kind === 'more') {
+    announcePolite(formatAnnouncement(resolvedLabels.sourceLoadedMore, { count: event.count }));
+  } else if (event.kind === 'failed') {
+    announcePolite(
+      formatAnnouncement(resolvedLabels.sourceFailed, {
+        label: sourceNodeLabel(event.path),
+        reason: event.message,
+      })
+    );
+  } else {
+    announcePolite(formatAnnouncement(resolvedLabels.sourceSaveFailed, { reason: event.message }));
+  }
+}
+
+const SOURCE_LOADING = Object.freeze({
+  status: 'loading' as const,
+  count: 0,
+  refreshing: false,
+  hasMore: false,
+  loadingMore: false,
+  error: null,
+  moreError: null,
+  writeError: null,
+  pending: 0,
+});
+
+setPlayerSources({
+  status(path) {
+    void sourceVersion;
+    if (!interactions.get(path)?.sources) return null;
+    return sourceViews?.state(path) ?? SOURCE_LOADING;
+  },
+  retry: (path) => sourceViews?.retry(path),
+  loadMore: (path) => sourceViews?.loadMore(path),
+});
+
 setPlayerInteraction({
   dispatch(path, event, detail, form) {
     const actions = interactions.get(path)?.on?.[event];
@@ -751,8 +965,21 @@ setPlayerInteraction({
   },
   bound: (path, prop) => interactions.get(path)?.bind?.[prop] !== undefined,
   write(path, prop, value) {
+    // Spec 0.8.0: a source-bound prop writes its edits back through the source, optimistically.
+    if (interactions.get(path)?.sources?.[prop]) {
+      if (!armed || !sourceViews) return false;
+      void sourceViews.write(path, prop, value);
+      return true;
+    }
     const name = interactions.get(path)?.bind?.[prop];
     return armed && name !== undefined && setState(name, value);
+  },
+  save(path, prop, value) {
+    if (!interactions.get(path)?.sources?.[prop]) return null;
+    if (!armed || !sourceViews) return Promise.reject(new Error('unavailable'));
+    return sourceViews.write(path, prop, value).then((stored) => {
+      if (!stored) throw new Error('not stored');
+    });
   },
   reorder(path) {
     const found = reorderOf(path);
@@ -975,6 +1202,9 @@ function countKind(nodes: readonly PlayerPaintNode[], kind: PlayerPaintNode['kin
 
 // Paint lifecycle: speak once the paint settles (no skeletons), and again only
 // when what was painted changes. A refusal is the notice's (assertive) to say.
+// Other polite messages in between (a data source's, spec 0.8.0) do not make
+// an unchanged paint speak again.
+let lastPaintText = '';
 $effect(() => {
   const nodes = paintNodes;
   // While streaming, progress is announced on its own schedule (below).
@@ -985,6 +1215,7 @@ $effect(() => {
       announcer.reset('polite');
       politeText = '';
     });
+    lastPaintText = '';
     return;
   }
   if (countKind(nodes, 'skeleton') > 0) return;
@@ -1005,6 +1236,8 @@ $effect(() => {
     },
     resolvedLabels
   );
+  if (text === lastPaintText) return;
+  lastPaintText = text;
   untrack(() => announcePolite(text));
 });
 
@@ -1071,6 +1304,13 @@ $effect(() => {
       checkBlock: checkFamilyBlock,
       // Documents (spec 0.7.0) are checked only with the host's validator; none refuses them.
       checkDocument: documentHost?.checkDocument,
+      // Canvases (spec 0.8.0) likewise: only the host's canvas validator admits one.
+      checkCanvas: canvasHost?.checkCanvas,
+      // Forms (spec 0.8.0) likewise: only the host's form validator admits one.
+      checkForm: formHost?.checkForm,
+      ...(formHost?.validators ? { formValidators: formHost.validators } : {}),
+      // Sheets (spec 0.8.0) likewise: only the host's sheet validator admits one.
+      checkSheet: sheetHost?.checkSheet,
       // `when` conditions (G07) read the local state, mapped to numbers.
       conditions: formulaConditions,
       conditionInputs: untrack(() => {
@@ -1131,9 +1371,15 @@ function streamValidateOptions(): ValidateDraftOptions {
     tier,
     checkBlock: checkFamilyBlock,
     checkDocument: documentHost?.checkDocument,
+    checkCanvas: canvasHost?.checkCanvas,
+    checkForm: formHost?.checkForm,
+    ...(formHost?.validators ? { formValidators: formHost.validators } : {}),
+    checkSheet: sheetHost?.checkSheet,
     conditions: formulaConditions,
     conditionInputs,
     roles: PLAYER_GRAMMAR_ROLES,
+    // Spec 0.8.0: a streamed node's source bindings are checked against the host's sources.
+    ...(sourceDescriptors ? { sources: sourceDescriptors } : {}),
   };
 }
 
@@ -1155,6 +1401,12 @@ $effect(() => {
         validate: streamValidateOptions(),
         bindable: (id) => catalog.get(id)?.bindable,
         ...(dataSources ? { dataSources } : {}),
+        sources: {
+          sourceable: (id) => catalog.get(id)?.sourceable,
+          resolver: sourceDescriptors
+            ? { descriptors: sourceDescriptors, rows: () => NO_ROWS }
+            : undefined,
+        },
         previous: streamView,
         onSnapshot: (view, progress) => {
           streamView = view;
@@ -1331,6 +1583,46 @@ $effect(() => {
   );
   if (typeof cleanup === 'function') return cleanup;
 });
+
+// Canvas host seam (spec 0.8.0): a valid `canvas` root is the host's to paint.
+let canvasTarget = $state<HTMLElement | null>(null);
+let canvasNode = $derived(
+  canvasHost && !previewing && playerState?.surface === 'tree' && !stateRefused
+    ? canvasRoot(playerState.validation.ok ? playerState.validation.roots : [])
+    : null
+);
+let canvasHostActive = $derived(canvasNode !== null);
+let canvasPresenter = $derived(canvasHost);
+let canvasSource = $derived(source);
+let canvasTier = $derived(tier);
+$effect(() => {
+  const host = canvasPresenter;
+  const presentTier = canvasTier;
+  void canvasSource;
+  const target = canvasTarget;
+  if (!host || !canvasHostActive || !target) return;
+  const node = untrack(() => canvasNode);
+  if (!node) return;
+  const canvasLabel = typeof node.props.label === 'string' ? node.props.label : undefined;
+  const cleanup = untrack(() =>
+    host.present({
+      canvas: node.props.canvas,
+      ...(canvasLabel !== undefined ? { canvasLabel } : {}),
+      ...(node.key !== undefined ? { key: node.key } : {}),
+      tier: presentTier,
+      get label() {
+        return label;
+      },
+      get active() {
+        return active;
+      },
+      get target() {
+        return canvasTarget;
+      },
+    })
+  );
+  if (typeof cleanup === 'function') return cleanup;
+});
 </script>
 
 
@@ -1345,6 +1637,7 @@ $effect(() => {
   class="tx-player"
   data-tx-player
   data-tx-player-chrome={chrome ? undefined : 'off'}
+  data-tx-player-print={printing ? '' : undefined}
   data-tx-player-deck-host={deckHostActive ? 'pending' : undefined}
   data-status={shownStatus}
   data-density={density}
@@ -1355,7 +1648,7 @@ $effect(() => {
   aria-label={label}
   onfocusin={onFocusIn}
 >
-  {#if chrome && playerState?.surface === 'tree' && !stateRefused}
+  {#if chrome && !printing && playerState?.surface === 'tree' && !stateRefused}
     <a class="tx-player__skip" href={`#${skipTargetId}`} onclick={skipPast}>
       {resolvedLabels.skip} {label}
     </a>
@@ -1402,7 +1695,7 @@ $effect(() => {
       class="tx-player__surface"
       data-tx-player-surface
       bind:this={surface}
-      inert={!active || streamPhase === 'streaming'}
+      inert={!active || streamPhase === 'streaming' || printing}
       aria-busy={streamPhase === 'streaming' ? 'true' : undefined}
       data-tx-player-stream={streamPhase ?? undefined}
       data-selectable={selectable || undefined}
@@ -1416,6 +1709,9 @@ $effect(() => {
       {:else if documentHostActive}
         <!-- Host seam: the document reader (or a mock) owns the paint. -->
         <div class="tx-player__document-host" data-tx-player-document-host-surface bind:this={documentTarget}></div>
+      {:else if canvasHostActive}
+        <!-- Host seam: the canvas viewer (or a mock) owns the paint. -->
+        <div class="tx-player__canvas-host" data-tx-player-canvas-host-surface bind:this={canvasTarget}></div>
       {:else if !hasReorder}
         {@render painted()}
       {:else if ReorderScope}
@@ -1436,7 +1732,7 @@ $effect(() => {
         data-tx-player-stream-error={streamView?.error?.code}
       >
         <p>{resolvedLabels.streamInterrupted}</p>
-        {#if onStreamRetry}
+        {#if onStreamRetry && !printing}
           <button type="button" class="tx-player__stream-retry" onclick={() => onStreamRetry?.()}>
             {resolvedLabels.streamRetry}
           </button>
@@ -1445,7 +1741,7 @@ $effect(() => {
     {/if}
   {/if}
 
-  {#if composer}
+  {#if composer && !printing}
     <footer class="tx-player__host-chrome" data-tx-player-host-chrome="composer">
       {@render composer()}
     </footer>
@@ -1454,7 +1750,7 @@ $effect(() => {
   <span class="tx-player__visually-hidden" aria-live="polite" aria-atomic="true" data-tx-player-announcer>
     {politeText}
   </span>
-  {#if chrome && playerState?.surface === 'tree' && !stateRefused}
+  {#if chrome && !printing && playerState?.surface === 'tree' && !stateRefused}
     <span class="tx-player__end" id={skipTargetId} tabindex="-1">
       <span class="tx-player__visually-hidden">{label}</span>
     </span>

@@ -10,6 +10,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { applyEditOps } from '@texuli/catalog/edit';
 import { validateDraft } from '@texuli/catalog/validate';
+import { DOCUMENT_BLOCK_TYPES, EMBED_KINDS } from '@texuli/document/model';
 import { validateDocument } from '@texuli/document/schema';
 import { exportDocument } from '@texuli/pages/export';
 import { checkDocumentDraft } from '@texuli/pages/host';
@@ -25,6 +26,11 @@ import {
   HOSTILE_PATCH,
   patchDocumentHost,
 } from '../src/components/documents-site/blueprint.ts';
+import {
+  BLOCK_NOTES,
+  EMBED_STATUSES,
+  slashInventory,
+} from '../src/components/documents-site/inventory.ts';
 import {
   DOCUMENTS_DOCS,
   DOCUMENTS_RELEASE,
@@ -43,6 +49,7 @@ const ISLANDS = [
 const SOURCES = [
   ...ISLANDS,
   'components/documents-site/blueprint.ts',
+  'components/documents-site/inventory.ts',
   'components/documents-site/page.ts',
   'components/documents-site/sample.ts',
   'pages/documents-page/index.astro',
@@ -63,8 +70,9 @@ const errorsOf = (blueprint: unknown) =>
 describe('documents page: copy and safety', () => {
   it('says both packages are in development and on npm from 0.7.0, their first release', () => {
     // Both packages were first published in 0.7.0; the copy names that release.
-    expect(pkg('pages').version).toBe(DOCUMENTS_RELEASE);
-    expect(pkg('document').version).toBe(DOCUMENTS_RELEASE);
+    // Later releases move them on; the placeholder never comes back.
+    expect(pkg('pages').version).not.toBe('0.0.0');
+    expect(pkg('document').version).not.toBe('0.0.0');
     expect(DOCUMENTS_RELEASE).toBe('0.7.0');
     expect(DOCUMENTS_STATUS).toBe('In development, on npm from 0.7.0, a pre-1.0 release.');
     const copy = PAGE.replace(/\s+/g, ' ');
@@ -209,5 +217,31 @@ describe('documents page: data', () => {
     expect(pdf.filename).toMatch(/\.pdf$/);
     expect(await pdf.blob.slice(0, 5).text()).toBe('%PDF-');
     expect(pdf.pageCount ?? 0).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('documents page: the whole vocabulary', () => {
+  it('describes every block type and every embed kind, and marks unpainted embeds as planned', () => {
+    expect(Object.keys(BLOCK_NOTES).sort()).toEqual([...DOCUMENT_BLOCK_TYPES].sort());
+    expect(EMBED_STATUSES.map((row) => row.kind)).toEqual([...EMBED_KINDS]);
+    for (const row of EMBED_STATUSES.filter(
+      (entry) => entry.kind === 'sheet' || entry.kind === 'canvas'
+    ))
+      expect(row.paints, row.kind).toMatch(/typed reference.*planned/);
+    expect(PAGE).toContain('id="blocks"');
+  });
+
+  it('lists every slash menu item, content blocks included, each inserting a real block type', async () => {
+    const items = await slashInventory();
+    expect(items.length).toBeGreaterThan(40);
+    expect(new Set(items.map((item) => item.group))).toEqual(
+      new Set(['text', 'layout', 'pages', 'embeds', 'blocks'])
+    );
+    for (const item of items)
+      expect(DOCUMENT_BLOCK_TYPES as readonly string[], item.label).toContain(item.creates);
+    // Every type a person can insert from the menu is reachable; media comes from files and agents.
+    const inserted = new Set(items.map((item) => item.creates));
+    for (const type of DOCUMENT_BLOCK_TYPES.filter((entry) => entry !== 'media'))
+      expect(inserted, type).toContain(type);
   });
 });

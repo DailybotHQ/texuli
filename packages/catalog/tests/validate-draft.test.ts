@@ -63,7 +63,13 @@ describe('validateDraft', () => {
           Object.fromEntries(
             DRAFT_CHECKS.map((c) => [
               c,
-              c === 'envelope' || c === 'spec' || c === 'documents' ? 'skipped' : 'pass',
+              c === 'envelope' ||
+              c === 'spec' ||
+              c === 'documents' ||
+              c === 'forms' ||
+              c === 'canvases'
+                ? 'skipped'
+                : 'pass',
             ])
           )
         );

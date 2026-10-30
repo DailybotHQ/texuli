@@ -2,6 +2,7 @@ package com.texuli.conformance
 
 import com.texuli.spec.JsonValue
 import com.texuli.spec.runtime.LoadResult
+import com.texuli.spec.runtime.decodeSourceDescriptors
 import com.texuli.spec.runtime.loadBlueprint
 import com.texuli.spec.runtime.parseJson
 import java.io.File
@@ -16,6 +17,9 @@ import kotlin.test.assertTrue
 class InvalidFixtureParityTest {
     private val repo = File(System.getProperty("texuli.repo") ?: error("texuli.repo is not set"))
 
+    // The fixture host's data sources (spec 0.8.0), as the TypeScript conformance passes them.
+    private val sources = decodeSourceDescriptors(parseJson(File(repo, "packages/spec/fixtures/sources.json").readText()))
+
     @Test
     fun nativeRefusalsMatchTheSpecCodes() {
         val fixtures = File(repo, "packages/spec/fixtures/invalid").listFiles { f -> f.extension == "json" }!!.sortedBy { it.name }
@@ -26,7 +30,7 @@ class InvalidFixtureParityTest {
             val options = (fixture.fields["options"] as? JsonValue.Obj)?.fields
             val hash = (options?.get("catalogHash") as? JsonValue.Str)?.value
             val blueprint = fixture.fields["blueprint"]!!
-            val result = loadBlueprint(stringify(blueprint), catalogHash = hash)
+            val result = loadBlueprint(stringify(blueprint), catalogHash = hash, sources = sources)
             val codes = (result as? LoadResult.Refused)?.diagnostics?.map { it.code.wire } ?: emptyList()
             assertEquals(expected, codes, file.name)
         }

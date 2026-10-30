@@ -69,6 +69,17 @@ export const WEB_HERO_ACTIONS: readonly WebHeroLink[] = [
   { href: '/native/', label: 'See the native story', role: 'secondary' },
 ];
 
+/**
+ * The announcement above the eyebrow: the all-features hub. It names what
+ * is new without a version or npm claim (the hub states each release's
+ * status), so the hero still claims the system only.
+ */
+export const WEB_HERO_NEWS: WebHeroLink = {
+  href: '/whats-new/',
+  label: 'What’s new: motion, documents, and in development forms, canvas, sheets and dashboards',
+  role: 'secondary',
+};
+
 /** Where the visual moment leads: the real galleries behind the real data. */
 export const WEB_HERO_GRID_LINKS: readonly WebHeroLink[] = [
   { href: '/gallery-themes/', label: 'Browse the theme gallery', role: 'secondary' },

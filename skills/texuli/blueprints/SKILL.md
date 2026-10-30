@@ -276,3 +276,36 @@ pnpm vitest run packages/catalog/tests/validate-document.test.ts
 pnpm vitest run packages/catalog/tests/edit-document.test.ts
 pnpm vitest run packages/tools/tests/document.test.ts
 ```
+
+## J — Forms, canvases, sheets, dashboards and data sources (spec 0.8.0)
+
+New in the `0.8.0` packages, the first release of `@texuli/forms`,
+`@texuli/canvas` and `@texuli/sheets`; `0.7.0` predates it. Each shape is
+documented in its package (`packages/forms/docs/`, `packages/canvas/docs/`,
+`packages/sheets/docs/`, `packages/data/docs/data-dashboard.md`,
+`packages/spec/docs/source.md`).
+
+- **One node each.** A `schema-form` node's `schema` is a closed form
+  schema (named formats only, never a pattern; conditions and rules are
+  `@texuli/core/expression` trees); a `canvas` node's `canvas` prop and a
+  `spreadsheet` node's `sheet` prop carry their package's format (the id is
+  `spreadsheet`: `sheet` is the texuli drawer); a `data-dashboard` holds
+  `data-dashboard-widget` children only (unique `widgetId`, at most 200).
+- **No validator, no node.** `validateDraft` refuses `schema-form`,
+  `canvas` and `spreadsheet` nodes unless the host passes `checkForm`,
+  `checkCanvas` and `checkSheet` (`form-unchecked`, `canvas-unchecked`,
+  `sheet-unchecked`); the player paints them only through `formHost`,
+  `canvasHost` and `sheetHost` (`createFormPlayerHost()`,
+  `createCanvasPlayerHost()`, `createSheetPlayerHost()`).
+- **Data is named, never fetched.** A sourceable prop may read
+  `{"$source": name, "query": {...}}` from a source the host registered;
+  without the host's sources every binding is refused (`source`,
+  `unknown-source`). Never put a URL or code in a blueprint.
+
+```bash
+pnpm vitest run packages/catalog/tests/validate-form.test.ts
+pnpm vitest run packages/catalog/tests/validate-canvas.test.ts
+pnpm vitest run packages/catalog/tests/validate-sheet.test.ts
+pnpm vitest run packages/catalog/tests/validate-dashboard.test.ts
+pnpm vitest run packages/catalog/tests/validate-source.test.ts
+```

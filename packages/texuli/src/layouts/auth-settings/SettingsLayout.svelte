@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import { tick } from 'svelte';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import type { SettingsNavItem } from './types.ts';
 import './auth-settings.css';
@@ -33,7 +34,7 @@ type Props = {
 };
 
 let {
-  title = 'Settings',
+  title: titleProp,
   description,
   sections,
   active = $bindable(sections[0]?.id ?? ''),
@@ -45,6 +46,8 @@ let {
   backLabel,
   class: className,
 }: Props = $props();
+const msg = useMessages();
+const title = $derived(titleProp ?? msg('texuli.settings-layout.title', 'Settings'));
 
 const uid = $props.id();
 // svelte-ignore state_referenced_locally

@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { HTMLInputAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { fieldVariants } from './field-classes.ts';
 import './field.css';
@@ -34,7 +35,7 @@ let {
   files = $bindable(null),
   ref = $bindable(null),
   clearable = false,
-  clearLabel = 'Clear',
+  clearLabel: clearLabelProp,
   disabled = false,
   readonly = false,
   onValueChange,
@@ -43,6 +44,8 @@ let {
   onchange,
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const clearLabel = $derived(clearLabelProp ?? msg('texuli.input.clear-label', 'Clear'));
 
 const classes = $derived(fieldVariants({ control: 'input', class: className }));
 const numeric = $derived(type === 'number' || type === 'range');

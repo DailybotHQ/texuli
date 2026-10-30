@@ -1,9 +1,12 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLButtonAttributes } from 'svelte/elements';
+import { useMessages } from '../i18n/use-messages.ts';
 import type { ChildSnippet } from '../internal/child.ts';
 import type { RefProp } from '../internal/ref.ts';
 import { getComboboxContext } from './context.ts';
+
+const msg = useMessages();
 
 type Props = Omit<HTMLButtonAttributes, 'children'> & {
   children?: Snippet;
@@ -21,7 +24,8 @@ function handleClick(event: ClickEvent): void {
 const triggerProps = $derived({
   ...rest,
   type: 'button' as const,
-  'aria-label': rest['aria-label'] ?? 'Show options',
+  'aria-label':
+    rest['aria-label'] ?? msg('primitives.combobox.trigger.show-options', 'Show options'),
   'aria-controls': context.listId,
   'aria-expanded': context.open,
   'data-state': context.open ? 'open' : 'closed',

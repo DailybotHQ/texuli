@@ -447,6 +447,11 @@ export function vocabularyToKotlin(catalog: SpecCatalog, stamp: Stamp): string {
         `${INDENT}${INDENT}${INDENT}bindable = listOf(${c.bindable.map(kotlinString).join(', ')}),`
       );
     }
+    if (c.sourceable) {
+      lines.push(
+        `${INDENT}${INDENT}${INDENT}sourceable = listOf(${c.sourceable.map(kotlinString).join(', ')}),`
+      );
+    }
     if (c.deprecated)
       lines.push(`${INDENT}${INDENT}${INDENT}deprecated = ${deprecationExpr(c.deprecated)},`);
     lines.push(`${INDENT}${INDENT}),`);

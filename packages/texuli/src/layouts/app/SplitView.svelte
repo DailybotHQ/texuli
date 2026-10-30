@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import './app.css';
 
@@ -19,12 +20,15 @@ let {
   list,
   detail,
   empty,
-  listLabel = 'List',
-  detailLabel = 'Details',
+  listLabel: listLabelProp,
+  detailLabel: detailLabelProp,
   detailActive = $bindable(false),
   class: className,
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const listLabel = $derived(listLabelProp ?? msg('texuli.split-view.list-label', 'List'));
+const detailLabel = $derived(detailLabelProp ?? msg('texuli.split-view.detail-label', 'Details'));
 
 const hasDetail = $derived(Boolean(detail));
 const selectedDetail = $derived(detailActive && hasDetail);

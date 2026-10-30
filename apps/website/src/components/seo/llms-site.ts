@@ -63,6 +63,12 @@ export function siteLlmsSections(siteUrl: string): SiteLlmsSection[] {
         },
         { title: 'Getting started', href: abs(GET_STARTED) },
         {
+          title: 'What’s new',
+          href: abs('/whats-new/'),
+          description:
+            'Every package and capability of 0.6.0, 0.7.0 and 0.8.0 (all on npm; 0.8.0 is current), with demos.',
+        },
+        {
           title: 'Skill',
           href: abs('/skill/'),
           description: 'The distributable agent skill for building with Texuli.',

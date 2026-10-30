@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type BadgeVariant, tagClass } from './variants.ts';
 import './badge.css';
 
@@ -27,12 +28,14 @@ let {
   ref = $bindable(null),
   label,
   variant = 'secondary',
-  removeLabel = 'Remove {label}',
+  removeLabel: removeLabelProp,
   onRemove,
   disabled = false,
   class: className,
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const removeLabel = $derived(removeLabelProp ?? msg('texuli.tag.remove-label', 'Remove {label}'));
 
 let pending = $state(false);
 

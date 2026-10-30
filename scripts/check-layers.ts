@@ -39,13 +39,21 @@ export const LAYERS: Readonly<Record<string, number>> = Object.freeze({
   '@texuli/document': 1,
   '@texuli/tokens': 2,
   texuli: 3,
+  // L4: the infinite canvas; its model is framework-free and it syncs through
+  // @texuli/document/sync (ADR-010).
+  '@texuli/canvas': 4,
   '@texuli/charts': 4,
   '@texuli/chat': 4,
   '@texuli/data': 4,
   '@texuli/editor': 4,
+  // L4: schema-driven forms on texuli components and @texuli/core/expression (ADR-015).
+  '@texuli/forms': 4,
   '@texuli/media': 4,
   '@texuli/workflows': 4,
   '@texuli/blocks': 5,
+  // L5: spreadsheets; the formula and model subpaths are framework-free and the
+  // sheet view builds on @texuli/data grid editing (L4), so not L4 (ADR-015).
+  '@texuli/sheets': 5,
   '@texuli/catalog': 6,
   '@texuli/tools': 8,
   // L7: the Svelte player paints validated blueprints (roadmap D4).

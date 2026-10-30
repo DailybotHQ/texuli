@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue } from '../../internal/cx.ts';
 import { Button } from '../button/index.ts';
 import Stepper from './Stepper.svelte';
@@ -49,16 +50,27 @@ let {
   validate,
   onFinish,
   onStepChange,
-  backLabel = 'Back',
-  nextLabel = 'Next',
-  finishLabel = 'Finish',
-  reviewMessage = 'Please review this step before continuing.',
-  failureMessage = 'Something went wrong.',
+  backLabel: backLabelProp,
+  nextLabel: nextLabelProp,
+  finishLabel: finishLabelProp,
+  reviewMessage: reviewMessageProp,
+  failureMessage: failureMessageProp,
   secondaryActions,
   class: className,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const backLabel = $derived(backLabelProp ?? msg('texuli.wizard.back-label', 'Back'));
+const nextLabel = $derived(nextLabelProp ?? msg('texuli.wizard.next-label', 'Next'));
+const finishLabel = $derived(finishLabelProp ?? msg('texuli.wizard.finish-label', 'Finish'));
+const reviewMessage = $derived(
+  reviewMessageProp ??
+    msg('texuli.wizard.review-message', 'Please review this step before continuing.')
+);
+const failureMessage = $derived(
+  failureMessageProp ?? msg('texuli.wizard.failure-message', 'Something went wrong.')
+);
 
 function bindRef(node: HTMLElement): () => void {
   ref = node;

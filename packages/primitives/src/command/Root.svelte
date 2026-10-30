@@ -2,6 +2,7 @@
 import { getNavigationIntent, isActivationKey } from '@texuli/core/keyboard';
 import { onDestroy, type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../i18n/use-messages.ts';
 import type { RefProp } from '../internal/ref.ts';
 import { type CommandContextValue, type CommandItemRecord, commandContext } from './context.ts';
 import type { CommandSearch } from './types.ts';
@@ -20,7 +21,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
 let {
   children,
   debounceMs = 0,
-  label = 'Commands',
+  label: labelProp,
   loop = true,
   onSearch,
   onSearchError,
@@ -29,6 +30,8 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('primitives.command.label', 'Commands'));
 
 const id = $props.id();
 /** Consumer ids claimed by the list and items (`item:<value>`); they win over the generated ones. */

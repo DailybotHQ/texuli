@@ -2,6 +2,7 @@
 import { type HrefTrust, safeHref } from '@texuli/core/url-policy';
 import type { Snippet } from 'svelte';
 import { Button } from '../../components/button/index.ts';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import MarketingLayout from './MarketingLayout.svelte';
 import { normalizeCta, normalizeNavLinks } from './model.ts';
@@ -38,13 +39,17 @@ let {
   title,
   lede,
   heroAlign = 'start',
-  navigationLabel = 'Main navigation',
+  navigationLabel: navigationLabelProp,
   sections,
   footer,
   brandSlot,
   actionsSlot,
   class: className,
 }: Props = $props();
+const msg = useMessages();
+const navigationLabel = $derived(
+  navigationLabelProp ?? msg('texuli.landing-layout.navigation-label', 'Main navigation')
+);
 
 const links = $derived(normalizeNavLinks(navLinks));
 const primary = $derived(normalizeCta(primaryCta));

@@ -11,7 +11,7 @@ Show `@texuli/slides` on the `@texuli/deck` engine (PLAN_008, deck model v2)
 as a working product: a real deck to present, editors that write decks in
 JSON or Markdown, every layout and background, components on slides, and
 print and PPTX export. Both packages are in development and on npm
-as 0.7.0 (the v2 stage from 0.4.0; the 0.3.0 release of `@texuli/slides` has the previous model), and
+as 0.8.0 (the v2 stage from 0.4.0; the 0.3.0 release of `@texuli/slides` has the previous model), and
 the page says so.
 
 ## How it works

@@ -30,6 +30,29 @@ export function splitControlProps(props: Readonly<Record<string, unknown>>): Con
   return { control, wrapper };
 }
 
+export interface RequiredControlPropsSplit extends ControlPropsSplit {
+  /** True when the consumer passed `aria-required` (true or `"true"`). */
+  required: boolean;
+}
+
+/**
+ * {@link splitControlProps} that takes `aria-required` (for example from a
+ * Field's control props) out of `control` and reports it as `required`, for
+ * the component to apply the supported way. A `group` of date or time
+ * segments or a `slider` thumb does not support `aria-required` (axe
+ * `aria-allowed-attr`): native `required` goes on each segment input or the
+ * slider's form input instead. A checkbox primitive derives
+ * `aria-required` from `required`, so a spread one would be overwritten.
+ */
+export function splitRequiredControlProps(
+  props: Readonly<Record<string, unknown>>
+): RequiredControlPropsSplit {
+  const split = splitControlProps(props);
+  const flag = split.control['aria-required'];
+  delete split.control['aria-required'];
+  return { ...split, required: flag === true || flag === 'true' };
+}
+
 /** Join id lists for `aria-describedby` / `aria-labelledby`, dropping empties. */
 export function joinIds(...ids: (string | null | undefined | false)[]): string | undefined {
   return ids.filter(Boolean).join(' ') || undefined;

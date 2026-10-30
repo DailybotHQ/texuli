@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../i18n/use-messages.ts';
 import type { RefProp } from '../internal/ref.ts';
 import { getComboboxContext } from './context.ts';
 
@@ -14,10 +15,14 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
 let {
   children,
   showRetry = true,
-  retryLabel = 'Retry',
+  retryLabel: retryLabelProp,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const retryLabel = $derived(
+  retryLabelProp ?? msg('primitives.combobox.error.retry-label', 'Retry')
+);
 const context = getComboboxContext();
 const visible = $derived(context.open && context.status === 'error');
 
@@ -36,7 +41,7 @@ function handleRetry(): void {
     {#if children}
       {@render children()}
     {:else}
-      <p data-tx-combobox-error-message="">{context.errorMessage ?? 'Failed to load options'}</p>
+      <p data-tx-combobox-error-message="">{context.errorMessage ?? msg('primitives.combobox.error.failed-to-load-options', 'Failed to load options')}</p>
     {/if}
     {#if showRetry}
       <button

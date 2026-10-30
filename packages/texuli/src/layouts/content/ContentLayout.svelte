@@ -2,6 +2,7 @@
 import { getOwnerWindow } from '@texuli/core/env';
 import { safeHref } from '@texuli/core/url-policy';
 import { untrack } from 'svelte';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import LayoutChrome from '../host/LayoutChrome.svelte';
 import { isNavPathActive } from '../host/nav-model.ts';
@@ -76,6 +77,7 @@ let {
   options,
   class: className,
 }: Props = $props();
+const msg = useMessages();
 let screenTarget = $state<HTMLElement>();
 let scannedItems = $state<TocItem[]>([]);
 const instanceId = $props.id();
@@ -278,7 +280,7 @@ function safeNavHref(href: string): string | undefined {
     <LayoutChrome part="skip" mainId={mainId} />
     <LayoutChrome part="brand" {nav} />
     {#if nav?.sections.length}
-      <nav class="tx-content-layout__top-nav" aria-label="Primary">
+      <nav class="tx-content-layout__top-nav" aria-label={msg('texuli.content-layout.primary', 'Primary')}>
         {#each nav.sections as section (section.id)}
           {#each section.items as item (item.id)}
             {@const href = safeNavHref(item.href)}
@@ -296,7 +298,7 @@ function safeNavHref(href: string): string | undefined {
 
   <svelte:element this={nested ? 'div' : 'main'} id={mainId} class="tx-content-layout__frame" data-content-kind={kind} tabindex="-1">
     {#if kind === 'docs' && nav?.sections.length}
-      <nav class="tx-content-layout__sections" aria-label="Documentation sections">
+      <nav class="tx-content-layout__sections" aria-label={msg('texuli.content-layout.documentation-sections', 'Documentation sections')}>
         {#each nav.sections as section (section.id)}
           {#if section.label}<h2>{section.label}</h2>{/if}
           <ul>
@@ -337,7 +339,7 @@ function safeNavHref(href: string): string | undefined {
       >{@render children?.()}</div>
     </article>
 
-    <aside class="tx-content-layout__toc" aria-label="On this page">
+    <aside class="tx-content-layout__toc" aria-label={msg('texuli.content-layout.on-this-page', 'On this page')}>
       <details open class="tx-content-layout__toc-details">
         <summary>On this page</summary>
         {#if tocItems.length}

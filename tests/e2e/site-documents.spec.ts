@@ -374,3 +374,27 @@ test('at 360 px nothing overflows, nothing still loads, and the views switch fro
   });
   expect(await polishProblems(page)).toEqual([]);
 });
+
+test('the vocabulary: every block type, every slash item and every embed kind, read from the packages', async ({
+  page,
+}) => {
+  await page.goto(`${origin()}/documents-page/#blocks`);
+  await settle(page);
+  await expect(
+    page.getByRole('heading', { level: 2, name: 'Every block, every slash item, every embed' })
+  ).toBeVisible();
+  await expect(page.locator('[data-documents-block-types] tbody tr')).toHaveCount(13);
+  await expect(page.locator('[data-documents-block-type="columns"]')).toContainText('Columns 2');
+  await expect(page.locator('[data-documents-block-type="block"]')).toContainText(
+    /\d{2}: Heading, Paragraph/
+  );
+  const slashItems = page.locator('[data-documents-slash] li li');
+  expect(await slashItems.count()).toBeGreaterThan(40);
+  await expect(page.locator('[data-documents-embeds] tbody tr')).toHaveCount(4);
+  await expect(page.locator('[data-documents-embed="canvas"]')).toContainText('planned');
+  await expect(page.getByRole('link', { name: 'Canvas', exact: true }).last()).toHaveAttribute(
+    'href',
+    '/canvas-page/'
+  );
+  expect(await axeViolations(page)).toEqual([]);
+});

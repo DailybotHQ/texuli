@@ -2,6 +2,7 @@
 import { getAnnouncer } from '@texuli/core/announcer';
 import { getComboboxContext, Error as PrimitiveErrorPart } from '@texuli/primitives/combobox';
 import type { ComponentProps, Snippet } from 'svelte';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue } from '../../internal/cx.ts';
 import { comboboxErrorClass } from './variants.ts';
 import './combobox.css';
@@ -17,14 +18,22 @@ let {
   children,
   class: className,
   announce,
-  retryLabel = 'Retry',
+  retryLabel: retryLabelProp,
   showRetry = true,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const retryLabel = $derived(retryLabelProp ?? msg('texuli.combobox-error.retry-label', 'Retry'));
 
 const context = getComboboxContext();
-const message = $derived((announce ?? context.errorMessage ?? 'Failed to load options').trim());
+const message = $derived(
+  (
+    announce ??
+    context.errorMessage ??
+    msg('texuli.combobox-error.failed-to-load-options', 'Failed to load options')
+  ).trim()
+);
 
 const classes = $derived(
   comboboxErrorClass({

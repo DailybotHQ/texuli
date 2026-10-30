@@ -8,7 +8,9 @@ type Props = ComponentProps<typeof PrimitiveValue> & {
   class?: ClassValue;
 };
 
-let { class: className, placeholder = 'Select…', children, ...rest }: Props = $props();
+// The prop is renamed: the `{#snippet children}` below would shadow it,
+// and rendering it would then recurse into the snippet itself.
+let { class: className, placeholder = 'Select…', children: content, ...rest }: Props = $props();
 </script>
 
 <PrimitiveValue {placeholder} {...rest}>
@@ -21,8 +23,8 @@ let { class: className, placeholder = 'Select…', children, ...rest }: Props = 
       data-tx-select-value
       data-placeholder={!label ? '' : undefined}
     >
-      {#if children}
-        {@render children({ value, label })}
+      {#if content}
+        {@render content({ value, label })}
       {:else}
         {label || placeholder}
       {/if}

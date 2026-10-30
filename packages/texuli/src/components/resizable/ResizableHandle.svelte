@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Splitter } from '@texuli/primitives/splitter';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { type ResizableHandleSize, resizableHandleClass } from './variants.ts';
 
@@ -23,7 +24,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'class' | 'role'>
 };
 
 let {
-  label = 'Resize',
+  label: labelProp,
   disabled = false,
   withGrip = true,
   size = 'md',
@@ -31,6 +32,8 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('texuli.resizable-handle.label', 'Resize'));
 
 const handleClass = $derived(resizableHandleClass({ size, class: className }));
 </script>

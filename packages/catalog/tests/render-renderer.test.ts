@@ -440,6 +440,7 @@ describe('tier semantics (D5)', () => {
     'blocks-media',
     'blocks-structure',
     'blocks-text',
+    'canvas',
     'charts-area',
     'charts-bar',
     'charts-bubble',
@@ -472,6 +473,8 @@ describe('tier semantics (D5)', () => {
     'data-board',
     'data-calendar',
     'data-cohort-table',
+    'data-dashboard',
+    'data-dashboard-widget',
     'data-files',
     'data-filter-builder',
     'data-grid',
@@ -498,7 +501,9 @@ describe('tier semantics (D5)', () => {
     'media-composition-canvas',
     'media-composition-svg',
     'media-image',
+    'schema-form',
     'sortable-list',
+    'spreadsheet',
     'workflow-graph',
   ];
 

@@ -1,0 +1,16 @@
+{
+  "golden": "form-registration",
+  "trace": [
+    {
+      "children": [
+        {
+          "id": "schema-form",
+          "role": "form"
+        }
+      ],
+      "id": "layout-page",
+      "name": "Community day",
+      "role": "main"
+    }
+  ]
+}

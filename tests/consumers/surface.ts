@@ -437,6 +437,12 @@ export const RENDER_CHECKS: Readonly<Record<string, RenderCheck>> = {
     ssr: 'Consumer block heading',
     styled: true,
   },
+  '@texuli/canvas': {
+    region: '[data-render="@texuli/canvas"]',
+    client: 'Consumer canvas note',
+    ssr: 'Consumer canvas note',
+    styled: true,
+  },
   '@texuli/charts': {
     region: '[data-render="@texuli/charts"]',
     client: 'Consumer chart',
@@ -453,6 +459,19 @@ export const RENDER_CHECKS: Readonly<Record<string, RenderCheck>> = {
     region: '[data-render="@texuli/editor"]',
     client: 'Consumer editor text',
     ssr: 'Consumer editor text',
+    styled: true,
+  },
+  '@texuli/sheets': {
+    region: '[data-render="@texuli/sheets"]',
+    client: 'Consumer sheet total',
+    // The sheet view is the data grid's editing layer, which mounts after hydration.
+    ssr: null,
+    styled: true,
+  },
+  '@texuli/forms': {
+    region: '[data-render="@texuli/forms"]',
+    client: 'Consumer form email',
+    ssr: 'Consumer form email',
     styled: true,
   },
   '@texuli/media': {

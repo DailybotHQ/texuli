@@ -558,6 +558,16 @@ host, never from the blueprint or the reader.
 
 Today only scalar state variables bind.
 
+### Data-source bindings (spec 0.8.0)
+
+Host data binding above carries scalars into state. Rows come from a data
+source instead: a sourceable prop (`data-grid.rows`, `data-board.items` and
+the other data views) reads `{"$source": name, "query": {...}, "map": {...}}`
+from a source the host registered in `@texuli/core/data-source` and passed as
+`sourceRegistry` (or `sourceLoader`). Without one every source binding is
+refused. Loading, empty and error states, paging, announcements and
+optimistic edits are in [data-sources.md](data-sources.md).
+
 ### Selection (builder preview)
 
 `selectable` (default `false`) lets a host select painted frames, as the

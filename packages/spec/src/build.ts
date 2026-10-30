@@ -17,10 +17,14 @@ export const NORMATIVE_DIRS = ['schemas/', 'catalog/', 'fixtures/'] as const;
  * Normative schemas that are pinned by digest but are not in the dialect and
  * generate nothing: they are exported by a higher-layer engine and kept here
  * so the contract pins the exact version agents write against. Spec 0.7.0
- * pins `@texuli/document`'s JSON Schema export (ADR-011); a freshness test in
- * `@texuli/catalog` keeps it equal to `documentJsonSchema()`.
+ * pins `@texuli/document`'s JSON Schema export (ADR-011) and spec 0.8.0
+ * `@texuli/canvas`'s (ADR-012); freshness tests in `@texuli/catalog` keep
+ * them equal to `documentJsonSchema()` and `canvasJsonSchema()`.
  */
-export const EXTERNAL_SCHEMAS: readonly string[] = Object.freeze(['schemas/document.schema.json']);
+export const EXTERNAL_SCHEMAS: readonly string[] = Object.freeze([
+  'schemas/canvas.schema.json',
+  'schemas/document.schema.json',
+]);
 
 /** The schema documents, their generated names and output files. */
 export const SCHEMA_UNITS = [

@@ -2,6 +2,7 @@
 import { type HrefTrust, safeHref } from '@texuli/core/url-policy';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import './mobile.css';
 
@@ -38,7 +39,7 @@ let {
   titleAs = 'h1',
   backHref,
   onBack,
-  backLabel = 'Back',
+  backLabel: backLabelProp,
   backTarget,
   hrefTrust = 'developer',
   actions,
@@ -46,6 +47,8 @@ let {
   class: className,
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const backLabel = $derived(backLabelProp ?? msg('texuli.mobile-header.back-label', 'Back'));
 
 const href = $derived(backHref === undefined ? undefined : safeHref(backHref, hrefTrust));
 // The name keeps the visible word first (WCAG 2.5.3) and adds where Back goes.

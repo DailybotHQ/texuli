@@ -1,0 +1,386 @@
+---
+import { FORMULA_LIMITS, SHEET_FUNCTION_NAMES } from '@texuli/sheets/formula';
+import { SHEET_LIMITS } from '@texuli/sheets/model';
+/**
+ * /sheets-page/ — spreadsheets (@texuli/sheets, in development, on npm from
+ * 0.8.0): a live workbook in SheetView with the recalculation it caused,
+ * every function of the closed set evaluated at build time plus a lab,
+ * the dependency graph, cycles, limits and refused formulas evaluated by
+ * the real engine, CSV import and export with formula injection
+ * neutralized, and a spreadsheet as agent data painted by the player
+ * through the sheet host. Every demo is a lazy island (client:visible).
+ */
+import FeaturePage from '../../components/feature-site/FeaturePage.astro';
+import GuideCode from '../../components/guides/GuideCode.astro';
+import AgentSheetDemo from '../../components/sheets-site/AgentSheetDemo.svelte';
+import { AGENT_SHEET_JSON, HOSTILE_CELL_JSON } from '../../components/sheets-site/blueprint.ts';
+import CsvLab from '../../components/sheets-site/CsvLab.svelte';
+import FunctionLab from '../../components/sheets-site/FunctionLab.svelte';
+import {
+  SHEET_KEYS,
+  SHEETS_DOCS,
+  SHEETS_PIECES,
+  SHEETS_RELEASE,
+  SHEETS_RULES,
+  SHEETS_SECTIONS,
+} from '../../components/sheets-site/page.ts';
+import SheetWorkbench from '../../components/sheets-site/SheetWorkbench.svelte';
+import {
+  BUILD_CLOCK,
+  CATEGORY_NAMES,
+  dependencyRows,
+  functionRows,
+  SAMPLE_COLUMNS,
+  safetyCases,
+  sampleRows,
+} from '../../components/sheets-site/workbook.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const section = (id: string) => {
+  const entry = SHEETS_SECTIONS.find((candidate) => candidate.id === id);
+  if (!entry) throw new Error(`Unknown sheets section ${id}`);
+  return entry;
+};
+
+const functions = functionRows();
+const byCategory = Object.entries(CATEGORY_NAMES).map(([category, name]) => ({
+  category,
+  name,
+  rows: functions.filter((row) => row.category === category),
+}));
+const dependencies = dependencyRows();
+const cases = safetyCases();
+const sample = sampleRows();
+const clock = new Date(BUILD_CLOCK).toISOString().replace('.000Z', 'Z');
+
+const limits = [
+  { name: 'Sheets per workbook', value: String(SHEET_LIMITS.sheets) },
+  { name: 'Rows per sheet', value: SHEET_LIMITS.rows.toLocaleString('en') },
+  { name: 'Columns per sheet', value: `${SHEET_LIMITS.columns} (IV)` },
+  { name: 'Non-blank cells', value: SHEET_LIMITS.cells.toLocaleString('en') },
+  { name: 'Characters of one formula', value: FORMULA_LIMITS.length.toLocaleString('en') },
+  { name: 'Nesting the parser follows', value: String(FORMULA_LIMITS.depth) },
+  { name: 'Cells one range may read', value: '10,000' },
+];
+
+const viewSnippet = `import { loadUntrustedSheet } from '@texuli/sheets/model';
+import { SheetView } from '@texuli/sheets/view';
+
+const loaded = loadUntrustedSheet(json); // a file, a link or an agent: validated first
+let sheet = $state(loaded.ok ? loaded.sheet : null);
+
+<SheetView bind:sheet now={() => Date.now()} />`;
+
+const engineSnippet = `import { createWorkbook, displayValue } from '@texuli/sheets/model';
+
+const book = createWorkbook(sheet, { now: () => Date.now() });
+const pass = book.setInput('orders', 1, 1, 150); // B2 = 150
+pass.evaluated; // only the formulas that read B2
+book.insertRows('orders', 4, 2); // =SUM(B2:B9) becomes =SUM(B2:B11)
+displayValue(book.value('orders', 12, 1));`;
+
+const hostSnippet = `import { Player } from '@texuli/player';
+import { createSheetPlayerHost } from '@texuli/sheets/host';
+
+const sheetHost = createSheetPlayerHost({ now: () => Date.now() });
+
+<Player blueprint={agentDraft} tier="untrusted" {sheetHost} />`;
+---
+
+<BaseLayout
+  title="Sheets"
+  description="Texuli spreadsheets (@texuli/sheets, in development, on npm from 0.8.0): an owned formula engine with 54 functions, a dependency graph with incremental recalculation, cycle and limit errors, CSV that neutralizes formula injection, an accessible sheet view, and spreadsheets as agent data."
+>
+  <FeaturePage
+    name="sheets"
+    eyebrow={`@texuli/sheets · in development · on npm from ${SHEETS_RELEASE}`}
+    title="Spreadsheets with a formula engine you can trust"
+    pieces={SHEETS_PIECES}
+    piecesLabel="The pieces of the sheets package"
+    sections={SHEETS_SECTIONS}
+  >
+    <Fragment slot="lead">
+      <p>
+        An owned formula engine: a linear-time parser, {SHEET_FUNCTION_NAMES.length} documented
+        functions, a dependency graph that recalculates only what changed, cycles and overruns as
+        error values, and no way to build a reference from text. Around it a framework-free workbook,
+        CSV that neutralizes formula injection, and an accessible sheet view. <code>@texuli/sheets</code>
+        is in development and on npm from <code>{SHEETS_RELEASE}</code>, a pre-1.0 release.
+      </p>
+    </Fragment>
+
+    <section class="fx-section" id="workbook" aria-labelledby="workbook-title">
+      <h2 id="workbook-title">{section('workbook').title}</h2>
+      <p>{section('workbook').summary}</p>
+      <SheetWorkbench client:visible />
+      <div class="fx-table-wrap" role="region" aria-label="Sheet keys" tabindex="0">
+        <table class="fx-table">
+          <caption>Keys in the sheet</caption>
+          <thead>
+            <tr>
+              <th scope="col">Keys</th>
+              <th scope="col">What they do</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              SHEET_KEYS.map((row) => (
+                <tr>
+                  <td>
+                    <kbd>{row.keys}</kbd>
+                  </td>
+                  <td>{row.does}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="fx-section" id="functions" aria-labelledby="functions-title">
+      <h2 id="functions-title">{section('functions').title}</h2>
+      <p>{section('functions').summary}</p>
+      <FunctionLab client:visible />
+      <div class="fx-table-wrap" role="region" aria-label="The order log the examples read" tabindex="0">
+        <table class="fx-table" data-sheets-sample="">
+          <caption>The order log (Orders!A1:I9) every example reads</caption>
+          <thead>
+            <tr>
+              <th scope="col"><span class="fx-sr">Row</span></th>
+              {SAMPLE_COLUMNS.map((column) => <th scope="col">{column}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {
+              sample.map((row, index) => (
+                <tr>
+                  <th scope="row">{index + 1}</th>
+                  {row.map((cell) => (
+                    <td>
+                      <code>{cell}</code>
+                    </td>
+                  ))}
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="fx-note">
+        Results below were computed by the engine when this page was built, with the clock fixed at
+        <code>{clock}</code> for <code>TODAY</code> and <code>NOW</code>; the lab above uses your
+        clock.
+      </p>
+      {
+        byCategory.map((group) => (
+          <div class="fx-table-wrap" role="region" aria-label={group.name} tabindex="0">
+            <table class="fx-table" data-sheets-functions={group.category}>
+              <caption>
+                {group.name}: {group.rows.length} functions
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Function</th>
+                  <th scope="col">What it does</th>
+                  <th scope="col">Example</th>
+                  <th scope="col">Result</th>
+                </tr>
+              </thead>
+              <tbody>
+                {group.rows.map((row) => (
+                  <tr data-sheets-function={row.name}>
+                    <th scope="row">
+                      <code>{row.signature}</code>
+                    </th>
+                    <td>{row.description}</td>
+                    <td>
+                      <code>{row.example}</code>
+                    </td>
+                    <td data-sheets-result="">{row.result}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))
+      }
+    </section>
+
+    <section class="fx-section" id="recalc" aria-labelledby="recalc-title">
+      <h2 id="recalc-title">{section('recalc').title}</h2>
+      <p>{section('recalc').summary}</p>
+      <div class="fx-pair">
+        <div class="fx-table-wrap" role="region" aria-label="Dependency graph" tabindex="0">
+          <table class="fx-table" data-sheets-graph="">
+            <caption>The live workbook’s graph: {dependencies.length} formulas</caption>
+            <thead>
+              <tr>
+                <th scope="col">Formula cell</th>
+                <th scope="col">Reads</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                dependencies.map((row) => (
+                  <tr>
+                    <th scope="row">{row.cell}</th>
+                    <td>
+                      {row.reads.map((read, index) => (
+                        <>
+                          {index > 0 ? ', ' : ''}
+                          <code>{read}</code>
+                        </>
+                      ))}
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="fx-panel">
+          <h3>Try it above</h3>
+          <ul class="fx-list">
+            <li>
+              Edit <code>Orders!B2</code>: the totals, the paid share and the summary figures that read
+              amounts recalculate; the open-order count and the shipping days are not evaluated.
+            </li>
+            <li>
+              Edit <code>Summary!B6</code> (the tax rate): exactly one formula,
+              <code>Summary!B7</code>, is evaluated.
+            </li>
+            <li>
+              Insert two rows above row 5: <code>=SUM(B2:B9)</code> becomes <code>=SUM(B2:B11)</code>
+              and moves to <code>B13</code>, and the summary’s cross-sheet ranges follow.
+            </li>
+            <li>Undo with Control or Command and Z: the panel shows the reverse edit.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="fx-section" id="safety" aria-labelledby="safety-title">
+      <h2 id="safety-title">{section('safety').title}</h2>
+      <p>{section('safety').summary}</p>
+      <div class="fx-table-wrap" role="region" aria-label="What the engine does with hostile input" tabindex="0">
+        <table class="fx-table" data-sheets-safety="">
+          <caption>Evaluated by the engine at build time</caption>
+          <thead>
+            <tr>
+              <th scope="col">Case</th>
+              <th scope="col">Input</th>
+              <th scope="col">Outcome</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              cases.map((row) => (
+                <tr data-sheets-case={row.id}>
+                  <th scope="row">{row.title}</th>
+                  <td>
+                    <code>{row.input}</code>
+                  </td>
+                  <td>{row.outcome}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="fx-pair">
+        <div class="fx-table-wrap" role="region" aria-label="Limits" tabindex="0">
+          <table class="fx-table">
+            <caption>Limits the validator and engine hold</caption>
+            <tbody>
+              {
+                limits.map((row) => (
+                  <tr>
+                    <th scope="row">{row.name}</th>
+                    <td>{row.value}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <ul class="fx-rules">
+          {
+            SHEETS_RULES.map((rule) => (
+              <li>
+                <h3>{rule.title}</h3>
+                <p>{rule.body}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section class="fx-section" id="csv" aria-labelledby="csv-title">
+      <h2 id="csv-title">{section('csv').title}</h2>
+      <p>{section('csv').summary}</p>
+      <CsvLab client:visible />
+      <p class="fx-note">
+        With “Import formulas” on, the whole file is refused because <code>HYPERLINK</code> is not a
+        sheet function; delete that line and the <code>=SUM</code> formula imports and computes.
+      </p>
+    </section>
+
+    <section class="fx-section" id="agents" aria-labelledby="agents-title">
+      <h2 id="agents-title">{section('agents').title}</h2>
+      <p>{section('agents').summary}</p>
+      <div class="fx-pair fx-pair--code">
+        <div class="fx-panel">
+          <h3>The blueprint the agent wrote</h3>
+          <p class="fx-note">
+            Spec <code>0.8.0</code> adds the <code>spreadsheet</code> catalog id; it ships in the
+            <code>{SHEETS_RELEASE}</code> release of <code>@texuli/spec</code>.
+          </p>
+          <GuideCode code={AGENT_SHEET_JSON} label="The spreadsheet blueprint (JSON)" lang="text" />
+          <h3>The hostile cell</h3>
+          <GuideCode code={HOSTILE_CELL_JSON} label="A formula that builds a reference from text" lang="text" />
+        </div>
+        <div class="fx-panel">
+          <h3>Painted by the player</h3>
+          <AgentSheetDemo client:visible />
+        </div>
+      </div>
+    </section>
+
+    <section class="fx-section" id="in-code" aria-labelledby="in-code-title">
+      <h2 id="in-code-title">{section('in-code').title}</h2>
+      <p>{section('in-code').summary}</p>
+      <div class="fx-pair">
+        <GuideCode code={viewSnippet} label="Validate, then edit" lang="ts" />
+        <GuideCode code={engineSnippet} label="The workbook engine" lang="ts" />
+        <GuideCode code={hostSnippet} label="Agent sheets in the player" lang="ts" />
+      </div>
+    </section>
+
+    <section class="fx-section" id="package-docs" aria-labelledby="package-docs-title">
+      <h2 id="package-docs-title">Package docs</h2>
+      <p>The site does not render the package docs yet. Read them in the repository:</p>
+      <ul class="fx-list">
+        {
+          SHEETS_DOCS.map((doc) => (
+            <li>
+              {doc.label}: <code>{doc.path}</code>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </FeaturePage>
+</BaseLayout>
+
+<style>
+  .fx-sr {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+</style>

@@ -104,7 +104,7 @@ test('the settings drive every demo: full motion animates, reduced motion starts
   await openDialog.click();
   const dialog = page.getByRole('dialog', { name: 'Edit the release crew' });
   await expect(dialog).toBeVisible();
-  await expect.poll(() => animations(page)).toBeGreaterThan(before);
+  await expect.poll(() => animations(page), { timeout: 15_000 }).toBeGreaterThan(before);
   await page.keyboard.press('Escape');
   await expect(dialog).toBeHidden();
   await expect(openDialog).toBeFocused();
@@ -116,7 +116,7 @@ test('the settings drive every demo: full motion animates, reduced motion starts
   await expect(page.locator('[data-motion-list-status]')).toHaveText(
     'Write launch notes moved to position 2 of 4.'
   );
-  await expect.poll(() => animations(page)).toBeGreaterThan(before);
+  await expect.poll(() => animations(page), { timeout: 15_000 }).toBeGreaterThan(before);
   await expect(page.getByRole('button', { name: 'Move Write launch notes down' })).toBeFocused();
 
   // Shared element, timeline, springs and tokens play.
@@ -255,6 +255,10 @@ test('at 360 px nothing overflows and the settings work from the keyboard', asyn
     '[data-motion-springs]',
     '[data-motion-tokens]',
     '[data-motion-blueprint]',
+    '[data-motion-presets]',
+    '[data-motion-components]',
+    '[data-motion-spring-lab]',
+    '[data-motion-deck]',
   ]) {
     await hydrated(page, selector);
   }
@@ -275,4 +279,128 @@ test('at 360 px nothing overflows and the settings work from the keyboard', asyn
   await expect(page.locator('[data-motion-note="presence"]')).toContainText(
     'Level subtle, reduced motion on'
   );
+});
+
+test('every preset, every moving component, the spring lab and the deck levels', async ({
+  page,
+}) => {
+  test.setTimeout(150_000);
+  const foreign = watchForeign(page);
+  await countAnimations(page);
+  await page.goto(`${origin()}/motion-page/#presets`);
+  await settle(page);
+
+  // Every preset card plays its enter and exit through the runtime.
+  await hydrated(page, '[data-motion-presets]');
+  await expect(page.locator('[data-motion-preset]')).toHaveCount(9);
+  for (const preset of [
+    'fade',
+    'rise',
+    'scale',
+    'slide-start',
+    'slide-end',
+    'edge slide, bottom',
+  ]) {
+    const before = await animations(page);
+    await page.getByRole('button', { name: `Play ${preset} enter` }).click();
+    // The outcome is written only once the runtime's animation settles, so wait for it first
+    // (generously: the host may be loaded), then prove the play went through
+    // Element.animate. Under load the call lands late, never not at all.
+    await expect(outcome(page, 'presets')).toHaveText(`${preset} enter: Played: finished`, {
+      timeout: 15_000,
+    });
+    await expect.poll(() => animations(page), { timeout: 15_000 }).toBeGreaterThan(before);
+  }
+  await page.getByRole('button', { name: 'Play rise exit' }).click();
+  await expect(outcome(page, 'presets')).toHaveText('rise exit: Played: finished');
+  await expect(page.locator('[data-motion-preset="fade"]')).toContainText('opacity');
+
+  // Every component gallery overlay animates in, and focus comes back.
+  await hydrated(page, '[data-motion-components]');
+  const gallery = page.locator('[data-motion-components]');
+  let before = await animations(page);
+  const popover = gallery.getByRole('button', { name: 'Open popover' });
+  await popover.click();
+  await expect(page.getByText('Ada Example owns the release notes.')).toBeVisible();
+  await expect.poll(() => animations(page), { timeout: 15_000 }).toBeGreaterThan(before);
+  await page.keyboard.press('Escape');
+  await expect(popover).toBeFocused();
+  before = await animations(page);
+  await gallery.getByRole('button', { name: 'Actions' }).click();
+  await expect(page.getByRole('menuitem', { name: 'Rename' })).toBeVisible();
+  await expect.poll(() => animations(page), { timeout: 15_000 }).toBeGreaterThan(before);
+  await page.keyboard.press('Escape');
+  const alertTrigger = gallery.getByRole('button', { name: 'Archive board' });
+  await alertTrigger.click();
+  const alert = page.getByRole('alertdialog', { name: 'Archive the launch board?' });
+  await expect(alert).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(alert).toBeHidden();
+  await expect(alertTrigger).toBeFocused();
+  before = await animations(page);
+  await gallery.getByRole('button', { name: 'When does the beta open?' }).click();
+  await expect(gallery.getByText('Next week, for every fictional pilot team.')).toBeVisible();
+  await expect.poll(() => animations(page), { timeout: 15_000 }).toBeGreaterThan(before);
+  await expect(page.locator('[data-motion-adopters] tbody tr')).toHaveCount(30);
+
+  // The spring lab: the solver answers the sliders, and Play runs the spring.
+  await hydrated(page, '[data-motion-spring-lab]');
+  await page
+    .locator('[data-motion-spring-lab]')
+    .getByRole('button', { name: 'bouncy', exact: true })
+    .click();
+  await expect(page.locator('[data-spring-ratio]')).toContainText('0.46');
+  const damping = page.locator('[data-spring="damping"]');
+  await damping.focus();
+  for (let index = 0; index < 40; index += 1) await page.keyboard.press('ArrowRight');
+  await expect(page.locator('[data-spring-ratio]')).toContainText('overdamped');
+  await page.getByRole('button', { name: 'Play this spring' }).click();
+  await expect(outcome(page, 'spring-lab')).toHaveText('Played: finished');
+  await expect(page.locator('[data-spring-easing]')).toContainText('linear(');
+
+  // The deck: every transition at the page level; level none plays nothing.
+  await hydrated(page, '[data-motion-deck]');
+  const deck = page.locator('[data-motion-deck]');
+  await expect(deck.getByRole('button', { name: 'Transition: slide' })).toBeEnabled({
+    timeout: 20_000,
+  });
+  await expect(page.locator('[data-motion-deck-table] tbody tr')).toHaveCount(6);
+  before = await animations(page);
+  await deck.getByRole('button', { name: 'Transition: zoom' }).click();
+  await expect(deck.getByRole('button', { name: 'Transition: zoom' })).toHaveAttribute(
+    'aria-current',
+    'true'
+  );
+  await expect.poll(() => animations(page), { timeout: 15_000 }).toBeGreaterThan(before);
+
+  await page.locator('#settings').scrollIntoViewIfNeeded();
+  await page.getByRole('radio', { name: 'None' }).check();
+  await expect(page.locator('[data-motion-deck-level]')).toContainText('none');
+  await page.locator('#presets').scrollIntoViewIfNeeded();
+  await quiet(page);
+  before = await animations(page);
+  await page.getByRole('button', { name: 'Play scale enter' }).click();
+  await expect(outcome(page, 'presets')).toHaveText('scale enter: Instant: level-none');
+  await deck.getByRole('button', { name: 'Transition: morph' }).click();
+  await expect(deck.getByRole('button', { name: 'Transition: morph' })).toHaveAttribute(
+    'aria-current',
+    'true'
+  );
+  expect(await animations(page)).toBe(before);
+  await page.getByRole('radio', { name: 'Full' }).check();
+
+  // Reduced motion: the presets commit at once.
+  await setReduced(page, true);
+  await page.getByRole('button', { name: 'Play fade enter' }).click();
+  await expect(outcome(page, 'presets')).toHaveText('fade enter: Instant: reduced-motion');
+  await setReduced(page, false);
+
+  await expect(page.locator('[data-motion-inventory] > li')).toHaveCount(4);
+  await quiet(page);
+  for (const scheme of ['light', 'dark'] as const) {
+    await page.emulateMedia({ colorScheme: scheme });
+    await quiet(page);
+    expect(await axeViolations(page), scheme).toEqual([]);
+  }
+  expect(foreign).toEqual([]);
 });

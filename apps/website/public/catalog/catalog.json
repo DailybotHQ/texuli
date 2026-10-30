@@ -931,6 +931,98 @@
     },
     {
       "a11y": [
+        "Painted as an image named by the canvas title, with every shape and connector listed as text in reading order",
+        "Text is data, never HTML; image refs pass the URL policy at the host tier",
+        "Styles are a closed palette of theme tokens, never raw CSS"
+      ],
+      "agentEmittable": true,
+      "dontUseWhen": [
+        "A workflow with typed ports that runs: use workflow-graph",
+        "A chart of data: use a chart family",
+        "Prose: use document"
+      ],
+      "emit": ["developer", "untrusted"],
+      "examples": [
+        {
+          "id": "decision",
+          "props": {
+            "canvas": {
+              "connectors": [
+                {
+                  "from": { "shape": "ask" },
+                  "id": "yes",
+                  "routing": "curved",
+                  "text": "yes",
+                  "to": { "shape": "ship" }
+                }
+              ],
+              "format": "texuli-canvas",
+              "formatVersion": 1,
+              "meta": { "title": "Release decision" },
+              "shapes": [
+                {
+                  "height": 72,
+                  "id": "ask",
+                  "text": "Ready to ship?",
+                  "type": "ellipse",
+                  "width": 160,
+                  "x": 0,
+                  "y": 0
+                },
+                {
+                  "height": 72,
+                  "id": "ship",
+                  "text": "Ship on example.com",
+                  "type": "rect",
+                  "width": 160,
+                  "x": 240,
+                  "y": 0
+                },
+                {
+                  "color": "yellow",
+                  "height": 120,
+                  "id": "idea",
+                  "text": "Ask the beta testers",
+                  "type": "sticky",
+                  "width": 160,
+                  "x": 0,
+                  "y": 120
+                }
+              ]
+            }
+          },
+          "title": "Decision flow"
+        }
+      ],
+      "group": "canvas",
+      "id": "canvas",
+      "label": "Canvas",
+      "package": "@texuli/canvas",
+      "props": [
+        {
+          "description": "A Texuli canvas: { format: \"texuli-canvas\", formatVersion: 1, meta: { title }, shapes, connectors }. Shapes: rect, ellipse, diamond, line, arrow, path (points), text, sticky, image ({ ref, alt }), frame ({ title, children }) and group ({ children }), each with an id and x, y, width, height. Connectors: { id, from: { shape }, to: { shape }, routing: straight | elbow | curved, text }.",
+          "kind": "object",
+          "name": "canvas",
+          "required": true,
+          "schema": { "$ref": "#/$defs/canvas" }
+        },
+        {
+          "description": "Accessible name; defaults to the canvas title.",
+          "kind": "string",
+          "name": "label",
+          "trust": "untrusted"
+        }
+      ],
+      "related": ["document", "workflow-graph"],
+      "summary": "A whiteboard or diagram as data: shapes, sticky notes, text, frames, groups and connectors on an infinite canvas.",
+      "tier": "content",
+      "useWhen": [
+        "Sketch a flow, a map of ideas, a retro board or an architecture diagram people can keep editing",
+        "Lay out sticky notes in frames and connect shapes with arrows"
+      ]
+    },
+    {
+      "a11y": [
         "When href is set, the card is a real link with an accessible name",
         "Rejected href schemes render as a non-interactive surface"
       ],
@@ -2526,6 +2618,7 @@
         { "enumValues": ["comfortable", "compact"], "kind": "enum", "name": "density" }
       ],
       "related": ["sortable-list", "data-tree-view"],
+      "sourceable": ["items"],
       "summary": "A kanban board: cards in columns (and optional swimlanes), moved by drag, keyboard or a move menu, with work-in-progress limits.",
       "tier": "content",
       "useWhen": ["Show work items by status and let people move them between columns"]
@@ -2624,6 +2717,7 @@
         { "default": false, "kind": "boolean", "name": "readOnly" }
       ],
       "related": ["data-timeline"],
+      "sourceable": ["events"],
       "summary": "Events on a month, week, day or agenda view; people open, and when allowed move, events.",
       "tier": "content",
       "useWhen": ["Show scheduled events or availability over days and weeks"]
@@ -2728,6 +2822,210 @@
     },
     {
       "a11y": [
+        "A named region whose widgets are a list in reading order (row, then column), whatever order they were written in",
+        "Each widget has a move handle and a resize handle: Space or Enter picks up, arrows move or resize one column or row, Space or Enter drops, Escape cancels; every step is announced with its column, row and size",
+        "A click on a handle opens an arrange toolbar, so nothing needs a drag (WCAG 2.5.7); handles are at least 24 by 24 px",
+        "Widgets glide to their new cell only when motion is allowed; reduced motion commits at once"
+      ],
+      "agentEmittable": true,
+      "bindable": ["layout"],
+      "dontUseWhen": [
+        "A fixed grid of cards: use layout-grid",
+        "One chart or one table: paint it on its own"
+      ],
+      "emit": ["developer", "untrusted"],
+      "events": ["change"],
+      "examples": [
+        {
+          "id": "operations",
+          "props": { "columns": 12, "editable": true, "label": "Operations" },
+          "title": "Operations overview"
+        }
+      ],
+      "group": "data",
+      "id": "data-dashboard",
+      "label": "Dashboard",
+      "package": "@texuli/data",
+      "props": [
+        {
+          "description": "Accessible name of the view.",
+          "kind": "string",
+          "name": "label",
+          "required": true,
+          "trust": "untrusted"
+        },
+        {
+          "default": 12,
+          "description": "Columns of the widest grid (1 to 24). Narrower screens reflow onto at most 6 columns from 640 px and one column below.",
+          "kind": "number",
+          "name": "columns"
+        },
+        { "enumValues": ["compact", "default", "comfortable"], "kind": "enum", "name": "density" },
+        { "enumValues": ["none", "small", "medium", "large"], "kind": "enum", "name": "gap" },
+        {
+          "default": false,
+          "description": "Shows the move and resize handles.",
+          "kind": "boolean",
+          "name": "editable"
+        },
+        {
+          "default": "vertical",
+          "description": "\"vertical\" floats widgets up to close gaps; \"none\" keeps gaps.",
+          "enumValues": ["vertical", "none"],
+          "kind": "enum",
+          "name": "compaction"
+        },
+        {
+          "description": "The saved layout of the widest grid: one {id, x, y, w, h} per widget, id matching a widget's widgetId. Bind it to a list state, or read it from a host data source, to persist what people arrange; without it the widgets' own place props lay out the grid.",
+          "kind": "array",
+          "name": "layout",
+          "schema": {
+            "items": {
+              "properties": {
+                "h": {
+                  "description": "Height in rows.",
+                  "maximum": 48,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "id": { "maxLength": 64, "minLength": 1, "type": "string" },
+                "locked": {
+                  "description": "A locked widget never moves or resizes.",
+                  "type": "boolean"
+                },
+                "maxH": { "maximum": 48, "minimum": 1, "type": "integer" },
+                "maxW": { "maximum": 24, "minimum": 1, "type": "integer" },
+                "minH": { "maximum": 48, "minimum": 1, "type": "integer" },
+                "minW": { "maximum": 24, "minimum": 1, "type": "integer" },
+                "w": {
+                  "description": "Width in columns.",
+                  "maximum": 24,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "x": {
+                  "description": "First column, from 0 (the inline start).",
+                  "maximum": 23,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "y": {
+                  "description": "First row, from 0.",
+                  "maximum": 4096,
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              },
+              "required": ["id"],
+              "type": "object"
+            },
+            "maxItems": 200,
+            "type": "array"
+          }
+        },
+        {
+          "description": "data-dashboard-widget nodes only (at most 200).",
+          "kind": "slot",
+          "name": "children"
+        }
+      ],
+      "related": ["data-dashboard-widget", "layout-grid", "data-grid"],
+      "sourceable": ["layout"],
+      "summary": "A widget grid people can rearrange: data-dashboard-widget children on columns and rows, moved and resized by drag or keyboard, reflowing on narrow screens.",
+      "tier": "content",
+      "useWhen": [
+        "An overview of several views (KPIs, charts, grids bound to host data sources) people arrange themselves",
+        "A home or operations screen whose layout should persist per person"
+      ]
+    },
+    {
+      "a11y": [
+        "Its title is a heading, and it names the widget's move and resize handles",
+        "Its content is ordinary catalog nodes: no HTML, and data only from host-registered sources"
+      ],
+      "agentEmittable": true,
+      "dontUseWhen": ["Anywhere outside a data-dashboard: use layout-card"],
+      "emit": ["developer", "untrusted"],
+      "examples": [
+        {
+          "id": "revenue",
+          "props": {
+            "place": { "h": 2, "w": 4, "x": 0, "y": 0 },
+            "title": "Revenue",
+            "widgetId": "revenue"
+          },
+          "title": "Revenue tile"
+        }
+      ],
+      "group": "data",
+      "id": "data-dashboard-widget",
+      "label": "Dashboard widget",
+      "package": "@texuli/data",
+      "props": [
+        {
+          "description": "Stable id, unique in the dashboard: letters, digits, \"-\" and \"_\", at most 64 characters. The key of this widget in every saved layout.",
+          "kind": "string",
+          "name": "widgetId",
+          "required": true
+        },
+        {
+          "description": "Visible title; also names the handles.",
+          "kind": "string",
+          "name": "title",
+          "required": true,
+          "trust": "untrusted"
+        },
+        {
+          "description": "Where the widget starts on the widest grid when the dashboard has no saved layout for it: {x, y, w, h} in columns and rows, with optional minW, minH, maxW, maxH and locked. Without x and y it takes the first free slot.",
+          "kind": "object",
+          "name": "place",
+          "schema": {
+            "properties": {
+              "h": {
+                "description": "Height in rows.",
+                "maximum": 48,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "locked": {
+                "description": "A locked widget never moves or resizes.",
+                "type": "boolean"
+              },
+              "maxH": { "maximum": 48, "minimum": 1, "type": "integer" },
+              "maxW": { "maximum": 24, "minimum": 1, "type": "integer" },
+              "minH": { "maximum": 48, "minimum": 1, "type": "integer" },
+              "minW": { "maximum": 24, "minimum": 1, "type": "integer" },
+              "w": {
+                "description": "Width in columns.",
+                "maximum": 24,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "x": {
+                "description": "First column, from 0 (the inline start).",
+                "maximum": 23,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "y": {
+                "description": "First row, from 0.",
+                "maximum": 4096,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          }
+        },
+        { "description": "The widget content.", "kind": "slot", "name": "children" }
+      ],
+      "related": ["data-dashboard"],
+      "summary": "One titled widget of a data-dashboard, placed on the grid; its child is any content node, such as a chart, a KPI or a grid bound to a host data source.",
+      "tier": "content",
+      "useWhen": ["A tile of a data-dashboard"]
+    },
+    {
+      "a11y": [
         "A labelled grid or list with roving focus; folders open with Enter, Backspace goes up",
         "Selection is exposed per item; previews are decorative"
       ],
@@ -2800,6 +3098,7 @@
         { "enumValues": ["comfortable", "compact"], "kind": "enum", "name": "density" }
       ],
       "related": ["data-tree-view"],
+      "sourceable": ["entries"],
       "summary": "Folders and files in a grid or list with breadcrumbs, selection and type previews.",
       "tier": "content",
       "useWhen": ["Show a folder structure people browse and select from"]
@@ -2987,6 +3286,7 @@
         { "enumValues": ["compact", "default", "comfortable"], "kind": "enum", "name": "density" }
       ],
       "related": ["table", "blocks-data"],
+      "sourceable": ["rows"],
       "summary": "A sortable, searchable grid of rows and typed columns; virtualized for long lists.",
       "tier": "content",
       "useWhen": ["Show many records people sort, search and select"]
@@ -3154,6 +3454,7 @@
         }
       ],
       "related": ["timeline", "chat-thread"],
+      "sourceable": ["items"],
       "summary": "Notifications, newest first, with unread state, mark read and unread, mark all read and an unread view.",
       "tier": "content",
       "useWhen": ["List updates someone should catch up on, such as mentions or review requests"]
@@ -3259,6 +3560,7 @@
         { "default": "en", "kind": "string", "name": "locale" }
       ],
       "related": ["data-calendar", "timeline"],
+      "sourceable": ["tasks"],
       "summary": "Tasks as bars over days, weeks, months or quarters, with dependencies and progress.",
       "tier": "content",
       "useWhen": ["Show a schedule of tasks with durations and dependencies"]
@@ -3326,6 +3628,7 @@
         { "enumValues": ["comfortable", "compact"], "kind": "enum", "name": "density" }
       ],
       "related": ["data-files", "data-board"],
+      "sourceable": ["items"],
       "summary": "A hierarchy of items people expand, select and reorder or re-parent by drag or keyboard.",
       "tier": "content",
       "useWhen": ["Show nested items such as folders, outlines or org charts"]
@@ -5872,6 +6175,92 @@
       "useWhen": ["One flow that should adapt across breakpoints"]
     },
     {
+      "a11y": [
+        "A form landmark named by its title; every control is a texuli control with a visible label, its description and its error linked",
+        "Errors are announced, an error summary takes focus and links to each field; each new step heading takes focus and is announced",
+        "Keyboard-complete: native order, Enter moves to the next step or submits; reduced motion makes step transitions instant"
+      ],
+      "agentEmittable": true,
+      "dontUseWhen": [
+        "One or two values for an action: use action-form with form-field",
+        "Payment, passwords or one-time codes: use a host-region",
+        "A filter bar over data: use control-filter or data-filter-builder"
+      ],
+      "emit": ["developer", "untrusted"],
+      "events": ["submit"],
+      "examples": [
+        {
+          "id": "request",
+          "props": {
+            "action": "request-access",
+            "schema": {
+              "fields": [
+                { "label": "Work email", "name": "email", "required": true, "type": "email" },
+                {
+                  "label": "Team",
+                  "name": "team",
+                  "options": [
+                    { "label": "Design", "value": "design" },
+                    { "label": "Engineering", "value": "engineering" }
+                  ],
+                  "required": true,
+                  "type": "select"
+                },
+                {
+                  "label": "Why do you need access?",
+                  "maxLength": 500,
+                  "name": "reason",
+                  "type": "textarea",
+                  "when": {
+                    "require": {
+                      "left": { "name": "team", "op": "field" },
+                      "op": "eq",
+                      "right": { "op": "str", "value": "engineering" }
+                    }
+                  }
+                }
+              ],
+              "submitLabel": "Send request",
+              "title": "Request access"
+            }
+          },
+          "title": "Access request"
+        }
+      ],
+      "group": "schema-forms",
+      "id": "schema-form",
+      "label": "Schema form",
+      "package": "@texuli/forms",
+      "props": [
+        {
+          "description": "The form: { title, description?, submitLabel?, fields | sections | steps, rules? }. Field types: text, textarea, number, email, url, date, time, select, multiselect, checkbox, radio, switch, slider, file (host-handled), tags. Rules: required, minLength, maxLength, min, max, step, minItems, maxItems, a named format (email, url, phone, postal-code…, never a pattern) and validator (a name the host registered). when.show / require / enable are expressions over earlier fields; rules[] are cross-field expressions that fail when false.",
+          "kind": "object",
+          "name": "schema",
+          "required": true,
+          "schema": { "$ref": "#/$defs/formSchema" }
+        },
+        {
+          "description": "The action name the host receives with the submitted values.",
+          "kind": "string",
+          "name": "action",
+          "required": true
+        },
+        {
+          "description": "Accessible name; defaults to the form title.",
+          "kind": "string",
+          "name": "label",
+          "trust": "untrusted"
+        }
+      ],
+      "related": ["action-form", "form-field", "layout-wizard"],
+      "summary": "A whole form as data: typed fields in sections or steps, conditional logic, named formats and cross-field rules, painted with texuli controls; submitting proposes one action intent to the host.",
+      "tier": "content",
+      "useWhen": [
+        "Collect structured answers: registrations, requests, surveys, intake and settings",
+        "A multi-step flow with per-step validation, or fields that appear, become required or become editable from earlier answers"
+      ]
+    },
+    {
       "a11y": "Outlet is a plain region; screen content supplies its own landmarks.",
       "agentEmittable": false,
       "dontUseWhen": ["Static pages without layout switching"],
@@ -6327,6 +6716,89 @@
       "summary": "Master-detail split with list and detail panes.",
       "tier": "app",
       "useWhen": ["List/detail workflows on wide screens"]
+    },
+    {
+      "a11y": [
+        "Painted as an APG grid with column letters, row numbers and one tab stop",
+        "Values are text, never HTML; formulas are a closed language with no references built from text and no network",
+        "A formula error shows its code in the cell (#DIV/0!, #REF!, #CYCLE!…)"
+      ],
+      "agentEmittable": true,
+      "dontUseWhen": [
+        "Read-only records with typed columns, sorting and search: use data-grid",
+        "A chart of values: use a chart family",
+        "A form people fill in once: use schema-form"
+      ],
+      "emit": ["developer", "untrusted"],
+      "examples": [
+        {
+          "id": "budget",
+          "props": {
+            "sheet": {
+              "format": "texuli-sheet",
+              "formatVersion": 1,
+              "meta": { "title": "Team offsite budget" },
+              "sheets": [
+                {
+                  "cells": {
+                    "A1": "Item",
+                    "A2": "Venue",
+                    "A3": "Lunch",
+                    "A4": "Coffee",
+                    "A6": "Total",
+                    "A7": "Over budget?",
+                    "B1": "Unit cost",
+                    "B2": 1200,
+                    "B3": 18.5,
+                    "B4": 3.25,
+                    "C1": "Quantity",
+                    "C2": 1,
+                    "C3": 24,
+                    "C4": 48,
+                    "D1": "Total",
+                    "D2": "=B2*C2",
+                    "D3": "=B3*C3",
+                    "D4": "=B4*C4",
+                    "D6": "=SUM(D2:D4)",
+                    "D7": "=IF(D6>2000, \"yes\", \"no\")"
+                  },
+                  "columns": 4,
+                  "id": "costs",
+                  "name": "Costs",
+                  "rows": 8
+                }
+              ]
+            }
+          },
+          "title": "Team offsite budget"
+        }
+      ],
+      "group": "sheets",
+      "id": "spreadsheet",
+      "label": "Spreadsheet",
+      "package": "@texuli/sheets",
+      "props": [
+        {
+          "description": "A Texuli sheet: { format: \"texuli-sheet\", formatVersion: 1, meta: { title }, sheets: [{ id, name, rows, columns, cells }] }. cells maps A1 addresses (\"B3\") to a number, a boolean, text, or a formula that starts with \"=\" (\"=SUM(B1:B2)\", \"=IF(C2>100, \\\"high\\\", \\\"low\\\")\", \"=Rates!A1*B2\"). About 50 functions: SUM, AVERAGE, MIN, MAX, COUNT, COUNTA, ROUND, SUMIF, COUNTIF, IF, IFS, AND, OR, IFERROR, CONCAT, LEFT, TEXT, INDEX, MATCH, VLOOKUP, XLOOKUP, DATE, TODAY and more. No INDIRECT, OFFSET or RAND. Dates are \"YYYY-MM-DD\" text. Text that must start with \"=\" is written \"'=…\". At most 16 sheets, 10,000 rows, 256 columns and 100,000 cells.",
+          "kind": "object",
+          "name": "sheet",
+          "required": true,
+          "schema": { "$ref": "#/$defs/sheet" }
+        },
+        {
+          "description": "Accessible name; defaults to the sheet title.",
+          "kind": "string",
+          "name": "label",
+          "trust": "untrusted"
+        }
+      ],
+      "related": ["data-grid", "document"],
+      "summary": "A spreadsheet as data: tabs of cells holding numbers, text, booleans and formulas that recalculate.",
+      "tier": "content",
+      "useWhen": [
+        "A budget, an estimate, a price list or a tracker whose totals people keep editing",
+        "Numbers that depend on other numbers through formulas (SUM, IF, VLOOKUP, DATE…)"
+      ]
     },
     {
       "a11y": "Label and value are text; trend has a spoken word, not color alone.",
@@ -6957,6 +7429,7 @@
   ],
   "format": "texuli-catalog",
   "groups": {
+    "canvas": ["canvas"],
     "chat": ["chat-message", "chat-thread"],
     "composition": ["layout-row", "layout-split", "layout-stack", "layout-tile"],
     "content": [
@@ -7000,6 +7473,8 @@
       "data-board",
       "data-calendar",
       "data-cohort-table",
+      "data-dashboard",
+      "data-dashboard-widget",
       "data-files",
       "data-filter-builder",
       "data-grid",
@@ -7116,6 +7591,8 @@
       "toaster",
       "tooltip"
     ],
+    "schema-forms": ["schema-form"],
+    "sheets": ["spreadsheet"],
     "state": [
       "action-form",
       "control-choice",
@@ -7143,6 +7620,7 @@
       "blocks-media",
       "blocks-structure",
       "blocks-text",
+      "canvas",
       "charts-area",
       "charts-bar",
       "charts-bubble",
@@ -7175,6 +7653,8 @@
       "data-board",
       "data-calendar",
       "data-cohort-table",
+      "data-dashboard",
+      "data-dashboard-widget",
       "data-files",
       "data-filter-builder",
       "data-grid",
@@ -7201,7 +7681,9 @@
       "media-composition-canvas",
       "media-composition-svg",
       "media-image",
+      "schema-form",
       "sortable-list",
+      "spreadsheet",
       "workflow-graph"
     ],
     "untrusted": [
@@ -7215,6 +7697,7 @@
       "blocks-media",
       "blocks-structure",
       "blocks-text",
+      "canvas",
       "charts-area",
       "charts-bar",
       "charts-bubble",
@@ -7247,6 +7730,8 @@
       "data-board",
       "data-calendar",
       "data-cohort-table",
+      "data-dashboard",
+      "data-dashboard-widget",
       "data-files",
       "data-filter-builder",
       "data-grid",
@@ -7273,7 +7758,9 @@
       "media-composition-canvas",
       "media-composition-svg",
       "media-image",
+      "schema-form",
       "sortable-list",
+      "spreadsheet",
       "workflow-graph"
     ]
   },

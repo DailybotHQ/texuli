@@ -2,6 +2,7 @@
 import { createFormBridge, type FormBridge } from '@texuli/core/form-bridge';
 import { type Snippet, untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../i18n/use-messages.ts';
 import type { ChildSnippet } from '../internal/child.ts';
 import type { RefProp } from '../internal/ref.ts';
 import { type NumberFieldContextValue, numberFieldContext } from './context.ts';
@@ -66,14 +67,21 @@ let {
   name,
   form,
   id,
-  incrementLabel = 'Increase',
-  decrementLabel = 'Decrease',
+  incrementLabel: incrementLabelProp,
+  decrementLabel: decrementLabelProp,
   onValueChange,
   child,
   children,
   ref = $bindable(null),
   ...rest
 }: NumberFieldRootProps & RefProp = $props();
+const msg = useMessages();
+const incrementLabel = $derived(
+  incrementLabelProp ?? msg('primitives.number-field.increment-label', 'Increase')
+);
+const decrementLabel = $derived(
+  decrementLabelProp ?? msg('primitives.number-field.decrement-label', 'Decrease')
+);
 
 const generatedId = $props.id();
 const base = $derived(id ?? generatedId);

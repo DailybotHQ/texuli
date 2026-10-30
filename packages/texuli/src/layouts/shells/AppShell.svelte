@@ -1,6 +1,7 @@
 <script lang="ts">
 import { lazyChunk } from '@texuli/core/lazy';
 import type { Snippet } from 'svelte';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { closeWhenWide } from '../host/layout-kit.ts';
 import { setAppShellContext } from './context.ts';
@@ -56,16 +57,27 @@ let {
   notifications,
   children,
   sidebarOpen = $bindable(false),
-  sidebarLabel = 'Navigation',
-  closeLabel = 'Close navigation',
-  skipLabel = 'Skip to content',
-  notificationsLabel = 'Notifications',
+  sidebarLabel: sidebarLabelProp,
+  closeLabel: closeLabelProp,
+  skipLabel: skipLabelProp,
+  notificationsLabel: notificationsLabelProp,
   mainId = 'main-content',
   mainElement = 'main',
   class: className,
   mainClass,
   sidebarClass,
 }: Props = $props();
+const msg = useMessages();
+const sidebarLabel = $derived(
+  sidebarLabelProp ?? msg('texuli.app-shell.sidebar-label', 'Navigation')
+);
+const closeLabel = $derived(
+  closeLabelProp ?? msg('texuli.app-shell.close-label', 'Close navigation')
+);
+const skipLabel = $derived(skipLabelProp ?? msg('texuli.app-shell.skip-label', 'Skip to content'));
+const notificationsLabel = $derived(
+  notificationsLabelProp ?? msg('texuli.app-shell.notifications-label', 'Notifications')
+);
 
 let root = $state<HTMLElement>();
 /** Previews inside a page `<main>` drop nested landmarks (one main per page). */

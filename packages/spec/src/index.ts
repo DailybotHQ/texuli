@@ -58,6 +58,25 @@ export {
 } from './dialect.ts';
 export type { SpecMigration, SpecMigrationResult } from './migrations/types.ts';
 export {
+  checkSourceBinding,
+  isSourceBinding,
+  isSpecSourceDate,
+  SOURCE_BINDING_FIELDS,
+  SOURCE_BINDING_KEY,
+  type SourceBindingContext,
+  type SourceBindingIssue,
+  SPEC_SOURCE_FIELD_TYPES,
+  SPEC_SOURCE_FILTER_OPERATORS,
+  SPEC_SOURCE_LIMITS,
+  SPEC_SOURCE_OPERATIONS,
+  SPEC_SOURCE_PATTERNS,
+  type SpecSourceDescriptor,
+  type SpecSourceField,
+  type SpecSourceFieldType,
+  type SpecSourceFilterOperator,
+  type SpecSourceOperation,
+} from './source.ts';
+export {
   checkStateSurface,
   LIST_TEXT_PATTERN,
   SPEC_CONTROL_STATE_TYPES,

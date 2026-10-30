@@ -139,6 +139,16 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
         role: 'In development: interactive, accessible workflow graph editor and viewer (model, layout, editor)',
         dependsOn: ['core', 'drag', 'primitives', 'tokens', 'texuli'],
       },
+      {
+        name: '@texuli/forms',
+        role: 'In development (on npm from 0.8.0): schema-driven forms: the closed form schema and its validator, conditional logic and cross-field rules on @texuli/core/expression, named formats, drafts and autosave, and the form controller (model, framework-free); SchemaForm, which paints any schema with texuli controls, multi-step and keyboard-complete (.); the player form host (host)',
+        dependsOn: ['core', 'texuli'],
+      },
+      {
+        name: '@texuli/canvas',
+        role: 'In development (on npm from 0.8.0): the infinite canvas: the canvas format, its untrusted validator, geometry, connector routing on the curve shared with workflows, freehand simplification, operations with inverses and the op-log history (model, framework-free); CRDT collaboration on @texuli/document/sync (sync); SVG and PNG export (export); the accessible editor and viewer (editor, viewer); the player canvas host (host)',
+        dependsOn: ['core', 'deck', 'document', 'drag', 'texuli'],
+      },
     ],
   },
   {
@@ -150,6 +160,11 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
         role: 'Content blocks (text, code, data, diagram, embed, interactive, map, media, structure): closed vocabulary, untrusted guard, formula AST',
         dependsOn: ['core', 'tokens', 'texuli', 'charts', 'data', 'media'],
       },
+      {
+        name: '@texuli/sheets',
+        role: 'In development (on npm from 0.8.0): spreadsheets: the formula language (a linear-time parser into the @texuli/core/expression AST, 54 documented functions, criteria, closed TEXT formats, reference rewriting; formula, framework-free); the sheet format, its untrusted validator, the dependency graph with incremental and bounded recalculation and cycle reports, and the workbook engine (model, framework-free); CSV import and export that neutralizes formula injection (csv); SheetView over the data grid editing (view); the sheet half of a player host (host)',
+        dependsOn: ['core', 'date', 'data', 'texuli'],
+      },
     ],
   },
   {
@@ -158,7 +173,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
     packages: [
       {
         name: '@texuli/catalog',
-        role: 'The agent catalog (manifests per group, build) and the renderer with no HTML sinks',
+        role: 'The agent catalog (manifests per group, build) and the renderer with no HTML sinks; schema-form, canvas and spreadsheet drafts are checked by host-injected validators (checkForm, checkCanvas, checkSheet from @texuli/forms, @texuli/canvas and @texuli/sheets), so the catalog depends on none of them and fails closed without one (form-unchecked, canvas-unchecked, sheet-unchecked)',
         dependsOn: ['core', 'spec', 'texuli', 'charts', 'data', 'blocks', 'media'],
       },
     ],
@@ -192,7 +207,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       {
         name: '@texuli/tools',
         role: 'Copy-in CLI (texuli-add, texuli-init, texuli-update), texuli-llms, A2UI adapter, custom elements and the golden set',
-        dependsOn: ['core', 'tokens', 'catalog', 'blocks', 'charts', 'media'],
+        dependsOn: ['core', 'tokens', 'catalog', 'blocks', 'charts', 'media', 'deck', 'document'],
       },
       {
         name: '@texuli/astro',
@@ -331,7 +346,7 @@ export const LADDER_STAGES: readonly LadderStage[] = [
     layer: 'L3',
     runtimes: {
       web: {
-        text: 'Ships: styled components are published on npm as 0.7.0.',
+        text: 'Ships: styled components are published on npm as 0.8.0.',
         sources: [],
       },
       native: {

@@ -3,6 +3,7 @@ import { lazyChunk } from '@texuli/core/lazy';
 import type { HrefTrust } from '@texuli/core/url-policy';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue } from '../../internal/cx.ts';
 import Sidebar from './Sidebar.svelte';
 import type { SidebarItem, SidebarSection } from './types.ts';
@@ -51,16 +52,23 @@ let {
   children,
   mainLandmark = true,
   topBar,
-  label = 'Main',
-  menuLabel = 'Open navigation',
-  drawerTitle = 'Navigation',
-  closeLabel = 'Close navigation',
+  label: labelProp,
+  menuLabel: menuLabelProp,
+  drawerTitle: drawerTitleProp,
+  closeLabel: closeLabelProp,
   hrefTrust = 'developer',
   mobileOpen = $bindable(false),
   class: className,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('texuli.app-nav.label', 'Main'));
+const menuLabel = $derived(menuLabelProp ?? msg('texuli.app-nav.menu-label', 'Open navigation'));
+const drawerTitle = $derived(drawerTitleProp ?? msg('texuli.app-nav.drawer-title', 'Navigation'));
+const closeLabel = $derived(
+  closeLabelProp ?? msg('texuli.app-nav.close-label', 'Close navigation')
+);
 
 let menuButton = $state<HTMLButtonElement | undefined>();
 let MobileDrawer = $state.raw<DrawerComponent | null>(null);

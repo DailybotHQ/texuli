@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { spreadsheetManifest } from '@texuli/catalog/manifests/sheets';
 import { createBlueprintAssembler } from '@texuli/spec/stream';
 import { describe, expect, it } from 'vitest';
 import type { AgentEvent, DraftResult } from '../src/contract.ts';
@@ -483,6 +484,119 @@ describe('the service validates document drafts with the host document validator
         const refused = events.find((e) => e.type === 'refused' && e.attempt === 1);
         expect(refused?.type === 'refused' && refused.codes).toContain('document-schema');
       }
+    }
+  );
+});
+
+describe('the service validates forms, canvases and source bindings (spec 0.8.0)', () => {
+  const spec = (name: string) =>
+    (
+      JSON.parse(
+        readFileSync(
+          join(import.meta.dirname, `../../../packages/spec/fixtures/golden/${name}.json`),
+          'utf8'
+        )
+      ) as { tree: Record<string, unknown> }
+    ).tree;
+  const form = spec('form-registration');
+  const canvas = spec('canvas-retro');
+  const sourced = spec('source-tickets');
+  const formNode = (form.children as Record<string, unknown>[])[0] as {
+    props: { schema: { steps?: unknown } & Record<string, unknown> };
+  };
+  // An agent may never ship a regular expression (ReDoS): the forms validator refuses it.
+  const hostileForm = {
+    ...form,
+    children: [
+      {
+        ...formNode,
+        props: {
+          ...formNode.props,
+          schema: {
+            title: 'Evil',
+            fields: [{ name: 'code', type: 'text', label: 'Code', pattern: '^(a+)+$' }],
+          },
+        },
+      },
+    ],
+  };
+  const canvasProps = canvas.props as { canvas: Record<string, unknown> };
+  const hostileCanvas = {
+    ...canvas,
+    props: { ...canvasProps, canvas: { ...canvasProps.canvas, format: 'texuli-evil' } },
+  };
+  const verdict = async (tree: unknown, stream: boolean) => {
+    const prompt = 'Draft it.';
+    const s = service({ provider: createFakeProvider([recording(prompt, tree)]) });
+    const events = await collect(s.draft(request(prompt, { stream }), caller));
+    const result = stream
+      ? finalOf(events)
+      : (events.find((e) => e.type === 'result') as { result: DraftResult }).result;
+    const refused = events.filter((e) => e.type === 'refused' && e.attempt === 1);
+    return { result, codes: result.diagnostics.map((d) => d.code), refused };
+  };
+
+  it.each([true, false])('accepts a valid form and a valid canvas (stream: %s)', async (stream) => {
+    for (const tree of [form, canvas]) {
+      const { result, refused } = await verdict(tree, stream);
+      expect(result.diagnostics).toEqual([]);
+      expect(result.status).toBe('valid');
+      expect(refused).toEqual([]);
+    }
+  });
+
+  it.each([true, false])(
+    'refuses a hostile form and a hostile canvas with the schema reason (stream: %s)',
+    async (stream) => {
+      const formVerdict = await verdict(hostileForm, stream);
+      expect(formVerdict.result.status).toBe('invalid');
+      expect(formVerdict.codes).toContain('form-schema');
+      expect(formVerdict.codes).not.toContain('form-unchecked');
+      const canvasVerdict = await verdict(hostileCanvas, stream);
+      expect(canvasVerdict.result.status).toBe('invalid');
+      expect(canvasVerdict.codes).toContain('canvas-schema');
+      expect(canvasVerdict.codes).not.toContain('canvas-unchecked');
+      if (stream) {
+        expect(formVerdict.refused.length).toBeGreaterThan(0);
+        expect(canvasVerdict.refused.length).toBeGreaterThan(0);
+      }
+    }
+  );
+
+  it.each([true, false])(
+    'refuses source bindings: the service holds no source registry (stream: %s)',
+    async (stream) => {
+      const { result, codes } = await verdict(sourced, stream);
+      expect(result.status).toBe('invalid');
+      expect(codes).toContain('source');
+    }
+  );
+
+  // Sheets (spec 0.8.0): every agent formula is parsed by the sheet validator at draft time.
+  const budget = spreadsheetManifest.examples?.[0]?.props.sheet as {
+    sheets: { cells: Record<string, unknown> }[];
+  } & Record<string, unknown>;
+  const sheetTree = (sheet: unknown) => ({
+    id: 'layout-page',
+    props: { title: 'Offsite' },
+    children: [{ id: 'spreadsheet', props: { sheet } }],
+  });
+  const firstTab = budget.sheets[0] as { cells: Record<string, unknown> } & Record<string, unknown>;
+  const hostileSheet = {
+    ...budget,
+    sheets: [{ ...firstTab, cells: { ...firstTab.cells, E1: '=INDIRECT("A1")' } }],
+  };
+
+  it.each([true, false])(
+    'accepts a valid spreadsheet and refuses a bad formula with the schema reason (stream: %s)',
+    async (stream) => {
+      const ok = await verdict(sheetTree(budget), stream);
+      expect(ok.result.diagnostics).toEqual([]);
+      expect(ok.result.status).toBe('valid');
+      const bad = await verdict(sheetTree(hostileSheet), stream);
+      expect(bad.result.status).toBe('invalid');
+      expect(bad.codes).toContain('sheet-schema');
+      expect(bad.codes).not.toContain('sheet-unchecked');
     }
   );
 });

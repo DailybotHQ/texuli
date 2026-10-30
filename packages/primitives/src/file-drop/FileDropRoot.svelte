@@ -1,4 +1,5 @@
 <script lang="ts">
+import { useMessages } from '../i18n/use-messages.ts';
 import type { ChildSnippet } from '../internal/child.ts';
 import type { RefProp } from '../internal/ref.ts';
 import { validateFiles } from './accept.ts';
@@ -24,9 +25,9 @@ let {
   name,
   files = $bindable<File[]>([]),
   rejects = $bindable<FileDropRejection[]>([]),
-  label = 'Upload files',
-  inputLabel = label,
-  browseLabel = 'Choose files',
+  label: labelProp,
+  inputLabel: inputLabelProp,
+  browseLabel: browseLabelProp,
   description,
   inputClass,
   getRejectMessage,
@@ -39,6 +40,12 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('primitives.file-drop.label', 'Upload files'));
+const inputLabel = $derived(inputLabelProp ?? label);
+const browseLabel = $derived(
+  browseLabelProp ?? msg('primitives.file-drop.browse-label', 'Choose files')
+);
 
 const rootId = $derived(id ?? `file-drop-${uid}`);
 // A consumer input id wins; the label, description and rejections follow it.

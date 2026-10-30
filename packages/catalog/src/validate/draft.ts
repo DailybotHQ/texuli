@@ -1,4 +1,5 @@
 import { migrateBlueprint } from '@texuli/spec/migrate';
+import type { SpecSourceDescriptor } from '@texuli/spec/source';
 import { isEnvelopeLike, parseEnvelope } from '../envelope/parse.ts';
 import type { BlueprintEnvelope } from '../envelope/types.ts';
 import { checkCompositionGrammar, grammarIssueSeverity } from '../render/grammar/check.ts';
@@ -16,8 +17,12 @@ import type {
   RenderOptions,
   RenderTier,
 } from '../render/renderer/types.ts';
+import { checkCanvases, type DraftCanvasCheck } from './canvas.ts';
+import { checkDashboards } from './dashboard.ts';
 import { checkDocuments, type DraftDocumentCheck } from './document.ts';
+import { checkForms, type DraftFormCheck } from './form.ts';
 import { resolveInteraction } from './interaction.ts';
+import { checkSheets, type DraftSheetCheck } from './sheet.ts';
 import { scanSinks } from './sinks.ts';
 
 /** The checks `validateDraft` runs, in order. */
@@ -32,6 +37,9 @@ export const DRAFT_CHECKS = [
   'render',
   'blocks',
   'documents',
+  'forms',
+  'canvases',
+  'sheets',
   'grammar',
   'root',
 ] as const;
@@ -43,6 +51,9 @@ export const DRAFT_FRAME_IDS: readonly string[] = Object.freeze([
   'layout-doc',
   'layout-deck',
   'document',
+  'canvas',
+  // Spec 0.8.0: a dashboard is a whole surface.
+  'data-dashboard',
 ]);
 
 /** Whitespace headroom for text input on top of the tree's `maxBytes`. */
@@ -106,6 +117,45 @@ export interface ValidateDraftOptions {
    * and component embeds are also checked as catalog nodes at the tier.
    */
   checkDocument?: DraftDocumentCheck;
+  /**
+   * The canvas validator for `canvas` nodes (spec 0.8.0), usually
+   * `checkCanvasDraft` from `@texuli/canvas/host` (`validateCanvas` at the
+   * given tier). Injected like `checkDocument`, so this module stays free of
+   * the canvas engine. Without it every `canvas` node is refused
+   * (`canvas-unchecked`).
+   */
+  checkCanvas?: DraftCanvasCheck;
+  /**
+   * The sheet validator for `spreadsheet` nodes (spec 0.8.0, ADR-015), usually
+   * `checkSheetDraft` from `@texuli/sheets/model` (`validateSheet`, which
+   * parses every formula with the sheet grammar). Injected like
+   * `checkCanvas`, so this module stays free of the formula engine. Without
+   * it every `spreadsheet` node is refused (`sheet-unchecked`); a draft with
+   * no spreadsheet passes this check.
+   */
+  checkSheet?: DraftSheetCheck;
+  /**
+   * The form validator for `schema-form` nodes (spec 0.8.0, ADR-015),
+   * usually `checkFormDraft` from `@texuli/forms/model` (`validateFormSchema`
+   * at the given tier). Injected like `checkDocument`, so this module stays
+   * free of the forms runtime. Without it every `schema-form` node is
+   * refused (`form-unchecked`).
+   */
+  checkForm?: DraftFormCheck;
+  /**
+   * The validator names the host registered for `schema-form` fields; with
+   * it a field's `validator` must name one of them.
+   */
+  formValidators?: readonly string[];
+  /**
+   * The host's data sources (spec 0.8.0, ADR-015), usually
+   * `registry.describe()` from `@texuli/core/data-source`. A
+   * `{"$source": name, "query": {...}}` prop is checked against them: a
+   * sourceable prop, a registered name, declared fields with the operators
+   * and value types they allow, sortable fields, search, the page size and
+   * the map. Without them every source binding is refused (`source`).
+   */
+  sources?: readonly SpecSourceDescriptor[];
   /**
    * The condition runtime for `when` (audit G07), usually `formulaConditions`
    * from `@texuli/catalog/render/conditions`. Without it a node with `when`
@@ -292,7 +342,13 @@ export function validateDraft(input: unknown, options: ValidateDraftOptions): Dr
 
     // ── Interaction (spec 0.3.0) ─────────────────────────────
     // Bindings paint their first values; bind and on name closed sets.
-    const interaction = resolveInteraction(draft, envelope?.state, options.catalog, envelope);
+    const interaction = resolveInteraction(
+      draft,
+      envelope?.state,
+      options.catalog,
+      envelope,
+      options.sources
+    );
     for (const issue of interaction.issues) {
       error('interaction', issue.code, issue.path, issue.message, issue.id);
     }
@@ -318,6 +374,11 @@ export function validateDraft(input: unknown, options: ValidateDraftOptions): Dr
       conditionInputs: options.conditionInputs,
     });
     for (const d of rendered.diagnostics) error('render', d.code, d.path, d.message, d.id);
+    // Spec 0.8.0 dashboards: widgets only in dashboards, ids unique (composition rules).
+    for (const finding of checkDashboards(rendered.roots)) {
+      const id = finding.code === 'dashboard-parent' ? 'data-dashboard-widget' : 'data-dashboard';
+      error('render', finding.code, finding.path, finding.message, id);
+    }
     checks.render = 'pass';
     const roots = rendered.roots;
 
@@ -338,6 +399,30 @@ export function validateDraft(input: unknown, options: ValidateDraftOptions): Dr
       error('documents', finding.code, finding.path, finding.message, 'document');
     }
     if (options.checkDocument) checks.documents = 'pass';
+
+    // ── Forms (spec 0.8.0) ───────────────────────────────────
+    const forms = checkForms(roots, {
+      tier,
+      checkForm: options.checkForm,
+      ...(options.formValidators ? { validators: options.formValidators } : {}),
+    });
+    for (const finding of forms) {
+      error('forms', finding.code, finding.path, finding.message, 'schema-form');
+    }
+    if (options.checkForm) checks.forms = 'pass';
+
+    // ── Canvases (spec 0.8.0) ────────────────────────────────
+    for (const finding of checkCanvases(roots, { tier, checkCanvas: options.checkCanvas })) {
+      error('canvases', finding.code, finding.path, finding.message, 'canvas');
+    }
+    if (options.checkCanvas) checks.canvases = 'pass';
+
+    // ── Sheets (spec 0.8.0) ──────────────────────────────────
+    for (const finding of checkSheets(roots, { tier, checkSheet: options.checkSheet })) {
+      error('sheets', finding.code, finding.path, finding.message, 'spreadsheet');
+    }
+    // Every spreadsheet node was checked (or refused above); `finish` marks errors as `fail`.
+    checks.sheets = 'pass';
 
     // ── Grammar ──────────────────────────────────────────────
     if (roots.length > 0) {

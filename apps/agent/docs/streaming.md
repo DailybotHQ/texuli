@@ -19,7 +19,10 @@ Tests run it with the fake replay provider only.
 3. Each node whose shell is final (every member but `children`) is checked
    with the catalog's `validateStreamNode`, under that header, with exactly
    the options of the service's gate (untrusted tier, the URL policy, the
-   sink scan, block schemas, the limits measured so far). It is reported
+   sink scan, block schemas, the host validators for `document`,
+   `schema-form` and `canvas` nodes, the limits measured so far). The gate
+   holds no data-source registry, so a `{"$source": …}` binding (spec
+   0.8.0) is refused here and in the final verdict alike. It is reported
    `node-ready`, or `refused` with its codes; a refused node holds its whole
    subtree (`held`). A member after `children` is `stream-order`. A
    tokenizer refusal (bad JSON, too large, too deep, a duplicate or

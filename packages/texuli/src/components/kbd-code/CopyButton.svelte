@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { HTMLButtonAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue } from '../../internal/cx.ts';
 import { type ClipboardLike, copyText } from './copy-text.ts';
 import { type CopyButtonSize, copyButtonClass } from './variants.ts';
@@ -29,8 +30,8 @@ type Props = HTMLButtonAttributes & {
 
 let {
   value,
-  label = 'Copy',
-  copiedLabel = 'Copied',
+  label: labelProp,
+  copiedLabel: copiedLabelProp,
   feedbackMs = 1500,
   size = 'md',
   clipboard = undefined,
@@ -43,6 +44,9 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const label = $derived(labelProp ?? msg('texuli.copy-button.label', 'Copy'));
+const copiedLabel = $derived(copiedLabelProp ?? msg('texuli.copy-button.copied-label', 'Copied'));
 
 type CopyFeedback = 'idle' | 'copied' | 'error';
 

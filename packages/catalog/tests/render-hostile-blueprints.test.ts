@@ -57,6 +57,7 @@ describe('hostile spec 0.3.0 blueprints', () => {
       'unknown-action',
       'binding',
       'prototype',
+      'source',
     ]) {
       expect(categories.has(category as never), category).toBe(true);
     }

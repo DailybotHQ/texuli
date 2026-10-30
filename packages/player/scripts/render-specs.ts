@@ -14,6 +14,7 @@
  */
 import { writeFileSync } from 'node:fs';
 import type { CatalogManifest } from '@texuli/catalog/manifest';
+import { CANVAS_MANIFESTS } from '@texuli/catalog/manifests/canvas';
 import { CHAT_MANIFESTS } from '@texuli/catalog/manifests/chat';
 import { COMPOSITION_MANIFESTS } from '@texuli/catalog/manifests/composition';
 import { CONTENT_MANIFESTS } from '@texuli/catalog/manifests/content';
@@ -27,6 +28,8 @@ import {
   gridLayoutManifest,
   pageLayoutManifest,
 } from '@texuli/catalog/manifests/layouts';
+import { SCHEMA_FORMS_MANIFESTS } from '@texuli/catalog/manifests/schema-forms';
+import { SPREADSHEET_MANIFESTS } from '@texuli/catalog/manifests/sheets';
 import { STATE_MANIFESTS } from '@texuli/catalog/manifests/state';
 import { WORKFLOWS_MANIFESTS } from '@texuli/catalog/manifests/workflows';
 import type { RenderComponentSpec } from '@texuli/catalog/render/renderer';
@@ -46,6 +49,9 @@ export const PLAYER_MANIFESTS: readonly CatalogManifest[] = [
   ...DATA_MANIFESTS,
   ...WORKFLOWS_MANIFESTS,
   ...DOCUMENTS_MANIFESTS,
+  ...CANVAS_MANIFESTS,
+  ...SCHEMA_FORMS_MANIFESTS,
+  ...SPREADSHEET_MANIFESTS,
 ];
 
 export function projectPlayerSpecs(
@@ -65,6 +71,7 @@ export function projectPlayerSpecs(
     emit: manifest.agentEmittable === true ? ['developer', 'untrusted'] : ['developer'],
     ...(manifest.events ? { events: [...manifest.events] } : {}),
     ...(manifest.bindable ? { bindable: [...manifest.bindable] } : {}),
+    ...(manifest.sourceable ? { sourceable: [...manifest.sourceable] } : {}),
   }));
 }
 

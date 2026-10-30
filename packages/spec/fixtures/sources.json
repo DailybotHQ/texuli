@@ -1,0 +1,64 @@
+{
+  "$comment": "The fixture host's data sources (spec 0.8.0, ADR-015): what registry.describe() from @texuli/core/data-source returns for the host the goldens and invalid fixtures are validated against. Agents never write these; the host registers them, and a blueprint can only name them.",
+  "sources": [
+    {
+      "name": "tickets",
+      "key": "id",
+      "fields": [
+        {
+          "name": "id",
+          "type": "text",
+          "filter": [],
+          "sort": false,
+          "editable": false,
+          "required": false
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "filter": ["eq", "neq", "contains", "in", "isEmpty", "isNotEmpty"],
+          "sort": true,
+          "editable": true,
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "options": ["open", "doing", "done"],
+          "filter": ["eq", "neq", "in"],
+          "sort": true,
+          "editable": true,
+          "required": false
+        },
+        {
+          "name": "points",
+          "type": "number",
+          "filter": ["eq", "neq", "in", "between", "isEmpty", "isNotEmpty"],
+          "sort": true,
+          "editable": true,
+          "required": false
+        },
+        {
+          "name": "due",
+          "type": "date",
+          "filter": ["before", "after", "between"],
+          "sort": true,
+          "editable": false,
+          "required": false
+        },
+        {
+          "name": "assignee",
+          "type": "text",
+          "filter": ["eq"],
+          "sort": false,
+          "editable": false,
+          "required": false
+        }
+      ],
+      "operations": ["list", "update", "search"],
+      "pagination": "cursor",
+      "maxPageSize": 100,
+      "defaultPageSize": 25
+    }
+  ]
+}

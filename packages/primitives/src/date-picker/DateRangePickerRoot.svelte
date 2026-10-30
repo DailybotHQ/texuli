@@ -1,10 +1,13 @@
 <script lang="ts">
+import { localizeLabels } from '@texuli/core/i18n';
 import type { CalendarDate } from '@texuli/date';
 import type { Snippet } from 'svelte';
+import { useMessages } from '../i18n/use-messages.ts';
 import * as Popover from '../popover/index.ts';
 import {
   type DateInvalidHandler,
   type DatePickerLabels,
+  DEFAULT_DATE_PICKER_LABELS,
   focusTrigger,
   formatLongDate,
   orderedRange,
@@ -64,8 +67,14 @@ let {
   labels,
   children,
 }: Props = $props();
+const msg = useMessages();
 
-const text = $derived(resolveDatePickerLabels(labels));
+const text = $derived(
+  resolveDatePickerLabels(
+    labels,
+    localizeLabels(msg, 'primitives.date-picker', DEFAULT_DATE_PICKER_LABELS)
+  )
+);
 const uid = $props.id();
 let pending = $state(false);
 let message = $state('');

@@ -15,6 +15,25 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The packages move to `0.8.0`: 25 published packages, `@texuli/forms`,
+  `@texuli/canvas` and `@texuli/sheets` published for the first time. The
+  router, components, build-ui and recipes say "on npm as `0.8.0`" and pin
+  `^0.8.0`; `build-ui/references/imports.md` gains a "New in 0.8.0" table
+  (forms, the canvas, sheets, dashboards, host data sources, the expression
+  language, the message catalog, email and PDF, and the player's form,
+  canvas and sheet hosts), the build-ui table gains a forms, canvas, sheets
+  and dashboard row, the package index lists `@texuli/forms` and
+  `@texuli/canvas` (L4) and `@texuli/sheets` (L5) and marks spec 0.8.0 and
+  the new subpaths as new in `0.8.0` (and the deck, drag, editor and
+  workflows rows name `0.8.0` instead of `0.6.0`), and the layer map lists
+  the three packages.
+- `upgrade/SKILL.md` lists the `0.8.0` breaking changes an app checks
+  before moving from `^0.7.0` (spec 0.8.0 stamps, the new catalog hash,
+  `aria-required` only on supporting roles, labels from one catalog).
+- `blueprints/SKILL.md` gains stage J: forms, canvases, sheets, dashboards
+  and data sources as agent data (spec 0.8.0), refused without the host's
+  check.
+
 ## [0.3.0] — 2026-10-29
 
 ### Changes

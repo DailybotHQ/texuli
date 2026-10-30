@@ -9,8 +9,8 @@
 | L1 | `@texuli/document` | The framework-free block document engine (model, schema, operations, Markdown, pagination, DOCX and PDF, sync, collaboration; in development, on npm from `0.7.0`) | Svelte, the DOM, `@texuli/primitives` and above |
 | L2 | `@texuli/tokens` | Theme engine, `--tx-*` contract, themes, CSS | Components |
 | L3 | `texuli` | Styled components, layouts, shells | Domain packages |
-| L4 | `@texuli/charts`, `@texuli/data`, `@texuli/media`, `@texuli/chat`, `@texuli/editor` | Domain kits (the editor is in development, on npm from `0.5.0`) | Blocks, catalog and above |
-| L5 | `@texuli/blocks` | Content blocks for pages, documents and slides | Catalog and above |
+| L4 | `@texuli/charts`, `@texuli/data`, `@texuli/media`, `@texuli/chat`, `@texuli/editor`, `@texuli/workflows`, `@texuli/forms`, `@texuli/canvas` | Domain kits (in development: the editor, on npm from `0.5.0`; workflows; forms and the canvas, on npm from `0.8.0`) | Blocks, catalog and above |
+| L5 | `@texuli/blocks`, `@texuli/sheets` | Content blocks for pages, documents and slides; spreadsheets on the data grid (`@texuli/sheets`, in development, on npm from `0.8.0`) | Catalog and above |
 | L6 | `@texuli/catalog` | Manifests, the sink-free renderer, validation, envelope, edit ops, player core | Svelte paint above it |
 | L7 | `@texuli/player` | The Svelte paint of validated blueprints | Tools, adapters |
 | L8 | `@texuli/slides`, `@texuli/tools`, `@texuli/astro`, `@texuli/pages` | The deck stage on `@texuli/deck` and the player; CLI, MCP, custom elements, golden set; the Astro integration; the block document editor and reader (`@texuli/pages`, in development, on npm from `0.7.0`) | — |

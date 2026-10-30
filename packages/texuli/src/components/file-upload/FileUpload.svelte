@@ -1,4 +1,5 @@
 <script lang="ts">
+import { localizeLabels } from '@texuli/core/i18n';
 import { safeImageSrc } from '@texuli/core/url-policy';
 import {
   FileDrop,
@@ -6,11 +7,16 @@ import {
   type FileDropRejectReason,
 } from '@texuli/primitives/file-drop';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { joinIds } from '../../internal/control-props.ts';
 import { type ClassValue } from '../../internal/cx.ts';
 import { chainHandlers } from '../../internal/handlers.ts';
 import type { RefProp } from '../../internal/ref.ts';
-import type { FileUploadLabels, FileUploadProgressMap } from './types.ts';
+import {
+  DEFAULT_FILE_UPLOAD_LABELS,
+  type FileUploadLabels,
+  type FileUploadProgressMap,
+} from './types.ts';
 import { type FileUploadVariant, fileUploadClass } from './variants.ts';
 import './file-upload.css';
 
@@ -78,6 +84,7 @@ let {
   ref = $bindable(null),
   ...rest
 }: Props & RefProp = $props();
+const msg = useMessages();
 
 /** The list before a pick or drop reaches the zone (set in the capture phase). */
 let before: File[] | null = null;
@@ -102,16 +109,7 @@ function removeFromList(file: File, removeFile: (file: File) => void): void {
 }
 
 const labels = $derived<FileUploadLabels>({
-  label: 'Upload files',
-  inputLabel: 'Choose files to upload',
-  browse: 'Browse files',
-  description: 'Drop files here or browse. Only file names and sizes are checked.',
-  selectedList: 'Selected files',
-  remove: 'Remove',
-  rejectType: 'Unsupported type',
-  rejectSize: 'File too large',
-  rejectCount: 'Too many files',
-  empty: 'No files selected yet.',
+  ...localizeLabels(msg, 'texuli.file-upload', DEFAULT_FILE_UPLOAD_LABELS),
   ...labelOverrides,
 });
 

@@ -49,6 +49,8 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     label: 'Get started',
     links: [
       { href: DOCS_HOME, label: 'Introduction' },
+      // The all-features hub: every package and capability of 0.6.0 to 0.8.0.
+      { href: '/whats-new/', label: 'What’s new' },
       { href: '/skill/', label: 'Skill' },
     ],
     expand: 'guides',
@@ -74,6 +76,12 @@ export const NAV_GROUPS: readonly NavGroup[] = [
       { href: '/drag-page/', label: 'Drag and drop' },
       { href: '/motion-page/', label: 'Motion' },
       { href: '/documents-page/', label: 'Documents' },
+      // The 0.8.0 feature pages (new in 0.8.0; the new packages are in development).
+      { href: '/forms-page/', label: 'Forms' },
+      { href: '/canvas-page/', label: 'Canvas' },
+      { href: '/sheets-page/', label: 'Sheets' },
+      { href: '/dashboards-page/', label: 'Dashboards' },
+      { href: '/output-page/', label: 'Email, PDF and i18n' },
       { href: '/workflows-page/', label: 'Workflow editor' },
       { href: '/workflows-page/json/', label: 'JSON live preview' },
     ],

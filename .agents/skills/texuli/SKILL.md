@@ -40,22 +40,29 @@ agent config, or publish packages without explicit consent (see
    Installing the skill does **not** install Texuli packages or a CLI.
 2. Confirm the workspace has Texuli (workspace packages `texuli`,
    `@texuli/core`, `@texuli/tokens`, …) before promising package imports.
-   All 22 published packages are on npm as `0.7.0` (published by CI with
+   All 25 published packages are on npm as `0.8.0` (published by CI with
    provenance; `latest` and `next` both point to it; pre-1.0, so a new minor
    may break and 1.0.0 will be the first stable release), so install them
-   plainly (`pnpm add texuli`) and pin `0.7.0` or `^0.7.0`; the workspace packages
+   plainly (`pnpm add texuli`) and pin `0.8.0` or `^0.8.0`; the workspace packages
    stay `private: true`. `@texuli/drag` (the drag engine),
    `@texuli/workflows` (the workflow editor), `@texuli/deck` (the deck
    engine behind the deck generator, first published in `0.4.0`),
    `@texuli/editor` (the rich text editor, first published in `0.5.0`),
    `@texuli/document` (the block document engine) and `@texuli/pages` (the
-   block document editor and reader; both first published in `0.7.0`) are
-   in development but on npm as `0.7.0`. The APIs marked "new in `0.7.0`"
-   in the package index (both document packages, spec 0.7.0 node keys and
-   the `document` id, `patchDocument`, the player's `documentHost`,
-   `@texuli/tools/document`) are not in `0.6.0`, and `0.7.0` changes some
-   behavior (spec `0.7.0` stamps, a new catalog hash, the `patchDocument`
-   edit op; see [`upgrade/SKILL.md`](upgrade/SKILL.md)). `0.6.0` added
+   block document editor and reader; both first published in `0.7.0`), and
+   `@texuli/forms` (schema-driven forms), `@texuli/canvas` (the infinite
+   canvas) and `@texuli/sheets` (spreadsheets; all three first published in
+   `0.8.0`) are in development but on npm as `0.8.0`. The APIs marked "new
+   in `0.8.0`" in the package index (the three new packages, spec 0.8.0
+   data-source bindings and the `schema-form`, `canvas`, `spreadsheet` and
+   dashboard ids, `@texuli/core/expression`, `@texuli/core/data-source`,
+   `@texuli/core/i18n`, `@texuli/data/dashboard`, `@texuli/tools/email`
+   and `@texuli/tools/print`, the player's form, canvas and sheet hosts) are
+   not in `0.7.0`, and `0.8.0` changes some behavior (spec `0.8.0` stamps, a
+   new catalog hash, `aria-required` only on supporting roles; see
+   [`upgrade/SKILL.md`](upgrade/SKILL.md)). `0.7.0` added both document
+   packages, spec 0.7.0 node keys and the `document` id, `patchDocument`,
+   the player's `documentHost` and `@texuli/tools/document`. `0.6.0` added
    motion, the one API contract, streamed blueprints and spec 0.6.0,
    `@texuli/slides/stage-core`, `@texuli/core/markup` and `@texuli/core/zip`,
    and the G48 to G85 additions, and changed some behavior (Field ids,

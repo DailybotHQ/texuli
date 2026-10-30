@@ -176,6 +176,40 @@ export function edgePath(a: Point, b: Point, segments = 16, curvature = 0.5): Po
   return out;
 }
 
+/** The side of a box an edge leaves or enters (physical). */
+export type EdgeSide = 'left' | 'right' | 'top' | 'bottom';
+
+/**
+ * The two control points of a cubic edge that leaves `a` along `fromSide`
+ * and enters `b` along `toSide`: each reaches out 40% of the distance (at
+ * least 32). Shared by the workflow editor and the canvas connectors.
+ */
+export function sideCurveControls(
+  a: Point,
+  fromSide: EdgeSide,
+  b: Point,
+  toSide: EdgeSide
+): [Point, Point] {
+  const reach = Math.max(32, Math.hypot(b.x - a.x, b.y - a.y) * 0.4);
+  const out = (side: EdgeSide, p: Point): Point =>
+    side === 'left'
+      ? { x: p.x - reach, y: p.y }
+      : side === 'right'
+        ? { x: p.x + reach, y: p.y }
+        : side === 'top'
+          ? { x: p.x, y: p.y - reach }
+          : { x: p.x, y: p.y + reach };
+  return [out(fromSide, a), out(toSide, b)];
+}
+
+const tenth = (value: number) => Math.round(value * 10) / 10;
+
+/** {@link sideCurveControls} as SVG path data (`M…C…`), coordinates rounded to tenths. */
+export function sideCurvePath(a: Point, fromSide: EdgeSide, b: Point, toSide: EdgeSide): string {
+  const [c1, c2] = sideCurveControls(a, fromSide, b, toSide);
+  return `M${tenth(a.x)} ${tenth(a.y)}C${tenth(c1.x)} ${tenth(c1.y)} ${tenth(c2.x)} ${tenth(c2.y)} ${tenth(b.x)} ${tenth(b.y)}`;
+}
+
 /** Shortest distance from `p` to a polyline. */
 export function distanceToPolyline(points: readonly Point[], p: Point): number {
   if (points.length === 1) return distance(points[0] as Point, p);

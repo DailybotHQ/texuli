@@ -83,13 +83,14 @@ export const DEFAULT_CAROUSEL_MESSAGES: Readonly<CarouselMessages> = Object.free
 
 /** Merges a partial translation over the English defaults (non-strings are ignored). */
 export function resolveCarouselMessages(
-  overrides: Partial<CarouselMessages> = {}
+  overrides: Partial<CarouselMessages> = {},
+  base: Readonly<CarouselMessages> = DEFAULT_CAROUSEL_MESSAGES
 ): CarouselMessages {
   const keys = Object.keys(DEFAULT_CAROUSEL_MESSAGES) as (keyof CarouselMessages)[];
   return Object.fromEntries(
     keys.map((key) => {
       const value = overrides[key];
-      return [key, typeof value === 'string' ? value : DEFAULT_CAROUSEL_MESSAGES[key]];
+      return [key, typeof value === 'string' ? value : base[key]];
     })
   ) as unknown as CarouselMessages;
 }

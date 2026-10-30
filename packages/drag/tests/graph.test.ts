@@ -12,6 +12,8 @@ import {
   nodesReaching,
   type Port,
   reaches,
+  sideCurveControls,
+  sideCurvePath,
 } from '../src/graph.ts';
 
 const ports: Port[] = [
@@ -135,5 +137,16 @@ describe('edge hit areas', () => {
     expect(hitEdge(areas, { x: 150, y: 37 })).toBe('low');
     expect(hitEdge(areas, { x: 150, y: 20 })).toBeNull();
     expect(hitEdge(areas, { x: 150, y: 20 }, 25)).toBe('top');
+  });
+
+  it('reaches out from each side for side-aware cubic edges (workflows and canvas)', () => {
+    const a = { x: 0, y: 0 };
+    const b = { x: 100, y: 50 };
+    expect(sideCurvePath(a, 'right', b, 'left')).toBe('M0 0C44.7 0 55.3 50 100 50');
+    expect(sideCurvePath(a, 'bottom', b, 'top')).toBe('M0 0C0 44.7 100 5.3 100 50');
+    // Short edges still reach 32 out, so the curve leaves its side visibly.
+    const [c1, c2] = sideCurveControls(a, 'left', { x: 10, y: 0 }, 'right');
+    expect(c1).toEqual({ x: -32, y: 0 });
+    expect(c2).toEqual({ x: 42, y: 0 });
   });
 });

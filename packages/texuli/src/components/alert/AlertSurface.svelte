@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { Button } from '../button/index.ts';
 import ToneIcon from './ToneIcon.svelte';
@@ -42,13 +43,17 @@ let {
   actionHref,
   onAction,
   dismissible = false,
-  dismissLabel = 'Dismiss',
+  dismissLabel: dismissLabelProp,
   onDismiss,
   children,
   class: className,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
+const msg = useMessages();
+const dismissLabel = $derived(
+  dismissLabelProp ?? msg('texuli.alert-surface.dismiss-label', 'Dismiss')
+);
 
 const role = $derived(alertRole(tone));
 const classes = $derived(

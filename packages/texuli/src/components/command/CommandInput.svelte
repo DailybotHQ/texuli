@@ -1,5 +1,6 @@
 <script lang="ts">
 import { type CommandInputProps, Input as PrimitiveInput } from '@texuli/primitives/command';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue } from '../../internal/cx.ts';
 import type { RefProp } from '../../internal/ref.ts';
 import { commandInputClass, commandInputRowClass } from './variants.ts';
@@ -19,13 +20,18 @@ let {
   value = $bindable(),
   onValueChange,
   showEscHint = true,
-  escLabel = 'Esc',
-  placeholder = 'Search commands…',
+  escLabel: escLabelProp,
+  placeholder: placeholderProp,
   class: className,
   rowClass,
   ref = $bindable(null),
   ...rest
 }: Props & RefProp = $props();
+const msg = useMessages();
+const escLabel = $derived(escLabelProp ?? msg('texuli.command-input.esc-label', 'Esc'));
+const placeholder = $derived(
+  placeholderProp ?? msg('texuli.command-input.placeholder', 'Search commands…')
+);
 
 const rowClasses = $derived(
   commandInputRowClass({

@@ -73,7 +73,12 @@ const triggerProps = $derived({
   'aria-expanded': context.open,
   'aria-controls': context.contentId,
   'aria-haspopup': 'listbox' as const,
-  'aria-required': context.required || undefined,
+  // A Field's `aria-required` on the trigger is kept, like `disabled`.
+  'aria-required':
+    context.required ||
+    rest['aria-required'] === true ||
+    rest['aria-required'] === 'true' ||
+    undefined,
   disabled: Boolean(rest.disabled || context.disabled) || undefined,
   ...stateAttributes(context.open ? 'open' : 'closed', Boolean(rest.disabled || context.disabled)),
   onclick: handleClick,
