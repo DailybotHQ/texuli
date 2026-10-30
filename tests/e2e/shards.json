@@ -28,6 +28,7 @@
       "site-perf.spec.ts",
       "site-seo.spec.ts",
       "site-agent-discovery.spec.ts",
+      "theme-scopes.spec.ts",
       "toaster-viewport.spec.ts"
     ],
     [
