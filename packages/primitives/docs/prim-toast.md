@@ -67,6 +67,13 @@ For reactive lists, subscribe to `manager.subscribe` or use `Toast.Toaster` with
 - **`mode`** (`'top-layer'` default or `'contained'`) and **`container`**:
   a contained viewport has no `popover` attribute, never enters the top
   layer, and is moved into `container`, which becomes its containing block.
+- **`positioned`** (default `false`, contained mode only): reading the
+  container's computed position forces a layout, so it never runs during
+  the first render (G99). By default it runs one animation frame after
+  mount (cancelled on unmount or when `container` changes) and gives a
+  static container `position: relative`, restored on unmount. Pass
+  `positioned` when the container is already a containing block
+  (`relative`, `absolute`, `fixed`, `sticky`): the style is never read.
 - Toasts published in the same millisecond list newest first, deterministically.
 - `Toast.Toaster` forwards extra attributes (`class`, `data-*`) to its
   viewport, so a consumer can style or place it (for example

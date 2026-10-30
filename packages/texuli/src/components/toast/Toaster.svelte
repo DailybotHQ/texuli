@@ -42,6 +42,13 @@ type OwnProps = {
   /** The element a `'contained'` stack renders in; it becomes the containing block. */
   container?: Element | null;
   /**
+   * Contained mode: declare `container` already positioned (a containing
+   * block) so its computed style is never read. Default `false`: one frame
+   * after mount the Toaster reads the container's position and gives a static
+   * one `position: relative`, never during the first render (no forced layout).
+   */
+  positioned?: boolean;
+  /**
    * Motion (`texuli/motion`): new toasts rise in from the stack's edge, a
    * dismissed one fades out (kept, inert, until it ends) and the stack
    * reflows (`layout`). `false` for none.
@@ -64,6 +71,7 @@ let {
   class: className,
   mode = 'top-layer',
   container = null,
+  positioned = false,
   onpointerenter,
   onpointerleave,
   onfocusin,
@@ -283,6 +291,7 @@ function runAction(item: ToastItem): void {
       data-position={position}
       {mode}
       {container}
+      {positioned}
       active={rendered.length > 0}
     >
       {#if rendered.length > 0}

@@ -15,6 +15,7 @@ import NavigationMenuFixture from './navigation-menu-fixture.svelte';
 import PortalHarness from './PortalHarness.svelte';
 import PopoverFixture from './popover-fixture.svelte';
 import Fixture from './sheet-fixture.svelte';
+import ToastContainedFixture from './toast-contained-fixture.svelte';
 import ToastFixture from './toast-fixture.svelte';
 import TooltipFixture from './tooltip-fixture.svelte';
 
@@ -733,6 +734,133 @@ describe('toast', () => {
       await fireEvent.pointerMove(root, { clientX: 80, pointerId: 1 });
       await fireEvent.pointerUp(root, { clientX: 80, pointerId: 1 });
       expect(queryByText('File saved')).toBeNull();
+    });
+  });
+
+  describe('contained position read (G99)', () => {
+    /** Queued animation frames, run by hand so each test controls when they fire. */
+    let frames: Map<number, FrameRequestCallback>;
+    let reads: Element[];
+    let hosts: HTMLElement[];
+
+    beforeEach(() => {
+      frames = new Map();
+      reads = [];
+      hosts = [];
+      let next = 0;
+      vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
+        next += 1;
+        frames.set(next, callback);
+        return next;
+      });
+      vi.spyOn(window, 'cancelAnimationFrame').mockImplementation((id) => {
+        frames.delete(id);
+      });
+      // happy-dom reports an unset position as '': report 'static' as browsers do.
+      const original = window.getComputedStyle.bind(window);
+      vi.spyOn(window, 'getComputedStyle').mockImplementation((element, pseudo) => {
+        reads.push(element);
+        const style = original(element, pseudo);
+        return new Proxy(style, {
+          get: (target, key) =>
+            key === 'position' ? target.position || 'static' : Reflect.get(target, key, target),
+        });
+      });
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+      for (const host of hosts) host.remove();
+    });
+
+    function host(style = ''): HTMLElement {
+      const element = document.createElement('div');
+      element.setAttribute('style', style);
+      document.body.append(element);
+      hosts.push(element);
+      return element;
+    }
+
+    function runFrames(): void {
+      const queued = [...frames.values()];
+      frames.clear();
+      for (const callback of queued) callback(performance.now());
+    }
+
+    it('never reads the container style synchronously while it mounts', () => {
+      for (const positioned of [undefined, false, true]) {
+        const container = host('position: relative');
+        reads.length = 0;
+        const view = render(ToastContainedFixture, { props: { container, positioned } });
+        flushSync();
+        expect(reads.filter((element) => element === container)).toEqual([]);
+        expect(container.querySelector('[data-tx-toast-viewport]')).toBeTruthy();
+        view.unmount();
+      }
+    });
+
+    it('never reads the style of a container declared positioned, even after a frame', () => {
+      const container = host();
+      render(ToastContainedFixture, { props: { container, positioned: true } });
+      flushSync();
+      runFrames();
+      expect(reads).not.toContain(container);
+      expect(container.style.position).toBe('');
+    });
+
+    it('positions a static container one frame after mount, and restores it on unmount', () => {
+      const container = host();
+      const view = render(ToastContainedFixture, { props: { container } });
+      flushSync();
+      expect(container.style.position).toBe('');
+      runFrames();
+      expect(reads).toContain(container);
+      expect(container.style.position).toBe('relative');
+      view.unmount();
+      expect(container.style.position).toBe('');
+    });
+
+    it('leaves an already positioned container alone after the deferred read', () => {
+      const container = host('position: absolute');
+      render(ToastContainedFixture, { props: { container } });
+      flushSync();
+      runFrames();
+      expect(reads).toContain(container);
+      expect(container.style.position).toBe('absolute');
+    });
+
+    it('cancels the pending read when it unmounts before the frame', () => {
+      const container = host();
+      const view = render(ToastContainedFixture, { props: { container } });
+      flushSync();
+      expect(frames.size).toBe(1);
+      view.unmount();
+      expect(frames.size).toBe(0);
+      expect(() => runFrames()).not.toThrow();
+      expect(reads).not.toContain(container);
+      expect(container.style.position).toBe('');
+    });
+
+    it('moves the pending read to a new container, and restores the old one', async () => {
+      const first = host();
+      const second = host();
+      const view = render(ToastContainedFixture, { props: { container: first } });
+      flushSync();
+      // Changed before the first frame: only the new container is read.
+      await view.rerender({ container: second });
+      flushSync();
+      expect(frames.size).toBe(1);
+      runFrames();
+      expect(reads).not.toContain(first);
+      expect(second.style.position).toBe('relative');
+      expect(second.querySelector('[data-tx-toast-viewport]')).toBeTruthy();
+      // Changed after it: the old container gets its position back.
+      await view.rerender({ container: first });
+      flushSync();
+      expect(second.style.position).toBe('');
+      runFrames();
+      expect(first.style.position).toBe('relative');
+      expect(first.querySelector('[data-tx-toast-viewport]')).toBeTruthy();
     });
   });
 });
