@@ -334,6 +334,7 @@ run on the JVM and (for `texuli-spec`) the iOS simulator as well.
 | `MessagesParityTest` | `conformance` | Native label interpolation equals `@texuli/core/i18n` on the shared vectors (`packages/core/tests/fixtures/i18n-vectors.json`), and every composition layout the spec goldens use paints natively |
 | `InvalidFixtureParityTest` | `conformance` | Every spec invalid fixture is refused with exactly the TypeScript codes |
 | `WorkflowFixtureParityTest` | `conformance` | Every spec workflow golden validates and every workflow invalid fixture is refused with exactly the TypeScript codes |
+| `DesignSystemFixtureTest` | `conformance` | The spec's design-system fixtures (spec `0.10.0`, in development) decode with the generated `DesignSystem` types across every section, kebab-case component keys as camelCase properties; an unknown key fails closed. Types only: the TypeScript validator checks patterns and caps |
 | `KmpStarterMigrationTest` | `conformance` | The KMPStarter blueprint loads natively and each widget keeps its documented status |
 | `KmpTodoMigrationTest` | `conformance` | The KMPTodoApp screen as a static fixture: registry statuses pinned, external app untouched |
 | `KmpAiChatMigrationTest` | `conformance` | The KMPAIChat screen: the chat form validates and plans (no native chat painter yet), the fallback loads painted |
