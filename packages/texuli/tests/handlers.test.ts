@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import * as primitives from '../../primitives/src/index.ts';
-import * as cxEntry from '../src/internal/index.ts';
 import * as root from '../src/index.ts';
+import * as cxEntry from '../src/internal/index.ts';
 
 // G95: the handler composers behind the "caller first" rule
 // (docs/STANDARDS.md) are public, so a host building its own parts follows
