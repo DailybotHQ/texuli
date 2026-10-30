@@ -11,6 +11,7 @@ import {
 } from '@texuli/drag/messages';
 import { type Component, type Snippet, tick, untrack } from 'svelte';
 import type { Attachment } from 'svelte/attachments';
+import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue, cx, variants } from 'texuli/cx';
 import type { MotionProp } from 'texuli/motion';
 import {
@@ -51,7 +52,7 @@ type MoveMenuProps = {
   onOpenChange?: (open: boolean) => void;
 };
 
-interface BoardProps<T> {
+interface OwnBoardProps<T> {
   columns: readonly BoardColumnDef[];
   items: readonly T[];
   lanes?: readonly BoardLaneDef[];
@@ -92,7 +93,15 @@ interface BoardProps<T> {
    * `false` for none; instant under reduced motion and at level `none`.
    */
   motion?: MotionProp;
+  /** The board's root `section` (bindable). */
+  ref?: HTMLElement | null;
 }
+/**
+ * Other attributes (`id`, `aria-*`, `data-*`, `style`, handlers) land on the
+ * root `section`. A caller `id` replaces the generated one.
+ */
+type BoardProps<T> = OwnBoardProps<T> &
+  Omit<HTMLAttributes<HTMLElement>, keyof OwnBoardProps<T> | 'children'>;
 
 const rootClasses = variants({
   base: 'tx-board',
@@ -147,6 +156,8 @@ let {
   dir,
   class: className,
   motion,
+  ref = $bindable(null),
+  ...rest
 }: BoardProps<T> = $props();
 
 const uid = $props.id();
@@ -156,8 +167,7 @@ const cardMotion = createLazyListMotion({
   defaults: { layout: true, duration: 'base' },
   items: () =>
     Array.from(
-      document.getElementById(`board-${uid}`)?.querySelectorAll<HTMLElement>('[data-board-card]') ??
-        [],
+      ref?.querySelectorAll<HTMLElement>('[data-board-card]') ?? [],
       (element) => [element.getAttribute('data-item-id') ?? '', element] as const
     ),
 });
@@ -305,7 +315,7 @@ async function focusCard(id: string, prefer: 'menu' | 'handle' = 'handle'): Prom
     if (win?.requestAnimationFrame) win.requestAnimationFrame(() => resolve());
     else resolve();
   });
-  const root = document.getElementById(`board-${uid}`);
+  const root = ref;
   const cardNode = [...(root?.querySelectorAll<HTMLElement>('[data-board-card]') ?? [])].find(
     (node) => node.getAttribute('data-item-id') === id
   );
@@ -463,7 +473,7 @@ let stopWatching: (() => void) | null = null;
 let origin: DragMessageValues = {};
 
 function measureCells(itemId: string): void {
-  const root = document.getElementById(`board-${uid}`);
+  const root = ref;
   cellMiddles = new Map(
     [...(root?.querySelectorAll<HTMLElement>('[data-board-cell]') ?? [])].map((cell) => [
       cell,
@@ -483,7 +493,7 @@ function measureCells(itemId: string): void {
  * drop. The index comes from the engine's midpoint search.
  */
 function targetAt(point: Point): MoveTarget | null {
-  const root = document.getElementById(`board-${uid}`);
+  const root = ref;
   const cell = root?.ownerDocument
     .elementFromPoint(point.x, point.y)
     ?.closest<HTMLElement>('[data-board-cell]');
@@ -498,7 +508,7 @@ function targetAt(point: Point): MoveTarget | null {
 function startDrag(item: T, point: Point): void {
   const id = getId(item);
   measureCells(id);
-  const root = document.getElementById(`board-${uid}`);
+  const root = ref;
   const doc = root?.ownerDocument;
   if (doc) {
     const onScroll = () => measureCells(id);
@@ -595,6 +605,8 @@ function dragFrom(id: string): Attachment<HTMLElement> {
 
 <section
   id="board-{uid}"
+  {...rest}
+  bind:this={ref}
   class={cx(rootClasses({ density, class: className }), drag?.active && 'tx-board--dragging')}
   aria-labelledby={titleId}
   dir={dir}
