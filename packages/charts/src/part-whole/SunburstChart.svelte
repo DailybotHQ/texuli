@@ -104,13 +104,13 @@ const legendItems = $derived(
   }
 
   figcaption h3 {
-    font-size: 1rem;
+    font-size: var(--tx-type-body-size);
     margin-block: 0;
   }
 
   figcaption p {
     color: var(--tx-muted-foreground, CanvasText);
-    margin-block: 0.25rem 0.75rem;
+    margin-block: var(--tx-space-1) var(--tx-space-3);
   }
 
   .chart {

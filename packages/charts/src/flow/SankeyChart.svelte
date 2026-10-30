@@ -97,11 +97,11 @@ const nodeName = (id: string) => nodes.find((node) => node.id === id)?.label ?? 
 
 <style>
   .flow-chart { color: var(--tx-foreground, CanvasText); margin: 0; max-inline-size: 100%; }
-  figcaption h3 { font-size: 1rem; margin-block: 0; }
-  figcaption p { color: var(--tx-muted-foreground, CanvasText); margin-block: 0.25rem 0.75rem; }
+  figcaption h3 { font-size: var(--tx-type-body-size); margin-block: 0; }
+  figcaption p { color: var(--tx-muted-foreground, CanvasText); margin-block: var(--tx-space-1) var(--tx-space-3); }
   .flow-svg { display: block; inline-size: 100%; max-block-size: 32rem; overflow: visible; }
   /* Token-sized labels: the chart lays out at its drawn width, so user units are pixels. */
-  .flow-svg text { fill: var(--tx-foreground, CanvasText); font: var(--tx-font-size-xs, 0.75rem) var(--tx-font-sans, system-ui, sans-serif); }
+  .flow-svg text { fill: var(--tx-foreground, CanvasText); font: var(--tx-type-caption-size) var(--tx-font-sans, system-ui, sans-serif); }
   @media (forced-colors: active) { .flow-svg path { stroke: CanvasText; stroke-dasharray: 4 3; } .flow-svg rect { fill: Canvas; stroke: CanvasText; stroke-width: 2; } }
   @media (forced-colors: active) {
     figcaption h3, figcaption p { color: CanvasText; }
