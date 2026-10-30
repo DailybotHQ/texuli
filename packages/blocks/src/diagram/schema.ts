@@ -43,9 +43,16 @@ export type TreeNode = {
   label: string;
   tone?: BlockTone;
 };
+/** How a tree draws: an indented file tree or a top-down org chart. */
+export type TreeVariant = 'file-tree' | 'org';
 export type TreeDiagram = BlockBase & {
   type: 'tree';
-  style: 'file-tree' | 'org';
+  /**
+   * Named `style` until 0.8; renamed because the untrusted sink scan refuses
+   * every `style` key, so agents could never send a tree. The parser still
+   * accepts `style` as an alias through 0.9.x (removed in 0.10.0).
+   */
+  variant: TreeVariant;
   nodes: TreeNode[];
 };
 
@@ -144,15 +151,38 @@ function parseFlow(
   return ok(data);
 }
 
+const TREE_VARIANTS: readonly TreeVariant[] = ['file-tree', 'org'];
+const isTreeVariant = (value: unknown): value is TreeVariant =>
+  TREE_VARIANTS.includes(value as TreeVariant);
+
+/** `variant`, or the deprecated `style` alias (accepted through 0.9.x; they must agree). */
+function parseTreeVariant(
+  record: Record<string, unknown>,
+  path: (string | number)[]
+): ParseResult<TreeVariant> {
+  if (record.style !== undefined) {
+    if (!isTreeVariant(record.style)) {
+      return fail([...path, 'style'], 'style (renamed variant) must be "file-tree" or "org"');
+    }
+    if (record.variant !== undefined && record.variant !== record.style) {
+      return fail([...path, 'style'], 'style is the old name of variant; send variant only');
+    }
+  }
+  const value = record.variant ?? record.style;
+  if (!isTreeVariant(value)) {
+    return fail([...path, 'variant'], 'variant must be "file-tree" or "org"');
+  }
+  return ok(value);
+}
+
 function parseTree(
   record: Record<string, unknown>,
   path: (string | number)[]
 ): ParseResult<TreeDiagram> {
   const base = parseBlockBase(record, path);
   if (!base.success) return base;
-  if (record.style !== 'file-tree' && record.style !== 'org') {
-    return fail([...path, 'style'], 'style must be "file-tree" or "org"');
-  }
+  const variant = parseTreeVariant(record, path);
+  if (!variant.success) return variant;
   if (!Array.isArray(record.nodes)) return fail([...path, 'nodes'], 'nodes must be an array');
   if (record.nodes.length < 1 || record.nodes.length > DIAGRAM_LIMITS.treeNodes) {
     return fail([...path, 'nodes'], `nodes must have 1–${DIAGRAM_LIMITS.treeNodes} items`);
@@ -240,7 +270,7 @@ function parseTree(
     }
   }
   if (issues.length > 0) return failMany(issues);
-  return ok({ ...base.data, type: 'tree', style: record.style, nodes });
+  return ok({ ...base.data, type: 'tree', variant: variant.data, nodes });
 }
 
 function parseBoard(
