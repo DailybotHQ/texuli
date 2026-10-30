@@ -13,6 +13,7 @@ import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AstroIntegration } from 'astro';
+import { apiHeaderRules } from '../../lib/api-surface.ts';
 import { agentEndpoint } from '../agent-chat/client.ts';
 import {
   DISCOVERY_PATHS,
@@ -289,11 +290,12 @@ export function cspIntegration(): AstroIntegration {
             });
           }
         }
-        // The discovery files (content types, CORS on the public JSON) follow
-        // the page rules; their paths never match an HTML route.
+        // The discovery files (content types, CORS on the public JSON) and the
+        // JSON API (`/api/*`, `/openapi.json`) follow the page rules; their
+        // paths never match an HTML route.
         await writeFile(
           join(out, '_headers'),
-          `${[...rules.sort(), ...discoveryHeaderRules()].join('\n\n')}\n`
+          `${[...rules.sort(), ...discoveryHeaderRules(), ...apiHeaderRules()].join('\n\n')}\n`
         );
         await writeFile(
           join(out, 'csp-manifest.json'),
