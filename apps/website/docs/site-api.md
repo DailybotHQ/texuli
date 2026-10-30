@@ -18,13 +18,14 @@ model, a developer portal and a CLI.
 
 | Path | What it is | How it is produced |
 | --- | --- | --- |
-| `/api/v1/index.json`, `/api/index.json` | The version, limits, versioning policy and every endpoint with its operationId | `buildApiIndex` (`src/lib/openapi.ts`), written by `src/integrations/api-surface.ts` |
-| `/api/v1/health.json`, `/api/health.json` | `status`, release line, build time. A static file: it proves the build is served, not that a Function runs | `buildHealth`, written at build |
-| `/api/v1/catalog.json` | Same bytes as `/catalog/catalog.json` | Copied at build (`aliasCopies`) |
-| `/api/v1/themes.json`, `/api/v1/themes-dark.json`, `/api/v1/theme-gallery.json` | Same bytes as `/theme-catalog.json`, `/theme-catalog-dark.json`, `/theme-gallery.json` | Copied at build |
-| `/api/v1/themes/{id}.json` | Same bytes as `/theme-data/{id}.json`, one per library theme | Copied at build |
-| `/api/v1/twins.json` | Same bytes as `/md-manifest.json` (page → Markdown twin) | Copied at build, after the twins integration writes the manifest |
-| `/openapi.json` | OpenAPI 3.1: every path above, the unversioned site files and `POST /mcp` | `buildOpenApi`, written at build and checked by `checkOpenApi` (the build fails on a duplicate operationId, an unresolved `$ref` or a described path that is not built) |
+| `/api/index.json` | The version, limits, versioning policy and every endpoint with its operationId | A static file: `buildApiIndex` (`src/lib/openapi.ts`), written by `src/integrations/api-surface.ts` |
+| `/api/health.json` | `status`, release line, build time. It proves the build is served, not that a Function runs | A static file: `buildHealth`, written at build |
+| `/api/v1/index.json`, `/api/v1/health.json` | The two files above | **Function only:** the middleware reads `/api/index.json` or `/api/health.json` |
+| `/api/v1/catalog.json` | Byte for byte `/catalog/catalog.json` | **Function only:** read from the source file |
+| `/api/v1/themes.json`, `/api/v1/themes-dark.json`, `/api/v1/theme-gallery.json` | Byte for byte `/theme-catalog.json`, `/theme-catalog-dark.json`, `/theme-gallery.json` | **Function only** |
+| `/api/v1/themes/{id}.json` | Byte for byte `/theme-data/{id}.json`; `{id}` must be a plain id (`^[a-z0-9]+(-[a-z0-9]+)*$`) | **Function only** |
+| `/api/v1/twins.json` | Byte for byte `/md-manifest.json` (page → Markdown twin) | **Function only** |
+| `/openapi.json` | OpenAPI 3.1: every path above, the unversioned site files and `POST /mcp` | `buildOpenApi`, written at build and checked by `checkOpenApi` (the build fails on a duplicate operationId, an unresolved `$ref`, a described file that is not built, or an alias that maps to no resource or to a source file that is not built) |
 | `/developers/` | The portal: endpoints, MCP (remote and `npx -y @texuli/mcp`), the CLI, files for agents, limits, errors, versioning, access, license; WebAPI JSON-LD | `src/pages/developers/index.astro` over `src/components/developers/developers.ts`; Markdown twin `/developers.md` |
 
 Every list and number on these surfaces comes from a typed source:
@@ -35,6 +36,37 @@ whose runtime is not `node`, so a new `edge` or `site` operation appears in
 `/openapi.json` with its input and output schemas without an edit here);
 the MCP page data (`mcp-server-data.ts`, `pnpm check:surfaces`).
 
+### The `/api/v1/` aliases are served by the Function
+
+The build writes no alias file. `aliasSource` (`src/lib/api-surface.ts`)
+maps each `/api/v1/` path to the built file it names, and the envelope
+(`functions/_lib/api-endpoint.ts`) reads that file from `env.ASSETS`, the
+same deployment's static assets (not a network fetch), then adds the
+headers below. A path that maps to no resource is a `404` problem without
+touching the asset store, and a path parameter that is not a plain id
+(dots, slashes, encoded bytes, upper case) maps to nothing, so an alias can
+never name another file.
+
+The aliases therefore exist only where the Pages Function runs. On
+Cloudflare Pages with Functions deployed, the middleware runs on every
+request (the build writes no `_routes.json` that excludes a path), so every
+alias answers; that Functions run for the texuli.com project is the open
+owner check recorded in [site-aeo.md](site-aeo.md#deviations-and-limits),
+and the remote MCP at `/mcp` depends on it in the same way. A host that serves `dist` as plain files (`astro preview`, a
+static server) has no `/api/v1/` paths at all: only `/api/index.json`,
+`/api/health.json`, `/openapi.json` and the unversioned site files. The
+local e2e spec runs the real middleware in front of `dist`, as
+`site-twins.spec.ts` does.
+
+Compared with `release/0.9.0` before this task (measured 2026-10-30):
+`dist` grows by 6 files (3,926 → 3,932: `/openapi.json`,
+`/api/index.json`, `/api/health.json`, `/developers/index.html`,
+`/developers.md`, `/og/developers.png`; four search chunks change hash)
+and 557,131 bytes (125,486,296 → 126,043,427): 395,356 bytes of new files
+(the OpenAPI document is 236,683) plus the new nav link and `service-desc`
+on every page and `_headers` rule. An earlier draft copied the aliases into
+`dist` (217 more files, about 7 MB); the mapping replaced it.
+
 `API_VERSION` (`X-API-Version`, the OpenAPI `info.version`) is the release
 line. It is a plain constant because the edge middleware cannot import the
 registry; `apps/website/tests/site-api.test.ts` fails when it differs from
@@ -44,7 +76,8 @@ registry; `apps/website/tests/site-api.test.ts` fails when it differs from
 
 | Header or behavior | Delivered by | Without Functions |
 | --- | --- | --- |
-| `X-API-Version`, `Access-Control-Allow-Origin: *`, `Access-Control-Expose-Headers`, `X-Content-Type-Options`, `Cache-Control` | The middleware (`functions/_lib/api-endpoint.ts`) on every `/api/` answer, and the `/api/*` rule in `dist/_headers` (`apiHeaderRules`) | Still sent: Cloudflare applies the `_headers` rule to the static file |
+| The `/api/v1/` aliases themselves | The middleware (`aliasSource`, read through `env.ASSETS`) | Absent: no alias file is built |
+| `X-API-Version`, `Access-Control-Allow-Origin: *`, `Access-Control-Expose-Headers`, `X-Content-Type-Options`, `Cache-Control` | The middleware (`functions/_lib/api-endpoint.ts`) on every `/api/` answer, and the `/api/*` rule in `dist/_headers` (`apiHeaderRules`) for the static `/api/index.json` and `/api/health.json` | Still sent on those two files: Cloudflare applies the `_headers` rule to them |
 | `RateLimit-Policy: "api";q=300;w=60`, `RateLimit`, `429` with `Retry-After` | The middleware: the same per-isolate token bucket as the remote MCP (`createTokenBucket` in `functions/_lib/mcp-endpoint.ts`), keyed by `CF-Connecting-IP` | Not sent: a static rule cannot count requests |
 | RFC 9457 `application/problem+json` for misses (`404`), writes (`405` with `Allow`) and failures (`500`), for every client | The middleware | A miss gets the static HTML 404 page |
 | `/api/` and `/api/v1/` answer the index | The middleware (`apiAssetPath`) | Not answered; request the `index.json` file |
@@ -103,6 +136,10 @@ the OpenAPI `x-versioning` block and the portal.
   committed file, and lists the OpenAPI document and the npm packages
   `texuli`, `@texuli/mcp` and `@texuli/tools`
   (`application/vnd.npm.package+json`).
+- Static discovery documents (`llms.txt`, the API catalog, the ARD
+  catalog, the JSON-LD) link the static `/api/index.json`, never an
+  `/api/v1/` alias: the AEO audit resolves their links against `dist`,
+  where no alias file exists. The index lists the `/api/v1/` URLs.
 - `/auth.md` states the `/api/` limit next to the MCP's.
 - `llms.txt` lists the OpenAPI document and the API index.
 
@@ -110,11 +147,11 @@ the OpenAPI `x-versioning` block and the portal.
 
 | Behavior | Pinned by |
 | --- | --- |
-| Version equals the registry's; alias copies; the `/api` route and the umami exclusion; problems and hostile `instance`; `_headers` rules | `apps/website/tests/site-api.test.ts` |
-| The OpenAPI document: 3.1, version, license, server, unique operationIds, `$ref`s resolve, every resource and alias plus `POST /mcp`, headers and the `Problem` schema, a new remote operation appears, the checker's failure cases | `apps/website/tests/site-api.test.ts` |
-| The envelope: 200 headers, HEAD, 304, directory URLs, 404/405/500 problems, preflight, the 429 with `Retry-After` per client; the middleware route | `apps/website/tests/site-api.test.ts`, `apps/website/tests/edge-middleware.test.ts` |
+| Version equals the registry's; the alias mapping (every resource, hostile ids map to nothing); the `/api` route and the umami exclusion; problems and hostile `instance`; `_headers` rules | `apps/website/tests/site-api.test.ts` |
+| The OpenAPI document: 3.1, version, license, server, unique operationIds, `$ref`s resolve, every resource and alias plus `POST /mcp`, headers and the `Problem` schema, a new remote operation appears; the checker accepts an alias whose source file is built with no alias file, and reports a missing source, a stray alias and the other failure cases | `apps/website/tests/site-api.test.ts` |
+| The envelope: an alias read from its source file, 200 headers, HEAD, 304, directory URLs, 404 (unmapped aliases never reach the asset store), 405, 500, preflight, the 429 with `Retry-After` per client; the middleware route | `apps/website/tests/site-api.test.ts`, `apps/website/tests/edge-middleware.test.ts` |
 | ARD npm entries, API catalog links, WebAPI JSON-LD | `apps/website/tests/site-api.test.ts`, `apps/website/tests/site-build-guards.test.ts` |
-| The portal in the browser (facts, axe light and dark, every link), `/openapi.json` against `dist`, `/api/v1/` through the real middleware, the static `_headers` fallback, the built ARD | `tests/e2e/site-developers.spec.ts` |
+| The portal in the browser (facts, axe light, dark and forced colors, every link), `/openapi.json` against `dist`, every alias through the real middleware byte for byte its source, no `dist/api/v1/`, the static files' `_headers` rule, the built ARD | `tests/e2e/site-developers.spec.ts` |
 
 ```bash
 pnpm vitest run apps/website/tests/site-api.test.ts
@@ -131,7 +168,8 @@ TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-developers.spec.
 - Nothing here has run on Cloudflare yet. After the deploy, check
   `curl -sI https://texuli.com/api/v1/health.json` for `X-API-Version` and
   `RateLimit-Policy`, and a miss for `application/problem+json`.
-- The `/api/v1/` copies add about 7 MB of theme files to the build (one
-  copy of each `/theme-data/` file).
+- The aliases depend on Pages Functions running for the project. If they
+  ever do not, `/api/v1/` answers the HTML 404 and agents can still read
+  the unversioned files the OpenAPI document also describes.
 - Design-system manifests are not served yet; they join `API_RESOURCES`
   when their files exist.
