@@ -1,14 +1,14 @@
 /**
- * Serialize token defaults for `base.css`. The defaults are declared on every
- * scope element (the root, any `[data-tx-theme]` element `applyTheme` writes,
- * and any `[data-tx-scope]`), so values that read theme tokens (density,
- * radius, shadows, roles) resolve against the nearest scope, not only `:root`.
+ * Serialize the emitted system token defaults for `base.css`. Only plain
+ * literals are declared, on `:root`; they inherit into every scope, and a
+ * design system overrides them on its own scope element.
  */
 
+import { isDerivedValue } from './fallback.ts';
 import { SYSTEM_TOKEN_FAMILIES } from './families.ts';
 
-/** The selector the token defaults are declared on (zero specificity). */
-export const TOKEN_SCOPE_SELECTOR = ':where(:root, [data-tx-theme], [data-tx-scope])';
+/** The selector the emitted token defaults are declared on. */
+export const TOKEN_SCOPE_SELECTOR = ':root';
 
 /** Markers around the generated blocks inside `base.css`. */
 export const GENERATED_START =
@@ -34,13 +34,17 @@ export function renderDeclarations(
     .concat('\n');
 }
 
-/** The `base.css` declarations of every `base`-emitted system family. */
+/** The `base.css` declarations of the emitted system tokens (derived ones stay fallback-only). */
 export function renderSystemTokenDeclarations(indent = '    '): string {
   return renderDeclarations(
-    SYSTEM_TOKEN_FAMILIES.filter((family) => family.emit === 'base').map((family) => ({
-      comment: `System: ${family.title.toLowerCase()}`,
-      entries: family.tokens.map((token) => [token.name, token.value] as const),
-    })),
+    SYSTEM_TOKEN_FAMILIES.filter((family) => family.emit === 'base')
+      .map((family) => ({
+        comment: `System: ${family.title.toLowerCase()}`,
+        entries: family.tokens
+          .filter((token) => !isDerivedValue(token.value))
+          .map((token) => [token.name, token.value] as const),
+      }))
+      .filter((group) => group.entries.length > 0),
     indent
   );
 }

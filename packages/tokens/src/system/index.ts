@@ -1,4 +1,13 @@
 /** `@texuli/tokens/system`: the token contract v2 system families (ADR-020). */
+
+export {
+  closingParen,
+  EMITTED_SYSTEM_TOKENS,
+  expandTokenRefs,
+  FALLBACK_SYSTEM_TOKENS,
+  isDerivedValue,
+  systemVar,
+} from './fallback.ts';
 export {
   SYSTEM_TOKEN_FAMILIES,
   SYSTEM_TOKENS,

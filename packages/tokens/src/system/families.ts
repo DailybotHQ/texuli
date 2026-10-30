@@ -11,7 +11,11 @@ import { STATUS_NAMES, TYPE_ROLES, type TypeRole } from './names.ts';
 /** One system token: its custom property, default CSS value and meaning. */
 export interface SystemToken {
   readonly name: string;
-  /** The default `base.css` declares, or the theme source for `theme` families. */
+  /**
+   * The default. `base.css` declares it when it is a plain literal; when it
+   * reads other variables it is the read fallback instead (`systemVar`). For
+   * the `theme` family it names the theme source.
+   */
   readonly value: string;
   readonly description: string;
 }

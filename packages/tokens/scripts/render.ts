@@ -1,5 +1,5 @@
 /**
- * Pure renderers for the generated token surfaces: the token-defaults block
+ * Pure renderers for the generated token surfaces: the system-defaults block
  * of `src/css/base.css`, `src/renames/renames.json` and
  * `docs/tokens-components.md`. `generate.ts` writes them; the tests compare
  * them with the files so a hand edit or a stale file fails.
@@ -7,15 +7,19 @@
 import {
   COMPONENT_TOKEN_FAMILIES,
   COMPONENT_TOKENS,
-  renderComponentTokenDeclarations,
+  componentVar,
 } from '../src/components/index.ts';
 import { renderTokenRenamesJson, TOKEN_RENAMES } from '../src/renames/index.ts';
 import {
+  EMITTED_SYSTEM_TOKENS,
+  FALLBACK_SYSTEM_TOKENS,
   GENERATED_END,
   GENERATED_START,
+  isDerivedValue,
   renderSystemTokenDeclarations,
   SYSTEM_TOKEN_FAMILIES,
   SYSTEM_TOKENS,
+  systemVar,
   TOKEN_SCOPE_SELECTOR,
 } from '../src/system/index.ts';
 
@@ -25,7 +29,6 @@ export function renderTokenDefaultsBlock(): string {
     `  ${GENERATED_START}`,
     `  ${TOKEN_SCOPE_SELECTOR} {`,
     renderSystemTokenDeclarations().trimEnd(),
-    renderComponentTokenDeclarations().trimEnd(),
     '  }',
     `  ${GENERATED_END}`,
   ].join('\n');
@@ -48,10 +51,6 @@ const code = (value: string) => `\`${value}\``;
 
 /** The generated token tables (`docs/tokens-components.md`). */
 export function renderTokenTablesDoc(): string {
-  const baseCount = SYSTEM_TOKEN_FAMILIES.filter((f) => f.emit === 'base').reduce(
-    (sum, f) => sum + f.tokens.length,
-    0
-  );
   const lines: string[] = [
     '# Token contract v2: system families and component tokens',
     '',
@@ -62,23 +61,54 @@ export function renderTokenTablesDoc(): string {
     'additive: nothing existing is renamed or removed.',
     '',
     `- **System tokens:** ${SYSTEM_TOKENS.length} in ${SYSTEM_TOKEN_FAMILIES.length} families`,
-    `  (${SYSTEM_TOKEN_FAMILIES.map((f) => f.id).join(', ')}). ${baseCount} have defaults in`,
-    '  `@texuli/tokens/base.css`; the data-viz family is emitted per theme.',
+    `  (${SYSTEM_TOKEN_FAMILIES.map((f) => f.id).join(', ')}).`,
+    `  ${EMITTED_SYSTEM_TOKENS.length} are declared by \`@texuli/tokens/base.css\`, ${FALLBACK_SYSTEM_TOKENS.length} are`,
+    '  fallback-only, and the data-viz family is emitted per theme.',
     `- **Component tokens:** ${COMPONENT_TOKENS.length} for ${COMPONENT_TOKEN_FAMILIES.length} components`,
-    '  (`@texuli/tokens/components`), each with a default that references system',
-    '  or theme tokens, declared in `base.css` inside `@layer tx.base`.',
+    '  (`@texuli/tokens/components`), all fallback-only.',
     `- **Renames:** ${TOKEN_RENAMES.length} (\`@texuli/tokens/renames.json\`, schema`,
     '  `TOKEN_RENAMES_JSON_SCHEMA`).',
     '',
+    '## The fallback model',
+    '',
+    'A page pays only for tokens something sets. Three kinds of token exist:',
+    '',
+    '- **Emitted system tokens.** Their default is a plain literal',
+    '  (`--tx-size-control-md: 2.25rem`, `--tx-z-modal: 60`). `base.css` declares',
+    '  them on `:root`: they are the stable hooks a design system overrides, and',
+    '  they inherit into every scope.',
+    '- **Fallback-only system tokens.** Their default is derived from other',
+    '  variables (`--tx-space-4` → `calc(var(--tx-space-unit) * 4)`,',
+    '  `--tx-type-label-size` → `var(--tx-font-size-sm, 0.875rem)`). No stylesheet',
+    '  declares them. Every read carries the derivation as its fallback, so it',
+    '  resolves where it is read (density and radius follow the nearest theme):',
+    '  `systemVar(name)` from `@texuli/tokens/system` returns that exact expression.',
+    '- **Component tokens.** No stylesheet declares them either. The registry',
+    '  default is the fallback every read carries, and `componentVar(component, key)`',
+    '  returns the exact expression, for example',
+    `  ${code(componentVar('button', 'radius'))}. \`componentTokenFallbacks()\``,
+    '  maps every token to its expression.',
+    '',
+    'So a fallback-only or component token exists on a page only when a theme, a',
+    'design system or the host sets it. **Design systems set component tokens on',
+    'their scope** (the element that carries `data-tx-theme` or `data-tx-scope`),',
+    'never on `:root` globally, so two design systems can share a page.',
+    '',
+    '`checkTokenReads(source)` (`@texuli/tokens/components`) is the drift guard:',
+    'every `var()` read of a component token or a fallback-only system token must',
+    'equal `componentVar` / `systemVar` exactly. `tests/token-contract-v2.test.ts`',
+    'runs it over every component stylesheet in the repository.',
+    '',
     '## Status',
     '',
-    '- **Shipped in this package:** the families, the registry, the defaults in',
-    '  `base.css`, `@texuli/tokens/data-viz` (complete chart tokens for any theme)',
-    '  and the rename list.',
+    '- **Shipped in this package:** the families, the registry, the emitted defaults',
+    '  in `base.css`, the read helpers and guard, `@texuli/tokens/data-viz`',
+    '  (complete chart tokens for any theme) and the rename list.',
     '- **Not adopted yet:** no component stylesheet reads these tokens; the',
-    '  adoption tasks move component CSS onto them, each behind a zero-change',
-    '  `pnpm visual` gate. Until then, setting a component token changes nothing.',
-    '- **Defaults equal today:** every component default resolves to the value',
+    '  adoption tasks move component CSS onto `componentVar` expressions, each',
+    '  behind a zero-change `pnpm visual` gate. Until then, setting a component',
+    '  token changes nothing.',
+    '- **Defaults equal today:** every component fallback resolves to the value',
     '  the component renders today under the visual-baseline theme',
     '  (`enterprise-neutral`, density 1), checked by `tests/token-contract-v2.test.ts`.',
     '  Some components hard-code a value that ignores the theme today (for example',
@@ -92,12 +122,10 @@ export function renderTokenTablesDoc(): string {
     '',
     '## Scoping',
     '',
-    `Defaults are declared on ${code(TOKEN_SCOPE_SELECTOR)}, so tokens that read`,
-    'theme values (density, radius, shadows, roles) resolve against the nearest',
-    'scope. Set system tokens on a scope element (`data-tx-theme`, written by',
-    '`applyTheme`, or `data-tx-scope`): a system token overridden on a plain',
-    'element does not reach the component tokens computed at the scope above it.',
-    'A component token can be set on any element.',
+    `Emitted system defaults are plain literals declared on ${code(TOKEN_SCOPE_SELECTOR)};`,
+    'they inherit into every scope. Fallback-only and component tokens resolve',
+    'where they are read, against the nearest theme. A design system sets any of',
+    'them on its scope element (`data-tx-theme` or `data-tx-scope`).',
     '',
     'The shape radius scale is `--tx-shape-radius-*`, not `--tx-radius-*`:',
     'components already read `--tx-radius-sm`, `-md`, `-lg`, `-xl` and `-full`',
@@ -109,30 +137,41 @@ export function renderTokenTablesDoc(): string {
   ];
   for (const family of SYSTEM_TOKEN_FAMILIES) {
     lines.push(`### ${family.title} (\`${family.id}\`)`, '', family.description, '');
-    lines.push(
-      family.emit === 'base' ? '| Token | Default | Meaning |' : '| Token | Source | Meaning |',
-      '| --- | --- | --- |'
-    );
-    for (const token of family.tokens) {
-      lines.push(`| ${code(token.name)} | ${code(token.value)} | ${token.description} |`);
+    if (family.emit === 'theme') {
+      lines.push('| Token | Source | Meaning |', '| --- | --- | --- |');
+      for (const token of family.tokens) {
+        lines.push(`| ${code(token.name)} | ${code(token.value)} | ${token.description} |`);
+      }
+    } else {
+      lines.push(
+        '| Token | Kind | Default | Read as | Meaning |',
+        '| --- | --- | --- | --- | --- |'
+      );
+      for (const token of family.tokens) {
+        const kind = isDerivedValue(token.value) ? 'fallback-only' : 'emitted';
+        lines.push(
+          `| ${code(token.name)} | ${kind} | ${code(token.value)} | ${code(systemVar(token.name))} | ${token.description} |`
+        );
+      }
     }
     lines.push('');
   }
   lines.push('## Component tokens', '');
   lines.push(
-    'A design system sets `components.<component>.<key>`; CSS reads `--tx-<component>-<key>`.',
+    'A design system sets `components.<component>.<key>`; CSS reads it with the',
+    '`componentVar` expression in the last column.',
     ''
   );
   for (const family of COMPONENT_TOKEN_FAMILIES) {
     lines.push(
       `### ${family.title} (\`${family.component}\`, \`texuli/${family.subpath}\`)`,
       '',
-      '| Key | Token | Default | Meaning |',
-      '| --- | --- | --- | --- |'
+      '| Key | Token | Default | Meaning | Read as |',
+      '| --- | --- | --- | --- | --- |'
     );
     for (const token of family.tokens) {
       lines.push(
-        `| ${code(token.key)} | ${code(token.token)} | ${code(token.default)} | ${token.description} |`
+        `| ${code(token.key)} | ${code(token.token)} | ${code(token.default)} | ${token.description} | ${code(componentVar(token.component, token.key))} |`
       );
     }
     lines.push('');

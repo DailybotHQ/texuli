@@ -1,9 +1,12 @@
 /**
  * The component token tier of token contract v2 (ADR-020): the closed
  * vocabulary a design system may set per component (`components.button.radius`),
- * each with its default reference to a system or theme token. Defaults are
- * declared in `base.css`; they equal what each component renders today under
- * the visual-baseline theme, and component CSS adopts them in a later task.
+ * each with its default reference to a system or theme token. No stylesheet
+ * declares component tokens: the default is the fallback every read carries
+ * (`componentVar('button', 'radius')`), so a component token exists on a page
+ * only when a theme, design system or host sets it on its scope. Defaults equal
+ * what each component renders today under the visual-baseline theme; component
+ * CSS adopts them in a later task.
  */
 
 /** One component token. */
@@ -14,7 +17,7 @@ export interface ComponentToken {
   readonly key: string;
   /** The CSS custom property: `--tx-<component>-<key>`. */
   readonly token: string;
-  /** The default: a reference to system or theme tokens, never a literal color. */
+  /** The default (the read fallback): system or theme token references, never a literal color. */
   readonly default: string;
   readonly description: string;
 }
