@@ -131,6 +131,15 @@ the handler knows but does not serve (a `node` operation on an `edge`
 handler) gives `runtime-unavailable`. A name the registry does not know is a
 `-32602` protocol error.
 
+The content blocks of the `blocks-*` components are reachable as tools, not
+resources: `block.list` lists every block type the validator accepts, and
+`block.schema` returns one type's shape, a derived JSON Schema and examples
+that validate (see [ops.md](ops.md#block-shapes)). Tools reach every door,
+including hosts that show no resources and the CLI (`texuli block list`,
+`texuli block schema`). The `build-ui` prompt sends agents there before
+they write a `block` prop, and a `block-schema` diagnostic names the shape
+expected at the failing path.
+
 ## Resources
 
 | URI | Type | Content |
@@ -270,3 +279,15 @@ oversized stdio lines and operation inputs, stateless and stateful handlers,
 and the runtime filter. It also checks that the llms resources are
 byte-identical to the site's committed snapshots. `mcp.test.ts`,
 `deck.test.ts` and `document.test.ts` cover the tools themselves.
+
+`tests/agent-evals/` (`pnpm vitest run tests/agent-evals`) replays scripted
+agent sessions, with no model, on both doors: the stateful handler as the
+stdio server builds it, and the remote Function with real `Request`
+objects. The jobs are discovery from cold (including `block.list`), a
+pricing page validated with `blueprint.validate` whose table block is
+written only from `block.schema`, theming with the `theme-blueprint` prompt and a
+Markdown deck conversion; every edge operation must answer identically on
+both doors. `tool-descriptions.test.ts` there lints every operation's
+summary, stated limits, argument descriptions and bounds, closed input
+schema and examples. The design-system jobs are skipped until their
+operations exist.

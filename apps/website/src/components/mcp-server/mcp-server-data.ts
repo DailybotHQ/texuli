@@ -87,7 +87,7 @@ export const MCP_SERVER_DATA = {
       name: 'component.get',
       title: 'Read a component manifest',
       summary:
-        'Read one component manifest from the catalog: its props with kinds and schemas, events, examples, useWhen and dontUseWhen guidance, accessibility notes and the emit tiers that may place it.',
+        'Read one component manifest from the catalog by id. Returns { component }: its props with kinds and schemas, events, worked examples, useWhen and dontUseWhen guidance, accessibility notes and the emit tiers that may place it (an empty emit list means agent output may not).',
       runtime: 'edge',
       remote: true,
       limits: {
@@ -174,6 +174,52 @@ export const MCP_SERVER_DATA = {
       example: 'A valid page with a hero heading',
     },
     {
+      name: 'block.list',
+      title: 'List block types',
+      summary:
+        'List the content block types the blocks-* components render (table, stat, cta, poll …), optionally for one component or matching words. Returns the match count and, per type, the component that renders it, a label and when to use it; read one shape with block.schema.',
+      runtime: 'edge',
+      remote: true,
+      limits: {
+        inputBytes: 1024,
+        items: 32,
+        timeMs: 5000,
+      },
+      arguments: [
+        {
+          name: 'component',
+          required: false,
+          description: 'Only the types this blocks-* component renders, e.g. "blocks-data".',
+        },
+        {
+          name: 'query',
+          required: false,
+          description: 'Words to match against the type, its label and its useWhen notes.',
+        },
+      ],
+      example: 'What blocks-data renders',
+    },
+    {
+      name: 'block.schema',
+      title: 'Read a block shape',
+      summary:
+        'Read the shape of one content block type: the component that renders it, its fields as compact text and as a JSON Schema (required fields are the ones the validator refuses a block without), examples that validate in a blueprint, limits, when to use it and whether it can pass blueprint.validate today. Returns what a blocks-* node’s block prop needs.',
+      runtime: 'edge',
+      remote: true,
+      limits: {
+        inputBytes: 1024,
+        timeMs: 5000,
+      },
+      arguments: [
+        {
+          name: 'type',
+          required: true,
+          description: 'A block type from block.list, e.g. "table" or "cta".',
+        },
+      ],
+      example: 'The table block',
+    },
+    {
       name: 'theme.search',
       title: 'Search the theme library',
       summary:
@@ -224,7 +270,7 @@ export const MCP_SERVER_DATA = {
       name: 'theme.get',
       title: 'Read a full theme',
       summary:
-        'Read the full token definition of one library theme: its id, name and every light and dark color, radius, font and chart token, ready to compile or apply.',
+        'Read the full token definition of one library theme by id. Returns { theme }: its id, name, description and every light and dark color, radius, font and chart token, ready to compile or apply.',
       runtime: 'edge',
       remote: true,
       limits: {
@@ -244,7 +290,7 @@ export const MCP_SERVER_DATA = {
       name: 'theme.preview',
       title: 'Preview a theme',
       summary:
-        'Preview one library theme in light or dark mode: its key tokens (background, foreground, primary, border, radius, font …) and the WCAG 2.x AA contrast report for both modes, with issue counts.',
+        'Preview one library theme in light or dark mode. Returns its summary, the key tokens of that mode (background, foreground, primary, border, radius, font …) and the WCAG 2.x AA contrast report for both modes (aa.pass and issue counts).',
       runtime: 'edge',
       remote: true,
       limits: {

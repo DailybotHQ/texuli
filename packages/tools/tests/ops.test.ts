@@ -32,6 +32,8 @@ const EXPECTED = [
   'component.get',
   'example.search',
   'blueprint.validate',
+  'block.list',
+  'block.schema',
   'theme.search',
   'theme.get',
   'theme.preview',

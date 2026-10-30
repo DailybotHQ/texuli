@@ -46,12 +46,30 @@ const EXAMPLE_DOCUMENT = {
 export const LEGACY_DOCUMENT_INPUT: JsonSchema = {
   type: 'object',
   properties: {
-    command: { type: 'string', enum: DOCUMENT_COMMANDS },
+    command: {
+      type: 'string',
+      enum: DOCUMENT_COMMANDS,
+      description:
+        'capabilities and schema take nothing; from-markdown takes markdown; to-pdf and to-docx (routed to document.export) and every other command take document.',
+    },
     document: documentSchema,
-    markdown: { type: 'string', maxLength: MAX_SOURCE },
-    patch: { type: 'array', maxItems: MAX_PATCH_OPERATIONS, items: { type: 'object' } },
+    markdown: {
+      type: 'string',
+      maxLength: MAX_SOURCE,
+      description: 'Markdown text for from-markdown.',
+    },
+    patch: {
+      type: 'array',
+      maxItems: MAX_PATCH_OPERATIONS,
+      items: { type: 'object' },
+      description: `RFC 6902 operations for patch (at most ${MAX_PATCH_OPERATIONS}).`,
+    },
     tier: tierSchema,
-    key: { type: 'string', pattern: '^[A-Za-z0-9._:-]{1,64}$' },
+    key: {
+      type: 'string',
+      pattern: '^[A-Za-z0-9._:-]{1,64}$',
+      description: 'The node key for to-blueprint (default "document").',
+    },
   },
   required: ['command'],
   additionalProperties: false,

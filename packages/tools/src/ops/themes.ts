@@ -230,7 +230,7 @@ export const themeGet: Operation = defineOperation({
   name: 'theme.get',
   title: 'Read a full theme',
   summary:
-    'Read the full token definition of one library theme: its id, name and every light and dark color, radius, font and chart token, ready to compile or apply.',
+    'Read the full token definition of one library theme by id. Returns { theme }: its id, name, description and every light and dark color, radius, font and chart token, ready to compile or apply.',
   input: {
     type: 'object',
     properties: { id: themeId },
@@ -264,7 +264,7 @@ export const themePreview: Operation = defineOperation({
   name: 'theme.preview',
   title: 'Preview a theme',
   summary:
-    'Preview one library theme in light or dark mode: its key tokens (background, foreground, primary, border, radius, font …) and the WCAG 2.x AA contrast report for both modes, with issue counts.',
+    'Preview one library theme in light or dark mode. Returns its summary, the key tokens of that mode (background, foreground, primary, border, radius, font …) and the WCAG 2.x AA contrast report for both modes (aa.pass and issue counts).',
   input: {
     type: 'object',
     properties: {

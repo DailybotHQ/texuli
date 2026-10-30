@@ -3,17 +3,10 @@
  * at the `untrusted` tier with the deep block schemas, any roots allowed.
  * Shared by `@texuli/tools/email` and `@texuli/tools/print`.
  */
-import { checkCodeBlock } from '@texuli/blocks/code/engine';
-import { checkDataBlock } from '@texuli/blocks/data/engine';
-import { checkEmbedBlock } from '@texuli/blocks/embed/engine';
-import { checkInteractiveBlock } from '@texuli/blocks/interactive/engine';
-import { checkMapBlock } from '@texuli/blocks/map/engine';
-import { checkMediaBlock } from '@texuli/blocks/media/engine';
-import { checkStructureBlock } from '@texuli/blocks/structure/engine';
-import { checkTextBlock } from '@texuli/blocks/text/engine';
 import type { RenderCatalog } from '@texuli/catalog/render/renderer';
 import { type DraftValidation, validateDraft } from '@texuli/catalog/validate';
-import { createFamilyBlockCheck, diagramFamilyCheck } from '@texuli/catalog/validate/blocks';
+import { loadedBlockShapes } from '../ops/block-shapes-loader.ts';
+import { rawFamilyCheck } from './family-check.ts';
 
 export interface StaticDiagnostic {
   code: string;
@@ -23,21 +16,24 @@ export interface StaticDiagnostic {
   id?: string;
 }
 
-let familyCheck: ReturnType<typeof createFamilyBlockCheck> | undefined;
-/** The deep schema check of every `blocks-*` family, shared with `blueprint.validate`. */
+/**
+ * The deep schema check of every `blocks-*` family, shared with
+ * `blueprint.validate`: the family parsers' verdict, with each failure
+ * naming the shape expected at its path (derived from the validated
+ * examples, see `ops/block-shapes.ts`) once `loadBlockShapes()` has run
+ * (`blueprint.validate` loads it first), so an agent can repair the block
+ * from the diagnostic alone.
+ */
 export function checkFamilyBlock(block: unknown, id: string) {
-  familyCheck ??= createFamilyBlockCheck({
-    'blocks-code': checkCodeBlock,
-    'blocks-data': checkDataBlock,
-    'blocks-diagram': diagramFamilyCheck,
-    'blocks-embed': checkEmbedBlock,
-    'blocks-interactive': checkInteractiveBlock,
-    'blocks-map': checkMapBlock,
-    'blocks-media': checkMediaBlock,
-    'blocks-structure': checkStructureBlock,
-    'blocks-text': checkTextBlock,
-  });
-  return familyCheck(block, id);
+  const result = rawFamilyCheck(block, id);
+  if (result.success) return result;
+  return {
+    success: false as const,
+    issues: result.issues.map((issue) => {
+      const expected = loadedBlockShapes()?.expectedAt(block, id, issue.path ?? []);
+      return expected ? { ...issue, message: `${issue.message}. ${expected}` } : issue;
+    }),
+  };
 }
 
 /** Validate a draft for a static target; never throws. `validation` is null when validation itself failed. */
