@@ -1,4 +1,11 @@
-/** ScrollArea — native viewport with optional decorative scrollbar chrome. */
+/**
+ * ScrollArea — native viewport with optional decorative scrollbar chrome.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the per-size block limits (8rem, 12rem, 18rem) are content
+ * heights, not design tokens.
+ */
 @layer tx.components {
   .tx-scroll-area {
     position: relative;

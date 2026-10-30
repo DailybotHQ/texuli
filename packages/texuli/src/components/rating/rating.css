@@ -1,6 +1,12 @@
 /**
  * Rating: star rating input and display on the token contract.
  * @layer tx.components so consumer utilities can override.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the star box sizes (1.25rem to 3rem) and the 24px-wide half-
+ * star targets are proportional geometry of each size; the 0.55 disabled
+ * opacity has no token.
  */
 @layer tx.components {
   .tx-rating {

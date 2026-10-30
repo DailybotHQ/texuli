@@ -1,6 +1,12 @@
 /**
  * Tabs, Accordion and Collapsible — disclosure surfaces on the token contract.
  * @layer tx.components so consumer utilities can override.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the -1px line-trigger overlap and 2px active rule, the 10rem
+ * vertical list minimum and the visually-hidden 1px box are tab geometry, not
+ * design tokens.
  */
 @layer tx.components {
   /* ── Tabs ─────────────────────────────────────────────────────────────── */

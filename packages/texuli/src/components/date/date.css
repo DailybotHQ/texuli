@@ -5,6 +5,13 @@
  * chosen day and a range's ends, and
  * surface/muted foregrounds elsewhere; selection/selection-foreground for the
  * days between a range's ends and the active preset. @layer tx.components.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the ch-based segment widths, the 0.6 and 0.4 disabled
+ * opacities, the 1.125rem icon, the 3px error rule, the 1.875rem small day
+ * cell and the 9rem presets column are tuned geometry; segment heights read
+ * the existing --tx-target-size.
  */
 @layer tx.components {
   .tx-date {

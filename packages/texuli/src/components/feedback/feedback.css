@@ -1,6 +1,13 @@
 /**
  * Skeleton, Spinner and Progress — loading feedback on the token contract.
  * @layer tx.components so consumer utilities can override.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the circle skeleton sm and lg sizes off the space steps
+ * (3.5rem), the spinner lg size (1.75rem) and its 2px and 3px strokes, the
+ * progress circle md and lg sizes (3.5rem, 4.5rem), the 0.55 pulse opacity and
+ * the visually-hidden 1px box are proportional geometry.
  */
 @layer tx.components {
   /* ── Skeleton ─────────────────────────────────────────────────────────── */

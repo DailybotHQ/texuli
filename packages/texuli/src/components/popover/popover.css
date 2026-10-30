@@ -1,6 +1,12 @@
 /**
  * Popover and HoverCard surfaces — floating panels with an arrow.
  * @layer tx.components so consumer utilities can override.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the inline size limits (16rem to 28rem) with their 1.5rem
+ * viewport gutter, the 1.45 body line height, the 0.5rem arrow and the
+ * fractional close button paddings are geometry, not design tokens.
  */
 @layer tx.components {
   .tx-popover,

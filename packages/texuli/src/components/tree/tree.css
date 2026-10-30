@@ -1,4 +1,12 @@
-/** Styled TreeView — @layer tx.components, logical indentation, system-color fallbacks. */
+/**
+ * Styled TreeView — @layer tx.components, logical indentation, system-color fallbacks.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the row heights and indents stay in --tx-tree-row-size and
+ * --tx-tree-indent (already multiplied by --tx-density), the 0.875rem check
+ * glyph and 1.125rem node icon are proportional geometry.
+ */
 @layer tx.components {
   .tx-tree {
     --tx-tree-indent: 1.25rem;

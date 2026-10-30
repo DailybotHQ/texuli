@@ -1,6 +1,12 @@
 /**
  * Toggle and ToggleGroup styles. @layer tx.components so consumer CSS wins.
  * Logical properties only; colors from --tx-* tokens.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the 0.8125rem small text, the 0.2rem and 0.15rem default-
+ * group padding and gap and the 0.1rem nested-radius inset are tuned geometry
+ * off the token steps.
  */
 @layer tx.components {
   .tx-toggle {

@@ -1,6 +1,13 @@
 /**
  * Sidebar and AppNav — app chrome on sidebar tokens.
  * `@layer tx.components`. Logical properties only.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the 16rem and 4rem widths (read through --tx-sidebar-width),
+ * the 3.5rem and 3.25rem header heights, the 0.7rem section, icon and badge
+ * texts, the 3px active mark, the fractional section and badge paddings, the
+ * 0.45 disabled opacity and the 20rem drawer sheet are tuned geometry.
  */
 
 @layer tx.components {

@@ -2,6 +2,12 @@
  * Timeline — @layer tx.components, logical properties only (it mirrors in
  * right-to-left), token colors with system-color fallbacks. Status is a marker
  * shape (filled with a check, ringed, hollow) and a spoken word; tone is color.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the 2px line width (--tx-timeline-line), the 0.625rem marker
+ * glyph, the 3px current halo, the 10rem horizontal track and the 0.125rem
+ * marker offsets that center the line are proportional geometry.
  */
 @layer tx.components {
   .tx-timeline {

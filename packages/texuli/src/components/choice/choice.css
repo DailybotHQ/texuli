@@ -1,6 +1,12 @@
 /**
  * Checkbox, Radio and Switch — styled choice controls on the token contract.
  * @layer tx.components so consumer utilities can override.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the touch hit-area insets, the 0.875rem small control, the
+ * switch track and thumb geometry and the 1.25rem label line box keep the
+ * control and its label aligned; they are geometry, not design tokens.
  */
 @layer tx.components {
   .tx-choice {

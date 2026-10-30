@@ -1,6 +1,12 @@
 /**
  * TagsInput and ColorPicker — token-styled field chrome.
  * @layer tx.components so consumer utilities can override.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the tag input track (6rem basis, 4rem minimum), the 16rem
+ * picker measure, the color area and hue gradients (functional color ramps,
+ * not theme colors) and the 2px and 4px selected-swatch rings are geometry.
  */
 @layer tx.components {
   /* ── Tags input ───────────────────────────────────────────────────────── */

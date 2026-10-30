@@ -1,6 +1,12 @@
 /**
  * Avatar and AvatarGroup — @layer tx.components so consumer utilities win.
  * Logical properties only; status dots use system colors under forced-colors.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: initials font sizes below the type scale (0.55rem, 0.65rem),
+ * status dot sizes, the 2px tone and group rings and the group overlap margins
+ * are proportional geometry of each avatar size, not design tokens.
  */
 @layer tx.components {
   .tx-avatar {

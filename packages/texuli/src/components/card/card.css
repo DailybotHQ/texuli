@@ -1,6 +1,10 @@
 /**
  * Card family — surface, media, header, content, footer, grid.
  * @layer tx.components so consumer utilities can override.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: none besides the 0 resets.
  */
 @layer tx.components {
   .tx-card {

@@ -2,6 +2,13 @@
  * Table — scroll wrapper, density, plain / striped / grid rows, sticky header,
  * selected rows, numeric cells and container-driven stacking.
  * @layer tx.components so consumer utilities can override.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the per-density cell paddings stay in --tx-table-pad-block
+ * and --tx-table-pad-inline (already multiplied by --tx-density), the 1.4 line
+ * height, the 3px selected-row edge, the 6rem stacked label column and the
+ * container-query widths are table geometry.
  */
 @layer tx.components {
   .tx-table-wrap {

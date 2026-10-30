@@ -1,6 +1,13 @@
 /**
  * LayoutHost chrome — token-styled frame.
  * @layer tx.components so consumer utilities can override.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the drawer and overlay z-index 50 (below the sheet layer on
+ * purpose), the --tx-shadow-lg drawer shadow (no theme emits it, so a token
+ * read would change pixels), drawer widths and the local z-index 10 are layout
+ * contracts.
  */
 @layer tx.components {
   .tx-layout-host {

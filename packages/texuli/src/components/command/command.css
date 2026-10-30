@@ -1,6 +1,14 @@
 /**
  * Command palette — @layer tx.components so consumer utilities win.
  * Logical properties only; forced-colors keeps borders and selection visible.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the --tx-shadow-lg panel and palette shadows and the 0.9rem
+ * palette radius have fallbacks no theme token reproduces (no theme emits
+ * --tx-shadow-lg or --tx-radius-xl), so a token read would change pixels; the
+ * fractional per-size paddings, row heights (2.5rem to 3.75rem), the 1.15rem
+ * search icon and the 0.7rem key text are tuned geometry off the token steps.
  */
 @layer tx.components {
   .tx-command {

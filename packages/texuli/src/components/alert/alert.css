@@ -1,6 +1,11 @@
 /**
  * Alert, Callout and Banner — token-tinted surfaces in @layer tx.components.
  * Logical properties only; no static style attributes on hosts.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the 1.4 body line height (no type role is 1.4), the 0 banner
+ * radius and the dismiss button's line-height 0.
  */
 @layer tx.components {
   .tx-alert {

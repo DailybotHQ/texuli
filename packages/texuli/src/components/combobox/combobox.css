@@ -1,6 +1,13 @@
 /**
  * Styled Combobox / MultiSelect.
  * `@layer tx.components` so consumer CSS wins. Logical properties only.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the fractional field, chip and item paddings (0.1rem to
+ * 0.65rem), the 0.55 and 0.45 disabled opacities, the 0.8125rem chip text and
+ * the menu inline and block size limits are tuned geometry off the 0.25rem
+ * step.
  */
 
 @layer tx.components {

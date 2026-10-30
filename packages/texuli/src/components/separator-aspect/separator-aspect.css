@@ -2,6 +2,11 @@
  * Separator, AspectRatio, VisuallyHidden — layout utilities.
  * `@layer tx.components` so consumer CSS wins.
  * Logical properties only.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the 0.35 strong-separator opacity mix and the visually-hidden
+ * 1px box are not design tokens.
  */
 
 @layer tx.components {

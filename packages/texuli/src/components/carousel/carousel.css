@@ -1,6 +1,12 @@
 /**
  * Carousel styles. Live in `@layer tx.components` so consumer CSS wins.
  * Side-effect import from `carouselVariants` keeps recipe-only usage styled.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the 2.5rem control and 1.5rem dot hit boxes, the 0.5rem and
+ * 1.25rem dot marks, the 0.8125rem counter text and the visually-hidden 1px
+ * box are fixed geometry; z-index 1 is local stacking inside the stage.
  */
 
 @layer tx.components {

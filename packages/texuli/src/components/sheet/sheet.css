@@ -1,4 +1,14 @@
-/** Sheet family surfaces — logical edges and theme tokens. */
+/**
+ * Sheet family surfaces — logical edges and theme tokens.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the drawer and panel sizes (22rem to 52rem, 85dvh, 48rem),
+ * the 2rem viewport margins, the drawer handle (2.75rem by 0.375rem at 0.45
+ * opacity) and the visually-hidden 1px box are layout limits; the sheet
+ * z-index now reads --tx-sheet-z-index (the undocumented --tx-overlay-z read
+ * is retired).
+ */
 @layer tx.components {
   .tx-sheet,
   .tx-drawer,

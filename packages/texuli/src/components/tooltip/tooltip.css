@@ -1,6 +1,12 @@
 /**
  * Styled tooltip. `@layer tx.components` so consumer CSS wins.
  * Logical properties; inverted surface for contrast on chrome.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the 20rem measure, the fractional paddings and gaps (0.35rem,
+ * 0.6rem, 0.4rem, 0.2rem) and the shortcut key overrides (1.1rem, 0.65rem) are
+ * tuned geometry off the token steps.
  */
 
 @layer tx.components {

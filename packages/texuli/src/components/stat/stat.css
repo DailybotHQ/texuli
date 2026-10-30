@@ -1,6 +1,12 @@
 /**
  * Stat and KPI — metric tiles on the token contract.
  * @layer tx.components so consumer utilities in later layers can override.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the -0.025em value tracking, the 0.875rem delta icon, the
+ * 1.75rem sparkline minimum, the skeleton bar sizes, the 0.55 pulse opacity
+ * and the 12rem KPI track are tuned geometry.
  */
 @layer tx.components {
   .tx-stat {

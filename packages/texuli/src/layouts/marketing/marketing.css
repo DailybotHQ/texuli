@@ -1,6 +1,11 @@
 /**
  * Marketing layouts — landing, pricing and section frames.
  * @layer tx.components so consumer utilities can override.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: hero and pricing type weights and sizes, the 1px highlighted-
+ * tier ring and section widths are page design, not component tokens.
  */
 @layer tx.components {
   .tx-marketing-layout {

@@ -1,5 +1,10 @@
 /**
  * EmptyState and ErrorState — feedback surfaces on the token contract.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the 24rem copy measure is a reading width, not a design
+ * token.
  */
 @layer tx.components {
   .tx-empty {

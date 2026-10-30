@@ -1,6 +1,13 @@
 /**
  * DropdownMenu, ContextMenu and Menubar surfaces.
  * `@layer tx.components` so consumer utilities win. Logical properties only.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the fractional trigger and item paddings (0.15rem to 0.9rem),
+ * the 0.7rem and 0.75rem indicator and shortcut glyph sizes, the menu inline
+ * size limits, the 0.45 and 0.85 opacities and the 1.85rem menubar trigger are
+ * tuned geometry off the token steps.
  */
 
 @layer tx.components {

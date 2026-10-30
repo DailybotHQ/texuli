@@ -1,6 +1,11 @@
 /**
  * Button family styles. Live in `@layer tx.components` so consumer CSS wins.
  * Logical properties only; colors from `--tx-*` tokens.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the 2px spinner stroke, the 4px link underline offset and the
+ * visually-hidden 1px box are geometry, not design tokens.
  */
 
 @layer tx.components {

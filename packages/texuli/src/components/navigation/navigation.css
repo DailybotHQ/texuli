@@ -1,6 +1,13 @@
 /**
  * NavigationMenu, Breadcrumb and Pagination — site navigation chrome.
  * @layer tx.components so consumer utilities can override.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the fractional link and breadcrumb paddings, the 0.85rem
+ * chevron, the 2px indicator, the 1.5rem breadcrumb tap target, the small and
+ * large pagination sizes (1.9rem, 2.6rem) and the stable-count width formula
+ * are tuned geometry; the 0.55 and 0.45 opacities have no token.
  */
 @layer tx.components {
   /* ── NavigationMenu ─────────────────────────────────────────── */

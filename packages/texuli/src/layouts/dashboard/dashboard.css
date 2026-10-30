@@ -1,6 +1,11 @@
 /**
  * Dashboard grid and analytics widget grids.
  * @layer tx.components so consumer utilities can override.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: container-query breakpoints (var() cannot appear in a query)
+ * and the 0.75rem to 1rem section type are layout geometry.
  */
 @layer tx.components {
   .tx-layout-dashboard {

@@ -1,6 +1,13 @@
 /**
  * Styled file upload. `@layer tx.components` so consumer CSS wins.
  * Logical properties only.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the 36rem measure, the fractional item paddings and gaps
+ * (0.2rem to 0.85rem), the 0.8125rem and 0.7rem small texts, the 0.35rem
+ * progress track and the visually-hidden 1px box are tuned geometry off the
+ * token steps.
  */
 
 @layer tx.components {

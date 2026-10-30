@@ -1,4 +1,12 @@
-/** NumberField and PinInput — token styled controls. */
+/**
+ * NumberField and PinInput — token styled controls.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the input inline sizes (6rem to 10rem), the 1.875rem small
+ * stepper, the 0.6 disabled opacity, the large cell (3.25rem by 3.5rem), the
+ * small cell block size and the 1px fake caret are tuned geometry.
+ */
 @layer tx.components {
   .tx-number-field {
     display: inline-flex;

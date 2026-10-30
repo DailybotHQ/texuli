@@ -1,6 +1,12 @@
 /**
  * Stepper and Wizard — @layer tx.components so consumer utilities can override.
  * Logical properties only; token colors for AA pairs on step markers.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the connector offsets (1rem, 2.5rem, 0.9375rem) follow the
+ * marker geometry, the 1px connector, the 4px current-marker halo and the
+ * visually-hidden 1px box are not design tokens.
  */
 @layer tx.components {
   .tx-stepper {

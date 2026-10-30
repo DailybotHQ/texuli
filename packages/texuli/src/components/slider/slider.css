@@ -1,6 +1,12 @@
 /**
  * Slider track, range, thumb, ticks and value label.
  * @layer tx.components — consumer CSS wins. Logical properties only.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the track thicknesses (0.375rem to 0.625rem), the 20rem and
+ * 12rem track lengths, the tick marks (0.125rem by 0.375rem) and the 0.8125rem
+ * value text are proportional geometry of each size.
  */
 @layer tx.components {
   .tx-slider {

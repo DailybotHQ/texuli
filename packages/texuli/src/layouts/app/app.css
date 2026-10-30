@@ -1,3 +1,11 @@
+/**
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: rail and pane widths, fractional paddings, the 0.75rem and
+ * 1.05rem labels and the local z-index 1 are layout geometry, not design
+ * tokens.
+ */
 @layer tx.base, tx.components;
 
 @layer tx.components {

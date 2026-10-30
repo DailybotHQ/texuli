@@ -1,6 +1,12 @@
 /**
  * Toolbar shell, buttons, groups and separators.
  * @layer tx.components — consumer CSS wins. Logical properties only.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the fractional small and default button paddings (0.2rem to
+ * 0.55rem), the 0.8125rem small text, the 1.2 line height, the 0.1rem and
+ * 0.05rem nested-radius insets and the 1px separators are tuned geometry.
  */
 @layer tx.components {
   .tx-toolbar {

@@ -1,3 +1,10 @@
+/**
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the 650 and 700 prose heading weights, em-based prose rhythm
+ * and the TOC widths are typographic layout, not design tokens.
+ */
 @layer tx.components {
   .tx-content-layout {
     display: block;

@@ -1,6 +1,12 @@
 /**
  * Dialog and AlertDialog surfaces on the token contract.
  * @layer tx.components so consumer utilities can override.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the per-size inline sizes (22rem to 56rem) and the 2rem
+ * viewport margin in min(), the 90vh block limit and the visually-hidden 1px
+ * box are layout limits, not design tokens.
  */
 @layer tx.components {
   .tx-dialog__overlay {

@@ -1,6 +1,13 @@
 /**
  * Kbd, Code and CopyButton. `@layer tx.components` so consumer CSS wins.
  * Logical properties; colors from `--tx-*`.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the 0.7rem key text and 0.8125rem code block text, the 2px
+ * key bottom edge, the em-based inline code padding, the 0.35rem copy button
+ * gap and the fractional copy button block paddings are tuned geometry; tab-
+ * size 2 is not a design token.
  */
 
 @layer tx.components {

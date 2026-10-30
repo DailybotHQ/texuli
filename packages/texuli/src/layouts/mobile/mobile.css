@@ -2,6 +2,11 @@
  * Mobile layouts: a sticky header (Back, title, actions), the screen, and a
  * sticky bottom tab bar or a drawer menu. Logical properties throughout, so
  * RTL mirrors; safe-area insets pad the edges. @layer tx.components.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: tab bar and header heights, the 0.6875rem badge text, the 3px
+ * indicator radius and the local z-index 2 are mobile chrome geometry.
  */
 @layer tx.components {
   .tx-mobile-layout-root {

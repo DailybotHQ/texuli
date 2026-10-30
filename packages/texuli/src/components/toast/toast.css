@@ -2,6 +2,13 @@
  * Toaster — @layer tx.components. Logical placement by `data-position` on the
  * viewport; token tones for AA pairs; enter and exit motion with a reduced
  * motion fallback.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the 24rem toast measure, the 44px close target below 40rem,
+ * the 0.7rem status glyph, the 4px action underline offset, the 1px body nudge
+ * and the contained-mode z-index 2000 (above the overlay stack base of 1000)
+ * are geometry or stacking contracts.
  */
 @layer tx.components {
   /*

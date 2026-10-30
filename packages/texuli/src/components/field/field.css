@@ -1,6 +1,12 @@
 /**
  * Field, Label, Description, FieldError, Form — @layer tx.components.
  * Logical properties; token colors for AA text on surfaces.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the horizontal label column (6rem to 10rem), the 12rem grid
+ * track, the 0.6 disabled opacity and the visually-hidden 1px box are layout
+ * limits, not design tokens.
  */
 @layer tx.components {
   .tx-field-root {

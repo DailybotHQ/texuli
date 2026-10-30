@@ -1,6 +1,12 @@
 /**
  * Badge, Tag and Chip — @layer tx.components so consumer utilities in later
  * layers can override. Token pairs keep small text AA against the fill.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the tag remove hit box (24px target from 1.5rem plus 0.375rem
+ * padding and -0.25rem margins) is fixed accessibility geometry; the 1px
+ * selected ring is a hairline.
  */
 @layer tx.components {
   .tx-badge,

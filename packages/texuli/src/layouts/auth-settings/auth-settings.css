@@ -1,6 +1,12 @@
 /**
  * Authentication, onboarding wizard and settings layouts.
  * @layer tx.components so consumer utilities can override.
+ * Token contract v2: sizes, spaces, radii, borders, shadows and z-indexes read
+ * component tokens (componentVar) or system tokens (systemVar), each with its
+ * registry fallback.
+ * Kept literals: the 1rem auth card radius (its fallback is above every theme
+ * radius step), panel widths, the decorative 0.2 to 0.85 opacities and the
+ * local z-index 1 are layout geometry.
  */
 @layer tx.components {
   .tx-auth-split {
