@@ -54,9 +54,7 @@ test('the live dashboard: source data, keyboard moves announced, breakpoints; ax
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'Dashboards people arrange, from the keyboard too'
   );
-  await expect(
-    page.getByText('@texuli/data/dashboard · unreleased · coming in 0.8.0')
-  ).toBeVisible();
+  await expect(page.getByText('@texuli/data/dashboard · new in 0.8.0')).toBeVisible();
   await expect(page.locator('[data-dashboards-breakpoints] tbody tr')).toHaveCount(3);
 
   await hydrated(page, '[data-dashboards-workbench]');

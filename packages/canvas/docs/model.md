@@ -4,7 +4,8 @@ The framework-free, DOM-free canvas model. Everything an editor, an agent
 tool or a server needs: the format, its validator, geometry, routing,
 operations and history. No Svelte, no DOM (an import-guard test enforces it).
 
-> **Status: in development.** Not on npm yet (`0.0.0` placeholder).
+> **Status: in development.** On npm from `0.8.0`, the package's first
+> release (pre-1.0).
 
 ```ts
 import { applyCanvasOps, createCanvas, moveOps, validateCanvas } from '@texuli/canvas/model';

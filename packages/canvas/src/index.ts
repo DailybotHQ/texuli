@@ -7,5 +7,5 @@ export * from './editor/index.ts';
 export * from './model/index.ts';
 export { CanvasViewer } from './viewer/index.ts';
 
-/** The package version (the 0.0.0 placeholder until its first release). */
-export const CANVAS_PACKAGE_VERSION = '0.0.0';
+/** The package version (first published as `0.8.0`). */
+export const CANVAS_PACKAGE_VERSION = '0.8.0';

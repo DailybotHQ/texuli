@@ -8,5 +8,5 @@ export * from './formula/index.ts';
 export * from './model/index.ts';
 export * from './view/index.ts';
 
-/** The package version (the 0.0.0 placeholder until its first release). */
-export const SHEETS_PACKAGE_VERSION = '0.0.0';
+/** The package version (first published as `0.8.0`). */
+export const SHEETS_PACKAGE_VERSION = '0.8.0';

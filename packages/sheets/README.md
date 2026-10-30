@@ -10,10 +10,11 @@ rewrite references, CSV import and export that neutralizes formula
 injection, and an accessible Svelte 5 sheet view over the `@texuli/data`
 grid editing layer.
 
-> **Status: in development (pre-1.0).** `@texuli/sheets` is not on npm yet:
-> its version is the `0.0.0` placeholder and it is private to the workspace
-> until a release the developer approves publishes it (planned for `0.8.0`,
-> PLAN_010; see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
+> **Status: in development (pre-1.0).** `@texuli/sheets` is published on
+> npm as `0.8.0`, with provenance (its first release; built in PLAN_010).
+> Under 0.x a new minor (`0.9.0`) may contain breaking changes, so pin the
+> exact version or use `^0.8.0`, which accepts only 0.8.x
+> (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 > Agents emit sheets as data through the `spreadsheet` catalog id of
 > blueprint spec `0.8.0`, checked by `checkSheetDraft`, and
 > `@texuli/player` paints them through its `sheetHost` seam with
@@ -27,6 +28,17 @@ depends on `@texuli/core` (the expression core), `@texuli/date` (date
 functions), `@texuli/data` (grid editing) and `texuli` (`cx`); `svelte`
 (^5.57.2) is a peer dependency. The `formula`, `model` and `csv` subpaths
 import no Svelte and no DOM.
+
+## Install
+
+```bash
+npm install @texuli/sheets
+```
+
+In the Texuli workspace, depend on it as `"@texuli/sheets": "workspace:*"`.
+It has no third-party runtime dependencies; its `@texuli/*` and `texuli`
+dependencies come with it. Import the token stylesheet once
+(`@texuli/tokens/base.css`).
 
 ## Quick start
 
@@ -58,7 +70,7 @@ import no Svelte and no DOM.
 | `./view` | `SheetView`: the accessible spreadsheet with tabs and a formula bar | [view](https://github.com/DailybotHQ/texuli/blob/main/packages/sheets/docs/view.md) |
 | `./host` | `createSheetPlayerHost`: the sheet half of the player's `sheetHost` seam (pass it as `sheetHost` on `Player`) and its draft check | [host](https://github.com/DailybotHQ/texuli/blob/main/packages/sheets/docs/host.md) |
 
-`SHEETS_PACKAGE_VERSION` is `0.0.0` until the first release.
+`SHEETS_PACKAGE_VERSION` equals the package version (`0.8.0`).
 
 ## Security
 

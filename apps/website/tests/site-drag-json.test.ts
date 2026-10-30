@@ -233,7 +233,7 @@ describe('the /workflows-page/json/ page', () => {
     expect(page).toContain('<JsonPreviewApp client:visible />');
     const copy = page.replace(/\s+/g, ' ');
     expect(copy).toContain('<code>@texuli/workflows</code>');
-    expect(copy).toContain('is in development and on npm as <code>0.7.0</code>');
+    expect(copy).toContain('is in development and on npm as <code>0.8.0</code>');
     expect(copy).toContain(
       "painter that uses it ships from the player's <code>0.4.0</code> release"
     );

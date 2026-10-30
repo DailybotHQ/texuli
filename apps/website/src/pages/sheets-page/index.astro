@@ -2,7 +2,7 @@
 import { FORMULA_LIMITS, SHEET_FUNCTION_NAMES } from '@texuli/sheets/formula';
 import { SHEET_LIMITS } from '@texuli/sheets/model';
 /**
- * /sheets-page/ — spreadsheets (@texuli/sheets, in development, coming in
+ * /sheets-page/ — spreadsheets (@texuli/sheets, in development, on npm from
  * 0.8.0): a live workbook in SheetView with the recalculation it caused,
  * every function of the closed set evaluated at build time plus a lab,
  * the dependency graph, cycles, limits and refused formulas evaluated by
@@ -89,11 +89,11 @@ const sheetHost = createSheetPlayerHost({ now: () => Date.now() });
 
 <BaseLayout
   title="Sheets"
-  description="Texuli spreadsheets (@texuli/sheets, in development, coming in 0.8.0): an owned formula engine with 54 functions, a dependency graph with incremental recalculation, cycle and limit errors, CSV that neutralizes formula injection, an accessible sheet view, and spreadsheets as agent data."
+  description="Texuli spreadsheets (@texuli/sheets, in development, on npm from 0.8.0): an owned formula engine with 54 functions, a dependency graph with incremental recalculation, cycle and limit errors, CSV that neutralizes formula injection, an accessible sheet view, and spreadsheets as agent data."
 >
   <FeaturePage
     name="sheets"
-    eyebrow={`@texuli/sheets · in development · coming in ${SHEETS_RELEASE}`}
+    eyebrow={`@texuli/sheets · in development · on npm from ${SHEETS_RELEASE}`}
     title="Spreadsheets with a formula engine you can trust"
     pieces={SHEETS_PIECES}
     piecesLabel="The pieces of the sheets package"
@@ -105,7 +105,7 @@ const sheetHost = createSheetPlayerHost({ now: () => Date.now() });
         functions, a dependency graph that recalculates only what changed, cycles and overruns as
         error values, and no way to build a reference from text. Around it a framework-free workbook,
         CSV that neutralizes formula injection, and an accessible sheet view. <code>@texuli/sheets</code>
-        is in development and coming in <code>{SHEETS_RELEASE}</code>; it is not published to npm yet.
+        is in development and on npm from <code>{SHEETS_RELEASE}</code>, a pre-1.0 release.
       </p>
     </Fragment>
 
@@ -334,8 +334,8 @@ const sheetHost = createSheetPlayerHost({ now: () => Date.now() });
         <div class="fx-panel">
           <h3>The blueprint the agent wrote</h3>
           <p class="fx-note">
-            Spec <code>0.8.0</code> adds the <code>spreadsheet</code> catalog id; it is in development
-            and coming in <code>{SHEETS_RELEASE}</code>.
+            Spec <code>0.8.0</code> adds the <code>spreadsheet</code> catalog id; it ships in the
+            <code>{SHEETS_RELEASE}</code> release of <code>@texuli/spec</code>.
           </p>
           <GuideCode code={AGENT_SHEET_JSON} label="The spreadsheet blueprint (JSON)" lang="text" />
           <h3>The hostile cell</h3>

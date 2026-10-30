@@ -141,12 +141,12 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       },
       {
         name: '@texuli/forms',
-        role: 'In development (unreleased; first release planned for 0.8.0): schema-driven forms: the closed form schema and its validator, conditional logic and cross-field rules on @texuli/core/expression, named formats, drafts and autosave, and the form controller (model, framework-free); SchemaForm, which paints any schema with texuli controls, multi-step and keyboard-complete (.); the player form host (host)',
+        role: 'In development (on npm from 0.8.0): schema-driven forms: the closed form schema and its validator, conditional logic and cross-field rules on @texuli/core/expression, named formats, drafts and autosave, and the form controller (model, framework-free); SchemaForm, which paints any schema with texuli controls, multi-step and keyboard-complete (.); the player form host (host)',
         dependsOn: ['core', 'texuli'],
       },
       {
         name: '@texuli/canvas',
-        role: 'In development (unreleased; first release planned for 0.8.0): the infinite canvas: the canvas format, its untrusted validator, geometry, connector routing on the curve shared with workflows, freehand simplification, operations with inverses and the op-log history (model, framework-free); CRDT collaboration on @texuli/document/sync (sync); SVG and PNG export (export); the accessible editor and viewer (editor, viewer); the player canvas host (host)',
+        role: 'In development (on npm from 0.8.0): the infinite canvas: the canvas format, its untrusted validator, geometry, connector routing on the curve shared with workflows, freehand simplification, operations with inverses and the op-log history (model, framework-free); CRDT collaboration on @texuli/document/sync (sync); SVG and PNG export (export); the accessible editor and viewer (editor, viewer); the player canvas host (host)',
         dependsOn: ['core', 'deck', 'document', 'drag', 'texuli'],
       },
     ],
@@ -162,7 +162,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       },
       {
         name: '@texuli/sheets',
-        role: 'In development (unreleased; first release planned for 0.8.0): spreadsheets: the formula language (a linear-time parser into the @texuli/core/expression AST, 54 documented functions, criteria, closed TEXT formats, reference rewriting; formula, framework-free); the sheet format, its untrusted validator, the dependency graph with incremental and bounded recalculation and cycle reports, and the workbook engine (model, framework-free); CSV import and export that neutralizes formula injection (csv); SheetView over the data grid editing (view); the sheet half of a player host (host)',
+        role: 'In development (on npm from 0.8.0): spreadsheets: the formula language (a linear-time parser into the @texuli/core/expression AST, 54 documented functions, criteria, closed TEXT formats, reference rewriting; formula, framework-free); the sheet format, its untrusted validator, the dependency graph with incremental and bounded recalculation and cycle reports, and the workbook engine (model, framework-free); CSV import and export that neutralizes formula injection (csv); SheetView over the data grid editing (view); the sheet half of a player host (host)',
         dependsOn: ['core', 'date', 'data', 'texuli'],
       },
     ],
@@ -346,7 +346,7 @@ export const LADDER_STAGES: readonly LadderStage[] = [
     layer: 'L3',
     runtimes: {
       web: {
-        text: 'Ships: styled components are published on npm as 0.7.0.',
+        text: 'Ships: styled components are published on npm as 0.8.0.',
         sources: [],
       },
       native: {

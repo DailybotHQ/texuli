@@ -69,7 +69,7 @@ test('the workbook: keyboard edits recalculate dependents, rows rewrite ranges; 
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'Spreadsheets with a formula engine you can trust'
   );
-  await expect(page.getByText('@texuli/sheets · in development · coming in 0.8.0')).toBeVisible();
+  await expect(page.getByText('@texuli/sheets · in development · on npm from 0.8.0')).toBeVisible();
   await expect(page.locator('[data-sheets-function]')).toHaveCount(54);
   await expect(page.locator('[data-sheets-function="SUMIF"] [data-sheets-result]')).toHaveText(
     '820'

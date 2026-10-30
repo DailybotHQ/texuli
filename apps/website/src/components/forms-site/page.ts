@@ -5,11 +5,11 @@
  */
 import type { FormFieldType } from '@texuli/forms/model';
 
-/** The release `@texuli/forms` is planned for. It is not on npm. */
+/** The release `@texuli/forms` first ships in (on npm, in development, pre-1.0). */
 export const FORMS_RELEASE = '0.8.0';
 
 /** The status line every surface of this page repeats. */
-export const FORMS_STATUS = `In development, coming in ${FORMS_RELEASE}: not published to npm yet.`;
+export const FORMS_STATUS = `In development, on npm from ${FORMS_RELEASE}, a pre-1.0 release.`;
 
 export interface FormsPiece {
   readonly name: string;

@@ -6,10 +6,10 @@
  */
 import type { CanvasTool } from '@texuli/canvas/editor';
 
-/** The release `@texuli/canvas` is planned for. It is not on npm. */
+/** The release `@texuli/canvas` first ships in (on npm, in development, pre-1.0). */
 export const CANVAS_RELEASE = '0.8.0';
 
-export const CANVAS_STATUS = `In development, coming in ${CANVAS_RELEASE}: not published to npm yet.`;
+export const CANVAS_STATUS = `In development, on npm from ${CANVAS_RELEASE}, a pre-1.0 release.`;
 
 export const CANVAS_PIECES: readonly { readonly name: string; readonly role: string }[] = [
   { name: 'canvas/model', role: 'format, validation, ops, history' },

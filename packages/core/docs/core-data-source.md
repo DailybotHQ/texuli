@@ -1,7 +1,7 @@
 # Core data sources: host-registered data for generated views
 
 **Package:** `@texuli/core`
-**Subpath:** `@texuli/core/data-source` (subpath only; unreleased, planned for 0.8.0)
+**Subpath:** `@texuli/core/data-source` (subpath only; new in 0.8.0)
 **Source:** `packages/core/src/data-source/`
 **Tests:** `packages/core/tests/data-source.test.ts`,
 `packages/core/tests/data-source-loader.test.ts`

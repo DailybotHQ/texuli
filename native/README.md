@@ -59,7 +59,7 @@ minimum-width tiles where possible. Its `gap` accepts only a fixed spacing set
 values); unsupported values produce a visible placeholder rather than
 interpreting arbitrary CSS.
 
-**Composition, code and structure (unreleased, planned for 0.8.0;
+**Composition, code and structure (spec 0.8.0;
 ADR-016).** `layout-stack`, `layout-row` (wrapping lines of 160dp items, or
 one scrolling line with `wrap: false`), `layout-split` (two panes at the
 catalog's ratios, stacked below 600dp) and `layout-tile` (a titled card;
@@ -154,7 +154,7 @@ evaluating expressions in Kotlin is planned. The Compose renderer fails
 closed: `schema-form` is not in `NativeRegistry`, so it paints a visible
 `not-on-this-target` placeholder.
 
-**Data-source bindings (spec 0.8.0, unreleased).** Validation parity,
+**Data-source bindings (spec 0.8.0).** Validation parity,
 loading planned. `Source.kt` (`texuli-spec`) checks a
 `{"$source": name, "query": {...}, "map": {...}}` prop with the TypeScript
 rules: a `sourceable` prop of the catalog, the closed shape, then the host's
@@ -168,7 +168,7 @@ match the web. The Compose renderer fails closed: a node that reads a source
 paints an `unsupported-source` placeholder (`readsDataSource()`); loading
 sources natively is planned.
 
-**Canvases (spec 0.8.0, unreleased).** Validation parity, painting
+**Canvases (spec 0.8.0).** Validation parity, painting
 planned. The generated decoders read the `canvas` id's `canvas` (the
 `$defs.canvas` shape: format, version and members), and
 `PropSchemaValidator` applies the grid range and the 5,000-shape and
@@ -181,7 +181,7 @@ renderer fails closed: `canvas` is not in `NativeRegistry`, so it paints a
 visible `not-on-this-target` placeholder. Painting canvases natively is
 planned.
 
-**Sheets (spec 0.8.0, unreleased).** Validation of the envelope, painting
+**Sheets (spec 0.8.0).** Validation of the envelope, painting
 planned. The generated decoders read the `spreadsheet` id's `sheet`
 (`$defs.sheet`: format, version and members), and `PropSchemaValidator`
 applies the 1-to-16-tab cap and each tab's row (10,000) and column (256)
@@ -192,7 +192,7 @@ Compose renderer fails closed: `spreadsheet` is not in `NativeRegistry`, so
 it paints a visible `not-on-this-target` placeholder. Painting sheets
 natively is planned.
 
-**Dashboards (spec 0.8.0, unreleased).** Validation parity for the props,
+**Dashboards (spec 0.8.0).** Validation parity for the props,
 painting planned. `data-dashboard` and `data-dashboard-widget` are in the
 generated vocabulary, so their prop schemas (the closed `layout` places in
 grid units, `columns`, `widgetId`) are checked natively as in TypeScript,

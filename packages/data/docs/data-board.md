@@ -133,7 +133,7 @@ Test: the "Board column descriptions, header snippet and column-only mode
 `labels.savingMove` while the promise is pending (its controls are disabled);
 when it rejects, the card goes back to where it was and `labels.moveFailed`
 is announced. `@texuli/player` uses this for boards whose items read a host
-data source (blueprint spec 0.8.0, unreleased): the move is saved through the
+data source (blueprint spec 0.8.0, new in 0.8.0): the move is saved through the
 source, optimistically
 ([player data sources](../../player/docs/data-sources.md)).
 

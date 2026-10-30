@@ -103,7 +103,7 @@
       "displayName": "Texuli on npm",
       "type": "application/vnd.npm.package+json",
       "url": "https://www.npmjs.com/package/texuli",
-      "description": "The Texuli package on npm (0.7.0, a pre-1.0 release): styled components built on owned primitives, tokens and the agent catalog. Twenty-one scoped @texuli/* packages ship alongside it.",
+      "description": "The Texuli package on npm (0.8.0, a pre-1.0 release): styled components built on owned primitives, tokens and the agent catalog. Twenty-four scoped @texuli/* packages ship alongside it.",
       "tags": ["npm", "svelte", "components", "pre-1.0"],
       "representativeQueries": ["install Texuli from npm", "which @texuli packages exist on npm"]
     }

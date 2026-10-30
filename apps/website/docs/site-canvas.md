@@ -4,8 +4,8 @@
 **Path:** `/canvas-page/` (Components group, after Forms)
 **Packages:** `@texuli/canvas` (`model`, `editor`, `viewer`, `sync`,
 `export`, `host`), `@texuli/document/sync`, `@texuli/player`; all of the
-canvas in development, coming in `0.8.0` and not published to npm yet (the
-private `0.0.0` placeholder); the `canvas` catalog id is spec `0.8.0`
+canvas in development and on npm from `0.8.0`, its first release (pre-1.0);
+the `canvas` catalog id is spec `0.8.0`
 **Tests:** `apps/website/tests/site-canvas.test.ts`, `tests/e2e/site-canvas.spec.ts`
 
 ## Goal
@@ -19,7 +19,7 @@ The frame is the shared `FeaturePage.astro`.
 
 | Section | Island | What it shows |
 | --- | --- | --- |
-| Hero | static | Status (in development, coming in `0.8.0`, not on npm) and the subpaths as pieces. |
+| Hero | static | Status (in development, on npm from `0.8.0`) and the subpaths as pieces. |
 | `#editor` | `CanvasWorkbench.svelte` | `CanvasEditor` (toolbar, surface with snapping and the minimap, shape tree) on `launchBoard()` (`board.ts`: every `SHAPE_TYPES` entry, every routing and cap); a bar with live counts, selection and zoom from the controller, Reset, and SVG and PNG export as downloads. |
 | `#vocabulary` | static | Shape types, tools with their keys, routes, caps, anchors, colors, dashes, text sizes and limits, read from the package at build time. |
 | `#keyboard` | static | The keyboard model of `packages/canvas/docs/editor.md`, with the tool row built from `TOOL_KEYS`. |

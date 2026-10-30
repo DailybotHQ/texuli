@@ -274,7 +274,7 @@ const result = validateDraft(agentOutput, { catalog, checkForm: checkFormDraft, 
 
 ## Sheets
 
-A `spreadsheet` node (spec 0.8.0, ADR-015; 0.8.0, unreleased) carries a
+A `spreadsheet` node (spec 0.8.0, ADR-015; new in 0.8.0) carries a
 Texuli sheet in its `sheet` prop (`$defs.sheet`): tabs of A1-addressed
 inputs, where text that starts with `=` is a formula in the closed sheet
 grammar. The catalog id is `spreadsheet` (`SPREADSHEET_ID`), not `sheet`,
@@ -303,7 +303,7 @@ const result = validateDraft(agentOutput, { catalog, checkSheet: checkSheetDraft
 
 ## Dashboards
 
-A `data-dashboard` node (spec 0.8.0; 0.8.0, unreleased) lays out
+A `data-dashboard` node (spec 0.8.0; new in 0.8.0) lays out
 `data-dashboard-widget` children on a grid (`layout`: each widget's place
 by `widgetId`). The prop schemas cannot say how the nodes compose, so the
 `render` check runs `checkDashboards(roots)` on the render tree

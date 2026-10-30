@@ -10,11 +10,12 @@ formats and validators are names, conditions are expressions of the closed
 language in `@texuli/core/expression`, and no schema carries a regular
 expression or code.
 
-> **Status: in development (pre-1.0).** `@texuli/forms` is not published
-> yet: it lives in this repository with the `0.0.0` placeholder version,
-> and its first release is planned for `0.8.0` (PLAN_010, ADR-015 in
+> **Status: in development (pre-1.0).** `@texuli/forms` is published on
+> npm as `0.8.0`, with provenance (its first release; built in PLAN_010,
+> ADR-015 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
-> Under 0.x a new minor may contain breaking changes
+> Under 0.x a new minor (`0.9.0`) may contain breaking changes, so pin the
+> exact version or use `^0.8.0`, which accepts only 0.8.x
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 It sits on layer L4 and depends on `texuli` and `@texuli/core`; `svelte`
@@ -23,8 +24,12 @@ framework-free.
 
 ## Install
 
-In the Texuli workspace, depend on it as `"@texuli/forms": "workspace:*"`
-(it is not on npm yet). Import the token stylesheet once
+```bash
+npm install @texuli/forms
+```
+
+In the Texuli workspace, depend on it as `"@texuli/forms": "workspace:*"`.
+Import the token stylesheet once
 (`@texuli/tokens/base.css`); `SchemaForm` imports its own CSS.
 
 ## Quick start

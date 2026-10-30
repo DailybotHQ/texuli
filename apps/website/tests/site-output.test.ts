@@ -1,6 +1,6 @@
 /**
- * /output-page/ (PLAN_010 T-site-080): honest status (unreleased, coming
- * in 0.8.0; English the only shipped language, translations planned),
+ * /output-page/ (PLAN_010 T-site-080): honest status (new in 0.8.0, on
+ * npm; English the only shipped language, translations planned),
  * fictional data, no HTML sink anywhere in the site's output code (the
  * email is shown as text or as a static file in a sandboxed frame, never
  * through srcdoc or innerHTML), lazy islands, the drafts rendering and
@@ -47,19 +47,21 @@ const SOURCES = [
 ].map((path) => [path, read(path)] as const);
 
 describe('output page: copy and safety', () => {
-  it('says the targets are unreleased and coming in 0.8.0, and that translations are planned', () => {
+  it('says the targets are new in 0.8.0 and on npm, and that translations are planned', () => {
     expect(OUTPUT_RELEASE).toBe('0.8.0');
-    expect(OUTPUT_STATUS).toContain('not in the published 0.7.0');
+    expect(OUTPUT_STATUS).toBe('New in 0.8.0: on npm from 0.8.0, a pre-1.0 release.');
     const copy = PAGE.replace(/\s+/g, ' ');
     // biome-ignore lint/suspicious/noTemplateCurlyInString: the page source holds this template literally.
-    expect(copy).toContain('unreleased · coming in ${OUTPUT_RELEASE}');
-    expect(copy).toContain('they are not in the <code>0.7.0</code> published to npm');
+    expect(copy).toContain('@texuli/core/i18n · new in ${OUTPUT_RELEASE}');
+    expect(copy).toContain('the previous release, <code>0.7.0</code>, is without them');
     const i18n = OUTPUT_SECTIONS.find((entry) => entry.id === 'i18n')?.summary ?? '';
     expect(i18n).toContain('English is the only language Texuli ships');
     expect(i18n).toContain('translations beyond English are planned');
     expect(read('components/output-site/locales/es.ts')).toContain('Texuli ships English only');
     for (const [path, source] of SOURCES) {
-      expect(source, path).not.toMatch(/production[- ]ready|is released|available on npm/i);
+      expect(source, path).not.toMatch(
+        /not (?:yet )?published to npm|coming in 0\.8|unreleased|production[- ]ready/i
+      );
       expect(source, path).not.toMatch(/\{@html|set:html|innerHTML|srcdoc|insertAdjacentHTML/);
       for (const [url] of source.matchAll(/https?:\/\/[^\s'"`)]+/g)) {
         expect(new URL(url).hostname, `${path}: ${url}`).toMatch(/(^|\.)example\.com$/);

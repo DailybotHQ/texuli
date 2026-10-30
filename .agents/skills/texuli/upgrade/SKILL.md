@@ -141,6 +141,37 @@ Move the backup back into the host's skills folder and verify it with
 - **Offline-safe.** An unreachable network ends with a report, never a
   partial install.
 
+## Texuli packages 0.8.0: breaking changes
+
+This sub-skill never upgrades packages; moving an app from `^0.7.0` to
+`^0.8.0` is the developer's install ([`../components/SKILL.md`](../components/SKILL.md)).
+`0.8.0` publishes `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets`
+for the first time; an app that does not use them sees only these changes.
+Before the move, check the app for:
+
+- **Spec 0.8.0:** validated drafts carry `spec: "0.8.0"`; a host that
+  compares the string must accept it. A `0.8.0` envelope with a `$source`
+  binding or a `schema-form`, `canvas`, `spreadsheet` or dashboard node is
+  refused by `0.7.0` validators, so upgrade the validating side first.
+- **A new catalog hash:** the new ids change the catalog hash; a host that
+  pins `catalogHash` refuses envelopes written for the `0.7.0` catalog
+  (`catalog-mismatch`) until it pins the new hash.
+- **`aria-required` inside a `Field`:** it lands only on roles that
+  support it; a `DatePicker`, `DateRangePicker`, `TimeField` or `Slider`
+  gets native `required` on its inputs, and a `ColorPicker` drops it. A
+  test or selector that expected it on every control needs an update.
+- **Component labels from one catalog:** `texuli` and
+  `@texuli/primitives` labels resolve through `@texuli/core/i18n`; the
+  English defaults stay and label props still win, but check labels an
+  app set another way.
+
+Not breaking: `validateDraft` takes `checkForm`, `checkCanvas` and
+`checkSheet`; the player takes `formHost`, `canvasHost`, `sheetHost`,
+`sourceRegistry` or `sourceLoader`, and `print`.
+
+New APIs in `0.8.0` (none of them in `0.7.0`) are listed in
+[`../build-ui/references/imports.md`](../build-ui/references/imports.md).
+
 ## Texuli packages 0.7.0: breaking changes
 
 This sub-skill never upgrades packages; moving an app from `^0.6.0` to

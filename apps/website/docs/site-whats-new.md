@@ -10,8 +10,8 @@ the home page hero)
 
 Every new package and capability of `0.6.0`, `0.7.0` and `0.8.0` on one page
 (PLAN_010 Amendment 8), grouped by release with the status the repository
-states: `0.6.0` and `0.7.0` are published on npm (`0.7.0` is current, pre-1.0),
-`0.8.0` is unreleased. Each feature has a small demo or a preview and a link
+states: `0.6.0`, `0.7.0` and `0.8.0` are published on npm (`0.8.0` is
+current, pre-1.0). Each feature has a small demo or a preview and a link
 to its full page.
 
 ## Cards

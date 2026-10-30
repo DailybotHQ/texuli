@@ -34,10 +34,10 @@ packages in lower layers.
 | L4 | `@texuli/chat` | Thread, message list, composer, typing indicator | core, primitives, tokens, texuli |
 | L4 | `@texuli/editor` | Rich text editor surface, toolbar, link dialog, headless controller, clipboard import | core, primitives, tokens, texuli |
 | L4 | `@texuli/workflows` | In development: interactive, accessible workflow graph editor and viewer (model, layout, editor) | core, drag, primitives, tokens, texuli |
-| L4 | `@texuli/forms` | In development (unreleased; first release planned for `0.8.0`): schema-driven forms: the closed form schema and its validator, conditional logic and cross-field rules on `@texuli/core/expression`, named formats, drafts and autosave, and the form controller (`model`, framework-free); `SchemaForm`, which paints any schema with texuli controls, multi-step and keyboard-complete (`.`); the player form host (`host`) | core, texuli |
-| L4 | `@texuli/canvas` | In development (unreleased; first release planned for `0.8.0`): the infinite canvas: the canvas format, its untrusted validator, geometry, connector routing on the curve shared with workflows, freehand simplification, operations with inverses and the op-log history (`model`, framework-free); CRDT collaboration on `@texuli/document/sync` (`sync`); SVG and PNG export (`export`); the accessible editor and viewer (`editor`, `viewer`); the player canvas host (`host`) | core, deck, document, drag, texuli |
+| L4 | `@texuli/forms` | In development (on npm from `0.8.0`): schema-driven forms: the closed form schema and its validator, conditional logic and cross-field rules on `@texuli/core/expression`, named formats, drafts and autosave, and the form controller (`model`, framework-free); `SchemaForm`, which paints any schema with texuli controls, multi-step and keyboard-complete (`.`); the player form host (`host`) | core, texuli |
+| L4 | `@texuli/canvas` | In development (on npm from `0.8.0`): the infinite canvas: the canvas format, its untrusted validator, geometry, connector routing on the curve shared with workflows, freehand simplification, operations with inverses and the op-log history (`model`, framework-free); CRDT collaboration on `@texuli/document/sync` (`sync`); SVG and PNG export (`export`); the accessible editor and viewer (`editor`, `viewer`); the player canvas host (`host`) | core, deck, document, drag, texuli |
 | L5 | `@texuli/blocks` | Content blocks (text, code, data, diagram, embed, interactive, map, media, structure): closed vocabulary, untrusted guard, formula AST | core, tokens, texuli, charts, data, media |
-| L5 | `@texuli/sheets` | In development (unreleased; first release planned for `0.8.0`): spreadsheets: the formula language (a linear-time parser into the `@texuli/core/expression` AST, 54 documented functions, criteria, closed TEXT formats, reference rewriting; `formula`, framework-free); the sheet format, its untrusted validator, the dependency graph with incremental and bounded recalculation and cycle reports, and the workbook engine (`model`, framework-free); CSV import and export that neutralizes formula injection (`csv`); `SheetView` over the data grid editing (`view`); the sheet half of a player host (`host`) | core, date, data, texuli |
+| L5 | `@texuli/sheets` | In development (on npm from `0.8.0`): spreadsheets: the formula language (a linear-time parser into the `@texuli/core/expression` AST, 54 documented functions, criteria, closed TEXT formats, reference rewriting; `formula`, framework-free); the sheet format, its untrusted validator, the dependency graph with incremental and bounded recalculation and cycle reports, and the workbook engine (`model`, framework-free); CSV import and export that neutralizes formula injection (`csv`); `SheetView` over the data grid editing (`view`); the sheet half of a player host (`host`) | core, date, data, texuli |
 | L6 | `@texuli/catalog` | The agent catalog (manifests per group, build) and the renderer with no HTML sinks; `schema-form`, `canvas` and `spreadsheet` drafts are checked by host-injected validators (`checkForm`, `checkCanvas`, `checkSheet` from `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets`), so the catalog depends on none of them and fails closed without one (`form-unchecked`, `canvas-unchecked`, `sheet-unchecked`) | core, spec, texuli, charts, data, blocks, media |
 | L7 | `@texuli/player` | Blueprint player runtime and styles | blocks, catalog, charts, chat, data, media, primitives, spec, texuli, workflows |
 | L8 | `@texuli/tools` | Copy-in CLI (`texuli-add`, `texuli-init`, `texuli-update`), `texuli-llms`, A2UI adapter, custom elements and the golden set | core, tokens, catalog, blocks, charts, media, deck, document |
@@ -61,12 +61,13 @@ Not layers, because they consume the library:
   website (see [The website](#the-website)).
 
 `@texuli/examples` is never packed (`NEVER_PACKED` in
-`scripts/packages.ts`); `pnpm verify:packages` packs the other 22, and all
-22 are released on npm as `0.7.0`, the first release of `@texuli/document`
-and `@texuli/pages` (new in PLAN_010; the previous release, `0.6.0`, had
-20 packages);
+`scripts/packages.ts`); `pnpm verify:packages` packs the other 25, and all
+25 are released on npm as `0.8.0`, the first release of `@texuli/forms`,
+`@texuli/canvas` and `@texuli/sheets` (new in PLAN_010; the previous
+release, `0.7.0`, had 22 packages);
 `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/editor`,
-`@texuli/document` and `@texuli/pages` are in development
+`@texuli/document`, `@texuli/pages`, `@texuli/forms`, `@texuli/canvas` and
+`@texuli/sheets` are in development
 and sit in the `publish.yml` wave order ahead of their dependents
 ([RELEASE](RELEASE.md)).
 
@@ -83,12 +84,12 @@ L0  core · date · deck · drag · spec (framework-free)
           ▲ dependencies point down only (scripts/check-layers.ts)
 ```
 
-The packages and subpaths PLAN_010 plans (forms, canvas, sheets and
-more) are not in this table or in `LAYERS` until they land (the motion,
-streaming, markup, ZIP and stage-core subpaths landed in `0.6.0`);
-`@texuli/document` and `@texuli/pages` have landed and are on npm from
-`0.7.0` (in development). The decided
-names and layers are listed in
+Every package PLAN_010 decided has landed and is in this table and in
+`LAYERS` (the motion, streaming, markup, ZIP and stage-core subpaths landed
+in `0.6.0`; `@texuli/document` and `@texuli/pages` are on npm from `0.7.0`,
+and `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` from `0.8.0`, all
+in development). What is still planned, and the decided
+names and layers, are listed in
 [Planned (PLAN_010)](#planned-plan010).
 
 ### What the layer guard enforces
@@ -181,12 +182,16 @@ agent output (JSON) ─► @texuli/spec migrate + validate (closed vocabulary, s
                     ─► @texuli/player painters ─► URL policy ('untrusted') on every link and source
 ```
 
-- **Catalog groups.** `@texuli/catalog` builds 163 ids from manifest groups:
+- **Catalog groups.** `@texuli/catalog` builds 168 ids from manifest groups:
   `content`, `display`, `forms`, `layouts`, `overlays`, (new in `0.4.0`)
-  `composition`, `data`, `chat`, `state` and `workflows`, and (new in
-  `0.7.0`) `documents`, whose `document` id carries a Texuli document as
-  data, validated by a host-supplied check (`@texuli/pages/host`). 70 ids
-  are agent-emittable; the rest are app tier.
+  `composition`, `data`, `chat`, `state` and `workflows`, (new in `0.7.0`)
+  `documents`, whose `document` id carries a Texuli document as data,
+  validated by a host-supplied check (`@texuli/pages/host`), and (new in
+  `0.8.0`) `schema-forms`, `canvas` and `sheets` (`schema-form`, `canvas`
+  and `spreadsheet`, checked by `@texuli/forms/host`, `@texuli/canvas/host`
+  and `@texuli/sheets/host`), plus `data-dashboard` and
+  `data-dashboard-widget` in `data`. 75 ids are agent-emittable; the rest
+  are app tier.
 - **Player painters.** `@texuli/player` loads one lazy painter per
   emittable id (`PLAYER_LOADERS`): layouts, blocks, charts, media, data views
   (grid, tree, board, calendar, timeline, map, files), chat display, state
@@ -214,7 +219,7 @@ agent output (JSON) ─► @texuli/spec migrate + validate (closed vocabulary, s
 
 ## Decks: engine and stage
 
-ADR-009 splits presentations in two packages (both on npm as `0.7.0`;
+ADR-009 splits presentations in two packages (both on npm as `0.8.0`;
 `@texuli/deck` was first released in `0.4.0`):
 
 - **`@texuli/deck` (L0)** owns everything that is data: deck model v2
@@ -254,8 +259,12 @@ document and offers a `deckHost` seam (and `chrome={false}`) so a host with
 **Planned, not shipped**, except the rows marked as released in `0.6.0`
 (`@texuli/core/motion`, `@texuli/core/markup`, `@texuli/core/zip`, the
 `@texuli/tokens` motion tokens, `@texuli/spec/stream` and the player's
-streaming mode) and in `0.7.0` (`@texuli/document` and `@texuli/pages`,
-every subpath, `collab` included, and spec `0.7.0`). These are the package
+streaming mode), in `0.7.0` (`@texuli/document` and `@texuli/pages`,
+every subpath, `collab` included, and spec `0.7.0`) and in `0.8.0`
+(`@texuli/forms`, `@texuli/canvas`, `@texuli/sheets`, the core
+`expression`, `data-source` and `i18n` subpaths, the data dashboard, the
+tools email and print outputs, the player print mode and spec `0.8.0`).
+These are the package
 names, layers and subpaths decided by
 ADR-010 to ADR-016 in [DECISIONS](DECISIONS.md) for the 0.6.0, 0.7.0 and
 0.8.0 release waves. Each package stays "in development" until a release
@@ -268,9 +277,9 @@ New packages:
 | Planned layer | Package | Subpaths | What it will hold | Will depend on | Release wave | Decision |
 | --- | --- | --- | --- | --- | --- | --- |
 | L1 | `@texuli/document` (released in `0.7.0`: `.`, `model`, `schema`, `ops`, `markdown`, `paged`, `docx`, `pdf`, `sync`, `collab`; in the layer table) | none left | Framework-free, DOM-free document engine: the block document format with persisted ids, typed operations and bounded RFC 6902 patches, the untrusted loader, Markdown through the core codec, pagination, DOCX and PDF writers, and the CRDT sync layer | core, deck | 0.7.0 | [ADR-011](DECISIONS.md#adr-011-document-packages-texulidocument-l1-engine-and-texulipages-l8-editor), [ADR-010](DECISIONS.md#adr-010-document-sync-an-owned-crdt-behind-an-op-log-transport) |
-| L4 | `@texuli/forms` (in the repository: `.`, `model`, `host`, `styles.css`; in the layer table; unreleased) | none left | Schema-driven forms: fields, steps, conditional logic on the shared expression AST, closed validation rules, drafts and autosave | core, texuli | 0.8.0 | [ADR-015](DECISIONS.md#adr-015-one-bounded-expression-language-and-closed-vocabularies-for-agent-logic) |
-| L4 | `@texuli/canvas` (in the repository: `.`, `model`, `sync`, `export`, `editor`, `viewer`, `host`; in the layer table; unreleased) | none left | Infinite canvas: shapes, text, connectors, frames, selection, zoom and pan on `@texuli/drag` spatial geometry (the edge curve moved into `@texuli/drag/graph`, shared with workflows), synced through `@texuli/document/sync` | core, deck, document, drag, texuli | 0.8.0 | [ADR-010](DECISIONS.md#adr-010-document-sync-an-owned-crdt-behind-an-op-log-transport) |
-| L5 | `@texuli/sheets` (in the repository: `.`, `formula`, `model`, `csv`, `view`, `host`; in the layer table; unreleased) | `sync` (collaboration on `@texuli/document/sync`, planned) | Spreadsheets: the owned formula engine (parser, function set, dependency graph, incremental and bounded recalculation), a sheet view over the data grid editing, CSV import and export; L5 because it builds on `@texuli/data` (L4) | core, date, data, texuli | 0.8.0 | [ADR-015](DECISIONS.md#adr-015-one-bounded-expression-language-and-closed-vocabularies-for-agent-logic) |
+| L4 | `@texuli/forms` (released in `0.8.0`: `.`, `model`, `host`, `styles.css`; in the layer table) | none left | Schema-driven forms: fields, steps, conditional logic on the shared expression AST, closed validation rules, drafts and autosave | core, texuli | 0.8.0 | [ADR-015](DECISIONS.md#adr-015-one-bounded-expression-language-and-closed-vocabularies-for-agent-logic) |
+| L4 | `@texuli/canvas` (released in `0.8.0`: `.`, `model`, `sync`, `export`, `editor`, `viewer`, `host`; in the layer table) | none left | Infinite canvas: shapes, text, connectors, frames, selection, zoom and pan on `@texuli/drag` spatial geometry (the edge curve moved into `@texuli/drag/graph`, shared with workflows), synced through `@texuli/document/sync` | core, deck, document, drag, texuli | 0.8.0 | [ADR-010](DECISIONS.md#adr-010-document-sync-an-owned-crdt-behind-an-op-log-transport) |
+| L5 | `@texuli/sheets` (released in `0.8.0`: `.`, `formula`, `model`, `csv`, `view`, `host`; in the layer table) | `sync` (collaboration on `@texuli/document/sync`, planned) | Spreadsheets: the owned formula engine (parser, function set, dependency graph, incremental and bounded recalculation), a sheet view over the data grid editing, CSV import and export; L5 because it builds on `@texuli/data` (L4) | core, date, data, texuli | 0.8.0 | [ADR-015](DECISIONS.md#adr-015-one-bounded-expression-language-and-closed-vocabularies-for-agent-logic) |
 | L8 | `@texuli/pages` (released in `0.7.0`: `.`, `editor`, `reader`, `paged`, `export`, `host`, `collab`, `styles.css`; in the layer table) | none left | The block document editor and reader on `@texuli/editor`: slash menu, block drag, nested pages, columns, live embeds painted by the player, paged view and print, comments, suggestions, history and presence | document, editor, blocks, player, drag, primitives, tokens, texuli, core | 0.7.0 | [ADR-011](DECISIONS.md#adr-011-document-packages-texulidocument-l1-engine-and-texulipages-l8-editor) |
 
 New subpaths in existing packages:
@@ -279,13 +288,13 @@ New subpaths in existing packages:
 | --- | --- | --- | --- | --- |
 | `@texuli/core` | `motion`, `motion/spring` (released in `0.6.0`) | Presence enter and exit, FLIP layout, shared elements, sequences and timelines, the spring solver, on the Web Animations API; reduced motion is instant | 0.6.0 | [ADR-013](DECISIONS.md#adr-013-motion-runtime-web-animations-with-an-owned-spring-solver) |
 | `@texuli/core` | `markup`, `zip` (released in `0.6.0`) | Typed, escaped XML and HTML builders with URL-policy attributes, and the deterministic ZIP writer (stored, or deflated through `CompressionStream`) | 0.6.0 | [ADR-016](DECISIONS.md#adr-016-static-output-targets-and-i18n) |
-| `@texuli/core` | `expression`, `data-source` (in the repository; unreleased, 0.8.0) | The bounded expression evaluator with a closed function table; host-registered data sources with pagination, filters, sorting, optimistic updates and cancellation | 0.8.0 | [ADR-015](DECISIONS.md#adr-015-one-bounded-expression-language-and-closed-vocabularies-for-agent-logic) |
-| `@texuli/core` | `i18n` (in the repository; unreleased, 0.8.0) | The message catalog, placeholder, plural and select formatting, lazy locale loading, a pseudo-locale; `texuli` and `@texuli/primitives` resolve their labels through it (`setI18nContext`, `useMessages`) | 0.8.0 | [ADR-016](DECISIONS.md#adr-016-static-output-targets-and-i18n) |
+| `@texuli/core` | `expression`, `data-source` (released in `0.8.0`) | The bounded expression evaluator with a closed function table; host-registered data sources with pagination, filters, sorting, optimistic updates and cancellation | 0.8.0 | [ADR-015](DECISIONS.md#adr-015-one-bounded-expression-language-and-closed-vocabularies-for-agent-logic) |
+| `@texuli/core` | `i18n` (released in `0.8.0`) | The message catalog, placeholder, plural and select formatting, lazy locale loading, a pseudo-locale; `texuli` and `@texuli/primitives` resolve their labels through it (`setI18nContext`, `useMessages`) | 0.8.0 | [ADR-016](DECISIONS.md#adr-016-static-output-targets-and-i18n) |
 | `@texuli/tokens` | `motion`, and motion properties in the existing CSS (released in `0.6.0`) | Durations, easings and springs as data and `--tx-motion-*` properties | 0.6.0 | [ADR-013](DECISIONS.md#adr-013-motion-runtime-web-animations-with-an-owned-spring-solver) |
-| `@texuli/spec` | `stream` and `motion` (released in `0.6.0`, with spec `0.6.0`); spec `0.7.0` (released in `0.7.0`: the document shape, the patch schema and node keys) | The incremental, bounded JSON tokenizer for streamed blueprints and the closed motion vocabulary; spec minors 0.6.0, 0.7.0 and 0.8.0 | 0.6.0 (`stream`, `motion`), 0.7.0 (documents), 0.8.0 (later spec minor) | [ADR-014](DECISIONS.md#adr-014-streaming-generation-paint-only-validated-closed-node-shells), [ADR-012](DECISIONS.md#adr-012-spec-evolution-one-additive-minor-per-release-wave) |
-| `@texuli/data` | `dashboard`, `dashboard/engine` (in the repository; unreleased, 0.8.0) | The widget grid with drag and resize, keyboard equivalents, breakpoints and persistence; painted by the player as `data-dashboard` and `data-dashboard-widget` | 0.8.0 | [ADR-010](DECISIONS.md#adr-010-document-sync-an-owned-crdt-behind-an-op-log-transport) |
-| `@texuli/tools` | `email`, `print` (in the repository; unreleased, 0.8.0) | Email-safe HTML and plain text from validated blueprints, with typed inline styles (email dark mode is planned); and a headless PDF of a validated blueprint through `@texuli/document` (`print`) | 0.8.0 | [ADR-016](DECISIONS.md#adr-016-static-output-targets-and-i18n) |
-| `@texuli/player` | streaming mode (released in `0.6.0`: `<Player stream>`), print mode (no new subpath) | Paint validated node shells while a blueprint streams; print styles for blueprints | 0.6.0 (streaming), 0.8.0 (print) | [ADR-014](DECISIONS.md#adr-014-streaming-generation-paint-only-validated-closed-node-shells), [ADR-016](DECISIONS.md#adr-016-static-output-targets-and-i18n) |
+| `@texuli/spec` | `stream` and `motion` (released in `0.6.0`, with spec `0.6.0`); spec `0.7.0` (released in `0.7.0`: the document shape, the patch schema and node keys); spec `0.8.0` (released in `0.8.0`: data-source bindings, forms, canvases, dashboards and spreadsheets) | The incremental, bounded JSON tokenizer for streamed blueprints and the closed motion vocabulary; spec minors 0.6.0, 0.7.0 and 0.8.0 | 0.6.0 (`stream`, `motion`), 0.7.0 (documents), 0.8.0 (sources, forms, canvases, dashboards, sheets) | [ADR-014](DECISIONS.md#adr-014-streaming-generation-paint-only-validated-closed-node-shells), [ADR-012](DECISIONS.md#adr-012-spec-evolution-one-additive-minor-per-release-wave) |
+| `@texuli/data` | `dashboard`, `dashboard/engine` (released in `0.8.0`) | The widget grid with drag and resize, keyboard equivalents, breakpoints and persistence; painted by the player as `data-dashboard` and `data-dashboard-widget` | 0.8.0 | [ADR-010](DECISIONS.md#adr-010-document-sync-an-owned-crdt-behind-an-op-log-transport) |
+| `@texuli/tools` | `email`, `print` (released in `0.8.0`) | Email-safe HTML and plain text from validated blueprints, with typed inline styles (email dark mode is planned); and a headless PDF of a validated blueprint through `@texuli/document` (`print`) | 0.8.0 | [ADR-016](DECISIONS.md#adr-016-static-output-targets-and-i18n) |
+| `@texuli/player` | streaming mode (released in `0.6.0`: `<Player stream>`), print mode (released in `0.8.0`; no new subpath) | Paint validated node shells while a blueprint streams; print styles for blueprints | 0.6.0 (streaming), 0.8.0 (print) | [ADR-014](DECISIONS.md#adr-014-streaming-generation-paint-only-validated-closed-node-shells), [ADR-016](DECISIONS.md#adr-016-static-output-targets-and-i18n) |
 
 ## The website
 
@@ -323,9 +332,9 @@ The pure decisions live in `apps/website/src/lib/` and are tested in
     way npm would publish it: `dist/` via `@sveltejs/package`, a derived
     manifest, publint and attw. It publishes nothing.
   - Workspace packages stay `private: true`; the publish workflow publishes
-    the 22 packable packages, `@texuli/document` and `@texuli/pages`
-    included, to npm as the `0.7.0` release (dist-tags `latest` and
-    `next`), with provenance
+    the 25 packable packages, `@texuli/forms`, `@texuli/canvas` and
+    `@texuli/sheets` included, to npm as the `0.8.0` release (dist-tags
+    `latest` and `next`), with provenance
     ([RELEASE](RELEASE.md)).
 - **Tests:**
   - **Unit:** Vitest (happy-dom) in `packages/*/tests/`,

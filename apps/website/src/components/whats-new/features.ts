@@ -2,8 +2,8 @@
  * The features /whats-new/ showcases, grouped by the release that carries
  * them, each with its honest status, its packages, the page that shows it
  * in full and the kind of demo or preview the hub paints. Plain data, so
- * the page and its tests share one source. Releases: 0.6.0 and 0.7.0 are
- * published on npm (0.7.0 is `latest`); 0.8.0 is unreleased.
+ * the page and its tests share one source. Releases: 0.6.0, 0.7.0 and 0.8.0
+ * are published on npm (0.8.0 is `latest`).
  */
 
 export type ReleaseId = '0.6.0' | '0.7.0' | '0.8.0';
@@ -19,16 +19,16 @@ export interface Release {
 export const RELEASES: readonly Release[] = [
   {
     id: '0.8.0',
-    title: 'Coming in 0.8.0',
-    status: 'Unreleased: in development in the repository, not on npm yet.',
-    published: false,
+    title: '0.8.0: forms, canvas, sheets and output',
+    status: 'Published on npm as 0.8.0, the current release (pre-1.0).',
+    published: true,
     summary:
-      'Forms, data sources, the canvas, spreadsheets, dashboards, email and PDF output, and one message catalog for every label, with blueprint spec 0.8.0. @texuli/forms, @texuli/canvas and @texuli/sheets will be published for the first time.',
+      'Forms, data sources, the canvas, spreadsheets, dashboards, email and PDF output, and one message catalog for every label, with blueprint spec 0.8.0. @texuli/forms, @texuli/canvas and @texuli/sheets were published for the first time; all three are still in development.',
   },
   {
     id: '0.7.0',
     title: '0.7.0: documents',
-    status: 'Published on npm as 0.7.0, the current release (pre-1.0).',
+    status: 'Published on npm as 0.7.0; everything in it is also in 0.8.0.',
     published: true,
     summary:
       'A block document engine with collaboration, the Notion-like page editor, and documents as agent data in blueprint spec 0.7.0. @texuli/document and @texuli/pages were published for the first time; both are still in development.',
@@ -36,7 +36,7 @@ export const RELEASES: readonly Release[] = [
   {
     id: '0.6.0',
     title: '0.6.0: motion and live generation',
-    status: 'Published on npm as 0.6.0; everything in it is also in 0.7.0.',
+    status: 'Published on npm as 0.6.0; everything in it is also in 0.7.0 and 0.8.0.',
     published: true,
     summary:
       'One API contract for every component, a motion system with a closed vocabulary, and blueprints that paint while they stream, with blueprint spec 0.6.0.',

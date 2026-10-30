@@ -1,6 +1,6 @@
 /**
  * /forms-page/ (PLAN_010 T-site-features): honest status copy (in
- * development, coming in 0.8.0, not on npm), fictional data, no HTML sinks,
+ * development, on npm from 0.8.0, its first release), fictional data, no HTML sinks,
  * lazy islands, sections that match the page, and the demos' data checked
  * against @texuli/forms itself: every field type, every named format with a
  * sample it accepts and one it refuses, every closed rule shown by the
@@ -88,28 +88,30 @@ const compile = (schema: unknown) => {
 };
 
 describe('forms page: copy and safety', () => {
-  it('says @texuli/forms is in development and coming in 0.8.0, and never that it is on npm', () => {
+  it('says @texuli/forms is in development and on npm from 0.8.0, its first release', () => {
     const pkg = JSON.parse(readFileSync(resolve('packages/forms/package.json'), 'utf8')) as {
       version: string;
       private?: boolean;
     };
-    // The claim "not published to npm yet" holds only while the package is the private placeholder.
-    expect(pkg.version).toBe('0.0.0');
+    // First published in 0.8.0; the copy names that release.
+    expect(pkg.version).toBe(FORMS_RELEASE);
     expect(pkg.private).toBe(true);
     expect(FORMS_RELEASE).toBe('0.8.0');
-    expect(FORMS_STATUS).toBe('In development, coming in 0.8.0: not published to npm yet.');
+    expect(FORMS_STATUS).toBe('In development, on npm from 0.8.0, a pre-1.0 release.');
     const copy = PAGE.replace(/\s+/g, ' ');
     expect(copy).toMatch(
-      /eyebrow=\{`@texuli\/forms · in development · coming in \$\{FORMS_RELEASE\}`\}/
+      /eyebrow=\{`@texuli\/forms · in development · on npm from \$\{FORMS_RELEASE\}`\}/
     );
-    expect(copy).toContain('it is not published to npm yet');
     expect(copy).toContain(
-      'description="Texuli schema-driven forms (@texuli/forms, in development, coming in 0.8.0)'
+      'is in development and on npm from <code>{FORMS_RELEASE}</code>, a pre-1.0 release'
+    );
+    expect(copy).toContain(
+      'description="Texuli schema-driven forms (@texuli/forms, in development, on npm from 0.8.0)'
     );
     expect(copy).toContain('<a href="/guides/forms/">forms guide</a>');
     for (const [path, source] of SOURCES) {
       expect(source, path).not.toMatch(
-        /on npm from|production[- ]ready|is released|available on npm|npm install @texuli\/forms/i
+        /not (?:yet )?published to npm|coming in 0\.8|unreleased|production[- ]ready/i
       );
     }
   });

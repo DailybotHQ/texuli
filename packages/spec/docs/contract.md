@@ -231,7 +231,7 @@ stamps `spec` only.
 ## Spec 0.8.0: forms (T-forms)
 
 ADR-012 and ADR-015; additive, so the `0.7.0 → 0.8.0` migration stamps
-`spec` only. (Spec 0.8.0 is the open pin of the 0.8.0 wave; other
+`spec` only. (Spec 0.8.0 ships in `@texuli/spec@0.8.0`; the other
 additions of the wave are described with their tasks.)
 
 - **The expression AST.** `$defs.expression` is the closed AST of

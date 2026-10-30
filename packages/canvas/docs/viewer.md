@@ -9,7 +9,8 @@ it. Canvas embeds in `@texuli/pages` documents are typed references today:
 the editor and reader show the reference and pass no `canvasHost` to the
 player, so painting a canvas embed with this viewer is planned.
 
-> **Status: in development.** Not on npm yet (`0.0.0` placeholder).
+> **Status: in development.** On npm from `0.8.0`, the package's first
+> release (pre-1.0).
 
 ```svelte
 <script lang="ts">

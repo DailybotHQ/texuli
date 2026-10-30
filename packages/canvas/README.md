@@ -9,10 +9,11 @@ clipboard and undo through an op log, all in a framework-free model; CRDT
 collaboration on `@texuli/document/sync`; an accessible Svelte 5 editor and
 viewer; and SVG and PNG export with no HTML sinks.
 
-> **Status: in development (pre-1.0).** `@texuli/canvas` is not on npm yet:
-> its version is the `0.0.0` placeholder and it is private to the workspace
-> until a release the developer approves publishes it (planned for `0.8.0`,
-> PLAN_010; see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
+> **Status: in development (pre-1.0).** `@texuli/canvas` is published on
+> npm as `0.8.0`, with provenance (its first release; built in PLAN_010).
+> Under 0.x a new minor (`0.9.0`) may contain breaking changes, so pin the
+> exact version or use `^0.8.0`, which accepts only 0.8.x
+> (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 > Agents emit canvases as data through the `canvas` catalog id of blueprint
 > spec `0.8.0`; the Kotlin twin validates them and does not paint them yet.
 
@@ -22,6 +23,17 @@ builders, motion, announcer), `@texuli/deck` (the schema kit),
 `@texuli/drag` (pan, zoom, snapping, resize and the edge curve shared with
 `@texuli/workflows`) and `texuli` (the motion settings); `svelte`
 (^5.57.2) is a peer dependency.
+
+## Install
+
+```bash
+npm install @texuli/canvas
+```
+
+In the Texuli workspace, depend on it as `"@texuli/canvas": "workspace:*"`.
+It has no third-party runtime dependencies; its `@texuli/*` and `texuli`
+dependencies come with it. Import the token stylesheet once
+(`@texuli/tokens/base.css`).
 
 ## Quick start
 
@@ -54,7 +66,7 @@ builders, motion, announcer), `@texuli/deck` (the schema kit),
 | `./viewer` | `CanvasViewer`: a read-only canvas with its structure as text | [viewer](https://github.com/DailybotHQ/texuli/blob/main/packages/canvas/docs/viewer.md) |
 | `./host` | `createCanvasPlayerHost`: the `canvasHost` of `@texuli/player` for agent canvases | [host](https://github.com/DailybotHQ/texuli/blob/main/packages/canvas/docs/host.md) |
 
-`CANVAS_PACKAGE_VERSION` is `0.0.0` until the first release.
+`CANVAS_PACKAGE_VERSION` equals the package version (`0.8.0`).
 
 ## Security
 

@@ -69,7 +69,9 @@ test('every feature by release, each demo working, links that resolve; axe light
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('What’s new in Texuli');
   await expect(page.locator('[data-hub-release]')).toHaveCount(3);
   await expect(page.locator('[data-hub-feature]')).toHaveCount(13);
-  await expect(page.locator('[data-hub-release="0.8.0"] .hub__status')).toContainText('Unreleased');
+  await expect(page.locator('[data-hub-release="0.8.0"] .hub__status')).toContainText(
+    'Published on npm as 0.8.0'
+  );
   await expect(page.locator('[data-hub-release="0.7.0"] .hub__status')).toContainText(
     'Published on npm as 0.7.0'
   );

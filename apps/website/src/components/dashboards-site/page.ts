@@ -4,10 +4,10 @@
  * and the docs. Plain data, so the page and its tests share one source.
  */
 
-/** The release the dashboard is planned for. It is not in the published 0.7.0. */
+/** The release the dashboard first ships in (a new subpath of @texuli/data, pre-1.0). */
 export const DASHBOARDS_RELEASE = '0.8.0';
 
-export const DASHBOARDS_STATUS = `Unreleased, coming in ${DASHBOARDS_RELEASE}: not in the published @texuli/data 0.7.0.`;
+export const DASHBOARDS_STATUS = `New in ${DASHBOARDS_RELEASE}: on npm in @texuli/data from ${DASHBOARDS_RELEASE}, a pre-1.0 release.`;
 
 export const DASHBOARDS_PIECES: readonly { readonly name: string; readonly role: string }[] = [
   { name: 'data/dashboard', role: 'Dashboard and DashboardWidget' },

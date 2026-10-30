@@ -4,8 +4,8 @@
 **Path:** `/dashboards-page/` (Components group, after Sheets)
 **Packages:** `@texuli/data/dashboard` and `/dashboard/engine`,
 `@texuli/core/data-source`, `@texuli/player`; the dashboard is a new subpath
-of `@texuli/data`, unreleased and coming in `0.8.0` (not in the published
-`0.7.0`); the `data-dashboard` and `data-dashboard-widget` catalog ids are
+of `@texuli/data`, new in `0.8.0` (the published `0.7.0` is without it);
+the `data-dashboard` and `data-dashboard-widget` catalog ids are
 spec `0.8.0`
 **Tests:** `apps/website/tests/site-dashboards.test.ts`, `tests/e2e/site-dashboards.spec.ts`
 

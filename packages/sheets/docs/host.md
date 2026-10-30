@@ -6,8 +6,7 @@ The sheet half of the `sheetHost` seam of `@texuli/player`, shaped like the
 is parsed at draft time) and paints each valid `spreadsheet` node in place
 through `present`. Without a sheet host the player refuses `spreadsheet`
 nodes (`sheet-unchecked`). Outside the player, a host can pass the same
-check to `validateDraft`. Both sides are on this branch and not yet
-published.
+check to `validateDraft`. Both sides ship in `0.8.0`.
 
 ```svelte
 <script lang="ts">

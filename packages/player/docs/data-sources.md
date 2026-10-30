@@ -1,6 +1,6 @@
 # Player data sources (blueprint spec 0.8.0)
 
-**Status:** unreleased, planned for `0.8.0` (ADR-012, ADR-015).
+**Status:** new in `0.8.0` (ADR-012, ADR-015).
 **Source:** `packages/player/src/sources/`, `packages/player/src/state/bind.ts`
 **Tests:** `packages/player/tests/data-sources.test.ts`, the `source-tickets`
 golden in `packages/player/tests/golden.test.ts` and
@@ -68,7 +68,7 @@ load lazily, only when one of these props is set.
 The catalog's `sourceable` list (spec 0.8.0): `data-grid.rows`,
 `data-board.items`, `data-tree-view.items`, `data-calendar.events`,
 `data-files.entries`, `data-timeline.tasks`,
-`data-notification-inbox.items` and, from spec 0.8.0 (0.8.0, unreleased),
+`data-notification-inbox.items` and, from spec 0.8.0 (new in 0.8.0),
 `data-dashboard.layout` (a host source that persists a dashboard's layout:
 one record per widget, `id` the `widgetId`, with `x`, `y`, `w`, `h`, the
 `min`/`max` sizes and `locked` in grid units, at most 200). A `$source` binding anywhere else (another

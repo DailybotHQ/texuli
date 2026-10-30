@@ -14,9 +14,9 @@ which is built on these primitives. They are built from scratch on the
 not depend on any other component library.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.7.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.8.0`) may contain breaking
-> changes, so pin the exact version or use `^0.7.0`, which accepts only 0.7.x.
+> published to npm as `0.8.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.9.0`) may contain breaking
+> changes, so pin the exact version or use `^0.8.0`, which accepts only 0.8.x.
 
 ## Install
 
@@ -120,9 +120,9 @@ from subpaths to keep bundles narrow.
   and label them with `Intl.DateTimeFormat`. Only the Gregorian calendar is
   supported; `CalendarDate` is re-exported from `@texuli/date`.
 
-### Unreleased (planned for 0.8.0)
+### New in 0.8.0
 
-On this branch, not yet published: the labels primitives write themselves
+Ships in `0.8.0`; the `0.7.0` release predates it: the labels primitives write themselves
 resolve through the `@texuli/core/i18n` message catalog (ADR-016):
 `setI18nContext`, `useMessages` and `PRIMITIVES_MESSAGES_EN` (every label id
 with its English default); instance props keep winning, and English stays
@@ -176,7 +176,7 @@ spins with the APG spinbutton keys, the calendar and date picker's `today`, `wee
 `sortable` (`Sortable.Root`, `List`, `Item`, `Handle`) ships in `0.4.0`; it
 is not in `0.3.0`. It binds the drag engine
 [`@texuli/drag`](https://github.com/DailybotHQ/texuli/blob/main/packages/drag/README.md),
-which is in development and on npm as `0.7.0`
+which is in development and on npm as `0.8.0`
 ([RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 Contract: [prim-sortable.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-sortable.md).
 
@@ -200,7 +200,7 @@ the date picker from about 28.60 to 20.26 KiB.
   and [prim-combobox.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-combobox.md)
 - Dates: [prim-calendar.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-calendar.md)
   and [prim-date-picker.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-date-picker.md)
-- Messages (i18n, 0.8.0 unreleased): [i18n.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/i18n.md)
+- Messages (i18n, new in 0.8.0): [i18n.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/i18n.md)
 - Consumer ids: [consumer-ids.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/consumer-ids.md)
 - How the texels bind to Svelte 5 attachments: [svelte-attachments.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/svelte-attachments.md)
 - Accessibility contract: [ACCESSIBILITY.md](https://github.com/DailybotHQ/texuli/blob/main/docs/ACCESSIBILITY.md)

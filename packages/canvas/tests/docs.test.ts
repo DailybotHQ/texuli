@@ -103,16 +103,23 @@ describe('canvas documentation', () => {
     expect(readme).toContain('`CANVAS_PACKAGE_VERSION`');
   });
 
-  it('states the release status honestly: the placeholder until a release publishes it', () => {
+  it('states the release status honestly: published from 0.8.0, never the placeholder', () => {
     const manifest = JSON.parse(read('package.json')) as { version: string; private?: boolean };
-    expect(manifest.version).toBe('0.0.0');
+    // First published in 0.8.0; the 0.0.0 placeholder is gone for good.
+    expect(manifest.version).not.toBe('0.0.0');
     expect(manifest.private).toBe(true);
     expect(readme).toMatch(/Status: in development/);
-    expect(readme).toMatch(/not on npm yet/);
+    expect(readme).toMatch(/published on\s+(?:>\s+)?npm/);
+    expect(readme).toContain(`\`${manifest.version}\``);
     expect(readme).toContain('utm_source=dailybotopensource');
     expect(read('src/index.ts')).toContain(
       `export const CANVAS_PACKAGE_VERSION = '${manifest.version}';`
     );
+    const pages = [readme, ...readdirSync(`${ROOT}/docs`).map((file) => read(`docs/${file}`))];
+    for (const page of pages)
+      expect(page).not.toMatch(
+        /not on npm yet|not published\s+(?:>\s+)?yet|0\.0\.0` placeholder|repository only|first release (?:is )?planned|unreleased/i
+      );
   });
 
   it('keeps the model, sync and export framework-free; sync takes only the CRDT core', () => {

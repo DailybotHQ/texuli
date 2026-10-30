@@ -4,15 +4,16 @@ Back to [`../SKILL.md`](../SKILL.md).
 
 ## A. Use the packages
 
-The packages are on npm as `0.7.0`, a pre-1.0 release (`latest` and `next`
+The packages are on npm as `0.8.0`, a pre-1.0 release (`latest` and `next`
 both point to it; 1.0.0 will be the first stable release). An app outside a
 Texuli checkout installs them plainly, for example
-`pnpm add texuli @texuli/tokens`, and pins the exact version or `^0.7.0`
-(for 0.x it accepts only 0.7.x, since a new minor may break) (the developer
+`pnpm add texuli @texuli/tokens`, and pins the exact version or `^0.8.0`
+(for 0.x it accepts only 0.8.x, since a new minor may break) (the developer
 runs the install; it uses the network). `@texuli/drag`,
 `@texuli/workflows`, `@texuli/deck`, `@texuli/editor` (first published
 in `0.5.0`), `@texuli/document` and `@texuli/pages` (both first published
-in `0.7.0`) are in development and on npm as `0.7.0`.
+in `0.7.0`), `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (all
+three first published in `0.8.0`) are in development and on npm as `0.8.0`.
 Inside this monorepo, an app depends on the workspace packages:
 
 ```json

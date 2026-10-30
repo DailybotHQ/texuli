@@ -70,8 +70,9 @@ const errorsOf = (blueprint: unknown) =>
 describe('documents page: copy and safety', () => {
   it('says both packages are in development and on npm from 0.7.0, their first release', () => {
     // Both packages were first published in 0.7.0; the copy names that release.
-    expect(pkg('pages').version).toBe(DOCUMENTS_RELEASE);
-    expect(pkg('document').version).toBe(DOCUMENTS_RELEASE);
+    // Later releases move them on; the placeholder never comes back.
+    expect(pkg('pages').version).not.toBe('0.0.0');
+    expect(pkg('document').version).not.toBe('0.0.0');
     expect(DOCUMENTS_RELEASE).toBe('0.7.0');
     expect(DOCUMENTS_STATUS).toBe('In development, on npm from 0.7.0, a pre-1.0 release.');
     const copy = PAGE.replace(/\s+/g, ' ');

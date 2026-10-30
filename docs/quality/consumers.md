@@ -91,7 +91,20 @@ pnpm verify:packages && TEXULI_E2E_PORT=4953 pnpm exec playwright test tests/con
 
 ## Last verified
 
-2026-10-29 on `feat/plan-010-070` (`011a2eec` plus the working tree),
+2026-10-29 on `feat/plan-010-080` (`401e459d` plus the working tree),
+T-release-080: `pnpm verify:packages` passed for 25 packages at `0.8.0`
+(`@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` included), then
+`TEXULI_E2E_PORT=4973 pnpm exec playwright test tests/consumers --project
+chromium` reported 7 passed in 2.7 min for `consumers.spec.ts`: the six
+tarball-mode apps installed all 25 tarballs, imported every exported
+subpath and rendered one component per UI package (a `CanvasViewer`, a
+`SchemaForm` and a `SheetView` for the three new packages), plus the
+matrix check. Registry mode (`consumers-registry.spec.ts`) failed at its
+first install with npm `E404` for `@texuli/core@0.8.0`, as expected:
+`0.8.0` is not on npm before the post-merge publish, so its other five
+apps did not run.
+
+Before that, 2026-10-29 on `feat/plan-010-070` (`011a2eec` plus the working tree),
 T-release-070: `pnpm verify:packages` passed for 22 packages
 (`@texuli/document` and `@texuli/pages` included), then
 `TEXULI_E2E_PORT=4970 pnpm exec playwright test

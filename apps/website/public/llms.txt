@@ -11,7 +11,7 @@ What Texuli is and where to begin.
 - [Texuli](https://texuli.com/): The product landing.
 - [Introduction](https://texuli.com/guides/): The docs home and reading order.
 - [Getting started](https://texuli.com/guides/getting-started/)
-- [What’s new](https://texuli.com/whats-new/): Every package and capability of 0.6.0 and 0.7.0 (on npm) and 0.8.0 (unreleased), with demos.
+- [What’s new](https://texuli.com/whats-new/): Every package and capability of 0.6.0, 0.7.0 and 0.8.0 (all on npm; 0.8.0 is current), with demos.
 - [Skill](https://texuli.com/skill/): The distributable agent skill for building with Texuli.
 
 ## Platform

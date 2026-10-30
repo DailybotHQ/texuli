@@ -14,9 +14,9 @@ Svelte, use [`@texuli/player`](https://www.npmjs.com/package/@texuli/player),
 which is built on this package.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.7.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.8.0`) may contain breaking
-> changes, so pin the exact version or use `^0.7.0`, which accepts only 0.7.x.
+> published to npm as `0.8.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.9.0`) may contain breaking
+> changes, so pin the exact version or use `^0.8.0`, which accepts only 0.8.x.
 
 > **New in `0.4.0`.** The `chat`, `composition`, `data`, `state` and
 > `workflows` manifest groups (158 catalog ids, 66 of them agent-emittable;
@@ -99,13 +99,13 @@ grammar and renderer APIs. Import subpaths to keep bundles narrow.
 | `@texuli/catalog/manifests/layouts` | Authored manifests for layouts, decks and app shells |
 | `@texuli/catalog/manifests/overlays` | Authored manifests for overlays and navigation chrome (app tier) |
 | `@texuli/catalog/manifests/composition` | New in `0.4.0`: composition layouts (`layout-stack`, `layout-row`, `layout-split`, `layout-tile`) |
-| `@texuli/catalog/manifests/data` | New in `0.4.0`: data views as JSON (grid, tree, board, calendar, timeline, map, files), with their `bind` props and `on` events; `0.5.0` adds the cohort table, notification inbox and filter builder; `0.8.0` (unreleased) adds `data-dashboard` and `data-dashboard-widget` |
+| `@texuli/catalog/manifests/data` | New in `0.4.0`: data views as JSON (grid, tree, board, calendar, timeline, map, files), with their `bind` props and `on` events; `0.5.0` adds the cohort table, notification inbox and filter builder; `0.8.0` adds `data-dashboard` and `data-dashboard-widget` |
 | `@texuli/catalog/manifests/chat` | New in `0.4.0`: chat display ids (thread and messages; the composer stays host chrome) |
 | `@texuli/catalog/manifests/state` | New in `0.4.0`: state and action surfaces (controls, forms, flow views and actions, sortable lists, host regions) |
 | `@texuli/catalog/manifests/workflows` | New in `0.4.0`: `workflow-graph`, validated against the spec workflow schema |
 | `@texuli/catalog/manifests/documents` | New in `0.7.0`: `document`, a Texuli document as data (spec 0.7.0) |
-| `@texuli/catalog/manifests/schema-forms` | Unreleased (planned for `0.8.0`): `schema-form`, a form as data (spec 0.8.0), painted by `@texuli/forms` through the player's `formHost` |
-| `@texuli/catalog/manifests/sheets` | Unreleased (planned for `0.8.0`): `spreadsheet`, a sheet as data (spec 0.8.0; not `sheet`, which is the texuli `Sheet` drawer), painted by `@texuli/sheets` through the player's `sheetHost` |
+| `@texuli/catalog/manifests/schema-forms` | New in `0.8.0`: `schema-form`, a form as data (spec 0.8.0), painted by `@texuli/forms` through the player's `formHost` |
+| `@texuli/catalog/manifests/sheets` | New in `0.8.0`: `spreadsheet`, a sheet as data (spec 0.8.0; not `sheet`, which is the texuli `Sheet` drawer), painted by `@texuli/sheets` through the player's `sheetHost` |
 | `@texuli/catalog/build` | `buildCatalog`: a content-addressed catalog (`catalog-<sha256>.json`) |
 | `@texuli/catalog/build/node` | Node only: discover the manifest groups (source or published files) and write the content-addressed catalog file |
 
@@ -141,9 +141,9 @@ grammar and renderer APIs. Import subpaths to keep bundles narrow.
   paint time, and list item text refuses control, bidirectional and
   invisible formatting characters.
 
-## Unreleased (planned for 0.8.0)
+## New in 0.8.0
 
-On this branch, not yet published:
+Ships in `0.8.0`; the `0.7.0` release predates it:
 
 - Spec `0.8.0` forms (ADR-015): the agent-emittable `schema-form` id
   (`@texuli/catalog/manifests/schema-forms`) whose `schema` is a closed form

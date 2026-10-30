@@ -59,7 +59,7 @@ Inline cell editing on top of the grid core: typed drafts, validation, undo/redo
 - **Ctrl/Cmd+C** copies the cell as TSV; **V** pastes a block from the anchor cell over editable targets, and the live region announces how many cells the paste wrote.
 - Failed commits keep the previous value and show `role="alert"` under the cell; reopening the editor exposes `aria-invalid` and describes the error through `aria-describedby`.
 - Toolbar exposes Undo / Redo with the same stack.
-- **`onFocusCell`** (0.8.0, unreleased) is called with `{ rowId, columnKey }` each time focus moves to another body cell, by keyboard or pointer (not again for the cell that already has focus), so a host can follow the focused cell in a formula bar or a status line, as `@texuli/sheets`' `SheetView` does.
+- **`onFocusCell`** (new in 0.8.0) is called with `{ rowId, columnKey }` each time focus moves to another body cell, by keyboard or pointer (not again for the cell that already has focus), so a host can follow the focused cell in a formula bar or a status line, as `@texuli/sheets`' `SheetView` does.
 
 ## Labels
 

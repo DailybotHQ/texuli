@@ -1,6 +1,6 @@
 /**
  * /canvas-page/ (PLAN_010 T-site-features): honest status copy (in
- * development, coming in 0.8.0, not on npm), fictional data, no HTML sinks,
+ * development, on npm from 0.8.0, its first release), fictional data, no HTML sinks,
  * lazy islands, sections that match the page, a board that holds every
  * shape type, routing and cap and validates at the untrusted tier, the
  * vocabulary tables keyed to the package's own lists, two replicas that
@@ -66,25 +66,26 @@ const errorsOf = (blueprint: unknown) =>
   }).diagnostics.filter((entry) => entry.severity === 'error');
 
 describe('canvas page: copy and safety', () => {
-  it('says @texuli/canvas is in development and coming in 0.8.0, and never that it is on npm', () => {
+  it('says @texuli/canvas is in development and on npm from 0.8.0, its first release', () => {
     const pkg = JSON.parse(readFileSync(resolve('packages/canvas/package.json'), 'utf8')) as {
       version: string;
       private?: boolean;
     };
-    expect(pkg.version).toBe('0.0.0');
+    // First published in 0.8.0; the copy names that release.
+    expect(pkg.version).toBe(CANVAS_RELEASE);
     expect(pkg.private).toBe(true);
     expect(CANVAS_RELEASE).toBe('0.8.0');
-    expect(CANVAS_STATUS).toBe('In development, coming in 0.8.0: not published to npm yet.');
+    expect(CANVAS_STATUS).toBe('In development, on npm from 0.8.0, a pre-1.0 release.');
     const copy = PAGE.replace(/\s+/g, ' ');
     expect(copy).toMatch(
-      /eyebrow=\{`@texuli\/canvas · in development · coming in \$\{CANVAS_RELEASE\}`\}/
+      /eyebrow=\{`@texuli\/canvas · in development · on npm from \$\{CANVAS_RELEASE\}`\}/
     );
-    expect(copy).toContain('it is not published to npm yet');
+    expect(copy).toContain('on npm from <code>{CANVAS_RELEASE}</code>, a pre-1.0 release');
     // Planned work is labelled as planned.
     expect(copy).toContain('The editor does not paint other people’s cursors yet');
     for (const [path, source] of SOURCES) {
       expect(source, path).not.toMatch(
-        /on npm from|production[- ]ready|is released|available on npm|npm install @texuli\/canvas/i
+        /not (?:yet )?published to npm|coming in 0\.8|unreleased|production[- ]ready/i
       );
       expect(source, path).not.toMatch(/\{@html|set:html|innerHTML/);
       for (const [url] of source.matchAll(/https?:\/\/[^\s'"`)]+/g)) {

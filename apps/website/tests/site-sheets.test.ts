@@ -1,6 +1,6 @@
 /**
  * /sheets-page/ (PLAN_010 T-site-080): honest status copy (in development,
- * coming in 0.8.0, not on npm), fictional data, no HTML sinks, lazy
+ * on npm from 0.8.0, its first release), fictional data, no HTML sinks, lazy
  * islands, sections that match the page, one example per function of the
  * package's own list (each evaluated without an unexpected error), the
  * safety cases the engine really produces, a valid two-tab workbook, CSV
@@ -56,23 +56,24 @@ const errorsOf = (blueprint: unknown) =>
   }).diagnostics.filter((entry) => entry.severity === 'error');
 
 describe('sheets page: copy and safety', () => {
-  it('says @texuli/sheets is in development and coming in 0.8.0, and never that it is on npm', () => {
+  it('says @texuli/sheets is in development and on npm from 0.8.0, its first release', () => {
     const pkg = JSON.parse(readFileSync(resolve('packages/sheets/package.json'), 'utf8')) as {
       version: string;
       private?: boolean;
     };
-    expect(pkg.version).toBe('0.0.0');
+    // First published in 0.8.0; the copy names that release.
+    expect(pkg.version).toBe(SHEETS_RELEASE);
     expect(pkg.private).toBe(true);
     expect(SHEETS_RELEASE).toBe('0.8.0');
-    expect(SHEETS_STATUS).toBe('In development, coming in 0.8.0: not published to npm yet.');
+    expect(SHEETS_STATUS).toBe('In development, on npm from 0.8.0, a pre-1.0 release.');
     const copy = PAGE.replace(/\s+/g, ' ');
     expect(copy).toMatch(
-      /eyebrow=\{`@texuli\/sheets · in development · coming in \$\{SHEETS_RELEASE\}`\}/
+      /eyebrow=\{`@texuli\/sheets · in development · on npm from \$\{SHEETS_RELEASE\}`\}/
     );
-    expect(copy).toContain('it is not published to npm yet');
+    expect(copy).toContain('on npm from <code>{SHEETS_RELEASE}</code>, a pre-1.0 release');
     for (const [path, source] of SOURCES) {
       expect(source, path).not.toMatch(
-        /on npm from|production[- ]ready|is released|available on npm|npm install @texuli\/sheets/i
+        /not (?:yet )?published to npm|coming in 0\.8|unreleased|production[- ]ready/i
       );
       expect(source, path).not.toMatch(/\{@html|set:html|innerHTML|srcdoc/);
       for (const [url] of source.matchAll(/https?:\/\/[^\s'"`)]+/g)) {

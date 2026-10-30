@@ -3,8 +3,7 @@
 **Package:** `@texuli/tools` · **Import:** `@texuli/tools/email` ·
 **Path:** `src/email/`
 
-> **Status: unreleased, planned for `0.8.0`** (ADR-016). Not in the
-> published `0.7.0`.
+> **Status: new in `0.8.0`** (ADR-016); the `0.7.0` release predates it.
 
 `renderEmail(draft, options)` turns a blueprint draft (an envelope, a
 catalog node, an array of nodes, or their JSON text) into an

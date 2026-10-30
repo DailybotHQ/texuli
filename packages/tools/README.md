@@ -10,9 +10,9 @@ catalog trees in any host, Svelte or not. A golden set of interface tasks
 with an offline scorer measures how well an agent builds with the catalog.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.7.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.8.0`) may contain breaking
-> changes, so pin the exact version or use `^0.7.0`, which accepts only 0.7.x.
+> published to npm as `0.8.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.9.0`) may contain breaking
+> changes, so pin the exact version or use `^0.8.0`, which accepts only 0.8.x.
 
 ## Install
 
@@ -104,7 +104,7 @@ command of the `texuli` bin, with ten commands on `@texuli/document`
 read-only `document` tool; see
 [document.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/document.md).
 
-**Email and print (unreleased, planned for `0.8.0`).** `@texuli/tools/email`
+**Email and print (new in `0.8.0`).** `@texuli/tools/email`
 renders a validated blueprint to email-safe HTML and a plain-text part
 (tables, typed inline styles resolved to sRGB, escaped text only, links and
 images through the untrusted URL policy); see
@@ -141,8 +141,8 @@ document and writes a headless PDF with the owned writer; see
 - Golden set and scorer: [golden.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/golden.md)
 - Deck commands, the `texuli deck` CLI and the `deck` MCP tool (new in `0.4.0`): [deck.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/deck.md)
 - Document commands, the `texuli document` CLI and the `document` MCP tool (new in `0.7.0`): [document.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/document.md)
-- Email-safe HTML from blueprints (unreleased, planned for `0.8.0`): [email.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/email.md)
-- Print and headless PDF of blueprints (unreleased, planned for `0.8.0`): [print.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/print.md)
+- Email-safe HTML from blueprints (new in `0.8.0`): [email.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/email.md)
+- Print and headless PDF of blueprints (new in `0.8.0`): [print.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/print.md)
 
 ## Related packages
 

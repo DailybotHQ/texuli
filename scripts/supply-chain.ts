@@ -58,7 +58,7 @@ export const ALLOWED_LICENSES = new Set([
 export const RUNTIME_EXTERNAL_ALLOWLIST: Readonly<Record<string, readonly string[]>> = {
   '@texuli/core': [],
   '@texuli/date': [],
-  // In development (PLAN_007): no runtime externals; private until a publish wave.
+  // In development (PLAN_007): no runtime externals; first published in 0.4.0.
   '@texuli/deck': [],
   '@texuli/drag': [],
   '@texuli/workflows': [],
@@ -72,11 +72,10 @@ export const RUNTIME_EXTERNAL_ALLOWLIST: Readonly<Record<string, readonly string
   // First published in 0.7.0; only internal runtime deps.
   '@texuli/document': [],
   '@texuli/pages': [],
-  // In development (PLAN_010 T-canvas): only internal runtime deps; private until a release.
+  // First published in 0.8.0 (PLAN_010 T-canvas, T-forms, T-sheets); only
+  // internal runtime deps.
   '@texuli/canvas': [],
-  // In development (PLAN_010 T-forms): only internal runtime deps; private until a release.
   '@texuli/forms': [],
-  // In development (PLAN_010 T-sheets): only internal runtime deps; private until a release.
   '@texuli/sheets': [],
   '@texuli/data': [],
   '@texuli/media': [],
@@ -280,7 +279,7 @@ export function checkRuntimeAllowlist(packages: readonly WorkspacePackage[]): Su
     const deps = pkg.manifest.dependencies ?? {};
     for (const [dep, range] of Object.entries(deps)) {
       if (isWorkspaceRange(range) || isInternalName(dep)) {
-        // Internal deps may be pinned to exact versions (0.7.0)
+        // Internal deps may be pinned to exact versions (0.8.0)
         // instead of workspace: ranges; they are still
         // workspace packages, resolved by the workspace, not externals.
         if (!isInternalName(dep) && !names.has(dep)) {

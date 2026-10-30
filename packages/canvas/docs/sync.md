@@ -5,7 +5,8 @@ Collaborative canvases on the CRDT core of `@texuli/document/sync`
 transports and storage behind a `SyncAdapter`. Framework-free; load it only
 for collaborative sessions.
 
-> **Status: in development.** Not on npm yet (`0.0.0` placeholder).
+> **Status: in development.** On npm from `0.8.0`, the package's first
+> release (pre-1.0).
 
 ```ts
 import { createMemorySyncHub } from '@texuli/document/sync';

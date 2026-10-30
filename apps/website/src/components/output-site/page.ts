@@ -5,10 +5,10 @@
  * source (labels are text, never HTML).
  */
 
-/** The release these targets are planned for. None is in the published 0.7.0. */
+/** The release these targets first ship in (on npm, pre-1.0). */
 export const OUTPUT_RELEASE = '0.8.0';
 
-export const OUTPUT_STATUS = `Unreleased, coming in ${OUTPUT_RELEASE}: not in the published 0.7.0.`;
+export const OUTPUT_STATUS = `New in ${OUTPUT_RELEASE}: on npm from ${OUTPUT_RELEASE}, a pre-1.0 release.`;
 
 export const OUTPUT_PIECES: readonly { readonly name: string; readonly role: string }[] = [
   { name: 'tools/email', role: 'email-safe HTML and plain text' },

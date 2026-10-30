@@ -52,7 +52,7 @@ jobs:
         run: |
           set -euo pipefail
           refused=0
-          for dir in core date spec drag deck tokens primitives document texuli workflows editor charts data media chat blocks catalog tools astro player pages slides; do
+          for dir in core date spec drag deck tokens primitives document texuli workflows editor forms canvas charts data media chat blocks sheets catalog tools astro player pages slides; do
             name=$(node -p "require('./packages/${dir}/package.json').name")
             version=$(node -p "require('./packages/${dir}/package.json').version")
             if [ "$version" = "0.0.0" ]; then
@@ -117,12 +117,21 @@ jobs:
           publish packages/workflows
           # L4: the rich text editor (core, primitives, tokens and texuli first).
           publish packages/editor
+          # L4: schema-driven forms (core and texuli first) and the infinite
+          # canvas (core, deck, document, drag and texuli first); first
+          # published in 0.8.0. No published package imports either: the
+          # catalog and the player take their checks and painters from the host.
+          publish packages/forms
+          publish packages/canvas
           # Wave 177 — L4 domain packages.
           publish packages/charts
           publish packages/data
           publish packages/media
           publish packages/chat
           publish packages/blocks
+          # L5: spreadsheets (core, date, data and texuli first; first published
+          # in 0.8.0); the catalog and the player reach it only through the host.
+          publish packages/sheets
           # Wave 178 — L6/L7 and the newer surfaces.
           publish packages/catalog
           publish packages/tools
@@ -138,7 +147,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
-          for dir in core date spec drag deck tokens primitives document texuli workflows editor charts data media chat blocks catalog tools astro player pages slides; do
+          for dir in core date spec drag deck tokens primitives document texuli workflows editor forms canvas charts data media chat blocks sheets catalog tools astro player pages slides; do
             name=$(node -p "require('./packages/${dir}/package.json').name")
             version=$(node -p "require('./packages/${dir}/package.json').version")
             npm dist-tag add "${name}@${version}" latest

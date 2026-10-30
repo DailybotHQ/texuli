@@ -1,6 +1,6 @@
 /**
- * /dashboards-page/ (PLAN_010 T-site-080): honest status copy (unreleased,
- * coming in 0.8.0, not in the published 0.7.0), fictional data, no HTML
+ * /dashboards-page/ (PLAN_010 T-site-080): honest status copy (new in
+ * 0.8.0, on npm in @texuli/data; the published 0.7.0 is without it), fictional data, no HTML
  * sinks, lazy islands, sections that match the page, persistence presets
  * that parse the way the page says (round trip, tampered, refused), the
  * in-page sources answering through the loader, and the agent dashboard
@@ -49,18 +49,25 @@ const preset = (id: string) => {
 };
 
 describe('dashboards page: copy and safety', () => {
-  it('says the dashboard is unreleased and coming in 0.8.0, never that it is on npm', () => {
+  it('says the dashboard is new in 0.8.0 and on npm in @texuli/data from that release', () => {
     expect(DASHBOARDS_RELEASE).toBe('0.8.0');
-    expect(DASHBOARDS_STATUS).toContain('not in the published @texuli/data 0.7.0');
+    const data = JSON.parse(readFileSync(resolve('packages/data/package.json'), 'utf8')) as {
+      version: string;
+    };
+    // The subpath ships with @texuli/data from 0.8.0; the copy names that release.
+    expect(data.version).toBe(DASHBOARDS_RELEASE);
+    expect(DASHBOARDS_STATUS).toBe(
+      'New in 0.8.0: on npm in @texuli/data from 0.8.0, a pre-1.0 release.'
+    );
     const copy = PAGE.replace(/\s+/g, ' ');
     expect(copy).toMatch(
-      /eyebrow=\{`@texuli\/data\/dashboard · unreleased · coming in \$\{DASHBOARDS_RELEASE\}`\}/
+      /eyebrow=\{`@texuli\/data\/dashboard · new in \$\{DASHBOARDS_RELEASE\}`\}/
     );
-    expect(copy).toContain('not in the <code>0.7.0</code> published to npm');
+    expect(copy).toContain('the previous release, <code>0.7.0</code>, is without it');
     expect(copy).toContain('Planned, not built yet');
     for (const [path, source] of SOURCES) {
       expect(source, path).not.toMatch(
-        /on npm from|production[- ]ready|is released|available on npm/i
+        /not (?:yet )?published to npm|coming in 0\.8|unreleased|production[- ]ready/i
       );
       expect(source, path).not.toMatch(/\{@html|set:html|innerHTML|srcdoc/);
       for (const [url] of source.matchAll(/https?:\/\/[^\s'"`)]+/g)) {

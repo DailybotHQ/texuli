@@ -216,7 +216,7 @@ reflect this decision.
   `io.github.dailybothq` — a GitHub-account namespace, verifiable without a
   domain.
 - **Choice:** `com.texuli`, artifacts `texuli-spec` and `texuli-compose`,
-  versions tracking the npm release line they mirror (`0.7.0`).
+  versions tracking the npm release line they mirror (`0.8.0`).
 - **Why:** texuli.com is owned and deployed, so the Central Portal can verify
   the namespace by DNS, and the group matches the Kotlin package names the
   sources already use (`com.texuli.spec.runtime`, `com.texuli.compose`).
@@ -1120,7 +1120,7 @@ reflect this decision.
   `expression` member of the query, evaluated by the adapter's own engine,
   never by turning the filter into code.
 
-- **Addendum (2026-10-29, PLAN_010 T-sheets, 0.8.0, unreleased): the
+- **Addendum (2026-10-29, PLAN_010 T-sheets, 0.8.0): the
   catalog id of a spreadsheet is `spreadsheet`, not `sheet`.** Agents emit a
   sheet as a `spreadsheet` node whose `sheet` prop holds the
   `@texuli/sheets` format (`$defs.sheet` in spec 0.8.0). The natural id
@@ -1236,7 +1236,7 @@ reflect this decision.
   writer behind its subpath), or a single static-output package becomes
   possible without a layer conflict.
 
-- **Note (2026-10-29, PLAN_010 T-targets, 0.8.0, unreleased): email dark
+- **Note (2026-10-29, PLAN_010 T-targets, 0.8.0): email dark
   mode is planned.** The decision above planned a head rule set with "a
   dark-mode media query". The `@texuli/core/markup` builders have no
   `<style>` element (deliberately: a style sheet is free text, and the

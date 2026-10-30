@@ -22,13 +22,14 @@ end to end and native for agents:
   blueprint contract (`@texuli/spec`) also feeds a Kotlin Multiplatform
   twin in `native/`.
 
-**Status: in development, pre-1.0.** All 22 published packages (all of
-`packages/` except `@texuli/examples`) are released as `0.7.0`, which the
+**Status: in development, pre-1.0.** All 25 published packages (all of
+`packages/` except `@texuli/examples`) are released as `0.8.0`, which the
 publish workflow publishes from `main` after the merge and points `latest`
-and `next` to; `@texuli/document` and `@texuli/pages` are published for the
-first time in `0.7.0` (the previous release, `0.6.0`, had 20 packages), and
-`@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/editor`,
-`@texuli/document` and `@texuli/pages` are still in development
+and `next` to; `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` are
+published for the first time in `0.8.0` (the previous release, `0.7.0`, had
+22 packages), and `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`,
+`@texuli/editor`, `@texuli/document`, `@texuli/pages`, `@texuli/forms`,
+`@texuli/canvas` and `@texuli/sheets` are still in development
 ([RELEASE](docs/RELEASE.md)). Workspace packages stay
 `private: true`, and no stable release is out (1.0.0 will be the first; under
 0.x a new minor may break; see [RELEASE](docs/RELEASE.md)),
@@ -57,7 +58,7 @@ Functions in `functions/`. See
 | Onboarding | [AI_AGENT_ONBOARDING](docs/AI_AGENT_ONBOARDING.md) | First-session checklist |
 | Collaboration | [AI_AGENT_COLLAB](docs/AI_AGENT_COLLAB.md) | Path ownership, owner-held files, commits in a shared checkout, handoffs |
 | Index | [docs/README](docs/README.md) | Every guide: repository, package, website and quality docs |
-| Packages | [core](packages/core/README.md) · [date](packages/date/README.md) · [deck](packages/deck/README.md) · [drag](packages/drag/README.md) · [primitives](packages/primitives/README.md) · [tokens](packages/tokens/README.md) · [texuli](packages/texuli/README.md) · [charts](packages/charts/README.md) · [data](packages/data/README.md) · [media](packages/media/README.md) · [chat](packages/chat/README.md) · [workflows](packages/workflows/README.md) · [blocks](packages/blocks/README.md) · [catalog](packages/catalog/README.md) · [slides](packages/slides/README.md) · [player](packages/player/README.md) · [tools](packages/tools/README.md) · [astro](packages/astro/README.md) · [spec](packages/spec/README.md) · [editor](packages/editor/README.md) · [document](packages/document/README.md) · [pages](packages/pages/README.md) · [examples](packages/examples/README.md) | Each package's front page; its `docs/*.md` describe every subpath |
+| Packages | [core](packages/core/README.md) · [date](packages/date/README.md) · [deck](packages/deck/README.md) · [drag](packages/drag/README.md) · [primitives](packages/primitives/README.md) · [tokens](packages/tokens/README.md) · [texuli](packages/texuli/README.md) · [charts](packages/charts/README.md) · [data](packages/data/README.md) · [media](packages/media/README.md) · [chat](packages/chat/README.md) · [workflows](packages/workflows/README.md) · [blocks](packages/blocks/README.md) · [catalog](packages/catalog/README.md) · [slides](packages/slides/README.md) · [player](packages/player/README.md) · [tools](packages/tools/README.md) · [astro](packages/astro/README.md) · [spec](packages/spec/README.md) · [editor](packages/editor/README.md) · [document](packages/document/README.md) · [pages](packages/pages/README.md) · [forms](packages/forms/README.md) · [canvas](packages/canvas/README.md) · [sheets](packages/sheets/README.md) · [examples](packages/examples/README.md) | Each package's front page; its `docs/*.md` describe every subpath |
 | Website | [apps/website](apps/website/README.md) | texuli.com (Astro 7 + Svelte islands); area designs in `apps/website/docs/` |
 | Agent service | [apps/agent](apps/agent/README.md) | The texuli.com agent service: prompt → validated blueprint draft, fake replay provider only, not deployed |
 | Native | [native](native/README.md) | The Gradle Kotlin Multiplatform twin (`texuli-spec`, `texuli-compose`, `conformance`); not a pnpm package |
@@ -73,10 +74,10 @@ texuli/
 ├── packages/            layers point down only (scripts/check-layers.ts)
 │   ├── core/            L0 @texuli/core: texels (overlay engine, roving, positioning, URL policy…)  (README, docs/)
 │   ├── date/            L0 @texuli/date: Gregorian date arithmetic and locale week starts      (README)
-│   ├── deck/            L0 @texuli/deck: deck model v2 from JSON or Markdown, engine, authoring (in development, on npm as 0.7.0) (README, docs/)
-│   ├── drag/            L0 @texuli/drag: framework-free drag engine (in development, on npm as 0.7.0) (README, docs/)
+│   ├── deck/            L0 @texuli/deck: deck model v2 from JSON or Markdown, engine, authoring (in development, on npm as 0.8.0) (README, docs/)
+│   ├── drag/            L0 @texuli/drag: framework-free drag engine (in development, on npm as 0.8.0) (README, docs/)
 │   ├── primitives/      L1 @texuli/primitives: 42 owned headless primitives, APG patterns      (README, docs/)
-│   ├── document/        L1 @texuli/document: block document engine, ops, Markdown, CRDT sync (in development, first on npm as 0.7.0) (README, docs/)
+│   ├── document/        L1 @texuli/document: block document engine, ops, Markdown, CRDT sync (in development, on npm since 0.7.0) (README, docs/)
 │   ├── tokens/          L2 @texuli/tokens: OKLCH theme engine, --tx-* contract, 200+ themes, CSS (README, docs/)
 │   ├── texuli/          L3 texuli: styled components, cx/variants, icons, layouts, shells      (README, docs/)
 │   ├── charts/          L4 @texuli/charts: chart math + every family, one subpath each         (README, docs/)
@@ -87,12 +88,15 @@ texuli/
 │   ├── spec/            L0 @texuli/spec: the blueprint contract, schemas, TS + Kotlin codegen   (README)
 │   ├── editor/          L4 @texuli/editor: rich text editor, Markdown in/out (in development, on npm since 0.5.0) (README, docs/)
 │   ├── workflows/       L4 @texuli/workflows: workflow editor, viewer, model, layout (in development) (README)
+│   ├── forms/           L4 @texuli/forms: schema-driven forms, conditions, steps, drafts (in development, first on npm as 0.8.0) (README, docs/)
+│   ├── canvas/          L4 @texuli/canvas: infinite canvas, CRDT sync, SVG/PNG export (in development, first on npm as 0.8.0) (README, docs/)
+│   ├── sheets/          L5 @texuli/sheets: spreadsheets, owned formula engine, CSV, sheet view (in development, first on npm as 0.8.0) (README, docs/)
 │   ├── catalog/         L6 @texuli/catalog: agent catalog + sink-free renderer                 (README, docs/)
 │   ├── player/          L7 @texuli/player: paint runtime for validated blueprints              (README, docs/)
 │   ├── slides/          L8 @texuli/slides: presentation stage on @texuli/deck, print, PPTX (README, docs/)
 │   ├── tools/           L8 @texuli/tools: CLI, llms, A2UI, custom elements, golden set, MCP     (README, docs/)
 │   ├── astro/           L8 @texuli/astro: Astro integration, content layouts, sections          (README, docs/)
-│   ├── pages/           L8 @texuli/pages: block document editor and reader (in development, first on npm as 0.7.0) (README, docs/)
+│   ├── pages/           L8 @texuli/pages: block document editor and reader (in development, on npm since 0.7.0) (README, docs/)
 │   └── examples/        @texuli/examples (private): the examples registry for tests, visuals and the site
 ├── apps/
 │   ├── website/         @texuli/website: texuli.com, Astro 7 + Svelte islands                  (README, docs/)
@@ -159,7 +163,7 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
 1. **English only** in code, comments, UI copy, docs and commits.
 2. **Conventional Commits**: `type(scope): summary`. Scopes: `core`,
    `spec`, `deck`, `drag`, `primitives`, `tokens`, `texuli`, `charts`, `data`, `media`,
-   `chat`, `editor`, `document`, `pages`, `workflows`, `blocks`, `catalog`, `slides`, `player`, `tools`,
+   `chat`, `editor`, `document`, `pages`, `forms`, `canvas`, `sheets`, `workflows`, `blocks`, `catalog`, `slides`, `player`, `tools`,
    `astro`, `examples`, `website` (also `functions/`), `agent`, `native`,
    `skill`, `e2e`, `visual`, `consumers`, `scripts`, `docs`, `deps`, `ci`,
    `dwp` (the `.agents/`, `.review/` and `.dwp/` harness). **Stage exact paths**, never
@@ -199,13 +203,14 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     Never real PII, secrets or tokens; never read `.env` files.
 12. **Honesty.** Docs describe what works today and mark everything planned
     as planned. Never invent benchmarks, deploy URLs, release status or
-    check results. The 22 published packages, including `@texuli/document`
-    and `@texuli/pages` (first published in `0.7.0`), are released on npm
-    as `0.7.0` (dist-tags `latest` and `next`, published by CI with
-    provenance); `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`,
-    `@texuli/editor`, `@texuli/document` and `@texuli/pages` are still in
-    development, and the blueprint spec in `@texuli/spec@0.7.0` is `0.7.0`.
-    `@texuli/examples`, the apps and `native/` publish nothing. 0.7.0 is a
+    check results. The 25 published packages, including `@texuli/forms`,
+    `@texuli/canvas` and `@texuli/sheets` (first published in `0.8.0`), are
+    released on npm as `0.8.0` (dist-tags `latest` and `next`, published by
+    CI with provenance); `@texuli/drag`, `@texuli/workflows`,
+    `@texuli/deck`, `@texuli/editor`, `@texuli/document`, `@texuli/pages`,
+    `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` are still in
+    development, and the blueprint spec in `@texuli/spec@0.8.0` is `0.8.0`.
+    `@texuli/examples`, the apps and `native/` publish nothing. 0.8.0 is a
     pre-1.0 release, not stable (1.0.0 will be the first
     stable release; `latest` tracks the newest release). texuli.com
     deploys from `main` (Cloudflare Pages); the agent service is not

@@ -6,7 +6,7 @@
 **View:** `packages/data/src/dashboard/`
 **Tests:** `packages/data/tests/dashboard.test.ts`, `packages/data/tests/dashboard-ssr.test.ts`, `packages/data/tests/dashboard-engine.test.ts`
 **Example:** `data-dashboard`
-**Status:** unreleased, planned for `0.8.0` (PLAN_010 T-dashboard). It is not in the `@texuli/data` root barrel: import the subpath.
+**Status:** new in `0.8.0` (PLAN_010 T-dashboard). It is not in the `@texuli/data` root barrel: import the subpath.
 
 ## Goal
 

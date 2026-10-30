@@ -4,10 +4,10 @@
  * the page and its tests share one source (labels are text, never HTML).
  */
 
-/** The release `@texuli/sheets` is planned for. It is not on npm. */
+/** The release `@texuli/sheets` first ships in (on npm, in development, pre-1.0). */
 export const SHEETS_RELEASE = '0.8.0';
 
-export const SHEETS_STATUS = `In development, coming in ${SHEETS_RELEASE}: not published to npm yet.`;
+export const SHEETS_STATUS = `In development, on npm from ${SHEETS_RELEASE}, a pre-1.0 release.`;
 
 export const SHEETS_PIECES: readonly { readonly name: string; readonly role: string }[] = [
   { name: 'sheets/formula', role: 'parser, functions, criteria' },

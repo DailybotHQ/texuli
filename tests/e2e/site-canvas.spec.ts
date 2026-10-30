@@ -59,7 +59,7 @@ test('the editor: every shape, keyboard moves, undo, zoom, export; axe in light 
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'An infinite canvas you can use from the keyboard'
   );
-  await expect(page.getByText('@texuli/canvas · in development · coming in 0.8.0')).toBeVisible();
+  await expect(page.getByText('@texuli/canvas · in development · on npm from 0.8.0')).toBeVisible();
   await expect(page.locator('[data-canvas-shapes] tbody tr')).toHaveCount(11);
   await expect(page.locator('[data-canvas-tools] tbody tr')).toHaveCount(12);
 

@@ -4,7 +4,8 @@ The accessible infinite canvas editor (Svelte 5). `CanvasEditor` composes
 the tools toolbar, the application surface with its minimap, and the shape
 tree for screen readers over one `CanvasController`.
 
-> **Status: in development.** Not on npm yet (`0.0.0` placeholder).
+> **Status: in development.** On npm from `0.8.0`, the package's first
+> release (pre-1.0).
 
 ```svelte
 <script lang="ts">

@@ -1,7 +1,7 @@
 # @texuli/forms/host
 
-> **Status: in development (pre-1.0).** Not published yet; first release
-> planned for `0.8.0`.
+> **Status: in development (pre-1.0).** On npm from `0.8.0`, the
+> package's first release.
 
 The form host for `@texuli/player`: how a `schema-form` catalog node
 (spec 0.8.0, ADR-015) paints. The player does not depend on

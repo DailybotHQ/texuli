@@ -1,6 +1,6 @@
 # Embedding the player
 
-**Package:** `@texuli/player` (on npm as `0.7.0`, a pre-1.0 release; no
+**Package:** `@texuli/player` (on npm as `0.8.0`, a pre-1.0 release; no
 stable 1.0.0 yet)
 
 How to put a validated catalog blueprint on a page: quick start, the props a
@@ -70,12 +70,12 @@ Every option belongs to the host. A blueprint can set none of them.
 | `landmarks` | `true` | `false` stops layout painters from emitting `<main>`; pass it when the player sits inside your own landmark |
 | `motion` | `'auto'` | `auto` follows `prefers-reduced-motion`; `reduce` stops motion inside the player |
 | `chrome` | `true` | `false` paints no frame chrome: no label heading, status, trust badge, skip link or end anchor (`data-tx-player-chrome="off"`). For a host that already frames the content and states its trust itself, such as a slide (see [Frameless and deck hosts](#frameless-and-deck-hosts)) |
-| `print` | `false` | Print mode (ADR-016; unreleased, planned for 0.8.0): a static paint (`data-tx-player-print`) with an inert surface, motion off, and no skip link, retry button or composer; the print styles (no page break inside frames, tables, figures and code, headings kept with what follows) also preview on screen. The player enters print mode on its own between the browser's `beforeprint` and `afterprint` events, so the browser's "Save as PDF" prints the static form. For a headless PDF see `@texuli/tools/print` |
+| `print` | `false` | Print mode (ADR-016; new in 0.8.0): a static paint (`data-tx-player-print`) with an inert surface, motion off, and no skip link, retry button or composer; the print styles (no page break inside frames, tables, figures and code, headings kept with what follows) also preview on screen. The player enters print mode on its own between the browser's `beforeprint` and `afterprint` events, so the browser's "Save as PDF" prints the static form. For a headless PDF see `@texuli/tools/print` |
 | `deckHost` | `null` | A `DeckPlayerHost` that presents a validated `layout-deck` blueprint on a stage instead of the document flow (see [Frameless and deck hosts](#frameless-and-deck-hosts)) |
 | `documentHost` | `null` | A `DocumentPlayerHost` (spec 0.7.0): its `checkDocument` validates `document` nodes, and its `present` paints a valid `document` root. Without one a document blueprint is refused (see [Document hosts](#document-hosts)) |
 | `canvasHost` | `null` | A `CanvasPlayerHost` (spec 0.8.0): its `checkCanvas` validates `canvas` nodes, and its `present` paints a valid `canvas` root. Without one a canvas blueprint is refused (see [Canvas hosts](#canvas-hosts)) |
 | `formHost` | `null` | A `FormPlayerHost` (spec 0.8.0): its `checkForm` validates `schema-form` nodes (with its `validators` names), and its `present` paints each valid one. Without one a form blueprint is refused (see [Forms](#forms)) |
-| `sheetHost` | `null` | A `SheetPlayerHost` (spec 0.8.0; 0.8.0, unreleased): its `checkSheet` validates `spreadsheet` nodes (every formula parsed), and its `present` paints each valid one in place. Without one a spreadsheet blueprint is refused (see [Sheet hosts](#sheet-hosts)) |
+| `sheetHost` | `null` | A `SheetPlayerHost` (spec 0.8.0; new in 0.8.0): its `checkSheet` validates `spreadsheet` nodes (every formula parsed), and its `present` paints each valid one in place. Without one a spreadsheet blueprint is refused (see [Sheet hosts](#sheet-hosts)) |
 | `selectable`, `selection`, `onSelectionChange` | `false`, —, — | Frame selection for a builder-style preview ([Selection](reference.md#selection-builder-preview)) |
 | `view`, `onFlowChange` | — | The flow view and its transitions ([Views and flows](reference.md#views-and-flows-g09)) |
 | `onAction` | — | Answers action-form intents with `confirmed` or `rejected`; without it, actions are unavailable ([Action surface](reference.md#action-surface-and-receipts-g17)) |
@@ -318,7 +318,7 @@ document never presented, the preview notice, keyed streaming) and
 
 ## Canvas hosts
 
-On this branch, not yet published (spec 0.8.0, ADR-012). A `canvas`
+New in `0.8.0` (spec 0.8.0, ADR-012). A `canvas`
 blueprint is one node whose `canvas` prop is a Texuli canvas. The player
 (L7) could import `@texuli/canvas` (L4), but the canvas validator stays out
 of its first-load chunk, so, as for documents, the host supplies both
@@ -401,7 +401,7 @@ suites.
 
 ## Sheet hosts
 
-On this branch, not yet published (spec 0.8.0, ADR-015). A `spreadsheet`
+New in `0.8.0` (spec 0.8.0, ADR-015). A `spreadsheet`
 node is a sheet as data: its `sheet` prop holds tabs of cells and formulas
 in the closed sheet grammar (the id is `spreadsheet` because `sheet` is the
 texuli `Sheet` drawer). The player (L7) does not import `@texuli/sheets`

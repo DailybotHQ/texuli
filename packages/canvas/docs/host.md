@@ -9,7 +9,8 @@ both. The player (L7) could import this package (L4), but the seam keeps
 the canvas engine out of the player's first-load chunk, as the document
 host does.
 
-> **Status: in development.** Not on npm yet (`0.0.0` placeholder).
+> **Status: in development.** On npm from `0.8.0`, the package's first
+> release (pre-1.0).
 
 ```svelte
 <script lang="ts">

@@ -1,7 +1,7 @@
 ---
 /**
  * /forms-page/ — schema-driven forms (@texuli/forms, ADR-015, in
- * development, coming in 0.8.0): every field type, every named format,
+ * development, on npm from 0.8.0): every field type, every named format,
  * every closed rule with announced errors, multi-step flows with
  * conditional logic, drafts and autosave, fields backed by host data
  * sources, and forms as agent data painted by the player. Every demo is a
@@ -61,11 +61,11 @@ const formHost = createFormPlayerHost({ validators: { 'handle-free': checkHandle
 
 <BaseLayout
   title="Forms"
-  description="Texuli schema-driven forms (@texuli/forms, in development, coming in 0.8.0): every field type, named formats, validation with announced errors, multi-step flows, conditional logic, drafts and autosave, data-source fields and agent-generated forms."
+  description="Texuli schema-driven forms (@texuli/forms, in development, on npm from 0.8.0): every field type, named formats, validation with announced errors, multi-step flows, conditional logic, drafts and autosave, data-source fields and agent-generated forms."
 >
   <FeaturePage
     name="forms"
-    eyebrow={`@texuli/forms · in development · coming in ${FORMS_RELEASE}`}
+    eyebrow={`@texuli/forms · in development · on npm from ${FORMS_RELEASE}`}
     title="Forms as data, painted accessibly"
     pieces={FORMS_PIECES}
     piecesLabel="The pieces of schema-driven forms"
@@ -76,8 +76,8 @@ const formHost = createFormPlayerHost({ validators: { 'handle-free': checkHandle
         A closed form schema becomes an accessible form: typed fields in sections or steps,
         conditions over earlier answers, named formats, host validators and cross-field rules, with
         announced errors, drafts and autosave. Agents send the same schema as data. Everything below is
-        live. <code>@texuli/forms</code> is in development and coming in <code>{FORMS_RELEASE}</code>;
-        it is not published to npm yet. For hand-written forms with <code>Field</code> and
+        live. <code>@texuli/forms</code> is in development and on npm from <code>{FORMS_RELEASE}</code>,
+        a pre-1.0 release. For hand-written forms with <code>Field</code> and
         <code>Form</code>, read the <a href="/guides/forms/">forms guide</a>.
       </p>
     </Fragment>
@@ -173,7 +173,7 @@ const formHost = createFormPlayerHost({ validators: { 'handle-free': checkHandle
       <SourceDemo client:visible />
       <p class="fx-note">
         The form names nothing of the source: the host reads it and hands the form its choices and a
-        validator. <code>@texuli/core/data-source</code> is in development and coming in
+        validator. <code>@texuli/core/data-source</code> ships in
         <code>{FORMS_RELEASE}</code> too.
       </p>
     </section>
@@ -185,8 +185,8 @@ const formHost = createFormPlayerHost({ validators: { 'handle-free': checkHandle
         <div class="fx-panel">
           <h3>The blueprint the agent wrote</h3>
           <p class="fx-note">
-            Spec <code>0.8.0</code> adds the <code>schema-form</code> catalog id; it is in development
-            and coming in <code>{FORMS_RELEASE}</code>. Conditions travel as expression trees.
+            Spec <code>0.8.0</code> adds the <code>schema-form</code> catalog id; it ships in the
+            <code>{FORMS_RELEASE}</code> release of <code>@texuli/spec</code>. Conditions travel as expression trees.
           </p>
           <GuideCode code={AGENT_FORM_JSON} label="The schema-form blueprint (JSON)" lang="text" />
           <h3>The hostile field</h3>

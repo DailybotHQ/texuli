@@ -4,7 +4,7 @@
 **Subpath:** `@texuli/data/dashboard/engine` (framework-free: no Svelte, no DOM; also re-exported by `@texuli/data/dashboard`)
 **Source:** `packages/data/src/dashboard/engine/`
 **Tests:** `packages/data/tests/dashboard-engine.test.ts`
-**Status:** unreleased, planned for `0.8.0` (PLAN_010 T-dashboard).
+**Status:** new in `0.8.0` (PLAN_010 T-dashboard).
 
 Layout math for dashboards: every position is in grid units (column and row
 indexes from 0), never pixels. Every operation is pure (it returns a new

@@ -1,8 +1,8 @@
 /**
  * /whats-new/ (PLAN_010 T-site-080, Amendment 8): the hub covers every
  * new package and capability of 0.6.0 to 0.8.0, with the release statuses
- * the repository states (0.6.0 and 0.7.0 on npm, 0.7.0 current, 0.8.0
- * unreleased and its packages still private), every feature linking to a
+ * the repository states (0.6.0, 0.7.0 and 0.8.0 on npm, 0.8.0 current and
+ * the first release of its three packages), every feature linking to a
  * page that exists, live demos as lazy islands, no HTML sinks, and the
  * hub linked from the home page and the sidebar.
  */
@@ -69,25 +69,21 @@ describe('whats-new hub', () => {
     const byId = Object.fromEntries(RELEASES.map((release) => [release.id, release]));
     expect(byId['0.6.0']?.published).toBe(true);
     expect(byId['0.7.0']?.published).toBe(true);
-    expect(byId['0.7.0']?.status).toContain('Published on npm as 0.7.0, the current release');
-    expect(byId['0.8.0']?.published).toBe(false);
-    expect(byId['0.8.0']?.status).toContain('Unreleased');
-    // The 0.8.0 packages are still private placeholders.
-    for (const name of ['forms', 'canvas', 'sheets']) {
+    expect(byId['0.7.0']?.status).toContain('Published on npm as 0.7.0');
+    expect(byId['0.8.0']?.published).toBe(true);
+    expect(byId['0.8.0']?.status).toContain('Published on npm as 0.8.0, the current release');
+    // 0.8.0 is what npm has (the published packages' versions), the three
+    // packages it publishes for the first time included.
+    for (const name of ['forms', 'canvas', 'sheets', 'document']) {
       const pkg = JSON.parse(readFileSync(resolve(`packages/${name}/package.json`), 'utf8')) as {
         version: string;
-        private?: boolean;
       };
-      expect(pkg.version, name).toBe('0.0.0');
-      expect(pkg.private, name).toBe(true);
+      expect(pkg.version, name).toBe('0.8.0');
     }
-    // 0.7.0 is what npm has (the published packages' versions).
-    const document = JSON.parse(
-      readFileSync(resolve('packages/document/package.json'), 'utf8')
-    ) as {
-      version: string;
-    };
-    expect(document.version).toBe('0.7.0');
+    for (const release of RELEASES)
+      expect(`${release.title} ${release.status} ${release.summary}`).not.toMatch(
+        /unreleased|coming in|not on npm/i
+      );
     // The agent service is not called deployed or published.
     const service = FEATURES.find((feature) => feature.id === 'agent-service');
     expect(service?.note).toContain('not deployed');

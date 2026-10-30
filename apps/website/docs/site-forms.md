@@ -3,9 +3,9 @@
 **App:** `apps/website`
 **Path:** `/forms-page/` (Components group, after Documents)
 **Packages:** `@texuli/forms` (root, `model`, `host`), `@texuli/core/expression`,
-`@texuli/core/data-source`, `@texuli/player`; all in development, coming in
-`0.8.0` and not published to npm yet (`@texuli/forms` is the private `0.0.0`
-placeholder); the `schema-form` catalog id is spec `0.8.0`
+`@texuli/core/data-source`, `@texuli/player`; on npm from `0.8.0`
+(`@texuli/forms` for the first time, in development, pre-1.0); the
+`schema-form` catalog id is spec `0.8.0`
 **Decision:** ADR-015 (one bounded expression language) in [DECISIONS](../../../docs/DECISIONS.md)
 **Tests:** `apps/website/tests/site-forms.test.ts`, `tests/e2e/site-forms.spec.ts`
 
@@ -22,7 +22,7 @@ shared `FeaturePage.astro` (`src/components/feature-site/`), which the later
 
 | Section | Island | What it shows |
 | --- | --- | --- |
-| Hero | static | Status (in development, coming in `0.8.0`, not on npm), the pieces, and a link to the hand-written forms guide (`/guides/forms/`). |
+| Hero | static | Status (in development, on npm from `0.8.0`), the pieces, and a link to the hand-written forms guide (`/guides/forms/`). |
 | `#fields` | `FieldGallery.svelte` | One `SchemaForm` with a field of every `FORM_FIELD_TYPES` entry (built from a record keyed by `FormFieldType`), the typed values live and what a submit sends; a build-time table of every type, its control and its value type. |
 | `#formats` | `FormatLab.svelte` | Every `FORM_FORMATS` entry checked live by `matchesFormat`, each with an accepted and a refused sample (`formats.ts`). |
 | `#validation` | `ValidationDemo.svelte` | Every `FORM_RULE_NAMES` entry (the coverage table maps each to its field), an async host validator, a cross-field rule, the error summary that takes focus, and server errors from `onSubmit`. |

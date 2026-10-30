@@ -3,8 +3,7 @@
 **Package:** `@texuli/tools` · **Import:** `@texuli/tools/print` ·
 **Path:** `src/print/`
 
-> **Status: unreleased, planned for `0.8.0`** (ADR-016). Not in the
-> published `0.7.0`.
+> **Status: new in `0.8.0`** (ADR-016); the `0.7.0` release predates it.
 
 Two ways to print a blueprint (ADR-016):
 

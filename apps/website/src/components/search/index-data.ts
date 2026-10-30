@@ -114,7 +114,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     id: 'page-forms',
     title: 'Forms',
     description:
-      'Schema-driven forms: every field type, named formats, validation with announced errors, multi-step flows, conditional logic, drafts and autosave, data-source fields and agent-generated forms (in development, coming in 0.8.0).',
+      'Schema-driven forms: every field type, named formats, validation with announced errors, multi-step flows, conditional logic, drafts and autosave, data-source fields and agent-generated forms (in development, on npm from 0.8.0).',
     href: '/forms-page/',
     kind: 'page',
     keywords: [
@@ -133,7 +133,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     id: 'page-canvas',
     title: 'Canvas',
     description:
-      'An infinite canvas: shapes, text, sticky notes, frames, connectors, snapping, zoom and pan, a full keyboard model, collaboration, SVG and PNG export (in development, coming in 0.8.0).',
+      'An infinite canvas: shapes, text, sticky notes, frames, connectors, snapping, zoom and pan, a full keyboard model, collaboration, SVG and PNG export (in development, on npm from 0.8.0).',
     href: '/canvas-page/',
     kind: 'page',
     keywords: [
@@ -150,7 +150,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     id: 'page-sheets',
     title: 'Sheets',
     description:
-      'Spreadsheets: an owned formula engine with 54 functions, incremental recalculation, cycle and limit errors, CSV that neutralizes formula injection, and agent spreadsheets (in development, coming in 0.8.0).',
+      'Spreadsheets: an owned formula engine with 54 functions, incremental recalculation, cycle and limit errors, CSV that neutralizes formula injection, and agent spreadsheets (in development, on npm from 0.8.0).',
     href: '/sheets-page/',
     kind: 'page',
     keywords: ['sheets', 'spreadsheet', 'formula', 'functions', 'csv', 'recalculation', 'workbook'],
@@ -159,7 +159,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     id: 'page-dashboards',
     title: 'Dashboards',
     description:
-      'Dashboards: widgets moved and resized by pointer or keyboard with announcements, breakpoints, persisted layouts, host data sources and agent dashboards (unreleased, coming in 0.8.0).',
+      'Dashboards: widgets moved and resized by pointer or keyboard with announcements, breakpoints, persisted layouts, host data sources and agent dashboards (new in 0.8.0).',
     href: '/dashboards-page/',
     kind: 'page',
     keywords: ['dashboard', 'widgets', 'grid', 'layout', 'drag', 'resize', 'persistence'],
@@ -168,7 +168,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     id: 'page-output',
     title: 'Email, PDF and i18n',
     description:
-      'Multi-target output: email-safe HTML from a blueprint, print mode and PDF, and every component label from one message catalog with lazy locales (unreleased, coming in 0.8.0).',
+      'Multi-target output: email-safe HTML from a blueprint, print mode and PDF, and every component label from one message catalog with lazy locales (new in 0.8.0).',
     href: '/output-page/',
     kind: 'page',
     keywords: ['email', 'pdf', 'print', 'i18n', 'translation', 'locale', 'message catalog'],

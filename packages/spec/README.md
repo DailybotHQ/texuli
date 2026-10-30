@@ -14,9 +14,16 @@ by Texuli's Kotlin Multiplatform twin. The package is framework-free: no
 DOM, no Svelte, no Node APIs and no runtime dependencies.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.7.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.8.0`) may contain breaking
-> changes, so pin the exact version or use `^0.7.0`, which accepts only 0.7.x.
+> published to npm as `0.8.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.9.0`) may contain breaking
+> changes, so pin the exact version or use `^0.8.0`, which accepts only 0.8.x.
+
+> **New in `0.8.0`.** `@texuli/spec@0.8.0` carries **spec 0.8.0**, which adds
+> data-source bindings (the `@texuli/spec/source` subpath), the
+> agent-emittable `schema-form`, `canvas`, `spreadsheet`, `data-dashboard`
+> and `data-dashboard-widget` ids with their closed shapes, the closed
+> expression AST, and the pinned `schemas/canvas.schema.json`. Every
+> `0.7.0` envelope migrates by stamping `spec`.
 
 > **New in `0.7.0`.** `@texuli/spec@0.7.0` carries **spec 0.7.0**, which adds
 > an optional node `key` (unique in the tree), the agent-emittable
@@ -68,7 +75,7 @@ import {
   validateInstance,
 } from '@texuli/spec';
 
-SPEC_VERSION;                         // the spec version: '0.7.0' in @texuli/spec@0.7.0
+SPEC_VERSION;                         // the spec version: '0.8.0' in @texuli/spec@0.8.0
 SPEC_COMPONENT_IDS.includes('alert'); // true: the closed component vocabulary
 
 // The dialect validator: a closed subset of JSON Schema 2020-12.
@@ -100,7 +107,7 @@ import { type Schema, type SpecCatalog, validateBlueprint } from '@texuli/spec';
 import { migrateBlueprint } from '@texuli/spec/migrate';
 import { validateWorkflowGraph } from '@texuli/spec/workflow';
 
-const migrated = migrateBlueprint(blueprint); // 0.2.0 → … → 0.6.0 → 0.7.0; never throws
+const migrated = migrateBlueprint(blueprint); // 0.2.0 → … → 0.7.0 → 0.8.0; never throws
 const result = validateBlueprint(migrated.blueprint, {
   blueprintSchema: blueprintSchemaJson as Schema,
   catalog: componentsJson as SpecCatalog,
@@ -138,7 +145,7 @@ warning without failing.
 | `@texuli/spec/surface` | Runtime: the state surface rules every validator shares (no imports) | `checkStateSurface`, `surfaceInputs`, `SPEC_CONTROL_STATE_TYPES`, `SURFACE_PLAYER_CODES`, `LIST_TEXT_PATTERN` |
 | `@texuli/spec/motion` | Runtime (new in `0.6.0`, spec `0.6.0`): the closed motion vocabulary and its check, shared by the catalog and the player ([motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/motion.md)) | `SPEC_MOTION_PRESETS`, `SPEC_MOTION_DURATIONS`, `SPEC_MOTION_STAGGERS`, `SPEC_MOTION_LEVELS`, `checkNodeMotion`, `checkEnvelopeMotion` |
 | `@texuli/spec/stream` | Runtime, opt-in (new in `0.6.0`): streamed blueprints ([stream.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/stream.md)) | `createJsonTokenizer`, `createBlueprintAssembler`, `createBlueprintStream`, `STREAM_NODE_ORDER` |
-| `@texuli/spec/source` | Runtime (unreleased, planned for `0.8.0`, spec `0.8.0`): data-source bindings, shared by the spec validator, `@texuli/catalog` and the player ([source.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/source.md)) | `checkSourceBinding`, `isSourceBinding`, `SOURCE_BINDING_KEY`, `SPEC_SOURCE_LIMITS`, `SPEC_SOURCE_FILTER_OPERATORS`, `SpecSourceDescriptor` |
+| `@texuli/spec/source` | Runtime (new in `0.8.0`, spec `0.8.0`): data-source bindings, shared by the spec validator, `@texuli/catalog` and the player ([source.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/source.md)) | `checkSourceBinding`, `isSourceBinding`, `SOURCE_BINDING_KEY`, `SPEC_SOURCE_LIMITS`, `SPEC_SOURCE_FILTER_OPERATORS`, `SpecSourceDescriptor` |
 | `@texuli/spec/codegen` | Build time: generation and conformance | `buildSpec`, `projectCatalog`, `checkConformance`, `checkCatalogContract`, `formatJson`, `nextSpecVersion`, `checkVersionHistory` |
 
 ## Key guarantees
@@ -199,7 +206,7 @@ warning without failing.
   nodes without a matching view or event, and writers of a host-bound
   variable. The spec, `@texuli/catalog`'s `validateDraft` and the Kotlin
   twin run the same rules.
-- **Data as a named source, never a request (spec 0.8.0, unreleased).** A
+- **Data as a named source, never a request (spec 0.8.0, new in `0.8.0`).** A
   component's `sourceable` prop may read rows with
   `{"$source": name, "query": {...}, "map": {...}}`: an opaque name the host
   registered, and a closed query (projection, the `@texuli/data` grid filter
@@ -207,7 +214,7 @@ warning without failing.
   descriptors (`SpecDocuments.sources`) and refused without them; nothing in
   it is a URL, SQL or code
   ([source.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/source.md)).
-- **Forms as data, never patterns or code (spec 0.8.0, unreleased).** The
+- **Forms as data, never patterns or code (spec 0.8.0, new in `0.8.0`).** The
   agent-emittable `schema-form` id carries a closed form schema
   (`$defs.formSchema`): fields of 15 closed types in sections or steps,
   named formats and host validator names (never a regular expression),
@@ -218,7 +225,7 @@ warning without failing.
   forms validator (`@texuli/forms/model`, `checkForm` in `validateDraft`)
   checks the rest at the host's tier. The Kotlin twin decodes the shape and
   its list caps and paints a placeholder (planned).
-- **Dashboards as data (spec 0.8.0, unreleased).** The agent-emittable
+- **Dashboards as data (spec 0.8.0, new in `0.8.0`).** The agent-emittable
   `data-dashboard` id holds `data-dashboard-widget` children (`widgetId`,
   `title` and a `place` in grid units); widget content is ordinary catalog
   nodes, so its data comes only from host sources. The dashboard's `layout`
@@ -228,7 +235,7 @@ warning without failing.
   (widgets only directly in a dashboard, unique ids) on the web. The Kotlin
   twin decodes the props and paints a placeholder (planned).
 - **Spreadsheets as data, formulas in a closed grammar (spec 0.8.0,
-  unreleased).** The agent-emittable `spreadsheet` id (not `sheet`, which
+  new in `0.8.0`).** The agent-emittable `spreadsheet` id (not `sheet`, which
   is the texuli `Sheet` overlay) carries a sheet in its `sheet` prop
   (`$defs.sheet`, `$defs.sheetTab`): `format` `texuli-sheet`, 1 to 16 tabs
   of `{ id, name, rows, columns, cells }` with cells keyed by A1 address.
@@ -267,9 +274,12 @@ written for (`spec`; omitted means 0.2.0). `migrateBlueprint`
 (`@texuli/spec/migrate`) brings an
 envelope up to the current spec with pure, per-version steps
 (`src/migrations/`: `0.2.0 → 0.3.0`, `0.3.0 → 0.4.0`, `0.4.0 → 0.5.0`,
-`0.5.0 → 0.6.0` and `0.6.0 → 0.7.0`, each of which only stamps `spec`); a
-compatible version range is planned, not built. `@texuli/spec@0.7.0`
-carries spec `0.7.0` (digest
+`0.5.0 → 0.6.0`, `0.6.0 → 0.7.0` and `0.7.0 → 0.8.0`, each of which only
+stamps `spec`); a compatible version range is planned, not built.
+`@texuli/spec@0.8.0` carries spec `0.8.0` (digest
+`f6b6388280d247eb9c3106a925111f35b90d1ec3b59c23652542f06a9f103daf`), which
+adds data-source bindings, forms, canvases, dashboards and spreadsheets;
+`@texuli/spec@0.7.0` carried spec `0.7.0` (digest
 `43e44fa9a198d337d686b4e2d86882a06a676ae1e1c1f02d023b3a525795a8b2`), which
 adds node keys and documents; `@texuli/spec@0.6.0` carried spec `0.6.0` (digest
 `37141b85b9ab9f02af849a62a9c97ba729d6c5c2705130290bcdf45b308ea4cc`), which
@@ -297,7 +307,7 @@ conformance harness) are in
   [motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/motion.md)
 - Streamed blueprints (the incremental tokenizer, the canonical order and
   node shells; new in `0.6.0`): [stream.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/stream.md)
-- Data-source bindings (spec 0.8.0; unreleased):
+- Data-source bindings (spec 0.8.0; new in `0.8.0`):
   [source.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/source.md)
 - The Kotlin Multiplatform twin that consumes the generated models:
   [native/README.md](https://github.com/DailybotHQ/texuli/blob/main/native/README.md)

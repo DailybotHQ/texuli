@@ -105,16 +105,23 @@ describe('sheets documentation', () => {
     expect(readme).toContain(`${SHEET_FUNCTION_NAMES.length} documented functions`);
   });
 
-  it('states the release status honestly: the placeholder until a release publishes it', () => {
+  it('states the release status honestly: published from 0.8.0, never the placeholder', () => {
     const manifest = JSON.parse(read('package.json')) as { version: string; private?: boolean };
-    expect(manifest.version).toBe('0.0.0');
+    // First published in 0.8.0; the 0.0.0 placeholder is gone for good.
+    expect(manifest.version).not.toBe('0.0.0');
     expect(manifest.private).toBe(true);
     expect(readme).toMatch(/Status: in development/);
-    expect(readme).toMatch(/not on npm yet/);
+    expect(readme).toMatch(/published on\s+(?:>\s+)?npm/);
+    expect(readme).toContain(`\`${manifest.version}\``);
     expect(readme).toContain('utm_source=dailybotopensource');
     expect(read('src/index.ts')).toContain(
       `export const SHEETS_PACKAGE_VERSION = '${manifest.version}';`
     );
+    const pages = [readme, ...readdirSync(`${ROOT}/docs`).map((file) => read(`docs/${file}`))];
+    for (const page of pages)
+      expect(page).not.toMatch(
+        /not on npm yet|not published\s+(?:>\s+)?yet|0\.0\.0` placeholder|repository only|first release (?:is )?planned|unreleased/i
+      );
   });
 
   it('describes the player sheetHost as built, since packages/player ships it', () => {

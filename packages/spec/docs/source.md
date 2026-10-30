@@ -1,6 +1,6 @@
 # Data-source bindings (spec 0.8.0)
 
-**Status:** unreleased; spec `0.8.0` is the open pin of the 0.8.0 wave.
+**Status:** new in `0.8.0` (spec `0.8.0`).
 **Subpath:** `@texuli/spec/source` (`src/source.ts`)
 **Schema:** `$defs.sourceBinding`, `sourceQuery`, `sourceFilter`,
 `sourceSort`, `sourceName` and `sourceFieldName` in

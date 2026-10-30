@@ -5,7 +5,7 @@ import { EMAIL_BLOCK_TYPES, EMAIL_COMPONENT_IDS, renderEmail } from '@texuli/too
 import { blueprintToDocument } from '@texuli/tools/print';
 import { TEXULI_MESSAGES_EN } from 'texuli';
 /**
- * /output-page/ — multi-target output (unreleased, coming in 0.8.0): one
+ * /output-page/ — multi-target output (new in 0.8.0): one
  * blueprint as an email (@texuli/tools/email; the rendered email is a
  * static file shown in a sandboxed frame, its source and plain text live
  * in an island), as print and PDF (the player's print mode and
@@ -112,11 +112,11 @@ await i18n.setLocale('pt-BR');`;
 
 <BaseLayout
   title="Multi-target output"
-  description="One Texuli blueprint, many targets (unreleased, coming in 0.8.0): email-safe HTML with a plain-text part, print mode and PDF, and every component label from one i18n message catalog with lazy locales and a pseudo-locale."
+  description="One Texuli blueprint, many targets (new in 0.8.0): email-safe HTML with a plain-text part, print mode and PDF, and every component label from one i18n message catalog with lazy locales and a pseudo-locale."
 >
   <FeaturePage
     name="output"
-    eyebrow={`@texuli/tools/email · @texuli/tools/print · @texuli/core/i18n · unreleased · coming in ${OUTPUT_RELEASE}`}
+    eyebrow={`@texuli/tools/email · @texuli/tools/print · @texuli/core/i18n · new in ${OUTPUT_RELEASE}`}
     title="One blueprint: a page, an email, a PDF, in any language"
     pieces={OUTPUT_PIECES}
     piecesLabel="The pieces of multi-target output"
@@ -126,8 +126,8 @@ await i18n.setLocale('pt-BR');`;
       <p>
         The same validated blueprint that paints in the player becomes an email that mail clients
         render, a print-ready page and a PDF, and every label the components show comes from one
-        message catalog. These targets are unreleased and coming in <code>{OUTPUT_RELEASE}</code>;
-        they are not in the <code>0.7.0</code> published to npm.
+        message catalog. These targets are on npm from <code>{OUTPUT_RELEASE}</code>, a pre-1.0
+        release; the previous release, <code>0.7.0</code>, is without them.
       </p>
     </Fragment>
 
