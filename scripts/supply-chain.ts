@@ -82,6 +82,8 @@ export const RUNTIME_EXTERNAL_ALLOWLIST: Readonly<Record<string, readonly string
   '@texuli/blocks': [],
   '@texuli/catalog': [],
   '@texuli/tools': [],
+  // First published in 0.9.0 (ADR-019): only @texuli/tools, pinned exactly.
+  '@texuli/mcp': [],
   '@texuli/astro': ['astro'],
   '@texuli/slides': [],
   '@texuli/spec': [],
