@@ -23,6 +23,7 @@ through the same registry. The registry is framework-free.
 | `catalog.validate` | edge | Validate one candidate manifest, or a set of at most 500 (which also catches duplicate ids); returns `valid` and diagnostics with a code, a JSONPath, a message and a hint |
 | `component.get` | edge | Read one component manifest: props with kinds and schemas, events, examples, `useWhen`/`dontUseWhen`, accessibility notes and emit tiers |
 | `example.search` | edge | Find worked manifest examples by component id and/or example id, or by text (at most 100) |
+| `blueprint.validate` | edge | Validate a blueprint draft (a tree, a list of trees or an envelope, migrated first) with the catalog's `validateDraft` at the caller's tier; returns `valid`, `status`, `tier`, `migratedFrom` and diagnostics with the catalog's codes |
 | `theme.search` | edge | Search the theme library by words, category, collection, mood or tag; returns theme metadata (at most 500, more than the whole library) |
 | `theme.get` | edge | Read the full token definition of one theme (light and dark) |
 | `theme.preview` | edge | Key tokens of one theme in light or dark mode and the WCAG 2.x AA report for both modes |
@@ -51,6 +52,7 @@ and `openWorldHint`.
 | `catalog.validate` | 1,000,000 | 500 manifests | 5 s |
 | `component.get` | 1,024 | — | 5 s |
 | `example.search` | 4,096 | 100 results | 5 s |
+| `blueprint.validate` | 270,336 (the catalog's 256 KiB tree cap plus 8 KiB) | 512 nodes (the catalog's tree cap) | 5 s |
 | `theme.search` | 4,096 | 500 results | 5 s |
 | `theme.get`, `theme.preview` | 1,024 | — | 5 s |
 | `deck.run` | 2,100,000 (Markdown at most 2,000,000 characters) | — | 10 s |
@@ -61,6 +63,40 @@ Input bytes are the UTF-8 size of the input as JSON. The time budget is
 checked whenever the handler yields (it awaits a promise); a synchronous
 handler cannot be interrupted, so the deck commands are bounded by their
 input size instead.
+
+## Blueprint validation
+
+`blueprint.validate` wraps `validateDraft` from `@texuli/catalog/validate`
+(see the catalog's `docs/validate.md`) so any door can check a blueprint:
+
+- **Input:** `draft` (a catalog tree `{ id, props, children }`, an array of
+  trees, or a `texuli-blueprint` envelope), `tier` (`untrusted`, the
+  default, or `developer`) and `fragment` (`true` accepts any roots; by
+  default the single root must be `layout-page`, `layout-doc`,
+  `layout-deck`, `document`, `canvas` or `data-dashboard`).
+- **What runs:** the catalog's checks in order (input, envelope, structure,
+  interaction, sinks, limits, render, blocks, documents, forms, canvases,
+  sheets, grammar, root), against the catalog `catalog.search` reports
+  (an envelope written for another catalog hash fails with
+  `catalog-mismatch`), with the deep block family schemas and
+  `validateDocument` from `@texuli/document/schema` for `document` nodes.
+  The tier the draft declares is ignored, as in every host.
+- **Output:** `valid` (true only with no error diagnostics), `status`
+  (`valid`, `invalid`, `parse` or `over-limits`), `tier`, `migratedFrom`
+  (the spec version an envelope declared, when it was migrated; an envelope
+  without `spec` is `0.2.0`) and `diagnostics`, each with `check`, `code`,
+  `severity`, `path`, `message` and, for a node, its `id`. The codes are the
+  catalog's own (`sink`, `tier-denied`, `nodes-exceeded`, `frame-root`,
+  `catalog-mismatch` …); the catalog has no `hint` field, so none is added.
+- **Not checked on this server:** `schema-form`, `canvas` and `spreadsheet`
+  nodes and `{"$source": …}` bindings are refused (`form-unchecked`,
+  `canvas-unchecked`, `sheet-unchecked`, and source bindings), because `@texuli/tools`
+  does not depend on `@texuli/forms`, `@texuli/canvas` or `@texuli/sheets`
+  and holds no data sources. The full spec check of an envelope
+  (`validateBlueprint` from `@texuli/spec`) is skipped for the same reason;
+  the catalog-local interaction check always runs. When `when` conditions
+  appear, they are refused (`invalid-condition`): no condition runtime is
+  passed.
 
 ## Library
 
@@ -127,11 +163,15 @@ An alias returns exactly what its target returns.
 
 ## Doors that use it today
 
-- **MCP (local stdio, in the repository source):** `tools/list` comes from
-  the registry: every `edge` and `node` operation, then the aliases. A call
-  goes through `invoke()`; a failure is an `isError` result whose JSON has
-  `error`, `code` and, for schema failures, `issues`. An unknown tool name
-  is still a JSON-RPC `-32602` error.
+- **MCP (in the repository source):** `createMcpHandler` ([mcp.md](mcp.md))
+  generates `tools/list` from the registry: every operation of the runtime
+  classes the door serves (`edge` and `node` for the local stdio server),
+  with `inputSchema`, `outputSchema`, `annotations` and cursor pagination,
+  then the aliases. A call goes through `invoke()` and returns
+  `structuredContent` plus a text mirror; a failure is an `isError` result
+  whose JSON has `error`, `code` and, for schema failures, `issues`. An
+  unknown tool name is a JSON-RPC `-32602` error. The same handler serves
+  the resources, prompts and completions.
 - **CLI:** `texuli deck …` runs `deck.run`; `texuli document …` runs
   `document.run`, or `document.export` for `to-docx` and `to-pdf`;
   `texuli-init theme list` and `theme preview` run `theme.search` and
@@ -139,9 +179,8 @@ An alias returns exactly what its target returns.
   (`themeExists`, `themeCss`) from `src/ops/themes.ts`.
 
 Planned (not built yet): the generated `texuli <group> <verb>` router, the
-remote endpoint for `edge` operations, MCP `outputSchema` and
-`structuredContent`, and the generated server card, llms section and this
-page.
+`texuli-mcp` binary, the remote endpoint for `edge` operations, and the
+generated server card, llms section and this page.
 
 ## Tests
 
@@ -150,6 +189,10 @@ once in the schema subset, round-trips every example through its input and
 output schemas, refuses bad input with each error code, resolves every
 alias to the same result as its target, reads the version from
 `package.json`, and that the CLI runs through the registry.
-`packages/tools/tests/mcp.test.ts` covers the MCP tool list and calls, and
+The same file checks `blueprint.validate` on golden and hostile fixtures,
+envelope migration, the catalog hash, deep block checks, the frame root,
+the node cap and the input cap.
+`packages/tools/tests/mcp.test.ts` covers the MCP tool list and calls,
+`packages/tools/tests/mcp-protocol.test.ts` is the MCP conformance suite, and
 `packages/catalog/tests/manifests-all.test.ts` checks the static manifest
 list builds the same catalog hash as file-system discovery.

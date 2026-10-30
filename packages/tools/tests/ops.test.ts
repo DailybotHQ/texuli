@@ -31,6 +31,7 @@ const EXPECTED = [
   'catalog.validate',
   'component.get',
   'example.search',
+  'blueprint.validate',
   'theme.search',
   'theme.get',
   'theme.preview',
@@ -325,4 +326,138 @@ it('runs the CLI theme, deck and document commands through the registry, with on
       ]);
     }
   );
+});
+
+it('validates blueprint drafts with the catalog draft checks and reports the catalog codes', async () => {
+  const operation = texuliOps.get('blueprint.validate') as Operation;
+  expect(operation.runtime).toBe('edge');
+  const validate = async (input: Record<string, unknown>) => {
+    const outcome = await texuliOps.invoke('blueprint.validate', input, { runtimes: ['edge'] });
+    expect(outcome.ok, JSON.stringify(outcome).slice(0, 300)).toBe(true);
+    return (outcome as { output: Record<string, unknown> }).output as {
+      valid: boolean;
+      tier: string;
+      status: string;
+      migratedFrom?: string;
+      diagnostics: {
+        code: string;
+        check: string;
+        severity: string;
+        path: string;
+        message: string;
+      }[];
+    };
+  };
+  const codes = (output: Awaited<ReturnType<typeof validate>>) =>
+    output.diagnostics.map((diagnostic) => diagnostic.code);
+  const golden = (name: string) =>
+    (
+      JSON.parse(
+        readFileSync(
+          new URL(`../../../tests/fixtures/golden/${name}.json`, import.meta.url),
+          'utf8'
+        )
+      ) as { tree: Record<string, unknown> }
+    ).tree;
+  const catalogHash = (
+    (await texuliOps.invoke('catalog.search', { limit: 1 })) as { output: { hash: string } }
+  ).output.hash;
+  const [validExample, invalidExample] = operation.examples;
+  await scenario('the worked examples: one valid golden tree, one hostile tree', async () => {
+    expect(validExample && invalidExample).toBeTruthy();
+    const valid = await validate(validExample?.input as Record<string, unknown>);
+    expect(valid).toMatchObject({ valid: true, status: 'valid', tier: 'untrusted' });
+    expect(valid.diagnostics.filter((d) => d.severity === 'error')).toEqual([]);
+    const invalid = await validate(invalidExample?.input as Record<string, unknown>);
+    expect(invalid.valid).toBe(false);
+    expect(codes(invalid)).toEqual(expect.arrayContaining(['sink', 'tier-denied']));
+    for (const diagnostic of invalid.diagnostics)
+      expect(Object.keys(diagnostic).sort()).toEqual(
+        expect.arrayContaining(['check', 'code', 'message', 'path', 'severity'])
+      );
+  });
+  await scenario(
+    'every golden fixture tree gets a verdict, and the document brief passes its deep check',
+    async () => {
+      for (const name of ['01-landing-page', '02-dashboard', '09-document-brief']) {
+        const output = await validate({ draft: golden(name) });
+        expect(typeof output.valid, name).toBe('boolean');
+      }
+      const brief = await validate({ draft: golden('09-document-brief'), fragment: true });
+      expect(codes(brief)).not.toContain('document-unchecked');
+    }
+  );
+  await scenario(
+    'migrates a 0.2.0 envelope and refuses one written for another catalog',
+    async () => {
+      const envelope = {
+        format: 'texuli-blueprint',
+        version: 1,
+        id: 'draft-1',
+        catalog: catalogHash,
+        status: 'draft',
+        createdAt: '2026-10-30T00:00:00.000Z',
+        updatedAt: '2026-10-30T00:00:00.000Z',
+        generator: { kind: 'agent', name: 'example-agent' },
+        tree: (validExample?.input as { draft: unknown } | undefined)?.draft,
+      };
+      const migrated = await validate({ draft: envelope });
+      expect(migrated).toMatchObject({ valid: true, migratedFrom: '0.2.0' });
+      const current = await validate({ draft: { ...envelope, spec: '0.8.0' } });
+      expect(current.migratedFrom).toBeUndefined();
+      const foreign = await validate({ draft: { ...envelope, catalog: 'a'.repeat(64) } });
+      expect(foreign.valid).toBe(false);
+      expect(codes(foreign)).toContain('catalog-mismatch');
+    }
+  );
+  await scenario('checks blocks deeply, the frame root unless fragment, and the tier', async () => {
+    const badBlock = {
+      id: 'layout-page',
+      props: { title: 'Fictional page' },
+      children: [
+        { id: 'blocks-text', props: { block: { type: 'heading', level: 99, text: 'x' } } },
+      ],
+    };
+    const deep = await validate({ draft: badBlock });
+    expect(deep.valid).toBe(false);
+    expect(deep.diagnostics.some((d) => d.check === 'blocks' || d.check === 'render')).toBe(true);
+    const bare = {
+      id: 'blocks-text',
+      props: { block: { type: 'heading', level: 2, text: 'Fictional.' } },
+    };
+    expect(codes(await validate({ draft: bare }))).toContain('frame-root');
+    expect(await validate({ draft: bare, fragment: true })).toMatchObject({ valid: true });
+    expect((await validate({ draft: bare, fragment: true, tier: 'developer' })).tier).toBe(
+      'developer'
+    );
+  });
+  await scenario('caps nodes and input bytes, and refuses bad arguments', async () => {
+    const leaf = { id: 'blocks-text', props: { block: { type: 'heading', level: 2, text: 'x' } } };
+    const wide = {
+      id: 'layout-page',
+      props: { title: 'Wide' },
+      children: Array.from({ length: 600 }, () => leaf),
+    };
+    expect(codes(await validate({ draft: wide }))).toContain('nodes-exceeded');
+    expect(operation.limits.items).toBe(512);
+    const huge = { id: 'layout-page', props: { title: 'x'.repeat(operation.limits.inputBytes) } };
+    expect(await texuliOps.invoke('blueprint.validate', { draft: huge })).toMatchObject({
+      ok: false,
+      error: { code: 'input-too-large' },
+    });
+    for (const input of [
+      {},
+      { draft: 'text' },
+      { draft: {}, tier: 'root' },
+      { draft: {}, extra: 1 },
+    ])
+      expect(
+        await texuliOps.invoke('blueprint.validate', input),
+        JSON.stringify(input)
+      ).toMatchObject({
+        ok: false,
+        error: { code: 'invalid-input' },
+      });
+    expect(codes(await validate({ draft: [] }))).toEqual(expect.arrayContaining(['root-count']));
+  });
 });

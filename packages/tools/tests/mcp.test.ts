@@ -2,7 +2,12 @@
 import { readFileSync } from 'node:fs';
 import { PassThrough } from 'node:stream';
 import { expect, it } from 'vitest';
-import { createTexuliMcpServer, MCP_PROTOCOL_VERSION, runMcpStdio } from '../src/mcp/index.ts';
+import {
+  createTexuliMcpServer,
+  MCP_ERROR_CODES,
+  MCP_PROTOCOL_VERSION,
+  runMcpStdio,
+} from '../src/mcp/index.ts';
 import { scenario } from './scenario.ts';
 
 type Response = {
@@ -55,7 +60,7 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
     async () => {
       const handle = createTexuliMcpServer();
       const early = (await callTool(handle, 'catalog')) as Response;
-      expect(early.error?.code).toBe(-32002);
+      expect(early.error?.code).toBe(MCP_ERROR_CODES.notInitialized);
 
       const init = (await handle({
         jsonrpc: '2.0',
@@ -64,7 +69,12 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
         params: { protocolVersion: MCP_PROTOCOL_VERSION },
       })) as Response;
       expect(init.result?.protocolVersion).toBe(MCP_PROTOCOL_VERSION);
-      expect(init.result?.capabilities).toEqual({ tools: { listChanged: false } });
+      expect(init.result?.capabilities).toEqual({
+        tools: { listChanged: false },
+        resources: { subscribe: false, listChanged: false },
+        prompts: { listChanged: false },
+        completions: {},
+      });
       await handle({ jsonrpc: '2.0', method: 'notifications/initialized' });
 
       const listed = (await handle({ jsonrpc: '2.0', id: 2, method: 'tools/list' })) as Response;
@@ -77,6 +87,7 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
         'catalog.validate',
         'component.get',
         'example.search',
+        'blueprint.validate',
         'theme.search',
         'theme.get',
         'theme.preview',
@@ -92,7 +103,7 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
         'theme',
       ]);
       const described = tools as unknown as { name: string; description: string }[];
-      for (const legacy of described.slice(10)) {
+      for (const legacy of described.slice(11)) {
         expect(legacy.description, legacy.name).toMatch(/^Deprecated alias of [a-z]+\.[a-z-]+/u);
       }
       expect(tools.every(({ annotations }) => annotations.readOnlyHint === true)).toBe(true);
@@ -216,7 +227,7 @@ it('reports tool and protocol errors and speaks newline-delimited JSON-RPC on st
       ) as { version: string };
       expect(messages[0]?.result?.serverInfo).toEqual({ name: 'texuli', version });
       expect(version).not.toBe('0.0.0');
-      expect(messages[1]?.result?.tools).toHaveLength(17);
+      expect(messages[1]?.result?.tools).toHaveLength(18);
     }
   );
 });
