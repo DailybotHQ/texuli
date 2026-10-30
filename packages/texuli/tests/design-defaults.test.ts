@@ -330,7 +330,8 @@ describe('design defaults: components', () => {
     }
     expect(checked).toBeGreaterThan(80);
     expect(families.size).toBe(33);
-  });
+    // About 350 mounts: generous under a loaded machine (about 0.5 s alone).
+  }, 60_000);
 
   it('a reactive provider updates mounted components', async () => {
     render(Reactive);

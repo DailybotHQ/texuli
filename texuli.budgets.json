@@ -76,8 +76,8 @@
     },
     "@texuli/forms": {
       "gzip": 83008,
-      "cssGzip": 8832,
-      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the root carries SchemaForm with every texuli field control it paints (input, select, date and time, slider, choice, tags, file upload, stepper), the model and the controller; consumers that only validate import ./model. Measured 79,802 B (CSS 8,472 B)."
+      "cssGzip": 10368,
+      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the root carries SchemaForm with every texuli field control it paints (input, select, date and time, slider, choice, tags, file upload, stepper), the model and the controller; consumers that only validate import ./model. Measured 79,802 B (CSS 8,472 B). PLAN_011 T-adopt-core (2026-10-30): cssGzip 8832 -> 10368 B, measured + 4% (measured 9,957 B) after the texuli components it bundles read token contract v2 (componentVar and systemVar reads with their fallbacks) and load the focus ring hook."
     },
     "@texuli/forms/model": {
       "gzip": 19392,
@@ -723,8 +723,8 @@
     },
     "@texuli/editor": {
       "gzip": 35456,
-      "cssGzip": 2368,
-      "note": "The package barrel: editor, toolbar, link dialog, controller and paste, with the core editor texels bundled (measured 34,012 B). Grown from the 1,024 B skeleton row. PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 34,086 B (CSS 2,221 B); the Markdown codec is not in the barrel."
+      "cssGzip": 2624,
+      "note": "The package barrel: editor, toolbar, link dialog, controller and paste, with the core editor texels bundled (measured 34,012 B). Grown from the 1,024 B skeleton row. PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 34,086 B (CSS 2,221 B); the Markdown codec is not in the barrel. PLAN_011 T-adopt-core (2026-10-30): cssGzip 2368 -> 2624 B, measured + 4% (measured 2,516 B) after the texuli components it bundles read token contract v2 (componentVar and systemVar reads with their fallbacks) and load the focus ring hook."
     },
     "@texuli/editor/controller": {
       "gzip": 19136,
@@ -732,8 +732,8 @@
     },
     "@texuli/editor/editor": {
       "gzip": 36160,
-      "cssGzip": 2368,
-      "note": "RichTextEditor and EditorSurface: the contenteditable surface, block and inline renderers, selection sync, toolbar and link dialog (measured 34,590 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 34,605 B + 4% headroom so platform drift does not flip it. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 34,737 B (CSS 2,221 B)."
+      "cssGzip": 2624,
+      "note": "RichTextEditor and EditorSurface: the contenteditable surface, block and inline renderers, selection sync, toolbar and link dialog (measured 34,590 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 34,605 B + 4% headroom so platform drift does not flip it. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 34,737 B (CSS 2,221 B). PLAN_011 T-adopt-core (2026-10-30): cssGzip 2368 -> 2624 B, measured + 4% (measured 2,516 B) after the texuli components it bundles read token contract v2 (componentVar and systemVar reads with their fallbacks) and load the focus ring hook."
     },
     "@texuli/editor/link-dialog": {
       "gzip": 1600,
@@ -750,8 +750,8 @@
     },
     "@texuli/editor/toolbar": {
       "gzip": 7360,
-      "cssGzip": 2304,
-      "note": "The roving formatting toolbar on the texuli toolbar (measured 6,904 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 6,928 B + 4% headroom so platform drift does not flip it. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 7,023 B (CSS 2,214 B)."
+      "cssGzip": 2624,
+      "note": "The roving formatting toolbar on the texuli toolbar (measured 6,904 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 6,928 B + 4% headroom so platform drift does not flip it. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 7,023 B (CSS 2,214 B). PLAN_011 T-adopt-core (2026-10-30): cssGzip 2304 -> 2624 B, measured + 4% (measured 2,499 B) after the texuli components it bundles read token contract v2 (componentVar and systemVar reads with their fallbacks) and load the focus ring hook."
     },
     "@texuli/astro": {
       "gzip": 19520,
@@ -925,8 +925,8 @@
     },
     "@texuli/sheets": {
       "gzip": 46528,
-      "cssGzip": 2624,
-      "note": "PLAN_010 T-sheets (consented plan): new row at measured + 4%: the root barrel re-exports formula, model, csv, view and host; consumers import the subpaths. Measured 44,680 B (CSS 2,488 B; the lazy cell editor 6,262 B)."
+      "cssGzip": 2816,
+      "note": "PLAN_010 T-sheets (consented plan): new row at measured + 4%: the root barrel re-exports formula, model, csv, view and host; consumers import the subpaths. Measured 44,680 B (CSS 2,488 B; the lazy cell editor 6,262 B). PLAN_011 T-adopt-core (2026-10-30): cssGzip 2624 -> 2816 B, measured + 4% (measured 2,704 B) after the texuli components it bundles read token contract v2 (componentVar and systemVar reads with their fallbacks) and load the focus ring hook."
     },
     "@texuli/sheets/formula": {
       "gzip": 19392,
@@ -942,8 +942,8 @@
     },
     "@texuli/sheets/view": {
       "gzip": 43264,
-      "cssGzip": 2624,
-      "note": "PLAN_010 T-sheets (consented plan): new row at measured + 4%: SheetView over @texuli/data grid editing (grid core, editing engine) with the workbook model; the cell editor loads lazily (6,262 B). Measured 41,584 B (CSS 2,488 B)."
+      "cssGzip": 2816,
+      "note": "PLAN_010 T-sheets (consented plan): new row at measured + 4%: SheetView over @texuli/data grid editing (grid core, editing engine) with the workbook model; the cell editor loads lazily (6,262 B). Measured 41,584 B (CSS 2,488 B). PLAN_011 T-adopt-core (2026-10-30): cssGzip 2624 -> 2816 B, measured + 4% (measured 2,704 B) after the texuli components it bundles read token contract v2 (componentVar and systemVar reads with their fallbacks) and load the focus ring hook."
     },
     "@texuli/sheets/host": {
       "gzip": 19584,
