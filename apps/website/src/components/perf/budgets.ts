@@ -106,6 +106,12 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
     budget: { pageGzipKb: 164, htmlRawKb: 236, htmlGzipKb: 31 },
   },
   {
+    route: '/showcase/dashboard/',
+    reason:
+      'PLAN_011 T-adopt-core (ADR-020, second amendment): components read their design tokens so a design system can restyle every component; base.css carries the system token defaults once (+1.1 KB) and component CSS the token reads (+1.5 KB). Every route grew 2.3–5.1 KB; this showcase, at 94.8 KB before, crosses the 96 KB default. Measured 97.6 KB page on 2026-10-30 (+4% headroom). Trimming is a Final Review follow-up.',
+    budget: { pageGzipKb: 102 },
+  },
+  {
     route: '/dashboards-page/',
     reason:
       'PLAN_010 T-site-080: three lazy dashboard islands (client:visible); the player loads only in the agent demo, after hydration, so JS at the ready signal is 61.3 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the islands can import (the dashboard, the player loaders and the painters its blueprint uses), the same follow-up as /motion-page/. Measured 2026-10-29: 148.3 KB page (+4% headroom; a proposal for the owner). CI on Linux: the dashboard workbench sits at the 720 px fold (system fonts), so it hydrates on open there: 176.9 KB page, 90.1 KB JS measured 2026-10-30 (+4% headroom).',
