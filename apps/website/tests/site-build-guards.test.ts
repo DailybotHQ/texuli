@@ -38,14 +38,21 @@ import {
   MCP_PROTOCOL_VERSION,
   MCP_SUPPORTED_PROTOCOL_VERSIONS,
 } from '../../../packages/tools/src/mcp/protocol.ts';
-import { TOOLS_VERSION, texuliOps } from '../../../packages/tools/src/ops/index.ts';
+import {
+  REMOTE_RUNTIMES,
+  TOOLS_VERSION,
+  texuliOps,
+} from '../../../packages/tools/src/ops/index.ts';
 import {
   ANALYTICS_TRUSTED_TYPES_POLICY,
   pagePolicy,
   pageRoute,
   reportOnlyPolicy,
 } from '../src/components/security/csp.ts';
-import { apiCatalog as buildApiCatalog } from '../src/components/seo/agent-discovery.ts';
+import {
+  aiCatalog as buildAiCatalog,
+  apiCatalog as buildApiCatalog,
+} from '../src/components/seo/agent-discovery.ts';
 import { breadcrumbJsonLd, breadcrumbTrail } from '../src/components/seo/breadcrumbs.ts';
 import { gitCommitDateUtc } from '../src/components/seo/integration.ts';
 import { serializeJsonLd } from '../src/components/seo/json-ld.ts';
@@ -417,14 +424,15 @@ describe('JSON-LD builders', () => {
   });
 });
 
-describe('agent discovery files (public/.well-known, the generated API catalog, public/llms.txt)', () => {
+describe('agent discovery files (public/.well-known, the generated API and ARD catalogs, public/llms.txt)', () => {
   const read = (path: string) =>
     JSON.parse(
       readFileSync(fileURLToPath(new URL(`../public/.well-known/${path}`, import.meta.url)), 'utf8')
     );
 
   it('describe only real surfaces: unique entries, texuli.com or npm URLs, the registry tools on both MCP transports', async () => {
-    const aiCatalog = read('ai-catalog.json') as {
+    // The ARD catalog is generated at build too (agent-discovery.ts, PLAN_011 T-ar-api).
+    const aiCatalog = buildAiCatalog({ origin: 'https://texuli.com', openapi: true }) as {
       host: { displayName: string; documentationUrl: string };
       entries: { identifier: string; url: string }[];
     };
@@ -472,9 +480,9 @@ describe('agent discovery files (public/.well-known, the generated API catalog, 
     expect(card.capabilities).toContain('tools');
     expect(card.transport.stdio.launch).toBe('npx -y @texuli/mcp');
     // The remote endpoint (functions/mcp.ts) is the Streamable HTTP door; the
-    // card's remote flags match what its edge handler lists.
+    // card's remote flags match what its handler (edge and site operations) lists.
     expect(card.transport.streamableHttp.url).toBe('https://texuli.com/mcp');
-    const listed = (await createMcpHandler({ mode: 'stateless', runtimes: ['edge'] })({
+    const listed = (await createMcpHandler({ mode: 'stateless', runtimes: REMOTE_RUNTIMES })({
       jsonrpc: '2.0',
       id: 1,
       method: 'tools/list',

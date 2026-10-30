@@ -27,6 +27,7 @@ import * as webAgents from '../src/components/sections/web/web-agents-content.ts
 import * as webCorrelation from '../src/components/sections/web/web-correlation-content.ts';
 import * as webHero from '../src/components/sections/web/web-hero-content.ts';
 import * as webWhy from '../src/components/sections/web/web-why-svelte-content.ts';
+import { DISCOVERY_FILE_TYPES } from '../src/components/seo/agent-discovery.ts';
 
 function findRepoRoot(): string {
   let dir = process.cwd();
@@ -218,7 +219,11 @@ describe('the layer data is the documented and enforced graph', () => {
 });
 
 /** An on-site href resolves to a page, a dynamic page, or a public file. */
+/** Files the build generates from typed sources (agent-discovery.ts), not committed. */
+const GENERATED_FILES = new Set(DISCOVERY_FILE_TYPES.map((file) => file.path));
+
 function routeExists(href: string): boolean {
+  if (GENERATED_FILES.has(href)) return true;
   if (!href.endsWith('/')) return existsSync(join(REPO_ROOT, 'apps/website/public', href));
   const page = join(PAGES_DIR, href);
   if (existsSync(join(page, 'index.astro')) || existsSync(`${page.replace(/\/$/, '')}.astro`)) {

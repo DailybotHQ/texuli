@@ -16,9 +16,17 @@
  * points at the MCP server and says Texuli has no A2A agent; the Personal
  * Agent Protocol manifest declares website-only discovery (no sessions, no
  * sign-in, no APIs); `service-desc` is advertised only when the build
- * actually contains `/openapi.json`.
+ * actually contains `/openapi.json`. The ARD catalog (`ai-catalog.json`)
+ * is generated here too since PLAN_011 T-ar-api, with the npm packages an
+ * agent can run (`@texuli/mcp`, `@texuli/tools`).
  */
 import type { Operation } from '@texuli/tools/ops';
+import {
+  API_PATHS,
+  API_PREFIX,
+  API_RATE_LIMIT,
+  API_RELEASE_STATUS,
+} from '../../lib/api-surface.ts';
 
 /** Every discovery path the site serves or links, root-relative. */
 export const DISCOVERY_PATHS = Object.freeze({
@@ -166,7 +174,7 @@ export interface DiscoveryFacts {
   origin: string;
   /** The `@texuli/tools` version that serves the MCP operations. */
   toolsVersion: string;
-  /** The operations the remote MCP serves (the registry's `edge` runtime). */
+  /** The operations the remote MCP serves (the registry's `edge` and `site` runtimes). */
   operations: readonly Pick<Operation, 'name' | 'title' | 'summary' | 'annotations'>[];
   /** The security contact address, read from the root SECURITY.md. */
   securityContact: string;
@@ -233,6 +241,26 @@ export function apiCatalog(facts: Pick<DiscoveryFacts, 'origin' | 'openapi'>): u
       href: at(DISCOVERY_PATHS.authMd),
       type: 'text/markdown',
       title: 'How agents access texuli.com (anonymous, read-only)',
+    },
+    {
+      rel: 'service-doc',
+      href: at(API_PATHS.docs),
+      type: 'text/html',
+      title: 'Developer portal: the JSON API, MCP, CLI, limits and versioning',
+    },
+    {
+      rel: 'status',
+      href: at(API_PATHS.health),
+      type: JSON_TYPE,
+      title: 'API health (a static file written by the build)',
+    },
+    {
+      rel: 'item',
+      // The static index (built everywhere); it lists the /api/v1/ URLs,
+      // which only the middleware serves.
+      href: at(API_PATHS.index),
+      type: JSON_TYPE,
+      title: 'API index: every endpoint with its operationId',
     },
     {
       rel: 'item',
@@ -380,8 +408,19 @@ before deciding how to authenticate.
 - **Operations:** read-only (search, read and validate the catalog,
   examples, blueprints and themes). The server lists them in \`tools/list\`.
 
+## The JSON API
+
+- **Index:** [${at(API_PATHS.index)}](${at(API_PATHS.index)}); **OpenAPI:**
+  [${at(API_PATHS.openapi)}](${at(API_PATHS.openapi)}); **portal:**
+  [${at(API_PATHS.docs)}](${at(API_PATHS.docs)}).
+- Read-only files under \`${API_PREFIX}/\` (\`GET\` and \`HEAD\`), anonymous, CORS \`*\`.
+  Every answer carries \`X-API-Version\`; errors are RFC 9457
+  \`application/problem+json\`.
+
 ## Limits
 
+- ${API_RATE_LIMIT.capacity} JSON API requests per client per ${API_RATE_LIMIT.windowSeconds} seconds under \`/api/\`, with the
+  same \`RateLimit-Policy\`, \`RateLimit\` and \`429\` + \`Retry-After\` fields.
 - ${limits.capacity} MCP messages per client per ${limits.windowSeconds} seconds; each message in a
   batch counts. Every answer carries \`RateLimit-Policy\` and \`RateLimit\`
   headers. Past the limit the answer is \`429\` with \`Retry-After\`: wait
@@ -485,9 +524,214 @@ export function poppyManifest(facts: Pick<DiscoveryFacts, 'origin'>): unknown {
   };
 }
 
+/** One ARD catalog entry (Agentic Resource Discovery). */
+export interface AiCatalogEntry {
+  identifier: string;
+  displayName: string;
+  type: string;
+  url: string;
+  description: string;
+  tags: string[];
+  capabilities?: string[];
+  representativeQueries: string[];
+}
+
+const NPM = 'https://www.npmjs.com/package/';
+const NPM_TYPE = 'application/vnd.npm.package+json';
+
+/**
+ * The ARD catalog (`/.well-known/ai-catalog.json`, `Agentmap` in robots):
+ * the content, data, server, API and skill resources of texuli.com, plus the
+ * npm packages an agent runs. URLs on texuli.com must be built paths (the
+ * AEO audit resolves them); copy describes only what exists.
+ */
+export function aiCatalog(facts: Pick<DiscoveryFacts, 'origin' | 'openapi'>): unknown {
+  const at = (path: string) => absolute(facts.origin, path);
+  const host = new URL(facts.origin).hostname;
+  const urn = (kind: string, name: string) => `urn:air:${host}:${kind}:${name}`;
+  const status =
+    API_RELEASE_STATUS.state === 'released' ? '' : ' (in development, first published in 0.9.0)';
+  const entries: AiCatalogEntry[] = [
+    {
+      identifier: urn('content', 'llms-txt'),
+      displayName: 'Texuli Site Guide for LLMs',
+      type: 'text/plain',
+      url: at(DISCOVERY_PATHS.llms),
+      description:
+        'Curated map of texuli.com for language models: getting started, guides, component families, primitives, themes and the agent surfaces, as Markdown links.',
+      tags: ['llms-txt', 'content', 'navigation'],
+      representativeQueries: [
+        'what is Texuli and what can I build with it',
+        'give me a map of the Texuli component families',
+        'how do Texuli web components relate to the Kotlin renderer',
+      ],
+    },
+    {
+      identifier: urn('content', 'llms-full-txt'),
+      displayName: 'Texuli Full Content Corpus for LLMs',
+      type: 'text/plain',
+      url: at(DISCOVERY_PATHS.llmsFull),
+      description:
+        "Expanded llms.txt corpus (also at /llms/llms-full.txt, the same bytes) with the catalog's component documentation for retrieval and grounding. Every page also has a Markdown twin at the same path plus .md (guides/theming.md beside guides/theming/).",
+      tags: ['llms-txt', 'content', 'corpus', 'markdown'],
+      representativeQueries: [
+        'read the full Texuli component documentation for grounding',
+        'fetch the Markdown twin of the Button component page',
+      ],
+    },
+    {
+      identifier: urn('content', 'component-docs'),
+      displayName: 'Texuli Component Docs Bundle',
+      type: 'text/plain',
+      url: at(DISCOVERY_PATHS.componentDocs),
+      description:
+        'The llms bundle index over one pre-rendered Markdown document per catalog component, each also served standalone at /llms/components/<id>.md.',
+      tags: ['llms-txt', 'components', 'catalog'],
+      representativeQueries: [
+        'list every Texuli component with its llms doc',
+        'open the llms doc for the dialog component',
+      ],
+    },
+    {
+      identifier: urn('data', 'catalog'),
+      displayName: 'Texuli Catalog Manifest Snapshot',
+      type: JSON_TYPE,
+      url: at(DISCOVERY_PATHS.catalog),
+      description:
+        'The agent catalog snapshot: every component manifest with props, variants, examples, a11y notes and keyboard interactions, the data the sink-free renderer consumes. Also served as /api/v1/catalog.json. A README beside it names the content hash.',
+      tags: ['catalog', 'json', 'components', 'a2ui'],
+      capabilities: [
+        'component manifests with prop schemas',
+        'examples as renderable props',
+        'a11y and keyboard documentation per component',
+      ],
+      representativeQueries: [
+        'fetch the Texuli catalog snapshot as JSON',
+        'what props does the Texuli button component accept',
+        'which Texuli components are agent-emittable',
+      ],
+    },
+    {
+      identifier: urn('server', 'mcp'),
+      displayName: 'Texuli MCP Server',
+      type: JSON_TYPE,
+      url: at(DISCOVERY_PATHS.mcp),
+      description: `Read-only MCP server over stateless Streamable HTTP at ${at(DISCOVERY_PATHS.mcp)} (alias /.well-known/mcp): search and read the component catalog, examples and themes, and validate blueprints. POST JSON-RPC, anonymous, rate limited; the server card is /.well-known/mcp/server-card.json and access is described in /auth.md.`,
+      tags: ['mcp', 'catalog', 'themes', 'read-only'],
+      representativeQueries: [
+        'search the Texuli component catalog for a date picker',
+        'validate this Texuli blueprint draft',
+        'list Texuli themes with a dark mode',
+      ],
+    },
+    ...(facts.openapi
+      ? [
+          {
+            identifier: urn('api', 'openapi'),
+            displayName: 'Texuli Public API (OpenAPI 3.1)',
+            type: 'application/vnd.oai.openapi+json',
+            url: at(DISCOVERY_PATHS.openapi),
+            description:
+              'OpenAPI 3.1 description of the read-only JSON API (the catalog, themes, the Markdown twins manifest, health, every /api/v1/ path) and POST /mcp, with an operationId and a typed schema on every operation. Anonymous; X-API-Version and RateLimit headers; RFC 9457 errors.',
+            tags: ['openapi', 'api', 'json', 'read-only'],
+            representativeQueries: [
+              'get the OpenAPI description of texuli.com',
+              'which JSON endpoints does texuli.com serve',
+            ],
+          },
+        ]
+      : []),
+    {
+      identifier: urn('api', 'catalog'),
+      displayName: 'Texuli API Catalog',
+      type: 'application/linkset+json',
+      url: at(DISCOVERY_PATHS.apiCatalog),
+      description:
+        'RFC 9727 API catalog linkset pointing at the OpenAPI description, the developer portal, the health file, the service documentation (llms.txt), the catalog snapshot, the component docs bundle and the skill.',
+      tags: ['api-catalog', 'rfc9727', 'linkset'],
+      representativeQueries: [
+        'where is the API catalog for texuli.com',
+        'find the service documentation for Texuli',
+      ],
+    },
+    {
+      identifier: urn('skills', 'agent-readiness'),
+      displayName: 'Texuli Agent Skills Index',
+      type: 'application/agent-skills+json',
+      url: at(DISCOVERY_PATHS.agentSkills),
+      description:
+        'Agent Skills Discovery index listing every SKILL.md in the Texuli skill pack (the router and each sub-skill), served with the pack itself under /skill-pack/ and pinned by SHA-256 digest.',
+      tags: ['agent-skills', 'discovery', 'well-known'],
+      representativeQueries: [
+        'which agent skills does texuli.com publish',
+        'show the agent skills discovery index for Texuli',
+      ],
+    },
+    {
+      identifier: urn('skills', 'pack'),
+      displayName: 'The Texuli Skill Pack',
+      type: 'text/markdown',
+      url: at('/skill-pack/SKILL.md'),
+      description:
+        'The distributable Texuli skill, served raw: a router that teaches coding agents to build with Texuli (components, themes, media, blueprints, contribution). Offline and install-free to read; the /skill/ page documents per-host installation and checksums.',
+      tags: ['skill', 'agents', 'documentation'],
+      representativeQueries: [
+        'read the Texuli skill router for coding agents',
+        'how do I install the Texuli skill in my coding agent',
+      ],
+    },
+    {
+      identifier: urn('package', 'npm'),
+      displayName: 'Texuli on npm',
+      type: NPM_TYPE,
+      url: `${NPM}texuli`,
+      description:
+        'The Texuli package on npm (the 0.8 line, a pre-1.0 release): styled components built on owned primitives, tokens and the agent catalog. Scoped @texuli/* packages ship alongside it.',
+      tags: ['npm', 'svelte', 'components', 'pre-1.0'],
+      representativeQueries: ['install Texuli from npm', 'which @texuli packages exist on npm'],
+    },
+    {
+      identifier: urn('package', 'mcp'),
+      displayName: 'Texuli MCP server on npm (@texuli/mcp)',
+      type: NPM_TYPE,
+      url: `${NPM}@texuli/mcp`,
+      description: `The local Texuli MCP server over stdio${status}: every MCP host runs \`npx -y @texuli/mcp\`. The same operations as the remote server, plus the ones that need Node (PDF and DOCX export).`,
+      tags: ['npm', 'mcp', 'stdio', 'cli'],
+      representativeQueries: [
+        'add the Texuli MCP server to my coding agent',
+        'run the Texuli MCP server locally',
+      ],
+    },
+    {
+      identifier: urn('package', 'tools'),
+      displayName: 'Texuli CLI and tools on npm (@texuli/tools)',
+      type: NPM_TYPE,
+      url: `${NPM}@texuli/tools`,
+      description:
+        'The Texuli developer tools: the `texuli` CLI (`texuli <group> <verb>` for every operation from 0.9.0, in development; deck and document commands since the 0.8 line), init, theme, add and update commands, and the llms generator. Run without installing with `npx -p @texuli/tools texuli help`.',
+      tags: ['npm', 'cli', 'tools'],
+      representativeQueries: [
+        'search the Texuli catalog from the command line',
+        'validate a Texuli blueprint with a CLI',
+      ],
+    },
+  ];
+  return {
+    specVersion: '1.0',
+    host: {
+      displayName: 'Texuli',
+      identifier: `did:web:${host}`,
+      documentationUrl: at('/guides/'),
+      logoUrl: at('/brand/texuli-logo-light.png'),
+    },
+    entries,
+  };
+}
+
 /** The served shape of every generated file: path, content type and CORS. */
 export const DISCOVERY_FILE_TYPES: readonly Omit<DiscoveryFile, 'body'>[] = Object.freeze([
   { path: DISCOVERY_PATHS.apiCatalog, contentType: 'application/linkset+json', cors: true },
+  { path: DISCOVERY_PATHS.aiCatalog, contentType: JSON_TYPE, cors: true },
   { path: DISCOVERY_PATHS.oauthAuthorizationServer, contentType: JSON_TYPE, cors: true },
   { path: DISCOVERY_PATHS.oauthProtectedResource, contentType: JSON_TYPE, cors: true },
   { path: DISCOVERY_PATHS.jwks, contentType: JSON_TYPE, cors: true },
@@ -501,6 +745,7 @@ export const DISCOVERY_FILE_TYPES: readonly Omit<DiscoveryFile, 'body'>[] = Obje
 export function discoveryFiles(facts: DiscoveryFacts): DiscoveryFile[] {
   const bodies: Record<string, string> = {
     [DISCOVERY_PATHS.apiCatalog]: json(apiCatalog(facts)),
+    [DISCOVERY_PATHS.aiCatalog]: json(aiCatalog(facts)),
     [DISCOVERY_PATHS.oauthAuthorizationServer]: json(oauthAuthorizationServer(facts)),
     [DISCOVERY_PATHS.oauthProtectedResource]: json(oauthProtectedResource(facts)),
     [DISCOVERY_PATHS.jwks]: json(jwks()),
@@ -517,16 +762,15 @@ export function discoveryFiles(facts: DiscoveryFacts): DiscoveryFile[] {
 }
 
 /**
- * The `_headers` rules for the discovery files: the generated ones, the
- * committed ARD catalog (CORS) and the root llms-full.txt copy. Cloudflare
- * Pages applies these only to static asset responses.
+ * The `_headers` rules for the discovery files: the generated ones and the
+ * root llms-full.txt copy. Cloudflare Pages applies these only to static
+ * asset responses.
  */
 export function discoveryHeaderRules(
   files: readonly Omit<DiscoveryFile, 'body'>[] = DISCOVERY_FILE_TYPES
 ): string[] {
   const all = [
     ...files,
-    { path: DISCOVERY_PATHS.aiCatalog, contentType: JSON_TYPE, cors: true },
     { path: DISCOVERY_PATHS.llmsFull, contentType: 'text/plain; charset=utf-8', cors: false },
   ];
   return all.map(

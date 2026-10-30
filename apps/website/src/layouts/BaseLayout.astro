@@ -116,6 +116,18 @@ const markdownHead = docs
       import { setupOutboundDocTracking } from '../lib/outbound-links.ts';
       setupOutboundDocTracking();
     </script>
+    <script>
+      // WebMCP (PLAN_011 T-ar-site-mcp): four read-only tools for browser
+      // agents, same-origin requests only. This loader only feature-detects:
+      // the tools chunk is fetched when the page has a modelContext (an
+      // agent's browser) and registers as soon as it arrives, during page
+      // load; every other browser downloads nothing more. registerWebMcp
+      // checks the API itself (provideContext, else registerTool).
+      const host = globalThis as { navigator: object; document: object };
+      if ('modelContext' in host.navigator || 'modelContext' in host.document) {
+        import('../lib/webmcp.ts').then((bridge) => bridge.registerWebMcp(globalThis as never));
+      }
+    </script>
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <SeoHead title={fullTitle} {description} siteName={SITE_NAME} {lang} {noindex} />

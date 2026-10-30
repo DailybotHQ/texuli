@@ -10,9 +10,10 @@
  * access line, Last Updated from the same git dates as the sitemap), the
  * page's content, and a "For agents" note on interactive pages
  * (`twins.ts`, `twin-notes.ts`). `md-manifest.json` maps every page route to
- * its twin. Working on the built HTML keeps the page render single: the
- * layout never renders its slot twice. Static files only; nothing runs at
- * request time.
+ * its twin (`twins`) and lists every page with its title, description and
+ * h2/h3 headings (`pages`, read by the remote MCP's `site.*` operations).
+ * Working on the built HTML keeps the page render single: the layout never
+ * renders its slot twice. Static files only; nothing runs at request time.
  */
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -23,7 +24,15 @@ import { pageRoute } from '../security/csp.ts';
 import { readPageMeta } from '../seo/seo.ts';
 import { htmlToMarkdown } from './markdown.ts';
 import { agentNoteMarkdown } from './twin-notes.ts';
-import { isRedirectStub, pageLanguage, renderTwin, TWIN_EXEMPTIONS, twinPathFor } from './twins.ts';
+import {
+  isRedirectStub,
+  pageLanguage,
+  renderTwin,
+  TWIN_EXEMPTIONS,
+  type TwinIndexEntry,
+  twinIndexEntry,
+  twinPathFor,
+} from './twins.ts';
 
 const BODY = /<!--tx-page-body-->([\s\S]*?)<!--\/tx-page-body-->/;
 const TEMPLATE = /(<template data-page-markdown=""[^>]*>)([\s\S]*?)(<\/template>)/;
@@ -89,6 +98,7 @@ export function copyPageIntegration(): AstroIntegration {
         let filled = 0;
         let exempt = 0;
         const twins: Record<string, string> = {};
+        const pages: TwinIndexEntry[] = [];
         const operations = texuliOps
           .list({ runtimes: ['edge'] })
           .map(({ name, title }) => ({ name, title }));
@@ -127,10 +137,11 @@ export function copyPageIntegration(): AstroIntegration {
           });
           await writeFile(join(out, twin.slice(1)), markdown, 'utf8');
           twins[route] = twin;
+          pages.push(twinIndexEntry(route, twin, markdown, meta.description));
         }
         await writeFile(
           join(out, 'md-manifest.json'),
-          `${JSON.stringify({ twins }, null, 2)}\n`,
+          `${JSON.stringify({ twins, pages }, null, 2)}\n`,
           'utf8'
         );
         logger.info(

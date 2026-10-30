@@ -55,10 +55,11 @@ stateless mode.
 import { createMcpHandler } from '@texuli/tools/mcp';
 
 const local = createMcpHandler({ mode: 'stateful' }); // stdio: edge + node operations
-const remote = createMcpHandler({ mode: 'stateless', runtimes: ['edge'] }); // HTTP
+const remote = createMcpHandler({ mode: 'stateless', runtimes: ['edge', 'site'] }); // HTTP
 const response = await remote(
   { jsonrpc: '2.0', id: 1, method: 'tools/list' },
-  { protocolVersion: '2025-11-25' } // the MCP-Protocol-Version header
+  // the MCP-Protocol-Version header, and the built site the site.* tools read
+  { protocolVersion: '2025-11-25', site: { assets: env.ASSETS } }
 );
 ```
 
@@ -68,7 +69,7 @@ const response = await remote(
 | --- | --- | --- |
 | `registry` | every Texuli operation | The operations served as tools |
 | `mode` | `stateful` | `stateful` keeps the initialization gate (stdio); `stateless` never requires it (HTTP) |
-| `runtimes` | `['edge', 'node']` | The runtime classes served; a remote door passes `['edge']` |
+| `runtimes` | `['edge', 'node']` | The runtime classes served; the remote door passes `['edge', 'site']` |
 | `capabilities` | all on | `{ resources, prompts, completions }`: `false` switches one off |
 | `resources` | the Texuli resources | Resource providers; an empty list advertises no resources |
 | `prompts` | the Texuli prompts | Prompts; an empty list advertises no prompts |
@@ -128,8 +129,11 @@ operation's stable code (`invalid-input`, `input-too-large`, `not-found`,
 `runtime-unavailable`, `invalid-output`, `timeout`, `operation-failed`,
 `unknown-operation`; see [ops.md](ops.md#error-codes)). Calling an operation
 the handler knows but does not serve (a `node` operation on an `edge`
-handler) gives `runtime-unavailable`. A name the registry does not know is a
-`-32602` protocol error.
+handler, or a `site` operation on a local one) gives `runtime-unavailable`.
+A name the registry does not know is a `-32602` protocol error. Besides the
+protocol version, the per-request context may carry `site: { assets,
+origin? }`, the `env.ASSETS`-shaped binding the `site` operations read;
+without it they answer `runtime-unavailable`.
 
 The content blocks of the `blocks-*` components are reachable as tools, not
 resources: `block.list` lists every block type the validator accepts, and
@@ -162,8 +166,9 @@ over-2,048-character URI is `-32602`.
 - **Package guides** (`packages/<pkg>/docs/*.md`): about 300 files and
   1.5 MB, too large to bundle into an edge handler. `texuli://docs/{slug}`
   is scoped to the component pages, which are computed from the catalog the
-  handler already holds. Reading the site's Markdown twins is planned as the
-  `site` operations of ADR-018.
+  handler already holds. The site's own pages, as Markdown twins, are read
+  with the remote-only `site.pages`, `site.read` and `site.search` tools
+  ([Site tools](#site-tools-remote-only)).
 - **`texuli://schema/blueprint`:** the blueprint JSON Schema lives only in
   `@texuli/spec` (`schemas/blueprint.schema.json`); `@texuli/catalog` exports
   no copy of it, and `@texuli/tools` does not depend on `@texuli/spec` yet
@@ -245,9 +250,9 @@ MCP-Protocol-Version: 2025-11-25
 ```
 
 - **What it serves:** `createMcpHandler({ mode: 'stateless', runtimes:
-  ['edge'] })`, so every tool, resource, prompt and completion above except
-  the `node` operations (`document.export`: PDF and DOCX), which are not
-  listed and answer `runtime-unavailable`. No handshake is required; send
+  ['edge', 'site'] })`, so every tool, resource, prompt and completion above
+  except the `node` operations (`document.export`: PDF and DOCX), which are
+  not listed and answer `runtime-unavailable`, plus the site tools below. No handshake is required; send
   `initialize` if the host wants one. The protocol version comes from the
   `MCP-Protocol-Version` header (an unsupported one is `400`).
 - **Responses:** JSON only, no SSE stream and no `Mcp-Session-Id`. A
@@ -266,6 +271,32 @@ MCP-Protocol-Version: 2025-11-25
   Cloudflare rule are in
   [SECURITY section 21](../../../docs/SECURITY.md#21-remote-mcp-endpoint).
 
+### Site tools (remote only)
+
+`site.pages`, `site.read` and `site.search` list, read and search the pages
+of texuli.com as their Markdown twins (PLAN_011 T-ar-site-mcp). The
+Function passes each request's `env.ASSETS` binding and origin as the site
+context, so they read the deployed build's `md-manifest.json` and twin
+files and never the network; a page URL they return uses the request's
+origin (texuli.com, or the preview host). `site.read` takes a route, a twin
+path or a texuli.com URL, refuses traversal, encoded paths and other hosts
+with `invalid-input` and unknown pages with `not-found`, and caps a twin at
+256 KiB (`truncated: true`). Ranking, paging and the manifest rules are in
+[ops.md](ops.md#site-operations).
+
+```text
+{"jsonrpc":"2.0","id":2,"method":"tools/call",
+ "params":{"name":"site.search","arguments":{"query":"dark mode","limit":3}}}
+{"jsonrpc":"2.0","id":3,"method":"tools/call",
+ "params":{"name":"site.read","arguments":{"path":"/guides/theming/"}}}
+```
+
+The local doors (stdio, `texuli mcp`, the CLI) do not list them: there is
+no built site to read locally, and a local agent reads the repository. The
+server card marks them `remote: true, local: false`. The same pages are
+offered to browser agents in the page itself through WebMCP
+([site-aeo.md](../../../apps/website/docs/site-aeo.md)).
+
 ## Tests
 
 `packages/tools/tests/mcp-cli.test.ts` covers `runMcpCli` and `texuli mcp`,
@@ -278,7 +309,10 @@ method, every JSON-RPC and operation error code, the four versions, cursors,
 oversized stdio lines and operation inputs, stateless and stateful handlers,
 and the runtime filter. It also checks that the llms resources are
 byte-identical to the site's committed snapshots. `mcp.test.ts`,
-`deck.test.ts` and `document.test.ts` cover the tools themselves.
+`deck.test.ts` and `document.test.ts` cover the tools themselves, and
+`site-ops.test.ts` the site tools through the stateless handler with a
+fake `env.ASSETS`; `apps/website/tests/mcp-function.test.ts` drives them
+through the Pages Function.
 
 `tests/agent-evals/` (`pnpm vitest run tests/agent-evals`) replays scripted
 agent sessions, with no model, on both doors: the stateful handler as the
@@ -286,8 +320,11 @@ stdio server builds it, and the remote Function with real `Request`
 objects. The jobs are discovery from cold (including `block.list`), a
 pricing page validated with `blueprint.validate` whose table block is
 written only from `block.schema`, theming with the `theme-blueprint` prompt and a
-Markdown deck conversion; every edge operation must answer identically on
-both doors. `tool-descriptions.test.ts` there lints every operation's
+Markdown deck conversion, on both doors; every edge operation must answer
+identically on both. A fifth job reads the site (`site.search` →
+`site.read` → `site.pages`, then a traversal refusal) on the remote door
+only, with a fake `env.ASSETS`, and the stdio door is checked to refuse
+`site.read` with `runtime-unavailable`. `tool-descriptions.test.ts` there lints every operation's
 summary, stated limits, argument descriptions and bounds, closed input
 schema and examples. The design-system jobs are skipped until their
 operations exist.

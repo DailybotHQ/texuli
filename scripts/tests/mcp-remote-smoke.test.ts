@@ -6,6 +6,7 @@ import type { AddressInfo } from 'node:net';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createMcpHandler } from '../../packages/tools/src/mcp/handler.ts';
+import { REMOTE_RUNTIMES } from '../../packages/tools/src/ops/index.ts';
 
 const SCRIPT = join(import.meta.dirname, '../mcp-remote-smoke.sh');
 let server: Server | undefined;
@@ -50,8 +51,9 @@ function run(url: string): Promise<{ code: number; out: string }> {
   });
 }
 
+/** What the remote handler lists: the edge and site operations, then the served aliases. */
 const edgeNames = async () => {
-  const handler = createMcpHandler({ mode: 'stateless', runtimes: ['edge'] });
+  const handler = createMcpHandler({ mode: 'stateless', runtimes: REMOTE_RUNTIMES });
   const response = (await handler({ jsonrpc: '2.0', id: 1, method: 'tools/list' })) as {
     result: { tools: { name: string }[] };
   };
@@ -59,7 +61,7 @@ const edgeNames = async () => {
 };
 
 describe('scripts/mcp-remote-smoke.sh', () => {
-  it('passes when tools/list equals the edge handler (the registry), posting a read-only tools/list with the card protocol version', async () => {
+  it('passes when tools/list equals the remote handler (the registry), posting a read-only tools/list with the card protocol version', async () => {
     const { url, seen } = await serve(edgeNames);
     const { code, out } = await run(url);
     expect(code, out).toBe(0);
