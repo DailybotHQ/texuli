@@ -155,9 +155,18 @@ export {
 } from './overlay/index.ts';
 export {
   createPortal,
+  createScopedPortal,
+  createScopedPortalRoot,
+  findPortalScope,
+  PORTAL_ROOT_ATTRIBUTE,
   type PortalController,
   type PortalOptions,
+  type PortalScope,
   type PortalTarget,
+  SCOPE_ATTRIBUTE,
+  SCOPE_SELECTOR,
+  type ScopedPortalOptions,
+  type ScopedPortalRoot,
 } from './portal/index.ts';
 export {
   type ApplyPositionOptions,
