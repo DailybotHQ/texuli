@@ -365,11 +365,13 @@ static site with `client:visible` islands:
 It imports the workspace packages directly, so a broken component breaks
 `pnpm build`. Cloudflare Pages Functions in the repository-root
 `functions/` run beside the static output:
-- `_middleware.ts` serves Markdown twins of docs pages on an explicit
-  `text/markdown` preference, a stripped `robots.txt` to audit tools and a
-  `problem+json` 404 to agents, and sends bot-hit events; every other
-  request gets the static asset response back untouched, so its `_headers`
-  (CSP, and `Vary: Accept` on negotiable docs pages) survive;
+- `_middleware.ts` serves the Markdown twin of any page (`/index.md` for
+  `/`) on an explicit `text/markdown` preference, labels `.md` files
+  `text/markdown`, a stripped `robots.txt` to audit tools and a Markdown
+  404 to agents (`problem+json` under `/api/` and for JSON clients), and
+  sends bot-hit and `markdown_request` events; every other request gets the
+  static asset response back untouched, so its `_headers` (CSP, and
+  `Vary: Accept` on every page with a twin) survive;
 - `api/umami/[[path]].ts` is the same-origin Umami analytics proxy, off
   until the owner provisions it.
 - `mcp.ts` is the remote MCP endpoint for `/mcp` (the middleware routes
