@@ -1,10 +1,13 @@
 /**
  * Cloudflare Pages middleware (T-26, T-27, T-28, T-37): request shaping
  * for agents plus server-side analytics for automated consumers. A
- * request that explicitly prefers `text/markdown` gets the docs page's
- * static twin from the build output (`/guides/theming.md` beside
- * `/guides/theming/`); an automated consumer that misses gets RFC 9457
- * `application/problem+json` instead of the HTML 404; a strict-parser
+ * request that explicitly prefers `text/markdown` gets the page's static
+ * twin from the build output (`/index.md` for `/`, `/guides/theming.md`
+ * beside `/guides/theming/`; every page has one since PLAN_011 T-ar-twins),
+ * and a `.md` URL is served as `text/markdown; charset=utf-8`; a
+ * non-browser client that misses gets a Markdown 404 body (RFC 9457
+ * `application/problem+json` under `/api/` and for JSON clients) instead of
+ * the HTML 404; a strict-parser
  * auditing tool (Lighthouse family) gets the stripped robots variant;
  * counted bot page hits and served twins emit UA-class + path events
  * through the same-origin Umami proxy via waitUntil (never blocking the
@@ -16,6 +19,7 @@
  * Function (T-mcp-remote).
  */
 
+import { prefersMarkdown } from '../apps/website/src/components/docs/markdown-negotiation.ts';
 import {
   discoveryLinks,
   formatLinkHeader,
@@ -27,7 +31,13 @@ import {
   buildBotEventBody,
   buildBotEventRequest,
 } from '../apps/website/src/lib/bot-events.ts';
-import { negotiateTwin } from '../apps/website/src/lib/md-negotiate.ts';
+import {
+  isDirectMarkdownPath,
+  MARKDOWN_CONTENT_TYPE,
+  markdownNotFound,
+  negotiateTwin,
+  prefersProblemJson,
+} from '../apps/website/src/lib/md-negotiate.ts';
 import {
   isStrictParserAudit,
   stripDirectivesForStrictParsers,
@@ -101,10 +111,12 @@ export const onRequest = async (context: Context): Promise<Response> => {
       });
     }
   }
-  const decision = negotiateTwin(url.pathname, context.request.headers.get('accept'));
+  const accept = context.request.headers.get('accept');
+  const decision = negotiateTwin(url.pathname, accept);
   if (decision) {
     const asset = new URL(context.request.url);
     asset.pathname = decision.twin;
+    asset.search = '';
     const response = await context.env.ASSETS.fetch(new Request(asset));
     // A twin that was not built falls through to the normal pipeline (the
     // site's own 404), never to a fabricated body.
@@ -121,6 +133,19 @@ export const onRequest = async (context: Context): Promise<Response> => {
   }
   const response = await context.next();
   const status = response.status;
+  // A Markdown file asked for by its URL (`/index.md`, `/guides/theming.md`):
+  // counted like a negotiated twin, and always labelled `text/markdown` with
+  // UTF-8, whatever type the static host guessed for `.md` (PLAN_011
+  // T-ar-twins). Only a 200 is rebuilt; misses and 304s pass through.
+  if (status === 200 && isDirectMarkdownPath(url.pathname)) {
+    const markdownEvent = botEventFor(userAgent, true);
+    if (markdownEvent) sendBotEvent(context, markdownEvent, url.pathname);
+    const headers = new Headers(response.headers);
+    headers.set('content-type', MARKDOWN_CONTENT_TYPE);
+    headers.set('x-content-type-options', 'nosniff');
+    if (!headers.has('link')) headers.set('link', TWIN_LINK);
+    return new Response(response.body, { status: 200, headers });
+  }
   // Bot page hits count by class; only real HTML pages answered 200 — never
   // assets, redirects, errors or the HTML 404 (whose path the client chose).
   const pageEvent = botEventFor(userAgent, false);
@@ -131,15 +156,28 @@ export const onRequest = async (context: Context): Promise<Response> => {
   ) {
     sendBotEvent(context, pageEvent, url.pathname);
   }
-  if (status === 404 && isAgentRequest(userAgent)) {
-    return new Response(JSON.stringify(agentProblem(url.pathname, url.origin)), {
+  // A miss for a non-browser client (an agent user agent, or any request
+  // that asks for Markdown): RFC 9457 problem JSON under /api/ and for JSON
+  // clients, a Markdown body otherwise. Browsers and Lighthouse keep the
+  // static 404.html.
+  if (status === 404 && (isAgentRequest(userAgent) || prefersMarkdown(accept))) {
+    if (prefersProblemJson(url.pathname, accept))
+      return new Response(JSON.stringify(agentProblem(url.pathname, url.origin)), {
+        status: 404,
+        headers: { 'content-type': 'application/problem+json', vary: 'Accept' },
+      });
+    return new Response(markdownNotFound(url.pathname, url.origin), {
       status: 404,
-      headers: { 'content-type': 'application/problem+json' },
+      headers: {
+        'content-type': MARKDOWN_CONTENT_TYPE,
+        vary: 'Accept',
+        'x-content-type-options': 'nosniff',
+      },
     });
   }
   // Pass-through responses are returned as the very object the pipeline
   // gave: Cloudflare applies `_headers` (the page CSP, and `Vary: Accept` on
-  // negotiable docs pages) only to that asset response, so a rebuilt copy
+  // every page with a twin) only to that asset response, so a rebuilt copy
   // would drop them (PLAN_006 T-100 S-2).
   return response;
 };

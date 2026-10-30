@@ -20,7 +20,7 @@ import {
   buildBotEventRequest,
   classifyBotUa,
 } from '../src/lib/bot-events.ts';
-import { negotiateTwin } from '../src/lib/md-negotiate.ts';
+import { markdownNotFound, negotiateTwin, prefersProblemJson } from '../src/lib/md-negotiate.ts';
 import {
   isStrictParserAudit,
   stripDirectivesForStrictParsers,
@@ -106,11 +106,33 @@ describe('user-agent classification', () => {
 });
 
 describe('Markdown twins: negotiation and rendition', () => {
-  it('markdownTwinFor maps directory paths to a .md twin and nothing else', () => {
-    expect(markdownTwinFor('/guides/theming/')).toBe('/guides/theming.md');
-    expect(markdownTwinFor('/skill/')).toBe('/skill.md');
-    expect(markdownTwinFor('/component-pages/button/')).toBe('/component-pages/button.md');
-    for (const path of ['/', '/guides/theming.md', 'guides/theming/', '']) {
+  it('markdownTwinFor maps every page path to its .md twin, the root to /index.md, and nothing else (T-ar-twins)', () => {
+    const table: [string, string][] = [
+      ['/', '/index.md'],
+      ['/index.html', '/index.md'],
+      ['/guides/theming/', '/guides/theming.md'],
+      ['/guides/theming/index.html', '/guides/theming.md'],
+      ['/guides/theming', '/guides/theming.md'],
+      ['/skill/', '/skill.md'],
+      ['/theme-studio/', '/theme-studio.md'],
+      ['/examples/preview/blocks-code/', '/examples/preview/blocks-code.md'],
+      ['/component-pages/button/', '/component-pages/button.md'],
+    ];
+    for (const [path, twin] of table) expect(markdownTwinFor(path), path).toBe(twin);
+    for (const path of [
+      '/guides/theming.md',
+      '/llms.txt',
+      '/theme-css/aurora.css',
+      '/catalog/catalog.json',
+      '/api/umami/api/send',
+      '/.well-known/api-catalog',
+      '/mcp',
+      '/_astro/app.js',
+      '//evil.example/',
+      '/a/../b/',
+      'guides/theming/',
+      '',
+    ]) {
       expect(markdownTwinFor(path), path).toBeUndefined();
     }
   });
@@ -146,6 +168,10 @@ describe('Markdown twins: negotiation and rendition', () => {
       ['/component-pages/button/', ' text/markdown ;q=0.8', '/component-pages/button.md'],
       ['/primitives-page/accordion/', 'text/markdown', '/primitives-page/accordion.md'],
       ['/skill/', 'text/markdown', '/skill.md'],
+      // PLAN_011 T-ar-twins: the root and non-docs pages negotiate too.
+      ['/', 'text/markdown', '/index.md'],
+      ['/examples/', 'text/markdown', '/examples.md'],
+      ['/theme-studio/', 'text/markdown', '/theme-studio.md'],
     ] as const) {
       const decision = negotiateTwin(pathname, accept);
       expect(decision?.twin, `${pathname} ${accept}`).toBe(twin);
@@ -156,23 +182,30 @@ describe('Markdown twins: negotiation and rendition', () => {
       });
     }
     for (const [pathname, accept] of [
-      ['/', 'text/markdown'],
+      ['/', 'text/html'],
+      ['/', '*/*'],
       ['/guides/theming/', 'text/html'],
       ['/guides/theming/', '*/*'],
       ['/guides/theming/', null],
       ['/guides/theming/', ''],
       ['/guides/theming.md', 'text/markdown'],
-      ['/examples/', 'text/markdown'],
+      ['/llms.txt', 'text/markdown'],
+      ['/api/umami/api/send', 'text/markdown'],
     ] as const) {
       expect(negotiateTwin(pathname, accept), `${pathname} ${accept}`).toBeNull();
     }
   });
 
-  it('declares Vary: Accept in the _headers rule of a page with a twin only (S-2)', () => {
-    expect(varyHeaderLine('/guides/theming/')).toBe('\n  Vary: Accept');
-    expect(varyHeaderLine('/guides/theming/index.html')).toBe('\n  Vary: Accept');
-    expect(varyHeaderLine('/')).toBe('');
-    expect(varyHeaderLine('/theme-studio/')).toBe('');
+  it('declares Vary: Accept in the _headers rule of every page whose twin was built (S-2, T-ar-twins)', () => {
+    const built = new Set(['/guides/theming.md', '/index.md', '/theme-studio.md']);
+    const exists = (path: string) => built.has(path);
+    expect(varyHeaderLine('/guides/theming/', exists)).toBe('\n  Vary: Accept');
+    expect(varyHeaderLine('/guides/theming/index.html', exists)).toBe('\n  Vary: Accept');
+    expect(varyHeaderLine('/', exists)).toBe('\n  Vary: Accept');
+    expect(varyHeaderLine('/theme-studio/', exists)).toBe('\n  Vary: Accept');
+    // No twin built (the 404, a missing page): no Vary.
+    expect(varyHeaderLine('/404.html', exists)).toBe('');
+    expect(varyHeaderLine('/brand/', exists)).toBe('');
   });
 
   it('absolutizes root-relative links, leaving anchors and fenced code alone', () => {
@@ -356,17 +389,64 @@ describe('the middleware: twins, host headers, agent 404', () => {
     expect(fallback.headers.get('content-type')).toBe('text/html; charset=utf-8');
   });
 
-  it('passes browsers through without an asset fetch, and never negotiates the root', async () => {
-    const browser = makeContext('/guides/theming/', 'text/html', {});
-    const response = await onRequest(browser.context);
-    expect(browser.next).toHaveBeenCalledTimes(1);
-    expect(browser.fetches).toEqual([]);
-    expect(response.headers.get('x-content-negotiation')).toBeNull();
+  it('passes browsers through without an asset fetch', async () => {
+    for (const path of ['/guides/theming/', '/', '/theme-studio/']) {
+      const browser = makeContext(path, 'text/html,application/xhtml+xml,*/*;q=0.8', {
+        '/index.md': 1,
+      });
+      const response = await onRequest(browser.context);
+      expect(browser.next, path).toHaveBeenCalledTimes(1);
+      expect(browser.fetches, path).toEqual([]);
+      expect(response.headers.get('x-content-negotiation')).toBeNull();
+    }
+  });
 
-    const root = makeContext('/', 'text/markdown', { '/.md': 1 });
-    await onRequest(root.context);
-    expect(root.next).toHaveBeenCalledTimes(1);
-    expect(root.fetches).toEqual([]);
+  it('negotiates the root and non-docs pages to their twins, with Vary (T-ar-twins)', async () => {
+    for (const [path, twin] of [
+      ['/', '/index.md'],
+      ['/theme-studio/', '/theme-studio.md'],
+      ['/examples/blocks-code/', '/examples/blocks-code.md'],
+      ['/showcase/kanban', '/showcase/kanban.md'],
+    ] as const) {
+      const served = makeContext(path, 'text/markdown', { [twin]: 2 }, 'curl/8.4.0');
+      const response = await onRequest(served.context);
+      expect(served.next, path).not.toHaveBeenCalled();
+      expect(served.fetches, path).toEqual([twin]);
+      expect(response.status).toBe(200);
+      expect(response.headers.get('content-type')).toBe('text/markdown; charset=utf-8');
+      expect(response.headers.get('vary')).toBe('Accept');
+      expect(response.headers.get('x-content-negotiation')).toBe('markdown');
+      expect(await response.text()).toBe('# Twin\n# Twin\n');
+    }
+    // The query string never reaches the asset fetch.
+    const query = makeContext('/?utm=x', 'text/markdown', { '/index.md': 1 });
+    await onRequest(query.context);
+    expect(query.fetches).toEqual(['/index.md']);
+  });
+
+  it('serves a .md URL directly as text/markdown with UTF-8, and counts nothing extra on a miss', async () => {
+    const direct = makeContext('/index.md', null, {});
+    direct.next.mockImplementationOnce(
+      async () =>
+        new Response('# Home\n', {
+          status: 200,
+          headers: { 'content-type': 'application/octet-stream', etag: '"abc"' },
+        })
+    );
+    const response = await onRequest(direct.context);
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toBe('text/markdown; charset=utf-8');
+    expect(response.headers.get('x-content-type-options')).toBe('nosniff');
+    expect(response.headers.get('etag')).toBe('"abc"');
+    expect(response.headers.get('link')).toContain('rel="api-catalog"');
+    expect(await response.text()).toBe('# Home\n');
+    expect(direct.fetches).toEqual([]);
+
+    // A 304 for a cached twin passes through untouched.
+    const cached = makeContext('/guides/theming.md', null, {});
+    const notModified = new Response(null, { status: 304 });
+    cached.next.mockImplementationOnce(async () => notModified);
+    expect(await onRequest(cached.context)).toBe(notModified);
   });
 
   // Cloudflare Pages applies `_headers` (the per-page CSP) only to the asset
@@ -383,7 +463,47 @@ describe('the middleware: twins, host headers, agent 404', () => {
     }
   });
 
-  it('answers an agent miss with problem+json and keeps the HTML 404 for humans and Lighthouse (T-27)', async () => {
+  it('answers a non-browser miss with a Markdown body (T-ar-twins)', async () => {
+    for (const [userAgent, accept] of [
+      [CLAUDEBOT, 'text/html'],
+      ['curl/8.4.0', '*/*'],
+      ['GPTBot/1.0', null],
+      // Any client that asks for Markdown is not a browser page view.
+      ['Mozilla/5.0 (Macintosh) AppleWebKit/537.36 Chrome/131 Safari/537.36', 'text/markdown'],
+    ] as const) {
+      const miss = makeContext('/no/such/page/', accept, { '*404*': 1 }, userAgent);
+      const response = await onRequest(miss.context);
+      expect(response.status, userAgent).toBe(404);
+      expect(response.headers.get('content-type')).toBe('text/markdown; charset=utf-8');
+      expect(response.headers.get('vary')).toBe('Accept');
+      const body = await response.text();
+      expect(body).toMatch(/^# Not found\n/);
+      expect(body).toContain('`/no/such/page/`');
+      expect(body).toContain('https://texuli.com/llms.txt');
+      expect(body).toContain('https://texuli.com/index.md');
+    }
+    // A negotiated twin that does not exist ends in the Markdown 404 too.
+    const ghost = makeContext('/ghost/', 'text/markdown', { '*404*': 1 }, 'curl/8.4.0');
+    const ghostResponse = await onRequest(ghost.context);
+    expect(ghost.fetches).toEqual(['/ghost.md']);
+    expect(ghostResponse.status).toBe(404);
+    expect(ghostResponse.headers.get('content-type')).toBe('text/markdown; charset=utf-8');
+  });
+
+  it('echoes a hostile missed path only as inert, capped code text', async () => {
+    const hostile = `/${'x'.repeat(400)}\`<script>alert(1)</script>`;
+    const body = markdownNotFound(hostile, 'https://texuli.com');
+    const shown = /There is no page at `([^`]*)`/.exec(body)?.[1] ?? '';
+    expect(shown.length).toBeLessThanOrEqual(200);
+    expect(body.split('`').length % 2).toBe(1);
+    expect(markdownNotFound('/a\u0000b\nc`d/', 'https://texuli.com')).toContain('`/abcd/`');
+    expect(prefersProblemJson('/api/x', 'text/markdown')).toBe(true);
+    expect(prefersProblemJson('/x/', 'application/json, text/markdown')).toBe(false);
+    expect(prefersProblemJson('/x/', 'text/html')).toBe(false);
+    expect(prefersProblemJson('/x/', null)).toBe(false);
+  });
+
+  it('answers an /api/ or JSON miss with problem+json and keeps the HTML 404 for humans and Lighthouse (T-27)', async () => {
     const problem = {
       type: 'about:blank',
       title: 'Not found',
@@ -393,11 +513,18 @@ describe('the middleware: twins, host headers, agent 404', () => {
     };
     expect(agentProblem('/no/such/page/', 'https://texuli.com')).toEqual(problem);
 
-    const agent = makeContext('/no/such/page/', 'text/html', { '*404*': 1 }, CLAUDEBOT);
-    const agentResponse = await onRequest(agent.context);
-    expect(agentResponse.status).toBe(404);
-    expect(agentResponse.headers.get('content-type')).toBe('application/problem+json');
-    expect(await agentResponse.json()).toMatchObject(problem);
+    // problem+json stays for /api/ paths and for JSON clients.
+    const api = makeContext('/api/no-such', 'text/html', { '*404*': 1 }, CLAUDEBOT);
+    const apiResponse = await onRequest(api.context);
+    expect(apiResponse.status).toBe(404);
+    expect(apiResponse.headers.get('content-type')).toBe('application/problem+json');
+    expect(await apiResponse.json()).toMatchObject({ ...problem, instance: '/api/no-such' });
+    for (const accept of ['application/json', 'application/problem+json, */*;q=0.1']) {
+      const json = makeContext('/no/such/page/', accept, { '*404*': 1 }, 'curl/8.4.0');
+      const jsonResponse = await onRequest(json.context);
+      expect(jsonResponse.headers.get('content-type'), accept).toBe('application/problem+json');
+      expect(await jsonResponse.json()).toMatchObject(problem);
+    }
 
     for (const userAgent of [
       'Mozilla/5.0 (Macintosh) AppleWebKit/537.36 Chrome/131 Safari/537.36',
@@ -677,5 +804,28 @@ describe('server-side bot and markdown events (T-37)', () => {
       assets: async () => new Response('missing', { status: 404 }),
     });
     expect(missing.sent).toHaveLength(0);
+  });
+
+  it('sends markdown_request for a .md URL fetched directly, only when it is served (T-ar-twins)', async () => {
+    const direct = await run({
+      userAgent: 'GPTBot/1.0',
+      path: '/index.md',
+      env: PROVISIONED,
+      next: async () => new Response('# Home\n', { status: 200 }),
+    });
+    expect(direct.response.headers.get('content-type')).toBe('text/markdown; charset=utf-8');
+    expect(direct.sent).toHaveLength(1);
+    const body = JSON.parse(String(direct.sent[0].init.body));
+    expect(body.payload.name).toBe('markdown_request');
+    expect(body.payload.data.path).toBe('/index.md');
+
+    const miss = await run({
+      userAgent: 'GPTBot/1.0',
+      path: '/nothing.md',
+      env: PROVISIONED,
+      next: async () => new Response('gone', { status: 404 }),
+    });
+    expect(miss.sent).toHaveLength(0);
+    expect(miss.response.status).toBe(404);
   });
 });

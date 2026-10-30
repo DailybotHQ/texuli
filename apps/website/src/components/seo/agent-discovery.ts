@@ -358,9 +358,10 @@ before deciding how to authenticate.
 
 ## What an agent can read
 
-- Every page, as HTML, and the Markdown twin of every page that has one: the
-  page's \`Link\` header names it with \`rel="alternate"; type="text/markdown"\`,
-  and a request that sends \`Accept: text/markdown\` gets it.
+- Every page, as HTML, and its Markdown twin: the page URL plus \`.md\`
+  (\`/index.md\` for the home page). The page's \`Link\` header and its head
+  name it with \`rel="alternate"; type="text/markdown"\`, and a request that
+  sends \`Accept: text/markdown\` to the page URL gets it.
 - [${at(DISCOVERY_PATHS.llms)}](${at(DISCOVERY_PATHS.llms)}) (the site guide) and
   [${at(DISCOVERY_PATHS.llmsFull)}](${at(DISCOVERY_PATHS.llmsFull)}) (the full corpus).
 - [${at(DISCOVERY_PATHS.apiCatalog)}](${at(DISCOVERY_PATHS.apiCatalog)}) (RFC 9727) and

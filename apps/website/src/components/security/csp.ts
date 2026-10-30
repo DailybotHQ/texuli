@@ -14,8 +14,6 @@ import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AstroIntegration } from 'astro';
 import { agentEndpoint } from '../agent-chat/client.ts';
-import { markdownTwinFor } from '../docs/markdown-negotiation.ts';
-import { isDocsPath } from '../foundation/nav-data.ts';
 import {
   DISCOVERY_PATHS,
   discoveryHeaderRules,
@@ -50,14 +48,16 @@ export interface PageSources {
 
 /**
  * The `Vary: Accept` line a page's `_headers` rule carries when the page is
- * negotiable (a docs path with a Markdown twin). It lives here, next to the
- * CSP, because Cloudflare Pages applies `_headers` only to the asset
- * response: the edge middleware must pass that response through untouched,
- * or the page loses its CSP (PLAN_006 T-100 S-2, seen in production).
+ * negotiable: its Markdown twin was built (every page since PLAN_011
+ * T-ar-twins, `/` included). It lives here, next to the CSP, because
+ * Cloudflare Pages applies `_headers` only to the asset response: the edge
+ * middleware must pass that response through untouched, or the page loses
+ * its CSP (PLAN_006 T-100 S-2, seen in production). `exists` answers for a
+ * root-relative path in the finished build.
  */
-export function varyHeaderLine(route: string): string {
-  const page = route.endsWith('/index.html') ? route.slice(0, -'index.html'.length) : route;
-  return isDocsPath(page) && markdownTwinFor(page) ? '\n  Vary: Accept' : '';
+export function varyHeaderLine(route: string, exists: (path: string) => boolean): string {
+  const twin = twinCandidate(route);
+  return twin && exists(twin) ? '\n  Vary: Accept' : '';
 }
 
 /**
@@ -261,7 +261,7 @@ export function cspIntegration(): AstroIntegration {
           });
           const reportOnly = reportOnlyPolicy(policy, reportEndpoint);
           const rule = (path: string) =>
-            `${path}\n  Content-Security-Policy: ${policy}\n  Content-Security-Policy-Report-Only: ${reportOnly}${reporting}${varyHeaderLine(path)}${linkHeaderLine(path, builtFile)}`;
+            `${path}\n  Content-Security-Policy: ${policy}\n  Content-Security-Policy-Report-Only: ${reportOnly}${reporting}${varyHeaderLine(path, builtFile)}${linkHeaderLine(path, builtFile)}`;
           rules.push(rule(route));
           manifestPages.push({
             route,

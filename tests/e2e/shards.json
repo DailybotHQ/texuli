@@ -79,6 +79,7 @@
       "site-responsive.spec.ts",
       "site-search.spec.ts",
       "site-theme-switcher.spec.ts",
+      "site-twins.spec.ts",
       "site-whats-new.spec.ts"
     ]
   ]
