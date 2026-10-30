@@ -166,7 +166,7 @@ export interface DiscoveryFacts {
   origin: string;
   /** The `@texuli/tools` version that serves the MCP operations. */
   toolsVersion: string;
-  /** The operations the remote MCP serves (the registry's `edge` runtime). */
+  /** The operations the remote MCP serves (the registry's `edge` and `site` runtimes). */
   operations: readonly Pick<Operation, 'name' | 'title' | 'summary' | 'annotations'>[];
   /** The security contact address, read from the root SECURITY.md. */
   securityContact: string;

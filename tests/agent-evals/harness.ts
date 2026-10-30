@@ -12,7 +12,9 @@
  * - `remote`: the Pages Function itself (`functions/mcp.ts` `onRequest`,
  *   which calls `handleMcpHttp` with the Function's own deps), driven with
  *   real `Request` objects, so the headers, the limits and the stateless
- *   path all run. Every answer's transport is checked before its body.
+ *   path all run, with a fake `env.ASSETS` (the fixture site of
+ *   `packages/tools/tests/fixtures/site-assets.ts`) for the `site`
+ *   operations. Every answer's transport is checked before its body.
  *
  * Nothing here calls a model or the network.
  */
@@ -20,7 +22,13 @@ import { expect } from 'vitest';
 import { onRequest } from '../../functions/mcp.ts';
 import { createMcpHandler } from '../../packages/tools/src/mcp/handler.ts';
 import { MCP_PROTOCOL_VERSION } from '../../packages/tools/src/mcp/protocol.ts';
-import { type OperationRuntime, texuliOps } from '../../packages/tools/src/ops/index.ts';
+import {
+  LOCAL_RUNTIMES,
+  type OperationRuntime,
+  REMOTE_RUNTIMES as REMOTE_DOOR_RUNTIMES,
+  texuliOps,
+} from '../../packages/tools/src/ops/index.ts';
+import { fakeSiteAssets } from '../../packages/tools/tests/fixtures/site-assets.ts';
 
 // biome-ignore lint/suspicious/noExplicitAny: JSON-RPC results are untyped JSON an eval inspects.
 export type Json = any;
@@ -75,6 +83,8 @@ export interface Session {
   final: (ctx: SessionContext) => void | Promise<void>;
   /** Present when the session cannot run yet: the reason it is skipped. */
   skip?: string;
+  /** The doors that serve the job (default both); `site` jobs run on the remote door only. */
+  doors?: readonly DoorName[];
 }
 
 /** A transport the harness can talk JSON-RPC through. */
@@ -85,9 +95,9 @@ interface Door {
 }
 
 /** The runtimes the stdio server serves (`packages/tools/src/mcp/stdio.ts`). */
-export const STDIO_RUNTIMES: readonly OperationRuntime[] = ['edge', 'node'];
+export const STDIO_RUNTIMES: readonly OperationRuntime[] = LOCAL_RUNTIMES;
 /** The runtimes the remote Function serves (`functions/_lib/mcp-server.ts`). */
-export const REMOTE_RUNTIMES: readonly OperationRuntime[] = ['edge'];
+export const REMOTE_RUNTIMES: readonly OperationRuntime[] = REMOTE_DOOR_RUNTIMES;
 
 const SECURITY_HEADERS: Record<string, string> = {
   'content-security-policy': "default-src 'none'; frame-ancestors 'none'",
@@ -118,6 +128,7 @@ let clients = 0;
 /** The remote door: the Pages Function with real `Request` objects. */
 function remoteDoor(): Door {
   const ip = `203.0.113.${(clients++ % 250) + 1}`;
+  const assets = fakeSiteAssets();
   return {
     name: 'remote',
     runtimes: REMOTE_RUNTIMES,
@@ -132,7 +143,7 @@ function remoteDoor(): Door {
         },
         body: JSON.stringify(message),
       });
-      const response = await onRequest({ request, env: {} });
+      const response = await onRequest({ request, env: { ASSETS: assets } });
       const label = `remote ${String((message as { method?: unknown }).method)}`;
       for (const [name, value] of Object.entries(SECURITY_HEADERS))
         expect(response.headers.get(name), `${label}: ${name}`).toBe(value);
