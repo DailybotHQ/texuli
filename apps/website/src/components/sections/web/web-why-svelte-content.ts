@@ -204,7 +204,7 @@ export function isItemDisabled(item: Element): boolean {
 import type { HTMLAttributes } from 'svelte/elements';
 import { type BadgeVariant, badgeClass } from './variants.ts';
 import './badge.css';
-import { designDefaults, withDefault } from '../../internal/design-defaults.ts';
+import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = HTMLAttributes<HTMLSpanElement> & {
   /** Semantic fill. Filled pairs use token foregrounds for AA on small text. */
@@ -218,16 +218,15 @@ type Props = HTMLAttributes<HTMLSpanElement> & {
   ref?: HTMLElement | null;
 };
 
+const txDefaults = designDefaults('badge');
 let {
   ref = $bindable(null),
-  variant: variantProp,
+  variant = txDefaults().variant ?? 'default',
   label,
   class: className,
   children,
   ...rest
 }: Props = $props();
-const txDefaults = designDefaults('badge');
-const variant = $derived(withDefault(variantProp, txDefaults().variant, 'default'));
 
 const hasLabel = $derived(typeof label === 'string' && label.length > 0);
 </script>
