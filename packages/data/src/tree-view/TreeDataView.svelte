@@ -734,31 +734,31 @@ function dropTargetFor(row: FlatNode<T>): boolean {
     .tx-tree-view__list {
       list-style: none;
       margin: 0;
-      padding: 0.25rem;
-      border: 1px solid var(--tx-border, CanvasText);
-      border-radius: var(--tx-radius-lg, 0.75rem);
+      padding: var(--tx-space-1);
+      border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
+      border-radius: var(--tx-shape-radius-xl);
       background: var(--tx-surface, Canvas);
     }
 
     .tx-tree-view__row {
       display: flex;
       align-items: center;
-      gap: 0.25rem;
+      gap: var(--tx-space-1);
       min-block-size: 2.75rem;
-      padding-block: 0.25rem;
-      padding-inline-end: 0.5rem;
-      padding-inline-start: calc(var(--tx-tree-view-depth, 0) * 1.25rem);
-      border-radius: var(--tx-radius-md, 0.5rem);
+      padding-block: var(--tx-space-1);
+      padding-inline-end: var(--tx-space-2);
+      padding-inline-start: calc(var(--tx-tree-view-depth, 0) * var(--tx-space-5));
+      border-radius: var(--tx-shape-radius-lg);
       outline: none;
     }
 
     .tx-tree-view--compact .tx-tree-view__row {
       min-block-size: 2.25rem;
-      gap: 0.125rem;
+      gap: calc(var(--tx-space-unit) * 0.5);
     }
 
     .tx-tree-view__row:focus-visible {
-      outline: 2px solid var(--tx-ring, Highlight);
+      outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
       outline-offset: 2px;
     }
 
@@ -793,7 +793,7 @@ function dropTargetFor(row: FlatNode<T>): boolean {
       margin: 0;
       padding: 0;
       border: 0;
-      border-radius: var(--tx-radius-sm, 0.375rem);
+      border-radius: var(--tx-shape-radius-md);
       background: transparent;
       color: inherit;
       cursor: pointer;
@@ -817,13 +817,13 @@ function dropTargetFor(row: FlatNode<T>): boolean {
     .tx-tree-view__handle:focus-visible,
     .tx-tree-view__check:focus-visible,
     .tx-tree-view__twist:focus-visible {
-      outline: 2px solid var(--tx-ring, Highlight);
+      outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
       outline-offset: 2px;
     }
 
     .tx-tree-view__grip {
       color: var(--tx-muted-foreground, GrayText);
-      font-size: 0.875rem;
+      font-size: var(--tx-type-label-size);
       line-height: 1;
     }
 
@@ -831,7 +831,7 @@ function dropTargetFor(row: FlatNode<T>): boolean {
        the 1.25rem pseudo-element, so the tap target clears 24px. */
     .tx-tree-view__check {
       position: relative;
-      margin-inline: 0.25rem;
+      margin-inline: var(--tx-space-1);
     }
 
     .tx-tree-view__check::before {
@@ -841,8 +841,8 @@ function dropTargetFor(row: FlatNode<T>): boolean {
       margin: auto;
       inline-size: 1.25rem;
       block-size: 1.25rem;
-      border: 1px solid var(--tx-border, CanvasText);
-      border-radius: 0.25rem;
+      border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
+      border-radius: var(--tx-shape-radius-sm);
     }
 
     .tx-tree-view__check[data-checked='true'] {
@@ -875,8 +875,8 @@ function dropTargetFor(row: FlatNode<T>): boolean {
       display: block;
       inline-size: 0.5rem;
       block-size: 0.5rem;
-      border-block-end: 2px solid currentColor;
-      border-inline-end: 2px solid currentColor;
+      border-block-end: var(--tx-border-width-thick) solid currentColor;
+      border-inline-end: var(--tx-border-width-thick) solid currentColor;
       transform: rotate(-45deg);
       transition: transform 120ms ease;
     }
@@ -890,9 +890,9 @@ function dropTargetFor(row: FlatNode<T>): boolean {
       flex: 1 1 auto;
       flex-wrap: wrap;
       align-items: baseline;
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
       min-inline-size: 0;
-      padding-inline: 0.25rem;
+      padding-inline: var(--tx-space-1);
     }
 
     .tx-tree-view__label {
@@ -910,15 +910,15 @@ function dropTargetFor(row: FlatNode<T>): boolean {
 
     .tx-tree-view__empty {
       margin: 0;
-      padding: 1rem;
-      border: 1px dashed var(--tx-border, CanvasText);
-      border-radius: var(--tx-radius-md, 0.5rem);
+      padding: var(--tx-space-4);
+      border: var(--tx-border-width-thin) dashed var(--tx-border, CanvasText);
+      border-radius: var(--tx-shape-radius-lg);
       color: var(--tx-muted-foreground, GrayText);
     }
 
     .tx-tree-view__live {
       min-block-size: 1.5em;
-      margin-block: 0.5rem 0;
+      margin-block: var(--tx-space-2) 0;
     }
 
     @media (prefers-reduced-motion: reduce) {

@@ -553,7 +553,13 @@ describe('chart block rendering', () => {
           const cssRule = rule as CSSStyleRule;
           const selector = cssRule.selectorText.replace(/\.svelte-[a-z0-9]+/g, '');
           if (!notice.matches(selector)) continue;
-          for (const property of ['border-style', 'padding', 'border-radius', 'font-size']) {
+          for (const property of [
+            'border',
+            'border-style',
+            'padding',
+            'border-radius',
+            'font-size',
+          ]) {
             const value = cssRule.style.getPropertyValue(property);
             if (value) declarations.set(property, value);
           }
@@ -561,7 +567,10 @@ describe('chart block rendering', () => {
         style.remove();
         // The text, code, structure and media families all paint the invalid
         // notice with a dashed currentColor border, inner padding and an em size.
-        expect(declarations.get('border-style')).toBe('dashed');
+        // A border shorthand with a var() width stays a shorthand in the CSSOM.
+        expect(
+          `${declarations.get('border') ?? ''} ${declarations.get('border-style') ?? ''}`
+        ).toMatch(/\bdashed\b/);
         expect(declarations.get('padding')).not.toBe('');
         expect(declarations.get('border-radius')).not.toBe('');
         expect(declarations.get('font-size')).toBe('0.875em');

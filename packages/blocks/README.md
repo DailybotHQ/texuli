@@ -92,6 +92,21 @@ The core vocabulary includes `safeParseBlocks` and `safeParseBlock`,
 `validateBlocksForAuthoring` (metadata for builders and agents), and the
 text helpers `walkBlocks`, `blockText` and `headingOutline`.
 
+## In development for 0.9.0
+
+- **`tree` diagrams take `variant`, not `style`** (`variant: 'file-tree' | 'org'`).
+  The untrusted draft scan refuses every `style` key, so a `tree` block could
+  never pass blueprint validation for an agent. The parser still accepts
+  `style` as an alias through 0.9.x and returns `variant` (removed in 0.10.0);
+  sending both with different values is refused. The `list` block's optional
+  `style` has the same limit (agents can send lists without it) and is not
+  renamed yet.
+- **Design-system tokens:** the block stylesheets read the token contract v2
+  system tokens (`--tx-space-*`, `--tx-shape-radius-*`, `--tx-type-*`) with
+  the visual-baseline pixels unchanged; `code` and `structure` keep their
+  literals because they also render inside deck themes (see
+  `scripts/check-token-usage.ts`).
+
 ## New in 0.6.0
 
 Ships in `0.6.0`; the `0.5.0` release predates it: the packed declarations of

@@ -34,6 +34,7 @@ against its 152 KB budget.
 | The fast full gate | `pnpm check` (lint, typecheck, test, layers) | 2026-10-27: exit 0 (about 1 min 20 s) |
 | Docs links and commands | `pnpm exec tsx scripts/check-docs.ts` | 2026-10-27: 537 docs, every relative link and command is real (also a test in `pnpm test`) |
 | Dead CSS | `pnpm exec tsx scripts/check-css.ts` | 71 package stylesheets, no dead CSS (also a test in `pnpm test`: `scripts/tests/check-css.test.ts`) |
+| Token hardcodes | `pnpm exec tsx scripts/check-token-usage.ts` | 782 package stylesheets, no literal outside the allowlist (839 kept, each with a reason; most are the deck-scope and pending-adoption entries); also a test in `pnpm test`: `scripts/tests/check-token-usage.test.ts` |
 | Agent skill | `pnpm check:skill` | `skills/texuli pack is valid` (2 s) |
 | Agent surfaces | `pnpm check:surfaces` | `check:surfaces ✓ 4 generated surfaces match the registry` |
 | Agent evals (scripted MCP sessions, no model) | `pnpm vitest run tests/agent-evals` | 2026-10-30 (T-agent-evals): 2 files, 10 passed, 2 skipped (the design-system jobs, planned in T-ds-agent-tools); also part of `pnpm test` |
@@ -182,6 +183,7 @@ then the package, then its consumers (the layers above it).
 | `skills/texuli/**`, `scripts/check-skill.ts` | `pnpm check:skill && pnpm vitest run scripts/tests/skill.test.ts` | after an intentional pack edit: `pnpm exec tsx scripts/check-skill.ts --write-sums` |
 | `scripts/check-layers.ts` | `pnpm vitest run scripts/tests/layers.test.ts` | `pnpm check:layers` |
 | `scripts/check-docs.ts`, `scripts/check-css.ts`, `scripts/check-trojan-source.ts` | `pnpm vitest run scripts/tests/check-docs.test.ts scripts/tests/check-css.test.ts scripts/tests/trojan-source.test.ts` | `pnpm check:docs`; `pnpm check:trojan-source` |
+| `scripts/check-token-usage.ts` | `pnpm vitest run scripts/tests/check-token-usage.test.ts` | `pnpm exec tsx scripts/check-token-usage.ts` |
 | `scripts/size.ts`, `texuli.budgets.json` | `pnpm vitest run scripts/tests/size.test.ts` | `pnpm size` |
 | `scripts/packages.ts` | `pnpm vitest run scripts/tests/packages.test.ts` | `pnpm verify:packages` |
 | `scripts/dist-parity.ts` (a consumer bundle from the packed `dist/` against one from source) | `pnpm vitest run scripts/tests/dist-parity.test.ts` (helpers, then two real Vite builds; up to 10 minutes) | `pnpm exec tsx scripts/dist-parity.ts` (`--tarballs` after `pnpm verify:packages`, `--json`) |

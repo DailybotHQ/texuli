@@ -24,11 +24,11 @@ const href = $derived(safeHref(block.href, 'untrusted'));
 </article>
 
 <style>
-  .tx-link-preview { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem; border: 1px solid var(--tx-color-border, #9ca3af); border-radius: 0.625rem; background: var(--tx-color-surface, Canvas); color: var(--tx-color-text, CanvasText); }
+  .tx-link-preview { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--tx-space-4); padding: var(--tx-space-4); border: var(--tx-border-width-thin) solid var(--tx-color-border, #9ca3af); border-radius: calc(var(--tx-shape-radius-lg) * 1.25); background: var(--tx-color-surface, Canvas); color: var(--tx-color-text, CanvasText); }
   .tx-link-copy { min-inline-size: 0; }
   h3, p { margin: 0; overflow-wrap: anywhere; }
-  h3 { font-size: 1rem; }
-  .tx-link-copy > p { margin-block-start: 0.375rem; }
+  h3 { font-size: var(--tx-type-body-size); }
+  .tx-link-copy > p { margin-block-start: calc(var(--tx-space-unit) * 1.5); }
   /* Site line uses foreground (not muted) so WCAG AA holds on surface in light/dark/HC. */
   .tx-link-site { color: var(--tx-color-text, CanvasText); font-size: 0.8125rem; }
   a { color: var(--tx-color-link, LinkText); font-weight: 600; }

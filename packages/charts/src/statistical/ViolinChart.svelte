@@ -125,11 +125,11 @@ $effect(() => {
 
 <style>
   .statistical { color: var(--tx-foreground, CanvasText); margin: 0; max-inline-size: 100%; }
-  figcaption h3 { font-size: 1rem; margin-block: 0; }
-  figcaption p { color: var(--tx-muted-foreground, GrayText); margin-block: 0.25rem 0.75rem; }
+  figcaption h3 { font-size: var(--tx-type-body-size); margin-block: 0; }
+  figcaption p { color: var(--tx-muted-foreground, GrayText); margin-block: var(--tx-space-1) var(--tx-space-3); }
   svg { display: block; inline-size: 100%; max-block-size: 22rem; overflow: visible; }
   .grid { stroke: var(--tx-chart-grid, var(--tx-border, GrayText)); stroke-dasharray: 2 3; }
-  .tick, .category { fill: var(--tx-muted-foreground, GrayText); font-size: 0.75rem; }
+  .tick, .category { fill: var(--tx-muted-foreground, GrayText); font-size: var(--tx-type-caption-size); }
   .violin { fill: color-mix(in oklab, var(--violin-color) 32%, transparent); stroke: var(--violin-color); stroke-width: 1.5; }
   .median { stroke: var(--tx-foreground, CanvasText); stroke-width: 2.5; }
   @media (forced-colors: active) {

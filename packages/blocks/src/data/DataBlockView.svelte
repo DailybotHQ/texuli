@@ -125,24 +125,24 @@ function cellText(value: string | number | null): string {
   .tx-block-invalid {
     margin: 0;
     padding: 0.5em 0.75em;
-    border: 1px dashed currentColor;
+    border: var(--tx-border-width-thin) dashed currentColor;
     border-radius: 0.375em;
     color: var(--tx-muted-foreground, GrayText);
     font-size: 0.875em;
   }
   .tx-stat-title {
-    margin: 0 0 0.75rem;
+    margin: 0 0 var(--tx-space-3);
     font-weight: 600;
   }
   .tx-stat-source {
-    margin: 0.75rem 0 0;
+    margin: var(--tx-space-3) 0 0;
     color: var(--tx-muted-foreground, GrayText);
     font-size: 0.8125rem;
   }
   .tx-stat-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
-    gap: 0.75rem;
+    gap: var(--tx-space-3);
   }
   .tx-block-table,
   .tx-block-chart {

@@ -48,14 +48,14 @@ const image = $derived(
     .tx-workflow-body {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
       min-inline-size: 0;
       block-size: 100%;
     }
 
     .tx-workflow-body__icon {
       flex: none;
-      border-radius: var(--tx-radius-sm, 0.25rem);
+      border-radius: var(--tx-shape-radius-sm);
     }
 
     .tx-workflow-body__text {
@@ -76,13 +76,13 @@ const image = $derived(
     }
 
     .tx-workflow-body__type {
-      font-size: 0.75rem;
+      font-size: var(--tx-type-caption-size);
       color: var(--tx-muted-foreground, GrayText);
     }
 
     .tx-workflow-body__link {
       flex: none;
-      font-size: 0.75rem;
+      font-size: var(--tx-type-caption-size);
       color: var(--tx-primary, LinkText);
       min-block-size: 24px;
       display: inline-flex;

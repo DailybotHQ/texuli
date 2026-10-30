@@ -83,14 +83,14 @@
   border-radius: var(--tx-radius-lg, 0.5rem);
   background-color: var(--tx-elevated, var(--tx-surface, Canvas));
   color: var(--tx-foreground, CanvasText);
-  font-size: var(--tx-font-size-xs, 0.75rem);
-  box-shadow: var(--tx-shadow-soft, 0 1px 2px color-mix(in srgb, CanvasText 10%, transparent));
+  font-size: var(--tx-type-caption-size);
+  box-shadow: var(--tx-elevation-1);
   pointer-events: none;
 }
 
 .tx-chart-tooltip__x {
   margin: 0 0 0.25rem;
-  font-weight: var(--tx-font-weight-medium, 500);
+  font-weight: var(--tx-type-label-weight);
 }
 
 .tx-chart-tooltip__list {
@@ -109,7 +109,7 @@
 }
 
 .tx-chart-tooltip__row--current {
-  font-weight: var(--tx-font-weight-heading, 600);
+  font-weight: var(--tx-type-heading-weight);
 }
 
 .tx-chart-tooltip__label {
@@ -136,7 +136,7 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: var(--tx-font-size-xs, 0.75rem);
+  font-size: var(--tx-type-caption-size);
 }
 
 .tx-chart-legend li {
@@ -203,7 +203,7 @@
   background: var(--tx-surface, Canvas);
   color: var(--tx-foreground, CanvasText);
   font: inherit;
-  font-size: var(--tx-font-size-sm, 0.875rem);
+  font-size: var(--tx-type-label-size);
   cursor: pointer;
 }
 
@@ -215,7 +215,7 @@
 .tx-chart-table {
   inline-size: 100%;
   border-collapse: collapse;
-  font-size: var(--tx-font-size-sm, 0.875rem);
+  font-size: var(--tx-type-label-size);
   color: var(--tx-foreground, CanvasText);
 }
 
@@ -247,7 +247,7 @@
 .tx-chart-table caption {
   caption-side: top;
   text-align: start;
-  font-weight: var(--tx-font-weight-medium, 500);
+  font-weight: var(--tx-type-label-weight);
   margin-block-end: 0.35rem;
 }
 

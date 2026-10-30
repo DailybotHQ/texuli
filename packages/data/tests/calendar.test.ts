@@ -291,7 +291,8 @@ describe('calendar audit (T-62)', () => {
         // draws the drag shadow from the shadow token, not hardcoded black
         const css = sourceOf('../src/calendar/EventButton.svelte');
         expect(css).not.toMatch(/rgb\(0 0 0/);
-        expect(css).toMatch(/box-shadow:\s*var\(--tx-shadow-float/);
+        // --tx-elevation-3 is the theme's float shadow (token contract v2).
+        expect(css).toMatch(/box-shadow:\s*var\(--tx-elevation-3\)/);
       }
     });
   });

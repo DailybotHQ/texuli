@@ -144,9 +144,9 @@ function onKeydown(event: KeyboardEvent): void {
     .tx-canvas-toolbar {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.25rem;
-      padding: 0.375rem;
-      border-block-end: 1px solid var(--tx-border, CanvasText);
+      gap: var(--tx-canvas-toolbar-gap, var(--tx-space-1));
+      padding: var(--tx-canvas-toolbar-padding, calc(var(--tx-space-unit) * 1.5));
+      border-block-end: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
       background: var(--tx-surface, Canvas);
     }
 
@@ -155,13 +155,13 @@ function onKeydown(event: KeyboardEvent): void {
       place-items: center;
       min-inline-size: var(--tx-target-size, 2.25rem);
       min-block-size: var(--tx-target-size, 2.25rem);
-      padding: 0 0.5rem;
-      border: 1px solid transparent;
-      border-radius: var(--tx-radius-md, 0.375rem);
+      padding: 0 var(--tx-space-2);
+      border: var(--tx-border-width-thin) solid transparent;
+      border-radius: var(--tx-canvas-toolbar-button-radius, var(--tx-shape-radius-md));
       background: transparent;
       color: var(--tx-foreground, CanvasText);
       font: inherit;
-      font-size: 1rem;
+      font-size: var(--tx-canvas-toolbar-button-font-size, var(--tx-type-body-size));
       cursor: pointer;
     }
 

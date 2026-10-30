@@ -735,7 +735,10 @@ describe('Cartesian chart family cohesion', () => {
         css: 'external',
       }).css?.code;
       // The grammar assigns Cartesian titles rank 2; keep the visual title size at 1rem.
-      expect(css).toMatch(/figcaption[^{]*h2[^{]*\{[^}]*font-size:\s*1rem/);
+      // The chart-frame title token defaults to the body type role (1rem under every library theme).
+      expect(css).toMatch(
+        /figcaption[^{]*h2[^{]*\{[^}]*font-size:\s*var\(--tx-chart-frame-title-font-size, var\(--tx-type-body-size\)\)/
+      );
       expect(css).toMatch(/figcaption[^{]*h2[^{]*\{[^}]*margin-block:\s*0/);
       expect(css).toMatch(/figcaption[^{]*p[^{]*\{[^}]*margin-block:\s*0\.25rem\s+0\.75rem/);
     }

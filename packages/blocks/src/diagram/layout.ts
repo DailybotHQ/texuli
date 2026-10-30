@@ -77,7 +77,7 @@ export function layoutTree(diagram: TreeDiagram): DiagramLayout {
   const roots = children.get(null) ?? [];
   const positions = new Map<string, DiagramPosition>();
   const edges: DiagramEdge[] = [];
-  if (diagram.style === 'file-tree') {
+  if (diagram.variant === 'file-tree') {
     let row = 0;
     const walk = (id: string, depth: number) => {
       const node = byId.get(id);

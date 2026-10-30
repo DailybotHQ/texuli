@@ -32,16 +32,16 @@ function formatMoment(iso: string): string {
 
 <style>
   @layer tx.components {
-    .tx-chat-mention { border-radius: 0.25rem; background: color-mix(in srgb, currentColor 12%, transparent); padding-inline: 0.2em; font-weight: 600; }
+    .tx-chat-mention { border-radius: var(--tx-shape-radius-sm); background: color-mix(in srgb, currentColor 12%, transparent); padding-inline: 0.2em; font-weight: 600; }
     .tx-chat-mention[data-self] { background: var(--tx-warning, Mark); color: var(--tx-warning-foreground, MarkText); }
     .tx-chat-date { text-decoration: underline dotted; text-underline-offset: 0.2em; }
-    .tx-chat-status-chip { display: inline-block; border: 1px solid currentColor; border-radius: 999px; padding: 0 0.5em; font-size: 0.8em; font-weight: 600; line-height: 1.5; vertical-align: baseline; }
+    .tx-chat-status-chip { display: inline-block; border: var(--tx-border-width-thin) solid currentColor; border-radius: var(--tx-shape-radius-full); padding: 0 0.5em; font-size: 0.8em; font-weight: 600; line-height: 1.5; vertical-align: baseline; }
     .tx-chat-status-chip[data-tone="info"] { color: var(--tx-info, LinkText); }
     .tx-chat-status-chip[data-tone="success"] { color: var(--tx-success, CanvasText); }
     .tx-chat-status-chip[data-tone="warning"] { color: var(--tx-warning, CanvasText); }
     .tx-chat-status-chip[data-tone="danger"] { color: var(--tx-destructive, Mark); }
     :global(.tx-chat-message--own) .tx-chat-status-chip { color: inherit; }
     a { color: inherit; text-decoration: underline; text-underline-offset: 0.15em; }
-    code { border-radius: 0.25rem; background: var(--tx-surface, Canvas); color: var(--tx-foreground, CanvasText); padding-inline: 0.2em; font-family: var(--tx-font-mono, ui-monospace, monospace); }
+    code { border-radius: var(--tx-shape-radius-sm); background: var(--tx-surface, Canvas); color: var(--tx-foreground, CanvasText); padding-inline: 0.2em; font-family: var(--tx-font-mono, ui-monospace, monospace); }
   }
 </style>

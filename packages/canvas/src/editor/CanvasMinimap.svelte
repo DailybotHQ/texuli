@@ -84,8 +84,8 @@ function recenter(event: PointerEvent): void {
       position: absolute;
       inset-block-end: 0.5rem;
       inset-inline-end: 0.5rem;
-      border: 1px solid var(--tx-border, CanvasText);
-      border-radius: var(--tx-radius-md, 0.375rem);
+      border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
+      border-radius: var(--tx-shape-radius-md);
       background: var(--tx-surface, Canvas);
       cursor: pointer;
       touch-action: none;

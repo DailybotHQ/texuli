@@ -23,10 +23,12 @@ export interface ComponentToken {
   readonly description: string;
 }
 
-/** One component and the `texuli` subpath that styles it. */
+/** One component and the package subpath that styles it. */
 export interface ComponentTokenFamily {
   readonly component: string;
-  /** The `texuli/<subpath>` export the component ships in. */
+  /** The package that styles it: `texuli`, or a domain package (`@texuli/data`). */
+  readonly package: string;
+  /** The `<package>/<subpath>` export the component ships in (`.` for the package root). */
   readonly subpath: string;
   readonly title: string;
   readonly tokens: readonly ComponentToken[];
@@ -63,10 +65,12 @@ function family(
   component: string,
   subpath: string,
   title: string,
-  rows: readonly Row[]
+  rows: readonly Row[],
+  pkg = 'texuli'
 ): ComponentTokenFamily {
   return {
     component,
+    package: pkg,
     subpath,
     title,
     tokens: rows.map(([key, value, description]) => ({
@@ -496,6 +500,104 @@ export const COMPONENT_TOKEN_FAMILIES: readonly ComponentTokenFamily[] = [
     ['checkbox-size', icon('sm'), 'Checkbox size.'],
     ['checkbox-radius', radius('xs'), 'Checkbox corner radius.'],
   ]),
+  // Domain packages (T-adopt-domain): the chrome a design system restyles.
+  family(
+    'data-grid',
+    'grid-core',
+    'Data grid',
+    [
+      ['gap', space(2), 'Gap between the toolbar, table and pager, and inside them.'],
+      ['radius', radius('lg'), 'Corner radius of the bulk bar and pager buttons.'],
+      ['pager-font-size', type('label', 'size'), 'Pager font size.'],
+    ],
+    '@texuli/data'
+  ),
+  family(
+    'board',
+    'board',
+    'Board',
+    [
+      ['column-gap', space(4), 'Gap between columns.'],
+      ['column-radius', radius('xl'), 'Column corner radius.'],
+      ['column-padding', space(3), 'Column header padding.'],
+      ['card-radius', radius('lg'), 'Card corner radius.'],
+      ['card-elevation', elevation(1), 'Card shadow.'],
+    ],
+    '@texuli/data'
+  ),
+  family(
+    'chart-frame',
+    'cartesian',
+    'Chart frame',
+    [['title-font-size', type('body', 'size'), 'Chart title font size.']],
+    '@texuli/charts'
+  ),
+  family(
+    'chat-bubble',
+    '.',
+    'Chat message bubble',
+    [
+      ['radius', `calc(${radius('lg')} * 2)`, 'Bubble corner radius.'],
+      ['tail-radius', radius('sm'), 'Radius of the corner on the author side (the tail).'],
+      ['padding-block', space(2), 'Block padding.'],
+      ['padding-inline', spaceTimes(3.5), 'Inline padding.'],
+    ],
+    '@texuli/chat'
+  ),
+  family(
+    'chat-composer',
+    '.',
+    'Chat composer',
+    [
+      ['radius', radius('lg'), 'Corner radius of the composer and its field.'],
+      ['padding', space(3), 'Composer padding.'],
+      ['gap', space(2), 'Gap between the field and the actions.'],
+    ],
+    '@texuli/chat'
+  ),
+  family(
+    'canvas-toolbar',
+    'editor',
+    'Canvas toolbar',
+    [
+      ['gap', space(1), 'Gap between tools.'],
+      ['padding', spaceTimes(1.5), 'Toolbar padding.'],
+      ['button-radius', radius('md'), 'Tool button corner radius.'],
+      ['button-font-size', type('body', 'size'), 'Tool button font size.'],
+    ],
+    '@texuli/canvas'
+  ),
+  family(
+    'workflow-node',
+    'editor',
+    'Workflow node',
+    [
+      ['padding-block', space(2), 'Block padding.'],
+      ['padding-inline', space(3), 'Inline padding.'],
+      ['radius', radius('lg'), 'Corner radius.'],
+      ['elevation', elevation(1), 'Shadow.'],
+    ],
+    '@texuli/workflows'
+  ),
+  family(
+    'spreadsheet',
+    'view',
+    'Sheet view',
+    [
+      ['gap', space(2), 'Gap between the tabs, formula bar and grid.'],
+      ['tab-radius', radius('lg'), 'Sheet tab corner radius.'],
+      ['tab-padding-inline', space(3), 'Sheet tab inline padding.'],
+      ['bar-radius', `calc(${radius('lg')} * 0.75)`, 'Formula bar corner radius.'],
+    ],
+    '@texuli/sheets'
+  ),
+  family(
+    'forms',
+    '.',
+    'Schema form',
+    [['gap', space(5), 'Gap between fields, sections and steps.']],
+    '@texuli/forms'
+  ),
 ];
 
 /** Every component token, flattened in family order. */

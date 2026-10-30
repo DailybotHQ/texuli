@@ -11,8 +11,8 @@
     min-inline-size: 0;
     max-inline-size: 100%;
     margin: 0;
-    border: var(--tx-border-width, 1px) solid var(--tx-border, currentColor);
-    border-radius: var(--tx-radius, 0.5rem);
+    border: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+    border-radius: var(--tx-shape-radius-lg);
     background-color: var(--tx-surface, Canvas);
     color: var(--tx-surface-foreground, CanvasText);
     overflow: clip;
@@ -25,7 +25,7 @@
     gap: 0.5rem;
     padding-block: 0.25rem;
     padding-inline: 0.75rem 0.25rem;
-    border-block-end: var(--tx-border-width, 1px) solid var(--tx-border, currentColor);
+    border-block-end: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
   }
 
   .tx-code__name {
@@ -34,8 +34,8 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     font-family: var(--tx-font-mono, ui-monospace, monospace);
-    font-size: var(--tx-font-size-xs, 0.75rem);
-    font-weight: var(--tx-font-weight-medium, 500);
+    font-size: var(--tx-type-caption-size);
+    font-weight: var(--tx-type-label-weight);
     color: var(--tx-muted-foreground, CanvasText);
   }
 
@@ -46,7 +46,7 @@
     align-items: center;
     min-inline-size: 0;
     color: var(--tx-muted-foreground, CanvasText);
-    font-size: var(--tx-font-size-xs, 0.75rem);
+    font-size: var(--tx-type-caption-size);
   }
 
   /* Host actions sit at the end of the bar, before the copy button. */
@@ -66,12 +66,12 @@
     min-block-size: var(--tx-target-size, 2rem);
     padding-inline: 0.5rem;
     border: 0;
-    border-radius: calc(var(--tx-radius, 0.5rem) * 0.75);
+    border-radius: calc(var(--tx-shape-radius-lg) * 0.75);
     background: transparent;
     color: var(--tx-muted-foreground, ButtonText);
     font: inherit;
-    font-size: var(--tx-font-size-xs, 0.75rem);
-    font-weight: var(--tx-font-weight-medium, 500);
+    font-size: var(--tx-type-caption-size);
+    font-weight: var(--tx-type-label-weight);
     cursor: pointer;
   }
 
@@ -149,7 +149,7 @@
   .tx-code-tok--keyword,
   .tx-code-tok--tag {
     color: var(--tx-primary, CanvasText);
-    font-weight: var(--tx-font-weight-bold, 700);
+    font-weight: var(--tx-type-display-weight);
   }
 
   .tx-code-tok--string,
@@ -175,10 +175,10 @@
   .tx-code__caption {
     padding-block: 0.5rem;
     padding-inline: 0.75rem;
-    border-block-start: var(--tx-border-width, 1px) solid var(--tx-border, currentColor);
+    border-block-start: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
     color: var(--tx-muted-foreground, CanvasText);
     font-family: var(--tx-font-sans, system-ui, sans-serif);
-    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-size: var(--tx-type-label-size);
   }
 
   .tx-code__sr-only {
@@ -198,7 +198,7 @@
     padding-block: 0.5em;
     padding-inline: 0.75em;
     border: 1px dashed currentColor;
-    border-radius: var(--tx-radius, 0.375em);
+    border-radius: var(--tx-shape-radius-lg);
     font-size: 0.875em;
   }
 

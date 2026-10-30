@@ -150,7 +150,7 @@ onMount(() => {
     background: var(--tx-elevated, var(--tx-surface, var(--tx-background)));
     border: 1px solid var(--tx-border-strong, var(--tx-border));
     border-radius: var(--tx-radius-lg, 0.75rem);
-    box-shadow: var(--tx-shadow-float, 0 8px 32px rgb(0 0 0 / 0.2));
+    box-shadow: var(--tx-elevation-3);
   }
 
   .tx-deck-chrome-help[open] {
@@ -217,7 +217,7 @@ onMount(() => {
     flex-wrap: wrap;
     align-items: center;
     gap: 0.25rem 0.5rem;
-    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-size: var(--tx-type-label-size);
   }
 
   .tx-deck-chrome-help__label {

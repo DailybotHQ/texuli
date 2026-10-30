@@ -98,7 +98,7 @@ const BLOCKS: Record<string, readonly unknown[]> = {
     },
     {
       type: 'tree',
-      style: 'org',
+      variant: 'org',
       nodes: [
         { id: 'lead', parentId: null, label: 'Product lead' },
         { id: 'design', parentId: 'lead', label: 'Design' },

@@ -108,8 +108,8 @@ onMount(() => {
     color: var(--tx-foreground);
     background: var(--tx-elevated, var(--tx-surface, var(--tx-background)));
     border: 1px solid var(--tx-border-strong, var(--tx-border));
-    border-radius: var(--tx-radius, 0.5rem);
-    box-shadow: var(--tx-shadow-float, 0 4px 16px rgb(0 0 0 / 0.16));
+    border-radius: var(--tx-shape-radius-lg);
+    box-shadow: var(--tx-elevation-3);
   }
 
   /* Below the slide: open upward, anchored at the navigation's inline end. */
@@ -130,9 +130,9 @@ onMount(() => {
     color: inherit;
     background: transparent;
     border: 0;
-    border-radius: calc(var(--tx-radius, 0.5rem) - 0.125rem);
+    border-radius: calc(var(--tx-shape-radius-lg) - 0.125rem);
     font: inherit;
-    font-size: var(--tx-font-size-sm, 0.875rem);
+    font-size: var(--tx-type-label-size);
     text-align: start;
     cursor: pointer;
   }

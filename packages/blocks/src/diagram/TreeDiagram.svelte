@@ -23,7 +23,7 @@ const roots = $derived(children.get(null) ?? []);
 const stageW = $derived(layout.width + DIAGRAM_PAD * 2);
 const stageH = $derived(layout.height + DIAGRAM_PAD * 2);
 const summary = $derived(
-  `${block.style === 'org' ? 'Organization chart' : 'File tree'} with ${block.nodes.length} ${
+  `${block.variant === 'org' ? 'Organization chart' : 'File tree'} with ${block.nodes.length} ${
     block.nodes.length === 1 ? 'item' : 'items'
   }`
 );
@@ -94,8 +94,8 @@ function nodeStyle(node: { x: number; y: number; width: number; height: number }
   {/if}
 {/snippet}
 
-<figure class="tx-diagram" data-tx-diagram="tree" data-style={block.style}>
-  {#if block.style === 'file-tree'}
+<figure class="tx-diagram" data-tx-diagram="tree" data-variant={block.variant}>
+  {#if block.variant === 'file-tree'}
     <div class="tx-diagram-filetree">
       <ul aria-label={summary}>
         {#each roots as root (root)}

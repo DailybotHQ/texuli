@@ -25,7 +25,7 @@ const flow = {
 
 const org = {
   type: 'tree',
-  style: 'org',
+  variant: 'org',
   nodes: [
     { id: 'ceo', parentId: null, label: 'Alex Harbor' },
     { id: 'eng', parentId: 'ceo', label: 'Engineering' },
@@ -84,7 +84,7 @@ describe('parseDiagram', () => {
 
       const cycle = parseDiagram({
         type: 'tree',
-        style: 'org',
+        variant: 'org',
         nodes: [
           { id: 'a', parentId: 'b', label: 'A' },
           { id: 'b', parentId: 'a', label: 'B' },
@@ -107,6 +107,31 @@ describe('parseDiagram', () => {
       expect(isDiagramFamilyBlock(flow)).toBe(true);
       expect(isDiagramFamilyBlock({ type: 'heading', level: 1, text: 'Hi' })).toBe(false);
     }
+  });
+});
+
+describe('tree variant (renamed from style in 0.9.0)', () => {
+  it('reads variant, accepts the deprecated style alias for one minor, and refuses a conflict', () => {
+    const nodes = org.nodes;
+    const current = parseDiagram({ type: 'tree', variant: 'file-tree', nodes });
+    expect(current.success && current.data).toMatchObject({ type: 'tree', variant: 'file-tree' });
+    // The 0.8 key still parses (removed in 0.10.0) and normalizes to variant.
+    const legacy = parseDiagram({ type: 'tree', style: 'org', nodes });
+    expect(legacy.success).toBe(true);
+    if (legacy.success) {
+      expect(legacy.data).toMatchObject({ type: 'tree', variant: 'org' });
+      expect('style' in legacy.data).toBe(false);
+    }
+    const same = parseDiagram({ type: 'tree', variant: 'org', style: 'org', nodes });
+    expect(same.success).toBe(true);
+    const conflict = parseDiagram({ type: 'tree', variant: 'org', style: 'file-tree', nodes });
+    expect(conflict.success).toBe(false);
+    if (!conflict.success) expect(conflict.issues[0]?.jsonPath).toContain('style');
+    const missing = parseDiagram({ type: 'tree', nodes });
+    expect(missing.success).toBe(false);
+    if (!missing.success) expect(missing.issues[0]?.message).toMatch(/variant must be/u);
+    const bad = parseDiagram({ type: 'tree', variant: 'radial', nodes });
+    expect(bad.success).toBe(false);
   });
 });
 

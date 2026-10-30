@@ -70,11 +70,11 @@ const uid = $props.id();
 </div>
 
 <style>
-  .tx-calendar__agenda { display: grid; gap: 1rem; padding: 1rem; }
-  .tx-calendar__agenda-day { display: grid; gap: .5rem; }
+  .tx-calendar__agenda { display: grid; gap: var(--tx-space-4); padding: var(--tx-space-4); }
+  .tx-calendar__agenda-day { display: grid; gap: var(--tx-space-2); }
   .tx-calendar__agenda-heading { margin: 0; font-size: .9rem; font-weight: 650; }
   .tx-calendar__agenda-heading button { border: 0; background: transparent; padding: 0; color: inherit; font: inherit; text-align: start; }
-  .tx-calendar__agenda-heading button:focus-visible { outline: 2px solid var(--tx-ring, Highlight); outline-offset: 2px; }
-  ul { display: grid; gap: .35rem; margin: 0; padding: 0; list-style: none; }
-  .tx-calendar__empty { margin: 0; color: var(--tx-muted-foreground, GrayText); font-size: .875rem; }
+  .tx-calendar__agenda-heading button:focus-visible { outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight); outline-offset: 2px; }
+  ul { display: grid; gap: calc(var(--tx-space-unit) * 1.4); margin: 0; padding: 0; list-style: none; }
+  .tx-calendar__empty { margin: 0; color: var(--tx-muted-foreground, GrayText); font-size: var(--tx-type-label-size); }
 </style>

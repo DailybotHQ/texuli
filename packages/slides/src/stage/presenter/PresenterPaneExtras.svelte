@@ -124,7 +124,7 @@ async function openWindow() {
     color: var(--tx-foreground);
     background: var(--tx-muted, var(--tx-background));
     border-inline-start: 3px solid var(--tx-warning, var(--tx-ring));
-    border-radius: var(--tx-radius, 0.625rem);
+    border-radius: var(--tx-shape-radius-lg);
   }
 
   @media (forced-colors: active) {

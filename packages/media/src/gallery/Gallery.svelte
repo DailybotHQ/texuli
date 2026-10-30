@@ -267,7 +267,7 @@ function tile(target: number): HTMLElement | null {
     }
     .tx-gallery-figure {
       display: grid;
-      gap: 0.375rem;
+      gap: calc(var(--tx-space-unit) * 1.5);
       margin: 0;
     }
     .tx-gallery-tile {
@@ -278,7 +278,7 @@ function tile(target: number): HTMLElement | null {
       padding: 0;
       overflow: hidden;
       border: 0;
-      border-radius: var(--tx-radius, 0.5rem);
+      border-radius: var(--tx-shape-radius-lg);
       background: var(--tx-muted, Canvas);
       color: inherit;
       font: inherit;
@@ -304,7 +304,7 @@ function tile(target: number): HTMLElement | null {
     }
     .tx-gallery-caption {
       color: var(--tx-muted-foreground, CanvasText);
-      font-size: 0.875rem;
+      font-size: var(--tx-type-label-size);
       line-height: 1.4;
     }
 
@@ -339,9 +339,9 @@ function tile(target: number): HTMLElement | null {
       position: absolute;
       inset-inline: 0;
       inset-block-end: 0;
-      padding: 1.5rem 0.625rem 0.5rem;
-      border-end-start-radius: var(--tx-radius, 0.5rem);
-      border-end-end-radius: var(--tx-radius, 0.5rem);
+      padding: var(--tx-space-6) calc(var(--tx-space-unit) * 2.5) var(--tx-space-2);
+      border-end-start-radius: var(--tx-shape-radius-lg);
+      border-end-end-radius: var(--tx-shape-radius-lg);
       background: linear-gradient(transparent, rgb(0 0 0 / 0.78) 45%);
       color: #fff;
       pointer-events: none;
@@ -356,7 +356,7 @@ function tile(target: number): HTMLElement | null {
     }
     @media (forced-colors: active) {
       .tx-gallery-tile {
-        border: 1px solid CanvasText;
+        border: var(--tx-border-width-thin) solid CanvasText;
       }
       button.tx-gallery-tile:focus-visible {
         outline-color: Highlight;

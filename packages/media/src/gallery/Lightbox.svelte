@@ -447,8 +447,8 @@ function openChange(next: boolean): void {
     .tx-lightbox-bar {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      padding: 0.5rem 0.75rem;
+      gap: var(--tx-space-3);
+      padding: var(--tx-space-2) var(--tx-space-3);
     }
     :global(.tx-lightbox-title),
     .tx-lightbox-hidden {
@@ -461,12 +461,12 @@ function openChange(next: boolean): void {
     }
     .tx-lightbox-count {
       margin: 0;
-      font-size: 0.875rem;
+      font-size: var(--tx-type-label-size);
       font-variant-numeric: tabular-nums;
     }
     .tx-lightbox-tools {
       display: flex;
-      gap: 0.25rem;
+      gap: var(--tx-space-1);
       margin-inline-start: auto;
     }
     .tx-lightbox-button,
@@ -475,13 +475,13 @@ function openChange(next: boolean): void {
       place-items: center;
       min-inline-size: 2.75rem;
       min-block-size: 2.75rem;
-      padding: 0 0.5rem;
-      border: 1px solid rgb(255 255 255 / 0.35);
-      border-radius: var(--tx-radius, 0.5rem);
+      padding: 0 var(--tx-space-2);
+      border: var(--tx-border-width-thin) solid rgb(255 255 255 / 0.35);
+      border-radius: var(--tx-shape-radius-lg);
       background: rgb(0 0 0 / 0.55);
       color: #fff;
       font: inherit;
-      font-size: 0.875rem;
+      font-size: var(--tx-type-label-size);
       font-variant-numeric: tabular-nums;
       cursor: pointer;
     }
@@ -543,9 +543,9 @@ function openChange(next: boolean): void {
       place-items: center;
       min-inline-size: 12rem;
       min-block-size: 8rem;
-      padding: 1rem;
-      border: 1px dashed rgb(255 255 255 / 0.6);
-      border-radius: var(--tx-radius, 0.5rem);
+      padding: var(--tx-space-4);
+      border: var(--tx-border-width-thin) dashed rgb(255 255 255 / 0.6);
+      border-radius: var(--tx-shape-radius-lg);
     }
     .tx-lightbox-nav {
       position: absolute;
@@ -563,7 +563,7 @@ function openChange(next: boolean): void {
     }
     :global(.tx-lightbox-caption) {
       margin: 0;
-      padding: 0.5rem 1rem 1rem;
+      padding: var(--tx-space-2) var(--tx-space-4) var(--tx-space-4);
       text-align: center;
       font-size: 0.9375rem;
     }

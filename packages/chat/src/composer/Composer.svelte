@@ -201,11 +201,11 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
   @layer tx.components {
     .tx-chat-composer {
       display: grid;
-      gap: 0.5rem;
-      border: 1px solid var(--tx-border, CanvasText);
-      border-radius: var(--tx-radius, 0.75rem);
+      gap: var(--tx-chat-composer-gap, var(--tx-space-2));
+      border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
+      border-radius: var(--tx-chat-composer-radius, var(--tx-shape-radius-lg));
       background: var(--tx-surface, Canvas);
-      padding: 0.75rem;
+      padding: var(--tx-chat-composer-padding, var(--tx-space-3));
     }
 
     .tx-chat-composer:focus-within {
@@ -219,16 +219,16 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
     min-block-size: 2.5rem;
     max-block-size: none;
     margin: 0;
-    border: 1px solid var(--tx-input, var(--tx-border, CanvasText));
-    border-radius: var(--tx-radius, 0.375rem);
+    border: var(--tx-border-width-thin) solid var(--tx-input, var(--tx-border, CanvasText));
+    border-radius: var(--tx-chat-composer-radius, var(--tx-shape-radius-lg));
     background: var(--tx-surface, Canvas);
     color: var(--tx-foreground, CanvasText);
-    padding: 0.625rem 0.75rem;
+    padding: calc(var(--tx-space-unit) * 2.5) var(--tx-space-3);
     font-family: var(--tx-font-sans, system-ui, sans-serif);
     line-height: 1.4;
     resize: none;
     overflow-y: hidden;
-    font-size: 1rem;
+    font-size: var(--tx-type-body-size);
     outline: none;
     }
 
@@ -251,13 +251,13 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
       display: flex;
       align-items: end;
       justify-content: space-between;
-      gap: 0.75rem;
+      gap: var(--tx-space-3);
     }
 
     .tx-chat-composer__end {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
     }
 
     .tx-chat-composer__attachments {
@@ -265,13 +265,13 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
       min-inline-size: 0;
       flex-wrap: wrap;
       align-items: center;
-      gap: 0.5rem;
+      gap: var(--tx-space-2);
     }
 
     .tx-chat-composer__error {
       margin: 0;
       color: var(--tx-destructive, Mark);
-      font-size: 0.875rem;
+      font-size: var(--tx-type-label-size);
     }
 
     .visually-hidden {
@@ -285,7 +285,7 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
 
     @media (min-width: 640px) {
       .tx-chat-composer__field {
-        font-size: 0.875rem;
+        font-size: var(--tx-type-label-size);
       }
     }
   }
