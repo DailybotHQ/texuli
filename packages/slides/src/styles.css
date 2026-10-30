@@ -334,17 +334,22 @@
 /*
  * The trust badge row (untrusted tier): the badge at the inline start, the
  * toolbar (or the host `chrome`) takes the rest, so its own alignment holds.
+ * When less than 16rem would be left beside the badge (a phone), the toolbar
+ * wraps onto its own line instead of overflowing: even folded, the toolbar
+ * needs about 14rem (previous, the counter, next and "More").
  */
 .tx-deck-stage__chrome-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
   min-inline-size: 0;
 }
 
-.tx-deck-stage__chrome-row > :not(.tx-deck-stage__trust) {
-  flex: 1 1 auto;
-  min-inline-size: 0;
+/* Scoped under the stage: the toolbar's own `min-inline-size: 0` must not win. */
+.tx-deck-stage .tx-deck-stage__chrome-row > :not(.tx-deck-stage__trust) {
+  flex: 1 1 0;
+  min-inline-size: min(100%, 16rem);
 }
 
 .tx-deck-stage__trust {

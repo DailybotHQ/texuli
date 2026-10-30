@@ -240,6 +240,21 @@ test('the player paints motion as data and refuses a motion outside the vocabula
   expect(foreign).toEqual([]);
 });
 
+test('at 340 px the untrusted deck stage wraps its trust badge and its toolbar stays inside', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 340, height: 800 });
+  await page.goto(`${origin()}/motion-page/`);
+  await settle(page);
+  await hydrated(page, '[data-motion-deck]');
+  const more = page.locator('[data-motion-deck] .tx-deck-chrome-more');
+  await expect(more).toBeVisible({ timeout: 20_000 });
+  const box = await more.boundingBox();
+  expect(box && box.x + box.width).toBeLessThanOrEqual(340);
+  const row = page.locator('[data-motion-deck] .tx-deck-stage__chrome-row');
+  expect(await row.evaluate((node) => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
+});
+
 test('at 360 px nothing overflows and the settings work from the keyboard', async ({ page }) => {
   test.setTimeout(120_000);
   await page.setViewportSize({ width: 360, height: 800 });
