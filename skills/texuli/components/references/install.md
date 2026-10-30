@@ -15,6 +15,8 @@ in `0.5.0`), `@texuli/document` and `@texuli/pages` (both first published
 in `0.7.0`), `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (all
 three first published in `0.8.0`) and `@texuli/mcp` (first published in
 `0.9.0`) are in development and on npm as `0.9.0`.
+A Texuli checkout may show `0.10.0` in its manifests: 0.10.0 is in
+development and not on npm, so install the 0.9 line.
 Inside this monorepo, an app depends on the workspace packages:
 
 ```json

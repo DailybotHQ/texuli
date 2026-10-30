@@ -9,7 +9,7 @@ the intended process; it does not publish packages or grant release authority.
 "what the manifests are working toward". scripts/release-line.ts parses
 the next line; tests and honesty checks read it from there. Change it only
 when a publish lands (published) or a new version opens (in development). -->
-Release line: published `0.9`
+Release line: published `0.9` · in development `0.10.0`
 
 All 26 published packages are on npm in the 0.9 line: every one at
 `0.9.0`, every internal `@texuli/*` pin exactly `0.9.0`. `@texuli/mcp`
@@ -22,7 +22,10 @@ moves both the `latest` and `next` dist-tags to `0.9.0`, so a bare
 `npm install texuli` or `pnpm add texuli` gets it. `@texuli/drag`,
 `@texuli/workflows`, `@texuli/deck`, `@texuli/editor`, `@texuli/document`,
 `@texuli/pages`, `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets` and
-`@texuli/mcp` are still **in development** (pre-1.0).
+`@texuli/mcp` are still **in development** (pre-1.0). The workspace
+manifests are at `0.10.0`, which is in development on the release branch
+and not on npm (see "0.10.0 (in development)" below); installs stay on the
+0.9 line (`^0.9.0`).
 
 `0.9.0` is a breaking `0.x` minor: it carries the PLAN_011 changes listed
 under "0.9.0" below, none of which were in the 0.8 tarballs. It is still
@@ -37,6 +40,25 @@ versions into `main`). Publishing never overwrites a published version.
   `scripts/packages.ts`).
 - The apps (`apps/website`, `apps/agent`) and the native twin (`native/`)
   publish nothing.
+
+### 0.10.0 (in development)
+
+`0.10.0` is design systems (PLAN_011 part B). Like `0.9.0`, it cannot land
+on `main` piece by piece: every merge to `main` publishes the versions npm
+does not have, and the exact internal pins cascade a spec bump to every
+dependent. So design systems integrate on the branch `release/0.10.0`:
+
+- `0.10.0` is opened once on that branch: all 26 published packages move
+  to `0.10.0` and every internal pin to exactly `0.10.0`. The blueprint
+  spec format stays `0.9.0` until the design-system task bumps it.
+- Feature work merges into `release/0.10.0`, not `main`. Nothing on the
+  branch is published.
+- Only the final merge of `release/0.10.0` into `main`, after the
+  developer's GO, publishes `0.10.0`. That merge also moves the release
+  line above to published `0.10` with nothing in development.
+- Until then npm has the 0.9 line, the install instructions (README, the
+  skill, the website) name the 0.9 line (`^0.9.0`), and fixes that must
+  ship before `0.10.0` go to `main` as `0.9.x` patch releases.
 
 ### 0.9.0
 
@@ -1403,7 +1425,8 @@ version.
 
 Task 172 made every published dependency an intentional semver range: the
 published package manifests pin internal `@texuli/*` dependencies to exact
-versions (for `0.9.0`, every internal pin is exactly `0.9.0`; compatibility
+versions (for `0.9.0`, every internal pin is exactly `0.9.0`, and on the
+`release/0.10.0` branch every one is exactly `0.10.0`; compatibility
 between Texuli packages is exact, per "Independent package versions" above), while the private development
 manifests (`apps/website`, `apps/agent`, `packages/examples`) keep the
 pnpm `workspace:` protocol. The release packer enforces that boundary

@@ -25,7 +25,7 @@
  * registry; `apps/website/tests/site-api.test.ts` fails when it drifts from
  * `TOOLS_VERSION` in `@texuli/tools/ops`.
  */
-export const API_VERSION = '0.9.0';
+export const API_VERSION = '0.10.0';
 
 /**
  * Where the API stands in the release line (docs/RELEASE.md). One switch:

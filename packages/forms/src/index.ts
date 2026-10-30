@@ -22,4 +22,4 @@ export {
 } from './view/index.ts';
 
 /** The version of this package, kept equal to its manifest. */
-export const FORMS_PACKAGE_VERSION = '0.9.0';
+export const FORMS_PACKAGE_VERSION = '0.10.0';

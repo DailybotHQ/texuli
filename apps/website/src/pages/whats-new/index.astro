@@ -7,7 +7,8 @@ import { SHEET_FUNCTION_NAMES } from '@texuli/sheets/formula';
  * /whats-new/ — every new package and capability of 0.6.0 to 0.9.0 in one
  * place, grouped by release with its honest status: 0.6.0 to 0.9.0 are
  * published on npm, and 0.9.0 is the current release (the release line in
- * docs/RELEASE.md). Each feature has a
+ * docs/RELEASE.md); a release in development is listed with its status,
+ * and its cards join as its features land. Each feature has a
  * small live demo (a lazy island, client:visible) or a static preview the
  * packages build at build time, and a link to the page that shows it in
  * full.
@@ -121,95 +122,97 @@ const releaseFeatures = RELEASES.map((release) => ({
             {release.status}
           </p>
           <p class="hub__summary">{release.summary}</p>
-          <ul class="hub__grid">
-            {release.features.map((feature) => (
-              <li class="hub__card" data-hub-feature={feature.id}>
-                <h3>{feature.title}</h3>
-                <p class="hub__packages">
-                  {feature.packages.map((name, index) => (
-                    <>
-                      {index > 0 ? ' · ' : ''}
-                      <code>{name}</code>
-                    </>
-                  ))}
-                </p>
-                <p>{feature.summary}</p>
-                {feature.note ? <p class="hub__note">{feature.note}</p> : null}
-                <div class="hub__demo">
-                  {feature.id === 'motion' && <HubMotion client:visible />}
-                  {feature.id === 'contract' && (
-                    <GuideCode code={contract} label="The contract in two lines" lang="ts" />
-                  )}
-                  {feature.id === 'streaming' && (
-                    <ol class="hub__steps">
-                      {streamFrames.map((frame) => (
-                        <li>{frame}</li>
-                      ))}
-                    </ol>
-                  )}
-                  {feature.id === 'agent-service' && (
-                    <GuideCode code={agentSnippet} label="The agent service in short" lang="text" />
-                  )}
-                  {feature.id === 'documents' && (
-                    <>
-                      <GuideCode code={documentMarkdown} label="Markdown in" lang="text" />
-                      <p class="hub__note" data-hub-document-blocks="">
-                        Imported at build time as {documentBlocks.length} blocks:{' '}
-                        {documentBlocks.join(', ')}.
+          {release.features.length > 0 && (
+            <ul class="hub__grid">
+              {release.features.map((feature) => (
+                <li class="hub__card" data-hub-feature={feature.id}>
+                  <h3>{feature.title}</h3>
+                  <p class="hub__packages">
+                    {feature.packages.map((name, index) => (
+                      <>
+                        {index > 0 ? ' · ' : ''}
+                        <code>{name}</code>
+                      </>
+                    ))}
+                  </p>
+                  <p>{feature.summary}</p>
+                  {feature.note ? <p class="hub__note">{feature.note}</p> : null}
+                  <div class="hub__demo">
+                    {feature.id === 'motion' && <HubMotion client:visible />}
+                    {feature.id === 'contract' && (
+                      <GuideCode code={contract} label="The contract in two lines" lang="ts" />
+                    )}
+                    {feature.id === 'streaming' && (
+                      <ol class="hub__steps">
+                        {streamFrames.map((frame) => (
+                          <li>{frame}</li>
+                        ))}
+                      </ol>
+                    )}
+                    {feature.id === 'agent-service' && (
+                      <GuideCode code={agentSnippet} label="The agent service in short" lang="text" />
+                    )}
+                    {feature.id === 'documents' && (
+                      <>
+                        <GuideCode code={documentMarkdown} label="Markdown in" lang="text" />
+                        <p class="hub__note" data-hub-document-blocks="">
+                          Imported at build time as {documentBlocks.length} blocks:{' '}
+                          {documentBlocks.join(', ')}.
+                        </p>
+                      </>
+                    )}
+                    {feature.id === 'pages' && (
+                      <p class="hub__note">
+                        The slash menu offers all {blockTypes} block types; every edit is one operation
+                        in one op log, so undo, collaboration and export see the same history.
                       </p>
-                    </>
-                  )}
-                  {feature.id === 'pages' && (
-                    <p class="hub__note">
-                      The slash menu offers all {blockTypes} block types; every edit is one operation
-                      in one op log, so undo, collaboration and export see the same history.
-                    </p>
-                  )}
-                  {feature.id === 'forms' && <HubForm client:visible />}
-                  {feature.id === 'sources' && (
-                    <GuideCode code={sourceSnippet} label="A source binding in a blueprint" lang="text" />
-                  )}
-                  {feature.id === 'canvas' && (
-                    <img
-                      class="hub__canvas"
-                      src={canvasImage}
-                      alt="A support flow board: a new ticket, a known-issue decision, a saved reply or an escalation, and a sticky note to reply within one business day"
-                      width="600"
-                      height="270"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  )}
-                  {feature.id === 'sheets' && <HubSheet client:visible />}
-                  {feature.id === 'dashboards' && <HubDashboard client:visible />}
-                  {feature.id === 'output' && (
-                    <EmailFrame
-                      client:visible
-                      src={emailPreview}
-                      title="Email preview of the weekly digest (sandboxed, no scripts)"
-                    />
-                  )}
-                  {feature.id === 'i18n' && <HubLocale client:visible />}
-                  {feature.id === 'mcp' && (
-                    <GuideCode code={mcpSnippet} label="The two MCP doors" lang="text" />
-                  )}
-                  {feature.id === 'tokens' && (
-                    <p class="hub__note" data-hub-token-counts="">
-                      {TOKEN_COUNTS.system} system tokens in {TOKEN_COUNTS.systemFamilies} families and{' '}
-                      {TOKEN_COUNTS.component} component tokens for {TOKEN_COUNTS.components} components,
-                      read from the registries when this page was built.
-                    </p>
-                  )}
-                </div>
-                <p class="hub__more">
-                  <a href={link(feature.href)}>
-                    {feature.linkLabel}
-                    <span class="hub__sr"> ({feature.title})</span>
-                  </a>
-                </p>
-              </li>
-            ))}
-          </ul>
+                    )}
+                    {feature.id === 'forms' && <HubForm client:visible />}
+                    {feature.id === 'sources' && (
+                      <GuideCode code={sourceSnippet} label="A source binding in a blueprint" lang="text" />
+                    )}
+                    {feature.id === 'canvas' && (
+                      <img
+                        class="hub__canvas"
+                        src={canvasImage}
+                        alt="A support flow board: a new ticket, a known-issue decision, a saved reply or an escalation, and a sticky note to reply within one business day"
+                        width="600"
+                        height="270"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    )}
+                    {feature.id === 'sheets' && <HubSheet client:visible />}
+                    {feature.id === 'dashboards' && <HubDashboard client:visible />}
+                    {feature.id === 'output' && (
+                      <EmailFrame
+                        client:visible
+                        src={emailPreview}
+                        title="Email preview of the weekly digest (sandboxed, no scripts)"
+                      />
+                    )}
+                    {feature.id === 'i18n' && <HubLocale client:visible />}
+                    {feature.id === 'mcp' && (
+                      <GuideCode code={mcpSnippet} label="The two MCP doors" lang="text" />
+                    )}
+                    {feature.id === 'tokens' && (
+                      <p class="hub__note" data-hub-token-counts="">
+                        {TOKEN_COUNTS.system} system tokens in {TOKEN_COUNTS.systemFamilies} families and{' '}
+                        {TOKEN_COUNTS.component} component tokens for {TOKEN_COUNTS.components} components,
+                        read from the registries when this page was built.
+                      </p>
+                    )}
+                  </div>
+                  <p class="hub__more">
+                    <a href={link(feature.href)}>
+                      {feature.linkLabel}
+                      <span class="hub__sr"> ({feature.title})</span>
+                    </a>
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       ))
     }

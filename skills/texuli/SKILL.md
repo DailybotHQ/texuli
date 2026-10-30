@@ -44,7 +44,9 @@ agent config, or publish packages without explicit consent (see
    `0.9.0` (published by CI with provenance; `latest` and `next` both point
    to it; pre-1.0, so a new minor may break and 1.0.0 will be the first
    stable release), so install them plainly (`pnpm add texuli`) and pin
-   `0.9.0` or `^0.9.0`; the workspace packages stay `private: true`.
+   `0.9.0` or `^0.9.0`; the workspace packages stay `private: true`. A
+   Texuli checkout may show `0.10.0` in its manifests: 0.10.0 is in
+   development and not on npm, so install the 0.9 line.
    `@texuli/drag` (the drag engine),
    `@texuli/workflows` (the workflow editor), `@texuli/deck` (the deck
    engine behind the deck generator, first published in `0.4.0`),

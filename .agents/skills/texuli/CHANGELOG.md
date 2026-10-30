@@ -15,6 +15,9 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The packages are still installed from the 0.9 line on npm; a Texuli
+  checkout whose manifests say `0.10.0` is ahead of npm (0.10.0 is in
+  development).
 - The packages move to `0.9.0`: 26 published packages, `@texuli/mcp`
   published for the first time. The router, components, install and
   build-ui references say "on npm as `0.9.0`" and pin `^0.9.0`; the

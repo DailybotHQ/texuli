@@ -6,8 +6,8 @@
 > released on npm in the 0.9 line, every one at `0.9.0` (dist-tags
 > `latest` and `next`; published by CI from verified tarballs, with signed
 > provenance), including the first release of `@texuli/mcp`; the remote
-> MCP server at `https://texuli.com/mcp` is live ([RELEASE](RELEASE.md));
-> texuli.com deploys
+> MCP server at `https://texuli.com/mcp` is live; `0.10.0` is in
+> development and not on npm yet ([RELEASE](RELEASE.md)); texuli.com deploys
 > from `main` to Cloudflare Pages. The
 > implementation itself is substantial: every layer from L0 texels to L9
 > MCP exists in source with tests, all in this private workspace. The
@@ -160,7 +160,8 @@ closed, documented catalog that can be validated before anything renders.
 - The implementation is pre-1.0. All 26 published packages are on npm in the 0.9 line (see [RELEASE](RELEASE.md))
   (published by CI with provenance; `latest` and `next` both point to it; not
   a stable release: under 0.x a new minor may contain breaking changes, and
-  1.0.0 will be the first stable release), and the
+  1.0.0 will be the first stable release); `0.10.0` is in development on
+  the release branch and not on npm, and the
   workspace packages stay `private: true`. texuli.com deploys from `main` to
   Cloudflare Pages. The repository's remote is
   `https://github.com/DailybotHQ/texuli.git` (`git remote -v`), and GitHub
