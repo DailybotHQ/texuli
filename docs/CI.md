@@ -10,7 +10,7 @@ integration.
 | Workflow | File | Trigger | Jobs |
 | --- | --- | --- | --- |
 | CI | [.github/workflows/ci.yml](../.github/workflows/ci.yml) | push to `main`, pull requests | `check`, `behavior`, `website`, `audits`, `setup-smoke-macos` |
-| Publish packages | [.github/workflows/publish.yml](../.github/workflows/publish.yml) | `v*` tag push, manual dispatch | `publish` |
+| Publish packages | [.github/workflows/publish.yml](../.github/workflows/publish.yml) | CI success on a push to `main` (a merged PR), `v*` tag push, manual dispatch | `publish` |
 | Skill release | [.github/workflows/skill-release.yml](../.github/workflows/skill-release.yml) | `workflow_run` after a successful CI run for a push to `main` | `release` (`contents: write`), `smoke` (read-only) |
 
 - **`check`** — `pnpm check` (Biome lint, typecheck, unit and component
@@ -122,8 +122,12 @@ granular access token of the publishing account with read-and-write on
 the `@texuli` packages. CI tokens bypass the 2FA one-time-password flow
 that blocks terminal publishes.
 
-To release: push a tag (`v0.8.0`) or run the workflow from the
-Actions tab against `main`. Never overwrite a published version; new
+To release: merge a pull request that bumps the versions into `main`.
+Every pull request runs the full CI; once CI passes on the merge commit,
+`publish.yml` starts on its own (`workflow_run`) and publishes every
+`name@version` npm does not have yet, so a merge without a version bump
+publishes nothing. A tag (`v0.8.0`) or a manual run from the Actions tab
+against `main` still works. Never overwrite a published version; new
 content means a new version.
 
 The publish step is idempotent: it skips any `name@version` already on the

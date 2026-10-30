@@ -1103,6 +1103,9 @@ Tasks 174–178 establish this dependency order. Completing a task or passing a
 gate does not publish anything; **each wave requires a separate, fresh owner
 GO** for the exact packages, versions, tarball digests, and `next` or `latest`
 tag. Any GO for Task 170's name reservation covers only that reservation.
+Since 0.8.0 (owner decision 2026-10-29), merging a pull request that bumps
+the versions into `main` is that GO: once CI passes on the merge commit,
+`publish.yml` publishes the new versions on its own ([CI](CI.md)).
 
 | Task | Wave | Planned package order | Approval boundary |
 | --- | --- | --- | --- |

@@ -1,7 +1,9 @@
 # Publishes the packable packages to npm (docs/RELEASE.md).
 #
-# Trigger: a `v*` tag push, or a manual workflow_dispatch run against a
-# branch. The job rebuilds every tarball from source with
+# Trigger: CI succeeding on a push to main (a merged pull request), a `v*`
+# tag push, or a manual workflow_dispatch run against a branch. Merging a
+# version bump into main is the owner GO: the loop skips every name@version
+# already on npm, so a merge without a bump publishes nothing. The job rebuilds every tarball from source with
 # `pnpm verify:packages` (publint-strict, byte checks), then publishes the
 # freshly packed tarballs in the documented wave order with `--tag next`,
 # then points `latest` at the same versions: until 1.0.0, `latest` tracks
@@ -20,6 +22,10 @@ on:
   workflow_dispatch:
   push:
     tags: ['v*']
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
 
 concurrency:
   group: publish
@@ -33,8 +39,17 @@ jobs:
   publish:
     name: Pack, verify and publish (dist-tag next)
     runs-on: ubuntu-latest
+    # After a merge, publish only when CI passed on that push to main.
+    if: >-
+      github.event_name != 'workflow_run'
+      || (github.event.workflow_run.conclusion == 'success'
+      && github.event.workflow_run.event == 'push'
+      && github.event.workflow_run.head_branch == 'main')
     steps:
       - uses: actions/checkout@v7
+        with:
+          # The commit CI tested; empty (the triggering ref) on tag and manual runs.
+          ref: ${{ github.event.workflow_run.head_sha }}
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with:
