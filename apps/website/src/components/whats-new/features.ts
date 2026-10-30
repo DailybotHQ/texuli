@@ -3,10 +3,11 @@
  * them, each with its honest status, its packages, the page that shows it
  * in full and the kind of demo or preview the hub paints. Plain data, so
  * the page and its tests share one source. Releases: 0.6.0, 0.7.0 and 0.8.0
- * are published on npm (0.8.0 is `latest`).
+ * are published on npm (0.8.0 is `latest`); 0.9.0 is in development on the
+ * release/0.9.0 branch (the release line in docs/RELEASE.md).
  */
 
-export type ReleaseId = '0.6.0' | '0.7.0' | '0.8.0';
+export type ReleaseId = '0.6.0' | '0.7.0' | '0.8.0' | '0.9.0';
 
 export interface Release {
   readonly id: ReleaseId;
@@ -17,6 +18,15 @@ export interface Release {
 }
 
 export const RELEASES: readonly Release[] = [
+  {
+    id: '0.9.0',
+    title: '0.9.0: MCP, an agent-ready site and design tokens',
+    status:
+      'In development on the release/0.9.0 branch; npm has the 0.8 line until 0.9.0 is published.',
+    published: false,
+    summary:
+      'An MCP server for agents (remote and local), texuli.com readable by agents end to end, token contract v2 with a component tier, overlays that keep their scope, and the fixes Protoyard asked for. @texuli/mcp is a new package, first published with 0.9.0.',
+  },
   {
     id: '0.8.0',
     title: '0.8.0: forms, canvas, sheets and output',
@@ -56,7 +66,12 @@ export type DemoKind =
   | 'sheets'
   | 'dashboards'
   | 'output'
-  | 'i18n';
+  | 'i18n'
+  | 'mcp'
+  | 'agent-ready'
+  | 'tokens'
+  | 'portals'
+  | 'protoyard';
 
 export interface Feature {
   readonly id: DemoKind;
@@ -216,5 +231,62 @@ export const FEATURES: readonly Feature[] = [
     href: '/output-page/#i18n',
     linkLabel: 'Switch the locale',
     demo: 'live',
+  },
+  {
+    id: 'mcp',
+    release: '0.9.0',
+    title: 'Texuli MCP',
+    packages: ['@texuli/mcp', '@texuli/tools/mcp'],
+    summary:
+      'One operations registry served as MCP tools, resources and prompts: remotely at texuli.com/mcp, or locally with npx -y @texuli/mcp, with setup for every major host.',
+    href: '/mcp-server/',
+    linkLabel: 'Connect your agent',
+    demo: 'preview',
+    note: 'The remote server goes live when 0.9.0 deploys from main.',
+  },
+  {
+    id: 'agent-ready',
+    release: '0.9.0',
+    title: 'An agent-ready site',
+    packages: ['apps/website', 'functions'],
+    summary:
+      'A read-only JSON API with an OpenAPI description, Markdown twins of every page, discovery files, site tools on the MCP and a WebMCP bridge for browser agents.',
+    href: '/developers/',
+    linkLabel: 'The developer portal',
+    demo: 'preview',
+  },
+  {
+    id: 'tokens',
+    release: '0.9.0',
+    title: 'Design tokens v2',
+    packages: ['@texuli/tokens/system', '@texuli/tokens/components', 'texuli/defaults'],
+    summary:
+      'System families for space, size, type, elevation, shape, layers and more, plus a component tier every styled component reads, and default variants and sizes for design systems and agents.',
+    href: '/tokens/',
+    linkLabel: 'The token reference',
+    demo: 'preview',
+  },
+  {
+    id: 'portals',
+    release: '0.9.0',
+    title: 'Scoped portals',
+    packages: ['@texuli/core', '@texuli/primitives', 'texuli'],
+    summary:
+      'Every token is element-scoped with data-tx-scope, and overlays (dialogs, menus, popovers, tooltips, toasts) keep the theme and tokens of the scope that opened them.',
+    href: '/tokens/#scope',
+    linkLabel: 'The scope model',
+    demo: 'preview',
+    note: 'In development for 0.9.0, with the rest of this release.',
+  },
+  {
+    id: 'protoyard',
+    release: '0.9.0',
+    title: 'Fixes from Protoyard',
+    packages: ['texuli', '@texuli/data', '@texuli/charts', '@texuli/chat', '@texuli/primitives'],
+    summary:
+      'Gaps a production adopter reported: dialog and command palette callbacks, date control hooks and invalid state, keyboard rows in table grids, ref and rest on every layout, a time x-axis for charts and contained toasts without a forced layout.',
+    href: '/changelog/',
+    linkLabel: 'The changelog',
+    demo: 'preview',
   },
 ];
