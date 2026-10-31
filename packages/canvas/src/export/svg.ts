@@ -2,7 +2,9 @@
  * Static SVG of a canvas through `@texuli/core/markup`: typed, escaped
  * nodes only (no raw markup), an element and attribute allowlist, image
  * URLs through the URL policy at the tier (`untrusted` by default), and
- * fixed colors (an exported file carries no theme). Linear in the canvas.
+ * concrete colors: the fixed export palette, or the design values passed
+ * as `design` (an exported file carries no custom properties). Linear in
+ * the canvas.
  */
 import { el, imageUrl, type MarkupElement, serializeXml } from '@texuli/core/markup';
 import type { HrefTrust } from '@texuli/core/url-policy';
@@ -17,7 +19,67 @@ import {
   shapeTransform,
   textLayout,
 } from '../model/paint.ts';
-import type { BoxedShape, CanvasDocument, CanvasShape } from '../model/types.ts';
+import type { BoxedShape, CanvasColor, CanvasDocument, CanvasShape } from '../model/types.ts';
+
+/** The design roles each palette name reads (the same roles `PALETTE_TOKENS` paints with on screen). */
+export const EXPORT_DESIGN_ROLES = Object.freeze({
+  default: 'foreground',
+  gray: 'mutedForeground',
+  red: 'destructive',
+  orange: 'warning',
+  yellow: 'chart4',
+  green: 'success',
+  teal: 'chart2',
+  blue: 'info',
+  purple: 'chart5',
+  pink: 'chart6',
+} as const satisfies Record<CanvasColor, string>);
+
+type DesignRole = (typeof EXPORT_DESIGN_ROLES)[CanvasColor] | 'background' | 'muted' | 'border';
+
+/**
+ * Design values for an export (ADR-024): sRGB `#rrggbb` per role and the
+ * text stack, which callers build from a compiled design system (for
+ * example `designValues(compiled, mode)` from `@texuli/tools/print`).
+ * Values outside `#rrggbb`, and stack names outside plain letters, digits,
+ * spaces and `-`, are ignored.
+ */
+export interface CanvasExportDesign {
+  colors?: Readonly<Partial<Record<DesignRole, string>>>;
+  fonts?: Readonly<{ sans?: string }>;
+}
+
+const hex = (design: CanvasExportDesign | null | undefined, role: DesignRole, fallback: string) => {
+  const value = design?.colors?.[role];
+  return typeof value === 'string' && /^#[0-9a-fA-F]{6}$/.test(value)
+    ? value.toLowerCase()
+    : fallback;
+};
+
+/** The export palette with every color the design resolves (the fixed palette otherwise). */
+export function exportPalette(
+  design?: CanvasExportDesign | null
+): Readonly<Record<CanvasColor, string>> {
+  if (!design?.colors) return EXPORT_PALETTE;
+  const out = { ...EXPORT_PALETTE };
+  for (const name of Object.keys(out) as CanvasColor[])
+    out[name] = hex(design, EXPORT_DESIGN_ROLES[name], out[name]);
+  return out;
+}
+
+const SYSTEM_FONT = 'system-ui, sans-serif';
+
+function fontStack(stack: unknown): string {
+  if (typeof stack !== 'string' || stack.length > 400) return SYSTEM_FONT;
+  const names = stack
+    .split(',')
+    .map((name) => name.trim().replace(/^["']|["']$/g, ''))
+    .filter((name) => /^[A-Za-z0-9 -]{1,40}$/.test(name))
+    .slice(0, 5);
+  return names.length > 0
+    ? [...new Set([...names, 'system-ui', 'sans-serif'])].join(', ')
+    : SYSTEM_FONT;
+}
 
 export interface SvgExportOptions {
   /** URL tier for resolved image URLs. Default `untrusted`. */
@@ -32,6 +94,11 @@ export interface SvgExportOptions {
   dir?: 'ltr' | 'rtl';
   /** Export only these shapes (and connectors between them). */
   ids?: Iterable<string>;
+  /**
+   * Design values: the palette, the background, the image placeholder and
+   * the text stack. Default: none (the fixed palette, unchanged output).
+   */
+  design?: CanvasExportDesign | null;
 }
 
 /** Elements and attributes the export writes; everything else is refused at serialization. */
@@ -52,16 +119,6 @@ const allow = (name: string, what: 'element' | 'attribute') =>
 
 const tenth = (value: number) => Math.round(value * 10) / 10;
 
-const paint = (name: string) =>
-  name === 'none' ? 'none' : (EXPORT_PALETTE[name as keyof typeof EXPORT_PALETTE] ?? 'none');
-
-function fillOf(name: string, kind: string): string {
-  if (name === 'none') return 'none';
-  // Fills are tints, so text stays readable on them.
-  const base = paint(name);
-  return kind === 'sticky' ? `${base}33` : `${base}22`;
-}
-
 /** The SVG text of a canvas (no XML declaration). */
 export function canvasToSvg(doc: CanvasDocument, options: SvgExportOptions = {}): string {
   return serializeXml(canvasSvgElement(doc, options), { declaration: false, allow });
@@ -73,6 +130,14 @@ export function canvasSvgElement(
   options: SvgExportOptions = {}
 ): MarkupElement {
   const trust = options.trust ?? 'untrusted';
+  const design = options.design;
+  const palette = exportPalette(design);
+  const font = design?.fonts?.sans ? fontStack(design.fonts.sans) : SYSTEM_FONT;
+  const paint = (name: string) =>
+    name === 'none' ? 'none' : (palette[name as CanvasColor] ?? 'none');
+  // Fills are tints, so text stays readable on them.
+  const fillOf = (name: string, kind: string) =>
+    name === 'none' ? 'none' : `${paint(name)}${kind === 'sticky' ? '33' : '22'}`;
   const dir = options.dir ?? 'ltr';
   const padding = options.padding ?? 24;
   const index = indexShapes(doc);
@@ -117,10 +182,10 @@ export function canvasSvgElement(
         x: layout.x,
         y: layout.y,
         'font-size': layout.size,
-        'font-family': 'system-ui, sans-serif',
+        'font-family': font,
         'font-weight': shape.type === 'frame' ? 600 : undefined,
         'text-anchor': layout.anchor,
-        fill: EXPORT_PALETTE.default,
+        fill: palette.default,
       },
       layout.lines.map((line, i) =>
         el('tspan', { x: layout.x, dy: i === 0 ? 0 : layout.step }, line)
@@ -165,8 +230,8 @@ export function canvasSvgElement(
             y: shape.y,
             width: shape.width,
             height: shape.height,
-            fill: '#f6f8fa',
-            stroke: '#d0d7de',
+            fill: hex(design, 'muted', '#f6f8fa'),
+            stroke: hex(design, 'border', '#d0d7de'),
           })
         );
         parts.push(
@@ -177,7 +242,7 @@ export function canvasSvgElement(
               y: tenth(shape.y + shape.height / 2),
               'font-size': 14,
               'text-anchor': 'middle',
-              fill: EXPORT_PALETTE.gray,
+              fill: palette.gray,
             },
             shape.alt
           )
@@ -282,7 +347,7 @@ export function canvasSvgElement(
                 y: tenth(route.mid.y - 6),
                 'font-size': 13,
                 'text-anchor': 'middle',
-                fill: EXPORT_PALETTE.default,
+                fill: palette.default,
               },
               connector.text
             )
@@ -305,7 +370,9 @@ export function canvasSvgElement(
     el('title', { id: 'tx-canvas-title' }, title),
     doc.meta?.description ? el('desc', {}, doc.meta.description) : null,
     el('defs', {}, defs),
-    options.background === false ? null : el('rect', { ...box, fill: '#ffffff' }),
+    options.background === false
+      ? null
+      : el('rect', { ...box, fill: hex(design, 'background', '#ffffff') }),
     shapes,
     connectors
   );
