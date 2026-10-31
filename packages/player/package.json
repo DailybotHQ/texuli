@@ -34,6 +34,11 @@
       "svelte": "./src/design-system.ts",
       "default": "./src/design-system.ts"
     },
+    "./design-system-core": {
+      "types": "./src/design-system-core.ts",
+      "svelte": "./src/design-system-core.ts",
+      "default": "./src/design-system-core.ts"
+    },
     "./styles.css": "./src/player.css"
   },
   "scripts": {

@@ -334,3 +334,63 @@ describe('a blueprint without a design system costs nothing', () => {
     expect(events).toEqual([]);
   });
 });
+
+describe('the design-system core step takes the theme library loader from its caller (G127)', () => {
+  it(
+    'refuses texuli:<theme> without a loader, resolves it with one, and the default step keeps the library',
+    TIMEOUT,
+    async () => {
+      const core = await import('../src/design-system-core.ts');
+      const step = await import('../src/design-system.ts');
+      const violet = { ref: 'texuli:violet' } as const;
+      // No loader: the reference and an inline document's texuli: base are both refused.
+      const bare = await core.resolvePlayerDesignSystemCore(violet, null, 'untrusted');
+      expect(bare).toMatchObject({ ok: false, code: 'design-system-unresolved' });
+      const based = await core.resolvePlayerDesignSystemCore(
+        { inline: { ...minimal, extends: 'texuli:violet' } },
+        null,
+        'developer'
+      );
+      expect(based).toMatchObject({
+        ok: false,
+        code: 'invalid-value',
+        path: '$.designSystem.inline.extends',
+      });
+      // An injected loader resolves both (here the library's, opted into by name).
+      const asked: string[] = [];
+      const loadLibraryBase = (ref: string) => {
+        asked.push(ref);
+        return step.loadPlayerLibraryBase(ref);
+      };
+      const injected = await core.resolvePlayerDesignSystemCore(violet, null, 'untrusted', {
+        loadLibraryBase,
+      });
+      expect(injected.ok).toBe(true);
+      const inline = await core.resolvePlayerDesignSystemCore(
+        { inline: { ...minimal, extends: 'texuli:violet' } },
+        null,
+        'developer',
+        { loadLibraryBase }
+      );
+      expect(inline.ok).toBe(true);
+      expect(asked).toEqual(['texuli:violet', 'texuli:violet']);
+      // The host's resolver answers first, so a host that resolves texuli: ids needs no loader.
+      const fromHost = await core.resolvePlayerDesignSystemCore(
+        violet,
+        { resolve: () => step.loadPlayerLibraryBase('texuli:violet') as never },
+        'untrusted'
+      );
+      expect(fromHost.ok).toBe(true);
+      // The default step loads the library unless the caller turns it off with null.
+      expect((await step.resolvePlayerDesignSystem(violet, null, 'untrusted')).ok).toBe(true);
+      expect(
+        await step.resolvePlayerDesignSystem(violet, null, 'untrusted', { loadLibraryBase: null })
+      ).toMatchObject({ ok: false, code: 'design-system-unresolved' });
+      // Only the default step names the full compiler; the core loads the library-free one.
+      const source = (name: string) =>
+        readFileSync(join(import.meta.dirname, '../src', name), 'utf8');
+      expect(source('design-system-core.ts')).not.toMatch(/loadDesignSystemCompiler\(/);
+      expect(source('design-system-core.ts')).toContain('loadDesignSystemCompilerCore()');
+    }
+  );
+});
