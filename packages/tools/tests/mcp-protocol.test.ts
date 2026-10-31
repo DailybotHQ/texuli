@@ -428,27 +428,31 @@ it('lists and reads the Texuli resources and resource templates', async () => {
     expect(uris.filter((uri) => uri.startsWith('texuli://theme/'))).toEqual(
       themes.map((theme) => `texuli://theme/${theme.id}`)
     );
-    expect(uris.some((uri) => uri.includes('design-system'))).toBe(false);
+    // Only the spec's examples are listed; the library themes as documents are read by id.
+    expect(uris.filter((uri) => uri.startsWith('texuli://design-system/'))).toEqual([
+      'texuli://design-system/acme',
+      'texuli://design-system/minimal',
+    ]);
     for (const item of items) {
       expect(typeof item.name, item.uri as string).toBe('string');
       expect(typeof item.description, item.uri as string).toBe('string');
       expect(item.mimeType, item.uri as string).toMatch(/^(application\/json|text\/markdown)$/u);
     }
   });
-  await scenario(
-    'lists four templates, with no design-system template until it exists',
-    async () => {
-      const templates = (await rpc(handle, 'resources/templates/list')).result
-        ?.resourceTemplates as { uriTemplate: string; description: string }[];
-      expect(templates.map((template) => template.uriTemplate)).toEqual([
-        'texuli://component/{id}',
-        'texuli://docs/{slug}',
-        'texuli://theme/{id}',
-        'texuli://schema/{name}',
-      ]);
-      for (const template of templates) expect(template.description.length).toBeGreaterThan(40);
-    }
-  );
+  await scenario('lists five templates, the design-system documents among them', async () => {
+    const templates = (await rpc(handle, 'resources/templates/list')).result?.resourceTemplates as {
+      uriTemplate: string;
+      description: string;
+    }[];
+    expect(templates.map((template) => template.uriTemplate)).toEqual([
+      'texuli://component/{id}',
+      'texuli://docs/{slug}',
+      'texuli://theme/{id}',
+      'texuli://design-system/{id}',
+      'texuli://schema/{name}',
+    ]);
+    for (const template of templates) expect(template.description.length).toBeGreaterThan(40);
+  });
   await scenario('reads each resource from the same source as the other doors', async () => {
     const read = async (uri: string) => {
       const response = await rpc(handle, 'resources/read', { uri });
@@ -476,6 +480,15 @@ it('lists and reads the Texuli resources and resource templates', async () => {
     expect(JSON.parse(deck?.text ?? '{}')).toEqual(runDeckCommand('schema'));
     const [documentSchema] = await read('texuli://schema/document');
     expect(JSON.parse(documentSchema?.text ?? '{}')).toEqual(await runDocumentCommand('schema'));
+    // An example document, and a library theme as a document: one per read, both valid.
+    for (const id of ['acme', 'ocean']) {
+      const [ds] = await read(`texuli://design-system/${id}`);
+      expect(ds?.mimeType).toBe('application/json');
+      const outcome = await texuliOps.invoke('ds.validate', {
+        document: JSON.parse(ds?.text ?? ''),
+      });
+      expect(outcome, id).toMatchObject({ ok: true, output: { valid: true } });
+    }
   });
   await scenario(
     'answers unknown and hostile URIs with resource-not-found or invalid params',
@@ -488,7 +501,8 @@ it('lists and reads the Texuli resources and resource templates', async () => {
         'texuli://component/',
         'texuli://theme/not-a-theme',
         'texuli://schema/blueprint',
-        'texuli://design-system/acme',
+        'texuli://design-system/not-a-theme',
+        'texuli://design-system/ACME',
         'texuli://docs/__proto__',
         'texuli://catalog?x=1',
         'file:///etc/passwd',
@@ -516,7 +530,7 @@ it('lists and reads the Texuli resources and resource templates', async () => {
 it('lists and renders the workflow prompts with arguments an agent can complete', async () => {
   const { handle } = await ready();
   await scenario(
-    'lists build-ui, theme-blueprint and convert-deck (no design-system prompt yet)',
+    'lists build-ui, theme-blueprint, create-design-system and convert-deck',
     async () => {
       const prompts = (await rpc(handle, 'prompts/list')).result?.prompts as {
         name: string;
@@ -527,6 +541,7 @@ it('lists and renders the workflow prompts with arguments an agent can complete'
       expect(prompts.map((prompt) => prompt.name)).toEqual([
         'build-ui',
         'theme-blueprint',
+        'create-design-system',
         'convert-deck',
       ]);
       for (const prompt of prompts) {
@@ -555,6 +570,11 @@ it('lists and renders the workflow prompts with arguments an agent can complete'
           theme: 'violet',
         },
         'theme-blueprint': { brief: 'A calm analytics dashboard', mode: 'dark' },
+        'create-design-system': {
+          brief: 'Harborline: teal #0e7490, Inter, rounded, calm',
+          base: 'ocean',
+          contrast: 'AAA',
+        },
         'convert-deck': { direction: 'from-markdown', source: '# Fictional deck' },
       };
       for (const prompt of TEXULI_PROMPTS) {
@@ -606,6 +626,7 @@ it('lists and renders the workflow prompts with arguments an agent can complete'
   await scenario('refuses unknown prompts and bad arguments', async () => {
     for (const params of [
       { name: 'create-design-system', arguments: {} },
+      { name: 'create-design-system', arguments: { brief: 'ok', contrast: 'AAAA' } },
       { name: 'nope' },
       { name: 'build-ui' },
       { name: 'build-ui', arguments: { brief: 42 } },
@@ -646,6 +667,12 @@ it('completes template and prompt arguments from the real ids', async () => {
       await complete({ type: 'ref/resource', uri: 'texuli://theme/{id}' }, 'id', 'VIO')
     );
     expect(theme.values).toContain('violet');
+    const designSystems = values(
+      await complete({ type: 'ref/resource', uri: 'texuli://design-system/{id}' }, 'id', '')
+    );
+    const library = await listFullThemeLibrary();
+    expect(designSystems.values.slice(0, 3)).toEqual(['acme', 'minimal', library[0]?.id]);
+    expect(designSystems.total).toBe(2 + library.length);
     expect(
       values(await complete({ type: 'ref/resource', uri: 'texuli://schema/{name}' }, 'name', ''))
         .values

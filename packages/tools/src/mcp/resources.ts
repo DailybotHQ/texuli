@@ -1,7 +1,7 @@
 /**
  * The Texuli MCP resources. Every body is computed from data the package
- * already ships (the static manifest list, the theme library, the deck and
- * document schemas), so the provider is edge-safe: no file system, no
+ * already ships (the static manifest list, the theme library, the spec's
+ * example design systems, the deck and document schemas), so the provider is edge-safe: no file system, no
  * network. The package guides (`packages/<pkg>/docs/*.md`) are not bundled;
  * `texuli://docs/{slug}` serves the per-component Markdown the site
  * publishes under `/llms/components/` (see `docs/mcp.md`).
@@ -37,6 +37,12 @@ const COMPONENT_URI = new RegExp(`^texuli://component/${ID}$`, 'u');
 const DOCS_URI = new RegExp(`^texuli://docs/${ID}$`, 'u');
 const THEME_URI = /^texuli:\/\/theme\/([a-z0-9][a-z0-9-]{0,63})$/u;
 const SCHEMA_URI = /^texuli:\/\/schema\/([a-z]+)$/u;
+const DESIGN_SYSTEM_URI = /^texuli:\/\/design-system\/([a-z0-9][a-z0-9-]{0,63})$/u;
+
+/** The spec's example design systems (a lazy chunk: only the data). */
+async function designSystemExamples(): Promise<Readonly<Record<string, unknown>>> {
+  return (await import('../ops/design-system-examples.ts')).DESIGN_SYSTEM_EXAMPLES;
+}
 
 let bundle: Promise<{ full: string; docs: Map<string, string> }> | undefined;
 
@@ -63,7 +69,7 @@ const one = (uri: string, mimeType: string, text: string): McpResourceContents[]
   { uri, mimeType, text },
 ];
 
-/** The Texuli resource provider: catalog, components, docs, llms, themes and schemas. */
+/** The Texuli resource provider: catalog, components, docs, llms, themes, design systems and schemas. */
 export const texuliResources: McpResourceProvider = {
   async list() {
     const built = await loadOpsCatalog();
@@ -108,6 +114,16 @@ export const texuliResources: McpResourceProvider = {
         description: `The agent Markdown page for ${entry.id}: use when, do not use when, props table and examples.`,
         mimeType: MARKDOWN_TYPE,
       });
+    // Only the examples are listed; the library themes as documents are
+    // read one at a time through the template (complete {id} for the ids).
+    for (const [id, doc] of Object.entries(await designSystemExamples()))
+      resources.push({
+        uri: `texuli://design-system/${id}`,
+        name: `design-system-${id}`,
+        title: `${String((doc as { name?: unknown }).name ?? id)} design system`,
+        description: `${String((doc as { description?: unknown }).description ?? 'An example design system.')} A fictional example document as JSON; validate your own with ds.validate.`,
+        mimeType: JSON_TYPE,
+      });
     for (const theme of themes)
       resources.push({
         uri: `texuli://theme/${theme.id}`,
@@ -144,6 +160,14 @@ export const texuliResources: McpResourceProvider = {
       mimeType: JSON_TYPE,
     },
     {
+      uriTemplate: 'texuli://design-system/{id}',
+      name: 'design-system',
+      title: 'Design-system document',
+      description:
+        'One design-system document as JSON: a fictional example (acme shows every section, minimal the smallest) or a library theme as a document (its generator input as color.brand), ready to extend, validate with ds.validate and compile with ds.compile. Complete {id} for every id; one document per read.',
+      mimeType: JSON_TYPE,
+    },
+    {
       uriTemplate: 'texuli://schema/{name}',
       name: 'schema',
       title: 'Format JSON Schema',
@@ -172,6 +196,13 @@ export const texuliResources: McpResourceProvider = {
         { uri, mimeType: 'text/css', text: await themeCss(theme) },
       ];
     }
+    const designSystem = DESIGN_SYSTEM_URI.exec(uri)?.[1];
+    if (designSystem !== undefined) {
+      const doc = await (await import('../ops/design-system-run.ts')).designSystemDocument(
+        designSystem
+      );
+      return doc === undefined ? undefined : one(uri, JSON_TYPE, JSON.stringify(doc));
+    }
     const schema = SCHEMA_URI.exec(uri)?.[1];
     if (schema === 'deck') return one(uri, JSON_TYPE, JSON.stringify(runDeckCommand('schema')));
     if (schema === 'document')
@@ -185,6 +216,8 @@ export const texuliResources: McpResourceProvider = {
     )
       return [...(await entries()).keys()];
     if (uriTemplate === 'texuli://theme/{id}' && variable === 'id') return themeIds();
+    if (uriTemplate === 'texuli://design-system/{id}' && variable === 'id')
+      return designSystemIds();
     if (uriTemplate === 'texuli://schema/{name}' && variable === 'name') return MCP_SCHEMA_NAMES;
     return undefined;
   },
@@ -193,6 +226,11 @@ export const texuliResources: McpResourceProvider = {
 /** Every library theme id, in library order. */
 export async function themeIds(): Promise<readonly string[]> {
   return (await listFullThemeLibrary()).map((theme) => theme.id);
+}
+
+/** Every `texuli://design-system/{id}` id: the examples, then the library themes. */
+export async function designSystemIds(): Promise<readonly string[]> {
+  return [...Object.keys(await designSystemExamples()), ...(await themeIds())];
 }
 
 /** Every catalog component id, sorted. */
