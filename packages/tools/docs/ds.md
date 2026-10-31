@@ -1,13 +1,12 @@
 # Design-system operations: `ds.*`, `blueprint.theme` and `texuli ds`
 
-> **Status: in development for `0.10.0`, not on npm.** The operations, the
+> **Status: released in `0.10.0`.** The operations, the
 > `create-design-system` prompt, the `texuli://design-system/{id}`
-> resources and the `texuli ds` commands exist on the `release/0.10.0`
-> branch (PLAN_011 T-ds-agent-tools) and ship only with
-> `@texuli/tools@0.10.0` and `@texuli/mcp@0.10.0`. The remote endpoint at
-> `https://texuli.com/mcp` serves them once `0.10.0` is merged to `main` and
-> deployed. The Kotlin, email, PDF, DOCX, PPTX and canvas outputs of a
-> design system are on the same branch (`designValues` from
+> resources and the `texuli ds` commands ship in `@texuli/tools@0.10.0`
+> and `@texuli/mcp@0.10.0` (PLAN_011 T-ds-agent-tools). The remote endpoint
+> at `https://texuli.com/mcp`, deployed with texuli.com from `main`, serves
+> the edge ones. The Kotlin, email, PDF, DOCX, PPTX and canvas outputs of a
+> design system ship in the same release (`designValues` from
 > `@texuli/tools/print` and `@texuli/tools/email`; see
 > [docs/DESIGN_SYSTEMS.md](../../../docs/DESIGN_SYSTEMS.md)).
 

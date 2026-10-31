@@ -11,8 +11,8 @@ Generate agent-facing documentation from catalog manifests:
 | `components/<id>.md` | Per-component Markdown (props, examples, use/don't-use, a11y) |
 
 `llms.txt` and `llms-full.txt` also carry a "Blueprint envelope" section
-(`LLMS_ENVELOPE_NOTES`): the envelope fields and, from spec 0.10.0 (in
-development for `0.10.0`, not on npm), the envelope's `designSystem`
+(`LLMS_ENVELOPE_NOTES`): the envelope fields and, from spec 0.10.0 (new in
+`0.10.0`), the envelope's `designSystem`
 (`{ ref }` or `{ inline }`, what the player does with it and the
 `design-system` validation codes).
 

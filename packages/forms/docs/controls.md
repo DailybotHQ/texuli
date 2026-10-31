@@ -1,8 +1,7 @@
 # `@texuli/forms/controls`
 
-> **Status: in development (pre-1.0).** New in `0.10.0` (on
-> `release/0.10.0`, not released yet); `@texuli/forms` is on npm from
-> `0.8.0`.
+> **Status: in development (pre-1.0).** New in `0.10.0`; `@texuli/forms`
+> is on npm from `0.8.0`.
 
 The static control registry of `SchemaForm` (G119). `SchemaForm` loads the
 controls of date, time, datetime, slider, tags, file, color and radio

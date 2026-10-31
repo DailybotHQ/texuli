@@ -1,6 +1,6 @@
 ---
 name: texuli-design-systems
-description: Author, validate, repair, apply and export a Texuli design system (one closed JSON document for a whole brand) — importers, the ds.* MCP operations, texuli ds, stable error codes, blueprint designSystem. In development for 0.10.0, not on npm.
+description: Author, validate, repair, apply and export a Texuli design system (one closed JSON document for a whole brand) — importers, the ds.* MCP operations, texuli ds, stable error codes, blueprint designSystem. New in 0.10.0.
 version: "0.3.3"
 documentation_url: https://texuli.com/guides/
 user-invocable: true
@@ -16,10 +16,11 @@ that every Texuli surface follows: components, the blueprint player,
 documents, decks, email, PDF, DOCX, PPTX, canvas and the Kotlin twin. For a
 quick library theme instead, use [`../themes/SKILL.md`](../themes/SKILL.md).
 
-> **In development for `0.10.0`, not on npm.** The document, compiler,
-> runtime, importers, the `ds.*` operations and `texuli ds` exist on the
-> `release/0.10.0` branch only. With the published 0.9 line, say so and
-> use themes; never promise these APIs from npm before `0.10.0` publishes.
+> **Released in `0.10.0`.** The document, compiler, runtime, importers,
+> the `ds.*` operations and `texuli ds` ship in the 0.10 line (install
+> `^0.10.0`); the 0.9 line does not have them, so an app pinned to
+> `^0.9.0` moves up first ([`../upgrade/SKILL.md`](../upgrade/SKILL.md))
+> or stays on themes.
 
 Guide (monorepo): `docs/DESIGN_SYSTEMS.md`. Reference: the document
 `packages/spec/docs/design-system.md`, the compiler
@@ -92,7 +93,7 @@ In app code (a checkout on the branch): `compileDesignSystem` then
 server HTML, the Astro `designSystem` option, or `<Player designSystems={{
 resolve, mode }}>` for blueprints. Details: the guide.
 
-## CLI (a checkout on `release/0.10.0`)
+## CLI (`texuli ds`, from `0.10.0`)
 
 ```bash
 texuli ds init design-systems/example.ds.json --name Example

@@ -68,7 +68,7 @@ those steps.
 
 - Off-step values exist (0.35rem in 37 declarations, 0.375rem in 37, 0.15rem,
   0.2rem, 0.625rem, 0.65rem). New surfaces should not copy them.
-- **Spacing scale (token contract v2, ADR-020, unreleased):** `--tx-space-unit`
+- **Spacing scale (token contract v2, ADR-020, from `0.9.0`):** `--tx-space-unit`
   (`calc(0.25rem * var(--tx-density, 1))`) and `--tx-space-0` … `--tx-space-12`
   (0 to 3rem at density 1) exist in `@texuli/tokens/system`. `base.css`
   declares them (with every other system default) once per token scope

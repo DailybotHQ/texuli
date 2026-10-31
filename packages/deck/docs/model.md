@@ -57,7 +57,7 @@ with the [schema kit](schema.md).
 | `navigation` | object | Optional. `start` (a visible slide id), `loop` (default `false`), `autoSlideMs` (`0` is off, otherwise 1,000 to 600,000). |
 | `outline` | object | Optional. `title` (120) and 1 to 200 `sections`; each section has an `id`, an optional `title` (120), 1 to 200 `slideIds` and an optional `stack: true` (a vertical stack). |
 | `slides` | array | Required. 1 to 200 slides, told apart by `layout`. |
-| `designSystem` | object | Optional (in development for `0.10.0`, not on npm). The design system the deck follows; see [Design systems](#design-systems). |
+| `designSystem` | object | Optional (from `0.10.0`). The design system the deck follows; see [Design systems](#design-systems). |
 
 Lengths count Unicode code points. Single-line strings are trimmed and
 refuse control, line-break and bidi-override characters; notes and code are
@@ -322,7 +322,7 @@ two-field form of the transition rule (the full resolver is
 
 ## Design systems
 
-> **In development for `0.10.0`, not on npm.**
+> **New in `0.10.0`.**
 
 A deck may name the design system it follows
 ([ADR-024](../../../docs/DECISIONS.md#adr-024-design-systems-on-every-surface)),

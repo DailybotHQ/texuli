@@ -1,7 +1,7 @@
 # Design systems through the MCP
 
-In development for `0.10.0` (the `release/0.10.0` branch; not on npm, and
-not on `https://texuli.com/mcp` until `0.10.0` is deployed). The local
+New in `0.10.0`, on `@texuli/mcp` and on `https://texuli.com/mcp` (every
+tool but `ds.save`). The local
 server is `npx -y @texuli/mcp` (see [`../../router/hosts.md`](../../router/hosts.md));
 the same operations run from a shell as `texuli <group> <verb> --json
 <object>`.

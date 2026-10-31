@@ -360,7 +360,7 @@ const result = validateDraft(agentOutput, { catalog, sources: registry.describe(
 
 ## Design systems (spec 0.10.0)
 
-> **In development for `0.10.0`, not on npm.**
+> **New in `0.10.0`.**
 
 An envelope may carry `designSystem` (ADR-024): `{ ref: "id@x.y.z" }` or
 `{ inline: <document> }`. The `design-system` check always runs

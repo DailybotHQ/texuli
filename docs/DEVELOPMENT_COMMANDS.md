@@ -96,8 +96,8 @@ budget rows (2026-10-26).
 | `node scripts/audit-seo.mjs --dist apps/website/dist` | Offline SEO audit of a completed website build; tests: `pnpm vitest run scripts/tests/audit-seo.test.ts`; T-29 recorded exit 0 (550 pages, 0 critical, 33 warnings, 4 planned). Opt-in |
 | `node scripts/audit-aeo.mjs --dist apps/website/dist` | Offline agent-surface audit of a completed website build; tests: `pnpm vitest run scripts/tests/audit-aeo.test.ts`; T-30 recorded exit 0 (26 top routes, 187 twins, 0 critical, 2 warnings, 3 planned). Opt-in |
 | `pnpm vitest run scripts/tests/theme-sweep.test.ts` | Test the deterministic theme sweep helpers. There is no durable sweep CLI; T-77 used a temporary runner: 14/14 sample and 210/210 full cells, no red cells; it does not render components in a browser. Details: `.dwp/plans/PLAN_006_website_marketing_seo_analytics/analysis_results/themes-sweep-findings.md` (local plan evidence, git-ignored) |
-| `pnpm exec tsx packages/tools/src/cli/texuli.ts ds validate <file>` | The design-system commands (in development for `0.10.0`): `ds init`, `validate`, `compile`, `export`, `preview`, `diff` and `import` run the `ds.*` operations on files and print their JSON, or write the content with `--out`. Exit 0 valid, 1 refused, 2 could not run. Details: [ds.md](../packages/tools/docs/ds.md) |
-| `pnpm exec tsx packages/tools/src/cli/texuli.ts ds check <file> --json` | Design-system conformance (in development for `0.10.0`; also `--render`, `--mode`, `--variant`, `--base`, `--trust`): the spec's codes, the guarantees and the contrast report; `--render` paints the agent-emittable catalog components under the design system in headless chromium (axe, painted contrast, literal colors). Exit 0 pass, 1 refusal or finding, 2 could not run. Details: [ds-check.md](../packages/tools/docs/ds-check.md); browser gate: `tests/e2e/ds-conformance.spec.ts` |
+| `pnpm exec tsx packages/tools/src/cli/texuli.ts ds validate <file>` | The design-system commands (from `0.10.0`): `ds init`, `validate`, `compile`, `export`, `preview`, `diff` and `import` run the `ds.*` operations on files and print their JSON, or write the content with `--out`. Exit 0 valid, 1 refused, 2 could not run. Details: [ds.md](../packages/tools/docs/ds.md) |
+| `pnpm exec tsx packages/tools/src/cli/texuli.ts ds check <file> --json` | Design-system conformance (from `0.10.0`; also `--render`, `--mode`, `--variant`, `--base`, `--trust`): the spec's codes, the guarantees and the contrast report; `--render` paints the agent-emittable catalog components under the design system in headless chromium (axe, painted contrast, literal colors). Exit 0 pass, 1 refusal or finding, 2 could not run. Details: [ds-check.md](../packages/tools/docs/ds-check.md); browser gate: `tests/e2e/ds-conformance.spec.ts` |
 | `pnpm exec tsx scripts/generate-site-llms.ts` | Regenerate the checked-in root `llms.txt`; its freshness is asserted by `scripts/tests/site-loaders.test.ts` |
 | `pnpm exec tsx tests/behavior/harness/limits-cli.ts [<primitive>] [--measure]` | Report the last behavior run against its limits |
 | `pnpm exec tsx scripts/check-skill.ts --write-sums` | Regenerate `skills/texuli/SHA256SUMS` after an intentional skill edit |
@@ -126,7 +126,7 @@ budget rows (2026-10-26).
 
 There are no release, publish or deploy commands. Packages are
 `private: true`; npm carries the 26 packable packages as the CI-published
-`0.9.0` release (dist-tags `latest` and `next`; pre-1.0, not stable) — publishing runs
+`0.10.0` release (dist-tags `latest` and `next`; pre-1.0, not stable) — publishing runs
 through the publish workflow (see [CI](CI.md)). See [RELEASE](RELEASE.md)
 for the version and owner-GO policy. texuli.com deploys from `main`
 (CI in [CI](CI.md)); pushing and adding a remote stay gated on the

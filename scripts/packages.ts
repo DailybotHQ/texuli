@@ -234,11 +234,18 @@ export function rewriteDeclarationSpecifiers(text: string): string {
     );
 }
 
-/** Point source imports from the sibling generated tree at its packed dist path. */
+/**
+ * Point source imports from the sibling generated tree at its packed dist
+ * path. `generated/` sits beside `src/` but compiles into `dist/generated/`,
+ * so every import reaching it climbs one level less: `../generated/` from
+ * `src/` becomes `./generated/`, `../../generated/` from a nested subpath
+ * such as `src/design-system/` becomes `../generated/`.
+ */
 export function rewriteGeneratedTypeScriptSpecifiers(text: string): string {
   return text.replace(
-    /((?:from|import)\s*\(?\s*)(['"])\.\.\/generated\/typescript\//g,
-    '$1$2./generated/typescript/'
+    /((?:from|import)\s*\(?\s*)(['"])((?:\.\.\/)+)generated\/typescript\//g,
+    (_match, head: string, quote: string, ups: string) =>
+      `${head}${quote}${ups.length === 3 ? './' : ups.slice(3)}generated/typescript/`
   );
 }
 

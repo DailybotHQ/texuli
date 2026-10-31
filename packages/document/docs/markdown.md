@@ -52,7 +52,7 @@ blocks have no Markdown spelling and degrade:
 first; `embeds` is `title` (default) or `drop`; `blocks` is `text`
 (default) or `drop`. Annotations are never written.
 
-> **In development for `0.10.0`, not on npm** (Protoyard gap G112): the
+> **New in `0.10.0`** (Protoyard gap G112): the
 > `0.9.0` writer leaves every wrapped block out.
 
 A wrapped table is read like the DOCX and PDF writers read it
@@ -70,7 +70,7 @@ of its text.
 
 ## Design system front matter
 
-> **In development for `0.10.0`, not on npm.**
+> **New in `0.10.0`.**
 
 A document's `designSystem` ([model](model.md),
 [ADR-024](../../../docs/DECISIONS.md#adr-024-design-systems-on-every-surface))

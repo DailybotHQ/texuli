@@ -1,12 +1,12 @@
 # Design-system importers, emitters, report and diff
 
-> **Status: in development for `0.10.0`, not on npm.** The subpaths
+> **Status: released in `0.10.0`.** The subpaths
 > `design-system/import`, `design-system/emit`, `design-system/report`,
-> `design-system/diff` and `design-system/fixtures` exist on the
-> `release/0.10.0` branch and ship only with `@texuli/tokens@0.10.0`, and
-> so do `texuli ds import | export | diff` and the `ds.*` operations that
-> call them ([ds.md](../../tools/docs/ds.md)). The Kotlin, email, PDF,
-> DOCX, PPTX and canvas outputs are **planned** (later PLAN_011 tasks).
+> `design-system/diff` and `design-system/fixtures` ship in
+> `@texuli/tokens@0.10.0`, and so do `texuli ds import | export | diff` and
+> the `ds.*` operations that call them ([ds.md](../../tools/docs/ds.md)).
+> The Kotlin, email, PDF, DOCX, PPTX and canvas outputs are in the outputs
+> table of [DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md#outputs).
 
 The end-to-end guide (author, validate, apply, distribute, outputs) is
 [DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md).

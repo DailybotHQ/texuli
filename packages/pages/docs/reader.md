@@ -48,7 +48,7 @@ with `@texuli/player`, as in the editor, or with the host's renderer
 
 ## `@texuli/pages/reader-core`
 
-> **In development for `0.10.0`, not on npm.**
+> **New in `0.10.0`.**
 
 `PageReaderCore` is `PageReader` with no default `loadPlayer`: a host on
 this entry has no `@texuli/player` reference in its build, and embeds
@@ -59,7 +59,7 @@ paint only with the host's `PagesPlayerLoader` (its result is a
 
 ## Design systems
 
-> **In development for `0.10.0`, not on npm.**
+> **New in `0.10.0`.**
 
 When the document carries `designSystem` (spec 0.10.0,
 [ADR-024](../../../docs/DECISIONS.md#adr-024-design-systems-on-every-surface)),

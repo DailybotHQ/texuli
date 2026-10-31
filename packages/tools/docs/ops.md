@@ -188,8 +188,7 @@ group).
   `designSystem` (spec `0.10.0`) goes through the spec's
   `checkDesignSystemReference` as the catalog's `checkDesignSystem` hook,
   so an inline document's codes (`unknown-key`, `url-refused` …) land
-  under `$.designSystem` at the caller's tier (in development for
-  `0.10.0`). `blueprint.theme` sets that field and also compiles an inline
+  under `$.designSystem` at the caller's tier (from `0.10.0`). `blueprint.theme` sets that field and also compiles an inline
   document for the guarantee codes ([ds.md](ds.md)).
 - **Output:** `valid` (true only with no error diagnostics), `status`
   (`valid`, `invalid`, `parse` or `over-limits`), `tier`, `migratedFrom`
@@ -294,8 +293,7 @@ is silently ignored. Every input schema is an object with
 
 The seven MCP tool names of `0.8` (`deck`, `document`, `catalog`,
 `component`, `validate`, `example`, `theme`) were deprecated aliases in
-`0.9.0` and are removed in `0.10.0` (on the `release/0.10.0` branch; not
-on npm yet). No door lists them. A call is refused with a message that
+`0.9.0` and are removed in `0.10.0`. No door lists them. A call is refused with a message that
 names the operation to call instead: `invoke()` returns `unknown-operation`
 with `The tool "theme" was removed in 0.10.0; call theme.search or
 theme.get instead.`, and the MCP `tools/call` answers the same text as a

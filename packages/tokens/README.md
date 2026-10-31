@@ -13,9 +13,9 @@ components, or on its own as a framework-free token engine for any CSS
 runtime dependencies.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.9.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.10.0`) may contain breaking
-> changes, so pin the exact version or use `^0.9.0`, which accepts only 0.9.x.
+> published to npm as `0.10.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.11.0`) may contain breaking
+> changes, so pin the exact version or use `^0.10.0`, which accepts only 0.10.x.
 
 ## Install
 
@@ -106,13 +106,13 @@ const css = compileThemeCss(theme);
 | Style presets | `style-presets` | Shared style presets on top of the contract |
 | Tailwind 4 | `tailwind` | Utilities mapped onto the `--tx-*` contract |
 | Motion tokens | `motion` | New in `0.6.0`: 5 durations, 5 easings and 3 springs as data (`MOTION_DURATIONS`, `MOTION_EASINGS`, `MOTION_SPRINGS`), behind the `--tx-motion-*` properties in `base.css` |
-| System tokens | `system` | Unreleased (token contract v2, ADR-020): 151 system tokens in 11 families (space, size, type roles, elevation, shape, layers, opacity, layout, icons, status, data-viz). `base.css` declares the 123 non-chart defaults once per token scope (generated); CSS reads them plainly with `systemVar(name)` (`var(--tx-space-4)`) |
-| Component tokens | `components` | Unreleased: the component token registry (57 components, 364 tokens: the `texuli` styled families plus 9 domain families). Component tokens are never declared (0 B until set): CSS reads them with `componentVar(component, key)`, one fallback level (`var(--tx-button-radius, var(--tx-shape-radius-lg))`), and design systems set them on their scope. `checkTokenReads` guards the read forms; every `texuli` styled component reads its tokens, and the domain packages read theirs |
-| Chart tokens | `data-viz` | Unreleased: `dataVizVariables(theme, mode)` returns all 28 `--tx-chart-*` values for any theme, derived when the theme has no `charts` |
-| Renames | `renames`, `renames.json` | Unreleased: the machine-readable `--tx-*` rename list for codemods (empty: contract v2 renames nothing) |
-| Design systems | `design-system/compile`, `design-system/validate` | Unreleased (`0.10.0`, ADR-021, ADR-022): `compileDesignSystem` turns a design-system document into concrete `--tx-*` variables per mode with enforced contrast, focus and target guarantees (refusals with codes and JSON paths), `resolveDesignSystem` follows `extends` (`texuli:<id>` library themes, `id@x.y.z` from your resolver), variants and patches, and `fromTheme` turns any `Theme` into a document. `validate` re-checks compiled maps with `checkDesignSystemGuarantees`. Both are lazy: the root never imports them. |
-| Design-system runtime | `design-system/apply` | Unreleased (`0.10.0`, ADR-023): `applyDesignSystem(el, compiled, { mode })` writes a compiled map on one element in one style write with the allowlisted attributes and `[data-tx-scope]`, registers fonts lazily and returns a restoring dispose; `designSystemStyle` is the same declarations for SSR and `designSystemAppearance` for the no-flash replay (byte-identical, tested). Lazy, 1,966 B gzip |
-| Design-system I/O | `design-system/import`, `design-system/emit`, `design-system/report`, `design-system/diff`, `design-system/fixtures` | Unreleased (`0.10.0`): importers (brand one-liner, W3C DTCG, Tokens Studio, flat role palette, Texuli `Theme`, logo pixels) that return a valid document plus warnings and never throw; deterministic emitters (scoped CSS, Tailwind preset, DTCG, Tokens Studio, flat palette, compiled JSON); a static report page escaped by construction; `diffDesignSystems` (token changes per mode, contrast regressions, default changes); fictional fixtures, including a `protoyard-theme/v1`-shaped palette, with lossless round trips. All lazy |
+| System tokens | `system` | From `0.9.0` (token contract v2, ADR-020): 151 system tokens in 11 families (space, size, type roles, elevation, shape, layers, opacity, layout, icons, status, data-viz). `base.css` declares the 123 non-chart defaults once per token scope (generated); CSS reads them plainly with `systemVar(name)` (`var(--tx-space-4)`) |
+| Component tokens | `components` | From `0.9.0`: the component token registry (57 components, 364 tokens: the `texuli` styled families plus 9 domain families). Component tokens are never declared (0 B until set): CSS reads them with `componentVar(component, key)`, one fallback level (`var(--tx-button-radius, var(--tx-shape-radius-lg))`), and design systems set them on their scope. `checkTokenReads` guards the read forms; every `texuli` styled component reads its tokens, and the domain packages read theirs |
+| Chart tokens | `data-viz` | From `0.9.0`: `dataVizVariables(theme, mode)` returns all 28 `--tx-chart-*` values for any theme, derived when the theme has no `charts` |
+| Renames | `renames`, `renames.json` | From `0.9.0`: the machine-readable `--tx-*` rename list for codemods (empty: contract v2 renames nothing) |
+| Design systems | `design-system/compile`, `design-system/validate` | From `0.10.0` (ADR-021, ADR-022): `compileDesignSystem` turns a design-system document into concrete `--tx-*` variables per mode with enforced contrast, focus and target guarantees (refusals with codes and JSON paths), `resolveDesignSystem` follows `extends` (`texuli:<id>` library themes, `id@x.y.z` from your resolver), variants and patches, and `fromTheme` turns any `Theme` into a document. `validate` re-checks compiled maps with `checkDesignSystemGuarantees`. Both are lazy: the root never imports them. |
+| Design-system runtime | `design-system/apply` | From `0.10.0` (ADR-023): `applyDesignSystem(el, compiled, { mode })` writes a compiled map on one element in one style write with the allowlisted attributes and `[data-tx-scope]`, registers fonts lazily and returns a restoring dispose; `designSystemStyle` is the same declarations for SSR and `designSystemAppearance` for the no-flash replay (byte-identical, tested). Lazy, 1,966 B gzip |
+| Design-system I/O | `design-system/import`, `design-system/emit`, `design-system/report`, `design-system/diff`, `design-system/fixtures` | From `0.10.0`: importers (brand one-liner, W3C DTCG, Tokens Studio, flat role palette, Texuli `Theme`, logo pixels) that return a valid document plus warnings and never throw; deterministic emitters (scoped CSS, Tailwind preset, DTCG, Tokens Studio, flat palette, compiled JSON); a static report page escaped by construction; `diffDesignSystems` (token changes per mode, contrast regressions, default changes); fictional fixtures, including a `protoyard-theme/v1`-shaped palette, with lossless round trips. All lazy |
 
 The root entry (`@texuli/tokens`) re-exports the engine areas; the theme
 libraries and `build` stay behind their subpaths so unused themes are never
@@ -164,9 +164,9 @@ Ships in `0.6.0`; the `0.5.0` release predates it:
   and [tokens-library-expand.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-library-expand.md)
 - Color modes and no-flash: [tokens-modes.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-modes.md)
   and [tokens-no-flash.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-no-flash.md)
-- Design-system compiler (unreleased): [design-system-compiler.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/design-system-compiler.md)
-- Design-system runtime (unreleased): [design-system-runtime.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/design-system-runtime.md)
-- Design-system importers, emitters, report and diff (unreleased): [design-system-io.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/design-system-io.md)
+- Design-system compiler (from `0.10.0`): [design-system-compiler.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/design-system-compiler.md)
+- Design-system runtime (from `0.10.0`): [design-system-runtime.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/design-system-runtime.md)
+- Design-system importers, emitters, report and diff (from `0.10.0`): [design-system-io.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/design-system-io.md)
 - Contrast gate: [tokens-aa-gate.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-aa-gate.md)
 - Forced colors: [tokens-forced-colors.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-forced-colors.md)
 - Tailwind 4 preset: [tokens-tailwind.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-tailwind.md)

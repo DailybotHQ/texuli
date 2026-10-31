@@ -2,7 +2,7 @@
 /**
  * Consumers matrix, registry mode (T-p10-consumers-matrix): the same six
  * consumer fixtures install the *published* tarballs of the workspace
- * version (`0.9.0` after the release/0.9.0 merge) from
+ * version (`0.10.0` after the release/0.10.0 merge) from
  * the npm registry — not local `file:` packs — and must build, typecheck
  * and render the same smoke surface. This failed before the 2026-10-25
  * publish: the registry had no such version to install.

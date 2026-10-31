@@ -57,7 +57,7 @@ collaborator list, decorations over the text and a sidebar.
 | `history` | `false` | Bindable: show the version history panel |
 | `announce` | `@texuli/core/announcer` | Polite announcements |
 | `renderBlock`, `blockHost` | — | The host's own blocks, as on `PageEditor` ([host blocks](editor.md#host-blocks)) |
-| `loadPlayer` | the package loader | A `PagesPlayerLoader` for live embeds; `null` turns them off. `CollabEditorCore`, from `@texuli/pages/collab-core` (in development for `0.10.0`, not on npm), is `CollabEditor` on `PageEditorCore` with no default, so its build has no `@texuli/player` reference; the entry exports `PagesPlayerLoader` and `PagesPlayerModule`, and `@texuli/pages/collab` exports `CollabEditorCore` too ([core entries](editor.md#core-entries-without-the-player)) |
+| `loadPlayer` | the package loader | A `PagesPlayerLoader` for live embeds; `null` turns them off. `CollabEditorCore`, from `@texuli/pages/collab-core` (from `0.10.0`), is `CollabEditor` on `PageEditorCore` with no default, so its build has no `@texuli/player` reference; the entry exports `PagesPlayerLoader` and `PagesPlayerModule`, and `@texuli/pages/collab` exports `CollabEditorCore` too ([core entries](editor.md#core-entries-without-the-player)) |
 | `class` | — | Extra class on the root |
 
 - **Review bar** (a labelled group of buttons): Comment (also

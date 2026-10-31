@@ -174,6 +174,16 @@ describe('rewriteGeneratedTypeScriptSpecifiers', () => {
       'export type * from \'./generated/typescript/model.js\';\nexport { value } from "./generated/typescript/vocabulary.js";\n'
     );
   });
+
+  it('maps the same imports from a nested subpath (src/design-system/) one level up', () => {
+    expect(
+      rewriteGeneratedTypeScriptSpecifiers(
+        "export type * from '../../generated/typescript/design-system.js';\nimport { a } from '../../../generated/typescript/x.js';\n"
+      )
+    ).toBe(
+      "export type * from '../generated/typescript/design-system.js';\nimport { a } from '../../generated/typescript/x.js';\n"
+    );
+  });
 });
 
 describe('generated TypeScript packaging', () => {

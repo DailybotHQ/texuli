@@ -74,7 +74,7 @@ const runLabel = (variant: string | null) => (variant ? `${variant} variant` : '
   <link rel="stylesheet" href={link('/design-systems/brands.css')} />
   <div class="ds-hub" data-ds-hub="">
     <header class="ds-hub__hero">
-      <p class="ds-hub__eyebrow">Design systems · in development for 0.10.0</p>
+      <p class="ds-hub__eyebrow">Design systems · new in 0.10.0</p>
       <h1>Design systems</h1>
       <p class="ds-hub__lead">
         Describe a brand once, as one JSON document, and every Texuli surface follows it: components,
@@ -287,7 +287,7 @@ const runLabel = (variant: string | null) => (variant ? `${variant} variant` : '
           <p>
             The same operations as MCP tools, on the local server (<code
               >{MCP_SERVER_DATA.local.launch}</code
-            >) and, once 0.10.0 is deployed, the remote one:
+            >) and the remote one at <code>{MCP_SERVER_DATA.remote.url}</code>:
           </p>
           <ul class="ds-hub__tools" data-ds-tools="">
             {
