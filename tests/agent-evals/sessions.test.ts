@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { onRequest } from '../../functions/mcp.ts';
-import { texuliOps } from '../../packages/tools/src/ops/index.ts';
+import { MINIMAL_DESIGN_SYSTEM, texuliOps } from '../../packages/tools/src/ops/index.ts';
 import {
   assertEdgeParity,
   isEdgeTool,
@@ -96,7 +96,55 @@ describe('what differs between the doors, and only that', () => {
       'stdio'
     );
     const nodeOnly = texuliOps.list({ runtimes: ['node'] }).map((operation) => operation.name);
-    expect(nodeOnly).toEqual(['document.export']);
+    expect(nodeOnly).toEqual(['ds.save', 'document.export']);
+
+    // ds.save checks its path locally (a dry run writes nothing) and is refused remotely.
+    const saveStep = (check: Pick<Step, 'expect' | 'toolError'>): Step => ({
+      label: 'save',
+      method: 'tools/call',
+      params: {
+        name: 'ds.save',
+        arguments: {
+          path: 'design-systems/minimal.ds.json',
+          document: MINIMAL_DESIGN_SYSTEM,
+          dryRun: true,
+        },
+      },
+      ...check,
+    });
+    await runSession(
+      {
+        name: 'ds.save (stdio)',
+        steps: [
+          saveStep({
+            expect: (result) =>
+              expect(result.structuredContent).toMatchObject({
+                saved: false,
+                dryRun: true,
+                path: 'design-systems/minimal.ds.json',
+                errors: [],
+              }),
+          }),
+        ],
+        final() {},
+      },
+      'stdio'
+    );
+    await runSession(
+      {
+        name: 'ds.save (remote)',
+        steps: [
+          saveStep({
+            toolError(failure) {
+              expect(failure.code).toBe('runtime-unavailable');
+              expect(failure.error).toMatch(/needs the node runtime/u);
+            },
+          }),
+        ],
+        final() {},
+      },
+      'remote'
+    );
 
     const exportStep = (check: Pick<Step, 'expect' | 'toolError'>): Step => ({
       label: 'export',
