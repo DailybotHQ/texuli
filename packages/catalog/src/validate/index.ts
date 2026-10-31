@@ -36,6 +36,12 @@ export {
   validateDeckDraft,
 } from './deck-draft.ts';
 export {
+  checkDraftDesignSystem,
+  DESIGN_SYSTEM_REF,
+  type DraftDesignSystemCheck,
+  type DraftDesignSystemIssue,
+} from './design-system.ts';
+export {
   checkDocuments,
   DOCUMENT_ID,
   type DocumentCheckOptions,

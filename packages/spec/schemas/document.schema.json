@@ -271,6 +271,23 @@
         }
       },
       "additionalProperties": false
+    },
+    "designSystem": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "^(?:texuli:[a-z][a-z0-9]*(?:-[a-z0-9]+)*|[a-z][a-z0-9]*(?:-[a-z0-9]+)*@(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?)$"
+        },
+        "inline": {
+          "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_16",
+          "description": "Checked by rule \"invalid-type\"."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Exactly one of ref and inline. (rule \"invalid-value\")"
     }
   },
   "required": ["format", "formatVersion", "meta", "blocks"],
@@ -1611,6 +1628,632 @@
           },
           "additionalProperties": {
             "$ref": "#/$defs/Json_d10_k200_i1000_s20000_n64_9"
+          }
+        }
+      ]
+    },
+    "Json_d16_k200_i64_s360000_n64_line_0": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 360000,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "Json_d16_k200_i64_s360000_n64_line_1": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 360000,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_0"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_0"
+          }
+        }
+      ]
+    },
+    "Json_d16_k200_i64_s360000_n64_line_2": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 360000,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_1"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_1"
+          }
+        }
+      ]
+    },
+    "Json_d16_k200_i64_s360000_n64_line_3": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 360000,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_2"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_2"
+          }
+        }
+      ]
+    },
+    "Json_d16_k200_i64_s360000_n64_line_4": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 360000,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_3"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_3"
+          }
+        }
+      ]
+    },
+    "Json_d16_k200_i64_s360000_n64_line_5": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 360000,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_4"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_4"
+          }
+        }
+      ]
+    },
+    "Json_d16_k200_i64_s360000_n64_line_6": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 360000,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_5"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_5"
+          }
+        }
+      ]
+    },
+    "Json_d16_k200_i64_s360000_n64_line_7": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 360000,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_6"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_6"
+          }
+        }
+      ]
+    },
+    "Json_d16_k200_i64_s360000_n64_line_8": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 360000,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_7"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_7"
+          }
+        }
+      ]
+    },
+    "Json_d16_k200_i64_s360000_n64_line_9": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 360000,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_8"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_8"
+          }
+        }
+      ]
+    },
+    "Json_d16_k200_i64_s360000_n64_line_10": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 360000,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_9"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_9"
+          }
+        }
+      ]
+    },
+    "Json_d16_k200_i64_s360000_n64_line_11": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 360000,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_10"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_10"
+          }
+        }
+      ]
+    },
+    "Json_d16_k200_i64_s360000_n64_line_12": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 360000,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_11"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_11"
+          }
+        }
+      ]
+    },
+    "Json_d16_k200_i64_s360000_n64_line_13": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 360000,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_12"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_12"
+          }
+        }
+      ]
+    },
+    "Json_d16_k200_i64_s360000_n64_line_14": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 360000,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_13"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_13"
+          }
+        }
+      ]
+    },
+    "Json_d16_k200_i64_s360000_n64_line_15": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 360000,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_14"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_14"
+          }
+        }
+      ]
+    },
+    "Json_d16_k200_i64_s360000_n64_line_16": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 360000,
+          "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]*$"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_15"
+          }
+        },
+        {
+          "type": "object",
+          "maxProperties": 200,
+          "propertyNames": {
+            "maxLength": 64,
+            "not": {
+              "enum": ["__proto__", "constructor", "prototype"]
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Json_d16_k200_i64_s360000_n64_line_15"
           }
         }
       ]

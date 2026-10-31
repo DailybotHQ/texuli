@@ -67,10 +67,13 @@ On the branch so far:
   carries spec `0.9.0`). Additive: the design-system document schema
   (`schemas/design-system.schema.json`, format `texuli/design-system`,
   `formatVersion` 1) with generated TypeScript and Kotlin types, its
-  fixtures under `fixtures/design-systems/`, and
-  `$defs.designSystemReference` in the blueprint schema, which the envelope
-  does not carry yet. The `0.9.0 → 0.10.0` migration only stamps `spec`;
-  the digest `fb523b3dd45a05910723a160f5767a6b11ea83bda0dd1b03341bd04520af48eb` is pinned in `packages/spec/versions.json`.
+  fixtures under `fixtures/design-systems/`, and (T-ds-blueprint,
+  ADR-024) the optional `designSystem` on the envelope and on a
+  `document`'s shape (`$defs.designSystemReference`: exactly one of `ref`,
+  an exact `id@x.y.z` or `texuli:<theme>`, and `inline`, a whole
+  document), with the `brand-report` and `brand-deck` goldens and three
+  invalid fixtures. The `0.9.0 → 0.10.0` migration only stamps `spec`;
+  the digest `c6d6cb0753100f3807ecb6e03bcd3aca2e151bb13a654b99ec1595c5caf92b13` is pinned in `packages/spec/versions.json`.
   `validateDraft` migrates a `0.9.0` envelope and stamps `spec: "0.10.0"`;
   hosts that compare the `spec` string need to accept it.
 - **`@texuli/spec/design-system`** (new subpath): `validateDesignSystem`
@@ -78,8 +81,19 @@ On the branch so far:
   `validateDesignSystemPatch` and `applyDesignSystemPatch`,
   `migrateDesignSystem` and `checkDesignSystemReference`
   ([design-system.md](../packages/spec/docs/design-system.md)). The
-  compiler, runtime, importers and emitters are planned (later PLAN_011
-  tasks).
+  compiler, runtime, importers and emitters are on the branch too
+  (`@texuli/tokens/design-system/*`).
+- **Design systems in blueprints and documents** (T-ds-blueprint,
+  ADR-024): `validateDraft` (`@texuli/catalog`) checks the envelope's
+  `designSystem` (a new `design-system` check; the host passes
+  `checkDesignSystem`, usually `checkDesignSystemReference`, for an inline
+  document's rules at the draft's tier); `@texuli/player` takes
+  `designSystems: { resolve, mode }`, compiles lazily (a blueprint without
+  one loads nothing more) and applies the result to its root, keeping the
+  default theme with a visible notice when nothing resolves or the document
+  is refused; `@texuli/document` documents carry `designSystem` and
+  `@texuli/pages`' `PageReader` applies it the same way. `texuli/design-system`
+  also exports `applyDesignSystem` and `loadDesignSystemCompiler`.
 
 ### 0.9.0
 
@@ -1474,7 +1488,7 @@ the package-to-package contract outside this repository.
 | `@texuli/deck` | `0.9.0` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/document`, `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
 | `@texuli/drag`, `@texuli/workflows` | `0.9.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
 | `@texuli/mcp` | `0.9.0` (first published as `0.9.0`) | `packages/mcp/package.json`, with `@texuli/tools` pinned to exactly its own version; published right after `@texuli/tools`. In development (ADR-019), pre-1.0. |
-| Blueprint spec on `release/0.10.0` (in development, not on npm) | `0.10.0`, digest `fb523b3dd45a05910723a160f5767a6b11ea83bda0dd1b03341bd04520af48eb` | `packages/spec/versions.json`; the workspace's generated sources carry the `0.10.0` stamp. Ships only when `@texuli/spec@0.10.0` publishes; a stamp-only migration from `0.9.0`. |
+| Blueprint spec on `release/0.10.0` (in development, not on npm) | `0.10.0`, digest `c6d6cb0753100f3807ecb6e03bcd3aca2e151bb13a654b99ec1595c5caf92b13` | `packages/spec/versions.json`; the workspace's generated sources carry the `0.10.0` stamp. Ships only when `@texuli/spec@0.10.0` publishes; a stamp-only migration from `0.9.0`. |
 | Blueprint spec | `0.9.0`, digest `497df4d3b0c67d53483163ebd9bd73733b52caf5f8e2966478f1cf860e6f9d9d` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.9.0`; a stamp-only migration from `0.8.0`. |
 | Blueprint spec in `@texuli/spec@0.8.0` | `0.8.0`, digest `f6b6388280d247eb9c3106a925111f35b90d1ec3b59c23652542f06a9f103daf` | The 0.8 line's generated sources carry the `0.8.0` stamp. |
 | Blueprint spec in `@texuli/spec@0.7.0` | `0.7.0`, digest `43e44fa9a198d337d686b4e2d86882a06a676ae1e1c1f02d023b3a525795a8b2` | The previous release's generated sources carry the `0.7.0` stamp. |

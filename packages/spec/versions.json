@@ -57,9 +57,9 @@
     },
     {
       "specVersion": "0.10.0",
-      "specDigest": "fb523b3dd45a05910723a160f5767a6b11ea83bda0dd1b03341bd04520af48eb",
+      "specDigest": "c6d6cb0753100f3807ecb6e03bcd3aca2e151bb13a654b99ec1595c5caf92b13",
       "change": "minor",
-      "summary": "Additive (PLAN_011 T-ds-spec, ADR-021): the design-system document schema (schemas/design-system.schema.json, format texuli/design-system, formatVersion 1; generated from the @texuli/spec/design-system vocabulary, with TypeScript and Kotlin types), its fixtures under fixtures/design-systems/, and $defs.designSystemReference in the blueprint schema (not yet carried by the envelope); stamp-only migration 0.9.0→0.10.0"
+      "summary": "Additive (PLAN_011 T-ds-spec and T-ds-blueprint, ADR-021 and ADR-024): the design-system document schema (schemas/design-system.schema.json, format texuli/design-system, formatVersion 1; generated from the @texuli/spec/design-system vocabulary, with TypeScript and Kotlin types) and its fixtures under fixtures/design-systems/; the optional envelope designSystem ($defs.designSystemReference: exactly one of ref, an exact id@x.y.z or texuli:<theme>, and inline, a whole document) and the same field on $defs.document (schemas/document.schema.json re-pinned from @texuli/document); the brand-report and brand-deck goldens and the design-system-range, design-system-both and design-system-extra-field invalid fixtures; stamp-only migration 0.9.0→0.10.0"
     }
   ]
 }

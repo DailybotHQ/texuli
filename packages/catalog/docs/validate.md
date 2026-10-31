@@ -22,6 +22,7 @@ closed with an `internal-error` diagnostic.
 | `input` | Text: a byte cap before `JSON.parse` (`maxBytes` + 8 KiB), then parse. The value must be an object or an array | yes |
 | `envelope` | For a [blueprint envelope](./envelope.md): strict field rules, the catalog binding (`catalogHash`), and trust warnings for a declared status, activation or tier; then the tree runs the checks below. `skipped` for a bare tree | on an unsupported version or a missing tree |
 | `spec` | For an envelope, after `migrateBlueprint` (`@texuli/spec/migrate`) brings an older envelope (undeclared or `"spec": "0.2.0"`) to the current spec version: the host's `checkSpec` (for example `@texuli/spec`'s `validateBlueprint` with the spec documents); `skipped` without one | no |
+| `design-system` | For an envelope (spec 0.10.0, ADR-024): the `designSystem` shape (`{ ref }` or `{ inline }`, exactly one, closed) and the `ref` grammar (an exact `id@x.y.z` or `texuli:<theme>`, `DESIGN_SYSTEM_REF`), always; an inline document's own rules through the host's `checkDesignSystem` (usually `checkDesignSystemReference` from `@texuli/spec/design-system`, passed as is) at the draft's tier, so agent output refuses `data:` URLs and every remote asset. Codes are the design-system codes (`unknown-key`, `invalid-type`, `invalid-value`, `required`, `extends-range`, `url-refused`, `inline-bytes`, `format-version`…) with JSON paths under `$.designSystem`, at most 64. `pass` with no design system or a `ref`; `skipped` for an inline document without the host check, and for a bare tree | no |
 | `structure` | One iterative pass: prototype keys (`__proto__`, `constructor`, `prototype`) anywhere, values nested deeper than 128 levels, node fields other than `key`, `id`, `props`, `children`, `slot`, `when`, `bind`, `on`, `motion`; from spec 0.7.0 a malformed node `key` (`invalid-key`, not `^[A-Za-z0-9._:-]{1,64}$`) or one used twice in the tree (`duplicate-key`) | only on a depth bomb |
 | `interaction` | Spec 0.3.0 interaction, catalog-local: `$state` and `$data` bindings name declared variables (and are replaced by their first-paint values for the checks below), `bind` only on `bindable` props, `on` only for events the component fires, closed action ops and fields; from spec 0.8.0, `$source` data-source bindings on `sourceable` props, checked against the host's `sources` (see Data-source bindings below) and replaced by an empty list; list item text follows `SPEC_PATTERNS.listText`; and, for an envelope, the state surface rules from `@texuli/spec/surface` (form nodes inside an `action-form`, controls and fields bound to declared variables of their type, flow nodes matching the flow, no writes to host-bound variables), as `@texuli/player` refuses them | no |
 | `sinks` | The raw sink scan (`scanSinks`): executable strings, HTML strings, `class` / `style` / `innerHTML` / `srcdoc` keys, `on…` keys, functions, bidi controls, and URLs the host tier's policy refuses for their kind of key (links through the link policy, `src` and `poster` through the image or media policy, and every `srcset` candidate through the image-set policy) | no |
@@ -350,6 +351,36 @@ check; `@texuli/player` fills it with the source's rows at paint time
 
 ```ts
 const result = validateDraft(agentOutput, { catalog, sources: registry.describe() });
+```
+
+## Design systems (spec 0.10.0)
+
+> **In development for `0.10.0`, not on npm.**
+
+An envelope may carry `designSystem` (ADR-024): `{ ref: "id@x.y.z" }` or
+`{ inline: <document> }`. The `design-system` check always runs
+`checkDraftDesignSystem(value, tier, check?)`: the closed shape, exactly one
+key and the `ref` grammar (`DESIGN_SYSTEM_REF`, the blueprint schema's
+pattern). The inline document's own rules come from the host's
+`checkDesignSystem` (`DraftDesignSystemCheck`, returning
+`DraftDesignSystemIssue`s); `checkDesignSystemReference` from
+`@texuli/spec/design-system` fits as is and runs at the draft's tier, so an
+untrusted draft refuses every `data:` URL and every remote font or asset,
+CSS-shaped values, invisible or bidi characters, prototype keys and
+documents over the spec's caps (20,000 values, depth 16). Injected like
+`checkDocument`, so `@texuli/catalog/validate` never bundles the
+design-system vocabulary; without it an inline document passes on shape
+and the receipt says `skipped` (the players validate and compile it before
+it paints, and a refused one paints with the default theme). A host with
+`@texuli/tokens` may wrap the check to compile the document too and add
+the guarantee codes (`aa-text`, `aa-focus`, `target-size`).
+
+```ts
+import { validateDraft } from '@texuli/catalog/validate';
+import { checkDesignSystemReference } from '@texuli/spec/design-system';
+
+const result = validateDraft(agentOutput, { catalog, checkDesignSystem: checkDesignSystemReference });
+// result.diagnostics: [{ check: 'design-system', code: 'url-refused', path: '$.designSystem.inline.assets.favicon', … }]
 ```
 
 ## Streamed nodes

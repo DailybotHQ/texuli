@@ -389,6 +389,8 @@ describe('conformance harness', () => {
     const golden = Object.keys(normative).filter((p) => p.startsWith('fixtures/golden/'));
     expect(golden.sort()).toEqual([
       'fixtures/golden/app-dashboard.json',
+      'fixtures/golden/brand-deck.json',
+      'fixtures/golden/brand-report.json',
       'fixtures/golden/canvas-retro.json',
       'fixtures/golden/conditional-report.json',
       'fixtures/golden/dashboard.json',
@@ -449,6 +451,10 @@ describe('conformance harness', () => {
       ['source-operator', ['source']],
       ['source-page-size', ['source']],
       ['source-not-sourceable', ['source']],
+      // Spec 0.10.0: the envelope design system (ADR-024).
+      ['design-system-range', ['schema']],
+      ['design-system-both', ['schema']],
+      ['design-system-extra-field', ['schema']],
     ] as const) {
       const fixture = json<{ expect: string[]; blueprint: unknown }>(
         `fixtures/invalid/${name}.json`

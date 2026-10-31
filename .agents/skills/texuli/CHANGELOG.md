@@ -15,6 +15,10 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- `blueprints/SKILL.md` gains "K — Design systems (spec 0.10.0)": the
+  envelope's `designSystem` (`ref` or `inline`), `validateDraft`'s
+  `checkDesignSystem` and the player's `designSystems` resolver, marked in
+  development for `0.10.0`.
 - The packages are still installed from the 0.9 line on npm; a Texuli
   checkout whose manifests say `0.10.0` is ahead of npm (0.10.0 is in
   development).

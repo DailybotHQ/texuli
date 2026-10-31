@@ -65,6 +65,7 @@ describe('validateDraft', () => {
               c,
               c === 'envelope' ||
               c === 'spec' ||
+              c === 'design-system' ||
               c === 'documents' ||
               c === 'forms' ||
               c === 'canvases'

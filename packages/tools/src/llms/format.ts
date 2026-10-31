@@ -171,6 +171,8 @@ export function formatLlmsTxt(
     lines.push('');
   }
 
+  lines.push(...envelopeSection(), '');
+
   lines.push('## Optional\n');
   lines.push(
     `- [Full catalog docs](${baseUrl ? `${baseUrl.replace(/\/$/, '')}/` : ''}llms-full.txt)`
@@ -181,6 +183,20 @@ export function formatLlmsTxt(
     .join('\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim()}\n`;
+}
+
+/**
+ * What agents need to know about the blueprint envelope beyond the
+ * components: the fields that change how a whole tree paints. Printed in
+ * `llms.txt` and `llms-full.txt`.
+ */
+export const LLMS_ENVELOPE_NOTES: readonly string[] = Object.freeze([
+  'A tree may travel in a blueprint envelope (`"format": "texuli-blueprint"`, `"version": 1`, `"spec"`, `"catalog"`, `"status": "draft"`, `"tree"`). Hosts validate it with `validateDraft` from `@texuli/catalog/validate` and paint it with `@texuli/player`.',
+  'Design system (spec 0.10.0, in development, not on npm): the envelope may carry `"designSystem"`, exactly one of `{"ref": "acme@2.1.0"}` (an exact `id@x.y.z` the host resolves, or `"texuli:<theme>"` for a library theme) and `{"inline": {"format": "texuli/design-system", "formatVersion": 1, "id", "version", "name", …}}` (a whole design-system document: colors, typography, shape, space and the other closed sections; never CSS). Never a version range, a URL, a path or a `data:` URL. The player applies it to its root; when it cannot (nothing resolves it, or the compiler refuses it for contrast, targets or URLs), the content paints in the default theme with a notice. Validation reports `check: "design-system"` with codes such as `extends-range`, `url-refused` and `unknown-key` and paths under `$.designSystem`.',
+]);
+
+function envelopeSection(): string[] {
+  return ['## Blueprint envelope\n', ...LLMS_ENVELOPE_NOTES.map((note) => `${note}\n`)];
 }
 
 /**
@@ -195,6 +211,7 @@ export function formatLlmsFullTxt(
   const parts: string[] = [
     `# ${title} — full agent docs\n`,
     `> Complete catalog documentation generated from manifests (${sorted.length} components).\n`,
+    ...envelopeSection(),
     '---\n',
   ];
   for (const entry of sorted) {

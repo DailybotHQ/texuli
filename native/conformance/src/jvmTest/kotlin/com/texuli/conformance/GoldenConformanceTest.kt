@@ -35,7 +35,7 @@ class GoldenConformanceTest {
 
     @Test
     fun everyGoldenHasAnExpectedWebTrace() {
-        assertEquals(13, goldens.size)
+        assertEquals(15, goldens.size)
         for (golden in goldens) {
             assertTrue(File(expected, "${golden.nameWithoutExtension}.trace.json").isFile, golden.name)
         }

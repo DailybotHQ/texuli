@@ -13,6 +13,8 @@ export interface PagesLabels {
   breadcrumb: string;
   /** The reader's headings outline. */
   outline: string;
+  /** Shown when the document's design system (spec 0.10.0) is not resolved or is refused. */
+  designSystemRefused: string;
   /** A block type's spoken name (`paragraph` → "Paragraph"). */
   blockType: (type: DocumentBlockType, detail?: string) => string;
   /** The drag handle's name: block type and a short excerpt. */
@@ -86,6 +88,7 @@ export const DEFAULT_PAGES_LABELS: PagesLabels = {
   reader: 'Page',
   breadcrumb: 'Breadcrumb',
   outline: 'On this page',
+  designSystemRefused: 'The design system could not be applied. Showing the default theme.',
   blockType: (type, detail) => (detail ? `${TYPE_NAMES[type]} ${detail}` : TYPE_NAMES[type]),
   handle: (type, excerpt) => (excerpt ? `${type}: ${excerpt}` : type),
   handleHelp:

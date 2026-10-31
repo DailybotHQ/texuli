@@ -362,7 +362,7 @@ describe('patches, migration and blueprint references', () => {
     ]);
     expect(ref({ inline: { ...minimal, assets: { favicon: data } } }, 'developer')).toEqual([]);
     expect(ref('acme@2.1.0')).toEqual([['invalid-type', '$']]);
-    // The blueprint schema carries the reference shape (wired into the envelope later).
+    // The blueprint schema carries the reference shape (the envelope designSystem, spec 0.10.0).
     const blueprint = json<Schema>('schemas/blueprint.schema.json');
     const def = blueprint.$defs?.designSystemReference as Schema;
     expect(validateInstance(def, { ref: 'acme@2.1.0' }, blueprint)).toEqual([]);

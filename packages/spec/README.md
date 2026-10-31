@@ -21,8 +21,9 @@ DOM, no Svelte, no Node APIs and no runtime dependencies.
 > **In development (`0.10.0`, not on npm).** The workspace is at **spec
 > 0.10.0**: the design-system document (`schemas/design-system.schema.json`,
 > format `texuli/design-system`) with its new `@texuli/spec/design-system`
-> subpath, and `$defs.designSystemReference` in the blueprint schema (not
-> carried by the envelope yet). Every `0.9.0` envelope migrates by stamping
+> subpath, and the optional `designSystem` on the envelope and on a
+> `document` (`$defs.designSystemReference`: `{ ref: "id@x.y.z" }` or
+> `{ inline: <document> }`). Every `0.9.0` envelope migrates by stamping
 > `spec`. It ships only with `@texuli/spec@0.10.0`.
 
 > **New in `0.9.0`.** `@texuli/spec@0.9.0` carries **spec 0.9.0**, a
@@ -291,8 +292,9 @@ envelope up to the current spec with pure, per-version steps
 `0.5.0 → 0.6.0`, `0.6.0 → 0.7.0`, `0.7.0 → 0.8.0`, `0.8.0 → 0.9.0` and
 `0.9.0 → 0.10.0`, each of which only stamps `spec`); a compatible version
 range is planned, not built. The workspace is at spec `0.10.0` (digest
-`fb523b3dd45a05910723a160f5767a6b11ea83bda0dd1b03341bd04520af48eb`), which adds the
-design-system document (PLAN_011 T-ds-spec); it is in development on
+`c6d6cb0753100f3807ecb6e03bcd3aca2e151bb13a654b99ec1595c5caf92b13`), which adds the
+design-system document (PLAN_011 T-ds-spec) and the envelope's
+`designSystem` (T-ds-blueprint); it is in development on
 `release/0.10.0` and ships only with `@texuli/spec@0.10.0`, which is not on
 npm yet. `@texuli/spec@0.9.0` carries spec `0.9.0` (digest
 `497df4d3b0c67d53483163ebd9bd73733b52caf5f8e2966478f1cf860e6f9d9d`), an

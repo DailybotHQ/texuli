@@ -55,6 +55,7 @@ export type {
   DocumentBlock,
   DocumentBlockId,
   DocumentBlockType,
+  DocumentDesignSystem,
   DocumentHeadingLevel,
   DocumentInline,
   DocumentJson,

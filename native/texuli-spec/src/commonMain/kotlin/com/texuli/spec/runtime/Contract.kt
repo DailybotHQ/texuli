@@ -72,6 +72,13 @@ object SpecContract {
     val ITEM_KEY: Regex = Regex("^[A-Za-z0-9._:-]{1,64}\$")
     /** A node's stable instance id (spec 0.7.0 `$defs.nodeKey`), unique in its tree. */
     val NODE_KEY: Regex = Regex("^[A-Za-z0-9._:-]{1,64}\$")
+    /**
+     * A design-system reference (spec 0.10.0 `$defs.designSystemReference.ref`):
+     * an exact `id@x.y.z` or `texuli:<theme>`, never a range, a URL or a path.
+     */
+    val DESIGN_SYSTEM_REF: Regex = Regex(
+        "^(?:texuli:[a-z][a-z0-9]*(?:-[a-z0-9]+)*|[a-z][a-z0-9]*(?:-[a-z0-9]+)*@(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?)\$",
+    )
     val WORKFLOW_ID: Regex = Regex("^[A-Za-z0-9._:-]{1,64}\$")
     val WORKFLOW_FIELD_NAME: Regex = Regex("^[a-z][A-Za-z0-9_]{0,31}\$")
 
