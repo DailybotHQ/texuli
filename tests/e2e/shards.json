@@ -87,7 +87,8 @@
       "site-search.spec.ts",
       "site-theme-switcher.spec.ts",
       "site-twins.spec.ts",
-      "site-whats-new.spec.ts"
+      "site-whats-new.spec.ts",
+      "site-design-systems.spec.ts"
     ]
   ]
 }
