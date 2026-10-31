@@ -26,6 +26,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import {
   applyDesignSystem,
   loadDesignSystemCompiler,
+  loadDesignSystemCompilerCore,
   PROVIDER_ATTRIBUTES,
 } from '../src/design-system/index.ts';
 import Harness from './fixtures/DesignSystemProviderHarness.svelte';
@@ -140,6 +141,13 @@ describe('runtime helpers for hosts without @texuli/tokens (T-ds-blueprint)', ()
     // Only a dynamic import reaches the compiler, so the subpath stays small.
     expect(source).not.toMatch(/from\s+'@texuli\/tokens\/design-system\/compile'/);
     expect(source).toContain("import('@texuli/tokens/design-system/compile')");
+  });
+
+  it('loads the library-free compiler on demand for hosts that inject the theme library (G127)', async () => {
+    const core = await loadDesignSystemCompilerCore();
+    expect(core.compileDesignSystem).toBe(compileDesignSystem);
+    expect(typeof core.resolveDesignSystemCore).toBe('function');
+    expect('loadLibraryBase' in core).toBe(false);
   });
 });
 
