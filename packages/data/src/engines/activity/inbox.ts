@@ -61,3 +61,11 @@ export function newArrivals<T extends Pick<InboxNotification, 'id'>>(
 ): T[] {
   return items.filter((item) => !seen.has(item.id));
 }
+
+/**
+ * Where a read change came from: the "Mark all as read" button, one row's
+ * toggle, or opening an unread item (`markReadOnOpen`).
+ */
+export interface InboxReadChangeContext {
+  source: 'all' | 'item' | 'open';
+}

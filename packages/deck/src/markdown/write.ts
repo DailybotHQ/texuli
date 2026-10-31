@@ -641,6 +641,14 @@ function frontmatter(deck: Deck, issues: DeckDiagnostic[]): string[] {
   values.set('loop', navigation.loop);
   values.set('autoSlide', navigation.autoSlideMs);
   values.set('outlineTitle', deck.outline?.title);
+  const designSystem = deck.designSystem;
+  if (designSystem?.ref !== undefined) values.set('designSystem', designSystem.ref);
+  else if (designSystem !== undefined)
+    unrepresentable(
+      issues,
+      ['designSystem', 'inline'],
+      'An inline design system cannot be written as frontmatter; use a ref (`designSystem: id@x.y.z`).'
+    );
 
   const lines = ['---'];
   for (const key of Object.keys(FRONTMATTER_KEYS)) {

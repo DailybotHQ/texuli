@@ -28,9 +28,10 @@
 | Name | Kind | Required | Trust | Default | Description |
 | --- | --- | --- | --- | --- | --- |
 | `label` | string | yes | untrusted | — | Accessible name of the view. |
-| `fields` | array | yes | — | — | The fields a condition can test; options list the values of an enum field. |
+| `fields` | array | yes | — | — | The fields a condition can test; options list the values of an enum field, and optionLabels maps a value to the text its menus show (the value otherwise). |
 | `value` | object | no | — | — | The starting filter: {type:"group", op:"and"\|"or", children:[{type:"condition", field, operator, value}…]}. It is checked against fields (at most 6 levels and 200 nodes); one that does not fit starts empty. |
 | `maxDepth` | number | no | — | `3` | Deepest group level offered (the root is 1), capped at 5. |
+| `issues` | array | no | — | — | Problems to show on conditions: each message appears under the condition at path (child indexes from the root) and marks its value control invalid. Paths that are not a condition are ignored. |
 | `disabled` | boolean | no | — | `false` | — |
 
 ### Examples

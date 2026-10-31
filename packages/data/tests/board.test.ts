@@ -185,6 +185,34 @@ describe('@texuli/data/board', () => {
   }, 20_000);
 });
 
+describe('Board keyboard focus across columns (G103)', () => {
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
+
+  it('keeps focus on the held card when it moves to another column, without waiting a frame', async () => {
+    // No frame ever runs: focus may not wait for one.
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 0);
+    render(BoardHarness);
+    const held = () => document.activeElement as HTMLElement;
+    screen.getByRole('button', { name: 'Drag Alpha task' }).focus();
+    await fireEvent.keyDown(held(), { key: ' ' });
+    for (const _step of [1, 2]) {
+      await fireEvent.keyDown(held(), { key: 'ArrowLeft' });
+      // The key after the move lands on the moved card's handle, not on <body>.
+      expect(held().getAttribute('aria-label')).toBe('Drag Alpha task');
+      expect(held().isConnected).toBe(true);
+    }
+    expect(screen.getByRole('list', { name: 'Done' }).contains(held())).toBe(true);
+    await fireEvent.keyDown(held(), { key: ' ' });
+    await waitFor(() => expect(screen.getByLabelText('Move count').textContent).toBe('1'));
+    expect(document.querySelector('.tx-board__status')?.textContent).toContain(
+      'Dropped Alpha task in Done'
+    );
+  });
+});
+
 describe('Board column footers and heading levels (G14)', () => {
   it('renders a footer per column and honors the heading level', async () => {
     const { default: BoardFooterHarness } = await import('./fixtures/BoardFooterHarness.svelte');

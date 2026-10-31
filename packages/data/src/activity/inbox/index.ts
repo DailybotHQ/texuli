@@ -9,6 +9,7 @@ export {
   filterInbox,
   type InboxFilter,
   type InboxNotification,
+  type InboxReadChangeContext,
   markAllRead,
   newArrivals,
   setRead,

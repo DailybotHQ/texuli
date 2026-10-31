@@ -172,9 +172,19 @@ time across DST changes.
 
 ## Accessibility
 
-- **Name:** every event chip is named `title[, recurring], date, time,
-  press Enter to open`. The visible text leads, so axe's label-in-name rule
-  passes.
+- **Name:** every event chip is named `title[, recurring], time, date,
+  press Enter to open` ("Standup, 9:00 AM – 10:00 AM, Tuesday, October 20,
+  2026, press Enter to open"; all-day events read "All day" for the time).
+  The visible text (title, "recurring", then the time where the chip shows
+  it) is always a prefix of the name, in order, in every view and for every
+  event kind, so axe's label-in-name rule (WCAG 2.5.3) passes. Every piece
+  comes from `labels` and the locale formats. Before 0.10.0 the date came
+  before the time, which broke the rule in the agenda view.
+- **Month cells:** a month gridcell has no `aria-label`; it is named by its
+  content, which leads with the date button ("<date>, <n> events") and then
+  the event chips. `tests/e2e/data.spec.ts` runs axe's
+  `label-content-name-mismatch` rule over the month, week, day and agenda
+  views.
 - **Movable chips:**
   - `aria-describedby` points at a visually hidden hint ("Alt or Control
     plus arrow keys move this event. Shift+F10 opens its move options. You

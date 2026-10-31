@@ -81,7 +81,7 @@ On the branch so far:
   an exact `id@x.y.z` or `texuli:<theme>`, and `inline`, a whole
   document), with the `brand-report` and `brand-deck` goldens and three
   invalid fixtures. The `0.9.0 → 0.10.0` migration only stamps `spec`;
-  the digest `c6d6cb0753100f3807ecb6e03bcd3aca2e151bb13a654b99ec1595c5caf92b13` is pinned in `packages/spec/versions.json`.
+  the digest `07fc15722c3e2f5d9961d62d02ea7a1866d86b8d5099ff3339556f79ef50e59f` is pinned in `packages/spec/versions.json`.
   `validateDraft` migrates a `0.9.0` envelope and stamps `spec: "0.10.0"`;
   hosts that compare the `spec` string need to accept it.
 - **`@texuli/spec/design-system`** (new subpath): `validateDesignSystem`
@@ -102,6 +102,132 @@ On the branch so far:
   is refused; `@texuli/document` documents carry `designSystem` and
   `@texuli/pages`' `PageReader` applies it the same way. `texuli/design-system`
   also exports `applyDesignSystem` and `loadDesignSystemCompiler`.
+- **The compiler** (`@texuli/tokens/design-system/compile` and
+  `/validate`, T-ds-compiler, ADR-022): resolves `extends`
+  (`texuli:<theme>` from the library in lazy chunks, or an exact
+  `id@x.y.z` through the host), applies the variant and patches, and
+  compiles concrete `--tx-*` variables per mode. Text contrast at the
+  declared target, the focus ring at 3:1 and 2 px, and touch targets at
+  `accessibility.targetMin` are enforced (refused as `aa-text`, `aa-focus`
+  and `target-size` when only pins could fix them; every solver move is in
+  the report). `fromTheme` turns any `Theme` into a document; all 210
+  library themes compile both ways with zero variable drift.
+- **The runtime** (`@texuli/tokens/design-system/apply`, 1,966 B gzip,
+  T-ds-runtime, ADR-023): `applyDesignSystem` (one style write per switch,
+  element-scoped), `designSystemStyle` for server HTML and
+  `designSystemAppearance` for the no-flash cache, byte-identical;
+  `DesignSystemProvider` in `texuli/design-system`; the `@texuli/astro`
+  `designSystem` option inlines the style with its CSP hash.
+- **Importers, emitters, report and diff** (`@texuli/tokens/design-system/
+  import | emit | report | diff | fixtures`, T-ds-io): a brand one-liner,
+  W3C DTCG, Tokens Studio, a flat role palette (the `protoyard-theme/v1`
+  shape), a `Theme` and logo pixels in; scoped CSS, a Tailwind preset,
+  compiled JSON, DTCG, Tokens Studio and a role palette out (lossless round
+  trips); a static review page; a diff of changed variables, contrast
+  regressions and defaults.
+- **Outputs follow a design system** (T-ds-outputs): email (colors, fonts,
+  radius, spacing and a dark head rule), the blueprint PDF, the document
+  PDF and DOCX writers, PPTX, the canvas SVG and PNG export, and the Kotlin
+  twin's generated `DesignTokens.kt` (web value conformance in Gradle).
+- **Conformance** (T-ds-conformance): `texuli ds check <file>` (stable JSON
+  and codes; `--render` paints every agent-emittable catalog component under
+  the design system in chromium for axe, painted contrast and literal
+  colors) and `@texuli/tools/ds-check` for adopters' CI.
+- **Agent operations** (T-ds-agent-tools): `ds.validate`, `ds.compile`
+  (JSON, CSS, Tailwind, DTCG, Tokens Studio), `ds.contrast`, `ds.suggest`,
+  `ds.import`, `ds.diff`, `ds.preview` (a deterministic SVG or HTML
+  snapshot) and `blueprint.theme` on every door, and `ds.save` (local doors
+  only, an explicit path inside the working directory); the
+  `create-design-system` prompt and `texuli://design-system/{id}`;
+  `texuli ds init | validate | compile | export | preview | diff |
+  import`. `blueprint.validate` checks an inline design system with the
+  spec's rules. The remote Function's initial bundle grew to 223,613 B gzip
+  (the operation declarations; the compute loads lazily).
+- **Landed on the branch:** the design-system guide (`docs/DESIGN_SYSTEMS.md`),
+  the skill's design-systems sub-skill and three fictional example brands in
+  `examples/design-systems/` (T-ds-docs-skill); the fixes for every tracked
+  conformance finding (`DS_CHECK_KNOWN_FINDINGS` is empty) and the stronger
+  token-usage guard (`system-color` and `unknown-token` rules).
+- **Also landed on the branch:** the Design System Studio at
+  `/theme-studio/` and the `/design-systems/` hub on texuli.com; design
+  systems on standalone decks (`designSystem` in `@texuli/deck`, applied by
+  the slides stage through `@texuli/player/design-system`), player component
+  defaults, and the document writers (Markdown front matter; DOCX and PDF
+  report `design-system-unapplied`).
+- **In progress on the branch (not merged yet, listed here as they land):**
+  the Protoyard gaps G105 and G107–G110.
+
+**Removed in 0.10.0** (deprecated in `0.9.0` for one minor; done on the
+branch):
+
+- **The seven 0.8 MCP tool names** (`deck`, `document`, `catalog`,
+  `component`, `validate`, `example`, `theme`). No door lists them. A
+  call is refused with the operation to use: MCP `tools/call` answers
+  `-32602` with `The tool "theme" was removed in 0.10.0; call theme.search
+  or theme.get instead.`, and `invoke()` returns `unknown-operation` with
+  the same text. The server card has `removedTools` (name, `replacedBy`,
+  `removedIn`) and `deprecatedTools: []`; the alias mechanism stays for
+  the next rename (ADR-017).
+- **The tree block's `style` key** (renamed `variant` in `0.9.0`). A
+  `tree` block with `style` is refused at `…style` with `style was removed
+  in 0.10.0; send variant ("file-tree" or "org") instead`, alone or next
+  to `variant`.
+- **Token rename aliases:** none. `@texuli/tokens/renames.json` is still
+  empty: token contract v2 renamed or removed no `--tx-*` name.
+
+**Migrating from 0.9 to 0.10** (when `0.10.0` is published):
+
+- **MCP hosts:** replace the old tool names in prompts and allowlists:
+  `deck` → `deck.run`; `document` → `document.run`, or `document.export`
+  with `format: "pdf"` or `"docx"` instead of the `to-pdf` and `to-docx`
+  commands; `catalog` → `catalog.search`; `component` → `component.get`;
+  `validate` → `catalog.validate`; `example` → `example.search`; `theme` →
+  `theme.get` (with `id`) or `theme.search`.
+- **Blueprints and blocks:** write `variant` on `tree` blocks, never
+  `style`. `validateDraft` migrates a `0.9.0` envelope and stamps `spec:
+  "0.10.0"`; a host that compares the `spec` string must accept it.
+- **Themes keep working:** `applyTheme`, `compileThemeCss`, scopes
+  (`data-tx-scope`), scoped portals and every `--tx-*` read are unchanged;
+  a design system is an addition. Start one from a theme with `extends:
+  "texuli:<id>"` or `fromTheme`.
+- **New subpaths load lazily:** the `@texuli/tokens` and `texuli` roots do
+  not import the design-system modules, so an app that adopts none pays
+  nothing.
+- **Protoyard gaps G100–G104 and G106** (PLAN_011 T-gaps-100-104; each reported on
+  0.8.x and still present in 0.9.0):
+  - **G104** (`@texuli/data/calendar`): an event chip's accessible name
+    now leads with its visible text in the same order (title,
+    "recurring", time or "All day", then the date and "press Enter to
+    open"; before, the date came before the time, which failed axe's
+    label-in-name rule in the agenda view). Month cells drop their
+    `aria-label` and are named by their content. `tests/e2e/data.spec.ts`
+    runs axe's `label-content-name-mismatch` over every view.
+  - **G100** (`@texuli/editor/markdown`, `@texuli/core/editor-markdown`):
+    a backslash before any ASCII punctuation is an escape (CommonMark), so
+    `\@` reads as `@` and `\@{p|P}` never opens a mention.
+  - **G101** (`@texuli/data/filter-builder`): FilterBuilder takes
+    `issues` (`{ path, message }[]`), shown after the builder's own issue
+    with `aria-invalid` and `aria-describedby` on the condition's value
+    control, and enum `FilterField.options` may be `{ value, label }`
+    (`FilterFieldOption`, `optionValue`, `optionLabel`). The
+    `data-filter-builder` catalog id gains the optional `issues` prop and
+    `fields[].optionLabels` (an additive catalog projection refresh inside
+    spec `0.10.0`), and the player paints both.
+  - **G102** (`texuli/layouts/content`): `trackActiveHeading(container,
+    entries, { readingLine, onChange, activeId })` tracks the heading
+    being read without ContentLayout's chrome and returns a dispose;
+    ContentLayout runs on it.
+  - **G103** (`@texuli/data/board`): after a keyboard move into another
+    column, focus is restored to the held card in the same task, so the
+    next Space or Enter drops it instead of landing on `<body>`.
+  - **G106** (`@texuli/data/activity/inbox`): `onReadChange` gets a third
+    argument `{ source: 'all' | 'item' | 'open' }`, and the new
+    `onMarkAllRead(ids)` takes over "Mark all as read" when given. Either
+    may return a promise: the control that started it is `aria-busy`,
+    `aria-disabled` and shows texuli's button spinner until it settles,
+    and a rejection is announced (`labels.saveFailed`). Existing
+    two-argument handlers keep working; both buttons keep the
+    `tx-inbox__button` class.
 
 ### 0.9.0
 
@@ -1496,7 +1622,7 @@ the package-to-package contract outside this repository.
 | `@texuli/deck` | `0.9.0` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/document`, `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
 | `@texuli/drag`, `@texuli/workflows` | `0.9.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
 | `@texuli/mcp` | `0.9.0` (first published as `0.9.0`) | `packages/mcp/package.json`, with `@texuli/tools` pinned to exactly its own version; published right after `@texuli/tools`. In development (ADR-019), pre-1.0. |
-| Blueprint spec on `release/0.10.0` (in development, not on npm) | `0.10.0`, digest `c6d6cb0753100f3807ecb6e03bcd3aca2e151bb13a654b99ec1595c5caf92b13` | `packages/spec/versions.json`; the workspace's generated sources carry the `0.10.0` stamp. Ships only when `@texuli/spec@0.10.0` publishes; a stamp-only migration from `0.9.0`. |
+| Blueprint spec on `release/0.10.0` (in development, not on npm) | `0.10.0`, digest `07fc15722c3e2f5d9961d62d02ea7a1866d86b8d5099ff3339556f79ef50e59f` | `packages/spec/versions.json`; the workspace's generated sources carry the `0.10.0` stamp. Ships only when `@texuli/spec@0.10.0` publishes; a stamp-only migration from `0.9.0`. |
 | Blueprint spec | `0.9.0`, digest `497df4d3b0c67d53483163ebd9bd73733b52caf5f8e2966478f1cf860e6f9d9d` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.9.0`; a stamp-only migration from `0.8.0`. |
 | Blueprint spec in `@texuli/spec@0.8.0` | `0.8.0`, digest `f6b6388280d247eb9c3106a925111f35b90d1ec3b59c23652542f06a9f103daf` | The 0.8 line's generated sources carry the `0.8.0` stamp. |
 | Blueprint spec in `@texuli/spec@0.7.0` | `0.7.0`, digest `43e44fa9a198d337d686b4e2d86882a06a676ae1e1c1f02d023b3a525795a8b2` | The previous release's generated sources carry the `0.7.0` stamp. |

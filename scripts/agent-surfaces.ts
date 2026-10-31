@@ -148,6 +148,11 @@ export async function buildServerCard(registry: OperationRegistry = texuliOps) {
       removeIn: alias.removeIn,
       remote: remote.has(alias.name),
     })),
+    removedTools: registry.removed().map((entry) => ({
+      name: entry.name,
+      replacedBy: [...entry.replacedBy],
+      removedIn: entry.removedIn,
+    })),
   };
 }
 
@@ -210,15 +215,32 @@ export function buildOpsTables(registry: OperationRegistry = texuliOps): string 
       return `| \`${operation.name}\` | ${number(operation.limits.inputBytes)} | ${operation.limits.items === undefined ? '—' : number(operation.limits.items)} | ${number(operation.limits.timeMs / 1000)} s | ${args || '—'} |`;
     }),
     '',
-    '### Deprecated 0.8 tool names',
+    ...(registry.aliases().length === 0
+      ? []
+      : [
+          '### Deprecated tool names',
+          '',
+          '| Alias | Resolves to | Removed in |',
+          '| --- | --- | --- |',
+          ...registry
+            .aliases()
+            .map(
+              (alias) =>
+                `| \`${alias.name}\` | ${alias.targets.map((target) => `\`${target}\``).join(', ')} | \`${alias.removeIn}\` |`
+            ),
+          '',
+        ]),
+    '### Removed tool names',
     '',
-    '| Alias | Resolves to | Removed in |',
+    'A call to a removed name is refused with a message that names the operation to call instead.',
+    '',
+    '| Name | Call instead | Removed in |',
     '| --- | --- | --- |',
     ...registry
-      .aliases()
+      .removed()
       .map(
-        (alias) =>
-          `| \`${alias.name}\` | ${alias.targets.map((target) => `\`${target}\``).join(', ')} | \`${alias.removeIn}\` |`
+        (entry) =>
+          `| \`${entry.name}\` | ${entry.replacedBy.map((target) => `\`${target}\``).join(', ')} | \`${entry.removedIn}\` |`
       ),
   ];
   return lines.join('\n');
@@ -275,6 +297,7 @@ export async function buildMcpPageData(registry: OperationRegistry = texuliOps) 
       };
     }),
     deprecatedTools: card.deprecatedTools,
+    removedTools: card.removedTools,
     resources: resources.map((resource) => ({
       uri: resource.uri,
       title: resource.title ?? resource.name,

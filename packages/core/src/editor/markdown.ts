@@ -60,7 +60,8 @@ const BULLET = /^( {0,3})([-*+])[ \t]+(.*)$/s;
 const ORDERED = /^( {0,3})(\d{1,9})[.)][ \t]+(.*)$/s;
 const TASK = /^\[([ xX])\][ \t]+/;
 const IMAGE_ONLY = /^!\[((?:[^\]\\\n]|\\.)*)\]\(\s*<?([^\s()<>]+)>?\s*\)$/;
-const ESCAPABLE = /[\\`*_{}[\]()#+\-.!~<>|]/;
+/** CommonMark 2.4: a backslash before any ASCII punctuation character is an escape. */
+const ESCAPABLE = /[!-/:-@[-`{-~]/;
 
 const isBlank = (line: string) => line.trim() === '';
 const isSpace = (char: string | undefined) => char === ' ' || char === '\t';
@@ -330,7 +331,7 @@ class Reader {
 const isEmptyText = (block: EditorBlock) =>
   (block.type === 'paragraph' || block.type === 'heading') && block.content.length === 0;
 
-const unescapeMarkdown = (text: string) => text.replace(/\\([\\`*_{}[\]()#+\-.!~<>|])/g, '$1');
+const unescapeMarkdown = (text: string) => text.replace(/\\([!-/:-@[-`{-~])/g, '$1');
 
 /**
  * Closers and bracket pairs of one inline source, computed once so that each

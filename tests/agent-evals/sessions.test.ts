@@ -185,8 +185,32 @@ describe('what differs between the doors, and only that', () => {
       'remote'
     );
     expect(REMOTE_RUNTIMES).toEqual(['edge', 'site']);
-    expect(isEdgeTool('document')).toBe(false);
-    expect(isEdgeTool('theme')).toBe(true);
+    expect(isEdgeTool('document.export')).toBe(false);
+    expect(isEdgeTool('theme.get')).toBe(true);
+    // A name removed in 0.10.0 runs nowhere.
+    expect(isEdgeTool('theme')).toBe(false);
+  });
+
+  it('refuses the 0.8 tool names removed in 0.10.0 identically on both doors, naming the replacement', async () => {
+    const removed = {
+      name: 'removed names',
+      steps: texuliOps.removed().map((entry) => ({
+        label: entry.name,
+        method: 'tools/call',
+        params: { name: entry.name, arguments: {} },
+        rpcError: (error: Json) => {
+          expect(error.code).toBe(-32602);
+          expect(error.message).toBe(
+            `The tool "${entry.name}" was removed in 0.10.0; call ${entry.replacedBy.join(' or ')} instead.`
+          );
+        },
+      })),
+      final() {},
+    };
+    const stdio = await runSession(removed, 'stdio');
+    const remote = await runSession(removed, 'remote');
+    expect(stdio.length).toBe(8);
+    expect(remote.map((item) => item.response)).toEqual(stdio.map((item) => item.response));
   });
 
   it('returns identical refusals for edge operations on both doors', async () => {

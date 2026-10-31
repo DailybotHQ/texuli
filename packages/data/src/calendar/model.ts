@@ -7,6 +7,8 @@ import {
   spanDates,
 } from '../engines/calendar/index.ts';
 
+import type { CalendarLabels } from './types.ts';
+
 export type CalendarMode = CalendarView;
 
 export const MODES: readonly CalendarMode[] = ['month', 'week', 'day', 'agenda'];
@@ -84,4 +86,28 @@ export function describeWhen(
   timeZone: string
 ): string {
   return `${fmt.longDate(spanDates(span, timeZone).first)}, ${fmt.span(span, allDayLabel)}`;
+}
+
+/**
+ * An event chip's accessible name. The visible text leads it, in the same order
+ * (WCAG 2.5.3 label in name): the title, "recurring", the time ("All day" for
+ * all-day events), then the date and how to open it. A compact chip shows only
+ * the title and "recurring", which still lead. Every piece comes from `labels`
+ * and the locale formats.
+ */
+export function eventName(
+  fmt: CalendarFormats,
+  item: Pick<Occurrence, 'start' | 'end' | 'allDay'> & { title: string; recurring: boolean },
+  labels: Pick<CalendarLabels, 'allDay' | 'recurring' | 'openHint'>,
+  timeZone: string
+): string {
+  return [
+    item.title,
+    item.recurring ? labels.recurring : '',
+    fmt.span(item, labels.allDay),
+    fmt.longDate(spanDates(item, timeZone).first),
+    labels.openHint,
+  ]
+    .filter(Boolean)
+    .join(', ');
 }

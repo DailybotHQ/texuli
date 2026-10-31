@@ -965,48 +965,42 @@ export const MCP_SERVER_DATA = {
       example: 'Pages about theming',
     },
   ],
-  deprecatedTools: [
+  deprecatedTools: [],
+  removedTools: [
     {
       name: 'deck',
       replacedBy: ['deck.run'],
-      removeIn: '0.10.0',
-      remote: true,
+      removedIn: '0.10.0',
     },
     {
       name: 'document',
       replacedBy: ['document.run', 'document.export'],
-      removeIn: '0.10.0',
-      remote: false,
+      removedIn: '0.10.0',
     },
     {
       name: 'catalog',
       replacedBy: ['catalog.search'],
-      removeIn: '0.10.0',
-      remote: true,
+      removedIn: '0.10.0',
     },
     {
       name: 'component',
       replacedBy: ['component.get'],
-      removeIn: '0.10.0',
-      remote: true,
+      removedIn: '0.10.0',
     },
     {
       name: 'validate',
       replacedBy: ['catalog.validate'],
-      removeIn: '0.10.0',
-      remote: true,
+      removedIn: '0.10.0',
     },
     {
       name: 'example',
       replacedBy: ['example.search'],
-      removeIn: '0.10.0',
-      remote: true,
+      removedIn: '0.10.0',
     },
     {
       name: 'theme',
       replacedBy: ['theme.search', 'theme.get'],
-      removeIn: '0.10.0',
-      remote: true,
+      removedIn: '0.10.0',
     },
   ],
   resources: [
@@ -1014,7 +1008,7 @@ export const MCP_SERVER_DATA = {
       uri: 'texuli://catalog',
       title: 'Component catalog',
       description:
-        'The content-addressed Texuli component catalog (catalog-8e72aaa2c94d…, 168 components): every manifest with props, examples, useWhen, dontUseWhen and emit tiers. The exact bytes hash to the catalog id.',
+        'The content-addressed Texuli component catalog (catalog-3a33e532bf78…, 168 components): every manifest with props, examples, useWhen, dontUseWhen and emit tiers. The exact bytes hash to the catalog id.',
       mimeType: 'application/json',
     },
     {

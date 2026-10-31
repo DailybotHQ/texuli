@@ -3,8 +3,13 @@ import { describe, expect, it } from 'vitest';
 import {
   ALLOWLIST,
   checkTokenUsage,
+  componentTokenNames,
   contractTokenNames,
   cssOf,
+  declaredTokenNames,
+  definedTokenNames,
+  forcedColorsBlocks,
+  isDefinedName,
   literalMatches,
   maskContractFallbacks,
   scanStylesheet,
@@ -90,6 +95,166 @@ const color = '#fff';
   });
 });
 
+const ROLES = new Set([
+  '--tx-surface',
+  '--tx-surface-foreground',
+  '--tx-foreground',
+  '--tx-border',
+  '--tx-destructive',
+  '--tx-primary',
+  '--tx-ring',
+  '--tx-link',
+  '--tx-shape-radius-lg',
+]);
+// Svelte and script sources hold template placeholders; build them without one here.
+const DOLLAR = '$';
+const DEFINED = new Set(['--tx-button-radius', '--tx-player-gap-size', '--tx-cohort-heat-*']);
+const flagged = (css: string, file = 'packages/x/src/x.css') =>
+  scanStylesheet(file, css, ROLES, DEFINED)
+    .filter((f) => f.code === 'system-color' || f.code === 'unknown-token')
+    .map((f) => `${f.code} ${f.property}: ${f.literal} @${f.line}`);
+
+describe('check-token-usage: system colors and undefined names (T-ds-conformance)', () => {
+  it('flags a system color that can render, but not in a contract fallback or a forced-colors block', () => {
+    expect(
+      flagged(`.a {
+  background: Canvas;
+  color: var(--tx-foreground, CanvasText);
+  border-color: color-mix(in srgb, var(--tx-primary, Highlight) 30%, Canvas);
+  outline-color: var(--tx-made-up, Highlight);
+  grid-area: canvas;
+  content: "Mark";
+  --edge: ButtonText;
+}
+@media (forced-colors: active) {
+  .a { border-color: CanvasText; color: LinkText; }
+  @supports (color: red) { .b { background: Canvas; } }
+}
+@media (min-width: 40rem) and (forced-colors: active) {
+  .c { outline-color: Highlight; }
+}
+.d { accent-color: AccentColor; }`)
+    ).toEqual([
+      'system-color background: Canvas @2',
+      'system-color border-color: Canvas @4',
+      'system-color outline-color: Highlight @5',
+      'unknown-token outline-color: --tx-made-up @5',
+      'system-color --edge: ButtonText @8',
+      'system-color accent-color: AccentColor @17',
+    ]);
+  });
+
+  it('finds the forced-colors blocks, nested braces included', () => {
+    const css = '.a{} @media (forced-colors: active) { .b { color: red; } } .c{}';
+    const [[from, to]] = forcedColorsBlocks(css) as [[number, number]];
+    expect(css.slice(from, to)).toBe('@media (forced-colors: active) { .b { color: red; } }');
+  });
+
+  it('flags a --tx-* read nothing defines, unless it is a component token, declared, or a hook onto a role', () => {
+    expect(
+      flagged(`.a {
+  border-radius: var(--tx-button-radius, var(--tx-shape-radius-lg));
+  gap: var(--tx-player-gap-size);
+  background: var(--tx-cohort-heat-3, var(--tx-surface));
+  color: var(--tx-cohort-heat-3-text, var(--tx-foreground));
+  border-inline-start-color: var(--tx-workflow-accent, var(--tx-primary, CanvasText));
+  inline-size: var(--tx-sidebar-width, 16rem);
+  font-weight: var(--tx-font-weight-semibold);
+  color: var(--tx-danger, var(--tx-destructive));
+}`)
+    ).toEqual([
+      'unknown-token inline-size: --tx-sidebar-width @7',
+      'unknown-token font-weight: --tx-font-weight-semibold @8',
+    ]);
+    // Without the defined names, the rule is off (the literal rules still run).
+    expect(
+      scanStylesheet('packages/x/src/x.css', '.a { gap: var(--tx-nope); }', ROLES).map(
+        (f) => f.code
+      )
+    ).toEqual([]);
+  });
+
+  it('collects declared names: CSS declarations, style directives, setProperty and templated families', () => {
+    const names = declaredTokenNames([
+      { source: '.a { --tx-player-gap-size: 1rem; }' },
+      {
+        source: `<div style:--tx-pages-caret-color={c} style="--tx-swatch-color: ${DOLLAR}{v}"></div>`,
+      },
+      {
+        source: `node.style.setProperty('--tx-chart-hover', v); node.style.setProperty(\`--tx-cohort-heat-${DOLLAR}{i}\`, s);`,
+      },
+    ]);
+    expect([...names].sort()).toEqual([
+      '--tx-chart-hover',
+      '--tx-cohort-heat-*',
+      '--tx-pages-caret-color',
+      '--tx-player-gap-size',
+      '--tx-swatch-color',
+    ]);
+    expect(isDefinedName('--tx-cohort-heat-9-text', names)).toBe(true);
+    expect(isDefinedName('--tx-cohort', names)).toBe(false);
+    expect(componentTokenNames().has('--tx-button-radius')).toBe(true);
+    expect(definedTokenNames([]).has('--tx-button-radius')).toBe(true);
+  });
+
+  it('fails on the reads the first conformance run reported, and passes on their fixes', async () => {
+    const contract = await contractTokenNames();
+    const defined = definedTokenNames([]);
+    const codes = (file: string, css: string) =>
+      scanStylesheet(file, css, contract, defined).map((f) => `${f.code} ${f.literal}`);
+    // packages/player/src/player.css: cards, slides and tiles, and the danger accents.
+    expect(
+      codes(
+        'packages/player/src/player.css',
+        `.tx-player-layout--card { background: var(--tx-card, Canvas); }
+.tx-player__badge[data-status="invalid"] { border-color: var(--tx-danger, Mark); }`
+      )
+    ).toEqual([
+      'system-color Canvas',
+      'unknown-token --tx-card',
+      'system-color Mark',
+      'unknown-token --tx-danger',
+    ]);
+    expect(
+      codes(
+        'packages/player/src/player.css',
+        `.tx-player-layout--card { background: var(--tx-surface, Canvas); color: var(--tx-surface-foreground, CanvasText); }
+.tx-player__badge[data-status="invalid"] { border-color: var(--tx-destructive, Mark); }`
+      )
+    ).toEqual([]);
+    // packages/data/src/dashboard/Dashboard.svelte: the widget.
+    expect(
+      codes(
+        'packages/data/src/dashboard/Dashboard.svelte',
+        '<style>.w { background: var(--tx-card, Canvas); color: var(--tx-card-foreground, CanvasText); }</style>'
+      )
+    ).toEqual([
+      'system-color Canvas',
+      'unknown-token --tx-card',
+      'system-color CanvasText',
+      'unknown-token --tx-card-foreground',
+    ]);
+    // packages/blocks: the structure block and the link preview.
+    expect(
+      codes(
+        'packages/blocks/src/structure/structure.css',
+        '.c { border: 1px solid var(--tx-color-border, CanvasText); outline: 2px solid var(--tx-color-ring, Highlight); }'
+      )
+    ).toEqual([
+      'system-color CanvasText',
+      'unknown-token --tx-color-border',
+      'system-color Highlight',
+      'unknown-token --tx-color-ring',
+    ]);
+    expect(
+      codes(
+        'packages/blocks/src/embed/LinkPreview.svelte',
+        '<style>a { color: var(--tx-color-link, LinkText); } .p { border-color: var(--tx-border, ButtonBorder); } a { color: var(--tx-link, LinkText); }</style>'
+      )
+    ).toEqual(['system-color LinkText', 'unknown-token --tx-color-link']);
+  });
+});
+
 describe('check-token-usage: the allowlist', () => {
   it('keeps listed literals per path and rule, matches *px by unit, and reports stale entries', () => {
     expect(literalMatches('*px', '24px')).toBe(true);
@@ -131,7 +296,12 @@ describe('check-token-usage: the repository', () => {
     const files = stylesheetFiles().map((file) => ({ file, source: readFileSync(file, 'utf8') }));
     expect(files.length).toBeGreaterThan(500);
     expect(files.some((f) => f.file.startsWith('packages/tokens/'))).toBe(false);
-    const report = checkTokenUsage(files, await contractTokenNames());
+    const report = checkTokenUsage(
+      files,
+      await contractTokenNames(),
+      ALLOWLIST,
+      definedTokenNames()
+    );
     expect(report.findings).toEqual([]);
     expect(report.stale).toEqual([]);
   });

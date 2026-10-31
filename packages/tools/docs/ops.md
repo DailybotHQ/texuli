@@ -81,9 +81,11 @@ through the same registry. The design-system operations are described in
 | `site.read` | 1,024 | — | 5 s | `path` (required) |
 | `site.search` | 1,024 | 50 | 5 s | `query` (required), `limit` |
 
-### Deprecated 0.8 tool names
+### Removed tool names
 
-| Alias | Resolves to | Removed in |
+A call to a removed name is refused with a message that names the operation to call instead.
+
+| Name | Call instead | Removed in |
 | --- | --- | --- |
 | `deck` | `deck.run` | `0.10.0` |
 | `document` | `document.run`, `document.export` | `0.10.0` |
@@ -267,7 +269,7 @@ package version, read from `package.json` (the MCP `serverInfo.version`).
 
 | Code | When |
 | --- | --- |
-| `unknown-operation` | The name is neither an operation nor an alias |
+| `unknown-operation` | The name is neither an operation nor an alias; a name removed in `0.10.0` gets a message naming its replacement |
 | `invalid-input` | The input is not a JSON object, has a cycle, or fails the input schema (`issues` lists each failure with a JSONPath) |
 | `input-too-large` | The input is over `limits.inputBytes` |
 | `not-found` | A named thing does not exist (an unknown component or theme id) |
@@ -288,15 +290,27 @@ refused when the registry is built (`schemaKeywordIssues`), so no constraint
 is silently ignored. Every input schema is an object with
 `additionalProperties: false`, so unknown arguments are refused by name.
 
-## Deprecated 0.8 tool names
+## Removed 0.8 tool names
 
-The seven MCP tool names of `0.8` stay as aliases for one minor (the
-generated table under [Operations](#operations) names their targets and the
-release that removes them). Their MCP descriptions start with "Deprecated
-alias of …". `theme` resolves to `theme.get` when `id` is given, otherwise
-`theme.search`; `document` resolves to `document.export` for `to-docx` and
-`to-pdf`, otherwise `document.run` (the legacy input schema, with all ten
-commands). An alias returns exactly what its target returns.
+The seven MCP tool names of `0.8` (`deck`, `document`, `catalog`,
+`component`, `validate`, `example`, `theme`) were deprecated aliases in
+`0.9.0` and are removed in `0.10.0` (on the `release/0.10.0` branch; not
+on npm yet). No door lists them. A call is refused with a message that
+names the operation to call instead: `invoke()` returns `unknown-operation`
+with `The tool "theme" was removed in 0.10.0; call theme.search or
+theme.get instead.`, and the MCP `tools/call` answers the same text as a
+`-32602` protocol error. The generated table under
+[Operations](#operations) lists each name and its replacement
+(`TEXULI_REMOVED_NAMES`, `registry.removed()`). Move host prompts and
+allowlists: `deck` → `deck.run`; `document` → `document.run`, or
+`document.export` with `format: "pdf"` or `"docx"` for the old `to-pdf` and
+`to-docx` commands; `catalog` → `catalog.search`; `component` →
+`component.get`; `validate` → `catalog.validate`; `example` →
+`example.search`; `theme` → `theme.get` (with `id`) or `theme.search`.
+
+The alias mechanism stays (`OperationAlias`, `registry.aliases()`, empty in
+`0.10.0`): the next renamed operation keeps its old name for one minor
+(ADR-017).
 
 ## Doors that use it today
 
@@ -306,7 +320,7 @@ commands). An alias returns exactly what its target returns.
   `edge` and `site` for the remote endpoint, which passes each request's
   `env.ASSETS` as the site context),
   with `inputSchema`, `outputSchema`, `annotations` and cursor pagination,
-  then the aliases. A call goes through `invoke()` and returns
+  then any deprecated aliases (none in `0.10.0`). A call goes through `invoke()` and returns
   `structuredContent` plus a text mirror; a failure is an `isError` result
   whose JSON has `error`, `code` and, for schema failures, `issues`. An
   unknown tool name is a JSON-RPC `-32602` error. The same handler serves
@@ -335,8 +349,8 @@ commands). An alias returns exactly what its target returns.
 
 `packages/tools/tests/ops.test.ts` checks that every operation is declared
 once in the schema subset, round-trips every example through its input and
-output schemas, refuses bad input with each error code, resolves every
-alias to the same result as its target, reads the version from
+output schemas, refuses bad input with each error code, refuses every
+removed 0.8 name with its replacement, reads the version from
 `package.json`, and that the CLI runs through the registry.
 The same file checks `blueprint.validate` on golden and hostile fixtures,
 envelope migration, the catalog hash, deep block checks, the frame root,

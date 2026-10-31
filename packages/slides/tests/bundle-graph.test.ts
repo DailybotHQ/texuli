@@ -40,6 +40,15 @@ const HOST_REPLACED = [
   '/slides/src/stage/loaders.ts',
 ];
 
+/** Module id fragments only a deck with a `designSystem` loads (ADR-024): never in the initial graph. */
+const DESIGN_SYSTEM_ONLY = [
+  '/slides/src/stage/design-system.ts',
+  '/player/src/design-system.ts',
+  '/tokens/src/design-system/apply.ts',
+  '/tokens/src/design-system/compile',
+  '/texuli/src/defaults/',
+];
+
 interface Chunk {
   fileName: string;
   code: string;
@@ -135,6 +144,13 @@ let { deck }: { deck: unknown } = $props();
     const initial = staticModules(chunks, entries);
     expect(initial.some((id) => id.endsWith('/slides/src/stage/DeckStage.svelte'))).toBe(true);
     expect(defaultsIn(initial)).toEqual([]);
+    // A deck without a design system costs nothing: the step is a lazy chunk.
+    expect(DESIGN_SYSTEM_ONLY.filter((part) => initial.some((id) => id.includes(part)))).toEqual(
+      []
+    );
+    const step = chunkWith(chunks, '/slides/src/stage/design-system.ts');
+    expect(step, 'the design-system step chunk').toBeTruthy();
+    expect(entries).not.toContain(step?.fileName);
     // The defaults are still there for hosts that keep them on, as a lazy chunk.
     const lazy = chunkWith(chunks, '/slides/src/stage/default-renderers.ts');
     expect(lazy, 'the default tables chunk').toBeTruthy();

@@ -112,6 +112,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-component-pages](../apps/website/docs/site-component-pages.md) | Component pages generator |
 | [site-csp](../apps/website/docs/site-csp.md) | Built-site Content Security Policy |
 | [site-dashboards](../apps/website/docs/site-dashboards.md) | Dashboards page (texuli.com) |
+| [site-design-systems](../apps/website/docs/site-design-systems.md) | Design systems hub at /design-systems/ (texuli.com) |
 | [site-docs-shell](../apps/website/docs/site-docs-shell.md) | Docs shell (texuli.com) |
 | [site-documents](../apps/website/docs/site-documents.md) | texuli.com: documents page |
 | [site-drag](../apps/website/docs/site-drag.md) | Drag page (texuli.com) |
@@ -143,7 +144,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-skill](../apps/website/docs/site-skill.md) | The Texuli skill page |
 | [site-slides-page](../apps/website/docs/site-slides-page.md) | texuli.com: slides area |
 | [site-subsite](../apps/website/docs/site-subsite.md) | texuli.com sub-sites: routes, doors and breadcrumbs |
-| [site-theme-studio](../apps/website/docs/site-theme-studio.md) | Theme studio (texuli.com) |
+| [site-theme-studio](../apps/website/docs/site-theme-studio.md) | Design system studio at /theme-studio/ (texuli.com) |
 | [site-theme-swatches](../apps/website/docs/site-theme-swatches.md) | Theme swatches (own palette) |
 | [site-theme-sweep](../apps/website/docs/site-theme-sweep.md) | Theme sweep tooling |
 | [site-theme-switcher](../apps/website/docs/site-theme-switcher.md) | texuli.com: theme and mode switcher |

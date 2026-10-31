@@ -1,3 +1,9 @@
+export {
+  type ActiveHeadingEntry,
+  DEFAULT_READING_LINE,
+  type TrackActiveHeadingOptions,
+  trackActiveHeading,
+} from './active-heading.ts';
 export { default as ContentLayout } from './ContentLayout.svelte';
 export {
   type BuildTocOptions,

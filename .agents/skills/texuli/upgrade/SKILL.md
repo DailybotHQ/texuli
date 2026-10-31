@@ -154,8 +154,9 @@ the app for:
   written for the 0.8 catalog (`catalog-mismatch`) until it pins the new
   hash.
 - **MCP tool names:** the seven 0.8 names (`deck`, `document`, `catalog`,
-  `component`, `validate`, `example`, `theme`) are deprecated aliases until
-  `0.10.0`; move host prompts and allowlists to the `group.verb` tools
+  `component`, `validate`, `example`, `theme`) are deprecated aliases in
+  `0.9.0` and removed in `0.10.0` (in development; a call is refused with
+  the name to use); move host prompts and allowlists to the `group.verb` tools
   ([`../router/hosts.md`](../router/hosts.md#mcp)). A stdio request before
   `initialize` now gets `-32600`, not `-32002`.
 - **Token contract v2:** additive, `renames.json` is empty; component
@@ -169,7 +170,7 @@ the app for:
 - **Date controls** set `aria-invalid="true"` when a `Field` marks them
   invalid, not only from their own `error` prop.
 - **Tree blocks** take `variant` (`file-tree` or `org`); `style` is an
-  alias through `0.9.x`, removed in `0.10.0`.
+  alias through `0.9.x` and is refused from `0.10.0` (in development).
 
 New APIs in `0.9.0` are marked "new in `0.9.0`" in
 [`../router/packages.md`](../router/packages.md); the full notes are in

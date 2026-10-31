@@ -33,7 +33,8 @@ texuli ds check acme.json --mode dark --variant compact
 | `--base <file>` | A document that `extends: "id@x.y.z"` names, keyed by its own `id` and `version`; repeatable. `texuli:<id>` bases load from the theme library |
 | `--render` | Add the render checks (below) |
 | `--url <page>` | With `--render`: check your own page instead of the repository sheet |
-| `--strict` | With `--render`: known library findings fail too |
+| `--known <file>` | With `--render`: a JSON array of findings you track, `[{ "component", "element", "property", "reason" }]` (at most 1 MB and 500 entries; `component` may be `*`, `element` and `property` are prefixes). They are reported as `known` and do not fail the run. A malformed list exits 2 |
+| `--strict` | With `--render`: known findings fail too |
 
 **Exit codes:** `0` every check passed; `1` a refusal or a render finding;
 `2` the check could not run (a bad flag, an unreadable or non-JSON file, or a
@@ -101,16 +102,24 @@ the compiled design system to that scope (`applyDesignSystem`) and asserts:
   color that does not move does not come from the scope's `--tx-*`
   variables: a literal, a system-color fallback of a variable outside the
   contract, or a variable resolved outside the scope. Code `render-literal`
-  at `$.render["<catalog id>"]`;
+  at `$.render["<catalog id>"]`. Elements that paint no pixel are skipped:
+  hidden ones, and the visually-hidden pattern (`clip-path: inset(50%)` or
+  `clip: rect(0 0 0 0)`) with its subtree, such as a select's form-bridge
+  input or screen-reader text;
 - a sheet that painted nothing: `render-empty`.
 
-**Known findings.** `DS_CHECK_KNOWN_FINDINGS` lists the library findings
-that are tracked, each with its reason (player cards and the dashboard
-widget read `--tx-card`, the link preview and structure block read
-`--tx-color-*`, and a few native player controls are unstyled). They are
-reported as `known` in each render run and do not fail it; `--strict` makes
-them fail. The repository's conformance spec fails when one is no longer
-found, so the list shrinks as the fixes land.
+**Known findings.** The library tracks none: `DS_CHECK_KNOWN_FINDINGS` is
+empty. The first conformance run found 12 (player cards, slides and tiles
+and the dashboard widget read `--tx-card`, the link preview and structure
+block read `--tx-color-*`, `player.css` read `--tx-danger`, and the native
+player controls painted the user agent's colors); T-ds-conformance fixed
+each at its root and `scripts/check-token-usage.ts` now refuses their
+causes (a system color outside a forced-colors block, a `--tx-*` name
+nothing defines). The mechanism stays for adopters: pass your own list with
+`known` (or `--known <file>`); each match is reported as `known` in its
+render run and does not fail it, and `--strict` makes it fail, so a CI job
+can still see what it tracks. The repository's conformance spec fails when
+a library entry is no longer found, so the list cannot rot.
 
 **Requirements.** `--render` uses the Playwright of the project it runs in:
 `@playwright/test` (or `playwright`) with chromium installed
@@ -155,7 +164,7 @@ expect(runs.every((run) => run.ok)).toBe(true);
 | `renderDesignSystemCheck(report, { url?, cwd?, … })` | Launches chromium (and the repository sheet) and adds `render` to the report; throws `DsCheckRequirementError` when a requirement is missing |
 | `renderIssues(run)` | One run's findings as report issues |
 | `playwrightAxeRunner()` | An axe runner over `@axe-core/playwright`, scoped to the sheet |
-| `DS_CHECK_KNOWN_FINDINGS`, `knownFinding(literal)` | The tracked library findings |
+| `DS_CHECK_KNOWN_FINDINGS`, `knownFinding(literal, known?)`, `parseKnownFindings(value)` | The tracked library findings (none), the matcher, and the validator of a `--known` list |
 | `runDsCli(argv, io?)`, `parseDsCliArgs(argv)`, `formatDsCheckReport(report)` | The CLI |
 | `installDsCheckHost(scope, { ready? })` (`/ds-check/host`) | The in-page half |
 
@@ -163,8 +172,10 @@ expect(runs.every((run) => run.ok)).toBe(true);
 
 - `packages/tools/tests/ds-check.test.ts`: every refusal code (the spec's
   invalid fixtures and the three guarantees) reaches exit 1 and the JSON
-  with its path; flags, exit 2, `--base`, `--variant`, `--mode`, the
-  `--render` requirement message, and the render findings' codes.
+  with its path; flags, exit 2, `--base`, `--variant`, `--mode`, `--known`
+  and `--strict`, the `--render` requirement message, and the render
+  findings' codes.
 - `tests/e2e/ds-conformance.spec.ts` (chromium): the acme, minimal and
   fictional protoyard-theme/v1 brands and six library themes, every mode,
-  plus a planted literal and a broken pair that the checks must catch.
+  with no known finding, plus a planted literal and a broken pair that the
+  checks must catch and a planted visually-hidden element they must skip.

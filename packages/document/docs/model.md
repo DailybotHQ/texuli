@@ -52,8 +52,11 @@ stack.
   shape, the ref grammar and bounded, single-line JSON (depth 16, no
   control or bidi characters); the design-system rules themselves run in
   the reader (`@texuli/pages/reader`), which validates and compiles the
-  document before it applies it. The Markdown, DOCX and PDF writers do not
-  carry or read it today.
+  document before it applies it. The Markdown writer carries it in front
+  matter, losslessly ([markdown.md](markdown.md#design-system-front-matter)),
+  and the DOCX and PDF writers apply it as `design` values the caller
+  compiles, reporting `design-system-unapplied` when none are given
+  ([pdf.md](pdf.md#design-systems)).
 
 ## Blocks
 

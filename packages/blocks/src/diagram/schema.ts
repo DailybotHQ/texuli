@@ -49,8 +49,8 @@ export type TreeDiagram = BlockBase & {
   type: 'tree';
   /**
    * Named `style` until 0.8; renamed because the untrusted sink scan refuses
-   * every `style` key, so agents could never send a tree. The parser still
-   * accepts `style` as an alias through 0.9.x (removed in 0.10.0).
+   * every `style` key, so agents could never send a tree. `style` was an
+   * alias through 0.9.x and is refused from 0.10.0.
    */
   variant: TreeVariant;
   nodes: TreeNode[];
@@ -155,20 +155,18 @@ const TREE_VARIANTS: readonly TreeVariant[] = ['file-tree', 'org'];
 const isTreeVariant = (value: unknown): value is TreeVariant =>
   TREE_VARIANTS.includes(value as TreeVariant);
 
-/** `variant`, or the deprecated `style` alias (accepted through 0.9.x; they must agree). */
+/** `variant`. The 0.8 key `style` (an alias through 0.9.x) is refused, naming its replacement. */
 function parseTreeVariant(
   record: Record<string, unknown>,
   path: (string | number)[]
 ): ParseResult<TreeVariant> {
   if (record.style !== undefined) {
-    if (!isTreeVariant(record.style)) {
-      return fail([...path, 'style'], 'style (renamed variant) must be "file-tree" or "org"');
-    }
-    if (record.variant !== undefined && record.variant !== record.style) {
-      return fail([...path, 'style'], 'style is the old name of variant; send variant only');
-    }
+    return fail(
+      [...path, 'style'],
+      'style was removed in 0.10.0; send variant ("file-tree" or "org") instead'
+    );
   }
-  const value = record.variant ?? record.style;
+  const value = record.variant;
   if (!isTreeVariant(value)) {
     return fail([...path, 'variant'], 'variant must be "file-tree" or "org"');
   }

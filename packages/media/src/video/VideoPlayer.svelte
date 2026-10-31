@@ -450,14 +450,14 @@ function onPlayerKeydown(event: KeyboardEvent): void {
       max-inline-size: 90%;
       padding: 0.35rem 0.75rem;
       border-radius: var(--tx-radius-md, 0.375rem);
-      /* Keep the scrim and foreground in the same system-color scheme. */
+      /* An inverted theme pair: the scrim is mostly foreground, the text is the background. */
       background-color: color-mix(
         in oklab,
-        Canvas 18%,
-        CanvasText 82%
+        var(--tx-background, Canvas) 18%,
+        var(--tx-foreground, CanvasText) 82%
       );
-      color: Canvas;
-      border: 1px solid CanvasText;
+      color: var(--tx-background, Canvas);
+      border: 1px solid var(--tx-foreground, CanvasText);
       font-size: var(--tx-text-sm, 0.875rem);
       line-height: 1.35;
       text-align: center;
@@ -509,7 +509,7 @@ function onPlayerKeydown(event: KeyboardEvent): void {
       border-radius: var(--tx-shape-radius-lg);
       /* Canvas pair stays AA even when theme surface/foreground are soft greys. */
       background: var(--tx-background, Canvas);
-      color: CanvasText;
+      color: var(--tx-foreground, CanvasText);
       font: inherit;
       font-size: var(--tx-type-label-size);
     }
@@ -597,7 +597,7 @@ function onPlayerKeydown(event: KeyboardEvent): void {
     }
     .tx-video-player__time,
     .tx-video-player__rate {
-      color: CanvasText;      font-size: 0.8125rem;
+      color: var(--tx-foreground, CanvasText);      font-size: 0.8125rem;
       font-variant-numeric: tabular-nums;
     }
     .tx-video-player__rate {

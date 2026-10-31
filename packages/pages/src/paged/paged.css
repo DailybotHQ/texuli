@@ -30,7 +30,7 @@
   border: var(--tx-border-width-thin) solid
     var(--tx-border, color-mix(in oklab, CanvasText 15%, transparent));
   border-radius: var(--tx-shape-radius-xs);
-  box-shadow: 0 1px 3px color-mix(in oklab, CanvasText 18%, transparent);
+  box-shadow: 0 1px 3px color-mix(in oklab, var(--tx-foreground, CanvasText) 18%, transparent);
 }
 
 .tx-pages-paged__body {

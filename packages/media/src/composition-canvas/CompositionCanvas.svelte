@@ -242,7 +242,7 @@ function onkeydown(event: KeyboardEvent) {
       inline-size: 100%;
       block-size: auto;
       border-radius: var(--tx-shape-radius-lg);
-      background: var(--tx-color-surface-sunken, transparent);
+      background: var(--tx-canvas, transparent);
     }
     .tx-composition-canvas-controls {
       display: flex;
@@ -256,8 +256,8 @@ function onkeydown(event: KeyboardEvent) {
       padding-inline: var(--tx-space-3);
       font: inherit;
       color: inherit;
-      background: var(--tx-color-surface, transparent);
-      border: var(--tx-border-width-thin) solid var(--tx-color-border-strong, currentColor);
+      background: var(--tx-surface, transparent);
+      border: var(--tx-border-width-thin) solid var(--tx-border-strong, currentColor);
       border-radius: var(--tx-shape-radius-md);
       cursor: pointer;
     }
@@ -266,7 +266,7 @@ function onkeydown(event: KeyboardEvent) {
       opacity: 0.6;
     }
     .tx-composition-canvas-controls button:focus-visible {
-      outline: 2px solid var(--tx-color-focus-ring, currentColor);
+      outline: 2px solid var(--tx-ring, currentColor);
       outline-offset: 2px;
     }
     .tx-composition-canvas-note {

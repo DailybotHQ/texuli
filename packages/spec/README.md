@@ -292,9 +292,11 @@ envelope up to the current spec with pure, per-version steps
 `0.5.0 → 0.6.0`, `0.6.0 → 0.7.0`, `0.7.0 → 0.8.0`, `0.8.0 → 0.9.0` and
 `0.9.0 → 0.10.0`, each of which only stamps `spec`); a compatible version
 range is planned, not built. The workspace is at spec `0.10.0` (digest
-`c6d6cb0753100f3807ecb6e03bcd3aca2e151bb13a654b99ec1595c5caf92b13`), which adds the
+`07fc15722c3e2f5d9961d62d02ea7a1866d86b8d5099ff3339556f79ef50e59f`), which adds the
 design-system document (PLAN_011 T-ds-spec) and the envelope's
-`designSystem` (T-ds-blueprint); it is in development on
+`designSystem` (T-ds-blueprint), plus a catalog projection refresh
+(`data-filter-builder` gains the optional `issues` prop and
+`fields[].optionLabels`, T-gaps-100-104); it is in development on
 `release/0.10.0` and ships only with `@texuli/spec@0.10.0`, which is not on
 npm yet. `@texuli/spec@0.9.0` carries spec `0.9.0` (digest
 `497df4d3b0c67d53483163ebd9bd73733b52caf5f8e2966478f1cf860e6f9d9d`), an

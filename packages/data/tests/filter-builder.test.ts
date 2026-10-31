@@ -10,6 +10,7 @@ import {
   changeValue,
   defaultValue,
   emptyFilter,
+  FilterBuilder,
   type FilterField,
   type FilterGroup,
   type FilterOperatorDef,
@@ -646,6 +647,118 @@ describe('FilterBuilder with a property catalog (G49)', () => {
     );
     // An invalid condition is skipped, so every account matches.
     expect(matches()).toBe('a1,a2,a3');
+  });
+
+  function condition(field: string, operator: string, value: unknown): FilterGroup {
+    return {
+      type: 'group',
+      op: 'and',
+      children: [{ type: 'condition', field, operator, value } as never],
+    };
+  }
+});
+
+describe('FilterBuilder host issues and labelled options (G101)', () => {
+  const labelled: FilterField<Row>[] = [
+    { key: 'name', header: 'Name', type: 'text' },
+    {
+      key: 'stage',
+      header: 'Stage',
+      type: 'enum',
+      options: [
+        { value: 'open', label: 'Open deal' },
+        { value: 'won', label: 'Closed won' },
+        'lost',
+      ],
+    },
+    { key: 'amount', header: 'Amount', type: 'number' },
+    { key: 'closes', header: 'Closes', type: 'date' },
+  ];
+  const model: FilterGroup = {
+    type: 'group',
+    op: 'and',
+    children: [
+      { type: 'condition', field: 'stage', operator: 'eq', value: 'archived' },
+      { type: 'condition', field: 'name', operator: 'isEmpty' },
+      {
+        type: 'group',
+        op: 'or',
+        children: [{ type: 'condition', field: 'amount', operator: 'between', value: [1, 2] }],
+      },
+    ],
+  };
+  const describedText = (element: HTMLElement) =>
+    (element.getAttribute('aria-describedby') ?? '')
+      .split(' ')
+      .map((id) => document.getElementById(id)?.textContent ?? '')
+      .join(' | ');
+
+  it('merges host issues into each condition and marks its value control, or its operator when it has none', async () => {
+    const view = render(FilterBuilder, {
+      props: {
+        fields: labelled,
+        value: model,
+        issues: [
+          { path: [0], message: 'Stage is locked for this segment' },
+          { path: [1], message: 'Name is never empty here' },
+          { path: [2, 0], message: 'Use a wider range' },
+          // A group path and a missing path are ignored.
+          { path: [2], message: 'ignored group' },
+          { path: [9], message: 'ignored missing' },
+        ],
+      },
+    });
+    const [first, second] = screen.getAllByRole('group', { name: 'Condition 1' }) as HTMLElement[];
+    const stage = within(first as HTMLElement).getByRole('combobox', { name: 'Value' });
+    expect(stage.getAttribute('aria-invalid')).toBe('true');
+    // The built-in issue and the host's, in that order.
+    expect(describedText(stage)).toMatch(/archived is not an option of Stage.*Stage is locked/);
+    const name = screen.getByRole('group', { name: 'Condition 2' });
+    const operator = within(name).getByRole('combobox', { name: 'Operator' });
+    expect(operator.getAttribute('aria-invalid')).toBe('true');
+    expect(describedText(operator)).toBe('Name is never empty here');
+    for (const end of [
+      within(second as HTMLElement).getByRole('spinbutton', { name: 'From' }),
+      within(second as HTMLElement).getByRole('spinbutton', { name: 'To' }),
+    ]) {
+      expect(end.getAttribute('aria-invalid')).toBe('true');
+      expect(describedText(end)).toBe('Use a wider range');
+    }
+    expect(document.body.textContent).not.toMatch(/ignored/);
+    // Clearing the host issues leaves only the built-in one.
+    await view.rerender({ fields: labelled, value: model, issues: [] });
+    expect(describedText(stage)).not.toMatch(/locked/);
+    expect(operator.getAttribute('aria-invalid')).toBeNull();
+    expect(operator.hasAttribute('aria-describedby')).toBe(false);
+  });
+
+  it('accepts enum options as { value, label } or strings: labels show, values are stored and checked', async () => {
+    const stage = labelled[1] as FilterField;
+    expect(defaultValue('eq', stage)).toBe('open');
+    expect(names(applyFilter(rows, condition('stage', 'in', ['open', 'lost']), labelled))).toEqual([
+      'Atlas',
+      'Pine',
+    ]);
+    expect(parseFilter(condition('stage', 'eq', 'won'), labelled).children).toHaveLength(1);
+    expect(() => parseFilter(condition('stage', 'eq', 'Closed won'), labelled)).toThrow(/option/);
+    expect(filterIssues(condition('stage', 'eq', 'archived'), labelled)).toHaveLength(1);
+    render(FilterBuilder, { props: { fields: labelled, value: condition('stage', 'eq', 'won') } });
+    const value = screen.getByRole('combobox', { name: 'Value' }) as HTMLSelectElement;
+    expect(value.value).toBe('won');
+    expect([...value.options].map((option) => [option.value, option.textContent])).toEqual([
+      ['', 'Choose…'],
+      ['open', 'Open deal'],
+      ['won', 'Closed won'],
+      ['lost', 'lost'],
+    ]);
+    const operator = screen.getByRole('combobox', { name: 'Operator' });
+    await fireEvent.change(operator, { target: { value: 'in' } });
+    const many = screen.getByRole('listbox', { name: 'Value' }) as HTMLSelectElement;
+    expect([...many.options].map((option) => option.textContent)).toEqual([
+      'Open deal',
+      'Closed won',
+      'lost',
+    ]);
   });
 
   function condition(field: string, operator: string, value: unknown): FilterGroup {

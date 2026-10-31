@@ -287,7 +287,7 @@ export interface DocumentAnnotations {
  * of `ref` (an exact `id@x.y.z` the host resolves, or `texuli:<theme>`) and
  * `inline` (a whole `texuli/design-system` document, bounded JSON here; its
  * own rules are `@texuli/spec/design-system`'s, run by the reader before it
- * compiles). Readers apply it to their root; exports ignore it today.
+ * compiles). Readers apply it to their root; the Markdown writer carries it in front matter, and the DOCX and PDF writers take the compiled values as `design`.
  */
 export interface DocumentDesignSystem {
   ref?: string;

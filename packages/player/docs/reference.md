@@ -607,9 +607,30 @@ refuses it (a design-system code such as `aa-text` or `url-refused`), the
 player keeps the default theme, shows `labels.designSystemRefused` in a
 `role="status"` paragraph and announces it politely. It never throws, and
 the content still paints. A later blueprint without a design system
-restores the root. Component defaults (`compiled.defaults`) are not handed
-to the painted components yet (planned); `DesignSystemProvider` does that
-for app code.
+restores the root.
+
+**Component defaults.** The compiled `defaults` (`components.<id>.defaults`
+in the document: a default `variant` or `size`, ADR-020) reach the painted
+components through the `texuli/defaults` context the player provides on
+its root:
+
+- a component uses a default only when its prop is undefined, so a prop in
+  the blueprint always wins;
+- the step keeps only the closed vocabulary (`validateDesignDefaults`), so
+  a cached compiled copy from a host cannot select a class that does not
+  exist;
+- the design system's defaults merge over an app's own
+  `setDesignDefaults` or `DesignSystemProvider` around the player, prop by
+  prop;
+- a refused design system, or a later blueprint without one, restores the
+  library defaults (`tests/design-system.test.ts`).
+
+The context is a small closure on the main entry (94 B gzip); the
+vocabulary, the compiler and the runtime stay in the lazy step. A deck
+presented through `deckHost` is mounted by the host, outside the player's
+component tree: it follows the tokens on the root, and the host gives it
+the defaults (the slides stage applies a deck's own `designSystem`,
+[@texuli/slides stage](../../slides/docs/stage.md#design-systems)).
 
 ```svelte
 <Player

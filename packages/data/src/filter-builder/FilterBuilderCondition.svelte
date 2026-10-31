@@ -1,6 +1,12 @@
 <script lang="ts">
 import type { FilterCondition, FilterOperator } from '../engines/grid/filter.ts';
-import { customOperator, type FilterAnyOperator, groupFields } from './catalog.ts';
+import {
+  customOperator,
+  type FilterAnyOperator,
+  groupFields,
+  optionLabel,
+  optionValue,
+} from './catalog.ts';
 import { type FilterBuilderContext, pathKey } from './context.ts';
 import { type FilterPath, operatorsFor } from './model.ts';
 
@@ -39,7 +45,11 @@ const type = $derived.by(() => {
       return 'text';
   }
 });
-const issue = $derived(ctx.issues.get(key));
+const messages = $derived(ctx.issues.get(key) ?? []);
+/** The ids of this condition's issue messages, or undefined when it has none. */
+const issue = $derived(
+  messages.length > 0 ? messages.map((_, index) => `${id}-issue-${index}`).join(' ') : undefined
+);
 const shape = $derived(
   custom
     ? custom.editor === 'none'
@@ -140,6 +150,8 @@ function shown(node: HTMLInputElement | null, value: unknown): string {
     id="{id}-operator"
     class="tx-filter-builder__control"
     disabled={ctx.disabled}
+    aria-invalid={issue && shape === 'none' ? 'true' : undefined}
+    aria-describedby={shape === 'none' ? issue : undefined}
     value={operator}
     onchange={(event) =>
       ctx.act({ kind: 'operator', path, operator: event.currentTarget.value })}
@@ -160,7 +172,7 @@ function shown(node: HTMLInputElement | null, value: unknown): string {
         type={inputType}
         disabled={ctx.disabled}
         aria-invalid={issue ? 'true' : undefined}
-        aria-describedby={issue ? `${id}-issue` : undefined}
+        aria-describedby={issue}
         bind:this={ends[end]}
         value={shown(ends[end] ?? null, list[end])}
         oninput={(event) => setEnd(end, event.currentTarget.value)}
@@ -176,12 +188,12 @@ function shown(node: HTMLInputElement | null, value: unknown): string {
         size={Math.min(4, options.length || 1)}
         disabled={ctx.disabled}
         aria-invalid={issue ? 'true' : undefined}
-        aria-describedby={issue ? `${id}-issue` : undefined}
+        aria-describedby={issue}
         onchange={(event) =>
           setValue([...event.currentTarget.selectedOptions].map((option) => option.value))}
       >
-        {#each options as option (option)}
-          <option value={option} selected={list.includes(option)}>{option}</option>
+        {#each options as option (optionValue(option))}
+          <option value={optionValue(option)} selected={list.includes(optionValue(option))}>{optionLabel(option)}</option>
         {/each}
       </select>
     {:else if shape === 'in'}
@@ -191,7 +203,7 @@ function shown(node: HTMLInputElement | null, value: unknown): string {
         type="text"
         disabled={ctx.disabled}
         aria-invalid={issue ? 'true' : undefined}
-        aria-describedby="{id}-hint{issue ? ` ${id}-issue` : ''}"
+        aria-describedby="{id}-hint{issue ? ` ${issue}` : ''}"
         value={list.join(', ')}
         onchange={(event) => setList(event.currentTarget.value)}
       />
@@ -202,7 +214,7 @@ function shown(node: HTMLInputElement | null, value: unknown): string {
         class="tx-filter-builder__control tx-filter-builder__value"
         disabled={ctx.disabled}
         aria-invalid={issue ? 'true' : undefined}
-        aria-describedby={issue ? `${id}-issue` : undefined}
+        aria-describedby={issue}
         value={show(condition.value)}
         onchange={(event) => {
           const raw = event.currentTarget.value;
@@ -214,8 +226,8 @@ function shown(node: HTMLInputElement | null, value: unknown): string {
           <option value="false">{ctx.labels.no}</option>
         {:else}
           <option value="">{ctx.labels.choose}</option>
-          {#each options as option (option)}
-            <option value={option}>{option}</option>
+          {#each options as option (optionValue(option))}
+            <option value={optionValue(option)}>{optionLabel(option)}</option>
           {/each}
         {/if}
       </select>
@@ -226,7 +238,7 @@ function shown(node: HTMLInputElement | null, value: unknown): string {
         type={inputType}
         disabled={ctx.disabled}
         aria-invalid={issue ? 'true' : undefined}
-        aria-describedby={issue ? `${id}-issue` : undefined}
+        aria-describedby={issue}
         bind:this={single}
         value={shown(single, condition.value)}
         oninput={(event) => setValue(read(event.currentTarget.value))}
@@ -242,7 +254,7 @@ function shown(node: HTMLInputElement | null, value: unknown): string {
   >
     <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 3l6 6M9 3l-6 6" /></svg>
   </button>
-  {#if issue}
-    <p id="{id}-issue" class="tx-filter-builder__issue">{issue}</p>
-  {/if}
+  {#each messages as message, index (index)}
+    <p id="{id}-issue-{index}" class="tx-filter-builder__issue">{message}</p>
+  {/each}
 </fieldset>

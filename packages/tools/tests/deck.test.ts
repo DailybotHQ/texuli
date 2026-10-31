@@ -118,7 +118,7 @@ it('registers a closed, read-only MCP deck tool with CLI command parity', async 
       }[];
     };
   };
-  const tool = listed.result.tools.find((item) => item.name === 'deck');
+  const tool = listed.result.tools.find((item) => item.name === 'deck.run');
   expect(tool?.inputSchema.additionalProperties).toBe(false);
   expect(tool?.inputSchema.properties.command.enum).toEqual(DECK_COMMANDS);
   expect(tool?.annotations.readOnlyHint).toBe(true);
@@ -126,7 +126,7 @@ it('registers a closed, read-only MCP deck tool with CLI command parity', async 
     jsonrpc: '2.0',
     id: 3,
     method: 'tools/call',
-    params: { name: 'deck', arguments: { command: 'inspect', deck: fixture } },
+    params: { name: 'deck.run', arguments: { command: 'inspect', deck: fixture } },
   })) as unknown as { result: { content: { text: string }[] } };
   expect(JSON.parse(result.result.content[0]!.text)).toMatchObject({
     result: { ok: true, slideCount: 1 },
@@ -135,7 +135,7 @@ it('registers a closed, read-only MCP deck tool with CLI command parity', async 
     jsonrpc: '2.0',
     id: 4,
     method: 'tools/call',
-    params: { name: 'deck', arguments: { command: 'lint', filepath: '/tmp/deck.json' } },
+    params: { name: 'deck.run', arguments: { command: 'lint', filepath: '/tmp/deck.json' } },
   })) as { result: { isError?: boolean } };
   expect(invalid.result.isError).toBe(true);
 });
