@@ -1,0 +1,69 @@
+{
+  "format": "texuli-blueprint",
+  "version": 1,
+  "catalog": "48d6231182dcdb62ed2c8816ff3f620ae9b9683612403dc7e3db00ad85ad893a",
+  "status": "draft",
+  "createdAt": "2026-10-30T09:00:00Z",
+  "updatedAt": "2026-10-30T09:00:00Z",
+  "generator": {
+    "kind": "agent",
+    "name": "Harbor assistant",
+    "model": "example-model"
+  },
+  "tier": "untrusted",
+  "profile": "web",
+  "spec": "0.10.0",
+  "id": "brand-report-week-44",
+  "designSystem": {
+    "ref": "harbor@1.2.0"
+  },
+  "tree": {
+    "id": "layout-doc",
+    "props": {
+      "title": "Delivery report, week 44"
+    },
+    "children": [
+      {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "heading",
+            "level": 2,
+            "text": "Summary"
+          }
+        }
+      },
+      {
+        "id": "blocks-text",
+        "props": {
+          "block": {
+            "type": "text",
+            "markdown": "Fictional: the team closed **41 of 46** planned items."
+          }
+        }
+      },
+      {
+        "id": "blocks-data",
+        "props": {
+          "block": {
+            "type": "kpi",
+            "items": [
+              {
+                "label": "Items closed",
+                "value": "41",
+                "delta": "+3",
+                "tone": "success"
+              },
+              {
+                "label": "Blocked",
+                "value": "1",
+                "delta": "-1",
+                "tone": "success"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

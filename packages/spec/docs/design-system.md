@@ -6,9 +6,10 @@
 > `@texuli/tokens/design-system/compile` on the same branch
 > ([design-system-compiler.md](../../tokens/docs/design-system-compiler.md));
 > the importers, emitters, report and diff are on the same branch
-> ([design-system-io.md](../../tokens/docs/design-system-io.md)); the
-> runtime (`apply`), the `ds.*` operations and `texuli ds check` are
-> **planned** (later PLAN_011 tasks, ADR-021 to ADR-023).
+> ([design-system-io.md](../../tokens/docs/design-system-io.md)), and so is
+> the runtime ([design-system-runtime.md](../../tokens/docs/design-system-runtime.md)).
+> The `ds.*` operations and `texuli ds check` are **planned** (later
+> PLAN_011 tasks, ADR-021 to ADR-023).
 
 A design system describes a brand once, as one closed JSON document that
 a company or an agent writes, and every Texuli surface follows
@@ -114,7 +115,7 @@ values.
 | `validateDesignSystemPatch(patch, options?)` | Checks a `DesignSystemPatch`: the sections only, every field optional, `null` to remove a field or a map entry |
 | `applyDesignSystemPatch(base, patch)` | Pure merge: objects merge, arrays and scalars replace, `null` removes, reserved keys are skipped. Validate the result again |
 | `migrateDesignSystem(doc)` | `{ ok: true, document, from, to, applied }` or `{ ok: false, errors: [issue] }`; pure and total. `DESIGN_SYSTEM_MIGRATIONS` is empty for `formatVersion` 1 |
-| `checkDesignSystemReference(value, options?)` | The blueprint's `$defs.designSystemReference`: exactly one of `ref` and `inline`; `inline` runs through `validateDesignSystem` |
+| `checkDesignSystemReference(value, options?)` | The blueprint's (and a document's) `designSystem`, `$defs.designSystemReference`: exactly one of `ref` and `inline`; `inline` runs through `validateDesignSystem`. Fits `validateDraft`'s `checkDesignSystem` as is |
 | Constants | `DESIGN_SYSTEM_FORMAT`, `DESIGN_SYSTEM_FORMAT_VERSION`, `DESIGN_SYSTEM_CODES`, `DESIGN_SYSTEM_COMPILER_CODES`, `DESIGN_SYSTEM_LIMITS` |
 | Types | `DesignSystem` and every section type (generated), `DesignSystemIssue`, `DesignSystemPatch`, `DesignSystemValidation` |
 
@@ -123,6 +124,39 @@ closed decoders (`DesignSystem.decode`); hyphenated keys become camelCase
 properties (`iconButton`, `heightMd`). Native validation of patterns and
 caps is not built: the native twin decodes, the TypeScript validator
 checks.
+
+## In blueprints and documents
+
+From spec `0.10.0` (T-ds-blueprint,
+[ADR-024](../../../docs/DECISIONS.md#adr-024-design-systems-on-every-surface))
+a blueprint envelope, and a document (`$defs.document`, `@texuli/document`),
+may name the design system it follows:
+
+```jsonc
+{ "format": "texuli-blueprint", "version": 1, "spec": "0.10.0", /* … */
+  "designSystem": { "ref": "acme@2.1.0" },          // the host resolves it
+  // or: "designSystem": { "inline": { "format": "texuli/design-system", … } }
+  "tree": { "id": "layout-deck", /* … */ } }
+```
+
+- **Closed:** exactly one of `ref` and `inline`; any other key is refused.
+  `ref` is an exact `id@x.y.z` or `texuli:<theme>` (a library theme),
+  never a range (`extends-range`), a URL or a path (`url-refused`).
+- **Checked:** `checkDesignSystemReference(value, { trust })` is the whole
+  check. `@texuli/catalog`'s `validateDraft` runs it when the host passes it
+  as `checkDesignSystem` (codes and paths under `$.designSystem`, at the
+  draft's tier, so agent output refuses every `data:` URL); without it the
+  shape and the `ref` grammar are still checked and the inline rules are
+  `skipped` in the receipt. A host with `@texuli/tokens` can compile the
+  inline document as well, for the guarantee codes.
+- **Applied:** `@texuli/player` (`designSystems: { resolve, mode }`) and
+  `@texuli/pages`' `PageReader` resolve a `ref` through the host (never a
+  fetch), compile lazily, and apply the result to their root scope. A
+  reference nothing resolves, or a document the compiler refuses, paints
+  with the default theme and a visible notice; neither throws. A deck as a
+  blueprint (a `layout-deck` root) follows the envelope's design system,
+  and so does a document root. The deck model's own `themeRef`
+  (`@texuli/deck`, model v2) does not name a design system yet (planned).
 
 ## Size
 
