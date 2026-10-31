@@ -299,7 +299,10 @@ branch):
     9,385 B to 5,266 B (gzip; `packages/forms/tests/bundle-graph.test.ts`,
     which asserts that neither initial graph holds those controls).
     For server rendering, pass `SCHEMA_FORM_CONTROLS` from the new
-    `@texuli/forms/controls` as `controls`.
+    `@texuli/forms/controls` as `controls`. The form and each placeholder
+    carry `data-tx-pending` and `aria-busy` until the controls mount (the
+    visual suite waits for it), and each placeholder is sized like its
+    control, so nothing shifts when it mounts.
   - **G120**: `onStep({ step, position, values, allValues, signal })` on
     SchemaForm and the controller can block Next with field errors or a
     message (`stepError`); Next shows "Checking…" while it runs.
