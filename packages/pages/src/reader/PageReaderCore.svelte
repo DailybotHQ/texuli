@@ -146,8 +146,20 @@ $effect(() => {
         systemStatus = event.status;
         untrack(() => onDesignSystem?.(event));
       },
-      () => {
-        if (live) systemStatus = 'refused';
+      (error: unknown) => {
+        if (!live) return;
+        // The step never rejects; a chunk that fails to load still replaces the old system.
+        dropSystem();
+        systemStatus = 'refused';
+        const message = error instanceof Error ? error.message.slice(0, 200) : 'Refused.';
+        untrack(() =>
+          onDesignSystem?.({
+            status: 'refused',
+            code: 'design-system-refused',
+            path: '$.designSystem',
+            message,
+          })
+        );
       }
     );
   return () => {

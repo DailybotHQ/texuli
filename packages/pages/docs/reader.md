@@ -74,15 +74,23 @@ goes to `designSystems.resolve`, an inline document is validated at
 `designSystems.trust` and both are compiled by
 `@texuli/tokens/design-system/compile-core`, then applied
 to the article with `applyDesignSystem` (`data-tx-ds`, `data-tx-scope`,
-`data-tx-mode` and the variables). Fonts load only for host-resolved
-documents or at the `developer` level. Nothing resolves, the resolver
-throws, another document comes back, or the compiler refuses it (for
-example `aa-text`, `url-refused`): the reader keeps the default theme,
-sets `data-tx-pages-design-system="refused"` and shows
+`data-tx-mode` and the variables). A `designSystems.mode` the design
+system did not compile paints its first compiled mode (a
+dark-only design system paints dark under a light host), and
+`data-tx-mode` names the mode painted. Fonts load only for host-resolved
+documents or at the `developer` level. A compiled copy from `resolve` must
+carry `id`, `vars` and `attrs` (the player's check); anything else is
+validated as a document. Nothing resolves, the resolver throws, another
+document comes back, the compiler refuses it (for example `aa-text`,
+`url-refused`), or applying fails (`design-system-refused`): the reader
+keeps the default theme, drops the design system applied before, sets
+`data-tx-pages-design-system="refused"`, reports the event and shows
 `labels.designSystemRefused` in a `role="status"` paragraph. Never throws.
 
 A `texuli:<theme>` reference or `extends` base that `resolve` leaves
-`undefined` goes to `loadLibraryBase` (G127, from `0.10.1`). `PageReader` (and `createDocumentPlayerHost`) default it to
+`undefined` goes to `loadLibraryBase` (G127, from `0.10.1`), which may
+return a design-system document or a token `Theme` (compiled as
+`fromTheme` of it, for the reference as for a base). `PageReader` (and `createDocumentPlayerHost`) default it to
 `loadPagesLibraryBase`, which loads the token theme library on first use.
 `PageReaderCore` (and `createDocumentPlayerHostCore`) have no default:
 without a loader such a design system is refused

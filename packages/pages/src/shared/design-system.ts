@@ -34,6 +34,20 @@ const refused = (code: string, path: string, message: string): PagesDesignSystem
   message,
 });
 
+/** A compiled copy a host may hand back (a cached JSON copy works): the player's check. */
+const isCompiled = (value: unknown): value is ApplicableDesignSystem =>
+  isRecord(value) && isRecord(value.vars) && isRecord(value.attrs) && typeof value.id === 'string';
+
+/** The mode painted for `mode`: that mode when compiled, else the first compiled mode. */
+function paintedMode(compiled: ApplicableDesignSystem, mode: 'light' | 'dark'): 'light' | 'dark' {
+  const modes = (['light', 'dark'] as const).filter((candidate) => compiled.vars[candidate]);
+  return modes.includes(mode) ? mode : (modes[0] ?? mode);
+}
+
+/** A token `Theme` (what a `texuli:<theme>` loader may return), as the compiler's resolver tells it. */
+const isTheme = (value: unknown): boolean =>
+  isRecord(value) && isRecord(value.light) && isRecord(value.dark) && isRecord(value.style);
+
 /** Resolve and compile a document's design system for the reader. */
 export async function resolvePagesDesignSystem(
   reference: Readonly<DocumentDesignSystem>,
@@ -45,8 +59,8 @@ export async function resolvePagesDesignSystem(
     const ref = reference.ref;
     const resolve = host?.resolve;
     let document: unknown = ref === undefined ? reference.inline : await resolve?.(ref);
-    if (ref !== undefined && isRecord(document) && isRecord(document.vars)) {
-      return { ok: true, compiled: document as unknown as ApplicableDesignSystem, source: 'ref' };
+    if (ref !== undefined && isCompiled(document)) {
+      return { ok: true, compiled: document, source: 'ref' };
     }
     const compiler = await import('@texuli/tokens/design-system/compile-core');
     if (document === undefined && ref?.startsWith('texuli:')) {
@@ -57,6 +71,9 @@ export async function resolvePagesDesignSystem(
           'No theme library loader resolves it.'
         );
       document = (await loadLibraryBase(ref)) ?? undefined;
+      // The loader may hand back a token `Theme`, as for an `extends` base: `fromTheme` of it.
+      if (isTheme(document))
+        document = compiler.fromTheme(document as Parameters<typeof compiler.fromTheme>[0]);
     }
     if (document === undefined)
       return refused('design-system-unresolved', '$.designSystem.ref', 'Nothing resolves it.');
@@ -98,7 +115,9 @@ export async function resolvePagesDesignSystem(
 /**
  * Resolve, compile and apply in one call (what `PageReader` runs): returns
  * the event to report and the dispose of what was applied (none on a
- * refusal). Never rejects.
+ * refusal). A `designSystems.mode` the design system did not compile paints
+ * its first compiled mode, and `data-tx-mode` names it.
+ * Never rejects: an error while applying is a `design-system-refused` event.
  */
 export async function applyPagesDesignSystem(
   target: HTMLElement,
@@ -109,10 +128,22 @@ export async function applyPagesDesignSystem(
   const trust = host?.trust ?? 'untrusted';
   const result = await resolvePagesDesignSystem(reference, host, trust, loadLibraryBase);
   if (!result.ok) return { event: { status: 'refused', ...result } };
-  const dispose = applyDesignSystem(target, result.compiled, {
-    mode: host?.mode ?? 'light',
-    // Fonts load only for host-resolved documents, or at the developer level.
-    fonts: result.source === 'ref' || trust === 'developer',
-  });
+  let dispose: () => void;
+  try {
+    dispose = applyDesignSystem(target, result.compiled, {
+      mode: paintedMode(result.compiled, host?.mode ?? 'light'),
+      // Fonts load only for host-resolved documents, or at the developer level.
+      fonts: result.source === 'ref' || trust === 'developer',
+    });
+  } catch (error) {
+    return {
+      event: {
+        status: 'refused',
+        code: 'design-system-refused',
+        path: '$.designSystem',
+        message: error instanceof Error ? error.message.slice(0, 200) : 'Refused.',
+      },
+    };
+  }
   return { event: { status: 'applied', id: result.compiled.id, source: result.source }, dispose };
 }
