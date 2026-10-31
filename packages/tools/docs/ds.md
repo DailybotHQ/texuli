@@ -7,7 +7,9 @@
 > `@texuli/tools@0.10.0` and `@texuli/mcp@0.10.0`. The remote endpoint at
 > `https://texuli.com/mcp` serves them once `0.10.0` is merged to `main` and
 > deployed. The Kotlin, email, PDF, DOCX, PPTX and canvas outputs of a
-> design system are **planned** ([design-system-io.md](../../tokens/docs/design-system-io.md)).
+> design system are on the same branch (`designValues` from
+> `@texuli/tools/print` and `@texuli/tools/email`; see
+> [docs/DESIGN_SYSTEMS.md](../../../docs/DESIGN_SYSTEMS.md)).
 
 The developer and agent guide is
 [DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md). An agent authors a design system

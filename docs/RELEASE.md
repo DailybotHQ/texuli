@@ -140,10 +140,14 @@ On the branch so far:
   `examples/design-systems/` (T-ds-docs-skill); the fixes for every tracked
   conformance finding (`DS_CHECK_KNOWN_FINDINGS` is empty) and the stronger
   token-usage guard (`system-color` and `unknown-token` rules).
+- **Also landed on the branch:** the Design System Studio at
+  `/theme-studio/` and the `/design-systems/` hub on texuli.com; design
+  systems on standalone decks (`designSystem` in `@texuli/deck`, applied by
+  the slides stage through `@texuli/player/design-system`), player component
+  defaults, and the document writers (Markdown front matter; DOCX and PDF
+  report `design-system-unapplied`).
 - **In progress on the branch (not merged yet, listed here as they land):**
-  the Design System Studio on texuli.com; design systems on standalone decks,
-  player component defaults and the document writers; the Protoyard gaps
-  G105 and G107–G110.
+  the Protoyard gaps G105 and G107–G110.
 
 **Removed in 0.10.0** (deprecated in `0.9.0` for one minor; done on the
 branch):
