@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Design-system conformance sheet</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      #ds-scope {
+        color: var(--tx-foreground);
+        background: var(--tx-background);
+        font-family: var(--tx-font-sans);
+        padding: 1rem;
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 28rem), 1fr));
+      }
+      #ds-scope > section {
+        min-inline-size: 0;
+        border: 1px solid var(--tx-border);
+        border-radius: var(--tx-radius);
+        padding: 0.75rem;
+      }
+      #ds-scope > section > h2 {
+        margin: 0 0 0.5rem;
+        font-size: 0.875rem;
+        color: var(--tx-muted-foreground);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Design-system conformance sheet</h1>
+      <div id="ds-scope"></div>
+      <output id="ds-status">Loading…</output>
+    </main>
+    <script type="module" src="/src/ds-conformance-page.ts"></script>
+  </body>
+</html>
