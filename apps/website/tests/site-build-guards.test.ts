@@ -45,8 +45,12 @@ import {
 } from '../../../packages/tools/src/ops/index.ts';
 import {
   ANALYTICS_TRUSTED_TYPES_POLICY,
+  decodeJsString,
+  type InjectedChunk,
+  pageInjectedStyles,
   pagePolicy,
   pageRoute,
+  readInjectedChunk,
   reportOnlyPolicy,
 } from '../src/components/security/csp.ts';
 import {
@@ -229,6 +233,45 @@ describe('pagePolicy: trusted types (T-100 S-1) and hashes', () => {
     expect(pageRoute('/dist', '/dist/index.html')).toBe('/');
     expect(pageRoute('/dist', '/dist/404.html')).toBe('/404.html');
     expect(reportOnlyPolicy(policy)).toBe(`${policy}; report-to texuli-csp`);
+  });
+
+  it('hashes the styles a page injects at runtime, from the chunks it can load, and no others', () => {
+    // A Svelte component with css="injected", as the minifier emits it: the
+    // browser hashes the `<style>` it appends, whose text is exactly `code`.
+    const frame = '.frame.svelte-1a {display:grid;}';
+    const stage = '.stage.svelte-2b {gap:0.5rem;content:"\\2192";}';
+    const other = '.other.svelte-3c {color:red;}';
+    const chunks = new Map<string, InjectedChunk>([
+      [
+        'LiveDemo.a1.js',
+        readInjectedChunk(
+          `import{x}from"./DemoFrame.b2.js";const s=()=>import("./CardStage.c3.js");`
+        ),
+      ],
+      ['DemoFrame.b2.js', readInjectedChunk(`var D={hash:\`svelte-1a\`,code:\`${frame}\`};`)],
+      [
+        'CardStage.c3.js',
+        readInjectedChunk(`var C={hash:"svelte-2b",code:${JSON.stringify(stage)}};`),
+      ],
+      ['Other.d4.js', readInjectedChunk(`var O={hash:'svelte-3c',code:'${other}'};`)],
+    ]);
+    expect(chunks.get('LiveDemo.a1.js')?.imports.sort()).toEqual([
+      'CardStage.c3.js',
+      'DemoFrame.b2.js',
+    ]);
+    expect(chunks.get('CardStage.c3.js')?.styles).toEqual([stage]);
+    const html =
+      '<html><head><style>p{color:red}</style></head><body><astro-island component-url="/_astro/LiveDemo.a1.js"></astro-island></body></html>';
+    const injected = pageInjectedStyles(html, chunks);
+    expect(injected.sort()).toEqual([frame, stage].sort());
+    const sha = (source: string) =>
+      `'sha256-${createHash('sha256').update(source).digest('base64')}'`;
+    const styleSrc = directive(pagePolicy(html, { injectedStyles: injected }), 'style-src') ?? '';
+    for (const source of ['p{color:red}', frame, stage]) expect(styleSrc).toContain(sha(source));
+    expect(styleSrc).not.toContain(sha(other));
+    // A page that loads none of them gets none of their hashes.
+    expect(pageInjectedStyles('<html><body><p>Static</p></body></html>', chunks)).toEqual([]);
+    expect(decodeJsString('a\\`b\\u0041\\x42\\n\\\\')).toBe('a`bAB\n\\');
   });
 });
 
