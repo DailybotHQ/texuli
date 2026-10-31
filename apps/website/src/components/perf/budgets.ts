@@ -102,8 +102,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/sheets-page/',
     reason:
-      'PLAN_010 T-site-080: four lazy sheet islands (client:visible); the player and the sheet host load only in the agent demo, after hydration, so JS at the ready signal is 61.3 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the islands can import (SheetView over the editable data grid, the player loaders), the same follow-up as /motion-page/. The HTML carries all 54 functions with their build-time results, the dependency graph, the safety cases and the agent blueprint. Measured 2026-10-29: 157.3 KB page, 226.8 KB raw and 29.3 KB gzip of HTML (+4% headroom; a proposal for the owner).',
-    budget: { pageGzipKb: 164, htmlRawKb: 236, htmlGzipKb: 31 },
+      'PLAN_010 T-site-080: four lazy sheet islands (client:visible); the player and the sheet host load only in the agent demo, after hydration, so JS at the ready signal is 61.3 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the islands can import (SheetView over the editable data grid, the player loaders), the same follow-up as /motion-page/. The HTML carries all 54 functions with their build-time results, the dependency graph, the safety cases and the agent blueprint. Measured 2026-10-29: 157.3 KB page, 226.8 KB raw and 29.3 KB gzip of HTML (+4% headroom; a proposal for the owner). PLAN_011 T-gaps-100-104 (FilterBuilder issues and grid styling on token v2): CI on Linux measured 164.2 KB page on 2026-10-30 (+4% headroom).',
+    budget: { pageGzipKb: 171, htmlRawKb: 236, htmlGzipKb: 31 },
   },
   {
     route: '/showcase/dashboard/',
@@ -236,6 +236,12 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
     reason:
       'The results island ships the static search index; it grew with the site content (PLAN_006 T-80/T-83): measured 104.4 KB page / 75.1 KB JS, limits 108 / 80. PLAN_009 (new package docs pages in the index) measured 108.1 KB page, limit 113 (+4% headroom). PLAN_010 (motion and the API contract in the shared components): measured 113.1 KB page, limit 118 (+4% headroom). PLAN_010 (motion and the API contract in the shared components): measured 84.1 KB JS, limit 88 (+4% headroom).',
     budget: { jsGzipKb: 88, pageGzipKb: 118 },
+  },
+  {
+    route: '/theme-studio/',
+    reason:
+      'PLAN_011 T-ds-studio: the Design System Studio (one client:load island) edits every section of a design-system document with Texuli controls and previews it on five surfaces (component sheet, dashboard, slide, document, email). Before, the theme studio measured 129.3 KB page and 91.5 KB JS (2026-10-30, not budgeted: the route was not in the browser list). The compiler, diff, importers, emitters and email renderer load only on interaction; the starting design system is a 5.2 KB build-time JSON instead of the compiler. The preview surfaces and the report load right after mount, so the total depends on whether they finish before the ready signal (153 to 175 KB measured); the limits are the fully loaded measurement, 180.7 KB page and 126.8 KB JS on 2026-10-30 (+4% headroom). Every dynamic import destructures its exports, so the shared @texuli/tokens chunks stay tree-shaken and no other route grows. Follow-up: trim the component chunks the previews pull in.',
+    budget: { pageGzipKb: 188, jsGzipKb: 132 },
   },
   {
     route: '/color-explorer/',

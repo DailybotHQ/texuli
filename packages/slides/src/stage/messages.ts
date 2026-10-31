@@ -41,6 +41,8 @@ export const DECK_STAGE_MESSAGES = Object.freeze({
   'stage.nextStep': 'Step {current} of {total} on this slide',
   // The stage-level trust signal shown at the untrusted paint tier (`trustBadge`).
   'stage.untrustedBadge': 'Untrusted content',
+  // A deck's design system was not applied (ADR-024); the deck theme paints instead.
+  'stage.designSystemRefused': 'The design system could not be applied. Showing the deck theme.',
   // Chrome strings (toolbar, jump list, tooltips, help, toast), owned by `chrome/`.
   ...DECK_CHROME_MESSAGES,
   // Overview and presenter strings, owned by `overview/` and `presenter/`.

@@ -56,6 +56,7 @@
       "site-color-explorer.spec.ts",
       "site-foundation.spec.ts",
       "site-theme-studio.spec.ts",
+      "site-ds-studio.spec.ts",
       "site-webmcp.spec.ts",
       "ssr.spec.ts",
       "site-developers.spec.ts"

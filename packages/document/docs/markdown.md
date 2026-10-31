@@ -49,3 +49,32 @@ same blocks. Document-only blocks have no Markdown spelling and degrade:
 `MarkdownExportOptions`: `title` writes `meta.title` as a level 1 heading
 first; `embeds` is `title` (default) or `drop`. Annotations are never
 written.
+
+## Design system front matter
+
+> **In development for `0.10.0`, not on npm.**
+
+A document's `designSystem` ([model](model.md),
+[ADR-024](../../../docs/DECISIONS.md#adr-024-design-systems-on-every-surface))
+is written as a closed front matter block before the content, and read
+back from it, losslessly:
+
+```markdown
+---
+designSystem: acme@2.1.0
+---
+
+# Launch plan
+```
+
+- A `ref` is written as itself (`acme@2.1.0`, `texuli:violet`); an inline
+  document is written as the whole field in one line of JSON
+  (`designSystem: {"inline":{…}}`; its strings hold no line break).
+- Only that exact shape is front matter: `---`, one `designSystem:` line,
+  `---`. Any other leading `---` stays Markdown (a divider), and a value
+  starting with `{` that is not JSON leaves the source as it is.
+- What is read is validated like any document field: a range, a URL or
+  both keys is refused with an issue under `$.designSystem`. The design
+  system's own rules run where it is compiled (the reader).
+- A document without a design system is written with no front matter, as
+  before.
