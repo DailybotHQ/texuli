@@ -155,7 +155,7 @@ On the branch so far:
   defaults, and the document writers (Markdown front matter; DOCX and PDF
   report `design-system-unapplied`).
 - **In progress on the branch (not merged yet, listed here as they land):**
-  the Protoyard gaps G105 and G107–G110.
+  the Protoyard gaps G107–G110 (G105 landed: `@texuli/slides/export-core`).
 
 **Removed in 0.10.0** (deprecated in `0.9.0` for one minor; done on the
 branch):
