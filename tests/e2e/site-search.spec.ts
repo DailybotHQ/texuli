@@ -28,6 +28,14 @@ test('query results, the lazy palette by shortcut and trigger, centered in ltr a
   await siteSearch(page);
   // Only the trigger ships with the page: the palette and its index wait for a search.
   expect(scripts.some((url) => /SitePalette/.test(url))).toBe(false);
+  // Nor does the palette's code ride in a shared chunk: importing the `Command`
+  // namespace object for its trigger once put CommandPalette and its dialog
+  // stack on every page (about 22.5 KB gzip), whatever the chunk was named.
+  for (const url of scripts) {
+    expect(await (await page.request.get(url)).text(), url).not.toContain(
+      'tx-command-palette__content'
+    );
+  }
   const dialog = page.getByRole('dialog', { name: 'Search Texuli' });
   await page.keyboard.press('ControlOrMeta+k');
   await expect(dialog).toBeVisible();
