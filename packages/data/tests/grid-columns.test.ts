@@ -600,3 +600,27 @@ describe('ColumnGrid', () => {
     }
   }, 20_000);
 });
+
+describe('ColumnGrid per-column classes (G107)', () => {
+  it('adds class to body cells and headerClass to the header, keeping its own classes', () => {
+    const styled: DataGridColumn<Row>[] = [
+      { key: 'name', header: 'Deal', type: 'text', class: 'cell-name', headerClass: 'head-name' },
+      { key: 'amount', header: 'Amount', type: 'number' },
+    ];
+    const { container } = render(TypedColumnGrid, {
+      props: { rows, columns: styled, getRowId: (r: Row) => r.id, caption: 'Deals' },
+    });
+    const head = container.querySelector('th[data-column-key="name"]') as HTMLElement;
+    expect(head.classList.contains('head-name')).toBe(true);
+    expect(head.classList.contains('tx-grid-columns__head')).toBe(true);
+    const bodyRows = [...container.querySelectorAll('tbody tr')];
+    expect(bodyRows).toHaveLength(3);
+    for (const row of bodyRows) {
+      const [name, amount] = [...row.querySelectorAll('td')];
+      expect(name?.classList.contains('cell-name')).toBe(true);
+      expect(name?.classList.contains('tx-grid-columns__cell')).toBe(true);
+      expect(amount?.classList.contains('cell-name')).toBe(false);
+    }
+    cleanup();
+  });
+});

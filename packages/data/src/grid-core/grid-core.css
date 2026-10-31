@@ -226,6 +226,27 @@
     cursor: pointer;
   }
 
+  /* Skeleton loading rows (G107): a muted bar per cell, pulsing unless reduced motion. */
+  .tx-data-grid__skeleton {
+    display: block;
+    inline-size: 70%;
+    block-size: 0.75em;
+    border-radius: var(--tx-shape-radius-sm);
+    background-color: var(--tx-muted, Canvas);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tx-data-grid__skeleton {
+      animation: tx-data-grid-skeleton-pulse 1.4s ease-in-out infinite;
+    }
+  }
+
+  @keyframes tx-data-grid-skeleton-pulse {
+    50% {
+      opacity: 0.5;
+    }
+  }
+
   .tx-data-grid__sr-only {
     position: absolute;
     inline-size: 1px;
