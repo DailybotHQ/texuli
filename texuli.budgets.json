@@ -546,7 +546,11 @@
     },
     "@texuli/tokens/library-expand": {
       "gzip": 6720,
-      "note": "FIX-library-expand-quality + FIX-port-compact: expand meta carries neutral; measured ~8.58 KiB. Catalog listing only. PLAN_010 T-release-060 (2026-10-29): 8832 -> 6720 B, tightened to measured + 4% (measured 6,450 B)."
+      "note": "FIX-library-expand-quality + FIX-port-compact: expand meta carries neutral; measured ~8.58 KiB. Catalog listing only. PLAN_010 T-release-060 (2026-10-29): 8832 -> 6720 B, tightened to measured + 4% (measured 6,450 B). PLAN_011 T-gaps-125-127 (G126): budget unchanged; the rows carry each full description instead of a 48-character cut, measured 6,408 B gzip (37,808 B raw, was 34,880 B), since the full sentences repeat and compress better."
+    },
+    "@texuli/tokens/library-ids": {
+      "gzip": 1856,
+      "note": "PLAN_011 T-gaps-125-127 (G125, trust mode): new row at measured + 4%, rounded up to 64 B: every library theme id (6 built-in, 64 port, 140 expand; 210) with no metadata, isLibraryThemeId and libraryThemeSet, generated from the library sources, so a host validates ids synchronously without the 6,408 B library-expand rows. Measured 1,730 B gzip (3,273 B raw)."
     },
     "@texuli/tokens/palette": {
       "gzip": 4352,
