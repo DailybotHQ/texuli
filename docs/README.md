@@ -562,6 +562,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [tokens-forced-colors](../packages/tokens/docs/tokens-forced-colors.md) | Forced colors and prefers-contrast |
 | [tokens-generator](../packages/tokens/docs/tokens-generator.md) | Theme generator |
 | [tokens-library-expand](../packages/tokens/docs/tokens-library-expand.md) | Tokens: Expand the library to 200+ themes |
+| [tokens-library-ids](../packages/tokens/docs/tokens-library-ids.md) | Library theme ids (unreleased, planned for `0.10.1`) |
 | [tokens-library-port](../packages/tokens/docs/tokens-library-port.md) | Theme library (64-theme port) |
 | [tokens-modes](../packages/tokens/docs/tokens-modes.md) | Color modes |
 | [tokens-motion](../packages/tokens/docs/tokens-motion.md) | Motion tokens (new in `0.6.0`) |
