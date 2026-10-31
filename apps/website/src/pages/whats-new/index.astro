@@ -4,7 +4,7 @@ import { validateCanvas } from '@texuli/canvas/model';
 import { documentFromMarkdown } from '@texuli/document/markdown';
 import { SHEET_FUNCTION_NAMES } from '@texuli/sheets/formula';
 /**
- * /whats-new/ — every new package and capability of 0.6.0 to 0.9.0 in one
+ * /whats-new/ — every new package and capability of 0.6.0 to 0.10.0 in one
  * place, grouped by release with its honest status: 0.6.0 to 0.9.0 are
  * published on npm, and 0.9.0 is the current release (the release line in
  * docs/RELEASE.md); a release in development is listed with its status,
@@ -14,6 +14,7 @@ import { SHEET_FUNCTION_NAMES } from '@texuli/sheets/formula';
  * full.
  */
 import { AGENT_CANVAS } from '../../components/canvas-site/blueprint.ts';
+import { loadBrands } from '../../components/design-systems/brands.ts';
 import { BLOCK_NOTES } from '../../components/documents-site/inventory.ts';
 import { withBase } from '../../components/foundation/site.ts';
 import GuideCode from '../../components/guides/GuideCode.astro';
@@ -77,6 +78,19 @@ ${MCP_SERVER_DATA.local.launch}
 # remote, Streamable HTTP
 ${MCP_SERVER_DATA.remote.url}`;
 const blockTypes = Object.keys(BLOCK_NOTES).length;
+// PLAN_011 T-site-0100: the example brands, checked when this page is built.
+const brands = await loadBrands();
+const brandPairs = brands.map((brand) => {
+  const base = brand.conformance.runs[0];
+  const passed = base?.modes.reduce((sum, mode) => sum + mode.passed, 0) ?? 0;
+  const total = base?.modes.reduce((sum, mode) => sum + mode.total, 0) ?? 0;
+  return `${brand.name} ${passed} of ${total}`;
+});
+const dsCli = `texuli ds init brand.ds.json --name Harborline
+texuli ds validate brand.ds.json
+texuli ds compile brand.ds.json --format css --out dist/brand.css`;
+const dsCheck = 'texuli ds check brand.ds.json --render';
+const removedTools = MCP_SERVER_DATA.removedTools.length;
 const releaseFeatures = RELEASES.map((release) => ({
   ...release,
   features: FEATURES.filter((feature) => feature.release === release.id),
@@ -85,16 +99,17 @@ const releaseFeatures = RELEASES.map((release) => ({
 
 <BaseLayout
   title="What’s new"
-  description="Every new Texuli package and capability of 0.6.0, 0.7.0, 0.8.0 and 0.9.0, with a demo or preview each: motion, live generation, documents, forms, the canvas, spreadsheets, dashboards, output, i18n, and the MCP server, the agent-ready site and design tokens v2."
+  description="Every new Texuli package and capability of 0.6.0 to 0.9.0, and design systems in development for 0.10.0, with a demo or preview each: motion, live generation, documents, forms, the canvas, spreadsheets, dashboards, output, i18n, the MCP server, design tokens v2 and design systems."
 >
   <div class="hub" data-tx-whats-new="">
     <header class="hub__hero">
-      <p class="hub__eyebrow">0.6.0 to 0.9.0 on npm · 0.9.0 is current</p>
+      <p class="hub__eyebrow">0.6.0 to 0.9.0 on npm · 0.9.0 is current · 0.10.0 in development</p>
       <h1>What’s new in Texuli</h1>
       <p class="hub__lead">
         Every package and capability added since 0.5.0, each with a small demo or a preview and a link
         to its full page. <code>0.9.0</code> is the current release on npm (pre-1.0, not a stable
-        release); the packages first published in 0.7.0 to 0.9.0 are still in development.
+        release); the packages first published in 0.7.0 to 0.9.0 are still in development. 0.10.0,
+        design systems, is in development on its release branch.
       </p>
       <nav class="hub__toc" aria-label="Releases on this page">
         <ul>
@@ -194,6 +209,24 @@ const releaseFeatures = RELEASES.map((release) => ({
                     {feature.id === 'i18n' && <HubLocale client:visible />}
                     {feature.id === 'mcp' && (
                       <GuideCode code={mcpSnippet} label="The two MCP doors" lang="text" />
+                    )}
+                    {feature.id === 'design-systems' && (
+                      <p class="hub__note" data-hub-ds-brands="">
+                        The three example brands, checked when this page was built, contrast pairs
+                        passing in light and dark: {brandPairs.join('; ')}.
+                      </p>
+                    )}
+                    {feature.id === 'ds-tools' && (
+                      <GuideCode code={dsCli} label="Three texuli ds commands" lang="text" />
+                    )}
+                    {feature.id === 'ds-conformance' && (
+                      <GuideCode code={dsCheck} label="The conformance check" lang="text" />
+                    )}
+                    {feature.id === 'removals' && (
+                      <p class="hub__note" data-hub-removed-tools="">
+                        {removedTools} tool names removed; the MCP server card lists each with its
+                        replacement.
+                      </p>
                     )}
                     {feature.id === 'tokens' && (
                       <p class="hub__note" data-hub-token-counts="">
