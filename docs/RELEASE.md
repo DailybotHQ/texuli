@@ -94,6 +94,33 @@ On the branch so far:
   is refused; `@texuli/document` documents carry `designSystem` and
   `@texuli/pages`' `PageReader` applies it the same way. `texuli/design-system`
   also exports `applyDesignSystem` and `loadDesignSystemCompiler`.
+- **Protoyard gaps G100–G104** (PLAN_011 T-gaps-100-104; each reported on
+  0.8.x and still present in 0.9.0):
+  - **G104** (`@texuli/data/calendar`): an event chip's accessible name
+    now leads with its visible text in the same order (title,
+    "recurring", time or "All day", then the date and "press Enter to
+    open"; before, the date came before the time, which failed axe's
+    label-in-name rule in the agenda view). Month cells drop their
+    `aria-label` and are named by their content. `tests/e2e/data.spec.ts`
+    runs axe's `label-content-name-mismatch` over every view.
+  - **G100** (`@texuli/editor/markdown`, `@texuli/core/editor-markdown`):
+    a backslash before any ASCII punctuation is an escape (CommonMark), so
+    `\@` reads as `@` and `\@{p|P}` never opens a mention.
+  - **G101** (`@texuli/data/filter-builder`): FilterBuilder takes
+    `issues` (`{ path, message }[]`), shown after the builder's own issue
+    with `aria-invalid` and `aria-describedby` on the condition's value
+    control, and enum `FilterField.options` may be `{ value, label }`
+    (`FilterFieldOption`, `optionValue`, `optionLabel`). The
+    `data-filter-builder` catalog id gains the optional `issues` prop and
+    `fields[].optionLabels` (an additive catalog projection refresh inside
+    spec `0.10.0`), and the player paints both.
+  - **G102** (`texuli/layouts/content`): `trackActiveHeading(container,
+    entries, { readingLine, onChange, activeId })` tracks the heading
+    being read without ContentLayout's chrome and returns a dispose;
+    ContentLayout runs on it.
+  - **G103** (`@texuli/data/board`): after a keyboard move into another
+    column, focus is restored to the held card in the same task, so the
+    next Space or Enter drops it instead of landing on `<body>`.
 
 ### 0.9.0
 
