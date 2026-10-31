@@ -924,8 +924,8 @@
       "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 27,361 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
     },
     "@texuli/document": {
-      "gzip": 44654,
-      "note": "PLAN_010 T-doc-engine (2026-10-28): new row; measured 42,936 B gzip, cap = measured + 4% headroom. Includes @texuli/deck parseDeck for embedded decks (ADR-011)."
+      "gzip": 46464,
+      "note": "PLAN_010 T-doc-engine (2026-10-28): new row; measured 42,936 B gzip, cap = measured + 4% headroom. Includes @texuli/deck parseDeck for embedded decks (ADR-011). PLAN_011 T-ds-blueprint: 44654 -> 46464 (CI Linux 44,656 B + 4%) for the document designSystem field and its schema."
     },
     "@texuli/document/model": {
       "gzip": 1741,
