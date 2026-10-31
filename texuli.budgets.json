@@ -649,8 +649,8 @@
       "note": "Styled Calendar, DatePicker and DateRangePicker over the 28 KiB DatePicker primitive plus presets and styling; measured 31,244 B (lead decision 2026-10-23). PLAN_010 T-release-060 (2026-10-29): 32768 -> 30144 B, tightened to measured + 4% (measured 28,934 B)."
     },
     "texuli/design-system": {
-      "gzip": 3520,
-      "note": "PLAN_011 T-ds-runtime (ADR-023; owner-approved new row): DesignSystemProvider, a scope element over @texuli/tokens/design-system/apply (bundled, 1,966 B) plus setDesignDefaults and its closed vocabulary (texuli/defaults). The texuli root never imports it (an import-graph test), and the root measured 217,091 B before and after. Measured 3,345 B, cap = measured + 4% rounded up to 64 B."
+      "gzip": 3776,
+      "note": "PLAN_011 T-ds-runtime (ADR-023; owner-approved new row): DesignSystemProvider, a scope element over @texuli/tokens/design-system/apply (bundled, 1,966 B) plus setDesignDefaults and its closed vocabulary (texuli/defaults). The texuli root never imports it (an import-graph test), and the root measured 217,091 B before and after. Measured 3,345 B, cap = measured + 4% rounded up to 64 B. Final Review P1-1 (0.11.0): the Provider never throws from its effect (try/catch, drops the previous system, onapplyerror) and renders the painted mode; measured 3,572 B, cap 3,520 -> 3,776 B (measured + 4%)."
     },
     "texuli/dialog": {
       "gzip": 20928,

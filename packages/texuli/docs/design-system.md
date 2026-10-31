@@ -159,6 +159,7 @@ and provides its component defaults to every Texuli component inside.
 | `fonts` | `true` | Register `fontFaces` lazily on first use |
 | `base` | the document's base URI | What relative font paths resolve against |
 | `ref` | | The scope element (bindable) |
+| `onapplyerror` | | Called with the error when `compiled` cannot be applied (no compiled mode, a variant mismatch); the provider never throws, and restores the scope so the previous design system does not stay painted |
 
 - **Scope:** the element carries `data-tx-scope`, `data-tx-mode` and the
   allowlisted `data-tx-ds*` and hook attributes in markup (escaped

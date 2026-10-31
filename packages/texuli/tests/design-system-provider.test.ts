@@ -147,6 +147,25 @@ describe('DesignSystemProvider', () => {
     expect(inlineVars(scope)).toEqual(expected(acme, 'light'));
   });
 
+  it('reports a design system it cannot apply, without throwing or keeping the previous one', async () => {
+    const errors: unknown[] = [];
+    const view = render(Harness, { compiled: acme, onapplyerror: (e) => errors.push(e) });
+    await tick();
+    const scope = screen.getByTestId('scope');
+    expect(inlineVars(scope)).toEqual(expected(acme, 'light'));
+    // A cached copy with no compiled mode: nothing to paint.
+    await view.rerender({ compiled: { ...acme, vars: {} } });
+    await tick();
+    expect(errors).toHaveLength(1);
+    expect(String(errors[0])).toMatch(/not compiled/);
+    expect(inlineVars(scope)).toEqual({});
+    // A good design system afterwards applies again.
+    await view.rerender({ compiled: minimal });
+    await tick();
+    expect(inlineVars(scope)).toEqual(expected(minimal, 'light'));
+    expect(errors).toHaveLength(1);
+  });
+
   it('renders the allowlisted attributes in markup, so designSystemStyle matches server HTML', () => {
     expect([...PROVIDER_ATTRIBUTES]).toEqual([...DESIGN_SYSTEM_ATTRIBUTES]);
   });
