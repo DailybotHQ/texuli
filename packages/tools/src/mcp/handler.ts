@@ -9,6 +9,13 @@
  * - `stateless` (HTTP): every request stands alone; `initialize` answers but
  *   is never required, and the request's protocol version comes from the
  *   caller's context (the `MCP-Protocol-Version` header).
+ *
+ * In both modes a request whose `params._meta` names the 2026-07-28 revision
+ * (`io.modelcontextprotocol/protocolVersion`) is answered on its own, with no
+ * `initialize` and nothing stored, and may call `server/discover`; a `_meta`
+ * revision the handler does not serve is refused with `-32022` and
+ * `error.data.supported`. A request without that `_meta` version behaves as
+ * before.
  */
 import {
   type InvokeFailure,
@@ -28,7 +35,10 @@ import {
   type JsonRpcId,
   type JsonRpcResponse,
   MCP_ERROR_CODES,
+  MCP_PROTOCOL_REVISIONS,
   MCP_PROTOCOL_VERSION,
+  MCP_PROTOCOL_VERSION_META_KEY,
+  MCP_STATELESS_PROTOCOL_VERSIONS,
   MCP_SUPPORTED_PROTOCOL_VERSIONS,
   type McpPrompt,
   type McpResourceProvider,
@@ -81,6 +91,7 @@ const MAX_COMPLETIONS = 100;
 const MAX_URI_LENGTH = 2048;
 const MAX_NAME_LENGTH = 256;
 const MAX_CURSOR_LENGTH = 512;
+const MAX_VERSION_LENGTH = 64;
 const DEFAULT_ARGUMENT_LENGTH = 10_000;
 
 const INSTRUCTIONS =
@@ -102,6 +113,14 @@ function isObject(value: unknown): value is JsonObject {
 
 function validId(id: unknown): id is JsonRpcId {
   return typeof id === 'string' || (typeof id === 'number' && Number.isFinite(id));
+}
+
+/** The revision `params._meta` names, or `undefined` when it names none. */
+function metaVersion(params: unknown): unknown {
+  if (!isObject(params) || !isObject(params._meta)) return undefined;
+  return Object.hasOwn(params._meta, MCP_PROTOCOL_VERSION_META_KEY)
+    ? params._meta[MCP_PROTOCOL_VERSION_META_KEY]
+    : undefined;
 }
 
 function hints(annotations: OperationAnnotations) {
@@ -378,6 +397,35 @@ export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
     throw invalidParams('params.ref.type must be ref/prompt or ref/resource.');
   }
 
+  /**
+   * `server/discover` (2026-07-28): what an `initialize` result says, plus
+   * every served revision and a summary of the tools, prompts and resources
+   * (the full items come from the list methods).
+   */
+  async function discover(version: string): Promise<JsonObject> {
+    return {
+      protocolVersion: version,
+      supportedVersions: [...MCP_PROTOCOL_REVISIONS],
+      serverInfo: { name: 'texuli', version: TOOLS_VERSION },
+      capabilities: capabilities(version),
+      instructions: INSTRUCTIONS,
+      tools: tools.map(({ name, title }) => (title ? { name, title } : { name })),
+      ...(promptsOn ? { prompts: prompts.map(({ name, title }) => ({ name, title })) } : {}),
+      ...(resourcesOn
+        ? {
+            resources: {
+              count: (await listResources()).length,
+              templates: templates.map(({ template }) => ({
+                uriTemplate: template.uriTemplate,
+                name: template.name,
+                ...(template.title ? { title: template.title } : {}),
+              })),
+            },
+          }
+        : {}),
+    };
+  }
+
   async function dispatch(
     method: string,
     params: unknown,
@@ -474,6 +522,23 @@ export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
       return undefined;
     }
 
+    // A per-request revision in params._meta (2026-07-28) overrides the session.
+    const requested = metaVersion(message.params);
+    if (requested !== undefined && !MCP_PROTOCOL_REVISIONS.includes(requested as string))
+      return fail(id, {
+        code: MCP_ERROR_CODES.unsupportedProtocolVersion,
+        message: `Unsupported protocol version; supported: ${MCP_PROTOCOL_REVISIONS.join(', ')}.`,
+        data: {
+          supported: [...MCP_PROTOCOL_REVISIONS],
+          ...(typeof requested === 'string'
+            ? { requested: requested.slice(0, MAX_VERSION_LENGTH) }
+            : {}),
+        },
+      });
+    const perRequest = MCP_STATELESS_PROTOCOL_VERSIONS.includes(requested as string)
+      ? (requested as string)
+      : undefined;
+
     if (message.method === 'initialize') {
       const params = message.params;
       if (!isObject(params) || typeof params.protocolVersion !== 'string')
@@ -499,7 +564,18 @@ export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
     if (message.method === 'ping') return reply(id, {});
 
     let version = negotiated;
-    if (mode === 'stateful') {
+    if (perRequest) {
+      if (
+        mode === 'stateless' &&
+        context.protocolVersion !== undefined &&
+        context.protocolVersion !== perRequest
+      )
+        return fail(id, {
+          code: MCP_ERROR_CODES.invalidRequest,
+          message: `The MCP-Protocol-Version header (${context.protocolVersion.slice(0, MAX_VERSION_LENGTH)}) and params._meta["${MCP_PROTOCOL_VERSION_META_KEY}"] (${perRequest}) disagree.`,
+        });
+      version = perRequest;
+    } else if (mode === 'stateful') {
       if (!initialized)
         return fail(id, {
           code: MCP_ERROR_CODES.notInitialized,
@@ -508,6 +584,11 @@ export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
         });
     } else {
       version = context.protocolVersion ?? MCP_PROTOCOL_VERSION;
+      if (MCP_STATELESS_PROTOCOL_VERSIONS.includes(version))
+        return fail(id, {
+          code: MCP_ERROR_CODES.invalidRequest,
+          message: `Protocol version ${version} carries its version in params._meta["${MCP_PROTOCOL_VERSION_META_KEY}"] on every request.`,
+        });
       if (!MCP_SUPPORTED_PROTOCOL_VERSIONS.includes(version))
         return fail(id, {
           code: MCP_ERROR_CODES.invalidRequest,
@@ -516,6 +597,8 @@ export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
     }
 
     try {
+      if (perRequest && message.method === 'server/discover')
+        return reply(id, await discover(version));
       return reply(id, await dispatch(message.method, message.params, version, context.site));
     } catch (error) {
       if (error instanceof RpcFailure) return fail(id, error.failure);

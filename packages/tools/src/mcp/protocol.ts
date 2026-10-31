@@ -6,7 +6,7 @@
 /** The protocol version the handler prefers. */
 export const MCP_PROTOCOL_VERSION = '2025-11-25';
 
-/** Every version the handler negotiates, newest first. */
+/** Every version `initialize` negotiates, newest first (the initialize-based revisions). */
 export const MCP_SUPPORTED_PROTOCOL_VERSIONS: readonly string[] = Object.freeze([
   '2025-11-25',
   '2025-06-18',
@@ -15,10 +15,28 @@ export const MCP_SUPPORTED_PROTOCOL_VERSIONS: readonly string[] = Object.freeze(
 ]);
 
 /**
+ * The stateless revisions: a request names one in
+ * `params._meta["io.modelcontextprotocol/protocolVersion"]` and is answered
+ * on its own, with no `initialize`. Only the parts of 2026-07-28 listed in
+ * `docs/mcp.md` are implemented.
+ */
+export const MCP_STATELESS_PROTOCOL_VERSIONS: readonly string[] = Object.freeze(['2026-07-28']);
+
+/** Every revision the handler serves, newest first: what `-32022` lists in `error.data.supported`. */
+export const MCP_PROTOCOL_REVISIONS: readonly string[] = Object.freeze([
+  ...MCP_STATELESS_PROTOCOL_VERSIONS,
+  ...MCP_SUPPORTED_PROTOCOL_VERSIONS,
+]);
+
+/** The `params._meta` key that carries a request's protocol revision. */
+export const MCP_PROTOCOL_VERSION_META_KEY = 'io.modelcontextprotocol/protocolVersion';
+
+/**
  * The JSON-RPC error codes the handler returns. Tool failures are never
  * JSON-RPC errors: they are `isError` results carrying the operation's
  * stable code. `notInitialized` shares `-32600` (Invalid Request) because
- * MCP reserves `-32002` for an unknown resource.
+ * MCP reserves `-32002` for an unknown resource. `unsupportedProtocolVersion`
+ * (`-32022`) answers a `_meta` revision the handler does not serve.
  */
 export const MCP_ERROR_CODES = Object.freeze({
   parseError: -32700,
@@ -28,6 +46,7 @@ export const MCP_ERROR_CODES = Object.freeze({
   internalError: -32603,
   notInitialized: -32600,
   resourceNotFound: -32002,
+  unsupportedProtocolVersion: -32022,
 } as const);
 
 export type JsonObject = Record<string, unknown>;
