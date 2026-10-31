@@ -8,6 +8,9 @@
 > call them ([ds.md](../../tools/docs/ds.md)). The Kotlin, email, PDF,
 > DOCX, PPTX and canvas outputs are **planned** (later PLAN_011 tasks).
 
+The end-to-end guide (author, validate, apply, distribute, outputs) is
+[DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md).
+
 These subpaths move a design system
 ([the document](../../spec/docs/design-system.md),
 [the compiler](design-system-compiler.md)) in and out of the formats a

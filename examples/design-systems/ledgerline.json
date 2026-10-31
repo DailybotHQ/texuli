@@ -1,0 +1,44 @@
+{
+  "format": "texuli/design-system",
+  "formatVersion": 1,
+  "id": "ledgerline",
+  "version": "2.3.0",
+  "name": "Ledgerline",
+  "description": "A fictional finance back office: dense tables, crisp edges and a high-contrast variant for long sessions.",
+  "owner": "Ledgerline Platform (fictional)",
+  "license": "MIT",
+  "tags": ["enterprise", "dense", "example"],
+  "extends": "texuli:slate-masthead",
+  "color": {
+    "brand": { "seed": "#1d4ed8", "secondary": "#0f766e", "neutral": "slate" }
+  },
+  "typography": {
+    "families": {
+      "sans": { "stack": ["IBM Plex Sans", "system-ui", "sans-serif"] },
+      "mono": { "stack": ["IBM Plex Mono", "ui-monospace", "monospace"] }
+    },
+    "scale": { "base": 14, "ratio": 1.125 }
+  },
+  "shape": { "radius": 4, "radiusScale": 0.5, "borderWidth": 1 },
+  "space": { "base": 4, "density": 0.875 },
+  "elevation": { "style": "crisp" },
+  "surface": { "style": "solid" },
+  "motion": { "personality": "subtle" },
+  "components": {
+    "button": { "defaults": { "variant": "default", "size": "sm" } },
+    "card": { "defaults": { "variant": "flat" } }
+  },
+  "voice": {
+    "tone": ["precise", "neutral"],
+    "lexicon": { "workspace": "ledger" },
+    "guidelines": ["Lead with the number.", "Name the period every figure covers."]
+  },
+  "accessibility": { "contrast": "AA", "targetMin": 24, "focus": "ring", "focusWidth": 2 },
+  "variants": {
+    "high-contrast": {
+      "accessibility": { "contrast": "AAA", "focus": "outline", "focusWidth": 3 },
+      "shape": { "borderWidth": 2 }
+    },
+    "compact": { "space": { "density": 0.75 } }
+  }
+}

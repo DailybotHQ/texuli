@@ -433,10 +433,13 @@ it('lists and reads the Texuli resources and resource templates', async () => {
     expect(uris.filter((uri) => uri.startsWith('texuli://theme/'))).toEqual(
       themes.map((theme) => `texuli://theme/${theme.id}`)
     );
-    // Only the spec's examples are listed; the library themes as documents are read by id.
+    // Only the fictional examples are listed; the library themes as documents are read by id.
     expect(uris.filter((uri) => uri.startsWith('texuli://design-system/'))).toEqual([
       'texuli://design-system/acme',
       'texuli://design-system/minimal',
+      'texuli://design-system/quillmark',
+      'texuli://design-system/ledgerline',
+      'texuli://design-system/tumbletown',
     ]);
     for (const item of items) {
       expect(typeof item.name, item.uri as string).toBe('string');
@@ -676,8 +679,15 @@ it('completes template and prompt arguments from the real ids', async () => {
       await complete({ type: 'ref/resource', uri: 'texuli://design-system/{id}' }, 'id', '')
     );
     const library = await listFullThemeLibrary();
-    expect(designSystems.values.slice(0, 3)).toEqual(['acme', 'minimal', library[0]?.id]);
-    expect(designSystems.total).toBe(2 + library.length);
+    expect(designSystems.values.slice(0, 6)).toEqual([
+      'acme',
+      'minimal',
+      'quillmark',
+      'ledgerline',
+      'tumbletown',
+      library[0]?.id,
+    ]);
+    expect(designSystems.total).toBe(5 + library.length);
     expect(
       values(await complete({ type: 'ref/resource', uri: 'texuli://schema/{name}' }, 'name', ''))
         .values

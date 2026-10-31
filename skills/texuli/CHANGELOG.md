@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- New `design-systems/SKILL.md` sub-skill, with `references/codes.md`
+  (every design-system code and its fix) and `references/mcp.md` (the
+  `ds.*` tools, `blueprint.theme`, the `create-design-system` prompt and
+  `texuli://design-system/{id}`): author, validate and repair, apply to a
+  blueprint and export a design system, marked in development for
+  `0.10.0`. The router and `router/routes.md` route to it.
 - `themes/SKILL.md` and `upgrade/SKILL.md`: the seven 0.8 MCP tool names
   and the tree block's `style` key are removed in `0.10.0` (in
   development); a call or a block that uses them is refused with the name

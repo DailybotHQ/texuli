@@ -1,6 +1,6 @@
 /**
  * The Texuli MCP resources. Every body is computed from data the package
- * already ships (the static manifest list, the theme library, the spec's
+ * already ships (the static manifest list, the theme library, the fictional
  * example design systems, the deck and document schemas), so the provider is edge-safe: no file system, no
  * network. The package guides (`packages/<pkg>/docs/*.md`) are not bundled;
  * `texuli://docs/{slug}` serves the per-component Markdown the site
@@ -164,7 +164,7 @@ export const texuliResources: McpResourceProvider = {
       name: 'design-system',
       title: 'Design-system document',
       description:
-        'One design-system document as JSON: a fictional example (acme shows every section, minimal the smallest) or a library theme as a document (its generator input as color.brand), ready to extend, validate with ds.validate and compile with ds.compile. Complete {id} for every id; one document per read.',
+        'One design-system document as JSON: a fictional example (acme shows every section, minimal the smallest; quillmark, ledgerline and tumbletown are example brands) or a library theme as a document (its generator input as color.brand), ready to extend, validate with ds.validate and compile with ds.compile. Complete {id} for every id; one document per read.',
       mimeType: JSON_TYPE,
     },
     {
