@@ -222,8 +222,9 @@ branch):
     `tx-inbox__button` class.
 - **Protoyard gaps G111 and G112** (PLAN_011 T-gaps-111-112; reported
   while adopting `@texuli/document` and `@texuli/pages` 0.9.0):
-  - **G111** (`@texuli/pages`): `PageReader`, `PageEditor`, `PagedView`
-    and `CollabEditor` take a host block renderer: a `renderBlock`
+  - **G111** (`@texuli/pages`): `PageReader`, `PageEditor`, `PagedView`,
+    `CollabEditor` and `createDocumentPlayerHost` (`@texuli/pages/host`,
+    for documents the player paints) take a host block renderer: a `renderBlock`
     snippet and a `blockHost` (`PagesBlockHost`: `claim`, `component`,
     `present`). The host paints the wrapped blocks and embeds the library
     refuses (an unknown family or block, an embed with no payload), and
