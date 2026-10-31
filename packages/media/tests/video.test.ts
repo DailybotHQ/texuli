@@ -319,12 +319,16 @@ describe('VideoPlayer', () => {
     }
     cleanup();
     {
-      // keeps both sides of the caption scrim contrast pair in system colors
+      // keeps both sides of the caption scrim contrast pair in one scheme: the
+      // theme pair inverted (T-ds-conformance), each with its system-color fallback
       const css = styleBlock(videoPlayerSource);
-      expect(css).not.toMatch(
-        /\.tx-video-player__caption-text\s*\{[^}]*background-color:[^}]*var\(--tx-background[^}]*CanvasText/s
+      const rule = /\.tx-video-player__caption-text\s*\{([^}]*)\}/s.exec(css)?.[1] ?? '';
+      expect(rule).toMatch(
+        /background-color:\s*color-mix\(\s*in oklab,\s*var\(--tx-background, Canvas\) 18%,\s*var\(--tx-foreground, CanvasText\) 82%\s*\)/s
       );
-      expect(css).toMatch(/\.tx-video-player__caption-text\s*\{[^}]*color:\s*Canvas\s*;/s);
+      expect(rule).toMatch(/[^-]color:\s*var\(--tx-background, Canvas\)\s*;/s);
+      // No bare system color outside a fallback: it would not follow a design system.
+      expect(rule.replace(/var\(--tx-[a-z-]+, [A-Za-z]+\)/g, '')).not.toMatch(/\bCanvas(Text)?\b/);
     }
     cleanup();
     // exposes captionsUnavailable on the labels contract
