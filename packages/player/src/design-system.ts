@@ -11,6 +11,10 @@
  * failure is a refusal with a stable code, and the player keeps the default
  * theme and shows a notice.
  *
+ * Also the `@texuli/player/design-system` subpath, so other stages resolve a
+ * `designSystem` the same way (the `@texuli/slides` stage does, for a deck's
+ * own `designSystem`); import it lazily to keep the 0 B cost.
+ *
  * The compiled component defaults (`compiled.defaults`) come back filtered by
  * the closed vocabulary (`validateDesignDefaults` from `texuli/defaults`, in
  * this lazy chunk too); `Player.svelte` provides them to the painted
@@ -24,6 +28,12 @@ import {
   loadDesignSystemCompiler,
 } from 'texuli/design-system';
 import type { PlayerDesignSystemEvent, PlayerDesignSystems } from './design-system-types.ts';
+
+export type {
+  PlayerDesignSystemEvent,
+  PlayerDesignSystemSource,
+  PlayerDesignSystems,
+} from './design-system-types.ts';
 
 export type PlayerDesignSystemResult =
   | { ok: true; compiled: ApplicableDesignSystem; source: 'ref' | 'inline' }

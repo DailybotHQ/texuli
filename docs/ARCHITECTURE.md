@@ -134,7 +134,7 @@ cap in `texuli.budgets.json` (`pnpm size`).
 | `@texuli/examples` (private) | `.` |
 | `@texuli/forms` (private, in development) | `.`, `model`, `host`, `styles.css` |
 | `@texuli/media` (private) | `.`, `animation`, `animation/player`, `audio`, `captions`, `composition-canvas`, `composition-canvas/draw`, `composition-canvas/render`, `composition-model`, `composition-svg`, `composition-v2`, `export`, `export/ui`, `gallery`, `gallery/lightbox`, `generator-slot`, `image`, `image-editor`, `image-editor/model`, `image-editor/render`, `timeline`, `timeline/model`, `video` |
-| `@texuli/player` (private) | `.`, `styles.css` |
+| `@texuli/player` (private) | `.`, `design-system` (in development for `0.10.0`: the lazy design-system step, shared with the slides stage), `styles.css` |
 | `@texuli/pages` (private, in development) | `.`, `editor`, `reader`, `paged`, `export`, `host`, `collab`, `styles.css` |
 | `@texuli/primitives` (private) | `.`, `accordion`, `alert-dialog`, `color-picker`, `context-menu`, `label`, `number-field`, `progress`, `separator`, `sheet`, `slider`, `tags-input`, `toolbar`, `tooltip`, `collapsible`, `command`, `date-picker`, `date-field`, `file-drop`, `radio-group`, `switch`, `checkbox`, `calendar`, `toggle`, `menu`, `menubar`, `popover`, `tabs`, `hover-card`, `tree`, `listbox`, `select`, `splitter`, `portal`, `navigation-menu`, `scroll-area`, `pagination`, `toast`, `dialog`, `pin-input`, `combobox`, `avatar`, `sortable` |
 | `@texuli/slides` (private) | `.`, `model`, `grammar`, `export`, `templates`, `stage`, `stage-core`, `components`, `layouts`, `styles.css` |
