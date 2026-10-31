@@ -6,10 +6,13 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { parseRouterArgs, routerHelp } from '../src/cli/router.ts';
 import {
   checkDesignSystem,
+  DS_CHECK_KNOWN_FINDINGS,
   type DsCheckPage,
   type DsCheckReport,
   findSheetApp,
+  knownFinding,
   parseDsCliArgs,
+  parseKnownFindings,
   renderDesignSystemCheck,
   renderIssues,
   runDsCli,
@@ -267,8 +270,16 @@ describe('texuli ds check (static)', () => {
     expect(await runDsCli(['--help'], io)).toEqual({ ok: true });
     expect(out.join('')).toContain('Usage: texuli ds check <file>');
     expect(routerHelp()).toContain('  ds check <file> ');
-    for (const [args, message] of [[['a.json', '--strict'], /--strict needs --render/u]] as const)
+    for (const [args, message] of [
+      [['a.json', '--strict'], /--strict needs --render/u],
+      [['a.json', '--known', 'k.json'], /--known needs --render/u],
+      [['a.json', '--render', '--known'], /needs a value/u],
+    ] as const)
       expect(() => parseDsCliArgs(['check', ...args])).toThrow(message);
+    expect(parseDsCliArgs(['check', 'a.json', '--render', '--known', 'k.json'])).toMatchObject({
+      known: 'k.json',
+      render: true,
+    });
   });
 
   it('--render names its requirement when there is no sheet page (outside the repository)', async () => {
@@ -288,6 +299,69 @@ describe('texuli ds check (static)', () => {
       renderDesignSystemCheck(await checkDesignSystem(await read('minimal.json')), { cwd: outside })
     ).rejects.toThrow(/needs a sheet page|needs Playwright/u);
   }, 30_000);
+});
+
+describe('known findings', () => {
+  it('the library tracks none: every finding of the first conformance run was fixed', () => {
+    expect(DS_CHECK_KNOWN_FINDINGS).toEqual([]);
+  });
+
+  it('parses an adopter list and refuses anything else, naming the entry', () => {
+    const entry = { component: 'chart-bar', element: 'rect', property: 'fill', reason: 'r' };
+    expect(parseKnownFindings([entry])).toEqual([entry]);
+    expect(() => parseKnownFindings({})).toThrow(/JSON array/u);
+    expect(() => parseKnownFindings(Array.from({ length: 501 }, () => entry))).toThrow(/500/u);
+    for (const bad of [
+      null,
+      'chart-bar',
+      { ...entry, extra: 1 },
+      { ...entry, component: '' },
+      { ...entry, reason: ' ' },
+      { component: 'chart-bar', element: 'rect', reason: 'r' },
+    ])
+      expect(() => parseKnownFindings([entry, bad])).toThrow(/Known finding 1 /u);
+  });
+
+  it('a known finding does not fail a run unless strict, and a bad --known file cannot run', async () => {
+    const report = await checkDesignSystem(await read('minimal.json'));
+    const literal = { component: 'chart-bar', element: 'rect', property: 'fill', value: 'red' };
+    const page: DsCheckPage = {
+      goto: async () => undefined,
+      emulateMedia: async () => undefined,
+      waitForFunction: async () => true,
+      evaluate: (async (_fn: unknown, arg: unknown) =>
+        Array.isArray(arg)
+          ? { components: ['chart-bar'], checked: 3, pairs: [], literals: [literal] }
+          : ['chart-bar']) as DsCheckPage['evaluate'],
+    };
+    const known = [{ component: 'chart-bar', element: 'rect', property: '', reason: 'tracked' }];
+    expect(knownFinding(literal, known)).toBe(known[0]);
+    expect(knownFinding(literal)).toBeUndefined();
+    const options = { modes: ['light' as const], axe: async () => [] };
+    const [tracked] = await runDsRenderChecks(page, report.runs, { ...options, known });
+    expect(tracked).toMatchObject({
+      ok: true,
+      literals: [],
+      known: [{ ...literal, reason: 'tracked' }],
+    });
+    const [strict] = await runDsRenderChecks(page, report.runs, {
+      ...options,
+      known,
+      strict: true,
+    });
+    expect(strict).toMatchObject({ ok: false, literals: [literal], known: [] });
+    const [untracked] = await runDsRenderChecks(page, report.runs, options);
+    expect(untracked?.ok).toBe(false);
+
+    const path = await file('minimal.json', await read('minimal.json'));
+    const bad = await file('known.json', JSON.stringify([{ component: 'x' }]));
+    const { err, io } = capture();
+    await runDsCli(['check', path, '--render', '--known', bad], io);
+    const code = process.exitCode;
+    process.exitCode = undefined;
+    expect(code).toBe(2);
+    expect(err.join('')).toMatch(/Known finding 0 /u);
+  });
 });
 
 describe('render findings', () => {
