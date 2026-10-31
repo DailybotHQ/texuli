@@ -336,7 +336,7 @@ Compile a design-system document to concrete --tx-* variables per mode and emit 
 
 Arguments (JSON object keys):
   document (required): object. A design-system document: format "texuli/design-system", formatVersion 1, id, version, name, and optional sections (extends, color, typography, shape, space, elevation, surface, motion, layout, icons, components, assets, voice, accessibility, variants). texuli://design-system/acme is a full example.
-  format: "json" | "css" | "tailwind" | "dtcg" | "tokens-studio". json (the compiled design system, keys sorted), css (scoped custom properties, light and dark), tailwind (a preset), dtcg or tokens-studio (the document as token files).
+  format: "json" | "css" | "tailwind" | "dtcg" | "tokens-studio". json (the compiled design system, keys sorted), css (scoped custom properties, light and dark; a single compiled mode goes on the selector), tailwind (a preset), dtcg or tokens-studio (the resolved document as token files: extends merged and the variant applied, so the content matches the reported variant and hash).
   selector: string. css only: the scope selector (default [data-tx-ds="<id>"], or :root).
   dark: "class" | "attribute" | "media". css only: dark mode through the .dark class (default), [data-tx-mode="dark"] or prefers-color-scheme.
   mode: "light" | "dark". Compile one mode only (default: every mode the document declares).

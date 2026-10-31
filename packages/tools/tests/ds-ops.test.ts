@@ -2,9 +2,12 @@
 import { mkdir, mkdtemp, readFile, realpath, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { CompiledDesignSystem } from '@texuli/tokens/design-system/compile';
+import {
+  type CompiledDesignSystem,
+  resolveDesignSystem,
+} from '@texuli/tokens/design-system/compile';
 import { DESIGN_SYSTEM_IMPORT_LIMITS } from '@texuli/tokens/design-system/import';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { parseDsArgs, runDs } from '../src/cli/ds.ts';
 import { parseRouterArgs } from '../src/cli/router.ts';
 import { localFiles } from '../src/internal/local-write.ts';
@@ -195,6 +198,63 @@ describe('design-system operations', () => {
       });
       expect(selector).toMatchObject({ valid: false, errors: [{ path: '$.selector' }] });
     });
+    await scenario(
+      'dtcg and tokens-studio emit what was compiled: extends and the variant applied',
+      async () => {
+        const child = {
+          ...HARBORLINE,
+          id: 'harborline-docs',
+          extends: 'harborline@1.0.0',
+          variants: { dense: { space: { density: 0.8 } } },
+        };
+        const bases = { 'harborline@1.0.0': HARBORLINE };
+        for (const format of ['dtcg', 'tokens-studio'] as const) {
+          const from = format;
+          const base = await run('ds.compile', { document: child, bases, format });
+          const baseDoc = (await run('ds.import', { from, input: base.content })).document;
+          // The base's seed reaches the token files; the extends reference does not.
+          expect(baseDoc.color.brand.seed, format).toBe('#0e7490');
+          expect(baseDoc.extends, format).toBeUndefined();
+          expect(baseDoc.variants, format).toEqual(child.variants);
+          const dense = await run('ds.compile', {
+            document: child,
+            bases,
+            format,
+            variant: 'dense',
+          });
+          expect(dense).toMatchObject({ valid: true, variant: 'dense' });
+          expect(dense.hash, format).not.toBe(base.hash);
+          const denseDoc = (await run('ds.import', { from, input: dense.content })).document;
+          // The variant's patch is applied, and the variants it came from are gone.
+          expect(denseDoc.space?.density, format).toBe(0.8);
+          expect(denseDoc.variants, format).toBeUndefined();
+          expect(dense.content, format).not.toBe(base.content);
+        }
+      }
+    );
+    await scenario('an emit error that is not the selector is reported at $', async () => {
+      vi.resetModules();
+      vi.doMock('@texuli/tokens/design-system/emit', async (original) => ({
+        ...(await original<typeof import('@texuli/tokens/design-system/emit')>()),
+        emitTailwindPresetJson: () => {
+          throw new TypeError('The preset failed.');
+        },
+      }));
+      try {
+        const { runCompile } = await import('../src/ops/design-system-run.ts');
+        const failed = await runCompile({
+          document: MINIMAL_DESIGN_SYSTEM,
+          format: 'tailwind',
+          selector: 'a{}body',
+        });
+        expect(failed).toMatchObject({ valid: false, errors: [{ path: '$' }] });
+        expect(failed.errors[0]).not.toHaveProperty('hint');
+        expect(failed.errors[0]?.message).toContain('The preset failed.');
+      } finally {
+        vi.doUnmock('@texuli/tokens/design-system/emit');
+        vi.resetModules();
+      }
+    });
   });
 
   it('suggest and import deterministically, refusing hostile input without throwing', async () => {
@@ -237,19 +297,23 @@ describe('design-system operations', () => {
         valid: false,
         errors: [{ code: 'invalid-input' }],
       });
+      // dtcg and tokens-studio carry the resolved document: acme's texuli:violet base merged in.
+      const resolvedAcme = await resolveDesignSystem(DESIGN_SYSTEM_EXAMPLES.acme);
+      if (!resolvedAcme.ok) throw new Error('acme resolves');
       const dtcg = await run('ds.compile', {
         document: DESIGN_SYSTEM_EXAMPLES.acme,
         format: 'dtcg',
       });
       const back = await run('ds.import', { from: 'dtcg', input: dtcg.content });
-      expect(back.document).toEqual(DESIGN_SYSTEM_EXAMPLES.acme);
+      expect(back.document).toEqual(resolvedAcme.document);
+      expect(back.document.extends).toBeUndefined();
       const studio = await run('ds.compile', {
         document: DESIGN_SYSTEM_EXAMPLES.acme,
         format: 'tokens-studio',
       });
       expect(
         (await run('ds.import', { from: 'tokens-studio', input: studio.content })).document
-      ).toEqual(DESIGN_SYSTEM_EXAMPLES.acme);
+      ).toEqual(resolvedAcme.document);
       const hostile = await run('ds.import', {
         from: 'dtcg',
         input:

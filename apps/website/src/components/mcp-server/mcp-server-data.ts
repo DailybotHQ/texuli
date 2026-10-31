@@ -422,7 +422,7 @@ export const MCP_SERVER_DATA = {
           name: 'format',
           required: false,
           description:
-            'json (the compiled design system, keys sorted), css (scoped custom properties, light and dark), tailwind (a preset), dtcg or tokens-studio (the document as token files).',
+            'json (the compiled design system, keys sorted), css (scoped custom properties, light and dark; a single compiled mode goes on the selector), tailwind (a preset), dtcg or tokens-studio (the resolved document as token files: extends merged and the variant applied, so the content matches the reported variant and hash).',
         },
         {
           name: 'selector',
