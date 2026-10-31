@@ -1248,6 +1248,18 @@ reflect this decision.
   builder (selectors and properties from an allowlist, values escaped)
   before it can ship.
 
+- **Note (2026-10-30, PLAN_011 T-ds-outputs, unreleased 0.10.0): the
+  email dark rule landed for design systems.** With a compiled design
+  system that has a dark mode, `@texuli/tools/email` writes one
+  `prefers-color-scheme: dark` rule from a closed grammar: classes are a
+  fixed prefix plus a light sRGB hex, declarations are `background-color`,
+  `color` or `border-color` plus a dark sRGB hex with `!important`, and the
+  whole rule is checked against that grammar before the serialized
+  document gets it in the head (the core builders still have no `<style>`
+  element; the email writer inserts the checked rule after serializing).
+  Without a design system the output is unchanged and still declares
+  `color-scheme: light`.
+
 ## ADR-017: One operations registry (`@texuli/tools/ops`) for every agent surface
 
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
