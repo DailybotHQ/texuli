@@ -309,3 +309,28 @@ pnpm vitest run packages/catalog/tests/validate-sheet.test.ts
 pnpm vitest run packages/catalog/tests/validate-dashboard.test.ts
 pnpm vitest run packages/catalog/tests/validate-source.test.ts
 ```
+
+## K — Design systems (spec 0.10.0)
+
+In development for `0.10.0` (not on npm; the 0.9 packages do not read it).
+Rules: `packages/spec/docs/design-system.md`.
+
+- **One field brands the whole blueprint.** The envelope (and a document)
+  may carry `designSystem`: `{"ref": "acme@2.1.0"}` (an exact
+  `id@x.y.z` the host resolves, or `"texuli:<theme>"`) or
+  `{"inline": {"format": "texuli/design-system", "formatVersion": 1, …}}`.
+  Exactly one key; never a range, a URL, a path, raw CSS or a `data:` URL
+  in agent output. Prefer `ref` when the host already has the brand.
+- **Validate it.** Pass `checkDesignSystem: checkDesignSystemReference`
+  (`@texuli/spec/design-system`) to `validateDraft`: issues come back under
+  `check: "design-system"` with design-system codes (`extends-range`,
+  `url-refused`, `unknown-key`, `invalid-value`…) and `$.designSystem…`
+  paths. Fix the field, never the validator.
+- **Paint it.** `<Player designSystems={{ resolve }}>` (and `PageReader`)
+  resolves through the host, compiles lazily and applies it to the root;
+  a refused design system paints with the default theme and a notice.
+
+```bash
+pnpm vitest run packages/catalog/tests/validate-design-system.test.ts
+pnpm vitest run packages/player/tests/design-system.test.ts
+```
