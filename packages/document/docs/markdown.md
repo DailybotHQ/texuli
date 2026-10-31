@@ -52,6 +52,9 @@ blocks have no Markdown spelling and degrade:
 first; `embeds` is `title` (default) or `drop`; `blocks` is `text`
 (default) or `drop`. Annotations are never written.
 
+> **In development for `0.10.0`, not on npm** (Protoyard gap G112): the
+> `0.9.0` writer leaves every wrapped block out.
+
 A wrapped table is read like the DOCX and PDF writers read it
 (`wrappedTable`: `{ caption?, columns: [{ id, label }], rows: [{ [id]: cell }] }`,
 at most 16 columns and 500 rows; string, number and boolean cells). Each
@@ -63,7 +66,7 @@ a list item keeps that block's prefix on every line.
 Wrapped blocks do not round-trip: the closed subset has no table and no
 wrapped block, so `documentFromMarkdown` reads a written table back as a
 paragraph of its escaped cells, and any other wrapped block as a paragraph
-of its text. (Before `0.10.0`, every wrapped block was left out.)
+of its text.
 
 ## Design system front matter
 

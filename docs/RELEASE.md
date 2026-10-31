@@ -220,6 +220,27 @@ branch):
     and a rejection is announced (`labels.saveFailed`). Existing
     two-argument handlers keep working; both buttons keep the
     `tx-inbox__button` class.
+- **Protoyard gaps G111 and G112** (PLAN_011 T-gaps-111-112; reported
+  while adopting `@texuli/document` and `@texuli/pages` 0.9.0):
+  - **G111** (`@texuli/pages`): `PageReader`, `PageEditor`, `PagedView`
+    and `CollabEditor` take a host block renderer: a `renderBlock`
+    snippet and a `blockHost` (`PagesBlockHost`: `claim`, `component`,
+    `present`). The host paints the wrapped blocks and embeds the library
+    refuses (an unknown family or block, an embed with no payload), and
+    every node its `claim` returns `'host'` for; library blocks keep their
+    renderers otherwise, and the refused notice still shows when no host
+    paints a node. The node is a deep-frozen copy (`PagesHostNode`): host
+    code is developer-tier, the node may come from a user or an agent. In
+    the editor, host blocks are opaque rows that select, move and delete
+    from their handle. Without a host, the slot that paints them never
+    loads (it is imported with `import()`).
+  - **G112** (`@texuli/document/markdown`): `documentToMarkdown` writes a
+    wrapped data `table` as a GFM table (the caption in emphasis on the
+    line before; cells on one line with `|` and Markdown punctuation
+    escaped), and any other wrapped block as the text the DOCX and PDF
+    writers print for it; before, every wrapped block was left out. The
+    new `blocks: 'drop'` option leaves them out. Neither reads back as a
+    wrapped block (the Markdown subset has no table).
 
 ### 0.9.0
 
