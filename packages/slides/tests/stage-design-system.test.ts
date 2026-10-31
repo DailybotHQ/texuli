@@ -222,6 +222,29 @@ describe('the stage applies a deck design system', () => {
   );
 });
 
+describe('a dark-only deck design system on a light stage', () => {
+  it('paints the dark variables and says data-tx-mode="dark"', TIMEOUT, async () => {
+    const darkOnly = { ...harbor, color: { ...(harbor.color as object), modes: ['dark'] } };
+    const compiled = compileDesignSystem(darkOnly);
+    if (!compiled.ok) throw new Error('dark-only harbor compiles');
+    expect(Object.keys(compiled.vars)).toEqual(['dark']);
+    for (const props of [{}, { designSystems: { mode: 'light' } }]) {
+      const { root, onDesignSystem } = paint(deck({ inline: darkOnly }), props);
+      expect(await settled(root)).toBe('applied');
+      expect(onDesignSystem).toHaveBeenCalledWith({
+        status: 'applied',
+        id: 'harbor',
+        source: 'inline',
+      });
+      expect(root().getAttribute('data-tx-mode')).toBe('dark');
+      expect(root().style.getPropertyValue('--tx-background')).toBe(
+        compiled.vars.dark?.['--tx-background']
+      );
+      cleanup();
+    }
+  });
+});
+
 describe('the stage core reaches the theme library for a design system only through a loader it is given (G127)', () => {
   it(
     'refuses texuli:<theme> on DeckStageCore without loadLibraryBase, applies it with one, and DeckStage keeps the library default',

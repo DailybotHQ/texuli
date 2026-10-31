@@ -548,9 +548,13 @@ let systemReference = $derived(model?.designSystem);
 let systemKey = $derived(systemReference ? JSON.stringify(systemReference) : '');
 let system = $state.raw<StageSystem | undefined>();
 let systemStatus = $state<'pending' | 'applied' | 'refused' | undefined>();
-let systemMode = $derived<'light' | 'dark'>(
-  designSystems?.mode ?? (mode === 'dark' ? 'dark' : 'light')
-);
+// The mode painted: the host's, unless the design system did not compile it; then its
+// first compiled mode (what `stageSystem` paints), so `data-tx-mode` matches the variables.
+let systemMode = $derived.by<'light' | 'dark'>(() => {
+  const requested = designSystems?.mode ?? (mode === 'dark' ? 'dark' : 'light');
+  const modes = system?.modes;
+  return !modes || modes.includes(requested) ? requested : (modes[0] ?? requested);
+});
 // Component defaults for every texuli component on the slides (the `texuli/defaults` context),
 // merged over an outer provider's prop by prop; props on a block still win.
 const DEFAULTS_KEY = 'texuli.design-defaults';
@@ -588,7 +592,9 @@ $effect(() => {
         onDesignSystem?.(event);
       },
       () => {
-        if (live) systemStatus = 'refused';
+        if (!live) return;
+        system = undefined;
+        systemStatus = 'refused';
       }
     );
   return () => {

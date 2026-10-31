@@ -581,7 +581,10 @@ The stage applies it the way `@texuli/player` applies a blueprint's:
 3. **Applied on the stage root, in place of the deck theme:** the compiled
    variables for `designSystems.mode` (default: `dark` when the stage mode
    is dark, else `light`), `data-tx-ds` and the other scope attributes,
-   `data-tx-scope` and `data-tx-mode`. The deck theme (`style.theme`, a
+   `data-tx-scope` and `data-tx-mode`. A mode the design system did not
+   compile paints its first compiled mode (a dark-only design system
+   paints dark on a light stage), and `data-tx-mode` and the
+   background palette follow the mode painted. The deck theme (`style.theme`, a
    slide's `theme`) stops writing its variables while the design system
    applies, and backgrounds resolve against the design system's palette.
    Font faces register for host-resolved documents or at the `developer`

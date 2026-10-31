@@ -54,7 +54,7 @@ export interface StageDesignSystem {
   readonly id: string;
   /** The compiled modes (`light`, `dark` or both). */
   readonly modes: readonly ('light' | 'dark')[];
-  /** The safe variables of a mode (a compiled mode; another falls back to the first). */
+  /** The safe variables of a mode (a compiled mode; another paints the first compiled one). */
   vars(mode: 'light' | 'dark'): Record<string, string>;
   /** The scope attributes (escaped values only). */
   readonly attrs: Readonly<Record<string, string>>;
@@ -70,6 +70,7 @@ export type StageDesignSystemResult =
 
 function stageSystem(compiled: ApplicableDesignSystem): StageDesignSystem {
   const modes = (['light', 'dark'] as const).filter((mode) => compiled.vars[mode]);
+  // A mode the design system did not compile paints its first compiled mode.
   const vars = (mode: 'light' | 'dark') => {
     const pick = modes.includes(mode) ? mode : modes[0];
     return pick ? designSystemAppearance(compiled, { mode: pick }).vars : {};
