@@ -28,10 +28,10 @@ const formHost = createFormPlayerHost({
 
 | Export | What it does |
 | --- | --- |
-| `createFormPlayerHost(options?)` | Returns a `FormHost`: `checkForm` joins the player's `validateDraft`, `validators` lists the registered names, and `present` validates the schema again at the player's tier and mounts `SchemaForm` (loaded on first use) into the player's element. A schema that does not validate paints nothing; the cleanup unmounts the form or cancels a mount still loading |
-| `checkFormDraft(schema, tier, validators?)` | The draft check (`validateFormSchema` at the tier): `{ ok, issues }`. Also exported by `@texuli/forms/model` for hosts that only validate (the agent service) |
-| `FormHost` | `{ checkForm, validators, present(request) }`, structurally the player's `FormPlayerHost` |
-| `FormHostOptions` | `validators` (host validators by name, sync or async) and `labels` (`SchemaForm` label overrides) |
+| `createFormPlayerHost(options?)` | Returns a `FormHost`: `checkForm` joins the player's `validateDraft`, `validators` lists the registered names, `customKinds` the custom field kinds it paints, and `present` validates the schema again at the player's tier and mounts `SchemaForm` (loaded on first use) into the player's element. A schema that does not validate paints nothing; the cleanup unmounts the form or cancels a mount still loading |
+| `checkFormDraft(schema, tier, validators?, kinds?)` | The draft check (`validateFormSchema` at the tier): `{ ok, issues }`. Also exported by `@texuli/forms/model` for hosts that only validate (the agent service) |
+| `FormHost` | `{ checkForm, validators, customKinds, present(request) }`, structurally the player's `FormPlayerHost` |
+| `FormHostOptions` | `validators` (host validators by name, sync or async), `labels` (`SchemaForm` label overrides), `customFields` (custom field painters by kind: `{ component, validate? }`, G113) and `credentials` (allow password and otp fields, G117; off by default) |
 | `FormHostRequest` | What the player hands `present`: `schema`, `action`, `formLabel`, `tier`, the live `active`, `labels` and `target`, and `submit(values)` |
 | `FormHostSubmitResult` | `{ ok: true }` or `{ ok: false, message }`: what `submit` resolves to after the host confirmed or refused the action |
 | `FormDraftCheck` | The type of `checkForm` |
@@ -42,6 +42,13 @@ const formHost = createFormPlayerHost({
 - **Validator names are closed.** Only the names in `options.validators`
   are allowed; with none registered, a field that names a validator is
   refused before anything paints.
+- **Custom kinds are closed** (G113). A draft may declare a `custom` field
+  only of a kind in `options.customFields` (refused with `kind` before
+  anything paints, even when a caller passes more kinds); the field's
+  component receives the `SchemaFormCustomField` context as `field`, and
+  its `validate` runs with the form's validation.
+- **Credentials are opt-in** (G117). `password` and `otp` fields are
+  refused (`credential`) unless `options.credentials` is `true`.
 - **The tier is the host's.** `present` validates at the player's tier,
   never at one the draft claims.
 - **Submit goes through the player.** The form's submit calls
@@ -49,5 +56,6 @@ const formHost = createFormPlayerHost({
   (`onAction`) with the visible, enabled answers; a refusal shows in the
   form and keeps the answers.
 
-Tests: `packages/forms/tests/host.test.ts` and
-`packages/player/tests/schema-form.test.ts`.
+Tests: `packages/forms/tests/host.test.ts`,
+`packages/player/tests/schema-form.test.ts` and
+`packages/player/tests/schema-form-custom.test.ts`.

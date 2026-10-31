@@ -63,6 +63,16 @@ export interface FieldSample {
   readonly field: FormField;
 }
 
+/** The custom field kind the gallery paints itself (a people picker). */
+export const GALLERY_KIND = 'person';
+
+/**
+ * How the gallery validates its schema: at the default (untrusted) tier,
+ * opting in to credential fields and to the custom kind it paints, as a host
+ * would for agent output.
+ */
+export const GALLERY_OPTIONS = { credentials: true, kinds: [GALLERY_KIND] } as const;
+
 /** One sample field per type. Keyed by `FormFieldType`: the compiler checks it is exhaustive. */
 export const FIELD_SAMPLES: Readonly<Record<FormFieldType, FieldSample>> = {
   text: {
@@ -108,7 +118,31 @@ export const FIELD_SAMPLES: Readonly<Record<FormFieldType, FieldSample>> = {
       type: 'url',
       label: 'Website',
       placeholder: 'https://example.com',
-      description: 'https only; the URL policy checks it.',
+      description: 'https and http here (protocols); the URL policy checks both.',
+      protocols: ['http', 'https'],
+    },
+  },
+  password: {
+    group: 'text',
+    control: 'Input (password) with a reveal toggle',
+    field: {
+      name: 'deployPassword',
+      type: 'password',
+      label: 'Deploy password',
+      autocomplete: 'new-password',
+      minLength: 12,
+      description: 'At least 12 characters. Never saved in drafts; masked in summaries.',
+    },
+  },
+  otp: {
+    group: 'text',
+    control: 'Input (one-time code)',
+    field: {
+      name: 'verification',
+      type: 'otp',
+      label: 'Verification code',
+      length: 6,
+      description: 'Six digits; one input with autocomplete="one-time-code".',
     },
   },
   tags: {
@@ -155,6 +189,23 @@ export const FIELD_SAMPLES: Readonly<Record<FormFieldType, FieldSample>> = {
     control: 'Switch',
     field: { name: 'public', type: 'switch', label: 'Public project' },
   },
+  color: {
+    group: 'choice',
+    control: 'ColorPicker',
+    field: { name: 'accent', type: 'color', label: 'Accent color' },
+  },
+  custom: {
+    group: 'choice',
+    control: 'Painted by the page (a field snippet)',
+    field: {
+      name: 'owner',
+      type: 'custom',
+      kind: GALLERY_KIND,
+      label: 'Owner',
+      config: { directory: 'team' },
+      description: 'A host-painted field: validated, summarized and submitted with the rest.',
+    },
+  },
   slider: {
     group: 'choice',
     control: 'Slider',
@@ -169,6 +220,11 @@ export const FIELD_SAMPLES: Readonly<Record<FormFieldType, FieldSample>> = {
     group: 'time',
     control: 'TimeField',
     field: { name: 'standup', type: 'time', label: 'Stand-up time' },
+  },
+  datetime: {
+    group: 'time',
+    control: 'DatePicker + TimeField',
+    field: { name: 'kickoff', type: 'datetime', label: 'Kickoff', min: '2026-01-01T09:00' },
   },
   file: {
     group: 'time',

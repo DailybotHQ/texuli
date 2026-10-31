@@ -76,7 +76,9 @@ describe('the schema validator', () => {
       [{ ...schemaWith(field('a')), script: 'x' }, 'unknown-member', '$.script'],
       [schemaWith(field('a', { pattern: '^(a+)+$' })), 'unknown-member', '$.fields[0].pattern'],
       [schemaWith(field('a', { format: '^\\d+$' })), 'type', '$.fields[0].format'],
-      [schemaWith(field('a', { type: 'password' })), 'type', '$.fields[0].type'],
+      [schemaWith(field('a', { type: 'html' })), 'type', '$.fields[0].type'],
+      // A credential type is known, but agent output may not ask for one (G117).
+      [schemaWith(field('a', { type: 'password' })), 'credential', '$.fields[0].type'],
       [schemaWith(field('A b')), 'name', '$.fields[0].name'],
       [schemaWith(field('a'), field('a')), 'duplicate', '$.fields[1].name'],
       [schemaWith(field('a', { min: 3 })), 'not-applicable', '$.fields[0].min'],

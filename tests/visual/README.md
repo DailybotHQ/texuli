@@ -86,6 +86,9 @@ registered example gets its own tests (one per color scheme) with no change
 here. Its loaders stay lazy, so the spec never imports Svelte. The fixture app
 renders an example at `/?fixture=<id>` inside `[data-example-host="<id>"]`. A
 capture waits until the host no longer shows its "Loading example…" status and
-has no load-error alert. The app's own `smoke` page is captured too, as a
+has no load-error alert, and until nothing inside it carries
+`data-tx-pending` (the generic "still loading a part" marker: a `SchemaForm`
+and the placeholders of its per-type controls set it until those controls
+arrive). The app's own `smoke` page is captured too, as a
 canary. A new example has no baseline yet: run `pnpm visual:update`, review
 its PNGs and commit them with the example.

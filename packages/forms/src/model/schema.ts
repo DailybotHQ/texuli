@@ -11,10 +11,13 @@ import {
   FORM_FIELD_TYPES,
   FORM_FORMATS,
   FORM_ID,
+  FORM_KIND,
   FORM_LIMITS,
   FORM_NAME,
+  FORM_PASSWORD_AUTOCOMPLETE,
   FORM_RESERVED_NAMES,
   FORM_RULE_NAMES,
+  FORM_URL_PROTOCOLS,
   FORM_VALIDATOR_NAME,
   type FormField,
   type FormFieldType,
@@ -32,6 +35,8 @@ import {
   hasOptions,
   isListType,
   isNumericType,
+  isoDateTime,
+  isSecretType,
   isTextType,
 } from './values.ts';
 
@@ -101,6 +106,18 @@ export interface FormSchemaOptions {
   readonly tier?: HrefTrust;
   /** When given, `validator` names must be in this list (the validators the host registered). */
   readonly validators?: readonly string[];
+  /**
+   * The custom field kinds the host paints. When given, a `custom` field's
+   * `kind` must be one of them; without it the `developer` tier accepts any
+   * kind and the `untrusted` tier refuses every custom field (`kind`).
+   */
+  readonly kinds?: readonly string[];
+  /**
+   * Whether `password` and `otp` fields are allowed. Default: yes at the
+   * `developer` tier, no at the `untrusted` tier (`credential`), so agent
+   * output asks for a credential only where the host opted in.
+   */
+  readonly credentials?: boolean;
 }
 
 export type FormSchemaResult =
@@ -144,6 +161,11 @@ const FIELD_MEMBERS = [
   'maxSize',
   'autocomplete',
   'link',
+  'kind',
+  'config',
+  'length',
+  'protocols',
+  'clearable',
 ];
 
 /** Which field types each constraint applies to. */
@@ -151,18 +173,24 @@ const APPLIES: Readonly<Record<string, (type: FormFieldType) => boolean>> = {
   options: hasOptions,
   minLength: (t) => isTextType(t) || t === 'tags',
   maxLength: (t) => isTextType(t) || t === 'tags',
-  min: (t) => isNumericType(t) || t === 'date' || t === 'time',
-  max: (t) => isNumericType(t) || t === 'date' || t === 'time',
+  min: (t) => isNumericType(t) || t === 'date' || t === 'time' || t === 'datetime',
+  max: (t) => isNumericType(t) || t === 'date' || t === 'time' || t === 'datetime',
   step: isNumericType,
   minItems: (t) => isListType(t) || t === 'file',
   maxItems: (t) => isListType(t) || t === 'file',
   format: (t) => t === 'text' || t === 'textarea' || t === 'tags',
-  placeholder: (t) => isTextType(t) || t === 'number' || t === 'select' || t === 'tags',
+  placeholder: (t) =>
+    isTextType(t) || t === 'number' || t === 'select' || t === 'tags' || t === 'otp',
   rows: (t) => t === 'textarea',
   accept: (t) => t === 'file',
   maxSize: (t) => t === 'file',
   autocomplete: (t) => isTextType(t) || t === 'number' || t === 'date' || t === 'select',
-  default: (t) => t !== 'file',
+  default: (t) => t !== 'file' && !isSecretType(t),
+  kind: (t) => t === 'custom',
+  config: (t) => t === 'custom',
+  length: (t) => t === 'otp',
+  protocols: (t) => t === 'url',
+  clearable: (t) => t === 'select',
 };
 
 const ACCEPT = /^(?:[a-z]+\/(?:\*|[a-z0-9][a-z0-9.+-]{0,63})|\.[a-z0-9]{1,10})$/;
@@ -179,6 +207,8 @@ export function validateFormSchema(
 ): FormSchemaResult {
   const tier: HrefTrust = options.tier ?? 'untrusted';
   const allowedValidators = options.validators ? new Set(options.validators) : null;
+  const allowedKinds = options.kinds ? new Set(options.kinds) : null;
+  const credentials = options.credentials ?? tier === 'developer';
   const issues: FormSchemaIssue[] = [];
   const report = (code: FormSchemaIssueCode, path: string, message: string) => {
     if (issues.length < MAX_ISSUES) issues.push(Object.freeze({ code, path, message }));
@@ -360,6 +390,9 @@ export function validateFormSchema(
     } else if (type === 'time') {
       if (typeof value === 'string' && ISO_TIME.test(value)) return value;
       report('range', path, 'A time written HH:MM (24-hour).');
+    } else if (type === 'datetime') {
+      if (isoDateTime(value) !== undefined) return value as string;
+      report('range', path, 'A local date and time written YYYY-MM-DDTHH:MM.');
     }
     return undefined;
   };
@@ -402,6 +435,13 @@ export function validateFormSchema(
           `"${member}" does not apply to a ${t} field.`
         );
       }
+    }
+    if (isSecretType(t) && !credentials) {
+      report(
+        'credential',
+        `${path}.type`,
+        `A ${t} field asks for a credential; this host does not allow credential fields here.`
+      );
     }
     const out: Record<string, unknown> = { name, type: t };
     const label = text(raw.label, `${path}.label`, FORM_LIMITS.label, true);
@@ -519,12 +559,79 @@ export function validateFormSchema(
       if (maxSize !== undefined) out.maxSize = maxSize;
     }
     if (APPLIES.autocomplete?.(t) && raw.autocomplete !== undefined) {
-      if (
-        typeof raw.autocomplete !== 'string' ||
-        !(FORM_AUTOCOMPLETE as readonly string[]).includes(raw.autocomplete)
-      ) {
-        report('type', `${path}.autocomplete`, `One of ${FORM_AUTOCOMPLETE.join(', ')}.`);
+      const tokens: readonly string[] =
+        t === 'password' ? FORM_PASSWORD_AUTOCOMPLETE : FORM_AUTOCOMPLETE;
+      if (typeof raw.autocomplete !== 'string' || !tokens.includes(raw.autocomplete)) {
+        report('type', `${path}.autocomplete`, `One of ${tokens.join(', ')}.`);
       } else out.autocomplete = raw.autocomplete;
+    }
+    if (t === 'custom') {
+      if (raw.kind === undefined)
+        report('missing', `${path}.kind`, 'A custom field names its kind.');
+      else if (typeof raw.kind !== 'string' || !FORM_KIND.test(raw.kind)) {
+        report(
+          'name',
+          `${path}.kind`,
+          'A kind is a lowercase letter, then letters, digits, _ or -.'
+        );
+      } else if (allowedKinds ? !allowedKinds.has(raw.kind) : tier !== 'developer') {
+        report(
+          'kind',
+          `${path}.kind`,
+          `The host paints no custom field of kind "${raw.kind}"; use a registered kind or a built-in type.`
+        );
+      } else out.kind = raw.kind;
+      if (raw.config !== undefined) {
+        if (!isRecord(raw.config)) report('shape', `${path}.config`, 'An object of settings.');
+        else {
+          const entries = Object.entries(raw.config);
+          const config: Record<string, string | number | boolean> = {};
+          if (entries.length > FORM_LIMITS.config) {
+            report('too-many', `${path}.config`, `At most ${FORM_LIMITS.config} settings.`);
+          } else if (
+            !entries.every(([key]) => FORM_NAME.test(key) && !FORM_RESERVED_NAMES.has(key))
+          ) {
+            report('name', `${path}.config`, 'Setting names are written like field names.');
+          } else {
+            for (const [key, value] of entries) {
+              const at = `${path}.config.${key}`;
+              if (typeof value === 'string') {
+                const checked = text(value, at, FORM_LIMITS.short, false);
+                if (checked !== undefined) config[key] = checked;
+              } else if (
+                typeof value === 'boolean' ||
+                (typeof value === 'number' && Number.isFinite(value))
+              ) {
+                config[key] = value;
+              } else report('shape', at, 'A setting is a string, a number or a boolean.');
+            }
+            out.config = Object.freeze(config);
+          }
+        }
+      }
+    }
+    if (t === 'otp') {
+      const length = integer(raw.length, `${path}.length`, FORM_LIMITS.otpMin, FORM_LIMITS.otpMax);
+      if (length !== undefined) out.length = length;
+    }
+    if (t === 'url' && raw.protocols !== undefined) {
+      if (
+        !Array.isArray(raw.protocols) ||
+        raw.protocols.length === 0 ||
+        raw.protocols.length > FORM_URL_PROTOCOLS.length
+      ) {
+        report('shape', `${path}.protocols`, 'A list of http and/or https.');
+      } else if (
+        !raw.protocols.every((item) => (FORM_URL_PROTOCOLS as readonly unknown[]).includes(item)) ||
+        new Set(raw.protocols).size !== raw.protocols.length
+      ) {
+        report('type', `${path}.protocols`, `Each of ${FORM_URL_PROTOCOLS.join(', ')}, once.`);
+      } else out.protocols = Object.freeze([...(raw.protocols as string[])]);
+    }
+    if (t === 'select' && raw.clearable !== undefined) {
+      if (typeof raw.clearable !== 'boolean')
+        report('shape', `${path}.clearable`, 'true or false.');
+      else out.clearable = raw.clearable;
     }
     if (raw.link !== undefined) {
       if (!isRecord(raw.link)) report('shape', `${path}.link`, 'A link is { label, href }.');
@@ -856,13 +963,20 @@ function collectNames(input: unknown): ReadonlySet<string> {
 /**
  * The `validateDraft` adapter (`checkForm` in `@texuli/catalog/validate`,
  * spec 0.8.0): validates a `schema-form` node's schema at the draft's tier
- * and, when given, against the validator names the host registered.
+ * and, when given, against the validator names and the custom field kinds
+ * the host registered (at the `untrusted` tier, no kinds means no custom
+ * fields, and password and otp fields are refused).
  */
 export function checkFormDraft(
   schema: unknown,
   tier: HrefTrust,
-  validators?: readonly string[]
+  validators?: readonly string[],
+  kinds?: readonly string[]
 ): { ok: boolean; issues: readonly FormSchemaIssue[] } {
-  const result = validateFormSchema(schema, { tier, ...(validators ? { validators } : {}) });
+  const result = validateFormSchema(schema, {
+    tier,
+    ...(validators ? { validators } : {}),
+    ...(kinds ? { kinds } : {}),
+  });
   return { ok: result.ok, issues: result.issues };
 }

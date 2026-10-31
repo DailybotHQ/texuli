@@ -53,7 +53,7 @@ test('every field type and format, live, axe-clean in light and dark', async ({ 
     'Forms as data, painted accessibly'
   );
   await expect(page.getByText('@texuli/forms · in development · on npm from 0.8.0')).toBeVisible();
-  await expect(page.locator('[data-forms-types] tbody tr')).toHaveCount(15);
+  await expect(page.locator('[data-forms-types] tbody tr')).toHaveCount(20);
 
   await hydrated(page, '[data-forms-gallery]');
   const gallery = page.locator('[data-forms-gallery]');
@@ -233,4 +233,108 @@ test('at 360 px nothing overflows', async ({ page }) => {
     await hydrated(page, selector);
   }
   expect(await polishProblems(page)).toEqual([]);
+});
+
+/** The lazy control chunks SchemaForm loads per field type (G119), and the step navigation. */
+const LAZY_CHUNK =
+  /\/_astro\/(?:Date|DateTime|Time|Slider|Tags|File|Color|Radio|Progress)Control\.[\w-]+\.js$/;
+
+interface Slot {
+  readonly field: string;
+  readonly type: string;
+  /** The field box (label, control, description). */
+  readonly field_h: number;
+  /** The control's own box: the placeholder before, the mounted control after. */
+  readonly w: number;
+  readonly h: number;
+}
+
+/** Each lazy field of a region: its box and the box in its control's slot. */
+async function slots(page: Page, region: string, mark: boolean): Promise<Slot[]> {
+  return page.locator(region).evaluate((root, marking) => {
+    const out: Slot[] = [];
+    if (marking) {
+      for (const placeholder of root.querySelectorAll<HTMLElement>(
+        '.tx-forms__control-loading, .tx-forms__progress-loading'
+      )) {
+        const parent = placeholder.parentElement as HTMLElement;
+        parent.dataset.clsSlot = String([...parent.children].indexOf(placeholder));
+      }
+    }
+    for (const parent of root.querySelectorAll<HTMLElement>('[data-cls-slot]')) {
+      const control = parent.children[Number(parent.dataset.clsSlot)] as HTMLElement;
+      // The step navigation has no field around it: its own box stands in.
+      const field = parent.closest<HTMLElement>('[data-tx-forms-field]') ?? control;
+      const box = control.getBoundingClientRect();
+      out.push({
+        field: field.dataset.txFormsField ?? 'progress',
+        type: field.dataset.type ?? 'progress',
+        field_h: Math.round(field.getBoundingClientRect().height),
+        w: Math.round(box.width),
+        h: Math.round(box.height),
+      });
+    }
+    return out;
+  }, mark);
+}
+
+/** Where the region's submit button sits, relative to the region. */
+async function submitTop(page: Page, region: string): Promise<number> {
+  return page.locator(region).evaluate((root) => {
+    const button = root.querySelector('button[type="submit"]') as HTMLElement;
+    return Math.round(button.getBoundingClientRect().top - root.getBoundingClientRect().top);
+  });
+}
+
+test('per-type controls replace placeholders of the same size: no layout shift (G119)', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  // Hold every lazy control chunk until the placeholders are measured.
+  let release: () => void = () => {};
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route(LAZY_CHUNK, async (route) => {
+    await gate;
+    await route.continue();
+  });
+  await open(page);
+  const regions = ['[data-forms-gallery]', '[data-forms-flow]'];
+  const before = new Map<string, { slots: Slot[]; submit: number }>();
+  for (const region of regions) {
+    await hydrated(page, region);
+    await expect(page.locator(`${region} form[data-tx-pending]`)).toHaveCount(1);
+    before.set(region, {
+      slots: await slots(page, region, true),
+      submit: await submitTop(page, region),
+    });
+  }
+  const gallery = before.get('[data-forms-gallery]')?.slots.map((slot) => slot.type) ?? [];
+  // Every lazy type is measured (the flow adds its step navigation).
+  expect([...new Set(gallery)].sort()).toEqual(
+    ['color', 'date', 'datetime', 'file', 'radio', 'slider', 'tags', 'time'].sort()
+  );
+  release();
+  for (const region of regions) {
+    await expect(page.locator(`${region} [data-tx-pending]`)).toHaveCount(0, { timeout: 30_000 });
+    const after = await slots(page, region, false);
+    const was = before.get(region);
+    const rows = (was?.slots ?? []).map((slot, index) => ({ before: slot, after: after[index] }));
+    console.info(region, JSON.stringify(rows));
+    for (const { before: placeholder, after: control } of rows) {
+      expect(control?.h, `${region} ${placeholder.field} block size`).toBeCloseTo(
+        placeholder.h,
+        -0.5
+      );
+      expect(control?.field_h, `${region} ${placeholder.field} field`).toBeCloseTo(
+        placeholder.field_h,
+        -0.5
+      );
+    }
+    expect(await submitTop(page, region), `${region} submit moved`).toBeCloseTo(
+      was?.submit ?? 0,
+      -0.5
+    );
+  }
 });

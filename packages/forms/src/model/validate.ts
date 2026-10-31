@@ -16,6 +16,7 @@ import {
   isEmptyValue,
   isListType,
   isNumericType,
+  isoDateTime,
   isTextType,
   ownValue,
 } from './values.ts';
@@ -45,6 +46,7 @@ export const DEFAULT_FORM_MESSAGES = Object.freeze({
   invalid: 'Enter a valid value.',
   validatorMissing: 'This answer cannot be checked right now.',
   validatorFailed: 'This answer could not be checked. Try again.',
+  stepFailed: 'This step could not be checked. Try again.',
   minDate: 'Choose {min} or later.',
   maxDate: 'Choose {max} or earlier.',
 });
@@ -128,11 +130,39 @@ export function checkFieldValue(
     if (field.maxLength !== undefined && length > field.maxLength)
       return say('maxLength', { max: field.maxLength });
     const format = type === 'email' ? 'email' : type === 'url' ? 'url' : field.format;
-    if (format && !matchesFormat(format, value.trim())) {
-      return say('format', { format: FORMAT_NAMES[format] ?? format.replace(/-/g, ' ') });
+    const protocols = type === 'url' ? (field.protocols ?? ['https']) : undefined;
+    if (format && !matchesFormat(format, value.trim(), protocols ? { protocols } : {})) {
+      const name =
+        format === 'url' && protocols
+          ? protocols.length > 1
+            ? 'web address (http:// or https://)'
+            : `${protocols[0]}:// web address`
+          : (FORMAT_NAMES[format] ?? format.replace(/-/g, ' '));
+      return say('format', { format: name });
     }
     return null;
   }
+  if (type === 'otp') {
+    const length = field.length ?? 6;
+    if (typeof value !== 'string' || value.length !== length || !/^\d+$/.test(value))
+      return say('format', { format: `${length}-digit code` });
+    return null;
+  }
+  if (type === 'color') {
+    return typeof value === 'string' && /^#(?:[0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(value)
+      ? null
+      : say('invalid');
+  }
+  if (type === 'datetime') {
+    if (isoDateTime(value) === undefined) return say('invalid');
+    const text = value as string;
+    if (typeof field.min === 'string' && text < field.min)
+      return say('minDate', { min: field.min });
+    if (typeof field.max === 'string' && text > field.max)
+      return say('maxDate', { max: field.max });
+    return null;
+  }
+  if (type === 'custom') return null;
   if (isNumericType(type)) {
     if (typeof value !== 'number') return say('invalid');
     if (typeof field.min === 'number' && value < field.min) return say('min', { min: field.min });
