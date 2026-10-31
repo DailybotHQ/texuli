@@ -3,7 +3,12 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/sv
 import { tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SchemaForm } from '../src/index.ts';
-import { createFormController, createMemoryDrafts, FORM_FIELD_TYPES } from '../src/model/index.ts';
+import {
+  createFormController,
+  createMemoryDrafts,
+  FORM_FIELD_TYPES,
+  validateFormSchema,
+} from '../src/model/index.ts';
 import { compiled, REGISTRATION } from './fixtures.ts';
 import MultiFormHarness from './MultiFormHarness.svelte';
 
@@ -29,10 +34,11 @@ const RULES = [
   'link-name',
 ];
 
-/** Every field type on one page. */
+/** Every built-in field type on one page (custom fields are host-painted: view-gaps.test.ts). */
+const BUILT_IN_TYPES = FORM_FIELD_TYPES.filter((type) => type !== 'custom');
 const EVERY_TYPE = {
   title: 'Every field',
-  fields: FORM_FIELD_TYPES.map((type) => ({
+  fields: BUILT_IN_TYPES.map((type) => ({
     name: `f${type.replace(/[^a-z]/g, '')}`,
     type,
     label: `Field ${type}`,
@@ -61,10 +67,15 @@ const ADULT = {
 
 describe('SchemaForm', () => {
   it('paints every field type with a texuli control named by its label, with no name or ARIA violations (axe)', async () => {
-    const { container } = render(SchemaForm, { props: { form: compiled(EVERY_TYPE), id: 'all' } });
+    // Credential fields are app-authored here (the developer tier).
+    const every = validateFormSchema(EVERY_TYPE, { tier: 'developer' });
+    if (!every.ok) throw new Error(JSON.stringify(every.issues));
+    const { container } = render(SchemaForm, { props: { form: every.form, id: 'all' } });
     const form = screen.getByRole('form', { name: 'Every field' });
     expect(form.getAttribute('novalidate')).not.toBeNull();
-    for (const type of FORM_FIELD_TYPES) {
+    // Per-type controls load on first use (G119); wait until none is a placeholder.
+    await waitFor(() => expect(container.querySelector('.tx-forms__control-loading')).toBeNull());
+    for (const type of BUILT_IN_TYPES) {
       const root = container.querySelector(`[data-type="${type}"]`);
       expect(root, type).not.toBeNull();
     }
@@ -119,7 +130,7 @@ describe('SchemaForm', () => {
     await waitFor(() => expect(document.activeElement).toBe(heading));
     expect(screen.getByRole('status').textContent).toBe('Step 2 of 2: Attendance');
     expect(screen.getByRole('group', { name: 'When' })).toBeTruthy();
-    await fireEvent.click(screen.getByRole('radio', { name: 'Design' }));
+    await fireEvent.click(await screen.findByRole('radio', { name: 'Design' }));
     // Choosing a track reveals the third step.
     expect(screen.getByRole('button', { name: 'Next' })).toBeTruthy();
     await fireEvent.click(screen.getByRole('button', { name: 'Back' }));
@@ -149,7 +160,8 @@ describe('SchemaForm', () => {
       target: { value: 'ada@example.com' },
     });
     const file = new File(['png'], 'shot.png', { type: 'image/png' });
-    await fireEvent.change(screen.getByLabelText('Screenshot'), { target: { files: [file] } });
+    const upload = await screen.findByLabelText('Screenshot', { selector: 'input' });
+    await fireEvent.change(upload, { target: { files: [file] } });
     await fireEvent.click(screen.getByRole('button', { name: 'Send feedback' }));
     await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce());
     const [submission] = onSubmit.mock.calls[0] as unknown as [
@@ -284,7 +296,7 @@ describe('SchemaForm', () => {
         second: compiled({ ...REGISTRATION, title: 'Volunteer signup' }),
       },
     });
-    const navs = screen.getAllByRole('navigation');
+    const navs = await screen.findAllByRole('navigation');
     expect(navs.map((nav) => nav.getAttribute('aria-label'))).toEqual([
       'Event registration progress',
       'Volunteer signup progress',

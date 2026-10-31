@@ -262,6 +262,26 @@ const SITE_PAGES: readonly SearchEntry[] = [
     keywords: ['slides', 'deck', 'presentation', 'markdown', 'json', 'presenter', 'pptx'],
   },
   {
+    id: 'page-design-systems',
+    title: 'Design systems',
+    description:
+      'One JSON document per brand: three example brands on a dashboard, slide, document and email, their conformance report, the studio, texuli ds and the MCP.',
+    href: '/design-systems/',
+    kind: 'page',
+    keywords: [
+      'design system',
+      'brand',
+      'tokens',
+      'conformance',
+      'contrast',
+      'texuli ds',
+      'ds check',
+      'quillmark',
+      'ledgerline',
+      'tumbletown',
+    ],
+  },
+  {
     id: 'page-theme-studio',
     title: 'Design system studio',
     description:

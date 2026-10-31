@@ -247,7 +247,8 @@ additions of the wave are described with their tasks.)
 - **Forms.** The agent-emittable `schema-form` catalog id takes a required
   `schema` prop whose property schema is `{ "$ref": "#/$defs/formSchema" }`
   (`SPEC_PROP_REFS` gains `formSchema`), with `$defs.formField` (15 closed
-  types; named `format`s; `validator` names; no `pattern` member),
+  types, 20 from 0.10.0; named `format`s; `validator` names; no `pattern`
+  member),
   `formOption`, `formSection`, `formStep`, `formWhen` (`show`, `require`,
   `enable` expressions), `formVisibility`, `formLink`, `formMessages` and
   `formRule` (cross-field expressions). Members per type, ranges, unique
@@ -307,12 +308,21 @@ runs through the host's `checkDesignSystem`, as documents run through
 hold the contract on both targets; the Kotlin twin decodes both forms and
 reads an inline document with `DesignSystem.decode`. Spec 0.10.0
 is in development on `release/0.10.0` (digest
-`6c0ce9cec3dfc318928e739b34570ede57670a628908aaf57b1a0bb2294be5bf`); it ships only with
+`36722679ebb84e38e86632789af1bda5dfcc1eb6db1b6712cda1b4f56ad1e1c7`); it ships only with
 `@texuli/spec@0.10.0`. The same version also carries an additive catalog
 projection refresh (T-gaps-100-104): `data-filter-builder` gains the
 optional `issues` prop (`{ path, message }` per condition) and
-`fields[].optionLabels` (enum value to menu text); and (T-gaps-107-110)
-the web-only `command-palette` lists the `searchLabel` prop.
+`fields[].optionLabels` (enum value to menu text), and an additive forms
+field vocabulary (T-gaps-113-121): `$defs.formField` gains the types
+`password` and `otp` (credential fields; the forms validator refuses them in
+agent output unless the host allows credentials), `color`, `datetime`
+(`YYYY-MM-DDTHH:MM`) and `custom` (painted by the host; agent output may name
+only a `kind` the host registered), the optional members `kind`, `config`
+(scalar settings for the host painter), `length` (otp digits, 4 to 12),
+`protocols` (`http` and/or `https` for url fields) and `clearable` (select),
+and the `current-password` and `new-password` autocomplete tokens, which
+apply to password fields only; and (T-gaps-107-110) the web-only
+`command-palette` lists the `searchLabel` prop.
 
 ## Named slots and conditions
 

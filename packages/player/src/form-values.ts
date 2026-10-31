@@ -3,7 +3,8 @@
  * carry scalars, so scalars pass as they are, a list answer (multiselect,
  * tags) travels as JSON array text, and a file answer as the JSON list of
  * its file names: the player has no upload channel, uploads are the
- * host's. Empty (`null`) answers are left out.
+ * host's. A custom field's object or mixed-list answer travels as its JSON
+ * text. Empty (`null`) answers are left out.
  */
 export function formActionValues(
   values: Readonly<Record<string, unknown>>
@@ -11,7 +12,19 @@ export function formActionValues(
   const out: Record<string, string | number | boolean> = {};
   for (const [name, value] of Object.entries(values)) {
     let entry: string | number | boolean | undefined;
-    if (Array.isArray(value)) {
+    const listOfNames =
+      Array.isArray(value) &&
+      value.every(
+        (item: unknown) =>
+          typeof item === 'string' ||
+          (typeof item === 'object' &&
+            item !== null &&
+            typeof (item as { name?: unknown }).name === 'string')
+      );
+    if (Array.isArray(value) && !listOfNames) {
+      // A custom field's list answer travels as its JSON text.
+      entry = safeJson(value);
+    } else if (Array.isArray(value)) {
       entry = JSON.stringify(
         value.map((item: unknown) =>
           typeof item === 'string'
@@ -27,6 +40,9 @@ export function formActionValues(
       entry = value;
     } else if (typeof value === 'number' && Number.isFinite(value)) {
       entry = value;
+    } else if (typeof value === 'object' && value !== null) {
+      // A custom field's object answer travels as its JSON text.
+      entry = safeJson(value);
     }
     if (entry !== undefined) {
       Object.defineProperty(out, name, {
@@ -38,4 +54,12 @@ export function formActionValues(
     }
   }
   return out;
+}
+
+function safeJson(value: unknown): string | undefined {
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return undefined;
+  }
 }

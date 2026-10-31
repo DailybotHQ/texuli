@@ -97,6 +97,8 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     id: 'themes',
     label: 'Themes',
     links: [
+      // PLAN_011 T-site-0100: the design systems hub (in development for 0.10.0).
+      { href: '/design-systems/', label: 'Design systems' },
       { href: '/gallery-themes/', label: 'Theme gallery' },
       { href: '/theme-switcher/', label: 'Switcher' },
       { href: '/theme-studio/', label: 'Studio' },

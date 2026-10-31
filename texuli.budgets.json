@@ -75,22 +75,27 @@
       "note": "PLAN_010 T-canvas (consented plan): new row at measured + 4%: the read-only viewer with its routing and paint geometry; no validator, no editor. Measured 9,264 B (CSS 676 B)."
     },
     "@texuli/forms": {
-      "gzip": 83008,
-      "cssGzip": 9792,
-      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the root carries SchemaForm with every texuli field control it paints (input, select, date and time, slider, choice, tags, file upload, stepper), the model and the controller; consumers that only validate import ./model. Measured 79,802 B (CSS 8,472 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 8832 B before adoption): cssGzip 10368 -> 9792 B, measured + 4% (measured 9,403 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook."
+      "gzip": 58304,
+      "cssGzip": 5504,
+      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the root carries SchemaForm with every texuli field control it paints (input, select, date and time, slider, choice, tags, file upload, stepper), the model and the controller; consumers that only validate import ./model. Measured 79,802 B (CSS 8,472 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 8832 B before adoption): cssGzip 10368 -> 9792 B, measured + 4% (measured 9,403 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook. PLAN_011 T-gaps-113-121 (G119): tightened 83008 -> 58304 B and cssGzip 9792 -> 5504 B, measured + 4% (measured 56,004 B, CSS 5,267 B): the date, time, datetime, slider, tags, file, color and radio controls and the multi-step Stepper load per field type (lazy 49,503 B, CSS 5,382 B), so the root carries only the text, select and choice controls."
+    },
+    "@texuli/forms/controls": {
+      "gzip": 52800,
+      "cssGzip": 6464,
+      "note": "PLAN_011 T-gaps-113-121 (G119): new row at measured + 4% (measured 50,742 B, CSS 6,157 B): the static control registry SCHEMA_FORM_CONTROLS for server rendering, every per-type control (DatePicker, TimeField, Slider, TagsInput, FileUpload, ColorPicker, RadioGroup) and the Stepper with their CSS, imported on purpose by SSR hosts."
     },
     "@texuli/forms/model": {
-      "gzip": 19392,
-      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the framework-free runtime: schema validator, named formats, conditional logic on @texuli/core/expression, value validation, the controller and drafts. Measured 18,614 B."
+      "gzip": 22144,
+      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the framework-free runtime: schema validator, named formats, conditional logic on @texuli/core/expression, value validation, the controller and drafts. Measured 18,614 B. PLAN_011 T-gaps-113-121 (G113, G116, G117, G120, G121): 19392 -> 22144 B, measured + 4% (measured 21,237 B; 18,760 B before): the password, otp, color, datetime and custom types (bounded JSON values for custom), host kinds and credential opt-in in the schema validator, url protocols, custom validators, form-level disabled and read-only, the onStep hook, and formatFormValue / formValuesToMarkdown."
     },
     "@texuli/forms/host": {
-      "gzip": 13248,
-      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the player formHost adapter carries the form schema validator (checkForm runs inside validation); SchemaForm loads lazily on the first present. Measured 12,720 B."
+      "gzip": 14912,
+      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the player formHost adapter carries the form schema validator (checkForm runs inside validation); SchemaForm loads lazily on the first present. Measured 12,720 B. PLAN_011 T-gaps-113-121: 13248 -> 14912 B, measured + 4% (measured 14,292 B; 12,869 B before): the schema validator it carries grew with the 0.10.0 field types (see @texuli/forms/model), plus the host's custom kinds and credentials options."
     },
     "@texuli/forms/styles.css": {
       "gzip": 64,
-      "cssGzip": 832,
-      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4% for the stylesheet only; measured 0 B, CSS 762 B."
+      "cssGzip": 1280,
+      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4% for the stylesheet only; measured 0 B, CSS 762 B. PLAN_011 T-gaps-113-121: cssGzip 832 -> 1152 B, measured + 4% (measured 1,066 B; 806 B before): the password, otp and datetime layouts, the custom-field notice and the same-size placeholders of per-type controls and the Stepper (G117, G119). Then 1152 -> 1280 B, measured + 4% (measured 1,201 B): each placeholder sized like its control per type and viewport, so mounting causes no layout shift (lead review of G119)."
     },
     "@texuli/catalog": {
       "gzip": 57024,
@@ -858,10 +863,20 @@
       "cssGzip": 4544,
       "note": "PLAN_010 (ADR-010, ADR-011, ADR-016, consented plan): new row at measured + 4% for the lazy review UI (comments, suggestions, history, collaborators) with the collab binding; measured 121,200 B, CSS 4,343 B."
     },
+    "@texuli/pages/collab-core": {
+      "gzip": 126784,
+      "cssGzip": 4608,
+      "note": "PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for CollabEditorCore on PageEditorCore (and every collab export) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 121,868 B, CSS 4,409 B; every lazy chunk 163,071 B gzip."
+    },
     "@texuli/pages/editor": {
       "gzip": 95296,
       "cssGzip": 3648,
       "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the the block editor: editor surface and the document validator that runs on every edit; the player and block renderers load lazily; measured 91,608 B, CSS 3,455 B."
+    },
+    "@texuli/pages/editor-core": {
+      "gzip": 96512,
+      "cssGzip": 3712,
+      "note": "PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for PageEditorCore (and every editor export) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 92,783 B, CSS 3,515 B; every lazy chunk 163,090 B gzip."
     },
     "@texuli/pages/export": {
       "gzip": 1152,
@@ -871,15 +886,29 @@
       "gzip": 30272,
       "note": "PLAN_010 T-doc-agents (ADR-011, consented plan): new row at measured + 4% for the player document host (it carries the document validator; the reader loads lazily); measured 29,061 B."
     },
+    "@texuli/pages/host-core": {
+      "gzip": 30656,
+      "note": "PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for createDocumentPlayerHostCore (the document host on PageReaderCore) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 29,451 B; every lazy chunk 209,595 B gzip."
+    },
     "@texuli/pages/paged": {
-      "gzip": 13312,
+      "gzip": 14080,
       "cssGzip": 3136,
-      "note": "PLAN_010 (ADR-010, ADR-011, ADR-016, consented plan): new row at measured + 4% for the paged view with print isolation; measured 12,761 B, CSS 3,000 B."
+      "note": "PLAN_010 (ADR-010, ADR-011, ADR-016, consented plan): new row at measured + 4% for the paged view with print isolation; measured 12,761 B, CSS 3,000 B. PLAN_011 T-gap-123 (G123, trust mode): 13312 -> 14080 (measured 13,533 B + 4%; 12.93 KiB before) for PagedView as a wrapper that hands PagedViewCore the default player loader (the props spread), so paged-core can leave the player out."
+    },
+    "@texuli/pages/paged-core": {
+      "gzip": 13888,
+      "cssGzip": 3200,
+      "note": "PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for PagedViewCore (and every paged export) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 13,351 B, CSS 3,047 B; every lazy chunk 144,388 B gzip."
     },
     "@texuli/pages/reader": {
-      "gzip": 9536,
+      "gzip": 9984,
       "cssGzip": 2432,
-      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the read-only reader with outline; measured 8,718 B, CSS 2,296 B. PLAN_011 T-ds-blueprint: 9088 -> 9536 (measured 9,148 B + 4%) for a document's own designSystem applied to the reader root."
+      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the read-only reader with outline; measured 8,718 B, CSS 2,296 B. PLAN_011 T-ds-blueprint: 9088 -> 9536 (measured 9,148 B + 4%) for a document's own designSystem applied to the reader root. PLAN_011 T-gaps-111-112 (G111, trust mode): 9536 -> 9984 (measured 9,577 B + 4%; 9,145 B before) for the host block renderer wiring (renderBlock and blockHost props, the lazy host-slot loader, the library views' refusal hand-off); the slot that decides and paints loads with import() only when a host is given."
+    },
+    "@texuli/pages/reader-core": {
+      "gzip": 10048,
+      "cssGzip": 2432,
+      "note": "PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for PageReaderCore (and every reader export) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 9,654 B, CSS 2,333 B; every lazy chunk 201,810 B gzip."
     },
     "@texuli/pages/styles.css": {
       "gzip": 64,
@@ -1021,6 +1050,10 @@
     "@texuli/slides/export": {
       "gzip": 7936,
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 7,723 B gzip, cap = measured + 4% headroom. PLAN_010 T-release-060 (2026-10-29): 8064 -> 7936 B, tightened to measured + 4% (measured 7,622 B)."
+    },
+    "@texuli/slides/export-core": {
+      "gzip": 7936,
+      "note": "PLAN_011 T-gap-105 (2026-10-30, Protoyard G105): new row for the print counterpart of stage-core (DeckPrintViewCore, preloadDeckPrintViewCore; no reference to the default renderer tables). Measured 7,611 B gzip initial (220,663 B lazy, against 564,611 B for @texuli/slides/export); budget = measured + 4%, rounded up to 64 B. @texuli/slides/export measured 7.44 KiB before G105 and 7,777 B after (DeckPrintView is now the core plus the lazy defaults source), within its 7,936 B budget."
     },
     "@texuli/slides/templates": {
       "gzip": 23296,

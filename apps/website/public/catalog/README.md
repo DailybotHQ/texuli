@@ -1,3 +1,3 @@
 # Site catalog snapshot
 
-Content-addressed name would be `catalog-0be8cbf4bfd5c077e44162e9807033c507ac1b1ad56ce0348ac154df1cc5217c.json`. Hash: `0be8cbf4bfd5c077e44162e9807033c507ac1b1ad56ce0348ac154df1cc5217c`.
+Content-addressed name would be `catalog-1372c1dde6017747a7fd62bf309b2c30484effeae209585b46c97506b0a8842c.json`. Hash: `1372c1dde6017747a7fd62bf309b2c30484effeae209585b46c97506b0a8842c`.

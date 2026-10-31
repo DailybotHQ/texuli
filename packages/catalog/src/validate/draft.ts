@@ -150,6 +150,11 @@ export interface ValidateDraftOptions {
    */
   formValidators?: readonly string[];
   /**
+   * The custom field kinds the host paints for `schema-form` fields (G113);
+   * at the `untrusted` tier a `custom` field must name one of them.
+   */
+  formKinds?: readonly string[];
+  /**
    * The host's data sources (spec 0.8.0, ADR-015), usually
    * `registry.describe()` from `@texuli/core/data-source`. A
    * `{"$source": name, "query": {...}}` prop is checked against them: a
@@ -425,6 +430,7 @@ export function validateDraft(input: unknown, options: ValidateDraftOptions): Dr
       tier,
       checkForm: options.checkForm,
       ...(options.formValidators ? { validators: options.formValidators } : {}),
+      ...(options.formKinds ? { kinds: options.formKinds } : {}),
     });
     for (const finding of forms) {
       error('forms', finding.code, finding.path, finding.message, 'schema-form');

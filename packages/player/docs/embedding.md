@@ -74,7 +74,7 @@ Every option belongs to the host. A blueprint can set none of them.
 | `deckHost` | `null` | A `DeckPlayerHost` that presents a validated `layout-deck` blueprint on a stage instead of the document flow (see [Frameless and deck hosts](#frameless-and-deck-hosts)) |
 | `documentHost` | `null` | A `DocumentPlayerHost` (spec 0.7.0): its `checkDocument` validates `document` nodes, and its `present` paints a valid `document` root. Without one a document blueprint is refused (see [Document hosts](#document-hosts)) |
 | `canvasHost` | `null` | A `CanvasPlayerHost` (spec 0.8.0): its `checkCanvas` validates `canvas` nodes, and its `present` paints a valid `canvas` root. Without one a canvas blueprint is refused (see [Canvas hosts](#canvas-hosts)) |
-| `formHost` | `null` | A `FormPlayerHost` (spec 0.8.0): its `checkForm` validates `schema-form` nodes (with its `validators` names), and its `present` paints each valid one. Without one a form blueprint is refused (see [Forms](#forms)) |
+| `formHost` | `null` | A `FormPlayerHost` (spec 0.8.0): its `checkForm` validates `schema-form` nodes (with its `validators` names and `customKinds`), and its `present` paints each valid one. Without one a form blueprint is refused (see [Forms](#forms)) |
 | `sheetHost` | `null` | A `SheetPlayerHost` (spec 0.8.0; new in 0.8.0): its `checkSheet` validates `spreadsheet` nodes (every formula parsed), and its `present` paints each valid one in place. Without one a spreadsheet blueprint is refused (see [Sheet hosts](#sheet-hosts)) |
 | `selectable`, `selection`, `onSelectionChange` | `false`, —, — | Frame selection for a builder-style preview ([Selection](reference.md#selection-builder-preview)) |
 | `view`, `onFlowChange` | — | The flow view and its transitions ([Views and flows](reference.md#views-and-flows-g09)) |
@@ -370,8 +370,11 @@ without the forms package. `@texuli/forms/host` supplies the adapter:
 ```
 
 - **Validation.** The host's `checkForm` (`checkFormDraft`) joins
-  `validateDraft` at the player's tier, with the host's `validators` names:
-  a field may name only those. Without a `formHost` every `schema-form`
+  `validateDraft` at the player's tier, with the host's `validators` names
+  and `customKinds` (the custom field kinds it paints, as `formKinds`): a
+  field may name only those validators, and a `custom` field only those
+  kinds. A custom field's object or mixed-list answer reaches the action as
+  its JSON text. Without a `formHost` every `schema-form`
   node fails with `form-unchecked`, the invalid notice shows, and nothing
   of the form paints.
 - **Painting.** Each valid `schema-form` node renders an element

@@ -1,14 +1,16 @@
 <script lang="ts">
 // A live embed. Component and deck payloads are painted by `@texuli/player`
-// (loaded on first use) at the untrusted tier: the player validates the
-// one-node blueprint again and refuses it when it does not pass. Sheets and
-// canvases are typed references until their packages ship (planned).
+// (loaded on first use through the host's `loadPlayer`) at the untrusted
+// tier: the player validates the one-node blueprint again and refuses it
+// when it does not pass. Without a loader (G123) such an embed shows a
+// notice instead. Sheets and canvases are typed references until their
+// packages ship (planned).
 import type { DocumentJson, EmbedBlock } from '@texuli/document/model';
 import type { DeckPlayerHost, PlayerDiagnosticsEvent } from '@texuli/player';
 import type { Component } from 'svelte';
 import { type EmbedResolver, planEmbed } from './embeds.ts';
 import type { PagesLabels } from './labels.ts';
-import { loadPlayer } from './player.ts';
+import { type PagesPlayerLoader, resolvePlayer } from './player-loader.ts';
 
 let {
   node,
@@ -16,12 +18,18 @@ let {
   resolveEmbed,
   deckHost = null,
   reducedMotion = false,
+  loadPlayer = null,
+  onrefused,
 }: {
   node: EmbedBlock;
   labels: PagesLabels;
   resolveEmbed?: EmbedResolver | undefined;
   deckHost?: DeckPlayerHost | null | undefined;
   reducedMotion?: boolean;
+  /** Loads the player; `null` turns live embeds off (G123). */
+  loadPlayer?: PagesPlayerLoader | null | undefined;
+  /** The embed was refused or is only a reference: a host takes it over (no notice shows). */
+  onrefused?: (() => void) | undefined;
 } = $props();
 
 /** `undefined` while a host ref resolves. */
@@ -56,10 +64,14 @@ $effect(() => {
 
 const plan = $derived(payload === undefined ? null : planEmbed(node, payload));
 
+/** The embed needs the player and the host gave no loader. */
+const off = $derived(plan?.kind === 'player' && !loadPlayer);
+
 $effect(() => {
-  if (plan?.kind !== 'player' || Player) return;
+  const load = loadPlayer;
+  if (plan?.kind !== 'player' || Player || !load) return;
   let live = true;
-  loadPlayer().then(
+  resolvePlayer(load).then(
     (component) => {
       if (live) Player = component;
     },
@@ -80,8 +92,15 @@ const status = $derived(
       ? 'refused'
       : plan.kind === 'reference'
         ? 'reference'
-        : 'painted'
+        : off
+          ? 'off'
+          : 'painted'
 );
+
+$effect(() => {
+  if ((status === 'refused' || status === 'reference' || status === 'off') && onrefused)
+    onrefused();
+});
 
 function ondiagnostics(event: PlayerDiagnosticsEvent): void {
   refused = event.surface === 'notice';
@@ -99,6 +118,8 @@ function ondiagnostics(event: PlayerDiagnosticsEvent): void {
     <p class="tx-pages-notice" role="note" data-refused="">{labels.refused}</p>
   {:else if plan.kind === 'reference'}
     <p class="tx-pages-notice" role="note">{labels.embedUnavailable(plan.embed)}</p>
+  {:else if off}
+    <p class="tx-pages-notice" role="note" data-player-off="">{labels.embedOff(node.kind)}</p>
   {:else if Player}
     <Player
       blueprint={plan.blueprint}

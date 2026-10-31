@@ -30,5 +30,9 @@ stylesheet once (`@texuli/tokens/base.css`).
 | `.tx-forms__summary`, `.tx-forms__summary-title`, `.tx-forms__summary-list` | The error summary |
 | `.tx-forms__done` | The confirmation after a successful submit |
 | `.tx-forms__actions`, `.tx-forms__draft` | The Back, Next and Submit row, and the draft status (`data-draft`) |
-| `.tx-forms__progress` | The texuli `Stepper` of a multi-step form |
+| `.tx-forms__progress`, `.tx-forms__progress-loading` | The texuli `Stepper` of a multi-step form, and the space it holds while it loads |
+| `.tx-forms__control-loading` | The place of a per-type control while it loads (`data-type`; about the control's size, `--tx-forms-loading-rows` for radio groups), G119 |
+| `.tx-forms__password`, `.tx-forms__otp` | A password input with its reveal toggle; a one-time-code input sized by `--tx-forms-otp-length` |
+| `.tx-forms__datetime` | The date and time controls of a datetime field |
+| `.tx-forms__custom-missing` | The notice for a custom field no painter was given for |
 | `.tx-forms__visually-hidden` | The polite status line (step changes, restored drafts, the confirmation) |

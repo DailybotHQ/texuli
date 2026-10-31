@@ -1,65 +1,15 @@
 /**
  * `@texuli/slides/export`: print plans and flags, the PDF seam, PPTX (v1
  * synchronous, v2 loaded on first use), the owned XML and ZIP writers
- * (`api.ts`), and the v2 print view, which loads its body on first use.
+ * (`api.ts`), and the v2 print view, which loads its body on first use and
+ * paints with the stage's default renderer tables unless turned off. A host
+ * that brings every renderer itself uses `@texuli/slides/export-core`
+ * (`DeckPrintViewCore`), which never references those tables (G105).
  */
-export {
-  buildDeckPptx,
-  crc32,
-  DECK_EXPORT_CANVAS,
-  DECK_PRINT_CANVAS_PAGE_SIZES,
-  DECK_PRINT_NOTES,
-  DECK_PRINT_PAGE_SIZES,
-  type DeckExportAspect,
-  type DeckPdfExporter,
-  type DeckPdfRequestOptions,
-  type DeckPdfResult,
-  type DeckPptxAssetContext,
-  type DeckPptxChartContext,
-  type DeckPptxDesign,
-  type DeckPptxDesignRole,
-  type DeckPptxImageAsset,
-  type DeckPptxOmission,
-  type DeckPptxOmissionKind,
-  type DeckPptxOptions,
-  type DeckPptxPackage,
-  type DeckPptxPart,
-  type DeckPptxV2Export,
-  type DeckPptxV2Omission,
-  type DeckPptxV2Options,
-  type DeckPptxV2Package,
-  type DeckPrintFlags,
-  type DeckPrintNotes,
-  type DeckPrintOptions,
-  type DeckPrintPage,
-  type DeckPrintPageSize,
-  type DeckPrintPlan,
-  deckExportFilename,
-  deckPrintSearch,
-  deckSlideLabel,
-  el,
-  escapeXmlAttribute,
-  escapeXmlText,
-  exportDeckPptx,
-  loadDeckPptxWriter,
-  PPTX_CANVAS_SLIDE_SIZES,
-  PPTX_MIME_TYPE,
-  PPTX_SLIDE_SIZES,
-  parseDeckPrintFlags,
-  planDeckPrint,
-  requestDeckPdf,
-  sanitizeXmlChars,
-  serializeXml,
-  writeDeckPptx,
-  writeZip,
-  type XmlAttributeValue,
-  type XmlChild,
-  type XmlElement,
-  type XmlNode,
-  type XmlText,
-  xmlText,
-  type ZipEntry,
-} from './api.ts';
+export * from './core.ts';
 export { default as DeckPrintView } from './DeckPrintView.svelte';
-export { type PreloadDeckPrintViewOptions, preloadDeckPrintView } from './print-preload.ts';
-export type { DeckPrintViewProps } from './print-types.ts';
+export {
+  DECK_PRINT_DEFAULTS,
+  type PreloadDeckPrintViewOptions,
+  preloadDeckPrintView,
+} from './print-preload.ts';

@@ -1,17 +1,12 @@
-/** The player loads on first use: a page without embeds never downloads it. */
-import type { Component } from 'svelte';
+/**
+ * The default player loader: the default entries (`editor`, `reader`,
+ * `paged`, `collab`, `host` and the root) hand it to the views, so a page
+ * without embeds never downloads the player, but the dynamic import stays
+ * in their graph. The core entries never import this module (G123).
+ */
+import type { PagesPlayerLoader } from './player-loader.ts';
 
-// biome-ignore lint/suspicious/noExplicitAny: the player's props are checked where it is defined.
-let pending: Promise<Component<any>> | null = null;
-
-// biome-ignore lint/suspicious/noExplicitAny: see above.
-export function loadPlayer(): Promise<Component<any>> {
-  pending ??= Promise.all([import('@texuli/player'), import('@texuli/player/styles.css')]).then(
-    ([module]) => module.Player,
-    (error: unknown) => {
-      pending = null;
-      throw error;
-    }
+export const loadDefaultPlayer: PagesPlayerLoader = () =>
+  Promise.all([import('@texuli/player'), import('@texuli/player/styles.css')]).then(
+    ([module]) => module
   );
-  return pending;
-}

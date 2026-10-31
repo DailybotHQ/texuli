@@ -62,6 +62,14 @@ dependent. So design systems integrate on the branch `release/0.10.0`:
 
 On the branch so far:
 
+- **Added `@texuli/slides/export-core`** (Protoyard G105):
+  `DeckPrintViewCore` and `preloadDeckPrintViewCore`, the print view and
+  its preload without the default renderer tables; they take a `defaults`
+  source from the host like `DeckStageCore`. A `DeckStageCore` host that
+  prints through it emits no default-table chunk or CSS (measured on a
+  minimal host: 324 KB instead of 715 KB of JS and 28 KB instead of 72 KB of
+  CSS across every chunk, gzip). `@texuli/slides/export` behaves as before:
+  `DeckPrintView` is the core with the stage's tables as its defaults.
 - **Blueprint spec 0.10.0** (PLAN_011 T-ds-spec, ADR-021; in development
   on `release/0.10.0`, not on npm; `@texuli/spec@0.9.0` on npm still
   carries spec `0.9.0`). Additive: the design-system document schema
@@ -73,7 +81,7 @@ On the branch so far:
   an exact `id@x.y.z` or `texuli:<theme>`, and `inline`, a whole
   document), with the `brand-report` and `brand-deck` goldens and three
   invalid fixtures. The `0.9.0 → 0.10.0` migration only stamps `spec`;
-  the digest `6c0ce9cec3dfc318928e739b34570ede57670a628908aaf57b1a0bb2294be5bf` is pinned in `packages/spec/versions.json`.
+  the digest `36722679ebb84e38e86632789af1bda5dfcc1eb6db1b6712cda1b4f56ad1e1c7` is pinned in `packages/spec/versions.json`.
   `validateDraft` migrates a `0.9.0` envelope and stamps `spec: "0.10.0"`;
   hosts that compare the `spec` string need to accept it.
 - **`@texuli/spec/design-system`** (new subpath): `validateDesignSystem`
@@ -140,10 +148,14 @@ On the branch so far:
   `examples/design-systems/` (T-ds-docs-skill); the fixes for every tracked
   conformance finding (`DS_CHECK_KNOWN_FINDINGS` is empty) and the stronger
   token-usage guard (`system-color` and `unknown-token` rules).
+- **Also landed on the branch:** the Design System Studio at
+  `/theme-studio/` and the `/design-systems/` hub on texuli.com; design
+  systems on standalone decks (`designSystem` in `@texuli/deck`, applied by
+  the slides stage through `@texuli/player/design-system`), player component
+  defaults, and the document writers (Markdown front matter; DOCX and PDF
+  report `design-system-unapplied`).
 - **In progress on the branch (not merged yet, listed here as they land):**
-  the Design System Studio on texuli.com; design systems on standalone decks,
-  player component defaults and the document writers; the Protoyard gap
-  G105.
+  the Protoyard gaps G107–G110 (G105 landed: `@texuli/slides/export-core`).
 
 **Removed in 0.10.0** (deprecated in `0.9.0` for one minor; done on the
 branch):
@@ -255,6 +267,112 @@ branch):
     closing the dialog; DateRangePicker takes `panel` and `footer`
     snippets rendered inside the modal calendar dialog, each with
     `{ value, close }` (`DateRangePickerPanelContext`).
+- **Protoyard gaps G111 and G112** (PLAN_011 T-gaps-111-112; reported
+  while adopting `@texuli/document` and `@texuli/pages` 0.9.0):
+  - **G111** (`@texuli/pages`): `PageReader`, `PageEditor`, `PagedView`,
+    `CollabEditor` and `createDocumentPlayerHost` (`@texuli/pages/host`,
+    for documents the player paints) take a host block renderer: a `renderBlock`
+    snippet and a `blockHost` (`PagesBlockHost`: `claim`, `component`,
+    `present`). The host paints the wrapped blocks and embeds the library
+    refuses (an unknown family or block, an embed with no payload), and
+    every node its `claim` returns `'host'` for; library blocks keep their
+    renderers otherwise, and the refused notice still shows when no host
+    paints a node. The node is a deep-frozen copy (`PagesHostNode`): host
+    code is developer-tier, the node may come from a user or an agent. In
+    the editor, host blocks are opaque rows that select, move and delete
+    from their handle. Without a host, the slot that paints them never
+    loads (it is imported with `import()`).
+  - **G112** (`@texuli/document/markdown`): `documentToMarkdown` writes a
+    wrapped data `table` as a GFM table (the caption in emphasis on the
+    line before; cells on one line with `|` and Markdown punctuation
+    escaped), and any other wrapped block as the text the DOCX and PDF
+    writers print for it; before, every wrapped block was left out. The
+    new `blocks: 'drop'` option leaves them out. Neither reads back as a
+    wrapped block (the Markdown subset has no table).
+- **Protoyard gap G123** (PLAN_011 T-gap-123; reported while adopting
+  `@texuli/pages` 0.9.0): `@texuli/pages` always reached all of
+  `@texuli/player`. The embed view's `import('@texuli/player')` stayed in
+  every host's graph, even with no embeds, so a bundler that inlines lazy
+  chunks carried the whole player. The new entries `editor-core`,
+  `reader-core`, `paged-core`, `collab-core` and `host-core` export
+  `PageEditorCore`, `PageReaderCore`, `PagedViewCore`, `CollabEditorCore`
+  and `createDocumentPlayerHostCore`, which have no default player loader.
+  Live embeds paint only with the host's `loadPlayer` (a
+  `PagesPlayerLoader`, such as `() => import('@texuli/player')`, so the
+  import lives in host code). Without a loader, an embed that needs the
+  player shows a note (`labels.embedOff`), or goes to the host block
+  renderer when its claim is `'fallback'`. A host on the core entries with
+  no loader has no player module or specifier in any chunk
+  (`packages/pages/tests/bundle-graph.test.ts`). `pnpm size` measures
+  every lazy chunk of `editor-core` at 159 KiB gzip, against 467 KiB for
+  `editor`, with about the same initial JS (90.6 KiB against 91.8 KiB).
+  The default entries behave as before, and `loadPlayer={null}` turns live
+  embeds off at runtime.
+- **Protoyard forms gaps G113–G121** (PLAN_011 T-gaps-113-121, contract
+  amendment 15; reported on `@texuli/forms` 0.9.0, which Protoyard uses
+  for generated entity forms, page and doc forms and two SaaS forms).
+  `$defs.formField` grows inside spec `0.10.0` (additive: new types and
+  optional members; the `form-field-type` invalid fixture now uses an
+  `html` type, since `password` is a closed type):
+  - **G113 host-painted fields**: a `custom` field type (`kind`, scalar
+    `config`) painted by the host through SchemaForm's `field` snippet or
+    `customFields` (by field name or kind: a snippet or `{ render?,
+    component?, validate? }`). It sits in the form landmark in schema
+    order with the form's label, description and error, gets `props`
+    (`id`, `aria-labelledby`, `aria-describedby`, `aria-invalid`,
+    `aria-required`, `disabled`), is validated by a host validator
+    (`customValidators`, sync or async), joins the error summary and
+    focus-on-error, and is submitted with the rest (any bounded JSON
+    value). For agent output a custom field must name a kind the host
+    registered: `validateFormSchema({ kinds })`, `checkFormDraft(…,
+    kinds)`, `validateDraft({ formKinds })`, `FormPlayerHost.customKinds`
+    and `createFormPlayerHost({ customFields })`; anything else is refused
+    with the code `kind`.
+  - **G114**: `hideTitle` hides the title visually; it still names the
+    form (`aria-labelledby`).
+  - **G115**: `actions` (a snippet given `SchemaFormActions`: `submitting`,
+    `last`, `step`, `steps`, `back`, `next`, `submit`…) or
+    `actions={false}`; an outside `<button form="<id>">`, the component's
+    `requestSubmit()` and `controller.submit()` all validate and open the
+    error summary.
+  - **G116**: form-level `disabled` and `readOnly` on SchemaForm and
+    `createFormController` (`setDisabled`, `setReadOnly`, state
+    `disabled`, `readOnly`): every control and action is disabled (text is
+    `readonly` when read-only), and a host submit still sends the values.
+  - **G117**: `password` (reveal toggle with `aria-pressed`;
+    `current-password` or `new-password`), `otp` (one input,
+    `autocomplete="one-time-code"`, `inputmode="numeric"`, `length` 4–12),
+    `color` (texuli ColorPicker, hex) and `datetime` (`YYYY-MM-DDTHH:MM`,
+    DatePicker + TimeField). Passwords and codes never enter drafts and are
+    masked by the new `formatFormValue` and `formValuesToMarkdown`; agent
+    output may use them only where the host passes `credentials: true`
+    (code `credential`).
+  - **G118**: an optional select gets a "None" choice that clears it
+    (`labels.selectNone`); `clearable` overrides the default.
+  - **G119**: the date, time, datetime, slider, tags, file, color and radio
+    controls and the multi-step Stepper load per type on first use, with
+    a same-size placeholder. A text, select and checkbox form's host went
+    from 90,507 B to 60,048 B of initial JavaScript and from 9,385 B to
+    5,266 B of CSS, and a text-only form's from 90,466 B to 60,011 B and
+    9,385 B to 5,266 B (gzip; `packages/forms/tests/bundle-graph.test.ts`,
+    which asserts that neither initial graph holds those controls).
+    For server rendering, pass `SCHEMA_FORM_CONTROLS` from the new
+    `@texuli/forms/controls` as `controls`. The form and each placeholder
+    carry `data-tx-pending` and `aria-busy` until the controls mount (the
+    visual suite waits for it), and each placeholder is sized like its
+    control, so nothing shifts when it mounts.
+  - **G120**: `onStep({ step, position, values, allValues, signal })` on
+    SchemaForm and the controller can block Next with field errors or a
+    message (`stepError`); Next shows "Checking…" while it runs.
+  - **G121**: url fields take `protocols` (`['https']` by default,
+    `['http', 'https']` to accept http); an http answer passes the
+    untrusted URL policy as its https twin, and `javascript:`, `data:` and
+    every other scheme stay refused.
+  - Migration notes: an optional select now shows the "None" choice (set
+    `clearable: false` to keep the old list); controls of the lazy types
+    paint after their chunk loads (pass `controls` to paint at once, and
+    wait for them in tests); `SchemaForm` focuses the summary or the
+    confirmation for any finished submit, including `controller.submit()`.
 
 ### 0.9.0
 
@@ -1653,7 +1771,7 @@ the package-to-package contract outside this repository.
 | `@texuli/deck` | `0.9.0` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/document`, `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
 | `@texuli/drag`, `@texuli/workflows` | `0.9.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
 | `@texuli/mcp` | `0.9.0` (first published as `0.9.0`) | `packages/mcp/package.json`, with `@texuli/tools` pinned to exactly its own version; published right after `@texuli/tools`. In development (ADR-019), pre-1.0. |
-| Blueprint spec on `release/0.10.0` (in development, not on npm) | `0.10.0`, digest `6c0ce9cec3dfc318928e739b34570ede57670a628908aaf57b1a0bb2294be5bf` | `packages/spec/versions.json`; the workspace's generated sources carry the `0.10.0` stamp. Ships only when `@texuli/spec@0.10.0` publishes; a stamp-only migration from `0.9.0`. |
+| Blueprint spec on `release/0.10.0` (in development, not on npm) | `0.10.0`, digest `36722679ebb84e38e86632789af1bda5dfcc1eb6db1b6712cda1b4f56ad1e1c7` | `packages/spec/versions.json`; the workspace's generated sources carry the `0.10.0` stamp. Ships only when `@texuli/spec@0.10.0` publishes; a stamp-only migration from `0.9.0`. |
 | Blueprint spec | `0.9.0`, digest `497df4d3b0c67d53483163ebd9bd73733b52caf5f8e2966478f1cf860e6f9d9d` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.9.0`; a stamp-only migration from `0.8.0`. |
 | Blueprint spec in `@texuli/spec@0.8.0` | `0.8.0`, digest `f6b6388280d247eb9c3106a925111f35b90d1ec3b59c23652542f06a9f103daf` | The 0.8 line's generated sources carry the `0.8.0` stamp. |
 | Blueprint spec in `@texuli/spec@0.7.0` | `0.7.0`, digest `43e44fa9a198d337d686b4e2d86882a06a676ae1e1c1f02d023b3a525795a8b2` | The previous release's generated sources carry the `0.7.0` stamp. |

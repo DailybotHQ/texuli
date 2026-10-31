@@ -80,6 +80,8 @@ const BROWSER_ROUTES = [
   '/mcp-server/',
   '/tokens/',
   '/tokens/components/',
+  // PLAN_011 T-site-0100: the design systems hub, static (twelve server-rendered brand scopes).
+  '/design-systems/',
 ] as const;
 
 const kb = (bytes: number) => Math.round((bytes / 1024) * 10) / 10;

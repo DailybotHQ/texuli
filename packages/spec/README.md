@@ -231,7 +231,9 @@ warning without failing.
   ([source.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/source.md)).
 - **Forms as data, never patterns or code (spec 0.8.0, new in `0.8.0`).** The
   agent-emittable `schema-form` id carries a closed form schema
-  (`$defs.formSchema`): fields of 15 closed types in sections or steps,
+  (`$defs.formSchema`): fields of 15 closed types in sections or steps (20
+  from `0.10.0`, which adds password, otp, color, datetime and the
+  host-painted custom type),
   named formats and host validator names (never a regular expression),
   and conditions and cross-field rules in the closed expression AST of
   `@texuli/core/expression` (`$defs.expression`, the `numberFormula` and
@@ -292,11 +294,14 @@ envelope up to the current spec with pure, per-version steps
 `0.5.0 → 0.6.0`, `0.6.0 → 0.7.0`, `0.7.0 → 0.8.0`, `0.8.0 → 0.9.0` and
 `0.9.0 → 0.10.0`, each of which only stamps `spec`); a compatible version
 range is planned, not built. The workspace is at spec `0.10.0` (digest
-`6c0ce9cec3dfc318928e739b34570ede57670a628908aaf57b1a0bb2294be5bf`), which adds the
+`36722679ebb84e38e86632789af1bda5dfcc1eb6db1b6712cda1b4f56ad1e1c7`), which adds the
 design-system document (PLAN_011 T-ds-spec) and the envelope's
 `designSystem` (T-ds-blueprint), plus a catalog projection refresh
 (`data-filter-builder` gains the optional `issues` prop and
-`fields[].optionLabels`, T-gaps-100-104; `command-palette` lists
+`fields[].optionLabels`, T-gaps-100-104) and an additive forms field
+vocabulary (`$defs.formField` gains the `password`, `otp`, `color`,
+`datetime` and `custom` types and the `kind`, `config`, `length`,
+`protocols` and `clearable` members, T-gaps-113-121; `command-palette` lists
 `searchLabel`, T-gaps-107-110); it is in development on
 `release/0.10.0` and ships only with `@texuli/spec@0.10.0`, which is not on
 npm yet. `@texuli/spec@0.9.0` carries spec `0.9.0` (digest

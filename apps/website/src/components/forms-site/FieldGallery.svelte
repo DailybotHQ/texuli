@@ -5,11 +5,17 @@
  * the form holds, live, and what a submit sends (visible, enabled fields
  * only; file fields send their File objects to the host, never upload).
  */
-import { SchemaForm } from '@texuli/forms';
+import { SchemaForm, type SchemaFormCustomField } from '@texuli/forms';
 import { type FormValues, validateFormSchema } from '@texuli/forms/model';
-import { FIELDS_SCHEMA, FIELDS_VALUES } from './schemas.ts';
+import { FIELDS_SCHEMA, FIELDS_VALUES, GALLERY_OPTIONS } from './schemas.ts';
 
-const result = validateFormSchema(FIELDS_SCHEMA);
+const result = validateFormSchema(FIELDS_SCHEMA, GALLERY_OPTIONS);
+/** The fictional people the custom `person` field picks from. */
+const PEOPLE = [
+  { id: 'p-ada', name: 'Ada Example' },
+  { id: 'p-grace', name: 'Grace Example' },
+  { id: 'p-alan', name: 'Alan Example' },
+];
 let values = $state.raw<FormValues>({});
 let sent = $state('');
 
@@ -18,6 +24,20 @@ function show(value: unknown): string {
 }
 </script>
 
+{#snippet person(ctx: SchemaFormCustomField)}
+  <select
+    {...ctx.props}
+    class="gallery__picker"
+    data-forms-person=""
+    value={typeof ctx.value === 'string' ? ctx.value : ''}
+    onchange={(event) => ctx.setValue((event.currentTarget as HTMLSelectElement).value || null)}
+    onblur={() => ctx.blur()}
+  >
+    <option value="">Nobody yet</option>
+    {#each PEOPLE as entry (entry.id)}<option value={entry.id}>{entry.name}</option>{/each}
+  </select>
+{/snippet}
+
 <div class="gallery" data-forms-gallery="">
   <div class="gallery__form">
     {#if result.ok}
@@ -25,6 +45,7 @@ function show(value: unknown): string {
         form={result.form}
         values={FIELDS_VALUES}
         headingLevel={3}
+        field={person}
         onValueChange={(_name, _value, all) => {
           values = all;
         }}
@@ -95,6 +116,16 @@ function show(value: unknown): string {
     background: var(--tx-muted, Canvas);
     font-size: 0.8125rem;
   }
+  .gallery__picker {
+    min-block-size: 2.5rem;
+    padding-inline: 0.6rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 0.5rem;
+    background: var(--tx-surface, Canvas);
+    color: inherit;
+    font: inherit;
+  }
+  .gallery__picker:focus-visible,
   .gallery__json:focus-visible {
     outline: 2px solid var(--tx-ring, Highlight);
     outline-offset: 2px;

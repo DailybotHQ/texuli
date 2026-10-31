@@ -703,7 +703,7 @@
       "additionalProperties": false
     },
     "formField": {
-      "description": "One field of a closed type. Which members apply to which type, value types, option membership, ranges and the conditions' field references are checked by @texuli/forms/model (validateFormSchema). Formats are names; a pattern is never accepted.",
+      "description": "One field of a closed type. Which members apply to which type, value types, option membership, ranges and the conditions' field references are checked by @texuli/forms/model (validateFormSchema). Formats are names; a pattern is never accepted. password and otp are credential fields that agent output may use only where the host allows them; custom is painted by the host for a kind it registered (refused otherwise).",
       "type": "object",
       "properties": {
         "name": {
@@ -728,7 +728,12 @@
             "switch",
             "slider",
             "file",
-            "tags"
+            "tags",
+            "password",
+            "otp",
+            "color",
+            "datetime",
+            "custom"
           ]
         },
         "label": {
@@ -745,7 +750,7 @@
           "maxLength": 300
         },
         "default": {
-          "description": "A value of the field's type (a string, number, boolean, YYYY-MM-DD, HH:MM or a list of option values). Not for file fields."
+          "description": "A value of the field's type (a string, number, boolean, YYYY-MM-DD, HH:MM, YYYY-MM-DDTHH:MM, a #hex color, a list of option values, or any JSON value for custom). Not for file, password or otp fields."
         },
         "options": {
           "type": "array",
@@ -772,10 +777,10 @@
           "maximum": 10000
         },
         "min": {
-          "description": "A number for number and slider; YYYY-MM-DD for date; HH:MM for time."
+          "description": "A number for number and slider; YYYY-MM-DD for date; HH:MM for time; YYYY-MM-DDTHH:MM for datetime."
         },
         "max": {
-          "description": "A number for number and slider; YYYY-MM-DD for date; HH:MM for time."
+          "description": "A number for number and slider; YYYY-MM-DD for date; HH:MM for time; YYYY-MM-DDTHH:MM for datetime."
         },
         "step": {
           "description": "Above 0, for number and slider.",
@@ -850,7 +855,7 @@
           "maximum": 1073741824
         },
         "autocomplete": {
-          "description": "An autocomplete token; payment, credential and one-time-code tokens are absent.",
+          "description": "An autocomplete token; payment and one-time-code tokens are absent, and current-password and new-password apply to password fields only.",
           "type": "string",
           "enum": [
             "off",
@@ -869,11 +874,45 @@
             "country-name",
             "language",
             "url",
-            "bday"
+            "bday",
+            "current-password",
+            "new-password"
           ]
         },
         "link": {
           "$ref": "#/$defs/formLink"
+        },
+        "kind": {
+          "description": "Custom fields: the kind the host paints; agent output may name only a kind the host registered.",
+          "type": "string",
+          "pattern": "^[a-z][A-Za-z0-9_-]{0,63}$"
+        },
+        "config": {
+          "description": "Custom fields: at most 20 scalar settings under field-like names, handed to the host painter.",
+          "type": "object",
+          "additionalProperties": {
+            "description": "A string (at most 300 characters), a finite number or a boolean."
+          }
+        },
+        "length": {
+          "description": "Otp fields: the number of digits (default 6).",
+          "type": "integer",
+          "minimum": 4,
+          "maximum": 12
+        },
+        "protocols": {
+          "description": "Url fields: the allowed schemes (default https only); an http answer passes the untrusted URL policy as its https twin.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": {
+            "type": "string",
+            "enum": ["http", "https"]
+          }
+        },
+        "clearable": {
+          "description": "Select fields: whether an empty choice clears the answer (default: while the field is not required).",
+          "type": "boolean"
         }
       },
       "required": ["name", "type", "label"],
