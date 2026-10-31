@@ -877,9 +877,9 @@
       "note": "PLAN_010 (ADR-010, ADR-011, ADR-016, consented plan): new row at measured + 4% for the paged view with print isolation; measured 12,761 B, CSS 3,000 B."
     },
     "@texuli/pages/reader": {
-      "gzip": 9536,
+      "gzip": 9984,
       "cssGzip": 2432,
-      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the read-only reader with outline; measured 8,718 B, CSS 2,296 B. PLAN_011 T-ds-blueprint: 9088 -> 9536 (measured 9,148 B + 4%) for a document's own designSystem applied to the reader root."
+      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the read-only reader with outline; measured 8,718 B, CSS 2,296 B. PLAN_011 T-ds-blueprint: 9088 -> 9536 (measured 9,148 B + 4%) for a document's own designSystem applied to the reader root. PLAN_011 T-gaps-111-112 (G111, trust mode): 9536 -> 9984 (measured 9,577 B + 4%; 9,145 B before) for the host block renderer wiring (renderBlock and blockHost props, the lazy host-slot loader, the library views' refusal hand-off); the slot that decides and paints loads with import() only when a host is given."
     },
     "@texuli/pages/styles.css": {
       "gzip": 64,
@@ -1021,6 +1021,10 @@
     "@texuli/slides/export": {
       "gzip": 7936,
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 7,723 B gzip, cap = measured + 4% headroom. PLAN_010 T-release-060 (2026-10-29): 8064 -> 7936 B, tightened to measured + 4% (measured 7,622 B)."
+    },
+    "@texuli/slides/export-core": {
+      "gzip": 7936,
+      "note": "PLAN_011 T-gap-105 (2026-10-30, Protoyard G105): new row for the print counterpart of stage-core (DeckPrintViewCore, preloadDeckPrintViewCore; no reference to the default renderer tables). Measured 7,611 B gzip initial (220,663 B lazy, against 564,611 B for @texuli/slides/export); budget = measured + 4%, rounded up to 64 B. @texuli/slides/export measured 7.44 KiB before G105 and 7,777 B after (DeckPrintView is now the core plus the lazy defaults source), within its 7,936 B budget."
     },
     "@texuli/slides/templates": {
       "gzip": 23296,

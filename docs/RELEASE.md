@@ -62,6 +62,14 @@ dependent. So design systems integrate on the branch `release/0.10.0`:
 
 On the branch so far:
 
+- **Added `@texuli/slides/export-core`** (Protoyard G105):
+  `DeckPrintViewCore` and `preloadDeckPrintViewCore`, the print view and
+  its preload without the default renderer tables; they take a `defaults`
+  source from the host like `DeckStageCore`. A `DeckStageCore` host that
+  prints through it emits no default-table chunk or CSS (measured on a
+  minimal host: 324 KB instead of 715 KB of JS and 28 KB instead of 72 KB of
+  CSS across every chunk, gzip). `@texuli/slides/export` behaves as before:
+  `DeckPrintView` is the core with the stage's tables as its defaults.
 - **Blueprint spec 0.10.0** (PLAN_011 T-ds-spec, ADR-021; in development
   on `release/0.10.0`, not on npm; `@texuli/spec@0.9.0` on npm still
   carries spec `0.9.0`). Additive: the design-system document schema
@@ -220,6 +228,28 @@ branch):
     and a rejection is announced (`labels.saveFailed`). Existing
     two-argument handlers keep working; both buttons keep the
     `tx-inbox__button` class.
+- **Protoyard gaps G111 and G112** (PLAN_011 T-gaps-111-112; reported
+  while adopting `@texuli/document` and `@texuli/pages` 0.9.0):
+  - **G111** (`@texuli/pages`): `PageReader`, `PageEditor`, `PagedView`,
+    `CollabEditor` and `createDocumentPlayerHost` (`@texuli/pages/host`,
+    for documents the player paints) take a host block renderer: a `renderBlock`
+    snippet and a `blockHost` (`PagesBlockHost`: `claim`, `component`,
+    `present`). The host paints the wrapped blocks and embeds the library
+    refuses (an unknown family or block, an embed with no payload), and
+    every node its `claim` returns `'host'` for; library blocks keep their
+    renderers otherwise, and the refused notice still shows when no host
+    paints a node. The node is a deep-frozen copy (`PagesHostNode`): host
+    code is developer-tier, the node may come from a user or an agent. In
+    the editor, host blocks are opaque rows that select, move and delete
+    from their handle. Without a host, the slot that paints them never
+    loads (it is imported with `import()`).
+  - **G112** (`@texuli/document/markdown`): `documentToMarkdown` writes a
+    wrapped data `table` as a GFM table (the caption in emphasis on the
+    line before; cells on one line with `|` and Markdown punctuation
+    escaped), and any other wrapped block as the text the DOCX and PDF
+    writers print for it; before, every wrapped block was left out. The
+    new `blocks: 'drop'` option leaves them out. Neither reads back as a
+    wrapped block (the Markdown subset has no table).
 - **Protoyard forms gaps G113–G121** (PLAN_011 T-gaps-113-121, contract
   amendment 15; reported on `@texuli/forms` 0.9.0, which Protoyard uses
   for generated entity forms, page and doc forms and two SaaS forms).

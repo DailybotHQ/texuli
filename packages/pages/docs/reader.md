@@ -31,6 +31,7 @@ editing code.
 | `reducedMotion` | `false` | Paint embeds without motion |
 | `designSystems` | — | `PagesDesignSystems` (spec 0.10.0): `resolve(ref)` for the document's `designSystem.ref` (a document or a compiled design system; may be async; the reader never fetches), `mode` (`light`, `dark`) and `trust` for an inline document (default `untrusted`) |
 | `onDesignSystem` | — | Called with a `PagesDesignSystemEvent`: `{ status: 'applied', id, source }` or `{ status: 'refused', code, path, message }` |
+| `renderBlock`, `blockHost` | — | The host's own blocks: a snippet and a `PagesBlockHost` ([host blocks](editor.md#host-blocks)) |
 | `class` | — | Extra classes on the root |
 
 Blocks render as semantic elements: paragraphs, `h1` to `h4` (plus the
@@ -39,7 +40,10 @@ offset), `pre`, `ul` and `ol` (todo items say "Done" or "Not done"),
 and a grid for columns. Text renders through text interpolation; links pass
 `safeHref` at the untrusted tier with `rel="noopener noreferrer nofollow"`.
 Wrapped blocks paint with their `@texuli/blocks` family renderer and embeds
-with `@texuli/player`, as in the editor.
+with `@texuli/player`, as in the editor, or with the host's renderer
+([host blocks](editor.md#host-blocks): `PagesBlockHost`, `PagesBlockClaim`,
+`PagesBlockHostProps`, `PagesBlockHostRequest`, `PagesBlockSnippet`,
+`PagesHostNode`, `PagesReadonly`).
 
 ## Design systems
 

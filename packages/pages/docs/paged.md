@@ -45,6 +45,7 @@ model, at the page size.
 | `onNavigate`, `pageHref` | — | Page links, as in the reader |
 | `resolveEmbed`, `resolveMedia`, `deckHost` | — | Embeds and media, as in the reader |
 | `reducedMotion` | `false` | Paint embeds without motion |
+| `renderBlock`, `blockHost` | — | The host's own blocks, as in the reader ([host blocks](editor.md#host-blocks); the types `PagesBlockHost`, `PagesBlockClaim`, `PagesBlockHostProps`, `PagesBlockHostRequest`, `PagesBlockSnippet` and `PagesHostNode` are exported here too) |
 | `class` | — | Extra classes on the root |
 
 How it works:

@@ -4,6 +4,15 @@
  * (measured in the DOM), paints headers and footers, and prints one sheet
  * per page through named `@page` rules, isolated to the mounted view.
  */
+
+export type {
+  PagesBlockClaim,
+  PagesBlockHost,
+  PagesBlockHostProps,
+  PagesBlockHostRequest,
+  PagesBlockSnippet,
+  PagesHostNode,
+} from '../shared/block-host.ts';
 export { DEFAULT_PAGED_LABELS, type PagedLabels, resolvePagedLabels } from './labels.ts';
 export { ATOMIC_SELECTOR, lineBottoms, measureUnit, splitPoints } from './measure.ts';
 export { default as PagedView } from './PagedView.svelte';
