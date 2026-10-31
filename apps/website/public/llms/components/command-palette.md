@@ -35,6 +35,7 @@
 | `shortcut` | boolean | no | — | `true` | — |
 | `recentLabel` | string | no | — | — | — |
 | `title` | string | no | — | — | — |
+| `searchLabel` | string | no | — | — | Accessible name of the search combobox and its results; defaults to title |
 | `description` | string | no | — | — | — |
 | `emptyLabel` | string | no | — | — | — |
 | `recentEmptyLabel` | string | no | — | — | — |

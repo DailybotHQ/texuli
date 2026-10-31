@@ -57,9 +57,9 @@
     },
     {
       "specVersion": "0.10.0",
-      "specDigest": "07fc15722c3e2f5d9961d62d02ea7a1866d86b8d5099ff3339556f79ef50e59f",
+      "specDigest": "6c0ce9cec3dfc318928e739b34570ede57670a628908aaf57b1a0bb2294be5bf",
       "change": "minor",
-      "summary": "Additive (PLAN_011 T-ds-spec and T-ds-blueprint, ADR-021 and ADR-024): the design-system document schema (schemas/design-system.schema.json, format texuli/design-system, formatVersion 1; generated from the @texuli/spec/design-system vocabulary, with TypeScript and Kotlin types) and its fixtures under fixtures/design-systems/; the optional envelope designSystem ($defs.designSystemReference: exactly one of ref, an exact id@x.y.z or texuli:<theme>, and inline, a whole document) and the same field on $defs.document (schemas/document.schema.json re-pinned from @texuli/document); the brand-report and brand-deck goldens and the design-system-range, design-system-both and design-system-extra-field invalid fixtures; catalog projection refresh (PLAN_011 T-gaps-100-104: data-filter-builder optional issues prop and fields[].optionLabels); stamp-only migration 0.9.0→0.10.0"
+      "summary": "Additive (PLAN_011 T-ds-spec and T-ds-blueprint, ADR-021 and ADR-024): the design-system document schema (schemas/design-system.schema.json, format texuli/design-system, formatVersion 1; generated from the @texuli/spec/design-system vocabulary, with TypeScript and Kotlin types) and its fixtures under fixtures/design-systems/; the optional envelope designSystem ($defs.designSystemReference: exactly one of ref, an exact id@x.y.z or texuli:<theme>, and inline, a whole document) and the same field on $defs.document (schemas/document.schema.json re-pinned from @texuli/document); the brand-report and brand-deck goldens and the design-system-range, design-system-both and design-system-extra-field invalid fixtures; catalog projection refresh (PLAN_011 T-gaps-100-104: data-filter-builder optional issues prop and fields[].optionLabels; T-gaps-107-110: command-palette searchLabel); stamp-only migration 0.9.0→0.10.0"
     }
   ]
 }

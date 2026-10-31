@@ -2320,6 +2320,11 @@
         { "default": true, "kind": "boolean", "name": "shortcut" },
         { "kind": "string", "name": "recentLabel" },
         { "kind": "string", "name": "title" },
+        {
+          "description": "Accessible name of the search combobox and its results; defaults to title",
+          "kind": "string",
+          "name": "searchLabel"
+        },
         { "kind": "string", "name": "description" },
         { "kind": "string", "name": "emptyLabel" },
         { "kind": "string", "name": "recentEmptyLabel" },
