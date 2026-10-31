@@ -2,8 +2,10 @@ import { readFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { render } from '@testing-library/svelte';
 import { describe, expect, it } from 'vitest';
+import { loadPagesLibraryBase } from '../src/reader/core.ts';
 import type { PagesDesignSystemEvent } from '../src/reader/index.ts';
 import PageReader from '../src/reader/PageReader.svelte';
+import PageReaderCore from '../src/reader/PageReaderCore.svelte';
 import { doc, para } from './fixtures.ts';
 
 /**
@@ -20,10 +22,14 @@ const harbor = (
 ).designSystem.inline;
 const TIMEOUT = { timeout: 30_000 };
 
-function read(designSystem: unknown, props: Record<string, unknown> = {}) {
+function read(
+  designSystem: unknown,
+  props: Record<string, unknown> = {},
+  component: typeof PageReader | typeof PageReaderCore = PageReader
+) {
   const events: PagesDesignSystemEvent[] = [];
   const page = { ...doc([para('p1', 'Fictional notes.')]), designSystem } as never;
-  const result = render(PageReader, {
+  const result = render(component as typeof PageReader, {
     props: {
       document: page,
       onDesignSystem: (e: PagesDesignSystemEvent) => events.push(e),
@@ -99,4 +105,36 @@ describe('the page reader applies a document design system', () => {
     visit(join(src, 'reader/index.ts'));
     expect(seen.has(join(src, 'reader/PageReader.svelte'))).toBe(true);
   });
+});
+
+describe('the reader core reaches the theme library only through a loader it is given (G127)', () => {
+  it(
+    'refuses texuli:<theme> on PageReaderCore without loadLibraryBase, applies it with one, and PageReader keeps the library default',
+    TIMEOUT,
+    async () => {
+      const violet = { ref: 'texuli:violet' };
+      const bare = read(violet, {}, PageReaderCore);
+      expect(await settled(bare.article)).toBe('refused');
+      expect(bare.events).toEqual([
+        expect.objectContaining({ status: 'refused', code: 'design-system-unresolved' }),
+      ]);
+      bare.unmount();
+
+      const asked: string[] = [];
+      const loadLibraryBase = (ref: string) => {
+        asked.push(ref);
+        return loadPagesLibraryBase(ref);
+      };
+      const injected = read(violet, { loadLibraryBase }, PageReaderCore);
+      expect(await settled(injected.article)).toBe('applied');
+      expect(asked).toEqual(['texuli:violet']);
+      injected.unmount();
+
+      const reader = read(violet);
+      expect(await settled(reader.article)).toBe('applied');
+      reader.unmount();
+      const off = read(violet, { loadLibraryBase: null });
+      expect(await settled(off.article)).toBe('refused');
+    }
+  );
 });
