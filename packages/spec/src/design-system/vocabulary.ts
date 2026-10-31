@@ -83,8 +83,14 @@ export const DS_PATTERNS = {
   ),
   image: new RegExp(`^${PATH}(?:png|jpe?g|gif|webp|avif|svg|ico)$`),
   font: new RegExp(`^${PATH}(?:woff2?|ttf|otf)$`),
-  // biome-ignore lint/suspicious/noControlCharactersInRegex: text refuses control and bidi characters
-  text: /^[^\u0000-\u001f\u007f-\u009f؜\u200e\u200f\u202a-\u202e\u2066-\u2069]*$/,
+  // Free text refuses control, bidi and invisible characters: the tokens
+  // importers' set (C0, C1, soft hyphen, Arabic letter mark, Mongolian vowel
+  // separator, zero-width space, non-joiner and joiner, LRM and RLM, word
+  // joiner and invisible operators, bidi embeddings, overrides and isolates,
+  // byte order mark), plus the line and paragraph separators and the tag
+  // characters. The schema compiles patterns with the `u` flag.
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: text refuses control, bidi and invisible characters
+  text: /^[^\u0000-\u001f\u007f-\u009f\u00ad\u061c\u180e\u200b-\u200f\u2028-\u202e\u2060-\u2069\ufeff\u{e0000}-\u{e007f}]*$/u,
   key: /^[a-z][a-z0-9-]{0,47}$/,
 };
 

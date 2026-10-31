@@ -94,7 +94,7 @@ of `@texuli/core` at the same trust.
 | --- | --- |
 | `unknown-key` | A key outside a closed object, including `__proto__`, `constructor` and `prototype`; the hint lists the allowed keys |
 | `invalid-type` | The wrong JSON type |
-| `invalid-value` | An enum, pattern, range, length, duplicate, reserved or malformed map key, or a size cap |
+| `invalid-value` | An enum, pattern, range, length, duplicate, reserved or malformed map key, or a size cap; also free text (`name`, `description`, voice guidelines and lexicon values) holding a control, bidi or invisible character: C0 and C1 controls, U+00AD, U+061C, U+180E, U+200B–200F, U+2028–202E, U+2060–2069, U+FEFF and the tag characters U+E0000–E007F (the set the `@texuli/tokens` importers refuse, plus the separators and tags; a joiner inside an emoji sequence is refused too) |
 | `required` | A missing identity field or `color.brand.seed` |
 | `format-version` | `formatVersion` missing, not an integer, below 1 or newer than this package; validation stops there |
 | `extends-range` | A range-shaped `extends` or `ref` (`^`, `~`, `*`, `x`, `>=`, `\|\|`, `acme@2`) |

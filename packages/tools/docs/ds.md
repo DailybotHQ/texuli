@@ -69,8 +69,13 @@ request body at 256 KB), 10 s.
   ([local write policy](mcp.md#the-local-door)): an explicit path inside the
   working directory; traversal, absolute paths outside it and symlinked
   components are refused (`outside-working-directory`, `symlink`), and an
-  existing file needs `overwrite` (`exists`). `dryRun` checks the document
-  and the path and writes nothing. The remote door does not list it, and a
+  existing file needs `overwrite` (`exists`). On top of that policy,
+  `ds.save` writes `.json` files only (any case; `path-extension`
+  otherwise) and never a path with a segment that starts with `.` (so
+  `.git/`, `.github/`, `.vscode/` and dotfiles such as `.npmrc`), a
+  `node_modules` segment or a file named `package.json`
+  (`path-reserved`), with or without `overwrite`. `dryRun` checks the
+  document and the path, these rules included, and writes nothing. The remote door does not list it, and a
   door without a writer answers `runtime-unavailable`.
 - **`blueprint.theme`** sets the envelope's `designSystem` (spec `0.10.0`,
   [ADR-024](../../../docs/DECISIONS.md#adr-024-design-systems-on-every-surface)),
