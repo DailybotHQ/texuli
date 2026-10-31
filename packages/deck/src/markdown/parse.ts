@@ -235,6 +235,8 @@ export function readDeckDraft(text: string): DeckDraft {
   const autoSlide = value('autoSlide');
   if (autoSlide !== undefined) navigation.autoSlideMs = autoSlide;
   const outlineTitle = value('outlineTitle');
+  // ADR-024: a design-system reference (an inline document stays JSON-only).
+  const designSystem = value('designSystem');
 
   deck.meta = meta;
   if (Object.keys(style).length > 0) deck.style = style;
@@ -249,6 +251,7 @@ export function readDeckDraft(text: string): DeckDraft {
     );
   }
   deck.slides = slides;
+  if (designSystem !== undefined) deck.designSystem = { ref: designSystem };
   return { draft: deck, sink, map };
 }
 

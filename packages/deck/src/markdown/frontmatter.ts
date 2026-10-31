@@ -45,6 +45,7 @@ export const FRONTMATTER_KEYS: Readonly<Record<string, KeySpec>> = Object.freeze
   loop: { kind: 'boolean', path: ['navigation', 'loop'] },
   autoSlide: { kind: 'int', path: ['navigation', 'autoSlideMs'] },
   outlineTitle: { kind: 'string', path: ['outline', 'title'] },
+  designSystem: { kind: 'string', path: ['designSystem', 'ref'] },
 });
 
 /** Kebab-case spellings accepted on input (the writer uses camelCase). */
@@ -56,6 +57,7 @@ const ALIASES: Readonly<Record<string, string>> = Object.freeze({
   'theme-mode': 'themeMode',
   'theme-seed': 'themeSeed',
   'outline-title': 'outlineTitle',
+  'design-system': 'designSystem',
 });
 
 export interface Frontmatter {

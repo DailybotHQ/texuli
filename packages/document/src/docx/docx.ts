@@ -24,6 +24,7 @@ import type {
 import type { DocumentDesign } from '../output/design.ts';
 import {
   bandSegments,
+  designSystemUnapplied,
   embedText,
   fileLink,
   type ImageResolver,
@@ -912,6 +913,8 @@ export async function writeDocx(
     ? (await import('./design.ts')).docxDesign(options.design, DEFAULT_THEME)
     : DEFAULT_THEME;
   const writer = new Writer(doc, trust, geometry.contentWidth, rtl, options.pageHref, theme);
+  const unapplied = designSystemUnapplied(doc, options.design);
+  if (unapplied) writer.diagnostics.push(unapplied);
   await writer.preload(doc.blocks, options.resolveImage);
 
   writer.rel('styles', 'styles.xml');

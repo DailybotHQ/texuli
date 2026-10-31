@@ -102,7 +102,7 @@ not YAML: a closed key set (`FRONTMATTER_KEYS`), one scalar per line, no
 lists, maps, anchors, tags or multi-line values. Values are bare, or quoted
 with `"…"` (escapes `\"` and `\\`) or `'…'` (`''` for a quote). `#` lines are
 comments. Kebab-case spellings (`font-pair`, `slide-numbers`, `code-theme`,
-`auto-slide`, `theme-mode`, `theme-seed`, `outline-title`) are accepted on
+`auto-slide`, `theme-mode`, `theme-seed`, `outline-title`, `design-system`) are accepted on
 input; the writer uses camelCase.
 
 | Key | Goes to | Type |
@@ -119,6 +119,7 @@ input; the writer uses camelCase.
 | `loop` | `navigation.loop` | `true` or `false` |
 | `autoSlide` | `navigation.autoSlideMs` | whole number of milliseconds |
 | `outlineTitle` | `outline.title` | string (needs at least one section) |
+| `designSystem` | `designSystem` as `{ ref }` | an exact `id@x.y.z` or `texuli:<theme>` (in development for `0.10.0`); an inline design system is not written (`md-unrepresentable`) |
 
 ## Slides, stacks and sections
 
@@ -565,7 +566,8 @@ JSON gives the same deck:
 - Free-slide fragments omit `step=` when the step is the next number in
   document order; layout fragments always carry an explicit `step=`.
 - Deck-level fields the dialect cannot hold (a field with a line break, a
-  part of `meta`, `style`, `navigation` or `outline` that does not read back)
+  part of `meta`, `style`, `navigation` or `outline` that does not read back,
+  an inline `designSystem`)
   are reported by `writeDeckMarkdown` as `md-unrepresentable` warnings,
   never silently dropped.
 
