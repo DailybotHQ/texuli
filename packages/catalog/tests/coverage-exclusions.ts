@@ -213,6 +213,12 @@ add(
 add(
   'texuli',
   'utility',
+  'A design-system scope with no content of its own; it takes a compiled design system from the host, and blueprints reference design systems as data (ADR-023).',
+  ['DesignSystemProvider']
+);
+add(
+  'texuli',
+  'utility',
   'Writes to the clipboard on press: host chrome next to code (manifest code).',
   ['CopyButton']
 );
@@ -377,5 +383,8 @@ export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(row
 // (src/build/tiers.ts) and chart parts are composed by their families. New
 // content components still get a manifest. Raised to 210 under the same
 // decision (PLAN_010): MarketingSectionHeader is marketing chrome placed by
-// the host and MotionProvider a contentless utility.
-export const EXCLUSION_CEILING = 210;
+// the host and MotionProvider a contentless utility. Raised to 211 in
+// PLAN_011 (lead decision under the plan's trust mode, recorded in its
+// decisions log): DesignSystemProvider is a contentless scope like
+// MotionProvider; the host passes it a compiled design system.
+export const EXCLUSION_CEILING = 211;

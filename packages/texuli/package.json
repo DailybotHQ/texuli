@@ -85,6 +85,11 @@
       "svelte": "./src/defaults/index.ts",
       "default": "./src/defaults/index.ts"
     },
+    "./design-system": {
+      "types": "./src/design-system/index.ts",
+      "svelte": "./src/design-system/index.ts",
+      "default": "./src/design-system/index.ts"
+    },
     "./dialog": {
       "types": "./src/components/dialog/index.ts",
       "svelte": "./src/components/dialog/index.ts",

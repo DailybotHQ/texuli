@@ -2,9 +2,9 @@
 
 > **Status: in development for `0.10.0`, not on npm.** Both subpaths exist on
 > the `release/0.10.0` branch and ship only with `@texuli/tokens@0.10.0`. The
+> runtime is [design-system-runtime.md](design-system-runtime.md); the
 > importers, emitters, report, diff and fixtures are built on the same branch
-> ([design-system-io.md](design-system-io.md)). The runtime
-> (`design-system/apply`, `designSystemStyle`), `texuli ds check` and the MCP
+> ([design-system-io.md](design-system-io.md)). `texuli ds check` and the MCP
 > `ds.*` operations are **planned** (later PLAN_011 tasks).
 
 The compiler turns a design-system document

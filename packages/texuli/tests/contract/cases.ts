@@ -1,6 +1,7 @@
 import type { ContractCase } from '../../../primitives/tests/support/contract.ts';
 import ComboboxContract from './ComboboxContract.svelte';
 import CommandContract from './CommandContract.svelte';
+import DesignSystemContract from './DesignSystemContract.svelte';
 import DisplayContract from './DisplayContract.svelte';
 import FormsContract from './FormsContract.svelte';
 import LayoutsContract from './LayoutsContract.svelte';
@@ -55,6 +56,7 @@ export const CASES: ContractCase[] = [
   { key: 'layouts/mobile/BottomNav', harness: LayoutsContract },
   { key: 'layouts/mobile/MobileHeader', harness: LayoutsContract },
   { key: 'layouts/mobile/MobileAppFrame', harness: LayoutsContract },
+  { key: 'design-system/DesignSystemProvider', harness: DesignSystemContract },
   { key: 'components/alert/Alert', harness: DisplayContract },
   { key: 'components/alert/ToneIcon', harness: DisplayContract },
   { key: 'components/alert/AlertSurface', harness: DisplayContract },

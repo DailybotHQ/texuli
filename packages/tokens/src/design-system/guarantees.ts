@@ -11,22 +11,15 @@ import type { DesignSystemIssue } from '@texuli/spec/design-system';
 import { semanticTokenToCssVar } from '../contract/prefix.ts';
 import { THEME_CONTRAST_PAIRS } from '../generator/contrast.ts';
 import { contrastRatio } from '../palette/contrast.ts';
+import type { DesignSystemMode } from './attributes.ts';
 import { composite, parseDsColor } from './color.ts';
 
-/** The `data-tx-*` attributes a compiled design system may carry (ADR-023). */
-export const DESIGN_SYSTEM_ATTRIBUTES = [
-  'data-tx-ds',
-  'data-tx-ds-version',
-  'data-tx-ds-variant',
-  'data-tx-surface',
-  'data-tx-elevation',
-  'data-tx-focus-ring-style',
-  'data-tx-icon-style',
-] as const;
+export {
+  DESIGN_SYSTEM_ATTRIBUTES,
+  type DesignSystemAttribute,
+  type DesignSystemMode,
+} from './attributes.ts';
 
-export type DesignSystemAttribute = (typeof DESIGN_SYSTEM_ATTRIBUTES)[number];
-
-export type DesignSystemMode = 'light' | 'dark';
 export type DesignSystemContrast = 'AA' | 'AAA';
 
 /** One checked pair: `kind` `text` needs the target, `ui` and `focus` need 3:1. */

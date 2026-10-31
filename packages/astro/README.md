@@ -77,6 +77,7 @@ import Section from '@texuli/astro/sections/Section';
 | `@texuli/astro/integration` | The integration and the theme bootstrap (namespace, fallback mode, density and radius) |
 | `@texuli/astro/appearance` | `AppearanceSwitcher`: a light, dark or system island that persists per site in the bootstrap's appearance cache, with its framework-free model |
 | `@texuli/astro/content` | `parseTexuliBlocks`: validates unknown input against the `@texuli/blocks` schemas |
+| `@texuli/astro/design-system` | Unreleased (`0.10.0`): `designSystemInlineStyle` (a compiled design system's `designSystemStyle` and its CSP hash), `injectDesignSystemStyle` and the middleware behind the integration's `designSystem` option |
 | `@texuli/astro/site` | `defineSite` and helpers: a validated, frozen site model with page metadata and a sitemap |
 | `@texuli/astro/styles.css` | Token base, forced-colors rules, density and radius variants, and print rules |
 | `@texuli/astro/layouts/ContentLayout` | A semantic HTML document shell |

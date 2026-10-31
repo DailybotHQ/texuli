@@ -27,6 +27,7 @@
     ".": "./src/index.ts",
     "./appearance": "./src/appearance/index.ts",
     "./content": "./src/content/index.ts",
+    "./design-system": "./src/design-system/index.ts",
     "./integration": "./src/integration/index.ts",
     "./site": "./src/site/index.ts",
     "./styles.css": "./src/styles.css",

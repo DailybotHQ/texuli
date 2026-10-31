@@ -2,6 +2,7 @@ import type { ColorMode } from '@texuli/tokens/modes';
 import { COLOR_MODE_NAMES } from '@texuli/tokens/modes';
 import { appearanceCacheKey, noFlashScript } from '@texuli/tokens/no-flash';
 import type { AstroIntegration } from 'astro';
+import type { TexuliAstroDesignSystem } from '../design-system/index.ts';
 
 export type TexuliDensityVariant = 'compact' | 'comfortable' | 'spacious';
 export type TexuliRadiusVariant = 'compact' | 'comfortable' | 'rounded';
@@ -17,6 +18,12 @@ export interface TexuliAstroOptions {
   radius?: TexuliRadiusVariant;
   /** Use Astro's inline-script injection, or render the exported body with a host nonce. */
   bootstrap?: 'injected' | 'manual';
+  /**
+   * Inline a compiled design system's `designSystemStyle` in every page's
+   * `<head>` (ADR-023), through a generated middleware. Its hash joins
+   * `security.csp.styleDirective.hashes` when Astro's CSP is on.
+   */
+  designSystem?: TexuliAstroDesignSystem;
 }
 
 const DENSITIES: readonly TexuliDensityVariant[] = ['compact', 'comfortable', 'spacious'];
@@ -53,6 +60,9 @@ function validateOptions(
   }
   if (bootstrap !== 'injected' && bootstrap !== 'manual') {
     throw new TypeError('Bootstrap must be injected or manual.');
+  }
+  if (options.designSystem && !options.designSystem.compiled?.vars) {
+    throw new TypeError('designSystem.compiled is required.');
   }
   return { namespace, fallbackMode, bootstrap, density: options.density, radius: options.radius };
 }
@@ -97,8 +107,16 @@ export function texuli(options: TexuliAstroOptions = {}): AstroIntegration {
   return {
     name: '@texuli/astro',
     hooks: {
-      'astro:config:setup': ({ injectScript }) => {
-        if (normalized.bootstrap === 'injected') injectScript('head-inline', script);
+      'astro:config:setup': async (params) => {
+        if (normalized.bootstrap === 'injected') params.injectScript('head-inline', script);
+        // Node-only and lazy: loaded only with the option (`@vite-ignore`
+        // keeps a browser bundler from adding a preload helper here).
+        if (options.designSystem)
+          await (
+            (await import(
+              /* @vite-ignore */ '../design-system/setup.ts'
+            )) as typeof import('../design-system/setup.ts')
+          ).setupDesignSystem(params, options.designSystem);
       },
     },
   };
