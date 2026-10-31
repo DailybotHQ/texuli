@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Checkbox as CheckboxPrimitive } from '@texuli/primitives/checkbox';
+import { CheckboxRoot } from '@texuli/primitives/checkbox';
 import type { HTMLAttributes } from 'svelte/elements';
 import { joinIds, splitRequiredControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
@@ -67,7 +67,7 @@ const controlClass = $derived(
 </script>
 
 {#snippet box()}
-  <CheckboxPrimitive.Root
+  <CheckboxRoot
     {...split.control}
     bind:checked
     bind:indeterminate
@@ -104,7 +104,7 @@ const controlClass = $derived(
         </svg>
       {/if}
     {/snippet}
-  </CheckboxPrimitive.Root>
+  </CheckboxRoot>
 {/snippet}
 
 {#if label}
