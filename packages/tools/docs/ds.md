@@ -99,7 +99,7 @@ request body at 256 KB), 10 s.
 ## CLI
 
 ```bash
-texuli ds init brand.ds.json --brand "name Harborline, brand #0e7490, font Inter, rounded"
+texuli ds init brand.ds.json --name Harborline         # a starter document; --brand takes a one-liner
 texuli ds validate brand.ds.json                       # JSON result; exit 1 when refused
 texuli ds compile brand.ds.json --format css --out dist/brand.css
 texuli ds export brand.ds.json --format dtcg --out tokens/brand.tokens.json
