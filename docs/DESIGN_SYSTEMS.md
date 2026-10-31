@@ -46,7 +46,7 @@ author ──► validate ──► compile ──► apply / emit
 | --- | --- | --- |
 | Validate | `@texuli/spec/design-system` (6.91 KiB gzip), re-exported with the guarantee re-check by `@texuli/tokens/design-system/validate` (9,850 B gzip) | Only where documents are validated: studio, CLI, MCP, hosts checking saved documents |
 | Compile | `@texuli/tokens/design-system/compile` (30,780 B gzip; library themes in lazy chunks) | Build time, the CLI or a lazy chunk; never in an app's initial bundle unless it compiles at run time |
-| Apply | `@texuli/tokens/design-system/apply` (1,966 B gzip), `texuli/design-system` | The compiled variables of one design system |
+| Apply | `@texuli/tokens/design-system/apply` (2,040 B gzip), `texuli/design-system` | The compiled variables of one design system |
 
 ## Example brands
 

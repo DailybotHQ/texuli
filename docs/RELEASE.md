@@ -89,7 +89,7 @@ merged there with full CI, and only the merge of `release/0.10.0` into
   and `target-size` when only pins could fix them; every solver move is in
   the report). `fromTheme` turns any `Theme` into a document; all 210
   library themes compile both ways with zero variable drift.
-- **The runtime** (`@texuli/tokens/design-system/apply`, 1,966 B gzip,
+- **The runtime** (`@texuli/tokens/design-system/apply`, 2,040 B gzip,
   T-ds-runtime, ADR-023): `applyDesignSystem` (one style write per switch,
   element-scoped), `designSystemStyle` for server HTML and
   `designSystemAppearance` for the no-flash cache, byte-identical;
