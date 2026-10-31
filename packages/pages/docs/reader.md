@@ -32,6 +32,7 @@ editing code.
 | `designSystems` | — | `PagesDesignSystems` (spec 0.10.0): `resolve(ref)` for the document's `designSystem.ref` (a document or a compiled design system; may be async; the reader never fetches), `mode` (`light`, `dark`) and `trust` for an inline document (default `untrusted`) |
 | `onDesignSystem` | — | Called with a `PagesDesignSystemEvent`: `{ status: 'applied', id, source }` or `{ status: 'refused', code, path, message }` |
 | `renderBlock`, `blockHost` | — | The host's own blocks: a snippet and a `PagesBlockHost` ([host blocks](editor.md#host-blocks)) |
+| `loadPlayer` | the package loader | A `PagesPlayerLoader` for live embeds; `null` turns them off ([core entries](editor.md#core-entries-without-the-player)) |
 | `class` | — | Extra classes on the root |
 
 Blocks render as semantic elements: paragraphs, `h1` to `h4` (plus the
@@ -44,6 +45,17 @@ with `@texuli/player`, as in the editor, or with the host's renderer
 ([host blocks](editor.md#host-blocks): `PagesBlockHost`, `PagesBlockClaim`,
 `PagesBlockHostProps`, `PagesBlockHostRequest`, `PagesBlockSnippet`,
 `PagesHostNode`, `PagesReadonly`).
+
+## `@texuli/pages/reader-core`
+
+> **In development for `0.10.0`, not on npm.**
+
+`PageReaderCore` is `PageReader` with no default `loadPlayer`: a host on
+this entry has no `@texuli/player` reference in its build, and embeds
+paint only with the host's `PagesPlayerLoader` (its result is a
+`PagesPlayerModule`). Every other export is the same as
+`@texuli/pages/reader`, which exports `PageReaderCore` too. See
+[core entries](editor.md#core-entries-without-the-player).
 
 ## Design systems
 

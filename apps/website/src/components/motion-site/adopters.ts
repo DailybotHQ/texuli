@@ -190,7 +190,7 @@ export const MOTION_ADOPTERS: readonly MotionAdopter[] = [
     live: '/documents-page/#workbench',
   },
   {
-    file: 'packages/pages/src/editor/PageEditor.svelte',
+    file: 'packages/pages/src/editor/PageEditorCore.svelte',
     component: 'PageEditor',
     pkg: '@texuli/pages',
     motion: 'Takes the motion prop and passes it to its block list',
@@ -204,7 +204,7 @@ export const MOTION_ADOPTERS: readonly MotionAdopter[] = [
     live: '/documents-page/#workbench',
   },
   {
-    file: 'packages/pages/src/collab/CollabEditor.svelte',
+    file: 'packages/pages/src/collab/CollabEditorCore.svelte',
     component: 'CollabEditor',
     pkg: '@texuli/pages',
     motion: 'The same block motion in collaborative editing',

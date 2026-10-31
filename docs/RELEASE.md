@@ -250,6 +250,25 @@ branch):
     writers print for it; before, every wrapped block was left out. The
     new `blocks: 'drop'` option leaves them out. Neither reads back as a
     wrapped block (the Markdown subset has no table).
+- **Protoyard gap G123** (PLAN_011 T-gap-123; reported while adopting
+  `@texuli/pages` 0.9.0): `@texuli/pages` always reached all of
+  `@texuli/player`. The embed view's `import('@texuli/player')` stayed in
+  every host's graph, even with no embeds, so a bundler that inlines lazy
+  chunks carried the whole player. The new entries `editor-core`,
+  `reader-core`, `paged-core`, `collab-core` and `host-core` export
+  `PageEditorCore`, `PageReaderCore`, `PagedViewCore`, `CollabEditorCore`
+  and `createDocumentPlayerHostCore`, which have no default player loader.
+  Live embeds paint only with the host's `loadPlayer` (a
+  `PagesPlayerLoader`, such as `() => import('@texuli/player')`, so the
+  import lives in host code). Without a loader, an embed that needs the
+  player shows a note (`labels.embedOff`), or goes to the host block
+  renderer when its claim is `'fallback'`. A host on the core entries with
+  no loader has no player module or specifier in any chunk
+  (`packages/pages/tests/bundle-graph.test.ts`). `pnpm size` measures
+  every lazy chunk of `editor-core` at 159 KiB gzip, against 467 KiB for
+  `editor`, with about the same initial JS (90.6 KiB against 91.8 KiB).
+  The default entries behave as before, and `loadPlayer={null}` turns live
+  embeds off at runtime.
 
 ### 0.9.0
 
