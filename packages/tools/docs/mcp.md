@@ -44,7 +44,10 @@ source.
   bytes, over-long paths and symlinked components (the target included)
   refused with a stable code (`path-required`, `path-invalid`,
   `outside-working-directory`, `not-a-file`, `symlink`); and a new file
-  (`exists` otherwise) unless `overwrite` is set. The `texuli document --out`
+  (`exists` otherwise) unless `overwrite` is set. `ds.save` adds its own
+  path rules: a `.json` file (`path-extension`), with no dot directory or
+  dotfile, no `node_modules` segment and no `package.json`
+  (`path-reserved`; [ds.md](ds.md)). The `texuli document --out`
   CLI flag keeps its own rule (a new file at the path the user typed).
 
 `createMcpHandler` turns the [operations registry](ops.md) into an MCP

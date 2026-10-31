@@ -417,26 +417,55 @@ export async function runPreview(input: Input) {
 /** The document as the file `ds.save` writes: two-space JSON and a final newline. */
 export const savedText = (document: unknown) => `${JSON.stringify(document, null, 2)}\n`;
 
+/**
+ * What `ds.save` may write, on top of the local write policy (ADR-019):
+ * a `.json` file (any case), with no path segment that starts with `.`
+ * (`.git/`, `.github/`, `.vscode/`, `.npmrc`), no `node_modules` segment and
+ * no file named `package.json`, so even with `overwrite` it cannot replace
+ * repository, CI or tool files. Checked on the path relative to the working
+ * directory; the names compare case-insensitively (case-insensitive file
+ * systems). Returns the refusal, or `undefined` when the path may be written.
+ */
+export function savePathRefusal(
+  relative: string
+): { code: 'path-extension' | 'path-reserved'; error: string } | undefined {
+  const segments = relative.split(/[\\/]/u);
+  const name = (segments.at(-1) ?? '').toLowerCase();
+  if (segments.some((segment) => segment.startsWith('.')))
+    return {
+      code: 'path-reserved',
+      error: `ds.save does not write in a dot directory or to a dotfile: ${relative}`,
+    };
+  if (
+    segments.some((segment) => segment.toLowerCase() === 'node_modules') ||
+    name === 'package.json'
+  )
+    return {
+      code: 'path-reserved',
+      error: `ds.save does not write to node_modules or package.json: ${relative}`,
+    };
+  if (!name.endsWith('.json'))
+    return { code: 'path-extension', error: `ds.save writes .json files only: ${relative}` };
+  return undefined;
+}
+
 export async function runSave(input: Input, files: LocalFiles) {
   const check = await runValidate(input);
   if (!check.valid) return { saved: false, errors: check.errors };
   const text = savedText(input.document);
   const path = input.path as string;
-  if (input.dryRun === true) {
-    const target = files.check(path);
-    if (!target.ok)
-      return {
-        saved: false,
-        errors: [{ code: target.code, path: '$.path', message: target.error }],
-      };
+  const refused = (code: string, message: string) => ({
+    saved: false,
+    errors: [{ code, path: '$.path', message }],
+  });
+  const target = files.check(path);
+  if (!target.ok) return refused(target.code, target.error);
+  const reserved = savePathRefusal(target.relative);
+  if (reserved) return refused(reserved.code, reserved.error);
+  if (input.dryRun === true)
     return { saved: false, dryRun: true, path: target.relative, bytes: bytesOf(text), errors: [] };
-  }
   const written = await files.write(path, text, { overwrite: input.overwrite === true });
-  if (!written.ok)
-    return {
-      saved: false,
-      errors: [{ code: written.code, path: '$.path', message: written.error }],
-    };
+  if (!written.ok) return refused(written.code, written.error);
   return { saved: true, path: written.relative, bytes: written.bytes, errors: [] };
 }
 

@@ -436,10 +436,10 @@ Example (An SVG snapshot): texuli ds preview --json '{"document":{"format":"texu
 Usage: texuli ds save [--json <object> | --file <path>] [--out <path>]
 
 Save a design system to a file (ds.save, runtime node)
-Validate a design-system document (as ds.validate does) and write it as two-space JSON to the explicit path you pass, inside the working directory: traversal, symlinks and an existing file without overwrite are refused. Local doors only. Returns saved, the relative path and bytes written, or errors with stable codes.
+Validate a design-system document (as ds.validate does) and write it as two-space JSON to the explicit .json path you pass, inside the working directory: traversal, symlinks, dot directories and dotfiles, node_modules, package.json and an existing file without overwrite are refused. Local doors only. Returns saved, the relative path and bytes written, or errors with stable codes.
 
 Arguments (JSON object keys):
-  path (required): string. Where to write, relative to the working directory (e.g. design-systems/harborline.ds.json).
+  path (required): string. Where to write, relative to the working directory (e.g. design-systems/harborline.ds.json): a .json file outside dot directories and node_modules, never package.json.
   document (required): object. A design-system document: format "texuli/design-system", formatVersion 1, id, version, name, and optional sections (extends, color, typography, shape, space, elevation, surface, motion, layout, icons, components, assets, voice, accessibility, variants). texuli://design-system/acme is a full example.
   overwrite: boolean. Replace an existing file (default false: an existing file is refused).
   dryRun: boolean. Validate the document and the path, and write nothing.
