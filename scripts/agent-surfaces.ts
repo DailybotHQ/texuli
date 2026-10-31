@@ -23,6 +23,7 @@ import { createMcpHandler } from '../packages/tools/src/mcp/handler.ts';
 import { TEXULI_PROMPTS } from '../packages/tools/src/mcp/prompts.ts';
 import {
   MCP_PROTOCOL_VERSION,
+  MCP_STATELESS_PROTOCOL_VERSIONS,
   MCP_SUPPORTED_PROTOCOL_VERSIONS,
 } from '../packages/tools/src/mcp/protocol.ts';
 import { texuliResources } from '../packages/tools/src/mcp/resources.ts';
@@ -108,6 +109,8 @@ export async function buildServerCard(registry: OperationRegistry = texuliOps) {
     },
     protocolVersion: MCP_PROTOCOL_VERSION,
     protocolVersions: [...MCP_SUPPORTED_PROTOCOL_VERSIONS],
+    /** Revisions served per request through params._meta, with no initialize (server/discover). */
+    statelessProtocolVersions: [...MCP_STATELESS_PROTOCOL_VERSIONS],
     transport: {
       streamableHttp: {
         url: REMOTE_MCP_URL,

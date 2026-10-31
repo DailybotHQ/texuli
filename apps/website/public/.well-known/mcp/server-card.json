@@ -9,6 +9,7 @@
   },
   "protocolVersion": "2025-11-25",
   "protocolVersions": ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"],
+  "statelessProtocolVersions": ["2026-07-28"],
   "transport": {
     "streamableHttp": {
       "url": "https://texuli.com/mcp",

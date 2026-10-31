@@ -15,7 +15,10 @@ import {
   createMcpHandler,
   createTexuliMcpServer,
   MCP_ERROR_CODES,
+  MCP_PROTOCOL_REVISIONS,
   MCP_PROTOCOL_VERSION,
+  MCP_PROTOCOL_VERSION_META_KEY,
+  MCP_STATELESS_PROTOCOL_VERSIONS,
   MCP_SUPPORTED_PROTOCOL_VERSIONS,
   type McpHandler,
   type McpResourceProvider,
@@ -206,6 +209,173 @@ it('keeps the initialization gate on stateful handlers and never requires it on 
       expect(await handle({ jsonrpc: '2.0', method: 'notifications/initialized' })).toBeUndefined();
     }
   );
+});
+
+it('serves the 2026-07-28 revision per request from params._meta, with no initialize (G124)', async () => {
+  const STATELESS = '2026-07-28';
+  const meta = (version: unknown = STATELESS) => ({
+    _meta: { [MCP_PROTOCOL_VERSION_META_KEY]: version },
+  });
+  const ALL = [STATELESS, ...MCP_SUPPORTED_PROTOCOL_VERSIONS];
+  await scenario('the revision constants name 2026-07-28 next to the initialize-based ones', () => {
+    expect(MCP_PROTOCOL_VERSION_META_KEY).toBe('io.modelcontextprotocol/protocolVersion');
+    expect(MCP_STATELESS_PROTOCOL_VERSIONS).toEqual([STATELESS]);
+    expect(MCP_PROTOCOL_REVISIONS).toEqual(ALL);
+    // initialize still negotiates only the initialize-based revisions.
+    expect(MCP_SUPPORTED_PROTOCOL_VERSIONS).not.toContain(STATELESS);
+    expect(MCP_ERROR_CODES.unsupportedProtocolVersion).toBe(-32022);
+  });
+  await scenario('the Protoyard repro: server/discover answers before any initialize', async () => {
+    const handle = createMcpHandler({ mode: 'stateful' });
+    const answer = (await handle({
+      jsonrpc: '2.0',
+      id: 4,
+      method: 'server/discover',
+      params: meta(),
+    })) as Rpc;
+    expect(answer.error).toBeUndefined();
+    expect(answer.id).toBe(4);
+    const { handle: initialized, init } = await ready();
+    const tools = await walk(initialized, 'tools/list', 'tools');
+    const prompts = await walk(initialized, 'prompts/list', 'prompts');
+    const resources = await walk(initialized, 'resources/list', 'resources');
+    const templates = await walk(initialized, 'resources/templates/list', 'resourceTemplates');
+    expect(answer.result).toEqual({
+      protocolVersion: STATELESS,
+      supportedVersions: ALL,
+      serverInfo: { name: 'texuli', version: VERSION },
+      capabilities: init.result?.capabilities,
+      instructions: init.result?.instructions,
+      tools: tools.items.map(({ name, title }) => (title ? { name, title } : { name })),
+      prompts: prompts.items.map(({ name, title }) => ({ name, title })),
+      resources: {
+        count: resources.items.length,
+        templates: templates.items.map(({ uriTemplate, name, title }) => ({
+          uriTemplate,
+          name,
+          title,
+        })),
+      },
+    });
+    // The server card lists the same revisions.
+    const card = JSON.parse(
+      readFileSync(new URL('.well-known/mcp/server-card.json', PUBLIC), 'utf8')
+    ) as { protocolVersions: string[]; statelessProtocolVersions: string[] };
+    expect([...card.statelessProtocolVersions, ...card.protocolVersions]).toEqual(
+      answer.result?.supportedVersions
+    );
+  });
+  await scenario('server/discover leaves out what a handler does not serve', async () => {
+    const handle = createMcpHandler({ resources: [], prompts: [] });
+    const answer = await rpc(handle, 'server/discover', meta());
+    expect(answer.result?.capabilities).toEqual({ tools: { listChanged: false } });
+    expect(answer.result).not.toHaveProperty('prompts');
+    expect(answer.result).not.toHaveProperty('resources');
+  });
+  await scenario('every list, read, get, call and completion answers statelessly', async () => {
+    const { handle: initialized } = await ready();
+    for (const mode of ['stateful', 'stateless'] as const) {
+      const handle = createMcpHandler({ mode });
+      const calls: [string, Record<string, unknown>][] = [
+        ['ping', {}],
+        ['tools/list', {}],
+        ['tools/call', { name: 'catalog.search', arguments: { query: 'card', limit: 2 } }],
+        ['tools/call', { name: 'component.get', arguments: { id: 'no-such-component' } }],
+        ['prompts/list', {}],
+        ['prompts/get', { name: 'build-ui', arguments: { brief: 'A fictional settings page.' } }],
+        ['resources/list', {}],
+        ['resources/templates/list', {}],
+        ['resources/read', { uri: 'texuli://schema/deck' }],
+        ['resources/read', { uri: 'texuli://nope' }],
+        [
+          'completion/complete',
+          {
+            ref: { type: 'ref/resource', uri: 'texuli://theme/{id}' },
+            argument: { name: 'id', value: 'a' },
+          },
+        ],
+      ];
+      for (const [method, params] of calls) {
+        const stateless = await rpc(handle, method, { ...params, ...meta() });
+        const classic = await rpc(initialized, method, params);
+        const label = `${mode} ${method} ${JSON.stringify(params).slice(0, 60)}`;
+        expect(stateless.error?.code, label).not.toBe(MCP_ERROR_CODES.notInitialized);
+        expect({ ...stateless, id: 0 }, label).toEqual({ ...classic, id: 0 });
+      }
+      // Nothing was stored: a request without the _meta version keeps today's gate.
+      if (mode === 'stateful') {
+        const gated = await rpc(handle, 'tools/list');
+        expect(gated.error?.code).toBe(MCP_ERROR_CODES.notInitialized);
+      }
+    }
+  });
+  await scenario('an unknown revision is -32022 with error.data.supported', async () => {
+    for (const mode of ['stateful', 'stateless'] as const) {
+      const handle = createMcpHandler({ mode });
+      for (const [version, method] of [
+        ['2099-01-01', 'server/discover'],
+        ['2099-01-01', 'tools/list'],
+        ['2099-01-01', 'initialize'],
+        ['', 'ping'],
+        [42, 'tools/call'],
+        [null, 'prompts/list'],
+      ] as const) {
+        const refused = await rpc(handle, method, meta(version));
+        const label = `${mode} ${method} ${String(version)}`;
+        expect(refused.error?.code, label).toBe(-32022);
+        expect(refused.error?.message, label).toMatch(/^Unsupported protocol version/u);
+        expect(refused.error?.data, label).toEqual({
+          supported: ALL,
+          ...(typeof version === 'string' ? { requested: version } : {}),
+        });
+      }
+      const long = await rpc(handle, 'tools/list', meta('9'.repeat(1000)));
+      const requested = (long.error?.data as { requested?: string } | undefined)?.requested;
+      expect(requested).toBe('9'.repeat(64));
+    }
+  });
+  await scenario(
+    'a request without the 2026-07-28 _meta version keeps the behavior of today',
+    async () => {
+      const stateful = createMcpHandler({ mode: 'stateful' });
+      // server/discover is a 2026-07-28 method: before initialize it is gated, after it is unknown.
+      expect((await rpc(stateful, 'server/discover')).error?.code).toBe(
+        MCP_ERROR_CODES.notInitialized
+      );
+      // _meta naming an initialize-based revision changes nothing either.
+      expect((await rpc(stateful, 'tools/list', meta('2025-11-25'))).error?.code).toBe(
+        MCP_ERROR_CODES.notInitialized
+      );
+      expect((await rpc(stateful, 'tools/list', { _meta: 'not an object' })).error?.code).toBe(
+        MCP_ERROR_CODES.notInitialized
+      );
+      const { handle } = await ready();
+      const unknown = await rpc(handle, 'server/discover');
+      expect(unknown.error?.code).toBe(MCP_ERROR_CODES.methodNotFound);
+      expect(unknown.error?.message).toBe('Method not found: server/discover');
+      const stateless = createMcpHandler({ mode: 'stateless' });
+      expect((await rpc(stateless, 'server/discover')).error?.code).toBe(
+        MCP_ERROR_CODES.methodNotFound
+      );
+      // A 2026-07-28 notification is still a notification: no answer.
+      expect(
+        await stateful({ jsonrpc: '2.0', method: 'notifications/initialized', params: meta() })
+      ).toBeUndefined();
+      expect((await rpc(stateful, 'tools/list')).error?.code).toBe(MCP_ERROR_CODES.notInitialized);
+    }
+  );
+  await scenario('on HTTP the MCP-Protocol-Version header must agree with _meta', async () => {
+    const handle = createMcpHandler({ mode: 'stateless' });
+    const agreed = await rpc(handle, 'tools/list', meta(), { protocolVersion: STATELESS });
+    expect(agreed.result?.tools).toBeDefined();
+    const mismatch = await rpc(handle, 'tools/list', meta(), { protocolVersion: '2025-11-25' });
+    expect(mismatch.error?.code).toBe(MCP_ERROR_CODES.invalidRequest);
+    expect(mismatch.error?.message).toMatch(/MCP-Protocol-Version header/u);
+    // The 2026-07-28 header without the _meta version: that revision carries it in every request.
+    const headerOnly = await rpc(handle, 'tools/list', {}, { protocolVersion: STATELESS });
+    expect(headerOnly.error?.code).toBe(MCP_ERROR_CODES.invalidRequest);
+    expect(headerOnly.error?.message).toContain(MCP_PROTOCOL_VERSION_META_KEY);
+  });
 });
 
 it('lists every served operation as a tool with schemas, annotations and cursor pagination', async () => {
@@ -846,6 +1016,7 @@ it('answers malformed JSON-RPC with the standard error codes', async () => {
     internalError: -32603,
     notInitialized: -32600,
     resourceNotFound: -32002,
+    unsupportedProtocolVersion: -32022,
   });
 });
 
