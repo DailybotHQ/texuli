@@ -1052,6 +1052,27 @@ export const MCP_SERVER_DATA = {
         'An example design system. A fictional example document as JSON; validate your own with ds.validate.',
       mimeType: 'application/json',
     },
+    {
+      uri: 'texuli://design-system/quillmark',
+      title: 'Quillmark design system',
+      description:
+        'A fictional literary magazine: warm paper tones, a serif voice and calm motion. A fictional example document as JSON; validate your own with ds.validate.',
+      mimeType: 'application/json',
+    },
+    {
+      uri: 'texuli://design-system/ledgerline',
+      title: 'Ledgerline design system',
+      description:
+        'A fictional finance back office: dense tables, crisp edges and a high-contrast variant for long sessions. A fictional example document as JSON; validate your own with ds.validate.',
+      mimeType: 'application/json',
+    },
+    {
+      uri: 'texuli://design-system/tumbletown',
+      title: 'Tumbletown design system',
+      description:
+        'A fictional family game studio: big rounded shapes, lively motion and a pinned brand pink. A fictional example document as JSON; validate your own with ds.validate.',
+      mimeType: 'application/json',
+    },
   ],
   resourceTemplates: [
     {
@@ -1079,7 +1100,7 @@ export const MCP_SERVER_DATA = {
       uriTemplate: 'texuli://design-system/{id}',
       title: 'Design-system document',
       description:
-        'One design-system document as JSON: a fictional example (acme shows every section, minimal the smallest) or a library theme as a document (its generator input as color.brand), ready to extend, validate with ds.validate and compile with ds.compile. Complete {id} for every id; one document per read.',
+        'One design-system document as JSON: a fictional example (acme shows every section, minimal the smallest; quillmark, ledgerline and tumbletown are example brands) or a library theme as a document (its generator input as color.brand), ready to extend, validate with ds.validate and compile with ds.compile. Complete {id} for every id; one document per read.',
       mimeType: 'application/json',
     },
     {

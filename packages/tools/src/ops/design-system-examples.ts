@@ -1,10 +1,12 @@
 /**
- * The spec's example design systems (`packages/spec/fixtures/design-systems/
- * acme.json` and `minimal.json`, fictional brands), served as
- * `texuli://design-system/{id}`. `@texuli/spec` does not export its
- * fixtures, so they are copied here; `tests/ds-ops.test.ts` checks the
- * copies equal the files. Loaded lazily, so the edge bundle pays only when
- * one is read.
+ * The fictional example design systems served as
+ * `texuli://design-system/{id}`: the spec's fixtures (`acme`, every
+ * section; `minimal`, the smallest; `packages/spec/fixtures/design-systems/`)
+ * and the guide's example brands (`quillmark`, `ledgerline`, `tumbletown`;
+ * `examples/design-systems/`, docs/DESIGN_SYSTEMS.md). Neither directory is
+ * a package export, so they are copied here; `tests/ds-ops.test.ts` checks
+ * the copies equal the files. Loaded lazily, so the edge bundle pays only
+ * when one is read.
  */
 
 /** The example documents by id, in listing order. */
@@ -359,5 +361,130 @@ export const DESIGN_SYSTEM_EXAMPLES: Readonly<Record<string, Readonly<Record<str
     version: '1.0.0',
     name: 'Minimal',
     color: { brand: { seed: '#4f46e5' } },
+  },
+  quillmark: {
+    format: 'texuli/design-system',
+    formatVersion: 1,
+    id: 'quillmark',
+    version: '1.0.0',
+    name: 'Quillmark',
+    description: 'A fictional literary magazine: warm paper tones, a serif voice and calm motion.',
+    owner: 'Quillmark Editorial (fictional)',
+    license: 'MIT',
+    tags: ['editorial', 'warm', 'example'],
+    color: { brand: { seed: '#b4532a', secondary: '#6b7a3a', accent: '#c99a2e', neutral: 'warm' } },
+    typography: {
+      families: {
+        sans: { stack: ['Inter', 'system-ui', 'sans-serif'] },
+        heading: { stack: ['Fraunces', 'Georgia', 'serif'] },
+        serif: { stack: ['Source Serif 4', 'Georgia', 'serif'] },
+        mono: { stack: ['ui-monospace', 'monospace'] },
+      },
+      scale: { base: 17, ratio: 1.25 },
+      roles: {
+        display: { family: 'heading', weight: 600, line: 1.1 },
+        heading: { family: 'heading', weight: 600 },
+        body: { family: 'serif', line: 1.6 },
+      },
+    },
+    shape: { radius: 4, borderWidth: 1 },
+    space: { base: 4, density: 1.0625 },
+    elevation: { style: 'flat' },
+    surface: { style: 'solid' },
+    motion: { personality: 'subtle' },
+    layout: { contentMax: 720, wideMax: 1120 },
+    components: {
+      card: { radius: 'sm', 'border-width': 'thin', defaults: { variant: 'flat' } },
+      button: { defaults: { variant: 'outline' } },
+    },
+    assets: { logo: { light: 'brand/quillmark.svg', dark: 'brand/quillmark-dark.svg' } },
+    voice: {
+      tone: ['thoughtful', 'warm'],
+      lexicon: { post: 'essay', author: 'contributor' },
+      guidelines: ['Write in full sentences.', 'Prefer plain words over jargon.'],
+    },
+    accessibility: { contrast: 'AA', targetMin: 24, focus: 'outline', focusWidth: 2 },
+  },
+  ledgerline: {
+    format: 'texuli/design-system',
+    formatVersion: 1,
+    id: 'ledgerline',
+    version: '2.3.0',
+    name: 'Ledgerline',
+    description:
+      'A fictional finance back office: dense tables, crisp edges and a high-contrast variant for long sessions.',
+    owner: 'Ledgerline Platform (fictional)',
+    license: 'MIT',
+    tags: ['enterprise', 'dense', 'example'],
+    extends: 'texuli:slate-masthead',
+    color: { brand: { seed: '#1d4ed8', secondary: '#0f766e', neutral: 'slate' } },
+    typography: {
+      families: {
+        sans: { stack: ['IBM Plex Sans', 'system-ui', 'sans-serif'] },
+        mono: { stack: ['IBM Plex Mono', 'ui-monospace', 'monospace'] },
+      },
+      scale: { base: 14, ratio: 1.125 },
+    },
+    shape: { radius: 4, radiusScale: 0.5, borderWidth: 1 },
+    space: { base: 4, density: 0.875 },
+    elevation: { style: 'crisp' },
+    surface: { style: 'solid' },
+    motion: { personality: 'subtle' },
+    components: {
+      button: { defaults: { variant: 'default', size: 'sm' } },
+      card: { defaults: { variant: 'flat' } },
+    },
+    voice: {
+      tone: ['precise', 'neutral'],
+      lexicon: { workspace: 'ledger' },
+      guidelines: ['Lead with the number.', 'Name the period every figure covers.'],
+    },
+    accessibility: { contrast: 'AA', targetMin: 24, focus: 'ring', focusWidth: 2 },
+    variants: {
+      'high-contrast': {
+        accessibility: { contrast: 'AAA', focus: 'outline', focusWidth: 3 },
+        shape: { borderWidth: 2 },
+      },
+      compact: { space: { density: 0.75 } },
+    },
+  },
+  tumbletown: {
+    format: 'texuli/design-system',
+    formatVersion: 1,
+    id: 'tumbletown',
+    version: '1.0.0',
+    name: 'Tumbletown',
+    description:
+      'A fictional family game studio: big rounded shapes, lively motion and a pinned brand pink.',
+    owner: 'Tumbletown Games (fictional)',
+    license: 'MIT',
+    tags: ['playful', 'rounded', 'example'],
+    color: {
+      brand: { seed: '#d6336c', secondary: '#1098ad', accent: '#f59f00', neutral: 'tinted' },
+      pin: { primary: '#d6336c' },
+    },
+    typography: {
+      families: {
+        sans: { stack: ['Nunito', 'system-ui', 'sans-serif'] },
+        heading: { stack: ['Baloo 2', 'Nunito', 'system-ui'] },
+      },
+      scale: { base: 16, ratio: 1.333 },
+      roles: { heading: { family: 'heading', weight: 700 } },
+    },
+    shape: { radius: 20, radiusScale: 1.5, borderWidth: 2 },
+    space: { base: 4, density: 1.125 },
+    elevation: { style: 'soft' },
+    surface: { style: 'solid' },
+    motion: { personality: 'expressive' },
+    components: {
+      button: { radius: 'full', defaults: { variant: 'default', size: 'lg' } },
+      card: { radius: 'xl' },
+    },
+    voice: {
+      tone: ['playful', 'kind'],
+      lexicon: { account: 'player profile' },
+      guidelines: ['Celebrate small wins.', 'Never shame a mistake.'],
+    },
+    accessibility: { contrast: 'AA', targetMin: 44, focus: 'glow', focusWidth: 3 },
   },
 };
