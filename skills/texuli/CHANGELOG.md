@@ -51,6 +51,14 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
   `loadPlayer`). The `0.8.0` to `0.5.0` sections move to
   `upgrade/references/packages.md` to keep `upgrade/SKILL.md` within its
   budget.
+
+## [0.3.4] — 2026-10-30
+
+### Changes
+
+- chore(skill): the skill pack says 0.9.0 is published
+- docs(skill): add the MCP hosts section and cite registry operations and published bins
+
 - The packages move to `0.9.0`: 26 published packages, `@texuli/mcp`
   published for the first time. The router, components, install and
   build-ui references say "on npm as `0.9.0`" and pin `^0.9.0`; the
