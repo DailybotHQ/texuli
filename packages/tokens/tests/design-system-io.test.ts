@@ -320,6 +320,27 @@ describe('emitters are deterministic', () => {
     );
   });
 
+  it('puts a single compiled mode on the selector, as designSystemStyle does', () => {
+    const darkOnly = compiled({
+      ...acmeLocal,
+      color: { ...(acmeLocal.color as Doc), modes: ['dark'] },
+    });
+    expect(Object.keys(darkOnly.vars)).toEqual(['dark']);
+    for (const dark of ['class', 'attribute', 'media'] as const) {
+      const css = emitCss(darkOnly, { dark });
+      expect(css).toContain('[data-tx-ds="acme"] {\n  --tx-');
+      expect(css).not.toMatch(/\.dark|data-tx-mode|@media/);
+      expect(css).toContain(`--tx-background: ${darkOnly.vars.dark?.['--tx-background']};`);
+    }
+    // An explicit single mode of a two-mode design system is the base rule too.
+    const darkRule = emitCss(acmeCompiled, { selector: ':root', modes: ['dark'] });
+    expect(darkRule).toContain(`:root {\n`);
+    expect(darkRule).toContain(`--tx-background: ${acmeCompiled.vars.dark?.['--tx-background']};`);
+    expect(darkRule).not.toContain('.dark');
+    // The Tailwind preset of a dark-only design system still names every variable.
+    expect(emitTailwindPreset(darkOnly).theme.extend.colors.primary).toBe('var(--tx-primary)');
+  });
+
   it('builds a Tailwind preset over the --tx-* variables or concrete values', () => {
     const preset = emitTailwindPreset(acmeCompiled);
     expect(preset.theme.extend.colors.primary).toBe('var(--tx-primary)');
