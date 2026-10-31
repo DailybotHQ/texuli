@@ -612,8 +612,8 @@ const gridStyle = $derived({ columns: active.columns, row: `${safeRow}px` });
       overflow: hidden;
       border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
       border-radius: var(--tx-shape-radius-xl);
-      background: var(--tx-card, Canvas);
-      color: var(--tx-card-foreground, CanvasText);
+      background: var(--tx-surface, Canvas);
+      color: var(--tx-surface-foreground, CanvasText);
     }
 
     .tx-dashboard__widget[data-held] {

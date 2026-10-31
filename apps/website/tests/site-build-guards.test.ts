@@ -448,6 +448,7 @@ describe('agent discovery files (public/.well-known, the generated API and ARD c
       capabilities: string[];
       tools: { name: string; title: string; description: string; remote: boolean }[];
       deprecatedTools: { name: string; remote: boolean }[];
+      removedTools: { name: string; replacedBy: string[]; removedIn: string }[];
     };
     expect(aiCatalog.host.displayName).toBe('Texuli');
     // T-100 P1-4: /docs/ was advertised but has no route.
@@ -475,6 +476,9 @@ describe('agent discovery files (public/.well-known, the generated API and ARD c
     }
     expect(card.deprecatedTools.map((alias) => alias.name)).toEqual(
       texuliOps.aliases().map((alias) => alias.name)
+    );
+    expect(card.removedTools.map((entry) => entry.name)).toEqual(
+      texuliOps.removed().map((entry) => entry.name)
     );
     expect(card.capabilities.every((name) => typeof name === 'string')).toBe(true);
     expect(card.capabilities).toContain('tools');

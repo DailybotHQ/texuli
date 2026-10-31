@@ -21,6 +21,7 @@ export {
   type DsRenderOptions,
   findSheetApp,
   knownFinding,
+  parseKnownFindings,
   playwrightAxeRunner,
   type RenderDesignSystemCheckOptions,
   renderDesignSystemCheck,

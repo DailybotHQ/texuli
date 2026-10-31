@@ -231,14 +231,10 @@ it('lists every served operation as a tool with schemas, annotations and cursor 
           openWorldHint: operation.annotations.openWorld,
         });
       }
-      const aliases = listed.slice(operations.length);
-      expect(aliases.map((tool) => tool.name)).toEqual(
-        texuliOps.aliases().map((alias) => alias.name)
-      );
-      for (const alias of aliases) {
-        expect(alias.description).toMatch(/^Deprecated alias of /u);
-        expect(alias.outputSchema).toBeUndefined();
-      }
+      // The 0.8 tool names were removed in 0.10.0: only operations are listed.
+      expect(listed.length).toBe(operations.length);
+      for (const removed of texuliOps.removed())
+        expect(listed.map((tool) => tool.name)).not.toContain(removed.name);
     }
   );
   await scenario('pages with opaque cursors and refuses forged or foreign ones', async () => {
@@ -271,8 +267,15 @@ it('returns structuredContent with a text mirror, and every operation error code
     expect(call.result?.isError).toBeUndefined();
     expect(call.result?.structuredContent).toMatchObject({ component: { id: 'card' } });
     expect(textOf(call)).toEqual(call.result?.structuredContent);
-    const alias = await rpc(handle, 'tools/call', { name: 'component', arguments: { id: 'card' } });
-    expect(alias.result?.structuredContent).toEqual(call.result?.structuredContent);
+    // A 0.8 name removed in 0.10.0 is a protocol error that names its replacement.
+    const removed = await rpc(handle, 'tools/call', {
+      name: 'component',
+      arguments: { id: 'card' },
+    });
+    expect(removed.error).toEqual({
+      code: MCP_ERROR_CODES.invalidParams,
+      message: 'The tool "component" was removed in 0.10.0; call component.get instead.',
+    });
     const noArguments = await rpc(handle, 'tools/call', { name: 'catalog.search' });
     expect(
       (noArguments.result?.structuredContent as { total: number } | undefined)?.total
@@ -383,21 +386,23 @@ it('serves only the runtime classes a handler is given', async () => {
     expect(edgeNames).not.toContain(operation.name);
     expect(localNames).toContain(operation.name);
   }
-  // An alias is listed only when every target is served; `document` reaches document.export.
-  expect(edgeNames).not.toContain('document');
-  expect(localNames).toContain('document');
+  // The 0.8 names were removed in 0.10.0: neither door lists them.
+  for (const removed of texuliOps.removed()) {
+    expect(edgeNames).not.toContain(removed.name);
+    expect(localNames).not.toContain(removed.name);
+  }
   expect(edgeNames).toContain('deck.run');
   // Calling a node operation on the edge names the runtime instead of "unknown tool".
   for (const [name, args] of [
-    ['document.export', { command: 'to-pdf', document: {} }],
-    ['document', { command: 'to-docx', document: {} }],
+    ['document.export', { format: 'pdf', document: {} }],
+    ['ds.save', { path: 'x.ds.json', document: {} }],
   ] as const) {
     const refused = await rpc(edge, 'tools/call', { name, arguments: args });
     expect(refused.result?.isError, name).toBe(true);
     expect((textOf(refused) as { code: string }).code, name).toBe('runtime-unavailable');
   }
   const edgeCall = await rpc(edge, 'tools/call', {
-    name: 'document',
+    name: 'document.run',
     arguments: { command: 'capabilities' },
   });
   expect(edgeCall.result?.isError).toBeUndefined();
@@ -428,10 +433,13 @@ it('lists and reads the Texuli resources and resource templates', async () => {
     expect(uris.filter((uri) => uri.startsWith('texuli://theme/'))).toEqual(
       themes.map((theme) => `texuli://theme/${theme.id}`)
     );
-    // Only the spec's examples are listed; the library themes as documents are read by id.
+    // Only the fictional examples are listed; the library themes as documents are read by id.
     expect(uris.filter((uri) => uri.startsWith('texuli://design-system/'))).toEqual([
       'texuli://design-system/acme',
       'texuli://design-system/minimal',
+      'texuli://design-system/quillmark',
+      'texuli://design-system/ledgerline',
+      'texuli://design-system/tumbletown',
     ]);
     for (const item of items) {
       expect(typeof item.name, item.uri as string).toBe('string');
@@ -671,8 +679,15 @@ it('completes template and prompt arguments from the real ids', async () => {
       await complete({ type: 'ref/resource', uri: 'texuli://design-system/{id}' }, 'id', '')
     );
     const library = await listFullThemeLibrary();
-    expect(designSystems.values.slice(0, 3)).toEqual(['acme', 'minimal', library[0]?.id]);
-    expect(designSystems.total).toBe(2 + library.length);
+    expect(designSystems.values.slice(0, 6)).toEqual([
+      'acme',
+      'minimal',
+      'quillmark',
+      'ledgerline',
+      'tumbletown',
+      library[0]?.id,
+    ]);
+    expect(designSystems.total).toBe(5 + library.length);
     expect(
       values(await complete({ type: 'ref/resource', uri: 'texuli://schema/{name}' }, 'name', ''))
         .values

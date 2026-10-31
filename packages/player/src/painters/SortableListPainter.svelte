@@ -117,11 +117,37 @@ function onMove(move: SortableMove): boolean {
     border: 1px solid var(--tx-border, CanvasText);
     border-radius: var(--tx-radius-md, 0.5rem);
     background: var(--tx-surface, Canvas);
+    color: var(--tx-surface-foreground, CanvasText);
   }
 
+  /* The drag handle is a native button: theme colors, not ButtonFace. */
   .tx-player-sortable :global(.tx-player-sortable__handle) {
-    min-inline-size: 24px;
-    min-block-size: 24px;
+    min-inline-size: max(24px, var(--tx-size-target-min));
+    min-block-size: max(24px, var(--tx-size-target-min));
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--tx-radius, 0.5rem);
+    background: transparent;
+    color: var(--tx-muted-foreground, GrayText);
+    font: inherit;
+    cursor: grab;
+  }
+
+  .tx-player-sortable :global(.tx-player-sortable__handle:hover) {
+    background: var(--tx-muted, ButtonFace);
+    color: var(--tx-foreground, ButtonText);
+  }
+
+  .tx-player-sortable :global(.tx-player-sortable__handle:focus-visible) {
+    outline: 2px solid var(--tx-ring, Highlight);
+    outline-offset: 2px;
+  }
+
+  @media (forced-colors: active) {
+    .tx-player-sortable :global(.tx-player-sortable__handle) {
+      border-color: ButtonText;
+      color: ButtonText;
+    }
   }
 
   .tx-player-sortable__text {

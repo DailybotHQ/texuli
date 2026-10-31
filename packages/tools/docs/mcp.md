@@ -9,7 +9,9 @@
 > `@texuli/tools/mcp` export, `texuli mcp` and the `@texuli/mcp` package
 > are new in `0.9.0`, and the remote endpoint is live at
 > `https://texuli.com/mcp` (see [The remote door](#the-remote-door)). The
-> seven 0.8 tool names stay as deprecated aliases until `0.10.0`.
+> seven 0.8 tool names, deprecated aliases in `0.9.0`, are removed on the
+> `release/0.10.0` branch (not on npm yet): a call names the operation to
+> use instead ([ops.md](ops.md#removed-08-tool-names)).
 
 ## The local door
 
@@ -155,14 +157,14 @@ expected at the failing path.
 | `texuli://component/{id}` | JSON | One catalog entry (the manifest with group and emit tiers) |
 | `texuli://docs/{slug}` | Markdown | One component's agent page, identical to `/llms/components/<id>.md` on the site |
 | `texuli://theme/{id}` | JSON, then CSS | The full light and dark theme definition, then its compiled CSS |
-| `texuli://design-system/{id}` | JSON | One design-system document: the spec's fictional examples (`acme`, every section; `minimal`, the smallest), or a library theme as a document (`loadLibraryBase`: `fromTheme` with its generator input as `color.brand`) |
+| `texuli://design-system/{id}` | JSON | One design-system document: the fictional examples (the spec's `acme`, every section, and `minimal`, the smallest; the guide's brands `quillmark`, `ledgerline` and `tumbletown`), or a library theme as a document (`loadLibraryBase`: `fromTheme` with its generator input as `color.brand`) |
 | `texuli://schema/{name}` | JSON | The JSON Schema of `deck` or `document` |
 
 `resources/list` lists the two fixed resources, both schemas, then every
-component, every component page, the two example design systems and every
+component, every component page, the five example design systems and every
 library theme (paginated). The library themes as design-system documents are
 not listed, to bound the list: complete `texuli://design-system/{id}` for
-every id (the examples, then the 210 themes) and read one at a time.
+every id (the five examples, then the 210 themes) and read one at a time.
 `resources/templates/list` returns the five templates. An unknown URI is
 `-32002` (resource not found) with `data: { uri }`; a missing, non-string or
 over-2,048-character URI is `-32602`.

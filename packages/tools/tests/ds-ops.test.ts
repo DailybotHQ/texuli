@@ -27,6 +27,7 @@ import { scenario } from './scenario.ts';
  */
 
 const FIXTURES = new URL('../../spec/fixtures/design-systems/', import.meta.url);
+const EXAMPLES = new URL('../../../examples/design-systems/', import.meta.url);
 // biome-ignore lint/suspicious/noExplicitAny: operation outputs are JSON the tests inspect.
 type Json = any;
 
@@ -92,6 +93,17 @@ describe('design-system operations', () => {
       const file = JSON.parse(await readFile(new URL(`${id}.json`, FIXTURES), 'utf8'));
       expect(DESIGN_SYSTEM_EXAMPLES[id], id).toEqual(file);
     }
+    for (const id of ['quillmark', 'ledgerline', 'tumbletown']) {
+      const file = JSON.parse(await readFile(new URL(`${id}.json`, EXAMPLES), 'utf8'));
+      expect(DESIGN_SYSTEM_EXAMPLES[id], id).toEqual(file);
+    }
+    expect(Object.keys(DESIGN_SYSTEM_EXAMPLES)).toEqual([
+      'acme',
+      'minimal',
+      'quillmark',
+      'ledgerline',
+      'tumbletown',
+    ]);
     expect(MINIMAL_DESIGN_SYSTEM).toEqual(DESIGN_SYSTEM_EXAMPLES.minimal);
     expect(DS_INPUT_BYTES).toBe(DESIGN_SYSTEM_IMPORT_LIMITS.bytes);
   });

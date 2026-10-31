@@ -803,7 +803,7 @@ function dragFrom(id: string): Attachment<HTMLElement> {
     }
 
     .tx-board__column[data-wip='blocked'] .tx-board__column-header {
-      border-block-end-color: var(--tx-danger, CanvasText);
+      border-block-end-color: var(--tx-destructive, CanvasText);
     }
 
     .tx-board__column-header {
@@ -931,7 +931,7 @@ function dragFrom(id: string): Attachment<HTMLElement> {
       padding: var(--tx-space-3);
       color: var(--tx-foreground, CanvasText);
     }
-    .tx-board__unplaced { margin-block-start: var(--tx-space-4); border: var(--tx-border-width-thin) solid var(--tx-danger, CanvasText); padding: var(--tx-space-3); }
+    .tx-board__unplaced { margin-block-start: var(--tx-space-4); border: var(--tx-border-width-thin) solid var(--tx-destructive, CanvasText); padding: var(--tx-space-3); }
     .tx-board__status { min-block-size: 1.5em; margin-block: var(--tx-space-2) 0; }
 
     @media (prefers-reduced-motion: no-preference) {

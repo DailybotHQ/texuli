@@ -38,7 +38,7 @@
   .tx-captions__message {
     margin: 0;
     font-size: var(--tx-type-label-size);
-    color: CanvasText;
+    color: var(--tx-foreground, CanvasText);
   }
 
   .tx-captions-chapters {
@@ -96,7 +96,7 @@
   .tx-captions-chapters__button[aria-current="true"] {
     border-color: var(--tx-border, currentColor);
     background-color: var(--tx-background, Canvas);
-    color: CanvasText;
+    color: var(--tx-foreground, CanvasText);
     font-weight: 600;
   }
 
@@ -114,7 +114,7 @@
     flex-shrink: 0;
     font-variant-numeric: tabular-nums;
     font-size: var(--tx-type-caption-size);
-    color: CanvasText;
+    color: var(--tx-foreground, CanvasText);
   }
 
   .tx-captions-transcript {
@@ -174,7 +174,7 @@
 
   .tx-captions-transcript__button[aria-current="true"] {
     background-color: var(--tx-background, Canvas);
-    color: CanvasText;
+    color: var(--tx-foreground, CanvasText);
     font-weight: 600;
   }
 
@@ -191,7 +191,7 @@
   .tx-captions-transcript__time {
     font-variant-numeric: tabular-nums;
     font-size: var(--tx-type-caption-size);
-    color: CanvasText;
+    color: var(--tx-foreground, CanvasText);
   }
 
   .tx-captions-transcript__text {

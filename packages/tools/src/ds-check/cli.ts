@@ -2,14 +2,14 @@
 /**
  * `texuli ds check <file> [--json] [--render] [--mode light|dark|all]
  * [--variant <name>]… [--trust developer|untrusted] [--base <file>]…
- * [--url <page>] [--strict]`.
+ * [--url <page>] [--known <file>] [--strict]`.
  *
  * Exit codes: 0 when every check passes, 1 on any refusal or render
  * finding, 2 when the check could not run (a bad flag, an unreadable file,
  * or a missing `--render` requirement).
  */
 import { readFile, stat } from 'node:fs/promises';
-import { DsCheckRequirementError, renderDesignSystemCheck } from './render.ts';
+import { DsCheckRequirementError, parseKnownFindings, renderDesignSystemCheck } from './render.ts';
 import { checkDesignSystem, serializeDsCheckReport } from './static.ts';
 import type { DsCheckMode, DsCheckReport } from './types.ts';
 
@@ -17,7 +17,7 @@ import type { DsCheckMode, DsCheckReport } from './types.ts';
 export const DS_CHECK_MAX_BYTES = 1_000_000;
 
 export const DS_CHECK_USAGE =
-  'Usage: texuli ds check <file> [--json] [--render] [--mode light|dark|all] [--variant <name>]... [--trust developer|untrusted] [--base <file>]... [--url <page>] [--strict]';
+  'Usage: texuli ds check <file> [--json] [--render] [--mode light|dark|all] [--variant <name>]... [--trust developer|untrusted] [--base <file>]... [--url <page>] [--known <file>] [--strict]';
 
 export interface DsCliArgs {
   command: 'check';
@@ -29,6 +29,8 @@ export interface DsCliArgs {
   trust?: 'developer' | 'untrusted';
   bases: string[];
   url?: string;
+  /** A JSON file of known findings (`[{ component, element, property, reason }]`). */
+  known?: string;
   strict: boolean;
   help: boolean;
 }
@@ -74,6 +76,7 @@ export function parseDsCliArgs(argv: readonly string[]): DsCliArgs {
       args.trust = trust;
     } else if (arg === '--base') args.bases.push(value());
     else if (arg === '--url') args.url = value();
+    else if (arg === '--known') args.known = value();
     else if (arg.startsWith('-')) throw new TypeError(`Unknown ds check flag "${arg}".`);
     else if (args.file === undefined) args.file = arg;
     else throw new TypeError(`ds check takes one file; got "${args.file}" and "${arg}".`);
@@ -81,6 +84,7 @@ export function parseDsCliArgs(argv: readonly string[]): DsCliArgs {
   if (args.file === undefined) throw new TypeError(`ds check needs a file. ${DS_CHECK_USAGE}`);
   if (args.url !== undefined && !args.render) throw new TypeError('Flag --url needs --render.');
   if (args.strict && !args.render) throw new TypeError('Flag --strict needs --render.');
+  if (args.known !== undefined && !args.render) throw new TypeError('Flag --known needs --render.');
   return args;
 }
 
@@ -157,7 +161,7 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
   }
   if (args.help) {
     stdout.write(
-      `${DS_CHECK_USAGE}\n\nValidate, compile and check a design-system document: the spec's codes, the guarantees (aa-text, aa-focus, target-size) and the contrast report, for the base document and its high-contrast variant. --render also paints every agent-emittable catalog component under it in a headless browser (Playwright) and checks axe, the painted contrast and colors that do not follow the design system; known library findings are listed and do not fail unless --strict.\nExit 0 pass, 1 refusal or finding, 2 could not run.\n`
+      `${DS_CHECK_USAGE}\n\nValidate, compile and check a design-system document: the spec's codes, the guarantees (aa-text, aa-focus, target-size) and the contrast report, for the base document and its high-contrast variant. --render also paints every agent-emittable catalog component under it in a headless browser (Playwright) and checks axe, the painted contrast and colors that do not follow the design system; known findings (none in the library; --known <file> adds your own) are listed and do not fail unless --strict.\nExit 0 pass, 1 refusal or finding, 2 could not run.\n`
     );
     return { ok: true };
   }
@@ -179,9 +183,14 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
       ...(args.variants ? { variants: args.variants } : {}),
       ...(args.trust ? { trust: args.trust } : {}),
     });
+    const known =
+      args.known === undefined
+        ? undefined
+        : parseKnownFindings(await readJsonFile(args.known, 'The known findings'));
     if (args.render && report.runs.some((run) => run.compiled))
       report = await renderDesignSystemCheck(report, {
         ...(args.url ? { url: args.url } : {}),
+        ...(known ? { known } : {}),
         ...(args.strict ? { strict: true } : {}),
         ...(args.modes ? { modes: args.modes } : {}),
         ...(io.cwd ? { cwd: io.cwd } : {}),

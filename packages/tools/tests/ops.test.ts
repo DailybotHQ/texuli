@@ -15,6 +15,7 @@ import {
   schemaKeywordIssues,
   TEXULI_ALIASES,
   TEXULI_OPERATIONS,
+  TEXULI_REMOVED_NAMES,
   TOOLS_VERSION,
   texuliOps,
   validateJson,
@@ -245,57 +246,54 @@ it('checks handler output, failures and the time budget', async () => {
   });
 });
 
-it('keeps the seven 0.8 tool names as deprecated aliases that resolve to operations', async () => {
-  await scenario('every alias targets a real operation and says it is deprecated', () => {
-    expect(TEXULI_ALIASES.map((alias) => alias.name)).toEqual([
-      'deck',
-      'document',
-      'catalog',
-      'component',
-      'validate',
-      'example',
-      'theme',
-    ]);
-    for (const alias of TEXULI_ALIASES) {
-      for (const target of alias.targets)
-        expect(texuliOps.get(target)?.name, alias.name).toBe(target);
-      expect(texuliOps.describe(alias.name), alias.name).toMatch(/^Deprecated alias/u);
-      expect(schemaKeywordIssues(texuliOps.inputSchema(alias.name) ?? {}), alias.name).toEqual([]);
-    }
-  });
-  const pairs: [string, unknown, string, unknown][] = [
-    ['catalog', { query: 'card', limit: 3 }, 'catalog.search', { query: 'card', limit: 3 }],
-    ['component', { id: 'card' }, 'component.get', { id: 'card' }],
-    ['example', { componentId: 'card' }, 'example.search', { componentId: 'card' }],
-    ['theme', { id: 'violet' }, 'theme.get', { id: 'violet' }],
-    ['theme', { query: 'violet', limit: 5 }, 'theme.search', { query: 'violet', limit: 5 }],
-    ['deck', { command: 'capabilities' }, 'deck.run', { command: 'capabilities' }],
-    [
-      'document',
-      { command: 'from-markdown', markdown: '# Brief' },
-      'document.run',
-      { command: 'from-markdown', markdown: '# Brief' },
-    ],
-    [
-      'document',
-      { command: 'to-docx', document: documentFixture },
-      'document.export',
-      { format: 'docx', document: documentFixture },
-    ],
+it('removes the seven 0.8 tool names in 0.10.0: never listed, refused with the operation to call instead', async () => {
+  const removed: [string, string][] = [
+    ['deck', 'deck.run'],
+    ['document', 'document.run or document.export'],
+    ['catalog', 'catalog.search'],
+    ['component', 'component.get'],
+    ['validate', 'catalog.validate'],
+    ['example', 'example.search'],
+    ['theme', 'theme.search or theme.get'],
   ];
-  for (const [alias, aliasInput, target, targetInput] of pairs) {
-    await scenario(`${alias} -> ${target}`, async () => {
-      const viaAlias = await texuliOps.invoke(alias, aliasInput);
-      const direct = await texuliOps.invoke(target, targetInput);
-      expect(viaAlias).toEqual(direct);
-      expect(viaAlias).toMatchObject({ ok: true, operation: target });
+  expect(TEXULI_ALIASES).toEqual([]);
+  expect(texuliOps.aliases()).toEqual([]);
+  expect(TEXULI_REMOVED_NAMES.map((entry) => entry.name)).toEqual(removed.map(([name]) => name));
+  for (const [name, instead] of removed) {
+    await scenario(name, async () => {
+      expect(texuliOps.get(name)).toBeUndefined();
+      expect(texuliOps.describe(name)).toBeUndefined();
+      expect(texuliOps.inputSchema(name)).toBeUndefined();
+      const outcome = await texuliOps.invoke(name, {});
+      expect(outcome).toEqual({
+        ok: false,
+        error: {
+          code: 'unknown-operation',
+          message: `The tool "${name}" was removed in 0.10.0; call ${instead} instead.`,
+        },
+      });
+      expect(texuliOps.removedMessage(name)).toBe(
+        `The tool "${name}" was removed in 0.10.0; call ${instead} instead.`
+      );
     });
   }
-  await scenario('an alias still refuses what its target refuses', async () => {
-    expect(await texuliOps.invoke('theme', { id: 'violet', bogus: 1 })).toMatchObject({
-      ok: false,
-      error: { code: 'invalid-input' },
-    });
+  await scenario('a removed name may not shadow a name or point nowhere', () => {
+    const base = TEXULI_OPERATIONS[0] as Operation;
+    expect(() =>
+      createOperationRegistry(
+        [base],
+        [],
+        [{ name: base.name, replacedBy: [base.name], removedIn: '0.10.0' }]
+      )
+    ).toThrow(/duplicates a name/u);
+    expect(() =>
+      createOperationRegistry(
+        [base],
+        [],
+        [{ name: 'old', replacedBy: ['no.such'], removedIn: '0.10.0' }]
+      )
+    ).toThrow(/points at "no.such"/u);
+    expect(texuliOps.removedMessage('catalog.search')).toBeUndefined();
   });
 });
 

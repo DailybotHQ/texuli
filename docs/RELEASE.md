@@ -94,6 +94,90 @@ On the branch so far:
   is refused; `@texuli/document` documents carry `designSystem` and
   `@texuli/pages`' `PageReader` applies it the same way. `texuli/design-system`
   also exports `applyDesignSystem` and `loadDesignSystemCompiler`.
+- **The compiler** (`@texuli/tokens/design-system/compile` and
+  `/validate`, T-ds-compiler, ADR-022): resolves `extends`
+  (`texuli:<theme>` from the library in lazy chunks, or an exact
+  `id@x.y.z` through the host), applies the variant and patches, and
+  compiles concrete `--tx-*` variables per mode. Text contrast at the
+  declared target, the focus ring at 3:1 and 2 px, and touch targets at
+  `accessibility.targetMin` are enforced (refused as `aa-text`, `aa-focus`
+  and `target-size` when only pins could fix them; every solver move is in
+  the report). `fromTheme` turns any `Theme` into a document; all 210
+  library themes compile both ways with zero variable drift.
+- **The runtime** (`@texuli/tokens/design-system/apply`, 1,966 B gzip,
+  T-ds-runtime, ADR-023): `applyDesignSystem` (one style write per switch,
+  element-scoped), `designSystemStyle` for server HTML and
+  `designSystemAppearance` for the no-flash cache, byte-identical;
+  `DesignSystemProvider` in `texuli/design-system`; the `@texuli/astro`
+  `designSystem` option inlines the style with its CSP hash.
+- **Importers, emitters, report and diff** (`@texuli/tokens/design-system/
+  import | emit | report | diff | fixtures`, T-ds-io): a brand one-liner,
+  W3C DTCG, Tokens Studio, a flat role palette (the `protoyard-theme/v1`
+  shape), a `Theme` and logo pixels in; scoped CSS, a Tailwind preset,
+  compiled JSON, DTCG, Tokens Studio and a role palette out (lossless round
+  trips); a static review page; a diff of changed variables, contrast
+  regressions and defaults.
+- **Outputs follow a design system** (T-ds-outputs): email (colors, fonts,
+  radius, spacing and a dark head rule), the blueprint PDF, the document
+  PDF and DOCX writers, PPTX, the canvas SVG and PNG export, and the Kotlin
+  twin's generated `DesignTokens.kt` (web value conformance in Gradle).
+- **Conformance** (T-ds-conformance): `texuli ds check <file>` (stable JSON
+  and codes; `--render` paints every agent-emittable catalog component under
+  the design system in chromium for axe, painted contrast and literal
+  colors) and `@texuli/tools/ds-check` for adopters' CI.
+- **Agent operations** (T-ds-agent-tools): `ds.validate`, `ds.compile`
+  (JSON, CSS, Tailwind, DTCG, Tokens Studio), `ds.contrast`, `ds.suggest`,
+  `ds.import`, `ds.diff`, `ds.preview` (a deterministic SVG or HTML
+  snapshot) and `blueprint.theme` on every door, and `ds.save` (local doors
+  only, an explicit path inside the working directory); the
+  `create-design-system` prompt and `texuli://design-system/{id}`;
+  `texuli ds init | validate | compile | export | preview | diff |
+  import`. `blueprint.validate` checks an inline design system with the
+  spec's rules. The remote Function's initial bundle grew to 223,613 B gzip
+  (the operation declarations; the compute loads lazily).
+- **In progress on the branch (not merged yet, listed here as they land):**
+  the design-system guide (`docs/DESIGN_SYSTEMS.md`), the skill's
+  design-systems sub-skill and three example brands (T-ds-docs-skill); the
+  fixes for the tracked conformance findings (`DS_CHECK_KNOWN_FINDINGS`)
+  and the token-usage guard; the Design System Studio on texuli.com; the
+  Protoyard gaps G100–G104.
+
+**Removed in 0.10.0** (deprecated in `0.9.0` for one minor; done on the
+branch):
+
+- **The seven 0.8 MCP tool names** (`deck`, `document`, `catalog`,
+  `component`, `validate`, `example`, `theme`). No door lists them. A
+  call is refused with the operation to use: MCP `tools/call` answers
+  `-32602` with `The tool "theme" was removed in 0.10.0; call theme.search
+  or theme.get instead.`, and `invoke()` returns `unknown-operation` with
+  the same text. The server card has `removedTools` (name, `replacedBy`,
+  `removedIn`) and `deprecatedTools: []`; the alias mechanism stays for
+  the next rename (ADR-017).
+- **The tree block's `style` key** (renamed `variant` in `0.9.0`). A
+  `tree` block with `style` is refused at `…style` with `style was removed
+  in 0.10.0; send variant ("file-tree" or "org") instead`, alone or next
+  to `variant`.
+- **Token rename aliases:** none. `@texuli/tokens/renames.json` is still
+  empty: token contract v2 renamed or removed no `--tx-*` name.
+
+**Migrating from 0.9 to 0.10** (when `0.10.0` is published):
+
+- **MCP hosts:** replace the old tool names in prompts and allowlists:
+  `deck` → `deck.run`; `document` → `document.run`, or `document.export`
+  with `format: "pdf"` or `"docx"` instead of the `to-pdf` and `to-docx`
+  commands; `catalog` → `catalog.search`; `component` → `component.get`;
+  `validate` → `catalog.validate`; `example` → `example.search`; `theme` →
+  `theme.get` (with `id`) or `theme.search`.
+- **Blueprints and blocks:** write `variant` on `tree` blocks, never
+  `style`. `validateDraft` migrates a `0.9.0` envelope and stamps `spec:
+  "0.10.0"`; a host that compares the `spec` string must accept it.
+- **Themes keep working:** `applyTheme`, `compileThemeCss`, scopes
+  (`data-tx-scope`), scoped portals and every `--tx-*` read are unchanged;
+  a design system is an addition. Start one from a theme with `extends:
+  "texuli:<id>"` or `fromTheme`.
+- **New subpaths load lazily:** the `@texuli/tokens` and `texuli` roots do
+  not import the design-system modules, so an app that adopts none pays
+  nothing.
 - **Protoyard gaps G100–G104 and G106** (PLAN_011 T-gaps-100-104; each reported on
   0.8.x and still present in 0.9.0):
   - **G104** (`@texuli/data/calendar`): an event chip's accessible name

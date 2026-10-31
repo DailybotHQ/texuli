@@ -118,6 +118,18 @@ export interface OperationAlias {
   route?: (input: Record<string, unknown>) => { name: string; input: Record<string, unknown> };
 }
 
+/**
+ * A tool name an earlier release served and a later one removed. Calling it
+ * is refused with a message that names `replacedBy`; it is never listed.
+ */
+export interface RemovedOperationName {
+  name: string;
+  /** The operations to call instead. */
+  replacedBy: readonly string[];
+  /** The release that removed it. */
+  removedIn: string;
+}
+
 /** Stable error codes `invoke()` returns. */
 export const OPERATION_ERROR_CODES = [
   'unknown-operation',

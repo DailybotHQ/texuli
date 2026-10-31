@@ -184,8 +184,8 @@
     padding: var(--tx-space-1);
     border: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
     border-radius: var(--tx-shape-radius-lg);
-    background: var(--tx-popover, Canvas);
-    color: var(--tx-popover-foreground, CanvasText);
+    background: var(--tx-surface, Canvas);
+    color: var(--tx-foreground, CanvasText);
     box-shadow: var(--tx-shadow-md, 0 4px 12px rgb(0 0 0 / 0.15));
     font-size: var(--tx-type-label-size);
   }
