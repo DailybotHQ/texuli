@@ -1389,6 +1389,7 @@ $effect(() => {
       // Forms (spec 0.8.0) likewise: only the host's form validator admits one.
       checkForm: formHost?.checkForm,
       ...(formHost?.validators ? { formValidators: formHost.validators } : {}),
+      ...(formHost?.customKinds ? { formKinds: formHost.customKinds } : {}),
       // Sheets (spec 0.8.0) likewise: only the host's sheet validator admits one.
       checkSheet: sheetHost?.checkSheet,
       // `when` conditions (G07) read the local state, mapped to numbers.
@@ -1454,6 +1455,7 @@ function streamValidateOptions(): ValidateDraftOptions {
     checkCanvas: canvasHost?.checkCanvas,
     checkForm: formHost?.checkForm,
     ...(formHost?.validators ? { formValidators: formHost.validators } : {}),
+    ...(formHost?.customKinds ? { formKinds: formHost.customKinds } : {}),
     checkSheet: sheetHost?.checkSheet,
     conditions: formulaConditions,
     conditionInputs,
