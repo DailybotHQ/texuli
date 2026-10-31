@@ -117,8 +117,7 @@ const runLabel = (variant: string | null) => (variant ? `${variant} variant` : '
           declared target size; the compiler refuses only what pinned colors make impossible.
         </li>
         <li>
-          <strong>Apply or emit:</strong> <code>DesignSystemProvider</code> or
-          <code>applyDesignSystem</code> on any element, <code>designSystemStyle</code> for server HTML,
+          <strong>Apply or emit:</strong> <code>DesignSystemProvider</code> or <code>applyDesignSystem</code> on any element, <code>designSystemStyle</code> for server HTML,
           and emitters for CSS, a Tailwind preset, DTCG, Tokens Studio, email, PDF, DOCX, PPTX, canvas
           and Kotlin tokens.
         </li>
@@ -128,8 +127,8 @@ const runLabel = (variant: string | null) => (variant ? `${variant} variant` : '
     <section aria-labelledby="brands">
       <h2 id="brands">Three brands, four surfaces</h2>
       <p>
-        Three fictional brands from the repository's
-        <a href={repo('examples/design-systems/')}>examples/design-systems</a> folder, compiled when
+        Three fictional brands from the
+        repository's <a href={repo('examples/design-systems/')}>examples/design-systems</a> folder, compiled when
         this page was built and applied through <code>DesignSystemProvider</code>. Each surface below
         is the same markup and the same content; only the design system changes. The previews show
         light mode, and they ship no JavaScript.
@@ -192,8 +191,8 @@ const runLabel = (variant: string | null) => (variant ? `${variant} variant` : '
     <section aria-labelledby="conformance">
       <h2 id="conformance">Conformance</h2>
       <p>
-        Every number below is read from the compiler's report when this page was built, through
-        <code>checkDesignSystem</code>: the static half of <code>texuli ds check</code> (the spec's
+        Every number below is read from the compiler's report when this page was built,
+        through <code>checkDesignSystem</code>: the static half of <code>texuli ds check</code> (the spec's
         validation, the <code>extends</code> chain, the compile of the document and of its
         high-contrast variant, then the guarantees checked again over the compiled variables).
       </p>
@@ -258,8 +257,8 @@ const runLabel = (variant: string | null) => (variant ? `${variant} variant` : '
       <p>
         <code>--render</code> also paints every agent-emittable catalog component under the design
         system in headless Chromium and checks axe, the painted contrast of every pair and colors that
-        ignore the design system; CI runs it on these three brands. Details:
-        <a href={checkDoc}>texuli ds check</a>.
+        ignore the design system; CI runs it on these three brands.
+        Details: <a href={checkDoc}>texuli ds check</a>.
       </p>
     </section>
 
@@ -278,9 +277,7 @@ const runLabel = (variant: string | null) => (variant ? `${variant} variant` : '
         <section class="ds-hub__door" aria-labelledby="start-cli">
           <h3 id="start-cli">In a terminal: texuli ds</h3>
           <p>
-            Eight commands in <code>@texuli/tools</code>: <code>init</code>, <code>validate</code>,
-            <code>compile</code>, <code>preview</code>, <code>diff</code>, <code>import</code>,
-            <code>export</code> and <code>check</code>. Exit 0 when valid, 1 when refused.
+            Eight commands in <code>@texuli/tools</code>: <code>init</code>, <code>validate</code>, <code>compile</code>, <code>preview</code>, <code>diff</code>, <code>import</code>, <code>export</code> and <code>check</code>. Exit 0 when valid, 1 when refused.
           </p>
           <GuideCode code={cli} label="texuli ds commands" lang="text" />
           <p><a href={opsDoc}>Every command and operation</a></p>
