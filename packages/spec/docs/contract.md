@@ -308,7 +308,7 @@ runs through the host's `checkDesignSystem`, as documents run through
 hold the contract on both targets; the Kotlin twin decodes both forms and
 reads an inline document with `DesignSystem.decode`. Spec 0.10.0
 is in development on `release/0.10.0` (digest
-`5858625bffea7972f78a2b0f127f75359848aeb5c4792764b17ca45b2d7de4ca`); it ships only with
+`36722679ebb84e38e86632789af1bda5dfcc1eb6db1b6712cda1b4f56ad1e1c7`); it ships only with
 `@texuli/spec@0.10.0`. The same version also carries an additive catalog
 projection refresh (T-gaps-100-104): `data-filter-builder` gains the
 optional `issues` prop (`{ path, message }` per condition) and
@@ -321,7 +321,8 @@ only a `kind` the host registered), the optional members `kind`, `config`
 (scalar settings for the host painter), `length` (otp digits, 4 to 12),
 `protocols` (`http` and/or `https` for url fields) and `clearable` (select),
 and the `current-password` and `new-password` autocomplete tokens, which
-apply to password fields only.
+apply to password fields only; and (T-gaps-107-110) the web-only
+`command-palette` lists the `searchLabel` prop.
 
 ## Named slots and conditions
 

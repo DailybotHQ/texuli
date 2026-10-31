@@ -624,6 +624,10 @@ export const commandPaletteManifest = /* @__PURE__ */ manifestData({
     shortcut: { kind: 'boolean', default: true },
     recentLabel: { kind: 'string' },
     title: { kind: 'string' },
+    searchLabel: {
+      kind: 'string',
+      description: 'Accessible name of the search combobox and its results; defaults to title',
+    },
     description: { kind: 'string' },
     emptyLabel: { kind: 'string' },
     recentEmptyLabel: { kind: 'string' },

@@ -212,6 +212,26 @@
     gap: var(--tx-space-3);
   }
 
+  .tx-date__range-panel {
+    display: grid;
+    align-content: start;
+    gap: var(--tx-space-2);
+    min-inline-size: 0;
+    max-inline-size: 16rem;
+  }
+
+  .tx-date__range-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--tx-space-2);
+    margin-block-start: var(--tx-space-3);
+    padding-block-start: var(--tx-space-3);
+    border-block-start: var(--tx-date-control-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-border, ButtonBorder);
+  }
+
   .tx-date__presets {
     display: grid;
     align-content: start;

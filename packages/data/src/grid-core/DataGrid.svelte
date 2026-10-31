@@ -2,6 +2,7 @@
 import { getPageTokens } from '@texuli/primitives/pagination';
 import type { Snippet } from 'svelte';
 import { tick, untrack } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from 'texuli/cx';
 import type { MotionProp } from 'texuli/motion';
 import {
@@ -31,16 +32,23 @@ import {
   clampCell,
   type DataGridBulkContext,
   type DataGridColumn,
+  type DataGridColumnInput,
   type DataGridEmptyContext,
   gridRows,
   moveCell,
   nextSort,
+  resolveDataGridColumns,
 } from './model.ts';
 import './grid-core.css';
 
-interface Props {
+interface OwnProps {
   rows: readonly T[];
-  columns: readonly DataGridColumn<T>[];
+  /**
+   * The columns. `type` may be left out: it is inferred from the rows (a
+   * number, boolean or `Date` value, `enum` with `options`), else `text`.
+   * `class` and `headerClass` add classes to the column's cells and header.
+   */
+  columns: readonly DataGridColumnInput<T>[];
   /** Stable id of a row (selection, keys). */
   getRowId: (row: T) => string;
   /** The grid's accessible name, shown as its caption unless `captionHidden`. */
@@ -122,7 +130,25 @@ interface Props {
    * announced.
    */
   pager?: 'compact' | 'numbered';
+  /**
+   * Rows are loading: the table is `aria-busy` and the status line says the
+   * `loading` label (politely). Without `loadingRows` or `loadingRow`, one
+   * row shows the label.
+   */
   loading?: boolean;
+  /**
+   * While `loading`, render this many skeleton rows (placeholder bars in every
+   * column) instead of the single text row (G107). Only the first is exposed
+   * to assistive tech, carrying the `loading` label; the rest are
+   * `aria-hidden`. Default `0`, or `3` when `loadingRow` is set; at most 100.
+   */
+  loadingRows?: number;
+  /**
+   * Your own skeleton row content, rendered across every column of each
+   * skeleton row (receives the row index). Decorative: the grid supplies the
+   * accessible loading text.
+   */
+  loadingRow?: Snippet<[number]>;
   /** Caps the height (a plain CSS length) so the body scrolls under a sticky header. */
   maxBlockSize?: string;
   density?: 'compact' | 'default' | 'comfortable';
@@ -146,11 +172,19 @@ interface Props {
    * on). `false` for none; instant under reduced motion and at level `none`.
    */
   motion?: MotionProp;
+  /** The root element (bindable). */
+  ref?: HTMLElement | null;
 }
+
+/**
+ * Other attributes (`id`, `aria-*`, `data-*`, `style`, handlers) land on the
+ * root element, like every texuli and data component.
+ */
+type Props = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps | 'children'>;
 
 let {
   rows,
-  columns,
+  columns: columnInput,
   getRowId,
   caption,
   captionHidden = false,
@@ -180,6 +214,8 @@ let {
   onPageChange,
   pager = 'compact',
   loading = false,
+  loadingRows,
+  loadingRow,
   maxBlockSize,
   density = 'default',
   virtualizeAbove = Number.POSITIVE_INFINITY,
@@ -190,7 +226,17 @@ let {
   labels,
   class: className,
   motion,
+  ref = $bindable(null),
+  ...rest
 }: Props = $props();
+
+/** The columns, each with a `type` (inferred from the rows when missing). */
+const columns = $derived(resolveDataGridColumns(columnInput, rows));
+/** Skeleton rows while loading (0: the single text row). */
+const skeletonCount = $derived(
+  loading ? Math.min(100, Math.max(0, Math.floor(loadingRows ?? (loadingRow ? 3 : 0)) || 0)) : 0
+);
+const skeletonIndexes = $derived(Array.from({ length: skeletonCount }, (_, index) => index));
 
 const text = $derived(resolveDataGridLabels(labels));
 const isGrid = $derived(mode !== 'table');
@@ -255,12 +301,12 @@ const allState = $derived(selectionState(selected, visibleIds));
 const selectedSet = $derived(new Set(selected));
 /** Grid columns, the selection column included. */
 const colCount = $derived(shownColumns.length + (selectable ? 1 : 0));
+const columnIndexes = $derived(Array.from({ length: colCount }, (_, index) => index));
 /** Grid rows, the header row included (an empty grid keeps one body row for its message). */
 const rowCount = $derived(1 + Math.max(shown.length, 1));
 
 let active = $state<CellPosition>({ row: 0, col: 0 });
 let anchor: string | null = null;
-let root: HTMLDivElement | undefined = $state();
 
 // Layout motion: measure the rows before the shown order changes, play after.
 const rowMotion = createLazyListMotion({
@@ -268,7 +314,7 @@ const rowMotion = createLazyListMotion({
   defaults: { layout: true, duration: 'base' },
   items: () =>
     Array.from(
-      root?.querySelectorAll<HTMLElement>('tr[data-tx-row-id]') ?? [],
+      ref?.querySelectorAll<HTMLElement>('tr[data-tx-row-id]') ?? [],
       (element) => [element.getAttribute('data-tx-row-id') ?? '', element] as const
     ),
 });
@@ -280,7 +326,7 @@ $effect(() => {
   void shown;
   untrack(() => rowMotion.play());
 });
-const tableElement = () => root?.querySelector('table') ?? null;
+const tableElement = () => ref?.querySelector('table') ?? null;
 
 // Row windowing: the body renders the rows in view plus overscan, with spacer
 // rows standing in for the rest. The active row stays rendered wherever it
@@ -478,7 +524,8 @@ function handleFocusIn(event: FocusEvent): void {
 {/snippet}
 
 <div
-  bind:this={root}
+  {...rest}
+  bind:this={ref}
   class={cx('tx-data-grid', className)}
   data-tx-data-grid
   data-virtual={virtual || undefined}
@@ -552,6 +599,7 @@ function handleFocusIn(event: FocusEvent): void {
           {@const col = index + (selectable ? 1 : 0)}
           {@const sortable = column.sortable !== false}
           <TableHead
+            class={column.headerClass}
             align={align(column)}
             data-tx-grid-cell={`0:${col}`}
             aria-colindex={isGrid ? col + 1 : undefined}
@@ -592,7 +640,28 @@ function handleFocusIn(event: FocusEvent): void {
       </TableRow>
     </TableHeader>
     <TableBody>
-      {#if loading || shown.length === 0}
+      {#if skeletonCount > 0}
+        <!-- Skeleton rows (G107): the first carries the loading text (and, as a
+             grid, the body's focusable cell); the rest are decorative. -->
+        {#each skeletonIndexes as index (index)}
+          <TableRow data-tx-grid-skeleton aria-hidden={index > 0 ? 'true' : undefined}>
+            {#each loadingRow ? [0] : columnIndexes as col (col)}
+              {@const first = index + col === 0}
+              <TableCell
+                colspan={loadingRow ? colCount : undefined}
+                {...first && isGrid ? { role: 'gridcell', tabindex: isActive(1, 0) ? 0 : -1 } : {}}
+                data-tx-grid-cell={first ? '1:0' : undefined}
+              >
+                {#if first}<span class="tx-data-grid__sr-only">{text.loading}</span>{/if}
+                {#if loadingRow}<span aria-hidden="true">{@render loadingRow(index)}</span>{:else}<span
+                    class="tx-data-grid__skeleton"
+                    aria-hidden="true"
+                  ></span>{/if}
+              </TableCell>
+            {/each}
+          </TableRow>
+        {/each}
+      {:else if loading || shown.length === 0}
         <TableEmpty
           colspan={colCount}
           {...isGrid ? { role: 'gridcell', tabindex: isActive(1, 0) ? 0 : -1 } : {}}
@@ -660,6 +729,7 @@ function handleFocusIn(event: FocusEvent): void {
                       tabindex: isActive(r, col) && !inWidget ? 0 : -1,
                     }
                   : {}}
+                class={column.class}
                 align={align(column)}
                 numeric={column.type === 'number'}
                 data-tx-grid-cell={`${r}:${col}`}
@@ -698,6 +768,6 @@ function handleFocusIn(event: FocusEvent): void {
     </nav>
   {/if}
   <p class="tx-data-grid__status" role="status" aria-live="polite">
-    {text.rowCount(visible.length, rows.length)}{selectable && selected.length > 0 ? ` · ${text.selectedCount(selected.length)}` : ''}
+    {#if loading}{text.loading}{:else}{text.rowCount(visible.length, rows.length)}{selectable && selected.length > 0 ? ` · ${text.selectedCount(selected.length)}` : ''}{/if}
   </p>
 </div>

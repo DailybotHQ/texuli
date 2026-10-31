@@ -73,6 +73,10 @@ Sizes: `sm` \| `md` \| `lg`. Variants: `outline` \| `soft`.
   `onSearch`): `Command.Loading` shows its status, `Command.Empty` hides and
   the list is `aria-busy` while it is `true`. The palette passes its own
   pending state this way.
+- `title` (default “Command palette”) names the dialog; `searchLabel` names
+  the search combobox and its results list, and defaults to `title` (G108).
+  Set it when the dialog's name is not a good name for the field, for
+  example `title="Jump to"` with `searchLabel="Search pages and actions"`.
 - ⌘/Ctrl+K toggles the palette when `shortcut` is true (default).
 - Selecting an item closes the dialog and restores focus to the opener.
 

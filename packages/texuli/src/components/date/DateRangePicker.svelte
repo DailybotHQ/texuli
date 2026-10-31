@@ -8,13 +8,14 @@ import {
   rangeDays,
   rangeLimit,
 } from '@texuli/primitives/date-picker';
+import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { useMessages } from '../../i18n/use-messages.ts';
 import { isAriaInvalid, joinIds, splitRequiredControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import { getFieldLabelContext } from '../field/context.ts';
 import CalendarIcon from './CalendarIcon.svelte';
-import type { DateLabels } from './labels.ts';
+import type { DateLabels, DateRangePickerPanelContext } from './labels.ts';
 import {
   type DateRangePreset,
   DEFAULT_DATE_RANGE_PRESET_LABELS,
@@ -74,6 +75,14 @@ interface OwnProps {
   class?: ClassValue;
   /** Classes for the bordered control (`.tx-date__control`: segments and button); `class` styles the wrapper. */
   controlClass?: ClassValue;
+  /**
+   * Host content beside the calendar, inside the dialog (G109): a hint or a
+   * legend stays reachable while the dialog is modal (content outside it is
+   * inert). Receives the current value and `close()`.
+   */
+  panel?: Snippet<[DateRangePickerPanelContext]>;
+  /** Host content under the calendar, inside the dialog (Apply, Clear, a note); same context as `panel`. */
+  footer?: Snippet<[DateRangePickerPanelContext]>;
 }
 
 /** Field attributes (`aria-*`, `data-*`, handlers) reach the field group; the rest the wrapper. */
@@ -110,6 +119,8 @@ let {
   labels,
   class: className,
   controlClass,
+  panel,
+  footer,
   ref = $bindable(null),
   ...rest
 }: Props = $props();
@@ -151,6 +162,15 @@ const presetList = $derived(
   })
 );
 const active = $derived(matchingPreset(presetList, value.start, value.end));
+
+const panelContext: DateRangePickerPanelContext = {
+  get value() {
+    return value;
+  },
+  close: () => {
+    open = false;
+  },
+};
 
 function choose(preset: DateRangePreset): void {
   value = { start: preset.start, end: preset.end };
@@ -216,7 +236,9 @@ function choose(preset: DateRangePreset): void {
           </div>
         {/if}
         <Primitive.Calendar class="tx-date-calendar" />
+        {#if panel}<div class="tx-date__range-panel" data-tx-date-panel>{@render panel(panelContext)}</div>{/if}
       </div>
+      {#if footer}<div class="tx-date__range-footer" data-tx-date-footer>{@render footer(panelContext)}</div>{/if}
     </Primitive.Content>
   </Primitive.Root>
   {#if description}<p id={descriptionId} class="tx-date__description">{description}</p>{/if}

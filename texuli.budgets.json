@@ -306,8 +306,8 @@
       "note": "Default per-view cap (lead decision 2026-10-23): a data view ships its framework-free engine (sort, collation, filter compiler, validation) with its component; measured grid-core 10,342 B."
     },
     "@texuli/data/grid-core": {
-      "gzip": 14336,
-      "note": "PLAN_010 T-gaps-53-69 (G55): pointer row activation, the static table mode, breakpoint column hiding and the query-aware empty snippet, over the shared checkout where T-gaps-48-52 also changed the grid filter engine it bundles; measured 13,416 B gzip (over the 12,288 B @texuli/data/* default), cap = measured + 4% rounded up to 64 B. G86 (Protoyard): list motion loads lazily (2026-10-30): 14016 -> 13632 B, measured + 4% rounded up to 64 B; measured 13,082 B (13,416 B before); the view takes list motion through a small local shim that loads texuli/motion with import() only once a mounted list could animate a change, so the seams, the contract and the provider context leave its initial graph (never loaded with motion={false}, level none or reduced motion). PLAN_011 T-gaps-87-95 (G92, Protoyard): table-mode rowFocusable rows, a searchPredicate and the opt-in numbered pager (page buttons from @texuli/primitives/pagination getPageTokens, about 0.23 KiB, plus their markup and styles) (2026-10-30): 13632 -> 14336 B, measured + 4% rounded up to 64 B; measured 13,736 B (12.95 KiB with rowFocusable and searchPredicate, before the pager)."
+      "gzip": 15104,
+      "note": "PLAN_010 T-gaps-53-69 (G55): pointer row activation, the static table mode, breakpoint column hiding and the query-aware empty snippet, over the shared checkout where T-gaps-48-52 also changed the grid filter engine it bundles; measured 13,416 B gzip (over the 12,288 B @texuli/data/* default), cap = measured + 4% rounded up to 64 B. G86 (Protoyard): list motion loads lazily (2026-10-30): 14016 -> 13632 B, measured + 4% rounded up to 64 B; measured 13,082 B (13,416 B before); the view takes list motion through a small local shim that loads texuli/motion with import() only once a mounted list could animate a change, so the seams, the contract and the provider context leave its initial graph (never loaded with motion={false}, level none or reduced motion). PLAN_011 T-gaps-87-95 (G92, Protoyard): table-mode rowFocusable rows, a searchPredicate and the opt-in numbered pager (page buttons from @texuli/primitives/pagination getPageTokens, about 0.23 KiB, plus their markup and styles) (2026-10-30): 13632 -> 14336 B, measured + 4% rounded up to 64 B; measured 13,736 B (12.95 KiB with rowFocusable and searchPredicate, before the pager). PLAN_011 T-gaps-107-110 (G107, contract amendment 13, trust mode; flagged to the lead): 14336 -> 15104 B, measured + 4% (measured 14,464 B; 13,736 B before): DataGrid as a drop-in table: bind:ref and rest attributes on the root, skeleton loading rows (loadingRows, loadingRow) with a polite loading status, per-column class and headerClass, and column type inference (resolveDataGridColumns)."
     },
     "@texuli/data/board": {
       "gzip": 12864,
@@ -334,8 +334,8 @@
       "note": "PLAN_009 (2026-10-28, owner-consented release plan): default 12288 -> 13184 B, measured + 4% after the styled Avatar it renders filters srcset candidates through the URL policy and composes handlers (G10, G26); measured 12,664 B."
     },
     "@texuli/data/grid-editing": {
-      "gzip": 18624,
-      "note": "Editable grid composes the grid core (10.1 KiB) with the editing engine (validation, undo, TSV clipboard); measured 14,641 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 15,360 B to measured 15,808 B + 4% headroom; already over at T-01. Trimming stays a follow-up. PLAN_009 (2026-10-28, owner-consented release plan): 16448 -> 17280 B, measured + 4% after DataGrid paging, rowClass and toolbar/filters/bulkActions snippets (G7); measured 16,601 B. PLAN_010 T-motion-adopt (ADR-013): 17280 -> 18944 B, measured + 4% rounded up to 64 B after DataGrid row layout motion (texuli/motion createListMotion) together with the T-gaps-53-69 DataGrid changes it bundles; measured 18,188 B (16,663 B at HEAD). G86 (Protoyard): list motion loads lazily (2026-10-30): 18944 -> 18624 B, measured + 4% rounded up to 64 B; measured 17,889 B (18,224 B before); the DataGrid it bundles takes list motion through a small local shim that loads texuli/motion with import() only once a mounted grid could animate a change (never with motion={false}, level none or reduced motion)."
+      "gzip": 20096,
+      "note": "Editable grid composes the grid core (10.1 KiB) with the editing engine (validation, undo, TSV clipboard); measured 14,641 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 15,360 B to measured 15,808 B + 4% headroom; already over at T-01. Trimming stays a follow-up. PLAN_009 (2026-10-28, owner-consented release plan): 16448 -> 17280 B, measured + 4% after DataGrid paging, rowClass and toolbar/filters/bulkActions snippets (G7); measured 16,601 B. PLAN_010 T-motion-adopt (ADR-013): 17280 -> 18944 B, measured + 4% rounded up to 64 B after DataGrid row layout motion (texuli/motion createListMotion) together with the T-gaps-53-69 DataGrid changes it bundles; measured 18,188 B (16,663 B at HEAD). G86 (Protoyard): list motion loads lazily (2026-10-30): 18944 -> 18624 B, measured + 4% rounded up to 64 B; measured 17,889 B (18,224 B before); the DataGrid it bundles takes list motion through a small local shim that loads texuli/motion with import() only once a mounted grid could animate a change (never with motion={false}, level none or reduced motion). PLAN_011 T-gaps-107-110 (G107, contract amendment 13, trust mode; flagged to the lead): 18624 -> 20096 B, measured + 4% (measured 19,283 B; 18,528 B before, 96 B under the old cap): it bundles the grid core, which grew with the G107 drop-in table props."
     },
     "@texuli/data/timeline": {
       "gzip": 11520,
@@ -556,6 +556,11 @@
       "gzip": 64,
       "cssGzip": 2944,
       "note": "PLAN_011 T-tokens-v2 (ADR-020): new exact row (was the @texuli/tokens/* default, which caps JS only); measured 0 B gzip and 1,680 B CSS gzip. Token contract v2 adds no declaration here: system and component tokens are read with their default as the fallback (systemVar, componentVar), cap = measured + 4% rounded up to 64 B. PLAN_011 T-adopt-core (2026-10-30, lead decision): cssGzip 1792 -> 2944 B, measured + 4% (measured 2,781 B): base.css declares the 123 token contract v2 system defaults once per token scope (so every component read carries one fallback level at most) and the focus ring hook rules."
+    },
+    "@texuli/tokens/system.css": {
+      "gzip": 64,
+      "cssGzip": 1280,
+      "note": "PLAN_011 T-gaps-107-110 (G110, contract amendment 13, approved under trust mode): new exact row for the system token defaults alone (the base.css generated block on every token scope, with no reset, motion tables or focus ring hook), for hosts that bring their own reset. Measured 0 B gzip and 1,189 B CSS gzip (base.css 2,781 B), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/tokens/components": {
       "gzip": 9152,
@@ -998,8 +1003,8 @@
     },
     "@texuli/sheets": {
       "gzip": 46528,
-      "cssGzip": 2752,
-      "note": "PLAN_010 T-sheets (consented plan): new row at measured + 4%: the root barrel re-exports formula, model, csv, view and host; consumers import the subpaths. Measured 44,680 B (CSS 2,488 B; the lazy cell editor 6,262 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2624 B before adoption): cssGzip 2816 -> 2752 B, measured + 4% (measured 2,635 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook."
+      "cssGzip": 2944,
+      "note": "PLAN_010 T-sheets (consented plan): new row at measured + 4%: the root barrel re-exports formula, model, csv, view and host; consumers import the subpaths. Measured 44,680 B (CSS 2,488 B; the lazy cell editor 6,262 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2624 B before adoption): cssGzip 2816 -> 2752 B, measured + 4% (measured 2,635 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook. PLAN_011 T-gaps-107-110 (G107, contract amendment 13, trust mode; flagged to the lead): cssGzip 2752 -> 2944 B, measured + 4% (measured 2,825 B; 2,714 B before): it bundles the grid core stylesheet, which gained the skeleton loading row bar and its pulse."
     },
     "@texuli/sheets/formula": {
       "gzip": 19392,
@@ -1015,8 +1020,8 @@
     },
     "@texuli/sheets/view": {
       "gzip": 43264,
-      "cssGzip": 2752,
-      "note": "PLAN_010 T-sheets (consented plan): new row at measured + 4%: SheetView over @texuli/data grid editing (grid core, editing engine) with the workbook model; the cell editor loads lazily (6,262 B). Measured 41,584 B (CSS 2,488 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2624 B before adoption): cssGzip 2816 -> 2752 B, measured + 4% (measured 2,635 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook."
+      "cssGzip": 2944,
+      "note": "PLAN_010 T-sheets (consented plan): new row at measured + 4%: SheetView over @texuli/data grid editing (grid core, editing engine) with the workbook model; the cell editor loads lazily (6,262 B). Measured 41,584 B (CSS 2,488 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2624 B before adoption): cssGzip 2816 -> 2752 B, measured + 4% (measured 2,635 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook. PLAN_011 T-gaps-107-110 (G107, contract amendment 13, trust mode; flagged to the lead): cssGzip 2752 -> 2944 B, measured + 4% (measured 2,825 B; 2,714 B before): it bundles the grid core stylesheet, which gained the skeleton loading row bar and its pulse."
     },
     "@texuli/sheets/host": {
       "gzip": 19584,

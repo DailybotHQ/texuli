@@ -346,6 +346,22 @@ describe('command', () => {
     });
   });
 
+  describe('Command palette searchLabel (G108)', () => {
+    it('names the search combobox apart from the dialog, defaulting to the title', async () => {
+      const { default: Palette } = await import('../src/components/command/CommandPalette.svelte');
+      const cases = [
+        { props: { title: 'Jump to', searchLabel: 'Search pages' }, name: 'Search pages' },
+        { props: { title: 'Jump to' }, name: 'Jump to' },
+      ];
+      for (const { props, name } of cases) {
+        render(Palette, { props: { open: true, shortcut: false, ...props } });
+        const dialog = await screen.findByRole('dialog', { name: 'Jump to' });
+        expect(within(dialog).getByRole('combobox', { name })).toBeTruthy();
+        cleanup();
+      }
+    });
+  });
+
   describe('Command.Trigger options', () => {
     it('adds a search glyph and a narrow collapse that keeps the label as the name', async () => {
       const { default: Trigger } = await import('../src/components/command/CommandTrigger.svelte');

@@ -3,6 +3,10 @@
  * Tailwind directives or build-time plugin requirements.
  *
  * @import '@texuli/tokens/base.css';
+ *
+ * Component CSS reads the system tokens declared below with no fallback, so a
+ * host must load this file or @texuli/tokens/system.css (the same generated
+ * token block alone, for hosts that bring their own reset).
  */
 /* biome-ignore-all lint/complexity/noImportantStyles: system reduced-motion preferences must override component animation durations. */
 

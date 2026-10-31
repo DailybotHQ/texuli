@@ -690,7 +690,7 @@ function dropSide(key: string): 'before' | 'after' | undefined {
             aria-colindex={col + 1}
             aria-sort={sortable ? ariaSort(sort, def.key) : undefined}
             tabindex={!sortable && isActive(0, col) ? 0 : !sortable ? -1 : undefined}
-            class="tx-grid-columns__head"
+            class={cx('tx-grid-columns__head', def.headerClass)}
             style={pinStyle(pin)}
             {@attach reorderFrom(def.key)}
           >
@@ -781,7 +781,7 @@ function dropSide(key: string): 'before' | 'after' | undefined {
                 data-pin-edge={pin?.edge ? '' : undefined}
                 aria-colindex={col + 1}
                 tabindex={isActive(r, col) ? 0 : -1}
-                class="tx-grid-columns__cell"
+                class={cx('tx-grid-columns__cell', def.class)}
                 style={pinStyle(pin)}
               >
                 {#if cell}{@render cell(row, def)}{:else}{cellText(row, def)}{/if}

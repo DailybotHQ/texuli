@@ -155,6 +155,7 @@ export const commandPalettePropNames = [
   'shortcut',
   'recentLabel',
   'title',
+  'searchLabel',
   'description',
   'emptyLabel',
   'recentEmptyLabel',
