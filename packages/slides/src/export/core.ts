@@ -1,0 +1,71 @@
+/**
+ * `@texuli/slides/export-core` (G105): `@texuli/slides/export` without the
+ * stage's default renderer tables. Print plans and flags, the PDF seam,
+ * PPTX and the owned XML and ZIP writers are the same; the print view is
+ * `DeckPrintViewCore`, which paints with the host's `renderers` (and a
+ * `defaults` source only when the host hands it one), so a `DeckStageCore`
+ * host that prints emits none of the default tables' chunks or CSS.
+ */
+export {
+  buildDeckPptx,
+  crc32,
+  DECK_EXPORT_CANVAS,
+  DECK_PRINT_CANVAS_PAGE_SIZES,
+  DECK_PRINT_NOTES,
+  DECK_PRINT_PAGE_SIZES,
+  type DeckExportAspect,
+  type DeckPdfExporter,
+  type DeckPdfRequestOptions,
+  type DeckPdfResult,
+  type DeckPptxAssetContext,
+  type DeckPptxChartContext,
+  type DeckPptxDesign,
+  type DeckPptxDesignRole,
+  type DeckPptxImageAsset,
+  type DeckPptxOmission,
+  type DeckPptxOmissionKind,
+  type DeckPptxOptions,
+  type DeckPptxPackage,
+  type DeckPptxPart,
+  type DeckPptxV2Export,
+  type DeckPptxV2Omission,
+  type DeckPptxV2Options,
+  type DeckPptxV2Package,
+  type DeckPrintFlags,
+  type DeckPrintNotes,
+  type DeckPrintOptions,
+  type DeckPrintPage,
+  type DeckPrintPageSize,
+  type DeckPrintPlan,
+  deckExportFilename,
+  deckPrintSearch,
+  deckSlideLabel,
+  el,
+  escapeXmlAttribute,
+  escapeXmlText,
+  exportDeckPptx,
+  loadDeckPptxWriter,
+  PPTX_CANVAS_SLIDE_SIZES,
+  PPTX_MIME_TYPE,
+  PPTX_SLIDE_SIZES,
+  parseDeckPrintFlags,
+  planDeckPrint,
+  requestDeckPdf,
+  sanitizeXmlChars,
+  serializeXml,
+  writeDeckPptx,
+  writeZip,
+  type XmlAttributeValue,
+  type XmlChild,
+  type XmlElement,
+  type XmlNode,
+  type XmlText,
+  xmlText,
+  type ZipEntry,
+} from './api.ts';
+export { default as DeckPrintViewCore } from './DeckPrintViewCore.svelte';
+export {
+  type PreloadDeckPrintViewCoreOptions,
+  preloadDeckPrintViewCore,
+} from './print-preload-core.ts';
+export type { DeckPrintViewCoreProps, DeckPrintViewProps } from './print-types.ts';

@@ -19,6 +19,7 @@ const SUBPATH_DOCS: Record<string, { doc: string; entry?: string }> = {
   './components': { doc: 'docs/components.md', entry: 'src/registry/index.ts' },
   './layouts': { doc: 'docs/layouts.md', entry: 'src/layouts/index.ts' },
   './export': { doc: 'docs/export.md', entry: 'src/export/index.ts' },
+  './export-core': { doc: 'docs/export.md', entry: 'src/export/core.ts' },
   './templates': { doc: 'docs/templates.md', entry: 'src/templates/index.ts' },
   './styles.css': { doc: 'docs/styles.md' },
 };

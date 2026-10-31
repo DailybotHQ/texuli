@@ -9,7 +9,7 @@ import { parseDeck } from '@texuli/deck/model';
 import { describe, expect, it } from 'vitest';
 import DeckPrintView from '../src/export/DeckPrintView.svelte';
 import { preloadDeckPrintView } from '../src/export/index.ts';
-import { loadedDeckPrintBody } from '../src/export/print-preload.ts';
+import { loadedDeckPrintBody } from '../src/export/print-preload-core.ts';
 import { loadedDefaultDeckRenderers } from '../src/stage/defaults.ts';
 import { scenario } from './scenario.ts';
 
