@@ -721,7 +721,9 @@ export function compileDesignSystem(
     }
     const own = rec(dataViz[mode]);
     let charts: Doc;
-    if (Object.keys(own).length > 0) charts = own;
+    // A partial palette (every list is optional) fills the rest from the derived one.
+    if (['categorical', 'sequential', 'diverging', 'grid', 'axis'].every((key) => key in own))
+      charts = own;
     else {
       const p = Object.fromEntries(
         SEMANTIC_ROLES.map((role) => [role, { default: solved.hexOf(role) }])
@@ -731,7 +733,7 @@ export function compileDesignSystem(
         const { h } = seedOklch(accent, 'Accent');
         input.chart3 = hex(mode === 'light' ? 0.58 : 0.72, 0.16, h);
       }
-      charts = deriveChartTokens(input, mode) as unknown as Doc;
+      charts = { ...(deriveChartTokens(input, mode) as unknown as Doc), ...own };
       if (dataViz.cvdSafe === true)
         for (const issue of validateChartTokens(charts as never, input, mode))
           if (issue.kind === 'cvd-distance')
