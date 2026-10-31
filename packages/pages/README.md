@@ -105,6 +105,13 @@ Keep the document in `$state.raw`: every change is a new immutable value.
   `@texuli/canvas` is planned). Embedded players get no `formHost`,
   `canvasHost` or sheet host, so a component embed holding a
   `schema-form`, `canvas` or `spreadsheet` node is refused rather than painted.
+- **Host blocks** (in development for `0.10.0`, not on npm): a
+  `renderBlock` snippet or a `blockHost` (`claim`, `component`, `present`)
+  lets the host paint its own wrapped blocks and embeds in the editor, the
+  reader and the paged view: what the library refuses, and what the host
+  claims. The node is handed as a frozen copy, the refused notice stays
+  when nobody paints a node, and the host slot loads only when a host is
+  given ([editor](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/editor.md#host-blocks)).
 - **Undo and redo** replay the document op log (typing in one block within
   a second is one step); undos are log entries too.
 - **Motion:** inserts, removes and reorders glide (FLIP) on the shared

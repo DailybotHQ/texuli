@@ -5,6 +5,7 @@ import type { TexuliDocument } from '@texuli/document/model';
 import type { DeckPlayerHost } from '@texuli/player';
 import { untrack } from 'svelte';
 import Breadcrumb from '../shared/Breadcrumb.svelte';
+import { blockPainter, type PagesBlockHost, type PagesBlockSnippet } from '../shared/block-host.ts';
 import type { PagesDesignSystemEvent, PagesDesignSystems } from '../shared/design-system-types.ts';
 import type { EmbedResolver } from '../shared/embeds.ts';
 import { type PagesLabels, resolvePagesLabels } from '../shared/labels.ts';
@@ -42,6 +43,18 @@ interface Props {
    */
   designSystems?: PagesDesignSystems | null;
   onDesignSystem?: (event: PagesDesignSystemEvent) => void;
+  /**
+   * The host's own blocks (G111): a snippet handed each wrapped block or
+   * embed the host claims, read-only. Host code is developer-tier; the node
+   * may come from a user or an agent. See `blockHost`.
+   */
+  renderBlock?: PagesBlockSnippet;
+  /**
+   * The host's block renderer: `claim` (who paints a node: `'host'`,
+   * `'fallback'` by default, or `'library'`), and a `component` or a
+   * `present` mount when there is no `renderBlock` snippet.
+   */
+  blockHost?: PagesBlockHost | null;
   class?: string;
 }
 
@@ -61,8 +74,12 @@ let {
   reducedMotion = false,
   designSystems = null,
   onDesignSystem,
+  renderBlock,
+  blockHost = null,
   class: className,
 }: Props = $props();
+
+const painter = $derived(blockPainter(blockHost, renderBlock));
 
 const labels = $derived(resolvePagesLabels(labelOverrides));
 const entries = $derived(documentOutline(doc, { prefix: anchorPrefix }));
@@ -149,6 +166,7 @@ $effect(() => () => disposeSystem?.());
       {onNavigate}
       {pageHref}
       {reducedMotion}
+      {painter}
     />
   </div>
 </article>

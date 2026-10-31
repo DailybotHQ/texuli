@@ -15,6 +15,7 @@ import type { MotionProp } from 'texuli/motion';
 import PageEditor from '../editor/PageEditor.svelte';
 import type { ComponentEmbedOption } from '../editor/slash.ts';
 import type { PagesEditor } from '../editor/state.svelte.ts';
+import type { PagesBlockHost, PagesBlockSnippet } from '../shared/block-host.ts';
 import type { EmbedResolver } from '../shared/embeds.ts';
 import { type PagesLabels, resolvePagesLabels } from '../shared/labels.ts';
 import type { MediaResolver } from '../shared/media.ts';
@@ -57,6 +58,10 @@ interface Props {
   history?: boolean;
   /** Polite announcements. Default: `@texuli/core/announcer`. */
   announce?: (message: string) => void;
+  /** The host's own blocks (see `PageEditor`). */
+  renderBlock?: PagesBlockSnippet;
+  /** The host's block renderer (see `PageEditor`). */
+  blockHost?: PagesBlockHost | null;
   class?: string;
 }
 
@@ -78,6 +83,8 @@ let {
   editor = $bindable(),
   history = $bindable(false),
   announce,
+  renderBlock,
+  blockHost = null,
   class: className,
 }: Props = $props();
 
@@ -229,6 +236,8 @@ function keys(node: HTMLElement): () => void {
         {components}
         {motion}
         {announce}
+        {renderBlock}
+        {blockHost}
       />
       <CollabOverlay {session} root={docRoot} />
     </div>

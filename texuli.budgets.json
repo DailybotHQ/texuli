@@ -872,9 +872,9 @@
       "note": "PLAN_010 (ADR-010, ADR-011, ADR-016, consented plan): new row at measured + 4% for the paged view with print isolation; measured 12,761 B, CSS 3,000 B."
     },
     "@texuli/pages/reader": {
-      "gzip": 9536,
+      "gzip": 9984,
       "cssGzip": 2432,
-      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the read-only reader with outline; measured 8,718 B, CSS 2,296 B. PLAN_011 T-ds-blueprint: 9088 -> 9536 (measured 9,148 B + 4%) for a document's own designSystem applied to the reader root."
+      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the read-only reader with outline; measured 8,718 B, CSS 2,296 B. PLAN_011 T-ds-blueprint: 9088 -> 9536 (measured 9,148 B + 4%) for a document's own designSystem applied to the reader root. PLAN_011 T-gaps-111-112 (G111, trust mode): 9536 -> 9984 (measured 9,577 B + 4%; 9,145 B before) for the host block renderer wiring (renderBlock and blockHost props, the lazy host-slot loader, the library views' refusal hand-off); the slot that decides and paints loads with import() only when a host is given."
     },
     "@texuli/pages/styles.css": {
       "gzip": 64,

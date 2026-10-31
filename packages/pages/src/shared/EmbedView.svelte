@@ -16,12 +16,15 @@ let {
   resolveEmbed,
   deckHost = null,
   reducedMotion = false,
+  onrefused,
 }: {
   node: EmbedBlock;
   labels: PagesLabels;
   resolveEmbed?: EmbedResolver | undefined;
   deckHost?: DeckPlayerHost | null | undefined;
   reducedMotion?: boolean;
+  /** The embed was refused or is only a reference: a host takes it over (no notice shows). */
+  onrefused?: (() => void) | undefined;
 } = $props();
 
 /** `undefined` while a host ref resolves. */
@@ -82,6 +85,10 @@ const status = $derived(
         ? 'reference'
         : 'painted'
 );
+
+$effect(() => {
+  if ((status === 'refused' || status === 'reference') && onrefused) onrefused();
+});
 
 function ondiagnostics(event: PlayerDiagnosticsEvent): void {
   refused = event.surface === 'notice';

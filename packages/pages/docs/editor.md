@@ -50,6 +50,8 @@ through one op log.
 | `motion` | layout on | The `texuli/motion` prop for inserts, removes and reorders; `false` is instant |
 | `editor` | created | Bindable `PagesEditor`, for hosts that drive it |
 | `announce` | the core announcer | Where polite announcements go |
+| `renderBlock` | — | A snippet that paints the host's own blocks, handed the read-only node ([host blocks](#host-blocks)) |
+| `blockHost` | `null` | A `PagesBlockHost`: `claim`, and a `component` or a `present` mount ([host blocks](#host-blocks)) |
 | `class` | — | Extra classes on the root |
 
 The root is a `section` named by `label`. Each block is a row: an insert
@@ -159,6 +161,73 @@ slides for a deck host, `deck-slide` children for the document flow). A
 wrapped block reads. `MediaResolver` and `mediaSource` resolve images through
 `safeImageSrc`; `pageLinkHref` passes the host's `pageHref` through
 `safeHref`.
+
+## Host blocks
+
+> **In development for `0.10.0`, not on npm** (Protoyard gap G111).
+
+A host paints its own blocks (a form backed by its services, a chart on its
+own spec) in `PageEditor`, `PageReader`, `PagedView` and `CollabEditor`
+with the same two props:
+
+```svelte
+<script lang="ts">
+  import type { PagesBlockHost, PagesHostNode } from '@texuli/pages/editor';
+  import { PageEditor } from '@texuli/pages/editor';
+  import HostForm from './HostForm.svelte';
+
+  let { doc } = $props();
+  const blockHost: PagesBlockHost = {
+    // 'host': the host paints it, even a library block; 'fallback' (the
+    // default): only when the library refuses it; 'library': never.
+    claim: (node) => (node.type === 'block' && node.block === 'form' ? 'host' : 'fallback'),
+  };
+</script>
+
+{#snippet renderBlock(node: PagesHostNode)}
+  <HostForm {node} />
+{/snippet}
+
+<PageEditor document={doc} {renderBlock} {blockHost} />
+```
+
+- **What it is handed.** A `PagesHostNode`: a wrapped block
+  (`{ type: 'block', family, block, props }`) or an embed
+  (`{ type: 'embed', kind, ref?, inline?, title? }`), as a deep-frozen copy
+  (`PagesReadonly`). Writing to it throws; the document is not touched.
+- **Who paints.** `blockHost.claim(node)` returns a `PagesBlockClaim`:
+  `'host'` paints the node with the host (the library's renderer never
+  loads), `'fallback'` (the default, and what an unknown value or a missing
+  `claim` means) lets the library paint first and hands the node to the host
+  only when the library would refuse it: an unknown family or block, props
+  its renderer refuses, an embed with no payload (a `ref` the
+  `resolveEmbed` does not know, or no resolver), a blueprint the player
+  refuses, or a sheet or canvas reference. `'library'` keeps the host out. A
+  `claim` that throws counts as `'library'`.
+- **How it paints.** The `renderBlock` snippet wins; without one,
+  `blockHost.component` (`Component<PagesBlockHostProps>`, props
+  `{ node }`); without one, `blockHost.present({ node, target })` mounts
+  into an empty element and may return a cleanup, as the player's
+  `deckHost` and `documentHost` do. A host renderer that throws shows the
+  refused notice.
+- **Security.** The host's renderer is developer-tier code: it is the app's
+  own. The node is not: it may come from a user or an agent. Paint it with
+  text interpolation, never `{@html}` or `innerHTML`, and pass every link or
+  image in it through `safeHref` or `safeImageSrc` at the `untrusted` tier.
+  When no host paints a node the library refuses, the refused notice shows,
+  as without a host.
+- **In the editor.** A host block is an opaque row: its handle selects it,
+  picks it up and drags it, moves it with Alt+Up and Alt+Down and removes it
+  with Delete or Backspace, with undo, as any non-text row. The host's own
+  controls inside the row stay focusable.
+- **Types.** `PagesBlockHost`, `PagesBlockClaim`, `PagesBlockHostProps`,
+  `PagesBlockHostRequest` (`{ node, target }`), `PagesBlockSnippet`
+  (`Snippet<[PagesHostNode]>`), `PagesHostNode` and `PagesReadonly`, from
+  `@texuli/pages/editor`, `@texuli/pages/reader` and the root
+  (`@texuli/pages/paged` has all but `PagesReadonly`).
+- **Cost.** The slot that decides and paints (`HostSlot`) is imported with
+  `import()` the first time a document with a host shows a wrapped block or
+  an embed; a reader or an editor without a host never loads it.
 
 ## Labels
 

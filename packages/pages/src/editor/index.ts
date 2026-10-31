@@ -4,6 +4,15 @@
  * block drag on `@texuli/drag` and live embeds painted by `@texuli/player`.
  */
 
+export type {
+  PagesBlockClaim,
+  PagesBlockHost,
+  PagesBlockHostProps,
+  PagesBlockHostRequest,
+  PagesBlockSnippet,
+  PagesHostNode,
+  PagesReadonly,
+} from '../shared/block-host.ts';
 export {
   type BlueprintNode,
   componentBlueprint,

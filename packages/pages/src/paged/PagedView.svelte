@@ -19,6 +19,7 @@ import type { DeckPlayerHost } from '@texuli/player';
 import { tick } from 'svelte';
 import { documentOutline } from '../reader/outline.ts';
 import ReaderBlocks from '../reader/ReaderBlocks.svelte';
+import { blockPainter, type PagesBlockHost, type PagesBlockSnippet } from '../shared/block-host.ts';
 import type { EmbedResolver } from '../shared/embeds.ts';
 import { type PagesLabels, resolvePagesLabels } from '../shared/labels.ts';
 import type { MediaResolver } from '../shared/media.ts';
@@ -56,6 +57,18 @@ interface Props {
   deckHost?: DeckPlayerHost | null;
   /** Paint embeds without motion. */
   reducedMotion?: boolean;
+  /**
+   * The host's own blocks (G111): a snippet handed each wrapped block or
+   * embed the host claims, read-only. Host code is developer-tier; the node
+   * may come from a user or an agent. See `blockHost`.
+   */
+  renderBlock?: PagesBlockSnippet;
+  /**
+   * The host's block renderer: `claim` (who paints a node: `'host'`,
+   * `'fallback'` by default, or `'library'`), and a `component` or a
+   * `present` mount when there is no `renderBlock` snippet.
+   */
+  blockHost?: PagesBlockHost | null;
   class?: string;
 }
 
@@ -77,9 +90,12 @@ let {
   resolveMedia,
   deckHost = null,
   reducedMotion = false,
+  renderBlock,
+  blockHost = null,
   class: className,
 }: Props = $props();
 
+const painter = $derived(blockPainter(blockHost, renderBlock));
 const labels = $derived(resolvePagesLabels(labelOverrides));
 const pagedLabels = $derived(resolvePagedLabels(labelOverrides));
 const settings = $derived(documentPageSettings(doc, pageOverrides));
@@ -190,7 +206,7 @@ const mm = (points: number) => `${(points / (72 / 25.4)).toFixed(3)}mm`;
   <div class="tx-pages-paged__measure" bind:this={measureRoot} aria-hidden="true" inert style:inline-size={`${contentWidth}px`}>
     {#each doc.blocks as block, index (block.id)}
       <div class="tx-pages-paged__unit" data-paged-unit={index}>
-        <ReaderBlocks blocks={[block]} {labels} anchors={NO_ANCHORS} headingOffset={0} {resolveEmbed} {resolveMedia} {deckHost} {reducedMotion} />
+        <ReaderBlocks blocks={[block]} {labels} anchors={NO_ANCHORS} headingOffset={0} {resolveEmbed} {resolveMedia} {deckHost} {reducedMotion} {painter} />
       </div>
     {/each}
   </div>
@@ -252,6 +268,7 @@ const mm = (points: number) => `${(points / (72 / 25.4)).toFixed(3)}mm`;
                       {onNavigate}
                       {pageHref}
                       {reducedMotion}
+                      {painter}
                     />
                   </div>
                 </div>
