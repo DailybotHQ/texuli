@@ -179,7 +179,7 @@ The spec's codes (`unknown-key`, `invalid-type`, `invalid-value`,
 
 ### Without the theme library (`design-system/compile-core`, G127)
 
-> From `0.10.1`.
+> From `0.11.0`.
 
 `@texuli/tokens/design-system/compile-core` is every export of
 `design-system/compile` except `loadLibraryBase` and `resolveDesignSystem`,

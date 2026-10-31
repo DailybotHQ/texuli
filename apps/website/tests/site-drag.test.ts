@@ -39,16 +39,15 @@ const SOURCES = [
 afterEach(() => cleanup());
 
 describe('drag and workflows pages: copy and safety', () => {
-  it('say "in development" for both packages and name their published 0.10 pre-release', () => {
-    // @texuli/drag stays 0.10.0; @texuli/workflows is a 0.10.1 exact-pin patch release.
-    for (const [page, name, version] of [
-      [DRAG_PAGE, 'drag', '0.10.0'],
-      [WORKFLOWS_PAGE, 'workflows', '0.10.1'],
+  it('say "in development" for both packages and name the published 0.11.0 pre-release', () => {
+    for (const [page, name] of [
+      [DRAG_PAGE, 'drag'],
+      [WORKFLOWS_PAGE, 'workflows'],
     ] as const) {
       const copy = page.replace(/\s+/g, ' ');
       expect(copy).toContain(`@texuli/${name} · in development`);
       expect(copy).toContain(
-        `<code>@texuli/${name}</code> is in development and on npm as <code>${version}</code>, a pre-1.0 release.`
+        `<code>@texuli/${name}</code> is in development and on npm as <code>0.11.0</code>, a pre-1.0 release.`
       );
       expect(copy).not.toMatch(/not (?:yet )?on npm/);
     }

@@ -3,7 +3,7 @@
   "serverInfo": {
     "name": "texuli",
     "title": "Texuli MCP Server",
-    "version": "0.10.1",
+    "version": "0.11.0",
     "description": "Every Texuli operation as an MCP tool: search the component catalog, read manifests and examples, validate manifests and blueprints, search, read and preview themes, and run deck and document commands. Local over stdio (npx -y @texuli/mcp, the edge and node operations) or remote over Streamable HTTP (https://texuli.com/mcp, the edge operations plus the site operations that list, read and search texuli.com's pages as Markdown). Read-only: nothing is stored, fetched from the network or modified.",
     "documentation": "https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/mcp.md"
   },

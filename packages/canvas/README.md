@@ -10,9 +10,9 @@ collaboration on `@texuli/document/sync`; an accessible Svelte 5 editor and
 viewer; and SVG and PNG export with no HTML sinks.
 
 > **Status: in development (pre-1.0).** `@texuli/canvas` is published on
-> npm as `0.10.1`, with provenance (first published as `0.8.0`; built in PLAN_010).
-> Under 0.x a new minor (`0.11.0`) may contain breaking changes, so pin the
-> exact version or use `^0.10.0`, which accepts only 0.10.x
+> npm as `0.11.0`, with provenance (first published as `0.8.0`; built in PLAN_010).
+> Under 0.x a new minor (`0.12.0`) may contain breaking changes, so pin the
+> exact version or use `^0.11.0`, which accepts only 0.11.x
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 > Agents emit canvases as data through the `canvas` catalog id of blueprint
 > spec `0.8.0`; the Kotlin twin validates them and does not paint them yet.

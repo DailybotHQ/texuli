@@ -38,9 +38,10 @@ the same pieces are safe to hand to a machine.
 
 > **Status: in development, pre-1.0.** The screenshot above is the
 > texuli.com website, which deploys from `main` to Cloudflare Pages. The 26
-> published packages are released on npm in the 0.10 line:
-> 7 at `0.10.0` (core, date, deck, drag, document, primitives, spec) and 19 at `0.10.1` (G125–G127 and their exact-pin dependents) (published by CI with provenance; `latest` and `next` point to
-> the newest), which adds design systems. It is not a stable release:
+> published packages are released on npm in the 0.11 line,
+> every one at `0.11.0` (published by CI with provenance; `latest` and `next` point to
+> it); `0.10.0` added design systems and `0.11.0` adds the Protoyard gaps
+> G125–G127 and the Final Review fixes. It is not a stable release:
 > under 0.x a new minor may contain breaking changes, and 1.0.0 will be
 > the first stable release.
 > The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
@@ -193,9 +194,9 @@ every verified command.
 ## Honest boundaries
 
 - **No stable release yet.** The 26 published packages are on npm in the
-  0.10 line, a pre-1.0 release (`npm install texuli`; `latest` and `next`
-  both point to it). Under 0.x a new minor (`0.11.0`) may contain breaking
-  changes, so pin the exact version or use `^0.10.0`; 1.0.0 will be the
+  0.11 line, a pre-1.0 release (`npm install texuli`; `latest` and `next`
+  both point to it). Under 0.x a new minor (`0.12.0`) may contain breaking
+  changes, so pin the exact version or use `^0.11.0`; 1.0.0 will be the
   first stable release.
   The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
 - **texuli.com deploys from `main`** (Cloudflare Pages). Run it locally with

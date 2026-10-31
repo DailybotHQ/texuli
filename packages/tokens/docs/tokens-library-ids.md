@@ -1,7 +1,7 @@
 # Library theme ids
 
 **Package:** `@texuli/tokens`
-**Subpath:** `@texuli/tokens/library-ids` (from `0.10.1`; G125)
+**Subpath:** `@texuli/tokens/library-ids` (from `0.11.0`; G125)
 **Source:** `packages/tokens/src/library-ids/` (`ids.ts` is generated)
 **Tests:** `packages/tokens/tests/library-ids.test.ts`
 

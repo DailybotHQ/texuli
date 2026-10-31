@@ -49,7 +49,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     label: 'Get started',
     links: [
       { href: DOCS_HOME, label: 'Introduction' },
-      // The all-features hub: every package and capability of 0.6.0 to 0.10.0.
+      // The all-features hub: every package and capability of 0.6.0 to 0.11.0.
       { href: '/whats-new/', label: 'What’s new' },
       { href: '/skill/', label: 'Skill' },
     ],

@@ -631,7 +631,7 @@ its root:
   library defaults (`tests/design-system.test.ts`).
 
 **Without the theme library (`@texuli/player/design-system-core`, G127,
-from `0.10.1`).** The subpath step is the core step
+from `0.11.0`).** The subpath step is the core step
 with the library as its default `texuli:<theme>` loader:
 `resolvePlayerDesignSystem(reference, host, tier, options?)` and
 `applyPlayerDesignSystem(root, reference, host, tier, options?)` take

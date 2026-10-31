@@ -66,7 +66,7 @@ export function siteLlmsSections(siteUrl: string): SiteLlmsSection[] {
           title: 'What’s new',
           href: abs('/whats-new/'),
           description:
-            'Every package and capability of 0.6.0 to 0.10.0 (all on npm; 0.10.0, design systems, is current), with demos.',
+            'Every package and capability of 0.6.0 to 0.11.0 (all on npm; 0.11.0 is current, and 0.10.0 added design systems), with demos.',
         },
         {
           title: 'Skill',
