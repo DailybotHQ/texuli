@@ -31,11 +31,7 @@ interface Props {
    * Any other return value is ignored (typed `unknown`, so handlers written
    * as expressions keep compiling).
    */
-  onReadChange?: (
-    ids: string[],
-    read: boolean,
-    context: InboxReadChangeContext
-  ) => unknown;
+  onReadChange?: (ids: string[], read: boolean, context: InboxReadChangeContext) => unknown;
   /**
    * "Mark all as read", with the ids of the unread items listed now. When
    * given, it replaces `onReadChange` for that button, so a host whose own
