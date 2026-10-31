@@ -11,7 +11,10 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { cleanup, render, screen } from '@testing-library/svelte';
 import { createScopedPortalRoot, findPortalScope } from '@texuli/core';
-import { designSystemDeclarations } from '@texuli/tokens/design-system/apply';
+import {
+  designSystemDeclarations,
+  applyDesignSystem as tokensApply,
+} from '@texuli/tokens/design-system/apply';
 import {
   type CompiledDesignSystem,
   compileDesignSystem,
@@ -20,7 +23,11 @@ import {
 } from '@texuli/tokens/design-system/compile';
 import { tick } from 'svelte';
 import { afterEach, describe, expect, it } from 'vitest';
-import { PROVIDER_ATTRIBUTES } from '../src/design-system/index.ts';
+import {
+  applyDesignSystem,
+  loadDesignSystemCompiler,
+  PROVIDER_ATTRIBUTES,
+} from '../src/design-system/index.ts';
 import Harness from './fixtures/DesignSystemProviderHarness.svelte';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -121,6 +128,18 @@ describe('DesignSystemProvider', () => {
 
   it('renders the allowlisted attributes in markup, so designSystemStyle matches server HTML', () => {
     expect([...PROVIDER_ATTRIBUTES]).toEqual([...DESIGN_SYSTEM_ATTRIBUTES]);
+  });
+});
+
+describe('runtime helpers for hosts without @texuli/tokens (T-ds-blueprint)', () => {
+  it('re-exports applyDesignSystem and loads the compiler on demand', async () => {
+    expect(applyDesignSystem).toBe(tokensApply);
+    const compiler = await loadDesignSystemCompiler();
+    expect(compiler.compileDesignSystem).toBe(compileDesignSystem);
+    const source = readFileSync(join(root, 'packages/texuli/src/design-system/index.ts'), 'utf8');
+    // Only a dynamic import reaches the compiler, so the subpath stays small.
+    expect(source).not.toMatch(/from\s+'@texuli\/tokens\/design-system\/compile'/);
+    expect(source).toContain("import('@texuli/tokens/design-system/compile')");
   });
 });
 

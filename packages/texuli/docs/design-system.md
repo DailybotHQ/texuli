@@ -178,4 +178,12 @@ and provides its component defaults to every Texuli component inside.
   `texuli` root never imports it (a test walks the import graph; the root
   measured 217,091 B before and after).
 
+The subpath also re-exports `applyDesignSystem` (with its
+`ApplicableDesignSystem` and `ApplyDesignSystemOptions` types) and offers
+`loadDesignSystemCompiler()`, which imports
+`@texuli/tokens/design-system/compile` on demand as a lazy chunk (never at
+import), for hosts that compile at run time without depending on
+`@texuli/tokens` themselves: `@texuli/player` uses both for a blueprint's
+`designSystem` (spec 0.10.0).
+
 Tests: `packages/texuli/tests/design-system-provider.test.ts`.
