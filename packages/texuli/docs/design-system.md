@@ -184,6 +184,10 @@ The subpath also re-exports `applyDesignSystem` (with its
 `@texuli/tokens/design-system/compile` on demand as a lazy chunk (never at
 import), for hosts that compile at run time without depending on
 `@texuli/tokens` themselves: `@texuli/player` uses both for a blueprint's
-`designSystem` (spec 0.10.0).
+`designSystem` (spec 0.10.0). `loadDesignSystemCompilerCore()` (from
+`0.10.1`, G127) imports `@texuli/tokens/design-system/compile-core`
+instead: the same compiler without the theme library, whose
+`resolveDesignSystemCore` loads `texuli:<id>` bases only through a loader the
+caller passes (`@texuli/player/design-system-core` uses it).
 
 Tests: `packages/texuli/tests/design-system-provider.test.ts`.

@@ -63,7 +63,7 @@ Not layers, because they consume the library:
 
 `@texuli/examples` is never packed (`NEVER_PACKED` in
 `scripts/packages.ts`); `pnpm verify:packages` packs the other 26, and all
-26 are released on npm as `0.10.0`, the design-systems release (`@texuli/mcp`
+26 are released on npm in the 0.10 line: 7 at `0.10.0` (core, date, deck, drag, document, primitives, spec) and 19 at `0.10.1` (G125–G127 and their exact-pin dependents); `0.10.0` is the design-systems release (`@texuli/mcp`
 was first released in `0.9.0`; the 0.8 line had 25 packages);
 `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/editor`,
 `@texuli/document`, `@texuli/pages`, `@texuli/forms`, `@texuli/canvas`,
@@ -134,14 +134,14 @@ cap in `texuli.budgets.json` (`pnpm size`).
 | `@texuli/examples` (private) | `.` |
 | `@texuli/forms` (private, in development) | `.`, `model`, `controls` (from `0.10.0`), `host`, `styles.css` |
 | `@texuli/media` (private) | `.`, `animation`, `animation/player`, `audio`, `captions`, `composition-canvas`, `composition-canvas/draw`, `composition-canvas/render`, `composition-model`, `composition-svg`, `composition-v2`, `export`, `export/ui`, `gallery`, `gallery/lightbox`, `generator-slot`, `image`, `image-editor`, `image-editor/model`, `image-editor/render`, `timeline`, `timeline/model`, `video` |
-| `@texuli/player` (private) | `.`, `design-system` (from `0.10.0`: the lazy design-system step, shared with the slides stage), `styles.css` |
+| `@texuli/player` (private) | `.`, `design-system` (from `0.10.0`: the lazy design-system step), `design-system-core` (from `0.10.1`: the same step without the theme library, shared with the slides stage core), `styles.css` |
 | `@texuli/pages` (private, in development) | `.`, `editor`, `editor-core`, `reader`, `reader-core`, `paged`, `paged-core`, `export`, `host`, `host-core`, `collab`, `collab-core` (the `*-core` subpaths from `0.10.0`), `styles.css` |
 | `@texuli/primitives` (private) | `.`, `accordion`, `alert-dialog`, `color-picker`, `context-menu`, `label`, `number-field`, `progress`, `separator`, `sheet`, `slider`, `tags-input`, `toolbar`, `tooltip`, `collapsible`, `command`, `date-picker`, `date-field`, `file-drop`, `radio-group`, `switch`, `checkbox`, `calendar`, `toggle`, `menu`, `menubar`, `popover`, `tabs`, `hover-card`, `tree`, `listbox`, `select`, `splitter`, `portal`, `navigation-menu`, `scroll-area`, `pagination`, `toast`, `dialog`, `pin-input`, `combobox`, `avatar`, `sortable` |
 | `@texuli/slides` (private) | `.`, `model`, `grammar`, `export`, `export-core` (from `0.10.0`), `templates`, `stage`, `stage-core`, `components`, `layouts`, `styles.css` |
 | `@texuli/spec` (private) | `.`, `workflow`, `migrate`, `codegen`, `surface`, `motion`, `stream`, `source`, `design-system` (from `0.10.0`) |
 | `@texuli/workflows` (private, in development) | `.`, `model`, `layout`, `spec-adapter`, `editor`, `viewer`, `inspector` |
 | `texuli` (private) | `.`, `alert`, `avatar`, `badge`, `button`, `card`, `carousel`, `choice`, `combobox`, `command`, `cx`, `date`, `defaults`, `design-system` (from `0.10.0`), `dialog`, `empty`, `feedback`, `field`, `file-upload`, `icons`, `icons/lucide`, `input`, `kbd-code`, `layouts/app`, `layouts/app/dual-sidebar`, `layouts/app/master-detail`, `layouts/app/rail`, `layouts/app/sidebar`, `layouts/app/split-view`, `layouts/app/top-nav`, `layouts/auth-settings`, `layouts/auth-settings/register`, `layouts/content`, `layouts/content/blog`, `layouts/content/docs`, `layouts/content/editorial`, `layouts/dashboard`, `layouts/dashboard/register`, `layouts/host`, `layouts/host/chrome`, `layouts/host/drawer`, `layouts/marketing`, `layouts/marketing/entry`, `layouts/marketing/landing`, `layouts/marketing/pricing`, `layouts/marketing/register`, `layouts/marketing/section`, `layouts/mobile`, `layouts/mobile/register`, `layouts/shells`, `menus`, `motion`, `navigation`, `number-pin`, `popover`, `rating`, `resizable`, `scroll-area`, `select`, `separator-aspect`, `sheet`, `sidebar`, `slider`, `stat`, `stepper`, `table`, `tabs-accordion`, `tags-color`, `timeline`, `toast`, `toggle`, `toolbar`, `tooltip`, `tree` |
-| `@texuli/tokens` (private) | `.`, `aa-gate`, `aa-gate/components`, `base.css`, `build`, `components`, `contract`, `css`, `data-viz`, `design-system/apply`, `design-system/compile`, `design-system/diff`, `design-system/emit`, `design-system/fixtures`, `design-system/import`, `design-system/report`, `design-system/validate` (the `design-system/*` subpaths from `0.10.0`), `forced-colors`, `forced-colors.css`, `generator`, `library`, `library-expand`, `modes`, `motion`, `no-flash`, `palette`, `renames`, `renames.json`, `style-presets`, `system`, `system.css` (the system token defaults alone, from `0.10.0`), `tailwind`, `tailwind/preset.css` |
+| `@texuli/tokens` (private) | `.`, `aa-gate`, `aa-gate/components`, `base.css`, `build`, `components`, `contract`, `css`, `data-viz`, `design-system/apply`, `design-system/compile`, `design-system/compile-core` (from `0.10.1`), `design-system/diff`, `design-system/emit`, `design-system/fixtures`, `design-system/import`, `design-system/report`, `design-system/validate` (the `design-system/*` subpaths from `0.10.0`), `forced-colors`, `forced-colors.css`, `generator`, `library`, `library-expand`, `library-ids` (from `0.10.1`), `modes`, `motion`, `no-flash`, `palette`, `renames`, `renames.json`, `style-presets`, `system`, `system.css` (the system token defaults alone, from `0.10.0`), `tailwind`, `tailwind/preset.css` |
 | `@texuli/tools` (private) | `.`, `a2ui`, `cli-add`, `cli-init`, `cli-update`, `llms`, `elements`, `golden`, `deck`, `document`, `email`, `print`, `ops` (the operations registry, ADR-017), `ds-check` and `ds-check/host` (design-system conformance, from `0.10.0`), `mcp` (the MCP protocol layer, its stdio transport and `runMcpCli`) |
 | `@texuli/mcp` (private, in development) | `.` (`startTexuliMcp`, `runTexuliMcpCli`, `TEXULI_MCP_VERSION`; the bin `texuli-mcp`) |
 
@@ -243,7 +243,7 @@ after each deploy of `main`.
 
 ## Decks: engine and stage
 
-ADR-009 splits presentations in two packages (both on npm as `0.10.0`;
+ADR-009 splits presentations in two packages (`@texuli/deck` on npm as `0.10.0`, `@texuli/slides` as `0.10.1`;
 `@texuli/deck` was first released in `0.4.0`):
 
 - **`@texuli/deck` (L0)** owns everything that is data: deck model v2

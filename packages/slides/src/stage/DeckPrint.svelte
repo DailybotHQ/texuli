@@ -7,6 +7,7 @@ import { type DeckPrintNotes, type DeckPrintPlan, planDeckPrint } from '../expor
 import { catalogIdForBlock } from '../grammar/index.ts';
 import type { Deck, DeckThemeReference } from '../model/index.ts';
 import { resolveSlideMaster, resolveSlideTheme } from '../model/index.ts';
+import { loadDeckLibraryTheme } from './library-theme.ts';
 import { loadDeckBlockFamily } from './loaders.ts';
 import { type DeckMediaTrust, settleDeckImages } from './media.ts';
 import SlideContent from './SlideContent.svelte';
@@ -15,7 +16,6 @@ import {
   type DeckThemeLoader,
   deckCatalogThemeIds,
   deckThemeVariables,
-  loadDeckLibraryTheme,
 } from './theme.ts';
 
 interface Props {

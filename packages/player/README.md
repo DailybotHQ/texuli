@@ -10,7 +10,7 @@ output stays inside a labelled frame with a visible trust badge, and the
 player never navigates, fetches or persists anything on its own.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.10.0`, a pre-1.0 release (1.0.0 will be the first
+> published to npm as `0.10.1`, a pre-1.0 release (1.0.0 will be the first
 > stable release). Under 0.x, a new minor (`0.11.0`) may contain breaking
 > changes, so pin the exact version or use `^0.10.0`, which accepts only 0.10.x.
 
@@ -95,7 +95,7 @@ Everything is exported from the root entry, `@texuli/player`.
 | Media policy | `applyMediaPolicy`, `TRUST_PINNED_IDS` |
 | Streaming (new in `0.6.0`) | `<Player stream>`, `BlueprintStreamSource`, `PlayerStreamProgress`, `STREAM_PENDING_ID`; the push handle is `createBlueprintStream` from `@texuli/spec/stream` ([streaming.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/streaming.md)) |
 | Data sources (new in `0.8.0`) | `<Player sourceRegistry>` or `sourceLoader`: blueprint props `{"$source": name, "query": {...}}` read host-registered sources from `@texuli/core/data-source`, with loading, empty and error states, paging and optimistic edits ([data-sources.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/data-sources.md)) |
-| Design systems (from `0.10.0`) | `<Player designSystems={{ resolve, mode }}>` and `onDesignSystem`: a blueprint's `designSystem` (spec 0.10.0) is resolved by the host (never fetched), compiled lazily and applied to the player root; a refused one keeps the default theme with a notice, and its component defaults reach the painted components (props still win); `PlayerDesignSystems`, `PlayerDesignSystemEvent`. The step is also the `@texuli/player/design-system` subpath (`resolvePlayerDesignSystem`, `applyPlayerDesignSystem`, `playerDesignDefaults`), which the `@texuli/slides` stage loads lazily for a deck's own `designSystem` ([reference.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/reference.md#design-systems-spec-0100)) |
+| Design systems (from `0.10.0`) | `<Player designSystems={{ resolve, mode }}>` and `onDesignSystem`: a blueprint's `designSystem` (spec 0.10.0) is resolved by the host (never fetched), compiled lazily and applied to the player root; a refused one keeps the default theme with a notice, and its component defaults reach the painted components (props still win); `PlayerDesignSystems`, `PlayerDesignSystemEvent`. The step is also the `@texuli/player/design-system` subpath (`resolvePlayerDesignSystem`, `applyPlayerDesignSystem`, `playerDesignDefaults`, `loadPlayerLibraryBase`); `@texuli/player/design-system-core` (from `0.10.1`, G127) is the same step without the theme library (`resolvePlayerDesignSystemCore`, `applyPlayerDesignSystemCore`: `texuli:<theme>` loads only through the caller's `loadLibraryBase`), which the `@texuli/slides` stage loads lazily for a deck's own `designSystem` ([reference.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/reference.md#design-systems-spec-0100)) |
 | Stylesheet | `@texuli/player/styles.css` |
 
 The TypeScript declarations list the full surface.

@@ -49,6 +49,7 @@ Returns a `DocumentPlayerHost` (the player's type):
 | `resolveEmbed`, `resolveMedia` | — | Embeds and media, as in the reader |
 | `reducedMotion` | `false` | Paint embeds without motion |
 | `loadPlayer` | the package loader | A `PagesPlayerLoader` for embeds inside the document; `null` turns them off ([core entries](editor.md#core-entries-without-the-player)) |
+| `loadLibraryBase` | the theme library (`createDocumentPlayerHost`); none on `createDocumentPlayerHostCore` | A `PagesLibraryBaseLoader` for the reader's design-system `texuli:<theme>` bases; `null` refuses them ([design systems](reader.md#design-systems); G127, from `0.10.1`) |
 | `renderBlock`, `blockHost` | — | The host's own blocks in the painted document, passed to the reader ([host blocks](editor.md#host-blocks); from `0.10.0`). The player validates the document against the catalog first, so a wrapped block the catalog does not know is refused before the reader sees it; here the host paints what passes: embeds the library cannot paint (a `ref` with no payload) and library blocks it claims with `'host'` |
 
 The node's `outline` prop goes to the reader's `outline`.
@@ -64,8 +65,12 @@ this entry has no `@texuli/player` reference of its own in its build; the
 paint only with `options.loadPlayer` (a `PagesPlayerLoader` whose result is
 a `PagesPlayerModule`, for example `() => import('@texuli/player')`, since
 the host already has the player); without it they show a note.
-`@texuli/pages/host-core` also exports `checkDocumentDraft` and
-`DocumentPlayerHostOptions`. See
+It has no default `options.loadLibraryBase` either (G127, from
+`0.10.1`): pass `loadPagesLibraryBase` to resolve a design
+system's `texuli:<theme>` bases from the token theme library.
+`@texuli/pages/host-core` also exports `checkDocumentDraft`,
+`DocumentPlayerHostOptions`, `loadPagesLibraryBase` and
+`PagesLibraryBaseLoader`. See
 [core entries](editor.md#core-entries-without-the-player).
 
 ## `checkDocumentDraft(doc, tier)`

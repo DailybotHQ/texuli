@@ -3,7 +3,8 @@
  *   pnpm exec tsx packages/tokens/scripts/generate.ts          (write)
  *   pnpm exec tsx packages/tokens/scripts/generate.ts --check  (fail on drift)
  * Outputs: the base.css token-defaults block, system.css (the same block alone), renames.json, docs/tokens-components.md and the Tokens section of
- * every texuli component page (packages/texuli/docs/ui-<subpath>.md).
+ * every texuli component page (packages/texuli/docs/ui-<subpath>.md), plus the theme library's
+ * generated rows: src/library-expand/metadata.ts and src/library-ids/ids.ts (render-library.ts).
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -17,6 +18,7 @@ import {
   replaceTokenDefaultsBlock,
   withComponentTokensSection,
 } from './render.ts';
+import { renderExpandMetadata, renderLibraryIds } from './render-library.ts';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -27,6 +29,8 @@ const outputs: Record<string, string> = {
   'src/css/system.css': renderSystemCss(),
   'src/renames/renames.json': renderRenamesJson(),
   'docs/tokens-components.md': renderTokenTablesDoc(),
+  'src/library-expand/metadata.ts': await renderExpandMetadata(),
+  'src/library-ids/ids.ts': await renderLibraryIds(),
 };
 // Each texuli component page carries a generated Tokens section.
 for (const subpath of componentDocSubpaths()) {

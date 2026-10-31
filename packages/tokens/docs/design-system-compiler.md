@@ -1,4 +1,4 @@
-# The design-system compiler (`@texuli/tokens/design-system/compile` and `/validate`)
+# The design-system compiler (`@texuli/tokens/design-system/compile`, `/compile-core` and `/validate`)
 
 > **Status: released in `0.10.0`.** Both subpaths ship in
 > `@texuli/tokens@0.10.0`. The runtime is
@@ -176,6 +176,40 @@ The spec's codes (`unknown-key`, `invalid-type`, `invalid-value`,
 | `target-size` | A pinned interactive size below `accessibility.targetMin` |
 
 ## Size and speed
+
+### Without the theme library (`design-system/compile-core`, G127)
+
+> From `0.10.1`.
+
+`@texuli/tokens/design-system/compile-core` is every export of
+`design-system/compile` except `loadLibraryBase` and `resolveDesignSystem`,
+plus `resolveDesignSystemCore(input, options)` and the
+`ResolveDesignSystemCoreOptions` and `DesignSystemLibraryLoader` types (both
+entries export them). `resolveDesignSystemCore` is `resolveDesignSystem`
+with the `texuli:<id>` loader injected: `options.resolve` answers first,
+then `options.loadLibraryBase` for a `texuli:<id>` base it left `undefined`
+or `null`. Without a loader such a base is refused like the synchronous
+resolver refuses it (`invalid-value` at `$.extends`, "Nothing resolves
+texuli:<id>."). `resolveDesignSystem` is `resolveDesignSystemCore` with
+`loadLibraryBase` as the default, and it accepts `options.loadLibraryBase`
+too. The library code lives in `src/design-system/resolve-library.ts`,
+which only `design-system/compile` imports, so a host on the core entry has
+no reference to the theme library in its build
+(`tests/tree-shake.test.ts` bundles both entries).
+
+```ts
+import { compileDesignSystem, resolveDesignSystemCore } from '@texuli/tokens/design-system/compile-core';
+
+const resolved = await resolveDesignSystemCore(doc, {
+  resolve: (ref) => hostDocuments.get(ref),
+  loadLibraryBase: (ref) => hostThemeBases.get(ref), // or none: texuli:<id> is refused
+});
+const compiled = resolved.ok ? compileDesignSystem(resolved.document) : resolved;
+```
+
+Measured on 2026-10-31: `design-system/compile-core` 30,245 B gzip with no
+lazy chunks; `design-system/compile` 30,915 B gzip plus the 22,243 B of
+lazy library chunks (30,814 B before the split).
 
 Measured with `pnpm size --filter tokens` (gzip, 2026-10-30):
 `design-system/compile` 30,780 B (library themes in lazy chunks, 21.9 KB,

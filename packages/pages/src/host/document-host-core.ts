@@ -2,6 +2,7 @@ import { validateDocument } from '@texuli/document/schema';
 import type { DocumentPlayerHost, DraftDocumentCheck } from '@texuli/player';
 import { mount, unmount } from 'svelte';
 import type { PagesBlockHost, PagesBlockSnippet } from '../shared/block-host.ts';
+import type { PagesLibraryBaseLoader } from '../shared/design-system-types.ts';
 import type { EmbedResolver } from '../shared/embeds.ts';
 import type { PagesLabels } from '../shared/labels.ts';
 import type { MediaResolver } from '../shared/media.ts';
@@ -49,6 +50,14 @@ export interface DocumentPlayerHostOptions {
    * turns them off on either.
    */
   loadPlayer?: PagesPlayerLoader | null;
+  /**
+   * Loads a design system's `texuli:<theme>` base for the reader (G127).
+   * `createDocumentPlayerHost` defaults to the theme library;
+   * `createDocumentPlayerHostCore` has none, so its build has no theme
+   * library reference, and such a design system is refused. `null` refuses
+   * them on either.
+   */
+  loadLibraryBase?: PagesLibraryBaseLoader | null;
 }
 
 /**
@@ -96,6 +105,7 @@ export function createDocumentPlayerHostCore(
             ...(options.renderBlock ? { renderBlock: options.renderBlock } : {}),
             ...(options.blockHost ? { blockHost: options.blockHost } : {}),
             ...(options.loadPlayer ? { loadPlayer: options.loadPlayer } : {}),
+            ...(options.loadLibraryBase ? { loadLibraryBase: options.loadLibraryBase } : {}),
           },
         });
       });

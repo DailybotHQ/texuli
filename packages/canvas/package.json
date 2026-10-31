@@ -1,6 +1,6 @@
 {
   "name": "@texuli/canvas",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "private": true,
   "description": "Infinite canvas for Texuli: a framework-free canvas model (shapes, text, connectors, frames, transforms, snapping, an op log with undo), CRDT sync on @texuli/document/sync, an accessible Svelte 5 editor and viewer, and SVG and PNG export.",
   "keywords": [
@@ -65,7 +65,7 @@
     "@texuli/deck": "0.10.0",
     "@texuli/document": "0.10.0",
     "@texuli/drag": "0.10.0",
-    "texuli": "0.10.0"
+    "texuli": "0.10.1"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

@@ -13,7 +13,9 @@ import { join } from 'node:path';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { compileDesignSystem } from '@texuli/tokens/design-system/compile';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { loadDeckLibraryBase } from '../src/stage/core.ts';
 import DeckStage from '../src/stage/DeckStage.svelte';
+import DeckStageCore from '../src/stage/DeckStageCore.svelte';
 import { clearDeckHash } from './scenario.ts';
 
 const SPEC = join(import.meta.dirname, '../../spec');
@@ -216,6 +218,45 @@ describe('the stage applies a deck design system', () => {
       await waitFor(() => expect(plain.className).toContain('tx-button--default'));
       expect(plain.className).toContain('tx-button--md');
       expect(onDesignSystem).toHaveBeenCalledTimes(1);
+    }
+  );
+});
+
+describe('the stage core reaches the theme library for a design system only through a loader it is given (G127)', () => {
+  it(
+    'refuses texuli:<theme> on DeckStageCore without loadLibraryBase, applies it with one, and DeckStage keeps the library default',
+    TIMEOUT,
+    async () => {
+      const core = (props: Record<string, unknown> = {}) => {
+        const onDesignSystem = vi.fn();
+        const view = render(DeckStageCore, {
+          props: {
+            deck: deck({ ref: 'texuli:violet' }),
+            loadTheme: null,
+            syncHash: false,
+            onDesignSystem,
+            ...props,
+          },
+        });
+        const root = () =>
+          view.container.querySelector<HTMLElement>('.tx-deck-stage') as HTMLElement;
+        return { root, onDesignSystem };
+      };
+      const bare = core();
+      expect(await settled(bare.root)).toBe('refused');
+      expect(bare.onDesignSystem).toHaveBeenCalledWith(
+        expect.objectContaining({ status: 'refused', code: 'design-system-unresolved' })
+      );
+      cleanup();
+
+      const loadLibraryBase = vi.fn(loadDeckLibraryBase);
+      const injected = core({ loadLibraryBase });
+      expect(await settled(injected.root)).toBe('applied');
+      expect(loadLibraryBase).toHaveBeenCalledWith('texuli:violet');
+      cleanup();
+
+      const stage = paint(deck({ ref: 'texuli:violet' }));
+      expect(await settled(stage.root)).toBe('applied');
     }
   );
 });

@@ -62,6 +62,27 @@ await loadFullLibraryTheme('harbor-teal'); // port id still works
 
 Lazy per-definition modules under `library-expand/themes/`. Chart tokens: `loadFullLibraryThemeCharts(id)`.
 
+To check an id without loading these catalog rows, use
+`@texuli/tokens/library-ids` ([tokens-library-ids.md](tokens-library-ids.md)).
+
+## Catalog rows and descriptions (G126)
+
+`EXPAND_THEME_LIBRARY_META` is built from compact rows in
+`library-expand/metadata.ts`. The rows are generated from the definition
+modules by `pnpm exec tsx packages/tokens/scripts/generate.ts` (`--check`
+fails on drift), in catalog order: the six built-ins, then the curated
+themes sorted by id.
+
+Each row's `description` is the definition's full sentence, the same text
+`loadExpandThemeDefinition(id)` returns. Before `0.10.1` the
+rows cut descriptions at 48 characters, mid-sentence ("Terracotta Hearth:
+curated warm family theme for"). The full sentences cost nothing in size:
+the descriptions repeat, so the entry measures 6,408 B gzip, against
+6,450 B with the cut (37,808 B raw, against 34,880 B). The port metadata
+(`@texuli/tokens/library`) already carried full descriptions.
+`tests/library-expand.test.ts` checks that all 210 metadata descriptions end
+a sentence and are a prefix of, or equal to, the full description.
+
 ## Contrast
 
 Every expand theme is gated in tests for WCAG 2.x AA (AAA for `high-contrast` family and HC collection). APCA is out of scope.

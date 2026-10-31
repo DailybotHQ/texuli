@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { COMPONENT_TOKENS } from '../src/components/registry.ts';
 import { SEMANTIC_ROLES } from '../src/contract/semantic.ts';
+import * as compileEntry from '../src/design-system/compile.ts';
 import {
   type CompiledDesignSystem,
   canonicalJson,
@@ -17,6 +18,7 @@ import {
   resolveDesignSystemSync,
   sha256Hex,
 } from '../src/design-system/compile.ts';
+import * as compileCore from '../src/design-system/compile-core.ts';
 import * as validateEntry from '../src/design-system/validate.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -586,5 +588,40 @@ describe('compileDesignSystem: partial data-viz palettes', () => {
     ] as const)
       expect(partial.vars.light?.[name]).toBe(full.vars.light?.[name]);
     expect(partial.vars.dark).toEqual(full.vars.dark);
+  });
+});
+
+describe('@texuli/tokens/design-system/compile-core (G127)', () => {
+  it('resolves texuli:<id> bases only through an injected loader, and compile keeps the library default', async () => {
+    const base = doc({ extends: 'texuli:violet' });
+    // No loader: the same unresolved-base refusal the sync resolver gives.
+    const bare = await compileCore.resolveDesignSystemCore(base);
+    expect(bare.ok).toBe(false);
+    expect(bare.ok ? [] : bare.errors.map((issue) => [issue.code, issue.path])).toEqual([
+      ['invalid-value', '$.extends'],
+    ]);
+    expect(bare.ok ? '' : bare.errors[0]?.message).toBe('Nothing resolves texuli:violet.');
+    // An injected loader (here the library's, by name) resolves it like resolveDesignSystem.
+    const asked: string[] = [];
+    const injected = await compileCore.resolveDesignSystemCore(base, {
+      loadLibraryBase: (ref) => {
+        asked.push(ref);
+        return compileEntry.loadLibraryBase(ref);
+      },
+    });
+    const library = await resolveDesignSystem(base);
+    expect(asked).toEqual(['texuli:violet']);
+    expect(injected.ok && library.ok).toBe(true);
+    if (injected.ok && library.ok) expect(injected.hash).toBe(library.hash);
+    // The host resolver is asked first; null and undefined fall through to the loader.
+    const viaResolve = await compileCore.resolveDesignSystemCore(base, {
+      resolve: () => null,
+      loadLibraryBase: () => undefined,
+    });
+    expect(viaResolve.ok).toBe(false);
+    // The core entry is the compile entry without the library pair.
+    expect(Object.keys(compileEntry).sort()).toEqual(
+      [...Object.keys(compileCore), 'loadLibraryBase', 'resolveDesignSystem'].sort()
+    );
   });
 });

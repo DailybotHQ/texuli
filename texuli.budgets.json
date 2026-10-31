@@ -546,7 +546,11 @@
     },
     "@texuli/tokens/library-expand": {
       "gzip": 6720,
-      "note": "FIX-library-expand-quality + FIX-port-compact: expand meta carries neutral; measured ~8.58 KiB. Catalog listing only. PLAN_010 T-release-060 (2026-10-29): 8832 -> 6720 B, tightened to measured + 4% (measured 6,450 B)."
+      "note": "FIX-library-expand-quality + FIX-port-compact: expand meta carries neutral; measured ~8.58 KiB. Catalog listing only. PLAN_010 T-release-060 (2026-10-29): 8832 -> 6720 B, tightened to measured + 4% (measured 6,450 B). PLAN_011 T-gaps-125-127 (G126): budget unchanged; the rows carry each full description instead of a 48-character cut, measured 6,408 B gzip (37,808 B raw, was 34,880 B), since the full sentences repeat and compress better."
+    },
+    "@texuli/tokens/library-ids": {
+      "gzip": 1856,
+      "note": "PLAN_011 T-gaps-125-127 (G125, trust mode): new row at measured + 4%, rounded up to 64 B: every library theme id (6 built-in, 64 port, 140 expand; 210) with no metadata, isLibraryThemeId and libraryThemeSet, generated from the library sources, so a host validates ids synchronously without the 6,408 B library-expand rows. Measured 1,730 B gzip (3,273 B raw)."
     },
     "@texuli/tokens/palette": {
       "gzip": 4352,
@@ -577,6 +581,10 @@
     "@texuli/tokens/design-system/compile": {
       "gzip": 32064,
       "note": "PLAN_011 T-ds-compiler (ADR-021, ADR-022; owner-approved new row): the lazy design-system compiler: extends resolution, variants and patches, the pinned-color contrast solver over the seed generator, guarantees, concrete variables per mode, fontFaces, assets, report and the SHA-256 hash. It bundles the @texuli/spec/design-system validator (about 7 KB) and the system token families; library themes for texuli:<id> load in lazy chunks (21.9 KB, not counted). Loaded only by the studio, CLI, builds and MCP; the @texuli/tokens root never imports it. Measured 30,780 B, cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/tokens/design-system/compile-core": {
+      "gzip": 31488,
+      "note": "PLAN_011 T-gaps-125-127 (G127, lead-approved): new row at measured + 4%, rounded up to 64 B: the design-system compiler without the theme library (every export of design-system/compile except loadLibraryBase and resolveDesignSystem; resolveDesignSystemCore takes the texuli:<id> loader from its caller). Measured 30,245 B gzip with no lazy chunks, against 30,915 B plus 22,243 B of lazy library chunks for design-system/compile (30,814 B before the split, budget unchanged)."
     },
     "@texuli/tokens/design-system/diff": {
       "gzip": 3584,
@@ -901,9 +909,9 @@
       "note": "PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for PagedViewCore (and every paged export) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 13,351 B, CSS 3,047 B; every lazy chunk 144,388 B gzip."
     },
     "@texuli/pages/reader": {
-      "gzip": 9984,
+      "gzip": 10368,
       "cssGzip": 2432,
-      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the read-only reader with outline; measured 8,718 B, CSS 2,296 B. PLAN_011 T-ds-blueprint: 9088 -> 9536 (measured 9,148 B + 4%) for a document's own designSystem applied to the reader root. PLAN_011 T-gaps-111-112 (G111, trust mode): 9536 -> 9984 (measured 9,577 B + 4%; 9,145 B before) for the host block renderer wiring (renderBlock and blockHost props, the lazy host-slot loader, the library views' refusal hand-off); the slot that decides and paints loads with import() only when a host is given."
+      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the read-only reader with outline; measured 8,718 B, CSS 2,296 B. PLAN_011 T-ds-blueprint: 9088 -> 9536 (measured 9,148 B + 4%) for a document's own designSystem applied to the reader root. PLAN_011 T-gaps-111-112 (G111, trust mode): 9536 -> 9984 (measured 9,577 B + 4%; 9,145 B before) for the host block renderer wiring (renderBlock and blockHost props, the lazy host-slot loader, the library views' refusal hand-off); the slot that decides and paints loads with import() only when a host is given. PLAN_011 T-gaps-125-127 (G127, lead-approved): 9984 -> 10368 B, measured + 4% (measured 9,955 B, 9,835 B before): PageReader passes the default theme library loader (loadPagesLibraryBase) for a design system's texuli:<theme> bases, now that the reader core takes it injected; the old cap left 29 B."
     },
     "@texuli/pages/reader-core": {
       "gzip": 10048,
@@ -921,8 +929,12 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 76,730 B gzip, 15,251 B CSS, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): 79808 -> 85184 B, measured + 4% after the streaming mode (ADR-014, about 1.3 KB on the main entry, the reader loop lazy) and the motion frame (ADR-013, about 1.85 KB; its runtime and core motion load only when a node declares motion); measured 81,854 B. PLAN_010 T-release-060 (2026-10-29): CSS 15872 -> 2688 B, tightened to measured + 4% (measured 2,545 B). PLAN_010 0.8.0 integration (consented plan): 85184 -> 94528 B, measured + 4% after data-source bindings (the source access, loader and optimistic-edit wiring on the main entry; painters stay lazy), the canvasHost and formHost seams and the spec 0.8.0 checks of the catalog validator it bundles; the form and canvas engines are not in it (they come from the hosts). Measured 90,833 B (CSS 2,545 B). PLAN_010 T-targets (ADR-016): CSS 2688 -> 2816 B at measured + 4% (measured 2,673 B): the print mode rules (page breaks, hidden controls, no dimmed surface). PLAN_011 T-ds-conformance: CSS 2816 -> 3200 B at measured + 4% (measured 3,025 B): the native player controls (flow actions, action-form submits and fields, filter and slider inputs, the toggle label) are styled from the token contract instead of painting the user agent's colors, with focus rings, targets of at least --tx-size-target-min and forced-colors rules."
     },
     "@texuli/player/design-system": {
-      "gzip": 3648,
-      "note": "PLAN_011 T-ds-blueprint (trust mode): new row at measured + 4%: the player's design-system step as a public subpath (resolve through the host, compile, component defaults), so the @texuli/slides stage applies a deck's designSystem the same way; hosts and the player load it only with import(). Measured 3,506 B gzip; the compiler and runtime stay lazy (53,293 B)."
+      "gzip": 3840,
+      "note": "PLAN_011 T-ds-blueprint (trust mode): new row at measured + 4%: the player's design-system step as a public subpath (resolve through the host, compile, component defaults), so the @texuli/slides stage applies a deck's designSystem the same way; hosts and the player load it only with import(). Measured 3,506 B gzip; the compiler and runtime stay lazy (53,293 B). PLAN_011 T-gaps-125-127 (G127, lead-approved): 3648 -> 3840 B, measured + 4% (measured 3,682 B, 3,505 B before): the step is now the library-free design-system-core plus the default theme library loader (loadPlayerLibraryBase) and the options wrapper."
+    },
+    "@texuli/player/design-system-core": {
+      "gzip": 3776,
+      "note": "PLAN_011 T-gaps-125-127 (G127, lead-approved): new row at measured + 4%, rounded up to 64 B: the player's design-system step without the theme library (resolvePlayerDesignSystemCore, applyPlayerDesignSystemCore; texuli:<theme> loads only through the caller's loadLibraryBase), compiling with @texuli/tokens/design-system/compile-core. Measured 3,573 B gzip, lazy 30,242 B (against 53,455 B lazy for @texuli/player/design-system, which carries the library chunks)."
     },
     "@texuli/player/styles.css": {
       "gzip": 64,

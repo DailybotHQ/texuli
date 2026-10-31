@@ -1,6 +1,6 @@
 {
   "name": "@texuli/tokens",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "private": true,
   "description": "The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS.",
   "keywords": [
@@ -38,6 +38,7 @@
     "./data-viz": "./src/data-viz/index.ts",
     "./design-system/apply": "./src/design-system/apply.ts",
     "./design-system/compile": "./src/design-system/compile.ts",
+    "./design-system/compile-core": "./src/design-system/compile-core.ts",
     "./design-system/diff": "./src/design-system/diff.ts",
     "./design-system/emit": "./src/design-system/emit.ts",
     "./design-system/fixtures": "./src/design-system/fixtures.ts",
@@ -49,6 +50,7 @@
     "./generator": "./src/generator/index.ts",
     "./library": "./src/library-port/index.ts",
     "./library-expand": "./src/library-expand/index.ts",
+    "./library-ids": "./src/library-ids/index.ts",
     "./modes": "./src/modes/index.ts",
     "./motion": "./src/motion/index.ts",
     "./no-flash": "./src/no-flash/index.ts",

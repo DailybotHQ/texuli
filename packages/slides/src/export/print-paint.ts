@@ -26,7 +26,7 @@ import {
   loadDeckTheme,
   slideThemeReference,
 } from '../stage/style.ts';
-import { type DeckThemeLoader, deckThemeVariables, loadDeckLibraryTheme } from '../stage/theme.ts';
+import { type DeckThemeLoader, deckThemeVariables } from '../stage/theme.ts';
 import { DECK_EXPORT_CANVAS, isDeckExportAspect } from './canvas.ts';
 
 export { DeckSlidePreview };
@@ -43,7 +43,11 @@ export interface DeckPrintPaintOptions {
   defaults?: DeckDefaultRenderersSource;
   tier?: DeckMediaTrust;
   messages?: DeckStageMessages;
-  /** Catalog theme loader; `null` leaves catalog themes to host CSS. */
+  /**
+   * Catalog theme loader; none (or `null`) leaves catalog themes to host CSS.
+   * No default here (G127): `DeckPrintView` passes `loadDeckLibraryTheme`,
+   * `DeckPrintViewCore` only the host's.
+   */
   loadTheme?: DeckThemeLoader | null;
   resolveAvatar?: (id: string) => string | undefined;
 }
@@ -69,7 +73,7 @@ export async function createDeckPrintPaint(
   deck: Deck,
   options: DeckPrintPaintOptions = {}
 ): Promise<DeckPrintPaint> {
-  const loader = options.loadTheme === undefined ? loadDeckLibraryTheme : options.loadTheme;
+  const loader = options.loadTheme ?? null;
   const themes = new Map<string, Theme | null>();
   await Promise.all(
     deckThemeReferences(deck).map(async (reference) => {

@@ -15,7 +15,7 @@ in the lower-priority `tx.base` layer. Unlayered consumer CSS and later
 
 Component CSS reads the system tokens (`--tx-space-unit`, `--tx-size-*`,
 `--tx-shape-radius-*`, the type roles…) with no fallback, so a host must load
-`base.css` or `@texuli/tokens/system.css` (unreleased, `0.10.0`; G110).
+`base.css` or `@texuli/tokens/system.css` (from `0.10.0`; G110).
 `system.css` holds only the generated system token block of `base.css`, on
 the same scopes and in the same `tx.base` layer, with no reset, motion tables
 or focus ring hook, for hosts that keep their own reset. `generate.ts` writes

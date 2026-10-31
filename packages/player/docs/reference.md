@@ -583,9 +583,10 @@ After validation (the catalog's `design-system` check), the player:
    `pnpm size` keeps the step in a lazy chunk);
 2. resolves a `ref` through `designSystems.resolve(ref)` (sync or async; a
    document or a compiled design system, a cached JSON copy works). The
-   player never fetches. `texuli:<theme>` falls back to the theme library
-   (lazy chunks, never the network). A resolved document must declare the
-   exact `id` and `version` of the ref;
+   player never fetches. `texuli:<theme>` (a reference or an `extends` base
+   the resolver leaves `undefined`) falls back to the theme library (lazy
+   chunks, never the network). A resolved document must declare the exact
+   `id` and `version` of the ref;
 3. validates and compiles the document with
    `@texuli/tokens/design-system/compile` (through `texuli/design-system`'s
    `loadDesignSystemCompiler`, a lazy chunk): an inline document at the
@@ -624,6 +625,33 @@ its root:
   prop;
 - a refused design system, or a later blueprint without one, restores the
   library defaults (`tests/design-system.test.ts`).
+
+**Without the theme library (`@texuli/player/design-system-core`, G127,
+from `0.10.1`).** The subpath step is the core step
+with the library as its default `texuli:<theme>` loader:
+`resolvePlayerDesignSystem(reference, host, tier, options?)` and
+`applyPlayerDesignSystem(root, reference, host, tier, options?)` take
+`options.loadLibraryBase` (`null` turns the fallback off), and
+`loadPlayerLibraryBase(ref)` is the library's loader.
+`@texuli/player/design-system-core` exports `resolvePlayerDesignSystemCore`,
+`applyPlayerDesignSystemCore`, `playerDesignDefaults`, the
+`PlayerDesignSystemCoreOptions` and `PlayerDesignSystemLibraryLoader` types
+and the `PlayerDesignSystem*` host types. It compiles with
+`@texuli/tokens/design-system/compile-core` (through `texuli/design-system`'s
+`loadDesignSystemCompilerCore`) and has no default loader: a `texuli:<theme>`
+reference the host does not resolve is refused (`design-system-unresolved`),
+an `extends: "texuli:<theme>"` base gets the compiler's `invalid-value`, and
+the build has no reference to the theme library. Measured 3,573 B gzip with
+30,242 B of lazy chunks, against 3,682 B and 53,455 B for
+`@texuli/player/design-system`. The `@texuli/slides` stage core uses it
+(`tests/design-system.test.ts`).
+
+```ts
+const { resolvePlayerDesignSystemCore } = await import('@texuli/player/design-system-core');
+const result = await resolvePlayerDesignSystemCore({ ref: 'texuli:violet' }, host, 'untrusted', {
+  loadLibraryBase: (ref) => hostThemeLibrary.get(ref), // or none: refused
+});
+```
 
 The context is a small closure on the main entry (94 B gzip); the
 vocabulary, the compiler and the runtime stay in the lazy step. A deck

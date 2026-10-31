@@ -33,6 +33,7 @@ editing code.
 | `onDesignSystem` | — | Called with a `PagesDesignSystemEvent`: `{ status: 'applied', id, source }` or `{ status: 'refused', code, path, message }` |
 | `renderBlock`, `blockHost` | — | The host's own blocks: a snippet and a `PagesBlockHost` ([host blocks](editor.md#host-blocks)) |
 | `loadPlayer` | the package loader | A `PagesPlayerLoader` for live embeds; `null` turns them off ([core entries](editor.md#core-entries-without-the-player)) |
+| `loadLibraryBase` | `loadPagesLibraryBase` (`PageReader`); none on `PageReaderCore` | A `PagesLibraryBaseLoader` for a design system's `texuli:<theme>` reference or base that `designSystems.resolve` leaves `undefined`; none (or `null`) refuses it ([design systems](#design-systems); G127, from `0.10.1`) |
 | `class` | — | Extra classes on the root |
 
 Blocks render as semantic elements: paragraphs, `h1` to `h4` (plus the
@@ -55,7 +56,11 @@ this entry has no `@texuli/player` reference in its build, and embeds
 paint only with the host's `PagesPlayerLoader` (its result is a
 `PagesPlayerModule`). Every other export is the same as
 `@texuli/pages/reader`, which exports `PageReaderCore` too. See
-[core entries](editor.md#core-entries-without-the-player).
+[core entries](editor.md#core-entries-without-the-player). It has no default
+`loadLibraryBase` either (G127, from `0.10.1`): pass
+`loadPagesLibraryBase` (exported by both reader entries, with the
+`PagesLibraryBaseLoader` type) to resolve a design system's `texuli:<theme>`
+bases from the token theme library ([design systems](#design-systems)).
 
 ## Design systems
 
@@ -65,9 +70,9 @@ When the document carries `designSystem` (spec 0.10.0,
 [ADR-024](../../../docs/DECISIONS.md#adr-024-design-systems-on-every-surface)),
 the reader loads its design-system step with `import()` (a document
 without one never loads it; a test walks the static imports): a `ref`
-goes to `designSystems.resolve` (`texuli:<theme>` falls back to the theme
-library), an inline document is validated at `designSystems.trust` and
-both are compiled by `@texuli/tokens/design-system/compile`, then applied
+goes to `designSystems.resolve`, an inline document is validated at
+`designSystems.trust` and both are compiled by
+`@texuli/tokens/design-system/compile-core`, then applied
 to the article with `applyDesignSystem` (`data-tx-ds`, `data-tx-scope`,
 `data-tx-mode` and the variables). Fonts load only for host-resolved
 documents or at the `developer` level. Nothing resolves, the resolver
@@ -75,6 +80,29 @@ throws, another document comes back, or the compiler refuses it (for
 example `aa-text`, `url-refused`): the reader keeps the default theme,
 sets `data-tx-pages-design-system="refused"` and shows
 `labels.designSystemRefused` in a `role="status"` paragraph. Never throws.
+
+A `texuli:<theme>` reference or `extends` base that `resolve` leaves
+`undefined` goes to `loadLibraryBase` (G127, from `0.10.1`). `PageReader` (and `createDocumentPlayerHost`) default it to
+`loadPagesLibraryBase`, which loads the token theme library on first use.
+`PageReaderCore` (and `createDocumentPlayerHostCore`) have no default:
+without a loader such a design system is refused
+(`design-system-unresolved`, or `invalid-value` for an `extends` base), and
+the build has no reference to the theme library. A host on every core
+entry with no loaders has no theme library module and no `@texuli/player`
+in any chunk: 78 chunks and none from the library, against 231 chunks, 152
+of them with library modules, before G127 (`tests/bundle-graph.test.ts`).
+The editor, paged and collab views never apply a design system, so they
+take no `loadLibraryBase`.
+
+```svelte
+<script lang="ts">
+  import { loadPagesLibraryBase, PageReaderCore } from '@texuli/pages/reader-core';
+  let { doc } = $props();
+</script>
+
+<!-- Or pass the host's own loader; with none, texuli:<theme> design systems are refused. -->
+<PageReaderCore document={doc} loadLibraryBase={loadPagesLibraryBase} />
+```
 
 ## Outline and anchors
 

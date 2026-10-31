@@ -11,18 +11,23 @@ the next line; tests and honesty checks read it from there. Change it only
 when a publish lands (published) or a new version opens (in development). -->
 Release line: published `0.10`
 
-All 26 published packages are on npm in the 0.10 line: every one at
-`0.10.0`, every internal `@texuli/*` pin exactly `0.10.0`. The blueprint
-spec in `@texuli/spec@0.10.0` is `0.10.0`, and the remote MCP server at
-`https://texuli.com/mcp` is live with the site. The publish workflow
-publishes from `main` after the merge of `release/0.10.0`, from the
-verified tarballs with signed provenance, and moves both the `latest` and
-`next` dist-tags to `0.10.0`, so a bare `npm install texuli` or `pnpm add
-texuli` gets it. `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`,
+All 26 published packages are on npm in the 0.10 line: 7 at `0.10.0`
+(`@texuli/core`, `@texuli/date`, `@texuli/deck`, `@texuli/drag`,
+`@texuli/document`, `@texuli/primitives` and `@texuli/spec`) and 19 at
+`0.10.1`, the patch releases for G125–G127 and their exact-pin dependents
+(see "0.10.1 patch releases (G125–G127)" below). Every internal
+`@texuli/*` pin is exact: a package pins `0.10.1` for the 19 and `0.10.0`
+for the 7. The blueprint spec in `@texuli/spec@0.10.0` is `0.10.0`, and
+the remote MCP server at `https://texuli.com/mcp` is live with the site.
+The publish workflow publishes from `main` after the merge of
+`release/0.10.0` and then of `release/0.10.1`, from the verified tarballs
+with signed provenance, skips every version npm already has, and moves the
+`latest` and `next` dist-tags to each package's newest version, so a bare
+`npm install texuli` or `pnpm add texuli` gets `0.10.1`. `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`,
 `@texuli/editor`, `@texuli/document`, `@texuli/pages`, `@texuli/forms`,
 `@texuli/canvas`, `@texuli/sheets` and `@texuli/mcp` are still **in
-development** (pre-1.0). Nothing is in development beyond `0.10.0`; installs
-use the 0.10 line (`^0.10.0`).
+development** (pre-1.0). Nothing is in development beyond `0.10.1`; installs
+use the 0.10 line (`^0.10.0` accepts `0.10.1`).
 
 `0.10.0` is a breaking `0.x` minor: it carries design systems (PLAN_011
 part B), the removals and the Protoyard gaps G100–G124 listed under
@@ -38,6 +43,136 @@ versions into `main`). Publishing never overwrites a published version.
   `scripts/packages.ts`).
 - The apps (`apps/website`, `apps/agent`) and the native twin (`native/`)
   publish nothing.
+
+### 0.10.1 patch releases (G125–G127)
+
+Fixes and additive entries for the Protoyard gaps G125–G127, released from
+the branch `release/0.10.1` (opened from `main` after `0.10.0`). Nothing in
+the blueprint spec changes: it stays `0.10.0`, digest unchanged.
+
+| Package | Version | Why |
+| --- | --- | --- |
+| `@texuli/tokens` | `0.10.1` | G125 `library-ids`, G126 full expand descriptions, G127 `design-system/compile-core` |
+| `texuli` | `0.10.1` | G127 `loadDesignSystemCompilerCore()`; pins `@texuli/tokens` `0.10.1` |
+| `@texuli/player` | `0.10.1` | G127 `design-system-core`; pins the `0.10.1` packages below |
+| `@texuli/slides` | `0.10.1` | G127: the stage and export cores have no default theme library loaders |
+| `@texuli/pages` | `0.10.1` | G127: the reader and host cores take an injected `loadLibraryBase` |
+| `@texuli/charts`, `@texuli/data`, `@texuli/media`, `@texuli/chat`, `@texuli/editor`, `@texuli/workflows`, `@texuli/forms`, `@texuli/canvas` | `0.10.1` | Pin `@texuli/tokens` and `texuli` `0.10.1` |
+| `@texuli/blocks`, `@texuli/catalog`, `@texuli/sheets`, `@texuli/tools`, `@texuli/astro` | `0.10.1` | Pin the `0.10.1` packages they depend on |
+| `@texuli/mcp` | `0.10.1` | Pins `@texuli/tools` `0.10.1` (`TEXULI_MCP_VERSION` and the MCP `serverInfo.version` read `0.10.1`) |
+| `@texuli/core`, `@texuli/date`, `@texuli/deck`, `@texuli/drag`, `@texuli/document`, `@texuli/primitives`, `@texuli/spec` | `0.10.0` | Unchanged; nothing they pin moved |
+
+**@texuli/tokens.**
+
+- **New subpath `@texuli/tokens/library-ids` (G125).** Every library theme
+  id with no metadata: `BUILTIN_THEME_IDS` (6), `PORT_THEME_IDS` (64),
+  `EXPAND_THEME_IDS` (140), `LIBRARY_THEME_IDS` (all 210, frozen, in the
+  order of `getFullThemeLibraryMeta()`), the `LibraryThemeId` and
+  `LibraryThemeSet` types, `isLibraryThemeId(id)` and
+  `libraryThemeSet(id)`. It is generated from the port records and the
+  expand definition modules (`packages/tokens/scripts/generate.ts`;
+  `--check` fails on drift). 1,730 B gzip, budget 1,856 B.
+- **Complete expand catalog descriptions (G126).**
+  `EXPAND_THEME_LIBRARY_META` descriptions are each theme's full sentence
+  (the text `loadExpandThemeDefinition(id)` returns), not a 48-character
+  cut ending mid-word. The rows are generated from the definition modules.
+  `library-expand` measures 6,408 B gzip (6,450 B before); its budget is
+  unchanged.
+- **New subpath `@texuli/tokens/design-system/compile-core` (G127).** The
+  design-system compiler without the theme library: every export of
+  `design-system/compile` except `loadLibraryBase` and
+  `resolveDesignSystem`, plus `resolveDesignSystemCore(input, { resolve,
+  loadLibraryBase, ... })` and the `ResolveDesignSystemCoreOptions` and
+  `DesignSystemLibraryLoader` types. A `texuli:<id>` base loads only
+  through the injected `loadLibraryBase`; without one it is refused
+  (`invalid-value` at `$.extends`). `resolveDesignSystem` accepts
+  `options.loadLibraryBase` too and still defaults to the library.
+  30,245 B gzip, budget 31,488 B.
+
+**texuli.** `texuli/design-system` adds `loadDesignSystemCompilerCore()`,
+which imports `@texuli/tokens/design-system/compile-core` on demand (G127;
+3,481 B gzip, budget unchanged).
+
+**@texuli/player.** New subpath `@texuli/player/design-system-core` (G127):
+`resolvePlayerDesignSystemCore`, `applyPlayerDesignSystemCore(..., {
+loadLibraryBase })`, `playerDesignDefaults` and the
+`PlayerDesignSystemCoreOptions` and `PlayerDesignSystemLibraryLoader`
+types. Without `loadLibraryBase`, a `texuli:<theme>` reference the host
+does not resolve is refused (`design-system-unresolved`; an `extends` base
+gets `invalid-value`). `@texuli/player/design-system` is the same step with
+the library as the default loader, so its behavior is unchanged;
+`resolvePlayerDesignSystem` and `applyPlayerDesignSystem` take an optional
+`{ loadLibraryBase }` (`null` turns the fallback off), and
+`loadPlayerLibraryBase(ref)` is new. Sizes: `design-system-core` 3,573 B
+gzip (budget 3,776 B); `design-system` 3,682 B (budget raised from 3,648 B
+to 3,840 B, measured + 4%).
+
+**@texuli/slides: the core entries have no default theme library loaders
+(G127).** `DeckStageCore` (`@texuli/slides/stage-core`) no longer defaults
+`loadTheme` to `loadDeckLibraryTheme`, and has a new `loadLibraryBase` prop
+(a `DeckLibraryBaseLoader`, for a deck design system's `texuli:<theme>`
+reference or `extends` base) with no default. `DeckPrintViewCore`
+(`@texuli/slides/export-core`) no longer defaults `loadTheme`. The stage's
+design-system step uses `@texuli/player/design-system-core`. A stage-core
+plus export-core host with no loaders, or its own, has no theme-library
+module in any chunk, initial or lazy: the bundle-graph test measures 98
+chunks, none with library modules, against 250 chunks, 152 of them with
+library modules, before. A stage-core host's whole build goes from
+369,781 B gzip in 245 chunks to 308,205 B in 93. `DeckStage` (both
+loaders), `DeckPrint` and `DeckPrintView` (`loadTheme`) keep the library
+loaders as defaults and behave as before. No slides budget changes.
+
+**@texuli/pages: the reader and host cores take an injected theme library
+loader (G127).** `PageReaderCore` (`@texuli/pages/reader-core`) has a new
+`loadLibraryBase` prop and `createDocumentPlayerHostCore`
+(`@texuli/pages/host-core`) a `loadLibraryBase` option, both
+`PagesLibraryBaseLoader`s with no default. The reader's design-system step
+compiles with `@texuli/tokens/design-system/compile-core`.
+`loadPagesLibraryBase` is exported by `reader-core`, `reader`, `host-core`
+and `host`. A host on every core entry with no loaders has no
+theme-library module and no `@texuli/player` in any chunk: 78 chunks
+(354,857 B gzip), against 231 chunks (416,835 B), 152 with library
+modules, before. `PageReader` and `createDocumentPlayerHost` default to
+`loadPagesLibraryBase` (`null` refuses those bases) and behave as before.
+`pages/reader` measures 9,955 B gzip; its budget is raised from 9,984 B to
+10,368 B (measured + 4%).
+
+**Behavior changes and migration (core entries only).** On the core
+entries, a library theme or `texuli:<theme>` base is no longer loaded
+unless the host passes the loader:
+
+- `DeckStageCore` without `loadTheme` leaves catalog themes to host CSS
+  (`data-theme-status="host"`); `DeckPrintViewCore` without `loadTheme`
+  prints them with host CSS. Migration:
+  `loadTheme={loadDeckLibraryTheme}`.
+- `DeckStageCore` without `loadLibraryBase` refuses a `designSystem` whose
+  `texuli:<theme>` reference or base `designSystems.resolve` leaves
+  `undefined` (`design-system-unresolved`, or `invalid-value` for an
+  `extends` base); the deck theme keeps painting and the notice shows.
+  Migration: `loadLibraryBase={loadDeckLibraryBase}`. Both loaders are
+  exported by `@texuli/slides/stage-core` and `@texuli/slides/stage`.
+- `PageReaderCore` or `createDocumentPlayerHostCore` without a loader
+  refuse the same bases; the reader keeps its theme and shows the notice.
+  Migration: `loadLibraryBase={loadPagesLibraryBase}`, or
+  `createDocumentPlayerHostCore({ loadLibraryBase: loadPagesLibraryBase })`.
+
+The default entries (`DeckStage`, `DeckPrint`, `DeckPrintView`,
+`PageReader`, `createDocumentPlayerHost`, `@texuli/player/design-system`,
+`@texuli/tokens/design-system/compile`) are unchanged.
+
+**Why the dependents moved.** Internal dependencies are exact pins (see
+"Workspace dependencies and consumers"), so a published package that pins
+`@texuli/tokens@0.10.0` or `texuli@0.10.0` would keep installing the
+unfixed versions. Every package that depends on the five fixed packages,
+directly or through another pinned package, gets a patch release that pins
+the new versions (53 internal pins move to `0.10.1`; the lockfile moves
+with them). `TOOLS_VERSION`, `PAGES_PACKAGE_VERSION`,
+`SHEETS_PACKAGE_VERSION`, `EDITOR_PACKAGE_VERSION`,
+`FORMS_PACKAGE_VERSION` and `CANVAS_PACKAGE_VERSION` follow their
+manifests. The `workspace:*` ranges of `@texuli/examples` and the apps are
+unchanged. Each is published by the publish workflow after the merge of
+`release/0.10.1` into `main`; the seven packages still at `0.10.0` are
+skipped as already on npm.
 
 ### 0.10.0
 
@@ -1757,6 +1892,11 @@ tools, astro, player, slides. `@texuli/deck` goes out before
 
 ### History
 
+- `0.10.1` (2026-10-31; published from `main` after the merge of
+  `release/0.10.1`): patch releases for 19 packages, the Protoyard gaps
+  G125–G127 and their exact-pin dependents (see "0.10.1 patch releases
+  (G125–G127)" above); the other 7 packages stay `0.10.0`. Blueprint spec
+  `0.10.0`, unchanged.
 - `0.9.0` (2026-10-30; merged and published from `main` on 2026-10-30
   UTC): a breaking `0.x` minor for 26 packages, the first publication of
   `@texuli/mcp` (PLAN_011 part A: the operations registry, the MCP server
@@ -1874,7 +2014,7 @@ version.
 
 Task 172 made every published dependency an intentional semver range: the
 published package manifests pin internal `@texuli/*` dependencies to exact
-versions (for `0.10.0`, every internal pin is exactly `0.10.0`; compatibility
+versions (in the 0.10 line, every internal pin is the exact current version of its target: `0.10.1` for the 19 packages patched in `0.10.1`, `0.10.0` for the other 7; compatibility
 between Texuli packages is exact, per "Independent package versions" above), while the private development
 manifests (`apps/website`, `apps/agent`, `packages/examples`) keep the
 pnpm `workspace:` protocol. The release packer enforces that boundary
@@ -1894,13 +2034,13 @@ the package-to-package contract outside this repository.
 
 | Surface | Version | Where it is pinned |
 | --- | --- | --- |
-| 26 npm packages | `0.10.0` (dist-tags `latest` and `next`) | Each package manifest, with exact `0.10.0` internal pins; published by the publish workflow after the merge of `release/0.10.0` (before it: `0.9.0` for 26 packages on 2026-10-30 UTC; the 0.8 line for 25 packages, `0.8.0` on 2026-10-29 UTC plus the `0.8.x` patches in "0.8.x patch releases (G86)"; `0.7.0` for 22 packages on 2026-10-29 UTC; `0.6.0` for 20 packages on 2026-10-29 UTC; `0.5.0` for 20 packages on 2026-10-29 UTC; `0.4.0` for 19 packages on 2026-10-28; `0.3.0` for 16 packages on 2026-10-27 plus drag and workflows on 2026-10-28, run 40616266068; `0.2.0` for 15 packages on 2026-10-27; previews `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
-| `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets` | `0.10.0` (first published as `0.8.0`) | Each package manifest (and `FORMS_PACKAGE_VERSION`, `CANVAS_PACKAGE_VERSION`, `SHEETS_PACKAGE_VERSION`); `@texuli/forms` and `@texuli/canvas` are published after `@texuli/editor`, once `@texuli/core`, `@texuli/deck`, `@texuli/document`, `@texuli/drag` and `texuli` are out, and `@texuli/sheets` after `@texuli/blocks`, once `@texuli/date` and `@texuli/data` are out; no published package depends on them. In development (ADR-012, ADR-015), pre-1.0. |
-| `@texuli/document`, `@texuli/pages` | `0.10.0` (first published as `0.7.0`) | Each package manifest (and `PAGES_PACKAGE_VERSION`); `@texuli/document` is published after `@texuli/core` and `@texuli/deck` and before `@texuli/tools` and `@texuli/pages`, which depend on it; `@texuli/pages` after `@texuli/player`. In development (ADR-010, ADR-011), pre-1.0. |
-| `@texuli/editor` | `0.10.0` (first published as `0.5.0`) | `packages/editor/package.json` (and `EDITOR_PACKAGE_VERSION`); published after `texuli`, which it depends on. In development (ADR-003), pre-1.0. |
+| 26 npm packages | The 0.10 line: `0.10.1` for 19 packages, `0.10.0` for core, date, deck, drag, document, primitives and spec (dist-tags `latest` and `next` on each package's newest) | Each package manifest, with exact internal pins; `0.10.0` published by the publish workflow after the merge of `release/0.10.0`, and the `0.10.1` patches after the merge of `release/0.10.1` (see "0.10.1 patch releases (G125–G127)") (before them: `0.9.0` for 26 packages on 2026-10-30 UTC; the 0.8 line for 25 packages, `0.8.0` on 2026-10-29 UTC plus the `0.8.x` patches in "0.8.x patch releases (G86)"; `0.7.0` for 22 packages on 2026-10-29 UTC; `0.6.0` for 20 packages on 2026-10-29 UTC; `0.5.0` for 20 packages on 2026-10-29 UTC; `0.4.0` for 19 packages on 2026-10-28; `0.3.0` for 16 packages on 2026-10-27 plus drag and workflows on 2026-10-28, run 40616266068; `0.2.0` for 15 packages on 2026-10-27; previews `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
+| `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets` | `0.10.1` (first published as `0.8.0`) | Each package manifest (and `FORMS_PACKAGE_VERSION`, `CANVAS_PACKAGE_VERSION`, `SHEETS_PACKAGE_VERSION`); `@texuli/forms` and `@texuli/canvas` are published after `@texuli/editor`, once `@texuli/core`, `@texuli/deck`, `@texuli/document`, `@texuli/drag` and `texuli` are out, and `@texuli/sheets` after `@texuli/blocks`, once `@texuli/date` and `@texuli/data` are out; no published package depends on them. In development (ADR-012, ADR-015), pre-1.0. |
+| `@texuli/document`, `@texuli/pages` | `@texuli/document` `0.10.0`, `@texuli/pages` `0.10.1` (both first published as `0.7.0`) | Each package manifest (and `PAGES_PACKAGE_VERSION`); `@texuli/document` is published after `@texuli/core` and `@texuli/deck` and before `@texuli/tools` and `@texuli/pages`, which depend on it; `@texuli/pages` after `@texuli/player`. In development (ADR-010, ADR-011), pre-1.0. |
+| `@texuli/editor` | `0.10.1` (first published as `0.5.0`) | `packages/editor/package.json` (and `EDITOR_PACKAGE_VERSION`); published after `texuli`, which it depends on. In development (ADR-003), pre-1.0. |
 | `@texuli/deck` | `0.10.0` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/document`, `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
-| `@texuli/drag`, `@texuli/workflows` | `0.10.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
-| `@texuli/mcp` | `0.10.0` (first published as `0.9.0`) | `packages/mcp/package.json`, with `@texuli/tools` pinned to exactly its own version; published right after `@texuli/tools`. In development (ADR-019), pre-1.0. |
+| `@texuli/drag`, `@texuli/workflows` | `@texuli/drag` `0.10.0`, `@texuli/workflows` `0.10.1` (both first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
+| `@texuli/mcp` | `0.10.1` (first published as `0.9.0`) | `packages/mcp/package.json`, with `@texuli/tools` pinned to exactly its own version; published right after `@texuli/tools`. In development (ADR-019), pre-1.0. |
 | Blueprint spec | `0.10.0`, digest `afcb9e3ed6b74b833a0f7477a657168621785ee98602ff582aa047e2d86aef17` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.10.0`; a stamp-only migration from `0.9.0`. |
 | Blueprint spec in `@texuli/spec@0.9.0` | `0.9.0`, digest `497df4d3b0c67d53483163ebd9bd73733b52caf5f8e2966478f1cf860e6f9d9d` | The 0.9 line's generated sources carry the `0.9.0` stamp. |
 | Blueprint spec in `@texuli/spec@0.8.0` | `0.8.0`, digest `f6b6388280d247eb9c3106a925111f35b90d1ec3b59c23652542f06a9f103daf` | The 0.8 line's generated sources carry the `0.8.0` stamp. |
@@ -1958,8 +2098,9 @@ mcp, astro, player, pages, slides; `@texuli/editor` goes out from `0.5.0`,
 after `texuli`, `@texuli/document` and `@texuli/pages` from `0.7.0`,
 `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` from `0.8.0`, and
 `@texuli/mcp` from `0.9.0`).
-Every published package is `0.10.0`, and every internal dependency between
-them is pinned to exactly `0.10.0`; the workflow refuses to start publishing while any listed
+Every published package is in the 0.10 line (`0.10.1` for 19 packages,
+`0.10.0` for the other 7), and every internal dependency between them is
+pinned to the exact version of its target; the workflow refuses to start publishing while any listed
 package is still `0.0.0`. `pnpm verify:packages` still refuses any
 `0.0.0` or `workspace:` range in a published manifest, the guard that keeps
 an unversioned dependency out. The publish loop skips versions npm already

@@ -1,6 +1,6 @@
 {
   "name": "@texuli/editor",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "private": true,
   "description": "Rich text editor for Svelte 5 on the @texuli/core editor texels: owned document model, transforms, history, Markdown in and out, and a sink-free rendering.",
   "keywords": [
@@ -66,8 +66,8 @@
   "dependencies": {
     "@texuli/core": "0.10.0",
     "@texuli/primitives": "0.10.0",
-    "@texuli/tokens": "0.10.0",
-    "texuli": "0.10.0"
+    "@texuli/tokens": "0.10.1",
+    "texuli": "0.10.1"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

@@ -38,8 +38,8 @@ the same pieces are safe to hand to a machine.
 
 > **Status: in development, pre-1.0.** The screenshot above is the
 > texuli.com website, which deploys from `main` to Cloudflare Pages. The 26
-> published packages are released on npm in the 0.10 line, every one at
-> `0.10.0` (published by CI with provenance; `latest` and `next` point to
+> published packages are released on npm in the 0.10 line:
+> 7 at `0.10.0` (core, date, deck, drag, document, primitives, spec) and 19 at `0.10.1` (G125–G127 and their exact-pin dependents) (published by CI with provenance; `latest` and `next` point to
 > the newest), which adds design systems. It is not a stable release:
 > under 0.x a new minor may contain breaking changes, and 1.0.0 will be
 > the first stable release.

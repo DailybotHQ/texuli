@@ -1,6 +1,6 @@
 {
   "name": "texuli",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "private": true,
   "description": "Styled Texuli components, layouts and shells.",
   "keywords": [
@@ -392,7 +392,7 @@
   "dependencies": {
     "@texuli/core": "0.10.0",
     "@texuli/primitives": "0.10.0",
-    "@texuli/tokens": "0.10.0"
+    "@texuli/tokens": "0.10.1"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

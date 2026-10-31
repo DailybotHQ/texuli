@@ -1,6 +1,6 @@
 {
   "name": "@texuli/workflows",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "private": true,
   "description": "Interactive, accessible workflow graph editor and viewer for Texuli, built on @texuli/drag.",
   "keywords": [
@@ -64,8 +64,8 @@
     "@texuli/core": "0.10.0",
     "@texuli/drag": "0.10.0",
     "@texuli/primitives": "0.10.0",
-    "@texuli/tokens": "0.10.0",
-    "texuli": "0.10.0"
+    "@texuli/tokens": "0.10.1",
+    "texuli": "0.10.1"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

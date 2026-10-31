@@ -357,7 +357,7 @@ export const LADDER_STAGES: readonly LadderStage[] = [
     layer: 'L3',
     runtimes: {
       web: {
-        text: 'Ships: styled components are published on npm as 0.10.0.',
+        text: 'Ships: styled components are published on npm as 0.10.1.',
         sources: [],
       },
       native: {
