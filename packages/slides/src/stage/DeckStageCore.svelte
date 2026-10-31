@@ -111,7 +111,7 @@ import {
 } from './style.ts';
 import type { DeckSync } from './sync.ts';
 import { deckSyncLink } from './sync-link.ts';
-import { type DeckThemeLoader, deckThemeVariables, loadDeckLibraryTheme } from './theme.ts';
+import { type DeckLibraryBaseLoader, type DeckThemeLoader, deckThemeVariables } from './theme.ts';
 import {
   type DeckTransitionDirection,
   playDeckTransition,
@@ -190,7 +190,12 @@ interface Props {
   presenterTimer?: boolean;
   /** A same-origin link to another stage window: the presenter protocol, or a v1 `DeckSync`. */
   sync?: PresenterTransport | DeckSync | null;
-  /** Catalog theme loader (`null` when the host loads theme CSS itself). */
+  /**
+   * Catalog theme loader. This core component has no default (G127): without
+   * one (or with `null`) catalog themes are left to the host's CSS, and the
+   * build has no reference to the token theme library. `DeckStage` defaults
+   * to `loadDeckLibraryTheme`; pass it here to load the library on first use.
+   */
   loadTheme?: DeckThemeLoader | null;
   /**
    * Resolves a deck's `designSystem.ref` (ADR-024): a document or a compiled
@@ -198,6 +203,15 @@ interface Props {
    * mode (default: the stage's, `dark` or `light`).
    */
   designSystems?: PlayerDesignSystems | null;
+  /**
+   * Loads a deck design system's `texuli:<theme>` reference or `extends`
+   * base that `designSystems.resolve` leaves `undefined`. This core component
+   * has no default (G127): without one such a design system is refused
+   * (`design-system-unresolved`), and the build has no reference to the
+   * token theme library. `DeckStage` defaults to `loadDeckLibraryBase`; pass
+   * it here to load the library on first use.
+   */
+  loadLibraryBase?: DeckLibraryBaseLoader | null;
   /** Called when a deck's design system applies or is refused. */
   onDesignSystem?: (event: PlayerDesignSystemEvent) => void;
   resolveAvatar?: (id: string) => string | undefined;
@@ -253,8 +267,9 @@ let {
   presenter = $bindable(false),
   presenterTimer = false,
   sync = null,
-  loadTheme = loadDeckLibraryTheme,
+  loadTheme,
   designSystems,
+  loadLibraryBase,
   onDesignSystem,
   resolveAvatar,
   controller = $bindable(null),
@@ -533,9 +548,13 @@ let systemReference = $derived(model?.designSystem);
 let systemKey = $derived(systemReference ? JSON.stringify(systemReference) : '');
 let system = $state.raw<StageSystem | undefined>();
 let systemStatus = $state<'pending' | 'applied' | 'refused' | undefined>();
-let systemMode = $derived<'light' | 'dark'>(
-  designSystems?.mode ?? (mode === 'dark' ? 'dark' : 'light')
-);
+// The mode painted: the host's, unless the design system did not compile it; then its
+// first compiled mode (what `stageSystem` paints), so `data-tx-mode` matches the variables.
+let systemMode = $derived.by<'light' | 'dark'>(() => {
+  const requested = designSystems?.mode ?? (mode === 'dark' ? 'dark' : 'light');
+  const modes = system?.modes;
+  return !modes || modes.includes(requested) ? requested : (modes[0] ?? requested);
+});
 // Component defaults for every texuli component on the slides (the `texuli/defaults` context),
 // merged over an outer provider's prop by prop; props on a block still win.
 const DEFAULTS_KEY = 'texuli.design-defaults';
@@ -552,6 +571,7 @@ $effect(() => {
   const key = systemKey;
   const reference = untrack(() => systemReference);
   const host = untrack(() => designSystems);
+  const libraryBase = untrack(() => loadLibraryBase);
   const trust = paintTier === 'developer' ? 'developer' : 'untrusted';
   if (!key || !reference) {
     system = undefined;
@@ -561,7 +581,9 @@ $effect(() => {
   let live = true;
   systemStatus = 'pending';
   import('./design-system.ts')
-    .then((step) => step.loadStageDesignSystem(reference, host, trust, root?.ownerDocument))
+    .then((step) =>
+      step.loadStageDesignSystem(reference, host, trust, root?.ownerDocument, libraryBase)
+    )
     .then(
       ({ event, system: next }) => {
         if (!live) return;
@@ -570,7 +592,9 @@ $effect(() => {
         onDesignSystem?.(event);
       },
       () => {
-        if (live) systemStatus = 'refused';
+        if (!live) return;
+        system = undefined;
+        systemStatus = 'refused';
       }
     );
   return () => {
@@ -1011,7 +1035,7 @@ $effect(() => {
 
 $effect(() => {
   const current = model;
-  const loader = loadTheme;
+  const loader = loadTheme ?? null;
   if (!current) return;
   const known = untrack(() => themes);
   for (const reference of deckThemeReferences(current)) {

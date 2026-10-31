@@ -55,8 +55,16 @@ request body at 256 KB), 10 s.
 - **Deterministic.** The same document gives byte-equal output in any key
   order, on every door (the parity tests compare the stdio handler and the
   Pages Function). `ds.compile` with `dtcg` or `tokens-studio` emits the
-  document itself (lossless: `ds.import` reads it back to the same
-  document); the other formats emit the compiled values.
+  resolved document, the one the compile ran on: `extends` merged in (the
+  token files need no Texuli base), and with `variant` that variant applied
+  and `variants` dropped, so the content matches the reported `variant` and
+  `hash`. Lossless: `ds.import` reads it back to the same resolved document,
+  which is the input itself when it has no `extends` or `variant`. The other
+  formats emit the compiled values; `css` puts a single compiled mode on the
+  selector.
+- **Emit errors.** A `css` selector `isSafeSelector` refuses is
+  `invalid-value` at `$.selector` with a hint; any other emit failure is
+  `invalid-value` at `$`.
 - **Preview.** `svg` is a compact snapshot (key role swatches, a primary
   button, a card and the contrast count per mode) with a fixed font stack,
   fixed geometry, no time and no random ids. Every text and attribute goes

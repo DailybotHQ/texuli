@@ -12,6 +12,7 @@ import {
   type CompiledDesignSystem,
   compileDesignSystem,
   loadLibraryBase,
+  resolveDesignSystemSync,
 } from '@texuli/tokens/design-system/compile';
 import { diffDesignSystems } from '@texuli/tokens/design-system/diff';
 import {
@@ -20,6 +21,7 @@ import {
   emitDtcgJson,
   emitTailwindPresetJson,
   emitTokensStudio,
+  isSafeSelector,
 } from '@texuli/tokens/design-system/emit';
 import {
   type DesignSystemImportOptions,
@@ -86,23 +88,29 @@ const modesOf = (input: Input): DsCheckMode[] | undefined =>
   input.mode === 'light' || input.mode === 'dark' ? [input.mode] : undefined;
 
 type Compiled =
-  | { ok: true; compiled: CompiledDesignSystem }
+  | {
+      ok: true;
+      compiled: CompiledDesignSystem;
+      /** The bases `extends` named, loaded once (what the compile resolved against). */
+      resolve: (ref: string) => unknown;
+    }
   | { ok: false; errors: DsCheckIssue[] };
 
 /** Resolve `extends`, then compile one document (one variant), with the guarantees enforced. */
 export async function compileOne(document: unknown, input: Input): Promise<Compiled> {
   const loaded = await loadDesignSystemBases(document, basesOf(input));
+  const resolve = (ref: string) => loaded.get(ref);
   const variant = typeof input.variant === 'string' ? input.variant : undefined;
   const modes = modesOf(input);
   const result = compileDesignSystem(document, {
-    resolve: (ref: string) => loaded.get(ref),
+    resolve,
     trust: trustOf(input),
     ...(variant ? { variant } : {}),
     ...(modes ? { modes } : {}),
   });
   if (!result.ok)
     return { ok: false, errors: result.errors.map((issue) => toIssue(issue, variant ?? null)) };
-  return { ok: true, compiled: result };
+  return { ok: true, compiled: result, resolve };
 }
 
 /** The identity fields of a compiled design system. */
@@ -136,8 +144,33 @@ export async function runValidate(input: Input) {
 
 // ─── ds.compile ────────────────────────────────────────────────────────────
 
-/** The text of one format; `dtcg` and `tokens-studio` carry the document itself. */
-function emitFormat(format: DsCompileFormat, compiled: CompiledDesignSystem, input: Input): string {
+/**
+ * The document `dtcg` and `tokens-studio` carry: the one the compile ran on,
+ * with `extends` merged in and the variant applied (the resolver's output,
+ * so the content matches the reported `variant` and `hash`). With a variant
+ * applied, `variants` is dropped: the tokens are that variant's.
+ */
+function resolvedDocument(input: Input, resolve: (ref: string) => unknown): DesignSystem {
+  const variant = typeof input.variant === 'string' ? input.variant : undefined;
+  const resolved = resolveDesignSystemSync(input.document, {
+    resolve,
+    trust: trustOf(input),
+    ...(variant ? { variant } : {}),
+  });
+  // The compile already resolved this input with the same options.
+  if (!resolved.ok) throw new TypeError('The document did not resolve.');
+  if (!variant) return resolved.document;
+  const { variants: _variants, ...document } = resolved.document;
+  return document as DesignSystem;
+}
+
+/** The text of one format; `dtcg` and `tokens-studio` carry the resolved document. */
+function emitFormat(
+  format: DsCompileFormat,
+  compiled: CompiledDesignSystem,
+  input: Input,
+  resolve: (ref: string) => unknown
+): string {
   switch (format) {
     case 'css':
       return emitCss(compiled, {
@@ -149,9 +182,9 @@ function emitFormat(format: DsCompileFormat, compiled: CompiledDesignSystem, inp
     case 'tailwind':
       return emitTailwindPresetJson(compiled);
     case 'dtcg':
-      return emitDtcgJson(input.document as DesignSystem);
+      return emitDtcgJson(resolvedDocument(input, resolve));
     case 'tokens-studio':
-      return `${JSON.stringify(emitTokensStudio(input.document as DesignSystem), null, 2)}\n`;
+      return `${JSON.stringify(emitTokensStudio(resolvedDocument(input, resolve)), null, 2)}\n`;
     default:
       return emitCompiledJson(compiled);
   }
@@ -161,21 +194,31 @@ export async function runCompile(input: Input) {
   const format = (input.format ?? 'json') as DsCompileFormat;
   const result = await compileOne(input.document, input);
   if (!result.ok) return { valid: false, format, errors: result.errors, warnings: [] };
-  const { compiled } = result;
+  const { compiled, resolve } = result;
   let content: string;
   try {
-    content = emitFormat(format, compiled, input);
+    content = emitFormat(format, compiled, input, resolve);
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    // Only the CSS emitter reads the selector; any other emit error is the document's.
+    const selector =
+      format === 'css' && typeof input.selector === 'string' && !isSafeSelector(input.selector);
     return {
       valid: false,
       format,
       errors: [
-        {
-          code: 'invalid-value',
-          path: '$.selector',
-          message: error instanceof Error ? error.message : String(error),
-          hint: 'A selector is one simple selector list item: no commas, blocks or comments.',
-        },
+        selector
+          ? {
+              code: 'invalid-value',
+              path: '$.selector',
+              message,
+              hint: 'A selector is one simple selector list item: no commas, blocks or comments.',
+            }
+          : {
+              code: 'invalid-value',
+              path: '$',
+              message: `The ${format} output failed: ${message}`,
+            },
       ],
       warnings: compiled.report.warnings,
     };

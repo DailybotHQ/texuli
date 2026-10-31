@@ -27,8 +27,8 @@ import {
   resolveSlideMaster,
   resolveSlideTheme,
 } from '../src/model/index.ts';
+import { loadDeckLibraryTheme } from '../src/stage/library-theme.ts';
 import { gateDeckMedia } from '../src/stage/media.ts';
-import { loadDeckLibraryTheme } from '../src/stage/theme.ts';
 import {
   createDeckFromTemplate,
   DECK_TEMPLATE_IDS,

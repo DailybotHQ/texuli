@@ -14,9 +14,9 @@ Svelte, use [`@texuli/player`](https://www.npmjs.com/package/@texuli/player),
 which is built on this package.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.10.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.11.0`) may contain breaking
-> changes, so pin the exact version or use `^0.10.0`, which accepts only 0.10.x.
+> published to npm as `0.11.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.12.0`) may contain breaking
+> changes, so pin the exact version or use `^0.11.0`, which accepts only 0.11.x.
 
 > **New in `0.4.0`.** The `chat`, `composition`, `data`, `state` and
 > `workflows` manifest groups (158 catalog ids, 66 of them agent-emittable;

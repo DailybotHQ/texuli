@@ -8,13 +8,14 @@ interface Props {
   compiled: ApplicableDesignSystem;
   mode?: 'light' | 'dark';
   show?: boolean;
+  onapplyerror?: (error: unknown) => void;
 }
 
-let { compiled, mode = 'light', show = true }: Props = $props();
+let { compiled, mode = 'light', show = true, onapplyerror }: Props = $props();
 </script>
 
 {#if show}
-  <DesignSystemProvider {compiled} {mode} fonts={false} data-testid="scope">
+  <DesignSystemProvider {compiled} {mode} {onapplyerror} fonts={false} data-testid="scope">
     <DefaultsProbe />
     <Button>Save</Button>
   </DesignSystemProvider>

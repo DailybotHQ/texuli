@@ -104,8 +104,8 @@ browser visual test.
 then publishes the packable packages in the wave order documented in
 [RELEASE](RELEASE.md), always `--tag next`, then points `latest` at the
 same versions: `latest` tracks the newest release (owner decision
-2026-10-27; both name `0.10.0` once the post-merge run of the
-`release/0.10.0` merge publishes it), so npm's package page shows the current README. Tarballs ship with signed npm provenance via
+2026-10-27; both name `0.11.0` once the post-merge run of the
+`release/0.11.0` merge publishes it), so npm's package page shows the current README. Tarballs ship with signed npm provenance via
 GitHub's OIDC token (`id-token: write`).
 
 `publish.yml` lists `@texuli/drag`, `@texuli/workflows` and
@@ -126,7 +126,7 @@ first time as `0.3.0`; `@texuli/deck` was first published in `0.4.0`, and
 `@texuli/editor` was first published in `0.5.0`, `@texuli/document`
 and `@texuli/pages` in `0.7.0`, and `@texuli/forms`, `@texuli/canvas` and
 `@texuli/sheets` in `0.8.0`, and `@texuli/mcp` in `0.9.0`; in `0.10.0`
-all 26 packable packages move together. A pre-flight step refuses the run,
+and `0.11.0` all 26 packable packages move together. A pre-flight step refuses the run,
 before the first `npm publish`, when any listed package is still `0.0.0`.
 The publish loop
 skips versions npm already has, so a package changed since its published

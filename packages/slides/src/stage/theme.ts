@@ -9,17 +9,21 @@ import type { MatchMedia, ResolvedColorMode } from '@texuli/tokens/modes';
 import { colorSchemeValue, resolveColorMode, resolveSemanticPalette } from '@texuli/tokens/modes';
 import type { Deck, DeckThemeReference } from '../model/index.ts';
 
-/** Resolve a catalog theme id to a validated token theme; reject unknown ids. */
+/**
+ * Resolve a catalog theme id to a validated token theme; reject unknown ids.
+ * The library default (`loadDeckLibraryTheme`) lives in `./library-theme.ts`,
+ * so this module, which the core entries import, never references the
+ * theme library (G127).
+ */
 export type DeckThemeLoader = (id: string) => Promise<Theme>;
 
 /**
- * Default loader: the full token theme library, imported on first use so the
- * stage bundle does not carry the theme records.
+ * Resolve a deck design system's `texuli:<theme>` reference or `extends`
+ * base to a design-system document (or a token `Theme`); `undefined` when it
+ * knows no such theme. The library default (`loadDeckLibraryBase`) lives in
+ * `./library-theme.ts` (G127).
  */
-export const loadDeckLibraryTheme: DeckThemeLoader = async (id) => {
-  const { loadFullLibraryTheme } = await import('@texuli/tokens/library-expand');
-  return loadFullLibraryTheme(id);
-};
+export type DeckLibraryBaseLoader = (ref: string) => Promise<unknown>;
 
 /** Unique catalog theme ids a deck references, deck default first, for preloading. */
 export function deckCatalogThemeIds(deck: Pick<Deck, 'meta' | 'slides'>): string[] {

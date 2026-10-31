@@ -2,14 +2,21 @@
  * Pure helpers of the Design System Studio (PLAN_011 T-ds-studio): the
  * starting document, the editor's field table for every section of the
  * design-system document, immutable path edits, plain-language explanations
- * of the spec's codes, the export formats and import detection. No DOM and
- * no engine imports: the island loads the compiler, importers and emitters
- * lazily (`ds-engine.ts`), so this module stays a few KB.
+ * of the spec's codes, the export formats, import detection and the preview
+ * mode. No DOM and no engine imports: the island loads the compiler,
+ * importers and emitters lazily (`ds-engine.ts`), so this module stays a few
+ * KB. The one runtime import is `pickDesignSystemMode`, from the apply entry
+ * the preview's `DesignSystemProvider` loads anyway.
  *
  * The field table mirrors the closed vocabulary of `@texuli/spec`
  * (`src/design-system/vocabulary.ts`); `apps/website/tests/ds-studio.test.ts`
  * proves every field's bounds and options against `validateDesignSystem`.
  */
+
+import {
+  type ApplicableDesignSystem,
+  pickDesignSystemMode,
+} from '@texuli/tokens/design-system/apply';
 
 /** A design-system document as the studio holds it: plain JSON. */
 export type StudioDocument = Record<string, unknown>;
@@ -902,4 +909,35 @@ export function contrastSummary(
 /** `--tx-primary-foreground` → `primary foreground`. */
 export function variableLabel(name: string): string {
   return name.replace(/^--tx-/, '').replace(/-/g, ' ');
+}
+
+type PreviewMode = 'light' | 'dark';
+
+/**
+ * The preview modes a compiled design system offers: the modes it compiled
+ * (`color.modes: ["dark"]` offers dark only). Before the first compile, both.
+ */
+export function previewModes(
+  compiled: Pick<ApplicableDesignSystem, 'vars'> | null | undefined
+): PreviewMode[] {
+  const modes = (['light', 'dark'] as const).filter((mode) => compiled?.vars?.[mode]);
+  return compiled && modes.length > 0 ? modes : ['light', 'dark'];
+}
+
+/**
+ * The mode the preview paints and the toggle shows for the one chosen: the
+ * runtime's rule (`pickDesignSystemMode`), so a dark-only design system
+ * previews dark with Dark pressed. Never throws: with no compiled mode it is
+ * the chosen one.
+ */
+export function previewMode(
+  compiled: Pick<ApplicableDesignSystem, 'vars'> | null | undefined,
+  mode: PreviewMode
+): PreviewMode {
+  if (!compiled) return mode;
+  try {
+    return pickDesignSystemMode(compiled, mode);
+  } catch {
+    return mode;
+  }
 }

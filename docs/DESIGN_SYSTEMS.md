@@ -186,7 +186,7 @@ A design system sets theme roles and component tokens; it does not declare
 the system token defaults (`--tx-space-unit`, `--tx-size-*`,
 `--tx-shape-radius-*`…) that component CSS reads with no fallback. The host
 must load `@texuli/tokens/base.css`, or `@texuli/tokens/system.css` (the
-defaults alone, for a host with its own reset; unreleased, `0.10.0`), or
+defaults alone, for a host with its own reset; from `0.10.0`), or
 controls render with no size.
 
 The compiled object is plain JSON: cache it (`emitCompiledJson`, or
@@ -260,7 +260,7 @@ exports the document (and, optionally, its cached compiled form):
     "./design-system.json": "./design-system.json",
     "./design-system.compiled.json": "./design-system.compiled.json"
   },
-  "peerDependencies": { "@texuli/tokens": "^0.10.0" }
+  "peerDependencies": { "@texuli/tokens": "^0.11.0" }
 }
 ```
 

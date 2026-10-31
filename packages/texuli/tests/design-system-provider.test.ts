@@ -26,6 +26,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import {
   applyDesignSystem,
   loadDesignSystemCompiler,
+  loadDesignSystemCompilerCore,
   PROVIDER_ATTRIBUTES,
 } from '../src/design-system/index.ts';
 import Harness from './fixtures/DesignSystemProviderHarness.svelte';
@@ -126,6 +127,45 @@ describe('DesignSystemProvider', () => {
     // Chromium (tests/perf/design-system-switch.test.ts).
   }, 20_000);
 
+  it('paints a dark-only design system dark under a light mode, and the markup says so', async () => {
+    const darkDoc = json('packages/spec/fixtures/design-systems/acme.json');
+    delete darkDoc.extends;
+    darkDoc.color = { ...(darkDoc.color as Doc), modes: ['dark'] };
+    const dark = compileDesignSystem(darkDoc, { trust: 'developer' });
+    if (!dark.ok) throw new Error(JSON.stringify(dark.errors));
+    expect(Object.keys(dark.vars)).toEqual(['dark']);
+    // The studio's light preview of a dark-only system: no throw, the dark variables, mode dark.
+    const view = render(Harness, { compiled: dark, mode: 'light' });
+    await tick();
+    const scope = screen.getByTestId('scope');
+    expect(scope.getAttribute('data-tx-mode')).toBe('dark');
+    expect(inlineVars(scope)).toEqual(expected(dark, 'dark'));
+    // Switching to a two-mode system in light paints light again.
+    await view.rerender({ compiled: acme, mode: 'light' });
+    await tick();
+    expect(scope.getAttribute('data-tx-mode')).toBe('light');
+    expect(inlineVars(scope)).toEqual(expected(acme, 'light'));
+  });
+
+  it('reports a design system it cannot apply, without throwing or keeping the previous one', async () => {
+    const errors: unknown[] = [];
+    const view = render(Harness, { compiled: acme, onapplyerror: (e) => errors.push(e) });
+    await tick();
+    const scope = screen.getByTestId('scope');
+    expect(inlineVars(scope)).toEqual(expected(acme, 'light'));
+    // A cached copy with no compiled mode: nothing to paint.
+    await view.rerender({ compiled: { ...acme, vars: {} } });
+    await tick();
+    expect(errors).toHaveLength(1);
+    expect(String(errors[0])).toMatch(/not compiled/);
+    expect(inlineVars(scope)).toEqual({});
+    // A good design system afterwards applies again.
+    await view.rerender({ compiled: minimal });
+    await tick();
+    expect(inlineVars(scope)).toEqual(expected(minimal, 'light'));
+    expect(errors).toHaveLength(1);
+  });
+
   it('renders the allowlisted attributes in markup, so designSystemStyle matches server HTML', () => {
     expect([...PROVIDER_ATTRIBUTES]).toEqual([...DESIGN_SYSTEM_ATTRIBUTES]);
   });
@@ -140,6 +180,13 @@ describe('runtime helpers for hosts without @texuli/tokens (T-ds-blueprint)', ()
     // Only a dynamic import reaches the compiler, so the subpath stays small.
     expect(source).not.toMatch(/from\s+'@texuli\/tokens\/design-system\/compile'/);
     expect(source).toContain("import('@texuli/tokens/design-system/compile')");
+  });
+
+  it('loads the library-free compiler on demand for hosts that inject the theme library (G127)', async () => {
+    const core = await loadDesignSystemCompilerCore();
+    expect(core.compileDesignSystem).toBe(compileDesignSystem);
+    expect(typeof core.resolveDesignSystemCore).toBe('function');
+    expect('loadLibraryBase' in core).toBe(false);
   });
 });
 

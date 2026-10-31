@@ -27,6 +27,19 @@ export function loadDesignSystemCompiler(): Promise<
 }
 
 /**
+ * Load the library-free compiler (`@texuli/tokens/design-system/compile-core`,
+ * G127) on demand: `resolveDesignSystemCore` takes the `texuli:<id>` loader
+ * from its caller, so a host that imports only this loader has no reference
+ * to the theme library in its build (`@texuli/player/design-system-core`
+ * uses it).
+ */
+export function loadDesignSystemCompilerCore(): Promise<
+  typeof import('@texuli/tokens/design-system/compile-core')
+> {
+  return import('@texuli/tokens/design-system/compile-core');
+}
+
+/**
  * The attributes the provider renders in markup, so a server-rendered page
  * matches `designSystemStyle`'s selector before hydration. Equal to
  * `DESIGN_SYSTEM_ATTRIBUTES` (a test holds them together); a copy keeps the

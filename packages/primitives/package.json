@@ -1,6 +1,6 @@
 {
   "name": "@texuli/primitives",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "private": true,
   "description": "Owned, headless Svelte 5 primitives built on the texels.",
   "keywords": [
@@ -248,9 +248,9 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/core": "0.10.0",
-    "@texuli/date": "0.10.0",
-    "@texuli/drag": "0.10.0"
+    "@texuli/core": "0.11.0",
+    "@texuli/date": "0.11.0",
+    "@texuli/drag": "0.11.0"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

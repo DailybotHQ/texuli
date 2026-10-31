@@ -141,6 +141,39 @@ Move the backup back into the host's skills folder and verify it with
 - **Offline-safe.** An unreachable network ends with a report, never a
   partial install.
 
+## Texuli packages 0.10 → 0.11: breaking changes
+
+This sub-skill never upgrades packages; moving an app from `^0.10.0` to
+`^0.11.0` is the developer's install ([`../components/SKILL.md`](../components/SKILL.md)).
+The blueprint spec stays `0.10.0`. Before the move, check the app for:
+
+- **Core entries without the theme library (breaking):** the slides and
+  pages core entries no longer load the theme library by default; a host
+  that relied on it passes the loaders (the default entries behave as
+  before). `@texuli/slides`: `DeckStageCore` (`stage-core`) and
+  `DeckPrintViewCore` (`export-core`) take
+  `loadTheme={loadDeckLibraryTheme}`, and `DeckStageCore` also
+  `loadLibraryBase={loadDeckLibraryBase}` (both from `stage-core`).
+  `@texuli/pages`: `PageReaderCore` (`reader-core`) takes
+  `loadLibraryBase={loadPagesLibraryBase}`, and `host-core` is
+  `createDocumentPlayerHostCore({ loadLibraryBase: loadPagesLibraryBase })`
+  (exported by both entries).
+- **Single-mode design systems:** `applyDesignSystem`,
+  `designSystemStyle` and `designSystemAppearance` never throw for a mode
+  that was not compiled; they paint the first compiled mode and write it as
+  `data-tx-mode` (`pickDesignSystemMode`). `emitCss` puts a single mode on
+  the base selector.
+- **Player and pages cores never reject:** an error while applying a
+  design system becomes a refusal (`design-system-refused` at
+  `$.designSystem`) that drops the previous system and reaches
+  `onDesignSystem`.
+- **`DesignSystemProvider`:** never throws from its effect; a failed apply
+  drops the previous system and calls `onapplyerror`.
+
+New APIs in `0.11.0` are marked "new in `0.11.0`" in
+[`../router/packages.md`](../router/packages.md); the full notes are in
+`docs/RELEASE.md` of the Texuli repository ("0.11.0").
+
 ## Texuli packages 0.10.0: breaking changes
 
 This sub-skill never upgrades packages; moving an app from `^0.9.0` to

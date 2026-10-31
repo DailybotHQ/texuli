@@ -7,6 +7,17 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const entries = [
   {
+    version: '0.11',
+    date: '2026-10',
+    items: [
+      'Lighter design-system hosts (G127): @texuli/tokens/design-system/compile-core, @texuli/player/design-system-core and loadDesignSystemCompilerCore() in texuli/design-system compile and paint a design system with no theme library in any chunk.',
+      'Breaking for the core entries only: DeckStageCore, DeckPrintViewCore, PageReaderCore and createDocumentPlayerHostCore no longer load the theme library unless the host passes a loader (loadDeckLibraryTheme, loadDeckLibraryBase, loadPagesLibraryBase); the default entries behave as before.',
+      'The library theme ids without the library in @texuli/tokens/library-ids (G125), and complete expand theme descriptions (G126).',
+      'A design system with one mode never throws: it paints its compiled mode; the player and pages cores report design-system-refused instead of rejecting, and DesignSystemProvider calls onapplyerror.',
+      'Blueprint spec stays 0.10.0; @texuli/spec 0.11.0 ships it unchanged.',
+    ],
+  },
+  {
     version: '0.10',
     date: '2026-10',
     items: [

@@ -11,11 +11,11 @@ Every edit is a `@texuli/document` operation in one op log, so undo, redo,
 persistence and sync share one history.
 
 > **Status: in development (pre-1.0).** `@texuli/pages` is published on npm
-> as `0.10.0`, with provenance (first published as `0.7.0`, with `@texuli/document`;
+> as `0.11.0`, with provenance (first published as `0.7.0`, with `@texuli/document`;
 > built in PLAN_010, ADR-011 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
-> Under 0.x a new minor (`0.11.0`) may contain breaking changes, so pin the
-> exact version or use `^0.10.0`, which accepts only 0.10.x
+> Under 0.x a new minor (`0.12.0`) may contain breaking changes, so pin the
+> exact version or use `^0.11.0`, which accepts only 0.11.x
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 It sits on layer L8, above the player, because it paints any catalog
@@ -73,7 +73,7 @@ Keep the document in `$state.raw`: every change is a new immutable value.
 | `export` | `exportDocument` (Markdown, DOCX and PDF as a `Blob`, writers loaded lazily), `exportFileName` and `downloadBlob` | [export](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/export.md) |
 | `host` | `createDocumentPlayerHost`, the `documentHost` that lets `@texuli/player` paint agent `document` blueprints (spec 0.7.0) with the reader, and `checkDocumentDraft`, the document check for `validateDraft` | [host](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/host.md) |
 | `collab` | `CollabEditor` and its parts on a `CollabSession` of `@texuli/document/collab`: comments anchored to the text, suggestions with accept and reject, version history with restore, remote carets and an accessible collaborator list (import it lazily) | [collab](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/collab.md) |
-| `editor-core`, `reader-core`, `paged-core`, `collab-core`, `host-core` | `PageEditorCore`, `PageReaderCore`, `PagedViewCore`, `CollabEditorCore` and `createDocumentPlayerHostCore`: the same components and host with no default player loader, so a host that passes no `loadPlayer` has no `@texuli/player` reference in its build (G123; from `0.10.0`) | [core entries](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/editor.md#core-entries-without-the-player) |
+| `editor-core`, `reader-core`, `paged-core`, `collab-core`, `host-core` | `PageEditorCore`, `PageReaderCore`, `PagedViewCore`, `CollabEditorCore` and `createDocumentPlayerHostCore`: the same components and host with no default player loader, so a host that passes no `loadPlayer` has no `@texuli/player` reference in its build (G123; from `0.10.0`); `PageReaderCore` and `createDocumentPlayerHostCore` have no default `loadLibraryBase` either, so a design system's `texuli:<theme>` bases never reach the theme library unless the host passes `loadPagesLibraryBase` (G127; from `0.11.0`) | [core entries](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/editor.md#core-entries-without-the-player) |
 | `styles.css` | The editor and reader stylesheet (both components import it) | [styles](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/styles.md) |
 
 ## What it does

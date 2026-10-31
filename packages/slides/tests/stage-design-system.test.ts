@@ -13,7 +13,9 @@ import { join } from 'node:path';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { compileDesignSystem } from '@texuli/tokens/design-system/compile';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { loadDeckLibraryBase } from '../src/stage/core.ts';
 import DeckStage from '../src/stage/DeckStage.svelte';
+import DeckStageCore from '../src/stage/DeckStageCore.svelte';
 import { clearDeckHash } from './scenario.ts';
 
 const SPEC = join(import.meta.dirname, '../../spec');
@@ -216,6 +218,68 @@ describe('the stage applies a deck design system', () => {
       await waitFor(() => expect(plain.className).toContain('tx-button--default'));
       expect(plain.className).toContain('tx-button--md');
       expect(onDesignSystem).toHaveBeenCalledTimes(1);
+    }
+  );
+});
+
+describe('a dark-only deck design system on a light stage', () => {
+  it('paints the dark variables and says data-tx-mode="dark"', TIMEOUT, async () => {
+    const darkOnly = { ...harbor, color: { ...(harbor.color as object), modes: ['dark'] } };
+    const compiled = compileDesignSystem(darkOnly);
+    if (!compiled.ok) throw new Error('dark-only harbor compiles');
+    expect(Object.keys(compiled.vars)).toEqual(['dark']);
+    for (const props of [{}, { designSystems: { mode: 'light' } }]) {
+      const { root, onDesignSystem } = paint(deck({ inline: darkOnly }), props);
+      expect(await settled(root)).toBe('applied');
+      expect(onDesignSystem).toHaveBeenCalledWith({
+        status: 'applied',
+        id: 'harbor',
+        source: 'inline',
+      });
+      expect(root().getAttribute('data-tx-mode')).toBe('dark');
+      expect(root().style.getPropertyValue('--tx-background')).toBe(
+        compiled.vars.dark?.['--tx-background']
+      );
+      cleanup();
+    }
+  });
+});
+
+describe('the stage core reaches the theme library for a design system only through a loader it is given (G127)', () => {
+  it(
+    'refuses texuli:<theme> on DeckStageCore without loadLibraryBase, applies it with one, and DeckStage keeps the library default',
+    TIMEOUT,
+    async () => {
+      const core = (props: Record<string, unknown> = {}) => {
+        const onDesignSystem = vi.fn();
+        const view = render(DeckStageCore, {
+          props: {
+            deck: deck({ ref: 'texuli:violet' }),
+            loadTheme: null,
+            syncHash: false,
+            onDesignSystem,
+            ...props,
+          },
+        });
+        const root = () =>
+          view.container.querySelector<HTMLElement>('.tx-deck-stage') as HTMLElement;
+        return { root, onDesignSystem };
+      };
+      const bare = core();
+      expect(await settled(bare.root)).toBe('refused');
+      expect(bare.onDesignSystem).toHaveBeenCalledWith(
+        expect.objectContaining({ status: 'refused', code: 'design-system-unresolved' })
+      );
+      cleanup();
+
+      const loadLibraryBase = vi.fn(loadDeckLibraryBase);
+      const injected = core({ loadLibraryBase });
+      expect(await settled(injected.root)).toBe('applied');
+      expect(loadLibraryBase).toHaveBeenCalledWith('texuli:violet');
+      cleanup();
+
+      const stage = paint(deck({ ref: 'texuli:violet' }));
+      expect(await settled(stage.root)).toBe('applied');
     }
   );
 });

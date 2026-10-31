@@ -184,6 +184,48 @@ describe('the player applies a blueprint design system to its root scope', () =>
     }
   );
 
+  it(
+    'paints a dark-only design system dark under a light host, and data-tx-mode says so',
+    TIMEOUT,
+    async () => {
+      const darkOnly = { ...harbor, color: { ...(harbor.color as object), modes: ['dark'] } };
+      const compiled = compileDesignSystem(darkOnly);
+      if (!compiled.ok) throw new Error('dark-only harbor compiles');
+      expect(Object.keys(compiled.vars)).toEqual(['dark']);
+      // No host mode (light) and an explicit light host both paint the compiled dark mode.
+      for (const props of [{}, { designSystems: { mode: 'light' } }]) {
+        const { root, events, unmount } = paint(withSystem({ inline: darkOnly }), props);
+        expect(await settled(root)).toBe('applied');
+        expect(events).toEqual([{ status: 'applied', id: 'harbor', source: 'inline' }]);
+        expect(root.getAttribute('data-tx-mode')).toBe('dark');
+        expect(root.style.getPropertyValue('--tx-background')).toBe(
+          compiled.vars.dark?.['--tx-background']
+        );
+        unmount();
+      }
+    }
+  );
+
+  it(
+    'replaces an applied design system with the refusal when the next one is refused',
+    TIMEOUT,
+    async () => {
+      const { root, events, rerender } = paint(deck);
+      expect(await settled(root)).toBe('applied');
+      expect(root.getAttribute('data-tx-ds')).toBe('harbor');
+      // A host cache that hands back a compiled copy with no mode: refused, never thrown.
+      await rerender({
+        blueprint: report,
+        designSystems: { resolve: () => ({ id: 'harbor', vars: {}, attrs: {} }) },
+      });
+      await expect.poll(() => events.length).toBe(2);
+      expect(events[1]).toMatchObject({ status: 'refused', code: 'design-system-refused' });
+      expect(root.getAttribute('data-tx-player-design-system')).toBe('refused');
+      expect(root.hasAttribute('data-tx-ds')).toBe(false);
+      expect(root.style.getPropertyValue('--tx-primary')).toBe('');
+    }
+  );
+
   it('applies nothing for a blueprint the validator refuses', TIMEOUT, async () => {
     const { root, container } = paint(withSystem({ ref: 'acme@^2' }));
     await expect.poll(() => container.querySelector('[data-status="invalid"]')).not.toBeNull();
@@ -333,4 +375,82 @@ describe('a blueprint without a design system costs nothing', () => {
     expect(root.hasAttribute('data-tx-scope')).toBe(false);
     expect(events).toEqual([]);
   });
+});
+
+describe('the design-system core step takes the theme library loader from its caller (G127)', () => {
+  it(
+    'refuses texuli:<theme> without a loader, resolves it with one, and the default step keeps the library',
+    TIMEOUT,
+    async () => {
+      const core = await import('../src/design-system-core.ts');
+      const step = await import('../src/design-system.ts');
+      const violet = { ref: 'texuli:violet' } as const;
+      // No loader: the reference and an inline document's texuli: base are both refused.
+      const bare = await core.resolvePlayerDesignSystemCore(violet, null, 'untrusted');
+      expect(bare).toMatchObject({ ok: false, code: 'design-system-unresolved' });
+      const based = await core.resolvePlayerDesignSystemCore(
+        { inline: { ...minimal, extends: 'texuli:violet' } },
+        null,
+        'developer'
+      );
+      expect(based).toMatchObject({
+        ok: false,
+        code: 'invalid-value',
+        path: '$.designSystem.inline.extends',
+      });
+      // An injected loader resolves both (here the library's, opted into by name).
+      const asked: string[] = [];
+      const loadLibraryBase = (ref: string) => {
+        asked.push(ref);
+        return step.loadPlayerLibraryBase(ref);
+      };
+      const injected = await core.resolvePlayerDesignSystemCore(violet, null, 'untrusted', {
+        loadLibraryBase,
+      });
+      expect(injected.ok).toBe(true);
+      const inline = await core.resolvePlayerDesignSystemCore(
+        { inline: { ...minimal, extends: 'texuli:violet' } },
+        null,
+        'developer',
+        { loadLibraryBase }
+      );
+      expect(inline.ok).toBe(true);
+      expect(asked).toEqual(['texuli:violet', 'texuli:violet']);
+      // The host's resolver answers first, so a host that resolves texuli: ids needs no loader.
+      const fromHost = await core.resolvePlayerDesignSystemCore(
+        violet,
+        { resolve: () => step.loadPlayerLibraryBase('texuli:violet') as never },
+        'untrusted'
+      );
+      expect(fromHost.ok).toBe(true);
+      // A loader may hand back a token Theme for a direct reference, as for an extends base.
+      const { loadFullLibraryTheme } = await import('@texuli/tokens/library-expand');
+      const themed = await core.resolvePlayerDesignSystemCore(violet, null, 'untrusted', {
+        loadLibraryBase: (ref: string) => loadFullLibraryTheme(ref.slice('texuli:'.length)),
+      });
+      expect(themed).toMatchObject({ ok: true, source: 'ref' });
+      // The never-reject contract holds for a compiled copy no writer can paint.
+      const root = document.createElement('div');
+      const empty = await core
+        .applyPlayerDesignSystemCore(
+          root,
+          { ref: 'harbor@1.2.0' },
+          { resolve: () => ({ id: 'harbor', vars: {}, attrs: {} }) },
+          'untrusted'
+        )
+        .catch((error: unknown) => ({ rejected: error }));
+      expect(empty).toMatchObject({ event: { status: 'refused', code: 'design-system-refused' } });
+      expect(root.hasAttribute('data-tx-ds')).toBe(false);
+      // The default step loads the library unless the caller turns it off with null.
+      expect((await step.resolvePlayerDesignSystem(violet, null, 'untrusted')).ok).toBe(true);
+      expect(
+        await step.resolvePlayerDesignSystem(violet, null, 'untrusted', { loadLibraryBase: null })
+      ).toMatchObject({ ok: false, code: 'design-system-unresolved' });
+      // Only the default step names the full compiler; the core loads the library-free one.
+      const source = (name: string) =>
+        readFileSync(join(import.meta.dirname, '../src', name), 'utf8');
+      expect(source('design-system-core.ts')).not.toMatch(/loadDesignSystemCompiler\(/);
+      expect(source('design-system-core.ts')).toContain('loadDesignSystemCompilerCore()');
+    }
+  );
 });

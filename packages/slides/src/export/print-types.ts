@@ -30,7 +30,12 @@ export interface DeckPrintViewProps {
   /** URL policy tier for media and links; keep `untrusted` for agent decks. */
   tier?: DeckMediaTrust;
   messages?: DeckStageMessages;
-  /** Catalog theme loader (`null` when the host loads theme CSS itself). */
+  /**
+   * Catalog theme loader (`null` when the host loads theme CSS itself).
+   * `DeckPrintView` defaults to `loadDeckLibraryTheme`; `DeckPrintViewCore`
+   * has no default (G127), so without one catalog themes are host CSS and the
+   * build has no reference to the token theme library.
+   */
   loadTheme?: DeckThemeLoader | null;
   resolveAvatar?: (id: string) => string | undefined;
   /** Hosts keep this false until their own content (chart snapshots, fonts) is ready. */

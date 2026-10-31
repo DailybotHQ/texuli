@@ -13,9 +13,9 @@ components, or on its own as a framework-free token engine for any CSS
 runtime dependencies.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.10.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.11.0`) may contain breaking
-> changes, so pin the exact version or use `^0.10.0`, which accepts only 0.10.x.
+> published to npm as `0.11.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.12.0`) may contain breaking
+> changes, so pin the exact version or use `^0.11.0`, which accepts only 0.11.x.
 
 ## Install
 
@@ -47,7 +47,7 @@ colors come from a theme, which you apply at runtime (below).
 `--tx-size-icon-sm`, `--tx-shape-radius-*`…) with no fallback, and a theme
 does not declare them. A host with its own reset that loads neither renders
 controls with no size. A host that keeps its own reset can load the system
-token defaults alone (unreleased, `0.10.0`):
+token defaults alone (from `0.10.0`):
 
 ```css
 @import '@texuli/tokens/system.css';
@@ -91,12 +91,13 @@ const css = compileThemeCss(theme);
 
 | Purpose | Subpath | What it does |
 | --- | --- | --- |
-| Stylesheets | `base.css`, `system.css`, `forced-colors.css`, `tailwind/preset.css` | Base layer, the system token defaults alone (unreleased, `0.10.0`), forced-colors mapping, Tailwind 4 preset |
+| Stylesheets | `base.css`, `system.css`, `forced-colors.css`, `tailwind/preset.css` | Base layer, the system token defaults alone (from `0.10.0`), forced-colors mapping, Tailwind 4 preset |
 | Apply themes | `css` | `applyTheme`, `clearTheme`, `themeVariables`, `compileThemeCss` |
 | Token contract | `contract` | The `--tx-*` contract and the `Theme` type |
 | Palette engine | `palette` | OKLCH scales, tones and contrast pairs |
 | Theme library | `library` | 64 themes with lazy loaders: `loadLibraryTheme`, `listThemeLibrary`, `searchThemeLibrary` |
 | Expanded library | `library-expand` | 146 more themes (6 built-ins, then 140 curated) |
+| Library ids | `library-ids` | From `0.11.0`: every library theme id (6 built-in, 64 port, 140 expand; 210) with no metadata, `isLibraryThemeId` and `libraryThemeSet`, for synchronous id checks (1.7 KB gzip) |
 | Single theme | `build` | `buildLibraryTheme`: build one theme from a compact definition without loading the catalog |
 | Theme generator | `generator` | `generateThemeFromSeed`, `generateThemeFromMood`, `generateThemeFromImage` |
 | Contrast gate | `aa-gate`, `aa-gate/components` | WCAG AA checks for theme and component color pairs |
@@ -110,7 +111,7 @@ const css = compileThemeCss(theme);
 | Component tokens | `components` | From `0.9.0`: the component token registry (57 components, 364 tokens: the `texuli` styled families plus 9 domain families). Component tokens are never declared (0 B until set): CSS reads them with `componentVar(component, key)`, one fallback level (`var(--tx-button-radius, var(--tx-shape-radius-lg))`), and design systems set them on their scope. `checkTokenReads` guards the read forms; every `texuli` styled component reads its tokens, and the domain packages read theirs |
 | Chart tokens | `data-viz` | From `0.9.0`: `dataVizVariables(theme, mode)` returns all 28 `--tx-chart-*` values for any theme, derived when the theme has no `charts` |
 | Renames | `renames`, `renames.json` | From `0.9.0`: the machine-readable `--tx-*` rename list for codemods (empty: contract v2 renames nothing) |
-| Design systems | `design-system/compile`, `design-system/validate` | From `0.10.0` (ADR-021, ADR-022): `compileDesignSystem` turns a design-system document into concrete `--tx-*` variables per mode with enforced contrast, focus and target guarantees (refusals with codes and JSON paths), `resolveDesignSystem` follows `extends` (`texuli:<id>` library themes, `id@x.y.z` from your resolver), variants and patches, and `fromTheme` turns any `Theme` into a document. `validate` re-checks compiled maps with `checkDesignSystemGuarantees`. Both are lazy: the root never imports them. |
+| Design systems | `design-system/compile`, `design-system/validate` | From `0.10.0` (ADR-021, ADR-022): `compileDesignSystem` turns a design-system document into concrete `--tx-*` variables per mode with enforced contrast, focus and target guarantees (refusals with codes and JSON paths), `resolveDesignSystem` follows `extends` (`texuli:<id>` library themes, `id@x.y.z` from your resolver), variants and patches, and `fromTheme` turns any `Theme` into a document. `validate` re-checks compiled maps with `checkDesignSystemGuarantees`. Both are lazy: the root never imports them. `design-system/compile-core` (from `0.11.0`, G127) is the compiler without the theme library: `resolveDesignSystemCore` loads `texuli:<id>` bases only through a `loadLibraryBase` you pass. |
 | Design-system runtime | `design-system/apply` | From `0.10.0` (ADR-023): `applyDesignSystem(el, compiled, { mode })` writes a compiled map on one element in one style write with the allowlisted attributes and `[data-tx-scope]`, registers fonts lazily and returns a restoring dispose; `designSystemStyle` is the same declarations for SSR and `designSystemAppearance` for the no-flash replay (byte-identical, tested). Lazy, 2,040 B gzip |
 | Design-system I/O | `design-system/import`, `design-system/emit`, `design-system/report`, `design-system/diff`, `design-system/fixtures` | From `0.10.0`: importers (brand one-liner, W3C DTCG, Tokens Studio, flat role palette, Texuli `Theme`, logo pixels) that return a valid document plus warnings and never throw; deterministic emitters (scoped CSS, Tailwind preset, DTCG, Tokens Studio, flat palette, compiled JSON); a static report page escaped by construction; `diffDesignSystems` (token changes per mode, contrast regressions, default changes); fictional fixtures, including a `protoyard-theme/v1`-shaped palette, with lossless round trips. All lazy |
 
@@ -161,7 +162,8 @@ Ships in `0.6.0`; the `0.5.0` release predates it:
 - Motion tokens (durations, easings, springs): [tokens-motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-motion.md)
 - Theme generator: [tokens-generator.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-generator.md)
 - Theme libraries: [tokens-library-port.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-library-port.md)
-  and [tokens-library-expand.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-library-expand.md)
+  and [tokens-library-expand.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-library-expand.md);
+  every library id without metadata: [tokens-library-ids.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-library-ids.md)
 - Color modes and no-flash: [tokens-modes.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-modes.md)
   and [tokens-no-flash.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-no-flash.md)
 - Design-system compiler (from `0.10.0`): [design-system-compiler.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/design-system-compiler.md)

@@ -18,6 +18,7 @@ import {
   designSystemDeclarations,
   designSystemStyle,
   isSafeDesignSystemValue,
+  pickDesignSystemMode,
 } from '../src/design-system/apply.ts';
 import {
   type CompiledDesignSystem,
@@ -376,6 +377,59 @@ describe('applyDesignSystem', { timeout: 20_000 }, () => {
     expect(seen).toEqual([{ button: { variant: 'outline', size: 'sm' } }]);
     dispose();
     expect(seen).toEqual([{ button: { variant: 'outline', size: 'sm' } }, {}]);
+  });
+});
+
+describe('a single-mode design system under the other mode (pickDesignSystemMode)', {
+  timeout: 20_000,
+}, () => {
+  it('paints the compiled mode in apply, SSR and the no-flash entry, and data-tx-mode names it', async () => {
+    const darkDoc = structuredClone(acmeDoc);
+    delete darkDoc.extends;
+    darkDoc.color = { ...(darkDoc.color as Doc), modes: ['dark'] };
+    const resolved = await resolveDesignSystem(darkDoc, { trust: 'developer' });
+    if (!resolved.ok) throw new Error(JSON.stringify(resolved.errors));
+    const dark = compileDesignSystem(resolved.document, { trust: 'developer' });
+    if (!dark.ok) throw new Error(JSON.stringify(dark.errors));
+    expect(Object.keys(dark.vars)).toEqual(['dark']);
+    const darkVars = Object.fromEntries(designSystemDeclarations(dark.vars.dark ?? {}));
+
+    expect(pickDesignSystemMode(dark, 'light')).toBe('dark');
+    expect(pickDesignSystemMode(dark, 'dark')).toBe('dark');
+    expect(pickDesignSystemMode(acme, 'dark')).toBe('dark');
+    expect(pickDesignSystemMode({ ...acme, vars: { dark: acme.vars.dark } }, 'light')).toBe('dark');
+    expect(pickDesignSystemMode({ ...acme, vars: { light: acme.vars.light } }, 'dark')).toBe(
+      'light'
+    );
+    expect(() => pickDesignSystemMode({ ...acme, vars: {} }, 'light')).toThrow(/not compiled/);
+    expect(() => pickDesignSystemMode(acme, 'dim' as 'dark')).toThrow(TypeError);
+
+    const el = host();
+    const dispose = applyDesignSystem(el, dark, { mode: 'light', fonts: false });
+    expect(el.getAttribute('data-tx-mode')).toBe('dark');
+    expect(inlineVars(el)).toEqual(darkVars);
+    expect(designSystemAppearance(dark, { mode: 'light' })).toEqual({
+      themeId: dark.id,
+      mode: 'dark',
+      vars: darkVars,
+    });
+    const body = Object.entries(darkVars)
+      .map(([name, value]) => `${name}:${value}`)
+      .join(';');
+    expect(designSystemStyle(dark)).toBe(`[data-tx-ds="acme"]{${body}}`);
+    expect(designSystemStyle(dark, { modes: ['light'] })).toBe(`[data-tx-ds="acme"]{${body}}`);
+    // An empty list is the default (every compiled mode), for two modes as for one.
+    expect(designSystemStyle(dark, { modes: [] })).toBe(`[data-tx-ds="acme"]{${body}}`);
+    expect(designSystemStyle(acme, { modes: [] })).toBe(designSystemStyle(acme));
+    dispose();
+    expect(el.hasAttribute('data-tx-mode')).toBe(false);
+    // A cached copy without attrs paints, keeping the element's own attributes.
+    const { attrs: _attrs, ...bare } = dark;
+    const again = applyDesignSystem(el, bare as typeof dark, { mode: 'dark', fonts: false });
+    expect(el.getAttribute('data-tx-mode')).toBe('dark');
+    expect(inlineVars(el)).toEqual(darkVars);
+    expect(el.hasAttribute('data-tx-ds')).toBe(false);
+    again();
   });
 });
 
