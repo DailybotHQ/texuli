@@ -1,5 +1,5 @@
 {
-  "$comment": "Must fail spec validation with exactly these diagnostic codes, in order. Spec 0.8.0 (ADR-015): a field type outside the closed set (no password fields in agent forms).",
+  "$comment": "Must fail spec validation with exactly these diagnostic codes, in order. Spec 0.8.0 (ADR-015): a field type outside the closed set (no raw HTML fields; password became a closed credential type in 0.10.0).",
   "expect": ["prop-type"],
   "blueprint": {
     "format": "texuli-blueprint",
@@ -27,7 +27,7 @@
           "fields": [
             {
               "name": "email",
-              "type": "password",
+              "type": "html",
               "label": "Work email",
               "required": true
             }
