@@ -53,9 +53,10 @@ import {
 import type { Deck, DeckSlide } from '@texuli/deck/model';
 import { resolveDeckStyle } from '@texuli/deck/model';
 import { resolveImageSources } from '@texuli/media/image';
+import type { PlayerDesignSystemEvent, PlayerDesignSystems } from '@texuli/player/design-system';
 import type { Theme } from '@texuli/tokens/contract';
 import { defineTheme } from '@texuli/tokens/contract';
-import { flushSync, onMount, type Snippet, tick, untrack } from 'svelte';
+import { flushSync, getContext, onMount, type Snippet, setContext, tick, untrack } from 'svelte';
 // A server build preloads the stage's own lazy code (never the default tables) here, so the
 // server render keeps the slides (`./ssr-core-server.ts`); a browser build imports nothing.
 import '#deck-ssr-core';
@@ -191,6 +192,14 @@ interface Props {
   sync?: PresenterTransport | DeckSync | null;
   /** Catalog theme loader (`null` when the host loads theme CSS itself). */
   loadTheme?: DeckThemeLoader | null;
+  /**
+   * Resolves a deck's `designSystem.ref` (ADR-024): a document or a compiled
+   * design system, sync or async; never a fetch. `mode` picks the compiled
+   * mode (default: the stage's, `dark` or `light`).
+   */
+  designSystems?: PlayerDesignSystems | null;
+  /** Called when a deck's design system applies or is refused. */
+  onDesignSystem?: (event: PlayerDesignSystemEvent) => void;
   resolveAvatar?: (id: string) => string | undefined;
   /** The engine controller (read-only binding) for imperative hosts. */
   controller?: DeckController | null;
@@ -245,6 +254,8 @@ let {
   presenterTimer = false,
   sync = null,
   loadTheme = loadDeckLibraryTheme,
+  designSystems,
+  onDesignSystem,
   resolveAvatar,
   controller = $bindable(null),
   chrome,
@@ -515,7 +526,60 @@ let themeStatus = $derived.by(() => {
   return themes[key] ? 'applied' : 'unavailable';
 });
 
+// ── A deck's own design system (ADR-024): loaded lazily, only for a deck that names one ──
+type StageSystem = import('./design-system.ts').StageDesignSystem;
+type Defaults = Record<string, Record<string, string>>;
+let systemReference = $derived(model?.designSystem);
+let systemKey = $derived(systemReference ? JSON.stringify(systemReference) : '');
+let system = $state.raw<StageSystem | undefined>();
+let systemStatus = $state<'pending' | 'applied' | 'refused' | undefined>();
+let systemMode = $derived<'light' | 'dark'>(
+  designSystems?.mode ?? (mode === 'dark' ? 'dark' : 'light')
+);
+// Component defaults for every texuli component on the slides (the `texuli/defaults` context),
+// merged over an outer provider's prop by prop; props on a block still win.
+const DEFAULTS_KEY = 'texuli.design-defaults';
+const outerDefaults = getContext<(() => Defaults) | undefined>(DEFAULTS_KEY);
+setContext(DEFAULTS_KEY, () => {
+  const outer = outerDefaults?.() ?? {};
+  const own = system?.defaults;
+  if (!own) return outer;
+  const merged: Defaults = { ...outer };
+  for (const key of Object.keys(own)) merged[key] = { ...outer[key], ...own[key] };
+  return merged;
+});
+$effect(() => {
+  const key = systemKey;
+  const reference = untrack(() => systemReference);
+  const host = untrack(() => designSystems);
+  const trust = paintTier === 'developer' ? 'developer' : 'untrusted';
+  if (!key || !reference) {
+    system = undefined;
+    systemStatus = undefined;
+    return;
+  }
+  let live = true;
+  systemStatus = 'pending';
+  import('./design-system.ts')
+    .then((step) => step.loadStageDesignSystem(reference, host, trust, root?.ownerDocument))
+    .then(
+      ({ event, system: next }) => {
+        if (!live) return;
+        system = next;
+        systemStatus = event.status;
+        onDesignSystem?.(event);
+      },
+      () => {
+        if (live) systemStatus = 'refused';
+      }
+    );
+  return () => {
+    live = false;
+  };
+});
+
 function paletteFor(slide: DeckSlide) {
+  if (system) return system.palette(systemMode);
   const reference = model ? slideThemeReference(model, slide) : undefined;
   const slideMode = reference?.mode && reference.mode !== 'system' ? reference.mode : mode;
   return deckBackgroundPalette(themeFor(reference) ?? null, slideMode);
@@ -963,11 +1027,15 @@ $effect(() => {
   }
 });
 
+// The deck theme's variables, or a deck design system's in their place (one owner, no overlap).
 $effect(() => {
   const element = root;
   const theme = activeTheme;
-  if (!element || !theme) return;
-  const vars = deckThemeVariables(theme, mode, { reducedMotion });
+  const applied = system;
+  if (!element || (!theme && !applied)) return;
+  const vars = applied
+    ? applied.vars(systemMode)
+    : deckThemeVariables(theme as Theme, mode, { reducedMotion });
   for (const [name, value] of Object.entries(vars)) element.style.setProperty(name, value);
   return () => {
     for (const name of Object.keys(vars)) element.style.removeProperty(name);
@@ -1331,9 +1399,12 @@ $effect(() => {
   data-tx-deck-motion={styleResolution.motion}
   data-tx-deck-aspect={styleResolution.style.aspect}
   data-tx-deck-toolbar={toolbarPosition === 'top' ? 'top' : 'bottom'}
+  {...system?.attrs}
+  data-tx-scope={system ? '' : undefined}
+  data-tx-deck-design-system={systemStatus}
   data-tx-theme={deckThemeId(activeRef)}
-  data-tx-mode={activeTheme || activeRef ? mode : undefined}
-  data-tx-surface={activeTheme?.style.surface}
+  data-tx-mode={system ? systemMode : activeTheme || activeRef ? mode : undefined}
+  data-tx-surface={system ? system.attrs['data-tx-surface'] : activeTheme?.style.surface}
   data-tx-motion={activeTheme ? (reducedMotion ? 'reduce' : 'full') : undefined}
   data-motion={reducedMotion ? 'reduce' : undefined}
   data-theme-status={themeStatus}
@@ -1346,6 +1417,11 @@ $effect(() => {
   onfocusout={onFocusOut}
   use:deckCssVars={styleResolution.cssVars}
 >
+  {#if systemStatus === 'refused'}
+    <p class="tx-deck-stage__fullscreen-note" role="status" data-tx-deck-design-system-notice>
+      {t('stage.designSystemRefused')}
+    </p>
+  {/if}
   {#if !prepared}
     <p class="tx-deck-stage__loading" role="status">{t('layout.contentLoading')}</p>
   {:else if !prepared.ok}
