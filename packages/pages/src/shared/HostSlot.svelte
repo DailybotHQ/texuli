@@ -11,6 +11,7 @@ import type { PagesBlockPainter } from './block-host.ts';
 import type { EmbedResolver } from './embeds.ts';
 import HostBlockView from './HostBlockView.svelte';
 import type { PagesLabels } from './labels.ts';
+import type { PagesPlayerLoader } from './player-loader.ts';
 
 let {
   node,
@@ -20,6 +21,7 @@ let {
   resolveEmbed,
   deckHost = null,
   reducedMotion = false,
+  loadPlayer = null,
 }: {
   node: WrappedBlock | EmbedBlock;
   /**
@@ -33,6 +35,7 @@ let {
   resolveEmbed?: EmbedResolver | undefined;
   deckHost?: DeckPlayerHost | null | undefined;
   reducedMotion?: boolean;
+  loadPlayer?: PagesPlayerLoader | null | undefined;
 } = $props();
 
 const frozen = $derived(readonlyNode(node));
@@ -49,5 +52,5 @@ const refusedLabel = $derived(node.type === 'block' ? labels.blockRefused : labe
 {:else if node.type === 'block'}
   <views.WrappedBlockView {node} {refusedLabel} loadingLabel={labels.embedLoading} {onrefused} />
 {:else}
-  <views.EmbedView {node} {labels} {resolveEmbed} {deckHost} {reducedMotion} {onrefused} />
+  <views.EmbedView {node} {labels} {resolveEmbed} {deckHost} {reducedMotion} {loadPlayer} {onrefused} />
 {/if}

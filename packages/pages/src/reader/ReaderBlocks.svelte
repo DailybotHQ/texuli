@@ -13,6 +13,7 @@ import type { PagesLabels } from '../shared/labels.ts';
 import MediaView from '../shared/MediaView.svelte';
 import type { MediaResolver } from '../shared/media.ts';
 import PageLinkView from '../shared/PageLinkView.svelte';
+import type { PagesPlayerLoader } from '../shared/player-loader.ts';
 import WrappedBlockView from '../shared/WrappedBlockView.svelte';
 import Self from './ReaderBlocks.svelte';
 
@@ -30,6 +31,8 @@ interface Props {
   reducedMotion: boolean;
   /** The host's block renderer (G111); without one the host slot never loads. */
   painter?: PagesBlockPainter | null | undefined;
+  /** Loads the player for live embeds; `null` turns them off (G123). */
+  loadPlayer?: PagesPlayerLoader | null | undefined;
 }
 
 let props: Props = $props();
@@ -88,13 +91,13 @@ const views = { WrappedBlockView, EmbedView };
     </p>
   {:else if (block.type === 'block' || block.type === 'embed') && props.painter}
     {#await loadHostSlot() then HostSlot}
-      <HostSlot node={block} {views} painter={props.painter} {labels} resolveEmbed={props.resolveEmbed} deckHost={props.deckHost} reducedMotion={props.reducedMotion} />
+      <HostSlot node={block} {views} painter={props.painter} {labels} resolveEmbed={props.resolveEmbed} deckHost={props.deckHost} reducedMotion={props.reducedMotion} loadPlayer={props.loadPlayer} />
     {:catch}
       <p class="tx-pages-notice" role="note">{block.type === 'block' ? labels.blockRefused : labels.refused}</p>
     {/await}
   {:else if block.type === 'block'}
     <WrappedBlockView node={block} refusedLabel={labels.blockRefused} loadingLabel={labels.embedLoading} />
   {:else if block.type === 'embed'}
-    <EmbedView node={block} {labels} resolveEmbed={props.resolveEmbed} deckHost={props.deckHost} reducedMotion={props.reducedMotion} />
+    <EmbedView node={block} {labels} resolveEmbed={props.resolveEmbed} deckHost={props.deckHost} reducedMotion={props.reducedMotion} loadPlayer={props.loadPlayer} />
   {/if}
 {/each}

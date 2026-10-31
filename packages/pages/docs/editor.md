@@ -52,6 +52,7 @@ through one op log.
 | `announce` | the core announcer | Where polite announcements go |
 | `renderBlock` | — | A snippet that paints the host's own blocks, handed the read-only node ([host blocks](#host-blocks)) |
 | `blockHost` | `null` | A `PagesBlockHost`: `claim`, and a `component` or a `present` mount ([host blocks](#host-blocks)) |
+| `loadPlayer` | the package loader | A `PagesPlayerLoader` for live embeds; `null` turns them off. `PageEditorCore` has no default ([core entries](#core-entries-without-the-player)) |
 | `class` | — | Extra classes on the root |
 
 The root is a `section` named by `label`. Each block is a row: an insert
@@ -161,6 +162,61 @@ slides for a deck host, `deck-slide` children for the document flow). A
 wrapped block reads. `MediaResolver` and `mediaSource` resolve images through
 `safeImageSrc`; `pageLinkHref` passes the host's `pageHref` through
 `safeHref`.
+
+## Core entries without the player
+
+> **In development for `0.10.0`, not on npm.**
+
+`component` and `deck` embeds paint with `@texuli/player`, loaded on first
+use. A page without embeds never downloads it, but the default components
+keep the player's dynamic import in the build, so a bundler that inlines
+lazy chunks (a single-file export) carries the whole player (G123). Each
+default entry has a core twin without that import:
+
+| Default | Core entry | Core component |
+| --- | --- | --- |
+| `@texuli/pages/editor` | `@texuli/pages/editor-core` | `PageEditorCore` |
+| `@texuli/pages/reader` | `@texuli/pages/reader-core` | `PageReaderCore` |
+| `@texuli/pages/paged` | `@texuli/pages/paged-core` | `PagedViewCore` |
+| `@texuli/pages/collab` | `@texuli/pages/collab-core` | `CollabEditorCore` |
+| `@texuli/pages/host` | `@texuli/pages/host-core` | `createDocumentPlayerHostCore` |
+
+A core component takes the same props as its default, and its `loadPlayer`
+has no default. Every other export of a core entry is the same as its
+default's, and each default entry also exports its core.
+
+- **No loader.** A host on the core entries that passes no `loadPlayer` has
+  no `@texuli/player` reference in its build, static or dynamic
+  (`tests/bundle-graph.test.ts` builds one). A `component` or `deck` embed
+  shows a note (`labels.embedOff`; the figure's `data-state` is `off`), or
+  goes to the host's block renderer when its `claim` returns `'fallback'`
+  ([host blocks](#host-blocks)). `sheet` and `canvas` references are
+  unchanged.
+- **The host's loader.** `PagesPlayerLoader` is
+  `() => Promise<PagesPlayerModule>`, where `PagesPlayerModule` is any
+  object with the player's `Player` component. The dynamic import then
+  lives in host code, where the host's bundler decides about it. The
+  loader runs once per function (a failed load is tried again on the
+  next embed); a load that fails, or a module with no `Player`, shows the
+  refused notice. The host loads the player's stylesheet too:
+
+```svelte
+<script lang="ts">
+  import { PageEditorCore } from '@texuli/pages/editor-core';
+  import type { PagesPlayerLoader } from '@texuli/pages/editor-core';
+
+  let { doc } = $props();
+  const loadPlayer: PagesPlayerLoader = () =>
+    import('@texuli/player/styles.css').then(() => import('@texuli/player'));
+</script>
+
+<PageEditorCore document={doc} {loadPlayer} />
+```
+
+- **The defaults.** `PageEditor`, `PageReader`, `PagedView`,
+  `CollabEditor` and `createDocumentPlayerHost` pass the package's loader
+  when `loadPlayer` is not given, as before. `loadPlayer={null}` turns live
+  embeds off at runtime, but the import stays in their build.
 
 ## Host blocks
 

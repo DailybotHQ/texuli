@@ -4,6 +4,7 @@ import type { MotionProp } from 'texuli/motion';
 import type { PagesBlockPainter } from '../shared/block-host.ts';
 import type { EmbedResolver } from '../shared/embeds.ts';
 import type { MediaResolver } from '../shared/media.ts';
+import type { PagesPlayerLoader } from '../shared/player-loader.ts';
 import type { PageRef, SlashItem } from './slash.ts';
 import type { PagesEditor } from './state.svelte.ts';
 
@@ -19,6 +20,8 @@ export interface PagesEditorContext {
   resolveEmbed?: EmbedResolver;
   resolveMedia?: MediaResolver;
   deckHost?: DeckPlayerHost | null;
+  /** Loads the player for live embeds, or null (G123). */
+  loadPlayer: () => PagesPlayerLoader | null;
   /** The host's block renderer (G111), or null. */
   painter: () => PagesBlockPainter | null;
   onNavigate?: (ref: string) => void;

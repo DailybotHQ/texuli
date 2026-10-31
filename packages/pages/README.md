@@ -73,6 +73,7 @@ Keep the document in `$state.raw`: every change is a new immutable value.
 | `export` | `exportDocument` (Markdown, DOCX and PDF as a `Blob`, writers loaded lazily), `exportFileName` and `downloadBlob` | [export](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/export.md) |
 | `host` | `createDocumentPlayerHost`, the `documentHost` that lets `@texuli/player` paint agent `document` blueprints (spec 0.7.0) with the reader, and `checkDocumentDraft`, the document check for `validateDraft` | [host](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/host.md) |
 | `collab` | `CollabEditor` and its parts on a `CollabSession` of `@texuli/document/collab`: comments anchored to the text, suggestions with accept and reject, version history with restore, remote carets and an accessible collaborator list (import it lazily) | [collab](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/collab.md) |
+| `editor-core`, `reader-core`, `paged-core`, `collab-core`, `host-core` | `PageEditorCore`, `PageReaderCore`, `PagedViewCore`, `CollabEditorCore` and `createDocumentPlayerHostCore`: the same components and host with no default player loader, so a host that passes no `loadPlayer` has no `@texuli/player` reference in its build (G123; in development for `0.10.0`, not on npm) | [core entries](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/editor.md#core-entries-without-the-player) |
 | `styles.css` | The editor and reader stylesheet (both components import it) | [styles](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/styles.md) |
 
 ## What it does
@@ -105,6 +106,14 @@ Keep the document in `$state.raw`: every change is a new immutable value.
   `@texuli/canvas` is planned). Embedded players get no `formHost`,
   `canvasHost` or sheet host, so a component embed holding a
   `schema-form`, `canvas` or `spreadsheet` node is refused rather than painted.
+- **Embeds without the player** (in development for `0.10.0`, not on npm):
+  every component and the document host take `loadPlayer` (`null` turns
+  live embeds off), and the core entries (`editor-core`, `reader-core`,
+  `paged-core`, `collab-core`, `host-core`) have no default loader, so a
+  host that never wants the player has no `@texuli/player` reference in
+  its build, not even a lazy one. An embed that needs the player then shows
+  a note, or goes to the host's block renderer
+  ([core entries](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/editor.md#core-entries-without-the-player)).
 - **Host blocks** (in development for `0.10.0`, not on npm): a
   `renderBlock` snippet or a `blockHost` (`claim`, `component`, `present`)
   lets the host paint its own wrapped blocks and embeds in the editor, the
