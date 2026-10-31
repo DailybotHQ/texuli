@@ -15,6 +15,13 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.3.6] — 2026-10-31
+
+### Changes
+
+- chore(skill): the skill pack says 0.11.0 is published - T-final-review of PLAN_011_mcp_and_design_systems
+- chore(skill): the skill pack names the 0.10.1 patch releases - T-gaps-125-127 of PLAN_011_mcp_and_design_systems
+
 - The packages are on npm in the 0.11 line, every one at `0.11.0`. The
   router, components, install and build-ui references say so and pin
   `^0.11.0`; the in-development packages read "on npm as `0.11.0`".
