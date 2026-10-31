@@ -98,8 +98,10 @@ never claim more than exists.
 
 - A new or changed texel needs tests in `packages/<pkg>/tests/<name>.test.ts`
   that import through `../src/index.ts`. Vitest collects
-  `packages/*/tests/**/*.test.ts`, `apps/website/tests/**/*.test.ts` and
-  `scripts/tests/**/*.test.ts` (plus `tests/perf/**` only with
+  `packages/*/tests/**/*.test.ts`, `apps/website/tests/**/*.test.ts`,
+  `scripts/tests/**/*.test.ts` and `tests/agent-evals/**/*.test.ts` (the
+  agent sessions and door parity, added to `vitest.config.ts` on 2026-10-30;
+  plus `tests/perf/**` only with
   `TEXULI_PERF=1` or an explicit path); a test anywhere else never runs. The
   `apps/website/tests` entry was added to the owner-held `vitest.config.ts`
   in commit `e6c5d205`; the owner's acknowledgement is pending.
