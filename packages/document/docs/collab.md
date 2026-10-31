@@ -60,6 +60,31 @@ dropped, the same way everywhere.
 Offsets in this API are UTF-16 code units of a block's text (a break
 counts 1), as in `@texuli/document/ops`.
 
+### Embeds and wrapped blocks
+
+Every embed the document model allows survives a session: `component`,
+`deck`, `sheet` and `canvas`, each by host `ref` or `inline` payload (an
+inline component is a one-node catalog blueprint, an inline deck is deck
+model v2), and every wrapped `@texuli/blocks` block with its `props`. They
+survive the seed, a remote insert, `load(snapshot)` and a round trip of
+the batches or the snapshot through JSON, on every replica; payloads past
+one register's bounds travel chunked and decode to the same value
+(`packages/document/tests/collab-embeds.test.ts`).
+
+An embed's `kind`, `ref`, `inline` and `title` are four separate
+registers. An inline payload (and a wrapped block's `props`) is one opaque
+value, never merged field by field: concurrent replacements of the same
+payload resolve **last writer wins at the embed level** (the CRDT's
+deterministic register order), so every replica ends with one writer's
+whole payload, never a mix of two. Concurrent writes to different
+registers of one embed (one peer edits the deck, another renames the
+embed's `title`) both survive.
+
+An embed whose payload the validator refuses (an inline deck that is not
+deck model v2, a component payload that is not one catalog node) is left
+out of the projection; only that embed, never the rest of the document.
+The replica keeps it, so an edit that fixes the payload brings it back.
+
 ## Sessions
 
 `createDocumentSync(options)` returns a `DocumentSync`.

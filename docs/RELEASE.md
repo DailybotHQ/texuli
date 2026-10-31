@@ -343,6 +343,14 @@ branch):
   widget below swaps above it. `edge` is left for the grid edge, or
   nothing left to pass. The `@texuli/sheets` README and view guide now say
   the cell editor loads lazily on the first Enter, so host tests await it.
+- **Fixed: collab embeds** (`@texuli/document/collab`, PLAN_011
+  T-final-review): an issue inside an embed payload (a slide of an inline
+  deck, the node of an inline component) made the projection's repair
+  target the payload object instead of the embed, so a session could empty
+  the whole document; now only that embed is left out (an inline deck must
+  be deck model v2), every embed kind (component, deck, sheet and canvas,
+  by ref and inline) survives sync, and concurrent payload writes resolve
+  last writer wins at the embed level.
 
 ### 0.9.0
 
