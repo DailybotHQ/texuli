@@ -1,4 +1,5 @@
 export { type ParsedTexuliBlocks, parseTexuliBlocks } from './content/index.ts';
+export type { TexuliAstroDesignSystem } from './design-system/index.ts';
 export {
   type TexuliAstroOptions,
   type TexuliDensityVariant,

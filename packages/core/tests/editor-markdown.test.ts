@@ -171,45 +171,63 @@ describe('reading Markdown', () => {
     expect(blocks.diagnostics.map((d) => d.code)).toContain('blocks-capped');
   }, 30_000);
 
-  it('reads long plain paragraphs in linear time', () => {
+  it('reads long plain paragraphs in linear time', { retry: 2, timeout: 120_000 }, () => {
     // A long paragraph read slower than linear: every soft line break read
     // the end of the text being built, which flattened the whole string
     // (101 ms at 100,000 characters and 3.7 s at 400,000 before the fix), and
-    // the mark pass made one object per character. Compared at N and 4N with
-    // the caps raised.
+    // the mark pass made one object per character. Measured on a doubling
+    // ladder with the caps raised, the read time's growth exponent (the
+    // least-squares slope of log time over log size) is about 1 when linear
+    // and 2 or more for those paths. Measured in this thread's CPU time and
+    // pooled over four sizes, it held at 0.96-1.17 with six copies running in
+    // parallel, where the wall-clock N-to-4N ratio it replaces flaked.
     const limits = { maxSource: 800_000, limits: { chars: 800_000 } };
+    // This thread's CPU time (ms), not wall-clock: time spent waiting for a
+    // core while parallel lanes run is not the reader's cost.
+    const cpu = () => {
+      const { user, system } = process.threadCpuUsage();
+      return (user + system) / 1000;
+    };
     const time = (source: string) => {
-      const started = performance.now();
+      const started = cpu();
       fromMarkdown(source, limits);
-      return performance.now() - started;
+      return cpu() - started;
     };
     const shapes = {
       'soft line breaks': (n: number) => 'ab\n'.repeat(Math.floor(n / 3)),
       'one long word': (n: number) => 'x'.repeat(n),
       'words and breaks': (n: number) => 'one two\nthree '.repeat(Math.floor(n / 14)),
     };
+    const sizes = [100_000, 200_000, 400_000, 800_000];
     for (const [name, make] of Object.entries(shapes)) {
       const read = fromMarkdown(make(800_000), limits);
       expect(editorPlainText(read.doc).length, name).toBeGreaterThan(780_000);
-      // Interleaved fastest-of-seven, so a load spike hits both sizes alike.
-      // Linear growth is 4x and the old quadratic paths were 16x or more
-      // (3.7 s at 400,000); sizes large enough that noise can't dominate and a
-      // 10x ratio with a 300 ms floor separate them
-      // on a loaded host without flaking on sub-millisecond noise.
-      const small = make(200_000);
-      const large = make(800_000);
-      let bestSmall = Number.POSITIVE_INFINITY;
-      let bestLarge = Number.POSITIVE_INFINITY;
+      // Interleaved fastest-of-seven, so a load spike hits every size alike.
+      const sources = sizes.map(make);
+      const best = sizes.map(() => Number.POSITIVE_INFINITY);
       for (let k = 0; k < 7; k += 1) {
-        bestSmall = Math.min(bestSmall, time(small));
-        bestLarge = Math.min(bestLarge, time(large));
+        for (const [i, source] of sources.entries()) {
+          best[i] = Math.min(best[i] as number, time(source));
+        }
       }
+      const xs = sizes.map(Math.log);
+      const ys = best.map((ms) => Math.log(Math.max(ms, 0.05)));
+      const mean = (values: number[]) => values.reduce((a, b) => a + b, 0) / values.length;
+      const mx = mean(xs);
+      const my = mean(ys);
+      let sxy = 0;
+      let sxx = 0;
+      for (const [i, x] of xs.entries()) {
+        sxy += (x - mx) * ((ys[i] as number) - my);
+        sxx += (x - mx) ** 2;
+      }
+      const slope = sxy / sxx;
       expect(
-        bestLarge,
-        `${name}: ${bestSmall.toFixed(1)} ms -> ${bestLarge.toFixed(1)} ms`
-      ).toBeLessThan(Math.max(10 * bestSmall, 300));
+        slope,
+        `${name}: ${best.map((ms) => ms.toFixed(1)).join(' -> ')} ms CPU, slope ${slope.toFixed(2)}`
+      ).toBeLessThan(1.5);
     }
-  }, 60_000);
+  });
 });
 
 describe('writing Markdown', () => {

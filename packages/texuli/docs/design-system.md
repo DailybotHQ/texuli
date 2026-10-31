@@ -2,8 +2,9 @@
 
 > **Status:** released in `0.9.0` (pre-1.0).
 > Token contract v2 is [ADR-020](../../../docs/DECISIONS.md#adr-020-token-contract-v2-additive-families-and-a-real-component-tier);
-> the design-system document that sets all of this from one JSON file is
-> planned (ADR-021).
+> the design-system document that sets all of this from one JSON file
+> (ADR-021) and `DesignSystemProvider` (`texuli/design-system`, ADR-023) are
+> released in `0.10.0`.
 
 A design system or an agent restyles Texuli components through three
 channels, none of which needs CSS of its own:
@@ -61,7 +62,7 @@ sets component tokens, so a token set closer to the component still wins.
 
 A scope is any element carrying `data-tx-scope` (ADR-023). `applyTheme(el)`
 (`@texuli/tokens`) writes it (empty unless the host already named the
-scope), and the planned `applyDesignSystem` will too. `@texuli/tokens/base.css`
+scope), and so does `applyDesignSystem` (`@texuli/tokens/design-system/apply`, from `0.10.0`). `@texuli/tokens/base.css`
 declares the system token defaults on `:where(:root, [data-tx-theme],
 [data-tx-scope])`, so derived tokens (space, radius and type steps) resolve
 against the nearest scope; nothing needs `:root`.
@@ -125,3 +126,64 @@ a `variant` or `size` prop, the vocabulary against each family's constants,
 hostile input), `packages/tokens/tests/token-contract-v2.test.ts` (every read
 is in its exact one-level form, `base.css` declares every system default,
 every component page carries its Tokens section).
+
+## DesignSystemProvider
+
+> **Status:** released in `0.10.0`.
+
+`texuli/design-system` exports `DesignSystemProvider`: a `<div>` scope that
+applies a compiled design system
+([design-system-runtime.md](../../tokens/docs/design-system-runtime.md))
+and provides its component defaults to every Texuli component inside.
+
+```svelte
+<script lang="ts">
+  import { DesignSystemProvider } from 'texuli/design-system';
+  import { Button } from 'texuli/button';
+  import compiled from './acme.compiled.json'; // compileDesignSystem output, cached
+
+  let mode = $state<'light' | 'dark'>('light');
+</script>
+
+<DesignSystemProvider {compiled} {mode} class="preview">
+  <Button>Save</Button>
+</DesignSystemProvider>
+```
+
+| Prop | Default | Effect |
+| --- | --- | --- |
+| `compiled` | required | A `CompiledDesignSystem` (or a cached JSON copy) |
+| `mode` | `light` | The compiled mode to apply |
+| `variant` | `compiled.variant` | Must match the variant it was compiled for |
+| `scope` | the design system's id | The `data-tx-scope` name, so `[data-tx-scope="acme"]` rules match |
+| `fonts` | `true` | Register `fontFaces` lazily on first use |
+| `base` | the document's base URI | What relative font paths resolve against |
+| `ref` | | The scope element (bindable) |
+
+- **Scope:** the element carries `data-tx-scope`, `data-tx-mode` and the
+  allowlisted `data-tx-ds*` and hook attributes in markup (escaped
+  attribute values, so server HTML already matches `designSystemStyle`'s
+  default `[data-tx-ds="<id>"]` selector), and the variables inline after
+  mount through `applyDesignSystem`. Portaled overlays inside (Dialog,
+  Sheet, CommandPalette…) mount in a scoped portal root that mirrors them
+  (see Scopes and overlays above).
+- **Switching:** a new `compiled` or `mode` re-applies in one style write;
+  the element is restored only when the provider unmounts.
+- **Defaults:** `compiled.defaults` goes through `setDesignDefaults`, so the
+  closed vocabulary filters it and an inner `setDesignDefaults` still wins.
+- **Server rendering:** effects do not run on the server, so put
+  `designSystemStyle(compiled)` in the page head (the `@texuli/astro`
+  `designSystem` option does it) for a first paint with the variables.
+- **Cost:** a subpath of its own, 3,345 B gzip with the runtime bundled; the
+  `texuli` root never imports it (a test walks the import graph; the root
+  measured 217,091 B before and after).
+
+The subpath also re-exports `applyDesignSystem` (with its
+`ApplicableDesignSystem` and `ApplyDesignSystemOptions` types) and offers
+`loadDesignSystemCompiler()`, which imports
+`@texuli/tokens/design-system/compile` on demand as a lazy chunk (never at
+import), for hosts that compile at run time without depending on
+`@texuli/tokens` themselves: `@texuli/player` uses both for a blueprint's
+`designSystem` (spec 0.10.0).
+
+Tests: `packages/texuli/tests/design-system-provider.test.ts`.

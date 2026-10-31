@@ -8,9 +8,9 @@ examples, validate blueprint drafts, search and preview themes with their
 WCAG AA report, and run the deck and document commands.
 
 > **Status: in development (pre-1.0).** `@texuli/mcp` is published on npm
-> as `0.9.0`, with provenance (its first release). Under 0.x a new minor
-> (`0.10.0`) may contain breaking changes, so pin the exact version or use
-> `^0.9.0`, which accepts only 0.9.x
+> as `0.10.0`, with provenance (first published as `0.9.0`). Under 0.x a new minor
+> (`0.11.0`) may contain breaking changes, so pin the exact version or use
+> `^0.10.0`, which accepts only 0.10.x
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 ## Connect your agent
@@ -94,7 +94,19 @@ both transports and every tool.
 - **Prompts:** `build-ui`, `theme-blueprint` and `convert-deck`, plus
   completions for their arguments.
 
-The protocol details (versions, lifecycle, limits, error codes) are in
+**Protocol revisions.** `initialize` negotiates `2025-11-25` (preferred),
+`2025-06-18`, `2025-03-26` and `2024-11-05`. Since 0.10.0 the server also answers MCP revision `2026-07-28` in part:
+a request that carries
+`params._meta["io.modelcontextprotocol/protocolVersion"]: "2026-07-28"`
+needs no `initialize` and may call `server/discover`, `tools/*`,
+`prompts/*`, `resources/*` and `completion/complete`; an unknown `_meta`
+revision is `-32022` with `error.data.supported`. Requests without that
+`_meta` version behave as before (a request before initialization is
+`-32600`). The remote `https://texuli.com/mcp` answers the same messages
+the same way.
+
+The protocol details (versions, the parts of `2026-07-28` that are
+implemented, lifecycle, limits, error codes) are in
 [`@texuli/tools` MCP](../tools/docs/mcp.md).
 
 ## Safety

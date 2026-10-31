@@ -1,0 +1,17 @@
+{
+  "description": "A key outside the closed vocabulary (raw CSS passthrough).",
+  "expect": [["unknown-key", "$.color.css"]],
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "acme",
+    "version": "1.0.0",
+    "name": "Acme",
+    "color": {
+      "brand": {
+        "seed": "#4f46e5"
+      },
+      "css": "body{}"
+    }
+  }
+}

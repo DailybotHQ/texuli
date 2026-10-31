@@ -4,9 +4,8 @@
  * `documentHost`: this module's `createDocumentPlayerHost()` validates a
  * `document` node inside the player's validation at the player's tier, and
  * paints a valid one with the read-only `PageReader`, loaded on first use.
+ * `@texuli/pages/host-core` is the same host without the default player
+ * loader (G123).
  */
-export {
-  checkDocumentDraft,
-  createDocumentPlayerHost,
-  type DocumentPlayerHostOptions,
-} from './document-host.ts';
+export * from './core.ts';
+export { createDocumentPlayerHost } from './document-host.ts';

@@ -49,6 +49,8 @@ const BROWSER_ROUTES = [
   '/gallery-themes/',
   '/theme-switcher/',
   '/color-explorer/',
+  // PLAN_011 T-ds-studio: the Design System Studio island (compiler and exporters load on use).
+  '/theme-studio/',
   '/component-pages/',
   '/gallery-components/',
   '/gallery-components/preview/',
@@ -78,6 +80,8 @@ const BROWSER_ROUTES = [
   '/mcp-server/',
   '/tokens/',
   '/tokens/components/',
+  // PLAN_011 T-site-0100: the design systems hub, static (twelve server-rendered brand scopes).
+  '/design-systems/',
 ] as const;
 
 const kb = (bytes: number) => Math.round((bytes / 1024) * 10) / 10;

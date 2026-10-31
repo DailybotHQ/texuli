@@ -23,6 +23,7 @@ import { createMcpHandler } from '../packages/tools/src/mcp/handler.ts';
 import { TEXULI_PROMPTS } from '../packages/tools/src/mcp/prompts.ts';
 import {
   MCP_PROTOCOL_VERSION,
+  MCP_STATELESS_PROTOCOL_VERSIONS,
   MCP_SUPPORTED_PROTOCOL_VERSIONS,
 } from '../packages/tools/src/mcp/protocol.ts';
 import { texuliResources } from '../packages/tools/src/mcp/resources.ts';
@@ -108,6 +109,8 @@ export async function buildServerCard(registry: OperationRegistry = texuliOps) {
     },
     protocolVersion: MCP_PROTOCOL_VERSION,
     protocolVersions: [...MCP_SUPPORTED_PROTOCOL_VERSIONS],
+    /** Revisions served per request through params._meta, with no initialize (server/discover). */
+    statelessProtocolVersions: [...MCP_STATELESS_PROTOCOL_VERSIONS],
     transport: {
       streamableHttp: {
         url: REMOTE_MCP_URL,
@@ -147,6 +150,11 @@ export async function buildServerCard(registry: OperationRegistry = texuliOps) {
       replacedBy: [...alias.targets],
       removeIn: alias.removeIn,
       remote: remote.has(alias.name),
+    })),
+    removedTools: registry.removed().map((entry) => ({
+      name: entry.name,
+      replacedBy: [...entry.replacedBy],
+      removedIn: entry.removedIn,
     })),
   };
 }
@@ -210,15 +218,32 @@ export function buildOpsTables(registry: OperationRegistry = texuliOps): string 
       return `| \`${operation.name}\` | ${number(operation.limits.inputBytes)} | ${operation.limits.items === undefined ? '—' : number(operation.limits.items)} | ${number(operation.limits.timeMs / 1000)} s | ${args || '—'} |`;
     }),
     '',
-    '### Deprecated 0.8 tool names',
+    ...(registry.aliases().length === 0
+      ? []
+      : [
+          '### Deprecated tool names',
+          '',
+          '| Alias | Resolves to | Removed in |',
+          '| --- | --- | --- |',
+          ...registry
+            .aliases()
+            .map(
+              (alias) =>
+                `| \`${alias.name}\` | ${alias.targets.map((target) => `\`${target}\``).join(', ')} | \`${alias.removeIn}\` |`
+            ),
+          '',
+        ]),
+    '### Removed tool names',
     '',
-    '| Alias | Resolves to | Removed in |',
+    'A call to a removed name is refused with a message that names the operation to call instead.',
+    '',
+    '| Name | Call instead | Removed in |',
     '| --- | --- | --- |',
     ...registry
-      .aliases()
+      .removed()
       .map(
-        (alias) =>
-          `| \`${alias.name}\` | ${alias.targets.map((target) => `\`${target}\``).join(', ')} | \`${alias.removeIn}\` |`
+        (entry) =>
+          `| \`${entry.name}\` | ${entry.replacedBy.map((target) => `\`${target}\``).join(', ')} | \`${entry.removedIn}\` |`
       ),
   ];
   return lines.join('\n');
@@ -275,6 +300,7 @@ export async function buildMcpPageData(registry: OperationRegistry = texuliOps) 
       };
     }),
     deprecatedTools: card.deprecatedTools,
+    removedTools: card.removedTools,
     resources: resources.map((resource) => ({
       uri: resource.uri,
       title: resource.title ?? resource.name,

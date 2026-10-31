@@ -13,6 +13,29 @@ export interface PartWholeTableLabels {
   value: string;
 }
 
+/** The table labels a chart shows when the host passes none (the schema's defaults). */
+export const PART_WHOLE_TABLE_LABELS: Readonly<PartWholeTableLabels> = Object.freeze({
+  table: 'View data table',
+  category: 'Category',
+  value: 'Value',
+});
+
+/**
+ * `labels` over {@link PART_WHOLE_TABLE_LABELS}: a missing or blank label
+ * keeps its default, so the data-table disclosure and the legend always
+ * have a name (an agent example may pass `labels: {}`).
+ */
+export function partWholeTableLabels(
+  labels?: Partial<PartWholeTableLabels> | null
+): PartWholeTableLabels {
+  const out: PartWholeTableLabels = { ...PART_WHOLE_TABLE_LABELS };
+  for (const key of ['table', 'category', 'value'] as const) {
+    const value = labels?.[key];
+    if (typeof value === 'string' && value.trim() !== '') out[key] = value;
+  }
+  return out;
+}
+
 export interface PartWholeTableRow {
   id: string;
   label: string;

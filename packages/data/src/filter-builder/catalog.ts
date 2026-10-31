@@ -74,11 +74,44 @@ export type FilterAnyOperator = FilterOperator | FilterCustomOperatorId;
  */
 export type FilterField<T = never> = Pick<
   GridColumnDef<T>,
-  'key' | 'header' | 'type' | 'options' | 'accessor'
+  'key' | 'header' | 'type' | 'accessor'
 > & {
+  /**
+   * The values of an enum field: plain strings, or `{ value, label }` where
+   * the menus show `label` and the model stores `value`. Mixing is allowed.
+   */
+  options?: readonly FilterFieldOption[];
   group?: string;
   operators?: readonly FilterAnyOperator[];
 };
+
+/** One enum option: the stored value, optionally with the text the menus show. */
+export type FilterFieldOption = string | { value: string; label: string };
+
+/** The stored value of an option. */
+export const optionValue = (option: FilterFieldOption): string =>
+  typeof option === 'string' ? option : option.value;
+
+/** The menu text of an option (its value when it has no label). */
+export const optionLabel = (option: FilterFieldOption): string =>
+  typeof option === 'string' ? option : option.label;
+
+/** The stored values of a field's options, or undefined when it has none. */
+export const optionValues = (
+  options: readonly FilterFieldOption[] | undefined
+): readonly string[] | undefined => options?.map(optionValue);
+
+/**
+ * The fields as grid columns: options reduced to their stored values, so the
+ * grid engine checks and runs them. Fields with plain options are reused.
+ */
+export function toColumns<T>(fields: readonly FilterField<T>[]): readonly GridColumnDef<T>[] {
+  if (!fields.some((field) => field.options?.some((option) => typeof option !== 'string')))
+    return fields as readonly GridColumnDef<T>[];
+  return fields.map((field) =>
+    field.options ? { ...field, options: optionValues(field.options) } : field
+  ) as readonly GridColumnDef<T>[];
+}
 
 /**
  * A host operator. `id` is what the saved model stores
@@ -215,7 +248,7 @@ export function customDefault<T>(def: FilterOperatorDef<T>, field: FilterField):
     case 'boolean':
       return true;
     case 'option':
-      return (def.options ?? field.options)?.[0];
+      return def.options ? def.options[0] : optionValues(field.options)?.[0];
     case 'options':
       return [];
     case 'range':
@@ -235,7 +268,7 @@ function checkValue(
   field: FilterField,
   raw: unknown
 ): FilterValue {
-  const options = def.options ?? field.options;
+  const options = def.options ?? optionValues(field.options);
   const option = (value: unknown, name: string): string => {
     const text = boundedString(value, name, 1, 500);
     if (options && !options.includes(text))
@@ -300,7 +333,7 @@ export function catalogSchema<T>(
   fields: readonly FilterField<T>[],
   operators?: readonly FilterOperatorDef<T>[]
 ): DataSchema<FilterNode> {
-  const builtIn = filterSchemaFor(fields as readonly GridColumnDef<T>[]);
+  const builtIn = filterSchemaFor(toColumns(fields));
   if (!customized(fields, operators)) return builtIn;
   const catalog = operatorCatalog(operators);
   const byKey = new Map(fields.map((field) => [field.key, field as FilterField]));
@@ -361,7 +394,7 @@ export function compileCatalogFilter<T>(
   fields: readonly FilterField<T>[],
   operators?: readonly FilterOperatorDef<T>[]
 ): (row: T) => boolean {
-  const columns = fields as readonly GridColumnDef<T>[];
+  const columns = toColumns(fields);
   if (!customized(fields, operators)) return compileFilter<T>(model, columns);
   const root = catalogSchema(fields, operators).parse(model);
   const catalog = operatorCatalog(operators);

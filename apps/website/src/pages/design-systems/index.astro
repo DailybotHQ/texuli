@@ -1,0 +1,501 @@
+---
+/**
+ * /design-systems/ — the design systems hub (PLAN_011 T-site-0100): what a
+ * design system is, the three fictional example brands of
+ * docs/DESIGN_SYSTEMS.md applied to the same dashboard, deck slide,
+ * document page and email side by side, their conformance report and the
+ * four ways to start (the studio, `texuli ds`, the MCP and the guide).
+ *
+ * Static: no island and no client script. The brands are checked and
+ * compiled when the page is built (`checkDesignSystem`, the static half of
+ * `texuli ds check`); each preview is a server-rendered
+ * `DesignSystemProvider` scope, and the variables come from the build-time
+ * stylesheet `/design-systems/brands.css` (`designSystemStyle`). Every
+ * number in the conformance table is read from the compiler's report.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import BrandSurface from '../../components/design-systems/BrandSurface.svelte';
+import { loadBrands } from '../../components/design-systems/brands.ts';
+import { pairsLabel, ratioLabel } from '../../components/design-systems/conformance.ts';
+import { DS_STATUS, DS_SURFACES } from '../../components/design-systems/page.ts';
+import { REPOSITORY_URL, withBase } from '../../components/foundation/site.ts';
+import GuideCode from '../../components/guides/GuideCode.astro';
+import { MCP_SERVER_DATA } from '../../components/mcp-server/mcp-server-data.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { techArticleJsonLd } from '../../lib/schema.ts';
+
+const base = import.meta.env.BASE_URL;
+const link = (path: string) => withBase(base, path);
+const repo = (path: string) => safeHref(`${REPOSITORY_URL}/blob/main/${path}`, 'developer');
+
+const brands = await loadBrands();
+const title = 'Design systems';
+const description =
+  'One JSON document per brand, followed by every Texuli surface: three example brands on one dashboard, slide, document and email, their conformance, and how to start.';
+const jsonLd = techArticleJsonLd(title, description, '/design-systems/');
+
+const minimal = `{
+  "format": "texuli/design-system",
+  "formatVersion": 1,
+  "id": "harborline",
+  "version": "1.0.0",
+  "name": "Harborline",
+  "color": { "brand": { "seed": "#0e7490" } }
+}`;
+
+const cli = `texuli ds init brand.ds.json --name Harborline       # a starter document
+texuli ds validate brand.ds.json                     # stable codes and JSON paths
+texuli ds compile brand.ds.json --format css --out dist/brand.css
+texuli ds preview brand.ds.json --format svg --out review/brand.svg
+texuli ds diff brand.ds.json next.ds.json            # changed variables, contrast regressions
+texuli ds import tokens/brand.tokens.json --from dtcg --out imported.ds.json
+texuli ds export brand.ds.json --format dtcg --out tokens/brand.tokens.json
+texuli ds check brand.ds.json --render               # the conformance check`;
+
+const check = brands
+  .map((brand) => `texuli ds check examples/design-systems/${brand.id}.json`)
+  .join('\n');
+
+const dsTools = MCP_SERVER_DATA.tools.filter(
+  (tool) => tool.name.startsWith('ds.') || tool.name === 'blueprint.theme'
+);
+const prompt = MCP_SERVER_DATA.prompts.find((entry) => entry.name === 'create-design-system');
+const template = MCP_SERVER_DATA.resourceTemplates.find((entry) =>
+  entry.uriTemplate.startsWith('texuli://design-system/')
+);
+
+const guide = repo('docs/DESIGN_SYSTEMS.md');
+const checkDoc = repo('packages/tools/docs/ds-check.md');
+const opsDoc = repo('packages/tools/docs/ds.md');
+const runLabel = (variant: string | null) => (variant ? `${variant} variant` : 'Base');
+---
+
+<BaseLayout {title} {description} {jsonLd}>
+  <link rel="stylesheet" href={link('/design-systems/brands.css')} />
+  <div class="ds-hub" data-ds-hub="">
+    <header class="ds-hub__hero">
+      <p class="ds-hub__eyebrow">Design systems · new in 0.10.0</p>
+      <h1>Design systems</h1>
+      <p class="ds-hub__lead">
+        Describe a brand once, as one JSON document, and every Texuli surface follows it: components,
+        layouts, dashboards, decks, documents, email, PDF, DOCX, PPTX, canvas exports and the Kotlin
+        twin. The document is data only, so an agent can write one without emitting CSS or script,
+        and the compiler enforces contrast, focus and target-size guarantees instead of reporting
+        them.
+      </p>
+      <p class="ds-hub__status" data-ds-status="">
+        <strong>Status:</strong>
+        {DS_STATUS}
+      </p>
+      <nav class="ds-hub__toc" aria-label="On this page">
+        <ul>
+          <li><a href="#what">What a design system is</a></li>
+          <li><a href="#brands">Three brands, four surfaces</a></li>
+          <li><a href="#conformance">Conformance</a></li>
+          <li><a href="#start">Start one</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <section aria-labelledby="what">
+      <h2 id="what">What a design system is</h2>
+      <p>
+        A closed JSON document (<code>format: "texuli/design-system"</code>): identity, then optional
+        sections for color, typography, shape, space, elevation, surface, motion, layout, icons,
+        component defaults, assets, voice, accessibility targets and variants. Lengths are numbers,
+        colors are values, and nothing is raw CSS. The smallest valid document is a brand color:
+      </p>
+      <GuideCode code={minimal} label="The smallest design-system document" lang="text" />
+      <ol class="ds-hub__steps">
+        <li>
+          <strong>Validate:</strong> the spec checks the closed shape and answers with stable codes and
+          JSON paths, so a person or an agent repairs a document from the code alone.
+        </li>
+        <li>
+          <strong>Compile:</strong> concrete <code>--tx-*</code> variables per mode. Text pairs meet the
+          declared target (AA 4.5:1 or AAA 7:1), the focus ring 3:1 at 2 px or wider, and controls the
+          declared target size; the compiler refuses only what pinned colors make impossible.
+        </li>
+        <li>
+          <strong>Apply or emit:</strong> <code>DesignSystemProvider</code> or <code>applyDesignSystem</code> on any element, <code>designSystemStyle</code> for server HTML,
+          and emitters for CSS, a Tailwind preset, DTCG, Tokens Studio, email, PDF, DOCX, PPTX, canvas
+          and Kotlin tokens.
+        </li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="brands">
+      <h2 id="brands">Three brands, four surfaces</h2>
+      <p>
+        Three fictional brands from the
+        repository's <a href={repo('examples/design-systems/')}>examples/design-systems</a> folder, compiled when
+        this page was built and applied through <code>DesignSystemProvider</code>. Each surface below
+        is the same markup and the same content; only the design system changes. The previews show
+        light mode, and they ship no JavaScript.
+      </p>
+      <ul class="ds-hub__brands">
+        {
+          brands.map((brand) => (
+            <li class="ds-hub__brand" data-ds-brand={brand.id}>
+              <h3>{brand.name}</h3>
+              <p class="ds-hub__meta">
+                <code>{brand.id}@{brand.version}</code>
+                {brand.extends ? (
+                  <>
+                    {' · extends '}
+                    <code>{brand.extends}</code>
+                  </>
+                ) : null}
+                {' · seed '}
+                <code>{brand.seed}</code>
+              </p>
+              <p>{brand.character}</p>
+              <p class="ds-hub__shows">{brand.shows}</p>
+              <p class="ds-hub__links">
+                <a href={repo(`examples/design-systems/${brand.id}.json`)}>
+                  The document<span class="ds-hub__sr"> for {brand.name}</span>
+                </a>
+                {' · '}
+                <code>texuli://design-system/{brand.id}</code>
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="ds-hub__note">
+        Brand fonts are named in each document but not loaded on this site, so each preview falls back
+        along its font stack.
+      </p>
+      {
+        DS_SURFACES.map((surface) => (
+          <section class="ds-hub__surface" aria-labelledby={`surface-${surface.id}`}>
+            <h3 id={`surface-${surface.id}`}>{surface.title}</h3>
+            <p>{surface.note}</p>
+            <ul class="ds-hub__trio" data-ds-trio={surface.id}>
+              {brands.map((brand) => (
+                <li>
+                  <figure class="ds-hub__figure" data-ds-preview={`${brand.id}:${surface.id}`}>
+                    <BrandSurface compiled={brand.compiled} surface={surface.id} />
+                    <figcaption>
+                      {surface.title} under {brand.name}
+                    </figcaption>
+                  </figure>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </section>
+
+    <section aria-labelledby="conformance">
+      <h2 id="conformance">Conformance</h2>
+      <p>
+        Every number below is read from the compiler's report when this page was built,
+        through <code>checkDesignSystem</code>: the static half of <code>texuli ds check</code> (the spec's
+        validation, the <code>extends</code> chain, the compile of the document and of its
+        high-contrast variant, then the guarantees checked again over the compiled variables).
+      </p>
+      <div class="ds-hub__table" role="region" aria-labelledby="conformance-caption" tabindex="0">
+        <table data-ds-conformance="">
+          <caption id="conformance-caption">
+            Contrast pairs passing per mode, target sizes and solver moves, per brand and run
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Brand and run</th>
+              <th scope="col">Target</th>
+              <th scope="col">Light pairs</th>
+              <th scope="col">Dark pairs</th>
+              <th scope="col">Tightest text pair (light)</th>
+              <th scope="col">Control heights</th>
+              <th scope="col">Solver moves</th>
+              <th scope="col">Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              brands.flatMap((brand) =>
+                brand.conformance.runs.map((run) => {
+                  const light = run.modes.find((mode) => mode.mode === 'light');
+                  const dark = run.modes.find((mode) => mode.mode === 'dark');
+                  return (
+                    <tr data-ds-run={`${brand.id}:${run.variant ?? 'base'}`}>
+                      <th scope="row">
+                        {brand.name}, {runLabel(run.variant)}
+                      </th>
+                      <td data-ds-cell="target">
+                        {run.contrast}, {run.targetMin} px targets
+                      </td>
+                      <td data-ds-cell="light">{light ? pairsLabel(light) : 'not compiled'}</td>
+                      <td data-ds-cell="dark">{dark ? pairsLabel(dark) : 'not compiled'}</td>
+                      <td data-ds-cell="tightest">
+                        {light?.tightest ? ratioLabel(light.tightest) : 'none'}
+                      </td>
+                      <td data-ds-cell="targets">
+                        {run.targets.passed} of {run.targets.total}
+                      </td>
+                      <td data-ds-cell="adjustments">{run.adjustments}</td>
+                      <td data-ds-cell="result">{run.ok ? 'Passes' : 'Refused'}</td>
+                    </tr>
+                  );
+                })
+              )
+            }
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Pairs are text on every surface role (4.5:1 at AA, 7:1 at AAA), strong borders and inputs
+        (3:1), and the focus ring against the page and the surface (3:1). Control heights are the
+        control sizes held to the brand's target size. A solver move is a color or a size the compiler
+        changed to meet a guarantee, per mode: Tumbletown's are its control heights lifted to its 44 px
+        target and the text color on its pinned pink in dark mode.
+      </p>
+      <p>Run the same check on a brand, or on your own document:</p>
+      <GuideCode code={check} label="texuli ds check on the example brands" lang="text" />
+      <p>
+        <code>--render</code> also paints every agent-emittable catalog component under the design
+        system in headless Chromium and checks axe, the painted contrast of every pair and colors that
+        ignore the design system; CI runs it on these three brands.
+        Details: <a href={checkDoc}>texuli ds check</a>.
+      </p>
+    </section>
+
+    <section aria-labelledby="start">
+      <h2 id="start">Start one</h2>
+      <div class="ds-hub__doors">
+        <section class="ds-hub__door" aria-labelledby="start-studio">
+          <h3 id="start-studio">In the browser: the studio</h3>
+          <p>
+            Start from a seed color, a logo, a library theme or a DTCG or Tokens Studio file; edit every
+            section; preview five surfaces; read the contrast report and the diff; export every format;
+            share the document in a link. Nothing leaves the page.
+          </p>
+          <p><a href={link('/theme-studio/')}>Open the design system studio</a></p>
+        </section>
+        <section class="ds-hub__door" aria-labelledby="start-cli">
+          <h3 id="start-cli">In a terminal: texuli ds</h3>
+          <p>
+            Eight commands in <code>@texuli/tools</code>: <code>init</code>, <code>validate</code>, <code>compile</code>, <code>preview</code>, <code>diff</code>, <code>import</code>, <code>export</code> and <code>check</code>. Exit 0 when valid, 1 when refused.
+          </p>
+          <GuideCode code={cli} label="texuli ds commands" lang="text" />
+          <p><a href={opsDoc}>Every command and operation</a></p>
+        </section>
+        <section class="ds-hub__door" aria-labelledby="start-mcp">
+          <h3 id="start-mcp">With an agent: the MCP</h3>
+          <p>
+            The same operations as MCP tools, on the local server (<code
+              >{MCP_SERVER_DATA.local.launch}</code
+            >) and the remote one at <code>{MCP_SERVER_DATA.remote.url}</code>:
+          </p>
+          <ul class="ds-hub__tools" data-ds-tools="">
+            {
+              dsTools.map((tool) => (
+                <li>
+                  <code>{tool.name}</code>: {tool.title}
+                  {tool.remote ? '' : ' (local only)'}
+                </li>
+              ))
+            }
+          </ul>
+          {
+            prompt && (
+              <p>
+                The prompt <code>{prompt.name}</code> walks an agent from a brief to a validated
+                document.
+              </p>
+            )
+          }
+          {
+            template && (
+              <p>
+                The resource <code>{template.uriTemplate}</code> serves the example brands and every
+                library theme as a document.
+              </p>
+            )
+          }
+          <p><a href={link('/mcp-server/')}>Connect your agent</a></p>
+        </section>
+        <section class="ds-hub__door" aria-labelledby="start-guide">
+          <h3 id="start-guide">Read the guide</h3>
+          <p>
+            Authoring by hand or from tokens you already have, the validation codes, compile and apply,
+            patches and variants, versioning, distribution, migrating from themes, the guarantees and
+            every output.
+          </p>
+          <p><a href={guide}>The design systems guide</a></p>
+        </section>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .ds-hub {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
+  }
+  .ds-hub section {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+    min-inline-size: 0;
+  }
+  .ds-hub__hero {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .ds-hub__eyebrow {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    line-height: 1.1;
+  }
+  h2 {
+    margin: 0;
+    font-size: clamp(1.35rem, 2.6vw, 1.75rem);
+    scroll-margin-block-start: 5rem;
+  }
+  h3 {
+    margin: 0;
+    font-size: 1.125rem;
+  }
+  .ds-hub p {
+    margin: 0;
+    max-inline-size: 48rem;
+  }
+  .ds-hub__lead {
+    font-size: 1.0625rem;
+  }
+  .ds-hub__status {
+    padding: 0.6rem 0.9rem;
+    border-inline-start: 4px solid var(--tx-info, CanvasText);
+    border-radius: 0.5rem;
+    background: var(--tx-info-soft, Canvas);
+    color: var(--tx-info-soft-foreground, CanvasText);
+    font-size: 0.9375rem;
+  }
+  .ds-hub__toc ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ds-hub a {
+    color: var(--tx-link, LinkText);
+  }
+  .ds-hub__steps {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding-inline-start: 1.25rem;
+    max-inline-size: 48rem;
+  }
+  .ds-hub__brands,
+  .ds-hub__trio {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ds-hub__brand {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    padding: 1rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 1rem;
+    background: var(--tx-surface, Canvas);
+    font-size: 0.9rem;
+  }
+  .ds-hub__meta,
+  .ds-hub__links {
+    overflow-wrap: anywhere;
+  }
+  .ds-hub__shows,
+  .ds-hub__note {
+    font-size: 0.875rem;
+  }
+  .ds-hub__surface {
+    margin-block-start: 1rem;
+  }
+  .ds-hub__trio > li {
+    display: grid;
+    min-inline-size: 0;
+  }
+  .ds-hub__figure {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    gap: 0.5rem;
+    margin: 0;
+    min-inline-size: 0;
+  }
+  .ds-hub__figure figcaption {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .ds-hub__table {
+    max-inline-size: 100%;
+    overflow-x: auto;
+  }
+  .ds-hub table {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  .ds-hub caption {
+    padding-block-end: 0.5rem;
+    text-align: start;
+    font-weight: 600;
+  }
+  .ds-hub th,
+  .ds-hub td {
+    padding: 0.4rem 0.6rem;
+    border-block-end: 1px solid var(--tx-border, CanvasText);
+    text-align: start;
+    vertical-align: top;
+  }
+  .ds-hub__doors {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: 1rem;
+  }
+  .ds-hub__door {
+    align-content: start;
+    padding: 1rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 1rem;
+    background: var(--tx-surface, Canvas);
+  }
+  .ds-hub__tools {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0;
+    padding-inline-start: 1.25rem;
+    font-size: 0.875rem;
+  }
+  .ds-hub :global(pre) {
+    max-inline-size: 100%;
+    overflow-x: auto;
+  }
+  .ds-hub__sr {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+</style>

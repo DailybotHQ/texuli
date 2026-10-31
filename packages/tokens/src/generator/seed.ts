@@ -65,13 +65,15 @@ export interface ThemeFromSeedOptions {
   deriveCharts?: (palette: ChartPaletteInput, mode: ColorModeName) => ChartTokens;
 }
 
-function seedOklch(color: string, label: string): Oklch {
+/** @internal A `#rgb` / `#rrggbb` color in OKLCH (throws otherwise); shared with the design-system solver. */
+export function seedOklch(color: string, label: string): Oklch {
   const rgb = parseHex(color);
   if (!rgb) throw new TypeError(`${label} must be a #rgb or #rrggbb color, got "${color}".`);
   return rgbToOklch(rgb);
 }
 
-const hex = (l: number, c: number, h: number) =>
+/** @internal Hex from OKLCH with the lightness clamped; shared with the design-system solver. */
+export const hex = (l: number, c: number, h: number) =>
   oklchToHex({ l: Math.min(1, Math.max(0, l)), c, h });
 
 /**
@@ -79,7 +81,7 @@ const hex = (l: number, c: number, h: number) =>
  * (+1), whose color reaches `minimum` against every background. Black or
  * white always does at the end of the range.
  */
-function search(
+export function search(
   h: number,
   c: number,
   start: number,
@@ -111,7 +113,8 @@ function fill(h: number, c: number, start: number, minimum: number) {
   return { color, foreground };
 }
 
-function interactive(
+/** @internal A fill's hover, active, disabled and focus states; shared with the design-system solver. */
+export function interactive(
   color: string,
   against: string,
   disabledTowards: string,

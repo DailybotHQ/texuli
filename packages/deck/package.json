@@ -1,6 +1,6 @@
 {
   "name": "@texuli/deck",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "private": true,
   "description": "Framework-free, dependency-free deck engine for Texuli: one validated deck model generated from JSON or Markdown, layouts, steps, navigation, presenter protocol, lint and authoring.",
   "keywords": [

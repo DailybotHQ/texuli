@@ -7,6 +7,7 @@ import { type ClassValue, cx } from '../../internal/cx.ts';
 import LayoutChrome from '../host/LayoutChrome.svelte';
 import { isNavPathActive } from '../host/nav-model.ts';
 import { isNestedInMain } from '../host/nested-main.ts';
+import { DEFAULT_READING_LINE, trackActiveHeading } from './active-heading.ts';
 import {
   buildToc,
   normalizeTocEntries,
@@ -103,7 +104,7 @@ const tocItems = $derived(providedItems ?? scannedItems);
 const currentId = $derived(activeId || (tocItems[0]?.id ?? ''));
 
 /** The share of the viewport, from its top, a heading must pass to become the current one. */
-const READING_LINE = 0.3;
+const READING_LINE = DEFAULT_READING_LINE;
 
 function setActive(id: string, items: readonly TocItem[]): void {
   if (id === activeId) return;
@@ -189,28 +190,11 @@ $effect(() => {
   const keep = keepIds;
   const entries = providedItems;
 
-  const win = getOwnerWindow(target);
-  const observerWindow = win as
-    | (Window & {
-        MutationObserver?: typeof MutationObserver;
-        IntersectionObserver?: typeof IntersectionObserver;
-      })
+  const win = getOwnerWindow(target) as
+    | (Window & { MutationObserver?: typeof MutationObserver })
     | undefined;
-  const MutationObserverCtor = observerWindow?.MutationObserver ?? globalThis.MutationObserver;
-  const IntersectionObserverCtor =
-    observerWindow?.IntersectionObserver ?? globalThis.IntersectionObserver;
-  let intersection: IntersectionObserver | undefined;
-  let current: readonly TocItem[] = [];
-  const observed = (): HTMLElement[] => {
-    if (!entries) {
-      return Array.from(target.querySelectorAll<HTMLElement>('[data-tx-content-heading]'));
-    }
-    const doc = target.ownerDocument;
-    return entries.flatMap((entry) => {
-      const element = doc.getElementById(entry.id);
-      return element ? [element] : [];
-    });
-  };
+  const MutationObserverCtor = win?.MutationObserver ?? globalThis.MutationObserver;
+  let stop = () => {};
   const refresh = () => {
     let items: readonly TocItem[];
     if (entries) items = entries;
@@ -218,47 +202,23 @@ $effect(() => {
       items = collectHeadings(target, selectorLevels, keep);
       scannedItems = items as TocItem[];
     }
-    current = items;
-    if (intersection) {
-      intersection.disconnect();
-      for (const heading of observed()) intersection.observe(heading);
-    }
     const kept = untrack(() => activeId);
     if (!items.some((item) => item.id === kept)) setActive(items[0]?.id ?? '', items);
-  };
-  /**
-   * The heading being read: the last listed one (in document order) whose top
-   * passed the reading line, or the first one above them all. The observer
-   * only says when a heading crosses the line; positions are read then.
-   */
-  const track = () => {
-    const headings = observed().sort((a, b) =>
-      a === b ? 0 : a.compareDocumentPosition(b) & 4 ? -1 : 1
-    );
-    if (headings.length === 0) return;
-    const line = (win?.innerHeight ?? 0) * READING_LINE;
-    let reading = headings[0] as HTMLElement;
-    for (const heading of headings) {
-      if (heading.getBoundingClientRect().top <= line) reading = heading;
-      else break;
-    }
-    setActive(reading.id, current);
-  };
-
-  if (typeof IntersectionObserverCtor === 'function') {
-    // The band is the top 30% of the viewport: crossing its lower edge moves the reading line.
-    intersection = new IntersectionObserverCtor(track, {
-      rootMargin: `0px 0px -${100 - READING_LINE * 100}% 0px`,
-      threshold: [0, 1],
+    // The tracker (trackActiveHeading, also exported) watches the listed headings again.
+    stop();
+    stop = trackActiveHeading(target, items, {
+      readingLine: READING_LINE,
+      activeId: () => untrack(() => activeId),
+      onChange: (id) => setActive(id, items),
     });
-  }
+  };
   untrack(refresh);
   const mutation =
     typeof MutationObserverCtor === 'function' ? new MutationObserverCtor(refresh) : undefined;
   mutation?.observe(target, { childList: true, subtree: true, characterData: true });
   return () => {
     mutation?.disconnect();
-    intersection?.disconnect();
+    stop();
   };
 });
 

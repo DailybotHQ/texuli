@@ -4,9 +4,9 @@
  * toward (`development`, or `null` when the manifests are the published
  * versions). It lives as one line in docs/RELEASE.md ("Current npm status"):
  *
- *   Release line: published `0.9`
+ *   Release line: published `0.10`
  *
- * (while a version is open: published `0.9` · in development `0.10.0`)
+ * (while a version is open: published `0.10` · in development `0.11.0`)
  *
  * Tests and honesty checks read it here instead of hardcoding a version, so
  * opening or publishing a version changes one line, and every check that

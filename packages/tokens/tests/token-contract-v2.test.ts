@@ -950,7 +950,9 @@ describe('token contract v2: component registry', () => {
       JSON.parse(read('packages/texuli/package.json')).exports as Record<string, unknown>
     )
       .map((key) => key.slice(2))
-      .filter((key) => key && !['cx', 'defaults', 'motion', 'icons/lucide'].includes(key))
+      .filter(
+        (key) => key && !['cx', 'defaults', 'design-system', 'motion', 'icons/lucide'].includes(key)
+      )
       .filter((key) => !key.startsWith('layouts'));
     const subpaths = new Set(
       COMPONENT_TOKEN_FAMILIES.filter((f) => f.package === 'texuli').map((f) => f.subpath)

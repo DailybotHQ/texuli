@@ -282,6 +282,18 @@ export interface DocumentAnnotations {
   comments?: CommentThread[];
 }
 
+/**
+ * The design system a document follows (spec 0.10.0, ADR-024): exactly one
+ * of `ref` (an exact `id@x.y.z` the host resolves, or `texuli:<theme>`) and
+ * `inline` (a whole `texuli/design-system` document, bounded JSON here; its
+ * own rules are `@texuli/spec/design-system`'s, run by the reader before it
+ * compiles). Readers apply it to their root; the Markdown writer carries it in front matter, and the DOCX and PDF writers take the compiled values as `design`.
+ */
+export interface DocumentDesignSystem {
+  ref?: string;
+  inline?: { [key: string]: DocumentJson };
+}
+
 export interface TexuliDocument {
   format: 'texuli-document';
   formatVersion: 1;
@@ -289,4 +301,6 @@ export interface TexuliDocument {
   page?: PageSettings;
   blocks: DocumentBlock[];
   annotations?: DocumentAnnotations;
+  /** The design system the document follows (spec 0.10.0). */
+  designSystem?: DocumentDesignSystem;
 }

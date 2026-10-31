@@ -1,0 +1,97 @@
+{
+  "description": "A chain five deep (the cap is four).",
+  "expect": [["extends-depth", "$.extends"]],
+  "resolve": {
+    "base0@1.0.0": {
+      "format": "texuli/design-system",
+      "formatVersion": 1,
+      "id": "base0",
+      "version": "1.0.0",
+      "name": "Acme",
+      "color": {
+        "brand": {
+          "seed": "#4f46e5"
+        }
+      },
+      "extends": "base1@1.0.0"
+    },
+    "base1@1.0.0": {
+      "format": "texuli/design-system",
+      "formatVersion": 1,
+      "id": "base1",
+      "version": "1.0.0",
+      "name": "Acme",
+      "color": {
+        "brand": {
+          "seed": "#4f46e5"
+        }
+      },
+      "extends": "base2@1.0.0"
+    },
+    "base2@1.0.0": {
+      "format": "texuli/design-system",
+      "formatVersion": 1,
+      "id": "base2",
+      "version": "1.0.0",
+      "name": "Acme",
+      "color": {
+        "brand": {
+          "seed": "#4f46e5"
+        }
+      },
+      "extends": "base3@1.0.0"
+    },
+    "base3@1.0.0": {
+      "format": "texuli/design-system",
+      "formatVersion": 1,
+      "id": "base3",
+      "version": "1.0.0",
+      "name": "Acme",
+      "color": {
+        "brand": {
+          "seed": "#4f46e5"
+        }
+      },
+      "extends": "base4@1.0.0"
+    },
+    "base4@1.0.0": {
+      "format": "texuli/design-system",
+      "formatVersion": 1,
+      "id": "base4",
+      "version": "1.0.0",
+      "name": "Acme",
+      "color": {
+        "brand": {
+          "seed": "#4f46e5"
+        }
+      },
+      "extends": "base5@1.0.0"
+    },
+    "base5@1.0.0": {
+      "format": "texuli/design-system",
+      "formatVersion": 1,
+      "id": "base5",
+      "version": "1.0.0",
+      "name": "Acme",
+      "color": {
+        "brand": {
+          "seed": "#4f46e5"
+        }
+      },
+      "extends": "base6@1.0.0"
+    }
+  },
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "acme",
+    "version": "1.0.0",
+    "name": "Acme",
+    "color": {
+      "brand": {
+        "seed": "#4f46e5"
+      }
+    },
+    "extends": "base0@1.0.0"
+  }
+}

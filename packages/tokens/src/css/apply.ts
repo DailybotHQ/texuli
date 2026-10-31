@@ -103,7 +103,8 @@ function assertMode(mode: unknown): asserts mode is ColorModeName {
   if (mode !== 'light' && mode !== 'dark') throw new TypeError('Theme mode must be light or dark');
 }
 
-function fontSizes(scaleRatio: number | null): Record<string, string> {
+/** @internal The 13 font size steps for a type scale ratio; shared with the design-system compiler. */
+export function fontSizes(scaleRatio: number | null): Record<string, string> {
   return Object.fromEntries(
     FONT_SIZES.map(([step, exponent, fallback]) => [
       `--tx-font-size-${step}`,
@@ -117,7 +118,8 @@ function fontSizes(scaleRatio: number | null): Record<string, string> {
   );
 }
 
-function shadows(elevation: Theme['style']['elevation']): [string, string] {
+/** @internal The soft and float shadows of an elevation style; shared with the design-system compiler. */
+export function shadows(elevation: Theme['style']['elevation']): [string, string] {
   switch (elevation) {
     case 'flat':
       return ['none', 'none'];

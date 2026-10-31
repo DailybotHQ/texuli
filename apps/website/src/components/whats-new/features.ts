@@ -2,12 +2,12 @@
  * The features /whats-new/ showcases, grouped by the release that carries
  * them, each with its honest status, its packages, the page that shows it
  * in full and the kind of demo or preview the hub paints. Plain data, so
- * the page and its tests share one source. Releases: 0.6.0 to 0.9.0 are
- * published on npm, and 0.9.0 is `latest` (the release line in
+ * the page and its tests share one source. Releases: 0.6.0 to 0.10.0 are
+ * published on npm, and 0.10.0 is `latest` (the release line in
  * docs/RELEASE.md).
  */
 
-export type ReleaseId = '0.6.0' | '0.7.0' | '0.8.0' | '0.9.0';
+export type ReleaseId = '0.6.0' | '0.7.0' | '0.8.0' | '0.9.0' | '0.10.0';
 
 export interface Release {
   readonly id: ReleaseId;
@@ -19,9 +19,17 @@ export interface Release {
 
 export const RELEASES: readonly Release[] = [
   {
+    id: '0.10.0',
+    title: '0.10.0: design systems',
+    status: 'Published on npm as 0.10.0, the current release (pre-1.0).',
+    published: true,
+    summary:
+      'Design systems: one JSON document per brand, compiled with contrast, focus and target size enforced and followed by every surface; the Design System Studio; ds tools on the MCP and the CLI; texuli ds check; the Protoyard gaps G100 to G124; and the removal of the names deprecated in 0.9.0. Blueprint spec 0.10.0 adds the design-system document, a stamp-only migration from 0.9.0.',
+  },
+  {
     id: '0.9.0',
     title: '0.9.0: MCP, an agent-ready site and design tokens',
-    status: 'Published on npm as 0.9.0, the current release (pre-1.0).',
+    status: 'Published on npm as 0.9.0; everything in it is also in 0.10.0.',
     published: true,
     summary:
       'An MCP server for agents (remote and local), texuli.com readable by agents end to end, token contract v2 with a component tier, overlays that keep their scope, and the fixes Protoyard asked for. @texuli/mcp is a new package, first published in 0.9.0, and still in development.',
@@ -29,7 +37,7 @@ export const RELEASES: readonly Release[] = [
   {
     id: '0.8.0',
     title: '0.8.0: forms, canvas, sheets and output',
-    status: 'Published on npm as 0.8.0; everything in it is also in 0.9.0.',
+    status: 'Published on npm as 0.8.0; everything in it is also in 0.9.0 and 0.10.0.',
     published: true,
     summary:
       'Forms, data sources, the canvas, spreadsheets, dashboards, email and PDF output, and one message catalog for every label, with blueprint spec 0.8.0. @texuli/forms, @texuli/canvas and @texuli/sheets were published for the first time; all three are still in development.',
@@ -37,7 +45,7 @@ export const RELEASES: readonly Release[] = [
   {
     id: '0.7.0',
     title: '0.7.0: documents',
-    status: 'Published on npm as 0.7.0; everything in it is also in 0.8.0 and 0.9.0.',
+    status: 'Published on npm as 0.7.0; everything in it is also in 0.8.0 to 0.10.0.',
     published: true,
     summary:
       'A block document engine with collaboration, the Notion-like page editor, and documents as agent data in blueprint spec 0.7.0. @texuli/document and @texuli/pages were published for the first time; both are still in development.',
@@ -45,7 +53,7 @@ export const RELEASES: readonly Release[] = [
   {
     id: '0.6.0',
     title: '0.6.0: motion and live generation',
-    status: 'Published on npm as 0.6.0; everything in it is also in 0.7.0 to 0.9.0.',
+    status: 'Published on npm as 0.6.0; everything in it is also in 0.7.0 to 0.10.0.',
     published: true,
     summary:
       'One API contract for every component, a motion system with a closed vocabulary, and blueprints that paint while they stream, with blueprint spec 0.6.0.',
@@ -70,7 +78,13 @@ export type DemoKind =
   | 'agent-ready'
   | 'tokens'
   | 'portals'
-  | 'protoyard';
+  | 'protoyard'
+  | 'design-systems'
+  | 'ds-studio'
+  | 'ds-tools'
+  | 'ds-conformance'
+  | 'protoyard-0100'
+  | 'removals';
 
 export interface Feature {
   readonly id: DemoKind;
@@ -285,6 +299,76 @@ export const FEATURES: readonly Feature[] = [
       'Gaps a production adopter reported: dialog and command palette callbacks, date control hooks and invalid state, keyboard rows in table grids, ref and rest on every layout, a time x-axis for charts and contained toasts without a forced layout.',
     href: '/changelog/',
     linkLabel: 'The changelog',
+    demo: 'preview',
+  },
+  {
+    id: 'design-systems',
+    release: '0.10.0',
+    title: 'Design systems',
+    packages: [
+      '@texuli/spec/design-system',
+      '@texuli/tokens/design-system',
+      'texuli/design-system',
+    ],
+    summary:
+      'One JSON document per brand, followed by components, blueprints, decks, documents, email, PDF, DOCX, PPTX, canvas exports and Kotlin tokens, with contrast, focus and target size enforced by the compiler.',
+    href: '/design-systems/',
+    linkLabel: 'Three brands, four surfaces',
+    demo: 'preview',
+  },
+  {
+    id: 'ds-studio',
+    release: '0.10.0',
+    title: 'Design system studio',
+    packages: ['apps/website', '@texuli/tokens/design-system'],
+    summary:
+      'Start from a seed, a logo, a library theme or a token file, edit every section, preview five surfaces, read the contrast report and the diff, export every format and share by link, all in the browser.',
+    href: '/theme-studio/',
+    linkLabel: 'Open the studio',
+    demo: 'preview',
+  },
+  {
+    id: 'ds-tools',
+    release: '0.10.0',
+    title: 'Design system tools for agents',
+    packages: ['@texuli/tools', '@texuli/mcp'],
+    summary:
+      'ds.validate, ds.compile, ds.contrast, ds.suggest, ds.import, ds.diff, ds.preview and ds.save on the MCP and as texuli ds commands, plus the create-design-system prompt and texuli://design-system/{id}.',
+    href: '/design-systems/#start',
+    linkLabel: 'Every way to start',
+    demo: 'preview',
+  },
+  {
+    id: 'ds-conformance',
+    release: '0.10.0',
+    title: 'Conformance',
+    packages: ['@texuli/tools/ds-check'],
+    summary:
+      'texuli ds check holds a document to its guarantees with stable codes and JSON paths; --render paints the catalog under it in Chromium for axe, painted contrast and literal colors.',
+    href: '/design-systems/#conformance',
+    linkLabel: 'The example brands’ report',
+    demo: 'preview',
+  },
+  {
+    id: 'protoyard-0100',
+    release: '0.10.0',
+    title: 'More fixes from Protoyard',
+    packages: ['texuli', '@texuli/data', '@texuli/editor', '@texuli/forms', '@texuli/pages'],
+    summary:
+      'Gaps G100 to G124 a production adopter reported, among them: Markdown backslash escapes, filter builder issues and labelled options, keyboard board moves that keep focus, host-painted form fields and new field types (G113 to G121), lighter core entries for deck printing and pages (G105, G123), system token defaults without the reset (G110), dashboard nudges past wider widgets (G122) and the stateless MCP revision 2026-07-28 in part (G124).',
+    href: '/changelog/',
+    linkLabel: 'The changelog',
+    demo: 'preview',
+  },
+  {
+    id: 'removals',
+    release: '0.10.0',
+    title: 'Removed after one minor',
+    packages: ['@texuli/tools', '@texuli/blocks'],
+    summary:
+      'The seven 0.8 MCP tool names and the tree block’s style key, deprecated in 0.9.0, are gone; a call or a block that still uses one is refused with the name to send instead.',
+    href: '/mcp-server/#versions',
+    linkLabel: 'Removed names and replacements',
     demo: 'preview',
   },
 ];

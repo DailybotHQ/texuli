@@ -16,7 +16,7 @@
  */
 import { buildBotEventRequest, buildMcpEventBody } from '../../apps/website/src/lib/bot-events.ts';
 import { createMcpHandler, type McpHandler } from '../../packages/tools/src/mcp/handler.ts';
-import { MCP_SUPPORTED_PROTOCOL_VERSIONS } from '../../packages/tools/src/mcp/protocol.ts';
+import { MCP_PROTOCOL_REVISIONS } from '../../packages/tools/src/mcp/protocol.ts';
 import { REMOTE_RUNTIMES, type SiteAssets, texuliOps } from '../../packages/tools/src/ops/index.ts';
 import {
   createTokenBucket,
@@ -43,7 +43,8 @@ for (const alias of texuliOps.aliases())
 const handler: McpHandler = createMcpHandler({ mode: 'stateless', runtimes: RUNTIMES });
 const deps: McpEndpointDeps = {
   handler,
-  supportedVersions: MCP_SUPPORTED_PROTOCOL_VERSIONS,
+  // Every revision, 2026-07-28 included: the handler checks that the header agrees with _meta.
+  supportedVersions: MCP_PROTOCOL_REVISIONS,
   limiter: createTokenBucket(MCP_RATE_POLICY),
   knownOperations: servedNames,
 };

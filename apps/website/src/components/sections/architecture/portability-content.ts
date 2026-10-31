@@ -147,16 +147,15 @@ export const PORTABILITY_STEPS: readonly PortabilityStep[] = [
   },
   {
     title: 'Tokens cross',
-    body: "The web themes through the --tx-* token contract. The native side starts honest and small: TexuliTheme is a minimal token theme until texuli-tokens is generated from the spec's token roles (design §3). The values mirror the default Texuli theme's neutral roles.",
+    body: 'The web themes through the --tx-* token contract. The native side reads the same values: TexuliTheme builds its Material colors from a generated design-token set compiled from a design system (new in 0.10.0). The default is the Texuli default design system.',
     sources: [
       {
         file: TEXULI_THEME,
-        phrase:
-          "minimal token theme until texuli-tokens is generated from the spec's token roles (design §3)",
+        phrase: 'Material colors from a generated design-token',
       },
       {
         file: TEXULI_THEME,
-        phrase: "The values mirror the default Texuli theme's neutral roles",
+        phrase: 'The default is the Texuli default design system',
       },
     ],
   },

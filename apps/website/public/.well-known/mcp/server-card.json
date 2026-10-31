@@ -3,12 +3,13 @@
   "serverInfo": {
     "name": "texuli",
     "title": "Texuli MCP Server",
-    "version": "0.9.0",
+    "version": "0.10.0",
     "description": "Every Texuli operation as an MCP tool: search the component catalog, read manifests and examples, validate manifests and blueprints, search, read and preview themes, and run deck and document commands. Local over stdio (npx -y @texuli/mcp, the edge and node operations) or remote over Streamable HTTP (https://texuli.com/mcp, the edge operations plus the site operations that list, read and search texuli.com's pages as Markdown). Read-only: nothing is stored, fetched from the network or modified.",
     "documentation": "https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/mcp.md"
   },
   "protocolVersion": "2025-11-25",
   "protocolVersions": ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"],
+  "statelessProtocolVersions": ["2026-07-28"],
   "transport": {
     "streamableHttp": {
       "url": "https://texuli.com/mcp",
@@ -74,7 +75,16 @@
     {
       "name": "blueprint.validate",
       "title": "Validate a blueprint draft",
-      "description": "Validate a blueprint draft (a catalog tree, an array of trees, or a texuli-blueprint envelope, migrated first) with the catalog's draft checks: structure, sinks, tree limits, component ids, tiers and prop schemas, deep block and document schemas, grammar and the frame root. Returns valid, status, tier, migratedFrom and diagnostics with the catalog's stable codes.",
+      "description": "Validate a blueprint draft (a catalog tree, an array of trees, or a texuli-blueprint envelope, migrated first) with the catalog's checks: structure, sinks, tree limits, component ids, tiers, prop, block and document schemas, the envelope's designSystem (codes under $.designSystem), grammar and the frame root. Returns valid, status, tier, migratedFrom and diagnostics with stable codes.",
+      "runtime": "edge",
+      "remote": true,
+      "local": true,
+      "readOnly": true
+    },
+    {
+      "name": "blueprint.theme",
+      "title": "Apply a design system to a blueprint",
+      "description": "Set a blueprint envelope's designSystem to a reference ({ ref: \"acme@2.1.0\" } or a library theme \"texuli:ocean\") or an inline document, wrapping a bare tree in a draft envelope first, then validate the result as blueprint.validate does; an inline document is also compiled for the contrast, focus and target guarantees. Returns valid, the themed blueprint and diagnostics with stable codes.",
       "runtime": "edge",
       "remote": true,
       "local": true,
@@ -124,6 +134,78 @@
       "remote": true,
       "local": true,
       "readOnly": true
+    },
+    {
+      "name": "ds.validate",
+      "title": "Validate a design system",
+      "description": "Validate a design-system document: the spec's closed schema, the extends chain, then a compile of the document and its high-contrast variant with the guarantees enforced (text contrast, focus ring, target size). Returns valid, the distinct codes, every error with its JSON path and hint, the compiler warnings and the hash.",
+      "runtime": "edge",
+      "remote": true,
+      "local": true,
+      "readOnly": true
+    },
+    {
+      "name": "ds.compile",
+      "title": "Compile a design system",
+      "description": "Compile a design-system document to concrete --tx-* variables per mode and emit one format: compiled JSON, scoped CSS, a Tailwind preset, DTCG or Tokens Studio. Returns valid, the format, its media type, the content as text, the hash and warnings; a refused document returns errors with stable codes instead.",
+      "runtime": "edge",
+      "remote": true,
+      "local": true,
+      "readOnly": true
+    },
+    {
+      "name": "ds.contrast",
+      "title": "Report design-system contrast",
+      "description": "Compile a design-system document and report every contrast pair the guarantees check, per mode: foreground and background roles, kind (text, ui, focus), ratio, requirement and pass, plus the solver adjustments. Returns valid, the target (AA or AAA), targetMin and the per-mode pairs, or errors with stable codes.",
+      "runtime": "edge",
+      "remote": true,
+      "local": true,
+      "readOnly": true
+    },
+    {
+      "name": "ds.suggest",
+      "title": "Suggest a design system",
+      "description": "Suggest a starting design-system document from one seed color, up to three brand colors (seed, secondary, accent) or a logo as RGBA pixels (the dominant colors pick the seed). Returns valid, the document, the dominant palette for pixels, the key tokens of each mode and warnings.",
+      "runtime": "edge",
+      "remote": true,
+      "local": true,
+      "readOnly": true
+    },
+    {
+      "name": "ds.import",
+      "title": "Import a design system",
+      "description": "Turn what a team already has into a valid design-system document: a brand one-liner (\"brand #4f46e5, font Inter, rounded, compact\"), a W3C DTCG file, a Tokens Studio file, a flat role palette or a Texuli theme (an object, or a library theme id). Returns valid, the document and warnings for every value it dropped, or errors with stable codes.",
+      "runtime": "edge",
+      "remote": true,
+      "local": true,
+      "readOnly": true
+    },
+    {
+      "name": "ds.diff",
+      "title": "Diff two design systems",
+      "description": "Compile two design-system documents (before is the baseline) and compare them: every added, removed or changed --tx-* variable per mode, contrast pairs that regressed below the target, changed component defaults and attributes. Returns valid, identical, the summary counts and each list, or errors tagged with their side.",
+      "runtime": "edge",
+      "remote": true,
+      "local": true,
+      "readOnly": true
+    },
+    {
+      "name": "ds.preview",
+      "title": "Preview a design system",
+      "description": "Render a static, deterministic snapshot of a compiled design system: svg (swatches, a button and a card per mode) or html (the review report: swatches, type ramp, component sheet, contrast table and adjustments). Fixed fonts, no time, no scripts; every value escaped. Returns valid, the format, media type, content and hash.",
+      "runtime": "edge",
+      "remote": true,
+      "local": true,
+      "readOnly": true
+    },
+    {
+      "name": "ds.save",
+      "title": "Save a design system to a file",
+      "description": "Validate a design-system document (as ds.validate does) and write it as two-space JSON to the explicit .json path you pass, inside the working directory: traversal, symlinks, dot directories and dotfiles, node_modules, package.json and an existing file without overwrite are refused. Local doors only. Returns saved, the relative path and bytes written, or errors with stable codes.",
+      "runtime": "node",
+      "remote": false,
+      "local": true,
+      "readOnly": false
     },
     {
       "name": "deck.run",
@@ -180,48 +262,42 @@
       "readOnly": true
     }
   ],
-  "deprecatedTools": [
+  "deprecatedTools": [],
+  "removedTools": [
     {
       "name": "deck",
       "replacedBy": ["deck.run"],
-      "removeIn": "0.10.0",
-      "remote": true
+      "removedIn": "0.10.0"
     },
     {
       "name": "document",
       "replacedBy": ["document.run", "document.export"],
-      "removeIn": "0.10.0",
-      "remote": false
+      "removedIn": "0.10.0"
     },
     {
       "name": "catalog",
       "replacedBy": ["catalog.search"],
-      "removeIn": "0.10.0",
-      "remote": true
+      "removedIn": "0.10.0"
     },
     {
       "name": "component",
       "replacedBy": ["component.get"],
-      "removeIn": "0.10.0",
-      "remote": true
+      "removedIn": "0.10.0"
     },
     {
       "name": "validate",
       "replacedBy": ["catalog.validate"],
-      "removeIn": "0.10.0",
-      "remote": true
+      "removedIn": "0.10.0"
     },
     {
       "name": "example",
       "replacedBy": ["example.search"],
-      "removeIn": "0.10.0",
-      "remote": true
+      "removedIn": "0.10.0"
     },
     {
       "name": "theme",
       "replacedBy": ["theme.search", "theme.get"],
-      "removeIn": "0.10.0",
-      "remote": true
+      "removedIn": "0.10.0"
     }
   ]
 }

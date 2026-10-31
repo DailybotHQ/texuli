@@ -20,6 +20,7 @@ stack.
   page: { size: 'a4', orientation: 'portrait' },   // optional
   blocks: [ /* DocumentBlock[] */ ],
   annotations: { comments: [ /* CommentThread[] */ ] },  // optional
+  designSystem: { ref: 'acme@2.1.0' },                   // optional, spec 0.10.0
 }
 ```
 
@@ -42,6 +43,19 @@ stack.
 - `DocumentAnnotations`: `CommentThread`s, each with a `CommentAnchor` (a
   block id, optionally a UTF-16 range of its text), a quoted text, a status
   and `CommentMessage`s. A thread whose block is gone is kept as orphaned.
+- `DocumentDesignSystem` (from spec 0.10.0, new in `0.10.0`): the design system the document follows, exactly one of
+  `ref` (an exact `id@x.y.z` the host resolves, or `texuli:<theme>`; the
+  grammar is `DESIGN_SYSTEM_REF_PATTERN` from `@texuli/document/schema`, the same as the blueprint's
+  `$defs.designSystemReference`) and `inline` (a whole
+  `texuli/design-system` document). `@texuli/document/schema` checks the
+  shape, the ref grammar and bounded, single-line JSON (depth 16, no
+  control or bidi characters); the design-system rules themselves run in
+  the reader (`@texuli/pages/reader`), which validates and compiles the
+  document before it applies it. The Markdown writer carries it in front
+  matter, losslessly ([markdown.md](markdown.md#design-system-front-matter)),
+  and the DOCX and PDF writers apply it as `design` values the caller
+  compiles, reporting `design-system-unapplied` when none are given
+  ([pdf.md](pdf.md#design-systems)).
 
 ## Blocks
 

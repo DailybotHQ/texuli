@@ -22,8 +22,8 @@ export interface FilterBuilderContext {
   /** Deepest group level the builder offers (the root is 1). */
   maxDepth: number;
   disabled: boolean;
-  /** Issue text by path key (`r-0-2`). */
-  issues: ReadonlyMap<string, string>;
+  /** Issue messages by condition path key (`r-0-2`): the builder's own, then the host's. */
+  issues: ReadonlyMap<string, readonly string[]>;
   act: (action: FilterAction) => void;
 }
 

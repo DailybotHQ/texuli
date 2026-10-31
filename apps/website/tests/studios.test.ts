@@ -692,7 +692,7 @@ describe('tool keys: scope (WCAG 2.1.4)', () => {
   describe('tool islands', () => {
     const islands = [
       'playground/PlaygroundApp.svelte',
-      'theme-studio/ThemeStudio.svelte',
+      'theme-studio/DesignSystemStudio.svelte',
       'color-explorer/ColorExplorer.svelte',
     ];
     it('every tool island scopes its shortcuts to its own root', () => {
@@ -710,49 +710,30 @@ describe('tool keys: scope (WCAG 2.1.4)', () => {
   });
 });
 
-describe('theme studio label in name', () => {
+describe('design system studio label in name', () => {
   /**
-   * T-88 (routed from the T-90 screen-reader pass): WCAG 2.5.3 Label in Name
-   * for the theme studio. Every labelled field whose control carries its own
-   * `aria-label` must have a name that contains the visible label text, so a
-   * speech-input user can say what they see ("click Color for light mode").
+   * T-88 (routed from the T-90 screen-reader pass), carried into the design
+   * system studio (PLAN_011 T-ds-studio): WCAG 2.5.3 Label in Name. Every
+   * text field and select is named by a visible <label for>, never by an
+   * aria-label that could drift from what a speech-input user sees.
    */
+  const dir = join(import.meta.dirname, '..', 'src', 'components', 'theme-studio');
+  const island = readFileSync(join(dir, 'DesignSystemStudio.svelte'), 'utf8');
+  const field = readFileSync(join(dir, 'StudioField.svelte'), 'utf8');
 
-  const source = readFileSync(
-    join(import.meta.dirname, '..', 'src', 'components', 'theme-studio', 'ThemeStudio.svelte'),
-    'utf8'
-  );
-
-  /** `<label class="field">` blocks: the visible label text and the control's aria-label. */
-  function labelledFields(): Array<{ visible: string; name: string }> {
-    const fields: Array<{ visible: string; name: string }> = [];
-    for (const match of source.matchAll(/<label class="field[^"]*">([\s\S]*?)<\/label>/g)) {
-      const block = match[1] ?? '';
-      const visible = /<span class="field__label"[^>]*>([^<]+)<\/span>/.exec(block)?.[1];
-      const name =
-        /aria-label="([^"]+)"/.exec(block)?.[1] ?? /aria-label=\{`([^`]+)`\}/.exec(block)?.[1];
-      if (visible && name) fields.push({ visible: visible.trim(), name: name.trim() });
+  it('labels every control of the island with a visible <label for>', () => {
+    const ids = [...island.matchAll(/<(?:Input|Textarea|select|input)\b[^>]*?\sid="([^"]+)"/g)].map(
+      (match) => match[1]
+    );
+    expect(ids.length).toBeGreaterThanOrEqual(10);
+    for (const id of ids) {
+      expect(island, id).toMatch(new RegExp(`<label[^>]*for="${id}"`));
     }
-    return fields;
-  }
+  });
 
-  /** Svelte `{expr}` and template `${expr}` placeholders compare as one token. */
-  function normalize(text: string): string {
-    return text
-      .replace(/\$?\{[^}]+\}/g, '<x>')
-      .replace(/\s+/g, ' ')
-      .toLowerCase();
-  }
-
-  describe('theme studio label in name (WCAG 2.5.3)', () => {
-    const fields = labelledFields();
-
-    it('names every labelled field with its visible label', () => {
-      expect(fields.length).toBeGreaterThanOrEqual(5);
-      for (const { visible, name } of fields) {
-        expect(normalize(name), `"${visible}" (name: "${name}")`).toContain(normalize(visible));
-      }
-    });
+  it('names every generated field by its visible label', () => {
+    expect(field).toMatch(/<label class="field__label" for=\{id\}>/);
+    expect(field).not.toMatch(/aria-label=\{spec\.label\}/);
   });
 });
 
@@ -786,7 +767,11 @@ describe('studio trust voice', () => {
         'Nothing here executes agent HTML or loads remote code.'
       );
       for (const file of [
-        'apps/website/src/components/theme-studio/ThemeStudio.svelte',
+        'apps/website/src/components/theme-studio/DesignSystemStudio.svelte',
+        'apps/website/src/components/theme-studio/StudioField.svelte',
+        'apps/website/src/components/theme-studio/StudioPreviews.svelte',
+        'apps/website/src/components/theme-studio/StudioReport.svelte',
+        'apps/website/src/components/theme-studio/ComponentsEditor.svelte',
         'apps/website/src/components/playground/PlaygroundApp.svelte',
         'apps/website/src/components/builder/BuilderApp.svelte',
         'apps/website/src/components/color-explorer/ColorExplorer.svelte',

@@ -1,0 +1,122 @@
+{
+  "format": "texuli-blueprint",
+  "version": 1,
+  "catalog": "48d6231182dcdb62ed2c8816ff3f620ae9b9683612403dc7e3db00ad85ad893a",
+  "status": "draft",
+  "createdAt": "2026-10-30T09:00:00Z",
+  "updatedAt": "2026-10-30T09:00:00Z",
+  "generator": {
+    "kind": "agent",
+    "name": "Harbor assistant",
+    "model": "example-model"
+  },
+  "tier": "untrusted",
+  "profile": "web",
+  "spec": "0.10.0",
+  "id": "brand-deck-2026-10-30",
+  "designSystem": {
+    "inline": {
+      "format": "texuli/design-system",
+      "formatVersion": 1,
+      "id": "harbor",
+      "version": "1.2.0",
+      "name": "Harbor",
+      "description": "A fictional brand for the conformance fixtures.",
+      "color": {
+        "brand": {
+          "seed": "#0f766e",
+          "neutral": "slate"
+        }
+      },
+      "typography": {
+        "families": {
+          "sans": {
+            "stack": ["Harbor Sans", "system-ui", "sans-serif"]
+          }
+        }
+      },
+      "shape": {
+        "radius": 10
+      },
+      "space": {
+        "density": 0.9
+      },
+      "components": {
+        "button": {
+          "radius": "full",
+          "defaults": {
+            "variant": "default",
+            "size": "md"
+          }
+        }
+      },
+      "accessibility": {
+        "contrast": "AA",
+        "targetMin": 24
+      }
+    }
+  },
+  "tree": {
+    "id": "layout-deck",
+    "props": {
+      "title": "Harbor planning, 2026-10-30"
+    },
+    "children": [
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Agenda"
+        },
+        "children": [
+          {
+            "id": "blocks-text",
+            "props": {
+              "block": {
+                "type": "list",
+                "items": [
+                  {
+                    "text": "Progress"
+                  },
+                  {
+                    "text": "Risks"
+                  },
+                  {
+                    "text": "Decisions"
+                  }
+                ],
+                "ordered": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Since Tuesday"
+        },
+        "children": [
+          {
+            "id": "blocks-data",
+            "props": {
+              "block": {
+                "type": "stat",
+                "items": [
+                  {
+                    "label": "Items closed",
+                    "value": "12"
+                  },
+                  {
+                    "label": "Blocked",
+                    "value": "1",
+                    "tone": "warning"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

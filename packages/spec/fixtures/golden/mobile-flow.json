@@ -24,7 +24,7 @@
     "kind": "request",
     "label": "Workshop sign-up requested in chat"
   },
-  "spec": "0.9.0",
+  "spec": "0.10.0",
   "state": {
     "fullName": {
       "type": "string",

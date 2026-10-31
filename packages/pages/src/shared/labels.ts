@@ -13,6 +13,8 @@ export interface PagesLabels {
   breadcrumb: string;
   /** The reader's headings outline. */
   outline: string;
+  /** Shown when the document's design system (spec 0.10.0) is not resolved or is refused. */
+  designSystemRefused: string;
   /** A block type's spoken name (`paragraph` → "Paragraph"). */
   blockType: (type: DocumentBlockType, detail?: string) => string;
   /** The drag handle's name: block type and a short excerpt. */
@@ -38,6 +40,8 @@ export interface PagesLabels {
   refused: string;
   embedLoading: string;
   embedUnavailable: (kind: EmbedKind) => string;
+  /** An embed that needs the player where the host turned live embeds off (no `loadPlayer`, G123). */
+  embedOff: (kind: EmbedKind) => string;
   blockRefused: string;
   mediaFallback: (alt: string) => string;
   /** Todo items in the reader. */
@@ -86,6 +90,7 @@ export const DEFAULT_PAGES_LABELS: PagesLabels = {
   reader: 'Page',
   breadcrumb: 'Breadcrumb',
   outline: 'On this page',
+  designSystemRefused: 'The design system could not be applied. Showing the default theme.',
   blockType: (type, detail) => (detail ? `${TYPE_NAMES[type]} ${detail}` : TYPE_NAMES[type]),
   handle: (type, excerpt) => (excerpt ? `${type}: ${excerpt}` : type),
   handleHelp:
@@ -113,6 +118,7 @@ export const DEFAULT_PAGES_LABELS: PagesLabels = {
   embedLoading: 'Loading the embed',
   embedUnavailable: (kind) =>
     `${EMBED_NAMES[kind]} embeds are not available here yet; the reference is kept.`,
+  embedOff: (kind) => `${EMBED_NAMES[kind]} embeds are not shown here; the embed is kept.`,
   blockRefused: 'This block was refused: it did not pass validation.',
   mediaFallback: (alt) => (alt ? `Image: ${alt}` : 'Image unavailable'),
   done: 'Done',

@@ -6,6 +6,7 @@ import type { DocumentBlock, DocumentBlockId } from '@texuli/document/model';
 import { Sortable } from '@texuli/primitives/sortable';
 import { untrack } from 'svelte';
 import EmbedView from '../shared/EmbedView.svelte';
+import { loadHostSlot } from '../shared/host-slot.ts';
 import MediaView from '../shared/MediaView.svelte';
 import PageLinkView from '../shared/PageLinkView.svelte';
 import WrappedBlockView from '../shared/WrappedBlockView.svelte';
@@ -91,6 +92,8 @@ function onCalloutTitle(event: Event & { currentTarget: HTMLInputElement }): voi
 const placeholder = $derived(
   block.type === 'paragraph' && block.content.length === 0 ? labels.slashFilter : undefined
 );
+/** The library's views, for the lazy host slot. */
+const views = { WrappedBlockView, EmbedView };
 </script>
 
 <Sortable.Item
@@ -181,6 +184,21 @@ const placeholder = $derived(
         onNavigate={context.onNavigate}
         pageHref={context.pageHref}
       />
+    {:else if (block.type === 'block' || block.type === 'embed') && context.painter()}
+      {#await loadHostSlot() then HostSlot}
+        <HostSlot
+          node={block}
+          {views}
+          painter={context.painter()}
+          {labels}
+          resolveEmbed={context.resolveEmbed}
+          deckHost={context.deckHost}
+          reducedMotion={context.motion() === false}
+          loadPlayer={context.loadPlayer()}
+        />
+      {:catch}
+        <p class="tx-pages-notice" role="note">{block.type === 'block' ? labels.blockRefused : labels.refused}</p>
+      {/await}
     {:else if block.type === 'block'}
       <WrappedBlockView node={block} refusedLabel={labels.blockRefused} loadingLabel={labels.embedLoading} />
     {:else if block.type === 'embed'}
@@ -190,6 +208,7 @@ const placeholder = $derived(
         resolveEmbed={context.resolveEmbed}
         deckHost={context.deckHost}
         reducedMotion={context.motion() === false}
+        loadPlayer={context.loadPlayer()}
       />
     {/if}
   </div>

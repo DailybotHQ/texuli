@@ -57,6 +57,7 @@ with the [schema kit](schema.md).
 | `navigation` | object | Optional. `start` (a visible slide id), `loop` (default `false`), `autoSlideMs` (`0` is off, otherwise 1,000 to 600,000). |
 | `outline` | object | Optional. `title` (120) and 1 to 200 `sections`; each section has an `id`, an optional `title` (120), 1 to 200 `slideIds` and an optional `stack: true` (a vertical stack). |
 | `slides` | array | Required. 1 to 200 slides, told apart by `layout`. |
+| `designSystem` | object | Optional (from `0.10.0`). The design system the deck follows; see [Design systems](#design-systems). |
 
 Lengths count Unicode code points. Single-line strings are trimmed and
 refuse control, line-break and bidi-override characters; notes and code are
@@ -319,6 +320,45 @@ The tables behind the variables: `DECK_DENSITY_SCALE` (0.875, 1, 1.125,
 two-field form of the transition rule (the full resolver is
 `resolveSlideTransition`, below).
 
+## Design systems
+
+> **New in `0.10.0`.**
+
+A deck may name the design system it follows
+([ADR-024](../../../docs/DECISIONS.md#adr-024-design-systems-on-every-surface)),
+with the same shape as a blueprint envelope's `designSystem` and a
+document's (schema `deckDesignSystem`, type `DeckDesignSystem`):
+
+```jsonc
+{ "formatVersion": 2, "meta": { "title": "Harbor review" },
+  "designSystem": { "ref": "acme@2.1.0" },       // the host resolves it
+  // or: "designSystem": { "inline": { "format": "texuli/design-system", … } }
+  "slides": [ /* … */ ] }
+```
+
+- **Closed:** exactly one of `ref` and `inline`; any other key is
+  `unknown-key`, both or neither is `design-system`.
+- **`ref`:** an exact `id@x.y.z` (an optional prerelease) or
+  `texuli:<theme>` (a library theme), at most 200 characters, matching
+  `DECK_DESIGN_SYSTEM_REF_PATTERN`: the blueprint's
+  `$defs.designSystemReference.ref` grammar (a test compares them). A range,
+  a URL or a path is `pattern`.
+- **`inline`:** a JSON object bounded by `DECK_DESIGN_SYSTEM_LIMITS`
+  (depth 16, 200 keys, 64 items, 360,000-code-point single-line strings);
+  anything else is `design-system` (`DESIGN_SYSTEM_CODES`).
+
+This L0 model checks the shape only. The design-system rules (AA contrast,
+URL tiers, the closed vocabulary) run where the document is compiled: the
+`@texuli/slides` stage resolves a `ref` through the host's `designSystems`
+resolver (never a fetch), compiles lazily and applies the result to the
+stage root ([stage](../../slides/docs/stage.md#design-systems)). A host can
+also run `checkDesignSystemReference` from `@texuli/spec/design-system`
+ahead of time. `style.theme` still applies: the design system's tokens
+apply over it on the stage root. Migration carries a top-level
+`designSystem` from every earlier shape unchanged, and deck Markdown holds
+a `ref` in the `designSystem` frontmatter key
+([markdown](markdown.md#frontmatter)); an inline document stays in JSON.
+
 ## Backgrounds
 
 `style.background` and `slides[].background` (schema `deckBackground`, type
@@ -564,7 +604,8 @@ number. `DECK_SOURCES` (type `DeckSource`):
 
 `DeckMigration` holds the v2 `deck` (unvalidated: pass it to `parseDeck`), the
 `from` source and the `issues`: every judgement call is a `migrated`
-warning. Migration is pure, idempotent and never throws. Lifting a free
+warning. A top-level `designSystem` on any earlier shape is carried over
+unchanged (`parseDeck` checks it). Migration is pure, idempotent and never throws. Lifting a free
 slide's master to a catalog layout is a lint suggestion (`prefer-layout`),
 never done here.
 
@@ -609,6 +650,7 @@ to `DeckCode`, the keys of `DECK_CODES`; `DeckCodeInfo` is one row
 | `unknown-theme-kind` | error | style | A theme reference `kind` is not catalog, embedded or seed. |
 | `embedded-theme` | error | style | An embedded theme is not an object. |
 | `unknown-theme` | warning | style | The catalog theme id is unknown to the host; default used. |
+| `design-system` | error | style | A design system names neither or both of `ref` and `inline`, or its inline document is not an object. |
 | `unknown-font-pair` | warning | style | The font pairing is unknown to the host; theme font used. |
 | `unknown-code-theme` | warning | style | The code theme is unknown to the host; default used. |
 | `duplicate-id` | error | cross-field | A slide or section id is used twice. |

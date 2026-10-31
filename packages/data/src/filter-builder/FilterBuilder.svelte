@@ -14,6 +14,7 @@ import {
   changeValue,
   emptyFilter,
   type FilterField,
+  type FilterPath,
   filterIssues,
   nodeAt,
   removeAt,
@@ -39,6 +40,14 @@ interface Props {
   maxDepth?: number;
   disabled?: boolean;
   labels?: Partial<FilterBuilderLabels>;
+  /**
+   * Problems the host found (a server check, a quota, a conflict), each on the
+   * condition at `path` (child indexes from the root, as in `filterIssues`).
+   * They show after the builder's own issue for that condition and mark its
+   * value control (its operator when it takes no value) with `aria-invalid`
+   * and an `aria-describedby` message. Paths that are not a condition are ignored.
+   */
+  issues?: readonly { path: FilterPath; message: string }[];
   class?: ClassValue;
 }
 
@@ -51,6 +60,7 @@ let {
   maxDepth = 3,
   disabled = false,
   labels,
+  issues: hostIssues = [],
   class: className,
 }: Props = $props();
 
@@ -59,11 +69,18 @@ const text = $derived(resolveFilterBuilderLabels(labels));
 let root: HTMLDivElement | undefined = $state();
 let announcement = $state('');
 
-const issues = $derived(
-  new Map(
-    filterIssues(value, fields, operators).map((issue) => [pathKey(issue.path), issue.message])
-  )
-);
+/** Messages by condition path key: the builder's own issue first, then the host's. */
+const issues = $derived.by(() => {
+  const byKey = new Map<string, string[]>();
+  const add = (path: FilterPath, message: string) => {
+    if (message === '' || nodeAt(value, path)?.type !== 'condition') return;
+    const key = pathKey(path);
+    byKey.set(key, [...(byKey.get(key) ?? []), message]);
+  };
+  for (const issue of filterIssues(value, fields, operators)) add(issue.path, issue.message);
+  for (const issue of hostIssues) add(issue.path, issue.message);
+  return byKey as ReadonlyMap<string, readonly string[]>;
+});
 
 /** Focus after a change: a key from `data-filter-focus`, else the nearest group's add button. */
 async function focusAfter(target: string): Promise<void> {

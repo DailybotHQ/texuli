@@ -23,6 +23,12 @@ cacheAppearance('billing', applied);
 const scriptBody = noFlashScript('billing', 'system');
 ```
 
+A compiled design system caches the same way:
+`cacheAppearance(namespace, designSystemAppearance(compiled, { mode }))`
+(`@texuli/tokens/design-system/apply`, from `0.10.0`) replays the variables
+`applyDesignSystem` writes, byte for byte
+([design-system-runtime.md](design-system-runtime.md)).
+
 The generated body has no `<script>` wrapper, is deterministic for a given
 namespace and fallback, and can be hashed for a CSP `script-src` directive.
 It replays only custom properties with `--tx-` names and rejects values with

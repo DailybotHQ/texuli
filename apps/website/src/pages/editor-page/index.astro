@@ -28,8 +28,8 @@ const builderHref = `${base.replace(/\/+$/, '')}/builder/`;
   <p class="lead">
     <code>@texuli/editor</code> edits rich text over a closed document model: every node and mark
     renders through owned components, links pass the URL policy, and Markdown goes in and out. The
-    package is in development and on npm as <code>0.9.0</code> (first released in
-    <code>0.5.0</code>, pre-1.0).
+    package is in development and on npm as <code>0.10.0</code> (first released
+    in <code>0.5.0</code>, pre-1.0).
   </p>
 
   <nav class="toc" aria-label="On this page">
@@ -46,8 +46,8 @@ const builderHref = `${base.replace(/\/+$/, '')}/builder/`;
   <section aria-labelledby="try-the-editor">
     <h2 id="try-the-editor">Try the editor</h2>
     <p>
-      A live <code>RichTextEditor</code>. The document loads from Markdown at the
-      <code>untrusted</code> tier, and the Markdown it saves as updates below it. It follows this
+      A live <code>RichTextEditor</code>. The document loads from Markdown at
+      the <code>untrusted</code> tier, and the Markdown it saves as updates below it. It follows this
       site's light or dark mode; the editor has no motion to reduce.
     </p>
     <ul class="keys">
@@ -97,8 +97,7 @@ const builderHref = `${base.replace(/\/+$/, '')}/builder/`;
       The <a href={builderHref}>blueprint builder</a> edits the Markdown fields of text blocks (text,
       quote and callout body) with this editor. The field still stores Markdown: the editor reads it,
       reports what it could not keep, and writes the Markdown back on each edit. Text edits join one
-      labeled undo step in the builder history, and <kbd>Ctrl</kbd> or <kbd>Cmd</kbd> +
-      <kbd>Z</kbd> inside the editor undoes text first.
+      labeled undo step in the builder history, and <kbd>Ctrl</kbd> or <kbd>Cmd</kbd> + <kbd>Z</kbd> inside the editor undoes text first.
     </p>
   </section>
 

@@ -23,10 +23,10 @@ end to end and native for agents:
   twin in `native/`.
 
 **Status: in development, pre-1.0.** All 26 published packages (all of
-`packages/` except `@texuli/examples`) are released on npm in the 0.9 line,
-every one at `0.9.0`, which the publish workflow publishes from `main`
-after the merge and points `latest` and `next` to; `@texuli/mcp` is
-published for the first time in `0.9.0` (the 0.8 line had 25 packages),
+`packages/` except `@texuli/examples`) are released on npm in the 0.10 line,
+every one at `0.10.0`, which the publish workflow publishes from `main`
+after the merge and points `latest` and `next` to; `0.10.0` adds design
+systems (one JSON document per brand, [DESIGN_SYSTEMS](docs/DESIGN_SYSTEMS.md)),
 and `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/editor`,
 `@texuli/document`, `@texuli/pages`, `@texuli/forms`, `@texuli/canvas`,
 `@texuli/sheets` and `@texuli/mcp` are still in development
@@ -47,6 +47,7 @@ Functions in `functions/`. See
 | Architecture | [ARCHITECTURE](docs/ARCHITECTURE.md) | The down-only layer graph (L0 core and spec … L8 tools and astro, L9 mcp), every package and subpath, engines, the website, build and test shape |
 | Decisions | [DECISIONS](docs/DECISIONS.md) | Architecture decisions: options, choice, why, how to reverse |
 | Design language | [DESIGN_LANGUAGE](docs/DESIGN_LANGUAGE.md) · [EDITOR_ARCHITECTURE](docs/EDITOR_ARCHITECTURE.md) | The cross-surface visual contract; the rich text editor's contracts (ADR-003) |
+| Design systems | [DESIGN_SYSTEMS](docs/DESIGN_SYSTEMS.md) | One JSON document per brand: author, import, validate (codes), compile, apply, patches and variants, distribute, guarantees, conformance, outputs; example brands in `examples/design-systems/` (released in `0.10.0`) |
 | Standards | [STANDARDS](docs/STANDARDS.md) | TypeScript, Svelte 5, Biome, CSS logical properties, naming, a11y, honesty |
 | Testing | [TESTING_GUIDE](docs/TESTING_GUIDE.md) | Every gate with verified results, source→test map, blind spots, posture |
 | Commands | [DEVELOPMENT_COMMANDS](docs/DEVELOPMENT_COMMANDS.md) | Every root and package script, scoped variants |
@@ -74,8 +75,8 @@ texuli/
 ├── packages/            layers point down only (scripts/check-layers.ts)
 │   ├── core/            L0 @texuli/core: texels (overlay engine, roving, positioning, URL policy…)  (README, docs/)
 │   ├── date/            L0 @texuli/date: Gregorian date arithmetic and locale week starts      (README)
-│   ├── deck/            L0 @texuli/deck: deck model v2 from JSON or Markdown, engine, authoring (in development, on npm as 0.9.0) (README, docs/)
-│   ├── drag/            L0 @texuli/drag: framework-free drag engine (in development, on npm as 0.9.0) (README, docs/)
+│   ├── deck/            L0 @texuli/deck: deck model v2 from JSON or Markdown, engine, authoring (in development, on npm as 0.10.0) (README, docs/)
+│   ├── drag/            L0 @texuli/drag: framework-free drag engine (in development, on npm as 0.10.0) (README, docs/)
 │   ├── primitives/      L1 @texuli/primitives: 42 owned headless primitives, APG patterns      (README, docs/)
 │   ├── document/        L1 @texuli/document: block document engine, ops, Markdown, CRDT sync (in development, on npm since 0.7.0) (README, docs/)
 │   ├── tokens/          L2 @texuli/tokens: OKLCH theme engine, --tx-* contract, 200+ themes, CSS (README, docs/)
@@ -119,6 +120,7 @@ texuli/
 ├── scripts/             check-layers, check-skill, size, visual, packages, supply-chain (+ tests/)
 ├── docs/                the guides above, plus docs/quality/
 ├── brand/               logos and favicons
+├── examples/design-systems/  fictional example brands (design-system documents; docs/DESIGN_SYSTEMS.md)
 ├── .agents/             skills, agents, commands (.claude and .cursor symlink here)
 ├── .review/extension.md repo rules for the AI Diff Reviewer local review
 ├── .dwp/                Deep Work Plans (git-ignored, except config.json)
@@ -207,14 +209,14 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
 12. **Honesty.** Docs describe what works today and mark everything planned
     as planned. Never invent benchmarks, deploy URLs, release status or
     check results. The 26 published packages, including `@texuli/mcp`
-    (first published in `0.9.0`), are released on npm in the 0.9 line
+    (first published in `0.9.0`), are released on npm in the 0.10 line
     (see docs/RELEASE.md; dist-tags `latest` and `next`, published by CI
     with provenance); `@texuli/drag`, `@texuli/workflows`,
     `@texuli/deck`, `@texuli/editor`, `@texuli/document`, `@texuli/pages`,
     `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets` and `@texuli/mcp`
     are still in development, and the blueprint spec in
-    `@texuli/spec@0.9.0` is `0.9.0`. `@texuli/examples`, the apps and
-    `native/` publish nothing. 0.9.0 is a pre-1.0 release, not stable
+    `@texuli/spec@0.10.0` is `0.10.0`. `@texuli/examples`, the apps and
+    `native/` publish nothing. 0.10.0 is a pre-1.0 release, not stable
     (1.0.0 will be the first stable release; `latest` tracks the newest
     release). texuli.com deploys from `main` (Cloudflare Pages), with the
     remote MCP at `https://texuli.com/mcp`; the agent service is not

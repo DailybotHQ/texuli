@@ -60,6 +60,43 @@ const file = new Blob([bytes], { type: PDF_MIME });
 (deflate content streams where the platform has `CompressionStream`,
 default true). `PDF_MIME` is `application/pdf`.
 
+## Design systems
+
+`design` takes plain design values, a `DocumentDesign`: `colors` as
+`#rrggbb` per `DocumentDesignRole` and `fonts.sans`, `fonts.heading` and
+`fonts.mono` as CSS stacks. Build them from a compiled design system with
+`designValues(compiled, mode)` from `@texuli/tools/print` (or pass
+`designSystem` to `renderBlueprintPdf`); the document engine never
+imports `@texuli/tokens`. The writer reads:
+
+| Role | Where |
+| --- | --- |
+| `foreground` | Text and table header rules |
+| `mutedForeground` | Captions, quotes, embeds, the header and footer |
+| `link` | Link text and underline |
+| `border` | Rules: dividers, quote bars, table lines |
+| `muted` | The code background |
+| `muted`/`borderStrong`, `primarySoft`/`primary`, `infoSoft`/`info`, `successSoft`/`success`, `warningSoft`/`warning`, `destructiveSoft`/`destructive` | The fill and bar of the neutral, accent, info, success, warning and danger callouts |
+| `background` | A full-page fill, only when it is not white (a dark design) |
+| `fonts.sans` | A serif stack (its first known serif family or `serif` comes before a sans one) sets the text in Times (Roman, Bold, Italic, BoldItalic), whose metrics load in a lazy chunk; any other stack stays Helvetica. Code stays Courier, and headings use the body family |
+
+A color outside `#rrggbb` is ignored, so hand-built or hostile values
+fall back to the defaults. Without `design` (or with an empty one) the
+bytes are exactly the default output (a test pins their SHA-256). The
+brand's own font files are not embedded from the design: pass TrueType
+bytes as `font` for that (planned: a design-driven font embedding).
+
+**A document's own `designSystem`** (`{ ref }` or `{ inline }`, from
+`0.10.0`): this L1 engine cannot compile it (that needs
+`@texuli/tokens`, a layer above), so the caller compiles it and passes the
+values. Resolve the reference or take the inline document, compile it with
+`compileDesignSystem` (`@texuli/tokens/design-system/compile`) and pass
+`designValues(compiled, mode)` from `@texuli/tools/print` as `design`.
+When the document names a design system and no `design` is passed, the
+writer uses the default styling (the same bytes as without the field) and
+reports one `design-system-unapplied` diagnostic naming the ref, so the
+omission is never silent.
+
 ## Security
 
 - Every string in the file (text, the title and author, URIs, the language)

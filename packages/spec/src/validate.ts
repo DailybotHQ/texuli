@@ -137,6 +137,18 @@ export function validateBlueprint(
       message: 'The blueprint is bound to another catalog.',
     });
   }
+  // Spec 0.10.0 (ADR-024): the schema has no unions, so "exactly one of ref
+  // and inline" is checked here. The inline document's own rules belong to
+  // `checkDesignSystemReference` (`@texuli/spec/design-system`), which
+  // `@texuli/catalog`'s `validateDraft` runs through the host's check.
+  const system = input.designSystem;
+  if (isRecord(system) && Object.hasOwn(system, 'ref') === Object.hasOwn(system, 'inline')) {
+    diagnostics.push({
+      code: 'schema',
+      path: '$.designSystem',
+      message: 'one-of: A design system sets exactly one of ref and inline.',
+    });
+  }
   const { workflowSchema: schema, validateWorkflowGraph: validate } = documents;
   const workflow = schema && validate ? { schema, validate } : undefined;
   const state = checkStateDeclarations(input.state, diagnostics, workflow);

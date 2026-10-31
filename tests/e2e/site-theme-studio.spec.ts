@@ -1,23 +1,21 @@
 /// <reference types="node" />
-import { resolve } from 'node:path';
-import { expect, type Locator, type Page, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 import { serveDist, settle } from './support/site.ts';
 
 /*
- * Theme studio on texuli.com, in the browser: generate from a color (AA
- * status and CSS export), from mood words and from a local image (no request
- * leaves the origin), switch the export to JSON, and on a phone tabbing
- * through the studio never leaves focus under the sticky header (WCAG
- * 2.4.11). Generation, tuning, exports and share links are unit-tested in
- * apps/website/tests/studios.test.ts and scripts/tests/site-loaders.test.ts;
- * axe runs in the page sweep.
+ * The theme studio URL after it became the Design System Studio (PLAN_011
+ * T-ds-studio): /theme-studio/ still serves the studio, links made by the
+ * old theme studio (`#theme=` recipes and library themes) still open, and on
+ * a phone tabbing through the studio never leaves focus under the sticky
+ * header (WCAG 2.4.11). Everything else the studio does is covered by
+ * site-ds-studio.spec.ts; axe runs there and in the page sweep.
  */
 
 const origin = serveDist();
-const FIXTURE_IMAGE = resolve('tests/fixtures/theme-studio-seed.png');
 
-async function open(page: Page) {
-  await page.goto(`${origin()}/theme-studio/`);
+async function open(page: Page, hash = '') {
+  await page.goto('about:blank');
+  await page.goto(`${origin()}/theme-studio/${hash}`);
   await settle(page);
   // The header script publishes a measured pixel height for scroll padding.
   await page.waitForFunction(() =>
@@ -27,58 +25,36 @@ async function open(page: Page) {
   );
 }
 
-/** Center the target below the sticky header, then click it. */
-async function tap(locator: Locator) {
-  await locator.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest' }));
-  await locator.click();
-}
-
-test('generates from color, words and a local image, exports JSON, and keeps focus clear of the header', async ({
+test('old theme studio links still open, from a recipe and from a library theme', async ({
   page,
 }) => {
-  test.setTimeout(90_000);
+  test.setTimeout(60_000);
   const foreign: string[] = [];
   page.on('request', (request) => {
     const url = request.url();
     if (!url.startsWith(origin()) && !/^(blob|data):/.test(url)) foreign.push(url);
   });
-  await open(page);
-  const status = page.locator('[data-tx-studio-status]');
-  const exported = page.locator('[data-tx-studio-export]');
-  const source = page.getByRole('group', { name: 'Theme source' });
+  await open(page, '#theme=s=c&seed=%230f766e&c=AA&m=l&r.l.primary=%23115e59');
+  const status = page.locator('[data-tx-ds-status]');
+  await expect(status).toContainText('Started from a theme studio link', { timeout: 20_000 });
+  await open(page, '#theme=s=c&seed=%232b6ce0&c=AA&m=d&lib=devtools-night');
+  await expect(status).toContainText('Started from a theme studio link', { timeout: 20_000 });
+  await open(page, '#theme=s=i&seed=%232b6ce0&c=AA&m=l');
+  await expect(page.locator('[data-tx-ds-refusal]')).toContainText('share-format', {
+    timeout: 20_000,
+  });
+  expect(foreign).toEqual([]);
+});
 
-  await page.getByLabel('Brand color').fill('#0f766e');
-  await tap(page.getByRole('button', { name: 'Generate theme' }));
-  await expect(status).toContainText(/Theme ready|pairs|AA/i, { timeout: 15_000 });
-  await expect(page.locator('[data-tx-studio-aa]')).toBeVisible();
-  await expect(exported).toContainText('--tx-primary');
-
-  await tap(source.getByRole('button', { name: 'Words' }));
-  await page.getByLabel('Mood words').fill('calm ocean');
-  await tap(page.getByRole('button', { name: 'Generate theme' }));
-  await expect(status).toContainText(/Theme ready|pairs|AA/i, { timeout: 15_000 });
-  await expect(page.locator('[data-tx-studio-error]')).toHaveCount(0);
-
-  await tap(source.getByRole('button', { name: 'Image' }));
-  await page.locator('[data-tx-studio-image]').setInputFiles(FIXTURE_IMAGE);
-  await expect(page.locator('[data-tx-studio-image-note]')).toBeVisible({ timeout: 15_000 });
-  await expect(status).toContainText(/Theme from image|pairs|AA/i, { timeout: 15_000 });
-  await expect(exported).toContainText('--tx-primary');
-
-  await tap(
-    page.getByRole('group', { name: 'Export format' }).getByRole('button', { name: 'JSON' })
-  );
-  await expect(exported).toContainText('"id"', { timeout: 10_000 });
-  await expect(exported).toContainText('theme-studio');
-
-  // A phone: no tab stop in the studio hides under the sticky header.
+test('on a phone, no tab stop in the studio hides under the sticky header', async ({ page }) => {
+  test.setTimeout(90_000);
   await page.setViewportSize({ width: 412, height: 839 });
   await open(page);
   await page.keyboard.press('Tab');
   await page.keyboard.press('Enter');
   const obscured: string[] = [];
   let sampled = 0;
-  for (let index = 0; index < 40; index += 1) {
+  for (let index = 0; index < 60; index += 1) {
     await page.keyboard.press('Tab');
     const state = await page.evaluate(() => {
       const studio = document.querySelector('[data-tx-theme-studio]');
@@ -91,6 +67,7 @@ test('generates from color, words and a local image, exports JSON, and keeps foc
         name:
           active.getAttribute('aria-label') ||
           active.textContent?.trim().slice(0, 40) ||
+          active.id ||
           active.tagName,
       };
     });
@@ -103,5 +80,4 @@ test('generates from color, words and a local image, exports JSON, and keeps foc
   }
   expect(sampled).toBeGreaterThan(5);
   expect(obscured).toEqual([]);
-  expect(foreign).toEqual([]);
 });

@@ -1,6 +1,6 @@
 {
   "name": "@texuli/core",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "private": true,
   "description": "Texels: framework-free behavior and policy that every Texuli component is built from.",
   "keywords": [

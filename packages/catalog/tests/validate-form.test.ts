@@ -161,6 +161,57 @@ describe('schema-form in validateDraft', () => {
     ).toEqual(['forms:form-schema']);
   });
 
+  it('lets a draft declare a custom field only for a kind the host registered (G113)', () => {
+    const ticket = formNode(
+      schema(field(), {
+        name: 'customer',
+        type: 'custom',
+        kind: 'relation',
+        label: 'Customer',
+        required: true,
+      })
+    );
+    const refused = validateDraft(ticket, { catalog, checkForm: checkFormDraft });
+    expect(codes(refused)).toEqual(['forms:form-schema']);
+    const finding = refused.diagnostics.find((d) => d.check === 'forms');
+    expect(finding?.path).toBe('0.children.0.props.schema.fields[1].kind');
+    expect(finding?.message.startsWith('kind:')).toBe(true);
+    expect(
+      validateDraft(ticket, { catalog, checkForm: checkFormDraft, formKinds: ['address'] }).ok
+    ).toBe(false);
+    const accepted = validateDraft(ticket, {
+      catalog,
+      checkForm: checkFormDraft,
+      formKinds: ['relation'],
+    });
+    expect(codes(accepted)).toEqual([]);
+  });
+
+  it('accepts the 0.10.0 field members and refuses credential fields in agent output (G117, G118, G121)', () => {
+    const fields = formNode(
+      schema(
+        field({ type: 'url', name: 'site', protocols: ['http', 'https'] }),
+        { name: 'tint', type: 'color', label: 'Accent' },
+        { name: 'starts', type: 'datetime', label: 'Starts', min: '2026-11-01T09:00' },
+        {
+          name: 'plan',
+          type: 'select',
+          label: 'Plan',
+          clearable: false,
+          options: [{ value: 'a', label: 'A' }],
+        }
+      )
+    );
+    expect(codes(validateDraft(fields, { catalog, checkForm: checkFormDraft }))).toEqual([]);
+    const login = formNode(schema({ name: 'pw', type: 'password', label: 'Password' }));
+    expect(codes(validateDraft(login, { catalog, checkForm: checkFormDraft }))).toEqual([
+      'forms:form-schema',
+    ]);
+    expect(
+      codes(validateDraft(login, { catalog, checkForm: checkFormDraft, tier: 'developer' }))
+    ).toEqual([]);
+  });
+
   it('stays bounded on a hostile schema at the size limits', () => {
     const big = (depth: number): unknown =>
       depth === 0 ? { op: 'field', name: 'f0' } : { op: 'not', value: big(depth - 1) };

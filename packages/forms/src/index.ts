@@ -9,17 +9,31 @@ export {
   type FormDraftOptions,
   type FormDraftStorage,
   type FormSchema,
+  type FormStepContext,
+  type FormStepResult,
   type FormSubmitResult,
   type FormValidator,
   type FormValues,
+  formatFormValue,
+  formValuesToMarkdown,
   validateFormSchema,
 } from './model/index.ts';
 export {
   DEFAULT_SCHEMA_FORM_LABELS,
+  LAZY_CONTROL_TYPES,
+  type LazyControlType,
   SchemaForm,
+  type SchemaFormActions,
+  type SchemaFormControl,
+  type SchemaFormControlProps,
+  type SchemaFormControls,
+  type SchemaFormCustomEntry,
+  type SchemaFormCustomField,
+  type SchemaFormCustomFields,
+  type SchemaFormCustomSnippet,
   type SchemaFormLabels,
   type SchemaFormSubmission,
 } from './view/index.ts';
 
 /** The version of this package, kept equal to its manifest. */
-export const FORMS_PACKAGE_VERSION = '0.9.0';
+export const FORMS_PACKAGE_VERSION = '0.10.0';

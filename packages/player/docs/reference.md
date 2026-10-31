@@ -568,6 +568,78 @@ from a source the host registered in `@texuli/core/data-source` and passed as
 refused. Loading, empty and error states, paging, announcements and
 optimistic edits are in [data-sources.md](data-sources.md).
 
+### Design systems (spec 0.10.0)
+
+> **New in `0.10.0`.**
+
+A blueprint envelope may name the design system it follows
+(`designSystem`, [ADR-024](../../../docs/DECISIONS.md#adr-024-design-systems-on-every-surface)):
+`{ ref: "id@x.y.z" }`, `{ ref: "texuli:<theme>" }` or `{ inline: <document> }`.
+After validation (the catalog's `design-system` check), the player:
+
+1. loads its design-system step with `import()`: a blueprint without one
+   never loads it, the compiler or the runtime
+   (`tests/design-system.test.ts` walks the static imports, and
+   `pnpm size` keeps the step in a lazy chunk);
+2. resolves a `ref` through `designSystems.resolve(ref)` (sync or async; a
+   document or a compiled design system, a cached JSON copy works). The
+   player never fetches. `texuli:<theme>` falls back to the theme library
+   (lazy chunks, never the network). A resolved document must declare the
+   exact `id` and `version` of the ref;
+3. validates and compiles the document with
+   `@texuli/tokens/design-system/compile` (through `texuli/design-system`'s
+   `loadDesignSystemCompiler`, a lazy chunk): an inline document at the
+   player's `tier` (so agent output refuses `data:` URLs and remote
+   assets), a host-resolved one at `developer`;
+4. applies the result to the player root with `applyDesignSystem`
+   (`data-tx-ds`, `data-tx-scope`, `data-tx-mode` from
+   `designSystems.mode`, default `light`, and the variables, in one style
+   write). Fonts register only for host-resolved documents or at the
+   `developer` tier. A deck or document painted through `deckHost` or
+   `documentHost` sits inside the root and follows it; overlays follow the
+   scope (scoped portals).
+
+The root carries `data-tx-player-design-system` (`pending`, `applied` or
+`refused`), and `onDesignSystem` receives a `PlayerDesignSystemEvent`. When
+nothing resolves (`design-system-unresolved`), the resolver throws or
+returns another document (`design-system-refused`), or the compiler
+refuses it (a design-system code such as `aa-text` or `url-refused`), the
+player keeps the default theme, shows `labels.designSystemRefused` in a
+`role="status"` paragraph and announces it politely. It never throws, and
+the content still paints. A later blueprint without a design system
+restores the root.
+
+**Component defaults.** The compiled `defaults` (`components.<id>.defaults`
+in the document: a default `variant` or `size`, ADR-020) reach the painted
+components through the `texuli/defaults` context the player provides on
+its root:
+
+- a component uses a default only when its prop is undefined, so a prop in
+  the blueprint always wins;
+- the step keeps only the closed vocabulary (`validateDesignDefaults`), so
+  a cached compiled copy from a host cannot select a class that does not
+  exist;
+- the design system's defaults merge over an app's own
+  `setDesignDefaults` or `DesignSystemProvider` around the player, prop by
+  prop;
+- a refused design system, or a later blueprint without one, restores the
+  library defaults (`tests/design-system.test.ts`).
+
+The context is a small closure on the main entry (94 B gzip); the
+vocabulary, the compiler and the runtime stay in the lazy step. A deck
+presented through `deckHost` is mounted by the host, outside the player's
+component tree: it follows the tokens on the root, and the host gives it
+the defaults (the slides stage applies a deck's own `designSystem`,
+[@texuli/slides stage](../../slides/docs/stage.md#design-systems)).
+
+```svelte
+<Player
+  {blueprint}
+  designSystems={{ resolve: (ref) => savedDesignSystems.get(ref), mode: 'dark' }}
+  onDesignSystem={(event) => console.log(event.status)}
+/>
+```
+
 ### Selection (builder preview)
 
 `selectable` (default `false`) lets a host select painted frames, as the

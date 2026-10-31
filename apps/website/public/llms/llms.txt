@@ -182,6 +182,12 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [Toaster](components/toaster.md): Live region that renders toast notifications from the shared store.
 - [Tooltip](components/tooltip.md): Short delayed hint on hover or focus.
 
+## Blueprint envelope
+
+A tree may travel in a blueprint envelope (`"format": "texuli-blueprint"`, `"version": 1`, `"spec"`, `"catalog"`, `"status": "draft"`, `"tree"`). Hosts validate it with `validateDraft` from `@texuli/catalog/validate` and paint it with `@texuli/player`.
+
+Design system (spec 0.10.0, from 0.10.0): the envelope may carry `"designSystem"`, exactly one of `{"ref": "acme@2.1.0"}` (an exact `id@x.y.z` the host resolves, or `"texuli:<theme>"` for a library theme) and `{"inline": {"format": "texuli/design-system", "formatVersion": 1, "id", "version", "name", …}}` (a whole design-system document: colors, typography, shape, space and the other closed sections; never CSS). Never a version range, a URL, a path or a `data:` URL. The player applies it to its root; when it cannot (nothing resolves it, or the compiler refuses it for contrast, targets or URLs), the content paints in the default theme with a notice. Validation reports `check: "design-system"` with codes such as `extends-range`, `url-refused` and `unknown-key` and paths under `$.designSystem`.
+
 ## Optional
 
 - [Full catalog docs](llms-full.txt)

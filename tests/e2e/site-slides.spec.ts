@@ -97,10 +97,17 @@ test('the flagship deck presents, routes, opens its layers; galleries and compon
   await hydrated(page, '[data-slides-gallery="components"]');
   const grid = page.locator('[data-slides-gallery-item="grid"]');
   await expect(grid).toBeEnabled({ timeout: 20_000 });
+  // Await each real step (the jump, the slide, then the player's lazily
+  // loaded grid painter) instead of one wait over all three: under parallel
+  // load the paint is what takes time, and a lost jump fails here, not later.
   await grid.click();
-  await expect(
-    activeSlide(page, '[data-slides-gallery="components"]').getByRole('grid').first()
-  ).toBeVisible({ timeout: 20_000 });
+  await expect(grid).toHaveAttribute('aria-current', 'true');
+  const componentSlide = activeSlide(page, '[data-slides-gallery="components"]');
+  await expect(componentSlide).toHaveAttribute('data-slide-id', 'grid');
+  await expect(componentSlide.locator('[data-tx-player-skeleton]')).toHaveCount(0, {
+    timeout: 30_000,
+  });
+  await expect(componentSlide.getByRole('grid').first()).toBeVisible({ timeout: 20_000 });
   await hydrated(page, '[data-slides-gallery="backgrounds"]');
 
   for (const scheme of ['light', 'dark'] as const) {

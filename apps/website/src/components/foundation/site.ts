@@ -49,7 +49,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     label: 'Get started',
     links: [
       { href: DOCS_HOME, label: 'Introduction' },
-      // The all-features hub: every package and capability of 0.6.0 to 0.9.0.
+      // The all-features hub: every package and capability of 0.6.0 to 0.10.0.
       { href: '/whats-new/', label: 'What’s new' },
       { href: '/skill/', label: 'Skill' },
     ],
@@ -97,6 +97,8 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     id: 'themes',
     label: 'Themes',
     links: [
+      // PLAN_011 T-site-0100: the design systems hub (released in 0.10.0).
+      { href: '/design-systems/', label: 'Design systems' },
       { href: '/gallery-themes/', label: 'Theme gallery' },
       { href: '/theme-switcher/', label: 'Switcher' },
       { href: '/theme-studio/', label: 'Studio' },

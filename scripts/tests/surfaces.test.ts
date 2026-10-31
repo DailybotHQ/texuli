@@ -4,7 +4,10 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createMcpHandler } from '../../packages/tools/src/mcp/handler.ts';
-import { MCP_SUPPORTED_PROTOCOL_VERSIONS } from '../../packages/tools/src/mcp/protocol.ts';
+import {
+  MCP_STATELESS_PROTOCOL_VERSIONS,
+  MCP_SUPPORTED_PROTOCOL_VERSIONS,
+} from '../../packages/tools/src/mcp/protocol.ts';
 import { REMOTE_RUNTIMES, TOOLS_VERSION, texuliOps } from '../../packages/tools/src/ops/index.ts';
 import {
   buildMcpPageData,
@@ -39,6 +42,9 @@ describe('generated agent surfaces', () => {
     const card = await buildServerCard();
     expect(card.serverInfo.version).toBe(TOOLS_VERSION);
     expect(card.protocolVersions).toEqual([...MCP_SUPPORTED_PROTOCOL_VERSIONS]);
+    // The 2026-07-28 revision: per request through params._meta, no initialize (G124).
+    expect(card.statelessProtocolVersions).toEqual(['2026-07-28']);
+    expect(card.statelessProtocolVersions).toEqual([...MCP_STATELESS_PROTOCOL_VERSIONS]);
     expect(card.transport.streamableHttp.url).toBe(REMOTE_MCP_URL);
     expect(card.transport.stdio.launch).toBe('npx -y @texuli/mcp');
     expect(card.capabilities.every((name) => typeof name === 'string')).toBe(true);
@@ -55,6 +61,23 @@ describe('generated agent surfaces', () => {
     expect(card.deprecatedTools.map((alias) => alias.name)).toEqual(
       texuliOps.aliases().map((alias) => alias.name)
     );
+    // The 0.8 names removed in 0.10.0, with what to call instead.
+    expect(card.removedTools).toEqual(
+      texuliOps.removed().map((entry) => ({
+        name: entry.name,
+        replacedBy: [...entry.replacedBy],
+        removedIn: entry.removedIn,
+      }))
+    );
+    expect(card.removedTools.map((entry) => entry.name)).toEqual([
+      'deck',
+      'document',
+      'catalog',
+      'component',
+      'validate',
+      'example',
+      'theme',
+    ]);
     const remote = [
       ...card.tools.filter((tool) => tool.remote).map((tool) => tool.name),
       ...card.deprecatedTools.filter((alias) => alias.remote).map((alias) => alias.name),
@@ -85,6 +108,7 @@ describe('generated agent surfaces', () => {
     const tables = buildOpsTables();
     for (const name of names) expect(tables).toContain(`| \`${name}\` |`);
     for (const alias of texuliOps.aliases()) expect(tables).toContain(`| \`${alias.name}\` |`);
+    for (const entry of texuliOps.removed()) expect(tables).toContain(`| \`${entry.name}\` |`);
     const data = await buildMcpPageData();
     expect(data.tools.map((tool) => tool.name)).toEqual(names);
     expect(data.prompts.map((prompt) => prompt.name)).toContain('build-ui');

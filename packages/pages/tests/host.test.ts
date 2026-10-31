@@ -2,8 +2,11 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { cleanup, render, screen, waitFor } from '@testing-library/svelte';
 import { Player } from '@texuli/player';
+import { createRawSnippet } from 'svelte';
 import { afterEach, describe, expect, it } from 'vitest';
 import { checkDocumentDraft, createDocumentPlayerHost } from '../src/host/index.ts';
+import type { PagesHostNode } from '../src/shared/block-host.ts';
+import HostBlockStub from './HostBlockStub.svelte';
 
 afterEach(cleanup);
 
@@ -63,6 +66,64 @@ describe('createDocumentPlayerHost', () => {
     cleanup();
     expect(document.querySelector('.tx-pages-reader')).toBeNull();
   });
+
+  it('passes the host block renderer to the reader (G111)', async () => {
+    // The player validates agent documents against the catalog first: an
+    // unknown wrapped block never reaches the reader, so in this path the
+    // host paints what the catalog accepts (a ref embed with no payload, a
+    // library block it claims).
+    const withBlock = (block: Record<string, unknown>) => ({
+      ...golden,
+      tree: { ...golden.tree, props: { doc: { ...doc, blocks: [...doc.blocks, block] } } },
+    });
+    render(Player, {
+      props: {
+        blueprint: withBlock({
+          id: 'kpi',
+          type: 'embed',
+          kind: 'component',
+          ref: 'host/kpi',
+          title: 'KPI',
+        }),
+        label: 'Agent document',
+        documentHost: createDocumentPlayerHost({ blockHost: { component: HostBlockStub } }),
+      },
+    });
+    await waitFor(
+      () =>
+        expect(
+          document.querySelector('[data-tx-pages-host] [data-host-node="kpi"]')
+        ).not.toBeNull(),
+      { timeout: 30_000 }
+    );
+    cleanup();
+    const renderBlock = createRawSnippet((node: () => PagesHostNode) => ({
+      render: () => '<p class="snippet-host"></p>',
+      setup(element) {
+        element.textContent = `snippet ${node().id}`;
+      },
+    }));
+    render(Player, {
+      props: {
+        blueprint: withBlock({
+          id: 'stat',
+          type: 'block',
+          family: 'data',
+          block: 'stat',
+          props: { items: [{ label: 'Uptime', value: '99.9%' }] },
+        }),
+        label: 'Agent document',
+        documentHost: createDocumentPlayerHost({
+          renderBlock,
+          blockHost: { claim: (node) => (node.id === 'stat' ? 'host' : 'library') },
+        }),
+      },
+    });
+    await waitFor(
+      () => expect(document.querySelector('.snippet-host')?.textContent).toBe('snippet stat'),
+      { timeout: 30_000 }
+    );
+  }, 60_000);
 
   it('paints nothing for a document the check refuses', async () => {
     const hostile = {

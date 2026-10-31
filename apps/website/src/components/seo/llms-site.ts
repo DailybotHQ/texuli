@@ -66,7 +66,7 @@ export function siteLlmsSections(siteUrl: string): SiteLlmsSection[] {
           title: 'What’s new',
           href: abs('/whats-new/'),
           description:
-            'Every package and capability of 0.6.0, 0.7.0, 0.8.0 and 0.9.0 (all on npm; 0.9.0 is current), with demos.',
+            'Every package and capability of 0.6.0 to 0.10.0 (all on npm; 0.10.0, design systems, is current), with demos.',
         },
         {
           title: 'Skill',
@@ -102,7 +102,7 @@ export function siteLlmsSections(siteUrl: string): SiteLlmsSection[] {
     {
       name: 'Themes',
       description:
-        'The OKLCH theme engine, the interactive theme tools and the design token reference.',
+        'Design systems (one JSON document per brand; new in 0.10.0), the OKLCH theme engine, the interactive theme tools and the design token reference.',
       links: nav('themes'),
     },
     {

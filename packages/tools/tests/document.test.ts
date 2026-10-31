@@ -11,6 +11,7 @@ import {
   runDocumentCommand,
 } from '../src/document/index.ts';
 import { createTexuliMcpServer, MCP_PROTOCOL_VERSION } from '../src/mcp/index.ts';
+import { RUN_COMMANDS } from '../src/ops/index.ts';
 
 /**
  * Document commands for agents and developers (spec 0.7.0, ADR-011): one
@@ -288,16 +289,16 @@ describe('the document MCP tool', () => {
         }[];
       };
     };
-    const tool = listed.result.tools.find((item) => item.name === 'document');
+    const tool = listed.result.tools.find((item) => item.name === 'document.run');
     expect(tool?.inputSchema.additionalProperties).toBe(false);
-    expect(tool?.inputSchema.properties.command.enum).toEqual(DOCUMENT_COMMANDS);
+    expect(tool?.inputSchema.properties.command.enum).toEqual(RUN_COMMANDS);
     expect(tool?.annotations.readOnlyHint).toBe(true);
     const call = async (args: Record<string, unknown>) =>
       (await handle({
         jsonrpc: '2.0',
         id: 3,
         method: 'tools/call',
-        params: { name: 'document', arguments: args },
+        params: { name: 'document.run', arguments: args },
       })) as unknown as { result: { isError?: boolean; content: { text: string }[] } };
     const patched = await call({
       command: 'patch',

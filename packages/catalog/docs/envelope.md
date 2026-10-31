@@ -155,6 +155,14 @@ else (another field, a duration, a level off the list) is an
 same closed vocabulary (`@texuli/spec/motion`,
 [motion.md](../../spec/docs/motion.md)).
 
+From spec 0.10.0 (from `0.10.0`) the envelope may
+name the design system the whole blueprint follows: `designSystem`, exactly
+one of `{ ref: "id@x.y.z" }` (or `texuli:<theme>`) and `{ inline: <a
+texuli/design-system document> }`. `parseEnvelope` accepts the field and
+keeps it on the envelope; `validateDraft`'s `design-system` check judges it
+([validate.md](./validate.md)), and players apply it to their root
+([design-system.md](../../spec/docs/design-system.md#in-blueprints-and-documents)).
+
 ## Developer tier (roadmap decision D5)
 
 The `developer` tier is normative: with `renderCatalogFromBuild`, it is the

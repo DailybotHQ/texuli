@@ -15,7 +15,10 @@ import {
   createMcpHandler,
   createTexuliMcpServer,
   MCP_ERROR_CODES,
+  MCP_PROTOCOL_REVISIONS,
   MCP_PROTOCOL_VERSION,
+  MCP_PROTOCOL_VERSION_META_KEY,
+  MCP_STATELESS_PROTOCOL_VERSIONS,
   MCP_SUPPORTED_PROTOCOL_VERSIONS,
   type McpHandler,
   type McpResourceProvider,
@@ -208,6 +211,173 @@ it('keeps the initialization gate on stateful handlers and never requires it on 
   );
 });
 
+it('serves the 2026-07-28 revision per request from params._meta, with no initialize (G124)', async () => {
+  const STATELESS = '2026-07-28';
+  const meta = (version: unknown = STATELESS) => ({
+    _meta: { [MCP_PROTOCOL_VERSION_META_KEY]: version },
+  });
+  const ALL = [STATELESS, ...MCP_SUPPORTED_PROTOCOL_VERSIONS];
+  await scenario('the revision constants name 2026-07-28 next to the initialize-based ones', () => {
+    expect(MCP_PROTOCOL_VERSION_META_KEY).toBe('io.modelcontextprotocol/protocolVersion');
+    expect(MCP_STATELESS_PROTOCOL_VERSIONS).toEqual([STATELESS]);
+    expect(MCP_PROTOCOL_REVISIONS).toEqual(ALL);
+    // initialize still negotiates only the initialize-based revisions.
+    expect(MCP_SUPPORTED_PROTOCOL_VERSIONS).not.toContain(STATELESS);
+    expect(MCP_ERROR_CODES.unsupportedProtocolVersion).toBe(-32022);
+  });
+  await scenario('the Protoyard repro: server/discover answers before any initialize', async () => {
+    const handle = createMcpHandler({ mode: 'stateful' });
+    const answer = (await handle({
+      jsonrpc: '2.0',
+      id: 4,
+      method: 'server/discover',
+      params: meta(),
+    })) as Rpc;
+    expect(answer.error).toBeUndefined();
+    expect(answer.id).toBe(4);
+    const { handle: initialized, init } = await ready();
+    const tools = await walk(initialized, 'tools/list', 'tools');
+    const prompts = await walk(initialized, 'prompts/list', 'prompts');
+    const resources = await walk(initialized, 'resources/list', 'resources');
+    const templates = await walk(initialized, 'resources/templates/list', 'resourceTemplates');
+    expect(answer.result).toEqual({
+      protocolVersion: STATELESS,
+      supportedVersions: ALL,
+      serverInfo: { name: 'texuli', version: VERSION },
+      capabilities: init.result?.capabilities,
+      instructions: init.result?.instructions,
+      tools: tools.items.map(({ name, title }) => (title ? { name, title } : { name })),
+      prompts: prompts.items.map(({ name, title }) => ({ name, title })),
+      resources: {
+        count: resources.items.length,
+        templates: templates.items.map(({ uriTemplate, name, title }) => ({
+          uriTemplate,
+          name,
+          title,
+        })),
+      },
+    });
+    // The server card lists the same revisions.
+    const card = JSON.parse(
+      readFileSync(new URL('.well-known/mcp/server-card.json', PUBLIC), 'utf8')
+    ) as { protocolVersions: string[]; statelessProtocolVersions: string[] };
+    expect([...card.statelessProtocolVersions, ...card.protocolVersions]).toEqual(
+      answer.result?.supportedVersions
+    );
+  });
+  await scenario('server/discover leaves out what a handler does not serve', async () => {
+    const handle = createMcpHandler({ resources: [], prompts: [] });
+    const answer = await rpc(handle, 'server/discover', meta());
+    expect(answer.result?.capabilities).toEqual({ tools: { listChanged: false } });
+    expect(answer.result).not.toHaveProperty('prompts');
+    expect(answer.result).not.toHaveProperty('resources');
+  });
+  await scenario('every list, read, get, call and completion answers statelessly', async () => {
+    const { handle: initialized } = await ready();
+    for (const mode of ['stateful', 'stateless'] as const) {
+      const handle = createMcpHandler({ mode });
+      const calls: [string, Record<string, unknown>][] = [
+        ['ping', {}],
+        ['tools/list', {}],
+        ['tools/call', { name: 'catalog.search', arguments: { query: 'card', limit: 2 } }],
+        ['tools/call', { name: 'component.get', arguments: { id: 'no-such-component' } }],
+        ['prompts/list', {}],
+        ['prompts/get', { name: 'build-ui', arguments: { brief: 'A fictional settings page.' } }],
+        ['resources/list', {}],
+        ['resources/templates/list', {}],
+        ['resources/read', { uri: 'texuli://schema/deck' }],
+        ['resources/read', { uri: 'texuli://nope' }],
+        [
+          'completion/complete',
+          {
+            ref: { type: 'ref/resource', uri: 'texuli://theme/{id}' },
+            argument: { name: 'id', value: 'a' },
+          },
+        ],
+      ];
+      for (const [method, params] of calls) {
+        const stateless = await rpc(handle, method, { ...params, ...meta() });
+        const classic = await rpc(initialized, method, params);
+        const label = `${mode} ${method} ${JSON.stringify(params).slice(0, 60)}`;
+        expect(stateless.error?.code, label).not.toBe(MCP_ERROR_CODES.notInitialized);
+        expect({ ...stateless, id: 0 }, label).toEqual({ ...classic, id: 0 });
+      }
+      // Nothing was stored: a request without the _meta version keeps today's gate.
+      if (mode === 'stateful') {
+        const gated = await rpc(handle, 'tools/list');
+        expect(gated.error?.code).toBe(MCP_ERROR_CODES.notInitialized);
+      }
+    }
+  });
+  await scenario('an unknown revision is -32022 with error.data.supported', async () => {
+    for (const mode of ['stateful', 'stateless'] as const) {
+      const handle = createMcpHandler({ mode });
+      for (const [version, method] of [
+        ['2099-01-01', 'server/discover'],
+        ['2099-01-01', 'tools/list'],
+        ['2099-01-01', 'initialize'],
+        ['', 'ping'],
+        [42, 'tools/call'],
+        [null, 'prompts/list'],
+      ] as const) {
+        const refused = await rpc(handle, method, meta(version));
+        const label = `${mode} ${method} ${String(version)}`;
+        expect(refused.error?.code, label).toBe(-32022);
+        expect(refused.error?.message, label).toMatch(/^Unsupported protocol version/u);
+        expect(refused.error?.data, label).toEqual({
+          supported: ALL,
+          ...(typeof version === 'string' ? { requested: version } : {}),
+        });
+      }
+      const long = await rpc(handle, 'tools/list', meta('9'.repeat(1000)));
+      const requested = (long.error?.data as { requested?: string } | undefined)?.requested;
+      expect(requested).toBe('9'.repeat(64));
+    }
+  });
+  await scenario(
+    'a request without the 2026-07-28 _meta version keeps the behavior of today',
+    async () => {
+      const stateful = createMcpHandler({ mode: 'stateful' });
+      // server/discover is a 2026-07-28 method: before initialize it is gated, after it is unknown.
+      expect((await rpc(stateful, 'server/discover')).error?.code).toBe(
+        MCP_ERROR_CODES.notInitialized
+      );
+      // _meta naming an initialize-based revision changes nothing either.
+      expect((await rpc(stateful, 'tools/list', meta('2025-11-25'))).error?.code).toBe(
+        MCP_ERROR_CODES.notInitialized
+      );
+      expect((await rpc(stateful, 'tools/list', { _meta: 'not an object' })).error?.code).toBe(
+        MCP_ERROR_CODES.notInitialized
+      );
+      const { handle } = await ready();
+      const unknown = await rpc(handle, 'server/discover');
+      expect(unknown.error?.code).toBe(MCP_ERROR_CODES.methodNotFound);
+      expect(unknown.error?.message).toBe('Method not found: server/discover');
+      const stateless = createMcpHandler({ mode: 'stateless' });
+      expect((await rpc(stateless, 'server/discover')).error?.code).toBe(
+        MCP_ERROR_CODES.methodNotFound
+      );
+      // A 2026-07-28 notification is still a notification: no answer.
+      expect(
+        await stateful({ jsonrpc: '2.0', method: 'notifications/initialized', params: meta() })
+      ).toBeUndefined();
+      expect((await rpc(stateful, 'tools/list')).error?.code).toBe(MCP_ERROR_CODES.notInitialized);
+    }
+  );
+  await scenario('on HTTP the MCP-Protocol-Version header must agree with _meta', async () => {
+    const handle = createMcpHandler({ mode: 'stateless' });
+    const agreed = await rpc(handle, 'tools/list', meta(), { protocolVersion: STATELESS });
+    expect(agreed.result?.tools).toBeDefined();
+    const mismatch = await rpc(handle, 'tools/list', meta(), { protocolVersion: '2025-11-25' });
+    expect(mismatch.error?.code).toBe(MCP_ERROR_CODES.invalidRequest);
+    expect(mismatch.error?.message).toMatch(/MCP-Protocol-Version header/u);
+    // The 2026-07-28 header without the _meta version: that revision carries it in every request.
+    const headerOnly = await rpc(handle, 'tools/list', {}, { protocolVersion: STATELESS });
+    expect(headerOnly.error?.code).toBe(MCP_ERROR_CODES.invalidRequest);
+    expect(headerOnly.error?.message).toContain(MCP_PROTOCOL_VERSION_META_KEY);
+  });
+});
+
 it('lists every served operation as a tool with schemas, annotations and cursor pagination', async () => {
   await scenario(
     'generates tools from the registry, operations first, then the aliases',
@@ -231,14 +401,10 @@ it('lists every served operation as a tool with schemas, annotations and cursor 
           openWorldHint: operation.annotations.openWorld,
         });
       }
-      const aliases = listed.slice(operations.length);
-      expect(aliases.map((tool) => tool.name)).toEqual(
-        texuliOps.aliases().map((alias) => alias.name)
-      );
-      for (const alias of aliases) {
-        expect(alias.description).toMatch(/^Deprecated alias of /u);
-        expect(alias.outputSchema).toBeUndefined();
-      }
+      // The 0.8 tool names were removed in 0.10.0: only operations are listed.
+      expect(listed.length).toBe(operations.length);
+      for (const removed of texuliOps.removed())
+        expect(listed.map((tool) => tool.name)).not.toContain(removed.name);
     }
   );
   await scenario('pages with opaque cursors and refuses forged or foreign ones', async () => {
@@ -271,8 +437,15 @@ it('returns structuredContent with a text mirror, and every operation error code
     expect(call.result?.isError).toBeUndefined();
     expect(call.result?.structuredContent).toMatchObject({ component: { id: 'card' } });
     expect(textOf(call)).toEqual(call.result?.structuredContent);
-    const alias = await rpc(handle, 'tools/call', { name: 'component', arguments: { id: 'card' } });
-    expect(alias.result?.structuredContent).toEqual(call.result?.structuredContent);
+    // A 0.8 name removed in 0.10.0 is a protocol error that names its replacement.
+    const removed = await rpc(handle, 'tools/call', {
+      name: 'component',
+      arguments: { id: 'card' },
+    });
+    expect(removed.error).toEqual({
+      code: MCP_ERROR_CODES.invalidParams,
+      message: 'The tool "component" was removed in 0.10.0; call component.get instead.',
+    });
     const noArguments = await rpc(handle, 'tools/call', { name: 'catalog.search' });
     expect(
       (noArguments.result?.structuredContent as { total: number } | undefined)?.total
@@ -383,21 +556,23 @@ it('serves only the runtime classes a handler is given', async () => {
     expect(edgeNames).not.toContain(operation.name);
     expect(localNames).toContain(operation.name);
   }
-  // An alias is listed only when every target is served; `document` reaches document.export.
-  expect(edgeNames).not.toContain('document');
-  expect(localNames).toContain('document');
+  // The 0.8 names were removed in 0.10.0: neither door lists them.
+  for (const removed of texuliOps.removed()) {
+    expect(edgeNames).not.toContain(removed.name);
+    expect(localNames).not.toContain(removed.name);
+  }
   expect(edgeNames).toContain('deck.run');
   // Calling a node operation on the edge names the runtime instead of "unknown tool".
   for (const [name, args] of [
-    ['document.export', { command: 'to-pdf', document: {} }],
-    ['document', { command: 'to-docx', document: {} }],
+    ['document.export', { format: 'pdf', document: {} }],
+    ['ds.save', { path: 'x.ds.json', document: {} }],
   ] as const) {
     const refused = await rpc(edge, 'tools/call', { name, arguments: args });
     expect(refused.result?.isError, name).toBe(true);
     expect((textOf(refused) as { code: string }).code, name).toBe('runtime-unavailable');
   }
   const edgeCall = await rpc(edge, 'tools/call', {
-    name: 'document',
+    name: 'document.run',
     arguments: { command: 'capabilities' },
   });
   expect(edgeCall.result?.isError).toBeUndefined();
@@ -428,27 +603,34 @@ it('lists and reads the Texuli resources and resource templates', async () => {
     expect(uris.filter((uri) => uri.startsWith('texuli://theme/'))).toEqual(
       themes.map((theme) => `texuli://theme/${theme.id}`)
     );
-    expect(uris.some((uri) => uri.includes('design-system'))).toBe(false);
+    // Only the fictional examples are listed; the library themes as documents are read by id.
+    expect(uris.filter((uri) => uri.startsWith('texuli://design-system/'))).toEqual([
+      'texuli://design-system/acme',
+      'texuli://design-system/minimal',
+      'texuli://design-system/quillmark',
+      'texuli://design-system/ledgerline',
+      'texuli://design-system/tumbletown',
+    ]);
     for (const item of items) {
       expect(typeof item.name, item.uri as string).toBe('string');
       expect(typeof item.description, item.uri as string).toBe('string');
       expect(item.mimeType, item.uri as string).toMatch(/^(application\/json|text\/markdown)$/u);
     }
   });
-  await scenario(
-    'lists four templates, with no design-system template until it exists',
-    async () => {
-      const templates = (await rpc(handle, 'resources/templates/list')).result
-        ?.resourceTemplates as { uriTemplate: string; description: string }[];
-      expect(templates.map((template) => template.uriTemplate)).toEqual([
-        'texuli://component/{id}',
-        'texuli://docs/{slug}',
-        'texuli://theme/{id}',
-        'texuli://schema/{name}',
-      ]);
-      for (const template of templates) expect(template.description.length).toBeGreaterThan(40);
-    }
-  );
+  await scenario('lists five templates, the design-system documents among them', async () => {
+    const templates = (await rpc(handle, 'resources/templates/list')).result?.resourceTemplates as {
+      uriTemplate: string;
+      description: string;
+    }[];
+    expect(templates.map((template) => template.uriTemplate)).toEqual([
+      'texuli://component/{id}',
+      'texuli://docs/{slug}',
+      'texuli://theme/{id}',
+      'texuli://design-system/{id}',
+      'texuli://schema/{name}',
+    ]);
+    for (const template of templates) expect(template.description.length).toBeGreaterThan(40);
+  });
   await scenario('reads each resource from the same source as the other doors', async () => {
     const read = async (uri: string) => {
       const response = await rpc(handle, 'resources/read', { uri });
@@ -476,6 +658,15 @@ it('lists and reads the Texuli resources and resource templates', async () => {
     expect(JSON.parse(deck?.text ?? '{}')).toEqual(runDeckCommand('schema'));
     const [documentSchema] = await read('texuli://schema/document');
     expect(JSON.parse(documentSchema?.text ?? '{}')).toEqual(await runDocumentCommand('schema'));
+    // An example document, and a library theme as a document: one per read, both valid.
+    for (const id of ['acme', 'ocean']) {
+      const [ds] = await read(`texuli://design-system/${id}`);
+      expect(ds?.mimeType).toBe('application/json');
+      const outcome = await texuliOps.invoke('ds.validate', {
+        document: JSON.parse(ds?.text ?? ''),
+      });
+      expect(outcome, id).toMatchObject({ ok: true, output: { valid: true } });
+    }
   });
   await scenario(
     'answers unknown and hostile URIs with resource-not-found or invalid params',
@@ -488,7 +679,8 @@ it('lists and reads the Texuli resources and resource templates', async () => {
         'texuli://component/',
         'texuli://theme/not-a-theme',
         'texuli://schema/blueprint',
-        'texuli://design-system/acme',
+        'texuli://design-system/not-a-theme',
+        'texuli://design-system/ACME',
         'texuli://docs/__proto__',
         'texuli://catalog?x=1',
         'file:///etc/passwd',
@@ -516,7 +708,7 @@ it('lists and reads the Texuli resources and resource templates', async () => {
 it('lists and renders the workflow prompts with arguments an agent can complete', async () => {
   const { handle } = await ready();
   await scenario(
-    'lists build-ui, theme-blueprint and convert-deck (no design-system prompt yet)',
+    'lists build-ui, theme-blueprint, create-design-system and convert-deck',
     async () => {
       const prompts = (await rpc(handle, 'prompts/list')).result?.prompts as {
         name: string;
@@ -527,6 +719,7 @@ it('lists and renders the workflow prompts with arguments an agent can complete'
       expect(prompts.map((prompt) => prompt.name)).toEqual([
         'build-ui',
         'theme-blueprint',
+        'create-design-system',
         'convert-deck',
       ]);
       for (const prompt of prompts) {
@@ -555,6 +748,11 @@ it('lists and renders the workflow prompts with arguments an agent can complete'
           theme: 'violet',
         },
         'theme-blueprint': { brief: 'A calm analytics dashboard', mode: 'dark' },
+        'create-design-system': {
+          brief: 'Harborline: teal #0e7490, Inter, rounded, calm',
+          base: 'ocean',
+          contrast: 'AAA',
+        },
         'convert-deck': { direction: 'from-markdown', source: '# Fictional deck' },
       };
       for (const prompt of TEXULI_PROMPTS) {
@@ -606,6 +804,7 @@ it('lists and renders the workflow prompts with arguments an agent can complete'
   await scenario('refuses unknown prompts and bad arguments', async () => {
     for (const params of [
       { name: 'create-design-system', arguments: {} },
+      { name: 'create-design-system', arguments: { brief: 'ok', contrast: 'AAAA' } },
       { name: 'nope' },
       { name: 'build-ui' },
       { name: 'build-ui', arguments: { brief: 42 } },
@@ -646,6 +845,19 @@ it('completes template and prompt arguments from the real ids', async () => {
       await complete({ type: 'ref/resource', uri: 'texuli://theme/{id}' }, 'id', 'VIO')
     );
     expect(theme.values).toContain('violet');
+    const designSystems = values(
+      await complete({ type: 'ref/resource', uri: 'texuli://design-system/{id}' }, 'id', '')
+    );
+    const library = await listFullThemeLibrary();
+    expect(designSystems.values.slice(0, 6)).toEqual([
+      'acme',
+      'minimal',
+      'quillmark',
+      'ledgerline',
+      'tumbletown',
+      library[0]?.id,
+    ]);
+    expect(designSystems.total).toBe(5 + library.length);
     expect(
       values(await complete({ type: 'ref/resource', uri: 'texuli://schema/{name}' }, 'name', ''))
         .values
@@ -804,6 +1016,7 @@ it('answers malformed JSON-RPC with the standard error codes', async () => {
     internalError: -32603,
     notInitialized: -32600,
     resourceNotFound: -32002,
+    unsupportedProtocolVersion: -32022,
   });
 });
 

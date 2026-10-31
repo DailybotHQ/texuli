@@ -1,0 +1,114 @@
+{
+  "format": "texuli/design-system",
+  "formatVersion": 1,
+  "id": "protoyard-knobs",
+  "version": "1.0.0",
+  "name": "Protoyard knobs (fictional)",
+  "description": "Every Protoyard Theme knob in its design-system field (architecture B.13), with fictional values.",
+  "color": {
+    "brand": { "seed": "#0f766e" },
+    "roles": {
+      "light": {
+        "background": "#ffffff",
+        "foreground": "#0b1220",
+        "primary": "#0f766e",
+        "primaryForeground": "#ffffff",
+        "ring": "#0f766e"
+      },
+      "dark": {
+        "background": "#0b1220",
+        "foreground": "#f1f5f9",
+        "primary": "#5eead4",
+        "primaryForeground": "#0b1220",
+        "ring": "#5eead4"
+      }
+    },
+    "dataViz": {
+      "light": {
+        "categorical": [
+          "#0f766e",
+          "#1d4ed8",
+          "#b45309",
+          "#7e22ce",
+          "#be123c",
+          "#15803d",
+          "#0369a1",
+          "#4d7c0f"
+        ],
+        "sequential": [
+          "#f0fdfa",
+          "#ccfbf1",
+          "#99f6e4",
+          "#5eead4",
+          "#2dd4bf",
+          "#14b8a6",
+          "#0d9488",
+          "#0f766e",
+          "#115e59"
+        ],
+        "diverging": [
+          "#b91c1c",
+          "#dc2626",
+          "#f87171",
+          "#fecaca",
+          "#f5f5f5",
+          "#99f6e4",
+          "#2dd4bf",
+          "#0d9488",
+          "#115e59"
+        ],
+        "grid": "#e2e8f0",
+        "axis": "#475569"
+      },
+      "dark": {
+        "categorical": [
+          "#5eead4",
+          "#93c5fd",
+          "#fcd34d",
+          "#d8b4fe",
+          "#fda4af",
+          "#86efac",
+          "#7dd3fc",
+          "#bef264"
+        ],
+        "sequential": [
+          "#115e59",
+          "#0f766e",
+          "#0d9488",
+          "#14b8a6",
+          "#2dd4bf",
+          "#5eead4",
+          "#99f6e4",
+          "#ccfbf1",
+          "#f0fdfa"
+        ],
+        "diverging": [
+          "#fca5a5",
+          "#f87171",
+          "#ef4444",
+          "#7f1d1d",
+          "#262626",
+          "#134e4a",
+          "#14b8a6",
+          "#2dd4bf",
+          "#5eead4"
+        ],
+        "grid": "#1e293b",
+        "axis": "#94a3b8"
+      }
+    }
+  },
+  "typography": {
+    "families": {
+      "sans": { "stack": ["Yard Sans", "system-ui", "sans-serif"] },
+      "heading": { "stack": ["Yard Display", "Yard Sans", "sans-serif"] },
+      "mono": { "stack": ["Yard Mono", "ui-monospace", "monospace"] }
+    }
+  },
+  "shape": { "radius": 6 },
+  "space": { "density": 0.875 },
+  "elevation": { "style": "layered" },
+  "surface": { "style": "glass", "glass": { "alpha": 0.7, "blur": 12 } },
+  "motion": { "personality": "expressive" },
+  "accessibility": { "focus": "glow" }
+}

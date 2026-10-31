@@ -28,12 +28,18 @@ import {
 } from '@texuli/core/markup';
 import { safeHref } from '@texuli/core/url-policy';
 import type { Theme } from '@texuli/tokens/build';
+import { type DesignVarsSource, designValues } from '../internal/design-values.ts';
 import { type StaticDiagnostic, validateStaticDraft } from '../internal/static-draft.ts';
 import { emailRenderCatalog } from './catalog.ts';
+import { emailDarkMode } from './dark.ts';
 import {
+  designEmailPalette,
+  EMAIL_MONO_FONT,
+  EMAIL_SYSTEM_FONT,
   type EmailPalette,
   type EmailStyle,
   emailFontFamily,
+  emailFontStack,
   resolveEmailPalette,
   serializeEmailStyle,
 } from './styles.ts';
@@ -93,7 +99,16 @@ export interface EmailOptions {
   baseUrl?: string;
   /** The theme whose `--tx-*` colors and font resolve to sRGB inline styles. Default: a neutral palette. */
   theme?: Theme | null;
-  /** Which theme mode to resolve. Default `light`. */
+  /**
+   * A compiled design system (`compileDesignSystem(…)` with `ok: true`, or
+   * anything with its `vars`): colors, fonts, the radius and the spacing
+   * step of `mode` become the inline styles (over `theme`), and when `mode`
+   * is `light` and the dark mode was compiled, the head carries a typed
+   * `prefers-color-scheme: dark` rule. Default: none (the output is
+   * unchanged).
+   */
+  designSystem?: DesignVarsSource | null;
+  /** Which theme or design-system mode to inline. Default `light`. */
   mode?: 'light' | 'dark';
   /** Content width in pixels (320 to 800). Default 600. */
   width?: number;
@@ -115,6 +130,12 @@ export interface EmailResult {
 type Ctx = {
   palette: EmailPalette;
   font: string;
+  /** Heading and code stacks. */
+  heading: string;
+  mono: string;
+  /** The card radius and the spacing step, in pixels. */
+  radius: number;
+  space: number;
   start: 'left' | 'right';
   end: 'left' | 'right';
   base: string | null;
@@ -125,10 +146,18 @@ type Ctx = {
 };
 
 const style = (value: EmailStyle) => serializeEmailStyle(value);
+/** `steps` spacing steps in pixels. */
+const px = (ctx: Ctx, steps: number) => `${Math.round(steps * ctx.space * 100) / 100}px`;
+/** The radius of inner controls (buttons, code): three quarters of the card's. */
+const innerRadius = (ctx: Ctx) => `${Math.round(ctx.radius * 75) / 100}px`;
+/** The bottom margin between blocks. */
+const gap = (ctx: Ctx) => `0 0 ${px(ctx, 4)} 0`;
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 const str = (value: unknown): string | undefined =>
   typeof value === 'string' && value.trim() !== '' ? value : undefined;
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(Number.isFinite(value) ? value : min, min), max);
 const num = (value: unknown): number | undefined =>
   typeof value === 'number' && Number.isFinite(value) ? value : undefined;
 
@@ -179,7 +208,7 @@ function inlineNodes(nodes: readonly MdInline[], ctx: Ctx, path: string): Markup
       case 'code':
         return el(
           'code',
-          { style: style({ 'font-family': 'Courier New, monospace', 'font-size': 13 }) },
+          { style: style({ 'font-family': ctx.mono, 'font-size': 13 }) },
           node.text
         );
       case 'strong':
@@ -229,21 +258,22 @@ function inlineText(nodes: readonly MdInline[], ctx: Ctx): string {
 // ── Building blocks ───────────────────────────────────────────────────────
 
 /** Padding on the inline-start side (mail clients lack logical properties, so the side follows `dir`). */
-function indent(ctx: Ctx, size = 24): string {
-  return ctx.start === 'left' ? `0 0 0 ${size}px` : `0 ${size}px 0 0`;
+function indent(ctx: Ctx, steps = 6): string {
+  const size = px(ctx, steps);
+  return ctx.start === 'left' ? `0 0 0 ${size}` : `0 ${size} 0 0`;
 }
 
 function quoteStyle(ctx: Ctx): string {
   return style({
-    margin: '0 0 16px 0',
-    padding: indent(ctx, 16),
+    margin: gap(ctx),
+    padding: indent(ctx, 4),
     [ctx.start === 'left' ? 'border-left' : 'border-right']: `4px solid ${ctx.palette.border}`,
   });
 }
 
 function paragraphStyle(ctx: Ctx, extra: EmailStyle = {}): string {
   return style({
-    margin: '0 0 16px 0',
+    margin: gap(ctx),
     color: ctx.palette.foreground,
     'font-family': ctx.font,
     'font-size': 16,
@@ -265,7 +295,7 @@ function heading(level: number, content: MarkupChild, ctx: Ctx, plain: string): 
       style: style({
         margin: '0 0 12px 0',
         color: ctx.palette.foreground,
-        'font-family': ctx.font,
+        'font-family': ctx.heading,
         'font-size': HEADING_SIZES[rank - 1],
         'font-weight': 700,
         'line-height': 1.25,
@@ -361,16 +391,16 @@ function codeBlock(code: string, ctx: Ctx): MarkupElement {
     'pre',
     {
       style: style({
-        margin: '0 0 16px 0',
-        padding: '12px',
+        margin: gap(ctx),
+        padding: px(ctx, 3),
         'background-color': ctx.palette.background,
         color: ctx.palette.foreground,
-        'font-family': 'Courier New, monospace',
+        'font-family': ctx.mono,
         'font-size': 13,
         'line-height': 1.45,
         'white-space': 'pre-wrap',
         'word-break': 'break-word',
-        'border-radius': '6px',
+        'border-radius': innerRadius(ctx),
       }),
     },
     el('code', {}, code)
@@ -378,7 +408,8 @@ function codeBlock(code: string, ctx: Ctx): MarkupElement {
 }
 
 /** A presentation table: one row, cells side by side. */
-function columnsTable(cells: readonly MarkupChild[][], ctx: Ctx, gap = 16): MarkupElement {
+function columnsTable(cells: readonly MarkupChild[][], ctx: Ctx, steps = 4): MarkupElement {
+  const space = px(ctx, steps);
   const share = `${Math.floor(100 / Math.max(cells.length, 1))}%`;
   return el(
     'table',
@@ -388,7 +419,7 @@ function columnsTable(cells: readonly MarkupChild[][], ctx: Ctx, gap = 16): Mark
       cellpadding: '0',
       cellspacing: '0',
       border: '0',
-      style: style({ 'border-collapse': 'collapse', margin: '0 0 16px 0' }),
+      style: style({ 'border-collapse': 'collapse', margin: gap(ctx) }),
     },
     el(
       'tbody',
@@ -406,7 +437,7 @@ function columnsTable(cells: readonly MarkupChild[][], ctx: Ctx, gap = 16): Mark
                 width: share,
                 'vertical-align': 'top',
                 padding:
-                  index === 0 ? '0' : ctx.start === 'left' ? `0 0 0 ${gap}px` : `0 ${gap}px 0 0`,
+                  index === 0 ? '0' : ctx.start === 'left' ? `0 0 0 ${space}` : `0 ${space} 0 0`,
               }),
             },
             cell
@@ -431,7 +462,7 @@ function boxed(
       cellpadding: '0',
       cellspacing: '0',
       border: '0',
-      style: style({ 'border-collapse': 'separate', margin: '0 0 16px 0' }),
+      style: style({ 'border-collapse': 'separate', margin: gap(ctx) }),
     },
     el(
       'tbody',
@@ -444,11 +475,11 @@ function boxed(
           {
             bgcolor: background,
             style: style({
-              padding: '16px',
+              padding: px(ctx, 4),
               'background-color': background,
               color,
               border: `1px solid ${ctx.palette.border}`,
-              'border-radius': '8px',
+              'border-radius': `${ctx.radius}px`,
             }),
           },
           children
@@ -466,14 +497,14 @@ function button(label: string, href: MarkupUrl, ctx: Ctx): MarkupElement {
       href,
       style: style({
         display: 'inline-block',
-        padding: '12px 20px',
+        padding: `${px(ctx, 3)} ${px(ctx, 5)}`,
         'background-color': ctx.palette.primary,
         color: ctx.palette.primaryForeground,
         'font-family': ctx.font,
         'font-size': 16,
         'font-weight': 600,
         'text-decoration': 'none',
-        'border-radius': '6px',
+        'border-radius': innerRadius(ctx),
       }),
     },
     label
@@ -543,7 +574,7 @@ function dataTable(block: Record<string, unknown>, ctx: Ctx): MarkupChild[] {
   const border = `1px solid ${ctx.palette.border}`;
   const cellStyle = (head: boolean) =>
     style({
-      padding: '8px',
+      padding: px(ctx, 2),
       border,
       'text-align': ctx.start,
       'font-family': ctx.font,
@@ -559,7 +590,7 @@ function dataTable(block: Record<string, unknown>, ctx: Ctx): MarkupChild[] {
         cellpadding: '0',
         cellspacing: '0',
         border: '0',
-        style: style({ 'border-collapse': 'collapse', margin: '0 0 16px 0' }),
+        style: style({ 'border-collapse': 'collapse', margin: gap(ctx) }),
       },
       caption
         ? el(
@@ -828,7 +859,7 @@ function block(value: unknown, ctx: Ctx, path: string, id: string, depth = 0): M
           cells.push([plainParagraph(label, ctx, { margin: '0' })]);
         } else cells.push([button(label, href, ctx)]);
       }
-      return cells.length === 0 ? [] : [columnsTable(cells, ctx, 12)];
+      return cells.length === 0 ? [] : [columnsTable(cells, ctx, 3)];
     }
     case 'columns': {
       const columns = (Array.isArray(value.columns) ? value.columns : []).filter(Array.isArray);
@@ -1010,11 +1041,21 @@ export function renderEmail(input: unknown, options: EmailOptions = {}): EmailRe
   if (!validation?.ok) return { ok: false, html: '', text: '', diagnostics };
 
   const dir = options.dir === 'rtl' ? 'rtl' : 'ltr';
-  const palette = resolveEmailPalette(options.theme, options.mode);
+  const mode = options.mode === 'dark' ? 'dark' : 'light';
+  const themed = resolveEmailPalette(options.theme, mode);
+  const design = designValues(options.designSystem, mode);
+  const palette = design ? designEmailPalette(design.colors, themed) : themed;
   const width = Math.round(Math.min(Math.max(num(options.width) ?? 600, 320), 800));
+  const font = design?.fonts.sans
+    ? emailFontStack(design.fonts.sans, EMAIL_SYSTEM_FONT)
+    : emailFontFamily(options.theme);
   const ctx: Ctx = {
     palette,
-    font: emailFontFamily(options.theme),
+    font,
+    heading: design?.fonts.heading ? emailFontStack(design.fonts.heading, EMAIL_SYSTEM_FONT) : font,
+    mono: emailFontStack(design?.fonts.mono, EMAIL_MONO_FONT),
+    radius: clamp(design?.radius ?? 8, 0, 32),
+    space: clamp(design?.space ?? 4, 2, 8),
     start: dir === 'rtl' ? 'right' : 'left',
     end: dir === 'rtl' ? 'left' : 'right',
     base: checkedBase(options.baseUrl, diagnostics),
@@ -1049,7 +1090,11 @@ export function renderEmail(input: unknown, options: EmailOptions = {}): EmailRe
       : 'en';
   const title = (str(options.title) ?? ctx.firstHeading ?? 'Message').slice(0, 200);
   const preheader = str(options.preheader)?.slice(0, 200);
-  const document = el(
+  // The compiled dark mode, when the light mode is inlined.
+  const darkValues = design && mode === 'light' ? designValues(options.designSystem, 'dark') : null;
+  const darkPalette = darkValues ? designEmailPalette(darkValues.colors, palette) : null;
+  const schemes = darkPalette ? 'light dark' : 'light';
+  const tree = el(
     'html',
     { lang, dir },
     el(
@@ -1057,7 +1102,8 @@ export function renderEmail(input: unknown, options: EmailOptions = {}): EmailRe
       {},
       el('meta', { charset: 'utf-8' }),
       el('meta', { name: 'viewport', content: 'width=device-width, initial-scale=1' }),
-      el('meta', { name: 'color-scheme', content: 'light' }),
+      el('meta', { name: 'color-scheme', content: schemes }),
+      darkPalette ? el('meta', { name: 'supported-color-schemes', content: schemes }) : null,
       el('meta', { name: 'x-apple-disable-message-reformatting', content: '' }),
       el('title', {}, title)
     ),
@@ -1101,7 +1147,7 @@ export function renderEmail(input: unknown, options: EmailOptions = {}): EmailRe
             {},
             el(
               'td',
-              { align: 'center', style: style({ padding: '24px 12px' }) },
+              { align: 'center', style: style({ padding: `${px(ctx, 6)} ${px(ctx, 3)}` }) },
               el(
                 'table',
                 {
@@ -1116,7 +1162,7 @@ export function renderEmail(input: unknown, options: EmailOptions = {}): EmailRe
                     'max-width': width,
                     'background-color': palette.surface,
                     'border-collapse': 'separate',
-                    'border-radius': '8px',
+                    'border-radius': `${ctx.radius}px`,
                   }),
                 },
                 el(
@@ -1130,7 +1176,7 @@ export function renderEmail(input: unknown, options: EmailOptions = {}): EmailRe
                       {
                         dir,
                         style: style({
-                          padding: '24px',
+                          padding: px(ctx, 6),
                           'font-family': ctx.font,
                           color: palette.foreground,
                           'text-align': ctx.start,
@@ -1147,7 +1193,13 @@ export function renderEmail(input: unknown, options: EmailOptions = {}): EmailRe
       )
     )
   );
-  const html = serializeHtml(document, { doctype: true });
+  const dark = darkPalette ? emailDarkMode(tree, palette, darkPalette) : null;
+  let html = serializeHtml(dark ? dark.root : tree, { doctype: true });
+  if (dark?.css) {
+    // The head's only rule set: checked against its closed grammar in `emailDarkMode`.
+    const head = html.indexOf('</head>');
+    html = `${html.slice(0, head)}<style>${dark.css}</style>${html.slice(head)}`;
+  }
   const text = [preheader, ...ctx.text]
     .filter((line) => line !== undefined && line.trim() !== '')
     .join('\n\n');

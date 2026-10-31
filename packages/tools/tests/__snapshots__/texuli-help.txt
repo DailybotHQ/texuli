@@ -3,31 +3,48 @@ Usage: texuli <group> <verb> [--json <object> | --file <path>] [--out <path> [--
        texuli help [<group>]
 
 Operations (the @texuli/tools registry; the same names are MCP tools):
-  catalog search      Search the component catalog
-  catalog validate    Validate catalog manifests
-  component get       Read a component manifest
-  example search      Find component examples
-  blueprint validate  Validate a blueprint draft
-  block list          List block types
-  block schema        Read a block shape
-  theme search        Search the theme library
-  theme get           Read a full theme
-  theme preview       Preview a theme
-  deck run            Run a deck command
-  document run        Run a document command
-  document export     Export a document as PDF or DOCX (node only)
+  catalog search            Search the component catalog
+  catalog validate          Validate catalog manifests
+  component get             Read a component manifest
+  example search            Find component examples
+  blueprint validate        Validate a blueprint draft
+  blueprint theme           Apply a design system to a blueprint
+  block list                List block types
+  block schema              Read a block shape
+  theme search              Search the theme library
+  theme get                 Read a full theme
+  theme preview             Preview a theme
+  ds validate               Validate a design system
+  ds compile                Compile a design system
+  ds contrast               Report design-system contrast
+  ds suggest                Suggest a design system
+  ds import                 Import a design system
+  ds diff                   Diff two design systems
+  ds preview                Preview a design system
+  ds save                   Save a design system to a file (node only)
+  deck run                  Run a deck command
+  document run              Run a document command
+  document export           Export a document as PDF or DOCX (node only)
 
 Commands:
-  deck <command>      The deck commands (capabilities, schema, layouts, lint, inspect, from-markdown, to-markdown)
-  document <command>  The document commands (validate, patch, from-markdown, to-pdf … with --out)
-  mcp                 Run the local MCP server over stdio (every operation)
-  init                Wire Texuli tokens and CSS into a Vite, Astro or SvelteKit project
-  theme list          List the theme library
-  theme preview <id>  Show a theme's key tokens and its WCAG AA report
-  theme apply <id>    Switch an initialized project to another theme
-  add <component>     Copy a styled component's source into the app
-  diff <component>    Show what an update of a copied component would change
-  update <component>  Three-way merge a copied component with a new source
+  deck <command>            The deck commands (capabilities, schema, layouts, lint, inspect, from-markdown, to-markdown)
+  document <command>        The document commands (validate, patch, from-markdown, to-pdf … with --out)
+  ds init <file>            Write a new design-system document (--brand "<one-liner>")
+  ds validate <file>        Validate a design-system document (ds.validate)
+  ds compile <file>         Compile it to JSON, CSS, a Tailwind preset, DTCG or Tokens Studio (--format, --out)
+  ds export <file>          Write one format to a file (--format, --out)
+  ds preview <file>         A static SVG or HTML snapshot (--format, --out)
+  ds diff <before> <after>  Compare two design systems (ds.diff)
+  ds import <file|text>     Import DTCG, Tokens Studio, a role palette, a theme or a one-liner (--from, --out)
+  ds check <file>           Check a design-system document: codes, guarantees, contrast report (--json, --render, --mode, --variant)
+  mcp                       Run the local MCP server over stdio (every operation)
+  init                      Wire Texuli tokens and CSS into a Vite, Astro or SvelteKit project
+  theme list                List the theme library
+  theme preview <id>        Show a theme's key tokens and its WCAG AA report
+  theme apply <id>          Switch an initialized project to another theme
+  add <component>           Copy a styled component's source into the app
+  diff <component>          Show what an update of a copied component would change
+  update <component>        Three-way merge a copied component with a new source
 
 Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
 Output: JSON on stdout (exit 1 on a refusal), or --out <path> to write it to a new file inside the working directory (--overwrite replaces one).
@@ -66,6 +83,7 @@ Usage: texuli blueprint <verb> [--json <object> | --file <path>] [--out <path>]
 
 Operations:
   blueprint validate  Validate a blueprint draft [blueprint.validate]
+  blueprint theme     Apply a design system to a blueprint [blueprint.theme]
 
 Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
 Output: JSON on stdout (exit 1 on a refusal), or --out <path> to write it to a new file inside the working directory (--overwrite replaces one).
@@ -88,10 +106,36 @@ Operations:
   theme get           Read a full theme [theme.get]
   theme preview       Preview a theme [theme.preview]
 
-Commands kept from 0.8:
+Commands:
   theme list          List the theme library
   theme preview <id>  Show a theme's key tokens and its WCAG AA report
   theme apply <id>    Switch an initialized project to another theme
+
+Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
+Output: JSON on stdout (exit 1 on a refusal), or --out <path> to write it to a new file inside the working directory (--overwrite replaces one).
+
+----
+Usage: texuli ds <verb> [--json <object> | --file <path>] [--out <path>]
+
+Operations:
+  ds validate               Validate a design system [ds.validate]
+  ds compile                Compile a design system [ds.compile]
+  ds contrast               Report design-system contrast [ds.contrast]
+  ds suggest                Suggest a design system [ds.suggest]
+  ds import                 Import a design system [ds.import]
+  ds diff                   Diff two design systems [ds.diff]
+  ds preview                Preview a design system [ds.preview]
+  ds save                   Save a design system to a file [ds.save]
+
+Commands:
+  ds init <file>            Write a new design-system document (--brand "<one-liner>")
+  ds validate <file>        Validate a design-system document (ds.validate)
+  ds compile <file>         Compile it to JSON, CSS, a Tailwind preset, DTCG or Tokens Studio (--format, --out)
+  ds export <file>          Write one format to a file (--format, --out)
+  ds preview <file>         A static SVG or HTML snapshot (--format, --out)
+  ds diff <before> <after>  Compare two design systems (ds.diff)
+  ds import <file|text>     Import DTCG, Tokens Studio, a role palette, a theme or a one-liner (--from, --out)
+  ds check <file>           Check a design-system document: codes, guarantees, contrast report (--json, --render, --mode, --variant)
 
 Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
 Output: JSON on stdout (exit 1 on a refusal), or --out <path> to write it to a new file inside the working directory (--overwrite replaces one).
@@ -102,7 +146,7 @@ Usage: texuli deck <verb> [--json <object> | --file <path>] [--out <path>]
 Operations:
   deck run        Run a deck command [deck.run]
 
-Commands kept from 0.8:
+Commands:
   deck <command>  The deck commands (capabilities, schema, layouts, lint, inspect, from-markdown, to-markdown)
 
 Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
@@ -115,7 +159,7 @@ Operations:
   document run        Run a document command [document.run]
   document export     Export a document as PDF or DOCX [document.export]
 
-Commands kept from 0.8:
+Commands:
   document <command>  The document commands (validate, patch, from-markdown, to-pdf … with --out)
 
 Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
@@ -179,7 +223,7 @@ Example (Every card example): texuli example search --json '{"componentId":"card
 Usage: texuli blueprint validate [--json <object> | --file <path>] [--out <path>]
 
 Validate a blueprint draft (blueprint.validate, runtime edge)
-Validate a blueprint draft (a catalog tree, an array of trees, or a texuli-blueprint envelope, migrated first) with the catalog's draft checks: structure, sinks, tree limits, component ids, tiers and prop schemas, deep block and document schemas, grammar and the frame root. Returns valid, status, tier, migratedFrom and diagnostics with the catalog's stable codes.
+Validate a blueprint draft (a catalog tree, an array of trees, or a texuli-blueprint envelope, migrated first) with the catalog's checks: structure, sinks, tree limits, component ids, tiers, prop, block and document schemas, the envelope's designSystem (codes under $.designSystem), grammar and the frame root. Returns valid, status, tier, migratedFrom and diagnostics with stable codes.
 
 Arguments (JSON object keys):
   draft (required): object | array. The blueprint: a catalog tree { id, props, children }, an array of trees, or a texuli-blueprint envelope (format, version, id, catalog hash from catalog.search, status, createdAt, updatedAt, generator, tree). At most 512 nodes. schema-form, canvas and spreadsheet nodes and data-source bindings are refused: this server has no validator for them.
@@ -187,6 +231,20 @@ Arguments (JSON object keys):
   fragment: boolean. Accept any roots (a fragment). Default false: one frame root (layout-page, layout-doc, layout-deck, document, canvas or data-dashboard).
 
 Limits: input up to 270336 bytes, at most 512 items, 5000 ms budget.
+
+----
+Usage: texuli blueprint theme [--json <object> | --file <path>] [--out <path>]
+
+Apply a design system to a blueprint (blueprint.theme, runtime edge)
+Set a blueprint envelope's designSystem to a reference ({ ref: "acme@2.1.0" } or a library theme "texuli:ocean") or an inline document, wrapping a bare tree in a draft envelope first, then validate the result as blueprint.validate does; an inline document is also compiled for the contrast, focus and target guarantees. Returns valid, the themed blueprint and diagnostics with stable codes.
+
+Arguments (JSON object keys):
+  blueprint (required): object | array. A texuli-blueprint envelope, or a catalog tree (or array of trees) to wrap in a draft envelope for the current catalog.
+  designSystem (required): object. Exactly one of ref and inline.
+  tier: "untrusted" | "developer". The tier to validate at: untrusted (agent output, the default; refuses data: URLs in an inline document) or developer.
+  id: string. A wrapped tree only: the envelope id (default "draft").
+
+Limits: input up to 1318912 bytes, at most 512 items, 10000 ms budget.
 
 ----
 Usage: texuli block list [--json <object> | --file <path>] [--out <path>]
@@ -254,6 +312,142 @@ Arguments (JSON object keys):
 
 Limits: input up to 1024 bytes, 5000 ms budget.
 Example (Ocean in dark mode): texuli theme preview --json '{"id":"ocean","mode":"dark"}'
+
+----
+Usage: texuli ds validate [--json <object> | --file <path>] [--out <path>]
+
+Validate a design system (ds.validate, runtime edge)
+Validate a design-system document: the spec's closed schema, the extends chain, then a compile of the document and its high-contrast variant with the guarantees enforced (text contrast, focus ring, target size). Returns valid, the distinct codes, every error with its JSON path and hint, the compiler warnings and the hash.
+
+Arguments (JSON object keys):
+  document (required): object. A design-system document: format "texuli/design-system", formatVersion 1, id, version, name, and optional sections (extends, color, typography, shape, space, elevation, surface, motion, layout, icons, components, assets, voice, accessibility, variants). texuli://design-system/acme is a full example.
+  trust: "untrusted" | "developer". untrusted (agent or user documents, the default) refuses every data: URL; developer accepts capped data: fonts and images.
+  variant: string. A variant the document declares under variants (e.g. "high-contrast").
+  bases: object. Documents for extends: "id@x.y.z", keyed by "id@version". "texuli:<theme>" bases load from the theme library; nothing is fetched.
+
+Limits: input up to 1048576 bytes, 10000 ms budget.
+Example (The smallest document): texuli ds validate --json '{"document":{"format":"texuli/design-system","formatVersion":1,"id":"minimal","version":"1.0.0","name":"Minimal","color":{"brand":{"seed":"#4f46e5"}}}}'
+
+----
+Usage: texuli ds compile [--json <object> | --file <path>] [--out <path>]
+
+Compile a design system (ds.compile, runtime edge)
+Compile a design-system document to concrete --tx-* variables per mode and emit one format: compiled JSON, scoped CSS, a Tailwind preset, DTCG or Tokens Studio. Returns valid, the format, its media type, the content as text, the hash and warnings; a refused document returns errors with stable codes instead.
+
+Arguments (JSON object keys):
+  document (required): object. A design-system document: format "texuli/design-system", formatVersion 1, id, version, name, and optional sections (extends, color, typography, shape, space, elevation, surface, motion, layout, icons, components, assets, voice, accessibility, variants). texuli://design-system/acme is a full example.
+  format: "json" | "css" | "tailwind" | "dtcg" | "tokens-studio". json (the compiled design system, keys sorted), css (scoped custom properties, light and dark), tailwind (a preset), dtcg or tokens-studio (the document as token files).
+  selector: string. css only: the scope selector (default [data-tx-ds="<id>"], or :root).
+  dark: "class" | "attribute" | "media". css only: dark mode through the .dark class (default), [data-tx-mode="dark"] or prefers-color-scheme.
+  mode: "light" | "dark". Compile one mode only (default: every mode the document declares).
+  trust: "untrusted" | "developer". untrusted (agent or user documents, the default) refuses every data: URL; developer accepts capped data: fonts and images.
+  variant: string. A variant the document declares under variants (e.g. "high-contrast").
+  bases: object. Documents for extends: "id@x.y.z", keyed by "id@version". "texuli:<theme>" bases load from the theme library; nothing is fetched.
+
+Limits: input up to 1048576 bytes, 10000 ms budget.
+Example (Scoped CSS): texuli ds compile --json '{"document":{"format":"texuli/design-system","formatVersion":1,"id":"minimal","version":"1.0.0","name":"Minimal","color":{"brand":{"seed":"#4f46e5"}}},"format":"css"}'
+
+----
+Usage: texuli ds contrast [--json <object> | --file <path>] [--out <path>]
+
+Report design-system contrast (ds.contrast, runtime edge)
+Compile a design-system document and report every contrast pair the guarantees check, per mode: foreground and background roles, kind (text, ui, focus), ratio, requirement and pass, plus the solver adjustments. Returns valid, the target (AA or AAA), targetMin and the per-mode pairs, or errors with stable codes.
+
+Arguments (JSON object keys):
+  document (required): object. A design-system document: format "texuli/design-system", formatVersion 1, id, version, name, and optional sections (extends, color, typography, shape, space, elevation, surface, motion, layout, icons, components, assets, voice, accessibility, variants). texuli://design-system/acme is a full example.
+  mode: "light" | "dark". Compile one mode only (default: every mode the document declares).
+  trust: "untrusted" | "developer". untrusted (agent or user documents, the default) refuses every data: URL; developer accepts capped data: fonts and images.
+  variant: string. A variant the document declares under variants (e.g. "high-contrast").
+  bases: object. Documents for extends: "id@x.y.z", keyed by "id@version". "texuli:<theme>" bases load from the theme library; nothing is fetched.
+
+Limits: input up to 1048576 bytes, 10000 ms budget.
+
+----
+Usage: texuli ds suggest [--json <object> | --file <path>] [--out <path>]
+
+Suggest a design system (ds.suggest, runtime edge)
+Suggest a starting design-system document from one seed color, up to three brand colors (seed, secondary, accent) or a logo as RGBA pixels (the dominant colors pick the seed). Returns valid, the document, the dominant palette for pixels, the key tokens of each mode and warnings.
+
+Arguments (JSON object keys):
+  seed: string. A color: #rgb, #rrggbb, #rrggbbaa or a numeric oklch(L C H).
+  colors: array. Up to 3 brand colors: the seed, then the secondary, then the accent.
+  pixels: array. A logo as RGBA values 0 to 255, 4 per pixel, row by row (at most 65536 values, 128 × 128 pixels); transparent pixels are ignored.
+  count: integer. pixels only: how many dominant colors to report (2 to 12, default 6).
+  id: string. The id of the resulting document (lowercase words joined by hyphens).
+  version: string. The semver version of the resulting document (default 1.0.0).
+  name: string. The display name of the resulting document.
+  trust: "untrusted" | "developer". untrusted (agent or user documents, the default) refuses every data: URL; developer accepts capped data: fonts and images.
+
+Limits: input up to 1048576 bytes, at most 65536 items, 10000 ms budget.
+Example (From one seed): texuli ds suggest --json '{"seed":"#0e7490","id":"harborline","name":"Harborline"}'
+
+----
+Usage: texuli ds import [--json <object> | --file <path>] [--out <path>]
+
+Import a design system (ds.import, runtime edge)
+Turn what a team already has into a valid design-system document: a brand one-liner ("brand #4f46e5, font Inter, rounded, compact"), a W3C DTCG file, a Tokens Studio file, a flat role palette or a Texuli theme (an object, or a library theme id). Returns valid, the document and warnings for every value it dropped, or errors with stable codes.
+
+Arguments (JSON object keys):
+  from (required): "brand" | "dtcg" | "tokens-studio" | "role-palette" | "theme". The source format: brand (text), dtcg, tokens-studio, role-palette (objects or JSON text) or theme (a Theme object or a library theme id).
+  input (required): string | object. The source: the one-liner for brand, a library theme id or Theme for theme, else the token file as an object or JSON text.
+  id: string. The id of the resulting document (lowercase words joined by hyphens).
+  version: string. The semver version of the resulting document (default 1.0.0).
+  name: string. The display name of the resulting document.
+  trust: "untrusted" | "developer". untrusted (agent or user documents, the default) refuses every data: URL; developer accepts capped data: fonts and images.
+
+Limits: input up to 1048576 bytes, 10000 ms budget.
+Example (A brand one-liner): texuli ds import --json '{"from":"brand","input":"name Harborline, brand #0e7490, accent #f59e0b, font Inter, rounded, compact"}'
+
+----
+Usage: texuli ds diff [--json <object> | --file <path>] [--out <path>]
+
+Diff two design systems (ds.diff, runtime edge)
+Compile two design-system documents (before is the baseline) and compare them: every added, removed or changed --tx-* variable per mode, contrast pairs that regressed below the target, changed component defaults and attributes. Returns valid, identical, the summary counts and each list, or errors tagged with their side.
+
+Arguments (JSON object keys):
+  before (required): object. The baseline design-system document.
+  after (required): object. The changed design-system document.
+  mode: "light" | "dark". Compile one mode only (default: every mode the document declares).
+  trust: "untrusted" | "developer". untrusted (agent or user documents, the default) refuses every data: URL; developer accepts capped data: fonts and images.
+  variant: string. A variant the document declares under variants (e.g. "high-contrast").
+  bases: object. Documents for extends: "id@x.y.z", keyed by "id@version". "texuli:<theme>" bases load from the theme library; nothing is fetched.
+
+Limits: input up to 1048576 bytes, 10000 ms budget.
+
+----
+Usage: texuli ds preview [--json <object> | --file <path>] [--out <path>]
+
+Preview a design system (ds.preview, runtime edge)
+Render a static, deterministic snapshot of a compiled design system: svg (swatches, a button and a card per mode) or html (the review report: swatches, type ramp, component sheet, contrast table and adjustments). Fixed fonts, no time, no scripts; every value escaped. Returns valid, the format, media type, content and hash.
+
+Arguments (JSON object keys):
+  document (required): object. A design-system document: format "texuli/design-system", formatVersion 1, id, version, name, and optional sections (extends, color, typography, shape, space, elevation, surface, motion, layout, icons, components, assets, voice, accessibility, variants). texuli://design-system/acme is a full example.
+  format: "svg" | "html". svg (a compact image, the default) or html (the full review report page).
+  title: string. html only: the page title.
+  mode: "light" | "dark". Compile one mode only (default: every mode the document declares).
+  trust: "untrusted" | "developer". untrusted (agent or user documents, the default) refuses every data: URL; developer accepts capped data: fonts and images.
+  variant: string. A variant the document declares under variants (e.g. "high-contrast").
+  bases: object. Documents for extends: "id@x.y.z", keyed by "id@version". "texuli:<theme>" bases load from the theme library; nothing is fetched.
+
+Limits: input up to 1048576 bytes, 10000 ms budget.
+Example (An SVG snapshot): texuli ds preview --json '{"document":{"format":"texuli/design-system","formatVersion":1,"id":"minimal","version":"1.0.0","name":"Minimal","color":{"brand":{"seed":"#4f46e5"}}}}'
+
+----
+Usage: texuli ds save [--json <object> | --file <path>] [--out <path>]
+
+Save a design system to a file (ds.save, runtime node)
+Validate a design-system document (as ds.validate does) and write it as two-space JSON to the explicit .json path you pass, inside the working directory: traversal, symlinks, dot directories and dotfiles, node_modules, package.json and an existing file without overwrite are refused. Local doors only. Returns saved, the relative path and bytes written, or errors with stable codes.
+
+Arguments (JSON object keys):
+  path (required): string. Where to write, relative to the working directory (e.g. design-systems/harborline.ds.json): a .json file outside dot directories and node_modules, never package.json.
+  document (required): object. A design-system document: format "texuli/design-system", formatVersion 1, id, version, name, and optional sections (extends, color, typography, shape, space, elevation, surface, motion, layout, icons, components, assets, voice, accessibility, variants). texuli://design-system/acme is a full example.
+  overwrite: boolean. Replace an existing file (default false: an existing file is refused).
+  dryRun: boolean. Validate the document and the path, and write nothing.
+  trust: "untrusted" | "developer". untrusted (agent or user documents, the default) refuses every data: URL; developer accepts capped data: fonts and images.
+  variant: string. A variant the document declares under variants (e.g. "high-contrast").
+  bases: object. Documents for extends: "id@x.y.z", keyed by "id@version". "texuli:<theme>" bases load from the theme library; nothing is fetched.
+
+Limits: input up to 1048576 bytes, 10000 ms budget.
 
 ----
 Usage: texuli deck run [--json <object> | --file <path>] [--out <path>]

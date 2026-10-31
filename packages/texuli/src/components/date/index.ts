@@ -1,7 +1,7 @@
 export { default as Calendar } from './Calendar.svelte';
 export { default as DatePicker } from './DatePicker.svelte';
 export { default as DateRangePicker } from './DateRangePicker.svelte';
-export type { DateLabels } from './labels.ts';
+export type { DateLabels, DateRangePickerPanelContext } from './labels.ts';
 export {
   type DateRangePreset,
   type DateRangePresetLabels,

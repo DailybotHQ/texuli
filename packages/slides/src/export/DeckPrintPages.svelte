@@ -5,9 +5,11 @@
  * every reveal step shown, optional notes after the slides (`appendix`) or
  * notes only (`handout`). Hidden slides are skipped.
  *
- * By default each page paints with the stage's own renderers (the 20
- * layouts, free slides, the component registry, backgrounds), loaded on
- * first use; a `slide` snippet replaces that. `data-print-ready="true"`
+ * Each page paints with the stage's slide view, its `renderers` and the
+ * default tables from `defaults` (the 20 layouts, free slides, the
+ * component registry, backgrounds; `DeckPrintView` passes the stage's,
+ * loaded on first use; the core passes none); a `slide` snippet replaces
+ * that. `data-print-ready="true"`
  * (and `onReady`) fires once the renderers, themes, images and fonts have
  * settled and the host's `contentReady` is true; after `mediaTimeoutMs` it
  * fires anyway, so a print never hangs on one broken image.
@@ -18,7 +20,7 @@ import type { DeckPreviewPaint } from '../stage/presenter/paint.ts';
 import { type DeckPrintPage, planDeckPrint } from './api.ts';
 import type { DeckPrintPaint } from './print-paint.ts';
 import { settleDeckPrint } from './print-ready.ts';
-import type { DeckPrintViewProps } from './print-types.ts';
+import type { DeckPrintViewCoreProps } from './print-types.ts';
 
 let {
   deck,
@@ -27,6 +29,7 @@ let {
   children,
   renderers,
   defaultRenderers = true,
+  defaults,
   tier = 'untrusted',
   messages,
   loadTheme,
@@ -36,7 +39,7 @@ let {
   onError,
   mediaTimeoutMs = 10_000,
   isolate = true,
-}: DeckPrintViewProps = $props();
+}: DeckPrintViewCoreProps = $props();
 
 type PaintModule = typeof import('./print-paint.ts');
 
@@ -59,7 +62,15 @@ let notePages = $derived(
 $effect(() => {
   if (custom) return;
   const current = deck;
-  const options = { renderers, defaultRenderers, tier, messages, loadTheme, resolveAvatar };
+  const options = {
+    renderers,
+    defaultRenderers,
+    defaults,
+    tier,
+    messages,
+    loadTheme,
+    resolveAvatar,
+  };
   let live = true;
   painter = null;
   import('./print-paint.ts')

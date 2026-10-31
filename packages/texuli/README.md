@@ -15,9 +15,9 @@ layouts for dashboards, marketing pages, auth and settings, content and
 mobile.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.9.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.10.0`) may contain breaking
-> changes, so pin the exact version or use `^0.9.0`, which accepts only 0.9.x.
+> published to npm as `0.10.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.11.0`) may contain breaking
+> changes, so pin the exact version or use `^0.10.0`, which accepts only 0.10.x.
 
 ## Install
 
@@ -37,7 +37,13 @@ yarn add texuli @texuli/tokens
   `@sveltejs/vite-plugin-svelte`, SvelteKit, or Astro with `@astrojs/svelte`
   (in Astro, add `vite.ssr.noExternal: ['texuli', /^@texuli\//]`).
 - **CSS:** import `@texuli/tokens/base.css` once and apply a theme (below).
-  Component styles load with each component.
+  Component styles load with each component. **This import is required:**
+  component CSS reads the system tokens (`--tx-space-unit`,
+  `--tx-size-icon-sm`, `--tx-shape-radius-*`…) with no fallback, and only
+  `base.css` declares them, so a host with its own reset that skips it gets
+  controls with no size. Such a host can load `@texuli/tokens/system.css`
+  instead (unreleased, `0.10.0`): the system token defaults alone, with no
+  reset.
 
 ## Quick start
 
@@ -132,6 +138,9 @@ typed vocabulary, used only when a prop is omitted. Every component also
 reads its component tokens (`--tx-button-radius`, `--tx-card-padding-inline`…)
 and the tier-3 hooks (`data-tx-button-style` and friends)
 ([design-system.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/design-system.md)).
+`texuli/design-system` (from `0.10.0`) adds `DesignSystemProvider`, a
+scope element that applies a compiled design system and its component
+defaults ([design-system.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/design-system.md#designsystemprovider)).
 
 ## New in 0.8.0
 

@@ -1,0 +1,17 @@
+{
+  "description": "extends resolves by exact id@version, never a range.",
+  "expect": [["extends-range", "$.extends"]],
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "acme",
+    "version": "1.0.0",
+    "name": "Acme",
+    "color": {
+      "brand": {
+        "seed": "#4f46e5"
+      }
+    },
+    "extends": "brand@^1.0.0"
+  }
+}

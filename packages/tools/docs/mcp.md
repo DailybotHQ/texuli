@@ -9,7 +9,9 @@
 > `@texuli/tools/mcp` export, `texuli mcp` and the `@texuli/mcp` package
 > are new in `0.9.0`, and the remote endpoint is live at
 > `https://texuli.com/mcp` (see [The remote door](#the-remote-door)). The
-> seven 0.8 tool names stay as deprecated aliases until `0.10.0`.
+> seven 0.8 tool names, deprecated aliases in `0.9.0`, are removed in
+> `0.10.0`: a call names the operation to
+> use instead ([ops.md](ops.md#removed-08-tool-names)).
 
 ## The local door
 
@@ -31,16 +33,21 @@ source.
   server. With no argument the server reads stdin until it closes, then
   exits with code 0.
 - **stdout carries only JSON-RPC**; usage errors go to stderr.
-- **Local writes:** no operation writes files today. Any operation that
-  will (`ds.save`, deck and document file outputs) must write through the
-  local write policy in `src/internal/local-write.ts`
-  (`resolveLocalWritePath`, `writeLocalFile`): an explicit path that
+- **Local writes:** `ds.save` is the only operation that writes (from
+  `0.10.0`). It writes through the local writer the door
+  passes (`files: localFiles()` in `runMcpStdio` and the CLI; the remote
+  door passes none, and the edge handler never imports `node:fs`), which applies the local write policy in
+  `src/internal/local-write.ts` (`resolveLocalWritePath`,
+  `writeLocalFile`): an explicit path that
   resolves inside the working directory and is not the directory itself;
   absolute paths only when they already point inside it; `..` escapes, NUL
   bytes, over-long paths and symlinked components (the target included)
   refused with a stable code (`path-required`, `path-invalid`,
   `outside-working-directory`, `not-a-file`, `symlink`); and a new file
-  (`exists` otherwise) unless `overwrite` is set. The `texuli document --out`
+  (`exists` otherwise) unless `overwrite` is set. `ds.save` adds its own
+  path rules: a `.json` file (`path-extension`), with no dot directory or
+  dotfile, no `node_modules` segment and no `package.json`
+  (`path-reserved`; [ds.md](ds.md)). The `texuli document --out`
   CLI flag keeps its own rule (a new file at the path the user typed).
 
 `createMcpHandler` turns the [operations registry](ops.md) into an MCP
@@ -73,6 +80,7 @@ const response = await remote(
 | `resources` | the Texuli resources | Resource providers; an empty list advertises no resources |
 | `prompts` | the Texuli prompts | Prompts; an empty list advertises no prompts |
 | `pageSize` | 100 | Items per page of every list method |
+| `files` | none | The local writer `ds.save` uses (`localFiles()` from the stdio server); without it `ds.save` answers `runtime-unavailable` |
 
 `createTexuliMcpServer(registry?)`, the 0.8 entry point, is a deprecated
 alias of `createMcpHandler({ registry, mode: 'stateful' })`.
@@ -96,6 +104,73 @@ unsupported one is refused with `-32600`.
   that says to initialize first.
 - **Stateless (HTTP):** every method works without a handshake;
   `initialize` still answers, and nothing is kept between requests.
+- **Per request (2026-07-28, both modes):** a request that names `2026-07-28`
+  in `params._meta` is answered on its own; see the next section.
+
+## The 2026-07-28 revision (partial)
+
+Since 0.10.0 the handler also serves MCP revision `2026-07-28` next to the
+initialize-based ones, in both modes and on both doors, to the extent
+Protoyard (Texuli's first consumer) asked for in G124. The constants are
+`MCP_STATELESS_PROTOCOL_VERSIONS` (`['2026-07-28']`), `MCP_PROTOCOL_REVISIONS`
+(every revision, newest first) and `MCP_PROTOCOL_VERSION_META_KEY`.
+
+**Implemented:**
+
+- **Per-request version.** The handler reads
+  `params._meta["io.modelcontextprotocol/protocolVersion"]` on every
+  request. When it is `2026-07-28`, the request needs no `initialize`, skips
+  the stdio initialization gate and stores nothing: a later request without
+  that `_meta` version still sees the session as it was.
+- **Unknown revision.** A `_meta` value that is not one of
+  `MCP_PROTOCOL_REVISIONS` (any string, or a non-string) is refused, on any
+  method including `initialize` and `ping`, with `-32022`,
+  `message: "Unsupported protocol version; supported: …"` and
+  `data: { supported: [...MCP_PROTOCOL_REVISIONS], requested }`
+  (`requested` is the string, cut to 64 characters, and absent for a
+  non-string).
+- **`server/discover`**, under `2026-07-28` only:
+
+  ```json
+  {"jsonrpc":"2.0","id":4,"method":"server/discover","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28"}}}
+  ```
+
+  answers `protocolVersion` (`2026-07-28`), `supportedVersions` (every
+  revision, newest first: the server card's `statelessProtocolVersions`
+  then its `protocolVersions`), `serverInfo`, `capabilities` and
+  `instructions` (as `initialize` returns them), and summaries: `tools`
+  (`name` and `title` of every tool `tools/list` returns on that door),
+  `prompts` (`name`, `title`) and `resources` (`count` and the
+  `templates`). `prompts` and `resources` are absent when the capability is
+  off. The full items come from the list methods.
+- **Stateless methods.** `ping`, `tools/list`, `tools/call`, `prompts/list`,
+  `prompts/get`, `resources/list`, `resources/templates/list`,
+  `resources/read` and `completion/complete` answer under `2026-07-28` with
+  the same results as after a `2025-11-25` handshake.
+
+**Not implemented** (anything of 2026-07-28 beyond the list above), and the
+conservative choices made where the report was silent:
+
+- A request without the `_meta` version behaves exactly as before, so
+  `server/discover` without it is gated on stdio before initialization
+  (`-32600`) and `-32601` otherwise. A `_meta` naming an initialize-based
+  revision (for example `2025-11-25`) changes nothing either.
+- `initialize` keeps negotiating only the initialize-based revisions
+  (`MCP_SUPPORTED_PROTOCOL_VERSIONS`): a client asking for `2026-07-28` in
+  `initialize` gets `2025-11-25`. An `initialize` that carries the
+  `2026-07-28` `_meta` version is answered as before.
+- Notifications are unchanged (they never get an answer).
+- On HTTP, the `MCP-Protocol-Version` header accepts `2026-07-28`, but the
+  header alone does not select it: a request with that header and no `_meta`
+  version is `-32600`, and a header that disagrees with the `_meta` version
+  is `-32600`. Without the header, the `_meta` version alone is enough.
+
+**Not initialized: `-32600`, not `-32002`.** Protoyard's own server answers a
+request before initialization with `-32002`. Texuli answers `-32600`
+(Invalid Request) and keeps it: in 2025-11-25, `-32002` is the
+resource-not-found code, which `resources/read` uses here. A client that
+tells the two apart should read `-32600` with the "Server not initialized"
+message as the not-initialized case.
 
 ## Capabilities
 
@@ -152,11 +227,15 @@ expected at the failing path.
 | `texuli://component/{id}` | JSON | One catalog entry (the manifest with group and emit tiers) |
 | `texuli://docs/{slug}` | Markdown | One component's agent page, identical to `/llms/components/<id>.md` on the site |
 | `texuli://theme/{id}` | JSON, then CSS | The full light and dark theme definition, then its compiled CSS |
+| `texuli://design-system/{id}` | JSON | One design-system document: the fictional examples (the spec's `acme`, every section, and `minimal`, the smallest; the guide's brands `quillmark`, `ledgerline` and `tumbletown`), or a library theme as a document (`loadLibraryBase`: `fromTheme` with its generator input as `color.brand`) |
 | `texuli://schema/{name}` | JSON | The JSON Schema of `deck` or `document` |
 
 `resources/list` lists the two fixed resources, both schemas, then every
-component, every component page and every library theme (paginated).
-`resources/templates/list` returns the four templates. An unknown URI is
+component, every component page, the five example design systems and every
+library theme (paginated). The library themes as design-system documents are
+not listed, to bound the list: complete `texuli://design-system/{id}` for
+every id (the five examples, then the 210 themes) and read one at a time.
+`resources/templates/list` returns the five templates. An unknown URI is
 `-32002` (resource not found) with `data: { uri }`; a missing, non-string or
 over-2,048-character URI is `-32602`.
 
@@ -173,9 +252,11 @@ over-2,048-character URI is `-32602`.
   no copy of it, and `@texuli/tools` does not depend on `@texuli/spec` yet
   (adding it needs a lockfile change). An agent checks a blueprint with the
   `blueprint.validate` tool instead.
-- **`texuli://design-system/{id}`** and the design-system schema: they come
-  with design systems (Part B of the plan). The template is omitted, not
-  registered empty, so an agent never sees a resource that cannot be read.
+- **The design-system JSON Schema** (`texuli://schema/design-system`): it
+  lives in `@texuli/spec` (`schemas/design-system.schema.json`), which
+  `@texuli/tools` does not depend on (the same reason as the blueprint
+  schema). `texuli://design-system/acme` shows every section, and
+  `ds.validate` checks a document with the spec's codes and paths.
 
 ## Prompts
 
@@ -183,12 +264,13 @@ over-2,048-character URI is `-32602`.
 | --- | --- | --- |
 | `build-ui` | `brief` (required), `tier` (`untrusted` or `developer`), `theme` | `catalog.search` → `component.get` (keep by useWhen, drop by dontUseWhen) → `example.search` → compose a catalog tree → `blueprint.validate` until `valid` is true |
 | `theme-blueprint` | `brief` (required), `mode` (`light` or `dark`), `theme` | `theme.search` → shortlist → `theme.preview` (keep `aa.pass`) → `theme.get` → how the host applies it |
+| `create-design-system` | `brief` (required), `base` (a library theme id), `contrast` (`AA` or `AAA`) | read `texuli://design-system/acme` → `ds.import` or `ds.suggest` → write the sections → `ds.validate` and fix by code until `valid` is true → `ds.contrast` and `ds.preview` → deliver with `ds.compile`, `blueprint.theme` or `ds.save` |
 | `convert-deck` | `direction` (required: `from-markdown` or `to-markdown`), `source` | `deck.run` capabilities and layouts → convert → lint until no errors → round-trip check |
 
 The texts follow the skill's loops (`skills/texuli/build-ui`, `themes` and
 the deck reference). Each names only real operations and served resources;
-the suite checks that. `create-design-system` comes with design systems
-(planned). `build-ui` validates through the `blueprint.validate` tool, so
+the suite checks that (the `create-design-system` text names `ds.save`,
+which only the local server lists, and says so). `build-ui` validates through the `blueprint.validate` tool, so
 an agent can finish the loop through the protocol alone. `prompts/get` refuses an unknown
 prompt, a missing required argument, an unknown argument, a non-string value,
 a value outside its enum and a value over its length cap (10,000 characters,
@@ -197,9 +279,9 @@ or 2,000,000 for `source`) with `-32602`.
 ## Completions
 
 `completion/complete` completes the template variables (component ids for
-`component/{id}` and `docs/{slug}`, theme ids, schema names) and the prompt
-arguments (`theme` from the library, and the enums of `tier`, `mode` and
-`direction`). Matching is a case-insensitive prefix. At most 100 values are
+`component/{id}` and `docs/{slug}`, theme ids, design-system ids, schema
+names) and the prompt arguments (`theme` and `base` from the library, and the
+enums of `tier`, `mode`, `contrast` and `direction`). Matching is a case-insensitive prefix. At most 100 values are
 returned, with `total` and `hasMore`. An unknown prompt, template, variable
 or reference type is `-32602`; a free-text argument completes to nothing.
 
@@ -215,11 +297,12 @@ from another method or is past the end is refused with `-32602`.
 | Code | When |
 | --- | --- |
 | `-32700` | stdio: a line that is not JSON, or longer than 2 MiB |
-| `-32600` | Not a JSON-RPC 2.0 request (bad `jsonrpc`, method or id); a stateful request before initialization; a stateless request with an unsupported protocol version |
+| `-32600` | Not a JSON-RPC 2.0 request (bad `jsonrpc`, method or id); a stateful request before initialization; a stateless request with an unsupported protocol version; on HTTP, a `2026-07-28` header without the `_meta` version or one that disagrees with it |
 | `-32601` | An unknown method, or one whose capability is not advertised |
 | `-32602` | Bad params: an unknown tool or prompt, a bad cursor, a bad URI, bad prompt arguments, a bad completion reference |
 | `-32603` | A resource provider threw; the message is `Internal error` and never carries the cause |
 | `-32002` | Resource not found |
+| `-32022` | `params._meta` names a protocol revision the handler does not serve; `error.data.supported` lists the revisions |
 
 Operation failures are never JSON-RPC errors; see [Tools](#tools).
 
@@ -252,7 +335,9 @@ MCP-Protocol-Version: 2025-11-25
   except the `node` operations (`document.export`: PDF and DOCX), which are
   not listed and answer `runtime-unavailable`, plus the site tools below. No handshake is required; send
   `initialize` if the host wants one. The protocol version comes from the
-  `MCP-Protocol-Version` header (an unsupported one is `400`).
+  `MCP-Protocol-Version` header (an unsupported one is `400`), or from
+  `params._meta` under `2026-07-28` (see
+  [The 2026-07-28 revision](#the-2026-07-28-revision-partial)).
 - **Responses:** JSON only, no SSE stream and no `Mcp-Session-Id`. A
   notification gets `202`. A batch of up to 10 messages gets an array of
   the responses to its requests. `GET` gets `405` with a pointer here (an
@@ -303,7 +388,8 @@ offered to browser agents in the page itself through WebMCP
 `texuli-mcp` bin from a clean install (handshake, `tools/list`,
 `catalog.search`, exit on stdin close).
 `packages/tools/tests/mcp-protocol.test.ts` is the conformance suite: every
-method, every JSON-RPC and operation error code, the four versions, cursors,
+method, every JSON-RPC and operation error code, the four versions and the
+per-request `2026-07-28` revision, cursors,
 oversized stdio lines and operation inputs, stateless and stateful handlers,
 and the runtime filter. It also checks that the llms resources are
 byte-identical to the site's committed snapshots. `mcp.test.ts`,
@@ -324,5 +410,9 @@ identically on both. A fifth job reads the site (`site.search` →
 only, with a fake `env.ASSETS`, and the stdio door is checked to refuse
 `site.read` with `runtime-unavailable`. `tool-descriptions.test.ts` there lints every operation's
 summary, stated limits, argument descriptions and bounds, closed input
-schema and examples. The design-system jobs are skipped until their
+schema and examples. `revisions.test.ts` there drives the real
+`@texuli/mcp` stdio entry (lines over streams, starting with Protoyard's
+`server/discover` repro) and the remote Function with the same
+`2026-07-28` messages, and asserts identical answers except the tools each
+door serves, `-32022` on both, the header rules and the counter label. The design-system jobs are skipped until their
 operations exist.

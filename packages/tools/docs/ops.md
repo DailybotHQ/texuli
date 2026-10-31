@@ -15,8 +15,9 @@ has a `group.verb` name, a title, a summary written for agents, a JSON Schema
 input and output, annotations, a runtime class, limits and worked examples.
 The MCP server (`src/mcp/`, local and remote) lists and calls them, the
 `texuli <group> <verb>` router runs each one, and the `texuli deck`,
-`texuli document` and `texuli theme list|preview` commands run through the
-same registry. The registry is framework-free.
+`texuli document`, `texuli ds` and `texuli theme list|preview` commands run
+through the same registry. The design-system operations are described in
+[ds.md](ds.md). The registry is framework-free.
 
 ## Operations
 
@@ -28,12 +29,21 @@ same registry. The registry is framework-free.
 | `catalog.validate` | Validate catalog manifests | edge | local and remote MCP, CLI | `texuli catalog validate` | Validate one candidate catalog manifest, or a set (which also catches duplicate ids), without writing files. Returns valid and a list of diagnostics, each with a code, a JSONPath, a message and a hint. |
 | `component.get` | Read a component manifest | edge | local and remote MCP, CLI | `texuli component get` | Read one component manifest from the catalog by id. Returns { component }: its props with kinds and schemas, events, worked examples, useWhen and dontUseWhen guidance, accessibility notes and the emit tiers that may place it (an empty emit list means agent output may not). |
 | `example.search` | Find component examples | edge | local and remote MCP, CLI | `texuli example search` | Find worked manifest examples (props an agent can copy) by component id and/or example id, or search their titles and descriptions. Returns the match count and each example with its component id and package. |
-| `blueprint.validate` | Validate a blueprint draft | edge | local and remote MCP, CLI | `texuli blueprint validate` | Validate a blueprint draft (a catalog tree, an array of trees, or a texuli-blueprint envelope, migrated first) with the catalog's draft checks: structure, sinks, tree limits, component ids, tiers and prop schemas, deep block and document schemas, grammar and the frame root. Returns valid, status, tier, migratedFrom and diagnostics with the catalog's stable codes. |
+| `blueprint.validate` | Validate a blueprint draft | edge | local and remote MCP, CLI | `texuli blueprint validate` | Validate a blueprint draft (a catalog tree, an array of trees, or a texuli-blueprint envelope, migrated first) with the catalog's checks: structure, sinks, tree limits, component ids, tiers, prop, block and document schemas, the envelope's designSystem (codes under $.designSystem), grammar and the frame root. Returns valid, status, tier, migratedFrom and diagnostics with stable codes. |
+| `blueprint.theme` | Apply a design system to a blueprint | edge | local and remote MCP, CLI | `texuli blueprint theme` | Set a blueprint envelope's designSystem to a reference ({ ref: "acme@2.1.0" } or a library theme "texuli:ocean") or an inline document, wrapping a bare tree in a draft envelope first, then validate the result as blueprint.validate does; an inline document is also compiled for the contrast, focus and target guarantees. Returns valid, the themed blueprint and diagnostics with stable codes. |
 | `block.list` | List block types | edge | local and remote MCP, CLI | `texuli block list` | List the content block types the blocks-* components render (table, stat, cta, poll …), optionally for one component or matching words. Returns the match count and, per type, the component that renders it, a label and when to use it; read one shape with block.schema. |
 | `block.schema` | Read a block shape | edge | local and remote MCP, CLI | `texuli block schema` | Read the shape of one content block type: the component that renders it, its fields as compact text and as a JSON Schema (required fields are the ones the validator refuses a block without), examples that validate in a blueprint, limits, when to use it and whether it can pass blueprint.validate today. Returns what a blocks-* node’s block prop needs. |
 | `theme.search` | Search the theme library | edge | local and remote MCP, CLI | `texuli theme search` | Search the Texuli theme library (200+ offline themes) by words, category, collection, mood or tag. Returns the match count and each theme’s metadata: id, name, description, category, collection, mood, tags, contrast level and whether it is dark-first. |
 | `theme.get` | Read a full theme | edge | local and remote MCP, CLI | `texuli theme get` | Read the full token definition of one library theme by id. Returns { theme }: its id, name, description and every light and dark color, radius, font and chart token, ready to compile or apply. |
 | `theme.preview` | Preview a theme | edge | local and remote MCP, CLI | `texuli theme preview` | Preview one library theme in light or dark mode. Returns its summary, the key tokens of that mode (background, foreground, primary, border, radius, font …) and the WCAG 2.x AA contrast report for both modes (aa.pass and issue counts). |
+| `ds.validate` | Validate a design system | edge | local and remote MCP, CLI | `texuli ds validate` | Validate a design-system document: the spec's closed schema, the extends chain, then a compile of the document and its high-contrast variant with the guarantees enforced (text contrast, focus ring, target size). Returns valid, the distinct codes, every error with its JSON path and hint, the compiler warnings and the hash. |
+| `ds.compile` | Compile a design system | edge | local and remote MCP, CLI | `texuli ds compile` | Compile a design-system document to concrete --tx-* variables per mode and emit one format: compiled JSON, scoped CSS, a Tailwind preset, DTCG or Tokens Studio. Returns valid, the format, its media type, the content as text, the hash and warnings; a refused document returns errors with stable codes instead. |
+| `ds.contrast` | Report design-system contrast | edge | local and remote MCP, CLI | `texuli ds contrast` | Compile a design-system document and report every contrast pair the guarantees check, per mode: foreground and background roles, kind (text, ui, focus), ratio, requirement and pass, plus the solver adjustments. Returns valid, the target (AA or AAA), targetMin and the per-mode pairs, or errors with stable codes. |
+| `ds.suggest` | Suggest a design system | edge | local and remote MCP, CLI | `texuli ds suggest` | Suggest a starting design-system document from one seed color, up to three brand colors (seed, secondary, accent) or a logo as RGBA pixels (the dominant colors pick the seed). Returns valid, the document, the dominant palette for pixels, the key tokens of each mode and warnings. |
+| `ds.import` | Import a design system | edge | local and remote MCP, CLI | `texuli ds import` | Turn what a team already has into a valid design-system document: a brand one-liner ("brand #4f46e5, font Inter, rounded, compact"), a W3C DTCG file, a Tokens Studio file, a flat role palette or a Texuli theme (an object, or a library theme id). Returns valid, the document and warnings for every value it dropped, or errors with stable codes. |
+| `ds.diff` | Diff two design systems | edge | local and remote MCP, CLI | `texuli ds diff` | Compile two design-system documents (before is the baseline) and compare them: every added, removed or changed --tx-* variable per mode, contrast pairs that regressed below the target, changed component defaults and attributes. Returns valid, identical, the summary counts and each list, or errors tagged with their side. |
+| `ds.preview` | Preview a design system | edge | local and remote MCP, CLI | `texuli ds preview` | Render a static, deterministic snapshot of a compiled design system: svg (swatches, a button and a card per mode) or html (the review report: swatches, type ramp, component sheet, contrast table and adjustments). Fixed fonts, no time, no scripts; every value escaped. Returns valid, the format, media type, content and hash. |
+| `ds.save` | Save a design system to a file | node | local MCP, CLI | `texuli ds save` | Validate a design-system document (as ds.validate does) and write it as two-space JSON to the explicit .json path you pass, inside the working directory: traversal, symlinks, dot directories and dotfiles, node_modules, package.json and an existing file without overwrite are refused. Local doors only. Returns saved, the relative path and bytes written, or errors with stable codes. |
 | `deck.run` | Run a deck command | edge | local and remote MCP, CLI | `texuli deck run` | Inspect, lint and convert a Texuli deck on the shared v2 model: capabilities, the JSON Schema, layouts, lint, inspect, from-markdown and to-markdown. Pure compute; returns { result } with the command output (ok, issues, deck, markdown …). |
 | `document.run` | Run a document command | edge | local and remote MCP, CLI | `texuli document run` | Create, validate, inspect, patch and convert a Texuli document (spec 0.7.0): capabilities, the JSON Schema, validate, inspect, a bounded RFC 6902 patch (at most 1000 operations), from-markdown, to-markdown and to-blueprint. Returns { result } with the command output; PDF and DOCX are document.export. |
 | `document.export` | Export a document as PDF or DOCX | node | local MCP, CLI | `texuli document export` | Write a Texuli document as PDF or DOCX bytes with the owned writers, links and media checked at the tier. Returns { result } with ok, mime, byteLength, base64 bytes (no files are written), diagnostics and, for PDF, pageCount. Needs Node. |
@@ -50,11 +60,20 @@ same registry. The registry is framework-free.
 | `component.get` | 1,024 | — | 5 s | `id` (required) |
 | `example.search` | 4,096 | 100 | 5 s | `componentId`, `exampleId`, `query`, `limit` |
 | `blueprint.validate` | 270,336 | 512 | 5 s | `draft` (required), `tier`, `fragment` |
+| `blueprint.theme` | 1,318,912 | 512 | 10 s | `blueprint` (required), `designSystem` (required), `tier`, `id` |
 | `block.list` | 1,024 | 32 | 5 s | `component`, `query` |
 | `block.schema` | 1,024 | — | 5 s | `type` (required) |
 | `theme.search` | 4,096 | 500 | 5 s | `query`, `category`, `collection`, `mood`, `tag`, `limit` |
 | `theme.get` | 1,024 | — | 5 s | `id` (required) |
 | `theme.preview` | 1,024 | — | 5 s | `id` (required), `mode` |
+| `ds.validate` | 1,048,576 | — | 10 s | `document` (required), `trust`, `variant`, `bases` |
+| `ds.compile` | 1,048,576 | — | 10 s | `document` (required), `format`, `selector`, `dark`, `mode`, `trust`, `variant`, `bases` |
+| `ds.contrast` | 1,048,576 | — | 10 s | `document` (required), `mode`, `trust`, `variant`, `bases` |
+| `ds.suggest` | 1,048,576 | 65,536 | 10 s | `seed`, `colors`, `pixels`, `count`, `id`, `version`, `name`, `trust` |
+| `ds.import` | 1,048,576 | — | 10 s | `from` (required), `input` (required), `id`, `version`, `name`, `trust` |
+| `ds.diff` | 1,048,576 | — | 10 s | `before` (required), `after` (required), `mode`, `trust`, `variant`, `bases` |
+| `ds.preview` | 1,048,576 | — | 10 s | `document` (required), `format`, `title`, `mode`, `trust`, `variant`, `bases` |
+| `ds.save` | 1,048,576 | — | 10 s | `path` (required), `document` (required), `overwrite`, `dryRun`, `trust`, `variant`, `bases` |
 | `deck.run` | 2,100,000 | — | 10 s | `command` (required), `deck`, `markdown` |
 | `document.run` | 2,100,000 | 1,000 | 10 s | `command` (required), `document`, `markdown`, `patch`, `tier`, `key` |
 | `document.export` | 2,100,000 | — | 30 s | `format` (required), `document` (required), `tier` |
@@ -62,9 +81,11 @@ same registry. The registry is framework-free.
 | `site.read` | 1,024 | — | 5 s | `path` (required) |
 | `site.search` | 1,024 | 50 | 5 s | `query` (required), `limit` |
 
-### Deprecated 0.8 tool names
+### Removed tool names
 
-| Alias | Resolves to | Removed in |
+A call to a removed name is refused with a message that names the operation to call instead.
+
+| Name | Call instead | Removed in |
 | --- | --- | --- |
 | `deck` | `deck.run` | `0.10.0` |
 | `document` | `document.run`, `document.export` | `0.10.0` |
@@ -163,7 +184,12 @@ group).
   (an envelope written for another catalog hash fails with
   `catalog-mismatch`), with the deep block family schemas and
   `validateDocument` from `@texuli/document/schema` for `document` nodes.
-  The tier the draft declares is ignored, as in every host.
+  The tier the draft declares is ignored, as in every host. An envelope's
+  `designSystem` (spec `0.10.0`) goes through the spec's
+  `checkDesignSystemReference` as the catalog's `checkDesignSystem` hook,
+  so an inline document's codes (`unknown-key`, `url-refused` …) land
+  under `$.designSystem` at the caller's tier (from `0.10.0`). `blueprint.theme` sets that field and also compiles an inline
+  document for the guarantee codes ([ds.md](ds.md)).
 - **Output:** `valid` (true only with no error diagnostics), `status`
   (`valid`, `invalid`, `parse` or `over-limits`), `tier`, `migratedFrom`
   (the spec version an envelope declared, when it was migrated; an envelope
@@ -242,7 +268,7 @@ package version, read from `package.json` (the MCP `serverInfo.version`).
 
 | Code | When |
 | --- | --- |
-| `unknown-operation` | The name is neither an operation nor an alias |
+| `unknown-operation` | The name is neither an operation nor an alias; a name removed in `0.10.0` gets a message naming its replacement |
 | `invalid-input` | The input is not a JSON object, has a cycle, or fails the input schema (`issues` lists each failure with a JSONPath) |
 | `input-too-large` | The input is over `limits.inputBytes` |
 | `not-found` | A named thing does not exist (an unknown component or theme id) |
@@ -263,15 +289,26 @@ refused when the registry is built (`schemaKeywordIssues`), so no constraint
 is silently ignored. Every input schema is an object with
 `additionalProperties: false`, so unknown arguments are refused by name.
 
-## Deprecated 0.8 tool names
+## Removed 0.8 tool names
 
-The seven MCP tool names of `0.8` stay as aliases for one minor (the
-generated table under [Operations](#operations) names their targets and the
-release that removes them). Their MCP descriptions start with "Deprecated
-alias of …". `theme` resolves to `theme.get` when `id` is given, otherwise
-`theme.search`; `document` resolves to `document.export` for `to-docx` and
-`to-pdf`, otherwise `document.run` (the legacy input schema, with all ten
-commands). An alias returns exactly what its target returns.
+The seven MCP tool names of `0.8` (`deck`, `document`, `catalog`,
+`component`, `validate`, `example`, `theme`) were deprecated aliases in
+`0.9.0` and are removed in `0.10.0`. No door lists them. A call is refused with a message that
+names the operation to call instead: `invoke()` returns `unknown-operation`
+with `The tool "theme" was removed in 0.10.0; call theme.search or
+theme.get instead.`, and the MCP `tools/call` answers the same text as a
+`-32602` protocol error. The generated table under
+[Operations](#operations) lists each name and its replacement
+(`TEXULI_REMOVED_NAMES`, `registry.removed()`). Move host prompts and
+allowlists: `deck` → `deck.run`; `document` → `document.run`, or
+`document.export` with `format: "pdf"` or `"docx"` for the old `to-pdf` and
+`to-docx` commands; `catalog` → `catalog.search`; `component` →
+`component.get`; `validate` → `catalog.validate`; `example` →
+`example.search`; `theme` → `theme.get` (with `id`) or `theme.search`.
+
+The alias mechanism stays (`OperationAlias`, `registry.aliases()`, empty in
+`0.10.0`): the next renamed operation keeps its old name for one minor
+(ADR-017).
 
 ## Doors that use it today
 
@@ -281,7 +318,7 @@ commands). An alias returns exactly what its target returns.
   `edge` and `site` for the remote endpoint, which passes each request's
   `env.ASSETS` as the site context),
   with `inputSchema`, `outputSchema`, `annotations` and cursor pagination,
-  then the aliases. A call goes through `invoke()` and returns
+  then any deprecated aliases (none in `0.10.0`). A call goes through `invoke()` and returns
   `structuredContent` plus a text mirror; a failure is an `isError` result
   whose JSON has `error`, `code` and, for schema failures, `issues`. An
   unknown tool name is a JSON-RPC `-32602` error. The same handler serves
@@ -296,7 +333,9 @@ commands). An alias returns exactly what its target returns.
   The 0.8 commands stay: `texuli deck …` runs `deck.run`; `texuli document
   …` runs `document.run`, or `document.export` for `to-docx` and `to-pdf`;
   `texuli theme list` and `theme preview <id>` run `theme.search` and
-  `theme.preview`; `texuli init`, `theme apply`, `add`, `diff`, `update` and
+  `theme.preview`; `texuli ds <command> <file>` runs the `ds.*` operations
+  on files ([ds.md](ds.md#cli)), and `texuli ds check` the conformance
+  check; `texuli init`, `theme apply`, `add`, `diff`, `update` and
   `mcp` route to their own commands, and every 0.8 bin (`texuli-init`,
   `texuli-deck` …) still works.
 - **Generated surfaces:** the MCP server card, the "Tools" section of the
@@ -308,8 +347,8 @@ commands). An alias returns exactly what its target returns.
 
 `packages/tools/tests/ops.test.ts` checks that every operation is declared
 once in the schema subset, round-trips every example through its input and
-output schemas, refuses bad input with each error code, resolves every
-alias to the same result as its target, reads the version from
+output schemas, refuses bad input with each error code, refuses every
+removed 0.8 name with its replacement, reads the version from
 `package.json`, and that the CLI runs through the registry.
 The same file checks `blueprint.validate` on golden and hostile fixtures,
 envelope migration, the catalog hash, deep block checks, the frame root,

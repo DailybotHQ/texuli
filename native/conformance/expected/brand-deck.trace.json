@@ -1,0 +1,34 @@
+{
+  "golden": "brand-deck",
+  "trace": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "id": "blocks-text",
+              "role": "list"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Agenda",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "id": "blocks-data",
+              "role": "group"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Since Tuesday",
+          "role": "group"
+        }
+      ],
+      "id": "layout-deck",
+      "name": "Harbor planning, 2026-10-30",
+      "role": "main"
+    }
+  ]
+}

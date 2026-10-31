@@ -83,6 +83,11 @@ export interface PlayerLabels {
   canvasNeedsHost: string;
   /** A `spreadsheet` node painted without a sheet host (spec 0.8.0): only previews reach it. */
   sheetNeedsHost: string;
+  /**
+   * Shown when the blueprint's design system (spec 0.10.0) is not resolved
+   * or is refused: the player keeps the default theme.
+   */
+  designSystemRefused: string;
 
   // Data sources (spec 0.8.0): a node whose rows come from the host's source.
   /** Shown while a bound node's first rows load. `{label}`: the node's caption or label. */
@@ -161,6 +166,7 @@ export const DEFAULT_PLAYER_LABELS: PlayerLabels = Object.freeze({
   documentNeedsHost: 'This document opens in a document reader.',
   canvasNeedsHost: 'This canvas opens in a canvas viewer.',
   sheetNeedsHost: 'This spreadsheet opens in a spreadsheet viewer.',
+  designSystemRefused: 'The design system could not be applied. Showing the default theme.',
 
   sourceLoading: 'Loading {label}…',
   sourceEmpty: 'Nothing to show yet.',
@@ -261,6 +267,7 @@ export function resolvePlayerLabels(overrides: PlayerLabelOverrides | undefined)
     documentNeedsHost: text(overrides.documentNeedsHost, base.documentNeedsHost),
     canvasNeedsHost: text(overrides.canvasNeedsHost, base.canvasNeedsHost),
     sheetNeedsHost: text(overrides.sheetNeedsHost, base.sheetNeedsHost),
+    designSystemRefused: text(overrides.designSystemRefused, base.designSystemRefused),
     sourceLoading: text(overrides.sourceLoading, base.sourceLoading),
     sourceEmpty: text(overrides.sourceEmpty, base.sourceEmpty),
     sourceFailed: text(overrides.sourceFailed, base.sourceFailed),

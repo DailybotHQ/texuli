@@ -79,11 +79,78 @@ const INVALID_DRAFT = {
   ],
 };
 
+/** One diagnostic as the operations return it. */
+export interface BlueprintDiagnostic {
+  check: string;
+  code: string;
+  severity: 'error' | 'warning';
+  path: string;
+  message: string;
+  id?: string;
+}
+
+/** What `blueprint.validate` returns, plus the migrated envelope `blueprint.theme` builds on. */
+export interface BlueprintVerdict {
+  valid: boolean;
+  status: DraftValidation['status'];
+  tier: 'untrusted' | 'developer';
+  migratedFrom?: string;
+  diagnostics: BlueprintDiagnostic[];
+}
+
+/**
+ * Validate a draft with the catalog's checks, the deep block and document
+ * schemas, and the envelope's design system through the spec's
+ * `checkDesignSystemReference` (loaded lazily with the design-system
+ * operations): an inline document's codes and paths land under
+ * `$.designSystem`.
+ */
+export async function validateBlueprintDraft(
+  draft: unknown,
+  tier: 'untrusted' | 'developer',
+  fragment: boolean
+): Promise<BlueprintVerdict & { envelope: DraftValidation['envelope'] }> {
+  const [{ catalog, hash }, , { checkDesignSystemReference }] = await Promise.all([
+    viewOfCatalog(),
+    loadBlockShapes(),
+    import('@texuli/tokens/design-system/validate'),
+  ]);
+  const result: DraftValidation = validateDraft(draft, {
+    catalog,
+    catalogHash: hash,
+    tier,
+    ...(fragment ? { frameRoots: false as const } : {}),
+    checkBlock: checkFamilyBlock,
+    checkDocument,
+    checkDesignSystem: checkDesignSystemReference,
+  });
+  const declared = declaredSpec(draft);
+  const migratedFrom =
+    declared !== undefined && result.envelope && result.envelope.spec !== declared
+      ? declared
+      : undefined;
+  return {
+    valid: result.ok,
+    status: result.status,
+    tier: result.tier,
+    ...(migratedFrom ? { migratedFrom } : {}),
+    diagnostics: result.diagnostics.map((diagnostic) => ({
+      check: diagnostic.check,
+      code: diagnostic.code,
+      severity: diagnostic.severity,
+      path: diagnostic.path,
+      message: diagnostic.message,
+      ...(diagnostic.id ? { id: diagnostic.id } : {}),
+    })),
+    envelope: result.envelope,
+  };
+}
+
 export const blueprintValidate: Operation = defineOperation({
   name: 'blueprint.validate',
   title: 'Validate a blueprint draft',
   summary:
-    "Validate a blueprint draft (a catalog tree, an array of trees, or a texuli-blueprint envelope, migrated first) with the catalog's draft checks: structure, sinks, tree limits, component ids, tiers and prop schemas, deep block and document schemas, grammar and the frame root. Returns valid, status, tier, migratedFrom and diagnostics with the catalog's stable codes.",
+    "Validate a blueprint draft (a catalog tree, an array of trees, or a texuli-blueprint envelope, migrated first) with the catalog's checks: structure, sinks, tree limits, component ids, tiers, prop, block and document schemas, the envelope's designSystem (codes under $.designSystem), grammar and the frame root. Returns valid, status, tier, migratedFrom and diagnostics with stable codes.",
   input: {
     type: 'object',
     properties: {
@@ -142,34 +209,182 @@ export const blueprintValidate: Operation = defineOperation({
     { title: 'A hostile card with a script link', input: { draft: INVALID_DRAFT } },
   ],
   async handler(input) {
-    const [{ catalog, hash }] = await Promise.all([viewOfCatalog(), loadBlockShapes()]);
+    const { envelope: _envelope, ...verdict } = await validateBlueprintDraft(
+      input.draft,
+      input.tier === 'developer' ? 'developer' : 'untrusted',
+      input.fragment === true
+    );
+    return verdict;
+  },
+});
+
+const DIAGNOSTICS = {
+  type: 'array',
+  items: {
+    type: 'object',
+    properties: {
+      check: { type: 'string' },
+      code: { type: 'string' },
+      severity: { type: 'string', enum: ['error', 'warning'] },
+      path: { type: 'string' },
+      message: { type: 'string' },
+      id: { type: 'string' },
+    },
+    required: ['check', 'code', 'severity', 'path', 'message'],
+  },
+} as const;
+
+/** The timestamp a wrapped tree's envelope gets: fixed, so the output is deterministic. */
+export const THEME_WRAP_TIMESTAMP = '1970-01-01T00:00:00.000Z';
+const REF =
+  '^(texuli:[a-z][a-z0-9]*(-[a-z0-9]+)*|[a-z][a-z0-9]*(-[a-z0-9]+)*@(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*))$';
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+export const blueprintTheme: Operation = defineOperation({
+  name: 'blueprint.theme',
+  title: 'Apply a design system to a blueprint',
+  summary:
+    'Set a blueprint envelope\'s designSystem to a reference ({ ref: "acme@2.1.0" } or a library theme "texuli:ocean") or an inline document, wrapping a bare tree in a draft envelope first, then validate the result as blueprint.validate does; an inline document is also compiled for the contrast, focus and target guarantees. Returns valid, the themed blueprint and diagnostics with stable codes.',
+  input: {
+    type: 'object',
+    properties: {
+      blueprint: {
+        type: ['object', 'array'],
+        maxItems: MAX_NODES,
+        description:
+          'A texuli-blueprint envelope, or a catalog tree (or array of trees) to wrap in a draft envelope for the current catalog.',
+      },
+      designSystem: {
+        type: 'object',
+        properties: {
+          ref: {
+            type: 'string',
+            maxLength: 140,
+            pattern: REF,
+            description:
+              'An exact id@x.y.z the host resolves, or texuli:<theme> for a library theme; never a range, URL or path.',
+          },
+          inline: {
+            type: 'object',
+            description: 'A whole design-system document carried in the blueprint.',
+          },
+        },
+        additionalProperties: false,
+        description: 'Exactly one of ref and inline.',
+      },
+      tier: {
+        type: 'string',
+        enum: ['untrusted', 'developer'],
+        default: 'untrusted',
+        description:
+          'The tier to validate at: untrusted (agent output, the default; refuses data: URLs in an inline document) or developer.',
+      },
+      id: {
+        type: 'string',
+        maxLength: 128,
+        pattern: '^[A-Za-z0-9][A-Za-z0-9._:-]*$',
+        description: 'A wrapped tree only: the envelope id (default "draft").',
+      },
+    },
+    required: ['blueprint', 'designSystem'],
+    additionalProperties: false,
+  },
+  output: {
+    type: 'object',
+    properties: {
+      valid: { type: 'boolean' },
+      status: { type: 'string', enum: ['valid', 'invalid', 'parse', 'over-limits'] },
+      tier: { type: 'string', enum: ['untrusted', 'developer'] },
+      blueprint: { type: 'object' },
+      diagnostics: DIAGNOSTICS,
+    },
+    required: ['valid', 'status', 'tier', 'blueprint', 'diagnostics'],
+  },
+  annotations: { readOnly: true, destructive: false, idempotent: true, openWorld: false },
+  runtime: 'edge',
+  limits: {
+    inputBytes: MAX_TREE_BYTES + DRAFT_TEXT_ALLOWANCE + 1_048_576,
+    items: MAX_NODES,
+    timeMs: 10_000,
+  },
+  examples: [
+    {
+      title: 'Theme the hero page with a library theme',
+      input: { blueprint: VALID_DRAFT, designSystem: { ref: 'texuli:ocean' } },
+    },
+    {
+      title: 'Carry a small inline design system',
+      input: {
+        blueprint: VALID_DRAFT,
+        designSystem: {
+          inline: {
+            format: 'texuli/design-system',
+            formatVersion: 1,
+            id: 'harborline',
+            version: '1.0.0',
+            name: 'Harborline',
+            color: { brand: { seed: '#0e7490' } },
+          },
+        },
+      },
+    },
+  ],
+  async handler(input) {
     const tier = input.tier === 'developer' ? 'developer' : 'untrusted';
-    const result: DraftValidation = validateDraft(input.draft, {
-      catalog,
-      catalogHash: hash,
-      tier,
-      ...(input.fragment === true ? { frameRoots: false as const } : {}),
-      checkBlock: checkFamilyBlock,
-      checkDocument,
-    });
-    const declared = declaredSpec(input.draft);
-    const migratedFrom =
-      declared !== undefined && result.envelope && result.envelope.spec !== declared
-        ? declared
-        : undefined;
+    const designSystem = input.designSystem as Record<string, unknown>;
+    let blueprint: Record<string, unknown>;
+    if (isRecord(input.blueprint) && input.blueprint.format === 'texuli-blueprint') {
+      blueprint = { ...input.blueprint, designSystem };
+    } else {
+      const { hash } = await viewOfCatalog();
+      blueprint = {
+        format: 'texuli-blueprint',
+        version: 1,
+        id: typeof input.id === 'string' ? input.id : 'draft',
+        catalog: hash,
+        status: 'draft',
+        createdAt: THEME_WRAP_TIMESTAMP,
+        updatedAt: THEME_WRAP_TIMESTAMP,
+        generator: { kind: 'tool', name: 'blueprint.theme' },
+        designSystem,
+        tree: input.blueprint,
+      };
+    }
+    const { envelope, ...verdict } = await validateBlueprintDraft(blueprint, tier, false);
+    // The migrated envelope (spec current), still a draft: only the host activates it.
+    const themed = envelope ? { ...envelope, status: 'draft' } : blueprint;
+    const diagnostics = [...verdict.diagnostics];
+    const ref = typeof designSystem.ref === 'string' ? designSystem.ref : undefined;
+    const ds = await import('./design-system-run.ts');
+    if (ref?.startsWith('texuli:') && !(await ds.libraryThemeExists(ref.slice(7))))
+      diagnostics.push({
+        check: 'design-system',
+        code: 'invalid-value',
+        severity: 'error',
+        path: '$.designSystem.ref',
+        message: `No library theme "${ref.slice(7)}". Find ids with theme.search.`,
+      });
+    if (isRecord(designSystem.inline) && !diagnostics.some((d) => d.check === 'design-system')) {
+      // The spec's rules passed: compile it too, for the guarantee codes.
+      const check = await ds.runValidate({ document: designSystem.inline, trust: tier });
+      for (const issue of check.errors)
+        diagnostics.push({
+          check: 'design-system',
+          code: issue.code,
+          severity: 'error',
+          path: `$.designSystem.inline${issue.path.slice(1)}`,
+          message: issue.hint ? `${issue.message} ${issue.hint}` : issue.message,
+        });
+    }
+    const valid = verdict.valid && !diagnostics.some((d) => d.severity === 'error');
     return {
-      valid: result.ok,
-      status: result.status,
-      tier: result.tier,
-      ...(migratedFrom ? { migratedFrom } : {}),
-      diagnostics: result.diagnostics.map((diagnostic) => ({
-        check: diagnostic.check,
-        code: diagnostic.code,
-        severity: diagnostic.severity,
-        path: diagnostic.path,
-        message: diagnostic.message,
-        ...(diagnostic.id ? { id: diagnostic.id } : {}),
-      })),
+      valid,
+      status: verdict.status === 'valid' && !valid ? 'invalid' : verdict.status,
+      tier: verdict.tier,
+      blueprint: themed,
+      diagnostics,
     };
   },
 });

@@ -43,6 +43,10 @@ header), `formulaBar`, `sheet` (the caption prefix) and `formulaError`.
 
 - Cells show computed values (errors as their code); the editor opens on
   what was typed, so a formula cell edits its formula.
+- The cell editor is a lazy chunk of `@texuli/data/grid-editing`, loaded on
+  the first Enter or F2, so it appears a moment after the key. Host tests
+  await it before typing, for example `await screen.findByRole('textbox', {
+  name: 'B' })` (the editor is named by its column letter).
 - Typed text is read by `parseSheetInput` (numbers, booleans, formulas,
   text). A formula with a syntax error is refused with an announced
   message and nothing changes; an unknown function is saved and shows

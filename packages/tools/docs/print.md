@@ -52,6 +52,15 @@ tier: no JavaScript, forms or embedded files, every string escaped by the
 writer, deterministic bytes. It resolves to a `BlueprintPdfResult`:
 `{ ok: true, bytes, pageCount, mime, diagnostics }` or `{ ok: false,
 bytes: null, pageCount: 0, … }`. `BlueprintPdfOptions` adds `pdf` (the
-writer's options except `trust`). A `PrintDiagnostic` has the shape of an
+writer's options except `trust`), `designSystem` (a compiled design
+system, `DesignVarsSource`) and `mode` (`light` by default): the mode's
+`designValues` become the writer's `design` (text, link, rule, code and
+callout colors, a page fill for a non-white background, and Times for a
+serif body stack) unless `pdf.design` is set. Without either, the PDF is
+byte-for-byte what it was before. `designValues`, `DESIGN_COLOR_ROLES`,
+`DesignValues`, `DesignColorRole` and `DesignVarsSource` are exported here
+too, so a host can build the plain values `@texuli/document`,
+`@texuli/canvas/export` and `@texuli/slides/export` take
+([email](email.md#design-systems) describes them). A `PrintDiagnostic` has the shape of an
 email diagnostic: `{ code, severity, path, message, id? }`; writer
 warnings arrive prefixed `pdf-`.

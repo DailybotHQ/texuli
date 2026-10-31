@@ -193,13 +193,13 @@
       no-repeat local,
       radial-gradient(
         farthest-side at 0 50%,
-        color-mix(in oklab, CanvasText 18%, transparent),
+        color-mix(in oklab, var(--tx-foreground, CanvasText) 18%, transparent),
         transparent
       )
       left / 0.75rem 100% no-repeat scroll,
       radial-gradient(
         farthest-side at 100% 50%,
-        color-mix(in oklab, CanvasText 18%, transparent),
+        color-mix(in oklab, var(--tx-foreground, CanvasText) 18%, transparent),
         transparent
       )
       right / 0.75rem 100% no-repeat scroll,
@@ -224,6 +224,27 @@
 
   .tx-data-grid [data-activatable] {
     cursor: pointer;
+  }
+
+  /* Skeleton loading rows (G107): a muted bar per cell, pulsing unless reduced motion. */
+  .tx-data-grid__skeleton {
+    display: block;
+    inline-size: 70%;
+    block-size: 0.75em;
+    border-radius: var(--tx-shape-radius-sm);
+    background-color: var(--tx-muted, Canvas);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tx-data-grid__skeleton {
+      animation: tx-data-grid-skeleton-pulse 1.4s ease-in-out infinite;
+    }
+  }
+
+  @keyframes tx-data-grid-skeleton-pulse {
+    50% {
+      opacity: 0.5;
+    }
   }
 
   .tx-data-grid__sr-only {

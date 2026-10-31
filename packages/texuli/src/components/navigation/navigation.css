@@ -280,7 +280,7 @@
 
   .tx-pagination--soft .tx-pagination__button {
     border-color: transparent;
-    background: color-mix(in srgb, var(--tx-muted, CanvasText) 8%, Canvas);
+    background: color-mix(in srgb, var(--tx-muted, CanvasText) 8%, var(--tx-background, Canvas));
   }
 
   .tx-pagination__button:hover:not(:disabled) {

@@ -21,6 +21,8 @@ export interface NotificationInboxLabels {
   emptyUnread: string;
   /** Announced (polite) when unread items arrive. */
   arrived: (count: number) => string;
+  /** Announced (polite) when the host's read-state save rejects. */
+  saveFailed: string;
 }
 
 export const DEFAULT_INBOX_LABELS: Readonly<NotificationInboxLabels> =
@@ -39,6 +41,7 @@ export const DEFAULT_INBOX_LABELS: Readonly<NotificationInboxLabels> =
     empty: 'No notifications.',
     emptyUnread: 'You are all caught up.',
     arrived: (count: number) => `${count} new ${count === 1 ? 'notification' : 'notifications'}.`,
+    saveFailed: 'Could not update the read state. Try again.',
   });
 
 /** Merges overrides over the English defaults; values of the wrong type are ignored. */

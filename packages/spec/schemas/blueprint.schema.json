@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://texuli.example/spec/schemas/blueprint.schema.json",
   "title": "BlueprintEnvelope",
-  "description": "Envelope version 1 around one catalog tree (ADR-004, audit G13). Mirrors what @texuli/catalog/envelope reads; a declared status, activation or tier is display data, never authority. Spec 0.4.0 (ADR-008 + PLAN_008 deck encoding) adds an optional spec version, local state and a flow; spec 0.6.0 (ADR-012, ADR-013) adds the closed motion vocabulary: a node motion and the envelope motion level; spec 0.7.0 (ADR-011, ADR-012, ADR-014) adds an optional node key (a stable instance id, unique in the tree), the document shape a `document` node carries and the patchDocument edit op with its bounded RFC 6902 patch. Spec 0.8.0 (ADR-012, ADR-015) adds data-source bindings: a sourceable prop may read rows from a source the host registered ({\"$source\": name, \"query\": {...}}), with a closed query, and forms as data: the closed form schema a `schema-form` node carries ($defs.formSchema) with conditions and cross-field rules in the closed expression AST of @texuli/core/expression ($defs.expression). Spec 0.8.0 (ADR-012) adds the canvas shape a `canvas` node carries ($defs.canvas). Spec 0.9.0 refreshes the catalog projection only (an additive minor; the envelope shape is unchanged). Planned minor additions: the native profile and several roots.",
+  "description": "Envelope version 1 around one catalog tree (ADR-004, audit G13). Mirrors what @texuli/catalog/envelope reads; a declared status, activation or tier is display data, never authority. Spec 0.4.0 (ADR-008 + PLAN_008 deck encoding) adds an optional spec version, local state and a flow; spec 0.6.0 (ADR-012, ADR-013) adds the closed motion vocabulary: a node motion and the envelope motion level; spec 0.7.0 (ADR-011, ADR-012, ADR-014) adds an optional node key (a stable instance id, unique in the tree), the document shape a `document` node carries and the patchDocument edit op with its bounded RFC 6902 patch. Spec 0.8.0 (ADR-012, ADR-015) adds data-source bindings: a sourceable prop may read rows from a source the host registered ({\"$source\": name, \"query\": {...}}), with a closed query, and forms as data: the closed form schema a `schema-form` node carries ($defs.formSchema) with conditions and cross-field rules in the closed expression AST of @texuli/core/expression ($defs.expression). Spec 0.8.0 (ADR-012) adds the canvas shape a `canvas` node carries ($defs.canvas). Spec 0.9.0 refreshes the catalog projection only (an additive minor; the envelope shape is unchanged). Spec 0.10.0 (ADR-021, ADR-024) adds the design-system document (schemas/design-system.schema.json) and the optional envelope designSystem ($defs.designSystemReference): the design system the whole blueprint follows, including a deck or document at its root (an additive minor). Planned minor additions: the native profile and several roots.",
   "type": "object",
   "properties": {
     "format": {
@@ -70,7 +70,7 @@
     "spec": {
       "description": "The spec version the envelope was written for. Omitted means 0.2.0; migrateBlueprint stamps it.",
       "type": "string",
-      "enum": ["0.3.0", "0.4.0", "0.5.0", "0.6.0", "0.7.0", "0.8.0", "0.9.0"]
+      "enum": ["0.3.0", "0.4.0", "0.5.0", "0.6.0", "0.7.0", "0.8.0", "0.9.0", "0.10.0"]
     },
     "state": {
       "description": "Local state declarations (ADR-008), at most 64. Names, counts and per-type rules are checked by the validator.",
@@ -84,6 +84,10 @@
     },
     "motion": {
       "$ref": "#/$defs/envelopeMotion"
+    },
+    "designSystem": {
+      "description": "The design system the blueprint follows (spec 0.10.0, ADR-024): a reference the host resolves or a whole inline document. Players apply it to their root scope; a reference nothing resolves, or a document the compiler refuses, paints with the default theme and a visible notice.",
+      "$ref": "#/$defs/designSystemReference"
     }
   },
   "required": [
@@ -699,7 +703,7 @@
       "additionalProperties": false
     },
     "formField": {
-      "description": "One field of a closed type. Which members apply to which type, value types, option membership, ranges and the conditions' field references are checked by @texuli/forms/model (validateFormSchema). Formats are names; a pattern is never accepted.",
+      "description": "One field of a closed type. Which members apply to which type, value types, option membership, ranges and the conditions' field references are checked by @texuli/forms/model (validateFormSchema). Formats are names; a pattern is never accepted. password and otp are credential fields that agent output may use only where the host allows them; custom is painted by the host for a kind it registered (refused otherwise).",
       "type": "object",
       "properties": {
         "name": {
@@ -724,7 +728,12 @@
             "switch",
             "slider",
             "file",
-            "tags"
+            "tags",
+            "password",
+            "otp",
+            "color",
+            "datetime",
+            "custom"
           ]
         },
         "label": {
@@ -741,7 +750,7 @@
           "maxLength": 300
         },
         "default": {
-          "description": "A value of the field's type (a string, number, boolean, YYYY-MM-DD, HH:MM or a list of option values). Not for file fields."
+          "description": "A value of the field's type (a string, number, boolean, YYYY-MM-DD, HH:MM, YYYY-MM-DDTHH:MM, a #hex color, a list of option values, or any JSON value for custom). Not for file, password or otp fields."
         },
         "options": {
           "type": "array",
@@ -768,10 +777,10 @@
           "maximum": 10000
         },
         "min": {
-          "description": "A number for number and slider; YYYY-MM-DD for date; HH:MM for time."
+          "description": "A number for number and slider; YYYY-MM-DD for date; HH:MM for time; YYYY-MM-DDTHH:MM for datetime."
         },
         "max": {
-          "description": "A number for number and slider; YYYY-MM-DD for date; HH:MM for time."
+          "description": "A number for number and slider; YYYY-MM-DD for date; HH:MM for time; YYYY-MM-DDTHH:MM for datetime."
         },
         "step": {
           "description": "Above 0, for number and slider.",
@@ -846,7 +855,7 @@
           "maximum": 1073741824
         },
         "autocomplete": {
-          "description": "An autocomplete token; payment, credential and one-time-code tokens are absent.",
+          "description": "An autocomplete token; payment and one-time-code tokens are absent, and current-password and new-password apply to password fields only.",
           "type": "string",
           "enum": [
             "off",
@@ -865,11 +874,45 @@
             "country-name",
             "language",
             "url",
-            "bday"
+            "bday",
+            "current-password",
+            "new-password"
           ]
         },
         "link": {
           "$ref": "#/$defs/formLink"
+        },
+        "kind": {
+          "description": "Custom fields: the kind the host paints; agent output may name only a kind the host registered.",
+          "type": "string",
+          "pattern": "^[a-z][A-Za-z0-9_-]{0,63}$"
+        },
+        "config": {
+          "description": "Custom fields: at most 20 scalar settings under field-like names, handed to the host painter.",
+          "type": "object",
+          "additionalProperties": {
+            "description": "A string (at most 300 characters), a finite number or a boolean."
+          }
+        },
+        "length": {
+          "description": "Otp fields: the number of digits (default 6).",
+          "type": "integer",
+          "minimum": 4,
+          "maximum": 12
+        },
+        "protocols": {
+          "description": "Url fields: the allowed schemes (default https only); an http answer passes the untrusted URL policy as its https twin.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": {
+            "type": "string",
+            "enum": ["http", "https"]
+          }
+        },
+        "clearable": {
+          "description": "Select fields: whether an empty choice clears the answer (default: while the field is not required).",
+          "type": "boolean"
         }
       },
       "required": ["name", "type", "label"],
@@ -1315,7 +1358,7 @@
       "additionalProperties": false
     },
     "document": {
-      "description": "A Texuli document (spec 0.7.0, ADR-011): the format, version, metadata, page settings, block list and annotations of @texuli/document. This contract checks the envelope of the document only; the closed block vocabulary, text safety, the URL policy and the caps are checked by @texuli/document/schema (schemas/document.schema.json) inside the runtime validator, @texuli/catalog's validateDraft, at the host's tier.",
+      "description": "A Texuli document (spec 0.7.0, ADR-011): the format, version, metadata, page settings, block list and annotations of @texuli/document, and from spec 0.10.0 the design system it follows (designSystem, the blueprint's $defs.designSystemReference; exactly one of ref and inline is @texuli/document/schema's check). This contract checks the envelope of the document only; the closed block vocabulary, text safety, the URL policy and the caps are checked by @texuli/document/schema (schemas/document.schema.json) inside the runtime validator, @texuli/catalog's validateDraft, at the host's tier.",
       "type": "object",
       "properties": {
         "format": {
@@ -1347,6 +1390,9 @@
           "description": "Comment threads, suggestions and named versions, kept apart from content.",
           "type": "object",
           "additionalProperties": {}
+        },
+        "designSystem": {
+          "$ref": "#/$defs/designSystemReference"
         }
       },
       "required": ["format", "formatVersion", "meta", "blocks"],
@@ -1606,6 +1652,22 @@
         }
       },
       "required": ["$source"],
+      "additionalProperties": false
+    },
+    "designSystemReference": {
+      "description": "A design system (spec 0.10.0, ADR-021 and ADR-024): exactly one of ref (an exact id@x.y.z the host resolves, never a range, a URL or a path; or texuli:<theme>, a library theme) and inline (a whole texuli/design-system document, checked by checkDesignSystemReference from @texuli/spec/design-system against schemas/design-system.schema.json, at the untrusted level for agent output). The validator refuses an empty reference or both keys.",
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "string",
+          "pattern": "^(?:texuli:[a-z][a-z0-9]*(?:-[a-z0-9]+)*|[a-z][a-z0-9]*(?:-[a-z0-9]+)*@(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?)$"
+        },
+        "inline": {
+          "description": "A whole design-system document.",
+          "type": "object",
+          "additionalProperties": {}
+        }
+      },
       "additionalProperties": false
     }
   }

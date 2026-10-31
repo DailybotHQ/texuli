@@ -1248,6 +1248,18 @@ reflect this decision.
   builder (selectors and properties from an allowlist, values escaped)
   before it can ship.
 
+- **Note (2026-10-30, PLAN_011 T-ds-outputs, released in 0.10.0): the
+  email dark rule landed for design systems.** With a compiled design
+  system that has a dark mode, `@texuli/tools/email` writes one
+  `prefers-color-scheme: dark` rule from a closed grammar: classes are a
+  fixed prefix plus a light sRGB hex, declarations are `background-color`,
+  `color` or `border-color` plus a dark sRGB hex with `!important`, and the
+  whole rule is checked against that grammar before the serialized
+  document gets it in the head (the core builders still have no `<style>`
+  element; the email writer inserts the checked rule after serializing).
+  Without a design system the output is unchanged and still declares
+  `color-scheme: light`.
+
 ## ADR-017: One operations registry (`@texuli/tools/ops`) for every agent surface
 
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
@@ -1548,7 +1560,10 @@ reflect this decision.
   - **Hardcode guard:** `scripts/check-token-usage.ts` fails on literal
     colors and literal size or space values in component CSS (an allowlist
     with reasons). It lands only after adoption, so it never blocks a half
-    migration.
+    migration. Since T-ds-conformance (PLAN_011) it also fails on a system
+    color outside a contract fallback or a forced-colors block, and on a
+    `--tx-*` read that nothing defines, the two causes of the literal
+    colors `texuli ds check --render` found.
   - **Renames:** v2 is additive, so 0.9.0 removes nothing. Any later rename
     keeps the old name as an alias for one minor, and
     `@texuli/tokens/renames.json` lists `{ from, to, since, removeIn }` for
@@ -1582,8 +1597,8 @@ reflect this decision.
 
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
-  developer may override this decision. **Status: planned** (release
-  0.10.0); nothing below is shipped yet.
+  developer may override this decision. **Status: shipped** in release
+  0.10.0.
 - **Context:** a company should describe its brand once, as data, and have
   every Texuli surface follow it; agents should author and change it with
   the same closed-vocabulary discipline as blueprints. Today the closest
@@ -1674,8 +1689,8 @@ reflect this decision.
 
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
-  developer may override this decision. **Status: planned** (release
-  0.10.0); nothing below is shipped yet.
+  developer may override this decision. **Status: shipped** in release
+  0.10.0.
 - **Context:** the theme generator already guarantees AA for generated
   text pairs, and the AA gate (`@texuli/tokens/aa-gate`) checks shipped
   themes. A design-system document adds inputs the generator does not
@@ -1721,6 +1736,30 @@ reflect this decision.
     guarantees hold), snapshot determinism and a compile-time bound in
     the opt-in perf suite.
   - **Forced colors** keep today's behavior; the system colors win there.
+  - **As built (T-ds-compiler, 2026-10-30; released in 0.10.0),
+    where it refines the plan:**
+    - The pairs are the generator's `THEME_CONTRAST_PAIRS` plus the status
+      set. Non-text boundaries (strong border, input) at 3:1 report as
+      `aa-text`; the focus ring pairs report as `aa-focus`, and so does a
+      `focusWidth` below 2 px (the closed code list has no separate
+      boundary code).
+    - Targets: the system control heights are derived, so the solver lifts
+      them to `targetMin` and reports it; only sizes the document pins on a
+      component are refused with `target-size`.
+    - `compileDesignSystem` is synchronous and its variables are concrete
+      (no `var()`), as ADR-023 requires. `extends: "texuli:<id>"` loads the
+      library lazily, so it resolves through the asynchronous
+      `resolveDesignSystem` (or a synchronous resolver that returns the
+      `Theme`).
+    - `@texuli/tokens/design-system/validate` measures 9,850 B gz, not
+      4 KB: the spec's validator alone is 7.1 KB (see the T-ds-spec
+      decision); the compiler entry measures 30,780 B gz with the library
+      themes in lazy chunks.
+    - The zero-drift bridge is exact: compiling `fromTheme(theme)` equals
+      `themeVariables(theme)` on every shared variable for all 210 library
+      themes, after normalizing two library source strings to their CSS
+      canonical form (`SFMono-Regular` unquoted, a `0px` radius as `0`),
+      which changes no pixel.
 - **Reverse when:** a measured, legitimate case cannot meet a guarantee
   (then add a named, reported waiver field in a `formatVersion` minor that
   the conformance run still flags; never a silent pass).
@@ -1729,9 +1768,11 @@ reflect this decision.
 
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
-  developer may override this decision. **Status: partly shipped:**
-  scoping (`[data-tx-scope]`) and scoped portals shipped in release 0.9.0;
-  the design-system runtime is planned for 0.10.0.
+  developer may override this decision. **Status: shipped:**
+  scoping (`[data-tx-scope]`) and scoped portals in release 0.9.0; the
+  design-system runtime (`@texuli/tokens/design-system/apply`,
+  `DesignSystemProvider` in `texuli/design-system`, and the `designSystem`
+  option of `@texuli/astro`) in release 0.10.0.
 - **Context:** `applyTheme` already writes `--tx-*` properties on an
   element through the CSSOM, and the no-flash script replays a cached,
   filtered variable map before first paint (it rejects `var(`, `url(` and
@@ -1806,8 +1847,8 @@ reflect this decision.
 
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
-  developer may override this decision. **Status: planned** (release
-  0.10.0, spec `0.10.0`); nothing below is shipped yet.
+  developer may override this decision. **Status: shipped** in release
+  0.10.0 (spec `0.10.0`).
 - **Context:** blueprints, decks and documents have no design-system
   reference (only the web-only deck `themeRef`); email covers color and
   font only and has no dark rule (the ADR-016 note); PDF, DOCX, canvas
@@ -1867,6 +1908,25 @@ reflect this decision.
     llms bundles and the catalog snapshot regenerate.
   - **Website:** the theme studio grows into a client-only Design System
     Studio (no server, no storage; sharing through the URL hash).
+  - **As built (released in 0.10.0; T-ds-blueprint follow-ups):**
+    - The player hands the compiled component defaults to the painted
+      components through the `texuli/defaults` context, below blueprint
+      props.
+    - Its design-system step is the `@texuli/player/design-system` subpath,
+      so the `@texuli/slides` stage applies a deck's design system the
+      same way.
+    - Decks carry a top-level `designSystem` (the blueprint's `{ ref }` or
+      `{ inline }` shape) instead of a new `DeckThemeReference` kind: one
+      field for the whole deck, as for blueprints and documents. While it
+      applies it replaces the deck theme on the stage, and `style.theme`
+      stays the fallback when it is refused. The deck format is
+      `@texuli/deck`'s own, so the spec digest is unchanged. Reverse: add
+      a `{ kind: "design-system", ref }` theme kind, for per-slide
+      design systems.
+    - The document Markdown writer carries `designSystem` in front
+      matter. The DOCX and PDF writers take caller-compiled `design`
+      values and report `design-system-unapplied` without them.
+    - A deck design system in `DeckPrint` and the print view is planned.
 - **Reverse when:** a surface needs design-system data the emitters
   cannot express (then add an emitter for it; writers still never read
   the document), or inline documents make blueprints too large in practice

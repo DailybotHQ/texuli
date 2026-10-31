@@ -3,6 +3,10 @@
  * (ADR-016), on the escaped `@texuli/core/markup` builders and the
  * `@texuli/core/zip` writer. Load it lazily: only an export pays for it.
  */
+export type {
+  DocumentDesign,
+  DocumentDesignRole,
+} from '../output/design.ts';
 export {
   type ImageInfo,
   type ImageResolver,

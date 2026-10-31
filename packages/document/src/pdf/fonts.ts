@@ -27,7 +27,7 @@ export function standardFont(style: {
 }
 
 // Widths for codes 32..255. Expanded from runs: `n*w` repeats w n times.
-function expand(source: string): Uint16Array {
+export function expand(source: string): Uint16Array {
   const out: number[] = [];
   for (const token of source.split(' ')) {
     const star = token.indexOf('*');
@@ -107,3 +107,15 @@ export function standardWidth(font: StandardFont, code: number): number {
   const table = font === 'F2' || font === 'F4' ? HELVETICA_BOLD : HELVETICA;
   return table[code - 32] ?? 556;
 }
+
+/** A standard 14 family for the four text styles (`F1`–`F4`) and Courier (`F5`). */
+export interface StandardFamily {
+  names: Readonly<Record<StandardFont, string>>;
+  width(font: StandardFont, code: number): number;
+}
+
+/** Helvetica and Courier: the default family. */
+export const HELVETICA_FAMILY: StandardFamily = Object.freeze({
+  names: STANDARD_FONTS,
+  width: standardWidth,
+});

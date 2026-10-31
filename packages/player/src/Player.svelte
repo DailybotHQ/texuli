@@ -10,7 +10,7 @@ import { formulaConditions } from '@texuli/catalog/render/conditions';
 import type { RenderCatalog, RenderTier } from '@texuli/catalog/render/renderer';
 import type { ValidateDraftOptions } from '@texuli/catalog/validate';
 import type { SourceLoader, SourceRegistry } from '@texuli/core/data-source';
-import { type Component, type Snippet, tick, untrack } from 'svelte';
+import { type Component, getContext, type Snippet, setContext, tick, untrack } from 'svelte';
 import './player.css';
 import { createActionAccess } from './action-access.ts';
 import type { ActionHandler } from './actions.ts';
@@ -37,6 +37,7 @@ import {
   setPlayerStateAccess,
 } from './context.ts';
 import { type DeckPlayerHost, isLayoutDeckTree } from './deck-host.ts';
+import type { PlayerDesignSystemEvent, PlayerDesignSystems } from './design-system-types.ts';
 import { type DocumentPlayerHost, documentRoot } from './document-host.ts';
 import type { PlayerDiagnosticsEvent, PlayerSize } from './embed/types.ts';
 import type { PlayerNodeError, PlayerNodeErrorPhase } from './errors.ts';
@@ -288,6 +289,17 @@ type Props = {
   sourceRegistry?: SourceRegistry | null;
   /** A shared loader (cache and in-flight reads across players); its registry is used. */
   sourceLoader?: SourceLoader | null;
+  /**
+   * Design systems (spec 0.10.0, ADR-024): the host's resolver for a
+   * blueprint's `designSystem.ref` (a document or a compiled design system;
+   * the player never fetches) and the mode to apply. A blueprint with a
+   * design system loads the compiler lazily and applies the result to the
+   * player root; one without pays nothing. An unresolved or refused design
+   * system keeps the default theme and shows a notice.
+   */
+  designSystems?: PlayerDesignSystems | null;
+  /** Called when a blueprint's design system is applied or refused. */
+  onDesignSystem?: (event: PlayerDesignSystemEvent) => void;
 };
 
 let {
@@ -334,6 +346,8 @@ let {
   sheetHost = null,
   sourceRegistry = null,
   sourceLoader = null,
+  designSystems = null,
+  onDesignSystem,
 }: Props = $props();
 
 // The user's reduced-motion preference, followed live.
@@ -1115,6 +1129,72 @@ function streamSkeleton(
 
 let player = $state<PlayerHandle | null>(null);
 let playerState = $state<PlayerState | null>(null);
+
+// ── Design system (spec 0.10.0, ADR-024): only a validated envelope's, loaded lazily ──
+let systemReference = $derived.by(() => {
+  const validation = playerState?.validation;
+  const reference = validation?.envelope?.designSystem;
+  if (!reference || validation.diagnostics.some((d) => d.check === 'design-system')) return;
+  return reference;
+});
+let systemKey = $derived(systemReference ? JSON.stringify(systemReference) : '');
+let systemStatus = $state<'pending' | 'applied' | 'refused' | undefined>();
+// Component defaults (`compiled.defaults`, ADR-020): the context key texuli's
+// components read (`texuli/defaults`). Validated in the lazy step; merged over
+// an outer provider's, prop by prop, so blueprint props still win.
+type Defaults = Record<string, Record<string, string>>;
+const DEFAULTS_KEY = 'texuli.design-defaults';
+const outerDefaults = getContext<(() => Defaults) | undefined>(DEFAULTS_KEY);
+let systemDefaults = $state.raw<Defaults | undefined>();
+setContext(DEFAULTS_KEY, () => {
+  const outer = outerDefaults?.() ?? {};
+  const own = systemDefaults;
+  if (!own) return outer;
+  const merged: Defaults = { ...outer };
+  for (const key of Object.keys(own)) merged[key] = { ...outer[key], ...own[key] };
+  return merged;
+});
+let disposeSystem: (() => void) | undefined;
+const dropSystem = () => {
+  disposeSystem?.();
+  disposeSystem = undefined;
+  systemDefaults = undefined;
+};
+$effect(() => {
+  const key = systemKey;
+  const element = root;
+  const reference = untrack(() => systemReference);
+  const host = untrack(() => designSystems);
+  const trust = tier;
+  void designSystems?.mode;
+  if (!key || !element || !reference) {
+    dropSystem();
+    systemStatus = undefined;
+    return;
+  }
+  let live = true;
+  systemStatus = 'pending';
+  import('./design-system.ts')
+    .then((step) => step.applyPlayerDesignSystem(element, reference, host, trust))
+    .then(
+      ({ event, dispose, defaults }) => {
+        if (!live) return dispose?.();
+        dropSystem();
+        disposeSystem = dispose;
+        systemDefaults = defaults;
+        systemStatus = event.status;
+        if (event.status === 'refused') announcePolite(resolvedLabels.designSystemRefused);
+        untrack(() => onDesignSystem?.(event));
+      },
+      () => {
+        if (live) systemStatus = 'refused';
+      }
+    );
+  return () => {
+    live = false;
+  };
+});
+$effect(() => () => disposeSystem?.());
 // Spec 0.6.0 motion: the host's level, then the blueprint's; reduced motion makes it instant.
 let motionSettings = $derived({
   level: playerMotionLevel({
@@ -1309,6 +1389,7 @@ $effect(() => {
       // Forms (spec 0.8.0) likewise: only the host's form validator admits one.
       checkForm: formHost?.checkForm,
       ...(formHost?.validators ? { formValidators: formHost.validators } : {}),
+      ...(formHost?.customKinds ? { formKinds: formHost.customKinds } : {}),
       // Sheets (spec 0.8.0) likewise: only the host's sheet validator admits one.
       checkSheet: sheetHost?.checkSheet,
       // `when` conditions (G07) read the local state, mapped to numbers.
@@ -1374,6 +1455,7 @@ function streamValidateOptions(): ValidateDraftOptions {
     checkCanvas: canvasHost?.checkCanvas,
     checkForm: formHost?.checkForm,
     ...(formHost?.validators ? { formValidators: formHost.validators } : {}),
+    ...(formHost?.customKinds ? { formKinds: formHost.customKinds } : {}),
     checkSheet: sheetHost?.checkSheet,
     conditions: formulaConditions,
     conditionInputs,
@@ -1642,6 +1724,7 @@ $effect(() => {
   data-status={shownStatus}
   data-density={density}
   data-tx-motion={reducedMotion ? 'reduce' : undefined}
+  data-tx-player-design-system={systemStatus}
   {dir}
   lang={rootLang}
   data-active={active}
@@ -1668,6 +1751,11 @@ $effect(() => {
     </header>
   {/if}
 
+  {#if systemStatus === 'refused'}
+    <p class="tx-player__preview-warning" role="status" data-tx-player-design-system-notice>
+      {resolvedLabels.designSystemRefused}
+    </p>
+  {/if}
   {#if stateRefused}
     <div class="tx-player__notice" role="alert" tabindex="-1" data-tx-player-state-notice>
       <h3>{resolvedLabels.invalidNotice}</h3>

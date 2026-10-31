@@ -139,7 +139,8 @@ fun BlueprintView(plan: List<PlanNode>, onIntent: (TexuliIntent) -> Unit = {})
 ```
 
 Wrap it in `TexuliTheme(dark = …) { … }` for the token colors
-(`TexuliTheme.kt`). The renderer never performs an effect. It reports intents
+(`TexuliTheme.kt`, generated design tokens; pass `tokens = DesignTokens.Acme`
+or another generated set to brand it). The renderer never performs an effect. It reports intents
 (`Intents.kt`), and the host decides whether to act on them, behind its own
 confirmation:
 

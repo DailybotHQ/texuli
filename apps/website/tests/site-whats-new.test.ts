@@ -51,6 +51,13 @@ describe('whats-new hub', () => {
         'sources',
         'streaming',
         'tokens',
+        // PLAN_011 T-site-0100: design systems and the rest of 0.10.0.
+        'design-systems',
+        'ds-studio',
+        'ds-tools',
+        'ds-conformance',
+        'protoyard-0100',
+        'removals',
       ].sort()
     );
     const ids = FEATURES.map((feature) => feature.id);

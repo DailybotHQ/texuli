@@ -3,6 +3,14 @@
  * theme references, and the pure resolver to `--tx-deck-*` CSS variables.
  * Theme data itself is resolved by the stage with `@texuli/tokens`.
  */
+
+export {
+  DECK_DESIGN_SYSTEM_LIMITS,
+  DECK_DESIGN_SYSTEM_REF_PATTERN,
+  DESIGN_SYSTEM_CODES,
+  type DeckDesignSystem,
+  deckDesignSystem,
+} from './design-system.ts';
 export {
   DECK_ASPECT_RATIOS,
   DECK_DENSITY_SCALE,

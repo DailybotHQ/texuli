@@ -11,11 +11,11 @@ language in `@texuli/core/expression`, and no schema carries a regular
 expression or code.
 
 > **Status: in development (pre-1.0).** `@texuli/forms` is published on
-> npm as `0.9.0`, with provenance (first published as `0.8.0`; built in PLAN_010,
+> npm as `0.10.0`, with provenance (first published as `0.8.0`; built in PLAN_010,
 > ADR-015 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
-> Under 0.x a new minor (`0.10.0`) may contain breaking changes, so pin the
-> exact version or use `^0.9.0`, which accepts only 0.9.x
+> Under 0.x a new minor (`0.11.0`) may contain breaking changes, so pin the
+> exact version or use `^0.10.0`, which accepts only 0.10.x
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 It sits on layer L4 and depends on `texuli` and `@texuli/core`; `svelte`
@@ -75,13 +75,20 @@ const result = validateFormSchema({
 | --- | --- | --- |
 | `.` | `SchemaForm`, `DEFAULT_SCHEMA_FORM_LABELS`, the model's main entry points and `FORMS_PACKAGE_VERSION` | [SchemaForm](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/schema-form.md) |
 | `./model` | The framework-free runtime: `validateFormSchema`, named formats, `computeFormLogic`, `validateFormValues`, `createFormController`, drafts | [Model](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/model.md) |
+| `./controls` | The static control registry (`SCHEMA_FORM_CONTROLS`) for server rendering; without it SchemaForm loads per-type controls on first use | [Controls](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/controls.md) |
 | `./host` | The `formHost` adapter for `@texuli/player` (`createFormPlayerHost`) and the draft check | [Host](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/host.md) |
 | `./styles.css` | The layout stylesheet and its hooks | [Styles](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/styles.md) |
 
 ## Field types and rules
 
-Fields: text, textarea, number, email, url, date, time, select, multiselect,
-checkbox, radio, switch, slider, file (the host uploads) and tags. Rules:
+Fields: text, textarea, number, email, url (https, or http where the field
+allows it), date, time, datetime, select (clearable while optional),
+multiselect, checkbox, radio, switch, slider, file (the host uploads), tags,
+color, password and otp (credential fields: kept out of drafts, and opt-in
+for agent output) and custom (painted by the host, validated and submitted
+with the rest). Date, time, datetime, slider, tags, file, color and radio
+controls load per type on first use, with a static registry for server
+rendering. Rules:
 required, minLength and maxLength, min and max, step, minItems and
 maxItems, a named format (email, url, phone, postal codes, digits, slug,
 ISO dates, times, hex colors), a host validator by name (sync or async),
@@ -112,6 +119,7 @@ Restored drafts are coerced field by field like any untrusted input.
 - [Model](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/model.md)
 - [Styles](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/styles.md)
 - [Host](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/host.md)
+- [Controls](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/controls.md)
 - The expression language: [core-expression](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-expression.md)
 - Forms in blueprints (the `schema-form` catalog id, spec 0.8.0), painted by the player through `formHost`: [`@texuli/catalog`](https://github.com/DailybotHQ/texuli/blob/main/packages/catalog/README.md)
 - Decisions: ADR-015 (one bounded expression language) and ADR-012 (spec evolution) in

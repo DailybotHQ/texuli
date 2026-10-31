@@ -9,8 +9,10 @@ import { createPackLayout, type PackTree, packColor } from '../src/pack/model.ts
 import PackChart from '../src/pack/PackChart.svelte';
 import DonutChart from '../src/part-whole/DonutChart.svelte';
 import {
+  PART_WHOLE_TABLE_LABELS,
   type PartWholeTableLabels,
   partWholeColor,
+  partWholeTableLabels,
   treeTableRows,
 } from '../src/part-whole/model.ts';
 import PieChart from '../src/part-whole/PieChart.svelte';
@@ -343,6 +345,35 @@ describe('part-whole charts', () => {
       }
     }
   }, 20_000);
+});
+
+describe('part-whole table labels (T-ds-conformance)', () => {
+  it('keeps a named data-table disclosure and legend when labels are missing or blank, as the catalog example passes them', () => {
+    const cases = [
+      () => render(PieChart, { title: 'Mix', description: 'Mix', data, labels: {} }),
+      () => render(DonutChart, { title: 'Mix', description: 'Mix', data, labels: {} }),
+      () => render(TreemapChart, { title: 'Tree', description: 'Tree', root: tree, labels: {} }),
+      () =>
+        render(SunburstChart, {
+          title: 'Sun',
+          description: 'Sun',
+          root: tree,
+          labels: { table: ' ', category: 'Group' },
+        }),
+    ];
+    for (const [index, paint] of cases.entries()) {
+      const { container, unmount } = paint();
+      const summary = container.querySelector('.table-fallback > summary');
+      expect(summary?.textContent, `case ${index}`).toBe('View data table');
+      const headers = [...container.querySelectorAll('thead th')].map((th) => th.textContent);
+      expect(headers, `case ${index}`).toEqual([index === 3 ? 'Group' : 'Category', 'Value']);
+      unmount();
+    }
+    expect(partWholeTableLabels({ value: 'Share' })).toEqual({
+      ...PART_WHOLE_TABLE_LABELS,
+      value: 'Share',
+    });
+  });
 });
 
 describe('pack', () => {

@@ -1,4 +1,10 @@
-import { type GridColumnDef, type GridValue, readValue } from '../engines/grid/columns.ts';
+import type { ClassValue } from 'texuli/cx';
+import {
+  type GridColumnDef,
+  type GridValue,
+  type GridValueType,
+  readValue,
+} from '../engines/grid/columns.ts';
 import { compileFilter } from '../engines/grid/filter.ts';
 import { foldedKey, type GridSort, sortRows } from '../engines/grid/sort.ts';
 
@@ -21,6 +27,49 @@ export interface DataGridColumn<T> extends GridColumnDef<T> {
    * model); search and filters still read them.
    */
   hideBelow?: DataGridBreakpoint;
+  /** Extra classes for this column's body cells (G107). */
+  class?: ClassValue;
+  /** Extra classes for this column's header cell (G107). */
+  headerClass?: ClassValue;
+}
+
+/**
+ * A column as `DataGrid` accepts it (G107): `type` is optional, inferred from
+ * the rows by {@link inferColumnType}. Every `DataGridColumn` is one.
+ */
+export type DataGridColumnInput<T> = Omit<DataGridColumn<T>, 'type'> & { type?: GridValueType };
+
+/**
+ * The type of a column without one: `enum` when it lists `options`, else the
+ * kind of the first non-empty value in `rows` (a number, a boolean or a
+ * `Date`), else `text`. Strings stay `text` (an ISO date string is not
+ * guessed); set `type: 'date'` for those.
+ */
+export function inferColumnType<T>(
+  rows: readonly T[],
+  column: DataGridColumnInput<T>
+): GridValueType {
+  if (column.type) return column.type;
+  if (column.options) return 'enum';
+  for (const row of rows) {
+    const value = readValue(row, column as GridColumnDef<T>);
+    if (value === null || value === undefined || value === '') continue;
+    if (typeof value === 'number') return 'number';
+    if (typeof value === 'boolean') return 'boolean';
+    if (value instanceof Date) return 'date';
+    return 'text';
+  }
+  return 'text';
+}
+
+/** Gives every column a `type` (inferred when missing); typed columns pass through unchanged. */
+export function resolveDataGridColumns<T>(
+  columns: readonly DataGridColumnInput<T>[],
+  rows: readonly T[]
+): DataGridColumn<T>[] {
+  return columns.map((column) =>
+    column.type ? (column as DataGridColumn<T>) : { ...column, type: inferColumnType(rows, column) }
+  );
 }
 
 /** A named viewport breakpoint or a width in px. */

@@ -18,6 +18,7 @@ import {
   componentDocPath,
   formatComponentMarkdown,
   formatLlmsTxt,
+  LLMS_ENVELOPE_NOTES,
   parseLlmsArgs,
   writeLlmsBundle,
 } from '../src/llms/index.ts';
@@ -288,5 +289,19 @@ it('writeLlmsBundle writes, dry-runs and refuses escaping or symlinked destinati
       await expect(readFile(join(out, 'llms.txt'), 'utf8')).rejects.toThrow();
     },
     reset
+  );
+});
+
+it('explains the blueprint envelope and its design system in llms.txt and llms-full.txt (spec 0.10.0)', () => {
+  const bundle = buildLlmsBundle({ manifests: [] });
+  for (const body of [bundle.llmsTxt, bundle.llmsFullTxt]) {
+    expect(body).toContain('## Blueprint envelope');
+    for (const note of LLMS_ENVELOPE_NOTES) expect(body).toContain(note);
+    expect(body).toContain('"designSystem"');
+    expect(body).toMatch(/\{"ref": "acme@2\.1\.0"\}/);
+  }
+  // Before the optional links in llms.txt.
+  expect(bundle.llmsTxt.indexOf('## Blueprint envelope')).toBeLessThan(
+    bundle.llmsTxt.indexOf('## Optional')
   );
 });

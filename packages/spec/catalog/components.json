@@ -1,5 +1,5 @@
 {
-  "catalogHash": "8e72aaa2c94dba6b4245a9778fdd21fd86c6398e5a0fca410da0aa51a3190b72",
+  "catalogHash": "1372c1dde6017747a7fd62bf309b2c30484effeae209585b46c97506b0a8842c",
   "components": [
     {
       "capability": "web-only",
@@ -2507,6 +2507,10 @@
           "name": "search"
         },
         {
+          "kind": "string",
+          "name": "searchLabel"
+        },
+        {
           "kind": "boolean",
           "name": "shortcut"
         },
@@ -3329,6 +3333,13 @@
                   "minLength": 1,
                   "type": "string"
                 },
+                "optionLabels": {
+                  "additionalProperties": {
+                    "maxLength": 120,
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
                 "options": {
                   "items": {
                     "maxLength": 120,
@@ -3346,6 +3357,33 @@
               "type": "object"
             },
             "maxItems": 48,
+            "type": "array"
+          }
+        },
+        {
+          "kind": "array",
+          "name": "issues",
+          "schema": {
+            "items": {
+              "properties": {
+                "message": {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                "path": {
+                  "items": {
+                    "maximum": 199,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "maxItems": 6,
+                  "type": "array"
+                }
+              },
+              "required": ["path", "message"],
+              "type": "object"
+            },
+            "maxItems": 200,
             "type": "array"
           }
         },

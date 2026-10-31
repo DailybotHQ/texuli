@@ -9,23 +9,24 @@ the intended process; it does not publish packages or grant release authority.
 "what the manifests are working toward". scripts/release-line.ts parses
 the next line; tests and honesty checks read it from there. Change it only
 when a publish lands (published) or a new version opens (in development). -->
-Release line: published `0.9`
+Release line: published `0.10`
 
-All 26 published packages are on npm in the 0.9 line: every one at
-`0.9.0`, every internal `@texuli/*` pin exactly `0.9.0`. `@texuli/mcp`
-(L9, the local MCP server) is published for the first time in `0.9.0`, the
-26th package. The blueprint spec in `@texuli/spec@0.9.0` is `0.9.0`, and
-the remote MCP server at `https://texuli.com/mcp` is live with the site.
-The publish workflow publishes from `main` after the merge of
-`release/0.9.0`, from the verified tarballs with signed provenance, and
-moves both the `latest` and `next` dist-tags to `0.9.0`, so a bare
-`npm install texuli` or `pnpm add texuli` gets it. `@texuli/drag`,
-`@texuli/workflows`, `@texuli/deck`, `@texuli/editor`, `@texuli/document`,
-`@texuli/pages`, `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets` and
-`@texuli/mcp` are still **in development** (pre-1.0).
+All 26 published packages are on npm in the 0.10 line: every one at
+`0.10.0`, every internal `@texuli/*` pin exactly `0.10.0`. The blueprint
+spec in `@texuli/spec@0.10.0` is `0.10.0`, and the remote MCP server at
+`https://texuli.com/mcp` is live with the site. The publish workflow
+publishes from `main` after the merge of `release/0.10.0`, from the
+verified tarballs with signed provenance, and moves both the `latest` and
+`next` dist-tags to `0.10.0`, so a bare `npm install texuli` or `pnpm add
+texuli` gets it. `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`,
+`@texuli/editor`, `@texuli/document`, `@texuli/pages`, `@texuli/forms`,
+`@texuli/canvas`, `@texuli/sheets` and `@texuli/mcp` are still **in
+development** (pre-1.0). Nothing is in development beyond `0.10.0`; installs
+use the 0.10 line (`^0.10.0`).
 
-`0.9.0` is a breaking `0.x` minor: it carries the PLAN_011 changes listed
-under "0.9.0" below, none of which were in the 0.8 tarballs. It is still
+`0.10.0` is a breaking `0.x` minor: it carries design systems (PLAN_011
+part B), the removals and the Protoyard gaps G100–G124 listed under
+"0.10.0" below, none of which were in the 0.9 tarballs. It is still
 pre-1.0, not a stable release: see "0.x versioning" below. Workspace
 manifests remain `private: true`, and every future version requires a
 fresh, explicit developer GO (since PR #17, the merge that bumps the
@@ -37,6 +38,456 @@ versions into `main`). Publishing never overwrites a published version.
   `scripts/packages.ts`).
 - The apps (`apps/website`, `apps/agent`) and the native twin (`native/`)
   publish nothing.
+
+### 0.10.0
+
+Every published package moves to `0.10.0` together, and every internal
+`@texuli/*` dependency between them is pinned to exactly `0.10.0`; the 26
+packages are the same as in `0.9.0`. `0.10.0` carries PLAN_011 part B,
+design systems: one closed JSON document per brand, validated with stable
+codes, compiled to `--tx-*` variables with enforced contrast, focus and
+target sizes, applied at runtime or on the server, imported from and
+emitted to the common token formats, carried by blueprints, documents,
+decks and every output writer, checked by `texuli ds check`, and served to
+agents by the `ds.*` operations ([DESIGN_SYSTEMS](DESIGN_SYSTEMS.md),
+ADR-021 to ADR-024). It also removes the 0.8 MCP tool names and the tree
+block's `style` key, closes the Protoyard gaps G100–G124, and ships blueprint
+spec `0.10.0`.
+
+**How it was integrated.** Like `0.9.0`, `0.10.0` was opened once on the
+branch `release/0.10.0` (every package and pin at `0.10.0`), feature work
+merged there with full CI, and only the merge of `release/0.10.0` into
+`main`, after the developer's GO, publishes it and deploys texuli.com.
+
+**Design systems** (ADR-021 to ADR-024; the guide is
+[DESIGN_SYSTEMS](DESIGN_SYSTEMS.md), with three fictional example brands in
+`examples/design-systems/`).
+
+- **`@texuli/spec/design-system`** (new subpath): `validateDesignSystem`
+  with stable codes and JSON paths, `DesignSystemPatch` with
+  `validateDesignSystemPatch` and `applyDesignSystemPatch`,
+  `migrateDesignSystem` and `checkDesignSystemReference`
+  ([design-system.md](../packages/spec/docs/design-system.md)).
+- **Design systems in blueprints and documents** (T-ds-blueprint,
+  ADR-024): `validateDraft` (`@texuli/catalog`) checks the envelope's
+  `designSystem` (a new `design-system` check; the host passes
+  `checkDesignSystem`, usually `checkDesignSystemReference`, for an inline
+  document's rules at the draft's tier); `@texuli/player` takes
+  `designSystems: { resolve, mode }`, compiles lazily (a blueprint without
+  one loads nothing more) and applies the result to its root, keeping the
+  default theme with a visible notice when nothing resolves or the document
+  is refused; `@texuli/document` documents carry `designSystem` and
+  `@texuli/pages`' `PageReader` applies it the same way. `texuli/design-system`
+  also exports `applyDesignSystem` and `loadDesignSystemCompiler`.
+- **The compiler** (`@texuli/tokens/design-system/compile` and
+  `/validate`, T-ds-compiler, ADR-022): resolves `extends`
+  (`texuli:<theme>` from the library in lazy chunks, or an exact
+  `id@x.y.z` through the host), applies the variant and patches, and
+  compiles concrete `--tx-*` variables per mode. Text contrast at the
+  declared target, the focus ring at 3:1 and 2 px, and touch targets at
+  `accessibility.targetMin` are enforced (refused as `aa-text`, `aa-focus`
+  and `target-size` when only pins could fix them; every solver move is in
+  the report). `fromTheme` turns any `Theme` into a document; all 210
+  library themes compile both ways with zero variable drift.
+- **The runtime** (`@texuli/tokens/design-system/apply`, 2,040 B gzip,
+  T-ds-runtime, ADR-023): `applyDesignSystem` (one style write per switch,
+  element-scoped), `designSystemStyle` for server HTML and
+  `designSystemAppearance` for the no-flash cache, byte-identical;
+  `DesignSystemProvider` in `texuli/design-system`; the `@texuli/astro`
+  `designSystem` option inlines the style with its CSP hash.
+- **Importers, emitters, report and diff** (`@texuli/tokens/design-system/
+  import | emit | report | diff | fixtures`, T-ds-io): a brand one-liner,
+  W3C DTCG, Tokens Studio, a flat role palette (the `protoyard-theme/v1`
+  shape), a `Theme` and logo pixels in; scoped CSS, a Tailwind preset,
+  compiled JSON, DTCG, Tokens Studio and a role palette out (lossless round
+  trips); a static review page; a diff of changed variables, contrast
+  regressions and defaults.
+- **Outputs follow a design system** (T-ds-outputs): email (colors, fonts,
+  radius, spacing and a dark head rule), the blueprint PDF, the document
+  PDF and DOCX writers, PPTX, the canvas SVG and PNG export, and the Kotlin
+  twin's generated `DesignTokens.kt` (web value conformance in Gradle).
+- **Standalone decks and the document writers:** a deck may name a design
+  system (`designSystem` in `@texuli/deck`), applied by the slides stage
+  through `@texuli/player/design-system`; player component defaults follow
+  it; the Markdown writers carry it in front matter, and the DOCX and PDF
+  writers report `design-system-unapplied` when they cannot apply it.
+- **Conformance** (T-ds-conformance): `texuli ds check <file>` (stable JSON
+  and codes; `--render` paints every agent-emittable catalog component under
+  the design system in chromium for axe, painted contrast and literal
+  colors) and `@texuli/tools/ds-check` for adopters' CI.
+- **Agent operations** (T-ds-agent-tools): `ds.validate`, `ds.compile`
+  (JSON, CSS, Tailwind, DTCG, Tokens Studio), `ds.contrast`, `ds.suggest`,
+  `ds.import`, `ds.diff`, `ds.preview` (a deterministic SVG or HTML
+  snapshot) and `blueprint.theme` on every door, and `ds.save` (local doors
+  only, an explicit path inside the working directory); the
+  `create-design-system` prompt and `texuli://design-system/{id}`;
+  `texuli ds init | validate | compile | export | preview | diff |
+  import`. `blueprint.validate` checks an inline design system with the
+  spec's rules. The remote Function's initial bundle grew to 223,613 B gzip
+  (the operation declarations; the compute loads lazily).
+- **On texuli.com:** the Design System Studio at `/theme-studio/` and the
+  `/design-systems/` hub (the example brands on four surfaces, with their
+  conformance numbers).
+
+- **Blueprint spec 0.10.0** (PLAN_011 T-ds-spec, ADR-021; shipped by
+  `@texuli/spec@0.10.0`). Additive: the design-system document schema
+  (`schemas/design-system.schema.json`, format `texuli/design-system`,
+  `formatVersion` 1) with generated TypeScript and Kotlin types, its
+  fixtures under `fixtures/design-systems/`, and (T-ds-blueprint,
+  ADR-024) the optional `designSystem` on the envelope and on a
+  `document`'s shape (`$defs.designSystemReference`: exactly one of `ref`,
+  an exact `id@x.y.z` or `texuli:<theme>`, and `inline`, a whole
+  document), with the `brand-report` and `brand-deck` goldens and three
+  invalid fixtures; within the same version, additive catalog projection
+  refreshes (`data-filter-builder`, `command-palette`) and the forms field
+  vocabulary (G101, G108, G113–G121 below). The `0.9.0 → 0.10.0` migration
+  only stamps `spec`;
+  the digest `afcb9e3ed6b74b833a0f7477a657168621785ee98602ff582aa047e2d86aef17` is pinned in `packages/spec/versions.json`.
+  `validateDraft` migrates a `0.9.0` envelope and stamps `spec: "0.10.0"`;
+  hosts that compare the `spec` string need to accept it.
+
+**Removed in 0.10.0** (deprecated in `0.9.0` for one minor):
+
+- **The seven 0.8 MCP tool names** (`deck`, `document`, `catalog`,
+  `component`, `validate`, `example`, `theme`). No door lists them. A
+  call is refused with the operation to use: MCP `tools/call` answers
+  `-32602` with `The tool "theme" was removed in 0.10.0; call theme.search
+  or theme.get instead.`, and `invoke()` returns `unknown-operation` with
+  the same text. The server card has `removedTools` (name, `replacedBy`,
+  `removedIn`) and `deprecatedTools: []`; the alias mechanism stays for
+  the next rename (ADR-017).
+- **The tree block's `style` key** (renamed `variant` in `0.9.0`). A
+  `tree` block with `style` is refused at `…style` with `style was removed
+  in 0.10.0; send variant ("file-tree" or "org") instead`, alone or next
+  to `variant`.
+- **Token rename aliases:** none. `@texuli/tokens/renames.json` is still
+  empty: token contract v2 renamed or removed no `--tx-*` name.
+
+**Breaking changes and migration notes under `0.x`.** A new minor may
+break; check these when upgrading from the 0.9 line:
+
+- **MCP hosts:** replace the old tool names in prompts and allowlists:
+  `deck` → `deck.run`; `document` → `document.run`, or `document.export`
+  with `format: "pdf"` or `"docx"` instead of the `to-pdf` and `to-docx`
+  commands; `catalog` → `catalog.search`; `component` → `component.get`;
+  `validate` → `catalog.validate`; `example` → `example.search`; `theme` →
+  `theme.get` (with `id`) or `theme.search`.
+- **Blueprints and blocks:** write `variant` on `tree` blocks, never
+  `style`. `validateDraft` migrates a `0.9.0` envelope and stamps `spec:
+  "0.10.0"`; a host that compares the `spec` string must accept it.
+- **Themes keep working:** `applyTheme`, `compileThemeCss`, scopes
+  (`data-tx-scope`), scoped portals and every `--tx-*` read are unchanged;
+  a design system is an addition. Start one from a theme with `extends:
+  "texuli:<id>"` or `fromTheme`.
+- **New subpaths load lazily:** the `@texuli/tokens` and `texuli` roots do
+  not import the design-system modules, so an app that adopts none pays
+  nothing.
+- **A host must load `@texuli/tokens/base.css` or `@texuli/tokens/system.css`**
+  (reported by Protoyard on 0.9.0). Since token contract v2 (`0.9.0`),
+  component CSS reads the system tokens (`--tx-space-unit`,
+  `--tx-size-icon-sm`, `--tx-shape-radius-*`, the type roles…) with no
+  fallback, and a theme does not declare them. A host with its own reset
+  that never loaded `base.css` rendered controls with no size (10 E2E
+  failures at Protoyard) until it imported it. No development warning
+  fires for this: a check would need a cross-bundler development flag (a
+  new dependency) and a computed-style read in every component on mount.
+
+**Protoyard gaps closed in 0.10.0** (reported against npm 0.8.x and 0.9.0):
+
+| Gap | Package | Fix |
+| --- | --- | --- |
+| G100 | `@texuli/editor/markdown`, `@texuli/core/editor-markdown` | A backslash escapes any ASCII punctuation (CommonMark) |
+| G101 | `@texuli/data/filter-builder` | Host `issues` per condition; enum options with labels |
+| G102 | `texuli/layouts/content` | `trackActiveHeading` without ContentLayout's chrome |
+| G103 | `@texuli/data/board` | Focus returns to the held card after a keyboard move |
+| G104 | `@texuli/data/calendar` | Event chip names lead with their visible text |
+| G105 | `@texuli/slides/export-core` (new) | Print without the default renderer tables |
+| G106 | `@texuli/data/activity/inbox` | `onReadChange` source, `onMarkAllRead`, pending and failed states |
+| G107 | `@texuli/data/grid-core` | DataGrid as a drop-in table: `ref`, rest, skeleton rows, column classes, inferred types |
+| G108 | `texuli/command` | CommandPalette `searchLabel` |
+| G109 | `texuli/date`, `@texuli/primitives/date-picker` | The pending range end is announced; `panel` and `footer` snippets |
+| G110 | `@texuli/tokens/system.css` (new) | The system token defaults without the reset |
+| G111 | `@texuli/pages` | A host block renderer for wrapped blocks and refused embeds |
+| G112 | `@texuli/document/markdown` | Wrapped tables as GFM tables, other wrapped blocks as text |
+| G113–G121 | `@texuli/forms` | Host-painted fields, `hideTitle`, actions, form-level disabled and read-only, password/otp/color/datetime, a "None" choice, lazy controls, `onStep`, url `protocols` |
+| G122 | `@texuli/data/dashboard` | A keyboard step passes the widget in the way |
+| G123 | `@texuli/pages` (`*-core` entries, new) | Hosts that never load the player |
+| G124 | `@texuli/tools`, `@texuli/mcp` | MCP revision `2026-07-28` served statelessly, in part |
+
+The details, by gap:
+
+- **G100–G104 and G106** (PLAN_011 T-gaps-100-104; each reported on 0.8.x
+  and still present in 0.9.0):
+  - **G104** (`@texuli/data/calendar`): an event chip's accessible name
+    now leads with its visible text in the same order (title,
+    "recurring", time or "All day", then the date and "press Enter to
+    open"; before, the date came before the time, which failed axe's
+    label-in-name rule in the agenda view). Month cells drop their
+    `aria-label` and are named by their content. `tests/e2e/data.spec.ts`
+    runs axe's `label-content-name-mismatch` over every view.
+  - **G100** (`@texuli/editor/markdown`, `@texuli/core/editor-markdown`):
+    a backslash before any ASCII punctuation is an escape (CommonMark), so
+    `\@` reads as `@` and `\@{p|P}` never opens a mention.
+  - **G101** (`@texuli/data/filter-builder`): FilterBuilder takes
+    `issues` (`{ path, message }[]`), shown after the builder's own issue
+    with `aria-invalid` and `aria-describedby` on the condition's value
+    control, and enum `FilterField.options` may be `{ value, label }`
+    (`FilterFieldOption`, `optionValue`, `optionLabel`). The
+    `data-filter-builder` catalog id gains the optional `issues` prop and
+    `fields[].optionLabels` (an additive catalog projection refresh inside
+    spec `0.10.0`), and the player paints both.
+  - **G102** (`texuli/layouts/content`): `trackActiveHeading(container,
+    entries, { readingLine, onChange, activeId })` tracks the heading
+    being read without ContentLayout's chrome and returns a dispose;
+    ContentLayout runs on it.
+  - **G103** (`@texuli/data/board`): after a keyboard move into another
+    column, focus is restored to the held card in the same task, so the
+    next Space or Enter drops it instead of landing on `<body>`.
+  - **G106** (`@texuli/data/activity/inbox`): `onReadChange` gets a third
+    argument `{ source: 'all' | 'item' | 'open' }`, and the new
+    `onMarkAllRead(ids)` takes over "Mark all as read" when given. Either
+    may return a promise: the control that started it is `aria-busy`,
+    `aria-disabled` and shows texuli's button spinner until it settles,
+    and a rejection is announced (`labels.saveFailed`). Existing
+    two-argument handlers keep working; both buttons keep the
+    `tx-inbox__button` class.
+- **G105** (`@texuli/slides/export-core`, new):
+  `DeckPrintViewCore` and `preloadDeckPrintViewCore`, the print view and
+  its preload without the default renderer tables; they take a `defaults`
+  source from the host like `DeckStageCore`. A `DeckStageCore` host that
+  prints through it emits no default-table chunk or CSS (measured on a
+  minimal host: 324 KB instead of 715 KB of JS and 28 KB instead of 72 KB of
+  CSS across every chunk, gzip). `@texuli/slides/export` behaves as before:
+  `DeckPrintView` is the core with the stage's tables as its defaults.
+- **G107–G110** (PLAN_011 T-gaps-107-110; reported on 0.9.0):
+  - **G110** (`@texuli/tokens/system.css`, new): the system token defaults
+    alone, the `:where(:root, [data-tx-theme], [data-tx-scope])` block in
+    `@layer tx.base`, with no reset, motion tables or focus ring hook, for
+    hosts that keep their own reset: 1,189 B of CSS gzip instead of
+    `base.css`'s 2,781 B. One renderer writes the block into both files
+    (`generate.ts --check` fails on drift), and a test checks that
+    `system.css` declares every system token that component CSS reads and
+    that `base.css` declares the same values.
+  - **G107** (`@texuli/data/grid-core`): DataGrid takes `bind:ref` and
+    rest attributes on its root; skeleton loading rows (`loadingRows`, or
+    a `loadingRow` snippet), with `aria-busy` on the table, one exposed row
+    carrying `labels.loading`, the rest `aria-hidden`, and `labels.loading`
+    in the polite status line while `loading`; per-column `class` and
+    `headerClass` (ColumnGrid reads them too); and an optional column
+    `type`, inferred from the rows (`DataGridColumnInput`,
+    `inferColumnType`, `resolveDataGridColumns`), else `text`. The status
+    line now says `labels.loading` instead of the row count while
+    `loading` (the single loading row is unchanged).
+  - **G108** (`texuli/command`): CommandPalette takes `searchLabel`, the
+    search combobox's name (and its results list's), defaulting to
+    `title`, which still names the dialog. The `command-palette` catalog
+    manifest lists it (not agent-emittable; an additive catalog projection
+    refresh inside spec `0.10.0`).
+  - **G109** (`texuli/date`, `@texuli/primitives/date-picker`): after the
+    first pick of a range, the grid's polite status says the end date is
+    still needed (`labels.pickEnd(start)`, a function label, message id
+    `primitives.date-picker.pick-end`), cleared by the second pick or by
+    closing the dialog; DateRangePicker takes `panel` and `footer`
+    snippets rendered inside the modal calendar dialog, each with
+    `{ value, close }` (`DateRangePickerPanelContext`).
+- **G111 and G112** (PLAN_011 T-gaps-111-112; reported
+  while adopting `@texuli/document` and `@texuli/pages` 0.9.0):
+  - **G111** (`@texuli/pages`): `PageReader`, `PageEditor`, `PagedView`,
+    `CollabEditor` and `createDocumentPlayerHost` (`@texuli/pages/host`,
+    for documents the player paints) take a host block renderer: a `renderBlock`
+    snippet and a `blockHost` (`PagesBlockHost`: `claim`, `component`,
+    `present`). The host paints the wrapped blocks and embeds the library
+    refuses (an unknown family or block, an embed with no payload), and
+    every node its `claim` returns `'host'` for; library blocks keep their
+    renderers otherwise, and the refused notice still shows when no host
+    paints a node. The node is a deep-frozen copy (`PagesHostNode`): host
+    code is developer-tier, the node may come from a user or an agent. In
+    the editor, host blocks are opaque rows that select, move and delete
+    from their handle. Without a host, the slot that paints them never
+    loads (it is imported with `import()`).
+  - **G112** (`@texuli/document/markdown`): `documentToMarkdown` writes a
+    wrapped data `table` as a GFM table (the caption in emphasis on the
+    line before; cells on one line with `|` and Markdown punctuation
+    escaped), and any other wrapped block as the text the DOCX and PDF
+    writers print for it; before, every wrapped block was left out. The
+    new `blocks: 'drop'` option leaves them out. Neither reads back as a
+    wrapped block (the Markdown subset has no table).
+- **G113–G121** (forms) (PLAN_011 T-gaps-113-121, contract
+  amendment 15; reported on `@texuli/forms` 0.9.0, which Protoyard uses
+  for generated entity forms, page and doc forms and two SaaS forms).
+  `$defs.formField` grows inside spec `0.10.0` (additive: new types and
+  optional members; the `form-field-type` invalid fixture now uses an
+  `html` type, since `password` is a closed type):
+  - **G113 host-painted fields**: a `custom` field type (`kind`, scalar
+    `config`) painted by the host through SchemaForm's `field` snippet or
+    `customFields` (by field name or kind: a snippet or `{ render?,
+    component?, validate? }`). It sits in the form landmark in schema
+    order with the form's label, description and error, gets `props`
+    (`id`, `aria-labelledby`, `aria-describedby`, `aria-invalid`,
+    `aria-required`, `disabled`), is validated by a host validator
+    (`customValidators`, sync or async), joins the error summary and
+    focus-on-error, and is submitted with the rest (any bounded JSON
+    value). For agent output a custom field must name a kind the host
+    registered: `validateFormSchema({ kinds })`, `checkFormDraft(…,
+    kinds)`, `validateDraft({ formKinds })`, `FormPlayerHost.customKinds`
+    and `createFormPlayerHost({ customFields })`; anything else is refused
+    with the code `kind`.
+  - **G114**: `hideTitle` hides the title visually; it still names the
+    form (`aria-labelledby`).
+  - **G115**: `actions` (a snippet given `SchemaFormActions`: `submitting`,
+    `last`, `step`, `steps`, `back`, `next`, `submit`…) or
+    `actions={false}`; an outside `<button form="<id>">`, the component's
+    `requestSubmit()` and `controller.submit()` all validate and open the
+    error summary.
+  - **G116**: form-level `disabled` and `readOnly` on SchemaForm and
+    `createFormController` (`setDisabled`, `setReadOnly`, state
+    `disabled`, `readOnly`): every control and action is disabled (text is
+    `readonly` when read-only), and a host submit still sends the values.
+  - **G117**: `password` (reveal toggle with `aria-pressed`;
+    `current-password` or `new-password`), `otp` (one input,
+    `autocomplete="one-time-code"`, `inputmode="numeric"`, `length` 4–12),
+    `color` (texuli ColorPicker, hex) and `datetime` (`YYYY-MM-DDTHH:MM`,
+    DatePicker + TimeField). Passwords and codes never enter drafts and are
+    masked by the new `formatFormValue` and `formValuesToMarkdown`; agent
+    output may use them only where the host passes `credentials: true`
+    (code `credential`).
+  - **G118**: an optional select gets a "None" choice that clears it
+    (`labels.selectNone`); `clearable` overrides the default.
+  - **G119**: the date, time, datetime, slider, tags, file, color and radio
+    controls and the multi-step Stepper load per type on first use, with
+    a same-size placeholder. A text, select and checkbox form's host went
+    from 90,507 B to 60,048 B of initial JavaScript and from 9,385 B to
+    5,266 B of CSS, and a text-only form's from 90,466 B to 60,011 B and
+    9,385 B to 5,266 B (gzip; `packages/forms/tests/bundle-graph.test.ts`,
+    which asserts that neither initial graph holds those controls).
+    For server rendering, pass `SCHEMA_FORM_CONTROLS` from the new
+    `@texuli/forms/controls` as `controls`. The form and each placeholder
+    carry `data-tx-pending` and `aria-busy` until the controls mount (the
+    visual suite waits for it), and each placeholder is sized like its
+    control, so nothing shifts when it mounts.
+  - **G120**: `onStep({ step, position, values, allValues, signal })` on
+    SchemaForm and the controller can block Next with field errors or a
+    message (`stepError`); Next shows "Checking…" while it runs.
+  - **G121**: url fields take `protocols` (`['https']` by default,
+    `['http', 'https']` to accept http); an http answer passes the
+    untrusted URL policy as its https twin, and `javascript:`, `data:` and
+    every other scheme stay refused.
+  - Migration notes: an optional select now shows the "None" choice (set
+    `clearable: false` to keep the old list); controls of the lazy types
+    paint after their chunk loads (pass `controls` to paint at once, and
+    wait for them in tests); `SchemaForm` focuses the summary or the
+    confirmation for any finished submit, including `controller.submit()`.
+- **G122** (PLAN_011 T-gap-122; reported on 0.9.0):
+  `nudgeItem` in `@texuli/data/dashboard` (so the Dashboard's arrow keys)
+  grows a step past the widgets in the way instead of refusing it with
+  `edge`: a widget moves down past a wider one below it (to the cell
+  `moveItem` accepts), up past a wider one above, and sideways past a
+  taller or locked one; when a narrower widget above holds its row, the
+  widget below swaps above it. `edge` is left for the grid edge, or
+  nothing left to pass. The `@texuli/sheets` README and view guide now say
+  the cell editor loads lazily on the first Enter, so host tests await it.
+- **G123** (PLAN_011 T-gap-123; reported while adopting
+  `@texuli/pages` 0.9.0): `@texuli/pages` always reached all of
+  `@texuli/player`. The embed view's `import('@texuli/player')` stayed in
+  every host's graph, even with no embeds, so a bundler that inlines lazy
+  chunks carried the whole player. The new entries `editor-core`,
+  `reader-core`, `paged-core`, `collab-core` and `host-core` export
+  `PageEditorCore`, `PageReaderCore`, `PagedViewCore`, `CollabEditorCore`
+  and `createDocumentPlayerHostCore`, which have no default player loader.
+  Live embeds paint only with the host's `loadPlayer` (a
+  `PagesPlayerLoader`, such as `() => import('@texuli/player')`, so the
+  import lives in host code). Without a loader, an embed that needs the
+  player shows a note (`labels.embedOff`), or goes to the host block
+  renderer when its claim is `'fallback'`. A host on the core entries with
+  no loader has no player module or specifier in any chunk
+  (`packages/pages/tests/bundle-graph.test.ts`). `pnpm size` measures
+  every lazy chunk of `editor-core` at 159 KiB gzip, against 467 KiB for
+  `editor`, with about the same initial JS (90.6 KiB against 91.8 KiB).
+  The default entries behave as before, and `loadPlayer={null}` turns live
+  embeds off at runtime.
+- **G124** (PLAN_011 T-gap-124, contract amendment 18;
+  reported on `@texuli/mcp` 0.9.0, run next to Protoyard's own server,
+  whose primary revision is `2026-07-28`): `createMcpHandler` serves MCP
+  revision `2026-07-28` next to the initialize-based ones, in part, on
+  the stdio bin and the remote `/mcp` alike. A request that names it in
+  `params._meta["io.modelcontextprotocol/protocolVersion"]` is answered
+  with no `initialize` and nothing stored: `server/discover` (server info,
+  capabilities, every supported revision, and tool, prompt and resource
+  summaries), `ping`, and the tools, prompts, resources and completion
+  methods. A `_meta` revision the handler does not serve is `-32022` with
+  `error.data.supported`. A request without that `_meta` version behaves
+  as in 0.9.0. On `/mcp` the `MCP-Protocol-Version` header accepts
+  `2026-07-28`, but only together with a matching `_meta` version. The
+  server card adds `statelessProtocolVersions`. Everything else in
+  `2026-07-28` is not implemented; what is, and the conservative choices,
+  are listed in the `@texuli/tools` MCP guide, which also notes that
+  Texuli answers "not initialized" with `-32600` (Protoyard uses
+  `-32002`, the 2025-11-25 resource-not-found code) and keeps it.
+
+**Hardening and fixes** (PLAN_011 T-final-review):
+
+- **Collab embeds** (`@texuli/document/collab`, PLAN_011
+  T-final-review): an issue inside an embed payload (a slide of an inline
+  deck, the node of an inline component) made the projection's repair
+  target the payload object instead of the embed, so a session could empty
+  the whole document; now only that embed is left out (an inline deck must
+  be deck model v2), every embed kind (component, deck, sheet and canvas,
+  by ref and inline) survives sync, and concurrent payload writes resolve
+  last writer wins at the embed level.
+
+- **The site's CSP:** the build hashes the styles each page's lazily loaded
+  components can inject, so live demo pages raise no `style-src-elem`
+  violation (`tests/e2e/site-csp.spec.ts` checks them in the browser).
+- **Security:** the design-system runtime and emitters share one value check (`isSafeCompiledValue`: no `image-set()`, `src()`, `cross-fade()`, `url()` or `var()`; apply now 2,040 B gzip), `designSystemStyle` refuses an id or variant that could widen its selector, the spec's free-text rule refuses zero-width, invisible and tag characters (spec 0.10.0 digest `afcb9e3e…`), and `ds.save` writes only `.json` files outside dot directories, `node_modules` and `package.json` (`path-extension`, `path-reserved`).
+- **Lighter pages and roots:** the search trigger no longer pulls the
+  command palette into every page; `/openapi.json` samples every list and
+  keyed record in its examples (172,386 B raw, from 244,366 B); the
+  `texuli` root sheds the unused Checkbox and toast primitive parts.
+- **Test hardening:** the flaky lazy-chunk, stream-session, cold-import and
+  linear-time tests listed in "Known gaps in 0.9.0" were reworked (lazy
+  chunks load before the waits, linear-time tests fit the growth exponent
+  of the thread's own CPU time).
+
+**Packaging and consumers.** `pnpm verify:packages` packs all 26 packages
+(`@texuli/examples` is the only package it skips); the consumers harness
+installs the packed tarballs.
+
+**Size budgets** (`texuli.budgets.json`). New rows at measured plus 4% for
+the design-system subpaths (`@texuli/spec/design-system`,
+`@texuli/tokens/design-system/*`, `@texuli/player/design-system`,
+`@texuli/astro/design-system`), `@texuli/slides/export-core`,
+`@texuli/pages/editor-core` and `@texuli/forms/controls`; rows that
+grew with a gap fix were raised at measured plus 4% with their reasons. The
+`texuli` root stays under its `@protoyard/ui` ceiling.
+
+**Publish order** (`publish.yml`, unchanged from `0.9.0`): core, date, spec,
+drag, deck, tokens, primitives, document, texuli, workflows, editor, forms,
+canvas, charts, data, media, chat, blocks, sheets, catalog, tools, mcp,
+astro, player, pages, slides. The new subpaths ship inside their packages;
+no package was added.
+
+### Known gaps in 0.10.0 (planned, not done)
+
+- **Design systems:** a hosted registry (read-only at most) and a CLI
+  command that writes `DesignTokens.kt` for your own brand are planned;
+  the Kotlin twin has generated tokens for the default and `acme` sets.
+- **MCP revision `2026-07-28`** is served in part (G124): the stateless
+  requests listed in the `@texuli/tools` MCP guide; everything else in it is
+  not implemented.
+- **Decks with only a deck theme:** components inside them keep their
+  literals (following the deck theme's tokens is still planned); a deck
+  that names a design system applies it on the stage root, where the
+  components read it. Library themes keep their own data-viz tokens; a
+  compiled design system always emits them.
+- **The list block's optional `style`** still has the conflict the tree
+  block had (the untrusted sink scan refuses every `style` key); a rename
+  is planned.
+- **Flaky tests:** the WebKit dialog motion scenario failed once in CI in
+  the 0.9 line and is not hardened yet.
+- **Smaller items.** `Table` keeps its built-in `plain` variant outside the
+  design defaults (planned); the Astro integration does not write the input
+  hook yet; the remote MCP and the API rate limits are per isolate (durable
+  limits need a KV binding the owner creates).
 
 ### 0.9.0
 
@@ -233,7 +684,11 @@ break; check these when upgrading from the 0.8 line:
   is empty in `0.9.0`. Component tokens are fallback-only (never
   declared), so a host reads them with their registry default and sets
   them on a scope; import `@texuli/tokens/base.css`, which now declares
-  the system defaults. Default variants and sizes come from
+  the system defaults. **Correction (reported after release): loading
+  `base.css` is required, not optional.** Component CSS reads the system
+  tokens with no fallback and only `base.css` declares them, so a host
+  with its own reset that skips it gets controls with no size. `0.10.0`
+  adds `@texuli/tokens/system.css`, the defaults without the reset. Default variants and sizes come from
   `setDesignDefaults` (`texuli/defaults`).
 - **A pending Button** (`loading` or `autoLoading`) is `aria-disabled`
   with its click suppressed instead of natively `disabled`, so it keeps
@@ -295,31 +750,41 @@ pages, slides.
 - **Data-viz tokens stay per theme.** Emitting them for every theme moved
   99 captures in 30 examples, because the chart fallbacks differ by design
   (ColorBrewer frames, semantic pie roles, `currentColor` sparklines). The
-  design-system compiler planned for `0.10.0` always emits them.
+  design-system compiler, shipped in `0.10.0`, always emits them.
 - **Components inside decks keep their literals** instead of following the
-  deck theme's tokens (following it moved 84 captures); planned with the
-  `0.10.0` design-system runtime and a one-time rebaseline.
+  deck theme's tokens (following it moved 84 captures). From `0.10.0` a
+  deck that names a design system applies it on the stage root; the deck
+  theme case is still planned.
 - **The list block's optional `style`** has the conflict the tree block
   had (the untrusted sink scan refuses every `style` key), so a list with
   a style cannot come from an agent yet; a rename is planned.
 - **`/openapi.json` is about 236 KB**, because its examples are real built
-  files; trimming them to small samples is planned.
+  files. Fixed in `0.10.0`: every
+  list and keyed record in an example keeps its first two entries, so the
+  file is 172,386 B raw (16,334 B gzip), from 244,366 B (22,442 B gzip).
 - **Flaky tests:** the lazy canvas chart renderer, the player's
   `schema-form` lookup, the `site-slides` components deck, a
   stream-session chunking timeout and the `editor-markdown` linear-time
   wall-clock bound each failed once under parallel local load, and the
-  WebKit dialog motion scenario once in CI; all passed on rerun. Hardening
-  their waits (and an operation-count test for the wall-clock bound) is
-  planned.
+  WebKit dialog motion scenario once in CI; all passed on rerun. Hardened
+  in `0.10.0`, except the WebKit motion scenario: the lazy chunks
+  load before the waits start, the chunking test's checks are no longer
+  quadratic (3.6 s to 0.35 s), the deck step awaits each stage, and the
+  linear-time tests (`editor-markdown` and `core/markup`) fit the growth
+  exponent of the thread's own CPU time. Three more seen in the same
+  review (the forms host's lazy mount, and two cold imports of the texuli
+  root and the examples registry) got the same treatment.
 - **`/component-pages/card/`** reports enforced CSP `style-src-elem`
-  inline violations (present before PLAN_011); finding and fixing or
-  hashing the inline style is planned.
+  inline violations (present before PLAN_011). The cause was every lazily
+  loaded demo frame and stage (`css="injected"`) on every component page.
+  Fixed in `0.10.0`: the build hashes the styles each page's chunks
+  can inject, and `tests/e2e/site-csp.spec.ts` checks the pages in the
+  browser.
 - **Smaller items.** `Table` keeps its built-in `plain` variant outside
   the design defaults (planned); the Astro integration does not write the
   input hook yet; the remote MCP and the API rate limits are per isolate
   (durable limits need a KV binding the owner creates); the design-system
-  document (ADR-021) and its compiler and runtime are planned for
-  `0.10.0`.
+  document (ADR-021) and its compiler and runtime shipped in `0.10.0`.
 
 ### 0.8.x patch releases (G86)
 
@@ -1292,6 +1757,13 @@ tools, astro, player, slides. `@texuli/deck` goes out before
 
 ### History
 
+- `0.9.0` (2026-10-30; merged and published from `main` on 2026-10-30
+  UTC): a breaking `0.x` minor for 26 packages, the first publication of
+  `@texuli/mcp` (PLAN_011 part A: the operations registry, the MCP server
+  local and remote, an agent-ready texuli.com, token contract v2, scoped
+  portals and the Protoyard gaps G87–G99; see "0.9.0" above). Its tarballs
+  ship blueprint spec `0.9.0`; design systems were on `release/0.10.0`
+  only.
 - `0.8.0` (2026-10-29; merged and published from `main` on 2026-10-29
   UTC): a breaking `0.x` minor for 25 packages, the first publication of
   `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (PLAN_010 waves 4
@@ -1341,10 +1813,10 @@ tools, astro, player, slides. `@texuli/deck` goes out before
 
 ### 0.x versioning
 
-Until 1.0.0, a breaking change bumps the minor (`0.9.0` to `0.10.0`) and a
-fix bumps the patch (`0.9.0` to `0.9.1`). Consumers pin the exact version or
-use `~0.9.0` or `^0.9.0`; for a `0.x` version both ranges accept only
-`0.9.x`, so a new minor never arrives unasked. 1.0.0 will be the first stable
+Until 1.0.0, a breaking change bumps the minor (`0.10.0` to `0.11.0`) and a
+fix bumps the patch (`0.10.0` to `0.10.1`). Consumers pin the exact version or
+use `~0.10.0` or `^0.10.0`; for a `0.x` version both ranges accept only
+`0.10.x`, so a new minor never arrives unasked. 1.0.0 will be the first stable
 release.
 
 ## Independent package versions
@@ -1379,15 +1851,14 @@ default.
 - **`next`** points to the newest owner-approved version, including any
   future `0.x.y-next.N` or other pre-release. The publish workflow always
   publishes with `--tag next`, so it moves only with a new version and a
-  fresh GO. It names `0.9.0` once the publish workflow runs after the merge
-  of `release/0.9.0` (the 0.8 line before that; `@texuli/mcp` has no
-  earlier version).
+  fresh GO. It names `0.10.0` once the publish workflow runs after the merge
+  of `release/0.10.0` (the 0.9 line before that).
 - **`latest`** is npm's default install tag, and npm's package page shows
   the README of the version it names. It tracks the newest release, before
   and after 1.0.0: the publish workflow moves it together with `next`
   (owner decision 2026-10-27; before that, `latest` was reserved for 1.0.0
-  and stayed on the first upload, `0.1.0-next.0`). It names `0.9.0` once the
-  publish workflow runs after the merge of `release/0.9.0` (the 0.8 line
+  and stayed on the first upload, `0.1.0-next.0`). It names `0.10.0` once the
+  publish workflow runs after the merge of `release/0.10.0` (the 0.9 line
   before that).
   The workflow moves `latest` on every run, so publishing a future
   pre-release without moving `latest` needs a workflow change first.
@@ -1403,7 +1874,7 @@ version.
 
 Task 172 made every published dependency an intentional semver range: the
 published package manifests pin internal `@texuli/*` dependencies to exact
-versions (for `0.9.0`, every internal pin is exactly `0.9.0`; compatibility
+versions (for `0.10.0`, every internal pin is exactly `0.10.0`; compatibility
 between Texuli packages is exact, per "Independent package versions" above), while the private development
 manifests (`apps/website`, `apps/agent`, `packages/examples`) keep the
 pnpm `workspace:` protocol. The release packer enforces that boundary
@@ -1423,14 +1894,15 @@ the package-to-package contract outside this repository.
 
 | Surface | Version | Where it is pinned |
 | --- | --- | --- |
-| 26 npm packages | `0.9.0` (dist-tags `latest` and `next`) | Each package manifest, with exact `0.9.0` internal pins; published by the publish workflow after the merge of `release/0.9.0` (before it: the 0.8 line for 25 packages, `0.8.0` on 2026-10-29 UTC plus the `0.8.x` patches in "0.8.x patch releases (G86)"; `0.7.0` for 22 packages on 2026-10-29 UTC; `0.6.0` for 20 packages on 2026-10-29 UTC; `0.5.0` for 20 packages on 2026-10-29 UTC; `0.4.0` for 19 packages on 2026-10-28; `0.3.0` for 16 packages on 2026-10-27 plus drag and workflows on 2026-10-28, run 40616266068; `0.2.0` for 15 packages on 2026-10-27; previews `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
-| `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets` | `0.9.0` (first published as `0.8.0`) | Each package manifest (and `FORMS_PACKAGE_VERSION`, `CANVAS_PACKAGE_VERSION`, `SHEETS_PACKAGE_VERSION`); `@texuli/forms` and `@texuli/canvas` are published after `@texuli/editor`, once `@texuli/core`, `@texuli/deck`, `@texuli/document`, `@texuli/drag` and `texuli` are out, and `@texuli/sheets` after `@texuli/blocks`, once `@texuli/date` and `@texuli/data` are out; no published package depends on them. In development (ADR-012, ADR-015), pre-1.0. |
-| `@texuli/document`, `@texuli/pages` | `0.9.0` (first published as `0.7.0`) | Each package manifest (and `PAGES_PACKAGE_VERSION`); `@texuli/document` is published after `@texuli/core` and `@texuli/deck` and before `@texuli/tools` and `@texuli/pages`, which depend on it; `@texuli/pages` after `@texuli/player`. In development (ADR-010, ADR-011), pre-1.0. |
-| `@texuli/editor` | `0.9.0` (first published as `0.5.0`) | `packages/editor/package.json` (and `EDITOR_PACKAGE_VERSION`); published after `texuli`, which it depends on. In development (ADR-003), pre-1.0. |
-| `@texuli/deck` | `0.9.0` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/document`, `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
-| `@texuli/drag`, `@texuli/workflows` | `0.9.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
-| `@texuli/mcp` | `0.9.0` (first published as `0.9.0`) | `packages/mcp/package.json`, with `@texuli/tools` pinned to exactly its own version; published right after `@texuli/tools`. In development (ADR-019), pre-1.0. |
-| Blueprint spec | `0.9.0`, digest `497df4d3b0c67d53483163ebd9bd73733b52caf5f8e2966478f1cf860e6f9d9d` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.9.0`; a stamp-only migration from `0.8.0`. |
+| 26 npm packages | `0.10.0` (dist-tags `latest` and `next`) | Each package manifest, with exact `0.10.0` internal pins; published by the publish workflow after the merge of `release/0.10.0` (before it: `0.9.0` for 26 packages on 2026-10-30 UTC; the 0.8 line for 25 packages, `0.8.0` on 2026-10-29 UTC plus the `0.8.x` patches in "0.8.x patch releases (G86)"; `0.7.0` for 22 packages on 2026-10-29 UTC; `0.6.0` for 20 packages on 2026-10-29 UTC; `0.5.0` for 20 packages on 2026-10-29 UTC; `0.4.0` for 19 packages on 2026-10-28; `0.3.0` for 16 packages on 2026-10-27 plus drag and workflows on 2026-10-28, run 40616266068; `0.2.0` for 15 packages on 2026-10-27; previews `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
+| `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets` | `0.10.0` (first published as `0.8.0`) | Each package manifest (and `FORMS_PACKAGE_VERSION`, `CANVAS_PACKAGE_VERSION`, `SHEETS_PACKAGE_VERSION`); `@texuli/forms` and `@texuli/canvas` are published after `@texuli/editor`, once `@texuli/core`, `@texuli/deck`, `@texuli/document`, `@texuli/drag` and `texuli` are out, and `@texuli/sheets` after `@texuli/blocks`, once `@texuli/date` and `@texuli/data` are out; no published package depends on them. In development (ADR-012, ADR-015), pre-1.0. |
+| `@texuli/document`, `@texuli/pages` | `0.10.0` (first published as `0.7.0`) | Each package manifest (and `PAGES_PACKAGE_VERSION`); `@texuli/document` is published after `@texuli/core` and `@texuli/deck` and before `@texuli/tools` and `@texuli/pages`, which depend on it; `@texuli/pages` after `@texuli/player`. In development (ADR-010, ADR-011), pre-1.0. |
+| `@texuli/editor` | `0.10.0` (first published as `0.5.0`) | `packages/editor/package.json` (and `EDITOR_PACKAGE_VERSION`); published after `texuli`, which it depends on. In development (ADR-003), pre-1.0. |
+| `@texuli/deck` | `0.10.0` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/document`, `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
+| `@texuli/drag`, `@texuli/workflows` | `0.10.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
+| `@texuli/mcp` | `0.10.0` (first published as `0.9.0`) | `packages/mcp/package.json`, with `@texuli/tools` pinned to exactly its own version; published right after `@texuli/tools`. In development (ADR-019), pre-1.0. |
+| Blueprint spec | `0.10.0`, digest `afcb9e3ed6b74b833a0f7477a657168621785ee98602ff582aa047e2d86aef17` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.10.0`; a stamp-only migration from `0.9.0`. |
+| Blueprint spec in `@texuli/spec@0.9.0` | `0.9.0`, digest `497df4d3b0c67d53483163ebd9bd73733b52caf5f8e2966478f1cf860e6f9d9d` | The 0.9 line's generated sources carry the `0.9.0` stamp. |
 | Blueprint spec in `@texuli/spec@0.8.0` | `0.8.0`, digest `f6b6388280d247eb9c3106a925111f35b90d1ec3b59c23652542f06a9f103daf` | The 0.8 line's generated sources carry the `0.8.0` stamp. |
 | Blueprint spec in `@texuli/spec@0.7.0` | `0.7.0`, digest `43e44fa9a198d337d686b4e2d86882a06a676ae1e1c1f02d023b3a525795a8b2` | The previous release's generated sources carry the `0.7.0` stamp. |
 | Blueprint spec in `@texuli/spec@0.6.0` | `0.6.0`, digest `37141b85b9ab9f02af849a62a9c97ba729d6c5c2705130290bcdf45b308ea4cc` | The `0.6.0` release's generated sources carry the `0.6.0` stamp. |
@@ -1486,12 +1958,12 @@ mcp, astro, player, pages, slides; `@texuli/editor` goes out from `0.5.0`,
 after `texuli`, `@texuli/document` and `@texuli/pages` from `0.7.0`,
 `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` from `0.8.0`, and
 `@texuli/mcp` from `0.9.0`).
-Every published package is `0.9.0`, and every internal dependency between
-them is pinned to exactly `0.9.0`; the workflow refuses to start publishing while any listed
+Every published package is `0.10.0`, and every internal dependency between
+them is pinned to exactly `0.10.0`; the workflow refuses to start publishing while any listed
 package is still `0.0.0`. `pnpm verify:packages` still refuses any
 `0.0.0` or `workspace:` range in a published manifest, the guard that keeps
 an unversioned dependency out. The publish loop skips versions npm already
-has, so a package changed after `0.9.0` needs a new version before its
+has, so a package changed after `0.10.0` needs a new version before its
 change reaches npm.
 
 Each outward wave must also pass its task's `pnpm verify:packages` gate and
@@ -1504,7 +1976,7 @@ new version rather than reusing a published version.
 ## Honesty in documentation
 
 The npm name reservation (`0.1.0-next.0`) was a prerelease publication by
-the owner, not a supported product release. `0.9.0` is a release but not a
+the owner, not a supported product release. `0.10.0` is a release but not a
 stable one: keep `private: true`, the pre-1.0 status, and the absence of a
 stable 1.0.0 clear until the corresponding approved stable release actually
 exists. A passing pack gate proves only that a tarball
@@ -1515,8 +1987,10 @@ usable by consumers.
 
 The agent skill (`skills/texuli/`) is released apart from the npm packages,
 by `.github/workflows/skill-release.yml`. Skill releases are tagged from
-`skill-v0.2.0` on (`skill-v0.3.3` is the latest when the `0.9.0` packages
-are released). A checkout install is described in
+`skill-v0.2.0` on (`skill-v0.3.3` was the latest when the `0.9.0` packages
+were released, and `skill-v0.3.4` is the latest tag when the `0.10.0`
+release notes are written; the skill release after the merge folds the
+pack's 0.10.0 changes into its own section). A checkout install is described in
 [SKILL_INSTALLATION](SKILL_INSTALLATION.md).
 
 **Tags.** Skill releases are tagged `skill-vX.Y.Z`. The npm publish

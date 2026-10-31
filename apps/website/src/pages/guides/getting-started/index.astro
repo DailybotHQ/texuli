@@ -10,7 +10,7 @@ const toc = [
   { id: 'live-example', label: 'Live example', level: 2 as const },
 ];
 
-const installSnippet = `# Texuli is in development: every published package ships as 0.9.0, a pre-1.0 release — 1.0.0 will be the first stable release.
+const installSnippet = `# Texuli is in development: every published package ships as 0.10.0, a pre-1.0 release — 1.0.0 will be the first stable release.
 pnpm add texuli @texuli/tokens @texuli/primitives @texuli/core`;
 
 const initSnippet = `# The copy path: run the init CLI from a checkout of the Texuli repository.
@@ -42,10 +42,10 @@ import '@texuli/tokens/base.css';`;
 >
   <h2 id="install">Install</h2>
   <p>
-    Texuli is in development: every published package is <code>0.9.0</code>, a pre-1.0
+    Texuli is in development: every published package is <code>0.10.0</code>, a pre-1.0
     release, and there is no stable release yet (1.0.0 will be the first). Under 0.x a new minor
-    may contain breaking changes, so pin the exact version or use <code>^0.9.0</code>, which
-    accepts only 0.9.x. Install the published release into your app:
+    may contain breaking changes, so pin the exact version or use <code>^0.10.0</code>, which
+    accepts only 0.10.x. Install the published release into your app:
   </p>
   <GuideCode code={installSnippet} label="Install the published release" lang="bash" />
   <p>
@@ -57,8 +57,7 @@ import '@texuli/tokens/base.css';`;
 
   <h2 id="wire-tokens">Wire tokens</h2>
   <p>
-    Every app needs the base stylesheet and a compiled theme on <code>&lt;html data-tx-theme&gt;</code>.
-    <code>texuli init</code> writes the three pieces below for Vite, Astro or SvelteKit. Default theme: <code>enterprise-neutral</code>.
+    Every app needs the base stylesheet and a compiled theme on <code>&lt;html data-tx-theme&gt;</code>. <code>texuli init</code> writes the three pieces below for Vite, Astro or SvelteKit. Default theme: <code>enterprise-neutral</code>.
   </p>
   <GuideCode code={wireSnippet} label="Wiring: theme attribute, no-flash bootstrap, stylesheet" lang="html" />
 

@@ -763,8 +763,8 @@ function dropTargetFor(row: FlatNode<T>): boolean {
     }
 
     .tx-tree-view__row--selected {
-      background: color-mix(in srgb, var(--tx-primary, Highlight) 18%, Canvas);
-      color: CanvasText;
+      background: var(--tx-primary-soft, Highlight);
+      color: var(--tx-primary-soft-foreground, HighlightText);
       outline: 2px solid var(--tx-primary, Highlight);
       outline-offset: -2px;
     }
@@ -772,7 +772,7 @@ function dropTargetFor(row: FlatNode<T>): boolean {
     .tx-tree-view__row--selected .tx-tree-view__label,
     .tx-tree-view__row--selected .tx-tree-view__content,
     .tx-tree-view__row--selected .tx-tree-view__content :where(*) {
-      color: CanvasText;
+      color: var(--tx-primary-soft-foreground, HighlightText);
     }
 
     .tx-tree-view__row--dragging,
@@ -905,7 +905,7 @@ function dropTargetFor(row: FlatNode<T>): boolean {
     }
 
     .tx-tree-view__status-inline--error {
-      color: var(--tx-danger, CanvasText);
+      color: var(--tx-destructive, CanvasText);
     }
 
     .tx-tree-view__empty {

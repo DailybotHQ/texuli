@@ -35,7 +35,7 @@ export const FORMS_SECTIONS: readonly FormsSection[] = [
     id: 'fields',
     title: 'Every field type',
     summary:
-      'One schema, fifteen field types, each painted by the texuli control for it and named by its label. Values are typed: numbers stay numbers, dates are YYYY-MM-DD, multiple choices are lists. Change anything and watch the values; submit to see what a host receives.',
+      'One schema, twenty field types, each painted by the texuli control for it and named by its label. Values are typed: numbers stay numbers, dates are YYYY-MM-DD, multiple choices are lists. Change anything and watch the values; submit to see what a host receives.',
   },
   {
     id: 'formats',
@@ -92,7 +92,7 @@ export const FIELD_VALUE_TYPES: Readonly<Record<FormFieldType, string>> = {
   textarea: 'string',
   number: 'number or null',
   email: 'string',
-  url: 'string (https)',
+  url: 'string (https, or http where protocols allow it)',
   date: 'YYYY-MM-DD or null',
   time: 'HH:MM or null',
   select: 'string',
@@ -103,6 +103,11 @@ export const FIELD_VALUE_TYPES: Readonly<Record<FormFieldType, string>> = {
   slider: 'number',
   file: 'file metadata list (the host uploads)',
   tags: 'string list',
+  password: 'string (never in drafts, masked in summaries)',
+  otp: 'string of digits',
+  color: '#hex or null',
+  datetime: 'YYYY-MM-DDTHH:MM or null',
+  custom: 'any JSON value the host painter sets',
 };
 
 export interface FormsKey {

@@ -368,20 +368,7 @@ function repair(
         fixedRoot = true;
         continue;
       }
-      // The deepest node on the path.
-      let at: unknown = doc;
-      let node: object | null = null;
-      for (const segment of path) {
-        if (at === null || typeof at !== 'object') break;
-        at = (at as Record<string | number, unknown>)[segment];
-        if (
-          at !== null &&
-          typeof at === 'object' &&
-          !Array.isArray(at) &&
-          typeof (at as { id?: unknown }).id === 'string'
-        )
-          node = at;
-      }
+      const node = nodeAt(doc, path);
       if (node) drop.add(node);
     }
     if (drop.size === 0 && !fixedRoot) break;
@@ -395,6 +382,33 @@ function repair(
     blocks: [],
   } as TexuliDocument;
   return { document: fallback, dropped: dropped + 1 };
+}
+
+/**
+ * The deepest document node an issue path points into: only child lists
+ * (`blocks`, `items`, `columns`) lead to a node, so an object inside a
+ * value (a slide of an inline deck, the catalog node of an inline
+ * component, an item of wrapped block props) is never taken for one. The
+ * repair then leaves out the node that holds the value, which `prune`
+ * can remove, instead of a value it cannot (which used to exhaust the
+ * rounds and empty the whole document).
+ */
+function nodeAt(doc: Record<string, unknown>, path: readonly (string | number)[]): object | null {
+  let at: unknown = doc;
+  let node: object | null = null;
+  for (let i = 0; i + 1 < path.length; i += 2) {
+    const key = path[i];
+    const index = path[i + 1];
+    if (key !== 'blocks' && key !== 'items' && key !== 'columns') break;
+    if (typeof index !== 'number') break;
+    const list = (at as Record<string, unknown>)[key];
+    if (!Array.isArray(list)) break;
+    const next: unknown = list[index];
+    if (next === null || typeof next !== 'object' || Array.isArray(next)) break;
+    at = next;
+    node = next;
+  }
+  return node;
 }
 
 /** Remove the dropped nodes from every child list (iterative). */
