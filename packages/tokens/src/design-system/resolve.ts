@@ -18,7 +18,6 @@ import {
   validateDesignSystemPatch,
 } from '@texuli/spec/design-system';
 import type { Theme } from '../contract/types.ts';
-import type { NeutralFamily } from '../generator/seed.ts';
 import { fromTheme } from './from-theme.ts';
 import type { DesignSystemPairResult } from './guarantees.ts';
 import { canonicalJson, sha256Hex } from './hash.ts';
@@ -148,7 +147,7 @@ export function resolveDesignSystemSync(
           path,
           message: `Nothing resolves ${ref}.`,
           hint: ref.startsWith('texuli:')
-            ? 'Use resolveDesignSystem (it loads library themes), or return the Theme from resolve.'
+            ? 'Use resolveDesignSystem (it loads library themes), pass loadLibraryBase to resolveDesignSystemCore, or return the Theme from resolve.'
             : 'Pass a resolve function that returns the document for this exact id@version.',
           ...where,
         },
@@ -224,40 +223,38 @@ export function resolveDesignSystemSync(
   };
 }
 
-/** Load `texuli:<id>` from the theme library (lazily) as a document with its generator brand. */
-export async function loadLibraryBase(ref: string): Promise<DesignSystem | undefined> {
-  const id = ref.slice('texuli:'.length);
-  const library = await import('../library-expand/registry.ts');
-  try {
-    const [theme, definition] = await Promise.all([
-      library.loadFullLibraryTheme(id),
-      library.loadFullLibraryThemeDefinition(id),
-    ]);
-    return fromTheme(theme, {
-      brand: {
-        seed: definition.seed,
-        ...(definition.secondary ? { secondary: definition.secondary } : {}),
-        ...(definition.neutral ? { neutral: definition.neutral as NeutralFamily } : {}),
-        contrast: definition.contrastLevel === 'AAA' ? 'AAA' : 'AA',
-      },
-    });
-  } catch {
-    return undefined;
-  }
+/**
+ * Loads a `texuli:<id>` base (a document or a `Theme`), or `undefined` when
+ * it knows no such theme. `loadLibraryBase` from
+ * `@texuli/tokens/design-system/compile` loads it from the theme library.
+ */
+export type DesignSystemLibraryLoader = (ref: string) => unknown | Promise<unknown>;
+
+export interface ResolveDesignSystemCoreOptions
+  extends Omit<ResolveDesignSystemOptions, 'resolve'> {
+  /** Returns the base for a reference; it may return a promise. Asked first, for every ref. */
+  resolve?: (ref: string) => unknown | Promise<unknown>;
+  /**
+   * Loads a `texuli:<id>` base that `resolve` left `undefined` (G127). There
+   * is no default here, so this module never references the theme library:
+   * without a loader such a base is refused (`invalid-value`, "Nothing
+   * resolves texuli:<id>"). `resolveDesignSystem` passes the library's.
+   */
+  loadLibraryBase?: DesignSystemLibraryLoader | null;
 }
 
 /**
  * Resolve a document's `extends` chain, variant and patches into one
- * document. `texuli:<id>` loads the library theme (a lazy chunk, never the
- * network); `id@x.y.z` goes to `options.resolve`, which may return a
- * promise. Resolves to a result, never rejects for a bad document.
+ * document, with the `texuli:<id>` loader injected (G127): the library-free
+ * form of `resolveDesignSystem`, exported by
+ * `@texuli/tokens/design-system/compile-core`. `id@x.y.z` goes to
+ * `options.resolve`. Resolves to a result, never rejects for a bad document.
  */
-export async function resolveDesignSystem(
+export async function resolveDesignSystemCore(
   input: unknown,
-  options: Omit<ResolveDesignSystemOptions, 'resolve'> & {
-    resolve?: (ref: string) => unknown | Promise<unknown>;
-  } = {}
+  options: ResolveDesignSystemCoreOptions = {}
 ): Promise<ResolvedDesignSystem | DesignSystemFailure> {
+  const { loadLibraryBase, ...rest } = options;
   const bases = new Map<string, unknown>();
   let next = isRecord(input) ? input.extends : undefined;
   for (let hop = 0; typeof next === 'string' && !bases.has(next); hop++) {
@@ -265,14 +262,14 @@ export async function resolveDesignSystem(
     const ref = next;
     let base: unknown;
     try {
-      base = ref.startsWith('texuli:')
-        ? ((await options.resolve?.(ref)) ?? (await loadLibraryBase(ref)))
-        : await options.resolve?.(ref);
+      base = await options.resolve?.(ref);
+      if ((base === undefined || base === null) && ref.startsWith('texuli:') && loadLibraryBase)
+        base = await loadLibraryBase(ref);
     } catch {
       base = undefined;
     }
     bases.set(ref, base);
     next = isRecord(base) ? base.extends : undefined;
   }
-  return resolveDesignSystemSync(input, { ...options, resolve: (ref) => bases.get(ref) });
+  return resolveDesignSystemSync(input, { ...rest, resolve: (ref) => bases.get(ref) });
 }

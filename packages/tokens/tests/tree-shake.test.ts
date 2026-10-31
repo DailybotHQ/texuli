@@ -212,4 +212,32 @@ export const loadOne = () => loadLibraryTheme('harbor-teal');
       expect(recordsInputs.length).toBeGreaterThanOrEqual(1);
     })();
   });
+
+  it('keeps the theme library out of @texuli/tokens/design-system/compile-core (G127)', async () => {
+    const bundle = async (entry: string) => {
+      const result = await loadEsbuild().build({
+        stdin: {
+          contents: `export * from ${JSON.stringify(join(tokensSrc, entry))};\n`,
+          resolveDir: tokensSrc,
+          sourcefile: 'compile-entry.ts',
+          loader: 'ts',
+        },
+        bundle: true,
+        write: false,
+        format: 'esm',
+        platform: 'browser',
+        target: 'es2022',
+        packages: 'bundle',
+        logLevel: 'silent',
+        metafile: true,
+      });
+      // esbuild inlines `import()` targets, so a lazy library reference would be an input too.
+      return Object.keys(result.metafile?.inputs ?? {}).filter(
+        (p) => p.includes('library-port') || p.includes('library-expand')
+      );
+    };
+    expect(await bundle('design-system/compile-core.ts')).toEqual([]);
+    // Control: the default entry still reaches the library (lazily).
+    expect((await bundle('design-system/compile.ts')).length).toBeGreaterThan(0);
+  });
 });
