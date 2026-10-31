@@ -22,6 +22,7 @@ import type {
 } from '../model/types.ts';
 import type { DocumentDesign } from '../output/design.ts';
 import {
+  designSystemUnapplied,
   embedText,
   fileLink,
   type ImageResolver,
@@ -827,6 +828,8 @@ export async function writePdf(doc: TexuliDocument, options: PdfOptions = {}): P
       ? Math.min(18, Math.max(8, options.fontSize))
       : 11;
   const diagnostics: OutputDiagnostic[] = [];
+  const unapplied = designSystemUnapplied(doc, options.design);
+  if (unapplied) diagnostics.push(unapplied);
   let ttf: TrueTypeFont | null = null;
   if (options.font) {
     ttf = parseTrueType(options.font);
