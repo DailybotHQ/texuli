@@ -49,6 +49,7 @@
     "./generator": "./src/generator/index.ts",
     "./library": "./src/library-port/index.ts",
     "./library-expand": "./src/library-expand/index.ts",
+    "./library-ids": "./src/library-ids/index.ts",
     "./modes": "./src/modes/index.ts",
     "./motion": "./src/motion/index.ts",
     "./no-flash": "./src/no-flash/index.ts",

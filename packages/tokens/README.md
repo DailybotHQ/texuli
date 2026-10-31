@@ -97,6 +97,7 @@ const css = compileThemeCss(theme);
 | Palette engine | `palette` | OKLCH scales, tones and contrast pairs |
 | Theme library | `library` | 64 themes with lazy loaders: `loadLibraryTheme`, `listThemeLibrary`, `searchThemeLibrary` |
 | Expanded library | `library-expand` | 146 more themes (6 built-ins, then 140 curated) |
+| Library ids | `library-ids` | Unreleased, planned for `0.10.1`: every library theme id (6 built-in, 64 port, 140 expand; 210) with no metadata, `isLibraryThemeId` and `libraryThemeSet`, for synchronous id checks (1.7 KB gzip) |
 | Single theme | `build` | `buildLibraryTheme`: build one theme from a compact definition without loading the catalog |
 | Theme generator | `generator` | `generateThemeFromSeed`, `generateThemeFromMood`, `generateThemeFromImage` |
 | Contrast gate | `aa-gate`, `aa-gate/components` | WCAG AA checks for theme and component color pairs |
@@ -161,7 +162,8 @@ Ships in `0.6.0`; the `0.5.0` release predates it:
 - Motion tokens (durations, easings, springs): [tokens-motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-motion.md)
 - Theme generator: [tokens-generator.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-generator.md)
 - Theme libraries: [tokens-library-port.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-library-port.md)
-  and [tokens-library-expand.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-library-expand.md)
+  and [tokens-library-expand.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-library-expand.md);
+  every library id without metadata: [tokens-library-ids.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-library-ids.md)
 - Color modes and no-flash: [tokens-modes.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-modes.md)
   and [tokens-no-flash.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-no-flash.md)
 - Design-system compiler (from `0.10.0`): [design-system-compiler.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/design-system-compiler.md)
