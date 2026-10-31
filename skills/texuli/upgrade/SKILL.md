@@ -163,6 +163,10 @@ no design system loads none of it. Before the move, check the app for:
 - **Spec 0.10.0:** validated drafts carry `spec: "0.10.0"`;
   `validateDraft` migrates a `0.9.0` envelope (a stamp-only migration), and
   a host that compares the `spec` string must accept `"0.10.0"`.
+- **Tokens CSS:** load `@texuli/tokens/base.css` or the new
+  `@texuli/tokens/system.css` (the system token defaults without the
+  reset). Component CSS reads the system tokens with no fallback, so a
+  host with its own reset that loads neither renders controls with no size.
 - **`@texuli/forms`:** an optional select shows a "None" choice that
   clears it (set `clearable: false` to keep the old list). The date, time,
   datetime, slider, tags, file, color and radio controls and the step

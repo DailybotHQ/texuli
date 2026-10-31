@@ -75,6 +75,11 @@ export interface DatePickerLabels {
   end: string;
   /** Announced when a range longer than `maxDays` is refused (`{max}` is the limit). */
   tooLong: string;
+  /**
+   * Announced (politely) after the first pick of a range, while the end is
+   * still needed (G109); receives the start as a long localized date.
+   */
+  pickEnd: (start: string) => string;
 }
 
 export const DEFAULT_DATE_PICKER_LABELS: Readonly<DatePickerLabels> = /* @__PURE__ */ Object.freeze(
@@ -87,6 +92,7 @@ export const DEFAULT_DATE_PICKER_LABELS: Readonly<DatePickerLabels> = /* @__PURE
     start: 'Start date',
     end: 'End date',
     tooLong: 'Choose a range of {max} days or fewer.',
+    pickEnd: (start: string) => `Start date ${start}. Now choose the end date.`,
   }
 );
 
@@ -94,12 +100,13 @@ export function resolveDatePickerLabels(
   overrides: Partial<DatePickerLabels> = {},
   base: Readonly<DatePickerLabels> = DEFAULT_DATE_PICKER_LABELS
 ): DatePickerLabels {
-  const labels = { ...base };
-  for (const key of Object.keys(labels) as (keyof DatePickerLabels)[]) {
-    const value = overrides[key];
-    if (typeof value === 'string') labels[key] = value;
+  const labels: Record<string, unknown> = { ...base };
+  for (const key of Object.keys(labels)) {
+    const value = (overrides as Record<string, unknown>)[key];
+    // A value of the default's type (a string, or a function label) replaces it.
+    if (value !== undefined && typeof value === typeof labels[key]) labels[key] = value;
   }
-  return labels;
+  return labels as unknown as DatePickerLabels;
 }
 
 /** A long, localized date for names (`Sunday, March 15, 2026`). */

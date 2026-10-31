@@ -9,14 +9,18 @@ import {
   cellText,
   clampCell,
   type DataGridColumn,
+  type DataGridColumnInput,
   gridRows,
+  inferColumnType,
   moveCell,
   nextSort,
+  resolveDataGridColumns,
   resolveDataGridLabels,
   searchRows,
 } from '../src/grid-core/index.ts';
 import DataGridHarness from './fixtures/DataGridHarness.svelte';
 import DataGridPagingHarness from './fixtures/DataGridPagingHarness.svelte';
+import DataGridRefHarness from './fixtures/DataGridRefHarness.svelte';
 
 type Row = { id: string; name: string; amount: number | null; when?: string | Date };
 const columns: DataGridColumn<Row>[] = [
@@ -817,5 +821,175 @@ describe('DataGrid numbered pager (G92 stretch)', () => {
     expect(within(pager).getByRole('button', { name: 'Page 1' }).hasAttribute('aria-current')).toBe(
       false
     );
+  });
+});
+
+describe('DataGrid as a drop-in table (G107)', () => {
+  afterEach(cleanup);
+
+  type Deal = { id: string; name: string; amount: number; won: boolean; closed: Date | null };
+  const deals: Deal[] = [
+    { id: 'd1', name: 'Northwind Example', amount: 10, won: true, closed: null },
+    { id: 'd2', name: 'Contoso Example', amount: 9, won: false, closed: new Date(0) },
+  ];
+  const base = { rows: deals, getRowId: (row: Deal) => row.id, caption: 'Deals' };
+
+  it('infers a missing column type from the data, else text; an explicit type wins', () => {
+    const cases: [DataGridColumnInput<Deal>, string][] = [
+      [{ key: 'name', header: 'Name' }, 'text'],
+      [{ key: 'amount', header: 'Amount' }, 'number'],
+      [{ key: 'won', header: 'Won' }, 'boolean'],
+      [{ key: 'closed', header: 'Closed' }, 'date'],
+      [{ key: 'stage', header: 'Stage', options: ['open', 'won'] }, 'enum'],
+      [{ key: 'missing', header: 'Missing' }, 'text'],
+      [{ key: 'amount', header: 'Amount', type: 'text' }, 'text'],
+      [{ key: 'x', header: 'X', accessor: (row) => row.amount * 2 }, 'number'],
+    ];
+    for (const [column, type] of cases) {
+      expect(inferColumnType(deals, column), column.key).toBe(type);
+    }
+    expect(inferColumnType([], { key: 'amount', header: 'Amount' })).toBe('text');
+    const typed: DataGridColumn<Deal> = { key: 'name', header: 'Name', type: 'text' };
+    const resolved = resolveDataGridColumns([{ key: 'amount', header: 'Amount' }, typed], deals);
+    expect(resolved.map((column) => column.type)).toEqual(['number', 'text']);
+    // A column that already has a type is passed through as is.
+    expect(resolved[1]).toBe(typed);
+  });
+
+  it('sorts and aligns an untyped number column as a number, in both modes', async () => {
+    for (const mode of ['grid', 'table'] as const) {
+      const { container } = render(DataGrid<Deal>, {
+        props: {
+          ...base,
+          mode,
+          columns: [
+            { key: 'name', header: 'Name' },
+            { key: 'amount', header: 'Amount' },
+          ],
+        },
+      });
+      await fireEvent.click(screen.getByRole('button', { name: /Amount/ }));
+      // 9 before 10: a number sort, not a text sort ("10" < "9").
+      const amounts = [...container.querySelectorAll('tbody tr')].map((row) =>
+        row.querySelectorAll('td')[1]?.textContent?.trim()
+      );
+      expect(amounts, mode).toEqual(['9', '10']);
+      const cell = container.querySelector('tbody td:nth-child(2)') as HTMLElement;
+      expect(cell.classList.contains('tx-table__cell--numeric'), mode).toBe(true);
+      cleanup();
+    }
+  });
+
+  it('puts per-column class and headerClass on the cells and the header', () => {
+    for (const mode of ['grid', 'table'] as const) {
+      const { container } = render(DataGrid<Deal>, {
+        props: {
+          ...base,
+          mode,
+          columns: [
+            { key: 'name', header: 'Name', type: 'text', class: 'cell-name' },
+            {
+              key: 'amount',
+              header: 'Amount',
+              type: 'number',
+              class: ['cell-amount', { 'cell-strong': true }],
+              headerClass: 'head-amount',
+            },
+          ],
+        },
+      });
+      const heads = [...container.querySelectorAll('thead th')];
+      expect(heads[1]?.classList.contains('head-amount'), mode).toBe(true);
+      expect(heads[0]?.classList.contains('head-amount'), mode).toBe(false);
+      for (const row of container.querySelectorAll('tbody tr')) {
+        const cells = row.querySelectorAll('td');
+        expect(cells[0]?.classList.contains('cell-name'), mode).toBe(true);
+        expect(cells[1]?.classList.contains('cell-amount'), mode).toBe(true);
+        expect(cells[1]?.classList.contains('cell-strong'), mode).toBe(true);
+      }
+      cleanup();
+    }
+  });
+
+  it('binds ref to the root and spreads other attributes on it', async () => {
+    let element: HTMLElement | null = null;
+    render(DataGridRefHarness, {
+      props: { onRef: (next: HTMLElement | null) => (element = next) },
+    });
+    const root = screen.getByTestId('people');
+    await waitFor(() => expect(element).toBe(root));
+    expect(root.hasAttribute('data-tx-data-grid')).toBe(true);
+    expect(root.id).toBe('people-table');
+    expect(root.getAttribute('aria-describedby')).toBe('people-help');
+    expect(root.getAttribute('style')).toContain('max-inline-size');
+    expect(root.classList.contains('tx-data-grid')).toBe(true);
+  });
+
+  it('renders skeleton loading rows: busy, one named row, a polite status', async () => {
+    const loadingRow = createRawSnippet((index: () => number) => ({
+      render: () => `<span class="host-skeleton">row ${index()}</span>`,
+    }));
+    const columns2: DataGridColumnInput<Deal>[] = [
+      { key: 'name', header: 'Name' },
+      { key: 'amount', header: 'Amount' },
+    ];
+    for (const mode of ['grid', 'table'] as const) {
+      for (const custom of [false, true]) {
+        const label = `${mode}${custom ? ' + loadingRow' : ''}`;
+        const view = render(DataGrid<Deal>, {
+          props: {
+            ...base,
+            mode,
+            columns: columns2,
+            loading: true,
+            loadingRows: 3,
+            ...(custom ? { loadingRow } : {}),
+          },
+        });
+        const table = view.container.querySelector('table') as HTMLElement;
+        expect(table.getAttribute('aria-busy'), label).toBe('true');
+        const skeletons = [...table.querySelectorAll('tbody tr[data-tx-grid-skeleton]')];
+        expect(skeletons, label).toHaveLength(3);
+        // No data row while loading, and only the first skeleton row is exposed,
+        // carrying the loading text; the others are hidden from assistive tech.
+        expect(table.querySelector('tbody tr[data-tx-row-id]'), label).toBeNull();
+        expect(skeletons[0]?.hasAttribute('aria-hidden'), label).toBe(false);
+        expect(skeletons[0]?.textContent, label).toContain('Loading rows…');
+        for (const row of skeletons.slice(1)) {
+          expect(row.getAttribute('aria-hidden'), label).toBe('true');
+        }
+        if (custom) {
+          expect(
+            skeletons.map((row) => row.querySelector('.host-skeleton')?.textContent),
+            label
+          ).toEqual(['row 0', 'row 1', 'row 2']);
+        } else {
+          expect(table.querySelectorAll('.tx-data-grid__skeleton').length, label).toBe(3 * 2);
+        }
+        if (mode === 'grid') {
+          const first = table.querySelector('[data-tx-grid-cell="1:0"]') as HTMLElement;
+          expect(first.getAttribute('role'), label).toBe('gridcell');
+          expect(first.closest('tr'), label).toBe(skeletons[0]);
+        }
+        const status = screen.getByRole('status');
+        expect(status.getAttribute('aria-live'), label).toBe('polite');
+        expect(status.textContent?.trim(), label).toBe('Loading rows…');
+        await view.rerender({ loading: false });
+        expect(table.querySelectorAll('tbody tr[data-tx-grid-skeleton]'), label).toHaveLength(0);
+        expect(table.hasAttribute('aria-busy'), label).toBe(false);
+        expect(screen.getByRole('status').textContent?.trim(), label).toBe('2 rows');
+        cleanup();
+      }
+    }
+  });
+
+  it('keeps the single loading row without loadingRows or loadingRow', () => {
+    const { container } = render(DataGrid<Deal>, {
+      props: { ...base, columns: [{ key: 'name', header: 'Name' }], loading: true },
+    });
+    expect(container.querySelectorAll('tbody tr[data-tx-grid-skeleton]')).toHaveLength(0);
+    expect(
+      within(container.querySelector('tbody') as HTMLElement).getByText('Loading rows…')
+    ).toBeTruthy();
   });
 });

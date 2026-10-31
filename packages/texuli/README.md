@@ -37,7 +37,13 @@ yarn add texuli @texuli/tokens
   `@sveltejs/vite-plugin-svelte`, SvelteKit, or Astro with `@astrojs/svelte`
   (in Astro, add `vite.ssr.noExternal: ['texuli', /^@texuli\//]`).
 - **CSS:** import `@texuli/tokens/base.css` once and apply a theme (below).
-  Component styles load with each component.
+  Component styles load with each component. **This import is required:**
+  component CSS reads the system tokens (`--tx-space-unit`,
+  `--tx-size-icon-sm`, `--tx-shape-radius-*`…) with no fallback, and only
+  `base.css` declares them, so a host with its own reset that skips it gets
+  controls with no size. Such a host can load `@texuli/tokens/system.css`
+  instead (unreleased, `0.10.0`): the system token defaults alone, with no
+  reset.
 
 ## Quick start
 

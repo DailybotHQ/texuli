@@ -38,7 +38,7 @@ These are styled date and time components on the owned WAI-ARIA primitives (`@te
 | --- | --- |
 | `Calendar` | `bind:value`, `onValueChange`, `defaultFocusedValue` (the day it opens on, so it can show a month with nothing selected), `bind:focusedValue` and `onFocusedValueChange` (the focused day, `YYYY-MM-DD`: setting it moves the month shown), `locale`, `minValue`, `maxValue`, `isDateUnavailable`, `today`, `weekStartsOn`, `disabled`, `readOnly`, `size` (`sm` or `md`), `previousLabel`, `nextLabel`, `label` (the group's name); range mode: `bind:range` (`{ start, end }`), `onRangeChange`, `maxDays`, `onInvalid`, `tooLongLabel` |
 | `DatePicker` | `label` (visible), `description`, `error` (sets `aria-invalid` and describes the field), `bind:value`, `bind:open`, `locale`, bounds, `isDateUnavailable`, `today`, `weekStartsOn`, `onInvalid`, `disabled`, `required` (shows `*`), `name`, `size`, `labels`, `class` (the wrapper), `controlClass` (the bordered `.tx-date__control` that holds the segments and the calendar button) |
-| `DateRangePicker` | the same, plus `bind:value` as `{ start, end }`, `startName`, `endName`, `required` (every segment of both dates, `*` after the label), `maxDays`, `onInvalid(text, reason, { side })` (`side`: the start or the end caused the refusal); `presets`: `true` for the built-in ones, your own `DateRangePreset[]`, or `false` (default); `today` (`YYYY-MM-DD`: the day presets count from and the calendar marks) |
+| `DateRangePicker` | the same, plus `bind:value` as `{ start, end }`, `startName`, `endName`, `required` (every segment of both dates, `*` after the label), `maxDays`, `onInvalid(text, reason, { side })` (`side`: the start or the end caused the refusal); `presets`: `true` for the built-in ones, your own `DateRangePreset[]`, or `false` (default); `today` (`YYYY-MM-DD`: the day presets count from and the calendar marks); `panel` and `footer` snippets (G109), rendered inside the calendar dialog |
 | `TimeField` | `label` (visible), `description`, `error`, `bind:value` (`HH:mm`, 24-hour, or `null`), `onValueChange`, `locale`, `hourCycle` (`12` or `24`; default the locale's), `minuteStep` (default `1`), `disabled`, `required`, `name`, `size`, `labels` (`hour`, `minute`, `dayPeriod`) |
 
 - **Inside a `Field`, and `id`.** `DatePicker`, `DateRangePicker` and `TimeField` take `hideLabel` (the visible label hides; it still names the field group). Inside a `Field` the label always hides and the group is named by the Field label, so it is never shown twice. `id` lands on the first segment (so `<label for>` focuses it), and `aria-describedby` and `aria-invalid` (from `{...control.props}`) reach every segment. A Field `error` (its `aria-invalid`) shows the same invalid state as the control's own `error`: `data-invalid="true"` on the wrapper and the danger border on the control. Other `aria-*`, `data-*` and handlers go to the field group, layout hooks to the wrapper; `bind:ref` is the wrapper (`Calendar`: its root).
@@ -51,7 +51,9 @@ These are styled date and time components on the owned WAI-ARIA primitives (`@te
 
 - **Built-in presets** (`dateRangePresets(today, labels)`, pure): Today, Yesterday, Last 7 days, Last 30 days, This month (so far) and Last month.
 - **Choosing a preset** sets the range and closes the dialog. The preset that matches the current range has `aria-pressed="true"`.
-- **Labels** (`labels`): the primitives' `trigger`, `triggerWithValue`, `dialog`, `previousMonth`, `nextMonth`, `start` and `end`, plus `presets` (the list's heading) and `presetLabels`.
+- **Half a range** (G109): after the first pick in the `DateRangePicker` dialog, the grid's polite `role="status"` says that the end date is still needed: `labels.pickEnd(start)`, which receives the start as a long localized date (default `Start date Monday, March 2, 2026. Now choose the end date.`; message id `primitives.date-picker.pick-end`, `{0}` the date). The second pick (or closing the dialog) clears it.
+- **Content inside the dialog** (G109): the calendar dialog is modal, so a hint rendered next to the picker is inert while it is open. Pass `panel` (beside the calendar) or `footer` (under it) instead; each receives `{ value, close }`, the current range and a function that closes the dialog (for an Apply or Done button).
+- **Labels** (`labels`): the primitives' `trigger`, `triggerWithValue`, `dialog`, `previousMonth`, `nextMonth`, `start`, `end`, `tooLong` and `pickEnd` (a function), plus `presets` (the list's heading) and `presetLabels`.
 
 ## Behavior and accessibility
 
@@ -80,6 +82,7 @@ The styling adds:
   - Presets: year and leap boundaries, labels, an invalid `today`, matching.
   - Calendar: bounds and unavailable days, locale digits.
   - DateRangePicker: applying a preset, and opening focus on the range start.
+  - DateRangePicker half range and dialog content (G109): the polite end-date announcement (default and a translated `labels.pickEnd`), cleared when the dialog closes mid-pick, and the `panel` and `footer` snippets inside the dialog with `{ value, close }`.
 - `pnpm vitest run packages/texuli/tests/date-time.test.ts`: **9 tests**.
   - `today` on all three components with `Date.now()` and `new Date()` stubbed to throw; `weekStartsOn` and the locale week start.
   - Calendar range mode: the highlighted span and its `aria-selected` days; two-step picks, and a range over `maxDays` refused and announced.

@@ -128,7 +128,10 @@ provideRange({
     if (!pending) {
       // First pick of a range: the start, with the end pending.
       pending = true;
-      commit({ start: date, end: null }, 'start');
+      if (commit({ start: date, end: null }, 'start')) {
+        // The end is still needed: say so (G109), with the start as a long date.
+        announce(text.pickEnd(formatLongDate(date, locale) ?? date));
+      }
       return;
     }
     // A range longer than maxDays is refused; the end stays pending.
@@ -142,8 +145,12 @@ provideRange({
 });
 
 $effect(() => {
-  // Closing (or reopening) never leaves a half-made pick in progress.
-  if (!open) pending = false;
+  // Closing (or reopening) never leaves a half-made pick in progress, nor its
+  // announcement in the status region.
+  if (!open) {
+    pending = false;
+    message = '';
+  }
 });
 
 provideShell({

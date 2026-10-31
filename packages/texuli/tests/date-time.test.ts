@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/svelte';
-import { tick } from 'svelte';
+import { createRawSnippet, tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Calendar, DatePicker, DateRangePicker, TimeField } from '../src/components/date/index.ts';
 import DateFieldHarness from './fixtures/DateFieldHarness.svelte';
@@ -245,6 +245,72 @@ describe('DateRangePicker required (G66)', () => {
     expect(segments).toHaveLength(6);
     for (const segment of segments) expect(segment.hasAttribute('required')).toBe(true);
     expect(view.container.querySelector('.tx-date__required')?.textContent?.trim()).toBe('*');
+  });
+});
+
+describe('DateRangePicker half range and dialog content (G109)', () => {
+  const open = async (props: Record<string, unknown> = {}) => {
+    render(DateRangePicker, { props: { label: 'Stay', today: '2026-03-01', ...props } });
+    await fireEvent.click(screen.getByRole('button', { name: /^Choose date/ }));
+    await settle();
+    return screen.getByRole('dialog');
+  };
+
+  it('announces politely that the end date is still needed after the first pick', async () => {
+    const cases: [Record<string, unknown>, string][] = [
+      [{}, 'Start date Monday, March 2, 2026. Now choose the end date.'],
+      [
+        { labels: { pickEnd: (start: string) => `Desde ${start}. Elige el final.` } },
+        'Desde Monday, March 2, 2026. Elige el final.',
+      ],
+    ];
+    for (const [props, said] of cases) {
+      const dialog = await open(props);
+      const status = within(dialog).getByRole('status');
+      expect(status.textContent).toBe('');
+      await fireEvent.click(within(dialog).getByRole('button', { name: 'Monday, March 2, 2026' }));
+      await settle();
+      expect(status.textContent).toBe(said);
+      // A half range closed with Escape leaves no stale announcement behind.
+      await fireEvent.keyDown(dialog, { key: 'Escape' });
+      await settle();
+      await fireEvent.click(screen.getByRole('button', { name: /^Choose date/ }));
+      await settle();
+      const again = screen.getByRole('dialog');
+      expect(within(again).getByRole('status').textContent).toBe('');
+      await fireEvent.click(within(again).getByRole('button', { name: 'Monday, March 2, 2026' }));
+      await settle();
+      expect(within(again).getByRole('status').textContent).toBe(said);
+      // The second pick completes the range and closes the dialog.
+      await fireEvent.click(within(again).getByRole('button', { name: 'Friday, March 6, 2026' }));
+      await settle();
+      expect(screen.queryByRole('dialog')).toBeNull();
+      cleanup();
+    }
+  });
+
+  it('renders the panel and footer snippets inside the modal dialog, with close()', async () => {
+    const panel = createRawSnippet(() => ({
+      render: () => '<p data-testid="panel">Check-in is after 3 pm.</p>',
+    }));
+    let close: () => void = () => {};
+    let seen: unknown;
+    const footer = createRawSnippet((context: () => { value: unknown; close: () => void }) => ({
+      render: () => '<p data-testid="footer">Up to 14 nights.</p>',
+      setup: () => {
+        close = context().close;
+        seen = context().value;
+      },
+    }));
+    const dialog = await open({ panel, footer, value: { start: '2026-03-02', end: null } });
+    expect(within(dialog).getByTestId('panel').textContent).toBe('Check-in is after 3 pm.');
+    expect(within(dialog).getByTestId('footer').textContent).toBe('Up to 14 nights.');
+    expect(seen).toEqual({ start: '2026-03-02', end: null });
+    close();
+    await settle();
+    expect(screen.queryByRole('dialog')).toBeNull();
+    // Focus goes back to the calendar button, never to the body.
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: /^Choose date/ }));
   });
 });
 

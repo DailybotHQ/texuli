@@ -46,6 +46,7 @@ export {
 export {
   DataGrid,
   type DataGridColumn,
+  type DataGridColumnInput,
   type DataGridLabels,
   gridRows,
   moveCell,

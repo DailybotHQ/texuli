@@ -57,6 +57,10 @@
     "./renames.json": "./src/renames/renames.json",
     "./style-presets": "./src/style-presets/index.ts",
     "./system": "./src/system/index.ts",
+    "./system.css": {
+      "types": "./src/css/styles.ts",
+      "default": "./src/css/system.css"
+    },
     "./tailwind": "./src/tailwind/index.ts",
     "./tailwind/preset.css": "./src/tailwind/preset.css"
   },

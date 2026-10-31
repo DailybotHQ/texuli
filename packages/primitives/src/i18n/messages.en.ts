@@ -25,6 +25,7 @@ export const PRIMITIVES_MESSAGES_EN: MessageCatalog = /* @__PURE__ */ Object.fre
     'primitives.date-picker.dialog': 'Choose date',
     'primitives.date-picker.end': 'End date',
     'primitives.date-picker.next-month': 'Next month',
+    'primitives.date-picker.pick-end': 'Start date {0}. Now choose the end date.',
     'primitives.date-picker.previous-month': 'Previous month',
     'primitives.date-picker.start': 'Start date',
     'primitives.date-picker.too-long': 'Choose a range of {max} days or fewer.',

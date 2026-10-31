@@ -38,9 +38,25 @@ CSS or entry module:
 @import '@texuli/tokens/forced-colors.css';
 ```
 
-`base.css` declares the `tx.base` and `tx.components` cascade layers and the
-reset, focus, motion and surface rules. The colors come from a theme, which
-you apply at runtime (below).
+`base.css` declares the `tx.base` and `tx.components` cascade layers, the
+system token defaults, and the reset, focus, motion and surface rules. The
+colors come from a theme, which you apply at runtime (below).
+
+**A host must load `base.css` or `system.css`.** Since token contract v2
+(`0.9.0`), component CSS reads the system tokens (`--tx-space-unit`,
+`--tx-size-icon-sm`, `--tx-shape-radius-*`…) with no fallback, and a theme
+does not declare them. A host with its own reset that loads neither renders
+controls with no size. A host that keeps its own reset can load the system
+token defaults alone (unreleased, `0.10.0`):
+
+```css
+@import '@texuli/tokens/system.css';
+```
+
+`system.css` is the same generated token block as `base.css` (one renderer
+writes both, and a test holds `base.css` to a superset), with no reset, motion
+tables or focus ring hook: 1,189 B of CSS gzip instead of 2,781 B (measured by
+`pnpm size`).
 
 ## Quick start
 
@@ -75,7 +91,7 @@ const css = compileThemeCss(theme);
 
 | Purpose | Subpath | What it does |
 | --- | --- | --- |
-| Stylesheets | `base.css`, `forced-colors.css`, `tailwind/preset.css` | Base layer, forced-colors mapping, Tailwind 4 preset |
+| Stylesheets | `base.css`, `system.css`, `forced-colors.css`, `tailwind/preset.css` | Base layer, the system token defaults alone (unreleased, `0.10.0`), forced-colors mapping, Tailwind 4 preset |
 | Apply themes | `css` | `applyTheme`, `clearTheme`, `themeVariables`, `compileThemeCss` |
 | Token contract | `contract` | The `--tx-*` contract and the `Theme` type |
 | Palette engine | `palette` | OKLCH scales, tones and contrast pairs |

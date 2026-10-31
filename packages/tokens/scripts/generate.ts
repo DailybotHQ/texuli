@@ -2,7 +2,7 @@
  * Regenerate the token contract v2 surfaces:
  *   pnpm exec tsx packages/tokens/scripts/generate.ts          (write)
  *   pnpm exec tsx packages/tokens/scripts/generate.ts --check  (fail on drift)
- * Outputs: the base.css token-defaults block, renames.json, docs/tokens-components.md and the Tokens section of
+ * Outputs: the base.css token-defaults block, system.css (the same block alone), renames.json, docs/tokens-components.md and the Tokens section of
  * every texuli component page (packages/texuli/docs/ui-<subpath>.md).
  */
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -12,6 +12,7 @@ import {
   componentDocPath,
   componentDocSubpaths,
   renderRenamesJson,
+  renderSystemCss,
   renderTokenTablesDoc,
   replaceTokenDefaultsBlock,
   withComponentTokensSection,
@@ -23,6 +24,7 @@ const outputs: Record<string, string> = {
   'src/css/base.css': replaceTokenDefaultsBlock(
     readFileSync(join(ROOT, 'src/css/base.css'), 'utf8')
   ),
+  'src/css/system.css': renderSystemCss(),
   'src/renames/renames.json': renderRenamesJson(),
   'docs/tokens-components.md': renderTokenTablesDoc(),
 };

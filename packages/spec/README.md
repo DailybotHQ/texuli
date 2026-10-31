@@ -294,14 +294,15 @@ envelope up to the current spec with pure, per-version steps
 `0.5.0 → 0.6.0`, `0.6.0 → 0.7.0`, `0.7.0 → 0.8.0`, `0.8.0 → 0.9.0` and
 `0.9.0 → 0.10.0`, each of which only stamps `spec`); a compatible version
 range is planned, not built. `@texuli/spec@0.10.0` carries spec `0.10.0` (digest
-`5858625bffea7972f78a2b0f127f75359848aeb5c4792764b17ca45b2d7de4ca`), which adds the
+`36722679ebb84e38e86632789af1bda5dfcc1eb6db1b6712cda1b4f56ad1e1c7`), which adds the
 design-system document (PLAN_011 T-ds-spec) and the envelope's
 `designSystem` (T-ds-blueprint), plus a catalog projection refresh
 (`data-filter-builder` gains the optional `issues` prop and
 `fields[].optionLabels`, T-gaps-100-104) and an additive forms field
 vocabulary (`$defs.formField` gains the `password`, `otp`, `color`,
 `datetime` and `custom` types and the `kind`, `config`, `length`,
-`protocols` and `clearable` members, T-gaps-113-121). `@texuli/spec@0.9.0` carried spec `0.9.0` (digest
+`protocols` and `clearable` members, T-gaps-113-121; `command-palette` lists
+`searchLabel`, T-gaps-107-110). `@texuli/spec@0.9.0` carried spec `0.9.0` (digest
 `497df4d3b0c67d53483163ebd9bd73733b52caf5f8e2966478f1cf860e6f9d9d`), an
 additive catalog projection refresh (PLAN_011 T-gaps-87-95 and
 T-gaps-96-98); `@texuli/spec@0.8.0` carried spec `0.8.0` (digest
