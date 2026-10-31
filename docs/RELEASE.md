@@ -334,6 +334,14 @@ branch):
     paint after their chunk loads (pass `controls` to paint at once, and
     wait for them in tests); `SchemaForm` focuses the summary or the
     confirmation for any finished submit, including `controller.submit()`.
+- **Fixed: collab embeds** (`@texuli/document/collab`, PLAN_011
+  T-final-review): an issue inside an embed payload (a slide of an inline
+  deck, the node of an inline component) made the projection's repair
+  target the payload object instead of the embed, so a session could empty
+  the whole document; now only that embed is left out (an inline deck must
+  be deck model v2), every embed kind (component, deck, sheet and canvas,
+  by ref and inline) survives sync, and concurrent payload writes resolve
+  last writer wins at the embed level.
 
 ### 0.9.0
 
