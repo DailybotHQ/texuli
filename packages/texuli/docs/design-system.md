@@ -153,7 +153,7 @@ and provides its component defaults to every Texuli component inside.
 | Prop | Default | Effect |
 | --- | --- | --- |
 | `compiled` | required | A `CompiledDesignSystem` (or a cached JSON copy) |
-| `mode` | `light` | The compiled mode to apply |
+| `mode` | `light` | The mode to apply; one `compiled` lacks paints its compiled mode (`pickDesignSystemMode`), and `data-tx-mode` names the mode painted |
 | `variant` | `compiled.variant` | Must match the variant it was compiled for |
 | `scope` | the design system's id | The `data-tx-scope` name, so `[data-tx-scope="acme"]` rules match |
 | `fonts` | `true` | Register `fontFaces` lazily on first use |
@@ -179,7 +179,8 @@ and provides its component defaults to every Texuli component inside.
   measured 217,091 B before and after).
 
 The subpath also re-exports `applyDesignSystem` (with its
-`ApplicableDesignSystem` and `ApplyDesignSystemOptions` types) and offers
+`ApplicableDesignSystem` and `ApplyDesignSystemOptions` types; the mode rule,
+`pickDesignSystemMode`, is in `@texuli/tokens/design-system/apply`) and offers
 `loadDesignSystemCompiler()`, which imports
 `@texuli/tokens/design-system/compile` on demand as a lazy chunk (never at
 import), for hosts that compile at run time without depending on

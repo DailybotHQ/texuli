@@ -127,6 +127,26 @@ describe('DesignSystemProvider', () => {
     // Chromium (tests/perf/design-system-switch.test.ts).
   }, 20_000);
 
+  it('paints a dark-only design system dark under a light mode, and the markup says so', async () => {
+    const darkDoc = json('packages/spec/fixtures/design-systems/acme.json');
+    delete darkDoc.extends;
+    darkDoc.color = { ...(darkDoc.color as Doc), modes: ['dark'] };
+    const dark = compileDesignSystem(darkDoc, { trust: 'developer' });
+    if (!dark.ok) throw new Error(JSON.stringify(dark.errors));
+    expect(Object.keys(dark.vars)).toEqual(['dark']);
+    // The studio's light preview of a dark-only system: no throw, the dark variables, mode dark.
+    const view = render(Harness, { compiled: dark, mode: 'light' });
+    await tick();
+    const scope = screen.getByTestId('scope');
+    expect(scope.getAttribute('data-tx-mode')).toBe('dark');
+    expect(inlineVars(scope)).toEqual(expected(dark, 'dark'));
+    // Switching to a two-mode system in light paints light again.
+    await view.rerender({ compiled: acme, mode: 'light' });
+    await tick();
+    expect(scope.getAttribute('data-tx-mode')).toBe('light');
+    expect(inlineVars(scope)).toEqual(expected(acme, 'light'));
+  });
+
   it('renders the allowlisted attributes in markup, so designSystemStyle matches server HTML', () => {
     expect([...PROVIDER_ATTRIBUTES]).toEqual([...DESIGN_SYSTEM_ATTRIBUTES]);
   });
