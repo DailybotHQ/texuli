@@ -4,7 +4,8 @@
  * in full and the kind of demo or preview the hub paints. Plain data, so
  * the page and its tests share one source. Releases: 0.6.0 to 0.9.0 are
  * published on npm, and 0.9.0 is `latest`; 0.10.0 is in development on the
- * release/0.10.0 branch (the release line in docs/RELEASE.md).
+ * release/0.10.0 branch (the release line in docs/RELEASE.md), and its
+ * cards (PLAN_011 T-site-0100) describe what has landed there.
  */
 
 export type ReleaseId = '0.6.0' | '0.7.0' | '0.8.0' | '0.9.0' | '0.10.0';
@@ -25,7 +26,7 @@ export const RELEASES: readonly Release[] = [
       'In development on the release/0.10.0 branch; npm has the 0.9 line until 0.10.0 is published.',
     published: false,
     summary:
-      'Design systems integrate on the release branch. Their features join this page as they land; until then, install the 0.9 line.',
+      'Design systems: one JSON document per brand, compiled with contrast, focus and target size enforced and followed by every surface; the Design System Studio; ds tools on the MCP and the CLI; texuli ds check; the Protoyard gaps G100 to G104 and G106; and the removal of the names deprecated in 0.9.0. Until 0.10.0 is published, install the 0.9 line.',
   },
   {
     id: '0.9.0',
@@ -79,7 +80,13 @@ export type DemoKind =
   | 'agent-ready'
   | 'tokens'
   | 'portals'
-  | 'protoyard';
+  | 'protoyard'
+  | 'design-systems'
+  | 'ds-studio'
+  | 'ds-tools'
+  | 'ds-conformance'
+  | 'protoyard-0100'
+  | 'removals';
 
 export interface Feature {
   readonly id: DemoKind;
@@ -294,6 +301,76 @@ export const FEATURES: readonly Feature[] = [
       'Gaps a production adopter reported: dialog and command palette callbacks, date control hooks and invalid state, keyboard rows in table grids, ref and rest on every layout, a time x-axis for charts and contained toasts without a forced layout.',
     href: '/changelog/',
     linkLabel: 'The changelog',
+    demo: 'preview',
+  },
+  {
+    id: 'design-systems',
+    release: '0.10.0',
+    title: 'Design systems',
+    packages: [
+      '@texuli/spec/design-system',
+      '@texuli/tokens/design-system',
+      'texuli/design-system',
+    ],
+    summary:
+      'One JSON document per brand, followed by components, blueprints, decks, documents, email, PDF, DOCX, PPTX, canvas exports and Kotlin tokens, with contrast, focus and target size enforced by the compiler.',
+    href: '/design-systems/',
+    linkLabel: 'Three brands, four surfaces',
+    demo: 'preview',
+  },
+  {
+    id: 'ds-studio',
+    release: '0.10.0',
+    title: 'Design system studio',
+    packages: ['apps/website', '@texuli/tokens/design-system'],
+    summary:
+      'Start from a seed, a logo, a library theme or a token file, edit every section, preview five surfaces, read the contrast report and the diff, export every format and share by link, all in the browser.',
+    href: '/theme-studio/',
+    linkLabel: 'Open the studio',
+    demo: 'preview',
+  },
+  {
+    id: 'ds-tools',
+    release: '0.10.0',
+    title: 'Design system tools for agents',
+    packages: ['@texuli/tools', '@texuli/mcp'],
+    summary:
+      'ds.validate, ds.compile, ds.contrast, ds.suggest, ds.import, ds.diff, ds.preview and ds.save on the MCP and as texuli ds commands, plus the create-design-system prompt and texuli://design-system/{id}.',
+    href: '/design-systems/#start',
+    linkLabel: 'Every way to start',
+    demo: 'preview',
+  },
+  {
+    id: 'ds-conformance',
+    release: '0.10.0',
+    title: 'Conformance',
+    packages: ['@texuli/tools/ds-check'],
+    summary:
+      'texuli ds check holds a document to its guarantees with stable codes and JSON paths; --render paints the catalog under it in Chromium for axe, painted contrast and literal colors.',
+    href: '/design-systems/#conformance',
+    linkLabel: 'The example brands’ report',
+    demo: 'preview',
+  },
+  {
+    id: 'protoyard-0100',
+    release: '0.10.0',
+    title: 'More fixes from Protoyard',
+    packages: ['texuli', '@texuli/data', '@texuli/editor'],
+    summary:
+      'Gaps G100 to G104 and G106: Markdown backslash escapes, filter builder issues and labelled options, an active-heading tracker on its own, keyboard board moves that keep focus, calendar chips named in visible order, and inbox read callbacks with pending saves.',
+    href: '/changelog/',
+    linkLabel: 'The changelog',
+    demo: 'preview',
+  },
+  {
+    id: 'removals',
+    release: '0.10.0',
+    title: 'Removed after one minor',
+    packages: ['@texuli/tools', '@texuli/blocks'],
+    summary:
+      'The seven 0.8 MCP tool names and the tree block’s style key, deprecated in 0.9.0, are gone; a call or a block that still uses one is refused with the name to send instead.',
+    href: '/mcp-server/#versions',
+    linkLabel: 'Removed names and replacements',
     demo: 'preview',
   },
 ];

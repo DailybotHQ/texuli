@@ -8,18 +8,25 @@ the home page hero)
 
 ## Goal
 
-Every new package and capability of `0.6.0` to `0.9.0` on one page
-(PLAN_010 Amendment 8, PLAN_011 T-site-090), grouped by release with the
-status the repository states: all four are published on npm, and `0.9.0`
-is current (pre-1.0), the published line of `docs/RELEASE.md`; the unit
-test requires the current release's status to say so, and a version in
-development (none today) to be marked as such. Each feature has a small demo or a preview and a link
+Every new package and capability of `0.6.0` to `0.9.0`, and what has landed
+for `0.10.0`, on one page (PLAN_010 Amendment 8, PLAN_011 T-site-090 and
+T-site-0100), grouped by release with the status the repository states:
+`0.6.0` to `0.9.0` are published on npm, and `0.9.0` is current (pre-1.0),
+the published line of `docs/RELEASE.md`; `0.10.0` is in development on the
+`release/0.10.0` branch. The unit test requires the current release's
+status to say so, and the version in development to be marked as such. Each feature has a small demo or a preview and a link
 to its full page.
 
 ## Cards
 
 | Release | Feature | Demo or preview |
 | --- | --- | --- |
+| 0.10.0 | Design systems | The three example brands' contrast pairs passing in light and dark, from `checkDesignSystem` at build time; links `/design-systems/` |
+| 0.10.0 | Design system studio | Static card linking `/theme-studio/` |
+| 0.10.0 | Design system tools for agents | Three `texuli ds` commands; links `/design-systems/#start` |
+| 0.10.0 | Conformance | The `texuli ds check --render` command; links `/design-systems/#conformance` |
+| 0.10.0 | More fixes from Protoyard (G100–G104, G106) | Static card linking `/changelog/` |
+| 0.10.0 | Removed after one minor | The removed MCP tool count from the generated MCP data; links `/mcp-server/#versions` |
 | 0.9.0 | Texuli MCP | The two doors (the remote URL and the npx command) from the generated MCP data |
 | 0.9.0 | An agent-ready site, scoped portals, fixes from Protoyard | Static cards linking `/developers/`, `/tokens/#scope` and `/changelog/` |
 | 0.9.0 | Design tokens v2 | The system and component token counts, read from the registries at build time |
