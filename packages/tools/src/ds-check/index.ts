@@ -32,6 +32,7 @@ export {
   type DsCheckOptions,
   HIGH_CONTRAST_VARIANT,
   issueCodes,
+  loadDesignSystemBases,
   serializeDsCheckReport,
 } from './static.ts';
 export * from './types.ts';

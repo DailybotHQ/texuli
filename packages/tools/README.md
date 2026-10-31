@@ -133,6 +133,11 @@ components under it in headless chromium (axe, painted contrast, literal
 colors). The `@texuli/tools/ds-check` subpath runs the same checks in your
 own tests; see
 [ds-check.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ds-check.md).
+The `ds.*` operations (validate, compile to JSON, CSS, Tailwind, DTCG or
+Tokens Studio, contrast, suggest, import, diff, preview, and `ds.save` on
+local doors), `blueprint.theme` and `texuli ds init | validate | compile |
+export | preview | diff | import` are on the same branch; see
+[ds.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ds.md).
 
 **Email and print (new in `0.8.0`).** `@texuli/tools/email`
 renders a validated blueprint to email-safe HTML and a plain-text part
@@ -174,6 +179,7 @@ document and writes a headless PDF with the owned writer; see
 - The operations registry behind the MCP tools and the CLI (in development, not released): [ops.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md)
 - The MCP protocol layer: tools, resources, prompts and completions (in development, not released): [mcp.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/mcp.md)
 - Design-system conformance, `texuli ds check` and `@texuli/tools/ds-check` (in development for `0.10.0`): [ds-check.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ds-check.md)
+- Design-system operations, `blueprint.theme` and `texuli ds` (in development for `0.10.0`): [ds.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ds.md)
 - Email-safe HTML from blueprints (new in `0.8.0`): [email.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/email.md)
 - Print and headless PDF of blueprints (new in `0.8.0`): [print.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/print.md)
 

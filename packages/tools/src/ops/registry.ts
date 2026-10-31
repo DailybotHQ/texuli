@@ -131,6 +131,7 @@ export function createOperationRegistry(
           operation.handler(input, {
             signal: controller.signal,
             ...(options.site ? { site: options.site } : {}),
+            ...(options.files ? { files: options.files } : {}),
           })
         ),
         timeout,

@@ -13,6 +13,7 @@
 import {
   type InvokeFailure,
   LOCAL_RUNTIMES,
+  type LocalFiles,
   type Operation,
   type OperationAnnotations,
   type OperationRegistry,
@@ -58,6 +59,8 @@ export interface McpHandlerOptions {
   prompts?: readonly McpPrompt[];
   /** Items per page of every list method (default 100). */
   pageSize?: number;
+  /** The local writer `ds.save` uses (the stdio door passes `localFiles()`); never on the remote door. */
+  files?: LocalFiles;
 }
 
 /** Per-request context a transport passes. */
@@ -81,7 +84,7 @@ const MAX_CURSOR_LENGTH = 512;
 const DEFAULT_ARGUMENT_LENGTH = 10_000;
 
 const INSTRUCTIONS =
-  'Texuli is a Svelte 5 component library with a closed agent catalog. Tools are group.verb operations: search the component catalog (catalog.search), read manifests (component.get) and worked examples (example.search), list content block types and read the shape and examples of each (block.list, block.schema), validate blueprint drafts (blueprint.validate) and catalog manifests, search, read and preview themes with their WCAG AA report, and run deck and document commands. Every tool states its limits and returns structured JSON; failures are isError results with a stable code (invalid-input, input-too-large, not-found, runtime-unavailable, timeout …). Resources: texuli://catalog, texuli://llms/full, texuli://component/{id}, texuli://docs/{slug}, texuli://theme/{id} and texuli://schema/{name}. Prompts build-ui, theme-blueprint and convert-deck walk through the main jobs. The remote endpoint also lists site.pages, site.read and site.search, which list, read (as Markdown) and search the pages of texuli.com. The 0.8 tool names (catalog, component, validate, example, theme, deck, document) are deprecated aliases. Read-only: nothing writes files or reaches the network.';
+  "Texuli is a Svelte 5 component library with a closed agent catalog. Tools are group.verb operations: search the component catalog (catalog.search), read manifests (component.get) and worked examples (example.search), list content block types and read the shape and examples of each (block.list, block.schema), validate blueprint drafts (blueprint.validate) and catalog manifests, search, read and preview themes with their WCAG AA report, author design systems (ds.validate, ds.compile, ds.contrast, ds.suggest, ds.import, ds.diff, ds.preview, and blueprint.theme to apply one to a blueprint), and run deck and document commands. Every tool states its limits and returns structured JSON; failures are isError results with a stable code (invalid-input, input-too-large, not-found, runtime-unavailable, timeout …), and a refused design system is a valid: false result with the spec's codes and JSON paths. Resources: texuli://catalog, texuli://llms/full, texuli://component/{id}, texuli://docs/{slug}, texuli://theme/{id}, texuli://design-system/{id} and texuli://schema/{name}. Prompts build-ui, theme-blueprint, create-design-system and convert-deck walk through the main jobs. The remote endpoint also lists site.pages, site.read and site.search, which list, read (as Markdown) and search the pages of texuli.com. The 0.8 tool names (catalog, component, validate, example, theme, deck, document) are deprecated aliases. Nothing reaches the network; the only write is ds.save, on the local server, to an explicit path inside the working directory.";
 
 type Failure = { code: number; message: string; data?: unknown };
 class RpcFailure extends Error {
@@ -262,6 +265,7 @@ export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
     const outcome = await registry.invoke(name, params.arguments ?? {}, {
       runtimes,
       ...(site ? { site } : {}),
+      ...(options.files ? { files: options.files } : {}),
     });
     if (outcome.ok) {
       return {

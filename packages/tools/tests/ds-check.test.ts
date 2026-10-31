@@ -262,7 +262,11 @@ describe('texuli ds check (static)', () => {
     expect(parseRouterArgs(['ds', 'check', 'a.json', '--frob'])).toMatchObject({ kind: 'error' });
     expect(parseRouterArgs(['ds', 'lint'])).toMatchObject({ kind: 'error' });
     expect(parseDsCliArgs(['--help'])).toMatchObject({ help: true });
-    expect(parseRouterArgs(['ds', '--help'])).toMatchObject({ kind: 'legacy', command: 'ds' });
+    expect(parseRouterArgs(['ds', '--help'])).toMatchObject({ kind: 'help', group: 'ds' });
+    expect(parseRouterArgs(['ds', 'check', '--help'])).toMatchObject({
+      kind: 'legacy',
+      command: 'ds',
+    });
     const { out, io } = capture();
     expect(await runDsCli(['--help'], io)).toEqual({ ok: true });
     expect(out.join('')).toContain('Usage: texuli ds check <file>');

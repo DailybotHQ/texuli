@@ -50,7 +50,8 @@ export interface DsCheckOptions {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
-function toIssue(issue: DesignSystemCompileIssue, variant: string | null): DsCheckIssue {
+/** A compiler issue as a report issue, tagged with the variant it came from. */
+export function toIssue(issue: DesignSystemCompileIssue, variant: string | null): DsCheckIssue {
   return {
     code: issue.code,
     path: issue.path,
@@ -63,8 +64,13 @@ function toIssue(issue: DesignSystemCompileIssue, variant: string | null): DsChe
   };
 }
 
-/** Load every base of the chain up front, so the synchronous compiler can follow it. */
-async function loadBases(
+/**
+ * Load every base of the `extends` chain up front, so the synchronous
+ * compiler can follow it: `bases` first, then the theme library for
+ * `texuli:<id>`. A base nothing provides is `undefined` (the compiler
+ * refuses it with a hint).
+ */
+export async function loadDesignSystemBases(
   input: unknown,
   bases: DsCheckOptions['bases']
 ): Promise<Map<string, unknown>> {
@@ -141,7 +147,7 @@ export async function checkDesignSystem(
     ...(typeof doc.version === 'string' ? { version: doc.version } : {}),
     ...(typeof doc.name === 'string' ? { name: doc.name } : {}),
   };
-  const loaded = await loadBases(input, options.bases);
+  const loaded = await loadDesignSystemBases(input, options.bases);
   const resolve = (ref: string) => loaded.get(ref);
   const trust = options.trust ?? 'untrusted';
   const compileOptions = {

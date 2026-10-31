@@ -57,7 +57,7 @@ function toolData(response: Response): Record<string, unknown> {
 
 it('negotiates MCP with read-only tools and serves the real catalog, manifests, validation and themes', async () => {
   await scenario(
-    'negotiates MCP, announces only read-only tools and waits for initialized',
+    'negotiates MCP, announces read-only tools and the one local writer, and waits for initialized',
     async () => {
       const handle = createTexuliMcpServer();
       const early = (await callTool(handle, 'catalog')) as Response;
@@ -89,11 +89,20 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
         'component.get',
         'example.search',
         'blueprint.validate',
+        'blueprint.theme',
         'block.list',
         'block.schema',
         'theme.search',
         'theme.get',
         'theme.preview',
+        'ds.validate',
+        'ds.compile',
+        'ds.contrast',
+        'ds.suggest',
+        'ds.import',
+        'ds.diff',
+        'ds.preview',
+        'ds.save',
         'deck.run',
         'document.run',
         'document.export',
@@ -109,8 +118,14 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
       for (const legacy of described.slice(TEXULI_OPERATIONS.length)) {
         expect(legacy.description, legacy.name).toMatch(/^Deprecated alias of [a-z]+\.[a-z-]+/u);
       }
-      expect(tools.every(({ annotations }) => annotations.readOnlyHint === true)).toBe(true);
-      expect(tools.every(({ annotations }) => annotations.destructiveHint === false)).toBe(true);
+      // ds.save is the one writer (an explicit path inside the working directory).
+      const readOnly = tools.filter(({ name }) => name !== 'ds.save');
+      expect(readOnly.every(({ annotations }) => annotations.readOnlyHint === true)).toBe(true);
+      expect(readOnly.every(({ annotations }) => annotations.destructiveHint === false)).toBe(true);
+      expect(tools.find(({ name }) => name === 'ds.save')?.annotations).toMatchObject({
+        readOnlyHint: false,
+        destructiveHint: true,
+      });
     }
   );
   await scenario('builds the real catalog and reads component manifests and examples', async () => {
@@ -230,7 +245,7 @@ it('reports tool and protocol errors and speaks newline-delimited JSON-RPC on st
       ) as { version: string };
       expect(messages[0]?.result?.serverInfo).toEqual({ name: 'texuli', version });
       expect(version).not.toBe('0.0.0');
-      expect(messages[1]?.result?.tools).toHaveLength(20);
+      expect(messages[1]?.result?.tools).toHaveLength(29);
     }
   );
 });

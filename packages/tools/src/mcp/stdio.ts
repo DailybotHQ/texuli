@@ -2,6 +2,7 @@ import { resolve } from 'node:path';
 import { createInterface } from 'node:readline';
 import type { Readable, Writable } from 'node:stream';
 import { pathToFileURL } from 'node:url';
+import { localFiles } from '../internal/local-write.ts';
 import { createMcpHandler } from './handler.ts';
 
 /** The longest stdio message (one line) the server parses: 2 MiB. */
@@ -11,13 +12,17 @@ const MAX_MESSAGE_BYTES = MCP_STDIO_MAX_MESSAGE_BYTES;
 /**
  * Run the MCP newline-delimited JSON-RPC transport over the supplied streams:
  * the stateful local handler (initialization gate; `edge` and `node`
- * operations). A line over 2 MiB or that is not JSON is answered with -32700.
+ * operations; `ds.save` writes inside the working directory). A line over 2 MiB or that is not JSON is answered with -32700.
  */
 export async function runMcpStdio(
   input: Readable = process.stdin,
   output: Writable = process.stdout
 ): Promise<void> {
-  const handle = createMcpHandler({ mode: 'stateful', runtimes: ['edge', 'node'] });
+  const handle = createMcpHandler({
+    mode: 'stateful',
+    runtimes: ['edge', 'node'],
+    files: localFiles(),
+  });
   const lines = createInterface({ input, crlfDelay: Infinity });
   for await (const line of lines) {
     if (Buffer.byteLength(line, 'utf8') > MAX_MESSAGE_BYTES) {

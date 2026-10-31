@@ -5,6 +5,7 @@ import { runDeckCli } from '../src/cli/deck.ts';
 import { runDocumentCli } from '../src/cli/document.ts';
 import { runInitCli } from '../src/cli-init/cli.ts';
 import { listThemes, previewTheme } from '../src/cli-init/themes.ts';
+import { localFiles } from '../src/internal/local-write.ts';
 import {
   createOperationRegistry,
   defineOperation,
@@ -33,11 +34,20 @@ const EXPECTED = [
   'component.get',
   'example.search',
   'blueprint.validate',
+  'blueprint.theme',
   'block.list',
   'block.schema',
   'theme.search',
   'theme.get',
   'theme.preview',
+  'ds.validate',
+  'ds.compile',
+  'ds.contrast',
+  'ds.suggest',
+  'ds.import',
+  'ds.diff',
+  'ds.preview',
+  'ds.save',
   'deck.run',
   'document.run',
   'document.export',
@@ -84,20 +94,21 @@ it('declares every operation once, self-described for agents, in the supported s
       expect(operation.limits.inputBytes, label).toBeGreaterThan(0);
       expect(operation.limits.timeMs, label).toBeGreaterThan(0);
       expect(operation.examples.length, label).toBeGreaterThan(0);
-      expect(operation.annotations, label).toMatchObject({
-        readOnly: true,
-        destructive: false,
-        openWorld: false,
-      });
+      // ds.save is the one writer: an explicit path inside the working directory.
+      expect(operation.annotations, label).toMatchObject(
+        operation.name === 'ds.save'
+          ? { readOnly: false, destructive: true, openWorld: true }
+          : { readOnly: true, destructive: false, openWorld: false }
+      );
       expect(schemaKeywordIssues(operation.input), label).toEqual([]);
       expect(schemaKeywordIssues(operation.output), label).toEqual([]);
     }
   });
   await scenario(
-    'PDF and DOCX writers are node-only; the site readers are site-only; the rest run at the edge',
+    'the file writer and the PDF and DOCX writers are node-only; the site readers are site-only; the rest run at the edge',
     () => {
       const node = TEXULI_OPERATIONS.filter((operation) => operation.runtime === 'node');
-      expect(node.map((operation) => operation.name)).toEqual(['document.export']);
+      expect(node.map((operation) => operation.name)).toEqual(['ds.save', 'document.export']);
       const site = TEXULI_OPERATIONS.filter((operation) => operation.runtime === 'site');
       expect(site.map((operation) => operation.name)).toEqual([
         'site.pages',
@@ -122,10 +133,13 @@ it('round-trips every example through its input and output schemas', async () =>
       await scenario(`${operation.name}: ${example.title}`, async () => {
         expect(validateJson(operation.input, example.input)).toEqual([]);
         // Site operations read a built site: the fixture binding stands in for env.ASSETS.
+        // ds.save's example is a dry run: the local writer checks the path and writes nothing.
         const outcome = await texuliOps.invoke(
           operation.name,
           example.input,
-          operation.runtime === 'site' ? { site: { assets: fakeSiteAssets() } } : {}
+          operation.runtime === 'site'
+            ? { site: { assets: fakeSiteAssets() } }
+            : { files: localFiles() }
         );
         if (!outcome.ok) throw new Error(`${outcome.error.code}: ${outcome.error.message}`);
         expect(validateJson(operation.output, outcome.output)).toEqual([]);
@@ -179,7 +193,9 @@ it('refuses invalid input, oversized input and unavailable runtimes with stable 
     );
     expect(outcome).toMatchObject({ ok: false, error: { code: 'runtime-unavailable' } });
     expect(texuliOps.list({ runtimes: ['edge'] }).map((operation) => operation.name)).toEqual(
-      EXPECTED.filter((name) => name !== 'document.export' && !name.startsWith('site.'))
+      EXPECTED.filter(
+        (name) => !['document.export', 'ds.save'].includes(name) && !name.startsWith('site.')
+      )
     );
   });
 });
