@@ -1,48 +1,31 @@
-import { LEGACY_DOCUMENT_INPUT, routeLegacyDocument } from './document.ts';
-import { THEME_SEARCH_PROPERTIES } from './themes.ts';
-import type { OperationAlias } from './types.ts';
+import type { OperationAlias, RemovedOperationName } from './types.ts';
 
-/** The release that removes the 0.8 tool names (one minor after 0.9.0). */
+/** The release that removed the 0.8 tool names (one minor after 0.9.0 deprecated them). */
 export const ALIASES_REMOVED_IN = '0.10.0';
 
 /**
- * The seven 0.8 MCP tool names, kept as deprecated aliases for one minor.
- * Each resolves to an operation; `theme` and `document` route by input.
+ * Deprecated aliases a door still serves. Empty in 0.10.0: the seven 0.8
+ * names were removed (see {@link TEXULI_REMOVED_NAMES}). The mechanism stays
+ * for the next rename, which keeps its old name as an alias for one minor
+ * (ADR-017).
  */
-export const TEXULI_ALIASES: readonly OperationAlias[] = Object.freeze([
-  { name: 'deck', targets: ['deck.run'], removeIn: ALIASES_REMOVED_IN },
+export const TEXULI_ALIASES: readonly OperationAlias[] = Object.freeze([]);
+
+/**
+ * The seven 0.8 MCP tool names, deprecated in 0.9.0 and removed in 0.10.0.
+ * They are not listed; a call is refused with a message that names the
+ * operations to call instead.
+ */
+export const TEXULI_REMOVED_NAMES: readonly RemovedOperationName[] = Object.freeze([
+  { name: 'deck', replacedBy: ['deck.run'], removedIn: ALIASES_REMOVED_IN },
   {
     name: 'document',
-    targets: ['document.run', 'document.export'],
-    removeIn: ALIASES_REMOVED_IN,
-    input: LEGACY_DOCUMENT_INPUT,
-    route: routeLegacyDocument,
+    replacedBy: ['document.run', 'document.export'],
+    removedIn: ALIASES_REMOVED_IN,
   },
-  { name: 'catalog', targets: ['catalog.search'], removeIn: ALIASES_REMOVED_IN },
-  { name: 'component', targets: ['component.get'], removeIn: ALIASES_REMOVED_IN },
-  { name: 'validate', targets: ['catalog.validate'], removeIn: ALIASES_REMOVED_IN },
-  { name: 'example', targets: ['example.search'], removeIn: ALIASES_REMOVED_IN },
-  {
-    name: 'theme',
-    targets: ['theme.search', 'theme.get'],
-    removeIn: ALIASES_REMOVED_IN,
-    input: {
-      type: 'object',
-      properties: {
-        id: {
-          type: 'string',
-          minLength: 1,
-          maxLength: 64,
-          pattern: '^[a-z0-9][a-z0-9-]*$',
-          description: 'Read this theme (theme.get); every other argument is then ignored.',
-        },
-        ...THEME_SEARCH_PROPERTIES,
-      },
-      additionalProperties: false,
-    },
-    route: (input) =>
-      typeof input.id === 'string'
-        ? { name: 'theme.get', input: { id: input.id } }
-        : { name: 'theme.search', input },
-  },
+  { name: 'catalog', replacedBy: ['catalog.search'], removedIn: ALIASES_REMOVED_IN },
+  { name: 'component', replacedBy: ['component.get'], removedIn: ALIASES_REMOVED_IN },
+  { name: 'validate', replacedBy: ['catalog.validate'], removedIn: ALIASES_REMOVED_IN },
+  { name: 'example', replacedBy: ['example.search'], removedIn: ALIASES_REMOVED_IN },
+  { name: 'theme', replacedBy: ['theme.search', 'theme.get'], removedIn: ALIASES_REMOVED_IN },
 ]);

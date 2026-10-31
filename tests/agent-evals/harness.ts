@@ -20,6 +20,7 @@
  */
 import { expect } from 'vitest';
 import { onRequest } from '../../functions/mcp.ts';
+import { localFiles } from '../../packages/tools/src/internal/local-write.ts';
 import { createMcpHandler } from '../../packages/tools/src/mcp/handler.ts';
 import { MCP_PROTOCOL_VERSION } from '../../packages/tools/src/mcp/protocol.ts';
 import {
@@ -107,9 +108,16 @@ const SECURITY_HEADERS: Record<string, string> = {
   'referrer-policy': 'no-referrer',
 };
 
-/** The local door: one stateful handler per session, as `texuli-mcp` builds it. */
+/**
+ * The local door: one stateful handler per session, as `texuli-mcp` builds
+ * it, with the local writer `ds.save` uses (the sessions only dry-run it).
+ */
 function stdioDoor(): Door {
-  const handle = createMcpHandler({ mode: 'stateful', runtimes: STDIO_RUNTIMES });
+  const handle = createMcpHandler({
+    mode: 'stateful',
+    runtimes: STDIO_RUNTIMES,
+    files: localFiles(),
+  });
   return {
     name: 'stdio',
     runtimes: STDIO_RUNTIMES,

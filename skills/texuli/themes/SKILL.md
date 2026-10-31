@@ -259,7 +259,8 @@ or the remote server for the edge operations
 | `theme.preview` | `id` (required), `mode` | Key tokens and the AA report for both modes |
 | `theme.get` | `id` (required) | The full light and dark definition |
 
-The 0.8 name `theme` stays as a deprecated alias until `0.10.0`.
+The 0.8 name `theme` was a deprecated alias in `0.9.0` and is removed in
+`0.10.0` (in development): call `theme.search` or `theme.get`.
 
 Example agent flow:
 

@@ -100,6 +100,7 @@ agent config, or publish packages without explicit consent (see
 | A deck from JSON or Markdown: layouts, validation, `DeckStage`, print and PPTX, the `deck` CLI and MCP tool | [`build-ui/references/decks.md`](build-ui/references/decks.md) |
 | Drag and drop: sortable lists, groups, boards, trees, a canvas, a workflow editor | [`build-ui/SKILL.md`](build-ui/SKILL.md) (recipes) |
 | Themes, palettes, forced-colors, AA contrast, theme CLI/MCP | [`themes/SKILL.md`](themes/SKILL.md) |
+| A whole brand as one design-system document: author, import (DTCG, Tokens Studio, a logo), validate and repair by code, apply to a blueprint, export (in development for `0.10.0`) | [`design-systems/SKILL.md`](design-systems/SKILL.md) |
 | Images, video, captions, compositions, export, generator slot | [`media/SKILL.md`](media/SKILL.md) |
 | Validate, wrap, edit or paint an agent blueprint; envelope, player, agent service, spec contract; a whole stateful screen as JSON (state, bindings, actions, `reorder`, `workflow-graph`) | [`blueprints/SKILL.md`](blueprints/SKILL.md) |
 | Contribute a primitive or texel | [`contribute/SKILL.md`](contribute/SKILL.md) |
