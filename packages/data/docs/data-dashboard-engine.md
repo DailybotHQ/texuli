@@ -37,7 +37,7 @@ layout) and refuses with a reason instead of throwing.
 | `compactLayout(layout, compaction)` | Removes overlaps and (with `vertical`) closes gaps; locked widgets stay put |
 | `moveItem(layout, id, { x, y }, options)` | Moves a widget to a cell; widgets it lands on are pushed down (or swap above it when it moves down) |
 | `resizeItem(layout, id, { w, h }, options)` | Resizes within the widget's bounds and the grid; `size` when nothing can change |
-| `nudgeItem(layout, id, { dx, dy }, options)` | One keyboard step; grows the step until the widget really moves, else `edge` |
+| `nudgeItem(layout, id, { dx, dy }, options)` | One keyboard step; grows the step past the widgets in the way until the widget really moves (the layout `moveItem` gives for that cell), else `edge` |
 | `addItem(layout, item, options)` / `removeItem(layout, id, options)` | Add (first-fit without a position) or remove a widget |
 | `firstFit(layout, { w, h }, columns)` | The first free slot, scanning rows then columns |
 | `overlaps(a, b)`, `compareItems(a, b)`, `sortLayout(layout)`, `layoutBottom(layout)`, `sameLayout(a, b)` | Helpers: collision, reading order, height, equality |
@@ -62,6 +62,16 @@ layout) and refuses with a reason instead of throwing.
   modified key is never the dashboard's.
 - `cellFromDelta(start, delta, cell, dir)` turns pointer travel into whole
   cells.
+- A step (`nudgeItem`) tries the next column or row first. When that cell
+  does not move the widget (with vertical compaction a step down falls back
+  above a wider widget below it), it grows past the widgets in the way: down
+  past a wider widget, up past one above, sideways past a taller or locked
+  one. When no cell moves it but one swaps the widget below to above it (a
+  narrower widget above holds its row), that swap is the step. `edge` means
+  nothing can change: the grid edge, or with vertical compaction nothing
+  left in its columns to pass. The view announces the step as usual
+  ("{item} moved to column {column}, row {row}"), naming the cell the
+  widget landed on.
 
 ## Messages
 
