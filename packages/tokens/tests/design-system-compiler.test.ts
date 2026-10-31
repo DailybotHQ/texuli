@@ -334,6 +334,13 @@ describe('refusals: every code, as results', () => {
     ]);
     const unknown = await resolveDesignSystem(doc({ extends: 'texuli:no-such-theme' }));
     expect(unknown.ok).toBe(false);
+    // An empty modes option compiles nothing a writer could paint: refused, like `color.modes: []`.
+    expect(codes(compileDesignSystem(minimal, { modes: [] }))).toEqual([
+      ['invalid-value', '$.color.modes'],
+    ]);
+    expect(codes(compileDesignSystem(doc({ color: { modes: [] } }))).map(([code]) => code)).toEqual(
+      ['invalid-value']
+    );
     for (const hostile of [
       null,
       undefined,

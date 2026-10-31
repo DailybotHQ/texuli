@@ -46,7 +46,7 @@ if (compiled.ok) {
 
 | Export | What it does |
 | --- | --- |
-| `compileDesignSystem(doc, { modes?, variant?, patches?, resolve?, trust? })` | Synchronous. Validates (the spec's validator at `trust`, `untrusted` by default), resolves `extends` through `resolve`, applies the variant then the patches, and compiles. Returns `CompiledDesignSystem` (`ok: true`) or `{ ok: false, errors }` |
+| `compileDesignSystem(doc, { modes?, variant?, patches?, resolve?, trust? })` | Synchronous. Validates (the spec's validator at `trust`, `untrusted` by default), resolves `extends` through `resolve`, applies the variant then the patches, and compiles. `modes` (default `color.modes`, then both) is one or both of `light` and `dark`; an empty list is refused (`invalid-value` at `$.color.modes`), as `color.modes: []` in a document is. Returns `CompiledDesignSystem` (`ok: true`) or `{ ok: false, errors }` |
 | `resolveDesignSystem(doc, { resolve?, variant?, patches?, trust? })` | Asynchronous: loads `texuli:<id>` from the theme library (lazy chunks) and awaits `resolve` for `id@x.y.z`. Returns `{ ok, document, chain, variant?, hash }`: the merged document without `extends` |
 | `resolveDesignSystemSync(doc, options)` | The same with a synchronous `resolve`, which may return a `Theme` (or a document) for `texuli:<id>` |
 | `loadLibraryBase('texuli:<id>')` | One library theme as a document whose `color.brand` is the theme's generator input |
