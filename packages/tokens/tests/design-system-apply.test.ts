@@ -25,6 +25,7 @@ import {
   DESIGN_SYSTEM_ATTRIBUTES,
   resolveDesignSystem,
 } from '../src/design-system/compile.ts';
+import { emitCss, isSafeCompiledValue } from '../src/design-system/emit.ts';
 import { cacheAppearance, noFlashScript } from '../src/no-flash/index.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -235,6 +236,79 @@ describe('applyDesignSystem', { timeout: 20_000 }, () => {
     ).toThrow(TypeError);
   });
 
+  it('refuses every value that could fetch or read, in apply, the SSR style and the emitters alike', () => {
+    // M-1 (PLAN_011 security review): `image-set()` and friends take a plain
+    // string URL, so a tampered compiled copy could make the browser fetch.
+    const hostile = [
+      'image-set("https://attacker.example/b.png" 1x)',
+      '-webkit-image-set("https://attacker.example/b.png" 1x)',
+      'src("https://attacker.example/x")',
+      'cross-fade(image-set("//attacker.example/a" 1x), red 50%)',
+      'cross-fade(red, blue 50%)',
+      'url(https://attacker.example/a.png)',
+      'url("https://attacker.example/a.png")',
+      'expression(alert(1))',
+      'image("https://attacker.example/a.png")',
+      'element(#secret)',
+      'paint(beacon)',
+      'attr(data-x)',
+      'var(--tx-primary)',
+      // Case variants and a space before the parenthesis.
+      'IMAGE-SET("https://attacker.example/b.png" 1x)',
+      'Image-Set("https://attacker.example/b.png" 1x)',
+      '-WEBKIT-image-set("https://attacker.example/b.png" 1x)',
+      'Src("https://attacker.example/x")',
+      'CROSS-FADE(red, blue 50%)',
+      'URL(https://attacker.example/a.png)',
+      'Expression(alert(1))',
+      'image-set ("https://attacker.example/b.png" 1x)',
+      // Escaped forms.
+      'im\\61 ge-set("https://attacker.example/b.png" 1x)',
+      '\\69mage-set("https://attacker.example/b.png" 1x)',
+      'u\\rl(https://attacker.example/a.png)',
+      'image-set(\\22https://attacker.example/b.png\\22 1x)',
+      // Comments.
+      'image/**/-set("https://attacker.example/b.png" 1x)',
+      'image-set/* x */("https://attacker.example/b.png" 1x)',
+      'red /* x */',
+      'red */',
+      // A quoted scheme or a protocol-relative URL on its own.
+      '"https://attacker.example/b.png"',
+      "'javascript:alert(1)'",
+      '//attacker.example/b.png',
+      // Invisible and non-ASCII characters.
+      `image${String.fromCharCode(0x200b)}-set("https://attacker.example/b.png" 1x)`,
+      `red${String.fromCharCode(0xfeff)}`,
+      `${String.fromCharCode(0xff49)}mage-set("https://attacker.example/b.png" 1x)`,
+      '',
+    ];
+    const vars = Object.fromEntries([
+      ['--tx-ok', '#ffffff'],
+      ...hostile.map((value, i) => [`--tx-h${i}`, value]),
+    ]);
+    const system: ApplicableDesignSystem = { ...acme, vars: { light: vars, dark: vars } };
+    for (const value of hostile) {
+      expect(isSafeDesignSystemValue(value), `apply ${JSON.stringify(value)}`).toBe(false);
+      expect(isSafeCompiledValue(value), `emit ${JSON.stringify(value)}`).toBe(false);
+    }
+    expect(designSystemDeclarations(vars)).toEqual([['--tx-ok', '#ffffff']]);
+    const el = host();
+    applyDesignSystem(el, system, { mode: 'light', fonts: false });
+    expect(inlineVars(el)).toEqual({ '--tx-ok': '#ffffff' });
+    expect(designSystemStyle(system)).toBe(
+      '[data-tx-ds="acme"]{--tx-ok:#ffffff}\n' +
+        ':is([data-tx-ds="acme"])[data-tx-mode="dark"],[data-tx-mode="dark"] :is([data-tx-ds="acme"]):not([data-tx-mode="light"]){--tx-ok:#ffffff}'
+    );
+    const css = emitCss({ ...acme, vars: { light: vars, dark: vars } });
+    expect(css).toContain(`/* skipped ${hostile.length * 2} unsafe declarations */`);
+    expect(css).toContain('--tx-ok: #ffffff;');
+    expect(css).not.toMatch(/attacker|image|src\(|fade|url|expression|paint|attr\(|var\(/i);
+    // One checker: apply and the emitters agree on every value the compiler writes.
+    for (const system of [acme, minimal])
+      for (const value of Object.values(system.vars.light ?? {}))
+        expect(isSafeDesignSystemValue(value), value).toBe(isSafeCompiledValue(value));
+  });
+
   it('registers font faces lazily on first use, same-origin relative paths and data URLs only', () => {
     const added: { family: string; source: string; descriptors: FontFaceDescriptors }[] = [];
     class FakeFontFace {
@@ -337,6 +411,20 @@ describe('designSystemStyle', { timeout: 20_000 }, () => {
       );
     }
     expect(() => designSystemStyle({ ...acme, id: 'a"]{}' })).toThrow(TypeError);
+    // L-1: a hand-made id or variant cannot widen the default selector.
+    for (const id of ['x"],*,[x="', 'x"]', 'x] *', 'X', 'a b', 'a,b', '-a', '']) {
+      expect(() => designSystemStyle({ ...acme, id }), JSON.stringify(id)).toThrow(TypeError);
+    }
+    for (const variant of ['x"],*,[x="', 'x"]', 'a b', 'A', '1a']) {
+      expect(() => designSystemStyle({ ...acme, variant }), JSON.stringify(variant)).toThrow(
+        TypeError
+      );
+    }
+    expect(designSystemStyle({ ...acme, variant: 'high-contrast' }, { modes: ['light'] })).toMatch(
+      /^\[data-tx-ds="acme"\]\[data-tx-ds-variant="high-contrast"\]\{/
+    );
+    // An explicit selector does not read the id.
+    expect(designSystemStyle({ ...acme, id: 'x"],*,[x="' }, { selector: '.x' })).toMatch(/^\.x\{/);
     expect(() => designSystemStyle(acme, { modes: ['dim' as 'dark'] })).toThrow(TypeError);
     expect(designSystemStyle(acme)).not.toMatch(/<|>|url\(|var\(/);
   });
@@ -414,6 +502,7 @@ describe('laziness: design-system/apply', () => {
     expect(graph('design-system/apply.ts').sort()).toEqual([
       'design-system/apply.ts',
       'design-system/attributes.ts',
+      'design-system/css-value.ts',
     ]);
     expect(graph('index.ts').filter((file) => file.includes('design-system/'))).toEqual([]);
   });

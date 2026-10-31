@@ -15,6 +15,18 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.3.5] — 2026-10-31
+
+### Changes
+
+- docs(docs): apply is 2,040 B after the shared value check; ds.save path codes in the skill - T-final-review of PLAN_011_mcp_and_design_systems
+- chore(skill): the skill pack says 0.10.0 is published - T-release-0100 of PLAN_011_mcp_and_design_systems
+- docs(skill): a host loads base.css or system.css; system.css in the tokens router entry - T-gaps-107-110 of PLAN_011_mcp_and_design_systems
+- docs(skill): the 0.8 tool names and the tree style key are removed in 0.10.0 - T-release-0100 of PLAN_011_mcp_and_design_systems
+- docs(skill): a design-systems sub-skill with the codes and MCP references - T-ds-docs-skill of PLAN_011_mcp_and_design_systems
+- docs(skill): blueprint.theme and the ds operations in the blueprints skill; ds.save is local only - T-ds-agent-tools of PLAN_011_mcp_and_design_systems
+- docs(skill): the blueprints skill explains designSystem (validate with checkDesignSystem, paint with designSystems) - T-ds-blueprint of PLAN_011_mcp_and_design_systems
+
 - New `design-systems/SKILL.md` sub-skill, with `references/codes.md`
   (every design-system code and its fix) and `references/mcp.md` (the
   `ds.*` tools, `blueprint.theme`, the `create-design-system` prompt and
@@ -51,6 +63,14 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
   `loadPlayer`). The `0.8.0` to `0.5.0` sections move to
   `upgrade/references/packages.md` to keep `upgrade/SKILL.md` within its
   budget.
+
+## [0.3.4] — 2026-10-30
+
+### Changes
+
+- chore(skill): the skill pack says 0.9.0 is published
+- docs(skill): add the MCP hosts section and cite registry operations and published bins
+
 - The packages move to `0.9.0`: 26 published packages, `@texuli/mcp`
   published for the first time. The router, components, install and
   build-ui references say "on npm as `0.9.0`" and pin `^0.9.0`; the

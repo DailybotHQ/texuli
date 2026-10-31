@@ -718,7 +718,7 @@ export const MCP_SERVER_DATA = {
       name: 'ds.save',
       title: 'Save a design system to a file',
       summary:
-        'Validate a design-system document (as ds.validate does) and write it as two-space JSON to the explicit path you pass, inside the working directory: traversal, symlinks and an existing file without overwrite are refused. Local doors only. Returns saved, the relative path and bytes written, or errors with stable codes.',
+        'Validate a design-system document (as ds.validate does) and write it as two-space JSON to the explicit .json path you pass, inside the working directory: traversal, symlinks, dot directories and dotfiles, node_modules, package.json and an existing file without overwrite are refused. Local doors only. Returns saved, the relative path and bytes written, or errors with stable codes.',
       runtime: 'node',
       remote: false,
       local: true,
@@ -731,7 +731,7 @@ export const MCP_SERVER_DATA = {
           name: 'path',
           required: true,
           description:
-            'Where to write, relative to the working directory (e.g. design-systems/harborline.ds.json).',
+            'Where to write, relative to the working directory (e.g. design-systems/harborline.ds.json): a .json file outside dot directories and node_modules, never package.json.',
         },
         {
           name: 'document',

@@ -26,7 +26,9 @@ Importers add `invalid-input` (not JSON or the wrong shape),
 `input-limit` (over 1 MiB, 50,000 values or 4096 × 4096 pixels) and, for
 `ds.import` from a theme id, `not-found`. `ds.diff` tags each error with
 `source: "before"` or `"after"`; `ds.save` adds the write policy's
-`outside-working-directory`, `symlink` and `exists`.
+`outside-working-directory`, `symlink` and `exists`, plus `path-extension`
+(the path must end in `.json`) and `path-reserved` (a dot segment such as
+`.github/`, a `node_modules` segment or a `package.json` file).
 
 A typical repair takes two or three rounds: the spec's codes come first,
 and the guarantee codes (`aa-text`, `aa-focus`, `target-size`) appear once

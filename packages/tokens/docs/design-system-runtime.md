@@ -31,10 +31,10 @@ const css = designSystemStyle(compiled); // [data-tx-ds="acme"]{…}\n…[data-t
 | Export | What it does |
 | --- | --- |
 | `applyDesignSystem(el, compiled, { mode, variant?, fonts?, base?, defaults? })` | Writes `compiled.vars[mode]` on `el` in **one** `style.cssText` write (CSSOM, so a strict `style-src` without `'unsafe-inline'` allows it), keeping the element's own declarations. Sets the allowlisted attributes (`DESIGN_SYSTEM_ATTRIBUTES`), `data-tx-mode` and `data-tx-scope` (a host-named scope is kept). Registers `fontFaces` (see below), passes `compiled.defaults` to `defaults` (`setDesignDefaults`, or the provider below). Returns a dispose that restores every variable and attribute it changed, in one write, and calls `defaults({})` |
-| `designSystemStyle(compiled, { selector?, modes? })` | The same declarations as a CSS string: the first mode (light when compiled) on `selector`, dark on `:is(selector)[data-tx-mode="dark"]` and `[data-tx-mode="dark"] :is(selector):not([data-tx-mode="light"])`. The default selector is `[data-tx-ds="<id>"]` (plus `[data-tx-ds-variant]` when compiled for a variant). Throws a `TypeError` for a selector (or id) with braces, `;`, `<`, `>`, `@`, `\`, `!`, comments, control or bidi characters |
+| `designSystemStyle(compiled, { selector?, modes? })` | The same declarations as a CSS string: the first mode (light when compiled) on `selector`, dark on `:is(selector)[data-tx-mode="dark"]` and `[data-tx-mode="dark"] :is(selector):not([data-tx-mode="light"])`. The default selector is `[data-tx-ds="<id>"]` (plus `[data-tx-ds-variant]` when compiled for a variant). Throws a `TypeError` for a selector with braces, `;`, `<`, `>`, `@`, `\`, `!`, `` ` ``, comments or characters outside printable ASCII, and, for the default selector, for an id or variant outside `[a-z][a-z0-9-]*` (so a hand-made id such as `x"],*,[x="` cannot widen the rule) |
 | `designSystemAppearance(compiled, { mode })` | The same map as a no-flash cache entry: `cacheAppearance(namespace, designSystemAppearance(compiled, { mode }))`, then `noFlashScript(namespace)` replays it on `<html>` before first paint ([tokens-no-flash.md](tokens-no-flash.md)) |
 | `designSystemDeclarations(vars)` | The safe `[name, value]` pairs of one map, sorted by name: what all three write |
-| `isSafeDesignSystemValue(value)` | The value filter |
+| `isSafeDesignSystemValue(value)` | The value filter: the same function as `isSafeCompiledValue` in [design-system/emit](design-system-io.md#emitters-design-systememit) |
 | `ApplicableDesignSystem` | The fields the runtime reads (`id`, `variant`, `vars`, `attrs`, `fontFaces`, `defaults`): a cached JSON copy of a `CompiledDesignSystem` works |
 
 `variant` defaults to `compiled.variant` and must equal it when both are
@@ -43,14 +43,21 @@ dispose: other scopes may use them.
 
 ## Escaped by construction
 
-`apply`, `designSystemStyle` and `designSystemAppearance` share one filter.
-A name must match `--tx-[a-z0-9-]+`; a value must be at most 2,048
-characters, with balanced quotes and parentheses, and no `;`, `{`, `}`,
-`<`, `>`, `\`, `!`, `@`, `/*`, control or bidi characters, `url(`,
-`var(`, `expression(` or `javascript:`. A pair that fails is dropped, never
+`apply`, `designSystemStyle` and `designSystemAppearance` share one filter,
+and it is the same function the emitters use (`isSafeCompiledValue`, in
+`src/design-system/css-value.ts`). A name must match `--tx-[a-z0-9-]+`; a
+value must be 1 to 512 characters of printable ASCII, with balanced quotes
+and parentheses, and no `;`, `{`, `}`, `<`, `>`, `\`, `!`, `@`, `` ` ``,
+`/*`, `*/`, `:` or `//`. It may call only the functions the compiler
+writes (`calc`, `max`, `color-mix`, `cubic-bezier`, `linear`, `oklch`,
+`rgb`), so `url()`, `image()`, `image-set()`, `-webkit-image-set()`,
+`src()`, `cross-fade()`, `element()`, `paint()`, `expression()`, `var()`
+and `attr()` are refused in any case, and escaped or commented spellings
+fail on the `\` or the comment. A pair that fails is dropped, never
 escaped into place, so a tampered cache or compiled file can add neither a
-declaration, a rule, a priority nor a URL. The filter is stricter than the
-no-flash replay's, so everything `apply` writes, the replay writes too.
+declaration, a rule, a priority, a read nor a fetch. The filter is
+stricter than the no-flash replay's, so everything `apply` writes, the
+replay writes too.
 Attribute values are written with `setAttribute` (never markup) and only
 for allowlisted names. The compiler never emits a value the filter drops
 (the acme and minimal fixtures keep all of theirs, a test checks it).
@@ -93,9 +100,10 @@ skipped. Pass `fonts: false` to manage fonts yourself (preload hints are on
 
 ## Size and speed
 
-Measured with `pnpm size --filter tokens` (gzip, 2026-10-30):
-`design-system/apply` 1,966 B (budget 2,048 B, the ADR-023 target of
-2 KB). The `@texuli/tokens` root measured 40,820 B before and after.
+Measured with `pnpm size --filter tokens` (gzip, 2026-10-31):
+`design-system/apply` 2,040 B (budget 2,048 B, the ADR-023 target of
+2 KB), after the filter became the one shared with the emitters (1,966 B
+before). The `@texuli/tokens` root measured 40,820 B before and after.
 
 `tests/perf/design-system-switch.test.ts` (`pnpm test:perf`) launches
 headless chromium with 1,000 elements under one scope, each painted from

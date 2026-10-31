@@ -164,6 +164,15 @@ describe('design-system operations', () => {
           name
         ).toContain('aa-text');
       }
+      // L-2: a zero-width character in free text is refused, as the importers refuse it.
+      for (const name of ['A\u200bB', 'A\u2060B', 'A\ufeffB', 'A\u{e0041}B']) {
+        const hidden = await run('ds.validate', { document: { ...MINIMAL_DESIGN_SYSTEM, name } });
+        expect(hidden, JSON.stringify(name)).toMatchObject({
+          valid: false,
+          codes: ['invalid-value'],
+          errors: [{ path: '$.name' }],
+        });
+      }
       const diff = await run('ds.diff', { before: MINIMAL_DESIGN_SYSTEM, after: LOW_CONTRAST });
       expect(diff.valid).toBe(false);
       expect(diff.errors.every((error: Json) => error.source === 'after')).toBe(true);
@@ -316,6 +325,45 @@ describe('design-system operations', () => {
       expect(refused.errors[0].code).toBe('aa-text');
       await expect(readFile(join(cwd, 'low.ds.json'))).rejects.toThrow();
     });
+    await scenario(
+      'writes .json files only, never in dot directories, node_modules or package.json',
+      async () => {
+        // I-1: even with overwrite, ds.save cannot replace repository or tool files.
+        const refusals: [string, string][] = [
+          ['harborline', 'path-extension'],
+          ['harborline.ds', 'path-extension'],
+          ['notes.md', 'path-extension'],
+          ['.github/workflows/ci.yml', 'path-reserved'],
+          ['.github/workflows/ci.json', 'path-reserved'],
+          ['.git/hooks/pre-commit', 'path-reserved'],
+          ['.git/config.json', 'path-reserved'],
+          ['.vscode/settings.json', 'path-reserved'],
+          ['.npmrc', 'path-reserved'],
+          ['.harborline.json', 'path-reserved'],
+          ['design-systems/.hidden/x.json', 'path-reserved'],
+          ['node_modules/x/index.json', 'path-reserved'],
+          ['packages/a/node_modules/x.json', 'path-reserved'],
+          ['Node_Modules/x.json', 'path-reserved'],
+          ['package.json', 'path-reserved'],
+          ['packages/a/package.json', 'path-reserved'],
+          ['PACKAGE.JSON', 'path-reserved'],
+        ];
+        await mkdir(join(cwd, '.github'), { recursive: true });
+        await writeFile(join(cwd, 'package.json'), '{"name":"fictional"}\n');
+        for (const [path, code] of refusals) {
+          for (const extra of [{}, { overwrite: true }, { dryRun: true }])
+            expect(await save({ path, document: HARBORLINE, ...extra }), path).toMatchObject({
+              saved: false,
+              errors: [{ code, path: '$.path' }],
+            });
+        }
+        expect(await readFile(join(cwd, 'package.json'), 'utf8')).toBe('{"name":"fictional"}\n');
+        await expect(readFile(join(cwd, '.github/workflows/ci.json'))).rejects.toThrow();
+        // A .json name anywhere else is fine, the extension in any case.
+        for (const path of ['brand.json', 'design-systems/Brand.JSON', 'a.b/c.ds.json'])
+          expect(await save({ path, document: HARBORLINE }), path).toMatchObject({ saved: true });
+      }
+    );
     await scenario('needs a door that writes files; the remote runtimes refuse it', async () => {
       const input = { path: 'x.ds.json', document: HARBORLINE };
       expect(await texuliOps.invoke('ds.save', input)).toMatchObject({

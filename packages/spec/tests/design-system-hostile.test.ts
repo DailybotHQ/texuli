@@ -219,14 +219,43 @@ describe('Unicode tricks in identifiers', () => {
         'invalid-value',
       ]);
     }
-    // Free text keeps emoji and joiners but refuses control and bidi characters.
-    expect(validateDesignSystem({ ...minimal, name: 'Acme \u{1f468}\u200d\u{1f4bb}' }).ok).toBe(
-      true
-    );
-    for (const bad of ['Acme\u202eemcA', 'Acme\n', 'Acme\u0085', 'Acme\u2069'])
-      expect(codes(validateDesignSystem({ ...minimal, name: bad })), JSON.stringify(bad)).toEqual([
-        ['invalid-value', '$.name'],
+    // Free text keeps emoji and non-Latin letters but refuses control, bidi
+    // and invisible characters: the importers' set (tokens io.ts INVISIBLE),
+    // plus the line and paragraph separators and the tag characters.
+    for (const good of ['Acme \u{1f4bb}', 'Acmé Ünïcode', '\u30a2\u30af\u30e1', 'A\u00a0B'])
+      expect(validateDesignSystem({ ...minimal, name: good }).ok, JSON.stringify(good)).toBe(true);
+    const invisible = [
+      'Acme\u202eemcA',
+      'Acme\n',
+      'Acme\u0085',
+      'Acme\u2069',
+      'A\u200bB', // zero-width space
+      'A\u200cB', // zero-width non-joiner
+      'A\u200dB', // zero-width joiner
+      'Acme \u{1f468}\u200d\u{1f4bb}', // a joiner inside an emoji sequence too
+      'A\u2060B', // word joiner
+      'A\u2061B',
+      'A\u2064B',
+      'A\u2065B',
+      'A\ufeffB', // byte order mark
+      'A\u00adB', // soft hyphen
+      'A\u180eB', // Mongolian vowel separator
+      'A\u061cB', // Arabic letter mark
+      'A\u2028B', // line separator
+      'A\u2029B', // paragraph separator
+      'A\u{e0001}B', // language tag
+      'A\u{e0041}\u{e007f}B', // tag letter and cancel tag
+    ];
+    for (const bad of invisible) {
+      for (const field of ['name', 'description'] as const)
+        expect(
+          codes(validateDesignSystem({ ...minimal, [field]: bad })),
+          `${field} ${JSON.stringify(bad)}`
+        ).toEqual([['invalid-value', `$.${field}`]]);
+      expect(only({ ...minimal, voice: { lexicon: { acme: bad } } }), JSON.stringify(bad)).toEqual([
+        'invalid-value',
       ]);
+    }
   });
 });
 
