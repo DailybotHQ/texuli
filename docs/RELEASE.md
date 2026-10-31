@@ -62,6 +62,14 @@ dependent. So design systems integrate on the branch `release/0.10.0`:
 
 On the branch so far:
 
+- **Added `@texuli/slides/export-core`** (Protoyard G105):
+  `DeckPrintViewCore` and `preloadDeckPrintViewCore`, the print view and
+  its preload without the default renderer tables; they take a `defaults`
+  source from the host like `DeckStageCore`. A `DeckStageCore` host that
+  prints through it emits no default-table chunk or CSS (measured on a
+  minimal host: 324 KB instead of 715 KB of JS and 28 KB instead of 72 KB of
+  CSS across every chunk, gzip). `@texuli/slides/export` behaves as before:
+  `DeckPrintView` is the core with the stage's tables as its defaults.
 - **Blueprint spec 0.10.0** (PLAN_011 T-ds-spec, ADR-021; in development
   on `release/0.10.0`, not on npm; `@texuli/spec@0.9.0` on npm still
   carries spec `0.9.0`). Additive: the design-system document schema

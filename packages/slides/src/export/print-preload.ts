@@ -1,40 +1,32 @@
 /**
- * The print view's lazy parts and their preload (G81). `DeckPrintView`
- * imports its body on first use; `preloadDeckPrintView()` warms the body,
- * its slide painter and (unless turned off) the default renderer tables
- * ahead of time, so a view mounted later (a print route, a `beforeprint`
- * handler) renders its pages on the first render and only waits for
- * themes, images and fonts. Every import is shared with the view: nothing
- * loads twice.
+ * The print view's preload with the stage's default renderer tables (G81).
+ * `preloadDeckPrintView()` warms the body, its slide painter and (unless
+ * turned off) the default tables ahead of time, so a view mounted later (a
+ * print route, a `beforeprint` handler) renders its pages on the first
+ * render. The tables come through {@link DECK_PRINT_DEFAULTS}, which imports
+ * the stage's loader on first use; a host that brings every renderer itself
+ * uses `@texuli/slides/export-core` instead, which never references them
+ * (G105).
  */
-import type { Component } from 'svelte';
-import type { DeckPrintViewProps } from './print-types.ts';
+import type { DeckDefaultRenderersSource, DeckRenderers } from '../stage/renderers.ts';
+import { preloadDeckPrintViewCore } from './print-preload-core.ts';
 
-type Body = Component<DeckPrintViewProps>;
+let tables: readonly DeckRenderers[] | undefined;
 
-let body: Body | undefined;
-let bodyLoading: Promise<Body> | undefined;
-
-/** Import the print view's body once (a failed import is retried by the next call). */
-export function loadDeckPrintBody(): Promise<Body> {
-  if (body) return Promise.resolve(body);
-  bodyLoading ??= import('./DeckPrintPages.svelte').then(
-    (module) => {
-      body = module.default as Body;
-      return body;
-    },
-    (error: unknown) => {
-      bodyLoading = undefined;
-      throw error;
-    }
-  );
-  return bodyLoading;
-}
-
-/** The body when it has already loaded, synchronously. */
-export function loadedDeckPrintBody(): Body | undefined {
-  return body;
-}
+/**
+ * The stage's default tables (the 20 catalog layouts and the component
+ * registry) as the print view's defaults source, imported on first use.
+ */
+export const DECK_PRINT_DEFAULTS: DeckDefaultRenderersSource = Object.freeze({
+  load: () =>
+    import('../stage/defaults.ts')
+      .then((module) => module.loadDefaultDeckRenderers())
+      .then((loaded) => {
+        tables = loaded;
+        return loaded;
+      }),
+  loaded: () => tables,
+});
 
 export interface PreloadDeckPrintViewOptions {
   /**
@@ -51,14 +43,9 @@ export interface PreloadDeckPrintViewOptions {
  * have loaded; rejects if one fails (the view retries on mount). Safe to
  * call more than once.
  */
-export async function preloadDeckPrintView(
-  options: PreloadDeckPrintViewOptions = {}
-): Promise<void> {
-  await Promise.all([
-    loadDeckPrintBody(),
-    import('./print-paint.ts'),
-    options.defaultRenderers === false
-      ? undefined
-      : import('../stage/defaults.ts').then((module) => module.loadDefaultDeckRenderers()),
-  ]);
+export function preloadDeckPrintView(options: PreloadDeckPrintViewOptions = {}): Promise<void> {
+  return preloadDeckPrintViewCore({
+    defaults: DECK_PRINT_DEFAULTS,
+    ...(options.defaultRenderers === false ? { defaultRenderers: false } : {}),
+  });
 }

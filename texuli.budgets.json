@@ -1017,6 +1017,10 @@
       "gzip": 7936,
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 7,723 B gzip, cap = measured + 4% headroom. PLAN_010 T-release-060 (2026-10-29): 8064 -> 7936 B, tightened to measured + 4% (measured 7,622 B)."
     },
+    "@texuli/slides/export-core": {
+      "gzip": 7936,
+      "note": "PLAN_011 T-gap-105 (2026-10-30, Protoyard G105): new row for the print counterpart of stage-core (DeckPrintViewCore, preloadDeckPrintViewCore; no reference to the default renderer tables). Measured 7,611 B gzip initial (220,663 B lazy, against 564,611 B for @texuli/slides/export); budget = measured + 4%, rounded up to 64 B. @texuli/slides/export measured 7.44 KiB before G105 and 7,777 B after (DeckPrintView is now the core plus the lazy defaults source), within its 7,936 B budget."
+    },
     "@texuli/slides/templates": {
       "gzip": 23296,
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 22,361 B gzip, cap = measured + 4% headroom."
