@@ -13,29 +13,36 @@ const ROOT = 'packages/pages';
 const read = (path: string) => readFileSync(`${ROOT}/${path}`, 'utf8');
 const DOCS_URL = 'https://github.com/DailybotHQ/texuli/blob/main/packages/pages';
 
+// The default components are their core with the default player loader
+// (G123), so their props are read from the core component.
 const SUBPATH_DOCS: Record<string, { doc: string; entry?: string; component?: string }> = {
   './editor': {
     doc: 'docs/editor.md',
     entry: 'src/editor/index.ts',
-    component: 'src/editor/PageEditor.svelte',
+    component: 'src/editor/PageEditorCore.svelte',
   },
+  './editor-core': { doc: 'docs/editor.md', entry: 'src/editor/core.ts' },
   './reader': {
     doc: 'docs/reader.md',
     entry: 'src/reader/index.ts',
-    component: 'src/reader/PageReader.svelte',
+    component: 'src/reader/PageReaderCore.svelte',
   },
+  './reader-core': { doc: 'docs/reader.md', entry: 'src/reader/core.ts' },
   './collab': {
     doc: 'docs/collab.md',
     entry: 'src/collab/index.ts',
-    component: 'src/collab/CollabEditor.svelte',
+    component: 'src/collab/CollabEditorCore.svelte',
   },
+  './collab-core': { doc: 'docs/collab.md', entry: 'src/collab/core.ts' },
   './paged': {
     doc: 'docs/paged.md',
     entry: 'src/paged/index.ts',
-    component: 'src/paged/PagedView.svelte',
+    component: 'src/paged/PagedViewCore.svelte',
   },
+  './paged-core': { doc: 'docs/paged.md', entry: 'src/paged/core.ts' },
   './export': { doc: 'docs/export.md', entry: 'src/export/index.ts' },
   './host': { doc: 'docs/host.md', entry: 'src/host/index.ts' },
+  './host-core': { doc: 'docs/host.md', entry: 'src/host/core.ts' },
   './styles.css': { doc: 'docs/styles.md' },
 };
 const PLANNED: string[] = [];

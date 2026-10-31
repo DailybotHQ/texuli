@@ -42,7 +42,8 @@ changes through `onReadChange`, and the pure helpers apply them.
 | `now` | required | The runtime clock, for the time labels ("Today, 9:00 AM") |
 | `timeZone`, `locale` | `UTC`, `en-US` | Time label formatting |
 | `filter` | `all` | `bind:filter`: `all` or `unread`. `onFilterChange` |
-| `onReadChange` | none | `(ids, read)` from an item's toggle, opening an unread item, or Mark all as read |
+| `onReadChange` | none | `(ids, read, { source })` from an item's toggle (`'item'`), opening an unread item (`'open'`), or Mark all as read (`'all'`, unless `onMarkAllRead` is given). It may return a promise (below). Two-argument handlers keep working |
+| `onMarkAllRead` | none | `(ids)` for Mark all as read, with the ids of the unread items listed now; when given it replaces `onReadChange` for that button, so a host whose mark-all covers rows outside `items` (paging, filters) can route it. It may return a promise (G106) |
 | `onOpen` | none | Opening an item from its title (a link with `href`, else a button when `onOpen` is set) |
 | `allowMarkUnread` | `true` | Read items offer "Mark unread". `false` hides that toggle (unread items still offer "Mark read"), for hosts that persist only mark-read |
 | `onMarkUnread` | none | `(ids)` after `onReadChange` when an item is marked unread, for hosts that store it separately |
@@ -58,6 +59,7 @@ changes through `onReadChange`, and the pure helpers apply them.
 - **Unread:** a dot and bold title show it, and "Unread:" is read before the title, so it never depends on color.
 - **Toggle:** each item has a visible "Mark as read" / "Mark as unread" button whose name starts with that text ("Mark as read: Export ready", WCAG 2.5.3).
 - **Mark all as read** uses `aria-disabled` when nothing is unread, so it keeps focus instead of dropping it.
+- **Pending saves (G106):** when `onReadChange` or `onMarkAllRead` returns a promise, the control that started it (the row's toggle or Mark all as read; opening shows nothing) gets `aria-busy="true"`, `aria-disabled="true"` with its clicks ignored, `data-pending` and texuli's button spinner over its hidden label until it settles. It stays focusable and focused, as texuli's Button does when busy, rather than natively `disabled`, which would drop focus to `<body>`. A rejection (or a throw) is announced politely ("Could not update the read state. Try again.", `labels.saveFailed`). Both buttons keep the `tx-inbox__button` class.
 - **Unread view:** items read while it is open stay listed until the view changes, so the focused control never disappears.
 - **Arrivals:** when the host adds items the inbox has not seen, a polite live region says "1 new notification." (the first render says nothing).
 - Titles and bodies are text, never markup.
@@ -70,7 +72,7 @@ framework-free; `setRead` keeps the identity of items it does not change.
 
 ## Verified
 
-- `pnpm vitest run packages/data/tests/inbox.test.ts`: **4 tests**: the pure helpers; `allowMarkUnread={false}` hiding the toggle on read items and `onMarkUnread` reporting a mark-unread (G50); the heading count, unread text, `datetime`, the URL policy at both tiers, toggle names and state, open marks read, the unread view keeping items and focus, mark all and its `aria-disabled`, item actions, the arrival announcement, and a `javascript:` link and markup title rendered as text.
+- `pnpm vitest run packages/data/tests/inbox.test.ts`: **6 tests**: the `source` of each read change and `onMarkAllRead` routing, and a pending save that marks only its control busy, ignores a second click, keeps focus, settles and announces a rejection (G106); the pure helpers; `allowMarkUnread={false}` hiding the toggle on read items and `onMarkUnread` reporting a mark-unread (G50); the heading count, unread text, `datetime`, the URL policy at both tiers, toggle names and state, open marks read, the unread view keeping items and focus, mark all and its `aria-disabled`, item actions, the arrival announcement, and a `javascript:` link and markup title rendered as text.
 - In the browser (a scratch spec on port 4937): the `data-inbox` example, after a simulated arrival, passes axe in light, dark and forced colors on Chromium, WebKit and the Pixel 7.
 
 ## Limits

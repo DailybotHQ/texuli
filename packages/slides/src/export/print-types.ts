@@ -6,7 +6,7 @@ import type { Deck, DeckSlide } from '@texuli/deck/model';
 import type { Snippet } from 'svelte';
 import type { DeckMediaTrust } from '../stage/media.ts';
 import type { DeckStageMessages } from '../stage/messages.ts';
-import type { DeckRenderers } from '../stage/renderers.ts';
+import type { DeckDefaultRenderersSource, DeckRenderers } from '../stage/renderers.ts';
 import type { DeckThemeLoader } from '../stage/theme.ts';
 import type { DeckPrintNotes, DeckPrintPlan } from './api.ts';
 
@@ -45,4 +45,16 @@ export interface DeckPrintViewProps {
    * is slide 1. Default true; turn off when the host prints its own frame.
    */
   isolate?: boolean;
+}
+
+/**
+ * The props of `DeckPrintViewCore` (`@texuli/slides/export-core`, G105):
+ * `DeckPrintView`'s, plus where the default tables come from. Without
+ * `defaults` the view behaves as `defaultRenderers={false}`: every page is
+ * painted by `renderers` (or the `slide` snippet), and the stage's default
+ * tables are never referenced.
+ */
+export interface DeckPrintViewCoreProps extends DeckPrintViewProps {
+  /** The default renderer tables (the same shape `DeckStageCore` takes). */
+  defaults?: DeckDefaultRenderersSource;
 }

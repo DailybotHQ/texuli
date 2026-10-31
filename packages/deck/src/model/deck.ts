@@ -41,6 +41,7 @@ import {
   slideId,
   stepFields,
 } from './shared.ts';
+import { type DeckDesignSystem, deckDesignSystem } from './style/design-system.ts';
 import { deckStyle } from './style/schema.ts';
 import { deckThemeReference, styleSlug } from './style/theme.ts';
 
@@ -443,6 +444,7 @@ const deckShape = {
   navigation: t.optional(deckNavigation),
   outline: t.optional(deckOutline),
   slides: t.array(deckSlide, { min: 1, max: DECK_MODEL_LIMITS.slides }),
+  designSystem: t.optional(deckDesignSystem),
 };
 
 /** The deck document (model v2). Cross-field rules run in `parseDeck`. */
@@ -458,6 +460,8 @@ export interface Deck {
   navigation?: DeckNavigation;
   outline?: DeckOutline;
   slides: DeckSlide[];
+  /** The design system the deck follows (`{ ref }` or `{ inline }`, ADR-024). */
+  designSystem?: DeckDesignSystem;
 }
 
 /** True when `layout` is a slide kind or a catalog layout id. */

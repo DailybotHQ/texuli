@@ -4,6 +4,13 @@
  * out, every link through `safeHref` and every image through
  * `safeImageSrc` at the tier. Document-only blocks have no Markdown
  * spelling and are written as their nearest text form.
+ *
+ * A document's `designSystem` (ADR-024) travels in a closed front matter
+ * block: `---`, one `designSystem: <value>` line, `---`. The value is the
+ * ref itself (`acme@2.1.0`, `texuli:ocean`) or, for an inline document, the
+ * whole field as one line of JSON (`{"inline":{…}}`), so the round trip is
+ * lossless. Only that exact shape is front matter; any other leading `---`
+ * stays Markdown (a divider).
  */
 import { fromMarkdown, toMarkdown } from '@texuli/core/editor-markdown';
 import type {
@@ -17,11 +24,13 @@ import { createDocument, createIdSource, type DocumentIdSource } from '../model/
 import { DOCUMENT_LIMITS } from '../model/limits.ts';
 import type {
   DocumentBlock,
+  DocumentDesignSystem,
   DocumentInline,
   DocumentMeta,
   ListItem,
   TexuliDocument,
 } from '../model/types.ts';
+import { type SimpleTable, wrappedTable, wrappedText } from '../output/shared.ts';
 import { type DocumentDiagnostic, validateDocument } from '../schema/validate.ts';
 
 export interface MarkdownImportOptions {
@@ -43,6 +52,28 @@ export type MarkdownImport =
       diagnostics: readonly EditorIssue[];
     }
   | { ok: false; issues: DocumentDiagnostic[]; diagnostics: readonly EditorIssue[] };
+
+/** The front matter: `---`, one `designSystem:` line, `---`, then a blank line or the end. */
+const FRONT_MATTER = /^---\r?\ndesignSystem:[ \t]*([^\r\n]*)\r?\n---[ \t]*(?:\r?\n|$)/;
+
+/** Split the design-system front matter off; a value that does not read leaves the source as is. */
+function readFrontMatter(source: string): {
+  body: string;
+  designSystem?: unknown;
+} {
+  const match = FRONT_MATTER.exec(source);
+  const raw = match?.[1]?.trim();
+  if (!match || !raw) return { body: source };
+  let designSystem: unknown = { ref: raw };
+  if (raw.startsWith('{')) {
+    try {
+      designSystem = JSON.parse(raw);
+    } catch {
+      return { body: source };
+    }
+  }
+  return { body: source.slice(match[0].length).replace(/^(?:[ \t]*\r?\n)+/, ''), designSystem };
+}
 
 /** Code points, truncated to `max`. */
 function clip(text: string, max: number): string {
@@ -148,7 +179,9 @@ export function documentFromMarkdown(
 ): MarkdownImport {
   const trust: HrefTrust = options.trust === 'developer' ? 'developer' : 'untrusted';
   const newId = options.newId ?? createIdSource('b');
-  const read = fromMarkdown(source, {
+  const front: { body: unknown; designSystem?: unknown } =
+    typeof source === 'string' ? readFrontMatter(source) : { body: source };
+  const read = fromMarkdown(front.body, {
     trust,
     newId,
     maxSource: options.maxSource,
@@ -163,6 +196,9 @@ export function documentFromMarkdown(
       ? clip(plain(firstHeading.content), DOCUMENT_LIMITS.title)
       : '');
   const created = createDocument({ meta: { ...options.meta, title }, blocks });
+  // validateDocument checks the shape and the ref grammar; the reader compiles it.
+  if (front.designSystem !== undefined)
+    created.designSystem = front.designSystem as DocumentDesignSystem;
   const checked = validateDocument(created, { trust });
   if (!checked.ok) return { ok: false, issues: checked.issues, diagnostics };
   return { ok: true, document: checked.document, diagnostics };
@@ -173,10 +209,53 @@ export interface MarkdownExportOptions {
   title?: boolean;
   /**
    * Embeds and nested-page links have no Markdown form: `title` (default)
-   * writes their title as a paragraph, `drop` leaves them out. Wrapped
-   * `@texuli/blocks` blocks are always left out.
+   * writes their title as a paragraph, `drop` leaves them out.
    */
   embeds?: 'title' | 'drop';
+  /**
+   * Wrapped `@texuli/blocks` blocks: `text` (default) writes a data table as
+   * a GFM table (its caption in emphasis on the line before) and any other
+   * block as the text the DOCX and PDF writers print for it; `drop` leaves
+   * them out. Neither reads back as a wrapped block: the subset has no
+   * table, so a table reads back as a paragraph of its cells.
+   */
+  blocks?: 'text' | 'drop';
+}
+
+const oneLine = (value: string) => value.replace(/\r\n?|[\n\u2028\u2029]/g, ' ');
+
+/** One GFM table cell: one line, Markdown punctuation and `|` escaped, so nothing in it is markup. */
+function tableCell(value: string): string {
+  return oneLine(value)
+    .replace(/[\\`*_[\]~<>!|&]/g, '\\$&')
+    .trim();
+}
+
+function tableRow(cells: readonly string[]): string {
+  return `| ${cells.map(tableCell).join(' | ')} |`;
+}
+
+/** A GFM table (header, delimiter row, body); `wrappedTable` already bounded it. */
+function gfmTable(table: SimpleTable): string {
+  return [
+    tableRow(table.header),
+    `| ${table.header.map(() => '---').join(' | ')} |`,
+    ...table.rows.map(tableRow),
+  ].join('\n');
+}
+
+/** Where the GFM tables go in the codec's output: one placeholder paragraph each. */
+interface TableSlots {
+  /** A word found nowhere in the document, so a placeholder never matches its text. */
+  token: string;
+  tables: string[];
+}
+
+function tableSlots(blocks: readonly DocumentBlock[]): TableSlots {
+  const source = JSON.stringify(blocks);
+  let token = 'txtable';
+  while (source.includes(token)) token += 'x';
+  return { token, tables: [] };
 }
 
 const text = (value: string): EditorInline[] =>
@@ -186,7 +265,8 @@ const text = (value: string): EditorInline[] =>
 function exportBlocks(
   blocks: readonly DocumentBlock[],
   options: MarkdownExportOptions,
-  depth: number
+  depth: number,
+  slots: TableSlots
 ): EditorBlock[] {
   if (depth > DOCUMENT_LIMITS.depth + 2) return [];
   const out: EditorBlock[] = [];
@@ -208,15 +288,15 @@ function exportBlocks(
           ...block,
           items: block.items.map((item) => ({
             ...item,
-            blocks: exportBlocks(item.blocks, options, depth + 1),
+            blocks: exportBlocks(item.blocks, options, depth + 1, slots),
           })),
         });
         break;
       case 'quote':
-        out.push({ ...block, blocks: exportBlocks(block.blocks, options, depth + 1) });
+        out.push({ ...block, blocks: exportBlocks(block.blocks, options, depth + 1, slots) });
         break;
       case 'callout': {
-        const inner = exportBlocks(block.blocks, options, depth + 1);
+        const inner = exportBlocks(block.blocks, options, depth + 1, slots);
         if (block.title)
           inner.unshift({
             id: `${block.id}-title`,
@@ -228,11 +308,11 @@ function exportBlocks(
       }
       case 'toggle':
         out.push({ id: block.id, type: 'paragraph', content: block.summary });
-        out.push(...exportBlocks(block.blocks, options, depth + 1));
+        out.push(...exportBlocks(block.blocks, options, depth + 1, slots));
         break;
       case 'columns':
         for (const column of block.columns)
-          out.push(...exportBlocks(column.blocks, options, depth + 1));
+          out.push(...exportBlocks(column.blocks, options, depth + 1, slots));
         break;
       case 'page-link':
         titled(block.id, block.title);
@@ -240,25 +320,81 @@ function exportBlocks(
       case 'embed':
         titled(block.id, block.title);
         break;
-      case 'block':
+      case 'block': {
+        if (options.blocks === 'drop') break;
+        const table = wrappedTable(block);
+        if (!table) {
+          out.push({ id: block.id, type: 'paragraph', content: text(wrappedText(block)) });
+          break;
+        }
+        if (table.caption)
+          out.push({
+            id: `${block.id}-caption`,
+            type: 'paragraph',
+            content: [{ type: 'text', text: oneLine(table.caption), marks: [{ type: 'em' }] }],
+          });
+        out.push({
+          id: block.id,
+          type: 'paragraph',
+          content: text(`${slots.token}${slots.tables.length}`),
+        });
+        slots.tables.push(gfmTable(table));
         break;
+      }
     }
   }
   return out;
 }
 
 /**
- * Write a document as the closed Markdown subset. A document of core
+ * Put each GFM table where its placeholder paragraph was written, under
+ * the same line prefix (`> ` in a quote, the item's indent in a list): the
+ * first line keeps the prefix, the next ones replace a list marker by
+ * spaces so the table stays inside the item.
+ */
+function placeTables(markdown: string, slots: TableSlots): string {
+  if (slots.tables.length === 0) return markdown;
+  const placeholder = new RegExp(`^(.*?)${slots.token}(\\d+)$`);
+  return markdown
+    .split('\n')
+    .map((line) => {
+      const match = placeholder.exec(line);
+      const table = match ? slots.tables[Number(match[2])] : undefined;
+      if (!match || table === undefined) return line;
+      const first = match[1] ?? '';
+      const next = first.replace(/(?:[-*+]|\d+[.)])(?: \[[ xX]\])? /g, (marker) =>
+        ' '.repeat(marker.length)
+      );
+      return table
+        .split('\n')
+        .map((row, index) => `${index === 0 ? first : next}${row}`)
+        .join('\n');
+    })
+    .join('\n');
+}
+
+/**
+ * Write a document as the closed Markdown subset, plus GFM tables for
+ * wrapped data tables. A document of core
  * blocks (paragraph, heading, code, list, quote, divider, media) reads back
  * as the same blocks; document-only blocks degrade as documented.
  */
 export function documentToMarkdown(
-  doc: Pick<TexuliDocument, 'blocks' | 'meta'>,
+  doc: Pick<TexuliDocument, 'blocks' | 'meta' | 'designSystem'>,
   options: MarkdownExportOptions = {}
 ): string {
-  const blocks = exportBlocks(doc.blocks, options, 0);
+  const slots = tableSlots(doc.blocks);
+  const blocks = exportBlocks(doc.blocks, options, 0, slots);
   if (options.title && doc.meta.title)
     blocks.unshift({ id: 'title', type: 'heading', level: 1, content: text(doc.meta.title) });
   const editorDoc: EditorDocument = { version: 1, blocks };
-  return toMarkdown(editorDoc);
+  const body = placeTables(toMarkdown(editorDoc), slots);
+  const system = doc.designSystem;
+  if (!system) return body;
+  // One line: a ref as itself, an inline document as JSON (its strings hold no line break).
+  const value =
+    typeof system.ref === 'string' && system.inline === undefined
+      ? system.ref
+      : JSON.stringify(system);
+  return `---\ndesignSystem: ${value}\n---\n\n${body}`;
 }

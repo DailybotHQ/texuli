@@ -86,6 +86,17 @@ bytes are exactly the default output (a test pins their SHA-256). The
 brand's own font files are not embedded from the design: pass TrueType
 bytes as `font` for that (planned: a design-driven font embedding).
 
+**A document's own `designSystem`** (`{ ref }` or `{ inline }`, in
+development for `0.10.0`): this L1 engine cannot compile it (that needs
+`@texuli/tokens`, a layer above), so the caller compiles it and passes the
+values. Resolve the reference or take the inline document, compile it with
+`compileDesignSystem` (`@texuli/tokens/design-system/compile`) and pass
+`designValues(compiled, mode)` from `@texuli/tools/print` as `design`.
+When the document names a design system and no `design` is passed, the
+writer uses the default styling (the same bytes as without the field) and
+reports one `design-system-unapplied` diagnostic naming the ref, so the
+omission is never silent.
+
 ## Security
 
 - Every string in the file (text, the title and author, URIs, the language)

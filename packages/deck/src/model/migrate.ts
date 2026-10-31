@@ -473,6 +473,9 @@ export function migrateDeck(input: unknown): DeckMigration {
         : from === 'texuli-grammar'
           ? fromGrammar(source, notes)
           : fromProtoyard(source, notes);
+    // A design system (ADR-024) set on an earlier shape carries over as is;
+    // parseDeck checks it.
+    if (source.designSystem !== undefined) (deck as Bag).designSystem = source.designSystem;
     notes.issues.unshift(
       createDiagnostic('migrated', `Converted from ${LABELS[from]} to model v2.`, [], {
         severity: 'warning',

@@ -2,6 +2,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { createFormPlayerHost, type FormHostRequest } from '../src/host/index.ts';
 import { CONTACT } from './fixtures.ts';
+import RelationPicker from './RelationPicker.svelte';
 
 /**
  * `@texuli/forms/host`: the `formHost` adapter `@texuli/player` paints
@@ -97,5 +98,58 @@ describe('createFormPlayerHost', () => {
     await new Promise((resolve) => setTimeout(resolve, 50));
     expect(invalid.target.childElementCount).toBe(0);
     expect(cancelled.target.childElementCount).toBe(0);
+  });
+
+  it('lets drafts use only the custom kinds it paints, validates them and submits their values (G113)', async () => {
+    const ticket = {
+      title: 'Ticket',
+      fields: [
+        { name: 'subject', type: 'text', label: 'Subject', required: true },
+        { name: 'customer', type: 'custom', kind: 'relation', label: 'Customer', required: true },
+      ],
+    };
+    const bare = createFormPlayerHost();
+    expect(bare.customKinds).toEqual([]);
+    expect(bare.checkForm(ticket, 'untrusted').issues.map((issue) => issue.code)).toEqual(['kind']);
+    // A caller cannot widen the kinds past what the host paints.
+    expect(bare.checkForm(ticket, 'untrusted', [], ['relation']).ok).toBe(false);
+    const validate = vi.fn((value: unknown) =>
+      value === 'gone' ? 'That customer was removed.' : null
+    );
+    const host = createFormPlayerHost({
+      customFields: { relation: { component: RelationPicker, validate } },
+    });
+    expect(host.customKinds).toEqual(['relation']);
+    expect(host.checkForm(ticket, 'untrusted', host.validators, host.customKinds).ok).toBe(true);
+    const { value, target, submit } = request(ticket);
+    const cleanup = host.present(value);
+    await screen.findByRole('form', { name: 'Contact form' });
+    const picker = target.querySelector<HTMLInputElement>('[data-relation-picker="relation"]');
+    expect(picker).not.toBeNull();
+    for (const input of target.querySelectorAll<HTMLInputElement>(
+      'input:not([data-relation-picker])'
+    )) {
+      await fireEvent.input(input, { target: { value: 'Printer jam' } });
+    }
+    await fireEvent.input(picker as HTMLInputElement, { target: { value: 'gone' } });
+    await fireEvent.click(target.querySelector('button[type="submit"]') as HTMLButtonElement);
+    await waitFor(() => expect(validate).toHaveBeenCalled());
+    expect(submit).not.toHaveBeenCalled();
+    await fireEvent.input(picker as HTMLInputElement, { target: { value: 'c-1' } });
+    await fireEvent.click(target.querySelector('button[type="submit"]') as HTMLButtonElement);
+    await waitFor(() =>
+      expect(submit).toHaveBeenCalledWith({ subject: 'Printer jam', customer: 'c-1' })
+    );
+    cleanup?.();
+  });
+
+  it('refuses password and otp fields unless the host allows credentials (G117)', () => {
+    const login = { title: 'Login', fields: [{ name: 'pw', type: 'password', label: 'Password' }] };
+    expect(
+      createFormPlayerHost()
+        .checkForm(login, 'untrusted')
+        .issues.map((i) => i.code)
+    ).toEqual(['credential']);
+    expect(createFormPlayerHost({ credentials: true }).checkForm(login, 'untrusted').ok).toBe(true);
   });
 });

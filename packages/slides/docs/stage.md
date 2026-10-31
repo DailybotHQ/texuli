@@ -55,6 +55,8 @@ scoped styles.
 | `presenterTimer` | `false` | Show the elapsed timer in the presenter pane |
 | `sync` | `null` | A same-origin link to another stage window: the engine presenter protocol, or a v1 `DeckSync` ([presenter screen](#presenter-screen)) |
 | `loadTheme` | `loadDeckLibraryTheme` | Resolves catalog theme ids; `null` leaves them to host CSS |
+| `designSystems` | — | `{ resolve, mode }` for a deck's `designSystem.ref` (in development for `0.10.0`); see [Design systems](#design-systems) |
+| `onDesignSystem` | — | Called with a `PlayerDesignSystemEvent` when a deck's design system applies or is refused |
 | `resolveAvatar` | — | Host adapter for `avatar:` image ids |
 | `controller` | `null` | Read-only binding to the engine `DeckController` for imperative hosts |
 | `chrome` | — | Snippet that replaces the default toolbar and progress bar (the [chrome layers](#chrome) stay) |
@@ -193,6 +195,10 @@ scoped styles.
   exports the same names as `@texuli/slides/stage` except `DeckStage`,
   `DeckPrint`, `DECK_DEFAULT_RENDERERS_SOURCE`, `loadDefaultDeckRenderers`
   and `loadedDefaultDeckRenderers` (a test keeps the two lists in step).
+  To print from such a host, use `DeckPrintViewCore` from
+  `@texuli/slides/export-core` (G105), which takes the same `defaults`
+  source and references no default table either
+  ([export.md](export.md#export-core-texulislidesexport-core-g105)).
 
   ```svelte
   <script lang="ts">
@@ -521,6 +527,64 @@ slide's theme overrides the deck's.
   (`loadTheme={null}`).
 
 A print-specific theme and per-slide compiled CSS are planned.
+
+### Design systems
+
+> **In development for `0.10.0`, not on npm.**
+
+A deck may name the design system it follows with a top-level
+`designSystem` (`{ ref }` or `{ inline }`, the blueprint's shape;
+[deck model](../../deck/docs/model.md#design-systems),
+[ADR-024](../../../docs/DECISIONS.md#adr-024-design-systems-on-every-surface)).
+The stage applies it the way `@texuli/player` applies a blueprint's:
+
+1. **Lazy:** a validated deck with a `designSystem` loads the stage's
+   design-system step with `import()`, which loads
+   `@texuli/player/design-system` (the player's own resolver) and the
+   compiler. A deck without one never loads any of them
+   (`tests/bundle-graph.test.ts` checks the initial graph by module id).
+2. **Resolved by the host:** `designSystems.resolve(ref)` returns a
+   document or a compiled design system (sync or async; a cached JSON copy
+   works). The stage never fetches; `texuli:<theme>` falls back to the theme
+   library. A resolved document must declare the exact `id` and `version`
+   of the ref. An inline document compiles at the stage's tier (`tier`, else
+   `mediaTrust`, else `untrusted`), so agent decks refuse `data:` URLs and
+   remote assets; a host-resolved one compiles at `developer`.
+3. **Applied on the stage root, in place of the deck theme:** the compiled
+   variables for `designSystems.mode` (default: `dark` when the stage mode
+   is dark, else `light`), `data-tx-ds` and the other scope attributes,
+   `data-tx-scope` and `data-tx-mode`. The deck theme (`style.theme`, a
+   slide's `theme`) stops writing its variables while the design system
+   applies, and backgrounds resolve against the design system's palette.
+   Font faces register for host-resolved documents or at the `developer`
+   tier.
+4. **Component defaults:** the compiled `defaults` (a default `variant` or
+   `size`, closed vocabulary) reach every texuli component on the slides
+   (a poll's buttons, a structure block's cards) through the
+   `texuli/defaults` context, merged over an outer provider's; a prop set by
+   a block still wins.
+
+The root carries `data-tx-deck-design-system` (`pending`, `applied` or
+`refused`). When nothing resolves, the resolver throws or returns another
+document, or the compiler refuses the document (`aa-text`, `url-refused`
+…), the deck theme keeps painting, a `role="status"` paragraph shows the
+`stage.designSystemRefused` message, and `onDesignSystem` receives the
+code. It never throws, and the slides still paint. A later deck without a
+design system restores the deck theme and the library defaults
+(`tests/stage-design-system.test.ts`).
+
+```svelte
+<DeckStage
+  {deck}
+  designSystems={{ resolve: (ref) => savedDesignSystems.get(ref) }}
+  onDesignSystem={(event) => console.log(event.status)}
+/>
+```
+
+`DeckPrint` and the print view (`DeckPrintView`) follow the deck theme
+only (a deck design system in print is planned); the PPTX writer takes
+`design` values built from a compiled design system
+([export.md](export.md)).
 
 ### Media
 

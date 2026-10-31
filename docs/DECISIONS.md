@@ -1560,7 +1560,10 @@ reflect this decision.
   - **Hardcode guard:** `scripts/check-token-usage.ts` fails on literal
     colors and literal size or space values in component CSS (an allowlist
     with reasons). It lands only after adoption, so it never blocks a half
-    migration.
+    migration. Since T-ds-conformance (PLAN_011) it also fails on a system
+    color outside a contract fallback or a forced-colors block, and on a
+    `--tx-*` read that nothing defines, the two causes of the literal
+    colors `texuli ds check --render` found.
   - **Renames:** v2 is additive, so 0.9.0 removes nothing. Any later rename
     keeps the old name as an alias for one minor, and
     `@texuli/tokens/renames.json` lists `{ from, to, since, removeIn }` for
@@ -1905,6 +1908,25 @@ reflect this decision.
     llms bundles and the catalog snapshot regenerate.
   - **Website:** the theme studio grows into a client-only Design System
     Studio (no server, no storage; sharing through the URL hash).
+  - **Built on `release/0.10.0` (not on npm; T-ds-blueprint follow-ups):**
+    - The player hands the compiled component defaults to the painted
+      components through the `texuli/defaults` context, below blueprint
+      props.
+    - Its design-system step is the `@texuli/player/design-system` subpath,
+      so the `@texuli/slides` stage applies a deck's design system the
+      same way.
+    - Decks carry a top-level `designSystem` (the blueprint's `{ ref }` or
+      `{ inline }` shape) instead of a new `DeckThemeReference` kind: one
+      field for the whole deck, as for blueprints and documents. While it
+      applies it replaces the deck theme on the stage, and `style.theme`
+      stays the fallback when it is refused. The deck format is
+      `@texuli/deck`'s own, so the spec digest is unchanged. Reverse: add
+      a `{ kind: "design-system", ref }` theme kind, for per-slide
+      design systems.
+    - The document Markdown writer carries `designSystem` in front
+      matter. The DOCX and PDF writers take caller-compiled `design`
+      values and report `design-system-unapplied` without them.
+    - A deck design system in `DeckPrint` and the print view is planned.
 - **Reverse when:** a surface needs design-system data the emitters
   cannot express (then add an emitter for it; writers still never read
   the document), or inline documents make blueprints too large in practice

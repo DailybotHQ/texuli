@@ -14,6 +14,7 @@ project overview.
 | [DECISIONS](DECISIONS.md) | Architecture decisions: options, choice, why, how to reverse |
 | [EDITOR_ARCHITECTURE](EDITOR_ARCHITECTURE.md) | The rich text editor's contracts (ADR-003): model, selection, history, keyboard, paste security, interchange. The model exists as core texels and the editor package implements the surface |
 | [STANDARDS](STANDARDS.md) | TypeScript, Svelte 5, Astro, CSS, Biome, naming, accessibility |
+| [DESIGN_SYSTEMS](DESIGN_SYSTEMS.md) | Design systems (in development for `0.10.0`, not on npm): author by hand or from a one-liner, DTCG, Tokens Studio, a role palette, a theme or a logo; validate with stable codes; compile and apply (runtime, SSR and no flash, provider, Astro, blueprints); patches and variants; versions; distribute as a file or npm package; guarantees; conformance; outputs |
 | [DESIGN_LANGUAGE](DESIGN_LANGUAGE.md) | The cross-surface visual contract: color roles and modes, spacing and density, shape and elevation, motion and reduced motion, focus, typography, direction |
 | [TESTING_GUIDE](TESTING_GUIDE.md) | Every gate, the source→test map, scoped commands, blind spots, posture, and PLAN_006 SEO/AEO/analytics/theme evidence |
 | [DEVELOPMENT_COMMANDS](DEVELOPMENT_COMMANDS.md) | Every root script and package script, verbatim, plus opt-in SEO/AEO audit commands |
@@ -111,6 +112,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-component-pages](../apps/website/docs/site-component-pages.md) | Component pages generator |
 | [site-csp](../apps/website/docs/site-csp.md) | Built-site Content Security Policy |
 | [site-dashboards](../apps/website/docs/site-dashboards.md) | Dashboards page (texuli.com) |
+| [site-design-systems](../apps/website/docs/site-design-systems.md) | Design systems hub at /design-systems/ (texuli.com) |
 | [site-docs-shell](../apps/website/docs/site-docs-shell.md) | Docs shell (texuli.com) |
 | [site-documents](../apps/website/docs/site-documents.md) | texuli.com: documents page |
 | [site-drag](../apps/website/docs/site-drag.md) | Drag page (texuli.com) |
@@ -142,7 +144,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-skill](../apps/website/docs/site-skill.md) | The Texuli skill page |
 | [site-slides-page](../apps/website/docs/site-slides-page.md) | texuli.com: slides area |
 | [site-subsite](../apps/website/docs/site-subsite.md) | texuli.com sub-sites: routes, doors and breadcrumbs |
-| [site-theme-studio](../apps/website/docs/site-theme-studio.md) | Theme studio (texuli.com) |
+| [site-theme-studio](../apps/website/docs/site-theme-studio.md) | Design system studio at /theme-studio/ (texuli.com) |
 | [site-theme-swatches](../apps/website/docs/site-theme-swatches.md) | Theme swatches (own palette) |
 | [site-theme-sweep](../apps/website/docs/site-theme-sweep.md) | Theme sweep tooling |
 | [site-theme-switcher](../apps/website/docs/site-theme-switcher.md) | texuli.com: theme and mode switcher |

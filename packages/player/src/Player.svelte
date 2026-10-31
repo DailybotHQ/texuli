@@ -10,7 +10,7 @@ import { formulaConditions } from '@texuli/catalog/render/conditions';
 import type { RenderCatalog, RenderTier } from '@texuli/catalog/render/renderer';
 import type { ValidateDraftOptions } from '@texuli/catalog/validate';
 import type { SourceLoader, SourceRegistry } from '@texuli/core/data-source';
-import { type Component, type Snippet, tick, untrack } from 'svelte';
+import { type Component, getContext, type Snippet, setContext, tick, untrack } from 'svelte';
 import './player.css';
 import { createActionAccess } from './action-access.ts';
 import type { ActionHandler } from './actions.ts';
@@ -1139,10 +1139,26 @@ let systemReference = $derived.by(() => {
 });
 let systemKey = $derived(systemReference ? JSON.stringify(systemReference) : '');
 let systemStatus = $state<'pending' | 'applied' | 'refused' | undefined>();
+// Component defaults (`compiled.defaults`, ADR-020): the context key texuli's
+// components read (`texuli/defaults`). Validated in the lazy step; merged over
+// an outer provider's, prop by prop, so blueprint props still win.
+type Defaults = Record<string, Record<string, string>>;
+const DEFAULTS_KEY = 'texuli.design-defaults';
+const outerDefaults = getContext<(() => Defaults) | undefined>(DEFAULTS_KEY);
+let systemDefaults = $state.raw<Defaults | undefined>();
+setContext(DEFAULTS_KEY, () => {
+  const outer = outerDefaults?.() ?? {};
+  const own = systemDefaults;
+  if (!own) return outer;
+  const merged: Defaults = { ...outer };
+  for (const key of Object.keys(own)) merged[key] = { ...outer[key], ...own[key] };
+  return merged;
+});
 let disposeSystem: (() => void) | undefined;
 const dropSystem = () => {
   disposeSystem?.();
   disposeSystem = undefined;
+  systemDefaults = undefined;
 };
 $effect(() => {
   const key = systemKey;
@@ -1161,10 +1177,11 @@ $effect(() => {
   import('./design-system.ts')
     .then((step) => step.applyPlayerDesignSystem(element, reference, host, trust))
     .then(
-      ({ event, dispose }) => {
+      ({ event, dispose, defaults }) => {
         if (!live) return dispose?.();
         dropSystem();
         disposeSystem = dispose;
+        systemDefaults = defaults;
         systemStatus = event.status;
         if (event.status === 'refused') announcePolite(resolvedLabels.designSystemRefused);
         untrack(() => onDesignSystem?.(event));
@@ -1372,6 +1389,7 @@ $effect(() => {
       // Forms (spec 0.8.0) likewise: only the host's form validator admits one.
       checkForm: formHost?.checkForm,
       ...(formHost?.validators ? { formValidators: formHost.validators } : {}),
+      ...(formHost?.customKinds ? { formKinds: formHost.customKinds } : {}),
       // Sheets (spec 0.8.0) likewise: only the host's sheet validator admits one.
       checkSheet: sheetHost?.checkSheet,
       // `when` conditions (G07) read the local state, mapped to numbers.
@@ -1437,6 +1455,7 @@ function streamValidateOptions(): ValidateDraftOptions {
     checkCanvas: canvasHost?.checkCanvas,
     checkForm: formHost?.checkForm,
     ...(formHost?.validators ? { formValidators: formHost.validators } : {}),
+    ...(formHost?.customKinds ? { formKinds: formHost.customKinds } : {}),
     checkSheet: sheetHost?.checkSheet,
     conditions: formulaConditions,
     conditionInputs,

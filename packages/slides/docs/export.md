@@ -126,7 +126,8 @@ attribute before it prints.
 importing `@texuli/slides/export` for PPTX or the print plan costs no print
 code.
 
-**Preload (G81).** `preloadDeckPrintView(options?)` warms what the view
+**Preload (G81).** `preloadDeckPrintView(options?)` (on
+`DECK_PRINT_DEFAULTS`, the defaults source the view uses) warms what the view
 imports on first use: its body, the slide painter and, unless
 `{ defaultRenderers: false }` (a `PreloadDeckPrintViewOptions`), the
 default renderer tables. It resolves once they have loaded (and rejects if
@@ -146,6 +147,50 @@ deck opens (or on idle) has the sheet ready by the time the user prints.
 {#if flags.print}
   <DeckPrintView {deck} notes={flags.notes} onReady={(plan) => requestDeckPdf(plan)} />
 {/if}
+```
+
+### Export core (`@texuli/slides/export-core`, G105)
+
+> In development for `0.10.0` (on the `release/0.10.0` branch; not on npm
+> yet).
+
+`@texuli/slides/export-core` is `@texuli/slides/export` without any
+reference to the stage's default renderer tables, the print counterpart of
+`@texuli/slides/stage-core` (G72). Print plans and flags, the PDF seam,
+PPTX and the XML and ZIP writers are the same exports. The print view is
+`DeckPrintViewCore` (props `DeckPrintViewCoreProps`: every `DeckPrintView`
+prop plus `defaults`, a `DeckDefaultRenderersSource`), and its preload is
+`preloadDeckPrintViewCore(options?)` (a `PreloadDeckPrintViewCoreOptions`:
+`defaults` and `defaultRenderers`).
+
+- **Without `defaults`** the view behaves as `defaultRenderers={false}`:
+  every page is painted by `renderers` (or the `slide` snippet), and
+  nothing references the layouts table or the component registry. A host on
+  `DeckStageCore` that prints with `DeckPrintViewCore` emits no chunk, CSS
+  or prefetch of the default tables, not even as a lazy chunk
+  (`tests/bundle-graph.test.ts`, "emits no default-table chunk at all for a
+  stage-core host that prints through the export core"). Before G105,
+  `DeckPrintView` and `preloadDeckPrintView({ defaultRenderers: false })`
+  still referenced `stage/defaults.ts` through a dynamic import, so such a
+  host emitted every default-table chunk and its CSS even though they never
+  loaded.
+- **With `defaults`** (for example the same source a `DeckStageCore` host
+  hands its stage) the view appends those tables after `renderers`, and
+  `preloadDeckPrintViewCore({ defaults })` warms them.
+- `DeckPrintView` is `DeckPrintViewCore` with `defaults` set to
+  `DECK_PRINT_DEFAULTS` (the stage's tables, imported on first use), so
+  `@texuli/slides/export` behaves exactly as before; `preloadDeckPrintView`
+  calls `preloadDeckPrintViewCore` with that source.
+
+```svelte
+<script lang="ts">
+  import { DeckStageCore } from '@texuli/slides/stage-core';
+  import { DeckPrintViewCore } from '@texuli/slides/export-core';
+  const renderers = { validateBlock: checkHostBlock, free: () => HostFreeSlide };
+</script>
+
+<DeckStageCore {deck} {renderers} />
+<DeckPrintViewCore {deck} {renderers} />
 ```
 
 ### DeckPrint (model v1)

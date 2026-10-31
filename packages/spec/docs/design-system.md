@@ -9,8 +9,11 @@
 > ([design-system-io.md](../../tokens/docs/design-system-io.md)), and so is
 > the runtime ([design-system-runtime.md](../../tokens/docs/design-system-runtime.md)).
 > `texuli ds check` is on the same branch
-> ([ds-check.md](../../tools/docs/ds-check.md)); the `ds.*` operations are
-> **planned** (a later PLAN_011 task, ADR-021 to ADR-023).
+> ([ds-check.md](../../tools/docs/ds-check.md)), and so are the `ds.*`
+> operations, `blueprint.theme` and `texuli ds` ([ds.md](../../tools/docs/ds.md)).
+
+The end-to-end guide (author, validate, apply, distribute, outputs) is
+[DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md).
 
 A design system describes a brand once, as one closed JSON document that
 a company or an agent writes, and every Texuli surface follows
@@ -152,12 +155,28 @@ may name the design system it follows:
   inline document as well, for the guarantee codes.
 - **Applied:** `@texuli/player` (`designSystems: { resolve, mode }`) and
   `@texuli/pages`' `PageReader` resolve a `ref` through the host (never a
-  fetch), compile lazily, and apply the result to their root scope. A
-  reference nothing resolves, or a document the compiler refuses, paints
-  with the default theme and a visible notice; neither throws. A deck as a
-  blueprint (a `layout-deck` root) follows the envelope's design system,
-  and so does a document root. The deck model's own `themeRef`
-  (`@texuli/deck`, model v2) does not name a design system yet (planned).
+  fetch), compile lazily, and apply the result to their root scope; the
+  player also hands the compiled component defaults to the painted
+  components (blueprint props still win). A reference nothing resolves, or
+  a document the compiler refuses, paints with the default theme and a
+  visible notice; neither throws. A deck as a blueprint (a `layout-deck`
+  root) follows the envelope's design system, and so does a document root.
+- **Standalone decks:** a `@texuli/deck` model v2 deck names its own with a
+  top-level `designSystem` of the same shape (the deck validator holds the
+  same `ref` grammar, and a test compares it with
+  `$defs.designSystemReference`), and the `@texuli/slides` stage applies it
+  through the player's step (`@texuli/player/design-system`): the host's
+  resolver, no fetch, a notice, never a throw
+  ([deck model](../../deck/docs/model.md#design-systems),
+  [stage](../../slides/docs/stage.md#design-systems)). The deck format is
+  not part of this contract (it is `@texuli/deck`'s own JSON Schema), so
+  the spec digest does not change.
+- **Writers:** the document Markdown writer carries `designSystem` in front
+  matter, losslessly; the DOCX and PDF writers take compiled `design`
+  values from the caller (the L1 engine cannot import the compiler) and
+  report `design-system-unapplied` when the document names one and none
+  are given ([document Markdown](../../document/docs/markdown.md#design-system-front-matter),
+  [PDF](../../document/docs/pdf.md#design-systems)).
 
 ## Size
 

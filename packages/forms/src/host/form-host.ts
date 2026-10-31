@@ -8,11 +8,11 @@
  * structurally, because this package (L4) cannot import the player (L7);
  * the player keeps the form engine out of its eager chunk this way.
  */
-import { mount, unmount } from 'svelte';
+import { type Component, mount, unmount } from 'svelte';
 import type { FormValidator } from '../model/controller.ts';
-import { checkFormDraft, validateFormSchema } from '../model/schema.ts';
+import { validateFormSchema } from '../model/schema.ts';
 import type { FormSchemaIssue } from '../model/types.ts';
-import type { SchemaFormLabels } from '../view/labels.ts';
+import type { SchemaFormCustomField, SchemaFormLabels } from '../view/labels.ts';
 
 /** The tiers the player validates at. */
 export type FormHostTier = 'developer' | 'untrusted';
@@ -21,7 +21,8 @@ export type FormHostTier = 'developer' | 'untrusted';
 export type FormDraftCheck = (
   schema: unknown,
   tier: FormHostTier,
-  validators?: readonly string[]
+  validators?: readonly string[],
+  kinds?: readonly string[]
 ) => { ok: boolean; issues: readonly FormSchemaIssue[] };
 
 /** What a submit resolves to: accepted, or refused with a message the form shows. */
@@ -47,6 +48,8 @@ export interface FormHost {
   checkForm: FormDraftCheck;
   /** The names of {@link FormHostOptions.validators}: the only ones drafts may name. */
   validators: readonly string[];
+  /** The kinds of {@link FormHostOptions.customFields}: the only custom kinds drafts may use. */
+  customKinds: readonly string[];
   present(request: FormHostRequest): undefined | (() => void);
 }
 
@@ -55,6 +58,26 @@ export interface FormHostOptions {
   validators?: Readonly<Record<string, FormValidator>>;
   /** Label overrides for every painted form (the player's confirmation wins for `submitted`). */
   labels?: Partial<SchemaFormLabels>;
+  /**
+   * Custom field painters by kind (G113): a component that receives the
+   * field context as `field`, and its validator. A draft may declare a
+   * `custom` field only with one of these kinds (refused with `kind`
+   * otherwise).
+   */
+  customFields?: Readonly<
+    Record<
+      string,
+      {
+        readonly component: Component<{ field: SchemaFormCustomField }>;
+        readonly validate?: FormValidator;
+      }
+    >
+  >;
+  /**
+   * Allow `password` and `otp` fields in drafts (G117). Off by default:
+   * agent output asking for a credential is refused (`credential`).
+   */
+  credentials?: boolean;
 }
 
 /**
@@ -68,13 +91,33 @@ export interface FormHostOptions {
 export function createFormPlayerHost(options: FormHostOptions = {}): FormHost {
   const validators = options.validators ?? {};
   const names = Object.keys(validators);
+  const customFields = options.customFields ?? {};
+  const kinds = Object.keys(customFields);
+  const credentials = options.credentials === true;
+  const check = (
+    schema: unknown,
+    tier: FormHostTier,
+    given?: readonly string[],
+    kindsGiven?: readonly string[]
+  ) =>
+    validateFormSchema(schema, {
+      tier,
+      validators: given ?? names,
+      // Only kinds this host paints, whatever the caller passes.
+      kinds: (kindsGiven ?? kinds).filter((kind) => kinds.includes(kind)),
+      credentials,
+    });
   return {
-    checkForm: checkFormDraft,
+    checkForm: (schema, tier, given, kindsGiven) => {
+      const result = check(schema, tier, given, kindsGiven);
+      return { ok: result.ok, issues: result.issues };
+    },
     validators: names,
+    customKinds: kinds,
     present(request) {
       const target = request.target;
       if (!target) return undefined;
-      const checked = validateFormSchema(request.schema, { tier: request.tier, validators: names });
+      const checked = check(request.schema, request.tier);
       if (!checked.ok) return undefined;
       let cancelled = false;
       let instance: Record<string, unknown> | null = null;
@@ -85,6 +128,7 @@ export function createFormPlayerHost(options: FormHostOptions = {}): FormHost {
           props: {
             form: checked.form,
             validators,
+            customFields,
             labels: { ...options.labels, submitted: request.labels.submitted },
             ...(request.formLabel ? { 'aria-label': request.formLabel } : {}),
             onSubmit: async ({ values }) => {

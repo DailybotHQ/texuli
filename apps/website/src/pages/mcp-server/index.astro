@@ -268,11 +268,12 @@ const released = RELEASE.state === 'released';
       unsupported one.
     </li>
     <li>
-      Renamed tools still answer under their old names until <code>{MCP.deprecatedTools[0]?.removeIn}</code>:
+      The 0.8 tool names were removed in <code>{MCP.removedTools[0]?.removedIn}</code>; a call to one is
+      refused with a message that names the tool to call instead:
     </li>
   </ul>
-  <div class="table-wrap" role="region" aria-label="Deprecated tool names" tabindex="0">
-    <table data-mcp-deprecated>
+  <div class="table-wrap" role="region" aria-label="Removed tool names" tabindex="0">
+    <table data-mcp-removed>
       <thead>
         <tr>
           <th scope="col">Old name</th>
@@ -282,7 +283,7 @@ const released = RELEASE.state === 'released';
       </thead>
       <tbody>
         {
-          MCP.deprecatedTools.map((tool) => (
+          MCP.removedTools.map((tool) => (
             <tr>
               <th scope="row">
                 <code>{tool.name}</code>
@@ -295,7 +296,7 @@ const released = RELEASE.state === 'released';
                 ))}
               </td>
               <td>
-                <code>{tool.removeIn}</code>
+                <code>{tool.removedIn}</code>
               </td>
             </tr>
           ))

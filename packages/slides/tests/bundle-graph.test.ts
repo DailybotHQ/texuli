@@ -40,6 +40,15 @@ const HOST_REPLACED = [
   '/slides/src/stage/loaders.ts',
 ];
 
+/** Module id fragments only a deck with a `designSystem` loads (ADR-024): never in the initial graph. */
+const DESIGN_SYSTEM_ONLY = [
+  '/slides/src/stage/design-system.ts',
+  '/player/src/design-system.ts',
+  '/tokens/src/design-system/apply.ts',
+  '/tokens/src/design-system/compile',
+  '/texuli/src/defaults/',
+];
+
 interface Chunk {
   fileName: string;
   code: string;
@@ -135,6 +144,13 @@ let { deck }: { deck: unknown } = $props();
     const initial = staticModules(chunks, entries);
     expect(initial.some((id) => id.endsWith('/slides/src/stage/DeckStage.svelte'))).toBe(true);
     expect(defaultsIn(initial)).toEqual([]);
+    // A deck without a design system costs nothing: the step is a lazy chunk.
+    expect(DESIGN_SYSTEM_ONLY.filter((part) => initial.some((id) => id.includes(part)))).toEqual(
+      []
+    );
+    const step = chunkWith(chunks, '/slides/src/stage/design-system.ts');
+    expect(step, 'the design-system step chunk').toBeTruthy();
+    expect(entries).not.toContain(step?.fileName);
     // The defaults are still there for hosts that keep them on, as a lazy chunk.
     const lazy = chunkWith(chunks, '/slides/src/stage/default-renderers.ts');
     expect(lazy, 'the default tables chunk').toBeTruthy();
@@ -170,6 +186,56 @@ const renderers = { validateBlock: () => undefined, free: () => HostFree };
     console.info(
       `[bundle-graph] stage-core host: initial JS ${gzip} B gzip, every chunk ${all} B gzip in ${chunks.size} chunks`
     );
+  }, 180_000);
+
+  it('emits no default-table chunk at all for a stage-core host that prints through the export core (G105)', async () => {
+    const chunks = await buildHost(
+      `<script lang="ts">
+import { DeckStageCore } from ${JSON.stringify(`${SRC}/stage/core.ts`)};
+import HostFree from './HostFree.svelte';
+let { deck }: { deck: unknown } = $props();
+const renderers = { validateBlock: () => undefined, free: () => HostFree };
+void import(${JSON.stringify(`${SRC}/export/core.ts`)}).then((m) => m.preloadDeckPrintViewCore());
+</script>
+<DeckStageCore {deck} {renderers} loadTheme={null} />
+`,
+      { 'HostFree.svelte': '<p>host</p>\n' }
+    );
+    const every = [...chunks.values()].flatMap((chunk) => chunk.modules);
+    // The print core and its lazy body and painter are in the build...
+    for (const suffix of [
+      '/slides/src/export/core.ts',
+      '/export/DeckPrintPages.svelte',
+      '/export/print-paint.ts',
+    ])
+      expect(chunkWith(chunks, suffix), suffix).toBeTruthy();
+    // ...and nothing references the default tables: no chunk, initial or lazy.
+    expect(defaultsIn(every)).toEqual([]);
+    expect(every.filter((id) => id.endsWith('/slides/src/stage/defaults.ts'))).toEqual([]);
+    expect(every.filter((id) => id.endsWith('/slides/src/export/print-preload.ts'))).toEqual([]);
+    expect(chunkWith(chunks, '/slides/src/stage/default-renderers.ts')).toBeUndefined();
+    const all = [...chunks.values()].reduce(
+      (sum, chunk) => sum + gzipSync(chunk.code, { level: 9 }).length,
+      0
+    );
+    // Reported, not asserted (the size budgets own the numbers).
+    console.info(
+      `[bundle-graph] stage-core + export-core host: every chunk ${all} B gzip in ${chunks.size} chunks`
+    );
+  }, 180_000);
+
+  it('keeps @texuli/slides/export printing with the default tables, as a lazy chunk (G105)', async () => {
+    const chunks = await buildHost(`<script lang="ts">
+import { DeckPrintView } from ${JSON.stringify(`${SRC}/export/index.ts`)};
+let { deck }: { deck: never } = $props();
+</script>
+<DeckPrintView {deck} />
+`);
+    const entries = [...chunks.values()].filter((chunk) => chunk.isEntry).map((c) => c.fileName);
+    expect(defaultsIn(staticModules(chunks, entries))).toEqual([]);
+    const lazy = chunkWith(chunks, '/slides/src/stage/default-renderers.ts');
+    expect(lazy, 'the default tables chunk').toBeTruthy();
+    expect(entries).not.toContain(lazy?.fileName);
   }, 180_000);
 
   it('a host handing the stage core a prepared deck (G83) has no migration or block schema in its initial graph', async () => {

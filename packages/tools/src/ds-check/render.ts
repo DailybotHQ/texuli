@@ -36,63 +36,51 @@ import {
 /** The fixture-app page the repository serves the catalog sheet from. */
 export const DS_CHECK_SHEET_PATH = 'ds-conformance.html';
 
-const UNSTYLED_CONTROL =
-  'A native control the player leaves unstyled, so it paints the user agent colors (ButtonFace, Field, ButtonText) whatever the theme. Styling it from the contract moves the pixels of the player visual baselines and waits for an owner visual review (T-ds-conformance report).';
+/**
+ * Library findings that are known and tracked: each one paints the same
+ * color under every design system, with its reason. Empty: T-ds-conformance
+ * fixed every finding its first run reported (player cards and controls,
+ * the blocks link preview and structure block, the dashboard widget) at its
+ * root, and `scripts/check-token-usage.ts` now refuses the causes (system
+ * colors outside forced-colors, `--tx-*` names nothing defines). Known
+ * findings are reported as `known` and do not fail a run unless `strict` is
+ * set; adopters pass their own with the `known` option (`--known <file>`).
+ * The conformance spec fails when an entry here is no longer found, so the
+ * list cannot rot.
+ */
+export const DS_CHECK_KNOWN_FINDINGS: readonly DsKnownFinding[] = Object.freeze([]);
 
 /**
- * Library findings that are known and tracked (T-ds-conformance): each one
- * paints the same color under every design system, with its reason. They are
- * reported as `known` and do not fail a run unless `strict` is set; the
- * conformance spec fails when one is no longer found, so the list cannot rot.
+ * Validate a known-findings list (what `--known <file>` reads): an array of
+ * `{ component, element, property, reason }` strings, at most 500 entries.
+ * Throws a `TypeError` naming the first bad entry.
  */
-export const DS_CHECK_KNOWN_FINDINGS: readonly DsKnownFinding[] = Object.freeze([
-  {
-    component: '*',
-    element: 'section.tx-player-layout',
-    property: 'background-color',
-    reason:
-      'The player layout card, slide and tile read --tx-card, which is not a contract variable, so they paint the user agent Canvas color (packages/player/src/player.css). The contract role is --tx-surface; the rename moves the dark visual baselines of the player examples and waits for an owner visual review.',
-  },
-  {
-    component: 'blocks-embed',
-    element: '',
-    property: '',
-    reason:
-      'The link preview reads --tx-color-border, --tx-color-surface, --tx-color-text and --tx-color-link, which no theme declares, so it paints its fallbacks (#9ca3af, Canvas, CanvasText, LinkText). Deferred by T-adopt-domain to a visual review (scripts/check-token-usage.ts allowlist, packages/blocks/src/embed/).',
-  },
-  {
-    component: 'blocks-structure',
-    element: 'a',
-    property: '',
-    reason:
-      'The structure block reads --tx-color-border, --tx-color-surface and --tx-color-foreground, which no theme declares, so it paints Canvas and CanvasText (packages/blocks/src/structure/structure.css). The rename to --tx-border, --tx-surface and --tx-foreground moves visual baselines and waits for an owner visual review.',
-  },
-  {
-    component: 'data-dashboard-widget',
-    element: '',
-    property: '',
-    reason:
-      'The dashboard widget reads --tx-card and --tx-card-foreground, which are not contract variables, so it paints Canvas and CanvasText (packages/data/src/dashboard/Dashboard.svelte). The rename to --tx-surface and --tx-surface-foreground moves the dashboard visual baselines and waits for an owner visual review.',
-  },
-  { component: 'control-toggle', element: 'span', property: 'color', reason: UNSTYLED_CONTROL },
-  {
-    component: 'control-filter',
-    element: 'input',
-    property: 'background',
-    reason: UNSTYLED_CONTROL,
-  },
-  {
-    component: 'control-slider',
-    element: 'input',
-    property: 'background',
-    reason: UNSTYLED_CONTROL,
-  },
-  { component: 'form-field', element: 'input', property: '', reason: UNSTYLED_CONTROL },
-  { component: 'schema-form', element: 'input', property: '', reason: UNSTYLED_CONTROL },
-  { component: 'form-submit', element: 'button', property: '', reason: UNSTYLED_CONTROL },
-  { component: 'flow-action', element: 'button', property: '', reason: UNSTYLED_CONTROL },
-  { component: 'sortable-list', element: 'button', property: '', reason: UNSTYLED_CONTROL },
-]);
+export function parseKnownFindings(value: unknown): DsKnownFinding[] {
+  if (!Array.isArray(value)) throw new TypeError('Known findings are a JSON array.');
+  if (value.length > 500) throw new RangeError('Known findings hold at most 500 entries.');
+  return value.map((entry: unknown, index) => {
+    const record = entry as Record<string, unknown> | null;
+    const keys = ['component', 'element', 'property', 'reason'] as const;
+    if (
+      typeof record !== 'object' ||
+      record === null ||
+      Array.isArray(record) ||
+      Object.keys(record).some((key) => !(keys as readonly string[]).includes(key)) ||
+      keys.some((key) => typeof record[key] !== 'string') ||
+      (record.component as string).length === 0 ||
+      (record.reason as string).trim().length === 0
+    )
+      throw new TypeError(
+        `Known finding ${index} needs exactly component, element, property and reason (strings; component and reason not empty).`
+      );
+    return {
+      component: record.component as string,
+      element: record.element as string,
+      property: record.property as string,
+      reason: record.reason as string,
+    };
+  });
+}
 
 /** The known finding a literal matches, if any. */
 export function knownFinding(

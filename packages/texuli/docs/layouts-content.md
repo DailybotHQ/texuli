@@ -11,7 +11,7 @@ contents that tracks the heading in view.
 
 | Subpath | Export |
 | --- | --- |
-| `texuli/layouts/content` | `ContentLayout` (direct use) and the TOC helpers `buildToc`, `headingSlug`, `resolveTocLevels`, `normalizeTocEntries`, `tocSelector`, `DEFAULT_TOC_LEVELS`, with the `TocEntry`, `TocItem`, `TocHeading`, `TocLevel` and `BuildTocOptions` types |
+| `texuli/layouts/content` | `ContentLayout` (direct use) and the TOC helpers `buildToc`, `headingSlug`, `resolveTocLevels`, `normalizeTocEntries`, `tocSelector`, `DEFAULT_TOC_LEVELS`, with the `TocEntry`, `TocItem`, `TocHeading`, `TocLevel` and `BuildTocOptions` types; the standalone active-heading tracker `trackActiveHeading` and `DEFAULT_READING_LINE`, with the `ActiveHeadingEntry` and `TrackActiveHeadingOptions` types |
 | `texuli/layouts/content/docs` | `loadDocsLayout`; registers `docs` with LayoutHost |
 | `texuli/layouts/content/blog` | `loadBlogLayout`; registers `blog` with LayoutHost |
 | `texuli/layouts/content/editorial` | `loadEditorialLayout`; registers `editorial` with LayoutHost |
@@ -76,6 +76,33 @@ height, or the first one when the reader is above them all. Its link gets
 fires. Nothing runs on the server: the markup marks `activeId`, else the
 first entry, and without `IntersectionObserver` the current entry only
 changes through `activeId`.
+
+**Tracking without the chrome (G102, new in 0.10.0).** The same tracker is
+exported on its own for hosts that render their own article and table of
+contents:
+
+```ts
+import { trackActiveHeading } from 'texuli/layouts/content';
+
+const dispose = trackActiveHeading(article, toc, {
+  readingLine: 0.3, // share of the viewport from its top (default 0.3, clamped to 0–1)
+  onChange: (id, element) => (currentId = id),
+});
+// later, when the article unmounts:
+dispose();
+```
+
+`entries` are ids or objects with an `id` (a `TocItem` list works as is);
+each resolves to the element with that id inside the container, else in its
+document, and missing ones are skipped. `onChange` never fires twice in a row
+for the same id; pass `activeId` (a string, or a getter when the host changes
+it too) to compare against the id the host shows instead. The tracker is
+framework-free and SSR-safe: without a window or an `IntersectionObserver` it
+returns a no-op dispose, and it reads positions only when the observer
+reports. It never scrolls or animates, so there is nothing to reduce under
+`prefers-reduced-motion`. The dispose is idempotent and disconnects the
+observer; a disposed tracker never reports again. ContentLayout itself now
+runs on it, recreating it whenever its list of headings changes.
 
 Compatibility: the scanned behavior with no new props is unchanged, except
 that a heading's own `tabindex` is no longer overwritten. `TocItem.level` and

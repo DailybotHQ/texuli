@@ -174,9 +174,63 @@ Rules: decks are data; never add HTML, scripts or remote iframes, and keep data 
   },
 };
 
-/** The prompts every Texuli MCP door offers. `create-design-system` comes with design systems (planned). */
+export const createDesignSystemPrompt: McpPrompt = {
+  name: 'create-design-system',
+  title: 'Create a design system from a brief',
+  description:
+    'Turn a brand brief (colors, fonts, mood, an existing token file or a library theme) into a validated Texuli design-system document: start from an importer or a suggestion, write the sections, validate with ds.validate and fix every code until it passes, then report contrast and a preview. Returns the step-by-step loop with the brief filled in.',
+  arguments: [
+    {
+      name: 'brief',
+      description:
+        'The brand in plain words: name, colors, fonts, shape, density, mood, audience, e.g. "Harborline: teal #0e7490, Inter, rounded, calm".',
+      required: true,
+    },
+    {
+      name: 'base',
+      description: 'A library theme id to extend, e.g. ocean (complete it, or omit).',
+      maxLength: 64,
+      complete: themeIds,
+    },
+    {
+      name: 'contrast',
+      description: 'The contrast target: AA (4.5:1 text, the default) or AAA (7:1 text).',
+      enum: ['AA', 'AAA'],
+    },
+  ],
+  render(args) {
+    const contrast = args.contrast ?? 'AA';
+    const base = args.base
+      ? `Extend the library theme "${args.base}": set "extends": "texuli:${args.base}" and override only what the brief changes (texuli://design-system/${args.base} is that base as a document).`
+      : 'If a library theme is close to the brief (`theme.search`, then `theme.preview`), extend it with "extends": "texuli:<id>"; otherwise start from the brand colors alone.';
+    return {
+      description: `Create a design system for: ${args.brief}`,
+      messages: [
+        user(`Create a Texuli design-system document for this brand:
+
+${args.brief}
+
+Contrast target: ${contrast}.
+
+Follow this loop and show your work at each step.
+
+1. Learn the shape. Read texuli://design-system/acme (every section, fictional) and texuli://design-system/minimal (the smallest valid document). Every object is closed; lengths are numbers in px; colors are #hex or numeric oklch(); nothing is raw CSS.
+2. Start. If the brand already has a token file, call \`ds.import\` with from "dtcg", "tokens-studio", "role-palette" or "theme". If you have colors or a logo, call \`ds.suggest\` with seed, colors (seed, secondary, accent) or pixels. Otherwise call \`ds.import\` with from "brand" and a one-liner built from the brief ("name …, brand #…, font …, rounded, compact, calm"). Read every warning: each names a value that was dropped.
+3. Write. ${base} Set the identity (format "texuli/design-system", formatVersion 1, a lowercase id, a semver version, a name), accessibility.contrast "${contrast}", then only the sections the brief asks for: typography families and scale, shape.radius, space.density, elevation, surface, motion.personality, components defaults. Pin a role (color.roles.light.primary …) only when the brand requires that exact color.
+4. Validate. Call \`ds.validate\` with { "document": <your document> } and fix every error by its code and path until valid is true: unknown-key (remove the key; the hint lists the allowed ones), invalid-type and invalid-value (fix the value at the path), required (add the identity field or color.brand.seed), extends-range (an exact id@x.y.z or texuli:<theme>), url-refused (a same-origin relative path, never a remote URL or a data: URL), aa-text and aa-focus (the pairs and the hint name the pinned colors that fail: unpin one or pick a darker or lighter pin), target-size (a component size at or above accessibility.targetMin). Never deliver a document that has not passed.
+5. Check. Call \`ds.contrast\` and report the failing count per mode (it must be 0) and the solver adjustments. Call \`ds.preview\` (format "svg") for a snapshot to show.
+6. Deliver the document as JSON, the codes you fixed, and how the host uses it: \`ds.compile\` with format "css" or "tailwind" for a stylesheet, \`blueprint.theme\` to put it on a blueprint, \`ds.save\` (local server only) or \`texuli ds init\` and \`texuli ds validate\` in a project.
+
+Rules: data only (no CSS strings, scripts or remote URLs), fictional names and example.com, no network, and never claim a document passes without a \`ds.validate\` result that says so.`),
+      ],
+    };
+  },
+};
+
+/** The prompts every Texuli MCP door offers. */
 export const TEXULI_PROMPTS: readonly McpPrompt[] = Object.freeze([
   buildUiPrompt,
   themeBlueprintPrompt,
+  createDesignSystemPrompt,
   convertDeckPrompt,
 ]);

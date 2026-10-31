@@ -326,6 +326,8 @@ Rules: `packages/spec/docs/design-system.md`.
   `check: "design-system"` with design-system codes (`extends-range`,
   `url-refused`, `unknown-key`, `invalid-value`…) and `$.designSystem…`
   paths. Fix the field, never the validator.
+- **Tools:** `blueprint.theme` sets it and validates (an inline document
+  is compiled for `aa-text`); author it with `ds.import` and `ds.validate`.
 - **Paint it.** `<Player designSystems={{ resolve }}>` (and `PageReader`)
   resolves through the host, compiles lazily and applies it to the root;
   a refused design system paints with the default theme and a notice.

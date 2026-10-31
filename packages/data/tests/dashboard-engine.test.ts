@@ -210,6 +210,157 @@ describe('moveItem and nudgeItem', () => {
     const free = nudgeItem(base, 'b', { dx: 0, dy: 1 }, { columns: 12, compaction: 'none' });
     expect(free.ok && free.item).toMatchObject({ y: 1 });
   });
+
+  // G122: a nudge grows past a wider (or taller) blocker instead of stopping at it.
+  const report: DashboardItem[] = [
+    { id: 'revenue', x: 0, y: 0, w: 8, h: 3 },
+    { id: 'signups', x: 8, y: 0, w: 4, h: 3 },
+    { id: 'funnel', x: 0, y: 3, w: 12, h: 4 },
+  ];
+  const vertical = { columns: 12, compaction: 'vertical' } as const;
+
+  it('moves a widget down past a wider one below it, to the cell moveItem accepts (G122)', () => {
+    const down = nudgeItem(report, 'revenue', { dx: 0, dy: 1 }, vertical);
+    const moved = moveItem(report, 'revenue', { x: 0, y: 7 }, vertical);
+    expect(down.ok && down.item).toMatchObject({ x: 0, y: 7 });
+    expect(down.ok && moved.ok && place(down.layout)).toEqual(moved.ok && place(moved.layout));
+    if (down.ok) assertValid(down.layout, 12);
+    // Below everything now: the next step down is the real edge.
+    expect(down.ok && nudgeItem(down.layout, 'revenue', { dx: 0, dy: 1 }, vertical)).toEqual({
+      ok: false,
+      reason: 'edge',
+    });
+  });
+
+  it('moves a widget up past a wider one above it, and sideways past a taller one (G122)', () => {
+    const below = [
+      { id: 'funnel', x: 0, y: 0, w: 12, h: 4 },
+      { id: 'revenue', x: 0, y: 4, w: 8, h: 3 },
+      { id: 'signups', x: 8, y: 4, w: 4, h: 3 },
+    ];
+    const up = nudgeItem(below, 'revenue', { dx: 0, dy: -1 }, vertical);
+    expect(up.ok && up.item).toMatchObject({ x: 0, y: 0 });
+    expect(up.ok && at(up.layout, 'funnel')?.y).toBeGreaterThanOrEqual(3);
+    const side = [
+      { id: 'kpi', x: 0, y: 0, w: 4, h: 2 },
+      { id: 'tall', x: 4, y: 0, w: 4, h: 8 },
+    ];
+    let layout: DashboardLayout = side;
+    for (let x = 1; x <= 8; x += 1) {
+      const right = nudgeItem(layout, 'kpi', { dx: 1, dy: 0 }, vertical);
+      expect(right.ok && right.item.x).toBe(x);
+      if (!right.ok) return;
+      assertValid(right.layout, 12);
+      layout = right.layout;
+    }
+    expect(nudgeItem(layout, 'kpi', { dx: 1, dy: 0 }, vertical)).toEqual({
+      ok: false,
+      reason: 'edge',
+    });
+    for (let x = 7; x >= 0; x -= 1) {
+      const left = nudgeItem(layout, 'kpi', { dx: -1, dy: 0 }, vertical);
+      expect(left.ok && left.item.x).toBe(x);
+      if (!left.ok) return;
+      layout = left.layout;
+    }
+  });
+
+  it('swaps the widget below above it when a narrower one above holds its row (G122)', () => {
+    const held = [
+      { id: 'post', x: 4, y: 0, w: 1, h: 3 },
+      { id: 'wide', x: 3, y: 3, w: 9, h: 2 },
+      { id: 'note', x: 6, y: 5, w: 6, h: 2 },
+    ];
+    const down = nudgeItem(held, 'wide', { dx: 0, dy: 1 }, vertical);
+    expect(down.ok && place(down.layout)).toEqual({
+      post: [4, 0, 1, 3],
+      note: [6, 0, 6, 2],
+      wide: [3, 3, 9, 2],
+    });
+    expect(down.ok && nudgeItem(down.layout, 'wide', { dx: 0, dy: 1 }, vertical)).toEqual({
+      ok: false,
+      reason: 'edge',
+    });
+  });
+
+  it('hops over a locked widget in the way instead of refusing (G122)', () => {
+    const pinned = [
+      { id: 'kpi', x: 0, y: 0, w: 4, h: 2 },
+      { id: 'pin', x: 4, y: 0, w: 4, h: 2, locked: true },
+    ];
+    const right = nudgeItem(pinned, 'kpi', { dx: 1, dy: 0 }, vertical);
+    expect(right.ok && right.item).toMatchObject({ x: 8, y: 0 });
+  });
+
+  it('every nudge on a random layout moves the widget that way or stops at a real edge (G122)', () => {
+    let seed = 122;
+    const random = (n: number) => {
+      seed = (seed * 1103515245 + 12345) % 2147483648;
+      return seed % n;
+    };
+    const steps = [
+      { dx: 1, dy: 0 },
+      { dx: -1, dy: 0 },
+      { dx: 0, dy: 1 },
+      { dx: 0, dy: -1 },
+    ];
+    for (let round = 0; round < 60; round += 1) {
+      const compaction = round % 3 === 0 ? 'none' : 'vertical';
+      const options = { columns: 12, compaction } as const;
+      const input = Array.from({ length: 2 + random(7) }, (_, i) => ({
+        id: `w${i}`,
+        x: random(12),
+        y: random(10),
+        w: 1 + random(12),
+        h: 1 + random(5),
+      }));
+      const { layout } = normalizeLayout(input, options);
+      for (const item of layout) {
+        for (const step of steps) {
+          const result = nudgeItem(layout, item.id, step, options);
+          if (result.ok) {
+            assertValid(result.layout, 12);
+            if (step.dx === 0) expect(result.item.x, `${item.id} x`).toBe(item.x);
+            if (step.dx) expect(Math.sign(result.item.x - item.x)).toBe(step.dx);
+            // Vertically it moves that way, or holds its row while the widget it passes swaps.
+            const movedY = Math.sign(result.item.y - item.y);
+            if (step.dy && movedY !== step.dy) {
+              expect(movedY, `${item.id} y`).toBe(0);
+              expect(place(result.layout)).not.toEqual(place(layout));
+            }
+            expect(result.item.w).toBe(item.w);
+            continue;
+          }
+          expect(result.reason).toBe('edge');
+          if (step.dx < 0) expect(item.x).toBe(0);
+          if (step.dx > 0) expect(item.x + item.w).toBe(12);
+          if (step.dy < 0 && compaction === 'none') expect(item.y).toBe(0);
+          // Up with vertical compaction: nothing above it in its columns to pass.
+          if (step.dy < 0 && compaction === 'vertical') {
+            const above = layout.some(
+              (other) =>
+                other.id !== item.id &&
+                other.y < item.y &&
+                other.x < item.x + item.w &&
+                item.x < other.x + other.w
+            );
+            expect(above, `${item.id} up`).toBe(false);
+          }
+          // Down: nothing in its columns below it, so compaction would pull it back.
+          if (step.dy > 0) {
+            const below = layout.some(
+              (other) =>
+                other.id !== item.id &&
+                other.y + other.h > item.y + item.h &&
+                other.x < item.x + item.w &&
+                item.x < other.x + other.w
+            );
+            expect(below || compaction === 'none', `${item.id} down`).toBe(false);
+          }
+        }
+      }
+    }
+  });
 });
 
 describe('resizeItem', () => {

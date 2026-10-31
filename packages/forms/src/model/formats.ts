@@ -1,6 +1,6 @@
 import { isoDateToDays } from '@texuli/core/expression';
 import { safeHref } from '@texuli/core/url-policy';
-import type { FormFormat } from './types.ts';
+import type { FormFormat, FormUrlProtocol } from './types.ts';
 
 /*
  * The named formats. Each check is owned code: either a hand-written scan or
@@ -60,15 +60,30 @@ function isEmail(value: string): boolean {
   return tld.length >= 2 && !/\d/.test(tld);
 }
 
-/** An `https:` URL with a host that the untrusted URL policy accepts. */
-function isUrl(value: string): boolean {
-  const safe = safeHref(value, 'untrusted');
+/**
+ * A web URL with one of the allowed schemes (default `https:` only) and a
+ * host that the untrusted URL policy accepts. An `http:` URL is checked as
+ * its `https:` twin, so it gets the same guarantees (the authority form, a
+ * real host, no credentials, no invisible characters); any other scheme
+ * (`javascript:`, `data:`, `ftp:`) never passes.
+ */
+function isUrl(value: string, protocols: readonly FormUrlProtocol[]): boolean {
+  const scheme = /^(https?):/i.exec(value)?.[1]?.toLowerCase() as FormUrlProtocol | undefined;
+  if (!scheme || !protocols.includes(scheme)) return false;
+  const twin = scheme === 'http' ? `https${value.slice(4)}` : value;
+  const safe = safeHref(twin, 'untrusted');
   if (safe === undefined || !/^https:\/\/[^/?#\s]+/i.test(safe)) return false;
   try {
     return new URL(safe).hostname.length > 0;
   } catch {
     return false;
   }
+}
+
+/** Options for {@link matchesFormat}. */
+export interface FormatOptions {
+  /** The schemes a `url` accepts (default `['https']`). */
+  readonly protocols?: readonly FormUrlProtocol[];
 }
 
 /** A phone number: digits with optional spaces, dots, hyphens and parentheses; one leading `+`; 7–15 digits. */
@@ -96,13 +111,17 @@ function isPostalCode(value: string): boolean {
 }
 
 /** Whether `value` matches the named format. Unknown names never match. */
-export function matchesFormat(format: FormFormat, value: string): boolean {
+export function matchesFormat(
+  format: FormFormat,
+  value: string,
+  options: FormatOptions = {}
+): boolean {
   if (typeof value !== 'string' || value.length > MAX_INPUT) return false;
   switch (format) {
     case 'email':
       return isEmail(value);
     case 'url':
-      return isUrl(value);
+      return isUrl(value, options.protocols ?? ['https']);
     case 'phone':
       return isPhone(value);
     case 'postal-code':

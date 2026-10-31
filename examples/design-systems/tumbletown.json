@@ -1,0 +1,43 @@
+{
+  "format": "texuli/design-system",
+  "formatVersion": 1,
+  "id": "tumbletown",
+  "version": "1.0.0",
+  "name": "Tumbletown",
+  "description": "A fictional family game studio: big rounded shapes, lively motion and a pinned brand pink.",
+  "owner": "Tumbletown Games (fictional)",
+  "license": "MIT",
+  "tags": ["playful", "rounded", "example"],
+  "color": {
+    "brand": {
+      "seed": "#d6336c",
+      "secondary": "#1098ad",
+      "accent": "#f59f00",
+      "neutral": "tinted"
+    },
+    "pin": { "primary": "#d6336c" }
+  },
+  "typography": {
+    "families": {
+      "sans": { "stack": ["Nunito", "system-ui", "sans-serif"] },
+      "heading": { "stack": ["Baloo 2", "Nunito", "system-ui"] }
+    },
+    "scale": { "base": 16, "ratio": 1.333 },
+    "roles": { "heading": { "family": "heading", "weight": 700 } }
+  },
+  "shape": { "radius": 20, "radiusScale": 1.5, "borderWidth": 2 },
+  "space": { "base": 4, "density": 1.125 },
+  "elevation": { "style": "soft" },
+  "surface": { "style": "solid" },
+  "motion": { "personality": "expressive" },
+  "components": {
+    "button": { "radius": "full", "defaults": { "variant": "default", "size": "lg" } },
+    "card": { "radius": "xl" }
+  },
+  "voice": {
+    "tone": ["playful", "kind"],
+    "lexicon": { "account": "player profile" },
+    "guidelines": ["Celebrate small wins.", "Never shame a mistake."]
+  },
+  "accessibility": { "contrast": "AA", "targetMin": 44, "focus": "glow", "focusWidth": 3 }
+}

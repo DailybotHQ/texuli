@@ -39,21 +39,24 @@ run it anywhere with the pure `applyFilter(rows, model, fields?)`.
 
 | Prop | Default | Meaning |
 | --- | --- | --- |
-| `fields` | required | `FilterField[]`: `key`, `header`, `type` (`text`, `number`, `date`, `boolean`, `enum`), `options` for enums, optional `accessor`, `group` (a field group id) and `operators` (the operators it offers, in menu order). DataGrid columns work as they are |
+| `fields` | required | `FilterField[]`: `key`, `header`, `type` (`text`, `number`, `date`, `boolean`, `enum`), `options` for enums (strings, or `{ value, label }` where the menus show `label` and the model stores `value`; `FilterFieldOption`), optional `accessor`, `group` (a field group id) and `operators` (the operators it offers, in menu order). DataGrid columns work as they are |
 | `operators` | none | Host operators of a property catalog (`FilterOperatorDef[]`, below) |
 | `groups` | none | `FilterFieldGroup[]` (`id`, `label`): the field menu's `<optgroup>` sections, in order |
 | `value` | empty `and` group | `bind:value`: the model. `onValueChange(model)` on every edit |
 | `maxDepth` | `3` | Deepest group level offered (the root is 1), capped at 5: the engine allows 6 levels and the deepest group still holds conditions |
 | `disabled` | `false` | Disables every control |
+| `issues` | none | Host problems, `{ path, message }[]` (a server check, a quota, a conflict): each shows under the condition at `path` after the builder's own issue, and marks its value control (its operator when it takes no value) with `aria-invalid` and an `aria-describedby` message. Paths that are not a condition are ignored |
 | `labels` | English | Every visible and announced string, including the operator names (`resolveFilterBuilderLabels`) |
 | `class` | none | Classes on the root |
+
+In a blueprint (`data-filter-builder` in `@texuli/catalog`, spec `0.10.0`), `fields[].options` stay strings and `fields[].optionLabels` maps a value to its menu text, because the spec's schema dialect has no union types; `issues` is the same `{ path, message }[]`.
 
 ## Behavior
 
 - **Structure:** the root and each nested group are a `fieldset` with a `legend` ("Filters", "Group 2"); each condition is a `fieldset` with a hidden legend ("Condition 1"). A group's combinator is a labelled native select ("Match [all/any] of these conditions"). A new nested group starts with the other combinator.
 - **Operators by type** (`operatorsFor`, the engine's `OPERATORS_BY_TYPE`): text `is`, `is not`, `contains`, `is any of`, `is empty`, `is not empty` (new text conditions start at `contains`); enums add a select of options and a multi-select for `is any of`; numbers add `is between` (two number inputs labelled From and To); dates add `is before`, `is after` and `is between` (date inputs); booleans use a Yes/No select.
 - **Values:** `is any of` on text or numbers is a comma-separated text field (described as such); changing the field keeps the operator when it still fits and resets the value; changing the operator keeps the value when its shape (one value, a list, a pair) still fits.
-- **Incomplete conditions** (no value yet) are part of the model while you type; `pruneFilter` and `applyFilter` skip them. Complete conditions that do not fit the fields (an enum value outside its options, text in a number field) get `aria-invalid` and a described error from `filterIssues`, and are skipped too.
+- **Incomplete conditions** (no value yet) are part of the model while you type; `pruneFilter` and `applyFilter` skip them. Complete conditions that do not fit the fields (an enum value outside its options, text in a number field) get `aria-invalid` and a described error from `filterIssues`, and are skipped too. Host `issues` join them: one message element per issue (`<id>-issue-<n>`), all named by the control's `aria-describedby`; a host issue alone does not skip the condition.
 - **Focus:** adding a condition focuses its field select; adding a group focuses its combinator; removing focuses the parent group's Add condition button. A polite live region says "Condition added.", "Group added." or "Removed.".
 - **Keyboard:** every control is a native `select`, `input` or `button` in reading order, so Tab, Shift+Tab, the arrow keys in selects, Enter and Space are all it needs.
 
@@ -151,7 +154,7 @@ applyFilter(rows, model, fields, operators);
 
 ## Verified
 
-- `pnpm vitest run packages/data/tests/filter-builder.test.ts`: **8 tests** (3 for the property catalog: offered operators, defaults, completeness, host validation, host predicates mixed with built-ins, a throwing predicate, bad catalogs, a 5,000-deep model, field groups, segment round trip and hostile metadata, and the view's optgroups, catalog operator menu, typed editor and host issue).
+- `pnpm vitest run packages/data/tests/filter-builder.test.ts`: **10 tests** (2 for G101: host `issues` merged after the built-in one on the value control, the operator when there is no value, both range ends, group and missing paths ignored, cleared on rerender; `{ value, label }` options in the defaults, `applyFilter`, `parseFilter`, `filterIssues` and both menus; 3 for the property catalog: offered operators, defaults, completeness, host validation, host predicates mixed with built-ins, a throwing predicate, bad catalogs, a 5,000-deep model, field groups, segment round trip and hostile metadata, and the view's optgroups, catalog operator menu, typed editor and host issue).
   - Model: immutable edits by path, field and operator changes, nested groups and combinators, pruning, the depth limit, JSON round trip and parse errors, issues by path, type inference without fields.
   - View: labelled native controls by field type (text, number pair, enum multi-select, comma list with its hint, boolean, date), the model and the matching rows after each edit, focus after add and remove, the live announcement, `aria-invalid` with a described error, `maxDepth`, loading a saved model.
 - In the browser (a scratch spec on port 4937): the `data-filter-builder` example passes axe in light, dark and forced colors on Chromium, WebKit and the Pixel 7, and on Chromium and the Pixel 7 a condition can be added, filled and removed with Tab and Enter alone (WebKit's default Tab order skips buttons, so that step was not run there).

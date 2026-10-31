@@ -1,10 +1,14 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { render, screen } from '@testing-library/svelte';
+import type { RenderCatalog } from '@texuli/catalog/render/renderer';
 import { compileDesignSystem } from '@texuli/tokens/design-system/compile';
 import { describe, expect, it, vi } from 'vitest';
+import { createPlayerCatalog } from '../src/catalog.ts';
 import type { PlayerDesignSystemEvent } from '../src/index.ts';
+import { PLAYER_LOADERS } from '../src/loaders.ts';
 import Player from '../src/Player.svelte';
+import DefaultsHarness from './DefaultsHarness.svelte';
 
 /**
  * Spec 0.10.0 (ADR-024, T-ds-blueprint): the player applies a blueprint's
@@ -187,6 +191,116 @@ describe('the player applies a blueprint design system to its root scope', () =>
   });
 });
 
+describe('the player hands the compiled component defaults to the painted components', () => {
+  const { designSystem: _ref, ...plainReport } = report;
+  const branded = (
+    defaults: Record<string, unknown> | undefined,
+    props: Record<string, unknown>
+  ) => ({
+    ...plainReport,
+    tier: 'developer',
+    ...(defaults === undefined
+      ? {}
+      : {
+          designSystem: {
+            inline: { ...harbor, components: { button: { radius: 'full', defaults } } },
+          },
+        }),
+    tree: {
+      id: 'layout-doc',
+      props: { title: 'Defaults' },
+      children: [{ id: 'button', props: { label: 'Save', ...props } }],
+    },
+  });
+  const button = (container: HTMLElement) =>
+    container.querySelector<HTMLElement>('button.tx-button') as HTMLElement;
+  // A host catalog that adds texuli's Button (the player catalog paints
+  // blocks, charts, layouts and data views; their inner texuli components
+  // read the same context).
+  const base = createPlayerCatalog();
+  const buttonSpec = {
+    id: 'button',
+    label: 'Button',
+    props: [
+      { name: 'label', kind: 'string' as const },
+      { name: 'variant', kind: 'string' as const },
+      { name: 'size', kind: 'string' as const },
+    ],
+    emit: ['developer'] as const,
+  };
+  const catalog: RenderCatalog = {
+    get: (id) => (id === 'button' ? buttonSpec : base.get(id)),
+    allows: (id, tier) => (id === 'button' ? true : (base.allows?.(id, tier) ?? false)),
+  };
+  const loaders = {
+    ...PLAYER_LOADERS,
+    button: async () => (await import('texuli/button')).Button,
+  };
+
+  it(
+    'a default variant and size show up, an explicit prop wins, and removing the design system restores the library defaults',
+    TIMEOUT,
+    async () => {
+      const { root, container, rerender } = paint(branded({ variant: 'outline', size: 'sm' }, {}), {
+        tier: 'developer',
+        catalog,
+        loaders,
+      });
+      expect(await settled(root)).toBe('applied');
+      await expect.poll(() => button(container)?.className).toContain('tx-button--outline');
+      expect(button(container).className).toContain('tx-button--sm');
+
+      // A prop in the blueprint wins over the design system's default.
+      await rerender({
+        blueprint: branded({ variant: 'outline', size: 'sm' }, { variant: 'ghost' }),
+      });
+      await expect.poll(() => button(container)?.className).toContain('tx-button--ghost');
+      expect(button(container).className).toContain('tx-button--sm');
+
+      // Without the design system the library defaults come back.
+      await rerender({ blueprint: branded(undefined, {}) });
+      await expect.poll(() => root.hasAttribute('data-tx-player-design-system')).toBe(false);
+      await expect.poll(() => button(container)?.className).toContain('tx-button--default');
+      expect(button(container).className).toContain('tx-button--md');
+      expect(button(container).className).not.toContain('tx-button--sm');
+    }
+  );
+
+  it(
+    'keeps only the closed vocabulary from a cached compiled copy, below an outer provider it overrides',
+    TIMEOUT,
+    async () => {
+      const compiled = compileDesignSystem({
+        ...harbor,
+        components: { button: { radius: 'full', defaults: { variant: 'secondary' } } },
+      });
+      if (!compiled.ok) throw new Error('harbor compiles');
+      const cached = {
+        ...JSON.parse(JSON.stringify(compiled)),
+        defaults: { button: { variant: 'secondary', size: 'huge' }, nope: { variant: 'x' } },
+      };
+      const { playerDesignDefaults } = await import('../src/design-system.ts');
+      expect(playerDesignDefaults(cached)).toEqual({ button: { variant: 'secondary' } });
+      expect(playerDesignDefaults({ ...cached, defaults: {} })).toBeUndefined();
+      const { container } = render(DefaultsHarness, {
+        props: {
+          outer: { button: { variant: 'ghost', size: 'lg' } },
+          blueprint: { ...branded(undefined, {}), designSystem: { ref: 'harbor@1.2.0' } },
+          label: 'Branded',
+          tier: 'developer',
+          catalog,
+          loaders,
+          designSystems: { resolve: () => cached },
+        },
+      });
+      const root = container.querySelector<HTMLElement>('[data-tx-player]') as HTMLElement;
+      expect(await settled(root)).toBe('applied');
+      await expect.poll(() => button(container)?.className).toContain('tx-button--secondary');
+      expect(button(container).className).toContain('tx-button--lg');
+    }
+  );
+});
+
 describe('a blueprint without a design system costs nothing', () => {
   it('never loads the step: no static path from the entry reaches it, the compiler or the runtime', () => {
     const src = join(import.meta.dirname, '../src');
@@ -198,7 +312,7 @@ describe('a blueprint without a design system costs nothing', () => {
       for (const match of source.matchAll(/(?:import|export)\s[^;]*?from\s+'([^']+)'/gms)) {
         const spec = match[1] as string;
         const where = relative(src, file);
-        expect(spec, where).not.toMatch(/^texuli\/design-system|^@texuli\/tokens/);
+        expect(spec, where).not.toMatch(/^texuli\/(?:design-system|defaults)|^@texuli\/tokens/);
         expect(spec, where).not.toBe('./design-system.ts');
         if (spec.startsWith('.') && /\.(?:ts|svelte)$/.test(spec)) visit(join(dirname(file), spec));
       }

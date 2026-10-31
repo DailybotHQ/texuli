@@ -11,6 +11,7 @@ import type {
   DocumentJson,
   EmbedBlock,
   MediaBlock,
+  TexuliDocument,
   WrappedBlock,
 } from '../model/types.ts';
 
@@ -22,6 +23,7 @@ export type OutputDiagnosticCode =
   | 'embed-as-text'
   | 'glyph-missing'
   | 'font-unsupported'
+  | 'design-system-unapplied'
   | 'truncated';
 
 export interface OutputDiagnostic {
@@ -29,6 +31,24 @@ export interface OutputDiagnostic {
   /** The block it concerns, when there is one. */
   id?: string;
   message: string;
+}
+
+/**
+ * ADR-024: the document names a design system but the caller passed no
+ * `design` values. The L1 writers cannot compile it (that needs
+ * `@texuli/tokens`), so they write the default styling and say so.
+ */
+export function designSystemUnapplied(
+  doc: Pick<TexuliDocument, 'designSystem'>,
+  design: unknown
+): OutputDiagnostic | undefined {
+  const system = doc.designSystem;
+  if (!system || design) return undefined;
+  const name = typeof system.ref === 'string' ? `"${system.ref.slice(0, 80)}"` : 'an inline one';
+  return {
+    code: 'design-system-unapplied',
+    message: `The document follows the design system ${name}; the default styling was used. Pass design values (designValues(compiled, mode) from @texuli/tools/print) to apply it.`,
+  };
 }
 
 /** Image bytes a host resolved for a media block's `ref`. */

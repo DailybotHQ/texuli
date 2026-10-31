@@ -53,11 +53,12 @@ const weekdays = $derived(weeks[0]?.map((cell) => fmt.weekday(cell.date)) ?? [])
       {#each week as cell (cell.date)}
         {@const dayItems = eventsOnDate(items, cell.date, timeZone)}
         <!-- svelte-ignore a11y_click_events_have_key_events, a11y_interactive_supports_focus -- the date button is the keyboard path. -->
+        <!-- No aria-label: the cell is named by its content, which leads with the date button
+             ("<date>, <n> events") and then the event chips (WCAG 2.5.3 label in name). -->
         <div
           class:tx-calendar__outside={!cell.inMonth}
           class="tx-calendar__month-cell"
           role="gridcell"
-          aria-label={`${fmt.longDate(cell.date)}, ${labels.eventCount(dayItems.length)}`}
           data-date={cell.date}
           onclick={(event) => {
             if (event.target === event.currentTarget) onCreateDay?.(cell.date);
