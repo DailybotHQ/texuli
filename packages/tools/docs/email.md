@@ -74,7 +74,8 @@ children, `columns` blocks with two columns); more columns stack with
 | `preheader` | none | Hidden preview text, also the first line of `text` |
 | `lang`, `dir` | `en`, `ltr` | Document language and direction; text alignment and quote borders follow `dir` (mail clients lack logical properties, so the physical side is chosen from it) |
 | `baseUrl` | none | Absolute `https` base for relative links and images |
-| `theme`, `mode` | default palette, `light` | The theme whose colors and font resolve to inline styles |
+| `theme`, `mode` | default palette, `light` | The theme whose colors and font resolve to inline styles; `mode` also picks the design-system mode to inline |
+| `designSystem` | none | A compiled design system (see below): colors, fonts, radius and spacing, plus the dark head rule |
 | `width` | 600 | Content width, 320 to 800 pixels |
 
 ## Styles and colors
@@ -93,10 +94,44 @@ mail clients support neither OKLCH nor custom properties; a role it cannot
 resolve keeps `DEFAULT_EMAIL_PALETTE`. `emailFontFamily(theme)` keeps only
 plain font names from the theme and appends a system stack.
 
-Planned: a dark-mode `prefers-color-scheme` rule set in the head (the
-markup builders have no `<style>` element today, so the output declares
-`color-scheme: light`), and an `email` envelope profile in a later spec
-minor.
+`emailFontStack(stack, fallback)` is the same filter for any CSS stack;
+`EMAIL_SYSTEM_FONT` and `EMAIL_MONO_FONT` are the fallbacks.
+
+## Design systems
+
+`designSystem` takes a compiled design system (`compileDesignSystem(…)`
+from `@texuli/tokens/design-system/compile` with `ok: true`, or anything
+with its `vars`; the type is `DesignVarsSource`). `designValues(source,
+mode)` resolves one mode to plain `DesignValues` (`mode`, `colors` as
+`#rrggbb` per `DesignColorRole` from `DESIGN_COLOR_ROLES`, `fonts.sans`,
+`fonts.heading` and `fonts.mono` as stacks, `radius` and `space` in
+pixels); it is shared with `@texuli/tools/print` and never throws.
+
+- **Colors:** `designEmailPalette(colors, base)` overlays the resolved
+  roles on the palette (`EMAIL_PALETTE_DESIGN_ROLES` names the role each
+  key reads). The design wins over `theme`.
+- **Fonts:** body text uses `fonts.sans`, headings `fonts.heading` and
+  code `fonts.mono`, each filtered by `emailFontStack`.
+- **Radius and spacing:** the card radius is `--tx-radius` (0 to 32 px);
+  buttons and code blocks use three quarters of it. Paddings, gaps and
+  indents are multiples of `--tx-space-1` (2 to 8 px). The defaults are
+  8 px and 4 px, so the default output is unchanged.
+- **Dark mode:** when `mode` is `light` and the dark mode was compiled,
+  the head declares `color-scheme: light dark` (and
+  `supported-color-schemes`) and carries one typed rule set,
+  `@media (prefers-color-scheme: dark){…}`. `emailDarkMode(tree, light,
+  dark)` gives every element whose inline style paints a palette color a
+  generated class (`tx-bg-<hex>`, `tx-fg-<hex>`, `tx-bd-<hex>`) and maps
+  each class to the compiled dark value with `!important`. Selectors are a
+  fixed prefix and a hex, declarations a fixed property and a hex, and the
+  rule is checked against that grammar before it is written; nothing from
+  content reaches it. Two roles that share a light color share one dark
+  value, in role priority order. Clients that ignore the media query (many
+  do) keep the light inline styles.
+
+Without `designSystem`, the output is byte-for-byte what it was before
+(a test pins its SHA-256). Planned: an `email` envelope profile in a
+later spec minor.
 
 ## Limits
 
