@@ -58,6 +58,15 @@ export type DocumentCode = (typeof DOCUMENT_CODES)[keyof typeof DOCUMENT_CODES];
 
 const C = DOCUMENT_CODES;
 
+/**
+ * A design-system reference (spec 0.10.0, ADR-024): an exact `id@x.y.z`
+ * or `texuli:<theme>`; the same grammar as the blueprint's
+ * `$defs.designSystemReference.ref`. Never a range, a URL or a path.
+ */
+export const DESIGN_SYSTEM_REF_PATTERN =
+  /^(?:texuli:[a-z][a-z0-9]*(?:-[a-z0-9]+)*|[a-z][a-z0-9]*(?:-[a-z0-9]+)*@(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?)$/;
+
+
 /** UTF-8 bytes of a JSON value's serialization, stopping once past `cap`. */
 export function jsonBytes(value: unknown, cap = Number.POSITIVE_INFINITY): number {
   let text: string;
@@ -348,6 +357,39 @@ function build(trust: HrefTrust): Schema {
     ),
   });
 
+  // Spec 0.10.0 (ADR-024): the design system the document follows.
+  const designSystem = t.refine(
+    t.object({
+      ref: t.optional(
+        t.string({
+          min: 1,
+          max: 200,
+          pattern: DESIGN_SYSTEM_REF_PATTERN,
+        })
+      ),
+      inline: t.optional(
+        t.refine(
+          t.json({ depth: 16, maxKeys: 200, maxItems: 64, maxString: 360_000, text: 'line' }),
+          {
+            code: 'invalid-type',
+            check(value, context) {
+              if (value === null || typeof value !== 'object' || Array.isArray(value))
+                context.issue({ message: 'An inline design system is an object.' });
+            },
+          }
+        )
+      ),
+    }),
+    {
+      code: 'invalid-value',
+      description: 'Exactly one of ref and inline.',
+      check(value, context) {
+        if ((value.ref === undefined) === (value.inline === undefined))
+          context.issue({ message: 'Set exactly one of ref and inline.' });
+      },
+    }
+  );
+
   const documentShape = t.object({
     format: t.literal(DOCUMENT_FORMAT, { code: C.unsupportedFormat }),
     formatVersion: t.literal(DOCUMENT_FORMAT_VERSION, { code: C.unsupportedVersion }),
@@ -357,6 +399,7 @@ function build(trust: HrefTrust): Schema {
     annotations: t.optional(
       t.object({ comments: t.optional(t.array(thread, { max: L.comments })) })
     ),
+    designSystem: t.optional(designSystem),
   });
 
   return t.refine(documentShape, {

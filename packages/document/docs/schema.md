@@ -50,6 +50,11 @@ const fromText = loadUntrustedDocument(jsonText, { maxBytes: 1_000_000 });
 - Embeds hold exactly one of `ref` and `inline`; an inline component is one
   catalog node (`{ id, props }`, no children); an inline deck passes
   `parseDeck` from `@texuli/deck/model`.
+- `designSystem` (spec 0.10.0, in development for `0.10.0`): exactly one
+  of `ref`, matching `DESIGN_SYSTEM_REF_PATTERN` (an exact `id@x.y.z` or
+  `texuli:<theme>`, the blueprint's grammar), and `inline`, an object of
+  bounded single-line JSON (depth 16, no control or bidi characters). The
+  design-system rules run in the reader before it compiles.
 - Comment anchors that name no node, or fall outside their block's text,
   are kept as orphaned threads and reported as warnings.
 

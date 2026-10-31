@@ -4,7 +4,13 @@
  * `untrusted` tier by default, the URL policy for links and media, embedded
  * decks through `@texuli/deck`, and the JSON Schema export.
  */
-export { DOCUMENT_CODES, type DocumentCode, documentSchema, jsonBytes } from './schema.ts';
+export {
+  DESIGN_SYSTEM_REF_PATTERN,
+  DOCUMENT_CODES,
+  type DocumentCode,
+  documentSchema,
+  jsonBytes,
+} from './schema.ts';
 export {
   type DocumentDiagnostic,
   type DocumentValidation,
