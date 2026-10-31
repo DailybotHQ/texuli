@@ -114,7 +114,10 @@ describe('DesignSystemProvider', () => {
     await view.rerender({ compiled: acme, mode: 'light' });
     await tick();
     expect(button.className).toContain('tx-button--outline');
-  });
+    // happy-dom re-parses ~310 custom properties per write; under CI load the
+    // six switches take several seconds. The real switch cost is measured in
+    // Chromium (tests/perf/design-system-switch.test.ts).
+  }, 20_000);
 
   it('renders the allowlisted attributes in markup, so designSystemStyle matches server HTML', () => {
     expect([...PROVIDER_ATTRIBUTES]).toEqual([...DESIGN_SYSTEM_ATTRIBUTES]);
