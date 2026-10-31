@@ -92,6 +92,11 @@ export const DECK_CODES = Object.freeze({
     'style',
     'The catalog theme id is unknown to the host; default used.'
   ),
+  'design-system': code(
+    'error',
+    'style',
+    'A design system names neither or both of ref and inline, or its inline document is not an object.'
+  ),
   'unknown-font-pair': code(
     'warning',
     'style',

@@ -71,7 +71,10 @@ a footer part when the page has them, and `word/media/` images.
   same roles as [the PDF writer](pdf.md#design-systems)). Values outside
   `#rrggbb` or a plain family name are ignored. Without it, the package is
   byte-for-byte the default (a test pins its SHA-256). Word substitutes a
-  font the reader does not have; nothing is embedded.
+  font the reader does not have; nothing is embedded. A document that
+  names a design system but gets no `design` keeps the default styling and
+  reports `design-system-unapplied` ([the PDF writer](pdf.md#design-systems)
+  explains how a caller compiles it).
 
 `DOCX_MIME` is the package's media type. Output is deterministic: the same
 document gives the same bytes.

@@ -29,6 +29,11 @@
       "svelte": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./design-system": {
+      "types": "./src/design-system.ts",
+      "svelte": "./src/design-system.ts",
+      "default": "./src/design-system.ts"
+    },
     "./styles.css": "./src/player.css"
   },
   "scripts": {
