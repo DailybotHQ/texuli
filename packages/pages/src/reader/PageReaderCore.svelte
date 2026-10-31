@@ -1,14 +1,19 @@
 <script lang="ts">
 // The read-only reader core: the same document the editor edits, rendered as
 // an article with anchored headings and an "On this page" outline. Embeds
-// load the player through the host's `loadPlayer` (G123); `PageReader` is
-// this component with the default loader.
+// load the player through the host's `loadPlayer` (G123), and a design
+// system's `texuli:<theme>` bases load through the host's `loadLibraryBase`
+// (G127); `PageReader` is this component with the default loaders.
 import type { TexuliDocument } from '@texuli/document/model';
 import type { DeckPlayerHost } from '@texuli/player';
 import { untrack } from 'svelte';
 import Breadcrumb from '../shared/Breadcrumb.svelte';
 import { blockPainter, type PagesBlockHost, type PagesBlockSnippet } from '../shared/block-host.ts';
-import type { PagesDesignSystemEvent, PagesDesignSystems } from '../shared/design-system-types.ts';
+import type {
+  PagesDesignSystemEvent,
+  PagesDesignSystems,
+  PagesLibraryBaseLoader,
+} from '../shared/design-system-types.ts';
 import type { EmbedResolver } from '../shared/embeds.ts';
 import { type PagesLabels, resolvePagesLabels } from '../shared/labels.ts';
 import type { MediaResolver } from '../shared/media.ts';
@@ -66,6 +71,15 @@ interface Props {
    * `() => import('@texuli/player')` to paint them.
    */
   loadPlayer?: PagesPlayerLoader | null;
+  /**
+   * Loads a design system's `texuli:<theme>` reference or `extends` base
+   * that `designSystems.resolve` leaves `undefined` (G127). On this core
+   * component there is no default: without one such a design system is
+   * refused (`design-system-unresolved`, the reader keeps its theme with a
+   * notice), and the build has no reference to the token theme library.
+   * Pass `loadPagesLibraryBase` to load the library on first use.
+   */
+  loadLibraryBase?: PagesLibraryBaseLoader | null;
   class?: string;
 }
 
@@ -88,6 +102,7 @@ let {
   renderBlock,
   blockHost = null,
   loadPlayer = null,
+  loadLibraryBase = null,
   class: className,
 }: Props = $props();
 
@@ -112,6 +127,7 @@ $effect(() => {
   const target = element;
   const reference = untrack(() => doc.designSystem);
   const host = untrack(() => designSystems);
+  const libraryBase = untrack(() => loadLibraryBase);
   void designSystems?.mode;
   if (!key || !target || !reference) {
     dropSystem();
@@ -121,7 +137,7 @@ $effect(() => {
   let live = true;
   systemStatus = 'pending';
   import('../shared/design-system.ts')
-    .then((step) => step.applyPagesDesignSystem(target, reference, host))
+    .then((step) => step.applyPagesDesignSystem(target, reference, host, libraryBase))
     .then(
       ({ event, dispose }) => {
         if (!live) return dispose?.();
@@ -130,8 +146,20 @@ $effect(() => {
         systemStatus = event.status;
         untrack(() => onDesignSystem?.(event));
       },
-      () => {
-        if (live) systemStatus = 'refused';
+      (error: unknown) => {
+        if (!live) return;
+        // The step never rejects; a chunk that fails to load still replaces the old system.
+        dropSystem();
+        systemStatus = 'refused';
+        const message = error instanceof Error ? error.message.slice(0, 200) : 'Refused.';
+        untrack(() =>
+          onDesignSystem?.({
+            status: 'refused',
+            code: 'design-system-refused',
+            path: '$.designSystem',
+            message,
+          })
+        );
       }
     );
   return () => {

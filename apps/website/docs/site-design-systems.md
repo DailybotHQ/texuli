@@ -6,7 +6,7 @@ stylesheet `/design-systems/brands.css`
 **Packages:** `texuli/design-system` (`DesignSystemProvider`),
 `@texuli/tokens/design-system/apply` (`designSystemStyle`),
 `@texuli/tools/ds-check` (`checkDesignSystem`); design systems are **released in
-0.10.0**, and installs name the 0.10 line
+0.10.0**, and installs name the published line of `docs/RELEASE.md`
 **Tests:** `apps/website/tests/site-design-systems.test.ts`,
 `tests/e2e/site-design-systems.spec.ts`, `tests/e2e/site-perf.spec.ts`
 

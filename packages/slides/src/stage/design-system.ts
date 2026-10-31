@@ -5,10 +5,13 @@
  * never loads it, the player's resolver, the compiler or the runtime
  * (`tests/stage-design-system.test.ts` walks the static graph).
  *
- * Resolution is the player's (`@texuli/player/design-system`): a `ref` goes
- * through the host's resolver (never a fetch; `texuli:<theme>` falls back to
- * the theme library), an inline document compiles at the stage's tier, and
- * every failure is a refusal with a stable code; it never throws.
+ * Resolution is the player's core step (`@texuli/player/design-system-core`,
+ * G127): a `ref` goes through the host's resolver (never a fetch); a
+ * `texuli:<theme>` reference or `extends` base it leaves `undefined` loads
+ * through `loadLibraryBase` only (`DeckStage` passes the theme library's,
+ * `DeckStageCore` only the host's), so this module never references the
+ * theme library. An inline document compiles at the stage's tier, and every
+ * failure is a refusal with a stable code; it never throws.
  *
  * The stage root already carries the deck theme's variables and attributes,
  * so this step does not write on it: it returns plain values (the variables
@@ -23,8 +26,8 @@ import {
   type PlayerDesignSystemEvent,
   type PlayerDesignSystems,
   playerDesignDefaults,
-  resolvePlayerDesignSystem,
-} from '@texuli/player/design-system';
+  resolvePlayerDesignSystemCore,
+} from '@texuli/player/design-system-core';
 import {
   type ApplicableDesignSystem,
   applyDesignSystem,
@@ -51,7 +54,7 @@ export interface StageDesignSystem {
   readonly id: string;
   /** The compiled modes (`light`, `dark` or both). */
   readonly modes: readonly ('light' | 'dark')[];
-  /** The safe variables of a mode (a compiled mode; another falls back to the first). */
+  /** The safe variables of a mode (a compiled mode; another paints the first compiled one). */
   vars(mode: 'light' | 'dark'): Record<string, string>;
   /** The scope attributes (escaped values only). */
   readonly attrs: Readonly<Record<string, string>>;
@@ -67,6 +70,7 @@ export type StageDesignSystemResult =
 
 function stageSystem(compiled: ApplicableDesignSystem): StageDesignSystem {
   const modes = (['light', 'dark'] as const).filter((mode) => compiled.vars[mode]);
+  // A mode the design system did not compile paints its first compiled mode.
   const vars = (mode: 'light' | 'dark') => {
     const pick = modes.includes(mode) ? mode : modes[0];
     return pick ? designSystemAppearance(compiled, { mode: pick }).vars : {};
@@ -100,18 +104,21 @@ function stageSystem(compiled: ApplicableDesignSystem): StageDesignSystem {
 /**
  * Resolve and compile a deck's design system. `tier` is the stage's paint
  * tier for an inline document; a host-resolved one compiles at `developer`.
+ * `loadLibraryBase` loads `texuli:<theme>` bases (none refuses them).
  * Never rejects.
  */
 export async function loadStageDesignSystem(
   reference: Readonly<DeckDesignSystem>,
   host: PlayerDesignSystems | null | undefined,
   tier: 'developer' | 'untrusted',
-  doc?: Document
+  doc?: Document,
+  loadLibraryBase?: ((ref: string) => Promise<unknown>) | null
 ): Promise<StageDesignSystemResult> {
-  const result = await resolvePlayerDesignSystem(
-    reference as Parameters<typeof resolvePlayerDesignSystem>[0],
+  const result = await resolvePlayerDesignSystemCore(
+    reference as Parameters<typeof resolvePlayerDesignSystemCore>[0],
     host,
-    tier
+    tier,
+    { loadLibraryBase }
   );
   if (!result.ok) {
     const { ok: _ok, ...refusal } = result;

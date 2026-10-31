@@ -68,7 +68,7 @@ import {
 export const DESIGN_SYSTEM_COMPILER_VERSION = 1;
 
 export interface CompileDesignSystemOptions extends ResolveDesignSystemOptions {
-  /** The modes to compile; defaults to `color.modes`, then light and dark. */
+  /** The modes to compile (one or both; an empty list is refused); defaults to `color.modes`, then light and dark. */
   modes?: readonly DesignSystemMode[];
 }
 
@@ -645,11 +645,20 @@ export function compileDesignSystem(
   const targetMin = typeof a11y.targetMin === 'number' ? a11y.targetMin : 24;
   const requested = options.modes ??
     (color.modes as DesignSystemMode[] | undefined) ?? ['light', 'dark'];
-  if (!Array.isArray(requested) || requested.some((m) => m !== 'light' && m !== 'dark'))
+  // An empty list would compile no mode, and every runtime writer needs one.
+  if (
+    !Array.isArray(requested) ||
+    requested.length === 0 ||
+    requested.some((m) => m !== 'light' && m !== 'dark')
+  )
     return {
       ok: false,
       errors: [
-        { code: 'invalid-value', path: '$.color.modes', message: 'Modes are light and dark.' },
+        {
+          code: 'invalid-value',
+          path: '$.color.modes',
+          message: 'Modes are one or both of light and dark.',
+        },
       ],
     };
   const modes = (['light', 'dark'] as const).filter((mode) => requested.includes(mode));

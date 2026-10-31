@@ -9,13 +9,16 @@
  * `defaults` (imported on first use, and only while `defaultRenderers` is
  * on). The body also loads on first use, so importing
  * `@texuli/slides/export` for PPTX or the print plan costs no print code;
- * `preloadDeckPrintView()` warms it (G81).
+ * `preloadDeckPrintView()` warms it (G81). Catalog themes load from the
+ * token theme library when the host passes no `loadTheme`
+ * (`loadDeckLibraryTheme`; the core has no default loader, G127).
  */
+import { loadDeckLibraryTheme } from '../stage/library-theme.ts';
 import DeckPrintViewCore from './DeckPrintViewCore.svelte';
 import { DECK_PRINT_DEFAULTS } from './print-preload.ts';
 import type { DeckPrintViewProps } from './print-types.ts';
 
-let props: DeckPrintViewProps = $props();
+let { loadTheme = loadDeckLibraryTheme, ...rest }: DeckPrintViewProps = $props();
 </script>
 
-<DeckPrintViewCore {...props} defaults={DECK_PRINT_DEFAULTS} />
+<DeckPrintViewCore {...rest} {loadTheme} defaults={DECK_PRINT_DEFAULTS} />

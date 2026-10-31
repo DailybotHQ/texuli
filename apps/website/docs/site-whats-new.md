@@ -8,11 +8,13 @@ the home page hero)
 
 ## Goal
 
-Every new package and capability of `0.6.0` to `0.10.0` on one page
+Every new package and capability of `0.6.0` to `0.11.0` on one page
 (PLAN_010 Amendment 8, PLAN_011 T-site-090 and T-site-0100), grouped by
-release with the status the repository states: `0.6.0` to `0.10.0` are
-published on npm, and `0.10.0` is current (pre-1.0), the published line of
-`docs/RELEASE.md`. The unit test requires the current release's status to
+release with the status the repository states: `0.6.0` to `0.11.0` are
+published on npm, and `0.11.0` is current (pre-1.0), the published line of
+`docs/RELEASE.md`. `0.11.0` (Protoyard G125–G127 and the Final Review
+fixes) is listed with its status and no cards; its details are on
+`/changelog/`. The unit test requires the current release's status to
 say so, and a version in development (when the release line names one) to
 be marked as such. Each feature has a small demo or a preview and a link
 to its full page.

@@ -93,7 +93,7 @@ A deck route prints when its URL asks for it:
 | `defaultRenderers` | `true` | Append the default tables (layouts, component registry) after `renderers`, imported on first use with the print body. `false` paints with `renderers` only and never loads the defaults. |
 | `tier` | `untrusted` | URL policy tier for media and links; keep `untrusted` for agent decks. |
 | `messages`, `resolveAvatar` | — | As on the stage ([stage.md](stage.md)). |
-| `loadTheme` | the library loader | Catalog theme loader; `null` when the host loads theme CSS itself. |
+| `loadTheme` | the library loader (`DeckPrintView`); none on `DeckPrintViewCore` | Catalog theme loader; `null` (or none, on the core) when the host loads theme CSS itself. |
 | `contentReady` | `true` | Hosts keep it `false` until their own content (chart snapshots, fonts) is ready. |
 | `onReady(plan)`, `onError(error)` | — | Readiness and load failures. |
 | `mediaTimeoutMs` | `10000` | Longest wait for renderers and images before reporting ready anyway. |
@@ -176,8 +176,16 @@ prop plus `defaults`, a `DeckDefaultRenderersSource`), and its preload is
 - **With `defaults`** (for example the same source a `DeckStageCore` host
   hands its stage) the view appends those tables after `renderers`, and
   `preloadDeckPrintViewCore({ defaults })` warms them.
+- **Themes (G127, from `0.11.0`):** `DeckPrintViewCore`
+  has no default `loadTheme`. Without one, catalog themes print with host
+  CSS, and the print painter never references the token theme library, so
+  an export-core host emits none of its chunks (`@texuli/slides/export-core`
+  measures 190,926 B (186.45 KiB) gzip of lazy chunks, against 215.47 KiB before). Pass the
+  stage's loader, or `loadDeckLibraryTheme` from
+  `@texuli/slides/stage-core`, to print library themes.
 - `DeckPrintView` is `DeckPrintViewCore` with `defaults` set to
-  `DECK_PRINT_DEFAULTS` (the stage's tables, imported on first use), so
+  `DECK_PRINT_DEFAULTS` (the stage's tables, imported on first use) and
+  `loadTheme` defaulting to `loadDeckLibraryTheme`, so
   `@texuli/slides/export` behaves exactly as before; `preloadDeckPrintView`
   calls `preloadDeckPrintViewCore` with that source.
 
@@ -186,10 +194,11 @@ prop plus `defaults`, a `DeckDefaultRenderersSource`), and its preload is
   import { DeckStageCore } from '@texuli/slides/stage-core';
   import { DeckPrintViewCore } from '@texuli/slides/export-core';
   const renderers = { validateBlock: checkHostBlock, free: () => HostFreeSlide };
+  const loadTheme = async (id: string) => hostThemes.get(id) ?? Promise.reject(new Error(id));
 </script>
 
-<DeckStageCore {deck} {renderers} />
-<DeckPrintViewCore {deck} {renderers} />
+<DeckStageCore {deck} {renderers} {loadTheme} />
+<DeckPrintViewCore {deck} {renderers} {loadTheme} />
 ```
 
 ### DeckPrint (model v1)

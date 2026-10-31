@@ -86,9 +86,12 @@ const darkSelector = (selector: string, dark: 'class' | 'attribute') => {
 
 /**
  * Scoped CSS custom properties for each compiled mode: light on the
- * selector, dark on the dark selector (or inside the media query). Throws a
- * `TypeError` for a selector {@link isSafeSelector} refuses; unsafe
- * compiled declarations are skipped and counted in a comment.
+ * selector, dark on the dark selector (or inside the media query). When only
+ * one mode is emitted (a dark-only design system, or `modes: ['dark']`), it
+ * goes on the selector itself, as `designSystemStyle` writes it, so the CSS
+ * paints without a `.dark` class. Throws a `TypeError` for a selector
+ * {@link isSafeSelector} refuses; unsafe compiled declarations are skipped
+ * and counted in a comment.
  */
 export function emitCss(compiled: CompiledDesignSystem, options: EmitCssOptions = {}): string {
   const id = typeof compiled.id === 'string' && DOC_ID.test(compiled.id) ? compiled.id : undefined;
@@ -104,13 +107,17 @@ export function emitCss(compiled: CompiledDesignSystem, options: EmitCssOptions 
       : '';
   const blocks: string[] = [`/* Texuli design system${id ? ` ${id}` : ''}${version} */`];
   let skipped = 0;
-  for (const mode of ['light', 'dark'] as const) {
-    if (!modes.includes(mode) || !compiled.vars?.[mode]) continue;
+  const emitted = (['light', 'dark'] as const).filter(
+    (mode) => modes.includes(mode) && compiled.vars?.[mode]
+  );
+  for (const mode of emitted) {
     const safe = safeEntries(compiled.vars[mode]);
     skipped += safe.skipped;
-    const indent = mode === 'dark' && dark === 'media' ? '    ' : '  ';
+    // A single mode is the base rule; dark gets its own rule only next to light.
+    const base = mode === 'light' || emitted.length === 1;
+    const indent = !base && dark === 'media' ? '    ' : '  ';
     const body = safe.entries.map(([name, value]) => `${indent}${name}: ${value};`).join('\n');
-    if (mode === 'light') blocks.push(`${selector} {\n${body}\n}`);
+    if (base) blocks.push(`${selector} {\n${body}\n}`);
     else if (dark === 'media')
       blocks.push(`@media (prefers-color-scheme: dark) {\n  ${selector} {\n${body}\n  }\n}`);
     else blocks.push(`${darkSelector(selector, dark)} {\n${body}\n}`);
@@ -158,7 +165,11 @@ export function emitTailwindPreset(
   options: EmitTailwindOptions = {}
 ): TailwindPreset {
   const values = options.values ?? 'vars';
-  const source = compiled.vars?.[values === 'dark' ? 'dark' : 'light'] ?? {};
+  // A single-mode design system reads its one mode (`pickDesignSystemMode`'s rule).
+  const source =
+    (values === 'dark'
+      ? (compiled.vars?.dark ?? compiled.vars?.light)
+      : (compiled.vars?.light ?? compiled.vars?.dark)) ?? {};
   const { entries } = safeEntries(source);
   const value = (name: string, concrete: string) => (values === 'vars' ? `var(${name})` : concrete);
   const extend: TailwindPreset['theme']['extend'] = {

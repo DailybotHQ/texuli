@@ -10,6 +10,13 @@
  * any chunk, and no import specifier left in the code. Each host is built
  * the way `pnpm size` builds an entry (Vite, minified, `svelte` external),
  * and the chunk graph is read from the output.
+ *
+ * The theme library (G127): a document's `designSystem` with a
+ * `texuli:<theme>` reference or base loads from the token theme library.
+ * The default entries keep that loader; on the core entries the host injects
+ * `loadLibraryBase` (or none), so a core host with no loaders has no theme
+ * library module in any chunk either, while the design-system step and its
+ * compiler are still in the build.
  */
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
@@ -108,6 +115,13 @@ function playerTraces(chunks: Map<string, Chunk>): string[] {
   return traces;
 }
 
+/** The token theme library's module folders. */
+const THEME_LIBRARY = ['/tokens/src/library-expand/', '/tokens/src/library-port/'];
+const libraryIn = (modules: readonly string[]) =>
+  THEME_LIBRARY.filter((part) => modules.some((id) => id.includes(part)));
+const libraryChunks = (chunks: Map<string, Chunk>) =>
+  [...chunks.values()].filter((chunk) => libraryIn(chunk.modules).length > 0);
+
 const gzipOf = (chunks: readonly Chunk[]) =>
   chunks.reduce((sum, chunk) => sum + gzipSync(chunk.code, { level: 9 }).length, 0);
 
@@ -145,8 +159,13 @@ const documentHost = createDocumentPlayerHostCore();
     // ...and nothing reaches the player: no module, no lazy chunk, no specifier.
     expect(playerTraces(chunks)).toEqual([]);
     expect(every.filter((id) => id.endsWith('/pages/src/shared/player.ts'))).toEqual([]);
+    // G127: the design-system step and its compiler are in the build, the theme library is not.
+    expect(every.some((id) => id.endsWith('/pages/src/shared/design-system.ts'))).toBe(true);
+    expect(every.some((id) => id.includes('/tokens/src/design-system/compiler.ts'))).toBe(true);
+    expect(libraryIn(every)).toEqual([]);
+    expect(every.filter((id) => id.endsWith('/pages/src/shared/library-base.ts'))).toEqual([]);
     console.info(
-      `[bundle-graph] pages core host: every chunk ${gzipOf([...chunks.values()])} B gzip in ${chunks.size} chunks`
+      `[bundle-graph] pages core host: every chunk ${gzipOf([...chunks.values()])} B gzip in ${chunks.size} chunks, ${libraryChunks(chunks).length} with theme library modules`
     );
   }, 180_000);
 
@@ -162,6 +181,27 @@ const loadPlayer = () => import(${PLAYER});
     const initial = staticChunks(chunks, entries).flatMap((chunk) => chunk.modules);
     expect(initial.filter((id) => id.includes('/player/src/'))).toEqual([]);
     expect(everyModule(chunks).some((id) => id.endsWith('/player/src/index.ts'))).toBe(true);
+  }, 180_000);
+
+  it('a core host that opts into the theme library reaches it, and still not the player (G127)', async () => {
+    const chunks = await buildHost(`<script lang="ts">
+import { loadPagesLibraryBase, PageReaderCore } from ${at('reader/core.ts')};
+import { createDocumentPlayerHostCore } from ${at('host/core.ts')};
+let { doc }: { doc: never } = $props();
+const documentHost = createDocumentPlayerHostCore({ loadLibraryBase: loadPagesLibraryBase });
+</script>
+<PageReaderCore document={doc} loadLibraryBase={loadPagesLibraryBase} />
+<p data-host={typeof documentHost.present}></p>
+`);
+    const every = everyModule(chunks);
+    expect(libraryIn(every)).toEqual(THEME_LIBRARY);
+    expect(libraryIn(staticChunks(chunks, entriesOf(chunks)).flatMap((c) => c.modules))).toEqual(
+      []
+    );
+    expect(playerTraces(chunks)).toEqual([]);
+    console.info(
+      `[bundle-graph] pages core host with the library: ${chunks.size} chunks, ${libraryChunks(chunks).length} with theme library modules`
+    );
   }, 180_000);
 
   it('the default entries still reach the player, lazily, with no loader and no embeds', async () => {
@@ -189,8 +229,11 @@ const documentHost = createDocumentPlayerHost();
     const player = [...chunks.values()].filter((chunk) =>
       chunk.modules.some((id) => id.includes('/player/src/'))
     );
+    // G127: the default reader keeps the theme library loader, as lazy chunks.
+    expect(libraryIn(staticChunks(chunks, entries).flatMap((c) => c.modules))).toEqual([]);
+    expect(libraryIn(everyModule(chunks))).toEqual(THEME_LIBRARY);
     console.info(
-      `[bundle-graph] pages default host: every chunk ${gzipOf([...chunks.values()])} B gzip in ${chunks.size} chunks; player chunks ${gzipOf(player)} B gzip`
+      `[bundle-graph] pages default host: every chunk ${gzipOf([...chunks.values()])} B gzip in ${chunks.size} chunks; player chunks ${gzipOf(player)} B gzip; ${libraryChunks(chunks).length} with theme library modules`
     );
   }, 180_000);
 });

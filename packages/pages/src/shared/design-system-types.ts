@@ -3,11 +3,21 @@
  * Types only: the step (`design-system.ts`) loads lazily.
  */
 
+/**
+ * Loads a document design system's `texuli:<theme>` reference or `extends`
+ * base that `resolve` leaves `undefined`: a design-system document (or a
+ * token `Theme`), or `undefined` when it knows no such theme (G127).
+ * `loadPagesLibraryBase` is the token theme library's.
+ */
+export type PagesLibraryBaseLoader = (ref: string) => Promise<unknown>;
+
 export interface PagesDesignSystems {
   /**
-   * Resolve `id@x.y.z` (and `texuli:<theme>`, which falls back to the theme
-   * library) to a design-system document or a compiled design system; may
-   * return a promise. The reader never fetches.
+   * Resolve `id@x.y.z` (and `texuli:<theme>`, which falls back to the
+   * reader's `loadLibraryBase`: the theme library on the default entries,
+   * the host's loader or none on the core entries) to a design-system
+   * document or a compiled design system; may return a promise. The reader
+   * never fetches.
    */
   resolve?: (
     ref: string

@@ -1,4 +1,4 @@
-# The design-system compiler (`@texuli/tokens/design-system/compile` and `/validate`)
+# The design-system compiler (`@texuli/tokens/design-system/compile`, `/compile-core` and `/validate`)
 
 > **Status: released in `0.10.0`.** Both subpaths ship in
 > `@texuli/tokens@0.10.0`. The runtime is
@@ -46,7 +46,7 @@ if (compiled.ok) {
 
 | Export | What it does |
 | --- | --- |
-| `compileDesignSystem(doc, { modes?, variant?, patches?, resolve?, trust? })` | Synchronous. Validates (the spec's validator at `trust`, `untrusted` by default), resolves `extends` through `resolve`, applies the variant then the patches, and compiles. Returns `CompiledDesignSystem` (`ok: true`) or `{ ok: false, errors }` |
+| `compileDesignSystem(doc, { modes?, variant?, patches?, resolve?, trust? })` | Synchronous. Validates (the spec's validator at `trust`, `untrusted` by default), resolves `extends` through `resolve`, applies the variant then the patches, and compiles. `modes` (default `color.modes`, then both) is one or both of `light` and `dark`; an empty list is refused (`invalid-value` at `$.color.modes`), as `color.modes: []` in a document is. Returns `CompiledDesignSystem` (`ok: true`) or `{ ok: false, errors }` |
 | `resolveDesignSystem(doc, { resolve?, variant?, patches?, trust? })` | Asynchronous: loads `texuli:<id>` from the theme library (lazy chunks) and awaits `resolve` for `id@x.y.z`. Returns `{ ok, document, chain, variant?, hash }`: the merged document without `extends` |
 | `resolveDesignSystemSync(doc, options)` | The same with a synchronous `resolve`, which may return a `Theme` (or a document) for `texuli:<id>` |
 | `loadLibraryBase('texuli:<id>')` | One library theme as a document whose `color.brand` is the theme's generator input |
@@ -176,6 +176,40 @@ The spec's codes (`unknown-key`, `invalid-type`, `invalid-value`,
 | `target-size` | A pinned interactive size below `accessibility.targetMin` |
 
 ## Size and speed
+
+### Without the theme library (`design-system/compile-core`, G127)
+
+> From `0.11.0`.
+
+`@texuli/tokens/design-system/compile-core` is every export of
+`design-system/compile` except `loadLibraryBase` and `resolveDesignSystem`,
+plus `resolveDesignSystemCore(input, options)` and the
+`ResolveDesignSystemCoreOptions` and `DesignSystemLibraryLoader` types (both
+entries export them). `resolveDesignSystemCore` is `resolveDesignSystem`
+with the `texuli:<id>` loader injected: `options.resolve` answers first,
+then `options.loadLibraryBase` for a `texuli:<id>` base it left `undefined`
+or `null`. Without a loader such a base is refused like the synchronous
+resolver refuses it (`invalid-value` at `$.extends`, "Nothing resolves
+texuli:<id>."). `resolveDesignSystem` is `resolveDesignSystemCore` with
+`loadLibraryBase` as the default, and it accepts `options.loadLibraryBase`
+too. The library code lives in `src/design-system/resolve-library.ts`,
+which only `design-system/compile` imports, so a host on the core entry has
+no reference to the theme library in its build
+(`tests/tree-shake.test.ts` bundles both entries).
+
+```ts
+import { compileDesignSystem, resolveDesignSystemCore } from '@texuli/tokens/design-system/compile-core';
+
+const resolved = await resolveDesignSystemCore(doc, {
+  resolve: (ref) => hostDocuments.get(ref),
+  loadLibraryBase: (ref) => hostThemeBases.get(ref), // or none: texuli:<id> is refused
+});
+const compiled = resolved.ok ? compileDesignSystem(resolved.document) : resolved;
+```
+
+Measured on 2026-10-31: `design-system/compile-core` 30,245 B gzip with no
+lazy chunks; `design-system/compile` 30,915 B gzip plus the 22,243 B of
+lazy library chunks (30,814 B before the split).
 
 Measured with `pnpm size --filter tokens` (gzip, 2026-10-30):
 `design-system/compile` 30,780 B (library themes in lazy chunks, 21.9 KB,

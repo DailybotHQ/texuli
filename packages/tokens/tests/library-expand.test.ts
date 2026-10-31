@@ -1,5 +1,7 @@
 // @vitest-environment node
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { renderExpandMetadata } from '../scripts/render-library.ts';
 import {
   BUILTIN_PRESET_IDS,
   clearExpandThemeCache,
@@ -11,11 +13,15 @@ import {
   listThemeLibrary,
   loadAllExpandThemes,
   loadExpandTheme,
+  loadExpandThemeDefinition,
   loadFullLibraryTheme,
   searchExpandThemeLibrary,
   searchThemeLibrary,
 } from '../src/library-expand/index.ts';
-import { THEME_LIBRARY_META as PORT_META } from '../src/library-port/index.ts';
+import {
+  loadLibraryThemeDefinition,
+  THEME_LIBRARY_META as PORT_META,
+} from '../src/library-port/index.ts';
 import { contrastRatio } from '../src/palette/index.ts';
 
 const TEXT_PAIRS = [
@@ -142,4 +148,34 @@ describe('library expand catalog (T-tokens-library-expand)', () => {
       expect(themes[0]?.id).toBe('violet');
     })();
   }, 240000);
+});
+
+describe('library metadata descriptions (G126)', () => {
+  // A complete sentence ends with terminal punctuation (a closing parenthesis may follow it).
+  const COMPLETE = /[.!?][)"']?$/;
+
+  it('gives every expand and port metadata row a complete sentence that the definition starts with', async () => {
+    const libraries = [
+      { meta: EXPAND_THEME_LIBRARY_META, load: loadExpandThemeDefinition },
+      { meta: PORT_META, load: loadLibraryThemeDefinition },
+    ];
+    let checked = 0;
+    for (const { meta, load } of libraries) {
+      for (const row of meta) {
+        const full = (await load(row.id)).description;
+        expect(row.description, row.id).toMatch(COMPLETE);
+        expect(full.startsWith(row.description), row.id).toBe(true);
+        checked += 1;
+      }
+    }
+    expect(checked).toBe(210);
+    expect(
+      EXPAND_THEME_LIBRARY_META.find((row) => row.id === 'terracotta-hearth')?.description
+    ).toBe('Terracotta Hearth: curated warm family theme for the expanded library.');
+  });
+
+  it('keeps the expand rows generated from the definition modules (no drift)', async () => {
+    const file = new URL('../src/library-expand/metadata.ts', import.meta.url);
+    expect(readFileSync(file, 'utf8')).toBe(await renderExpandMetadata());
+  });
 });

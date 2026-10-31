@@ -1,9 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { render } from '@testing-library/svelte';
+import { compileDesignSystem } from '@texuli/tokens/design-system/compile';
 import { describe, expect, it } from 'vitest';
+import { loadPagesLibraryBase } from '../src/reader/core.ts';
 import type { PagesDesignSystemEvent } from '../src/reader/index.ts';
 import PageReader from '../src/reader/PageReader.svelte';
+import PageReaderCore from '../src/reader/PageReaderCore.svelte';
 import { doc, para } from './fixtures.ts';
 
 /**
@@ -20,10 +23,14 @@ const harbor = (
 ).designSystem.inline;
 const TIMEOUT = { timeout: 30_000 };
 
-function read(designSystem: unknown, props: Record<string, unknown> = {}) {
+function read(
+  designSystem: unknown,
+  props: Record<string, unknown> = {},
+  component: typeof PageReader | typeof PageReaderCore = PageReader
+) {
   const events: PagesDesignSystemEvent[] = [];
   const page = { ...doc([para('p1', 'Fictional notes.')]), designSystem } as never;
-  const result = render(PageReader, {
+  const result = render(component as typeof PageReader, {
     props: {
       document: page,
       onDesignSystem: (e: PagesDesignSystemEvent) => events.push(e),
@@ -80,6 +87,61 @@ describe('the page reader applies a document design system', () => {
     }
   );
 
+  it(
+    'paints a dark-only design system dark under a light host, and data-tx-mode says so',
+    TIMEOUT,
+    async () => {
+      const darkOnly = { ...harbor, color: { ...(harbor.color as object), modes: ['dark'] } };
+      const compiled = compileDesignSystem(darkOnly);
+      if (!compiled.ok) throw new Error('dark-only harbor compiles');
+      for (const props of [{}, { designSystems: { mode: 'light' } }]) {
+        const { article, events, unmount } = read({ inline: darkOnly }, props);
+        expect(await settled(article)).toBe('applied');
+        expect(events).toEqual([{ status: 'applied', id: 'harbor', source: 'inline' }]);
+        expect(article.getAttribute('data-tx-mode')).toBe('dark');
+        expect(article.style.getPropertyValue('--tx-background')).toBe(
+          compiled.vars.dark?.['--tx-background']
+        );
+        unmount();
+      }
+    }
+  );
+
+  it(
+    'refuses a cached copy it cannot paint with an event, and drops the design system it replaces',
+    TIMEOUT,
+    async () => {
+      // A copy without attrs is not a compiled design system: refused, never thrown.
+      const bare = read(
+        { ref: 'harbor@1.2.0' },
+        { designSystems: { resolve: () => ({ id: 'harbor', vars: { light: {} } }) } }
+      );
+      expect(await settled(bare.article)).toBe('refused');
+      expect(bare.events[0]).toMatchObject({ status: 'refused' });
+      bare.unmount();
+
+      const page = (designSystem: unknown) =>
+        ({ ...doc([para('p1', 'Fictional notes.')]), designSystem }) as never;
+      const events: PagesDesignSystemEvent[] = [];
+      const { container, rerender } = render(PageReader, {
+        props: { document: page({ inline: harbor }), onDesignSystem: (e) => events.push(e) },
+      });
+      const article = container.querySelector('article') as HTMLElement;
+      expect(await settled(article)).toBe('applied');
+      expect(article.getAttribute('data-tx-ds')).toBe('harbor');
+      // A compiled copy with no mode: the reader refuses it and restores the article.
+      await rerender({
+        document: page({ ref: 'harbor@1.2.0' }),
+        designSystems: { resolve: () => ({ id: 'harbor', vars: {}, attrs: {} }) },
+      });
+      await expect.poll(() => events.length).toBe(2);
+      expect(events[1]).toMatchObject({ status: 'refused', code: 'design-system-refused' });
+      expect(article.getAttribute('data-tx-pages-design-system')).toBe('refused');
+      expect(article.hasAttribute('data-tx-ds')).toBe(false);
+      expect(article.style.getPropertyValue('--tx-primary')).toBe('');
+    }
+  );
+
   it('never reaches the step statically', () => {
     const src = join(import.meta.dirname, '../src');
     const seen = new Set<string>();
@@ -99,4 +161,49 @@ describe('the page reader applies a document design system', () => {
     visit(join(src, 'reader/index.ts'));
     expect(seen.has(join(src, 'reader/PageReader.svelte'))).toBe(true);
   });
+});
+
+describe('the reader core reaches the theme library only through a loader it is given (G127)', () => {
+  it(
+    'refuses texuli:<theme> on PageReaderCore without loadLibraryBase, applies it with one, and PageReader keeps the library default',
+    TIMEOUT,
+    async () => {
+      const violet = { ref: 'texuli:violet' };
+      const bare = read(violet, {}, PageReaderCore);
+      expect(await settled(bare.article)).toBe('refused');
+      expect(bare.events).toEqual([
+        expect.objectContaining({ status: 'refused', code: 'design-system-unresolved' }),
+      ]);
+      bare.unmount();
+
+      const asked: string[] = [];
+      const loadLibraryBase = (ref: string) => {
+        asked.push(ref);
+        return loadPagesLibraryBase(ref);
+      };
+      const injected = read(violet, { loadLibraryBase }, PageReaderCore);
+      expect(await settled(injected.article)).toBe('applied');
+      expect(asked).toEqual(['texuli:violet']);
+      injected.unmount();
+
+      // A loader that hands back a token Theme works for the reference itself, as for a base.
+      const { loadFullLibraryTheme } = await import('@texuli/tokens/library-expand');
+      const themed = read(
+        violet,
+        { loadLibraryBase: (ref: string) => loadFullLibraryTheme(ref.slice('texuli:'.length)) },
+        PageReaderCore
+      );
+      expect(await settled(themed.article)).toBe('applied');
+      expect(themed.events).toEqual([
+        expect.objectContaining({ status: 'applied', source: 'ref' }),
+      ]);
+      themed.unmount();
+
+      const reader = read(violet);
+      expect(await settled(reader.article)).toBe('applied');
+      reader.unmount();
+      const off = read(violet, { loadLibraryBase: null });
+      expect(await settled(off.article)).toBe('refused');
+    }
+  );
 });

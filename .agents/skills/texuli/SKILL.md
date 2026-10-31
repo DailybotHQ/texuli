@@ -40,11 +40,11 @@ agent config, or publish packages without explicit consent (see
    Installing the skill does **not** install Texuli packages or a CLI.
 2. Confirm the workspace has Texuli (workspace packages `texuli`,
    `@texuli/core`, `@texuli/tokens`, …) before promising package imports.
-   All 26 published packages are on npm in the 0.10 line, every one at
-   `0.10.0` (published by CI with provenance; `latest` and `next` both point
-   to it; pre-1.0, so a new minor may break and 1.0.0 will be the first
-   stable release), so install them plainly (`pnpm add texuli`) and pin
-   `0.10.0` or `^0.10.0`; the workspace packages stay `private: true`.
+   All 26 published packages are on npm in the 0.11 line, every one at
+   `0.11.0` (published by CI
+   with provenance; `latest` and `next` point to the newest; pre-1.0, so a
+   new minor may break and 1.0.0 will be the first stable release), so
+   install them plainly (`pnpm add texuli`) and pin `^0.11.0`; the workspace packages stay `private: true`.
    `@texuli/drag` (the drag engine),
    `@texuli/workflows` (the workflow editor), `@texuli/deck` (the deck
    engine behind the deck generator, first published in `0.4.0`),
@@ -54,7 +54,12 @@ agent config, or publish packages without explicit consent (see
    `@texuli/forms` (schema-driven forms), `@texuli/canvas` (the infinite
    canvas) and `@texuli/sheets` (spreadsheets; all three first published in
    `0.8.0`), and `@texuli/mcp` (the local MCP server, first published in
-   `0.9.0`) are in development but on npm as `0.10.0`. The APIs marked "new
+   `0.9.0`) are in development but on npm as `0.11.0`. `0.11.0` adds
+   `@texuli/tokens/library-ids` and the core design-system entries
+   (`@texuli/tokens/design-system/compile-core`,
+   `@texuli/player/design-system-core`), and the slides and pages core
+   entries stop loading the theme library by default (see
+   [`upgrade/SKILL.md`](upgrade/SKILL.md)). The APIs marked "new
    in `0.10.0`" in the package index (design systems: `@texuli/spec/design-system`,
    `@texuli/tokens/design-system/*`, `texuli/design-system`,
    `@texuli/player/design-system`, `@texuli/astro/design-system`,

@@ -41,6 +41,8 @@ import {
   libraryDocument,
   MAX_IMPORT_BYTES,
   type PairRow,
+  previewMode,
+  previewModes,
   ROLES,
   rolePinField,
   SECTIONS,
@@ -516,6 +518,11 @@ function setMode(next: string | string[]): void {
   if (next === 'light' || next === 'dark') mode = next;
 }
 
+// The modes the compiled design system offers, and the one the preview paints: a dark-only
+// design system previews dark (with Dark pressed and Light disabled), as the runtime paints it.
+const previewOffers = $derived(previewModes(compiled));
+const shownMode = $derived(previewMode(compiled, mode));
+
 /* ── Export and share ──────────────────────────────────────────────────── */
 
 async function exportContent(format: ExportFormat): Promise<string | null> {
@@ -582,7 +589,7 @@ const STUDIO_KEYS: ToolShortcutMap = { d: 'mode', s: 'share', '?': 'keys' };
 
 function onStudioAction(action: string): void {
   if (action === 'keys') keysOpen = !keysOpen;
-  else if (action === 'mode') mode = mode === 'light' ? 'dark' : 'light';
+  else if (action === 'mode') mode = shownMode === 'light' ? 'dark' : 'light';
   else if (action === 'share') void share();
 }
 
@@ -968,9 +975,9 @@ function toggle(id: string, event: Event): void {
       <section class="panel" aria-labelledby="ds-preview-title">
         <div class="preview-head">
           <h2 id="ds-preview-title">Preview</h2>
-          <ToggleGroup type="single" value={mode} onValueChange={setMode} aria-label="Preview mode">
-            <ToggleGroupItem value="light">Light</ToggleGroupItem>
-            <ToggleGroupItem value="dark">Dark</ToggleGroupItem>
+          <ToggleGroup type="single" value={shownMode} onValueChange={setMode} aria-label="Preview mode">
+            <ToggleGroupItem value="light" disabled={!previewOffers.includes('light')}>Light</ToggleGroupItem>
+            <ToggleGroupItem value="dark" disabled={!previewOffers.includes('dark')}>Dark</ToggleGroupItem>
           </ToggleGroup>
           {#if variants.length > 0}
             <label class="inline">
@@ -985,7 +992,7 @@ function toggle(id: string, event: Event): void {
           {/if}
         </div>
         {#if compiled && PreviewsView}
-          <DesignSystemProvider {compiled} {mode} scope="ds-studio" class="preview-host" data-tx-ds-scope="">
+          <DesignSystemProvider {compiled} mode={shownMode} scope="ds-studio" class="preview-host" data-tx-ds-scope="">
             <PreviewsView bind:value={previewTab} />
           </DesignSystemProvider>
         {:else}

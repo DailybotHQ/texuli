@@ -7,6 +7,10 @@
  *   allows it), sets the allowlisted attributes, `data-tx-mode` and
  *   `[data-tx-scope]`, registers font faces on first use, hands component
  *   defaults to the host, and returns a dispose that restores the element.
+ * - `pickDesignSystemMode(compiled, mode)` is the mode all three paint for a
+ *   requested one: that mode when it was compiled, otherwise the first
+ *   compiled mode (light, then dark), so a dark-only design system under a
+ *   light host paints dark and says so in `data-tx-mode`.
  * - `designSystemStyle(compiled, { selector })` is the same declarations as
  *   a CSS string, for server rendering, with the dark rule.
  * - `designSystemAppearance(compiled, { mode })` is the same map as a
@@ -55,7 +59,7 @@ export interface ApplyDesignSystemOptions {
 export interface DesignSystemStyleOptions {
   /** The scope selector; default `[data-tx-ds="<id>"]` (plus the variant attribute when compiled for one). */
   selector?: string;
-  /** The modes to emit (default: every compiled mode). With light and dark, dark is the `[data-tx-mode="dark"]` rule. */
+  /** The modes to emit (default, and for an empty list: every compiled mode). With light and dark, dark is the `[data-tx-mode="dark"]` rule. */
   modes?: readonly DesignSystemMode[];
 }
 
@@ -76,11 +80,30 @@ export function designSystemDeclarations(
   return out;
 }
 
-function modeVars(compiled: ApplicableDesignSystem, mode: DesignSystemMode) {
-  const vars = (mode === 'light' || mode === 'dark') && compiled.vars[mode];
-  if (!vars) throw new TypeError(`Mode not compiled: ${mode}`);
-  return vars;
+const MODES: readonly DesignSystemMode[] = ['light', 'dark'];
+
+/**
+ * The mode a design system paints for `mode`: `mode` itself when it was
+ * compiled, otherwise the first compiled mode (light, then dark). A design
+ * system compiled with `color.modes: ["dark"]` paints dark under a light
+ * host. `applyDesignSystem`, `designSystemStyle`, `designSystemAppearance`,
+ * `DesignSystemProvider`, the player, the pages reader and the slides stage
+ * all follow this rule, and write the result as `data-tx-mode`. Throws a
+ * `TypeError` for a mode other than `light` or `dark`, or when no mode was
+ * compiled.
+ */
+export function pickDesignSystemMode(
+  compiled: Pick<ApplicableDesignSystem, 'vars'>,
+  mode: DesignSystemMode
+): DesignSystemMode {
+  const painted =
+    MODES.includes(mode) && [mode, ...MODES].find((candidate) => compiled.vars[candidate]);
+  if (!painted) throw new TypeError(`Mode not compiled: ${mode}`);
+  return painted;
 }
+
+/** The variables of a painted mode (`pickDesignSystemMode` checked it is compiled). */
+type ModeVars = Readonly<Record<string, string>>;
 
 const body = (vars: Readonly<Record<string, string>>) =>
   designSystemDeclarations(vars)
@@ -91,8 +114,10 @@ const body = (vars: Readonly<Record<string, string>>) =>
  * The compiled variables as CSS for `selector`: the first mode (light when
  * present) on the selector itself, dark on `[data-tx-mode="dark"]` (the
  * scope or an ancestor). The same declarations, in the same order, that
- * `applyDesignSystem` writes. Throws a `TypeError` for a selector or id that
- * could leave the rule.
+ * `applyDesignSystem` writes. A requested mode that was not compiled is the
+ * one {@link pickDesignSystemMode} paints, so a single compiled mode always lands
+ * on the selector. Throws a `TypeError` for a selector or id that could leave
+ * the rule.
  */
 export function designSystemStyle(
   compiled: ApplicableDesignSystem,
@@ -108,14 +133,18 @@ export function designSystemStyle(
       : '');
   if (typeof selector !== 'string' || !selector.trim() || CSS_UNSAFE.test(selector))
     throw new TypeError('Unsafe selector');
-  const modes = options.modes ?? (Object.keys(compiled.vars) as DesignSystemMode[]);
-  for (const mode of modes) modeVars(compiled, mode);
-  const first = modes.includes('light') ? 'light' : modes[0];
-  if (!first) throw new TypeError('No mode');
-  let css = `${selector}{${body(modeVars(compiled, first))}}`;
-  if (first === 'light' && modes.includes('dark')) {
+  // The distinct painted modes: a requested mode that was not compiled is the one painted, so
+  // the default of both modes (also for an empty list) is every compiled mode.
+  const modes = new Set(
+    (options.modes?.length ? options.modes : MODES).map((mode) =>
+      pickDesignSystemMode(compiled, mode)
+    )
+  );
+  // Light on the selector when painted, else the one mode; dark is its own rule only next to light.
+  let css = `${selector}{${body(compiled.vars[modes.has('light') ? 'light' : 'dark'] as ModeVars)}}`;
+  if (modes.size > 1) {
     const s = `:is(${selector})`;
-    css += `\n${s}[data-tx-mode="dark"],[data-tx-mode="dark"] ${s}:not([data-tx-mode="light"]){${body(modeVars(compiled, 'dark'))}}`;
+    css += `\n${s}[data-tx-mode="dark"],[data-tx-mode="dark"] ${s}:not([data-tx-mode="light"]){${body(compiled.vars.dark as ModeVars)}}`;
   }
   return css;
 }
@@ -123,16 +152,18 @@ export function designSystemStyle(
 /**
  * The applied variables as a no-flash cache entry: pass it to
  * `cacheAppearance(namespace, …)` and the `noFlashScript` replay writes the
- * same values on `<html>` before first paint.
+ * same values on `<html>` before first paint. `mode` is the mode painted
+ * ({@link pickDesignSystemMode}), which may differ from the one requested.
  */
 export function designSystemAppearance(
   compiled: ApplicableDesignSystem,
   options: { mode: DesignSystemMode }
 ): { themeId: string; mode: DesignSystemMode; vars: Record<string, string> } {
+  const mode = pickDesignSystemMode(compiled, options.mode);
   return {
     themeId: compiled.id,
-    mode: options.mode,
-    vars: Object.fromEntries(designSystemDeclarations(modeVars(compiled, options.mode))),
+    mode,
+    vars: Object.fromEntries(designSystemDeclarations(compiled.vars[mode] as ModeVars)),
   };
 }
 
@@ -246,7 +277,9 @@ function setAttr(el: HTMLElement, name: string, value: string | null | undefined
  * write) and keeps the original state for the dispose. Returns a dispose
  * that restores the element as it was before the first apply (one style
  * write); a dispose superseded by a later apply does nothing. Fonts stay
- * registered: other scopes may use them.
+ * registered: other scopes may use them. A mode that was not compiled
+ * paints the one {@link pickDesignSystemMode} picks, and `data-tx-mode` names
+ * the mode painted.
  */
 export function applyDesignSystem(
   el: HTMLElement,
@@ -254,10 +287,11 @@ export function applyDesignSystem(
   options: ApplyDesignSystemOptions
 ): () => void {
   if (!el?.style) throw new TypeError('Not an element');
-  const { mode, variant = compiled.variant } = options;
+  const { variant = compiled.variant } = options;
   if (compiled.variant !== undefined && variant !== compiled.variant)
     throw new TypeError(`Compiled for variant ${compiled.variant}, not ${variant}`);
-  const next = designSystemDeclarations(modeVars(compiled, mode));
+  const painted = pickDesignSystemMode(compiled, options.mode);
+  const next = designSystemDeclarations(compiled.vars[painted] as ModeVars);
   const previous = applied.get(el);
   const state: Applied = {
     vars: previous?.vars ?? new Map(),
@@ -266,17 +300,20 @@ export function applyDesignSystem(
   applied.set(el, state);
   writeStyle(el.style, state.vars, next);
 
-  const attrs = compiled.attrs as Record<string, unknown>;
+  // A cached copy without `attrs` keeps the element's own attributes.
+  const attrs = (compiled.attrs ?? {}) as Record<string, unknown>;
   for (const name of DESIGN_SYSTEM_ATTRIBUTES) {
     const value = name === 'data-tx-ds-variant' ? variant : attrs[name];
-    const safe =
-      typeof value === 'string' && value.length <= 128 && !CSS_UNSAFE.test(value)
-        ? value
-        : undefined;
-    setAttr(el, name, safe ?? state.attrs.get(name));
+    // The provider's markup check, so the server HTML and the applied element agree.
+    setAttr(
+      el,
+      name,
+      isSafeDesignSystemValue(value) && value.length <= 128 ? value : state.attrs.get(name)
+    );
   }
-  setAttr(el, 'data-tx-mode', mode);
-  if (!el.hasAttribute('data-tx-scope')) el.setAttribute('data-tx-scope', '');
+  setAttr(el, 'data-tx-mode', painted);
+  // Adds an empty scope; a host-named one is kept.
+  el.toggleAttribute('data-tx-scope', true);
 
   if (options.fonts !== false && compiled.fontFaces?.length)
     registerFonts(el.ownerDocument, compiled.fontFaces, options.base);

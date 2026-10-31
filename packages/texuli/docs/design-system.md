@@ -153,12 +153,13 @@ and provides its component defaults to every Texuli component inside.
 | Prop | Default | Effect |
 | --- | --- | --- |
 | `compiled` | required | A `CompiledDesignSystem` (or a cached JSON copy) |
-| `mode` | `light` | The compiled mode to apply |
+| `mode` | `light` | The mode to apply; one `compiled` lacks paints its compiled mode (`pickDesignSystemMode`), and `data-tx-mode` names the mode painted |
 | `variant` | `compiled.variant` | Must match the variant it was compiled for |
 | `scope` | the design system's id | The `data-tx-scope` name, so `[data-tx-scope="acme"]` rules match |
 | `fonts` | `true` | Register `fontFaces` lazily on first use |
 | `base` | the document's base URI | What relative font paths resolve against |
 | `ref` | | The scope element (bindable) |
+| `onapplyerror` | | Called with the error when `compiled` cannot be applied (no compiled mode, a variant mismatch); the provider never throws, and restores the scope so the previous design system does not stay painted |
 
 - **Scope:** the element carries `data-tx-scope`, `data-tx-mode` and the
   allowlisted `data-tx-ds*` and hook attributes in markup (escaped
@@ -179,11 +180,16 @@ and provides its component defaults to every Texuli component inside.
   measured 217,091 B before and after).
 
 The subpath also re-exports `applyDesignSystem` (with its
-`ApplicableDesignSystem` and `ApplyDesignSystemOptions` types) and offers
+`ApplicableDesignSystem` and `ApplyDesignSystemOptions` types; the mode rule,
+`pickDesignSystemMode`, is in `@texuli/tokens/design-system/apply`) and offers
 `loadDesignSystemCompiler()`, which imports
 `@texuli/tokens/design-system/compile` on demand as a lazy chunk (never at
 import), for hosts that compile at run time without depending on
 `@texuli/tokens` themselves: `@texuli/player` uses both for a blueprint's
-`designSystem` (spec 0.10.0).
+`designSystem` (spec 0.10.0). `loadDesignSystemCompilerCore()` (from
+`0.11.0`, G127) imports `@texuli/tokens/design-system/compile-core`
+instead: the same compiler without the theme library, whose
+`resolveDesignSystemCore` loads `texuli:<id>` bases only through a loader the
+caller passes (`@texuli/player/design-system-core` uses it).
 
 Tests: `packages/texuli/tests/design-system-provider.test.ts`.

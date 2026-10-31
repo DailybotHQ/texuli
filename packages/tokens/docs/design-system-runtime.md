@@ -33,6 +33,7 @@ const css = designSystemStyle(compiled); // [data-tx-ds="acme"]{…}\n…[data-t
 | `applyDesignSystem(el, compiled, { mode, variant?, fonts?, base?, defaults? })` | Writes `compiled.vars[mode]` on `el` in **one** `style.cssText` write (CSSOM, so a strict `style-src` without `'unsafe-inline'` allows it), keeping the element's own declarations. Sets the allowlisted attributes (`DESIGN_SYSTEM_ATTRIBUTES`), `data-tx-mode` and `data-tx-scope` (a host-named scope is kept). Registers `fontFaces` (see below), passes `compiled.defaults` to `defaults` (`setDesignDefaults`, or the provider below). Returns a dispose that restores every variable and attribute it changed, in one write, and calls `defaults({})` |
 | `designSystemStyle(compiled, { selector?, modes? })` | The same declarations as a CSS string: the first mode (light when compiled) on `selector`, dark on `:is(selector)[data-tx-mode="dark"]` and `[data-tx-mode="dark"] :is(selector):not([data-tx-mode="light"])`. The default selector is `[data-tx-ds="<id>"]` (plus `[data-tx-ds-variant]` when compiled for a variant). Throws a `TypeError` for a selector with braces, `;`, `<`, `>`, `@`, `\`, `!`, `` ` ``, comments or characters outside printable ASCII, and, for the default selector, for an id or variant outside `[a-z][a-z0-9-]*` (so a hand-made id such as `x"],*,[x="` cannot widen the rule) |
 | `designSystemAppearance(compiled, { mode })` | The same map as a no-flash cache entry: `cacheAppearance(namespace, designSystemAppearance(compiled, { mode }))`, then `noFlashScript(namespace)` replays it on `<html>` before first paint ([tokens-no-flash.md](tokens-no-flash.md)) |
+| `pickDesignSystemMode(compiled, mode)` | The mode all three paint for a requested one: `mode` when it was compiled, otherwise the first compiled mode (light, then dark). Throws a `TypeError` for a mode other than `light` or `dark`, or when nothing was compiled. |
 | `designSystemDeclarations(vars)` | The safe `[name, value]` pairs of one map, sorted by name: what all three write |
 | `isSafeDesignSystemValue(value)` | The value filter: the same function as `isSafeCompiledValue` in [design-system/emit](design-system-io.md#emitters-design-systememit) |
 | `ApplicableDesignSystem` | The fields the runtime reads (`id`, `variant`, `vars`, `attrs`, `fontFaces`, `defaults`): a cached JSON copy of a `CompiledDesignSystem` works |
@@ -40,6 +41,22 @@ const css = designSystemStyle(compiled); // [data-tx-ds="acme"]{…}\n…[data-t
 `variant` defaults to `compiled.variant` and must equal it when both are
 set (a variant is chosen at compile time). Fonts stay registered after a
 dispose: other scopes may use them.
+
+### A mode the design system did not compile
+
+A document may compile one mode (`color.modes: ["dark"]`). Asking for the
+other mode is not an error: `applyDesignSystem`, `designSystemStyle` and
+`designSystemAppearance` paint the mode `pickDesignSystemMode` picks (the
+compiled one), and `data-tx-mode` (and the appearance entry's `mode`) names
+the mode painted, so components keyed on `[data-tx-mode="dark"]` follow the
+palette. A dark-only design system under a light host paints dark.
+`DesignSystemProvider` (`texuli/design-system`), the player, the pages
+reader and the slides stage follow the same rule. `designSystemStyle` puts a
+single compiled mode on the selector, and so does `emitCss`; its `modes`
+option, when empty, is the default (every compiled mode). A cached copy
+without `attrs` applies too, keeping the element's own attributes, and an
+attribute value passes `isSafeDesignSystemValue` (the provider's markup
+check) before it is written.
 
 ## Escaped by construction
 
