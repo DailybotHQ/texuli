@@ -132,6 +132,9 @@ typed vocabulary, used only when a prop is omitted. Every component also
 reads its component tokens (`--tx-button-radius`, `--tx-card-padding-inline`…)
 and the tier-3 hooks (`data-tx-button-style` and friends)
 ([design-system.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/design-system.md)).
+`texuli/design-system` (unreleased, `0.10.0`) adds `DesignSystemProvider`, a
+scope element that applies a compiled design system and its component
+defaults ([design-system.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/design-system.md#designsystemprovider)).
 
 ## New in 0.8.0
 

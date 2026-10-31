@@ -2,9 +2,9 @@
 
 > **Status: in development for `0.10.0`, not on npm.** Both subpaths exist on
 > the `release/0.10.0` branch and ship only with `@texuli/tokens@0.10.0`. The
-> runtime (`design-system/apply`, `designSystemStyle`), the emitters, the
-> importers, the published fixtures subpath, `texuli ds check` and the MCP
-> `ds.*` operations are **planned** (later PLAN_011 tasks).
+> runtime is [design-system-runtime.md](design-system-runtime.md); the
+> emitters, the importers, the published fixtures subpath, `texuli ds check`
+> and the MCP `ds.*` operations are **planned** (later PLAN_011 tasks).
 
 The compiler turns a design-system document
 ([`@texuli/spec/design-system`](../../spec/docs/design-system.md), ADR-021)

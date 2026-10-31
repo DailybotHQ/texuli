@@ -42,6 +42,7 @@ an appearance cache.
 | `bootstrap` | `injected` | `injected` registers the script in `head-inline`; `manual` skips registration so the host can place the returned body. |
 | `density` | unset | Optionally overrides the cached density scale with `compact`, `comfortable`, or `spacious`. |
 | `radius` | unset | Optionally overrides the cached radius scale with `compact`, `comfortable`, or `rounded`. |
+| `designSystem` | unset | Unreleased (`0.10.0`): `{ compiled, selector?, modes? }`. Inlines the compiled design system's `designSystemStyle` in every page's `<head>`; see [Design-system style](#design-system-style). |
 
 The selected density and radius are applied on the document root before the
 theme stylesheet paints. When either option is unset, the cached theme's
@@ -77,6 +78,56 @@ generated the page before relying on it in a production policy. Astro or host
 transformations that alter the body also alter the hash. This hash authorizes
 only that script body; it does not require a nonce or `'unsafe-inline'` for
 event handlers.
+
+## Design-system style
+
+> **Status:** in development for `0.10.0`, not on npm.
+
+`designSystem: { compiled }` puts a compiled design system
+([design-system-runtime.md](../../tokens/docs/design-system-runtime.md))
+on the server-rendered page, so the first paint already has its variables:
+
+```ts
+import { texuli } from '@texuli/astro';
+import compiled from './design-system/acme.compiled.json';
+
+export default defineConfig({
+  integrations: [svelte(), texuli({ designSystem: { compiled } })],
+});
+```
+
+- **What is inlined:** `designSystemStyle(compiled, { selector, modes })`,
+  by default `[data-tx-ds="<id>"]{…}` plus the
+  `[data-tx-mode="dark"]` rule, in a `<style data-tx-ds-style>` before
+  `</head>`. Give the scope element the attribute (`DesignSystemProvider`
+  from `texuli/design-system` renders it), or pass `selector: ':root'` for a
+  page-wide design system. The style is escaped by construction: the
+  runtime filter drops any value that could leave its declaration, and the
+  selector is refused if it could leave the rule.
+- **How:** in `astro:config:setup`, and only with the option, the
+  integration loads `@texuli/astro/design-system` lazily, writes a
+  self-contained middleware (no imports) to Astro's codegen directory and
+  registers it with `addMiddleware({ order: 'pre' })`. The middleware
+  inserts the style once into `text/html` responses (prerendered pages at
+  build time, on-demand pages per request) and drops `Content-Length`;
+  other responses pass through.
+- **CSP:** the hash is the SHA-256 of the exact style body, the way the
+  site's CSP build already hashes inline styles. With Astro's
+  `security.csp` on, the integration adds it to
+  `security.csp.styleDirective.hashes`. A host that writes its own policy
+  takes it from `designSystemInlineStyle`:
+
+```ts
+import { designSystemInlineStyle } from '@texuli/astro/design-system';
+
+const { css, hash } = await designSystemInlineStyle({ compiled });
+const source = `'${hash}'`; // for style-src
+```
+
+The client then keeps the same values: `applyDesignSystem` (or the
+provider) writes byte-identical variables
+([proof](../../tokens/docs/design-system-runtime.md#ssr-no-flash-and-the-client-are-identical)).
+Tests: `packages/astro/tests/design-system.test.ts`.
 
 ## Manual placement with a nonce
 
