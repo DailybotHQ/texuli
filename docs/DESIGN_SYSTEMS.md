@@ -184,6 +184,13 @@ if (compiled.ok) {
 }
 ```
 
+A design system sets theme roles and component tokens; it does not declare
+the system token defaults (`--tx-space-unit`, `--tx-size-*`,
+`--tx-shape-radius-*`…) that component CSS reads with no fallback. The host
+must load `@texuli/tokens/base.css`, or `@texuli/tokens/system.css` (the
+defaults alone, for a host with its own reset; unreleased, `0.10.0`), or
+controls render with no size.
+
 The compiled object is plain JSON: cache it (`emitCompiledJson`, or
 `texuli ds compile <file> --out brand.compiled.json`) and ship only that to
 the app. Its `hash` is stable regardless of key order.

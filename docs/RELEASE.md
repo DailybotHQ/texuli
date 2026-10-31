@@ -73,7 +73,7 @@ On the branch so far:
   an exact `id@x.y.z` or `texuli:<theme>`, and `inline`, a whole
   document), with the `brand-report` and `brand-deck` goldens and three
   invalid fixtures. The `0.9.0 → 0.10.0` migration only stamps `spec`;
-  the digest `07fc15722c3e2f5d9961d62d02ea7a1866d86b8d5099ff3339556f79ef50e59f` is pinned in `packages/spec/versions.json`.
+  the digest `6c0ce9cec3dfc318928e739b34570ede57670a628908aaf57b1a0bb2294be5bf` is pinned in `packages/spec/versions.json`.
   `validateDraft` migrates a `0.9.0` envelope and stamps `spec: "0.10.0"`;
   hosts that compare the `spec` string need to accept it.
 - **`@texuli/spec/design-system`** (new subpath): `validateDesignSystem`
@@ -142,8 +142,8 @@ On the branch so far:
   token-usage guard (`system-color` and `unknown-token` rules).
 - **In progress on the branch (not merged yet, listed here as they land):**
   the Design System Studio on texuli.com; design systems on standalone decks,
-  player component defaults and the document writers; the Protoyard gaps
-  G105 and G107–G110.
+  player component defaults and the document writers; the Protoyard gap
+  G105.
 
 **Removed in 0.10.0** (deprecated in `0.9.0` for one minor; done on the
 branch):
@@ -216,6 +216,45 @@ branch):
     and a rejection is announced (`labels.saveFailed`). Existing
     two-argument handlers keep working; both buttons keep the
     `tx-inbox__button` class.
+- **A host must load `@texuli/tokens/base.css` or `@texuli/tokens/system.css`**
+  (reported by Protoyard on 0.9.0). Since token contract v2 (`0.9.0`),
+  component CSS reads the system tokens (`--tx-space-unit`,
+  `--tx-size-icon-sm`, `--tx-shape-radius-*`, the type roles…) with no
+  fallback, and a theme does not declare them. A host with its own reset
+  that never loaded `base.css` rendered controls with no size (10 E2E
+  failures at Protoyard) until it imported it. No development warning
+  fires for this: a check would need a cross-bundler development flag (a
+  new dependency) and a computed-style read in every component on mount.
+- **Protoyard gaps G107–G110** (PLAN_011 T-gaps-107-110; reported on 0.9.0):
+  - **G110** (`@texuli/tokens/system.css`, new): the system token defaults
+    alone, the `:where(:root, [data-tx-theme], [data-tx-scope])` block in
+    `@layer tx.base`, with no reset, motion tables or focus ring hook, for
+    hosts that keep their own reset: 1,189 B of CSS gzip instead of
+    `base.css`'s 2,781 B. One renderer writes the block into both files
+    (`generate.ts --check` fails on drift), and a test checks that
+    `system.css` declares every system token that component CSS reads and
+    that `base.css` declares the same values.
+  - **G107** (`@texuli/data/grid-core`): DataGrid takes `bind:ref` and
+    rest attributes on its root; skeleton loading rows (`loadingRows`, or
+    a `loadingRow` snippet), with `aria-busy` on the table, one exposed row
+    carrying `labels.loading`, the rest `aria-hidden`, and `labels.loading`
+    in the polite status line while `loading`; per-column `class` and
+    `headerClass` (ColumnGrid reads them too); and an optional column
+    `type`, inferred from the rows (`DataGridColumnInput`,
+    `inferColumnType`, `resolveDataGridColumns`), else `text`. The status
+    line now says `labels.loading` instead of the row count while
+    `loading` (the single loading row is unchanged).
+  - **G108** (`texuli/command`): CommandPalette takes `searchLabel`, the
+    search combobox's name (and its results list's), defaulting to
+    `title`, which still names the dialog. The `command-palette` catalog
+    manifest lists it (not agent-emittable, so the spec is unchanged).
+  - **G109** (`texuli/date`, `@texuli/primitives/date-picker`): after the
+    first pick of a range, the grid's polite status says the end date is
+    still needed (`labels.pickEnd(start)`, a function label, message id
+    `primitives.date-picker.pick-end`), cleared by the second pick or by
+    closing the dialog; DateRangePicker takes `panel` and `footer`
+    snippets rendered inside the modal calendar dialog, each with
+    `{ value, close }` (`DateRangePickerPanelContext`).
 
 ### 0.9.0
 
@@ -412,7 +451,11 @@ break; check these when upgrading from the 0.8 line:
   is empty in `0.9.0`. Component tokens are fallback-only (never
   declared), so a host reads them with their registry default and sets
   them on a scope; import `@texuli/tokens/base.css`, which now declares
-  the system defaults. Default variants and sizes come from
+  the system defaults. **Correction (reported after release): loading
+  `base.css` is required, not optional.** Component CSS reads the system
+  tokens with no fallback and only `base.css` declares them, so a host
+  with its own reset that skips it gets controls with no size. `0.10.0`
+  adds `@texuli/tokens/system.css`, the defaults without the reset. Default variants and sizes come from
   `setDesignDefaults` (`texuli/defaults`).
 - **A pending Button** (`loading` or `autoLoading`) is `aria-disabled`
   with its click suppressed instead of natively `disabled`, so it keeps
@@ -1610,7 +1653,7 @@ the package-to-package contract outside this repository.
 | `@texuli/deck` | `0.9.0` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/document`, `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
 | `@texuli/drag`, `@texuli/workflows` | `0.9.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
 | `@texuli/mcp` | `0.9.0` (first published as `0.9.0`) | `packages/mcp/package.json`, with `@texuli/tools` pinned to exactly its own version; published right after `@texuli/tools`. In development (ADR-019), pre-1.0. |
-| Blueprint spec on `release/0.10.0` (in development, not on npm) | `0.10.0`, digest `07fc15722c3e2f5d9961d62d02ea7a1866d86b8d5099ff3339556f79ef50e59f` | `packages/spec/versions.json`; the workspace's generated sources carry the `0.10.0` stamp. Ships only when `@texuli/spec@0.10.0` publishes; a stamp-only migration from `0.9.0`. |
+| Blueprint spec on `release/0.10.0` (in development, not on npm) | `0.10.0`, digest `6c0ce9cec3dfc318928e739b34570ede57670a628908aaf57b1a0bb2294be5bf` | `packages/spec/versions.json`; the workspace's generated sources carry the `0.10.0` stamp. Ships only when `@texuli/spec@0.10.0` publishes; a stamp-only migration from `0.9.0`. |
 | Blueprint spec | `0.9.0`, digest `497df4d3b0c67d53483163ebd9bd73733b52caf5f8e2966478f1cf860e6f9d9d` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.9.0`; a stamp-only migration from `0.8.0`. |
 | Blueprint spec in `@texuli/spec@0.8.0` | `0.8.0`, digest `f6b6388280d247eb9c3106a925111f35b90d1ec3b59c23652542f06a9f103daf` | The 0.8 line's generated sources carry the `0.8.0` stamp. |
 | Blueprint spec in `@texuli/spec@0.7.0` | `0.7.0`, digest `43e44fa9a198d337d686b4e2d86882a06a676ae1e1c1f02d023b3a525795a8b2` | The previous release's generated sources carry the `0.7.0` stamp. |
