@@ -1755,7 +1755,9 @@ reflect this decision.
   architecture task under the developer's trust pre-authorization; the
   developer may override this decision. **Status: partly shipped:**
   scoping (`[data-tx-scope]`) and scoped portals shipped in release 0.9.0;
-  the design-system runtime is planned for 0.10.0.
+  the design-system runtime (`@texuli/tokens/design-system/apply`,
+  `DesignSystemProvider` in `texuli/design-system`, and the `designSystem`
+  option of `@texuli/astro`) is built on `release/0.10.0`, not on npm.
 - **Context:** `applyTheme` already writes `--tx-*` properties on an
   element through the CSSOM, and the no-flash script replays a cached,
   filtered variable map before first paint (it rejects `var(`, `url(` and
