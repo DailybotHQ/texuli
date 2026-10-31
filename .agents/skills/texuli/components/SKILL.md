@@ -24,7 +24,9 @@ minor may break), and never suggest a download URL. `@texuli/drag`,
 in `0.5.0`), `@texuli/document` and `@texuli/pages` (both first published
 in `0.7.0`), `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (all
 three first published in `0.8.0`) and `@texuli/mcp` (first published in
-`0.9.0`) are in development and on npm as `0.10.0`. Features such as
+`0.9.0`) are in development and on npm in the 0.10 line (`@texuli/drag`,
+`@texuli/deck` and `@texuli/document` as `0.10.0`, the others as
+`0.10.1`). Features such as
 `@texuli/primitives/sortable` and spec 0.3.0 and 0.4.0 need `0.4.0` or
 later (they are not in `0.3.0`); the `0.10.0`, `0.9.0`, `0.8.0`, `0.7.0`, `0.6.0` and `0.5.0` breaking changes
 are in [`../upgrade/SKILL.md`](../upgrade/SKILL.md).

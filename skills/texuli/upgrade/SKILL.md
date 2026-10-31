@@ -141,6 +141,20 @@ Move the backup back into the host's skills folder and verify it with
 - **Offline-safe.** An unreachable network ends with a report, never a
   partial install.
 
+## Texuli packages 0.10.0 → 0.10.1
+
+A patch inside `^0.10.0`. Only two core entries change: they no longer
+load the theme library by default, so a host that relied on it passes the
+loaders (the default entries behave as before).
+
+- **`@texuli/slides`:** `DeckStageCore` (`stage-core`) and
+  `DeckPrintViewCore` (`export-core`) take
+  `loadTheme={loadDeckLibraryTheme}`, and `DeckStageCore` also
+  `loadLibraryBase={loadDeckLibraryBase}` (both from `stage-core`).
+- **`@texuli/pages`:** `PageReaderCore` (`reader-core`) and
+  `createDocumentPlayerHostCore` (`host-core`) take
+  `loadLibraryBase={loadPagesLibraryBase}` (exported by both entries).
+
 ## Texuli packages 0.10.0: breaking changes
 
 This sub-skill never upgrades packages; moving an app from `^0.9.0` to
