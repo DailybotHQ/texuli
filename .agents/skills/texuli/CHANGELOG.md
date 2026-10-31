@@ -15,6 +15,10 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- `themes/SKILL.md` and `upgrade/SKILL.md`: the seven 0.8 MCP tool names
+  and the tree block's `style` key are removed in `0.10.0` (in
+  development); a call or a block that uses them is refused with the name
+  to use instead.
 - `blueprints/SKILL.md` gains "K — Design systems (spec 0.10.0)": the
   envelope's `designSystem` (`ref` or `inline`), `validateDraft`'s
   `checkDesignSystem` and the player's `designSystems` resolver, marked in
