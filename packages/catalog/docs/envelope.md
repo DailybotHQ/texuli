@@ -155,7 +155,7 @@ else (another field, a duration, a level off the list) is an
 same closed vocabulary (`@texuli/spec/motion`,
 [motion.md](../../spec/docs/motion.md)).
 
-From spec 0.10.0 (in development for `0.10.0`, not on npm) the envelope may
+From spec 0.10.0 (from `0.10.0`) the envelope may
 name the design system the whole blueprint follows: `designSystem`, exactly
 one of `{ ref: "id@x.y.z" }` (or `texuli:<theme>`) and `{ inline: <a
 texuli/design-system document> }`. `parseEnvelope` accepts the field and

@@ -14,7 +14,7 @@ project overview.
 | [DECISIONS](DECISIONS.md) | Architecture decisions: options, choice, why, how to reverse |
 | [EDITOR_ARCHITECTURE](EDITOR_ARCHITECTURE.md) | The rich text editor's contracts (ADR-003): model, selection, history, keyboard, paste security, interchange. The model exists as core texels and the editor package implements the surface |
 | [STANDARDS](STANDARDS.md) | TypeScript, Svelte 5, Astro, CSS, Biome, naming, accessibility |
-| [DESIGN_SYSTEMS](DESIGN_SYSTEMS.md) | Design systems (in development for `0.10.0`, not on npm): author by hand or from a one-liner, DTCG, Tokens Studio, a role palette, a theme or a logo; validate with stable codes; compile and apply (runtime, SSR and no flash, provider, Astro, blueprints); patches and variants; versions; distribute as a file or npm package; guarantees; conformance; outputs |
+| [DESIGN_SYSTEMS](DESIGN_SYSTEMS.md) | Design systems (released in `0.10.0`): author by hand or from a one-liner, DTCG, Tokens Studio, a role palette, a theme or a logo; validate with stable codes; compile and apply (runtime, SSR and no flash, provider, Astro, blueprints); patches and variants; versions; distribute as a file or npm package; guarantees; conformance; outputs |
 | [DESIGN_LANGUAGE](DESIGN_LANGUAGE.md) | The cross-surface visual contract: color roles and modes, spacing and density, shape and elevation, motion and reduced motion, focus, typography, direction |
 | [TESTING_GUIDE](TESTING_GUIDE.md) | Every gate, the source→test map, scoped commands, blind spots, posture, and PLAN_006 SEO/AEO/analytics/theme evidence |
 | [DEVELOPMENT_COMMANDS](DEVELOPMENT_COMMANDS.md) | Every root script and package script, verbatim, plus opt-in SEO/AEO audit commands |
@@ -33,30 +33,30 @@ project overview.
 | --- | --- |
 | `@texuli/astro` | [packages/astro/README.md](../packages/astro/README.md): Astro integration, content layouts and Svelte islands for Texuli sites. |
 | `@texuli/blocks` | [packages/blocks/README.md](../packages/blocks/README.md): Content blocks: closed vocabulary, untrusted guard, formula AST and catalog metadata for pages, documents and slides. |
-| `@texuli/canvas` | [packages/canvas/README.md](../packages/canvas/README.md): In development, on npm as `0.9.0` (first published as `0.8.0`): the infinite canvas (model, CRDT sync, SVG and PNG export, accessible editor and viewer, player canvas host). |
+| `@texuli/canvas` | [packages/canvas/README.md](../packages/canvas/README.md): In development, on npm as `0.10.0` (first published as `0.8.0`): the infinite canvas (model, CRDT sync, SVG and PNG export, accessible editor and viewer, player canvas host). |
 | `@texuli/catalog` | [packages/catalog/README.md](../packages/catalog/README.md): The agent catalog and the renderer with no HTML sinks. |
 | `@texuli/charts` | [packages/charts/README.md](../packages/charts/README.md): Chart math and every chart family, one lazy subpath per family. |
 | `@texuli/chat` | [packages/chat/README.md](../packages/chat/README.md): Chat interfaces: thread, message list, composer and typing indicator, generic for people and agents. |
-| `@texuli/editor` | [packages/editor/README.md](../packages/editor/README.md): In development, on npm as `0.9.0` (first published as `0.5.0`): the rich text editor surface, toolbar, link dialog, clipboard import and Markdown in and out on the core editor texels. |
+| `@texuli/editor` | [packages/editor/README.md](../packages/editor/README.md): In development, on npm as `0.10.0` (first published as `0.5.0`): the rich text editor surface, toolbar, link dialog, clipboard import and Markdown in and out on the core editor texels. |
 | `@texuli/core` | [packages/core/README.md](../packages/core/README.md): Texels: framework-free behavior and policy that every Texuli component is built from. |
 | `@texuli/date` | [packages/date/README.md](../packages/date/README.md): Owned Gregorian date arithmetic for Texuli calendars and date fields. |
-| `@texuli/deck` | [packages/deck/README.md](../packages/deck/README.md): In development, on npm as `0.9.0` (first published as `0.4.0`): the framework-free deck engine (deck model v2 from JSON or Markdown, layouts, engine, authoring). |
-| `@texuli/document` | [packages/document/README.md](../packages/document/README.md): In development, on npm as `0.9.0` (first published as `0.7.0`): the framework-free block document engine (model, schema, operations, Markdown, pagination, DOCX and PDF, sync, collaboration). |
-| `@texuli/drag` | [packages/drag/README.md](../packages/drag/README.md): In development, on npm as `0.9.0`: the framework-free drag engine (sortable, gesture, spatial, graph). |
+| `@texuli/deck` | [packages/deck/README.md](../packages/deck/README.md): In development, on npm as `0.10.0` (first published as `0.4.0`): the framework-free deck engine (deck model v2 from JSON or Markdown, layouts, engine, authoring). |
+| `@texuli/document` | [packages/document/README.md](../packages/document/README.md): In development, on npm as `0.10.0` (first published as `0.7.0`): the framework-free block document engine (model, schema, operations, Markdown, pagination, DOCX and PDF, sync, collaboration). |
+| `@texuli/drag` | [packages/drag/README.md](../packages/drag/README.md): In development, on npm as `0.10.0`: the framework-free drag engine (sortable, gesture, spatial, graph). |
 | `@texuli/data` | [packages/data/README.md](../packages/data/README.md): Data views: grid, tree, board, calendar, timeline, map, activity and files. |
 | `@texuli/examples` | [packages/examples/README.md](../packages/examples/README.md): The examples registry every component writes once for tests, visuals and the website (private). |
-| `@texuli/forms` | [packages/forms/README.md](../packages/forms/README.md): In development, on npm as `0.9.0` (first published as `0.8.0`): schema-driven forms (closed form schema, conditions, steps, drafts, `SchemaForm`, player form host). |
-| `@texuli/mcp` | [packages/mcp/README.md](../packages/mcp/README.md): In development, first on npm as `0.9.0`: the local MCP server for agent hosts (`npx -y @texuli/mcp`, bin `texuli-mcp`) over `@texuli/tools`, with copy-paste setup for Claude Code, Cursor, VS Code, Windsurf and Codex. |
+| `@texuli/forms` | [packages/forms/README.md](../packages/forms/README.md): In development, on npm as `0.10.0` (first published as `0.8.0`): schema-driven forms (closed form schema, conditions, steps, drafts, `SchemaForm`, player form host). |
+| `@texuli/mcp` | [packages/mcp/README.md](../packages/mcp/README.md): In development, on npm as `0.10.0` (first published as `0.9.0`): the local MCP server for agent hosts (`npx -y @texuli/mcp`, bin `texuli-mcp`) over `@texuli/tools`, with copy-paste setup for Claude Code, Cursor, VS Code, Windsurf and Codex. |
 | `@texuli/media` | [packages/media/README.md](../packages/media/README.md): Media: images, galleries, video, audio and layered compositions. |
-| `@texuli/pages` | [packages/pages/README.md](../packages/pages/README.md): In development, on npm as `0.9.0` (first published as `0.7.0`): the block document editor and reader on `@texuli/document` (paged view, export, collaboration, document host). |
+| `@texuli/pages` | [packages/pages/README.md](../packages/pages/README.md): In development, on npm as `0.10.0` (first published as `0.7.0`): the block document editor and reader on `@texuli/document` (paged view, export, collaboration, document host). |
 | `@texuli/player` | [packages/player/README.md](../packages/player/README.md): Svelte paint runtime for validated Texuli catalog blueprints. |
 | `@texuli/primitives` | [packages/primitives/README.md](../packages/primitives/README.md): Owned, headless Svelte 5 primitives built on the texels. |
-| `@texuli/sheets` | [packages/sheets/README.md](../packages/sheets/README.md): In development, on npm as `0.9.0` (first published as `0.8.0`): spreadsheets (owned formula engine, workbook model, CSV, sheet view, player sheet host). |
-| `@texuli/slides` | [packages/slides/README.md](../packages/slides/README.md): The presentation stage on `@texuli/deck` (in development; on npm as `0.9.0`, the v2 stage from `0.4.0`, after the `0.3.0` model v1 stage). |
+| `@texuli/sheets` | [packages/sheets/README.md](../packages/sheets/README.md): In development, on npm as `0.10.0` (first published as `0.8.0`): spreadsheets (owned formula engine, workbook model, CSV, sheet view, player sheet host). |
+| `@texuli/slides` | [packages/slides/README.md](../packages/slides/README.md): The presentation stage on `@texuli/deck` (in development; on npm as `0.10.0`, the v2 stage from `0.4.0`, after the `0.3.0` model v1 stage). |
 | `@texuli/spec` | [packages/spec/README.md](../packages/spec/README.md): The schema-first blueprint contract: JSON schemas, the catalog vocabulary, TypeScript and Kotlin projections, and the conformance harness. |
 | `texuli` | [packages/texuli/README.md](../packages/texuli/README.md): Styled Texuli components, layouts and shells. |
 | `@texuli/tokens` | [packages/tokens/README.md](../packages/tokens/README.md): The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS. |
-| `@texuli/workflows` | [packages/workflows/README.md](../packages/workflows/README.md): In development, on npm as `0.9.0`: the accessible workflow graph editor and viewer. |
+| `@texuli/workflows` | [packages/workflows/README.md](../packages/workflows/README.md): In development, on npm as `0.10.0`: the accessible workflow graph editor and viewer. |
 | `@texuli/tools` | [packages/tools/README.md](../packages/tools/README.md): Agent and developer tools: the copy-in CLI, the MCP server, custom elements, adapters and the golden set. |
 | `@texuli/website` | [apps/website/README.md](../apps/website/README.md): texuli.com: the Texuli documentation, catalog and live examples, built with Astro; the Pages Functions live in the root `functions/`. |
 | `@texuli/agent` | [apps/agent/README.md](../apps/agent/README.md): The texuli.com agent service: prompt to validated blueprint draft, fake replay provider only, not deployed. |
@@ -496,7 +496,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | --- | --- |
 | [class-value](../packages/texuli/docs/class-value.md) | `class` prop: Svelte 5 ClassValue |
 | [control-props](../packages/texuli/docs/control-props.md) | Control and wrapper attributes (FIX-choice-aria) |
-| [design-system](../packages/texuli/docs/design-system.md) | Design systems: component tokens, hooks and `texuli/defaults` (new in `0.9.0`) |
+| [design-system](../packages/texuli/docs/design-system.md) | Design systems: component tokens, hooks and `texuli/defaults` (new in `0.9.0`), `DesignSystemProvider` and `applyDesignSystem` (new in `0.10.0`) |
 | [i18n](../packages/texuli/docs/i18n.md) | Component messages (i18n, new in `0.8.0`) |
 | [layout-host](../packages/texuli/docs/layout-host.md) | LayoutHost and the layout contract |
 | [layout-register-subpaths](../packages/texuli/docs/layout-register-subpaths.md) | Layout register-only subpaths |

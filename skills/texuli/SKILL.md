@@ -40,13 +40,11 @@ agent config, or publish packages without explicit consent (see
    Installing the skill does **not** install Texuli packages or a CLI.
 2. Confirm the workspace has Texuli (workspace packages `texuli`,
    `@texuli/core`, `@texuli/tokens`, …) before promising package imports.
-   All 26 published packages are on npm in the 0.9 line, every one at
-   `0.9.0` (published by CI with provenance; `latest` and `next` both point
+   All 26 published packages are on npm in the 0.10 line, every one at
+   `0.10.0` (published by CI with provenance; `latest` and `next` both point
    to it; pre-1.0, so a new minor may break and 1.0.0 will be the first
    stable release), so install them plainly (`pnpm add texuli`) and pin
-   `0.9.0` or `^0.9.0`; the workspace packages stay `private: true`. A
-   Texuli checkout may show `0.10.0` in its manifests: 0.10.0 is in
-   development and not on npm, so install the 0.9 line.
+   `0.10.0` or `^0.10.0`; the workspace packages stay `private: true`.
    `@texuli/drag` (the drag engine),
    `@texuli/workflows` (the workflow editor), `@texuli/deck` (the deck
    engine behind the deck generator, first published in `0.4.0`),
@@ -56,14 +54,22 @@ agent config, or publish packages without explicit consent (see
    `@texuli/forms` (schema-driven forms), `@texuli/canvas` (the infinite
    canvas) and `@texuli/sheets` (spreadsheets; all three first published in
    `0.8.0`), and `@texuli/mcp` (the local MCP server, first published in
-   `0.9.0`) are in development but on npm as `0.9.0`. The APIs marked "new
-   in `0.9.0`" in the package index (the operations registry
-   `@texuli/tools/ops`, the MCP protocol layer `@texuli/tools/mcp` and
-   `@texuli/mcp`, token contract v2 in `@texuli/tokens/system`,
-   `@texuli/tokens/components` and `texuli/defaults`, scoped portals, and
-   the Protoyard gap props) are not in the 0.8 line, and `0.9.0` changes
-   some behavior (spec `0.9.0` stamps, a new catalog hash, MCP tool aliases
-   deprecated, a pending Button is `aria-disabled`; see
+   `0.9.0`) are in development but on npm as `0.10.0`. The APIs marked "new
+   in `0.10.0`" in the package index (design systems: `@texuli/spec/design-system`,
+   `@texuli/tokens/design-system/*`, `texuli/design-system`,
+   `@texuli/player/design-system`, `@texuli/astro/design-system`,
+   `@texuli/tools/ds-check`, the `ds.*` operations; and
+   `@texuli/slides/export-core`, the `@texuli/pages` `*-core` entries,
+   `@texuli/forms/controls` and the Protoyard gap props) are not in the 0.9
+   line, and `0.10.0` changes some behavior (spec `0.10.0` stamps, the 0.8
+   MCP tool aliases and the tree block's `style` removed, lazy form
+   controls; see [`upgrade/SKILL.md`](upgrade/SKILL.md)). `0.9.0` added
+   `@texuli/mcp`, the operations registry `@texuli/tools/ops`, the MCP
+   protocol layer `@texuli/tools/mcp`, token contract v2 in
+   `@texuli/tokens/system`, `@texuli/tokens/components` and
+   `texuli/defaults`, and scoped portals, and changed some behavior (spec
+   `0.9.0` stamps, a new catalog hash, MCP tool aliases deprecated, a
+   pending Button is `aria-disabled`; see
    [`upgrade/SKILL.md`](upgrade/SKILL.md)). `0.8.0` added `@texuli/forms`,
    `@texuli/canvas` and `@texuli/sheets`, spec 0.8.0 data-source bindings
    and the `schema-form`, `canvas`, `spreadsheet` and dashboard ids,
@@ -100,7 +106,7 @@ agent config, or publish packages without explicit consent (see
 | A deck from JSON or Markdown: layouts, validation, `DeckStage`, print and PPTX, the `deck` CLI and MCP tool | [`build-ui/references/decks.md`](build-ui/references/decks.md) |
 | Drag and drop: sortable lists, groups, boards, trees, a canvas, a workflow editor | [`build-ui/SKILL.md`](build-ui/SKILL.md) (recipes) |
 | Themes, palettes, forced-colors, AA contrast, theme CLI/MCP | [`themes/SKILL.md`](themes/SKILL.md) |
-| A whole brand as one design-system document: author, import (DTCG, Tokens Studio, a logo), validate and repair by code, apply to a blueprint, export (in development for `0.10.0`) | [`design-systems/SKILL.md`](design-systems/SKILL.md) |
+| A whole brand as one design-system document: author, import (DTCG, Tokens Studio, a logo), validate and repair by code, apply to a blueprint, export (new in `0.10.0`) | [`design-systems/SKILL.md`](design-systems/SKILL.md) |
 | Images, video, captions, compositions, export, generator slot | [`media/SKILL.md`](media/SKILL.md) |
 | Validate, wrap, edit or paint an agent blueprint; envelope, player, agent service, spec contract; a whole stateful screen as JSON (state, bindings, actions, `reorder`, `workflow-graph`) | [`blueprints/SKILL.md`](blueprints/SKILL.md) |
 | Contribute a primitive or texel | [`contribute/SKILL.md`](contribute/SKILL.md) |

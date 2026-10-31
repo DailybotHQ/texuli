@@ -570,7 +570,7 @@ optimistic edits are in [data-sources.md](data-sources.md).
 
 ### Design systems (spec 0.10.0)
 
-> **In development for `0.10.0`, not on npm.**
+> **New in `0.10.0`.**
 
 A blueprint envelope may name the design system it follows
 (`designSystem`, [ADR-024](../../../docs/DECISIONS.md#adr-024-design-systems-on-every-surface)):

@@ -119,7 +119,7 @@ input; the writer uses camelCase.
 | `loop` | `navigation.loop` | `true` or `false` |
 | `autoSlide` | `navigation.autoSlideMs` | whole number of milliseconds |
 | `outlineTitle` | `outline.title` | string (needs at least one section) |
-| `designSystem` | `designSystem` as `{ ref }` | an exact `id@x.y.z` or `texuli:<theme>` (in development for `0.10.0`); an inline design system is not written (`md-unrepresentable`) |
+| `designSystem` | `designSystem` as `{ ref }` | an exact `id@x.y.z` or `texuli:<theme>` (from `0.10.0`); an inline design system is not written (`md-unrepresentable`) |
 
 ## Slides, stacks and sections
 

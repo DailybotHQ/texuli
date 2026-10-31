@@ -105,8 +105,8 @@ describe('design systems hub', () => {
     expect(surface).toContain('DesignSystemProvider');
     for (const id of ['what', 'brands', 'conformance', 'start'])
       expect(page).toContain(`id="${id}"`);
-    expect(DS_STATUS).toMatch(/in development for 0\.10\.0/);
-    expect(DS_STATUS).toMatch(/0\.9 line/);
+    expect(DS_STATUS).toMatch(/shipped in 0\.10\.0/);
+    expect(DS_STATUS).toMatch(/0\.10 line/);
     expect(DS_SURFACES.map((entry) => entry.id)).toEqual([
       'dashboard',
       'slide',

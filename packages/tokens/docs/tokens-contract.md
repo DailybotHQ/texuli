@@ -15,7 +15,7 @@
 
 CSS custom properties use the **`--tx-*`** prefix (`tokenToCssVar`, `semanticTokenToCssVar`).
 
-## Token contract v2 (unreleased, ADR-020)
+## Token contract v2 (from `0.9.0`, ADR-020)
 
 Contract v2 adds two tiers on top of the three above, additively:
 

@@ -4,7 +4,7 @@
 > Token contract v2 is [ADR-020](../../../docs/DECISIONS.md#adr-020-token-contract-v2-additive-families-and-a-real-component-tier);
 > the design-system document that sets all of this from one JSON file
 > (ADR-021) and `DesignSystemProvider` (`texuli/design-system`, ADR-023) are
-> in development for `0.10.0`, not on npm.
+> released in `0.10.0`.
 
 A design system or an agent restyles Texuli components through three
 channels, none of which needs CSS of its own:
@@ -62,7 +62,7 @@ sets component tokens, so a token set closer to the component still wins.
 
 A scope is any element carrying `data-tx-scope` (ADR-023). `applyTheme(el)`
 (`@texuli/tokens`) writes it (empty unless the host already named the
-scope), and so does `applyDesignSystem` (`@texuli/tokens/design-system/apply`, unreleased). `@texuli/tokens/base.css`
+scope), and so does `applyDesignSystem` (`@texuli/tokens/design-system/apply`, from `0.10.0`). `@texuli/tokens/base.css`
 declares the system token defaults on `:where(:root, [data-tx-theme],
 [data-tx-scope])`, so derived tokens (space, radius and type steps) resolve
 against the nearest scope; nothing needs `:root`.
@@ -129,7 +129,7 @@ every component page carries its Tokens section).
 
 ## DesignSystemProvider
 
-> **Status:** in development for `0.10.0`, not on npm.
+> **Status:** released in `0.10.0`.
 
 `texuli/design-system` exports `DesignSystemProvider`: a `<div>` scope that
 applies a compiled design system

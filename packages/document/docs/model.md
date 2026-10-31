@@ -43,8 +43,7 @@ stack.
 - `DocumentAnnotations`: `CommentThread`s, each with a `CommentAnchor` (a
   block id, optionally a UTF-16 range of its text), a quoted text, a status
   and `CommentMessage`s. A thread whose block is gone is kept as orphaned.
-- `DocumentDesignSystem` (from spec 0.10.0, in development for `0.10.0`,
-  not on npm): the design system the document follows, exactly one of
+- `DocumentDesignSystem` (from spec 0.10.0, new in `0.10.0`): the design system the document follows, exactly one of
   `ref` (an exact `id@x.y.z` the host resolves, or `texuli:<theme>`; the
   grammar is `DESIGN_SYSTEM_REF_PATTERN` from `@texuli/document/schema`, the same as the blueprint's
   `$defs.designSystemReference`) and `inline` (a whole

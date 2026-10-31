@@ -38,12 +38,11 @@ the same pieces are safe to hand to a machine.
 
 > **Status: in development, pre-1.0.** The screenshot above is the
 > texuli.com website, which deploys from `main` to Cloudflare Pages. The 26
-> published packages are released on npm in the 0.9 line, every one at
-> `0.9.0` (published by CI with provenance; `latest` and `next` point to
-> the newest), including the first release of `@texuli/mcp`. It is not a
-> stable release: under 0.x a new minor may contain breaking changes, and
-> 1.0.0 will be the first stable release. `0.10.0` is in development and
-> not on npm yet.
+> published packages are released on npm in the 0.10 line, every one at
+> `0.10.0` (published by CI with provenance; `latest` and `next` point to
+> the newest), which adds design systems. It is not a stable release:
+> under 0.x a new minor may contain breaking changes, and 1.0.0 will be
+> the first stable release.
 > The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
 
 </div>
@@ -194,10 +193,10 @@ every verified command.
 ## Honest boundaries
 
 - **No stable release yet.** The 26 published packages are on npm in the
-  0.9 line, a pre-1.0 release (`npm install texuli`; `latest` and `next` both
-  point to it). Under 0.x a new minor (`0.10.0`, in development) may
-  contain breaking changes, so pin the exact version or use `^0.9.0`; 1.0.0
-  will be the first stable release.
+  0.10 line, a pre-1.0 release (`npm install texuli`; `latest` and `next`
+  both point to it). Under 0.x a new minor (`0.11.0`) may contain breaking
+  changes, so pin the exact version or use `^0.10.0`; 1.0.0 will be the
+  first stable release.
   The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
 - **texuli.com deploys from `main`** (Cloudflare Pages). Run it locally with
   `pnpm dev`.
@@ -228,7 +227,7 @@ Playwright browsers once (`pnpm test:e2e:install`).
 | [Agent onboarding](docs/AI_AGENT_ONBOARDING.md) | [Development commands](docs/DEVELOPMENT_COMMANDS.md) | [Performance](docs/PERFORMANCE.md) | [Quality reports](docs/README.md#quality-reports-docsquality) |
 
 Design systems (one JSON document for a whole brand, enforced AA, every
-surface; in development for `0.10.0`, not on npm) have their own guide:
+surface; released in `0.10.0`) have their own guide:
 [DESIGN_SYSTEMS](docs/DESIGN_SYSTEMS.md).
 
 The full index is [docs/README.md](docs/README.md). Every package also has

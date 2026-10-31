@@ -9,8 +9,8 @@
 > `@texuli/tools/mcp` export, `texuli mcp` and the `@texuli/mcp` package
 > are new in `0.9.0`, and the remote endpoint is live at
 > `https://texuli.com/mcp` (see [The remote door](#the-remote-door)). The
-> seven 0.8 tool names, deprecated aliases in `0.9.0`, are removed on the
-> `release/0.10.0` branch (not on npm yet): a call names the operation to
+> seven 0.8 tool names, deprecated aliases in `0.9.0`, are removed in
+> `0.10.0`: a call names the operation to
 > use instead ([ops.md](ops.md#removed-08-tool-names)).
 
 ## The local door
@@ -34,7 +34,7 @@ source.
   exits with code 0.
 - **stdout carries only JSON-RPC**; usage errors go to stderr.
 - **Local writes:** `ds.save` is the only operation that writes (from
-  `0.10.0`, in development). It writes through the local writer the door
+  `0.10.0`). It writes through the local writer the door
   passes (`files: localFiles()` in `runMcpStdio` and the CLI; the remote
   door passes none, and the edge handler never imports `node:fs`), which applies the local write policy in
   `src/internal/local-write.ts` (`resolveLocalWritePath`,

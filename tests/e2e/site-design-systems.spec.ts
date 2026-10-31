@@ -134,8 +134,8 @@ test('three brands paint four surfaces side by side, each with its own compiled 
   const { foreign, errors } = await watch(page);
   await open(page);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Design systems');
-  await expect(page.locator('[data-ds-status]')).toContainText('in development for 0.10.0');
-  await expect(page.locator('[data-ds-status]')).toContainText('0.9 line');
+  await expect(page.locator('[data-ds-status]')).toContainText('shipped in 0.10.0');
+  await expect(page.locator('[data-ds-status]')).toContainText('0.10 line');
   await expect(page.locator('[data-ds-brand]')).toHaveCount(3);
   await expect(page.locator('[data-ds-preview]')).toHaveCount(12);
   // Static: no island hydrates and the stylesheet is a same-origin file.

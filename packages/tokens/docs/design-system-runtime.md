@@ -1,7 +1,7 @@
 # The design-system runtime (`@texuli/tokens/design-system/apply`)
 
-> **Status: in development for `0.10.0`, not on npm.** The subpath exists on
-> the `release/0.10.0` branch and ships only with `@texuli/tokens@0.10.0`.
+> **Status: released in `0.10.0`.** The subpath ships in
+> `@texuli/tokens@0.10.0`.
 
 The end-to-end guide (author, validate, apply, distribute, outputs) is
 [DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md).

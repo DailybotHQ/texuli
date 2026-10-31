@@ -25,7 +25,7 @@ const scriptBody = noFlashScript('billing', 'system');
 
 A compiled design system caches the same way:
 `cacheAppearance(namespace, designSystemAppearance(compiled, { mode }))`
-(`@texuli/tokens/design-system/apply`, unreleased) replays the variables
+(`@texuli/tokens/design-system/apply`, from `0.10.0`) replays the variables
 `applyDesignSystem` writes, byte for byte
 ([design-system-runtime.md](design-system-runtime.md)).
 

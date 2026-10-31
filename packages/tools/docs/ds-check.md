@@ -1,10 +1,9 @@
 # Design-system conformance: `texuli ds check` and `@texuli/tools/ds-check`
 
-> **Status: in development for `0.10.0`, not on npm.** The command and the
-> `@texuli/tools/ds-check` and `@texuli/tools/ds-check/host` subpaths exist
-> on the `release/0.10.0` branch (PLAN_011 T-ds-conformance) and ship only
-> with `@texuli/tools@0.10.0`. The `ds.*` operations and the other
-> `texuli ds` commands are on the same branch ([ds.md](ds.md)).
+> **Status: released in `0.10.0`.** The command and the
+> `@texuli/tools/ds-check` and `@texuli/tools/ds-check/host` subpaths ship
+> in `@texuli/tools@0.10.0` (PLAN_011 T-ds-conformance). The `ds.*`
+> operations and the other `texuli ds` commands are in [ds.md](ds.md).
 
 `texuli ds check` tells you whether a design-system document
 ([`@texuli/spec/design-system`](../../spec/docs/design-system.md)) holds

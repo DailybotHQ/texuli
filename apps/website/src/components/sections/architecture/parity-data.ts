@@ -48,7 +48,7 @@ export const PARITY_ROWS: readonly ParityRow[] = [
     capability: 'Component vocabulary and prop schemas',
     web: {
       status: 'exists',
-      detail: 'Generated from the manifests and shipped in the npm packages (0.9.0).',
+      detail: 'Generated from the manifests and shipped in the npm packages (0.10.0).',
       surface: 'packages/spec/generated/typescript/vocabulary.ts',
     },
     native: {
@@ -155,7 +155,7 @@ export const PARITY_ROWS: readonly ParityRow[] = [
     capability: 'Distribution',
     web: {
       status: 'exists',
-      detail: 'All 26 packages are on npm in the 0.9 line (see docs/RELEASE.md), pre-1.0.',
+      detail: 'All 26 packages are on npm in the 0.10 line (see docs/RELEASE.md), pre-1.0.',
       surface: 'packages/texuli/package.json',
     },
     native: {

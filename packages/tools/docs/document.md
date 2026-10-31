@@ -71,8 +71,7 @@ In the repository source (in development, not released), the commands are
 two operations of the [operations registry](ops.md): `document.run` (edge)
 for every command but PDF and DOCX, and `document.export` (node) for those
 two. The CLI runs through them too. The 0.8 tool name `document` was a
-deprecated alias in `0.9.0` and is removed in `0.10.0` (on the release
-branch): call `document.run`, or `document.export` with `format`.
+deprecated alias in `0.9.0` and is removed in `0.10.0`: call `document.run`, or `document.export` with `format`.
 
 ## Tests
 

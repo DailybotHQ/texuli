@@ -87,7 +87,7 @@ export const TWIN_NOTES: readonly TwinNote[] = Object.freeze([
   },
   {
     route: /^\/theme-studio\/$/,
-    demo: 'The design system studio runs in the browser: it builds a design-system document from a seed, a logo, a library theme or a DTCG or Tokens Studio file, compiles it with enforced contrast, previews five surfaces, diffs and exports it, and shares it in the URL fragment. Design-system documents ship with release 0.10.0, which is in development and unreleased; the theme operations below work on the published themes.',
+    demo: 'The design system studio runs in the browser: it builds a design-system document from a seed, a logo, a library theme or a DTCG or Tokens Studio file, compiles it with enforced contrast, previews five surfaces, diffs and exports it, and shares it in the URL fragment. Design-system documents shipped in 0.10.0; the theme operations below work on the library themes.',
     operations: [...THEME_OPS],
     packages: ['tokens', 'spec'],
   },

@@ -4,19 +4,17 @@ Back to [`../SKILL.md`](../SKILL.md).
 
 ## A. Use the packages
 
-The packages are on npm as `0.9.0`, a pre-1.0 release (`latest` and `next`
+The packages are on npm as `0.10.0`, a pre-1.0 release (`latest` and `next`
 both point to it; 1.0.0 will be the first stable release). An app outside a
 Texuli checkout installs them plainly, for example
-`pnpm add texuli @texuli/tokens`, and pins the exact version or `^0.9.0`
-(for 0.x it accepts only 0.9.x, since a new minor may break) (the developer
+`pnpm add texuli @texuli/tokens`, and pins the exact version or `^0.10.0`
+(for 0.x it accepts only 0.10.x, since a new minor may break) (the developer
 runs the install; it uses the network). `@texuli/drag`,
 `@texuli/workflows`, `@texuli/deck`, `@texuli/editor` (first published
 in `0.5.0`), `@texuli/document` and `@texuli/pages` (both first published
 in `0.7.0`), `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (all
 three first published in `0.8.0`) and `@texuli/mcp` (first published in
-`0.9.0`) are in development and on npm as `0.9.0`.
-A Texuli checkout may show `0.10.0` in its manifests: 0.10.0 is in
-development and not on npm, so install the 0.9 line.
+`0.9.0`) are in development and on npm as `0.10.0`.
 Inside this monorepo, an app depends on the workspace packages:
 
 ```json
@@ -60,7 +58,7 @@ HTML sink.
 `0.9.0` component CSS reads the system tokens (the space unit, control and
 icon sizes, shape radii and type roles of `@texuli/tokens/system`) with no
 fallback, and a theme does not declare them: an app with its own reset that skips `base.css`
-renders controls with no size. From `0.10.0` (not on npm yet), such an app can
+renders controls with no size. From `0.10.0`, such an app can
 load `@texuli/tokens/system.css` instead: the system token defaults alone,
 with no reset.
 

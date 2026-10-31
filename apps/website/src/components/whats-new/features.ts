@@ -2,10 +2,9 @@
  * The features /whats-new/ showcases, grouped by the release that carries
  * them, each with its honest status, its packages, the page that shows it
  * in full and the kind of demo or preview the hub paints. Plain data, so
- * the page and its tests share one source. Releases: 0.6.0 to 0.9.0 are
- * published on npm, and 0.9.0 is `latest`; 0.10.0 is in development on the
- * release/0.10.0 branch (the release line in docs/RELEASE.md), and its
- * cards (PLAN_011 T-site-0100) describe what has landed there.
+ * the page and its tests share one source. Releases: 0.6.0 to 0.10.0 are
+ * published on npm, and 0.10.0 is `latest` (the release line in
+ * docs/RELEASE.md).
  */
 
 export type ReleaseId = '0.6.0' | '0.7.0' | '0.8.0' | '0.9.0' | '0.10.0';
@@ -22,16 +21,15 @@ export const RELEASES: readonly Release[] = [
   {
     id: '0.10.0',
     title: '0.10.0: design systems',
-    status:
-      'In development on the release/0.10.0 branch; npm has the 0.9 line until 0.10.0 is published.',
-    published: false,
+    status: 'Published on npm as 0.10.0, the current release (pre-1.0).',
+    published: true,
     summary:
-      'Design systems: one JSON document per brand, compiled with contrast, focus and target size enforced and followed by every surface; the Design System Studio; ds tools on the MCP and the CLI; texuli ds check; the Protoyard gaps G100 to G104 and G106; and the removal of the names deprecated in 0.9.0. Until 0.10.0 is published, install the 0.9 line.',
+      'Design systems: one JSON document per brand, compiled with contrast, focus and target size enforced and followed by every surface; the Design System Studio; ds tools on the MCP and the CLI; texuli ds check; the Protoyard gaps G100 to G124; and the removal of the names deprecated in 0.9.0. Blueprint spec 0.10.0 adds the design-system document, a stamp-only migration from 0.9.0.',
   },
   {
     id: '0.9.0',
     title: '0.9.0: MCP, an agent-ready site and design tokens',
-    status: 'Published on npm as 0.9.0, the current release (pre-1.0).',
+    status: 'Published on npm as 0.9.0; everything in it is also in 0.10.0.',
     published: true,
     summary:
       'An MCP server for agents (remote and local), texuli.com readable by agents end to end, token contract v2 with a component tier, overlays that keep their scope, and the fixes Protoyard asked for. @texuli/mcp is a new package, first published in 0.9.0, and still in development.',
@@ -39,7 +37,7 @@ export const RELEASES: readonly Release[] = [
   {
     id: '0.8.0',
     title: '0.8.0: forms, canvas, sheets and output',
-    status: 'Published on npm as 0.8.0; everything in it is also in 0.9.0.',
+    status: 'Published on npm as 0.8.0; everything in it is also in 0.9.0 and 0.10.0.',
     published: true,
     summary:
       'Forms, data sources, the canvas, spreadsheets, dashboards, email and PDF output, and one message catalog for every label, with blueprint spec 0.8.0. @texuli/forms, @texuli/canvas and @texuli/sheets were published for the first time; all three are still in development.',
@@ -47,7 +45,7 @@ export const RELEASES: readonly Release[] = [
   {
     id: '0.7.0',
     title: '0.7.0: documents',
-    status: 'Published on npm as 0.7.0; everything in it is also in 0.8.0 and 0.9.0.',
+    status: 'Published on npm as 0.7.0; everything in it is also in 0.8.0 to 0.10.0.',
     published: true,
     summary:
       'A block document engine with collaboration, the Notion-like page editor, and documents as agent data in blueprint spec 0.7.0. @texuli/document and @texuli/pages were published for the first time; both are still in development.',
@@ -55,7 +53,7 @@ export const RELEASES: readonly Release[] = [
   {
     id: '0.6.0',
     title: '0.6.0: motion and live generation',
-    status: 'Published on npm as 0.6.0; everything in it is also in 0.7.0 to 0.9.0.',
+    status: 'Published on npm as 0.6.0; everything in it is also in 0.7.0 to 0.10.0.',
     published: true,
     summary:
       'One API contract for every component, a motion system with a closed vocabulary, and blueprints that paint while they stream, with blueprint spec 0.6.0.',
@@ -355,9 +353,9 @@ export const FEATURES: readonly Feature[] = [
     id: 'protoyard-0100',
     release: '0.10.0',
     title: 'More fixes from Protoyard',
-    packages: ['texuli', '@texuli/data', '@texuli/editor'],
+    packages: ['texuli', '@texuli/data', '@texuli/editor', '@texuli/forms', '@texuli/pages'],
     summary:
-      'Gaps G100 to G104 and G106: Markdown backslash escapes, filter builder issues and labelled options, an active-heading tracker on its own, keyboard board moves that keep focus, calendar chips named in visible order, and inbox read callbacks with pending saves.',
+      'Gaps G100 to G124 a production adopter reported, among them: Markdown backslash escapes, filter builder issues and labelled options, keyboard board moves that keep focus, host-painted form fields and new field types (G113 to G121), lighter core entries for deck printing and pages (G105, G123), system token defaults without the reset (G110), dashboard nudges past wider widgets (G122) and the stateless MCP revision 2026-07-28 in part (G124).',
     href: '/changelog/',
     linkLabel: 'The changelog',
     demo: 'preview',

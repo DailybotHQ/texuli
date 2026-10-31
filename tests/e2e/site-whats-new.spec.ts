@@ -76,17 +76,16 @@ test('every feature by release, each demo working, links that resolve; axe light
     'Published on npm as 0.7.0'
   );
   await expect(page.locator('[data-hub-release="0.8.0"] [data-hub-feature]')).toHaveCount(7);
-  // PLAN_011 T-release-090: 0.9.0 is on the hub as the current release.
   await expect(page.locator('[data-hub-release="0.9.0"] .hub__status')).toContainText(
-    'Published on npm as 0.9.0, the current release'
+    'Published on npm as 0.9.0'
   );
   await expect(page.locator('[data-hub-release="0.9.0"] [data-hub-feature]')).toHaveCount(5);
-  // 0.10.0 is on the hub in development (the release line in docs/RELEASE.md).
+  // PLAN_011 T-release-0100: 0.10.0 is on the hub as the current release.
   await expect(page.locator('[data-hub-release="0.10.0"] .hub__status')).toContainText(
-    'In development on the release/0.10.0 branch'
+    'Published on npm as 0.10.0, the current release'
   );
-  // PLAN_011 T-site-0100: what landed on the branch (design systems, the studio, the ds tools,
-  // conformance, the Protoyard gaps and the removals).
+  // PLAN_011 T-site-0100: design systems, the studio, the ds tools, conformance, the
+  // Protoyard gaps and the removals.
   await expect(page.locator('[data-hub-release="0.10.0"] [data-hub-feature]')).toHaveCount(6);
   await expect(page.locator('[data-hub-ds-brands]')).toContainText('Tumbletown');
 

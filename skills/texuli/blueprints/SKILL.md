@@ -312,7 +312,7 @@ pnpm vitest run packages/catalog/tests/validate-source.test.ts
 
 ## K — Design systems (spec 0.10.0)
 
-In development for `0.10.0` (not on npm; the 0.9 packages do not read it).
+New in `0.10.0` (the 0.9 packages do not read it).
 Rules: `packages/spec/docs/design-system.md`.
 
 - **One field brands the whole blueprint.** The envelope (and a document)

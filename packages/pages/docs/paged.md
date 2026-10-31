@@ -46,7 +46,7 @@ model, at the page size.
 | `resolveEmbed`, `resolveMedia`, `deckHost` | — | Embeds and media, as in the reader |
 | `reducedMotion` | `false` | Paint embeds without motion |
 | `renderBlock`, `blockHost` | — | The host's own blocks, as in the reader ([host blocks](editor.md#host-blocks); the types `PagesBlockHost`, `PagesBlockClaim`, `PagesBlockHostProps`, `PagesBlockHostRequest`, `PagesBlockSnippet` and `PagesHostNode` are exported here too) |
-| `loadPlayer` | the package loader | A `PagesPlayerLoader` for live embeds; `null` turns them off. `PagedViewCore`, from `@texuli/pages/paged-core` (in development for `0.10.0`, not on npm), is `PagedView` with no default, so its build has no `@texuli/player` reference; the entry exports `PagesPlayerLoader` and `PagesPlayerModule`, and `@texuli/pages/paged` exports `PagedViewCore` too ([core entries](editor.md#core-entries-without-the-player)) |
+| `loadPlayer` | the package loader | A `PagesPlayerLoader` for live embeds; `null` turns them off. `PagedViewCore`, from `@texuli/pages/paged-core` (from `0.10.0`), is `PagedView` with no default, so its build has no `@texuli/player` reference; the entry exports `PagesPlayerLoader` and `PagesPlayerModule`, and `@texuli/pages/paged` exports `PagedViewCore` too ([core entries](editor.md#core-entries-without-the-player)) |
 | `class` | — | Extra classes on the root |
 
 How it works:
