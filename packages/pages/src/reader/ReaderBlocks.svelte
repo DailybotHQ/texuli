@@ -4,8 +4,10 @@
 // block, embed and page-link views the editor paints.
 import type { DocumentBlock } from '@texuli/document/model';
 import type { DeckPlayerHost } from '@texuli/player';
+import type { PagesBlockPainter } from '../shared/block-host.ts';
 import EmbedView from '../shared/EmbedView.svelte';
 import type { EmbedResolver } from '../shared/embeds.ts';
+import { loadHostSlot } from '../shared/host-slot.ts';
 import Inline from '../shared/Inline.svelte';
 import type { PagesLabels } from '../shared/labels.ts';
 import MediaView from '../shared/MediaView.svelte';
@@ -26,11 +28,15 @@ interface Props {
   onNavigate?: ((ref: string) => void) | undefined;
   pageHref?: ((ref: string) => string | null | undefined) | undefined;
   reducedMotion: boolean;
+  /** The host's block renderer (G111); without one the host slot never loads. */
+  painter?: PagesBlockPainter | null | undefined;
 }
 
 let props: Props = $props();
 const labels = $derived(props.labels);
 const level = (value: number) => `h${Math.min(6, Math.max(1, value + props.headingOffset))}`;
+/** The library's views, for the lazy host slot. */
+const views = { WrappedBlockView, EmbedView };
 </script>
 
 {#each props.blocks as block (block.id)}
@@ -80,6 +86,12 @@ const level = (value: number) => `h${Math.min(6, Math.max(1, value + props.headi
     <p class="tx-pages-p" data-block-id={block.id}>
       <PageLinkView node={block} label={labels.openPage(block.title)} onNavigate={props.onNavigate} pageHref={props.pageHref} />
     </p>
+  {:else if (block.type === 'block' || block.type === 'embed') && props.painter}
+    {#await loadHostSlot() then HostSlot}
+      <HostSlot node={block} {views} painter={props.painter} {labels} resolveEmbed={props.resolveEmbed} deckHost={props.deckHost} reducedMotion={props.reducedMotion} />
+    {:catch}
+      <p class="tx-pages-notice" role="note">{block.type === 'block' ? labels.blockRefused : labels.refused}</p>
+    {/await}
   {:else if block.type === 'block'}
     <WrappedBlockView node={block} refusedLabel={labels.blockRefused} loadingLabel={labels.embedLoading} />
   {:else if block.type === 'embed'}

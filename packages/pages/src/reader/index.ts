@@ -5,6 +5,15 @@
  */
 
 export type {
+  PagesBlockClaim,
+  PagesBlockHost,
+  PagesBlockHostProps,
+  PagesBlockHostRequest,
+  PagesBlockSnippet,
+  PagesHostNode,
+  PagesReadonly,
+} from '../shared/block-host.ts';
+export type {
   PagesDesignSystemEvent,
   PagesDesignSystems,
 } from '../shared/design-system-types.ts';

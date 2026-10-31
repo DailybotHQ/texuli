@@ -11,6 +11,7 @@ import { Sortable, type SortableMove } from '@texuli/primitives/sortable';
 import { untrack } from 'svelte';
 import type { MotionProp } from 'texuli/motion';
 import Breadcrumb from '../shared/Breadcrumb.svelte';
+import { blockPainter, type PagesBlockHost, type PagesBlockSnippet } from '../shared/block-host.ts';
 import type { EmbedResolver } from '../shared/embeds.ts';
 import { type PagesLabels, resolvePagesLabels } from '../shared/labels.ts';
 import type { MediaResolver } from '../shared/media.ts';
@@ -58,6 +59,19 @@ interface Props {
   editor?: PagesEditor;
   /** Polite announcements. Default: `@texuli/core/announcer`. */
   announce?: (message: string) => void;
+  /**
+   * The host's own blocks (G111): a snippet handed each wrapped block or
+   * embed the host claims, read-only. Host blocks are opaque rows: they
+   * select, move and delete from their handle like any block. Host code is
+   * developer-tier; the node may come from a user or an agent.
+   */
+  renderBlock?: PagesBlockSnippet;
+  /**
+   * The host's block renderer: `claim` (who paints a node: `'host'`,
+   * `'fallback'` by default, or `'library'`), and a `component` or a
+   * `present` mount when there is no `renderBlock` snippet.
+   */
+  blockHost?: PagesBlockHost | null;
   class?: string;
 }
 
@@ -78,11 +92,14 @@ let {
   motion,
   editor = $bindable(),
   announce,
+  renderBlock,
+  blockHost = null,
   class: className,
 }: Props = $props();
 
 const uid = $props.id();
 const labels = $derived(resolvePagesLabels(labelOverrides));
+const painter = $derived(blockPainter(blockHost, renderBlock));
 const pages = untrack(
   () =>
     new PagesEditor({
@@ -130,6 +147,7 @@ setPagesContext({
   items: () => items,
   readonly: () => readonly,
   motion: () => motion,
+  painter: () => painter,
   get resolveEmbed() {
     return resolveEmbed;
   },

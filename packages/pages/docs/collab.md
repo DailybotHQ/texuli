@@ -56,6 +56,7 @@ collaborator list, decorations over the text and a sidebar.
 | `editor` | created | Bindable `PagesEditor` |
 | `history` | `false` | Bindable: show the version history panel |
 | `announce` | `@texuli/core/announcer` | Polite announcements |
+| `renderBlock`, `blockHost` | — | The host's own blocks, as on `PageEditor` ([host blocks](editor.md#host-blocks)) |
 | `class` | — | Extra class on the root |
 
 - **Review bar** (a labelled group of buttons): Comment (also

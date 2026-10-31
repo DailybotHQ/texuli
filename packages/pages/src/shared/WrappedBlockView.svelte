@@ -12,7 +12,14 @@ let {
   node,
   refusedLabel,
   loadingLabel,
-}: { node: WrappedBlock; refusedLabel: string; loadingLabel: string } = $props();
+  onrefused,
+}: {
+  node: WrappedBlock;
+  refusedLabel: string;
+  loadingLabel: string;
+  /** The renderer refused the block: a host takes it over (no notice shows). */
+  onrefused?: (() => void) | undefined;
+} = $props();
 
 let view = $state.raw<Component<{
   block: unknown;
@@ -22,6 +29,11 @@ let failed = $state(false);
 let invalidFor = $state.raw<unknown>(null);
 const input = $derived(wrappedBlockInput(node));
 const invalid = $derived(invalidFor !== null && invalidFor === input);
+const handOff = $derived((invalid || failed) && onrefused !== undefined);
+
+$effect(() => {
+  if (handOff) onrefused?.();
+});
 
 $effect(() => {
   const family = node.family;
@@ -43,7 +55,9 @@ $effect(() => {
 </script>
 
 <div class="tx-pages-wrapped" data-family={node.family} data-block-type={node.block} data-refused={invalid || failed ? '' : undefined}>
-  {#if failed}
+  {#if handOff}
+    <p class="tx-pages-loading" aria-busy="true">{loadingLabel}</p>
+  {:else if failed}
     <p class="tx-pages-notice" role="note">{refusedLabel}</p>
   {:else if view}
     {@const View = view}
