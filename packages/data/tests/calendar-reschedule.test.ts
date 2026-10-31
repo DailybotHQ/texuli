@@ -102,14 +102,14 @@ describe('CalendarView rescheduling: names and keys', () => {
       const named = (name: RegExp | string) => screen.getByRole('button', { name });
       expect(
         named(
-          /^Design review, Wednesday, April 15, 2026, 1:00\sPM – 2:00\sPM, press Enter to open$/
+          /^Design review, 1:00\sPM – 2:00\sPM, Wednesday, April 15, 2026, press Enter to open$/
         )
       ).toBe(chip('review'));
       expect(named('Team offsite, All day, Thursday, April 16, 2026, press Enter to open')).toBe(
         chip('offsite')
       );
       expect(
-        named(/^Weekly planning, recurring, Monday, April 13, 2026, .+, press Enter to open$/)
+        named(/^Weekly planning, recurring, .+ – .+, Monday, April 13, 2026, press Enter to open$/)
       ).toBe(occurrenceChip('weekly'));
       // Movable chips point at the move hint; the locked one does not.
       const hint = document.getElementById(chip('review').getAttribute('aria-describedby') ?? '');
@@ -141,6 +141,50 @@ describe('CalendarView rescheduling: names and keys', () => {
       expect(chip('review').hasAttribute('data-movable')).toBe(false);
       expect(chip('review').hasAttribute('aria-describedby')).toBe(false);
     })();
+  });
+});
+
+describe('CalendarView event names: label in name (WCAG 2.5.3)', () => {
+  // A timed event that runs over two days, next to the all-day, recurring and plain ones.
+  const kinds: CalendarSeries<Details>[] = [
+    ...events,
+    {
+      id: 'retreat',
+      start: '2026-04-15T20:00:00Z',
+      end: '2026-04-16T02:00:00Z',
+      data: { title: 'Night retreat' },
+    },
+  ];
+
+  it('leads every chip name with its visible text, in order, in every view (axe runs the rule in tests/e2e/data.spec.ts)', async () => {
+    for (const view of ['month', 'week', 'day', 'agenda'] as const) {
+      render(Harness, { props: { initial: kinds, view } });
+      await ready();
+      const chips = [...document.querySelectorAll<HTMLElement>('[data-calendar-event]')];
+      expect(chips.length, view).toBeGreaterThan(0);
+      for (const element of chips) {
+        const visible = [...element.querySelectorAll('span')]
+          .map((span) => span.textContent?.trim() ?? '')
+          .filter(Boolean)
+          .join(', ');
+        expect(
+          element.getAttribute('aria-label')?.startsWith(`${visible}, `),
+          `${view}: ${visible}`
+        ).toBe(true);
+      }
+      if (view === 'month') {
+        // A month cell is named by its content (date button, then chips), never by a label
+        // that hides the visible text.
+        expect(document.querySelectorAll('[role="gridcell"][aria-label]'), view).toHaveLength(0);
+      }
+      if (view === 'agenda') {
+        // The agenda shows the time: the Protoyard repro.
+        expect(chip('review').getAttribute('aria-label')).toMatch(
+          /^Design review, 1:00\sPM – 2:00\sPM, Wednesday, April 15, 2026, press Enter to open$/
+        );
+      }
+      cleanup();
+    }
   });
 });
 

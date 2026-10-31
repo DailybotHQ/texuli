@@ -1,6 +1,5 @@
 <script lang="ts">
-import { spanDates } from '../engines/calendar/index.ts';
-import type { CalendarFormats } from './model.ts';
+import { type CalendarFormats, eventName } from './model.ts';
 import type { CalendarItem, CalendarLabels } from './types.ts';
 
 let {
@@ -29,21 +28,9 @@ const MOVE_SHORTCUTS = ['Alt', 'Control']
   .concat('Shift+F10')
   .join(' ');
 const time = $derived(fmt.span(item, labels.allDay));
-// The visible text leads the name (WCAG 2.5.3 label in name): title and "recurring",
-// then the date and time, then how to open it.
-// All-day events read "Title, All day, <date>"; timed ones "Title, <date>, <time>".
-const name = $derived(
-  [
-    item.title,
-    item.recurring ? labels.recurring : '',
-    item.allDay ? time : '',
-    fmt.longDate(spanDates(item, timeZone).first),
-    item.allDay ? '' : time,
-    labels.openHint,
-  ]
-    .filter(Boolean)
-    .join(', ')
-);
+// The visible text (title, "recurring", time) leads the name in the same order
+// (WCAG 2.5.3 label in name); the date and how to open it follow.
+const name = $derived(eventName(fmt, item, labels, timeZone));
 </script>
 
 <button

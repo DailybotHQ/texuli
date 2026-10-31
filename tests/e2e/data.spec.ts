@@ -324,6 +324,26 @@ test('data calendar: opens scrolled before paint, pointer create and drag (mirro
     }
   });
 
+  await test.step('G104: every view keeps the visible text leading each event name (label in name)', async () => {
+    await openCalendar();
+    const host = page.locator(`[data-example="${ID}"]`);
+    for (const view of ['Month', 'Week', 'Day', 'Agenda']) {
+      await host.getByRole('button', { name: view, exact: true }).click();
+      await expect(host.locator('[data-calendar-event]').first()).toBeVisible();
+      // The rule is experimental in axe, so it is outside AXE_TAGS: name it.
+      const results = await new AxeBuilder({ page })
+        .include(`[data-example="${ID}"]`)
+        .withRules(['label-content-name-mismatch'])
+        .analyze();
+      expect(results.passes.length + results.violations.length, view).toBeGreaterThan(0);
+      problems.push(
+        ...results.violations.map(
+          (v) => `${view} ${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(' | ')}`
+        )
+      );
+    }
+  });
+
   await test.step('P1-16: event tones render from tokens', async () => {
     await openCalendar();
     const tones = await Promise.all(
