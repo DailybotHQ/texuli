@@ -69,6 +69,14 @@ function isCompiled(value: Record<string, unknown>): boolean {
   return isRecord(value.vars) && isRecord(value.attrs) && typeof value.id === 'string';
 }
 
+/** An error as a `design-system-refused` refusal. */
+const failed = (error: unknown) =>
+  refused(
+    'design-system-refused',
+    '$.designSystem',
+    error instanceof Error ? error.message.slice(0, 200) : 'The design system was refused.'
+  );
+
 /**
  * Resolve, validate and compile the envelope's design system. `trust` is
  * the player's tier for an inline document (agent output), and `developer`
@@ -116,6 +124,10 @@ export async function resolvePlayerDesignSystemCore(
           '$.designSystem.ref',
           `The theme library has no "${ref.slice(7, 71)}".`
         );
+      // The loader may hand back a token `Theme`, as for an `extends` base: `fromTheme` of it
+      // (no design-system document has `light` or `style`).
+      if (isRecord(document) && isRecord(document.light) && isRecord(document.style))
+        document = compiler.fromTheme(document as Parameters<typeof compiler.fromTheme>[0]);
     }
     if (
       typeof ref === 'string' &&
@@ -147,11 +159,7 @@ export async function resolvePlayerDesignSystemCore(
     }
     return { ok: true, compiled, source: ref ? 'ref' : 'inline' };
   } catch (error) {
-    return refused(
-      'design-system-refused',
-      '$.designSystem',
-      error instanceof Error ? error.message.slice(0, 200) : 'The design system was refused.'
-    );
+    return failed(error);
   }
 }
 
@@ -159,7 +167,10 @@ export async function resolvePlayerDesignSystemCore(
  * Resolve, compile and apply in one call (what `Player.svelte` runs): the
  * event to report and the dispose of what was applied (none on a refusal).
  * Fonts register only for host-resolved documents or at the developer tier.
- * Never rejects.
+ * A `designSystems.mode` the design system did not compile paints its
+ * first compiled mode, and the root's `data-tx-mode` names
+ * it. Never rejects: an error while applying is a `design-system-refused`
+ * event.
  */
 export async function applyPlayerDesignSystemCore(
   root: HTMLElement,
@@ -172,12 +183,20 @@ export async function applyPlayerDesignSystemCore(
   dispose?: () => void;
   defaults?: Record<string, Record<string, string>>;
 }> {
-  const result = await resolvePlayerDesignSystemCore(reference, host, tier, options);
+  let result = await resolvePlayerDesignSystemCore(reference, host, tier, options);
+  let dispose: (() => void) | undefined;
+  const mode = host?.mode ?? 'light';
+  if (result.ok)
+    try {
+      // A mode the design system did not compile paints the other one (its only compiled mode).
+      dispose = applyDesignSystem(root, result.compiled, {
+        mode: result.compiled.vars[mode] ? mode : mode === 'light' ? 'dark' : 'light',
+        fonts: result.source === 'ref' || tier === 'developer',
+      });
+    } catch (error) {
+      result = failed(error);
+    }
   if (!result.ok) return { event: { status: 'refused', ...result } };
-  const dispose = applyDesignSystem(root, result.compiled, {
-    mode: host?.mode ?? 'light',
-    fonts: result.source === 'ref' || tier === 'developer',
-  });
   return {
     event: { status: 'applied', id: result.compiled.id, source: result.source },
     dispose,
