@@ -66,7 +66,6 @@ const C = DOCUMENT_CODES;
 export const DESIGN_SYSTEM_REF_PATTERN =
   /^(?:texuli:[a-z][a-z0-9]*(?:-[a-z0-9]+)*|[a-z][a-z0-9]*(?:-[a-z0-9]+)*@(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?)$/;
 
-
 /** UTF-8 bytes of a JSON value's serialization, stopping once past `cap`. */
 export function jsonBytes(value: unknown, cap = Number.POSITIVE_INFINITY): number {
   let text: string;
