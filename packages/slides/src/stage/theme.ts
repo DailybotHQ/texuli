@@ -17,6 +17,14 @@ import type { Deck, DeckThemeReference } from '../model/index.ts';
  */
 export type DeckThemeLoader = (id: string) => Promise<Theme>;
 
+/**
+ * Resolve a deck design system's `texuli:<theme>` reference or `extends`
+ * base to a design-system document (or a token `Theme`); `undefined` when it
+ * knows no such theme. The library default (`loadDeckLibraryBase`) lives in
+ * `./library-theme.ts` (G127).
+ */
+export type DeckLibraryBaseLoader = (ref: string) => Promise<unknown>;
+
 /** Unique catalog theme ids a deck references, deck default first, for preloading. */
 export function deckCatalogThemeIds(deck: Pick<Deck, 'meta' | 'slides'>): string[] {
   const ids = new Set<string>();

@@ -56,6 +56,7 @@ scoped styles.
 | `sync` | `null` | A same-origin link to another stage window: the engine presenter protocol, or a v1 `DeckSync` ([presenter screen](#presenter-screen)) |
 | `loadTheme` | `loadDeckLibraryTheme` (`DeckStage`); none on `DeckStageCore` | Resolves catalog theme ids; `null` (or none, on the core) leaves them to host CSS ([Themes](#themes)) |
 | `designSystems` | — | `{ resolve, mode }` for a deck's `designSystem.ref` (from `0.10.0`); see [Design systems](#design-systems) |
+| `loadLibraryBase` | `loadDeckLibraryBase` (`DeckStage`); none on `DeckStageCore` | A `DeckLibraryBaseLoader`: loads a design system's `texuli:<theme>` reference or `extends` base that `designSystems.resolve` leaves `undefined`; none (or `null`) refuses it (G127, unreleased, planned for `0.10.1`) |
 | `onDesignSystem` | — | Called with a `PlayerDesignSystemEvent` when a deck's design system applies or is refused |
 | `resolveAvatar` | — | Host adapter for `avatar:` image ids |
 | `controller` | `null` | Read-only binding to the engine `DeckController` for imperative hosts |
@@ -199,10 +200,11 @@ scoped styles.
   `@texuli/slides/export-core` (G105), which takes the same `defaults`
   source and references no default table either
   ([export.md](export.md#export-core-texulislidesexport-core-g105)).
-  The core has no default `loadTheme` either (G127, unreleased, planned
-  for `0.10.1`): pass the host's loader, or `loadDeckLibraryTheme`
-  (exported by both entries) to load the token theme library on first use;
-  see [Themes](#themes).
+  The core has no default `loadTheme` or `loadLibraryBase` either (G127,
+  unreleased, planned for `0.10.1`): pass the host's loaders, or
+  `loadDeckLibraryTheme` and `loadDeckLibraryBase` (exported by both
+  entries) to load the token theme library on first use; see
+  [Themes](#themes) and [Design systems](#design-systems).
 
   ```svelte
   <script lang="ts">
@@ -520,12 +522,13 @@ slide's theme overrides the deck's.
   (exported by `@texuli/slides/stage-core` too). Before G127 the core's
   default loader kept a dynamic import of the whole expanded set (the
   catalog rows and its 146 definition chunks) in every core host's build,
-  even when the host passed its own loader. One route remains: a deck's
-  design-system step (below) falls back to the theme library for
-  `designSystem.ref: "texuli:<id>"` (through `@texuli/player/design-system`),
-  so a core host's build still emits library chunks behind that lazy step
-  (`tests/bundle-graph.test.ts`, "reaches the theme library only through a
-  loader it injects"). A palette seed
+  even when the host passed its own loader. The design-system step has the
+  same seam (`loadLibraryBase`, [Design systems](#design-systems)), so a
+  core host with no loaders, or its own, has no theme library module in
+  any chunk: 98 chunks and none from the library, against 250 chunks, 152
+  of them with library modules, before G127
+  (`tests/bundle-graph.test.ts`, "reaches the theme library only through
+  loaders it injects"). A palette seed
   imports `@texuli/tokens/generator` on first use, so a host that passes its
   own `loadTheme` (or `null`) has neither the theme library records nor the
   generator in its initial graph (`tests/bundle-graph.test.ts` checks it by
@@ -560,13 +563,19 @@ The stage applies it the way `@texuli/player` applies a blueprint's:
 
 1. **Lazy:** a validated deck with a `designSystem` loads the stage's
    design-system step with `import()`, which loads
-   `@texuli/player/design-system` (the player's own resolver) and the
-   compiler. A deck without one never loads any of them
+   `@texuli/player/design-system-core` (the player's own resolver, without
+   the theme library) and `@texuli/tokens/design-system/compile-core`. A deck without one never loads any of them
    (`tests/bundle-graph.test.ts` checks the initial graph by module id).
 2. **Resolved by the host:** `designSystems.resolve(ref)` returns a
    document or a compiled design system (sync or async; a cached JSON copy
-   works). The stage never fetches; `texuli:<theme>` falls back to the theme
-   library. A resolved document must declare the exact `id` and `version`
+   works). The stage never fetches. A `texuli:<theme>` reference or
+   `extends` base that `resolve` leaves `undefined` goes to
+   `loadLibraryBase` (a `DeckLibraryBaseLoader`): `DeckStage` defaults it to
+   `loadDeckLibraryBase` (the theme library, imported on first use);
+   `DeckStageCore` has no default (G127, unreleased, planned for `0.10.1`),
+   so without one such a design system is refused
+   (`design-system-unresolved`, or `invalid-value` for an `extends` base),
+   and the build has no reference to the library. A resolved document must declare the exact `id` and `version`
    of the ref. An inline document compiles at the stage's tier (`tier`, else
    `mediaTrust`, else `untrusted`), so agent decks refuse `data:` URLs and
    remote assets; a host-resolved one compiles at `developer`.

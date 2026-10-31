@@ -130,26 +130,6 @@ function staticChunks(chunks: Map<string, Chunk>, roots: readonly string[]): Chu
   return [...seen].flatMap((name) => chunks.get(name) ?? []);
 }
 
-/**
- * The modules of `roots` and every chunk they import, statically or with
- * `import()`, never entering the `skip` chunk.
- */
-function loadableModules(
-  chunks: Map<string, Chunk>,
-  roots: readonly string[],
-  skip?: string
-): string[] {
-  const seen = new Set<string>();
-  const visit = (name: string) => {
-    if (name === skip || seen.has(name) || !chunks.has(name)) return;
-    seen.add(name);
-    const chunk = chunks.get(name);
-    for (const next of [...(chunk?.imports ?? []), ...(chunk?.dynamicImports ?? [])]) visit(next);
-  };
-  for (const root of roots) visit(root);
-  return [...seen].flatMap((name) => chunks.get(name)?.modules ?? []);
-}
-
 /** The modules of `roots` and every chunk they import statically. */
 function staticModules(chunks: Map<string, Chunk>, roots: readonly string[]): string[] {
   return staticChunks(chunks, roots).flatMap((chunk) => chunk.modules);
@@ -368,27 +348,30 @@ const loadTheme = async (id: string) => ({ id }) as never;
     );
   }, 180_000);
 
-  it('a stage-core and export-core host reaches the theme library only through a loader it injects (G127)', async () => {
+  it('a stage-core and export-core host reaches the theme library only through loaders it injects (G127)', async () => {
     const hosts = {
       // The host hands the stage and the print view an already resolved theme.
       resolved: `const theme = { id: 'host' } as never;
-const loadTheme = async () => theme;`,
-      // The host leaves catalog themes to its CSS (no loader at all).
-      none: 'const loadTheme = undefined;',
+const loadTheme = async () => theme;
+const loadLibraryBase = undefined;`,
+      // The host leaves catalog themes to its CSS and resolves no texuli: design system.
+      none: `const loadTheme = undefined;
+const loadLibraryBase = undefined;`,
       // Control: a core host that opts into the library by name does reach it.
-      library: `import { loadDeckLibraryTheme as loadTheme } from ${JSON.stringify(`${SRC}/stage/core.ts`)};`,
+      library: `import { loadDeckLibraryTheme as loadTheme, loadDeckLibraryBase as loadLibraryBase } from ${JSON.stringify(`${SRC}/stage/core.ts`)};`,
     };
-    for (const [name, loader] of Object.entries(hosts)) {
+    const counts: string[] = [];
+    for (const [name, loaders] of Object.entries(hosts)) {
       const chunks = await buildHost(
         `<script lang="ts">
 import { DeckStageCore } from ${JSON.stringify(`${SRC}/stage/core.ts`)};
 import { DeckPrintViewCore } from ${JSON.stringify(`${SRC}/export/core.ts`)};
 import HostFree from './HostFree.svelte';
-${loader}
+${loaders}
 let { deck }: { deck: never } = $props();
 const renderers = { validateBlock: () => undefined, free: () => HostFree };
 </script>
-<DeckStageCore {deck} {renderers} {loadTheme} />
+<DeckStageCore {deck} {renderers} {loadTheme} {loadLibraryBase} />
 <DeckPrintViewCore {deck} {renderers} {loadTheme} />
 `,
         { 'HostFree.svelte': '<p>host</p>\n' }
@@ -399,19 +382,25 @@ const renderers = { validateBlock: () => undefined, free: () => HostFree };
         name
       ).toBe(true);
       expect(chunkWith(chunks, '/export/print-paint.ts'), name).toBeTruthy();
-      const entries = [...chunks.values()].filter((chunk) => chunk.isEntry).map((c) => c.fileName);
-      // Every chunk the host can load, initial or lazy, except through a deck's design-system
-      // step (ADR-024: `designSystem.ref: "texuli:<id>"` falls back to the library in
-      // @texuli/player/design-system; only a deck that names a design system loads that step).
-      const step = chunkWith(chunks, '/slides/src/stage/design-system.ts')?.fileName;
-      const reachable = loadableModules(chunks, entries, step);
-      expect(libraryIn(reachable), name).toEqual(name === 'library' ? THEME_LIBRARY : []);
-      expect(libraryIn(staticModules(chunks, entries)), name).toEqual([]);
+      // The design-system step and its compiler are in the build (a deck may name one)...
+      expect(chunkWith(chunks, '/slides/src/stage/design-system.ts'), name).toBeTruthy();
+      expect(
+        every.some((id) => id.includes('/tokens/src/design-system/compiler.ts')),
+        name
+      ).toBe(true);
+      // ...and no chunk, initial or lazy, holds a theme library module, unless the host opts in.
       const library = [...chunks.values()].filter((chunk) => libraryIn(chunk.modules).length > 0);
-      // Reported, not asserted (the size budgets own the numbers).
-      console.info(
-        `[bundle-graph] core host (${name} loader): ${chunks.size} chunks, ${library.length} with theme library modules, none loadable outside the design-system step: ${libraryIn(reachable).length === 0}`
-      );
+      if (name === 'library') {
+        expect(libraryIn(every), name).toEqual(THEME_LIBRARY);
+      } else {
+        expect(libraryIn(every), name).toEqual([]);
+        expect(library, name).toEqual([]);
+      }
+      const entries = [...chunks.values()].filter((chunk) => chunk.isEntry).map((c) => c.fileName);
+      expect(libraryIn(staticModules(chunks, entries)), name).toEqual([]);
+      counts.push(`${name}: ${chunks.size} chunks, ${library.length} with theme library modules`);
     }
+    // Reported, not asserted (the size budgets own the numbers).
+    console.info(`[bundle-graph] core hosts (G127): ${counts.join('; ')}`);
   }, 360_000);
 });

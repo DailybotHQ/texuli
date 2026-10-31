@@ -58,7 +58,7 @@ export {
 } from './free.ts';
 export { canUseNativeFullscreen, type DeckFullscreenState } from './fullscreen.ts';
 export { clickInput, createSwipeTracker, keyInput, selectionLength } from './input.ts';
-export { loadDeckLibraryTheme } from './library-theme.ts';
+export { loadDeckLibraryBase, loadDeckLibraryTheme } from './library-theme.ts';
 export { type DeckBlockRendererProps, loadDeckBlockFamily } from './loaders.ts';
 export {
   type DeckMediaGate,
@@ -156,6 +156,7 @@ export {
 export { type DeckSyncLink, type DeckSyncSignal, deckSyncLink } from './sync-link.ts';
 export {
   createDeckThemeCache,
+  type DeckLibraryBaseLoader,
   type DeckThemeLoader,
   deckCatalogThemeIds,
   deckThemeVariables,

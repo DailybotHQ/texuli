@@ -111,7 +111,7 @@ import {
 } from './style.ts';
 import type { DeckSync } from './sync.ts';
 import { deckSyncLink } from './sync-link.ts';
-import { type DeckThemeLoader, deckThemeVariables } from './theme.ts';
+import { type DeckLibraryBaseLoader, type DeckThemeLoader, deckThemeVariables } from './theme.ts';
 import {
   type DeckTransitionDirection,
   playDeckTransition,
@@ -203,6 +203,15 @@ interface Props {
    * mode (default: the stage's, `dark` or `light`).
    */
   designSystems?: PlayerDesignSystems | null;
+  /**
+   * Loads a deck design system's `texuli:<theme>` reference or `extends`
+   * base that `designSystems.resolve` leaves `undefined`. This core component
+   * has no default (G127): without one such a design system is refused
+   * (`design-system-unresolved`), and the build has no reference to the
+   * token theme library. `DeckStage` defaults to `loadDeckLibraryBase`; pass
+   * it here to load the library on first use.
+   */
+  loadLibraryBase?: DeckLibraryBaseLoader | null;
   /** Called when a deck's design system applies or is refused. */
   onDesignSystem?: (event: PlayerDesignSystemEvent) => void;
   resolveAvatar?: (id: string) => string | undefined;
@@ -260,6 +269,7 @@ let {
   sync = null,
   loadTheme,
   designSystems,
+  loadLibraryBase,
   onDesignSystem,
   resolveAvatar,
   controller = $bindable(null),
@@ -557,6 +567,7 @@ $effect(() => {
   const key = systemKey;
   const reference = untrack(() => systemReference);
   const host = untrack(() => designSystems);
+  const libraryBase = untrack(() => loadLibraryBase);
   const trust = paintTier === 'developer' ? 'developer' : 'untrusted';
   if (!key || !reference) {
     system = undefined;
@@ -566,7 +577,9 @@ $effect(() => {
   let live = true;
   systemStatus = 'pending';
   import('./design-system.ts')
-    .then((step) => step.loadStageDesignSystem(reference, host, trust, root?.ownerDocument))
+    .then((step) =>
+      step.loadStageDesignSystem(reference, host, trust, root?.ownerDocument, libraryBase)
+    )
     .then(
       ({ event, system: next }) => {
         if (!live) return;
