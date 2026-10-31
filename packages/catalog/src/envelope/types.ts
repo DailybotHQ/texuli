@@ -1,3 +1,4 @@
+import type { BlueprintDesignSystemReference } from '@texuli/spec';
 import { SPEC_MIGRATIONS } from '@texuli/spec/migrate';
 import type { BlueprintEnvelopeMotion } from '@texuli/spec/motion';
 import type { EditOp } from '../edit/types.ts';
@@ -126,6 +127,13 @@ export interface BlueprintEnvelope {
    * lower it.
    */
   motion?: Readonly<BlueprintEnvelopeMotion>;
+  /**
+   * The design system the blueprint follows (spec 0.10.0, ADR-024):
+   * `{ ref: "id@x.y.z" }` the host resolves, or `{ inline: <document> }`.
+   * `validateDraft` checks it (the `design-system` check); players apply it
+   * to their root scope.
+   */
+  designSystem?: Readonly<BlueprintDesignSystemReference>;
   tree: CatalogTreeInput;
 }
 

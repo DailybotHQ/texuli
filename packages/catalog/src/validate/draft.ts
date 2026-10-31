@@ -19,6 +19,7 @@ import type {
 } from '../render/renderer/types.ts';
 import { checkCanvases, type DraftCanvasCheck } from './canvas.ts';
 import { checkDashboards } from './dashboard.ts';
+import { checkDraftDesignSystem, type DraftDesignSystemCheck } from './design-system.ts';
 import { checkDocuments, type DraftDocumentCheck } from './document.ts';
 import { checkForms, type DraftFormCheck } from './form.ts';
 import { resolveInteraction } from './interaction.ts';
@@ -30,6 +31,7 @@ export const DRAFT_CHECKS = [
   'input',
   'envelope',
   'spec',
+  'design-system',
   'structure',
   'interaction',
   'sinks',
@@ -165,6 +167,15 @@ export interface ValidateDraftOptions {
   conditions?: RenderOptions['conditions'];
   /** Values the `when` conditions read (audit G07). Default: none, so conditions are unknown. */
   conditionInputs?: RenderOptions['conditionInputs'];
+  /**
+   * The design-system check for the envelope's `designSystem` (spec 0.10.0,
+   * ADR-024), usually `checkDesignSystemReference` from
+   * `@texuli/spec/design-system` passed as is (it runs at the draft's tier:
+   * `untrusted` refuses every `data:` URL). Without it the reference's shape
+   * and `ref` grammar are still checked, and an inline document's own rules
+   * are `skipped`; the players validate and compile it before it paints.
+   */
+  checkDesignSystem?: DraftDesignSystemCheck;
   /**
    * The full spec 0.3.0 check of an envelope, usually `validateBlueprint`
    * from `@texuli/spec` with the host's spec documents (state and flow
@@ -330,6 +341,15 @@ export function validateDraft(input: unknown, options: ValidateDraftOptions): Dr
         }
         checks.spec = 'pass';
       }
+      // Spec 0.10.0: the design system the blueprint follows (ADR-024).
+      const system = envelope.designSystem;
+      const ds =
+        system === undefined
+          ? { issues: [], checked: true }
+          : checkDraftDesignSystem(system, tier, options.checkDesignSystem);
+      if (ds.checked) checks['design-system'] = 'pass';
+      for (const i of ds.issues)
+        error('design-system', i.code, i.path, i.hint ? `${i.message} ${i.hint}` : i.message);
       value = envelope.tree;
       checks.envelope = 'pass';
     }

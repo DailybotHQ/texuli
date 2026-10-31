@@ -60,6 +60,7 @@ const FIELDS: Readonly<Record<string, readonly string[]>> = {
     'state',
     'flow',
     'motion',
+    'designSystem',
     'tree',
   ],
   generator: ['kind', 'name', 'model'],
