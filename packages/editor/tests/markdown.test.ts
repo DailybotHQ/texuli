@@ -185,6 +185,44 @@ describe('host inline extensions (G48)', () => {
   });
 });
 
+describe('backslash escapes (G100, CommonMark 2.4)', () => {
+  /** The text of a one-paragraph document. */
+  const text = (doc: EditorDocument) => {
+    const block = doc.blocks[0];
+    if (block?.type !== 'paragraph') return '';
+    return block.content.map((node) => (node.type === 'text' ? node.text : '')).join('');
+  };
+  const extensions = [
+    { name: 'mention', sigil: '@' as const },
+    { name: 'reference', sigil: '#' as const },
+  ];
+
+  it('reads a backslash before any ASCII punctuation as that character, and nothing else as an escape', () => {
+    const punctuation = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
+    for (const ch of punctuation) {
+      expect(text(markdownToDocument(`a \\${ch} b`).doc), ch).toBe(`a ${ch} b`);
+    }
+    // A backslash before a letter, a digit or a space stays literal.
+    expect(text(markdownToDocument('C:\\path 1\\2 a\\ b').doc)).toBe('C:\\path 1\\2 a\\ b');
+  });
+
+  it('never opens an extension at an escaped sigil, and round-trips the literal text', () => {
+    const { doc, diagnostics } = markdownToDocument('mail \\@{p|P} and \\#{r|R}', { extensions });
+    expect(diagnostics).toEqual([]);
+    expect(text(doc)).toBe('mail @{p|P} and #{r|R}');
+    expect(editorMarks(doc)).toEqual([]);
+    for (const source of [
+      'a \\@ b',
+      'mail \\@{p|P} and \\#{r|R}',
+      'Ping @{person-1|Ada} \\@ team',
+    ]) {
+      const once = markdownToDocument(source, { extensions }).doc;
+      const written = documentToMarkdown(once, { extensions });
+      expect(shape(markdownToDocument(written, { extensions }).doc), source).toEqual(shape(once));
+    }
+  });
+});
+
 /** Every mark in a one-paragraph document, in order. */
 function editorMarks(doc: EditorDocument): unknown[] {
   const block = doc.blocks[0];
