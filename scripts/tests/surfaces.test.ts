@@ -55,6 +55,23 @@ describe('generated agent surfaces', () => {
     expect(card.deprecatedTools.map((alias) => alias.name)).toEqual(
       texuliOps.aliases().map((alias) => alias.name)
     );
+    // The 0.8 names removed in 0.10.0, with what to call instead.
+    expect(card.removedTools).toEqual(
+      texuliOps.removed().map((entry) => ({
+        name: entry.name,
+        replacedBy: [...entry.replacedBy],
+        removedIn: entry.removedIn,
+      }))
+    );
+    expect(card.removedTools.map((entry) => entry.name)).toEqual([
+      'deck',
+      'document',
+      'catalog',
+      'component',
+      'validate',
+      'example',
+      'theme',
+    ]);
     const remote = [
       ...card.tools.filter((tool) => tool.remote).map((tool) => tool.name),
       ...card.deprecatedTools.filter((alias) => alias.remote).map((alias) => alias.name),
@@ -85,6 +102,7 @@ describe('generated agent surfaces', () => {
     const tables = buildOpsTables();
     for (const name of names) expect(tables).toContain(`| \`${name}\` |`);
     for (const alias of texuliOps.aliases()) expect(tables).toContain(`| \`${alias.name}\` |`);
+    for (const entry of texuliOps.removed()) expect(tables).toContain(`| \`${entry.name}\` |`);
     const data = await buildMcpPageData();
     expect(data.tools.map((tool) => tool.name)).toEqual(names);
     expect(data.prompts.map((prompt) => prompt.name)).toContain('build-ui');

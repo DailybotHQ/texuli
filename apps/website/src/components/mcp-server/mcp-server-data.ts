@@ -965,48 +965,42 @@ export const MCP_SERVER_DATA = {
       example: 'Pages about theming',
     },
   ],
-  deprecatedTools: [
+  deprecatedTools: [],
+  removedTools: [
     {
       name: 'deck',
       replacedBy: ['deck.run'],
-      removeIn: '0.10.0',
-      remote: true,
+      removedIn: '0.10.0',
     },
     {
       name: 'document',
       replacedBy: ['document.run', 'document.export'],
-      removeIn: '0.10.0',
-      remote: false,
+      removedIn: '0.10.0',
     },
     {
       name: 'catalog',
       replacedBy: ['catalog.search'],
-      removeIn: '0.10.0',
-      remote: true,
+      removedIn: '0.10.0',
     },
     {
       name: 'component',
       replacedBy: ['component.get'],
-      removeIn: '0.10.0',
-      remote: true,
+      removedIn: '0.10.0',
     },
     {
       name: 'validate',
       replacedBy: ['catalog.validate'],
-      removeIn: '0.10.0',
-      remote: true,
+      removedIn: '0.10.0',
     },
     {
       name: 'example',
       replacedBy: ['example.search'],
-      removeIn: '0.10.0',
-      remote: true,
+      removedIn: '0.10.0',
     },
     {
       name: 'theme',
       replacedBy: ['theme.search', 'theme.get'],
-      removeIn: '0.10.0',
-      remote: true,
+      removedIn: '0.10.0',
     },
   ],
   resources: [

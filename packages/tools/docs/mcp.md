@@ -9,7 +9,9 @@
 > `@texuli/tools/mcp` export, `texuli mcp` and the `@texuli/mcp` package
 > are new in `0.9.0`, and the remote endpoint is live at
 > `https://texuli.com/mcp` (see [The remote door](#the-remote-door)). The
-> seven 0.8 tool names stay as deprecated aliases until `0.10.0`.
+> seven 0.8 tool names, deprecated aliases in `0.9.0`, are removed on the
+> `release/0.10.0` branch (not on npm yet): a call names the operation to
+> use instead ([ops.md](ops.md#removed-08-tool-names)).
 
 ## The local door
 
