@@ -3,7 +3,9 @@
 // article with anchored headings and an "On this page" outline.
 import type { TexuliDocument } from '@texuli/document/model';
 import type { DeckPlayerHost } from '@texuli/player';
+import { untrack } from 'svelte';
 import Breadcrumb from '../shared/Breadcrumb.svelte';
+import type { PagesDesignSystemEvent, PagesDesignSystems } from '../shared/design-system-types.ts';
 import type { EmbedResolver } from '../shared/embeds.ts';
 import { type PagesLabels, resolvePagesLabels } from '../shared/labels.ts';
 import type { MediaResolver } from '../shared/media.ts';
@@ -31,6 +33,15 @@ interface Props {
   deckHost?: DeckPlayerHost | null;
   /** Paint embeds without motion. */
   reducedMotion?: boolean;
+  /**
+   * The document's design system (spec 0.10.0): the host's resolver for a
+   * `ref` (the reader never fetches), the mode and the inline trust level.
+   * A document with one loads the compiler lazily and applies the result to
+   * the article; one without pays nothing. A refusal keeps the default
+   * theme and shows a notice.
+   */
+  designSystems?: PagesDesignSystems | null;
+  onDesignSystem?: (event: PagesDesignSystemEvent) => void;
   class?: string;
 }
 
@@ -48,6 +59,8 @@ let {
   resolveMedia,
   deckHost = null,
   reducedMotion = false,
+  designSystems = null,
+  onDesignSystem,
   class: className,
 }: Props = $props();
 
@@ -55,14 +68,63 @@ const labels = $derived(resolvePagesLabels(labelOverrides));
 const entries = $derived(documentOutline(doc, { prefix: anchorPrefix }));
 const anchors = $derived(new Map(entries.map((entry) => [entry.id, entry.anchor])));
 const title = $derived(doc.meta.title);
+
+// Spec 0.10.0: the document's design system, loaded only when it names one.
+let element = $state<HTMLElement | null>(null);
+let systemStatus = $state<'pending' | 'applied' | 'refused' | undefined>();
+const systemKey = $derived(doc.designSystem ? JSON.stringify(doc.designSystem) : '');
+let disposeSystem: (() => void) | undefined;
+const dropSystem = () => {
+  disposeSystem?.();
+  disposeSystem = undefined;
+};
+$effect(() => {
+  const key = systemKey;
+  const target = element;
+  const reference = untrack(() => doc.designSystem);
+  const host = untrack(() => designSystems);
+  void designSystems?.mode;
+  if (!key || !target || !reference) {
+    dropSystem();
+    systemStatus = undefined;
+    return;
+  }
+  let live = true;
+  systemStatus = 'pending';
+  import('../shared/design-system.ts')
+    .then((step) => step.applyPagesDesignSystem(target, reference, host))
+    .then(
+      ({ event, dispose }) => {
+        if (!live) return dispose?.();
+        dropSystem();
+        disposeSystem = dispose;
+        systemStatus = event.status;
+        untrack(() => onDesignSystem?.(event));
+      },
+      () => {
+        if (live) systemStatus = 'refused';
+      }
+    );
+  return () => {
+    live = false;
+  };
+});
+$effect(() => () => disposeSystem?.());
 </script>
 
 <article
+  bind:this={element}
   class={['tx-pages', 'tx-pages-reader', className]}
+  data-tx-pages-design-system={systemStatus}
   aria-label={title || labels.reader}
   {...(doc.meta.locale ? { lang: doc.meta.locale } : {})}
   {...(doc.meta.dir ? { dir: doc.meta.dir } : {})}
 >
+  {#if systemStatus === 'refused'}
+    <p class="tx-pages-reader__notice" role="status" data-tx-pages-design-system-notice>
+      {labels.designSystemRefused}
+    </p>
+  {/if}
   {#if trail.length > 0}
     <Breadcrumb {trail} current={title} label={labels.breadcrumb} {onNavigate} {pageHref} />
   {/if}

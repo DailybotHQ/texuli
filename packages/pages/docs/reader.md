@@ -29,6 +29,8 @@ editing code.
 | `trail`, `onNavigate`, `pageHref` | — | The breadcrumb and page links, as in the editor (`PageRef`) |
 | `resolveEmbed`, `resolveMedia`, `deckHost` | — | Embeds and media, as in the editor (`EmbedResolver`, `MediaResolver`) |
 | `reducedMotion` | `false` | Paint embeds without motion |
+| `designSystems` | — | `PagesDesignSystems` (spec 0.10.0): `resolve(ref)` for the document's `designSystem.ref` (a document or a compiled design system; may be async; the reader never fetches), `mode` (`light`, `dark`) and `trust` for an inline document (default `untrusted`) |
+| `onDesignSystem` | — | Called with a `PagesDesignSystemEvent`: `{ status: 'applied', id, source }` or `{ status: 'refused', code, path, message }` |
 | `class` | — | Extra classes on the root |
 
 Blocks render as semantic elements: paragraphs, `h1` to `h4` (plus the
@@ -38,6 +40,25 @@ and a grid for columns. Text renders through text interpolation; links pass
 `safeHref` at the untrusted tier with `rel="noopener noreferrer nofollow"`.
 Wrapped blocks paint with their `@texuli/blocks` family renderer and embeds
 with `@texuli/player`, as in the editor.
+
+## Design systems
+
+> **In development for `0.10.0`, not on npm.**
+
+When the document carries `designSystem` (spec 0.10.0,
+[ADR-024](../../../docs/DECISIONS.md#adr-024-design-systems-on-every-surface)),
+the reader loads its design-system step with `import()` (a document
+without one never loads it; a test walks the static imports): a `ref`
+goes to `designSystems.resolve` (`texuli:<theme>` falls back to the theme
+library), an inline document is validated at `designSystems.trust` and
+both are compiled by `@texuli/tokens/design-system/compile`, then applied
+to the article with `applyDesignSystem` (`data-tx-ds`, `data-tx-scope`,
+`data-tx-mode` and the variables). Fonts load only for host-resolved
+documents or at the `developer` level. Nothing resolves, the resolver
+throws, another document comes back, or the compiler refuses it (for
+example `aa-text`, `url-refused`): the reader keeps the default theme,
+sets `data-tx-pages-design-system="refused"` and shows
+`labels.designSystemRefused` in a `role="status"` paragraph. Never throws.
 
 ## Outline and anchors
 
@@ -53,4 +74,5 @@ The reader also exports what it shares with the editor: `planEmbed`,
 `componentBlueprint`, `deckBlueprint`, `wrappedBlockInput`, `EmbedPlan`,
 `BlueprintNode`, `EmbedResolver`, `mediaSource`, `pageLinkHref`,
 `MediaResolver`, `DEFAULT_PAGES_LABELS`, `resolvePagesLabels`, `PagesLabels`
-and `PageRef` (see [editor](editor.md#embeds-and-media)).
+and `PageRef`, plus the design-system types `PagesDesignSystems` and
+`PagesDesignSystemEvent` (see [editor](editor.md#embeds-and-media)).

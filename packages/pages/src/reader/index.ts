@@ -4,6 +4,10 @@
  * loads no editing code.
  */
 
+export type {
+  PagesDesignSystemEvent,
+  PagesDesignSystems,
+} from '../shared/design-system-types.ts';
 export {
   type BlueprintNode,
   componentBlueprint,
