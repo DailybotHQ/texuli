@@ -164,6 +164,15 @@ describe('design-system operations', () => {
           name
         ).toContain('aa-text');
       }
+      // L-2: a zero-width character in free text is refused, as the importers refuse it.
+      for (const name of ['A\u200bB', 'A\u2060B', 'A\ufeffB', 'A\u{e0041}B']) {
+        const hidden = await run('ds.validate', { document: { ...MINIMAL_DESIGN_SYSTEM, name } });
+        expect(hidden, JSON.stringify(name)).toMatchObject({
+          valid: false,
+          codes: ['invalid-value'],
+          errors: [{ path: '$.name' }],
+        });
+      }
       const diff = await run('ds.diff', { before: MINIMAL_DESIGN_SYSTEM, after: LOW_CONTRAST });
       expect(diff.valid).toBe(false);
       expect(diff.errors.every((error: Json) => error.source === 'after')).toBe(true);

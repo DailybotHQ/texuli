@@ -294,7 +294,7 @@ envelope up to the current spec with pure, per-version steps
 `0.5.0 → 0.6.0`, `0.6.0 → 0.7.0`, `0.7.0 → 0.8.0`, `0.8.0 → 0.9.0` and
 `0.9.0 → 0.10.0`, each of which only stamps `spec`); a compatible version
 range is planned, not built. The workspace is at spec `0.10.0` (digest
-`36722679ebb84e38e86632789af1bda5dfcc1eb6db1b6712cda1b4f56ad1e1c7`), which adds the
+`afcb9e3ed6b74b833a0f7477a657168621785ee98602ff582aa047e2d86aef17`), which adds the
 design-system document (PLAN_011 T-ds-spec) and the envelope's
 `designSystem` (T-ds-blueprint), plus a catalog projection refresh
 (`data-filter-builder` gains the optional `issues` prop and
