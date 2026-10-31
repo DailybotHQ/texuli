@@ -23,8 +23,8 @@ end to end and native for agents:
   twin in `native/`.
 
 **Status: in development, pre-1.0.** All 26 published packages (all of
-`packages/` except `@texuli/examples`) are released on npm in the 0.10 line,
-every one at `0.10.0`, which the publish workflow publishes from `main`
+`packages/` except `@texuli/examples`) are released on npm in the 0.10 line:
+7 at `0.10.0` (core, date, deck, drag, document, primitives, spec) and 19 at `0.10.1` (G125–G127 and their exact-pin dependents), which the publish workflow publishes from `main`
 after the merge and points `latest` and `next` to; `0.10.0` adds design
 systems (one JSON document per brand, [DESIGN_SYSTEMS](docs/DESIGN_SYSTEMS.md)),
 and `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/editor`,
@@ -216,7 +216,7 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets` and `@texuli/mcp`
     are still in development, and the blueprint spec in
     `@texuli/spec@0.10.0` is `0.10.0`. `@texuli/examples`, the apps and
-    `native/` publish nothing. 0.10.0 is a pre-1.0 release, not stable
+    `native/` publish nothing. The 0.10 line is a pre-1.0 release, not stable
     (1.0.0 will be the first stable release; `latest` tracks the newest
     release). texuli.com deploys from `main` (Cloudflare Pages), with the
     remote MCP at `https://texuli.com/mcp`; the agent service is not

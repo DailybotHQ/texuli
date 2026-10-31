@@ -74,7 +74,7 @@ fails on drift), in catalog order: the six built-ins, then the curated
 themes sorted by id.
 
 Each row's `description` is the definition's full sentence, the same text
-`loadExpandThemeDefinition(id)` returns. Before `0.10.1` (unreleased) the
+`loadExpandThemeDefinition(id)` returns. Before `0.10.1` the
 rows cut descriptions at 48 characters, mid-sentence ("Terracotta Hearth:
 curated warm family theme for"). The full sentences cost nothing in size:
 the descriptions repeat, so the entry measures 6,408 B gzip, against

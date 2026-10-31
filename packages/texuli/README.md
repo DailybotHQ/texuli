@@ -15,7 +15,7 @@ layouts for dashboards, marketing pages, auth and settings, content and
 mobile.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.10.0`, a pre-1.0 release (1.0.0 will be the first
+> published to npm as `0.10.1`, a pre-1.0 release (1.0.0 will be the first
 > stable release). Under 0.x, a new minor (`0.11.0`) may contain breaking
 > changes, so pin the exact version or use `^0.10.0`, which accepts only 0.10.x.
 
@@ -42,7 +42,7 @@ yarn add texuli @texuli/tokens
   `--tx-size-icon-sm`, `--tx-shape-radius-*`…) with no fallback, and only
   `base.css` declares them, so a host with its own reset that skips it gets
   controls with no size. Such a host can load `@texuli/tokens/system.css`
-  instead (unreleased, `0.10.0`): the system token defaults alone, with no
+  instead (from `0.10.0`): the system token defaults alone, with no
   reset.
 
 ## Quick start

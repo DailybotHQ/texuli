@@ -176,7 +176,7 @@ prop plus `defaults`, a `DeckDefaultRenderersSource`), and its preload is
 - **With `defaults`** (for example the same source a `DeckStageCore` host
   hands its stage) the view appends those tables after `renderers`, and
   `preloadDeckPrintViewCore({ defaults })` warms them.
-- **Themes (G127, unreleased, planned for `0.10.1`):** `DeckPrintViewCore`
+- **Themes (G127, from `0.10.1`):** `DeckPrintViewCore`
   has no default `loadTheme`. Without one, catalog themes print with host
   CSS, and the print painter never references the token theme library, so
   an export-core host emits none of its chunks (`@texuli/slides/export-core`

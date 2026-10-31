@@ -56,7 +56,7 @@ scoped styles.
 | `sync` | `null` | A same-origin link to another stage window: the engine presenter protocol, or a v1 `DeckSync` ([presenter screen](#presenter-screen)) |
 | `loadTheme` | `loadDeckLibraryTheme` (`DeckStage`); none on `DeckStageCore` | Resolves catalog theme ids; `null` (or none, on the core) leaves them to host CSS ([Themes](#themes)) |
 | `designSystems` | — | `{ resolve, mode }` for a deck's `designSystem.ref` (from `0.10.0`); see [Design systems](#design-systems) |
-| `loadLibraryBase` | `loadDeckLibraryBase` (`DeckStage`); none on `DeckStageCore` | A `DeckLibraryBaseLoader`: loads a design system's `texuli:<theme>` reference or `extends` base that `designSystems.resolve` leaves `undefined`; none (or `null`) refuses it (G127, unreleased, planned for `0.10.1`) |
+| `loadLibraryBase` | `loadDeckLibraryBase` (`DeckStage`); none on `DeckStageCore` | A `DeckLibraryBaseLoader`: loads a design system's `texuli:<theme>` reference or `extends` base that `designSystems.resolve` leaves `undefined`; none (or `null`) refuses it (G127, from `0.10.1`) |
 | `onDesignSystem` | — | Called with a `PlayerDesignSystemEvent` when a deck's design system applies or is refused |
 | `resolveAvatar` | — | Host adapter for `avatar:` image ids |
 | `controller` | `null` | Read-only binding to the engine `DeckController` for imperative hosts |
@@ -201,7 +201,7 @@ scoped styles.
   source and references no default table either
   ([export.md](export.md#export-core-texulislidesexport-core-g105)).
   The core has no default `loadTheme` or `loadLibraryBase` either (G127,
-  unreleased, planned for `0.10.1`): pass the host's loaders, or
+  from `0.10.1`): pass the host's loaders, or
   `loadDeckLibraryTheme` and `loadDeckLibraryBase` (exported by both
   entries) to load the token theme library on first use; see
   [Themes](#themes) and [Design systems](#design-systems).
@@ -514,8 +514,7 @@ slide's theme overrides the deck's.
 - **Loading:** embedded themes apply directly. Catalog ids go through
   `loadTheme` (a `DeckThemeLoader`). On `DeckStage` and `DeckPrint` the
   default, `loadDeckLibraryTheme`, imports `@texuli/tokens/library-expand` on
-  first use. `DeckStageCore` has no default (G127, unreleased, planned for
-  `0.10.1`): without a `loadTheme` its catalog themes are left to host CSS
+  first use. `DeckStageCore` has no default (G127, from `0.10.1`): without a `loadTheme` its catalog themes are left to host CSS
   (`data-theme-status="host"`), and nothing in a core host's build
   references the theme loader's library import, not even as a lazy chunk. A
   core host that wants the library passes `loadTheme={loadDeckLibraryTheme}`
@@ -572,7 +571,7 @@ The stage applies it the way `@texuli/player` applies a blueprint's:
    `extends` base that `resolve` leaves `undefined` goes to
    `loadLibraryBase` (a `DeckLibraryBaseLoader`): `DeckStage` defaults it to
    `loadDeckLibraryBase` (the theme library, imported on first use);
-   `DeckStageCore` has no default (G127, unreleased, planned for `0.10.1`),
+   `DeckStageCore` has no default (G127, from `0.10.1`),
    so without one such a design system is refused
    (`design-system-unresolved`, or `invalid-value` for an `extends` base),
    and the build has no reference to the library. A resolved document must declare the exact `id` and `version`
