@@ -34,6 +34,11 @@
       "types": "./src/model/index.ts",
       "default": "./src/model/index.ts"
     },
+    "./controls": {
+      "types": "./src/view/controls/index.ts",
+      "svelte": "./src/view/controls/index.ts",
+      "default": "./src/view/controls/index.ts"
+    },
     "./host": {
       "types": "./src/host/index.ts",
       "default": "./src/host/index.ts"

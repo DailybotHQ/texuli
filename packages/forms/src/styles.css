@@ -155,6 +155,68 @@ fieldset.tx-forms__group {
   border: 0;
 }
 
+/* G117: a password with its reveal toggle; a one-time code sized to its digits. */
+.tx-forms__password {
+  display: flex;
+  align-items: center;
+  gap: var(--tx-space-2);
+}
+
+.tx-forms__password > :first-child {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+.tx-forms__otp {
+  max-inline-size: calc(var(--tx-forms-otp-length, 6) * 1.25em + 2.5rem);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.25em;
+}
+
+.tx-forms__datetime {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tx-space-3);
+}
+
+.tx-forms__custom-missing {
+  margin: 0;
+  color: var(--tx-muted-foreground, GrayText);
+}
+
+/*
+ * G119: the place of a control that is still loading, about its size, so
+ * nothing moves when it arrives (no animation: it is usually gone at once).
+ */
+.tx-forms__control-loading {
+  box-sizing: border-box;
+  min-block-size: var(--tx-size-control-md, 2.5rem);
+  border-radius: var(--tx-shape-radius-md);
+  background: var(--tx-muted, transparent);
+  opacity: 0.5;
+}
+
+.tx-forms__progress-loading {
+  min-block-size: 3.5rem;
+}
+
+.tx-forms__control-loading[data-type="radio"] {
+  min-block-size: calc(var(--tx-forms-loading-rows, 1) * 1.75rem);
+  background: transparent;
+}
+
+.tx-forms__control-loading[data-type="file"] {
+  min-block-size: 7.5rem;
+}
+
+.tx-forms__control-loading[data-type="color"] {
+  min-block-size: 15rem;
+}
+
+.tx-forms__control-loading[data-type="datetime"] {
+  max-inline-size: 26rem;
+}
+
 @media (forced-colors: active) {
   .tx-forms__summary,
   .tx-forms__done {

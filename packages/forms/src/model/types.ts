@@ -8,7 +8,12 @@ import type { ExpressionNode } from '@texuli/core/expression';
  * registered, and cross-field rules are expressions.
  */
 
-/** Every field type. `file` is host-handled: the form collects files, the host uploads them. */
+/**
+ * Every field type. `file` is host-handled: the form collects files, the
+ * host uploads them. `password` and `otp` are credential fields (refused in
+ * agent output unless the host allows them); `custom` is painted by the
+ * host for a kind it registered.
+ */
 export const FORM_FIELD_TYPES = Object.freeze([
   'text',
   'textarea',
@@ -25,6 +30,11 @@ export const FORM_FIELD_TYPES = Object.freeze([
   'slider',
   'file',
   'tags',
+  'password',
+  'otp',
+  'color',
+  'datetime',
+  'custom',
 ] as const);
 export type FormFieldType = (typeof FORM_FIELD_TYPES)[number];
 
@@ -94,6 +104,17 @@ export const FORM_AUTOCOMPLETE = Object.freeze([
 ] as const);
 export type FormAutocomplete = (typeof FORM_AUTOCOMPLETE)[number];
 
+/** The `autocomplete` tokens of a `password` field (and only of one); default `current-password`. */
+export const FORM_PASSWORD_AUTOCOMPLETE = Object.freeze([
+  'current-password',
+  'new-password',
+] as const);
+export type FormPasswordAutocomplete = (typeof FORM_PASSWORD_AUTOCOMPLETE)[number];
+
+/** The schemes a `url` field may allow (`protocols`); the default is `['https']`. */
+export const FORM_URL_PROTOCOLS = Object.freeze(['http', 'https'] as const);
+export type FormUrlProtocol = (typeof FORM_URL_PROTOCOLS)[number];
+
 /** Size caps for schemas and values. */
 export const FORM_LIMITS = Object.freeze({
   fields: 200,
@@ -115,6 +136,15 @@ export const FORM_LIMITS = Object.freeze({
   accept: 20,
   /** Largest `maxSize` for a file field, in bytes (1 GiB). */
   maxFileSize: 1_073_741_824,
+  /** Digits of a one-time code (`length` of an otp field), from 4 to 12; default 6. */
+  otpMin: 4,
+  otpMax: 12,
+  /** Entries in a custom field's `config`. */
+  config: 20,
+  /** Characters of a custom value written as JSON. */
+  customValue: 10_000,
+  /** Nesting of a custom value. */
+  customDepth: 8,
 });
 
 /**
@@ -141,6 +171,8 @@ export const FORM_RESERVED_NAMES: ReadonlySet<string> = new Set([
 export const FORM_ID = /^[a-z][a-z0-9-]{0,63}$/;
 /** A host validator name. */
 export const FORM_VALIDATOR_NAME = /^[a-z][A-Za-z0-9_-]{0,63}$/;
+/** A custom field kind (the name a host registers a painter under). */
+export const FORM_KIND = /^[a-z][A-Za-z0-9_-]{0,63}$/;
 
 /** A choice of a select, radio or multiselect field. */
 export interface FormOption {
@@ -178,7 +210,10 @@ export interface FormField {
   readonly when?: FormWhen;
   readonly minLength?: number;
   readonly maxLength?: number;
-  /** A number for number and slider; `YYYY-MM-DD` for date; `HH:MM` for time. */
+  /**
+   * A number for number and slider; `YYYY-MM-DD` for date; `HH:MM` for
+   * time; `YYYY-MM-DDTHH:MM` for datetime.
+   */
   readonly min?: number | string;
   readonly max?: number | string;
   readonly step?: number;
@@ -194,8 +229,22 @@ export interface FormField {
   readonly accept?: readonly string[];
   /** Largest accepted file, in bytes. */
   readonly maxSize?: number;
-  readonly autocomplete?: FormAutocomplete;
+  /** A text token, or `current-password` / `new-password` on a password field. */
+  readonly autocomplete?: FormAutocomplete | FormPasswordAutocomplete;
   readonly link?: FormLink;
+  /** Custom fields: the kind the host paints (and, in agent output, registered). */
+  readonly kind?: string;
+  /** Custom fields: scalar settings handed to the host painter (`{ entity: 'customer' }`). */
+  readonly config?: Readonly<Record<string, string | number | boolean>>;
+  /** Otp fields: the number of digits (4 to 12, default 6). */
+  readonly length?: number;
+  /** Url fields: the allowed schemes (default `['https']`). */
+  readonly protocols?: readonly FormUrlProtocol[];
+  /**
+   * Select fields: whether an empty choice clears the answer. Default: on
+   * while the field is not required.
+   */
+  readonly clearable?: boolean;
 }
 
 export interface FormSection {
@@ -247,13 +296,31 @@ export interface FormFile {
   readonly ref?: string;
 }
 
+/** A JSON value: what a custom field holds (bounded by `FORM_LIMITS`). */
+export type FormJsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | readonly FormJsonValue[]
+  | { readonly [key: string]: FormJsonValue };
+
 /**
- * A typed answer: strings for text, email, url, textarea, select and radio
- * (`''` or `null` when empty); numbers for number and slider; `YYYY-MM-DD`
- * for date and `HH:MM` for time; booleans for checkbox and switch; string
- * lists for multiselect and tags; file metadata for file.
+ * A typed answer: strings for text, email, url, password, otp, textarea,
+ * select and radio (`''` or `null` when empty); numbers for number and
+ * slider; `YYYY-MM-DD` for date, `HH:MM` for time and `YYYY-MM-DDTHH:MM`
+ * for datetime; `#rgb`, `#rrggbb` or `#rrggbbaa` for color; booleans for
+ * checkbox and switch; string lists for multiselect and tags; file metadata
+ * for file; any bounded JSON value for custom.
  */
-export type FormValue = string | number | boolean | null | readonly string[] | readonly FormFile[];
+export type FormValue =
+  | string
+  | number
+  | boolean
+  | null
+  | readonly string[]
+  | readonly FormFile[]
+  | FormJsonValue;
 
 export type FormValues = Readonly<Record<string, FormValue>>;
 
@@ -281,4 +348,6 @@ export type FormSchemaIssueCode =
   | 'expression'
   | 'forward-reference'
   | 'url'
-  | 'layout';
+  | 'layout'
+  | 'kind'
+  | 'credential';
