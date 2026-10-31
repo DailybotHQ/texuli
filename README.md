@@ -227,6 +227,10 @@ Playwright browsers once (`pnpm test:e2e:install`).
 | [Decisions](docs/DECISIONS.md) | [Standards](docs/STANDARDS.md) | [Accessibility](docs/ACCESSIBILITY.md) | [Security](docs/SECURITY.md) |
 | [Agent onboarding](docs/AI_AGENT_ONBOARDING.md) | [Development commands](docs/DEVELOPMENT_COMMANDS.md) | [Performance](docs/PERFORMANCE.md) | [Quality reports](docs/README.md#quality-reports-docsquality) |
 
+Design systems (one JSON document for a whole brand, enforced AA, every
+surface; in development for `0.10.0`, not on npm) have their own guide:
+[DESIGN_SYSTEMS](docs/DESIGN_SYSTEMS.md).
+
 The full index is [docs/README.md](docs/README.md). Every package also has
 its own `README.md` describing every subpath.
 

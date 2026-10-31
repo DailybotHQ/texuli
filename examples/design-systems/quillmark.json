@@ -1,0 +1,45 @@
+{
+  "format": "texuli/design-system",
+  "formatVersion": 1,
+  "id": "quillmark",
+  "version": "1.0.0",
+  "name": "Quillmark",
+  "description": "A fictional literary magazine: warm paper tones, a serif voice and calm motion.",
+  "owner": "Quillmark Editorial (fictional)",
+  "license": "MIT",
+  "tags": ["editorial", "warm", "example"],
+  "color": {
+    "brand": { "seed": "#b4532a", "secondary": "#6b7a3a", "accent": "#c99a2e", "neutral": "warm" }
+  },
+  "typography": {
+    "families": {
+      "sans": { "stack": ["Inter", "system-ui", "sans-serif"] },
+      "heading": { "stack": ["Fraunces", "Georgia", "serif"] },
+      "serif": { "stack": ["Source Serif 4", "Georgia", "serif"] },
+      "mono": { "stack": ["ui-monospace", "monospace"] }
+    },
+    "scale": { "base": 17, "ratio": 1.25 },
+    "roles": {
+      "display": { "family": "heading", "weight": 600, "line": 1.1 },
+      "heading": { "family": "heading", "weight": 600 },
+      "body": { "family": "serif", "line": 1.6 }
+    }
+  },
+  "shape": { "radius": 4, "borderWidth": 1 },
+  "space": { "base": 4, "density": 1.0625 },
+  "elevation": { "style": "flat" },
+  "surface": { "style": "solid" },
+  "motion": { "personality": "subtle" },
+  "layout": { "contentMax": 720, "wideMax": 1120 },
+  "components": {
+    "card": { "radius": "sm", "border-width": "thin", "defaults": { "variant": "flat" } },
+    "button": { "defaults": { "variant": "outline" } }
+  },
+  "assets": { "logo": { "light": "brand/quillmark.svg", "dark": "brand/quillmark-dark.svg" } },
+  "voice": {
+    "tone": ["thoughtful", "warm"],
+    "lexicon": { "post": "essay", "author": "contributor" },
+    "guidelines": ["Write in full sentences.", "Prefer plain words over jargon."]
+  },
+  "accessibility": { "contrast": "AA", "targetMin": 24, "focus": "outline", "focusWidth": 2 }
+}

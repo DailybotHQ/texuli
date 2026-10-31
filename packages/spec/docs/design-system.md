@@ -12,6 +12,9 @@
 > ([ds-check.md](../../tools/docs/ds-check.md)), and so are the `ds.*`
 > operations, `blueprint.theme` and `texuli ds` ([ds.md](../../tools/docs/ds.md)).
 
+The end-to-end guide (author, validate, apply, distribute, outputs) is
+[DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md).
+
 A design system describes a brand once, as one closed JSON document that
 a company or an agent writes, and every Texuli surface follows
 ([ADR-021](../../../docs/DECISIONS.md#adr-021-the-design-system-document)).

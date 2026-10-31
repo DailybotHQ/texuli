@@ -8,6 +8,9 @@
 > ([ds-check.md](../../tools/docs/ds-check.md)), and so are the `ds.*`
 > operations and `texuli ds` commands ([ds.md](../../tools/docs/ds.md)).
 
+The end-to-end guide (author, validate, apply, distribute, outputs) is
+[DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md).
+
 The compiler turns a design-system document
 ([`@texuli/spec/design-system`](../../spec/docs/design-system.md), ADR-021)
 into concrete `--tx-*` variables per mode, and enforces the guarantees of
