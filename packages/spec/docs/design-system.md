@@ -5,9 +5,10 @@
 > branch; they ship only with `@texuli/spec@0.10.0`. The compiler is
 > `@texuli/tokens/design-system/compile` on the same branch
 > ([design-system-compiler.md](../../tokens/docs/design-system-compiler.md));
-> the runtime (`apply`), the importers and emitters, the `ds.*` operations
-> and `texuli ds check` are **planned** (later PLAN_011 tasks, ADR-021 to
-> ADR-023).
+> the importers, emitters, report and diff are on the same branch
+> ([design-system-io.md](../../tokens/docs/design-system-io.md)); the
+> runtime (`apply`), the `ds.*` operations and `texuli ds check` are
+> **planned** (later PLAN_011 tasks, ADR-021 to ADR-023).
 
 A design system describes a brand once, as one closed JSON document that
 a company or an agent writes, and every Texuli surface follows
