@@ -143,7 +143,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-skill](../apps/website/docs/site-skill.md) | The Texuli skill page |
 | [site-slides-page](../apps/website/docs/site-slides-page.md) | texuli.com: slides area |
 | [site-subsite](../apps/website/docs/site-subsite.md) | texuli.com sub-sites: routes, doors and breadcrumbs |
-| [site-theme-studio](../apps/website/docs/site-theme-studio.md) | Theme studio (texuli.com) |
+| [site-theme-studio](../apps/website/docs/site-theme-studio.md) | Design system studio at /theme-studio/ (texuli.com) |
 | [site-theme-swatches](../apps/website/docs/site-theme-swatches.md) | Theme swatches (own palette) |
 | [site-theme-sweep](../apps/website/docs/site-theme-sweep.md) | Theme sweep tooling |
 | [site-theme-switcher](../apps/website/docs/site-theme-switcher.md) | texuli.com: theme and mode switcher |
