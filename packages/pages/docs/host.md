@@ -48,6 +48,7 @@ Returns a `DocumentPlayerHost` (the player's type):
 | `onNavigate`, `pageHref` | — | Page links, as in the reader |
 | `resolveEmbed`, `resolveMedia` | — | Embeds and media, as in the reader |
 | `reducedMotion` | `false` | Paint embeds without motion |
+| `renderBlock`, `blockHost` | — | The host's own blocks in the painted document, passed to the reader ([host blocks](editor.md#host-blocks); in development for `0.10.0`, not on npm). The player validates the document against the catalog first, so a wrapped block the catalog does not know is refused before the reader sees it; here the host paints what passes: embeds the library cannot paint (a `ref` with no payload) and library blocks it claims with `'host'` |
 
 The node's `outline` prop goes to the reader's `outline`.
 

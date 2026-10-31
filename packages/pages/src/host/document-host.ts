@@ -1,6 +1,7 @@
 import { validateDocument } from '@texuli/document/schema';
 import type { DocumentPlayerHost, DraftDocumentCheck } from '@texuli/player';
 import { mount, unmount } from 'svelte';
+import type { PagesBlockHost, PagesBlockSnippet } from '../shared/block-host.ts';
 import type { EmbedResolver } from '../shared/embeds.ts';
 import type { PagesLabels } from '../shared/labels.ts';
 import type { MediaResolver } from '../shared/media.ts';
@@ -35,6 +36,10 @@ export interface DocumentPlayerHostOptions {
   resolveMedia?: MediaResolver;
   /** Paint embeds without motion. */
   reducedMotion?: boolean;
+  /** The host's own blocks: a snippet for the reader's `renderBlock` (G111). */
+  renderBlock?: PagesBlockSnippet;
+  /** The host's block renderer for the reader's `blockHost` (`claim`, `component`, `present`). */
+  blockHost?: PagesBlockHost | null;
 }
 
 /**
@@ -77,6 +82,8 @@ export function createDocumentPlayerHost(
             ...(options.reducedMotion !== undefined
               ? { reducedMotion: options.reducedMotion }
               : {}),
+            ...(options.renderBlock ? { renderBlock: options.renderBlock } : {}),
+            ...(options.blockHost ? { blockHost: options.blockHost } : {}),
           },
         });
       });

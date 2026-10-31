@@ -220,6 +220,15 @@ with the same two props:
   picks it up and drags it, moves it with Alt+Up and Alt+Down and removes it
   with Delete or Backspace, with undo, as any non-text row. The host's own
   controls inside the row stay focusable.
+- **While the library decides.** A `'fallback'` node shows the loading
+  line while its `@texuli/blocks` family (or the embed's payload and the
+  player) loads, and only then, if the library refuses it, the host's
+  renderer. A host that knows a node is its own avoids the wait by
+  claiming it with `'host'`: the library's renderer then never loads.
+- **Through the player.** `createDocumentPlayerHost` (`@texuli/pages/host`)
+  takes `renderBlock` and `blockHost` too and hands them to the reader. The
+  player validates an agent document against the catalog first, so an
+  unknown wrapped block is refused there, before any host sees it.
 - **Types.** `PagesBlockHost`, `PagesBlockClaim`, `PagesBlockHostProps`,
   `PagesBlockHostRequest` (`{ node, target }`), `PagesBlockSnippet`
   (`Snippet<[PagesHostNode]>`), `PagesHostNode` and `PagesReadonly`, from
