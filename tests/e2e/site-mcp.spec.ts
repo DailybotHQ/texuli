@@ -90,8 +90,8 @@ test('the tables match the registry and the server card', async ({ page }) => {
   await expect(page.locator('[data-mcp-prompts] tbody tr')).toHaveCount(
     MCP_SERVER_DATA.prompts.length
   );
-  await expect(page.locator('[data-mcp-deprecated] tbody tr')).toHaveCount(
-    MCP_SERVER_DATA.deprecatedTools.length
+  await expect(page.locator('[data-mcp-removed] tbody tr')).toHaveCount(
+    MCP_SERVER_DATA.removedTools.length
   );
 
   // Setup for every host, both doors each.
