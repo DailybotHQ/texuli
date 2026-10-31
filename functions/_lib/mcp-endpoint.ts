@@ -212,6 +212,7 @@ const KNOWN_METHODS = new Set([
   'prompts/list',
   'prompts/get',
   'completion/complete',
+  'server/discover',
   'notifications/initialized',
   'notifications/cancelled',
 ]);

@@ -343,6 +343,24 @@ branch):
   widget below swaps above it. `edge` is left for the grid edge, or
   nothing left to pass. The `@texuli/sheets` README and view guide now say
   the cell editor loads lazily on the first Enter, so host tests await it.
+- **Protoyard gap G124** (PLAN_011 T-gap-124, contract amendment 18;
+  reported on `@texuli/mcp` 0.9.0, run next to Protoyard's own server,
+  whose primary revision is `2026-07-28`): `createMcpHandler` serves MCP
+  revision `2026-07-28` next to the initialize-based ones, in part, on
+  the stdio bin and the remote `/mcp` alike. A request that names it in
+  `params._meta["io.modelcontextprotocol/protocolVersion"]` is answered
+  with no `initialize` and nothing stored: `server/discover` (server info,
+  capabilities, every supported revision, and tool, prompt and resource
+  summaries), `ping`, and the tools, prompts, resources and completion
+  methods. A `_meta` revision the handler does not serve is `-32022` with
+  `error.data.supported`. A request without that `_meta` version behaves
+  as in 0.9.0. On `/mcp` the `MCP-Protocol-Version` header accepts
+  `2026-07-28`, but only together with a matching `_meta` version. The
+  server card adds `statelessProtocolVersions`. Everything else in
+  `2026-07-28` is not implemented; what is, and the conservative choices,
+  are listed in the `@texuli/tools` MCP guide, which also notes that
+  Texuli answers "not initialized" with `-32600` (Protoyard uses
+  `-32002`, the 2025-11-25 resource-not-found code) and keeps it.
 - **Fixed: collab embeds** (`@texuli/document/collab`, PLAN_011
   T-final-review): an issue inside an embed payload (a slide of an inline
   deck, the node of an inline component) made the projection's repair
