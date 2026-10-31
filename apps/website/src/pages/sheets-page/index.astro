@@ -104,8 +104,8 @@ const sheetHost = createSheetPlayerHost({ now: () => Date.now() });
         An owned formula engine: a linear-time parser, {SHEET_FUNCTION_NAMES.length} documented
         functions, a dependency graph that recalculates only what changed, cycles and overruns as
         error values, and no way to build a reference from text. Around it a framework-free workbook,
-        CSV that neutralizes formula injection, and an accessible sheet view. <code>@texuli/sheets</code>
-        is in development and on npm from <code>{SHEETS_RELEASE}</code>, a pre-1.0 release.
+        CSV that neutralizes formula injection, and an accessible sheet view. <code>@texuli/sheets</code> is
+        in development and on npm from <code>{SHEETS_RELEASE}</code>, a pre-1.0 release.
       </p>
     </Fragment>
 
@@ -168,8 +168,8 @@ const sheetHost = createSheetPlayerHost({ now: () => Date.now() });
         </table>
       </div>
       <p class="fx-note">
-        Results below were computed by the engine when this page was built, with the clock fixed at
-        <code>{clock}</code> for <code>TODAY</code> and <code>NOW</code>; the lab above uses your
+        Results below were computed by the engine when this page was built, with the clock fixed
+        at <code>{clock}</code> for <code>TODAY</code> and <code>NOW</code>; the lab above uses your
         clock.
       </p>
       {
@@ -247,12 +247,12 @@ const sheetHost = createSheetPlayerHost({ now: () => Date.now() });
               amounts recalculate; the open-order count and the shipping days are not evaluated.
             </li>
             <li>
-              Edit <code>Summary!B6</code> (the tax rate): exactly one formula,
-              <code>Summary!B7</code>, is evaluated.
+              Edit <code>Summary!B6</code> (the tax rate): exactly one
+              formula, <code>Summary!B7</code>, is evaluated.
             </li>
             <li>
-              Insert two rows above row 5: <code>=SUM(B2:B9)</code> becomes <code>=SUM(B2:B11)</code>
-              and moves to <code>B13</code>, and the summary’s cross-sheet ranges follow.
+              Insert two rows above row 5: <code>=SUM(B2:B9)</code> becomes <code>=SUM(B2:B11)</code> and
+              moves to <code>B13</code>, and the summary’s cross-sheet ranges follow.
             </li>
             <li>Undo with Control or Command and Z: the panel shows the reverse edit.</li>
           </ul>
@@ -334,8 +334,8 @@ const sheetHost = createSheetPlayerHost({ now: () => Date.now() });
         <div class="fx-panel">
           <h3>The blueprint the agent wrote</h3>
           <p class="fx-note">
-            Spec <code>0.8.0</code> adds the <code>spreadsheet</code> catalog id; it ships in the
-            <code>{SHEETS_RELEASE}</code> release of <code>@texuli/spec</code>.
+            Spec <code>0.8.0</code> adds the <code>spreadsheet</code> catalog id; it ships in
+            the <code>{SHEETS_RELEASE}</code> release of <code>@texuli/spec</code>.
           </p>
           <GuideCode code={AGENT_SHEET_JSON} label="The spreadsheet blueprint (JSON)" lang="text" />
           <h3>The hostile cell</h3>

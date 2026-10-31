@@ -94,6 +94,16 @@ describe('Canvas chart rendering', () => {
     } as unknown as CanvasRenderingContext2D;
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(context);
     const points = Array.from({ length: CANVAS_POINT_THRESHOLD }, (_, x) => ({ x, y: x % 17 }));
+    // The canvas paints inside the lazily loaded interaction chunk. Load those
+    // modules first (the chart's own dynamic imports then resolve from the
+    // module cache), so the wait below covers the render, not a cold module
+    // transform that can outlast waitFor's 1 s under parallel load.
+    await Promise.all([
+      import('../src/interaction/InteractivePlot.svelte'),
+      import('../src/interaction/Legend.svelte'),
+      import('../src/interaction/TableToggle.svelte'),
+      import('../src/interaction/ChartTable.svelte'),
+    ]);
 
     render(LineChart, {
       title: 'Dense measurements',
@@ -105,8 +115,10 @@ describe('Canvas chart rendering', () => {
     expect(
       screen.getByText('Measurements sampled throughout the full reporting period.')
     ).toBeTruthy();
-    await waitFor(() => expect(document.querySelector('canvas.marks')).toBeTruthy());
-    expect(context.stroke).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(document.querySelector('canvas.marks')).toBeTruthy();
+      expect(context.stroke).toHaveBeenCalled();
+    });
     expect(context.strokeStyle).toBe('teal');
   });
 });

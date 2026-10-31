@@ -617,17 +617,27 @@ pages, slides.
   had (the untrusted sink scan refuses every `style` key), so a list with
   a style cannot come from an agent yet; a rename is planned.
 - **`/openapi.json` is about 236 KB**, because its examples are real built
-  files; trimming them to small samples is planned.
+  files. Fixed on `release/0.10.0` (not on npm or the site yet): every
+  list and keyed record in an example keeps its first two entries, so the
+  file is 172,386 B raw (16,334 B gzip), from 244,366 B (22,442 B gzip).
 - **Flaky tests:** the lazy canvas chart renderer, the player's
   `schema-form` lookup, the `site-slides` components deck, a
   stream-session chunking timeout and the `editor-markdown` linear-time
   wall-clock bound each failed once under parallel local load, and the
-  WebKit dialog motion scenario once in CI; all passed on rerun. Hardening
-  their waits (and an operation-count test for the wall-clock bound) is
-  planned.
+  WebKit dialog motion scenario once in CI; all passed on rerun. Hardened
+  on `release/0.10.0`, except the WebKit motion scenario: the lazy chunks
+  load before the waits start, the chunking test's checks are no longer
+  quadratic (3.6 s to 0.35 s), the deck step awaits each stage, and the
+  linear-time tests (`editor-markdown` and `core/markup`) fit the growth
+  exponent of the thread's own CPU time. Three more seen in the same
+  review (the forms host's lazy mount, and two cold imports of the texuli
+  root and the examples registry) got the same treatment.
 - **`/component-pages/card/`** reports enforced CSP `style-src-elem`
-  inline violations (present before PLAN_011); finding and fixing or
-  hashing the inline style is planned.
+  inline violations (present before PLAN_011). The cause was every lazily
+  loaded demo frame and stage (`css="injected"`) on every component page.
+  Fixed on `release/0.10.0`: the build hashes the styles each page's chunks
+  can inject, and `tests/e2e/site-csp.spec.ts` checks the pages in the
+  browser.
 - **Smaller items.** `Table` keeps its built-in `plain` variant outside
   the design defaults (planned); the Astro integration does not write the
   input hook yet; the remote MCP and the API rate limits are per isolate

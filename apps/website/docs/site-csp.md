@@ -21,6 +21,20 @@ configured agent service origin on the agent chat page only), and require
 Trusted Types for script sinks. Both the directory URL (`/docs/`) and the
 direct file URL (`/docs/index.html`) are covered.
 
+**Styles injected at runtime.** The live demo frames and stages are Svelte
+components compiled with `<svelte:options css="injected" />` (see
+[site-live-components.md](site-live-components.md)): when one mounts it
+appends a `<style>` holding its compiled CSS, which is not in the finished
+HTML. The integration reads that CSS from the built chunks (the compiler
+emits `{ hash: "svelte-…", code: "…" }`, and `code` is the exact text the
+browser hashes), follows each page's chunk graph from the scripts and
+islands its HTML names (static and dynamic imports), and adds to that
+page's `style-src` the hashes of exactly the injected styles it can load
+(`pageInjectedStyles` in `src/components/security/csp.ts`). Until PLAN_011's
+Final Review these styles were blocked as `style-src-elem` violations on
+every page with a lazily loaded demo (reported on `/component-pages/card/`).
+A build logs how many pages carry such hashes.
+
 ## The proof
 
 After `pnpm --filter @texuli/website build`, run:
@@ -40,6 +54,11 @@ pages, 2 492 script, 10 487 style and 862 attribute hashes covered.
 
 The browser side (hydration under the real headers, violation observers,
 Trusted Types enforcement) is proven separately by `tests/e2e/csp.spec.ts`.
+`tests/e2e/site-csp.spec.ts` opens the built site's live demo pages (the
+card, button, dialog and line chart component pages, the landing and a
+guide) under the exact `_headers` policies, scrolls each end to end so its
+`client:visible` islands and lazy stages mount, and fails on any violation,
+enforced or reported.
 `tests/e2e/analytics.spec.ts` checks every route's `trusted-types`
 against its HTML (the analytics name appears only where the loader is
 mounted). On an analytics fixture build it also loads the tracker under the

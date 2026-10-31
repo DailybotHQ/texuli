@@ -1,6 +1,14 @@
 <script lang="ts">
 import type { OverlayMode } from '@texuli/core/overlay';
-import { Toast } from '@texuli/primitives/toast';
+import {
+  Action as ToastAction,
+  Close as ToastClose,
+  Description as ToastDescription,
+  Provider as ToastProvider,
+  Root as ToastRoot,
+  Title as ToastTitle,
+  Viewport as ToastViewport,
+} from '@texuli/primitives/toast';
 import { untrack } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { useMessages } from '../../i18n/use-messages.ts';
@@ -274,7 +282,7 @@ function runAction(item: ToastItem): void {
 }
 </script>
 
-<Toast.Provider manager={store.manager} {label}>
+<ToastProvider manager={store.manager} {label}>
   <div bind:this={ref}
     {...rest}
     class={classes}
@@ -286,7 +294,7 @@ function runAction(item: ToastItem): void {
     onfocusout={chainHandlers(onfocusout, focusOut)}
   >
     <!-- No top-layer region while empty: it would sit at the viewport corner (G77). -->
-    <Toast.Viewport
+    <ToastViewport
       class="tx-toaster__viewport"
       data-position={position}
       {mode}
@@ -297,7 +305,7 @@ function runAction(item: ToastItem): void {
       {#if rendered.length > 0}
         <ol class="tx-toaster__list" data-tx-toast-list bind:this={listElement}>
           {#each rendered as { item, leaving } (item.id)}
-            <Toast.Root
+            <ToastRoot
               toast={{
                 id: item.id,
                 title: item.title,
@@ -318,15 +326,15 @@ function runAction(item: ToastItem): void {
             >
               <span class="tx-toast__icon" aria-hidden="true">{KIND_MARK[item.kind]}</span>
               <div class="tx-toast__body">
-                <Toast.Title class="tx-toast__title" />
+                <ToastTitle class="tx-toast__title" />
                 {#if item.description}
-                  <Toast.Description class="tx-toast__description" />
+                  <ToastDescription class="tx-toast__description" />
                 {/if}
                 {#if item.error}
                   <p class="tx-toast__error" role="alert">{item.error}</p>
                 {/if}
                 {#if item.action}
-                  <Toast.Action
+                  <ToastAction
                     class="tx-toast__action"
                     onclick={(event) => {
                       // Keep the toast mounted while the action runs; the
@@ -336,19 +344,19 @@ function runAction(item: ToastItem): void {
                     }}
                   >
                     {item.action.label}
-                  </Toast.Action>
+                  </ToastAction>
                 {/if}
               </div>
-              <Toast.Close
+              <ToastClose
                 class="tx-toast__close"
                 aria-label={`${dismissLabel}: ${item.title}`}
               >
                 <span aria-hidden="true">×</span>
-              </Toast.Close>
-            </Toast.Root>
+              </ToastClose>
+            </ToastRoot>
           {/each}
         </ol>
       {/if}
-    </Toast.Viewport>
+    </ToastViewport>
   </div>
-</Toast.Provider>
+</ToastProvider>

@@ -125,6 +125,20 @@ function stream(parts: readonly string[], end = true) {
   return { session: s, snapshots, last: s.snapshot() };
 }
 
+/**
+ * Asserts a painted node's shell (everything but `children`) equals the
+ * agent's. Equal JSON is equal data, so the JSON comparison settles the common
+ * case cheaply; any difference (key order included) goes through `toEqual`,
+ * which decides and reports it. A golden streamed three characters at a time
+ * makes thousands of snapshots, and a deep `toEqual` per path per snapshot
+ * made the test CPU-bound (seconds) under parallel load.
+ */
+function expectSameShell(painted: Node, agent: Node): void {
+  const { children: _a, ...got } = painted;
+  const { children: _b, ...want } = agent;
+  if (JSON.stringify(got) !== JSON.stringify(want)) expect(got).toEqual(want);
+}
+
 /** A diagnostic path, as a node path (`0.children.1`), or `null` when it names no node. */
 function nodePathOf(path: string): string | null {
   if (path === '' || path === '$') return null;
@@ -167,11 +181,12 @@ describe('streaming session: goldens', () => {
             playerResolveOptions(split, (id) => catalog.get(id)?.bindable, undefined, sources)
           );
           expect(resolved.issues).toEqual([]);
-          // Admitted shells are exactly what the agent wrote.
+          // Admitted shells are exactly what the agent wrote. (The snapshot's
+          // node map is built once, not once per path: per path it made this
+          // check quadratic in the node count and the test CPU-bound.)
+          const snapshotNodes = nodes(snapshot.blueprint);
           for (const path of paintedPaths(snapshot)) {
-            const { children: _a, ...shell } = all.get(path) as Node;
-            const { children: _b, ...painted } = nodes(snapshot.blueprint).get(path) as Node;
-            expect(painted).toEqual(shell);
+            expectSameShell(snapshotNodes.get(path) as Node, all.get(path) as Node);
           }
         }
       }
@@ -342,10 +357,9 @@ describe('streaming session: interruption', () => {
       const snapshot = s.snapshot();
       expect(snapshot.phase).toBe('interrupted');
       expect(snapshot.error?.code).toBe('connection');
+      const snapshotNodes = nodes(snapshot.blueprint);
       for (const path of paintedPaths(snapshot)) {
-        const { children: _a, ...shell } = all.get(path) as Node;
-        const { children: _b, ...painted } = nodes(snapshot.blueprint).get(path) as Node;
-        expect(painted).toEqual(shell);
+        expectSameShell(snapshotNodes.get(path) as Node, all.get(path) as Node);
       }
       for (const node of snapshot.pending.values()) expect(node.state).not.toBe('pending');
       // Nothing more is read after a stop.
