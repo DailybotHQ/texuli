@@ -912,16 +912,16 @@
       "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 24,156 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
     },
     "@texuli/deck/markdown": {
-      "gzip": 60181,
-      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 57,866 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
+      "gzip": 62528,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 57,866 B gzip on the final PLAN_008 code, cap = measured + 4% headroom. PLAN_011 T-ds-blueprint coverage: 60181 -> 62528 (measured 60,121 B + 4%) for design systems on decks and the stage."
     },
     "@texuli/deck/math": {
       "gzip": 6262,
       "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 6,021 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
     },
     "@texuli/deck/authoring": {
-      "gzip": 31971,
-      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 30,740 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
+      "gzip": 33216,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 30,740 B gzip on the final PLAN_008 code, cap = measured + 4% headroom. PLAN_011 T-ds-blueprint coverage: 31971 -> 33216 (measured 31,924 B + 4%) for design systems on decks and the stage."
     },
     "@texuli/deck/templates": {
       "gzip": 28456,
@@ -1022,9 +1022,9 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 22,361 B gzip, cap = measured + 4% headroom."
     },
     "@texuli/slides/stage": {
-      "gzip": 108480,
+      "gzip": 112832,
       "cssGzip": 2304,
-      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 105,851 B gzip on the final PLAN_008 code, cap = measured + 4% headroom. PLAN_009 T-slides-lazy (G24, G25): the default renderer tables load on first use; measured 104,263 B gzip (104.37 KiB, about 106,875 B, before), tightened to measured + 4% headroom. PLAN_010 T-release-060 (2026-10-29): CSS 11264 -> 2304 B, tightened to measured + 4% (measured 2,194 B)."
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 105,851 B gzip on the final PLAN_008 code, cap = measured + 4% headroom. PLAN_009 T-slides-lazy (G24, G25): the default renderer tables load on first use; measured 104,263 B gzip (104.37 KiB, about 106,875 B, before), tightened to measured + 4% headroom. PLAN_010 T-release-060 (2026-10-29): CSS 11264 -> 2304 B, tightened to measured + 4% (measured 2,194 B). PLAN_011 T-ds-blueprint coverage: 108480 -> 112832 (measured 108,460 B + 4%) for design systems on decks and the stage."
     },
     "@texuli/slides/stage-core": {
       "gzip": 100864,
