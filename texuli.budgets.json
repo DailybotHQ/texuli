@@ -313,8 +313,8 @@
       "note": "PLAN_010 T-dashboard (0.8.0): the Dashboard and DashboardWidget views with the layout engine, @texuli/drag/gesture and texuli/motion list motion inlined by the size tool; measured 11,102 B gzip (under the 12,288 B @texuli/data/* default), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/data/dashboard/engine": {
-      "gzip": 5312,
-      "note": "PLAN_010 T-dashboard (0.8.0): framework-free dashboard layout math (packing, collision, moves, resizes, keyboard steps, breakpoints, persistence) with hostile-input bounds; measured 5,100 B gzip, cap = measured + 4% rounded up to 64 B."
+      "gzip": 5760,
+      "note": "PLAN_010 T-dashboard (0.8.0): framework-free dashboard layout math (packing, collision, moves, resizes, keyboard steps, breakpoints, persistence) with hostile-input bounds; measured 5,100 B gzip, cap = measured + 4% rounded up to 64 B. PLAN_011 T-gap-122 (G122): keyboard steps grow past the widgets in the way (and swap when a narrower widget holds the row) instead of refusing with edge; measured 5,293 B before and 5,487 B after, cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/data/board/engine": {
       "gzip": 3904,
