@@ -2555,7 +2555,12 @@ describe('payload', () => {
   });
 
   describe('starter drafts (PLAN_005 task 6)', () => {
-    it('offers an empty page and three registry blueprints; every starter passes the JSON commit check and the history, and is a fresh copy', async () => {
+    // loadStarter imports the whole @texuli/examples registry: on a cold
+    // worker that transform is CPU-bound and outlasted the 5 s default under
+    // parallel load.
+    it('offers an empty page and three registry blueprints; every starter passes the JSON commit check and the history, and is a fresh copy', {
+      timeout: 30_000,
+    }, async () => {
       expect(STARTER_IDS).toEqual(['empty', 'report', 'dashboard', 'deck']);
       expect(STARTERS.map((starter) => starter.label)).toEqual([
         'Empty page',
