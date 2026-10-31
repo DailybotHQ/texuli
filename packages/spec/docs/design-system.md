@@ -8,8 +8,9 @@
 > the importers, emitters, report and diff are on the same branch
 > ([design-system-io.md](../../tokens/docs/design-system-io.md)), and so is
 > the runtime ([design-system-runtime.md](../../tokens/docs/design-system-runtime.md)).
-> The `ds.*` operations and `texuli ds check` are **planned** (later
-> PLAN_011 tasks, ADR-021 to ADR-023).
+> `texuli ds check` is on the same branch
+> ([ds-check.md](../../tools/docs/ds-check.md)); the `ds.*` operations are
+> **planned** (a later PLAN_011 task, ADR-021 to ADR-023).
 
 A design system describes a brand once, as one closed JSON document that
 a company or an agent writes, and every Texuli surface follows

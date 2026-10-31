@@ -16,7 +16,13 @@
       "@texuli/media/timeline": ["../../../packages/media/src/timeline/index.ts"],
       "@texuli/canvas/editor": ["../../../packages/canvas/src/editor/index.ts"],
       "@texuli/canvas/export": ["../../../packages/canvas/src/export/index.ts"],
-      "@texuli/canvas/model": ["../../../packages/canvas/src/model/index.ts"]
+      "@texuli/canvas/model": ["../../../packages/canvas/src/model/index.ts"],
+      "@texuli/canvas/host": ["../../../packages/canvas/src/host/index.ts"],
+      "@texuli/catalog/manifests/all": ["../../../packages/catalog/src/manifests/all.ts"],
+      "@texuli/forms/host": ["../../../packages/forms/src/host/index.ts"],
+      "@texuli/pages/host": ["../../../packages/pages/src/host/index.ts"],
+      "@texuli/sheets/host": ["../../../packages/sheets/src/host/index.ts"],
+      "@texuli/tools/ds-check/host": ["../../../packages/tools/src/ds-check/host.ts"]
     }
   }
 }

@@ -16,6 +16,7 @@ import { readFile, stat } from 'node:fs/promises';
 import { parseAddArgs, runAddCli } from '../cli-add/cli.ts';
 import { parseInitArgs, runInitCli } from '../cli-init/cli.ts';
 import { parseUpdateArgs, runUpdateCli } from '../cli-update/cli.ts';
+import { parseDsCliArgs, runDsCli } from '../ds-check/cli.ts';
 import { writeLocalFile } from '../internal/local-write.ts';
 import { runMcpCli } from '../mcp/cli.ts';
 import { LOCAL_RUNTIMES, type OperationRegistry, texuliOps } from '../ops/index.ts';
@@ -49,6 +50,11 @@ export const LEGACY_COMMANDS: readonly LegacyCommand[] = Object.freeze([
     usage: 'document <command>',
     summary: 'The document commands (validate, patch, from-markdown, to-pdf … with --out)',
   },
+  {
+    usage: 'ds check <file>',
+    summary:
+      'Check a design-system document: codes, guarantees, contrast report (--json, --render, --mode, --variant)',
+  },
   { usage: 'mcp', summary: 'Run the local MCP server over stdio (every operation)' },
   { usage: 'init', summary: 'Wire Texuli tokens and CSS into a Vite, Astro or SvelteKit project' },
   { usage: 'theme list', summary: 'List the theme library' },
@@ -60,7 +66,17 @@ export const LEGACY_COMMANDS: readonly LegacyCommand[] = Object.freeze([
 ]);
 
 /** The first word of each kept command. */
-const LEGACY_HEADS = new Set(['deck', 'document', 'mcp', 'init', 'theme', 'add', 'diff', 'update']);
+const LEGACY_HEADS = new Set([
+  'deck',
+  'document',
+  'ds',
+  'mcp',
+  'init',
+  'theme',
+  'add',
+  'diff',
+  'update',
+]);
 
 /**
  * Every operation the CLI runs as `{ group, verb }`, in registry order: the
@@ -111,7 +127,7 @@ export type RouterParse =
     }
   | {
       kind: 'legacy';
-      command: 'deck' | 'document' | 'mcp' | 'init' | 'theme' | 'add' | 'update';
+      command: 'deck' | 'document' | 'ds' | 'mcp' | 'init' | 'theme' | 'add' | 'update';
       argv: string[];
     }
   | { kind: 'error'; message: string };
@@ -197,6 +213,9 @@ export function parseRouterArgs(
         case 'document':
           parseDocumentCliArgs(tail);
           return { kind: 'legacy', command: 'document', argv: tail };
+        case 'ds':
+          parseDsCliArgs(tail);
+          return { kind: 'legacy', command: 'ds', argv: tail };
         case 'mcp': {
           const [flag, ...extra] = tail;
           if (
@@ -470,6 +489,10 @@ async function runLegacy(parsed: Extract<RouterParse, { kind: 'legacy' }>): Prom
       return (await runDeckCli(parsed.argv)) as RouterResult;
     case 'document':
       return (await runDocumentCli(parsed.argv)) as RouterResult;
+    case 'ds': {
+      const result = await runDsCli(parsed.argv);
+      return result.ok ? { ok: true } : { ok: false, error: result.error };
+    }
     case 'mcp':
       return (await runMcpCli(parsed.argv)) as RouterResult;
     default: {

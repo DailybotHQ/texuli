@@ -8,6 +8,7 @@ import {
   type PartWholeDatum,
   type PartWholeTableLabels,
   partWholeColor,
+  partWholeTableLabels,
 } from './model.ts';
 import PartWholeDataTable from './PartWholeDataTable.svelte';
 
@@ -15,7 +16,8 @@ type Props = {
   title: string;
   description: string;
   data: readonly PartWholeDatum[];
-  labels: PartWholeTableLabels;
+  /** Table and legend labels; a missing or blank one keeps its default. */
+  labels: Partial<PartWholeTableLabels>;
   size?: number;
   innerRatio?: number;
   padAngle?: number;
@@ -30,6 +32,7 @@ let {
   innerRatio = 0,
   padAngle = 0.01,
 }: Props = $props();
+const tableLabels = $derived(partWholeTableLabels(labels));
 
 $effect.pre(() => {
   assertPartWholeChrome(title, description);
@@ -111,8 +114,8 @@ const showCenterTotal = $derived(
       {/if}
     </g>
   </svg>
-  <Legend items={legendItems} label={labels.category} />
-  <PartWholeDataTable {title} {labels} {rows} />
+  <Legend items={legendItems} label={tableLabels.category} />
+  <PartWholeDataTable {title} labels={tableLabels} {rows} />
 </figure>
 
 <style>

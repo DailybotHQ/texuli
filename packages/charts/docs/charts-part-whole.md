@@ -71,7 +71,11 @@ non-negative. Model helpers: `partWholeColor`, `formatPartWholeValue`,
 `labels` is required on every part-whole chart: pass the three data-table
 strings (`table`, `category`, `value`). The legend's accessible group name is
 `labels.category`. Chart blocks in `@texuli/blocks` fill English defaults for
-you.
+you. A label that is missing or blank (an agent may pass `labels: {}`, as the
+catalog example does) keeps its English default from
+`PART_WHOLE_TABLE_LABELS` (`View data table`, `Category`, `Value`), so the
+data-table disclosure and the legend always have a name
+(`partWholeTableLabels(labels)` resolves them).
 
 ## Scales and color
 

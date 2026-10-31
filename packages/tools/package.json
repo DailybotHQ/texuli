@@ -73,6 +73,14 @@
       "types": "./src/ops/index.ts",
       "default": "./src/ops/index.ts"
     },
+    "./ds-check": {
+      "types": "./src/ds-check/index.ts",
+      "default": "./src/ds-check/index.ts"
+    },
+    "./ds-check/host": {
+      "types": "./src/ds-check/host.ts",
+      "default": "./src/ds-check/host.ts"
+    },
     "./mcp": {
       "types": "./src/mcp/index.ts",
       "default": "./src/mcp/index.ts"

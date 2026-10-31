@@ -7,6 +7,7 @@ import {
   type PartWholeTableLabels,
   type PartWholeTree,
   partWholeColor,
+  partWholeTableLabels,
   treeTableRows,
 } from './model.ts';
 import PartWholeDataTable from './PartWholeDataTable.svelte';
@@ -15,13 +16,15 @@ type Props = {
   title: string;
   description: string;
   root: PartWholeTree;
-  labels: PartWholeTableLabels;
+  /** Table and legend labels; a missing or blank one keeps its default. */
+  labels: Partial<PartWholeTableLabels>;
   width?: number;
   height?: number;
   padding?: number;
 };
 
 let { title, description, root, labels, width = 640, height = 360, padding = 2 }: Props = $props();
+const tableLabels = $derived(partWholeTableLabels(labels));
 
 $effect.pre(() => {
   assertPartWholeChrome(title, description);
@@ -73,8 +76,8 @@ const legendItems = $derived(
       </rect>
     {/each}
   </svg>
-  <Legend items={legendItems} label={labels.category} />
-  <PartWholeDataTable {title} {labels} {rows} />
+  <Legend items={legendItems} label={tableLabels.category} />
+  <PartWholeDataTable {title} labels={tableLabels} {rows} />
 </figure>
 
 <style>

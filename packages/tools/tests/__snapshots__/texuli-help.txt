@@ -20,6 +20,7 @@ Operations (the @texuli/tools registry; the same names are MCP tools):
 Commands:
   deck <command>      The deck commands (capabilities, schema, layouts, lint, inspect, from-markdown, to-markdown)
   document <command>  The document commands (validate, patch, from-markdown, to-pdf … with --out)
+  ds check <file>     Check a design-system document: codes, guarantees, contrast report (--json, --render, --mode, --variant)
   mcp                 Run the local MCP server over stdio (every operation)
   init                Wire Texuli tokens and CSS into a Vite, Astro or SvelteKit project
   theme list          List the theme library
