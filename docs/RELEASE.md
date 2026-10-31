@@ -73,7 +73,7 @@ On the branch so far:
   an exact `id@x.y.z` or `texuli:<theme>`, and `inline`, a whole
   document), with the `brand-report` and `brand-deck` goldens and three
   invalid fixtures. The `0.9.0 → 0.10.0` migration only stamps `spec`;
-  the digest `07fc15722c3e2f5d9961d62d02ea7a1866d86b8d5099ff3339556f79ef50e59f` is pinned in `packages/spec/versions.json`.
+  the digest `5858625bffea7972f78a2b0f127f75359848aeb5c4792764b17ca45b2d7de4ca` is pinned in `packages/spec/versions.json`.
   `validateDraft` migrates a `0.9.0` envelope and stamps `spec: "0.10.0"`;
   hosts that compare the `spec` string need to accept it.
 - **`@texuli/spec/design-system`** (new subpath): `validateDesignSystem`
@@ -220,6 +220,68 @@ branch):
     and a rejection is announced (`labels.saveFailed`). Existing
     two-argument handlers keep working; both buttons keep the
     `tx-inbox__button` class.
+- **Protoyard forms gaps G113–G121** (PLAN_011 T-gaps-113-121, contract
+  amendment 15; reported on `@texuli/forms` 0.9.0, which Protoyard uses
+  for generated entity forms, page and doc forms and two SaaS forms).
+  `$defs.formField` grows inside spec `0.10.0` (additive: new types and
+  optional members; the `form-field-type` invalid fixture now uses an
+  `html` type, since `password` is a closed type):
+  - **G113 host-painted fields**: a `custom` field type (`kind`, scalar
+    `config`) painted by the host through SchemaForm's `field` snippet or
+    `customFields` (by field name or kind: a snippet or `{ render?,
+    component?, validate? }`). It sits in the form landmark in schema
+    order with the form's label, description and error, gets `props`
+    (`id`, `aria-labelledby`, `aria-describedby`, `aria-invalid`,
+    `aria-required`, `disabled`), is validated by a host validator
+    (`customValidators`, sync or async), joins the error summary and
+    focus-on-error, and is submitted with the rest (any bounded JSON
+    value). For agent output a custom field must name a kind the host
+    registered: `validateFormSchema({ kinds })`, `checkFormDraft(…,
+    kinds)`, `validateDraft({ formKinds })`, `FormPlayerHost.customKinds`
+    and `createFormPlayerHost({ customFields })`; anything else is refused
+    with the code `kind`.
+  - **G114**: `hideTitle` hides the title visually; it still names the
+    form (`aria-labelledby`).
+  - **G115**: `actions` (a snippet given `SchemaFormActions`: `submitting`,
+    `last`, `step`, `steps`, `back`, `next`, `submit`…) or
+    `actions={false}`; an outside `<button form="<id>">`, the component's
+    `requestSubmit()` and `controller.submit()` all validate and open the
+    error summary.
+  - **G116**: form-level `disabled` and `readOnly` on SchemaForm and
+    `createFormController` (`setDisabled`, `setReadOnly`, state
+    `disabled`, `readOnly`): every control and action is disabled (text is
+    `readonly` when read-only), and a host submit still sends the values.
+  - **G117**: `password` (reveal toggle with `aria-pressed`;
+    `current-password` or `new-password`), `otp` (one input,
+    `autocomplete="one-time-code"`, `inputmode="numeric"`, `length` 4–12),
+    `color` (texuli ColorPicker, hex) and `datetime` (`YYYY-MM-DDTHH:MM`,
+    DatePicker + TimeField). Passwords and codes never enter drafts and are
+    masked by the new `formatFormValue` and `formValuesToMarkdown`; agent
+    output may use them only where the host passes `credentials: true`
+    (code `credential`).
+  - **G118**: an optional select gets a "None" choice that clears it
+    (`labels.selectNone`); `clearable` overrides the default.
+  - **G119**: the date, time, datetime, slider, tags, file, color and radio
+    controls and the multi-step Stepper load per type on first use, with
+    a same-size placeholder. A text, select and checkbox form's host went
+    from 90,507 B to 60,048 B of initial JavaScript and from 9,385 B to
+    5,266 B of CSS, and a text-only form's from 90,466 B to 60,011 B and
+    9,385 B to 5,266 B (gzip; `packages/forms/tests/bundle-graph.test.ts`,
+    which asserts that neither initial graph holds those controls).
+    For server rendering, pass `SCHEMA_FORM_CONTROLS` from the new
+    `@texuli/forms/controls` as `controls`.
+  - **G120**: `onStep({ step, position, values, allValues, signal })` on
+    SchemaForm and the controller can block Next with field errors or a
+    message (`stepError`); Next shows "Checking…" while it runs.
+  - **G121**: url fields take `protocols` (`['https']` by default,
+    `['http', 'https']` to accept http); an http answer passes the
+    untrusted URL policy as its https twin, and `javascript:`, `data:` and
+    every other scheme stay refused.
+  - Migration notes: an optional select now shows the "None" choice (set
+    `clearable: false` to keep the old list); controls of the lazy types
+    paint after their chunk loads (pass `controls` to paint at once, and
+    wait for them in tests); `SchemaForm` focuses the summary or the
+    confirmation for any finished submit, including `controller.submit()`.
 
 ### 0.9.0
 
@@ -1614,7 +1676,7 @@ the package-to-package contract outside this repository.
 | `@texuli/deck` | `0.9.0` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/document`, `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
 | `@texuli/drag`, `@texuli/workflows` | `0.9.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
 | `@texuli/mcp` | `0.9.0` (first published as `0.9.0`) | `packages/mcp/package.json`, with `@texuli/tools` pinned to exactly its own version; published right after `@texuli/tools`. In development (ADR-019), pre-1.0. |
-| Blueprint spec on `release/0.10.0` (in development, not on npm) | `0.10.0`, digest `07fc15722c3e2f5d9961d62d02ea7a1866d86b8d5099ff3339556f79ef50e59f` | `packages/spec/versions.json`; the workspace's generated sources carry the `0.10.0` stamp. Ships only when `@texuli/spec@0.10.0` publishes; a stamp-only migration from `0.9.0`. |
+| Blueprint spec on `release/0.10.0` (in development, not on npm) | `0.10.0`, digest `5858625bffea7972f78a2b0f127f75359848aeb5c4792764b17ca45b2d7de4ca` | `packages/spec/versions.json`; the workspace's generated sources carry the `0.10.0` stamp. Ships only when `@texuli/spec@0.10.0` publishes; a stamp-only migration from `0.9.0`. |
 | Blueprint spec | `0.9.0`, digest `497df4d3b0c67d53483163ebd9bd73733b52caf5f8e2966478f1cf860e6f9d9d` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.9.0`; a stamp-only migration from `0.8.0`. |
 | Blueprint spec in `@texuli/spec@0.8.0` | `0.8.0`, digest `f6b6388280d247eb9c3106a925111f35b90d1ec3b59c23652542f06a9f103daf` | The 0.8 line's generated sources carry the `0.8.0` stamp. |
 | Blueprint spec in `@texuli/spec@0.7.0` | `0.7.0`, digest `43e44fa9a198d337d686b4e2d86882a06a676ae1e1c1f02d023b3a525795a8b2` | The previous release's generated sources carry the `0.7.0` stamp. |
