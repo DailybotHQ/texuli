@@ -85,6 +85,11 @@ documentToMarkdown(doc, { extensions }); // 'Ask @{person-1|Ada} about #{record-
   extension mark loaded or written without its registry keeps only its
   label (`mark-dropped`). Plain text that spells a token is written with its
   `{` escaped (`@\{`), so it reads back as text.
+- **Escaped sigils stay text.** As in CommonMark, a backslash before any
+  ASCII punctuation character is an escape, so `\@` reads as a literal `@`
+  and `\@{p|P}` never opens a mention (no stray `\` is left). Before 0.10.0
+  only part of the punctuation set was escapable, and `\@` kept its
+  backslash.
 - **Links.** `extensionHref(extensions, mark)` returns the host `href(id)`
   checked by `safeHref` (`untrusted` by default), or `undefined`.
 - **Linear time.** A token is matched in constant time after two linear

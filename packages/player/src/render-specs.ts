@@ -2541,6 +2541,10 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
         kind: 'number',
       },
       {
+        name: 'issues',
+        kind: 'array',
+      },
+      {
         name: 'disabled',
         kind: 'boolean',
       },

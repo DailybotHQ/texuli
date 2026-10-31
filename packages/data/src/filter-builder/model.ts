@@ -15,6 +15,7 @@ import {
   type FilterField,
   type FilterOperatorDef,
   offeredOperators,
+  optionValue,
 } from './catalog.ts';
 
 /**
@@ -73,8 +74,9 @@ export function defaultValue(
   if (operator === 'in') return [];
   if (operator === 'between') return [null, null];
   if (field.type === 'boolean') return true;
-  if (field.type === 'enum' && field.options?.[0] !== undefined && operator !== 'contains') {
-    return field.options[0];
+  const first = field.options?.[0];
+  if (field.type === 'enum' && first !== undefined && operator !== 'contains') {
+    return optionValue(first);
   }
   return undefined;
 }

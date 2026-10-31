@@ -158,7 +158,11 @@ Focus a card's handle (announced as `Drag <card>`), then:
 | Escape | cancel — the card returns to its origin |
 
 Every step announces column, lane and position through the live region; a full
-column warns before the drop is rejected. The per-card **Move …** menu exposes
+column warns before the drop is rejected. Focus stays on the held card: a
+move into another column re-creates its node, so the board applies the move
+synchronously and focuses the new handle in the same task, and a Space or
+Enter pressed right after an arrow key drops the card instead of landing on
+`<body>` (G103, fixed in 0.10.0; before, focus came back one frame later). The per-card **Move …** menu exposes
 the same destinations (column top/bottom) for pointer and touch users.
 
 ## Engine vs view

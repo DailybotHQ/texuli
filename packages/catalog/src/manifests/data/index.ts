@@ -693,13 +693,15 @@ export const dataFilterBuilderManifest: CatalogManifest = /* @__PURE__ */ manife
       name: 'fields',
       kind: 'array',
       required: true,
-      description: 'The fields a condition can test; options list the values of an enum field.',
+      description:
+        'The fields a condition can test; options list the values of an enum field, and optionLabels maps a value to the text its menus show (the value otherwise).',
       schema: list(
         {
           key: id,
           header: text(120),
           type: { type: 'string', enum: [...FILTER_FIELD_TYPES] },
           options: { type: 'array', maxItems: 100, items: text(120) },
+          optionLabels: { type: 'object', additionalProperties: text(120) },
         },
         ['key', 'header', 'type'],
         48
@@ -716,6 +718,24 @@ export const dataFilterBuilderManifest: CatalogManifest = /* @__PURE__ */ manife
       kind: 'number',
       default: 3,
       description: 'Deepest group level offered (the root is 1), capped at 5.',
+    },
+    {
+      name: 'issues',
+      kind: 'array',
+      description:
+        'Problems to show on conditions: each message appears under the condition at path (child indexes from the root) and marks its value control invalid. Paths that are not a condition are ignored.',
+      schema: list(
+        {
+          path: {
+            type: 'array',
+            maxItems: 6,
+            items: { type: 'integer', minimum: 0, maximum: 199 },
+          },
+          message: text(200),
+        },
+        ['path', 'message'],
+        200
+      ),
     },
     { name: 'disabled', kind: 'boolean', default: false },
   ],

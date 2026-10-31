@@ -307,8 +307,11 @@ runs through the host's `checkDesignSystem`, as documents run through
 hold the contract on both targets; the Kotlin twin decodes both forms and
 reads an inline document with `DesignSystem.decode`. Spec 0.10.0
 is in development on `release/0.10.0` (digest
-`c6d6cb0753100f3807ecb6e03bcd3aca2e151bb13a654b99ec1595c5caf92b13`); it ships only with
-`@texuli/spec@0.10.0`.
+`07fc15722c3e2f5d9961d62d02ea7a1866d86b8d5099ff3339556f79ef50e59f`); it ships only with
+`@texuli/spec@0.10.0`. The same version also carries an additive catalog
+projection refresh (T-gaps-100-104): `data-filter-builder` gains the
+optional `issues` prop (`{ path, message }` per condition) and
+`fields[].optionLabels` (enum value to menu text).
 
 ## Named slots and conditions
 

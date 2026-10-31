@@ -1,6 +1,11 @@
 import { cleanup, render, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { buildToc, normalizeTocEntries, resolveTocLevels } from '../src/layouts/content/index.ts';
+import {
+  buildToc,
+  normalizeTocEntries,
+  resolveTocLevels,
+  trackActiveHeading,
+} from '../src/layouts/content/index.ts';
 import ContentLayoutDirectHarness from './fixtures/ContentLayoutDirectHarness.svelte';
 import ContentLayoutTrackingHarness from './fixtures/ContentLayoutTrackingHarness.svelte';
 
@@ -277,6 +282,60 @@ describe('layouts-content: active heading tracking (G52)', () => {
       view.unmount();
       for (const key of Object.keys(tops)) delete tops[key];
     }
+  });
+
+  it('tracks headings on its own outside ContentLayout (G102): reading line, onChange, dispose', () => {
+    vi.stubGlobal('IntersectionObserver', FakeObserver);
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+      this: HTMLElement
+    ) {
+      return { top: tops[this.id] ?? 10_000 } as DOMRect;
+    });
+    const container = document.createElement('article');
+    for (const id of ['a', 'b', 'c']) {
+      const heading = document.createElement('h2');
+      heading.id = id;
+      heading.textContent = id.toUpperCase();
+      container.append(heading);
+    }
+    document.body.append(container);
+    const changes: Array<[string, string | undefined]> = [];
+    // Host entries by id, or as strings; an id with no element is skipped.
+    const dispose = trackActiveHeading(container, ['a', { id: 'b' }, { id: 'missing' }, 'c'], {
+      readingLine: 0.5,
+      onChange: (id, element) => changes.push([id, element?.textContent ?? undefined]),
+    });
+    const observer = FakeObserver.instances.at(-1) as FakeObserver;
+    expect(observer.options?.rootMargin).toBe('0px 0px -50% 0px');
+    expect([...observer.targets].map((target) => target.id)).toEqual(['a', 'b', 'c']);
+    // 50% of 768 px is 384: "b" passed it, "c" did not.
+    scrollTo({ a: -500, b: 300, c: 500 });
+    // The same heading again reports nothing.
+    scrollTo({ a: -520, b: 280, c: 480 });
+    scrollTo({ a: -900, b: -100, c: 100 });
+    expect(changes).toEqual([
+      ['b', 'B'],
+      ['c', 'C'],
+    ]);
+    dispose();
+    expect(observer.targets.size).toBe(0);
+    // A disposed tracker never reports again, even if its observer fires late.
+    scrollTo({ a: 10, b: 900, c: 1_400 });
+    expect(changes).toHaveLength(2);
+    dispose();
+    container.remove();
+  });
+
+  it('is a no-op without an observer or a window (server rendering), and disposes cleanly', () => {
+    vi.stubGlobal('IntersectionObserver', undefined);
+    const onChange = vi.fn();
+    const container = document.createElement('div');
+    const heading = document.createElement('h2');
+    heading.id = 'x';
+    container.append(heading);
+    const dispose = trackActiveHeading(container, ['x'], { onChange });
+    expect(onChange).not.toHaveBeenCalled();
+    expect(() => dispose()).not.toThrow();
   });
 
   it('honors a bound activeId and needs no observer (server rendering, old browsers)', async () => {

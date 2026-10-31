@@ -189,4 +189,88 @@ describe('NotificationInbox (G19)', () => {
     ]);
     expect(unread).toEqual([['r']]);
   });
+
+  it('tells mark all, a row toggle and opening apart, and routes mark all to onMarkAllRead when given (G106)', async () => {
+    const { default: Inbox } = await import('../src/activity/inbox/NotificationInbox.svelte');
+    const items = [{ id: 'u', title: 'Only unread', at: 0, read: false }];
+    const calls: unknown[][] = [];
+    const onReadChange = (ids: string[], read: boolean, context?: { source: string }) => {
+      calls.push(['change', ids, read, context?.source]);
+    };
+    render(Inbox, { props: { now: 0, items, onReadChange, onOpen: () => {} } });
+    await fireEvent.click(screen.getByRole('button', { name: 'Mark all as read' }));
+    await fireEvent.click(screen.getByRole('button', { name: 'Mark as read: Only unread' }));
+    await fireEvent.click(screen.getByRole('button', { name: 'Only unread' }));
+    cleanup();
+    render(Inbox, {
+      props: {
+        now: 0,
+        items,
+        onReadChange,
+        onMarkAllRead: (ids: string[]) => {
+          calls.push(['all', ids]);
+        },
+      },
+    });
+    await fireEvent.click(screen.getByRole('button', { name: 'Mark all as read' }));
+    expect(calls).toEqual([
+      ['change', ['u'], true, 'all'],
+      ['change', ['u'], true, 'item'],
+      ['change', ['u'], true, 'open'],
+      ['all', ['u']],
+    ]);
+  });
+
+  it('marks the control that started a pending save busy until it settles, and announces a failure (G106)', async () => {
+    const { default: Inbox } = await import('../src/activity/inbox/NotificationInbox.svelte');
+    const items = [
+      { id: 'u', title: 'First', at: 0, read: false },
+      { id: 'v', title: 'Second', at: 0, read: false },
+    ];
+    let settle: { resolve: () => void; reject: (error: Error) => void } | undefined;
+    const pendingSave = () =>
+      new Promise<void>((resolve, reject) => {
+        settle = { resolve, reject };
+      });
+    let saves = 0;
+    render(Inbox, {
+      props: {
+        now: 0,
+        items,
+        onReadChange: () => {
+          saves += 1;
+          return pendingSave();
+        },
+        onMarkAllRead: () => pendingSave(),
+      },
+    });
+    const status = () => document.querySelector('.tx-inbox [role="status"]')?.textContent ?? '';
+    const busy = (button: HTMLElement) => [
+      button.getAttribute('aria-busy'),
+      button.getAttribute('aria-disabled'),
+      Boolean(button.querySelector('[data-tx-inbox-spinner]')),
+      button.classList.contains('tx-inbox__button'),
+    ];
+    const row = screen.getByRole('button', { name: 'Mark as read: First' });
+    const other = screen.getByRole('button', { name: 'Mark as read: Second' });
+    row.focus();
+    await fireEvent.click(row);
+    expect(busy(row)).toEqual(['true', 'true', true, true]);
+    // Only the control that started the save is pending; a second click does nothing.
+    expect(busy(other)).toEqual([null, null, false, true]);
+    await fireEvent.click(row);
+    expect(saves).toBe(1);
+    expect(document.activeElement).toBe(row);
+    settle?.resolve();
+    await waitFor(() => expect(busy(row)).toEqual([null, null, false, true]));
+    expect(status()).toBe('');
+
+    const all = screen.getByRole('button', { name: 'Mark all as read' });
+    await fireEvent.click(all);
+    expect(busy(all)).toEqual(['true', 'true', true, true]);
+    settle?.reject(new Error('offline'));
+    await waitFor(() => expect(status()).toBe('Could not update the read state. Try again.'));
+    // Settled: still two unread, so "Mark all" is enabled again.
+    expect(busy(all)).toEqual([null, 'false', false, true]);
+  });
 });
