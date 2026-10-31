@@ -43,6 +43,7 @@ import {
   FIELD_ROWS,
   FIELDS_SCHEMA,
   FLOW_SCHEMA,
+  GALLERY_OPTIONS,
   HANDLE_VALIDATOR,
   RULE_COVERAGE,
   TAMPERED_DRAFT,
@@ -83,7 +84,10 @@ const errorsOf = (blueprint: unknown) =>
   }).diagnostics.filter((entry) => entry.severity === 'error');
 
 const compile = (schema: unknown) => {
-  const result = validateFormSchema(schema, { validators: [HANDLE_VALIDATOR, 'handle-free'] });
+  const result = validateFormSchema(schema, {
+    validators: [HANDLE_VALIDATOR, 'handle-free'],
+    ...GALLERY_OPTIONS,
+  });
   if (!result.ok) throw new Error(JSON.stringify(result.issues));
   return result.form;
 };

@@ -53,7 +53,7 @@ test('every field type and format, live, axe-clean in light and dark', async ({ 
     'Forms as data, painted accessibly'
   );
   await expect(page.getByText('@texuli/forms · in development · on npm from 0.8.0')).toBeVisible();
-  await expect(page.locator('[data-forms-types] tbody tr')).toHaveCount(15);
+  await expect(page.locator('[data-forms-types] tbody tr')).toHaveCount(20);
 
   await hydrated(page, '[data-forms-gallery]');
   const gallery = page.locator('[data-forms-gallery]');
