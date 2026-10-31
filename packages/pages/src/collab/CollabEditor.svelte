@@ -8,9 +8,13 @@
  */
 import type { ComponentProps } from 'svelte';
 import { loadDefaultPlayer } from '../shared/player.ts';
+import type { PagesPlayerLoader } from '../shared/player-loader.ts';
 import CollabEditorCore from './CollabEditorCore.svelte';
 
-type Props = ComponentProps<typeof CollabEditorCore>;
+type Props = Omit<ComponentProps<typeof CollabEditorCore>, 'loadPlayer'> & {
+  /** Loads `@texuli/player` for live embeds; default: the package loader; `null` turns them off. */
+  loadPlayer?: PagesPlayerLoader | null;
+};
 
 let { editor = $bindable(), history = $bindable(false), loadPlayer, ...rest }: Props = $props();
 </script>

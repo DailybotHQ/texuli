@@ -8,9 +8,13 @@
  */
 import type { ComponentProps } from 'svelte';
 import { loadDefaultPlayer } from '../shared/player.ts';
+import type { PagesPlayerLoader } from '../shared/player-loader.ts';
 import PageReaderCore from './PageReaderCore.svelte';
 
-type Props = ComponentProps<typeof PageReaderCore>;
+type Props = Omit<ComponentProps<typeof PageReaderCore>, 'loadPlayer'> & {
+  /** Loads `@texuli/player` for live embeds; default: the package loader; `null` turns them off. */
+  loadPlayer?: PagesPlayerLoader | null;
+};
 
 let { loadPlayer, ...rest }: Props = $props();
 </script>

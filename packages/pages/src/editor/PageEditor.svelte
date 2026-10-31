@@ -8,9 +8,13 @@
  */
 import type { ComponentProps } from 'svelte';
 import { loadDefaultPlayer } from '../shared/player.ts';
+import type { PagesPlayerLoader } from '../shared/player-loader.ts';
 import PageEditorCore from './PageEditorCore.svelte';
 
-type Props = ComponentProps<typeof PageEditorCore>;
+type Props = Omit<ComponentProps<typeof PageEditorCore>, 'loadPlayer'> & {
+  /** Loads `@texuli/player` for live embeds; default: the package loader; `null` turns them off. */
+  loadPlayer?: PagesPlayerLoader | null;
+};
 
 let { editor = $bindable(), loadPlayer, ...rest }: Props = $props();
 </script>
