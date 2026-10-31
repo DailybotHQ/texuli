@@ -15,8 +15,8 @@ const toc = [
   {toc}
 >
   <p>
-    Texuli renders the web with <strong>Svelte 5</strong> and speaks to native platforms through
-    <strong>Kotlin</strong>. This page explains why both were chosen, what each owns, and how the
+    Texuli renders the web with <strong>Svelte 5</strong> and speaks to native platforms
+    through <strong>Kotlin</strong>. This page explains why both were chosen, what each owns, and how the
     same component catalog drives the two runtimes.
   </p>
 
@@ -33,19 +33,18 @@ const toc = [
       grids, charts, decks — inside their size and interaction budgets.
     </li>
     <li>
-      <strong>Small bundles by default.</strong> Each subpath is budgeted in
-      <code>texuli.budgets.json</code> and measured by <code>pnpm size</code>; a compiler that
+      <strong>Small bundles by default.</strong> Each subpath is budgeted
+      in <code>texuli.budgets.json</code> and measured by <code>pnpm size</code>; a compiler that
       emits only what the component uses makes those budgets honest ones.
     </li>
     <li>
-      <strong>Runes make state explicit.</strong> Svelte 5's <code>$state</code>,
-      <code>$derived</code> and <code>$effect</code> put reactivity in the language surface, so
+      <strong>Runes make state explicit.</strong> Svelte 5's <code>$state</code>, <code>$derived</code> and <code>$effect</code> put reactivity in the language surface, so
       component contracts stay readable and auditable — important for a library that is designed to
       be read, copied and owned by agents and humans alike.
     </li>
     <li>
-      <strong>Fewer ways to shoot yourself.</strong> Snippets over injection holes, no
-      <code>innerHTML</code> idiom in the mainstream path, and compile-time warnings on the
+      <strong>Fewer ways to shoot yourself.</strong> Snippets over injection holes,
+      no <code>innerHTML</code> idiom in the mainstream path, and compile-time warnings on the
       accessibility mistakes Texuli is held to anyway.
     </li>
   </ul>
@@ -74,10 +73,9 @@ const toc = [
   <h2 id="one-catalog-two-runtimes">One catalog, two runtimes</h2>
   <p>
     The seam between the two worlds is the <strong>catalog contract</strong>: every Texuli
-    component's props, kinds, enums and tiers are declared once in the manifests, and
-    <code>@texuli/spec</code> generates both a TypeScript and a Kotlin projection of that contract
-    (<code>packages/spec/generated/typescript/</code> and
-    <code>packages/spec/generated/kotlin/com/texuli/spec/</code>). Svelte components implement the
+    component's props, kinds, enums and tiers are declared once in the manifests,
+    and <code>@texuli/spec</code> generates both a TypeScript and a Kotlin projection of that contract
+    (<code>packages/spec/generated/typescript/</code> and <code>packages/spec/generated/kotlin/com/texuli/spec/</code>). Svelte components implement the
     contract on the web; Kotlin consumes it wherever Svelte cannot go. Agent output rendered on
     either runtime is validated against the same schema with the same URL policy tiers.
   </p>
@@ -86,8 +84,7 @@ const toc = [
   <p>
     Honesty first: the web stack is the implemented one. The Svelte packages, the theme engine,
     the catalog, the spec generator and both generated projections are real and tested. Every
-    package is on npm as <code>0.9.0</code>, a pre-1.0 release (<code>latest</code> and
-    <code>next</code> both point to it); there is no stable release yet, and 1.0.0 will be the
+    package is on npm as <code>0.9.0</code>, a pre-1.0 release (<code>latest</code> and <code>next</code> both point to it); there is no stable release yet, and 1.0.0 will be the
     first. texuli.com deploys from
     the main branch. The Kotlin Multiplatform side is in development: the Compose renderer
     consumes the Kotlin projection in place from this repository, and nothing is on Maven yet

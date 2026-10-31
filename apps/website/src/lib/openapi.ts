@@ -63,6 +63,36 @@ export interface OpenApiFacts {
   examples: Readonly<Record<string, unknown>>;
 }
 
+/** How many items of each list an example keeps (see {@link sampleExample}). */
+export const EXAMPLE_LIST_ITEMS = 2;
+
+/** A key a structured object would use (`name`, `cssVars`), not data (`--tx-ring`, `/guides/`). */
+const FIELD_KEY = /^[A-Za-z_$][\w$]*$/;
+
+/**
+ * A small, representative sample of a real body: every list, at any depth,
+ * keeps its first {@link EXAMPLE_LIST_ITEMS} items, and so does every record
+ * keyed by data (no key is an identifier: CSS variables, routes). Other
+ * objects keep all of their keys, so the example has the body's full shape
+ * with real values. (The examples were the built files with only the
+ * top-level lists cut; a theme's role lists and CSS variables made
+ * /openapi.json about 240 KB.)
+ */
+export function sampleExample(value: unknown, items = EXAMPLE_LIST_ITEMS): unknown {
+  if (Array.isArray(value)) return value.slice(0, items).map((item) => sampleExample(item, items));
+  if (value !== null && typeof value === 'object') {
+    const entries = Object.entries(value);
+    const record = entries.length > 0 && entries.every(([key]) => !FIELD_KEY.test(key));
+    return Object.fromEntries(
+      (record ? entries.slice(0, items) : entries).map(([key, item]) => [
+        key,
+        sampleExample(item, items),
+      ])
+    );
+  }
+  return value;
+}
+
 export const LICENSE = Object.freeze({ name: 'MIT', identifier: 'MIT' });
 const REPOSITORY = 'https://github.com/DailybotHQ/texuli';
 
@@ -734,7 +764,10 @@ export function buildOpenApi(facts: OpenApiFacts): Record<string, unknown> {
       examples: Object.fromEntries(
         Object.entries(facts.examples).map(([name, value]) => [
           name,
-          { summary: `A real ${name} body from the build (lists cut short)`, value },
+          {
+            summary: `A real ${name} body from the build, every list and keyed record cut to its first ${EXAMPLE_LIST_ITEMS} entries`,
+            value: sampleExample(value),
+          },
         ])
       ),
       parameters: {

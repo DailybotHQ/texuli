@@ -51,6 +51,12 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   // Measured on the static build (FIX-site-perf-routes): Chromium, gzip level 9,
   // every same-origin file loaded until the network is idle. Each limit is the
   // measurement rounded up a little; a route that fits the default has none.
+  // PLAN_011 Final Review (2026-10-30): the header's search trigger imported
+  // the `Command` namespace object, which pulled the whole command palette
+  // and its dialog stack into every page; importing `CommandTrigger` alone
+  // cut the shared shell by about 22.5 KB gzip of JavaScript on every route
+  // (a shell-only page: 95.4 -> 72.8 KB page, 63.1 -> 40.5 KB JS). The
+  // measurements quoted below predate that; the limits are unchanged.
   {
     route: '/',
     reason:
@@ -273,7 +279,7 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/mcp-server/',
     reason:
-      'PLAN_011 T-site-090: a static page (no island) whose tables are generated from the operations registry (every tool with its summary, arguments, doors and limits; resources, prompts, WebMCP tools) plus setup snippets for six hosts: 21.2 KB gzip of HTML, inside the HTML budget. The shared docs shell (header, sidebar, search and the token-adopted base CSS) is about 78 KB of the total. Measured 2026-10-30: 100.3 KB page (+4% headroom).',
+      'PLAN_011 T-site-090: a static page (no island) whose tables are generated from the operations registry (every tool with its summary, arguments, doors and limits; resources, prompts, WebMCP tools) plus setup snippets for six hosts: 21.2 KB gzip of HTML, inside the HTML budget. The shared docs shell (header, sidebar, search and the token-adopted base CSS) was about 78 KB of the total. Measured 2026-10-30: 100.3 KB page (+4% headroom); 78.7 KB after the shell trim of the same day.',
     budget: { pageGzipKb: 105 },
   },
   {

@@ -134,7 +134,11 @@ describe('control-aria', () => {
 describe('field label context (G91)', () => {
   afterEach(cleanup);
 
-  it('exports useFieldLabel and getFieldLabelContext from texuli/field', async () => {
+  // Importing the root barrel transforms the whole package on a cold worker,
+  // which is CPU-bound and outlasted the 5 s default under parallel load.
+  it('exports useFieldLabel and getFieldLabelContext from texuli/field', {
+    timeout: 30_000,
+  }, async () => {
     const field = (await import('../src/components/field/index.ts')) as Record<string, unknown>;
     const root = (await import('../src/index.ts')) as Record<string, unknown>;
     for (const name of ['useFieldLabel', 'getFieldLabelContext']) {

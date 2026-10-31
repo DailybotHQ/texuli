@@ -26,8 +26,8 @@ const titleId = 'arch-layers-title';
   <h2 id={titleId}>The layer graph: nine floors, dependencies point down</h2>
   <p class="arch-layers__lead">
     Every workspace package sits on exactly one floor, and a package may depend only on packages
-    below it — never sideways, never up. The layer of every package is declared once in
-    <code>scripts/check-layers.ts</code>, and <code>pnpm check:layers</code> enforces the graph on
+    below it — never sideways, never up. The layer of every package is declared once
+    in <code>scripts/check-layers.ts</code>, and <code>pnpm check:layers</code> enforces the graph on
     every manifest and every shipped file.
   </p>
 
