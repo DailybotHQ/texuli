@@ -19,19 +19,38 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
   (every design-system code and its fix) and `references/mcp.md` (the
   `ds.*` tools, `blueprint.theme`, the `create-design-system` prompt and
   `texuli://design-system/{id}`): author, validate and repair, apply to a
-  blueprint and export a design system, marked in development for
-  `0.10.0`. The router and `router/routes.md` route to it.
+  blueprint and export a design system, released in `0.10.0`. The router
+  and `router/routes.md` route to it.
 - `themes/SKILL.md` and `upgrade/SKILL.md`: the seven 0.8 MCP tool names
-  and the tree block's `style` key are removed in `0.10.0` (in
-  development); a call or a block that uses them is refused with the name
-  to use instead.
+  and the tree block's `style` key are removed in `0.10.0`; a call or a
+  block that uses them is refused with the name to use instead.
 - `blueprints/SKILL.md` gains "K — Design systems (spec 0.10.0)": the
   envelope's `designSystem` (`ref` or `inline`), `validateDraft`'s
-  `checkDesignSystem` and the player's `designSystems` resolver, marked in
-  development for `0.10.0`.
-- The packages are still installed from the 0.9 line on npm; a Texuli
-  checkout whose manifests say `0.10.0` is ahead of npm (0.10.0 is in
-  development).
+  `checkDesignSystem` and the player's `designSystems` resolver, new in
+  `0.10.0`.
+- The packages move to `0.10.0`: all 26 published packages on npm in the
+  0.10 line. The router, components, install and build-ui references say
+  "on npm as `0.10.0`" and pin `^0.10.0`; the "0.10.0 is in development"
+  install note is gone, and the design-systems sub-skill is no longer
+  marked in development.
+- `router/packages.md` gains a "New in `0.10.0`" paragraph, marks the new
+  entries (`@texuli/spec/design-system`, the `@texuli/tokens/design-system/*`
+  subpaths, `texuli/design-system`, `@texuli/player/design-system`,
+  `@texuli/astro/design-system`, `@texuli/tools/ds-check`,
+  `@texuli/slides/export-core`, the `@texuli/pages` `*-core` entries,
+  `@texuli/forms/controls`) and checks their imports; `router/hosts.md`
+  names the `ds.*` tools on both MCP servers.
+- `build-ui/references/imports.md` gains a "New in 0.10.0" table (design
+  systems: validate, compile, apply, import and export, blueprints, CI
+  checks; `DeckPrintViewCore`, the pages core entries with `loadPlayer`,
+  `SCHEMA_FORM_CONTROLS`).
+- `upgrade/SKILL.md` lists the `0.10.0` breaking changes an app checks
+  before moving from `^0.9.0` (the seven 0.8 MCP tool aliases and the tree
+  block's `style` removed, spec 0.10.0 stamps, the forms "None" choice and
+  lazy controls, the lazy sheets cell editor, the pages core entries'
+  `loadPlayer`). The `0.8.0` to `0.5.0` sections move to
+  `upgrade/references/packages.md` to keep `upgrade/SKILL.md` within its
+  budget.
 - The packages move to `0.9.0`: 26 published packages, `@texuli/mcp`
   published for the first time. The router, components, install and
   build-ui references say "on npm as `0.9.0`" and pin `^0.9.0`; the
