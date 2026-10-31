@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The packages are on npm in the 0.11 line, every one at `0.11.1`, a patch
+  (forms: concurrent `next()` calls share one move; `applyDesignSystem`
+  refuses a variant on a base compile). The skill, install and router
+  references and the in-development packages read `0.11.1`; installs still
+  pin `^0.11.0`, and the "new in `0.11.0`" notes stay.
+
 ## [0.3.6] — 2026-10-31
 
 ### Changes
