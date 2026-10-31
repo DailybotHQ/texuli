@@ -49,6 +49,8 @@ const BROWSER_ROUTES = [
   '/gallery-themes/',
   '/theme-switcher/',
   '/color-explorer/',
+  // PLAN_011 T-ds-studio: the Design System Studio island (compiler and exporters load on use).
+  '/theme-studio/',
   '/component-pages/',
   '/gallery-components/',
   '/gallery-components/preview/',
