@@ -475,6 +475,16 @@ describe('the controller', () => {
     terms: true,
   };
 
+  it('moves one step when next() is called again while a move is in flight', async () => {
+    const controller = createFormController(compiled(), { onSubmit: vi.fn() });
+    for (const [name, value] of Object.entries(valid)) controller.setValue(name, value);
+    const [first, second] = await Promise.all([controller.next(), controller.next()]);
+    expect(first).toBe(second);
+    expect(controller.getState().step).toBe(1);
+    expect((await controller.next()).ok).toBe(true);
+    expect(controller.getState().step).toBe(2);
+  });
+
   it('walks steps, blocks on an invalid step and submits only visible, enabled values', async () => {
     const onSubmit = vi.fn(async () => ({ ok: true }) as const);
     const controller = createFormController(compiled(), { onSubmit });
