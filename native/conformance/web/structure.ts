@@ -10,6 +10,7 @@ import { canonicalJson } from '../../../packages/spec/src/canonical.ts';
 import type { SpecCatalog } from '../../../packages/spec/src/catalog.ts';
 import { SPEC_PATTERNS } from '../../../packages/spec/src/contract.ts';
 import type { Schema } from '../../../packages/spec/src/dialect.ts';
+import type { SpecSourceDescriptor } from '../../../packages/spec/src/source.ts';
 import { SPEC_CONTROL_STATE_TYPES } from '../../../packages/spec/src/surface.ts';
 import { validateBlueprint } from '../../../packages/spec/src/validate.ts';
 import { validateWorkflowGraph } from '../../../packages/spec/src/workflow.ts';
@@ -141,6 +142,12 @@ const blueprintSchema = JSON.parse(
 const workflowSchema = JSON.parse(
   readFileSync(join(REPO, 'packages/spec/schemas/workflow.schema.json'), 'utf8')
 ) as Schema;
+// Goldens with `$source` bindings need the host's data sources (spec 0.8.0+).
+const sources = (
+  JSON.parse(readFileSync(join(REPO, 'packages/spec/fixtures/sources.json'), 'utf8')) as {
+    sources: SpecSourceDescriptor[];
+  }
+).sources;
 const portable = new Map(
   catalog.components.map((c) => [
     c.id,
@@ -166,8 +173,13 @@ const goldenDir = join(REPO, 'packages/spec/fixtures/golden');
 for (const file of readdirSync(goldenDir).filter((f) => f.endsWith('.json'))) {
   const envelope = JSON.parse(readFileSync(join(goldenDir, file), 'utf8')) as { tree: Node };
   check(
-    validateBlueprint(envelope, { blueprintSchema, catalog, workflowSchema, validateWorkflowGraph })
-      .ok,
+    validateBlueprint(envelope, {
+      blueprintSchema,
+      catalog,
+      workflowSchema,
+      validateWorkflowGraph,
+      sources,
+    }).ok,
     `${file}: valid under the spec validator`
   );
   const expected = JSON.parse(
