@@ -150,8 +150,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/whats-new/',
     reason:
-      'PLAN_010 T-site-080 (Amendment 8): the hub of every 0.6.0 to 0.8.0 feature with six lazy islands (client:visible); the first row of cards is static previews, so JS at the ready signal is 61.3 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the five live demos can import (the form, the dashboard, the rating, the motion runtime). Measured 2026-10-29: 160.6 KB page (+4% headroom; a proposal for the owner). PLAN_011 T-site-090 (2026-10-30): the 0.9.0 section (five static cards, the MCP doors snippet and the token counts; no new island) on top of token adoption: measured 167.8 KB page, 0.2 KB under the old cap, limit 175 (+4% headroom).',
-    budget: { pageGzipKb: 175 },
+      'PLAN_010 T-site-080 (Amendment 8): the hub of every 0.6.0 to 0.8.0 feature with six lazy islands (client:visible); the first row of cards is static previews, so JS at the ready signal is 61.3 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the five live demos can import (the form, the dashboard, the rating, the motion runtime). Measured 2026-10-29: 160.6 KB page (+4% headroom; a proposal for the owner). PLAN_011 T-site-090 (2026-10-30): the 0.9.0 section (five static cards, the MCP doors snippet and the token counts; no new island) on top of token adoption: measured 167.8 KB page, 0.2 KB under the old cap, limit 175 (+4% headroom). PLAN_011 T-site-0100 (2026-10-31): the 0.10.0 section (six static cards, two code samples and the pair counts of the example brands, read at build time; no new island) puts the HTML at 24.2 KB gzip, 0.2 KB over the default: limit 25.2 (measured + 4%).',
+    budget: { pageGzipKb: 175, htmlGzipKb: 25.2 },
   },
   {
     route: '/live-generation/',
@@ -287,6 +287,12 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
     reason:
       'PLAN_011 T-site-090: every component token (364 for 57 components) with its fallback, static (no island), compact tables with page-wide styles so no per-cell scope attribute is written: 23.2 KB gzip of HTML, inside the HTML budget. Measured 2026-10-30: 102.8 KB page (+4% headroom).',
     budget: { pageGzipKb: 107 },
+  },
+  {
+    route: '/design-systems/',
+    reason:
+      "PLAN_011 T-site-0100: the design systems hub, static (no island, only the site shell's JavaScript, 62.8 KB): twelve server-rendered brand scopes (three example brands on four surfaces) built from real Texuli components, so the page carries their CSS (26.9 KB gzip of CSS with the 4.7 KB build-time brands.css) and 17.9 KB gzip of HTML. Measured 2026-10-31: 108.7 KB page, limit 113.1 (measured + 4%).",
+    budget: { pageGzipKb: 113.1 },
   },
 ]);
 
