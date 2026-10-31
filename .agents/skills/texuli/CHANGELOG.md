@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- New `design-systems/SKILL.md` sub-skill, with `references/codes.md`
+  (every design-system code and its fix) and `references/mcp.md` (the
+  `ds.*` tools, `blueprint.theme`, the `create-design-system` prompt and
+  `texuli://design-system/{id}`): author, validate and repair, apply to a
+  blueprint and export a design system, marked in development for
+  `0.10.0`. The router and `router/routes.md` route to it.
 - `blueprints/SKILL.md` gains "K — Design systems (spec 0.10.0)": the
   envelope's `designSystem` (`ref` or `inline`), `validateDraft`'s
   `checkDesignSystem` and the player's `designSystems` resolver, marked in
