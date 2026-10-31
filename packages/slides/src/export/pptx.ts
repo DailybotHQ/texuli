@@ -31,6 +31,8 @@ export { PPTX_SLIDE_SIZES } from './pptx-v1.ts';
 export type {
   DeckPptxAssetContext,
   DeckPptxChartContext,
+  DeckPptxDesign,
+  DeckPptxDesignRole,
   DeckPptxImageAsset,
   DeckPptxImageMime,
   DeckPptxOmissionKind,

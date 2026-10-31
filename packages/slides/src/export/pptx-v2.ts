@@ -139,6 +139,14 @@ export interface DeckPptxV2Options {
     | ((slide: DeckSlide | undefined) => Maybe<DeckBackgroundPalette>);
   /** Font families for the theme (first concrete family of a CSS list is used). */
   fonts?: { heading?: string; body?: string; mono?: string };
+  /**
+   * Design values (ADR-024), as `designValues(compiled, mode)` from
+   * `@texuli/tools/print` builds them from a compiled design system: the
+   * theme palette (`#rrggbb` per role; `accent` reads `chart2`) and fonts
+   * for the deck theme and every slide. `palette` and `fonts`, when given,
+   * still win. Default: none, and the output is unchanged.
+   */
+  design?: DeckPptxDesign | null;
   /** List each slide's omissions on its notes page. Default true (needs `notes`). */
   noteOmissions?: boolean;
   /**
@@ -146,6 +154,15 @@ export interface DeckPptxV2Options {
    * slides (in the file, skipped in the slide show); `skip` leaves them out.
    */
   hidden?: 'include' | 'skip';
+}
+
+/** The design roles the PPTX theme reads. */
+export type DeckPptxDesignRole = Exclude<keyof DeckBackgroundPalette, 'accent'> | 'chart2';
+
+/** Design values for a PPTX theme: colors per role and CSS font stacks. */
+export interface DeckPptxDesign {
+  colors?: Readonly<Partial<Record<DeckPptxDesignRole, string>>>;
+  fonts?: Readonly<{ sans?: string; heading?: string; mono?: string }>;
 }
 
 export type DeckPptxOmissionKind =
@@ -421,11 +438,17 @@ function paletteFor(
   const mode = reference?.mode === 'dark' ? 'dark' : 'light';
   const base = NEUTRAL_PALETTES[mode];
   const host = typeof options.palette === 'function' ? options.palette(slide) : options.palette;
-  const source: Bag | undefined = isBag(host)
-    ? host
-    : reference?.kind === 'embedded' && isBag(reference.theme) && isBag(reference.theme[mode])
+  const design = options.design?.colors;
+  const embedded: Bag | undefined =
+    reference?.kind === 'embedded' && isBag(reference.theme) && isBag(reference.theme[mode])
       ? (reference.theme[mode] as Bag)
       : undefined;
+  // Design values layer over the embedded theme; a host palette replaces both.
+  const source: Bag | undefined = isBag(host)
+    ? host
+    : isBag(design)
+      ? { ...embedded, ...design, accent: design.chart2 ?? embedded?.accent }
+      : embedded;
   if (!source) return base;
   const out: Record<string, string> = { ...base };
   for (const role of PALETTE_ROLES) {
@@ -475,12 +498,22 @@ function themeFonts(
   const reference = normalizeThemeReference(deck.style?.theme);
   const theme: Bag =
     reference?.kind === 'embedded' && isBag(reference.theme) ? reference.theme : {};
+  const design = options.design?.fonts;
   const minor =
-    firstFontFamily(options.fonts?.body) ?? firstFontFamily(theme.fontFamily) ?? 'Calibri';
+    firstFontFamily(options.fonts?.body) ??
+    firstFontFamily(design?.sans) ??
+    firstFontFamily(theme.fontFamily) ??
+    'Calibri';
   const major =
-    firstFontFamily(options.fonts?.heading) ?? firstFontFamily(theme.fontFamilyHeading) ?? minor;
+    firstFontFamily(options.fonts?.heading) ??
+    firstFontFamily(design?.heading) ??
+    firstFontFamily(theme.fontFamilyHeading) ??
+    minor;
   const mono =
-    firstFontFamily(options.fonts?.mono) ?? firstFontFamily(theme.fontFamilyMono) ?? 'Courier New';
+    firstFontFamily(options.fonts?.mono) ??
+    firstFontFamily(design?.mono) ??
+    firstFontFamily(theme.fontFamilyMono) ??
+    'Courier New';
   return { major, minor, mono };
 }
 
