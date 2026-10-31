@@ -56,8 +56,8 @@
   }
 
   .tx-tree > [role="treeitem"][aria-selected="true"] {
-    color: CanvasText;
-    background: var(--tx-primary-subtle, color-mix(in srgb, Highlight 18%, Canvas));
+    color: var(--tx-primary-soft-foreground, HighlightText);
+    background: var(--tx-primary-soft, Highlight);
   }
 
   .tx-tree > [role="treeitem"][data-disabled] {
@@ -102,7 +102,7 @@
     place-items: center;
     inline-size: var(--tx-tree-checkbox-size, var(--tx-size-icon-sm));
     block-size: var(--tx-tree-checkbox-size, var(--tx-size-icon-sm));
-    border: var(--tx-border-width-thin) solid var(--tx-input-border, GrayText);
+    border: var(--tx-border-width-thin) solid var(--tx-input, GrayText);
     border-radius: var(--tx-tree-checkbox-radius, var(--tx-shape-radius-xs));
     color: var(--tx-primary-foreground, HighlightText);
     background: var(--tx-background, Canvas);
