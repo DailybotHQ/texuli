@@ -12,8 +12,6 @@ const decoder = new TextDecoder();
 
 /** The default outputs of `everyBlock()` before design values existed (recorded at 7e5211f7). */
 const DEFAULT_PDF_SHA = '4038c6fa02753704a946662c0c417a22eb7619bc995e2f9babf1f3609f64f838';
-const DEFAULT_PDF_COMPRESSED_SHA =
-  '221c9bf90c7c4697ff7ea730313367c302ba34bf271c0ec3da4f9f239e4ff1bf';
 const DEFAULT_DOCX_SHA = 'f9d0e7674aad0e35603594b01418f6060c44b9fdb0ab6019a71dba6cc72a392f';
 
 /** Plain design values, as `designValues(compiled, 'light')` builds them from a compiled design system. */
@@ -60,7 +58,9 @@ async function docxFiles(design?: DocumentDesign | null) {
 describe('document outputs: the default stays byte for byte', () => {
   it('writes the same PDF and DOCX bytes without a design (and with an empty or hostile one)', async () => {
     expect(sha((await writePdf(everyBlock(), { compress: false })).bytes)).toBe(DEFAULT_PDF_SHA);
-    expect(sha((await writePdf(everyBlock())).bytes)).toBe(DEFAULT_PDF_COMPRESSED_SHA);
+    // Deflate output depends on the platform's zlib, so the compressed PDF is
+    // compared with itself across designs rather than pinned to one hash.
+    const compressed = sha((await writePdf(everyBlock())).bytes);
     expect(sha((await writeDocx(everyBlock(), { compress: false })).bytes)).toBe(DEFAULT_DOCX_SHA);
     const hostile: DocumentDesign = {
       colors: { foreground: 'red', link: '#12345', border: 'url(x)', muted: '#00ff00;x' },
@@ -73,6 +73,7 @@ describe('document outputs: the default stays byte for byte', () => {
       expect(sha((await writeDocx(everyBlock(), { compress: false, design })).bytes)).toBe(
         DEFAULT_DOCX_SHA
       );
+      expect(sha((await writePdf(everyBlock(), { design })).bytes)).toBe(compressed);
     }
   });
 });
