@@ -1,7 +1,8 @@
 /**
  * Build-time CSP for the static website. Each page gets enforcing and
  * report-only response-header hashes for exactly the inline scripts, styles,
- * and server-rendered style attributes in its finished HTML. The build writes
+ * and server-rendered style attributes in its finished HTML, plus the styles
+ * its components inject at runtime (read from the built chunks it loads). The build writes
  * those policies twice: `dist/_headers` (Cloudflare Pages shape) and
  * `dist/csp-manifest.json` (host-neutral, one entry per route) so any static
  * host can apply them without re-parsing the HTML. The hosting adapter must
@@ -107,11 +108,111 @@ export function trustedTypesPolicies(html: string): string[] {
 export interface PagePolicyOptions {
   /** Extra `connect-src` origins (the configured agent service, on the agent chat page only). */
   connect?: readonly string[];
+  /**
+   * The CSS of `<style>` elements the page's scripts inject at runtime (see
+   * {@link injectedStyleGraph}): hashed into `style-src` with the inline ones.
+   */
+  injectedStyles?: readonly string[];
+}
+
+// ---------------------------------------------------------------------------
+// Styles injected at runtime
+
+/**
+ * Svelte components compiled with `<svelte:options css="injected" />` (the
+ * site's lazily loaded demo frames and stages, so their CSS ships with their
+ * chunk) append a `<style>` with their compiled CSS when they mount. That
+ * element is not in the finished HTML, so its hash must come from the built
+ * JavaScript: the compiler emits `{ hash: "svelte-…", code: "…" }`, and the
+ * `code` string is exactly the text the browser hashes.
+ */
+const INJECTED_CSS =
+  /\bhash:\s*(["'`])svelte-[a-z0-9]+\1\s*,\s*code:\s*(["'`])((?:\\[\s\S]|(?!\2)[^\\])*)\2/g;
+
+/** Relative module specifiers inside a built chunk (`"./x.js"`, static or `import()`). */
+const CHUNK_IMPORT = /["'`]\.\/([\w.$~-]+\.m?js)["'`]/g;
+
+/** Built chunks a page names in its HTML (scripts, islands, preloads). */
+const PAGE_CHUNK = /\/_astro\/([\w.$~-]+\.m?js)\b/g;
+
+/** Decodes the body of a JS string literal, as the minifier wrote it. */
+export function decodeJsString(body: string): string {
+  return body.replace(
+    /\\(u\{([0-9a-fA-F]+)\}|u([0-9a-fA-F]{4})|x([0-9a-fA-F]{2})|\r?\n|[\s\S])/g,
+    (whole, sequence: string, codePoint?: string, unit?: string, byte?: string) => {
+      const hex = codePoint ?? unit ?? byte;
+      if (hex) return String.fromCodePoint(Number.parseInt(hex, 16));
+      if (sequence === '\n' || sequence === '\r\n') return '';
+      const simple: Record<string, string> = {
+        n: '\n',
+        r: '\r',
+        t: '\t',
+        b: '\b',
+        f: '\f',
+        v: '\v',
+        '0': '\0',
+      };
+      if (sequence in simple) return simple[sequence] as string;
+      if (/^[0-9]$/.test(sequence)) throw new Error(`Unsupported escape ${whole} in injected CSS.`);
+      return sequence;
+    }
+  );
+}
+
+/** The CSS a chunk injects, and the chunks it imports (statically or lazily). */
+export interface InjectedChunk {
+  styles: string[];
+  imports: string[];
+}
+
+/** One chunk's injected CSS and imports, from its source text. */
+export function readInjectedChunk(code: string): InjectedChunk {
+  return {
+    styles: [...code.matchAll(INJECTED_CSS)].map((match) => decodeJsString(match[3] ?? '')),
+    imports: [...new Set([...code.matchAll(CHUNK_IMPORT)].map((match) => match[1] ?? ''))],
+  };
+}
+
+/**
+ * Every injected style a page can produce: the chunks its HTML names, and
+ * every chunk those reach through their imports. A page that never loads a
+ * component gets none of its hashes.
+ */
+export function pageInjectedStyles(
+  html: string,
+  chunks: ReadonlyMap<string, InjectedChunk>
+): string[] {
+  const seen = new Set<string>();
+  const queue = [...html.matchAll(PAGE_CHUNK)].map((match) => match[1] ?? '');
+  const styles = new Set<string>();
+  while (queue.length > 0) {
+    const name = queue.pop() as string;
+    if (seen.has(name)) continue;
+    seen.add(name);
+    const chunk = chunks.get(name);
+    if (!chunk) continue;
+    for (const style of chunk.styles) styles.add(style);
+    queue.push(...chunk.imports);
+  }
+  return [...styles];
+}
+
+/** Reads every chunk under `dist/_astro/` (empty when there is none). */
+export async function injectedStyleGraph(out: string): Promise<Map<string, InjectedChunk>> {
+  const dir = join(out, '_astro');
+  const chunks = new Map<string, InjectedChunk>();
+  if (!existsSync(dir)) return chunks;
+  for (const name of await readdir(dir)) {
+    if (!/\.m?js$/.test(name)) continue;
+    chunks.set(name, readInjectedChunk(await readFile(join(dir, name), 'utf8')));
+  }
+  return chunks;
 }
 
 /** Policy for one finished HTML document, including Astro's island boot code. */
 export function pagePolicy(html: string, options: PagePolicyOptions = {}): string {
-  const { scripts, styles, attributes } = pageSources(html);
+  const { scripts, attributes } = pageSources(html);
+  const styles = [...pageSources(html).styles, ...(options.injectedStyles ?? [])];
   return [
     "default-src 'none'",
     `script-src 'self' ${hashes(scripts)}`.trim(),
@@ -253,12 +354,18 @@ export function cspIntegration(): AstroIntegration {
         const reporting = reportEndpoint
           ? `\n  Reporting-Endpoints: ${reportingEndpointsHeader(reportEndpoint)}`
           : '';
+        const chunks = await injectedStyleGraph(out);
+        let injectedPages = 0;
         for (const file of files) {
           const route = pageRoute(out, file);
           const html = await readFile(file, 'utf8');
+          const injectedStyles = pageInjectedStyles(html, chunks);
+          if (injectedStyles.length > 0) injectedPages += 1;
           const sources = pageSources(html);
+          sources.styles.push(...injectedStyles);
           const policy = pagePolicy(html, {
             connect: agentConnectSources(html, process.env.PUBLIC_TEXULI_AGENT_URL),
+            injectedStyles,
           });
           const reportOnly = reportOnlyPolicy(policy, reportEndpoint);
           const rule = (path: string) =>
@@ -302,7 +409,7 @@ export function cspIntegration(): AstroIntegration {
           buildCspManifest(manifestPages, reportEndpoint)
         );
         logger.info(
-          `Enforcing and report-only CSP headers written for ${files.length} HTML pages, plus the csp-manifest.json host contract.`
+          `Enforcing and report-only CSP headers written for ${files.length} HTML pages (${injectedPages} also hash the styles their components inject at runtime), plus the csp-manifest.json host contract.`
         );
       },
     },

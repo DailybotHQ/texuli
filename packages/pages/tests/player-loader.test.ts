@@ -39,7 +39,11 @@ const DECK: DocumentBlock = {
   type: 'embed',
   kind: 'deck',
   title: 'Review',
-  inline: { meta: { title: 'Review' }, slides: [{ id: 's1', props: { title: 'Intro' } }] },
+  inline: {
+    formatVersion: 2,
+    meta: { title: 'Review' },
+    slides: [{ id: 's1', layout: 'title-hero', props: { title: 'Intro' } }],
+  },
 };
 const SHEET: DocumentBlock = {
   id: 'sheet',
@@ -98,16 +102,13 @@ const cores: [string, Mount][] = [
   ],
 ];
 
-/** The collab session's replica keeps no inline deck embed today, so its row checks the component only. */
-const withDeck = (name: string) => name !== 'CollabEditorCore';
-
 describe('the player seam (G123)', () => {
   it('shows the notice on every core component with no loader, and keeps references as they were', async () => {
     for (const [name, mount] of cores) {
       const { container } = mount({});
       const expected = [
         ['component', 'off'],
-        ...(withDeck(name) ? [['deck', 'off']] : []),
+        ['deck', 'off'],
         ['sheet', 'reference'],
       ];
       await waitFor(
@@ -119,7 +120,7 @@ describe('the player seam (G123)', () => {
         { timeout: 10_000 }
       );
       const notices = [...container.querySelectorAll('[data-player-off]')];
-      expect(notices.length, name).toBe(withDeck(name) ? 2 : 1);
+      expect(notices.length, name).toBe(2);
       expect(
         notices.every((notice) => notice.getAttribute('role') === 'note'),
         name
@@ -145,11 +146,7 @@ describe('the player seam (G123)', () => {
               item.getAttribute('data-player-stub')
             ),
             name
-          ).toEqual(
-            expect.arrayContaining(
-              withDeck(name) ? ['layout-page', 'layout-deck'] : ['layout-page']
-            )
-          ),
+          ).toEqual(expect.arrayContaining(['layout-page', 'layout-deck'])),
         { timeout: 10_000 }
       );
       expect(container.querySelector('[data-player-off]'), name).toBeNull();

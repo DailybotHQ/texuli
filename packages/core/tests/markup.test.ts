@@ -160,19 +160,43 @@ describe('core/markup: bounded work on hostile input', () => {
     expect(serializeHtml(el('p', {}, nested as never))).toBe('<p>deep</p>');
   });
 
-  it('escapes a megabyte of markup characters in linear time', () => {
-    const small = '<&>"\''.repeat(20_000);
-    const large = '<&>"\''.repeat(200_000);
-    const time = (value: string) => {
-      const start = performance.now();
-      serializeXml(el('p', { a: value }, value));
-      return performance.now() - start;
+  it('escapes a megabyte of markup characters in linear time', { retry: 2 }, () => {
+    // This thread's CPU time (ms), not wall-clock: time spent waiting for a
+    // core while parallel lanes run is not the escaper's cost. A single
+    // wall-clock N-to-10N ratio flaked under load (392 ms against 210 ms).
+    const cpu = () => {
+      const { user, system } = process.threadCpuUsage();
+      return (user + system) / 1000;
     };
-    time(small);
-    const smallTime = time(small);
-    const largeTime = time(large);
-    expect(largeTime).toBeLessThan(2_000);
-    expect(largeTime).toBeLessThan(Math.max(50, smallTime * 40));
+    const time = (value: string) => {
+      const start = cpu();
+      serializeXml(el('p', { a: value }, value));
+      return cpu() - start;
+    };
+    // Four doublings up to a megabyte, interleaved fastest-of-five so a spike
+    // hits every size alike; the growth exponent (least-squares slope of log
+    // time over log size) is about 1 when linear and 2 when quadratic.
+    const sizes = [25_000, 50_000, 100_000, 200_000];
+    const sources = sizes.map((count) => '<&>"\''.repeat(count));
+    const best = sizes.map(() => Number.POSITIVE_INFINITY);
+    for (let k = 0; k < 5; k += 1) {
+      for (const [i, source] of sources.entries())
+        best[i] = Math.min(best[i] as number, time(source));
+    }
+    const xs = sizes.map(Math.log);
+    const ys = best.map((ms) => Math.log(Math.max(ms, 0.05)));
+    const mx = xs.reduce((a, b) => a + b, 0) / xs.length;
+    const my = ys.reduce((a, b) => a + b, 0) / ys.length;
+    let sxy = 0;
+    let sxx = 0;
+    for (const [i, x] of xs.entries()) {
+      sxy += (x - mx) * ((ys[i] as number) - my);
+      sxx += (x - mx) ** 2;
+    }
+    const slope = sxy / sxx;
+    const detail = `${best.map((ms) => ms.toFixed(1)).join(' -> ')} ms CPU, slope ${slope.toFixed(2)}`;
+    expect(best[best.length - 1] as number, detail).toBeLessThan(2_000);
+    expect(slope, detail).toBeLessThan(1.5);
   });
 });
 

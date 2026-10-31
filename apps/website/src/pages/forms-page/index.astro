@@ -77,8 +77,7 @@ const formHost = createFormPlayerHost({ validators: { 'handle-free': checkHandle
         conditions over earlier answers, named formats, host validators and cross-field rules, with
         announced errors, drafts and autosave. Agents send the same schema as data. Everything below is
         live. <code>@texuli/forms</code> is in development and on npm from <code>{FORMS_RELEASE}</code>,
-        a pre-1.0 release. For hand-written forms with <code>Field</code> and
-        <code>Form</code>, read the <a href="/guides/forms/">forms guide</a>.
+        a pre-1.0 release. For hand-written forms with <code>Field</code> and <code>Form</code>, read the <a href="/guides/forms/">forms guide</a>.
       </p>
     </Fragment>
 
@@ -150,8 +149,8 @@ const formHost = createFormPlayerHost({ validators: { 'handle-free': checkHandle
       </div>
       <p class="fx-note">
         Plus a host validator by name (the handle check, asynchronous and abortable) and cross-field
-        rules as expressions (the trial must end after it starts). A field’s <code>messages</code>
-        override any rule’s text.
+        rules as expressions (the trial must end after it starts). A field’s <code>messages</code> override
+        any rule’s text.
       </p>
     </section>
 
@@ -173,8 +172,8 @@ const formHost = createFormPlayerHost({ validators: { 'handle-free': checkHandle
       <SourceDemo client:visible />
       <p class="fx-note">
         The form names nothing of the source: the host reads it and hands the form its choices and a
-        validator. <code>@texuli/core/data-source</code> ships in
-        <code>{FORMS_RELEASE}</code> too.
+        validator. <code>@texuli/core/data-source</code> ships
+        in <code>{FORMS_RELEASE}</code> too.
       </p>
     </section>
 
@@ -185,8 +184,8 @@ const formHost = createFormPlayerHost({ validators: { 'handle-free': checkHandle
         <div class="fx-panel">
           <h3>The blueprint the agent wrote</h3>
           <p class="fx-note">
-            Spec <code>0.8.0</code> adds the <code>schema-form</code> catalog id; it ships in the
-            <code>{FORMS_RELEASE}</code> release of <code>@texuli/spec</code>. Conditions travel as expression trees.
+            Spec <code>0.8.0</code> adds the <code>schema-form</code> catalog id; it ships in
+            the <code>{FORMS_RELEASE}</code> release of <code>@texuli/spec</code>. Conditions travel as expression trees.
           </p>
           <GuideCode code={AGENT_FORM_JSON} label="The schema-form blueprint (JSON)" lang="text" />
           <h3>The hostile field</h3>

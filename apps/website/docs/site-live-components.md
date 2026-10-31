@@ -31,7 +31,10 @@ props panel, live code sample, light/dark + RTL frame, and lazy mount.
   and a static router made each page collect every family's CSS.
 - Lazily loaded stages carry their styles (`<svelte:options css="injected" />`):
   Astro attaches a lazily imported component's CSS only to some pages, so
-  without it component pages lost the stages' own layout styles.
+  without it component pages lost the stages' own layout styles. The CSP
+  build hashes each injected `<style>` into the `style-src` of every page
+  that can load it ([site-csp.md](site-csp.md)); `tests/e2e/site-csp.spec.ts`
+  proves it in the browser.
 - Measured initial JS (gzip, chromium, 2026-10-23; dev = before this merge,
   merged = after):
 

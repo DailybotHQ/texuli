@@ -37,9 +37,11 @@ import {
   buildOpenApi,
   checkOpenApi,
   collectRefs,
+  EXAMPLE_LIST_ITEMS,
   type McpOperationFacts,
   type OpenApiFacts,
   resolvePointer,
+  sampleExample,
   toolSchemaName,
 } from '../src/lib/openapi.ts';
 import { webApiJsonLd } from '../src/lib/schema.ts';
@@ -300,6 +302,43 @@ describe('the OpenAPI document (openapi.ts)', () => {
     expect(
       checkOpenApi(doc as unknown as Record<string, unknown>, { ...allBuilt, expand: () => [] })
     ).toContain('/theme-data/{id}.json: no parameter values to check');
+  });
+
+  it('samples every example: each list cut short at any depth, every key kept', () => {
+    // A theme-shaped body: the real one is ~53 KB because of its role lists.
+    const roles = Array.from({ length: 40 }, (_, i) => ({ role: `role-${i}`, default: '#fff' }));
+    const cssVars = Object.fromEntries(roles.map(({ role }) => [`--tx-${role}`, '#fff']));
+    const theme = {
+      id: 'ocean',
+      name: 'Ocean',
+      light: { mode: 'light', roles, scales: [[1, 2, 3, 4]], cssVars },
+      dark: { mode: 'dark', roles },
+    };
+    expect(sampleExample(theme)).toEqual({
+      id: 'ocean',
+      name: 'Ocean',
+      light: {
+        mode: 'light',
+        roles: roles.slice(0, 2),
+        scales: [[1, 2]],
+        cssVars: { '--tx-role-0': '#fff', '--tx-role-1': '#fff' },
+      },
+      dark: { mode: 'dark', roles: roles.slice(0, 2) },
+    });
+    // A record keyed by route is cut; an object of fields keeps every field.
+    expect(sampleExample({ twins: { '/': '/index.md', '/a/': '/a.md', '/b/': '/b.md' } })).toEqual({
+      twins: { '/': '/index.md', '/a/': '/a.md' },
+    });
+    const fields = { a: 1, b: 2, c: 3, d: 4 };
+    expect(sampleExample(fields)).toEqual(fields);
+    const doc = buildOpenApi({ ...facts(), examples: { ThemeData: theme } }) as {
+      components: { examples: Record<string, { summary: string; value: unknown }> };
+    };
+    const example = doc.components.examples.ThemeData;
+    expect(example?.value).toEqual(sampleExample(theme));
+    expect(example?.summary).toContain(`first ${EXAMPLE_LIST_ITEMS} entries`);
+    // Sampling never touches the source body.
+    expect(theme.light.roles).toHaveLength(40);
   });
 
   it('builds the index and the health file from the same facts', () => {

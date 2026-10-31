@@ -59,7 +59,8 @@
       "site-ds-studio.spec.ts",
       "site-webmcp.spec.ts",
       "ssr.spec.ts",
-      "site-developers.spec.ts"
+      "site-developers.spec.ts",
+      "site-csp.spec.ts"
     ],
     [
       "csp.spec.ts",

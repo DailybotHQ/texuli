@@ -95,7 +95,10 @@ The view is the data grid's APG grid with one tab stop, arrow-key
 navigation, Enter or F2 to edit, Escape to cancel, undo and redo, and TSV
 copy and paste; columns are named by their letters, the first column holds
 row numbers, and the formula bar is a named group. Formula errors are
-announced. See [view](https://github.com/DailybotHQ/texuli/blob/main/packages/sheets/docs/view.md).
+announced. The cell editor loads lazily on the first Enter (or F2), so a
+host test awaits it before typing, for example
+`await screen.findByRole('textbox', { name: 'B' })` (the editor is named by
+its column letter). See [view](https://github.com/DailybotHQ/texuli/blob/main/packages/sheets/docs/view.md).
 
 ## License
 

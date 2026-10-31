@@ -87,8 +87,8 @@ import { Player } from '@texuli/player';
         A block editor, a reader, real pages and three export formats on one document engine. Every
         edit is an operation in one log, so undo, collaboration and agent patches share one history,
         and every document is validated before it paints. Both packages are in development and on npm
-        from <code>{DOCUMENTS_RELEASE}</code>, a pre-1.0 release; the previous release,
-        <code>0.6.0</code>, is without them.
+        from <code>{DOCUMENTS_RELEASE}</code>, a pre-1.0 release; the previous
+        release, <code>0.6.0</code>, is without them.
       </p>
       <ol class="pieces" aria-label="The pieces of the two document packages">
         {
@@ -198,10 +198,10 @@ import { Player } from '@texuli/player';
         </table>
       </div>
       <p class="demo__note">
-        Callout tones: {CALLOUT_TONES.join(', ')}. Content block families:
-        {BLOCK_FAMILIES.join(', ')}. Page sizes for the paged view and PDF: {PAGE_SIZES.join(', ')}.
-        The canvas has its own page: <a href="/canvas-page/">Canvas</a>; schema-driven forms are on
-        <a href="/forms-page/">Forms</a>.
+        Callout tones: {CALLOUT_TONES.join(', ')}. Content block
+        families: {BLOCK_FAMILIES.join(', ')}. Page sizes for the paged view and PDF: {PAGE_SIZES.join(', ')}.
+        The canvas has its own page: <a href="/canvas-page/">Canvas</a>; schema-driven forms are
+        on <a href="/forms-page/">Forms</a>.
       </p>
     </section>
 
@@ -223,9 +223,9 @@ import { Player } from '@texuli/player';
         <div class="demo__panel">
           <h3>The blueprint the agent wrote</h3>
           <p class="demo__note">
-            Spec <code>0.7.0</code> adds the <code>document</code> catalog id, an optional node
-            <code>key</code> and the <code>patchDocument</code> op. It ships in the
-            <code>{DOCUMENTS_RELEASE}</code> release of <code>@texuli/spec</code>.
+            Spec <code>0.7.0</code> adds the <code>document</code> catalog id, an optional
+            node <code>key</code> and the <code>patchDocument</code> op. It ships in
+            the <code>{DOCUMENTS_RELEASE}</code> release of <code>@texuli/spec</code>.
           </p>
           <GuideCode code={DOCUMENT_BLUEPRINT_JSON} label="The document blueprint (JSON)" lang="text" />
           <h3>The bounded patch</h3>
