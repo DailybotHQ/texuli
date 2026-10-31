@@ -15,17 +15,19 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
-- The packages are on npm in the 0.10 line: 7 at `0.10.0` (core, date,
-  deck, drag, document, primitives, spec) and 19 at `0.10.1` (the
-  G125–G127 fixes and their exact-pin dependents). The router, components,
-  install and build-ui references say so; the bumped in-development
-  packages read "on npm as `0.10.1`".
-- `router/packages.md` and `build-ui/references/imports.md` list the
-  `0.10.1` entries (`@texuli/tokens/library-ids`,
+- The packages are on npm in the 0.11 line, every one at `0.11.0`. The
+  router, components, install and build-ui references say so and pin
+  `^0.11.0`; the in-development packages read "on npm as `0.11.0`".
+- `router/packages.md` gains a "New in `0.11.0`" paragraph, and it and
+  `build-ui/references/imports.md` list the `0.11.0` entries
+  (`@texuli/tokens/library-ids`,
   `@texuli/tokens/design-system/compile-core`,
   `@texuli/player/design-system-core`, `loadDesignSystemCompilerCore`).
-- `upgrade/SKILL.md` gains "0.10.0 → 0.10.1": the `stage-core`,
-  `export-core`, `reader-core` and `host-core` loader props.
+- `upgrade/SKILL.md` gains "0.10 → 0.11: breaking changes": the
+  `stage-core`, `export-core`, `reader-core` and `host-core` loader
+  migrations, single-mode design systems that never throw,
+  `design-system-refused` from the player and pages cores, and
+  `DesignSystemProvider`'s `onapplyerror`.
 
 ## [0.3.5] — 2026-10-31
 
