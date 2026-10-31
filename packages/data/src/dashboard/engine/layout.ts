@@ -411,10 +411,47 @@ export function resizeItem(
 }
 
 /**
- * One keyboard step: moves a widget by `dx` columns and `dy` rows. With
- * vertical compaction a one-row step down can fall straight back, so the
- * step grows (up to the tallest widget plus one row) until the widget
- * really moves; it is refused with `edge` when it never does.
+ * The cells a keyboard step tries, nearest first: one column at a time to
+ * the grid edge sideways; one row at a time up to the tallest widget plus
+ * one, then the rows just past every widget in the way, vertically. So a
+ * step can always clear a wider (or taller, or locked) widget in its path.
+ */
+function nudgeTargets(
+  layout: DashboardLayout,
+  item: DashboardItem,
+  dx: number,
+  dy: number,
+  cols: number
+): { x: number; y: number }[] {
+  if (dy === 0) {
+    const cells: { x: number; y: number }[] = [];
+    for (let x = item.x + dx; x >= 0 && x + item.w <= cols; x += dx) cells.push({ x, y: item.y });
+    return cells;
+  }
+  let tallest = 1;
+  for (const other of layout) tallest = Math.max(tallest, other.h);
+  const rows = new Set<number>();
+  for (let step = 1; step <= tallest + 1; step += 1) rows.add(item.y + dy * step);
+  for (const other of layout) {
+    if (other.id === item.id) continue;
+    rows.add(dy > 0 ? other.y + other.h : other.y - item.h);
+  }
+  return [...rows]
+    .filter((y) => (dy > 0 ? y > item.y : y < item.y) && y >= 0 && y <= DASHBOARD_LIMITS.rows)
+    .sort((a, b) => (a - b) * dy)
+    .map((y) => ({ x: item.x + dx, y }));
+}
+
+/**
+ * One keyboard step: moves a widget by `dx` columns and `dy` rows. When the
+ * nearest cell does not really move it that way (with vertical compaction
+ * a step down can fall straight back above a wider widget), the step grows
+ * to the next cell, past the widgets in the way, and the result is always
+ * the layout `moveItem` gives for that cell. When no cell moves it that
+ * way but one swaps the widget it passes to its other side (with vertical
+ * compaction a narrower widget above can hold its row), that swap is the
+ * step. Refused with `edge` only when nothing changes: the grid edge, or
+ * (with vertical compaction) nothing left in its columns to pass.
  */
 export function nudgeItem(
   layout: DashboardLayout,
@@ -428,19 +465,29 @@ export function nudgeItem(
   const dx = Math.sign(delta.dx);
   const dy = Math.sign(delta.dy);
   if (dx === 0 && dy === 0) return { ok: false, reason: 'edge' };
-  let tallest = 1;
-  for (const other of layout) tallest = Math.max(tallest, other.h);
-  const steps = dy === 0 ? 1 : tallest + 1;
   let refusal: DashboardChange | null = null;
-  for (let step = 1; step <= steps; step += 1) {
-    const result = moveItem(layout, id, { x: item.x + dx * step, y: item.y + dy * step }, options);
+  let swap: DashboardChange | null = null;
+  for (const to of nudgeTargets(layout, item, dx, dy, clampColumns(options.columns))) {
+    const result = moveItem(layout, id, to, options);
     if (!result.ok) {
       refusal ??= result;
       continue;
     }
-    if (result.item.x !== item.x || result.item.y !== item.y) return result;
+    const movedX = Math.sign(result.item.x - item.x);
+    const movedY = Math.sign(result.item.y - item.y);
+    if ((dx === 0 || movedX === dx) && (dy === 0 || movedY === dy)) return result;
+    // Held on its row (a narrower widget above sets its floor) while the
+    // widget it passes swaps to the other side: a real move, keep it.
+    if (
+      dy !== 0 &&
+      movedY === 0 &&
+      (dx === 0 || movedX === dx) &&
+      !sameLayout(result.layout, layout)
+    ) {
+      swap ??= result;
+    }
   }
-  return refusal ?? { ok: false, reason: 'edge' };
+  return swap ?? refusal ?? { ok: false, reason: 'edge' };
 }
 
 /** Adds a widget at its own position, or first-fit when it has none, then compacts. */

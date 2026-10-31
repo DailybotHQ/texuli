@@ -140,6 +140,34 @@ describe('Dashboard keyboard', () => {
     expect(place(JSON.parse(bound))).toEqual(place(layout));
   });
 
+  it('moves a widget down past a wider one below it in one announced step (G122)', async () => {
+    const onLayoutChange = vi.fn();
+    const report = [
+      { id: 'revenue', title: 'Revenue', x: 0, y: 0, w: 8, h: 3 },
+      { id: 'signups', title: 'Signups', x: 8, y: 0, w: 4, h: 3 },
+      { id: 'funnel', title: 'Funnel', x: 0, y: 3, w: 12, h: 4 },
+    ];
+    const { container } = render(DashboardHarness, { props: { widgets: report, onLayoutChange } });
+    await settle();
+    const revenue = handle(container, 'revenue');
+    revenue.focus();
+    await fireEvent.keyDown(revenue, { key: 'Enter' });
+    await fireEvent.keyDown(revenue, { key: 'ArrowDown' });
+    await settle();
+    expect(status(container)).toBe('Revenue moved to column 1, row 8.');
+    await fireEvent.keyDown(handle(container, 'revenue'), { key: 'ArrowDown' });
+    await settle();
+    expect(status(container)).toBe('Cannot change Revenue: it is already at the edge.');
+    await fireEvent.keyDown(handle(container, 'revenue'), { key: 'Enter' });
+    await settle();
+    const [layout] = onLayoutChange.mock.calls[0] ?? [];
+    expect(place(layout)).toEqual({
+      signups: [8, 0, 4, 3],
+      funnel: [0, 3, 12, 4],
+      revenue: [0, 7, 8, 3],
+    });
+  });
+
   it('cancels with Escape and restores the widget', async () => {
     const onLayoutChange = vi.fn();
     const { container } = render(DashboardHarness, { props: { widgets, onLayoutChange } });
