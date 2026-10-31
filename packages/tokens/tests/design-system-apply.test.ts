@@ -98,7 +98,9 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe('applyDesignSystem', () => {
+// happy-dom re-parses ~310 custom properties per write, so these take
+// seconds under CI load; the real cost is measured in Chromium (tests/perf).
+describe('applyDesignSystem', { timeout: 20_000 }, () => {
   it('writes the whole variable map in one style write, with the allowlisted attributes and the scope', async () => {
     for (const [system, mode] of [
       [acme, 'light'],
@@ -303,7 +305,7 @@ describe('applyDesignSystem', () => {
   });
 });
 
-describe('designSystemStyle', () => {
+describe('designSystemStyle', { timeout: 20_000 }, () => {
   it('is the same declarations as apply, for a selector and the dark rule, escaped by construction', () => {
     const light = designSystemDeclarations(acme.vars.light ?? {});
     const dark = designSystemDeclarations(acme.vars.dark ?? {});

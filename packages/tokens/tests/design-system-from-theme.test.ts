@@ -84,7 +84,8 @@ describe('fromTheme: the zero-drift bridge', () => {
       expect.arrayContaining(['$.color.roles.light.primary', '$.shape.radius', '$.motion.easing'])
     );
     expect(validateDesignSystem(report.document).ok).toBe(true);
-  });
+    // 210 themes × 2 modes × 2 paths: about 2 s locally, slower under CI load.
+  }, 30_000);
 });
 
 /** A small seeded PRNG (mulberry32) so property runs are reproducible. */
