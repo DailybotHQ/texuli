@@ -24,7 +24,7 @@
 
 .tx-pages-collab__tools .tx-pages-action[aria-pressed="true"] {
   border-color: var(--tx-accent, Highlight);
-  background: var(--tx-accent-soft, var(--tx-muted, Canvas));
+  background: var(--tx-muted, Canvas);
 }
 
 .tx-pages-collab__body {
@@ -59,7 +59,7 @@
      client coordinates, which are physical in both directions. */
   left: 0;
   inline-size: 2px;
-  background: var(--tx-pages-caret-color, Highlight);
+  background: var(--tx-pages-caret-color, var(--tx-primary, Highlight));
 }
 
 .tx-pages-collab__caret-name {
@@ -68,7 +68,8 @@
   inset-inline-start: 0;
   padding-inline: var(--tx-space-1);
   /* Theme surface and text keep the contrast; the collaborator's color is the border. */
-  border: var(--tx-border-width-thin) solid var(--tx-pages-caret-color, Highlight);
+  border: var(--tx-border-width-thin) solid
+    var(--tx-pages-caret-color, var(--tx-primary, Highlight));
   border-inline-start-width: 3px;
   border-radius: var(--tx-shape-radius-sm);
   background: var(--tx-surface, Canvas);
@@ -253,7 +254,7 @@
   inline-size: 0.625rem;
   block-size: 0.625rem;
   border-radius: var(--tx-shape-radius-full);
-  background: var(--tx-pages-caret-color, Highlight);
+  background: var(--tx-pages-caret-color, var(--tx-primary, Highlight));
 }
 
 /* Highlights (CSS Custom Highlight API). */
@@ -272,7 +273,7 @@
 }
 
 ::highlight(tx-pages-suggest-delete) {
-  color: var(--tx-danger, firebrick);
+  color: var(--tx-destructive, CanvasText);
   text-decoration: line-through;
 }
 
