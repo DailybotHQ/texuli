@@ -493,7 +493,15 @@ export function createFormController(
   };
 
   /** Validate the current step, run the hook, and move one step forward. */
-  const advance = async (): Promise<FormSubmitOutcome> => {
+  let advancing: Promise<FormSubmitOutcome> | null = null;
+  // Calls made while a move is in flight share it, so a double click moves one step.
+  const advance = (): Promise<FormSubmitOutcome> => {
+    advancing ??= advanceOnce().finally(() => {
+      advancing = null;
+    });
+    return advancing;
+  };
+  const advanceOnce = async (): Promise<FormSubmitOutcome> => {
     stepError = null;
     const outcome = await controller.validateStep();
     if (!outcome.ok || position >= state.steps.length - 1) return outcome;

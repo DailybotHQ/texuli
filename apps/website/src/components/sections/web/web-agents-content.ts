@@ -9,7 +9,7 @@
  * word in both the cited file and this module's copy. Every agent surface
  * is a real file or page served by this site, and the install line states
  * the release truth from `docs/RELEASE.md`: the 0.11 line is out (`texuli`
- * is 0.11.0; `latest` and `next` name the newest), it is pre-1.0, and
+ * is 0.11.1; `latest` and `next` name the newest), it is pre-1.0, and
  * nothing stable is yet.
  */
 
@@ -140,7 +140,7 @@ export const WEB_AGENTS_SURFACES: readonly AgentsSurface[] = [
 export const WEB_AGENTS_INSTALL = {
   command: 'pnpm add texuli',
   note:
-    'Installs 0.11.0, a pre-1.0 release: under 0.x a new minor may contain breaking ' +
+    'Installs 0.11.1, a pre-1.0 release: under 0.x a new minor may contain breaking ' +
     'changes, so pin the version. 1.0.0 will be the first stable release.',
 } as const;
 

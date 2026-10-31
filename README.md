@@ -39,9 +39,11 @@ the same pieces are safe to hand to a machine.
 > **Status: in development, pre-1.0.** The screenshot above is the
 > texuli.com website, which deploys from `main` to Cloudflare Pages. The 26
 > published packages are released on npm in the 0.11 line,
-> every one at `0.11.0` (published by CI with provenance; `latest` and `next` point to
-> it); `0.10.0` added design systems and `0.11.0` adds the Protoyard gaps
-> G125–G127 and the Final Review fixes. It is not a stable release:
+> every one at `0.11.1` (published by CI with provenance; `latest` and `next` point to
+> it); `0.10.0` added design systems, `0.11.0` added the Protoyard gaps
+> G125–G127 and the Final Review fixes, and `0.11.1` is a patch (forms:
+> concurrent `next()` calls share one move; `applyDesignSystem` refuses a
+> variant on a base compile). It is not a stable release:
 > under 0.x a new minor may contain breaking changes, and 1.0.0 will be
 > the first stable release.
 > The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
