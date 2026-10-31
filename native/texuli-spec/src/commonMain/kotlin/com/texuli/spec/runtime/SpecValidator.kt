@@ -3,6 +3,7 @@ package com.texuli.spec.runtime
 import com.texuli.spec.BlueprintAction
 import com.texuli.spec.BlueprintActionOp
 import com.texuli.spec.BlueprintBinding
+import com.texuli.spec.BlueprintDesignSystemReference
 import com.texuli.spec.BlueprintEnvelope
 import com.texuli.spec.BlueprintFlow
 import com.texuli.spec.BlueprintNode
@@ -62,6 +63,7 @@ fun validateBlueprint(
     if (catalogHash != null && envelope.catalog != catalogHash) {
         out += SpecDiagnostic(SpecDiagnosticCode.CATALOG_MISMATCH, "\$.catalog", "The blueprint is bound to another catalog.")
     }
+    checkDesignSystem(envelope.designSystem, out)
     val state = checkStateDeclarations(envelope.state, out)
     val flow = checkFlow(envelope.flow, out)
     // The state surface's node rules, as the player refuses them at paint time.
@@ -78,6 +80,23 @@ fun validateBlueprint(
         sources,
     )
     return SpecValidation(ok = out.isEmpty(), diagnostics = out, warnings = warnings.ifEmpty { null })
+}
+
+/**
+ * Spec 0.10.0 (ADR-024): the envelope `designSystem` sets exactly one of
+ * `ref` (an exact `id@x.y.z` or `texuli:<theme>`) and `inline` (code
+ * `schema`, as in TypeScript). The inline document's own rules are the
+ * TypeScript design-system validator's; `DesignSystem.decode` reads it.
+ */
+fun checkDesignSystem(reference: BlueprintDesignSystemReference?, out: MutableList<SpecDiagnostic>) {
+    if (reference == null) return
+    val ref = reference.ref
+    if (ref != null && !SpecContract.DESIGN_SYSTEM_REF.matches(ref)) {
+        out += SpecDiagnostic(SpecDiagnosticCode.SCHEMA, "\$.designSystem.ref", "pattern: A design-system ref is an exact id@x.y.z or texuli:<theme>.")
+    }
+    if ((ref != null) == (reference.inline != null)) {
+        out += SpecDiagnostic(SpecDiagnosticCode.SCHEMA, "\$.designSystem", "one-of: A design system sets exactly one of ref and inline.")
+    }
 }
 
 // ---------------------------------------------------------------------------

@@ -1,0 +1,26 @@
+{
+  "golden": "brand-report",
+  "trace": [
+    {
+      "children": [
+        {
+          "id": "blocks-text",
+          "level": 2,
+          "name": "Summary",
+          "role": "heading"
+        },
+        {
+          "id": "blocks-text",
+          "role": "paragraph"
+        },
+        {
+          "id": "blocks-data",
+          "role": "group"
+        }
+      ],
+      "id": "layout-doc",
+      "name": "Delivery report, week 44",
+      "role": "main"
+    }
+  ]
+}
