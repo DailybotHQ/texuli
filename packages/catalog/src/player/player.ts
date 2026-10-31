@@ -27,6 +27,7 @@ export interface PlayerOptions
     | 'checkForm'
     | 'checkDesignSystem'
     | 'formValidators'
+    | 'formKinds'
     | 'limits'
     | 'frameRoots'
     | 'roles'
@@ -202,6 +203,7 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
       checkForm: options.checkForm,
       checkDesignSystem: options.checkDesignSystem,
       formValidators: options.formValidators,
+      ...(options.formKinds ? { formKinds: options.formKinds } : {}),
       limits: options.limits,
       frameRoots: options.frameRoots,
       roles: options.roles,

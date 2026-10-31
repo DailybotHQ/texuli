@@ -97,4 +97,30 @@ describe('SchemaForm on the server', () => {
     expect(html).toContain('data-tx-select-value');
     expect(html).toContain('Choose an option');
   }, 180_000);
+
+  it('renders lazy controls as placeholders by default and as controls with the static registry (G119)', async () => {
+    const schema = {
+      title: 'Booking',
+      fields: [
+        { name: 'day', type: 'date', label: 'Day' },
+        { name: 'level', type: 'slider', label: 'Level', min: 0, max: 5 },
+      ],
+    };
+    const host = (registry: boolean) => `<script lang="ts">
+import { SchemaForm } from ${JSON.stringify(`${SRC}/index.ts`)};
+import { validateFormSchema } from ${JSON.stringify(`${SRC}/model/index.ts`)};
+${registry ? `import { SCHEMA_FORM_CONTROLS } from ${JSON.stringify(`${SRC}/view/controls/index.ts`)};` : ''}
+const result = validateFormSchema(${JSON.stringify(schema)});
+if (!result.ok) throw new Error('invalid schema');
+</script>
+<SchemaForm form={result.form} id="booking"${registry ? ' controls={SCHEMA_FORM_CONTROLS}' : ''} />
+`;
+    const lazy = await serverRender(host(false));
+    expect(lazy).toContain('tx-forms__control-loading');
+    expect(lazy).toContain('Day');
+    const eager = await serverRender(host(true));
+    expect(eager).not.toContain('tx-forms__control-loading');
+    expect(eager).toContain('role="slider"');
+    expect(eager).toContain('id="booking-field-day"');
+  }, 240_000);
 });

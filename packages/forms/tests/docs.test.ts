@@ -20,6 +20,7 @@ const SUBPATH_DOCS: Record<string, { doc: string; entry?: string; component?: st
     component: 'src/view/SchemaForm.svelte',
   },
   './model': { doc: 'docs/model.md', entry: 'src/model/index.ts' },
+  './controls': { doc: 'docs/controls.md', entry: 'src/view/controls/index.ts' },
   './host': { doc: 'docs/host.md', entry: 'src/host/index.ts' },
   './styles.css': { doc: 'docs/styles.md' },
 };

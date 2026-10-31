@@ -141,7 +141,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       },
       {
         name: '@texuli/forms',
-        role: 'In development (on npm from 0.8.0): schema-driven forms: the closed form schema and its validator, conditional logic and cross-field rules on @texuli/core/expression, named formats, drafts and autosave, and the form controller (model, framework-free); SchemaForm, which paints any schema with texuli controls, multi-step and keyboard-complete (.); the player form host (host)',
+        role: 'In development (on npm from 0.8.0): schema-driven forms: the closed form schema and its validator, conditional logic and cross-field rules on @texuli/core/expression, named formats, drafts and autosave, and the form controller (model, framework-free); SchemaForm, which paints any schema with texuli controls (loading the heavier ones per field type), multi-step and keyboard-complete (.); the static control registry for server rendering (controls); the player form host (host)',
         dependsOn: ['core', 'texuli'],
       },
       {

@@ -14,6 +14,8 @@ export {
   type FormDraftStorage,
   type FormState,
   type FormStatus,
+  type FormStepContext,
+  type FormStepResult,
   type FormStepState,
   type FormSubmission,
   type FormSubmitOutcome,
@@ -21,7 +23,12 @@ export {
   type FormTimers,
   type FormValidator,
 } from './controller.ts';
-export { matchesFormat } from './formats.ts';
+export {
+  type FormatFormValueOptions,
+  formatFormValue,
+  formValuesToMarkdown,
+} from './format-values.ts';
+export { type FormatOptions, matchesFormat } from './formats.ts';
 export {
   type CompiledField,
   type CompiledForm,
@@ -38,18 +45,23 @@ export {
   FORM_FIELD_TYPES,
   FORM_FORMATS,
   FORM_ID,
+  FORM_KIND,
   FORM_LIMITS,
   FORM_NAME,
+  FORM_PASSWORD_AUTOCOMPLETE,
   FORM_RESERVED_NAMES,
   FORM_RULE_NAMES,
+  FORM_URL_PROTOCOLS,
   FORM_VALIDATOR_NAME,
   type FormAutocomplete,
   type FormField,
   type FormFieldType,
   type FormFile,
   type FormFormat,
+  type FormJsonValue,
   type FormLink,
   type FormOption,
+  type FormPasswordAutocomplete,
   type FormRule,
   type FormRuleName,
   type FormSchema,
@@ -57,6 +69,7 @@ export {
   type FormSchemaIssueCode,
   type FormSection,
   type FormStep,
+  type FormUrlProtocol,
   type FormValue,
   type FormValues,
   type FormWhen,
@@ -74,4 +87,11 @@ export {
   submittedValues,
   validateFormValues,
 } from './validate.ts';
-export { coerceValue, emptyValue, expressionTypeOf, isEmptyValue } from './values.ts';
+export {
+  coerceValue,
+  emptyValue,
+  expressionTypeOf,
+  isEmptyValue,
+  isoDateTime,
+  isSecretType,
+} from './values.ts';

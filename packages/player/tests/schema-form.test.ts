@@ -66,8 +66,9 @@ describe('schema-form in the player', () => {
     ).toBe('register-attendee');
     expect(screen.getByRole('heading', { name: 'About you' })).toBeTruthy();
     expect(screen.getByRole('textbox', { name: /Full name/ })).toBeTruthy();
+    // The step navigation loads with the form's first multi-step paint (G119).
     expect(
-      screen.getByRole('navigation', { name: 'Community day registration progress' })
+      await screen.findByRole('navigation', { name: 'Community day registration progress' })
     ).toBeTruthy();
   });
 

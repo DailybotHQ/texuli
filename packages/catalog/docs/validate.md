@@ -255,7 +255,12 @@ pattern or code. The `forms` check runs the host's `checkForm`
 field type, unique names and ids, options and defaults, ranges, help links
 through the URL policy, and conditions that read only earlier fields. With
 `formValidators` (the names of the validators the host registered) a
-field's `validator` must name one of them. Injected like `checkDocument`,
+field's `validator` must name one of them; `formKinds` (the custom field
+kinds the host paints, new in 0.10.0) is passed as the check's fourth
+argument, and at the `untrusted` tier a `custom` field must name one of
+them (refused with `kind` otherwise). `checkFormDraft` also refuses
+`password` and `otp` fields at that tier; a host that allows them passes
+its own check (`createFormPlayerHost({ credentials: true }).checkForm`). Injected like `checkDocument`,
 so `@texuli/catalog/validate` never bundles the forms runtime. **Without
 `checkForm` every `schema-form` node fails with `form-unchecked`**; a
 throwing check fails closed (`form-schema`). Issues report as

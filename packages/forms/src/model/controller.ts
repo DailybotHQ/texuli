@@ -10,7 +10,7 @@ import {
   submittedValues,
   validateFormValues,
 } from './validate.ts';
-import { coerceValue, emptyValue } from './values.ts';
+import { coerceValue, emptyValue, isSecretType } from './values.ts';
 
 /*
  * A framework-free form controller: values, touched fields, errors, the
@@ -60,6 +60,26 @@ export type FormSubmitResult =
       readonly message?: string;
     };
 
+/**
+ * What `onStep` may return: nothing or `{ ok: true }` moves on; `{ ok: false }`
+ * blocks the step, with errors by field name and/or a message for the step.
+ */
+export type FormStepResult = FormSubmitResult;
+
+/** What `onStep` receives when a step validated and the person moves forward. */
+export interface FormStepContext {
+  /** The step being left. */
+  readonly step: FormStepState;
+  /** Its position among the visible steps. */
+  readonly position: number;
+  /** The visible, enabled answers of this step. */
+  readonly values: FormValues;
+  /** Every visible, enabled answer so far. */
+  readonly allValues: FormValues;
+  /** Aborted when the controller is destroyed or reset. */
+  readonly signal: AbortSignal;
+}
+
 export interface FormSubmission {
   /** Visible, enabled fields only. */
   readonly values: FormValues;
@@ -83,6 +103,29 @@ export interface FormControllerOptions {
   readonly now?: () => number;
   /** Timer functions (tests pass fakes). Default `setTimeout` and `clearTimeout`. */
   readonly timers?: FormTimers;
+  /**
+   * Validators of `custom` fields, keyed by field name or by kind (the name
+   * wins), sync or async. They run after `required`, like a named
+   * `validator` (which, when the field also names one, runs after them).
+   */
+  readonly customValidators?: Readonly<Record<string, FormValidator>>;
+  /**
+   * The whole form is disabled: views disable every control and action.
+   * Presentation only: the API (setValue, submit) still works, and the
+   * fields' values are still submitted. Change it with `setDisabled`.
+   */
+  readonly disabled?: boolean;
+  /** The whole form is read-only (views show values without editing). Change it with `setReadOnly`. */
+  readonly readOnly?: boolean;
+  /**
+   * Runs when a step validated and the person moves forward (Next, or a
+   * later step in the progress), sync or async; `{ ok: false }` blocks the
+   * move with field errors and/or a step message. Not run on the last step:
+   * submitting goes to `onSubmit`.
+   */
+  readonly onStep?: (
+    context: FormStepContext
+  ) => FormStepResult | undefined | Promise<FormStepResult | undefined>;
 }
 
 export type FormStatus = 'editing' | 'validating' | 'submitting' | 'submitted' | 'failed';
@@ -113,6 +156,12 @@ export interface FormState {
   readonly pending: Readonly<Record<string, true>>;
   readonly draft: { readonly status: FormDraftStatus; readonly savedAt: number | null };
   readonly submitCount: number;
+  /** The form-level disabled flag. */
+  readonly disabled: boolean;
+  /** The form-level read-only flag. */
+  readonly readOnly: boolean;
+  /** A message from `onStep` that blocked the current step, or `null`. */
+  readonly stepError: string | null;
 }
 
 export type FormSubmitOutcome =
@@ -144,6 +193,10 @@ export interface FormController {
   saveDraft(): Promise<void>;
   clearDraft(): Promise<void>;
   reset(values?: Readonly<Record<string, unknown>>): void;
+  /** Disable or enable the whole form (see `FormControllerOptions.disabled`). */
+  setDisabled(disabled: boolean): void;
+  /** Make the whole form read-only or editable again. */
+  setReadOnly(readOnly: boolean): void;
   destroy(): void;
 }
 
@@ -164,6 +217,7 @@ export function createFormController(
   const timers = options.timers ?? DEFAULT_TIMERS;
   const messages: FormMessages = { ...DEFAULT_FORM_MESSAGES, ...options.messages };
   const validators = options.validators ?? {};
+  const customValidators = options.customValidators ?? {};
   const drafts = options.drafts;
   const debounce = Math.max(0, drafts?.debounceMs ?? 800);
 
@@ -189,6 +243,10 @@ export function createFormController(
   let draftStatus: FormDraftStatus = 'none';
   let savedAt: number | null = null;
   let submitCount = 0;
+  let disabled = options.disabled === true;
+  let readOnly = options.readOnly === true;
+  let stepError: string | null = null;
+  let stepRun: AbortController | null = null;
   let logic = computeFormLogic(form, values, { now });
   let state: FormState;
   let saveTimer: unknown = null;
@@ -223,6 +281,9 @@ export function createFormController(
       pending: Object.freeze({ ...pending }),
       draft: Object.freeze({ status: draftStatus, savedAt }),
       submitCount,
+      disabled,
+      readOnly,
+      stepError,
     });
   };
 
@@ -256,8 +317,9 @@ export function createFormController(
     }
     const kept: Record<string, FormValue> = {};
     for (const { field } of form.fields) {
-      // Files never go into drafts: the host owns them.
-      if (field.type !== 'file') kept[field.name] = values[field.name] as FormValue;
+      // Files never go into drafts (the host owns them), nor do credentials.
+      if (field.type !== 'file' && !isSecretType(field.type))
+        kept[field.name] = values[field.name] as FormValue;
     }
     const draft: FormDraft = Object.freeze({
       format: 'texuli-form-draft',
@@ -278,14 +340,26 @@ export function createFormController(
     emit();
   }
 
+  const own = (record: Readonly<Record<string, FormValidator>>, key: string | undefined) =>
+    key !== undefined && Object.hasOwn(record, key) ? record[key] : undefined;
+
+  /** The host validators of a field, in order; `null` marks a named one that is missing. */
+  const validatorsOf = (name: string): (FormValidator | null)[] => {
+    const field = form.byName.get(name)?.field;
+    if (!field) return [];
+    const out: (FormValidator | null)[] = [];
+    if (field.type === 'custom') {
+      const custom = own(customValidators, name) ?? own(customValidators, field.kind);
+      if (custom) out.push(custom);
+    }
+    if (field.validator !== undefined) out.push(own(validators, field.validator) ?? null);
+    return out;
+  };
+
   const runValidator = async (name: string): Promise<string | null> => {
-    const entry = form.byName.get(name);
-    const validatorName = entry?.field.validator;
-    if (!entry || !validatorName) return null;
-    const validator = Object.hasOwn(validators, validatorName)
-      ? validators[validatorName]
-      : undefined;
-    if (!validator) return messages.validatorMissing;
+    const list = validatorsOf(name);
+    if (list.length === 0) return null;
+    if (list.includes(null)) return messages.validatorMissing;
     running.get(name)?.abort();
     const controller = new AbortController();
     running.set(name, controller);
@@ -293,12 +367,18 @@ export function createFormController(
     emit();
     let message: string | null = null;
     try {
-      const result = await validator(values[name] as FormValue, {
-        name,
-        values,
-        signal: controller.signal,
-      });
-      message = typeof result === 'string' && result.length > 0 ? result.slice(0, 300) : null;
+      for (const validator of list as FormValidator[]) {
+        const result = await validator(values[name] as FormValue, {
+          name,
+          values,
+          signal: controller.signal,
+        });
+        if (typeof result === 'string' && result.length > 0) {
+          message = result.slice(0, 300);
+          break;
+        }
+        if (controller.signal.aborted) break;
+      }
     } catch {
       message = controller.signal.aborted ? null : messages.validatorFailed;
     }
@@ -326,7 +406,7 @@ export function createFormController(
     const async = scope.filter(
       (name) =>
         !found[name] &&
-        form.byName.get(name)?.field.validator !== undefined &&
+        validatorsOf(name).length > 0 &&
         logic.fields[name]?.visible &&
         logic.fields[name]?.enabled
     );
@@ -362,6 +442,68 @@ export function createFormController(
   };
 
   const stepNames = (index: number) => stepFields(form, index, logic);
+
+  /** Run `onStep` for the current step; `null` when it lets the person move on. */
+  const runStepHook = async (): Promise<FormSubmitOutcome | null> => {
+    if (!options.onStep) return null;
+    const current = state.steps[position];
+    if (!current) return null;
+    stepRun?.abort();
+    const run = new AbortController();
+    stepRun = run;
+    const all = submittedValues(form, values, logic);
+    const mine: Record<string, FormValue> = {};
+    for (const name of stepNames(current.index)) {
+      if (Object.hasOwn(all, name)) mine[name] = all[name] as FormValue;
+    }
+    status = 'validating';
+    emit();
+    let result: FormStepResult | undefined;
+    try {
+      result = await options.onStep({
+        step: current,
+        position,
+        values: Object.freeze(mine),
+        allValues: all,
+        signal: run.signal,
+      });
+    } catch {
+      result = { ok: false, message: messages.stepFailed };
+    }
+    if (stepRun === run) stepRun = null;
+    if (status === 'validating') status = 'editing';
+    if (run.signal.aborted || destroyed) {
+      return { ok: false, errors: {}, formErrors: [], firstInvalid: null };
+    }
+    if (result?.ok !== false) return null;
+    const found: Record<string, string> = {};
+    for (const [name, message] of Object.entries(result.errors ?? {})) {
+      if (form.byName.has(name) && typeof message === 'string') found[name] = message.slice(0, 300);
+    }
+    errors = { ...errors, ...found };
+    stepError = typeof result.message === 'string' ? result.message.slice(0, 300) : null;
+    if (Object.keys(found).length === 0 && stepError === null) stepError = messages.stepFailed;
+    emit();
+    return Object.freeze({
+      ok: false,
+      errors: Object.freeze(found),
+      formErrors: Object.freeze(stepError ? [stepError] : []),
+      firstInvalid: form.fields.find((entry) => found[entry.field.name])?.field.name ?? null,
+    });
+  };
+
+  /** Validate the current step, run the hook, and move one step forward. */
+  const advance = async (): Promise<FormSubmitOutcome> => {
+    stepError = null;
+    const outcome = await controller.validateStep();
+    if (!outcome.ok || position >= state.steps.length - 1) return outcome;
+    const blocked = await runStepHook();
+    if (blocked) return blocked;
+    position += 1;
+    emit();
+    scheduleSave();
+    return outcome;
+  };
 
   const controller: FormController = {
     form,
@@ -401,18 +543,11 @@ export function createFormController(
       emit();
       return outcome;
     },
-    async next() {
-      const outcome = await controller.validateStep();
-      if (outcome.ok && position < state.steps.length - 1) {
-        position += 1;
-        emit();
-        scheduleSave();
-      }
-      return outcome;
-    },
+    next: advance,
     back() {
       if (position > 0) {
         position -= 1;
+        stepError = null;
         emit();
         scheduleSave();
       }
@@ -421,11 +556,13 @@ export function createFormController(
       const last = state.steps.length - 1;
       const to = Math.max(0, Math.min(last, Math.floor(target)));
       while (position < to) {
-        const outcome = await controller.validateStep();
+        const outcome = await advance();
         if (!outcome.ok) return false;
-        position += 1;
       }
-      if (position > to) position = to;
+      if (position > to) {
+        position = to;
+        stepError = null;
+      }
       emit();
       scheduleSave();
       return true;
@@ -500,7 +637,12 @@ export function createFormController(
       }
       const restored: Record<string, FormValue> = { ...values };
       for (const { field } of form.fields) {
-        if (field.type === 'file' || !Object.hasOwn(raw.values, field.name)) continue;
+        if (
+          field.type === 'file' ||
+          isSecretType(field.type) ||
+          !Object.hasOwn(raw.values, field.name)
+        )
+          continue;
         const value = coerceValue(field, raw.values[field.name]);
         if (value !== undefined) restored[field.name] = value;
       }
@@ -542,12 +684,25 @@ export function createFormController(
       pending = {};
       position = 0;
       status = 'editing';
+      stepError = null;
+      stepRun?.abort();
       recalculate();
       emit();
       scheduleSave();
     },
+    setDisabled(next) {
+      if (disabled === (next === true)) return;
+      disabled = next === true;
+      emit();
+    },
+    setReadOnly(next) {
+      if (readOnly === (next === true)) return;
+      readOnly = next === true;
+      emit();
+    },
     destroy() {
       destroyed = true;
+      stepRun?.abort();
       if (saveTimer !== null) timers.clear(saveTimer);
       for (const run of running.values()) run.abort();
       running.clear();

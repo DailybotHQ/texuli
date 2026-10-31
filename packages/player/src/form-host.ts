@@ -66,6 +66,12 @@ export interface FormPlayerHost {
    */
   validators?: readonly string[];
   /**
+   * The custom field kinds this host paints (G113). Validation passes them
+   * on, so a draft may declare a `custom` field only of one of these kinds;
+   * without them every custom field is refused at the untrusted tier.
+   */
+  customKinds?: readonly string[];
+  /**
    * Paint the form into `request.target`. May return a cleanup; the player
    * calls it when the node, its schema, the tier or the host changes, and
    * on destroy, and only then presents again.

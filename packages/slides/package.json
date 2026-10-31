@@ -53,6 +53,10 @@
       "types": "./src/export/index.ts",
       "default": "./src/export/index.ts"
     },
+    "./export-core": {
+      "types": "./src/export/core.ts",
+      "default": "./src/export/core.ts"
+    },
     "./templates": {
       "types": "./src/templates/index.ts",
       "default": "./src/templates/index.ts"

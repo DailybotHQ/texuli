@@ -195,6 +195,10 @@ scoped styles.
   exports the same names as `@texuli/slides/stage` except `DeckStage`,
   `DeckPrint`, `DECK_DEFAULT_RENDERERS_SOURCE`, `loadDefaultDeckRenderers`
   and `loadedDefaultDeckRenderers` (a test keeps the two lists in step).
+  To print from such a host, use `DeckPrintViewCore` from
+  `@texuli/slides/export-core` (G105), which takes the same `defaults`
+  source and references no default table either
+  ([export.md](export.md#export-core-texulislidesexport-core-g105)).
 
   ```svelte
   <script lang="ts">

@@ -7,6 +7,7 @@ import { render, screen, waitFor } from '@testing-library/svelte';
 import type { DeckSlide } from '@texuli/deck/model';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createDeckPrintPaint } from '../src/export/print-paint.ts';
+import { DECK_PRINT_DEFAULTS } from '../src/export/print-preload.ts';
 import DeckStage from '../src/stage/DeckStage.svelte';
 import { DEFAULT_DECK_RENDERERS } from '../src/stage/default-renderers.ts';
 import { loadedDefaultDeckRenderers } from '../src/stage/defaults.ts';
@@ -56,6 +57,7 @@ describe('lazy default renderers and block checks', () => {
       expect(quote()?.querySelector('[data-tx-deck-placeholder="quote"]')).toBeTruthy();
       const paint = await createDeckPrintPaint(layoutDeck as never, {
         defaultRenderers: false,
+        defaults: DECK_PRINT_DEFAULTS,
         loadTheme: null,
       });
       expect(paint.paint.renderers).toEqual([]);
@@ -79,11 +81,19 @@ describe('lazy default renderers and block checks', () => {
       expect(stageRoot()?.getAttribute('aria-busy')).toBeNull();
       expect(quote()?.querySelector('[data-tx-deck-placeholder]')).toBeNull();
       const host: DeckRenderers = { custom: () => null };
+      // DeckPrintView's source reads the stage's tables (one shared import).
       const paint = await createDeckPrintPaint(layoutDeck as never, {
         renderers: host,
+        defaults: DECK_PRINT_DEFAULTS,
         loadTheme: null,
       });
       expect(paint.paint.renderers).toEqual([host, ...DEFAULT_DECK_RENDERERS]);
+      // The export core's painter has no source: the host's tables only (G105).
+      const core = await createDeckPrintPaint(layoutDeck as never, {
+        renderers: host,
+        loadTheme: null,
+      });
+      expect(core.paint.renderers).toEqual([host]);
     });
   });
 
