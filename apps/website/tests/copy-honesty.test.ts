@@ -63,7 +63,7 @@ const BANNED: readonly { phrase: RegExp; why: string }[] = [
   { phrase: /production[- ]ready/i, why: 'nothing is released as stable' },
   {
     phrase: /Nothing is on npm/i,
-    why: 'every published package is on npm as 0.10.0, and the site is deployed',
+    why: 'every published package is on npm in the 0.10 line, and the site is deployed',
   },
   {
     phrase: /\b0\.1\.0\b/,
@@ -76,7 +76,7 @@ const BANNED: readonly { phrase: RegExp; why: string }[] = [
   },
   {
     phrase: /texuli(?:\/[a-z-]+)?@next\b/,
-    why: 'install plainly: latest and next both name 0.10.0',
+    why: 'install plainly: latest and next name the newest of the 0.10 line',
   },
   {
     phrase: /not released yet/i,
