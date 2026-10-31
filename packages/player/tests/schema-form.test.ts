@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { createFormPlayerHost } from '../../forms/src/host/index.ts';
 import { formActionValues } from '../src/form-values.ts';
 import Player from '../src/Player.svelte';
@@ -52,6 +52,13 @@ async function painted(container: HTMLElement): Promise<void> {
 }
 
 describe('schema-form in the player', () => {
+  // The form host paints through a lazily imported SchemaForm. Load it once
+  // up front so each findByRole below waits for the render, not for a cold
+  // module transform that can outlast its 1 s window under parallel load.
+  beforeAll(async () => {
+    await import('../../forms/src/view/SchemaForm.svelte');
+  }, 30_000);
+
   it('paints the form-registration golden as a named form with its first step', {
     timeout: 30_000,
   }, async () => {
