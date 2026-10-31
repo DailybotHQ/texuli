@@ -56,6 +56,14 @@ URL, and `siteSitemap` writes the sitemap from the same model
 of content blocks (`parseTexuliBlocks`), so page content never reaches an
 HTML sink.
 
+**Always load `@texuli/tokens/base.css`** (once, before any component). Since
+`0.9.0` component CSS reads the system tokens (the space unit, control and
+icon sizes, shape radii and type roles of `@texuli/tokens/system`) with no
+fallback, and a theme does not declare them: an app with its own reset that skips `base.css`
+renders controls with no size. From `0.10.0` (not on npm yet), such an app can
+load `@texuli/tokens/system.css` instead: the system token defaults alone,
+with no reset.
+
 Import each component through its subpath:
 
 ```svelte
