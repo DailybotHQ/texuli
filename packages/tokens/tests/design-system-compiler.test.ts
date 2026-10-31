@@ -551,3 +551,40 @@ describe('component tokens map through the registry', () => {
     for (const name of names) expect(light[name], name).toBe(light[expected[name] as string]);
   });
 });
+
+describe('compileDesignSystem: partial data-viz palettes', () => {
+  it('fills the lists a document leaves out from the derived palette instead of throwing', () => {
+    const categorical = [
+      '#6d28d9',
+      '#0891b2',
+      '#ca8a04',
+      '#16a34a',
+      '#dc2626',
+      '#db2777',
+      '#4f46e5',
+      '#64748b',
+    ];
+    const full = ok(compileDesignSystem(minimal));
+    const partial = ok(
+      compileDesignSystem(
+        doc({
+          color: {
+            brand: { seed: '#4f46e5' },
+            dataViz: { light: { categorical, grid: '#e2e8f0' } },
+          },
+        })
+      )
+    );
+    categorical.forEach((color, i) => {
+      expect(partial.vars.light?.[`--tx-chart-${i + 1}`]).toBe(color);
+    });
+    expect(partial.vars.light?.['--tx-chart-grid']).toBe('#e2e8f0');
+    for (const name of [
+      '--tx-chart-sequential-1',
+      '--tx-chart-diverging-9',
+      '--tx-chart-axis',
+    ] as const)
+      expect(partial.vars.light?.[name]).toBe(full.vars.light?.[name]);
+    expect(partial.vars.dark).toEqual(full.vars.dark);
+  });
+});

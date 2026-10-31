@@ -3,8 +3,9 @@
 > **Status: in development for `0.10.0`, not on npm.** Both subpaths exist on
 > the `release/0.10.0` branch and ship only with `@texuli/tokens@0.10.0`. The
 > runtime is [design-system-runtime.md](design-system-runtime.md); the
-> emitters, the importers, the published fixtures subpath, `texuli ds check`
-> and the MCP `ds.*` operations are **planned** (later PLAN_011 tasks).
+> importers, emitters, report, diff and fixtures are built on the same branch
+> ([design-system-io.md](design-system-io.md)). `texuli ds check` and the MCP
+> `ds.*` operations are **planned** (later PLAN_011 tasks).
 
 The compiler turns a design-system document
 ([`@texuli/spec/design-system`](../../spec/docs/design-system.md), ADR-021)
@@ -113,8 +114,9 @@ without the compiler or the color engine.
 5. `color.status.*` sets the status fills; a status on-color that fails is
    replaced by a readable one. `color.dataViz.<mode>` sets the chart
    palette; without it, the palette is derived from the solved colors (as
-   `dataVizVariables` does), and `cvdSafe: true` reports color-vision
-   conflicts as warnings.
+   `dataVizVariables` does), and a palette that sets only some lists takes
+   the rest from the derived one. `cvdSafe: true` reports color-vision
+   conflicts of a derived palette as warnings.
 
 Every move is in `report.adjustments` with the field that caused it. A pair
 that still fails involves only pins; it is refused as `aa-text` (or

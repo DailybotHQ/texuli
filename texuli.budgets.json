@@ -568,6 +568,26 @@
       "gzip": 32064,
       "note": "PLAN_011 T-ds-compiler (ADR-021, ADR-022; owner-approved new row): the lazy design-system compiler: extends resolution, variants and patches, the pinned-color contrast solver over the seed generator, guarantees, concrete variables per mode, fontFaces, assets, report and the SHA-256 hash. It bundles the @texuli/spec/design-system validator (about 7 KB) and the system token families; library themes for texuli:<id> load in lazy chunks (21.9 KB, not counted). Loaded only by the studio, CLI, builds and MCP; the @texuli/tokens root never imports it. Measured 30,780 B, cap = measured + 4% rounded up to 64 B."
     },
+    "@texuli/tokens/design-system/diff": {
+      "gzip": 3584,
+      "note": "PLAN_011 T-ds-io (owner-approved new row): the lazy diff of two compiled design systems: variables per mode, contrast regressions against the baseline target (over evaluateDesignSystemContrast), component defaults and attributes, in a stable order. Used by the CLI, the MCP and PR review. The @texuli/tokens root never imports it (root unchanged at 40,820 B). Measured 3,394 B, cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/tokens/design-system/emit": {
+      "gzip": 4352,
+      "note": "PLAN_011 T-ds-io (owner-approved new row): the lazy text emitters: scoped CSS (selector, :root, .dark/attribute/media), the Tailwind preset (object and JSON), compiled JSON, and the document-side DTCG, Tokens Studio and flat role palette emitters (lossless inverses of the importers). Compiled values are re-checked before they are written. The @texuli/tokens root never imports it (root unchanged at 40,820 B). Measured 4,126 B, cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/tokens/design-system/fixtures": {
+      "gzip": 2816,
+      "note": "PLAN_011 T-ds-io (owner-approved new row): the fictional protoyard-theme/v1-shaped palette, DTCG and Tokens Studio fixtures, published so Protoyard's adapter tests run against the same files Texuli proves losslessness with (architecture B.13). Test data only. The @texuli/tokens root never imports it (root unchanged at 40,820 B). Measured 2,693 B, cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/tokens/design-system/import": {
+      "gzip": 27072,
+      "note": "PLAN_011 T-ds-io (owner-approved new row): the lazy importers (brand one-liner, W3C DTCG, Tokens Studio, flat role palette, Texuli Theme, logo pixels). Every importer validates its result, so the @texuli/spec/design-system validator (about 7 KB) is in each; importTheme adds the theme validator and the seed generator (about 8 KB). Named imports tree-shake per importer: importDtcg alone bundles to about 12.5 KB, importLogoPixels about 9.8 KB, importTheme about 17.8 KB, so a further split would save real consumers nothing. Loaded only by the studio, CLI and MCP. The @texuli/tokens root never imports it (root unchanged at 40,820 B). Measured 26,026 B, cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/tokens/design-system/report": {
+      "gzip": 4672,
+      "note": "PLAN_011 T-ds-io (owner-approved new row): the lazy static report page (swatches, type ramp, component sheet, contrast table, adjustments, warnings), built as strings with escaping by construction (no sinks), plus emitCss for its one stylesheet. The @texuli/tokens root never imports it (root unchanged at 40,820 B). Measured 4,432 B, cap = measured + 4% rounded up to 64 B."
+    },
     "@texuli/tokens/design-system/validate": {
       "gzip": 10304,
       "note": "PLAN_011 T-ds-compiler (ADR-022; owner-approved new row): the spec's validateDesignSystem, patch and migrate (7.1 KB on their own, see @texuli/spec/design-system) plus checkDesignSystemGuarantees over compiled variables (contrast pairs, focus width, targets) and DESIGN_SYSTEM_ATTRIBUTES, without the compiler or the color engine. Measured 9,850 B, cap = measured + 4% rounded up to 64 B."
