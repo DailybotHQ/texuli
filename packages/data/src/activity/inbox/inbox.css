@@ -82,8 +82,8 @@
     position: absolute;
     inset: 0;
     margin: auto;
-    inline-size: var(--tx-size-icon-sm, 1rem);
-    block-size: var(--tx-size-icon-sm, 1rem);
+    inline-size: var(--tx-size-icon-sm);
+    block-size: var(--tx-size-icon-sm);
     border-radius: var(--tx-shape-radius-full);
     border: 2px solid color-mix(in srgb, currentColor 25%, transparent);
     border-block-start-color: currentColor;
