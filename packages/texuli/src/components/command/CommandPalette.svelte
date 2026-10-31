@@ -60,6 +60,12 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   recentLabel?: string;
   /** Dialog accessible title. */
   title?: string;
+  /**
+   * Accessible name of the search combobox (G108). Default: `title`, so set it
+   * when the dialog's name ("Jump to") is not a good name for the field
+   * ("Search pages and actions").
+   */
+  searchLabel?: string;
   /** Dialog accessible description. */
   description?: string;
   emptyLabel?: string;
@@ -83,6 +89,7 @@ let {
   shortcut = true,
   recentLabel: recentLabelProp,
   title: titleProp,
+  searchLabel: searchLabelProp,
   description: descriptionProp,
   emptyLabel: emptyLabelProp,
   recentEmptyLabel: recentEmptyLabelProp,
@@ -106,6 +113,7 @@ const recentLabel = $derived(
   recentLabelProp ?? msg('texuli.command-palette.recent-label', 'Recent')
 );
 const title = $derived(titleProp ?? msg('texuli.command-palette.title', 'Command palette'));
+const searchLabel = $derived(searchLabelProp ?? title);
 const description = $derived(
   descriptionProp ??
     msg(
@@ -281,7 +289,7 @@ onMount(() => {
       <DialogTitle class="tx-sr-only">{title}</DialogTitle>
       <DialogDescription class="tx-sr-only">{description}</DialogDescription>
       <CommandRoot
-        label={title}
+        label={searchLabel}
         {loading}
         shouldFilter={false}
         loop
