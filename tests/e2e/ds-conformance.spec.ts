@@ -28,8 +28,10 @@ import { settleAnimations } from './support/site.ts';
  * scope's variables, apart from the tracked DS_CHECK_KNOWN_FINDINGS (which
  * must still be found, so the list cannot rot).
  *
- * Brands: the spec fixtures acme (with variants) and minimal, and the
- * fictional protoyard-theme/v1 fixture imported as a role palette (harbor).
+ * Brands: the spec fixtures acme (with variants) and minimal, the
+ * fictional protoyard-theme/v1 fixture imported as a role palette (harbor),
+ * and the guide's example brands in examples/design-systems (quillmark,
+ * ledgerline with its high-contrast variant, tumbletown).
  * Library themes: six of the 210, spread across hue families (sorted by
  * seed hue, every 35th), rotated by TEXULI_DS_THEME_SEED (default 0) so a
  * run can sample others without a date in the test.
@@ -38,6 +40,10 @@ import { settleAnimations } from './support/site.ts';
 const SPEC_FIXTURES = new URL('../../packages/spec/fixtures/design-systems/', import.meta.url);
 const readFixture = (name: string): unknown =>
   JSON.parse(readFileSync(new URL(name, SPEC_FIXTURES), 'utf8'));
+
+const EXAMPLES = new URL('../../examples/design-systems/', import.meta.url);
+const readExample = (name: string): unknown =>
+  JSON.parse(readFileSync(new URL(`${name}.json`, EXAMPLES), 'utf8'));
 
 const COMPONENTS = ALL_MANIFEST_GROUPS.flatMap((group) => group.manifests)
   .filter((manifest) => manifest.agentEmittable === true && manifest.examples.length > 0)
@@ -54,6 +60,9 @@ const BRANDS: readonly { name: string; doc: () => unknown; variants: (string | n
   { name: 'acme', doc: () => readFixture('acme.json'), variants: [null, 'high-contrast'] },
   { name: 'minimal', doc: () => readFixture('minimal.json'), variants: [null] },
   { name: 'protoyard-theme/v1 (harbor)', doc: harbor, variants: [null] },
+  { name: 'quillmark', doc: () => readExample('quillmark'), variants: [null] },
+  { name: 'ledgerline', doc: () => readExample('ledgerline'), variants: [null, 'high-contrast'] },
+  { name: 'tumbletown', doc: () => readExample('tumbletown'), variants: [null] },
 ];
 
 function hue(hex: string): number {
