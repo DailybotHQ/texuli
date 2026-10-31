@@ -129,11 +129,14 @@ JSON is copied into fresh plain objects, so no prototype is ever written.
 | `emitRolePalette(doc, { format?, roleCase? })` | The flat palette, the inverse of `importRolePalette` (radius in rem, stacks as CSS lists). Fields a flat palette cannot hold (pins, type roles, components, variants) are left out |
 | `isSafeCompiledValue`, `isSafeSelector` | The checks the emitters apply |
 
-Compiled values are checked again before they are written (no `;`, braces,
-`<`, `>`, backslash, `!`, comments, at-rules, `url()`, `image()` or
-`expression()`, no invisible characters, balanced quotes; names must be
-`--tx-[a-z0-9-]+`), so a cached or hand-edited compiled object cannot
-inject CSS. A refused declaration is never written; the CSS says how many
+Compiled values are checked again before they are written, by the same
+function the runtime uses ([the filter](design-system-runtime.md#escaped-by-construction):
+printable ASCII, no `;`, braces, `<`, `>`, backslash, `!`, comments,
+at-rules, `:` or `//`, only the color, math and easing functions the
+compiler writes, so no `url()`, `image-set()`, `src()`, `cross-fade()` or
+`var()`, balanced quotes and parentheses; names must be
+`--tx-[a-z0-9-]+`), so a cached or hand-edited compiled object can neither
+inject CSS nor make the browser fetch. A refused declaration is never written; the CSS says how many
 were skipped. For Tailwind 4, keep `@texuli/tokens/tailwind/preset.css` and
 add the scoped CSS from `emitCss`.
 

@@ -19,6 +19,17 @@
 
 import { DESIGN_SYSTEM_ATTRIBUTES, type DesignSystemMode } from './attributes.ts';
 import type { CompiledDesignSystem, DesignSystemFontFace } from './compiler.ts';
+import {
+  CSS_UNSAFE,
+  DESIGN_SYSTEM_NAME,
+  isSafeCompiledValue as isSafeDesignSystemValue,
+} from './css-value.ts';
+
+/**
+ * True when `value` is one safe custom-property value: the one check apply,
+ * SSR, the replay and the emitters share (`isSafeCompiledValue`).
+ */
+export { isSafeDesignSystemValue };
 
 /** What the runtime reads from a compiled design system (a cached JSON copy works). */
 export type ApplicableDesignSystem = Pick<
@@ -49,31 +60,9 @@ export interface DesignSystemStyleOptions {
 }
 
 const NAME = /^--tx-[a-z0-9-]+$/;
-// One declaration only: no terminators, blocks, comments, escapes, priority,
-// markup, at-rules, control or bidi characters, URLs or var() reads. The
-// same filter guards selectors.
-const BAD_CHARS = '\\u0000-\\u001f\\u007f\\u202a-\\u202e\\u2066-\\u2069';
-const UNSAFE = new RegExp(
-  `[;{}<>\\\\!@${BAD_CHARS}]|\\/\\*|url\\s*\\(|expression\\s*\\(|var\\s*\\(|javascript:`,
-  'i'
-);
 // A relative path without `..` (the origin check below refuses `//host`).
 const FONT_PATH = /^(?!.*\.\.)[\w./-]+\.(?:woff2?|ttf|otf)$/;
 const FONT_DATA = /^data:font\/(?:woff2?|ttf|otf);base64,[A-Za-z0-9+/]+={0,2}$/;
-
-const count = (value: string, char: string) => value.split(char).length - 1;
-
-/** True when `value` is one safe custom-property value (the filter apply, SSR and the replay share). */
-export function isSafeDesignSystemValue(value: unknown): value is string {
-  return (
-    typeof value === 'string' &&
-    value.length <= 2048 &&
-    !UNSAFE.test(value) &&
-    count(value, '"') % 2 === 0 &&
-    count(value, "'") % 2 === 0 &&
-    count(value, '(') === count(value, ')')
-  );
-}
 
 /** The safe `[name, value]` declarations of one variable map, sorted by name. */
 export function designSystemDeclarations(
@@ -109,12 +98,15 @@ export function designSystemStyle(
   compiled: ApplicableDesignSystem,
   options: DesignSystemStyleOptions = {}
 ): string {
-  const variant = compiled.variant;
+  const { id, variant } = compiled;
+  // The default selector takes the id and variant only as spec names, so a hand-made id such as `x"],*,[x="` cannot widen the rule;
+  // braces, `;`, `<` and comments cannot leave it.
   const selector =
     options.selector ??
-    `[data-tx-ds="${compiled.id}"]${variant ? `[data-tx-ds-variant="${variant}"]` : ''}`;
-  // The id and variant are checked here too: braces, `;`, `<` and comments cannot leave the rule.
-  if (typeof selector !== 'string' || !selector.trim() || UNSAFE.test(selector))
+    (DESIGN_SYSTEM_NAME.test(id) && (!variant || DESIGN_SYSTEM_NAME.test(variant))
+      ? `[data-tx-ds="${id}"]${variant ? `[data-tx-ds-variant="${variant}"]` : ''}`
+      : '');
+  if (typeof selector !== 'string' || !selector.trim() || CSS_UNSAFE.test(selector))
     throw new TypeError('Unsafe selector');
   const modes = options.modes ?? (Object.keys(compiled.vars) as DesignSystemMode[]);
   for (const mode of modes) modeVars(compiled, mode);
@@ -172,7 +164,7 @@ function registerFonts(doc: Document, faces: readonly DesignSystemFontFace[], ba
     if (
       !url ||
       typeof face.family !== 'string' ||
-      UNSAFE.test(face.family) ||
+      CSS_UNSAFE.test(face.family) ||
       !/^\d{1,4}(?: \d{1,4})?$/.test(face.weight)
     )
       continue;
@@ -278,7 +270,9 @@ export function applyDesignSystem(
   for (const name of DESIGN_SYSTEM_ATTRIBUTES) {
     const value = name === 'data-tx-ds-variant' ? variant : attrs[name];
     const safe =
-      typeof value === 'string' && value.length <= 128 && !UNSAFE.test(value) ? value : undefined;
+      typeof value === 'string' && value.length <= 128 && !CSS_UNSAFE.test(value)
+        ? value
+        : undefined;
     setAttr(el, name, safe ?? state.attrs.get(name));
   }
   setAttr(el, 'data-tx-mode', mode);

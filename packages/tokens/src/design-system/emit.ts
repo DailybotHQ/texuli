@@ -18,12 +18,21 @@ import type { DesignSystem } from '@texuli/spec/design-system';
 import { semanticTokenToCssVar } from '../contract/prefix.ts';
 import { INTERACTIVE_SEMANTIC_ROLES, SEMANTIC_ROLES } from '../contract/semantic.ts';
 import type { CompiledDesignSystem } from './compiler.ts';
+import { isSafeCompiledValue } from './css-value.ts';
 import { formatFontStack, splitFontStack } from './from-theme.ts';
 import type { DesignSystemMode } from './guarantees.ts';
 import type { RolePalette, RolePaletteCharts } from './import.ts';
-import { INVISIBLE, isObject, type JsonObject, stableJson } from './io.ts';
+import { isObject, type JsonObject, stableJson } from './io.ts';
 import { sortDeep } from './token-formats.ts';
 
+/**
+ * A compiled value safe to write into a stylesheet or a style attribute
+ * (the one check the runtime shares): printable ASCII, no declaration,
+ * block, comment, escape, markup or scheme characters, and only color, math
+ * and easing functions, so no `url()`, `image-set()`, `src()`,
+ * `cross-fade()`, `var()` or `attr()`.
+ */
+export { isSafeCompiledValue } from './css-value.ts';
 export {
   DESIGN_SYSTEM_EXTENSION,
   emitDtcg,
@@ -34,18 +43,6 @@ export {
 const SAFE_NAME = /^--tx-[a-z0-9-]{1,96}$/;
 const DOC_ID = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const VERSION = /^[0-9A-Za-z.+-]{1,64}$/;
-
-/**
- * A compiled value safe to write into a stylesheet or a style attribute: no
- * declaration, block, comment or markup characters, no `url()`, `image()`,
- * `expression()` or at-rules, no invisible characters, balanced quotes.
- */
-export function isSafeCompiledValue(value: unknown): value is string {
-  if (typeof value !== 'string' || value.length === 0 || value.length > 512) return false;
-  if (INVISIBLE.test(value) || /[;{}<>\\!`]|\/\*|\*\/|@/.test(value)) return false;
-  if (/\b(?:url|image|image-set|expression|element|src)\s*\(/i.test(value)) return false;
-  return (value.match(/"/g)?.length ?? 0) % 2 === 0 && (value.match(/'/g)?.length ?? 0) % 2 === 0;
-}
 
 const safeEntries = (vars: Readonly<Record<string, unknown>> | undefined) => {
   const entries: [string, string][] = [];
