@@ -12,6 +12,7 @@ import {
   type Script,
   type Session,
   type SessionContext,
+  type Step,
   texuliUris,
 } from './harness.ts';
 
@@ -717,7 +718,8 @@ const discovery: Session = {
     for (const tool of ctx.result('tools').tools) {
       expect(tool.description, tool.name).toMatch(/\S/u);
       expect(tool.inputSchema.type, tool.name).toBe('object');
-      expect(tool.annotations.readOnlyHint, tool.name).toBe(true);
+      // The one writer is ds.save, local only (an explicit path inside the working directory).
+      expect(tool.annotations.readOnlyHint, tool.name).toBe(tool.name !== 'ds.save');
       if (texuliOps.get(tool.name)) {
         expect(tool.description, tool.name).toMatch(/Limits: input up to \d+ bytes/u);
         expect(tool.outputSchema.type, tool.name).toBe('object');
@@ -747,6 +749,7 @@ const discovery: Session = {
     expect(ctx.result('prompts').prompts.map((prompt: Json) => prompt.name)).toEqual([
       'build-ui',
       'theme-blueprint',
+      'create-design-system',
       'convert-deck',
     ]);
     const buildUi = ctx.result('build-ui').messages[0].content.text as string;
@@ -843,23 +846,390 @@ const readTheSite: Session = {
 };
 
 // ---------------------------------------------------------------------------
-// Design-system jobs: planned, not runnable yet.
+// Design-system jobs (T-ds-agent-tools): brand a dashboard, import DTCG
+// tokens, and repair a refused document from its error codes alone.
 // ---------------------------------------------------------------------------
 
-const DS_REASON = 'lands in T-ds-agent-tools';
+const BRAND = {
+  id: 'example-co',
+  name: 'Example Co.',
+  seed: '#0e7490',
+  brief: 'Example Co. analytics: teal #0e7490, Inter, rounded, calm',
+} as const;
+
+/** The first worked example's props of a component, read with component.get. */
+function firstExample(ctx: SessionContext, label: string): Json {
+  const component = ctx.data(label).component;
+  expect(component.examples.length, `${component.id} has a worked example`).toBeGreaterThan(0);
+  return structuredClone(component.examples[0].props);
+}
+
+/** A data dashboard built from the catalog examples: one widget holding a stat block. */
+function dashboardTree(ctx: SessionContext): Json {
+  return {
+    id: 'data-dashboard',
+    props: { ...firstExample(ctx, 'get dashboard'), label: 'Example Co. operations' },
+    children: [
+      {
+        id: 'data-dashboard-widget',
+        props: firstExample(ctx, 'get widget'),
+        children: [{ id: 'blocks-data', props: firstExample(ctx, 'get stat') }],
+      },
+    ],
+  };
+}
+
+const getComponent = (label: string, id: string): Step => ({
+  label,
+  method: 'tools/call',
+  params: call('component.get', { id }),
+});
+
+/** The brand document the agent writes on top of the suggestion. */
+function brandDocument(ctx: SessionContext): Json {
+  const suggested = ctx.data('suggest').document;
+  return {
+    ...suggested,
+    extends: 'texuli:ocean',
+    typography: { families: { sans: { stack: ['Inter', 'system-ui', 'sans-serif'] } } },
+    shape: { radius: 12 },
+    motion: { personality: 'subtle' },
+    accessibility: { contrast: 'AA' },
+  };
+}
 
 const designSystemDashboard: Session = {
-  name: 'brand a dashboard with a design system',
-  skip: DS_REASON,
-  steps: [],
-  final() {},
+  name: 'brand a dashboard with a design system: create-design-system → ds.suggest → ds.validate → blueprint.theme',
+  steps: [
+    toolsStep,
+    {
+      label: 'prompt',
+      method: 'prompts/get',
+      params: {
+        name: 'create-design-system',
+        arguments: { brief: BRAND.brief, base: 'ocean' },
+      },
+      expect(result, ctx) {
+        const text = result.messages[0].content.text as string;
+        expect(text).toContain(BRAND.brief);
+        // Every named tool is served here, except ds.save on the remote door (the prompt says local only).
+        for (const tool of backtickedTools(text)) {
+          expect(texuliOps.get(tool), tool).toBeDefined();
+          if (ctx.door === 'stdio' || texuliOps.get(tool)?.runtime !== 'node')
+            expect(listedTools(ctx), tool).toContain(tool);
+        }
+      },
+    },
+    {
+      label: 'example',
+      method: 'resources/read',
+      params: { uri: 'texuli://design-system/acme' },
+      expect(result) {
+        expect(JSON.parse(result.contents[0].text).format).toBe('texuli/design-system');
+      },
+    },
+    {
+      label: 'suggest',
+      method: 'tools/call',
+      params: call('ds.suggest', { seed: BRAND.seed, id: BRAND.id, name: BRAND.name }),
+      expect(result) {
+        const data = result.structuredContent;
+        expect(data.valid).toBe(true);
+        expect(data.document.color.brand.seed).toBe(BRAND.seed);
+        expect(Object.keys(data.roles)).toEqual(['light', 'dark']);
+      },
+    },
+    (ctx) => [
+      {
+        label: 'validate',
+        method: 'tools/call',
+        params: call('ds.validate', { document: brandDocument(ctx) }),
+        expect(result) {
+          expect(result.structuredContent).toMatchObject({ valid: true, codes: [], errors: [] });
+        },
+      },
+      {
+        label: 'contrast',
+        method: 'tools/call',
+        params: call('ds.contrast', { document: brandDocument(ctx) }),
+        expect(result) {
+          const { modes } = result.structuredContent;
+          expect(modes.map((mode: Json) => mode.mode)).toEqual(['light', 'dark']);
+          for (const mode of modes) {
+            expect(mode.total, mode.mode).toBeGreaterThan(0);
+            expect(mode.failing, mode.mode).toBe(0);
+          }
+        },
+      },
+      {
+        label: 'preview',
+        method: 'tools/call',
+        params: call('ds.preview', { document: brandDocument(ctx) }),
+        expect(result) {
+          const { content, mediaType } = result.structuredContent;
+          expect(mediaType).toBe('image/svg+xml');
+          expect(content).toMatch(/^<svg /u);
+          expect(content).not.toMatch(/<script|<foreignObject|javascript:|on[a-z]+=/iu);
+        },
+      },
+    ],
+    getComponent('get dashboard', 'data-dashboard'),
+    getComponent('get widget', 'data-dashboard-widget'),
+    getComponent('get stat', 'blocks-data'),
+    (ctx) => [
+      {
+        label: 'theme',
+        method: 'tools/call',
+        params: call('blueprint.theme', {
+          blueprint: dashboardTree(ctx),
+          designSystem: { inline: brandDocument(ctx) },
+        }),
+        expect(result) {
+          const data = result.structuredContent;
+          expect(data.diagnostics.filter((d: Json) => d.severity === 'error')).toEqual([]);
+          expect(data.valid).toBe(true);
+          expect(data.blueprint).toMatchObject({
+            format: 'texuli-blueprint',
+            spec: '0.10.0',
+            status: 'draft',
+          });
+          expect(data.blueprint.tree.id).toBe('data-dashboard');
+        },
+      },
+    ],
+    // The host re-validates what the agent hands over, and compiles the stylesheet.
+    (ctx) => [
+      {
+        label: 'revalidate',
+        method: 'tools/call',
+        params: call('blueprint.validate', { draft: ctx.data('theme').blueprint }),
+        expect(result) {
+          expect(result.structuredContent.valid).toBe(true);
+        },
+      },
+      {
+        label: 'css',
+        method: 'tools/call',
+        params: call('ds.compile', { document: brandDocument(ctx), format: 'css' }),
+        expect(result) {
+          expect(result.structuredContent.content).toContain(`[data-tx-ds="${BRAND.id}"]`);
+        },
+      },
+    ],
+  ],
+  final(ctx) {
+    const inline = ctx.data('theme').blueprint.designSystem.inline;
+    expect(inline).toEqual(brandDocument(ctx));
+    // One document, one hash: validation, compile and preview agree.
+    const hash = ctx.data('validate').hash;
+    expect(ctx.data('css').hash).toBe(hash);
+    expect(ctx.data('preview').hash).toBe(hash);
+  },
+};
+
+/** A DTCG file from a fictional design tool: a brand color, a radius, fonts and a stray token. */
+const DTCG_FILE = {
+  brand: { $type: 'color', $value: '#7c2d92' },
+  font: {
+    body: { $type: 'fontFamily', $value: ['Inter', 'sans-serif'] },
+    code: { $type: 'fontFamily', $value: ['JetBrains Mono', 'monospace'] },
+  },
+  shape: { radius: { $type: 'dimension', $value: { value: 6, unit: 'px' } } },
+  legacy: { shadowGlow: { $type: 'shadow', $value: '0 0 8px #000' } },
 };
 
 const dtcgImport: Session = {
-  name: 'import DTCG tokens into a design system',
-  skip: DS_REASON,
-  steps: [],
-  final() {},
+  name: 'import DTCG tokens into a design system: ds.import → ds.validate → ds.compile dtcg round trip → ds.diff → blueprint.theme',
+  steps: [
+    toolsStep,
+    {
+      label: 'import',
+      method: 'tools/call',
+      params: call('ds.import', {
+        from: 'dtcg',
+        input: DTCG_FILE,
+        id: 'example-tokens',
+        name: 'Example tokens',
+      }),
+      expect(result) {
+        const data = result.structuredContent;
+        expect(data.valid).toBe(true);
+        expect(data.document.color.brand.seed).toBe('#7c2d92');
+        // The token no document field takes is named, not silently dropped.
+        expect(data.warnings.map((w: Json) => w.code)).toContain('unmapped');
+      },
+    },
+    (ctx) => [
+      {
+        label: 'validate',
+        method: 'tools/call',
+        params: call('ds.validate', { document: ctx.data('import').document }),
+        expect(result) {
+          expect(result.structuredContent.valid).toBe(true);
+        },
+      },
+      {
+        label: 'to dtcg',
+        method: 'tools/call',
+        params: call('ds.compile', { document: ctx.data('import').document, format: 'dtcg' }),
+      },
+    ],
+    (ctx) => [
+      {
+        label: 'round trip',
+        method: 'tools/call',
+        params: call('ds.import', { from: 'dtcg', input: ctx.data('to dtcg').content }),
+      },
+      {
+        label: 'diff',
+        method: 'tools/call',
+        params: call('ds.diff', {
+          before: ctx.data('import').document,
+          after: {
+            ...ctx.data('import').document,
+            version: '1.1.0',
+            color: { brand: { seed: '#0e7490' } },
+          },
+        }),
+        expect(result) {
+          const data = result.structuredContent;
+          expect(data.valid).toBe(true);
+          expect(data.identical).toBe(false);
+          expect(data.summary.changed).toBeGreaterThan(0);
+          expect(data.tokens.some((t: Json) => t.variable === '--tx-primary')).toBe(true);
+        },
+      },
+      {
+        label: 'apply',
+        method: 'tools/call',
+        params: call('blueprint.theme', {
+          blueprint: {
+            id: 'layout-page',
+            props: { title: 'Example tokens' },
+            children: [
+              { id: 'blocks-text', props: { block: { type: 'heading', level: 2, text: 'Hi' } } },
+            ],
+          },
+          designSystem: { inline: ctx.data('import').document },
+        }),
+        expect(result) {
+          expect(result.structuredContent.valid).toBe(true);
+        },
+      },
+    ],
+  ],
+  final(ctx) {
+    // document → DTCG → document is lossless.
+    expect(ctx.data('round trip').document).toEqual(ctx.data('import').document);
+    expect(ctx.data('round trip').warnings).toEqual([]);
+  },
+};
+
+/** A document with one mistake per class an agent makes. */
+const REFUSED_DOCUMENT = {
+  format: 'texuli/design-system',
+  formatVersion: 1,
+  id: 'example-broken',
+  version: '1.0.0',
+  extends: 'texuli-base@^1.0.0',
+  color: {
+    brand: { seed: '#4f46e5' },
+    roles: { light: { background: '#ffffff', foreground: '#f1f1f1' } },
+  },
+  colour: { primary: '#4f46e5' },
+  shape: { radius: 99 },
+  assets: { logo: { light: 'https://example.com/logo.svg' } },
+};
+
+/** Split a design-system JSON path (`$.a.b["c-d"]`) into keys. */
+function pathKeys(path: string): string[] {
+  return [...path.slice(1).matchAll(/\.([A-Za-z_$][\w$]*)|\["((?:[^"\\]|\\.)*)"\]/gu)].map(
+    (match) => (match[1] ?? JSON.parse(`"${match[2]}"`)) as string
+  );
+}
+
+/** Remove the value at a path (and an object it leaves empty). */
+function removeAt(doc: Json, path: string): void {
+  const keys = pathKeys(path);
+  const parents: Json[] = [doc];
+  for (const key of keys.slice(0, -1)) parents.push(parents[parents.length - 1]?.[key]);
+  delete parents[parents.length - 1]?.[keys[keys.length - 1] as string];
+  for (let at = parents.length - 1; at > 0; at--)
+    if (Object.keys(parents[at] ?? {}).length === 0) delete parents[at - 1][keys[at - 1] as string];
+}
+
+/**
+ * The repair an agent applies from a code and a path alone (no knowledge
+ * of the document): drop what is unknown or refused, supply what is
+ * required, unpin what fails contrast, clamp what is out of range.
+ */
+function repair(doc: Json, errors: readonly Json[]): Json {
+  const next = structuredClone(doc);
+  for (const error of errors) {
+    switch (error.code) {
+      case 'required':
+        if (error.path === '$.name') next.name = 'Example broken';
+        break;
+      case 'invalid-value':
+        if (error.path === '$.shape.radius') next.shape.radius = 12;
+        else removeAt(next, error.path);
+        break;
+      case 'unknown-key':
+      case 'url-refused':
+      case 'extends-range':
+      case 'aa-text':
+        // aa-text names the pinned roles that fail: unpinning lets the solver pick.
+        removeAt(next, error.path);
+        break;
+      default:
+        throw new Error(`No repair for ${error.code} at ${error.path}.`);
+    }
+  }
+  return next;
+}
+
+const ROUNDS = 4;
+
+/** Validate, and when refused, repair from the codes and validate again (at most ROUNDS). */
+function repairLoop(round: number, doc: Json): Script[] {
+  return [
+    {
+      label: `validate ${round}`,
+      method: 'tools/call',
+      params: call('ds.validate', { document: doc }),
+    },
+    (ctx) => {
+      const result = ctx.data(`validate ${round}`);
+      if (result.valid || round >= ROUNDS) return [];
+      return repairLoop(round + 1, repair(doc, result.errors));
+    },
+  ];
+}
+
+const repairRefused: Session = {
+  name: 'fix a refused design system from its error codes: ds.validate → repair by code and path → ds.validate',
+  steps: [toolsStep, ...repairLoop(1, REFUSED_DOCUMENT)],
+  final(ctx) {
+    const rounds = ctx.transcript.filter((item) => item.label.startsWith('validate '));
+    const first = ctx.data('validate 1');
+    expect(first.valid).toBe(false);
+    // Every error says what is wrong and where, with a stable code.
+    for (const error of first.errors) {
+      expect(error.path, error.code).toMatch(/^\$/u);
+      expect(error.message, error.code).toMatch(/\w/u);
+    }
+    expect(first.codes).toEqual(
+      expect.arrayContaining(['extends-range', 'invalid-value', 'unknown-key', 'url-refused'])
+    );
+    const last = ctx.data(`validate ${rounds.length}`);
+    expect(last).toMatchObject({ valid: true, codes: [], errors: [] });
+    expect(rounds.length).toBeLessThanOrEqual(ROUNDS);
+    // Codes seen across the rounds: the spec's, then the compiler's guarantee.
+    const seen = new Set(
+      rounds.flatMap((_, at) => ctx.data(`validate ${at + 1}`).codes as string[])
+    );
+    expect([...seen]).toEqual(expect.arrayContaining(['required', 'aa-text']));
+  },
 };
 
 /** Every scripted job, run on both doors by `sessions.test.ts`. */
@@ -871,4 +1241,5 @@ export const SESSIONS: readonly Session[] = [
   readTheSite,
   designSystemDashboard,
   dtcgImport,
+  repairRefused,
 ];

@@ -5,6 +5,7 @@ import { runDeckCli } from '../src/cli/deck.ts';
 import { runDocumentCli } from '../src/cli/document.ts';
 import { runInitCli } from '../src/cli-init/cli.ts';
 import { listThemes, previewTheme } from '../src/cli-init/themes.ts';
+import { localFiles } from '../src/internal/local-write.ts';
 import {
   createOperationRegistry,
   defineOperation,
@@ -14,6 +15,7 @@ import {
   schemaKeywordIssues,
   TEXULI_ALIASES,
   TEXULI_OPERATIONS,
+  TEXULI_REMOVED_NAMES,
   TOOLS_VERSION,
   texuliOps,
   validateJson,
@@ -33,11 +35,20 @@ const EXPECTED = [
   'component.get',
   'example.search',
   'blueprint.validate',
+  'blueprint.theme',
   'block.list',
   'block.schema',
   'theme.search',
   'theme.get',
   'theme.preview',
+  'ds.validate',
+  'ds.compile',
+  'ds.contrast',
+  'ds.suggest',
+  'ds.import',
+  'ds.diff',
+  'ds.preview',
+  'ds.save',
   'deck.run',
   'document.run',
   'document.export',
@@ -84,20 +95,21 @@ it('declares every operation once, self-described for agents, in the supported s
       expect(operation.limits.inputBytes, label).toBeGreaterThan(0);
       expect(operation.limits.timeMs, label).toBeGreaterThan(0);
       expect(operation.examples.length, label).toBeGreaterThan(0);
-      expect(operation.annotations, label).toMatchObject({
-        readOnly: true,
-        destructive: false,
-        openWorld: false,
-      });
+      // ds.save is the one writer: an explicit path inside the working directory.
+      expect(operation.annotations, label).toMatchObject(
+        operation.name === 'ds.save'
+          ? { readOnly: false, destructive: true, openWorld: true }
+          : { readOnly: true, destructive: false, openWorld: false }
+      );
       expect(schemaKeywordIssues(operation.input), label).toEqual([]);
       expect(schemaKeywordIssues(operation.output), label).toEqual([]);
     }
   });
   await scenario(
-    'PDF and DOCX writers are node-only; the site readers are site-only; the rest run at the edge',
+    'the file writer and the PDF and DOCX writers are node-only; the site readers are site-only; the rest run at the edge',
     () => {
       const node = TEXULI_OPERATIONS.filter((operation) => operation.runtime === 'node');
-      expect(node.map((operation) => operation.name)).toEqual(['document.export']);
+      expect(node.map((operation) => operation.name)).toEqual(['ds.save', 'document.export']);
       const site = TEXULI_OPERATIONS.filter((operation) => operation.runtime === 'site');
       expect(site.map((operation) => operation.name)).toEqual([
         'site.pages',
@@ -122,10 +134,13 @@ it('round-trips every example through its input and output schemas', async () =>
       await scenario(`${operation.name}: ${example.title}`, async () => {
         expect(validateJson(operation.input, example.input)).toEqual([]);
         // Site operations read a built site: the fixture binding stands in for env.ASSETS.
+        // ds.save's example is a dry run: the local writer checks the path and writes nothing.
         const outcome = await texuliOps.invoke(
           operation.name,
           example.input,
-          operation.runtime === 'site' ? { site: { assets: fakeSiteAssets() } } : {}
+          operation.runtime === 'site'
+            ? { site: { assets: fakeSiteAssets() } }
+            : { files: localFiles() }
         );
         if (!outcome.ok) throw new Error(`${outcome.error.code}: ${outcome.error.message}`);
         expect(validateJson(operation.output, outcome.output)).toEqual([]);
@@ -179,7 +194,9 @@ it('refuses invalid input, oversized input and unavailable runtimes with stable 
     );
     expect(outcome).toMatchObject({ ok: false, error: { code: 'runtime-unavailable' } });
     expect(texuliOps.list({ runtimes: ['edge'] }).map((operation) => operation.name)).toEqual(
-      EXPECTED.filter((name) => name !== 'document.export' && !name.startsWith('site.'))
+      EXPECTED.filter(
+        (name) => !['document.export', 'ds.save'].includes(name) && !name.startsWith('site.')
+      )
     );
   });
 });
@@ -229,57 +246,54 @@ it('checks handler output, failures and the time budget', async () => {
   });
 });
 
-it('keeps the seven 0.8 tool names as deprecated aliases that resolve to operations', async () => {
-  await scenario('every alias targets a real operation and says it is deprecated', () => {
-    expect(TEXULI_ALIASES.map((alias) => alias.name)).toEqual([
-      'deck',
-      'document',
-      'catalog',
-      'component',
-      'validate',
-      'example',
-      'theme',
-    ]);
-    for (const alias of TEXULI_ALIASES) {
-      for (const target of alias.targets)
-        expect(texuliOps.get(target)?.name, alias.name).toBe(target);
-      expect(texuliOps.describe(alias.name), alias.name).toMatch(/^Deprecated alias/u);
-      expect(schemaKeywordIssues(texuliOps.inputSchema(alias.name) ?? {}), alias.name).toEqual([]);
-    }
-  });
-  const pairs: [string, unknown, string, unknown][] = [
-    ['catalog', { query: 'card', limit: 3 }, 'catalog.search', { query: 'card', limit: 3 }],
-    ['component', { id: 'card' }, 'component.get', { id: 'card' }],
-    ['example', { componentId: 'card' }, 'example.search', { componentId: 'card' }],
-    ['theme', { id: 'violet' }, 'theme.get', { id: 'violet' }],
-    ['theme', { query: 'violet', limit: 5 }, 'theme.search', { query: 'violet', limit: 5 }],
-    ['deck', { command: 'capabilities' }, 'deck.run', { command: 'capabilities' }],
-    [
-      'document',
-      { command: 'from-markdown', markdown: '# Brief' },
-      'document.run',
-      { command: 'from-markdown', markdown: '# Brief' },
-    ],
-    [
-      'document',
-      { command: 'to-docx', document: documentFixture },
-      'document.export',
-      { format: 'docx', document: documentFixture },
-    ],
+it('removes the seven 0.8 tool names in 0.10.0: never listed, refused with the operation to call instead', async () => {
+  const removed: [string, string][] = [
+    ['deck', 'deck.run'],
+    ['document', 'document.run or document.export'],
+    ['catalog', 'catalog.search'],
+    ['component', 'component.get'],
+    ['validate', 'catalog.validate'],
+    ['example', 'example.search'],
+    ['theme', 'theme.search or theme.get'],
   ];
-  for (const [alias, aliasInput, target, targetInput] of pairs) {
-    await scenario(`${alias} -> ${target}`, async () => {
-      const viaAlias = await texuliOps.invoke(alias, aliasInput);
-      const direct = await texuliOps.invoke(target, targetInput);
-      expect(viaAlias).toEqual(direct);
-      expect(viaAlias).toMatchObject({ ok: true, operation: target });
+  expect(TEXULI_ALIASES).toEqual([]);
+  expect(texuliOps.aliases()).toEqual([]);
+  expect(TEXULI_REMOVED_NAMES.map((entry) => entry.name)).toEqual(removed.map(([name]) => name));
+  for (const [name, instead] of removed) {
+    await scenario(name, async () => {
+      expect(texuliOps.get(name)).toBeUndefined();
+      expect(texuliOps.describe(name)).toBeUndefined();
+      expect(texuliOps.inputSchema(name)).toBeUndefined();
+      const outcome = await texuliOps.invoke(name, {});
+      expect(outcome).toEqual({
+        ok: false,
+        error: {
+          code: 'unknown-operation',
+          message: `The tool "${name}" was removed in 0.10.0; call ${instead} instead.`,
+        },
+      });
+      expect(texuliOps.removedMessage(name)).toBe(
+        `The tool "${name}" was removed in 0.10.0; call ${instead} instead.`
+      );
     });
   }
-  await scenario('an alias still refuses what its target refuses', async () => {
-    expect(await texuliOps.invoke('theme', { id: 'violet', bogus: 1 })).toMatchObject({
-      ok: false,
-      error: { code: 'invalid-input' },
-    });
+  await scenario('a removed name may not shadow a name or point nowhere', () => {
+    const base = TEXULI_OPERATIONS[0] as Operation;
+    expect(() =>
+      createOperationRegistry(
+        [base],
+        [],
+        [{ name: base.name, replacedBy: [base.name], removedIn: '0.10.0' }]
+      )
+    ).toThrow(/duplicates a name/u);
+    expect(() =>
+      createOperationRegistry(
+        [base],
+        [],
+        [{ name: 'old', replacedBy: ['no.such'], removedIn: '0.10.0' }]
+      )
+    ).toThrow(/points at "no.such"/u);
+    expect(texuliOps.removedMessage('catalog.search')).toBeUndefined();
   });
 });
 

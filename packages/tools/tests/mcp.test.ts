@@ -57,10 +57,10 @@ function toolData(response: Response): Record<string, unknown> {
 
 it('negotiates MCP with read-only tools and serves the real catalog, manifests, validation and themes', async () => {
   await scenario(
-    'negotiates MCP, announces only read-only tools and waits for initialized',
+    'negotiates MCP, announces read-only tools and the one local writer, and waits for initialized',
     async () => {
       const handle = createTexuliMcpServer();
-      const early = (await callTool(handle, 'catalog')) as Response;
+      const early = (await callTool(handle, 'catalog.search')) as Response;
       expect(early.error?.code).toBe(MCP_ERROR_CODES.notInitialized);
 
       const init = (await handle({
@@ -89,43 +89,47 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
         'component.get',
         'example.search',
         'blueprint.validate',
+        'blueprint.theme',
         'block.list',
         'block.schema',
         'theme.search',
         'theme.get',
         'theme.preview',
+        'ds.validate',
+        'ds.compile',
+        'ds.contrast',
+        'ds.suggest',
+        'ds.import',
+        'ds.diff',
+        'ds.preview',
+        'ds.save',
         'deck.run',
         'document.run',
         'document.export',
-        'deck',
-        'document',
-        'catalog',
-        'component',
-        'validate',
-        'example',
-        'theme',
       ]);
-      const described = tools as unknown as { name: string; description: string }[];
-      for (const legacy of described.slice(TEXULI_OPERATIONS.length)) {
-        expect(legacy.description, legacy.name).toMatch(/^Deprecated alias of [a-z]+\.[a-z-]+/u);
-      }
-      expect(tools.every(({ annotations }) => annotations.readOnlyHint === true)).toBe(true);
-      expect(tools.every(({ annotations }) => annotations.destructiveHint === false)).toBe(true);
+      // ds.save is the one writer (an explicit path inside the working directory).
+      const readOnly = tools.filter(({ name }) => name !== 'ds.save');
+      expect(readOnly.every(({ annotations }) => annotations.readOnlyHint === true)).toBe(true);
+      expect(readOnly.every(({ annotations }) => annotations.destructiveHint === false)).toBe(true);
+      expect(tools.find(({ name }) => name === 'ds.save')?.annotations).toMatchObject({
+        readOnlyHint: false,
+        destructiveHint: true,
+      });
     }
   );
   await scenario('builds the real catalog and reads component manifests and examples', async () => {
     const { handle } = await initializedServer();
-    const catalog = toolData(await callTool(handle, 'catalog', { query: 'card' }));
+    const catalog = toolData(await callTool(handle, 'catalog.search', { query: 'card' }));
     expect(catalog.hash).toMatch(/^[0-9a-f]{64}$/);
     expect(catalog.fileName).toBe(`catalog-${catalog.hash}.json`);
     expect((catalog.entries as { id: string }[]).some(({ id }) => id === 'card')).toBe(true);
 
-    const component = toolData(await callTool(handle, 'component', { id: 'card' }));
+    const component = toolData(await callTool(handle, 'component.get', { id: 'card' }));
     expect(component.component).toMatchObject({ id: 'card', group: 'display' });
     const manifest = (component.component as { examples: unknown[] }).examples;
     expect(manifest.length).toBeGreaterThan(0);
 
-    const examples = toolData(await callTool(handle, 'example', { componentId: 'card' }));
+    const examples = toolData(await callTool(handle, 'example.search', { componentId: 'card' }));
     expect(examples.total).toBeGreaterThan(0);
     expect(
       (examples.examples as { componentId: string }[]).every((item) => item.componentId === 'card')
@@ -149,19 +153,21 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
         examples: [{ id: 'basic', title: 'Basic', props: { title: 'Hello' } }],
       };
       expect(
-        toolData(await callTool(handle, 'validate', { manifest: validManifest }))
+        toolData(await callTool(handle, 'catalog.validate', { manifest: validManifest }))
       ).toMatchObject({
         valid: true,
         diagnostics: [],
       });
       const duplicate = toolData(
-        await callTool(handle, 'validate', { manifests: [validManifest, validManifest] })
+        await callTool(handle, 'catalog.validate', { manifests: [validManifest, validManifest] })
       );
       expect(duplicate.valid).toBe(false);
       expect(
         (duplicate.diagnostics as { code: string }[]).some(({ code }) => code === 'duplicate-id')
       ).toBe(true);
-      const invalid = toolData(await callTool(handle, 'validate', { manifest: { id: 'bad id' } }));
+      const invalid = toolData(
+        await callTool(handle, 'catalog.validate', { manifest: { id: 'bad id' } })
+      );
       expect(invalid.valid).toBe(false);
       expect(
         (invalid.diagnostics as { jsonPath: string }[]).some(({ jsonPath }) => jsonPath === '$.id')
@@ -170,9 +176,9 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
   );
   await scenario('searches theme metadata and reads a real full theme definition', async () => {
     const { handle } = await initializedServer();
-    const matches = toolData(await callTool(handle, 'theme', { query: 'violet' }));
+    const matches = toolData(await callTool(handle, 'theme.search', { query: 'violet' }));
     expect((matches.themes as { id: string }[]).some(({ id }) => id === 'violet')).toBe(true);
-    const theme = toolData(await callTool(handle, 'theme', { id: 'violet' }));
+    const theme = toolData(await callTool(handle, 'theme.get', { id: 'violet' }));
     expect(theme.theme).toMatchObject({ id: 'violet' });
   });
 });
@@ -182,16 +188,16 @@ it('reports tool and protocol errors and speaks newline-delimited JSON-RPC on st
     'reports invalid arguments as tool errors and unknown tools as protocol errors',
     async () => {
       const { handle } = await initializedServer();
-      const badArgs = await callTool(handle, 'catalog', { limit: 0 });
+      const badArgs = await callTool(handle, 'catalog.search', { limit: 0 });
       expect(badArgs.result?.isError).toBe(true);
       expect(toolData(badArgs).error).toContain('limit');
       expect(toolData(badArgs).code).toBe('invalid-input');
-      const missing = await callTool(handle, 'component', { id: 'not-in-catalog' });
+      const missing = await callTool(handle, 'component.get', { id: 'not-in-catalog' });
       expect(missing.result?.isError).toBe(true);
       expect(toolData(missing).code).toBe('not-found');
       const renamed = await callTool(handle, 'component.get', { id: 'card' });
       expect(toolData(renamed)).toEqual(
-        toolData(await callTool(handle, 'component', { id: 'card' }))
+        toolData(await callTool(handle, 'component.get', { id: 'card' }))
       );
       const unknown = await callTool(handle, 'execute', {});
       expect(unknown.error?.code).toBe(-32602);
@@ -230,7 +236,7 @@ it('reports tool and protocol errors and speaks newline-delimited JSON-RPC on st
       ) as { version: string };
       expect(messages[0]?.result?.serverInfo).toEqual({ name: 'texuli', version });
       expect(version).not.toBe('0.0.0');
-      expect(messages[1]?.result?.tools).toHaveLength(20);
+      expect(messages[1]?.result?.tools).toHaveLength(22);
     }
   );
 });

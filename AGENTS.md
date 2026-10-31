@@ -49,6 +49,7 @@ Functions in `functions/`. See
 | Architecture | [ARCHITECTURE](docs/ARCHITECTURE.md) | The down-only layer graph (L0 core and spec … L8 tools and astro, L9 mcp), every package and subpath, engines, the website, build and test shape |
 | Decisions | [DECISIONS](docs/DECISIONS.md) | Architecture decisions: options, choice, why, how to reverse |
 | Design language | [DESIGN_LANGUAGE](docs/DESIGN_LANGUAGE.md) · [EDITOR_ARCHITECTURE](docs/EDITOR_ARCHITECTURE.md) | The cross-surface visual contract; the rich text editor's contracts (ADR-003) |
+| Design systems | [DESIGN_SYSTEMS](docs/DESIGN_SYSTEMS.md) | One JSON document per brand: author, import, validate (codes), compile, apply, patches and variants, distribute, guarantees, conformance, outputs; example brands in `examples/design-systems/` (in development for `0.10.0`) |
 | Standards | [STANDARDS](docs/STANDARDS.md) | TypeScript, Svelte 5, Biome, CSS logical properties, naming, a11y, honesty |
 | Testing | [TESTING_GUIDE](docs/TESTING_GUIDE.md) | Every gate with verified results, source→test map, blind spots, posture |
 | Commands | [DEVELOPMENT_COMMANDS](docs/DEVELOPMENT_COMMANDS.md) | Every root and package script, scoped variants |
@@ -121,6 +122,7 @@ texuli/
 ├── scripts/             check-layers, check-skill, size, visual, packages, supply-chain (+ tests/)
 ├── docs/                the guides above, plus docs/quality/
 ├── brand/               logos and favicons
+├── examples/design-systems/  fictional example brands (design-system documents; docs/DESIGN_SYSTEMS.md)
 ├── .agents/             skills, agents, commands (.claude and .cursor symlink here)
 ├── .review/extension.md repo rules for the AI Diff Reviewer local review
 ├── .dwp/                Deep Work Plans (git-ignored, except config.json)

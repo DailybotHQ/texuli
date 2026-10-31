@@ -1,10 +1,10 @@
 /// <reference types="node" />
 /**
  * The local write policy (ADR-019) for operations that write files through
- * the local MCP door (`texuli-mcp`, `texuli mcp`): `ds.save` and the file
- * outputs of deck and document operations. Today no operation writes; every
- * future writer goes through {@link resolveLocalWritePath} or
- * {@link writeLocalFile}, never `node:fs` directly.
+ * the local MCP door (`texuli-mcp`, `texuli mcp`) and the CLI: `ds.save`
+ * (through {@link localFiles}, which the local doors hand the registry) and
+ * the CLI's `--out`. Every writer goes through {@link resolveLocalWritePath}
+ * or {@link writeLocalFile}, never `node:fs` directly.
  *
  * The rules:
  * - the path is explicit: a non-empty string an agent or user passed, with
@@ -22,6 +22,7 @@
 import { constants, lstatSync, realpathSync } from 'node:fs';
 import { mkdir, open } from 'node:fs/promises';
 import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
+import type { LocalFiles } from '../ops/types.ts';
 
 /** The longest path the policy accepts (characters). */
 export const MAX_LOCAL_PATH_LENGTH = 1024;
@@ -178,4 +179,25 @@ export async function writeLocalFile(
     };
   }
   return { ok: true, path: target.path, relative: target.relative, bytes: bytes.byteLength };
+}
+
+/**
+ * The local writer a door hands `node` operations (`ds.save`): every write
+ * goes through {@link writeLocalFile}, confined to `cwd`.
+ */
+export function localFiles(options: LocalWriteOptions = {}): LocalFiles {
+  return {
+    check(path) {
+      const target = resolveLocalWritePath(path, options);
+      return target.ok
+        ? { ok: true, relative: target.relative }
+        : { ok: false, code: target.code, error: target.error };
+    },
+    async write(path, data, { overwrite }) {
+      const written = await writeLocalFile(path, data, { ...options, overwrite });
+      return written.ok
+        ? { ok: true, relative: written.relative, bytes: written.bytes }
+        : { ok: false, code: written.code, error: written.error };
+    },
+  };
 }

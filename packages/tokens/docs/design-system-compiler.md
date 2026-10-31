@@ -5,8 +5,11 @@
 > runtime is [design-system-runtime.md](design-system-runtime.md); the
 > importers, emitters, report, diff and fixtures are built on the same branch
 > ([design-system-io.md](design-system-io.md)), and so is `texuli ds check`
-> ([ds-check.md](../../tools/docs/ds-check.md)). The MCP `ds.*` operations
-> are **planned** (a later PLAN_011 task).
+> ([ds-check.md](../../tools/docs/ds-check.md)), and so are the `ds.*`
+> operations and `texuli ds` commands ([ds.md](../../tools/docs/ds.md)).
+
+The end-to-end guide (author, validate, apply, distribute, outputs) is
+[DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md).
 
 The compiler turns a design-system document
 ([`@texuli/spec/design-system`](../../spec/docs/design-system.md), ADR-021)
