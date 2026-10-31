@@ -6,6 +6,7 @@ import { whenLabel } from '../../engines/activity/days.ts';
 import {
   type InboxFilter,
   type InboxNotification,
+  type InboxReadChangeContext,
   newArrivals,
   unreadCount,
 } from '../../engines/activity/inbox.ts';
@@ -22,8 +23,26 @@ interface Props {
   /** Which items are listed (`bind:filter`). */
   filter?: InboxFilter;
   onFilterChange?: (filter: InboxFilter) => void;
-  /** Read state changes: one item (toggle, open) or every unread one (mark all). */
-  onReadChange?: (ids: string[], read: boolean) => void;
+  /**
+   * Read state changes: one item (`source: 'item'` for its toggle, `'open'`
+   * when opening marks it read) or every unread one (`'all'`, unless
+   * `onMarkAllRead` is given). Return a promise to show the control that
+   * started the save as pending until it settles; a rejection is announced.
+   * Any other return value is ignored (typed `unknown`, so handlers written
+   * as expressions keep compiling).
+   */
+  onReadChange?: (
+    ids: string[],
+    read: boolean,
+    context: InboxReadChangeContext
+  ) => unknown;
+  /**
+   * "Mark all as read", with the ids of the unread items listed now. When
+   * given, it replaces `onReadChange` for that button, so a host whose own
+   * mark-all covers rows outside `items` (paging, filters) can route it.
+   * May return a promise, like `onReadChange`.
+   */
+  onMarkAllRead?: (ids: string[]) => unknown;
   /**
    * Read items offer "Mark unread". Default `true`; `false` hides that toggle
    * (unread items still offer "Mark read"), for hosts that persist only
@@ -56,6 +75,7 @@ let {
   filter = $bindable('all'),
   onFilterChange,
   onReadChange,
+  onMarkAllRead,
   allowMarkUnread = true,
   onMarkUnread,
   onOpen,
@@ -100,15 +120,60 @@ function setFilter(next: InboxFilter): void {
   onFilterChange?.(next);
 }
 
-function setRead(ids: string[], read: boolean): void {
+/** Controls with a save in flight: `all`, or `item:<id>` for a row's toggle. */
+let pending = $state(new Set<string>());
+
+function isThenable(value: unknown): value is PromiseLike<unknown> {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as { then?: unknown }).then === 'function'
+  );
+}
+
+function announce(message: string): void {
+  // Cleared first so the same message is spoken again.
+  announcement = '';
+  void tick().then(() => (announcement = message));
+}
+
+/** Track a host save: its control is pending until it settles; a rejection is announced. */
+function track(result: unknown, control: string | null): void {
+  if (!isThenable(result)) return;
+  if (control) pending = new Set([...pending, control]);
+  const done = () => {
+    if (!control) return;
+    const next = new Set(pending);
+    next.delete(control);
+    pending = next;
+  };
+  result.then(done, () => {
+    done();
+    announce(text.saveFailed);
+  });
+}
+
+function setRead(ids: string[], read: boolean, source: InboxReadChangeContext['source']): void {
   if (ids.length === 0 || (!read && !allowMarkUnread)) return;
+  const control = source === 'all' ? 'all' : source === 'item' ? `item:${ids[0]}` : null;
+  if (control && pending.has(control)) return;
   if (filter === 'unread' && read) kept = new Set([...kept, ...ids]);
-  onReadChange?.(ids, read);
+  let result: unknown;
+  try {
+    result =
+      source === 'all' && onMarkAllRead
+        ? onMarkAllRead(ids)
+        : onReadChange?.(ids, read, { source });
+  } catch {
+    announce(text.saveFailed);
+    return;
+  }
+  track(result, control);
   if (!read) onMarkUnread?.(ids);
 }
 
 function open(item: T): void {
-  if (markReadOnOpen && !item.read) setRead([item.id], true);
+  if (markReadOnOpen && !item.read) setRead([item.id], true, 'open');
   onOpen?.(item);
 }
 
@@ -126,6 +191,20 @@ function when(item: T): { iso: string; label: string } {
     : { iso: '', label: '' };
 }
 </script>
+
+<!--
+  A pending control keeps focus: it is aria-disabled with its click ignored,
+  never natively disabled (which would drop focus to <body>), and shows
+  texuli's button spinner over its kept, hidden label.
+-->
+{#snippet label(value: string, busy: boolean)}
+  {#if busy}
+    <span class="tx-inbox__spinner" data-tx-inbox-spinner aria-hidden="true"></span>
+    <span class="tx-inbox__label--hidden">{value}</span>
+  {:else}
+    {value}
+  {/if}
+{/snippet}
 
 <section class={cx('tx-inbox', className)} aria-labelledby="{uid}-title" data-tx-inbox>
   <header class="tx-inbox__header">
@@ -152,9 +231,17 @@ function when(item: T): { iso: string; label: string } {
     <button
       type="button"
       class="tx-inbox__button"
-      aria-disabled={unread === 0}
-      onclick={() => unread > 0 && setRead(items.filter((item) => !item.read).map((item) => item.id), true)}
-      >{text.markAllRead}</button
+      aria-disabled={unread === 0 || pending.has('all')}
+      aria-busy={pending.has('all') || undefined}
+      data-pending={pending.has('all') || undefined}
+      onclick={() =>
+        unread > 0 &&
+        setRead(
+          items.filter((item) => !item.read).map((item) => item.id),
+          true,
+          'all'
+        )}
+      >{@render label(text.markAllRead, pending.has('all'))}</button
     >
   </header>
   {#if shown.length === 0}
@@ -187,12 +274,16 @@ function when(item: T): { iso: string; label: string } {
             </div>
             <div class="tx-inbox__actions">
               {#if !item.read || allowMarkUnread}
+                {@const busy = pending.has(`item:${item.id}`)}
                 <button
                   type="button"
                   class="tx-inbox__button"
                   aria-label={item.read ? text.markUnreadItem(item.title) : text.markReadItem(item.title)}
-                  onclick={() => setRead([item.id], !item.read)}
-                  >{item.read ? text.markUnread : text.markRead}</button
+                  aria-disabled={busy ? 'true' : undefined}
+                  aria-busy={busy || undefined}
+                  data-pending={busy || undefined}
+                  onclick={() => setRead([item.id], !item.read, 'item')}
+                  >{@render label(item.read ? text.markUnread : text.markRead, busy)}</button
                 >
               {/if}
               {@render actions?.(item)}

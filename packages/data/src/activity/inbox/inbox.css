@@ -72,6 +72,42 @@
     color: var(--tx-muted-foreground, GrayText);
   }
 
+  /* A save in flight (G106): texuli's button spinner over the kept, hidden label. */
+  .tx-inbox__button[data-pending] {
+    position: relative;
+    cursor: progress;
+  }
+
+  .tx-inbox__spinner {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    inline-size: var(--tx-size-icon-sm, 1rem);
+    block-size: var(--tx-size-icon-sm, 1rem);
+    border-radius: var(--tx-shape-radius-full);
+    border: 2px solid color-mix(in srgb, currentColor 25%, transparent);
+    border-block-start-color: currentColor;
+    animation: tx-inbox-spin var(--tx-motion-slow, 0.75s) linear infinite;
+  }
+
+  .tx-inbox__label--hidden {
+    opacity: 0;
+  }
+
+  @keyframes tx-inbox-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tx-inbox__spinner {
+      animation: none;
+      border-color: currentColor;
+      opacity: 0.7;
+    }
+  }
+
   .tx-inbox__view:focus-visible,
   .tx-inbox__button:focus-visible,
   .tx-inbox__open:focus-visible {

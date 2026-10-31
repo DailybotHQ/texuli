@@ -94,7 +94,7 @@ On the branch so far:
   is refused; `@texuli/document` documents carry `designSystem` and
   `@texuli/pages`' `PageReader` applies it the same way. `texuli/design-system`
   also exports `applyDesignSystem` and `loadDesignSystemCompiler`.
-- **Protoyard gaps G100–G104** (PLAN_011 T-gaps-100-104; each reported on
+- **Protoyard gaps G100–G104 and G106** (PLAN_011 T-gaps-100-104; each reported on
   0.8.x and still present in 0.9.0):
   - **G104** (`@texuli/data/calendar`): an event chip's accessible name
     now leads with its visible text in the same order (title,
@@ -121,6 +121,14 @@ On the branch so far:
   - **G103** (`@texuli/data/board`): after a keyboard move into another
     column, focus is restored to the held card in the same task, so the
     next Space or Enter drops it instead of landing on `<body>`.
+  - **G106** (`@texuli/data/activity/inbox`): `onReadChange` gets a third
+    argument `{ source: 'all' | 'item' | 'open' }`, and the new
+    `onMarkAllRead(ids)` takes over "Mark all as read" when given. Either
+    may return a promise: the control that started it is `aria-busy`,
+    `aria-disabled` and shows texuli's button spinner until it settles,
+    and a rejection is announced (`labels.saveFailed`). Existing
+    two-argument handlers keep working; both buttons keep the
+    `tx-inbox__button` class.
 
 ### 0.9.0
 
