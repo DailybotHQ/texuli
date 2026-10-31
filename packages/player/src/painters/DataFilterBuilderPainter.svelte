@@ -13,12 +13,15 @@ import { getPlayerInteraction } from '../context.ts';
  * filter, parsed against those fields within the engine's limits; one that
  * does not fit starts empty. Edits stay in view and run `on.change` (no
  * spec state type holds a nested filter, so `value` is not bindable).
+ * `optionLabels` gives an enum value its menu text; `issues` show under
+ * their conditions.
  */
 interface Field {
   key: string;
   header: string;
   type: FilterField['type'];
   options?: readonly string[];
+  optionLabels?: Readonly<Record<string, string>>;
 }
 
 let {
@@ -26,6 +29,7 @@ let {
   fields,
   value,
   maxDepth = 3,
+  issues,
   disabled = false,
   txPath,
 }: {
@@ -33,6 +37,7 @@ let {
   fields: readonly Field[];
   value?: unknown;
   maxDepth?: number;
+  issues?: readonly { path: readonly number[]; message: string }[];
   disabled?: boolean;
   txPath?: string;
 } = $props();
@@ -44,7 +49,16 @@ const fieldDefs = $derived(
       key: field.key,
       header: field.header,
       type: field.type,
-      ...(field.options ? { options: field.options } : {}),
+      ...(field.options
+        ? {
+            options: field.options.map((option) => {
+              const text = Object.hasOwn(field.optionLabels ?? {}, option)
+                ? field.optionLabels?.[option]
+                : undefined;
+              return text ? { value: option, label: text } : option;
+            }),
+          }
+        : {}),
     })
   )
 );
@@ -69,6 +83,7 @@ $effect.pre(() => {
     fields={fieldDefs}
     bind:value={model}
     {maxDepth}
+    {issues}
     {disabled}
     onValueChange={() => {
       if (txPath !== undefined) interaction?.dispatch(txPath, 'change');
