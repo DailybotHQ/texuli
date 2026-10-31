@@ -1,5 +1,5 @@
 import { fireEvent, screen, waitFor } from '@testing-library/svelte';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { createFormPlayerHost, type FormHostRequest } from '../src/host/index.ts';
 import { CONTACT } from './fixtures.ts';
 
@@ -35,6 +35,14 @@ function request(schema: unknown, overrides: Partial<FormHostRequest> = {}) {
 }
 
 describe('createFormPlayerHost', () => {
+  // The host paints through a lazily imported SchemaForm. Load it once up
+  // front, so findByRole waits for the render, not for a cold module
+  // transform that outlasted its 1 s window under parallel load. (import() of
+  // a loaded module still resolves later, so presenting stays asynchronous.)
+  beforeAll(async () => {
+    await import('../src/view/SchemaForm.svelte');
+  }, 30_000);
+
   it('checks drafts with the registered validator names only (none registered: none allowed)', () => {
     const named = {
       title: 'Named',
