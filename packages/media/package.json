@@ -1,6 +1,6 @@
 {
   "name": "@texuli/media",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "private": true,
   "description": "Media: images, galleries, video, audio and layered compositions.",
   "keywords": [
@@ -135,10 +135,10 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/core": "0.10.0",
-    "@texuli/primitives": "0.10.0",
-    "@texuli/tokens": "0.10.1",
-    "texuli": "0.10.1"
+    "@texuli/core": "0.11.0",
+    "@texuli/primitives": "0.11.0",
+    "@texuli/tokens": "0.11.0",
+    "texuli": "0.11.0"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

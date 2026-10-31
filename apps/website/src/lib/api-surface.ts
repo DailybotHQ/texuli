@@ -25,18 +25,19 @@
  * registry; `apps/website/tests/site-api.test.ts` fails when it drifts from
  * `TOOLS_VERSION` in `@texuli/tools/ops`.
  */
-export const API_VERSION = '0.10.1';
+export const API_VERSION = '0.11.0';
 
 /**
  * Where the API stands in the release line (docs/RELEASE.md). One switch:
  * the release task of 0.9.0 flipped it to `released` for the merge that
  * published 0.9.0 and deployed texuli.com from main, and the release task
- * of 0.10.0 names the release the API version ships in; the index, health
+ * of 0.10.0 names the release the API version ships in (0.11.0 since the
+ * 0.11.0 release); the index, health
  * file, OpenAPI document and portal follow.
  */
 export const API_RELEASE_STATUS = Object.freeze({
   state: 'released' as 'in-development' | 'released',
-  note: 'Released in the 0.10 line (0.10.1; first released in 0.9.0): published on npm and served by texuli.com, deployed from main.',
+  note: 'Released in 0.11.0 (first released in 0.9.0): published on npm and served by texuli.com, deployed from main.',
 });
 
 /** The path prefix of the current API major version. */

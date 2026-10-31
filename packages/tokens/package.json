@@ -1,6 +1,6 @@
 {
   "name": "@texuli/tokens",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "private": true,
   "description": "The OKLCH theme engine, the --tx-* token contract, 200+ themes and compiled CSS.",
   "keywords": [
@@ -70,6 +70,6 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@texuli/spec": "0.10.0"
+    "@texuli/spec": "0.11.0"
   }
 }
