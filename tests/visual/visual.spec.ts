@@ -106,6 +106,12 @@ async function capture(page: Page, target: VisualTarget, scheme: ColorScheme): P
       timeout: LOAD_TIMEOUT,
     });
   }
+  // Any part that marks itself as still loading (`data-tx-pending`: a
+  // SchemaForm whose per-type controls have not arrived, their placeholders)
+  // must be done, so a capture never shows a placeholder.
+  await expect(host.locator('[data-tx-pending]'), `${target.id} parts load`).toHaveCount(0, {
+    timeout: LOAD_TIMEOUT,
+  });
   const nestedLayoutHost = host.locator('[data-tx-layout-host]');
   if (await nestedLayoutHost.count()) {
     await expect(nestedLayoutHost, `${target.id} nested layout loads`).toHaveAttribute(
