@@ -453,7 +453,7 @@ describe('url protocols (G121)', () => {
       'data:text/html,hi',
       'http://user:pw@example.com',
       'http:example.com',
-      'http://exa​mple.com',
+      'http://exa\u200bmple.com',
       'ftp://example.com',
     ]) {
       expect(checkFieldValue(both, hostile, false), hostile).not.toBeNull();

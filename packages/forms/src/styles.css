@@ -190,7 +190,7 @@ fieldset.tx-forms__group {
  */
 .tx-forms__control-loading {
   box-sizing: border-box;
-  min-block-size: var(--tx-size-control-md, 2.5rem);
+  min-block-size: var(--tx-size-control-md);
   border-radius: var(--tx-shape-radius-md);
   background: var(--tx-muted, transparent);
   opacity: 0.5;
