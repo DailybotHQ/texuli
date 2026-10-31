@@ -112,6 +112,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [site-component-pages](../apps/website/docs/site-component-pages.md) | Component pages generator |
 | [site-csp](../apps/website/docs/site-csp.md) | Built-site Content Security Policy |
 | [site-dashboards](../apps/website/docs/site-dashboards.md) | Dashboards page (texuli.com) |
+| [site-design-systems](../apps/website/docs/site-design-systems.md) | Design systems hub at /design-systems/ (texuli.com) |
 | [site-docs-shell](../apps/website/docs/site-docs-shell.md) | Docs shell (texuli.com) |
 | [site-documents](../apps/website/docs/site-documents.md) | texuli.com: documents page |
 | [site-drag](../apps/website/docs/site-drag.md) | Drag page (texuli.com) |

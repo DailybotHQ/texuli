@@ -325,7 +325,8 @@ opened). Details: [ds-check.md](../packages/tools/docs/ds-check.md).
 | Canvas SVG and PNG | `design` on `@texuli/canvas/export` ([export](../packages/canvas/docs/export.md)) | On the branch |
 | Kotlin (Compose) | `packages/spec/scripts/design-tokens.ts` writes `DesignTokens.kt` for the default and `acme` sets, checked by `DesignTokensConformanceTest` ([native](../native/README.md#design-tokens-adr-024)) | On the branch; a CLI command for your own brand is **planned** |
 | Standalone decks naming a design system (`@texuli/deck` `themeRef`), Markdown writers carrying `designSystem` | — | **Planned** |
-| Design System Studio on texuli.com | — | **Planned** (a separate task) |
+| Design System Studio on texuli.com | [`/theme-studio/`](../apps/website/docs/site-theme-studio.md) | On the branch |
+| The design systems hub on texuli.com: the example brands on four surfaces and their conformance | [`/design-systems/`](../apps/website/docs/site-design-systems.md) | On the branch |
 
 ## Agents
 
