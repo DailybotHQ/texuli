@@ -387,6 +387,35 @@ test('data calendar: opens scrolled before paint, pointer create and drag (mirro
 test('data board and virtual list: the lazy move menu relocates a card; the active row is marked in forced colors', async ({
   page,
 }) => {
+  await test.step('G103: a keyboard move into another column keeps focus on the held card in the same task', async () => {
+    await page.goto('/?fixture=data-board&mode=light', { waitUntil: 'networkidle' });
+    const board = page.locator('[data-example="data-board"] .tx-board').first();
+    await expect(board).toBeVisible({ timeout: 20_000 });
+    // Record where focus is right after the board handles each key, before any frame runs.
+    await page.evaluate(() => {
+      const log: string[] = [];
+      (window as unknown as { focusLog: string[] }).focusLog = log;
+      window.addEventListener('keydown', () => {
+        const active = document.activeElement as HTMLElement | null;
+        const card = active?.closest('[data-board-card]');
+        log.push(
+          active?.hasAttribute('data-board-handle')
+            ? `handle:${card?.getAttribute('data-item-id')}`
+            : (active?.tagName ?? 'none')
+        );
+      });
+    });
+    await board.locator('[data-item-id="task-3"] [data-board-handle]').focus();
+    for (const key of ['Space', 'ArrowLeft', 'Space']) await page.keyboard.press(key);
+    expect(
+      await page.evaluate(() => (window as unknown as { focusLog: string[] }).focusLog)
+    ).toEqual(['handle:task-3', 'handle:task-3', 'handle:task-3']);
+    await expect(board.locator('.tx-board__status')).toContainText('Dropped Review navigation');
+    await expect(board.locator('[data-board-cell][aria-label="Backlog"]')).toContainText(
+      'Review navigation'
+    );
+  });
+
   await test.step('the board move menu loads lazily, moves a card and stays axe-clean', async () => {
     const example = page.locator('[data-example="data-board"]');
     await page.goto('/?fixture=data-board&mode=light', { waitUntil: 'networkidle' });

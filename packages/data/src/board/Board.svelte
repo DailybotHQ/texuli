@@ -9,7 +9,7 @@ import {
   formatDragMessage,
   resolveDragMessages,
 } from '@texuli/drag/messages';
-import { type Component, type Snippet, tick, untrack } from 'svelte';
+import { type Component, flushSync, type Snippet, tick, untrack } from 'svelte';
 import type { Attachment } from 'svelte/attachments';
 import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue, cx, variants } from 'texuli/cx';
@@ -315,17 +315,22 @@ async function focusCard(id: string, prefer: 'menu' | 'handle' = 'handle'): Prom
     if (win?.requestAnimationFrame) win.requestAnimationFrame(() => resolve());
     else resolve();
   });
+  focusCardNow(id, prefer);
+}
+
+/** Focus a card's handle (or Move menu) as the DOM is now; whether it took focus. */
+function focusCardNow(id: string, prefer: 'menu' | 'handle' = 'handle'): boolean {
   const root = ref;
   const cardNode = [...(root?.querySelectorAll<HTMLElement>('[data-board-card]') ?? [])].find(
     (node) => node.getAttribute('data-item-id') === id
   );
-  if (!cardNode) return;
+  if (!cardNode) return false;
   const menu = cardNode.querySelector<HTMLElement>('[data-board-move-menu]');
   const handle = cardNode.querySelector<HTMLElement>('[data-board-handle]');
   const target = prefer === 'menu' ? (menu ?? handle) : (handle ?? menu);
-  if (target && 'focus' in target && typeof target.focus === 'function') {
-    target.focus();
-  }
+  if (!target || typeof target.focus !== 'function') return false;
+  target.focus();
+  return target.ownerDocument.activeElement === target;
 }
 
 function cardLocked(item: T): boolean {
@@ -456,7 +461,11 @@ function onCardKey(event: KeyboardEvent, item: T): void {
     const itemToMove = itemById(result.commit.itemId);
     if (itemToMove) void commit(result.commit, itemToMove);
   }
-  void focusCard(id);
+  // A move into another column re-creates the card: apply it now and focus the
+  // new node in this same task, so the next key (Space to drop) never lands on
+  // <body> (G103). The frame-later focus stays as the fallback.
+  flushSync();
+  if (!focusCardNow(id)) void focusCard(id);
 }
 
 // ── Pointer drag on the shared @texuli/drag engine ─────────────────────────
