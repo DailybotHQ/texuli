@@ -3,7 +3,7 @@
 **Package:** `@texuli/tokens`
 **Source:** `packages/tokens/src/css/`  
 **Import:** `@texuli/tokens/css` (preferred) or the root barrel
-**Tests:** `packages/tokens/tests/css.test.ts`
+**Tests:** `packages/tokens/tests/css.test.ts`, `packages/tokens/tests/system-css.test.ts`
 
 ## Precompiled base stylesheet
 
@@ -12,6 +12,21 @@ plain CSS file; it does not require Tailwind or a CSS transform. It declares
 `@layer tx.base, tx.components` and puts reset, focus, motion and surface rules
 in the lower-priority `tx.base` layer. Unlayered consumer CSS and later
 `tx.components` rules can override those normal declarations.
+
+Component CSS reads the system tokens (`--tx-space-unit`, `--tx-size-*`,
+`--tx-shape-radius-*`, the type roles…) with no fallback, so a host must load
+`base.css` or `@texuli/tokens/system.css` (unreleased, `0.10.0`; G110).
+`system.css` holds only the generated system token block of `base.css`, on
+the same scopes and in the same `tx.base` layer, with no reset, motion tables
+or focus ring hook, for hosts that keep their own reset. `generate.ts` writes
+both from one renderer, and `tests/system-css.test.ts` checks that
+`system.css` declares every system token that component CSS reads and that
+`base.css` declares the same values.
+
+No development warning fires when the tokens are missing: a check would need a
+cross-bundler development flag (a new dependency) and a computed-style read in
+every component on mount, which forces a style recalculation. The test above
+and these notes carry the contract instead.
 
 ## Scoped themes
 

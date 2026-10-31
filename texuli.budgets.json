@@ -552,6 +552,11 @@
       "cssGzip": 2944,
       "note": "PLAN_011 T-tokens-v2 (ADR-020): new exact row (was the @texuli/tokens/* default, which caps JS only); measured 0 B gzip and 1,680 B CSS gzip. Token contract v2 adds no declaration here: system and component tokens are read with their default as the fallback (systemVar, componentVar), cap = measured + 4% rounded up to 64 B. PLAN_011 T-adopt-core (2026-10-30, lead decision): cssGzip 1792 -> 2944 B, measured + 4% (measured 2,781 B): base.css declares the 123 token contract v2 system defaults once per token scope (so every component read carries one fallback level at most) and the focus ring hook rules."
     },
+    "@texuli/tokens/system.css": {
+      "gzip": 64,
+      "cssGzip": 1280,
+      "note": "PLAN_011 T-gaps-107-110 (G110, contract amendment 13, approved under trust mode): new exact row for the system token defaults alone (the base.css generated block on every token scope, with no reset, motion tables or focus ring hook), for hosts that bring their own reset. Measured 0 B gzip and 1,189 B CSS gzip (base.css 2,781 B), cap = measured + 4% rounded up to 64 B."
+    },
     "@texuli/tokens/components": {
       "gzip": 9152,
       "note": "PLAN_011 T-tokens-v2 (ADR-020): new row for the component token registry (48 components covering the 41 styled texuli subpaths, 333 tokens), componentVar and the checkTokenReads guard over the system fallback model, and its JSON Schema. A tooling and authoring entry: component CSS uses the generated var() expressions, not this module. Measured 8,409 B, cap = measured + 4% rounded up to 64 B. PLAN_011 T-adopt-domain (2026-10-30): 8768 -> 9152 B, measured + 4% (measured 8,797 B): nine domain component families (data-grid, board, chart-frame, chat-bubble, chat-composer, canvas-toolbar, workflow-node, spreadsheet, forms; 29 tokens) join the closed vocabulary, and families name their package."
