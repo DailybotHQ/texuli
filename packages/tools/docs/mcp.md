@@ -101,6 +101,73 @@ unsupported one is refused with `-32600`.
   that says to initialize first.
 - **Stateless (HTTP):** every method works without a handshake;
   `initialize` still answers, and nothing is kept between requests.
+- **Per request (2026-07-28, both modes):** a request that names `2026-07-28`
+  in `params._meta` is answered on its own; see the next section.
+
+## The 2026-07-28 revision (partial)
+
+Since 0.10.0 the handler also serves MCP revision `2026-07-28` next to the
+initialize-based ones, in both modes and on both doors, to the extent
+Protoyard (Texuli's first consumer) asked for in G124. The constants are
+`MCP_STATELESS_PROTOCOL_VERSIONS` (`['2026-07-28']`), `MCP_PROTOCOL_REVISIONS`
+(every revision, newest first) and `MCP_PROTOCOL_VERSION_META_KEY`.
+
+**Implemented:**
+
+- **Per-request version.** The handler reads
+  `params._meta["io.modelcontextprotocol/protocolVersion"]` on every
+  request. When it is `2026-07-28`, the request needs no `initialize`, skips
+  the stdio initialization gate and stores nothing: a later request without
+  that `_meta` version still sees the session as it was.
+- **Unknown revision.** A `_meta` value that is not one of
+  `MCP_PROTOCOL_REVISIONS` (any string, or a non-string) is refused, on any
+  method including `initialize` and `ping`, with `-32022`,
+  `message: "Unsupported protocol version; supported: …"` and
+  `data: { supported: [...MCP_PROTOCOL_REVISIONS], requested }`
+  (`requested` is the string, cut to 64 characters, and absent for a
+  non-string).
+- **`server/discover`**, under `2026-07-28` only:
+
+  ```json
+  {"jsonrpc":"2.0","id":4,"method":"server/discover","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28"}}}
+  ```
+
+  answers `protocolVersion` (`2026-07-28`), `supportedVersions` (every
+  revision, newest first: the server card's `statelessProtocolVersions`
+  then its `protocolVersions`), `serverInfo`, `capabilities` and
+  `instructions` (as `initialize` returns them), and summaries: `tools`
+  (`name` and `title` of every tool `tools/list` returns on that door),
+  `prompts` (`name`, `title`) and `resources` (`count` and the
+  `templates`). `prompts` and `resources` are absent when the capability is
+  off. The full items come from the list methods.
+- **Stateless methods.** `ping`, `tools/list`, `tools/call`, `prompts/list`,
+  `prompts/get`, `resources/list`, `resources/templates/list`,
+  `resources/read` and `completion/complete` answer under `2026-07-28` with
+  the same results as after a `2025-11-25` handshake.
+
+**Not implemented** (anything of 2026-07-28 beyond the list above), and the
+conservative choices made where the report was silent:
+
+- A request without the `_meta` version behaves exactly as before, so
+  `server/discover` without it is gated on stdio before initialization
+  (`-32600`) and `-32601` otherwise. A `_meta` naming an initialize-based
+  revision (for example `2025-11-25`) changes nothing either.
+- `initialize` keeps negotiating only the initialize-based revisions
+  (`MCP_SUPPORTED_PROTOCOL_VERSIONS`): a client asking for `2026-07-28` in
+  `initialize` gets `2025-11-25`. An `initialize` that carries the
+  `2026-07-28` `_meta` version is answered as before.
+- Notifications are unchanged (they never get an answer).
+- On HTTP, the `MCP-Protocol-Version` header accepts `2026-07-28`, but the
+  header alone does not select it: a request with that header and no `_meta`
+  version is `-32600`, and a header that disagrees with the `_meta` version
+  is `-32600`. Without the header, the `_meta` version alone is enough.
+
+**Not initialized: `-32600`, not `-32002`.** Protoyard's own server answers a
+request before initialization with `-32002`. Texuli answers `-32600`
+(Invalid Request) and keeps it: in 2025-11-25, `-32002` is the
+resource-not-found code, which `resources/read` uses here. A client that
+tells the two apart should read `-32600` with the "Server not initialized"
+message as the not-initialized case.
 
 ## Capabilities
 
@@ -227,11 +294,12 @@ from another method or is past the end is refused with `-32602`.
 | Code | When |
 | --- | --- |
 | `-32700` | stdio: a line that is not JSON, or longer than 2 MiB |
-| `-32600` | Not a JSON-RPC 2.0 request (bad `jsonrpc`, method or id); a stateful request before initialization; a stateless request with an unsupported protocol version |
+| `-32600` | Not a JSON-RPC 2.0 request (bad `jsonrpc`, method or id); a stateful request before initialization; a stateless request with an unsupported protocol version; on HTTP, a `2026-07-28` header without the `_meta` version or one that disagrees with it |
 | `-32601` | An unknown method, or one whose capability is not advertised |
 | `-32602` | Bad params: an unknown tool or prompt, a bad cursor, a bad URI, bad prompt arguments, a bad completion reference |
 | `-32603` | A resource provider threw; the message is `Internal error` and never carries the cause |
 | `-32002` | Resource not found |
+| `-32022` | `params._meta` names a protocol revision the handler does not serve; `error.data.supported` lists the revisions |
 
 Operation failures are never JSON-RPC errors; see [Tools](#tools).
 
@@ -264,7 +332,9 @@ MCP-Protocol-Version: 2025-11-25
   except the `node` operations (`document.export`: PDF and DOCX), which are
   not listed and answer `runtime-unavailable`, plus the site tools below. No handshake is required; send
   `initialize` if the host wants one. The protocol version comes from the
-  `MCP-Protocol-Version` header (an unsupported one is `400`).
+  `MCP-Protocol-Version` header (an unsupported one is `400`), or from
+  `params._meta` under `2026-07-28` (see
+  [The 2026-07-28 revision](#the-2026-07-28-revision-partial)).
 - **Responses:** JSON only, no SSE stream and no `Mcp-Session-Id`. A
   notification gets `202`. A batch of up to 10 messages gets an array of
   the responses to its requests. `GET` gets `405` with a pointer here (an
@@ -315,7 +385,8 @@ offered to browser agents in the page itself through WebMCP
 `texuli-mcp` bin from a clean install (handshake, `tools/list`,
 `catalog.search`, exit on stdin close).
 `packages/tools/tests/mcp-protocol.test.ts` is the conformance suite: every
-method, every JSON-RPC and operation error code, the four versions, cursors,
+method, every JSON-RPC and operation error code, the four versions and the
+per-request `2026-07-28` revision, cursors,
 oversized stdio lines and operation inputs, stateless and stateful handlers,
 and the runtime filter. It also checks that the llms resources are
 byte-identical to the site's committed snapshots. `mcp.test.ts`,
@@ -336,5 +407,9 @@ identically on both. A fifth job reads the site (`site.search` →
 only, with a fake `env.ASSETS`, and the stdio door is checked to refuse
 `site.read` with `runtime-unavailable`. `tool-descriptions.test.ts` there lints every operation's
 summary, stated limits, argument descriptions and bounds, closed input
-schema and examples. The design-system jobs are skipped until their
+schema and examples. `revisions.test.ts` there drives the real
+`@texuli/mcp` stdio entry (lines over streams, starting with Protoyard's
+`server/discover` repro) and the remote Function with the same
+`2026-07-28` messages, and asserts identical answers except the tools each
+door serves, `-32022` on both, the header rules and the counter label. The design-system jobs are skipped until their
 operations exist.
