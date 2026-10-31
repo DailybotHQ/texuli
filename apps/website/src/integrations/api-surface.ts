@@ -52,20 +52,19 @@ async function readJson(out: string, path: string): Promise<unknown> {
   return JSON.parse(await readFile(join(out, path.slice(1)), 'utf8'));
 }
 
-/** Small, real examples cut from the built files. */
+/**
+ * Real bodies read from the built files. `buildOpenApi` samples each one
+ * (`sampleExample`: every list and every record keyed by data, such as the
+ * twins map or a theme's CSS variables, cut short at any depth).
+ */
 async function examplesFrom(out: string, themeId: string | undefined) {
-  const catalog = (await readJson(out, '/catalog/catalog.json')) as Record<string, unknown> & {
-    entries: unknown[];
-  };
-  const twins = (await readJson(out, '/md-manifest.json')) as { twins: Record<string, string> };
-  const first = <T>(list: unknown, count = 1) => (list as T[]).slice(0, count);
   return {
-    Catalog: { ...catalog, entries: first(catalog.entries) },
-    ThemeCatalog: first(await readJson(out, '/theme-catalog.json'), 2),
-    ThemeDarkSwatchList: first(await readJson(out, '/theme-catalog-dark.json'), 2),
-    ThemeGalleryCardList: first(await readJson(out, '/theme-gallery.json')),
+    Catalog: await readJson(out, '/catalog/catalog.json'),
+    ThemeCatalog: await readJson(out, '/theme-catalog.json'),
+    ThemeDarkSwatchList: await readJson(out, '/theme-catalog-dark.json'),
+    ThemeGalleryCardList: await readJson(out, '/theme-gallery.json'),
     ...(themeId ? { ThemeData: await readJson(out, `/theme-data/${themeId}.json`) } : {}),
-    TwinsManifest: { twins: Object.fromEntries(Object.entries(twins.twins).slice(0, 3)) },
+    TwinsManifest: await readJson(out, '/md-manifest.json'),
   };
 }
 
