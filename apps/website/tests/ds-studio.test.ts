@@ -43,6 +43,8 @@ import {
   issuesAt,
   libraryDocument,
   parseValue,
+  previewMode,
+  previewModes,
   ROLES,
   rolePinField,
   SECTIONS,
@@ -354,6 +356,25 @@ describe('the engine', () => {
     }
     const unknown = await compileStudio(libraryDocument('no-such-theme', 'x'));
     expect(unknown).toMatchObject({ ok: false });
+  });
+
+  it('previews a dark-only design system dark, with only Dark offered', async () => {
+    const darkOnly = await compileStudio(setAt(seedDocument(), ['color', 'modes'], ['dark']));
+    if (!darkOnly.ok) throw new Error(JSON.stringify(darkOnly.issues));
+    expect(Object.keys(darkOnly.compiled.vars)).toEqual(['dark']);
+    expect(previewModes(darkOnly.compiled)).toEqual(['dark']);
+    // The studio's default Light paints the compiled dark mode, as the runtime does.
+    expect(previewMode(darkOnly.compiled, 'light')).toBe('dark');
+    expect(previewMode(darkOnly.compiled, 'dark')).toBe('dark');
+    const both = await compileStudio(seedDocument());
+    if (!both.ok) throw new Error(JSON.stringify(both.issues));
+    expect(previewModes(both.compiled)).toEqual(['light', 'dark']);
+    for (const mode of ['light', 'dark'] as const)
+      expect(previewMode(both.compiled, mode)).toBe(mode);
+    // Before the first compile, and for a copy with no mode, the choice stands (never throws).
+    expect(previewModes(null)).toEqual(['light', 'dark']);
+    expect(previewMode(null, 'light')).toBe('light');
+    expect(previewMode({ vars: {} }, 'dark')).toBe('dark');
   });
 
   it('refuses an invalid document with codes and paths, and compiles a variant', async () => {

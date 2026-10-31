@@ -32,7 +32,9 @@ entirely in the browser (PLAN_011 T-ds-studio, architecture §B.8):
    path: a plain-language sentence, the code and the JSON path.
 3. **Preview** five surfaces in one `DesignSystemProvider` scope (light or
    dark, any variant): a component sheet, a dashboard, a deck slide, a
-   document page and an email.
+   document page and an email. A single-mode design system (Modes: `dark`)
+   previews its one mode with the other toggle disabled (`previewMode`, the
+   runtime's `pickDesignSystemMode` rule).
 4. **Report** every contrast pair per mode, the solver's adjustments and
    warnings, and the diff from the starting point (`diffDesignSystems`).
 5. **Export** as Blob downloads: the document, compiled JSON, scoped CSS,
