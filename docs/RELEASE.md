@@ -135,12 +135,15 @@ On the branch so far:
   import`. `blueprint.validate` checks an inline design system with the
   spec's rules. The remote Function's initial bundle grew to 223,613 B gzip
   (the operation declarations; the compute loads lazily).
+- **Landed on the branch:** the design-system guide (`docs/DESIGN_SYSTEMS.md`),
+  the skill's design-systems sub-skill and three fictional example brands in
+  `examples/design-systems/` (T-ds-docs-skill); the fixes for every tracked
+  conformance finding (`DS_CHECK_KNOWN_FINDINGS` is empty) and the stronger
+  token-usage guard (`system-color` and `unknown-token` rules).
 - **In progress on the branch (not merged yet, listed here as they land):**
-  the design-system guide (`docs/DESIGN_SYSTEMS.md`), the skill's
-  design-systems sub-skill and three example brands (T-ds-docs-skill); the
-  fixes for the tracked conformance findings (`DS_CHECK_KNOWN_FINDINGS`)
-  and the token-usage guard; the Design System Studio on texuli.com; the
-  Protoyard gaps G100–G104.
+  the Design System Studio on texuli.com; design systems on standalone decks,
+  player component defaults and the document writers; the Protoyard gaps
+  G105 and G107–G110.
 
 **Removed in 0.10.0** (deprecated in `0.9.0` for one minor; done on the
 branch):
