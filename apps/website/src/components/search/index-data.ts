@@ -263,11 +263,25 @@ const SITE_PAGES: readonly SearchEntry[] = [
   },
   {
     id: 'page-theme-studio',
-    title: 'Theme studio',
-    description: 'Generate a theme from color, words or image; tune roles; export CSS and JSON.',
+    title: 'Design system studio',
+    description:
+      'Build a design system from a seed, logo, library theme or DTCG file; edit every section; check contrast; export and share.',
     href: '/theme-studio/',
     kind: 'page',
-    keywords: ['theme', 'generator', 'seed', 'mood', 'export', 'aa'],
+    keywords: [
+      'design system',
+      'theme',
+      'studio',
+      'generator',
+      'seed',
+      'logo',
+      'dtcg',
+      'tokens studio',
+      'tailwind',
+      'export',
+      'contrast',
+      'aa',
+    ],
   },
 ];
 

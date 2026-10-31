@@ -1,28 +1,37 @@
 ---
 /**
- * /theme-studio/ — generate, tune, preview, AA-check and export a theme.
+ * /theme-studio/ — the Design System Studio (PLAN_011 T-ds-studio): start,
+ * edit, preview, check, diff, export and share a design-system document,
+ * all in the browser. The URL is the theme studio's, so every existing link
+ * (and every `#theme=` share link) keeps working.
  */
-import ThemeStudio from '../../components/theme-studio/ThemeStudio.svelte';
+import DesignSystemStudio from '../../components/theme-studio/DesignSystemStudio.svelte';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout
-  title="Theme studio"
-  description="Build a Texuli theme from a color, mood words or a local image. Tune roles, check WCAG AA, export CSS and JSON. Static site, no runtime network."
+  title="Design system studio"
+  description="Build a Texuli design system from a seed color, a logo, a library theme or a DTCG or Tokens Studio file. Edit every section, preview five surfaces, check contrast, export every format, share by link. Runs in the browser."
 >
   <div class="page" data-tx-theme-studio-page="">
     <header class="page__header">
-      <p class="eyebrow">@texuli/tokens generator</p>
-      <h1>Theme studio</h1>
+      <p class="eyebrow">@texuli/tokens design systems · in development for 0.10.0</p>
+      <h1>Design system studio</h1>
       <p class="lead">
-        Generate a light and dark theme from one brand color, mood words, or a local image — or start
-        from a preset seed or a library theme and make it yours. Retune roles, watch components update
-        live, gate WCAG 2.x contrast, and export CSS or JSON. A color, mood-word or library theme
-        also copies as a link that rebuilds it in any browser; an image theme stays on this device,
-        so export it instead. Nothing leaves this origin.
+        Describe a brand once, as data. Start from a seed color, a logo, a library theme, mood
+        words, or a DTCG, Tokens Studio or design-system file; edit identity, color, type, space,
+        shape, elevation, motion, layout, components, accessibility targets and variants; watch a
+        component sheet, a dashboard, a slide, a document and an email follow; read the contrast
+        report and the diff; export JSON, CSS, a Tailwind preset, DTCG, Tokens Studio, a report or
+        a sample email; share the whole document in a link. Nothing leaves this origin.
+      </p>
+      <p class="note">
+        Design-system documents, their compiler and these exports ship with release 0.10.0, which
+        is in development and unreleased; the published 0.9 line has the theme engine and the
+        token contract they build on.
       </p>
     </header>
-    <ThemeStudio base={import.meta.env.BASE_URL} client:load />
+    <DesignSystemStudio base={import.meta.env.BASE_URL} client:load />
   </div>
 </BaseLayout>
 
@@ -44,10 +53,16 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     font-size: clamp(1.75rem, 4vw, 2.5rem);
     color: var(--tx-foreground);
   }
-  .lead {
+  .lead,
+  .note {
     margin: 0.5rem 0 0;
-    max-inline-size: 44rem;
+    max-inline-size: 48rem;
     color: var(--tx-foreground);
+  }
+  .lead {
     font-size: 1.0625rem;
+  }
+  .note {
+    font-size: 0.9375rem;
   }
 </style>

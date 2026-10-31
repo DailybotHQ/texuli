@@ -238,6 +238,12 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
     budget: { jsGzipKb: 88, pageGzipKb: 118 },
   },
   {
+    route: '/theme-studio/',
+    reason:
+      'PLAN_011 T-ds-studio: the Design System Studio (one client:load island) edits every section of a design-system document with Texuli controls and previews it on five surfaces (component sheet, dashboard, slide, document, email). Before, the theme studio measured 129.3 KB page and 91.5 KB JS (2026-10-30, not budgeted: the route was not in the browser list). The compiler, diff, importers, emitters and email renderer load only on interaction; the starting design system is a 5.2 KB build-time JSON instead of the compiler. The preview surfaces and the report load right after mount, so the total depends on whether they finish before the ready signal (153 to 175 KB measured); the limits are the fully loaded measurement, 180.7 KB page and 126.8 KB JS on 2026-10-30 (+4% headroom). Every dynamic import destructures its exports, so the shared @texuli/tokens chunks stay tree-shaken and no other route grows. Follow-up: trim the component chunks the previews pull in.',
+    budget: { pageGzipKb: 188, jsGzipKb: 132 },
+  },
+  {
     route: '/color-explorer/',
     reason:
       'The theme list and one theme payload are inline; other payloads load as /theme-data/<id>.json on selection. Measured 291.5 KB raw / 30.8 KB gzip before the docs sidebar; the PLAN_006 studio polish (T-82) enriched the controls: 311.2 KB raw / 34.1 KB gzip of HTML, 114.8 KB page / 64.8 KB JS, limits 316 / 36 / 120 / 68. PLAN_010 (motion and the API contract in the shared components): measured 69.4 KB JS, limit 73 (+4% headroom). PLAN_010 wave 6 (component labels through the i18n message catalog): measured 120.9 KB page, limit 126 (+4% headroom). PLAN_010 T-site-080 (measured 2026-10-29 on f9809246 with this task’s pages; none of its islands loads on this route, and swapping its one texuli root import left the number unchanged): the shared component code of the 0.8.0 wave (the texuli and primitives labels moved to the i18n message catalog, and the SSR-safe Select.Value): measured 73.3 KB JS and 123.1 KB page, limits 77 and 129 (+4% headroom).',
