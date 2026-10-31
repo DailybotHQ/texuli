@@ -123,8 +123,10 @@ TEXULI_E2E_PORT=4880 pnpm exec playwright test tests/e2e/site-ds-studio.spec.ts 
 
 ## Planned
 
-- The MCP `ds.*` operations and `texuli ds` export commands the studio could
-  hand off to are later PLAN_011 tasks.
+- A hand-off to the MCP `ds.*` operations and `texuli ds` commands (which
+  exist on `release/0.10.0`): the studio runs the same compiler, importers
+  and emitters in the page and does not call them; a "copy as `texuli ds`
+  command" or MCP hand-off is planned.
 - Font files and logo assets: the studio edits their relative paths but
   cannot host files, so a document with fonts previews in fallback fonts.
 - Resolving `extends: "id@x.y.z"` (another design system): the page has no
