@@ -3,6 +3,9 @@
 > **Status: in development for `0.10.0`, not on npm.** The subpath exists on
 > the `release/0.10.0` branch and ships only with `@texuli/tokens@0.10.0`.
 
+The end-to-end guide (author, validate, apply, distribute, outputs) is
+[DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md).
+
 The runtime puts a compiled design system
 ([design-system-compiler.md](design-system-compiler.md)) on the page
 ([ADR-023](../../../docs/DECISIONS.md#adr-023-design-system-runtime-and-scoping)).

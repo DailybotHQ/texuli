@@ -9,7 +9,8 @@
 > deployed. The Kotlin, email, PDF, DOCX, PPTX and canvas outputs of a
 > design system are **planned** ([design-system-io.md](../../tokens/docs/design-system-io.md)).
 
-An agent authors a design system
+The developer and agent guide is
+[DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md). An agent authors a design system
 ([the document](../../spec/docs/design-system.md)) through the same
 [operations registry](ops.md) as everything else, so the local MCP
 (`texuli-mcp`), the remote MCP and the CLI give the same answers. Every
@@ -92,9 +93,11 @@ request body at 256 KB), 10 s.
   or `ds.suggest`, write the sections, `ds.validate` and fix by code until
   valid, `ds.contrast` and `ds.preview`, then deliver with `ds.compile`,
   `blueprint.theme` or `ds.save` ([mcp.md](mcp.md#prompts)).
-- **`texuli://design-system/{id}`**: the spec's fictional examples (`acme`,
-  `minimal`; listed) and every library theme as a document (completed, not
-  listed, read one at a time) ([mcp.md](mcp.md#resources)).
+- **`texuli://design-system/{id}`**: the fictional examples (the spec's
+  `acme` and `minimal`, and the guide's brands `quillmark`, `ledgerline`
+  and `tumbletown` from `examples/design-systems/`; listed) and every
+  library theme as a document (completed, not listed, read one at a time)
+  ([mcp.md](mcp.md#resources)).
 
 ## CLI
 
