@@ -59,6 +59,19 @@ a footer part when the page has them, and `word/media/` images.
   true);
 - `compress`: deflate the package where the platform has
   `CompressionStream` (default true; images stay stored).
+- `design`: plain design values, a `DocumentDesign` (`colors` as
+  `#rrggbb` per `DocumentDesignRole`, `fonts` as CSS stacks), built from
+  a compiled design system with `designValues(compiled, mode)` from
+  `@texuli/tools/print`. The first concrete family of `fonts.sans` is the
+  body font (instead of Calibri), of `fonts.heading` the heading font
+  when it differs, and of `fonts.mono` the code font (instead of
+  Consolas); `foreground` sets the text color, `link` the hyperlink
+  style, `border` every rule and table border, `muted` the code shading,
+  and the soft and strong status roles the callout fills and bars (the
+  same roles as [the PDF writer](pdf.md#design-systems)). Values outside
+  `#rrggbb` or a plain family name are ignored. Without it, the package is
+  byte-for-byte the default (a test pins its SHA-256). Word substitutes a
+  font the reader does not have; nothing is embedded.
 
 `DOCX_MIME` is the package's media type. Output is deterministic: the same
 document gives the same bytes.

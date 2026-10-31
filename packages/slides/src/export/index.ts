@@ -16,6 +16,8 @@ export {
   type DeckPdfResult,
   type DeckPptxAssetContext,
   type DeckPptxChartContext,
+  type DeckPptxDesign,
+  type DeckPptxDesignRole,
   type DeckPptxImageAsset,
   type DeckPptxOmission,
   type DeckPptxOmissionKind,

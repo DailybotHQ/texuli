@@ -207,9 +207,9 @@ visible `not-on-this-target` placeholder.
 
 | Module | What it holds | Targets |
 | --- | --- | --- |
-| `texuli-spec` | The generated models, enums and decoders from `packages/spec/generated/kotlin` (compiled in place through `srcDir`, never copied), plus a strict JSON reader, the spec validator (the twin of `validateBlueprint`), the render plan and the semantic trace | JVM, iOS (arm64 and simulator) |
-| `texuli-compose` | The token theme, the native registry (translation dictionary, native side), typed host intents (no activate intent) and Compose components: page, doc, deck, card, deck-slide and bounded responsive grid layouts, text blocks and lists, static board diagrams, stat, KPI, accessible table data blocks, stack, row, split and tile layouts, code blocks, calls to action, dividers and columns, image, figure, video and gallery media frames, and a subset of compact charts, each with a visible placeholder for anything else | JVM (Compose Desktop) |
-| `conformance` | The native half of the dual-target golden gate, the validator parity test and the six KMP app migration checks | JVM tests |
+| `texuli-spec` | The generated models, enums and decoders from `packages/spec/generated/kotlin` (compiled in place through `srcDir`, never copied), the generated design tokens (`tokens/DesignTokens.kt`), plus a strict JSON reader, the spec validator (the twin of `validateBlueprint`), the render plan and the semantic trace | JVM, iOS (arm64 and simulator) |
+| `texuli-compose` | The token theme (`TexuliTheme`, Material colors from a generated token set), the native registry (translation dictionary, native side), typed host intents (no activate intent) and Compose components: page, doc, deck, card, deck-slide and bounded responsive grid layouts, text blocks and lists, static board diagrams, stat, KPI, accessible table data blocks, stack, row, split and tile layouts, code blocks, calls to action, dividers and columns, image, figure, video and gallery media frames, and a subset of compact charts, each with a visible placeholder for anything else | JVM (Compose Desktop) |
+| `conformance` | The native half of the dual-target golden gate, the validator parity test, design-token value parity and the six KMP app migration checks | JVM tests |
 
 The native flow follows design §4:
 1. `loadBlueprint` parses and decodes the blueprint into the generated models.
@@ -223,6 +223,41 @@ The native flow follows design §4:
 **Targets.** iOS is compiled for `texuli-spec` only, for a SwiftUI adapter
 (design decision 3). Android is pending the same decision, and Compose for
 the web is not a target, because the web stays Svelte.
+
+## Design tokens (ADR-024)
+
+`TexuliTheme(dark, tokens)` paints with a generated design-token set, not
+hardcoded colors. `packages/spec/scripts/design-tokens.ts` compiles design
+systems with the web compiler (`@texuli/tokens/design-system/compile`),
+resolves every color to sRGB (the gamut-mapped `oklchToHex` the email and
+print outputs use) and writes, through `designTokensToKotlin`
+(`packages/spec/src/codegen/kotlin-tokens.ts`, internal to the script for
+now; a public export is planned):
+
+- `texuli-spec/src/commonMain/kotlin/com/texuli/spec/tokens/DesignTokens.kt`:
+  `DesignTokenColors` (29 roles as `0xAARRGGBB`, with `byVar` naming the
+  web variable each mirrors), `DesignTokenSet` (id, version, compiled hash,
+  font stacks, radius and spacing step in dp, light and dark colors) and
+  `DesignTokens.Default` (the Texuli default, `extends: "texuli:violet"`),
+  `DesignTokens.Acme` (the spec's `acme.json` fixture) and `all`;
+- `conformance/fixtures/design-tokens.web.json`: the web compiler's
+  variables for those sets, verbatim.
+
+`texuliColorScheme(tokens, dark)` maps the roles to Material: `primary`,
+`primarySoft` (containers), `secondary`, `accent` (tertiary), `background`,
+`surface`, `muted` (surface variant), `borderStrong` and `border`
+(outlines), `destructive` and `destructiveSoft` (error) and `scrim`, each
+with its foreground. A set without a dark mode paints its light colors.
+Fonts, radius and spacing are carried for hosts; the Compose components do
+not read them yet (planned).
+
+**Value conformance.** `DesignTokensConformanceTest` reads the web JSON,
+parses each web string in Kotlin on its own (hex, `rgb()`, and `oklch()`
+with the same chroma-reduction gamut mapping) and requires every generated
+color to match per channel (±1), and the font stacks, radius and spacing to
+be equal. On the web side, `pnpm vitest run packages/spec` fails when the
+committed Kotlin or JSON differs from a fresh compile. A brand's own set is
+the same script with another document (planned: a CLI command for it).
 
 ## The dual-target golden gate
 
@@ -304,6 +339,7 @@ slots exist on the parent, matching the shared spec validator; default
 pnpm exec tsx native/conformance/web/trace.ts       # the web traces and SemanticRules.kt are current
 pnpm exec tsx native/conformance/web/structure.ts   # wrapper, modules, packages, brackets, imports, trace parity
 pnpm vitest run packages/spec                       # the spec harness: generated Kotlin structure and closed decoding
+pnpm exec tsx packages/spec/scripts/design-tokens.ts --check  # DesignTokens.kt and the web token JSON are current
 ```
 
 ### Native test map
@@ -327,6 +363,7 @@ run on the JVM and (for `texuli-spec`) the iOS simulator as well.
 | `MediaWidgetsTest` | `texuli-compose` | Untrusted media source rules, `media-image` and `blocks-media` projections, gallery columns |
 | `MotionTest` (compose) | `texuli-compose` | Every motion preset maps to Compose enter and exit transitions in both directions; absent presets and level `none` play nothing |
 | `CompositionWidgetsTest` | `texuli-compose` | Stack, row, split and tile props (closed gaps, aligns and ratios, clamped spans), inert code blocks with a size cap, https-only call-to-action hrefs, columns and dividers, the nested-block families, and the hostile matrix on every new projection |
+| `TexuliThemeTest` | `texuli-compose` | `TexuliTheme`'s Material scheme reads the generated token set in light and dark; a brand set changes it |
 | `MessagesTest` | `texuli-compose` | `TexuliMessages`: one-pass `{name}` interpolation, catalog lookups with English defaults, untrusted catalog JSON, linear time on runs of braces |
 | `TableGridTest` | `texuli-compose` | Table column/row normalization, inert cells, bounded grid columns and rows |
 | `HostilePropsTest` | `texuli-compose` | The hostile matrix: every projection's props replaced by each value in `HOSTILE_VALUES` (wrong types, JSON null, non-finite and extreme numbers, huge, bidi, zero-width, control and surrogate strings, huge and deep containers) never throws and stays in bounds |
@@ -335,6 +372,7 @@ run on the JVM and (for `texuli-spec`) the iOS simulator as well.
 | `InvalidFixtureParityTest` | `conformance` | Every spec invalid fixture is refused with exactly the TypeScript codes |
 | `WorkflowFixtureParityTest` | `conformance` | Every spec workflow golden validates and every workflow invalid fixture is refused with exactly the TypeScript codes |
 | `DesignSystemFixtureTest` | `conformance` | The spec's design-system fixtures (spec `0.10.0`, in development) decode with the generated `DesignSystem` types across every section, kebab-case component keys as camelCase properties; an unknown key fails closed. Types only: the TypeScript validator checks patterns and caps |
+| `DesignTokensConformanceTest` | `conformance` | Every generated design-token color equals the web compiler's variable, parsed independently in Kotlin (hex, `rgb()`, gamut-mapped `oklch()`), per role and mode for the default and acme sets; fonts, radius and spacing equal |
 | `KmpStarterMigrationTest` | `conformance` | The KMPStarter blueprint loads natively and each widget keeps its documented status |
 | `KmpTodoMigrationTest` | `conformance` | The KMPTodoApp screen as a static fixture: registry statuses pinned, external app untouched |
 | `KmpAiChatMigrationTest` | `conformance` | The KMPAIChat screen: the chat form validates and plans (no native chat painter yet), the fallback loads painted |
@@ -471,6 +509,9 @@ Compose Multiplatform 1.10.3. Ratifying them is design decision 5.
 ## Regenerating
 
 - The spec's Kotlin comes from `pnpm exec tsx packages/spec/scripts/generate.ts`.
+- The design tokens come from
+  `pnpm exec tsx packages/spec/scripts/design-tokens.ts`; rerun it when the
+  compiler, a library theme or the acme fixture changes (the hash moves).
 - After a golden or a semantic rule changes, run
   `pnpm exec tsx native/conformance/web/trace.ts --write` and review the diff.
 - The generated Kotlin carries the spec version and digest in its stamp. A

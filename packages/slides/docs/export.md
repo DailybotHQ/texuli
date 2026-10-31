@@ -233,6 +233,7 @@ answers) gives the same bytes. Tests unzip the output and parse every part.
 | `snapshotChart(chart, context)` | — | Rasterize a chart block to a picture. Without it, charts are omitted and their title stays. |
 | `palette` | the embedded theme, else neutral | The resolved theme palette (`#rrggbb` per role), or a function of each slide (`undefined` for the deck theme). |
 | `fonts` | — | `heading`, `body` and `mono` families; the first concrete family of a CSS list is used. |
+| `design` | — | Design values, a `DeckPptxDesign` (`colors` as `#rrggbb` per `DeckPptxDesignRole`, `fonts.sans`, `fonts.heading` and `fonts.mono` as CSS stacks), built from a compiled design system with `designValues(compiled, mode)` from `@texuli/tools/print`. They layer over the embedded theme for the theme palette (the PPTX `accent` reads `chart2`, a saturated brand series) and fonts, for the deck and every slide; `palette` and `fonts` still win. Without it the package is byte-for-byte the default (a test pins its SHA-256). |
 | `noteOmissions` | `true` | Also list each slide's omissions on its notes page (needs `notes`). |
 | `hidden` | `include` | `include` writes hidden slides as PowerPoint hidden slides; `skip` leaves them out. |
 

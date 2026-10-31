@@ -21,6 +21,7 @@ import type {
   PageSettings,
   TexuliDocument,
 } from '../model/types.ts';
+import type { DocumentDesign } from '../output/design.ts';
 import {
   bandSegments,
   embedText,
@@ -53,6 +54,13 @@ export interface DocxOptions {
   pageNumbers?: boolean;
   /** Deflate the package where the platform can (default true). */
   compress?: boolean;
+  /**
+   * Design values (ADR-024): the body, heading and code families (the
+   * first concrete family of each stack), the text, link, rule and code
+   * colors, and the callout fills and bars. Default: none, and the output
+   * is unchanged.
+   */
+  design?: DocumentDesign | null;
 }
 
 export interface DocxResult {
@@ -89,6 +97,39 @@ const TONES: Record<CalloutTone, { fill: string; border: string }> = {
   warning: { fill: 'FFF6E0', border: 'D97706' },
   danger: { fill: 'FDECEC', border: 'DC2626' },
 };
+
+/** The fonts and colors a package is written with. */
+export interface DocxTheme {
+  body: string;
+  /** A heading family, only when it differs from the body's. */
+  heading: string | null;
+  mono: string;
+  /** The text color, only from a design. */
+  text: string | null;
+  link: string;
+  rule: string;
+  code: string;
+  tones: Record<CalloutTone, { fill: string; border: string }>;
+}
+
+const DEFAULT_THEME: DocxTheme = {
+  body: 'Calibri',
+  heading: null,
+  mono: 'Consolas',
+  text: null,
+  link: '0563C1',
+  rule: 'BFBFBF',
+  code: 'F2F2F2',
+  tones: TONES,
+};
+
+const fonts = (name: string, eastAsia = false) =>
+  el('w:rFonts', {
+    'w:ascii': name,
+    'w:hAnsi': name,
+    'w:eastAsia': eastAsia ? name : undefined,
+    'w:cs': name,
+  });
 
 interface ParagraphOptions {
   style?: string;
@@ -127,14 +168,17 @@ class Writer {
   readonly contentWidth: number;
   readonly rtl: boolean;
   readonly pageHref: ((ref: string) => string | null | undefined) | undefined;
+  readonly theme: DocxTheme;
 
   constructor(
     doc: TexuliDocument,
     trust: HrefTrust,
     contentWidth: number,
     rtl: boolean,
-    pageHref?: (ref: string) => string | null | undefined
+    pageHref?: (ref: string) => string | null | undefined,
+    theme: DocxTheme = DEFAULT_THEME
   ) {
+    this.theme = theme;
     this.doc = doc;
     this.trust = trust;
     this.contentWidth = contentWidth;
@@ -209,7 +253,12 @@ class Writer {
                 })
               : null,
             options.borderBottom
-              ? el('w:bottom', { 'w:val': 'single', 'w:sz': 6, 'w:space': 1, 'w:color': 'BFBFBF' })
+              ? el('w:bottom', {
+                  'w:val': 'single',
+                  'w:sz': 6,
+                  'w:space': 1,
+                  'w:color': this.theme.rule,
+                })
               : null
           )
         : null,
@@ -232,13 +281,13 @@ class Writer {
       'w:rPr',
       {},
       style.link ? el('w:rStyle', { 'w:val': 'Hyperlink' }) : null,
-      style.code
-        ? el('w:rFonts', { 'w:ascii': 'Consolas', 'w:hAnsi': 'Consolas', 'w:cs': 'Consolas' })
-        : null,
+      style.code ? fonts(this.theme.mono) : null,
       style.strong ? el('w:b') : null,
       style.em ? el('w:i') : null,
       style.strike ? el('w:strike') : null,
-      style.code ? el('w:shd', { 'w:val': 'clear', 'w:color': 'auto', 'w:fill': 'F2F2F2' }) : null
+      style.code
+        ? el('w:shd', { 'w:val': 'clear', 'w:color': 'auto', 'w:fill': this.theme.code })
+        : null
     );
     const pieces: MarkupElement[] = [];
     // Newlines become breaks and tabs become tab characters.
@@ -415,7 +464,7 @@ class Writer {
         return [this.paragraph(this.shaded(context), this.picture(image, block.alt))];
       }
       case 'callout': {
-        const shade = TONES[block.tone] ?? TONES.neutral;
+        const shade = this.theme.tones[block.tone] ?? this.theme.tones.neutral;
         const shadedContext = { ...inner, shade };
         const title = block.title
           ? [
@@ -673,7 +722,7 @@ class Writer {
   }
 }
 
-function stylesXml(locale: string | undefined): string {
+function stylesXml(locale: string | undefined, theme: DocxTheme = DEFAULT_THEME): string {
   const heading = (level: number, size: number) =>
     el(
       'w:style',
@@ -691,7 +740,14 @@ function stylesXml(locale: string | undefined): string {
         el('w:spacing', { 'w:before': level === 1 ? 360 : 240, 'w:after': 120 }),
         el('w:outlineLvl', { 'w:val': level - 1 })
       ),
-      el('w:rPr', {}, el('w:b'), el('w:sz', { 'w:val': size }), el('w:szCs', { 'w:val': size }))
+      el(
+        'w:rPr',
+        {},
+        theme.heading ? fonts(theme.heading, true) : null,
+        el('w:b'),
+        el('w:sz', { 'w:val': size }),
+        el('w:szCs', { 'w:val': size })
+      )
     );
   const paragraphStyle = (id: string, name: string, pPr: MarkupChild, rPr: MarkupChild) =>
     el(
@@ -716,12 +772,8 @@ function stylesXml(locale: string | undefined): string {
           el(
             'w:rPr',
             {},
-            el('w:rFonts', {
-              'w:ascii': 'Calibri',
-              'w:hAnsi': 'Calibri',
-              'w:eastAsia': 'Calibri',
-              'w:cs': 'Calibri',
-            }),
+            fonts(theme.body, true),
+            theme.text ? el('w:color', { 'w:val': theme.text }) : null,
             el('w:sz', { 'w:val': 22 }),
             el('w:szCs', { 'w:val': 22 }),
             el('w:lang', { 'w:val': locale || 'en-US' })
@@ -747,13 +799,10 @@ function stylesXml(locale: string | undefined): string {
         'Code',
         'Code',
         [
-          el('w:shd', { 'w:val': 'clear', 'w:color': 'auto', 'w:fill': 'F2F2F2' }),
+          el('w:shd', { 'w:val': 'clear', 'w:color': 'auto', 'w:fill': theme.code }),
           el('w:spacing', { 'w:after': 120, 'w:line': 240, 'w:lineRule': 'auto' }),
         ],
-        [
-          el('w:rFonts', { 'w:ascii': 'Consolas', 'w:hAnsi': 'Consolas', 'w:cs': 'Consolas' }),
-          el('w:sz', { 'w:val': 20 }),
-        ]
+        [fonts(theme.mono), el('w:sz', { 'w:val': 20 })]
       ),
       paragraphStyle('ListParagraph', 'List Paragraph', el('w:spacing', { 'w:after': 60 }), null),
       paragraphStyle('Caption', 'caption', el('w:spacing', { 'w:after': 60 }), [
@@ -776,7 +825,7 @@ function stylesXml(locale: string | undefined): string {
         'w:style',
         { 'w:type': 'character', 'w:styleId': 'Hyperlink' },
         el('w:name', { 'w:val': 'Hyperlink' }),
-        el('w:rPr', {}, el('w:color', { 'w:val': '0563C1' }), el('w:u', { 'w:val': 'single' }))
+        el('w:rPr', {}, el('w:color', { 'w:val': theme.link }), el('w:u', { 'w:val': 'single' }))
       ),
       el(
         'w:style',
@@ -789,7 +838,7 @@ function stylesXml(locale: string | undefined): string {
             'w:tblBorders',
             {},
             ['top', 'left', 'bottom', 'right', 'insideH', 'insideV'].map((side) =>
-              el(`w:${side}`, { 'w:val': 'single', 'w:sz': 4, 'w:space': 0, 'w:color': 'BFBFBF' })
+              el(`w:${side}`, { 'w:val': 'single', 'w:sz': 4, 'w:space': 0, 'w:color': theme.rule })
             )
           ),
           el(
@@ -858,7 +907,11 @@ export async function writeDocx(
   const geometry = pageGeometry(settings);
   const rtl = doc.meta.dir === 'rtl';
   const trust: HrefTrust = options.trust === 'developer' ? 'developer' : 'untrusted';
-  const writer = new Writer(doc, trust, geometry.contentWidth, rtl, options.pageHref);
+  // Design values load their resolver only when given.
+  const theme = options.design
+    ? (await import('./design.ts')).docxDesign(options.design, DEFAULT_THEME)
+    : DEFAULT_THEME;
+  const writer = new Writer(doc, trust, geometry.contentWidth, rtl, options.pageHref, theme);
   await writer.preload(doc.blocks, options.resolveImage);
 
   writer.rel('styles', 'styles.xml');
@@ -980,7 +1033,7 @@ export async function writeDocx(
     { path: 'docProps/core.xml', data: coreXml },
     { path: 'docProps/app.xml', data: appXml },
     { path: 'word/document.xml', data: documentXml },
-    { path: 'word/styles.xml', data: stylesXml(meta.locale) },
+    { path: 'word/styles.xml', data: stylesXml(meta.locale, theme) },
     { path: 'word/numbering.xml', data: numberingXml(writer.nums) },
     {
       path: 'word/_rels/document.xml.rels',

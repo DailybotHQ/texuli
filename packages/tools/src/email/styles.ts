@@ -230,15 +230,46 @@ export function resolveEmailPalette(
   return palette;
 }
 
-/** A safe font stack from a theme's `fontFamily`, else the system stack. */
-export function emailFontFamily(theme?: Theme | null): string {
-  const system = 'Arial, Helvetica, sans-serif';
-  const requested = theme?.fontFamily?.replace(/'/g, '"');
-  if (!requested) return system;
+/**
+ * A safe font stack: the plain names of a CSS stack (letters, digits,
+ * spaces and `-`, optionally quoted; at most five), then `fallback`.
+ * Anything else in the stack is dropped.
+ */
+export function emailFontStack(stack: string | null | undefined, fallback: string): string {
+  const requested = typeof stack === 'string' ? stack.slice(0, 400).replace(/'/g, '"') : '';
+  if (!requested) return fallback;
   const names = requested
     .split(',')
     .map((name) => name.trim())
     .filter((name) => /^(?:"[A-Za-z0-9 -]{1,40}"|[A-Za-z0-9 -]{1,40})$/.test(name))
     .slice(0, 5);
-  return names.length > 0 ? `${names.join(', ')}, ${system}` : system;
+  return names.length > 0 ? `${names.join(', ')}, ${fallback}` : fallback;
+}
+
+/** The system stack email text falls back to. */
+export const EMAIL_SYSTEM_FONT = 'Arial, Helvetica, sans-serif';
+/** The monospace stack email code falls back to. */
+export const EMAIL_MONO_FONT = 'Courier New, monospace';
+
+/** A safe font stack from a theme's `fontFamily`, else the system stack. */
+export function emailFontFamily(theme?: Theme | null): string {
+  return emailFontStack(theme?.fontFamily, EMAIL_SYSTEM_FONT);
+}
+
+/** The design-system roles each email palette key reads (`DesignValues.colors`). */
+export const EMAIL_PALETTE_DESIGN_ROLES: Readonly<Record<keyof EmailPalette, string>> =
+  Object.freeze({ ...PALETTE_ROLES });
+
+/** A palette with every role the design values resolve; the rest keep `base`. */
+export function designEmailPalette(
+  colors: Readonly<Record<string, string | undefined>> | null | undefined,
+  base: EmailPalette = DEFAULT_EMAIL_PALETTE
+): EmailPalette {
+  const palette: EmailPalette = { ...base };
+  if (!colors) return palette;
+  for (const key of Object.keys(PALETTE_ROLES) as (keyof EmailPalette)[]) {
+    const value = colors[PALETTE_ROLES[key]];
+    if (typeof value === 'string' && HEX.test(value)) palette[key] = value;
+  }
+  return palette;
 }

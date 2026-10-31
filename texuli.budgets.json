@@ -54,8 +54,8 @@
       "note": "PLAN_010 T-canvas (consented plan): new row at measured + 4%: the editor (toolbar, application surface, minimap, shape tree, controller) with the canvas model, operations and history it edits through; the sync session is not in it. Measured 44,454 B (CSS 1,910 B)."
     },
     "@texuli/canvas/export": {
-      "gzip": 8384,
-      "note": "PLAN_010 T-canvas (consented plan): new row at measured + 4%: SVG through @texuli/core/markup and PNG rasterization, with routing and paint geometry. Measured 8,010 B."
+      "gzip": 8768,
+      "note": "PLAN_010 T-canvas (consented plan): new row at measured + 4%: SVG through @texuli/core/markup and PNG rasterization, with routing and paint geometry. Measured 8,010 B. PLAN_011 T-ds-outputs: 8384 -> 8768 (CI Linux 8,401 B + 4%) for the design-system export palette, background and font stack."
     },
     "@texuli/canvas/host": {
       "gzip": 11200,

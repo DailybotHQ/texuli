@@ -20,6 +20,7 @@ import type {
   PageSettings,
   TexuliDocument,
 } from '../model/types.ts';
+import type { DocumentDesign } from '../output/design.ts';
 import {
   embedText,
   fileLink,
@@ -41,10 +42,10 @@ import {
 } from '../paged/layout.ts';
 import type { PageSlice } from '../paged/paginate.ts';
 import {
-  STANDARD_FONTS,
+  HELVETICA_FAMILY,
+  type StandardFamily,
   type StandardFont,
   standardFont,
-  standardWidth,
   winAnsiCode,
 } from './fonts.ts';
 import { type PdfImage, pdfImage } from './images.ts';
@@ -69,6 +70,13 @@ export interface PdfOptions {
   fontSize?: number;
   /** Deflate the content streams where the platform can (default true). */
   compress?: boolean;
+  /**
+   * Design values (ADR-024): text, muted, link, rule, code and callout
+   * colors, a page background when it is not white, and the body family
+   * (a serif stack sets the text in Times, loaded on use; anything else
+   * stays Helvetica). Default: none, and the output is unchanged.
+   */
+  design?: DocumentDesign | null;
 }
 
 export interface PdfResult {
@@ -79,7 +87,7 @@ export interface PdfResult {
   diagnostics: OutputDiagnostic[];
 }
 
-type Rgb = readonly [number, number, number];
+export type Rgb = readonly [number, number, number];
 type FontRef = StandardFont | 'T1';
 
 interface Frag {
@@ -133,11 +141,17 @@ interface Style {
   size: number;
 }
 
-const INK: Rgb = [0.13, 0.13, 0.15];
-const MUTED: Rgb = [0.36, 0.37, 0.4];
-const LINK: Rgb = [0.02, 0.36, 0.76];
-const RULE: Rgb = [0.75, 0.76, 0.78];
-const CODE_BG: Rgb = [0.95, 0.95, 0.96];
+export interface Colors {
+  ink: Rgb;
+  muted: Rgb;
+  link: Rgb;
+  rule: Rgb;
+  codeBg: Rgb;
+  tones: Record<CalloutTone, { fill: Rgb; bar: Rgb }>;
+  /** A page fill, only when the design's background is not white. */
+  page: Rgb | null;
+}
+
 const TONES: Record<CalloutTone, { fill: Rgb; bar: Rgb }> = {
   neutral: { fill: [0.953, 0.957, 0.965], bar: [0.612, 0.639, 0.686] },
   accent: { fill: [0.933, 0.949, 1], bar: [0.31, 0.275, 0.898] },
@@ -146,6 +160,16 @@ const TONES: Record<CalloutTone, { fill: Rgb; bar: Rgb }> = {
   warning: { fill: [1, 0.965, 0.878], bar: [0.851, 0.467, 0.024] },
   danger: { fill: [0.992, 0.925, 0.925], bar: [0.863, 0.149, 0.149] },
 };
+const DEFAULT_COLORS: Colors = {
+  ink: [0.13, 0.13, 0.15],
+  muted: [0.36, 0.37, 0.4],
+  link: [0.02, 0.36, 0.76],
+  rule: [0.75, 0.76, 0.78],
+  codeBg: [0.95, 0.95, 0.96],
+  tones: TONES,
+  page: null,
+};
+
 const HEADING_SCALE = [0, 2, 1.6, 1.3, 1.15];
 const LINE = 1.45;
 const GAP = 8;
@@ -182,14 +206,20 @@ class Layout {
   readonly pageHref: ((ref: string) => string | null | undefined) | undefined;
   /** Images never outgrow a page: the content height caps them. */
   readonly maxImageHeight: number;
+  readonly colors: Colors;
+  readonly family: StandardFamily;
 
   constructor(
     ttf: TrueTypeFont | null,
     trust: HrefTrust,
     base: number,
     pageHref: ((ref: string) => string | null | undefined) | undefined,
-    maxImageHeight: number
+    maxImageHeight: number,
+    colors: Colors = DEFAULT_COLORS,
+    family: StandardFamily = HELVETICA_FAMILY
   ) {
+    this.colors = colors;
+    this.family = family;
     this.ttf = ttf;
     this.trust = trust;
     this.base = base;
@@ -200,7 +230,7 @@ class Layout {
   /** Split text into same-font fragments with widths. */
   shape(text: string, style: Style, link: string | null): Frag[] {
     const std = standardFont(style);
-    const color = link ? LINK : (style.color ?? INK);
+    const color = link ? this.colors.link : (style.color ?? this.colors.ink);
     const out: Frag[] = [];
     let current: Frag | null = null;
     for (const character of text) {
@@ -231,7 +261,8 @@ class Layout {
           }
         }
       }
-      if (font !== 'T1') width = (standardWidth(font as StandardFont, code) * style.size) / 1000;
+      if (font !== 'T1')
+        width = (this.family.width(font as StandardFont, code) * style.size) / 1000;
       if (!current || current.font !== font) {
         current = {
           font,
@@ -376,7 +407,7 @@ class Layout {
     const lineHeight = size * 1.35;
     const pad = 6;
     const start = y;
-    const rect: RectItem = { kind: 'rect', top: y, bottom: y, x, width, color: CODE_BG };
+    const rect: RectItem = { kind: 'rect', top: y, bottom: y, x, width, color: this.colors.codeBg };
     box.items.push(rect);
     y += pad;
     const columns = Math.max(8, Math.floor((width - pad * 2) / (size * 0.6)));
@@ -487,19 +518,33 @@ class Layout {
       }
       case 'quote': {
         const top = y;
-        const bar: RectItem = { kind: 'rect', top, bottom: top, x, width: 2.5, color: RULE };
+        const bar: RectItem = {
+          kind: 'rect',
+          top,
+          bottom: top,
+          x,
+          width: 2.5,
+          color: this.colors.rule,
+        };
         box.items.push(bar);
         const before = box.items.length;
         y = this.blocks(box, block.blocks, x + 12, y, width - 12, depth + 1);
         for (const item of box.items.slice(before))
           if (item.kind === 'text')
-            for (const frag of item.frags) if (!frag.link) frag.color = MUTED;
+            for (const frag of item.frags) if (!frag.link) frag.color = this.colors.muted;
         bar.bottom = y;
         return y;
       }
       case 'divider': {
         const middle = y + size * 0.6;
-        box.items.push({ kind: 'rect', top: middle, bottom: middle + 0.75, x, width, color: RULE });
+        box.items.push({
+          kind: 'rect',
+          top: middle,
+          bottom: middle + 0.75,
+          x,
+          width,
+          color: this.colors.rule,
+        });
         return y + size * 1.2;
       }
       case 'media': {
@@ -510,7 +555,7 @@ class Layout {
             [
               {
                 text: `[Image: ${block.alt || block.ref}]`,
-                style: { size, em: true, color: MUTED },
+                style: { size, em: true, color: this.colors.muted },
                 link: null,
               },
             ],
@@ -537,7 +582,7 @@ class Layout {
         return y + drawHeight;
       }
       case 'callout': {
-        const tone = TONES[block.tone] ?? TONES.neutral;
+        const tone = this.colors.tones[block.tone] ?? this.colors.tones.neutral;
         const pad = 8;
         const fill: RectItem = { kind: 'rect', top: y, bottom: y, x, width, color: tone.fill };
         const bar: RectItem = { kind: 'rect', top: y, bottom: y, x, width: 3, color: tone.bar };
@@ -628,7 +673,7 @@ class Layout {
             [
               {
                 text: table.caption,
-                style: { size: cellSize, em: true, color: MUTED },
+                style: { size: cellSize, em: true, color: this.colors.muted },
                 link: null,
               },
             ],
@@ -661,12 +706,19 @@ class Layout {
             bottom,
             x,
             width,
-            color: header ? INK : RULE,
+            color: header ? this.colors.ink : this.colors.rule,
           });
           box.lines.push(bottom);
           y = bottom;
         };
-        box.items.push({ kind: 'rect', top: y, bottom: y + 0.5, x, width, color: RULE });
+        box.items.push({
+          kind: 'rect',
+          top: y,
+          bottom: y + 0.5,
+          x,
+          width,
+          color: this.colors.rule,
+        });
         row(table.header, true);
         for (const cells of table.rows) row(cells, false);
         return y;
@@ -679,7 +731,13 @@ class Layout {
         });
         return this.text(
           box,
-          [{ text: embedText(block), style: { size, em: true, color: MUTED }, link: null }],
+          [
+            {
+              text: embedText(block),
+              style: { size, em: true, color: this.colors.muted },
+              link: null,
+            },
+          ],
           x,
           y,
           width,
@@ -796,12 +854,20 @@ export async function writePdf(doc: TexuliDocument, options: PdfOptions = {}): P
     }
   }
   const settings = documentPageSettings(doc, options.page);
+  // Design values load their resolver (and Times, for a serif stack) only when given.
+  const styled = options.design
+    ? await (await import('./design.ts')).pdfDesign(options.design, DEFAULT_COLORS)
+    : null;
+  const colors = styled?.colors ?? DEFAULT_COLORS;
+  const family = styled?.family ?? HELVETICA_FAMILY;
   const layout = new Layout(
     ttf,
     trust,
     base,
     options.pageHref,
-    pageGeometry(settings).contentHeight * 0.95
+    pageGeometry(settings).contentHeight * 0.95,
+    colors,
+    family
   );
   let imageCount = 0;
   for (const [id, image] of loaded) {
@@ -840,8 +906,7 @@ export async function writePdf(doc: TexuliDocument, options: PdfOptions = {}): P
   const pagesId = out.reserve();
   const info = out.reserve();
   const fontIds = new Map<FontRef, number>();
-  for (const name of Object.keys(STANDARD_FONTS) as StandardFont[])
-    fontIds.set(name, out.reserve());
+  for (const name of Object.keys(family.names) as StandardFont[]) fontIds.set(name, out.reserve());
   const ttfIds =
     ttf && layout.glyphs.size > 0
       ? {
@@ -879,6 +944,10 @@ export async function writePdf(doc: TexuliDocument, options: PdfOptions = {}): P
   for (const page of paged.pages) {
     const ops: string[] = [];
     const links: string[] = [];
+    if (colors.page)
+      ops.push(
+        `${num(colors.page[0])} ${num(colors.page[1])} ${num(colors.page[2])} rg 0 0 ${num(geometry.width)} ${num(geometry.height)} re f`
+      );
     const contentTop = geometry.height - geometry.margins.top;
     const drawText = (item: TextItem, dy: number) => {
       for (const f of item.frags) {
@@ -948,7 +1017,7 @@ export async function writePdf(doc: TexuliDocument, options: PdfOptions = {}): P
     ) => {
       if (!value) return;
       const size = Math.max(7, base * 0.8);
-      const style: Style = { size, color: MUTED };
+      const style: Style = { size, color: colors.muted };
       const place = (textValue: string, align: 'start' | 'center' | 'end') => {
         if (!textValue) return;
         const frags = layout.shape(textValue, style, null);
@@ -997,7 +1066,7 @@ export async function writePdf(doc: TexuliDocument, options: PdfOptions = {}): P
       doc.meta.authors?.length ? ` /Author ${textString(doc.meta.authors.join('; '))}` : ''
     }${doc.meta.description ? ` /Subject ${textString(doc.meta.description)}` : ''} >>`
   );
-  for (const [name, base14] of Object.entries(STANDARD_FONTS)) {
+  for (const [name, base14] of Object.entries(family.names)) {
     out.put(
       fontIds.get(name as StandardFont) as number,
       `<< /Type /Font /Subtype /Type1 /BaseFont /${base14} /Encoding /WinAnsiEncoding >>`

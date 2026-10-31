@@ -5,6 +5,11 @@
  * policy, JPEG and PNG images, deterministic bytes. Load it lazily: only
  * an export pays for it.
  */
+
+export type {
+  DocumentDesign,
+  DocumentDesignRole,
+} from '../output/design.ts';
 export {
   type ImageInfo,
   type ImageResolver,

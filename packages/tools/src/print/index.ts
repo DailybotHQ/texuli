@@ -24,7 +24,16 @@ import {
 import type { PdfOptions } from '@texuli/document/pdf';
 import { validateDocument } from '@texuli/document/schema';
 import { emailRenderCatalog } from '../email/catalog.ts';
+import { type DesignVarsSource, designValues } from '../internal/design-values.ts';
 import { type StaticDiagnostic, validateStaticDraft } from '../internal/static-draft.ts';
+
+export {
+  DESIGN_COLOR_ROLES,
+  type DesignColorRole,
+  type DesignValues,
+  type DesignVarsSource,
+  designValues,
+} from '../internal/design-values.ts';
 
 export type PrintDiagnostic = StaticDiagnostic;
 
@@ -46,6 +55,14 @@ export type BlueprintDocumentResult =
 export interface BlueprintPdfOptions extends BlueprintDocumentOptions {
   /** Passed to `writePdf` (fonts, image bytes, page numbers…). `trust` is always `untrusted`. */
   pdf?: Omit<PdfOptions, 'trust'>;
+  /**
+   * A compiled design system (or anything with its `vars`): `mode`'s
+   * values become the PDF's `design` (colors, rules, the body family),
+   * unless `pdf.design` is set. Default: none (the output is unchanged).
+   */
+  designSystem?: DesignVarsSource | null;
+  /** Which design-system mode to print. Default `light`. */
+  mode?: 'light' | 'dark';
 }
 
 export type BlueprintPdfResult =
@@ -386,7 +403,14 @@ export async function renderBlueprintPdf(
   const diagnostics = [...mapped.diagnostics];
   try {
     const { writePdf } = await import('@texuli/document/pdf');
-    const written = await writePdf(mapped.document, { ...options.pdf, trust: 'untrusted' });
+    const design =
+      options.pdf?.design ??
+      designValues(options.designSystem, options.mode === 'dark' ? 'dark' : 'light');
+    const written = await writePdf(mapped.document, {
+      ...options.pdf,
+      ...(design ? { design } : {}),
+      trust: 'untrusted',
+    });
     for (const d of written.diagnostics.slice(0, 50)) {
       diagnostics.push({
         code: `pdf-${d.code}`,
