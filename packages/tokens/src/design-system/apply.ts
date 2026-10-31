@@ -288,8 +288,12 @@ export function applyDesignSystem(
 ): () => void {
   if (!el?.style) throw new TypeError('Not an element');
   const { variant = compiled.variant } = options;
-  if (compiled.variant !== undefined && variant !== compiled.variant)
-    throw new TypeError(`Compiled for variant ${compiled.variant}, not ${variant}`);
+  if (variant !== compiled.variant)
+    throw new TypeError(
+      compiled.variant === undefined
+        ? `Compiled without a variant, not for ${variant}`
+        : `Compiled for variant ${compiled.variant}, not ${variant}`
+    );
   const painted = pickDesignSystemMode(compiled, options.mode);
   const next = designSystemDeclarations(compiled.vars[painted] as ModeVars);
   const previous = applied.get(el);

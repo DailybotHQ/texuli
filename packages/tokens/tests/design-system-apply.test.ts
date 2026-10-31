@@ -232,6 +232,12 @@ describe('applyDesignSystem', { timeout: 20_000 }, () => {
     expect(() =>
       applyDesignSystem(el, { ...acme, variant: 'compact' }, { mode: 'light', variant: 'holiday' })
     ).toThrow(/variant/);
+    // A base compile never takes a variant attribute that SSR variant CSS would match.
+    const base = document.createElement('div');
+    expect(() => applyDesignSystem(base, acme, { mode: 'light', variant: 'compact' })).toThrow(
+      /without a variant/
+    );
+    expect(base.hasAttribute('data-tx-ds-variant')).toBe(false);
     expect(() =>
       applyDesignSystem(null as unknown as HTMLElement, acme, { mode: 'light' })
     ).toThrow(TypeError);
