@@ -54,7 +54,7 @@ scoped styles.
 | `presenter` | `false` | Bindable presenter layout |
 | `presenterTimer` | `false` | Show the elapsed timer in the presenter pane |
 | `sync` | `null` | A same-origin link to another stage window: the engine presenter protocol, or a v1 `DeckSync` ([presenter screen](#presenter-screen)) |
-| `loadTheme` | `loadDeckLibraryTheme` | Resolves catalog theme ids; `null` leaves them to host CSS |
+| `loadTheme` | `loadDeckLibraryTheme` (`DeckStage`); none on `DeckStageCore` | Resolves catalog theme ids; `null` (or none, on the core) leaves them to host CSS ([Themes](#themes)) |
 | `designSystems` | — | `{ resolve, mode }` for a deck's `designSystem.ref` (from `0.10.0`); see [Design systems](#design-systems) |
 | `onDesignSystem` | — | Called with a `PlayerDesignSystemEvent` when a deck's design system applies or is refused |
 | `resolveAvatar` | — | Host adapter for `avatar:` image ids |
@@ -199,14 +199,20 @@ scoped styles.
   `@texuli/slides/export-core` (G105), which takes the same `defaults`
   source and references no default table either
   ([export.md](export.md#export-core-texulislidesexport-core-g105)).
+  The core has no default `loadTheme` either (G127, unreleased, planned
+  for `0.10.1`): pass the host's loader, or `loadDeckLibraryTheme`
+  (exported by both entries) to load the token theme library on first use;
+  see [Themes](#themes).
 
   ```svelte
   <script lang="ts">
     import { DeckStageCore } from '@texuli/slides/stage-core';
     const renderers = { validateBlock: checkHostBlock, free: () => HostFreeSlide };
+    // A theme the host already resolved (or `loadDeckLibraryTheme`).
+    const loadTheme = async (id: string) => hostThemes.get(id) ?? Promise.reject(new Error(id));
   </script>
 
-  <DeckStageCore {deck} {renderers} />
+  <DeckStageCore {deck} {renderers} {loadTheme} />
   ```
 - **Canvas:** a fixed virtual canvas (1280 × 720 for 16:9) is scaled into
   the stage with a `ResizeObserver` and letterboxed. CSS variables go on the
@@ -504,8 +510,22 @@ The stage applies deck and slide themes with the `@texuli/tokens` engine. A
 slide's theme overrides the deck's.
 
 - **Loading:** embedded themes apply directly. Catalog ids go through
-  `loadTheme` (a `DeckThemeLoader`). The default, `loadDeckLibraryTheme`,
-  imports `@texuli/tokens/library-expand` on first use, and a palette seed
+  `loadTheme` (a `DeckThemeLoader`). On `DeckStage` and `DeckPrint` the
+  default, `loadDeckLibraryTheme`, imports `@texuli/tokens/library-expand` on
+  first use. `DeckStageCore` has no default (G127, unreleased, planned for
+  `0.10.1`): without a `loadTheme` its catalog themes are left to host CSS
+  (`data-theme-status="host"`), and nothing in a core host's build
+  references the theme loader's library import, not even as a lazy chunk. A
+  core host that wants the library passes `loadTheme={loadDeckLibraryTheme}`
+  (exported by `@texuli/slides/stage-core` too). Before G127 the core's
+  default loader kept a dynamic import of the whole expanded set (the
+  catalog rows and its 146 definition chunks) in every core host's build,
+  even when the host passed its own loader. One route remains: a deck's
+  design-system step (below) falls back to the theme library for
+  `designSystem.ref: "texuli:<id>"` (through `@texuli/player/design-system`),
+  so a core host's build still emits library chunks behind that lazy step
+  (`tests/bundle-graph.test.ts`, "reaches the theme library only through a
+  loader it injects"). A palette seed
   imports `@texuli/tokens/generator` on first use, so a host that passes its
   own `loadTheme` (or `null`) has neither the theme library records nor the
   generator in its initial graph (`tests/bundle-graph.test.ts` checks it by
@@ -524,7 +544,7 @@ slide's theme overrides the deck's.
   `prefers-color-scheme`. Server rendering uses light until mount.
 - **Status:** `data-theme-status` on the stage is `applied`, `loading`,
   `unavailable` (the loader rejected the id; host CSS applies) or `host`
-  (`loadTheme={null}`).
+  (`loadTheme={null}`, or no `loadTheme` on `DeckStageCore`).
 
 A print-specific theme and per-slide compiled CSS are planned.
 

@@ -6,8 +6,15 @@
  */
 import { cleanup, render, waitFor } from '@testing-library/svelte';
 import type { DeckSlide } from '@texuli/deck/model';
-import { afterEach, describe, expect, it } from 'vitest';
-import { DeckStageCore, loadDeckMigration, loadedDeckMigration } from '../src/stage/core.ts';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { createDeckPrintPaint } from '../src/export/print-paint.ts';
+import {
+  DeckStageCore,
+  loadDeckLibraryTheme,
+  loadDeckMigration,
+  loadedDeckMigration,
+} from '../src/stage/core.ts';
+import DeckStage from '../src/stage/DeckStage.svelte';
 import {
   DECK_DEFAULT_RENDERERS_SOURCE,
   loadedDefaultDeckRenderers,
@@ -57,4 +64,38 @@ describe('DeckStageCore', () => {
     expect(typeof migrate).toBe('function');
     expect(loadedDeckMigration()).toBe(migrate);
   });
+
+  it('reaches catalog themes only through an injected loader; DeckStage keeps the library default (G127)', async () => {
+    const themed = { ...deck, style: { theme: 'violet' } };
+    const renderers = { validateBlock: () => undefined, free: () => HostFreeSlide };
+    const status = () =>
+      document.querySelector('.tx-deck-stage')?.getAttribute('data-theme-status');
+
+    // The core has no default loader: without one, catalog themes are the host's CSS.
+    render(DeckStageCore, { props: { deck: themed, renderers } });
+    await waitFor(() => expect(document.querySelector('[data-host-free]')).toBeTruthy());
+    expect(status()).toBe('host');
+    cleanup();
+
+    // A host loader (here the library one, opted into by name) is what paints the theme.
+    const loadTheme = vi.fn(loadDeckLibraryTheme);
+    render(DeckStageCore, { props: { deck: themed, renderers, loadTheme } });
+    await waitFor(() => expect(status()).toBe('applied'), { timeout: 10_000 });
+    expect(loadTheme).toHaveBeenCalledWith('violet');
+    cleanup();
+
+    // DeckStage still loads the library theme by default.
+    render(DeckStage, { props: { deck: themed, renderers, defaultRenderers: false } });
+    await waitFor(() => expect(status()).toBe('applied'), { timeout: 10_000 });
+
+    // The print painter behind DeckPrintViewCore has no default either (DeckPrintView passes it).
+    const slide = themed.slides[0] as DeckSlide;
+    const bare = await createDeckPrintPaint(themed as never, { renderers });
+    expect(bare.themeVars(slide)).toEqual({});
+    const library = await createDeckPrintPaint(themed as never, {
+      renderers,
+      loadTheme: loadDeckLibraryTheme,
+    });
+    expect(Object.keys(library.themeVars(slide)).length).toBeGreaterThan(0);
+  }, 30_000);
 });

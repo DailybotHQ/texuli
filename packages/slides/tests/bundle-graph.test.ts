@@ -40,6 +40,16 @@ const HOST_REPLACED = [
   '/slides/src/stage/loaders.ts',
 ];
 
+/**
+ * The token theme library (G127): only the default entries' `loadTheme` reaches it. A host on
+ * the core entries injects its own loader (or none), so no chunk of its build, initial or lazy,
+ * carries the library records or the 146 expand definition modules.
+ */
+const THEME_LIBRARY = ['/tokens/src/library-expand/', '/tokens/src/library-port/'];
+
+const libraryIn = (modules: readonly string[]) =>
+  THEME_LIBRARY.filter((part) => modules.some((id) => id.includes(part)));
+
 /** Module id fragments only a deck with a `designSystem` loads (ADR-024): never in the initial graph. */
 const DESIGN_SYSTEM_ONLY = [
   '/slides/src/stage/design-system.ts',
@@ -118,6 +128,26 @@ function staticChunks(chunks: Map<string, Chunk>, roots: readonly string[]): Chu
   };
   for (const root of roots) visit(root);
   return [...seen].flatMap((name) => chunks.get(name) ?? []);
+}
+
+/**
+ * The modules of `roots` and every chunk they import, statically or with
+ * `import()`, never entering the `skip` chunk.
+ */
+function loadableModules(
+  chunks: Map<string, Chunk>,
+  roots: readonly string[],
+  skip?: string
+): string[] {
+  const seen = new Set<string>();
+  const visit = (name: string) => {
+    if (name === skip || seen.has(name) || !chunks.has(name)) return;
+    seen.add(name);
+    const chunk = chunks.get(name);
+    for (const next of [...(chunk?.imports ?? []), ...(chunk?.dynamicImports ?? [])]) visit(next);
+  };
+  for (const root of roots) visit(root);
+  return [...seen].flatMap((name) => chunks.get(name)?.modules ?? []);
 }
 
 /** The modules of `roots` and every chunk they import statically. */
@@ -236,6 +266,9 @@ let { deck }: { deck: never } = $props();
     const lazy = chunkWith(chunks, '/slides/src/stage/default-renderers.ts');
     expect(lazy, 'the default tables chunk').toBeTruthy();
     expect(entries).not.toContain(lazy?.fileName);
+    // G127: DeckPrintView keeps the library theme loader, as a lazy chunk.
+    expect(chunkWith(chunks, '/tokens/src/library-expand/index.ts')).toBeTruthy();
+    expect(libraryIn(staticModules(chunks, entries))).toEqual([]);
   }, 180_000);
 
   it('a host handing the stage core a prepared deck (G83) has no migration or block schema in its initial graph', async () => {
@@ -279,6 +312,10 @@ let { deck }: { deck: unknown } = $props();
     expect(every.filter((id) => /\/stage\/ssr-(preload|server)\.ts$/.test(id))).toEqual([]);
     expect(defaultsIn(staticModules(chunks, entries))).toEqual([]);
     expect(chunkWith(chunks, '/slides/src/stage/default-renderers.ts')).toBeTruthy();
+    // G127: DeckStage keeps the library theme loader, as a lazy chunk.
+    const library = chunkWith(chunks, '/tokens/src/library-expand/index.ts');
+    expect(library, 'the theme library chunk').toBeTruthy();
+    expect(libraryIn(staticModules(chunks, entries))).toEqual([]);
   }, 180_000);
 
   it('keeps them out of the print view when it turns them off', async () => {
@@ -330,4 +367,51 @@ const loadTheme = async (id: string) => ({ id }) as never;
       `[bundle-graph] replacing host: initial JS ${gzip} B gzip in ${initial.length} chunks`
     );
   }, 180_000);
+
+  it('a stage-core and export-core host reaches the theme library only through a loader it injects (G127)', async () => {
+    const hosts = {
+      // The host hands the stage and the print view an already resolved theme.
+      resolved: `const theme = { id: 'host' } as never;
+const loadTheme = async () => theme;`,
+      // The host leaves catalog themes to its CSS (no loader at all).
+      none: 'const loadTheme = undefined;',
+      // Control: a core host that opts into the library by name does reach it.
+      library: `import { loadDeckLibraryTheme as loadTheme } from ${JSON.stringify(`${SRC}/stage/core.ts`)};`,
+    };
+    for (const [name, loader] of Object.entries(hosts)) {
+      const chunks = await buildHost(
+        `<script lang="ts">
+import { DeckStageCore } from ${JSON.stringify(`${SRC}/stage/core.ts`)};
+import { DeckPrintViewCore } from ${JSON.stringify(`${SRC}/export/core.ts`)};
+import HostFree from './HostFree.svelte';
+${loader}
+let { deck }: { deck: never } = $props();
+const renderers = { validateBlock: () => undefined, free: () => HostFree };
+</script>
+<DeckStageCore {deck} {renderers} {loadTheme} />
+<DeckPrintViewCore {deck} {renderers} {loadTheme} />
+`,
+        { 'HostFree.svelte': '<p>host</p>\n' }
+      );
+      const every = [...chunks.values()].flatMap((chunk) => chunk.modules);
+      expect(
+        every.some((id) => id.endsWith('/slides/src/stage/DeckStageCore.svelte')),
+        name
+      ).toBe(true);
+      expect(chunkWith(chunks, '/export/print-paint.ts'), name).toBeTruthy();
+      const entries = [...chunks.values()].filter((chunk) => chunk.isEntry).map((c) => c.fileName);
+      // Every chunk the host can load, initial or lazy, except through a deck's design-system
+      // step (ADR-024: `designSystem.ref: "texuli:<id>"` falls back to the library in
+      // @texuli/player/design-system; only a deck that names a design system loads that step).
+      const step = chunkWith(chunks, '/slides/src/stage/design-system.ts')?.fileName;
+      const reachable = loadableModules(chunks, entries, step);
+      expect(libraryIn(reachable), name).toEqual(name === 'library' ? THEME_LIBRARY : []);
+      expect(libraryIn(staticModules(chunks, entries)), name).toEqual([]);
+      const library = [...chunks.values()].filter((chunk) => libraryIn(chunk.modules).length > 0);
+      // Reported, not asserted (the size budgets own the numbers).
+      console.info(
+        `[bundle-graph] core host (${name} loader): ${chunks.size} chunks, ${library.length} with theme library modules, none loadable outside the design-system step: ${libraryIn(reachable).length === 0}`
+      );
+    }
+  }, 360_000);
 });

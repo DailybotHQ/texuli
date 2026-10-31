@@ -58,6 +58,7 @@ export {
 } from './free.ts';
 export { canUseNativeFullscreen, type DeckFullscreenState } from './fullscreen.ts';
 export { clickInput, createSwipeTracker, keyInput, selectionLength } from './input.ts';
+export { loadDeckLibraryTheme } from './library-theme.ts';
 export { type DeckBlockRendererProps, loadDeckBlockFamily } from './loaders.ts';
 export {
   type DeckMediaGate,
@@ -158,7 +159,6 @@ export {
   type DeckThemeLoader,
   deckCatalogThemeIds,
   deckThemeVariables,
-  loadDeckLibraryTheme,
   resolveDeckThemeMode,
 } from './theme.ts';
 export {

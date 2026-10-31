@@ -6,6 +6,12 @@
  * the component registry, and its build emits none of their chunks or CSS.
  * Every other export is the same as `@texuli/slides/stage`, except
  * `DeckStage`, `DeckPrint` and the default-table loaders.
+ *
+ * Catalog themes (G127): `DeckStageCore` has no default `loadTheme`, so its
+ * build never references the token theme library. Pass the host's loader
+ * (for example one that returns a theme it already resolved), or
+ * `loadDeckLibraryTheme` (exported here) to load the library on first use;
+ * without one, catalog themes are left to the host's CSS (`data-theme-status="host"`).
  */
 export {
   type BuiltinDeckBlocks,
@@ -60,6 +66,7 @@ export {
 } from './free.ts';
 export { canUseNativeFullscreen, type DeckFullscreenState } from './fullscreen.ts';
 export { clickInput, createSwipeTracker, keyInput, selectionLength } from './input.ts';
+export { loadDeckLibraryTheme } from './library-theme.ts';
 export { type DeckBlockRendererProps, loadDeckBlockFamily } from './loaders.ts';
 export {
   type DeckMediaGate,
@@ -160,7 +167,6 @@ export {
   type DeckThemeLoader,
   deckCatalogThemeIds,
   deckThemeVariables,
-  loadDeckLibraryTheme,
   resolveDeckThemeMode,
 } from './theme.ts';
 export {

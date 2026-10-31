@@ -111,7 +111,7 @@ import {
 } from './style.ts';
 import type { DeckSync } from './sync.ts';
 import { deckSyncLink } from './sync-link.ts';
-import { type DeckThemeLoader, deckThemeVariables, loadDeckLibraryTheme } from './theme.ts';
+import { type DeckThemeLoader, deckThemeVariables } from './theme.ts';
 import {
   type DeckTransitionDirection,
   playDeckTransition,
@@ -190,7 +190,12 @@ interface Props {
   presenterTimer?: boolean;
   /** A same-origin link to another stage window: the presenter protocol, or a v1 `DeckSync`. */
   sync?: PresenterTransport | DeckSync | null;
-  /** Catalog theme loader (`null` when the host loads theme CSS itself). */
+  /**
+   * Catalog theme loader. This core component has no default (G127): without
+   * one (or with `null`) catalog themes are left to the host's CSS, and the
+   * build has no reference to the token theme library. `DeckStage` defaults
+   * to `loadDeckLibraryTheme`; pass it here to load the library on first use.
+   */
   loadTheme?: DeckThemeLoader | null;
   /**
    * Resolves a deck's `designSystem.ref` (ADR-024): a document or a compiled
@@ -253,7 +258,7 @@ let {
   presenter = $bindable(false),
   presenterTimer = false,
   sync = null,
-  loadTheme = loadDeckLibraryTheme,
+  loadTheme,
   designSystems,
   onDesignSystem,
   resolveAvatar,
@@ -1011,7 +1016,7 @@ $effect(() => {
 
 $effect(() => {
   const current = model;
-  const loader = loadTheme;
+  const loader = loadTheme ?? null;
   if (!current) return;
   const known = untrack(() => themes);
   for (const reference of deckThemeReferences(current)) {

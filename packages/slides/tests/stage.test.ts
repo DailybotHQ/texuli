@@ -11,11 +11,11 @@ import { DECK_TRANSITIONS, parseDeck, resolveSlideTransition } from '../src/mode
 import DeckStage from '../src/stage/DeckStage.svelte';
 import { loadDefaultDeckRenderers } from '../src/stage/defaults.ts';
 import FreeSlide from '../src/stage/FreeSlide.svelte';
+import { loadDeckLibraryTheme } from '../src/stage/library-theme.ts';
 import { createPresenterTimer, formatElapsed } from '../src/stage/presenter.ts';
 import {
   deckCatalogThemeIds,
   deckThemeVariables,
-  loadDeckLibraryTheme,
   resolveDeckThemeMode,
 } from '../src/stage/theme.ts';
 import { clearDeckHash, scenario } from './scenario.ts';
