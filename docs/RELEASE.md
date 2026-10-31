@@ -156,6 +156,7 @@ On the branch so far:
   report `design-system-unapplied`).
 - **In progress on the branch (not merged yet, listed here as they land):**
   the Protoyard gaps G107–G110 (G105 landed: `@texuli/slides/export-core`).
+- **Security notes** (PLAN_011 Final Review): the design-system runtime and emitters share one value check (`isSafeCompiledValue`: no `image-set()`, `src()`, `cross-fade()`, `url()` or `var()`; apply now 2,040 B gzip), `designSystemStyle` refuses an id or variant that could widen its selector, the spec's free-text rule refuses zero-width, invisible and tag characters, and `ds.save` writes only `.json` files outside dot directories, `node_modules` and `package.json` (`path-extension`, `path-reserved`).
 
 **Removed in 0.10.0** (deprecated in `0.9.0` for one minor; done on the
 branch):
