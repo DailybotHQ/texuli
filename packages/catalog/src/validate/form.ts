@@ -27,12 +27,15 @@ export interface DraftFormIssue {
 /**
  * The host's form validator: `checkFormDraft` from `@texuli/forms/model`
  * (`validateFormSchema` at the given tier). `validators` are the names the
- * host registered (`ValidateDraftOptions.formValidators`).
+ * host registered (`ValidateDraftOptions.formValidators`) and `kinds` the
+ * custom field kinds it paints (`ValidateDraftOptions.formKinds`; at the
+ * `untrusted` tier a custom field of any other kind is refused).
  */
 export type DraftFormCheck = (
   schema: unknown,
   tier: RenderTier,
-  validators?: readonly string[]
+  validators?: readonly string[],
+  kinds?: readonly string[]
 ) => { ok: boolean; issues: readonly DraftFormIssue[] };
 
 /** A finding of the form check, reported by `validateDraft` under `forms`. */
@@ -48,6 +51,8 @@ export interface FormCheckOptions {
   checkForm?: DraftFormCheck;
   /** The validator names the host registered. */
   validators?: readonly string[];
+  /** The custom field kinds the host paints. */
+  kinds?: readonly string[];
 }
 
 /** Issues reported per form, so a hostile schema cannot flood the receipt. */
@@ -91,7 +96,9 @@ export function checkForms(roots: readonly RenderNode[], options: FormCheckOptio
     }
     let result: ReturnType<DraftFormCheck>;
     try {
-      result = options.checkForm(node.props.schema, options.tier, options.validators);
+      result = options.kinds
+        ? options.checkForm(node.props.schema, options.tier, options.validators, options.kinds)
+        : options.checkForm(node.props.schema, options.tier, options.validators);
     } catch (cause) {
       findings.push({
         code: 'form-schema',
