@@ -125,6 +125,15 @@ command of the `texuli` bin, with ten commands on `@texuli/document`
 read-only `document` tool; see
 [document.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/document.md).
 
+**Design-system conformance (in development for `0.10.0`, not on
+npm).** `texuli ds check <file>` validates and compiles a design-system
+document and reports the spec's codes, the guarantees and the contrast
+report (`--json`); `--render` also paints the agent-emittable catalog
+components under it in headless chromium (axe, painted contrast, literal
+colors). The `@texuli/tools/ds-check` subpath runs the same checks in your
+own tests; see
+[ds-check.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ds-check.md).
+
 **Email and print (new in `0.8.0`).** `@texuli/tools/email`
 renders a validated blueprint to email-safe HTML and a plain-text part
 (tables, typed inline styles resolved to sRGB, escaped text only, links and
@@ -164,6 +173,7 @@ document and writes a headless PDF with the owned writer; see
 - Document commands, the `texuli document` CLI and the `document` MCP tool (new in `0.7.0`): [document.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/document.md)
 - The operations registry behind the MCP tools and the CLI (in development, not released): [ops.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md)
 - The MCP protocol layer: tools, resources, prompts and completions (in development, not released): [mcp.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/mcp.md)
+- Design-system conformance, `texuli ds check` and `@texuli/tools/ds-check` (in development for `0.10.0`): [ds-check.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ds-check.md)
 - Email-safe HTML from blueprints (new in `0.8.0`): [email.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/email.md)
 - Print and headless PDF of blueprints (new in `0.8.0`): [print.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/print.md)
 
