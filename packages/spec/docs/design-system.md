@@ -152,12 +152,28 @@ may name the design system it follows:
   inline document as well, for the guarantee codes.
 - **Applied:** `@texuli/player` (`designSystems: { resolve, mode }`) and
   `@texuli/pages`' `PageReader` resolve a `ref` through the host (never a
-  fetch), compile lazily, and apply the result to their root scope. A
-  reference nothing resolves, or a document the compiler refuses, paints
-  with the default theme and a visible notice; neither throws. A deck as a
-  blueprint (a `layout-deck` root) follows the envelope's design system,
-  and so does a document root. The deck model's own `themeRef`
-  (`@texuli/deck`, model v2) does not name a design system yet (planned).
+  fetch), compile lazily, and apply the result to their root scope; the
+  player also hands the compiled component defaults to the painted
+  components (blueprint props still win). A reference nothing resolves, or
+  a document the compiler refuses, paints with the default theme and a
+  visible notice; neither throws. A deck as a blueprint (a `layout-deck`
+  root) follows the envelope's design system, and so does a document root.
+- **Standalone decks:** a `@texuli/deck` model v2 deck names its own with a
+  top-level `designSystem` of the same shape (the deck validator holds the
+  same `ref` grammar, and a test compares it with
+  `$defs.designSystemReference`), and the `@texuli/slides` stage applies it
+  through the player's step (`@texuli/player/design-system`): the host's
+  resolver, no fetch, a notice, never a throw
+  ([deck model](../../deck/docs/model.md#design-systems),
+  [stage](../../slides/docs/stage.md#design-systems)). The deck format is
+  not part of this contract (it is `@texuli/deck`'s own JSON Schema), so
+  the spec digest does not change.
+- **Writers:** the document Markdown writer carries `designSystem` in front
+  matter, losslessly; the DOCX and PDF writers take compiled `design`
+  values from the caller (the L1 engine cannot import the compiler) and
+  report `design-system-unapplied` when the document names one and none
+  are given ([document Markdown](../../document/docs/markdown.md#design-system-front-matter),
+  [PDF](../../document/docs/pdf.md#design-systems)).
 
 ## Size
 
