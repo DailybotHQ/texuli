@@ -95,6 +95,7 @@ const css = compileThemeCss(theme);
 | Chart tokens | `data-viz` | Unreleased: `dataVizVariables(theme, mode)` returns all 28 `--tx-chart-*` values for any theme, derived when the theme has no `charts` |
 | Renames | `renames`, `renames.json` | Unreleased: the machine-readable `--tx-*` rename list for codemods (empty: contract v2 renames nothing) |
 | Design systems | `design-system/compile`, `design-system/validate` | Unreleased (`0.10.0`, ADR-021, ADR-022): `compileDesignSystem` turns a design-system document into concrete `--tx-*` variables per mode with enforced contrast, focus and target guarantees (refusals with codes and JSON paths), `resolveDesignSystem` follows `extends` (`texuli:<id>` library themes, `id@x.y.z` from your resolver), variants and patches, and `fromTheme` turns any `Theme` into a document. `validate` re-checks compiled maps with `checkDesignSystemGuarantees`. Both are lazy: the root never imports them. The runtime (`apply`) and emitters are planned |
+| Design-system I/O | `design-system/import`, `design-system/emit`, `design-system/report`, `design-system/diff`, `design-system/fixtures` | Unreleased (`0.10.0`): importers (brand one-liner, W3C DTCG, Tokens Studio, flat role palette, Texuli `Theme`, logo pixels) that return a valid document plus warnings and never throw; deterministic emitters (scoped CSS, Tailwind preset, DTCG, Tokens Studio, flat palette, compiled JSON); a static report page escaped by construction; `diffDesignSystems` (token changes per mode, contrast regressions, default changes); fictional fixtures, including a `protoyard-theme/v1`-shaped palette, with lossless round trips. All lazy |
 
 The root entry (`@texuli/tokens`) re-exports the engine areas; the theme
 libraries and `build` stay behind their subpaths so unused themes are never
@@ -147,6 +148,7 @@ Ships in `0.6.0`; the `0.5.0` release predates it:
 - Color modes and no-flash: [tokens-modes.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-modes.md)
   and [tokens-no-flash.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-no-flash.md)
 - Design-system compiler (unreleased): [design-system-compiler.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/design-system-compiler.md)
+- Design-system importers, emitters, report and diff (unreleased): [design-system-io.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/design-system-io.md)
 - Contrast gate: [tokens-aa-gate.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-aa-gate.md)
 - Forced colors: [tokens-forced-colors.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-forced-colors.md)
 - Tailwind 4 preset: [tokens-tailwind.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tokens/docs/tokens-tailwind.md)
