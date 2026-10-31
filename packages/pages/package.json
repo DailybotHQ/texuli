@@ -35,15 +35,30 @@
       "svelte": "./src/editor/index.ts",
       "default": "./src/editor/index.ts"
     },
+    "./editor-core": {
+      "types": "./src/editor/core.ts",
+      "svelte": "./src/editor/core.ts",
+      "default": "./src/editor/core.ts"
+    },
     "./reader": {
       "types": "./src/reader/index.ts",
       "svelte": "./src/reader/index.ts",
       "default": "./src/reader/index.ts"
     },
+    "./reader-core": {
+      "types": "./src/reader/core.ts",
+      "svelte": "./src/reader/core.ts",
+      "default": "./src/reader/core.ts"
+    },
     "./paged": {
       "types": "./src/paged/index.ts",
       "svelte": "./src/paged/index.ts",
       "default": "./src/paged/index.ts"
+    },
+    "./paged-core": {
+      "types": "./src/paged/core.ts",
+      "svelte": "./src/paged/core.ts",
+      "default": "./src/paged/core.ts"
     },
     "./export": {
       "types": "./src/export/index.ts",
@@ -55,10 +70,20 @@
       "svelte": "./src/host/index.ts",
       "default": "./src/host/index.ts"
     },
+    "./host-core": {
+      "types": "./src/host/core.ts",
+      "svelte": "./src/host/core.ts",
+      "default": "./src/host/core.ts"
+    },
     "./collab": {
       "types": "./src/collab/index.ts",
       "svelte": "./src/collab/index.ts",
       "default": "./src/collab/index.ts"
+    },
+    "./collab-core": {
+      "types": "./src/collab/core.ts",
+      "svelte": "./src/collab/core.ts",
+      "default": "./src/collab/core.ts"
     },
     "./styles.css": "./src/styles.css"
   },

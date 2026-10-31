@@ -194,6 +194,7 @@ const views = { WrappedBlockView, EmbedView };
           resolveEmbed={context.resolveEmbed}
           deckHost={context.deckHost}
           reducedMotion={context.motion() === false}
+          loadPlayer={context.loadPlayer()}
         />
       {:catch}
         <p class="tx-pages-notice" role="note">{block.type === 'block' ? labels.blockRefused : labels.refused}</p>
@@ -207,6 +208,7 @@ const views = { WrappedBlockView, EmbedView };
         resolveEmbed={context.resolveEmbed}
         deckHost={context.deckHost}
         reducedMotion={context.motion() === false}
+        loadPlayer={context.loadPlayer()}
       />
     {/if}
   </div>

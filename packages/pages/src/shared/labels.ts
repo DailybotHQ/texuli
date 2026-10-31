@@ -40,6 +40,8 @@ export interface PagesLabels {
   refused: string;
   embedLoading: string;
   embedUnavailable: (kind: EmbedKind) => string;
+  /** An embed that needs the player where the host turned live embeds off (no `loadPlayer`, G123). */
+  embedOff: (kind: EmbedKind) => string;
   blockRefused: string;
   mediaFallback: (alt: string) => string;
   /** Todo items in the reader. */
@@ -116,6 +118,7 @@ export const DEFAULT_PAGES_LABELS: PagesLabels = {
   embedLoading: 'Loading the embed',
   embedUnavailable: (kind) =>
     `${EMBED_NAMES[kind]} embeds are not available here yet; the reference is kept.`,
+  embedOff: (kind) => `${EMBED_NAMES[kind]} embeds are not shown here; the embed is kept.`,
   blockRefused: 'This block was refused: it did not pass validation.',
   mediaFallback: (alt) => (alt ? `Image: ${alt}` : 'Image unavailable'),
   done: 'Done',
