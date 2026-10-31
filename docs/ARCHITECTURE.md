@@ -63,7 +63,7 @@ Not layers, because they consume the library:
 
 `@texuli/examples` is never packed (`NEVER_PACKED` in
 `scripts/packages.ts`); `pnpm verify:packages` packs the other 26, and all
-26 are released on npm in the 0.11 line, every one at `0.11.0`; `0.10.0` was the design-systems release and `0.11.0` adds the Protoyard gaps G125–G127 and the Final Review fixes (`@texuli/mcp`
+26 are released on npm in the 0.11 line, every one at `0.11.1`; `0.10.0` was the design-systems release and `0.11.0` added the Protoyard gaps G125–G127 and the Final Review fixes, and `0.11.1` is a patch (forms concurrent `next()`, the `applyDesignSystem` variant check) (`@texuli/mcp`
 was first released in `0.9.0`; the 0.8 line had 25 packages);
 `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/editor`,
 `@texuli/document`, `@texuli/pages`, `@texuli/forms`, `@texuli/canvas`,
@@ -243,7 +243,7 @@ after each deploy of `main`.
 
 ## Decks: engine and stage
 
-ADR-009 splits presentations in two packages (both on npm as `0.11.0`;
+ADR-009 splits presentations in two packages (both on npm as `0.11.1`;
 `@texuli/deck` was first released in `0.4.0`):
 
 - **`@texuli/deck` (L0)** owns everything that is data: deck model v2
@@ -380,7 +380,7 @@ The pure decisions live in `apps/website/src/lib/` and are tested in
     way npm would publish it: `dist/` via `@sveltejs/package`, a derived
     manifest, publint and attw. It publishes nothing.
   - Workspace packages stay `private: true`; the publish workflow publishes
-    the 26 packable packages, `@texuli/mcp` included, to npm as the `0.11.0`
+    the 26 packable packages, `@texuli/mcp` included, to npm as the `0.11.1`
     release (dist-tags
     `latest` and `next`), with provenance
     ([RELEASE](RELEASE.md)).
