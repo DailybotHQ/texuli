@@ -220,6 +220,15 @@ branch):
     and a rejection is announced (`labels.saveFailed`). Existing
     two-argument handlers keep working; both buttons keep the
     `tx-inbox__button` class.
+- **Protoyard gap G122** (PLAN_011 T-gap-122; reported on 0.9.0):
+  `nudgeItem` in `@texuli/data/dashboard` (so the Dashboard's arrow keys)
+  grows a step past the widgets in the way instead of refusing it with
+  `edge`: a widget moves down past a wider one below it (to the cell
+  `moveItem` accepts), up past a wider one above, and sideways past a
+  taller or locked one; when a narrower widget above holds its row, the
+  widget below swaps above it. `edge` is left for the grid edge, or
+  nothing left to pass. The `@texuli/sheets` README and view guide now say
+  the cell editor loads lazily on the first Enter, so host tests await it.
 
 ### 0.9.0
 
