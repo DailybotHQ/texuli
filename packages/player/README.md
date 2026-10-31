@@ -95,6 +95,7 @@ Everything is exported from the root entry, `@texuli/player`.
 | Media policy | `applyMediaPolicy`, `TRUST_PINNED_IDS` |
 | Streaming (new in `0.6.0`) | `<Player stream>`, `BlueprintStreamSource`, `PlayerStreamProgress`, `STREAM_PENDING_ID`; the push handle is `createBlueprintStream` from `@texuli/spec/stream` ([streaming.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/streaming.md)) |
 | Data sources (new in `0.8.0`) | `<Player sourceRegistry>` or `sourceLoader`: blueprint props `{"$source": name, "query": {...}}` read host-registered sources from `@texuli/core/data-source`, with loading, empty and error states, paging and optimistic edits ([data-sources.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/data-sources.md)) |
+| Design systems (in development for `0.10.0`, not on npm) | `<Player designSystems={{ resolve, mode }}>` and `onDesignSystem`: a blueprint's `designSystem` (spec 0.10.0) is resolved by the host (never fetched), compiled lazily and applied to the player root; a refused one keeps the default theme with a notice; `PlayerDesignSystems`, `PlayerDesignSystemEvent` ([reference.md](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/reference.md#design-systems-spec-0100)) |
 | Stylesheet | `@texuli/player/styles.css` |
 
 The TypeScript declarations list the full surface.

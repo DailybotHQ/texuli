@@ -71,6 +71,11 @@ export {
   type DeckPlayerHostRequest,
   isLayoutDeckTree,
 } from './deck-host.ts';
+export type {
+  PlayerDesignSystemEvent,
+  PlayerDesignSystemSource,
+  PlayerDesignSystems,
+} from './design-system-types.ts';
 export {
   DOCUMENT_HOST_PACKAGE,
   type DocumentPlayerHost,
