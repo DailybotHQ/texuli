@@ -151,8 +151,7 @@ deck opens (or on idle) has the sheet ready by the time the user prints.
 
 ### Export core (`@texuli/slides/export-core`, G105)
 
-> In development for `0.10.0` (on the `release/0.10.0` branch; not on npm
-> yet).
+> New in `0.10.0`.
 
 `@texuli/slides/export-core` is `@texuli/slides/export` without any
 reference to the stage's default renderer tables, the print counterpart of

@@ -166,7 +166,7 @@ export const WHY_KMP_STEPS: WhyKmpStep[] = [
 
 /** The token-engine note: what the native theme is today, stated honestly. */
 export const WHY_KMP_TOKEN_NOTE: WhyKmpPiece = {
-  text: "The theme story is honest too: TexuliTheme takes its Material colors from a generated design-token set, compiled from the same design system the web uses (0.10.0, in development). The default is the Texuli default design system, while the engine behind the web's --tx-* contract remains the implemented one.",
+  text: "The theme story is honest too: TexuliTheme takes its Material colors from a generated design-token set, compiled from the same design system the web uses (new in 0.10.0). The default is the Texuli default design system, while the engine behind the web's --tx-* contract remains the implemented one.",
   sources: [
     {
       file: THEME_SOURCE,

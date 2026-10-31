@@ -1,16 +1,15 @@
 # The design-system document (`@texuli/spec/design-system`)
 
-> **Status: in development for `0.10.0`, not on npm.** Spec `0.10.0` and
-> the `@texuli/spec/design-system` subpath exist on the `release/0.10.0`
-> branch; they ship only with `@texuli/spec@0.10.0`. The compiler is
-> `@texuli/tokens/design-system/compile` on the same branch
+> **Status: released in `0.10.0`.** Spec `0.10.0` and the
+> `@texuli/spec/design-system` subpath ship in `@texuli/spec@0.10.0`. The
+> compiler is `@texuli/tokens/design-system/compile`
 > ([design-system-compiler.md](../../tokens/docs/design-system-compiler.md));
-> the importers, emitters, report and diff are on the same branch
-> ([design-system-io.md](../../tokens/docs/design-system-io.md)), and so is
-> the runtime ([design-system-runtime.md](../../tokens/docs/design-system-runtime.md)).
-> `texuli ds check` is on the same branch
-> ([ds-check.md](../../tools/docs/ds-check.md)), and so are the `ds.*`
-> operations, `blueprint.theme` and `texuli ds` ([ds.md](../../tools/docs/ds.md)).
+> the importers, emitters, report and diff are in
+> [design-system-io.md](../../tokens/docs/design-system-io.md), and the
+> runtime in [design-system-runtime.md](../../tokens/docs/design-system-runtime.md).
+> `texuli ds check` is in [ds-check.md](../../tools/docs/ds-check.md), and the
+> `ds.*` operations, `blueprint.theme` and `texuli ds` in
+> [ds.md](../../tools/docs/ds.md).
 
 The end-to-end guide (author, validate, apply, distribute, outputs) is
 [DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md).

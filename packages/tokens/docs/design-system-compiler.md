@@ -1,12 +1,12 @@
 # The design-system compiler (`@texuli/tokens/design-system/compile` and `/validate`)
 
-> **Status: in development for `0.10.0`, not on npm.** Both subpaths exist on
-> the `release/0.10.0` branch and ship only with `@texuli/tokens@0.10.0`. The
-> runtime is [design-system-runtime.md](design-system-runtime.md); the
-> importers, emitters, report, diff and fixtures are built on the same branch
-> ([design-system-io.md](design-system-io.md)), and so is `texuli ds check`
-> ([ds-check.md](../../tools/docs/ds-check.md)), and so are the `ds.*`
-> operations and `texuli ds` commands ([ds.md](../../tools/docs/ds.md)).
+> **Status: released in `0.10.0`.** Both subpaths ship in
+> `@texuli/tokens@0.10.0`. The runtime is
+> [design-system-runtime.md](design-system-runtime.md); the importers,
+> emitters, report, diff and fixtures are in
+> [design-system-io.md](design-system-io.md), `texuli ds check` in
+> [ds-check.md](../../tools/docs/ds-check.md), and the `ds.*` operations and
+> `texuli ds` commands in [ds.md](../../tools/docs/ds.md).
 
 The end-to-end guide (author, validate, apply, distribute, outputs) is
 [DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md).

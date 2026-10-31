@@ -1,13 +1,11 @@
 # Design systems
 
-> **Status: in development for `0.10.0`, not on npm.** Everything on this
-> page (the document, the compiler, the runtime, the importers and
-> emitters, the `ds.*` operations, `texuli ds` and the example brands) is
-> on the `release/0.10.0` branch. It ships only when `0.10.0` is published;
-> until then npm has the 0.9 line, which has none of it (0.9.0 has token
-> contract v2, component tokens, hooks and design defaults, the plumbing
-> this builds on). Items marked **planned** are not built on the branch
-> either.
+> **Status: released in `0.10.0`.** Everything on this page (the
+> document, the compiler, the runtime, the importers and emitters, the
+> `ds.*` operations, `texuli ds` and the example brands) ships in the 0.10
+> line on npm; 0.9.0 had none of it (it has token contract v2, component
+> tokens, hooks and design defaults, the plumbing this builds on). Items
+> marked **planned** are not built yet.
 
 A design system describes a brand once, as **one closed JSON document**,
 and every Texuli surface follows it: styled components, layouts and domain
@@ -316,17 +314,17 @@ opened). Details: [ds-check.md](../packages/tools/docs/ds-check.md).
 
 | Output | How | Status |
 | --- | --- | --- |
-| CSS, Tailwind preset, compiled JSON, DTCG, Tokens Studio, role palette | `@texuli/tokens/design-system/emit`, `ds.compile`, `texuli ds compile` / `export` | On the branch |
-| A static review page and an SVG snapshot | `emitReportHtml`, `ds.preview` (deterministic: fixed fonts, no time) | On the branch |
-| Email | `designSystem` on `@texuli/tools/email` (colors, fonts, radius, spacing, a dark head rule) ([email](../packages/tools/docs/email.md#design-systems)) | On the branch |
-| PDF | `designSystem` on `@texuli/tools/print` ([print](../packages/tools/docs/print.md)) | On the branch |
-| DOCX, PDF of documents | `design` (plain values from `designValues(compiled, mode)`) on `@texuli/document`'s writers ([docx](../packages/document/docs/docx.md)) | On the branch |
-| PPTX | `design` on `@texuli/slides/export` ([export](../packages/slides/docs/export.md)) | On the branch |
-| Canvas SVG and PNG | `design` on `@texuli/canvas/export` ([export](../packages/canvas/docs/export.md)) | On the branch |
-| Kotlin (Compose) | `packages/spec/scripts/design-tokens.ts` writes `DesignTokens.kt` for the default and `acme` sets, checked by `DesignTokensConformanceTest` ([native](../native/README.md#design-tokens-adr-024)) | On the branch; a CLI command for your own brand is **planned** |
-| Standalone decks naming a design system (`@texuli/deck` `themeRef`), Markdown writers carrying `designSystem` | — | **Planned** |
-| Design System Studio on texuli.com | [`/theme-studio/`](../apps/website/docs/site-theme-studio.md) | On the branch |
-| The design systems hub on texuli.com: the example brands on four surfaces and their conformance | [`/design-systems/`](../apps/website/docs/site-design-systems.md) | On the branch |
+| CSS, Tailwind preset, compiled JSON, DTCG, Tokens Studio, role palette | `@texuli/tokens/design-system/emit`, `ds.compile`, `texuli ds compile` / `export` | Released in `0.10.0` |
+| A static review page and an SVG snapshot | `emitReportHtml`, `ds.preview` (deterministic: fixed fonts, no time) | Released in `0.10.0` |
+| Email | `designSystem` on `@texuli/tools/email` (colors, fonts, radius, spacing, a dark head rule) ([email](../packages/tools/docs/email.md#design-systems)) | Released in `0.10.0` |
+| PDF | `designSystem` on `@texuli/tools/print` ([print](../packages/tools/docs/print.md)) | Released in `0.10.0` |
+| DOCX, PDF of documents | `design` (plain values from `designValues(compiled, mode)`) on `@texuli/document`'s writers ([docx](../packages/document/docs/docx.md)) | Released in `0.10.0` |
+| PPTX | `design` on `@texuli/slides/export` ([export](../packages/slides/docs/export.md)) | Released in `0.10.0` |
+| Canvas SVG and PNG | `design` on `@texuli/canvas/export` ([export](../packages/canvas/docs/export.md)) | Released in `0.10.0` |
+| Kotlin (Compose) | `packages/spec/scripts/design-tokens.ts` writes `DesignTokens.kt` for the default and `acme` sets, checked by `DesignTokensConformanceTest` ([native](../native/README.md#design-tokens-adr-024)) | Released in `0.10.0`; a CLI command for your own brand is **planned** |
+| Standalone decks naming a design system, and Markdown carrying it | `designSystem` on a `@texuli/deck` deck ([model](../packages/deck/docs/model.md#design-systems), [Markdown front matter](../packages/deck/docs/markdown.md#frontmatter)), applied by the `@texuli/slides` stage through `@texuli/player/design-system` ([stage](../packages/slides/docs/stage.md#design-systems)); `designSystem` front matter on `@texuli/document` Markdown ([markdown](../packages/document/docs/markdown.md#design-system-front-matter)); the document DOCX and PDF writers report `design-system-unapplied` for a ref they were not given compiled values for | Released in `0.10.0` |
+| Design System Studio on texuli.com | [`/theme-studio/`](../apps/website/docs/site-theme-studio.md) | Released in `0.10.0` |
+| The design systems hub on texuli.com: the example brands on four surfaces and their conformance | [`/design-systems/`](../apps/website/docs/site-design-systems.md) | Released in `0.10.0` |
 
 ## Agents
 
@@ -345,5 +343,4 @@ opened). Details: [ds-check.md](../packages/tools/docs/ds-check.md).
 Resources: `texuli://design-system/{id}` (the examples above and every
 library theme as a document). Prompt: `create-design-system`. Every edge
 operation answers byte-identically on the local server (`npx -y
-@texuli/mcp`) and the remote one (`https://texuli.com/mcp`, once `0.10.0`
-is deployed). Details: [ds.md](../packages/tools/docs/ds.md).
+@texuli/mcp`) and the remote one (`https://texuli.com/mcp`, deployed from `main`). Details: [ds.md](../packages/tools/docs/ds.md).

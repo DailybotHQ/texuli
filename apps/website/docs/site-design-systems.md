@@ -5,8 +5,8 @@
 stylesheet `/design-systems/brands.css`
 **Packages:** `texuli/design-system` (`DesignSystemProvider`),
 `@texuli/tokens/design-system/apply` (`designSystemStyle`),
-`@texuli/tools/ds-check` (`checkDesignSystem`); design systems are **in
-development for 0.10.0**, and installs name the 0.9 line
+`@texuli/tools/ds-check` (`checkDesignSystem`); design systems are **released in
+0.10.0**, and installs name the 0.10 line
 **Tests:** `apps/website/tests/site-design-systems.test.ts`,
 `tests/e2e/site-design-systems.spec.ts`, `tests/e2e/site-perf.spec.ts`
 
@@ -32,8 +32,8 @@ brand as one JSON document ([docs/DESIGN_SYSTEMS.md](../../../docs/DESIGN_SYSTEM
    the generated `mcp-server-data.ts`) and the guide.
 
 The status line (`DS_STATUS` in `src/components/design-systems/page.ts`) is
-the one place the release status lives; the release task changes it when
-`0.10.0` is published.
+the one place the release status lives; the release task of `0.10.0` set it
+to the published release.
 
 ## How it renders (no client JavaScript)
 

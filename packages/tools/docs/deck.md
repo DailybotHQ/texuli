@@ -79,7 +79,7 @@ modifies no files.
 In the repository source (in development, not released), the tool is the
 `deck.run` operation of the [operations registry](ops.md), and the CLI runs
 through it too. The 0.8 tool name `deck` was a deprecated alias in `0.9.0`
-and is removed in `0.10.0` (on the release branch): call `deck.run`.
+and is removed in `0.10.0`: call `deck.run`.
 
 ```json
 { "command": "lint", "deck": { "formatVersion": 2, "meta": { "title": "Launch" }, "slides": [] } }

@@ -1007,8 +1007,8 @@ function toggle(id: string, event: Event): void {
       <section class="panel" aria-labelledby="ds-export-title" data-tx-ds-export="">
         <h2 id="ds-export-title">Export</h2>
         <p class="hint">
-          Every file is built in this page and saved as a download. Design systems ship with
-          release 0.10.0, which is in development and unreleased.
+          Every file is built in this page and saved as a download. Design systems shipped in
+          0.10.0, a pre-1.0 release.
         </p>
         <ul class="exports">
           {#each EXPORT_FORMATS as format (format.id)}

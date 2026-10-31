@@ -42,7 +42,7 @@ an appearance cache.
 | `bootstrap` | `injected` | `injected` registers the script in `head-inline`; `manual` skips registration so the host can place the returned body. |
 | `density` | unset | Optionally overrides the cached density scale with `compact`, `comfortable`, or `spacious`. |
 | `radius` | unset | Optionally overrides the cached radius scale with `compact`, `comfortable`, or `rounded`. |
-| `designSystem` | unset | Unreleased (`0.10.0`): `{ compiled, selector?, modes? }`. Inlines the compiled design system's `designSystemStyle` in every page's `<head>`; see [Design-system style](#design-system-style). |
+| `designSystem` | unset | From `0.10.0`: `{ compiled, selector?, modes? }`. Inlines the compiled design system's `designSystemStyle` in every page's `<head>`; see [Design-system style](#design-system-style). |
 
 The selected density and radius are applied on the document root before the
 theme stylesheet paints. When either option is unset, the cached theme's
@@ -81,7 +81,7 @@ event handlers.
 
 ## Design-system style
 
-> **Status:** in development for `0.10.0`, not on npm.
+> **Status:** new in `0.10.0`.
 
 `designSystem: { compiled }` puts a compiled design system
 ([design-system-runtime.md](../../tokens/docs/design-system-runtime.md))

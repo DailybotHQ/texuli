@@ -15,7 +15,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 >
   <div class="page" data-tx-theme-studio-page="">
     <header class="page__header">
-      <p class="eyebrow">@texuli/tokens design systems · in development for 0.10.0</p>
+      <p class="eyebrow">@texuli/tokens design systems · new in 0.10.0</p>
       <h1>Design system studio</h1>
       <p class="lead">
         Describe a brand once, as data. Start from a seed color, a logo, a library theme, mood
@@ -26,9 +26,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         a sample email; share the whole document in a link. Nothing leaves this origin.
       </p>
       <p class="note">
-        Design-system documents, their compiler and these exports ship with release 0.10.0, which
-        is in development and unreleased; the published 0.9 line has the theme engine and the
-        token contract they build on.
+        Design-system documents, their compiler and these exports shipped in 0.10.0, on npm in the
+        0.10 line (pre-1.0); earlier lines have the theme engine and the token contract they build
+        on.
       </p>
     </header>
     <DesignSystemStudio base={import.meta.env.BASE_URL} client:load />

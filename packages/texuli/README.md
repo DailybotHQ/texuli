@@ -15,9 +15,9 @@ layouts for dashboards, marketing pages, auth and settings, content and
 mobile.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.9.0`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.10.0`) may contain breaking
-> changes, so pin the exact version or use `^0.9.0`, which accepts only 0.9.x.
+> published to npm as `0.10.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.11.0`) may contain breaking
+> changes, so pin the exact version or use `^0.10.0`, which accepts only 0.10.x.
 
 ## Install
 
@@ -132,7 +132,7 @@ typed vocabulary, used only when a prop is omitted. Every component also
 reads its component tokens (`--tx-button-radius`, `--tx-card-padding-inline`…)
 and the tier-3 hooks (`data-tx-button-style` and friends)
 ([design-system.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/design-system.md)).
-`texuli/design-system` (unreleased, `0.10.0`) adds `DesignSystemProvider`, a
+`texuli/design-system` (from `0.10.0`) adds `DesignSystemProvider`, a
 scope element that applies a compiled design system and its component
 defaults ([design-system.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/design-system.md#designsystemprovider)).
 

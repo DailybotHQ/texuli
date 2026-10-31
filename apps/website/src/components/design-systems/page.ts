@@ -1,14 +1,15 @@
 /**
  * /design-systems/ page copy that tests read too (PLAN_011 T-site-0100): the
- * release status in one place (the release task changes it when 0.10.0 is
- * published; docs/RELEASE.md is the source) and the four preview surfaces.
+ * release status in one place (the release task of 0.10.0 set it to the
+ * published release; docs/RELEASE.md is the source) and the four preview
+ * surfaces.
  */
 /** The surfaces every brand is applied to. */
 export type Surface = 'dashboard' | 'slide' | 'document' | 'email';
 
-/** The honest status: design systems are in the 0.10.0 release, which is in development. */
+/** The honest status: design systems shipped in 0.10.0, a pre-1.0 release. */
 export const DS_STATUS =
-  'Design systems are in development for 0.10.0 on the release/0.10.0 branch and ship when 0.10.0 is published. Installs today use the 0.9 line (texuli@^0.9.0 and @texuli/tokens@^0.9.0), which has token contract v2, component tokens and design defaults, the plumbing design systems build on, but not the design-system document, its compiler or the texuli ds commands.';
+  'Design systems shipped in 0.10.0, on npm in the 0.10 line (texuli@^0.10.0 and @texuli/tokens@^0.10.0), a pre-1.0 release: under 0.x a new minor may contain breaking changes. Earlier lines have the theme engine and token contract v2, but not the design-system document, its compiler or the texuli ds commands.';
 
 export interface SurfaceEntry {
   id: Surface;

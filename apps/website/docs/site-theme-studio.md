@@ -4,7 +4,7 @@
 **Path:** `/theme-studio/` (Themes group, "Studio"; the theme studio's URL, kept so every link works)
 **Packages:** `@texuli/tokens/design-system/*` (compile, diff, import, emit, report),
 `texuli/design-system` (`DesignSystemProvider`), `@texuli/tools/email` (the sample email export);
-design-system documents are **in development for 0.10.0, not on npm**
+design-system documents are **released in 0.10.0**
 **Tests:** `apps/website/tests/ds-studio.test.ts`, `apps/website/tests/studios.test.ts`,
 `tests/e2e/site-ds-studio.spec.ts`, `tests/e2e/site-theme-studio.spec.ts`
 
@@ -123,8 +123,8 @@ TEXULI_E2E_PORT=4880 pnpm exec playwright test tests/e2e/site-ds-studio.spec.ts 
 
 ## Planned
 
-- A hand-off to the MCP `ds.*` operations and `texuli ds` commands (which
-  exist on `release/0.10.0`): the studio runs the same compiler, importers
+- A hand-off to the MCP `ds.*` operations and `texuli ds` commands (released
+  in `0.10.0`): the studio runs the same compiler, importers
   and emitters in the page and does not call them; a "copy as `texuli ds`
   command" or MCP hand-off is planned.
 - Font files and logo assets: the studio edits their relative paths but

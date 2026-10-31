@@ -1248,7 +1248,7 @@ reflect this decision.
   builder (selectors and properties from an allowlist, values escaped)
   before it can ship.
 
-- **Note (2026-10-30, PLAN_011 T-ds-outputs, unreleased 0.10.0): the
+- **Note (2026-10-30, PLAN_011 T-ds-outputs, released in 0.10.0): the
   email dark rule landed for design systems.** With a compiled design
   system that has a dark mode, `@texuli/tools/email` writes one
   `prefers-color-scheme: dark` rule from a closed grammar: classes are a
@@ -1597,8 +1597,8 @@ reflect this decision.
 
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
-  developer may override this decision. **Status: planned** (release
-  0.10.0); nothing below is shipped yet.
+  developer may override this decision. **Status: shipped** in release
+  0.10.0.
 - **Context:** a company should describe its brand once, as data, and have
   every Texuli surface follow it; agents should author and change it with
   the same closed-vocabulary discipline as blueprints. Today the closest
@@ -1689,8 +1689,8 @@ reflect this decision.
 
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
-  developer may override this decision. **Status: planned** (release
-  0.10.0); nothing below is shipped yet.
+  developer may override this decision. **Status: shipped** in release
+  0.10.0.
 - **Context:** the theme generator already guarantees AA for generated
   text pairs, and the AA gate (`@texuli/tokens/aa-gate`) checks shipped
   themes. A design-system document adds inputs the generator does not
@@ -1736,7 +1736,7 @@ reflect this decision.
     guarantees hold), snapshot determinism and a compile-time bound in
     the opt-in perf suite.
   - **Forced colors** keep today's behavior; the system colors win there.
-  - **As built (T-ds-compiler, 2026-10-30; `release/0.10.0`, not on npm),
+  - **As built (T-ds-compiler, 2026-10-30; released in 0.10.0),
     where it refines the plan:**
     - The pairs are the generator's `THEME_CONTRAST_PAIRS` plus the status
       set. Non-text boundaries (strong border, input) at 3:1 report as
@@ -1768,11 +1768,11 @@ reflect this decision.
 
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
-  developer may override this decision. **Status: partly shipped:**
-  scoping (`[data-tx-scope]`) and scoped portals shipped in release 0.9.0;
-  the design-system runtime (`@texuli/tokens/design-system/apply`,
+  developer may override this decision. **Status: shipped:**
+  scoping (`[data-tx-scope]`) and scoped portals in release 0.9.0; the
+  design-system runtime (`@texuli/tokens/design-system/apply`,
   `DesignSystemProvider` in `texuli/design-system`, and the `designSystem`
-  option of `@texuli/astro`) is built on `release/0.10.0`, not on npm.
+  option of `@texuli/astro`) in release 0.10.0.
 - **Context:** `applyTheme` already writes `--tx-*` properties on an
   element through the CSSOM, and the no-flash script replays a cached,
   filtered variable map before first paint (it rejects `var(`, `url(` and
@@ -1847,8 +1847,8 @@ reflect this decision.
 
 - **Date:** 2026-10-30 · **Ratification:** decided by the PLAN_011
   architecture task under the developer's trust pre-authorization; the
-  developer may override this decision. **Status: planned** (release
-  0.10.0, spec `0.10.0`); nothing below is shipped yet.
+  developer may override this decision. **Status: shipped** in release
+  0.10.0 (spec `0.10.0`).
 - **Context:** blueprints, decks and documents have no design-system
   reference (only the web-only deck `themeRef`); email covers color and
   font only and has no dark rule (the ADR-016 note); PDF, DOCX, canvas
@@ -1908,7 +1908,7 @@ reflect this decision.
     llms bundles and the catalog snapshot regenerate.
   - **Website:** the theme studio grows into a client-only Design System
     Studio (no server, no storage; sharing through the URL hash).
-  - **Built on `release/0.10.0` (not on npm; T-ds-blueprint follow-ups):**
+  - **As built (released in 0.10.0; T-ds-blueprint follow-ups):**
     - The player hands the compiled component defaults to the painted
       components through the `texuli/defaults` context, below blueprint
       props.

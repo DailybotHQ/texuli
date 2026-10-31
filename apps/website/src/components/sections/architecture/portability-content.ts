@@ -147,7 +147,7 @@ export const PORTABILITY_STEPS: readonly PortabilityStep[] = [
   },
   {
     title: 'Tokens cross',
-    body: 'The web themes through the --tx-* token contract. The native side reads the same values: TexuliTheme builds its Material colors from a generated design-token set compiled from a design system (0.10.0, in development). The default is the Texuli default design system.',
+    body: 'The web themes through the --tx-* token contract. The native side reads the same values: TexuliTheme builds its Material colors from a generated design-token set compiled from a design system (new in 0.10.0). The default is the Texuli default design system.',
     sources: [
       {
         file: TEXULI_THEME,

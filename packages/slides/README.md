@@ -16,12 +16,12 @@ Svelte 5 stage on top of it
 ([ADR-009](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
 
 > **Status: 0.x release, in development.** The stage described here is
-> published on npm as `0.9.0` (first published in `0.4.0`, together with
+> published on npm as `0.10.0` (first published in `0.4.0`, together with
 > the first release of `@texuli/deck`). `@texuli/slides@0.3.0` has the
 > previous deck model (model v1) and its stage. Texuli is pre-1.0: under 0.x
 > a new minor may contain breaking changes, and `0.4.0` was one, so pin the
 > exact version or use
-> `^0.9.0`, which accepts only 0.9.x.
+> `^0.10.0`, which accepts only 0.10.x.
 > The upgrade path is in
 > [migration.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/migration.md).
 
@@ -220,7 +220,7 @@ public subpath for configuring the default component registry (see
 | `@texuli/slides/stage` | `DeckStage` (model v2 and v1), `DeckPrint` (v1), the chrome, overview and presenter components, preparation (`prepareDeck`, `validateDeckBlock`), routing, steps, renderers, themes, transitions and the v1 presenter sync |
 | `@texuli/slides/stage-core` | `DeckStageCore`: the same stage with no reference to the default renderer tables, for hosts that bring every renderer (their build emits none of the defaults' chunks or CSS), and the rest of `./stage` except `DeckStage`, `DeckPrint` and the default-table loaders ([stage.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/stage.md)) |
 | `@texuli/slides/export` | Print plans and flags, `DeckPrintView` for v2 decks, the PDF seam, PPTX for v1 and v2 decks, and the owned XML and ZIP writers |
-| `@texuli/slides/export-core` | The same without the default renderer tables: `DeckPrintViewCore` and `preloadDeckPrintViewCore` take a `defaults` source from the host, so a `DeckStageCore` host that prints emits none of the defaults' chunks or CSS (G105; in development for `0.10.0`) ([export.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/export.md)) |
+| `@texuli/slides/export-core` | The same without the default renderer tables: `DeckPrintViewCore` and `preloadDeckPrintViewCore` take a `defaults` source from the host, so a `DeckStageCore` host that prints emits none of the defaults' chunks or CSS (G105; new in `0.10.0`) ([export.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/export.md)) |
 | `@texuli/slides/styles.css` | Stage and print styles, named print pages and reduced-motion rules |
 | `@texuli/slides/model` | The model v1 (`0.3.0`) deck: `parseDeck`, masters, slots and reveal steps, kept for existing decks |
 | `@texuli/slides/grammar` | Catalog encodings of model v1 decks and their `validateDeckDraft` |

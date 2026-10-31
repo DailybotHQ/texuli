@@ -49,13 +49,13 @@ Returns a `DocumentPlayerHost` (the player's type):
 | `resolveEmbed`, `resolveMedia` | — | Embeds and media, as in the reader |
 | `reducedMotion` | `false` | Paint embeds without motion |
 | `loadPlayer` | the package loader | A `PagesPlayerLoader` for embeds inside the document; `null` turns them off ([core entries](editor.md#core-entries-without-the-player)) |
-| `renderBlock`, `blockHost` | — | The host's own blocks in the painted document, passed to the reader ([host blocks](editor.md#host-blocks); in development for `0.10.0`, not on npm). The player validates the document against the catalog first, so a wrapped block the catalog does not know is refused before the reader sees it; here the host paints what passes: embeds the library cannot paint (a `ref` with no payload) and library blocks it claims with `'host'` |
+| `renderBlock`, `blockHost` | — | The host's own blocks in the painted document, passed to the reader ([host blocks](editor.md#host-blocks); from `0.10.0`). The player validates the document against the catalog first, so a wrapped block the catalog does not know is refused before the reader sees it; here the host paints what passes: embeds the library cannot paint (a `ref` with no payload) and library blocks it claims with `'host'` |
 
 The node's `outline` prop goes to the reader's `outline`.
 
 ## `createDocumentPlayerHostCore(options)`
 
-> **In development for `0.10.0`, not on npm.**
+> **New in `0.10.0`.**
 
 From `@texuli/pages/host-core` (and `@texuli/pages/host`): the same host,
 mounting `PageReaderCore`, with no default `loadPlayer` (G123). A host on

@@ -165,7 +165,7 @@ wrapped block reads. `MediaResolver` and `mediaSource` resolve images through
 
 ## Core entries without the player
 
-> **In development for `0.10.0`, not on npm.**
+> **New in `0.10.0`.**
 
 `component` and `deck` embeds paint with `@texuli/player`, loaded on first
 use. A page without embeds never downloads it, but the default components
@@ -220,7 +220,7 @@ default's, and each default entry also exports its core.
 
 ## Host blocks
 
-> **In development for `0.10.0`, not on npm** (Protoyard gap G111).
+> **New in `0.10.0`** (Protoyard gap G111).
 
 A host paints its own blocks (a form backed by its services, a chart on its
 own spec) in `PageEditor`, `PageReader`, `PagedView` and `CollabEditor`

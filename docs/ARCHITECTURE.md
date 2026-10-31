@@ -63,8 +63,8 @@ Not layers, because they consume the library:
 
 `@texuli/examples` is never packed (`NEVER_PACKED` in
 `scripts/packages.ts`); `pnpm verify:packages` packs the other 26, and all
-26 are released on npm as `0.9.0`, the first release of `@texuli/mcp` (new
-in PLAN_011; the 0.8 line had 25 packages);
+26 are released on npm as `0.10.0`, the design-systems release (`@texuli/mcp`
+was first released in `0.9.0`; the 0.8 line had 25 packages);
 `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/editor`,
 `@texuli/document`, `@texuli/pages`, `@texuli/forms`, `@texuli/canvas`,
 `@texuli/sheets` and `@texuli/mcp` are in development
@@ -117,7 +117,7 @@ cap in `texuli.budgets.json` (`pnpm size`).
 
 | Package | `package.json` export subpaths |
 | --- | --- |
-| `@texuli/astro` (private) | `.`, `appearance`, `content`, `integration`, `site`, `styles.css`, `layouts/ContentLayout`, `sections/Hero`, `sections/Section` |
+| `@texuli/astro` (private) | `.`, `appearance`, `content`, `design-system` (from `0.10.0`), `integration`, `site`, `styles.css`, `layouts/ContentLayout`, `sections/Hero`, `sections/Section` |
 | `@texuli/blocks` (private) | `.`, `code`, `code/engine`, `code/renderers`, `code/tokenizer`, `core`, `data`, `data/engine`, `data/renderers`, `diagram`, `diagram/engine`, `diagram/renderers`, `embed`, `embed/engine`, `embed/renderers`, `formula`, `interactive`, `interactive/engine`, `interactive/renderers`, `map`, `map/engine`, `map/renderers`, `media`, `media/engine`, `media/renderers`, `structure`, `structure/engine`, `structure/renderers`, `text`, `text/engine`, `text/markdown`, `text/renderers` |
 | `@texuli/catalog` (private) | `.`, `build`, `build/node`, `edit`, `envelope`, `manifest`, `manifests/content`, `manifests/chat`, `manifests/composition`, `manifests/data`, `manifests/documents`, `manifests/display`, `manifests/forms`, `manifests/layouts`, `manifests/schema-forms`, `manifests/canvas`, `manifests/sheets`, `manifests/overlays`, `manifests/state`, `manifests/workflows`, `manifests/all` (every group statically, for the edge; ADR-017), `player`, `render/frame`, `render/grammar`, `render/hostile`, `render/limits`, `render/conditions`, `render/renderer`, `render/richtext`, `validate`, `validate/blocks` |
 | `@texuli/charts` (private) | `.`, `canvas`, `colors`, `calendar`, `annotations`, `axis`, `cartesian`, `compact`, `sparkline-lite`, `flow`, `geo`, `histogram`, `interaction`, `math`, `math/scales`, `math/shapes`, `math/layout`, `math/downsample`, `math/color`, `matrix`, `part-whole`, `pack`, `statistical`, `streaming`, `schemas`, `worker`, `worker/entry` |
@@ -132,17 +132,17 @@ cap in `texuli.budgets.json` (`pnpm size`).
 | `@texuli/canvas` (private, in development) | `.`, `model`, `sync`, `export`, `editor`, `viewer`, `host` |
 | `@texuli/sheets` (private, in development) | `.`, `formula`, `model`, `csv`, `view`, `host` |
 | `@texuli/examples` (private) | `.` |
-| `@texuli/forms` (private, in development) | `.`, `model`, `controls` (new in `0.10.0`), `host`, `styles.css` |
+| `@texuli/forms` (private, in development) | `.`, `model`, `controls` (from `0.10.0`), `host`, `styles.css` |
 | `@texuli/media` (private) | `.`, `animation`, `animation/player`, `audio`, `captions`, `composition-canvas`, `composition-canvas/draw`, `composition-canvas/render`, `composition-model`, `composition-svg`, `composition-v2`, `export`, `export/ui`, `gallery`, `gallery/lightbox`, `generator-slot`, `image`, `image-editor`, `image-editor/model`, `image-editor/render`, `timeline`, `timeline/model`, `video` |
-| `@texuli/player` (private) | `.`, `design-system` (in development for `0.10.0`: the lazy design-system step, shared with the slides stage), `styles.css` |
-| `@texuli/pages` (private, in development) | `.`, `editor`, `reader`, `paged`, `export`, `host`, `collab`, `styles.css` |
+| `@texuli/player` (private) | `.`, `design-system` (from `0.10.0`: the lazy design-system step, shared with the slides stage), `styles.css` |
+| `@texuli/pages` (private, in development) | `.`, `editor`, `editor-core`, `reader`, `reader-core`, `paged`, `paged-core`, `export`, `host`, `host-core`, `collab`, `collab-core` (the `*-core` subpaths from `0.10.0`), `styles.css` |
 | `@texuli/primitives` (private) | `.`, `accordion`, `alert-dialog`, `color-picker`, `context-menu`, `label`, `number-field`, `progress`, `separator`, `sheet`, `slider`, `tags-input`, `toolbar`, `tooltip`, `collapsible`, `command`, `date-picker`, `date-field`, `file-drop`, `radio-group`, `switch`, `checkbox`, `calendar`, `toggle`, `menu`, `menubar`, `popover`, `tabs`, `hover-card`, `tree`, `listbox`, `select`, `splitter`, `portal`, `navigation-menu`, `scroll-area`, `pagination`, `toast`, `dialog`, `pin-input`, `combobox`, `avatar`, `sortable` |
-| `@texuli/slides` (private) | `.`, `model`, `grammar`, `export`, `templates`, `stage`, `stage-core`, `components`, `layouts`, `styles.css` |
-| `@texuli/spec` (private) | `.`, `workflow`, `migrate`, `codegen`, `surface`, `motion`, `stream`, `source`, `design-system` (in development for `0.10.0`) |
+| `@texuli/slides` (private) | `.`, `model`, `grammar`, `export`, `export-core` (from `0.10.0`), `templates`, `stage`, `stage-core`, `components`, `layouts`, `styles.css` |
+| `@texuli/spec` (private) | `.`, `workflow`, `migrate`, `codegen`, `surface`, `motion`, `stream`, `source`, `design-system` (from `0.10.0`) |
 | `@texuli/workflows` (private, in development) | `.`, `model`, `layout`, `spec-adapter`, `editor`, `viewer`, `inspector` |
-| `texuli` (private) | `.`, `alert`, `avatar`, `badge`, `button`, `card`, `carousel`, `choice`, `combobox`, `command`, `cx`, `date`, `defaults`, `dialog`, `empty`, `feedback`, `field`, `file-upload`, `icons`, `icons/lucide`, `input`, `kbd-code`, `layouts/app`, `layouts/app/dual-sidebar`, `layouts/app/master-detail`, `layouts/app/rail`, `layouts/app/sidebar`, `layouts/app/split-view`, `layouts/app/top-nav`, `layouts/auth-settings`, `layouts/auth-settings/register`, `layouts/content`, `layouts/content/blog`, `layouts/content/docs`, `layouts/content/editorial`, `layouts/dashboard`, `layouts/dashboard/register`, `layouts/host`, `layouts/host/chrome`, `layouts/host/drawer`, `layouts/marketing`, `layouts/marketing/entry`, `layouts/marketing/landing`, `layouts/marketing/pricing`, `layouts/marketing/register`, `layouts/marketing/section`, `layouts/mobile`, `layouts/mobile/register`, `layouts/shells`, `menus`, `motion`, `navigation`, `number-pin`, `popover`, `rating`, `resizable`, `scroll-area`, `select`, `separator-aspect`, `sheet`, `sidebar`, `slider`, `stat`, `stepper`, `table`, `tabs-accordion`, `tags-color`, `timeline`, `toast`, `toggle`, `toolbar`, `tooltip`, `tree` |
-| `@texuli/tokens` (private) | `.`, `aa-gate`, `aa-gate/components`, `base.css`, `build`, `components`, `contract`, `css`, `data-viz`, `forced-colors`, `forced-colors.css`, `generator`, `library`, `library-expand`, `modes`, `motion`, `no-flash`, `palette`, `renames`, `renames.json`, `style-presets`, `system`, `tailwind`, `tailwind/preset.css` |
-| `@texuli/tools` (private) | `.`, `a2ui`, `cli-add`, `cli-init`, `cli-update`, `llms`, `elements`, `golden`, `deck`, `document`, `email`, `print`, `ops` (the operations registry, ADR-017), `mcp` (the MCP protocol layer, its stdio transport and `runMcpCli`) |
+| `texuli` (private) | `.`, `alert`, `avatar`, `badge`, `button`, `card`, `carousel`, `choice`, `combobox`, `command`, `cx`, `date`, `defaults`, `design-system` (from `0.10.0`), `dialog`, `empty`, `feedback`, `field`, `file-upload`, `icons`, `icons/lucide`, `input`, `kbd-code`, `layouts/app`, `layouts/app/dual-sidebar`, `layouts/app/master-detail`, `layouts/app/rail`, `layouts/app/sidebar`, `layouts/app/split-view`, `layouts/app/top-nav`, `layouts/auth-settings`, `layouts/auth-settings/register`, `layouts/content`, `layouts/content/blog`, `layouts/content/docs`, `layouts/content/editorial`, `layouts/dashboard`, `layouts/dashboard/register`, `layouts/host`, `layouts/host/chrome`, `layouts/host/drawer`, `layouts/marketing`, `layouts/marketing/entry`, `layouts/marketing/landing`, `layouts/marketing/pricing`, `layouts/marketing/register`, `layouts/marketing/section`, `layouts/mobile`, `layouts/mobile/register`, `layouts/shells`, `menus`, `motion`, `navigation`, `number-pin`, `popover`, `rating`, `resizable`, `scroll-area`, `select`, `separator-aspect`, `sheet`, `sidebar`, `slider`, `stat`, `stepper`, `table`, `tabs-accordion`, `tags-color`, `timeline`, `toast`, `toggle`, `toolbar`, `tooltip`, `tree` |
+| `@texuli/tokens` (private) | `.`, `aa-gate`, `aa-gate/components`, `base.css`, `build`, `components`, `contract`, `css`, `data-viz`, `design-system/apply`, `design-system/compile`, `design-system/diff`, `design-system/emit`, `design-system/fixtures`, `design-system/import`, `design-system/report`, `design-system/validate` (the `design-system/*` subpaths from `0.10.0`), `forced-colors`, `forced-colors.css`, `generator`, `library`, `library-expand`, `modes`, `motion`, `no-flash`, `palette`, `renames`, `renames.json`, `style-presets`, `system`, `tailwind`, `tailwind/preset.css` |
+| `@texuli/tools` (private) | `.`, `a2ui`, `cli-add`, `cli-init`, `cli-update`, `llms`, `elements`, `golden`, `deck`, `document`, `email`, `print`, `ops` (the operations registry, ADR-017), `ds-check` and `ds-check/host` (design-system conformance, from `0.10.0`), `mcp` (the MCP protocol layer, its stdio transport and `runMcpCli`) |
 | `@texuli/mcp` (private, in development) | `.` (`startTexuliMcp`, `runTexuliMcpCli`, `TEXULI_MCP_VERSION`; the bin `texuli-mcp`) |
 
 This inventory is checked against each package's `package.json` `exports`;
@@ -243,7 +243,7 @@ after each deploy of `main`.
 
 ## Decks: engine and stage
 
-ADR-009 splits presentations in two packages (both on npm as `0.9.0`;
+ADR-009 splits presentations in two packages (both on npm as `0.10.0`;
 `@texuli/deck` was first released in `0.4.0`):
 
 - **`@texuli/deck` (L0)** owns everything that is data: deck model v2
@@ -322,26 +322,20 @@ New subpaths in existing packages:
 
 ## Planned (PLAN_011)
 
-**Planned (PLAN_011), not shipped.** The 0.9.0 wave of ADR-017 to ADR-020
-and ADR-023 has landed and is released: `@texuli/mcp` (L9) is in the layer
-table, and `@texuli/tools` `ops` and `mcp`, `@texuli/catalog`
-`manifests/all`, the token contract v2 subpaths of `@texuli/tokens`
-(`system`, `components`, `data-viz`, `renames`, `renames.json`) and
-`texuli/defaults` are in the package subpaths table above; the remote MCP
-(`functions/mcp.ts`) is described under [The website](#the-website). What
-remains are the package, subpath and file names decided by ADR-021 to
-ADR-024 in [DECISIONS](DECISIONS.md) for the 0.10.0 (design systems) release
-wave. Each entry joins the package subpaths table only when it lands, and
-the release needs the developer's GO.
+PLAN_011 has landed and is released: the 0.9.0 wave of ADR-017 to ADR-020
+and ADR-023 (`@texuli/mcp` at L9, `@texuli/tools` `ops` and `mcp`,
+`@texuli/catalog` `manifests/all`, the token contract v2 subpaths and
+`texuli/defaults`) and the 0.10.0 design-systems wave of ADR-021 to
+ADR-024 (`@texuli/spec/design-system` and spec `0.10.0`, the
+`@texuli/tokens/design-system/*` subpaths, `texuli/design-system`,
+`@texuli/player/design-system`, `@texuli/astro/design-system` and
+`@texuli/tools/ds-check`) are in the package subpaths table above, and the
+remote MCP (`functions/mcp.ts`) is described under
+[The website](#the-website). The design-system guide is
+[DESIGN_SYSTEMS](DESIGN_SYSTEMS.md); what it still marks as planned (the
+hosted registry, the Kotlin CLI command) stays planned.
 
-New packages: none left.
-
-New subpaths in existing packages:
-
-| Package | Planned subpaths | What they will hold | Release wave | Decision |
-| --- | --- | --- | --- | --- |
-| `@texuli/tokens` | `design-system/validate` and `design-system/compile` (built on `release/0.10.0`, not on npm; [design-system-compiler.md](../packages/tokens/docs/design-system-compiler.md)); `design-system/import`, `design-system/emit`, `design-system/report`, `design-system/diff` and `design-system/fixtures` (built on `release/0.10.0`, not on npm; [design-system-io.md](../packages/tokens/docs/design-system-io.md)); `design-system/apply` (built on `release/0.10.0`, not on npm; [design-system-runtime.md](../packages/tokens/docs/design-system-runtime.md)) | The design-system runtime, all lazy: the validator with the compiled-map guarantee check, the compiler (`extends`, variants, patches, the pinned-color solver, enforced guarantees, `CompiledDesignSystem`, `fromTheme`), the importers (brand one-liner, DTCG, Tokens Studio, flat role palette, Theme, logo pixels), the emitters (scoped CSS, Tailwind preset, DTCG, compiled JSON), the static report, the diff and the fictional `protoyard-theme/v1` fixture, and `applyDesignSystem`, `designSystemStyle` and `designSystemAppearance` for element scope, SSR and no flash; `@texuli/tokens` gains a down-only dependency on `@texuli/spec` | 0.10.0 | [ADR-021](DECISIONS.md#adr-021-the-design-system-document), [ADR-022](DECISIONS.md#adr-022-design-system-guarantees-enforced-never-reported), [ADR-023](DECISIONS.md#adr-023-design-system-runtime-and-scoping), [ADR-024](DECISIONS.md#adr-024-design-systems-on-every-surface) |
-| `@texuli/spec` | the design-system schema and spec `0.10.0` (schema, types, validator, patch, migrate, Kotlin types and the envelope wiring built on `release/0.10.0`, not on npm) | The `texuli/design-system` document (`formatVersion` 1): schema, TypeScript types, `DesignSystemPatch`, the JSON-path validator, `migrate`, stable error codes and generated Kotlin (`@texuli/spec/design-system`, [design-system.md](../packages/spec/docs/design-system.md)); spec `0.10.0` adds `$defs.designSystemReference` (`ref` or `inline`), carried by blueprint envelopes and documents; `@texuli/deck` model v2 decks carry the same shape in their own format | 0.10.0 | [ADR-021](DECISIONS.md#adr-021-the-design-system-document), [ADR-024](DECISIONS.md#adr-024-design-systems-on-every-surface) |
+New packages: none left. New subpaths: none left.
 
 ## The website
 
@@ -386,7 +380,7 @@ The pure decisions live in `apps/website/src/lib/` and are tested in
     way npm would publish it: `dist/` via `@sveltejs/package`, a derived
     manifest, publint and attw. It publishes nothing.
   - Workspace packages stay `private: true`; the publish workflow publishes
-    the 26 packable packages, `@texuli/mcp` included, to npm as the `0.9.0`
+    the 26 packable packages, `@texuli/mcp` included, to npm as the `0.10.0`
     release (dist-tags
     `latest` and `next`), with provenance
     ([RELEASE](RELEASE.md)).

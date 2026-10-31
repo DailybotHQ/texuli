@@ -55,7 +55,7 @@ scoped styles.
 | `presenterTimer` | `false` | Show the elapsed timer in the presenter pane |
 | `sync` | `null` | A same-origin link to another stage window: the engine presenter protocol, or a v1 `DeckSync` ([presenter screen](#presenter-screen)) |
 | `loadTheme` | `loadDeckLibraryTheme` | Resolves catalog theme ids; `null` leaves them to host CSS |
-| `designSystems` | — | `{ resolve, mode }` for a deck's `designSystem.ref` (in development for `0.10.0`); see [Design systems](#design-systems) |
+| `designSystems` | — | `{ resolve, mode }` for a deck's `designSystem.ref` (from `0.10.0`); see [Design systems](#design-systems) |
 | `onDesignSystem` | — | Called with a `PlayerDesignSystemEvent` when a deck's design system applies or is refused |
 | `resolveAvatar` | — | Host adapter for `avatar:` image ids |
 | `controller` | `null` | Read-only binding to the engine `DeckController` for imperative hosts |
@@ -530,7 +530,7 @@ A print-specific theme and per-slide compiled CSS are planned.
 
 ### Design systems
 
-> **In development for `0.10.0`, not on npm.**
+> **New in `0.10.0`.**
 
 A deck may name the design system it follows with a top-level
 `designSystem` (`{ ref }` or `{ inline }`, the blueprint's shape;
