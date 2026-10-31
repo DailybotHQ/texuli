@@ -76,7 +76,7 @@
   }
 
   .tx-filter-builder__control[aria-invalid="true"] {
-    border-color: var(--tx-danger, Mark);
+    border-color: var(--tx-destructive, Mark);
   }
 
   .tx-filter-builder__button {
@@ -121,7 +121,7 @@
   .tx-filter-builder__issue {
     flex-basis: 100%;
     margin: 0;
-    color: var(--tx-danger, CanvasText);
+    color: var(--tx-destructive, CanvasText);
   }
 
   .tx-filter-builder__empty {

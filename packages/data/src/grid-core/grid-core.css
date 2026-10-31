@@ -193,13 +193,13 @@
       no-repeat local,
       radial-gradient(
         farthest-side at 0 50%,
-        color-mix(in oklab, CanvasText 18%, transparent),
+        color-mix(in oklab, var(--tx-foreground, CanvasText) 18%, transparent),
         transparent
       )
       left / 0.75rem 100% no-repeat scroll,
       radial-gradient(
         farthest-side at 100% 50%,
-        color-mix(in oklab, CanvasText 18%, transparent),
+        color-mix(in oklab, var(--tx-foreground, CanvasText) 18%, transparent),
         transparent
       )
       right / 0.75rem 100% no-repeat scroll,

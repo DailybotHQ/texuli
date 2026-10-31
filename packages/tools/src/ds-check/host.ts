@@ -154,11 +154,37 @@ function paintedColors(el: Element): Record<string, string> {
   return out;
 }
 
-function isRendered(el: Element): boolean {
+/**
+ * True when `el` clips its whole box away: the visually-hidden pattern
+ * (`clip-path: inset(50%)`, or the legacy `clip: rect(0 0 0 0)`), used for
+ * screen-reader text and form bridges. It and its subtree paint no pixel.
+ */
+function clipsAway(el: Element): boolean {
+  const style = getComputedStyle(el);
+  const inset = /^inset\(\s*(\d+(?:\.\d+)?)%/u.exec(style.clipPath);
+  if (inset && Number(inset[1]) >= 50) return true;
+  return (
+    style.position === 'absolute' &&
+    /^rect\(\s*0(?:px)?[\s,]+0(?:px)?[\s,]+0(?:px)?[\s,]+0(?:px)?\s*\)$/u.test(style.clip)
+  );
+}
+
+/** Whether `el` paints: visible, and neither it nor an ancestor up to `root` clips itself away. */
+function isRendered(el: Element, root: Element, clipped: Map<Element, boolean>): boolean {
   const check = (el as Element & { checkVisibility?: (o?: object) => boolean }).checkVisibility;
-  return check
+  const visible = check
     ? check.call(el, { opacityProperty: true, visibilityProperty: true })
     : el.getClientRects().length > 0;
+  if (!visible) return false;
+  for (let node: Element | null = el; node; node = node === root ? null : node.parentElement) {
+    let away = clipped.get(node);
+    if (away === undefined) {
+      away = clipsAway(node);
+      clipped.set(node, away);
+    }
+    if (away) return false;
+  }
+  return true;
 }
 
 /**
@@ -192,9 +218,10 @@ export function installDsCheckHost(
 
   const snapshot = () => {
     const map = new Map<Element, Record<string, string>>();
+    const clipped = new Map<Element, boolean>();
     for (const root of scope.querySelectorAll(`[${DS_CHECK_COMPONENT_ATTRIBUTE}]`))
       for (const el of [root, ...root.querySelectorAll('*')])
-        if (isRendered(el)) map.set(el, paintedColors(el));
+        if (isRendered(el, root, clipped)) map.set(el, paintedColors(el));
     return map;
   };
 

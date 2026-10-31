@@ -253,7 +253,7 @@
     position: fixed;
     inset: 0;
     z-index: 50;
-    background-color: color-mix(in oklab, CanvasText 40%, transparent);
+    background-color: var(--tx-overlay, color-mix(in oklab, CanvasText 40%, transparent));
   }
 
   .tx-layout-drawer {
@@ -266,7 +266,10 @@
     inline-size: min(18rem, 85vw);
     background-color: var(--tx-sidebar, var(--tx-surface, Canvas));
     color: var(--tx-sidebar-foreground, var(--tx-foreground, CanvasText));
-    box-shadow: var(--tx-shadow-lg, 0 10px 30px color-mix(in oklab, CanvasText 20%, transparent));
+    box-shadow: var(
+      --tx-shadow-lg,
+      0 10px 30px color-mix(in oklab, var(--tx-foreground, CanvasText) 20%, transparent)
+    );
     outline: none;
   }
 

@@ -117,7 +117,7 @@
 }
 
 .tx-player__badge[data-status="invalid"] {
-  border-color: var(--tx-danger, Mark);
+  border-color: var(--tx-destructive, Mark);
 }
 
 .tx-player__surface {
@@ -133,7 +133,7 @@
   overflow-wrap: anywhere;
   margin: clamp(0.75rem, 3vw, 1.5rem);
   padding: 1rem;
-  border-inline-start: 0.25rem solid var(--tx-danger, Mark);
+  border-inline-start: 0.25rem solid var(--tx-destructive, Mark);
   background: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
 }
 
@@ -213,7 +213,7 @@
 }
 
 .tx-player__placeholder[data-reason="node-error"] {
-  border-inline-start: 0.25rem solid var(--tx-danger, Mark);
+  border-inline-start: 0.25rem solid var(--tx-destructive, Mark);
 }
 
 .tx-player__placeholder-path {
@@ -285,7 +285,8 @@
   padding: clamp(1rem, 3vw, 1.5rem);
   border: 1px solid var(--tx-border, ButtonBorder);
   border-radius: var(--tx-radius-lg, 0.75rem);
-  background: var(--tx-card, Canvas);
+  background: var(--tx-surface, Canvas);
+  color: var(--tx-surface-foreground, CanvasText);
 }
 
 .tx-player-layout__title {
@@ -442,7 +443,8 @@
   padding: clamp(1rem, 3vw, 1.5rem);
   border: 1px solid var(--tx-border, ButtonBorder);
   border-radius: var(--tx-radius-lg, 0.75rem);
-  background: var(--tx-card, Canvas);
+  background: var(--tx-surface, Canvas);
+  color: var(--tx-surface-foreground, CanvasText);
 }
 
 @media (min-width: 48rem) {
@@ -513,6 +515,99 @@
   border: 1px solid var(--tx-border, ButtonBorder);
   border-radius: 999px;
   background: transparent;
+  /* A button paints ButtonText by default; the label follows the theme. */
+  color: inherit;
+  cursor: pointer;
+}
+
+/*
+ * Native text fields and sliders of the controls and action forms: the
+ * field chrome of texuli's Input (surface, input border, foreground), so
+ * they follow the theme instead of the user agent's Field colors. Targets
+ * stay at least --tx-size-target-min tall (a host without the tokens'
+ * base.css keeps the padded intrinsic height, above 24px).
+ */
+.tx-player-control input[type="search"],
+.tx-player-form-field input,
+.tx-player-form-field textarea {
+  min-block-size: max(2.25rem, var(--tx-size-target-min));
+  border: 1px solid var(--tx-input, var(--tx-border, ButtonBorder));
+  border-radius: var(--tx-radius, 0.5rem);
+  background: var(--tx-surface, Field);
+  color: var(--tx-foreground, FieldText);
+}
+
+.tx-player-control input[type="search"] {
+  padding-block: 0.25rem;
+  padding-inline: 0.5rem;
+}
+
+.tx-player-control input::placeholder,
+.tx-player-form-field input::placeholder,
+.tx-player-form-field textarea::placeholder {
+  color: var(--tx-muted-foreground, GrayText);
+  opacity: 1;
+}
+
+.tx-player-control input[type="range"] {
+  min-block-size: max(1.5rem, var(--tx-size-target-min));
+  background: transparent;
+  accent-color: var(--tx-primary, AccentColor);
+}
+
+.tx-player-control input:disabled,
+.tx-player-form-field input:disabled,
+.tx-player-form-field textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Flow actions (secondary) and action-form submits (primary). */
+.tx-player-flow-action,
+.tx-player-form-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-block-size: max(2.25rem, var(--tx-size-target-min));
+  min-inline-size: max(2.25rem, var(--tx-size-target-min));
+  padding-block: 0.375rem;
+  padding-inline: 1rem;
+  border: 1px solid var(--tx-border, ButtonBorder);
+  border-radius: var(--tx-radius, 0.5rem);
+  background: var(--tx-surface, ButtonFace);
+  color: var(--tx-surface-foreground, ButtonText);
+  font: inherit;
+  font-weight: 600;
+  line-height: 1.25;
+  cursor: pointer;
+  transition:
+    background-color var(--tx-motion-fast, 120ms) var(--tx-motion-easing, ease),
+    border-color var(--tx-motion-fast, 120ms) var(--tx-motion-easing, ease);
+}
+
+.tx-player-flow-action:hover:not([aria-disabled="true"]) {
+  background: var(--tx-muted, ButtonFace);
+}
+
+.tx-player-form-submit {
+  justify-self: start;
+  border-color: var(--tx-primary, ButtonBorder);
+  background: var(--tx-primary, ButtonFace);
+  color: var(--tx-primary-foreground, ButtonText);
+}
+
+.tx-player-form-submit:hover:not([aria-disabled="true"]):not(:disabled) {
+  border-color: var(--tx-primary-hover, ButtonBorder);
+  background: var(--tx-primary-hover, ButtonFace);
+}
+
+.tx-player-flow-action:focus-visible,
+.tx-player-form-submit:focus-visible,
+.tx-player-form-field input:focus-visible,
+.tx-player-form-field textarea:focus-visible {
+  outline: 2px solid var(--tx-ring, Highlight);
+  outline-offset: 2px;
 }
 
 .tx-player-control__track {
@@ -578,23 +673,22 @@
 .tx-player-form-field textarea {
   font: inherit;
   padding: 0.5rem;
-  border: 1px solid var(--tx-border, ButtonBorder);
-  border-radius: var(--tx-radius, 0.5rem);
 }
 
 .tx-player-form-field[data-invalid] input,
 .tx-player-form-field[data-invalid] textarea {
-  border-color: var(--tx-danger, Mark);
+  border-color: var(--tx-destructive, Mark);
 }
 
 .tx-player-form-field__error {
   margin: 0;
-  color: var(--tx-danger, Mark);
+  color: var(--tx-destructive, Mark);
   font-size: 0.875rem;
 }
 
 .tx-player-form-submit[aria-disabled="true"] {
   opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* Compact density for chat surfaces. */
@@ -620,8 +714,28 @@
   .tx-player__placeholder,
   .tx-player__skeleton,
   .tx-player__stream-retry,
-  .tx-player-layout--card {
+  .tx-player-layout--card,
+  .tx-player-layout--slide,
+  .tx-player-layout--tile {
     border-color: CanvasText;
+  }
+
+  .tx-player-flow-action,
+  .tx-player-form-submit,
+  .tx-player-control--toggle {
+    border-color: ButtonText;
+  }
+
+  .tx-player-control input[type="search"],
+  .tx-player-form-field input,
+  .tx-player-form-field textarea {
+    border-color: FieldText;
+  }
+
+  .tx-player-flow-action[aria-disabled="true"],
+  .tx-player-form-submit[aria-disabled="true"] {
+    border-color: GrayText;
+    color: GrayText;
   }
 }
 

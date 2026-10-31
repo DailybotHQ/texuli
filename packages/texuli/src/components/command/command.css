@@ -23,7 +23,10 @@
     background-color: var(--tx-elevated, var(--tx-surface, Canvas));
     color: var(--tx-foreground, CanvasText);
     font-family: var(--tx-font-sans, system-ui, sans-serif);
-    box-shadow: var(--tx-shadow-lg, 0 12px 40px color-mix(in srgb, CanvasText 18%, transparent));
+    box-shadow: var(
+      --tx-shadow-lg,
+      0 12px 40px color-mix(in srgb, var(--tx-foreground, CanvasText) 18%, transparent)
+    );
   }
 
   .tx-command--outline {
@@ -250,7 +253,10 @@
     border-radius: var(--tx-radius-xl, 0.9rem);
     background-color: var(--tx-elevated, var(--tx-surface, Canvas));
     color: var(--tx-foreground, CanvasText);
-    box-shadow: var(--tx-shadow-lg, 0 16px 48px color-mix(in srgb, CanvasText 22%, transparent));
+    box-shadow: var(
+      --tx-shadow-lg,
+      0 16px 48px color-mix(in srgb, var(--tx-foreground, CanvasText) 22%, transparent)
+    );
   }
 
   .tx-command-palette .tx-command {
@@ -263,7 +269,7 @@
   .tx-command-palette__overlay {
     position: fixed;
     inset: 0;
-    background-color: color-mix(in srgb, CanvasText 45%, transparent);
+    background-color: var(--tx-overlay, color-mix(in srgb, CanvasText 45%, transparent));
   }
 
   /*

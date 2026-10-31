@@ -1560,7 +1560,10 @@ reflect this decision.
   - **Hardcode guard:** `scripts/check-token-usage.ts` fails on literal
     colors and literal size or space values in component CSS (an allowlist
     with reasons). It lands only after adoption, so it never blocks a half
-    migration.
+    migration. Since T-ds-conformance (PLAN_011) it also fails on a system
+    color outside a contract fallback or a forced-colors block, and on a
+    `--tx-*` read that nothing defines, the two causes of the literal
+    colors `texuli ds check --render` found.
   - **Renames:** v2 is additive, so 0.9.0 removes nothing. Any later rename
     keeps the old name as an alias for one minor, and
     `@texuli/tokens/renames.json` lists `{ from, to, since, removeIn }` for
