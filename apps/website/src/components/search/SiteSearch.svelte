@@ -1,6 +1,6 @@
 <script lang="ts">
 import { type Component, onMount } from 'svelte';
-import { Command } from 'texuli/command';
+import { CommandTrigger } from 'texuli/command';
 
 /**
  * Site-wide ⌘/Ctrl+K search. The header ships only the trigger and the
@@ -56,7 +56,7 @@ onMount(() => {
 
 <div class="site-search" data-tx-site-search="">
   {#if showTrigger}
-    <Command.Trigger
+    <CommandTrigger
       label="Search the site"
       keys={['⌘', 'K']}
       icon={compact}
