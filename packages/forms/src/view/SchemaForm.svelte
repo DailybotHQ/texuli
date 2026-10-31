@@ -17,7 +17,7 @@ import {
 import type { CompiledForm } from '../model/schema.ts';
 import type { FormField, FormValues } from '../model/types.ts';
 import { DEFAULT_FORM_MESSAGES, type FormMessages, formatMessage } from '../model/validate.ts';
-import { loadControl, loadedProgress, loadProgress } from './controls/lazy.ts';
+import { loadControl, loadedControl, loadedProgress, loadProgress } from './controls/lazy.ts';
 import { isLazyControlType, type SchemaFormControls } from './controls/types.ts';
 import FormFieldControl from './FormFieldControl.svelte';
 import {
@@ -305,11 +305,32 @@ $effect(() => {
 });
 
 // Load the controls this form uses up front (G119), so later steps paint at once.
+/** Bumped as lazy controls arrive, so readiness is recomputed. */
+let arrivals = $state(0);
 $effect(() => {
   for (const { field } of form.fields) {
-    if (isLazyControlType(field.type) && !controls?.[field.type])
-      void loadControl(field.type).catch(() => {});
+    if (isLazyControlType(field.type) && !controls?.[field.type] && !loadedControl(field.type))
+      void loadControl(field.type).then(
+        () => {
+          arrivals += 1;
+        },
+        () => {}
+      );
   }
+});
+
+/**
+ * Whether a control this form uses (or its step navigation) is still
+ * loading. The form carries `data-tx-pending` and `aria-busy` until every
+ * one has arrived, so hosts, tests and screenshots can wait for it.
+ */
+const pendingControls = $derived.by(() => {
+  void arrivals;
+  if (form.multiStep && steps.length > 1 && !Progress) return true;
+  return form.fields.some(
+    ({ field }) =>
+      isLazyControlType(field.type) && !controls?.[field.type] && !loadedControl(field.type)
+  );
 });
 
 // A submission the controller finished (from this view, an outside button,
@@ -478,7 +499,8 @@ const draftText = $derived(
   class={cx('tx-forms', className)}
   aria-labelledby={rest['aria-label'] ? undefined : `${base}-title`}
   aria-describedby={form.schema.description ? `${base}-description` : undefined}
-  aria-busy={submitting || undefined}
+  aria-busy={submitting || pendingControls || undefined}
+  data-tx-pending={pendingControls ? '' : undefined}
   data-status={formState.status}
   novalidate
   {onsubmit}
@@ -501,7 +523,7 @@ const draftText = $derived(
         onStepClick={formDisabled ? undefined : (index: number) => void onStepClick(index)}
       />
     {:else}
-      <div class="tx-forms__progress-loading" aria-hidden="true"></div>
+      <div class="tx-forms__progress-loading" aria-hidden="true" data-tx-pending=""></div>
     {/if}
   {/if}
 

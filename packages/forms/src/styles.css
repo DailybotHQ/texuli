@@ -185,8 +185,15 @@ fieldset.tx-forms__group {
 }
 
 /*
- * G119: the place of a control that is still loading, about its size, so
- * nothing moves when it arrives (no animation: it is usually gone at once).
+ * G119: the place of a control that is still loading, sized like the control
+ * at the default density, so nothing moves when it arrives (no animation: it
+ * is usually gone at once). Each size mirrors its texuli control: the date
+ * and time segments are the target size plus their padding and border, the
+ * tags input grows to the large control size once it holds a chip, the
+ * slider shows its value line, a radio row is a choice plus its gap and each
+ * description adds a line, the file drop zone wraps its prompt on narrow
+ * screens. tests/e2e/site-forms.spec.ts holds every placeholder to its
+ * mounted control's block size.
  */
 .tx-forms__control-loading {
   box-sizing: border-box;
@@ -196,25 +203,65 @@ fieldset.tx-forms__group {
   opacity: 0.5;
 }
 
-.tx-forms__progress-loading {
-  min-block-size: 3.5rem;
+.tx-forms__control-loading[data-type="date"],
+.tx-forms__control-loading[data-type="time"],
+.tx-forms__control-loading[data-type="datetime"] {
+  min-block-size: calc(var(--tx-target-size, 2rem) + 0.375rem);
+}
+
+.tx-forms__control-loading[data-type="date"] {
+  max-inline-size: 11rem;
+}
+
+.tx-forms__control-loading[data-type="time"] {
+  max-inline-size: 7rem;
+}
+
+.tx-forms__control-loading[data-type="datetime"] {
+  max-inline-size: 19rem;
+}
+
+.tx-forms__control-loading[data-type="tags"] {
+  min-block-size: var(--tx-size-control-lg);
+}
+
+.tx-forms__control-loading[data-type="slider"] {
+  min-block-size: 3.8125rem;
 }
 
 .tx-forms__control-loading[data-type="radio"] {
-  min-block-size: calc(var(--tx-forms-loading-rows, 1) * 1.75rem);
+  min-block-size: calc(
+    var(--tx-forms-loading-rows, 1) *
+    1.8125rem +
+    var(--tx-forms-loading-notes, 0) *
+    0.875rem
+  );
   background: transparent;
 }
 
 .tx-forms__control-loading[data-type="file"] {
-  min-block-size: 7.5rem;
+  min-block-size: 10.875rem;
 }
 
 .tx-forms__control-loading[data-type="color"] {
-  min-block-size: 15rem;
+  inline-size: 16rem;
+  max-inline-size: 100%;
+  min-block-size: 21.875rem;
 }
 
-.tx-forms__control-loading[data-type="datetime"] {
-  max-inline-size: 26rem;
+.tx-forms__progress-loading {
+  min-block-size: var(--tx-target-size, 2rem);
+}
+
+@media (min-width: 40rem) {
+  /* The tags input is the medium control size until it holds a chip. */
+  .tx-forms__control-loading[data-type="tags"]:not([data-filled]) {
+    min-block-size: var(--tx-size-control-md);
+  }
+
+  .tx-forms__control-loading[data-type="file"] {
+    min-block-size: 9.625rem;
+  }
 }
 
 @media (forced-colors: active) {

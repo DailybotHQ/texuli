@@ -202,13 +202,15 @@ function customContext(control: {
   {/if}
 {/snippet}
 
-{#snippet placeholder(id: string | undefined, rows: number)}
+{#snippet placeholder(id: string | undefined, rows: number, notes = 0)}
   <div
     class="tx-forms__control-loading"
     id={id}
     data-type={field.type}
-    style={`--tx-forms-loading-rows: ${rows}`}
+    data-filled={field.type === 'tags' && strings.length > 0 ? '' : undefined}
+    style={`--tx-forms-loading-rows: ${rows}; --tx-forms-loading-notes: ${notes}`}
     aria-busy="true"
+    data-tx-pending=""
   >
     <span class="tx-forms__visually-hidden">{labels.loading}</span>
   </div>
@@ -276,7 +278,11 @@ function customContext(control: {
           {onFiles}
         />
       {:else}
-        {@render placeholder(controlId, field.options?.length ?? 1)}
+        {@render placeholder(
+          controlId,
+          field.options?.length ?? 1,
+          field.options?.filter((option) => option.description).length ?? 0
+        )}
       {/if}
     {:else}
       <div class="tx-forms__choices" id={controlId}>

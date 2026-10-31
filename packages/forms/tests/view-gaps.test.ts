@@ -360,6 +360,7 @@ describe('per-type controls (G119)', () => {
     const lazy = render(SchemaForm, { props: { form } });
     expect(await screen.findByRole('slider', { name: /Level/ })).toBeTruthy();
     expect(lazy.container.querySelector('.tx-forms__control-loading')).toBeNull();
+    lazy.unmount();
   });
 });
 

@@ -94,8 +94,8 @@
     },
     "@texuli/forms/styles.css": {
       "gzip": 64,
-      "cssGzip": 1152,
-      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4% for the stylesheet only; measured 0 B, CSS 762 B. PLAN_011 T-gaps-113-121: cssGzip 832 -> 1152 B, measured + 4% (measured 1,066 B; 806 B before): the password, otp and datetime layouts, the custom-field notice and the same-size placeholders of per-type controls and the Stepper (G117, G119)."
+      "cssGzip": 1280,
+      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4% for the stylesheet only; measured 0 B, CSS 762 B. PLAN_011 T-gaps-113-121: cssGzip 832 -> 1152 B, measured + 4% (measured 1,066 B; 806 B before): the password, otp and datetime layouts, the custom-field notice and the same-size placeholders of per-type controls and the Stepper (G117, G119). Then 1152 -> 1280 B, measured + 4% (measured 1,201 B): each placeholder sized like its control per type and viewport, so mounting causes no layout shift (lead review of G119)."
     },
     "@texuli/catalog": {
       "gzip": 57024,

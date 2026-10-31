@@ -109,8 +109,18 @@ time, datetime, slider, tags, file, color and radio controls
 load, with their CSS, the first time a form uses them; the form loads all
 of its types when it mounts, and a loaded control is kept for every later
 form. Until a control arrives its place holds a
-`.tx-forms__control-loading` box of about its size (`aria-busy`, "Loading…"
-for screen readers), so the layout does not jump.
+`.tx-forms__control-loading` box sized like the control at the default
+density (`aria-busy`, "Loading…" for screen readers), so the layout does not
+shift when it mounts; `tests/e2e/site-forms.spec.ts` holds every lazy type's
+placeholder to its mounted control's block size on chromium, webkit and a
+phone.
+
+**Readiness.** While any control the form uses (or its step navigation) is
+still loading, the form carries `data-tx-pending` and `aria-busy="true"`,
+and so does each placeholder. Wait for
+`form:not([data-tx-pending])` (or for no `[data-tx-pending]` inside the
+host) before a screenshot or a test that reads the controls; the visual
+suite does this for every example.
 
 Measured with `packages/forms/tests/bundle-graph.test.ts` (Vite,
 minified, gzip -9, `svelte` external), a host with one text, select and
