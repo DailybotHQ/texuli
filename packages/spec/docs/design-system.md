@@ -9,8 +9,8 @@
 > ([design-system-io.md](../../tokens/docs/design-system-io.md)), and so is
 > the runtime ([design-system-runtime.md](../../tokens/docs/design-system-runtime.md)).
 > `texuli ds check` is on the same branch
-> ([ds-check.md](../../tools/docs/ds-check.md)); the `ds.*` operations are
-> **planned** (a later PLAN_011 task, ADR-021 to ADR-023).
+> ([ds-check.md](../../tools/docs/ds-check.md)), and so are the `ds.*`
+> operations, `blueprint.theme` and `texuli ds` ([ds.md](../../tools/docs/ds.md)).
 
 A design system describes a brand once, as one closed JSON document that
 a company or an agent writes, and every Texuli surface follows

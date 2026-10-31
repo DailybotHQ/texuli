@@ -31,10 +31,12 @@ source.
   server. With no argument the server reads stdin until it closes, then
   exits with code 0.
 - **stdout carries only JSON-RPC**; usage errors go to stderr.
-- **Local writes:** no operation writes files today. Any operation that
-  will (`ds.save`, deck and document file outputs) must write through the
-  local write policy in `src/internal/local-write.ts`
-  (`resolveLocalWritePath`, `writeLocalFile`): an explicit path that
+- **Local writes:** `ds.save` is the only operation that writes (from
+  `0.10.0`, in development). It writes through the local writer the door
+  passes (`files: localFiles()` in `runMcpStdio` and the CLI; the remote
+  door passes none, and the edge handler never imports `node:fs`), which applies the local write policy in
+  `src/internal/local-write.ts` (`resolveLocalWritePath`,
+  `writeLocalFile`): an explicit path that
   resolves inside the working directory and is not the directory itself;
   absolute paths only when they already point inside it; `..` escapes, NUL
   bytes, over-long paths and symlinked components (the target included)
@@ -73,6 +75,7 @@ const response = await remote(
 | `resources` | the Texuli resources | Resource providers; an empty list advertises no resources |
 | `prompts` | the Texuli prompts | Prompts; an empty list advertises no prompts |
 | `pageSize` | 100 | Items per page of every list method |
+| `files` | none | The local writer `ds.save` uses (`localFiles()` from the stdio server); without it `ds.save` answers `runtime-unavailable` |
 
 `createTexuliMcpServer(registry?)`, the 0.8 entry point, is a deprecated
 alias of `createMcpHandler({ registry, mode: 'stateful' })`.
@@ -152,11 +155,15 @@ expected at the failing path.
 | `texuli://component/{id}` | JSON | One catalog entry (the manifest with group and emit tiers) |
 | `texuli://docs/{slug}` | Markdown | One component's agent page, identical to `/llms/components/<id>.md` on the site |
 | `texuli://theme/{id}` | JSON, then CSS | The full light and dark theme definition, then its compiled CSS |
+| `texuli://design-system/{id}` | JSON | One design-system document: the spec's fictional examples (`acme`, every section; `minimal`, the smallest), or a library theme as a document (`loadLibraryBase`: `fromTheme` with its generator input as `color.brand`) |
 | `texuli://schema/{name}` | JSON | The JSON Schema of `deck` or `document` |
 
 `resources/list` lists the two fixed resources, both schemas, then every
-component, every component page and every library theme (paginated).
-`resources/templates/list` returns the four templates. An unknown URI is
+component, every component page, the two example design systems and every
+library theme (paginated). The library themes as design-system documents are
+not listed, to bound the list: complete `texuli://design-system/{id}` for
+every id (the examples, then the 210 themes) and read one at a time.
+`resources/templates/list` returns the five templates. An unknown URI is
 `-32002` (resource not found) with `data: { uri }`; a missing, non-string or
 over-2,048-character URI is `-32602`.
 
@@ -173,9 +180,11 @@ over-2,048-character URI is `-32602`.
   no copy of it, and `@texuli/tools` does not depend on `@texuli/spec` yet
   (adding it needs a lockfile change). An agent checks a blueprint with the
   `blueprint.validate` tool instead.
-- **`texuli://design-system/{id}`** and the design-system schema: they come
-  with design systems (Part B of the plan). The template is omitted, not
-  registered empty, so an agent never sees a resource that cannot be read.
+- **The design-system JSON Schema** (`texuli://schema/design-system`): it
+  lives in `@texuli/spec` (`schemas/design-system.schema.json`), which
+  `@texuli/tools` does not depend on (the same reason as the blueprint
+  schema). `texuli://design-system/acme` shows every section, and
+  `ds.validate` checks a document with the spec's codes and paths.
 
 ## Prompts
 
@@ -183,12 +192,13 @@ over-2,048-character URI is `-32602`.
 | --- | --- | --- |
 | `build-ui` | `brief` (required), `tier` (`untrusted` or `developer`), `theme` | `catalog.search` → `component.get` (keep by useWhen, drop by dontUseWhen) → `example.search` → compose a catalog tree → `blueprint.validate` until `valid` is true |
 | `theme-blueprint` | `brief` (required), `mode` (`light` or `dark`), `theme` | `theme.search` → shortlist → `theme.preview` (keep `aa.pass`) → `theme.get` → how the host applies it |
+| `create-design-system` | `brief` (required), `base` (a library theme id), `contrast` (`AA` or `AAA`) | read `texuli://design-system/acme` → `ds.import` or `ds.suggest` → write the sections → `ds.validate` and fix by code until `valid` is true → `ds.contrast` and `ds.preview` → deliver with `ds.compile`, `blueprint.theme` or `ds.save` |
 | `convert-deck` | `direction` (required: `from-markdown` or `to-markdown`), `source` | `deck.run` capabilities and layouts → convert → lint until no errors → round-trip check |
 
 The texts follow the skill's loops (`skills/texuli/build-ui`, `themes` and
 the deck reference). Each names only real operations and served resources;
-the suite checks that. `create-design-system` comes with design systems
-(planned). `build-ui` validates through the `blueprint.validate` tool, so
+the suite checks that (the `create-design-system` text names `ds.save`,
+which only the local server lists, and says so). `build-ui` validates through the `blueprint.validate` tool, so
 an agent can finish the loop through the protocol alone. `prompts/get` refuses an unknown
 prompt, a missing required argument, an unknown argument, a non-string value,
 a value outside its enum and a value over its length cap (10,000 characters,
@@ -197,9 +207,9 @@ or 2,000,000 for `source`) with `-32602`.
 ## Completions
 
 `completion/complete` completes the template variables (component ids for
-`component/{id}` and `docs/{slug}`, theme ids, schema names) and the prompt
-arguments (`theme` from the library, and the enums of `tier`, `mode` and
-`direction`). Matching is a case-insensitive prefix. At most 100 values are
+`component/{id}` and `docs/{slug}`, theme ids, design-system ids, schema
+names) and the prompt arguments (`theme` and `base` from the library, and the
+enums of `tier`, `mode`, `contrast` and `direction`). Matching is a case-insensitive prefix. At most 100 values are
 returned, with `total` and `hasMore`. An unknown prompt, template, variable
 or reference type is `-32602`; a free-text argument completes to nothing.
 
