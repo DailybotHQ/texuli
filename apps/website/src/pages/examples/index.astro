@@ -65,8 +65,7 @@ const description =
   <section class="families" aria-labelledby="families-title">
     <h2 id="families-title">Every family, counted</h2>
     <p class="counts">
-      {full.length} registered examples across {counts.length} packages:
-      {counts.map((entry, index) => (
+      {full.length} registered examples across {counts.length} packages: {counts.map((entry, index) => (
         <>
           {index > 0 && <span aria-hidden="true"> · </span>}
           <span class="count"><strong>{entry.packageId}</strong> {entry.count}</span>

@@ -125,38 +125,38 @@ curl -sI ${SITE_ORIGIN}${PATHS.health}`}</code></pre>
   <h2 id="mcp">MCP server</h2>
   <ul class="points">
     <li>
-      <strong>Remote:</strong> <code>{MCP.remote}</code>, stateless Streamable HTTP (protocol
-      <code>{MCP.protocolVersion}</code>). POST JSON-RPC; no session, no sign-in. It serves {
+      <strong>Remote:</strong> <code>{MCP.remote}</code>, stateless Streamable HTTP
+      (protocol <code>{MCP.protocolVersion}</code>). POST JSON-RPC; no session, no sign-in. It serves {
         MCP.remoteTools.length
       } read-only tools.
     </li>
     <li>
       <strong>Local:</strong> <code>{MCP.local}</code>, over stdio, in any MCP host. It serves
-      every tool, including the ones that need Node ({MCP.localOnlyTools.join(', ')}). The
-      <code>@texuli/mcp</code> package is on npm since 0.9.0.
+      every tool, including the ones that need Node ({MCP.localOnlyTools.join(', ')}).
+      The <code>@texuli/mcp</code> package is on npm since 0.9.0.
     </li>
     <li>
       <strong>Server card:</strong> <a href={MCP.serverCard}><code>{MCP.serverCard}</code></a>.
       The tools, resources and prompts are documented in <a href={mcpDocs}>mcp.md</a>.
     </li>
     <li>
-      <strong>Setup for every host</strong>, every tool with its limits, and the site tools:
-      <a href="/mcp-server/">Texuli MCP</a>.
+      <strong>Setup for every host</strong>, every tool with its limits, and the site
+      tools: <a href="/mcp-server/">Texuli MCP</a>.
     </li>
   </ul>
 
   <h2 id="cli">Command line</h2>
   <p>
     The <code>texuli</code> command of <code>@texuli/tools</code> runs the same operations as the
-    MCP server: <code>texuli &lt;group&gt; &lt;verb&gt;</code>, with JSON input from stdin,
-    <code>--json</code> or <code>--file</code>. In a project that has <code>@texuli/tools</code>
-    installed, run <code>npx texuli &lt;group&gt; &lt;verb&gt;</code>; without installing it:
+    MCP server: <code>texuli &lt;group&gt; &lt;verb&gt;</code>, with JSON input from
+    stdin, <code>--json</code> or <code>--file</code>. In a project that has <code>@texuli/tools</code> installed,
+    run <code>npx texuli &lt;group&gt; &lt;verb&gt;</code>; without installing it:
   </p>
   <pre><code>{`npx -p @texuli/tools texuli help
 echo '{"query":"date"}' | npx -p @texuli/tools texuli catalog search`}</code></pre>
   <p>
-    The <code>&lt;group&gt; &lt;verb&gt;</code> commands are new in 0.9.0; the
-    <code>deck</code> and <code>document</code> commands date from the 0.8 line. Every command:
+    The <code>&lt;group&gt; &lt;verb&gt;</code> commands are new in 0.9.0;
+    the <code>deck</code> and <code>document</code> commands date from the 0.8 line. Every command:
     {' '}
     <a href={opsDocs}>ops.md</a>.
   </p>
@@ -232,15 +232,14 @@ echo '{"query":"date"}' | npx -p @texuli/tools texuli catalog search`}</code></p
 
   <h2 id="versioning">Versioning and deprecation</h2>
   <p>
-    <code>X-API-Version</code> is the release line that built the files (<code>{VERSION}</code>).
-    {VERSIONING.policy}
+    <code>X-API-Version</code> is the release line that built the files (<code>{VERSION}</code>). {VERSIONING.policy}
   </p>
 
   <h2 id="access">Access and license</h2>
   <p>
     Every endpoint is anonymous and read-only: there is no account, key or token, and the OAuth
-    documents under <code>/.well-known/</code> are discovery stubs that say so (see
-    <a href="/auth.md">auth.md</a>). Texuli is open source under the <a href={license}>MIT
+    documents under <code>/.well-known/</code> are discovery stubs that say so
+    (see <a href="/auth.md">auth.md</a>). Texuli is open source under the <a href={license}>MIT
     license</a>; the source is on <a href={repository}>GitHub</a>.
   </p>
 </BaseLayout>
