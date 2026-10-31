@@ -261,7 +261,7 @@
     padding: 0;
     border: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
     border-radius: var(--tx-color-picker-swatch-radius, var(--tx-shape-radius-sm));
-    background-color: var(--tx-swatch-color, Canvas);
+    background-color: var(--tx-swatch-color, var(--tx-background, Canvas));
     cursor: pointer;
     outline: none;
   }

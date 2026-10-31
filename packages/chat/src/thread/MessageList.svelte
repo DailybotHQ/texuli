@@ -696,7 +696,7 @@ $effect(() => {
     .tx-chat-message-group { display: flex; flex-direction: column; min-inline-size: 0; }
     /* The day separator is its own full-width row; the avatar and bubbles share the row after it (G70). */
     .tx-chat-message-group__row { display: flex; align-items: flex-start; gap: calc(var(--tx-space-unit) * 2.5); min-inline-size: 0; }
-    :global(.tx-chat-message-group__avatar .tx-avatar__surface[data-tone]) { color: CanvasText; }
+    :global(.tx-chat-message-group__avatar .tx-avatar__surface[data-tone]) { color: var(--tx-foreground, CanvasText); }
     .tx-chat-message-group__avatar { margin-block-start: var(--tx-space-5); flex: none; }
     .tx-chat-message-group__avatar-spacer { inline-size: 1.75rem; flex: none; }
     .tx-chat-message-group__content { display: flex; min-inline-size: 0; max-inline-size: min(85%, 42rem); flex-direction: column; align-items: flex-start; gap: var(--tx-space-1); }

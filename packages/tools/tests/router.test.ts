@@ -1,4 +1,5 @@
 // @vitest-environment node
+
 import { mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -13,6 +14,7 @@ import {
   routerOperations,
   runRouter,
 } from '../src/cli/router.ts';
+import { localFiles } from '../src/internal/local-write.ts';
 import { texuliOps } from '../src/ops/index.ts';
 
 function capture() {
@@ -138,7 +140,9 @@ describe('runRouter', () => {
     dir = await realpath(await mkdtemp(join(tmpdir(), 'texuli-router-')));
     for (const { group, verb, operation } of routerOperations()) {
       for (const example of operation.examples) {
-        const expected = await texuliOps.invoke(operation.name, example.input);
+        const expected = await texuliOps.invoke(operation.name, example.input, {
+          files: localFiles(),
+        });
         expect(expected.ok, `${operation.name}: ${example.title}`).toBe(true);
         const json = JSON.stringify(example.input);
         const viaJson = capture();

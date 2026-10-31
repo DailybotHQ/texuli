@@ -29,6 +29,24 @@ export interface SiteContext {
   origin?: string;
 }
 
+/** A local writer `node` operations that save files use (`ds.save`): the local write policy. */
+export interface LocalFiles {
+  /** Check `path` under the same policy without writing: the path relative to the working directory, or a refusal. */
+  check(path: string): { ok: true; relative: string } | { ok: false; code: string; error: string };
+  /**
+   * Write text to an explicit path inside the door's working directory
+   * (ADR-019): traversal, symlinks and an existing file without
+   * `overwrite` are refused with a stable code.
+   */
+  write(
+    path: string,
+    data: string,
+    options: { overwrite: boolean }
+  ): Promise<
+    { ok: true; relative: string; bytes: number } | { ok: false; code: string; error: string }
+  >;
+}
+
 /** Behavior hints every door publishes (MCP maps them to `*Hint` annotations). */
 export interface OperationAnnotations {
   /** Changes nothing outside its own output. */
@@ -63,6 +81,8 @@ export interface OperationContext {
   signal: AbortSignal;
   /** The built site, when the door serves `site` operations. */
   site?: SiteContext;
+  /** The local writer, when the door writes files (the stdio MCP and the CLI pass it). */
+  files?: LocalFiles;
 }
 
 /** One agent-facing capability, declared once and served by every door. */
@@ -96,6 +116,18 @@ export interface OperationAlias {
   removeIn: string;
   input?: JsonSchema;
   route?: (input: Record<string, unknown>) => { name: string; input: Record<string, unknown> };
+}
+
+/**
+ * A tool name an earlier release served and a later one removed. Calling it
+ * is refused with a message that names `replacedBy`; it is never listed.
+ */
+export interface RemovedOperationName {
+  name: string;
+  /** The operations to call instead. */
+  replacedBy: readonly string[];
+  /** The release that removed it. */
+  removedIn: string;
 }
 
 /** Stable error codes `invoke()` returns. */
@@ -135,4 +167,6 @@ export interface InvokeOptions {
   runtimes?: readonly OperationRuntime[];
   /** The built site `site` operations read (the remote door passes `env.ASSETS`). */
   site?: SiteContext;
+  /** The local writer `ds.save` uses; only the local doors pass it. */
+  files?: LocalFiles;
 }

@@ -231,14 +231,10 @@ it('lists every served operation as a tool with schemas, annotations and cursor 
           openWorldHint: operation.annotations.openWorld,
         });
       }
-      const aliases = listed.slice(operations.length);
-      expect(aliases.map((tool) => tool.name)).toEqual(
-        texuliOps.aliases().map((alias) => alias.name)
-      );
-      for (const alias of aliases) {
-        expect(alias.description).toMatch(/^Deprecated alias of /u);
-        expect(alias.outputSchema).toBeUndefined();
-      }
+      // The 0.8 tool names were removed in 0.10.0: only operations are listed.
+      expect(listed.length).toBe(operations.length);
+      for (const removed of texuliOps.removed())
+        expect(listed.map((tool) => tool.name)).not.toContain(removed.name);
     }
   );
   await scenario('pages with opaque cursors and refuses forged or foreign ones', async () => {
@@ -271,8 +267,15 @@ it('returns structuredContent with a text mirror, and every operation error code
     expect(call.result?.isError).toBeUndefined();
     expect(call.result?.structuredContent).toMatchObject({ component: { id: 'card' } });
     expect(textOf(call)).toEqual(call.result?.structuredContent);
-    const alias = await rpc(handle, 'tools/call', { name: 'component', arguments: { id: 'card' } });
-    expect(alias.result?.structuredContent).toEqual(call.result?.structuredContent);
+    // A 0.8 name removed in 0.10.0 is a protocol error that names its replacement.
+    const removed = await rpc(handle, 'tools/call', {
+      name: 'component',
+      arguments: { id: 'card' },
+    });
+    expect(removed.error).toEqual({
+      code: MCP_ERROR_CODES.invalidParams,
+      message: 'The tool "component" was removed in 0.10.0; call component.get instead.',
+    });
     const noArguments = await rpc(handle, 'tools/call', { name: 'catalog.search' });
     expect(
       (noArguments.result?.structuredContent as { total: number } | undefined)?.total
@@ -383,21 +386,23 @@ it('serves only the runtime classes a handler is given', async () => {
     expect(edgeNames).not.toContain(operation.name);
     expect(localNames).toContain(operation.name);
   }
-  // An alias is listed only when every target is served; `document` reaches document.export.
-  expect(edgeNames).not.toContain('document');
-  expect(localNames).toContain('document');
+  // The 0.8 names were removed in 0.10.0: neither door lists them.
+  for (const removed of texuliOps.removed()) {
+    expect(edgeNames).not.toContain(removed.name);
+    expect(localNames).not.toContain(removed.name);
+  }
   expect(edgeNames).toContain('deck.run');
   // Calling a node operation on the edge names the runtime instead of "unknown tool".
   for (const [name, args] of [
-    ['document.export', { command: 'to-pdf', document: {} }],
-    ['document', { command: 'to-docx', document: {} }],
+    ['document.export', { format: 'pdf', document: {} }],
+    ['ds.save', { path: 'x.ds.json', document: {} }],
   ] as const) {
     const refused = await rpc(edge, 'tools/call', { name, arguments: args });
     expect(refused.result?.isError, name).toBe(true);
     expect((textOf(refused) as { code: string }).code, name).toBe('runtime-unavailable');
   }
   const edgeCall = await rpc(edge, 'tools/call', {
-    name: 'document',
+    name: 'document.run',
     arguments: { command: 'capabilities' },
   });
   expect(edgeCall.result?.isError).toBeUndefined();
@@ -428,27 +433,34 @@ it('lists and reads the Texuli resources and resource templates', async () => {
     expect(uris.filter((uri) => uri.startsWith('texuli://theme/'))).toEqual(
       themes.map((theme) => `texuli://theme/${theme.id}`)
     );
-    expect(uris.some((uri) => uri.includes('design-system'))).toBe(false);
+    // Only the fictional examples are listed; the library themes as documents are read by id.
+    expect(uris.filter((uri) => uri.startsWith('texuli://design-system/'))).toEqual([
+      'texuli://design-system/acme',
+      'texuli://design-system/minimal',
+      'texuli://design-system/quillmark',
+      'texuli://design-system/ledgerline',
+      'texuli://design-system/tumbletown',
+    ]);
     for (const item of items) {
       expect(typeof item.name, item.uri as string).toBe('string');
       expect(typeof item.description, item.uri as string).toBe('string');
       expect(item.mimeType, item.uri as string).toMatch(/^(application\/json|text\/markdown)$/u);
     }
   });
-  await scenario(
-    'lists four templates, with no design-system template until it exists',
-    async () => {
-      const templates = (await rpc(handle, 'resources/templates/list')).result
-        ?.resourceTemplates as { uriTemplate: string; description: string }[];
-      expect(templates.map((template) => template.uriTemplate)).toEqual([
-        'texuli://component/{id}',
-        'texuli://docs/{slug}',
-        'texuli://theme/{id}',
-        'texuli://schema/{name}',
-      ]);
-      for (const template of templates) expect(template.description.length).toBeGreaterThan(40);
-    }
-  );
+  await scenario('lists five templates, the design-system documents among them', async () => {
+    const templates = (await rpc(handle, 'resources/templates/list')).result?.resourceTemplates as {
+      uriTemplate: string;
+      description: string;
+    }[];
+    expect(templates.map((template) => template.uriTemplate)).toEqual([
+      'texuli://component/{id}',
+      'texuli://docs/{slug}',
+      'texuli://theme/{id}',
+      'texuli://design-system/{id}',
+      'texuli://schema/{name}',
+    ]);
+    for (const template of templates) expect(template.description.length).toBeGreaterThan(40);
+  });
   await scenario('reads each resource from the same source as the other doors', async () => {
     const read = async (uri: string) => {
       const response = await rpc(handle, 'resources/read', { uri });
@@ -476,6 +488,15 @@ it('lists and reads the Texuli resources and resource templates', async () => {
     expect(JSON.parse(deck?.text ?? '{}')).toEqual(runDeckCommand('schema'));
     const [documentSchema] = await read('texuli://schema/document');
     expect(JSON.parse(documentSchema?.text ?? '{}')).toEqual(await runDocumentCommand('schema'));
+    // An example document, and a library theme as a document: one per read, both valid.
+    for (const id of ['acme', 'ocean']) {
+      const [ds] = await read(`texuli://design-system/${id}`);
+      expect(ds?.mimeType).toBe('application/json');
+      const outcome = await texuliOps.invoke('ds.validate', {
+        document: JSON.parse(ds?.text ?? ''),
+      });
+      expect(outcome, id).toMatchObject({ ok: true, output: { valid: true } });
+    }
   });
   await scenario(
     'answers unknown and hostile URIs with resource-not-found or invalid params',
@@ -488,7 +509,8 @@ it('lists and reads the Texuli resources and resource templates', async () => {
         'texuli://component/',
         'texuli://theme/not-a-theme',
         'texuli://schema/blueprint',
-        'texuli://design-system/acme',
+        'texuli://design-system/not-a-theme',
+        'texuli://design-system/ACME',
         'texuli://docs/__proto__',
         'texuli://catalog?x=1',
         'file:///etc/passwd',
@@ -516,7 +538,7 @@ it('lists and reads the Texuli resources and resource templates', async () => {
 it('lists and renders the workflow prompts with arguments an agent can complete', async () => {
   const { handle } = await ready();
   await scenario(
-    'lists build-ui, theme-blueprint and convert-deck (no design-system prompt yet)',
+    'lists build-ui, theme-blueprint, create-design-system and convert-deck',
     async () => {
       const prompts = (await rpc(handle, 'prompts/list')).result?.prompts as {
         name: string;
@@ -527,6 +549,7 @@ it('lists and renders the workflow prompts with arguments an agent can complete'
       expect(prompts.map((prompt) => prompt.name)).toEqual([
         'build-ui',
         'theme-blueprint',
+        'create-design-system',
         'convert-deck',
       ]);
       for (const prompt of prompts) {
@@ -555,6 +578,11 @@ it('lists and renders the workflow prompts with arguments an agent can complete'
           theme: 'violet',
         },
         'theme-blueprint': { brief: 'A calm analytics dashboard', mode: 'dark' },
+        'create-design-system': {
+          brief: 'Harborline: teal #0e7490, Inter, rounded, calm',
+          base: 'ocean',
+          contrast: 'AAA',
+        },
         'convert-deck': { direction: 'from-markdown', source: '# Fictional deck' },
       };
       for (const prompt of TEXULI_PROMPTS) {
@@ -606,6 +634,7 @@ it('lists and renders the workflow prompts with arguments an agent can complete'
   await scenario('refuses unknown prompts and bad arguments', async () => {
     for (const params of [
       { name: 'create-design-system', arguments: {} },
+      { name: 'create-design-system', arguments: { brief: 'ok', contrast: 'AAAA' } },
       { name: 'nope' },
       { name: 'build-ui' },
       { name: 'build-ui', arguments: { brief: 42 } },
@@ -646,6 +675,19 @@ it('completes template and prompt arguments from the real ids', async () => {
       await complete({ type: 'ref/resource', uri: 'texuli://theme/{id}' }, 'id', 'VIO')
     );
     expect(theme.values).toContain('violet');
+    const designSystems = values(
+      await complete({ type: 'ref/resource', uri: 'texuli://design-system/{id}' }, 'id', '')
+    );
+    const library = await listFullThemeLibrary();
+    expect(designSystems.values.slice(0, 6)).toEqual([
+      'acme',
+      'minimal',
+      'quillmark',
+      'ledgerline',
+      'tumbletown',
+      library[0]?.id,
+    ]);
+    expect(designSystems.total).toBe(5 + library.length);
     expect(
       values(await complete({ type: 'ref/resource', uri: 'texuli://schema/{name}' }, 'name', ''))
         .values

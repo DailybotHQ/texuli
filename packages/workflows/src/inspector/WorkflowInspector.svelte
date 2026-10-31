@@ -283,7 +283,7 @@ const errorId = (name: string) => `${uid}-${name}-error`;
 
     .tx-workflow-inspector__error {
       margin: 0;
-      color: var(--tx-danger, CanvasText);
+      color: var(--tx-destructive, CanvasText);
     }
 
     .tx-workflow-inspector__preview {

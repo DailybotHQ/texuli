@@ -8,14 +8,19 @@ import {
   OperationError,
   type OperationErrorCode,
   type OperationRuntime,
+  type RemovedOperationName,
 } from './types.ts';
 
 /** The registry every door (MCP, CLI, docs) reads. */
 export interface OperationRegistry {
   /** Operations in declaration order, optionally only those a door serves. */
   list(options?: InvokeOptions): readonly Operation[];
-  /** The deprecated 0.8 tool names. */
+  /** Deprecated aliases a door still serves (none in 0.10.0). */
   aliases(): readonly OperationAlias[];
+  /** Names an earlier release served and this one removed: refused, never listed. */
+  removed(): readonly RemovedOperationName[];
+  /** The refusal for a removed name, or `undefined` when the name was never removed. */
+  removedMessage(name: string): string | undefined;
   /** An operation by its name (not an alias). */
   get(name: string): Operation | undefined;
   /** The description a door shows for an operation or alias name. */
@@ -56,6 +61,11 @@ export function defineOperation(operation: Operation): Operation {
   return operation;
 }
 
+/** The refusal a door gives for a removed name: when it went and what to call instead. */
+export function removedNameMessage(removed: RemovedOperationName): string {
+  return `The tool "${removed.name}" was removed in ${removed.removedIn}; call ${removed.replacedBy.join(' or ')} instead.`;
+}
+
 /** The text a door shows for an operation: the summary plus its stated limits. */
 export function operationDescription(operation: Operation): string {
   const limits = [`input up to ${operation.limits.inputBytes} bytes`];
@@ -70,7 +80,8 @@ export function operationDescription(operation: Operation): string {
  */
 export function createOperationRegistry(
   operations: readonly Operation[],
-  aliases: readonly OperationAlias[] = []
+  aliases: readonly OperationAlias[] = [],
+  removed: readonly RemovedOperationName[] = []
 ): OperationRegistry {
   const byName = new Map<string, Operation>();
   for (const operation of operations) {
@@ -93,6 +104,15 @@ export function createOperationRegistry(
       if (issues.length > 0) throw new Error(issues.join('\n'));
     }
     byAlias.set(alias.name, alias);
+  }
+  const byRemoved = new Map<string, RemovedOperationName>();
+  for (const entry of removed) {
+    if (byName.has(entry.name) || byAlias.has(entry.name) || byRemoved.has(entry.name))
+      throw new Error(`Removed name "${entry.name}" duplicates a name.`);
+    for (const target of entry.replacedBy)
+      if (!byName.has(target))
+        throw new Error(`Removed name "${entry.name}" points at "${target}".`);
+    byRemoved.set(entry.name, entry);
   }
 
   async function run(
@@ -131,6 +151,7 @@ export function createOperationRegistry(
           operation.handler(input, {
             signal: controller.signal,
             ...(options.site ? { site: options.site } : {}),
+            ...(options.files ? { files: options.files } : {}),
           })
         ),
         timeout,
@@ -167,6 +188,13 @@ export function createOperationRegistry(
     aliases() {
       return aliases;
     },
+    removed() {
+      return removed;
+    },
+    removedMessage(name) {
+      const entry = byRemoved.get(name);
+      return entry ? removedNameMessage(entry) : undefined;
+    },
     get(name) {
       return byName.get(name);
     },
@@ -194,11 +222,15 @@ export function createOperationRegistry(
         );
       const operation = byName.get(name);
       const alias = operation ? undefined : byAlias.get(name);
-      if (!operation && !alias)
+      if (!operation && !alias) {
+        const gone = byRemoved.get(name);
         return fail(
           'unknown-operation',
-          `Unknown operation "${name}". Known: ${[...byName.keys()].join(', ')}.`
+          gone
+            ? removedNameMessage(gone)
+            : `Unknown operation "${name}". Known: ${[...byName.keys()].join(', ')}.`
         );
+      }
       const target = (operation ?? byName.get(alias?.targets[0] as string)) as Operation;
       const bytes = jsonBytes(input);
       if (bytes === undefined)

@@ -25,11 +25,14 @@ import { settleAnimations } from './support/site.ts';
  * compiles (and its high-contrast variant when it has one). Each run must
  * pass axe (WCAG A and AA, scoped to the sheet), paint every contrast pair of
  * the compiled report at its ratio, and paint no color that ignores the
- * scope's variables, apart from the tracked DS_CHECK_KNOWN_FINDINGS (which
- * must still be found, so the list cannot rot).
+ * scope's variables. DS_CHECK_KNOWN_FINDINGS is empty (every finding of the
+ * first run was fixed at its root); an entry added there must still be
+ * found, so the list cannot rot.
  *
- * Brands: the spec fixtures acme (with variants) and minimal, and the
- * fictional protoyard-theme/v1 fixture imported as a role palette (harbor).
+ * Brands: the spec fixtures acme (with variants) and minimal, the
+ * fictional protoyard-theme/v1 fixture imported as a role palette (harbor),
+ * and the guide's example brands in examples/design-systems (quillmark,
+ * ledgerline with its high-contrast variant, tumbletown).
  * Library themes: six of the 210, spread across hue families (sorted by
  * seed hue, every 35th), rotated by TEXULI_DS_THEME_SEED (default 0) so a
  * run can sample others without a date in the test.
@@ -38,6 +41,10 @@ import { settleAnimations } from './support/site.ts';
 const SPEC_FIXTURES = new URL('../../packages/spec/fixtures/design-systems/', import.meta.url);
 const readFixture = (name: string): unknown =>
   JSON.parse(readFileSync(new URL(name, SPEC_FIXTURES), 'utf8'));
+
+const EXAMPLES = new URL('../../examples/design-systems/', import.meta.url);
+const readExample = (name: string): unknown =>
+  JSON.parse(readFileSync(new URL(`${name}.json`, EXAMPLES), 'utf8'));
 
 const COMPONENTS = ALL_MANIFEST_GROUPS.flatMap((group) => group.manifests)
   .filter((manifest) => manifest.agentEmittable === true && manifest.examples.length > 0)
@@ -54,6 +61,9 @@ const BRANDS: readonly { name: string; doc: () => unknown; variants: (string | n
   { name: 'acme', doc: () => readFixture('acme.json'), variants: [null, 'high-contrast'] },
   { name: 'minimal', doc: () => readFixture('minimal.json'), variants: [null] },
   { name: 'protoyard-theme/v1 (harbor)', doc: harbor, variants: [null] },
+  { name: 'quillmark', doc: () => readExample('quillmark'), variants: [null] },
+  { name: 'ledgerline', doc: () => readExample('ledgerline'), variants: [null, 'high-contrast'] },
+  { name: 'tumbletown', doc: () => readExample('tumbletown'), variants: [null] },
 ];
 
 function hue(hex: string): number {
@@ -126,6 +136,7 @@ async function conform(
     expect(run.checked, label).toBeGreaterThan(1000);
     expect(run.pairs.length, label).toBeGreaterThan(40);
     expect(renderIssues(run), label).toEqual([]);
+    if (DS_CHECK_KNOWN_FINDINGS.length === 0) expect(run.known, label).toEqual([]);
     expect(run.ok, label).toBe(true);
   }
   return { report, runs };
@@ -186,6 +197,22 @@ test.describe('design-system conformance (texuli ds check --render)', () => {
       planted.textContent = 'A literal color';
       planted.style.setProperty('color', '#123456');
       section?.append(planted);
+      // A visually hidden element (a form bridge, screen-reader text) paints no pixel.
+      const hidden = document.createElement('input');
+      hidden.className = 'planted-hidden';
+      for (const [name, value] of [
+        ['position', 'absolute'],
+        ['inline-size', '1px'],
+        ['block-size', '1px'],
+        ['overflow', 'hidden'],
+        ['clip-path', 'inset(50%)'],
+        ['background-color', '#654321'],
+        ['color', '#654321'],
+      ])
+        hidden.style.setProperty(name as string, value as string);
+      hidden.tabIndex = -1;
+      hidden.setAttribute('aria-hidden', 'true');
+      section?.append(hidden);
     });
     const compiled = report.runs[0]?.compiled;
     if (!compiled) throw new Error('minimal must compile');
@@ -207,6 +234,7 @@ test.describe('design-system conformance (texuli ds check --render)', () => {
       property: 'color',
       value: 'rgb(18, 52, 86)',
     });
+    expect(run?.literals.some((literal) => literal.element.includes('planted-hidden'))).toBe(false);
     const codes = renderIssues(run as DsRenderRun).map((issue) => `${issue.code} ${issue.path}`);
     expect(codes).toContain('render-literal $.render["blocks-text"]');
     expect(codes).toContain('render-contrast $.vars.light["--tx-muted-foreground"]');

@@ -17,7 +17,21 @@
  *   are relative and pass);
  * - `literal-z-index`: a `z-index` above 30 that is not a token: values up
  *   to 30 order siblings inside one component, anything higher competes
- *   with the `--tx-z-*` layers.
+ *   with the `--tx-z-*` layers;
+ * - `system-color`: a CSS system color (`Canvas`, `CanvasText`, `ButtonFace`,
+ *   `Mark`, `Highlight`…) that can render under a theme: outside the
+ *   fallback of a contract token, and outside a `@media (forced-colors:
+ *   active)` block (where system colors are the right answer). It paints the
+ *   user agent palette whatever the design system says (T-ds-conformance);
+ * - `unknown-token`: a `var(--tx-…)` read of a name that nothing defines: not
+ *   a contract token (a theme role or a system token), not a component token
+ *   of the `@texuli/tokens/components` registry, and never declared or set
+ *   by package code (a CSS declaration, a `style:--tx-…` directive, a
+ *   `setProperty('--tx-…')` call or a quoted name), unless its fallback reads
+ *   one that is (the component-token pattern `var(--tx-<comp>-<key>,
+ *   var(--tx-<role>))`, a host hook that paints the theme until set). Such a
+ *   read always paints its fallback (`--tx-card`, `--tx-danger` and
+ *   `--tx-color-*` did, so they painted `Canvas`, `Mark` or a hex color).
  *
  * Out of scope: sizes (`inline-size`, `block-size` and their limits),
  * positions, border and outline widths, line heights and shadow geometry,
@@ -34,6 +48,7 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
+import { COMPONENT_TOKENS } from '../packages/tokens/src/components/registry.ts';
 import { themeVariables } from '../packages/tokens/src/css/apply.ts';
 import { loadLibraryTheme } from '../packages/tokens/src/library-port/index.ts';
 import { SYSTEM_TOKEN_NAMES } from '../packages/tokens/src/system/names.ts';
@@ -43,7 +58,9 @@ export type TokenUsageCode =
   | 'literal-space'
   | 'literal-radius'
   | 'literal-font-size'
-  | 'literal-z-index';
+  | 'literal-z-index'
+  | 'system-color'
+  | 'unknown-token';
 
 export interface TokenUsageFinding {
   file: string;
@@ -74,6 +91,11 @@ const PENDING =
   'Pending adoption outside T-adopt-domain: the literals this package kept after T-adopt-core (off-step spaces and type, layout radii). Converting them belongs to the package owner lane and must keep pnpm visual unchanged; remove entries as they are adopted (the stale check fails on leftovers).';
 const DECK_SCOPE =
   'Renders inside the deck stage, which applies the deck theme (graphite: radius 0.25rem, density 0.95) on its own scope: system and shape tokens there follow the deck theme and move the pixels of the visual baselines, so these rules keep their literals (and exact legacy reads only) until the lead decides whether components in a deck follow the deck theme.';
+
+const LEGACY_NAME =
+  'A pre-v2 size, type or shadow name that no theme or base.css defines (packages/tokens/docs/tokens-components.md, Naming: the --tx-radius-* reads carry fallbacks that disagree, so defining the names would change rendering); the read paints its fallback, which is the value the component means today. Not a color, so no design-system color is lost; moving each read to the shape, type or elevation family changes pixels and belongs to the package owner lane (remove the entry when it lands).';
+const HOST_HOOK =
+  'A documented host hook: the component reads it so a host can set it on an element, and the fallback is the default size or value (not a theme color). It is not a component token of the registry because a design system does not set it.';
 
 /** Every literal the packages keep, with the reason (ADR-020: allowlist with reasons). */
 export const ALLOWLIST: readonly AllowlistEntry[] = [
@@ -204,13 +226,6 @@ export const ALLOWLIST: readonly AllowlistEntry[] = [
   },
   // Colors that render today because the token name is not part of the contract.
   {
-    path: 'packages/blocks/src/embed/',
-    literals: ['#9ca3af', '#4338ca', '#b91c1c', 'white'],
-    code: 'literal-color',
-    reason:
-      'Embed frame and app chrome read --tx-color-* names that no theme declares, so these fallbacks are what renders; moving them to the contract roles (--tx-border, --tx-primary, --tx-destructive) changes pixels and waits for a visual review (follow-up).',
-  },
-  {
     path: 'packages/data/src/grid-columns/grid-columns.css',
     literals: ['rgb(0 0 0 / 0.15)'],
     code: 'literal-color',
@@ -223,6 +238,57 @@ export const ALLOWLIST: readonly AllowlistEntry[] = [
     code: 'literal-color',
     reason:
       'Slash menu shadow read through --tx-shadow-md, a name no theme declares; the elevation tokens are flat under the visual-baseline theme, so reading them would drop the shadow (pixel change).',
+  },
+  // Undefined names that are not colors (unknown-token).
+  {
+    path: 'packages/',
+    literals: [
+      '--tx-font-weight-semibold',
+      '--tx-text-xs',
+      '--tx-text-sm',
+      '--tx-text-base',
+      '--tx-text-lg',
+      '--tx-radius-sm',
+      '--tx-radius-md',
+      '--tx-radius-lg',
+      '--tx-radius-xl',
+      '--tx-radius-full',
+      '--tx-shadow-md',
+      '--tx-shadow-lg',
+    ],
+    code: 'unknown-token',
+    reason: LEGACY_NAME,
+  },
+  {
+    path: 'packages/texuli/src/components/sidebar/sidebar.css',
+    literals: ['--tx-sidebar-width', '--tx-sidebar-width-collapsed'],
+    code: 'unknown-token',
+    reason: HOST_HOOK,
+  },
+  {
+    path: 'packages/texuli/src/components/select/select.css',
+    literals: ['--tx-select-trigger-width'],
+    code: 'unknown-token',
+    reason: HOST_HOOK,
+  },
+  {
+    path: 'packages/texuli/src/components/tags-color/tags-color.css',
+    literals: ['--tx-color-picker-hue'],
+    code: 'unknown-token',
+    reason: `${HOST_HOOK} The value is the hue angle of the picker gradient.`,
+  },
+  {
+    path: 'packages/forms/src/styles.css',
+    literals: ['--tx-forms-max-inline-size'],
+    code: 'unknown-token',
+    reason: HOST_HOOK,
+  },
+  {
+    path: 'packages/media/src/image-editor/Editor.svelte',
+    literals: ['--tx-image-editor-edge', '--tx-image-editor-edge-contrast'],
+    code: 'unknown-token',
+    reason:
+      'Crop edge and handle colors a host may set (see the Editor.svelte literal-color entry): white and black over any image by default, on purpose independent of the theme.',
   },
   // Geometry.
   {
@@ -379,6 +445,56 @@ export const ALLOWLIST: readonly AllowlistEntry[] = [
   },
 ];
 
+/** The CSS Color 4 system colors (and the deprecated ones still parsed), in their canonical case. */
+export const SYSTEM_COLORS: readonly string[] = [
+  'AccentColor',
+  'AccentColorText',
+  'ActiveText',
+  'ButtonBorder',
+  'ButtonFace',
+  'ButtonText',
+  'Canvas',
+  'CanvasText',
+  'Field',
+  'FieldText',
+  'GrayText',
+  'Highlight',
+  'HighlightText',
+  'LinkText',
+  'Mark',
+  'MarkText',
+  'SelectedItem',
+  'SelectedItemText',
+  'VisitedText',
+  'ActiveBorder',
+  'ActiveCaption',
+  'AppWorkspace',
+  'Background',
+  'ButtonHighlight',
+  'ButtonShadow',
+  'CaptionText',
+  'InactiveBorder',
+  'InactiveCaption',
+  'InactiveCaptionText',
+  'InfoBackground',
+  'InfoText',
+  'Menu',
+  'MenuText',
+  'Scrollbar',
+  'ThreeDDarkShadow',
+  'ThreeDFace',
+  'ThreeDHighlight',
+  'ThreeDLightShadow',
+  'ThreeDShadow',
+  'Window',
+  'WindowFrame',
+  'WindowText',
+];
+// Canonical case only: lowercase words (`canvas`, `field`, `menu`) are grid
+// area and animation names far more often than colors in this repository.
+const SYSTEM_COLOR = new RegExp(`(?<![\\w-])(?:${SYSTEM_COLORS.join('|')})(?![\\w-])`, 'g');
+const TOKEN_READ = /var\(\s*(--tx-[a-zA-Z0-9-]+)/g;
+
 const SPACE_PROP = /^(padding|margin|gap|row-gap|column-gap)(-[a-z-]+)?$/;
 const RADIUS_PROP = /^border(-[a-z]+)*-radius$/;
 const LENGTH = /(?<![\w.#-])-?\d*\.?\d+(px|rem)\b/g;
@@ -431,15 +547,46 @@ export function cssOf(file: string, source: string): string {
   return css.replace(/\/\*[\s\S]*?\*\//g, (comment) => comment.replace(/[^\n]/g, ' '));
 }
 
-/** The findings of one stylesheet, before the allowlist. */
+/** The `[start, end)` offsets of every `@media` block whose query names `forced-colors`. */
+export function forcedColorsBlocks(css: string): [number, number][] {
+  const blocks: [number, number][] = [];
+  for (const match of css.matchAll(/@media[^{;]*forced-colors[^{;]*\{/g)) {
+    const open = (match.index as number) + match[0].length - 1;
+    let depth = 0;
+    for (let i = open; i < css.length; i += 1) {
+      if (css[i] === '{') depth += 1;
+      else if (css[i] === '}') {
+        depth -= 1;
+        if (depth === 0) {
+          blocks.push([match.index as number, i + 1]);
+          break;
+        }
+      }
+    }
+  }
+  return blocks;
+}
+
+/** Blank quoted strings (same length): `content: "Mark"` is text, not a color. */
+const maskStrings = (value: string) =>
+  value.replace(/"[^"]*"|'[^']*'/g, (text) => ' '.repeat(text.length));
+
+/**
+ * The findings of one stylesheet, before the allowlist. `defined` is the set
+ * of `--tx-*` names that exist besides the contract (component tokens and
+ * names package code declares); without it, `unknown-token` is not checked.
+ */
 export function scanStylesheet(
   file: string,
   source: string,
-  contract: ReadonlySet<string>
+  contract: ReadonlySet<string>,
+  defined?: ReadonlySet<string>
 ): TokenUsageFinding[] {
   const css = cssOf(file, source);
   const findings: TokenUsageFinding[] = [];
   const lineAt = (offset: number) => css.slice(0, offset).split('\n').length;
+  const forced = forcedColorsBlocks(css);
+  const inForced = (offset: number) => forced.some(([from, to]) => offset >= from && offset < to);
   const declaration = /(^|[;{\s])(--[a-zA-Z0-9-]+|[a-z][a-z-]*)(\s*:\s*)([^;{}]*?)(?=\s*(?:;|}))/g;
   for (const match of css.matchAll(declaration)) {
     const prop = match[2] as string;
@@ -459,6 +606,37 @@ export function scanStylesheet(
         literal: color[0],
         property: prop,
       });
+    }
+    if (!inForced(valueStart)) {
+      for (const system of maskStrings(value).matchAll(SYSTEM_COLOR)) {
+        findings.push({
+          file,
+          line: lineAt(valueStart + (system.index as number)),
+          code: 'system-color',
+          literal: system[0],
+          property: prop,
+        });
+      }
+    }
+    if (defined) {
+      for (const read of value.matchAll(TOKEN_READ)) {
+        const name = read[1] as string;
+        if (contract.has(name) || isDefinedName(name, defined)) continue;
+        // A host hook in the component-token pattern, `var(--tx-<comp>-<key>,
+        // var(--tx-<role>))`, paints the theme until a host sets it.
+        const fallback = /^\s*,\s*var\(\s*(--tx-[a-zA-Z0-9-]+)/.exec(
+          value.slice((read.index as number) + read[0].length)
+        );
+        const to = fallback?.[1];
+        if (to && (contract.has(to) || isDefinedName(to, defined))) continue;
+        findings.push({
+          file,
+          line: lineAt(valueStart + (read.index as number)),
+          code: 'unknown-token',
+          literal: name,
+          property: prop,
+        });
+      }
     }
     if (prop.startsWith('--')) continue;
     const code: TokenUsageCode | null = SPACE_PROP.test(prop)
@@ -528,6 +706,73 @@ export async function contractTokenNames(): Promise<Set<string>> {
   return names;
 }
 
+/** Every `--tx-*` name the component token registry defines (`--tx-<component>-<key>`). */
+export function componentTokenNames(): Set<string> {
+  return new Set(COMPONENT_TOKENS.map((token) => token.token));
+}
+
+const DECLARATIONS = [
+  // A CSS declaration, or a style string built in markup or script (`--tx-x: ${v}`).
+  /(--tx-[a-zA-Z0-9-]+)\s*:/g,
+  // A Svelte style directive.
+  /style:(--tx-[a-zA-Z0-9-]+)/g,
+  // `style.setProperty('--tx-x', …)` and quoted names in style objects.
+  /['"`](--tx-[a-zA-Z0-9-]+)['"`]/g,
+];
+
+/** A templated name set from script: `` `--tx-cohort-heat-${index}` `` defines the `--tx-cohort-heat-` family. */
+const TEMPLATED = /`(--tx-[a-zA-Z0-9-]+-)\$\{/g;
+
+/**
+ * The `--tx-*` names package code declares or sets (see {@link DECLARATIONS});
+ * a templated family is kept as its prefix followed by `*`.
+ */
+export function declaredTokenNames(sources: readonly { source: string }[]): Set<string> {
+  const names = new Set<string>();
+  for (const { source } of sources) {
+    for (const pattern of DECLARATIONS) {
+      for (const match of source.matchAll(pattern)) names.add(match[1] as string);
+    }
+    for (const match of source.matchAll(TEMPLATED)) names.add(`${match[1] as string}*`);
+  }
+  return names;
+}
+
+/** True when `name` is in `defined`, directly or through a templated family (`--tx-cohort-heat-*`). */
+export function isDefinedName(name: string, defined: ReadonlySet<string>): boolean {
+  if (defined.has(name)) return true;
+  for (let end = name.lastIndexOf('-'); end > 4; end = name.lastIndexOf('-', end - 1)) {
+    if (defined.has(`${name.slice(0, end + 1)}*`)) return true;
+  }
+  return false;
+}
+
+/** Package sources that may declare or set a `--tx-*` name (tracked files only). */
+export function declarationSourceFiles(root = process.cwd()): string[] {
+  const listed = execFileSync(
+    'git',
+    [
+      'ls-files',
+      ':(glob)packages/*/src/**/*.css',
+      ':(glob)packages/*/src/**/*.svelte',
+      ':(glob)packages/*/src/**/*.ts',
+    ],
+    { cwd: root, encoding: 'utf8' }
+  );
+  return listed.split('\n').filter(Boolean);
+}
+
+/** The defined names besides the contract: the component registry and every declared name. */
+export function definedTokenNames(
+  sources: readonly { source: string }[] = declarationSourceFiles().map((file) => ({
+    source: readFileSync(file, 'utf8'),
+  }))
+): Set<string> {
+  const names = componentTokenNames();
+  for (const name of declaredTokenNames(sources)) names.add(name);
+  return names;
+}
+
 /** Package stylesheets the guard scans (tracked files only). */
 export function stylesheetFiles(root = process.cwd()): string[] {
   const listed = execFileSync(
@@ -552,13 +797,14 @@ export interface TokenUsageReport {
 export function checkTokenUsage(
   files: readonly { file: string; source: string }[],
   contract: ReadonlySet<string>,
-  allowlist: readonly AllowlistEntry[] = ALLOWLIST
+  allowlist: readonly AllowlistEntry[] = ALLOWLIST,
+  defined: ReadonlySet<string> = definedTokenNames(files)
 ): TokenUsageReport {
   const findings: TokenUsageFinding[] = [];
   const used = new Set<string>();
   let allowed = 0;
   for (const { file, source } of files) {
-    for (const finding of scanStylesheet(file, source, contract)) {
+    for (const finding of scanStylesheet(file, source, contract, defined)) {
       const entry = allowlist.find((candidate) => isAllowed(finding, candidate));
       if (entry) {
         allowed += 1;
@@ -578,7 +824,7 @@ export function checkTokenUsage(
 async function main(): Promise<void> {
   const json = process.argv.includes('--json');
   const files = stylesheetFiles().map((file) => ({ file, source: readFileSync(file, 'utf8') }));
-  const report = checkTokenUsage(files, await contractTokenNames());
+  const report = checkTokenUsage(files, await contractTokenNames(), ALLOWLIST, definedTokenNames());
   if (json) {
     console.log(JSON.stringify(report, null, 2));
   } else {
@@ -589,7 +835,7 @@ async function main(): Promise<void> {
   }
   if (report.findings.length > 0 || report.stale.length > 0) {
     console.error(
-      `✗ token usage: ${report.findings.length} literal(s) outside the allowlist, ${report.stale.length} stale allowlist entr(ies). Read a token (componentVar/systemVar) or add an allowlist entry with its reason.`
+      `✗ token usage: ${report.findings.length} literal(s) outside the allowlist, ${report.stale.length} stale allowlist entr(ies). Read a contract token (componentVar/systemVar; system colors only inside @media (forced-colors: active)) or add an allowlist entry with its reason.`
     );
     process.exit(1);
   }

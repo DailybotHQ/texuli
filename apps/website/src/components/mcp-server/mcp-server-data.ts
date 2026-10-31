@@ -147,7 +147,7 @@ export const MCP_SERVER_DATA = {
       name: 'blueprint.validate',
       title: 'Validate a blueprint draft',
       summary:
-        "Validate a blueprint draft (a catalog tree, an array of trees, or a texuli-blueprint envelope, migrated first) with the catalog's draft checks: structure, sinks, tree limits, component ids, tiers and prop schemas, deep block and document schemas, grammar and the frame root. Returns valid, status, tier, migratedFrom and diagnostics with the catalog's stable codes.",
+        "Validate a blueprint draft (a catalog tree, an array of trees, or a texuli-blueprint envelope, migrated first) with the catalog's checks: structure, sinks, tree limits, component ids, tiers, prop, block and document schemas, the envelope's designSystem (codes under $.designSystem), grammar and the frame root. Returns valid, status, tier, migratedFrom and diagnostics with stable codes.",
       runtime: 'edge',
       remote: true,
       local: true,
@@ -177,6 +177,45 @@ export const MCP_SERVER_DATA = {
         },
       ],
       example: 'A valid page with a hero heading',
+    },
+    {
+      name: 'blueprint.theme',
+      title: 'Apply a design system to a blueprint',
+      summary:
+        'Set a blueprint envelope\'s designSystem to a reference ({ ref: "acme@2.1.0" } or a library theme "texuli:ocean") or an inline document, wrapping a bare tree in a draft envelope first, then validate the result as blueprint.validate does; an inline document is also compiled for the contrast, focus and target guarantees. Returns valid, the themed blueprint and diagnostics with stable codes.',
+      runtime: 'edge',
+      remote: true,
+      local: true,
+      limits: {
+        inputBytes: 1318912,
+        items: 512,
+        timeMs: 10000,
+      },
+      arguments: [
+        {
+          name: 'blueprint',
+          required: true,
+          description:
+            'A texuli-blueprint envelope, or a catalog tree (or array of trees) to wrap in a draft envelope for the current catalog.',
+        },
+        {
+          name: 'designSystem',
+          required: true,
+          description: 'Exactly one of ref and inline.',
+        },
+        {
+          name: 'tier',
+          required: false,
+          description:
+            'The tier to validate at: untrusted (agent output, the default; refuses data: URLs in an inline document) or developer.',
+        },
+        {
+          name: 'id',
+          required: false,
+          description: 'A wrapped tree only: the envelope id (default "draft").',
+        },
+      ],
+      example: 'Theme the hero page with a library theme',
     },
     {
       name: 'block.list',
@@ -320,6 +359,415 @@ export const MCP_SERVER_DATA = {
         },
       ],
       example: 'Ocean in dark mode',
+    },
+    {
+      name: 'ds.validate',
+      title: 'Validate a design system',
+      summary:
+        "Validate a design-system document: the spec's closed schema, the extends chain, then a compile of the document and its high-contrast variant with the guarantees enforced (text contrast, focus ring, target size). Returns valid, the distinct codes, every error with its JSON path and hint, the compiler warnings and the hash.",
+      runtime: 'edge',
+      remote: true,
+      local: true,
+      limits: {
+        inputBytes: 1048576,
+        timeMs: 10000,
+      },
+      arguments: [
+        {
+          name: 'document',
+          required: true,
+          description:
+            'A design-system document: format "texuli/design-system", formatVersion 1, id, version, name, and optional sections (extends, color, typography, shape, space, elevation, surface, motion, layout, icons, components, assets, voice, accessibility, variants). texuli://design-system/acme is a full example.',
+        },
+        {
+          name: 'trust',
+          required: false,
+          description:
+            'untrusted (agent or user documents, the default) refuses every data: URL; developer accepts capped data: fonts and images.',
+        },
+        {
+          name: 'variant',
+          required: false,
+          description: 'A variant the document declares under variants (e.g. "high-contrast").',
+        },
+        {
+          name: 'bases',
+          required: false,
+          description:
+            'Documents for extends: "id@x.y.z", keyed by "id@version". "texuli:<theme>" bases load from the theme library; nothing is fetched.',
+        },
+      ],
+      example: 'The smallest document',
+    },
+    {
+      name: 'ds.compile',
+      title: 'Compile a design system',
+      summary:
+        'Compile a design-system document to concrete --tx-* variables per mode and emit one format: compiled JSON, scoped CSS, a Tailwind preset, DTCG or Tokens Studio. Returns valid, the format, its media type, the content as text, the hash and warnings; a refused document returns errors with stable codes instead.',
+      runtime: 'edge',
+      remote: true,
+      local: true,
+      limits: {
+        inputBytes: 1048576,
+        timeMs: 10000,
+      },
+      arguments: [
+        {
+          name: 'document',
+          required: true,
+          description:
+            'A design-system document: format "texuli/design-system", formatVersion 1, id, version, name, and optional sections (extends, color, typography, shape, space, elevation, surface, motion, layout, icons, components, assets, voice, accessibility, variants). texuli://design-system/acme is a full example.',
+        },
+        {
+          name: 'format',
+          required: false,
+          description:
+            'json (the compiled design system, keys sorted), css (scoped custom properties, light and dark), tailwind (a preset), dtcg or tokens-studio (the document as token files).',
+        },
+        {
+          name: 'selector',
+          required: false,
+          description: 'css only: the scope selector (default [data-tx-ds="<id>"], or :root).',
+        },
+        {
+          name: 'dark',
+          required: false,
+          description:
+            'css only: dark mode through the .dark class (default), [data-tx-mode="dark"] or prefers-color-scheme.',
+        },
+        {
+          name: 'mode',
+          required: false,
+          description: 'Compile one mode only (default: every mode the document declares).',
+        },
+        {
+          name: 'trust',
+          required: false,
+          description:
+            'untrusted (agent or user documents, the default) refuses every data: URL; developer accepts capped data: fonts and images.',
+        },
+        {
+          name: 'variant',
+          required: false,
+          description: 'A variant the document declares under variants (e.g. "high-contrast").',
+        },
+        {
+          name: 'bases',
+          required: false,
+          description:
+            'Documents for extends: "id@x.y.z", keyed by "id@version". "texuli:<theme>" bases load from the theme library; nothing is fetched.',
+        },
+      ],
+      example: 'Scoped CSS',
+    },
+    {
+      name: 'ds.contrast',
+      title: 'Report design-system contrast',
+      summary:
+        'Compile a design-system document and report every contrast pair the guarantees check, per mode: foreground and background roles, kind (text, ui, focus), ratio, requirement and pass, plus the solver adjustments. Returns valid, the target (AA or AAA), targetMin and the per-mode pairs, or errors with stable codes.',
+      runtime: 'edge',
+      remote: true,
+      local: true,
+      limits: {
+        inputBytes: 1048576,
+        timeMs: 10000,
+      },
+      arguments: [
+        {
+          name: 'document',
+          required: true,
+          description:
+            'A design-system document: format "texuli/design-system", formatVersion 1, id, version, name, and optional sections (extends, color, typography, shape, space, elevation, surface, motion, layout, icons, components, assets, voice, accessibility, variants). texuli://design-system/acme is a full example.',
+        },
+        {
+          name: 'mode',
+          required: false,
+          description: 'Compile one mode only (default: every mode the document declares).',
+        },
+        {
+          name: 'trust',
+          required: false,
+          description:
+            'untrusted (agent or user documents, the default) refuses every data: URL; developer accepts capped data: fonts and images.',
+        },
+        {
+          name: 'variant',
+          required: false,
+          description: 'A variant the document declares under variants (e.g. "high-contrast").',
+        },
+        {
+          name: 'bases',
+          required: false,
+          description:
+            'Documents for extends: "id@x.y.z", keyed by "id@version". "texuli:<theme>" bases load from the theme library; nothing is fetched.',
+        },
+      ],
+      example: 'Both modes of a brand',
+    },
+    {
+      name: 'ds.suggest',
+      title: 'Suggest a design system',
+      summary:
+        'Suggest a starting design-system document from one seed color, up to three brand colors (seed, secondary, accent) or a logo as RGBA pixels (the dominant colors pick the seed). Returns valid, the document, the dominant palette for pixels, the key tokens of each mode and warnings.',
+      runtime: 'edge',
+      remote: true,
+      local: true,
+      limits: {
+        inputBytes: 1048576,
+        items: 65536,
+        timeMs: 10000,
+      },
+      arguments: [
+        {
+          name: 'seed',
+          required: false,
+          description: 'A color: #rgb, #rrggbb, #rrggbbaa or a numeric oklch(L C H).',
+        },
+        {
+          name: 'colors',
+          required: false,
+          description: 'Up to 3 brand colors: the seed, then the secondary, then the accent.',
+        },
+        {
+          name: 'pixels',
+          required: false,
+          description:
+            'A logo as RGBA values 0 to 255, 4 per pixel, row by row (at most 65536 values, 128 × 128 pixels); transparent pixels are ignored.',
+        },
+        {
+          name: 'count',
+          required: false,
+          description: 'pixels only: how many dominant colors to report (2 to 12, default 6).',
+        },
+        {
+          name: 'id',
+          required: false,
+          description: 'The id of the resulting document (lowercase words joined by hyphens).',
+        },
+        {
+          name: 'version',
+          required: false,
+          description: 'The semver version of the resulting document (default 1.0.0).',
+        },
+        {
+          name: 'name',
+          required: false,
+          description: 'The display name of the resulting document.',
+        },
+        {
+          name: 'trust',
+          required: false,
+          description:
+            'untrusted (agent or user documents, the default) refuses every data: URL; developer accepts capped data: fonts and images.',
+        },
+      ],
+      example: 'From one seed',
+    },
+    {
+      name: 'ds.import',
+      title: 'Import a design system',
+      summary:
+        'Turn what a team already has into a valid design-system document: a brand one-liner ("brand #4f46e5, font Inter, rounded, compact"), a W3C DTCG file, a Tokens Studio file, a flat role palette or a Texuli theme (an object, or a library theme id). Returns valid, the document and warnings for every value it dropped, or errors with stable codes.',
+      runtime: 'edge',
+      remote: true,
+      local: true,
+      limits: {
+        inputBytes: 1048576,
+        timeMs: 10000,
+      },
+      arguments: [
+        {
+          name: 'from',
+          required: true,
+          description:
+            'The source format: brand (text), dtcg, tokens-studio, role-palette (objects or JSON text) or theme (a Theme object or a library theme id).',
+        },
+        {
+          name: 'input',
+          required: true,
+          description:
+            'The source: the one-liner for brand, a library theme id or Theme for theme, else the token file as an object or JSON text.',
+        },
+        {
+          name: 'id',
+          required: false,
+          description: 'The id of the resulting document (lowercase words joined by hyphens).',
+        },
+        {
+          name: 'version',
+          required: false,
+          description: 'The semver version of the resulting document (default 1.0.0).',
+        },
+        {
+          name: 'name',
+          required: false,
+          description: 'The display name of the resulting document.',
+        },
+        {
+          name: 'trust',
+          required: false,
+          description:
+            'untrusted (agent or user documents, the default) refuses every data: URL; developer accepts capped data: fonts and images.',
+        },
+      ],
+      example: 'A brand one-liner',
+    },
+    {
+      name: 'ds.diff',
+      title: 'Diff two design systems',
+      summary:
+        'Compile two design-system documents (before is the baseline) and compare them: every added, removed or changed --tx-* variable per mode, contrast pairs that regressed below the target, changed component defaults and attributes. Returns valid, identical, the summary counts and each list, or errors tagged with their side.',
+      runtime: 'edge',
+      remote: true,
+      local: true,
+      limits: {
+        inputBytes: 1048576,
+        timeMs: 10000,
+      },
+      arguments: [
+        {
+          name: 'before',
+          required: true,
+          description: 'The baseline design-system document.',
+        },
+        {
+          name: 'after',
+          required: true,
+          description: 'The changed design-system document.',
+        },
+        {
+          name: 'mode',
+          required: false,
+          description: 'Compile one mode only (default: every mode the document declares).',
+        },
+        {
+          name: 'trust',
+          required: false,
+          description:
+            'untrusted (agent or user documents, the default) refuses every data: URL; developer accepts capped data: fonts and images.',
+        },
+        {
+          name: 'variant',
+          required: false,
+          description: 'A variant the document declares under variants (e.g. "high-contrast").',
+        },
+        {
+          name: 'bases',
+          required: false,
+          description:
+            'Documents for extends: "id@x.y.z", keyed by "id@version". "texuli:<theme>" bases load from the theme library; nothing is fetched.',
+        },
+      ],
+      example: 'A new seed color',
+    },
+    {
+      name: 'ds.preview',
+      title: 'Preview a design system',
+      summary:
+        'Render a static, deterministic snapshot of a compiled design system: svg (swatches, a button and a card per mode) or html (the review report: swatches, type ramp, component sheet, contrast table and adjustments). Fixed fonts, no time, no scripts; every value escaped. Returns valid, the format, media type, content and hash.',
+      runtime: 'edge',
+      remote: true,
+      local: true,
+      limits: {
+        inputBytes: 1048576,
+        timeMs: 10000,
+      },
+      arguments: [
+        {
+          name: 'document',
+          required: true,
+          description:
+            'A design-system document: format "texuli/design-system", formatVersion 1, id, version, name, and optional sections (extends, color, typography, shape, space, elevation, surface, motion, layout, icons, components, assets, voice, accessibility, variants). texuli://design-system/acme is a full example.',
+        },
+        {
+          name: 'format',
+          required: false,
+          description: 'svg (a compact image, the default) or html (the full review report page).',
+        },
+        {
+          name: 'title',
+          required: false,
+          description: 'html only: the page title.',
+        },
+        {
+          name: 'mode',
+          required: false,
+          description: 'Compile one mode only (default: every mode the document declares).',
+        },
+        {
+          name: 'trust',
+          required: false,
+          description:
+            'untrusted (agent or user documents, the default) refuses every data: URL; developer accepts capped data: fonts and images.',
+        },
+        {
+          name: 'variant',
+          required: false,
+          description: 'A variant the document declares under variants (e.g. "high-contrast").',
+        },
+        {
+          name: 'bases',
+          required: false,
+          description:
+            'Documents for extends: "id@x.y.z", keyed by "id@version". "texuli:<theme>" bases load from the theme library; nothing is fetched.',
+        },
+      ],
+      example: 'An SVG snapshot',
+    },
+    {
+      name: 'ds.save',
+      title: 'Save a design system to a file',
+      summary:
+        'Validate a design-system document (as ds.validate does) and write it as two-space JSON to the explicit path you pass, inside the working directory: traversal, symlinks and an existing file without overwrite are refused. Local doors only. Returns saved, the relative path and bytes written, or errors with stable codes.',
+      runtime: 'node',
+      remote: false,
+      local: true,
+      limits: {
+        inputBytes: 1048576,
+        timeMs: 10000,
+      },
+      arguments: [
+        {
+          name: 'path',
+          required: true,
+          description:
+            'Where to write, relative to the working directory (e.g. design-systems/harborline.ds.json).',
+        },
+        {
+          name: 'document',
+          required: true,
+          description:
+            'A design-system document: format "texuli/design-system", formatVersion 1, id, version, name, and optional sections (extends, color, typography, shape, space, elevation, surface, motion, layout, icons, components, assets, voice, accessibility, variants). texuli://design-system/acme is a full example.',
+        },
+        {
+          name: 'overwrite',
+          required: false,
+          description: 'Replace an existing file (default false: an existing file is refused).',
+        },
+        {
+          name: 'dryRun',
+          required: false,
+          description: 'Validate the document and the path, and write nothing.',
+        },
+        {
+          name: 'trust',
+          required: false,
+          description:
+            'untrusted (agent or user documents, the default) refuses every data: URL; developer accepts capped data: fonts and images.',
+        },
+        {
+          name: 'variant',
+          required: false,
+          description: 'A variant the document declares under variants (e.g. "high-contrast").',
+        },
+        {
+          name: 'bases',
+          required: false,
+          description:
+            'Documents for extends: "id@x.y.z", keyed by "id@version". "texuli:<theme>" bases load from the theme library; nothing is fetched.',
+        },
+      ],
+      example: 'Check where the minimal document would go',
     },
     {
       name: 'deck.run',
@@ -517,48 +965,42 @@ export const MCP_SERVER_DATA = {
       example: 'Pages about theming',
     },
   ],
-  deprecatedTools: [
+  deprecatedTools: [],
+  removedTools: [
     {
       name: 'deck',
       replacedBy: ['deck.run'],
-      removeIn: '0.10.0',
-      remote: true,
+      removedIn: '0.10.0',
     },
     {
       name: 'document',
       replacedBy: ['document.run', 'document.export'],
-      removeIn: '0.10.0',
-      remote: false,
+      removedIn: '0.10.0',
     },
     {
       name: 'catalog',
       replacedBy: ['catalog.search'],
-      removeIn: '0.10.0',
-      remote: true,
+      removedIn: '0.10.0',
     },
     {
       name: 'component',
       replacedBy: ['component.get'],
-      removeIn: '0.10.0',
-      remote: true,
+      removedIn: '0.10.0',
     },
     {
       name: 'validate',
       replacedBy: ['catalog.validate'],
-      removeIn: '0.10.0',
-      remote: true,
+      removedIn: '0.10.0',
     },
     {
       name: 'example',
       replacedBy: ['example.search'],
-      removeIn: '0.10.0',
-      remote: true,
+      removedIn: '0.10.0',
     },
     {
       name: 'theme',
       replacedBy: ['theme.search', 'theme.get'],
-      removeIn: '0.10.0',
-      remote: true,
+      removedIn: '0.10.0',
     },
   ],
   resources: [
@@ -590,6 +1032,41 @@ export const MCP_SERVER_DATA = {
         'The JSON Schema of a Texuli document (format texuli-document, formatVersion 1): blocks, marks and metadata. Check documents with the document.run validate command.',
       mimeType: 'application/json',
     },
+    {
+      uri: 'texuli://design-system/acme',
+      title: 'Acme design system',
+      description:
+        'The fictional Acme brand: every section of the design-system document. A fictional example document as JSON; validate your own with ds.validate.',
+      mimeType: 'application/json',
+    },
+    {
+      uri: 'texuli://design-system/minimal',
+      title: 'Minimal design system',
+      description:
+        'An example design system. A fictional example document as JSON; validate your own with ds.validate.',
+      mimeType: 'application/json',
+    },
+    {
+      uri: 'texuli://design-system/quillmark',
+      title: 'Quillmark design system',
+      description:
+        'A fictional literary magazine: warm paper tones, a serif voice and calm motion. A fictional example document as JSON; validate your own with ds.validate.',
+      mimeType: 'application/json',
+    },
+    {
+      uri: 'texuli://design-system/ledgerline',
+      title: 'Ledgerline design system',
+      description:
+        'A fictional finance back office: dense tables, crisp edges and a high-contrast variant for long sessions. A fictional example document as JSON; validate your own with ds.validate.',
+      mimeType: 'application/json',
+    },
+    {
+      uri: 'texuli://design-system/tumbletown',
+      title: 'Tumbletown design system',
+      description:
+        'A fictional family game studio: big rounded shapes, lively motion and a pinned brand pink. A fictional example document as JSON; validate your own with ds.validate.',
+      mimeType: 'application/json',
+    },
   ],
   resourceTemplates: [
     {
@@ -611,6 +1088,13 @@ export const MCP_SERVER_DATA = {
       title: 'Library theme',
       description:
         'One library theme: the full light and dark token definition as JSON, then the compiled CSS ready for a stylesheet. Complete {id}, or search with theme.search.',
+      mimeType: 'application/json',
+    },
+    {
+      uriTemplate: 'texuli://design-system/{id}',
+      title: 'Design-system document',
+      description:
+        'One design-system document as JSON: a fictional example (acme shows every section, minimal the smallest; quillmark, ledgerline and tumbletown are example brands) or a library theme as a document (its generator input as color.brand), ready to extend, validate with ds.validate and compile with ds.compile. Complete {id} for every id; one document per read.',
       mimeType: 'application/json',
     },
     {
@@ -671,6 +1155,31 @@ export const MCP_SERVER_DATA = {
           name: 'theme',
           required: false,
           description: 'A theme id to start from, e.g. ocean (complete it, or omit to search).',
+        },
+      ],
+    },
+    {
+      name: 'create-design-system',
+      title: 'Create a design system from a brief',
+      description:
+        'Turn a brand brief (colors, fonts, mood, an existing token file or a library theme) into a validated Texuli design-system document: start from an importer or a suggestion, write the sections, validate with ds.validate and fix every code until it passes, then report contrast and a preview. Returns the step-by-step loop with the brief filled in.',
+      arguments: [
+        {
+          name: 'brief',
+          required: true,
+          description:
+            'The brand in plain words: name, colors, fonts, shape, density, mood, audience, e.g. "Harborline: teal #0e7490, Inter, rounded, calm".',
+        },
+        {
+          name: 'base',
+          required: false,
+          description: 'A library theme id to extend, e.g. ocean (complete it, or omit).',
+        },
+        {
+          name: 'contrast',
+          required: false,
+          description: 'The contrast target: AA (4.5:1 text, the default) or AAA (7:1 text).',
+          enum: ['AA', 'AAA'],
         },
       ],
     },

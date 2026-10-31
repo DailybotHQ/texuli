@@ -234,8 +234,8 @@
   padding: var(--tx-space-1);
   border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
   border-radius: var(--tx-shape-radius-lg);
-  background: var(--tx-popover, var(--tx-surface, Canvas));
-  color: var(--tx-popover-foreground, var(--tx-foreground, CanvasText));
+  background: var(--tx-surface, Canvas);
+  color: var(--tx-foreground, CanvasText);
   box-shadow: var(--tx-shadow-md, 0 8px 24px rgb(0 0 0 / 0.16));
 }
 
@@ -295,7 +295,7 @@
 }
 
 .tx-pages-callout[data-tone="danger"] {
-  border-inline-start-color: var(--tx-danger, var(--tx-destructive, Highlight));
+  border-inline-start-color: var(--tx-destructive, Highlight);
 }
 
 .tx-pages-callout__title {

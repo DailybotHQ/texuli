@@ -121,18 +121,18 @@ onDestroy(close);
 </section>
 
 <style>
-  .tx-embed-app { overflow: hidden; border: var(--tx-border-width-thin) solid var(--tx-color-border, #9ca3af); border-radius: calc(var(--tx-shape-radius-lg) * 1.25); background: var(--tx-color-surface, Canvas); color: var(--tx-color-text, CanvasText); }
-  .tx-embed-header { display: flex; align-items: center; justify-content: space-between; gap: var(--tx-space-3); padding: var(--tx-space-3) var(--tx-space-4); border-block-end: var(--tx-border-width-thin) solid var(--tx-color-border, #9ca3af); }
+  .tx-embed-app { overflow: hidden; border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder); border-radius: calc(var(--tx-shape-radius-lg) * 1.25); background: var(--tx-surface, Canvas); color: var(--tx-surface-foreground, CanvasText); }
+  .tx-embed-header { display: flex; align-items: center; justify-content: space-between; gap: var(--tx-space-3); padding: var(--tx-space-3) var(--tx-space-4); border-block-end: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder); }
   .tx-embed-header h3 { margin: 0; font-size: var(--tx-type-body-size); }
   .tx-embed-content { min-block-size: 16rem; padding: var(--tx-space-4); }
   .tx-embed-content[data-size='sm'] { min-block-size: 10rem; }
   .tx-embed-content[data-size='lg'] { min-block-size: 24rem; }
   .tx-embed-start { display: grid; min-block-size: inherit; align-content: center; justify-items: center; gap: var(--tx-space-3); text-align: center; }
   .tx-embed-start p { margin: 0; }
-  button { min-block-size: 2.5rem; padding-inline: var(--tx-space-4); border: var(--tx-border-width-thin) solid currentColor; border-radius: var(--tx-shape-radius-md); background: var(--tx-color-accent, #4338ca); color: var(--tx-color-on-accent, white); font: inherit; cursor: pointer; }
+  button { min-block-size: 2.5rem; padding-inline: var(--tx-space-4); border: var(--tx-border-width-thin) solid currentColor; border-radius: var(--tx-shape-radius-md); background: var(--tx-primary, ButtonFace); color: var(--tx-primary-foreground, ButtonText); font: inherit; cursor: pointer; }
   button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
   button:disabled { cursor: wait; opacity: 0.65; }
   .tx-embed-mount { min-block-size: 12rem; overflow: auto; }
-  [role='alert'] { color: var(--tx-color-danger, #b91c1c); }
+  [role='alert'] { color: var(--tx-destructive, CanvasText); }
   @media (forced-colors: active) { .tx-embed-app, .tx-embed-header { border-color: CanvasText; } button { border: var(--tx-border-width-thin) solid ButtonText; } }
 </style>

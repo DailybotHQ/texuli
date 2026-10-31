@@ -883,13 +883,17 @@
     },
     "@texuli/player": {
       "gzip": 94528,
-      "cssGzip": 2816,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 76,730 B gzip, 15,251 B CSS, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): 79808 -> 85184 B, measured + 4% after the streaming mode (ADR-014, about 1.3 KB on the main entry, the reader loop lazy) and the motion frame (ADR-013, about 1.85 KB; its runtime and core motion load only when a node declares motion); measured 81,854 B. PLAN_010 T-release-060 (2026-10-29): CSS 15872 -> 2688 B, tightened to measured + 4% (measured 2,545 B). PLAN_010 0.8.0 integration (consented plan): 85184 -> 94528 B, measured + 4% after data-source bindings (the source access, loader and optimistic-edit wiring on the main entry; painters stay lazy), the canvasHost and formHost seams and the spec 0.8.0 checks of the catalog validator it bundles; the form and canvas engines are not in it (they come from the hosts). Measured 90,833 B (CSS 2,545 B). PLAN_010 T-targets (ADR-016): CSS 2688 -> 2816 B at measured + 4% (measured 2,673 B): the print mode rules (page breaks, hidden controls, no dimmed surface)."
+      "cssGzip": 3200,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 76,730 B gzip, 15,251 B CSS, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): 79808 -> 85184 B, measured + 4% after the streaming mode (ADR-014, about 1.3 KB on the main entry, the reader loop lazy) and the motion frame (ADR-013, about 1.85 KB; its runtime and core motion load only when a node declares motion); measured 81,854 B. PLAN_010 T-release-060 (2026-10-29): CSS 15872 -> 2688 B, tightened to measured + 4% (measured 2,545 B). PLAN_010 0.8.0 integration (consented plan): 85184 -> 94528 B, measured + 4% after data-source bindings (the source access, loader and optimistic-edit wiring on the main entry; painters stay lazy), the canvasHost and formHost seams and the spec 0.8.0 checks of the catalog validator it bundles; the form and canvas engines are not in it (they come from the hosts). Measured 90,833 B (CSS 2,545 B). PLAN_010 T-targets (ADR-016): CSS 2688 -> 2816 B at measured + 4% (measured 2,673 B): the print mode rules (page breaks, hidden controls, no dimmed surface). PLAN_011 T-ds-conformance: CSS 2816 -> 3200 B at measured + 4% (measured 3,025 B): the native player controls (flow actions, action-form submits and fields, filter and slider inputs, the toggle label) are styled from the token contract instead of painting the user agent's colors, with focus rings, targets of at least --tx-size-target-min and forced-colors rules."
+    },
+    "@texuli/player/design-system": {
+      "gzip": 3648,
+      "note": "PLAN_011 T-ds-blueprint (trust mode): new row at measured + 4%: the player's design-system step as a public subpath (resolve through the host, compile, component defaults), so the @texuli/slides stage applies a deck's designSystem the same way; hosts and the player load it only with import(). Measured 3,506 B gzip; the compiler and runtime stay lazy (53,293 B)."
     },
     "@texuli/player/styles.css": {
       "gzip": 64,
-      "cssGzip": 2816,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 0 B gzip, 2,420 B CSS, cap = measured + 4% headroom. PLAN_010 T-targets (ADR-016): CSS 2560 -> 2816 B at measured + 4% (measured 2,673 B): the print mode rules."
+      "cssGzip": 3200,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 0 B gzip, 2,420 B CSS, cap = measured + 4% headroom. PLAN_010 T-targets (ADR-016): CSS 2560 -> 2816 B at measured + 4% (measured 2,673 B): the print mode rules. PLAN_011 T-ds-conformance: CSS 2816 -> 3200 B at measured + 4% (measured 3,025 B): the native player controls (flow actions, action-form submits and fields, filter and slider inputs, the toggle label) are styled from the token contract instead of painting the user agent's colors, with focus rings, targets of at least --tx-size-target-min and forced-colors rules."
     },
     "@texuli/deck": {
       "gzip": 39340,
@@ -908,16 +912,16 @@
       "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 24,156 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
     },
     "@texuli/deck/markdown": {
-      "gzip": 60181,
-      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 57,866 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
+      "gzip": 62528,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 57,866 B gzip on the final PLAN_008 code, cap = measured + 4% headroom. PLAN_011 T-ds-blueprint coverage: 60181 -> 62528 (measured 60,121 B + 4%) for design systems on decks and the stage."
     },
     "@texuli/deck/math": {
       "gzip": 6262,
       "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 6,021 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
     },
     "@texuli/deck/authoring": {
-      "gzip": 31971,
-      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 30,740 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
+      "gzip": 33216,
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 30,740 B gzip on the final PLAN_008 code, cap = measured + 4% headroom. PLAN_011 T-ds-blueprint coverage: 31971 -> 33216 (measured 31,924 B + 4%) for design systems on decks and the stage."
     },
     "@texuli/deck/templates": {
       "gzip": 28456,
@@ -1018,9 +1022,9 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 22,361 B gzip, cap = measured + 4% headroom."
     },
     "@texuli/slides/stage": {
-      "gzip": 108480,
+      "gzip": 112832,
       "cssGzip": 2304,
-      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 105,851 B gzip on the final PLAN_008 code, cap = measured + 4% headroom. PLAN_009 T-slides-lazy (G24, G25): the default renderer tables load on first use; measured 104,263 B gzip (104.37 KiB, about 106,875 B, before), tightened to measured + 4% headroom. PLAN_010 T-release-060 (2026-10-29): CSS 11264 -> 2304 B, tightened to measured + 4% (measured 2,194 B)."
+      "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 105,851 B gzip on the final PLAN_008 code, cap = measured + 4% headroom. PLAN_009 T-slides-lazy (G24, G25): the default renderer tables load on first use; measured 104,263 B gzip (104.37 KiB, about 106,875 B, before), tightened to measured + 4% headroom. PLAN_010 T-release-060 (2026-10-29): CSS 11264 -> 2304 B, tightened to measured + 4% (measured 2,194 B). PLAN_011 T-ds-blueprint coverage: 108480 -> 112832 (measured 108,460 B + 4%) for design systems on decks and the stage."
     },
     "@texuli/slides/stage-core": {
       "gzip": 100864,
@@ -1074,8 +1078,8 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 12,228 B + 4% headroom so platform drift does not flip it. PLAN_010 T-release-060 (2026-10-29): CSS 2048 -> 832 B, tightened to measured + 4% (measured 784 B). PLAN_011 T-gaps-96-98 (2026-10-30, G97 time x-axis): gzip 12736 -> 14656 B, measured 14,039 B + 4% rounded up to the 64 B step; the time axis (UTC nice time ticks, locale date labels, the xKind, formatX and locale props) is eager because a static or server-rendered chart labels its axis synchronously."
     },
     "functions/mcp": {
-      "gzip": 218368,
-      "note": "PLAN_011 T-mcp-remote (2026-10-30): the remote MCP Pages Function (functions/mcp.ts), a server bundle, not a browser entry: the stateless handler, the edge operations, the static catalog manifests and the deck and document engines. Measured 209,909 B gzip initial (46,398 B lazy, the theme loaders and conversion chunks); budget = measured + 4%, rounded up to 64 B. Cloudflare's bundler does not split, so the deployed worker is about initial + lazy."
+      "gzip": 232576,
+      "note": "PLAN_011 T-mcp-remote (2026-10-30): the remote MCP Pages Function (functions/mcp.ts), a server bundle, not a browser entry: the stateless handler, the edge operations, the static catalog manifests and the deck and document engines. Measured 209,909 B gzip initial (46,398 B lazy, the theme loaders and conversion chunks); budget = measured + 4%, rounded up to 64 B. Cloudflare's bundler does not split, so the deployed worker is about initial + lazy. PLAN_011 T-ds-agent-tools (2026-10-30): 218368 -> 232576 B. The eight ds.* operations, blueprint.theme and the create-design-system prompt add their declarations (input and output schemas, descriptions, worked examples) to the initial chunk, because tools/list serves them; the compiler, importers, emitters, report and example documents load lazily (lazy 56.0 -> 99.5 KiB). Measured 223,613 B gzip initial (216,146 B before); budget = measured + 4%, rounded up to 64 B."
     }
   }
 }

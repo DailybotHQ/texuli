@@ -110,23 +110,24 @@ describe('parseDiagram', () => {
   });
 });
 
-describe('tree variant (renamed from style in 0.9.0)', () => {
-  it('reads variant, accepts the deprecated style alias for one minor, and refuses a conflict', () => {
+describe('tree variant (renamed from style in 0.9.0, style removed in 0.10.0)', () => {
+  it('reads variant and refuses the removed style key with its replacement, alone or beside variant', () => {
     const nodes = org.nodes;
     const current = parseDiagram({ type: 'tree', variant: 'file-tree', nodes });
     expect(current.success && current.data).toMatchObject({ type: 'tree', variant: 'file-tree' });
-    // The 0.8 key still parses (removed in 0.10.0) and normalizes to variant.
-    const legacy = parseDiagram({ type: 'tree', style: 'org', nodes });
-    expect(legacy.success).toBe(true);
-    if (legacy.success) {
-      expect(legacy.data).toMatchObject({ type: 'tree', variant: 'org' });
-      expect('style' in legacy.data).toBe(false);
+    // The 0.8 key, an alias through 0.9.x, is refused at its path from 0.10.0.
+    for (const block of [
+      { type: 'tree', style: 'org', nodes },
+      { type: 'tree', variant: 'org', style: 'org', nodes },
+      { type: 'tree', variant: 'org', style: 'file-tree', nodes },
+    ]) {
+      const legacy = parseDiagram(block);
+      expect(legacy.success).toBe(false);
+      if (!legacy.success) {
+        expect(legacy.issues[0]?.jsonPath).toContain('style');
+        expect(legacy.issues[0]?.message).toMatch(/style was removed in 0\.10\.0; send variant/u);
+      }
     }
-    const same = parseDiagram({ type: 'tree', variant: 'org', style: 'org', nodes });
-    expect(same.success).toBe(true);
-    const conflict = parseDiagram({ type: 'tree', variant: 'org', style: 'file-tree', nodes });
-    expect(conflict.success).toBe(false);
-    if (!conflict.success) expect(conflict.issues[0]?.jsonPath).toContain('style');
     const missing = parseDiagram({ type: 'tree', nodes });
     expect(missing.success).toBe(false);
     if (!missing.success) expect(missing.issues[0]?.message).toMatch(/variant must be/u);

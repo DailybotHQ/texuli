@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { onRequest } from '../../functions/mcp.ts';
-import { texuliOps } from '../../packages/tools/src/ops/index.ts';
+import { MINIMAL_DESIGN_SYSTEM, texuliOps } from '../../packages/tools/src/ops/index.ts';
 import {
   assertEdgeParity,
   isEdgeTool,
@@ -96,7 +96,55 @@ describe('what differs between the doors, and only that', () => {
       'stdio'
     );
     const nodeOnly = texuliOps.list({ runtimes: ['node'] }).map((operation) => operation.name);
-    expect(nodeOnly).toEqual(['document.export']);
+    expect(nodeOnly).toEqual(['ds.save', 'document.export']);
+
+    // ds.save checks its path locally (a dry run writes nothing) and is refused remotely.
+    const saveStep = (check: Pick<Step, 'expect' | 'toolError'>): Step => ({
+      label: 'save',
+      method: 'tools/call',
+      params: {
+        name: 'ds.save',
+        arguments: {
+          path: 'design-systems/minimal.ds.json',
+          document: MINIMAL_DESIGN_SYSTEM,
+          dryRun: true,
+        },
+      },
+      ...check,
+    });
+    await runSession(
+      {
+        name: 'ds.save (stdio)',
+        steps: [
+          saveStep({
+            expect: (result) =>
+              expect(result.structuredContent).toMatchObject({
+                saved: false,
+                dryRun: true,
+                path: 'design-systems/minimal.ds.json',
+                errors: [],
+              }),
+          }),
+        ],
+        final() {},
+      },
+      'stdio'
+    );
+    await runSession(
+      {
+        name: 'ds.save (remote)',
+        steps: [
+          saveStep({
+            toolError(failure) {
+              expect(failure.code).toBe('runtime-unavailable');
+              expect(failure.error).toMatch(/needs the node runtime/u);
+            },
+          }),
+        ],
+        final() {},
+      },
+      'remote'
+    );
 
     const exportStep = (check: Pick<Step, 'expect' | 'toolError'>): Step => ({
       label: 'export',
@@ -137,8 +185,32 @@ describe('what differs between the doors, and only that', () => {
       'remote'
     );
     expect(REMOTE_RUNTIMES).toEqual(['edge', 'site']);
-    expect(isEdgeTool('document')).toBe(false);
-    expect(isEdgeTool('theme')).toBe(true);
+    expect(isEdgeTool('document.export')).toBe(false);
+    expect(isEdgeTool('theme.get')).toBe(true);
+    // A name removed in 0.10.0 runs nowhere.
+    expect(isEdgeTool('theme')).toBe(false);
+  });
+
+  it('refuses the 0.8 tool names removed in 0.10.0 identically on both doors, naming the replacement', async () => {
+    const removed = {
+      name: 'removed names',
+      steps: texuliOps.removed().map((entry) => ({
+        label: entry.name,
+        method: 'tools/call',
+        params: { name: entry.name, arguments: {} },
+        rpcError: (error: Json) => {
+          expect(error.code).toBe(-32602);
+          expect(error.message).toBe(
+            `The tool "${entry.name}" was removed in 0.10.0; call ${entry.replacedBy.join(' or ')} instead.`
+          );
+        },
+      })),
+      final() {},
+    };
+    const stdio = await runSession(removed, 'stdio');
+    const remote = await runSession(removed, 'remote');
+    expect(stdio.length).toBe(8);
+    expect(remote.map((item) => item.response)).toEqual(stdio.map((item) => item.response));
   });
 
   it('returns identical refusals for edge operations on both doors', async () => {

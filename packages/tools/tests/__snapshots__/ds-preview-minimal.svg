@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="512" viewBox="0 0 640 512" role="img" aria-label="Minimal 1.0.0 design system preview" font-family="system-ui, sans-serif">
+<title>Minimal 1.0.0 design system preview</title>
+<g data-mode="light">
+<rect x="16" y="16" width="608" height="232" fill="#fbfbff" rx="12" stroke="#e1e1e5"/>
+<text x="32" y="44" fill="#15151b" font-size="16" font-weight="600">Minimal 1.0.0 · light</text>
+<text x="32" y="64" fill="#62626a" font-size="12" font-weight="400">74/74 contrast pairs pass (AA)</text>
+<rect x="32" y="80" width="64" height="40" fill="#4f49e0" rx="6" stroke="#e1e1e5"/>
+<text x="40" y="105" fill="#ffffff" font-size="12" font-weight="600">Aa</text>
+<text x="32" y="136" fill="#62626a" font-size="10" font-weight="400">primary</text>
+<rect x="106" y="80" width="64" height="40" fill="#e2e6ff" rx="6" stroke="#e1e1e5"/>
+<text x="114" y="105" fill="#16192d" font-size="12" font-weight="600">Aa</text>
+<text x="106" y="136" fill="#62626a" font-size="10" font-weight="400">secondary</text>
+<rect x="180" y="80" width="64" height="40" fill="#eaedff" rx="6" stroke="#e1e1e5"/>
+<text x="188" y="105" fill="#16192d" font-size="12" font-weight="600">Aa</text>
+<text x="180" y="136" fill="#62626a" font-size="10" font-weight="400">accent</text>
+<rect x="254" y="80" width="64" height="40" fill="#f3f3f7" rx="6" stroke="#e1e1e5"/>
+<text x="262" y="105" fill="#62626a" font-size="12" font-weight="600">Aa</text>
+<text x="254" y="136" fill="#62626a" font-size="10" font-weight="400">muted</text>
+<rect x="328" y="80" width="64" height="40" fill="#cc2827" rx="6" stroke="#e1e1e5"/>
+<text x="336" y="105" fill="#ffffff" font-size="12" font-weight="600">Aa</text>
+<text x="328" y="136" fill="#62626a" font-size="10" font-weight="400">destructive</text>
+<rect x="402" y="80" width="64" height="40" fill="#007f38" rx="6" stroke="#e1e1e5"/>
+<text x="410" y="105" fill="#ffffff" font-size="12" font-weight="600">Aa</text>
+<text x="402" y="136" fill="#62626a" font-size="10" font-weight="400">success</text>
+<rect x="476" y="80" width="64" height="40" fill="#916600" rx="6" stroke="#e1e1e5"/>
+<text x="484" y="105" fill="#ffffff" font-size="12" font-weight="600">Aa</text>
+<text x="476" y="136" fill="#62626a" font-size="10" font-weight="400">warning</text>
+<rect x="550" y="80" width="64" height="40" fill="#0871c1" rx="6" stroke="#e1e1e5"/>
+<text x="558" y="105" fill="#ffffff" font-size="12" font-weight="600">Aa</text>
+<text x="550" y="136" fill="#62626a" font-size="10" font-weight="400">info</text>
+<rect x="32" y="156" width="148" height="40" fill="#4f49e0" rx="10"/>
+<text x="48" y="181" fill="#ffffff" font-size="14" font-weight="600">Primary action</text>
+<rect x="196" y="152" width="412" height="80" fill="#ffffff" rx="10" stroke="#e1e1e5"/>
+<text x="212" y="178" fill="#15151b" font-size="14" font-weight="600">Card title</text>
+<text x="212" y="200" fill="#62626a" font-size="12" font-weight="400">Supporting text on the surface.</text>
+<text x="212" y="220" fill="#4d4bd1" font-size="12" font-weight="400">A link</text>
+</g>
+<g data-mode="dark">
+<rect x="16" y="264" width="608" height="232" fill="#0b0b0e" rx="12" stroke="#323236"/>
+<text x="32" y="292" fill="#f4f4fd" font-size="16" font-weight="600">Minimal 1.0.0 · dark</text>
+<text x="32" y="312" fill="#a4a4ac" font-size="12" font-weight="400">74/74 contrast pairs pass (AA)</text>
+<rect x="32" y="328" width="64" height="40" fill="#727aff" rx="6" stroke="#323236"/>
+<text x="40" y="353" fill="#0a0a0a" font-size="12" font-weight="600">Aa</text>
+<text x="32" y="384" fill="#a4a4ac" font-size="10" font-weight="400">primary</text>
+<rect x="106" y="328" width="64" height="40" fill="#292c42" rx="6" stroke="#323236"/>
+<text x="114" y="353" fill="#eaedff" font-size="12" font-weight="600">Aa</text>
+<text x="106" y="384" fill="#a4a4ac" font-size="10" font-weight="400">secondary</text>
+<rect x="180" y="328" width="64" height="40" fill="#1f2343" rx="6" stroke="#323236"/>
+<text x="188" y="353" fill="#eaedff" font-size="12" font-weight="600">Aa</text>
+<text x="180" y="384" fill="#a4a4ac" font-size="10" font-weight="400">accent</text>
+<rect x="254" y="328" width="64" height="40" fill="#212124" rx="6" stroke="#323236"/>
+<text x="262" y="353" fill="#a4a4ac" font-size="12" font-weight="600">Aa</text>
+<text x="254" y="384" fill="#a4a4ac" font-size="10" font-weight="400">muted</text>
+<rect x="328" y="328" width="64" height="40" fill="#ff645a" rx="6" stroke="#323236"/>
+<text x="336" y="353" fill="#0a0a0a" font-size="12" font-weight="600">Aa</text>
+<text x="328" y="384" fill="#a4a4ac" font-size="10" font-weight="400">destructive</text>
+<rect x="402" y="328" width="64" height="40" fill="#43b966" rx="6" stroke="#323236"/>
+<text x="410" y="353" fill="#0a0a0a" font-size="12" font-weight="600">Aa</text>
+<text x="402" y="384" fill="#a4a4ac" font-size="10" font-weight="400">success</text>
+<rect x="476" y="328" width="64" height="40" fill="#cd9200" rx="6" stroke="#323236"/>
+<text x="484" y="353" fill="#0a0a0a" font-size="12" font-weight="600">Aa</text>
+<text x="476" y="384" fill="#a4a4ac" font-size="10" font-weight="400">warning</text>
+<rect x="550" y="328" width="64" height="40" fill="#4ba3f7" rx="6" stroke="#323236"/>
+<text x="558" y="353" fill="#0a0a0a" font-size="12" font-weight="600">Aa</text>
+<text x="550" y="384" fill="#a4a4ac" font-size="10" font-weight="400">info</text>
+<rect x="32" y="404" width="148" height="40" fill="#727aff" rx="10"/>
+<text x="48" y="429" fill="#0a0a0a" font-size="14" font-weight="600">Primary action</text>
+<rect x="196" y="400" width="412" height="80" fill="#161619" rx="10" stroke="#323236"/>
+<text x="212" y="426" fill="#f4f4fd" font-size="14" font-weight="600">Card title</text>
+<text x="212" y="448" fill="#a4a4ac" font-size="12" font-weight="400">Supporting text on the surface.</text>
+<text x="212" y="468" fill="#99a5ff" font-size="12" font-weight="400">A link</text>
+</g>
+</svg>

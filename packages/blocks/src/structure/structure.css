@@ -75,9 +75,10 @@
   .tx-structure-cell {
     margin: 0;
     padding: 0.875rem 1rem;
-    border: 1px solid var(--tx-color-border, CanvasText);
+    border: 1px solid var(--tx-border, CanvasText);
     border-radius: 0.5rem;
-    background: var(--tx-color-surface, Canvas);
+    background: var(--tx-surface, Canvas);
+    color: var(--tx-surface-foreground, CanvasText);
     min-inline-size: 0;
   }
 
@@ -105,7 +106,7 @@
     margin-block: 1rem;
     margin-inline: 0;
     border: 0;
-    border-block-start: 1px solid var(--tx-color-border, CanvasText);
+    border-block-start: 1px solid var(--tx-border, CanvasText);
   }
 
   .tx-structure-divider-space {
@@ -149,15 +150,15 @@
     min-block-size: 2.25rem;
     padding-inline: 0.875rem;
     border-radius: 0.375rem;
-    border: 1px solid var(--tx-color-border, CanvasText);
-    background: var(--tx-color-surface, Canvas);
-    color: var(--tx-color-foreground, CanvasText);
+    border: 1px solid var(--tx-border, CanvasText);
+    background: var(--tx-surface, Canvas);
+    color: var(--tx-surface-foreground, CanvasText);
     font-weight: 600;
     text-decoration: none;
   }
 
   .tx-structure-cta a:focus-visible {
-    outline: 2px solid var(--tx-color-ring, Highlight);
+    outline: 2px solid var(--tx-ring, Highlight);
     outline-offset: 2px;
   }
 

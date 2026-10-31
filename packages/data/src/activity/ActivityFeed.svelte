@@ -503,7 +503,7 @@ function headline(item: T): string {
 <style>
   @layer tx.components {
     .tx-activity {
-      color: var(--tx-text, CanvasText);
+      color: var(--tx-foreground, CanvasText);
       color-scheme: light dark;
       min-inline-size: 0;
       display: grid;
@@ -701,7 +701,7 @@ function headline(item: T): string {
 
     .tx-activity__error {
       border-style: solid;
-      color: var(--tx-danger, CanvasText);
+      color: var(--tx-destructive, CanvasText);
     }
 
     .tx-activity__pager {

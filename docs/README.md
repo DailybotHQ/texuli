@@ -14,6 +14,7 @@ project overview.
 | [DECISIONS](DECISIONS.md) | Architecture decisions: options, choice, why, how to reverse |
 | [EDITOR_ARCHITECTURE](EDITOR_ARCHITECTURE.md) | The rich text editor's contracts (ADR-003): model, selection, history, keyboard, paste security, interchange. The model exists as core texels and the editor package implements the surface |
 | [STANDARDS](STANDARDS.md) | TypeScript, Svelte 5, Astro, CSS, Biome, naming, accessibility |
+| [DESIGN_SYSTEMS](DESIGN_SYSTEMS.md) | Design systems (in development for `0.10.0`, not on npm): author by hand or from a one-liner, DTCG, Tokens Studio, a role palette, a theme or a logo; validate with stable codes; compile and apply (runtime, SSR and no flash, provider, Astro, blueprints); patches and variants; versions; distribute as a file or npm package; guarantees; conformance; outputs |
 | [DESIGN_LANGUAGE](DESIGN_LANGUAGE.md) | The cross-surface visual contract: color roles and modes, spacing and density, shape and elevation, motion and reduced motion, focus, typography, direction |
 | [TESTING_GUIDE](TESTING_GUIDE.md) | Every gate, the source→test map, scoped commands, blind spots, posture, and PLAN_006 SEO/AEO/analytics/theme evidence |
 | [DEVELOPMENT_COMMANDS](DEVELOPMENT_COMMANDS.md) | Every root script and package script, verbatim, plus opt-in SEO/AEO audit commands |
