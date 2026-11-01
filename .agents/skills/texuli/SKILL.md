@@ -1,7 +1,7 @@
 ---
 name: texuli
 description: Build accessible, themed interfaces with Texuli by routing requests to local sub-skills for components, themes, media, installation, and contributions.
-version: "0.3.10"
+version: "0.3.11"
 documentation_url: https://texuli.com/guides/
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob
