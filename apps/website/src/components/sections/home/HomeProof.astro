@@ -1,0 +1,94 @@
+---
+/**
+ * Landing band 8 (PLAN_012 T-landing-close): a computed counts band —
+ * published packages, the blueprint catalog and the agent-emittable slice.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../foundation/site.ts';
+import { HOME_PROOF, loadHomeProof } from './home-content.ts';
+
+const base = import.meta.env.BASE_URL;
+const stats = await loadHomeProof();
+const resolveHref = (href: string): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  return safe === undefined ? undefined : withBase(base, safe);
+};
+---
+
+<section class="home-proof" aria-labelledby="home-proof-title" data-tx-home-proof="">
+  <div class="home-proof__inner">
+    <h2 id="home-proof-title">{HOME_PROOF.title}</h2>
+    <ul class="home-proof__stats" role="list" aria-label={HOME_PROOF.label}>
+      {
+        stats.map((stat) => (
+          <li data-tx-proof={stat.id}>
+            <a href={resolveHref(stat.href)}>
+              <span class="home-proof__value">{stat.value}</span>
+              <span class="home-proof__label">{stat.label}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .home-proof {
+    background: var(--home-ground);
+    border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 60%, transparent);
+  }
+  .home-proof__inner {
+    display: grid;
+    gap: 1.5rem;
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-block: clamp(2.5rem, 6vw, 4rem);
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  .home-proof h2 {
+    margin: 0;
+    color: var(--home-accent-text);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .home-proof__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .home-proof__stats a {
+    display: grid;
+    gap: 0.35rem;
+    padding: 1.25rem;
+    border: 1px solid color-mix(in oklab, var(--home-accent) 20%, var(--tx-border));
+    border-radius: 1rem;
+    background: var(--tx-background);
+    color: var(--tx-foreground);
+    text-decoration: none;
+  }
+  .home-proof__stats a:hover {
+    border-color: var(--home-accent);
+  }
+  .home-proof__stats a:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .home-proof__value {
+    font-size: clamp(2.25rem, 6vw, 3.25rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    color: var(--home-accent-text);
+  }
+  .home-proof__label {
+    color: var(--tx-muted-foreground);
+    font-size: 0.95rem;
+  }
+</style>

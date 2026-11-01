@@ -5,14 +5,19 @@
 import SiteIllustration from './SiteIllustration.astro';
 
 interface Props {
-  slot: string;
+  /**
+   * The illustration slot id. Named `art`, not `slot`: Astro reads a `slot`
+   * attribute on a component's direct child as a named-slot target and
+   * drops it when the parent has no such slot.
+   */
+  art: string;
 }
 
-const { slot } = Astro.props;
+const { art } = Astro.props;
 ---
 
-<div class="page-banner" data-tx-page-banner={slot}>
-  <SiteIllustration {slot} class="page-banner__art" />
+<div class="page-banner" data-tx-page-banner={art}>
+  <SiteIllustration {art} class="page-banner__art" />
 </div>
 
 <style>

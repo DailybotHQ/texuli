@@ -30,6 +30,7 @@ import {
 } from '../../components/dashboards-site/page.ts';
 import FeaturePage from '../../components/feature-site/FeaturePage.astro';
 import GuideCode from '../../components/guides/GuideCode.astro';
+import PageBanner from '../../components/landing/PageBanner.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const section = (id: string) => {
@@ -92,6 +93,7 @@ const sourceRegistry = createSourceRegistry([tickets]);
     piecesLabel="The pieces of the dashboard"
     sections={DASHBOARDS_SECTIONS}
   >
+    <PageBanner art="page-dashboards" slot="banner" />
     <Fragment slot="lead">
       <p>
         A widget grid with pointer and keyboard moves and resizes, announcements for every step, a

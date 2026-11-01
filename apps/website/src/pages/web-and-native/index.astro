@@ -1,4 +1,5 @@
 ---
+import DocsShell from '../../components/docs-shell/DocsShell.astro';
 /**
  * /web-and-native/ — the architecture and correlation page (sub-site IA
  * decision 3, owned by analysis_results/subsite-ia-routes.md). Final
@@ -10,7 +11,7 @@
  * not moved — no existing route moves (T-12). Canonical and the OG set are
  * emitted by SeoHead; the sitemap picks the route up via the build pipeline.
  */
-import DocsShell from '../../components/docs-shell/DocsShell.astro';
+import PageBanner from '../../components/landing/PageBanner.astro';
 import LayerGraph from '../../components/sections/architecture/LayerGraph.astro';
 import ParityTable from '../../components/sections/architecture/ParityTable.astro';
 import PortabilityDeepDive from '../../components/sections/architecture/PortabilityDeepDive.astro';
@@ -34,6 +35,7 @@ const jsonLd = techArticleJsonLd(
 ---
 
 <DocsShell title="Web and native, one contract — Texuli's architecture" description="One manifest projects to TypeScript and Kotlin: the spec seam that keeps web and native interfaces portable. What exists today, honestly." {toc} {jsonLd} demoNav={false}>
+  <PageBanner art="page-web-and-native" />
   <h2 id="why-both">Why both technologies</h2>
   <p>
     Texuli uses a different runtime on each side on purpose, and the reason is the same

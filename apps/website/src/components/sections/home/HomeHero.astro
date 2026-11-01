@@ -1,0 +1,214 @@
+---
+/**
+ * Landing hero (PLAN_012 T-landing-hero): the value proposition in one
+ * screen, following the plan's landing IA. A badge line, the two-part h1
+ * with its accent word, a short sub, three calls to action, one copyable
+ * install line, a computed proof row, and the `home-hero` illustration
+ * (eager, the only priority slot). Static markup; every link resolves
+ * through the URL policy (`safeHref`, developer tier: app-authored routes).
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../foundation/site.ts';
+import SiteIllustration from '../../landing/SiteIllustration.astro';
+import CopyCommand from './CopyCommand.astro';
+import { HOME_HERO, HOME_IDS, HOME_INSTALL_COMMAND, loadHomeHeroProof } from './home-content.ts';
+
+const base = import.meta.env.BASE_URL;
+const proof = await loadHomeHeroProof();
+const resolveHref = (href: string): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  return safe === undefined ? undefined : withBase(base, safe);
+};
+---
+
+<section class="home-hero" aria-labelledby={HOME_IDS.hero} data-tx-home-hero="">
+  <div class="home-hero__inner">
+    <div class="home-hero__copy">
+      <p class="home-hero__top">
+        <span class="home-hero__badge">
+        {
+          HOME_HERO.badge.map((item, index) => (
+            <>
+              {index > 0 && <span aria-hidden="true"> · </span>}
+              <span>{item}</span>
+            </>
+          ))
+        }
+        </span>
+        <a class="home-hero__news" href={resolveHref(HOME_HERO.news.href)} data-tx-hero-news=""
+          >{HOME_HERO.news.label}<span aria-hidden="true">&nbsp;→</span></a
+        >
+      </p>
+      <h1 id={HOME_IDS.hero}>
+        {HOME_HERO.title.lead}{' '}
+        <span class="home-hero__accent">{HOME_HERO.title.accent}</span>
+      </h1>
+      <p class="home-hero__sub">{HOME_HERO.sub}</p>
+      <div class="home-hero__actions">
+        {
+          HOME_HERO.actions.map((link) => (
+            <a href={resolveHref(link.href)} class={`home-cta home-cta--${link.role}`}>
+              {link.label}
+              {link.role === 'text' && <span aria-hidden="true">&nbsp;→</span>}
+            </a>
+          ))
+        }
+      </div>
+      <CopyCommand command={HOME_INSTALL_COMMAND} />
+      <ul class="home-hero__proof" role="list" aria-label={HOME_HERO.proofLabel}>
+        {
+          proof.map((stat) => (
+            <li data-tx-hero-proof={stat.id}>
+              <a class="home-hero__stat" href={resolveHref(stat.href)}>
+                <span class="home-hero__stat-value">{stat.value}</span>{' '}
+                <span class="home-hero__stat-label">{stat.label}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div class="home-hero__art">
+      <SiteIllustration art="home-hero" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .home-hero {
+    background: var(--home-ground);
+    border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 60%, transparent);
+  }
+  .home-hero__inner {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-block: clamp(2rem, 6vw, 4.5rem);
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  @media (min-width: 60rem) {
+    .home-hero__inner {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+      align-items: center;
+      min-block-size: min(46rem, calc(100svh - 4rem));
+    }
+  }
+  .home-hero__copy {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+    max-inline-size: 36rem;
+  }
+  .home-hero__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    margin: 0;
+  }
+  .home-hero__news {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.5rem;
+    color: var(--home-accent-text);
+    font-size: 0.85rem;
+    font-weight: 650;
+    text-underline-offset: 0.2em;
+  }
+  .home-hero__news:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .home-hero__badge {
+    margin: 0;
+    padding-block: 0.3rem;
+    padding-inline: 0.85rem;
+    border: 1px solid color-mix(in oklab, var(--home-accent) 35%, transparent);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--home-accent) 8%, var(--tx-background));
+    color: var(--tx-foreground);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .home-hero__badge span[aria-hidden] {
+    color: var(--home-accent-text);
+  }
+  .home-hero h1 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(2.75rem, 9vw, 5.25rem);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    font-weight: 800;
+    text-wrap: balance;
+  }
+  .home-hero__accent {
+    color: var(--home-accent-text);
+  }
+  .home-hero__sub {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+    line-height: 1.5;
+  }
+  .home-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+  }
+  .home-hero__proof {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem;
+    inline-size: 100%;
+    margin: 0;
+    padding: 0;
+    padding-block-start: 1.1rem;
+    border-block-start: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    list-style: none;
+  }
+  .home-hero__stat {
+    display: grid;
+    gap: 0.1rem;
+    min-block-size: 2.75rem;
+    border-radius: 0.375rem;
+    color: var(--tx-foreground);
+    text-decoration: none;
+  }
+  .home-hero__stat-value {
+    font-size: clamp(1.4rem, 4vw, 1.9rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .home-hero__stat-label {
+    color: var(--tx-muted-foreground);
+    font-size: 0.85rem;
+  }
+  .home-hero__stat:hover .home-hero__stat-label {
+    color: var(--tx-foreground);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .home-hero__stat:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .home-hero__art {
+    min-inline-size: 0;
+  }
+  @media (max-width: 30rem) {
+    .home-hero__proof {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .home-hero__actions :global(.home-cta--primary),
+    .home-hero__actions :global(.home-cta--secondary) {
+      flex: 1 1 100%;
+      text-align: center;
+    }
+  }
+</style>

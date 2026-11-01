@@ -3,60 +3,55 @@
 **App:** `apps/website`  
 **Pages:** `/` (unified landing), `/native/` (native landing), with the
 architecture reading page `/web-and-native/` as their deep link  
-**Components:** `src/components/sections/web/`, `src/components/sections/native/`,
-`src/components/sections/architecture/`  
-**Tasks:** PLAN_006 T-15 (narrative), T-40..T-44 (web sections and
-assembly), T-45..T-48 (native), T-49..T-52 (architecture), T-79 and T-84
-(polish and copy)
+**Components:** `src/components/sections/home/` (the landing),
+`src/components/sections/web/WebCorrelation.astro` (on `/web-and-native/`),
+`src/components/sections/native/`, `src/components/sections/architecture/`  
+**Tasks:** PLAN_012 (the illustrated landing); earlier PLAN_006 T-15, T-40..T-52,
+T-79 and T-84
 
 ## Purpose
 
-The landing sells a platform, not only a library: one owned component
-catalog, shipped for the web in Svelte 5 today, with the same catalog
-contract driving a Kotlin Multiplatform renderer in development. The
-recorded hero choice keeps "Interfaces from texels." as the `h1` and lets
-the eyebrow and sub-message carry the platform story; an audience split
-("Build for web / Build native") was rejected because it reads as two
-products. Every claim states shipped, in-development and planned work as
-such.
+The landing sells a platform in pictures, not paragraphs: one owned Svelte 5
+component library for building any interface, with a Kotlin Multiplatform
+renderer in development and agent safety built in. It follows
+deepworkplan.com's band pattern (a hero, alternating illustrated story
+bands, a proof band, a quickstart, a final call to action) in the 3D texel
+style of the social image ([ILLUSTRATIONS.md](ILLUSTRATIONS.md)). Every band
+keeps its body to about 40 words, the page carries no code block, and every
+claim links to the page that proves it. Counts are computed, never typed.
 
 ## Layout
 
 The home page does **not** use the docs sidebar. It uses `BaseLayout` with
-`landing` and the shared `SiteHeader` (slim header; docs shell lives on guide
-routes). Its four content sections are static Astro output; the shared header's
-search and theme controls are the only two client islands on the page.
-The route, door and shell decisions are in [site-subsite.md](site-subsite.md).
+`landing` and the shared `SiteHeader`. All bands are static Astro output; the
+header's search and theme controls are the only client islands. One small
+module script rides inside the bands and is not an island: the install-command
+copy button (`CopyCommand.astro` on `web-copy-command.ts`, which sends
+`code_copy` only after a successful clipboard write). The opt-in scroll reveal
+is CSS only, gated on reduced motion and scroll-timeline support, never on the
+hero. The route, door and shell decisions are in [site-subsite.md](site-subsite.md).
 
-## Sections (top to bottom)
+## Bands (top to bottom)
 
-1. `WebHero`: “Interfaces from texels.”, platform claim, proof strip and calls to action
-2. `WebWhySvelte`: why Texuli uses Svelte for the web
-3. `WebCorrelation`: one contract, two projections, linked to the architecture page
-4. `WebAgentsCta`: agent-safe renderer story and closing call to action
-5. Shared footer: llms.txt, skill, changelog and MIT (Dailybot, Inc.)
+| # | Band | Component | Art slot |
+| --- | --- | --- | --- |
+| 1 | Hero: badge, "Build any **interface.**", sub, three calls to action, install line, computed proof row | `HomeHero.astro` | `home-hero` (eager) |
+| 2 | Pitch: "Small pieces. Infinite possibilities.", texels → primitives → components → apps | `HomePitch.astro` | `home-pieces` |
+| 3–7 | Stories: Universal, Web + native, Your brand, For agents, Accessible. Each has a topic kicker with a texel mark that grows one cube per band (no numbered acts), and the art alternates end/start | `HomeStories.astro` → `LandingStory.astro`, `TexelMark.astro` | `home-universe`, `home-web-native`, `home-design-systems`, `home-agents`, `home-accessible` |
+| 8 | Proof: published packages, blueprint catalog, agent-emittable components | `HomeProof.astro` | none |
+| 9 | Quickstart: install, pick a theme, compose | `HomeQuickstart.astro` | `home-quickstart` |
+| 10 | Final call to action: "Start with one texel." | `HomeFinal.astro` | `home-final` (band) |
 
-No page-body island is needed: the previous interactive widget and playground
-islands were removed in favor of static, link-led sections. `SiteSearch` and
-`ThemeSwitch` remain `client:load` because the header exposes them immediately.
-Two small module scripts ride inside the sections and are not islands: the
-install-command copy button (`web-copy-command.ts`, which sends `code_copy`
-only after a successful clipboard write) and the opt-in scroll reveal
-(reduced-motion and support gated, never on the hero).
+Landing tokens (the brand violet, the lavender-to-peach ground, dark and high-contrast overrides) and the shared call-to-action styles live in `sections/home/home.css`.
 
-## Structure: component + content module
+## Structure: components + one content module
 
-Every section is a pair: an Astro component that owns markup and styles,
-and a plain TypeScript content module that owns the words, links and
-counts. Tests import the content module directly, so copy and targets are
-checked without a browser.
+Words, links and counts live in `sections/home/home-content.ts`. Build-time data lives in `home-data.ts`: the library themes, the theme count, catalog, primitives and examples counts, and published packages. The native slice is parsed from `NativeRegistry` against the spec catalog. Tests import these modules directly, so copy budgets and targets are checked without a browser.
 
 | Section | Component | Content |
 | --- | --- | --- |
-| Hero | `sections/web/WebHero.astro` | `web-hero-content.ts` (proof-strip counts come from the same sources the linked pages render; the theme moment is build-time token data) |
-| Why Svelte | `sections/web/WebWhySvelte.astro` | `web-why-svelte-content.ts` |
-| Correlation | `sections/web/WebCorrelation.astro` (also mounted on `/web-and-native/`) | `web-correlation-content.ts` |
-| Agents + close | `sections/web/WebAgentsCta.astro` | `web-agents-content.ts`, `web-copy-command.ts` |
+| Landing bands | `sections/home/*.astro` | `home-content.ts`, `home-data.ts` |
+| Correlation (on `/web-and-native/`) | `sections/web/WebCorrelation.astro` | `web-correlation-content.ts` |
 | Native hero + status | `sections/native/NativeHeroStatus.astro` | `native-hero-content.ts` |
 | Why KMP | `sections/native/WhyKmp.astro` | `why-kmp-content.ts` |
 | Native evidence + roadmap | `sections/native/NativeEvidenceRoadmap.astro` | `native-evidence-data.ts` |
@@ -68,11 +63,7 @@ and `src/pages/web-and-native/index.astro`. Native and architecture details:
 
 ## Illustrations
 
-`src/components/landing/SiteIllustration.astro` + `src/data/illustrations.json`.
-Files optional under `public/illustrations/<file>.webp`. Missing files
-render a token gradient fallback (width/height, lazy, async decode, alt
-required). The current home sections do not use it; `PageBanner` does
-(for example on `/changelog/`).
+Each band's art is a `SiteIllustration` slot from `src/data/illustrations.json`. Until its WebP file lands in `public/illustrations/`, the slot paints a texel mosaic in the illustration palette with the same aspect ratio, so the layout never shifts. The style, sizes and drop-in steps are in [ILLUSTRATIONS.md](ILLUSTRATIONS.md); the generated prompts are in [illustration-prompts.md](illustration-prompts.md).
 
 ## Spec map
 
@@ -81,16 +72,17 @@ required). The current home sections do not use it; `PageBanner` does
 | Section content, targets and honesty per section | `apps/website/tests/section-contracts.test.ts`, `analytics-client.test.ts` |
 | Native sections | `apps/website/tests/section-contracts.test.ts` |
 | Architecture sections | `apps/website/tests/section-contracts.test.ts` |
-| Proof-strip sources, home title band, motion rules, footer release truth | `apps/website/tests/landing.test.ts` |
+| Band copy budgets and routes, computed counts (proof, native slice), band order, home title band, motion rules, footer release truth | `apps/website/tests/landing.test.ts` |
+| Illustration slots and prompts | `apps/website/tests/illustrations.test.ts` |
 | Banned claims the repository contradicts (size, native targets, parity) | `apps/website/tests/copy-honesty.test.ts` |
-| Four sections in blueprint order, no islands inside `[data-tx-landing]`, CTAs, the announced install copy, reveal under reduced motion | `tests/e2e/site-landing.spec.ts` |
+| Ten bands in order, alternating art and growing texel marks, no islands or code blocks inside `[data-tx-landing]`, CTAs, the announced install copy, the art below the copy on a phone, reveal under reduced motion | `tests/e2e/site-landing.spec.ts` |
 | Landing header on desktop and phone | `tests/e2e/site-ia.spec.ts` |
 | axe in light and dark | the page sweep, `tests/e2e/a11y-site-<n>.spec.ts` |
 | Phone width (360 and 768 px, right to left too) | `tests/e2e/site-responsive.spec.ts` |
 | Page weight against the `/` budget | `tests/e2e/site-perf.spec.ts` |
 
 ```bash
-pnpm vitest run apps/website/tests/section-contracts.test.ts apps/website/tests/copy-honesty.test.ts
+pnpm vitest run apps/website/tests/landing.test.ts apps/website/tests/illustrations.test.ts apps/website/tests/section-contracts.test.ts apps/website/tests/copy-honesty.test.ts
 pnpm build
 TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-landing.spec.ts tests/e2e/site-ia.spec.ts --project=chromium
 ```
@@ -118,7 +110,7 @@ TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-landing.spec.ts 
   `/web-and-native/` has its own HTML budget there (26 KB gzip);
   `/native/` fits the default and has none.
 - **Rendered theme checks:** the highlighted `mark` in `WebCorrelation`
-  and the `WebAgentsCta` band use `color-mix()`; the static theme sweep
+  and the landing bands use `color-mix()`; the static theme sweep
   does not measure them ([site-theme-sweep.md](site-theme-sweep.md)).
 
 ## Gates

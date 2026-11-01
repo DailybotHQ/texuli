@@ -22,25 +22,51 @@ test('sections in order, working calls to action, announced copy, motion only on
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(`${origin()}/`);
   await settle(page);
-  const order = await page.$$eval(
-    '[data-tx-web-hero], [data-tx-web-why-svelte], [data-tx-web-correlation], [data-tx-web-agents]',
-    (sections) =>
-      sections.map((section) =>
-        section.hasAttribute('data-tx-web-hero')
-          ? 'hero'
-          : section.hasAttribute('data-tx-web-why-svelte')
-            ? 'why'
-            : section.hasAttribute('data-tx-web-correlation')
-              ? 'correlation'
-              : 'agents'
-      )
+  const order = await page.$$eval('[data-tx-landing] > section', (sections) =>
+    sections.map(
+      (section) =>
+        (section.hasAttribute('data-tx-home-hero') && 'hero') ||
+        (section.hasAttribute('data-tx-home-pitch') && 'pitch') ||
+        section.getAttribute('data-tx-home-story') ||
+        (section.hasAttribute('data-tx-home-proof') && 'proof') ||
+        (section.hasAttribute('data-tx-home-quickstart') && 'quickstart') ||
+        (section.hasAttribute('data-tx-home-final') && 'final') ||
+        'unknown'
+    )
   );
-  expect(order).toEqual(['hero', 'why', 'correlation', 'agents']);
-  await expect(page.locator('[data-tx-landing] astro-island')).toHaveCount(0);
+  expect(order).toEqual([
+    'hero',
+    'pitch',
+    'universal',
+    'web-native',
+    'brand',
+    'agents',
+    'accessible',
+    'proof',
+    'quickstart',
+    'final',
+  ]);
+  // The stories alternate their art and grow their texel mark one cube per band.
+  const stories = page.locator('[data-tx-home-story]');
+  expect(
+    await stories.evaluateAll((all) => all.map((story) => story.getAttribute('data-tx-art-side')))
+  ).toEqual(['end', 'start', 'end', 'start', 'end']);
+  expect(
+    await stories.evaluateAll((all) =>
+      all.map((story) => story.querySelectorAll('[data-tx-texel-mark] > *').length)
+    )
+  ).toEqual([1, 2, 3, 4, 5]);
+  await expect(page.locator('[data-tx-landing] pre')).toHaveCount(0);
+  await expect(page.locator('[data-tx-landing] [data-tx-illustration]')).toHaveCount(9);
   await expect(page.locator('[data-tx-hero-theme]')).toHaveCount(6);
-
-  const hero = page.locator('[data-tx-web-hero]');
-  for (const name of ['Start building', 'See the native story']) {
+  await expect(page.locator('[data-tx-landing] astro-island')).toHaveCount(0);
+  const hero = page.locator('[data-tx-home-hero]');
+  await expect(hero.getByRole('heading', { level: 1 })).toHaveText('Build any interface.');
+  const art = hero.locator('[data-tx-illustration="home-hero"]');
+  await expect(art).toBeVisible();
+  const box = await art.boundingBox();
+  expect(box?.height ?? 0).toBeGreaterThan(100);
+  for (const name of ['Start building', 'Browse components', 'Web + native']) {
     const link = hero.getByRole('link', { name });
     await link.focus();
     await expect(link).toBeFocused();
@@ -49,19 +75,17 @@ test('sections in order, working calls to action, announced copy, motion only on
   for (const [id, href] of [
     ['components', '/component-pages/'],
     ['primitives', '/primitives-page/'],
+    ['themes', '/gallery-themes/'],
     ['examples', '/examples/'],
   ] as const) {
     const stat = proof.locator(`[data-tx-hero-proof="${id}"] a`);
     await expect(stat).toHaveAttribute('href', href);
     await expect(stat).toHaveText(/^\s*\d+\s/);
   }
-  await expect(page.locator('[data-tx-corr-panel]')).toHaveCount(3);
 
-  const agents = page.locator('[data-tx-web-agents]');
-  const copy = agents.getByRole('button', { name: 'Copy install command' });
-  await copy.scrollIntoViewIfNeeded();
+  const copy = hero.getByRole('button', { name: 'Copy install command' });
   await copy.focus();
-  const status = agents.locator('[data-copy-command-status]');
+  const status = hero.locator('[data-copy-command-status]');
   await expect(status).toHaveText('');
   await page.keyboard.press('Enter');
   // Either outcome is announced: copied (clipboard allowed) or failed (denied).
@@ -71,11 +95,18 @@ test('sections in order, working calls to action, announced copy, motion only on
     page.$$eval('[data-tx-landing] > section', (sections) =>
       sections.map((section) => section.getAnimations().length)
     );
-  expect(await animated()).toEqual([0, 0, 0, 0]);
+  expect((await animated()).every((count) => count === 0)).toBe(true);
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   const counts = await animated();
   expect(counts[0]).toBe(0);
   if (await page.evaluate(() => CSS.supports('animation-timeline: view()')))
     expect(counts.slice(1).every((count) => count > 0)).toBe(true);
   expect(foreign).toEqual([]);
+
+  // On a phone the hero art drops below the copy and calls to action.
+  await page.setViewportSize({ width: 360, height: 800 });
+  const cta = await hero.getByRole('link', { name: 'Start building' }).boundingBox();
+  const artBox = await art.boundingBox();
+  expect(artBox?.y ?? 0).toBeGreaterThan((cta?.y ?? 0) + (cta?.height ?? 0));
+  expect(artBox?.width ?? 0).toBeLessThanOrEqual(360);
 });

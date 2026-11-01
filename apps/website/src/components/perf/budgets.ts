@@ -210,8 +210,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/component-pages/',
     reason:
-      'The catalog index lists every component with its summary and authoring guidance; the PLAN_006 catalog audit (T-81) added per-component guidance: measured 24.3 KB gzip, limit 26. PLAN_010 (motion and the API contract in the shared components): measured 98.1 KB page, limit 103 (+4% headroom). PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (ADR-020, second amendment); measured 104.5 KB page (+4% headroom).',
-    budget: { pageGzipKb: 109, htmlGzipKb: 26 },
+      'The catalog index lists every component with its summary and authoring guidance; the PLAN_006 catalog audit (T-81) added per-component guidance: measured 24.3 KB gzip, limit 26. PLAN_010 (motion and the API contract in the shared components): measured 98.1 KB page, limit 103 (+4% headroom). PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (ADR-020, second amendment); measured 104.5 KB page (+4% headroom). PLAN_012 (the page banner now renders: its texel fallback and the illustration styles): CI on Linux measured 226.1 KB raw HTML before the fallback was slimmed, limit 236 (+4% headroom).',
+    budget: { pageGzipKb: 109, htmlGzipKb: 26, htmlRawKb: 236 },
   },
   {
     route: '/web-and-native/',
@@ -222,8 +222,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/gallery-themes/',
     reason:
-      'The first 24 cards are in the HTML (18.8 KB gzip at FIX-site-perf-routes); the full 210-card list is fetched as /theme-gallery.json (17.9 KB) and each shown card loads its theme CSS. The PLAN_006 gallery audit (T-83) enriched the cards: 228.6 KB raw, 64.9 KB JS, limits 232 / 68. PLAN_009 (handler composition and ref props in the shared components) measured 24.1 KB gzip of HTML, limit 26 (+4% headroom). PLAN_010 (motion and the API contract in the shared components): measured 133.2 KB page, limit 139 (+4% headroom). PLAN_010 (motion and the API contract in the shared components): measured 69.4 KB JS, limit 73 (+4% headroom). PLAN_010 T-site-080 (measured 2026-10-29 on f9809246 with this task’s pages; none of its islands loads on this route, and swapping its one texuli root import left the number unchanged): the shared component code of the 0.8.0 wave (the texuli and primitives labels moved to the i18n message catalog, and the SSR-safe Select.Value): measured 73.3 KB JS and 137.2 KB page, limits 77 and 143 (+4% headroom).',
-    budget: { htmlRawKb: 232, htmlGzipKb: 26, pageGzipKb: 143, jsGzipKb: 77 },
+      'The first 24 cards are in the HTML (18.8 KB gzip at FIX-site-perf-routes); the full 210-card list is fetched as /theme-gallery.json (17.9 KB) and each shown card loads its theme CSS. The PLAN_006 gallery audit (T-83) enriched the cards: 228.6 KB raw, 64.9 KB JS, limits 232 / 68. PLAN_009 (handler composition and ref props in the shared components) measured 24.1 KB gzip of HTML, limit 26 (+4% headroom). PLAN_010 (motion and the API contract in the shared components): measured 133.2 KB page, limit 139 (+4% headroom). PLAN_010 (motion and the API contract in the shared components): measured 69.4 KB JS, limit 73 (+4% headroom). PLAN_010 T-site-080 (measured 2026-10-29 on f9809246 with this task’s pages; none of its islands loads on this route, and swapping its one texuli root import left the number unchanged): the shared component code of the 0.8.0 wave (the texuli and primitives labels moved to the i18n message catalog, and the SSR-safe Select.Value): measured 73.3 KB JS and 137.2 KB page, limits 77 and 143 (+4% headroom). PLAN_012 (the page banner now renders): CI on Linux measured 234 KB raw HTML before the fallback was slimmed, limit 244 (+4% headroom).',
+    budget: { htmlRawKb: 244, htmlGzipKb: 26, pageGzipKb: 143, jsGzipKb: 77 },
   },
   {
     route: '/theme-switcher/',
@@ -279,8 +279,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/mcp-server/',
     reason:
-      'PLAN_011 T-site-090: a static page (no island) whose tables are generated from the operations registry (every tool with its summary, arguments, doors and limits; resources, prompts, WebMCP tools) plus setup snippets for six hosts: 21.2 KB gzip of HTML, inside the HTML budget. The shared docs shell (header, sidebar, search and the token-adopted base CSS) was about 78 KB of the total. Measured 2026-10-30: 100.3 KB page (+4% headroom); 78.7 KB after the shell trim of the same day.',
-    budget: { pageGzipKb: 105 },
+      'PLAN_011 T-site-090: a static page (no island) whose tables are generated from the operations registry (every tool with its summary, arguments, doors and limits; resources, prompts, WebMCP tools) plus setup snippets for six hosts: 21.2 KB gzip of HTML, inside the HTML budget. The shared docs shell (header, sidebar, search and the token-adopted base CSS) was about 78 KB of the total. Measured 2026-10-30: 100.3 KB page (+4% headroom); 78.7 KB after the shell trim of the same day. PLAN_012 (the MCP banner slot: its texel fallback, alt text and the illustration styles): CI on Linux measured 26.3 KB gzip of HTML before the fallback was slimmed, 25.7 KB locally after, limit 27.4 (+4% headroom).',
+    budget: { pageGzipKb: 105, htmlGzipKb: 27.4 },
   },
   {
     route: '/tokens/',

@@ -1,0 +1,84 @@
+---
+/**
+ * Landing band 10 (PLAN_012 T-landing-close): the closing call to action
+ * over the `home-final` band art (its upper area is left open for the copy).
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../foundation/site.ts';
+import SiteIllustration from '../../landing/SiteIllustration.astro';
+import { HOME_FINAL } from './home-content.ts';
+
+const base = import.meta.env.BASE_URL;
+const resolveHref = (href: string): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  return safe === undefined ? undefined : withBase(base, safe);
+};
+---
+
+<section class="home-final" aria-labelledby="home-final-title" data-tx-home-final="">
+  <div class="home-final__inner">
+    <div class="home-final__copy">
+      <h2 id="home-final-title">{HOME_FINAL.title}</h2>
+      <p>{HOME_FINAL.sub}</p>
+      <div class="home-final__actions">
+        {
+          HOME_FINAL.actions.map((link) => (
+            <a href={resolveHref(link.href)} class={`home-cta home-cta--${link.role}`}>
+              {link.label}
+              {link.role === 'text' && <span aria-hidden="true">&nbsp;→</span>}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+    <div class="home-final__art">
+      <SiteIllustration art={HOME_FINAL.slot} />
+    </div>
+  </div>
+</section>
+
+<style>
+  .home-final {
+    background: var(--home-ground);
+  }
+  .home-final__inner {
+    display: grid;
+    gap: 2rem;
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-block: clamp(3rem, 8vw, 6rem);
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+    justify-items: center;
+    text-align: center;
+  }
+  .home-final__copy {
+    display: grid;
+    gap: 1rem;
+    justify-items: center;
+    max-inline-size: 40rem;
+  }
+  .home-final h2 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(2.25rem, 7vw, 4rem);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    font-weight: 800;
+    text-wrap: balance;
+  }
+  .home-final__copy p {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: clamp(1rem, 2.4vw, 1.2rem);
+  }
+  .home-final__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem 1rem;
+  }
+  .home-final__art {
+    inline-size: 100%;
+  }
+</style>

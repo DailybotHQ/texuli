@@ -20,13 +20,12 @@ import { LAYERS as GUARD_LAYERS } from '../../../scripts/check-layers.ts';
 import * as layers from '../src/components/sections/architecture/layers-data.ts';
 import * as parity from '../src/components/sections/architecture/parity-data.ts';
 import * as portability from '../src/components/sections/architecture/portability-content.ts';
+import * as home from '../src/components/sections/home/home-content.ts';
 import * as nativeEvidence from '../src/components/sections/native/native-evidence-data.ts';
 import * as nativeHero from '../src/components/sections/native/native-hero-content.ts';
+import * as nativeParity from '../src/components/sections/native/native-parity.ts';
 import * as whyKmp from '../src/components/sections/native/why-kmp-content.ts';
-import * as webAgents from '../src/components/sections/web/web-agents-content.ts';
 import * as webCorrelation from '../src/components/sections/web/web-correlation-content.ts';
-import * as webHero from '../src/components/sections/web/web-hero-content.ts';
-import * as webWhy from '../src/components/sections/web/web-why-svelte-content.ts';
 import { DISCOVERY_FILE_TYPES } from '../src/components/seo/agent-discovery.ts';
 
 function findRepoRoot(): string {
@@ -69,23 +68,6 @@ const claims: Claim[] = [
     text: limit.text,
     sources: limit.sources,
   })),
-  { name: 'why-svelte lede', ...webWhy.WEB_WHY_LEDE },
-  ...[...webWhy.WEB_WHY_STORY, ...webWhy.WEB_WHY_GUARANTEES].map((claim) => ({
-    name: `why-svelte ${claim.title}`,
-    text: claim.body,
-    sources: claim.sources,
-  })),
-  ...webWhy.WEB_WHY_LADDER.map((row) => ({
-    name: `why-svelte ladder ${row.layer}`,
-    text: row.role,
-    sources: row.sources,
-  })),
-  { name: 'agents lede', ...webAgents.WEB_AGENTS_LEDE },
-  ...webAgents.WEB_AGENTS_STEPS.map((step) => ({
-    name: `agents step ${step.title}`,
-    text: step.body,
-    sources: step.sources,
-  })),
   { name: 'why-kmp lede', ...whyKmp.WHY_KMP_LEDE },
   ...whyKmp.WHY_KMP_CLAIMS.map((claim) => ({
     name: `why-kmp ${claim.title}`,
@@ -108,7 +90,6 @@ const excerpts: Excerpt[] = [
     file: excerpt.file,
     code: excerpt.segments.map((segment) => segment.text).join(''),
   })),
-  ...webWhy.WEB_WHY_LADDER.map((row) => ({ name: `why-svelte ${row.layer}`, ...row.excerpt })),
   ...whyKmp.WHY_KMP_EXCERPTS.map((excerpt) => ({ name: 'why-kmp', ...excerpt })),
   ...webCorrelation.WEB_CORR_PANELS.flatMap((panel) =>
     panel.excerpts.map((excerpt) => ({ name: `correlation ${panel.id}`, ...excerpt }))
@@ -244,14 +225,16 @@ function sectionTemplates(): { file: string; source: string }[] {
 describe('links and sinks', () => {
   it('every section link is a path-only on-site route that exists', () => {
     const hrefs = [
-      ...webHero.WEB_HERO_ACTIONS,
-      webHero.WEB_HERO_NEWS,
-      ...webHero.WEB_HERO_GRID_LINKS,
-      ...webAgents.WEB_AGENTS_CTA_LINKS,
-      ...webAgents.WEB_AGENTS_SURFACES,
-      ...webWhy.WEB_WHY_STORY,
-      ...webWhy.WEB_WHY_LADDER,
-      ...webWhy.WEB_WHY_GUARANTEES,
+      ...home.HOME_HERO.actions,
+      ...home.HOME_PITCH.steps,
+      ...home.HOME_STORIES.flatMap((story) => [
+        ...(story.points ?? []).flatMap((point) =>
+          point.href === undefined ? [] : [{ href: point.href }]
+        ),
+        ...(story.chips ?? []),
+        ...(story.actions ?? []),
+      ]),
+      ...home.HOME_FINAL.actions,
       webCorrelation.WEB_CORR_DEMO_LINK,
       webCorrelation.WEB_CORR_ARCH_LINK,
       ...portability.PORTABILITY_LINKS,
@@ -276,7 +259,14 @@ describe('links and sinks', () => {
       expect(source.match(/href="\/[^"]*"/g) ?? [], file).toEqual([]);
       if (/<a\b/.test(source)) expect(source, file).toMatch(/withBase\(|safeHref\(/);
     }
-    for (const file of ['web/WebHero.astro', 'web/WebAgentsCta.astro', 'web/WebWhySvelte.astro']) {
+    for (const file of [
+      'home/HomeHero.astro',
+      'home/HomePitch.astro',
+      'home/LandingStory.astro',
+      'home/HomeProof.astro',
+      'home/HomeQuickstart.astro',
+      'home/HomeFinal.astro',
+    ]) {
       expect(readFileSync(join(SECTIONS_DIR, file), 'utf8'), file).toContain(
         "safeHref(href, 'developer')"
       );
@@ -293,10 +283,8 @@ describe('honesty', () => {
       nativeEvidence,
       nativeHero,
       whyKmp,
-      webAgents,
+      home,
       webCorrelation,
-      webHero,
-      webWhy,
     ]);
     for (const banned of [/coming soon/i, /production-ready/i, /write once/i, /iOS today/i]) {
       expect(copy, String(banned)).not.toMatch(banned);
@@ -308,5 +296,52 @@ describe('honesty', () => {
     expect([...statuses].every((status) => ['exists', 'in-repo', 'planned'].includes(status))).toBe(
       true
     );
+  });
+});
+
+describe('native claims follow the generated parity matrix (PLAN_012)', () => {
+  const parityJson = JSON.parse(readRepo('native/docs/parity.json')) as {
+    totals: { painted: number; catalog: number; agentEmittable: number; goldenTraces: number };
+  };
+
+  it('reads every native count on the site from native/docs/parity.json', () => {
+    expect(nativeParity.NATIVE_SLICE).toEqual({
+      painted: parityJson.totals.painted,
+      total: parityJson.totals.catalog,
+      goldenTraces: parityJson.totals.goldenTraces,
+    });
+    expect(nativeParity.NATIVE_CHARTS.painted).toEqual([
+      'charts-bullet',
+      'charts-gauge',
+      'charts-progress-ring',
+      'charts-sparkline',
+    ]);
+    const shipped = nativeEvidence.NATIVE_SHIPPED.join(' ');
+    expect(shipped).toContain(
+      `paints ${parityJson.totals.painted} of the ${parityJson.totals.catalog}`
+    );
+    const charts = parity.PARITY_ROWS.find((row) => row.capability === 'Charts');
+    expect(charts?.native.detail).toContain(
+      `of ${nativeParity.NATIVE_CHARTS.total} chart components`
+    );
+  });
+
+  it('carries no stale native count or claim in the docs or on the site', () => {
+    const sources = [
+      readRepo('native/README.md'),
+      readRepo('native/docs/ADOPTION.md'),
+      JSON.stringify([parity, nativeEvidence, nativeHero]),
+    ].join('\n');
+    for (const stale of [
+      /\b133 (?:spec )?vocabulary/,
+      /\b41 (?:may be emitted|emittable)/,
+      /other 92\b/,
+      /all nine spec goldens/,
+      /all four goldens/,
+      /full engine generated from the spec.s token roles is planned/,
+    ])
+      expect(sources, String(stale)).not.toMatch(stale);
+    expect(readRepo('native/docs/ADOPTION.md')).toContain('[PARITY.md](PARITY.md)');
+    expect(readRepo('native/README.md')).toContain('[web ↔ native parity matrix](docs/PARITY.md)');
   });
 });

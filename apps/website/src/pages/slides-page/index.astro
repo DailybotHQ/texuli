@@ -6,6 +6,7 @@
  * and background galleries and components on slides. Every island mounts
  * when it scrolls into view; everything else is static HTML.
  */
+import PageBanner from '../../components/landing/PageBanner.astro';
 import BackgroundsGallery from '../../components/slides-site/BackgroundsGallery.svelte';
 import ComponentsShowcase from '../../components/slides-site/ComponentsShowcase.svelte';
 import DeckEditorApp from '../../components/slides-site/editor/DeckEditorApp.svelte';
@@ -32,6 +33,7 @@ const section = (id: string) => {
 >
   <div class="slides-page" data-tx-slides-page="">
     <header class="slides-page__hero">
+      <PageBanner art="page-slides" />
       <p class="eyebrow">@texuli/slides · in development</p>
       <h1>Decks from JSON or Markdown, on one stage</h1>
       <p class="lead">

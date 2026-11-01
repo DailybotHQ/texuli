@@ -9,24 +9,29 @@ import { join } from 'node:path';
 import { illustrationFor, illustrationSrc } from './illustrations.ts';
 
 interface Props {
-  slot: string;
+  /** The illustration slot id (not `slot`, which Astro reserves; see PageBanner). */
+  art: string;
   class?: string;
   /** Override alt from the manifest when the surrounding context needs a different description. */
   alt?: string;
 }
 
-const { slot, class: className = '', alt: altOverride } = Astro.props;
+const { art: slot, class: className = '', alt: altOverride } = Astro.props;
 const entry = illustrationFor(slot);
 if (!entry) {
   throw new Error(`Unknown illustration slot "${slot}". Add it to src/data/illustrations.json.`);
 }
 
 const base = import.meta.env.BASE_URL;
-const publicFile = join(process.cwd(), 'apps/website/public/illustrations', entry.file);
 // When building from apps/website, cwd may already be the app root.
-const altPublic = join(process.cwd(), 'public/illustrations', entry.file);
-const hasFile = existsSync(publicFile) || existsSync(altPublic);
+const exists = (file: string) =>
+  existsSync(join(process.cwd(), 'apps/website/public/illustrations', file)) ||
+  existsSync(join(process.cwd(), 'public/illustrations', file));
+const hasFile = exists(entry.file);
+const hasDark = hasFile && entry.fileDark !== undefined && exists(entry.fileDark);
 const src = illustrationSrc(entry.file, base);
+const darkSrc = hasDark && entry.fileDark ? illustrationSrc(entry.fileDark, base) : undefined;
+const eager = entry.priority === true;
 const alt = altOverride ?? entry.alt;
 const ratio = `${entry.width} / ${entry.height}`;
 
@@ -46,21 +51,42 @@ const tiles = Array.from({ length: 48 }, (_, index) => {
 ---
 
 <figure
-  class:list={['site-illustration', className, { 'site-illustration--fallback': !hasFile }]}
+  class:list={[
+    'site-illustration',
+    `site-illustration--${entry.variant}`,
+    className,
+    { 'site-illustration--fallback': !hasFile, 'site-illustration--has-dark': hasDark },
+  ]}
   data-tx-illustration={slot}
+  data-tx-illustration-variant={entry.variant}
   data-tx-illustration-ready={hasFile ? 'file' : 'fallback'}
   style={`--si-w:${entry.width};--si-h:${entry.height};--si-ratio:${ratio};`}
 >
   {
     hasFile ? (
-      <img
-        src={src}
-        alt={alt}
-        width={entry.width}
-        height={entry.height}
-        loading="lazy"
-        decoding="async"
-      />
+      <>
+        <img
+          class="site-illustration__light"
+          src={src}
+          alt={alt}
+          width={entry.width}
+          height={entry.height}
+          loading={eager ? 'eager' : 'lazy'}
+          fetchpriority={eager ? 'high' : undefined}
+          decoding={eager ? 'sync' : 'async'}
+        />
+        {darkSrc && (
+          <img
+            class="site-illustration__dark"
+            src={darkSrc}
+            alt={alt}
+            width={entry.width}
+            height={entry.height}
+            loading="lazy"
+            decoding="async"
+          />
+        )}
+      </>
     ) : (
       <div
         class="site-illustration__fallback"
@@ -69,7 +95,7 @@ const tiles = Array.from({ length: 48 }, (_, index) => {
         style={`aspect-ratio:${ratio};`}
       >
         <div class="site-illustration__texels" aria-hidden="true">
-          {tiles.map((tone) => <span class={`texel texel--${tone}`} />)}
+          {tiles.map((tone) => (tone === 0 ? <i /> : <i class={`t${tone}`} />))}
         </div>
       </div>
     )
@@ -87,6 +113,33 @@ const tiles = Array.from({ length: 48 }, (_, index) => {
     inline-size: 100%;
     max-inline-size: 100%;
   }
+  /* Landing plates and bands sit flush on the light theme (the art carries
+     its own light ground); the dark theme frames them with a soft glow so
+     the light ground reads as a lit product shot, not a patch. */
+  .site-illustration--plate,
+  .site-illustration--band {
+    border-color: transparent;
+    background: transparent;
+  }
+  :global(:root[data-tx-mode='dark']) .site-illustration--plate,
+  :global(:root[data-tx-mode='dark']) .site-illustration--band {
+    border-color: color-mix(in oklab, var(--tx-primary) 35%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--tx-primary) 18%, transparent),
+      0 1.5rem 4rem -1.5rem color-mix(in oklab, var(--tx-primary) 45%, transparent);
+  }
+  .site-illustration__dark {
+    display: none !important;
+  }
+  :global(:root[data-tx-mode='dark']) .site-illustration--has-dark .site-illustration__light {
+    display: none !important;
+  }
+  :global(:root[data-tx-mode='dark']) .site-illustration--has-dark .site-illustration__dark {
+    display: block !important;
+  }
+  :global(:root[data-tx-mode='dark']) .site-illustration--has-dark {
+    border-color: transparent;
+    box-shadow: none;
+  }
   .site-illustration img {
     display: block;
     inline-size: 100%;
@@ -99,11 +152,7 @@ const tiles = Array.from({ length: 48 }, (_, index) => {
     inline-size: 100%;
     overflow: hidden;
     background:
-      radial-gradient(
-        90% 120% at 100% 0%,
-        color-mix(in oklab, var(--tx-primary) 14%, transparent),
-        transparent 60%
-      ),
+      radial-gradient(90% 120% at 100% 0%, rgb(109 74 255 / 0.14), transparent 60%),
       color-mix(in oklab, var(--tx-muted) 60%, var(--tx-background));
   }
   .site-illustration__texels {
@@ -115,24 +164,29 @@ const tiles = Array.from({ length: 48 }, (_, index) => {
     gap: clamp(4px, 1.1vw, 10px);
     padding: clamp(10px, 3vw, 28px);
   }
-  .texel {
+  /* Lean markup: bare <i> cells (no scope attribute each), tones as t1–t4. */
+  .site-illustration__texels > :global(i) {
     aspect-ratio: 1;
     border-radius: 22%;
     border: 1px solid color-mix(in oklab, var(--tx-border) 70%, transparent);
   }
-  .texel--1 {
-    background: color-mix(in oklab, var(--tx-primary) 12%, var(--tx-background));
+  /* Fallback texels use the illustration palette (docs/ILLUSTRATIONS.md):
+     lilac glass, a stronger lilac, the brand violet, and the rare orange. */
+  .site-illustration__texels > :global(.t1) {
+    background: color-mix(in oklab, #b9a8ff 22%, var(--tx-background));
   }
-  .texel--2 {
-    background: color-mix(in oklab, var(--tx-primary) 32%, var(--tx-background));
+  .site-illustration__texels > :global(.t2) {
+    background: color-mix(in oklab, #b9a8ff 55%, var(--tx-background));
     border-color: transparent;
   }
-  .texel--3 {
-    background: color-mix(in oklab, var(--tx-primary) 72%, var(--tx-background));
+  .site-illustration__texels > :global(.t3) {
+    background: #6d4aff;
     border-color: transparent;
   }
-  .texel--4 {
-    background: var(--tx-accent-foreground, var(--tx-foreground));
+  /* The rare strong texel is the social image's warm orange highlight
+     (docs/ILLUSTRATIONS.md palette), decorative only. */
+  .site-illustration__texels > :global(.t4) {
+    background: oklch(0.76 0.15 50);
     border-color: transparent;
   }
   @media (forced-colors: active) {
@@ -140,7 +194,7 @@ const tiles = Array.from({ length: 48 }, (_, index) => {
       border-color: CanvasText;
     }
     .texel--3,
-    .texel--4 {
+    .site-illustration__texels > :global(.t4) {
       background: CanvasText;
     }
   }

@@ -224,7 +224,8 @@ export async function polishProblems(page: Page): Promise<string[]> {
       }
     }
     for (const slot of document.querySelectorAll('[data-tx-illustration-ready="fallback"]')) {
-      if (!slot.querySelector('.texel')) problems.push('illustration fallback without its mosaic');
+      if (!slot.querySelector('.site-illustration__texels > i'))
+        problems.push('illustration fallback without its mosaic');
     }
     const match = standIn.exec(document.body.innerText);
     if (match) problems.push(`stand-in copy after load: "${match[0]}"`);

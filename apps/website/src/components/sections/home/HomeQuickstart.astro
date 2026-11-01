@@ -1,0 +1,141 @@
+---
+/**
+ * Landing band 9 (PLAN_012 T-landing-close): three numbered steps from
+ * install to interface, the one copyable command, and the `home-quickstart`
+ * plate.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../foundation/site.ts';
+import SiteIllustration from '../../landing/SiteIllustration.astro';
+import CopyCommand from './CopyCommand.astro';
+import { HOME_INSTALL_COMMAND, HOME_QUICKSTART } from './home-content.ts';
+
+const base = import.meta.env.BASE_URL;
+const resolveHref = (href: string): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  return safe === undefined ? undefined : withBase(base, safe);
+};
+---
+
+<section class="home-start" aria-labelledby="home-start-title" data-tx-home-quickstart="">
+  <div class="home-start__inner">
+    <div class="home-start__copy">
+      <h2 id="home-start-title">{HOME_QUICKSTART.title}</h2>
+      <ol class="home-start__steps">
+        {
+          HOME_QUICKSTART.steps.map((step, index) => (
+            <li>
+              <span class="home-start__number" aria-hidden="true">{index + 1}</span>
+              <div class="home-start__text">
+                <h3>
+                  {step.href ? <a href={resolveHref(step.href)}>{step.title}</a> : step.title}
+                </h3>
+                <p>{step.body}</p>
+                {index === 0 && <CopyCommand command={HOME_INSTALL_COMMAND} />}
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="home-start__note">{HOME_QUICKSTART.note}</p>
+    </div>
+    <div class="home-start__art">
+      <SiteIllustration art={HOME_QUICKSTART.slot} />
+    </div>
+  </div>
+</section>
+
+<style>
+  .home-start {
+    border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 60%, transparent);
+  }
+  .home-start__inner {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-block: clamp(3rem, 8vw, 6rem);
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+    align-items: center;
+  }
+  @media (min-width: 56rem) {
+    .home-start__inner {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+  .home-start__copy {
+    display: grid;
+    gap: 1.25rem;
+  }
+  .home-start h2 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(1.9rem, 5vw, 3rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    font-weight: 800;
+    text-wrap: balance;
+  }
+  .home-start__steps {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .home-start__steps li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid color-mix(in oklab, var(--home-accent) 18%, var(--tx-border));
+    border-radius: 1rem;
+    background: var(--tx-background);
+  }
+  .home-start__number {
+    display: grid;
+    place-items: center;
+    inline-size: 2.25rem;
+    block-size: 2.25rem;
+    border-radius: 0.6rem;
+    background: var(--home-accent);
+    color: var(--home-accent-ink);
+    font-weight: 800;
+  }
+  .home-start__text {
+    display: grid;
+    gap: 0.4rem;
+    justify-items: start;
+    min-inline-size: 0;
+  }
+  .home-start h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 750;
+  }
+  .home-start h3 a {
+    color: var(--tx-foreground);
+    text-decoration-color: color-mix(in oklab, var(--home-accent) 60%, transparent);
+    text-underline-offset: 0.2em;
+  }
+  .home-start h3 a:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .home-start__text p {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+  }
+  .home-start__note {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: 0.85rem;
+  }
+  @media (forced-colors: active) {
+    .home-start__number {
+      border: 1px solid CanvasText;
+      background: Canvas;
+      color: CanvasText;
+    }
+  }
+</style>

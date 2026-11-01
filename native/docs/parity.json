@@ -1,0 +1,1863 @@
+{
+  "specVersion": "0.10.0",
+  "totals": {
+    "catalog": 168,
+    "painted": 21,
+    "placeholder": 147,
+    "agentEmittable": 75,
+    "agentEmittablePainted": 21,
+    "semanticRules": 32,
+    "goldenTraces": 15,
+    "goldenCovered": 34
+  },
+  "unknownNativeIds": [],
+  "groups": [
+    {
+      "group": "canvas",
+      "total": 1,
+      "painted": 0
+    },
+    {
+      "group": "chat",
+      "total": 2,
+      "painted": 0
+    },
+    {
+      "group": "composition",
+      "total": 4,
+      "painted": 4
+    },
+    {
+      "group": "content",
+      "total": 35,
+      "painted": 11
+    },
+    {
+      "group": "data",
+      "total": 12,
+      "painted": 0
+    },
+    {
+      "group": "display",
+      "total": 17,
+      "painted": 0
+    },
+    {
+      "group": "documents",
+      "total": 1,
+      "painted": 0
+    },
+    {
+      "group": "forms",
+      "total": 29,
+      "painted": 0
+    },
+    {
+      "group": "layouts",
+      "total": 27,
+      "painted": 6
+    },
+    {
+      "group": "overlays",
+      "total": 26,
+      "painted": 0
+    },
+    {
+      "group": "schema-forms",
+      "total": 1,
+      "painted": 0
+    },
+    {
+      "group": "sheets",
+      "total": 1,
+      "painted": 0
+    },
+    {
+      "group": "state",
+      "total": 11,
+      "painted": 0
+    },
+    {
+      "group": "workflows",
+      "total": 1,
+      "painted": 0
+    }
+  ],
+  "capabilities": [
+    {
+      "name": "Blueprint contract and validation",
+      "web": "Validates and renders the spec through @texuli/spec and @texuli/player.",
+      "native": "Validates the same spec version from the generated Kotlin; invalid fixtures are refused identically.",
+      "status": "parity",
+      "evidence": [
+        "native/texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/SpecValidator.kt",
+        "native/conformance/src/jvmTest/kotlin/com/texuli/conformance/InvalidFixtureParityTest.kt"
+      ]
+    },
+    {
+      "name": "Semantic conformance (golden traces)",
+      "web": "Writes one semantic trace per golden blueprint.",
+      "native": "Produces the same trace for every golden; a semantic gate, not a pixel test.",
+      "status": "parity",
+      "evidence": [
+        "native/conformance/web/trace.ts",
+        "native/conformance/src/jvmTest/kotlin/com/texuli/conformance/GoldenConformanceTest.kt"
+      ]
+    },
+    {
+      "name": "Label interpolation (i18n messages)",
+      "web": "Interpolates component labels with @texuli/core/i18n.",
+      "native": "Produces the same strings on the shared interpolation vectors.",
+      "status": "parity",
+      "evidence": [
+        "packages/core/tests/fixtures/i18n-vectors.json",
+        "native/conformance/src/jvmTest/kotlin/com/texuli/conformance/MessagesParityTest.kt"
+      ]
+    },
+    {
+      "name": "Painting catalog components",
+      "web": "Every catalog component.",
+      "native": "The ids in NativeRegistry; every other id paints a visible placeholder (see the table).",
+      "status": "partial",
+      "evidence": [
+        "native/texuli-compose/src/commonMain/kotlin/com/texuli/compose/Registry.kt",
+        "native/texuli-compose/src/commonMain/kotlin/com/texuli/compose/BlueprintView.kt"
+      ]
+    },
+    {
+      "name": "Design systems and tokens",
+      "web": "Validates, compiles and applies any design-system document (@texuli/tokens).",
+      "native": "Decodes documents and validates the envelope reference; ships token sets compiled on the web side (Default and Acme); no Kotlin compiler for a brand document yet.",
+      "status": "partial",
+      "evidence": [
+        "native/texuli-spec/src/commonMain/kotlin/com/texuli/spec/tokens/DesignTokens.kt",
+        "native/conformance/src/jvmTest/kotlin/com/texuli/conformance/DesignSystemFixtureTest.kt",
+        "native/conformance/src/jvmTest/kotlin/com/texuli/conformance/DesignTokensConformanceTest.kt"
+      ]
+    },
+    {
+      "name": "Decks",
+      "web": "Deck model v2 with masters, transitions, notes and aspect (@texuli/deck, @texuli/slides).",
+      "native": "Paints the deck layout and slides as titled sections; masters, transitions, notes and aspect paint a placeholder.",
+      "status": "partial",
+      "evidence": [
+        "native/texuli-compose/src/commonMain/kotlin/com/texuli/compose/BlueprintView.kt"
+      ]
+    },
+    {
+      "name": "Workflows",
+      "web": "Workflow editor, viewer and model (@texuli/workflows).",
+      "native": "Validates workflow graphs identically; the graph does not paint natively.",
+      "status": "validation-only",
+      "evidence": [
+        "native/texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/WorkflowValidator.kt",
+        "native/conformance/src/jvmTest/kotlin/com/texuli/conformance/WorkflowFixtureParityTest.kt"
+      ]
+    },
+    {
+      "name": "Documents, forms, canvas and sheets",
+      "web": "Editors and readers (@texuli/pages, @texuli/forms, @texuli/canvas, @texuli/sheets).",
+      "native": "Validates their envelopes and caps; no painter, no form expressions, no sheet formulas.",
+      "status": "validation-only",
+      "evidence": [
+        "native/texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/SpecValidator.kt"
+      ]
+    },
+    {
+      "name": "Data sources and dashboards",
+      "web": "Host data sources and the dashboard (@texuli/data).",
+      "native": "Validates sources; data components paint a placeholder.",
+      "status": "validation-only",
+      "evidence": ["native/texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/Source.kt"]
+    },
+    {
+      "name": "Agent tools (MCP)",
+      "web": "The local and remote MCP servers (@texuli/mcp, texuli.com/mcp).",
+      "native": "None: the tools run in Node and on the edge, not inside an app.",
+      "status": "none",
+      "evidence": ["packages/mcp/package.json"]
+    }
+  ],
+  "components": [
+    {
+      "id": "action-form",
+      "group": "state",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": true
+    },
+    {
+      "id": "alert",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "alert-dialog",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "analytics-grid",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "app-nav",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "badge",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "banner",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "blocks-code",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "blocks-data",
+      "group": "content",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": false,
+      "golden": true
+    },
+    {
+      "id": "blocks-diagram",
+      "group": "content",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "blocks-embed",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "blocks-interactive",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "blocks-map",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "blocks-media",
+      "group": "content",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "blocks-structure",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "blocks-text",
+      "group": "content",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": false,
+      "golden": true
+    },
+    {
+      "id": "breadcrumb",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "button",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "button-group",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "callout",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "canvas",
+      "group": "canvas",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": true
+    },
+    {
+      "id": "card",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "charts-area",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": false
+    },
+    {
+      "id": "charts-bar",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": true
+    },
+    {
+      "id": "charts-bubble",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": false
+    },
+    {
+      "id": "charts-bullet",
+      "group": "content",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": true,
+      "golden": false
+    },
+    {
+      "id": "charts-canvas-renderer",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": false
+    },
+    {
+      "id": "charts-cartesian",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": false
+    },
+    {
+      "id": "charts-combo",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": false
+    },
+    {
+      "id": "charts-donut",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": true
+    },
+    {
+      "id": "charts-funnel",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": false
+    },
+    {
+      "id": "charts-gauge",
+      "group": "content",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": true,
+      "golden": true
+    },
+    {
+      "id": "charts-geo-map",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": false
+    },
+    {
+      "id": "charts-geo-point-map",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": false
+    },
+    {
+      "id": "charts-heatmap",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": false
+    },
+    {
+      "id": "charts-line",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": true
+    },
+    {
+      "id": "charts-network",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": false
+    },
+    {
+      "id": "charts-pie",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": false
+    },
+    {
+      "id": "charts-progress-ring",
+      "group": "content",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": true,
+      "golden": false
+    },
+    {
+      "id": "charts-sankey",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": false
+    },
+    {
+      "id": "charts-scatter",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": false
+    },
+    {
+      "id": "charts-sparkline",
+      "group": "content",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": true,
+      "golden": true
+    },
+    {
+      "id": "charts-stacked-bar",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": true
+    },
+    {
+      "id": "charts-sunburst",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": false
+    },
+    {
+      "id": "charts-treemap",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": false
+    },
+    {
+      "id": "chat-message",
+      "group": "chat",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "chat-thread",
+      "group": "chat",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "checkbox",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "chip",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "code",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "combobox",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "command-palette",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "content-layout",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "context-menu",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "context-menu-trigger",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "control-choice",
+      "group": "state",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": true
+    },
+    {
+      "id": "control-filter",
+      "group": "state",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": true
+    },
+    {
+      "id": "control-slider",
+      "group": "state",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": true
+    },
+    {
+      "id": "control-toggle",
+      "group": "state",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": true
+    },
+    {
+      "id": "data-board",
+      "group": "data",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": true
+    },
+    {
+      "id": "data-calendar",
+      "group": "data",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "data-cohort-table",
+      "group": "data",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "data-dashboard",
+      "group": "data",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "data-dashboard-widget",
+      "group": "data",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "data-files",
+      "group": "data",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "data-filter-builder",
+      "group": "data",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "data-grid",
+      "group": "data",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": true
+    },
+    {
+      "id": "data-map",
+      "group": "data",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "data-notification-inbox",
+      "group": "data",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "data-timeline",
+      "group": "data",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "data-tree-view",
+      "group": "data",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "deck-slide",
+      "group": "layouts",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "description",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "detail-panel",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "dialog",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "document",
+      "group": "documents",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": true
+    },
+    {
+      "id": "drawer",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "dropdown-menu",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "dropdown-menu-content",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "dropdown-menu-item",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "dropdown-menu-trigger",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "empty-state",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "error-state",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "field",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "field-error",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "flow-action",
+      "group": "state",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": true
+    },
+    {
+      "id": "flow-view",
+      "group": "state",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": true
+    },
+    {
+      "id": "form",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "form-field",
+      "group": "state",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": true
+    },
+    {
+      "id": "form-submit",
+      "group": "state",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": true
+    },
+    {
+      "id": "host-region",
+      "group": "state",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "hover-card",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "hover-card-content",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "icon-button",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "inline-text",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "input",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "input-group",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "kbd",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "kpi",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "label",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "layout-auth-split",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "layout-blog",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "layout-card",
+      "group": "layouts",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": true,
+      "golden": true
+    },
+    {
+      "id": "layout-chrome",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "layout-dashboard-grid",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "layout-deck",
+      "group": "layouts",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": true,
+      "golden": true
+    },
+    {
+      "id": "layout-doc",
+      "group": "layouts",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": true,
+      "golden": true
+    },
+    {
+      "id": "layout-docs",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "layout-drawer",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "layout-dual-sidebar",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "layout-editorial",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "layout-grid",
+      "group": "layouts",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": true,
+      "golden": true
+    },
+    {
+      "id": "layout-host",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "layout-landing",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "layout-marketing",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "layout-page",
+      "group": "layouts",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": true,
+      "golden": true
+    },
+    {
+      "id": "layout-pricing",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "layout-row",
+      "group": "composition",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": false,
+      "golden": true
+    },
+    {
+      "id": "layout-settings",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "layout-sidebar",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "layout-split",
+      "group": "composition",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": false,
+      "golden": true
+    },
+    {
+      "id": "layout-stack",
+      "group": "composition",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": false,
+      "golden": true
+    },
+    {
+      "id": "layout-tile",
+      "group": "composition",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": false,
+      "golden": true
+    },
+    {
+      "id": "layout-top-nav",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "layout-wizard",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "media-composition-canvas",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "media-composition-svg",
+      "group": "content",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "media-image",
+      "group": "content",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "painted",
+      "semanticRule": true,
+      "golden": true
+    },
+    {
+      "id": "menubar",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "menubar-trigger",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "multi-select",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "nav-icon",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "navigation-menu",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "pagination",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "popover",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "popover-content",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "radio",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "radio-group",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "responsive-modal",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "schema-form",
+      "group": "schema-forms",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": true,
+      "golden": true
+    },
+    {
+      "id": "screen-outlet",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "select",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "select-content",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "select-group",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "select-item",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "select-label",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "select-portal",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "select-separator",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "select-trigger",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "select-value",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "select-viewport",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "sheet",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "sidebar",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "sortable-list",
+      "group": "state",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": true
+    },
+    {
+      "id": "split-view",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "spreadsheet",
+      "group": "sheets",
+      "capability": "unknown",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "stat",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "stepper",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "switch",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "table",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "tag",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "text-counter",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "textarea",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "time-field",
+      "group": "forms",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "timeline",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "toaster",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "tooltip",
+      "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": false
+    },
+    {
+      "id": "workflow-graph",
+      "group": "workflows",
+      "capability": "web-only",
+      "agentEmittable": true,
+      "web": "renders",
+      "native": "placeholder",
+      "semanticRule": false,
+      "golden": true
+    }
+  ]
+}

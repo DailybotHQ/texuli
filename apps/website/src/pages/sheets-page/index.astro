@@ -12,6 +12,7 @@ import { SHEET_LIMITS } from '@texuli/sheets/model';
  */
 import FeaturePage from '../../components/feature-site/FeaturePage.astro';
 import GuideCode from '../../components/guides/GuideCode.astro';
+import PageBanner from '../../components/landing/PageBanner.astro';
 import AgentSheetDemo from '../../components/sheets-site/AgentSheetDemo.svelte';
 import { AGENT_SHEET_JSON, HOSTILE_CELL_JSON } from '../../components/sheets-site/blueprint.ts';
 import CsvLab from '../../components/sheets-site/CsvLab.svelte';
@@ -99,6 +100,7 @@ const sheetHost = createSheetPlayerHost({ now: () => Date.now() });
     piecesLabel="The pieces of the sheets package"
     sections={SHEETS_SECTIONS}
   >
+    <PageBanner art="page-sheets" slot="banner" />
     <Fragment slot="lead">
       <p>
         An owned formula engine: a linear-time parser, {SHEET_FUNCTION_NAMES.length} documented

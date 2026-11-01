@@ -1,0 +1,85 @@
+/*
+ * texuli.com landing tokens and shared band styles (PLAN_012). The accent is
+ * the social image's violet (docs/ILLUSTRATIONS.md palette): #6D4AFF holds
+ * 5.2:1 on white for text and carries white text on filled buttons; the
+ * dark theme switches text accents to the lilac #B9A8FF. The light ground is
+ * the image's lavender-to-peach gradient. High contrast falls back to the
+ * site tokens.
+ */
+.landing {
+  --home-accent: #6d4aff;
+  --home-accent-text: #5b3ae6;
+  --home-accent-ink: #ffffff;
+  --home-warm: #ff8a4c;
+  --home-ground: linear-gradient(160deg, #f4f0ff 0%, #fbf8ff 45%, #fff4ee 100%);
+  --home-tint: color-mix(in oklab, #6d4aff 6%, var(--tx-background));
+}
+
+:root[data-tx-mode="dark"] .landing {
+  --home-accent-text: #b9a8ff;
+  --home-ground:
+    radial-gradient(120% 90% at 85% 0%, rgb(109 74 255 / 0.22), transparent 60%),
+    var(--tx-background);
+  --home-tint: color-mix(in oklab, #6d4aff 10%, var(--tx-background));
+}
+
+:root[data-tx-mode="high-contrast"] .landing {
+  --home-accent: var(--tx-foreground);
+  --home-accent-text: var(--tx-foreground);
+  --home-accent-ink: var(--tx-background);
+  --home-ground: var(--tx-background);
+  --home-tint: var(--tx-background);
+}
+
+/* Calls to action: filled accent, outlined, and a text link. */
+.landing .home-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 2.75rem;
+  border: 1px solid transparent;
+  border-radius: 0.65rem;
+  padding-inline: 1.25rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+.landing .home-cta--primary {
+  background: var(--home-accent);
+  color: var(--home-accent-ink);
+  box-shadow: 0 0.5rem 1.5rem -0.75rem var(--home-accent);
+}
+.landing .home-cta--primary:hover {
+  background: color-mix(in oklab, var(--home-accent) 88%, black);
+  color: var(--home-accent-ink);
+}
+.landing .home-cta--secondary {
+  border-color: var(--tx-border);
+  background: var(--tx-background);
+  color: var(--tx-foreground);
+}
+.landing .home-cta--secondary:hover {
+  background: color-mix(in oklab, var(--tx-muted) 50%, var(--tx-background));
+}
+.landing .home-cta--text {
+  min-block-size: 1.5rem;
+  padding-inline: 0;
+  color: var(--home-accent-text);
+}
+.landing .home-cta--text:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.landing .home-cta:focus-visible {
+  outline: 2px solid var(--tx-ring);
+  outline-offset: 3px;
+}
+
+@media (forced-colors: active) {
+  .landing .home-cta,
+  .landing .home-cta:hover {
+    border-color: LinkText;
+    background: Canvas;
+    color: LinkText;
+    box-shadow: none;
+  }
+}

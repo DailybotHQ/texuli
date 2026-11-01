@@ -1,0 +1,38 @@
+---
+/**
+ * The story bands' sequence mark (PLAN_012, developer follow-up): a row of
+ * texel cubes that grows by one per band (1 → 5), in place of numbered
+ * "acts". Decorative only; the kicker beside it carries the meaning.
+ */
+interface Props {
+  count: number;
+}
+
+const { count } = Astro.props;
+---
+
+<span class="texel-mark" aria-hidden="true" data-tx-texel-mark={count}>
+  {Array.from({ length: count }, (_, index) => <span class:list={['texel-mark__cube', { 'texel-mark__cube--lead': index === count - 1 }]} />)}
+</span>
+
+<style>
+  .texel-mark {
+    display: inline-flex;
+    gap: 3px;
+    align-items: flex-end;
+  }
+  .texel-mark__cube {
+    inline-size: 0.6rem;
+    block-size: 0.6rem;
+    border-radius: 2px;
+    background: color-mix(in oklab, var(--home-accent, #6d4aff) 35%, var(--tx-background));
+  }
+  .texel-mark__cube--lead {
+    background: var(--home-accent, #6d4aff);
+  }
+  @media (forced-colors: active) {
+    .texel-mark__cube {
+      background: CanvasText;
+    }
+  }
+</style>

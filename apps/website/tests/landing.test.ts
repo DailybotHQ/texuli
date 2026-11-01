@@ -8,14 +8,30 @@
  * Templates are read as source (the root config does not compile .astro);
  * the rendered pages are covered by tests/e2e/site-*.spec.ts with axe.
  */
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { loadParity, parseNativeRegistry } from '../../../scripts/native-parity.ts';
+import { NEVER_PACKED } from '../../../scripts/packages.ts';
 import { COMPONENT_PAGES } from '../src/components/component-pages/load-manifests.ts';
 import { buildExampleCatalog } from '../src/components/examples/catalog.ts';
 import { REPOSITORY_URL } from '../src/components/foundation/site.ts';
+import { illustrationFor } from '../src/components/landing/illustrations.ts';
 import { PRIMITIVES } from '../src/components/primitives-page/primitives.ts';
-import { loadHeroProof } from '../src/components/sections/web/web-hero-content.ts';
+import {
+  fillCopy,
+  HOME_FINAL,
+  HOME_HERO,
+  HOME_INSTALL_COMMAND,
+  HOME_PITCH,
+  HOME_QUICKSTART,
+  HOME_STORIES,
+  loadHomeHeroProof,
+  loadHomeProof,
+  loadNativeSlice,
+  wordCount,
+} from '../src/components/sections/home/home-content.ts';
+import { countAllThemes, HOME_NEVER_PACKED } from '../src/components/sections/home/home-data.ts';
 
 const WEBSITE = resolve(import.meta.dirname, '..');
 const read = (path: string): string => readFileSync(resolve(WEBSITE, path), 'utf8');
@@ -28,20 +44,167 @@ const footer = read('src/components/foundation/SiteFooter.astro');
 const header = read('src/components/foundation/SiteHeader.astro');
 
 describe('landing', () => {
-  it('counts the real catalog, primitives and examples, each linked to its listing through the URL policy', async () => {
-    const proof = await loadHeroProof();
+  it('counts the real catalog, primitives, themes and examples, each linked to its listing through the URL policy', async () => {
+    const proof = await loadHomeHeroProof();
     expect(proof.map((stat) => [stat.id, stat.value, stat.href])).toEqual([
       ['components', COMPONENT_PAGES.length, '/component-pages/'],
       ['primitives', PRIMITIVES.length, '/primitives-page/'],
+      ['themes', await countAllThemes(), '/gallery-themes/'],
       ['examples', buildExampleCatalog().length, '/examples/'],
     ]);
     for (const stat of proof) {
       expect(stat.value, stat.id).toBeGreaterThan(0);
       expect(routeExists(stat.href), stat.href).toBe(true);
     }
-    const hero = read('src/components/sections/web/WebHero.astro');
+    const hero = read('src/components/sections/home/HomeHero.astro');
     expect(hero).toMatch(/href=\{resolveHref\(stat\.href\)\}/);
     expect(hero).not.toMatch(/>\s*\d{2,}\s*</);
+  });
+
+  it('keeps the hero to one value proposition: badge, accent h1, a short sub, three real calls to action, one install line and the eager art', () => {
+    const hero = read('src/components/sections/home/HomeHero.astro');
+    expect(HOME_HERO.badge).toEqual(['Open source', 'MIT', 'Svelte 5', 'Kotlin Multiplatform']);
+    expect(`${HOME_HERO.title.lead} ${HOME_HERO.title.accent}`).toBe('Build any interface.');
+    expect(hero).toContain('<span class="home-hero__accent">{HOME_HERO.title.accent}</span>');
+    expect(wordCount(HOME_HERO.sub)).toBeLessThanOrEqual(25);
+    expect(HOME_HERO.sub).toMatch(/Svelte 5/);
+    expect(HOME_HERO.sub).toMatch(/Kotlin Multiplatform twin in development/);
+    expect(HOME_HERO.actions.map((link) => link.role)).toEqual(['primary', 'secondary', 'text']);
+    for (const link of HOME_HERO.actions) expect(routeExists(link.href), link.href).toBe(true);
+    expect(hero).toContain('href={resolveHref(link.href)}');
+    expect(HOME_INSTALL_COMMAND).toBe('pnpm add texuli');
+    expect(hero).toContain('<CopyCommand command={HOME_INSTALL_COMMAND} />');
+    expect(hero).toContain('<SiteIllustration art="home-hero" />');
+    expect(illustrationFor('home-hero')?.priority).toBe(true);
+    expect((hero.match(/<h1[\s>]/g) ?? []).length).toBe(1);
+    expect(hero).not.toMatch(/<pre\b/);
+  });
+
+  it('tells five illustrated stories after the pitch, with topic kickers instead of numbered acts', () => {
+    expect(HOME_STORIES.map((story) => story.kicker)).toEqual([
+      'Universal',
+      'Web + native',
+      'Your brand',
+      'For agents',
+      'Accessible',
+    ]);
+    const slots = [HOME_PITCH.slot, ...HOME_STORIES.map((story) => story.slot)];
+    expect(new Set(slots).size).toBe(6);
+    for (const slot of slots) expect(illustrationFor(slot)?.variant, slot).toBe('plate');
+    expect(wordCount(HOME_PITCH.body)).toBeLessThanOrEqual(40);
+    const links = HOME_PITCH.steps.map((step) => step.href);
+    for (const story of HOME_STORIES) {
+      expect(
+        wordCount(fillCopy(story.body, { themeCount: 210, painted: 21, total: 168 })),
+        story.id
+      ).toBeLessThanOrEqual(40);
+      expect(story.points?.length ?? 0, story.id).toBeLessThanOrEqual(3);
+      for (const item of [
+        ...(story.points ?? []),
+        ...(story.chips ?? []),
+        ...(story.actions ?? []),
+      ])
+        if (item.href) links.push(item.href);
+    }
+    for (const href of links) expect(routeExists(href), href).toBe(true);
+    const copy = JSON.stringify([HOME_PITCH, HOME_STORIES]);
+    expect(copy).not.toMatch(/\bAct\b|\bActo\b/);
+
+    const stories = read('src/components/sections/home/HomeStories.astro');
+    expect(stories).toContain("side={index % 2 === 0 ? 'end' : 'start'}");
+    expect(stories).toContain('index={index + 1}');
+    for (const file of [
+      'HomePitch.astro',
+      'HomeStories.astro',
+      'LandingStory.astro',
+      'TexelMark.astro',
+    ]) {
+      const source = read(`src/components/sections/home/${file}`);
+      expect(source, file).not.toMatch(/<pre\b|<code\b/);
+    }
+    expect(read('src/components/sections/home/TexelMark.astro')).toContain('aria-hidden="true"');
+  });
+
+  it('states the native slice from the generated parity matrix, never typed in', () => {
+    const fixture = [
+      'val implemented: Set<String> = setOf(',
+      '  "layout-page",',
+      '  // 0.8.0 (ADR-016): a comment with parentheses',
+      '  "blocks-code",',
+      ') + compactCharts',
+      'private val compactCharts = setOf("charts-gauge")',
+    ].join('\n');
+    expect(parseNativeRegistry(fixture)).toEqual(['blocks-code', 'charts-gauge', 'layout-page']);
+    expect(parseNativeRegistry(fixture.replace(' + compactCharts', ''))).toEqual([
+      'blocks-code',
+      'layout-page',
+    ]);
+    const registry = read(
+      '../../native/texuli-compose/src/commonMain/kotlin/com/texuli/compose/Registry.kt'
+    );
+    const catalog = JSON.parse(read('../../packages/spec/catalog/components.json')) as {
+      components: { id: string }[];
+    };
+    const ids = new Set(catalog.components.map((entry) => entry.id));
+    const painted = parseNativeRegistry(registry).filter((id) => ids.has(id));
+    expect(painted).toContain('layout-stack');
+    expect(painted).toContain('charts-sparkline');
+    expect(loadNativeSlice()).toEqual({ painted: painted.length, total: ids.size });
+    const report = loadParity(resolve(WEBSITE, '../..'));
+    expect(loadNativeSlice()).toEqual({
+      painted: report.totals.painted,
+      total: report.totals.catalog,
+    });
+    expect(HOME_STORIES.find((story) => story.id === 'web-native')?.points?.[1]?.label).toContain(
+      '{painted} of {total} components paint today'
+    );
+    expect(() => fillCopy('{missing}', {})).toThrow('no value for {missing}');
+  });
+
+  it('closes with computed proof, a three-step quickstart and the final call to action, and nothing else', async () => {
+    const proof = await loadHomeProof();
+    const catalog = JSON.parse(read('../../packages/spec/catalog/components.json')) as {
+      components: { emit: string[] }[];
+    };
+    const manifests = readdirSync(resolve(WEBSITE, '../../packages'))
+      .map((dir) => resolve(WEBSITE, '../../packages', dir, 'package.json'))
+      .filter((path) => existsSync(path))
+      .map((path) => JSON.parse(readFileSync(path, 'utf8')) as { name: string });
+    expect(HOME_NEVER_PACKED).toEqual(NEVER_PACKED);
+    const published = manifests.filter((manifest) => !NEVER_PACKED.includes(manifest.name)).length;
+    expect(published).toBe(26);
+    expect(proof.map((stat) => [stat.id, stat.value])).toEqual([
+      ['packages', published],
+      ['blueprint', catalog.components.length],
+      ['agent-safe', catalog.components.filter((entry) => entry.emit.includes('untrusted')).length],
+    ]);
+    for (const stat of proof) expect(routeExists(stat.href), stat.href).toBe(true);
+    expect(HOME_QUICKSTART.steps.map((step) => step.title)).toEqual([
+      'Install',
+      'Pick a theme',
+      'Compose',
+    ]);
+    for (const step of HOME_QUICKSTART.steps)
+      if (step.href) expect(routeExists(step.href), step.href).toBe(true);
+    expect(read('src/components/sections/home/HomeQuickstart.astro')).toContain(
+      '<CopyCommand command={HOME_INSTALL_COMMAND} />'
+    );
+    expect(illustrationFor(HOME_QUICKSTART.slot)?.variant).toBe('plate');
+    expect(illustrationFor(HOME_FINAL.slot)?.variant).toBe('band');
+    for (const link of HOME_FINAL.actions) expect(routeExists(link.href), link.href).toBe(true);
+
+    const bands = [...home.matchAll(/^\s{4}<(Home\w+) \/>$/gm)].map((match) => match[1]);
+    expect(bands).toEqual([
+      'HomeHero',
+      'HomePitch',
+      'HomeStories',
+      'HomeProof',
+      'HomeQuickstart',
+      'HomeFinal',
+    ]);
+    expect(home).not.toMatch(/sections\/web\//);
+    for (const gone of ['WebHero.astro', 'WebWhySvelte.astro', 'WebAgentsCta.astro'])
+      expect(existsSync(resolve(WEBSITE, 'src/components/sections/web', gone)), gone).toBe(false);
   });
 
   it('keeps the home title and description inside the SEO audit bands', () => {

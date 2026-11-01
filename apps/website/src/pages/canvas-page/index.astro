@@ -34,6 +34,7 @@ import {
 } from '../../components/canvas-site/page.ts';
 import FeaturePage from '../../components/feature-site/FeaturePage.astro';
 import GuideCode from '../../components/guides/GuideCode.astro';
+import PageBanner from '../../components/landing/PageBanner.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const section = (id: string) => {
@@ -95,6 +96,7 @@ ada.connect(hub.adapter(), { name: 'Ada', color: 1 });
     piecesLabel="The pieces of the canvas package"
     sections={CANVAS_SECTIONS}
   >
+    <PageBanner art="page-canvas" slot="banner" />
     <Fragment slot="lead">
       <p>
         Shapes, text, sticky notes, images, frames and groups, connectors that route straight, elbow

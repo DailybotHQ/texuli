@@ -1,28 +1,30 @@
 ---
-import WebAgentsCta from '../components/sections/web/WebAgentsCta.astro';
-import WebCorrelation from '../components/sections/web/WebCorrelation.astro';
-import WebHero from '../components/sections/web/WebHero.astro';
-import WebWhySvelte from '../components/sections/web/WebWhySvelte.astro';
+import HomeFinal from '../components/sections/home/HomeFinal.astro';
+import HomeHero from '../components/sections/home/HomeHero.astro';
+import HomePitch from '../components/sections/home/HomePitch.astro';
+import HomeProof from '../components/sections/home/HomeProof.astro';
+import HomeQuickstart from '../components/sections/home/HomeQuickstart.astro';
+import HomeStories from '../components/sections/home/HomeStories.astro';
+import '../components/sections/home/home.css';
 /**
- * texuli.com home (PLAN_006 T-44): the unified landing assembled from the
- * four blueprint sections in order — hero, why Svelte for the web, the
- * correlation demo, agents + closing CTA (narrative blueprint §5 s1..s4).
- * The retired minimal-landing sections (LandingHero, FeatureCards,
- * AgentsSection and their islands) are deleted with this integration.
- * JSON-LD per the T-site-ia contract, unchanged. T-79 (core punch list
- * row 2): the title and description spend the SERP and quote surface on
- * the platform claim (web today, native in development, agent-safe), and
- * the bands below the hero rise in on scroll (row 13) — CSS only, behind
+ * texuli.com home (PLAN_012): the illustrated landing in ten bands, in the
+ * order of the plan's landing IA: hero, pitch, five story bands (Universal,
+ * Web + native, Your brand, For agents, Accessible), a computed proof band,
+ * the quickstart and the final call to action. Copy lives in
+ * `components/sections/home/home-content.ts`; illustration slots in
+ * `data/illustrations.json` (docs/ILLUSTRATIONS.md). JSON-LD per the
+ * T-site-ia contract, unchanged. The bands below the hero rise in on scroll
+ * (PLAN_006 T-79 row 13): CSS only, behind
  * `prefers-reduced-motion: no-preference` and a scroll-timeline support
  * check, translate only so contrast and visibility never depend on it.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { libraryJsonLd } from '../lib/schema';
 
-const HOME_TITLE = 'One component catalog for web and native';
+const HOME_TITLE = 'Build any interface, for web and native';
 const HOME_DESCRIPTION =
-  'Interfaces from texels: one owned, accessible component catalog. Svelte 5 for the web ' +
-  'today, a Kotlin Multiplatform renderer in development, safe for agents.';
+  'One owned, accessible Svelte 5 component library to build any interface, safe for ' +
+  'agents, with a Kotlin Multiplatform renderer in development.';
 ---
 
 <BaseLayout
@@ -32,10 +34,12 @@ const HOME_DESCRIPTION =
   jsonLd={libraryJsonLd()}
 >
   <div class="landing" data-tx-landing="">
-    <WebHero />
-    <WebWhySvelte />
-    <WebCorrelation />
-    <WebAgentsCta />
+    <HomeHero />
+    <HomePitch />
+    <HomeStories />
+    <HomeProof />
+    <HomeQuickstart />
+    <HomeFinal />
   </div>
 </BaseLayout>
 
