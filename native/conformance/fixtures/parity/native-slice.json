@@ -1,0 +1,148 @@
+{
+  "format": "texuli-blueprint",
+  "version": 1,
+  "id": "parity-native-slice",
+  "catalog": "48d6231182dcdb62ed2c8816ff3f620ae9b9683612403dc7e3db00ad85ad893a",
+  "status": "draft",
+  "createdAt": "2026-10-24T09:00:00Z",
+  "updatedAt": "2026-10-24T09:00:00Z",
+  "generator": {
+    "kind": "agent",
+    "name": "Parity fixture",
+    "model": "example-model"
+  },
+  "tier": "untrusted",
+  "profile": "web",
+  "tree": {
+    "id": "layout-deck",
+    "props": {
+      "title": "Native slice",
+      "description": "Fictional parity fixture"
+    },
+    "children": [
+      {
+        "id": "deck-slide",
+        "props": {
+          "slideId": "one",
+          "title": "Compact charts"
+        },
+        "children": [
+          {
+            "id": "charts-bullet",
+            "props": {
+              "label": "Quota",
+              "value": 72,
+              "max": 100,
+              "target": 80
+            }
+          },
+          {
+            "id": "charts-progress-ring",
+            "props": {
+              "label": "Onboarding",
+              "value": 3,
+              "max": 5
+            }
+          },
+          {
+            "id": "charts-gauge",
+            "props": {
+              "label": "Load",
+              "value": 41,
+              "min": 0,
+              "max": 100
+            }
+          },
+          {
+            "id": "charts-sparkline",
+            "props": {
+              "label": "Signups",
+              "values": [3, 5, 4, 8, 9]
+            }
+          }
+        ]
+      },
+      {
+        "id": "deck-slide",
+        "props": {
+          "slideId": "two",
+          "title": "Blocks"
+        },
+        "children": [
+          {
+            "id": "blocks-code",
+            "props": {
+              "block": {
+                "type": "code",
+                "language": "ts",
+                "code": "const total = 42;"
+              }
+            }
+          },
+          {
+            "id": "blocks-diagram",
+            "props": {
+              "block": {
+                "type": "board",
+                "columns": [
+                  {
+                    "id": "todo",
+                    "title": "To do",
+                    "cards": [
+                      {
+                        "id": "c1",
+                        "title": "Draft"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "done",
+                    "title": "Done",
+                    "cards": [
+                      {
+                        "id": "c2",
+                        "title": "Review"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "blocks-media",
+            "props": {
+              "block": {
+                "type": "image",
+                "src": "media/harbor.png",
+                "alt": "Harbor at dawn"
+              }
+            }
+          },
+          {
+            "id": "blocks-structure",
+            "props": {
+              "block": {
+                "type": "columns",
+                "columns": [
+                  [
+                    {
+                      "type": "text",
+                      "markdown": "Left"
+                    }
+                  ],
+                  [
+                    {
+                      "type": "text",
+                      "markdown": "Right"
+                    }
+                  ]
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

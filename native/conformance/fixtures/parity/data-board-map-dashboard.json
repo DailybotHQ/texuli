@@ -1,0 +1,176 @@
+{
+  "format": "texuli-blueprint",
+  "version": 1,
+  "id": "parity-data-board-map-dashboard",
+  "catalog": "48d6231182dcdb62ed2c8816ff3f620ae9b9683612403dc7e3db00ad85ad893a",
+  "status": "draft",
+  "createdAt": "2026-10-24T09:00:00Z",
+  "updatedAt": "2026-10-24T09:00:00Z",
+  "generator": {
+    "kind": "agent",
+    "name": "Parity fixture",
+    "model": "example-model"
+  },
+  "tier": "untrusted",
+  "profile": "web",
+  "tree": {
+    "id": "layout-page",
+    "props": {
+      "title": "Boards, maps and dashboards",
+      "description": "Fictional parity fixture (PLAN_013)."
+    },
+    "children": [
+      {
+        "id": "data-board",
+        "props": {
+          "label": "Support board",
+          "columns": [
+            {
+              "id": "todo",
+              "title": "To do"
+            },
+            {
+              "id": "doing",
+              "title": "Doing",
+              "wipSoft": 2,
+              "wipHard": 3
+            }
+          ],
+          "items": [
+            {
+              "id": "c1",
+              "title": "Login loop",
+              "column": "doing"
+            },
+            {
+              "id": "c2",
+              "title": "Invoice copy",
+              "column": "todo"
+            }
+          ]
+        }
+      },
+      {
+        "id": "data-map",
+        "props": {
+          "label": "Port Meridian sites",
+          "markers": [
+            {
+              "id": "m1",
+              "label": "North Pier",
+              "lat": -30.4,
+              "lng": -18.7
+            },
+            {
+              "id": "m2",
+              "label": "Old Mill",
+              "lat": -31.4,
+              "lng": -19.2,
+              "tone": "warning"
+            }
+          ]
+        }
+      },
+      {
+        "id": "data-dashboard",
+        "props": {
+          "label": "Support overview",
+          "columns": 12
+        },
+        "children": [
+          {
+            "id": "data-dashboard-widget",
+            "props": {
+              "widgetId": "volume",
+              "title": "Volume",
+              "place": {
+                "x": 0,
+                "y": 0,
+                "w": 6,
+                "h": 3
+              }
+            },
+            "children": [
+              {
+                "id": "charts-line",
+                "props": {
+                  "title": "Tickets per day",
+                  "description": "Opened tickets per day.",
+                  "series": [
+                    {
+                      "id": "opened",
+                      "label": "Opened",
+                      "points": [
+                        {
+                          "x": "Mon",
+                          "y": 210
+                        },
+                        {
+                          "x": "Tue",
+                          "y": 198
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "data-dashboard-widget",
+            "props": {
+              "widgetId": "mix",
+              "title": "Channel mix",
+              "place": {
+                "w": 6,
+                "h": 3
+              }
+            },
+            "children": [
+              {
+                "id": "blocks-text",
+                "props": {
+                  "block": {
+                    "type": "text",
+                    "markdown": "Email leads this week."
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "data-filter-builder",
+        "props": {
+          "label": "Ticket filter",
+          "fields": [
+            {
+              "key": "status",
+              "header": "Status",
+              "type": "enum",
+              "options": ["open", "closed"]
+            },
+            {
+              "key": "age",
+              "header": "Age",
+              "type": "number"
+            }
+          ],
+          "value": {
+            "type": "group",
+            "op": "and",
+            "children": [
+              {
+                "type": "condition",
+                "field": "status",
+                "operator": "in",
+                "value": ["open"]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

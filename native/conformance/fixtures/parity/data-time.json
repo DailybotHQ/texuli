@@ -1,0 +1,111 @@
+{
+  "format": "texuli-blueprint",
+  "version": 1,
+  "id": "parity-data-time",
+  "catalog": "48d6231182dcdb62ed2c8816ff3f620ae9b9683612403dc7e3db00ad85ad893a",
+  "status": "draft",
+  "createdAt": "2026-10-24T09:00:00Z",
+  "updatedAt": "2026-10-24T09:00:00Z",
+  "generator": {
+    "kind": "agent",
+    "name": "Parity fixture",
+    "model": "example-model"
+  },
+  "tier": "untrusted",
+  "profile": "web",
+  "tree": {
+    "id": "layout-page",
+    "props": {
+      "title": "Time-based data",
+      "description": "Fictional parity fixture (PLAN_013)."
+    },
+    "children": [
+      {
+        "id": "data-calendar",
+        "props": {
+          "label": "Support rota",
+          "view": "month",
+          "anchor": "2026-04-13",
+          "events": [
+            {
+              "id": "standup",
+              "title": "Standup",
+              "start": "2026-04-13T09:00:00Z",
+              "end": "2026-04-13T09:15:00Z"
+            },
+            {
+              "id": "offsite",
+              "title": "Offsite",
+              "start": "2026-04-14",
+              "end": "2026-04-16",
+              "allDay": true,
+              "tone": "info"
+            }
+          ]
+        }
+      },
+      {
+        "id": "data-timeline",
+        "props": {
+          "label": "Launch plan",
+          "zoom": "week",
+          "tasks": [
+            {
+              "id": "plan",
+              "title": "Plan",
+              "start": "2026-03-02",
+              "end": "2026-03-06",
+              "progress": 1
+            },
+            {
+              "id": "build",
+              "title": "Build",
+              "start": "2026-03-09",
+              "end": "2026-03-27",
+              "progress": 0.4
+            },
+            {
+              "id": "ship",
+              "title": "Ship",
+              "start": "2026-03-30",
+              "end": "2026-03-30",
+              "milestone": true
+            }
+          ],
+          "dependencies": [
+            {
+              "from": "plan",
+              "to": "build"
+            },
+            {
+              "from": "build",
+              "to": "ship"
+            }
+          ]
+        }
+      },
+      {
+        "id": "data-notification-inbox",
+        "props": {
+          "now": "2026-10-31T08:00:00Z",
+          "items": [
+            {
+              "id": "n1",
+              "title": "Ticket assigned to you",
+              "at": "2026-10-30T16:30:00Z",
+              "read": false,
+              "href": "https://help.example/tickets/42"
+            },
+            {
+              "id": "n2",
+              "title": "Weekly report ready",
+              "body": "Week 42 is ready.",
+              "at": "2026-10-27T09:00:00Z",
+              "read": true
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

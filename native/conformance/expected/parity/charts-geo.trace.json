@@ -1,0 +1,36 @@
+{
+  "fixture": "charts-geo",
+  "trace": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "id": "charts-geo-map",
+              "name": "Tickets by region",
+              "role": "figure"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Tickets by region",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "id": "charts-geo-point-map",
+              "name": "Support hubs",
+              "role": "figure"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Support hubs",
+          "role": "group"
+        }
+      ],
+      "id": "layout-page",
+      "name": "Geo charts",
+      "role": "main"
+    }
+  ]
+}

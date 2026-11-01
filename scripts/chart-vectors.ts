@@ -1,0 +1,1166 @@
+/**
+ * Geometry vectors for the native chart and data painters (PLAN_013,
+ * ADR-025): fixed fictional inputs run through the web's own public
+ * functions (`@texuli/charts`, `@texuli/data`, imported by path as root
+ * scripts do), written as
+ * `{ fn, input, output }` cases. The Kotlin port replays every case
+ * (`ChartMathParityTest` in `native/texuli-compose/src/jvmTest`): numbers to
+ * 1e-9, SVG path strings and labels exactly.
+ *
+ * Usage:
+ *   pnpm exec tsx scripts/chart-vectors.ts           # write the vectors
+ *   pnpm exec tsx scripts/chart-vectors.ts --check   # exit 1 on drift
+ */
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
+// Root scripts import packages by path. `math/index.ts` is the `@texuli/charts/math` entry;
+// the model modules are what the family entries re-export (those entries also load Svelte).
+import {
+  createCartesianLayout,
+  lineCoordinates,
+  windowCartesianSeries,
+  xDomain,
+} from '../packages/charts/src/cartesian/model.ts';
+import { networkLayout } from '../packages/charts/src/flow/model.ts';
+import {
+  clampGeoOffset,
+  geoCells,
+  geoColorIndex,
+  REGION_TILES,
+  WORLD_TILES,
+} from '../packages/charts/src/geo/model.ts';
+import { minMaxBuckets } from '../packages/charts/src/math/downsample/min-max.ts';
+import {
+  bandScale,
+  chooseTimeInterval,
+  extent,
+  floorTime,
+  formatCompact,
+  formatDate,
+  formatNumber,
+  formatPercent,
+  formatTick,
+  formatTimeTick,
+  groupOffsets,
+  linearScale,
+  niceDomain,
+  offsetTime,
+  sqrtScale,
+  stepPrecision,
+  type TimeInterval,
+  tickStep,
+  ticks,
+  timeScale,
+  timeTicks,
+} from '../packages/charts/src/math/index.ts';
+import { funnelLayout } from '../packages/charts/src/math/layout/funnel.ts';
+import { sankey } from '../packages/charts/src/math/layout/sankey.ts';
+import { sunburst } from '../packages/charts/src/math/layout/sunburst.ts';
+import { type TreemapNode, treemap } from '../packages/charts/src/math/layout/treemap.ts';
+import {
+  arcCentroid,
+  arcPath,
+  areaPath,
+  type Curve,
+  linePath,
+  pie,
+  roundCoord,
+  stack,
+} from '../packages/charts/src/math/shapes/index.ts';
+import { createHeatmapLayout, createScatterLayout } from '../packages/charts/src/matrix/model.ts';
+import { centerTotalFits, treeTableRows } from '../packages/charts/src/part-whole/model.ts';
+import { eventsOnDate, formatCalendar } from '../packages/data/src/calendar/model.ts';
+import {
+  cohortAverages,
+  formatCohortValue,
+  heatLevel,
+  heatMax,
+} from '../packages/data/src/cohort/model.ts';
+import {
+  dashboardBreakpoints,
+  reflowLayout,
+  resolveBreakpoint,
+} from '../packages/data/src/dashboard/engine/breakpoints.ts';
+import { firstFit, normalizeLayout } from '../packages/data/src/dashboard/engine/layout.ts';
+import { dayLabel, whenLabel } from '../packages/data/src/engines/activity/days.ts';
+import { evaluateWip, groupBoard } from '../packages/data/src/engines/board/board.ts';
+import { rankSequence } from '../packages/data/src/engines/board/rank.ts';
+import {
+  addDays,
+  daysBetween,
+  formatIsoDate,
+  parseInstant,
+  parseIsoDate,
+  weekdayOf,
+} from '../packages/data/src/engines/calendar/dates.ts';
+import {
+  monthGrid,
+  startOfWeek,
+  weekStartFor,
+} from '../packages/data/src/engines/calendar/grid.ts';
+import { spanDates } from '../packages/data/src/engines/calendar/move.ts';
+import { childrenOf, formatSize } from '../packages/data/src/engines/files/model.ts';
+import { basemapPaths } from '../packages/data/src/engines/map/basemap.ts';
+import { cluster } from '../packages/data/src/engines/map/cluster.ts';
+import { fitBounds, mercator, project } from '../packages/data/src/engines/map/geo.ts';
+import { PORT_MERIDIAN } from '../packages/data/src/engines/map/port-meridian.ts';
+import { durationDays } from '../packages/data/src/engines/timeline/schedule.ts';
+import { buildTree, flatten } from '../packages/data/src/engines/tree/tree.ts';
+import { parseFilter } from '../packages/data/src/filter-builder/model.ts';
+import { progressValue, timelineRange } from '../packages/data/src/timeline/model.ts';
+import { biomeFormat } from './generate-surfaces.ts';
+
+const ROOT = resolve(import.meta.dirname, '..');
+export const VECTORS_PATH = 'native/conformance/fixtures/chart-vectors.json';
+/** The web's bundled basemap, generated into Kotlin so native draws the same fictional city. */
+export const BASEMAP_KOTLIN_PATH =
+  'native/texuli-compose/src/commonMain/kotlin/com/texuli/compose/PortMeridian.kt';
+
+const kotlinString = (value: string): string => JSON.stringify(value).replace(/\$/g, '\\$');
+const kotlinNumber = (value: number): string =>
+  Number.isInteger(value) ? `${value}.0` : String(value);
+
+/** `PORT_MERIDIAN` as Kotlin source (deterministic). */
+export function renderBasemapKotlin(): string {
+  const b = PORT_MERIDIAN;
+  const lines = [
+    '// Generated by scripts/chart-vectors.ts from @texuli/data PORT_MERIDIAN. Do not edit.',
+    'package com.texuli.compose',
+    '',
+    "/** Port Meridian: the web map's bundled fictional city (no real geography). */",
+    'internal val PORT_MERIDIAN = Basemap(',
+    `    id = ${kotlinString(b.id)},`,
+    `    name = ${kotlinString(b.name)},`,
+    `    bbox = listOf(${b.bbox.map(kotlinNumber).join(', ')}),`,
+    `    attribution = ${kotlinString(b.attribution)},`,
+    '    features = listOf(',
+    ...b.features.map(
+      (f) =>
+        `        BasemapFeature(${kotlinString(f.id)}, ${kotlinString(f.kind)}, ${f.name === undefined ? 'null' : kotlinString(f.name)}, ${f.label ? `listOf(${f.label.map(kotlinNumber).join(', ')})` : 'null'}, ${kotlinString(f.geometry)}, listOf(${f.coords.map(kotlinNumber).join(', ')})),`
+    ),
+    '    ),',
+    ')',
+    '',
+  ];
+  return lines.join('\n');
+}
+
+export interface VectorCase {
+  fn: string;
+  input: unknown;
+  output: unknown;
+}
+
+/** JSON has no NaN or infinities: they are written as null, which the cases avoid. */
+const json = (value: unknown): unknown => JSON.parse(JSON.stringify(value));
+
+const DAY = 86_400_000;
+const T0 = Date.UTC(2026, 2, 2); // 2026-03-02, a Monday
+
+/** Number literals that cover integer, fraction, tie, exponent and negative-zero printing. */
+const NUMBERS = [
+  0,
+  -0,
+  1,
+  -1,
+  12,
+  12.5,
+  -12.25,
+  0.1,
+  0.30000000000000004,
+  1 / 3,
+  2 / 3,
+  123456789,
+  1e21,
+  1.5e21,
+  1e-6,
+  1e-7,
+  1.234e-7,
+  5e-324,
+  0.000123,
+  640,
+  618.75,
+  1234.5678,
+  -0.004,
+  99.995,
+];
+
+const FORMAT_VALUES = [
+  0, 1, -1, 12.345, 1.005, 2.5, -2.5, 0.125, 1234567.891, 999.995, 0.004, -0.004, 1e15, 42, 3.25,
+];
+
+const CURVES: readonly Curve[] = ['linear', 'monotone-x', 'step', 'step-before', 'step-after'];
+
+const INTERVALS: readonly TimeInterval[] = [
+  { unit: 'second', step: 15 },
+  { unit: 'minute', step: 5 },
+  { unit: 'hour', step: 3 },
+  { unit: 'day', step: 1 },
+  { unit: 'day', step: 2 },
+  { unit: 'week', step: 1 },
+  { unit: 'month', step: 1 },
+  { unit: 'month', step: 3 },
+  { unit: 'year', step: 1 },
+  { unit: 'year', step: 5 },
+];
+
+const SAMPLE_TIMES = [
+  T0,
+  T0 + 9 * 3_600_000 + 37 * 60_000 + 12_000,
+  Date.UTC(2024, 1, 29, 23, 59, 59),
+  Date.UTC(1999, 11, 31, 12),
+  Date.UTC(2026, 9, 27, 9, 5, 7),
+];
+
+function coreCases(): VectorCase[] {
+  const cases: VectorCase[] = [];
+  const add = (fn: string, input: unknown, output: unknown) =>
+    cases.push({ fn, input: json(input), output: json(output) });
+
+  for (const value of NUMBERS)
+    add('jsNumber', { value: Object.is(value, -0) ? 0 : value }, String(value));
+  for (const value of [0.005, 0.015, 1.005, -1.005, 2.675, 12.344999, -0.001, 640.125])
+    add('roundCoord', { value }, roundCoord(value));
+
+  const ranges: [number, number, number][] = [
+    [0, 1, 10],
+    [0, 97, 5],
+    [-3.2, 41.7, 5],
+    [0.001, 0.0093, 4],
+    [1200, 1, 6],
+    [0, 0, 5],
+    [-1e6, 2.5e6, 7],
+    [0.1, 0.7, 3],
+  ];
+  for (const [start, stop, count] of ranges) {
+    add('tickStep', { start, stop, count }, tickStep(start, stop, count));
+    add('ticks', { start, stop, count }, ticks(start, stop, count));
+    add('niceDomain', { start, stop, count }, niceDomain(start, stop, count));
+  }
+  for (const step of [1, 0.5, 0.25, 0.1, 0.02, 5, 1000, 0.001])
+    add('stepPrecision', { step }, stepPrecision(step));
+  add('extent', { values: [3, null, -2, 7.5, 0] }, extent([3, null, -2, 7.5, 0]));
+  add('extent', { values: [null] }, extent([null]));
+
+  const probes = [-5, 0, 13.7, 50, 97, 120];
+  for (const nice of [false, true, 5]) {
+    const scale = linearScale({ domain: [3.2, 96.4], range: [282, 18], nice });
+    add(
+      'linearScale',
+      { domain: [3.2, 96.4], range: [282, 18], nice, probes, inverts: [282, 150, 18] },
+      {
+        domain: scale.domain,
+        values: probes.map(scale),
+        invert: [282, 150, 18].map(scale.invert),
+        ticks: scale.ticks(5),
+      }
+    );
+  }
+  const single = linearScale({ domain: [4, 4], range: [0, 100] });
+  add(
+    'linearScale',
+    { domain: [4, 4], range: [0, 100], nice: false, probes: [4, 9], inverts: [0, 50] },
+    {
+      domain: single.domain,
+      values: [4, 9].map(single),
+      invert: [0, 50].map(single.invert),
+      ticks: single.ticks(5),
+    }
+  );
+  const sqrt = sqrtScale({ domain: [0, 400], range: [2, 24] });
+  add(
+    'sqrtScale',
+    { domain: [0, 400], range: [2, 24], probes: [0, 1, 100, 400] },
+    { values: [0, 1, 100, 400].map(sqrt) }
+  );
+
+  for (const [domain, range, paddingInner, paddingOuter, align] of [
+    [['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], [58, 622], 0.18, 0.1, 0.5],
+    [['a'], [0, 100], 0, 0, 0.5],
+    [['a', 'b', 'c'], [300, 0], 0.2, 0.5, 0],
+    [[], [0, 100], 0.1, 0.1, 0.5],
+  ] as [string[], [number, number], number, number, number][]) {
+    const scale = bandScale({ domain, range, paddingInner, paddingOuter, align });
+    add(
+      'bandScale',
+      { domain, range, paddingInner, paddingOuter, align },
+      { starts: domain.map((key) => scale(key)), bandwidth: scale.bandwidth(), step: scale.step() }
+    );
+  }
+
+  const matrix = [
+    [3, -2, null, 5],
+    [1, 4, 2, -3],
+    [null, 2, 6, 1],
+  ];
+  for (const offset of ['none', 'expand', 'diverging'] as const)
+    add('stack', { series: matrix, offset }, stack(matrix, { offset }));
+  for (const [bandwidth, count, padding] of [
+    [80, 3, 0.1],
+    [40, 1, 0.1],
+    [0, 2, 0.1],
+    [60, 4, 0.95],
+  ])
+    add('groupOffsets', { bandwidth, count, padding }, groupOffsets(bandwidth, count, padding));
+
+  const points = [
+    { x: 58, y: 120.456 },
+    { x: 140.333, y: 80 },
+    { x: 222.5, y: null },
+    { x: 304, y: 200.125 },
+    { x: 386.75, y: 60 },
+    { x: 468, y: 140 },
+  ];
+  const area = points.map((p) => ({ x: p.x, y0: 272, y1: p.y }));
+  for (const curve of CURVES) {
+    add('linePath', { points, curve }, linePath(points, { curve }));
+    add('areaPath', { points: area, curve }, areaPath(area, { curve }));
+  }
+  add('linePath', { points: [{ x: 1, y: 2 }], curve: 'linear' }, linePath([{ x: 1, y: 2 }]));
+
+  for (const [start, stop, count] of [
+    [T0, T0 + 7 * DAY, 6],
+    [T0, T0 + 3 * 3_600_000, 6],
+    [T0, T0 + 400 * DAY, 6],
+    [T0, T0 + 30 * 365 * DAY, 6],
+    [T0, T0 + 90_000, 4],
+    [T0, T0, 6],
+  ])
+    add('chooseTimeInterval', { start, stop, count }, chooseTimeInterval(start, stop, count));
+  for (const interval of INTERVALS)
+    for (const ms of SAMPLE_TIMES) {
+      add(
+        'floorTime',
+        { ms, interval, weekStartsOn: 1 },
+        floorTime(ms, interval, { weekStartsOn: 1 })
+      );
+      add('offsetTime', { ms, interval, count: 2 }, offsetTime(ms, interval, 2));
+      add('formatTimeTick', { ms, interval }, formatTimeTick(ms, interval));
+    }
+  add(
+    'floorTime',
+    { ms: T0 + 3 * DAY, interval: { unit: 'week', step: 1 }, weekStartsOn: 0 },
+    floorTime(T0 + 3 * DAY, { unit: 'week', step: 1 }, { weekStartsOn: 0 })
+  );
+  add(
+    'offsetTime',
+    { ms: Date.UTC(2026, 0, 31), interval: { unit: 'month', step: 1 }, count: 1 },
+    offsetTime(Date.UTC(2026, 0, 31), { unit: 'month', step: 1 }, 1)
+  );
+  for (const [start, stop] of [
+    [T0, T0 + 10 * DAY],
+    [T0 + 5 * 3_600_000, T0 + 2 * DAY],
+    [Date.UTC(2025, 10, 3), Date.UTC(2026, 7, 9)],
+    [Date.UTC(2001, 0, 1), Date.UTC(2026, 0, 1)],
+  ]) {
+    const interval = chooseTimeInterval(start, stop, 6);
+    add(
+      'timeTicks',
+      { start, stop, interval },
+      timeTicks(start, stop, interval, { weekStartsOn: 1 })
+    );
+    const scale = timeScale({ domain: [start, stop], range: [58, 622], nice: true });
+    add(
+      'timeScale',
+      { domain: [start, stop], range: [58, 622], nice: true, probes: [start, stop] },
+      {
+        domain: scale.domain,
+        values: [start, stop].map(scale),
+      }
+    );
+  }
+  for (const ms of SAMPLE_TIMES) {
+    add('formatDate', { ms, withTime: false }, formatDate(ms));
+    add('formatDate', { ms, withTime: true }, formatDate(ms, { withTime: true }));
+  }
+
+  for (const value of FORMAT_VALUES) {
+    for (const maximumFractionDigits of [0, 1, 2])
+      add(
+        'formatNumber',
+        { value, maximumFractionDigits, minimumFractionDigits: 0, signed: false },
+        formatNumber(value, { maximumFractionDigits })
+      );
+    add(
+      'formatNumber',
+      { value, maximumFractionDigits: 2, minimumFractionDigits: 2, signed: true },
+      formatNumber(value, { maximumFractionDigits: 2, minimumFractionDigits: 2, signed: true })
+    );
+    add('formatPercent', { value, digits: 1 }, formatPercent(value));
+  }
+  for (const [value, step] of [
+    [0.25, 0.25],
+    [1000, 200],
+    [0.1, 0.02],
+    [-2, 0.5],
+    [12, 1],
+  ])
+    add('formatTick', { value, step }, formatTick(value, step));
+  for (const value of [
+    0, 999, 1000, 1234, -1234, 12_345, 99_950, 999_950, 1_250_000, 3.4e9, 7.25e12, 0.5,
+  ])
+    add('formatCompact', { value }, formatCompact(value));
+  return cases;
+}
+
+const CARTESIAN_SERIES = [
+  {
+    id: 'opened',
+    label: 'Opened',
+    points: [
+      { x: 'Mon', y: 210 },
+      { x: 'Tue', y: 198 },
+      { x: 'Wed', y: null },
+      { x: 'Thu', y: 176 },
+      { x: 'Fri', y: 164 },
+    ],
+  },
+  {
+    id: 'solved',
+    label: 'Solved',
+    points: [
+      { x: 'Mon', y: 190 },
+      { x: 'Tue', y: -12 },
+      { x: 'Wed', y: 201 },
+      { x: 'Thu', y: 188 },
+      { x: 'Fri', y: 172 },
+    ],
+  },
+];
+
+const NUMERIC_SERIES = [
+  {
+    id: 'load',
+    label: 'Load',
+    points: [
+      { x: 3, y: 0.4 },
+      { x: 1, y: 0.25 },
+      { x: 8, y: 0.9 },
+    ],
+  },
+];
+
+function cartesianLayoutCases(): VectorCase[] {
+  const cases: VectorCase[] = [];
+  for (const [series, stacked] of [
+    [CARTESIAN_SERIES, false],
+    [CARTESIAN_SERIES, true],
+    [NUMERIC_SERIES, false],
+  ] as const) {
+    const layout = createCartesianLayout(series, 640, 320, stacked);
+    cases.push({
+      fn: 'createCartesianLayout',
+      input: json({ series, width: 640, height: 320, stacked }),
+      output: json({
+        xKeys: layout.xKeys,
+        xPositions: layout.xKeys.map(layout.xPosition),
+        yProbes: [-20, 0, 100, 250].map(layout.yPosition),
+        baseline: layout.baseline,
+        stacked: layout.stacked,
+        paths: series.map((_, index) => lineCoordinates(layout, index, true)),
+      }),
+    });
+  }
+  const wide = {
+    id: 'wide',
+    label: 'Wide',
+    points: [9, 2, 4, 7, 1, 12, 5].map((x, index) => ({ x, y: index * 3 })),
+  };
+  for (const domain of [
+    [2, 7],
+    [4.5, 4.8],
+    [20, 30],
+  ] as [number, number][])
+    cases.push({
+      fn: 'windowCartesianSeries',
+      input: json({ series: [wide], domain }),
+      output: json(windowCartesianSeries([wide], domain)),
+    });
+  cases.push({
+    fn: 'xDomain',
+    input: json({ series: CARTESIAN_SERIES }),
+    output: json(xDomain(CARTESIAN_SERIES)),
+  });
+  cases.push({ fn: 'xDomain', input: json({ series: [wide] }), output: json(xDomain([wide])) });
+  const xs = Array.from({ length: 64 }, (_, index) => index * 1.5);
+  const ys = xs.map((x, index) =>
+    index === 20 ? Number.NaN : Math.round(Math.sin(x) * 1000) / 10
+  );
+  for (const [buckets, x0, x1] of [
+    [8, undefined, undefined],
+    [100, undefined, undefined],
+    [5, 10, 60],
+  ] as [number, number | undefined, number | undefined][])
+    cases.push({
+      fn: 'minMaxBuckets',
+      input: json({
+        xs,
+        ys: ys.map((y) => (Number.isFinite(y) ? y : null)),
+        buckets,
+        x0: x0 ?? null,
+        x1: x1 ?? null,
+      }),
+      output: json(minMaxBuckets(xs, ys, { buckets, x0, x1 })),
+    });
+  return cases;
+}
+
+const TREE: TreemapNode = {
+  id: 'support',
+  label: 'Support',
+  children: [
+    {
+      id: 'email',
+      label: 'Email',
+      children: [
+        { id: 'billing', label: 'Billing', value: 42 },
+        { id: 'login', label: 'Login', value: 18 },
+        { id: 'empty', value: 0 },
+      ],
+    },
+    { id: 'chat', label: 'Chat', value: 61 },
+    { id: 'phone', value: 7.5 },
+    {
+      id: 'social',
+      label: 'Social',
+      children: [
+        { id: 'x-dm', value: 3 },
+        { id: 'forum', value: 9 },
+      ],
+    },
+  ],
+};
+
+function partWholeCases(): VectorCase[] {
+  const cases: VectorCase[] = [];
+  const add = (fn: string, input: unknown, output: unknown) =>
+    cases.push({ fn, input: json(input), output: json(output) });
+  for (const [values, padAngle] of [
+    [[42, 18, null, 61, -4, 7.5], 0.01],
+    [[1], 0.2],
+    [[0, 0], 0],
+    [[5, 1e-6, 5], 0.4],
+  ] as [(number | null)[], number][])
+    add('pie', { values, padAngle }, pie(values, { padAngle }));
+  for (const options of [
+    { innerRadius: 0, outerRadius: 108, startAngle: 0, endAngle: 1.2, padAngle: 0 },
+    { innerRadius: 62.64, outerRadius: 108, startAngle: 1.2, endAngle: 4.1, padAngle: 0.01 },
+    { innerRadius: 0, outerRadius: 108, startAngle: 0, endAngle: Math.PI * 2, padAngle: 0 },
+    { innerRadius: 30, outerRadius: 108, startAngle: 0, endAngle: Math.PI * 2, padAngle: 0 },
+    { innerRadius: 40, outerRadius: 100, startAngle: 0.3, endAngle: 2.2, cornerRadius: 6 },
+    { innerRadius: 0, outerRadius: 100, startAngle: 0.3, endAngle: 0.9, cornerRadius: 50 },
+    { innerRadius: 10, outerRadius: 100, startAngle: 1, endAngle: 1, padAngle: 0 },
+  ])
+    add('arcPath', options, arcPath(options));
+  add(
+    'arcCentroid',
+    { innerRadius: 20, outerRadius: 100, startAngle: 0.5, endAngle: 2 },
+    arcCentroid({ innerRadius: 20, outerRadius: 100, startAngle: 0.5, endAngle: 2 })
+  );
+  for (const [width, height, padding] of [
+    [640, 360, 2],
+    [300, 500, 0],
+    [120, 40, 8],
+  ])
+    add(
+      'treemap',
+      { root: TREE, width, height, padding },
+      treemap(TREE, { width, height, padding })
+    );
+  for (const [radius, innerRadius, padAngle] of [
+    [115.2, 27.648, 0],
+    [100, 0, 0.02],
+  ])
+    add(
+      'sunburst',
+      { root: TREE, radius, innerRadius, padAngle },
+      sunburst(TREE, { radius, innerRadius, padAngle })
+    );
+  add('treeTableRows', { root: TREE }, treeTableRows(TREE));
+  for (const [text, innerRadius, fontSize] of [
+    ['1,234.5', 62.64, 12.79],
+    ['138.5', 20, 12.79],
+  ] as [string, number, number][])
+    add(
+      'centerTotalFits',
+      { text, innerRadius, fontSize },
+      centerTotalFits(text, innerRadius, fontSize)
+    );
+  return cases;
+}
+
+function matrixFlowCases(): VectorCase[] {
+  const cases: VectorCase[] = [];
+  const add = (fn: string, input: unknown, output: unknown) =>
+    cases.push({ fn, input: json(input), output: json(output) });
+  const cells = ['Mon', 'Tue', 'Wed'].flatMap((x, i) =>
+    ['Night', 'Day'].map((y, j) => ({ x, y, value: (i + 1) * (j + 2) * 3.5 - 4 }))
+  );
+  for (const [width, height] of [
+    [640, 360],
+    [300, 200],
+  ]) {
+    const margin = { top: 16, right: 16, bottom: 48, left: 80 };
+    const layout = createHeatmapLayout(cells, width, height, margin);
+    add(
+      'createHeatmapLayout',
+      { cells, width, height, margin },
+      {
+        xKeys: layout.xKeys,
+        yKeys: layout.yKeys,
+        cells: layout.cells,
+        valueDomain: layout.valueDomain,
+      }
+    );
+  }
+  const points = [
+    { id: 'a', label: 'Harbor', x: 3.2, y: 41, r: 12, seriesId: 'north' },
+    { id: 'b', label: 'Ridge', x: 7.9, y: 18.5, r: 4 },
+    { id: 'c', label: 'Bay', x: -1.5, y: 66, r: 30, seriesId: 'north' },
+    { id: 'd', label: 'Cove', x: 5, y: 41, r: 0 },
+  ];
+  const series = [{ id: 'north', label: 'North region' }];
+  for (const bubble of [false, true]) {
+    const margin = { top: 16, right: 16, bottom: 48, left: 56 };
+    const layout = createScatterLayout(points, { width: 520, height: 360, margin, series, bubble });
+    add(
+      'createScatterLayout',
+      { points, width: 520, height: 360, margin, series, bubble },
+      {
+        points: layout.points.map(({ color: _color, ...point }) => point),
+        xTicks: layout.xTicks,
+        yTicks: layout.yTicks,
+        series: layout.series,
+      }
+    );
+  }
+  const single = [{ id: 'only', label: 'Only', x: 2, y: 2 }];
+  const singleLayout = createScatterLayout(single, {});
+  add(
+    'createScatterLayout',
+    {
+      points: single,
+      width: 640,
+      height: 360,
+      margin: { top: 16, right: 16, bottom: 48, left: 56 },
+      series: [],
+      bubble: false,
+    },
+    {
+      points: singleLayout.points.map(({ color: _color, ...point }) => point),
+      xTicks: singleLayout.xTicks,
+      yTicks: singleLayout.yTicks,
+      series: singleLayout.series,
+    }
+  );
+  const steps = [
+    { id: 'visit', label: 'Visited', value: 1200 },
+    { id: 'signup', label: 'Signed up', value: 430 },
+    { id: 'trial', value: 0 },
+    { id: 'paid', label: 'Paid', value: 85.5 },
+  ];
+  for (const orientation of ['vertical', 'horizontal'] as const)
+    add(
+      'funnelLayout',
+      { steps, width: 600, height: 320, orientation },
+      funnelLayout(steps, { width: 600, height: 320, orientation, gap: 8 })
+    );
+  add(
+    'funnelLayout',
+    { steps: [{ id: 'zero', value: 0 }], width: 300, height: 100, orientation: 'vertical' },
+    funnelLayout([{ id: 'zero', value: 0 }], { width: 300, height: 100, gap: 8 })
+  );
+  const nodes = [
+    { id: 'web', label: 'Website' },
+    { id: 'ads', label: 'Ads' },
+    { id: 'trial', label: 'Trial' },
+    { id: 'paid', label: 'Paid' },
+    { id: 'churn', label: 'Churned' },
+    { id: 'idle' },
+  ];
+  const links = [
+    { source: 'web', target: 'trial', value: 320 },
+    { source: 'ads', target: 'trial', value: 140 },
+    { source: 'trial', target: 'paid', value: 210 },
+    { source: 'trial', target: 'churn', value: 250 },
+    { source: 'ads', target: 'paid', value: 15 },
+  ];
+  for (const [width, height] of [
+    [608, 360],
+    [200, 120],
+  ])
+    add(
+      'sankey',
+      { nodes, links, width, height, nodeWidth: 14, nodePadding: 12 },
+      sankey(nodes, links, { width, height, nodeWidth: 14, nodePadding: 12 })
+    );
+  const netNodes = [
+    { id: 'a', label: 'Alpha', value: 12 },
+    { id: 'b', label: 'Beta' },
+    { id: 'c', value: 1000 },
+    { id: 'd', label: 'Delta', value: 0.5 },
+    { id: 'e' },
+  ];
+  const netLinks = [
+    { source: 'a', target: 'b', value: 3 },
+    { source: 'b', target: 'c' },
+    { source: 'c', target: 'a', value: 12 },
+    { source: 'd', target: 'e', value: 0.25 },
+  ];
+  for (const [width, height] of [
+    [480, 360],
+    [240, 400],
+  ])
+    add(
+      'networkLayout',
+      { nodes: netNodes, links: netLinks, width, height },
+      networkLayout(netNodes, netLinks, width, height)
+    );
+  return cases;
+}
+
+function geoCases(): VectorCase[] {
+  const cases: VectorCase[] = [];
+  const add = (fn: string, input: unknown, output: unknown) =>
+    cases.push({ fn, input: json(input), output: json(output) });
+  for (const [shape, width, height, gap] of [
+    [WORLD_TILES, 560, 320, 4],
+    [REGION_TILES, 300, 480, 2],
+    [[{ id: 'odd', label: 'Odd', abbr: 'OD', col: 2.7, row: -1 }], 100, 100, 4],
+  ] as const)
+    add('geoCells', { shape, width, height, gap }, geoCells(shape, width, height, gap));
+  const values = [12, null, 40, 7.5, 40];
+  for (const value of [12, null, 40, 7.5, 26])
+    add('geoColorIndex', { value, values }, geoColorIndex(value, values));
+  add('geoColorIndex', { value: 3, values: [3, 3] }, geoColorIndex(3, [3, 3]));
+  add('geoColorIndex', { value: 3, values: [null] }, geoColorIndex(3, [null]));
+  for (const value of [0.2, 0.9, -3, null])
+    add('clampGeoOffset', { value }, clampGeoOffset(value ?? undefined));
+  return cases;
+}
+
+function dataTableCases(): VectorCase[] {
+  const cases: VectorCase[] = [];
+  const add = (fn: string, input: unknown, output: unknown) =>
+    cases.push({ fn, input: json(input), output: json(output) });
+  const cohorts = [
+    { label: 'Jan', size: 1200, cells: [1, 0.42, 0.31, 0.27] },
+    { label: 'Feb', size: 800, cells: [1, 0.5, 0.36] },
+    { label: 'Mar', cells: [1, 0.61] },
+  ];
+  add('cohortAverages', { rows: cohorts }, cohortAverages(cohorts));
+  add('cohortAverages', { rows: cohorts.slice(0, 2) }, cohortAverages(cohorts.slice(0, 2)));
+  const counts = [{ label: 'Jan', cells: [120, 48, null, 7] }];
+  add('heatMax', { rows: counts, kind: 'count' }, heatMax(counts, 'count'));
+  add('heatMax', { rows: cohorts, kind: 'rate' }, heatMax(cohorts, 'rate'));
+  for (const [value, max] of [
+    [0.42, 1],
+    [1, 1],
+    [0, 1],
+    [48, 120],
+    [null, 1],
+    [3, 0],
+    [-2, 10],
+  ] as [number | null, number][])
+    add('heatLevel', { value, max }, heatLevel(value, max));
+  for (const [value, kind] of [
+    [0.4235, 'rate'],
+    [1, 'rate'],
+    [0.0004, 'rate'],
+    [1234.5, 'count'],
+    [7.5, 'count'],
+  ] as [number, 'rate' | 'count'][])
+    add('formatCohortValue', { value, kind }, formatCohortValue(value, kind));
+  for (const count of [1, 5, 70, 500]) add('rankSequence', { count }, rankSequence(count));
+  const items = [
+    { id: 'docs', parent: null, rank: 'a1' },
+    { id: 'guides', parent: 'docs', rank: 'a0' },
+    { id: 'api', parent: 'docs', rank: 'a0' },
+    { id: 'orphan', parent: 'missing', rank: 'a5' },
+    { id: 'loop-a', parent: 'loop-b', rank: 'a2' },
+    { id: 'loop-b', parent: 'loop-a', rank: 'a3' },
+    { id: 'Zeta', parent: null, rank: 'a1' },
+    { id: 'readme', parent: 'guides', rank: 'b00' },
+  ];
+  const tree = buildTree(items, {
+    id: (item) => item.id,
+    parentId: (item) => item.parent,
+    rank: (item) => item.rank,
+  });
+  add(
+    'flattenTree',
+    { items },
+    flatten(tree, { expanded: 'all' }).map((row) => ({ id: row.id, level: row.level }))
+  );
+  const entries = [
+    { id: '1', parentId: null, name: 'File 10.txt', kind: 'file' as const },
+    { id: '2', parentId: null, name: 'file 2.txt', kind: 'file' as const },
+    { id: '3', parentId: null, name: 'Reports', kind: 'folder' as const },
+    { id: '4', parentId: null, name: 'archive', kind: 'folder' as const },
+    { id: '5', parentId: '3', name: 'q1.csv', kind: 'file' as const },
+    { id: '6', parentId: null, name: 'File 9.txt', kind: 'file' as const },
+    { id: '7', parentId: null, name: 'file 007.txt', kind: 'file' as const },
+  ];
+  add(
+    'childrenOf',
+    { entries, folder: null },
+    childrenOf(entries, null).map((entry) => entry.id)
+  );
+  add(
+    'childrenOf',
+    { entries, folder: '3' },
+    childrenOf(entries, '3').map((entry) => entry.id)
+  );
+  for (const bytes of [
+    0, 512, 1023, 1024, 1536, 1075.2, 1484.8, 10_239, 10_240, 5_000_000, 1.5e12, 3e15, -1,
+  ])
+    add('formatSize', { bytes }, formatSize(bytes));
+  for (const [value, digits] of [
+    [1.25, 1],
+    [1.05, 1],
+    [1.45, 1],
+    [-0.05, 1],
+    [9.95, 1],
+    [2.5, 0],
+    [0.000001, 3],
+    [-0.0001, 1],
+  ])
+    add('toFixed', { value, digits }, value.toFixed(digits));
+  return cases;
+}
+
+function dataTimeCases(): VectorCase[] {
+  const cases: VectorCase[] = [];
+  const add = (fn: string, input: unknown, output: unknown) =>
+    cases.push({ fn, input: json(input), output: json(output) });
+  const attempt = (run: () => unknown) => {
+    try {
+      return run();
+    } catch {
+      return null;
+    }
+  };
+  for (const date of [
+    '2026-02-28',
+    '2024-02-29',
+    '2026-02-29',
+    '2026-13-01',
+    '26-01-01',
+    '0099-12-31',
+  ])
+    add(
+      'parseIsoDate',
+      { date },
+      attempt(() => parseIsoDate(date))
+    );
+  for (const [year, month, day] of [
+    [2026, 1, 32],
+    [2026, 0, 1],
+    [2025, 14, -3],
+  ])
+    add('formatIsoDate', { year, month, day }, formatIsoDate(year, month, day));
+  for (const [date, days] of [
+    ['2026-03-30', 5],
+    ['2026-01-01', -1],
+    ['2024-02-28', 366],
+  ] as [string, number][])
+    add('addDays', { date, days }, addDays(date, days));
+  add('daysBetween', { a: '2025-12-30', b: '2026-03-02' }, daysBetween('2025-12-30', '2026-03-02'));
+  for (const date of ['2026-03-02', '2026-11-01', '2000-01-01']) {
+    add('weekdayOf', { date }, weekdayOf(date));
+    for (const weekStartsOn of [0, 1, 6] as const)
+      add('startOfWeek', { date, weekStartsOn }, startOfWeek(date, weekStartsOn));
+  }
+  for (const [year, month, weekStartsOn] of [
+    [2026, 3, 0],
+    [2026, 2, 1],
+    [2027, 1, 6],
+  ] as [number, number, 0 | 1 | 6][])
+    add(
+      'monthGrid',
+      { year, month, weekStartsOn },
+      monthGrid(year, month, { weekStartsOn }).map((week) =>
+        week.map((cell) => [cell.date, cell.inMonth])
+      )
+    );
+  for (const locale of ['en-US', 'en', 'en-GB', 'pt-BR', 'de-DE', 'ar-EG', 'fr', 'he-IL', 'ja-JP'])
+    add('weekStartFor', { locale }, weekStartFor(locale));
+  for (const iso of [
+    '2026-10-27T09:00:00Z',
+    '2026-10-27T09:00:00.250Z',
+    '2026-10-27T23:30:00-05:00',
+    '2026-10-27T09:00+02:00',
+    '2026-10-27',
+    '2026-10-27T09:00:00',
+    '2026-02-30T09:00:00Z',
+  ])
+    add(
+      'parseInstant',
+      { iso },
+      attempt(() => parseInstant(iso))
+    );
+  const events = [
+    { id: 'standup', start: '2026-04-13T09:00:00Z', end: '2026-04-13T09:15:00Z', allDay: false },
+    { id: 'offsite', start: '2026-04-13', end: '2026-04-15', allDay: true },
+    { id: 'late', start: '2026-04-13T23:30:00Z', end: '2026-04-14T01:00:00Z', allDay: false },
+    { id: 'exact', start: '2026-04-14T00:00:00Z', end: '2026-04-15T00:00:00Z', allDay: false },
+  ];
+  for (const event of events) add('spanDates', event, spanDates(event, 'UTC'));
+  for (const date of ['2026-04-13', '2026-04-14', '2026-04-15'])
+    add(
+      'eventsOnDate',
+      { events, date },
+      eventsOnDate(events, date, 'UTC').map((event) => event.id)
+    );
+  const fmt = formatCalendar('en-US', 'UTC');
+  for (const date of ['2026-04-13', '2026-11-01'])
+    add(
+      'calendarLabels',
+      { date },
+      { weekday: fmt.weekday(date), longDate: fmt.longDate(date), monthTitle: fmt.monthTitle(date) }
+    );
+  for (const iso of [
+    '2026-04-13T00:05:00Z',
+    '2026-04-13T12:00:00Z',
+    '2026-04-13T13:07:00Z',
+    '2026-04-13T23:59:00Z',
+  ])
+    add('clockTime', { iso }, fmt.time(iso));
+  for (const [day, today] of [
+    ['2026-10-31', '2026-10-31'],
+    ['2026-10-30', '2026-10-31'],
+    ['2026-11-01', '2026-10-31'],
+    ['2026-10-27', '2026-10-31'],
+    ['2026-10-12', '2026-10-31'],
+    ['2025-12-24', '2026-01-02'],
+  ])
+    add('dayLabel', { day, today }, dayLabel(day, today));
+  add(
+    'whenLabel',
+    { at: '2026-10-30T16:30:00Z', now: '2026-10-31T08:00:00Z' },
+    whenLabel('2026-10-30T16:30:00Z', { now: '2026-10-31T08:00:00Z' })
+  );
+  const tasks = [
+    { id: 'plan', start: '2026-03-02', end: '2026-03-06' },
+    { id: 'build', start: '2026-03-09', end: '2026-03-27' },
+    { id: 'ship', start: '2026-03-30', end: '2026-03-30', milestone: true },
+  ];
+  add('timelineRange', { tasks, today: null }, timelineRange(tasks));
+  add('timelineRange', { tasks, today: '2026-06-01' }, timelineRange(tasks, '2026-06-01'));
+  add('timelineRange', { tasks: [], today: '2026-06-01' }, timelineRange([], '2026-06-01'));
+  for (const task of [
+    ...tasks,
+    { id: 'weekend', start: '2026-03-07', end: '2026-03-08' },
+    { id: 'span', start: '2026-03-06', end: '2026-03-10' },
+  ])
+    add('durationDays', task, durationDays(task));
+  for (const value of [42, -5, 140, null])
+    add('progressValue', { value }, progressValue(value ?? undefined));
+  return cases;
+}
+
+function dataBoardCases(): VectorCase[] {
+  const cases: VectorCase[] = [];
+  const add = (fn: string, input: unknown, output: unknown) =>
+    cases.push({ fn, input: json(input), output: json(output) });
+  const columns = [
+    { id: 'todo', title: 'To do' },
+    { id: 'doing', title: 'Doing', wip: { soft: 2, hard: 3 } },
+  ];
+  const lanes = [
+    { id: 'web', title: 'Web' },
+    { id: 'app', title: 'App' },
+  ];
+  const cards = [
+    { id: 'c3', column: 'doing', lane: 'web', rank: 'a1' },
+    { id: 'c1', column: 'doing', lane: 'web', rank: 'a0' },
+    { id: 'c2', column: 'todo', lane: 'app', rank: 'a0' },
+    { id: 'c4', column: 'gone', lane: 'web', rank: 'a2' },
+    { id: 'c5', column: 'todo', lane: 'nowhere', rank: 'a3' },
+    { id: 'c0', column: 'doing', lane: 'web', rank: 'a1' },
+  ];
+  for (const withLanes of [true, false]) {
+    const grid = groupBoard(cards, {
+      columns,
+      ...(withLanes ? { lanes, lane: (card: (typeof cards)[number]) => card.lane } : {}),
+      column: (card) => card.column,
+      rank: (card) => card.rank,
+      id: (card) => card.id,
+    });
+    add(
+      'groupBoard',
+      { cards, columns, lanes: withLanes ? lanes : [] },
+      {
+        cells: grid.cells.map((row) => row.map((cell) => cell.items.map((card) => card.id))),
+        counts: Object.fromEntries(grid.columnCounts),
+        unplaced: grid.unplaced.map((card) => card.id),
+      }
+    );
+  }
+  for (const count of [1, 2, 3, 4]) {
+    const wip = evaluateWip(columns[1] as (typeof columns)[number], count);
+    add(
+      'evaluateWip',
+      { soft: 2, hard: 3, title: 'Doing', count },
+      { status: wip.status, reason: wip.reason ?? null }
+    );
+  }
+  for (const point of [
+    { lng: 0, lat: 0 },
+    { lng: -18.5, lat: -31 },
+    { lng: 179.9, lat: 89 },
+  ])
+    add('mercator', point, mercator(point));
+  const view = fitBounds(PORT_MERIDIAN.bbox, { width: 800, height: 480 }, 28);
+  add('fitBounds', { bbox: PORT_MERIDIAN.bbox, width: 800, height: 480, padding: 28 }, view);
+  add(
+    'project',
+    { point: { lng: -18.6, lat: -31.2 }, view, width: 800, height: 480 },
+    project({ lng: -18.6, lat: -31.2 }, view, { width: 800, height: 480 })
+  );
+  add(
+    'basemapPaths',
+    { width: 800, height: 480 },
+    basemapPaths(PORT_MERIDIAN, view, { width: 800, height: 480 }).map((path) => ({
+      id: path.id,
+      closed: path.closed,
+      d: path.d,
+      label: path.label ?? null,
+    }))
+  );
+  const markers = [
+    { id: 'm2', lng: -18.61, lat: -31.21 },
+    { id: 'm1', lng: -18.6, lat: -31.2 },
+    { id: 'm3', lng: -17.4, lat: -30.6 },
+    { id: 'm4', lng: 10, lat: 50 },
+  ];
+  for (const zoom of [view.zoom, 3])
+    add(
+      'cluster',
+      { markers, zoom, cellPx: 72 },
+      cluster(markers, zoom, 72).map((item) =>
+        item.kind === 'point'
+          ? { kind: 'point', id: item.point.id }
+          : { kind: 'cluster', id: item.id, center: item.center, count: item.count, ids: item.ids }
+      )
+    );
+  const layout = [
+    { id: 'kpi', x: 0, y: 0, w: 3, h: 2 },
+    { id: 'chart', x: 3, y: 4, w: 9, h: 4 },
+    { id: 'pinned', x: 0, y: 2, w: 3, h: 2, locked: true },
+    { id: 'pinned2', x: 1, y: 2, w: 3, h: 2, locked: true },
+    { id: 'loose', w: 6, h: 3 },
+    { id: 'kpi', x: 5, y: 5 },
+    { id: 'bad id!', x: 0, y: 0 },
+    { id: 'wide', x: 20, y: 1.6, w: 40, h: 0, minW: 2, maxH: 5 },
+  ];
+  for (const [columns, compaction] of [
+    [12, 'vertical'],
+    [12, 'none'],
+    [6, 'vertical'],
+  ] as [number, 'vertical' | 'none'][])
+    add(
+      'normalizeLayout',
+      { layout, columns, compaction },
+      normalizeLayout(layout, { columns, compaction }).layout
+    );
+  const normalized = normalizeLayout(layout, { columns: 12 }).layout;
+  for (const to of [6, 1])
+    add('reflowLayout', { layout: normalized, from: 12, to }, reflowLayout(normalized, 12, to));
+  add(
+    'firstFit',
+    { layout: normalized, w: 4, h: 2, columns: 12 },
+    firstFit(normalized, { w: 4, h: 2 }, 12)
+  );
+  for (const columns of [12, 6, 1])
+    add('dashboardBreakpoints', { columns }, dashboardBreakpoints(columns));
+  for (const width of [1200, 800, 320])
+    add(
+      'resolveBreakpoint',
+      { width, columns: 12 },
+      resolveBreakpoint(width, dashboardBreakpoints(12)).id
+    );
+  const fields = [
+    { key: 'status', header: 'Status', type: 'enum' as const, options: ['open', 'closed'] },
+    { key: 'age', header: 'Age', type: 'number' as const },
+    { key: 'subject', header: 'Subject', type: 'text' as const },
+    { key: 'due', header: 'Due', type: 'date' as const },
+  ];
+  const filters = [
+    {
+      type: 'group',
+      op: 'and',
+      children: [
+        { type: 'condition', field: 'status', operator: 'in', value: ['open'] },
+        { type: 'condition', field: 'age', operator: 'between', value: [1, 7] },
+      ],
+    },
+    { type: 'condition', field: 'subject', operator: 'contains', value: 'login' },
+    { type: 'condition', field: 'age', operator: 'contains', value: 'x' },
+    { type: 'condition', field: 'ghost', operator: 'eq', value: 1 },
+    { type: 'condition', field: 'status', operator: 'eq', value: 'pending' },
+    { type: 'condition', field: 'due', operator: 'before', value: '2026-10-01' },
+    { type: 'condition', field: 'age', operator: 'isEmpty', value: 3 },
+    { type: 'group', op: 'xor', children: [] },
+  ];
+  for (const filter of filters) {
+    let output: unknown;
+    try {
+      output = parseFilter(filter, fields);
+    } catch {
+      output = null;
+    }
+    add('parseFilter', { filter, fields }, output);
+  }
+  return cases;
+}
+
+/** Every case, in a stable order: the shared core first, then each family's model. */
+export function buildVectors(): VectorCase[] {
+  return [
+    ...coreCases(),
+    ...cartesianLayoutCases(),
+    ...partWholeCases(),
+    ...matrixFlowCases(),
+    ...geoCases(),
+    ...dataTableCases(),
+    ...dataTimeCases(),
+    ...dataBoardCases(),
+  ];
+}
+
+export function renderVectors(cases: readonly VectorCase[], root = ROOT): string {
+  const doc = {
+    $comment:
+      'Generated by scripts/chart-vectors.ts from the web chart and data functions. Do not edit by hand. The Kotlin port replays every case (ADR-025).',
+    cases,
+  };
+  return biomeFormat(VECTORS_PATH, `${JSON.stringify(doc, null, 2)}\n`, root);
+}
+
+function main(argv: readonly string[]): number {
+  const cases = buildVectors();
+  const text = renderVectors(cases);
+  const target = join(ROOT, VECTORS_PATH);
+  const basemap = renderBasemapKotlin();
+  const basemapTarget = join(ROOT, BASEMAP_KOTLIN_PATH);
+  if (argv.includes('--check')) {
+    const current = existsSync(target) ? readFileSync(target, 'utf8') : '';
+    const currentBasemap = existsSync(basemapTarget) ? readFileSync(basemapTarget, 'utf8') : '';
+    if (current !== text || currentBasemap !== basemap) {
+      console.error('chart vectors are out of date: run pnpm exec tsx scripts/chart-vectors.ts');
+      return 1;
+    }
+    console.log(`chart vectors are current (${cases.length} cases)`);
+    return 0;
+  }
+  writeFileSync(target, text);
+  writeFileSync(basemapTarget, basemap);
+  console.log(`wrote chart vectors (${cases.length} cases) and the Kotlin basemap`);
+  return 0;
+}
+
+if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
+  process.exitCode = main(process.argv.slice(2));
+}

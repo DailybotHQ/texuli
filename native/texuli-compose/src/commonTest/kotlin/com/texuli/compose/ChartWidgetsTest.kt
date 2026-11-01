@@ -58,9 +58,10 @@ class ChartWidgetsTest {
     }
 
     @Test
-    fun `registry exposes only the implemented compact chart subset`() {
+    fun `registry paints the compact and cartesian charts and nothing it has no painter for`() {
         assertEquals(BindingStatus.IMPLEMENTED, NativeRegistry.status("charts-progress-ring"))
-        assertEquals(BindingStatus.PLACEHOLDER, NativeRegistry.status("charts-line"))
-        assertEquals(BindingStatus.PLACEHOLDER, NativeRegistry.status("charts-heatmap"))
+        assertEquals(BindingStatus.IMPLEMENTED, NativeRegistry.status("charts-line"))
+        assertEquals(BindingStatus.IMPLEMENTED, NativeRegistry.status("charts-heatmap"))
+        assertEquals(BindingStatus.PLACEHOLDER, NativeRegistry.status("chat-thread"))
     }
 }

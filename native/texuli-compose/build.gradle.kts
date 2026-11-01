@@ -31,3 +31,11 @@ kotlin {
 // repository, and the version mirrors the npm release line it tracks.
 group = "com.texuli"
 version = "0.8.0"
+
+// ChartMathParityTest reads the web-written vectors (ADR-025): a changed
+// vectors file reruns the tests instead of reporting them up to date.
+tasks.withType<Test>().configureEach {
+    inputs.file(rootDir.resolve("conformance/fixtures/chart-vectors.json"))
+        .withPropertyName("chartVectors")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+}

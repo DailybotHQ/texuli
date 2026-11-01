@@ -361,7 +361,7 @@ export const LADDER_STAGES: readonly LadderStage[] = [
         sources: [],
       },
       native: {
-        text: 'The Compose renderer (Status: in development) paints a documented slice; app-shell layouts and other chart families remain visible placeholders.',
+        text: 'The Compose renderer (Status: in development) paints a documented slice, every chart family and data view included; app-shell layouts, form controls and the remaining components remain visible placeholders.',
         sources: [
           { file: NATIVE_README, phrase: 'Status: in development' },
           { file: NATIVE_README, phrase: 'remain visible placeholders' },

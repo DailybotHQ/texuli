@@ -111,12 +111,63 @@ private fun PlanNodeContent(node: PlanNode, path: String, onIntent: (TexuliInten
                 val media = nativeMediaBlock(node.props.obj("block"))
                 if (media == null) Placeholder(node.id, "invalid-media") else MediaWidget(media, path, onIntent)
             }
+            in CARTESIAN_CHART_IDS -> {
+                val chart = nativeCartesianChart(node.id, node.props)
+                if (chart == null) Placeholder(node.id, "invalid-chart-data") else CartesianChartView(chart)
+            }
+            in PART_WHOLE_CHART_IDS -> {
+                val chart = nativePartWholeChart(node.id, node.props)
+                if (chart == null) Placeholder(node.id, "invalid-chart-data") else PartWholeChartView(chart)
+            }
+            in MATRIX_FLOW_CHART_IDS -> {
+                val chart = nativeMatrixFlowChart(node.id, node.props)
+                if (chart == null) Placeholder(node.id, "invalid-chart-data") else MatrixFlowChartView(chart)
+            }
+            in GEO_CHART_IDS -> {
+                val chart = nativeGeoChart(node.id, node.props)
+                if (chart == null) Placeholder(node.id, "invalid-chart-data") else GeoChartView(chart)
+            }
+            "data-grid" -> nativeGrid(node.props)?.let { GridViewPainter(it) } ?: Placeholder(node.id, "invalid-data")
+            "data-cohort-table" -> nativeCohort(node.props)?.let { CohortViewPainter(it) } ?: Placeholder(node.id, "invalid-data")
+            "data-tree-view" -> nativeTree(node.props)?.let { TreeViewPainter(it) } ?: Placeholder(node.id, "invalid-data")
+            "data-files" -> nativeFiles(node.props)?.let { FilesViewPainter(it) } ?: Placeholder(node.id, "invalid-data")
+            "data-calendar" -> nativeCalendar(node.props)?.let { CalendarPainter(it) } ?: Placeholder(node.id, "invalid-data")
+            "data-timeline" -> nativeTimeline(node.props)?.let { TimelinePainter(it) } ?: Placeholder(node.id, "invalid-data")
+            "data-notification-inbox" -> nativeInbox(node.props)?.let { InboxPainter(it, path, onIntent) } ?: Placeholder(node.id, "invalid-data")
+            "data-board" -> nativeDataBoard(node.props)?.let { BoardPainter(it) } ?: Placeholder(node.id, "invalid-data")
+            "data-map" -> nativeMap(node.props)?.let { MapPainter(it) } ?: Placeholder(node.id, "invalid-data")
+            "data-filter-builder" -> nativeFilterBuilder(node.props)?.let { FilterBuilderPainter(it) } ?: Placeholder(node.id, "invalid-data")
+            "data-dashboard" -> {
+                val model = nativeDashboard(node.props, node.children.map { child -> child.id to ((child as? PlanNode.Component)?.props ?: emptyMap()) })
+                if (model == null) {
+                    Placeholder(node.id, "invalid-data")
+                } else {
+                    DashboardGrid(model) { widget ->
+                        val child = node.children[widget.childIndex] as PlanNode.Component
+                        DashboardWidgetContent(child, "$path.children.${widget.childIndex}", onIntent)
+                    }
+                }
+            }
+            // Outside a dashboard a widget paints its content in place, as on the web.
+            "data-dashboard-widget" -> DashboardWidgetContent(node, path, onIntent)
+            "charts-canvas-renderer" -> {
+                val chart = nativeCanvasChart(node.props)
+                if (chart == null) Placeholder(node.id, "invalid-chart-data") else CanvasChartView(chart)
+            }
             in NATIVE_CHART_IDS -> {
                 val widget = nativeChartWidget(node.id, node.props)
                 if (widget == null) Placeholder(node.id, "invalid-chart-data") else ChartWidget(widget)
             }
             else -> Placeholder(node.id, "not-on-this-target")
         }
+    }
+}
+
+@Composable
+private fun DashboardWidgetContent(node: PlanNode.Component, path: String, onIntent: (TexuliIntent) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        node.props.str("title")?.let { Heading(it, level = 3) }
+        Children(node, path, onIntent)
     }
 }
 

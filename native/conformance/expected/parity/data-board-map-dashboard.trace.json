@@ -1,0 +1,57 @@
+{
+  "fixture": "data-board-map-dashboard",
+  "trace": [
+    {
+      "children": [
+        {
+          "id": "data-board",
+          "name": "Support board",
+          "role": "group"
+        },
+        {
+          "id": "data-map",
+          "name": "Port Meridian sites",
+          "role": "figure"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "id": "charts-line",
+                  "name": "Tickets per day",
+                  "role": "figure"
+                }
+              ],
+              "id": "data-dashboard-widget",
+              "name": "Volume",
+              "role": "group"
+            },
+            {
+              "children": [
+                {
+                  "id": "blocks-text",
+                  "role": "paragraph"
+                }
+              ],
+              "id": "data-dashboard-widget",
+              "name": "Channel mix",
+              "role": "group"
+            }
+          ],
+          "id": "data-dashboard",
+          "name": "Support overview",
+          "role": "region"
+        },
+        {
+          "id": "data-filter-builder",
+          "name": "Ticket filter",
+          "role": "group"
+        }
+      ],
+      "id": "layout-page",
+      "name": "Boards, maps and dashboards",
+      "role": "main"
+    }
+  ]
+}

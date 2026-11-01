@@ -1931,3 +1931,47 @@ reflect this decision.
   cannot express (then add an emitter for it; writers still never read
   the document), or inline documents make blueprints too large in practice
   (then cap inline size in the catalog limits and prefer references).
+
+## ADR-025: Native painting from ported web math
+
+- **Date:** 2026-11-01 · **Ratification:** decided by the PLAN_013
+  design task under the developer's trust pre-authorization; the
+  developer may override this decision. **Status: in progress** (the
+  native twin is in development).
+- **Context:** the Kotlin Multiplatform renderer paints 21 of the 168
+  catalog ids; every chart family except the four compact charts, and
+  every data view, paints a placeholder. The web's chart and data layouts
+  live in TypeScript (`@texuli/charts` models and `math/*`, `@texuli/data`
+  engines). Compose has no chart library, and the native module may not
+  add a dependency. The golden semantic traces compare roles and names,
+  not geometry.
+- **Options:** (1) write native layouts from scratch; (2) port the web's
+  model and math functions to Kotlin and prove them equal on vectors the
+  web writes; (3) compute geometry once in a shared format (precomputed by
+  the host or the web) and have native only draw it.
+- **Decision:** 2.
+  - Each family is a pure projection (props to an inert model, `null`
+    paints the placeholder), a pure layout ported from the web (a scene of
+    rectangles, SVG path strings, circles and labels) and a thin Compose
+    painter that draws the scene through `PathParser`.
+  - `scripts/chart-vectors.ts` writes
+    `native/conformance/fixtures/chart-vectors.json` from the web's public
+    functions; `ChartMathParityTest` replays every case in Kotlin (numbers
+    to 1e-9, path strings and labels exactly).
+  - Parity fixtures beyond the spec goldens live in
+    `native/conformance/fixtures/parity/`; the web trace writer and
+    `ParityFixtureConformanceTest` compare their semantic traces.
+    `scripts/native-parity.ts` refuses a painted id with no semantic rule
+    or no trace.
+  - Ids whose web view is interactive paint read-only and are listed in
+    `NativeRegistry.readOnly`; the parity matrix says so.
+  - Number and date labels follow the en-US rules of the web's `Intl`
+    usage; other locales and named time zones fall back to en-US and UTC
+    natively, a documented gap.
+- **Why:** option 1 drifts silently from the web; option 3 needs a host
+  or network step for every blueprint and breaks offline native
+  rendering. A port checked by web-written vectors keeps one source of
+  truth (the TypeScript) and makes drift a failing test on both sides.
+- **How to reverse:** the painters are additive bindings in
+  `NativeRegistry`; removing an id returns it to the placeholder, and the
+  matrix and site counts follow automatically.

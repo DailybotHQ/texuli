@@ -1,0 +1,32 @@
+{
+  "fixture": "data-tables",
+  "trace": [
+    {
+      "children": [
+        {
+          "id": "data-grid",
+          "name": "Open tickets",
+          "role": "table"
+        },
+        {
+          "id": "data-cohort-table",
+          "name": "Weekly retention",
+          "role": "table"
+        },
+        {
+          "id": "data-tree-view",
+          "name": "Help center",
+          "role": "tree"
+        },
+        {
+          "id": "data-files",
+          "name": "Shared files",
+          "role": "group"
+        }
+      ],
+      "id": "layout-page",
+      "name": "Data tables",
+      "role": "main"
+    }
+  ]
+}
