@@ -25,7 +25,8 @@ it with the read-only reader. The player (L7) cannot import this package
 
 Returns a `DocumentPlayerHost` (the player's type):
 
-- `checkDocument` is `checkDocumentDraft`: the player passes it to
+- `checkDocument` is `createDocumentDraftCheck(validateDeck)` (inline decks
+  checked with `checkDeckPayload` by default): the player passes it to
   `validateDraft`, which runs it for every `document` node at the player's
   tier (`untrusted` by default, never a tier the draft claims). The catalog
   then checks what the document borrows from the catalog at the same tier:
@@ -49,6 +50,7 @@ Returns a `DocumentPlayerHost` (the player's type):
 | `resolveEmbed`, `resolveMedia` | — | Embeds and media, as in the reader |
 | `reducedMotion` | `false` | Paint embeds without motion |
 | `loadPlayer` | the package loader | A `PagesPlayerLoader` for embeds inside the document; `null` turns them off ([core entries](editor.md#core-entries-without-the-player)) |
+| `validateDeck` | `checkDeckPayload` (`createDocumentPlayerHost`); none on `createDocumentPlayerHostCore` | A `DeckPayloadValidator` for inline decks; `null` refuses them. Without one the core host's build has no `@texuli/deck/model` reference and a document holding an inline deck is refused (G136, from `0.12.0`) |
 | `loadLibraryBase` | the theme library (`createDocumentPlayerHost`); none on `createDocumentPlayerHostCore` | A `PagesLibraryBaseLoader` for the reader's design-system `texuli:<theme>` bases; `null` refuses them ([design systems](reader.md#design-systems); G127, from `0.11.0`) |
 | `renderBlock`, `blockHost` | — | The host's own blocks in the painted document, passed to the reader ([host blocks](editor.md#host-blocks); from `0.10.0`). The player validates the document against the catalog first, so a wrapped block the catalog does not know is refused before the reader sees it; here the host paints what passes: embeds the library cannot paint (a `ref` with no payload) and library blocks it claims with `'host'` |
 
@@ -68,21 +70,29 @@ the host already has the player); without it they show a note.
 It has no default `options.loadLibraryBase` either (G127, from
 `0.11.0`): pass `loadPagesLibraryBase` to resolve a design
 system's `texuli:<theme>` bases from the token theme library.
+It has no default `options.validateDeck` either (G136, from `0.12.0`): pass
+`checkDeckPayload` from `@texuli/document/schema` to accept inline decks.
 `@texuli/pages/host-core` also exports `checkDocumentDraft`,
+`createDocumentDraftCheck`,
 `DocumentPlayerHostOptions`, `loadPagesLibraryBase` and
 `PagesLibraryBaseLoader`. See
 [core entries](editor.md#core-entries-without-the-player).
 
-## `checkDocumentDraft(doc, tier)`
+## `createDocumentDraftCheck(validateDeck)` and `checkDocumentDraft(doc, tier)`
 
 The `DraftDocumentCheck` behind the host, for hosts that validate without
 painting (servers, tools): `validateDocument` from
-`@texuli/document/schema` with `trust` set to the tier. Errors refuse;
-warnings (orphaned comment anchors) do not.
+`@texuli/document/schema-core` with `trust` set to the tier and inline decks
+checked by `validateDeck`. Errors refuse; warnings (orphaned comment
+anchors) do not. `checkDocumentDraft` is the check with no deck validator:
+from `0.12.0` it refuses inline decks (G136); use
+`createDocumentDraftCheck(checkDeckPayload)` to accept them.
 
 ```ts
 import { validateDraft } from '@texuli/catalog/validate';
-import { checkDocumentDraft } from '@texuli/pages/host';
+import { checkDeckPayload } from '@texuli/document/schema';
+import { createDocumentDraftCheck } from '@texuli/pages/host';
 
-const result = validateDraft(agentOutput, { catalog, checkDocument: checkDocumentDraft });
+const checkDocument = createDocumentDraftCheck(checkDeckPayload);
+const result = validateDraft(agentOutput, { catalog, checkDocument });
 ```

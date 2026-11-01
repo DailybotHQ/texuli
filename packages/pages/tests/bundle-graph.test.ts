@@ -169,6 +169,27 @@ const documentHost = createDocumentPlayerHostCore();
     );
   }, 180_000);
 
+  it('an editor, reader and host on the core entries never reach the deck model (G136)', async () => {
+    const chunks = await buildHost(`<script lang="ts">
+import { PageEditorCore } from ${at('editor/core.ts')};
+import { PageReaderCore } from ${at('reader/core.ts')};
+import { createDocumentPlayerHostCore } from ${at('host/core.ts')};
+let { doc }: { doc: never } = $props();
+const documentHost = createDocumentPlayerHostCore();
+</script>
+<PageEditorCore document={doc} />
+<PageReaderCore document={doc} />
+<p data-host={typeof documentHost.present}></p>
+`);
+    const every = everyModule(chunks);
+    // Not vacuous: the document validator and the operations are in the build...
+    expect(every.some((id) => id.includes('/document/src/schema/validate.ts'))).toBe(true);
+    expect(every.some((id) => id.includes('/document/src/ops/operations.ts'))).toBe(true);
+    // ...but not the deck model or its inline deck check.
+    expect(every.filter((id) => id.includes('/deck/src/model/'))).toEqual([]);
+    expect(every.filter((id) => id.endsWith('/document/src/schema/deck-check.ts'))).toEqual([]);
+  }, 180_000);
+
   it('a core host that injects its own loader reaches the player from host code, as a lazy chunk', async () => {
     const chunks = await buildHost(`<script lang="ts">
 import { PageEditorCore } from ${at('editor/core.ts')};

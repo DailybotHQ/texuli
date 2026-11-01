@@ -47,6 +47,7 @@ through one op log.
 | `resolveMedia` | — | A `MediaResolver`; the source passes `safeImageSrc` at the untrusted tier, otherwise the alt text shows |
 | `deckHost` | `null` | The player's `DeckPlayerHost`, to present deck embeds on a stage (`@texuli/slides` is also L8, so the host brings it) |
 | `components` | `DEFAULT_COMPONENT_EMBEDS` | The catalog components (`ComponentEmbedOption`) the menu offers |
+| `validateDeck` | `checkDeckPayload` (`PageEditor`); none on `PageEditorCore` | A `DeckPayloadValidator` for inline decks in every transaction; `null` refuses them. Without one (`PageEditorCore`, from `0.12.0`, G136) the build has no `@texuli/deck/model` reference, a transaction that leaves an inline deck is refused, and the slash menu has no inline deck item. Read once |
 | `motion` | layout on | The `texuli/motion` prop for inserts, removes and reorders; `false` is instant |
 | `editor` | created | Bindable `PagesEditor`, for hosts that drive it |
 | `announce` | the core announcer | Where polite announcements go |
@@ -81,8 +82,11 @@ walks the text; other blocks' handles are in the Tab order.
 ## State: `PagesEditor`
 
 `new PagesEditor(options)` (`PagesEditorOptions`: `document`, `idPrefix`,
-`labels`, `announce`, `onChange`, `tier`, `groupMs`, `limit`, `now`) wraps
-`createDocumentHistory` from `@texuli/document/ops`. Reactive fields: `doc`,
+`labels`, `announce`, `onChange`, `tier`, `validateDeck`, `groupMs`, `limit`,
+`now`) wraps `createDocumentHistory` from `@texuli/document/ops-core`. From
+`0.12.0` (G136) it checks inline decks only with `validateDeck` (pass
+`checkDeckPayload` from `@texuli/document/schema`); without it a transaction
+that leaves an inline deck in the document is refused. Reactive fields: `doc`,
 `selected` (block selection), `focus` (a `PagesFocusRequest` a row takes),
 `slash` (a `PagesSlashRequest`), `revision`, `canUndo`, `canRedo`.
 

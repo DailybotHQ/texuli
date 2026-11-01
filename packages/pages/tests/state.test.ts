@@ -275,3 +275,34 @@ describe('block lists', () => {
     expect(moveTarget(1, 1, 3)).toBe(2);
   });
 });
+
+describe('inline decks without the deck model (G136)', () => {
+  const DECK = {
+    formatVersion: 2,
+    meta: { title: 'Launch plan' },
+    slides: [{ id: 's1', layout: 'title-hero', props: { title: 'Launch plan' } }],
+  };
+  const embed = { id: 'e1', type: 'embed', kind: 'deck', inline: DECK } as unknown as DocumentBlock;
+  const insert = [{ op: 'insert-node', parent: null, index: 0, node: embed }] as never;
+
+  it('refuses an inline deck unless the editor has a deck validator', async () => {
+    const { checkDeckPayload } = await import('@texuli/document/schema');
+    const bare = new PagesEditor({ document: doc([para('p1', 'Intro')]), announce: () => {} });
+    expect(bare.apply(insert).ok).toBe(false);
+    const checked = new PagesEditor({
+      document: doc([para('p1', 'Intro')]),
+      announce: () => {},
+      validateDeck: checkDeckPayload,
+    });
+    expect(checked.apply(insert).ok).toBe(true);
+  });
+
+  it('leaves the inline deck item out of the slash menu when decks cannot be validated', () => {
+    const values = (decks?: boolean) =>
+      coreSlashItems(DEFAULT_PAGES_LABELS, decks === undefined ? {} : { decks }).map(
+        (i) => i.value
+      );
+    expect(values()).toContain('deck');
+    expect(values(false)).not.toContain('deck');
+  });
+});
