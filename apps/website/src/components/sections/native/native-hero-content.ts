@@ -16,6 +16,7 @@
  * Banned here, forever: invented versions, promised dates, "coming soon",
  * "write once", "production-ready native".
  */
+import { NATIVE_SLICE } from './native-parity.ts';
 
 /** The status kinds a ledger row can hold, in honesty order. */
 export type NativeStatusKind = 'shipped' | 'development' | 'planned';
@@ -79,8 +80,9 @@ export const nativeHeroContent = {
       kind: 'development',
       statusLabel: 'In development',
       detail:
-        'A Compose renderer driven by Kotlin Multiplatform: page, document and deck layouts, ' +
-        'text lists, boards, tables, media frames and a bounded compact-chart slice. ' +
+        `A Compose renderer driven by Kotlin Multiplatform that paints ${NATIVE_SLICE.painted} of ` +
+        `${NATIVE_SLICE.total} catalog components: page, document, deck and composition layouts, ` +
+        'text lists, code, boards, tables, media frames and a bounded compact-chart slice. ' +
         'Conformance-tested in this repository against the same semantic goldens as the web.',
     },
     {

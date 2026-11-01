@@ -11,6 +11,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { loadParity, parseNativeRegistry } from '../../../scripts/native-parity.ts';
 import { NEVER_PACKED } from '../../../scripts/packages.ts';
 import { COMPONENT_PAGES } from '../src/components/component-pages/load-manifests.ts';
 import { buildExampleCatalog } from '../src/components/examples/catalog.ts';
@@ -28,7 +29,6 @@ import {
   loadHomeHeroProof,
   loadHomeProof,
   loadNativeSlice,
-  parseNativeRegistry,
   wordCount,
 } from '../src/components/sections/home/home-content.ts';
 import { countAllThemes, HOME_NEVER_PACKED } from '../src/components/sections/home/home-data.ts';
@@ -125,7 +125,7 @@ describe('landing', () => {
     expect(read('src/components/sections/home/TexelMark.astro')).toContain('aria-hidden="true"');
   });
 
-  it('states the native slice from the registry, never typed in', () => {
+  it('states the native slice from the generated parity matrix, never typed in', () => {
     const fixture = [
       'val implemented: Set<String> = setOf(',
       '  "layout-page",',
@@ -150,6 +150,11 @@ describe('landing', () => {
     expect(painted).toContain('layout-stack');
     expect(painted).toContain('charts-sparkline');
     expect(loadNativeSlice()).toEqual({ painted: painted.length, total: ids.size });
+    const report = loadParity(resolve(WEBSITE, '../..'));
+    expect(loadNativeSlice()).toEqual({
+      painted: report.totals.painted,
+      total: report.totals.catalog,
+    });
     expect(HOME_STORIES.find((story) => story.id === 'web-native')?.points?.[1]?.label).toContain(
       '{painted} of {total} components paint today'
     );

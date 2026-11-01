@@ -15,6 +15,7 @@
  * - no dates presented as promises, no store badges, no invented versions,
  *   and no claim that anything is published to Maven Central.
  */
+import { NATIVE_SLICE } from './native-parity.ts';
 
 export interface NativeEvidenceItem {
   /** Short name shown as the row title. */
@@ -71,7 +72,8 @@ export const NATIVE_MODULES: readonly NativeEvidenceItem[] = [
 export const NATIVE_SHIPPED: readonly string[] = [
   'The Kotlin projection is generated and tested in this repository, from the same manifest data the shipped TypeScript packages are built from.',
   'texuli-spec compiles for the JVM and for iOS (arm64 and simulator targets); texuli-compose and conformance run their suites on the JVM.',
-  'The Compose renderer paints a documented slice: page, document, deck, card and grid layouts; text blocks and ordered and unordered lists; static boards; stat and KPI blocks; accessible tables; image, figure, video and gallery media frames; and a bounded compact-chart slice (sparkline, bullet, gauge, progress ring).',
+  `The Compose renderer paints ${NATIVE_SLICE.painted} of the ${NATIVE_SLICE.total} catalog components: page, document, deck, card and grid layouts; the stack, row, split and tile composition layouts; text blocks and ordered and unordered lists; code and structure blocks; static boards; stat and KPI blocks; accessible tables; image, figure, video and gallery media frames; and a bounded compact-chart slice (sparkline, bullet, gauge, progress ring). Every other component paints a visible placeholder; the generated parity matrix lists them.`,
+  'Design-system documents decode natively and a blueprint’s design-system reference validates as on the web; the renderer themes from token sets compiled by @texuli/tokens and checked against the web values.',
   'The dual-target golden gate passes: GoldenConformanceTest requires each spec golden’s native semantic trace to equal the web trace, and InvalidFixtureParityTest refuses every invalid fixture with exactly the TypeScript validator’s codes.',
   'Six Kotlin Multiplatform app migrations pin every widget’s documented status, from a starter screen to a static game scoreboard.',
   'HostilePropsTest drives wrong types, depth bombs and control strings through every projection: nothing throws, and everything stays in bounds.',

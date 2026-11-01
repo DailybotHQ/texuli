@@ -23,6 +23,7 @@ import * as portability from '../src/components/sections/architecture/portabilit
 import * as home from '../src/components/sections/home/home-content.ts';
 import * as nativeEvidence from '../src/components/sections/native/native-evidence-data.ts';
 import * as nativeHero from '../src/components/sections/native/native-hero-content.ts';
+import * as nativeParity from '../src/components/sections/native/native-parity.ts';
 import * as whyKmp from '../src/components/sections/native/why-kmp-content.ts';
 import * as webCorrelation from '../src/components/sections/web/web-correlation-content.ts';
 import { DISCOVERY_FILE_TYPES } from '../src/components/seo/agent-discovery.ts';
@@ -295,5 +296,52 @@ describe('honesty', () => {
     expect([...statuses].every((status) => ['exists', 'in-repo', 'planned'].includes(status))).toBe(
       true
     );
+  });
+});
+
+describe('native claims follow the generated parity matrix (PLAN_012)', () => {
+  const parityJson = JSON.parse(readRepo('native/docs/parity.json')) as {
+    totals: { painted: number; catalog: number; agentEmittable: number; goldenTraces: number };
+  };
+
+  it('reads every native count on the site from native/docs/parity.json', () => {
+    expect(nativeParity.NATIVE_SLICE).toEqual({
+      painted: parityJson.totals.painted,
+      total: parityJson.totals.catalog,
+      goldenTraces: parityJson.totals.goldenTraces,
+    });
+    expect(nativeParity.NATIVE_CHARTS.painted).toEqual([
+      'charts-bullet',
+      'charts-gauge',
+      'charts-progress-ring',
+      'charts-sparkline',
+    ]);
+    const shipped = nativeEvidence.NATIVE_SHIPPED.join(' ');
+    expect(shipped).toContain(
+      `paints ${parityJson.totals.painted} of the ${parityJson.totals.catalog}`
+    );
+    const charts = parity.PARITY_ROWS.find((row) => row.capability === 'Charts');
+    expect(charts?.native.detail).toContain(
+      `of ${nativeParity.NATIVE_CHARTS.total} chart families`
+    );
+  });
+
+  it('carries no stale native count or claim in the docs or on the site', () => {
+    const sources = [
+      readRepo('native/README.md'),
+      readRepo('native/docs/ADOPTION.md'),
+      JSON.stringify([parity, nativeEvidence, nativeHero]),
+    ].join('\n');
+    for (const stale of [
+      /\b133 (?:spec )?vocabulary/,
+      /\b41 (?:may be emitted|emittable)/,
+      /other 92\b/,
+      /all nine spec goldens/,
+      /all four goldens/,
+      /full engine generated from the spec.s token roles is planned/,
+    ])
+      expect(sources, String(stale)).not.toMatch(stale);
+    expect(readRepo('native/docs/ADOPTION.md')).toContain('[PARITY.md](PARITY.md)');
+    expect(readRepo('native/README.md')).toContain('[web ↔ native parity matrix](docs/PARITY.md)');
   });
 });

@@ -15,6 +15,7 @@
  * the Compose renderer is published, and the planned marker follows the
  * site convention (`data-status="planned"` plus the visible word).
  */
+import { NATIVE_CHARTS } from '../native/native-parity.ts';
 
 export type ParityStatus = 'exists' | 'in-repo' | 'planned';
 
@@ -93,7 +94,7 @@ export const PARITY_ROWS: readonly ParityRow[] = [
     },
     native: {
       status: 'in-repo',
-      detail: 'A bounded compact-chart slice: sparkline, bullet, gauge, progress ring.',
+      detail: `A bounded compact-chart slice: ${NATIVE_CHARTS.painted.length} of ${NATIVE_CHARTS.total} chart families (${NATIVE_CHARTS.painted.map((id) => id.replace('charts-', '').replace('-', ' ')).join(', ')}); the others paint a placeholder.`,
       surface: 'native/texuli-compose/src/commonMain/kotlin/com/texuli/compose/ChartWidgets.kt',
     },
   },
@@ -120,8 +121,8 @@ export const PARITY_ROWS: readonly ParityRow[] = [
     native: {
       status: 'in-repo',
       detail:
-        'TexuliTheme mirrors the default theme’s neutral roles; the full engine generated from the spec’s token roles is planned.',
-      surface: 'native/texuli-compose/src/commonMain/kotlin/com/texuli/compose/TexuliTheme.kt',
+        'TexuliTheme reads a token set compiled from @texuli/tokens and checked against the web values (Default and Acme); a Kotlin compiler for a brand’s design-system document is planned.',
+      surface: 'native/texuli-spec/src/commonMain/kotlin/com/texuli/spec/tokens/DesignTokens.kt',
     },
   },
   {

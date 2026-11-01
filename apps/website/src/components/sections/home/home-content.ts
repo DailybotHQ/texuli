@@ -4,6 +4,7 @@
  * from the source it links to, never typed in. Copy budgets are pinned by
  * apps/website/tests/landing.test.ts.
  */
+import { NATIVE_SLICE } from '../native/native-parity.ts';
 import { countAllThemes, loadHeroProof } from './home-data.ts';
 
 export interface HomeLink {
@@ -194,10 +195,6 @@ export function fillCopy(text: string, values: Readonly<Record<string, number | 
   });
 }
 
-const REGISTRY_RAW = import.meta.glob<string>(
-  '../../../../../../native/texuli-compose/src/commonMain/kotlin/com/texuli/compose/Registry.kt',
-  { query: '?raw', import: 'default', eager: true }
-);
 const CATALOG_RAW = import.meta.glob<string>(
   '../../../../../../packages/spec/catalog/components.json',
   {
@@ -207,31 +204,9 @@ const CATALOG_RAW = import.meta.glob<string>(
   }
 );
 
-/** The ids `NativeRegistry.implemented` lists (its own set plus the compact chart set). */
-export function parseNativeRegistry(source: string): string[] {
-  // Comments first: one names "(ADR-016)", whose parenthesis would end a set early.
-  const code = source.replace(/\/\/[^\n]*/g, '');
-  const block = (name: string): string =>
-    new RegExp(`val ${name}(?::[^=]+)?\\s*=\\s*setOf\\(([^)]*)\\)`).exec(code)?.[1] ?? '';
-  const ids = (text: string): string[] =>
-    [...text.matchAll(/"([a-z0-9-]+)"/g)].map((match) => match[1] ?? '');
-  const own = ids(block('implemented'));
-  const charts = /val implemented[^=]*=\s*setOf\([^)]*\)\s*\+\s*compactCharts/.test(code)
-    ? ids(block('compactCharts'))
-    : [];
-  return [...new Set([...own, ...charts])].sort();
-}
-
-/** How many catalog components paint natively today, of the whole catalog. */
+/** How many catalog components paint natively today, of the whole catalog (from the parity matrix). */
 export function loadNativeSlice(): { painted: number; total: number } {
-  const registry = Object.values(REGISTRY_RAW)[0];
-  const catalog = Object.values(CATALOG_RAW)[0];
-  if (!registry || !catalog) throw new Error('native registry or spec catalog not found');
-  const ids = new Set(
-    (JSON.parse(catalog) as { components: { id: string }[] }).components.map((entry) => entry.id)
-  );
-  const painted = parseNativeRegistry(registry).filter((id) => ids.has(id)).length;
-  return { painted, total: ids.size };
+  return { painted: NATIVE_SLICE.painted, total: NATIVE_SLICE.total };
 }
 
 export interface HomeProofStat {
