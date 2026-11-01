@@ -1,6 +1,6 @@
 {
   "name": "@texuli/mcp",
-  "version": "0.11.5",
+  "version": "0.12.0",
   "private": true,
   "description": "The Texuli MCP server for local agents: npx -y @texuli/mcp runs every Texuli operation over stdio.",
   "keywords": [
@@ -36,6 +36,6 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@texuli/tools": "0.11.5"
+    "@texuli/tools": "0.12.0"
   }
 }

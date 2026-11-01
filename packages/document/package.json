@@ -1,6 +1,6 @@
 {
   "name": "@texuli/document",
-  "version": "0.11.5",
+  "version": "0.12.0",
   "private": true,
   "description": "Framework-free, DOM-free document engine for Texuli: the block document format with persisted ids, the untrusted validator, typed operations and bounded RFC 6902 patches with undo, Markdown through the core codec, and the CRDT sync core.",
   "keywords": [
@@ -74,8 +74,8 @@
     }
   },
   "dependencies": {
-    "@texuli/core": "0.11.5",
-    "@texuli/deck": "0.11.5"
+    "@texuli/core": "0.12.0",
+    "@texuli/deck": "0.12.0"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"

@@ -9,4 +9,4 @@ export * from './model/index.ts';
 export * from './view/index.ts';
 
 /** The package version (first published as `0.8.0`). */
-export const SHEETS_PACKAGE_VERSION = '0.11.5';
+export const SHEETS_PACKAGE_VERSION = '0.12.0';
