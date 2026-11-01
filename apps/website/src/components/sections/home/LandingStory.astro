@@ -1,0 +1,225 @@
+---
+/**
+ * One story band of the landing (PLAN_012 T-landing-acts): a topic kicker
+ * with its growing texel mark, a headline, a short body, then points, chips
+ * or calls to action, beside one illustration slot. `side` puts the art at
+ * the inline start or end; bands alternate. On narrow screens the art comes
+ * first. Links resolve through the URL policy (developer tier).
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../foundation/site.ts';
+import SiteIllustration from '../../landing/SiteIllustration.astro';
+import type { HomeStory } from './home-content.ts';
+import TexelMark from './TexelMark.astro';
+
+interface Props {
+  story: HomeStory;
+  /** 1-based position among the stories; sizes the texel mark. */
+  index: number;
+  side: 'start' | 'end';
+}
+
+const { story, index, side } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const resolveHref = (href: string): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  return safe === undefined ? undefined : withBase(base, safe);
+};
+const titleId = `home-story-${story.id}`;
+---
+
+<section
+  class:list={['home-story', `home-story--art-${side}`, { 'home-story--tint': index % 2 === 1 }]}
+  aria-labelledby={titleId}
+  data-tx-home-story={story.id}
+  data-tx-art-side={side}
+>
+  <div class="home-story__inner">
+    <div class="home-story__copy">
+      <p class="home-story__kicker">
+        <TexelMark count={index} />
+        <span>{story.kicker}</span>
+      </p>
+      <h2 id={titleId}>{story.title}</h2>
+      <p class="home-story__body">{story.body}</p>
+      {
+        story.points && (
+          <ul class="home-story__points" role="list">
+            {story.points.map((point) => (
+              <li>
+                {point.href ? <a href={resolveHref(point.href)}>{point.label}</a> : <span>{point.label}</span>}
+              </li>
+            ))}
+          </ul>
+        )
+      }
+      {
+        story.chips && (
+          <ul class="home-story__chips" role="list">
+            {story.chips.map((chip) => (
+              <li>
+                <a href={resolveHref(chip.href)}>{chip.label}</a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+      <slot />
+      {
+        story.actions && (
+          <div class="home-story__actions">
+            {story.actions.map((link) => (
+              <a href={resolveHref(link.href)} class={`home-cta home-cta--${link.role}`}>
+                {link.label}
+                {link.role === 'text' && <span aria-hidden="true">&nbsp;→</span>}
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </div>
+    <div class="home-story__art">
+      <SiteIllustration slot={story.slot} />
+    </div>
+  </div>
+</section>
+
+<style>
+  .home-story {
+    border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 60%, transparent);
+  }
+  .home-story--tint {
+    background: var(--home-tint);
+  }
+  .home-story__inner {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-block: clamp(3rem, 8vw, 6rem);
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+    align-items: center;
+  }
+  .home-story__art {
+    order: -1;
+    min-inline-size: 0;
+  }
+  @media (min-width: 56rem) {
+    .home-story__inner {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    }
+    .home-story__art {
+      order: 0;
+    }
+    .home-story--art-start .home-story__inner {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    }
+    .home-story--art-start .home-story__art {
+      order: -1;
+    }
+  }
+  .home-story__copy {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+    max-inline-size: 34rem;
+  }
+  .home-story__kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0;
+    color: var(--home-accent-text);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .home-story h2 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(1.9rem, 5vw, 3rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    font-weight: 800;
+    text-wrap: balance;
+  }
+  .home-story__body {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: clamp(1rem, 2.2vw, 1.15rem);
+    line-height: 1.55;
+  }
+  .home-story__points {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .home-story__points li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+    color: var(--tx-foreground);
+    font-weight: 550;
+  }
+  .home-story__points li::before {
+    content: '';
+    flex: none;
+    inline-size: 0.55rem;
+    block-size: 0.55rem;
+    border-radius: 2px;
+    background: var(--home-accent);
+    translate: 0 -0.1rem;
+  }
+  .home-story__points a,
+  .home-story__chips a {
+    color: inherit;
+    text-decoration-color: color-mix(in oklab, var(--home-accent) 60%, transparent);
+    text-underline-offset: 0.2em;
+  }
+  .home-story__points a:focus-visible,
+  .home-story__chips a:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .home-story__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .home-story__chips a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.25rem;
+    padding-inline: 0.85rem;
+    border: 1px solid color-mix(in oklab, var(--home-accent) 30%, var(--tx-border));
+    border-radius: 999px;
+    background: var(--tx-background);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .home-story__chips a:hover {
+    border-color: var(--home-accent);
+    color: var(--home-accent-text);
+  }
+  .home-story__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+  }
+  @media (forced-colors: active) {
+    .home-story__points li::before {
+      background: CanvasText;
+    }
+    .home-story__chips a {
+      border-color: LinkText;
+    }
+  }
+</style>

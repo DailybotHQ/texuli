@@ -22,20 +22,38 @@ test('sections in order, working calls to action, announced copy, motion only on
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(`${origin()}/`);
   await settle(page);
-  const order = await page.$$eval(
-    '[data-tx-home-hero], [data-tx-web-why-svelte], [data-tx-web-correlation], [data-tx-web-agents]',
-    (sections) =>
-      sections.map((section) =>
-        section.hasAttribute('data-tx-home-hero')
-          ? 'hero'
-          : section.hasAttribute('data-tx-web-why-svelte')
-            ? 'why'
-            : section.hasAttribute('data-tx-web-correlation')
-              ? 'correlation'
-              : 'agents'
-      )
+  const order = await page.$$eval('[data-tx-landing] > section', (sections) =>
+    sections.map(
+      (section) =>
+        (section.hasAttribute('data-tx-home-hero') && 'hero') ||
+        (section.hasAttribute('data-tx-home-pitch') && 'pitch') ||
+        section.getAttribute('data-tx-home-story') ||
+        (section.hasAttribute('data-tx-web-agents') && 'agents') ||
+        'unknown'
+    )
   );
-  expect(order).toEqual(['hero', 'why', 'correlation', 'agents']);
+  expect(order).toEqual([
+    'hero',
+    'pitch',
+    'universal',
+    'web-native',
+    'brand',
+    'agents',
+    'accessible',
+    'agents',
+  ]);
+  // The stories alternate their art and grow their texel mark one cube per band.
+  const stories = page.locator('[data-tx-home-story]');
+  expect(
+    await stories.evaluateAll((all) => all.map((story) => story.getAttribute('data-tx-art-side')))
+  ).toEqual(['end', 'start', 'end', 'start', 'end']);
+  expect(
+    await stories.evaluateAll((all) =>
+      all.map((story) => story.querySelectorAll('[data-tx-texel-mark] > *').length)
+    )
+  ).toEqual([1, 2, 3, 4, 5]);
+  await expect(page.locator('[data-tx-landing] pre')).toHaveCount(1);
+  await expect(page.locator('[data-tx-hero-theme]')).toHaveCount(6);
   await expect(page.locator('[data-tx-landing] astro-island')).toHaveCount(0);
   const hero = page.locator('[data-tx-home-hero]');
   await expect(hero.getByRole('heading', { level: 1 })).toHaveText('Build any interface.');
@@ -59,7 +77,6 @@ test('sections in order, working calls to action, announced copy, motion only on
     await expect(stat).toHaveAttribute('href', href);
     await expect(stat).toHaveText(/^\s*\d+\s/);
   }
-  await expect(page.locator('[data-tx-corr-panel]')).toHaveCount(3);
 
   const copy = hero.getByRole('button', { name: 'Copy install command' });
   await copy.focus();
@@ -73,7 +90,7 @@ test('sections in order, working calls to action, announced copy, motion only on
     page.$$eval('[data-tx-landing] > section', (sections) =>
       sections.map((section) => section.getAnimations().length)
     );
-  expect(await animated()).toEqual([0, 0, 0, 0]);
+  expect((await animated()).every((count) => count === 0)).toBe(true);
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   const counts = await animated();
   expect(counts[0]).toBe(0);

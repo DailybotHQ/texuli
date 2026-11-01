@@ -17,9 +17,14 @@ import { REPOSITORY_URL } from '../src/components/foundation/site.ts';
 import { illustrationFor } from '../src/components/landing/illustrations.ts';
 import { PRIMITIVES } from '../src/components/primitives-page/primitives.ts';
 import {
+  fillCopy,
   HOME_HERO,
   HOME_INSTALL_COMMAND,
+  HOME_PITCH,
+  HOME_STORIES,
   loadHomeHeroProof,
+  loadNativeSlice,
+  parseNativeRegistry,
   wordCount,
 } from '../src/components/sections/home/home-content.ts';
 import { countAllThemes } from '../src/components/sections/web/web-hero-content.ts';
@@ -69,6 +74,82 @@ describe('landing', () => {
     expect(illustrationFor('home-hero')?.priority).toBe(true);
     expect((hero.match(/<h1[\s>]/g) ?? []).length).toBe(1);
     expect(hero).not.toMatch(/<pre\b/);
+  });
+
+  it('tells five illustrated stories after the pitch, with topic kickers instead of numbered acts', () => {
+    expect(HOME_STORIES.map((story) => story.kicker)).toEqual([
+      'Universal',
+      'Web + native',
+      'Your brand',
+      'For agents',
+      'Accessible',
+    ]);
+    const slots = [HOME_PITCH.slot, ...HOME_STORIES.map((story) => story.slot)];
+    expect(new Set(slots).size).toBe(6);
+    for (const slot of slots) expect(illustrationFor(slot)?.variant, slot).toBe('plate');
+    expect(wordCount(HOME_PITCH.body)).toBeLessThanOrEqual(40);
+    const links = HOME_PITCH.steps.map((step) => step.href);
+    for (const story of HOME_STORIES) {
+      expect(
+        wordCount(fillCopy(story.body, { themeCount: 210, painted: 21, total: 168 })),
+        story.id
+      ).toBeLessThanOrEqual(40);
+      expect(story.points?.length ?? 0, story.id).toBeLessThanOrEqual(3);
+      for (const item of [
+        ...(story.points ?? []),
+        ...(story.chips ?? []),
+        ...(story.actions ?? []),
+      ])
+        if (item.href) links.push(item.href);
+    }
+    for (const href of links) expect(routeExists(href), href).toBe(true);
+    const copy = JSON.stringify([HOME_PITCH, HOME_STORIES]);
+    expect(copy).not.toMatch(/\bAct\b|\bActo\b/);
+
+    const stories = read('src/components/sections/home/HomeStories.astro');
+    expect(stories).toContain("side={index % 2 === 0 ? 'end' : 'start'}");
+    expect(stories).toContain('index={index + 1}');
+    for (const file of [
+      'HomePitch.astro',
+      'HomeStories.astro',
+      'LandingStory.astro',
+      'TexelMark.astro',
+    ]) {
+      const source = read(`src/components/sections/home/${file}`);
+      expect(source, file).not.toMatch(/<pre\b|<code\b/);
+    }
+    expect(read('src/components/sections/home/TexelMark.astro')).toContain('aria-hidden="true"');
+  });
+
+  it('states the native slice from the registry, never typed in', () => {
+    const fixture = [
+      'val implemented: Set<String> = setOf(',
+      '  "layout-page",',
+      '  // 0.8.0 (ADR-016): a comment with parentheses',
+      '  "blocks-code",',
+      ') + compactCharts',
+      'private val compactCharts = setOf("charts-gauge")',
+    ].join('\n');
+    expect(parseNativeRegistry(fixture)).toEqual(['blocks-code', 'charts-gauge', 'layout-page']);
+    expect(parseNativeRegistry(fixture.replace(' + compactCharts', ''))).toEqual([
+      'blocks-code',
+      'layout-page',
+    ]);
+    const registry = read(
+      '../../native/texuli-compose/src/commonMain/kotlin/com/texuli/compose/Registry.kt'
+    );
+    const catalog = JSON.parse(read('../../packages/spec/catalog/components.json')) as {
+      components: { id: string }[];
+    };
+    const ids = new Set(catalog.components.map((entry) => entry.id));
+    const painted = parseNativeRegistry(registry).filter((id) => ids.has(id));
+    expect(painted).toContain('layout-stack');
+    expect(painted).toContain('charts-sparkline');
+    expect(loadNativeSlice()).toEqual({ painted: painted.length, total: ids.size });
+    expect(HOME_STORIES.find((story) => story.id === 'web-native')?.points?.[1]?.label).toContain(
+      '{painted} of {total} components paint today'
+    );
+    expect(() => fillCopy('{missing}', {})).toThrow('no value for {missing}');
   });
 
   it('keeps the home title and description inside the SEO audit bands', () => {

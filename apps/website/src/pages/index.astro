@@ -1,9 +1,9 @@
 ---
 import HomeHero from '../components/sections/home/HomeHero.astro';
+import HomePitch from '../components/sections/home/HomePitch.astro';
+import HomeStories from '../components/sections/home/HomeStories.astro';
 import '../components/sections/home/home.css';
 import WebAgentsCta from '../components/sections/web/WebAgentsCta.astro';
-import WebCorrelation from '../components/sections/web/WebCorrelation.astro';
-import WebWhySvelte from '../components/sections/web/WebWhySvelte.astro';
 /**
  * texuli.com home (PLAN_006 T-44): the unified landing assembled from the
  * four blueprint sections in order — hero, why Svelte for the web, the
@@ -34,8 +34,8 @@ const HOME_DESCRIPTION =
 >
   <div class="landing" data-tx-landing="">
     <HomeHero />
-    <WebWhySvelte />
-    <WebCorrelation />
+    <HomePitch />
+    <HomeStories />
     <WebAgentsCta />
   </div>
 </BaseLayout>

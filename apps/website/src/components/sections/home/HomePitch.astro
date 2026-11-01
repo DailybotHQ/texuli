@@ -1,0 +1,152 @@
+---
+/**
+ * Landing band 2 (PLAN_012 T-landing-acts): the ladder from texels to
+ * applications, as four linked steps beside the `home-pieces` plate.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../foundation/site.ts';
+import SiteIllustration from '../../landing/SiteIllustration.astro';
+import { HOME_PITCH } from './home-content.ts';
+
+const base = import.meta.env.BASE_URL;
+const resolveHref = (href: string): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  return safe === undefined ? undefined : withBase(base, safe);
+};
+---
+
+<section class="home-pitch" aria-labelledby="home-pitch-title" data-tx-home-pitch="">
+  <div class="home-pitch__inner">
+    <div class="home-pitch__art">
+      <SiteIllustration slot={HOME_PITCH.slot} />
+    </div>
+    <div class="home-pitch__copy">
+      <p class="home-pitch__kicker">{HOME_PITCH.kicker}</p>
+      <h2 id="home-pitch-title">{HOME_PITCH.title}</h2>
+      <p class="home-pitch__body">{HOME_PITCH.body}</p>
+      <ol class="home-pitch__steps">
+        {
+          HOME_PITCH.steps.map((step, index) => (
+            <li>
+              <a href={resolveHref(step.href)}>
+                <span class="home-pitch__cubes" aria-hidden="true">
+                  {Array.from({ length: index + 1 }, () => (
+                    <span />
+                  ))}
+                </span>
+                <span class="home-pitch__label">{step.label}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .home-pitch {
+    border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 60%, transparent);
+  }
+  .home-pitch__inner {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-block: clamp(3rem, 8vw, 6rem);
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+    align-items: center;
+  }
+  @media (min-width: 56rem) {
+    .home-pitch__inner {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+    }
+  }
+  .home-pitch__art {
+    max-inline-size: 26rem;
+    justify-self: center;
+    inline-size: 100%;
+  }
+  .home-pitch__copy {
+    display: grid;
+    gap: 1rem;
+    max-inline-size: 38rem;
+  }
+  .home-pitch__kicker {
+    margin: 0;
+    color: var(--home-accent-text);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .home-pitch h2 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(2rem, 5.5vw, 3.4rem);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    font-weight: 800;
+    text-wrap: balance;
+  }
+  .home-pitch__body {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: clamp(1rem, 2.2vw, 1.15rem);
+    line-height: 1.55;
+  }
+  .home-pitch__steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.6rem;
+    margin: 0;
+    margin-block-start: 0.5rem;
+    padding: 0;
+    list-style: none;
+  }
+  .home-pitch__steps a {
+    display: grid;
+    gap: 0.6rem;
+    align-content: end;
+    min-block-size: 6.5rem;
+    padding: 0.85rem;
+    border: 1px solid color-mix(in oklab, var(--home-accent) 22%, var(--tx-border));
+    border-radius: 0.85rem;
+    background: color-mix(in oklab, var(--home-accent) 4%, var(--tx-background));
+    color: var(--tx-foreground);
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .home-pitch__steps a:hover {
+    border-color: var(--home-accent);
+  }
+  .home-pitch__steps a:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .home-pitch__cubes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    max-inline-size: 3rem;
+  }
+  .home-pitch__cubes span {
+    inline-size: 0.65rem;
+    block-size: 0.65rem;
+    border-radius: 2px;
+    background: var(--home-accent);
+  }
+  .home-pitch__steps li:nth-child(odd) .home-pitch__cubes span:last-child {
+    background: var(--home-warm);
+  }
+  @media (max-width: 30rem) {
+    .home-pitch__steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (forced-colors: active) {
+    .home-pitch__cubes span {
+      background: CanvasText;
+    }
+  }
+</style>

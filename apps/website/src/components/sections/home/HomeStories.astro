@@ -1,0 +1,95 @@
+---
+/**
+ * Landing bands 3–7 (PLAN_012 T-landing-acts): the five story bands in
+ * order, art alternating end and start. Counts are filled from their
+ * sources (the theme library and the native registry against the spec
+ * catalog); the brand story carries a static swatch strip of six library
+ * themes.
+ */
+import { countAllThemes, loadHeroThemes } from '../web/web-hero-content.ts';
+import { fillCopy, HOME_STORIES, loadNativeSlice } from './home-content.ts';
+import LandingStory from './LandingStory.astro';
+
+const [themeCount, themes] = await Promise.all([countAllThemes(), loadHeroThemes()]);
+const native = loadNativeSlice();
+const values = { themeCount, painted: native.painted, total: native.total };
+const stories = HOME_STORIES.map((story) => ({
+  ...story,
+  body: fillCopy(story.body, values),
+  points: story.points?.map((point) => ({ ...point, label: fillCopy(point.label, values) })),
+}));
+---
+
+{
+  stories.map((story, index) => (
+    <LandingStory story={story} index={index + 1} side={index % 2 === 0 ? 'end' : 'start'}>
+      {story.id === 'brand' && (
+        <ul class="home-swatches" role="list" aria-label="Six of the library themes">
+          {themes.map((theme) => (
+            <li
+              data-tx-hero-theme={theme.id}
+              style={`--swatch-background: ${theme.swatches.background}; --swatch-primary: ${theme.swatches.primary}; --swatch-accent: ${theme.swatches.accent};`}
+            >
+              <span class="home-swatches__chips" aria-hidden="true">
+                <span class="home-swatches__chip home-swatches__chip--primary" />
+                <span class="home-swatches__chip home-swatches__chip--accent" />
+              </span>
+              <span class="home-swatches__name">{theme.name}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </LandingStory>
+  ))
+}
+
+<style>
+  .home-swatches {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+    inline-size: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .home-swatches li {
+    display: grid;
+    gap: 0.4rem;
+    padding: 0.55rem;
+    border: 1px solid var(--tx-border);
+    border-radius: 0.6rem;
+    background: var(--swatch-background);
+  }
+  .home-swatches__chips {
+    display: flex;
+    gap: 0.3rem;
+  }
+  .home-swatches__chip {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    border-radius: 0.3rem;
+  }
+  .home-swatches__chip--primary {
+    background: var(--swatch-primary);
+  }
+  .home-swatches__chip--accent {
+    background: var(--swatch-accent);
+  }
+  .home-swatches__name {
+    /* The name sits on the theme's own background, so it takes the page
+       colors on a chip of its own to keep contrast on every theme. */
+    justify-self: start;
+    padding-inline: 0.35rem;
+    border-radius: 0.25rem;
+    background: var(--tx-background);
+    color: var(--tx-foreground);
+    font-size: 0.75rem;
+    font-weight: 650;
+  }
+  @media (forced-colors: active) {
+    .home-swatches li {
+      border-color: CanvasText;
+    }
+  }
+</style>

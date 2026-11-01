@@ -62,3 +62,174 @@ export async function loadHomeHeroProof(): Promise<readonly HomeStat[]> {
 export function wordCount(text: string): number {
   return text.trim().split(/\s+/).filter(Boolean).length;
 }
+
+export interface HomeStep {
+  label: string;
+  href: string;
+}
+
+/** Band 2: the ladder from texels to applications. */
+export const HOME_PITCH = {
+  kicker: "How it's built",
+  title: 'Small pieces. Infinite possibilities.',
+  body:
+    'Texuli starts from texels: tiny, framework-free behaviors. They compose into owned ' +
+    'primitives, primitives into styled components, and components into whole applications. ' +
+    'Every layer is yours to read, theme and extend.',
+  slot: 'home-pieces',
+  steps: [
+    { label: 'Texels', href: '/foundation/' },
+    { label: 'Primitives', href: '/primitives-page/' },
+    { label: 'Components', href: '/component-pages/' },
+    { label: 'Apps', href: '/showcase/' },
+  ] satisfies readonly HomeStep[],
+} as const;
+
+export interface HomeStory {
+  id: 'universal' | 'web-native' | 'brand' | 'agents' | 'accessible';
+  /** The topic kicker; the texel mark beside it grows one cube per story. */
+  kicker: string;
+  title: string;
+  body: string;
+  slot: string;
+  /** Short points (at most three), each optionally a link. */
+  points?: readonly { label: string; href?: string }[];
+  /** A chip list of linked destinations. */
+  chips?: readonly HomeStep[];
+  actions?: readonly HomeLink[];
+}
+
+/**
+ * Bands 3–7, in order. The art alternates sides (end, start, end, …);
+ * `{themeCount}` and `{painted}`/`{total}` are filled from their sources.
+ */
+export const HOME_STORIES: readonly HomeStory[] = [
+  {
+    id: 'universal',
+    kicker: 'Universal',
+    title: 'One library. Every interface.',
+    body:
+      'Dashboards, documents, chat, forms, spreadsheets, slides and canvases come from the ' +
+      'same pieces, so a whole product speaks one design language.',
+    slot: 'home-universe',
+    chips: [
+      { label: 'Data and dashboards', href: '/dashboards-page/' },
+      { label: 'Charts', href: '/charts-page/' },
+      { label: 'Media', href: '/media-page/' },
+      { label: 'Chat', href: '/agent-chat/' },
+      { label: 'Forms', href: '/forms-page/' },
+      { label: 'Sheets', href: '/sheets-page/' },
+      { label: 'Canvas', href: '/canvas-page/' },
+      { label: 'Documents', href: '/documents-page/' },
+      { label: 'Slides', href: '/slides-page/' },
+      { label: 'Workflows', href: '/workflows-page/' },
+    ],
+  },
+  {
+    id: 'web-native',
+    kicker: 'Web + native',
+    title: 'Svelte on the web. Native next.',
+    body:
+      'One blueprint contract describes the interface. Svelte 5 renders it on the web today; ' +
+      'a Kotlin Multiplatform renderer validates the same contract and paints a growing slice natively.',
+    slot: 'home-web-native',
+    points: [
+      { label: 'Svelte 5 on the web: every component' },
+      {
+        label: 'Kotlin Multiplatform: in development, {painted} of {total} components paint today',
+      },
+      { label: 'One spec, shared conformance fixtures', href: '/native/' },
+    ],
+    actions: [{ href: '/web-and-native/', label: 'See web and native side by side', role: 'text' }],
+  },
+  {
+    id: 'brand',
+    kicker: 'Your brand',
+    title: 'Your brand in one JSON file.',
+    body:
+      'Pick one of {themeCount} themes or describe your own design system in one document. ' +
+      'Texuli compiles it with contrast guarantees and every component follows.',
+    slot: 'home-design-systems',
+    actions: [
+      { href: '/design-systems/', label: 'Design systems', role: 'secondary' },
+      { href: '/gallery-themes/', label: 'Theme gallery', role: 'text' },
+    ],
+  },
+  {
+    id: 'agents',
+    kicker: 'For agents',
+    title: 'Built for agents.',
+    body:
+      'Agents describe interfaces as data against a closed catalog; Texuli validates and renders ' +
+      'them with no HTML sinks. Agents never ship code, and every page has a Markdown twin.',
+    slot: 'home-agents',
+    points: [
+      { label: 'MCP server, local and remote', href: '/mcp-server/' },
+      { label: 'The agent catalog', href: '/agents-page/' },
+      { label: 'The agent skill', href: '/skill/' },
+    ],
+  },
+  {
+    id: 'accessible',
+    kicker: 'Accessible',
+    title: 'Accessible and owned.',
+    body:
+      'Every primitive is built in-house on WAI-ARIA patterns and tested with keyboards and ' +
+      'screen readers. No third-party UI dependency, and a size budget on every entry.',
+    slot: 'home-accessible',
+    points: [
+      { label: 'Accessibility guide', href: '/guides/accessibility/' },
+      { label: 'Owned primitives', href: '/primitives-page/' },
+      { label: 'Performance budgets', href: '/guides/performance/' },
+    ],
+  },
+];
+
+/** Fill `{name}` placeholders; an unknown name throws so copy cannot ship a raw brace. */
+export function fillCopy(text: string, values: Readonly<Record<string, number | string>>): string {
+  return text.replace(/\{(\w+)\}/g, (_, name: string) => {
+    const value = values[name];
+    if (value === undefined) throw new Error(`no value for {${name}} in landing copy`);
+    return String(value);
+  });
+}
+
+const REGISTRY_RAW = import.meta.glob<string>(
+  '../../../../../../native/texuli-compose/src/commonMain/kotlin/com/texuli/compose/Registry.kt',
+  { query: '?raw', import: 'default', eager: true }
+);
+const CATALOG_RAW = import.meta.glob<string>(
+  '../../../../../../packages/spec/catalog/components.json',
+  {
+    query: '?raw',
+    import: 'default',
+    eager: true,
+  }
+);
+
+/** The ids `NativeRegistry.implemented` lists (its own set plus the compact chart set). */
+export function parseNativeRegistry(source: string): string[] {
+  // Comments first: one names "(ADR-016)", whose parenthesis would end a set early.
+  const code = source.replace(/\/\/[^\n]*/g, '');
+  const block = (name: string): string =>
+    new RegExp(`val ${name}(?::[^=]+)?\\s*=\\s*setOf\\(([^)]*)\\)`).exec(code)?.[1] ?? '';
+  const ids = (text: string): string[] =>
+    [...text.matchAll(/"([a-z0-9-]+)"/g)].map((match) => match[1] ?? '');
+  const own = ids(block('implemented'));
+  const charts = /val implemented[^=]*=\s*setOf\([^)]*\)\s*\+\s*compactCharts/.test(code)
+    ? ids(block('compactCharts'))
+    : [];
+  return [...new Set([...own, ...charts])].sort();
+}
+
+/** How many catalog components paint natively today, of the whole catalog. */
+export function loadNativeSlice(): { painted: number; total: number } {
+  const registry = Object.values(REGISTRY_RAW)[0];
+  const catalog = Object.values(CATALOG_RAW)[0];
+  if (!registry || !catalog) throw new Error('native registry or spec catalog not found');
+  const ids = new Set(
+    (JSON.parse(catalog) as { components: { id: string }[] }).components.map((entry) => entry.id)
+  );
+  const painted = parseNativeRegistry(registry).filter((id) => ids.has(id)).length;
+  return { painted, total: ids.size };
+}
