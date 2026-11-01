@@ -302,6 +302,7 @@ describe('honesty', () => {
 describe('native claims follow the generated parity matrix (PLAN_012)', () => {
   const parityJson = JSON.parse(readRepo('native/docs/parity.json')) as {
     totals: { painted: number; catalog: number; agentEmittable: number; goldenTraces: number };
+    components: { id: string; native: string }[];
   };
 
   it('reads every native count on the site from native/docs/parity.json', () => {
@@ -310,12 +311,11 @@ describe('native claims follow the generated parity matrix (PLAN_012)', () => {
       total: parityJson.totals.catalog,
       goldenTraces: parityJson.totals.goldenTraces,
     });
-    expect(nativeParity.NATIVE_CHARTS.painted).toEqual([
-      'charts-bullet',
-      'charts-gauge',
-      'charts-progress-ring',
-      'charts-sparkline',
-    ]);
+    expect(nativeParity.NATIVE_CHARTS.painted).toEqual(
+      parityJson.components
+        .filter((row) => row.id.startsWith('charts-') && row.native === 'painted')
+        .map((row) => row.id)
+    );
     const shipped = nativeEvidence.NATIVE_SHIPPED.join(' ');
     expect(shipped).toContain(
       `paints ${parityJson.totals.painted} of the ${parityJson.totals.catalog}`
