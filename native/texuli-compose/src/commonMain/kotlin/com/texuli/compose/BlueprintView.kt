@@ -119,6 +119,10 @@ private fun PlanNodeContent(node: PlanNode, path: String, onIntent: (TexuliInten
                 val chart = nativePartWholeChart(node.id, node.props)
                 if (chart == null) Placeholder(node.id, "invalid-chart-data") else PartWholeChartView(chart)
             }
+            in MATRIX_FLOW_CHART_IDS -> {
+                val chart = nativeMatrixFlowChart(node.id, node.props)
+                if (chart == null) Placeholder(node.id, "invalid-chart-data") else MatrixFlowChartView(chart)
+            }
             "charts-canvas-renderer" -> {
                 val chart = nativeCanvasChart(node.props)
                 if (chart == null) Placeholder(node.id, "invalid-chart-data") else CanvasChartView(chart)

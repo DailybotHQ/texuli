@@ -1,0 +1,259 @@
+{
+  "format": "texuli-blueprint",
+  "version": 1,
+  "id": "parity-charts-matrix-flow",
+  "catalog": "48d6231182dcdb62ed2c8816ff3f620ae9b9683612403dc7e3db00ad85ad893a",
+  "status": "draft",
+  "createdAt": "2026-10-24T09:00:00Z",
+  "updatedAt": "2026-10-24T09:00:00Z",
+  "generator": {
+    "kind": "agent",
+    "name": "Parity fixture",
+    "model": "example-model"
+  },
+  "tier": "untrusted",
+  "profile": "web",
+  "tree": {
+    "id": "layout-page",
+    "props": {
+      "title": "Matrix and flow charts",
+      "description": "Fictional parity fixture (PLAN_013)."
+    },
+    "children": [
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Sites by response time"
+        },
+        "children": [
+          {
+            "id": "charts-scatter",
+            "props": {
+              "title": "Sites by response time",
+              "description": "Response time against volume per site.",
+              "points": [
+                {
+                  "id": "a",
+                  "label": "Harbor",
+                  "x": 3.2,
+                  "y": 41,
+                  "r": 12
+                },
+                {
+                  "id": "b",
+                  "label": "Ridge",
+                  "x": 7.9,
+                  "y": 18.5,
+                  "r": 4
+                },
+                {
+                  "id": "c",
+                  "label": "Bay",
+                  "x": -1.5,
+                  "y": 66,
+                  "r": 30
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Sites by size"
+        },
+        "children": [
+          {
+            "id": "charts-bubble",
+            "props": {
+              "title": "Sites by size",
+              "description": "Response time against volume, sized by staff.",
+              "points": [
+                {
+                  "id": "a",
+                  "label": "Harbor",
+                  "x": 3.2,
+                  "y": 41,
+                  "r": 12
+                },
+                {
+                  "id": "b",
+                  "label": "Ridge",
+                  "x": 7.9,
+                  "y": 18.5,
+                  "r": 4
+                },
+                {
+                  "id": "c",
+                  "label": "Bay",
+                  "x": -1.5,
+                  "y": 66,
+                  "r": 30
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Tickets by shift"
+        },
+        "children": [
+          {
+            "id": "charts-heatmap",
+            "props": {
+              "title": "Tickets by shift",
+              "description": "Tickets per day and shift.",
+              "cells": [
+                {
+                  "x": "Mon",
+                  "y": "Night",
+                  "value": 3
+                },
+                {
+                  "x": "Mon",
+                  "y": "Day",
+                  "value": 9
+                },
+                {
+                  "x": "Tue",
+                  "y": "Night",
+                  "value": 3
+                },
+                {
+                  "x": "Tue",
+                  "y": "Day",
+                  "value": 9
+                },
+                {
+                  "x": "Wed",
+                  "y": "Night",
+                  "value": 3
+                },
+                {
+                  "x": "Wed",
+                  "y": "Day",
+                  "value": 9
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Trial funnel"
+        },
+        "children": [
+          {
+            "id": "charts-funnel",
+            "props": {
+              "title": "Trial funnel",
+              "steps": [
+                {
+                  "id": "visit",
+                  "label": "Visited",
+                  "value": 1200
+                },
+                {
+                  "id": "signup",
+                  "label": "Signed up",
+                  "value": 430
+                },
+                {
+                  "id": "paid",
+                  "label": "Paid",
+                  "value": 85
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Trial flow"
+        },
+        "children": [
+          {
+            "id": "charts-sankey",
+            "props": {
+              "title": "Trial flow",
+              "nodes": [
+                {
+                  "id": "web",
+                  "label": "Website"
+                },
+                {
+                  "id": "trial",
+                  "label": "Trial"
+                },
+                {
+                  "id": "paid",
+                  "label": "Paid"
+                }
+              ],
+              "links": [
+                {
+                  "source": "web",
+                  "target": "trial",
+                  "value": 320
+                },
+                {
+                  "source": "trial",
+                  "target": "paid",
+                  "value": 210
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "layout-card",
+        "props": {
+          "title": "Team handoffs"
+        },
+        "children": [
+          {
+            "id": "charts-network",
+            "props": {
+              "title": "Team handoffs",
+              "nodes": [
+                {
+                  "id": "web",
+                  "label": "Website"
+                },
+                {
+                  "id": "trial",
+                  "label": "Trial"
+                },
+                {
+                  "id": "paid",
+                  "label": "Paid"
+                }
+              ],
+              "links": [
+                {
+                  "source": "web",
+                  "target": "trial",
+                  "value": 320
+                },
+                {
+                  "source": "trial",
+                  "target": "paid",
+                  "value": 210
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

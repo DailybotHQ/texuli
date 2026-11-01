@@ -22,6 +22,7 @@ import {
   windowCartesianSeries,
   xDomain,
 } from '../packages/charts/src/cartesian/model.ts';
+import { networkLayout } from '../packages/charts/src/flow/model.ts';
 import { minMaxBuckets } from '../packages/charts/src/math/downsample/min-max.ts';
 import {
   bandScale,
@@ -46,6 +47,8 @@ import {
   timeScale,
   timeTicks,
 } from '../packages/charts/src/math/index.ts';
+import { funnelLayout } from '../packages/charts/src/math/layout/funnel.ts';
+import { sankey } from '../packages/charts/src/math/layout/sankey.ts';
 import { sunburst } from '../packages/charts/src/math/layout/sunburst.ts';
 import { type TreemapNode, treemap } from '../packages/charts/src/math/layout/treemap.ts';
 import {
@@ -58,6 +61,7 @@ import {
   roundCoord,
   stack,
 } from '../packages/charts/src/math/shapes/index.ts';
+import { createHeatmapLayout, createScatterLayout } from '../packages/charts/src/matrix/model.ts';
 import { centerTotalFits, treeTableRows } from '../packages/charts/src/part-whole/model.ts';
 import { biomeFormat } from './generate-surfaces.ts';
 
@@ -508,9 +512,139 @@ function partWholeCases(): VectorCase[] {
   return cases;
 }
 
+function matrixFlowCases(): VectorCase[] {
+  const cases: VectorCase[] = [];
+  const add = (fn: string, input: unknown, output: unknown) =>
+    cases.push({ fn, input: json(input), output: json(output) });
+  const cells = ['Mon', 'Tue', 'Wed'].flatMap((x, i) =>
+    ['Night', 'Day'].map((y, j) => ({ x, y, value: (i + 1) * (j + 2) * 3.5 - 4 }))
+  );
+  for (const [width, height] of [
+    [640, 360],
+    [300, 200],
+  ]) {
+    const margin = { top: 16, right: 16, bottom: 48, left: 80 };
+    const layout = createHeatmapLayout(cells, width, height, margin);
+    add(
+      'createHeatmapLayout',
+      { cells, width, height, margin },
+      {
+        xKeys: layout.xKeys,
+        yKeys: layout.yKeys,
+        cells: layout.cells,
+        valueDomain: layout.valueDomain,
+      }
+    );
+  }
+  const points = [
+    { id: 'a', label: 'Harbor', x: 3.2, y: 41, r: 12, seriesId: 'north' },
+    { id: 'b', label: 'Ridge', x: 7.9, y: 18.5, r: 4 },
+    { id: 'c', label: 'Bay', x: -1.5, y: 66, r: 30, seriesId: 'north' },
+    { id: 'd', label: 'Cove', x: 5, y: 41, r: 0 },
+  ];
+  const series = [{ id: 'north', label: 'North region' }];
+  for (const bubble of [false, true]) {
+    const margin = { top: 16, right: 16, bottom: 48, left: 56 };
+    const layout = createScatterLayout(points, { width: 520, height: 360, margin, series, bubble });
+    add(
+      'createScatterLayout',
+      { points, width: 520, height: 360, margin, series, bubble },
+      {
+        points: layout.points.map(({ color: _color, ...point }) => point),
+        xTicks: layout.xTicks,
+        yTicks: layout.yTicks,
+        series: layout.series,
+      }
+    );
+  }
+  const single = [{ id: 'only', label: 'Only', x: 2, y: 2 }];
+  const singleLayout = createScatterLayout(single, {});
+  add(
+    'createScatterLayout',
+    {
+      points: single,
+      width: 640,
+      height: 360,
+      margin: { top: 16, right: 16, bottom: 48, left: 56 },
+      series: [],
+      bubble: false,
+    },
+    {
+      points: singleLayout.points.map(({ color: _color, ...point }) => point),
+      xTicks: singleLayout.xTicks,
+      yTicks: singleLayout.yTicks,
+      series: singleLayout.series,
+    }
+  );
+  const steps = [
+    { id: 'visit', label: 'Visited', value: 1200 },
+    { id: 'signup', label: 'Signed up', value: 430 },
+    { id: 'trial', value: 0 },
+    { id: 'paid', label: 'Paid', value: 85.5 },
+  ];
+  for (const orientation of ['vertical', 'horizontal'] as const)
+    add(
+      'funnelLayout',
+      { steps, width: 600, height: 320, orientation },
+      funnelLayout(steps, { width: 600, height: 320, orientation, gap: 8 })
+    );
+  add(
+    'funnelLayout',
+    { steps: [{ id: 'zero', value: 0 }], width: 300, height: 100, orientation: 'vertical' },
+    funnelLayout([{ id: 'zero', value: 0 }], { width: 300, height: 100, gap: 8 })
+  );
+  const nodes = [
+    { id: 'web', label: 'Website' },
+    { id: 'ads', label: 'Ads' },
+    { id: 'trial', label: 'Trial' },
+    { id: 'paid', label: 'Paid' },
+    { id: 'churn', label: 'Churned' },
+    { id: 'idle' },
+  ];
+  const links = [
+    { source: 'web', target: 'trial', value: 320 },
+    { source: 'ads', target: 'trial', value: 140 },
+    { source: 'trial', target: 'paid', value: 210 },
+    { source: 'trial', target: 'churn', value: 250 },
+    { source: 'ads', target: 'paid', value: 15 },
+  ];
+  for (const [width, height] of [
+    [608, 360],
+    [200, 120],
+  ])
+    add(
+      'sankey',
+      { nodes, links, width, height, nodeWidth: 14, nodePadding: 12 },
+      sankey(nodes, links, { width, height, nodeWidth: 14, nodePadding: 12 })
+    );
+  const netNodes = [
+    { id: 'a', label: 'Alpha', value: 12 },
+    { id: 'b', label: 'Beta' },
+    { id: 'c', value: 1000 },
+    { id: 'd', label: 'Delta', value: 0.5 },
+    { id: 'e' },
+  ];
+  const netLinks = [
+    { source: 'a', target: 'b', value: 3 },
+    { source: 'b', target: 'c' },
+    { source: 'c', target: 'a', value: 12 },
+    { source: 'd', target: 'e', value: 0.25 },
+  ];
+  for (const [width, height] of [
+    [480, 360],
+    [240, 400],
+  ])
+    add(
+      'networkLayout',
+      { nodes: netNodes, links: netLinks, width, height },
+      networkLayout(netNodes, netLinks, width, height)
+    );
+  return cases;
+}
+
 /** Every case, in a stable order: the shared core first, then each family's model. */
 export function buildVectors(): VectorCase[] {
-  return [...coreCases(), ...cartesianLayoutCases(), ...partWholeCases()];
+  return [...coreCases(), ...cartesianLayoutCases(), ...partWholeCases(), ...matrixFlowCases()];
 }
 
 export function renderVectors(cases: readonly VectorCase[], root = ROOT): string {

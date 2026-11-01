@@ -5940,6 +5940,1289 @@
         "fontSize": 12.79
       },
       "output": true
+    },
+    {
+      "fn": "createHeatmapLayout",
+      "input": {
+        "cells": [
+          {
+            "x": "Mon",
+            "y": "Night",
+            "value": 3
+          },
+          {
+            "x": "Mon",
+            "y": "Day",
+            "value": 6.5
+          },
+          {
+            "x": "Tue",
+            "y": "Night",
+            "value": 10
+          },
+          {
+            "x": "Tue",
+            "y": "Day",
+            "value": 17
+          },
+          {
+            "x": "Wed",
+            "y": "Night",
+            "value": 17
+          },
+          {
+            "x": "Wed",
+            "y": "Day",
+            "value": 27.5
+          }
+        ],
+        "width": 640,
+        "height": 360,
+        "margin": {
+          "top": 16,
+          "right": 16,
+          "bottom": 48,
+          "left": 80
+        }
+      },
+      "output": {
+        "xKeys": ["Mon", "Tue", "Wed"],
+        "yKeys": ["Night", "Day"],
+        "cells": [
+          {
+            "id": "Mon::Night",
+            "x": "Mon",
+            "y": "Night",
+            "value": 3,
+            "xPos": 87.25333333333333,
+            "yPos": 21.920000000000016,
+            "width": 166.82666666666668,
+            "height": 136.16,
+            "t": 0
+          },
+          {
+            "id": "Mon::Day",
+            "x": "Mon",
+            "y": "Day",
+            "value": 6.5,
+            "xPos": 87.25333333333333,
+            "yPos": 169.92000000000002,
+            "width": 166.82666666666668,
+            "height": 136.16,
+            "t": 0.14285714285714285
+          },
+          {
+            "id": "Tue::Night",
+            "x": "Tue",
+            "y": "Night",
+            "value": 10,
+            "xPos": 268.5866666666667,
+            "yPos": 21.920000000000016,
+            "width": 166.82666666666668,
+            "height": 136.16,
+            "t": 0.2857142857142857
+          },
+          {
+            "id": "Tue::Day",
+            "x": "Tue",
+            "y": "Day",
+            "value": 17,
+            "xPos": 268.5866666666667,
+            "yPos": 169.92000000000002,
+            "width": 166.82666666666668,
+            "height": 136.16,
+            "t": 0.5714285714285714
+          },
+          {
+            "id": "Wed::Night",
+            "x": "Wed",
+            "y": "Night",
+            "value": 17,
+            "xPos": 449.92,
+            "yPos": 21.920000000000016,
+            "width": 166.82666666666668,
+            "height": 136.16,
+            "t": 0.5714285714285714
+          },
+          {
+            "id": "Wed::Day",
+            "x": "Wed",
+            "y": "Day",
+            "value": 27.5,
+            "xPos": 449.92,
+            "yPos": 169.92000000000002,
+            "width": 166.82666666666668,
+            "height": 136.16,
+            "t": 1
+          }
+        ],
+        "valueDomain": [3, 27.5]
+      }
+    },
+    {
+      "fn": "createHeatmapLayout",
+      "input": {
+        "cells": [
+          {
+            "x": "Mon",
+            "y": "Night",
+            "value": 3
+          },
+          {
+            "x": "Mon",
+            "y": "Day",
+            "value": 6.5
+          },
+          {
+            "x": "Tue",
+            "y": "Night",
+            "value": 10
+          },
+          {
+            "x": "Tue",
+            "y": "Day",
+            "value": 17
+          },
+          {
+            "x": "Wed",
+            "y": "Night",
+            "value": 17
+          },
+          {
+            "x": "Wed",
+            "y": "Day",
+            "value": 27.5
+          }
+        ],
+        "width": 300,
+        "height": 200,
+        "margin": {
+          "top": 16,
+          "right": 16,
+          "bottom": 48,
+          "left": 80
+        }
+      },
+      "output": {
+        "xKeys": ["Mon", "Tue", "Wed"],
+        "yKeys": ["Night", "Day"],
+        "cells": [
+          {
+            "id": "Mon::Night",
+            "x": "Mon",
+            "y": "Night",
+            "value": 3,
+            "xPos": 82.72,
+            "yPos": 18.72,
+            "width": 62.56,
+            "height": 62.56,
+            "t": 0
+          },
+          {
+            "id": "Mon::Day",
+            "x": "Mon",
+            "y": "Day",
+            "value": 6.5,
+            "xPos": 82.72,
+            "yPos": 86.72,
+            "width": 62.56,
+            "height": 62.56,
+            "t": 0.14285714285714285
+          },
+          {
+            "id": "Tue::Night",
+            "x": "Tue",
+            "y": "Night",
+            "value": 10,
+            "xPos": 150.72,
+            "yPos": 18.72,
+            "width": 62.56,
+            "height": 62.56,
+            "t": 0.2857142857142857
+          },
+          {
+            "id": "Tue::Day",
+            "x": "Tue",
+            "y": "Day",
+            "value": 17,
+            "xPos": 150.72,
+            "yPos": 86.72,
+            "width": 62.56,
+            "height": 62.56,
+            "t": 0.5714285714285714
+          },
+          {
+            "id": "Wed::Night",
+            "x": "Wed",
+            "y": "Night",
+            "value": 17,
+            "xPos": 218.72,
+            "yPos": 18.72,
+            "width": 62.56,
+            "height": 62.56,
+            "t": 0.5714285714285714
+          },
+          {
+            "id": "Wed::Day",
+            "x": "Wed",
+            "y": "Day",
+            "value": 27.5,
+            "xPos": 218.72,
+            "yPos": 86.72,
+            "width": 62.56,
+            "height": 62.56,
+            "t": 1
+          }
+        ],
+        "valueDomain": [3, 27.5]
+      }
+    },
+    {
+      "fn": "createScatterLayout",
+      "input": {
+        "points": [
+          {
+            "id": "a",
+            "label": "Harbor",
+            "x": 3.2,
+            "y": 41,
+            "r": 12,
+            "seriesId": "north"
+          },
+          {
+            "id": "b",
+            "label": "Ridge",
+            "x": 7.9,
+            "y": 18.5,
+            "r": 4
+          },
+          {
+            "id": "c",
+            "label": "Bay",
+            "x": -1.5,
+            "y": 66,
+            "r": 30,
+            "seriesId": "north"
+          },
+          {
+            "id": "d",
+            "label": "Cove",
+            "x": 5,
+            "y": 41,
+            "r": 0
+          }
+        ],
+        "width": 520,
+        "height": 360,
+        "margin": {
+          "top": 16,
+          "right": 16,
+          "bottom": 48,
+          "left": 56
+        },
+        "series": [
+          {
+            "id": "north",
+            "label": "North region"
+          }
+        ],
+        "bubble": false
+      },
+      "output": {
+        "points": [
+          {
+            "id": "a",
+            "label": "Harbor",
+            "x": 3.2,
+            "y": 41,
+            "r": 12,
+            "cx": 288.96000000000004,
+            "cy": 172.07272727272726,
+            "radius": 4,
+            "seriesId": "north"
+          },
+          {
+            "id": "b",
+            "label": "Ridge",
+            "x": 7.9,
+            "y": 18.5,
+            "r": 4,
+            "cx": 499.52,
+            "cy": 293.1636363636364,
+            "radius": 4
+          },
+          {
+            "id": "c",
+            "label": "Bay",
+            "x": -1.5,
+            "y": 66,
+            "r": 30,
+            "cx": 78.4,
+            "cy": 37.52727272727276,
+            "radius": 4,
+            "seriesId": "north"
+          },
+          {
+            "id": "d",
+            "label": "Cove",
+            "x": 5,
+            "y": 41,
+            "r": 0,
+            "cx": 369.59999999999997,
+            "cy": 172.07272727272726,
+            "radius": 4
+          }
+        ],
+        "xTicks": [-2, 0, 2, 4, 6, 8],
+        "yTicks": [20, 30, 40, 50, 60, 70],
+        "series": [
+          {
+            "id": "north",
+            "label": "North region"
+          },
+          {
+            "id": "default",
+            "label": "Points"
+          }
+        ]
+      }
+    },
+    {
+      "fn": "createScatterLayout",
+      "input": {
+        "points": [
+          {
+            "id": "a",
+            "label": "Harbor",
+            "x": 3.2,
+            "y": 41,
+            "r": 12,
+            "seriesId": "north"
+          },
+          {
+            "id": "b",
+            "label": "Ridge",
+            "x": 7.9,
+            "y": 18.5,
+            "r": 4
+          },
+          {
+            "id": "c",
+            "label": "Bay",
+            "x": -1.5,
+            "y": 66,
+            "r": 30,
+            "seriesId": "north"
+          },
+          {
+            "id": "d",
+            "label": "Cove",
+            "x": 5,
+            "y": 41,
+            "r": 0
+          }
+        ],
+        "width": 520,
+        "height": 360,
+        "margin": {
+          "top": 16,
+          "right": 16,
+          "bottom": 48,
+          "left": 56
+        },
+        "series": [
+          {
+            "id": "north",
+            "label": "North region"
+          }
+        ],
+        "bubble": true
+      },
+      "output": {
+        "points": [
+          {
+            "id": "a",
+            "label": "Harbor",
+            "x": 3.2,
+            "y": 41,
+            "r": 12,
+            "cx": 288.96000000000004,
+            "cy": 172.07272727272726,
+            "radius": 14.8,
+            "seriesId": "north"
+          },
+          {
+            "id": "b",
+            "label": "Ridge",
+            "x": 7.9,
+            "y": 18.5,
+            "r": 4,
+            "cx": 499.52,
+            "cy": 293.1636363636364,
+            "radius": 8.933333333333334
+          },
+          {
+            "id": "c",
+            "label": "Bay",
+            "x": -1.5,
+            "y": 66,
+            "r": 30,
+            "cx": 78.4,
+            "cy": 37.52727272727276,
+            "radius": 28,
+            "seriesId": "north"
+          },
+          {
+            "id": "d",
+            "label": "Cove",
+            "x": 5,
+            "y": 41,
+            "r": 0,
+            "cx": 369.59999999999997,
+            "cy": 172.07272727272726,
+            "radius": 6
+          }
+        ],
+        "xTicks": [-2, 0, 2, 4, 6, 8],
+        "yTicks": [20, 30, 40, 50, 60, 70],
+        "series": [
+          {
+            "id": "north",
+            "label": "North region"
+          },
+          {
+            "id": "default",
+            "label": "Points"
+          }
+        ]
+      }
+    },
+    {
+      "fn": "createScatterLayout",
+      "input": {
+        "points": [
+          {
+            "id": "only",
+            "label": "Only",
+            "x": 2,
+            "y": 2
+          }
+        ],
+        "width": 640,
+        "height": 360,
+        "margin": {
+          "top": 16,
+          "right": 16,
+          "bottom": 48,
+          "left": 56
+        },
+        "series": [],
+        "bubble": false
+      },
+      "output": {
+        "points": [
+          {
+            "id": "only",
+            "label": "Only",
+            "x": 2,
+            "y": 2,
+            "r": 1,
+            "cx": 340,
+            "cy": 164,
+            "radius": 4
+          }
+        ],
+        "xTicks": [1, 1.5, 2, 2.5, 3],
+        "yTicks": [1, 1.5, 2, 2.5, 3],
+        "series": [
+          {
+            "id": "default",
+            "label": "Points"
+          }
+        ]
+      }
+    },
+    {
+      "fn": "funnelLayout",
+      "input": {
+        "steps": [
+          {
+            "id": "visit",
+            "label": "Visited",
+            "value": 1200
+          },
+          {
+            "id": "signup",
+            "label": "Signed up",
+            "value": 430
+          },
+          {
+            "id": "trial",
+            "value": 0
+          },
+          {
+            "id": "paid",
+            "label": "Paid",
+            "value": 85.5
+          }
+        ],
+        "width": 600,
+        "height": 320,
+        "orientation": "vertical"
+      },
+      "output": [
+        {
+          "id": "visit",
+          "label": "Visited",
+          "value": 1200,
+          "conversion": 1,
+          "stepConversion": 1,
+          "dropOff": 0,
+          "dropOffRate": 0,
+          "x": 0,
+          "y": 0,
+          "width": 600,
+          "height": 74
+        },
+        {
+          "id": "signup",
+          "label": "Signed up",
+          "value": 430,
+          "conversion": 0.35833333333333334,
+          "stepConversion": 0.35833333333333334,
+          "dropOff": 770,
+          "dropOffRate": 0.6416666666666667,
+          "x": 192.5,
+          "y": 82,
+          "width": 215,
+          "height": 74
+        },
+        {
+          "id": "trial",
+          "value": 0,
+          "conversion": 0,
+          "stepConversion": 0,
+          "dropOff": 430,
+          "dropOffRate": 1,
+          "x": 299,
+          "y": 164,
+          "width": 2,
+          "height": 74
+        },
+        {
+          "id": "paid",
+          "label": "Paid",
+          "value": 85.5,
+          "conversion": 0.07125,
+          "stepConversion": null,
+          "dropOff": -85.5,
+          "dropOffRate": null,
+          "x": 278.625,
+          "y": 246,
+          "width": 42.74999999999999,
+          "height": 74
+        }
+      ]
+    },
+    {
+      "fn": "funnelLayout",
+      "input": {
+        "steps": [
+          {
+            "id": "visit",
+            "label": "Visited",
+            "value": 1200
+          },
+          {
+            "id": "signup",
+            "label": "Signed up",
+            "value": 430
+          },
+          {
+            "id": "trial",
+            "value": 0
+          },
+          {
+            "id": "paid",
+            "label": "Paid",
+            "value": 85.5
+          }
+        ],
+        "width": 600,
+        "height": 320,
+        "orientation": "horizontal"
+      },
+      "output": [
+        {
+          "id": "visit",
+          "label": "Visited",
+          "value": 1200,
+          "conversion": 1,
+          "stepConversion": 1,
+          "dropOff": 0,
+          "dropOffRate": 0,
+          "x": 0,
+          "y": 0,
+          "width": 144,
+          "height": 320
+        },
+        {
+          "id": "signup",
+          "label": "Signed up",
+          "value": 430,
+          "conversion": 0.35833333333333334,
+          "stepConversion": 0.35833333333333334,
+          "dropOff": 770,
+          "dropOffRate": 0.6416666666666667,
+          "x": 152,
+          "y": 205.33333333333331,
+          "width": 144,
+          "height": 114.66666666666667
+        },
+        {
+          "id": "trial",
+          "value": 0,
+          "conversion": 0,
+          "stepConversion": 0,
+          "dropOff": 430,
+          "dropOffRate": 1,
+          "x": 304,
+          "y": 318,
+          "width": 144,
+          "height": 2
+        },
+        {
+          "id": "paid",
+          "label": "Paid",
+          "value": 85.5,
+          "conversion": 0.07125,
+          "stepConversion": null,
+          "dropOff": -85.5,
+          "dropOffRate": null,
+          "x": 456,
+          "y": 297.2,
+          "width": 144,
+          "height": 22.799999999999997
+        }
+      ]
+    },
+    {
+      "fn": "funnelLayout",
+      "input": {
+        "steps": [
+          {
+            "id": "zero",
+            "value": 0
+          }
+        ],
+        "width": 300,
+        "height": 100,
+        "orientation": "vertical"
+      },
+      "output": [
+        {
+          "id": "zero",
+          "value": 0,
+          "conversion": null,
+          "stepConversion": 1,
+          "dropOff": 0,
+          "dropOffRate": 0,
+          "x": 149,
+          "y": 0,
+          "width": 2,
+          "height": 100
+        }
+      ]
+    },
+    {
+      "fn": "sankey",
+      "input": {
+        "nodes": [
+          {
+            "id": "web",
+            "label": "Website"
+          },
+          {
+            "id": "ads",
+            "label": "Ads"
+          },
+          {
+            "id": "trial",
+            "label": "Trial"
+          },
+          {
+            "id": "paid",
+            "label": "Paid"
+          },
+          {
+            "id": "churn",
+            "label": "Churned"
+          },
+          {
+            "id": "idle"
+          }
+        ],
+        "links": [
+          {
+            "source": "web",
+            "target": "trial",
+            "value": 320
+          },
+          {
+            "source": "ads",
+            "target": "trial",
+            "value": 140
+          },
+          {
+            "source": "trial",
+            "target": "paid",
+            "value": 210
+          },
+          {
+            "source": "trial",
+            "target": "churn",
+            "value": 250
+          },
+          {
+            "source": "ads",
+            "target": "paid",
+            "value": 15
+          }
+        ],
+        "width": 608,
+        "height": 360,
+        "nodeWidth": 14,
+        "nodePadding": 12
+      },
+      "output": {
+        "nodes": [
+          {
+            "id": "web",
+            "label": "Website",
+            "depth": 0,
+            "value": 320,
+            "x0": 0,
+            "x1": 14,
+            "y0": 0,
+            "y1": 226.36
+          },
+          {
+            "id": "ads",
+            "label": "Ads",
+            "depth": 0,
+            "value": 155,
+            "x0": 0,
+            "x1": 14,
+            "y0": 238.36,
+            "y1": 348
+          },
+          {
+            "id": "trial",
+            "label": "Trial",
+            "depth": 1,
+            "value": 460,
+            "x0": 297,
+            "x1": 311,
+            "y0": 19.22,
+            "y1": 344.61
+          },
+          {
+            "id": "paid",
+            "label": "Paid",
+            "depth": 2,
+            "value": 225,
+            "x0": 594,
+            "x1": 608,
+            "y0": 200.84,
+            "y1": 360
+          },
+          {
+            "id": "churn",
+            "label": "Churned",
+            "depth": 2,
+            "value": 250,
+            "x0": 594,
+            "x1": 608,
+            "y0": 12,
+            "y1": 188.84
+          },
+          {
+            "id": "idle",
+            "depth": 0,
+            "value": 0,
+            "x0": 0,
+            "x1": 14,
+            "y0": 360,
+            "y1": 360
+          }
+        ],
+        "links": [
+          {
+            "source": "web",
+            "target": "trial",
+            "value": 320,
+            "width": 226.36,
+            "y0": 113.18,
+            "y1": 132.4,
+            "path": "M14,113.18C155.5,113.18,155.5,132.4,297,132.4"
+          },
+          {
+            "source": "ads",
+            "target": "trial",
+            "value": 140,
+            "width": 99.03,
+            "y0": 287.87,
+            "y1": 295.09,
+            "path": "M14,287.87C155.5,287.87,155.5,295.09,297,295.09"
+          },
+          {
+            "source": "trial",
+            "target": "paid",
+            "value": 210,
+            "width": 148.55,
+            "y0": 270.33,
+            "y1": 275.12,
+            "path": "M311,270.33C452.5,270.33,452.5,275.12,594,275.12"
+          },
+          {
+            "source": "trial",
+            "target": "churn",
+            "value": 250,
+            "width": 176.84,
+            "y0": 107.64,
+            "y1": 100.42,
+            "path": "M311,107.64C452.5,107.64,452.5,100.42,594,100.42"
+          },
+          {
+            "source": "ads",
+            "target": "paid",
+            "value": 15,
+            "width": 10.61,
+            "y0": 342.69,
+            "y1": 354.69,
+            "path": "M14,342.69C304,342.69,304,354.69,594,354.69"
+          }
+        ]
+      }
+    },
+    {
+      "fn": "sankey",
+      "input": {
+        "nodes": [
+          {
+            "id": "web",
+            "label": "Website"
+          },
+          {
+            "id": "ads",
+            "label": "Ads"
+          },
+          {
+            "id": "trial",
+            "label": "Trial"
+          },
+          {
+            "id": "paid",
+            "label": "Paid"
+          },
+          {
+            "id": "churn",
+            "label": "Churned"
+          },
+          {
+            "id": "idle"
+          }
+        ],
+        "links": [
+          {
+            "source": "web",
+            "target": "trial",
+            "value": 320
+          },
+          {
+            "source": "ads",
+            "target": "trial",
+            "value": 140
+          },
+          {
+            "source": "trial",
+            "target": "paid",
+            "value": 210
+          },
+          {
+            "source": "trial",
+            "target": "churn",
+            "value": 250
+          },
+          {
+            "source": "ads",
+            "target": "paid",
+            "value": 15
+          }
+        ],
+        "width": 200,
+        "height": 120,
+        "nodeWidth": 14,
+        "nodePadding": 12
+      },
+      "output": {
+        "nodes": [
+          {
+            "id": "web",
+            "label": "Website",
+            "depth": 0,
+            "value": 320,
+            "x0": 0,
+            "x1": 14,
+            "y0": 0,
+            "y1": 64.67
+          },
+          {
+            "id": "ads",
+            "label": "Ads",
+            "depth": 0,
+            "value": 155,
+            "x0": 0,
+            "x1": 14,
+            "y0": 76.67,
+            "y1": 108
+          },
+          {
+            "id": "trial",
+            "label": "Trial",
+            "depth": 1,
+            "value": 460,
+            "x0": 93,
+            "x1": 107,
+            "y0": 17.51,
+            "y1": 110.48
+          },
+          {
+            "id": "paid",
+            "label": "Paid",
+            "depth": 2,
+            "value": 225,
+            "x0": 186,
+            "x1": 200,
+            "y0": 74.53,
+            "y1": 120
+          },
+          {
+            "id": "churn",
+            "label": "Churned",
+            "depth": 2,
+            "value": 250,
+            "x0": 186,
+            "x1": 200,
+            "y0": 12,
+            "y1": 62.53
+          },
+          {
+            "id": "idle",
+            "depth": 0,
+            "value": 0,
+            "x0": 0,
+            "x1": 14,
+            "y0": 120,
+            "y1": 120
+          }
+        ],
+        "links": [
+          {
+            "source": "web",
+            "target": "trial",
+            "value": 320,
+            "width": 64.67,
+            "y0": 32.34,
+            "y1": 49.85,
+            "path": "M14,32.34C53.5,32.34,53.5,49.85,93,49.85"
+          },
+          {
+            "source": "ads",
+            "target": "trial",
+            "value": 140,
+            "width": 28.29,
+            "y0": 90.82,
+            "y1": 96.33,
+            "path": "M14,90.82C53.5,90.82,53.5,96.33,93,96.33"
+          },
+          {
+            "source": "trial",
+            "target": "paid",
+            "value": 210,
+            "width": 42.44,
+            "y0": 89.26,
+            "y1": 95.75,
+            "path": "M107,89.26C146.5,89.26,146.5,95.75,186,95.75"
+          },
+          {
+            "source": "trial",
+            "target": "churn",
+            "value": 250,
+            "width": 50.53,
+            "y0": 42.78,
+            "y1": 37.26,
+            "path": "M107,42.78C146.5,42.78,146.5,37.26,186,37.26"
+          },
+          {
+            "source": "ads",
+            "target": "paid",
+            "value": 15,
+            "width": 3.03,
+            "y0": 106.48,
+            "y1": 118.48,
+            "path": "M14,106.48C100,106.48,100,118.48,186,118.48"
+          }
+        ]
+      }
+    },
+    {
+      "fn": "networkLayout",
+      "input": {
+        "nodes": [
+          {
+            "id": "a",
+            "label": "Alpha",
+            "value": 12
+          },
+          {
+            "id": "b",
+            "label": "Beta"
+          },
+          {
+            "id": "c",
+            "value": 1000
+          },
+          {
+            "id": "d",
+            "label": "Delta",
+            "value": 0.5
+          },
+          {
+            "id": "e"
+          }
+        ],
+        "links": [
+          {
+            "source": "a",
+            "target": "b",
+            "value": 3
+          },
+          {
+            "source": "b",
+            "target": "c"
+          },
+          {
+            "source": "c",
+            "target": "a",
+            "value": 12
+          },
+          {
+            "source": "d",
+            "target": "e",
+            "value": 0.25
+          }
+        ],
+        "width": 480,
+        "height": 360
+      },
+      "output": {
+        "nodes": [
+          {
+            "id": "a",
+            "label": "Alpha",
+            "value": 12,
+            "x": 240,
+            "y": 50.4,
+            "radius": 8.7
+          },
+          {
+            "id": "b",
+            "label": "Beta",
+            "x": 363.26,
+            "y": 139.95,
+            "radius": 6
+          },
+          {
+            "id": "c",
+            "value": 1000,
+            "x": 316.18,
+            "y": 284.85,
+            "radius": 10
+          },
+          {
+            "id": "d",
+            "label": "Delta",
+            "value": 0.5,
+            "x": 163.82,
+            "y": 284.85,
+            "radius": 5.58
+          },
+          {
+            "id": "e",
+            "x": 116.74,
+            "y": 139.95,
+            "radius": 6
+          }
+        ],
+        "links": [
+          {
+            "source": "a",
+            "target": "b",
+            "value": 3,
+            "sourceIndex": 0,
+            "targetIndex": 1,
+            "path": "M240,50.4L363.26,139.95"
+          },
+          {
+            "source": "b",
+            "target": "c",
+            "sourceIndex": 1,
+            "targetIndex": 2,
+            "path": "M363.26,139.95L316.18,284.85"
+          },
+          {
+            "source": "c",
+            "target": "a",
+            "value": 12,
+            "sourceIndex": 2,
+            "targetIndex": 0,
+            "path": "M316.18,284.85L240,50.4"
+          },
+          {
+            "source": "d",
+            "target": "e",
+            "value": 0.25,
+            "sourceIndex": 3,
+            "targetIndex": 4,
+            "path": "M163.82,284.85L116.74,139.95"
+          }
+        ]
+      }
+    },
+    {
+      "fn": "networkLayout",
+      "input": {
+        "nodes": [
+          {
+            "id": "a",
+            "label": "Alpha",
+            "value": 12
+          },
+          {
+            "id": "b",
+            "label": "Beta"
+          },
+          {
+            "id": "c",
+            "value": 1000
+          },
+          {
+            "id": "d",
+            "label": "Delta",
+            "value": 0.5
+          },
+          {
+            "id": "e"
+          }
+        ],
+        "links": [
+          {
+            "source": "a",
+            "target": "b",
+            "value": 3
+          },
+          {
+            "source": "b",
+            "target": "c"
+          },
+          {
+            "source": "c",
+            "target": "a",
+            "value": 12
+          },
+          {
+            "source": "d",
+            "target": "e",
+            "value": 0.25
+          }
+        ],
+        "width": 240,
+        "height": 400
+      },
+      "output": {
+        "nodes": [
+          {
+            "id": "a",
+            "label": "Alpha",
+            "value": 12,
+            "x": 120,
+            "y": 113.6,
+            "radius": 8.7
+          },
+          {
+            "id": "b",
+            "label": "Beta",
+            "x": 202.17,
+            "y": 173.3,
+            "radius": 6
+          },
+          {
+            "id": "c",
+            "value": 1000,
+            "x": 170.78,
+            "y": 269.9,
+            "radius": 10
+          },
+          {
+            "id": "d",
+            "label": "Delta",
+            "value": 0.5,
+            "x": 69.22,
+            "y": 269.9,
+            "radius": 5.58
+          },
+          {
+            "id": "e",
+            "x": 37.83,
+            "y": 173.3,
+            "radius": 6
+          }
+        ],
+        "links": [
+          {
+            "source": "a",
+            "target": "b",
+            "value": 3,
+            "sourceIndex": 0,
+            "targetIndex": 1,
+            "path": "M120,113.6L202.17,173.3"
+          },
+          {
+            "source": "b",
+            "target": "c",
+            "sourceIndex": 1,
+            "targetIndex": 2,
+            "path": "M202.17,173.3L170.78,269.9"
+          },
+          {
+            "source": "c",
+            "target": "a",
+            "value": 12,
+            "sourceIndex": 2,
+            "targetIndex": 0,
+            "path": "M170.78,269.9L120,113.6"
+          },
+          {
+            "source": "d",
+            "target": "e",
+            "value": 0.25,
+            "sourceIndex": 3,
+            "targetIndex": 4,
+            "path": "M69.22,269.9L37.83,173.3"
+          }
+        ]
+      }
     }
   ]
 }

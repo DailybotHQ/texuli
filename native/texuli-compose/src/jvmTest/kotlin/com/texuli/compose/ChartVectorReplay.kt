@@ -62,7 +62,7 @@ internal object J {
 
 /** One Kotlin call per vector function name; null means no replay exists yet. */
 internal object ChartVectorReplay {
-    private val families: List<(String, Map<String, JsonValue>) -> JsonValue?> = listOf(::core, ::cartesian, ::partWhole)
+    private val families: List<(String, Map<String, JsonValue>) -> JsonValue?> = listOf(::core, ::cartesian, ::partWhole, ::matrixFlow)
 
     fun replay(fn: String, input: Map<String, JsonValue>): JsonValue? = families.firstNotNullOfOrNull { it(fn, input) }
 
@@ -183,6 +183,71 @@ internal object ChartVectorReplay {
             J.obj("id" to J.of(it.id), "label" to J.of(it.label), "value" to J.of(it.value), "depth" to J.of(it.depth ?: 0))
         })
         "centerTotalFits" -> J.of(centerTotalFits(J.str(i["text"]), J.num(i["innerRadius"]), J.num(i["fontSize"])))
+        else -> null
+    }
+
+    private fun margin(v: JsonValue?): Margin = J.obj(v).let { Margin(J.num(it["top"]), J.num(it["right"]), J.num(it["bottom"]), J.num(it["left"])) }
+
+    private fun optional(vararg fields: Pair<String, JsonValue?>): JsonValue = J.obj(*fields.filter { it.second != null }.map { it.first to it.second!! }.toTypedArray())
+
+    private fun flowNodes(v: JsonValue?): List<FlowNode> = J.arr(v).map { n -> J.obj(n).let { FlowNode(J.str(it["id"]), (it["label"] as? JsonValue.Str)?.value, J.numOrNull(it["value"])) } }
+
+    private fun flowLinks(v: JsonValue?): List<FlowLink> = J.arr(v).map { l -> J.obj(l).let { FlowLink(J.str(it["source"]), J.str(it["target"]), J.numOrNull(it["value"])) } }
+
+    private fun ratio(v: Double?): JsonValue = v?.let(J::of) ?: JsonValue.Null
+
+    private fun matrixFlow(fn: String, i: Map<String, JsonValue>): JsonValue? = when (fn) {
+        "createHeatmapLayout" -> {
+            val cells = J.arr(i["cells"]).map { c -> J.obj(c).let { HeatmapCell(J.str(it["x"]), J.str(it["y"]), J.num(it["value"])) } }
+            val layout = createHeatmapLayout(cells, J.num(i["width"]), J.num(i["height"]), margin(i["margin"]))
+            J.obj(
+                "xKeys" to J.list(layout.xKeys.map(J::of)),
+                "yKeys" to J.list(layout.yKeys.map(J::of)),
+                "cells" to J.list(layout.cells.map {
+                    J.obj("id" to J.of(it.id), "x" to J.of(it.x), "y" to J.of(it.y), "value" to J.of(it.value), "xPos" to J.of(it.xPos), "yPos" to J.of(it.yPos), "width" to J.of(it.width), "height" to J.of(it.height), "t" to J.of(it.t))
+                }),
+                "valueDomain" to J.of(layout.valueDomain),
+            )
+        }
+        "createScatterLayout" -> {
+            val points = J.arr(i["points"]).map { p -> J.obj(p).let { ScatterPoint(J.str(it["id"]), J.str(it["label"]), J.num(it["x"]), J.num(it["y"]), J.numOrNull(it["r"]), (it["seriesId"] as? JsonValue.Str)?.value) } }
+            val series = J.arr(i["series"]).map { s -> J.obj(s).let { ScatterSeries(J.str(it["id"]), J.str(it["label"])) } }
+            val layout = createScatterLayout(points, J.num(i["width"]), J.num(i["height"]), margin(i["margin"]), series, J.bool(i["bubble"]))
+            J.obj(
+                "points" to J.list(layout.points.map {
+                    optional("id" to J.of(it.id), "label" to J.of(it.label), "x" to J.of(it.x), "y" to J.of(it.y), "r" to J.of(it.r), "cx" to J.of(it.cx), "cy" to J.of(it.cy), "radius" to J.of(it.radius), "seriesId" to it.seriesId?.let(J::of))
+                }),
+                "xTicks" to J.nums(layout.xTicks),
+                "yTicks" to J.nums(layout.yTicks),
+                "series" to J.list(layout.series.map { J.obj("id" to J.of(it.id), "label" to J.of(it.label)) }),
+            )
+        }
+        "funnelLayout" -> {
+            val steps = J.arr(i["steps"]).map { s -> J.obj(s).let { FunnelStep(J.str(it["id"]), (it["label"] as? JsonValue.Str)?.value, J.num(it["value"])) } }
+            J.list(funnelLayout(steps, J.num(i["width"]), J.num(i["height"]), J.str(i["orientation"]) == "vertical").map {
+                optional(
+                    "id" to J.of(it.id), "label" to it.label?.let(J::of), "value" to J.of(it.value), "conversion" to ratio(it.conversion), "stepConversion" to ratio(it.stepConversion),
+                    "dropOff" to J.of(it.dropOff), "dropOffRate" to ratio(it.dropOffRate), "x" to J.of(it.x), "y" to J.of(it.y), "width" to J.of(it.width), "height" to J.of(it.height),
+                )
+            })
+        }
+        "sankey" -> {
+            val (nodes, links) = sankey(flowNodes(i["nodes"]), flowLinks(i["links"]), J.num(i["width"]), J.num(i["height"]), J.num(i["nodeWidth"]), J.num(i["nodePadding"]))!!
+            J.obj(
+                "nodes" to J.list(nodes.map { optional("id" to J.of(it.id), "label" to it.label?.let(J::of), "depth" to J.of(it.depth), "value" to J.of(it.value), "x0" to J.of(it.x0), "x1" to J.of(it.x1), "y0" to J.of(it.y0), "y1" to J.of(it.y1)) }),
+                "links" to J.list(links.map { J.obj("source" to J.of(it.source), "target" to J.of(it.target), "value" to J.of(it.value), "width" to J.of(it.width), "y0" to J.of(it.y0), "y1" to J.of(it.y1), "path" to J.of(it.path)) }),
+            )
+        }
+        "networkLayout" -> {
+            val inputNodes = flowNodes(i["nodes"])
+            val (nodes, links) = networkLayout(inputNodes, flowLinks(i["links"]), J.num(i["width"]), J.num(i["height"]))!!
+            J.obj(
+                "nodes" to J.list(nodes.mapIndexed { index, it ->
+                    optional("id" to J.of(it.id), "label" to it.label?.let(J::of), "value" to inputNodes[index].value?.let(J::of), "x" to J.of(it.x), "y" to J.of(it.y), "radius" to J.of(it.radius))
+                }),
+                "links" to J.list(links.map { optional("source" to J.of(it.source), "target" to J.of(it.target), "value" to it.value?.let(J::of), "sourceIndex" to J.of(it.sourceIndex), "targetIndex" to J.of(it.targetIndex), "path" to J.of(it.path)) }),
+            )
+        }
         else -> null
     }
 }

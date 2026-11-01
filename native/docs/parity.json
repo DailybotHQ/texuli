@@ -2,15 +2,15 @@
   "specVersion": "0.10.0",
   "totals": {
     "catalog": 168,
-    "painted": 32,
-    "placeholder": 136,
+    "painted": 38,
+    "placeholder": 130,
     "agentEmittable": 75,
-    "agentEmittablePainted": 32,
+    "agentEmittablePainted": 38,
     "semanticRules": 37,
     "goldenTraces": 15,
     "goldenCovered": 34,
-    "parityTraces": 3,
-    "traceCovered": 48,
+    "parityTraces": 4,
+    "traceCovered": 54,
     "readOnly": 0
   },
   "unknownNativeIds": [],
@@ -34,7 +34,7 @@
     {
       "group": "content",
       "total": 35,
-      "painted": 22
+      "painted": 28
     },
     {
       "group": "data",
@@ -478,11 +478,11 @@
       "capability": "web-only",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
+      "native": "painted",
       "readOnly": false,
       "semanticRule": true,
       "golden": false,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "charts-bullet",
@@ -550,11 +550,11 @@
       "capability": "web-only",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
+      "native": "painted",
       "readOnly": false,
       "semanticRule": true,
       "golden": false,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "charts-gauge",
@@ -598,11 +598,11 @@
       "capability": "web-only",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
+      "native": "painted",
       "readOnly": false,
       "semanticRule": true,
       "golden": false,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "charts-line",
@@ -622,11 +622,11 @@
       "capability": "web-only",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
+      "native": "painted",
       "readOnly": false,
       "semanticRule": true,
       "golden": false,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "charts-pie",
@@ -658,11 +658,11 @@
       "capability": "web-only",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
+      "native": "painted",
       "readOnly": false,
       "semanticRule": true,
       "golden": false,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "charts-scatter",
@@ -670,11 +670,11 @@
       "capability": "web-only",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
+      "native": "painted",
       "readOnly": false,
       "semanticRule": true,
       "golden": false,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "charts-sparkline",

@@ -12,20 +12,20 @@ every other component paints a visible placeholder. Native is in development.
 | Measure | Count |
 | --- | --- |
 | Catalog components | 168 |
-| Painted natively | 32 |
-| Placeholder natively | 136 |
+| Painted natively | 38 |
+| Placeholder natively | 130 |
 | Agent-emittable components | 75 |
-| Agent-emittable and painted natively | 32 |
+| Agent-emittable and painted natively | 38 |
 | Painted read-only (interactive on the web) | 0 |
 | Components with a shared semantic rule | 37 |
 | Golden traces (web = native) | 15 |
 | Components covered by a golden trace | 34 |
-| Parity fixture traces (web = native) | 3 |
-| Components covered by any trace | 48 |
+| Parity fixture traces (web = native) | 4 |
+| Components covered by any trace | 54 |
 
 So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes**
 (validation, label interpolation and the golden semantic traces match); **for painting, not yet**
-(32 of 168 components).
+(38 of 168 components).
 
 ## Capabilities
 
@@ -49,7 +49,7 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | canvas | 1 | 0 |
 | chat | 2 | 0 |
 | composition | 4 | 4 |
-| content | 35 | 22 |
+| content | 35 | 28 |
 | data | 12 | 0 |
 | display | 17 | 0 |
 | documents | 1 | 0 |
@@ -89,23 +89,23 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `card` | display | — | renders | placeholder | — | — | — |
 | `charts-area` | content | yes | renders | painted | yes | — | yes |
 | `charts-bar` | content | yes | renders | painted | yes | yes | yes |
-| `charts-bubble` | content | yes | renders | placeholder | yes | — | — |
+| `charts-bubble` | content | yes | renders | painted | yes | — | yes |
 | `charts-bullet` | content | yes | renders | painted | yes | — | yes |
 | `charts-canvas-renderer` | content | yes | renders | painted | yes | — | yes |
 | `charts-cartesian` | content | yes | renders | painted | yes | — | yes |
 | `charts-combo` | content | yes | renders | painted | yes | — | yes |
 | `charts-donut` | content | yes | renders | painted | yes | yes | yes |
-| `charts-funnel` | content | yes | renders | placeholder | yes | — | — |
+| `charts-funnel` | content | yes | renders | painted | yes | — | yes |
 | `charts-gauge` | content | yes | renders | painted | yes | yes | yes |
 | `charts-geo-map` | content | yes | renders | placeholder | yes | — | — |
 | `charts-geo-point-map` | content | yes | renders | placeholder | yes | — | — |
-| `charts-heatmap` | content | yes | renders | placeholder | yes | — | — |
+| `charts-heatmap` | content | yes | renders | painted | yes | — | yes |
 | `charts-line` | content | yes | renders | painted | yes | yes | yes |
-| `charts-network` | content | yes | renders | placeholder | yes | — | — |
+| `charts-network` | content | yes | renders | painted | yes | — | yes |
 | `charts-pie` | content | yes | renders | painted | yes | — | yes |
 | `charts-progress-ring` | content | yes | renders | painted | yes | — | yes |
-| `charts-sankey` | content | yes | renders | placeholder | yes | — | — |
-| `charts-scatter` | content | yes | renders | placeholder | yes | — | — |
+| `charts-sankey` | content | yes | renders | painted | yes | — | yes |
+| `charts-scatter` | content | yes | renders | painted | yes | — | yes |
 | `charts-sparkline` | content | yes | renders | painted | yes | yes | yes |
 | `charts-stacked-bar` | content | yes | renders | painted | yes | yes | yes |
 | `charts-sunburst` | content | yes | renders | painted | yes | — | yes |
