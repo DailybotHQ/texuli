@@ -1,7 +1,7 @@
 ---
 name: texuli-components
 description: Install Texuli packages or copy styled component source with texuli add, customize with tokens and component hooks, keep provenance, and update copies with texuli update. Offline; every command and snippet here is checked.
-version: "0.3.8"
+version: "0.3.9"
 documentation_url: https://texuli.com/guides/
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write
