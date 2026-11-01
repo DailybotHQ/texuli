@@ -1,0 +1,90 @@
+---
+/**
+ * One copyable command line for the landing (PLAN_012): the command as
+ * text, a copy button, and a `role="status"` region that announces the
+ * outcome. Wiring is the shared `wireCopyCommand` seam (clipboard, then the
+ * analytics `code_copy` event only after a successful write).
+ */
+interface Props {
+  command: string;
+  label?: string;
+}
+
+const { command, label = 'Copy install command' } = Astro.props;
+---
+
+<div class="copy-command" data-copy-command="">
+  <code class="copy-command__text"><span aria-hidden="true">$ </span>{command}</code>
+  <button type="button" class="copy-command__button" data-copy-command-button="">{label}</button>
+  <template data-copy-command-text="">{command}</template>
+  <p class="copy-command__status" role="status" data-copy-command-status=""></p>
+</div>
+
+<script>
+  import { wireCopyCommand } from '../web/web-copy-command.ts';
+
+  for (const host of document.querySelectorAll<HTMLElement>('[data-copy-command]')) {
+    if (host.dataset.copyCommandWired) continue;
+    host.dataset.copyCommandWired = 'true';
+    wireCopyCommand(host);
+  }
+</script>
+
+<style>
+  .copy-command {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    inline-size: fit-content;
+    max-inline-size: 100%;
+    padding-block: 0.4rem;
+    padding-inline: 0.9rem 0.4rem;
+    border: 1px solid color-mix(in oklab, var(--home-accent) 30%, var(--tx-border));
+    border-radius: 0.75rem;
+    background: color-mix(in oklab, var(--tx-background) 80%, transparent);
+  }
+  .copy-command__text {
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+    font-size: 0.95rem;
+    color: var(--tx-foreground);
+    overflow-wrap: anywhere;
+  }
+  .copy-command__text span {
+    color: var(--tx-muted-foreground);
+  }
+  .copy-command__button {
+    min-block-size: 2.25rem;
+    padding-inline: 0.8rem;
+    border: 1px solid var(--tx-border);
+    border-radius: 0.5rem;
+    background: var(--tx-background);
+    color: var(--tx-foreground);
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .copy-command__button:hover {
+    background: color-mix(in oklab, var(--tx-muted) 50%, var(--tx-background));
+  }
+  .copy-command__button:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .copy-command__status {
+    flex-basis: 100%;
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--tx-muted-foreground);
+  }
+  .copy-command__status:empty {
+    display: none;
+  }
+  @media (forced-colors: active) {
+    .copy-command,
+    .copy-command__button {
+      border-color: CanvasText;
+    }
+  }
+</style>

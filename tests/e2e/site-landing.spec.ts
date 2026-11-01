@@ -23,10 +23,10 @@ test('sections in order, working calls to action, announced copy, motion only on
   await page.goto(`${origin()}/`);
   await settle(page);
   const order = await page.$$eval(
-    '[data-tx-web-hero], [data-tx-web-why-svelte], [data-tx-web-correlation], [data-tx-web-agents]',
+    '[data-tx-home-hero], [data-tx-web-why-svelte], [data-tx-web-correlation], [data-tx-web-agents]',
     (sections) =>
       sections.map((section) =>
-        section.hasAttribute('data-tx-web-hero')
+        section.hasAttribute('data-tx-home-hero')
           ? 'hero'
           : section.hasAttribute('data-tx-web-why-svelte')
             ? 'why'
@@ -37,10 +37,13 @@ test('sections in order, working calls to action, announced copy, motion only on
   );
   expect(order).toEqual(['hero', 'why', 'correlation', 'agents']);
   await expect(page.locator('[data-tx-landing] astro-island')).toHaveCount(0);
-  await expect(page.locator('[data-tx-hero-theme]')).toHaveCount(6);
-
-  const hero = page.locator('[data-tx-web-hero]');
-  for (const name of ['Start building', 'See the native story']) {
+  const hero = page.locator('[data-tx-home-hero]');
+  await expect(hero.getByRole('heading', { level: 1 })).toHaveText('Build any interface.');
+  const art = hero.locator('[data-tx-illustration="home-hero"]');
+  await expect(art).toBeVisible();
+  const box = await art.boundingBox();
+  expect(box?.height ?? 0).toBeGreaterThan(100);
+  for (const name of ['Start building', 'Browse components', 'Web + native']) {
     const link = hero.getByRole('link', { name });
     await link.focus();
     await expect(link).toBeFocused();
@@ -49,6 +52,7 @@ test('sections in order, working calls to action, announced copy, motion only on
   for (const [id, href] of [
     ['components', '/component-pages/'],
     ['primitives', '/primitives-page/'],
+    ['themes', '/gallery-themes/'],
     ['examples', '/examples/'],
   ] as const) {
     const stat = proof.locator(`[data-tx-hero-proof="${id}"] a`);
@@ -57,11 +61,9 @@ test('sections in order, working calls to action, announced copy, motion only on
   }
   await expect(page.locator('[data-tx-corr-panel]')).toHaveCount(3);
 
-  const agents = page.locator('[data-tx-web-agents]');
-  const copy = agents.getByRole('button', { name: 'Copy install command' });
-  await copy.scrollIntoViewIfNeeded();
+  const copy = hero.getByRole('button', { name: 'Copy install command' });
   await copy.focus();
-  const status = agents.locator('[data-copy-command-status]');
+  const status = hero.locator('[data-copy-command-status]');
   await expect(status).toHaveText('');
   await page.keyboard.press('Enter');
   // Either outcome is announced: copied (clipboard allowed) or failed (denied).

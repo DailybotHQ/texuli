@@ -14,8 +14,15 @@ import { describe, expect, it } from 'vitest';
 import { COMPONENT_PAGES } from '../src/components/component-pages/load-manifests.ts';
 import { buildExampleCatalog } from '../src/components/examples/catalog.ts';
 import { REPOSITORY_URL } from '../src/components/foundation/site.ts';
+import { illustrationFor } from '../src/components/landing/illustrations.ts';
 import { PRIMITIVES } from '../src/components/primitives-page/primitives.ts';
-import { loadHeroProof } from '../src/components/sections/web/web-hero-content.ts';
+import {
+  HOME_HERO,
+  HOME_INSTALL_COMMAND,
+  loadHomeHeroProof,
+  wordCount,
+} from '../src/components/sections/home/home-content.ts';
+import { countAllThemes } from '../src/components/sections/web/web-hero-content.ts';
 
 const WEBSITE = resolve(import.meta.dirname, '..');
 const read = (path: string): string => readFileSync(resolve(WEBSITE, path), 'utf8');
@@ -28,20 +35,40 @@ const footer = read('src/components/foundation/SiteFooter.astro');
 const header = read('src/components/foundation/SiteHeader.astro');
 
 describe('landing', () => {
-  it('counts the real catalog, primitives and examples, each linked to its listing through the URL policy', async () => {
-    const proof = await loadHeroProof();
+  it('counts the real catalog, primitives, themes and examples, each linked to its listing through the URL policy', async () => {
+    const proof = await loadHomeHeroProof();
     expect(proof.map((stat) => [stat.id, stat.value, stat.href])).toEqual([
       ['components', COMPONENT_PAGES.length, '/component-pages/'],
       ['primitives', PRIMITIVES.length, '/primitives-page/'],
+      ['themes', await countAllThemes(), '/gallery-themes/'],
       ['examples', buildExampleCatalog().length, '/examples/'],
     ]);
     for (const stat of proof) {
       expect(stat.value, stat.id).toBeGreaterThan(0);
       expect(routeExists(stat.href), stat.href).toBe(true);
     }
-    const hero = read('src/components/sections/web/WebHero.astro');
+    const hero = read('src/components/sections/home/HomeHero.astro');
     expect(hero).toMatch(/href=\{resolveHref\(stat\.href\)\}/);
     expect(hero).not.toMatch(/>\s*\d{2,}\s*</);
+  });
+
+  it('keeps the hero to one value proposition: badge, accent h1, a short sub, three real calls to action, one install line and the eager art', () => {
+    const hero = read('src/components/sections/home/HomeHero.astro');
+    expect(HOME_HERO.badge).toEqual(['Open source', 'MIT', 'Svelte 5', 'Kotlin Multiplatform']);
+    expect(`${HOME_HERO.title.lead} ${HOME_HERO.title.accent}`).toBe('Build any interface.');
+    expect(hero).toContain('<span class="home-hero__accent">{HOME_HERO.title.accent}</span>');
+    expect(wordCount(HOME_HERO.sub)).toBeLessThanOrEqual(25);
+    expect(HOME_HERO.sub).toMatch(/Svelte 5/);
+    expect(HOME_HERO.sub).toMatch(/Kotlin Multiplatform twin in development/);
+    expect(HOME_HERO.actions.map((link) => link.role)).toEqual(['primary', 'secondary', 'text']);
+    for (const link of HOME_HERO.actions) expect(routeExists(link.href), link.href).toBe(true);
+    expect(hero).toContain('href={resolveHref(link.href)}');
+    expect(HOME_INSTALL_COMMAND).toBe('pnpm add texuli');
+    expect(hero).toContain('<CopyCommand command={HOME_INSTALL_COMMAND} />');
+    expect(hero).toContain('<SiteIllustration slot="home-hero" />');
+    expect(illustrationFor('home-hero')?.priority).toBe(true);
+    expect((hero.match(/<h1[\s>]/g) ?? []).length).toBe(1);
+    expect(hero).not.toMatch(/<pre\b/);
   });
 
   it('keeps the home title and description inside the SEO audit bands', () => {

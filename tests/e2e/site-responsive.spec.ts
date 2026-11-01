@@ -102,7 +102,7 @@ test('every page class fits 360 and 768px, and the landings fit 360px right to l
 /** Standalone links the sweep measured under 24px, each on a page that renders it. */
 const TARGETS = [
   ['/', '[data-tx-site-header] .brand'],
-  ['/', '.web-hero__grid-links a'],
+  ['/', '.home-cta--text'],
   ['/', '.web-why__claim-link'],
   ['/guides/getting-started/', '.crumbs__link'],
   ['/gallery-components/', '[data-tx-gallery-card] .title a'],
