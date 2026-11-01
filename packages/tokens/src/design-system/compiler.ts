@@ -149,7 +149,8 @@ type Values = Partial<Record<'default' | 'hover' | 'active' | 'disabled' | 'focu
 const rec = (value: unknown): Doc =>
   typeof value === 'object' && value !== null && !Array.isArray(value) ? (value as Doc) : {};
 const num = (n: number) => String(Number(n.toFixed(4)));
-const rem = (px: number) => (px === 0 ? '0' : `${num(px / 16)}rem`);
+// Zero keeps a unit: calc(var(--tx-radius) + 2px) is invalid with a unitless 0.
+const rem = (px: number) => (px === 0 ? '0px' : `${num(px / 16)}rem`);
 const at = (path: string, key: string) =>
   /^[A-Za-z_$][\w$]*$/.test(key) ? `${path}.${key}` : `${path}[${JSON.stringify(key)}]`;
 const sortKeys = (doc: Doc) => Object.keys(doc).sort();
