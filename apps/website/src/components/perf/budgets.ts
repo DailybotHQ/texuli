@@ -60,8 +60,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/',
     reason:
-      'The unified landing (PLAN_006 T-44) ships zero islands; its module scripts wire the install copy command and the ready signal. The generous page and JS limits below are the old hero-widget floors, kept until T-93 right-sizes them. PLAN_012 illustrations (2026-11-01): the generated WebP illustrations (6 of them load on open: the eager hero and the lazy plates within the browser’s load-ahead distance) add 936.1 KB; measured 1008.2 KB page, limit 1049 (+4% headroom).',
-    budget: { pageGzipKb: 1049, jsGzipKb: 116, lcpMs: 3000 },
+      'The unified landing (PLAN_006 T-44) ships zero islands; its module scripts wire the install copy command and the ready signal. The generous page and JS limits below are the old hero-widget floors, kept until T-93 right-sizes them. PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP plates (the eager hero and the lazy plates within the browser’s load-ahead distance load on open, each at the srcset width it renders), 362.9 KB of WebP on open; measured 435.5 KB page, limit 453 (+4% headroom).',
+    budget: { pageGzipKb: 453, jsGzipKb: 116, lcpMs: 3000 },
   },
   {
     route: '/component-pages/button/',
@@ -90,8 +90,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/documents-page/',
     reason:
-      'PLAN_010 T-site-070: three lazy document islands (client:visible) that import the editor, the reader, the paged view, the collaboration layer, the writers and the player only after they hydrate, so JS at the ready signal is 57.6 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk those islands can import lazily (pages, editor, player loaders, charts): 69.5 KB of CSS, the same follow-up as /motion-page/ and /slides-page/. Measured 2026-10-29: 147.5 KB page (+4% headroom). PLAN_011 T-ar-discovery (2026-10-30): already at 154.2 KB on release/0.9.0 before this change, and every page now carries <link rel="ai-catalog"> (about 0.1 KB): measured 154.3 KB, limit 161 (+4% headroom). PLAN_011 (token-driven components and design-system wiring through 0.10.0): measured 161.2 KB page on 2026-10-31 (+4% headroom). PLAN_012 illustrations (2026-11-01): the generated WebP banner adds 104.7 KB; measured 243.4 KB page, limit 254 (+4% headroom).',
-    budget: { pageGzipKb: 254 },
+      'PLAN_010 T-site-070: three lazy document islands (client:visible) that import the editor, the reader, the paged view, the collaboration layer, the writers and the player only after they hydrate, so JS at the ready signal is 57.6 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk those islands can import lazily (pages, editor, player loaders, charts): 69.5 KB of CSS, the same follow-up as /motion-page/ and /slides-page/. Measured 2026-10-29: 147.5 KB page (+4% headroom). PLAN_011 T-ar-discovery (2026-10-30): already at 154.2 KB on release/0.9.0 before this change, and every page now carries <link rel="ai-catalog"> (about 0.1 KB): measured 154.3 KB, limit 161 (+4% headroom). PLAN_011 (token-driven components and design-system wiring through 0.10.0): measured 161.2 KB page on 2026-10-31 (+4% headroom). PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (28.6 KB of WebP on open, logo included); measured 167.3 KB page, limit 174 (+4% headroom).',
+    budget: { pageGzipKb: 174 },
   },
   {
     route: '/forms-page/',
@@ -102,14 +102,14 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/canvas-page/',
     reason:
-      'PLAN_010 T-site-features: three lazy canvas islands (client:visible) that import the editor, the sync layer and the player only after they hydrate, so JS at the ready signal is 59.2 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk those islands can import (the canvas editor, the player loaders), the same follow-up as /motion-page/. Measured 2026-10-29: 147.1 KB page, 20.7 KB gzip of HTML (+4% headroom; a proposal for the owner). PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (ADR-020, second amendment); measured 152.4 KB page (+4% headroom). PLAN_012 illustrations (2026-11-01): the generated WebP banner adds 105.2 KB; measured 238.9 KB page, limit 249 (+4% headroom).',
-    budget: { pageGzipKb: 249 },
+      'PLAN_010 T-site-features: three lazy canvas islands (client:visible) that import the editor, the sync layer and the player only after they hydrate, so JS at the ready signal is 59.2 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk those islands can import (the canvas editor, the player loaders), the same follow-up as /motion-page/. Measured 2026-10-29: 147.1 KB page, 20.7 KB gzip of HTML (+4% headroom; a proposal for the owner). PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (ADR-020, second amendment); measured 152.4 KB page (+4% headroom). PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (28.6 KB of WebP on open, logo included); measured 162.4 KB page, limit 169 (+4% headroom).',
+    budget: { pageGzipKb: 169 },
   },
   {
     route: '/sheets-page/',
     reason:
-      'PLAN_010 T-site-080: four lazy sheet islands (client:visible); the player and the sheet host load only in the agent demo, after hydration, so JS at the ready signal is 61.3 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the islands can import (SheetView over the editable data grid, the player loaders), the same follow-up as /motion-page/. The HTML carries all 54 functions with their build-time results, the dependency graph, the safety cases and the agent blueprint. Measured 2026-10-29: 157.3 KB page, 226.8 KB raw and 29.3 KB gzip of HTML (+4% headroom; a proposal for the owner). PLAN_011 T-gaps-100-104 (FilterBuilder issues and grid styling on token v2): CI on Linux measured 164.2 KB page on 2026-10-30 (+4% headroom). PLAN_012 illustrations (2026-11-01): the generated WebP banner adds 129.9 KB; measured 271.7 KB page, limit 283 (+4% headroom).',
-    budget: { pageGzipKb: 283, htmlRawKb: 236, htmlGzipKb: 31 },
+      'PLAN_010 T-site-080: four lazy sheet islands (client:visible); the player and the sheet host load only in the agent demo, after hydration, so JS at the ready signal is 61.3 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the islands can import (SheetView over the editable data grid, the player loaders), the same follow-up as /motion-page/. The HTML carries all 54 functions with their build-time results, the dependency graph, the safety cases and the agent blueprint. Measured 2026-10-29: 157.3 KB page, 226.8 KB raw and 29.3 KB gzip of HTML (+4% headroom; a proposal for the owner). PLAN_011 T-gaps-100-104 (FilterBuilder issues and grid styling on token v2): CI on Linux measured 164.2 KB page on 2026-10-30 (+4% headroom). PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (36.4 KB of WebP on open, logo included); measured 178.2 KB page, limit 186 (+4% headroom).',
+    budget: { pageGzipKb: 186, htmlRawKb: 236, htmlGzipKb: 31 },
   },
   {
     route: '/showcase/dashboard/',
@@ -126,14 +126,14 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/showcase/',
     reason:
-      'PLAN_011 T-adopt-core (ADR-020, second amendment): components read their design tokens so a design system can restyle every component (base.css system defaults plus one-fallback reads), which takes this route, under the 96 KB default before, to its edge. Measured 94.5 KB page on 2026-10-30 (+4% headroom). Trimming is a Final Review follow-up. PLAN_012 illustrations (2026-11-01): the generated WebP banner adds 264.3 KB; measured 337.0 KB page, limit 351 (+4% headroom).',
-    budget: { pageGzipKb: 351 },
+      'PLAN_011 T-adopt-core (ADR-020, second amendment): components read their design tokens so a design system can restyle every component (base.css system defaults plus one-fallback reads), which takes this route, under the 96 KB default before, to its edge. Measured 94.5 KB page on 2026-10-30 (+4% headroom). Trimming is a Final Review follow-up. PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (58.8 KB of WebP on open, logo included); measured 131.5 KB page, limit 137 (+4% headroom).',
+    budget: { pageGzipKb: 137 },
   },
   {
     route: '/agents-page/',
     reason:
-      'PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (ADR-020, second amendment); measured 96.5 KB page (+4% headroom). Under the 96 KB default before. Trimming is a Final Review follow-up. PLAN_012 illustrations (2026-11-01): the generated WebP banner adds 183.4 KB; measured 258.1 KB page, limit 269 (+4% headroom).',
-    budget: { pageGzipKb: 269 },
+      'PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (ADR-020, second amendment); measured 96.5 KB page (+4% headroom). Under the 96 KB default before. Trimming is a Final Review follow-up. PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (45.2 KB of WebP on open, logo included); measured 120 KB page, limit 125 (+4% headroom).',
+    budget: { pageGzipKb: 125 },
   },
   {
     route: '/perf/',
@@ -144,8 +144,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/dashboards-page/',
     reason:
-      'PLAN_010 T-site-080: three lazy dashboard islands (client:visible); the player loads only in the agent demo, after hydration, so JS at the ready signal is 61.3 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the islands can import (the dashboard, the player loaders and the painters its blueprint uses), the same follow-up as /motion-page/. Measured 2026-10-29: 148.3 KB page (+4% headroom; a proposal for the owner). CI on Linux: the dashboard workbench sits at the 720 px fold (system fonts), so it hydrates on open there: 176.9 KB page, 90.1 KB JS measured 2026-10-30 (+4% headroom). PLAN_011 (token adoption, scoped portals): CI on Linux measured 184.3 KB page on 2026-10-30 (+4% headroom). PLAN_012 illustrations (2026-11-01): the generated WebP banner adds 91.8 KB; measured 224.5 KB page, limit 234 (+4% headroom).',
-    budget: { pageGzipKb: 234, jsGzipKb: 94 },
+      'PLAN_010 T-site-080: three lazy dashboard islands (client:visible); the player loads only in the agent demo, after hydration, so JS at the ready signal is 61.3 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the islands can import (the dashboard, the player loaders and the painters its blueprint uses), the same follow-up as /motion-page/. Measured 2026-10-29: 148.3 KB page (+4% headroom; a proposal for the owner). CI on Linux: the dashboard workbench sits at the 720 px fold (system fonts), so it hydrates on open there: 176.9 KB page, 90.1 KB JS measured 2026-10-30 (+4% headroom). PLAN_011 (token adoption, scoped portals): CI on Linux measured 184.3 KB page on 2026-10-30 (+4% headroom).',
+    budget: { pageGzipKb: 192, jsGzipKb: 94 },
   },
   {
     route: '/output-page/',
@@ -210,20 +210,20 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/component-pages/',
     reason:
-      'The catalog index lists every component with its summary and authoring guidance; the PLAN_006 catalog audit (T-81) added per-component guidance: measured 24.3 KB gzip, limit 26. PLAN_010 (motion and the API contract in the shared components): measured 98.1 KB page, limit 103 (+4% headroom). PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (ADR-020, second amendment); measured 104.5 KB page (+4% headroom). PLAN_012 (the page banner now renders: its texel fallback and the illustration styles): CI on Linux measured 226.1 KB raw HTML before the fallback was slimmed, limit 236 (+4% headroom). PLAN_012 illustrations (2026-11-01): the generated WebP banner adds 106.5 KB; measured 189.3 KB page, limit 197 (+4% headroom).',
-    budget: { pageGzipKb: 197, htmlGzipKb: 26, htmlRawKb: 236 },
+      'The catalog index lists every component with its summary and authoring guidance; the PLAN_006 catalog audit (T-81) added per-component guidance: measured 24.3 KB gzip, limit 26. PLAN_010 (motion and the API contract in the shared components): measured 98.1 KB page, limit 103 (+4% headroom). PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (ADR-020, second amendment); measured 104.5 KB page (+4% headroom). PLAN_012 (the page banner now renders: its texel fallback and the illustration styles): CI on Linux measured 226.1 KB raw HTML before the fallback was slimmed, limit 236 (+4% headroom). PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (26.3 KB of WebP on open, logo included); measured 109.1 KB page, limit 114 (+4% headroom).',
+    budget: { pageGzipKb: 114, htmlGzipKb: 26, htmlRawKb: 236 },
   },
   {
     route: '/web-and-native/',
     reason:
-      'The architecture page mounts five sections — the layer diagrams, the correlation demo, the portability walk and the parity table (PLAN_006 T-52): measured 24.8 KB gzip, limit 26. PLAN_007: the layer diagrams gained @texuli/drag and @texuli/workflows and the nav three links, measured 96.4 KB page (+4% headroom). PLAN_010: the layer diagrams gained @texuli/document and @texuli/pages and the nav the motion link, measured 100.9 KB page, limit 105 (+4% headroom). PLAN_010 wave 6 (@texuli/sheets in the layer diagrams, the canvas and forms nav links): measured 26.4 KB HTML gzip, limit 27.5 (+4% headroom). PLAN_010 T-site-080 (the catalog and tools rows follow the f9809246 architecture table; the nav gained the sheets, dashboards, output and What’s new links): measured 106.4 KB page, limit 111 (+4% headroom). PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (base.css system defaults plus one-fallback reads); CI measured 27.6 KB HTML gzip; 109.6 KB page (+4% headroom). PLAN_013 T-ship (2026-11-01): the parity table gained the Data views row and the native rows their chart and data counts; CI on Linux measured 29 KB HTML gzip, limit 30.2 (+4% headroom). PLAN_012 illustrations (2026-11-01): the generated WebP banner adds 127.1 KB; measured 215.5 KB page, limit 225 (+4% headroom).',
-    budget: { htmlGzipKb: 30.2, pageGzipKb: 225 },
+      'The architecture page mounts five sections — the layer diagrams, the correlation demo, the portability walk and the parity table (PLAN_006 T-52): measured 24.8 KB gzip, limit 26. PLAN_007: the layer diagrams gained @texuli/drag and @texuli/workflows and the nav three links, measured 96.4 KB page (+4% headroom). PLAN_010: the layer diagrams gained @texuli/document and @texuli/pages and the nav the motion link, measured 100.9 KB page, limit 105 (+4% headroom). PLAN_010 wave 6 (@texuli/sheets in the layer diagrams, the canvas and forms nav links): measured 26.4 KB HTML gzip, limit 27.5 (+4% headroom). PLAN_010 T-site-080 (the catalog and tools rows follow the f9809246 architecture table; the nav gained the sheets, dashboards, output and What’s new links): measured 106.4 KB page, limit 111 (+4% headroom). PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (base.css system defaults plus one-fallback reads); CI measured 27.6 KB HTML gzip; 109.6 KB page (+4% headroom). PLAN_013 T-ship (2026-11-01): the parity table gained the Data views row and the native rows their chart and data counts; CI on Linux measured 29 KB HTML gzip, limit 30.2 (+4% headroom). PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (34.8 KB of WebP on open, logo included); measured 123.6 KB page, limit 129 (+4% headroom).',
+    budget: { htmlGzipKb: 30.2, pageGzipKb: 129 },
   },
   {
     route: '/gallery-themes/',
     reason:
-      'The first 24 cards are in the HTML (18.8 KB gzip at FIX-site-perf-routes); the full 210-card list is fetched as /theme-gallery.json (17.9 KB) and each shown card loads its theme CSS. The PLAN_006 gallery audit (T-83) enriched the cards: 228.6 KB raw, 64.9 KB JS, limits 232 / 68. PLAN_009 (handler composition and ref props in the shared components) measured 24.1 KB gzip of HTML, limit 26 (+4% headroom). PLAN_010 (motion and the API contract in the shared components): measured 133.2 KB page, limit 139 (+4% headroom). PLAN_010 (motion and the API contract in the shared components): measured 69.4 KB JS, limit 73 (+4% headroom). PLAN_010 T-site-080 (measured 2026-10-29 on f9809246 with this task’s pages; none of its islands loads on this route, and swapping its one texuli root import left the number unchanged): the shared component code of the 0.8.0 wave (the texuli and primitives labels moved to the i18n message catalog, and the SSR-safe Select.Value): measured 73.3 KB JS and 137.2 KB page, limits 77 and 143 (+4% headroom). PLAN_012 (the page banner now renders): CI on Linux measured 234 KB raw HTML before the fallback was slimmed, limit 244 (+4% headroom). PLAN_012 illustrations (2026-11-01): the generated WebP banner adds 101.4 KB; measured 219.3 KB page, limit 229 (+4% headroom).',
-    budget: { htmlRawKb: 244, htmlGzipKb: 26, pageGzipKb: 229, jsGzipKb: 77 },
+      'The first 24 cards are in the HTML (18.8 KB gzip at FIX-site-perf-routes); the full 210-card list is fetched as /theme-gallery.json (17.9 KB) and each shown card loads its theme CSS. The PLAN_006 gallery audit (T-83) enriched the cards: 228.6 KB raw, 64.9 KB JS, limits 232 / 68. PLAN_009 (handler composition and ref props in the shared components) measured 24.1 KB gzip of HTML, limit 26 (+4% headroom). PLAN_010 (motion and the API contract in the shared components): measured 133.2 KB page, limit 139 (+4% headroom). PLAN_010 (motion and the API contract in the shared components): measured 69.4 KB JS, limit 73 (+4% headroom). PLAN_010 T-site-080 (measured 2026-10-29 on f9809246 with this task’s pages; none of its islands loads on this route, and swapping its one texuli root import left the number unchanged): the shared component code of the 0.8.0 wave (the texuli and primitives labels moved to the i18n message catalog, and the SSR-safe Select.Value): measured 73.3 KB JS and 137.2 KB page, limits 77 and 143 (+4% headroom). PLAN_012 (the page banner now renders): CI on Linux measured 234 KB raw HTML before the fallback was slimmed, limit 244 (+4% headroom). PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (22.7 KB of WebP on open, logo included); measured 140.8 KB page, limit 147 (+4% headroom).',
+    budget: { htmlRawKb: 244, htmlGzipKb: 26, pageGzipKb: 147, jsGzipKb: 77 },
   },
   {
     route: '/theme-switcher/',
@@ -279,8 +279,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/mcp-server/',
     reason:
-      'PLAN_011 T-site-090: a static page (no island) whose tables are generated from the operations registry (every tool with its summary, arguments, doors and limits; resources, prompts, WebMCP tools) plus setup snippets for six hosts: 21.2 KB gzip of HTML, inside the HTML budget. The shared docs shell (header, sidebar, search and the token-adopted base CSS) was about 78 KB of the total. Measured 2026-10-30: 100.3 KB page (+4% headroom); 78.7 KB after the shell trim of the same day. PLAN_012 (the MCP banner slot: its texel fallback, alt text and the illustration styles): CI on Linux measured 26.3 KB gzip of HTML before the fallback was slimmed, 25.7 KB locally after, limit 27.4 (+4% headroom). PLAN_012 illustrations (2026-11-01): the generated WebP banner adds 144.3 KB; measured 226.4 KB page, limit 236 (+4% headroom).',
-    budget: { pageGzipKb: 236, htmlGzipKb: 27.4 },
+      'PLAN_011 T-site-090: a static page (no island) whose tables are generated from the operations registry (every tool with its summary, arguments, doors and limits; resources, prompts, WebMCP tools) plus setup snippets for six hosts: 21.2 KB gzip of HTML, inside the HTML budget. The shared docs shell (header, sidebar, search and the token-adopted base CSS) was about 78 KB of the total. Measured 2026-10-30: 100.3 KB page (+4% headroom); 78.7 KB after the shell trim of the same day. PLAN_012 (the MCP banner slot: its texel fallback, alt text and the illustration styles): CI on Linux measured 26.3 KB gzip of HTML before the fallback was slimmed, 25.7 KB locally after, limit 27.4 (+4% headroom). PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (37.6 KB of WebP on open, logo included); measured 119.8 KB page, limit 125 (+4% headroom).',
+    budget: { pageGzipKb: 125, htmlGzipKb: 27.4 },
   },
   {
     route: '/tokens/',
@@ -297,20 +297,20 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/design-systems/',
     reason:
-      "PLAN_011 T-site-0100: the design systems hub, static (no island, only the site shell's JavaScript, 62.8 KB): twelve server-rendered brand scopes (three example brands on four surfaces) built from real Texuli components, so the page carries their CSS (26.9 KB gzip of CSS with the 4.7 KB build-time brands.css) and 17.9 KB gzip of HTML. Measured 2026-10-31: 108.7 KB page, limit 113.1 (measured + 4%). PLAN_012 illustrations (2026-11-01): the generated WebP banner adds 203.2 KB; measured 289.1 KB page, limit 301 (+4% headroom).",
-    budget: { pageGzipKb: 301 },
+      "PLAN_011 T-site-0100: the design systems hub, static (no island, only the site shell's JavaScript, 62.8 KB): twelve server-rendered brand scopes (three example brands on four surfaces) built from real Texuli components, so the page carries their CSS (26.9 KB gzip of CSS with the 4.7 KB build-time brands.css) and 17.9 KB gzip of HTML. Measured 2026-10-31: 108.7 KB page, limit 113.1 (measured + 4%). PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (48.4 KB of WebP on open, logo included); measured 134.4 KB page, limit 140 (+4% headroom).",
+    budget: { pageGzipKb: 140 },
   },
   {
     route: '/native/',
     reason:
-      'PLAN_012 illustrations (2026-11-01): the generated WebP banner adds 188.6 KB; measured 259.9 KB page, limit 271 (+4% headroom).',
-    budget: { pageGzipKb: 271 },
+      'PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (45.0 KB of WebP on open, logo included); measured 116.5 KB page, limit 122 (+4% headroom).',
+    budget: { pageGzipKb: 122 },
   },
   {
     route: '/guides/',
     reason:
-      'PLAN_012 illustrations (2026-11-01): the generated WebP banner adds 77.4 KB; measured 149.5 KB page, limit 156 (+4% headroom).',
-    budget: { pageGzipKb: 156 },
+      'PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (22.5 KB of WebP on open, logo included); measured 94.8 KB page, limit 99 (+4% headroom).',
+    budget: { pageGzipKb: 99 },
   },
 ]);
 

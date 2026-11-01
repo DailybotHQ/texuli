@@ -1,7 +1,8 @@
 /**
  * Illustration slots for texuli.com. Files live under
- * `apps/website/public/illustrations/`; until a file exists the
- * {@link SiteIllustration} component paints a token-based texel fallback.
+ * `apps/website/src/assets/illustrations/`, and the build derives smaller
+ * widths for `srcset`; until a file exists the {@link SiteIllustration}
+ * component paints a token-based texel fallback.
  * The style, sizes and drop-in procedure are in `docs/ILLUSTRATIONS.md`.
  */
 import illustrations from '../../data/illustrations.json';
@@ -37,11 +38,32 @@ export function illustrationFor(slot: string): IllustrationEntry | undefined {
   return bySlot.get(slot);
 }
 
-/** Public path for an illustration file (site-base relative). */
-export function illustrationSrc(file: string, base: string): string {
-  const root = base.endsWith('/') ? base : `${base}/`;
-  return `${root}illustrations/${file.replace(/^\/+/, '')}`;
+/** Smaller widths the build derives for `srcset`, per variant (the file's own width is added). */
+const SRCSET_STEPS: Readonly<Record<IllustrationVariant, readonly number[]>> = Object.freeze({
+  plate: [400, 600, 800, 1200],
+  band: [800, 1200],
+  banner: [400, 800, 1200],
+});
+
+/**
+ * The widths offered in `srcset`: the variant's steps below the file's own
+ * width, then the file itself, so a narrow or low-density screen downloads
+ * a fraction of the full file.
+ */
+export function illustrationWidths(entry: Pick<IllustrationEntry, 'variant' | 'width'>): number[] {
+  return [...SRCSET_STEPS[entry.variant].filter((width) => width < entry.width), entry.width];
 }
+
+/**
+ * The `sizes` hint per variant, from the rendered widths on texuli.com: plates
+ * top out near 38rem beside their text (wider on one column), the closing band
+ * near 73rem and page banners near 48rem.
+ */
+export const ILLUSTRATION_SIZES: Readonly<Record<IllustrationVariant, string>> = Object.freeze({
+  plate: '(min-width: 64rem) 38rem, 94vw',
+  band: 'min(100vw, 73rem)',
+  banner: 'min(100vw, 48rem)',
+});
 
 const SLOT_ID = /^[a-z][a-z0-9-]{1,47}$/;
 const WEBP = /^[a-z0-9][a-z0-9-]*\.webp$/;

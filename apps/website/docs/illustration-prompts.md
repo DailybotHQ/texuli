@@ -6,7 +6,7 @@
 One self-contained prompt per illustration slot (28 slots). Each prompt
 carries the whole style from [ILLUSTRATIONS.md](ILLUSTRATIONS.md), so it can be
 handed to an image-generation agent on its own. Save each result as the named
-WebP file, at the exact size, in `apps/website/public/illustrations/`; the slot
+WebP file, at the exact size, in `apps/website/src/assets/illustrations/`; the slot
 switches from its texel fallback to the file on the next build. A dark variant
 is optional.
 

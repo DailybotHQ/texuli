@@ -13,9 +13,11 @@ import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { PROMPTS_DOC, renderPromptsDoc } from '../scripts/illustration-prompts.ts';
 import {
+  ILLUSTRATION_SIZES,
   ILLUSTRATIONS,
   type IllustrationEntry,
   illustrationFor,
+  illustrationWidths,
   manifestProblems,
 } from '../src/components/landing/illustrations.ts';
 
@@ -110,6 +112,19 @@ describe('SiteIllustration', () => {
     );
     expect(source).toMatch(/\.site-illustration__dark \{\s+display: none !important;/);
     expect(source).toContain(":global(:root[data-tx-mode='dark']) .site-illustration--plate");
+  });
+
+  it('offers smaller build-time widths with a sizes hint, ending at the full file', () => {
+    expect(illustrationWidths({ variant: 'plate', width: 1600 })).toEqual([
+      400, 600, 800, 1200, 1600,
+    ]);
+    expect(illustrationWidths({ variant: 'plate', width: 1040 })).toEqual([400, 600, 800, 1040]);
+    expect(illustrationWidths({ variant: 'band', width: 1600 })).toEqual([800, 1200, 1600]);
+    expect(illustrationWidths({ variant: 'banner', width: 1920 })).toEqual([400, 800, 1200, 1920]);
+    for (const entry of ILLUSTRATIONS)
+      expect(ILLUSTRATION_SIZES[entry.variant], entry.slot).toBeTruthy();
+    expect(source).toContain('srcset={light.srcset}');
+    expect(source).toContain('sizes={sizes}');
   });
 });
 

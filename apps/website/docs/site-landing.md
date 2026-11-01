@@ -63,7 +63,7 @@ and `src/pages/web-and-native/index.astro`. Native and architecture details:
 
 ## Illustrations
 
-Each band's art is a `SiteIllustration` slot from `src/data/illustrations.json`. Until its WebP file lands in `public/illustrations/`, the slot paints a texel mosaic in the illustration palette with the same aspect ratio, so the layout never shifts. The style, sizes and drop-in steps are in [ILLUSTRATIONS.md](ILLUSTRATIONS.md); the generated prompts are in [illustration-prompts.md](illustration-prompts.md).
+Each band's art is a `SiteIllustration` slot from `src/data/illustrations.json`. Until its WebP file lands in `src/assets/illustrations/`, the slot paints a texel mosaic in the illustration palette with the same aspect ratio, so the layout never shifts. The style, sizes and drop-in steps are in [ILLUSTRATIONS.md](ILLUSTRATIONS.md); the generated prompts are in [illustration-prompts.md](illustration-prompts.md).
 
 ## Spec map
 

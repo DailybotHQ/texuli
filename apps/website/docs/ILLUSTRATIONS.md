@@ -49,7 +49,7 @@ Slots are declared in `apps/website/src/data/illustrations.json`. Each entry has
 | Field | What it holds |
 | --- | --- |
 | `slot` | The slot id |
-| `file` | A WebP name under `public/illustrations/` |
+| `file` | A WebP name under `src/assets/illustrations/` |
 | `fileDark` | Optional dark variant |
 | `width`, `height` | The file's pixel size, which is also the rendered aspect ratio |
 | `alt` | A literal description of the scene |
@@ -67,14 +67,14 @@ Slots are declared in `apps/website/src/data/illustrations.json`. Each entry has
 | Landing final call to action | `band` | 16:7 | 1600×700 |
 | Page banners | `banner` | 3:1 | 1920×640 |
 
-Export WebP at quality 82 or better, at the exact pixel size above, below 250 KB for plates and bands and below 180 KB for banners. Generate at a larger size if the tool prefers, then downscale. Keep the alpha channel lossless: a lossy alpha draws visible steps in the soft shadows. With a lossless alpha, five banners exceed 180 KB (`page-agents` 182, `page-primitives` 187, `page-native` 188, `page-design-systems` 202 and `page-showcase` 264 KB, all at quality 82), and the route budgets in `apps/website/src/components/perf/budgets.ts` count every image a page loads on open.
+Export WebP at quality 82 or better, at the exact pixel size above, below 250 KB for plates and bands and below 180 KB for banners. Generate at a larger size if the tool prefers, then downscale. Keep the alpha channel lossless: a lossy alpha draws visible steps in the soft shadows. With a lossless alpha, five banners exceed 180 KB (`page-agents` 182, `page-primitives` 187, `page-native` 188, `page-design-systems` 202 and `page-showcase` 264 KB, all at quality 82). The route budgets in `apps/website/src/components/perf/budgets.ts` count every image a page loads on open, which with `srcset` is the derived width, not the full file.
 
 ## Dropping in a file
 
 1. Generate the image from its prompt in [illustration-prompts.md](illustration-prompts.md).
-2. Save it as the slot's `file` (WebP, the exact size) in `apps/website/public/illustrations/`. Save the optional dark variant as `fileDark`.
+2. Save it as the slot's `file` (WebP, the exact size) in `apps/website/src/assets/illustrations/`. Save the optional dark variant as `fileDark`.
 3. Optionally record `model` and `created` in the manifest entry.
-4. Run `pnpm build`. The slot switches from its texel fallback to the file with no code change, and no layout shift, because the frame always reserves the same aspect ratio.
+4. Run `pnpm build`. The slot switches from its texel fallback to the file with no code change, and no layout shift, because the frame always reserves the same aspect ratio. The build also derives smaller WebP widths (quality 82, through Astro's image pipeline) and serves them with `srcset` and a per-variant `sizes`, so a page downloads about the width it shows; `illustrationWidths` and `ILLUSTRATION_SIZES` in `src/components/landing/illustrations.ts` set the steps.
 
 Until a file exists, `SiteIllustration.astro` paints a seeded texel mosaic in the same palette roles, so a page is always complete.
 

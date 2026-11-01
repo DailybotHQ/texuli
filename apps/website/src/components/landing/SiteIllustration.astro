@@ -1,12 +1,12 @@
 ---
+import { getImage } from 'astro:assets';
 /**
  * Reusable illustration slot: fixed aspect ratio, explicit width/height, lazy
  * decode, required alt. When the WebP file is missing, a CSS gradient built
  * from theme tokens fills the frame so layout never collapses.
  */
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
-import { illustrationFor, illustrationSrc } from './illustrations.ts';
+import type { ImageMetadata } from 'astro';
+import { ILLUSTRATION_SIZES, illustrationFor, illustrationWidths } from './illustrations.ts';
 
 interface Props {
   /** The illustration slot id (not `slot`, which Astro reserves; see PageBanner). */
@@ -22,15 +22,31 @@ if (!entry) {
   throw new Error(`Unknown illustration slot "${slot}". Add it to src/data/illustrations.json.`);
 }
 
-const base = import.meta.env.BASE_URL;
-// When building from apps/website, cwd may already be the app root.
-const exists = (file: string) =>
-  existsSync(join(process.cwd(), 'apps/website/public/illustrations', file)) ||
-  existsSync(join(process.cwd(), 'public/illustrations', file));
-const hasFile = exists(entry.file);
-const hasDark = hasFile && entry.fileDark !== undefined && exists(entry.fileDark);
-const src = illustrationSrc(entry.file, base);
-const darkSrc = hasDark && entry.fileDark ? illustrationSrc(entry.fileDark, base) : undefined;
+// Every file in src/assets/illustrations, keyed by its name. A missing file
+// keeps the slot on its fallback; a present one gets build-time widths.
+const files = import.meta.glob<{ default: ImageMetadata }>('../../assets/illustrations/*.webp', {
+  eager: true,
+});
+const asset = (file: string) => files[`../../assets/illustrations/${file}`]?.default;
+const sizes = ILLUSTRATION_SIZES[entry.variant];
+const widths = illustrationWidths(entry);
+/** The full file as `src`, plus smaller WebP widths derived at build time as `srcset`. */
+async function responsive(image: ImageMetadata | undefined) {
+  if (!image) return undefined;
+  const smaller = widths.filter((width) => width < image.width);
+  const derived = await Promise.all(
+    smaller.map((width) => getImage({ src: image, width, format: 'webp', quality: 82 }))
+  );
+  const srcset = [
+    ...derived.map((result, index) => `${result.src} ${smaller[index]}w`),
+    `${image.src} ${image.width}w`,
+  ].join(', ');
+  return { src: image.src, srcset };
+}
+const light = await responsive(asset(entry.file));
+const dark = light && entry.fileDark ? await responsive(asset(entry.fileDark)) : undefined;
+const hasFile = light !== undefined;
+const hasDark = dark !== undefined;
 const eager = entry.priority === true;
 const alt = altOverride ?? entry.alt;
 const ratio = `${entry.width} / ${entry.height}`;
@@ -63,11 +79,13 @@ const tiles = Array.from({ length: 48 }, (_, index) => {
   style={`--si-w:${entry.width};--si-h:${entry.height};--si-ratio:${ratio};`}
 >
   {
-    hasFile ? (
+    light ? (
       <>
         <img
           class="site-illustration__light"
-          src={src}
+          src={light.src}
+          srcset={light.srcset}
+          sizes={sizes}
           alt={alt}
           width={entry.width}
           height={entry.height}
@@ -75,10 +93,12 @@ const tiles = Array.from({ length: 48 }, (_, index) => {
           fetchpriority={eager ? 'high' : undefined}
           decoding={eager ? 'sync' : 'async'}
         />
-        {darkSrc && (
+        {dark && (
           <img
             class="site-illustration__dark"
-            src={darkSrc}
+            src={dark.src}
+            srcset={dark.srcset}
+            sizes={sizes}
             alt={alt}
             width={entry.width}
             height={entry.height}
