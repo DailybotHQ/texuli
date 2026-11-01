@@ -32,6 +32,13 @@ object NativeRegistry {
         "blocks-structure",
     ) + compactCharts
 
+    /**
+     * Painted ids whose web view is interactive (catalog interaction role
+     * `interactive`): native paints them read-only (ADR-025). Interactivity
+     * natively is a later wave.
+     */
+    val readOnly: Set<String> = setOf()
+
     fun status(id: String): BindingStatus =
         if (id in implemented) BindingStatus.IMPLEMENTED else BindingStatus.PLACEHOLDER
 }

@@ -6,11 +6,15 @@
     "placeholder": 147,
     "agentEmittable": 75,
     "agentEmittablePainted": 21,
-    "semanticRules": 32,
+    "semanticRules": 37,
     "goldenTraces": 15,
-    "goldenCovered": 34
+    "goldenCovered": 34,
+    "parityTraces": 1,
+    "traceCovered": 41,
+    "readOnly": 0
   },
   "unknownNativeIds": [],
+  "uncovered": [],
   "groups": [
     {
       "group": "canvas",
@@ -96,12 +100,13 @@
     },
     {
       "name": "Semantic conformance (golden traces)",
-      "web": "Writes one semantic trace per golden blueprint.",
-      "native": "Produces the same trace for every golden; a semantic gate, not a pixel test.",
+      "web": "Writes one semantic trace per golden blueprint and per parity fixture.",
+      "native": "Produces the same trace for every golden and every parity fixture; a semantic gate, not a pixel test.",
       "status": "parity",
       "evidence": [
         "native/conformance/web/trace.ts",
-        "native/conformance/src/jvmTest/kotlin/com/texuli/conformance/GoldenConformanceTest.kt"
+        "native/conformance/src/jvmTest/kotlin/com/texuli/conformance/GoldenConformanceTest.kt",
+        "native/conformance/src/jvmTest/kotlin/com/texuli/conformance/ParityFixtureConformanceTest.kt"
       ]
     },
     {
@@ -186,8 +191,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "alert",
@@ -196,8 +203,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "alert-dialog",
@@ -206,8 +215,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "analytics-grid",
@@ -216,8 +227,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "app-nav",
@@ -226,8 +239,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "badge",
@@ -236,8 +251,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "banner",
@@ -246,8 +263,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "blocks-code",
@@ -256,8 +275,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": true
     },
     {
       "id": "blocks-data",
@@ -266,8 +287,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "blocks-diagram",
@@ -276,8 +299,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": true
     },
     {
       "id": "blocks-embed",
@@ -286,8 +311,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "blocks-interactive",
@@ -296,8 +323,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "blocks-map",
@@ -306,8 +335,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "blocks-media",
@@ -316,8 +347,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": true
     },
     {
       "id": "blocks-structure",
@@ -326,8 +359,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": true
     },
     {
       "id": "blocks-text",
@@ -336,8 +371,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "breadcrumb",
@@ -346,8 +383,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "button",
@@ -356,8 +395,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "button-group",
@@ -366,8 +407,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "callout",
@@ -376,8 +419,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "canvas",
@@ -386,8 +431,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "card",
@@ -396,8 +443,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "charts-area",
@@ -406,8 +455,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "charts-bar",
@@ -416,8 +467,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "charts-bubble",
@@ -426,8 +479,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "charts-bullet",
@@ -436,8 +491,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": false
+      "golden": false,
+      "parityTrace": true
     },
     {
       "id": "charts-canvas-renderer",
@@ -446,8 +503,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "charts-cartesian",
@@ -456,8 +515,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "charts-combo",
@@ -466,8 +527,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "charts-donut",
@@ -476,8 +539,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "charts-funnel",
@@ -486,8 +551,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "charts-gauge",
@@ -496,8 +563,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": true
+      "golden": true,
+      "parityTrace": true
     },
     {
       "id": "charts-geo-map",
@@ -506,8 +575,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "charts-geo-point-map",
@@ -516,8 +587,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "charts-heatmap",
@@ -526,8 +599,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "charts-line",
@@ -536,8 +611,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "charts-network",
@@ -546,8 +623,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "charts-pie",
@@ -556,8 +635,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "charts-progress-ring",
@@ -566,8 +647,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": false
+      "golden": false,
+      "parityTrace": true
     },
     {
       "id": "charts-sankey",
@@ -576,8 +659,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "charts-scatter",
@@ -586,8 +671,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "charts-sparkline",
@@ -596,8 +683,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": true
+      "golden": true,
+      "parityTrace": true
     },
     {
       "id": "charts-stacked-bar",
@@ -606,8 +695,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "charts-sunburst",
@@ -616,8 +707,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "charts-treemap",
@@ -626,8 +719,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "chat-message",
@@ -636,8 +731,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "chat-thread",
@@ -646,8 +743,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "checkbox",
@@ -656,8 +755,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "chip",
@@ -666,8 +767,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "code",
@@ -676,8 +779,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "combobox",
@@ -686,8 +791,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "command-palette",
@@ -696,8 +803,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "content-layout",
@@ -706,8 +815,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "context-menu",
@@ -716,8 +827,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "context-menu-trigger",
@@ -726,8 +839,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "control-choice",
@@ -736,8 +851,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "control-filter",
@@ -746,8 +863,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "control-slider",
@@ -756,8 +875,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "control-toggle",
@@ -766,8 +887,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "data-board",
@@ -776,8 +899,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "data-calendar",
@@ -786,8 +911,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "data-cohort-table",
@@ -796,8 +923,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "data-dashboard",
@@ -806,8 +935,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "data-dashboard-widget",
@@ -816,8 +947,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "data-files",
@@ -826,8 +959,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "data-filter-builder",
@@ -836,8 +971,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "data-grid",
@@ -846,8 +983,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "data-map",
@@ -856,8 +995,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "data-notification-inbox",
@@ -866,8 +1007,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "data-timeline",
@@ -876,8 +1019,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "data-tree-view",
@@ -886,8 +1031,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "deck-slide",
@@ -896,8 +1043,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
-      "semanticRule": false,
-      "golden": false
+      "readOnly": false,
+      "semanticRule": true,
+      "golden": false,
+      "parityTrace": true
     },
     {
       "id": "description",
@@ -906,8 +1055,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "detail-panel",
@@ -916,8 +1067,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "dialog",
@@ -926,8 +1079,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "document",
@@ -936,8 +1091,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "drawer",
@@ -946,8 +1103,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "dropdown-menu",
@@ -956,8 +1115,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "dropdown-menu-content",
@@ -966,8 +1127,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "dropdown-menu-item",
@@ -976,8 +1139,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "dropdown-menu-trigger",
@@ -986,8 +1151,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "empty-state",
@@ -996,8 +1163,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "error-state",
@@ -1006,8 +1175,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "field",
@@ -1016,8 +1187,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "field-error",
@@ -1026,8 +1199,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "flow-action",
@@ -1036,8 +1211,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "flow-view",
@@ -1046,8 +1223,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "form",
@@ -1056,8 +1235,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "form-field",
@@ -1066,8 +1247,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "form-submit",
@@ -1076,8 +1259,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "host-region",
@@ -1086,8 +1271,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "hover-card",
@@ -1096,8 +1283,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "hover-card-content",
@@ -1106,8 +1295,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "icon-button",
@@ -1116,8 +1307,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "inline-text",
@@ -1126,8 +1319,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "input",
@@ -1136,8 +1331,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "input-group",
@@ -1146,8 +1343,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "kbd",
@@ -1156,8 +1355,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "kpi",
@@ -1166,8 +1367,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "label",
@@ -1176,8 +1379,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "layout-auth-split",
@@ -1186,8 +1391,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "layout-blog",
@@ -1196,8 +1403,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "layout-card",
@@ -1206,8 +1415,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "layout-chrome",
@@ -1216,8 +1427,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "layout-dashboard-grid",
@@ -1226,8 +1439,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "layout-deck",
@@ -1236,8 +1451,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": true
+      "golden": true,
+      "parityTrace": true
     },
     {
       "id": "layout-doc",
@@ -1246,8 +1463,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "layout-docs",
@@ -1256,8 +1475,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "layout-drawer",
@@ -1266,8 +1487,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "layout-dual-sidebar",
@@ -1276,8 +1499,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "layout-editorial",
@@ -1286,8 +1511,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "layout-grid",
@@ -1296,8 +1523,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "layout-host",
@@ -1306,8 +1535,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "layout-landing",
@@ -1316,8 +1547,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "layout-marketing",
@@ -1326,8 +1559,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "layout-page",
@@ -1336,8 +1571,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "layout-pricing",
@@ -1346,8 +1583,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "layout-row",
@@ -1356,8 +1595,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
-      "semanticRule": false,
-      "golden": true
+      "readOnly": false,
+      "semanticRule": true,
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "layout-settings",
@@ -1366,8 +1607,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "layout-sidebar",
@@ -1376,8 +1619,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "layout-split",
@@ -1386,8 +1631,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
-      "semanticRule": false,
-      "golden": true
+      "readOnly": false,
+      "semanticRule": true,
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "layout-stack",
@@ -1396,8 +1643,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
-      "semanticRule": false,
-      "golden": true
+      "readOnly": false,
+      "semanticRule": true,
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "layout-tile",
@@ -1406,8 +1655,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
-      "semanticRule": false,
-      "golden": true
+      "readOnly": false,
+      "semanticRule": true,
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "layout-top-nav",
@@ -1416,8 +1667,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "layout-wizard",
@@ -1426,8 +1679,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "media-composition-canvas",
@@ -1436,8 +1691,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "media-composition-svg",
@@ -1446,8 +1703,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "media-image",
@@ -1456,8 +1715,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "painted",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "menubar",
@@ -1466,8 +1727,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "menubar-trigger",
@@ -1476,8 +1739,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "multi-select",
@@ -1486,8 +1751,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "nav-icon",
@@ -1496,8 +1763,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "navigation-menu",
@@ -1506,8 +1775,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "pagination",
@@ -1516,8 +1787,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "popover",
@@ -1526,8 +1799,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "popover-content",
@@ -1536,8 +1811,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "radio",
@@ -1546,8 +1823,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "radio-group",
@@ -1556,8 +1835,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "responsive-modal",
@@ -1566,8 +1847,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "schema-form",
@@ -1576,8 +1859,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": true,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "screen-outlet",
@@ -1586,8 +1871,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "select",
@@ -1596,8 +1883,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "select-content",
@@ -1606,8 +1895,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "select-group",
@@ -1616,8 +1907,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "select-item",
@@ -1626,8 +1919,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "select-label",
@@ -1636,8 +1931,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "select-portal",
@@ -1646,8 +1943,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "select-separator",
@@ -1656,8 +1955,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "select-trigger",
@@ -1666,8 +1967,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "select-value",
@@ -1676,8 +1979,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "select-viewport",
@@ -1686,8 +1991,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "sheet",
@@ -1696,8 +2003,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "sidebar",
@@ -1706,8 +2015,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "sortable-list",
@@ -1716,8 +2027,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     },
     {
       "id": "split-view",
@@ -1726,8 +2039,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "spreadsheet",
@@ -1736,8 +2051,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "stat",
@@ -1746,8 +2063,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "stepper",
@@ -1756,8 +2075,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "switch",
@@ -1766,8 +2087,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "table",
@@ -1776,8 +2099,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "tag",
@@ -1786,8 +2111,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "text-counter",
@@ -1796,8 +2123,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "textarea",
@@ -1806,8 +2135,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "time-field",
@@ -1816,8 +2147,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "timeline",
@@ -1826,8 +2159,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "toaster",
@@ -1836,8 +2171,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "tooltip",
@@ -1846,8 +2183,10 @@
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": false
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "workflow-graph",
@@ -1856,8 +2195,10 @@
       "agentEmittable": true,
       "web": "renders",
       "native": "placeholder",
+      "readOnly": false,
       "semanticRule": false,
-      "golden": true
+      "golden": true,
+      "parityTrace": false
     }
   ]
 }
