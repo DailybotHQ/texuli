@@ -63,24 +63,24 @@ const BANNED: readonly { phrase: RegExp; why: string }[] = [
   { phrase: /production[- ]ready/i, why: 'nothing is released as stable' },
   {
     phrase: /Nothing is on npm/i,
-    why: 'every published package is on npm as 0.11.4, and the site is deployed',
+    why: 'every published package is on npm as 0.11.5, and the site is deployed',
   },
   {
     phrase: /\b0\.1\.0\b/,
-    why: 'the 0.1.0-next.N previews are superseded: name the current release, 0.11.4',
+    why: 'the 0.1.0-next.N previews are superseded: name the current release, 0.11.5',
   },
   {
     // A URL segment such as the agentskills discovery schema `/0.2.0/` is not a release claim.
     phrase: /(?<![/\w.-])0\.2\.0\b/,
-    why: '0.2.0 is superseded: name the current release, 0.11.4',
+    why: '0.2.0 is superseded: name the current release, 0.11.5',
   },
   {
     phrase: /texuli(?:\/[a-z-]+)?@next\b/,
-    why: 'install plainly: latest and next both name 0.11.4',
+    why: 'install plainly: latest and next both name 0.11.5',
   },
   {
     phrase: /not released yet/i,
-    why: '0.11.4 is published; say "no stable release yet" instead',
+    why: '0.11.5 is published; say "no stable release yet" instead',
   },
   { phrase: /token engine/i, why: 'the word list calls @texuli/tokens the theme engine' },
   {
@@ -89,7 +89,7 @@ const BANNED: readonly { phrase: RegExp; why: string }[] = [
   },
   {
     phrase: /stable release is (out|available|published)/i,
-    why: '0.11.4 is pre-1.0; 1.0.0 will be the first stable release',
+    why: '0.11.5 is pre-1.0; 1.0.0 will be the first stable release',
   },
 ];
 

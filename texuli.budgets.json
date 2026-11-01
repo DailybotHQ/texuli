@@ -975,7 +975,7 @@
     },
     "@texuli/document": {
       "gzip": 48576,
-      "note": "PLAN_010 T-doc-engine (2026-10-28): new row; measured 42,936 B gzip, cap = measured + 4% headroom. Includes @texuli/deck parseDeck for embedded decks (ADR-011). PLAN_011 T-ds-blueprint: 44654 -> 46464 (CI Linux 44,656 B + 4%) for the document designSystem field and its schema. 0.11.4 (Protoyard G133): 46464 -> 48576 (measured 46,662 B + 4%) for the injectable deck check that lets schema-core leave the deck model out."
+      "note": "PLAN_010 T-doc-engine (2026-10-28): new row; measured 42,936 B gzip, cap = measured + 4% headroom. Includes @texuli/deck parseDeck for embedded decks (ADR-011). PLAN_011 T-ds-blueprint: 44654 -> 46464 (CI Linux 44,656 B + 4%) for the document designSystem field and its schema. 0.11.5 (Protoyard G133): 46464 -> 48576 (measured 46,662 B + 4%) for the injectable deck check that lets schema-core leave the deck model out."
     },
     "@texuli/document/model": {
       "gzip": 1741,
@@ -995,7 +995,7 @@
     },
     "@texuli/document/schema-core": {
       "gzip": 15040,
-      "note": "0.11.4 (Protoyard G133): new row at measured + 4%; measured 14,405 B gzip. The document validator without @texuli/deck/model (inline decks need an injected validateDeck); the full schema entry is 30,956 B."
+      "note": "0.11.5 (Protoyard G133): new row at measured + 4%; measured 14,405 B gzip. The document validator without @texuli/deck/model (inline decks need an injected validateDeck); the full schema entry is 30,956 B."
     },
     "@texuli/document/ops": {
       "gzip": 34738,

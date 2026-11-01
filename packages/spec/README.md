@@ -14,7 +14,7 @@ by Texuli's Kotlin Multiplatform twin. The package is framework-free: no
 DOM, no Svelte, no Node APIs and no runtime dependencies.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.11.4`, a pre-1.0 release (1.0.0 will be the first
+> published to npm as `0.11.5`, a pre-1.0 release (1.0.0 will be the first
 > stable release). Under 0.x, a new minor (`0.12.0`) may contain breaking
 > changes, so pin the exact version or use `^0.11.0`, which accepts only 0.11.x.
 
@@ -89,7 +89,7 @@ import {
   validateInstance,
 } from '@texuli/spec';
 
-SPEC_VERSION;                         // the spec version: '0.10.0' in @texuli/spec@0.11.4
+SPEC_VERSION;                         // the spec version: '0.10.0' in @texuli/spec@0.11.5
 SPEC_COMPONENT_IDS.includes('alert'); // true: the closed component vocabulary
 
 // The dialect validator: a closed subset of JSON Schema 2020-12.
@@ -293,7 +293,7 @@ envelope up to the current spec with pure, per-version steps
 (`src/migrations/`: `0.2.0 → 0.3.0`, `0.3.0 → 0.4.0`, `0.4.0 → 0.5.0`,
 `0.5.0 → 0.6.0`, `0.6.0 → 0.7.0`, `0.7.0 → 0.8.0`, `0.8.0 → 0.9.0` and
 `0.9.0 → 0.10.0`, each of which only stamps `spec`); a compatible version
-range is planned, not built. `@texuli/spec@0.11.4` carries spec `0.10.0` (digest
+range is planned, not built. `@texuli/spec@0.11.5` carries spec `0.10.0` (digest
 `afcb9e3ed6b74b833a0f7477a657168621785ee98602ff582aa047e2d86aef17`), which adds the
 design-system document (PLAN_011 T-ds-spec) and the envelope's
 `designSystem` (T-ds-blueprint), plus a catalog projection refresh
