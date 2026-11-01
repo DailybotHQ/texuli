@@ -228,12 +228,17 @@ internal fun ticks(start: Double, stop: Double, count: Int = 10): List<Double> {
     val last = floor(hi / step + 1e-9)
     val values = mutableListOf<Double>()
     var i = first
-    while (i <= last) {
+    // Past 2^53 `i + 1 == i` and the web's loop never ends; native stops at a cap instead.
+    while (i <= last && values.size < MAX_TICKS) {
         values += multiple(i, step)
+        if (i + 1 == i) break
         i += 1
     }
     return if (reverse) values.reversed() else values
 }
+
+/** At most this many linear ticks (a bound the web lacks; it only matters past 2^53). */
+internal const val MAX_TICKS = 1_000
 
 /** Extend `[start, stop]` outward to round tick boundaries. */
 internal fun niceDomain(start: Double, stop: Double, count: Int = 10): Pair<Double, Double> {

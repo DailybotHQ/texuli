@@ -228,6 +228,7 @@ doc or the README records:
 - **Interactive data views.** Sorting, selecting, dragging, editing and view
   switches in the grid, tree, files, calendar, timeline, inbox, board, map
   and filter builder (wave 3: intents and bindings). They paint read-only today.
+  The native timeline also paints left to right only; the web mirrors it in RTL.
 - **Native chart palette.** The token sets carry no chart palette yet, so
   series colors come from the theme's roles in a fixed order (ADR-025).
 - **Copy intents** from painters that offer copyable text.

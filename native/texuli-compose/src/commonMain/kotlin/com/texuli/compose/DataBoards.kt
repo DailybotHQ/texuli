@@ -517,6 +517,9 @@ internal fun resolveDashboard(design: List<Map<String, JsonValue>>, widgets: Lis
     return next
 }
 
+/** The deepest dashboard row native draws. */
+internal const val DASHBOARD_MAX_ROWS = 400
+
 internal class DashWidget(val id: String, val title: String, val place: Map<String, JsonValue>, val childIndex: Int)
 
 internal class DashboardModel(val label: String, val columns: Int, val rowHeight: Int, val gap: Int, val vertical: Boolean, val layout: List<Map<String, JsonValue>>?, val widgets: List<DashWidget>)
@@ -569,9 +572,11 @@ internal fun DashboardGrid(model: DashboardModel, widget: @Composable (DashWidge
         val items = resolveDashboard(dashboardDesign(model), model.widgets, active, points, model.vertical)
         val byId = model.widgets.associateBy { it.id }
         val columnWidth = (maxWidth.value - model.gap * (active.columns - 1)) / active.columns
-        val rows = items.maxOfOrNull { it.y + it.h } ?: 0
+        // Rows past the cap are not drawn (Compose measures in Int pixels); `compaction: none` can leave y at 4096.
+        val shown = items.filter { it.y + it.h <= DASHBOARD_MAX_ROWS }
+        val rows = shown.maxOfOrNull { it.y + it.h } ?: 0
         Box(Modifier.fillMaxWidth().height((rows * model.rowHeight + max(0, rows - 1) * model.gap).dp)) {
-            for (item in items) {
+            for (item in shown) {
                 val w = byId[item.id] ?: continue
                 Column(
                     Modifier

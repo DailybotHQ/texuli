@@ -283,7 +283,9 @@ internal fun cartesianScene(chart: CartesianChart, width: Double): ChartScene {
 
 /** The rows the web's chart table lists: one per x key, a column per series. */
 internal fun cartesianTable(chart: CartesianChart): ChartTable {
-    val keys = xDomain(chart.series).let { all ->
+    // The web's table lists the rendered (windowed) keys.
+    val rendered = chart.visibleDomain?.let { windowCartesianSeries(chart.series, it) } ?: chart.series
+    val keys = xDomain(rendered).let { all ->
         if (all.size > 48) List(24) { all[jsRound(it * (all.size - 1) / 23.0).toInt()] } else all
     }
     fun xLabel(key: XValue): String = when {

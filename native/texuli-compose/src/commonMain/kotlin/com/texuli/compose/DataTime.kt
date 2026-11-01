@@ -104,6 +104,14 @@ internal fun dateInUtc(instant: Double): String {
     return formatIsoDate(f.year.toInt(), f.month + 1, f.day)
 }
 
+/**
+ * Dates the painters can step around: a margin inside the years the web's
+ * date code round-trips (0100 to 9999), so adding a week or two never leaves
+ * it. A date outside paints the placeholder (the web throws there).
+ */
+// A five-digit year ("10000-01-01") sorts before "9998" as text, so the length is checked first.
+internal fun inPaintRange(date: String): Boolean = date.length == 10 && date >= "0101-01-01" && date <= "9998-12-31"
+
 /** A `timeZone` prop native can honor: absent, or UTC. */
 internal fun isUtcZone(zone: String?): Boolean = zone == null || zone in setOf("UTC", "Etc/UTC", "Etc/GMT", "GMT")
 
@@ -217,6 +225,7 @@ internal fun nativeCalendar(props: Map<String, JsonValue>, today: () -> String =
         val end = f.propString("end") ?: return null
         val allDay = f.propBool("allDay") == true
         val (first, last) = spanDates(start, end, allDay) ?: return null
+        if (!inPaintRange(first) || !inPaintRange(last)) return null
         CalendarEvent(f.propName("id") ?: return null, f.propString("title") ?: return null, start, end, allDay, first, last)
     }
     val view = when (val v = props.propEnum("view", setOf("month", "week", "day", "agenda"))) {
@@ -227,6 +236,7 @@ internal fun nativeCalendar(props: Map<String, JsonValue>, today: () -> String =
     // Without a valid anchor the web opens on today.
     val anchorText = props.propString("anchor")
     val anchor = anchorText?.take(10)?.takeIf { parseIsoDate(it) != null && (parseInstant(anchorText) != null || anchorText.length == 10) } ?: today()
+    if (!inPaintRange(anchor)) return null
     for (key in listOf("locale")) if (props.mistyped(key) { it is JsonValue.Str }) return null
     return CalendarViewModel(label, events, view, anchor, weekStartFor(props.propString("locale") ?: "en-US"))
 }
@@ -343,8 +353,8 @@ internal fun nativeTimeline(props: Map<String, JsonValue>, today: () -> String =
         val f = item.asObject ?: return null
         for (key in listOf("start", "end", "group")) if (f.mistyped(key) { it is JsonValue.Str }) return null
         if (f.mistyped("progress") { it is JsonValue.Num } || f.mistyped("milestone") { it is JsonValue.Bool }) return null
-        val start = f.propString("start")?.also { parseIsoDate(it) ?: return null }
-        val end = f.propString("end")?.also { parseIsoDate(it) ?: return null }
+        val start = f.propString("start")?.also { if (parseIsoDate(it) == null || !inPaintRange(it)) return null }
+        val end = f.propString("end")?.also { if (parseIsoDate(it) == null || !inPaintRange(it)) return null }
         if (start != null && end != null && end < start) return null
         TimelineTask(f.propName("id") ?: return null, f.propString("title") ?: return null, start, end, f.propNumber("progress"), f.propString("group"), f.propBool("milestone") == true)
     }
@@ -364,8 +374,15 @@ internal fun nativeTimeline(props: Map<String, JsonValue>, today: () -> String =
         INVALID -> return null
         else -> z
     }
-    return TimelineViewModel(label, tasks, dependencies, zoom, today())
+    val model = TimelineViewModel(label, tasks, dependencies, zoom, today().takeIf(::inPaintRange) ?: "2026-01-15")
+    // A canvas wider than this is refused (Compose measures in Int pixels); the web has no cap.
+    val (start, end) = timelineRange(timelineRows(tasks).first, model.today)
+    if ((daysBetween(start, end) + 1) * DAY_WIDTH.getValue(zoom) > TIMELINE_MAX_WIDTH) return null
+    return model
 }
+
+/** The widest timeline canvas native paints, in dp. */
+internal const val TIMELINE_MAX_WIDTH = 40_000.0
 
 /** "June 2, 2026" (`formatDate` of the timeline: long month, UTC). */
 internal fun timelineDate(date: String): String = parseIsoDate(date)!!.let { (y, m, d) -> "${MONTHS_LONG[m - 1]} $d, $y" }
@@ -457,6 +474,7 @@ internal fun nativeInbox(props: Map<String, JsonValue>, clock: () -> Double = ::
         val f = item.asObject ?: return null
         if (f.mistyped("body") { it is JsonValue.Str } || f.mistyped("href") { it is JsonValue.Str }) return null
         val at = f.propString("at")?.let { parseInstant(it) ?: parseIsoDate(it)?.let { _ -> dateMs(it) } } ?: return null
+        if (!inPaintRange(dateInUtc(at))) return null
         InboxItem(f.propName("id") ?: return null, f.propString("title") ?: return null, f.propString("body"), at, f.propBool("read") ?: return null, f.propString("href"))
     }
     val unreadOnly = when (props.propEnum("filter", setOf("all", "unread"))) {
@@ -466,6 +484,7 @@ internal fun nativeInbox(props: Map<String, JsonValue>, clock: () -> Double = ::
     }
     // Without a valid `now` the web counts from when the node paints.
     val now = props.propString("now")?.let { parseInstant(it) } ?: clock()
+    if (!inPaintRange(dateInUtc(now))) return null
     val level = props.propNumber("headingLevel")?.let { min(6, max(2, it.toInt().takeIf { v -> v != 0 } ?: 2)) } ?: 2
     if (props.mistyped("markReadOnOpen") { it is JsonValue.Bool } || props.mistyped("locale") { it is JsonValue.Str }) return null
     return InboxViewModel(items, unreadOnly, now, level)

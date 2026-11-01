@@ -85,6 +85,21 @@ class DataTimeTest {
     }
 
     @Test
+    fun datesAtTheEdgeOfTheRangePaintThePlaceholderInsteadOfCrashing() {
+        // Review finding: stepping a week or two past 9999 or before 0100 left the date range and threw.
+        val lateTask = arr(obj("id" to str("x"), "title" to str("X"), "start" to str("9999-12-20"), "end" to str("9999-12-25")))
+        assertNull(nativeTimeline(timeline + ("tasks" to lateTask), today))
+        val earlyTask = arr(obj("id" to str("x"), "title" to str("X"), "start" to str("0100-01-03"), "end" to str("0100-01-04")))
+        assertNull(nativeTimeline(timeline + ("tasks" to earlyTask), today))
+        assertNull(nativeCalendar(calendar + ("anchor" to str("9999-12-15")), today))
+        val lateItem = arr(obj("id" to str("n"), "title" to str("N"), "at" to str("9999-12-31T23:00:00-05:00"), "read" to bool(false)))
+        assertNull(nativeInbox(inbox + ("items" to lateItem)) { 0.0 })
+        // A canvas wider than the cap is refused rather than measured.
+        val longTask = arr(obj("id" to str("x"), "title" to str("X"), "start" to str("2000-01-03"), "end" to str("2026-01-02")))
+        assertNull(nativeTimeline(timeline + ("tasks" to longTask) + ("zoom" to str("day")), today))
+    }
+
+    @Test
     fun hostilePropsNeverThrow() {
         val cases = listOf<Pair<Map<String, JsonValue>, (Map<String, JsonValue>) -> Any?>>(
             calendar to { p -> nativeCalendar(p, today)?.let(::calendarDates) },

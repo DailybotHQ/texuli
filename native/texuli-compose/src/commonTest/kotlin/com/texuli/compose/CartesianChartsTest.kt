@@ -113,6 +113,21 @@ class CartesianChartsTest {
     }
 
     @Test
+    fun hugeValuesNeitherHangNorOverflowTheTicks() {
+        // Review finding: past 2^53 the web's tick loop never advances; native stops at a cap.
+        assertTrue(ticks(1e17, 1e17 + 16, 5).size <= MAX_TICKS)
+        val huge = obj("id" to str("h"), "label" to str("H"), "points" to arr(obj("x" to str("a"), "y" to num(1e17)), obj("x" to str("b"), "y" to num(100000000000000016.0))))
+        cartesianScene(nativeCartesianChart("charts-line", base + ("series" to arr(huge)))!!, 640.0)
+    }
+
+    @Test
+    fun theTableListsTheWindowedKeysLikeTheWeb() {
+        val wide = obj("id" to str("w"), "label" to str("W"), "points" to arr(listOf(1, 2, 3, 4, 5, 6).map { obj("x" to num(it), "y" to num(it)) }))
+        val chart = nativeCartesianChart("charts-line", base + ("series" to arr(wide)) + ("visibleDomain" to arr(num(2.5), num(4.5))))!!
+        assertEquals(listOf("2", "3", "4", "5"), cartesianTable(chart).rows.map { it[0] })
+    }
+
+    @Test
     fun hostilePropsNeverThrowAndAcceptedScenesStayFinite() {
         for (id in CARTESIAN_CHART_IDS) {
             val props = if (id == "charts-cartesian") base + ("kind" to str("combo")) else base
