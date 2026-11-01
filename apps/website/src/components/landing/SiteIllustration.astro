@@ -95,7 +95,7 @@ const tiles = Array.from({ length: 48 }, (_, index) => {
         style={`aspect-ratio:${ratio};`}
       >
         <div class="site-illustration__texels" aria-hidden="true">
-          {tiles.map((tone) => <span class={`texel texel--${tone}`} />)}
+          {tiles.map((tone) => (tone === 0 ? <i /> : <i class={`t${tone}`} />))}
         </div>
       </div>
     )
@@ -164,27 +164,28 @@ const tiles = Array.from({ length: 48 }, (_, index) => {
     gap: clamp(4px, 1.1vw, 10px);
     padding: clamp(10px, 3vw, 28px);
   }
-  .texel {
+  /* Lean markup: bare <i> cells (no scope attribute each), tones as t1–t4. */
+  .site-illustration__texels > :global(i) {
     aspect-ratio: 1;
     border-radius: 22%;
     border: 1px solid color-mix(in oklab, var(--tx-border) 70%, transparent);
   }
   /* Fallback texels use the illustration palette (docs/ILLUSTRATIONS.md):
      lilac glass, a stronger lilac, the brand violet, and the rare orange. */
-  .texel--1 {
+  .site-illustration__texels > :global(.t1) {
     background: color-mix(in oklab, #b9a8ff 22%, var(--tx-background));
   }
-  .texel--2 {
+  .site-illustration__texels > :global(.t2) {
     background: color-mix(in oklab, #b9a8ff 55%, var(--tx-background));
     border-color: transparent;
   }
-  .texel--3 {
+  .site-illustration__texels > :global(.t3) {
     background: #6d4aff;
     border-color: transparent;
   }
   /* The rare strong texel is the social image's warm orange highlight
      (docs/ILLUSTRATIONS.md palette), decorative only. */
-  .texel--4 {
+  .site-illustration__texels > :global(.t4) {
     background: oklch(0.76 0.15 50);
     border-color: transparent;
   }
@@ -193,7 +194,7 @@ const tiles = Array.from({ length: 48 }, (_, index) => {
       border-color: CanvasText;
     }
     .texel--3,
-    .texel--4 {
+    .site-illustration__texels > :global(.t4) {
       background: CanvasText;
     }
   }

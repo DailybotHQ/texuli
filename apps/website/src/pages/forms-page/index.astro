@@ -1,13 +1,4 @@
 ---
-/**
- * /forms-page/ — schema-driven forms (@texuli/forms, ADR-015, in
- * development, on npm from 0.8.0): every field type, every named format,
- * every closed rule with announced errors, multi-step flows with
- * conditional logic, drafts and autosave, fields backed by host data
- * sources, and forms as agent data painted by the player. Every demo is a
- * lazy island (client:visible); the tables (field types, rules, keyboard)
- * are enumerated from the package's own constants at build time.
- */
 import FeaturePage from '../../components/feature-site/FeaturePage.astro';
 import AgentFormDemo from '../../components/forms-site/AgentFormDemo.svelte';
 import { AGENT_FORM_JSON, HOSTILE_FIELD_JSON } from '../../components/forms-site/blueprint.ts';
@@ -29,6 +20,16 @@ import SourceDemo from '../../components/forms-site/SourceDemo.svelte';
 import { FIELD_ROWS, RULE_COVERAGE } from '../../components/forms-site/schemas.ts';
 import ValidationDemo from '../../components/forms-site/ValidationDemo.svelte';
 import GuideCode from '../../components/guides/GuideCode.astro';
+/**
+ * /forms-page/ — schema-driven forms (@texuli/forms, ADR-015, in
+ * development, on npm from 0.8.0): every field type, every named format,
+ * every closed rule with announced errors, multi-step flows with
+ * conditional logic, drafts and autosave, fields backed by host data
+ * sources, and forms as agent data painted by the player. Every demo is a
+ * lazy island (client:visible); the tables (field types, rules, keyboard)
+ * are enumerated from the package's own constants at build time.
+ */
+import PageBanner from '../../components/landing/PageBanner.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const section = (id: string) => {
@@ -65,13 +66,13 @@ const formHost = createFormPlayerHost({ validators: { 'handle-free': checkHandle
 >
   <FeaturePage
     name="forms"
-    banner="page-forms"
     eyebrow={`@texuli/forms · in development · on npm from ${FORMS_RELEASE}`}
     title="Forms as data, painted accessibly"
     pieces={FORMS_PIECES}
     piecesLabel="The pieces of schema-driven forms"
     sections={FORMS_SECTIONS}
   >
+    <PageBanner art="page-forms" slot="banner" />
     <Fragment slot="lead">
       <p>
         A closed form schema becomes an accessible form: typed fields in sections or steps,
