@@ -1,0 +1,408 @@
+{
+  "format": "texuli-blueprint",
+  "version": 1,
+  "id": "parity-charts-cartesian",
+  "catalog": "48d6231182dcdb62ed2c8816ff3f620ae9b9683612403dc7e3db00ad85ad893a",
+  "status": "draft",
+  "createdAt": "2026-10-24T09:00:00Z",
+  "updatedAt": "2026-10-24T09:00:00Z",
+  "generator": {
+    "kind": "agent",
+    "name": "Parity fixture",
+    "model": "example-model"
+  },
+  "tier": "untrusted",
+  "profile": "web",
+  "tree": {
+    "id": "layout-page",
+    "props": {
+      "title": "Cartesian charts",
+      "description": "Fictional parity fixture (PLAN_013)."
+    },
+    "children": [
+      {
+        "id": "charts-line",
+        "props": {
+          "title": "Tickets per day",
+          "description": "Tickets per day for the Harborline support team, week 42.",
+          "series": [
+            {
+              "id": "opened",
+              "label": "Opened",
+              "points": [
+                {
+                  "x": "Mon",
+                  "y": 210
+                },
+                {
+                  "x": "Tue",
+                  "y": 198
+                },
+                {
+                  "x": "Wed",
+                  "y": 187
+                },
+                {
+                  "x": "Thu",
+                  "y": 176
+                },
+                {
+                  "x": "Fri",
+                  "y": 164
+                }
+              ]
+            },
+            {
+              "id": "solved",
+              "label": "Solved",
+              "points": [
+                {
+                  "x": "Mon",
+                  "y": 190
+                },
+                {
+                  "x": "Tue",
+                  "y": 201
+                },
+                {
+                  "x": "Wed",
+                  "y": null
+                },
+                {
+                  "x": "Thu",
+                  "y": 188
+                },
+                {
+                  "x": "Fri",
+                  "y": 172
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "charts-area",
+        "props": {
+          "title": "Ticket volume",
+          "description": "Ticket volume for the Harborline support team, week 42.",
+          "series": [
+            {
+              "id": "opened",
+              "label": "Opened",
+              "points": [
+                {
+                  "x": "Mon",
+                  "y": 210
+                },
+                {
+                  "x": "Tue",
+                  "y": 198
+                },
+                {
+                  "x": "Wed",
+                  "y": 187
+                },
+                {
+                  "x": "Thu",
+                  "y": 176
+                },
+                {
+                  "x": "Fri",
+                  "y": 164
+                }
+              ]
+            },
+            {
+              "id": "solved",
+              "label": "Solved",
+              "points": [
+                {
+                  "x": "Mon",
+                  "y": 190
+                },
+                {
+                  "x": "Tue",
+                  "y": 201
+                },
+                {
+                  "x": "Wed",
+                  "y": null
+                },
+                {
+                  "x": "Thu",
+                  "y": 188
+                },
+                {
+                  "x": "Fri",
+                  "y": 172
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "charts-bar",
+        "props": {
+          "title": "Tickets by day",
+          "description": "Tickets by day for the Harborline support team, week 42.",
+          "series": [
+            {
+              "id": "opened",
+              "label": "Opened",
+              "points": [
+                {
+                  "x": "Mon",
+                  "y": 210
+                },
+                {
+                  "x": "Tue",
+                  "y": 198
+                },
+                {
+                  "x": "Wed",
+                  "y": 187
+                },
+                {
+                  "x": "Thu",
+                  "y": 176
+                },
+                {
+                  "x": "Fri",
+                  "y": 164
+                }
+              ]
+            },
+            {
+              "id": "solved",
+              "label": "Solved",
+              "points": [
+                {
+                  "x": "Mon",
+                  "y": 190
+                },
+                {
+                  "x": "Tue",
+                  "y": 201
+                },
+                {
+                  "x": "Wed",
+                  "y": null
+                },
+                {
+                  "x": "Thu",
+                  "y": 188
+                },
+                {
+                  "x": "Fri",
+                  "y": 172
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "charts-stacked-bar",
+        "props": {
+          "title": "Opened and solved",
+          "description": "Opened and solved for the Harborline support team, week 42.",
+          "series": [
+            {
+              "id": "opened",
+              "label": "Opened",
+              "points": [
+                {
+                  "x": "Mon",
+                  "y": 210
+                },
+                {
+                  "x": "Tue",
+                  "y": 198
+                },
+                {
+                  "x": "Wed",
+                  "y": 187
+                },
+                {
+                  "x": "Thu",
+                  "y": 176
+                },
+                {
+                  "x": "Fri",
+                  "y": 164
+                }
+              ]
+            },
+            {
+              "id": "solved",
+              "label": "Solved",
+              "points": [
+                {
+                  "x": "Mon",
+                  "y": 190
+                },
+                {
+                  "x": "Tue",
+                  "y": 201
+                },
+                {
+                  "x": "Wed",
+                  "y": null
+                },
+                {
+                  "x": "Thu",
+                  "y": 188
+                },
+                {
+                  "x": "Fri",
+                  "y": 172
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "charts-combo",
+        "props": {
+          "title": "Opened with solved trend",
+          "description": "Opened with solved trend for the Harborline support team, week 42.",
+          "series": [
+            {
+              "id": "opened",
+              "label": "Opened",
+              "points": [
+                {
+                  "x": "Mon",
+                  "y": 210
+                },
+                {
+                  "x": "Tue",
+                  "y": 198
+                },
+                {
+                  "x": "Wed",
+                  "y": 187
+                },
+                {
+                  "x": "Thu",
+                  "y": 176
+                },
+                {
+                  "x": "Fri",
+                  "y": 164
+                }
+              ]
+            },
+            {
+              "id": "solved",
+              "label": "Solved",
+              "points": [
+                {
+                  "x": "Mon",
+                  "y": 190
+                },
+                {
+                  "x": "Tue",
+                  "y": 201
+                },
+                {
+                  "x": "Wed",
+                  "y": null
+                },
+                {
+                  "x": "Thu",
+                  "y": 188
+                },
+                {
+                  "x": "Fri",
+                  "y": 172
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "charts-cartesian",
+        "props": {
+          "title": "Median latency",
+          "description": "Median first response in minutes, daily.",
+          "kind": "line",
+          "xKind": "time",
+          "series": [
+            {
+              "id": "latency",
+              "label": "Latency",
+              "points": [
+                {
+                  "x": 1772409600000,
+                  "y": 120
+                },
+                {
+                  "x": 1772496000000,
+                  "y": 135
+                },
+                {
+                  "x": 1772582400000,
+                  "y": 128
+                },
+                {
+                  "x": 1772668800000,
+                  "y": 142
+                },
+                {
+                  "x": 1772755200000,
+                  "y": 138
+                },
+                {
+                  "x": 1772841600000,
+                  "y": 150
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "charts-canvas-renderer",
+        "props": {
+          "kind": "line",
+          "width": 320,
+          "height": 160,
+          "series": [
+            {
+              "id": "cpu",
+              "label": "CPU",
+              "color": "var(--chart-1)",
+              "points": [
+                {
+                  "x": 10,
+                  "y": 120,
+                  "y0": 150
+                },
+                {
+                  "x": 60,
+                  "y": 90,
+                  "y0": 150
+                },
+                {
+                  "x": 110,
+                  "y": null,
+                  "y0": 150
+                },
+                {
+                  "x": 160,
+                  "y": 70,
+                  "y0": 150
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

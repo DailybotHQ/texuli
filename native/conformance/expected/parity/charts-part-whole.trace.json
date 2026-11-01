@@ -1,0 +1,60 @@
+{
+  "fixture": "charts-part-whole",
+  "trace": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "id": "charts-pie",
+              "name": "Tickets by channel",
+              "role": "figure"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Tickets by channel",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "id": "charts-donut",
+              "name": "Channel mix",
+              "role": "figure"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Channel mix",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "id": "charts-sunburst",
+              "name": "Ticket topics",
+              "role": "figure"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Ticket topics",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "id": "charts-treemap",
+              "name": "Ticket topics by volume",
+              "role": "figure"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Ticket topics by volume",
+          "role": "group"
+        }
+      ],
+      "id": "layout-page",
+      "name": "Part-whole charts",
+      "role": "main"
+    }
+  ]
+}

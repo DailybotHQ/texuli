@@ -1,0 +1,26 @@
+{
+  "fixture": "data-time",
+  "trace": [
+    {
+      "children": [
+        {
+          "id": "data-calendar",
+          "name": "Support rota",
+          "role": "grid"
+        },
+        {
+          "id": "data-timeline",
+          "name": "Launch plan",
+          "role": "figure"
+        },
+        {
+          "id": "data-notification-inbox",
+          "role": "list"
+        }
+      ],
+      "id": "layout-page",
+      "name": "Time-based data",
+      "role": "main"
+    }
+  ]
+}

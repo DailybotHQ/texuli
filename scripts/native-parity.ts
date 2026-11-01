@@ -9,11 +9,16 @@
  *   other id paints a visible placeholder);
  * - `native/conformance/semantics.json`: the ids with a shared semantic rule;
  * - `native/conformance/expected/*.trace.json`: the ids the golden traces
- *   cover on both targets;
+ *   cover on both targets, and `expected/parity/*.trace.json`: the ids the
+ *   parity fixtures cover (PLAN_013, ADR-025);
+ * - `NativeRegistry.readOnly`: painted ids whose web view is interactive and
+ *   that native paints read-only;
  * - the capability rows below, each citing the files that prove it (the
  *   generator fails when a cited file is missing).
  *
- * Writes `native/docs/parity.json` and `native/docs/PARITY.md`.
+ * Writes `native/docs/parity.json` and `native/docs/PARITY.md`. Painted means
+ * covered: an id native paints without a semantic rule or without a trace
+ * fails the generator (`uncovered`).
  *
  * Usage:
  *   pnpm exec tsx scripts/native-parity.ts           # write both files
@@ -31,6 +36,7 @@ export const PATHS = {
   registry: 'native/texuli-compose/src/commonMain/kotlin/com/texuli/compose/Registry.kt',
   semantics: 'native/conformance/semantics.json',
   traces: 'native/conformance/expected',
+  parityTraces: 'native/conformance/expected/parity',
   json: 'native/docs/parity.json',
   markdown: 'native/docs/PARITY.md',
 } as const;
@@ -48,7 +54,8 @@ export interface Capability {
 
 /**
  * What each side does per capability, beyond painting individual ids.
- * Verified against the code on 2026-11-01 (main 90f2721b, spec 0.10.0).
+ * Verified against the code on 2026-11-01 (main 90f2721b, spec 0.10.0; charts and data
+ * after PLAN_013).
  */
 export const CAPABILITIES: readonly Capability[] = [
   {
@@ -64,12 +71,14 @@ export const CAPABILITIES: readonly Capability[] = [
   },
   {
     name: 'Semantic conformance (golden traces)',
-    web: 'Writes one semantic trace per golden blueprint.',
-    native: 'Produces the same trace for every golden; a semantic gate, not a pixel test.',
+    web: 'Writes one semantic trace per golden blueprint and per parity fixture.',
+    native:
+      'Produces the same trace for every golden and every parity fixture; a semantic gate, not a pixel test.',
     status: 'parity',
     evidence: [
       'native/conformance/web/trace.ts',
       'native/conformance/src/jvmTest/kotlin/com/texuli/conformance/GoldenConformanceTest.kt',
+      'native/conformance/src/jvmTest/kotlin/com/texuli/conformance/ParityFixtureConformanceTest.kt',
     ],
   },
   {
@@ -132,11 +141,27 @@ export const CAPABILITIES: readonly Capability[] = [
     evidence: ['native/texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/SpecValidator.kt'],
   },
   {
-    name: 'Data sources and dashboards',
-    web: 'Host data sources and the dashboard (@texuli/data).',
-    native: 'Validates sources; data components paint a placeholder.',
-    status: 'validation-only',
-    evidence: ['native/texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/Source.kt'],
+    name: 'Chart and data layout math',
+    web: 'Scales, ticks, stacks, paths, layouts and the data engines (@texuli/charts, @texuli/data).',
+    native:
+      'Ported to Kotlin; every vector the web functions write matches (numbers to 1e-9, paths and labels exactly).',
+    status: 'parity',
+    evidence: [
+      'scripts/chart-vectors.ts',
+      'native/conformance/fixtures/chart-vectors.json',
+      'native/texuli-compose/src/jvmTest/kotlin/com/texuli/compose/ChartMathParityTest.kt',
+    ],
+  },
+  {
+    name: 'Data views and dashboards',
+    web: 'Host data sources and every data view, interactive (@texuli/data).',
+    native:
+      'Every data view paints, read-only where the web view is interactive; sources validate, but a node that reads a host source paints a placeholder (native loads no sources yet).',
+    status: 'partial',
+    evidence: [
+      'native/texuli-compose/src/commonMain/kotlin/com/texuli/compose/DataBoards.kt',
+      'native/texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/Source.kt',
+    ],
   },
   {
     name: 'Agent tools (MCP)',
@@ -161,8 +186,12 @@ export interface ParityRow {
   agentEmittable: boolean;
   web: 'renders';
   native: 'painted' | 'placeholder';
+  /** Painted read-only: the web view is interactive, the native one is not yet. */
+  readOnly: boolean;
   semanticRule: boolean;
   golden: boolean;
+  /** Covered by a parity fixture trace (ids no spec golden uses). */
+  parityTrace: boolean;
 }
 
 export interface ParityReport {
@@ -176,27 +205,40 @@ export interface ParityReport {
     semanticRules: number;
     goldenTraces: number;
     goldenCovered: number;
+    parityTraces: number;
+    traceCovered: number;
+    readOnly: number;
   };
   /** NativeRegistry ids the catalog does not know (should stay empty). */
   unknownNativeIds: string[];
+  /** Painted ids with no semantic rule or no trace (should stay empty). */
+  uncovered: string[];
   groups: { group: string; total: number; painted: number }[];
   capabilities: Capability[];
   components: ParityRow[];
 }
 
-/** The ids `NativeRegistry.implemented` lists, with the compact chart set when it is added in. */
+// Comments first: one names "(ADR-016)", whose parenthesis would end a set early.
+const kotlinCode = (source: string): string => source.replace(/\/\/[^\n]*/g, '');
+const setBlock = (code: string, name: string): string =>
+  new RegExp(`val ${name}(?::[^=]+)?\\s*=\\s*setOf\\(([^)]*)\\)`).exec(code)?.[1] ?? '';
+const setIds = (text: string): string[] =>
+  [...text.matchAll(/"([a-z0-9-]+)"/g)].map((match) => match[1] ?? '');
+
+/** The ids `NativeRegistry.implemented` lists, with every named set added to it (`setOf(…) + compactCharts + …`). */
 export function parseNativeRegistry(source: string): string[] {
-  // Comments first: one names "(ADR-016)", whose parenthesis would end a set early.
-  const code = source.replace(/\/\/[^\n]*/g, '');
-  const block = (name: string): string =>
-    new RegExp(`val ${name}(?::[^=]+)?\\s*=\\s*setOf\\(([^)]*)\\)`).exec(code)?.[1] ?? '';
-  const ids = (text: string): string[] =>
-    [...text.matchAll(/"([a-z0-9-]+)"/g)].map((match) => match[1] ?? '');
-  const own = ids(block('implemented'));
-  const charts = /val implemented[^=]*=\s*setOf\([^)]*\)\s*\+\s*compactCharts/.test(code)
-    ? ids(block('compactCharts'))
-    : [];
-  return [...new Set([...own, ...charts])].sort();
+  const code = kotlinCode(source);
+  const added = /val implemented[^=]*=\s*setOf\([^)]*\)((?:\s*\+\s*\w+)*)/.exec(code)?.[1] ?? '';
+  const names = [...added.matchAll(/\w+/g)].map((match) => match[0]);
+  const ids = [setBlock(code, 'implemented'), ...names.map((name) => setBlock(code, name))].flatMap(
+    setIds
+  );
+  return [...new Set(ids)].sort();
+}
+
+/** The ids `NativeRegistry.readOnly` lists. */
+export function parseReadOnly(source: string): string[] {
+  return [...new Set(setIds(setBlock(kotlinCode(source), 'readOnly')))].sort();
 }
 
 interface SemanticRules {
@@ -220,6 +262,8 @@ export interface ParityInputs {
   registry: string;
   semantics: SemanticRules;
   traces: readonly unknown[];
+  /** Parity fixture traces (`expected/parity`). */
+  parityTraces?: readonly unknown[];
   capabilities?: readonly Capability[];
 }
 
@@ -227,12 +271,17 @@ export interface ParityInputs {
 export function buildParity(inputs: ParityInputs): ParityReport {
   const painted = new Set(parseNativeRegistry(inputs.registry));
   const known = new Set(inputs.catalog.map((entry) => entry.id));
+  const readOnly = new Set(parseReadOnly(inputs.registry));
   const golden = new Set<string>();
   for (const trace of inputs.traces) traceIds(trace, golden);
+  const parity = new Set<string>();
+  for (const trace of inputs.parityTraces ?? []) traceIds(trace, parity);
   const hasRule = (id: string): boolean =>
     inputs.semantics.components.some(
       (rule) => rule.id === id || (rule.prefix !== undefined && id.startsWith(rule.prefix))
     );
+  // A `blocks-*` node takes the rule of its block type (semantics.json `blocks`).
+  const ruled = (id: string): boolean => hasRule(id) || id.startsWith('blocks-');
   const components: ParityRow[] = [...inputs.catalog]
     .sort((a, b) => a.id.localeCompare(b.id, 'en'))
     .map((entry) => ({
@@ -242,8 +291,10 @@ export function buildParity(inputs: ParityInputs): ParityReport {
       agentEmittable: entry.emit.includes('untrusted'),
       web: 'renders',
       native: painted.has(entry.id) ? 'painted' : 'placeholder',
+      readOnly: painted.has(entry.id) && readOnly.has(entry.id),
       semanticRule: hasRule(entry.id),
       golden: golden.has(entry.id),
+      parityTrace: parity.has(entry.id),
     }));
   const groupNames = [...new Set(components.map((row) => row.group))].sort((a, b) =>
     a.localeCompare(b, 'en')
@@ -264,8 +315,16 @@ export function buildParity(inputs: ParityInputs): ParityReport {
       semanticRules: count(components, (row) => row.semanticRule),
       goldenTraces: inputs.traces.length,
       goldenCovered: count(components, (row) => row.golden),
+      parityTraces: inputs.parityTraces?.length ?? 0,
+      traceCovered: count(components, (row) => row.golden || row.parityTrace),
+      readOnly: count(components, (row) => row.readOnly),
     },
     unknownNativeIds: [...painted].filter((id) => !known.has(id)).sort(),
+    uncovered: components
+      .filter(
+        (row) => row.native === 'painted' && (!ruled(row.id) || !(row.golden || row.parityTrace))
+      )
+      .map((row) => row.id),
     groups: groupNames.map((group) => {
       const rows = components.filter((row) => row.group === group);
       return { group, total: rows.length, painted: count(rows, (row) => row.native === 'painted') };
@@ -283,6 +342,7 @@ const STATUS_LABEL: Record<CapabilityStatus, string> = {
 };
 
 const yes = (value: boolean): string => (value ? 'yes' : '—');
+const nativeCell = (row: ParityRow): string => (row.readOnly ? 'painted (read-only)' : row.native);
 
 /** The Markdown page for a report (deterministic). */
 export function renderParityMarkdown(report: ParityReport): string {
@@ -291,7 +351,7 @@ export function renderParityMarkdown(report: ParityReport): string {
     '# Web ↔ native parity',
     '',
     '<!-- Generated by scripts/native-parity.ts from the spec catalog, NativeRegistry,',
-    '     native/conformance/semantics.json and the golden traces. Do not edit by hand. -->',
+    '     native/conformance/semantics.json, the golden and parity traces. Do not edit by hand. -->',
     '',
     `Spec ${report.specVersion}. The web (Svelte 5) renders every catalog component. The native`,
     'renderer (Kotlin Multiplatform, Compose) validates the same contract and paints a slice;',
@@ -306,9 +366,12 @@ export function renderParityMarkdown(report: ParityReport): string {
     `| Placeholder natively | ${totals.placeholder} |`,
     `| Agent-emittable components | ${totals.agentEmittable} |`,
     `| Agent-emittable and painted natively | ${totals.agentEmittablePainted} |`,
+    `| Painted read-only (interactive on the web) | ${totals.readOnly} |`,
     `| Components with a shared semantic rule | ${totals.semanticRules} |`,
     `| Golden traces (web = native) | ${totals.goldenTraces} |`,
     `| Components covered by a golden trace | ${totals.goldenCovered} |`,
+    `| Parity fixture traces (web = native) | ${totals.parityTraces} |`,
+    `| Components covered by any trace | ${totals.traceCovered} |`,
     '',
     'So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes**',
     '(validation, label interpolation and the golden semantic traces match); **for painting, not yet**',
@@ -333,11 +396,11 @@ export function renderParityMarkdown(report: ParityReport): string {
     '',
     '## Every component',
     '',
-    '| Id | Group | Agent-emittable | Web | Native | Semantic rule | Golden trace |',
-    '| --- | --- | --- | --- | --- | --- | --- |',
+    '| Id | Group | Agent-emittable | Web | Native | Semantic rule | Golden trace | Parity trace |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- |',
     ...report.components.map(
       (row) =>
-        `| \`${row.id}\` | ${row.group} | ${yes(row.agentEmittable)} | ${row.web} | ${row.native} | ${yes(row.semanticRule)} | ${yes(row.golden)} |`
+        `| \`${row.id}\` | ${row.group} | ${yes(row.agentEmittable)} | ${row.web} | ${nativeCell(row)} | ${yes(row.semanticRule)} | ${yes(row.golden)} | ${yes(row.parityTrace)} |`
     ),
   ];
   if (report.unknownNativeIds.length > 0)
@@ -345,6 +408,8 @@ export function renderParityMarkdown(report: ParityReport): string {
       '',
       `NativeRegistry ids missing from the catalog: ${report.unknownNativeIds.join(', ')}.`
     );
+  if (report.uncovered.length > 0)
+    lines.push('', `Painted without a semantic rule or a trace: ${report.uncovered.join(', ')}.`);
   return `${lines.join('\n')}\n`;
 }
 
@@ -356,11 +421,15 @@ export function renderParityJson(report: ParityReport, root = ROOT): string {
 /** Read the inputs from the repository and build the report. */
 export function loadParity(root = ROOT): ParityReport {
   const read = (path: string): string => readFileSync(join(root, path), 'utf8');
-  const traceDir = join(root, PATHS.traces);
-  const traces = readdirSync(traceDir)
-    .filter((file) => file.endsWith('.trace.json'))
-    .sort()
-    .map((file) => JSON.parse(readFileSync(join(traceDir, file), 'utf8')) as unknown);
+  const readTraces = (dir: string): unknown[] =>
+    existsSync(join(root, dir))
+      ? readdirSync(join(root, dir))
+          .filter((file) => file.endsWith('.trace.json'))
+          .sort()
+          .map((file) => JSON.parse(readFileSync(join(root, dir, file), 'utf8')) as unknown)
+      : [];
+  const traces = readTraces(PATHS.traces);
+  const parityTraces = readTraces(PATHS.parityTraces);
   for (const capability of CAPABILITIES)
     for (const file of capability.evidence)
       if (!existsSync(join(root, file)))
@@ -371,6 +440,7 @@ export function loadParity(root = ROOT): ParityReport {
     registry: read(PATHS.registry),
     semantics: JSON.parse(read(PATHS.semantics)) as SemanticRules,
     traces,
+    parityTraces,
   });
 }
 
@@ -381,6 +451,12 @@ function main(argv: readonly string[]): number {
   if (report.unknownNativeIds.length > 0) {
     console.error(
       `NativeRegistry names ids the catalog does not know: ${report.unknownNativeIds.join(', ')}`
+    );
+    return 1;
+  }
+  if (report.uncovered.length > 0) {
+    console.error(
+      `painted natively without a semantic rule or a conformance trace: ${report.uncovered.join(', ')} (ADR-025)`
     );
     return 1;
   }

@@ -1,0 +1,60 @@
+{
+  "fixture": "native-slice",
+  "trace": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "id": "charts-bullet",
+              "name": "Quota",
+              "role": "figure"
+            },
+            {
+              "id": "charts-progress-ring",
+              "name": "Onboarding",
+              "role": "figure"
+            },
+            {
+              "id": "charts-gauge",
+              "name": "Load",
+              "role": "figure"
+            },
+            {
+              "id": "charts-sparkline",
+              "name": "Signups",
+              "role": "figure"
+            }
+          ],
+          "id": "deck-slide",
+          "role": "generic"
+        },
+        {
+          "children": [
+            {
+              "id": "blocks-code",
+              "role": "generic"
+            },
+            {
+              "id": "blocks-diagram",
+              "role": "generic"
+            },
+            {
+              "id": "blocks-media",
+              "role": "generic"
+            },
+            {
+              "id": "blocks-structure",
+              "role": "generic"
+            }
+          ],
+          "id": "deck-slide",
+          "role": "generic"
+        }
+      ],
+      "id": "layout-deck",
+      "name": "Native slice",
+      "role": "main"
+    }
+  ]
+}

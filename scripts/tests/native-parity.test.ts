@@ -13,6 +13,7 @@ import {
   loadParity,
   PATHS,
   parseNativeRegistry,
+  parseReadOnly,
   renderParityJson,
   renderParityMarkdown,
   traceIds,
@@ -76,6 +77,9 @@ describe('native parity', () => {
       semanticRules: 2,
       goldenTraces: 1,
       goldenCovered: 2,
+      parityTraces: 0,
+      traceCovered: 2,
+      readOnly: 0,
     });
     expect(report.unknownNativeIds).toEqual(['ghost-widget']);
     const row = (id: string) => report.components.find((entry) => entry.id === id);
@@ -100,8 +104,60 @@ describe('native parity', () => {
     const page = renderParityMarkdown(report);
     expect(page).toContain('| Painted natively | 3 |');
     expect(page).toContain('(3 of 5 components)');
-    expect(page).toContain('| `data-grid` | data | yes | renders | placeholder | — | yes |');
+    expect(page).toContain('| `data-grid` | data | yes | renders | placeholder | — | yes | — |');
     expect(page).toContain('NativeRegistry ids missing from the catalog: ghost-widget.');
+  });
+
+  it('adds every named set to implemented and reads the read-only set', () => {
+    const source = [
+      'object NativeRegistry {',
+      '  private val cartesian = setOf("charts-line")',
+      '  private val tables = setOf("data-grid")',
+      '  val implemented: Set<String> = setOf("layout-page") + cartesian + tables',
+      '  val readOnly: Set<String> = setOf("data-grid")',
+      '}',
+    ].join('\n');
+    expect(parseNativeRegistry(source)).toEqual(['charts-line', 'data-grid', 'layout-page']);
+    expect(parseReadOnly(source)).toEqual(['data-grid']);
+  });
+
+  it('refuses a painted id with no semantic rule or no trace, and marks read-only ids (ADR-025)', () => {
+    const catalog = [
+      { id: 'charts-line', group: 'content', emit: ['developer', 'untrusted'] },
+      { id: 'data-grid', group: 'data', emit: ['developer', 'untrusted'] },
+      { id: 'data-board', group: 'data', emit: ['developer', 'untrusted'] },
+      { id: 'blocks-code', group: 'content', emit: ['developer', 'untrusted'] },
+    ];
+    const registry = [
+      'object NativeRegistry {',
+      '  val implemented: Set<String> = setOf("charts-line", "data-grid", "data-board", "blocks-code")',
+      '  val readOnly: Set<String> = setOf("data-grid", "data-board")',
+      '}',
+    ].join('\n');
+    const report = buildParity({
+      specVersion: '9.9.9',
+      catalog,
+      registry,
+      semantics: {
+        components: [
+          { prefix: 'charts-', role: 'figure' },
+          { id: 'data-grid', role: 'table' },
+        ],
+      },
+      traces: [{ golden: 'g', trace: [{ id: 'charts-line' }] }],
+      parityTraces: [{ fixture: 'p', trace: [{ id: 'data-grid' }, { id: 'blocks-code' }] }],
+      capabilities: [],
+    });
+    // data-board has no rule and no trace; blocks-code takes its block's rule.
+    expect(report.uncovered).toEqual(['data-board']);
+    expect(report.totals).toMatchObject({ parityTraces: 1, traceCovered: 3, readOnly: 2 });
+    const row = (id: string) => report.components.find((entry) => entry.id === id);
+    expect(row('data-grid')).toMatchObject({ readOnly: true, parityTrace: true, golden: false });
+    const page = renderParityMarkdown(report);
+    expect(page).toContain(
+      '| `data-grid` | data | yes | renders | painted (read-only) | yes | — | yes |'
+    );
+    expect(page).toContain('Painted without a semantic rule or a trace: data-board.');
   });
 
   it('walks nested trace trees for ids', () => {
@@ -113,6 +169,7 @@ describe('native parity', () => {
   it('keeps the committed matrix equal to the repository, with every capability cited', () => {
     const report = loadParity(ROOT);
     expect(report.unknownNativeIds).toEqual([]);
+    expect(report.uncovered).toEqual([]);
     expect(report.totals.painted).toBeGreaterThan(0);
     expect(report.totals.painted).toBeLessThan(report.totals.catalog);
     expect(readFileSync(resolve(ROOT, PATHS.json), 'utf8')).toBe(renderParityJson(report, ROOT));

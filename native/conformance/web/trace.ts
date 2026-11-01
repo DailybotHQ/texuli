@@ -10,6 +10,9 @@
  *
  *   pnpm exec tsx native/conformance/web/trace.ts           (check; exit 1 on drift)
  *   pnpm exec tsx native/conformance/web/trace.ts --write   (refresh traces and rules)
+ *
+ * The parity fixtures (`../fixtures/parity/*.json`, PLAN_013, ADR-025) cover
+ * ids no spec golden uses; their traces go to `../expected/parity/`.
  */
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
@@ -28,6 +31,8 @@ const HERE = import.meta.dirname;
 const REPO = join(HERE, '../../..');
 const GOLDEN = join(REPO, 'packages/spec/fixtures/golden');
 const EXPECTED = join(HERE, '../expected');
+const PARITY = join(HERE, '../fixtures/parity');
+const PARITY_EXPECTED = join(EXPECTED, 'parity');
 const RULES_KT = join(
   HERE,
   '../../texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/SemanticRules.kt'
@@ -117,6 +122,26 @@ for (const file of goldens) {
   if (write) writeFileSync(target, text);
   else if (!existsSync(target) || readFileSync(target, 'utf8') !== text) drift.push(name);
 }
+// Parity fixtures: plain blueprints, validated as an agent's output is.
+const parity = readdirSync(PARITY)
+  .filter((f) => f.endsWith('.json'))
+  .sort();
+for (const file of parity) {
+  const name = basename(file, '.json');
+  const validation = validateDraft(JSON.parse(readFileSync(join(PARITY, file), 'utf8')), {
+    catalog,
+    tier: 'untrusted',
+  });
+  if (!validation.ok) {
+    console.error(`parity/${name}: the fixture does not validate on the web target`);
+    process.exit(1);
+  }
+  const text = formatJson({ fixture: name, trace: validation.roots.map(traceNode) });
+  const target = join(PARITY_EXPECTED, `${name}.trace.json`);
+  if (write) writeFileSync(target, text);
+  else if (!existsSync(target) || readFileSync(target, 'utf8') !== text)
+    drift.push(`parity/${name}`);
+}
 const rules = semanticRulesKotlin();
 if (write) writeFileSync(RULES_KT, rules);
 else if (!existsSync(RULES_KT) || readFileSync(RULES_KT, 'utf8') !== rules)
@@ -125,4 +150,6 @@ if (drift.length > 0) {
   console.error(`web trace drift: ${drift.join(', ')} (run with --write and review)`);
   process.exit(1);
 }
-console.log(`${write ? 'wrote' : 'checked'} ${goldens.length} web traces`);
+console.log(
+  `${write ? 'wrote' : 'checked'} ${goldens.length} golden and ${parity.length} parity web traces`
+);

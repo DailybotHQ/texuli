@@ -10,6 +10,29 @@ enum class BindingStatus { IMPLEMENTED, PLACEHOLDER }
 
 object NativeRegistry {
     private val compactCharts = setOf("charts-sparkline", "charts-bullet", "charts-gauge", "charts-progress-ring")
+    // PLAN_013 (ADR-025): chart and data families, painted from ported web math.
+    private val cartesianCharts = setOf(
+        "charts-line",
+        "charts-area",
+        "charts-bar",
+        "charts-stacked-bar",
+        "charts-combo",
+        "charts-cartesian",
+        "charts-canvas-renderer",
+    )
+    private val partWholeCharts = setOf("charts-pie", "charts-donut", "charts-sunburst", "charts-treemap")
+    private val matrixFlowCharts = setOf(
+        "charts-scatter",
+        "charts-bubble",
+        "charts-heatmap",
+        "charts-funnel",
+        "charts-sankey",
+        "charts-network",
+    )
+    private val geoCharts = setOf("charts-geo-map", "charts-geo-point-map")
+    private val dataTables = setOf("data-grid", "data-cohort-table", "data-tree-view", "data-files")
+    private val dataTime = setOf("data-calendar", "data-timeline", "data-notification-inbox")
+    private val dataBoards = setOf("data-board", "data-map", "data-dashboard", "data-dashboard-widget", "data-filter-builder")
     /** Ids the first renderer slice paints natively. */
     val implemented: Set<String> = setOf(
         "layout-page",
@@ -30,7 +53,24 @@ object NativeRegistry {
         "layout-tile",
         "blocks-code",
         "blocks-structure",
-    ) + compactCharts
+    ) + compactCharts + cartesianCharts + partWholeCharts + matrixFlowCharts + geoCharts + dataTables + dataTime + dataBoards
+
+    /**
+     * Painted ids whose web view is interactive (catalog interaction role
+     * `interactive`): native paints them read-only (ADR-025). Interactivity
+     * natively is a later wave.
+     */
+    val readOnly: Set<String> = setOf(
+        "data-grid",
+        "data-tree-view",
+        "data-files",
+        "data-calendar",
+        "data-timeline",
+        "data-notification-inbox",
+        "data-board",
+        "data-map",
+        "data-filter-builder",
+    )
 
     fun status(id: String): BindingStatus =
         if (id in implemented) BindingStatus.IMPLEMENTED else BindingStatus.PLACEHOLDER

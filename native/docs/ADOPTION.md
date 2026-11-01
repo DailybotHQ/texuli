@@ -25,7 +25,7 @@ The flow (`texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/RenderPlan.
    `"<id>" is not shown here (<reason>)`. It is never blank and never a crash.
 
 **Painted natively** (`NativeRegistry.implemented` in
-`texuli-compose/src/commonMain/kotlin/com/texuli/compose/Registry.kt`), 21 ids.
+`texuli-compose/src/commonMain/kotlin/com/texuli/compose/Registry.kt`), 52 ids.
 The full table, generated from the registry and the catalog, is
 [PARITY.md](PARITY.md):
 
@@ -36,14 +36,21 @@ The full table, generated from the registry and the catalog, is
 | Content blocks | `blocks-text` (heading, text, list, quote, callout), `blocks-data` (stat, KPI, table), `blocks-diagram` (static board), `blocks-code`, `blocks-structure` (CTA, divider, columns) |
 | Media | `media-image`, `blocks-media` (image, figure, video, gallery): frames with alt text, no decoded pixels |
 | Compact charts | `charts-sparkline`, `charts-bullet`, `charts-gauge`, `charts-progress-ring` |
+| Cartesian charts (ADR-025) | `charts-line`, `charts-area`, `charts-bar`, `charts-stacked-bar`, `charts-combo`, `charts-cartesian`, `charts-canvas-renderer`: the web's layout ported to Kotlin and checked against web-written vectors |
+| Part-whole charts (ADR-025) | `charts-pie`, `charts-donut`, `charts-sunburst`, `charts-treemap`, with the web's legend and data table |
+| Matrix and flow charts (ADR-025) | `charts-scatter`, `charts-bubble`, `charts-heatmap`, `charts-funnel`, `charts-sankey`, `charts-network` |
+| Geo charts (ADR-025) | `charts-geo-map`, `charts-geo-point-map`: the web's schematic tile maps, with no geographic data and no network |
+| Data tables (ADR-025) | `data-grid`, `data-cohort-table`, `data-tree-view`, `data-files`: the grid, tree and file browser paint read-only (`NativeRegistry.readOnly`), since sorting, selection and navigation are interactive on the web |
+| Time-based data (ADR-025) | `data-calendar`, `data-timeline`, `data-notification-inbox`, all read-only. The calendar's week and day views list each day's events (the web draws an hour grid). A named `timeZone` other than UTC paints the placeholder, because native carries no tz data. Inbox links are https navigate intents |
+| Boards, maps and dashboards (ADR-025) | `data-board`, `data-map` (the web's bundled fictional Port Meridian basemap, generated into Kotlin), `data-filter-builder` (all read-only), `data-dashboard` and `data-dashboard-widget`, which lay out by the web's dashboard engine at the measured breakpoint, with the widgets' content painting through the same registry |
 
 Every other id paints a placeholder. Of the 168 spec vocabulary ids, 75 may be
 emitted by a blueprint (their catalog `emit` list holds both `developer` and
 `untrusted`). The other 93 have an empty `emit` list: every form control, the
 app-shell layouts and the standalone UI components. Those plan to
-`tier-denied` at any tier. Emittable ids without a painter, such as the other
-chart families, `media-composition-svg` and `media-composition-canvas`, paint
-`not-on-this-target`.
+`tier-denied` at any tier. Emittable ids without a painter, such as
+`chat-thread`, the state controls, `media-composition-svg` and
+`media-composition-canvas`, paint `not-on-this-target`.
 
 **Placeholder reasons**, as painted:
 
@@ -52,7 +59,7 @@ chart families, `media-composition-svg` and `media-composition-canvas`, paint
 | `unknown-id` | Planning: the id is not in the component list passed to `loadBlueprint` |
 | `tier-denied` | Planning: the catalog's `emit` list for the id lacks the host's tier (the node's subtree is dropped too) |
 | `not-on-this-target` | Painting: no native painter for the id, for a `blocks-data` type other than stat, KPI and table, or for a `blocks-diagram` that is not a board |
-| `invalid-chart-data`, `invalid-table`, `invalid-list`, `invalid-media` | Painting: props outside what the native projection accepts |
+| `invalid-chart-data`, `invalid-data`, `invalid-table`, `invalid-list`, `invalid-media` | Painting: props outside what the native projection accepts |
 | `unsupported-gap`, `unsupported-deck-options` | Painting: grid gaps or deck options outside the supported set |
 | `unknown-block` | Painting: a `blocks-text` or `blocks-data` node without a `block`, or a `blocks-text` type other than heading, text, list, quote and callout |
 
@@ -216,8 +223,14 @@ doc or the README records:
   `https:` and relative sources, video playback, and a media conformance
   golden.
 - **More painters:** `media-composition-canvas` and `media-composition-svg`
-  (KMPTapDuelGame's goal markers), the other chart families, and app-shell
-  layouts.
+  (KMPTapDuelGame's goal markers), the state controls, chat, the editors and
+  app-shell layouts.
+- **Interactive data views.** Sorting, selecting, dragging, editing and view
+  switches in the grid, tree, files, calendar, timeline, inbox, board, map
+  and filter builder (wave 3: intents and bindings). They paint read-only today.
+  The native timeline also paints left to right only; the web mirrors it in RTL.
+- **Native chart palette.** The token sets carry no chart palette yet, so
+  series colors come from the theme's roles in a fixed order (ADR-025).
 - **Copy intents** from painters that offer copyable text.
 - **UI-level tests.** Compose semantics-tree, screenshot and interaction
   tests are not wired. A Desktop UI-test run stalled in macOS AWT/AppKit

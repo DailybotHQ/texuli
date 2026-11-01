@@ -5,11 +5,13 @@
       "children": [
         {
           "id": "data-grid",
-          "role": "generic"
+          "name": "Open tickets by points",
+          "role": "table"
         },
         {
           "id": "data-board",
-          "role": "generic"
+          "name": "Tickets by status",
+          "role": "group"
         }
       ],
       "id": "layout-page",

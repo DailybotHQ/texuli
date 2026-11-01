@@ -1,0 +1,84 @@
+{
+  "fixture": "charts-matrix-flow",
+  "trace": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "id": "charts-scatter",
+              "name": "Sites by response time",
+              "role": "figure"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Sites by response time",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "id": "charts-bubble",
+              "name": "Sites by size",
+              "role": "figure"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Sites by size",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "id": "charts-heatmap",
+              "name": "Tickets by shift",
+              "role": "figure"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Tickets by shift",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "id": "charts-funnel",
+              "name": "Trial funnel",
+              "role": "figure"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Trial funnel",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "id": "charts-sankey",
+              "name": "Trial flow",
+              "role": "figure"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Trial flow",
+          "role": "group"
+        },
+        {
+          "children": [
+            {
+              "id": "charts-network",
+              "name": "Team handoffs",
+              "role": "figure"
+            }
+          ],
+          "id": "layout-card",
+          "name": "Team handoffs",
+          "role": "group"
+        }
+      ],
+      "id": "layout-page",
+      "name": "Matrix and flow charts",
+      "role": "main"
+    }
+  ]
+}

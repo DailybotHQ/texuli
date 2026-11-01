@@ -20,4 +20,11 @@ kotlin {
 tasks.withType<Test>().configureEach {
     // Fixtures are read from the repository: the spec goldens and the expected traces.
     systemProperty("texuli.repo", rootDir.resolve("..").absolutePath)
+    // The repository files the tests read are inputs, so a changed golden,
+    // parity fixture or expected trace reruns them.
+    val repo = rootDir.resolve("..")
+    inputs.dir(repo.resolve("packages/spec/fixtures")).withPropertyName("specFixtures").withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.dir(rootDir.resolve("conformance/fixtures")).withPropertyName("fixtures").withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.dir(rootDir.resolve("conformance/expected")).withPropertyName("expected").withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.file(rootDir.resolve("conformance/semantics.json")).withPropertyName("semantics").withPathSensitivity(PathSensitivity.RELATIVE)
 }
