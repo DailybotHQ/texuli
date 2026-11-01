@@ -8,8 +8,7 @@
  * `checkDeckPayload` by default (`validateDeck={null}` refuses them, G136).
  * Every prop is the core's.
  */
-import type { DeckPayloadValidator } from '@texuli/document/schema';
-import { checkDeckPayload } from '@texuli/document/schema';
+import { checkDeckPayload, type DeckPayloadValidator } from '@texuli/document/schema';
 import type { ComponentProps } from 'svelte';
 import { loadDefaultPlayer } from '../shared/player.ts';
 import type { PagesPlayerLoader } from '../shared/player-loader.ts';

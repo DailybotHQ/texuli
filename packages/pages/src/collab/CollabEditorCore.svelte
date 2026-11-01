@@ -10,6 +10,7 @@
 import { getAnnouncer } from '@texuli/core/announcer';
 import type { CollabThread } from '@texuli/document/collab';
 import { findNode, inlinePlainText } from '@texuli/document/model';
+import type { DeckPayloadValidator } from '@texuli/document/schema-core';
 import { readDomSelection } from '@texuli/editor/editor';
 import type { DeckPlayerHost } from '@texuli/player';
 import { untrack } from 'svelte';
@@ -73,6 +74,11 @@ interface Props {
    * `() => import('@texuli/player')` to paint them.
    */
   loadPlayer?: PagesPlayerLoader | null;
+  /**
+   * Checks inline decks, local and remote (G136): `CollabEditor` defaults to
+   * `checkDeckPayload`; this core has none, so inline decks are refused.
+   */
+  validateDeck?: DeckPayloadValidator | null;
   class?: string;
 }
 
@@ -97,6 +103,7 @@ let {
   renderBlock,
   blockHost = null,
   loadPlayer = null,
+  validateDeck = null,
   class: className,
 }: Props = $props();
 
@@ -251,6 +258,7 @@ function keys(node: HTMLElement): () => void {
         {renderBlock}
         {blockHost}
         {loadPlayer}
+        {validateDeck}
       />
       <CollabOverlay {session} root={docRoot} />
     </div>
