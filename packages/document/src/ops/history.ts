@@ -65,7 +65,10 @@ export function createDocumentHistory(
 ): DocumentHistory {
   const limit = Math.max(0, Math.floor(options.limit ?? 200));
   const logLimit = Math.max(1, Math.floor(options.logLimit ?? 10_000));
-  const applyOptions: ApplyOptions = { validate: options.validate };
+  const applyOptions: ApplyOptions = {
+    validate: options.validate,
+    validateDeck: options.validateDeck ?? null,
+  };
   let current = initial;
   let seq = 0;
   const entries: OpLogEntry[] = [];

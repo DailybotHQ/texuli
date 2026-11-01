@@ -86,3 +86,23 @@ describe('@texuli/document/schema-core (G133)', () => {
     expect(codes(result)).toEqual(['invalid-deck']);
   });
 });
+
+describe('@texuli/document/ops-core (G136)', () => {
+  it('never reaches the deck model, while the full ops entry does', () => {
+    expect(reachable(resolve(srcDir, 'ops/core.ts'))).not.toContain('@texuli/deck/model');
+    expect(reachable(resolve(srcDir, 'ops/index.ts'))).toContain('@texuli/deck/model');
+  });
+
+  it('refuses an inline deck result unless validateDeck is passed, as the full entry checks it', async () => {
+    const opsCore = await import('../src/ops/core.ts');
+    const ops = await import('../src/ops/index.ts');
+    const base = withEmbed({ ref: 'decks/launch' });
+    const swap = [{ op: 'set-attrs', id: 'e', attrs: { ref: null, inline: DECK } }] as never;
+    expect(ops.applyOperations(base, swap).ok).toBe(true);
+    expect(opsCore.applyOperations(base, swap).ok).toBe(false);
+    expect(opsCore.applyOperations(base, swap, { validateDeck: checkDeckPayload }).ok).toBe(true);
+    const history = opsCore.createDocumentHistory(base, { validateDeck: checkDeckPayload });
+    expect(history.apply(swap).ok).toBe(true);
+    expect(opsCore.createDocumentHistory(base).apply(swap).ok).toBe(false);
+  });
+});

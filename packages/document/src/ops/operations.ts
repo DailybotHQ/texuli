@@ -19,8 +19,9 @@ import type {
   PageSettings,
   TexuliDocument,
 } from '../model/types.ts';
-import { validateDocument } from '../schema/index.ts';
+import type { DeckPayloadValidator } from '../schema/schema.ts';
 import type { DocumentDiagnostic } from '../schema/validate.ts';
+import { validateDocument } from '../schema/validate.ts';
 import { cloneData, equalData } from './clone.ts';
 
 /** Attribute values; `null` removes an optional attribute. */
@@ -110,6 +111,12 @@ const META_KEYS = new Set([
 export interface ApplyOptions {
   /** Validate the result at this tier (`untrusted` by default), or skip with `false`. */
   validate?: HrefTrust | false;
+  /**
+   * Checks inline deck payloads in the result. `@texuli/document/ops`
+   * defaults it to `checkDeckPayload`; `@texuli/document/ops-core` has no
+   * default and refuses inline decks unless one is passed (G136).
+   */
+  validateDeck?: DeckPayloadValidator | null;
 }
 
 export type ApplyResult =
@@ -497,7 +504,10 @@ export function applyOperations(
   }
   inverse.reverse();
   if (options.validate === false) return { ok: true, document: space.doc, inverse, issues: [] };
-  const checked = validateDocument(space.doc, { trust: options.validate ?? 'untrusted' });
+  const checked = validateDocument(space.doc, {
+    trust: options.validate ?? 'untrusted',
+    validateDeck: options.validateDeck ?? null,
+  });
   if (!checked.ok)
     return {
       ok: false,

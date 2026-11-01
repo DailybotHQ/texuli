@@ -81,3 +81,11 @@ and its undo is the replica's (`@texuli/document/collab`).
 `cloneData` copies plain JSON data iteratively (shared references are
 copied apart; more than `MAX_VALUES` containers, a cycle included, throws
 `DataError`); `equalData` compares it.
+
+## Without the deck model
+
+Every entry point here checks inline decks with `checkDeckPayload`
+(`validateDeck` in `ApplyOptions`, `PatchOptions` and
+`DocumentHistoryOptions` replaces it; `null` refuses inline decks).
+[`@texuli/document/ops-core`](ops-core.md) (from `0.11.5`) has the same
+API without the deck model.

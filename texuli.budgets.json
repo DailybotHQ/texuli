@@ -1001,6 +1001,10 @@
       "gzip": 34738,
       "note": "PLAN_010 T-doc-engine (2026-10-28): new row; measured 33,401 B gzip, cap = measured + 4% headroom."
     },
+    "@texuli/document/ops-core": {
+      "gzip": 18752,
+      "note": "0.11.5 (Protoyard G136): new row at measured + 4%; measured 17,976 B gzip. The operations, patches and op log validated with schema-core (no @texuli/deck/model); the full ops entry is about 34.3 KB."
+    },
     "@texuli/document/collab": {
       "gzip": 51392,
       "note": "PLAN_010 (ADR-010, ADR-011, ADR-016, consented plan): new row at measured + 4% for the document-to-CRDT binding, comments, suggestions, versions and presence; measured 49,392 B."

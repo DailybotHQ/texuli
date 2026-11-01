@@ -44,6 +44,10 @@
       "types": "./src/ops/index.ts",
       "default": "./src/ops/index.ts"
     },
+    "./ops-core": {
+      "types": "./src/ops/core.ts",
+      "default": "./src/ops/core.ts"
+    },
     "./markdown": {
       "types": "./src/markdown/index.ts",
       "default": "./src/markdown/index.ts"
