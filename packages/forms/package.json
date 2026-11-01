@@ -1,6 +1,6 @@
 {
   "name": "@texuli/forms",
-  "version": "0.11.3",
+  "version": "0.11.4",
   "private": true,
   "description": "Schema-driven forms for Texuli: a closed form schema rendered with texuli components, multi-step flows, conditional logic on @texuli/core/expression, announced validation, drafts and autosave.",
   "keywords": [
@@ -49,8 +49,8 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/core": "0.11.3",
-    "texuli": "0.11.3"
+    "@texuli/core": "0.11.4",
+    "texuli": "0.11.4"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

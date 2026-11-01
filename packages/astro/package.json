@@ -1,6 +1,6 @@
 {
   "name": "@texuli/astro",
-  "version": "0.11.3",
+  "version": "0.11.4",
   "private": true,
   "description": "Astro integration, content layouts and Svelte islands for Texuli sites.",
   "keywords": [
@@ -39,9 +39,9 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/blocks": "0.11.3",
-    "@texuli/core": "0.11.3",
-    "@texuli/tokens": "0.11.3",
+    "@texuli/blocks": "0.11.4",
+    "@texuli/core": "0.11.4",
+    "@texuli/tokens": "0.11.4",
     "astro": "^7.4.0"
   },
   "peerDependencies": {
