@@ -13,7 +13,7 @@ components, or on its own as a framework-free token engine for any CSS
 runtime dependencies.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.11.3`, a pre-1.0 release (1.0.0 will be the first
+> published to npm as `0.11.4`, a pre-1.0 release (1.0.0 will be the first
 > stable release). Under 0.x, a new minor (`0.12.0`) may contain breaking
 > changes, so pin the exact version or use `^0.11.0`, which accepts only 0.11.x.
 
