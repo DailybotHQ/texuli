@@ -104,8 +104,8 @@ browser visual test.
 then publishes the packable packages in the wave order documented in
 [RELEASE](RELEASE.md), always `--tag next`, then points `latest` at the
 same versions: `latest` tracks the newest release (owner decision
-2026-10-27; both name `0.11.2` once the post-merge run of the
-`release/0.11.2` merge publishes it), so npm's package page shows the current README. Tarballs ship with signed npm provenance via
+2026-10-27; both name `0.11.3` once the post-merge run of the
+`release/0.11.3` merge publishes it), so npm's package page shows the current README. Tarballs ship with signed npm provenance via
 GitHub's OIDC token (`id-token: write`).
 
 `publish.yml` lists `@texuli/drag`, `@texuli/workflows` and

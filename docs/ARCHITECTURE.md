@@ -63,7 +63,7 @@ Not layers, because they consume the library:
 
 `@texuli/examples` is never packed (`NEVER_PACKED` in
 `scripts/packages.ts`); `pnpm verify:packages` packs the other 26, and all
-26 are released on npm in the 0.11 line, every one at `0.11.2`; `0.10.0` was the design-systems release and `0.11.0` added the Protoyard gaps G125–G127 and the Final Review fixes, and `0.11.1` and `0.11.2` are patches (forms concurrent `next()`, the `applyDesignSystem` variant check, square theme radii keep `0px`, password `autocomplete` `off`) (`@texuli/mcp`
+26 are released on npm in the 0.11 line, every one at `0.11.3`; `0.10.0` was the design-systems release and `0.11.0` added the Protoyard gaps G125–G127 and the Final Review fixes, and `0.11.1` to `0.11.3` are patches (fixes and the additive Protoyard gaps G128–G134, among them `@texuli/document/schema-core`) (`@texuli/mcp`
 was first released in `0.9.0`; the 0.8 line had 25 packages);
 `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/editor`,
 `@texuli/document`, `@texuli/pages`, `@texuli/forms`, `@texuli/canvas`,
@@ -126,7 +126,7 @@ cap in `texuli.budgets.json` (`pnpm size`).
 | `@texuli/core` (private) | `.`, `announcer`, `controllable`, `data-source`, `dir-locale`, `dismiss`, `editor-history`, `editor-keymap`, `editor-markdown`, `editor-model`, `editor-transforms`, `env`, `expression`, `focus-scope`, `form-bridge`, `i18n`, `ids`, `inert`, `keyboard`, `layer-stack`, `lazy`, `markup`, `motion`, `motion/spring`, `overlay`, `overlay-core`, `portal`, `position-dom`, `position-math`, `presence`, `roving`, `scroll-lock`, `tabbable`, `url-policy`, `zip` |
 | `@texuli/date` (private) | `.`, `calendar` |
 | `@texuli/deck` (private, in development) | `.`, `model`, `schema`, `engine`, `markdown`, `math`, `authoring`, `templates` |
-| `@texuli/document` (private, in development) | `.`, `model`, `schema`, `ops`, `markdown`, `paged`, `docx`, `pdf`, `sync`, `collab` |
+| `@texuli/document` (private, in development) | `.`, `model`, `schema`, `schema-core`, `ops`, `markdown`, `paged`, `docx`, `pdf`, `sync`, `collab` |
 | `@texuli/drag` (private, in development) | `.`, `sortable`, `collision`, `modifiers`, `auto-scroll`, `gesture`, `spatial`, `graph`, `messages`, `testing` |
 | `@texuli/data` (private) | `.`, `activity`, `activity/engine`, `activity/inbox`, `board`, `board/engine`, `calendar`, `cohort`, `files`, `files/engine`, `filter-builder`, `geo`, `grid`, `grid-columns`, `grid-core`, `grid-virtual`, `map`, `timeline`, `timeline/engine`, `tree`, `tree-view`, `virtual-list`, `calendar/view`, `grid-editing`, `dashboard`, `dashboard/engine` |
 | `@texuli/canvas` (private, in development) | `.`, `model`, `sync`, `export`, `editor`, `viewer`, `host` |
@@ -243,7 +243,7 @@ after each deploy of `main`.
 
 ## Decks: engine and stage
 
-ADR-009 splits presentations in two packages (both on npm as `0.11.2`;
+ADR-009 splits presentations in two packages (both on npm as `0.11.3`;
 `@texuli/deck` was first released in `0.4.0`):
 
 - **`@texuli/deck` (L0)** owns everything that is data: deck model v2
@@ -380,7 +380,7 @@ The pure decisions live in `apps/website/src/lib/` and are tested in
     way npm would publish it: `dist/` via `@sveltejs/package`, a derived
     manifest, publint and attw. It publishes nothing.
   - Workspace packages stay `private: true`; the publish workflow publishes
-    the 26 packable packages, `@texuli/mcp` included, to npm as the `0.11.2`
+    the 26 packable packages, `@texuli/mcp` included, to npm as the `0.11.3`
     release (dist-tags
     `latest` and `next`), with provenance
     ([RELEASE](RELEASE.md)).
