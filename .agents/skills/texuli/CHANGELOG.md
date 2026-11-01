@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.3.7] — 2026-11-01
+
+### Changes
+
+- chore(skill): packages on npm at 0.11.1
+
 - The packages are on npm in the 0.11 line, every one at `0.11.1`, a patch
   (forms: concurrent `next()` calls share one move; `applyDesignSystem`
   refuses a variant on a base compile). The skill, install and router
