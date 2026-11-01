@@ -1,6 +1,6 @@
 {
   "name": "@texuli/data",
-  "version": "0.11.4",
+  "version": "0.11.5",
   "private": true,
   "description": "Data views: grid, tree, board, calendar, timeline, map, activity and files.",
   "keywords": [
@@ -123,11 +123,11 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/core": "0.11.4",
-    "@texuli/drag": "0.11.4",
-    "@texuli/primitives": "0.11.4",
-    "@texuli/tokens": "0.11.4",
-    "texuli": "0.11.4"
+    "@texuli/core": "0.11.5",
+    "@texuli/drag": "0.11.5",
+    "@texuli/primitives": "0.11.5",
+    "@texuli/tokens": "0.11.5",
+    "texuli": "0.11.5"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

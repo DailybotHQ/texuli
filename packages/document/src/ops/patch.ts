@@ -7,8 +7,9 @@
  */
 import type { HrefTrust } from '@texuli/core/url-policy';
 import type { TexuliDocument } from '../model/types.ts';
-import { validateDocument } from '../schema/index.ts';
+import type { DeckPayloadValidator } from '../schema/schema.ts';
 import type { DocumentDiagnostic } from '../schema/validate.ts';
+import { validateDocument } from '../schema/validate.ts';
 import { cloneData, equalData, isUnsafeKey } from './clone.ts';
 
 export type DocumentPatchOperation =
@@ -24,6 +25,12 @@ export const MAX_PATCH_OPERATIONS = 1_000;
 export interface PatchOptions {
   /** Validate the result at this tier (`untrusted` by default), or skip with `false`. */
   validate?: HrefTrust | false;
+  /**
+   * Checks inline deck payloads in the result. `@texuli/document/ops`
+   * defaults it to `checkDeckPayload`; `@texuli/document/ops-core` has no
+   * default and refuses inline decks unless one is passed (G136).
+   */
+  validateDeck?: DeckPayloadValidator | null;
 }
 
 export type PatchResult =
@@ -238,7 +245,10 @@ export function applyDocumentPatch(
   const inverse = cloneData(undo.reverse().flat());
   if (options.validate === false)
     return { ok: true, document: state.root as TexuliDocument, inverse, issues: [] };
-  const checked = validateDocument(state.root, { trust: options.validate ?? 'untrusted' });
+  const checked = validateDocument(state.root, {
+    trust: options.validate ?? 'untrusted',
+    validateDeck: options.validateDeck ?? null,
+  });
   if (!checked.ok)
     return {
       ok: false,

@@ -10,7 +10,7 @@ the CRDT sync core. It has no Svelte and no DOM: Node tools, agents and the
 `@texuli/pages` editor all use the same engine.
 
 > **Status: in development (pre-1.0).** `@texuli/document` is published on
-> npm as `0.11.4`, with provenance (first published as `0.7.0`; built in PLAN_010,
+> npm as `0.11.5`, with provenance (first published as `0.7.0`; built in PLAN_010,
 > ADR-010 and ADR-011 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
 > Under 0.x a new minor (`0.12.0`) may contain breaking changes, so pin the
@@ -71,6 +71,7 @@ JSON path, an RFC 6901 pointer, a message and a fix).
 | `schema` | The validator on the `@texuli/deck` schema kit, the URL policy for links and media, embedded decks, the untrusted loader and the JSON Schema export | [schema](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/schema.md) |
 | `schema-core` | The same validator without the deck model: inline decks refused unless the host passes `validateDeck` (from `0.11.3`) | [schema-core](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/schema-core.md) |
 | `ops` | Typed operations by persisted id with exact inverses, bounded RFC 6902 patches with inverse patches, and the op log with undo and redo | [ops](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/ops.md) |
+| `ops-core` | The same operations, patches and op log validated without the deck model: inline decks refused unless the host passes `validateDeck` (from `0.11.5`) | [ops-core](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/ops-core.md) |
 | `markdown` | Markdown import and export through the linear-time core editor codec | [markdown](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/markdown.md) |
 | `paged` | The pagination engine: page sizes and margins in points, explicit breaks, headings kept with what follows, widow and orphan control, headers and footers with page fields, over a measurer the caller injects | [paged](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/paged.md) |
 | `docx` | The owned DOCX (WordprocessingML) writer on the escaped `@texuli/core/markup` builders and `@texuli/core/zip` (lazy) | [docx](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/docx.md) |
@@ -122,6 +123,7 @@ JSON path, an RFC 6901 pointer, a message and a fix).
 - [Model](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/model.md)
 - [Schema](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/schema.md)
 - [Schema core](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/schema-core.md)
+- [Ops core](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/ops-core.md)
 - [Operations, patches and the op log](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/ops.md)
 - [Markdown](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/markdown.md)
 - [Paged layout](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/paged.md),
