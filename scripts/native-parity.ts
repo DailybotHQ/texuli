@@ -54,7 +54,8 @@ export interface Capability {
 
 /**
  * What each side does per capability, beyond painting individual ids.
- * Verified against the code on 2026-11-01 (main 90f2721b, spec 0.10.0).
+ * Verified against the code on 2026-11-01 (main 90f2721b, spec 0.10.0; charts and data
+ * after PLAN_013).
  */
 export const CAPABILITIES: readonly Capability[] = [
   {
@@ -140,11 +141,27 @@ export const CAPABILITIES: readonly Capability[] = [
     evidence: ['native/texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/SpecValidator.kt'],
   },
   {
-    name: 'Data sources and dashboards',
-    web: 'Host data sources and the dashboard (@texuli/data).',
-    native: 'Validates sources; data components paint a placeholder.',
-    status: 'validation-only',
-    evidence: ['native/texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/Source.kt'],
+    name: 'Chart and data layout math',
+    web: 'Scales, ticks, stacks, paths, layouts and the data engines (@texuli/charts, @texuli/data).',
+    native:
+      'Ported to Kotlin; every vector the web functions write matches (numbers to 1e-9, paths and labels exactly).',
+    status: 'parity',
+    evidence: [
+      'scripts/chart-vectors.ts',
+      'native/conformance/fixtures/chart-vectors.json',
+      'native/texuli-compose/src/jvmTest/kotlin/com/texuli/compose/ChartMathParityTest.kt',
+    ],
+  },
+  {
+    name: 'Data views and dashboards',
+    web: 'Host data sources and every data view, interactive (@texuli/data).',
+    native:
+      'Every data view paints, read-only where the web view is interactive; sources validate, but a node that reads a host source paints a placeholder (native loads no sources yet).',
+    status: 'partial',
+    evidence: [
+      'native/texuli-compose/src/commonMain/kotlin/com/texuli/compose/DataBoards.kt',
+      'native/texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/Source.kt',
+    ],
   },
   {
     name: 'Agent tools (MCP)',

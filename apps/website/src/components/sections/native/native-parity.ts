@@ -15,7 +15,7 @@ const RAW = import.meta.glob<string>('../../../../../../native/docs/parity.json'
 const source = Object.values(RAW)[0];
 if (!source) throw new Error('native/docs/parity.json not found: run scripts/native-parity.ts');
 const parity = JSON.parse(source) as {
-  totals: { painted: number; catalog: number; goldenTraces: number };
+  totals: { painted: number; catalog: number; goldenTraces: number; readOnly: number };
   components: ParityComponent[];
 };
 
@@ -43,10 +43,15 @@ export const NATIVE_CHARTS = (() => {
   };
 })();
 
-/** The painted chart components as words ("sparkline, bullet, …"), for copy. */
-export const NATIVE_CHART_NAMES: string = NATIVE_CHARTS.painted
-  .map((id) => id.replace('charts-', '').replaceAll('-', ' '))
-  .join(', ');
+/** Data components (`data-*` ids) painted natively, and how many of them paint read-only. */
+export const NATIVE_DATA = (() => {
+  const data = components.filter((entry) => entry.id.startsWith('data-'));
+  return {
+    painted: data.filter((entry) => entry.native === 'painted').length,
+    total: data.length,
+    readOnly: parity.totals.readOnly,
+  };
+})();
 
 /** Is this catalog id painted natively? */
 export function paintsNatively(id: string): boolean {

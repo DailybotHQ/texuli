@@ -82,7 +82,7 @@ export const nativeHeroContent = {
       detail:
         `A Compose renderer driven by Kotlin Multiplatform that paints ${NATIVE_SLICE.painted} of ` +
         `${NATIVE_SLICE.total} catalog components: page, document, deck and composition layouts, ` +
-        'text lists, code, boards, tables, media frames and a bounded compact-chart slice. ' +
+        'text lists, code, boards, tables, media frames, every chart family and every data view. ' +
         'Conformance-tested in this repository against the same semantic goldens as the web.',
     },
     {

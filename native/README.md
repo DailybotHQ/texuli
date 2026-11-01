@@ -8,12 +8,20 @@ TypeScript or Svelte. It is not a pnpm workspace package.
 **Status: in development.** The Compose renderer contains native ordered and
 unordered text lists plus a static, horizontally scrollable board projection
 (column headings, card counts and plain-text cards), alongside a native
-table-block projection, bounded responsive content layouts, and a deliberately limited
-compact-chart slice (`charts-sparkline`, `charts-bullet`, `charts-gauge`, and
-`charts-progress-ring`) with Kotlin projection tests. Page, document, deck,
+table-block projection, bounded responsive content layouts, the compact
+charts (`charts-sparkline`, `charts-bullet`, `charts-gauge`, and
+`charts-progress-ring`) and, since PLAN_013 ([ADR-025](../docs/DECISIONS.md#adr-025-native-painting-from-ported-web-math)),
+every chart family and every data view: cartesian, part-whole, matrix, flow and geo
+charts, and the grid, cohort table, tree, files, calendar, timeline,
+notification inbox, board, map, dashboard and filter builder. Their layouts are
+the web's own chart and data math, ported to Kotlin and checked against
+vectors the web writes (`scripts/chart-vectors.ts`, `ChartMathParityTest`).
+Data views that are interactive on the web paint read-only here
+(`NativeRegistry.readOnly`). Page, document, deck,
 card, grid, and deck-slide content layouts are rendered, as are the
 composition layouts (stack, row, split, tile) and the code and structure
-blocks; app-shell layouts and other chart families remain visible placeholders. This renderer support does
+blocks; app-shell layouts, form controls, chat, the editors and the remaining
+components remain visible placeholders. This renderer support does
 not promote catalog capability claims: capabilities remain `unknown` until
 portable behavior is audited and cross-target conformance is established.
 Nothing is published to Maven Central yet: both modules carry their planned
@@ -212,7 +220,7 @@ visible `not-on-this-target` placeholder.
 | Module | What it holds | Targets |
 | --- | --- | --- |
 | `texuli-spec` | The generated models, enums and decoders from `packages/spec/generated/kotlin` (compiled in place through `srcDir`, never copied), the generated design tokens (`tokens/DesignTokens.kt`), plus a strict JSON reader, the spec validator (the twin of `validateBlueprint`), the render plan and the semantic trace | JVM, iOS (arm64 and simulator) |
-| `texuli-compose` | The token theme (`TexuliTheme`, Material colors from a generated token set), the native registry (translation dictionary, native side), typed host intents (no activate intent) and Compose components: page, doc, deck, card, deck-slide and bounded responsive grid layouts, text blocks and lists, static board diagrams, stat, KPI, accessible table data blocks, stack, row, split and tile layouts, code blocks, calls to action, dividers and columns, image, figure, video and gallery media frames, and a subset of compact charts, each with a visible placeholder for anything else | JVM (Compose Desktop) |
+| `texuli-compose` | The token theme (`TexuliTheme`, Material colors from a generated token set), the native registry (translation dictionary, native side), typed host intents (no activate intent) and Compose components: page, doc, deck, card, deck-slide and bounded responsive grid layouts, text blocks and lists, static board diagrams, stat, KPI, accessible table data blocks, stack, row, split and tile layouts, code blocks, calls to action, dividers and columns, image, figure, video and gallery media frames, compact charts, every chart family and every data view (read-only where the web view is interactive), each with a visible placeholder for anything else | JVM (Compose Desktop) |
 | `conformance` | The native half of the dual-target golden gate, the validator parity test, design-token value parity and the six KMP app migration checks | JVM tests |
 
 The native flow follows design §4:
@@ -267,7 +275,9 @@ the same script with another document (planned: a CLI command for it).
 
 `conformance/semantics.json` holds the target-neutral semantic rules: role,
 accessible name and heading level per catalog id or block type. The two
-targets apply them to all 15 spec goldens (`packages/spec/fixtures/golden`):
+targets apply them to all 15 spec goldens (`packages/spec/fixtures/golden`)
+and to the parity fixtures (`conformance/fixtures/parity/`, PLAN_013), which
+cover the painted ids no golden uses:
 
 - **Web:** `conformance/web/trace.ts` validates and renders each golden with
   `@texuli/catalog/validate` (untrusted tier) and writes
@@ -344,6 +354,8 @@ pnpm exec tsx native/conformance/web/trace.ts       # the web traces and Semanti
 pnpm exec tsx native/conformance/web/structure.ts   # wrapper, modules, packages, brackets, imports, trace parity
 pnpm vitest run packages/spec                       # the spec harness: generated Kotlin structure and closed decoding
 pnpm exec tsx packages/spec/scripts/design-tokens.ts --check  # DesignTokens.kt and the web token JSON are current
+pnpm exec tsx scripts/chart-vectors.ts --check      # the chart and data vectors and PortMeridian.kt are current
+pnpm exec tsx scripts/native-parity.ts --check      # the parity matrix is current and every painted id is covered
 ```
 
 ### Native test map
@@ -362,6 +374,9 @@ run on the JVM and (for `texuli-spec`) the iOS simulator as well.
 | `SourceTest` | `texuli-spec` | Spec 0.8.0 data-source bindings: a valid binding passes with the host's sources and fails closed without them, the TypeScript refusals (unknown source, a URL name, extra members, page size, fields, sort, operators, values, map, mixed keys, nested bindings), a 10,000-level filter, descriptor decoding and bound plan nodes |
 | `AccessibilityTest` | `texuli-compose` | Image alternatives (blank alt is decorative) and heading ranks clamped to 1-6 |
 | `ChartWidgetsTest` | `texuli-compose` | Compact chart props: gaps, variants, title-over-label naming, bounded scales, refusals |
+| `ChartMathParityTest` (jvmTest) | `texuli-compose` | Every case in `conformance/fixtures/chart-vectors.json` (written by `scripts/chart-vectors.ts` from the web's chart and data functions): numbers to 1e-9, SVG paths and labels exactly; a perturbed vector fails |
+| `CartesianChartsTest`, `PartWholeChartsTest`, `MatrixFlowChartsTest`, `GeoChartsTest` | `texuli-compose` | Each chart family's projection, refusal where the web's layout throws, its scene and table, and the hostile matrix |
+| `DataTablesTest`, `DataTimeTest`, `DataBoardsTest` | `texuli-compose` | Each data view's projection and the web's ordering, date and layout rules as the views use them, https-only inbox intents, named time zones refused, and the hostile matrix |
 | `LayoutWidgetsTest` | `texuli-compose` | Responsive grid columns, gap mapping, document outline order, deck-slide labels |
 | `ListBoardTest` | `texuli-compose` | List ordering and board columns/cards, with column, card and unique-id caps |
 | `MediaWidgetsTest` | `texuli-compose` | Untrusted media source rules, `media-image` and `blocks-media` projections, gallery columns |
@@ -372,6 +387,7 @@ run on the JVM and (for `texuli-spec`) the iOS simulator as well.
 | `TableGridTest` | `texuli-compose` | Table column/row normalization, inert cells, bounded grid columns and rows |
 | `HostilePropsTest` | `texuli-compose` | The hostile matrix: every projection's props replaced by each value in `HOSTILE_VALUES` (wrong types, JSON null, non-finite and extreme numbers, huge, bidi, zero-width, control and surrogate strings, huge and deep containers) never throws and stays in bounds |
 | `GoldenConformanceTest` | `conformance` | Each spec golden's native trace equals the web trace; prints native coverage per id |
+| `ParityFixtureConformanceTest` | `conformance` | Each parity fixture (`conformance/fixtures/parity/`, ids no spec golden uses) traces as on the web, and names only painted ids |
 | `MessagesParityTest` | `conformance` | Native label interpolation equals `@texuli/core/i18n` on the shared vectors (`packages/core/tests/fixtures/i18n-vectors.json`), and every composition layout the spec goldens use paints natively |
 | `InvalidFixtureParityTest` | `conformance` | Every spec invalid fixture is refused with exactly the TypeScript codes |
 | `WorkflowFixtureParityTest` | `conformance` | Every spec workflow golden validates and every workflow invalid fixture is refused with exactly the TypeScript codes |

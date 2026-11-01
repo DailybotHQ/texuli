@@ -15,7 +15,7 @@
  * - no dates presented as promises, no store badges, no invented versions,
  *   and no claim that anything is published to Maven Central.
  */
-import { NATIVE_CHART_NAMES, NATIVE_SLICE } from './native-parity.ts';
+import { NATIVE_CHARTS, NATIVE_DATA, NATIVE_SLICE } from './native-parity.ts';
 
 export interface NativeEvidenceItem {
   /** Short name shown as the row title. */
@@ -40,7 +40,7 @@ export const NATIVE_MODULES: readonly NativeEvidenceItem[] = [
   },
   {
     name: 'texuli-compose',
-    role: 'The Compose renderer: the token theme, the native registry and typed host intents, with layout, text, list, table, board, stat, media and compact-chart widgets. Anything outside the documented slice paints a visible placeholder, never silence.',
+    role: 'The Compose renderer: the token theme, the native registry and typed host intents, with layout, text, list, table, board, stat and media widgets, every chart family and every data view, laid out by the web’s own math ported to Kotlin. Anything outside the documented slice paints a visible placeholder, never silence.',
     path: 'native/texuli-compose',
   },
   {
@@ -72,7 +72,8 @@ export const NATIVE_MODULES: readonly NativeEvidenceItem[] = [
 export const NATIVE_SHIPPED: readonly string[] = [
   'The Kotlin projection is generated and tested in this repository, from the same manifest data the shipped TypeScript packages are built from.',
   'texuli-spec compiles for the JVM and for iOS (arm64 and simulator targets); texuli-compose and conformance run their suites on the JVM.',
-  `The Compose renderer paints ${NATIVE_SLICE.painted} of the ${NATIVE_SLICE.total} catalog components: page, document, deck, card and grid layouts; the stack, row, split and tile composition layouts; text blocks and ordered and unordered lists; code and structure blocks; static boards; stat and KPI blocks; accessible tables; image, figure, video and gallery media frames; and a bounded compact-chart slice (${NATIVE_CHART_NAMES}). Every other component paints a visible placeholder; the generated parity matrix lists every one.`,
+  `The Compose renderer paints ${NATIVE_SLICE.painted} of the ${NATIVE_SLICE.total} catalog components: page, document, deck, card and grid layouts; the stack, row, split and tile composition layouts; text blocks and ordered and unordered lists; code and structure blocks; static boards; stat and KPI blocks; accessible tables; image, figure, video and gallery media frames; ${NATIVE_CHARTS.painted.length} of ${NATIVE_CHARTS.total} chart components; and ${NATIVE_DATA.painted} of ${NATIVE_DATA.total} data views, ${NATIVE_DATA.readOnly} of them read-only. Every other component paints a visible placeholder; the generated parity matrix lists every one.`,
+  'Chart and data layouts match the web: scripts/chart-vectors.ts writes vectors from the web’s own functions and ChartMathParityTest replays every case in Kotlin, and ParityFixtureConformanceTest traces the ids no spec golden uses on both targets.',
   'Design-system documents decode natively and a blueprint’s design-system reference validates as on the web; the renderer themes from token sets compiled by @texuli/tokens and checked against the web values.',
   'The dual-target golden gate passes: GoldenConformanceTest requires each spec golden’s native semantic trace to equal the web trace, and InvalidFixtureParityTest refuses every invalid fixture with exactly the TypeScript validator’s codes.',
   'Six Kotlin Multiplatform app migrations pin every widget’s documented status, from a starter screen to a static game scoreboard.',
@@ -90,7 +91,8 @@ export const NATIVE_PLANNED: readonly string[] = [
   'An Android target for the renderer, pending a design decision.',
   'A SwiftUI adapter over the iOS texuli-spec projection, pending the same decision.',
   'Image decoding is planned: data-URI pixels and a host-supplied loader for https and relative sources, plus a conformance golden with media.',
-  'App-shell layouts and the remaining chart families are planned — visible placeholders in the renderer today.',
+  'App-shell layouts, form controls, chat and the editors are planned — visible placeholders in the renderer today.',
+  'Interactive data views natively (sorting, selecting, dragging and editing) are planned; they paint read-only today.',
 ];
 
 /** Real on-site routes this section may link to; verified to exist. */

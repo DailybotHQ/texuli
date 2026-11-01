@@ -48,9 +48,9 @@ Every other id paints a placeholder. Of the 168 spec vocabulary ids, 75 may be
 emitted by a blueprint (their catalog `emit` list holds both `developer` and
 `untrusted`). The other 93 have an empty `emit` list: every form control, the
 app-shell layouts and the standalone UI components. Those plan to
-`tier-denied` at any tier. Emittable ids without a painter, such as the other
-chart families, `media-composition-svg` and `media-composition-canvas`, paint
-`not-on-this-target`.
+`tier-denied` at any tier. Emittable ids without a painter, such as
+`chat-thread`, the state controls, `media-composition-svg` and
+`media-composition-canvas`, paint `not-on-this-target`.
 
 **Placeholder reasons**, as painted:
 
@@ -223,8 +223,13 @@ doc or the README records:
   `https:` and relative sources, video playback, and a media conformance
   golden.
 - **More painters:** `media-composition-canvas` and `media-composition-svg`
-  (KMPTapDuelGame's goal markers), the other chart families, and app-shell
-  layouts.
+  (KMPTapDuelGame's goal markers), the state controls, chat, the editors and
+  app-shell layouts.
+- **Interactive data views.** Sorting, selecting, dragging, editing and view
+  switches in the grid, tree, files, calendar, timeline, inbox, board, map
+  and filter builder (wave 3: intents and bindings). They paint read-only today.
+- **Native chart palette.** The token sets carry no chart palette yet, so
+  series colors come from the theme's roles in a fixed order (ADR-025).
 - **Copy intents** from painters that offer copyable text.
 - **UI-level tests.** Compose semantics-tree, screenshot and interaction
   tests are not wired. A Desktop UI-test run stalled in macOS AWT/AppKit

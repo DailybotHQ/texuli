@@ -15,7 +15,7 @@
  * the Compose renderer is published, and the planned marker follows the
  * site convention (`data-status="planned"` plus the visible word).
  */
-import { NATIVE_CHARTS } from '../native/native-parity.ts';
+import { NATIVE_CHARTS, NATIVE_DATA } from '../native/native-parity.ts';
 
 export type ParityStatus = 'exists' | 'in-repo' | 'planned';
 
@@ -94,8 +94,22 @@ export const PARITY_ROWS: readonly ParityRow[] = [
     },
     native: {
       status: 'in-repo',
-      detail: `A bounded compact-chart slice: ${NATIVE_CHARTS.painted.length} of ${NATIVE_CHARTS.total} chart components (${NATIVE_CHARTS.painted.map((id) => id.replace('charts-', '').replaceAll('-', ' ')).join(', ')}); the others paint a placeholder.`,
-      surface: 'native/texuli-compose/src/commonMain/kotlin/com/texuli/compose/ChartWidgets.kt',
+      detail: `${NATIVE_CHARTS.painted.length} of ${NATIVE_CHARTS.total} chart components paint natively, laid out by the web's chart math ported to Kotlin and checked against vectors the web writes.`,
+      surface: 'native/texuli-compose/src/commonMain/kotlin/com/texuli/compose/ChartMath.kt',
+    },
+  },
+  {
+    capability: 'Data views',
+    web: {
+      status: 'exists',
+      detail:
+        'Grid, tree, files, calendar, timeline, inbox, board, map, dashboard and filter builder.',
+      surface: 'packages/data/src',
+    },
+    native: {
+      status: 'in-repo',
+      detail: `${NATIVE_DATA.painted} of ${NATIVE_DATA.total} data components paint natively from the same engines, ported; ${NATIVE_DATA.readOnly} of them paint read-only, since sorting, dragging and editing are interactive on the web.`,
+      surface: 'native/texuli-compose/src/commonMain/kotlin/com/texuli/compose/DataBoards.kt',
     },
   },
   {
