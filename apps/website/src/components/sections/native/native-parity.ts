@@ -4,7 +4,20 @@
  * spec catalog and `NativeRegistry`). Every native count on texuli.com comes
  * from here, so the pages cannot drift from the renderer.
  */
-import parity from '../../../../../../native/docs/parity.json';
+
+// Inlined at build time (a glob, not an import: the layer guard keeps
+// imports inside the package; the site reads repository files this way).
+const RAW = import.meta.glob<string>('../../../../../../native/docs/parity.json', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+const source = Object.values(RAW)[0];
+if (!source) throw new Error('native/docs/parity.json not found: run scripts/native-parity.ts');
+const parity = JSON.parse(source) as {
+  totals: { painted: number; catalog: number; goldenTraces: number };
+  components: ParityComponent[];
+};
 
 interface ParityComponent {
   id: string;
@@ -12,7 +25,7 @@ interface ParityComponent {
   native: 'painted' | 'placeholder';
 }
 
-const components = parity.components as readonly ParityComponent[];
+const components: readonly ParityComponent[] = parity.components;
 
 /** Catalog components the native renderer paints, of the whole catalog. */
 export const NATIVE_SLICE = {
