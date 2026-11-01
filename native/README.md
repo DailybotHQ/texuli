@@ -20,6 +20,9 @@ coordinates (`com.texuli`, decision
 [ADR-005](../docs/DECISIONS.md#adr-005-maven-coordinates-comtexuli-for-the-native-modules))
 and are consumed in place from this repository. To embed the renderer, start
 with the [adoption guide](docs/ADOPTION.md).
+What paints natively today, component by component and capability by
+capability, is the generated [web ↔ native parity matrix](docs/PARITY.md)
+(`pnpm exec tsx scripts/native-parity.ts`).
 The native slice currently accepts only a documented subset of each compact
 chart's props; unsupported options (such as custom formatting, thresholds,
 localized labels, and bullet ranges) produce a visible invalid-chart
