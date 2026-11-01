@@ -11,6 +11,7 @@
 import {
   type CompiledDesignSystem,
   compileDesignSystem,
+  fromThemeWithReport,
   loadLibraryBase,
   resolveDesignSystemSync,
 } from '@texuli/tokens/design-system/compile';
@@ -403,8 +404,11 @@ export async function runImport(input: Input) {
             ],
             warnings: [],
           };
-        result = importTheme(await loadFullLibraryTheme(source), options);
-      } else result = importTheme(source, options);
+        result = importTheme(await loadFullLibraryTheme(source), {
+          ...options,
+          fromTheme: fromThemeWithReport,
+        });
+      } else result = importTheme(source, { ...options, fromTheme: fromThemeWithReport });
     }
   }
   if (!result.ok) return { valid: false, from, errors: result.errors, warnings: result.warnings };

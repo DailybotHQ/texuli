@@ -487,6 +487,17 @@ export function importRolePalette(
   });
 }
 
+/** Options of {@link importTheme}. */
+export interface ImportThemeOptions extends DesignSystemImportOptions {
+  /**
+   * The theme-to-document bridge. Defaults to the one without the compiler;
+   * pass `fromThemeWithReport` from `@texuli/tokens/design-system/compile`
+   * (or `compile-core`) so the document always compiles, its dropped pins
+   * listed as `lossy` warnings (G135).
+   */
+  fromTheme?: typeof fromThemeWithReport;
+}
+
 /**
  * A Texuli `Theme` (object or JSON text) as a document, through
  * `fromThemeWithReport`: the fields the closed vocabulary cannot carry are
@@ -494,7 +505,7 @@ export function importRolePalette(
  */
 export function importTheme(
   input: unknown,
-  options: DesignSystemImportOptions = {}
+  options: ImportThemeOptions = {}
 ): DesignSystemImportResult {
   const warnings = new Warnings();
   return guard(warnings, () => {
@@ -510,7 +521,7 @@ export function importTheme(
         })),
         warnings: warnings.list,
       };
-    const { document, losses } = fromThemeWithReport(theme.value, {
+    const { document, losses } = (options.fromTheme ?? fromThemeWithReport)(theme.value, {
       ...(options.id ? { id: options.id } : {}),
       ...(options.version ? { version: options.version } : {}),
     });

@@ -26,10 +26,9 @@ export {
   type FromThemeLoss,
   type FromThemeOptions,
   formatFontStack,
-  fromTheme,
-  fromThemeWithReport,
   splitFontStack,
 } from './from-theme.ts';
+export { fromTheme, fromThemeWithReport } from './from-theme-compiled.ts';
 export {
   checkDesignSystemGuarantees,
   DESIGN_SYSTEM_ATTRIBUTES,

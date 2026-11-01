@@ -279,7 +279,9 @@ design system already:
 - `fromTheme(theme)` (`@texuli/tokens/design-system/compile`) turns any
   `Theme` into a valid document; `fromThemeWithReport` lists the fields the
   closed vocabulary cannot carry (custom interaction states, a radius over
-  48 px, an unnamed easing, component hooks). A test compiles all 210
+  48 px, an unnamed easing, component hooks). From `0.11.4` the document
+  always compiles: a role pin below the compiler's contrast guarantees is
+  dropped so the compiler derives that role, and the drop is listed too. A test compiles all 210
   library themes both ways and checks every variable `themeVariables`
   writes is equal.
 - `applyTheme(el)` and `compileThemeCss` keep working; a design system is
