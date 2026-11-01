@@ -1,6 +1,6 @@
 {
   "name": "@texuli/slides",
-  "version": "0.11.4",
+  "version": "0.11.5",
   "private": true,
   "description": "Presentation deck model, grammar, and responsive stage runtime.",
   "keywords": [
@@ -87,13 +87,13 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/blocks": "0.11.4",
-    "@texuli/catalog": "0.11.4",
-    "@texuli/core": "0.11.4",
-    "@texuli/deck": "0.11.4",
-    "@texuli/media": "0.11.4",
-    "@texuli/player": "0.11.4",
-    "@texuli/tokens": "0.11.4"
+    "@texuli/blocks": "0.11.5",
+    "@texuli/catalog": "0.11.5",
+    "@texuli/core": "0.11.5",
+    "@texuli/deck": "0.11.5",
+    "@texuli/media": "0.11.5",
+    "@texuli/player": "0.11.5",
+    "@texuli/tokens": "0.11.5"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

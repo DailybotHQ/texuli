@@ -1,6 +1,6 @@
 {
   "name": "@texuli/chat",
-  "version": "0.11.4",
+  "version": "0.11.5",
   "private": true,
   "description": "Chat interfaces: thread, message list, composer and typing indicator, generic for people and agents.",
   "keywords": [
@@ -34,10 +34,10 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/core": "0.11.4",
-    "@texuli/primitives": "0.11.4",
-    "@texuli/tokens": "0.11.4",
-    "texuli": "0.11.4"
+    "@texuli/core": "0.11.5",
+    "@texuli/primitives": "0.11.5",
+    "@texuli/tokens": "0.11.5",
+    "texuli": "0.11.5"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

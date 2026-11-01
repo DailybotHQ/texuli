@@ -1,6 +1,6 @@
 {
   "name": "@texuli/date",
-  "version": "0.11.4",
+  "version": "0.11.5",
   "private": true,
   "description": "Framework-free Gregorian date arithmetic for Texuli calendars and date fields.",
   "keywords": [
