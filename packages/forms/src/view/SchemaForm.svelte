@@ -191,6 +191,20 @@ $effect(() => {
   }
 });
 
+// The internal controller follows the disabled and readOnly props after
+// mount too (G134); a host's own controller is the host's to change.
+$effect(() => {
+  const target = controller;
+  const disabled = disabledProp;
+  const readOnly = readOnlyProp;
+  if (external) return;
+  untrack(() => {
+    const state = target.getState();
+    if (state.disabled !== disabled) target.setDisabled(disabled);
+    if (state.readOnly !== readOnly) target.setReadOnly(readOnly);
+  });
+});
+
 /** The last state heard, tagged with the controller it came from. */
 let observed = $state.raw<{ controller: FormController; state: FormState } | null>(null);
 const formState = $derived(

@@ -14,6 +14,7 @@ import { type CompiledForm, createFormController, validateFormSchema } from '../
 import { SCHEMA_FORM_CONTROLS } from '../src/view/controls/index.ts';
 import { compiled } from './fixtures.ts';
 import GapsHarness from './GapsHarness.svelte';
+import ToggleHarness from './ToggleHarness.svelte';
 
 afterEach(() => cleanup());
 
@@ -226,6 +227,20 @@ describe('form-level disabled and read-only (G116)', () => {
         values: { name: 'Ada', plan: 'team', news: false, size: 's', pw: '' },
       })
     );
+  });
+
+  it('follows disabled and readOnly after mount (G134)', async () => {
+    render(ToggleHarness, { props: { form: PROFILE } });
+    const name = screen.getByRole('textbox', { name: /Name/ }) as HTMLInputElement;
+    expect(name.disabled).toBe(true);
+    await fireEvent.click(screen.getByRole('button', { name: 'Enable' }));
+    await tick();
+    expect(name.disabled).toBe(false);
+    expect(name.readOnly).toBe(true);
+    await fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
+    await tick();
+    expect(name.readOnly).toBe(false);
+    expect(screen.getByRole('button', { name: 'Submit' })).toHaveProperty('disabled', false);
   });
 
   it('shows values read-only: text is readonly, other controls are disabled, Submit is disabled', () => {
