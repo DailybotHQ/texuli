@@ -25,7 +25,7 @@ The flow (`texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/RenderPlan.
    `"<id>" is not shown here (<reason>)`. It is never blank and never a crash.
 
 **Painted natively** (`NativeRegistry.implemented` in
-`texuli-compose/src/commonMain/kotlin/com/texuli/compose/Registry.kt`), 38 ids.
+`texuli-compose/src/commonMain/kotlin/com/texuli/compose/Registry.kt`), 40 ids.
 The full table, generated from the registry and the catalog, is
 [PARITY.md](PARITY.md):
 
@@ -39,6 +39,7 @@ The full table, generated from the registry and the catalog, is
 | Cartesian charts (ADR-025) | `charts-line`, `charts-area`, `charts-bar`, `charts-stacked-bar`, `charts-combo`, `charts-cartesian`, `charts-canvas-renderer`: the web's layout ported to Kotlin and checked against web-written vectors |
 | Part-whole charts (ADR-025) | `charts-pie`, `charts-donut`, `charts-sunburst`, `charts-treemap`, with the web's legend and data table |
 | Matrix and flow charts (ADR-025) | `charts-scatter`, `charts-bubble`, `charts-heatmap`, `charts-funnel`, `charts-sankey`, `charts-network` |
+| Geo charts (ADR-025) | `charts-geo-map`, `charts-geo-point-map`: the web's schematic tile maps, with no geographic data and no network |
 
 Every other id paints a placeholder. Of the 168 spec vocabulary ids, 75 may be
 emitted by a blueprint (their catalog `emit` list holds both `developer` and

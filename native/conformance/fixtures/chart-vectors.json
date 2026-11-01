@@ -7223,6 +7223,585 @@
           }
         ]
       }
+    },
+    {
+      "fn": "geoCells",
+      "input": {
+        "shape": [
+          {
+            "id": "north-america",
+            "label": "North America",
+            "abbr": "NAM",
+            "col": 0,
+            "row": 0
+          },
+          {
+            "id": "northern-europe",
+            "label": "Northern Europe",
+            "abbr": "NEU",
+            "col": 2,
+            "row": 0
+          },
+          {
+            "id": "eastern-europe",
+            "label": "Eastern Europe",
+            "abbr": "EEU",
+            "col": 3,
+            "row": 0
+          },
+          {
+            "id": "central-asia",
+            "label": "Central Asia",
+            "abbr": "CAS",
+            "col": 4,
+            "row": 0
+          },
+          {
+            "id": "east-asia",
+            "label": "East Asia",
+            "abbr": "EAS",
+            "col": 5,
+            "row": 0
+          },
+          {
+            "id": "central-america",
+            "label": "Central America & Caribbean",
+            "abbr": "CAM",
+            "col": 0,
+            "row": 1
+          },
+          {
+            "id": "western-europe",
+            "label": "Western Europe",
+            "abbr": "WEU",
+            "col": 2,
+            "row": 1
+          },
+          {
+            "id": "southern-europe",
+            "label": "Southern Europe",
+            "abbr": "SEU",
+            "col": 3,
+            "row": 1
+          },
+          {
+            "id": "middle-east",
+            "label": "Middle East",
+            "abbr": "MEA",
+            "col": 4,
+            "row": 1
+          },
+          {
+            "id": "south-asia",
+            "label": "South Asia",
+            "abbr": "SAS",
+            "col": 5,
+            "row": 1
+          },
+          {
+            "id": "south-america",
+            "label": "South America",
+            "abbr": "SAM",
+            "col": 1,
+            "row": 2
+          },
+          {
+            "id": "north-africa",
+            "label": "North Africa",
+            "abbr": "NAF",
+            "col": 3,
+            "row": 2
+          },
+          {
+            "id": "southeast-asia",
+            "label": "Southeast Asia",
+            "abbr": "SEA",
+            "col": 5,
+            "row": 2
+          },
+          {
+            "id": "sub-saharan-africa",
+            "label": "Sub-Saharan Africa",
+            "abbr": "SSA",
+            "col": 3,
+            "row": 3
+          },
+          {
+            "id": "oceania",
+            "label": "Oceania",
+            "abbr": "OCE",
+            "col": 6,
+            "row": 3
+          }
+        ],
+        "width": 560,
+        "height": 320,
+        "gap": 4
+      },
+      "output": [
+        {
+          "id": "north-america",
+          "label": "North America",
+          "abbr": "NAM",
+          "col": 0,
+          "row": 0,
+          "x": 0,
+          "y": 0.8571428571428612,
+          "size": 76.57142857142857
+        },
+        {
+          "id": "northern-europe",
+          "label": "Northern Europe",
+          "abbr": "NEU",
+          "col": 2,
+          "row": 0,
+          "x": 161.14285714285714,
+          "y": 0.8571428571428612,
+          "size": 76.57142857142857
+        },
+        {
+          "id": "eastern-europe",
+          "label": "Eastern Europe",
+          "abbr": "EEU",
+          "col": 3,
+          "row": 0,
+          "x": 241.71428571428572,
+          "y": 0.8571428571428612,
+          "size": 76.57142857142857
+        },
+        {
+          "id": "central-asia",
+          "label": "Central Asia",
+          "abbr": "CAS",
+          "col": 4,
+          "row": 0,
+          "x": 322.2857142857143,
+          "y": 0.8571428571428612,
+          "size": 76.57142857142857
+        },
+        {
+          "id": "east-asia",
+          "label": "East Asia",
+          "abbr": "EAS",
+          "col": 5,
+          "row": 0,
+          "x": 402.85714285714283,
+          "y": 0.8571428571428612,
+          "size": 76.57142857142857
+        },
+        {
+          "id": "central-america",
+          "label": "Central America & Caribbean",
+          "abbr": "CAM",
+          "col": 0,
+          "row": 1,
+          "x": 0,
+          "y": 81.42857142857143,
+          "size": 76.57142857142857
+        },
+        {
+          "id": "western-europe",
+          "label": "Western Europe",
+          "abbr": "WEU",
+          "col": 2,
+          "row": 1,
+          "x": 161.14285714285714,
+          "y": 81.42857142857143,
+          "size": 76.57142857142857
+        },
+        {
+          "id": "southern-europe",
+          "label": "Southern Europe",
+          "abbr": "SEU",
+          "col": 3,
+          "row": 1,
+          "x": 241.71428571428572,
+          "y": 81.42857142857143,
+          "size": 76.57142857142857
+        },
+        {
+          "id": "middle-east",
+          "label": "Middle East",
+          "abbr": "MEA",
+          "col": 4,
+          "row": 1,
+          "x": 322.2857142857143,
+          "y": 81.42857142857143,
+          "size": 76.57142857142857
+        },
+        {
+          "id": "south-asia",
+          "label": "South Asia",
+          "abbr": "SAS",
+          "col": 5,
+          "row": 1,
+          "x": 402.85714285714283,
+          "y": 81.42857142857143,
+          "size": 76.57142857142857
+        },
+        {
+          "id": "south-america",
+          "label": "South America",
+          "abbr": "SAM",
+          "col": 1,
+          "row": 2,
+          "x": 80.57142857142857,
+          "y": 162,
+          "size": 76.57142857142857
+        },
+        {
+          "id": "north-africa",
+          "label": "North Africa",
+          "abbr": "NAF",
+          "col": 3,
+          "row": 2,
+          "x": 241.71428571428572,
+          "y": 162,
+          "size": 76.57142857142857
+        },
+        {
+          "id": "southeast-asia",
+          "label": "Southeast Asia",
+          "abbr": "SEA",
+          "col": 5,
+          "row": 2,
+          "x": 402.85714285714283,
+          "y": 162,
+          "size": 76.57142857142857
+        },
+        {
+          "id": "sub-saharan-africa",
+          "label": "Sub-Saharan Africa",
+          "abbr": "SSA",
+          "col": 3,
+          "row": 3,
+          "x": 241.71428571428572,
+          "y": 242.57142857142858,
+          "size": 76.57142857142857
+        },
+        {
+          "id": "oceania",
+          "label": "Oceania",
+          "abbr": "OCE",
+          "col": 6,
+          "row": 3,
+          "x": 483.42857142857144,
+          "y": 242.57142857142858,
+          "size": 76.57142857142857
+        }
+      ]
+    },
+    {
+      "fn": "geoCells",
+      "input": {
+        "shape": [
+          {
+            "id": "north-ridge",
+            "label": "North Ridge",
+            "abbr": "NR",
+            "col": 1,
+            "row": 0
+          },
+          {
+            "id": "pine-hollow",
+            "label": "Pine Hollow",
+            "abbr": "PH",
+            "col": 2,
+            "row": 0
+          },
+          {
+            "id": "west-shore",
+            "label": "West Shore",
+            "abbr": "WS",
+            "col": 0,
+            "row": 1
+          },
+          {
+            "id": "old-town",
+            "label": "Old Town",
+            "abbr": "OT",
+            "col": 1,
+            "row": 1
+          },
+          {
+            "id": "harbor-point",
+            "label": "Harbor Point",
+            "abbr": "HP",
+            "col": 2,
+            "row": 1
+          },
+          {
+            "id": "east-quay",
+            "label": "East Quay",
+            "abbr": "EQ",
+            "col": 3,
+            "row": 1
+          },
+          {
+            "id": "mill-district",
+            "label": "Mill District",
+            "abbr": "MD",
+            "col": 0,
+            "row": 2
+          },
+          {
+            "id": "lantern-row",
+            "label": "Lantern Row",
+            "abbr": "LR",
+            "col": 1,
+            "row": 2
+          },
+          {
+            "id": "coral-flats",
+            "label": "Coral Flats",
+            "abbr": "CF",
+            "col": 2,
+            "row": 2
+          },
+          {
+            "id": "south-bend",
+            "label": "South Bend",
+            "abbr": "SB",
+            "col": 1,
+            "row": 3
+          },
+          {
+            "id": "tidewater",
+            "label": "Tidewater",
+            "abbr": "TW",
+            "col": 2,
+            "row": 3
+          }
+        ],
+        "width": 300,
+        "height": 480,
+        "gap": 2
+      },
+      "output": [
+        {
+          "id": "north-ridge",
+          "label": "North Ridge",
+          "abbr": "NR",
+          "col": 1,
+          "row": 0,
+          "x": 75.5,
+          "y": 90,
+          "size": 73.5
+        },
+        {
+          "id": "pine-hollow",
+          "label": "Pine Hollow",
+          "abbr": "PH",
+          "col": 2,
+          "row": 0,
+          "x": 151,
+          "y": 90,
+          "size": 73.5
+        },
+        {
+          "id": "west-shore",
+          "label": "West Shore",
+          "abbr": "WS",
+          "col": 0,
+          "row": 1,
+          "x": 0,
+          "y": 165.5,
+          "size": 73.5
+        },
+        {
+          "id": "old-town",
+          "label": "Old Town",
+          "abbr": "OT",
+          "col": 1,
+          "row": 1,
+          "x": 75.5,
+          "y": 165.5,
+          "size": 73.5
+        },
+        {
+          "id": "harbor-point",
+          "label": "Harbor Point",
+          "abbr": "HP",
+          "col": 2,
+          "row": 1,
+          "x": 151,
+          "y": 165.5,
+          "size": 73.5
+        },
+        {
+          "id": "east-quay",
+          "label": "East Quay",
+          "abbr": "EQ",
+          "col": 3,
+          "row": 1,
+          "x": 226.5,
+          "y": 165.5,
+          "size": 73.5
+        },
+        {
+          "id": "mill-district",
+          "label": "Mill District",
+          "abbr": "MD",
+          "col": 0,
+          "row": 2,
+          "x": 0,
+          "y": 241,
+          "size": 73.5
+        },
+        {
+          "id": "lantern-row",
+          "label": "Lantern Row",
+          "abbr": "LR",
+          "col": 1,
+          "row": 2,
+          "x": 75.5,
+          "y": 241,
+          "size": 73.5
+        },
+        {
+          "id": "coral-flats",
+          "label": "Coral Flats",
+          "abbr": "CF",
+          "col": 2,
+          "row": 2,
+          "x": 151,
+          "y": 241,
+          "size": 73.5
+        },
+        {
+          "id": "south-bend",
+          "label": "South Bend",
+          "abbr": "SB",
+          "col": 1,
+          "row": 3,
+          "x": 75.5,
+          "y": 316.5,
+          "size": 73.5
+        },
+        {
+          "id": "tidewater",
+          "label": "Tidewater",
+          "abbr": "TW",
+          "col": 2,
+          "row": 3,
+          "x": 151,
+          "y": 316.5,
+          "size": 73.5
+        }
+      ]
+    },
+    {
+      "fn": "geoCells",
+      "input": {
+        "shape": [
+          {
+            "id": "odd",
+            "label": "Odd",
+            "abbr": "OD",
+            "col": 2.7,
+            "row": -1
+          }
+        ],
+        "width": 100,
+        "height": 100,
+        "gap": 4
+      },
+      "output": [
+        {
+          "id": "odd",
+          "label": "Odd",
+          "abbr": "OD",
+          "col": 2.7,
+          "row": -1,
+          "x": 93.60000000000002,
+          "y": 34.666666666666664,
+          "size": 30.666666666666668
+        }
+      ]
+    },
+    {
+      "fn": "geoColorIndex",
+      "input": {
+        "value": 12,
+        "values": [12, null, 40, 7.5, 40]
+      },
+      "output": 1
+    },
+    {
+      "fn": "geoColorIndex",
+      "input": {
+        "value": null,
+        "values": [12, null, 40, 7.5, 40]
+      },
+      "output": null
+    },
+    {
+      "fn": "geoColorIndex",
+      "input": {
+        "value": 40,
+        "values": [12, null, 40, 7.5, 40]
+      },
+      "output": 8
+    },
+    {
+      "fn": "geoColorIndex",
+      "input": {
+        "value": 7.5,
+        "values": [12, null, 40, 7.5, 40]
+      },
+      "output": 0
+    },
+    {
+      "fn": "geoColorIndex",
+      "input": {
+        "value": 26,
+        "values": [12, null, 40, 7.5, 40]
+      },
+      "output": 5
+    },
+    {
+      "fn": "geoColorIndex",
+      "input": {
+        "value": 3,
+        "values": [3, 3]
+      },
+      "output": 4
+    },
+    {
+      "fn": "geoColorIndex",
+      "input": {
+        "value": 3,
+        "values": [null]
+      },
+      "output": null
+    },
+    {
+      "fn": "clampGeoOffset",
+      "input": {
+        "value": 0.2
+      },
+      "output": 0.2
+    },
+    {
+      "fn": "clampGeoOffset",
+      "input": {
+        "value": 0.9
+      },
+      "output": 0.4
+    },
+    {
+      "fn": "clampGeoOffset",
+      "input": {
+        "value": -3
+      },
+      "output": -0.4
+    },
+    {
+      "fn": "clampGeoOffset",
+      "input": {
+        "value": null
+      },
+      "output": 0
     }
   ]
 }

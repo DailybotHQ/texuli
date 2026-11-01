@@ -29,6 +29,7 @@ object NativeRegistry {
         "charts-sankey",
         "charts-network",
     )
+    private val geoCharts = setOf("charts-geo-map", "charts-geo-point-map")
     /** Ids the first renderer slice paints natively. */
     val implemented: Set<String> = setOf(
         "layout-page",
@@ -49,7 +50,7 @@ object NativeRegistry {
         "layout-tile",
         "blocks-code",
         "blocks-structure",
-    ) + compactCharts + cartesianCharts + partWholeCharts + matrixFlowCharts
+    ) + compactCharts + cartesianCharts + partWholeCharts + matrixFlowCharts + geoCharts
 
     /**
      * Painted ids whose web view is interactive (catalog interaction role

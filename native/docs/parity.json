@@ -2,15 +2,15 @@
   "specVersion": "0.10.0",
   "totals": {
     "catalog": 168,
-    "painted": 38,
-    "placeholder": 130,
+    "painted": 40,
+    "placeholder": 128,
     "agentEmittable": 75,
-    "agentEmittablePainted": 38,
+    "agentEmittablePainted": 40,
     "semanticRules": 37,
     "goldenTraces": 15,
     "goldenCovered": 34,
-    "parityTraces": 4,
-    "traceCovered": 54,
+    "parityTraces": 5,
+    "traceCovered": 56,
     "readOnly": 0
   },
   "unknownNativeIds": [],
@@ -34,7 +34,7 @@
     {
       "group": "content",
       "total": 35,
-      "painted": 28
+      "painted": 30
     },
     {
       "group": "data",
@@ -574,11 +574,11 @@
       "capability": "web-only",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
+      "native": "painted",
       "readOnly": false,
       "semanticRule": true,
       "golden": false,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "charts-geo-point-map",
@@ -586,11 +586,11 @@
       "capability": "web-only",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
+      "native": "painted",
       "readOnly": false,
       "semanticRule": true,
       "golden": false,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "charts-heatmap",

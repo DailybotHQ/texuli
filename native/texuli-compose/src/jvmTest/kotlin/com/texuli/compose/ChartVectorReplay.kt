@@ -62,7 +62,7 @@ internal object J {
 
 /** One Kotlin call per vector function name; null means no replay exists yet. */
 internal object ChartVectorReplay {
-    private val families: List<(String, Map<String, JsonValue>) -> JsonValue?> = listOf(::core, ::cartesian, ::partWhole, ::matrixFlow)
+    private val families: List<(String, Map<String, JsonValue>) -> JsonValue?> = listOf(::core, ::cartesian, ::partWhole, ::matrixFlow, ::geo)
 
     fun replay(fn: String, input: Map<String, JsonValue>): JsonValue? = families.firstNotNullOfOrNull { it(fn, input) }
 
@@ -248,6 +248,18 @@ internal object ChartVectorReplay {
                 "links" to J.list(links.map { optional("source" to J.of(it.source), "target" to J.of(it.target), "value" to it.value?.let(J::of), "sourceIndex" to J.of(it.sourceIndex), "targetIndex" to J.of(it.targetIndex), "path" to J.of(it.path)) }),
             )
         }
+        else -> null
+    }
+
+    private fun geo(fn: String, i: Map<String, JsonValue>): JsonValue? = when (fn) {
+        "geoCells" -> {
+            val shape = J.arr(i["shape"]).map { t -> J.obj(t).let { GeoTile(J.str(it["id"]), J.str(it["label"]), J.str(it["abbr"]), J.num(it["col"]), J.num(it["row"])) } }
+            J.list(geoCells(shape, J.num(i["width"]), J.num(i["height"]), J.num(i["gap"])).map {
+                J.obj("id" to J.of(it.tile.id), "label" to J.of(it.tile.label), "abbr" to J.of(it.tile.abbr), "col" to J.of(it.tile.col), "row" to J.of(it.tile.row), "x" to J.of(it.x), "y" to J.of(it.y), "size" to J.of(it.size))
+            })
+        }
+        "geoColorIndex" -> geoColorIndex(J.numOrNull(i["value"]), J.arr(i["values"]).map(J::numOrNull))?.let(J::of) ?: JsonValue.Null
+        "clampGeoOffset" -> J.of(clampGeoOffset(J.numOrNull(i["value"])))
         else -> null
     }
 }

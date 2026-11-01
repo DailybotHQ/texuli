@@ -23,6 +23,13 @@ import {
   xDomain,
 } from '../packages/charts/src/cartesian/model.ts';
 import { networkLayout } from '../packages/charts/src/flow/model.ts';
+import {
+  clampGeoOffset,
+  geoCells,
+  geoColorIndex,
+  REGION_TILES,
+  WORLD_TILES,
+} from '../packages/charts/src/geo/model.ts';
 import { minMaxBuckets } from '../packages/charts/src/math/downsample/min-max.ts';
 import {
   bandScale,
@@ -642,9 +649,35 @@ function matrixFlowCases(): VectorCase[] {
   return cases;
 }
 
+function geoCases(): VectorCase[] {
+  const cases: VectorCase[] = [];
+  const add = (fn: string, input: unknown, output: unknown) =>
+    cases.push({ fn, input: json(input), output: json(output) });
+  for (const [shape, width, height, gap] of [
+    [WORLD_TILES, 560, 320, 4],
+    [REGION_TILES, 300, 480, 2],
+    [[{ id: 'odd', label: 'Odd', abbr: 'OD', col: 2.7, row: -1 }], 100, 100, 4],
+  ] as const)
+    add('geoCells', { shape, width, height, gap }, geoCells(shape, width, height, gap));
+  const values = [12, null, 40, 7.5, 40];
+  for (const value of [12, null, 40, 7.5, 26])
+    add('geoColorIndex', { value, values }, geoColorIndex(value, values));
+  add('geoColorIndex', { value: 3, values: [3, 3] }, geoColorIndex(3, [3, 3]));
+  add('geoColorIndex', { value: 3, values: [null] }, geoColorIndex(3, [null]));
+  for (const value of [0.2, 0.9, -3, null])
+    add('clampGeoOffset', { value }, clampGeoOffset(value ?? undefined));
+  return cases;
+}
+
 /** Every case, in a stable order: the shared core first, then each family's model. */
 export function buildVectors(): VectorCase[] {
-  return [...coreCases(), ...cartesianLayoutCases(), ...partWholeCases(), ...matrixFlowCases()];
+  return [
+    ...coreCases(),
+    ...cartesianLayoutCases(),
+    ...partWholeCases(),
+    ...matrixFlowCases(),
+    ...geoCases(),
+  ];
 }
 
 export function renderVectors(cases: readonly VectorCase[], root = ROOT): string {

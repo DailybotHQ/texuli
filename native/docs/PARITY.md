@@ -12,20 +12,20 @@ every other component paints a visible placeholder. Native is in development.
 | Measure | Count |
 | --- | --- |
 | Catalog components | 168 |
-| Painted natively | 38 |
-| Placeholder natively | 130 |
+| Painted natively | 40 |
+| Placeholder natively | 128 |
 | Agent-emittable components | 75 |
-| Agent-emittable and painted natively | 38 |
+| Agent-emittable and painted natively | 40 |
 | Painted read-only (interactive on the web) | 0 |
 | Components with a shared semantic rule | 37 |
 | Golden traces (web = native) | 15 |
 | Components covered by a golden trace | 34 |
-| Parity fixture traces (web = native) | 4 |
-| Components covered by any trace | 54 |
+| Parity fixture traces (web = native) | 5 |
+| Components covered by any trace | 56 |
 
 So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes**
 (validation, label interpolation and the golden semantic traces match); **for painting, not yet**
-(38 of 168 components).
+(40 of 168 components).
 
 ## Capabilities
 
@@ -49,7 +49,7 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | canvas | 1 | 0 |
 | chat | 2 | 0 |
 | composition | 4 | 4 |
-| content | 35 | 28 |
+| content | 35 | 30 |
 | data | 12 | 0 |
 | display | 17 | 0 |
 | documents | 1 | 0 |
@@ -97,8 +97,8 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `charts-donut` | content | yes | renders | painted | yes | yes | yes |
 | `charts-funnel` | content | yes | renders | painted | yes | — | yes |
 | `charts-gauge` | content | yes | renders | painted | yes | yes | yes |
-| `charts-geo-map` | content | yes | renders | placeholder | yes | — | — |
-| `charts-geo-point-map` | content | yes | renders | placeholder | yes | — | — |
+| `charts-geo-map` | content | yes | renders | painted | yes | — | yes |
+| `charts-geo-point-map` | content | yes | renders | painted | yes | — | yes |
 | `charts-heatmap` | content | yes | renders | painted | yes | — | yes |
 | `charts-line` | content | yes | renders | painted | yes | yes | yes |
 | `charts-network` | content | yes | renders | painted | yes | — | yes |

@@ -58,6 +58,7 @@ internal sealed interface Ink {
     data object Grid : Ink
     data object Axis : Ink
     data object Surface : Ink
+    data object Muted : Ink
 }
 
 internal sealed interface Mark {
@@ -100,6 +101,7 @@ private fun Ink.color(palette: List<Color>, grid: Color, axis: Color, surface: C
     Ink.Grid -> grid
     Ink.Axis -> axis
     Ink.Surface -> surface
+    Ink.Muted -> rampLow
 }
 
 /** Draws a scene laid out at the available width (the web's charts measure their width too). */
