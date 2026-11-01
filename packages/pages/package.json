@@ -1,6 +1,6 @@
 {
   "name": "@texuli/pages",
-  "version": "0.11.2",
+  "version": "0.11.3",
   "private": true,
   "description": "Block document editor and reader for Texuli on @texuli/document: text through @texuli/editor, a slash menu, block drag, nested pages, columns and live embeds painted by the player.",
   "keywords": [
@@ -91,15 +91,15 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/blocks": "0.11.2",
-    "@texuli/core": "0.11.2",
-    "@texuli/document": "0.11.2",
-    "@texuli/drag": "0.11.2",
-    "@texuli/editor": "0.11.2",
-    "@texuli/player": "0.11.2",
-    "@texuli/primitives": "0.11.2",
-    "@texuli/tokens": "0.11.2",
-    "texuli": "0.11.2"
+    "@texuli/blocks": "0.11.3",
+    "@texuli/core": "0.11.3",
+    "@texuli/document": "0.11.3",
+    "@texuli/drag": "0.11.3",
+    "@texuli/editor": "0.11.3",
+    "@texuli/player": "0.11.3",
+    "@texuli/primitives": "0.11.3",
+    "@texuli/tokens": "0.11.3",
+    "texuli": "0.11.3"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

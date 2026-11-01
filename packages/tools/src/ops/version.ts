@@ -6,4 +6,4 @@
  * plain JSON import breaks Node ESM. `tests/ops.test.ts` fails when this
  * drifts from `packages/tools/package.json`.
  */
-export const TOOLS_VERSION = '0.11.2';
+export const TOOLS_VERSION = '0.11.3';

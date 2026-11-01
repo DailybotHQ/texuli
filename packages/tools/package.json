@@ -1,6 +1,6 @@
 {
   "name": "@texuli/tools",
-  "version": "0.11.2",
+  "version": "0.11.3",
   "private": true,
   "description": "Agent and developer tools: the copy-in CLI, the MCP server, custom elements, adapters and the golden set.",
   "keywords": [
@@ -98,14 +98,14 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@texuli/core": "0.11.2",
-    "@texuli/catalog": "0.11.2",
-    "@texuli/tokens": "0.11.2",
-    "@texuli/blocks": "0.11.2",
-    "@texuli/charts": "0.11.2",
-    "@texuli/media": "0.11.2",
-    "@texuli/deck": "0.11.2",
-    "@texuli/document": "0.11.2"
+    "@texuli/core": "0.11.3",
+    "@texuli/catalog": "0.11.3",
+    "@texuli/tokens": "0.11.3",
+    "@texuli/blocks": "0.11.3",
+    "@texuli/charts": "0.11.3",
+    "@texuli/media": "0.11.3",
+    "@texuli/deck": "0.11.3",
+    "@texuli/document": "0.11.3"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"
