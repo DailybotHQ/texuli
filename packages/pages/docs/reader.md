@@ -25,6 +25,7 @@ editing code.
 | `outline` | `true` | Show the outline `nav` when there are at least `outlineMin` headings |
 | `outlineMin` | `2` | Fewer headings show no outline |
 | `anchorPrefix` | `''` | Prefix for heading ids, so two readers on one page never share an id |
+| `anchorFor` | — | The host's own anchor for a heading (`HeadingAnchorFor`, for example `(block) => block.id`), so existing `#` links keep resolving; see "Outline and anchors" |
 | `headingOffset` | `0` | Added to every heading level (clamped to 6), for a reader under a page heading |
 | `trail`, `onNavigate`, `pageHref` | — | The breadcrumb and page links, as in the editor (`PageRef`) |
 | `resolveEmbed`, `resolveMedia`, `deckHost` | — | Embeds and media, as in the editor (`EmbedResolver`, `MediaResolver`) |
@@ -114,11 +115,19 @@ take no `loadLibraryBase`.
 
 ## Outline and anchors
 
-`documentOutline(doc, { prefix })` returns every heading in reading order
-(inside callouts, toggles, quotes and columns too) as an `OutlineEntry`
-(`id`, `anchor`, `level`, `text`). Anchors are `slugify(text)` (folded, lower
-case, `a-z`, `0-9` and dashes, at most 64 characters; `section` when empty),
-made unique with `-2`, `-3`… One iterative walk, linear in the document.
+`documentOutline(doc, { prefix, anchorFor })` (`DocumentOutlineOptions`)
+returns every heading in reading order (inside callouts, toggles, quotes and
+columns too) as an `OutlineEntry` (`id`, `anchor`, `level`, `text`). Anchors
+are `slugify(text)` (folded, lower case, `a-z`, `0-9` and dashes, at most 64
+characters; `section` when empty), made unique with `-2`, `-3`…
+
+`anchorFor` (`HeadingAnchorFor`, `(block) => string | null | undefined`,
+from `0.11.3`) lets a host keep its own anchors: a returned id that starts
+with a letter, has only letters, digits, `_` and `-`, is at most 64
+characters and is not already taken becomes the anchor (after `prefix`);
+anything else, a throw included, falls back to the slug. The reader, the
+paged view and the outline use the same anchors. One iterative walk,
+linear in the document.
 
 ## Shared exports
 

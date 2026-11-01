@@ -19,7 +19,7 @@ import {
 } from '@texuli/document/paged';
 import type { DeckPlayerHost } from '@texuli/player';
 import { tick } from 'svelte';
-import { documentOutline } from '../reader/outline.ts';
+import { documentOutline, type HeadingAnchorFor } from '../reader/outline.ts';
 import ReaderBlocks from '../reader/ReaderBlocks.svelte';
 import { blockPainter, type PagesBlockHost, type PagesBlockSnippet } from '../shared/block-host.ts';
 import type { EmbedResolver } from '../shared/embeds.ts';
@@ -51,6 +51,12 @@ interface Props {
   fit?: boolean;
   /** Prefix for heading anchors, so two views on one page never share an id. */
   anchorPrefix?: string;
+  /**
+   * The host's own anchor for a heading (for example `(block) => block.id`),
+   * used when it is fragment-safe and unique; otherwise the slug. The outline
+   * and the headings always agree.
+   */
+  anchorFor?: HeadingAnchorFor;
   /** Called with every new layout (page count, slices). */
   onLayout?: (layout: PagedLayout) => void;
   onNavigate?: (ref: string) => void;
@@ -94,6 +100,7 @@ let {
   isolate = true,
   fit = true,
   anchorPrefix = 'paged-',
+  anchorFor,
   onLayout,
   onNavigate,
   pageHref,
@@ -116,7 +123,12 @@ const px = (points: number) => points * PX_PER_PT;
 const contentWidth = $derived(px(geometry.contentWidth));
 const name = $derived(pageName(geometry));
 const anchors = $derived(
-  new Map(documentOutline(doc, { prefix: anchorPrefix }).map((entry) => [entry.id, entry.anchor]))
+  new Map(
+    documentOutline(doc, { prefix: anchorPrefix, anchorFor }).map((entry) => [
+      entry.id,
+      entry.anchor,
+    ])
+  )
 );
 const NO_ANCHORS: ReadonlyMap<string, string> = new Map();
 

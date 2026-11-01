@@ -36,5 +36,11 @@ export { loadPagesLibraryBase } from '../shared/library-base.ts';
 export { type MediaResolver, mediaSource, pageLinkHref } from '../shared/media.ts';
 export type { PagesPlayerLoader, PagesPlayerModule } from '../shared/player-loader.ts';
 export type { PageRef } from '../shared/types.ts';
-export { documentOutline, type OutlineEntry, slugify } from './outline.ts';
+export {
+  type DocumentOutlineOptions,
+  documentOutline,
+  type HeadingAnchorFor,
+  type OutlineEntry,
+  slugify,
+} from './outline.ts';
 export { default as PageReaderCore } from './PageReaderCore.svelte';

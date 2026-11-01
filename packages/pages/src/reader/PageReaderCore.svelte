@@ -19,7 +19,7 @@ import { type PagesLabels, resolvePagesLabels } from '../shared/labels.ts';
 import type { MediaResolver } from '../shared/media.ts';
 import type { PagesPlayerLoader } from '../shared/player-loader.ts';
 import type { PageRef } from '../shared/types.ts';
-import { documentOutline } from './outline.ts';
+import { documentOutline, type HeadingAnchorFor } from './outline.ts';
 import ReaderBlocks from './ReaderBlocks.svelte';
 import '../styles.css';
 
@@ -32,6 +32,12 @@ interface Props {
   outlineMin?: number;
   /** Prefix for heading anchors, so two readers on one page never share an id. */
   anchorPrefix?: string;
+  /**
+   * The host's own anchor for a heading (for example `(block) => block.id`),
+   * used when it is fragment-safe and unique; otherwise the slug. The outline
+   * and the headings always agree.
+   */
+  anchorFor?: HeadingAnchorFor;
   /** Added to every heading level (1 makes a level-1 heading an `h2`). */
   headingOffset?: number;
   trail?: readonly PageRef[];
@@ -89,6 +95,7 @@ let {
   outline = true,
   outlineMin = 2,
   anchorPrefix = '',
+  anchorFor,
   headingOffset = 0,
   trail = [],
   onNavigate,
@@ -109,7 +116,7 @@ let {
 const painter = $derived(blockPainter(blockHost, renderBlock));
 
 const labels = $derived(resolvePagesLabels(labelOverrides));
-const entries = $derived(documentOutline(doc, { prefix: anchorPrefix }));
+const entries = $derived(documentOutline(doc, { prefix: anchorPrefix, anchorFor }));
 const anchors = $derived(new Map(entries.map((entry) => [entry.id, entry.anchor])));
 const title = $derived(doc.meta.title);
 

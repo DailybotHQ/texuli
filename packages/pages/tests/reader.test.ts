@@ -29,6 +29,27 @@ describe('reader outline', () => {
     expect(slugify('x'.repeat(500))).toHaveLength(64);
   });
 
+  it('keeps the host anchor from anchorFor when it is fragment-safe and unique (G132)', () => {
+    const page = doc([
+      { id: 'overview', type: 'heading', level: 2, content: text('Where we stand') },
+      { id: 'overview2', type: 'heading', level: 2, content: text('Where we stand') },
+      { id: 'bad id', type: 'heading', level: 2, content: text('Unsafe id') },
+      { id: 'dup', type: 'heading', level: 2, content: text('Duplicate') },
+    ]);
+    const anchorFor = (block: { id: string }) => (block.id === 'dup' ? 'overview' : block.id);
+    expect(documentOutline(page, { anchorFor }).map((entry) => entry.anchor)).toEqual([
+      'overview',
+      'overview2',
+      'unsafe-id',
+      'duplicate',
+    ]);
+    expect(documentOutline(page, { prefix: 'doc-', anchorFor })[0]?.anchor).toBe('doc-overview');
+    const throwing = () => {
+      throw new Error('host bug');
+    };
+    expect(documentOutline(page, { anchorFor: throwing })[0]?.anchor).toBe('where-we-stand');
+  });
+
   it('stays linear on many headings', () => {
     const blocks = Array.from({ length: 2_000 }, (_, i) => ({
       id: `h${i}`,
@@ -62,6 +83,20 @@ describe('PageReader', () => {
     ]);
     expect(article.querySelector('aside')?.textContent).toContain('Inside the callout');
     expect(article.querySelectorAll('.tx-pages-column')).toHaveLength(2);
+  });
+
+  it('renders host anchors on the headings and in the outline alike (G132)', () => {
+    const page = doc([
+      { id: 'overview', type: 'heading', level: 2, content: text('Where we stand') },
+      { id: 'next', type: 'heading', level: 2, content: text('Next steps') },
+    ]);
+    render(PageReader, { props: { document: page, anchorFor: (block) => block.id } });
+    expect(screen.getByRole('heading', { level: 2, name: 'Where we stand' }).id).toBe('overview');
+    const outline = screen.getByRole('navigation', { name: 'On this page' });
+    expect(Array.from(outline.querySelectorAll('a')).map((a) => a.getAttribute('href'))).toEqual([
+      '#overview',
+      '#next',
+    ]);
   });
 
   it('renders marks sink-free and links through the URL policy', () => {

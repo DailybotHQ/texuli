@@ -41,6 +41,7 @@ model, at the page size.
 | `isolate` | `true` | Mark the view as the print target (`data-tx-print-isolate`): while it is mounted, printing prints only it |
 | `fit` | `true` | Scale the sheets down (CSS `zoom`) to fit narrow containers on screen; print is always 1:1 |
 | `anchorPrefix` | `'paged-'` | Prefix for heading ids, so a reader and a paged view on one page never share an id |
+| `anchorFor` | — | The host's own heading anchors, as in the reader (`HeadingAnchorFor`) |
 | `onLayout` | — | Called with every new `PagedLayout` (pages and slices) |
 | `onNavigate`, `pageHref` | — | Page links, as in the reader |
 | `resolveEmbed`, `resolveMedia`, `deckHost` | — | Embeds and media, as in the reader |
