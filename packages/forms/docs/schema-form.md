@@ -91,7 +91,8 @@ Each field is the texuli control for its type: `Input` (text, email, url,
 number; password with a reveal toggle; otp), `Textarea`, `DatePicker`,
 `TimeField` (datetime is both), `Select`, `RadioGroup`, `Checkbox` (also
 each choice of a multiselect), `Switch`, `Slider`, `TagsInput`,
-`ColorPicker` and `FileUpload`; a `custom` field is the host's. Text-like controls sit in a texuli `Field`,
+`ColorPicker` and `FileUpload`; a `custom` field is the host's. A text field with `format: 'phone'` renders
+`type="tel"` with `inputmode="tel"`, so phones open the dial pad (G131, from `0.11.3`). Text-like controls sit in a texuli `Field`,
 so by the Field rule the label, description and error reach the focusable
 control (`<label for>`, `aria-describedby`, `aria-invalid`); radio and
 multiselect are a `fieldset` with a `legend`; checkbox and switch carry

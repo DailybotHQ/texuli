@@ -20,7 +20,7 @@ import { type EditorMark, normalizeInline, sortMarks } from '@texuli/core/editor
 import type { HrefTrust } from '@texuli/core/url-policy';
 import { DOCUMENT_FORMAT, DOCUMENT_FORMAT_VERSION, DOCUMENT_LIMITS as L } from '../model/limits.ts';
 import type { DocumentInline, DocumentNode, TexuliDocument } from '../model/types.ts';
-import { validateDocument } from '../schema/validate.ts';
+import { validateDocument } from '../schema/index.ts';
 import { type ItemId, type Replica, ROOT, type SyncJson, type SyncTextRun } from '../sync/index.ts';
 import {
   acceptsChild,

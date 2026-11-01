@@ -6,7 +6,6 @@
  * at that tier.
  */
 import { type HrefTrust, safeHref, safeImageSrc } from '@texuli/core/url-policy';
-import { parseDeck } from '@texuli/deck/model';
 import { type RefineContext, type Schema, t } from '@texuli/deck/schema';
 import { childrenOf, ownText, walkDocument } from '../model/document.ts';
 import {
@@ -87,7 +86,7 @@ export function jsonBytes(value: unknown, cap = Number.POSITIVE_INFINITY): numbe
   return bytes;
 }
 
-function build(trust: HrefTrust): Schema {
+function build(trust: HrefTrust, validateDeck: DeckPayloadValidator | null): Schema {
   const id = t.string({
     min: 1,
     max: L.id,
@@ -223,7 +222,7 @@ function build(trust: HrefTrust): Schema {
       description:
         'Exactly one of ref and inline; inline components are one catalog node, inline decks are deck model v2.',
       check(value, context) {
-        checkEmbed(value as unknown as EmbedBlock, context);
+        checkEmbed(value as unknown as EmbedBlock, context, validateDeck);
       },
     }
   );
@@ -410,7 +409,11 @@ function build(trust: HrefTrust): Schema {
   });
 }
 
-function checkEmbed(value: EmbedBlock, context: RefineContext): void {
+function checkEmbed(
+  value: EmbedBlock,
+  context: RefineContext,
+  validateDeck: DeckPayloadValidator | null
+): void {
   const hasRef = value.ref !== undefined;
   const hasInline = value.inline !== undefined;
   if (hasRef === hasInline) {
@@ -442,7 +445,26 @@ function checkEmbed(value: EmbedBlock, context: RefineContext): void {
         fix: 'Use a kebab-case catalog id and an optional props object; children are not allowed.',
       });
   } else if (value.kind === 'deck') {
-    const result = parseDeck(payload);
+    if (!validateDeck) {
+      context.issue({
+        code: C.invalidDeck,
+        message: 'Inline decks are not validated by this entry.',
+        path: ['inline'],
+        fix: 'Pass validateDeck (checkDeckPayload from @texuli/document/schema), or embed the deck by ref.',
+      });
+      return;
+    }
+    let result: DeckPayloadResult;
+    try {
+      result = validateDeck(payload);
+    } catch {
+      result = {
+        ok: false,
+        issues: [
+          { code: 'deck-check', message: 'The deck check failed.', path: [], severity: 'error' },
+        ],
+      };
+    }
     if (!result.ok) {
       for (const issue of result.issues.filter((entry) => entry.severity === 'error').slice(0, 20))
         context.issue({
@@ -537,15 +559,44 @@ function childKeyOf(node: DocumentNode): string {
   return 'blocks';
 }
 
-const cache = new Map<HrefTrust, Schema>();
+/** One issue of an inline deck payload, as `parseDeck` reports it. */
+export interface DeckPayloadIssue {
+  code: string;
+  message: string;
+  path: readonly (string | number)[];
+  severity: 'error' | 'warning' | 'info';
+  fix?: string;
+}
 
-/** The document schema for a URL tier (`untrusted` by default). Built once per tier. */
-export function documentSchema(trust: HrefTrust = 'untrusted'): Schema<TexuliDocument> {
+export type DeckPayloadResult = { ok: true } | { ok: false; issues: readonly DeckPayloadIssue[] };
+
+/** Validates an inline deck payload (`checkDeckPayload` wraps `parseDeck` from `@texuli/deck/model`). */
+export type DeckPayloadValidator = (payload: unknown) => DeckPayloadResult;
+
+// Keyed weakly by the validator, so a host's validators never pile up.
+const cache = new WeakMap<object, Map<HrefTrust, Schema>>();
+const NO_DECKS = {};
+
+/**
+ * The document schema for a URL tier (`untrusted` by default), with inline
+ * decks checked by `validateDeck` or, without one, refused. Built once per
+ * tier and validator.
+ */
+export function documentSchemaCore(
+  trust: HrefTrust = 'untrusted',
+  validateDeck: DeckPayloadValidator | null = null
+): Schema<TexuliDocument> {
   const tier: HrefTrust = trust === 'developer' ? 'developer' : 'untrusted';
-  let schema = cache.get(tier);
+  const key = validateDeck ?? NO_DECKS;
+  let tiers = cache.get(key);
+  if (!tiers) {
+    tiers = new Map();
+    cache.set(key, tiers);
+  }
+  let schema = tiers.get(tier);
   if (!schema) {
-    schema = build(tier);
-    cache.set(tier, schema);
+    schema = build(tier, validateDeck);
+    tiers.set(tier, schema);
   }
   return schema as Schema<TexuliDocument>;
 }

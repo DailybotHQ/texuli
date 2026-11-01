@@ -24,13 +24,14 @@ end to end and native for agents:
 
 **Status: in development, pre-1.0.** All 26 published packages (all of
 `packages/` except `@texuli/examples`) are released on npm in the 0.11 line,
-every one at `0.11.2`, which the publish workflow publishes from `main`
+every one at `0.11.3`, which the publish workflow publishes from `main`
 after the merge and points `latest` and `next` to; `0.10.0` added design
 systems (one JSON document per brand, [DESIGN_SYSTEMS](docs/DESIGN_SYSTEMS.md))
 and `0.11.0` added the Protoyard gaps G125–G127 and the Final Review fixes;
-`0.11.1` and `0.11.2` are patches (forms concurrent `next()` and the
-`applyDesignSystem` variant check; square theme radii keep `0px` and a
-password field may take `autocomplete` `off`).
+`0.11.1` to `0.11.3` are patches with fixes and additive Protoyard gaps
+(G128–G134: square theme radii keep `0px`, password `autocomplete` `off`,
+host heading anchors, `@texuli/document/schema-core`, telephone inputs, and
+live `disabled` and `readOnly` in `SchemaForm`).
 `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/editor`,
 `@texuli/document`, `@texuli/pages`, `@texuli/forms`, `@texuli/canvas`,
 `@texuli/sheets` and `@texuli/mcp` are still in development
@@ -79,8 +80,8 @@ texuli/
 ├── packages/            layers point down only (scripts/check-layers.ts)
 │   ├── core/            L0 @texuli/core: texels (overlay engine, roving, positioning, URL policy…)  (README, docs/)
 │   ├── date/            L0 @texuli/date: Gregorian date arithmetic and locale week starts      (README)
-│   ├── deck/            L0 @texuli/deck: deck model v2 from JSON or Markdown, engine, authoring (in development, on npm as 0.11.2) (README, docs/)
-│   ├── drag/            L0 @texuli/drag: framework-free drag engine (in development, on npm as 0.11.2) (README, docs/)
+│   ├── deck/            L0 @texuli/deck: deck model v2 from JSON or Markdown, engine, authoring (in development, on npm as 0.11.3) (README, docs/)
+│   ├── drag/            L0 @texuli/drag: framework-free drag engine (in development, on npm as 0.11.3) (README, docs/)
 │   ├── primitives/      L1 @texuli/primitives: 42 owned headless primitives, APG patterns      (README, docs/)
 │   ├── document/        L1 @texuli/document: block document engine, ops, Markdown, CRDT sync (in development, on npm since 0.7.0) (README, docs/)
 │   ├── tokens/          L2 @texuli/tokens: OKLCH theme engine, --tx-* contract, 200+ themes, CSS (README, docs/)
@@ -219,8 +220,8 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     `@texuli/deck`, `@texuli/editor`, `@texuli/document`, `@texuli/pages`,
     `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets` and `@texuli/mcp`
     are still in development, and the blueprint spec in
-    `@texuli/spec@0.11.2` is `0.10.0`. `@texuli/examples`, the apps and
-    `native/` publish nothing. 0.11.2 is a pre-1.0 release, not stable
+    `@texuli/spec@0.11.3` is `0.10.0`. `@texuli/examples`, the apps and
+    `native/` publish nothing. 0.11.3 is a pre-1.0 release, not stable
     (1.0.0 will be the first stable release; `latest` tracks the newest
     release). texuli.com deploys from `main` (Cloudflare Pages), with the
     remote MCP at `https://texuli.com/mcp`; the agent service is not

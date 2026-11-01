@@ -39,12 +39,12 @@ the same pieces are safe to hand to a machine.
 > **Status: in development, pre-1.0.** The screenshot above is the
 > texuli.com website, which deploys from `main` to Cloudflare Pages. The 26
 > published packages are released on npm in the 0.11 line,
-> every one at `0.11.2` (published by CI with provenance; `latest` and `next` point to
+> every one at `0.11.3` (published by CI with provenance; `latest` and `next` point to
 > it); `0.10.0` added design systems, `0.11.0` added the Protoyard gaps
-> G125–G127 and the Final Review fixes, and `0.11.1` and `0.11.2` are
-> patches (forms concurrent `next()` and the `applyDesignSystem` variant
-> check; square theme radii keep `0px` and a password field may take
-> `autocomplete` `off`). It is not a stable release:
+> G125–G127 and the Final Review fixes, and `0.11.1` to `0.11.3` are
+> patches with fixes and additive Protoyard gaps (G128–G134: square theme
+> radii, password `autocomplete` `off`, host heading anchors,
+> `@texuli/document/schema-core`, telephone inputs, live `disabled`). It is not a stable release:
 > under 0.x a new minor may contain breaking changes, and 1.0.0 will be
 > the first stable release.
 > The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).

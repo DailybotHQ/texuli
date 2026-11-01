@@ -11,7 +11,7 @@ language in `@texuli/core/expression`, and no schema carries a regular
 expression or code.
 
 > **Status: in development (pre-1.0).** `@texuli/forms` is published on
-> npm as `0.11.2`, with provenance (first published as `0.8.0`; built in PLAN_010,
+> npm as `0.11.3`, with provenance (first published as `0.8.0`; built in PLAN_010,
 > ADR-015 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
 > Under 0.x a new minor (`0.12.0`) may contain breaking changes, so pin the

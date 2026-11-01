@@ -1,6 +1,6 @@
 {
   "name": "@texuli/document",
-  "version": "0.11.2",
+  "version": "0.11.3",
   "private": true,
   "description": "Framework-free, DOM-free document engine for Texuli: the block document format with persisted ids, the untrusted validator, typed operations and bounded RFC 6902 patches with undo, Markdown through the core codec, and the CRDT sync core.",
   "keywords": [
@@ -36,6 +36,10 @@
       "types": "./src/schema/index.ts",
       "default": "./src/schema/index.ts"
     },
+    "./schema-core": {
+      "types": "./src/schema/core.ts",
+      "default": "./src/schema/core.ts"
+    },
     "./ops": {
       "types": "./src/ops/index.ts",
       "default": "./src/ops/index.ts"
@@ -66,8 +70,8 @@
     }
   },
   "dependencies": {
-    "@texuli/core": "0.11.2",
-    "@texuli/deck": "0.11.2"
+    "@texuli/core": "0.11.3",
+    "@texuli/deck": "0.11.3"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"

@@ -7,8 +7,8 @@
  */
 import type { HrefTrust } from '@texuli/core/url-policy';
 import type { TexuliDocument } from '../model/types.ts';
+import { validateDocument } from '../schema/index.ts';
 import type { DocumentDiagnostic } from '../schema/validate.ts';
-import { validateDocument } from '../schema/validate.ts';
 import { cloneData, equalData, isUnsafeKey } from './clone.ts';
 
 export type DocumentPatchOperation =

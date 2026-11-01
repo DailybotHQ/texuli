@@ -16,6 +16,7 @@ const DOCS_URL = 'https://github.com/DailybotHQ/texuli/blob/main/packages/docume
 const SUBPATH_DOCS: Record<string, { doc: string; entry: string }> = {
   './model': { doc: 'docs/model.md', entry: 'src/model/index.ts' },
   './schema': { doc: 'docs/schema.md', entry: 'src/schema/index.ts' },
+  './schema-core': { doc: 'docs/schema-core.md', entry: 'src/schema/core.ts' },
   './ops': { doc: 'docs/ops.md', entry: 'src/ops/index.ts' },
   './markdown': { doc: 'docs/markdown.md', entry: 'src/markdown/index.ts' },
   './paged': { doc: 'docs/paged.md', entry: 'src/paged/index.ts' },
