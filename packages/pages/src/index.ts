@@ -6,7 +6,9 @@
  */
 export * from './editor/index.ts';
 export {
+  type DocumentOutlineOptions,
   documentOutline,
+  type HeadingAnchorFor,
   type OutlineEntry,
   PageReader,
   PageReaderCore,
