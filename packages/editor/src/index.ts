@@ -29,4 +29,4 @@ export {
 } from './paste/index.ts';
 export { EditorToolbar } from './toolbar/index.ts';
 
-export const EDITOR_PACKAGE_VERSION = '0.11.3';
+export const EDITOR_PACKAGE_VERSION = '0.11.4';

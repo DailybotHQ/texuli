@@ -13,6 +13,8 @@ import {
   loadLibraryBase,
   resolveDesignSystemSync,
 } from '../src/design-system/compile.ts';
+import { fromThemeWithReport as fromThemeDocument } from '../src/design-system/from-theme.ts';
+import { importTheme } from '../src/design-system/import.ts';
 import { validateDesignSystem } from '../src/design-system/validate.ts';
 import { generateThemeFromSeed } from '../src/generator/seed.ts';
 import { loadAllFullLibraryThemes } from '../src/library-expand/index.ts';
@@ -35,6 +37,36 @@ function resolved(vars: Record<string, string>): Record<string, string> {
 }
 
 describe('fromTheme: the zero-drift bridge', () => {
+  it('always compiles: pins every role and drops the pins below the guarantees, as losses (G135)', () => {
+    const base = generateThemeFromSeed({ seed: '#0284c7' });
+    // A light input edge below 3:1 made the solver darken the page under it,
+    // and a dark strong border below 3:1 was kept as pinned.
+    const theme = structuredClone(base);
+    theme.light.input = { ...base.light.input, default: '#e2e8f0' };
+    theme.dark.borderStrong = { ...base.dark.borderStrong, default: '#1e293b' };
+    expect(compileDesignSystem(fromThemeDocument(theme).document).ok).toBe(false);
+    const { document, losses } = fromThemeWithReport(theme);
+    const compiled = compileDesignSystem(document);
+    if (!compiled.ok) throw new Error(JSON.stringify(compiled.errors[0]));
+    expect(losses.map((loss) => loss.path)).toEqual([
+      '$.color.roles.light.input',
+      '$.color.roles.dark.borderStrong',
+    ]);
+    expect(losses[0]?.reason).toMatch(/contrast guarantee/);
+    // The page and its text keep the theme's colors.
+    expect(compiled.vars.light?.['--tx-background']).toBe(base.light.background.default);
+    expect(compiled.vars.light?.['--tx-foreground']).toBe(base.light.foreground.default);
+    expect(compileDesignSystem(fromTheme(theme)).ok).toBe(true);
+    // importTheme takes the compiling bridge, its drops as lossy warnings.
+    const imported = importTheme(theme, { fromTheme: fromThemeWithReport });
+    if (!imported.ok) throw new Error(JSON.stringify(imported.errors.slice(0, 2)));
+    expect(compileDesignSystem(imported.document).ok).toBe(true);
+    expect(imported.warnings.filter((w) => w.code === 'lossy').map((w) => w.path)).toEqual([
+      '$.color.roles.light.input',
+      '$.color.roles.dark.borderStrong',
+    ]);
+  });
+
   it('keeps a unit on a square radius, so calc(var(--tx-radius) + 2px) stays valid (G128)', async () => {
     const themes = await loadAllFullLibraryThemes();
     const square = themes.filter(

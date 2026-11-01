@@ -10,7 +10,7 @@ the URL policy. It is part of [Texuli](https://texuli.com), "Small pieces.
 Infinite possibilities.": an MIT Svelte 5 component library by Dailybot, Inc.
 
 > **Status: in development (pre-1.0).** `@texuli/editor` is published on
-> npm as `0.11.3`, with provenance (first published as `0.5.0`; the publish
+> npm as `0.11.4`, with provenance (first published as `0.5.0`; the publish
 > workflow publishes it after `texuli`). Under 0.x a new minor (`0.12.0`) may contain
 > breaking changes, so pin the exact version or use `^0.11.0`, which accepts
 > only 0.11.x. The architecture

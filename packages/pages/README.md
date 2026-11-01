@@ -11,7 +11,7 @@ Every edit is a `@texuli/document` operation in one op log, so undo, redo,
 persistence and sync share one history.
 
 > **Status: in development (pre-1.0).** `@texuli/pages` is published on npm
-> as `0.11.3`, with provenance (first published as `0.7.0`, with `@texuli/document`;
+> as `0.11.4`, with provenance (first published as `0.7.0`, with `@texuli/document`;
 > built in PLAN_010, ADR-011 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
 > Under 0.x a new minor (`0.12.0`) may contain breaking changes, so pin the

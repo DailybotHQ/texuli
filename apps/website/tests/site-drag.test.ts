@@ -39,7 +39,7 @@ const SOURCES = [
 afterEach(() => cleanup());
 
 describe('drag and workflows pages: copy and safety', () => {
-  it('say "in development" for both packages and name the published 0.11.3 pre-release', () => {
+  it('say "in development" for both packages and name the published 0.11.4 pre-release', () => {
     for (const [page, name] of [
       [DRAG_PAGE, 'drag'],
       [WORKFLOWS_PAGE, 'workflows'],
@@ -47,7 +47,7 @@ describe('drag and workflows pages: copy and safety', () => {
       const copy = page.replace(/\s+/g, ' ');
       expect(copy).toContain(`@texuli/${name} · in development`);
       expect(copy).toContain(
-        `<code>@texuli/${name}</code> is in development and on npm as <code>0.11.3</code>, a pre-1.0 release.`
+        `<code>@texuli/${name}</code> is in development and on npm as <code>0.11.4</code>, a pre-1.0 release.`
       );
       expect(copy).not.toMatch(/not (?:yet )?on npm/);
     }

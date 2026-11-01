@@ -163,6 +163,18 @@ so a hand-made theme with custom states, a radius over 48 px, an unnamed
 easing or component hooks loses those fields; `fromThemeWithReport` lists
 them.
 
+The document always compiles (from `0.11.4`, Protoyard G135). A theme's own colors can fall below the compiler's guarantees (a text
+role on its surface below the text minimum, an input edge or strong border
+below 3:1), and a pinned role never moves; the solver would instead move the
+unpinned page colors around it. So when the first document does not
+compile, every role is pinned, and each pin a contrast error names is
+dropped, one per failing pair a round, so the compiler derives that role;
+every drop is in the report with the error that caused it. A theme that
+compiles as it is, every library theme included, is returned unchanged.
+`importTheme` takes the bridge as `fromTheme` (`ImportThemeOptions`): the
+import entry defaults to the one without the compiler, and `ds.import`
+passes this one.
+
 ## Codes
 
 The spec's codes (`unknown-key`, `invalid-type`, `invalid-value`,

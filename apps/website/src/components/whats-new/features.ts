@@ -3,7 +3,7 @@
  * them, each with its honest status, its packages, the page that shows it
  * in full and the kind of demo or preview the hub paints. Plain data, so
  * the page and its tests share one source. Releases: 0.6.0 to 0.11.0 are
- * published on npm, and 0.11.3 (a patch of 0.11.0) is `latest` (the release line in
+ * published on npm, and 0.11.4 (a patch of 0.11.0) is `latest` (the release line in
  * docs/RELEASE.md).
  */
 
@@ -22,7 +22,7 @@ export const RELEASES: readonly Release[] = [
     id: '0.11.0',
     title: '0.11.0: lighter design-system hosts',
     status:
-      'Published on npm as 0.11.0, the current release line (pre-1.0); its patches 0.11.1 to 0.11.3 (fixes and additive Protoyard gaps G128–G134) follow, and 0.11.3 is the newest.',
+      'Published on npm as 0.11.0, the current release line (pre-1.0); its patches 0.11.1 to 0.11.4 (fixes and additive Protoyard gaps G128–G135) follow, and 0.11.4 is the newest.',
     published: true,
     summary:
       'The Protoyard gaps G125 to G127: the library theme ids without the library (@texuli/tokens/library-ids), complete expand theme descriptions, and core entries that compile and paint design systems with no theme library in any chunk (@texuli/tokens/design-system/compile-core, @texuli/player/design-system-core). The slides and pages core entries no longer load the theme library unless the host passes a loader, a one-line migration. Design systems with one mode never throw, and DesignSystemProvider reports a failed apply through onapplyerror. Blueprint spec stays 0.10.0.',
