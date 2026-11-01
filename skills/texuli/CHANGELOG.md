@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.3.10] — 2026-11-01
+
+### Changes
+
+- chore(skill): packages on npm at 0.11.4
+
 - The packages are on npm in the 0.11 line, every one at `0.11.4`, a patch
   with Protoyard G135: `fromTheme` from the compile entries always returns a
   document that compiles, listing the role pins it dropped. Installs still
