@@ -336,14 +336,20 @@ function customContext(control: {
       {:else if field.type === 'text' || field.type === 'email' || field.type === 'url'}
         <Input
           {...props}
-          type={field.type === 'text' ? 'text' : field.type}
+          type={field.type !== 'text' ? field.type : field.format === 'phone' ? 'tel' : 'text'}
           name={field.name}
           value={text}
           required={fieldState.required}
           readonly={readOnly}
           placeholder={field.placeholder}
           autocomplete={field.autocomplete}
-          inputmode={field.type === 'email' ? 'email' : field.type === 'url' ? 'url' : undefined}
+          inputmode={field.type === 'email'
+            ? 'email'
+            : field.type === 'url'
+              ? 'url'
+              : field.format === 'phone'
+                ? 'tel'
+                : undefined}
           oninput={(event) => onValue((event.currentTarget as HTMLInputElement).value)}
         />
       {:else if field.type === 'password'}

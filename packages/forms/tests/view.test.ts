@@ -156,6 +156,11 @@ describe('SchemaForm', () => {
       ],
     };
     render(SchemaForm, { props: { form: compiled(schema), onSubmit } });
+    // A phone format paints a telephone input, so phones open the dial pad (G131).
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Contact me' }));
+    const phone = (await screen.findByRole('textbox', { name: /Phone/ })) as HTMLInputElement;
+    expect([phone.type, phone.inputMode]).toEqual(['tel', 'tel']);
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Contact me' }));
     await fireEvent.input(screen.getByRole('textbox', { name: /Email/ }), {
       target: { value: 'ada@example.com' },
     });
