@@ -62,7 +62,7 @@ internal object J {
 
 /** One Kotlin call per vector function name; null means no replay exists yet. */
 internal object ChartVectorReplay {
-    private val families: List<(String, Map<String, JsonValue>) -> JsonValue?> = listOf(::core, ::cartesian, ::partWhole, ::matrixFlow, ::geo, ::dataTables)
+    private val families: List<(String, Map<String, JsonValue>) -> JsonValue?> = listOf(::core, ::cartesian, ::partWhole, ::matrixFlow, ::geo, ::dataTables, ::dataTime)
 
     fun replay(fn: String, input: Map<String, JsonValue>): JsonValue? = families.firstNotNullOfOrNull { it(fn, input) }
 
@@ -283,6 +283,43 @@ internal object ChartVectorReplay {
         }
         "formatSize" -> J.of(formatSize(J.num(i["bytes"])))
         "toFixed" -> J.of(jsToFixed(J.num(i["value"]), J.int(i["digits"])))
+        else -> null
+    }
+
+    private fun events(v: JsonValue?): List<CalendarEvent> = J.arr(v).map { e ->
+        J.obj(e).let {
+            val allDay = J.bool(it["allDay"])
+            val (first, last) = spanDates(J.str(it["start"]), J.str(it["end"]), allDay)!!
+            CalendarEvent(J.str(it["id"]), J.str(it["id"]), J.str(it["start"]), J.str(it["end"]), allDay, first, last)
+        }
+    }
+
+    private fun tasks(v: JsonValue?): List<TimelineTask> = J.arr(v).map { t ->
+        J.obj(t).let { TimelineTask(J.str(it["id"]), J.str(it["id"]), J.str(it["start"]), J.str(it["end"]), null, null, (it["milestone"] as? JsonValue.Bool)?.value == true) }
+    }
+
+    private fun dataTime(fn: String, i: Map<String, JsonValue>): JsonValue? = when (fn) {
+        "parseIsoDate" -> parseIsoDate(J.str(i["date"]))?.let { (y, m, d) -> J.obj("year" to J.of(y), "month" to J.of(m), "day" to J.of(d)) } ?: JsonValue.Null
+        "formatIsoDate" -> J.of(formatIsoDate(J.int(i["year"]), J.int(i["month"]), J.int(i["day"])))
+        "addDays" -> J.of(addDays(J.str(i["date"]), J.int(i["days"])))
+        "daysBetween" -> J.of(daysBetween(J.str(i["a"]), J.str(i["b"])))
+        "weekdayOf" -> J.of(weekdayOf(J.str(i["date"])))
+        "startOfWeek" -> J.of(startOfWeek(J.str(i["date"]), J.int(i["weekStartsOn"])))
+        "monthGrid" -> J.list(monthGrid(J.int(i["year"]), J.int(i["month"]), J.int(i["weekStartsOn"])).map { week -> J.list(week.map { (date, inMonth) -> J.list(listOf(J.of(date), J.of(inMonth))) }) })
+        "weekStartFor" -> J.of(weekStartFor(J.str(i["locale"])))
+        "parseInstant" -> parseInstant(J.str(i["iso"]))?.let(J::of) ?: JsonValue.Null
+        "spanDates" -> spanDates(J.str(i["start"]), J.str(i["end"]), J.bool(i["allDay"]))!!.let { (first, last) -> J.obj("first" to J.of(first), "last" to J.of(last)) }
+        "eventsOnDate" -> J.list(eventsOnDate(events(i["events"]), J.str(i["date"])).map { J.of(it.id) })
+        "calendarLabels" -> J.str(i["date"]).let { J.obj("weekday" to J.of(weekdayShort(it)), "longDate" to J.of(longDate(it)), "monthTitle" to J.of(monthTitle(it))) }
+        "clockTime" -> J.of(clockTime(parseInstant(J.str(i["iso"]))!!))
+        "dayLabel" -> J.of(dayLabel(J.str(i["day"]), J.str(i["today"])))
+        "whenLabel" -> J.of(whenLabel(parseInstant(J.str(i["at"]))!!, parseInstant(J.str(i["now"]))!!))
+        "timelineRange" -> timelineRange(tasks(i["tasks"]), (i["today"] as? JsonValue.Str)?.value).let { (start, end) -> J.obj("start" to J.of(start), "end" to J.of(end)) }
+        "durationDays" -> {
+            val task = TimelineTask(J.str(i["id"]), "", J.str(i["start"]), J.str(i["end"]), null, null, (i["milestone"] as? JsonValue.Bool)?.value == true)
+            J.of(if (task.milestone) 0 else maxOf(1, workDayCount(task.start!!, task.end!!)))
+        }
+        "progressValue" -> J.of(progressValue(J.numOrNull(i["value"])))
         else -> null
     }
 }

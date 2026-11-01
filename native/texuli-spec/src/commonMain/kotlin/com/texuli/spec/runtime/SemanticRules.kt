@@ -29,6 +29,9 @@ object SemanticRules {
         "id:data-cohort-table" to SemanticRule(role = "table", name = listOf("caption")),
         "id:data-tree-view" to SemanticRule(role = "tree", name = listOf("label")),
         "id:data-files" to SemanticRule(role = "group", name = listOf("label")),
+        "id:data-calendar" to SemanticRule(role = "grid", name = listOf("label")),
+        "id:data-timeline" to SemanticRule(role = "figure", name = listOf("label")),
+        "id:data-notification-inbox" to SemanticRule(role = "list"),
     )
 
     /** Block rules by `block.type`, for `blocks-*` ids. */

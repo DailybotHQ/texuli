@@ -376,9 +376,9 @@ internal fun utcFields(ms: Double): UtcFields {
     )
 }
 
-/** `Date.UTC(year, month0, day, …)` with month and day overflow normalized. */
+/** `Date.UTC(year, month0, day, …)` with month and day overflow normalized; years 0–99 mean 1900–1999, as in JS. */
 internal fun dateUtc(year: Long, month0: Int, day: Int, hour: Int = 0, minute: Int = 0, second: Int = 0): Double {
-    val y = year + month0.floorDiv(12)
+    val y = (if (year in 0L..99L) year + 1900 else year) + month0.floorDiv(12)
     val m = month0.mod(12) + 1
     val days = daysFromCivil(y, m, 1) + (day - 1)
     return days * DAY_MS + hour * HOUR_MS + minute * MINUTE_MS + second * SECOND_MS

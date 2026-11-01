@@ -21,7 +21,10 @@
     { "id": "data-grid", "role": "table", "name": ["caption"] },
     { "id": "data-cohort-table", "role": "table", "name": ["caption"] },
     { "id": "data-tree-view", "role": "tree", "name": ["label"] },
-    { "id": "data-files", "role": "group", "name": ["label"] }
+    { "id": "data-files", "role": "group", "name": ["label"] },
+    { "id": "data-calendar", "role": "grid", "name": ["label"] },
+    { "id": "data-timeline", "role": "figure", "name": ["label"] },
+    { "id": "data-notification-inbox", "role": "list" }
   ],
   "blocks": {
     "heading": { "role": "heading", "name": ["text"], "level": "level" },

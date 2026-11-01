@@ -70,15 +70,33 @@ import {
 } from '../packages/charts/src/math/shapes/index.ts';
 import { createHeatmapLayout, createScatterLayout } from '../packages/charts/src/matrix/model.ts';
 import { centerTotalFits, treeTableRows } from '../packages/charts/src/part-whole/model.ts';
+import { eventsOnDate, formatCalendar } from '../packages/data/src/calendar/model.ts';
 import {
   cohortAverages,
   formatCohortValue,
   heatLevel,
   heatMax,
 } from '../packages/data/src/cohort/model.ts';
+import { dayLabel, whenLabel } from '../packages/data/src/engines/activity/days.ts';
 import { rankSequence } from '../packages/data/src/engines/board/rank.ts';
+import {
+  addDays,
+  daysBetween,
+  formatIsoDate,
+  parseInstant,
+  parseIsoDate,
+  weekdayOf,
+} from '../packages/data/src/engines/calendar/dates.ts';
+import {
+  monthGrid,
+  startOfWeek,
+  weekStartFor,
+} from '../packages/data/src/engines/calendar/grid.ts';
+import { spanDates } from '../packages/data/src/engines/calendar/move.ts';
 import { childrenOf, formatSize } from '../packages/data/src/engines/files/model.ts';
+import { durationDays } from '../packages/data/src/engines/timeline/schedule.ts';
 import { buildTree, flatten } from '../packages/data/src/engines/tree/tree.ts';
+import { progressValue, timelineRange } from '../packages/data/src/timeline/model.ts';
 import { biomeFormat } from './generate-surfaces.ts';
 
 const ROOT = resolve(import.meta.dirname, '..');
@@ -768,6 +786,136 @@ function dataTableCases(): VectorCase[] {
   return cases;
 }
 
+function dataTimeCases(): VectorCase[] {
+  const cases: VectorCase[] = [];
+  const add = (fn: string, input: unknown, output: unknown) =>
+    cases.push({ fn, input: json(input), output: json(output) });
+  const attempt = (run: () => unknown) => {
+    try {
+      return run();
+    } catch {
+      return null;
+    }
+  };
+  for (const date of [
+    '2026-02-28',
+    '2024-02-29',
+    '2026-02-29',
+    '2026-13-01',
+    '26-01-01',
+    '0099-12-31',
+  ])
+    add(
+      'parseIsoDate',
+      { date },
+      attempt(() => parseIsoDate(date))
+    );
+  for (const [year, month, day] of [
+    [2026, 1, 32],
+    [2026, 0, 1],
+    [2025, 14, -3],
+  ])
+    add('formatIsoDate', { year, month, day }, formatIsoDate(year, month, day));
+  for (const [date, days] of [
+    ['2026-03-30', 5],
+    ['2026-01-01', -1],
+    ['2024-02-28', 366],
+  ] as [string, number][])
+    add('addDays', { date, days }, addDays(date, days));
+  add('daysBetween', { a: '2025-12-30', b: '2026-03-02' }, daysBetween('2025-12-30', '2026-03-02'));
+  for (const date of ['2026-03-02', '2026-11-01', '2000-01-01']) {
+    add('weekdayOf', { date }, weekdayOf(date));
+    for (const weekStartsOn of [0, 1, 6] as const)
+      add('startOfWeek', { date, weekStartsOn }, startOfWeek(date, weekStartsOn));
+  }
+  for (const [year, month, weekStartsOn] of [
+    [2026, 3, 0],
+    [2026, 2, 1],
+    [2027, 1, 6],
+  ] as [number, number, 0 | 1 | 6][])
+    add(
+      'monthGrid',
+      { year, month, weekStartsOn },
+      monthGrid(year, month, { weekStartsOn }).map((week) =>
+        week.map((cell) => [cell.date, cell.inMonth])
+      )
+    );
+  for (const locale of ['en-US', 'en', 'en-GB', 'pt-BR', 'de-DE', 'ar-EG', 'fr', 'he-IL', 'ja-JP'])
+    add('weekStartFor', { locale }, weekStartFor(locale));
+  for (const iso of [
+    '2026-10-27T09:00:00Z',
+    '2026-10-27T09:00:00.250Z',
+    '2026-10-27T23:30:00-05:00',
+    '2026-10-27T09:00+02:00',
+    '2026-10-27',
+    '2026-10-27T09:00:00',
+    '2026-02-30T09:00:00Z',
+  ])
+    add(
+      'parseInstant',
+      { iso },
+      attempt(() => parseInstant(iso))
+    );
+  const events = [
+    { id: 'standup', start: '2026-04-13T09:00:00Z', end: '2026-04-13T09:15:00Z', allDay: false },
+    { id: 'offsite', start: '2026-04-13', end: '2026-04-15', allDay: true },
+    { id: 'late', start: '2026-04-13T23:30:00Z', end: '2026-04-14T01:00:00Z', allDay: false },
+    { id: 'exact', start: '2026-04-14T00:00:00Z', end: '2026-04-15T00:00:00Z', allDay: false },
+  ];
+  for (const event of events) add('spanDates', event, spanDates(event, 'UTC'));
+  for (const date of ['2026-04-13', '2026-04-14', '2026-04-15'])
+    add(
+      'eventsOnDate',
+      { events, date },
+      eventsOnDate(events, date, 'UTC').map((event) => event.id)
+    );
+  const fmt = formatCalendar('en-US', 'UTC');
+  for (const date of ['2026-04-13', '2026-11-01'])
+    add(
+      'calendarLabels',
+      { date },
+      { weekday: fmt.weekday(date), longDate: fmt.longDate(date), monthTitle: fmt.monthTitle(date) }
+    );
+  for (const iso of [
+    '2026-04-13T00:05:00Z',
+    '2026-04-13T12:00:00Z',
+    '2026-04-13T13:07:00Z',
+    '2026-04-13T23:59:00Z',
+  ])
+    add('clockTime', { iso }, fmt.time(iso));
+  for (const [day, today] of [
+    ['2026-10-31', '2026-10-31'],
+    ['2026-10-30', '2026-10-31'],
+    ['2026-11-01', '2026-10-31'],
+    ['2026-10-27', '2026-10-31'],
+    ['2026-10-12', '2026-10-31'],
+    ['2025-12-24', '2026-01-02'],
+  ])
+    add('dayLabel', { day, today }, dayLabel(day, today));
+  add(
+    'whenLabel',
+    { at: '2026-10-30T16:30:00Z', now: '2026-10-31T08:00:00Z' },
+    whenLabel('2026-10-30T16:30:00Z', { now: '2026-10-31T08:00:00Z' })
+  );
+  const tasks = [
+    { id: 'plan', start: '2026-03-02', end: '2026-03-06' },
+    { id: 'build', start: '2026-03-09', end: '2026-03-27' },
+    { id: 'ship', start: '2026-03-30', end: '2026-03-30', milestone: true },
+  ];
+  add('timelineRange', { tasks, today: null }, timelineRange(tasks));
+  add('timelineRange', { tasks, today: '2026-06-01' }, timelineRange(tasks, '2026-06-01'));
+  add('timelineRange', { tasks: [], today: '2026-06-01' }, timelineRange([], '2026-06-01'));
+  for (const task of [
+    ...tasks,
+    { id: 'weekend', start: '2026-03-07', end: '2026-03-08' },
+    { id: 'span', start: '2026-03-06', end: '2026-03-10' },
+  ])
+    add('durationDays', task, durationDays(task));
+  for (const value of [42, -5, 140, null])
+    add('progressValue', { value }, progressValue(value ?? undefined));
+  return cases;
+}
+
 /** Every case, in a stable order: the shared core first, then each family's model. */
 export function buildVectors(): VectorCase[] {
   return [
@@ -777,6 +925,7 @@ export function buildVectors(): VectorCase[] {
     ...matrixFlowCases(),
     ...geoCases(),
     ...dataTableCases(),
+    ...dataTimeCases(),
   ];
 }
 

@@ -107,15 +107,22 @@ private fun Ink.color(palette: List<Color>, grid: Color, axis: Color, surface: C
 /** Draws a scene laid out at the available width (the web's charts measure their width too). */
 @Composable
 internal fun SceneCanvas(minUnits: Double = 240.0, maxUnits: Double = 640.0, layout: (Double) -> ChartScene) {
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        val width = max(minUnits, min(maxUnits, maxWidth.value.toDouble()))
+        DrawScene(remember(width, layout) { layout(width) })
+    }
+}
+
+/** Draws a scene at its own size (1 unit = 1 dp). */
+@Composable
+internal fun DrawScene(scene: ChartScene, modifier: Modifier = Modifier) {
     val palette = chartPalette()
     val scheme = MaterialTheme.colorScheme
     val measurer = rememberTextMeasurer()
     val textColor = scheme.onSurfaceVariant
     val strongColor = scheme.onSurface
-    BoxWithConstraints(Modifier.fillMaxWidth()) {
-        val width = max(minUnits, min(maxUnits, maxWidth.value.toDouble()))
-        val scene = remember(width, layout) { layout(width) }
-        Canvas(Modifier.width(scene.width.dp).height(scene.height.dp)) {
+    run {
+        Canvas(modifier.width(scene.width.dp).height(scene.height.dp)) {
             scale(density, density, pivot = Offset.Zero) {
                 for (mark in scene.marks) {
                     when (mark) {

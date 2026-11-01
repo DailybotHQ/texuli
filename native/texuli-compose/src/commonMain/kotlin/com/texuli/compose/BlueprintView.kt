@@ -131,6 +131,9 @@ private fun PlanNodeContent(node: PlanNode, path: String, onIntent: (TexuliInten
             "data-cohort-table" -> nativeCohort(node.props)?.let { CohortViewPainter(it) } ?: Placeholder(node.id, "invalid-data")
             "data-tree-view" -> nativeTree(node.props)?.let { TreeViewPainter(it) } ?: Placeholder(node.id, "invalid-data")
             "data-files" -> nativeFiles(node.props)?.let { FilesViewPainter(it) } ?: Placeholder(node.id, "invalid-data")
+            "data-calendar" -> nativeCalendar(node.props)?.let { CalendarPainter(it) } ?: Placeholder(node.id, "invalid-data")
+            "data-timeline" -> nativeTimeline(node.props)?.let { TimelinePainter(it) } ?: Placeholder(node.id, "invalid-data")
+            "data-notification-inbox" -> nativeInbox(node.props)?.let { InboxPainter(it, path, onIntent) } ?: Placeholder(node.id, "invalid-data")
             "charts-canvas-renderer" -> {
                 val chart = nativeCanvasChart(node.props)
                 if (chart == null) Placeholder(node.id, "invalid-chart-data") else CanvasChartView(chart)
