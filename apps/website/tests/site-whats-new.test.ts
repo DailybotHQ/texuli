@@ -11,7 +11,6 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { isLineVersion, releaseLine } from '../../../scripts/release-line.ts';
 import { NAV_GROUPS } from '../src/components/foundation/site.ts';
-import { WEB_HERO_NEWS } from '../src/components/sections/web/web-hero-content.ts';
 import { FEATURES, RELEASES } from '../src/components/whats-new/features.ts';
 
 const read = (path: string) => readFileSync(resolve('apps/website/src', path), 'utf8');
@@ -132,9 +131,7 @@ describe('whats-new hub', () => {
     expect((PAGE.match(/<h1[\s>]/g) ?? []).length).toBe(1);
   });
 
-  it('is linked from the home page hero and the sidebar', () => {
-    expect(WEB_HERO_NEWS.href).toBe('/whats-new/');
-    expect(WEB_HERO_NEWS.label).not.toMatch(/\d+\.\d+\.\d+|npm/);
+  it('is linked from the sidebar', () => {
     const links = NAV_GROUPS.flatMap((group) => group.links.map((link) => link.href));
     expect(links).toContain('/whats-new/');
     for (const href of ['/sheets-page/', '/dashboards-page/', '/output-page/']) {

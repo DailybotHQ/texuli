@@ -8,7 +8,7 @@
  * Templates are read as source (the root config does not compile .astro);
  * the rendered pages are covered by tests/e2e/site-*.spec.ts with axe.
  */
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { COMPONENT_PAGES } from '../src/components/component-pages/load-manifests.ts';
@@ -18,16 +18,19 @@ import { illustrationFor } from '../src/components/landing/illustrations.ts';
 import { PRIMITIVES } from '../src/components/primitives-page/primitives.ts';
 import {
   fillCopy,
+  HOME_FINAL,
   HOME_HERO,
   HOME_INSTALL_COMMAND,
   HOME_PITCH,
+  HOME_QUICKSTART,
   HOME_STORIES,
   loadHomeHeroProof,
+  loadHomeProof,
   loadNativeSlice,
   parseNativeRegistry,
   wordCount,
 } from '../src/components/sections/home/home-content.ts';
-import { countAllThemes } from '../src/components/sections/web/web-hero-content.ts';
+import { countAllThemes } from '../src/components/sections/home/home-data.ts';
 
 const WEBSITE = resolve(import.meta.dirname, '..');
 const read = (path: string): string => readFileSync(resolve(WEBSITE, path), 'utf8');
@@ -150,6 +153,49 @@ describe('landing', () => {
       '{painted} of {total} components paint today'
     );
     expect(() => fillCopy('{missing}', {})).toThrow('no value for {missing}');
+  });
+
+  it('closes with computed proof, a three-step quickstart and the final call to action, and nothing else', async () => {
+    const proof = await loadHomeProof();
+    const catalog = JSON.parse(read('../../packages/spec/catalog/components.json')) as {
+      components: { emit: string[] }[];
+    };
+    const manifests = readdirSync(resolve(WEBSITE, '../../packages'))
+      .map((dir) => resolve(WEBSITE, '../../packages', dir, 'package.json'))
+      .filter((path) => existsSync(path))
+      .map((path) => JSON.parse(readFileSync(path, 'utf8')) as { private?: boolean });
+    expect(proof.map((stat) => [stat.id, stat.value])).toEqual([
+      ['packages', manifests.filter((manifest) => manifest.private !== true).length],
+      ['blueprint', catalog.components.length],
+      ['agent-safe', catalog.components.filter((entry) => entry.emit.includes('untrusted')).length],
+    ]);
+    for (const stat of proof) expect(routeExists(stat.href), stat.href).toBe(true);
+    expect(HOME_QUICKSTART.steps.map((step) => step.title)).toEqual([
+      'Install',
+      'Pick a theme',
+      'Compose',
+    ]);
+    for (const step of HOME_QUICKSTART.steps)
+      if (step.href) expect(routeExists(step.href), step.href).toBe(true);
+    expect(read('src/components/sections/home/HomeQuickstart.astro')).toContain(
+      '<CopyCommand command={HOME_INSTALL_COMMAND} />'
+    );
+    expect(illustrationFor(HOME_QUICKSTART.slot)?.variant).toBe('plate');
+    expect(illustrationFor(HOME_FINAL.slot)?.variant).toBe('band');
+    for (const link of HOME_FINAL.actions) expect(routeExists(link.href), link.href).toBe(true);
+
+    const bands = [...home.matchAll(/^\s{4}<(Home\w+) \/>$/gm)].map((match) => match[1]);
+    expect(bands).toEqual([
+      'HomeHero',
+      'HomePitch',
+      'HomeStories',
+      'HomeProof',
+      'HomeQuickstart',
+      'HomeFinal',
+    ]);
+    expect(home).not.toMatch(/sections\/web\//);
+    for (const gone of ['WebHero.astro', 'WebWhySvelte.astro', 'WebAgentsCta.astro'])
+      expect(existsSync(resolve(WEBSITE, 'src/components/sections/web', gone)), gone).toBe(false);
   });
 
   it('keeps the home title and description inside the SEO audit bands', () => {

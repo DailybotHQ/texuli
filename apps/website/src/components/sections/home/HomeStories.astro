@@ -1,4 +1,5 @@
 ---
+import { fillCopy, HOME_STORIES, loadNativeSlice } from './home-content.ts';
 /**
  * Landing bands 3–7 (PLAN_012 T-landing-acts): the five story bands in
  * order, art alternating end and start. Counts are filled from their
@@ -6,8 +7,7 @@
  * catalog); the brand story carries a static swatch strip of six library
  * themes.
  */
-import { countAllThemes, loadHeroThemes } from '../web/web-hero-content.ts';
-import { fillCopy, HOME_STORIES, loadNativeSlice } from './home-content.ts';
+import { countAllThemes, loadHeroThemes } from './home-data.ts';
 import LandingStory from './LandingStory.astro';
 
 const [themeCount, themes] = await Promise.all([countAllThemes(), loadHeroThemes()]);

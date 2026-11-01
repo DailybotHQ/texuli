@@ -28,7 +28,9 @@ test('sections in order, working calls to action, announced copy, motion only on
         (section.hasAttribute('data-tx-home-hero') && 'hero') ||
         (section.hasAttribute('data-tx-home-pitch') && 'pitch') ||
         section.getAttribute('data-tx-home-story') ||
-        (section.hasAttribute('data-tx-web-agents') && 'agents') ||
+        (section.hasAttribute('data-tx-home-proof') && 'proof') ||
+        (section.hasAttribute('data-tx-home-quickstart') && 'quickstart') ||
+        (section.hasAttribute('data-tx-home-final') && 'final') ||
         'unknown'
     )
   );
@@ -40,7 +42,9 @@ test('sections in order, working calls to action, announced copy, motion only on
     'brand',
     'agents',
     'accessible',
-    'agents',
+    'proof',
+    'quickstart',
+    'final',
   ]);
   // The stories alternate their art and grow their texel mark one cube per band.
   const stories = page.locator('[data-tx-home-story]');
@@ -52,7 +56,8 @@ test('sections in order, working calls to action, announced copy, motion only on
       all.map((story) => story.querySelectorAll('[data-tx-texel-mark] > *').length)
     )
   ).toEqual([1, 2, 3, 4, 5]);
-  await expect(page.locator('[data-tx-landing] pre')).toHaveCount(1);
+  await expect(page.locator('[data-tx-landing] pre')).toHaveCount(0);
+  await expect(page.locator('[data-tx-landing] [data-tx-illustration]')).toHaveCount(9);
   await expect(page.locator('[data-tx-hero-theme]')).toHaveCount(6);
   await expect(page.locator('[data-tx-landing] astro-island')).toHaveCount(0);
   const hero = page.locator('[data-tx-home-hero]');

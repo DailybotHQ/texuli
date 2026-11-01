@@ -4,7 +4,7 @@
  * from the source it links to, never typed in. Copy budgets are pinned by
  * apps/website/tests/landing.test.ts.
  */
-import { countAllThemes, loadHeroProof } from '../web/web-hero-content.ts';
+import { countAllThemes, loadHeroProof } from './home-data.ts';
 
 export interface HomeLink {
   href: string;
@@ -233,3 +233,75 @@ export function loadNativeSlice(): { painted: number; total: number } {
   const painted = parseNativeRegistry(registry).filter((id) => ids.has(id)).length;
   return { painted, total: ids.size };
 }
+
+export interface HomeProofStat {
+  id: 'packages' | 'blueprint' | 'agent-safe';
+  value: number;
+  label: string;
+  href: string;
+}
+
+/** Band 8: what is built in the open, counted from the packages and the spec catalog. */
+export const HOME_PROOF = {
+  title: 'Built in the open',
+  label: 'Texuli in the open',
+} as const;
+
+export async function loadHomeProof(): Promise<readonly HomeProofStat[]> {
+  const { countPublishedPackages } = await import('./home-data.ts');
+  const catalog = Object.values(CATALOG_RAW)[0];
+  if (!catalog) throw new Error('spec catalog not found');
+  const components = (JSON.parse(catalog) as { components: { emit: string[] }[] }).components;
+  return [
+    {
+      id: 'packages',
+      value: countPublishedPackages(),
+      label: 'packages on npm, MIT licensed',
+      href: '/guides/getting-started/',
+    },
+    {
+      id: 'blueprint',
+      value: components.length,
+      label: 'components in the blueprint catalog',
+      href: '/component-pages/',
+    },
+    {
+      id: 'agent-safe',
+      value: components.filter((entry) => entry.emit.includes('untrusted')).length,
+      label: 'components agents may emit, validated',
+      href: '/agents-page/',
+    },
+  ];
+}
+
+/** Band 9: from install to interface, three steps and one command. */
+export const HOME_QUICKSTART = {
+  title: 'From install to interface in three steps.',
+  slot: 'home-quickstart',
+  steps: [
+    { title: 'Install', body: 'One package for the styled components.', href: undefined },
+    {
+      title: 'Pick a theme',
+      body: 'Start from the library or your own brand.',
+      href: '/gallery-themes/',
+    },
+    {
+      title: 'Compose',
+      body: 'Put components together into your interface.',
+      href: '/guides/getting-started/',
+    },
+  ],
+  note: 'Pre-1.0: pin the version.',
+} as const;
+
+/** Band 10: the closing call to action on the `home-final` band art. */
+export const HOME_FINAL = {
+  title: 'Start with one texel.',
+  sub: 'Open source, MIT, and ready for people and agents.',
+  slot: 'home-final',
+  actions: [
+    { href: '/guides/getting-started/', label: 'Start building', role: 'primary' },
+    { href: '/playground/', label: 'Open the playground', role: 'secondary' },
+    { href: '/agents-page/', label: 'For agents', role: 'text' },
+  ] satisfies readonly HomeLink[],
+} as const;

@@ -103,7 +103,6 @@ test('every page class fits 360 and 768px, and the landings fit 360px right to l
 const TARGETS = [
   ['/', '[data-tx-site-header] .brand'],
   ['/', '.home-cta--text'],
-  ['/', '.web-why__claim-link'],
   ['/guides/getting-started/', '.crumbs__link'],
   ['/gallery-components/', '[data-tx-gallery-card] .title a'],
 ] as const;
