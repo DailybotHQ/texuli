@@ -16,7 +16,13 @@ import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 // Root scripts import packages by path. `math/index.ts` is the `@texuli/charts/math` entry;
 // the model modules are what the family entries re-export (those entries also load Svelte).
-import { createCartesianLayout, lineCoordinates } from '../packages/charts/src/cartesian/model.ts';
+import {
+  createCartesianLayout,
+  lineCoordinates,
+  windowCartesianSeries,
+  xDomain,
+} from '../packages/charts/src/cartesian/model.ts';
+import { minMaxBuckets } from '../packages/charts/src/math/downsample/min-max.ts';
 import {
   bandScale,
   chooseTimeInterval,
@@ -368,6 +374,47 @@ function cartesianLayoutCases(): VectorCase[] {
       }),
     });
   }
+  const wide = {
+    id: 'wide',
+    label: 'Wide',
+    points: [9, 2, 4, 7, 1, 12, 5].map((x, index) => ({ x, y: index * 3 })),
+  };
+  for (const domain of [
+    [2, 7],
+    [4.5, 4.8],
+    [20, 30],
+  ] as [number, number][])
+    cases.push({
+      fn: 'windowCartesianSeries',
+      input: json({ series: [wide], domain }),
+      output: json(windowCartesianSeries([wide], domain)),
+    });
+  cases.push({
+    fn: 'xDomain',
+    input: json({ series: CARTESIAN_SERIES }),
+    output: json(xDomain(CARTESIAN_SERIES)),
+  });
+  cases.push({ fn: 'xDomain', input: json({ series: [wide] }), output: json(xDomain([wide])) });
+  const xs = Array.from({ length: 64 }, (_, index) => index * 1.5);
+  const ys = xs.map((x, index) =>
+    index === 20 ? Number.NaN : Math.round(Math.sin(x) * 1000) / 10
+  );
+  for (const [buckets, x0, x1] of [
+    [8, undefined, undefined],
+    [100, undefined, undefined],
+    [5, 10, 60],
+  ] as [number, number | undefined, number | undefined][])
+    cases.push({
+      fn: 'minMaxBuckets',
+      input: json({
+        xs,
+        ys: ys.map((y) => (Number.isFinite(y) ? y : null)),
+        buckets,
+        x0: x0 ?? null,
+        x1: x1 ?? null,
+      }),
+      output: json(minMaxBuckets(xs, ys, { buckets, x0, x1 })),
+    });
   return cases;
 }
 

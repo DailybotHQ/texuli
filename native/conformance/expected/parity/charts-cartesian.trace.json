@@ -1,0 +1,46 @@
+{
+  "fixture": "charts-cartesian",
+  "trace": [
+    {
+      "children": [
+        {
+          "id": "charts-line",
+          "name": "Tickets per day",
+          "role": "figure"
+        },
+        {
+          "id": "charts-area",
+          "name": "Ticket volume",
+          "role": "figure"
+        },
+        {
+          "id": "charts-bar",
+          "name": "Tickets by day",
+          "role": "figure"
+        },
+        {
+          "id": "charts-stacked-bar",
+          "name": "Opened and solved",
+          "role": "figure"
+        },
+        {
+          "id": "charts-combo",
+          "name": "Opened with solved trend",
+          "role": "figure"
+        },
+        {
+          "id": "charts-cartesian",
+          "name": "Median latency",
+          "role": "figure"
+        },
+        {
+          "id": "charts-canvas-renderer",
+          "role": "figure"
+        }
+      ],
+      "id": "layout-page",
+      "name": "Cartesian charts",
+      "role": "main"
+    }
+  ]
+}

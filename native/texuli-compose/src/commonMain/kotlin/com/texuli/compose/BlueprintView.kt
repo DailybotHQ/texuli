@@ -111,6 +111,14 @@ private fun PlanNodeContent(node: PlanNode, path: String, onIntent: (TexuliInten
                 val media = nativeMediaBlock(node.props.obj("block"))
                 if (media == null) Placeholder(node.id, "invalid-media") else MediaWidget(media, path, onIntent)
             }
+            in CARTESIAN_CHART_IDS -> {
+                val chart = nativeCartesianChart(node.id, node.props)
+                if (chart == null) Placeholder(node.id, "invalid-chart-data") else CartesianChartView(chart)
+            }
+            "charts-canvas-renderer" -> {
+                val chart = nativeCanvasChart(node.props)
+                if (chart == null) Placeholder(node.id, "invalid-chart-data") else CanvasChartView(chart)
+            }
             in NATIVE_CHART_IDS -> {
                 val widget = nativeChartWidget(node.id, node.props)
                 if (widget == null) Placeholder(node.id, "invalid-chart-data") else ChartWidget(widget)

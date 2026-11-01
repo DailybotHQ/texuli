@@ -51,6 +51,12 @@ internal object J {
         )
     }
 
+    fun of(series: CartesianSeries): JsonValue = obj(
+        "id" to of(series.id),
+        "label" to of(series.label),
+        "points" to list(series.points.map { obj("x" to of(it.x), "y" to of(it.y)) }),
+    )
+
     fun spans(stacks: List<List<Pair<Double, Double>>>): JsonValue = list(stacks.map { row -> list(row.map { of(it) }) })
 }
 
@@ -134,6 +140,17 @@ internal object ChartVectorReplay {
                 }),
             )
         }
+        "windowCartesianSeries" -> J.list(windowCartesianSeries(J.cartesianSeries(i["series"]), J.pair(i["domain"])).map(J::of))
+        "xDomain" -> J.list(xDomain(J.cartesianSeries(i["series"])).map(J::of))
+        "minMaxBuckets" -> J.nums(
+            minMaxBuckets(
+                J.arr(i["xs"]).map(J::num),
+                J.arr(i["ys"]).map { J.numOrNull(it) ?: Double.NaN },
+                J.int(i["buckets"]),
+                J.numOrNull(i["x0"]),
+                J.numOrNull(i["x1"]),
+            ).map(Int::toDouble),
+        )
         else -> null
     }
 }

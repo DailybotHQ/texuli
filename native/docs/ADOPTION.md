@@ -25,7 +25,7 @@ The flow (`texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/RenderPlan.
    `"<id>" is not shown here (<reason>)`. It is never blank and never a crash.
 
 **Painted natively** (`NativeRegistry.implemented` in
-`texuli-compose/src/commonMain/kotlin/com/texuli/compose/Registry.kt`), 21 ids.
+`texuli-compose/src/commonMain/kotlin/com/texuli/compose/Registry.kt`), 28 ids.
 The full table, generated from the registry and the catalog, is
 [PARITY.md](PARITY.md):
 
@@ -36,6 +36,7 @@ The full table, generated from the registry and the catalog, is
 | Content blocks | `blocks-text` (heading, text, list, quote, callout), `blocks-data` (stat, KPI, table), `blocks-diagram` (static board), `blocks-code`, `blocks-structure` (CTA, divider, columns) |
 | Media | `media-image`, `blocks-media` (image, figure, video, gallery): frames with alt text, no decoded pixels |
 | Compact charts | `charts-sparkline`, `charts-bullet`, `charts-gauge`, `charts-progress-ring` |
+| Cartesian charts (ADR-025) | `charts-line`, `charts-area`, `charts-bar`, `charts-stacked-bar`, `charts-combo`, `charts-cartesian`, `charts-canvas-renderer`: the web's layout ported to Kotlin and checked against web-written vectors |
 
 Every other id paints a placeholder. Of the 168 spec vocabulary ids, 75 may be
 emitted by a blueprint (their catalog `emit` list holds both `developer` and

@@ -10,6 +10,16 @@ enum class BindingStatus { IMPLEMENTED, PLACEHOLDER }
 
 object NativeRegistry {
     private val compactCharts = setOf("charts-sparkline", "charts-bullet", "charts-gauge", "charts-progress-ring")
+    // PLAN_013 (ADR-025): chart and data families, painted from ported web math.
+    private val cartesianCharts = setOf(
+        "charts-line",
+        "charts-area",
+        "charts-bar",
+        "charts-stacked-bar",
+        "charts-combo",
+        "charts-cartesian",
+        "charts-canvas-renderer",
+    )
     /** Ids the first renderer slice paints natively. */
     val implemented: Set<String> = setOf(
         "layout-page",
@@ -30,7 +40,7 @@ object NativeRegistry {
         "layout-tile",
         "blocks-code",
         "blocks-structure",
-    ) + compactCharts
+    ) + compactCharts + cartesianCharts
 
     /**
      * Painted ids whose web view is interactive (catalog interaction role

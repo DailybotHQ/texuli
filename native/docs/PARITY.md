@@ -12,20 +12,20 @@ every other component paints a visible placeholder. Native is in development.
 | Measure | Count |
 | --- | --- |
 | Catalog components | 168 |
-| Painted natively | 21 |
-| Placeholder natively | 147 |
+| Painted natively | 28 |
+| Placeholder natively | 140 |
 | Agent-emittable components | 75 |
-| Agent-emittable and painted natively | 21 |
+| Agent-emittable and painted natively | 28 |
 | Painted read-only (interactive on the web) | 0 |
 | Components with a shared semantic rule | 37 |
 | Golden traces (web = native) | 15 |
 | Components covered by a golden trace | 34 |
-| Parity fixture traces (web = native) | 1 |
-| Components covered by any trace | 41 |
+| Parity fixture traces (web = native) | 2 |
+| Components covered by any trace | 45 |
 
 So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes**
 (validation, label interpolation and the golden semantic traces match); **for painting, not yet**
-(21 of 168 components).
+(28 of 168 components).
 
 ## Capabilities
 
@@ -49,7 +49,7 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | canvas | 1 | 0 |
 | chat | 2 | 0 |
 | composition | 4 | 4 |
-| content | 35 | 11 |
+| content | 35 | 18 |
 | data | 12 | 0 |
 | display | 17 | 0 |
 | documents | 1 | 0 |
@@ -87,27 +87,27 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `callout` | display | — | renders | placeholder | — | — | — |
 | `canvas` | canvas | yes | renders | placeholder | yes | yes | — |
 | `card` | display | — | renders | placeholder | — | — | — |
-| `charts-area` | content | yes | renders | placeholder | yes | — | — |
-| `charts-bar` | content | yes | renders | placeholder | yes | yes | — |
+| `charts-area` | content | yes | renders | painted | yes | — | yes |
+| `charts-bar` | content | yes | renders | painted | yes | yes | yes |
 | `charts-bubble` | content | yes | renders | placeholder | yes | — | — |
 | `charts-bullet` | content | yes | renders | painted | yes | — | yes |
-| `charts-canvas-renderer` | content | yes | renders | placeholder | yes | — | — |
-| `charts-cartesian` | content | yes | renders | placeholder | yes | — | — |
-| `charts-combo` | content | yes | renders | placeholder | yes | — | — |
+| `charts-canvas-renderer` | content | yes | renders | painted | yes | — | yes |
+| `charts-cartesian` | content | yes | renders | painted | yes | — | yes |
+| `charts-combo` | content | yes | renders | painted | yes | — | yes |
 | `charts-donut` | content | yes | renders | placeholder | yes | yes | — |
 | `charts-funnel` | content | yes | renders | placeholder | yes | — | — |
 | `charts-gauge` | content | yes | renders | painted | yes | yes | yes |
 | `charts-geo-map` | content | yes | renders | placeholder | yes | — | — |
 | `charts-geo-point-map` | content | yes | renders | placeholder | yes | — | — |
 | `charts-heatmap` | content | yes | renders | placeholder | yes | — | — |
-| `charts-line` | content | yes | renders | placeholder | yes | yes | — |
+| `charts-line` | content | yes | renders | painted | yes | yes | yes |
 | `charts-network` | content | yes | renders | placeholder | yes | — | — |
 | `charts-pie` | content | yes | renders | placeholder | yes | — | — |
 | `charts-progress-ring` | content | yes | renders | painted | yes | — | yes |
 | `charts-sankey` | content | yes | renders | placeholder | yes | — | — |
 | `charts-scatter` | content | yes | renders | placeholder | yes | — | — |
 | `charts-sparkline` | content | yes | renders | painted | yes | yes | yes |
-| `charts-stacked-bar` | content | yes | renders | placeholder | yes | yes | — |
+| `charts-stacked-bar` | content | yes | renders | painted | yes | yes | yes |
 | `charts-sunburst` | content | yes | renders | placeholder | yes | — | — |
 | `charts-treemap` | content | yes | renders | placeholder | yes | — | — |
 | `chat-message` | chat | yes | renders | placeholder | — | — | — |
@@ -180,7 +180,7 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `layout-host` | layouts | — | renders | placeholder | — | — | — |
 | `layout-landing` | layouts | — | renders | placeholder | — | — | — |
 | `layout-marketing` | layouts | — | renders | placeholder | — | — | — |
-| `layout-page` | layouts | yes | renders | painted | yes | yes | — |
+| `layout-page` | layouts | yes | renders | painted | yes | yes | yes |
 | `layout-pricing` | layouts | — | renders | placeholder | — | — | — |
 | `layout-row` | composition | yes | renders | painted | yes | yes | — |
 | `layout-settings` | layouts | — | renders | placeholder | — | — | — |
