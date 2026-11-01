@@ -24,7 +24,12 @@
     { "id": "data-files", "role": "group", "name": ["label"] },
     { "id": "data-calendar", "role": "grid", "name": ["label"] },
     { "id": "data-timeline", "role": "figure", "name": ["label"] },
-    { "id": "data-notification-inbox", "role": "list" }
+    { "id": "data-notification-inbox", "role": "list" },
+    { "id": "data-board", "role": "group", "name": ["label"] },
+    { "id": "data-map", "role": "figure", "name": ["label"] },
+    { "id": "data-dashboard", "role": "region", "name": ["label"] },
+    { "id": "data-dashboard-widget", "role": "group", "name": ["title"] },
+    { "id": "data-filter-builder", "role": "group", "name": ["label"] }
   ],
   "blocks": {
     "heading": { "role": "heading", "name": ["text"], "level": "level" },

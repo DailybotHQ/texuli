@@ -10,7 +10,8 @@
         },
         {
           "id": "data-board",
-          "role": "generic"
+          "name": "Tickets by status",
+          "role": "group"
         }
       ],
       "id": "layout-page",

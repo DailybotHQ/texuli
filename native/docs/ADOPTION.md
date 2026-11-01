@@ -25,7 +25,7 @@ The flow (`texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/RenderPlan.
    `"<id>" is not shown here (<reason>)`. It is never blank and never a crash.
 
 **Painted natively** (`NativeRegistry.implemented` in
-`texuli-compose/src/commonMain/kotlin/com/texuli/compose/Registry.kt`), 47 ids.
+`texuli-compose/src/commonMain/kotlin/com/texuli/compose/Registry.kt`), 52 ids.
 The full table, generated from the registry and the catalog, is
 [PARITY.md](PARITY.md):
 
@@ -42,6 +42,7 @@ The full table, generated from the registry and the catalog, is
 | Geo charts (ADR-025) | `charts-geo-map`, `charts-geo-point-map`: the web's schematic tile maps, with no geographic data and no network |
 | Data tables (ADR-025) | `data-grid`, `data-cohort-table`, `data-tree-view`, `data-files`: the grid, tree and file browser paint read-only (`NativeRegistry.readOnly`), since sorting, selection and navigation are interactive on the web |
 | Time-based data (ADR-025) | `data-calendar`, `data-timeline`, `data-notification-inbox`, all read-only. The calendar's week and day views list each day's events (the web draws an hour grid). A named `timeZone` other than UTC paints the placeholder, because native carries no tz data. Inbox links are https navigate intents |
+| Boards, maps and dashboards (ADR-025) | `data-board`, `data-map` (the web's bundled fictional Port Meridian basemap, generated into Kotlin), `data-filter-builder` (all read-only), `data-dashboard` and `data-dashboard-widget`, which lay out by the web's dashboard engine at the measured breakpoint, with the widgets' content painting through the same registry |
 
 Every other id paints a placeholder. Of the 168 spec vocabulary ids, 75 may be
 emitted by a blueprint (their catalog `emit` list holds both `developer` and

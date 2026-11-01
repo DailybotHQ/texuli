@@ -2,16 +2,16 @@
   "specVersion": "0.10.0",
   "totals": {
     "catalog": 168,
-    "painted": 47,
-    "placeholder": 121,
+    "painted": 52,
+    "placeholder": 116,
     "agentEmittable": 75,
-    "agentEmittablePainted": 47,
-    "semanticRules": 44,
+    "agentEmittablePainted": 52,
+    "semanticRules": 49,
     "goldenTraces": 15,
     "goldenCovered": 34,
-    "parityTraces": 7,
-    "traceCovered": 62,
-    "readOnly": 6
+    "parityTraces": 8,
+    "traceCovered": 66,
+    "readOnly": 9
   },
   "unknownNativeIds": [],
   "uncovered": [],
@@ -39,7 +39,7 @@
     {
       "group": "data",
       "total": 12,
-      "painted": 7
+      "painted": 12
     },
     {
       "group": "display",
@@ -374,7 +374,7 @@
       "readOnly": false,
       "semanticRule": false,
       "golden": true,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "breadcrumb",
@@ -898,11 +898,11 @@
       "capability": "web-only",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
-      "readOnly": false,
-      "semanticRule": false,
+      "native": "painted",
+      "readOnly": true,
+      "semanticRule": true,
       "golden": true,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "data-calendar",
@@ -934,11 +934,11 @@
       "capability": "unknown",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
+      "native": "painted",
       "readOnly": false,
-      "semanticRule": false,
+      "semanticRule": true,
       "golden": false,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "data-dashboard-widget",
@@ -946,11 +946,11 @@
       "capability": "unknown",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
+      "native": "painted",
       "readOnly": false,
-      "semanticRule": false,
+      "semanticRule": true,
       "golden": false,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "data-files",
@@ -970,11 +970,11 @@
       "capability": "web-only",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
-      "readOnly": false,
-      "semanticRule": false,
+      "native": "painted",
+      "readOnly": true,
+      "semanticRule": true,
       "golden": false,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "data-grid",
@@ -994,11 +994,11 @@
       "capability": "web-only",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
-      "readOnly": false,
-      "semanticRule": false,
+      "native": "painted",
+      "readOnly": true,
+      "semanticRule": true,
       "golden": false,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "data-notification-inbox",

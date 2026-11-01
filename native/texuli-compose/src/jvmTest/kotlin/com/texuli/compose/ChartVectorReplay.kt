@@ -62,7 +62,7 @@ internal object J {
 
 /** One Kotlin call per vector function name; null means no replay exists yet. */
 internal object ChartVectorReplay {
-    private val families: List<(String, Map<String, JsonValue>) -> JsonValue?> = listOf(::core, ::cartesian, ::partWhole, ::matrixFlow, ::geo, ::dataTables, ::dataTime)
+    private val families: List<(String, Map<String, JsonValue>) -> JsonValue?> = listOf(::core, ::cartesian, ::partWhole, ::matrixFlow, ::geo, ::dataTables, ::dataTime, ::dataBoards)
 
     fun replay(fn: String, input: Map<String, JsonValue>): JsonValue? = families.firstNotNullOfOrNull { it(fn, input) }
 
@@ -320,6 +320,62 @@ internal object ChartVectorReplay {
             J.of(if (task.milestone) 0 else maxOf(1, workDayCount(task.start!!, task.end!!)))
         }
         "progressValue" -> J.of(progressValue(J.numOrNull(i["value"])))
+        else -> null
+    }
+
+    private fun lngLat(v: JsonValue?): LngLat = J.obj(v).let { LngLat(J.num(it["lng"]), J.num(it["lat"])) }
+
+    private fun of(p: LngLat): JsonValue = J.obj("lng" to J.of(p.lng), "lat" to J.of(p.lat))
+
+    private fun view(v: JsonValue?): MapViewState = J.obj(v).let { MapViewState(lngLat(it["center"]), J.num(it["zoom"])) }
+
+    private fun dash(items: List<DashItem>): JsonValue = J.list(items.map { JsonValue.Obj(it.toJson()) })
+
+    private fun filterJson(node: FilterNode): JsonValue = when (node) {
+        is FilterNode.Group -> J.obj("type" to J.of("group"), "op" to J.of(node.op), "children" to J.list(node.children.map(::filterJson)))
+        is FilterNode.Condition -> optional("type" to J.of("condition"), "field" to J.of(node.field), "operator" to J.of(node.operator), "value" to node.value)
+    }
+
+    private fun dataBoards(fn: String, i: Map<String, JsonValue>): JsonValue? = when (fn) {
+        "groupBoard" -> {
+            val columns = J.arr(i["columns"]).map { c -> J.obj(c).let { f -> BoardColumnDef(J.str(f["id"]), J.str(f["title"]), (f["wip"] as? JsonValue.Obj)?.fields?.get("soft")?.let(J::int), (f["wip"] as? JsonValue.Obj)?.fields?.get("hard")?.let(J::int)) } }
+            val lanes = J.arr(i["lanes"]).map { l -> J.obj(l).let { J.str(it["id"]) to J.str(it["title"]) } }
+            val cards = J.arr(i["cards"]).map { c -> J.obj(c).let { BoardCard(J.str(it["id"]), J.str(it["id"]), J.str(it["column"]), (it["lane"] as? JsonValue.Str)?.value, J.str(it["rank"]), null) } }
+            val grid = groupBoard(cards, columns, lanes)
+            J.obj(
+                "cells" to J.list(grid.cells.map { row -> J.list(row.map { cell -> J.list(cell.map { J.of(it.id) }) }) }),
+                "counts" to JsonValue.Obj(grid.counts.mapValues { J.of(it.value) }),
+                "unplaced" to J.list(grid.unplaced.map { J.of(it.id) }),
+            )
+        }
+        "evaluateWip" -> evaluateWip(BoardColumnDef("doing", J.str(i["title"]), J.int(i["soft"]), J.int(i["hard"])), J.int(i["count"])).let { (status, reason) -> J.obj("status" to J.of(status), "reason" to (reason?.let(J::of) ?: JsonValue.Null)) }
+        "mercator" -> mercator(LngLat(J.num(i["lng"]), J.num(i["lat"]))).let { (x, y) -> J.obj("x" to J.of(x), "y" to J.of(y)) }
+        "fitBounds" -> fitBounds(J.arr(i["bbox"]).map(J::num), J.num(i["width"]), J.num(i["height"]), J.num(i["padding"])).let { J.obj("center" to of(it.center), "zoom" to J.of(it.zoom)) }
+        "project" -> project(lngLat(i["point"]), view(i["view"]), J.num(i["width"]), J.num(i["height"])).let { (x, y) -> J.obj("x" to J.of(x), "y" to J.of(y)) }
+        "basemapPaths" -> {
+            val v = fitBounds(PORT_MERIDIAN.bbox, J.num(i["width"]), J.num(i["height"]), 28.0)
+            J.list(basemapPaths(PORT_MERIDIAN, v, J.num(i["width"]), J.num(i["height"])).map { p ->
+                J.obj("id" to J.of(p.id), "closed" to J.of(p.closed), "d" to J.of(p.d), "label" to (p.label?.let { (x, y, text) -> J.obj("x" to J.of(x), "y" to J.of(y), "text" to J.of(text)) } ?: JsonValue.Null))
+            })
+        }
+        "cluster" -> {
+            val markers = J.arr(i["markers"]).map { m -> J.obj(m).let { MapMarker(J.str(it["id"]), "", J.num(it["lat"]), J.num(it["lng"]), null, "primary") } }
+            J.list(cluster(markers, J.num(i["zoom"]), J.num(i["cellPx"])).map { item ->
+                when (item) {
+                    is ClusterItem.Point -> J.obj("kind" to J.of("point"), "id" to J.of(item.marker.id))
+                    is ClusterItem.Cluster -> J.obj("kind" to J.of("cluster"), "id" to J.of(item.id), "center" to of(item.center), "count" to J.of(item.count), "ids" to J.list(item.ids.map(J::of)))
+                }
+            })
+        }
+        "normalizeLayout" -> dash(normalizeLayout(J.arr(i["layout"]).map(J::obj), J.int(i["columns"]), J.str(i["compaction"]) == "vertical"))
+        "reflowLayout" -> dash(reflowLayout(normalizeLayout(J.arr(i["layout"]).map(J::obj), J.int(i["from"])), J.int(i["from"]), J.int(i["to"])))
+        "firstFit" -> firstFit(normalizeLayout(J.arr(i["layout"]).map(J::obj), J.int(i["columns"])), J.int(i["w"]), J.int(i["h"]), J.int(i["columns"])).let { (x, y) -> J.obj("x" to J.of(x), "y" to J.of(y)) }
+        "dashboardBreakpoints" -> J.list(dashboardBreakpoints(J.int(i["columns"])).map { J.obj("id" to J.of(it.id), "minWidth" to J.of(it.minWidth), "columns" to J.of(it.columns)) })
+        "resolveBreakpoint" -> J.of(resolveBreakpoint(J.num(i["width"]), dashboardBreakpoints(J.int(i["columns"]))).id)
+        "parseFilter" -> {
+            val fields = J.arr(i["fields"]).map { f -> J.obj(f).let { FilterFieldDef(J.str(it["key"]), J.str(it["header"]), J.str(it["type"]), (it["options"] as? JsonValue.Arr)?.items?.map(J::str) ?: emptyList(), emptyMap()) } }
+            parseFilter(i.getValue("filter"), fields)?.let(::filterJson) ?: JsonValue.Null
+        }
         else -> null
     }
 }

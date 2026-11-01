@@ -13,7 +13,8 @@
               "children": [
                 {
                   "id": "data-board",
-                  "role": "generic"
+                  "name": "Pipeline board",
+                  "role": "group"
                 }
               ],
               "id": "layout-tile",

@@ -32,6 +32,11 @@ object SemanticRules {
         "id:data-calendar" to SemanticRule(role = "grid", name = listOf("label")),
         "id:data-timeline" to SemanticRule(role = "figure", name = listOf("label")),
         "id:data-notification-inbox" to SemanticRule(role = "list"),
+        "id:data-board" to SemanticRule(role = "group", name = listOf("label")),
+        "id:data-map" to SemanticRule(role = "figure", name = listOf("label")),
+        "id:data-dashboard" to SemanticRule(role = "region", name = listOf("label")),
+        "id:data-dashboard-widget" to SemanticRule(role = "group", name = listOf("title")),
+        "id:data-filter-builder" to SemanticRule(role = "group", name = listOf("label")),
     )
 
     /** Block rules by `block.type`, for `blocks-*` ids. */

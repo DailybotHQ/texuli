@@ -12,20 +12,20 @@ every other component paints a visible placeholder. Native is in development.
 | Measure | Count |
 | --- | --- |
 | Catalog components | 168 |
-| Painted natively | 47 |
-| Placeholder natively | 121 |
+| Painted natively | 52 |
+| Placeholder natively | 116 |
 | Agent-emittable components | 75 |
-| Agent-emittable and painted natively | 47 |
-| Painted read-only (interactive on the web) | 6 |
-| Components with a shared semantic rule | 44 |
+| Agent-emittable and painted natively | 52 |
+| Painted read-only (interactive on the web) | 9 |
+| Components with a shared semantic rule | 49 |
 | Golden traces (web = native) | 15 |
 | Components covered by a golden trace | 34 |
-| Parity fixture traces (web = native) | 7 |
-| Components covered by any trace | 62 |
+| Parity fixture traces (web = native) | 8 |
+| Components covered by any trace | 66 |
 
 So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes**
 (validation, label interpolation and the golden semantic traces match); **for painting, not yet**
-(47 of 168 components).
+(52 of 168 components).
 
 ## Capabilities
 
@@ -50,7 +50,7 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | chat | 2 | 0 |
 | composition | 4 | 4 |
 | content | 35 | 30 |
-| data | 12 | 7 |
+| data | 12 | 12 |
 | display | 17 | 0 |
 | documents | 1 | 0 |
 | forms | 29 | 0 |
@@ -80,7 +80,7 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `blocks-map` | content | yes | renders | placeholder | — | — | — |
 | `blocks-media` | content | yes | renders | painted | — | — | yes |
 | `blocks-structure` | content | yes | renders | painted | — | — | yes |
-| `blocks-text` | content | yes | renders | painted | — | yes | — |
+| `blocks-text` | content | yes | renders | painted | — | yes | yes |
 | `breadcrumb` | overlays | — | renders | placeholder | — | — | — |
 | `button` | forms | — | renders | placeholder | — | — | — |
 | `button-group` | forms | — | renders | placeholder | — | — | — |
@@ -124,15 +124,15 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `control-filter` | state | yes | renders | placeholder | — | yes | — |
 | `control-slider` | state | yes | renders | placeholder | — | yes | — |
 | `control-toggle` | state | yes | renders | placeholder | — | yes | — |
-| `data-board` | data | yes | renders | placeholder | — | yes | — |
+| `data-board` | data | yes | renders | painted (read-only) | yes | yes | yes |
 | `data-calendar` | data | yes | renders | painted (read-only) | yes | — | yes |
 | `data-cohort-table` | data | yes | renders | painted | yes | — | yes |
-| `data-dashboard` | data | yes | renders | placeholder | — | — | — |
-| `data-dashboard-widget` | data | yes | renders | placeholder | — | — | — |
+| `data-dashboard` | data | yes | renders | painted | yes | — | yes |
+| `data-dashboard-widget` | data | yes | renders | painted | yes | — | yes |
 | `data-files` | data | yes | renders | painted (read-only) | yes | — | yes |
-| `data-filter-builder` | data | yes | renders | placeholder | — | — | — |
+| `data-filter-builder` | data | yes | renders | painted (read-only) | yes | — | yes |
 | `data-grid` | data | yes | renders | painted (read-only) | yes | yes | yes |
-| `data-map` | data | yes | renders | placeholder | — | — | — |
+| `data-map` | data | yes | renders | painted (read-only) | yes | — | yes |
 | `data-notification-inbox` | data | yes | renders | painted (read-only) | yes | — | yes |
 | `data-timeline` | data | yes | renders | painted (read-only) | yes | — | yes |
 | `data-tree-view` | data | yes | renders | painted (read-only) | yes | — | yes |

@@ -134,6 +134,22 @@ private fun PlanNodeContent(node: PlanNode, path: String, onIntent: (TexuliInten
             "data-calendar" -> nativeCalendar(node.props)?.let { CalendarPainter(it) } ?: Placeholder(node.id, "invalid-data")
             "data-timeline" -> nativeTimeline(node.props)?.let { TimelinePainter(it) } ?: Placeholder(node.id, "invalid-data")
             "data-notification-inbox" -> nativeInbox(node.props)?.let { InboxPainter(it, path, onIntent) } ?: Placeholder(node.id, "invalid-data")
+            "data-board" -> nativeDataBoard(node.props)?.let { BoardPainter(it) } ?: Placeholder(node.id, "invalid-data")
+            "data-map" -> nativeMap(node.props)?.let { MapPainter(it) } ?: Placeholder(node.id, "invalid-data")
+            "data-filter-builder" -> nativeFilterBuilder(node.props)?.let { FilterBuilderPainter(it) } ?: Placeholder(node.id, "invalid-data")
+            "data-dashboard" -> {
+                val model = nativeDashboard(node.props, node.children.map { child -> child.id to ((child as? PlanNode.Component)?.props ?: emptyMap()) })
+                if (model == null) {
+                    Placeholder(node.id, "invalid-data")
+                } else {
+                    DashboardGrid(model) { widget ->
+                        val child = node.children[widget.childIndex] as PlanNode.Component
+                        DashboardWidgetContent(child, "$path.children.${widget.childIndex}", onIntent)
+                    }
+                }
+            }
+            // Outside a dashboard a widget paints its content in place, as on the web.
+            "data-dashboard-widget" -> DashboardWidgetContent(node, path, onIntent)
             "charts-canvas-renderer" -> {
                 val chart = nativeCanvasChart(node.props)
                 if (chart == null) Placeholder(node.id, "invalid-chart-data") else CanvasChartView(chart)
@@ -144,6 +160,14 @@ private fun PlanNodeContent(node: PlanNode, path: String, onIntent: (TexuliInten
             }
             else -> Placeholder(node.id, "not-on-this-target")
         }
+    }
+}
+
+@Composable
+private fun DashboardWidgetContent(node: PlanNode.Component, path: String, onIntent: (TexuliIntent) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        node.props.str("title")?.let { Heading(it, level = 3) }
+        Children(node, path, onIntent)
     }
 }
 

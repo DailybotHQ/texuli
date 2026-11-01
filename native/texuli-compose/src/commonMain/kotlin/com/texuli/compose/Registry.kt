@@ -32,6 +32,7 @@ object NativeRegistry {
     private val geoCharts = setOf("charts-geo-map", "charts-geo-point-map")
     private val dataTables = setOf("data-grid", "data-cohort-table", "data-tree-view", "data-files")
     private val dataTime = setOf("data-calendar", "data-timeline", "data-notification-inbox")
+    private val dataBoards = setOf("data-board", "data-map", "data-dashboard", "data-dashboard-widget", "data-filter-builder")
     /** Ids the first renderer slice paints natively. */
     val implemented: Set<String> = setOf(
         "layout-page",
@@ -52,7 +53,7 @@ object NativeRegistry {
         "layout-tile",
         "blocks-code",
         "blocks-structure",
-    ) + compactCharts + cartesianCharts + partWholeCharts + matrixFlowCharts + geoCharts + dataTables + dataTime
+    ) + compactCharts + cartesianCharts + partWholeCharts + matrixFlowCharts + geoCharts + dataTables + dataTime + dataBoards
 
     /**
      * Painted ids whose web view is interactive (catalog interaction role
@@ -66,6 +67,9 @@ object NativeRegistry {
         "data-calendar",
         "data-timeline",
         "data-notification-inbox",
+        "data-board",
+        "data-map",
+        "data-filter-builder",
     )
 
     fun status(id: String): BindingStatus =

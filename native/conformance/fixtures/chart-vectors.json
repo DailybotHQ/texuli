@@ -9816,6 +9816,1527 @@
         "value": null
       },
       "output": 0
+    },
+    {
+      "fn": "groupBoard",
+      "input": {
+        "cards": [
+          {
+            "id": "c3",
+            "column": "doing",
+            "lane": "web",
+            "rank": "a1"
+          },
+          {
+            "id": "c1",
+            "column": "doing",
+            "lane": "web",
+            "rank": "a0"
+          },
+          {
+            "id": "c2",
+            "column": "todo",
+            "lane": "app",
+            "rank": "a0"
+          },
+          {
+            "id": "c4",
+            "column": "gone",
+            "lane": "web",
+            "rank": "a2"
+          },
+          {
+            "id": "c5",
+            "column": "todo",
+            "lane": "nowhere",
+            "rank": "a3"
+          },
+          {
+            "id": "c0",
+            "column": "doing",
+            "lane": "web",
+            "rank": "a1"
+          }
+        ],
+        "columns": [
+          {
+            "id": "todo",
+            "title": "To do"
+          },
+          {
+            "id": "doing",
+            "title": "Doing",
+            "wip": {
+              "soft": 2,
+              "hard": 3
+            }
+          }
+        ],
+        "lanes": [
+          {
+            "id": "web",
+            "title": "Web"
+          },
+          {
+            "id": "app",
+            "title": "App"
+          }
+        ]
+      },
+      "output": {
+        "cells": [[[], ["c1", "c0", "c3"]], [["c2"], []]],
+        "counts": {
+          "todo": 1,
+          "doing": 3
+        },
+        "unplaced": ["c4", "c5"]
+      }
+    },
+    {
+      "fn": "groupBoard",
+      "input": {
+        "cards": [
+          {
+            "id": "c3",
+            "column": "doing",
+            "lane": "web",
+            "rank": "a1"
+          },
+          {
+            "id": "c1",
+            "column": "doing",
+            "lane": "web",
+            "rank": "a0"
+          },
+          {
+            "id": "c2",
+            "column": "todo",
+            "lane": "app",
+            "rank": "a0"
+          },
+          {
+            "id": "c4",
+            "column": "gone",
+            "lane": "web",
+            "rank": "a2"
+          },
+          {
+            "id": "c5",
+            "column": "todo",
+            "lane": "nowhere",
+            "rank": "a3"
+          },
+          {
+            "id": "c0",
+            "column": "doing",
+            "lane": "web",
+            "rank": "a1"
+          }
+        ],
+        "columns": [
+          {
+            "id": "todo",
+            "title": "To do"
+          },
+          {
+            "id": "doing",
+            "title": "Doing",
+            "wip": {
+              "soft": 2,
+              "hard": 3
+            }
+          }
+        ],
+        "lanes": []
+      },
+      "output": {
+        "cells": [[["c2", "c5"], ["c1", "c0", "c3"]]],
+        "counts": {
+          "todo": 2,
+          "doing": 3
+        },
+        "unplaced": ["c4"]
+      }
+    },
+    {
+      "fn": "evaluateWip",
+      "input": {
+        "soft": 2,
+        "hard": 3,
+        "title": "Doing",
+        "count": 1
+      },
+      "output": {
+        "status": "ok",
+        "reason": null
+      }
+    },
+    {
+      "fn": "evaluateWip",
+      "input": {
+        "soft": 2,
+        "hard": 3,
+        "title": "Doing",
+        "count": 2
+      },
+      "output": {
+        "status": "warn",
+        "reason": "Doing has reached its soft WIP limit (2 of 2)."
+      }
+    },
+    {
+      "fn": "evaluateWip",
+      "input": {
+        "soft": 2,
+        "hard": 3,
+        "title": "Doing",
+        "count": 3
+      },
+      "output": {
+        "status": "blocked",
+        "reason": "Doing has reached its WIP limit (3 of 3)."
+      }
+    },
+    {
+      "fn": "evaluateWip",
+      "input": {
+        "soft": 2,
+        "hard": 3,
+        "title": "Doing",
+        "count": 4
+      },
+      "output": {
+        "status": "blocked",
+        "reason": "Doing is over its WIP limit (4 of 3)."
+      }
+    },
+    {
+      "fn": "mercator",
+      "input": {
+        "lng": 0,
+        "lat": 0
+      },
+      "output": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "fn": "mercator",
+      "input": {
+        "lng": -18.5,
+        "lat": -31
+      },
+      "output": {
+        "x": 0.4486111111111111,
+        "y": 0.5906487244131758
+      }
+    },
+    {
+      "fn": "mercator",
+      "input": {
+        "lng": 179.9,
+        "lat": 89
+      },
+      "output": {
+        "x": 0.9997222222222222,
+        "y": -6.228684235054516e-12
+      }
+    },
+    {
+      "fn": "fitBounds",
+      "input": {
+        "bbox": [-20, -32, -17, -30],
+        "width": 800,
+        "height": 480,
+        "padding": 28
+      },
+      "output": {
+        "center": {
+          "lng": -18.5,
+          "lat": -31.00524430789964
+        },
+        "zoom": 7.997296123364408
+      }
+    },
+    {
+      "fn": "project",
+      "input": {
+        "point": {
+          "lng": -18.6,
+          "lat": -31.2
+        },
+        "view": {
+          "center": {
+            "lng": -18.5,
+            "lat": -31.00524430789964
+          },
+          "zoom": 7.997296123364408
+        },
+        "width": 800,
+        "height": 480
+      },
+      "output": {
+        "x": 381.8296420903515,
+        "y": 281.3291756821219
+      }
+    },
+    {
+      "fn": "basemapPaths",
+      "input": {
+        "width": 800,
+        "height": 480
+      },
+      "output": [
+        {
+          "id": "mainland",
+          "closed": true,
+          "d": "M127.4 28L327.3 28L400 59.5L436.3 101.6L409.1 143.7L363.7 158.5L349.1 207.1L390.9 238.9L454.5 270.7L499.9 313.2L563.5 340.9L578.1 387.8L509 413.5L418.2 400.6L327.3 430.6L236.5 452L127.4 452Z",
+          "label": null
+        },
+        {
+          "id": "gull-island",
+          "closed": true,
+          "d": "M590.8 143.7L618 133.2L632.6 158.5L603.5 181.7Z",
+          "label": {
+            "x": 609,
+            "y": 158.5,
+            "text": "Gull Island"
+          }
+        },
+        {
+          "id": "mill-lake",
+          "closed": true,
+          "d": "M145.6 355.8L191 345.2L209.2 377.2L182 404.9L142 387.8Z",
+          "label": {
+            "x": 174.7,
+            "y": 375,
+            "text": "Mill Lake"
+          }
+        },
+        {
+          "id": "meridian-river",
+          "closed": false,
+          "d": "M127.4 323.9L172.9 306.8L209.2 277.1L245.6 243.1L281.9 228.3L318.2 217.7L349.1 207.1",
+          "label": {
+            "x": 209.2,
+            "y": 277.1,
+            "text": "Meridian River"
+          }
+        },
+        {
+          "id": "highland-park",
+          "closed": true,
+          "d": "M154.7 91L209.2 86.8L218.3 122.6L163.8 137.4Z",
+          "label": {
+            "x": 185.6,
+            "y": 112.1,
+            "text": "Highland Park"
+          }
+        },
+        {
+          "id": "lantern-dunes",
+          "closed": true,
+          "d": "M445.4 345.2L481.8 340.9L490.9 370.7L450.9 379.3Z",
+          "label": {
+            "x": 467.2,
+            "y": 360.1,
+            "text": "Lantern Dunes"
+          }
+        },
+        {
+          "id": "north-pier",
+          "closed": true,
+          "d": "M336.4 80.5L390.9 70L414.5 101.6L396.4 143.7L354.6 150.1L327.3 122.6Z",
+          "label": {
+            "x": 381.8,
+            "y": 112.1,
+            "text": "North Pier"
+          }
+        },
+        {
+          "id": "meridian-center",
+          "closed": true,
+          "d": "M245.6 143.7L318.2 154.3L341.9 196.5L291 213.5L240.1 188.1Z",
+          "label": {
+            "x": 291,
+            "y": 179.6,
+            "text": "Meridian Center"
+          }
+        },
+        {
+          "id": "old-mill",
+          "closed": true,
+          "d": "M227.4 234.6L309.1 224.1L336.4 260.1L309.1 302.6L236.5 302.6Z",
+          "label": {
+            "x": 272.8,
+            "y": 260.1,
+            "text": "Old Mill"
+          }
+        },
+        {
+          "id": "lantern-point",
+          "closed": true,
+          "d": "M494.5 334.5L549 334.5L567.2 366.5L545.4 398.5L499.9 396.4Z",
+          "label": {
+            "x": 527.2,
+            "y": 366.5,
+            "text": "Lantern Point"
+          }
+        },
+        {
+          "id": "coast-road",
+          "closed": false,
+          "d": "M336.4 49L381.8 112.1L331 179.6L378.2 243.1L481.8 309L527.2 366.5",
+          "label": {
+            "x": 336.4,
+            "y": 49,
+            "text": "Coast Road"
+          }
+        },
+        {
+          "id": "meridian-avenue",
+          "closed": false,
+          "d": "M136.5 101.6L200.1 133.2L291 179.6L381.8 112.1",
+          "label": {
+            "x": 136.5,
+            "y": 101.6,
+            "text": "Meridian Avenue"
+          }
+        },
+        {
+          "id": "mill-road",
+          "closed": false,
+          "d": "M127.4 264.3L272.8 260.1L291 179.6",
+          "label": {
+            "x": 127.4,
+            "y": 264.3,
+            "text": "Mill Road"
+          }
+        },
+        {
+          "id": "southern-highway",
+          "closed": false,
+          "d": "M272.8 260.1L318.2 328.1L381.8 362.2L454.5 370.7L527.2 366.5",
+          "label": {
+            "x": 272.8,
+            "y": 260.1,
+            "text": "Southern Highway"
+          }
+        },
+        {
+          "id": "harbor-line",
+          "closed": false,
+          "d": "M136.5 186L227.4 200.8L291 179.6L354.6 133.2L381.8 112.1",
+          "label": {
+            "x": 136.5,
+            "y": 186,
+            "text": "Harbor Line"
+          }
+        }
+      ]
+    },
+    {
+      "fn": "cluster",
+      "input": {
+        "markers": [
+          {
+            "id": "m2",
+            "lng": -18.61,
+            "lat": -31.21
+          },
+          {
+            "id": "m1",
+            "lng": -18.6,
+            "lat": -31.2
+          },
+          {
+            "id": "m3",
+            "lng": -17.4,
+            "lat": -30.6
+          },
+          {
+            "id": "m4",
+            "lng": 10,
+            "lat": 50
+          }
+        ],
+        "zoom": 7.997296123364408,
+        "cellPx": 72
+      },
+      "output": [
+        {
+          "kind": "point",
+          "id": "m4"
+        },
+        {
+          "kind": "point",
+          "id": "m3"
+        },
+        {
+          "kind": "cluster",
+          "id": "cluster:7:204:269",
+          "center": {
+            "lng": -18.60499999999999,
+            "lat": -31.20500013215213
+          },
+          "count": 2,
+          "ids": ["m1", "m2"]
+        }
+      ]
+    },
+    {
+      "fn": "cluster",
+      "input": {
+        "markers": [
+          {
+            "id": "m2",
+            "lng": -18.61,
+            "lat": -31.21
+          },
+          {
+            "id": "m1",
+            "lng": -18.6,
+            "lat": -31.2
+          },
+          {
+            "id": "m3",
+            "lng": -17.4,
+            "lat": -30.6
+          },
+          {
+            "id": "m4",
+            "lng": 10,
+            "lat": 50
+          }
+        ],
+        "zoom": 3,
+        "cellPx": 72
+      },
+      "output": [
+        {
+          "kind": "point",
+          "id": "m4"
+        },
+        {
+          "kind": "cluster",
+          "id": "cluster:3:12:16",
+          "center": {
+            "lng": -18.20333333333332,
+            "lat": -31.003758552329
+          },
+          "count": 3,
+          "ids": ["m1", "m2", "m3"]
+        }
+      ]
+    },
+    {
+      "fn": "normalizeLayout",
+      "input": {
+        "layout": [
+          {
+            "id": "kpi",
+            "x": 0,
+            "y": 0,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "chart",
+            "x": 3,
+            "y": 4,
+            "w": 9,
+            "h": 4
+          },
+          {
+            "id": "pinned",
+            "x": 0,
+            "y": 2,
+            "w": 3,
+            "h": 2,
+            "locked": true
+          },
+          {
+            "id": "pinned2",
+            "x": 1,
+            "y": 2,
+            "w": 3,
+            "h": 2,
+            "locked": true
+          },
+          {
+            "id": "loose",
+            "w": 6,
+            "h": 3
+          },
+          {
+            "id": "kpi",
+            "x": 5,
+            "y": 5
+          },
+          {
+            "id": "bad id!",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "wide",
+            "x": 20,
+            "y": 1.6,
+            "w": 40,
+            "h": 0,
+            "minW": 2,
+            "maxH": 5
+          }
+        ],
+        "columns": 12,
+        "compaction": "vertical"
+      },
+      "output": [
+        {
+          "id": "kpi",
+          "x": 0,
+          "y": 0,
+          "w": 3,
+          "h": 2
+        },
+        {
+          "id": "chart",
+          "x": 3,
+          "y": 0,
+          "w": 9,
+          "h": 4
+        },
+        {
+          "id": "pinned",
+          "x": 0,
+          "y": 2,
+          "w": 3,
+          "h": 2,
+          "locked": true
+        },
+        {
+          "id": "wide",
+          "x": 0,
+          "y": 4,
+          "w": 12,
+          "h": 1,
+          "minW": 2,
+          "maxH": 5
+        },
+        {
+          "id": "pinned2",
+          "x": 1,
+          "y": 5,
+          "w": 3,
+          "h": 2
+        },
+        {
+          "id": "loose",
+          "x": 4,
+          "y": 5,
+          "w": 6,
+          "h": 3
+        }
+      ]
+    },
+    {
+      "fn": "normalizeLayout",
+      "input": {
+        "layout": [
+          {
+            "id": "kpi",
+            "x": 0,
+            "y": 0,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "chart",
+            "x": 3,
+            "y": 4,
+            "w": 9,
+            "h": 4
+          },
+          {
+            "id": "pinned",
+            "x": 0,
+            "y": 2,
+            "w": 3,
+            "h": 2,
+            "locked": true
+          },
+          {
+            "id": "pinned2",
+            "x": 1,
+            "y": 2,
+            "w": 3,
+            "h": 2,
+            "locked": true
+          },
+          {
+            "id": "loose",
+            "w": 6,
+            "h": 3
+          },
+          {
+            "id": "kpi",
+            "x": 5,
+            "y": 5
+          },
+          {
+            "id": "bad id!",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "wide",
+            "x": 20,
+            "y": 1.6,
+            "w": 40,
+            "h": 0,
+            "minW": 2,
+            "maxH": 5
+          }
+        ],
+        "columns": 12,
+        "compaction": "none"
+      },
+      "output": [
+        {
+          "id": "kpi",
+          "x": 0,
+          "y": 0,
+          "w": 3,
+          "h": 2
+        },
+        {
+          "id": "loose",
+          "x": 3,
+          "y": 0,
+          "w": 6,
+          "h": 3
+        },
+        {
+          "id": "pinned",
+          "x": 0,
+          "y": 2,
+          "w": 3,
+          "h": 2,
+          "locked": true
+        },
+        {
+          "id": "wide",
+          "x": 0,
+          "y": 4,
+          "w": 12,
+          "h": 1,
+          "minW": 2,
+          "maxH": 5
+        },
+        {
+          "id": "pinned2",
+          "x": 1,
+          "y": 5,
+          "w": 3,
+          "h": 2
+        },
+        {
+          "id": "chart",
+          "x": 3,
+          "y": 7,
+          "w": 9,
+          "h": 4
+        }
+      ]
+    },
+    {
+      "fn": "normalizeLayout",
+      "input": {
+        "layout": [
+          {
+            "id": "kpi",
+            "x": 0,
+            "y": 0,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "chart",
+            "x": 3,
+            "y": 4,
+            "w": 9,
+            "h": 4
+          },
+          {
+            "id": "pinned",
+            "x": 0,
+            "y": 2,
+            "w": 3,
+            "h": 2,
+            "locked": true
+          },
+          {
+            "id": "pinned2",
+            "x": 1,
+            "y": 2,
+            "w": 3,
+            "h": 2,
+            "locked": true
+          },
+          {
+            "id": "loose",
+            "w": 6,
+            "h": 3
+          },
+          {
+            "id": "kpi",
+            "x": 5,
+            "y": 5
+          },
+          {
+            "id": "bad id!",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "wide",
+            "x": 20,
+            "y": 1.6,
+            "w": 40,
+            "h": 0,
+            "minW": 2,
+            "maxH": 5
+          }
+        ],
+        "columns": 6,
+        "compaction": "vertical"
+      },
+      "output": [
+        {
+          "id": "kpi",
+          "x": 0,
+          "y": 0,
+          "w": 3,
+          "h": 2
+        },
+        {
+          "id": "pinned",
+          "x": 0,
+          "y": 2,
+          "w": 3,
+          "h": 2,
+          "locked": true
+        },
+        {
+          "id": "wide",
+          "x": 0,
+          "y": 4,
+          "w": 6,
+          "h": 1,
+          "minW": 2,
+          "maxH": 5
+        },
+        {
+          "id": "pinned2",
+          "x": 1,
+          "y": 5,
+          "w": 3,
+          "h": 2
+        },
+        {
+          "id": "chart",
+          "x": 0,
+          "y": 7,
+          "w": 6,
+          "h": 4
+        },
+        {
+          "id": "loose",
+          "x": 0,
+          "y": 11,
+          "w": 6,
+          "h": 3
+        }
+      ]
+    },
+    {
+      "fn": "reflowLayout",
+      "input": {
+        "layout": [
+          {
+            "id": "kpi",
+            "x": 0,
+            "y": 0,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "chart",
+            "x": 3,
+            "y": 0,
+            "w": 9,
+            "h": 4
+          },
+          {
+            "id": "pinned",
+            "x": 0,
+            "y": 2,
+            "w": 3,
+            "h": 2,
+            "locked": true
+          },
+          {
+            "id": "wide",
+            "x": 0,
+            "y": 4,
+            "w": 12,
+            "h": 1,
+            "minW": 2,
+            "maxH": 5
+          },
+          {
+            "id": "pinned2",
+            "x": 1,
+            "y": 5,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "loose",
+            "x": 4,
+            "y": 5,
+            "w": 6,
+            "h": 3
+          }
+        ],
+        "from": 12,
+        "to": 6
+      },
+      "output": [
+        {
+          "id": "kpi",
+          "x": 0,
+          "y": 0,
+          "w": 2,
+          "h": 2
+        },
+        {
+          "id": "loose",
+          "x": 2,
+          "y": 0,
+          "w": 3,
+          "h": 3
+        },
+        {
+          "id": "pinned",
+          "x": 0,
+          "y": 2,
+          "w": 2,
+          "h": 2,
+          "locked": true
+        },
+        {
+          "id": "chart",
+          "x": 1,
+          "y": 4,
+          "w": 5,
+          "h": 4
+        },
+        {
+          "id": "wide",
+          "x": 0,
+          "y": 8,
+          "w": 6,
+          "h": 1,
+          "minW": 2,
+          "maxH": 5
+        },
+        {
+          "id": "pinned2",
+          "x": 1,
+          "y": 9,
+          "w": 2,
+          "h": 2
+        }
+      ]
+    },
+    {
+      "fn": "reflowLayout",
+      "input": {
+        "layout": [
+          {
+            "id": "kpi",
+            "x": 0,
+            "y": 0,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "chart",
+            "x": 3,
+            "y": 0,
+            "w": 9,
+            "h": 4
+          },
+          {
+            "id": "pinned",
+            "x": 0,
+            "y": 2,
+            "w": 3,
+            "h": 2,
+            "locked": true
+          },
+          {
+            "id": "wide",
+            "x": 0,
+            "y": 4,
+            "w": 12,
+            "h": 1,
+            "minW": 2,
+            "maxH": 5
+          },
+          {
+            "id": "pinned2",
+            "x": 1,
+            "y": 5,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "loose",
+            "x": 4,
+            "y": 5,
+            "w": 6,
+            "h": 3
+          }
+        ],
+        "from": 12,
+        "to": 1
+      },
+      "output": [
+        {
+          "id": "kpi",
+          "x": 0,
+          "y": 0,
+          "w": 1,
+          "h": 2
+        },
+        {
+          "id": "pinned",
+          "x": 0,
+          "y": 2,
+          "w": 1,
+          "h": 2,
+          "locked": true
+        },
+        {
+          "id": "chart",
+          "x": 0,
+          "y": 4,
+          "w": 1,
+          "h": 4
+        },
+        {
+          "id": "wide",
+          "x": 0,
+          "y": 8,
+          "w": 1,
+          "h": 1,
+          "maxH": 5
+        },
+        {
+          "id": "pinned2",
+          "x": 0,
+          "y": 9,
+          "w": 1,
+          "h": 2
+        },
+        {
+          "id": "loose",
+          "x": 0,
+          "y": 11,
+          "w": 1,
+          "h": 3
+        }
+      ]
+    },
+    {
+      "fn": "firstFit",
+      "input": {
+        "layout": [
+          {
+            "id": "kpi",
+            "x": 0,
+            "y": 0,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "chart",
+            "x": 3,
+            "y": 0,
+            "w": 9,
+            "h": 4
+          },
+          {
+            "id": "pinned",
+            "x": 0,
+            "y": 2,
+            "w": 3,
+            "h": 2,
+            "locked": true
+          },
+          {
+            "id": "wide",
+            "x": 0,
+            "y": 4,
+            "w": 12,
+            "h": 1,
+            "minW": 2,
+            "maxH": 5
+          },
+          {
+            "id": "pinned2",
+            "x": 1,
+            "y": 5,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "loose",
+            "x": 4,
+            "y": 5,
+            "w": 6,
+            "h": 3
+          }
+        ],
+        "w": 4,
+        "h": 2,
+        "columns": 12
+      },
+      "output": {
+        "x": 0,
+        "y": 7
+      }
+    },
+    {
+      "fn": "dashboardBreakpoints",
+      "input": {
+        "columns": 12
+      },
+      "output": [
+        {
+          "id": "lg",
+          "minWidth": 1024,
+          "columns": 12
+        },
+        {
+          "id": "md",
+          "minWidth": 640,
+          "columns": 6
+        },
+        {
+          "id": "sm",
+          "minWidth": 0,
+          "columns": 1
+        }
+      ]
+    },
+    {
+      "fn": "dashboardBreakpoints",
+      "input": {
+        "columns": 6
+      },
+      "output": [
+        {
+          "id": "lg",
+          "minWidth": 1024,
+          "columns": 6
+        },
+        {
+          "id": "md",
+          "minWidth": 640,
+          "columns": 6
+        },
+        {
+          "id": "sm",
+          "minWidth": 0,
+          "columns": 1
+        }
+      ]
+    },
+    {
+      "fn": "dashboardBreakpoints",
+      "input": {
+        "columns": 1
+      },
+      "output": [
+        {
+          "id": "lg",
+          "minWidth": 1024,
+          "columns": 1
+        },
+        {
+          "id": "sm",
+          "minWidth": 0,
+          "columns": 1
+        }
+      ]
+    },
+    {
+      "fn": "resolveBreakpoint",
+      "input": {
+        "width": 1200,
+        "columns": 12
+      },
+      "output": "lg"
+    },
+    {
+      "fn": "resolveBreakpoint",
+      "input": {
+        "width": 800,
+        "columns": 12
+      },
+      "output": "md"
+    },
+    {
+      "fn": "resolveBreakpoint",
+      "input": {
+        "width": 320,
+        "columns": 12
+      },
+      "output": "sm"
+    },
+    {
+      "fn": "parseFilter",
+      "input": {
+        "filter": {
+          "type": "group",
+          "op": "and",
+          "children": [
+            {
+              "type": "condition",
+              "field": "status",
+              "operator": "in",
+              "value": ["open"]
+            },
+            {
+              "type": "condition",
+              "field": "age",
+              "operator": "between",
+              "value": [1, 7]
+            }
+          ]
+        },
+        "fields": [
+          {
+            "key": "status",
+            "header": "Status",
+            "type": "enum",
+            "options": ["open", "closed"]
+          },
+          {
+            "key": "age",
+            "header": "Age",
+            "type": "number"
+          },
+          {
+            "key": "subject",
+            "header": "Subject",
+            "type": "text"
+          },
+          {
+            "key": "due",
+            "header": "Due",
+            "type": "date"
+          }
+        ]
+      },
+      "output": {
+        "type": "group",
+        "op": "and",
+        "children": [
+          {
+            "type": "condition",
+            "field": "status",
+            "operator": "in",
+            "value": ["open"]
+          },
+          {
+            "type": "condition",
+            "field": "age",
+            "operator": "between",
+            "value": [1, 7]
+          }
+        ]
+      }
+    },
+    {
+      "fn": "parseFilter",
+      "input": {
+        "filter": {
+          "type": "condition",
+          "field": "subject",
+          "operator": "contains",
+          "value": "login"
+        },
+        "fields": [
+          {
+            "key": "status",
+            "header": "Status",
+            "type": "enum",
+            "options": ["open", "closed"]
+          },
+          {
+            "key": "age",
+            "header": "Age",
+            "type": "number"
+          },
+          {
+            "key": "subject",
+            "header": "Subject",
+            "type": "text"
+          },
+          {
+            "key": "due",
+            "header": "Due",
+            "type": "date"
+          }
+        ]
+      },
+      "output": {
+        "type": "group",
+        "op": "and",
+        "children": [
+          {
+            "type": "condition",
+            "field": "subject",
+            "operator": "contains",
+            "value": "login"
+          }
+        ]
+      }
+    },
+    {
+      "fn": "parseFilter",
+      "input": {
+        "filter": {
+          "type": "condition",
+          "field": "age",
+          "operator": "contains",
+          "value": "x"
+        },
+        "fields": [
+          {
+            "key": "status",
+            "header": "Status",
+            "type": "enum",
+            "options": ["open", "closed"]
+          },
+          {
+            "key": "age",
+            "header": "Age",
+            "type": "number"
+          },
+          {
+            "key": "subject",
+            "header": "Subject",
+            "type": "text"
+          },
+          {
+            "key": "due",
+            "header": "Due",
+            "type": "date"
+          }
+        ]
+      },
+      "output": null
+    },
+    {
+      "fn": "parseFilter",
+      "input": {
+        "filter": {
+          "type": "condition",
+          "field": "ghost",
+          "operator": "eq",
+          "value": 1
+        },
+        "fields": [
+          {
+            "key": "status",
+            "header": "Status",
+            "type": "enum",
+            "options": ["open", "closed"]
+          },
+          {
+            "key": "age",
+            "header": "Age",
+            "type": "number"
+          },
+          {
+            "key": "subject",
+            "header": "Subject",
+            "type": "text"
+          },
+          {
+            "key": "due",
+            "header": "Due",
+            "type": "date"
+          }
+        ]
+      },
+      "output": null
+    },
+    {
+      "fn": "parseFilter",
+      "input": {
+        "filter": {
+          "type": "condition",
+          "field": "status",
+          "operator": "eq",
+          "value": "pending"
+        },
+        "fields": [
+          {
+            "key": "status",
+            "header": "Status",
+            "type": "enum",
+            "options": ["open", "closed"]
+          },
+          {
+            "key": "age",
+            "header": "Age",
+            "type": "number"
+          },
+          {
+            "key": "subject",
+            "header": "Subject",
+            "type": "text"
+          },
+          {
+            "key": "due",
+            "header": "Due",
+            "type": "date"
+          }
+        ]
+      },
+      "output": null
+    },
+    {
+      "fn": "parseFilter",
+      "input": {
+        "filter": {
+          "type": "condition",
+          "field": "due",
+          "operator": "before",
+          "value": "2026-10-01"
+        },
+        "fields": [
+          {
+            "key": "status",
+            "header": "Status",
+            "type": "enum",
+            "options": ["open", "closed"]
+          },
+          {
+            "key": "age",
+            "header": "Age",
+            "type": "number"
+          },
+          {
+            "key": "subject",
+            "header": "Subject",
+            "type": "text"
+          },
+          {
+            "key": "due",
+            "header": "Due",
+            "type": "date"
+          }
+        ]
+      },
+      "output": {
+        "type": "group",
+        "op": "and",
+        "children": [
+          {
+            "type": "condition",
+            "field": "due",
+            "operator": "before",
+            "value": "2026-10-01"
+          }
+        ]
+      }
+    },
+    {
+      "fn": "parseFilter",
+      "input": {
+        "filter": {
+          "type": "condition",
+          "field": "age",
+          "operator": "isEmpty",
+          "value": 3
+        },
+        "fields": [
+          {
+            "key": "status",
+            "header": "Status",
+            "type": "enum",
+            "options": ["open", "closed"]
+          },
+          {
+            "key": "age",
+            "header": "Age",
+            "type": "number"
+          },
+          {
+            "key": "subject",
+            "header": "Subject",
+            "type": "text"
+          },
+          {
+            "key": "due",
+            "header": "Due",
+            "type": "date"
+          }
+        ]
+      },
+      "output": null
+    },
+    {
+      "fn": "parseFilter",
+      "input": {
+        "filter": {
+          "type": "group",
+          "op": "xor",
+          "children": []
+        },
+        "fields": [
+          {
+            "key": "status",
+            "header": "Status",
+            "type": "enum",
+            "options": ["open", "closed"]
+          },
+          {
+            "key": "age",
+            "header": "Age",
+            "type": "number"
+          },
+          {
+            "key": "subject",
+            "header": "Subject",
+            "type": "text"
+          },
+          {
+            "key": "due",
+            "header": "Due",
+            "type": "date"
+          }
+        ]
+      },
+      "output": null
     }
   ]
 }

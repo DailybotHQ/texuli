@@ -113,17 +113,25 @@ internal fun SceneCanvas(minUnits: Double = 240.0, maxUnits: Double = 640.0, lay
     }
 }
 
-/** Draws a scene at its own size (1 unit = 1 dp). */
+/** Draws a scene scaled down to the available width (never up), as an SVG with a viewBox does. */
 @Composable
-internal fun DrawScene(scene: ChartScene, modifier: Modifier = Modifier) {
+internal fun FittedScene(scene: ChartScene) {
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        DrawScene(scene, scale = min(1.0, maxWidth.value.toDouble() / scene.width).toFloat())
+    }
+}
+
+/** Draws a scene at its own size (1 unit = 1 dp), times `scale`. */
+@Composable
+internal fun DrawScene(scene: ChartScene, modifier: Modifier = Modifier, scale: Float = 1f) {
     val palette = chartPalette()
     val scheme = MaterialTheme.colorScheme
     val measurer = rememberTextMeasurer()
     val textColor = scheme.onSurfaceVariant
     val strongColor = scheme.onSurface
     run {
-        Canvas(modifier.width(scene.width.dp).height(scene.height.dp)) {
-            scale(density, density, pivot = Offset.Zero) {
+        Canvas(modifier.width((scene.width * scale).dp).height((scene.height * scale).dp)) {
+            scale(density * scale, density * scale, pivot = Offset.Zero) {
                 for (mark in scene.marks) {
                     when (mark) {
                         is Mark.PathMark -> {
@@ -157,16 +165,16 @@ internal fun DrawScene(scene: ChartScene, modifier: Modifier = Modifier) {
                 }
             }
             for (label in scene.texts) {
-                val style = TextStyle(fontSize = label.size.sp, color = if (label.strong) strongColor else textColor)
+                val style = TextStyle(fontSize = (label.size * scale).sp, color = if (label.strong) strongColor else textColor)
                 val measured = measurer.measure(label.text, style)
                 val w = measured.size.width.toFloat()
-                val x = label.x.toFloat() * density - when (label.anchor) {
+                val x = label.x.toFloat() * density * scale - when (label.anchor) {
                     TextAnchor.START -> 0f
                     TextAnchor.MIDDLE -> w / 2
                     TextAnchor.END -> w
                 }
                 // SVG text sits on its baseline; Compose draws from the top of the line box.
-                val y = label.y.toFloat() * density - measured.firstBaseline
+                val y = label.y.toFloat() * density * scale - measured.firstBaseline
                 drawText(measured, topLeft = Offset(x, y))
             }
         }
