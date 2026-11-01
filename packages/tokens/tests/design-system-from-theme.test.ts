@@ -35,6 +35,20 @@ function resolved(vars: Record<string, string>): Record<string, string> {
 }
 
 describe('fromTheme: the zero-drift bridge', () => {
+  it('keeps a unit on a square radius, so calc(var(--tx-radius) + 2px) stays valid (G128)', async () => {
+    const themes = await loadAllFullLibraryThemes();
+    const square = themes.filter(
+      (theme) => theme.id === 'brutalist-block' || theme.id === 'velvet-shop'
+    );
+    expect(square).toHaveLength(2);
+    for (const theme of square) {
+      expect(themeVariables({ theme, mode: 'light' })['--tx-radius'], theme.id).toBe('0px');
+      const compiled = compileDesignSystem(await loadLibraryBase(`texuli:${theme.id}`));
+      if (!compiled.ok) throw new Error(theme.id);
+      expect(compiled.vars.light?.['--tx-radius'], theme.id).toBe('0px');
+    }
+  });
+
   it('turns all 210 library themes into valid documents that compile to their themeVariables', async () => {
     const themes = await loadAllFullLibraryThemes();
     expect(themes).toHaveLength(210);

@@ -535,7 +535,7 @@ export const PORT_THEME_RECORDS: readonly LibraryThemeDefinition[] = Object.free
         secondary: '#f59e0b',
         neutral: 'zinc',
         font: 'grotesk',
-        radius: '0',
+        radius: '0px',
         density: 1,
         style: {
           elevation: 'flat',
@@ -1154,7 +1154,7 @@ export const PORT_THEME_RECORDS: readonly LibraryThemeDefinition[] = Object.free
         secondary: '#a16207',
         neutral: 'warm',
         font: 'editorial',
-        radius: '0',
+        radius: '0px',
         density: 1,
         style: {
           elevation: 'soft',

@@ -8,7 +8,7 @@ examples, validate blueprint drafts, search and preview themes with their
 WCAG AA report, and run the deck and document commands.
 
 > **Status: in development (pre-1.0).** `@texuli/mcp` is published on npm
-> as `0.11.1`, with provenance (first published as `0.9.0`). Under 0.x a new minor
+> as `0.11.2`, with provenance (first published as `0.9.0`). Under 0.x a new minor
 > (`0.12.0`) may contain breaking changes, so pin the exact version or use
 > `^0.11.0`, which accepts only 0.11.x
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).

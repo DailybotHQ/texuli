@@ -205,6 +205,10 @@ describe('password, otp, color and datetime (G117)', () => {
         dev
       )
     ).toEqual([]);
+    // A simulation keeps fake passwords out of the password manager (G129).
+    expect(
+      codes(schemaWith({ name: 'pw', type: 'password', label: 'P', autocomplete: 'off' }), dev)
+    ).toEqual([]);
     expect(
       codes(
         schemaWith(

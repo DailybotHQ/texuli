@@ -104,10 +104,14 @@ export const FORM_AUTOCOMPLETE = Object.freeze([
 ] as const);
 export type FormAutocomplete = (typeof FORM_AUTOCOMPLETE)[number];
 
-/** The `autocomplete` tokens of a `password` field (and only of one); default `current-password`. */
+/**
+ * The `autocomplete` tokens of a `password` field; default `current-password`. `off` keeps a
+ * simulated or throwaway password out of the browser's password manager.
+ */
 export const FORM_PASSWORD_AUTOCOMPLETE = Object.freeze([
   'current-password',
   'new-password',
+  'off',
 ] as const);
 export type FormPasswordAutocomplete = (typeof FORM_PASSWORD_AUTOCOMPLETE)[number];
 

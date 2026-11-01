@@ -49,7 +49,7 @@ of `FORM_RESERVED_NAMES`, the `Object.prototype` members such as
 | `messages` | every type | Plain-text overrides by rule (`FormRuleName`, `FORM_RULE_NAMES`) |
 | `rows` | textarea | Visible rows (2–20) |
 | `accept`, `maxSize` | file | MIME types or extensions, and the largest file in bytes |
-| `autocomplete` (`FormAutocomplete`) | text types, number, date, select | A token of `FORM_AUTOCOMPLETE` (no payment or one-time-code tokens); a password field takes `current-password` (the default) or `new-password` (`FORM_PASSWORD_AUTOCOMPLETE`, `FormPasswordAutocomplete`) and nothing else |
+| `autocomplete` (`FormAutocomplete`) | text types, number, date, select | A token of `FORM_AUTOCOMPLETE` (no payment or one-time-code tokens); a password field takes `current-password` (the default), `new-password` or `off`, which keeps a simulated password out of the password manager (`FORM_PASSWORD_AUTOCOMPLETE`, `FormPasswordAutocomplete`), and nothing else |
 | `kind`, `config` | custom | The kind the host paints (`FORM_KIND`, required) and up to 20 scalar settings handed to the painter |
 | `length` | otp | Digits of the code, 4 to 12 (default 6) |
 | `protocols` (`FormUrlProtocol`) | url | Allowed schemes from `FORM_URL_PROTOCOLS`: `['https']` by default, `['http', 'https']` to accept http |

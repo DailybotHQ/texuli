@@ -9,7 +9,7 @@ plain TypeScript you can use without any component. It is part of
 Svelte 5 component library by Dailybot, Inc., for application developers and
 for agents that render charts from validated data.
 
-> **Status: 0.x release.** `@texuli/charts` is published on npm as `0.11.1`, a
+> **Status: 0.x release.** `@texuli/charts` is published on npm as `0.11.2`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
 > minor (`0.12.0`) may contain breaking changes, so pin the exact version or
 > use `^0.11.0`, which accepts only 0.11.x.

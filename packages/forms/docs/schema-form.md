@@ -212,7 +212,8 @@ Back and Next, and disables Submit. Both also follow the controller's
 ## Password, one-time code, color and datetime (G117)
 
 - **Password**: an `Input type="password"` with `autocomplete`
-  `current-password` (or the field's `new-password`) and a "Show password"
+  `current-password` (or the field's `new-password`, or `off` for a simulated
+  password the browser must not save) and a "Show password"
   toggle button (`aria-pressed`, `aria-controls`) that switches it to text.
 - **One-time code**: one input (not split boxes, so screen readers and
   paste work) with `autocomplete="one-time-code"`, `inputmode="numeric"`
