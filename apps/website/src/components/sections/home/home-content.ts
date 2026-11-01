@@ -40,6 +40,8 @@ export const HOME_HERO = {
     { href: '/web-and-native/', label: 'Web + native', role: 'text' },
   ] satisfies readonly HomeLink[],
   proofLabel: 'Texuli by the numbers',
+  /** The release hub, linked from the badge line (no version number to drift). */
+  news: { href: '/whats-new/', label: 'What’s new' },
 } as const;
 
 /** The hero's proof row: the catalog, primitives and examples counts plus the theme count. */

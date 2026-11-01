@@ -24,7 +24,8 @@ const resolveHref = (href: string): string | undefined => {
 <section class="home-hero" aria-labelledby={HOME_IDS.hero} data-tx-home-hero="">
   <div class="home-hero__inner">
     <div class="home-hero__copy">
-      <p class="home-hero__badge">
+      <p class="home-hero__top">
+        <span class="home-hero__badge">
         {
           HOME_HERO.badge.map((item, index) => (
             <>
@@ -33,6 +34,10 @@ const resolveHref = (href: string): string | undefined => {
             </>
           ))
         }
+        </span>
+        <a class="home-hero__news" href={resolveHref(HOME_HERO.news.href)} data-tx-hero-news=""
+          >{HOME_HERO.news.label}<span aria-hidden="true">&nbsp;→</span></a
+        >
       </p>
       <h1 id={HOME_IDS.hero}>
         {HOME_HERO.title.lead}{' '}
@@ -94,6 +99,26 @@ const resolveHref = (href: string): string | undefined => {
     gap: 1.25rem;
     justify-items: start;
     max-inline-size: 36rem;
+  }
+  .home-hero__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    margin: 0;
+  }
+  .home-hero__news {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.5rem;
+    color: var(--home-accent-text);
+    font-size: 0.85rem;
+    font-weight: 650;
+    text-underline-offset: 0.2em;
+  }
+  .home-hero__news:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
   }
   .home-hero__badge {
     margin: 0;
