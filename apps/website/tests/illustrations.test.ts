@@ -11,6 +11,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { PROMPTS_DOC, renderPromptsDoc } from '../scripts/illustration-prompts.ts';
 import {
   ILLUSTRATIONS,
   type IllustrationEntry,
@@ -109,5 +110,26 @@ describe('SiteIllustration', () => {
     );
     expect(source).toMatch(/\.site-illustration__dark \{\s+display: none !important;/);
     expect(source).toContain(":global(:root[data-tx-mode='dark']) .site-illustration--plate");
+  });
+});
+
+describe('illustration prompts', () => {
+  it('makes every prompt self-contained: subject, camera, palette, no-text rule, size and file', () => {
+    for (const entry of ILLUSTRATIONS) {
+      const { prompt } = entry;
+      expect(prompt.split(/\s+/).length, entry.slot).toBeGreaterThanOrEqual(90);
+      expect(prompt, entry.slot).toMatch(/^Subject: /);
+      expect(prompt, entry.slot).toContain('isometric');
+      for (const hex of ['#F7F5FB', '#6D4AFF', '#B9A8FF', '#FF8A4C', '#F4F0FF', '#FFF4EE'])
+        expect(prompt, `${entry.slot} ${hex}`).toContain(hex);
+      expect(prompt, entry.slot).toContain('No text: absolutely no letters, words, numbers');
+      expect(prompt, entry.slot).toContain(`exactly ${entry.width}x${entry.height} pixels`);
+      expect(prompt, entry.slot).toContain(`saved as ${entry.file}`);
+      if (entry.fileDark) expect(prompt, entry.slot).toContain(`save it as ${entry.fileDark}`);
+    }
+  });
+
+  it('keeps the generated prompts doc in sync with the manifest', () => {
+    expect(readFileSync(PROMPTS_DOC, 'utf8')).toBe(renderPromptsDoc(ILLUSTRATIONS));
   });
 });

@@ -75,3 +75,9 @@ Export WebP at quality 82 or better, at the exact pixel size above, below 250 KB
 4. Run `pnpm build`. The slot switches from its texel fallback to the file with no code change, and no layout shift, because the frame always reserves the same aspect ratio.
 
 Until a file exists, `SiteIllustration.astro` paints a seeded texel mosaic in the same palette roles, so a page is always complete.
+
+Prompts live in each manifest entry's `prompt`. After editing one, regenerate the prompts doc (the website tests fail while it is stale):
+
+```bash
+pnpm exec tsx apps/website/scripts/illustration-prompts.ts
+```
