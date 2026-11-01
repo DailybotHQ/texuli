@@ -69,6 +69,7 @@ JSON path, an RFC 6901 pointer, a message and a fix).
 | `.` | `model`, `schema`, `ops` and `markdown` together (not `sync` or `collab`) | this page |
 | `model` | The format and its types, the closed vocabularies and caps, constructors and iterative read helpers | [model](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/model.md) |
 | `schema` | The validator on the `@texuli/deck` schema kit, the URL policy for links and media, embedded decks, the untrusted loader and the JSON Schema export | [schema](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/schema.md) |
+| `schema-core` | The same validator without the deck model: inline decks refused unless the host passes `validateDeck` (from `0.11.3`) | [schema-core](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/schema-core.md) |
 | `ops` | Typed operations by persisted id with exact inverses, bounded RFC 6902 patches with inverse patches, and the op log with undo and redo | [ops](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/ops.md) |
 | `markdown` | Markdown import and export through the linear-time core editor codec | [markdown](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/markdown.md) |
 | `paged` | The pagination engine: page sizes and margins in points, explicit breaks, headings kept with what follows, widow and orphan control, headers and footers with page fields, over a measurer the caller injects | [paged](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/paged.md) |
@@ -120,6 +121,7 @@ JSON path, an RFC 6901 pointer, a message and a fix).
 
 - [Model](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/model.md)
 - [Schema](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/schema.md)
+- [Schema core](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/schema-core.md)
 - [Operations, patches and the op log](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/ops.md)
 - [Markdown](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/markdown.md)
 - [Paged layout](https://github.com/DailybotHQ/texuli/blob/main/packages/document/docs/paged.md),

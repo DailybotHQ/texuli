@@ -36,6 +36,10 @@
       "types": "./src/schema/index.ts",
       "default": "./src/schema/index.ts"
     },
+    "./schema-core": {
+      "types": "./src/schema/core.ts",
+      "default": "./src/schema/core.ts"
+    },
     "./ops": {
       "types": "./src/ops/index.ts",
       "default": "./src/ops/index.ts"

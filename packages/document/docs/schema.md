@@ -33,6 +33,15 @@ const fromText = loadUntrustedDocument(jsonText, { maxBytes: 1_000_000 });
   Schema cannot express them.
 - `jsonBytes(value, cap)` counts the UTF-8 bytes of a value's JSON (the
   inline payload cap uses it).
+- `checkDeckPayload(payload)` is the inline deck check these entry points
+  use by default (`parseDeck` from `@texuli/deck/model`, as a
+  `DeckPayloadValidator` returning a `DeckPayloadResult` of
+  `DeckPayloadIssue`s); `ValidateDocumentOptions.validateDeck` replaces it,
+  and `null` refuses inline decks. `documentSchemaCore(trust, validateDeck)`
+  builds the schema with any validator.
+- A host that never embeds an inline deck can import the same validator
+  from [`@texuli/document/schema-core`](schema-core.md) (from `0.11.3`),
+  which leaves the deck model out of its bundle.
 
 ## What is checked
 

@@ -19,8 +19,8 @@ import type {
   PageSettings,
   TexuliDocument,
 } from '../model/types.ts';
+import { validateDocument } from '../schema/index.ts';
 import type { DocumentDiagnostic } from '../schema/validate.ts';
-import { validateDocument } from '../schema/validate.ts';
 import { cloneData, equalData } from './clone.ts';
 
 /** Attribute values; `null` removes an optional attribute. */

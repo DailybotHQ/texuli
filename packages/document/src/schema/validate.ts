@@ -13,7 +13,7 @@ import {
 } from '@texuli/deck/schema';
 import { DOCUMENT_LIMITS } from '../model/limits.ts';
 import type { TexuliDocument } from '../model/types.ts';
-import { DOCUMENT_CODES, documentSchema } from './schema.ts';
+import { type DeckPayloadValidator, DOCUMENT_CODES, documentSchemaCore } from './schema.ts';
 
 /** One issue: a code, a severity, a path (`jsonPath`, RFC 6901 `pointer`), a message and a fix. */
 export type DocumentDiagnostic = DeckDiagnostic;
@@ -23,6 +23,12 @@ export interface ValidateDocumentOptions {
   trust?: HrefTrust;
   /** Diagnostics kept (default 200). */
   maxIssues?: number;
+  /**
+   * Checks inline deck payloads. `@texuli/document/schema` defaults it to
+   * `checkDeckPayload`; `@texuli/document/schema-core` has no default and
+   * refuses inline decks (`invalid-deck`) unless one is passed.
+   */
+  validateDeck?: DeckPayloadValidator | null;
 }
 
 export type DocumentValidation =
@@ -37,7 +43,7 @@ export function validateDocument(
   input: unknown,
   options: ValidateDocumentOptions = {}
 ): DocumentValidation {
-  const result = validate(documentSchema(options.trust), input, {
+  const result = validate(documentSchemaCore(options.trust, options.validateDeck ?? null), input, {
     maxIssues: options.maxIssues,
     maxNodes: MAX_NODES,
   });
@@ -98,7 +104,7 @@ export function loadUntrustedDocument(
 
 /** The JSON Schema 2020-12 of the document format (untrusted tier). */
 export function documentJsonSchema(): JsonSchema {
-  return toJsonSchema(documentSchema('untrusted'), {
+  return toJsonSchema(documentSchemaCore('untrusted'), {
     $id: 'https://texuli.com/schemas/document.schema.json',
     title: 'Texuli document',
     description: 'A Texuli block document, format version 1 (ADR-011).',
