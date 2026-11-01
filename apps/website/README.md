@@ -38,6 +38,7 @@ islands (`client:load`, `client:visible`, …).
 | Area | Note |
 | --- | --- |
 | Landing system (`/`, section pattern) | [site-landing.md](docs/site-landing.md) |
+| Illustrations: the texel style, slots, sizes, dropping in a file | [ILLUSTRATIONS.md](docs/ILLUSTRATIONS.md) |
 | Native landing (`/native/`) | [site-native.md](docs/site-native.md) |
 | Architecture page (`/web-and-native/`) | [site-architecture.md](docs/site-architecture.md) |
 | Sub-site IA: routes, doors, breadcrumbs, per-route metadata | [site-subsite.md](docs/site-subsite.md) |
