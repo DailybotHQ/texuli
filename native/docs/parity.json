@@ -2,15 +2,15 @@
   "specVersion": "0.10.0",
   "totals": {
     "catalog": 168,
-    "painted": 28,
-    "placeholder": 140,
+    "painted": 32,
+    "placeholder": 136,
     "agentEmittable": 75,
-    "agentEmittablePainted": 28,
+    "agentEmittablePainted": 32,
     "semanticRules": 37,
     "goldenTraces": 15,
     "goldenCovered": 34,
-    "parityTraces": 2,
-    "traceCovered": 45,
+    "parityTraces": 3,
+    "traceCovered": 48,
     "readOnly": 0
   },
   "unknownNativeIds": [],
@@ -34,7 +34,7 @@
     {
       "group": "content",
       "total": 35,
-      "painted": 18
+      "painted": 22
     },
     {
       "group": "data",
@@ -538,11 +538,11 @@
       "capability": "web-only",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
+      "native": "painted",
       "readOnly": false,
       "semanticRule": true,
       "golden": true,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "charts-funnel",
@@ -634,11 +634,11 @@
       "capability": "web-only",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
+      "native": "painted",
       "readOnly": false,
       "semanticRule": true,
       "golden": false,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "charts-progress-ring",
@@ -706,11 +706,11 @@
       "capability": "web-only",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
+      "native": "painted",
       "readOnly": false,
       "semanticRule": true,
       "golden": false,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "charts-treemap",
@@ -718,11 +718,11 @@
       "capability": "web-only",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
+      "native": "painted",
       "readOnly": false,
       "semanticRule": true,
       "golden": false,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "chat-message",
@@ -1418,7 +1418,7 @@
       "readOnly": false,
       "semanticRule": true,
       "golden": true,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "layout-chrome",

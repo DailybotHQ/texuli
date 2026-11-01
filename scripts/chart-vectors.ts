@@ -46,13 +46,19 @@ import {
   timeScale,
   timeTicks,
 } from '../packages/charts/src/math/index.ts';
+import { sunburst } from '../packages/charts/src/math/layout/sunburst.ts';
+import { type TreemapNode, treemap } from '../packages/charts/src/math/layout/treemap.ts';
 import {
+  arcCentroid,
+  arcPath,
   areaPath,
   type Curve,
   linePath,
+  pie,
   roundCoord,
   stack,
 } from '../packages/charts/src/math/shapes/index.ts';
+import { centerTotalFits, treeTableRows } from '../packages/charts/src/part-whole/model.ts';
 import { biomeFormat } from './generate-surfaces.ts';
 
 const ROOT = resolve(import.meta.dirname, '..');
@@ -418,9 +424,93 @@ function cartesianLayoutCases(): VectorCase[] {
   return cases;
 }
 
+const TREE: TreemapNode = {
+  id: 'support',
+  label: 'Support',
+  children: [
+    {
+      id: 'email',
+      label: 'Email',
+      children: [
+        { id: 'billing', label: 'Billing', value: 42 },
+        { id: 'login', label: 'Login', value: 18 },
+        { id: 'empty', value: 0 },
+      ],
+    },
+    { id: 'chat', label: 'Chat', value: 61 },
+    { id: 'phone', value: 7.5 },
+    {
+      id: 'social',
+      label: 'Social',
+      children: [
+        { id: 'x-dm', value: 3 },
+        { id: 'forum', value: 9 },
+      ],
+    },
+  ],
+};
+
+function partWholeCases(): VectorCase[] {
+  const cases: VectorCase[] = [];
+  const add = (fn: string, input: unknown, output: unknown) =>
+    cases.push({ fn, input: json(input), output: json(output) });
+  for (const [values, padAngle] of [
+    [[42, 18, null, 61, -4, 7.5], 0.01],
+    [[1], 0.2],
+    [[0, 0], 0],
+    [[5, 1e-6, 5], 0.4],
+  ] as [(number | null)[], number][])
+    add('pie', { values, padAngle }, pie(values, { padAngle }));
+  for (const options of [
+    { innerRadius: 0, outerRadius: 108, startAngle: 0, endAngle: 1.2, padAngle: 0 },
+    { innerRadius: 62.64, outerRadius: 108, startAngle: 1.2, endAngle: 4.1, padAngle: 0.01 },
+    { innerRadius: 0, outerRadius: 108, startAngle: 0, endAngle: Math.PI * 2, padAngle: 0 },
+    { innerRadius: 30, outerRadius: 108, startAngle: 0, endAngle: Math.PI * 2, padAngle: 0 },
+    { innerRadius: 40, outerRadius: 100, startAngle: 0.3, endAngle: 2.2, cornerRadius: 6 },
+    { innerRadius: 0, outerRadius: 100, startAngle: 0.3, endAngle: 0.9, cornerRadius: 50 },
+    { innerRadius: 10, outerRadius: 100, startAngle: 1, endAngle: 1, padAngle: 0 },
+  ])
+    add('arcPath', options, arcPath(options));
+  add(
+    'arcCentroid',
+    { innerRadius: 20, outerRadius: 100, startAngle: 0.5, endAngle: 2 },
+    arcCentroid({ innerRadius: 20, outerRadius: 100, startAngle: 0.5, endAngle: 2 })
+  );
+  for (const [width, height, padding] of [
+    [640, 360, 2],
+    [300, 500, 0],
+    [120, 40, 8],
+  ])
+    add(
+      'treemap',
+      { root: TREE, width, height, padding },
+      treemap(TREE, { width, height, padding })
+    );
+  for (const [radius, innerRadius, padAngle] of [
+    [115.2, 27.648, 0],
+    [100, 0, 0.02],
+  ])
+    add(
+      'sunburst',
+      { root: TREE, radius, innerRadius, padAngle },
+      sunburst(TREE, { radius, innerRadius, padAngle })
+    );
+  add('treeTableRows', { root: TREE }, treeTableRows(TREE));
+  for (const [text, innerRadius, fontSize] of [
+    ['1,234.5', 62.64, 12.79],
+    ['138.5', 20, 12.79],
+  ] as [string, number, number][])
+    add(
+      'centerTotalFits',
+      { text, innerRadius, fontSize },
+      centerTotalFits(text, innerRadius, fontSize)
+    );
+  return cases;
+}
+
 /** Every case, in a stable order: the shared core first, then each family's model. */
 export function buildVectors(): VectorCase[] {
-  return [...coreCases(), ...cartesianLayoutCases()];
+  return [...coreCases(), ...cartesianLayoutCases(), ...partWholeCases()];
 }
 
 export function renderVectors(cases: readonly VectorCase[], root = ROOT): string {

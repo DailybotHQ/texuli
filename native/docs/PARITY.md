@@ -12,20 +12,20 @@ every other component paints a visible placeholder. Native is in development.
 | Measure | Count |
 | --- | --- |
 | Catalog components | 168 |
-| Painted natively | 28 |
-| Placeholder natively | 140 |
+| Painted natively | 32 |
+| Placeholder natively | 136 |
 | Agent-emittable components | 75 |
-| Agent-emittable and painted natively | 28 |
+| Agent-emittable and painted natively | 32 |
 | Painted read-only (interactive on the web) | 0 |
 | Components with a shared semantic rule | 37 |
 | Golden traces (web = native) | 15 |
 | Components covered by a golden trace | 34 |
-| Parity fixture traces (web = native) | 2 |
-| Components covered by any trace | 45 |
+| Parity fixture traces (web = native) | 3 |
+| Components covered by any trace | 48 |
 
 So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes**
 (validation, label interpolation and the golden semantic traces match); **for painting, not yet**
-(28 of 168 components).
+(32 of 168 components).
 
 ## Capabilities
 
@@ -49,7 +49,7 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | canvas | 1 | 0 |
 | chat | 2 | 0 |
 | composition | 4 | 4 |
-| content | 35 | 18 |
+| content | 35 | 22 |
 | data | 12 | 0 |
 | display | 17 | 0 |
 | documents | 1 | 0 |
@@ -94,7 +94,7 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `charts-canvas-renderer` | content | yes | renders | painted | yes | — | yes |
 | `charts-cartesian` | content | yes | renders | painted | yes | — | yes |
 | `charts-combo` | content | yes | renders | painted | yes | — | yes |
-| `charts-donut` | content | yes | renders | placeholder | yes | yes | — |
+| `charts-donut` | content | yes | renders | painted | yes | yes | yes |
 | `charts-funnel` | content | yes | renders | placeholder | yes | — | — |
 | `charts-gauge` | content | yes | renders | painted | yes | yes | yes |
 | `charts-geo-map` | content | yes | renders | placeholder | yes | — | — |
@@ -102,14 +102,14 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `charts-heatmap` | content | yes | renders | placeholder | yes | — | — |
 | `charts-line` | content | yes | renders | painted | yes | yes | yes |
 | `charts-network` | content | yes | renders | placeholder | yes | — | — |
-| `charts-pie` | content | yes | renders | placeholder | yes | — | — |
+| `charts-pie` | content | yes | renders | painted | yes | — | yes |
 | `charts-progress-ring` | content | yes | renders | painted | yes | — | yes |
 | `charts-sankey` | content | yes | renders | placeholder | yes | — | — |
 | `charts-scatter` | content | yes | renders | placeholder | yes | — | — |
 | `charts-sparkline` | content | yes | renders | painted | yes | yes | yes |
 | `charts-stacked-bar` | content | yes | renders | painted | yes | yes | yes |
-| `charts-sunburst` | content | yes | renders | placeholder | yes | — | — |
-| `charts-treemap` | content | yes | renders | placeholder | yes | — | — |
+| `charts-sunburst` | content | yes | renders | painted | yes | — | yes |
+| `charts-treemap` | content | yes | renders | painted | yes | — | yes |
 | `chat-message` | chat | yes | renders | placeholder | — | — | — |
 | `chat-thread` | chat | yes | renders | placeholder | — | — | — |
 | `checkbox` | forms | — | renders | placeholder | — | — | — |
@@ -167,7 +167,7 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `label` | forms | — | renders | placeholder | — | — | — |
 | `layout-auth-split` | layouts | — | renders | placeholder | — | — | — |
 | `layout-blog` | layouts | — | renders | placeholder | — | — | — |
-| `layout-card` | layouts | yes | renders | painted | yes | yes | — |
+| `layout-card` | layouts | yes | renders | painted | yes | yes | yes |
 | `layout-chrome` | layouts | — | renders | placeholder | — | — | — |
 | `layout-dashboard-grid` | layouts | — | renders | placeholder | — | — | — |
 | `layout-deck` | layouts | yes | renders | painted | yes | yes | yes |

@@ -30,6 +30,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.PathParser
 import androidx.compose.ui.semantics.Role
@@ -60,7 +61,7 @@ internal sealed interface Ink {
 }
 
 internal sealed interface Mark {
-    data class PathMark(val d: String, val ink: Ink, val fill: Boolean, val alpha: Float = 1f, val strokeWidth: Float = 2.5f) : Mark
+    data class PathMark(val d: String, val ink: Ink, val fill: Boolean, val alpha: Float = 1f, val strokeWidth: Float = 2.5f, val dx: Double = 0.0, val dy: Double = 0.0) : Mark
     data class RectMark(val x: Double, val y: Double, val width: Double, val height: Double, val ink: Ink, val alpha: Float = 1f) : Mark
     data class CircleMark(val cx: Double, val cy: Double, val r: Double, val ink: Ink, val alpha: Float = 1f, val fill: Boolean = true) : Mark
     data class LineMark(val x0: Double, val y0: Double, val x1: Double, val y1: Double, val ink: Ink, val strokeWidth: Float = 1f) : Mark
@@ -120,8 +121,10 @@ internal fun SceneCanvas(minUnits: Double = 240.0, maxUnits: Double = 640.0, lay
                             if (mark.d.isEmpty()) continue
                             val path = PathParser().parsePathString(mark.d).toPath()
                             val color = mark.ink.color(palette, scheme.outlineVariant, scheme.outline, scheme.surface, scheme.surfaceVariant, scheme.primary)
-                            if (mark.fill) drawPath(path, color, alpha = mark.alpha)
-                            else drawPath(path, color, alpha = mark.alpha, style = Stroke(width = mark.strokeWidth))
+                            translate(mark.dx.toFloat(), mark.dy.toFloat()) {
+                                if (mark.fill) drawPath(path, color, alpha = mark.alpha)
+                                else drawPath(path, color, alpha = mark.alpha, style = Stroke(width = mark.strokeWidth))
+                            }
                         }
                         is Mark.RectMark -> drawRect(
                             mark.ink.color(palette, scheme.outlineVariant, scheme.outline, scheme.surface, scheme.surfaceVariant, scheme.primary),

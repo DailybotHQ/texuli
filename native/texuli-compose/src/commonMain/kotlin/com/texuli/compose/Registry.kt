@@ -20,6 +20,7 @@ object NativeRegistry {
         "charts-cartesian",
         "charts-canvas-renderer",
     )
+    private val partWholeCharts = setOf("charts-pie", "charts-donut", "charts-sunburst", "charts-treemap")
     /** Ids the first renderer slice paints natively. */
     val implemented: Set<String> = setOf(
         "layout-page",
@@ -40,7 +41,7 @@ object NativeRegistry {
         "layout-tile",
         "blocks-code",
         "blocks-structure",
-    ) + compactCharts + cartesianCharts
+    ) + compactCharts + cartesianCharts + partWholeCharts
 
     /**
      * Painted ids whose web view is interactive (catalog interaction role

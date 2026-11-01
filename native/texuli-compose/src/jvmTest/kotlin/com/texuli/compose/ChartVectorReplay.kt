@@ -62,7 +62,7 @@ internal object J {
 
 /** One Kotlin call per vector function name; null means no replay exists yet. */
 internal object ChartVectorReplay {
-    private val families: List<(String, Map<String, JsonValue>) -> JsonValue?> = listOf(::core, ::cartesian)
+    private val families: List<(String, Map<String, JsonValue>) -> JsonValue?> = listOf(::core, ::cartesian, ::partWhole)
 
     fun replay(fn: String, input: Map<String, JsonValue>): JsonValue? = families.firstNotNullOfOrNull { it(fn, input) }
 
@@ -151,6 +151,38 @@ internal object ChartVectorReplay {
                 J.numOrNull(i["x1"]),
             ).map(Int::toDouble),
         )
+        else -> null
+    }
+
+    private fun tree(v: JsonValue?): TreeNode {
+        val f = J.obj(v)
+        return TreeNode(J.str(f["id"]), (f["label"] as? JsonValue.Str)?.value, J.numOrNull(f["value"]), (f["children"] as? JsonValue.Arr)?.items?.map(::tree) ?: emptyList())
+    }
+
+    private fun labelled(label: String?, vararg fields: Pair<String, JsonValue>): JsonValue {
+        val all = fields.toMutableList()
+        if (label != null) all.add(1, "label" to J.of(label))
+        return J.obj(*all.toTypedArray())
+    }
+
+    private fun partWhole(fn: String, i: Map<String, JsonValue>): JsonValue? = when (fn) {
+        "pie" -> J.list(pie(J.arr(i["values"]).map(J::numOrNull), padAngle = J.num(i["padAngle"])).map {
+            J.obj("index" to J.of(it.index), "value" to J.of(it.value), "startAngle" to J.of(it.startAngle), "endAngle" to J.of(it.endAngle), "padAngle" to J.of(it.padAngle))
+        })
+        "arcPath" -> J.of(arcPath(J.num(i["innerRadius"]), J.num(i["outerRadius"]), J.num(i["startAngle"]), J.num(i["endAngle"]), J.numOrNull(i["cornerRadius"]) ?: 0.0, J.numOrNull(i["padAngle"]) ?: 0.0))
+        "arcCentroid" -> J.of(arcCentroid(J.num(i["innerRadius"]), J.num(i["outerRadius"]), J.num(i["startAngle"]), J.num(i["endAngle"])))
+        "treemap" -> J.list(treemap(tree(i["root"]), J.num(i["width"]), J.num(i["height"]), J.num(i["padding"]))!!.map {
+            labelled(it.label, "id" to J.of(it.id), "parentId" to (it.parentId?.let(J::of) ?: JsonValue.Null), "depth" to J.of(it.depth), "value" to J.of(it.value), "leaf" to J.of(it.leaf),
+                "x0" to J.of(it.x0), "y0" to J.of(it.y0), "x1" to J.of(it.x1), "y1" to J.of(it.y1))
+        })
+        "sunburst" -> J.list(sunburst(tree(i["root"]), J.num(i["radius"]), J.num(i["innerRadius"]), padAngle = J.num(i["padAngle"]))!!.map {
+            labelled(it.label, "id" to J.of(it.id), "parentId" to (it.parentId?.let(J::of) ?: JsonValue.Null), "depth" to J.of(it.depth), "value" to J.of(it.value), "leaf" to J.of(it.leaf),
+                "x0" to J.of(it.x0), "x1" to J.of(it.x1), "y0" to J.of(it.y0), "y1" to J.of(it.y1))
+        })
+        "treeTableRows" -> J.list(treeTableRows(tree(i["root"])).map {
+            J.obj("id" to J.of(it.id), "label" to J.of(it.label), "value" to J.of(it.value), "depth" to J.of(it.depth ?: 0))
+        })
+        "centerTotalFits" -> J.of(centerTotalFits(J.str(i["text"]), J.num(i["innerRadius"]), J.num(i["fontSize"])))
         else -> null
     }
 }
