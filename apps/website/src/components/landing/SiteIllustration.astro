@@ -22,11 +22,15 @@ if (!entry) {
 }
 
 const base = import.meta.env.BASE_URL;
-const publicFile = join(process.cwd(), 'apps/website/public/illustrations', entry.file);
 // When building from apps/website, cwd may already be the app root.
-const altPublic = join(process.cwd(), 'public/illustrations', entry.file);
-const hasFile = existsSync(publicFile) || existsSync(altPublic);
+const exists = (file: string) =>
+  existsSync(join(process.cwd(), 'apps/website/public/illustrations', file)) ||
+  existsSync(join(process.cwd(), 'public/illustrations', file));
+const hasFile = exists(entry.file);
+const hasDark = hasFile && entry.fileDark !== undefined && exists(entry.fileDark);
 const src = illustrationSrc(entry.file, base);
+const darkSrc = hasDark && entry.fileDark ? illustrationSrc(entry.fileDark, base) : undefined;
+const eager = entry.priority === true;
 const alt = altOverride ?? entry.alt;
 const ratio = `${entry.width} / ${entry.height}`;
 
@@ -46,21 +50,42 @@ const tiles = Array.from({ length: 48 }, (_, index) => {
 ---
 
 <figure
-  class:list={['site-illustration', className, { 'site-illustration--fallback': !hasFile }]}
+  class:list={[
+    'site-illustration',
+    `site-illustration--${entry.variant}`,
+    className,
+    { 'site-illustration--fallback': !hasFile, 'site-illustration--has-dark': hasDark },
+  ]}
   data-tx-illustration={slot}
+  data-tx-illustration-variant={entry.variant}
   data-tx-illustration-ready={hasFile ? 'file' : 'fallback'}
   style={`--si-w:${entry.width};--si-h:${entry.height};--si-ratio:${ratio};`}
 >
   {
     hasFile ? (
-      <img
-        src={src}
-        alt={alt}
-        width={entry.width}
-        height={entry.height}
-        loading="lazy"
-        decoding="async"
-      />
+      <>
+        <img
+          class="site-illustration__light"
+          src={src}
+          alt={alt}
+          width={entry.width}
+          height={entry.height}
+          loading={eager ? 'eager' : 'lazy'}
+          fetchpriority={eager ? 'high' : undefined}
+          decoding={eager ? 'sync' : 'async'}
+        />
+        {darkSrc && (
+          <img
+            class="site-illustration__dark"
+            src={darkSrc}
+            alt={alt}
+            width={entry.width}
+            height={entry.height}
+            loading="lazy"
+            decoding="async"
+          />
+        )}
+      </>
     ) : (
       <div
         class="site-illustration__fallback"
@@ -86,6 +111,33 @@ const tiles = Array.from({ length: 48 }, (_, index) => {
     background: var(--tx-muted);
     inline-size: 100%;
     max-inline-size: 100%;
+  }
+  /* Landing plates and bands sit flush on the light theme (the art carries
+     its own light ground); the dark theme frames them with a soft glow so
+     the light ground reads as a lit product shot, not a patch. */
+  .site-illustration--plate,
+  .site-illustration--band {
+    border-color: transparent;
+    background: transparent;
+  }
+  :global(:root[data-tx-mode='dark']) .site-illustration--plate,
+  :global(:root[data-tx-mode='dark']) .site-illustration--band {
+    border-color: color-mix(in oklab, var(--tx-primary) 35%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--tx-primary) 18%, transparent),
+      0 1.5rem 4rem -1.5rem color-mix(in oklab, var(--tx-primary) 45%, transparent);
+  }
+  .site-illustration__dark {
+    display: none !important;
+  }
+  :global(:root[data-tx-mode='dark']) .site-illustration--has-dark .site-illustration__light {
+    display: none !important;
+  }
+  :global(:root[data-tx-mode='dark']) .site-illustration--has-dark .site-illustration__dark {
+    display: block !important;
+  }
+  :global(:root[data-tx-mode='dark']) .site-illustration--has-dark {
+    border-color: transparent;
+    box-shadow: none;
   }
   .site-illustration img {
     display: block;
@@ -131,8 +183,10 @@ const tiles = Array.from({ length: 48 }, (_, index) => {
     background: color-mix(in oklab, var(--tx-primary) 72%, var(--tx-background));
     border-color: transparent;
   }
+  /* The rare strong texel is the social image's warm orange highlight
+     (docs/ILLUSTRATIONS.md palette), decorative only. */
   .texel--4 {
-    background: var(--tx-accent-foreground, var(--tx-foreground));
+    background: oklch(0.76 0.15 50);
     border-color: transparent;
   }
   @media (forced-colors: active) {
