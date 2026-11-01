@@ -25,18 +25,21 @@ The flow (`texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/RenderPlan.
    `"<id>" is not shown here (<reason>)`. It is never blank and never a crash.
 
 **Painted natively** (`NativeRegistry.implemented` in
-`texuli-compose/src/commonMain/kotlin/com/texuli/compose/Registry.kt`), 15 ids:
+`texuli-compose/src/commonMain/kotlin/com/texuli/compose/Registry.kt`), 21 ids.
+The full table, generated from the registry and the catalog, is
+[PARITY.md](PARITY.md):
 
 | Group | Ids |
 | --- | --- |
 | Layouts | `layout-page`, `layout-doc`, `layout-deck`, `layout-card`, `layout-grid`, `deck-slide` |
-| Content blocks | `blocks-text` (heading, text, list, quote, callout), `blocks-data` (stat, KPI, table), `blocks-diagram` (static board) |
+| Composition layouts (0.8.0) | `layout-stack`, `layout-row`, `layout-split`, `layout-tile` |
+| Content blocks | `blocks-text` (heading, text, list, quote, callout), `blocks-data` (stat, KPI, table), `blocks-diagram` (static board), `blocks-code`, `blocks-structure` (CTA, divider, columns) |
 | Media | `media-image`, `blocks-media` (image, figure, video, gallery): frames with alt text, no decoded pixels |
 | Compact charts | `charts-sparkline`, `charts-bullet`, `charts-gauge`, `charts-progress-ring` |
 
-Every other id paints a placeholder. Of the 133 spec vocabulary ids, 41 may be
+Every other id paints a placeholder. Of the 168 spec vocabulary ids, 75 may be
 emitted by a blueprint (their catalog `emit` list holds both `developer` and
-`untrusted`). The other 92 have an empty `emit` list: every form control, the
+`untrusted`). The other 93 have an empty `emit` list: every form control, the
 app-shell layouts and the standalone UI components. Those plan to
 `tier-denied` at any tier. Emittable ids without a painter, such as the other
 chart families, `media-composition-svg` and `media-composition-canvas`, paint
@@ -124,12 +127,13 @@ fun loadBlueprint(
   `PlanNode.Placeholder(id, "tier-denied")`, with its subtree dropped.
   Validation checks structure only and never reads `emit`, so this gate is a
   render-time policy on both targets (`RenderPlanTest`). Today the two tiers
-  plan the same: the 41 emittable ids allow both, and the other 92 (every
+  plan the same: the 75 emittable ids allow both, and the other 93 (every
   control, such as `button`, `input`, `textarea` and `form`) allow neither,
   so they are `tier-denied` at every tier.
 - **Profiles.** A `portable` envelope is refused with `unsupported-profile`
-  for every id that is not portable core. No id is portable core yet: all
-  133 vocabulary entries are `unknown`, so only `web`-profile blueprints load.
+  for every id that is not portable core. No id is portable core yet: of the
+  168 vocabulary entries, 21 are `unknown` and 147 are `web-only`, so only
+  `web`-profile blueprints load.
 
 ### `BlueprintView` and intents
 

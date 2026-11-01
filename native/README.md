@@ -11,8 +11,9 @@ unordered text lists plus a static, horizontally scrollable board projection
 table-block projection, bounded responsive content layouts, and a deliberately limited
 compact-chart slice (`charts-sparkline`, `charts-bullet`, `charts-gauge`, and
 `charts-progress-ring`) with Kotlin projection tests. Page, document, deck,
-card, grid, and deck-slide content layouts are rendered; app-shell layouts and
-other chart families remain visible placeholders. This renderer support does
+card, grid, and deck-slide content layouts are rendered, as are the
+composition layouts (stack, row, split, tile) and the code and structure
+blocks; app-shell layouts and other chart families remain visible placeholders. This renderer support does
 not promote catalog capability claims: capabilities remain `unknown` until
 portable behavior is audited and cross-target conformance is established.
 Nothing is published to Maven Central yet: both modules carry their planned
@@ -266,7 +267,7 @@ the same script with another document (planned: a CLI command for it).
 
 `conformance/semantics.json` holds the target-neutral semantic rules: role,
 accessible name and heading level per catalog id or block type. The two
-targets apply them to all nine spec goldens (`packages/spec/fixtures/golden`):
+targets apply them to all 15 spec goldens (`packages/spec/fixtures/golden`):
 
 - **Web:** `conformance/web/trace.ts` validates and renders each golden with
   `@texuli/catalog/validate` (untrusted tier) and writes
@@ -330,7 +331,7 @@ placeholders, and the portable profile refuses the scoreboard with
 [docs/kmp-tapduel-migration.md](docs/kmp-tapduel-migration.md).
 
 After the spec added named child slots and `when` conditions, the expected web
-traces were refreshed from all four goldens. The conditional report trace uses
+traces were refreshed from every golden. The conditional report trace uses
 explicit fictional host inputs (`closed: 38`, `blocked: 2`) so its conditional
 node is visible on both targets. The native validator also checks that named
 slots exist on the parent, matching the shared spec validator; default
