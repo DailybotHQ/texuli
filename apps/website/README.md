@@ -21,7 +21,7 @@ and the evidence and perf reports. Each area has a design doc in
 
 | File | What it is |
 | --- | --- |
-| `src/pages/index.astro` | The unified landing (PLAN_006 T-44): the four `sections/web/*` sections in order (`WebHero`, `WebWhySvelte`, `WebCorrelation`, `WebAgentsCta`), static, between the landing header and the footer |
+| `src/pages/index.astro` | The illustrated landing (PLAN_012): ten static `sections/home/*` bands (hero, pitch, five story bands, proof, quickstart, final call to action) between the landing header and the footer ([site-landing.md](docs/site-landing.md)) |
 | `src/layouts/BaseLayout.astro` | The layout behind content pages: the docs shell with the left sidebar (`SiteSidebar`), the utility header and the phone drawer; `variant="landing"` drives the home |
 | `src/components/component-pages/load-manifests.ts` | Component pages resolve against the workspace packages' real exports, so a broken component breaks the build |
 | `src/components/TexelsDiagram.astro` | The texels → Texuli → interfaces diagram (decorative grids marked `aria-hidden`) |

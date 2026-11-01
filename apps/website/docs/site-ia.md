@@ -19,17 +19,15 @@ the landing sections are in [site-landing.md](site-landing.md).
   a Docs link (`/guides/`), the platform doors (Web + native, Native), a
   GitHub door, search with the ⌘/Ctrl+K hint, the light/dark/system switch
   and a Get started button (`/guides/getting-started/`). GitHub and Get
-  started hide up to 64rem and the platform doors up to 48rem (T-89): the hero carries `/native/` and Get
-  started, the web-and-native section carries `/web-and-native/`, and the
+  started hide up to 64rem and the platform doors up to 48rem (T-89): the hero carries Start building and
+  `/web-and-native/`, the Web + native story band carries `/native/`, and the
   footer carries GitHub. `site-ia.spec.ts` pins 6 header links on desktop
   and 2 on phones.
-- **Sections** (`sections/web/*`, PLAN_006 T-44): `WebHero` (platform hero,
-  proof strip, theme swatches as data), `WebWhySvelte`, `WebCorrelation`
-  (one contract, two projections; links the badge page and
-  `/web-and-native/`) and `WebAgentsCta` (agents strip and closing call to
-  action). The page body is static Astro. The shared header still hydrates
+- **Bands** (`sections/home/*`, PLAN_012): the illustrated landing in ten
+  bands (hero, pitch, five story bands, proof, quickstart, final call to
+  action; see [site-landing.md](site-landing.md)). The page body is static Astro. The shared header still hydrates
   `SiteSearch` and `ThemeSwitch` (`client:load`), so the full home document has
-  two islands; neither landing section needs a page-specific island.
+  two islands; no landing band needs a page-specific island.
 - **Footer:** the site footer.
 
 There is no sidebar and no page links in the header beyond the platform

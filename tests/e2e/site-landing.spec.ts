@@ -102,4 +102,11 @@ test('sections in order, working calls to action, announced copy, motion only on
   if (await page.evaluate(() => CSS.supports('animation-timeline: view()')))
     expect(counts.slice(1).every((count) => count > 0)).toBe(true);
   expect(foreign).toEqual([]);
+
+  // On a phone the hero art drops below the copy and calls to action.
+  await page.setViewportSize({ width: 360, height: 800 });
+  const cta = await hero.getByRole('link', { name: 'Start building' }).boundingBox();
+  const artBox = await art.boundingBox();
+  expect(artBox?.y ?? 0).toBeGreaterThan((cta?.y ?? 0) + (cta?.height ?? 0));
+  expect(artBox?.width ?? 0).toBeLessThanOrEqual(360);
 });
