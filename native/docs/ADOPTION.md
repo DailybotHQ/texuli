@@ -25,7 +25,7 @@ The flow (`texuli-spec/src/commonMain/kotlin/com/texuli/spec/runtime/RenderPlan.
    `"<id>" is not shown here (<reason>)`. It is never blank and never a crash.
 
 **Painted natively** (`NativeRegistry.implemented` in
-`texuli-compose/src/commonMain/kotlin/com/texuli/compose/Registry.kt`), 40 ids.
+`texuli-compose/src/commonMain/kotlin/com/texuli/compose/Registry.kt`), 44 ids.
 The full table, generated from the registry and the catalog, is
 [PARITY.md](PARITY.md):
 
@@ -40,6 +40,7 @@ The full table, generated from the registry and the catalog, is
 | Part-whole charts (ADR-025) | `charts-pie`, `charts-donut`, `charts-sunburst`, `charts-treemap`, with the web's legend and data table |
 | Matrix and flow charts (ADR-025) | `charts-scatter`, `charts-bubble`, `charts-heatmap`, `charts-funnel`, `charts-sankey`, `charts-network` |
 | Geo charts (ADR-025) | `charts-geo-map`, `charts-geo-point-map`: the web's schematic tile maps, with no geographic data and no network |
+| Data tables (ADR-025) | `data-grid`, `data-cohort-table`, `data-tree-view`, `data-files`: the grid, tree and file browser paint read-only (`NativeRegistry.readOnly`), since sorting, selection and navigation are interactive on the web |
 
 Every other id paints a placeholder. Of the 168 spec vocabulary ids, 75 may be
 emitted by a blueprint (their catalog `emit` list holds both `developer` and
@@ -56,7 +57,7 @@ chart families, `media-composition-svg` and `media-composition-canvas`, paint
 | `unknown-id` | Planning: the id is not in the component list passed to `loadBlueprint` |
 | `tier-denied` | Planning: the catalog's `emit` list for the id lacks the host's tier (the node's subtree is dropped too) |
 | `not-on-this-target` | Painting: no native painter for the id, for a `blocks-data` type other than stat, KPI and table, or for a `blocks-diagram` that is not a board |
-| `invalid-chart-data`, `invalid-table`, `invalid-list`, `invalid-media` | Painting: props outside what the native projection accepts |
+| `invalid-chart-data`, `invalid-data`, `invalid-table`, `invalid-list`, `invalid-media` | Painting: props outside what the native projection accepts |
 | `unsupported-gap`, `unsupported-deck-options` | Painting: grid gaps or deck options outside the supported set |
 | `unknown-block` | Painting: a `blocks-text` or `blocks-data` node without a `block`, or a `blocks-text` type other than heading, text, list, quote and callout |
 

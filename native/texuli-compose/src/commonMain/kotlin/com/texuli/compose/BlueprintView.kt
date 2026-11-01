@@ -127,6 +127,10 @@ private fun PlanNodeContent(node: PlanNode, path: String, onIntent: (TexuliInten
                 val chart = nativeGeoChart(node.id, node.props)
                 if (chart == null) Placeholder(node.id, "invalid-chart-data") else GeoChartView(chart)
             }
+            "data-grid" -> nativeGrid(node.props)?.let { GridViewPainter(it) } ?: Placeholder(node.id, "invalid-data")
+            "data-cohort-table" -> nativeCohort(node.props)?.let { CohortViewPainter(it) } ?: Placeholder(node.id, "invalid-data")
+            "data-tree-view" -> nativeTree(node.props)?.let { TreeViewPainter(it) } ?: Placeholder(node.id, "invalid-data")
+            "data-files" -> nativeFiles(node.props)?.let { FilesViewPainter(it) } ?: Placeholder(node.id, "invalid-data")
             "charts-canvas-renderer" -> {
                 val chart = nativeCanvasChart(node.props)
                 if (chart == null) Placeholder(node.id, "invalid-chart-data") else CanvasChartView(chart)

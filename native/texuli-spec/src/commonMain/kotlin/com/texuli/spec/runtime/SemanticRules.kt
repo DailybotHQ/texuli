@@ -25,6 +25,10 @@ object SemanticRules {
         "id:schema-form" to SemanticRule(role = "form", name = listOf("label")),
         "id:canvas" to SemanticRule(role = "figure", name = listOf("label")),
         "prefix:charts-" to SemanticRule(role = "figure", name = listOf("title", "label")),
+        "id:data-grid" to SemanticRule(role = "table", name = listOf("caption")),
+        "id:data-cohort-table" to SemanticRule(role = "table", name = listOf("caption")),
+        "id:data-tree-view" to SemanticRule(role = "tree", name = listOf("label")),
+        "id:data-files" to SemanticRule(role = "group", name = listOf("label")),
     )
 
     /** Block rules by `block.type`, for `blocks-*` ids. */

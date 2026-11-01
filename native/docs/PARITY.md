@@ -12,20 +12,20 @@ every other component paints a visible placeholder. Native is in development.
 | Measure | Count |
 | --- | --- |
 | Catalog components | 168 |
-| Painted natively | 40 |
-| Placeholder natively | 128 |
+| Painted natively | 44 |
+| Placeholder natively | 124 |
 | Agent-emittable components | 75 |
-| Agent-emittable and painted natively | 40 |
-| Painted read-only (interactive on the web) | 0 |
-| Components with a shared semantic rule | 37 |
+| Agent-emittable and painted natively | 44 |
+| Painted read-only (interactive on the web) | 3 |
+| Components with a shared semantic rule | 41 |
 | Golden traces (web = native) | 15 |
 | Components covered by a golden trace | 34 |
-| Parity fixture traces (web = native) | 5 |
-| Components covered by any trace | 56 |
+| Parity fixture traces (web = native) | 6 |
+| Components covered by any trace | 59 |
 
 So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes**
 (validation, label interpolation and the golden semantic traces match); **for painting, not yet**
-(40 of 168 components).
+(44 of 168 components).
 
 ## Capabilities
 
@@ -50,7 +50,7 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | chat | 2 | 0 |
 | composition | 4 | 4 |
 | content | 35 | 30 |
-| data | 12 | 0 |
+| data | 12 | 4 |
 | display | 17 | 0 |
 | documents | 1 | 0 |
 | forms | 29 | 0 |
@@ -126,16 +126,16 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `control-toggle` | state | yes | renders | placeholder | — | yes | — |
 | `data-board` | data | yes | renders | placeholder | — | yes | — |
 | `data-calendar` | data | yes | renders | placeholder | — | — | — |
-| `data-cohort-table` | data | yes | renders | placeholder | — | — | — |
+| `data-cohort-table` | data | yes | renders | painted | yes | — | yes |
 | `data-dashboard` | data | yes | renders | placeholder | — | — | — |
 | `data-dashboard-widget` | data | yes | renders | placeholder | — | — | — |
-| `data-files` | data | yes | renders | placeholder | — | — | — |
+| `data-files` | data | yes | renders | painted (read-only) | yes | — | yes |
 | `data-filter-builder` | data | yes | renders | placeholder | — | — | — |
-| `data-grid` | data | yes | renders | placeholder | — | yes | — |
+| `data-grid` | data | yes | renders | painted (read-only) | yes | yes | yes |
 | `data-map` | data | yes | renders | placeholder | — | — | — |
 | `data-notification-inbox` | data | yes | renders | placeholder | — | — | — |
 | `data-timeline` | data | yes | renders | placeholder | — | — | — |
-| `data-tree-view` | data | yes | renders | placeholder | — | — | — |
+| `data-tree-view` | data | yes | renders | painted (read-only) | yes | — | yes |
 | `deck-slide` | layouts | yes | renders | painted | yes | — | yes |
 | `description` | forms | — | renders | placeholder | — | — | — |
 | `detail-panel` | overlays | — | renders | placeholder | — | — | — |

@@ -70,6 +70,15 @@ import {
 } from '../packages/charts/src/math/shapes/index.ts';
 import { createHeatmapLayout, createScatterLayout } from '../packages/charts/src/matrix/model.ts';
 import { centerTotalFits, treeTableRows } from '../packages/charts/src/part-whole/model.ts';
+import {
+  cohortAverages,
+  formatCohortValue,
+  heatLevel,
+  heatMax,
+} from '../packages/data/src/cohort/model.ts';
+import { rankSequence } from '../packages/data/src/engines/board/rank.ts';
+import { childrenOf, formatSize } from '../packages/data/src/engines/files/model.ts';
+import { buildTree, flatten } from '../packages/data/src/engines/tree/tree.ts';
 import { biomeFormat } from './generate-surfaces.ts';
 
 const ROOT = resolve(import.meta.dirname, '..');
@@ -669,6 +678,96 @@ function geoCases(): VectorCase[] {
   return cases;
 }
 
+function dataTableCases(): VectorCase[] {
+  const cases: VectorCase[] = [];
+  const add = (fn: string, input: unknown, output: unknown) =>
+    cases.push({ fn, input: json(input), output: json(output) });
+  const cohorts = [
+    { label: 'Jan', size: 1200, cells: [1, 0.42, 0.31, 0.27] },
+    { label: 'Feb', size: 800, cells: [1, 0.5, 0.36] },
+    { label: 'Mar', cells: [1, 0.61] },
+  ];
+  add('cohortAverages', { rows: cohorts }, cohortAverages(cohorts));
+  add('cohortAverages', { rows: cohorts.slice(0, 2) }, cohortAverages(cohorts.slice(0, 2)));
+  const counts = [{ label: 'Jan', cells: [120, 48, null, 7] }];
+  add('heatMax', { rows: counts, kind: 'count' }, heatMax(counts, 'count'));
+  add('heatMax', { rows: cohorts, kind: 'rate' }, heatMax(cohorts, 'rate'));
+  for (const [value, max] of [
+    [0.42, 1],
+    [1, 1],
+    [0, 1],
+    [48, 120],
+    [null, 1],
+    [3, 0],
+    [-2, 10],
+  ] as [number | null, number][])
+    add('heatLevel', { value, max }, heatLevel(value, max));
+  for (const [value, kind] of [
+    [0.4235, 'rate'],
+    [1, 'rate'],
+    [0.0004, 'rate'],
+    [1234.5, 'count'],
+    [7.5, 'count'],
+  ] as [number, 'rate' | 'count'][])
+    add('formatCohortValue', { value, kind }, formatCohortValue(value, kind));
+  for (const count of [1, 5, 70, 500]) add('rankSequence', { count }, rankSequence(count));
+  const items = [
+    { id: 'docs', parent: null, rank: 'a1' },
+    { id: 'guides', parent: 'docs', rank: 'a0' },
+    { id: 'api', parent: 'docs', rank: 'a0' },
+    { id: 'orphan', parent: 'missing', rank: 'a5' },
+    { id: 'loop-a', parent: 'loop-b', rank: 'a2' },
+    { id: 'loop-b', parent: 'loop-a', rank: 'a3' },
+    { id: 'Zeta', parent: null, rank: 'a1' },
+    { id: 'readme', parent: 'guides', rank: 'b00' },
+  ];
+  const tree = buildTree(items, {
+    id: (item) => item.id,
+    parentId: (item) => item.parent,
+    rank: (item) => item.rank,
+  });
+  add(
+    'flattenTree',
+    { items },
+    flatten(tree, { expanded: 'all' }).map((row) => ({ id: row.id, level: row.level }))
+  );
+  const entries = [
+    { id: '1', parentId: null, name: 'File 10.txt', kind: 'file' as const },
+    { id: '2', parentId: null, name: 'file 2.txt', kind: 'file' as const },
+    { id: '3', parentId: null, name: 'Reports', kind: 'folder' as const },
+    { id: '4', parentId: null, name: 'archive', kind: 'folder' as const },
+    { id: '5', parentId: '3', name: 'q1.csv', kind: 'file' as const },
+    { id: '6', parentId: null, name: 'File 9.txt', kind: 'file' as const },
+    { id: '7', parentId: null, name: 'file 007.txt', kind: 'file' as const },
+  ];
+  add(
+    'childrenOf',
+    { entries, folder: null },
+    childrenOf(entries, null).map((entry) => entry.id)
+  );
+  add(
+    'childrenOf',
+    { entries, folder: '3' },
+    childrenOf(entries, '3').map((entry) => entry.id)
+  );
+  for (const bytes of [
+    0, 512, 1023, 1024, 1536, 1075.2, 1484.8, 10_239, 10_240, 5_000_000, 1.5e12, 3e15, -1,
+  ])
+    add('formatSize', { bytes }, formatSize(bytes));
+  for (const [value, digits] of [
+    [1.25, 1],
+    [1.05, 1],
+    [1.45, 1],
+    [-0.05, 1],
+    [9.95, 1],
+    [2.5, 0],
+    [0.000001, 3],
+    [-0.0001, 1],
+  ])
+    add('toFixed', { value, digits }, value.toFixed(digits));
+  return cases;
+}
+
 /** Every case, in a stable order: the shared core first, then each family's model. */
 export function buildVectors(): VectorCase[] {
   return [
@@ -677,6 +776,7 @@ export function buildVectors(): VectorCase[] {
     ...partWholeCases(),
     ...matrixFlowCases(),
     ...geoCases(),
+    ...dataTableCases(),
   ];
 }
 

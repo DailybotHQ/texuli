@@ -2,16 +2,16 @@
   "specVersion": "0.10.0",
   "totals": {
     "catalog": 168,
-    "painted": 40,
-    "placeholder": 128,
+    "painted": 44,
+    "placeholder": 124,
     "agentEmittable": 75,
-    "agentEmittablePainted": 40,
-    "semanticRules": 37,
+    "agentEmittablePainted": 44,
+    "semanticRules": 41,
     "goldenTraces": 15,
     "goldenCovered": 34,
-    "parityTraces": 5,
-    "traceCovered": 56,
-    "readOnly": 0
+    "parityTraces": 6,
+    "traceCovered": 59,
+    "readOnly": 3
   },
   "unknownNativeIds": [],
   "uncovered": [],
@@ -39,7 +39,7 @@
     {
       "group": "data",
       "total": 12,
-      "painted": 0
+      "painted": 4
     },
     {
       "group": "display",
@@ -922,11 +922,11 @@
       "capability": "web-only",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
+      "native": "painted",
       "readOnly": false,
-      "semanticRule": false,
+      "semanticRule": true,
       "golden": false,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "data-dashboard",
@@ -958,11 +958,11 @@
       "capability": "web-only",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
-      "readOnly": false,
-      "semanticRule": false,
+      "native": "painted",
+      "readOnly": true,
+      "semanticRule": true,
       "golden": false,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "data-filter-builder",
@@ -982,11 +982,11 @@
       "capability": "web-only",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
-      "readOnly": false,
-      "semanticRule": false,
+      "native": "painted",
+      "readOnly": true,
+      "semanticRule": true,
       "golden": true,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "data-map",
@@ -1030,11 +1030,11 @@
       "capability": "web-only",
       "agentEmittable": true,
       "web": "renders",
-      "native": "placeholder",
-      "readOnly": false,
-      "semanticRule": false,
+      "native": "painted",
+      "readOnly": true,
+      "semanticRule": true,
       "golden": false,
-      "parityTrace": false
+      "parityTrace": true
     },
     {
       "id": "deck-slide",

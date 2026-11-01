@@ -30,6 +30,7 @@ object NativeRegistry {
         "charts-network",
     )
     private val geoCharts = setOf("charts-geo-map", "charts-geo-point-map")
+    private val dataTables = setOf("data-grid", "data-cohort-table", "data-tree-view", "data-files")
     /** Ids the first renderer slice paints natively. */
     val implemented: Set<String> = setOf(
         "layout-page",
@@ -50,14 +51,14 @@ object NativeRegistry {
         "layout-tile",
         "blocks-code",
         "blocks-structure",
-    ) + compactCharts + cartesianCharts + partWholeCharts + matrixFlowCharts + geoCharts
+    ) + compactCharts + cartesianCharts + partWholeCharts + matrixFlowCharts + geoCharts + dataTables
 
     /**
      * Painted ids whose web view is interactive (catalog interaction role
      * `interactive`): native paints them read-only (ADR-025). Interactivity
      * natively is a later wave.
      */
-    val readOnly: Set<String> = setOf()
+    val readOnly: Set<String> = setOf("data-grid", "data-tree-view", "data-files")
 
     fun status(id: String): BindingStatus =
         if (id in implemented) BindingStatus.IMPLEMENTED else BindingStatus.PLACEHOLDER

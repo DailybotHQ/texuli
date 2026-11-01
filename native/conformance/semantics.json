@@ -17,7 +17,11 @@
     { "id": "document", "role": "article", "name": ["label"] },
     { "id": "schema-form", "role": "form", "name": ["label"] },
     { "id": "canvas", "role": "figure", "name": ["label"] },
-    { "prefix": "charts-", "role": "figure", "name": ["title", "label"] }
+    { "prefix": "charts-", "role": "figure", "name": ["title", "label"] },
+    { "id": "data-grid", "role": "table", "name": ["caption"] },
+    { "id": "data-cohort-table", "role": "table", "name": ["caption"] },
+    { "id": "data-tree-view", "role": "tree", "name": ["label"] },
+    { "id": "data-files", "role": "group", "name": ["label"] }
   ],
   "blocks": {
     "heading": { "role": "heading", "name": ["text"], "level": "level" },

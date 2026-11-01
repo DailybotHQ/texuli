@@ -62,7 +62,7 @@ internal object J {
 
 /** One Kotlin call per vector function name; null means no replay exists yet. */
 internal object ChartVectorReplay {
-    private val families: List<(String, Map<String, JsonValue>) -> JsonValue?> = listOf(::core, ::cartesian, ::partWhole, ::matrixFlow, ::geo)
+    private val families: List<(String, Map<String, JsonValue>) -> JsonValue?> = listOf(::core, ::cartesian, ::partWhole, ::matrixFlow, ::geo, ::dataTables)
 
     fun replay(fn: String, input: Map<String, JsonValue>): JsonValue? = families.firstNotNullOfOrNull { it(fn, input) }
 
@@ -260,6 +260,29 @@ internal object ChartVectorReplay {
         }
         "geoColorIndex" -> geoColorIndex(J.numOrNull(i["value"]), J.arr(i["values"]).map(J::numOrNull))?.let(J::of) ?: JsonValue.Null
         "clampGeoOffset" -> J.of(clampGeoOffset(J.numOrNull(i["value"])))
+        else -> null
+    }
+
+    private fun cohortRows(v: JsonValue?): List<CohortRow> = J.arr(v).map { r ->
+        J.obj(r).let { CohortRow(null, J.str(it["label"]), J.numOrNull(it["size"]), J.arr(it["cells"]).map(J::numOrNull), false) }
+    }
+
+    private fun dataTables(fn: String, i: Map<String, JsonValue>): JsonValue? = when (fn) {
+        "cohortAverages" -> J.nums(cohortAverages(cohortRows(i["rows"])))
+        "heatMax" -> J.of(heatMax(cohortRows(i["rows"]), J.str(i["kind"]) == "rate"))
+        "heatLevel" -> heatLevel(J.numOrNull(i["value"]), J.num(i["max"]))?.let(J::of) ?: JsonValue.Null
+        "formatCohortValue" -> J.of(formatCohortValue(J.num(i["value"]), J.str(i["kind"]) == "rate"))
+        "rankSequence" -> J.list(rankSequence(J.int(i["count"])).map(J::of))
+        "flattenTree" -> J.list(
+            flattenTree(J.arr(i["items"]).map { e -> J.obj(e).let { TreeEntry(J.str(it["id"]), J.str(it["id"]), (it["parent"] as? JsonValue.Str)?.value, J.str(it["rank"])) } })
+                .map { J.obj("id" to J.of(it.entry.id), "level" to J.of(it.level)) },
+        )
+        "childrenOf" -> {
+            val entries = J.arr(i["entries"]).map { e -> J.obj(e).let { FileItem(J.str(it["id"]), (it["parentId"] as? JsonValue.Str)?.value, J.str(it["name"]), J.str(it["kind"]) == "folder", null, null, null) } }
+            J.list(childrenOf(entries, (i["folder"] as? JsonValue.Str)?.value).map { J.of(it.id) })
+        }
+        "formatSize" -> J.of(formatSize(J.num(i["bytes"])))
+        "toFixed" -> J.of(jsToFixed(J.num(i["value"]), J.int(i["digits"])))
         else -> null
     }
 }
