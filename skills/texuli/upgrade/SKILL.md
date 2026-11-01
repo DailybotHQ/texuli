@@ -141,6 +141,31 @@ Move the backup back into the host's skills folder and verify it with
 - **Offline-safe.** An unreachable network ends with a report, never a
   partial install.
 
+## Texuli packages 0.11 → 0.12: breaking changes
+
+This sub-skill never upgrades packages; moving an app from `^0.11.0` to
+`^0.12.0` is the developer's install ([`../components/SKILL.md`](../components/SKILL.md)).
+The blueprint spec stays `0.10.0`. Only the `@texuli/pages` core entries
+change (Protoyard G136: they validate without `@texuli/deck/model`); the
+default entries behave as before. Before the move, check the app for:
+
+- **`PageEditorCore`, `CollabEditorCore` and `new PagesEditor(...)`
+  (breaking):** they take `validateDeck` (a `DeckPayloadValidator`) with
+  no default, so a transaction that leaves an inline deck in the document
+  is refused, and `PageEditorCore`'s slash menu has no inline deck item.
+  Pass `validateDeck={checkDeckPayload}` (or `validateDeck:
+  checkDeckPayload`), with `checkDeckPayload` from
+  `@texuli/document/schema`.
+- **`createDocumentPlayerHostCore` (breaking):** takes `validateDeck`
+  with no default, and `checkDocumentDraft` refuses inline decks. Use
+  `createDocumentPlayerHostCore({ validateDeck: checkDeckPayload })`, and
+  `createDocumentDraftCheck(checkDeckPayload)` (new) for the draft check.
+- **Unchanged:** `PageEditor`, `CollabEditor` and
+  `createDocumentPlayerHost` keep `checkDeckPayload` as their default.
+
+The full notes are in `docs/RELEASE.md` of the Texuli repository
+("0.12.0").
+
 ## Texuli packages 0.10 → 0.11: breaking changes
 
 This sub-skill never upgrades packages; moving an app from `^0.10.0` to

@@ -18,7 +18,7 @@ quick library theme instead, use [`../themes/SKILL.md`](../themes/SKILL.md).
 
 > **Released in `0.10.0`.** The document, compiler, runtime, importers,
 > the `ds.*` operations and `texuli ds` ship from `0.10.0` (install
-> `^0.11.0`); the 0.9 line does not have them, so an app pinned to
+> `^0.12.0`); the 0.9 line does not have them, so an app pinned to
 > `^0.9.0` moves up first ([`../upgrade/SKILL.md`](../upgrade/SKILL.md))
 > or stays on themes.
 
