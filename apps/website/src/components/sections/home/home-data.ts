@@ -4,6 +4,8 @@
  * examples counts, and the published package count. Everything is read
  * from the source it names when the site builds; nothing is typed in.
  */
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 
 /** The palette values one real theme contributes to the swatch tile. */
 export interface HeroThemeSwatches {
@@ -108,12 +110,23 @@ export async function loadHeroProof(): Promise<readonly HeroProofStat[]> {
   ];
 }
 
-const PACKAGE_MANIFESTS = import.meta.glob<{ name: string; private?: boolean }>(
-  '../../../../../../packages/*/package.json',
-  { import: 'default', eager: true }
-);
+/**
+ * Packages the release publishes to npm, read from disk when the site
+ * builds: every workspace package except the never-packed ones (the same
+ * list as `NEVER_PACKED` in scripts/packages.ts; the manifests themselves
+ * all carry `private: true`, which only the pack step drops). The build runs
+ * from the repository root or from apps/website.
+ */
+export const HOME_NEVER_PACKED: readonly string[] = ['@texuli/examples'];
 
-/** Workspace packages that publish to npm (everything not marked private). */
 export function countPublishedPackages(): number {
-  return Object.values(PACKAGE_MANIFESTS).filter((manifest) => manifest.private !== true).length;
+  const root = [resolve(process.cwd(), 'packages'), resolve(process.cwd(), '../../packages')].find(
+    (dir) => existsSync(dir)
+  );
+  if (!root) throw new Error('packages directory not found from the build root');
+  return readdirSync(root)
+    .map((dir) => join(root, dir, 'package.json'))
+    .filter((path) => existsSync(path))
+    .map((path) => JSON.parse(readFileSync(path, 'utf8')) as { name: string })
+    .filter((manifest) => !HOME_NEVER_PACKED.includes(manifest.name)).length;
 }

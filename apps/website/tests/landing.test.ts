@@ -11,6 +11,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { NEVER_PACKED } from '../../../scripts/packages.ts';
 import { COMPONENT_PAGES } from '../src/components/component-pages/load-manifests.ts';
 import { buildExampleCatalog } from '../src/components/examples/catalog.ts';
 import { REPOSITORY_URL } from '../src/components/foundation/site.ts';
@@ -30,7 +31,7 @@ import {
   parseNativeRegistry,
   wordCount,
 } from '../src/components/sections/home/home-content.ts';
-import { countAllThemes } from '../src/components/sections/home/home-data.ts';
+import { countAllThemes, HOME_NEVER_PACKED } from '../src/components/sections/home/home-data.ts';
 
 const WEBSITE = resolve(import.meta.dirname, '..');
 const read = (path: string): string => readFileSync(resolve(WEBSITE, path), 'utf8');
@@ -163,9 +164,12 @@ describe('landing', () => {
     const manifests = readdirSync(resolve(WEBSITE, '../../packages'))
       .map((dir) => resolve(WEBSITE, '../../packages', dir, 'package.json'))
       .filter((path) => existsSync(path))
-      .map((path) => JSON.parse(readFileSync(path, 'utf8')) as { private?: boolean });
+      .map((path) => JSON.parse(readFileSync(path, 'utf8')) as { name: string });
+    expect(HOME_NEVER_PACKED).toEqual(NEVER_PACKED);
+    const published = manifests.filter((manifest) => !NEVER_PACKED.includes(manifest.name)).length;
+    expect(published).toBe(26);
     expect(proof.map((stat) => [stat.id, stat.value])).toEqual([
-      ['packages', manifests.filter((manifest) => manifest.private !== true).length],
+      ['packages', published],
       ['blueprint', catalog.components.length],
       ['agent-safe', catalog.components.filter((entry) => entry.emit.includes('untrusted')).length],
     ]);
