@@ -80,7 +80,9 @@ describe('illustration manifest', () => {
   it('has a manifest entry for every slot a template names', () => {
     const used = new Set<string>();
     for (const file of astroFiles(resolve(WEBSITE, 'src'))) {
-      for (const match of readFileSync(file, 'utf8').matchAll(/\bslot="([a-z][a-z0-9-]*)"/g)) {
+      for (const match of readFileSync(file, 'utf8').matchAll(
+        /\b(?:art|banner)="([a-z][a-z0-9-]*)"/g
+      )) {
         const [, slot] = match;
         if (slot && (slot.startsWith('home-') || slot.startsWith('page-'))) used.add(slot);
       }
@@ -131,5 +133,38 @@ describe('illustration prompts', () => {
 
   it('keeps the generated prompts doc in sync with the manifest', () => {
     expect(readFileSync(PROMPTS_DOC, 'utf8')).toBe(renderPromptsDoc(ILLUSTRATIONS));
+  });
+});
+
+describe('platform page banners', () => {
+  it('gives every platform page an on-style banner slot', () => {
+    const banners: Record<string, string> = {
+      'native/index.astro': 'art="page-native"',
+      'web-and-native/index.astro': 'art="page-web-and-native"',
+      'design-systems/index.astro': 'art="page-design-systems"',
+      'mcp-server/index.astro': 'art="page-mcp"',
+      'forms-page/index.astro': 'banner="page-forms"',
+      'sheets-page/index.astro': 'banner="page-sheets"',
+      'canvas-page/index.astro': 'banner="page-canvas"',
+      'documents-page/index.astro': 'art="page-documents"',
+      'slides-page/index.astro': 'art="page-slides"',
+      'workflows-page/index.astro': 'art="page-workflows"',
+      'dashboards-page/index.astro': 'banner="page-dashboards"',
+    };
+    for (const [page, marker] of Object.entries(banners)) {
+      expect(read(`src/pages/${page}`), page).toContain(marker);
+      const slot = /"(page-[a-z-]+)"/.exec(marker)?.[1] ?? '';
+      expect(illustrationFor(slot)?.variant, slot).toBe('banner');
+    }
+    expect(read('src/components/feature-site/FeaturePage.astro')).toContain(
+      '{banner && <PageBanner art={banner} />}'
+    );
+  });
+
+  it('never passes the slot id as `slot`, which Astro drops on a layout child', () => {
+    const offenders = astroFiles(resolve(WEBSITE, 'src')).filter((file) =>
+      /<(?:PageBanner|SiteIllustration)\s[^>]*\bslot=/.test(readFileSync(file, 'utf8'))
+    );
+    expect(offenders).toEqual([]);
   });
 });

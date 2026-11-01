@@ -8,6 +8,8 @@
  * `fx-rules`, `fx-keys`, `fx-docs`), so every showcase reads the same.
  * Static: no client JavaScript of its own.
  */
+import PageBanner from '../landing/PageBanner.astro';
+
 interface Piece {
   readonly name: string;
   readonly role: string;
@@ -25,13 +27,16 @@ interface Props {
   sections: readonly Section[];
   /** A data attribute value on the root, for tests (`data-tx-feature-page`). */
   name: string;
+  /** An illustration slot shown above the eyebrow (`data/illustrations.json`). */
+  banner?: string;
 }
 
-const { eyebrow, title, pieces, piecesLabel, sections, name } = Astro.props;
+const { eyebrow, title, pieces, piecesLabel, sections, name, banner } = Astro.props;
 ---
 
 <div class="fx-page" data-tx-feature-page={name}>
   <header class="fx-hero">
+    {banner && <PageBanner art={banner} />}
     <p class="fx-eyebrow">{eyebrow}</p>
     <h1>{title}</h1>
     <div class="fx-lead"><slot name="lead" /></div>

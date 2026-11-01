@@ -9,13 +9,14 @@ import { join } from 'node:path';
 import { illustrationFor, illustrationSrc } from './illustrations.ts';
 
 interface Props {
-  slot: string;
+  /** The illustration slot id (not `slot`, which Astro reserves; see PageBanner). */
+  art: string;
   class?: string;
   /** Override alt from the manifest when the surrounding context needs a different description. */
   alt?: string;
 }
 
-const { slot, class: className = '', alt: altOverride } = Astro.props;
+const { art: slot, class: className = '', alt: altOverride } = Astro.props;
 const entry = illustrationFor(slot);
 if (!entry) {
   throw new Error(`Unknown illustration slot "${slot}". Add it to src/data/illustrations.json.`);

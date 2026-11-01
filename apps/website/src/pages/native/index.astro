@@ -15,6 +15,7 @@
  * SoftwareApplication node would be dishonest. Canonical and the OG set are
  * emitted by SeoHead; the sitemap picks the route up via the build pipeline.
  */
+import PageBanner from '../../components/landing/PageBanner.astro';
 import NativeEvidenceRoadmap from '../../components/sections/native/NativeEvidenceRoadmap.astro';
 import NativeHeroStatus from '../../components/sections/native/NativeHeroStatus.astro';
 import WhyKmp from '../../components/sections/native/WhyKmp.astro';
@@ -39,8 +40,19 @@ const organizationJsonLd = {
   jsonLd={organizationJsonLd}
 >
   <div class="landing" data-tx-landing="">
+    <div class="native-banner">
+      <PageBanner art="page-native" />
+    </div>
     <NativeHeroStatus />
     <WhyKmp />
     <NativeEvidenceRoadmap />
   </div>
 </BaseLayout>
+
+<style>
+  .native-banner {
+    inline-size: min(100% - 2rem, 72rem);
+    margin-inline: auto;
+    padding-block-start: clamp(1rem, 3vw, 2rem);
+  }
+</style>

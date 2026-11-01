@@ -74,7 +74,7 @@ describe('landing', () => {
     expect(hero).toContain('href={resolveHref(link.href)}');
     expect(HOME_INSTALL_COMMAND).toBe('pnpm add texuli');
     expect(hero).toContain('<CopyCommand command={HOME_INSTALL_COMMAND} />');
-    expect(hero).toContain('<SiteIllustration slot="home-hero" />');
+    expect(hero).toContain('<SiteIllustration art="home-hero" />');
     expect(illustrationFor('home-hero')?.priority).toBe(true);
     expect((hero.match(/<h1[\s>]/g) ?? []).length).toBe(1);
     expect(hero).not.toMatch(/<pre\b/);

@@ -1,4 +1,11 @@
 ---
+import { safeHref } from '@texuli/core/url-policy';
+import BrandSurface from '../../components/design-systems/BrandSurface.svelte';
+import { loadBrands } from '../../components/design-systems/brands.ts';
+import { pairsLabel, ratioLabel } from '../../components/design-systems/conformance.ts';
+import { DS_STATUS, DS_SURFACES } from '../../components/design-systems/page.ts';
+import { REPOSITORY_URL, withBase } from '../../components/foundation/site.ts';
+import GuideCode from '../../components/guides/GuideCode.astro';
 /**
  * /design-systems/ — the design systems hub (PLAN_011 T-site-0100): what a
  * design system is, the three fictional example brands of
@@ -13,13 +20,7 @@
  * stylesheet `/design-systems/brands.css` (`designSystemStyle`). Every
  * number in the conformance table is read from the compiler's report.
  */
-import { safeHref } from '@texuli/core/url-policy';
-import BrandSurface from '../../components/design-systems/BrandSurface.svelte';
-import { loadBrands } from '../../components/design-systems/brands.ts';
-import { pairsLabel, ratioLabel } from '../../components/design-systems/conformance.ts';
-import { DS_STATUS, DS_SURFACES } from '../../components/design-systems/page.ts';
-import { REPOSITORY_URL, withBase } from '../../components/foundation/site.ts';
-import GuideCode from '../../components/guides/GuideCode.astro';
+import PageBanner from '../../components/landing/PageBanner.astro';
 import { MCP_SERVER_DATA } from '../../components/mcp-server/mcp-server-data.ts';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { techArticleJsonLd } from '../../lib/schema.ts';
@@ -74,6 +75,7 @@ const runLabel = (variant: string | null) => (variant ? `${variant} variant` : '
   <link rel="stylesheet" href={link('/design-systems/brands.css')} />
   <div class="ds-hub" data-ds-hub="">
     <header class="ds-hub__hero">
+      <PageBanner art="page-design-systems" />
       <p class="ds-hub__eyebrow">Design systems · new in 0.10.0</p>
       <h1>Design systems</h1>
       <p class="ds-hub__lead">

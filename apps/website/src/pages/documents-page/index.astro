@@ -37,6 +37,7 @@ import {
  * hydrates, so none of them is on the first paint.
  */
 import GuideCode from '../../components/guides/GuideCode.astro';
+import PageBanner from '../../components/landing/PageBanner.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const section = (id: string) => {
@@ -81,6 +82,7 @@ import { Player } from '@texuli/player';
 >
   <div class="documents-page" data-tx-documents-page="">
     <header class="documents-page__hero">
+      <PageBanner art="page-documents" />
       <p class="eyebrow">@texuli/pages · @texuli/document · in development · on npm from {DOCUMENTS_RELEASE}</p>
       <h1>Documents people edit and agents write</h1>
       <p class="lead">
