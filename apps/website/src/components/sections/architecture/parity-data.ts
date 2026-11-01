@@ -94,7 +94,7 @@ export const PARITY_ROWS: readonly ParityRow[] = [
     },
     native: {
       status: 'in-repo',
-      detail: `A bounded compact-chart slice: ${NATIVE_CHARTS.painted.length} of ${NATIVE_CHARTS.total} chart families (${NATIVE_CHARTS.painted.map((id) => id.replace('charts-', '').replace('-', ' ')).join(', ')}); the others paint a placeholder.`,
+      detail: `A bounded compact-chart slice: ${NATIVE_CHARTS.painted.length} of ${NATIVE_CHARTS.total} chart components (${NATIVE_CHARTS.painted.map((id) => id.replace('charts-', '').replaceAll('-', ' ')).join(', ')}); the others paint a placeholder.`,
       surface: 'native/texuli-compose/src/commonMain/kotlin/com/texuli/compose/ChartWidgets.kt',
     },
   },

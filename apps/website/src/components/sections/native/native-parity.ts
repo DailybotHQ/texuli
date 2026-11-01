@@ -34,7 +34,7 @@ export const NATIVE_SLICE = {
   goldenTraces: parity.totals.goldenTraces,
 } as const;
 
-/** Chart families painted natively, of every chart family in the catalog. */
+/** Chart components (`charts-*` ids) painted natively, of every chart component in the catalog. */
 export const NATIVE_CHARTS = (() => {
   const charts = components.filter((entry) => entry.id.startsWith('charts-'));
   return {
@@ -42,6 +42,11 @@ export const NATIVE_CHARTS = (() => {
     total: charts.length,
   };
 })();
+
+/** The painted chart components as words ("sparkline, bullet, …"), for copy. */
+export const NATIVE_CHART_NAMES: string = NATIVE_CHARTS.painted
+  .map((id) => id.replace('charts-', '').replaceAll('-', ' '))
+  .join(', ');
 
 /** Is this catalog id painted natively? */
 export function paintsNatively(id: string): boolean {

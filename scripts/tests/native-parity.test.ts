@@ -124,3 +124,26 @@ describe('native parity', () => {
     );
   });
 });
+
+describe('native docs quote the current matrix', () => {
+  it('states the painted, vocabulary, emittable and golden counts the matrix reports', () => {
+    const { totals, components } = loadParity(ROOT);
+    const adoption = readFileSync(resolve(ROOT, 'native/docs/ADOPTION.md'), 'utf8').replace(
+      /\s+/g,
+      ' '
+    );
+    const readme = readFileSync(resolve(ROOT, 'native/README.md'), 'utf8').replace(/\s+/g, ' ');
+    const other = totals.catalog - totals.agentEmittable;
+    const unknown = components.filter((row) => row.capability === 'unknown').length;
+    const webOnly = components.filter((row) => row.capability === 'web-only').length;
+    for (const phrase of [
+      `Registry.kt\`), ${totals.painted} ids`,
+      `Of the ${totals.catalog} spec vocabulary ids, ${totals.agentEmittable} may be emitted`,
+      `The other ${other} have an empty \`emit\` list`,
+      `the ${totals.agentEmittable} emittable ids allow both, and the other ${other}`,
+      `${unknown} are \`unknown\` and ${webOnly} are \`web-only\``,
+    ])
+      expect(adoption, phrase).toContain(phrase);
+    expect(readme).toContain(`all ${totals.goldenTraces} spec goldens`);
+  });
+});

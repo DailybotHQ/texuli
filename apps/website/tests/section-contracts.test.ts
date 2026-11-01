@@ -322,7 +322,7 @@ describe('native claims follow the generated parity matrix (PLAN_012)', () => {
     );
     const charts = parity.PARITY_ROWS.find((row) => row.capability === 'Charts');
     expect(charts?.native.detail).toContain(
-      `of ${nativeParity.NATIVE_CHARTS.total} chart families`
+      `of ${nativeParity.NATIVE_CHARTS.total} chart components`
     );
   });
 
