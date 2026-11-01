@@ -1,4 +1,4 @@
-import { validateDocument } from '@texuli/document/schema';
+import { type DeckPayloadValidator, validateDocument } from '@texuli/document/schema-core';
 import type { DocumentPlayerHost, DraftDocumentCheck } from '@texuli/player';
 import { mount, unmount } from 'svelte';
 import type { PagesBlockHost, PagesBlockSnippet } from '../shared/block-host.ts';
@@ -10,24 +10,39 @@ import type { PagesPlayerLoader } from '../shared/player-loader.ts';
 
 /**
  * The document check `validateDraft` runs for every `document` node:
- * `validateDocument` from `@texuli/document/schema` at the draft's tier
- * (the host's, never the draft's). Warnings (orphaned comment anchors) do
- * not refuse; every error does.
+ * `validateDocument` from `@texuli/document/schema-core` at the draft's tier
+ * (the host's, never the draft's), inline decks checked by `validateDeck` or,
+ * without one, refused. Warnings (orphaned comment anchors) do not refuse;
+ * every error does.
  */
-export const checkDocumentDraft: DraftDocumentCheck = (doc, tier) => {
-  const result = validateDocument(doc, { trust: tier });
-  const issues = result.issues.map((issue) => ({
-    code: issue.code,
-    path: issue.jsonPath,
-    message: issue.message,
-    severity: issue.severity === 'warning' ? ('warning' as const) : ('error' as const),
-  }));
-  return result.ok ? { ok: true, document: result.document, issues } : { ok: false, issues };
-};
+export function createDocumentDraftCheck(
+  validateDeck: DeckPayloadValidator | null = null
+): DraftDocumentCheck {
+  return (doc, tier) => {
+    const result = validateDocument(doc, { trust: tier, validateDeck });
+    const issues = result.issues.map((issue) => ({
+      code: issue.code,
+      path: issue.jsonPath,
+      message: issue.message,
+      severity: issue.severity === 'warning' ? ('warning' as const) : ('error' as const),
+    }));
+    return result.ok ? { ok: true, document: result.document, issues } : { ok: false, issues };
+  };
+}
+
+/** The draft check without a deck validator: inline decks are refused (`0.12.0`, G136). */
+export const checkDocumentDraft: DraftDocumentCheck = createDocumentDraftCheck();
 
 /** What the reader takes besides the document (see `PageReader`). */
 export interface DocumentPlayerHostOptions {
   labels?: Partial<PagesLabels>;
+  /**
+   * Checks inline deck payloads (G136). `createDocumentPlayerHost` defaults
+   * to `checkDeckPayload`; `createDocumentPlayerHostCore` has none, so its
+   * build has no `@texuli/deck/model` reference, and a document holding an
+   * inline deck is refused. `null` refuses them on either.
+   */
+  validateDeck?: DeckPayloadValidator | null;
   /** Added to every heading level; default 1, so a level-1 heading sits under the player's label. */
   headingOffset?: number;
   /** Prefix for heading anchors, so two documents on one page never share an id. */
@@ -72,12 +87,13 @@ export interface DocumentPlayerHostOptions {
 export function createDocumentPlayerHostCore(
   options: DocumentPlayerHostOptions = {}
 ): DocumentPlayerHost {
+  const validateDeck = options.validateDeck ?? null;
   return {
-    checkDocument: checkDocumentDraft,
+    checkDocument: createDocumentDraftCheck(validateDeck),
     present(request) {
       const target = request.target;
       if (!target) return undefined;
-      const checked = validateDocument(request.doc, { trust: request.tier });
+      const checked = validateDocument(request.doc, { trust: request.tier, validateDeck });
       if (!checked.ok) return undefined;
       let cancelled = false;
       let instance: Record<string, unknown> | null = null;

@@ -7,7 +7,8 @@
 // `loadPlayer` (G123). `PageEditor` is this component with the default
 // loader.
 import type { DocumentBlockId, TexuliDocument } from '@texuli/document/model';
-import type { OpLogEntry } from '@texuli/document/ops';
+import type { OpLogEntry } from '@texuli/document/ops-core';
+import type { DeckPayloadValidator } from '@texuli/document/schema-core';
 import type { DeckPlayerHost } from '@texuli/player';
 import { Sortable, type SortableMove } from '@texuli/primitives/sortable';
 import { untrack } from 'svelte';
@@ -56,6 +57,13 @@ interface Props {
   deckHost?: DeckPlayerHost | null;
   /** Catalog components the slash menu offers (default: a line chart, a donut chart and a table). */
   components?: readonly ComponentEmbedOption[];
+  /**
+   * Checks inline deck payloads (G136). `PageEditor` defaults to
+   * `checkDeckPayload`; `PageEditorCore` has none, so its build has no
+   * `@texuli/deck/model` reference: a document holding an inline deck cannot
+   * be edited, and the slash menu has no inline deck item. Read once.
+   */
+  validateDeck?: DeckPayloadValidator | null;
   /** Layout motion of inserts, removes and reorders (`false` turns it off). */
   motion?: MotionProp;
   /** The editor state, for hosts that drive it (undo, insert, log). */
@@ -100,6 +108,7 @@ let {
   resolveMedia,
   deckHost = null,
   components,
+  validateDeck = null,
   motion,
   editor = $bindable(),
   announce,
@@ -119,6 +128,7 @@ const pages = untrack(
       labels: resolvePagesLabels(labelOverrides),
       ...(announce ? { announce } : {}),
       onChange: (next, entry) => onChange?.(next, entry),
+      validateDeck,
     })
 );
 editor = pages;
@@ -137,7 +147,11 @@ $effect(() => {
 
 let blockItems = $state.raw<SlashItem[]>([]);
 const items = $derived([
-  ...coreSlashItems(labels, { components, pages: Boolean(createPage) }),
+  ...coreSlashItems(labels, {
+    components,
+    pages: Boolean(createPage),
+    decks: untrack(() => validateDeck) !== null,
+  }),
   ...blockItems,
 ]);
 

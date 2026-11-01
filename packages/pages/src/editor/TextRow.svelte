@@ -7,7 +7,7 @@
 import { getAnnouncer } from '@texuli/core/announcer';
 import type { EditorDocument, EditorSelection } from '@texuli/core/editor-model';
 import type { DocumentBlock, DocumentBlockId } from '@texuli/document/model';
-import { equalData } from '@texuli/document/ops';
+import { equalData } from '@texuli/document/ops-core';
 import {
   EditorSurface,
   readDomSelection,

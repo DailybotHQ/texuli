@@ -882,21 +882,21 @@
       "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the the block editor: editor surface and the document validator that runs on every edit; the player and block renderers load lazily; measured 91,608 B, CSS 3,455 B."
     },
     "@texuli/pages/editor-core": {
-      "gzip": 96512,
+      "gzip": 79744,
       "cssGzip": 3712,
-      "note": "PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for PageEditorCore (and every editor export) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 92,783 B, CSS 3,515 B; every lazy chunk 163,090 B gzip."
+      "note": "0.12.0 (Protoyard G136): 96512 -> 79744 (measured 76,670 B + 4%): PageEditorCore validates with @texuli/document/ops-core and no longer carries @texuli/deck/model. PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for PageEditorCore (and every editor export) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 92,783 B, CSS 3,515 B; every lazy chunk 163,090 B gzip."
     },
     "@texuli/pages/export": {
       "gzip": 1152,
       "note": "PLAN_010 (ADR-010, ADR-011, ADR-016, consented plan): new row at measured + 4% for the lazy Markdown, DOCX and PDF export helpers; measured 1,056 B."
     },
     "@texuli/pages/host": {
-      "gzip": 30272,
-      "note": "PLAN_010 T-doc-agents (ADR-011, consented plan): new row at measured + 4% for the player document host (it carries the document validator; the reader loads lazily); measured 29,061 B."
+      "gzip": 31552,
+      "note": "PLAN_010 T-doc-agents (ADR-011, consented plan): new row at measured + 4% for the player document host (it carries the document validator; the reader loads lazily); measured 29,061 B. 0.12.0 (Protoyard G136): 30272 -> 31552 (measured 30,335 B + 4%) for the deck check the default host now injects."
     },
     "@texuli/pages/host-core": {
-      "gzip": 30656,
-      "note": "PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for createDocumentPlayerHostCore (the document host on PageReaderCore) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 29,451 B; every lazy chunk 209,595 B gzip."
+      "gzip": 14080,
+      "note": "0.12.0 (Protoyard G136): 30656 -> 14080 (measured 13,478 B + 4%): the core host validates with @texuli/document/schema-core and no longer carries @texuli/deck/model. PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for createDocumentPlayerHostCore (the document host on PageReaderCore) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 29,451 B; every lazy chunk 209,595 B gzip."
     },
     "@texuli/pages/paged": {
       "gzip": 14080,

@@ -23,16 +23,17 @@ end to end and native for agents:
   twin in `native/`.
 
 **Status: in development, pre-1.0.** All 26 published packages (all of
-`packages/` except `@texuli/examples`) are released on npm in the 0.11 line,
-every one at `0.11.5`, which the publish workflow publishes from `main`
+`packages/` except `@texuli/examples`) are released on npm in the 0.12 line,
+every one at `0.12.0`, which the publish workflow publishes from `main`
 after the merge and points `latest` and `next` to; `0.10.0` added design
 systems (one JSON document per brand, [DESIGN_SYSTEMS](docs/DESIGN_SYSTEMS.md))
-and `0.11.0` added the Protoyard gaps G125–G127 and the Final Review fixes;
-`0.11.1` to `0.11.5` are patches with fixes and additive Protoyard gaps
-(G128–G136: square theme radii keep `0px`, password `autocomplete` `off`,
-host heading anchors, `@texuli/document/schema-core`, telephone inputs,
-live `disabled` and `readOnly` in `SchemaForm`, a `fromTheme` that always
-compiles, and `@texuli/document/ops-core`).
+and the 0.11 line added the Protoyard gaps G125–G136 and the Final Review
+fixes (square theme radii keep `0px`, password `autocomplete` `off`, host
+heading anchors, `@texuli/document/schema-core`, telephone inputs, live
+`disabled` and `readOnly` in `SchemaForm`, a `fromTheme` that always
+compiles, and `@texuli/document/ops-core`); `0.12.0` moves the
+`@texuli/pages` core entries off the deck model (G136; breaking for those
+core entries only).
 `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/editor`,
 `@texuli/document`, `@texuli/pages`, `@texuli/forms`, `@texuli/canvas`,
 `@texuli/sheets` and `@texuli/mcp` are still in development
@@ -81,8 +82,8 @@ texuli/
 ├── packages/            layers point down only (scripts/check-layers.ts)
 │   ├── core/            L0 @texuli/core: texels (overlay engine, roving, positioning, URL policy…)  (README, docs/)
 │   ├── date/            L0 @texuli/date: Gregorian date arithmetic and locale week starts      (README)
-│   ├── deck/            L0 @texuli/deck: deck model v2 from JSON or Markdown, engine, authoring (in development, on npm as 0.11.5) (README, docs/)
-│   ├── drag/            L0 @texuli/drag: framework-free drag engine (in development, on npm as 0.11.5) (README, docs/)
+│   ├── deck/            L0 @texuli/deck: deck model v2 from JSON or Markdown, engine, authoring (in development, on npm as 0.12.0) (README, docs/)
+│   ├── drag/            L0 @texuli/drag: framework-free drag engine (in development, on npm as 0.12.0) (README, docs/)
 │   ├── primitives/      L1 @texuli/primitives: 42 owned headless primitives, APG patterns      (README, docs/)
 │   ├── document/        L1 @texuli/document: block document engine, ops, Markdown, CRDT sync (in development, on npm since 0.7.0) (README, docs/)
 │   ├── tokens/          L2 @texuli/tokens: OKLCH theme engine, --tx-* contract, 200+ themes, CSS (README, docs/)
@@ -215,14 +216,14 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
 12. **Honesty.** Docs describe what works today and mark everything planned
     as planned. Never invent benchmarks, deploy URLs, release status or
     check results. The 26 published packages, including `@texuli/mcp`
-    (first published in `0.9.0`), are released on npm in the 0.11 line
+    (first published in `0.9.0`), are released on npm in the 0.12 line
     (see docs/RELEASE.md; dist-tags `latest` and `next`, published by CI
     with provenance); `@texuli/drag`, `@texuli/workflows`,
     `@texuli/deck`, `@texuli/editor`, `@texuli/document`, `@texuli/pages`,
     `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets` and `@texuli/mcp`
     are still in development, and the blueprint spec in
-    `@texuli/spec@0.11.5` is `0.10.0`. `@texuli/examples`, the apps and
-    `native/` publish nothing. 0.11.5 is a pre-1.0 release, not stable
+    `@texuli/spec@0.12.0` is `0.10.0`. `@texuli/examples`, the apps and
+    `native/` publish nothing. 0.12.0 is a pre-1.0 release, not stable
     (1.0.0 will be the first stable release; `latest` tracks the newest
     release). texuli.com deploys from `main` (Cloudflare Pages), with the
     remote MCP at `https://texuli.com/mcp`; the agent service is not

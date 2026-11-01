@@ -7,7 +7,7 @@
  */
 import type { EditorBlock, EditorDocument } from '@texuli/core/editor-model';
 import type { DocumentBlock, DocumentBlockId, DocumentInline } from '@texuli/document/model';
-import { type DocumentOperation, equalData } from '@texuli/document/ops';
+import { type DocumentOperation, equalData } from '@texuli/document/ops-core';
 
 /** Block types a text row edits through the editor surface. */
 export const TEXT_ROW_TYPES: ReadonlySet<string> = new Set([

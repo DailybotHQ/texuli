@@ -5,7 +5,7 @@
 import { getAnnouncer } from '@texuli/core/announcer';
 import type { EditorDocument } from '@texuli/core/editor-model';
 import type { DocumentInline, ToggleBlock } from '@texuli/document/model';
-import { equalData } from '@texuli/document/ops';
+import { equalData } from '@texuli/document/ops-core';
 import { EditorSurface } from '@texuli/editor/editor';
 import { untrack } from 'svelte';
 import { getPagesContext } from './context.ts';

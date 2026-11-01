@@ -7,6 +7,15 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const entries = [
   {
+    version: '0.12',
+    date: '2026-11',
+    items: [
+      'The @texuli/pages core entries validate without the deck model (G136): @texuli/pages/editor-core measures 76,670 B gzip (about 92.8 KB before) and @texuli/pages/host-core 13,478 B (about 29.5 KB before).',
+      'Breaking for the core entries only: PageEditorCore, CollabEditorCore, new PagesEditor(...) and createDocumentPlayerHostCore take validateDeck with no default and refuse inline decks without it; pass checkDeckPayload from @texuli/document/schema, and use createDocumentDraftCheck(checkDeckPayload) for draft checks. PageEditor, CollabEditor and createDocumentPlayerHost behave as before.',
+      'Blueprint spec stays 0.10.0; @texuli/spec 0.12.0 ships it unchanged.',
+    ],
+  },
+  {
     version: '0.11',
     date: '2026-10',
     items: [

@@ -15,6 +15,7 @@ export { loadPagesLibraryBase } from '../shared/library-base.ts';
 export type { PagesPlayerLoader, PagesPlayerModule } from '../shared/player-loader.ts';
 export {
   checkDocumentDraft,
+  createDocumentDraftCheck,
   createDocumentPlayerHostCore,
   type DocumentPlayerHostOptions,
 } from './document-host-core.ts';

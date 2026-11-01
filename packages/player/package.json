@@ -1,6 +1,6 @@
 {
   "name": "@texuli/player",
-  "version": "0.11.5",
+  "version": "0.12.0",
   "private": true,
   "description": "Svelte paint runtime for validated Texuli catalog blueprints.",
   "keywords": [
@@ -45,17 +45,17 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/blocks": "0.11.5",
-    "@texuli/catalog": "0.11.5",
-    "@texuli/charts": "0.11.5",
-    "@texuli/chat": "0.11.5",
-    "@texuli/core": "0.11.5",
-    "@texuli/data": "0.11.5",
-    "@texuli/media": "0.11.5",
-    "@texuli/primitives": "0.11.5",
-    "@texuli/spec": "0.11.5",
-    "@texuli/workflows": "0.11.5",
-    "texuli": "0.11.5"
+    "@texuli/blocks": "0.12.0",
+    "@texuli/catalog": "0.12.0",
+    "@texuli/charts": "0.12.0",
+    "@texuli/chat": "0.12.0",
+    "@texuli/core": "0.12.0",
+    "@texuli/data": "0.12.0",
+    "@texuli/media": "0.12.0",
+    "@texuli/primitives": "0.12.0",
+    "@texuli/spec": "0.12.0",
+    "@texuli/workflows": "0.12.0",
+    "texuli": "0.12.0"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

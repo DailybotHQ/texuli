@@ -121,10 +121,13 @@ export const SAMPLE_DECK: DocumentJsonObject = Object.freeze({
   ],
 }) as DocumentJsonObject;
 
-/** The built-in items: text, layout, pages and embeds. */
+/**
+ * The built-in items: text, layout, pages and embeds. `decks: false` leaves
+ * out the inline deck item (an editor that cannot validate inline decks).
+ */
 export function coreSlashItems(
   labels: PagesLabels,
-  options: { components?: readonly ComponentEmbedOption[]; pages?: boolean } = {}
+  options: { components?: readonly ComponentEmbedOption[]; pages?: boolean; decks?: boolean } = {}
 ): SlashItem[] {
   const name = labels.blockType;
   const items: SlashItem[] = [
@@ -262,6 +265,7 @@ export function coreSlashItems(
         },
       }),
     });
+  if (options.decks === false) return items;
   items.push({
     value: 'deck',
     label: name('embed', 'deck'),

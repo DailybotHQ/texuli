@@ -1,6 +1,6 @@
 # texuli.com public API and developer portal
 
-PLAN_011 T-ar-api. **Status:** released in 0.9.0 (current in 0.11.5) and served by texuli.com,
+PLAN_011 T-ar-api. **Status:** released in 0.9.0 (current in 0.12.0) and served by texuli.com,
 deployed from `main` (`API_RELEASE_STATUS` in `src/lib/api-surface.ts` is
 `released`; the portal and the API index follow it).
 

@@ -25,7 +25,8 @@ import {
   type DocumentHistory,
   type DocumentOperation,
   type OpLogEntry,
-} from '@texuli/document/ops';
+} from '@texuli/document/ops-core';
+import type { DeckPayloadValidator } from '@texuli/document/schema-core';
 import { DEFAULT_PAGES_LABELS, type PagesLabels } from '../shared/labels.ts';
 import { columnWidths } from './columns.ts';
 import { adjacentRow, moveTarget } from './moves.ts';
@@ -77,6 +78,12 @@ export interface PagesEditorOptions {
   onChange?: (doc: TexuliDocument, entry: OpLogEntry) => void;
   /** Validation tier of every transaction (default `untrusted`). */
   tier?: HrefTrust;
+  /**
+   * Checks inline deck payloads in every transaction (G136, from `0.12.0`):
+   * pass `checkDeckPayload` from `@texuli/document/schema`. Without it a
+   * transaction that leaves an inline deck in the document is refused.
+   */
+  validateDeck?: DeckPayloadValidator | null;
   /** Typing in one block within this many ms is one undo step (default 1000). */
   groupMs?: number;
   /** Undo steps kept (default 500 transactions). */
@@ -141,6 +148,7 @@ export class PagesEditor {
     const history = createDocumentHistory(doc, {
       limit: this.#limit,
       validate: this.options.tier ?? 'untrusted',
+      validateDeck: this.options.validateDeck ?? null,
     });
     history.subscribe((entry, next) => {
       this.doc = next;

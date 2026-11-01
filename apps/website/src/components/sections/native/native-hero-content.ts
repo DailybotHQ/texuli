@@ -6,7 +6,7 @@
  * the same strings, so the test covers what ships. Every claim here is a
  * repository fact today:
  *
- * - the web packages are on npm in the 0.11 line (dist-tags `latest` and `next`);
+ * - the web packages are on npm in the 0.12 line (dist-tags `latest` and `next`);
  * - the Kotlin projection of the spec is generated and tested in-repo;
  * - the native Compose renderer is in development and conformance-tested,
  *   never published (`native/README.md`);
@@ -49,7 +49,7 @@ export const nativeHeroContent = {
   title: 'The same catalog, rendered by Compose.',
   lead:
     'One component contract drives both runtimes. The web side ships today: every published package ' +
-    'is on npm in the 0.11 line. The native side renders Compose through Kotlin Multiplatform and ' +
+    'is on npm in the 0.12 line. The native side renders Compose through Kotlin Multiplatform and ' +
     'is in development — conformance-tested in this repository, published nowhere yet.',
   statusHeading: 'What exists today',
   statusIntro: 'What ships, what is being built, and what is only planned — stated plainly.',
@@ -60,7 +60,7 @@ export const nativeHeroContent = {
       kind: 'shipped',
       statusLabel: 'Shipped',
       detail:
-        'All 26 packages are published to npm in the 0.11 line (see docs/RELEASE.md), pre-1.0, and ' +
+        'All 26 packages are published to npm in the 0.12 line (see docs/RELEASE.md), pre-1.0, and ' +
         'texuli.com builds from this repository.',
     },
     {
