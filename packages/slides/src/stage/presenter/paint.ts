@@ -20,6 +20,8 @@ export interface DeckPreviewPaint {
   /** The virtual canvas (1280 × 720 for 16:9, …). */
   readonly canvas: { width: number; height: number };
   readonly resolveAvatar?: (id: string) => string | undefined;
+  /** The cover title's heading level (`DeckSlideRenderContext.coverHeadingLevel`). */
+  readonly coverHeadingLevel?: 1 | 2;
   /** The background palette of one slide (its theme reference and mode). */
   palette(slide: DeckSlide): DeckBackgroundPalette;
 }

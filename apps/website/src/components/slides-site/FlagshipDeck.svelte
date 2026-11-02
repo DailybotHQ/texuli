@@ -69,7 +69,7 @@ async function downloadPptx() {
   {/if}
 {:else}
   <div class="flagship" data-slides-flagship={FLAGSHIP_ID}>
-    <DeckStage deck={input} tier="untrusted" />
+    <DeckStage deck={input} tier="untrusted" coverHeadingLevel={2} />
     <div class="flagship__export" role="group" aria-label="Export the deck">
       <button type="button" class="flagship__button" disabled={busy} onclick={downloadPptx}>
         Download PPTX

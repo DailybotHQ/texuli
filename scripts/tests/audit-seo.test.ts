@@ -242,9 +242,12 @@ describe('auditSite page checks', () => {
         '<h2>Section</h2>',
         '<h1 class="tx-deck-layout__display">A slide</h1><h2>Section</h2>'
       );
+      // An embedded deck must title its cover with h2 (coverHeadingLevel): an h1 counts.
       expect(
-        auditSite(slides).findings.filter((finding) => finding.category === 'Outline')
-      ).toEqual([]);
+        auditSite(slides)
+          .findings.filter((finding) => finding.category === 'Outline')
+          .map((finding) => `${finding.severity} ${finding.detail}`)
+      ).toEqual(['warning 2 h1 elements (want exactly 1)']);
       const twins = greenSite();
       twins.pages[2]!.html = twins.pages[2]!.html.replaceAll(
         'Texuli — page /component-pages/button/',

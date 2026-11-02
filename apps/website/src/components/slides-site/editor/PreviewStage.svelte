@@ -28,6 +28,7 @@ let { deck, onError }: Props = $props();
 <DeckStage
   {deck}
   syncHash={false}
+  coverHeadingLevel={2}
   fit="container"
   tier="untrusted"
   autofocus={false}
