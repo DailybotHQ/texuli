@@ -11,7 +11,7 @@ the home page hero)
 Every new package and capability of `0.6.0` to `0.12.0` on one page
 (PLAN_010 Amendment 8, PLAN_011 T-site-090 and T-site-0100), grouped by
 release with the status the repository states: `0.6.0` to `0.12.0` are
-published on npm, and `0.12.1` is current (pre-1.0), the published line of
+published on npm, and `0.12.2` is current (pre-1.0), the published line of
 `docs/RELEASE.md`. `0.11.0` (Protoyard G125–G127 and the Final Review
 fixes, with its patches `0.11.1` to `0.11.5`) and `0.12.0` (Protoyard
 G136: the `@texuli/pages` core entries without the deck model) are listed

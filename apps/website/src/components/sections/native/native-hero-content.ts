@@ -6,7 +6,7 @@
  * the same strings, so the test covers what ships. Every claim here is a
  * repository fact today:
  *
- * - the web packages are on npm in the 0.12 line (dist-tags `latest` and `next`);
+ * - the web packages are on npm in the 0.12 line (dist-tag `latest`; `next` is no longer maintained);
  * - the Kotlin projection of the spec is generated and tested in-repo;
  * - the native Compose renderer is in development and conformance-tested,
  *   never published (`native/README.md`);
