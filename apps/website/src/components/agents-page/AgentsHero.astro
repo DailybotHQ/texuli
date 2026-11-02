@@ -13,7 +13,10 @@ const base = import.meta.env.BASE_URL;
   <h1 id="agents-hero-title">Texuli for agents</h1>
   <p class="hero__lead">
     A closed catalog, emit tiers, a sink-free renderer and local tools—so agents build real
-    interfaces without inventing components or HTML sinks.
+    interfaces without inventing components or HTML sinks. For coding agents and the people who
+    run them: connect the MCP server at <a href={withBase(base, '/mcp-server/')}>/mcp</a> or install
+    the <a href={withBase(base, '/skill/')}>Texuli skill</a>, then let the agent read llms.txt
+    and the catalog below.
   </p>
   <div class="hero__actions">
     <Button href={withBase(base, '/llms/llms.txt')} variant="outline">Open llms.txt</Button>
