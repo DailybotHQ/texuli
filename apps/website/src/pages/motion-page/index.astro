@@ -79,7 +79,7 @@ await run.finished; // "finished", or "instant" under reduced motion`;
 
 <BaseLayout
   title="Motion"
-  description="Texuli motion (in development, on npm from 0.6.0): presence, FLIP layout, shared elements, timelines and springs on the Web Animations API, motion tokens, levels, reduced motion, and motion as blueprint data."
+  description="Texuli motion (in development): presence, FLIP layout, shared elements, timelines and springs on the Web Animations API, motion tokens and reduced motion."
 >
   <div class="motion-page" data-tx-motion-page="">
     <header class="motion-page__hero">
@@ -90,7 +90,7 @@ await run.finished; // "finished", or "instant" under reduced motion`;
         grows into its detail view, timelines play on one clock, springs settle. The browser does the
         interpolation through the Web Animations API, and reduced motion is instant by construction.
         The motion system is in development and on npm from <code>{MOTION_RELEASE}</code>, a pre-1.0
-        release; the previous release, <code>0.5.0</code>, is without it.
+        release; <code>0.5.0</code> and earlier are without it.
       </p>
       <ol class="pieces" aria-label="The pieces of @texuli/core/motion">
         {
@@ -353,7 +353,7 @@ await run.finished; // "finished", or "instant" under reduced motion`;
       <p>{section('api-contract').summary}</p>
       <p class="status">
         <code>0.5.0</code> brought <code>bind:ref</code> and rest attributes to about 40 components and
-        made the inputs and 14 primitive parts compose a caller's handlers. <code>{MOTION_RELEASE}</code> brings
+        made the inputs and 14 primitive parts compose a caller's handlers. <code>{MOTION_RELEASE}</code> brought
         the rest: the remaining parts, the Field rule, and a contract test that derives every
         component from the package exports, so a new export without a case fails.
       </p>

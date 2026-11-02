@@ -28,7 +28,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { webApiJsonLd } from '../../lib/schema';
 
 const description =
-  'The texuli.com developer portal: a read-only JSON API with an OpenAPI 3.1 description, the MCP server (remote and npx), the CLI, files for agents, limits, errors and versioning.';
+  'The texuli.com developer portal: a read-only JSON API described by OpenAPI 3.1, the MCP server (remote and npx), the CLI, agent files, limits and versioning.';
 const jsonLd = webApiJsonLd(
   'Read-only JSON files of texuli.com (the component catalog, themes, the Markdown twins manifest, health) under /api/v1/, described by an OpenAPI 3.1 document, plus a read-only MCP server at /mcp. Anonymous, rate limited, MIT.'
 );
@@ -53,8 +53,7 @@ const released = RELEASE.state === 'released';
   {
     !released && (
       <p class="status" data-api-status>
-        <strong>Status:</strong> {RELEASE.note} Until then, the packages on npm are the
-        0.8 line.
+        <strong>Status:</strong> {RELEASE.note}
       </p>
     )
   }
@@ -155,7 +154,7 @@ curl -sI ${SITE_ORIGIN}${PATHS.health}`}</code></pre>
   <pre><code>{`npx -p @texuli/tools texuli help
 echo '{"query":"date"}' | npx -p @texuli/tools texuli catalog search`}</code></pre>
   <p>
-    The <code>&lt;group&gt; &lt;verb&gt;</code> commands are new in 0.9.0;
+    The <code>&lt;group&gt; &lt;verb&gt;</code> commands date from 0.9.0;
     the <code>deck</code> and <code>document</code> commands date from the 0.8 line. Every command:
     {' '}
     <a href={opsDocs}>ops.md</a>.

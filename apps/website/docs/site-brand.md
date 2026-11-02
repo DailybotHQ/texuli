@@ -1,13 +1,13 @@
-# texuli.com: brand and home page
+# texuli.com: brand page
 
 **App:** `apps/website`  
-**Pages:** `/` (home), `/brand/`  
+**Pages:** `/brand/` (the home page is [site-landing.md](site-landing.md))  
 **Components:** `src/components/brand/`  
 **Tests:** `apps/website/tests/brand.test.ts`; axe and polish in the page sweep, `tests/e2e/a11y-site-<n>.spec.ts`
 
 ## Goal
 
-Home and brand pages tell the Texuli story:
+The brand page tells the Texuli story and hands out the assets:
 
 - Tagline: **Small pieces. Infinite possibilities.**
 - **Texels → Texuli → Interfaces** with live Button, Badge and Card (SSR)
@@ -19,12 +19,13 @@ Home and brand pages tell the Texuli story:
 
 | File | Role |
 | --- | --- |
-| `BrandHero.astro` | Hero, tagline, CTAs |
 | `StoryStrip.astro` | Three-stage story; stages 2–3 mount live Texuli components |
 | `WhySections.astro` | Pillar cards (Card + Badge) |
 | `LiveDemos.astro` | ButtonGroup, badges, card footer actions |
 
-Motion is CSS-only (`prefers-reduced-motion: reduce` disables it). No client islands on these sections (only the site `ThemeSwitch` remains).
+The page itself adds four sections after these: the mark (a T built from texels), color as a token story, voice, and a table of downloadable assets under `public/brand/`.
+
+Motion is CSS-only (`prefers-reduced-motion: reduce` disables it). These sections add no client island.
 
 ## Navigation
 

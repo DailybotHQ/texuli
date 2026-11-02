@@ -81,7 +81,7 @@ import { createRovingFocus } from '@texuli/core/roving';
 
   /** The outline shape: a plain text tree, nothing highlighted. */
   const TREE = `guides/
-  getting-started/   install the published preview
+  getting-started/   install the pre-1.0 release
   why-svelte-kotlin/ web and native, one contract`;
 
   const kindsOf = (tokens: readonly GuideToken[]): string =>

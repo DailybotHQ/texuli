@@ -47,7 +47,7 @@ ${SCRIPT_END}
     <Toolbar.GroupItem value="underline">Underline</Toolbar.GroupItem>
   </Toolbar.Group>
   <Toolbar.Separator />
-  <Toolbar.Link href="/help/">Help</Toolbar.Link>
+  <Toolbar.Link href="/guides/">Guides</Toolbar.Link>
 </Toolbar.Root>
 ${recipeLine('toolbarRootClass', 'texuli/toolbar', { variant: String(v.variant), size: String(v.size), orientation: String(v.orientation) })}`,
   keyCheck: {

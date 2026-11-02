@@ -28,7 +28,7 @@ const a11y = a11yLines(entry.a11y);
 const keys = keyboardRows(entry.a11y);
 const { prev, next } = componentPager(entry.id);
 // Family differentiators (punch-list row 3): why this family, not just what it is.
-const note = familyNote(entry.group);
+const note = familyNote(entry.group, entry.id);
 // Resolved at build time so the live demo island ships no per-id tables.
 const stage = stageFor(entry.id);
 const EDITABLE = new Set(['string', 'number', 'boolean', 'enum']);

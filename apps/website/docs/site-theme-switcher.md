@@ -7,7 +7,7 @@
 
 ## Goal
 
-Pick any of the **200+** library themes and a color mode (**light**, **dark**,
+Pick any of the **210** library themes and a color mode (**light**, **dark**,
 **high-contrast**, or **system**) for the whole site. The choice is
 **persisted**, applied **before first paint** (no flash), and the page is
 **static** with **no runtime network**.
@@ -27,7 +27,7 @@ picks a theme, the switcher **captures computed variables** (or injects
 high-contrast system colors) into `cacheAppearance`. Every other page's
 `BaseLayout` already runs `noFlashScript('texuli-site', 'system')`, which
 replays `themeId`, `mode` and safe `--tx-*` vars before paint — so the whole
-site follows the choice without shipping 200 themes on every URL.
+site follows the choice without shipping 210 themes on every URL.
 
 ## Modes
 
@@ -62,7 +62,7 @@ bash -c 'pnpm build && TEXULI_E2E_PORT=4910 pnpm exec playwright test tests/e2e/
 The spec (one test on Chromium since the 2026-10-27 trim) serves
 `apps/website/dist` on a free loopback port and checks:
 
-- the page lists the library (200+ themes), and two cards paint two
+- the page lists the library (210 themes), and two cards paint two
   different primaries in the active mode's palette;
 - mode and theme changes update `data-tx-theme` / `data-tx-mode`; dark mode
   lowers the background luminance; high contrast sets

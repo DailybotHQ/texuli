@@ -14,7 +14,7 @@ export interface SlidesPiece {
 export const SLIDES_PIECES: readonly SlidesPiece[] = [
   { name: 'model', role: 'one validated deck, every issue with its JSON path' },
   { name: 'markdown', role: 'Markdown to deck and back, math included' },
-  { name: 'layouts', role: '20 layouts with limits and pacing' },
+  { name: 'layouts', role: '21 layouts (20 structured plus free) with limits and pacing' },
   { name: 'backgrounds', role: 'presets with a 4.5:1 contrast scrim' },
   { name: 'engine', role: 'navigation, steps, hash routes, presenter protocol' },
   { name: 'stage', role: 'canvas fit, chrome, overview, presenter view' },
@@ -88,4 +88,4 @@ export const SLIDES_KEYS: readonly SlidesKey[] = [
 
 /** Honest status line (the 0.4.0 release was the first with the v2 stage). */
 export const SLIDES_STATUS =
-  'The slides stage and @texuli/deck are in development and on npm (@texuli/slides 0.12.0, @texuli/deck 0.12.0), pre-1.0 releases; @texuli/slides 0.3.0 has the previous deck model.';
+  'The slides stage and @texuli/deck are in development and on npm (@texuli/slides 0.12.0, @texuli/deck 0.12.0), pre-1.0 releases; releases before 0.4.0 use the previous deck model.';

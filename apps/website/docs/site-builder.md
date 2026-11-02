@@ -27,7 +27,7 @@ builder uses; the builder's own code is website code, not a package.
 | --- | --- |
 | `src/pages/builder/index.astro` | The page; mounts `BuilderApp` as a `client:load` island |
 | `BuilderApp.svelte` | Owns the draft and the selection, wires the panes below, and routes every write through one history |
-| `manifest.ts` | `BUILDER_MANIFESTS`: the Tier U content manifests and the page, doc, card and grid layouts that `PLAYER_LOADERS` paints (39 ids). This is the closed id set the history and the payload panel accept |
+| `manifest.ts` | `BUILDER_MANIFESTS`: the Tier U content manifests and the page, doc, card and grid layouts that `PLAYER_LOADERS` paints. This is the closed id set the history and the payload panel accept |
 | `model.ts` | `EMPTY_BLUEPRINT` (an empty `layout-page`), `canonicalJson`, `MAX_BLUEPRINT_BYTES`, `duplicateJsonKeys`, `validateBuilderTree` and `createBuilderHistory`. The history's commit gate is the tree limits plus one closed rule (only `id`, `props` and `children`; palette ids; manifest prop names; never `class`, `style` or `on*`). It is not the full `validateDraft`, so a draft with a wrong prop value or a grammar error can still be built step by step, and the preview lists those errors |
 
 ## Palette

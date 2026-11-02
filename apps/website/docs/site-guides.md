@@ -6,9 +6,9 @@
 
 ## Goal
 
-Product guides for getting started (install or copy), theming, dark mode,
-accessibility, RTL and i18n, forms and performance. Every page includes a
-**live** Texuli snippet that actually runs. Static output, no runtime network
+Product guides for getting started (install or copy), why Svelte and Kotlin,
+theming, dark mode, accessibility, RTL and i18n, forms and performance. Every how-to guide includes a
+**live** Texuli snippet that actually runs (the why-Svelte-and-Kotlin essay has none). Static output, no runtime network
 beyond the page’s own assets, axe WCAG 2.1 A/AA in light and dark (the page
 sweep, `a11y-site-<n>.spec.ts`).
 
@@ -36,6 +36,7 @@ Reuses `DocsSidebar`, `DocsMobileNav`, `DocsToc` and `DocsPager` with a
 | `/guides/rtl-i18n/` | RTL and i18n |
 | `/guides/forms/` | Forms |
 | `/guides/performance/` | Performance |
+| `/guides/why-svelte-kotlin/` | Why Svelte and Kotlin |
 
 ## Navigation
 
