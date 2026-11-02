@@ -28,7 +28,7 @@ const resolveHref = (href: string): string | undefined => {
               <span class="home-start__number" aria-hidden="true">{index + 1}</span>
               <div class="home-start__text">
                 <h3>
-                  {step.href ? <a href={resolveHref(step.href)}>{step.title}</a> : step.title}
+                  <a href={resolveHref(step.href)}>{step.title}</a>
                 </h3>
                 <p>{step.body}</p>
                 {index === 0 && <CopyCommand command={HOME_INSTALL_COMMAND} />}

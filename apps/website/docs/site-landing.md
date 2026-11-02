@@ -46,7 +46,7 @@ Landing tokens (the brand violet, the lavender-to-peach ground, dark and high-co
 
 ## Structure: components + one content module
 
-Words, links and counts live in `sections/home/home-content.ts`. Build-time data lives in `home-data.ts`: the library themes, the theme count, catalog, primitives and examples counts, and published packages. The native slice is parsed from `NativeRegistry` against the spec catalog. Tests import these modules directly, so copy budgets and targets are checked without a browser.
+Words, links and counts live in `sections/home/home-content.ts`. Build-time data lives in `home-data.ts`: the library themes, the theme count, catalog, primitives and examples counts, and published packages. The native counts come from the generated parity matrix (`native/docs/parity.json`, written by `scripts/native-parity.ts`). Tests import these modules directly, so copy budgets and targets are checked without a browser.
 
 | Section | Component | Content |
 | --- | --- | --- |
@@ -63,7 +63,7 @@ and `src/pages/web-and-native/index.astro`. Native and architecture details:
 
 ## Illustrations
 
-Each band's art is a `SiteIllustration` slot from `src/data/illustrations.json`. Until its WebP file lands in `src/assets/illustrations/`, the slot paints a texel mosaic in the illustration palette with the same aspect ratio, so the layout never shifts. The style, sizes and drop-in steps are in [ILLUSTRATIONS.md](ILLUSTRATIONS.md); the generated prompts are in [illustration-prompts.md](illustration-prompts.md).
+Each band's art is a `SiteIllustration` slot from `src/data/illustrations.json`, filled by its WebP in `src/assets/illustrations/` (all 28 slots have one). A slot whose file is missing paints a texel mosaic in the illustration palette with the same aspect ratio, so the layout never shifts. The style, sizes and drop-in steps are in [ILLUSTRATIONS.md](ILLUSTRATIONS.md); the generated prompts are in [illustration-prompts.md](illustration-prompts.md).
 
 ## Spec map
 

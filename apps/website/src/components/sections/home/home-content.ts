@@ -25,7 +25,7 @@ export const HOME_IDS = {
 } as const;
 
 /** The one install command the landing offers to copy. */
-export const HOME_INSTALL_COMMAND = 'pnpm add texuli';
+export const HOME_INSTALL_COMMAND = 'pnpm add texuli @texuli/tokens';
 
 export const HOME_HERO = {
   badge: ['Open source', 'MIT', 'Svelte 5', 'Kotlin Multiplatform'],
@@ -54,7 +54,7 @@ export async function loadHomeHeroProof(): Promise<readonly HomeStat[]> {
     return { id, value: found.value, label, href: found.href };
   };
   return [
-    stat('components', 'components'),
+    stat('components', 'component pages'),
     stat('primitives', 'primitives'),
     { id: 'themes', value: themes, label: 'themes', href: '/gallery-themes/' },
     stat('examples', 'examples'),
@@ -81,7 +81,7 @@ export const HOME_PITCH = {
     'Every layer is yours to read, theme and extend.',
   slot: 'home-pieces',
   steps: [
-    { label: 'Texels', href: '/foundation/' },
+    { label: 'Texels', href: '/web-and-native/#how-layered' },
     { label: 'Primitives', href: '/primitives-page/' },
     { label: 'Components', href: '/component-pages/' },
     { label: 'Apps', href: '/showcase/' },
@@ -239,7 +239,7 @@ export async function loadHomeProof(): Promise<readonly HomeProofStat[]> {
     {
       id: 'blueprint',
       value: components.length,
-      label: 'components in the blueprint catalog',
+      label: 'ids in the blueprint catalog, layouts included',
       href: '/component-pages/',
     },
     {
@@ -256,7 +256,11 @@ export const HOME_QUICKSTART = {
   title: 'From install to interface in three steps.',
   slot: 'home-quickstart',
   steps: [
-    { title: 'Install', body: 'One package for the styled components.', href: undefined },
+    {
+      title: 'Install',
+      body: 'The styled components and the theme tokens.',
+      href: '/guides/getting-started/',
+    },
     {
       title: 'Pick a theme',
       body: 'Start from the library or your own brand.',
