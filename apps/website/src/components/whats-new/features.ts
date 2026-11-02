@@ -3,7 +3,7 @@
  * them, each with its honest status, its packages, the page that shows it
  * in full and the kind of demo or preview the hub paints. Plain data, so
  * the page and its tests share one source. Releases: 0.6.0 to 0.12.0 are
- * published on npm, and 0.12.0 is `latest` (the release line in
+ * published on npm, and 0.12.1 is `latest` (the release line in
  * docs/RELEASE.md).
  */
 
@@ -21,7 +21,8 @@ export const RELEASES: readonly Release[] = [
   {
     id: '0.12.0',
     title: '0.12.0: pages core entries without the deck model',
-    status: 'Published on npm as 0.12.0, the current release (pre-1.0).',
+    status:
+      'Published on npm as 0.12.0; its patch 0.12.1, the current release (pre-1.0), adds coverHeadingLevel to the @texuli/slides stage.',
     published: true,
     summary:
       'Protoyard G136 finished: the @texuli/pages core entries (PageEditorCore, CollabEditorCore, PagesEditor and createDocumentPlayerHostCore) validate documents without @texuli/deck/model, so @texuli/pages/editor-core and host-core are much smaller. Breaking for those core entries only: they take validateDeck with no default and refuse inline decks without it, a one-line migration (validateDeck: checkDeckPayload from @texuli/document/schema); PageEditor, CollabEditor and createDocumentPlayerHost behave as before. Blueprint spec stays 0.10.0.',

@@ -87,8 +87,11 @@ describe('whats-new hub', () => {
     // docs/RELEASE.md (a version in development is not on the page as
     // published).
     const line = releaseLine();
+    // The line's first release carries the hub entry; a later patch is named
+    // there as the current release.
     const current = `${line.published}.0`;
-    expect(byId[current]?.status).toContain(`Published on npm as ${current}, the current release`);
+    expect(byId[current]?.status).toContain(`Published on npm as ${current}`);
+    expect(byId[current]?.status).toContain('the current release');
     if (line.development) {
       expect(byId[line.development]?.published ?? false).toBe(false);
       // PLAN_011 T-site-090: the version in development is on the hub, marked so.
