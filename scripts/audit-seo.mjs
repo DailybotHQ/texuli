@@ -51,13 +51,9 @@ export const AUDIT_CONFIG = {
         'twitter:site (+creator) awaits the developer handle — onsite.md §1; the open owner question is recorded in T-21',
     },
     {
-      category: 'Open Graph',
-      detail: 'og:image:secure_url per the reference most-complete set — onsite.md §1',
-    },
-    {
       category: 'JSON-LD',
       detail:
-        'graph targets beyond the shipped scope (Organization on every page, FAQPage, …) grow with their implementing tasks — structured.md rows',
+        'FAQPage only where a page shows real questions and answers; none does today — structured.md rows',
     },
     {
       category: 'OG art',
@@ -200,6 +196,7 @@ export function auditPage(page, config) {
     'og:description',
     'og:url',
     'og:image',
+    'og:image:secure_url',
     'og:type',
     'og:site_name',
     'og:image:alt',
@@ -220,6 +217,8 @@ export function auditPage(page, config) {
     add('critical', 'Open Graph', `og:url "${og['og:url']}" differs from the canonical`);
   if (og['og:image'] !== null && og['og:image'] !== expectedImage)
     add('critical', 'Open Graph', `og:image "${og['og:image']}" is not the built ${expectedImage}`);
+  if (og['og:image:secure_url'] !== null && og['og:image:secure_url'] !== og['og:image'])
+    add('critical', 'Open Graph', 'og:image:secure_url differs from og:image');
   if (og['og:image:width'] !== null && og['og:image:width'] !== String(config.og.width))
     add(
       'critical',
@@ -265,8 +264,13 @@ export function auditPage(page, config) {
       return [];
     }
   });
-  if (path === '/' && !types.includes('WebSite'))
-    add('critical', 'JSON-LD', 'the landing page lacks the WebSite graph (T-18 scope)');
+  // PLAN_014: every indexable page carries the site graph (owner, website, page).
+  for (const type of ['Organization', 'WebSite', 'WebPage'])
+    if (!types.includes(type))
+      add('critical', 'JSON-LD', `the page lacks the site graph's ${type}`);
+  for (const type of ['Organization', 'WebSite'])
+    if (types.filter((entry) => entry === type).length > 1)
+      add('warning', 'JSON-LD', `more than one ${type} node`);
   if (
     config.docsFamilies.some((family) => path.startsWith(`/${family}`)) &&
     !types.includes('BreadcrumbList')

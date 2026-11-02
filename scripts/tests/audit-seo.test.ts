@@ -28,7 +28,7 @@ function pngHeader(width: number, height: number): Buffer {
   return buffer;
 }
 
-const LANDING_JSONLD = `{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"Texuli"}]}`;
+const SITE_JSONLD = `{"@context":"https://schema.org","@graph":[{"@type":"Organization","name":"Dailybot, Inc."},{"@type":"WebSite","name":"Texuli"},{"@type":"WebPage","name":"Page"}]}`;
 const BREADCRUMB_JSONLD = `{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[]}`;
 
 /** A fully green page for `path` per the shipped head shape. */
@@ -38,7 +38,10 @@ function greenPage(
 ): { path: string; html: string; noindex: boolean } {
   const url = `https://texuli.com${path}`;
   const image = `https://texuli.com/${ogImageFile(path)}`;
-  const jsonld = path === '/' ? LANDING_JSONLD : BREADCRUMB_JSONLD;
+  const jsonld =
+    path === '/'
+      ? `<script type="application/ld+json">${SITE_JSONLD}</script>`
+      : `<script type="application/ld+json">${SITE_JSONLD}</script><script type="application/ld+json">${BREADCRUMB_JSONLD}</script>`;
   const html = `<!doctype html><html lang="en"><head>
 <title>${title}</title>
 <meta name="description" content="A unique honest description for ${path} long enough for the band.">
@@ -47,12 +50,13 @@ function greenPage(
 <meta property="og:title" content="${title}">
 <meta property="og:description" content="A unique honest description for ${path} long enough for the band.">
 <meta property="og:url" content="${url}"><meta property="og:image" content="${image}">
+<meta property="og:image:secure_url" content="${image}">
 <meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630"><meta property="og:image:alt" content="Texuli">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${title}">
 <meta name="twitter:description" content="A unique honest description for ${path} long enough for the band.">
 <meta name="twitter:image" content="${image}">
-<script type="application/ld+json">${jsonld}</script>
+${jsonld}
 </head><body></body></html>`;
   return { path, html, noindex: false };
 }
@@ -96,7 +100,8 @@ describe('auditSite on a green fixture dist', () => {
         []
       );
       expect(result.summary.findings.critical).toBe(0);
-      expect(result.summary.findings.planned).toBe(4);
+      expect(result.summary.findings.planned).toBe(3);
+      expect(result.summary.byCategory['Open Graph']?.planned).toBeUndefined();
       expect(result.summary.byCategory.Twitter?.planned).toBe(1);
       expect(result.summary.pages).toEqual({ total: 3, indexed: 3, noindex: 0 });
     }
@@ -194,10 +199,45 @@ describe('auditSite page checks', () => {
       expect(categories.some((finding) => finding.detail.includes('does not parse'))).toBe(true);
       expect(categories.some((finding) => finding.detail.includes('BreadcrumbList'))).toBe(true);
 
+      // PLAN_014: every page carries the site graph, once.
       const noGraph = greenSite();
-      noGraph.pages[0]!.html = noGraph.pages[0]!.html.replace(LANDING_JSONLD, BREADCRUMB_JSONLD);
+      noGraph.pages[1]!.html = noGraph.pages[1]!.html.replace(SITE_JSONLD, '{"@type":"Thing"}');
+      const missing = criticals(auditSite(noGraph)).map((finding) => finding.detail);
+      for (const type of ['Organization', 'WebSite', 'WebPage'])
+        expect(missing).toContain(`the page lacks the site graph's ${type}`);
+      const twice = greenSite();
+      twice.pages[0]!.html = twice.pages[0]!.html.replace(
+        '</head>',
+        `<script type="application/ld+json">${SITE_JSONLD}</script></head>`
+      );
       expect(
-        criticals(auditSite(noGraph)).some((finding) => finding.detail.includes('WebSite graph'))
+        auditSite(twice).findings.some(
+          (finding) =>
+            finding.severity === 'warning' && finding.detail === 'more than one Organization node'
+        )
+      ).toBe(true);
+    }
+    // PLAN_014: og:image:secure_url is required and equals og:image
+    {
+      const noSecure = greenSite();
+      noSecure.pages[0]!.html = noSecure.pages[0]!.html.replace(
+        /<meta property="og:image:secure_url"[^>]*>/,
+        ''
+      );
+      expect(
+        criticals(auditSite(noSecure)).some(
+          (finding) => finding.detail === 'missing og:image:secure_url'
+        )
+      ).toBe(true);
+      const other = greenSite();
+      other.pages[0]!.html = other.pages[0]!.html.replace(
+        /(<meta property="og:image:secure_url" content=")[^"]*/,
+        '$1https://texuli.com/og/other.png'
+      );
+      expect(
+        criticals(auditSite(other)).some(
+          (finding) => finding.detail === 'og:image:secure_url differs from og:image'
+        )
       ).toBe(true);
     }
     // flags a missing or wrong-size OG art and keeps title length a warning
