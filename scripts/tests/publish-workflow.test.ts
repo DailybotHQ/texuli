@@ -92,6 +92,19 @@ describe('publish workflow pre-flight', () => {
     expect(npmIndex).toBeLessThan(publishIndex);
   });
 
+  it('verifies every package on npm after publishing, with latest and provenance', () => {
+    const verifyIndex = all.findIndex((step) => step.name.includes('Verify the release on npm'));
+    expect(verifyIndex).toBeGreaterThan(publishIndex);
+    const verify = all[verifyIndex] as Step;
+    const waves = [...publish.run.matchAll(/^publish packages\/(\S+)$/gm)].map((match) => match[1]);
+    expect(loopDirs(verify.run)).toEqual(waves);
+    expect(verify.run).toContain('dist-tags.latest');
+    expect(verify.run).toContain('dist.attestations.provenance');
+    // It polls (registry lag), then fails instead of passing silently.
+    expect(verify.run).toMatch(/for attempt in \$\(seq 1 \d+\)/);
+    expect(verify.run).toMatch(/exit 1\s*$/);
+  });
+
   it('fails when any listed package is 0.0.0 and passes when every one is released', () => {
     // A stand-in `node -p "require('./…/package.json').field"`: forty real Node
     // starts per run take minutes on a loaded host.

@@ -125,4 +125,28 @@ test('sections in order, working calls to action, announced copy, motion only on
   const artBox = await art.boundingBox();
   expect(artBox?.y ?? 0).toBeGreaterThan((cta?.y ?? 0) + (cta?.height ?? 0));
   expect(artBox?.width ?? 0).toBeLessThanOrEqual(360);
+
+  // Every band with art leads with its title and text on a phone: the pitch
+  // and each story put the art below the copy, so the heading reads first.
+  const bands = page.locator('[data-tx-home-pitch], [data-tx-home-story]');
+  expect(await bands.count()).toBeGreaterThan(1);
+  const bandBoxes = async () =>
+    bands.evaluateAll((sections) =>
+      sections.map((section) => {
+        const copy = section.querySelector('[class$="__copy"]')?.getBoundingClientRect();
+        const art = section.querySelector('[class$="__art"]')?.getBoundingClientRect();
+        return {
+          copyTop: copy?.top ?? 0,
+          copyLeft: copy?.left ?? 0,
+          artTop: art?.top ?? 0,
+          artLeft: art?.left ?? 0,
+        };
+      })
+    );
+  for (const band of await bandBoxes()) expect(band.artTop).toBeGreaterThan(band.copyTop);
+
+  // On a wide screen the pitch keeps its art in the first column.
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const [pitch] = await bandBoxes();
+  expect(pitch?.artLeft ?? 0).toBeLessThan(pitch?.copyLeft ?? 0);
 });

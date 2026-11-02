@@ -17,9 +17,6 @@ const resolveHref = (href: string): string | undefined => {
 
 <section class="home-pitch" aria-labelledby="home-pitch-title" data-tx-home-pitch="">
   <div class="home-pitch__inner">
-    <div class="home-pitch__art">
-      <SiteIllustration art={HOME_PITCH.slot} />
-    </div>
     <div class="home-pitch__copy">
       <p class="home-pitch__kicker">{HOME_PITCH.kicker}</p>
       <h2 id="home-pitch-title">{HOME_PITCH.title}</h2>
@@ -41,6 +38,9 @@ const resolveHref = (href: string): string | undefined => {
         }
       </ol>
     </div>
+    <div class="home-pitch__art">
+      <SiteIllustration art={HOME_PITCH.slot} />
+    </div>
   </div>
 </section>
 
@@ -57,9 +57,14 @@ const resolveHref = (href: string): string | undefined => {
     padding-inline: clamp(1rem, 4vw, 1.5rem);
     align-items: center;
   }
+  /* The copy comes first in the source, so a single column reads the title
+     before the art; wide screens put the art back in the first column. */
   @media (min-width: 56rem) {
     .home-pitch__inner {
       grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+    }
+    .home-pitch__art {
+      order: -1;
     }
   }
   .home-pitch__art {

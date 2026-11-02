@@ -165,5 +165,33 @@ jobs:
           publish packages/pages
           publish packages/slides
           echo "All packable packages published under dist-tag latest."
+      # npm's registry metadata can lag a few minutes behind a publish (four
+      # packages showed the previous latest for ~90 s on 0.12.1), so poll for
+      # up to ten minutes before failing: every package must report this
+      # version, with `latest` on it and a provenance attestation.
+      - name: Verify the release on npm
+        run: |
+          set -euo pipefail
+          missing=()
+          for attempt in $(seq 1 20); do
+            missing=()
+            for dir in core date spec drag deck tokens primitives document texuli workflows editor forms canvas charts data media chat blocks sheets catalog tools mcp astro player pages slides; do
+              name=$(node -p "require('./packages/${dir}/package.json').name")
+              version=$(node -p "require('./packages/${dir}/package.json').version")
+              latest=$(npm view "${name}" dist-tags.latest --prefer-online 2>/dev/null || true)
+              provenance=$(npm view "${name}@${version}" dist.attestations.provenance.predicateType --prefer-online 2>/dev/null || true)
+              if [ "$latest" != "$version" ] || [ -z "$provenance" ]; then
+                missing+=("${name}@${version}")
+              fi
+            done
+            if [ "${#missing[@]}" -eq 0 ]; then
+              echo "Every package is on npm at its version, with latest and provenance."
+              exit 0
+            fi
+            echo "Attempt ${attempt}: not yet on npm as latest with provenance: ${missing[*]}"
+            sleep 30
+          done
+          echo "Release not visible on npm after ten minutes: ${missing[*]}"
+          exit 1
       - name: Record digests
         run: cat tmp/packages/SHA256SUMS
