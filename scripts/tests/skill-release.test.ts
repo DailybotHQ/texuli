@@ -10,11 +10,7 @@ import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSyn
 import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import {
-  installRoutes,
-  latestRelease,
-  SKILL_TAG_PREFIX,
-} from '../../apps/website/src/components/skill/skill.ts';
+import { installRoutes, latestRelease } from '../../apps/website/src/components/skill/skill.ts';
 import {
   applyRelease,
   bumpLevel,
@@ -232,14 +228,10 @@ describe('workflows', () => {
 
   it('never lets a skill tag start the npm publish', () => {
     const publish = read('publish.yml');
-    const filters = /tags:\s*\[([^\]]*)\]/.exec(publish)?.[1]?.split(',') ?? [];
-    expect(filters.map((f) => f.trim().replace(/['"]/g, ''))).toEqual(['v*']);
-    // GitHub matches a tag filter against the whole tag name; `*` stops at `/`.
-    const glob = (pattern: string) =>
-      new RegExp(`^${pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '[^/]*')}$`);
-    expect(glob('v*').test('v0.3.0')).toBe(true);
-    expect(glob('v*').test(`${SKILL_TAG_PREFIX}0.3.0`)).toBe(false);
-    // The skill release has no tag trigger at all.
+    // Neither workflow triggers on a tag: npm publishes only after CI on main
+    // (or by hand), so a `skill-v*` tag can never start one.
+    expect(publish).not.toMatch(/^\s+tags:/m);
+    expect(publish).not.toMatch(/^ {2}push:/m);
     expect(release).not.toMatch(/^\s+tags:/m);
   });
 

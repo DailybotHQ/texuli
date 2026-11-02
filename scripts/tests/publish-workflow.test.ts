@@ -63,18 +63,33 @@ describe('publish workflow pre-flight', () => {
     expect(publishIndex).toBeGreaterThan(preflightIndex);
     // No step before the pre-flight publishes anything.
     for (const step of all.slice(0, preflightIndex)) expect(step.run).not.toMatch(/npm publish/);
-    // The pre-flight list is the publish list, in wave order (and the dist-tag loop's).
+    // The pre-flight list is the publish list, in wave order.
     const waves = [...publish.run.matchAll(/^publish packages\/(\S+)$/gm)].map((match) => match[1]);
     expect(waves.length).toBeGreaterThan(10);
     expect(loopDirs(preflight.run)).toEqual(waves);
-    const latest = all.find((step) => step.name.includes('Point latest')) as Step;
-    expect(loopDirs(latest.run)).toEqual(waves);
     // The refusal no longer lives inside publish(), mid-wave.
     expect(publish.run).not.toContain('0.0.0');
     // @texuli/mcp pins @texuli/tools exactly, so it publishes right after it (ADR-019).
     expect(waves.indexOf('mcp')).toBe(waves.indexOf('tools') + 1);
-    // Provenance and the next dist-tag stay on every publish.
-    expect(publish.run).toContain('npm publish "$tarball" --tag next --access public --provenance');
+    // Provenance and the latest dist-tag stay on every publish.
+    expect(publish.run).toContain(
+      'npm publish "$tarball" --tag latest --access public --provenance'
+    );
+  });
+
+  it('publishes through trusted publishing from the npm environment, with no stored token', () => {
+    // npm trusts publish.yml in the `npm` environment; only main may deploy to it.
+    expect(workflow).toMatch(/^ {4}environment: npm$/m);
+    expect(workflow).toMatch(/^ {2}id-token: write$/m);
+    // No token secret, and no dist-tag command (trusted publishing covers publish only).
+    expect(workflow).not.toMatch(/NPM_TOKEN|NODE_AUTH_TOKEN|secrets\./);
+    for (const step of all) expect(step.run).not.toMatch(/npm dist-tag/);
+    // Tags no longer trigger a publish: they would bypass the main-only environment rule.
+    expect(workflow).not.toMatch(/^ {2}push:/m);
+    // Trusted publishing needs npm 11.5.1 or later, installed before the first publish.
+    const npmIndex = all.findIndex((step) => /npm install --global npm@\d/.test(step.run));
+    expect(npmIndex).toBeGreaterThan(-1);
+    expect(npmIndex).toBeLessThan(publishIndex);
   });
 
   it('fails when any listed package is 0.0.0 and passes when every one is released', () => {

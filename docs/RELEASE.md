@@ -2258,20 +2258,19 @@ default.
 
 ## Dist-tags
 
-- **`next`** points to the newest owner-approved version, including any
-  future `0.x.y-next.N` or other pre-release. The publish workflow always
-  publishes with `--tag next`, so it moves only with a new version and a
-  fresh GO. It names `0.12.1` once the publish workflow runs after the merge
-  of `release/0.12.1` (`0.12.0` before that).
 - **`latest`** is npm's default install tag, and npm's package page shows
   the README of the version it names. It tracks the newest release, before
-  and after 1.0.0: the publish workflow moves it together with `next`
-  (owner decision 2026-10-27; before that, `latest` was reserved for 1.0.0
-  and stayed on the first upload, `0.1.0-next.0`). It names `0.12.1` once the
-  publish workflow runs after the merge of `release/0.12.1` (`0.12.0`
-  before that).
-  The workflow moves `latest` on every run, so publishing a future
-  pre-release without moving `latest` needs a workflow change first.
+  and after 1.0.0 (owner decision 2026-10-27; before that, `latest` was
+  reserved for 1.0.0 and stayed on the first upload, `0.1.0-next.0`). The
+  publish workflow publishes every version with `--tag latest`. It names
+  `0.12.1`. Publishing a future pre-release without moving `latest` needs a
+  workflow change first.
+- **`next`** names `0.12.1`, and the workflow no longer moves it. npm
+  trusted publishing, the workflow's only credential since 2026-11-02,
+  authorizes `npm publish` but not `npm dist-tag`, so `next` changes only
+  when the publishing account moves or removes it from a terminal. Until
+  then, the first release after `0.12.1` leaves `next` behind `latest`;
+  do not install from `next`.
 - Dailybot v4 and other production consumers must pin exact package versions
   in their manifests and lockfiles. They must not rely on a moving dist-tag;
   `next` is for deliberate pre-release integration only.
@@ -2409,11 +2408,9 @@ release notes are written; the skill release after the merge folds the
 pack's 0.12.1 changes into its own section). A checkout install is described in
 [SKILL_INSTALLATION](SKILL_INSTALLATION.md).
 
-**Tags.** Skill releases are tagged `skill-vX.Y.Z`. The npm publish
-workflow triggers on `v*` tags; GitHub matches tag filters against the
-whole tag name, so `skill-v0.3.0` never starts an npm publish, and a
-package tag never starts a skill release (the skill workflow does not
-trigger on tags at all).
+**Tags.** Skill releases are tagged `skill-vX.Y.Z`. No workflow triggers on
+a tag: the npm publish workflow runs after CI on `main` (or by hand), and
+the skill workflow does not trigger on tags either.
 
 **Trigger.** The workflow runs on `workflow_run` after the `CI` workflow
 completes for a push to `main`, and only when CI succeeded. It is skipped

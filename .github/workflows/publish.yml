@@ -1,27 +1,27 @@
 # Publishes the packable packages to npm (docs/RELEASE.md).
 #
-# Trigger: CI succeeding on a push to main (a merged pull request), a `v*`
-# tag push, or a manual workflow_dispatch run against a branch. Merging a
-# version bump into main is the owner GO: the loop skips every name@version
-# already on npm, so a merge without a bump publishes nothing. The job rebuilds every tarball from source with
-# `pnpm verify:packages` (publint-strict, byte checks), then publishes the
-# freshly packed tarballs in the documented wave order with `--tag next`,
-# then points `latest` at the same versions: until 1.0.0, `latest` tracks
-# the newest preview, so npm's package page shows the current README and a
-# bare install gets the current preview (owner decision 2026-10-27).
+# Trigger: CI succeeding on a push to main (a merged pull request), or a
+# manual workflow_dispatch run. Merging a version bump into main is the
+# owner GO: the loop skips every name@version already on npm, so a merge
+# without a bump publishes nothing. The job rebuilds every tarball from
+# source with `pnpm verify:packages` (publint-strict, byte checks), then
+# publishes the freshly packed tarballs in the documented wave order with
+# `--tag latest`: until 1.0.0, `latest` tracks the newest release, so npm's
+# package page shows the current README and a bare install gets it (owner
+# decision 2026-10-27).
 #
-# Requires one repository secret:
-#   NPM_TOKEN — a granular access token of the publishing account with
-#   read-and-write on the @texuli packages. CI tokens bypass 2FA OTP.
-#
-# Tarballs ship with npm provenance (signed, linked to this repository and
-# workflow through GitHub's OIDC token — the `id-token: write` permission).
+# Authentication is npm trusted publishing (OIDC), with no stored token:
+# every published package trusts this workflow file (publish.yml) of
+# DailybotHQ/texuli in the `npm` environment, and GitHub lets only `main`
+# deploy to that environment, so a workflow run from any other branch or tag
+# gets no publish rights. Trusted publishing covers `npm publish` only, not
+# `npm dist-tag`, so the workflow no longer moves `next` (docs/RELEASE.md,
+# "Dist-tags"). Tarballs ship with npm provenance (signed, linked to this
+# repository and workflow through the same OIDC token: `id-token: write`).
 name: Publish packages
 
 on:
   workflow_dispatch:
-  push:
-    tags: ['v*']
   workflow_run:
     workflows: [CI]
     types: [completed]
@@ -37,8 +37,11 @@ permissions:
 
 jobs:
   publish:
-    name: Pack, verify and publish (dist-tag next)
+    name: Pack, verify and publish (dist-tag latest)
     runs-on: ubuntu-latest
+    # The npm trusted publisher of every package names this environment, and
+    # its deployment rule admits only main.
+    environment: npm
     # After a merge, publish only when CI passed on that push to main.
     if: >-
       github.event_name != 'workflow_run'
@@ -48,7 +51,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          # The commit CI tested; empty (the triggering ref) on tag and manual runs.
+          # The commit CI tested; empty (the triggering ref) on manual runs.
           ref: ${{ github.event.workflow_run.head_sha }}
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
@@ -56,6 +59,9 @@ jobs:
           node-version: 24
           cache: pnpm
           registry-url: 'https://registry.npmjs.org'
+      # Trusted publishing needs npm 11.5.1 or later; pin the CLI rather than
+      # rely on the npm bundled with the runner's Node 24.
+      - run: npm install --global npm@11.20.0
       - run: pnpm install --frozen-lockfile
       # Packs the tarballs into tmp/packages/tarballs/ and records
       # SHA-256 digests; publint warnings fail the job.
@@ -77,8 +83,6 @@ jobs:
           done
           exit "$refused"
       - name: Publish in wave order (docs/RELEASE.md)
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
           publish() {
@@ -95,12 +99,12 @@ jobs:
               return 0
             fi
             echo "Publishing ${name}@${version} (${tarball})"
-            # The provenance step reads a GitHub OIDC token, which can fail
+            # Trusted publishing and provenance read a GitHub OIDC token, which can fail
             # transiently (IDENTITY_TOKEN_READ_ERROR, run 40506123596), so
             # retry before failing the wave.
             local attempt
             for attempt in 1 2 3; do
-              if npm publish "$tarball" --tag next --access public --provenance; then
+              if npm publish "$tarball" --tag latest --access public --provenance; then
                 return 0
               fi
               # A failed attempt may still have landed; never publish twice.
@@ -160,16 +164,6 @@ jobs:
           # editor and player first; first published in 0.7.0).
           publish packages/pages
           publish packages/slides
-          echo "All packable packages published under dist-tag next."
-      - name: Point latest at this release
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          set -euo pipefail
-          for dir in core date spec drag deck tokens primitives document texuli workflows editor forms canvas charts data media chat blocks sheets catalog tools mcp astro player pages slides; do
-            name=$(node -p "require('./packages/${dir}/package.json').name")
-            version=$(node -p "require('./packages/${dir}/package.json').version")
-            npm dist-tag add "${name}@${version}" latest
-          done
+          echo "All packable packages published under dist-tag latest."
       - name: Record digests
         run: cat tmp/packages/SHA256SUMS
