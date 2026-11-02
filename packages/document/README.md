@@ -14,7 +14,7 @@ the CRDT sync core. It has no Svelte and no DOM: Node tools, agents and the
 > ADR-010 and ADR-011 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
 > Under 0.x a new minor (`0.12.0`) may contain breaking changes, so pin the
-> exact version or use `^0.12.1`, which accepts only 0.12.x
+> exact version or use `^0.12.0`, which accepts only 0.12.x
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 It sits on layer L1: it imports `@texuli/core` (the editor text model, the

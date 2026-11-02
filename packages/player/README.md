@@ -12,7 +12,7 @@ player never navigates, fetches or persists anything on its own.
 > **Status: 0.x release.** Texuli is in development. The packages are
 > published to npm as `0.12.1`, a pre-1.0 release (1.0.0 will be the first
 > stable release). Under 0.x, a new minor (`0.12.0`) may contain breaking
-> changes, so pin the exact version or use `^0.12.1`, which accepts only 0.12.x.
+> changes, so pin the exact version or use `^0.12.0`, which accepts only 0.12.x.
 
 > **New in `0.4.0`.** Spec 0.3.0 and 0.4.0 envelopes (`state`, `flow`,
 > `bind`, `on` and the closed actions), the data view, chat display,

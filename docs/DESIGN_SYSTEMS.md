@@ -260,7 +260,7 @@ exports the document (and, optionally, its cached compiled form):
     "./design-system.json": "./design-system.json",
     "./design-system.compiled.json": "./design-system.compiled.json"
   },
-  "peerDependencies": { "@texuli/tokens": "^0.12.1" }
+  "peerDependencies": { "@texuli/tokens": "^0.12.0" }
 }
 ```
 

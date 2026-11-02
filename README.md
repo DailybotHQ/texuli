@@ -201,7 +201,7 @@ every verified command.
 - **No stable release yet.** The 26 published packages are on npm in the
   0.12 line, a pre-1.0 release (`npm install texuli`; `latest` and `next`
   both point to it). Under 0.x a new minor (`0.12.0`) may contain breaking
-  changes, so pin the exact version or use `^0.12.1`; 1.0.0 will be the
+  changes, so pin the exact version or use `^0.12.0`; 1.0.0 will be the
   first stable release.
   The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
 - **texuli.com deploys from `main`** (Cloudflare Pages). Run it locally with

@@ -12,7 +12,7 @@ data-heavy product screens.
 > **Status: 0.x release.** `@texuli/data` is published on npm as `0.12.1`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
 > minor (`0.12.0`) may contain breaking changes, so pin the exact version or
-> use `^0.12.1`, which accepts only 0.12.x.
+> use `^0.12.0`, which accepts only 0.12.x.
 
 ## Install
 

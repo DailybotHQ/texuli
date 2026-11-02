@@ -19,7 +19,7 @@ tools and agents can use it on its own.
 > has the previous deck model), and `@texuli/spec` ships the blueprint spec
 > that encodes deck model v2 from `0.4.0` (spec `0.10.0` in `@texuli/spec@0.12.1`).
 > Under 0.x a new minor may contain breaking changes, so pin the exact
-> version or use `^0.12.1`
+> version or use `^0.12.0`
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 ## Install
