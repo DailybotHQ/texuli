@@ -334,7 +334,9 @@ export function auditSite({ pages, sitemap, robots, readAsset }, config = AUDIT_
       if (!descriptions.has(description)) descriptions.set(description, []);
       descriptions.get(description).push(page.path);
     }
-    const title = decodeEntities(/<title\b[^>]*>([\s\S]*?)<\/title>/i.exec(page.html)?.[1]?.trim() ?? '');
+    const title = decodeEntities(
+      /<title\b[^>]*>([\s\S]*?)<\/title>/i.exec(page.html)?.[1]?.trim() ?? ''
+    );
     if (title !== '') {
       if (!titles.has(title)) titles.set(title, []);
       titles.get(title).push(page.path);
