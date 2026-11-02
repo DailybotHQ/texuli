@@ -1,9 +1,8 @@
 # Releases the agent skill (skills/texuli/) on its own tag namespace,
 # skill-vX.Y.Z (docs/RELEASE.md "Skill release").
 #
-# Trigger: the CI workflow completed successfully for a push to main. The
-# npm publish workflow triggers on `v*` tags; this one never triggers on a
-# tag, and its `skill-v*` tags never match `v*`.
+# Trigger: the CI workflow completed successfully for a push to main. This
+# workflow never triggers on a tag, and neither does the npm publish workflow.
 #
 # Skipped when the head commit is a release commit (`chore(release):`) or
 # carries `[skip release]`, and when no commit since the last skill-v tag

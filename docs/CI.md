@@ -1,8 +1,8 @@
 # CI — GitHub Actions and deployment
 
 The repository runs three GitHub Actions workflows: CI, npm publishing and the skill release. Checks run on every push
-to `main` and every pull request; publishing runs on demand or on a `v*`
-tag. The website deploys separately through Cloudflare Pages' own Git
+to `main` and every pull request; publishing runs after CI passes on
+`main`, or on demand. The website deploys separately through Cloudflare Pages' own Git
 integration.
 
 ## Workflows
@@ -10,7 +10,7 @@ integration.
 | Workflow | File | Trigger | Jobs |
 | --- | --- | --- | --- |
 | CI | [.github/workflows/ci.yml](../.github/workflows/ci.yml) | push to `main`, pull requests | `check`, `behavior`, `website`, `audits`, `setup-smoke-macos`; `mcp-remote-smoke` on pushes to `main` only |
-| Publish packages | [.github/workflows/publish.yml](../.github/workflows/publish.yml) | CI success on a push to `main` (a merged PR), `v*` tag push, manual dispatch | `publish` |
+| Publish packages | [.github/workflows/publish.yml](../.github/workflows/publish.yml) | CI success on a push to `main` (a merged PR), manual dispatch | `publish` |
 | Skill release | [.github/workflows/skill-release.yml](../.github/workflows/skill-release.yml) | `workflow_run` after a successful CI run for a push to `main` | `release` (`contents: write`), `smoke` (read-only) |
 
 - **`check`** — `pnpm check` (Biome lint, typecheck, unit and component
@@ -102,11 +102,11 @@ browser visual test.
 `publish.yml` rebuilds every tarball from source with
 `pnpm verify:packages` (publint strict, byte checks, SHA-256 recorded),
 then publishes the packable packages in the wave order documented in
-[RELEASE](RELEASE.md), always `--tag next`, then points `latest` at the
-same versions: `latest` tracks the newest release (owner decision
-2026-10-27; both name `0.12.1` once the post-merge run of the
-`release/0.12.1` merge publishes it), so npm's package page shows the current README. Tarballs ship with signed npm provenance via
-GitHub's OIDC token (`id-token: write`).
+[RELEASE](RELEASE.md), always `--tag latest`: `latest` tracks the newest
+release (owner decision 2026-10-27), so npm's package page shows the
+current README. Tarballs ship with signed npm provenance via GitHub's OIDC
+token (`id-token: write`). The workflow no longer moves `next`
+([RELEASE](RELEASE.md#dist-tags)).
 
 `publish.yml` lists `@texuli/drag`, `@texuli/workflows` and
 `@texuli/deck` (all in development) ahead of the packages that depend on
@@ -133,22 +133,35 @@ skips versions npm already has, so a package changed since its published
 version needs a new version first
 ([RELEASE](RELEASE.md#publication-waves)).
 
-One-time setup, already done: the repository secret `NPM_TOKEN` holds a
-granular access token of the publishing account with read-and-write on
-the `@texuli` packages. CI tokens bypass the 2FA one-time-password flow
-that blocks terminal publishes.
+**Authentication: npm trusted publishing (OIDC), no stored token.** Each of
+the 26 published packages trusts `publish.yml` of `DailybotHQ/texuli` in
+the `npm` environment (`npm trust github <package> --file publish.yml
+--repo DailybotHQ/texuli --env npm --allow-publish`, run by the publishing
+account, which confirms with its 2FA; npm keeps one trusted publisher per
+package, so changing it means `npm trust revoke` first). At publish time npm
+exchanges the job's GitHub OIDC token for a short-lived publish right, so
+there is no `NPM_TOKEN` secret to leak. The GitHub environment `npm` admits
+deployments from `main` only, so a run of a changed workflow on another
+branch gets no environment claim and npm refuses it. Trusted publishing
+covers `npm publish` only: `npm dist-tag` still needs the publishing
+account, from a terminal. The job installs npm `11.20.0` first (trusted
+publishing needs 11.5.1 or later). Package writers can still push to
+`main` directly: `main` has no branch protection, because the skill release
+pushes its release commit to `main`
+([RELEASE](RELEASE.md#skill-release)).
 
 To release: merge a pull request that bumps the versions into `main`.
 Every pull request runs the full CI; once CI passes on the merge commit,
 `publish.yml` starts on its own (`workflow_run`) and publishes every
 `name@version` npm does not have yet, so a merge without a version bump
-publishes nothing. A tag (`v0.8.0`) or a manual run from the Actions tab
-against `main` still works. Never overwrite a published version; new
+publishes nothing. A manual run from the Actions tab against `main` still
+works; a manual run on any other branch is refused by the environment. Tag
+pushes no longer start a publish (they would bypass the main-only rule). Never overwrite a published version; new
 content means a new version.
 
 The publish step is idempotent: it skips any `name@version` already on the
 registry and retries `npm publish` up to three times, because the
-provenance step can fail transiently reading the OIDC token
+trusted publishing and provenance can fail transiently reading the OIDC token
 (`IDENTITY_TOKEN_READ_ERROR`; the 2026-10-27 `0.1.0-next.3` run stopped at
 `@texuli/slides` that way). After a partial failure, re-run the workflow:
 it publishes only what is missing.
