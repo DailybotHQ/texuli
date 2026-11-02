@@ -7,9 +7,10 @@ verified baseline before you change anything.
 
 1. [`AGENTS.md`](../AGENTS.md): rules, quick commands, authority.
 2. [`PRODUCT_SPEC.md`](PRODUCT_SPEC.md): what exists today versus what is
-   planned. Most packages exist in source with tests; the editor, the
-   native twin and the agent service are in development. Describe only what
-   the table says exists.
+   planned. Every package exists in source with tests; the packages listed
+   as in development in [`RELEASE.md`](RELEASE.md), the native twin and the
+   agent service are still in development. Describe only what the table
+   says exists.
 3. [`ARCHITECTURE.md`](ARCHITECTURE.md): the down-only layers L0 to L9.
 4. The README of the module you will touch (every package, `apps/website`,
    `apps/agent` and `native/` has one; [docs/README](README.md) lists them).
@@ -28,7 +29,7 @@ do not run it yourself in a shared checkout.
 ## 3. Run the baseline
 
 ```bash
-pnpm check   # lint, typecheck, unit and component tests, layer guard (minutes)
+pnpm check   # lint, typecheck, unit and component tests, layer guard, agent surfaces (minutes)
 pnpm build   # astro check + astro build of the website
 ```
 

@@ -2,7 +2,7 @@
 
 `pnpm verify:packages` (`scripts/packages.ts`) builds, packs and checks every library package the way npm would publish it, **without publishing anything**.
 
-The tarballs keep `private: true`: npm refuses to publish them until a release task deliberately changes that.
+At the time of this report (before the first publication), the tarballs kept `private: true`. Since the first publication, `scripts/packages.ts` drops `private` from the packed manifests and `publish.yml` publishes them.
 
 ```sh
 pnpm verify:packages                        # every package

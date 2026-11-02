@@ -1,6 +1,6 @@
 # CI — GitHub Actions and deployment
 
-The repository runs two GitHub Actions workflows. Checks run on every push
+The repository runs three GitHub Actions workflows: CI, npm publishing and the skill release. Checks run on every push
 to `main` and every pull request; publishing runs on demand or on a `v*`
 tag. The website deploys separately through Cloudflare Pages' own Git
 integration.
@@ -42,8 +42,8 @@ integration.
   `scripts/check-skill.ts --release-plan`, stamps it, pushes the release
   commit and the `skill-vX.Y.Z` tag atomically, builds the archive and its
   `SHA256SUMS`, and creates the GitHub Release; `smoke` installs the tag
-  with the skills CLI and checks the version and checksums. No skill release
-  has been cut yet. Details: [RELEASE](RELEASE.md#skill-release);
+  with the skills CLI and checks the version and checksums. The latest skill
+  release is the `skill-v0.3.12` tag. Details: [RELEASE](RELEASE.md#skill-release);
   tests: `scripts/tests/skill-release.test.ts`.
 - **`behavior`** — the primitives behavior suite on chromium and webkit
   (the phone-specific rows run in a Pixel 7 context inside the chromium
@@ -63,7 +63,7 @@ integration.
   to a shard. The a11y page sweep is three files (`a11y-site-1..3.spec.ts`)
   so it spreads over shards. `check:csp` and the twin parity check run on shard 1. Locally,
   `pnpm exec playwright test tests/e2e` runs every spec.
-- **Runners and browsers:** every job runs on `ubuntu-24.04` with a
+- **Runners and browsers:** every CI job except `setup-smoke-macos` (on `macos-latest`) runs on `ubuntu-24.04` with a
   `timeout-minutes` limit. `behavior`, `website` and `audits` run in
   Playwright's image (`mcr.microsoft.com/playwright:v1.64.1-noble`, the
   pinned `@playwright/test` version), which ships the browsers and their
@@ -153,7 +153,7 @@ provenance step can fail transiently reading the OIDC token
 `@texuli/slides` that way). After a partial failure, re-run the workflow:
 it publishes only what is missing.
 
-Both workflows use the Node 24 action majors (`actions/checkout@v7`,
+All three workflows use the Node 24 action majors (`actions/checkout@v7`,
 `actions/setup-node@v7`, `pnpm/action-setup@v6`,
 `actions/upload-artifact@v7`); the v4 majors ran on the deprecated Node 20
 runtime.
@@ -205,8 +205,8 @@ responses ([SECURITY](SECURITY.md#21-remote-mcp-endpoint)). Its bundle is
 budgeted in `pnpm size` as `functions/mcp`. After the first deploy,
 confirm by hand that `POST https://texuli.com/mcp` answers `initialize`
 and `tools/list` with the `edge` operations, that a `GET` gets `405`, and
-that the security headers are present; a post-deploy smoke job that
-compares `tools/list` with the registry is planned (ADR-018), not wired.
+that the security headers are present; the `mcp-remote-smoke` job (above)
+compares the live `tools/list` with the registry after each deploy from `main`.
 The optional Cloudflare rate-limiting rule for `/mcp` is an owner action
 in the dashboard, described in the same SECURITY section.
 

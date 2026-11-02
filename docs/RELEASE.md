@@ -19,9 +19,9 @@ The publish workflow publishes from `main` after the merge of
 `release/0.12.0`, from the verified tarballs with signed provenance, and
 moves both the `latest` and `next` dist-tags to `0.12.0`, so a bare
 `npm install texuli` or `pnpm add texuli` gets it. `@texuli/drag`,
-`@texuli/workflows`, `@texuli/deck`, `@texuli/editor`, `@texuli/document`,
-`@texuli/pages`, `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets` and
-`@texuli/mcp` are still **in development** (pre-1.0). Nothing is in
+`@texuli/workflows`, `@texuli/deck`, `@texuli/slides`, `@texuli/editor`,
+`@texuli/document`, `@texuli/pages`, `@texuli/forms`, `@texuli/canvas`,
+`@texuli/sheets` and `@texuli/mcp` are still **in development** (pre-1.0). Nothing is in
 development beyond `0.12.0`; installs use the 0.12 line (`^0.12.0`).
 
 `0.12.0` is a `0.x` minor because the core entries of `@texuli/pages`

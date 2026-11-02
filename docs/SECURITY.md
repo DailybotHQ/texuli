@@ -180,7 +180,7 @@ Related detail: [CSP and Trusted Types](quality/csp.md),
 | **Threat** | Install lifecycle scripts; banned runtime deps; non-allowlisted externals; license drift |
 | **Control** | `scripts/supply-chain.ts`: runtime external allowlist; banned packages; **no** install/uninstall lifecycle scripts on workspace manifests; SPDX allowlist; CycloneDX SBOM under `tmp/supply-chain/` (gitignored). `pnpm-workspace.yaml` `allowBuilds` only for known native tooling |
 | **Tests** | `scripts/tests/supply-chain.test.ts` |
-| **Residual** | Direct-deps SBOM only; no automated advisory audit yet (pre-publish gap). |
+| **Residual** | Direct-deps SBOM only; no automated advisory audit yet (an open gap; the packages are published). |
 
 ### 14. Embed blocks (`mountEmbed`)
 
