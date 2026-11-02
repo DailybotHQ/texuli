@@ -327,17 +327,20 @@ export const META_DESCRIPTION_MAX = 160;
  * at a word boundary with an ellipsis. The on-page copy is never shortened.
  */
 export function metaDescription(lead: string, context = ''): string {
-  const clean = (text: string): string => text.replace(/\s+/g, ' ').trim();
-  const sentences =
-    clean(`${clean(lead)} ${clean(context)}`).match(/[^.!?]+[.!?]+(?=\s|$)|[^.!?]+$/g) ?? [];
+  const text = `${lead} ${context}`.replace(/\s+/g, ' ').trim();
+  if (text === '') return '';
+  // A sentence ends at . ! or ? followed by a space and a capital, a digit or
+  // an opening mark, so versions, domains and "e.g." never split one. The
+  // split keeps every character: no text is ever dropped.
+  const sentences = text.split(/(?<=[.!?])\s+(?=[A-Z0-9"'(“‘`@])/);
   let out = '';
-  for (const sentence of sentences.map(clean)) {
+  for (const sentence of sentences) {
     const next = out ? `${out} ${sentence}` : sentence;
     if (next.length > META_DESCRIPTION_MAX) break;
     out = next;
   }
   if (out) return out;
-  const first = clean(sentences[0] ?? lead);
-  const cut = first.slice(0, META_DESCRIPTION_MAX - 1);
-  return `${cut.slice(0, cut.lastIndexOf(' ')).replace(/[,;:—–-]\s*$/, '')}…`;
+  const cut = (sentences[0] ?? text).slice(0, META_DESCRIPTION_MAX - 1);
+  const space = cut.lastIndexOf(' ');
+  return `${(space > 0 ? cut.slice(0, space) : cut).replace(/[,;:—–-]\s*$/, '')}…`;
 }

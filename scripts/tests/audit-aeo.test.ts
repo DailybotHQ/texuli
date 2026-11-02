@@ -150,6 +150,19 @@ describe('answer-ready twin leads (PLAN_014)', () => {
     ).toBe(false);
   });
 
+  it('joins a hard-wrapped paragraph, counts bold-led prose, and reads a twin with no header', () => {
+    const wrapped =
+      'Texuli guides walk a Svelte 5 team\nthrough install, theming and accessibility,\none task per page.';
+    expect(twinHasLead(`# Guides\n\n---\n\n${wrapped}\n\n## One`)).toBe(true);
+    expect(twinHasLead(`# Guides\n\n---\n\n**Status:** ${lead}\n\n## One`)).toBe(true);
+    expect(twinHasLead(`${lead}\n\n## One\n\n## Two`)).toBe(true);
+    expect(
+      twinHasLead(
+        '# Guides\n\n---\n\n[Open](a) [Copy](b)\n\n- a list item that is long enough to count as many words here\n\n## One\n\n## Two'
+      )
+    ).toBe(false);
+  });
+
   it('warns on a top route whose twin has no lead, and reads only twins that exist', () => {
     const surface = greenSurface();
     surface.readBytes = (relative: string) =>

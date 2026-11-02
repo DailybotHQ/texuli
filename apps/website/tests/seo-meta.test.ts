@@ -31,6 +31,15 @@ describe('metaDescription', () => {
     expect(out).not.toMatch(/\s…$/);
   });
 
+  it('never drops text at a dot inside a word (versions, domains, e.g.)', () => {
+    expect(metaDescription('Texuli 0.12.0 ships today. More here.')).toBe(
+      'Texuli 0.12.0 ships today. More here.'
+    );
+    expect(metaDescription('Use e.g. buttons and links.')).toBe('Use e.g. buttons and links.');
+    expect(metaDescription('Visit texuli.com for docs.')).toBe('Visit texuli.com for docs.');
+    expect(metaDescription('', '')).toBe('');
+  });
+
   it('collapses whitespace and never returns an empty string for real copy', () => {
     expect(metaDescription('  Two\n  lines.  ', '')).toBe('Two lines.');
   });

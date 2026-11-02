@@ -162,7 +162,7 @@ export function auditPage(page, config) {
     0,
     html.search(/<\/head>/i) === -1 ? html.length : html.search(/<\/head>/i)
   );
-  const title = decodeEntities(/<title>([\s\S]*?)<\/title>/i.exec(head)?.[1]?.trim() ?? '');
+  const title = decodeEntities(/<title\b[^>]*>([\s\S]*?)<\/title>/i.exec(head)?.[1]?.trim() ?? '');
   const description = metaContent(head, 'description') ?? '';
   if (title === '') add('critical', 'Meta', 'missing <title>');
   else if (title.length < config.title.min || title.length > config.title.max)
@@ -278,7 +278,7 @@ export function auditPage(page, config) {
     add('critical', 'JSON-LD', 'a docs-family page lacks BreadcrumbList (T-19 scope)');
 
   // Outline and images (PLAN_014): one h1, no skipped heading level, alt on
-  // every image. Script, style and template bodies are not page content, and
+  // every image (an <img> inside <noscript> counts too: it is still served). Script, style and template bodies are not page content, and
   // the slide titles of an embedded deck (`tx-deck-layout__…`) are the deck's
   // own outline, not the page's.
   const body = html
@@ -334,7 +334,7 @@ export function auditSite({ pages, sitemap, robots, readAsset }, config = AUDIT_
       if (!descriptions.has(description)) descriptions.set(description, []);
       descriptions.get(description).push(page.path);
     }
-    const title = decodeEntities(/<title>([\s\S]*?)<\/title>/i.exec(page.html)?.[1]?.trim() ?? '');
+    const title = decodeEntities(/<title\b[^>]*>([\s\S]*?)<\/title>/i.exec(page.html)?.[1]?.trim() ?? '');
     if (title !== '') {
       if (!titles.has(title)) titles.set(title, []);
       titles.get(title).push(page.path);

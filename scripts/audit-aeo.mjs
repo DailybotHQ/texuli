@@ -195,16 +195,30 @@ export const LEAD_MIN_WORDS = 15;
  * not prose; the header block above the first `---` is skipped.
  */
 export function twinHasLead(markdown) {
-  const cut = markdown.indexOf('\n---\n');
-  const body = cut === -1 ? markdown : markdown.slice(cut + 5);
+  // The header block ends at the first `---` rule near the top (Language,
+  // Canonical, access lines); a twin without one starts at line 1.
+  const lines = markdown.split('\n');
+  const rule = lines.findIndex((line, index) => index < 20 && line.trim() === '---');
   let sections = 0;
-  for (const raw of body.split('\n')) {
+  let paragraph = [];
+  const words = () => (paragraph.join(' ').match(/[\p{L}\p{N}]+/gu) ?? []).length;
+  for (const raw of lines.slice(rule + 1)) {
     const line = raw.trim();
+    // Prose only: headings, images, tables, list items, code, quotes, markup
+    // and lines made only of links (buttons) end the paragraph.
+    const prose =
+      line !== '' &&
+      !/^(#|!\[|\||[-*+] |\d+\. |```|>|<)/.test(line) &&
+      !/^(\[[^\]]*\]\([^)]*\)\s*)+$/.test(line);
+    if (prose) {
+      paragraph.push(line);
+      continue;
+    }
+    if (words() >= LEAD_MIN_WORDS) return true;
+    paragraph = [];
     if (line.startsWith('## ') && ++sections >= 2) return false;
-    if (line === '' || /^[#![|*`>-]|^</.test(line)) continue;
-    if ((line.match(/[\p{L}\p{N}]+/gu) ?? []).length >= LEAD_MIN_WORDS) return true;
   }
-  return false;
+  return words() >= LEAD_MIN_WORDS;
 }
 
 /** The whole audit. Pure: the collected surface in, findings out. */

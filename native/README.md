@@ -212,7 +212,7 @@ and `data-dashboard.layout` is a sourceable prop for the source checks
 above. The composition rules `@texuli/catalog` adds (`dashboard-child`,
 `dashboard-parent`, `dashboard-widgets`, `dashboard-widget-id`) run in the
 catalog's draft validation only; a native check is planned. The Compose
-renderer paints both ids read-only with the web's dashboard layout math
+renderer paints both ids with the web's dashboard layout math
 (`DataBoards.kt`), and a malformed layout still refuses to the visible
 placeholder.
 

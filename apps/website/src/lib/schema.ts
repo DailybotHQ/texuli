@@ -14,6 +14,10 @@ import { SITE_NAME, SITE_URL } from './constances';
 
 const require = createRequire(import.meta.url);
 
+/** The shared node ids every page's graph (siteJsonLd) defines once. */
+const ORGANIZATION_ID = 'https://dailybot.com/#organization';
+const WEBSITE_ID = `${SITE_URL}/#website`;
+
 /**
  * The published version of the `texuli` package, resolved through the
  * installed entry point — never hand-copied into the site. The exports map
@@ -92,13 +96,10 @@ export function techArticleJsonLd(headline: string, description: string, path: s
         description,
         url: `${SITE_URL}${path}`,
         inLanguage: 'en',
-        isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: `${SITE_URL}/` },
-        author: { '@type': 'Organization', name: 'Dailybot, Inc.', url: 'https://dailybot.com/' },
-        publisher: {
-          '@type': 'Organization',
-          name: 'Dailybot, Inc.',
-          url: 'https://dailybot.com/',
-        },
+        isPartOf: { '@id': WEBSITE_ID },
+        mainEntityOfPage: { '@id': `${SITE_URL}${path}#webpage` },
+        author: { '@id': ORGANIZATION_ID },
+        publisher: { '@id': ORGANIZATION_ID },
         license: 'https://opensource.org/licenses/MIT',
         about: [
           'Svelte 5 web components',
@@ -129,8 +130,9 @@ export function webApiJsonLd(description: string) {
         license: 'https://opensource.org/licenses/MIT',
         isAccessibleForFree: true,
         inLanguage: 'en',
-        provider: { '@type': 'Organization', name: 'Dailybot, Inc.', url: 'https://dailybot.com/' },
-        isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: `${SITE_URL}/` },
+        provider: { '@id': ORGANIZATION_ID },
+        isPartOf: { '@id': WEBSITE_ID },
+        mainEntityOfPage: { '@id': `${SITE_URL}/developers/#webpage` },
         potentialAction: {
           '@type': 'ConsumeAction',
           target: [
@@ -144,9 +146,6 @@ export function webApiJsonLd(description: string) {
 }
 
 type JsonLdNode = Record<string, unknown>;
-
-const ORGANIZATION_ID = 'https://dailybot.com/#organization';
-const WEBSITE_ID = `${SITE_URL}/#website`;
 
 /**
  * The site graph every page carries (PLAN_014 T-seo): the owner

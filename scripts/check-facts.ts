@@ -21,7 +21,7 @@
 import { execFileSync } from 'node:child_process';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = join(import.meta.dirname, '..');
 
@@ -85,10 +85,9 @@ export async function deriveFacts(root = ROOT): Promise<Facts> {
   const primitives = Object.keys(byName.get('@texuli/primitives')?.exports ?? {}).filter(
     (key) => key !== '.' && !key.endsWith('package.json')
   ).length;
-  const ids = (await import(join(root, 'packages/tokens/src/library-ids/ids.ts'))) as Record<
-    'BUILTIN_THEME_IDS' | 'PORT_THEME_IDS' | 'EXPAND_THEME_IDS',
-    readonly string[]
-  >;
+  const ids = (await import(
+    pathToFileURL(join(root, 'packages/tokens/src/library-ids/ids.ts')).href
+  )) as Record<'BUILTIN_THEME_IDS' | 'PORT_THEME_IDS' | 'EXPAND_THEME_IDS', readonly string[]>;
   return {
     primitives,
     themesFull:
