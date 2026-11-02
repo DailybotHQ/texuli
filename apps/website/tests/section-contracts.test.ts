@@ -203,7 +203,12 @@ describe('the layer data is the documented and enforced graph', () => {
 /** Files the build generates from typed sources (agent-discovery.ts), not committed. */
 const GENERATED_FILES = new Set(DISCOVERY_FILE_TYPES.map((file) => file.path));
 
-function routeExists(href: string): boolean {
+function routeExists(link: string): boolean {
+  const [href = '', fragment] = link.split('#');
+  if (fragment) {
+    const page = join(PAGES_DIR, href, 'index.astro');
+    return existsSync(page) && readFileSync(page, 'utf8').includes(`id="${fragment}"`);
+  }
   if (GENERATED_FILES.has(href)) return true;
   if (!href.endsWith('/')) return existsSync(join(REPO_ROOT, 'apps/website/public', href));
   const page = join(PAGES_DIR, href);

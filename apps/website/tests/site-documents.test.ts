@@ -78,9 +78,10 @@ describe('documents page: copy and safety', () => {
     const copy = PAGE.replace(/\s+/g, ' ');
     expect(copy).toContain('in development · on npm from {DOCUMENTS_RELEASE}');
     expect(copy).toContain(
-      'Both packages are in development and on npm from <code>{DOCUMENTS_RELEASE}</code>, a pre-1.0 release; the previous release, <code>0.6.0</code>, is without them.'
+      'Both packages are in development and on npm from <code>{DOCUMENTS_RELEASE}</code>, a pre-1.0 release; <code>0.6.0</code> and earlier are without them.'
     );
-    expect(copy).toContain('description="Texuli documents (in development, on npm from 0.7.0)');
+    expect(copy).toContain('description="Texuli documents (in development)');
+    expect(copy).toContain('in development · on npm from {DOCUMENTS_RELEASE}');
     expect(copy).not.toMatch(/repository only|planned (?:for|with) (?:the )?.?0\.7\.0/i);
     for (const [path, source] of SOURCES) {
       expect(source, path).not.toMatch(

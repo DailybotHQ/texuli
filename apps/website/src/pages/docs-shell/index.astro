@@ -16,13 +16,13 @@ const toc = [
   <h2 id="what-you-get">What you get</h2>
   <p>
     The docs shell is the layout every documentation page shares: a section sidebar, an on-page
-    table of contents, and previous/next links in reading order. There is no “edit on GitHub”
-    control — this site is built and reviewed locally.
+    table of contents, and previous/next links in reading order. Each page also offers “Copy
+    page” as Markdown and links its Markdown twin.
   </p>
   <h2 id="static-and-local">Static and local</h2>
   <p>
     Pages are plain HTML and CSS after <code>pnpm build</code>. Navigation stays on the same origin.
-    The only client script on the site is the shared appearance switch in the header.
+    The shell itself ships no island: interactive demos on other pages load their own islands.
   </p>
   <h2 id="reading-order">Reading order</h2>
   <p>

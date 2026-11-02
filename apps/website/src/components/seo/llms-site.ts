@@ -73,6 +73,11 @@ export function siteLlmsSections(siteUrl: string): SiteLlmsSection[] {
           href: abs('/skill/'),
           description: 'The distributable agent skill for building with Texuli.',
         },
+        {
+          title: 'Search',
+          href: abs('/search/'),
+          description: 'Search every page, component, guide and example (?q= in the URL).',
+        },
       ],
     },
     {
@@ -113,8 +118,16 @@ export function siteLlmsSections(siteUrl: string): SiteLlmsSection[] {
     },
     {
       name: 'Project',
-      description: 'Brand, foundation, evidence, performance and the changelog.',
-      links: nav('project'),
+      description:
+        'Brand, foundation, evidence, performance, the changelog and the docs shell sample.',
+      links: [
+        ...nav('project'),
+        {
+          title: 'Docs shell',
+          href: abs('/docs-shell/'),
+          description: 'The documentation layout every docs page shares, with sample pages.',
+        },
+      ],
     },
     {
       name: 'For agents',

@@ -51,13 +51,9 @@ export const AUDIT_CONFIG = {
         'twitter:site (+creator) awaits the developer handle — onsite.md §1; the open owner question is recorded in T-21',
     },
     {
-      category: 'Open Graph',
-      detail: 'og:image:secure_url per the reference most-complete set — onsite.md §1',
-    },
-    {
       category: 'JSON-LD',
       detail:
-        'graph targets beyond the shipped scope (Organization on every page, FAQPage, …) grow with their implementing tasks — structured.md rows',
+        'FAQPage only where a page shows real questions and answers; none does today — structured.md rows',
     },
     {
       category: 'OG art',
@@ -166,7 +162,7 @@ export function auditPage(page, config) {
     0,
     html.search(/<\/head>/i) === -1 ? html.length : html.search(/<\/head>/i)
   );
-  const title = decodeEntities(/<title>([\s\S]*?)<\/title>/i.exec(head)?.[1]?.trim() ?? '');
+  const title = decodeEntities(/<title\b[^>]*>([\s\S]*?)<\/title>/i.exec(head)?.[1]?.trim() ?? '');
   const description = metaContent(head, 'description') ?? '';
   if (title === '') add('critical', 'Meta', 'missing <title>');
   else if (title.length < config.title.min || title.length > config.title.max)
@@ -200,6 +196,7 @@ export function auditPage(page, config) {
     'og:description',
     'og:url',
     'og:image',
+    'og:image:secure_url',
     'og:type',
     'og:site_name',
     'og:image:alt',
@@ -220,6 +217,8 @@ export function auditPage(page, config) {
     add('critical', 'Open Graph', `og:url "${og['og:url']}" differs from the canonical`);
   if (og['og:image'] !== null && og['og:image'] !== expectedImage)
     add('critical', 'Open Graph', `og:image "${og['og:image']}" is not the built ${expectedImage}`);
+  if (og['og:image:secure_url'] !== null && og['og:image:secure_url'] !== og['og:image'])
+    add('critical', 'Open Graph', 'og:image:secure_url differs from og:image');
   if (og['og:image:width'] !== null && og['og:image:width'] !== String(config.og.width))
     add(
       'critical',
@@ -265,13 +264,39 @@ export function auditPage(page, config) {
       return [];
     }
   });
-  if (path === '/' && !types.includes('WebSite'))
-    add('critical', 'JSON-LD', 'the landing page lacks the WebSite graph (T-18 scope)');
+  // PLAN_014: every indexable page carries the site graph (owner, website, page).
+  for (const type of ['Organization', 'WebSite', 'WebPage'])
+    if (!types.includes(type))
+      add('critical', 'JSON-LD', `the page lacks the site graph's ${type}`);
+  for (const type of ['Organization', 'WebSite'])
+    if (types.filter((entry) => entry === type).length > 1)
+      add('warning', 'JSON-LD', `more than one ${type} node`);
   if (
     config.docsFamilies.some((family) => path.startsWith(`/${family}`)) &&
     !types.includes('BreadcrumbList')
   )
     add('critical', 'JSON-LD', 'a docs-family page lacks BreadcrumbList (T-19 scope)');
+
+  // Outline and images (PLAN_014): one h1, no skipped heading level, alt on
+  // every image (an <img> inside <noscript> counts too: it is still served). Script, style and template bodies are not page content, and
+  // the slide titles of an embedded deck (`tx-deck-layout__…`) are the deck's
+  // own outline, not the page's.
+  const body = html
+    .slice(html.search(/<body[\s>]/i) === -1 ? 0 : html.search(/<body[\s>]/i))
+    .replace(/<(script|style|template)\b[\s\S]*?<\/\1>/gi, '');
+  const headings = [...body.matchAll(/<h([1-6])\b([^>]*)>/gi)]
+    .filter((match) => !/class="[^"]*tx-deck-layout__/.test(match[2]))
+    .map((match) => Number(match[1]));
+  const h1 = headings.filter((level) => level === 1).length;
+  if (h1 !== 1)
+    add(h1 === 0 ? 'critical' : 'warning', 'Outline', `${h1} h1 elements (want exactly 1)`);
+  for (let i = 1; i < headings.length; i++)
+    if (headings[i] > headings[i - 1] + 1) {
+      add('warning', 'Outline', `heading level skips from h${headings[i - 1]} to h${headings[i]}`);
+      break;
+    }
+  const bare = [...body.matchAll(/<img\b[^>]*>/gi)].filter((match) => !/\salt=/i.test(match[0]));
+  if (bare.length > 0) add('critical', 'Images', `${bare.length} <img> without an alt attribute`);
 
   return findings;
 }
@@ -286,6 +311,7 @@ export function auditSite({ pages, sitemap, robots, readAsset }, config = AUDIT_
   const noindexed = pages.filter((page) => page.noindex);
 
   const descriptions = new Map();
+  const titles = new Map();
   for (const page of indexed) {
     findings.push(...auditPage(page, config));
     if (readAsset !== undefined) {
@@ -308,7 +334,24 @@ export function auditSite({ pages, sitemap, robots, readAsset }, config = AUDIT_
       if (!descriptions.has(description)) descriptions.set(description, []);
       descriptions.get(description).push(page.path);
     }
+    const title = decodeEntities(
+      /<title\b[^>]*>([\s\S]*?)<\/title>/i.exec(page.html)?.[1]?.trim() ?? ''
+    );
+    if (title !== '') {
+      if (!titles.has(title)) titles.set(title, []);
+      titles.get(title).push(page.path);
+    }
   }
+  for (const [title, paths] of titles)
+    if (paths.length > 1)
+      findings.push(
+        finding(
+          'warning',
+          'Meta',
+          paths.join(', '),
+          `duplicate title across ${paths.length} pages: "${title}"`
+        )
+      );
   for (const [description, paths] of descriptions)
     if (paths.length > 1)
       findings.push(

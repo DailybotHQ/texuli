@@ -34,7 +34,8 @@ export const selectExamples = [
   defineExample({
     id: 'ui-select-rtl',
     title: 'Select, right to left',
-    description: 'Arabic labels in a right-to-left layout with logical padding.',
+    description:
+      'A language select with Arabic labels in a right-to-left layout, shown open with its list of three languages and logical padding.',
     tags: ['ui', 'select', 'rtl', 'i18n'],
     component,
     load: () => import('./SelectRtlDemo.svelte'),

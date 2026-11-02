@@ -131,7 +131,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       },
       {
         name: '@texuli/editor',
-        role: 'Rich text editor surface, toolbar, link dialog, headless controller, clipboard import',
+        role: 'In development (on npm from 0.5.0): rich text editor surface, toolbar, link dialog, headless controller, clipboard import',
         dependsOn: ['core', 'primitives', 'tokens', 'texuli'],
       },
       {

@@ -99,8 +99,9 @@ function onExport(file: { format: string; filename: string }) {
     <h1 id="media-lab-title">Media lab</h1>
     <p class="lead">
       Image, video, audio and layered compositions — including browser export to PNG and WebM.
-      Assets are same-origin or synthetic; nothing is fetched from another origin. Fictional Harbor
-      Notes copy only.
+      For Svelte 5 apps that show or edit media: install <code>@texuli/media</code> and import one
+      subpath per piece (for example <code>@texuli/media/audio</code>). Assets are same-origin or
+      synthetic; nothing is fetched from another origin. Fictional Harbor Notes copy only.
     </p>
   </header>
 

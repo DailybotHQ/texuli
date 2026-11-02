@@ -20,24 +20,12 @@ import NativeEvidenceRoadmap from '../../components/sections/native/NativeEviden
 import NativeHeroStatus from '../../components/sections/native/NativeHeroStatus.astro';
 import WhyKmp from '../../components/sections/native/WhyKmp.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-
-const organizationJsonLd = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'Organization',
-      name: 'Dailybot, Inc.',
-      url: 'https://dailybot.com/',
-    },
-  ],
-};
 ---
 
 <BaseLayout
   title="Texuli native — the same catalog, rendered by Compose"
   description="The Texuli contract renders native surfaces with Compose through Kotlin Multiplatform. In development, conformance-tested, and open about its status."
   landing
-  jsonLd={organizationJsonLd}
 >
   <div class="landing" data-tx-landing="">
     <div class="native-banner">

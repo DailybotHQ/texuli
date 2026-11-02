@@ -193,7 +193,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     id: 'page-dashboards',
     title: 'Dashboards',
     description:
-      'Dashboards: widgets moved and resized by pointer or keyboard with announcements, breakpoints, persisted layouts, host data sources and agent dashboards (new in 0.8.0).',
+      'Dashboards: widgets moved and resized by pointer or keyboard with announcements, breakpoints, persisted layouts, host data sources and agent dashboards (since 0.8.0).',
     href: '/dashboards-page/',
     kind: 'page',
     keywords: ['dashboard', 'widgets', 'grid', 'layout', 'drag', 'resize', 'persistence'],
@@ -202,7 +202,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     id: 'page-output',
     title: 'Email, PDF and i18n',
     description:
-      'Multi-target output: email-safe HTML from a blueprint, print mode and PDF, and every component label from one message catalog with lazy locales (new in 0.8.0).',
+      'Multi-target output: email-safe HTML from a blueprint, print mode and PDF, and every component label from one message catalog with lazy locales (since 0.8.0).',
     href: '/output-page/',
     kind: 'page',
     keywords: ['email', 'pdf', 'print', 'i18n', 'translation', 'locale', 'message catalog'],
@@ -267,7 +267,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     id: 'page-slides',
     title: 'Slides',
     description:
-      'Generate decks from JSON or Markdown: 20 layouts, contrast-safe backgrounds, any component on a slide, presenter, print and PPTX.',
+      'Generate decks from JSON or Markdown: 21 layouts, contrast-safe backgrounds, any component on a slide, presenter, print and PPTX.',
     href: '/slides-page/',
     kind: 'page',
     keywords: ['slides', 'deck', 'presentation', 'markdown', 'json', 'presenter', 'pptx'],

@@ -48,7 +48,8 @@ validated theme values), never from page data.
   `withBase(base, path)`.
 - `SiteHeader.astro`: brand, the primary navigation and the appearance switch.
 - `ThemeSwitch.svelte`: Light, Dark and System, built from Texuli's
-  `ToggleGroup`. It is the only client island (`client:load`).
+  `ToggleGroup`, the shell's one client island (`client:load`); feature
+  pages add their own demo islands.
   - Light or Dark is cached with `cacheAppearance`, so the no-flash script
     replays it on the next load.
   - System clears the cache and follows the operating system live.
@@ -86,6 +87,5 @@ axe on every page group in light and dark is the page sweep
   asks for more contrast, the no-flash script resolves
   `data-tx-mode="high-contrast"`, which has no theme rules yet, so the page
   falls back to `base.css` defaults.
-- **No 404 page** of the site's own; static hosts show theirs.
-- **The site theme is fixed** (enterprise-neutral). The theme gallery is a
-  later task.
+- **The site theme is fixed** (enterprise-neutral); visitors browse every
+  library theme on `/gallery-themes/` and preview one with the theme switcher.

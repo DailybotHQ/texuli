@@ -34,9 +34,9 @@ heading anchors, `@texuli/document/schema-core`, telephone inputs, live
 compiles, and `@texuli/document/ops-core`); `0.12.0` moves the
 `@texuli/pages` core entries off the deck model (G136; breaking for those
 core entries only).
-`@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/editor`,
-`@texuli/document`, `@texuli/pages`, `@texuli/forms`, `@texuli/canvas`,
-`@texuli/sheets` and `@texuli/mcp` are still in development
+`@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/slides`,
+`@texuli/editor`, `@texuli/document`, `@texuli/pages`, `@texuli/forms`,
+`@texuli/canvas`, `@texuli/sheets` and `@texuli/mcp` are still in development
 ([RELEASE](docs/RELEASE.md)). Workspace packages stay
 `private: true`, and no stable release is out (1.0.0 will be the first; under
 0.x a new minor may break; see [RELEASE](docs/RELEASE.md)),
@@ -70,7 +70,7 @@ Functions in `functions/`. See
 | Website | [apps/website](apps/website/README.md) | texuli.com (Astro 7 + Svelte islands); area designs in `apps/website/docs/` |
 | Agent service | [apps/agent](apps/agent/README.md) | The texuli.com agent service: prompt → validated blueprint draft, fake replay provider only, not deployed |
 | Native | [native](native/README.md) | The Gradle Kotlin Multiplatform twin (`texuli-spec`, `texuli-compose`, `conformance`); not a pnpm package |
-| Agent skill | [skills/texuli](skills/texuli/SKILL.md) | The distributable skill for building with Texuli (`pnpm check:skill`) |
+| Agent skill | [skills/texuli](skills/texuli/SKILL.md) · [SKILL_INSTALLATION](docs/SKILL_INSTALLATION.md) · [SKILL_COMPATIBILITY](docs/SKILL_COMPATIBILITY.md) | The distributable skill for building with Texuli (`pnpm check:skill`), how to install it, and which hosts it supports |
 | Test suites | [behavior](tests/behavior/README.md) · [visual](tests/visual/README.md) | The primitives behavior suite; visual baselines |
 | Kit | [.agents catalog](.agents/docs/skills_agents_catalog.md), [commands](.agents/docs/COMMANDS_REFERENCE.md) | Skills, agents, slash commands |
 | Review rules | [.review/extension.md](.review/extension.md) | Texuli overrides for the AI Diff Reviewer local review |
@@ -93,7 +93,7 @@ texuli/
 │   ├── media/           L4 @texuli/media: image, gallery, video, audio, editor, compositions   (README, docs/)
 │   ├── chat/            L4 @texuli/chat: thread, messages, composer                            (README, docs/)
 │   ├── blocks/          L5 @texuli/blocks: content blocks for pages, documents and slides      (README, docs/)
-│   ├── spec/            L0 @texuli/spec: the blueprint contract, schemas, TS + Kotlin codegen   (README)
+│   ├── spec/            L0 @texuli/spec: the blueprint contract, schemas, TS + Kotlin codegen   (README, docs/)
 │   ├── editor/          L4 @texuli/editor: rich text editor, Markdown in/out (in development, on npm since 0.5.0) (README, docs/)
 │   ├── workflows/       L4 @texuli/workflows: workflow editor, viewer, model, layout (in development) (README)
 │   ├── forms/           L4 @texuli/forms: schema-driven forms, conditions, steps, drafts (in development, first on npm as 0.8.0) (README, docs/)
@@ -101,7 +101,7 @@ texuli/
 │   ├── sheets/          L5 @texuli/sheets: spreadsheets, owned formula engine, CSV, sheet view (in development, first on npm as 0.8.0) (README, docs/)
 │   ├── catalog/         L6 @texuli/catalog: agent catalog + sink-free renderer                 (README, docs/)
 │   ├── player/          L7 @texuli/player: paint runtime for validated blueprints              (README, docs/)
-│   ├── slides/          L8 @texuli/slides: presentation stage on @texuli/deck, print, PPTX (README, docs/)
+│   ├── slides/          L8 @texuli/slides: presentation stage on @texuli/deck, print, PPTX (in development, on npm as 0.12.0) (README, docs/)
 │   ├── tools/           L8 @texuli/tools: CLI, llms, A2UI, custom elements, golden set, MCP     (README, docs/)
 │   ├── astro/           L8 @texuli/astro: Astro integration, content layouts, sections          (README, docs/)
 │   ├── pages/           L8 @texuli/pages: block document editor and reader (in development, on npm since 0.7.0) (README, docs/)
@@ -114,9 +114,10 @@ texuli/
 │                        problem+json 404s, bot events), api/umami (same-origin analytics proxy)
 │                        and mcp.ts (the remote MCP at /mcp, stateless, edge and site operations)
 ├── native/              Gradle Kotlin Multiplatform twin: texuli-spec, texuli-compose, conformance (README, docs/)
-├── .github/workflows/   CI (checks, behavior, website, budget audits) and the npm publish workflow
+├── .github/workflows/   CI (checks, behavior, website, budget audits), the npm publish workflow and the skill release
 ├── skills/texuli/       the distributable agent skill (setup.sh, SHA256SUMS)
 ├── tests/
+│   ├── agent-evals/     scripted MCP sessions over the tool descriptions (part of pnpm test)
 │   ├── behavior/        primitives behavior suite (scenarios + rows, chromium and webkit)
 │   ├── e2e/             Playwright specs: a11y sweeps, CSP, SSR, site-*.spec.ts, components
 │   ├── visual/          visual baselines (light/dark, desktop/Pixel 7)
@@ -219,7 +220,7 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     (first published in `0.9.0`), are released on npm in the 0.12 line
     (see docs/RELEASE.md; dist-tags `latest` and `next`, published by CI
     with provenance); `@texuli/drag`, `@texuli/workflows`,
-    `@texuli/deck`, `@texuli/editor`, `@texuli/document`, `@texuli/pages`,
+    `@texuli/deck`, `@texuli/slides`, `@texuli/editor`, `@texuli/document`, `@texuli/pages`,
     `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets` and `@texuli/mcp`
     are still in development, and the blueprint spec in
     `@texuli/spec@0.12.0` is `0.10.0`. `@texuli/examples`, the apps and

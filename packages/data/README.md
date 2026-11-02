@@ -180,7 +180,7 @@ Not in the `0.3.0` release:
 - **One drag engine.** The board, tree view, calendar, timeline and grid
   column moves run on
   [`@texuli/drag`](https://github.com/DailybotHQ/texuli/blob/main/packages/drag/README.md)
-  (in development, on npm as `0.5.0`; `@texuli/data` `0.3.0` predates this
+  (in development, on npm in the 0.12 line; `@texuli/data` `0.3.0` predates this
   migration):
   one pointer gesture tracker (capture, threshold, `pointercancel` as
   cancel). The board and tree view also announce moves from localized

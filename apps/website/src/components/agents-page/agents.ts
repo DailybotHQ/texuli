@@ -63,10 +63,10 @@ export const AGENT_TOPICS: readonly AgentTopic[] = [
     title: 'MCP server',
     badge: 'Tools',
     summary:
-      'A local stdio MCP server exposes catalog lookup so coding agents can search components without inventing props.',
+      'The Texuli MCP server lets coding agents search components, themes and examples without inventing props: remote at texuli.com/mcp, or local with npx -y @texuli/mcp.',
     points: [
       'Read-only tools over the closed catalog',
-      'Runs in-process with the monorepo — no remote catalog fetch',
+      'Remote (stateless, at the edge) or local over stdio from npm',
       'Pair with llms.txt for prose context and MCP for structured props',
     ],
   },
@@ -129,20 +129,20 @@ export const AGENT_RESOURCES: readonly AgentResource[] = [
 
 export const AGENT_SETUP_STEPS: readonly { title: string; body: string }[] = [
   {
-    title: 'Install the monorepo skill',
-    body: 'Point your coding agent at the Texuli skill pack so it follows AGENTS.md, layers and gates.',
+    title: 'Install the Texuli skill',
+    body: 'Give your coding agent the Texuli skill pack (see /skill/) so it builds with the real components, themes and install steps.',
   },
   {
     title: 'Load llms.txt',
-    body: 'Fetch /llms/llms.txt from this site build (or regenerate with @texuli/tools/llms) for component orientation.',
+    body: 'Fetch /llms.txt (the site index) and /llms/llms.txt (the component docs), or regenerate them with @texuli/tools/llms.',
   },
   {
     title: 'Attach the catalog',
     body: 'Use catalog-<hash>.json or /catalog/catalog.json so the agent only emits known ids and props.',
   },
   {
-    title: 'Run MCP locally',
-    body: 'Start the Texuli MCP server from the repo for structured catalog lookup during implementation.',
+    title: 'Connect the MCP server',
+    body: 'Add the remote server at https://texuli.com/mcp, or run npx -y @texuli/mcp locally, for structured catalog lookup (setup for every host on /mcp-server/).',
   },
   {
     title: 'Render untrusted trees safely',

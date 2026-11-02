@@ -209,9 +209,7 @@ canonical Markdown. The dialect is documented with `@texuli/deck`.
   ([export.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/export.md)).
 
 Not built: a presenter screen on another device, a server-side PDF or image
-renderer, deck video export, inline `$…$` math inside text blocks, and a
-public subpath for configuring the default component registry (see
-[components.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/components.md)).
+renderer, deck video export, and inline `$…$` math inside text blocks.
 
 ## What's inside
 
@@ -221,6 +219,8 @@ public subpath for configuring the default component registry (see
 | `@texuli/slides/stage-core` | `DeckStageCore`: the same stage with no reference to the default renderer tables, for hosts that bring every renderer (their build emits none of the defaults' chunks or CSS), and the rest of `./stage` except `DeckStage`, `DeckPrint` and the default-table loaders ([stage.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/stage.md)) |
 | `@texuli/slides/export` | Print plans and flags, `DeckPrintView` for v2 decks, the PDF seam, PPTX for v1 and v2 decks, and the owned XML and ZIP writers |
 | `@texuli/slides/export-core` | The same without the default renderer tables: `DeckPrintViewCore` and `preloadDeckPrintViewCore` take a `defaults` source from the host, so a `DeckStageCore` host that prints emits none of the defaults' chunks or CSS (G105; new in `0.10.0`) ([export.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/export.md)) |
+| `@texuli/slides/components` | The default component registry for slides and its overrides (`createComponentRenderers`) ([components.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/components.md)) |
+| `@texuli/slides/layouts` | The layout renderer table (`layoutRenderers`) and the helpers the renderers are built from ([layouts.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/layouts.md)) |
 | `@texuli/slides/styles.css` | Stage and print styles, named print pages and reduced-motion rules |
 | `@texuli/slides/model` | The model v1 (`0.3.0`) deck: `parseDeck`, masters, slots and reveal steps, kept for existing decks |
 | `@texuli/slides/grammar` | Catalog encodings of model v1 decks and their `validateDeckDraft` |

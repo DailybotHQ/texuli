@@ -29,7 +29,9 @@ test('current page, pager, contents and the phone menu', async ({ page }) => {
   const pager = page.getByRole('navigation', { name: 'Page' });
   await pager.getByRole('link', { name: /Getting started/i }).click();
   await expect(page).toHaveURL(`${origin()}/docs-shell/getting-started/`);
-  await expect(page.getByRole('heading', { level: 1, name: 'Getting started' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Getting started with the docs shell' })
+  ).toBeVisible();
   await pager.getByRole('link', { name: /Navigation/i }).click();
   await expect(page).toHaveURL(`${origin()}/docs-shell/navigation/`);
 

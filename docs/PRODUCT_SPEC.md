@@ -2,7 +2,7 @@
 
 > **Small pieces. Infinite possibilities.**
 >
-> Status on 2026-10-31: **pre-1.0.** All 26 published packages are
+> Status on 2026-11-01: **pre-1.0.** All 26 published packages are
 > released on npm in the 0.12 line, every one at `0.12.0` (dist-tags
 > `latest` and `next`; published by CI from verified tarballs, with signed
 > provenance); `0.10.0` added design systems ([DESIGN_SYSTEMS](DESIGN_SYSTEMS.md))
@@ -74,10 +74,10 @@ closed, documented catalog that can be validated before anything renders.
    operations registry served as read-only MCP tools (local and remote) and
    as `texuli <group> <verb>` commands, with the server card, the llms Tools
    section and the operation docs generated from it.
-6. **Whole interfaces as JSON.** A blueprint (spec 0.3.0) declares local
+6. **Whole interfaces as JSON.** A blueprint (spec 0.10.0; interaction since 0.3.0) declares local
    state, flows, two-way bindings and a closed action set, so an agent can
    send a working dashboard, form flow, sortable board or workflow builder
-   as data. All 66 agent-emittable ids of the 158-id catalog paint in the
+   as data. All 75 agent-emittable ids of the 168-id catalog paint in the
    player, and a blueprint that validates always paints (the spec, catalog,
    player and Kotlin validators share the state surface rules).
 7. **One drag engine.** `@texuli/drag` plans every drag as data (sortable
@@ -158,7 +158,7 @@ closed, documented catalog that can be validated before anything renders.
 - **Not "agent-native" by marketing.** The claim waits for the catalog, the
   renderer and their tests to exist.
 - **No release before it is earned.** Package names, the token prefix and
-  component names stay provisional until the first public artifact.
+  component names stay provisional until 1.0.0, the first stable release.
 
 ## Honest boundaries
 
@@ -175,6 +175,6 @@ closed, documented catalog that can be validated before anything renders.
   stay documented where they apply (for example, the data map accepts a host
   seam but does not draw fence-editing handles, and the blocks text renderer
   does not yet implement the Reveal animation).
-- Planned package names and the layer split may change before the first
-  public artifact; [ARCHITECTURE.md](ARCHITECTURE.md) tracks the current
+- Package names and the layer split may change before 1.0.0, the first
+  stable release; [ARCHITECTURE.md](ARCHITECTURE.md) tracks the current
   plan.

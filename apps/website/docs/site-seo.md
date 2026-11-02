@@ -26,8 +26,8 @@ old canonical and two Open Graph lines):
 | --- | --- |
 | `link rel="canonical"`, `og:url` | `https://texuli.com/<page>/`, honoring `TEXULI_SITE_BASE` |
 | `og:type`, `og:site_name`, `og:locale` | `website`, `Texuli`, from the page `lang` (`en_US`) |
-| `og:title`, `og:description` | the document title and description |
-| `og:image` (+ `:type`, `:width`, `:height`, `:alt`) | `https://texuli.com/og/<page>.png`, 1200 × 630 PNG |
+| `og:title`, `og:description`, `meta description` | the document title and description; descriptions stay within 50 to 160 characters (hand-written, or `metaDescription` in `seo.ts` for generated families: whole sentences, the on-page copy never shortened) |
+| `og:image` (+ `:secure_url`, `:type`, `:width`, `:height`, `:alt`) | `https://texuli.com/og/<page>.png`, 1200 × 630 PNG |
 | `twitter:card` (+ title, description, image, alt) | `summary_large_image` |
 
 **`noindex`.** `BaseLayout`'s new `noindex` prop (the 404 uses it) emits
@@ -118,15 +118,16 @@ for unknown paths.
 
 | Addition | Where | Pinned by |
 | --- | --- | --- |
-| **JSON-LD.** `JsonLd.astro` renders code-authored data only (never page data or agent output). `/` carries Organization, WebSite with a SearchAction and SoftwareApplication (`libraryJsonLd` in `src/lib/schema.ts`; the version is read from the installed `texuli` manifest, the description says "in development", no `offers`). `/web-and-native/` carries a TechArticle. The CSP integration hashes the inline blocks automatically | `src/components/seo/JsonLd.astro`, `src/lib/schema.ts`, `BaseLayout`'s `jsonLd` prop | `apps/website/tests/site-build-guards.test.ts`; the SEO audit in `tests/e2e/site-seo.spec.ts` |
+| **JSON-LD.** `JsonLd.astro` renders code-authored data only (never page data or agent output). Every indexable page carries one graph from `siteJsonLd` (PLAN_014): the Organization, the WebSite with its SearchAction and the page as a WebPage, merged with the page's own nodes (their duplicate Organization and WebSite are dropped). `/` adds SoftwareApplication (`libraryJsonLd` in `src/lib/schema.ts`; the version is read from the installed `texuli` manifest, the description says "in development", no `offers`). `/web-and-native/` carries a TechArticle. The CSP integration hashes the inline blocks automatically | `src/components/seo/JsonLd.astro`, `src/lib/schema.ts`, `BaseLayout`'s `jsonLd` prop | `apps/website/tests/site-build-guards.test.ts`; the SEO audit in `tests/e2e/site-seo.spec.ts` |
 | **BreadcrumbList** on nested pages from the sidebar nav, plus the visible trail on docs pages ([site-subsite.md](site-subsite.md)) | `src/components/seo/breadcrumbs.ts` | `apps/website/tests/site-build-guards.test.ts`, `apps/website/tests/docs-reading.test.ts` |
 | **Per-page `<lastmod>`** from `git log -1 --format=%cs` of the route's source (component and primitive pages also follow their manifests and sources) | `src/components/seo/integration.ts` | `apps/website/tests/site-build-guards.test.ts`; the SEO audit in `tests/e2e/site-seo.spec.ts` |
 | **AI-crawler robots policy.** 16 named crawlers (`AI_CRAWLERS`), each allowed; no `Disallow`, no static `Content-Signal` (a per-agent header a static file cannot serve). The edge variant for strict parsers is in [site-aeo.md](site-aeo.md) | `src/components/seo/seo.ts` | `apps/website/tests/site-build-guards.test.ts`, `apps/website/tests/edge-middleware.test.ts` |
 | **Area badges on social images.** `ogAreaFor(path)` maps a route prefix to a section label and accent (Guides, Components, Primitives, Themes, Agents, Project, Native, Architecture); unmapped routes get the brand card. Labels only, no metrics | `src/components/seo/seo.ts` | `apps/website/tests/site-build-guards.test.ts` |
 | **Verification metas.** `google-site-verification` and `msvalidate.01` render only when `PUBLIC_GOOGLE_SITE_VERIFICATION` or `PUBLIC_BING_SITE_VERIFICATION` is set; absent by default | `src/lib/constances.ts`, `SeoHead.astro` | `apps/website/tests/analytics-client.test.ts` |
-| **Offline audit.** `node scripts/audit-seo.mjs --dist apps/website/dist` checks titles, descriptions, canonicals, the OG and Twitter sets, JSON-LD validity, the PNG art, sitemap equality and the robots shape; critical findings exit non-zero. Its T-29 run: 550 pages, 0 critical, 33 warning (length bands and one duplicate-description pair), 4 planned | `scripts/audit-seo.mjs` | `scripts/tests/audit-seo.test.ts` |
+| **Offline audit.** `node scripts/audit-seo.mjs --dist apps/website/dist` checks titles, descriptions, canonicals, the OG and Twitter sets, JSON-LD validity, the PNG art, sitemap equality and the robots shape; critical findings exit non-zero. PLAN_014 added `og:image:secure_url` and the site graph on every page (critical), images without `alt` (critical), a page without an h1 (critical), more than one h1 outside an embedded deck's slide titles, a skipped heading level, a duplicated title and a duplicated Organization or WebSite node (warnings). Its 2026-11-01 run: 654 pages, 0 critical, 0 warning, 3 planned | `scripts/audit-seo.mjs` | `scripts/tests/audit-seo.test.ts` |
 
 **Planned, not shipped:** `twitter:site` and `twitter:creator` (no handle
-exists, so none is rendered), an image sitemap extension (graded optional
+exists, so none is rendered; the developer has not given one), FAQPage
+(no page shows real questions and answers today), an image sitemap extension (graded optional
 by the SEO audit), and the other open audit rows the script reports as
 `planned`.

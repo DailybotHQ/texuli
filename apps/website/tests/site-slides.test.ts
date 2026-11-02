@@ -73,7 +73,7 @@ describe('slides page: copy and safety', () => {
     expect(status).toMatch(
       /in development and on npm \(@texuli\/slides 0\.12\.0, @texuli\/deck 0\.12\.0\), pre-1\.0 releases/
     );
-    expect(status).toMatch(/@texuli\/slides 0\.3\.0 has the previous deck model/);
+    expect(status).toMatch(/releases before 0\.4\.0 use the previous deck model/);
   });
 
   it('renders no HTML from data, and names only fictional example.com addresses', () => {

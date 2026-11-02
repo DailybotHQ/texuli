@@ -8,6 +8,7 @@ import FooterSection from '../../components/blocks-page/sections/FooterSection.s
 import HeroSection from '../../components/blocks-page/sections/HeroSection.svelte';
 import PricingSection from '../../components/blocks-page/sections/PricingSection.svelte';
 import { blockSource } from '../../components/blocks-page/sources.ts';
+import { metaDescription } from '../../components/seo/seo.ts';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 /** One page per block: the section as a full-width template. */
@@ -19,7 +20,13 @@ const { block } = Astro.props as { block: PageBlock };
 const source = blockSource(block.file);
 ---
 
-<BaseLayout title={`${block.title} template`} description={block.description}>
+<BaseLayout
+  title={`${block.title} template`}
+  description={metaDescription(
+    block.description,
+    'A copy-paste Texuli section template built on the styled components.'
+  )}
+>
   <nav class="crumbs" aria-label="Breadcrumb">
     <a href="/blocks-page/">Blocks and templates</a>
     <span aria-hidden="true"> / </span>

@@ -1,5 +1,13 @@
+import { existsSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
-import { serveDist, settle } from './support/site.ts';
+import { DIST, serveDist, settle } from './support/site.ts';
+
+/** Detail pages built under one listing route: the truth a proof stat counts. */
+const builtDetails = (route: string): number =>
+  readdirSync(join(DIST, route), { withFileTypes: true }).filter(
+    (entry) => entry.isDirectory() && existsSync(join(DIST, route, entry.name, 'index.html'))
+  ).length;
 
 /*
  * texuli.com home (PLAN_006 T-44), in the browser: the four blueprint
@@ -81,6 +89,14 @@ test('sections in order, working calls to action, announced copy, motion only on
     const stat = proof.locator(`[data-tx-hero-proof="${id}"] a`);
     await expect(stat).toHaveAttribute('href', href);
     await expect(stat).toHaveText(/^\s*\d+\s/);
+  }
+  // The counts are derived, never typed: each equals the detail pages built (PLAN_014).
+  for (const [id, route] of [
+    ['components', 'component-pages'],
+    ['primitives', 'primitives-page'],
+  ] as const) {
+    const text = await proof.locator(`[data-tx-hero-proof="${id}"] a`).innerText();
+    expect(Number.parseInt(text, 10), `${id} count`).toBe(builtDetails(route));
   }
 
   const copy = hero.getByRole('button', { name: 'Copy install command' });

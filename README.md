@@ -79,7 +79,7 @@ corepack enable && pnpm install
 Then:
 
 ```bash
-pnpm check     # lint, typecheck, unit and component tests, layer guard
+pnpm check     # lint, typecheck, unit and component tests, layer guard, agent surfaces
 pnpm dev       # the texuli.com website → http://localhost:4321
 ```
 
@@ -99,7 +99,7 @@ Every layer is a package with one job, and every dependency points down only
 | L0 | [`@texuli/drag`](packages/drag/README.md) | The framework-free drag engine: sortable lists, trees, canvas and graph editing, with moves planned as data (in development) |
 | L0 | [`@texuli/deck`](packages/deck/README.md) | The framework-free deck engine: deck model v2 from JSON or Markdown, layouts, navigation and lint (in development) |
 | L0 | [`@texuli/spec`](packages/spec/README.md) | The schema-first blueprint contract, with TypeScript and Kotlin projections |
-| L1 | [`@texuli/primitives`](packages/primitives/README.md) | 41 owned headless primitives, one subpath each, held to the APG patterns |
+| L1 | [`@texuli/primitives`](packages/primitives/README.md) | 42 owned headless primitives, one subpath each, held to the APG patterns |
 | L1 | [`@texuli/document`](packages/document/README.md) | The framework-free block document engine: model, operations, Markdown, pagination, DOCX and PDF, CRDT sync (in development) |
 | L2 | [`@texuli/tokens`](packages/tokens/README.md) | The OKLCH theme engine, the `--tx-*` token contract, 200+ themes, compiled CSS |
 | L3 | [`texuli`](packages/texuli/README.md) | Styled components, icons, layouts and app shells |
@@ -107,7 +107,8 @@ Every layer is a package with one job, and every dependency points down only
 | L5 | [`@texuli/blocks`](packages/blocks/README.md) · [`@texuli/sheets`](packages/sheets/README.md) | Content blocks for pages, documents and slides; spreadsheets with an owned formula engine (in development) |
 | L6 | [`@texuli/catalog`](packages/catalog/README.md) | The agent catalog and its sink-free renderer |
 | L7 | [`@texuli/player`](packages/player/README.md) | The runtime that paints validated blueprints |
-| L8 | [`@texuli/tools`](packages/tools/README.md) · [`@texuli/astro`](packages/astro/README.md) · [`@texuli/slides`](packages/slides/README.md) · [`@texuli/pages`](packages/pages/README.md) | The copy-in CLI, LLM docs, the A2UI adapter, custom elements, the MCP server; the Astro integration; the slide stage on `@texuli/deck`; the block document editor and reader (in development) |
+| L8 | [`@texuli/tools`](packages/tools/README.md) · [`@texuli/astro`](packages/astro/README.md) · [`@texuli/slides`](packages/slides/README.md) · [`@texuli/pages`](packages/pages/README.md) | The copy-in CLI, LLM docs, the A2UI adapter, custom elements, the MCP server; the Astro integration; the slide stage on `@texuli/deck` (in development); the block document editor and reader (in development) |
+| L9 | [`@texuli/mcp`](packages/mcp/README.md) | The local MCP server, `npx -y @texuli/mcp`, on the same operations as the remote server at texuli.com/mcp (in development) |
 
 The layer graph is enforced, not aspirational: `pnpm check:layers` fails any
 import that points up.

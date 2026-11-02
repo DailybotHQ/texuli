@@ -13,8 +13,9 @@ const toc = [
 const installSnippet = `# Texuli is in development: every published package ships as 0.12.0, a pre-1.0 release — 1.0.0 will be the first stable release.
 pnpm add texuli @texuli/tokens @texuli/primitives @texuli/core`;
 
-const initSnippet = `# The copy path: run the init CLI from a checkout of the Texuli repository.
-pnpm exec tsx packages/tools/src/cli-init/cli.ts init --cwd path/to/app --theme enterprise-neutral`;
+const initSnippet = `# The guided path: the init CLI from @texuli/tools writes the tokens, a theme and the no-flash bootstrap.
+pnpm add -D @texuli/tools
+pnpm exec texuli-init init --theme enterprise-neutral --dry-run   # review, then run without --dry-run`;
 
 const wireSnippet = `<!-- index.html — the theme attribute selects the theme; the bootstrap resolves the mode -->
 <html lang="en" data-tx-theme="enterprise-neutral" data-tx-mode="light">
@@ -50,10 +51,10 @@ import '@texuli/tokens/base.css';`;
   <GuideCode code={installSnippet} label="Install the published release" lang="bash" />
   <p>
     Prefer copying files instead? <code>texuli init</code> writes the stylesheet, the no-flash
-    bootstrap and <code>texuli.config.json</code> with no network. It runs from a checkout of the
-    repository (see <code>@texuli/tools/cli-init</code>):
+    bootstrap and <code>texuli.config.json</code> with no network. The
+    command is <code>texuli-init</code>, from <code>@texuli/tools</code>:
   </p>
-  <GuideCode code={initSnippet} label="Copy path: texuli init from a repository checkout" lang="bash" />
+  <GuideCode code={initSnippet} label="Guided path: texuli-init from @texuli/tools" lang="bash" />
 
   <h2 id="wire-tokens">Wire tokens</h2>
   <p>

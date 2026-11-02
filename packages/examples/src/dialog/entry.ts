@@ -34,7 +34,8 @@ export const dialogExamples = [
   defineExample({
     id: 'ui-dialog-rtl',
     title: 'Dialog, right to left',
-    description: 'Arabic labels in a right-to-left layout with logical padding.',
+    description:
+      'A workspace settings dialog with Arabic labels in a right-to-left layout, shown open with logical padding.',
     tags: ['ui', 'dialog', 'rtl', 'i18n'],
     component,
     props: ['title', 'closeLabel'],

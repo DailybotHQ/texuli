@@ -17,6 +17,7 @@ import {
   primitiveBehavior,
   primitiveBudget,
 } from '../../components/primitives-page/sources.ts';
+import { metaDescription } from '../../components/seo/seo.ts';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 export function getStaticPaths() {
@@ -28,7 +29,15 @@ const behavior = primitiveBehavior(doc.id);
 const budget = primitiveBudget(doc.id);
 ---
 
-<BaseLayout title={`${doc.name} primitive`} description={doc.summary}>
+<BaseLayout
+  title={`${doc.name} primitive`}
+  description={metaDescription(
+    doc.summary,
+    doc.pattern.href
+      ? `An owned headless Svelte 5 primitive from @texuli/primitives, held to the WAI-ARIA ${doc.pattern.name} pattern.`
+      : 'An owned headless Svelte 5 primitive from @texuli/primitives.'
+  )}
+>
   <h1>{doc.name}</h1>
   <p class="lead">{doc.summary}</p>
 

@@ -5,7 +5,14 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { texuliOps } from '../../packages/tools/src/ops/index.ts';
-import { AEO_CONFIG, auditAeo, collectAeo, distPathFor, renderMarkdown } from '../audit-aeo.mjs';
+import {
+  AEO_CONFIG,
+  auditAeo,
+  collectAeo,
+  distPathFor,
+  renderMarkdown,
+  twinHasLead,
+} from '../audit-aeo.mjs';
 
 const sha256 = (text: string) => `sha256:${createHash('sha256').update(text).digest('hex')}`;
 
@@ -124,6 +131,51 @@ describe('auditAeo on a green fixture surface', () => {
       );
       expect(warnings.map((finding) => finding.page).sort()).toEqual(['docs-shell/', 'search/']);
     }
+  });
+});
+
+describe('answer-ready twin leads (PLAN_014)', () => {
+  const lead =
+    'Texuli guides walk a Svelte 5 team through install, theming and accessibility, one task per page, with live examples.';
+
+  it('accepts a twin whose first prose paragraph answers what, who and how', () => {
+    expect(
+      twinHasLead(`# Guides\n\n> Language: en\n\n---\n\n![art](a.webp)\n\n${lead}\n\n## One`)
+    ).toBe(true);
+  });
+
+  it('rejects a twin that reaches its second section without a lead', () => {
+    expect(
+      twinHasLead(`# Guides\n\n---\n\nShort.\n\n## One\n\n- a list\n\n## Two\n\n${lead}`)
+    ).toBe(false);
+  });
+
+  it('joins a hard-wrapped paragraph, counts bold-led prose, and reads a twin with no header', () => {
+    const wrapped =
+      'Texuli guides walk a Svelte 5 team\nthrough install, theming and accessibility,\none task per page.';
+    expect(twinHasLead(`# Guides\n\n---\n\n${wrapped}\n\n## One`)).toBe(true);
+    expect(twinHasLead(`# Guides\n\n---\n\n**Status:** ${lead}\n\n## One`)).toBe(true);
+    expect(twinHasLead(`${lead}\n\n## One\n\n## Two`)).toBe(true);
+    expect(
+      twinHasLead(
+        '# Guides\n\n---\n\n[Open](a) [Copy](b)\n\n- a list item that is long enough to count as many words here\n\n## One\n\n## Two'
+      )
+    ).toBe(false);
+  });
+
+  it('warns on a top route whose twin has no lead, and reads only twins that exist', () => {
+    const surface = greenSurface();
+    surface.readBytes = (relative: string) =>
+      relative === 'guides.md' ? Buffer.from('# Guides\n\n---\n\n## A\n\n## B') : null;
+    const warnings = auditAeo(surface).findings.filter(
+      (finding) => finding.severity === 'warning' && finding.category === 'twins'
+    );
+    expect(warnings.map((finding) => finding.page)).toEqual(['/guides/']);
+    surface.readBytes = (relative: string) =>
+      relative === 'guides.md' ? Buffer.from(`# Guides\n\n---\n\n${lead}\n\n## A`) : null;
+    expect(auditAeo(surface).findings.filter((finding) => finding.category === 'twins')).toEqual(
+      []
+    );
   });
 });
 

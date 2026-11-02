@@ -4,6 +4,10 @@ import SiteIllustration from '../../components/landing/SiteIllustration.astro';
  * Simple public changelog for texuli.com (linked from the landing footer).
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { texuliPackageVersion } from '../../lib/schema.ts';
+
+/** The current release, read from the texuli package manifest at build. */
+const current = texuliPackageVersion();
 
 const entries = [
   {
@@ -51,10 +55,63 @@ const entries = [
     ],
   },
   {
+    version: '0.8',
+    date: '2026-10',
+    items: [
+      'First publication of @texuli/forms, @texuli/canvas and @texuli/sheets: schema-driven forms and host data sources, the infinite canvas and spreadsheets with an owned formula engine.',
+      'Dashboards in @texuli/data, multi-target output (email-safe HTML, print and PDF, one i18n message catalog) and the texuli.com feature pages.',
+      'Blueprint spec 0.8.0.',
+    ],
+  },
+  {
+    version: '0.7',
+    date: '2026-10',
+    items: [
+      'First publication of @texuli/document and @texuli/pages: the block document engine, its editor and reader.',
+      'Blueprint spec 0.7.0: documents as agent data and node keys, with catalog, player and tools support.',
+    ],
+  },
+  {
+    version: '0.6',
+    date: '2026-10',
+    items: [
+      'One API contract across components, motion, streamed blueprints, @texuli/core/markup and zip, and the gaps Protoyard reported on 0.5.0 (G48 to G85).',
+      'Blueprint spec 0.6.0.',
+    ],
+  },
+  {
+    version: '0.5',
+    date: '2026-10',
+    items: [
+      'First publication of @texuli/editor, the rich text editor, and the gaps Protoyard found adopting Texuli from npm.',
+      'Blueprint spec 0.5.0.',
+    ],
+  },
+  {
+    version: '0.4',
+    date: '2026-10',
+    items: [
+      'First publication of @texuli/deck; every drag surface in @texuli/data runs on @texuli/drag, and blueprints become interactive.',
+      'Blueprint spec 0.4.0.',
+    ],
+  },
+  {
+    version: '0.3',
+    date: '2026-10',
+    items: [
+      'First publication of @texuli/date, @texuli/drag and @texuli/workflows; the calendar entry fell from about 13.05 to 5.15 KiB gzip.',
+    ],
+  },
+  {
+    version: '0.2',
+    date: '2026-10',
+    items: ['The first non-prerelease 0.x line, for the 15 packages packable then.'],
+  },
+  {
     version: '0.1',
     date: '2026-10',
     items: [
-      '41 owned primitives and the Texuli component layer on Svelte 5.',
+      'The 0.1 previews on the next tag: 41 owned primitives (42 today) and the Texuli component layer on Svelte 5.',
       'Theme engine with a 210-theme library target, token contract and CSS apply path.',
       'Agent surfaces: catalog, safe renderer, skill pack and llms.txt.',
       'Library landing on texuli.com with live interactive moments.',
@@ -65,13 +122,16 @@ const entries = [
 
 <BaseLayout
   title="Changelog"
-  description="What shipped in Texuli — versions and highlights for people and agents."
+  description={`What shipped in each Texuli release, from the 0.1 previews to ${current}: new packages, breaking changes and the blueprint spec version.`}
 >
   <header class="page-head">
     <SiteIllustration art="page-guides" class="page-head__art" />
     <h1>Changelog</h1>
     <p class="lead">
-      High-level notes for the public site. Detailed package history lives in the repository.
+      Every Texuli release, newest first. <code>{current}</code> is the current release on npm, pre-1.0:
+      under <code>0.x</code> a new minor may break, so pin the version. Demos of each new capability
+      are on <a href="/whats-new/">What’s new</a>; the full notes, with every closed gap and
+      migration, are in the repository’s release document.
     </p>
   </header>
 

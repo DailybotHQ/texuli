@@ -53,7 +53,7 @@ describe('output page: copy and safety', () => {
     const copy = PAGE.replace(/\s+/g, ' ');
     // biome-ignore lint/suspicious/noTemplateCurlyInString: the page source holds this template literally.
     expect(copy).toContain('@texuli/core/i18n · new in ${OUTPUT_RELEASE}');
-    expect(copy).toContain('the previous release, <code>0.7.0</code>, is without them');
+    expect(copy).toContain('<code>0.7.0</code> and earlier are without them');
     const i18n = OUTPUT_SECTIONS.find((entry) => entry.id === 'i18n')?.summary ?? '';
     expect(i18n).toContain('English is the only language Texuli ships');
     expect(i18n).toContain('translations beyond English are planned');

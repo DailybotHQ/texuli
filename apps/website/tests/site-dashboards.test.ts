@@ -66,7 +66,7 @@ describe('dashboards page: copy and safety', () => {
     expect(copy).toMatch(
       /eyebrow=\{`@texuli\/data\/dashboard · new in \$\{DASHBOARDS_RELEASE\}`\}/
     );
-    expect(copy).toContain('the previous release, <code>0.7.0</code>, is without it');
+    expect(copy).toContain('<code>0.7.0</code> and earlier are without it');
     expect(copy).toContain('Planned, not built yet');
     for (const [path, source] of SOURCES) {
       expect(source, path).not.toMatch(

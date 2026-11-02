@@ -36,8 +36,12 @@ import { countAllThemes, HOME_NEVER_PACKED } from '../src/components/sections/ho
 const WEBSITE = resolve(import.meta.dirname, '..');
 const read = (path: string): string => readFileSync(resolve(WEBSITE, path), 'utf8');
 const styleOf = (source: string): string => source.slice(source.lastIndexOf('<style>'));
-const routeExists = (href: string): boolean =>
-  existsSync(resolve(WEBSITE, 'src/pages', href.replace(/^\/+|\/+$/g, ''), 'index.astro'));
+/** A page route, and its `#fragment` target when it names one. */
+const routeExists = (href: string): boolean => {
+  const [path = '', fragment] = href.split('#');
+  const page = resolve(WEBSITE, 'src/pages', path.replace(/^\/+|\/+$/g, ''), 'index.astro');
+  return existsSync(page) && (!fragment || readFileSync(page, 'utf8').includes(`id="${fragment}"`));
+};
 
 const home = read('src/pages/index.astro');
 const footer = read('src/components/foundation/SiteFooter.astro');
@@ -72,7 +76,7 @@ describe('landing', () => {
     expect(HOME_HERO.actions.map((link) => link.role)).toEqual(['primary', 'secondary', 'text']);
     for (const link of HOME_HERO.actions) expect(routeExists(link.href), link.href).toBe(true);
     expect(hero).toContain('href={resolveHref(link.href)}');
-    expect(HOME_INSTALL_COMMAND).toBe('pnpm add texuli');
+    expect(HOME_INSTALL_COMMAND).toBe('pnpm add texuli @texuli/tokens');
     expect(hero).toContain('<CopyCommand command={HOME_INSTALL_COMMAND} />');
     expect(hero).toContain('<SiteIllustration art="home-hero" />');
     expect(illustrationFor('home-hero')?.priority).toBe(true);

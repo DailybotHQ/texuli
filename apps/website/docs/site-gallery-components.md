@@ -7,7 +7,7 @@
 
 ## Goal
 
-Every catalog component, live. Each of the 127 cards mounts the real Texuli
+Every catalog component, live. Each card (one per component page, 134 today, counted from `COMPONENT_PAGES` at build) mounts the real Texuli
 component with fictional data:
 - charts with real series, data blocks, media with a local image;
 - overlays that open on click or from the keyboard;
@@ -32,7 +32,7 @@ that follows the props. Filter the cards by category, tag or search.
 | `live/stage-loaders.ts` | One lazy chunk per family |
 | `live/stage-controls.ts` | The props each id's panel offers: the manifest props its stage applies |
 | `live/PreviewFrame.svelte`, `live/preview.ts` | The lazy iframe and its same-origin `postMessage` protocol |
-| `live/stages/*` | 21 stage families covering all 127 ids |
+| `live/stages/*` | 21 stage families covering every gallery id |
 | `framed` ids (`stage-map.ts`) | Operated in the isolated preview document on their component pages too. The combobox family is framed: its CSS is also server-rendered on the primitives pages, and Astro links the CSS of every lazily reachable stage on each page with a demo, so an inline entry put 1.5 KB gzip on every component page. Only the preview document loads it (`FRAMED_FAMILIES`). |
 
 ### Why an isolated preview document

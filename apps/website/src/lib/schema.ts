@@ -14,6 +14,10 @@ import { SITE_NAME, SITE_URL } from './constances';
 
 const require = createRequire(import.meta.url);
 
+/** The shared node ids every page's graph (siteJsonLd) defines once. */
+const ORGANIZATION_ID = 'https://dailybot.com/#organization';
+const WEBSITE_ID = `${SITE_URL}/#website`;
+
 /**
  * The published version of the `texuli` package, resolved through the
  * installed entry point — never hand-copied into the site. The exports map
@@ -92,13 +96,10 @@ export function techArticleJsonLd(headline: string, description: string, path: s
         description,
         url: `${SITE_URL}${path}`,
         inLanguage: 'en',
-        isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: `${SITE_URL}/` },
-        author: { '@type': 'Organization', name: 'Dailybot, Inc.', url: 'https://dailybot.com/' },
-        publisher: {
-          '@type': 'Organization',
-          name: 'Dailybot, Inc.',
-          url: 'https://dailybot.com/',
-        },
+        isPartOf: { '@id': WEBSITE_ID },
+        mainEntityOfPage: { '@id': `${SITE_URL}${path}#webpage` },
+        author: { '@id': ORGANIZATION_ID },
+        publisher: { '@id': ORGANIZATION_ID },
         license: 'https://opensource.org/licenses/MIT',
         about: [
           'Svelte 5 web components',
@@ -129,8 +130,9 @@ export function webApiJsonLd(description: string) {
         license: 'https://opensource.org/licenses/MIT',
         isAccessibleForFree: true,
         inLanguage: 'en',
-        provider: { '@type': 'Organization', name: 'Dailybot, Inc.', url: 'https://dailybot.com/' },
-        isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: `${SITE_URL}/` },
+        provider: { '@id': ORGANIZATION_ID },
+        isPartOf: { '@id': WEBSITE_ID },
+        mainEntityOfPage: { '@id': `${SITE_URL}/developers/#webpage` },
         potentialAction: {
           '@type': 'ConsumeAction',
           target: [
@@ -139,6 +141,63 @@ export function webApiJsonLd(description: string) {
           ],
         },
       },
+    ],
+  };
+}
+
+type JsonLdNode = Record<string, unknown>;
+
+/**
+ * The site graph every page carries (PLAN_014 T-seo): the owner
+ * organization, the website with its search action, and this page as a
+ * WebPage that is part of the website. A page's own graph (`jsonLd` on
+ * BaseLayout) is merged into the same block; its Organization and WebSite
+ * nodes are dropped there, since these two carry the canonical ones.
+ */
+export function siteJsonLd(
+  url: string,
+  name: string,
+  description: string,
+  page?: Record<string, unknown>
+): { '@context': string; '@graph': JsonLdNode[] } {
+  const own = ((page?.['@graph'] as JsonLdNode[] | undefined) ?? (page ? [page] : []))
+    .filter((node) => node['@type'] !== 'Organization' && node['@type'] !== 'WebSite')
+    .map(({ '@context': _context, ...node }) => node);
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': ORGANIZATION_ID,
+        name: 'Dailybot, Inc.',
+        url: 'https://dailybot.com/',
+      },
+      {
+        '@type': 'WebSite',
+        '@id': WEBSITE_ID,
+        name: SITE_NAME,
+        url: `${SITE_URL}/`,
+        inLanguage: 'en',
+        publisher: { '@id': ORGANIZATION_ID },
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: {
+            '@type': 'EntryPoint',
+            urlTemplate: `${SITE_URL}/search/?q={search_term_string}`,
+          },
+          'query-input': 'required name=search_term_string',
+        },
+      },
+      {
+        '@type': 'WebPage',
+        '@id': `${url}#webpage`,
+        url,
+        name,
+        description,
+        inLanguage: 'en',
+        isPartOf: { '@id': WEBSITE_ID },
+      },
+      ...own,
     ],
   };
 }

@@ -56,7 +56,31 @@ export const FAMILY_NOTES: Readonly<Record<string, FamilyNote>> = Object.freeze(
   },
 });
 
-/** The note for one catalog group folder name, or `undefined` for an unknown group. */
-export function familyNote(group: string): FamilyNote | undefined {
+/**
+ * Navigation ids the catalog files under `overlays` (PLAN_014): they are not
+ * overlays, so their pages carry the navigation note instead.
+ */
+export const NAVIGATION_IDS: ReadonlySet<string> = new Set([
+  'navigation-menu',
+  'breadcrumb',
+  'pagination',
+  'sidebar',
+  'app-nav',
+]);
+
+export const NAVIGATION_NOTE: FamilyNote = Object.freeze({
+  headline: 'Navigation landmarks that mark where you are.',
+  body:
+    'Navigation components render a labelled nav landmark and mark the current page or ' +
+    'item with aria-current, so assistive technology announces where you are.',
+});
+
+/**
+ * The note for one catalog group folder name, or `undefined` for an unknown
+ * group. Pass the component id to get the navigation note for the
+ * navigation ids filed under `overlays`.
+ */
+export function familyNote(group: string, id?: string): FamilyNote | undefined {
+  if (id && NAVIGATION_IDS.has(id)) return NAVIGATION_NOTE;
   return FAMILY_NOTES[group];
 }

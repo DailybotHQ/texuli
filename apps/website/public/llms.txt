@@ -13,6 +13,7 @@ What Texuli is and where to begin.
 - [Getting started](https://texuli.com/guides/getting-started/)
 - [What’s new](https://texuli.com/whats-new/): Every package and capability of 0.6.0 to 0.12.0 (all on npm; 0.12.0 is current, and 0.10.0 added design systems), with demos.
 - [Skill](https://texuli.com/skill/): The distributable agent skill for building with Texuli.
+- [Search](https://texuli.com/search/): Search every page, component, guide and example (?q= in the URL).
 
 ## Platform
 
@@ -89,7 +90,7 @@ The agent catalog, the sink-free renderer, streaming generation and the agent su
 
 ## Project
 
-Brand, foundation, evidence, performance and the changelog.
+Brand, foundation, evidence, performance, the changelog and the docs shell sample.
 
 - [Brand](https://texuli.com/brand/)
 - [Foundation](https://texuli.com/foundation/)
@@ -97,6 +98,7 @@ Brand, foundation, evidence, performance and the changelog.
 - [Evidence](https://texuli.com/evidence/)
 - [Performance](https://texuli.com/perf/)
 - [Changelog](https://texuli.com/changelog/)
+- [Docs shell](https://texuli.com/docs-shell/): The documentation layout every docs page shares, with sample pages.
 
 ## For agents
 

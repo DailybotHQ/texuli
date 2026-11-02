@@ -176,8 +176,14 @@ pnpm exec tsx scripts/check-llms-parity.ts
 The audit is plain Node over the built site:
 `node scripts/audit-aeo.mjs --dist apps/website/dist`. Its T-30 run
 reported `26 top routes, 187 twins, 4 .well-known files: 0 critical,
-2 warning, 3 planned` (the two warnings are `/search/` and `/docs-shell/`,
-left out of the nav-curated `llms.txt` by design).
+2 warning, 3 planned` (the two warnings were `/search/` and `/docs-shell/`,
+then left out of the nav-curated `llms.txt`). PLAN_014 lists both in
+`llms-site.ts` (Start here and Project) and gives the weak pages an
+answer-ready lead (what it is, who it is for, how to start), which the
+twins carry, and `audit-aeo` warns when the landing or a top route's twin
+does not open with a lead of 15 or more prose words (`twinHasLead`); its run
+reported `43 top routes, 654 twins, 8 .well-known files: 0 critical,
+0 warning, 1 planned`.
 
 ## How to extend
 

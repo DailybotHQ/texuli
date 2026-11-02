@@ -204,16 +204,17 @@ Compose renderer fails closed: `spreadsheet` is not in `NativeRegistry`, so
 it paints a visible `not-on-this-target` placeholder. Painting sheets
 natively is planned.
 
-**Dashboards (spec 0.8.0).** Validation parity for the props,
-painting planned. `data-dashboard` and `data-dashboard-widget` are in the
+**Dashboards (spec 0.8.0).** Validation parity for the props, and both
+ids paint natively (PLAN_013, ADR-025). `data-dashboard` and `data-dashboard-widget` are in the
 generated vocabulary, so their prop schemas (the closed `layout` places in
 grid units, `columns`, `widgetId`) are checked natively as in TypeScript,
 and `data-dashboard.layout` is a sourceable prop for the source checks
 above. The composition rules `@texuli/catalog` adds (`dashboard-child`,
 `dashboard-parent`, `dashboard-widgets`, `dashboard-widget-id`) run in the
 catalog's draft validation only; a native check is planned. The Compose
-renderer fails closed: neither id is in `NativeRegistry`, so they paint a
-visible `not-on-this-target` placeholder.
+renderer paints both ids with the web's dashboard layout math
+(`DataBoards.kt`), and a malformed layout still refuses to the visible
+placeholder.
 
 ## Modules
 

@@ -28,7 +28,7 @@ import {
 } from '../../components/mcp-server/page.ts';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
-const description = `Texuli MCP: ${COUNTS.tools} tools, ${COUNTS.resources + COUNTS.templates} resources and ${COUNTS.prompts} prompts for agents, from the remote server at texuli.com/mcp or locally with npx -y @texuli/mcp. Setup for every host, limits, security and versions.`;
+const description = `Texuli MCP: ${COUNTS.tools} tools, ${COUNTS.resources + COUNTS.templates} resources and ${COUNTS.prompts} prompts for agents, remote at texuli.com/mcp or local with npx -y @texuli/mcp, with setup for every host.`;
 const repo = (path: string) =>
   safeHref(`https://github.com/DailybotHQ/texuli/blob/main/${path}`, 'developer');
 const security21 = repo('docs/SECURITY.md#21-remote-mcp-endpoint');
@@ -53,7 +53,7 @@ const released = RELEASE.state === 'released';
   {
     !released && (
       <p class="status" data-mcp-status>
-        <strong>Status:</strong> {RELEASE.note} <code>@texuli/mcp</code> is first published in <code>{MCP.version}</code>; until then the packages on npm are the 0.8 line.
+        <strong>Status:</strong> {RELEASE.note} <code>@texuli/mcp</code> is first published in <code>{MCP.version}</code>.
       </p>
     )
   }
@@ -348,8 +348,7 @@ const released = RELEASE.state === 'released';
 
   <h2 id="try-it">Try it</h2>
   <p>
-    List the remote tools with curl (once {MCP.version} is deployed; until then the URL answers with
-    the site's 404):
+    List the remote tools with curl:
   </p>
   <pre><code data-mcp-curl>{CURL_TOOLS_LIST}</code></pre>
   <p>Then call one:</p>
