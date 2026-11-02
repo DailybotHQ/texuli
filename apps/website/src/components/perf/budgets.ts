@@ -60,8 +60,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/',
     reason:
-      'The unified landing (PLAN_006 T-44) ships zero islands; its module scripts wire the install copy command and the ready signal. The generous page and JS limits below are the old hero-widget floors, kept until T-93 right-sizes them. PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP plates (the eager hero and the lazy plates within the browser’s load-ahead distance load on open, each at the srcset width it renders), 362.9 KB of WebP on open; measured 435.5 KB page, limit 453 (+4% headroom).',
-    budget: { pageGzipKb: 453, jsGzipKb: 116, lcpMs: 3000 },
+      'The unified landing (PLAN_006 T-44) ships zero islands; its module scripts wire the install copy command and the ready signal. The generous page and JS limits below are the old hero-widget floors, kept until T-93 right-sizes them. PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP plates (the eager hero and the lazy plates within the browser’s load-ahead distance load on open, each at the srcset width it renders), 362.9 KB of WebP on open; measured 435.5 KB page, limit 453 (+4% headroom). The transparent hero (2026-11-01) carries an alpha channel and weighs more: measured 491.4 KB page, limit 512 (+4% headroom).',
+    budget: { pageGzipKb: 512, jsGzipKb: 116, lcpMs: 3000 },
   },
   {
     route: '/component-pages/button/',

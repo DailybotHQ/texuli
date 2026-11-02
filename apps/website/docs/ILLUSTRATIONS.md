@@ -31,16 +31,14 @@ This guide fixes that style, the slot sizes and how a finished file reaches the 
 1. **No text.** No letters, words, numbers, logos or watermarks anywhere in an image. The page's HTML carries every word, so statements stay readable, translatable and indexable. The one exception is the Texuli "T" isotype (a T built from square cells), allowed only as an embossed glyph on a single cube where the prompt says so.
 2. **One idea per image.** Each image shows texel cubes plus one or two interface objects that tell the slot's single idea.
 3. **No people, no robots, no photographs.** No dark or busy backgrounds, and no extra brand colours.
-4. **Safe area.** Keep important content inside the central 84% of the frame. Leave 8% margins on every side, because crops and rounded frames clip the edges.
+4. **Safe area.** Keep important content inside the central 84% of the frame. Leave 8% margins on every side, because crops clip the edges.
 5. **Same light, same camera, same palette** in every image, so the set reads as one family.
 
 ## Light and dark
 
-Each image is rendered on the light lavender-to-peach ground. On the light theme it sits flush, with no frame on `plate` variants. On the dark theme the same file sits in a rounded frame with a soft violet glow, so it reads as a lit product shot rather than a light patch on a dark page.
+Every file has a transparent background, so it sits bare on the page ground in both themes: no border, no ground and no shadow. A file must therefore read on both a light and a dark ground. Only the texel fallback, shown when a file is missing, keeps a rounded frame. A replacement keeps the slot's file name and size, and the build derives its smaller widths, so it needs no code change.
 
-The files in the site today (added 2026-11-01) were generated with a transparent background instead of the gradient, so they sit on the page ground in both themes; the dark frame then only outlines them. `home-hero.webp` is the exception: it arrived without transparency, on a white ground, so it still shows as a white plate. Regenerating it with a transparent background replaces it with no code change.
-
-A slot may also name an optional `fileDark` (the same scene on a deep violet-ink ground, about `#17142A` to `#221B3D`). When that file exists, the dark theme uses it instead of the frame. Dark variants are optional: the frame keeps every page correct without them.
+A slot may also name an optional `fileDark` (the same scene on a deep violet-ink ground, about `#17142A` to `#221B3D`). When that file exists, the dark theme uses it instead of the light file. Dark variants are optional.
 
 ## Slots and sizes
 
@@ -74,7 +72,7 @@ Export WebP at quality 82 or better, at the exact pixel size above, below 250 KB
 1. Generate the image from its prompt in [illustration-prompts.md](illustration-prompts.md).
 2. Save it as the slot's `file` (WebP, the exact size) in `apps/website/src/assets/illustrations/`. Save the optional dark variant as `fileDark`.
 3. Optionally record `model` and `created` in the manifest entry.
-4. Run `pnpm build`. The slot switches from its texel fallback to the file with no code change, and no layout shift, because the frame always reserves the same aspect ratio. The build also derives smaller WebP widths (quality 82, through Astro's image pipeline) and serves them with `srcset` and a per-variant `sizes`, so a page downloads about the width it shows; `illustrationWidths` and `ILLUSTRATION_SIZES` in `src/components/landing/illustrations.ts` set the steps.
+4. Run `pnpm build`. The slot switches from its texel fallback to the file with no code change, and no layout shift, because the slot always reserves the same aspect ratio. The build also derives smaller WebP widths (quality 82, through Astro's image pipeline) and serves them with `srcset` and a per-variant `sizes`, so a page downloads about the width it shows; `illustrationWidths` and `ILLUSTRATION_SIZES` in `src/components/landing/illustrations.ts` set the steps.
 
 Until a file exists, `SiteIllustration.astro` paints a seeded texel mosaic in the same palette roles, so a page is always complete.
 

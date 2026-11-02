@@ -123,29 +123,19 @@ const tiles = Array.from({ length: 48 }, (_, index) => {
 </figure>
 
 <style>
+  /* The art is transparent, so it sits bare on the page ground in both
+     themes: no border, ground or shadow. Only the texel fallback is framed. */
   .site-illustration {
     display: block;
     margin: 0;
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+  .site-illustration--fallback {
     overflow: hidden;
     border-radius: calc(var(--tx-radius, 0.5rem) * 1.25);
     border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
     background: var(--tx-muted);
-    inline-size: 100%;
-    max-inline-size: 100%;
-  }
-  /* Landing plates and bands sit flush on the light theme (the art carries
-     its own light ground); the dark theme frames them with a soft glow so
-     the light ground reads as a lit product shot, not a patch. */
-  .site-illustration--plate,
-  .site-illustration--band {
-    border-color: transparent;
-    background: transparent;
-  }
-  :global(:root[data-tx-mode='dark']) .site-illustration--plate,
-  :global(:root[data-tx-mode='dark']) .site-illustration--band {
-    border-color: color-mix(in oklab, var(--tx-primary) 35%, transparent);
-    box-shadow: 0 0 0 1px color-mix(in oklab, var(--tx-primary) 18%, transparent),
-      0 1.5rem 4rem -1.5rem color-mix(in oklab, var(--tx-primary) 45%, transparent);
   }
   .site-illustration__dark {
     display: none !important;
@@ -155,10 +145,6 @@ const tiles = Array.from({ length: 48 }, (_, index) => {
   }
   :global(:root[data-tx-mode='dark']) .site-illustration--has-dark .site-illustration__dark {
     display: block !important;
-  }
-  :global(:root[data-tx-mode='dark']) .site-illustration--has-dark {
-    border-color: transparent;
-    box-shadow: none;
   }
   .site-illustration img {
     display: block;
