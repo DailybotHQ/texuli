@@ -231,6 +231,9 @@ const canonical = deckToMarkdown(result.deck); // supported features round-trip
 - Fixed canvas (1280 × 720 for 16:9) scaled and letterboxed; `fit` is
   `container` (default) or `viewport`. `syncHash` (default on, first stage
   only) keeps `#/<slide>/<step>` deep links.
+- A deck embedded in a page that has its own h1 takes
+  `coverHeadingLevel={2}` (from `0.12.1`), so the cover slide's title is an
+  h2 and the page keeps one h1; the default `1` suits a deck that is the page.
 - Keys: arrows, Space, PageUp/PageDown, Home/End; `O` overview, `F`
   fullscreen, `S` or `P` presenter (notes, next slide, optional timer), `B`
   or `.` blackout, `L` laser, `?` help; swipe and click-to-advance.

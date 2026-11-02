@@ -15,6 +15,8 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The packages are on npm at `0.12.1`; decks embedded in a page take `coverHeadingLevel={2}`.
+
 ## [0.3.13] — 2026-11-02
 
 ### Changes
