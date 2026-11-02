@@ -180,7 +180,7 @@ spins with the APG spinbutton keys, the calendar and date picker's `today`, `wee
 `sortable` (`Sortable.Root`, `List`, `Item`, `Handle`) ships in `0.4.0`; it
 is not in `0.3.0`. It binds the drag engine
 [`@texuli/drag`](https://github.com/DailybotHQ/texuli/blob/main/packages/drag/README.md),
-which is in development and on npm as `0.8.0`
+which is in development and on npm in the 0.12 line
 ([RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 Contract: [prim-sortable.md](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-sortable.md).
 

@@ -1,7 +1,7 @@
 # Using Texuli with your own CSS
 
 **Package:** `texuli`  
-**Related:** [Button](./ui-button.md), site guide [Theming](/guides/theming/)
+**Related:** [Button](./ui-button.md), site guide [Theming](https://texuli.com/guides/theming/)
 
 ## Layer contract
 

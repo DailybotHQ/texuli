@@ -67,7 +67,7 @@ commands: `command` (one of `DOCUMENT_COMMANDS`), `document`, `markdown`,
 other tiers and inputs over 2,000,000 bytes are refused. DOCX and PDF come
 back as base64; the tool writes no files.
 
-In the repository source (in development, not released), the commands are
+From `0.9.0`, the commands are
 two operations of the [operations registry](ops.md): `document.run` (edge)
 for every command but PDF and DOCX, and `document.export` (node) for those
 two. The CLI runs through them too. The 0.8 tool name `document` was a

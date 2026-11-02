@@ -76,7 +76,7 @@ example and theme tools. Its arguments are `command` (one of the seven),
 refused. It answers `{ "result": … }` with the same value as the CLI and
 modifies no files.
 
-In the repository source (in development, not released), the tool is the
+From `0.9.0`, the tool is the
 `deck.run` operation of the [operations registry](ops.md), and the CLI runs
 through it too. The 0.8 tool name `deck` was a deprecated alias in `0.9.0`
 and is removed in `0.10.0`: call `deck.run`.

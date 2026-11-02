@@ -20,7 +20,7 @@ the 0.12 line (see docs/RELEASE.md), a pre-1.0 line (`latest` and `next` point t
 be the first stable release). Install them plainly (`pnpm add texuli`), pin
 the exact version or `^0.12.0` (for 0.x it accepts only 0.12.x, since a new
 minor may break), and never suggest a download URL. `@texuli/drag`,
-`@texuli/workflows`, `@texuli/deck`, `@texuli/editor` (first published
+`@texuli/workflows`, `@texuli/deck`, `@texuli/slides`, `@texuli/editor` (first published
 in `0.5.0`), `@texuli/document` and `@texuli/pages` (both first published
 in `0.7.0`), `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (all
 three first published in `0.8.0`) and `@texuli/mcp` (first published in
