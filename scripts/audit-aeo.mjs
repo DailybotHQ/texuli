@@ -185,6 +185,28 @@ export function collectAeo(distDir, config = AEO_CONFIG) {
   };
 }
 
+/** Prose words a lead must carry to answer what, who and how (PLAN_014). */
+export const LEAD_MIN_WORDS = 15;
+
+/**
+ * Whether a Markdown twin opens with an answer-ready lead (PLAN_014): a
+ * prose paragraph of at least {@link LEAD_MIN_WORDS} words before its second
+ * `## ` section. Headings, images, links, lists, tables, code and quotes are
+ * not prose; the header block above the first `---` is skipped.
+ */
+export function twinHasLead(markdown) {
+  const cut = markdown.indexOf('\n---\n');
+  const body = cut === -1 ? markdown : markdown.slice(cut + 5);
+  let sections = 0;
+  for (const raw of body.split('\n')) {
+    const line = raw.trim();
+    if (line.startsWith('## ') && ++sections >= 2) return false;
+    if (line === '' || /^[#![|*`>-]|^</.test(line)) continue;
+    if ((line.match(/[\p{L}\p{N}]+/gu) ?? []).length >= LEAD_MIN_WORDS) return true;
+  }
+  return false;
+}
+
 /** The whole audit. Pure: the collected surface in, findings out. */
 export function auditAeo(surface, config = AEO_CONFIG) {
   const findings = [];
@@ -383,6 +405,20 @@ export function auditAeo(surface, config = AEO_CONFIG) {
           findings.push(
             finding('critical', 'twins', pagePath, `a built ${family} page without a manifest twin`)
           );
+    // Answer-ready leads (PLAN_014): the landing and every top route's twin.
+    for (const pagePath of ['/', ...surface.topRoutes.map((route) => `/${route}`)]) {
+      const twinPath = twins[pagePath];
+      const bytes = twinPath ? surface.readBytes(twinPath.replace(/^\//, '')) : null;
+      if (bytes !== null && !twinHasLead(bytes.toString('utf8')))
+        findings.push(
+          finding(
+            'warning',
+            'twins',
+            pagePath,
+            `the twin does not open with an answer-ready lead (${LEAD_MIN_WORDS}+ words of prose before its second section)`
+          )
+        );
+    }
   }
 
   // §4 robots policy.

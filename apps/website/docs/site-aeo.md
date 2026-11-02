@@ -180,8 +180,10 @@ reported `26 top routes, 187 twins, 4 .well-known files: 0 critical,
 then left out of the nav-curated `llms.txt`). PLAN_014 lists both in
 `llms-site.ts` (Start here and Project) and gives the weak pages an
 answer-ready lead (what it is, who it is for, how to start), which the
-twins carry; its run reported `43 top routes, 654 twins, 8 .well-known
-files: 0 critical, 0 warning, 1 planned`.
+twins carry, and `audit-aeo` warns when the landing or a top route's twin
+does not open with a lead of 15 or more prose words (`twinHasLead`); its run
+reported `43 top routes, 654 twins, 8 .well-known files: 0 critical,
+0 warning, 1 planned`.
 
 ## How to extend
 

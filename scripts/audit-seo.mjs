@@ -277,6 +277,27 @@ export function auditPage(page, config) {
   )
     add('critical', 'JSON-LD', 'a docs-family page lacks BreadcrumbList (T-19 scope)');
 
+  // Outline and images (PLAN_014): one h1, no skipped heading level, alt on
+  // every image. Script, style and template bodies are not page content, and
+  // the slide titles of an embedded deck (`tx-deck-layout__…`) are the deck's
+  // own outline, not the page's.
+  const body = html
+    .slice(html.search(/<body[\s>]/i) === -1 ? 0 : html.search(/<body[\s>]/i))
+    .replace(/<(script|style|template)\b[\s\S]*?<\/\1>/gi, '');
+  const headings = [...body.matchAll(/<h([1-6])\b([^>]*)>/gi)]
+    .filter((match) => !/class="[^"]*tx-deck-layout__/.test(match[2]))
+    .map((match) => Number(match[1]));
+  const h1 = headings.filter((level) => level === 1).length;
+  if (h1 !== 1)
+    add(h1 === 0 ? 'critical' : 'warning', 'Outline', `${h1} h1 elements (want exactly 1)`);
+  for (let i = 1; i < headings.length; i++)
+    if (headings[i] > headings[i - 1] + 1) {
+      add('warning', 'Outline', `heading level skips from h${headings[i - 1]} to h${headings[i]}`);
+      break;
+    }
+  const bare = [...body.matchAll(/<img\b[^>]*>/gi)].filter((match) => !/\salt=/i.test(match[0]));
+  if (bare.length > 0) add('critical', 'Images', `${bare.length} <img> without an alt attribute`);
+
   return findings;
 }
 
@@ -290,6 +311,7 @@ export function auditSite({ pages, sitemap, robots, readAsset }, config = AUDIT_
   const noindexed = pages.filter((page) => page.noindex);
 
   const descriptions = new Map();
+  const titles = new Map();
   for (const page of indexed) {
     findings.push(...auditPage(page, config));
     if (readAsset !== undefined) {
@@ -312,7 +334,22 @@ export function auditSite({ pages, sitemap, robots, readAsset }, config = AUDIT_
       if (!descriptions.has(description)) descriptions.set(description, []);
       descriptions.get(description).push(page.path);
     }
+    const title = decodeEntities(/<title>([\s\S]*?)<\/title>/i.exec(page.html)?.[1]?.trim() ?? '');
+    if (title !== '') {
+      if (!titles.has(title)) titles.set(title, []);
+      titles.get(title).push(page.path);
+    }
   }
+  for (const [title, paths] of titles)
+    if (paths.length > 1)
+      findings.push(
+        finding(
+          'warning',
+          'Meta',
+          paths.join(', '),
+          `duplicate title across ${paths.length} pages: "${title}"`
+        )
+      );
   for (const [description, paths] of descriptions)
     if (paths.length > 1)
       findings.push(

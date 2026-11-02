@@ -57,7 +57,7 @@ function greenPage(
 <meta name="twitter:description" content="A unique honest description for ${path} long enough for the band.">
 <meta name="twitter:image" content="${image}">
 ${jsonld}
-</head><body></body></html>`;
+</head><body><h1>${title}</h1><h2>Section</h2><img src="/a.webp" alt=""></body></html>`;
   return { path, html, noindex: false };
 }
 
@@ -214,6 +214,47 @@ describe('auditSite page checks', () => {
         auditSite(twice).findings.some(
           (finding) =>
             finding.severity === 'warning' && finding.detail === 'more than one Organization node'
+        )
+      ).toBe(true);
+    }
+    // PLAN_014: one h1, no skipped heading level, alt on every image, unique titles
+    {
+      const outline = greenSite();
+      outline.pages[1]!.html = outline.pages[1]!.html.replace(/<h1>[^<]*<\/h1>/, '');
+      outline.pages[2]!.html = outline.pages[2]!.html.replace(
+        '<h2>Section</h2>',
+        '<h4>Deep</h4><img src="/b.webp">'
+      );
+      const result = auditSite(outline);
+      const details = (path: string) =>
+        result.findings
+          .filter((finding) => finding.page === path)
+          .map((finding) => `${finding.severity} ${finding.detail}`);
+      expect(details('/guides/theming/')).toContain('critical 0 h1 elements (want exactly 1)');
+      expect(details('/component-pages/button/')).toContain(
+        'warning heading level skips from h1 to h4'
+      );
+      expect(details('/component-pages/button/')).toContain(
+        'critical 1 <img> without an alt attribute'
+      );
+      const slides = greenSite();
+      slides.pages[1]!.html = slides.pages[1]!.html.replace(
+        '<h2>Section</h2>',
+        '<h1 class="tx-deck-layout__display">A slide</h1><h2>Section</h2>'
+      );
+      expect(
+        auditSite(slides).findings.filter((finding) => finding.category === 'Outline')
+      ).toEqual([]);
+      const twins = greenSite();
+      twins.pages[2]!.html = twins.pages[2]!.html.replaceAll(
+        'Texuli — page /component-pages/button/',
+        'Texuli — page /guides/theming/'
+      );
+      expect(
+        auditSite(twins).findings.some(
+          (finding) =>
+            finding.severity === 'warning' &&
+            finding.detail.startsWith('duplicate title across 2 pages')
         )
       ).toBe(true);
     }

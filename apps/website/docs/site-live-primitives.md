@@ -2,7 +2,7 @@
 
 **Task:** T-site-live-primitives · **Spec:** `tests/e2e/site-live-primitives.spec.ts`
 
-Every `/primitives-page/<id>/` page (41 primitives) mounts the **real
+Every `/primitives-page/<id>/` page (42 primitives) mounts the **real
 primitive** from `@texuli/primitives/<id>` in a live, framed preview. It is
 styled with Texuli's own exported class recipes (for example
 `accordionRootClass` from `texuli/tabs-accordion`, `dialogContentClass` from
