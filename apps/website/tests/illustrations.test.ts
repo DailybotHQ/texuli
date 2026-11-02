@@ -106,12 +106,18 @@ describe('SiteIllustration', () => {
     expect(source).toContain("fetchpriority={eager ? 'high' : undefined}");
   });
 
-  it('swaps to the dark file only under the dark theme, and frames plates otherwise', () => {
+  it('swaps to the dark file only under the dark theme, and frames only the fallback', () => {
     expect(source).toContain(
       ":global(:root[data-tx-mode='dark']) .site-illustration--has-dark .site-illustration__dark"
     );
     expect(source).toMatch(/\.site-illustration__dark \{\s+display: none !important;/);
-    expect(source).toContain(":global(:root[data-tx-mode='dark']) .site-illustration--plate");
+    // Transparent art sits bare on the page: no border, ground or shadow.
+    expect(source).toMatch(/\.site-illustration \{(?:(?!\})[\s\S])*\}/);
+    expect(source.match(/\.site-illustration \{(?:(?!\})[\s\S])*\}/)?.[0]).not.toMatch(
+      /border|background|box-shadow/
+    );
+    expect(source).toMatch(/\.site-illustration--fallback \{[^}]*border: 1px solid/);
+    expect(source).not.toContain('box-shadow');
   });
 
   it('offers smaller build-time widths with a sizes hint, ending at the full file', () => {
