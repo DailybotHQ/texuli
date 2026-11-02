@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.3.15] — 2026-11-02
+
+### Changes
+
+- chore(skill): packages on npm at 0.12.2
+
 - The packages are on npm at `0.12.2`, the first release published through npm trusted publishing; install the default `latest` (`next` is no longer maintained and stays on `0.12.1`).
 
 ## [0.3.14] — 2026-11-02
