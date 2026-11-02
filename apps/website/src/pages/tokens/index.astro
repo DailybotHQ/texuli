@@ -24,7 +24,7 @@ import {
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { API_RELEASE_STATUS } from '../../lib/api-surface.ts';
 
-const description = `The Texuli token contract v2: ${TOKEN_COUNTS.system} system tokens in ${TOKEN_COUNTS.systemFamilies} families with their defaults, ${TOKEN_COUNTS.component} component tokens, the scope model, hooks and setDesignDefaults, generated from the registries.`;
+const description = `The Texuli token contract v2: ${TOKEN_COUNTS.system} system tokens in ${TOKEN_COUNTS.systemFamilies} families with their defaults, ${TOKEN_COUNTS.component} component tokens and the scope model, generated from the registries.`;
 const repo = (path: string) =>
   safeHref(`https://github.com/DailybotHQ/texuli/blob/main/${path}`, 'developer');
 const adr = repo(

@@ -44,6 +44,8 @@ import {
 import { breadcrumbJsonLd, breadcrumbTrail } from '../components/seo/breadcrumbs';
 import JsonLd from '../components/seo/JsonLd.astro';
 import SeoHead from '../components/seo/SeoHead.astro';
+import { absoluteUrl, normalizePagePath } from '../components/seo/seo.ts';
+import { siteJsonLd } from '../lib/schema.ts';
 
 /**
  * Explicit page-readiness signal for E2E and prefetchers, served from
@@ -88,6 +90,13 @@ const pager = docs ? pagerFor(current) : {};
 // Nested listed pages announce their real nav hierarchy; unlisted pages get
 // no trail and no markup (see components/seo/breadcrumbs.ts).
 const crumbs = breadcrumbTrail(current);
+// One schema.org graph per page: the site nodes plus the page's own (PLAN_014).
+const pageUrl = absoluteUrl(
+  Astro.site ?? 'https://texuli.com',
+  base,
+  normalizePagePath(Astro.url.pathname, base)
+);
+const graph = noindex ? undefined : siteJsonLd(pageUrl, fullTitle, description, jsonLd);
 // "Copy page": the title line here; the body is converted from the built page,
 // between the markers below, by `copyPageIntegration` (rendering the slot twice
 // here would emit the island runtime into a string that never reaches the page).
@@ -132,7 +141,7 @@ const markdownHead = docs
     <meta name="description" content={description} />
     <SeoHead title={fullTitle} {description} siteName={SITE_NAME} {lang} {noindex} />
     <BrandHead />
-    {jsonLd && <JsonLd data={jsonLd} />}
+    {graph && <JsonLd data={graph} />}
     {crumbs.length >= 2 && <JsonLd data={breadcrumbJsonLd(crumbs)} />}
     <style is:inline set:html={themeCss}></style>
     {/* Analytics mounts here (T-39): renders nothing unless enabled. */}

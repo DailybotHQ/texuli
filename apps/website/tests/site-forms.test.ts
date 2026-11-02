@@ -112,7 +112,7 @@ describe('forms page: copy and safety', () => {
       'is in development and on npm from <code>{FORMS_RELEASE}</code>, a pre-1.0 release'
     );
     expect(copy).toContain(
-      'description="Texuli schema-driven forms (@texuli/forms, in development, on npm from 0.8.0)'
+      'description="Texuli schema-driven forms (@texuli/forms, in development)'
     );
     expect(copy).toContain('<a href="/guides/forms/">forms guide</a>');
     for (const [path, source] of SOURCES) {
