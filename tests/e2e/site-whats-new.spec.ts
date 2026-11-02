@@ -90,7 +90,7 @@ test('every feature by release, each demo working, links that resolve; axe light
   await expect(page.locator('[data-hub-release="0.11.0"] [data-hub-feature]')).toHaveCount(0);
   // Protoyard G136: 0.12.0 is on the hub as the current release, with no cards of its own.
   await expect(page.locator('[data-hub-release="0.12.0"] .hub__status')).toContainText(
-    'its patch 0.12.1, the current release'
+    'its patch 0.12.2, the current release'
   );
   await expect(page.locator('[data-hub-release="0.12.0"] [data-hub-feature]')).toHaveCount(0);
   // PLAN_011 T-site-0100: design systems, the studio, the ds tools, conformance, the
