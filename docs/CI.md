@@ -145,10 +145,17 @@ deployments from `main` only, so a run of a changed workflow on another
 branch gets no environment claim and npm refuses it. Trusted publishing
 covers `npm publish` only: `npm dist-tag` still needs the publishing
 account, from a terminal. The job installs npm `11.20.0` first (trusted
-publishing needs 11.5.1 or later). Package writers can still push to
-`main` directly: `main` has no branch protection, because the skill release
-pushes its release commit to `main`
-([RELEASE](RELEASE.md#skill-release)).
+publishing needs 11.5.1 or later). The former CI token ("Texuli Access
+Token") was revoked on npm on 2026-11-02. Setting each package to "Require
+2FA and disallow tokens" (`npm access set mfa=publish`, one 2FA check per
+package) would also refuse any other token of the publishing account;
+trusted publishing keeps working either way. The repository ruleset
+"main: no force-push or deletion" blocks rewriting or deleting `main`. It
+does not require pull requests, so writers can still push to `main`
+directly: GitHub does not let the Actions integration bypass a ruleset, and
+the skill release pushes its release commit to `main`
+([RELEASE](RELEASE.md#skill-release)). Requiring pull requests needs an
+`AUTOMATION_GITHUB_TOKEN` secret that may bypass the rule first.
 
 To release: merge a pull request that bumps the versions into `main`.
 Every pull request runs the full CI; once CI passes on the merge commit,
@@ -165,6 +172,11 @@ trusted publishing and provenance can fail transiently reading the OIDC token
 (`IDENTITY_TOKEN_READ_ERROR`; the 2026-10-27 `0.1.0-next.3` run stopped at
 `@texuli/slides` that way). After a partial failure, re-run the workflow:
 it publishes only what is missing.
+
+The last step, "Verify the release on npm", checks every package on the
+registry: its version is `latest` and carries a provenance attestation.
+npm's metadata can lag a few minutes behind a publish, so the step polls
+every 30 seconds for up to ten minutes before it fails the run.
 
 All three workflows use the Node 24 action majors (`actions/checkout@v7`,
 `actions/setup-node@v7`, `pnpm/action-setup@v6`,
