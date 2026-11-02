@@ -39,7 +39,7 @@ the same pieces are safe to hand to a machine.
 > **Status: in development, pre-1.0.** The screenshot above is the
 > texuli.com website, which deploys from `main` to Cloudflare Pages. The 26
 > published packages are released on npm in the 0.12 line,
-> every one at `0.12.0` (published by CI with provenance; `latest` and `next` point to
+> every one at `0.12.1` (published by CI with provenance; `latest` and `next` point to
 > it); `0.10.0` added design systems, the 0.11 line added the Protoyard
 > gaps G125–G136 and the Final Review fixes (square theme radii, password
 > `autocomplete` `off`, host heading anchors, `@texuli/document/schema-core`,
@@ -201,7 +201,7 @@ every verified command.
 - **No stable release yet.** The 26 published packages are on npm in the
   0.12 line, a pre-1.0 release (`npm install texuli`; `latest` and `next`
   both point to it). Under 0.x a new minor (`0.12.0`) may contain breaking
-  changes, so pin the exact version or use `^0.12.0`; 1.0.0 will be the
+  changes, so pin the exact version or use `^0.12.1`; 1.0.0 will be the
   first stable release.
   The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
 - **texuli.com deploys from `main`** (Cloudflare Pages). Run it locally with
