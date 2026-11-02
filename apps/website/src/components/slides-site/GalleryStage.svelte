@@ -64,7 +64,7 @@ function show(id: string) {
     </ul>
   </div>
   <div class="gallery__stage">
-    <DeckStage {deck} tier="untrusted" syncHash={false} bind:controller />
+    <DeckStage {deck} tier="untrusted" syncHash={false} coverHeadingLevel={2} bind:controller />
   </div>
 </div>
 

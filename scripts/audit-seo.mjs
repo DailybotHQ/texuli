@@ -278,15 +278,14 @@ export function auditPage(page, config) {
     add('critical', 'JSON-LD', 'a docs-family page lacks BreadcrumbList (T-19 scope)');
 
   // Outline and images (PLAN_014): one h1, no skipped heading level, alt on
-  // every image (an <img> inside <noscript> counts too: it is still served). Script, style and template bodies are not page content, and
-  // the slide titles of an embedded deck (`tx-deck-layout__…`) are the deck's
-  // own outline, not the page's.
+  // every image (an <img> inside <noscript> counts too: it is still served).
+  // Script, style and template bodies are not page content. A deck embedded
+  // in a page titles its cover with h2 (`coverHeadingLevel={2}` on DeckStage),
+  // so its slides count like any other heading.
   const body = html
     .slice(html.search(/<body[\s>]/i) === -1 ? 0 : html.search(/<body[\s>]/i))
     .replace(/<(script|style|template)\b[\s\S]*?<\/\1>/gi, '');
-  const headings = [...body.matchAll(/<h([1-6])\b([^>]*)>/gi)]
-    .filter((match) => !/class="[^"]*tx-deck-layout__/.test(match[2]))
-    .map((match) => Number(match[1]));
+  const headings = [...body.matchAll(/<h([1-6])\b([^>]*)>/gi)].map((match) => Number(match[1]));
   const h1 = headings.filter((level) => level === 1).length;
   if (h1 !== 1)
     add(h1 === 0 ? 'critical' : 'warning', 'Outline', `${h1} h1 elements (want exactly 1)`);

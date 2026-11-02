@@ -64,7 +64,7 @@ integration.
   so it spreads over shards. `check:csp` and the twin parity check run on shard 1. Locally,
   `pnpm exec playwright test tests/e2e` runs every spec.
 - **Runners and browsers:** every CI job except `setup-smoke-macos` (on `macos-latest`) runs on `ubuntu-24.04` with a
-  `timeout-minutes` limit. `behavior`, `website` and `audits` run in
+  `timeout-minutes` limit (15 for `check`, which ran 6.5 to 9.5 minutes in 2026-11). `behavior`, `website` and `audits` run in
   Playwright's image (`mcr.microsoft.com/playwright:v1.64.1-noble`, the
   pinned `@playwright/test` version), which ships the browsers and their
   system libraries, so no job installs them through apt; that step stalled

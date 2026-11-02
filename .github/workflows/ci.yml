@@ -32,7 +32,9 @@ jobs:
   check:
     name: Lint, types, unit tests, layers
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    # 15, not 10: the job ran 6.5 to 9.5 minutes in 2026-11 and a slow runner
+    # was cancelled at 10 (PLAN_014; owner-approved 2026-11-02).
+    timeout-minutes: 15
     steps:
       # Full history, so tests and scripts that read git (size revisions,
       # check-docs) see the same repository as a local clone.

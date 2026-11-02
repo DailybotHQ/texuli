@@ -215,6 +215,11 @@ interface Props {
   /** Called when a deck's design system applies or is refused. */
   onDesignSystem?: (event: PlayerDesignSystemEvent) => void;
   resolveAvatar?: (id: string) => string | undefined;
+  /**
+   * The heading level of the cover slide's title: `1` (default) when the
+   * deck is the page, `2` when it is embedded in a page with its own h1.
+   */
+  coverHeadingLevel?: 1 | 2;
   /** The engine controller (read-only binding) for imperative hosts. */
   controller?: DeckController | null;
   /** Replaces the default toolbar and progress bar. */
@@ -272,6 +277,7 @@ let {
   loadLibraryBase,
   onDesignSystem,
   resolveAvatar,
+  coverHeadingLevel = 1,
   controller = $bindable(null),
   chrome,
   tools,
@@ -1213,6 +1219,9 @@ const previewPaint: DeckPreviewPaint = {
   get resolveAvatar() {
     return resolveAvatar;
   },
+  get coverHeadingLevel() {
+    return coverHeadingLevel;
+  },
   palette: (slide) => paletteFor(slide),
 };
 // The presenter window (a second screen, opened from the split view): the
@@ -1501,6 +1510,7 @@ $effect(() => {
                 palette={paletteFor(entry.slide)}
                 {canvas}
                 {resolveAvatar}
+                {coverHeadingLevel}
                 enter={active && enter?.slideId === entry.slide.id ? enter.name : undefined}
                 enterDirection={enter?.direction}
                 bind:element={slideElements[entry.slide.id]}

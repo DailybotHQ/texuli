@@ -93,6 +93,7 @@ onMount(() => {
         palette={paint.palette(slide)}
         canvas={paint.canvas}
         resolveAvatar={paint.resolveAvatar}
+        coverHeadingLevel={paint.coverHeadingLevel}
       />
     </div>
   {/if}

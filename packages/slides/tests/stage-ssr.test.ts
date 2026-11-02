@@ -101,6 +101,19 @@ describe('DeckStage on the server', () => {
     expect(html).not.toContain('aria-busy="true"');
   }, 180_000);
 
+  it('titles the cover with h1 by default and with h2 when embedded (coverHeadingLevel)', async () => {
+    const coverTag = (html: string) =>
+      /<(h[12])[^>]*data-slot="title"[^>]*>\s*Small pieces on the server/.exec(html)?.[1];
+    expect(coverTag(await serverRender(HOST, deckOf(slides.hero)))).toBe('h1');
+    const embedded = HOST.replace(
+      'syncHash={false} />',
+      'syncHash={false} coverHeadingLevel={2} />'
+    );
+    const html = await serverRender(embedded, deckOf(slides.hero));
+    expect(coverTag(html)).toBe('h2');
+    expect(html).not.toMatch(/<h1\b/);
+  }, 180_000);
+
   it('renders free-slide blocks through the preloaded block families', async () => {
     const html = await serverRender(HOST, deckOf(slides.free, slides.hero));
     expect(html).toContain('data-slide-id="free"');

@@ -59,6 +59,7 @@ scoped styles.
 | `loadLibraryBase` | `loadDeckLibraryBase` (`DeckStage`); none on `DeckStageCore` | A `DeckLibraryBaseLoader`: loads a design system's `texuli:<theme>` reference or `extends` base that `designSystems.resolve` leaves `undefined`; none (or `null`) refuses it (G127, from `0.11.0`) |
 | `onDesignSystem` | — | Called with a `PlayerDesignSystemEvent` when a deck's design system applies or is refused |
 | `resolveAvatar` | — | Host adapter for `avatar:` image ids |
+| `coverHeadingLevel` | `1` | The heading level of the cover slide's title (`title-hero`): `1` when the deck is the page, `2` when it sits inside a page with its own h1, so the page keeps one h1. Every other layout titles its slide with h2. On `DeckStage` and `DeckStageCore`, and on `DeckSlideRenderContext` for custom renderers. In the repository source; ships with the next release after `0.12.0` |
 | `controller` | `null` | Read-only binding to the engine `DeckController` for imperative hosts |
 | `chrome` | — | Snippet that replaces the default toolbar and progress bar (the [chrome layers](#chrome) stay) |
 | `tools` | — | Snippet of host controls added to the default toolbar as its last group, labelled "More tools" (`stage.groupTools`), G82. They follow the stage's own tools in Tab order, stay out of the "More" fold, and the progress bar stays. Not rendered when `chrome` replaces the toolbar |

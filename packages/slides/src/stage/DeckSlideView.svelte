@@ -41,6 +41,8 @@ interface Props {
   palette: DeckBackgroundPalette;
   canvas: { width: number; height: number };
   resolveAvatar?: (id: string) => string | undefined;
+  /** The cover title's heading level (`DeckSlideRenderContext.coverHeadingLevel`). */
+  coverHeadingLevel?: 1 | 2;
   /** The CSS-fallback entrance (`fade`, `slide`, …) when this slide just became active. */
   enter?: string;
   enterDirection?: 'forward' | 'backward';
@@ -61,6 +63,7 @@ let {
   palette,
   canvas,
   resolveAvatar,
+  coverHeadingLevel = 1,
   enter,
   enterDirection,
   element = $bindable(),
@@ -99,6 +102,9 @@ let context: DeckSlideRenderContext = {
   },
   get resolveAvatar() {
     return resolveAvatar;
+  },
+  get coverHeadingLevel() {
+    return coverHeadingLevel;
   },
   get renderers() {
     return renderers;

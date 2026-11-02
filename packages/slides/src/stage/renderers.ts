@@ -62,6 +62,12 @@ export interface DeckSlideRenderContext {
   /** The fixed virtual canvas (1280 × 720 for 16:9): renderers lay out in these pixels. */
   readonly canvas: { readonly width: number; readonly height: number };
   readonly resolveAvatar?: (id: string) => string | undefined;
+  /**
+   * The heading level of the cover slide's title (`title-hero`): `1` by
+   * default, for a deck that is the page; `2` when the deck sits inside a
+   * page that has its own h1. Every other layout titles its slide with h2.
+   */
+  readonly coverHeadingLevel?: 1 | 2;
   /** The renderer list, so a free-slide renderer can resolve its component items. */
   readonly renderers: readonly DeckRenderers[];
 }

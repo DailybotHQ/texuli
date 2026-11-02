@@ -16,9 +16,15 @@ let p = $derived(slide.props);
   </div>
   <div class="hero" data-slot="hero">
     <span class="tx-deck-layout__accent" aria-hidden="true"></span>
-    <h1 class="tx-deck-layout__display" data-slot="title" data-clamp="3" {@attach fitText(56)}>
+    <svelte:element
+      this={context.coverHeadingLevel === 2 ? 'h2' : 'h1'}
+      class="tx-deck-layout__display"
+      data-slot="title"
+      data-clamp="3"
+      {@attach fitText(56)}
+    >
       {p.title}
-    </h1>
+    </svelte:element>
     {#if p.subtitle}
       <p class="tx-deck-layout__lead subtitle" data-slot="subtitle" data-clamp="2">{p.subtitle}</p>
     {/if}
