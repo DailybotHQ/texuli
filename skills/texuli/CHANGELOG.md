@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.3.14] — 2026-11-02
+
+### Changes
+
+- chore(skill): packages on npm at 0.12.1
+
 - The packages are on npm at `0.12.1`; decks embedded in a page take `coverHeadingLevel={2}`.
 
 ## [0.3.13] — 2026-11-02
