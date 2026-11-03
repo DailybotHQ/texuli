@@ -52,6 +52,8 @@ const resolveHref = (href: string): string | undefined => {
     text-align: center;
   }
   .home-final__copy {
+    position: relative;
+    z-index: 1;
     display: grid;
     gap: 1rem;
     justify-items: center;
@@ -78,7 +80,11 @@ const resolveHref = (href: string): string | undefined => {
     align-items: center;
     gap: 0.75rem 1rem;
   }
+  /* The art's upper sky is empty by design, so pull it up under the copy
+     (a percentage margin follows the art's own width, so the overlap keeps
+     the same proportion at every size). */
   .home-final__art {
     inline-size: 100%;
+    margin-block-start: -12%;
   }
 </style>
