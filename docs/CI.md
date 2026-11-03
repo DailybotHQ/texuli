@@ -146,10 +146,10 @@ branch gets no environment claim and npm refuses it. Trusted publishing
 covers `npm publish` only: `npm dist-tag` still needs the publishing
 account, from a terminal. The job installs npm `11.20.0` first (trusted
 publishing needs 11.5.1 or later). The former CI token ("Texuli Access
-Token") was revoked on npm on 2026-11-02. Setting each package to "Require
-2FA and disallow tokens" (`npm access set mfa=publish`, one 2FA check per
-package) would also refuse any other token of the publishing account;
-trusted publishing keeps working either way. The repository ruleset
+Token") was revoked on npm on 2026-11-02. Every published package is set to "Require
+2FA and disallow tokens" (`npm access set mfa=publish`, applied on
+2026-11-03, one 2FA check per package), so npm refuses any token of the
+publishing account; trusted publishing keeps working. The repository ruleset
 "main: no force-push or deletion" blocks rewriting or deleting `main`. It
 does not require pull requests, so writers can still push to `main`
 directly: GitHub does not let the Actions integration bypass a ruleset, and
