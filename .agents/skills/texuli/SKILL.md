@@ -41,7 +41,7 @@ agent config, or publish packages without explicit consent (see
 2. Confirm the workspace has Texuli (workspace packages `texuli`,
    `@texuli/core`, `@texuli/tokens`, …) before promising package imports.
    All 26 published packages are on npm in the 0.12 line, every one at
-   `0.12.2` (published by CI through npm trusted publishing
+   `0.12.3` (published by CI through npm trusted publishing
    with provenance; `latest` points to the newest, and `next` is no longer
    maintained and stays on `0.12.1`; pre-1.0, so a
    new minor may break and 1.0.0 will be the first stable release), so
@@ -55,7 +55,7 @@ agent config, or publish packages without explicit consent (see
    `@texuli/forms` (schema-driven forms), `@texuli/canvas` (the infinite
    canvas) and `@texuli/sheets` (spreadsheets; all three first published in
    `0.8.0`), and `@texuli/mcp` (the local MCP server, first published in
-   `0.9.0`) are in development but on npm as `0.12.2`. `0.11.0` adds
+   `0.9.0`) are in development but on npm as `0.12.3`. `0.11.0` adds
    `@texuli/tokens/library-ids` and the core design-system entries
    (`@texuli/tokens/design-system/compile-core`,
    `@texuli/player/design-system-core`), and the slides and pages core
