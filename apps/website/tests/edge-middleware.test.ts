@@ -620,6 +620,7 @@ describe('the middleware robots rewrite (T-28)', () => {
     expect(served.fetches).toEqual(['/robots.txt']);
     expect(response.status).toBe(200);
     expect(response.headers.get('content-type')).toBe('text/plain; charset=utf-8');
+    expect(response.headers.get('cache-control')).toBe('no-store');
     const body = await response.text();
     expect(body).not.toContain('Content-Signal:');
     expect(body).not.toContain('Agentmap:');
@@ -633,18 +634,28 @@ describe('the middleware robots rewrite (T-28)', () => {
     expect(fallback.status).toBe(404);
   });
 
-  it('never touches the asset pipeline for anyone else', async () => {
+  it('serves an in-page fetch the stripped variant (current Lighthouse and PageSpeed Insights)', async () => {
+    const served = robotsContext(CHROME, { '/robots.txt': POLICY });
+    served.context.request = new Request('https://texuli.com/robots.txt', {
+      headers: { 'user-agent': CHROME, 'sec-fetch-dest': 'empty' },
+    });
+    const body = await (await onRequest(served.context)).text();
+    expect(body).not.toContain('Content-Signal:');
+    expect(body).toContain('User-agent: *');
+  });
+
+  it('serves everyone else the full policy, uncached, so the edge never mixes the renderings', async () => {
     for (const userAgent of [
       'Mozilla/5.0 (Macintosh) AppleWebKit/537.36 Chrome/131 Safari/537.36',
       CLAUDEBOT,
       'GPTBot/1.0',
       null,
     ]) {
-      const { context, next, fetches } = robotsContext(userAgent, { '/robots.txt': POLICY });
+      const { context, next } = robotsContext(userAgent, { '/robots.txt': POLICY });
       const response = await onRequest(context);
-      expect(fetches, String(userAgent)).toEqual([]);
-      expect(next).toHaveBeenCalledTimes(1);
-      expect(await response.text()).not.toContain('User-agent: *');
+      expect(next, String(userAgent)).not.toHaveBeenCalled();
+      expect(response.headers.get('cache-control')).toBe('no-store');
+      expect(await response.text(), String(userAgent)).toBe(POLICY);
     }
   });
 });

@@ -126,20 +126,23 @@ export const onRequest = async (context: Context): Promise<Response> => {
     });
   }
   const userAgent = context.request.headers.get('user-agent');
-  // Auditing tools see the stripped robots variant (one text file, no other
-  // change): the full policy stays the default for every real crawler.
-  if (
-    url.pathname === '/robots.txt' &&
-    isStrictParserAudit(userAgent, context.request.headers.get('sec-fetch-dest'))
-  ) {
+  // robots.txt has two renderings: auditing tools see the stripped variant,
+  // every crawler the full policy. Both answer `no-store`, so the edge cache
+  // (which caches `.txt` by extension and ignores Vary) never hands one
+  // rendering to the other audience.
+  if (url.pathname === '/robots.txt') {
     const asset = new URL(context.request.url);
-    asset.pathname = '/robots.txt';
+    asset.search = '';
     const response = await context.env.ASSETS.fetch(new Request(asset));
     if (response.ok) {
       const policy = await response.text();
-      return new Response(`${stripDirectivesForStrictParsers(policy)}\n`, {
+      const strict = isStrictParserAudit(
+        context.request.headers.get('user-agent'),
+        context.request.headers.get('sec-fetch-dest')
+      );
+      return new Response(strict ? `${stripDirectivesForStrictParsers(policy)}\n` : policy, {
         status: 200,
-        headers: { 'content-type': 'text/plain; charset=utf-8' },
+        headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' },
       });
     }
   }

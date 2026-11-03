@@ -53,6 +53,9 @@ counting it also does is in [site-analytics.md](site-analytics.md)):
    `stripDirectivesForStrictParsers` (`robots-variants.ts`): the shipped
    policy minus its `Content-Signal` and `Agentmap` lines, which strict
    parsers flag although RFC 9309 says to ignore unknown directives.
+   Both renderings answer `Cache-Control: no-store`: the Cloudflare edge
+   caches `.txt` files by extension and ignores `Vary`, so a cached copy
+   would hand one audience's rendering to the other.
 2. **Markdown negotiation.** `negotiateTwin` (`md-negotiate.ts`) answers
    an explicit `text/markdown` Accept on every page path, `/` included
    (`markdownTwinFor`: `/` and `/index.html` → `/index.md`; `/a/b/`,
