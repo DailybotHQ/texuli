@@ -1,6 +1,6 @@
 {
   "name": "@texuli/catalog",
-  "version": "0.12.2",
+  "version": "0.12.3",
   "private": true,
   "description": "The agent catalog and the renderer with no HTML sinks.",
   "keywords": [
@@ -154,13 +154,13 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/blocks": "0.12.2",
-    "@texuli/charts": "0.12.2",
-    "@texuli/core": "0.12.2",
-    "@texuli/data": "0.12.2",
-    "@texuli/media": "0.12.2",
-    "@texuli/spec": "0.12.2",
-    "texuli": "0.12.2"
+    "@texuli/blocks": "0.12.3",
+    "@texuli/charts": "0.12.3",
+    "@texuli/core": "0.12.3",
+    "@texuli/data": "0.12.3",
+    "@texuli/media": "0.12.3",
+    "@texuli/spec": "0.12.3",
+    "texuli": "0.12.3"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"
