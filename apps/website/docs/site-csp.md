@@ -110,15 +110,16 @@ server configured from the manifest) before trusting a preview.
 | Directive | Covers |
 | --- | --- |
 | `default-src 'none'` | Deny-by-default for everything not named below |
-| `script-src 'self' + hashes` | Same-origin scripts and every inline script, including island boot code; a one-character change needs a new hash |
+| `script-src 'self' https://static.cloudflareinsights.com + hashes` | Same-origin scripts and every inline script, including island boot code (a one-character change needs a new hash), plus the Cloudflare Web Analytics beacon, which the Cloudflare edge injects into every production page (`CLOUDFLARE_WEB_ANALYTICS`) |
 | `style-src 'self' + hashes` | Same-origin stylesheets and every inline `<style>` element |
 | `style-src-attr 'unsafe-hashes' + hashes` | The generated `style="…"` attributes; `unsafe-hashes` here allows exactly those static values and no live style mutation |
 | `img-src` / `media-src` | Same origin plus `data:`, `blob:` and the fictional example origins the components document |
-| `font-src`, `manifest-src`, `connect-src`, `worker-src`, `frame-src` | Same origin only |
+| `connect-src 'self' https://cloudflareinsights.com` | Same origin (the Umami proxy included) plus the endpoint the Cloudflare Web Analytics beacon reports to |
+| `font-src`, `manifest-src`, `worker-src`, `frame-src` | Same origin only |
 | `object-src 'none'`, `base-uri 'none'` | No plugins, no base-tag hijack |
 | `form-action 'self'` | Submissions stay on-site |
 | `require-trusted-types-for 'script'` + `trusted-types svelte-trusted-html` | DOM sink injection requires the single allow-listed policy |
-| `trusted-types … texuli-analytics` (analytics pages only) | Added only on a page whose HTML mounts the Umami loader tag (`<script … data-umami-loader>`), so a build without `PUBLIC_UMAMI_WEBSITE_ID` keeps exactly `trusted-types svelte-trusted-html`. `public/umami-loader.js` creates the policy, and its `createScriptURL` returns only the one configured script URL (throwing for any other). Nothing else is broadened: `script-src` stays `'self'` + hashes |
+| `trusted-types … texuli-analytics` (analytics pages only) | Added only on a page whose HTML mounts the Umami loader tag (`<script … data-umami-loader>`), so a build without `PUBLIC_UMAMI_WEBSITE_ID` keeps exactly `trusted-types svelte-trusted-html`. `public/umami-loader.js` creates the policy, and its `createScriptURL` returns only the one configured script URL (throwing for any other). Nothing else is broadened: `script-src` stays `'self'`, the Cloudflare beacon origin and hashes |
 
 ## What is not covered
 
