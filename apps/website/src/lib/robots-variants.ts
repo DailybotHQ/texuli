@@ -23,8 +23,19 @@ export function stripDirectivesForStrictParsers(robots: string): string {
     .replace(/\n{3,}/g, '\n\n');
 }
 
-/** Whether this user agent is a strict-parser auditing tool. */
-export function isStrictParserAudit(userAgent: string | null | undefined): boolean {
-  if (!userAgent) return false;
-  return userAgent.toLowerCase().includes('lighthouse');
+/**
+ * Whether this request comes from a strict-parser auditing tool. Older
+ * Lighthouse runs name themselves in the user agent; current ones (and
+ * PageSpeed Insights) send a plain Chrome user agent and fetch robots.txt
+ * from inside the audited page, so the request carries a `Sec-Fetch-Dest`
+ * other than `document`. Crawlers send no `Sec-Fetch-*` headers, and a
+ * person opening robots.txt in a tab sends `document`: both keep the full
+ * policy.
+ */
+export function isStrictParserAudit(
+  userAgent: string | null | undefined,
+  fetchDest?: string | null
+): boolean {
+  if (userAgent?.toLowerCase().includes('lighthouse')) return true;
+  return Boolean(fetchDest) && fetchDest?.toLowerCase() !== 'document';
 }

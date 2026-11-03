@@ -45,11 +45,17 @@ Cloudflare Pages Functions from the repository root. The site itself stays
 `apps/website/src/lib/` and does three things, in order (the bot-event
 counting it also does is in [site-analytics.md](site-analytics.md)):
 
-1. **Strict-parser robots.** For Lighthouse-family user agents
-   (`isStrictParserAudit`) it serves `/robots.txt` through
+1. **Strict-parser robots.** For Lighthouse-family requests
+   (`isStrictParserAudit`: a user agent naming Lighthouse, or an in-page
+   fetch with a `Sec-Fetch-Dest` other than `document`, which is how
+   Lighthouse 12 and PageSpeed Insights read robots.txt with a plain Chrome
+   user agent) it serves `/robots.txt` through
    `stripDirectivesForStrictParsers` (`robots-variants.ts`): the shipped
    policy minus its `Content-Signal` and `Agentmap` lines, which strict
    parsers flag although RFC 9309 says to ignore unknown directives.
+   Both renderings answer `Cache-Control: no-store`: the Cloudflare edge
+   caches `.txt` files by extension and ignores `Vary`, so a cached copy
+   would hand one audience's rendering to the other.
 2. **Markdown negotiation.** `negotiateTwin` (`md-negotiate.ts`) answers
    an explicit `text/markdown` Accept on every page path, `/` included
    (`markdownTwinFor`: `/` and `/index.html` → `/index.md`; `/a/b/`,
