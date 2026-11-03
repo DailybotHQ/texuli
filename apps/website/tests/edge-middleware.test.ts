@@ -103,6 +103,16 @@ describe('user-agent classification', () => {
       expect(isStrictParserAudit(userAgent), String(userAgent)).toBe(false);
     }
   });
+
+  it('isStrictParserAudit recognizes the in-page robots fetch of current Lighthouse runs', () => {
+    // Lighthouse 12 and PageSpeed Insights send a plain Chrome user agent and
+    // fetch robots.txt from the audited page (Sec-Fetch-Dest: empty).
+    expect(isStrictParserAudit(CHROME, 'empty')).toBe(true);
+    // A tab opening robots.txt and a crawler (no Sec-Fetch-* at all) keep the full policy.
+    expect(isStrictParserAudit(CHROME, 'document')).toBe(false);
+    expect(isStrictParserAudit(CLAUDEBOT, null)).toBe(false);
+    expect(isStrictParserAudit(CLAUDEBOT, undefined)).toBe(false);
+  });
 });
 
 describe('Markdown twins: negotiation and rendition', () => {

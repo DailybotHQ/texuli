@@ -8,7 +8,8 @@
  * non-browser client that misses gets a Markdown 404 body (RFC 9457
  * `application/problem+json` under `/api/` and for JSON clients) instead of
  * the HTML 404; a strict-parser
- * auditing tool (Lighthouse family) gets the stripped robots variant;
+ * auditing tool (Lighthouse family, by user agent or an in-page fetch)
+ * gets the stripped robots variant;
  * counted bot page hits and served twins emit UA-class + path events
  * through the same-origin Umami proxy via waitUntil (never blocking the
  * response, silent unless `PUBLIC_UMAMI_WEBSITE_ID` is provisioned).
@@ -127,7 +128,10 @@ export const onRequest = async (context: Context): Promise<Response> => {
   const userAgent = context.request.headers.get('user-agent');
   // Auditing tools see the stripped robots variant (one text file, no other
   // change): the full policy stays the default for every real crawler.
-  if (url.pathname === '/robots.txt' && isStrictParserAudit(userAgent)) {
+  if (
+    url.pathname === '/robots.txt' &&
+    isStrictParserAudit(userAgent, context.request.headers.get('sec-fetch-dest'))
+  ) {
     const asset = new URL(context.request.url);
     asset.pathname = '/robots.txt';
     const response = await context.env.ASSETS.fetch(new Request(asset));
