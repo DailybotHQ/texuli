@@ -45,6 +45,7 @@ import {
 } from '../../../packages/tools/src/ops/index.ts';
 import {
   ANALYTICS_TRUSTED_TYPES_POLICY,
+  CLOUDFLARE_WEB_ANALYTICS,
   decodeJsString,
   type InjectedChunk,
   pageInjectedStyles,
@@ -214,8 +215,19 @@ describe('pagePolicy: trusted types (T-100 S-1) and hashes', () => {
     expect(ANALYTICS_TRUSTED_TYPES_POLICY).toBe('texuli-analytics');
     expect(directive(policy, 'trusted-types')).toBe('svelte-trusted-html texuli-analytics');
     expect(directive(policy, 'require-trusted-types-for')).toBe("'script'");
-    expect(directive(policy, 'script-src')).toBe("'self'");
+    expect(directive(policy, 'script-src')).toBe(`'self' ${CLOUDFLARE_WEB_ANALYTICS.script}`);
     expect(policy).not.toContain("'allow-duplicates'");
+  });
+
+  it('allows Cloudflare Web Analytics (injected at the edge) and no other foreign origin', () => {
+    const policy = pagePolicy('<!doctype html><html><head></head><body></body></html>');
+    expect(CLOUDFLARE_WEB_ANALYTICS).toEqual({
+      script: 'https://static.cloudflareinsights.com',
+      connect: 'https://cloudflareinsights.com',
+    });
+    expect(directive(policy, 'script-src')).toBe("'self' https://static.cloudflareinsights.com");
+    expect(directive(policy, 'connect-src')).toBe("'self' https://cloudflareinsights.com");
+    expect(policy).not.toContain('umami.is');
   });
 
   it('hashes each inline source, so a changed script needs a new hash; maps files to routes; report-only adds its group', () => {
@@ -224,7 +236,9 @@ describe('pagePolicy: trusted types (T-100 S-1) and hashes', () => {
     const html =
       '<html><head><script>window.ready=1</script><script src="/a.js"></script><style>p{color:red}</style></head><body><p style="margin:0">x</p></body></html>';
     const policy = pagePolicy(html);
-    expect(directive(policy, 'script-src')).toBe(`'self' ${sha('window.ready=1')}`);
+    expect(directive(policy, 'script-src')).toBe(
+      `'self' ${CLOUDFLARE_WEB_ANALYTICS.script} ${sha('window.ready=1')}`
+    );
     expect(directive(policy, 'style-src')).toBe(`'self' ${sha('p{color:red}')}`);
     expect(directive(policy, 'style-src-attr')).toBe(`'unsafe-hashes' ${sha('margin:0')}`);
     expect(policy).not.toMatch(/'unsafe-(?:inline|eval)'/);

@@ -81,7 +81,7 @@ test('static sections and SSR fallback survive strict CSP while the island hydra
   baseURL,
 }) => {
   const policy = pagePolicy(html);
-  expect(policy).toContain("script-src 'self' 'sha256-");
+  expect(policy).toContain("script-src 'self' https://static.cloudflareinsights.com 'sha256-");
   expect(policy).toContain("require-trusted-types-for 'script'");
   expect(policy).not.toMatch(/'unsafe-(?:inline|eval)'/);
 

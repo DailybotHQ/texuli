@@ -45,8 +45,9 @@ committed build).
 
 ## Only the first-party proxy works under the enforced CSP
 
-The enforced page policy allows `script-src 'self'` and `connect-src 'self'`
-and has no carve-out for an analytics origin ([site-csp.md](site-csp.md)).
+The enforced page policy allows no Umami origin but its own: its one
+foreign analytics allowance is Cloudflare Web Analytics, which the Cloudflare
+edge injects into production pages ([site-csp.md](site-csp.md)).
 A direct Umami Cloud script, or any foreign `PUBLIC_UMAMI_SCRIPT_URL`, would
 be blocked by the browser and record nothing. `src/lib/constances.ts`
 therefore fails closed: when the resolved script source is not a

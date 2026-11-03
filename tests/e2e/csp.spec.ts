@@ -445,7 +445,7 @@ test('the built website hydrates its islands under each page policy, which both 
     const reportOnly = response?.headers()['content-security-policy-report-only'];
     expect(policy).toBe(pagePolicy(readFileSync(join(SITE_DIST, 'index.html'), 'utf8')));
     expect(reportOnly).toBe(`${policy}; report-to texuli-csp`);
-    expect(policy).toContain("script-src 'self' 'sha256-");
+    expect(policy).toContain("script-src 'self' https://static.cloudflareinsights.com 'sha256-");
     expect(policy).toContain("style-src 'self' 'sha256-");
     expect(policy).toContain("require-trusted-types-for 'script'");
     expect(policy).not.toMatch(/'unsafe-(?:inline|eval)'/);

@@ -105,6 +105,18 @@ export function trustedTypesPolicies(html: string): string[] {
     : ['svelte-trusted-html'];
 }
 
+/**
+ * Cloudflare Web Analytics, which the Cloudflare edge injects into every HTML
+ * answer of the production project at serve time (so the build never sees
+ * it): the origin of its beacon script and the origin it reports to. These
+ * are the only foreign script and connect origins in the site policy; Umami
+ * stays same-origin through the `/api/umami/*` proxy.
+ */
+export const CLOUDFLARE_WEB_ANALYTICS = Object.freeze({
+  script: 'https://static.cloudflareinsights.com',
+  connect: 'https://cloudflareinsights.com',
+});
+
 export interface PagePolicyOptions {
   /** Extra `connect-src` origins (the configured agent service, on the agent chat page only). */
   connect?: readonly string[];
@@ -215,7 +227,7 @@ export function pagePolicy(html: string, options: PagePolicyOptions = {}): strin
   const styles = [...pageSources(html).styles, ...(options.injectedStyles ?? [])];
   return [
     "default-src 'none'",
-    `script-src 'self' ${hashes(scripts)}`.trim(),
+    `script-src 'self' ${CLOUDFLARE_WEB_ANALYTICS.script} ${hashes(scripts)}`.trim(),
     `style-src 'self' ${hashes(styles)}`.trim(),
     // Static, generated style attributes need their exact hashes. No dynamic
     // style attribute gains permission from these page-specific values.
@@ -224,7 +236,7 @@ export function pagePolicy(html: string, options: PagePolicyOptions = {}): strin
     "font-src 'self'",
     "media-src 'self' blob: https://example.com https://media.example.test",
     "manifest-src 'self'",
-    ["connect-src 'self'", ...(options.connect ?? [])].join(' '),
+    ["connect-src 'self'", CLOUDFLARE_WEB_ANALYTICS.connect, ...(options.connect ?? [])].join(' '),
     "worker-src 'self'",
     "frame-src 'self'",
     "object-src 'none'",

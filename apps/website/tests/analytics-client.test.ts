@@ -77,8 +77,9 @@ describe('ANALYTICS gating', () => {
     });
   });
 
-  // The enforced CSP allows `script-src 'self'` and `connect-src 'self'` only,
-  // so direct mode or a foreign script would be a silent off: fail closed.
+  // The enforced CSP allows no Umami origin but its own (only Cloudflare Web
+  // Analytics is a foreign origin there), so direct mode or a foreign script
+  // would be a silent off: fail closed.
   it('fails closed in direct mode and on every non-same-origin script override', async () => {
     const off = { enabled: false, scriptUrl: '', hostUrl: '' };
     const direct = await loadConstances({
