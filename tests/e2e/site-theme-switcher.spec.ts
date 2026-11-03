@@ -114,3 +114,42 @@ test('lists and paints the library, switches theme and mode, filters, and persis
   expect(await bodyLuminance(page)).toBeLessThan(0.35);
   expect(foreign).toEqual([]);
 });
+
+test('the header switch darkens a theme picked on the theme page, on any page', async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto(`${origin()}/theme-switcher/`);
+  await settle(page);
+  await clickMode(page, 'Light');
+  const ocean = page.locator('[data-theme-id="ocean"]');
+  const pick = (await ocean.count()) > 0 ? ocean : page.getByRole('option').nth(2);
+  const chosen = await pick.getAttribute('data-theme-id');
+  await pick.click();
+  await expect.poll(() => themeAttr(page), { timeout: 15_000 }).toBe(chosen);
+
+  // Another page replays the theme from the cache, then the header goes dark.
+  await page.goto(`${origin()}/`);
+  await settle(page);
+  expect(await themeAttr(page)).toBe(chosen);
+  const appearance = page.getByRole('group', { name: 'Appearance' });
+  await appearance
+    .getByRole('radio', { name: 'Dark' })
+    .or(appearance.getByRole('button', { name: 'Dark' }))
+    .click();
+  await expect.poll(() => modeAttr(page), { timeout: 15_000 }).toBe('dark');
+  await expect.poll(() => bodyLuminance(page), { timeout: 15_000 }).toBeLessThan(0.35);
+  expect(await themeAttr(page)).toBe(chosen);
+
+  await page.reload();
+  await settle(page);
+  expect(await modeAttr(page)).toBe('dark');
+  expect(await bodyLuminance(page)).toBeLessThan(0.35);
+  expect(await themeAttr(page)).toBe(chosen);
+
+  await appearance
+    .getByRole('radio', { name: 'Light' })
+    .or(appearance.getByRole('button', { name: 'Light' }))
+    .click();
+  await expect.poll(() => bodyLuminance(page), { timeout: 15_000 }).toBeGreaterThan(0.6);
+});
