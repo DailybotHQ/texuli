@@ -49,7 +49,7 @@ export const PARITY_ROWS: readonly ParityRow[] = [
     capability: 'Component vocabulary and prop schemas',
     web: {
       status: 'exists',
-      detail: 'Generated from the manifests and shipped in the npm packages (0.12.2).',
+      detail: 'Generated from the manifests and shipped in the npm packages (0.12.3).',
       surface: 'packages/spec/generated/typescript/vocabulary.ts',
     },
     native: {

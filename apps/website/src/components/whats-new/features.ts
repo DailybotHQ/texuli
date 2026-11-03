@@ -22,7 +22,7 @@ export const RELEASES: readonly Release[] = [
     id: '0.12.0',
     title: '0.12.0: pages core entries without the deck model',
     status:
-      'Published on npm as 0.12.0; its patch 0.12.1 adds coverHeadingLevel to the @texuli/slides stage, and its patch 0.12.2, the current release (pre-1.0), is the first published through npm trusted publishing.',
+      'Published on npm as 0.12.0; its patch 0.12.1 adds coverHeadingLevel to the @texuli/slides stage, its patch 0.12.2 is the first published through npm trusted publishing, and its patch 0.12.3, the current release (pre-1.0), has no package code change.',
     published: true,
     summary:
       'Protoyard G136 finished: the @texuli/pages core entries (PageEditorCore, CollabEditorCore, PagesEditor and createDocumentPlayerHostCore) validate documents without @texuli/deck/model, so @texuli/pages/editor-core and host-core are much smaller. Breaking for those core entries only: they take validateDeck with no default and refuse inline decks without it, a one-line migration (validateDeck: checkDeckPayload from @texuli/document/schema); PageEditor, CollabEditor and createDocumentPlayerHost behave as before. Blueprint spec stays 0.10.0.',
