@@ -197,7 +197,8 @@ planned.
 planned. The generated decoders read the `spreadsheet` id's `sheet`
 (`$defs.sheet`: format, version and members), and `PropSchemaValidator`
 applies the 1-to-16-tab cap and each tab's row (10,000) and column (256)
-ranges, as TypeScript does; the `sheet-format` invalid fixture runs in
+ranges, as TypeScript does; the three sheet invalid fixtures
+(`sheet-format`, `sheet-extra-field`, `sheet-rows`) run in
 `InvalidFixtureParityTest`. Cell inputs, the formula grammar and its closed
 function set are checked by `@texuli/sheets/model` on the web only. The
 Compose renderer fails closed: `spreadsheet` is not in `NativeRegistry`, so
@@ -371,6 +372,8 @@ run on the JVM and (for `texuli-spec`) the iOS simulator as well.
 | `SpecValidatorTest` | `texuli-spec` | `validateBlueprint` reports the TypeScript validator's codes, fails the portable profile closed, judges named slots; spec 0.3.0 state, bindings, `bind`, `on` actions, property schemas and `deprecated` warnings with the TypeScript codes and paths |
 | `WorkflowValidatorTest` | `texuli-spec` | Workflow graph rules (ids, types, fields, ports, multiplicity, kinds, cycles), label control and bidi refusals, and the 500-node / 2,000-edge limits |
 | `MotionTest` | `texuli-spec` | Spec 0.6.0 motion: closed decoding into the plan, `schema` refusals of CSS, milliseconds, unknown names and a huge stagger, level precedence, `subtle`, and the stagger cap |
+| `SurfaceTest` | `texuli-spec` | The twin of the spec's state surface rules (`surface.ts`): list item text refuses control, bidi and invisible characters; form nodes sit inside an `action-form`; controls and flow nodes name declared state and handled events, with the TypeScript codes and paths |
+| `DocumentKeyTest` | `texuli-spec` | Spec 0.7.0 node keys (well formed and unique in the tree) and the `document` node's shape, judged as `validateBlueprint` judges them |
 | `RenderPlanTest` | `texuli-spec` | The render plan's tier gate: ids whose catalog `emit` list lacks the tier become `tier-denied` placeholders (default tier `untrusted`), checked for every catalog id |
 | `SourceTest` | `texuli-spec` | Spec 0.8.0 data-source bindings: a valid binding passes with the host's sources and fails closed without them, the TypeScript refusals (unknown source, a URL name, extra members, page size, fields, sort, operators, values, map, mixed keys, nested bindings), a 10,000-level filter, descriptor decoding and bound plan nodes |
 | `AccessibilityTest` | `texuli-compose` | Image alternatives (blank alt is decorative) and heading ranks clamped to 1-6 |
