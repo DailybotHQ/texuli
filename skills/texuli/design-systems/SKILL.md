@@ -13,7 +13,9 @@ metadata: {"openclaw":{"emoji":"▣","homepage":"https://texuli.com/guides/","re
 Use this sub-skill when the developer wants **a brand as data**: one
 design-system document (format `texuli/design-system`, `formatVersion` 1)
 that every Texuli surface follows: components, the blueprint player,
-documents, decks, email, PDF, DOCX, PPTX, canvas and the Kotlin twin. For a
+documents, decks, email, PDF, DOCX, PPTX and canvas. The Kotlin twin decodes
+the document and paints with token sets compiled on the web side (no Kotlin
+compiler for a brand document yet). For a
 quick library theme instead, use [`../themes/SKILL.md`](../themes/SKILL.md).
 
 > **Released in `0.10.0`.** The document, compiler, runtime, importers,
