@@ -90,7 +90,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       {
         name: '@texuli/tokens',
         role: 'The OKLCH theme engine, the --tx-* token contract, 200+ themes, compiled CSS, forced colors, the AA gate, the Tailwind preset',
-        dependsOn: [],
+        dependsOn: ['spec'],
       },
     ],
   },
@@ -190,6 +190,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
           'catalog',
           'charts',
           'chat',
+          'core',
           'data',
           'media',
           'primitives',
@@ -217,7 +218,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       {
         name: '@texuli/slides',
         role: 'The Svelte 5 presentation stage on @texuli/deck (canvas, routes, chrome, overview, presenter window, the 21 layouts, backgrounds, the component registry), print and PPTX export, and the model v1 subpaths kept from 0.3.0; in development',
-        dependsOn: ['blocks', 'catalog', 'deck', 'media', 'player', 'tokens'],
+        dependsOn: ['blocks', 'catalog', 'core', 'deck', 'media', 'player', 'tokens'],
       },
       {
         name: '@texuli/pages',
