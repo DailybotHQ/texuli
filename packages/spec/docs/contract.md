@@ -169,7 +169,8 @@ its normative files moved without a version until 0.2.0.
   codes.
 - **Blueprints:** a blueprint binds to an exact catalog hash. From 0.3.0
   an envelope may declare the exact spec version it was written for
-  (`spec`, an enum of the current version; omitted means 0.2.0). A field
+  (`spec`, an enum of the versions the migration chain reaches, `0.3.0`
+  through the current one; omitted means 0.2.0). A field
   for a compatible spec *range* is **planned, not built**.
 
 **Migrations** (`src/migrations/<from>-<to>.ts`, exported from

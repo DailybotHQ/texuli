@@ -141,7 +141,7 @@ moves stored data up. The result still goes through `validateDraft`.
 The envelope's optional `spec` field follows the blueprint contract
 (`@texuli/spec/migrate`). `parseEnvelope` accepts the versions in
 `SUPPORTED_SPEC_VERSIONS`, the targets of the migration chain (today `0.3.0`
-and `0.4.0`, the same enum as `blueprint.schema.json`), and an envelope with
+through `0.10.0`, the same enum as `blueprint.schema.json`), and an envelope with
 no `spec`, which was written for the undeclared baseline `0.2.0`. An explicit
 `"spec": "0.2.0"` is accepted only through migration: `validateDraft` runs
 `migrateBlueprint` first, which stamps the current version, so the validated
