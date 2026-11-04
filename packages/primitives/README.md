@@ -6,6 +6,8 @@ possibilities.*). Each primitive implements the behavior of a WAI-ARIA
 Authoring Practices pattern (roles, keyboard, focus, dismissal, form
 participation) and renders unstyled markup, so you bring your own design.
 
+**In the stack:** layer L1: owned headless primitives on the `@texuli/core` texels (plus `@texuli/date` and `@texuli/drag`). The `texuli` components (L3) and the domain packages build on them.
+
 Use it when you are building a design system or styled components on
 Svelte 5 and want accessible behavior you do not have to write yourself.
 For ready-styled components, use [`texuli`](https://www.npmjs.com/package/texuli),

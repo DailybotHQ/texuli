@@ -11,6 +11,8 @@ patches, text twins, a typed builder, brief outlines and templates. It has no
 Svelte and no DOM: the `@texuli/slides` stage presents its decks, and Node
 tools and agents can use it on its own.
 
+**In the stack:** layer L0: framework-free, with no dependencies. `@texuli/slides` (the stage), `@texuli/document` (inline decks), `@texuli/canvas` and `@texuli/tools` build on it.
+
 > **Status: in development (pre-1.0).** `@texuli/deck` is published on npm
 > as `0.12.3`, with provenance (first published as `0.4.0`). It was built in PLAN_008
 > (ADR-009 in

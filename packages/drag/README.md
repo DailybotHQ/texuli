@@ -9,6 +9,8 @@ drag and an agent's move. It is part of [Texuli](https://texuli.com),
 "Small pieces. Infinite possibilities.": an MIT Svelte 5 component library
 by Dailybot, Inc.
 
+**In the stack:** layer L0: framework-free, with no dependencies. The `@texuli/primitives` sortable, `@texuli/data`, `@texuli/workflows`, `@texuli/canvas` and `@texuli/pages` build on it.
+
 > **Status: in development (pre-1.0).** `@texuli/drag` is on npm as
 > `0.12.3`, with provenance (first published as `0.3.0` on 2026-10-28). It
 > powers `@texuli/primitives/sortable`, the `@texuli/data` board, tree view,

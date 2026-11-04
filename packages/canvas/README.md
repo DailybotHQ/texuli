@@ -9,6 +9,8 @@ clipboard and undo through an op log, all in a framework-free model; CRDT
 collaboration on `@texuli/document/sync`; an accessible Svelte 5 editor and
 viewer; and SVG and PNG export with no HTML sinks.
 
+**In the stack:** layer L4, a domain package on the `@texuli/core` texels, `@texuli/drag`, `@texuli/document` (sync), `@texuli/deck` and the `texuli` components. The player paints it through its `canvasHost` seam.
+
 > **Status: in development (pre-1.0).** `@texuli/canvas` is published on
 > npm as `0.12.3`, with provenance (first published as `0.8.0`; built in PLAN_010).
 > Under 0.x a new minor (`0.12.0`) may contain breaking changes, so pin the
@@ -66,7 +68,7 @@ dependencies come with it. Import the token stylesheet once
 | `./viewer` | `CanvasViewer`: a read-only canvas with its structure as text | [viewer](https://github.com/DailybotHQ/texuli/blob/main/packages/canvas/docs/viewer.md) |
 | `./host` | `createCanvasPlayerHost`: the `canvasHost` of `@texuli/player` for agent canvases | [host](https://github.com/DailybotHQ/texuli/blob/main/packages/canvas/docs/host.md) |
 
-`CANVAS_PACKAGE_VERSION` equals the package version (`0.9.0`).
+`CANVAS_PACKAGE_VERSION` equals the package version (`0.12.3`).
 
 ## Security
 
@@ -93,6 +95,12 @@ shared live region. Motion (zoom and fit) plays through `texuli/motion`
 and is instant under reduced motion. Forced colors keep outlines, focus and
 selection visible. The keyboard model is in
 [editor](https://github.com/DailybotHQ/texuli/blob/main/packages/canvas/docs/editor.md).
+
+## Contributing
+
+Contributions are welcome; start at the
+[GitHub repository](https://github.com/DailybotHQ/texuli)
+(issues: [github.com/DailybotHQ/texuli/issues](https://github.com/DailybotHQ/texuli/issues)).
 
 ## License
 

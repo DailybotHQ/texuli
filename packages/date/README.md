@@ -6,6 +6,8 @@ Infinite possibilities.*). `@texuli/date` is the date arithmetic behind
 Texuli's calendar, date field and date picker primitives: a `CalendarDate`
 without a clock time, plus the month and week helpers a calendar grid needs.
 
+**In the stack:** layer L0, beside the `@texuli/core` texels; no dependencies. `@texuli/primitives` (calendar, date field, date picker) and `@texuli/sheets` build on it.
+
 Use it when you work with the values those primitives read and emit, or when
 you need small, framework-free date-only math (add months, find the start of
 a locale's week, count the weeks in a month) without a larger date library.

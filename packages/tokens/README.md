@@ -7,6 +7,8 @@ property contract every styled Texuli component reads, computes palettes in
 OKLCH, ships a library of 210 ready-made themes, generates new themes from a
 brand color, a mood or an image, and checks contrast against WCAG AA.
 
+**In the stack:** layer L2: the token engine, on `@texuli/spec` (the design-system contract). The `texuli` components (L3), the domain packages and `@texuli/astro` read its `--tx-*` tokens.
+
 Use it to theme the [`texuli`](https://www.npmjs.com/package/texuli)
 components, or on its own as a framework-free token engine for any CSS
 (including a Tailwind 4 preset). The engine is plain TypeScript with no

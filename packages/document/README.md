@@ -9,6 +9,8 @@ import and export, the pagination engine, owned DOCX and PDF writers, and
 the CRDT sync core. It has no Svelte and no DOM: Node tools, agents and the
 `@texuli/pages` editor all use the same engine.
 
+**In the stack:** layer L1, on the `@texuli/core` texels and `@texuli/deck`. `@texuli/pages`, `@texuli/canvas` (CRDT sync) and `@texuli/tools` build on it.
+
 > **Status: in development (pre-1.0).** `@texuli/document` is published on
 > npm as `0.12.3`, with provenance (first published as `0.7.0`; built in PLAN_010,
 > ADR-010 and ADR-011 in

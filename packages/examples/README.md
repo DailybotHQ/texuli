@@ -1,13 +1,20 @@
 # @texuli/examples
 
-**Private** workspace package: one registry of named component examples shared by
-the fixture app, visual suite, a11y sweep and website. Write an example once;
-tests, screenshots and docs all read it.
+**Private** workspace package of [Texuli](https://texuli.com) (*Small pieces.
+Infinite possibilities.*): one registry of named examples, from `@texuli/core`
+texels through primitives, `texuli` components and the domain packages,
+shared by the fixture app, visual suite, a11y sweep and website. Write an
+example once; tests, screenshots and docs all read it. It is not a layer:
+`scripts/check-layers.ts` lists it as a consumer, so it may import any
+package, and it publishes nothing to npm.
 
 ## Status
 
-The registry API and a seed example (`core-safe-href` over `@texuli/core`
-`safeHref`) ship. Component packages add entry modules as they land.
+The registry API ships with entries for every package area (`core-safe-href`,
+the primitives, `texuli` components and layouts, blocks, charts, data, media,
+chat, editor, forms, canvas, sheets, workflows, slides, player and the Astro
+sections). Each area is one directory in `src/` whose `entry.ts` or
+`entries.ts` registers its examples; `src/index.ts` imports them all.
 
 ## Public API
 
@@ -17,7 +24,8 @@ The registry API and a seed example (`core-safe-href` over `@texuli/core`
 | `getExample(id)` | Look up one entry |
 | `listExamples(filter?)` | Stable id order; optional `tag` / `component` filters |
 | `listExampleIds()` | Ids only |
-| `ExampleMeta` / `ExampleEntry` / `ExampleFilter` | Types |
+| `ExampleMeta` / `ExampleEntry` / `ExampleFilter` / `ExampleModule` | Types |
+| `<name>Example` (for example `texuliComboboxExample`, `canvasEditorExample`, `workflowsViewerExample`) | Some entries are also exported by name for direct use; see `src/index.ts` |
 | `reportBlueprint` / `dashboardBlueprint` / `deckBlueprint` | The player fixture blueprints (fictional data), plain JSON trees; the website builder uses them as starters |
 
 ```ts
@@ -54,6 +62,7 @@ registration runs when consumers import `@texuli/examples`.
 | `/?fixture=smoke` | Original smoke fixture (URL policy links) |
 | `/?fixture=examples` | Lists every registered example |
 | `/?fixture=<id>` | Loads and renders that example |
+| `/?fixture=builder`, `/?fixture=builder-draft` | The website builder island, standalone |
 
 ## Layout
 
@@ -63,11 +72,12 @@ packages/examples/
 ├── tsconfig.json
 ├── README.md
 ├── src/
-│   ├── index.ts              public barrel (imports entries)
+│   ├── index.ts              public barrel (imports every area's entries)
 │   ├── types.ts
 │   ├── registry.ts
-│   ├── entries/              one module per example (side-effect register)
-│   └── demos/                Svelte demo components
+│   ├── scoped-theme.ts       scope a library theme mode to one example
+│   ├── <area>/               entry.ts or entries.ts (side-effect register) + demo .svelte files
+│   └── demos/                SafeHrefDemo.svelte (the core-safe-href demo)
 └── tests/
     ├── registry.test.ts               the registry and the public barrel
     ├── registration-side-effects.test.ts
@@ -86,7 +96,7 @@ npx biome check packages/examples
 ## Rules
 
 - Private package: not published; consumers are in-repo only.
-- Dependencies point down only (`core`, later styled packages). No website import reverse.
+- A consumer, not a layer: it may import any package, but no package or layer imports it back. The website reads it; it never imports the website.
 - No `{@html}`, `eval` or `innerHTML` in demos. Links and images go through `@texuli/core` URL helpers.
 - Lazy `load()` so unused demos stay out of first paint.
 

@@ -7,6 +7,8 @@ connected to it can search the component catalog, read manifests and worked
 examples, validate blueprint drafts, search and preview themes with their
 WCAG AA report, and run the deck and document commands.
 
+**In the stack:** layer L9, the top: a thin bin over the stdio MCP server in `@texuli/tools` (L8), which reads the agent catalog (L6) and the `@texuli/tokens` themes.
+
 > **Status: in development (pre-1.0).** `@texuli/mcp` is published on npm
 > as `0.12.3`, with provenance (first published as `0.9.0`). Under 0.x a new minor
 > (`0.12.0`) may contain breaking changes, so pin the exact version or use
