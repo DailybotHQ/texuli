@@ -314,7 +314,10 @@ texuli ds check examples/design-systems/tumbletown.json --render   # paints the 
 
 `--render` paints every agent-emittable catalog component under the design
 system in headless chromium and checks axe, the painted contrast of every
-pair and colors that do not come from the design system. In a CI job,
+pair and colors that do not come from the design system. It paints the
+conformance sheet that ships inside `@texuli/tools`, so it runs in any
+project with `playwright` and `@axe-core/playwright` installed (the command
+names the packages when they are missing). In a CI job,
 `@texuli/tools/ds-check` runs the same checks from your own tests
 (`checkDesignSystem` for the static half, `runDsRenderChecks` on a page you
 opened). Details: [ds-check.md](../packages/tools/docs/ds-check.md).

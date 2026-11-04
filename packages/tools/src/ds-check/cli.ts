@@ -2,14 +2,19 @@
 /**
  * `texuli ds check <file> [--json] [--render] [--mode light|dark|all]
  * [--variant <name>]… [--trust developer|untrusted] [--base <file>]…
- * [--url <page>] [--known <file>] [--strict]`.
+ * [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict]`.
  *
  * Exit codes: 0 when every check passes, 1 on any refusal or render
  * finding, 2 when the check could not run (a bad flag, an unreadable file,
  * or a missing `--render` requirement).
  */
 import { readFile, stat } from 'node:fs/promises';
-import { DsCheckRequirementError, parseKnownFindings, renderDesignSystemCheck } from './render.ts';
+import {
+  DS_CHECK_BUILTIN_SHEET,
+  DsCheckRequirementError,
+  parseKnownFindings,
+  renderDesignSystemCheck,
+} from './render.ts';
 import { checkDesignSystem, serializeDsCheckReport } from './static.ts';
 import type { DsCheckMode, DsCheckReport } from './types.ts';
 
@@ -17,7 +22,7 @@ import type { DsCheckMode, DsCheckReport } from './types.ts';
 export const DS_CHECK_MAX_BYTES = 1_000_000;
 
 export const DS_CHECK_USAGE =
-  'Usage: texuli ds check <file> [--json] [--render] [--mode light|dark|all] [--variant <name>]... [--trust developer|untrusted] [--base <file>]... [--url <page>] [--known <file>] [--strict]';
+  'Usage: texuli ds check <file> [--json] [--render] [--mode light|dark|all] [--variant <name>]... [--trust developer|untrusted] [--base <file>]... [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict]';
 
 export interface DsCliArgs {
   command: 'check';
@@ -28,6 +33,8 @@ export interface DsCliArgs {
   variants?: string[];
   trust?: 'developer' | 'untrusted';
   bases: string[];
+  /** The sheet `--render` paints: `builtin` (the default, inside `@texuli/tools`) or a built page. */
+  sheet?: string;
   url?: string;
   /** A JSON file of known findings (`[{ component, element, property, reason }]`). */
   known?: string;
@@ -75,6 +82,7 @@ export function parseDsCliArgs(argv: readonly string[]): DsCliArgs {
         throw new TypeError('Flag --trust is "developer" or "untrusted".');
       args.trust = trust;
     } else if (arg === '--base') args.bases.push(value());
+    else if (arg === '--sheet') args.sheet = value();
     else if (arg === '--url') args.url = value();
     else if (arg === '--known') args.known = value();
     else if (arg.startsWith('-')) throw new TypeError(`Unknown ds check flag "${arg}".`);
@@ -83,6 +91,9 @@ export function parseDsCliArgs(argv: readonly string[]): DsCliArgs {
   }
   if (args.file === undefined) throw new TypeError(`ds check needs a file. ${DS_CHECK_USAGE}`);
   if (args.url !== undefined && !args.render) throw new TypeError('Flag --url needs --render.');
+  if (args.sheet !== undefined && !args.render) throw new TypeError('Flag --sheet needs --render.');
+  if (args.sheet !== undefined && args.url !== undefined)
+    throw new TypeError('Flags --sheet and --url are exclusive: --url checks a page you serve.');
   if (args.strict && !args.render) throw new TypeError('Flag --strict needs --render.');
   if (args.known !== undefined && !args.render) throw new TypeError('Flag --known needs --render.');
   return args;
@@ -161,7 +172,7 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
   }
   if (args.help) {
     stdout.write(
-      `${DS_CHECK_USAGE}\n\nValidate, compile and check a design-system document: the spec's codes, the guarantees (aa-text, aa-focus, target-size) and the contrast report, for the base document and its high-contrast variant. --render also paints every agent-emittable catalog component under it in a headless browser (Playwright) and checks axe, the painted contrast and colors that do not follow the design system; known findings (none in the library; --known <file> adds your own) are listed and do not fail unless --strict.\nExit 0 pass, 1 refusal or finding, 2 could not run.\n`
+      `${DS_CHECK_USAGE}\n\nValidate, compile and check a design-system document: the spec's codes, the guarantees (aa-text, aa-focus, target-size) and the contrast report, for the base document and its high-contrast variant. --render also paints every agent-emittable catalog component under it in a headless browser and checks axe, the painted contrast and colors that do not follow the design system; known findings (none in the library; --known <file> adds your own) are listed and do not fail unless --strict.\n\n--render paints the conformance sheet that ships inside @texuli/tools (--sheet ${DS_CHECK_BUILTIN_SHEET}, the default; no bundler needed). --sheet <page.html> serves a page you built that installs @texuli/tools/ds-check/host, and --url <page> checks a page you serve. It needs "playwright" (or "@playwright/test") and "@axe-core/playwright" as dev dependencies of your project, and chromium (npx playwright install chromium); the static checks need neither.\nExit 0 pass, 1 refusal or finding, 2 could not run.\n`
     );
     return { ok: true };
   }
@@ -190,6 +201,7 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
     if (args.render && report.runs.some((run) => run.compiled))
       report = await renderDesignSystemCheck(report, {
         ...(args.url ? { url: args.url } : {}),
+        ...(args.sheet ? { sheet: args.sheet } : {}),
         ...(known ? { known } : {}),
         ...(args.strict ? { strict: true } : {}),
         ...(args.modes ? { modes: args.modes } : {}),

@@ -9,14 +9,22 @@
  * scope's `--tx-*` variables.
  *
  * Playwright and `@axe-core/playwright` are loaded only here, at run time,
- * from the caller's install: `@texuli/tools` does not depend on either.
- * Without them {@link renderDesignSystemCheck} throws a
- * {@link DsCheckRequirementError} that names what to install.
+ * from the project that runs the check: `@texuli/tools` does not depend on
+ * either. Without them {@link renderDesignSystemCheck} throws a
+ * {@link DsCheckRequirementError} that names the exact packages to install.
+ *
+ * The sheet ships inside the published package (`dist/ds-check/sheet/`, a
+ * built page with every component bundled) and is served from there by a
+ * read-only static server, so a consumer needs no bundler and no Texuli
+ * repository; `--sheet <page.html>` serves a page you built instead, and
+ * `--url` checks a page you serve yourself.
  */
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
+import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
-import { dirname, join, resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import type { AddressInfo } from 'node:net';
+import { basename, dirname, extname, join, resolve, sep } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { CompiledDesignSystem } from '@texuli/tokens/design-system/compile';
 import { issueCodes } from './static.ts';
 import {
@@ -33,7 +41,7 @@ import {
   type DsRenderRun,
 } from './types.ts';
 
-/** The fixture-app page the repository serves the catalog sheet from. */
+/** The sheet page: the built-in sheet's file name, and the fixture-app page of the repository. */
 export const DS_CHECK_SHEET_PATH = 'ds-conformance.html';
 
 /**
@@ -95,7 +103,7 @@ export function knownFinding(
   );
 }
 
-/** A missing requirement of `--render` (Playwright, axe, or a sheet page). */
+/** A missing requirement of `--render` (Playwright, axe, chromium, or a sheet page). */
 export class DsCheckRequirementError extends Error {
   override name = 'DsCheckRequirementError';
 }
@@ -242,27 +250,38 @@ export async function runDsRenderChecks(
   return out;
 }
 
-const importOptional = (specifier: string): Promise<unknown> => import(specifier);
+// ── requirements: Playwright and axe, from the project that runs the check ──
+
+/** The Playwright packages that provide chromium, in the order they are tried. */
+export const DS_CHECK_PLAYWRIGHT_PACKAGES = ['playwright', '@playwright/test', 'playwright-core'];
+
+/** The axe package the render check runs inside the sheet. */
+export const DS_CHECK_AXE_PACKAGE = '@axe-core/playwright';
+
+/** Loads one optional package by name; rejects when it is not installed. */
+export type DsModuleLoader = (specifier: string) => Promise<unknown>;
+
+/**
+ * The default loader: the package as the project in `cwd` resolves it (so a
+ * strict pnpm install, where `@texuli/tools` cannot see the project's dev
+ * dependencies, still finds them), then as `@texuli/tools` itself does.
+ */
+export function projectModuleLoader(cwd: string = process.cwd()): DsModuleLoader {
+  const fromProject = createRequire(join(resolve(cwd), 'package.json'));
+  return async (specifier) => {
+    try {
+      return fromProject(specifier) as unknown;
+    } catch {
+      return (await import(specifier)) as unknown;
+    }
+  };
+}
 
 interface ChromiumLike {
   launch(options?: { headless?: boolean }): Promise<{
     newContext(): Promise<{ newPage(): Promise<DsCheckPage> }>;
     close(): Promise<void>;
   }>;
-}
-
-async function loadChromium(): Promise<ChromiumLike> {
-  for (const name of ['playwright', '@playwright/test', 'playwright-core']) {
-    try {
-      const mod = (await importOptional(name)) as { chromium?: ChromiumLike };
-      if (mod.chromium) return mod.chromium;
-    } catch {
-      // try the next one
-    }
-  }
-  throw new DsCheckRequirementError(
-    'texuli ds check --render needs Playwright with chromium: install "@playwright/test" (or "playwright") as a dev dependency, then run "npx playwright install chromium". The static checks run without it.'
-  );
 }
 
 type AxeBuilderClass = new (options: {
@@ -275,6 +294,62 @@ type AxeBuilderClass = new (options: {
   }>;
 };
 
+/** What `--render` loads from the project: chromium and the axe builder (absent when not asked for). */
+export interface DsRenderModules {
+  chromium: ChromiumLike;
+  AxeBuilder?: AxeBuilderClass;
+}
+
+/** The message of a missing render requirement: the exact packages, and the command that installs them. */
+export function missingRenderPackagesMessage(missing: readonly string[]): string {
+  const one = missing.length === 1;
+  const list = missing.map((name) => `"${name}"`).join(' and ');
+  const alternative = missing.includes('playwright')
+    ? '; "@playwright/test" also works in place of "playwright"'
+    : '';
+  return `texuli ds check --render needs ${list}, which ${one ? 'is' : 'are'} not installed in this project. Install ${one ? 'it as a dev dependency' : 'them as dev dependencies'} (npm install --save-dev ${missing.join(' ')}${alternative}), then run "npx playwright install chromium". @texuli/tools does not depend on ${one ? 'it' : 'them'}, and the static checks run without ${one ? 'it' : 'them'}.`;
+}
+
+/**
+ * Load Playwright's chromium and (unless `axe: false`, when the caller runs
+ * its own axe) `@axe-core/playwright` from the project. Throws one
+ * {@link DsCheckRequirementError} that names every missing package.
+ */
+export async function loadRenderModules(
+  load: DsModuleLoader = projectModuleLoader(),
+  options: { axe?: boolean } = {}
+): Promise<DsRenderModules> {
+  const needAxe = options.axe ?? true;
+  let chromium: ChromiumLike | undefined;
+  for (const name of DS_CHECK_PLAYWRIGHT_PACKAGES) {
+    try {
+      const mod = (await load(name)) as { chromium?: ChromiumLike } | undefined;
+      chromium = mod?.chromium;
+    } catch {
+      chromium = undefined;
+    }
+    if (chromium) break;
+  }
+  let AxeBuilder: AxeBuilderClass | undefined;
+  if (needAxe)
+    try {
+      const mod = (await load(DS_CHECK_AXE_PACKAGE)) as {
+        default?: AxeBuilderClass;
+        AxeBuilder?: AxeBuilderClass;
+      };
+      AxeBuilder = mod?.AxeBuilder ?? mod?.default;
+    } catch {
+      AxeBuilder = undefined;
+    }
+  const missing = [
+    ...(chromium ? [] : ['playwright']),
+    ...(!needAxe || typeof AxeBuilder === 'function' ? [] : [DS_CHECK_AXE_PACKAGE]),
+  ];
+  if (missing.length > 0 || !chromium)
+    throw new DsCheckRequirementError(missingRenderPackagesMessage(missing));
+  return AxeBuilder ? { chromium, AxeBuilder } : { chromium };
+}
+
 /** The WCAG A and AA tags of the a11y sweeps (tests/e2e/support/site.ts adds best-practice). */
 export const DS_CHECK_AXE_TAGS = [
   'wcag2a',
@@ -285,23 +360,7 @@ export const DS_CHECK_AXE_TAGS = [
   'wcag22aa',
 ];
 
-/** An axe runner over `@axe-core/playwright`, scoped to the sheet. */
-export async function playwrightAxeRunner(): Promise<DsAxeRunner> {
-  let Builder: AxeBuilderClass | undefined;
-  try {
-    const mod = (await importOptional('@axe-core/playwright')) as {
-      default?: AxeBuilderClass;
-      AxeBuilder?: AxeBuilderClass;
-    };
-    Builder = mod.default ?? mod.AxeBuilder;
-  } catch {
-    Builder = undefined;
-  }
-  if (!Builder)
-    throw new DsCheckRequirementError(
-      'texuli ds check --render needs "@axe-core/playwright" for the axe check: install it as a dev dependency next to Playwright.'
-    );
-  const AxeBuilder = Builder;
+function axeRunner(AxeBuilder: AxeBuilderClass): DsAxeRunner {
   return async (page) => {
     const builder = new AxeBuilder({ page }) as {
       include(selector: string): typeof builder;
@@ -321,6 +380,40 @@ export async function playwrightAxeRunner(): Promise<DsAxeRunner> {
   };
 }
 
+/** An axe runner over `@axe-core/playwright` (as the project in `cwd` resolves it), scoped to the sheet. */
+export async function playwrightAxeRunner(cwd?: string): Promise<DsAxeRunner> {
+  const load = projectModuleLoader(cwd);
+  let Builder: AxeBuilderClass | undefined;
+  try {
+    const mod = (await load(DS_CHECK_AXE_PACKAGE)) as {
+      default?: AxeBuilderClass;
+      AxeBuilder?: AxeBuilderClass;
+    };
+    Builder = mod?.AxeBuilder ?? mod?.default;
+  } catch {
+    Builder = undefined;
+  }
+  if (typeof Builder !== 'function')
+    throw new DsCheckRequirementError(missingRenderPackagesMessage([DS_CHECK_AXE_PACKAGE]));
+  return axeRunner(Builder);
+}
+
+// ── the sheet ───────────────────────────────────────────────────────────
+
+/** The `--sheet` value of the conformance sheet that ships inside `@texuli/tools`. */
+export const DS_CHECK_BUILTIN_SHEET = 'builtin';
+
+/**
+ * Where the published package keeps its built conformance sheet: beside this
+ * module, in `dist/ds-check/sheet/` (`pnpm verify:packages` builds it from
+ * `tests/fixtures/app/ds-conformance.html`, every component bundled, so it
+ * needs no bundler and no other Texuli package at run time). A source
+ * checkout has no built sheet; there the repository's fixture app serves it.
+ */
+export function builtinSheetDir(): string {
+  return fileURLToPath(new URL('./sheet/', import.meta.url));
+}
+
 /** The repository's fixture app above `from`, when there is one. */
 export function findSheetApp(from: string): string | undefined {
   for (let dir = resolve(from); ; dir = dirname(dir)) {
@@ -331,6 +424,105 @@ export function findSheetApp(from: string): string | undefined {
   }
 }
 
+/** How a sheet is served: a built page as static files, or the repository's fixture app through Vite. */
+export type DsCheckSheetSource =
+  | { kind: 'static'; dir: string; page: string; builtin: boolean }
+  | { kind: 'repository'; app: string };
+
+/**
+ * Resolve `--sheet`: `builtin` (the default) is the sheet inside this
+ * package, or, in a source checkout without one, the repository's fixture
+ * app; any other value is a built HTML page (a file path, relative to
+ * `cwd`) that installs `@texuli/tools/ds-check/host`, served with the files
+ * of its folder. Throws a {@link DsCheckRequirementError} when there is none.
+ */
+export function resolveDsCheckSheet(
+  sheet: string = DS_CHECK_BUILTIN_SHEET,
+  options: { cwd?: string; builtinDir?: string } = {}
+): DsCheckSheetSource {
+  const cwd = options.cwd ?? process.cwd();
+  if (sheet === DS_CHECK_BUILTIN_SHEET) {
+    const dir = options.builtinDir ?? builtinSheetDir();
+    if (existsSync(join(dir, DS_CHECK_SHEET_PATH)))
+      return { kind: 'static', dir, page: DS_CHECK_SHEET_PATH, builtin: true };
+    const app = findSheetApp(cwd);
+    if (app) return { kind: 'repository', app };
+    throw new DsCheckRequirementError(
+      `texuli ds check --render could not find the built-in conformance sheet (${join(dir, DS_CHECK_SHEET_PATH)}): it ships in the published @texuli/tools package, so reinstall it, or pass --sheet <page.html> (a built page that installs @texuli/tools/ds-check/host) or --url <page>.`
+    );
+  }
+  const file = resolve(cwd, sheet);
+  if (!/\.html?$/iu.test(file) || !existsSync(file) || !statSync(file).isFile())
+    throw new DsCheckRequirementError(
+      `texuli ds check --sheet ${sheet}: not an HTML file. Pass "builtin" (the default) or a built page (.html) that installs @texuli/tools/ds-check/host.`
+    );
+  return { kind: 'static', dir: dirname(file), page: basename(file), builtin: false };
+}
+
+const CONTENT_TYPES: Readonly<Record<string, string>> = {
+  '.html': 'text/html; charset=utf-8',
+  '.htm': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.mjs': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json',
+  '.svg': 'image/svg+xml',
+  '.png': 'image/png',
+  '.webp': 'image/webp',
+  '.woff2': 'font/woff2',
+  '.woff': 'font/woff',
+  '.wasm': 'application/wasm',
+};
+
+/**
+ * Serve the files of `dir` on 127.0.0.1 (an ephemeral port), read-only:
+ * GET and HEAD only, nothing outside `dir`, no directory listing.
+ */
+export async function serveSheetDirectory(
+  dir: string,
+  page: string = DS_CHECK_SHEET_PATH
+): Promise<{ url: string; close(): Promise<void> }> {
+  const root = resolve(dir);
+  const server = createServer((request, response) => {
+    const send = (status: number, body = '') => {
+      response.writeHead(status, { 'content-type': 'text/plain; charset=utf-8' });
+      response.end(body);
+    };
+    if (request.method !== 'GET' && request.method !== 'HEAD') return send(405);
+    let path: string;
+    try {
+      path = decodeURIComponent(new URL(request.url ?? '/', 'http://127.0.0.1').pathname);
+    } catch {
+      return send(400);
+    }
+    const file = resolve(root, `.${path}`);
+    if ((file !== root && !file.startsWith(`${root}${sep}`)) || path.includes('\0'))
+      return send(404);
+    let body: Buffer;
+    try {
+      if (!statSync(file).isFile()) return send(404);
+      body = readFileSync(file);
+    } catch {
+      return send(404);
+    }
+    response.writeHead(200, {
+      'content-type': CONTENT_TYPES[extname(file).toLowerCase()] ?? 'application/octet-stream',
+      'content-length': body.byteLength,
+      'cache-control': 'no-store',
+    });
+    response.end(request.method === 'HEAD' ? undefined : body);
+  });
+  await new Promise<void>((done, fail) => {
+    server.once('error', fail);
+    server.listen(0, '127.0.0.1', () => done());
+  });
+  const { port } = server.address() as AddressInfo;
+  return {
+    url: `http://127.0.0.1:${port}/${page.split('/').map(encodeURIComponent).join('/')}`,
+    close: () => new Promise<void>((done) => server.close(() => done())),
+  };
+}
+
 interface ViteLike {
   createServer(config: Record<string, unknown>): Promise<{
     listen(): Promise<unknown>;
@@ -339,14 +531,14 @@ interface ViteLike {
   }>;
 }
 
-async function startSheetServer(app: string) {
+async function startRepositorySheet(app: string) {
   let vite: ViteLike;
   try {
     const entry = createRequire(join(app, 'package.json')).resolve('vite');
-    vite = (await importOptional(pathToFileURL(entry).href)) as ViteLike;
+    vite = (await import(pathToFileURL(entry).href)) as ViteLike;
   } catch {
     throw new DsCheckRequirementError(
-      'texuli ds check --render serves the repository sheet with Vite, which is not installed here. Pass --url <page> to check a page you serve.'
+      'texuli ds check --render serves the repository sheet with Vite, which is not installed here. Pass --sheet <page.html> or --url <page> to check a page you built.'
     );
   }
   const server = await vite.createServer({
@@ -364,39 +556,60 @@ async function startSheetServer(app: string) {
   return { url: new URL(DS_CHECK_SHEET_PATH, base).href, close: () => server.close() };
 }
 
+/** Start serving a resolved sheet; returns its URL and how to stop it. */
+export async function startDsCheckSheet(
+  source: DsCheckSheetSource
+): Promise<{ url: string; close(): Promise<void> }> {
+  return source.kind === 'static'
+    ? serveSheetDirectory(source.dir, source.page)
+    : startRepositorySheet(source.app);
+}
+
 export interface RenderDesignSystemCheckOptions extends DsRenderOptions {
-  /** A page that hosts the ds-check host; default: the repository's fixture-app sheet. */
+  /** A page that already hosts the ds-check host (you serve it); overrides `sheet`. */
   url?: string;
-  /** Where to look for the repository (default: the working directory). */
+  /**
+   * The sheet to serve: `builtin` (default), the conformance sheet inside
+   * `@texuli/tools`, or the path of a built HTML page that installs the host.
+   */
+  sheet?: string;
+  /** The project that runs the check: where Playwright and axe resolve from and relative paths start (default: the working directory). */
   cwd?: string;
+  /** How optional packages load (default {@link projectModuleLoader} of `cwd`). */
+  load?: DsModuleLoader;
 }
 
 /**
  * Add the render checks to a static report: launch headless chromium, open
- * the sheet (the repository's fixture app through Vite, or `url`), and run
- * {@link runDsRenderChecks} for every compiled run. Throws a
- * {@link DsCheckRequirementError} when Playwright, axe or a sheet is missing.
+ * the sheet (the built-in conformance sheet by default, a page you built
+ * with `sheet`, or `url`), and run {@link runDsRenderChecks} for every
+ * compiled run. Throws a {@link DsCheckRequirementError} when Playwright,
+ * axe, chromium or a sheet is missing.
  */
 export async function renderDesignSystemCheck(
   report: DsCheckReport,
   options: RenderDesignSystemCheckOptions = {}
 ): Promise<DsCheckReport> {
-  const chromium = await loadChromium();
-  const axe = options.axe ?? (await playwrightAxeRunner());
-  let url = options.url;
-  let stop: (() => Promise<void>) | undefined;
-  if (url === undefined) {
-    const app = findSheetApp(options.cwd ?? process.cwd());
-    if (!app)
-      throw new DsCheckRequirementError(
-        `texuli ds check --render needs a sheet page: run it inside the Texuli repository (tests/fixtures/app/${DS_CHECK_SHEET_PATH}), or pass --url <page> that installs @texuli/tools/ds-check/host.`
-      );
-    const server = await startSheetServer(app);
-    url = server.url;
-    stop = server.close;
-  }
-  const browser = await chromium.launch({ headless: true });
+  const cwd = options.cwd ?? process.cwd();
+  const modules = await loadRenderModules(options.load ?? projectModuleLoader(cwd), {
+    axe: options.axe === undefined,
+  });
+  const axe = options.axe ?? axeRunner(modules.AxeBuilder as AxeBuilderClass);
+  const source =
+    options.url === undefined ? resolveDsCheckSheet(options.sheet, { cwd }) : undefined;
+  let browser: Awaited<ReturnType<ChromiumLike['launch']>>;
   try {
+    browser = await modules.chromium.launch({ headless: true });
+  } catch (error) {
+    const reason = error instanceof Error ? error.message.split('\n')[0] : String(error);
+    throw new DsCheckRequirementError(
+      `texuli ds check --render could not launch chromium (${reason}). Run "npx playwright install chromium" in this project.`
+    );
+  }
+  let server: { url: string; close(): Promise<void> } | undefined;
+  try {
+    server = source ? await startDsCheckSheet(source) : undefined;
+    const url = options.url ?? (server?.url as string);
     // axe needs a page of an explicit context.
     const page = await (await browser.newContext()).newPage();
     await page.goto(url, { timeout: options.timeoutMs ?? 60_000 });
@@ -412,6 +625,6 @@ export async function renderDesignSystemCheck(
     };
   } finally {
     await browser.close();
-    await stop?.();
+    await server?.close();
   }
 }

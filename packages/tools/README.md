@@ -131,7 +131,8 @@ read-only `document` tool; see
 document and reports the spec's codes, the guarantees and the contrast
 report (`--json`); `--render` also paints the agent-emittable catalog
 components under it in headless chromium (axe, painted contrast, literal
-colors). The `@texuli/tools/ds-check` subpath runs the same checks in your
+colors), from the conformance sheet this package ships (no bundler needed;
+your project installs `playwright` and `@axe-core/playwright`). The `@texuli/tools/ds-check` subpath runs the same checks in your
 own tests; see
 [ds-check.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ds-check.md).
 The `ds.*` operations (validate, compile to JSON, CSS, Tailwind, DTCG or
