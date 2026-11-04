@@ -36,5 +36,5 @@ horizontal scrolling at 360 and 768 px with the disclosures open
 
 ## Limits
 
-- **No release links:** the page shows the commands for a Texuli checkout and a downloaded release archive. It links to no release, because none is published yet.
+- **Releases:** the page names the latest skill release (`skill-vX.Y.Z`, read from the pack's `CHANGELOG.md` at build time), pins its commands to that version, and links to the repository's releases page for the archive and its `SHA256SUMS`. Before the first stamped release it shows `<version>` instead.
 - **Discovery:** whether a host discovers the installed folder is that host's behavior.

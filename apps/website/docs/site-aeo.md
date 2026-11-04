@@ -42,10 +42,16 @@ middleware also does is in [site-analytics.md](site-analytics.md).
 
 Cloudflare Pages Functions from the repository root. The site itself stays
 `output: 'static'`; the middleware imports pure decision modules from
-`apps/website/src/lib/` and does three things, in order (the bot-event
-counting it also does is in [site-analytics.md](site-analytics.md)):
+`apps/website/src/lib/`. It first routes `/.well-known/mcp` to the remote
+MCP server (`functions/_lib/mcp-server.ts`), passes `/mcp` untouched to
+its Function ([site-mcp-server.md](site-mcp-server.md)) and answers every
+`/api` request with the JSON API envelope ([site-api.md](site-api.md)).
+Then it does three things, in order (the bot-event counting it also does
+is in [site-analytics.md](site-analytics.md)):
 
-1. **Strict-parser robots.** For Lighthouse-family requests
+1. **Robots, two renderings.** The middleware answers every `/robots.txt`
+   request itself, from the built file: crawlers and people get the full
+   policy. For Lighthouse-family requests
    (`isStrictParserAudit`: a user agent naming Lighthouse, or an in-page
    fetch with a `Sec-Fetch-Dest` other than `document`, which is how
    Lighthouse 12 and PageSpeed Insights read robots.txt with a plain Chrome
@@ -85,6 +91,9 @@ counting it also does is in [site-analytics.md](site-analytics.md)):
    path as `instance`, `guide: <origin>/llms.txt`). Browsers and
    Lighthouse keep the static `404.html`.
 
+Extensionless discovery files (`/.well-known/api-catalog` and the OAuth
+stubs) answered 200 are relabelled with their declared content type, since
+Pages guesses `application/octet-stream` for a file with no extension.
 Every other response is returned as the very object `context.next()` gave,
 never a rebuilt copy: Cloudflare Pages applies `_headers` only to that
 asset response, so a copy would drop the page CSP (PLAN_006 T-100 S-2). The
@@ -111,6 +120,9 @@ to every route whose twin file exists (see [site-csp.md](site-csp.md)).
   between the layout's `<!--tx-page-body-->` markers (every `BaseLayout`
   page; the landing branch carries them too), else `<main>`, else `<body>`,
   through `htmlToMarkdown` (headings, prose, lists, tables, links, code).
+  Elements marked `hidden` or `aria-hidden="true"` are dropped with all of
+  their content; screen-reader-only text (`visually-hidden`) is content
+  and stays, and a table's `<caption>` is kept above the table.
   Images keep their facts: informative `alt` text becomes `![alt](src)`
   (or the alt text alone for a non-site source), a labelled SVG
   (`role="img"` with `aria-label`) keeps its label, and decorative images
@@ -158,7 +170,7 @@ to every route whose twin file exists (see [site-csp.md](site-csp.md)).
 | Every built page but the allowlist has a twin with a valid header block, a head link and a manifest entry | `scripts/check-md-parity.ts --strict` after a build (CI website shard 1); `scripts/tests/check-md-parity.test.ts`; the AEO audit in `tests/e2e/site-seo.spec.ts` |
 | Twin paths, the allowlist, the header block and its parser, the rendition (title, links, alt text, layout tables) and the "For agents" notes | `apps/website/tests/twins.test.ts` |
 | `/index.md` and non-docs twins served, Accept negotiation on `/` and non-docs pages with `Vary`, the head link, the Markdown 404 | `tests/e2e/site-twins.spec.ts` (the real middleware in front of the built `dist`) |
-| The Markdown rendition keeps content, drops controls and hidden text, and writes one separator row per table | `apps/website/tests/docs-reading.test.ts`, `apps/website/tests/edge-middleware.test.ts` |
+| The Markdown rendition keeps content, screen-reader text and table captions, drops controls and hidden elements (nesting included), and writes one separator row per table | `apps/website/tests/docs-reading.test.ts`, `apps/website/tests/edge-middleware.test.ts` |
 | Component twin ids equal the llms component-doc ids | `scripts/tests/check-llms-parity.test.ts` |
 | The `.well-known` files describe only real surfaces and the server card names exactly the shipped tools | `apps/website/tests/site-build-guards.test.ts` |
 | The built `.well-known` files parse, their on-site URLs resolve and the skill digests match | the AEO audit in `tests/e2e/site-seo.spec.ts` |
@@ -212,12 +224,16 @@ reported `43 top routes, 654 twins, 8 .well-known files: 0 critical,
 
 ## Deviations and limits
 
-- **No edge run is recorded.** `wrangler` is not a workspace dependency
-  (adding it needs the owner), so the middleware is proven by unit tests
-  over the exact `Request`/`Response`/`ASSETS` shapes, not by
-  `wrangler pages dev` or a deployed origin. Whether Functions run for the
-  texuli.com Pages project (root-directory override, Functions enabled) is
-  an open owner question.
+- **Functions run on texuli.com; no local edge run.** The Pages Functions
+  run for the texuli.com project: a read-only check on 2026-11-03 got
+  `/robots.txt` with `cache-control: no-store` and `/` with
+  `Accept: text/markdown` as `text/markdown; charset=utf-8`, and CI's
+  post-deploy `mcp-remote-smoke` job lists the tools of
+  `https://texuli.com/mcp` after every deploy of `main`. `wrangler` is not
+  a workspace dependency (adding it needs the owner), so locally the
+  middleware is proven by unit tests over the exact
+  `Request`/`Response`/`ASSETS` shapes and by the e2e specs that run it in
+  front of `dist`, not by `wrangler pages dev`.
 - **Static-only fallback.** If Functions do not run, every file above is
   still served as a plain static file: twins are fetchable at their `.md`
   URLs, agents get the HTML `404.html`, and every crawler gets the one
@@ -245,7 +261,7 @@ site until a scan after the deploy of `main` (run
 | `robotsTxt` | `/robots.txt` (`buildRobots`) | Shipped (passed in the baseline) |
 | `sitemap` | `/sitemap.xml` (SEO integration) | Shipped (passed in the baseline) |
 | `linkHeaders` | `Link` on every HTML page in `dist/_headers` (`linkHeaderLine`): `api-catalog`, `service-desc` (`/openapi.json`, which every build writes since T-ar-api), `describedby` (`/llms.txt`), `ai-catalog`, and `alternate` `text/markdown` where a twin is built; the middleware's twins carry the same targets | Shipped in this repo |
-| `dnsAid` | SVCB/HTTPS records under `_agents.texuli.com` with DNSSEC | Owner action (DNS); not in the repository |
+| `dnsAid` | SVCB records `_index._agents.texuli.com` and `_mcp._agents.texuli.com` (`alpn=mcp`, `port=443`, target `texuli.com`), signed with DNSSEC | Live on the texuli.com DNS (account configuration, not in the repository) |
 | `markdownNegotiation` | The middleware's twin negotiation on every page path: `GET https://texuli.com` with `Accept: text/markdown` gets `/index.md` as `text/markdown; charset=utf-8` with `Vary: Accept` (T-ar-twins); every page has a twin and a head link | Shipped in this repo (answers the baseline's failed request); verified against the deployed site only by a scan after the deploy of `main` |
 | `robotsTxtAiRules` | The 16 named `AI_CRAWLERS` groups | Shipped (passed in the baseline) |
 | `contentSignals` | `Content-Signal: ai-train=yes, search=yes, ai-input=yes` in every robots group | Shipped |
@@ -279,6 +295,18 @@ directive from `buildRobots` in the same change.
 
 
 
+### Agent discovery over DNS (DNS-AID)
+
+Besides the HTTP discovery files, texuli.com publishes two DNS-AID SVCB
+records: `_index._agents.texuli.com` (the agent index) and
+`_mcp._agents.texuli.com` (the remote MCP), both priority 1 with target
+`texuli.com`, `alpn=mcp` and `port=443`. The zone is signed with DNSSEC,
+so a validating resolver returns them authenticated. They are account
+configuration in Cloudflare DNS, not files in this repository: no build or
+test checks them, and a change goes through the DNS owner. Check them with
+`dig _mcp._agents.texuli.com TYPE64` (the `ad` flag shows a validated
+answer).
+
 ### Measuring the score
 
 `pnpm exec tsx scripts/agent-readiness-scan.ts <https-url> [--out <file.json>] [--require-all-pass] [--allow <check>,…]`
@@ -293,15 +321,15 @@ check this repository controls, but four checks cannot pass there:
 `oauthProtectedResource` and `personalAgentProtocol` compare their documents
 with the scanned host (they name `https://texuli.com`), `authMd` fetches the
 OAuth metadata from texuli.com itself, and `dnsAid` needs DNS records with
-DNSSEC. Preview scans pass `--allow dnsAid,oauthProtectedResource,authMd,personalAgentProtocol`;
-the texuli.com scan after a release allows only `dnsAid`, and only while the
-owner has not enabled DNSSEC.
+DNSSEC on the scanned host. Preview scans pass `--allow dnsAid,oauthProtectedResource,authMd,personalAgentProtocol`;
+the texuli.com scan after a release needs no allowance for `dnsAid`, since
+its records and DNSSEC are live.
 
 Owner-only actions (Cloudflare dashboard and DNS, never this repository):
 
-1. **DNSSEC** for texuli.com (Cloudflare DNS → DNSSEC → enable, then add the
-   DS record at the registrar). The scanner already finds DNS-AID records;
-   it fails only because DNSSEC is not validated.
+1. **DNS-AID and DNSSEC** for texuli.com (done; see "Agent discovery over
+   DNS" below). Keep the DS record at the registrar in step with
+   Cloudflare's key if DNSSEC is ever re-enabled.
 2. **Content Signals:** keep Cloudflare's managed Content Signals (AI Crawl
    Control) off; robots.txt here owns them.
 3. **Crawler access:** confirm AI Crawl Control and Bot Fight Mode do not

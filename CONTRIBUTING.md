@@ -14,7 +14,7 @@ AGENTS.md wins.
 - First session: [AI_AGENT_ONBOARDING](docs/AI_AGENT_ONBOARDING.md).
   Working beside other contributors in one checkout:
   [AI_AGENT_COLLAB](docs/AI_AGENT_COLLAB.md).
-- Install once with `pnpm install` (Node 24 and pnpm). Owner-held files
+- Install once with `pnpm install` (Node 24.20 or newer and pnpm 11). Owner-held files
   (`package.json`, `pnpm-lock.yaml`, `biome.json`, `tsconfig.base.json`, …)
   change only with the owner.
 

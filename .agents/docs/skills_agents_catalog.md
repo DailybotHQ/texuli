@@ -34,12 +34,15 @@ to concrete models in your harness, in one place (see [../README.md](../README.m
 ## Distributable skill (`skills/texuli/`)
 
 Not part of this kit: the skill pack Texuli ships to people building with it
-(router plus `build-ui`, `components`, `themes`, `media`, `blueprints`,
-`contribute` and `evals` sub-skills). Its `contribute` sub-skill is also the
-detailed procedure for primitives, styled components, catalog manifests and
-examples in this repository. Validate it with `pnpm check:skill` and
+(router plus `build-ui`, `components`, `themes`, `design-systems`,
+`media`, `blueprints`, `contribute`, `evals` and `upgrade` sub-skills). Its
+`contribute` sub-skill is also the detailed procedure for primitives, styled
+components, catalog manifests and examples in this repository.
+`.agents/skills/texuli/` is its byte-identical dogfood mirror, pinned in
+`skills-lock.json`. Validate it with `pnpm check:skill`; after any edit,
 regenerate its checksums with
-`pnpm exec tsx scripts/check-skill.ts --write-sums` after any edit.
+`pnpm exec tsx scripts/check-skill.ts --write-sums` and refresh the mirror
+with `pnpm exec tsx scripts/check-skill.ts --refresh-mirror`.
 
 ## Vendored skills (do not edit; upgrade through their own flows)
 

@@ -35,5 +35,6 @@ renamed tools, the site tools and the WebMCP bridge, and a curl example. The
 
 Static: no island and no script of its own. Styles are page-wide under one
 wrapper class (`.tx-mcp-ref`), so Astro writes no scope attribute on each
-table cell. HTML 21.2 KB gzip (inside the default); the page weight has an
-override in `src/components/perf/budgets.ts` (measured 100.3 KB, limit 105).
+table cell. The page has an override in `src/components/perf/budgets.ts`:
+HTML at most 27.4 KB gzip (25.7 KB measured locally) and the page at most
+125 KB (119.8 KB measured on 2026-11-01, with the WebP banner).

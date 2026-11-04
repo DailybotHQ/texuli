@@ -17,13 +17,17 @@ fixture build)
 Privacy-respecting, cookie-free page and event counts for texuli.com, plus
 a count of how agents read the site (AI crawlers, unknown bots, Markdown
 twins served). The design keeps three promises: **off by default**,
-**first-party only** (the browser never contacts a foreign analytics
-origin, so the CSP needs no carve-out) and **a closed event catalog**
-with no personal data.
+**first-party only** (the browser never contacts an Umami origin, so the
+CSP needs no carve-out for it) and **a closed event catalog** with no
+personal data.
 
 **Status today: not provisioned.** `PUBLIC_UMAMI_WEBSITE_ID` is not set
-for the texuli.com Pages project, so the deployed site sends nothing. The
-code below is complete and inert until the owner passes the checkpoint.
+for the texuli.com Pages project, so the site's own code sends no
+analytics. The code below is complete and inert until the owner passes the
+checkpoint. Separately, the Cloudflare edge injects its Web Analytics
+beacon into production pages at serve time (account configuration, not
+code in this repository); the CSP allows exactly its script and report
+origins ([site-csp.md](site-csp.md)).
 
 ## The consent checkpoint
 
@@ -61,8 +65,8 @@ path `/api/umami/script.js` with the collect endpoint `/api/umami`.
 - **Client:** one same-origin `/umami-loader.js` (cached, CSP-friendly:
   `script-src 'self'`, no inline script) injects the tracker from
   `/api/umami/script.js`; the tracker beacons to `/api/umami/api/send`.
-  The browser never talks to a foreign analytics origin — there is no
-  CSP carve-out for one.
+  The browser never talks to an Umami origin — there is no CSP carve-out
+  for one.
 - **Trusted Types:** the site enforces `require-trusted-types-for 'script'`,
   so the loader sets the script URL through its named `texuli-analytics`
   policy. The policy's `createScriptURL` returns only the one configured URL

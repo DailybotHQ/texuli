@@ -29,7 +29,7 @@ against its 152 KB budget.
 | --- | --- | --- |
 | Lint + format | `pnpm lint` | exit 0: 2815 files checked, 23 warnings, no errors (3 s; FINAL-docs-honesty re-run) |
 | Types (every package) | `pnpm typecheck` | exit 0: every package, `astro check` 0 errors (95 s) |
-| Unit + component tests | `pnpm test` | 2026-10-27, after the lean-suite trim: 194 files, 1551 passed, 2 skipped, 0 failed (20 s). Was 5941 tests before the trim |
+| Unit + component tests | `pnpm test` | 2026-11-03: 476 files, 5037 passed, 4 skipped, 0 failed (89 s, macOS). 2026-10-27, after the lean-suite trim: 194 files, 1551 passed, 2 skipped (20 s); 5941 tests before the trim |
 | Layer guard | `pnpm check:layers` | ✓ dependencies point down; no banned imports, sinks or static styles (3 s) |
 | The fast full gate | `pnpm check` (lint, typecheck, test, layers, surfaces) | 2026-10-27: exit 0 (about 1 min 20 s) |
 | Docs links and commands | `pnpm exec tsx scripts/check-docs.ts` | 2026-10-27: 537 docs, every relative link and command is real (also a test in `pnpm test`) |

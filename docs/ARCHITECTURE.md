@@ -5,8 +5,13 @@ Texuli is built from scratch, in small pieces it owns end to end:
 - **primitives**, headless Svelte 5 parts bound to texels;
 - **tokens**, the theme engine and CSS contract;
 - **styled components** and layouts;
-- **domain packages** (data, charts, media, chat, content blocks);
-- the **agent catalog** and **tools**.
+- **domain packages** (data, charts, media, chat, editor, forms, canvas,
+  workflows, content blocks, sheets, documents and pages, decks and slides);
+- the **agent catalog**, its sink-free renderer and the blueprint
+  **player**, on the blueprint contract (`@texuli/spec`), which a Kotlin
+  Multiplatform twin in `native/` also consumes;
+- **tools** and the **MCP server** (`@texuli/mcp`, local; the same
+  operations run remotely at `https://texuli.com/mcp`).
 
 Dependencies point **down only**, and `scripts/check-layers.ts` enforces it
 (`pnpm check:layers`, also part of `pnpm check`).
@@ -65,9 +70,9 @@ Not layers, because they consume the library:
 `scripts/packages.ts`); `pnpm verify:packages` packs the other 26, and all
 26 are released on npm in the 0.12 line, every one at `0.12.3`; `0.10.0` was the design-systems release and the 0.11 line added the Protoyard gaps G125–G136 and the Final Review fixes (among them `@texuli/document/schema-core`), and `0.12.0` moves the `@texuli/pages` core entries off the deck model (G136; breaking for those core entries only) (`@texuli/mcp`
 was first released in `0.9.0`; the 0.8 line had 25 packages);
-`@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/editor`,
-`@texuli/document`, `@texuli/pages`, `@texuli/forms`, `@texuli/canvas`,
-`@texuli/sheets` and `@texuli/mcp` are in development
+`@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/slides`,
+`@texuli/editor`, `@texuli/document`, `@texuli/pages`, `@texuli/forms`,
+`@texuli/canvas`, `@texuli/sheets` and `@texuli/mcp` are in development
 and sit in the `publish.yml` wave order ahead of their dependents
 ([RELEASE](RELEASE.md)).
 
@@ -137,7 +142,7 @@ cap in `texuli.budgets.json` (`pnpm size`).
 | `@texuli/player` (private) | `.`, `design-system` (from `0.10.0`: the lazy design-system step), `design-system-core` (from `0.11.0`: the same step without the theme library, shared with the slides stage core), `styles.css` |
 | `@texuli/pages` (private, in development) | `.`, `editor`, `editor-core`, `reader`, `reader-core`, `paged`, `paged-core`, `export`, `host`, `host-core`, `collab`, `collab-core` (the `*-core` subpaths from `0.10.0`), `styles.css` |
 | `@texuli/primitives` (private) | `.`, `accordion`, `alert-dialog`, `color-picker`, `context-menu`, `label`, `number-field`, `progress`, `separator`, `sheet`, `slider`, `tags-input`, `toolbar`, `tooltip`, `collapsible`, `command`, `date-picker`, `date-field`, `file-drop`, `radio-group`, `switch`, `checkbox`, `calendar`, `toggle`, `menu`, `menubar`, `popover`, `tabs`, `hover-card`, `tree`, `listbox`, `select`, `splitter`, `portal`, `navigation-menu`, `scroll-area`, `pagination`, `toast`, `dialog`, `pin-input`, `combobox`, `avatar`, `sortable` |
-| `@texuli/slides` (private) | `.`, `model`, `grammar`, `export`, `export-core` (from `0.10.0`), `templates`, `stage`, `stage-core`, `components`, `layouts`, `styles.css` |
+| `@texuli/slides` (private, in development) | `.`, `model`, `grammar`, `export`, `export-core` (from `0.10.0`), `templates`, `stage`, `stage-core`, `components`, `layouts`, `styles.css` |
 | `@texuli/spec` (private) | `.`, `workflow`, `migrate`, `codegen`, `surface`, `motion`, `stream`, `source`, `design-system` (from `0.10.0`) |
 | `@texuli/workflows` (private, in development) | `.`, `model`, `layout`, `spec-adapter`, `editor`, `viewer`, `inspector` |
 | `texuli` (private) | `.`, `alert`, `avatar`, `badge`, `button`, `card`, `carousel`, `choice`, `combobox`, `command`, `cx`, `date`, `defaults`, `design-system` (from `0.10.0`), `dialog`, `empty`, `feedback`, `field`, `file-upload`, `icons`, `icons/lucide`, `input`, `kbd-code`, `layouts/app`, `layouts/app/dual-sidebar`, `layouts/app/master-detail`, `layouts/app/rail`, `layouts/app/sidebar`, `layouts/app/split-view`, `layouts/app/top-nav`, `layouts/auth-settings`, `layouts/auth-settings/register`, `layouts/content`, `layouts/content/blog`, `layouts/content/docs`, `layouts/content/editorial`, `layouts/dashboard`, `layouts/dashboard/register`, `layouts/host`, `layouts/host/chrome`, `layouts/host/drawer`, `layouts/marketing`, `layouts/marketing/entry`, `layouts/marketing/landing`, `layouts/marketing/pricing`, `layouts/marketing/register`, `layouts/marketing/section`, `layouts/mobile`, `layouts/mobile/register`, `layouts/shells`, `menus`, `motion`, `navigation`, `number-pin`, `popover`, `rating`, `resizable`, `scroll-area`, `select`, `separator-aspect`, `sheet`, `sidebar`, `slider`, `stat`, `stepper`, `table`, `tabs-accordion`, `tags-color`, `timeline`, `toast`, `toggle`, `toolbar`, `tooltip`, `tree` |
@@ -354,13 +359,17 @@ It imports the workspace packages directly, so a broken component breaks
 `functions/` run beside the static output:
 - `_middleware.ts` serves the Markdown twin of any page (`/index.md` for
   `/`) on an explicit `text/markdown` preference, labels `.md` files
-  `text/markdown`, a stripped `robots.txt` to audit tools and a Markdown
-  404 to agents (`problem+json` under `/api/` and for JSON clients), and
+  `text/markdown`, answers `/robots.txt` for every client with
+  `Cache-Control: no-store` (the built policy, or a stripped variant for
+  Lighthouse-family audits, `apps/website/src/lib/robots-variants.ts`),
+  serves a Markdown 404 to agents (`problem+json` under `/api/` and for JSON clients), and
   sends bot-hit and `markdown_request` events; every other request gets the
   static asset response back untouched, so its `_headers` (CSP, and
   `Vary: Accept` on every page with a twin) survive;
 - `api/umami/[[path]].ts` is the same-origin Umami analytics proxy, off
-  until the owner provisions it.
+  until the owner provisions it. (Cloudflare Web Analytics is separate: the
+  Cloudflare edge injects its beacon, and the page CSP allows its two
+  origins.)
 - `mcp.ts` is the remote MCP endpoint for `/mcp` (the middleware routes
   `/.well-known/mcp` to the same server): the `edge` and `site` operations,
   with its own limits and headers

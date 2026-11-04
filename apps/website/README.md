@@ -4,8 +4,9 @@
 Astro 7 with the `@astrojs/svelte` integration, static output. Private
 workspace package. Cloudflare Pages deploys it from `main` (see
 [`docs/CI.md`](../../docs/CI.md)); `site` in `astro.config.mjs` is
-`https://texuli.com`. Root `functions/` holds the Pages Functions
-middleware and the analytics proxy.
+`https://texuli.com`. Root `functions/` holds the Pages Functions: the
+middleware (Markdown twins, the robots variants, agent-shaped 404s, the
+`/api/` envelope), the Umami analytics proxy and the remote MCP at `/mcp`.
 
 ## What exists today
 
@@ -25,8 +26,8 @@ and the evidence and perf reports. Each area has a design doc in
 | `src/layouts/BaseLayout.astro` | The layout behind content pages: the docs shell with the left sidebar (`SiteSidebar`), the utility header and the phone drawer; `variant="landing"` drives the home |
 | `src/components/component-pages/load-manifests.ts` | Component pages resolve against the workspace packages' real exports, so a broken component breaks the build |
 | `src/components/TexelsDiagram.astro` | The texels → Texuli → interfaces diagram (decorative grids marked `aria-hidden`) |
-| `astro.config.mjs` | `site: 'https://texuli.com'`, `integrations: [svelte(), copyPageIntegration(), skillPackIntegration(), seoIntegration(), cspIntegration()]` |
-| `src/components/security/csp.ts` | The build-time CSP integration: per-route hash policies written to `dist/_headers` (plus `Vary: Accept` on negotiable docs pages) and `dist/csp-manifest.json` |
+| `astro.config.mjs` | `site: 'https://texuli.com'`, `integrations: [svelte(), copyPageIntegration(), skillPackIntegration(), seoIntegration(), apiSurfaceIntegration(), agentDiscoveryIntegration(), cspIntegration()]` |
+| `src/components/security/csp.ts` | The build-time CSP integration: per-route hash policies written to `dist/_headers` (plus `Vary: Accept` on every page with a Markdown twin, and the discovery `Link` header) and `dist/csp-manifest.json` |
 | `tests/csp-coverage.mts` | The generation-side proof: every built page's inline scripts, styles and style attributes are covered by its policy in both artifacts (`pnpm --filter @texuli/website check:csp`) |
 | `tsconfig.json` | Extends `astro/tsconfigs/strict` |
 
@@ -64,14 +65,17 @@ islands (`client:load`, `client:visible`, …).
 | Theme sweep tooling | [site-theme-sweep.md](docs/site-theme-sweep.md) |
 | Agents, playground, builder, skill | [site-agents-page.md](docs/site-agents-page.md) · [site-agent-chat.md](docs/site-agent-chat.md) · [site-playground.md](docs/site-playground.md) · [site-builder.md](docs/site-builder.md) · [site-skill.md](docs/site-skill.md) |
 
-## Planned
+## Status and limits
 
-- **Analytics are not provisioned.** `PUBLIC_UMAMI_WEBSITE_ID` is not set,
-  so the deployed site sends nothing; turning it on is the owner's
-  checkpoint ([site-analytics.md](docs/site-analytics.md)).
-- **No recorded edge run.** The Pages middleware is unit-tested only;
-  whether Functions run for the texuli.com project is an open owner
-  question ([site-aeo.md](docs/site-aeo.md)).
+- **Umami analytics are not provisioned.** `PUBLIC_UMAMI_WEBSITE_ID` is
+  not set, so the site's own code sends no analytics; turning it on is the
+  owner's checkpoint ([site-analytics.md](docs/site-analytics.md)). The
+  Cloudflare Web Analytics beacon, which the Cloudflare edge injects, is
+  the one foreign origin the CSP allows ([site-csp.md](docs/site-csp.md)).
+- **No local edge run.** The Pages Functions run on texuli.com (the remote
+  MCP, Markdown twins, the robots variants and the `/api/v1/` aliases), but
+  locally the middleware runs only under unit tests and the e2e specs
+  ([site-aeo.md](docs/site-aeo.md#deviations-and-limits)).
 
 ## Commands
 

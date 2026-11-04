@@ -49,9 +49,9 @@ never name another file.
 The aliases therefore exist only where the Pages Function runs. On
 Cloudflare Pages with Functions deployed, the middleware runs on every
 request (the build writes no `_routes.json` that excludes a path), so every
-alias answers; that Functions run for the texuli.com project is the open
-owner check recorded in [site-aeo.md](site-aeo.md#deviations-and-limits),
-and the remote MCP at `/mcp` depends on it in the same way. A host that serves `dist` as plain files (`astro preview`, a
+alias answers. Functions run for the texuli.com project
+([site-aeo.md](site-aeo.md#deviations-and-limits)), and the remote MCP at
+`/mcp` depends on them in the same way. A host that serves `dist` as plain files (`astro preview`, a
 static server) has no `/api/v1/` paths at all: only `/api/index.json`,
 `/api/health.json`, `/openapi.json` and the unversioned site files. The
 local e2e spec runs the real middleware in front of `dist`, as
@@ -164,9 +164,11 @@ TEXULI_E2E_PORT=<port> pnpm exec playwright test tests/e2e/site-developers.spec.
   clients behind one address share a bucket. The optional Cloudflare WAF
   rule in [SECURITY section 23](../../../docs/SECURITY.md#23-public-json-api-api)
   is the durable layer, owner-held.
-- Nothing here has run on Cloudflare yet. After the deploy, check
+- After a deploy, check
   `curl -sI https://texuli.com/api/v1/health.json` for `X-API-Version` and
-  `RateLimit-Policy`, and a miss for `application/problem+json`.
+  `RateLimit-Policy`, and a miss for `application/problem+json`. A
+  read-only run on 2026-11-03 answered 200 with `x-api-version: 0.12.3`,
+  `ratelimit-policy: "api";q=300;w=60` and `ratelimit`.
 - The aliases depend on Pages Functions running for the project. If they
   ever do not, `/api/v1/` answers the HTML 404 and agents can still read
   the unversioned files the OpenAPI document also describes.

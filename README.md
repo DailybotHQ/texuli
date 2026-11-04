@@ -7,7 +7,7 @@
 
 # Texuli
 
-### Small pieces. Build anything. Built for the agentic era.
+### Small pieces. Infinite possibilities.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Svelte 5](https://img.shields.io/badge/Svelte_5-FF3E00?logo=svelte&logoColor=white)](package.json)
@@ -16,14 +16,16 @@
 [![Status: in development](https://img.shields.io/badge/status-in_development-yellow)](docs/RELEASE.md)
 [![Powered by Dailybot](https://img.shields.io/badge/Powered%20by-Dailybot-6C5CE7.svg)](https://www.dailybot.com?utm_source=dailybotopensource&utm_medium=texuli)
 
-**Small pieces. Infinite possibilities.** Texuli is an open-source Svelte 5
-component library, built from scratch and owned end to end. Framework-free
+Texuli is an open-source Svelte 5 component library, built from scratch,
+owned end to end and native for agents. Framework-free
 *texels* compose into accessible headless primitives; with the OKLCH theme
 engine (a perceptual color space: lightness, chroma, hue) those become
 styled components and whole interfaces — apps, dashboards, data views,
 charts, media, chat, documents and slide decks.
 Agents get a catalog whose output renders through a sink-free renderer, so
-the same pieces are safe to hand to a machine.
+the same pieces are safe to hand to a machine. They also get a blueprint
+contract that describes whole interfaces as JSON (with a Kotlin
+Multiplatform twin), an MCP server and an agent skill.
 
 [Quickstart](#60-second-start) ·
 [The layers](#small-pieces-all-the-way-down) ·
@@ -124,6 +126,8 @@ import that points up.
 | **Media** | Images, galleries, video, audio and editors, with compositions that keep their layout while media resolves |
 | **Chat** | Threads, messages and composers for conversational products |
 | **Documents & decks** | Content blocks that compose into pages, long documents and slide decks with a full keyboard map |
+| **Editors and workspaces** (in development) | A rich text editor, a block document editor and reader, schema-driven forms, an infinite canvas, spreadsheets with an owned formula engine, and workflow graphs |
+| **Design systems** | One JSON document per brand, compiled to the `--tx-*` tokens with enforced contrast ([DESIGN_SYSTEMS](docs/DESIGN_SYSTEMS.md)) |
 
 Every example in [`@texuli/examples`](packages/examples/README.md) is a
 registered fixture: it runs in unit tests, visual baselines, accessibility
@@ -169,6 +173,7 @@ Texuli is designed to be built *by* agents as much as by people.
 | --- | --- | --- |
 | **Agent skill** | A distributable skill pack (`skills/texuli/`) that installs into Claude Code, Codex, Cursor and other hosts — pinned, checksum-verified, checked by `pnpm check:skill` | [Skill](skills/texuli/SKILL.md) |
 | **Agent catalog** | A declarative catalog of components and props. An agent emits catalog nodes; the renderer turns them into real components | [Catalog](packages/catalog/README.md) |
+| **Blueprints** | Whole interfaces as JSON (spec `0.10.0`): local state, flows, bindings and a closed action set, validated by `@texuli/spec` and painted by `@texuli/player`; 75 of the catalog's 168 ids are agent-emittable | [Spec](packages/spec/README.md) · [Player](packages/player/README.md) |
 | **No HTML sinks** | Never `{@html}`, `innerHTML`, `eval` or `new Function` on props, content or agent output. Structure is trusted; markup never is | [Security](docs/SECURITY.md) |
 | **Two-tier URL policy** | Every link and media source passes `safeHref` / `safeMediaSrc`: `developer` for app-authored props, `untrusted` for agent and user content | [URL policy](docs/SECURITY.md) |
 | **MCP server** | Every operation of one registry as an MCP tool: local over stdio (`npx -y @texuli/mcp`) and remote over Streamable HTTP at `https://texuli.com/mcp` (the edge and site operations, read-only, no key); the same operations run as `texuli <group> <verb>`. New in `0.9.0`; `@texuli/mcp` is in development | [MCP](packages/mcp/README.md) · [Tools](packages/tools/docs/mcp.md) |
@@ -180,8 +185,8 @@ every verified command.
 
 ## Measured quality
 
-- **1,551 unit and component tests** after the 2026-10-27 lean-suite trim
-  (one suite, the same locally and in CI), plus a behavior suite per
+- **5,037 passing unit and component tests** in 476 files (`pnpm test`,
+  2026-11-03; one suite, the same locally and in CI), plus a behavior suite per
   primitive on Chromium and WebKit, with touch rows on a Pixel 7 viewport
   ([TESTING_GUIDE](docs/TESTING_GUIDE.md)).
 - **axe with zero exclusions** in light, dark and forced colors, with

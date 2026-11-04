@@ -15,6 +15,18 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The router opens with the value proposition (texels, primitives, tokens
+  and design systems, components, domain packages, the agent catalog and
+  blueprints, the MCP server) and routes every published package: new rows
+  for the MCP server, upgrades, charts, data views, chat, documents and
+  pages, schema forms, the canvas and spreadsheets. Its first run states the
+  current release (`0.12.3`) and points to `router/packages.md` and the
+  upgrade sub-skill for the per-release history.
+- `@texuli/slides` is listed as in development, as `AGENTS.md` lists it.
+- The design-systems sub-skill no longer says the Kotlin twin follows a
+  brand document: it decodes the document and paints with token sets
+  compiled on the web side.
+
 ## [0.3.16] — 2026-11-03
 
 ### Changes
