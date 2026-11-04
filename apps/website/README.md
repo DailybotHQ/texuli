@@ -67,9 +67,11 @@ islands (`client:load`, `client:visible`, …).
 
 ## Status and limits
 
-- **Umami analytics are not provisioned.** `PUBLIC_UMAMI_WEBSITE_ID` is
-  not set, so the site's own code sends no analytics; turning it on is the
-  owner's checkpoint ([site-analytics.md](docs/site-analytics.md)). The
+- **Umami analytics are on in production.** The owner set
+  `PUBLIC_UMAMI_WEBSITE_ID` and `UMAMI_ENDPOINT_ORIGIN` for the Pages
+  project, so texuli.com sends page views and events through the
+  same-origin proxy; a build without them stays inert
+  ([site-analytics.md](docs/site-analytics.md)). The
   Cloudflare Web Analytics beacon, which the Cloudflare edge injects, is
   the one foreign origin the CSP allows ([site-csp.md](docs/site-csp.md)).
 - **No local edge run.** The Pages Functions run on texuli.com (the remote

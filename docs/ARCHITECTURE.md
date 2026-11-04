@@ -366,8 +366,9 @@ It imports the workspace packages directly, so a broken component breaks
   sends bot-hit and `markdown_request` events; every other request gets the
   static asset response back untouched, so its `_headers` (CSP, and
   `Vary: Accept` on every page with a twin) survive;
-- `api/umami/[[path]].ts` is the same-origin Umami analytics proxy, off
-  until the owner provisions it. (Cloudflare Web Analytics is separate: the
+- `api/umami/[[path]].ts` is the same-origin Umami analytics proxy, on in
+  production (the owner set its environment variables; a build without them
+  sends nothing). (Cloudflare Web Analytics is separate: the
   Cloudflare edge injects its beacon, and the page CSP allows its two
   origins.)
 - `mcp.ts` is the remote MCP endpoint for `/mcp` (the middleware routes

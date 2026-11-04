@@ -21,10 +21,12 @@ twins served). The design keeps three promises: **off by default**,
 CSP needs no carve-out for it) and **a closed event catalog** with no
 personal data.
 
-**Status today: not provisioned.** `PUBLIC_UMAMI_WEBSITE_ID` is not set
-for the texuli.com Pages project, so the site's own code sends no
-analytics. The code below is complete and inert until the owner passes the
-checkpoint. Separately, the Cloudflare edge injects its Web Analytics
+**Status today: on.** The owner set `PUBLIC_UMAMI_WEBSITE_ID` and
+`UMAMI_ENDPOINT_ORIGIN` for the texuli.com Pages project, so production
+pages load `/api/umami/script.js` and send page views and events through
+the same-origin proxy (checked on 2026-11-03: the script and the send
+endpoint both answer 200). A build without those variables, such as a
+local or CI build, stays inert. Separately, the Cloudflare edge injects its Web Analytics
 beacon into production pages at serve time (account configuration, not
 code in this repository); the CSP allows exactly its script and report
 origins ([site-csp.md](site-csp.md)).

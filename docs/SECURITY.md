@@ -198,7 +198,8 @@ analytics proxy below, and the remote MCP in section 21) and an opt-in
 Umami analytics loader. Umami analytics is **off by default**: with no
 `PUBLIC_UMAMI_WEBSITE_ID` the loader tag is not rendered, the middleware
 sends no events, and with no `UMAMI_ENDPOINT_ORIGIN` the proxy answers 503.
-Neither value is set in the repository; both are owner-provisioned.
+Neither value is set in the repository; both are owner-provisioned, and
+the owner has set both for production, so texuli.com sends Umami events.
 Cloudflare Web Analytics is separate: the Cloudflare edge injects its
 beacon into production pages (a setting of the Cloudflare account, not
 code in this repository), and the page CSP allows exactly its two origins

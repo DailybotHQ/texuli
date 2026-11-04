@@ -216,7 +216,8 @@ After the next deploy, confirm on a few HTML routes (a docs page with a
 twin, `/`, a component page) that `Content-Security-Policy` is present
 and that docs pages carry `Vary: Accept`. The variables
 `PUBLIC_UMAMI_WEBSITE_ID` and `UMAMI_ENDPOINT_ORIGIN` live in the Pages
-project settings, owner-provisioned; Umami analytics stays off without them.
+project settings, owner-provisioned (set for production, so texuli.com
+sends Umami events); Umami analytics stays off without them.
 Cloudflare Web Analytics is a Cloudflare account setting: the edge injects
 its beacon into production pages, and the page CSP allows its script and
 report origins (`CLOUDFLARE_WEB_ANALYTICS` in `csp.ts`). Every push to
