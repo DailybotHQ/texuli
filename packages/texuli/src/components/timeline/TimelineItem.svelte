@@ -2,6 +2,7 @@
 import { safeHref } from '@texuli/core/url-policy';
 import { getContext, type Snippet } from 'svelte';
 import type { HTMLLiAttributes } from 'svelte/elements';
+import { type ClassValue, cx } from '../../internal/cx.ts';
 import { DEFAULT_TIMELINE_MESSAGES, TIMELINE_CONTEXT, type TimelineContext } from './types.ts';
 import { type TimelineStatus, type TimelineTone, timelineItemClass } from './variants.ts';
 import './timeline.css';
@@ -19,6 +20,8 @@ type Props = Omit<HTMLLiAttributes, 'title'> & {
   href?: string;
   tone?: TimelineTone;
   status?: TimelineStatus;
+  /** Classes for the marker (added after the timeline's `markerClass`). */
+  markerClass?: ClassValue;
   /** Replaces the marker's dot or check with your icon (decorative). */
   icon?: Snippet;
   /** Extra content under the description. */
@@ -33,6 +36,7 @@ let {
   href,
   tone = 'default',
   status,
+  markerClass,
   icon,
   children,
   class: className,
@@ -42,6 +46,7 @@ let {
 
 const context = getContext<TimelineContext | undefined>(TIMELINE_CONTEXT);
 const messages = $derived(context?.messages ?? DEFAULT_TIMELINE_MESSAGES);
+const markerClasses = $derived(cx('tx-timeline__marker', context?.markerClass, markerClass));
 const link = $derived(href ? safeHref(href, context?.hrefTrust ?? 'developer') : undefined);
 </script>
 
@@ -49,12 +54,13 @@ const link = $derived(href ? safeHref(href, context?.hrefTrust ?? 'developer') :
   bind:this={ref}
   class={timelineItemClass({ tone, class: className })}
   data-tx-timeline-item
+  data-part="item"
   data-tone={tone}
   data-status={status}
   aria-current={status === 'current' ? 'step' : undefined}
   {...rest}
 >
-  <span class="tx-timeline__marker" aria-hidden="true">
+  <span class={markerClasses} data-part="marker" aria-hidden="true">
     {#if icon}
       {@render icon()}
     {:else if status === 'complete'}
@@ -70,17 +76,18 @@ const link = $derived(href ? safeHref(href, context?.hrefTrust ?? 'developer') :
       </svg>
     {/if}
   </span>
-  <div class="tx-timeline__content">
+  <span class="tx-timeline__connector" data-part="connector" aria-hidden="true"></span>
+  <div class="tx-timeline__content" data-part="content">
     {#if time}
-      <time class="tx-timeline__time" {datetime}>{time}</time>
+      <time class="tx-timeline__time" data-part="time" {datetime}>{time}</time>
     {/if}
-    <p class="tx-timeline__title">
+    <p class="tx-timeline__title" data-part="title">
       {#if link}<a class="tx-timeline__link" href={link}>{title}</a>{:else}{title}{/if}{#if status}<span
           class="tx-timeline__sr-only">, {messages[status]}</span
         >{/if}
     </p>
     {#if description}
-      <p class="tx-timeline__description">{description}</p>
+      <p class="tx-timeline__description" data-part="description">{description}</p>
     {/if}
     {@render children?.()}
   </div>

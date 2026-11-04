@@ -781,6 +781,28 @@ describe('timeline', () => {
         'have a forced-colors fallback': () => {
           expect(css).toContain('@media (forced-colors: active)');
         },
+        // `--tx-timeline-gap: 0` is a number, and calc(0 * -1 - 0.125rem)
+        // is invalid: every read goes through the registered <length>.
+        'accept a unitless 0 gap: calc() only reads the registered length': () => {
+          expect(css).toMatch(
+            /@property --tx-timeline-gap-length \{\s*syntax: "<length>";\s*inherits: true;\s*initial-value: 0px;\s*\}/
+          );
+          expect(css).toContain(
+            '--tx-timeline-gap-length: var(--tx-timeline-gap, var(--tx-space-6));'
+          );
+          expect(css.match(/var\(--tx-timeline-gap\)/g)).toBeNull();
+          expect(css.replace(/\/\*[\s\S]*?\*\//g, '')).not.toMatch(/--tx-timeline-gap:/);
+        },
+        'expose per-status tones and a connector color as host hooks': () => {
+          const flat = css.replace(/\(\s+/g, '(').replace(/\s+\)/g, ')').replace(/\s+/g, ' ');
+          for (const status of ['complete', 'current', 'upcoming']) {
+            expect(flat).toContain(
+              `--tx-timeline-tone: var(--tx-timeline-${status}-tone, var(--tx-primary, LinkText));`
+            );
+            expect(flat).toContain(`var(--tx-timeline-${status}-tone-foreground,`);
+          }
+          expect(flat).toContain('var(--tx-timeline-connector-color, var(--tx-border, GrayText))');
+        },
       });
     });
   });

@@ -8,12 +8,28 @@
  * Kept literals: the 2px line width (--tx-timeline-line), the 0.625rem marker
  * glyph, the 3px current halo, the 10rem horizontal track and the 0.125rem
  * marker offsets that center the line are proportional geometry.
+ * Every part carries `data-part` (item, marker, connector, content, time,
+ * title, description) for host selectors.
  */
+
+/*
+ * The gap as a registered length: a host may write `--tx-timeline-gap: 0`
+ * (unitless), which a calc() mixing it with a length would reject; parsed
+ * through `<length>`, it computes to 0px. Outside the layer because
+ * @property is global.
+ */
+@property --tx-timeline-gap-length {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
 @layer tx.components {
   .tx-timeline {
     --tx-timeline-marker: var(--tx-timeline-marker-size, var(--tx-size-icon-sm));
     --tx-timeline-line: 2px;
-    --tx-timeline-gap: var(--tx-space-6);
+    /* Set --tx-timeline-gap on the timeline or any ancestor (default 1.5rem; 0 works). */
+    --tx-timeline-gap-length: var(--tx-timeline-gap, var(--tx-space-6));
     --tx-timeline-tone: var(--tx-primary, LinkText);
     --tx-timeline-tone-foreground: var(--tx-primary-foreground, Canvas);
     /*
@@ -34,10 +50,13 @@
   }
 
   /* The line to the next item (none after the last). */
-  .tx-timeline__item:not(:last-child)::after {
-    content: "";
+  .tx-timeline__connector {
     position: absolute;
-    background-color: var(--tx-border, GrayText);
+    background-color: var(--tx-timeline-connector-color, var(--tx-border, GrayText));
+  }
+
+  .tx-timeline__item:last-child > .tx-timeline__connector {
+    display: none;
   }
 
   .tx-timeline__marker {
@@ -68,6 +87,33 @@
   .tx-timeline__item[data-status="current"] .tx-timeline__marker {
     background-color: var(--tx-timeline-tone);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--tx-timeline-tone) 30%, transparent);
+  }
+
+  /*
+   * Per-status tones for items with the default tone (an explicit `tone`
+   * wins): set --tx-timeline-{complete,current,upcoming}-tone, and the
+   * matching -tone-foreground for the check glyph.
+   */
+  .tx-timeline__item--default[data-status="complete"] {
+    --tx-timeline-tone: var(--tx-timeline-complete-tone, var(--tx-primary, LinkText));
+    --tx-timeline-tone-foreground: var(
+      --tx-timeline-complete-tone-foreground,
+      var(--tx-primary-foreground, Canvas)
+    );
+  }
+  .tx-timeline__item--default[data-status="current"] {
+    --tx-timeline-tone: var(--tx-timeline-current-tone, var(--tx-primary, LinkText));
+    --tx-timeline-tone-foreground: var(
+      --tx-timeline-current-tone-foreground,
+      var(--tx-primary-foreground, Canvas)
+    );
+  }
+  .tx-timeline__item--default[data-status="upcoming"] {
+    --tx-timeline-tone: var(--tx-timeline-upcoming-tone, var(--tx-primary, LinkText));
+    --tx-timeline-tone-foreground: var(
+      --tx-timeline-upcoming-tone-foreground,
+      var(--tx-primary-foreground, Canvas)
+    );
   }
 
   /* Upcoming: hollow, and its line is dashed. */
@@ -148,7 +194,7 @@
   /* Vertical: marker column, content beside it, the line runs down the marker's center. */
   .tx-timeline--vertical {
     display: grid;
-    gap: var(--tx-timeline-gap);
+    gap: var(--tx-timeline-gap-length);
   }
 
   .tx-timeline--vertical > .tx-timeline__item {
@@ -160,9 +206,9 @@
     margin-block-start: 0.125rem;
   }
 
-  .tx-timeline--vertical > .tx-timeline__item:not(:last-child)::after {
+  .tx-timeline--vertical > .tx-timeline__item > .tx-timeline__connector {
     inset-block-start: calc(var(--tx-timeline-marker) + 0.125rem);
-    inset-block-end: calc(var(--tx-timeline-gap) * -1 - 0.125rem);
+    inset-block-end: calc(var(--tx-timeline-gap-length) * -1 - 0.125rem);
     inset-inline-start: calc((var(--tx-timeline-marker) - var(--tx-timeline-line)) / 2);
     inline-size: var(--tx-timeline-line);
   }
@@ -172,7 +218,7 @@
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: minmax(10rem, 1fr);
-    gap: var(--tx-timeline-gap);
+    gap: var(--tx-timeline-gap-length);
     overflow-x: auto;
     overscroll-behavior-inline: contain;
     padding-block: var(--tx-space-1);
@@ -188,21 +234,21 @@
     align-content: start;
   }
 
-  .tx-timeline--horizontal > .tx-timeline__item:not(:last-child)::after {
+  .tx-timeline--horizontal > .tx-timeline__item > .tx-timeline__connector {
     inset-block-start: calc((var(--tx-timeline-marker) - var(--tx-timeline-line)) / 2);
     block-size: var(--tx-timeline-line);
     inset-inline-start: var(--tx-timeline-marker);
-    inset-inline-end: calc(var(--tx-timeline-gap) * -1);
+    inset-inline-end: calc(var(--tx-timeline-gap-length) * -1);
   }
 
-  .tx-timeline__item[data-status="upcoming"]:not(:last-child)::after {
+  .tx-timeline__item[data-status="upcoming"] > .tx-timeline__connector {
     background-color: transparent;
-    border: 0 dashed var(--tx-border, GrayText);
+    border: 0 dashed var(--tx-timeline-connector-color, var(--tx-border, GrayText));
   }
-  .tx-timeline--vertical > .tx-timeline__item[data-status="upcoming"]:not(:last-child)::after {
+  .tx-timeline--vertical > .tx-timeline__item[data-status="upcoming"] > .tx-timeline__connector {
     border-inline-start-width: var(--tx-timeline-line);
   }
-  .tx-timeline--horizontal > .tx-timeline__item[data-status="upcoming"]:not(:last-child)::after {
+  .tx-timeline--horizontal > .tx-timeline__item[data-status="upcoming"] > .tx-timeline__connector {
     border-block-start-width: var(--tx-timeline-line);
   }
 
@@ -224,7 +270,7 @@
     .tx-timeline__item[data-status="upcoming"] .tx-timeline__marker {
       background-color: Canvas;
     }
-    .tx-timeline__item:not(:last-child)::after {
+    .tx-timeline__connector {
       background-color: CanvasText;
       border-color: CanvasText;
       forced-color-adjust: none;

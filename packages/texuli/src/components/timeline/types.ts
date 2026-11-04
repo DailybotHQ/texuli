@@ -1,4 +1,5 @@
 import type { HrefTrust } from '@texuli/core/url-policy';
+import type { ClassValue } from '../../internal/cx.ts';
 import type { TimelineStatus, TimelineTone } from './variants.ts';
 
 /** One entry of a data-driven `<Timeline items={…}>`. */
@@ -37,6 +38,8 @@ export const DEFAULT_TIMELINE_MESSAGES: Readonly<TimelineMessages> = Object.free
 export interface TimelineContext {
   messages: TimelineMessages;
   hrefTrust: HrefTrust;
+  /** Classes every item's marker gets (the timeline's `markerClass`). */
+  markerClass?: ClassValue;
 }
 
 export const TIMELINE_CONTEXT = Symbol('texuli.timeline');

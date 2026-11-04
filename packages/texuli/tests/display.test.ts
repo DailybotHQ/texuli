@@ -1259,6 +1259,30 @@ describe('timeline', () => {
       }
     });
 
+    it('names every part with data-part and merges markerClass from the timeline and the item', () => {
+      const view = render(Timeline, {
+        props: { items, markerClass: 'host-marker', orientation: 'vertical' },
+      });
+      const root = view.getByRole('list');
+      expect(root.dataset.part).toBe('root');
+      for (const item of listItems(view.container)) {
+        expect(item.dataset.part).toBe('item');
+        const parts = [...item.querySelectorAll<HTMLElement>('[data-part]')].map(
+          (part) => part.dataset.part
+        );
+        expect(parts.slice(0, 3)).toEqual(['marker', 'connector', 'content']);
+        expect(parts).toContain('title');
+        const marker = item.querySelector<HTMLElement>('[data-part="marker"]');
+        expect(marker?.className).toBe('tx-timeline__marker host-marker');
+        expect(item.querySelector('[data-part="connector"]')?.getAttribute('aria-hidden')).toBe(
+          'true'
+        );
+      }
+      const [first] = listItems(view.container);
+      expect(first?.querySelector('[data-part="time"]')?.textContent).toBe('Mar 4');
+      expect(first?.querySelector('[data-part="description"]')).not.toBeNull();
+    });
+
     it('passes every link through the URL policy', () => {
       const view = render(Timeline, {
         props: {

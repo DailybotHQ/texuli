@@ -49,6 +49,15 @@ const BUTTON_CSS = readFileSync(
   'utf8'
 );
 
+const TIMELINE_CSS = readFileSync(
+  join(process.cwd(), 'packages/texuli/src/components/timeline/timeline.css'),
+  'utf8'
+);
+
+/** A rendered vertical timeline item (the markup TimelineItem writes). */
+const timelineItem = (title: string) =>
+  `<li class="tx-timeline__item tx-timeline__item--default" data-part="item" data-status="complete"><span class="tx-timeline__marker" data-part="marker" aria-hidden="true"></span><span class="tx-timeline__connector" data-part="connector" aria-hidden="true"></span><div class="tx-timeline__content" data-part="content"><p class="tx-timeline__title" data-part="title">${title}</p></div></li>`;
+
 function pageHtml(extraHead: string, body: string): string {
   return `<!doctype html>
 <html lang="en">
@@ -206,6 +215,41 @@ test('component polish: no sideways scroll, parts stay attached, forced colors, 
         (seek?.y ?? 0) + (seek?.height ?? 0) / 2 - ((playBox?.y ?? 0) + (playBox?.height ?? 0) / 2)
       )
     ).toBeLessThan(4);
+  });
+
+  // C-G-013 and C-G-014: host hooks that only a real engine resolves.
+  await test.step('a unitless --tx-timeline-gap: 0 still joins the markers; --tx-button-line-height applies', async () => {
+    await page.setContent(
+      pageHtml(
+        `${TIMELINE_CSS}
+.host { --tx-timeline-gap: 0; --tx-timeline-marker-size: 16px; --tx-button-line-height: 1; --tx-timeline-complete-tone: rgb(0, 128, 0); }`,
+        `<div class="host"><ol class="tx-timeline tx-timeline--vertical" data-part="root">${timelineItem('One')}${timelineItem('Two')}</ol>
+<button class="tx-button tx-button--default tx-button--md" style="font-size: 20px">Save</button></div>`
+      )
+    );
+    const geometry = await page.evaluate(() => {
+      const list = document.querySelector('.tx-timeline') as HTMLElement;
+      const connector = list.querySelector('[data-part="connector"]') as HTMLElement;
+      const markers = list.querySelectorAll('[data-part="marker"]');
+      const button = document.querySelector('.tx-button') as HTMLElement;
+      return {
+        rowGap: getComputedStyle(list).rowGap,
+        connectorBottom: connector.getBoundingClientRect().bottom,
+        connectorHeight: connector.getBoundingClientRect().height,
+        nextMarkerTop: (markers[1] as HTMLElement).getBoundingClientRect().top,
+        lastConnector: getComputedStyle(
+          list.querySelectorAll('[data-part="connector"]')[1] as Element
+        ).display,
+        markerFill: getComputedStyle(markers[0] as Element).backgroundColor,
+        buttonLineHeight: getComputedStyle(button).lineHeight,
+      };
+    });
+    expect(geometry.rowGap).toBe('0px');
+    expect(geometry.connectorHeight).toBeGreaterThan(0);
+    expect(Math.abs(geometry.connectorBottom - geometry.nextMarkerTop)).toBeLessThan(0.5);
+    expect(geometry.lastConnector).toBe('none');
+    expect(geometry.markerFill).toBe('rgb(0, 128, 0)');
+    expect(geometry.buttonLineHeight).toBe('20px');
   });
 
   // Host CSS layer contract for anchor Buttons: a host that layers its element
