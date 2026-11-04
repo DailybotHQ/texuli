@@ -48,8 +48,9 @@ from `main` to Cloudflare Pages, so merged copy is public.
 5. CSS: the site's `--tx-*` tokens, logical properties, light, dark and
    forced colors.
 6. Copy: mark planned features as planned. The packages are on npm
-   as `0.8.0` (pre-1.0), not a stable release; the agent service and
-   analytics are not provisioned. Never invent numbers, URLs or status.
+   in the 0.12 line (pre-1.0; AGENTS.md has the current version), not a
+   stable release; the agent service is not deployed, and Umami analytics
+   is on in production only. Never invent numbers, URLs or status.
 7. Agent surfaces: a new area updates `src/components/seo/llms-site.ts` and
    the regenerated `public/llms.txt`; docs pages get their Markdown twin
    automatically.

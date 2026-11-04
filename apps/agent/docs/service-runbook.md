@@ -19,6 +19,7 @@ for SSE. There are no activation, publish, send, or deploy routes.
 | `GET /v1/health` | No body or session required | `{"ok":true,"api":"v1","enabled":true,"catalogHash":"<64 hex>","guards":{"killSwitch":{"enabled":true,"source":"default"},"breaker":{"state":"closed","failures":0,"trips":0,"retryAt":null}}}` | Reports guard state only; it contains no prompt or caller data. |
 | `POST /v1/session` | No required fields; body is ignored | `{"token":"<signed session token>"}` when the worker has `AGENT_SESSION_SECRET`, otherwise `{"token":null}` | The local Node server does not configure a signing secret. |
 | `GET /v1/receipts` | Worker: `Authorization: Bearer <token>`; local Node: caller IP identifies the session | `{"receipts":[<ActionReceipt>,...]}` | Lists action receipts for that session only. |
+| `POST /v1/csp-reports` | `application/reports+json` or `application/csp-report`, at most 16 KiB | `204`, no body | Reports are reduced and counted, never stored verbatim; no session, and the kill switch does not apply. Enabled when the adapter passes a report store (the Node dev server and the edge worker both do); see [csp-reports.md](csp-reports.md). |
 | `POST /v1/draft` | JSON below | `DraftResult` below, or `AgentEvent` frames when `Accept: text/event-stream` | Worker requires a valid bearer session token and a configured signing secret; local dev may use IP identity when no secret is configured. |
 
 Draft request:

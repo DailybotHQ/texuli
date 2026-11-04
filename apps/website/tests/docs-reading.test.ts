@@ -828,6 +828,41 @@ describe('site navigation model', () => {
     for (const dropped of ['Copy page', 'alert(1)', 'decoration', 'secret'])
       expect(markdown).not.toContain(dropped);
 
+    // A hidden icon or probe drops only itself: the old pattern ran on to the
+    // next closing tag and took headings, prose and tables with it.
+    const chart = htmlToMarkdown(`
+      <figure><svg class="icon" aria-hidden="true"><path d=""/></svg><figcaption><h2>Latency versus throughput</h2>
+      <p>Services by error rate.</p></figcaption>
+      <div class="probe" aria-hidden="true"><div>probe</div><div>more probe</div></div>
+      <p>After the probe.</p>
+      <span class="visually-hidden">Use arrow keys to move between points.</span>
+      <table><caption class="sr-only">Public props for Alert</caption><tr><th>Prop</th></tr><tr><td>tone</td></tr></table>
+      <p hidden>secret <span>nested</span> still secret</p><p>Visible tail.</p></figure>
+      <astro-island props="{&quot;d&quot;:&quot;a callout still hidden&quot;}" aria-hidden="false"><p>Island text.</p></astro-island>`);
+    expect(chart).toContain('Island text.');
+
+    // Entries presented as buttons in lists and cells, a textarea's document,
+    // and adjacent inline elements keep their text apart.
+    const controls = htmlToMarkdown(`
+      <ul><li><button><span>Title hero</span><span>The first slide of a deck.</span></button></li></ul>
+      <table><tr><th>Value</th></tr><tr><td><button aria-label="Try"><code>SW1A 1AA</code></button></td></tr></table>
+      <textarea>{ &quot;id&quot;: &quot;card&quot; }</textarea><textarea></textarea>
+      <ul><li><code>canvas/model</code><span>format, validation</span></li></ul>
+      <button>Load live example</button>`);
+    expect(controls).toContain('- Title hero The first slide of a deck.');
+    expect(controls).toContain('| `SW1A 1AA` |');
+    expect(controls).toContain('```\n{ "id": "card" }\n```');
+    expect(controls).toContain('- `canvas/model` format, validation');
+    expect(controls).not.toContain('Load live example');
+    expect(chart).toContain('## Latency versus throughput');
+    expect(chart).toContain('Services by error rate.');
+    expect(chart).toContain('After the probe.');
+    expect(chart).toContain('Use arrow keys to move between points.');
+    expect(chart).toContain('Public props for Alert\n\n| Prop |');
+    expect(chart).toContain('Visible tail.');
+    for (const dropped of ['probe\n', 'more probe', 'secret', 'nested'])
+      expect(chart).not.toContain(dropped);
+
     const page = `<main><template data-page-markdown="" data-x>Head\n</template><!--tx-page-body--><h2>A &lt;b&gt; tag</h2><p>x</p><!--/tx-page-body--><nav>Pager</nav></main>`;
     const filled = fillPageMarkdown(page) ?? '';
     expect(filled).toContain('<template data-page-markdown="" data-x>Head\n## A &lt;b&gt; tag');

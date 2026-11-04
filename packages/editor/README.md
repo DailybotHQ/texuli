@@ -9,6 +9,8 @@ the rendering is sink-free: no `{@html}`, no `innerHTML`, every link through
 the URL policy. It is part of [Texuli](https://texuli.com), "Small pieces.
 Infinite possibilities.": an MIT Svelte 5 component library by Dailybot, Inc.
 
+**In the stack:** layer L4, a domain package on the `@texuli/core` editor texels, `@texuli/primitives`, the `@texuli/tokens` token engine and the `texuli` components. `@texuli/pages` builds on it.
+
 > **Status: in development (pre-1.0).** `@texuli/editor` is published on
 > npm as `0.12.3`, with provenance (first published as `0.5.0`; the publish
 > workflow publishes it after `texuli`). Under 0.x a new minor (`0.12.0`) may contain

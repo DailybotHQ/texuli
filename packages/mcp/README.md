@@ -7,6 +7,8 @@ connected to it can search the component catalog, read manifests and worked
 examples, validate blueprint drafts, search and preview themes with their
 WCAG AA report, and run the deck and document commands.
 
+**In the stack:** layer L9, the top: a thin bin over the stdio MCP server in `@texuli/tools` (L8), which reads the agent catalog (L6) and the `@texuli/tokens` themes.
+
 > **Status: in development (pre-1.0).** `@texuli/mcp` is published on npm
 > as `0.12.3`, with provenance (first published as `0.9.0`). Under 0.x a new minor
 > (`0.12.0`) may contain breaking changes, so pin the exact version or use
@@ -112,11 +114,14 @@ implemented, lifecycle, limits, error codes) are in
 ## Safety
 
 - **No network.** No operation fetches anything or needs a secret.
-- **No writes today.** Every current operation is read-only and returns its
-  output (a PDF comes back as base64, not as a file). Operations that write
-  files later (such as saving a design system) take an explicit path that
-  must resolve inside the working directory the host starts the server in;
-  `..` traversal and symlinks are refused.
+- **One local write.** Every operation is read-only and returns its output
+  (a PDF comes back as base64, not as a file), except `ds.save`, which
+  validates a design system and writes it as JSON to the explicit `.json`
+  path you pass. The path must resolve inside the working directory the
+  host starts the server in: `..` traversal, symlinks, dot directories and
+  dotfiles, `node_modules`, `package.json` and an existing file (unless
+  `overwrite` is set) are refused, and `dryRun` writes nothing. The remote
+  `https://texuli.com/mcp` does not offer it.
 - **Bounded input.** A stdio message over 2 MiB is refused before parsing,
   and every operation has its own input, item and time limits.
 - **stdout is the protocol.** Logs and errors go to stderr only.

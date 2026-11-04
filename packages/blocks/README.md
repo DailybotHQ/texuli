@@ -9,6 +9,8 @@ an inert notice instead of reaching the page. It is part of
 [Texuli](https://texuli.com), "Small pieces. Infinite possibilities.": an MIT
 Svelte 5 component library by Dailybot, Inc.
 
+**In the stack:** layer L5, on the `@texuli/core` texels, the `@texuli/tokens` token engine, the `texuli` components and the `@texuli/charts`, `@texuli/data` and `@texuli/media` domain packages. The agent catalog, the player, `@texuli/pages`, `@texuli/slides`, `@texuli/astro` and `@texuli/tools` build on it.
+
 > **Status: 0.x release.** `@texuli/blocks` is published on npm as `0.12.3`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
 > minor (`0.12.0`) may contain breaking changes, so pin the exact version or

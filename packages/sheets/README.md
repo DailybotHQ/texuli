@@ -10,6 +10,8 @@ rewrite references, CSV import and export that neutralizes formula
 injection, and an accessible Svelte 5 sheet view over the `@texuli/data`
 grid editing layer.
 
+**In the stack:** layer L5, on the `@texuli/core` texels (the expression AST), `@texuli/date`, the `texuli` components and the `@texuli/data` grid (L4). The player paints it through its `sheetHost` seam.
+
 > **Status: in development (pre-1.0).** `@texuli/sheets` is published on
 > npm as `0.12.3`, with provenance (first released as `0.8.0`; built in PLAN_010).
 > Under 0.x a new minor (`0.12.0`) may contain breaking changes, so pin the
@@ -70,7 +72,7 @@ dependencies come with it. Import the token stylesheet once
 | `./view` | `SheetView`: the accessible spreadsheet with tabs and a formula bar | [view](https://github.com/DailybotHQ/texuli/blob/main/packages/sheets/docs/view.md) |
 | `./host` | `createSheetPlayerHost`: the sheet half of the player's `sheetHost` seam (pass it as `sheetHost` on `Player`) and its draft check | [host](https://github.com/DailybotHQ/texuli/blob/main/packages/sheets/docs/host.md) |
 
-`SHEETS_PACKAGE_VERSION` equals the package version (`0.9.0`).
+`SHEETS_PACKAGE_VERSION` equals the package version (`0.12.3`).
 
 ## Security
 
@@ -99,6 +101,12 @@ announced. The cell editor loads lazily on the first Enter (or F2), so a
 host test awaits it before typing, for example
 `await screen.findByRole('textbox', { name: 'B' })` (the editor is named by
 its column letter). See [view](https://github.com/DailybotHQ/texuli/blob/main/packages/sheets/docs/view.md).
+
+## Contributing
+
+Contributions are welcome; start at the
+[GitHub repository](https://github.com/DailybotHQ/texuli)
+(issues: [github.com/DailybotHQ/texuli/issues](https://github.com/DailybotHQ/texuli/issues)).
 
 ## License
 

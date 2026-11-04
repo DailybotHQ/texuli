@@ -43,7 +43,7 @@ integration.
   commit and the `skill-vX.Y.Z` tag atomically, builds the archive and its
   `SHA256SUMS`, and creates the GitHub Release; `smoke` installs the tag
   with the skills CLI and checks the version and checksums. The latest skill
-  release is the `skill-v0.3.12` tag. Details: [RELEASE](RELEASE.md#skill-release);
+  release is the `skill-v0.3.16` tag (2026-11-03). Details: [RELEASE](RELEASE.md#skill-release);
   tests: `scripts/tests/skill-release.test.ts`.
 - **`behavior`** — the primitives behavior suite on chromium and webkit
   (the phone-specific rows run in a Pixel 7 context inside the chromium
@@ -200,9 +200,10 @@ prebuild, `astro check`, and the CSP integration (whose `_headers` file
 ships in the output and is applied by Cloudflare Pages).
 
 Pages also deploys the Functions in the repository-root `functions/`
-directory: `_middleware.ts` runs on every route, and
+directory: `_middleware.ts` runs on every route,
 `api/umami/[[path]].ts` is the same-origin analytics proxy
-([SECURITY](SECURITY.md#15-website-edge-functions-and-analytics)).
+([SECURITY](SECURITY.md#15-website-edge-functions-and-analytics)), and
+`mcp.ts` is the remote MCP (below).
 Cloudflare applies `_headers` only to the static asset response, so the
 middleware returns that response object untouched on every pass-through
 request; `Vary: Accept` for the docs pages that have a Markdown twin is
@@ -215,10 +216,18 @@ After the next deploy, confirm on a few HTML routes (a docs page with a
 twin, `/`, a component page) that `Content-Security-Policy` is present
 and that docs pages carry `Vary: Accept`. The variables
 `PUBLIC_UMAMI_WEBSITE_ID` and `UMAMI_ENDPOINT_ORIGIN` live in the Pages
-project settings, owner-provisioned; analytics stays off without them. Every push to
+project settings, owner-provisioned (set for production, so texuli.com
+sends Umami events); Umami analytics stays off without them.
+Cloudflare Web Analytics is a Cloudflare account setting: the edge injects
+its beacon into production pages, and the page CSP allows its script and
+report origins (`CLOUDFLARE_WEB_ANALYTICS` in `csp.ts`). Every push to
 `main` deploys; a pull request gets a preview deployment. The per-page
 social images, sitemap and robots.txt are generated at build time against
-`https://texuli.com` (the `site` in `apps/website/astro.config.mjs`).
+`https://texuli.com` (the `site` in `apps/website/astro.config.mjs`). The
+middleware answers `/robots.txt` itself for every client with
+`Cache-Control: no-store`: the built policy, or a variant without the
+non-standard lines for Lighthouse-family audits, so the edge cache never
+hands one rendering to the other audience.
 
 The remote MCP endpoint (`functions/mcp.ts`, PLAN_011 T-mcp-remote) deploys
 with the site from `main` and is live from release 0.9.0. It needs no
@@ -233,7 +242,12 @@ and `tools/list` with the `edge` operations, that a `GET` gets `405`, and
 that the security headers are present; the `mcp-remote-smoke` job (above)
 compares the live `tools/list` with the registry after each deploy from `main`.
 The optional Cloudflare rate-limiting rule for `/mcp` is an owner action
-in the dashboard, described in the same SECURITY section.
+in the dashboard, described in the same SECURITY section. The DNS side of
+agent discovery is account configuration too, not in the repository: the
+texuli.com zone is signed with DNSSEC and carries DNS-AID `SVCB` records
+for `_index._agents.texuli.com` and `_mcp._agents.texuli.com` (target
+`texuli.com`, `alpn=mcp`, `port=443`)
+([SECURITY](SECURITY.md#22-agent-discovery-files-texulicom)).
 
 ## Budget audits
 

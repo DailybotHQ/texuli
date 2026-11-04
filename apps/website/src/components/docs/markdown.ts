@@ -108,11 +108,88 @@ function unwrapLayoutTables(html: string): string {
   );
 }
 
+const TAG = /<(\/?)([a-zA-Z][\w-]*)\b((?:[^>"']|"[^"]*"|'[^']*')*)>/g;
+const VOID =
+  /^(?:area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr|path|circle|rect|line|polyline|polygon|ellipse|use|stop)$/i;
+const CODE_ONLY = /<(script|style|template)\b[^>]*>[\s\S]*?<\/\1>/gi;
+
+const ATTRIBUTE = /([^\s=/>"']+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+)))?/g;
+
+/**
+ * A start tag's attributes mark the element hidden (`hidden`,
+ * `aria-hidden="true"`). Names are parsed, so a value that merely contains
+ * the word (an island's JSON props) never counts.
+ */
+function hiddenAttributes(attributes: string): boolean {
+  for (const [, name = '', double, single, bare] of attributes.matchAll(ATTRIBUTE)) {
+    const key = name.toLowerCase();
+    if (key === 'hidden') return true;
+    if (key === 'aria-hidden' && (double ?? single ?? bare ?? '').trim().toLowerCase() === 'true')
+      return true;
+  }
+  return false;
+}
+
+/**
+ * Removes every hidden element with all of its content, matching its own
+ * closing tag through nesting. A class name such as `visually-hidden` is
+ * not hiding: screen-reader text is content. An element left unclosed is
+ * kept, so a malformed tag never swallows the rest of the page.
+ */
+export function dropHiddenElements(html: string): string {
+  let out = '';
+  let last = 0;
+  let skip: { name: string; depth: number; start: number } | undefined;
+  for (const match of html.matchAll(TAG)) {
+    const [tag, close, rawName, attributes = ''] = match;
+    const name = (rawName ?? '').toLowerCase();
+    const index = match.index ?? 0;
+    const empty = VOID.test(name) || tag.endsWith('/>');
+    if (skip) {
+      if (name !== skip.name || empty) continue;
+      skip.depth += close ? -1 : 1;
+      if (skip.depth === 0) {
+        last = index + tag.length;
+        skip = undefined;
+      }
+      continue;
+    }
+    if (close || !hiddenAttributes(attributes)) continue;
+    out += html.slice(last, index);
+    if (empty) last = index + tag.length;
+    else skip = { name, depth: 1, start: index };
+  }
+  return out + html.slice(skip ? skip.start : last);
+}
+
+/**
+ * Content controls keep their text: a button inside a list item or a table
+ * cell is how a gallery or a sample list presents its entries (a slide
+ * layout and its summary, a sample value to try), and a `textarea`'s
+ * initial value is a document the page shows (a JSON blueprint). Every
+ * other control is chrome and is dropped later.
+ */
+function keepContentControls(html: string): string {
+  return html
+    .replace(/<(li|td|th)\b[^>]*>[\s\S]*?<\/\1>/gi, (cell) =>
+      cell.replace(/<button\b[^>]*>([\s\S]*?)<\/button>/gi, ' <span>$1</span> ')
+    )
+    .replace(/<textarea\b[^>]*>([\s\S]*?)<\/textarea>/gi, (_m, value: string) =>
+      value.trim() ? `<pre>${value}</pre>` : ''
+    );
+}
+
 /** Converts rendered HTML (a page's main content) to Markdown. */
 export function htmlToMarkdown(html: string): string {
-  let text = unwrapLayoutTables(html)
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/<[^>]+\b(hidden|aria-hidden="true")[^>]*>[\s\S]*?<\/(span|div|p)>/gi, '')
+  let text = keepContentControls(
+    dropHiddenElements(
+      unwrapLayoutTables(html)
+        .replace(/<!--[\s\S]*?-->/g, '')
+        .replace(CODE_ONLY, '')
+    )
+  )
+    // Adjacent inline elements render apart (`<code>canvas/model</code><span>format…`).
+    .replace(/(<\/(?:code|span|small|strong|b|em|i|a)>)(?=<(?:span|small|code)\b)/gi, '$1 ')
     .replace(/<img\b[^>]*>/gi, imageText)
     .replace(/(<svg\b[^>]*\srole="img"[^>]*>)[\s\S]*?<\/svg>/gi, (_m, open: string) =>
       imageText(open)
@@ -129,6 +206,9 @@ export function htmlToMarkdown(html: string): string {
   // Tables next, as one Markdown table per `<table>`: the separator belongs
   // after the header row only, even when body rows use `th` row headers.
   text = text.replace(/<table\b[^>]*>([\s\S]*?)<\/table>/gi, (_m, table: string) => {
+    // The caption names the table (often for screen readers only): keep it above.
+    const caption = inline(/<caption\b[^>]*>([\s\S]*?)<\/caption>/i.exec(table)?.[1] ?? '').trim();
+    const title = caption ? `\n\n${caption}\n\n` : '';
     const rows = [...table.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map((row) =>
       [...(row[1] ?? '').matchAll(/<(th|td)\b[^>]*>([\s\S]*?)<\/\1>/gi)].map((cell) =>
         inline(cell[2] ?? '')
@@ -136,7 +216,7 @@ export function htmlToMarkdown(html: string): string {
           .replace(/\|/g, '\\|')
       )
     );
-    if (!rows.length) return '\n\n';
+    if (!rows.length) return `${title}\n\n`;
     const width = Math.max(...rows.map((cells) => cells.length));
     const pad = (cells: string[]) => {
       const copy = [...cells];
@@ -149,7 +229,7 @@ export function htmlToMarkdown(html: string): string {
       separator,
       ...rows.slice(1).map((cells) => `| ${pad(cells).join(' | ')} |`),
     ];
-    return `\n\n${lines.join('\n')}\n\n`;
+    return `${title}\n\n${lines.join('\n')}\n\n`;
   });
   text = text
     .replace(
@@ -181,14 +261,39 @@ export function htmlToMarkdown(html: string): string {
 /**
  * Root-relative links to absolute ones for the served `.md` twins (T-23):
  * an agent fetching `guides/theming.md` from anywhere must be able to follow
- * links without resolving a base. Fenced code is left untouched, so a code
- * sample that shows Markdown keeps its shape.
+ * links without resolving a base. With `pageUrl` (the HTML page the twin
+ * mirrors), relative links (`./getting-started/`, `../SKILL.md`, `#api`)
+ * resolve against that page too: the twin lives at another URL
+ * (`/guides.md`), so leaving them relative would point somewhere else.
+ * Fenced code is left untouched, so a code sample that shows Markdown keeps
+ * its shape.
  */
-export function absolutizeMarkdownLinks(markdown: string, origin: string): string {
+export function absolutizeMarkdownLinks(
+  markdown: string,
+  origin: string,
+  pageUrl?: string
+): string {
+  const relative = (href: string): string => {
+    if (!pageUrl || /^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith('//')) return href;
+    try {
+      return new URL(href, pageUrl).href;
+    } catch {
+      return href;
+    }
+  };
   return markdown
     .split(/(```[\s\S]*?```)/g)
     .map((chunk) =>
-      chunk.startsWith('```') ? chunk : chunk.replace(/\]\((\/[^)]*)\)/g, `](${origin}$1)`)
+      chunk.startsWith('```')
+        ? chunk
+        : chunk
+            .replace(/\]\((\/[^/)][^)]*|\/)\)/g, `](${origin}$1)`)
+            .replace(
+              /\]\(((?:\.{1,2}\/|#|[\w-]+\/)[^)\s]*)(\s+"[^"]*")?\)/g,
+              (_m, href: string, title = '') => {
+                return `](${relative(href)}${title})`;
+              }
+            )
     )
     .join('');
 }

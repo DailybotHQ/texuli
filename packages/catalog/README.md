@@ -8,6 +8,8 @@ sink-free renderer that turns untrusted agent trees into safe render trees.
 Agent output is treated as hostile data: it is parsed, bounded and checked
 against closed schemas, and it never reaches an HTML sink.
 
+**In the stack:** layer L6: the agent catalog over the `texuli` components and the `@texuli/blocks`, `@texuli/charts`, `@texuli/data` and `@texuli/media` domain packages, with the `@texuli/spec` blueprint contract and the `@texuli/core` URL policy. The player, `@texuli/slides` and `@texuli/tools` build on it.
+
 Use it to validate agent output on a server, in an edge worker or in the
 browser, or to build your own painter. To paint validated blueprints in
 Svelte, use [`@texuli/player`](https://www.npmjs.com/package/@texuli/player),

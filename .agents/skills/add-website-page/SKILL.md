@@ -71,10 +71,12 @@ manifest entry or the `PRIMITIVES` row instead.
    hierarchy to edit.
 5. **Docs shell and twin:** a reading page outside `/guides/` joins
    `DOC_SHELL_ROUTES` in `src/components/foundation/nav-data.ts`
-   (`isDocsPath`). Docs pages get "Copy page", the table of contents, the
-   pager and a Markdown twin (`<route>.md`, written at build time with
-   absolute links) plus `Vary: Accept` in `_headers`. A page outside the docs
-   shell needs an explicit decision there.
+   (`isDocsPath`). Docs pages get "Copy page", the table of contents and the
+   pager. Every page, docs or not, gets a Markdown twin (`<route>.md`,
+   written at build time with absolute links) plus `Vary: Accept` in
+   `_headers`; a page with a live demo adds its route to `TWIN_NOTES`
+   (`src/components/docs/twin-notes.ts`, see `site-aeo.md`). A page outside
+   the docs shell needs an explicit decision there.
 6. **Agent index:** if the page adds a site area or a new top-level link,
    give its section one factual line in `src/components/seo/llms-site.ts`,
    run `pnpm exec tsx scripts/generate-site-llms.ts` and commit the new
@@ -97,10 +99,12 @@ manifest entry or the `PRIMITIVES` row instead.
 10. **CSP:** the build-time integration (`src/components/security/csp.ts`)
     hashes every inline script, style element and style attribute per
     route into `dist/_headers` and `dist/csp-manifest.json`, so write
-    nothing that needs `unsafe-inline` or `unsafe-eval`. `connect-src` and
-    `frame-src` are same-origin, and `img-src`/`media-src` add only `data:`,
-    `blob:` and the documented fictional example origins; a page that needs
-    another origin is a security decision for the owner, not a local edit. Trusted Types are required, so no DOM HTML
+    nothing that needs `unsafe-inline` or `unsafe-eval`. `frame-src` is
+    same-origin; `script-src` and `connect-src` add only the Cloudflare Web
+    Analytics beacon's origins (`CLOUDFLARE_WEB_ANALYTICS`, injected by the
+    Cloudflare edge); `img-src`/`media-src` add only `data:`, `blob:` and the
+    documented fictional example origins. A page that needs another origin
+    is a security decision for the owner, not a local edit. Trusted Types are required, so no DOM HTML
     sink can run anyway.
 11. **Analytics:** Umami is off unless the owner sets
     `PUBLIC_UMAMI_WEBSITE_ID`; `BaseLayout` mounts the loader, so a page
@@ -111,9 +115,10 @@ manifest entry or the `PRIMITIVES` row instead.
 12. **Content safety:** no `set:html` or `{@html}`; links built from data go
     through `safeHref` from `@texuli/core/url-policy`; fictional data only
     (`example.com`).
-13. **Honesty:** the packages are on npm as `0.8.0` (pre-1.0),
-    not a stable release; the agent service and analytics are not
-    provisioned in production. Copy states what ships today
+13. **Honesty:** the packages are on npm at `0.12.3` (pre-1.0), not a
+    stable release; the agent service is not deployed and Umami analytics
+    are not provisioned in production (the remote MCP at
+    `https://texuli.com/mcp` is live). Copy states what ships today
     (`apps/website/tests/copy-honesty.test.ts` bans claims the repository
     contradicts, such as size or native parity claims).
 

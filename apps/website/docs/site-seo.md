@@ -58,8 +58,10 @@ For each page:
 Then it writes:
 - `dist/sitemap.xml`: every indexed page, absolute, sorted, deduplicated,
   each with a `<lastmod>` from git (PLAN_006 T-20, below);
-- `dist/robots.txt`: allow everything, the `Sitemap:` line and one
-  `Allow: /` group per AI crawler (T-20, below).
+- `dist/robots.txt`: allow everything, the `Sitemap:` line, the
+  `Agentmap:` line (the ARD catalog) and one `Allow: /` group per AI
+  crawler, with the site's `Content-Signal` in every group (T-20, below;
+  the Pages middleware serves it, [site-aeo.md](site-aeo.md)).
 
 The pure helpers live in `seo.ts`: path normalization, file names,
 absolute URLs, XML escaping, the sitemap and robots builders, meta
@@ -121,7 +123,7 @@ for unknown paths.
 | **JSON-LD.** `JsonLd.astro` renders code-authored data only (never page data or agent output). Every indexable page carries one graph from `siteJsonLd` (PLAN_014): the Organization, the WebSite with its SearchAction and the page as a WebPage, merged with the page's own nodes (their duplicate Organization and WebSite are dropped). `/` adds SoftwareApplication (`libraryJsonLd` in `src/lib/schema.ts`; the version is read from the installed `texuli` manifest, the description says "in development", no `offers`). `/web-and-native/` carries a TechArticle. The CSP integration hashes the inline blocks automatically | `src/components/seo/JsonLd.astro`, `src/lib/schema.ts`, `BaseLayout`'s `jsonLd` prop | `apps/website/tests/site-build-guards.test.ts`; the SEO audit in `tests/e2e/site-seo.spec.ts` |
 | **BreadcrumbList** on nested pages from the sidebar nav, plus the visible trail on docs pages ([site-subsite.md](site-subsite.md)) | `src/components/seo/breadcrumbs.ts` | `apps/website/tests/site-build-guards.test.ts`, `apps/website/tests/docs-reading.test.ts` |
 | **Per-page `<lastmod>`** from `git log -1 --format=%cs` of the route's source (component and primitive pages also follow their manifests and sources) | `src/components/seo/integration.ts` | `apps/website/tests/site-build-guards.test.ts`; the SEO audit in `tests/e2e/site-seo.spec.ts` |
-| **AI-crawler robots policy.** 16 named crawlers (`AI_CRAWLERS`), each allowed; no `Disallow`, no static `Content-Signal` (a per-agent header a static file cannot serve). The edge variant for strict parsers is in [site-aeo.md](site-aeo.md) | `src/components/seo/seo.ts` | `apps/website/tests/site-build-guards.test.ts`, `apps/website/tests/edge-middleware.test.ts` |
+| **AI-crawler robots policy.** 16 named crawlers (`AI_CRAWLERS`), each allowed; no `Disallow`; `Content-Signal: ai-train=yes, search=yes, ai-input=yes` in every group and the `Agentmap:` line, both from `agent-discovery.ts`. The middleware serves `/robots.txt` with `cache-control: no-store`, and strict-parser audits get a variant without those two directives ([site-aeo.md](site-aeo.md)) | `src/components/seo/seo.ts` | `apps/website/tests/site-build-guards.test.ts`, `apps/website/tests/edge-middleware.test.ts` |
 | **Area badges on social images.** `ogAreaFor(path)` maps a route prefix to a section label and accent (Guides, Components, Primitives, Themes, Agents, Project, Native, Architecture); unmapped routes get the brand card. Labels only, no metrics | `src/components/seo/seo.ts` | `apps/website/tests/site-build-guards.test.ts` |
 | **Verification metas.** `google-site-verification` and `msvalidate.01` render only when `PUBLIC_GOOGLE_SITE_VERIFICATION` or `PUBLIC_BING_SITE_VERIFICATION` is set; absent by default | `src/lib/constances.ts`, `SeoHead.astro` | `apps/website/tests/analytics-client.test.ts` |
 | **Offline audit.** `node scripts/audit-seo.mjs --dist apps/website/dist` checks titles, descriptions, canonicals, the OG and Twitter sets, JSON-LD validity, the PNG art, sitemap equality and the robots shape; critical findings exit non-zero. PLAN_014 added `og:image:secure_url` and the site graph on every page (critical), images without `alt` (critical), a page without an h1 (critical), more than one h1 (an embedded deck sets `coverHeadingLevel={2}`, as the slides page does), a skipped heading level, a duplicated title and a duplicated Organization or WebSite node (warnings). Its 2026-11-01 run: 654 pages, 0 critical, 0 warning, 3 planned | `scripts/audit-seo.mjs` | `scripts/tests/audit-seo.test.ts` |
