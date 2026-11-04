@@ -15,6 +15,13 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.3.17] — 2026-11-04
+
+### Changes
+
+- docs(skill): say the packages are on npm in the 0.12 line
+- docs(skill): route every published package and state the value proposition
+
 - The router opens with the value proposition (texels, primitives, tokens
   and design systems, components, domain packages, the agent catalog and
   blueprints, the MCP server) and routes every published package: new rows
