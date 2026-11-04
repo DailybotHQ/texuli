@@ -9,6 +9,8 @@ with the theme engine in
 [`@texuli/tokens`](https://www.npmjs.com/package/@texuli/tokens), so you get
 keyboard support, focus management and theming out of the box.
 
+**In the stack:** layer L3: owned headless primitives (L1, on the `@texuli/core` texels) plus the token engine (L2) become styled components and layouts. The domain packages (L4 and up), the agent catalog and the player build on it.
+
 Use it to build Svelte 5 apps, dashboards and sites without writing
 component behavior or design tokens yourself: 41 component families plus
 layouts for dashboards, marketing pages, auth and settings, content and

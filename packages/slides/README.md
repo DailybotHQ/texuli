@@ -9,6 +9,8 @@ backgrounds with guaranteed text contrast, and any Texuli component on a
 slide. The same deck prints to PDF through the browser and exports to PPTX
 locally.
 
+**In the stack:** layer L8, on `@texuli/deck` (L0), the `@texuli/tokens` token engine, `@texuli/blocks`, `@texuli/media`, the agent catalog and the player (any slide-renderable component).
+
 The deck model, its validation, the Markdown dialect and the navigation
 engine live in [`@texuli/deck`](https://github.com/DailybotHQ/texuli/blob/main/packages/deck/README.md),
 a framework-free package with no runtime dependencies. This package is the

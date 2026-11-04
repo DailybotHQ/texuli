@@ -9,6 +9,8 @@ edits the graph without the canvas. It is part of
 [Texuli](https://texuli.com), "Small pieces. Infinite possibilities.": an
 MIT Svelte 5 component library by Dailybot, Inc.
 
+**In the stack:** layer L4, a domain package on the `@texuli/core` texels, `@texuli/primitives`, `@texuli/drag`, the `@texuli/tokens` token engine and the `texuli` components. The player paints workflow blueprints with it.
+
 > **Status: in development (pre-1.0).** `@texuli/workflows` is on npm as
 > `0.12.3`, with provenance (first published as `0.3.0` on 2026-10-28). It
 > is the `workflow-graph` painter of `@texuli/player`, so an agent can send

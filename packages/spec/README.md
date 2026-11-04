@@ -8,6 +8,8 @@ closed catalog. `@texuli/spec` is the platform-neutral source of truth for
 that format: the generated TypeScript types, the closed component
 vocabulary, a target-neutral blueprint validator and deterministic hashing.
 
+**In the stack:** layer L0: the blueprint contract every agent-facing layer shares. `@texuli/tokens` (design-system documents), `@texuli/catalog` and `@texuli/player` build on it, and the Kotlin Multiplatform twin in `native/` is generated from it.
+
 Use it when you generate, store, diff or check blueprints, or build a
 renderer for them. The same contract also generates the Kotlin models used
 by Texuli's Kotlin Multiplatform twin. The package is framework-free: no

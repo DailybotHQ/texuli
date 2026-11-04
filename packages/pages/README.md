@@ -10,6 +10,8 @@ components and decks painted by `@texuli/player` at the untrusted tier.
 Every edit is a `@texuli/document` operation in one op log, so undo, redo,
 persistence and sync share one history.
 
+**In the stack:** layer L8, on `@texuli/document` (L1), `@texuli/editor`, `@texuli/drag`, `@texuli/primitives`, the `texuli` components, `@texuli/blocks` and the player.
+
 > **Status: in development (pre-1.0).** `@texuli/pages` is published on npm
 > as `0.12.3`, with provenance (first published as `0.7.0`, with `@texuli/document`;
 > built in PLAN_010, ADR-011 in

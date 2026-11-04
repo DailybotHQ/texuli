@@ -10,6 +10,8 @@ formats and validators are names, conditions are expressions of the closed
 language in `@texuli/core/expression`, and no schema carries a regular
 expression or code.
 
+**In the stack:** layer L4, a domain package on the `@texuli/core` texels (the expression language) and the `texuli` components. The player paints it through its `formHost` seam.
+
 > **Status: in development (pre-1.0).** `@texuli/forms` is published on
 > npm as `0.12.3`, with provenance (first published as `0.8.0`; built in PLAN_010,
 > ADR-015 in

@@ -7,6 +7,8 @@ TypeScript units of behavior and policy (focus management, roving focus,
 layering and Escape handling, positioning, ids, keyboard shortcuts, URL
 safety) that every Texuli primitive and component is built from.
 
+**In the stack:** layer L0, the base. Texuli is built from scratch and owned end to end: texels here, owned headless primitives on them (`@texuli/primitives`), the token engine (`@texuli/tokens`), styled components (`texuli`), domain packages, and the agent catalog, player and tools on top. `@texuli/core` depends on no other package.
+
 Use it directly when you build your own components in any framework, or
 when you need Texuli's URL policy to sanitize links and media from agents
 or users. It has no runtime dependencies and imports no UI framework.
