@@ -38,7 +38,8 @@ There are no backports.
   any network call, file write or persistent change it causes.
 - The release workflows under `.github/workflows/` and the assets they
   publish (npm tarballs, the skill archive and its `SHA256SUMS`).
-- The website at texuli.com and the Pages Functions in `functions/`.
+- The website at texuli.com and the Pages Functions in `functions/`,
+  including the remote MCP at `https://texuli.com/mcp`.
 
 ## Out of scope
 
@@ -50,7 +51,8 @@ There are no backports.
 
 ## Integrity of what we publish
 
-- npm packages are published by CI with npm provenance.
+- npm packages are published by CI through npm trusted publishing (no
+  stored npm token), with npm provenance.
 - Skill releases are **checksummed, not signed**: verify the archive and
   every file against the release's `SHA256SUMS` before installing
   ([skills/texuli/TRUST.md](skills/texuli/TRUST.md#provenance),

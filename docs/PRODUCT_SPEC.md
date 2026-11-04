@@ -27,7 +27,10 @@ management, keyboard navigation and URL safety. Texels compose into **Texuli
 components** (buttons, dialogs, menus, data grids, charts), and components
 compose into **complete interfaces**: apps, dashboards, documents, slides and
 media. People use Texuli by writing Svelte; agents use it by choosing from a
-closed, documented catalog that can be validated before anything renders.
+closed, documented catalog that can be validated before anything renders:
+whole interfaces travel as blueprints (`@texuli/spec`, which a Kotlin
+Multiplatform twin also paints), and the MCP server and the agent skill put
+the catalog and its operations in an agent's hands.
 
 ## The problem
 
@@ -48,7 +51,7 @@ closed, documented catalog that can be validated before anything renders.
 | Consumer | Why they choose Texuli |
 | --- | --- |
 | **Svelte 5 developers** | One coherent library from tokens to data views, with accessibility behavior proven rather than assumed. |
-| **Coding agents** (Claude Code, Codex, Cursor and others) | A closed catalog with authored manifests, a sink-free renderer and a read-only MCP to look components up. |
+| **Coding agents** (Claude Code, Codex, Cursor and others) | A closed catalog with authored manifests, a sink-free renderer, blueprints that are validated before they paint, and an MCP server (local, and read-only at `https://texuli.com/mcp`) to look components up and check output. |
 | **Protoyard** | The open-source prototyping workspace becomes a consumer: its prototypes will render with Texuli components. |
 | **Dailybot** | A later production consumer of the same public library. |
 
@@ -72,8 +75,9 @@ closed, documented catalog that can be validated before anything renders.
    authored manifests (schema, `useWhen`, `dontUseWhen`, accessibility notes,
    examples); a renderer with no HTML sinks; a two-tier URL policy that
    separates developer-written props from untrusted content; and one
-   operations registry served as read-only MCP tools (local and remote) and
-   as `texuli <group> <verb>` commands, with the server card, the llms Tools
+   operations registry served as MCP tools (local and remote; the remote
+   is read-only, and the one local write is `ds.save`, inside the working
+   directory) and as `texuli <group> <verb>` commands, with the server card, the llms Tools
    section and the operation docs generated from it.
 6. **Whole interfaces as JSON.** A blueprint (spec 0.10.0; interaction since 0.3.0) declares local
    state, flows, two-way bindings and a closed action set, so an agent can
@@ -129,7 +133,7 @@ closed, documented catalog that can be validated before anything renders.
 | Tools (L8): the copy-in CLIs (`texuli-add`, `texuli-init`, `texuli-update`, `texuli-llms`), A2UI, custom elements, the golden set, and the MCP protocol layer (`@texuli/tools/mcp`) | **Exists**, on npm as `0.12.3` with its bins (`texuli`, `texuli-add`, `texuli-init`, `texuli-llms`, `texuli-update`, `texuli-deck`) | [`packages/tools`](../packages/tools/README.md) |
 | Agent surfaces (PLAN_011): the operations registry (`@texuli/tools/ops`), the `texuli <group> <verb>` router, the local MCP (`@texuli/mcp`, `npx -y @texuli/mcp`, every `edge` and `node` operation), the remote MCP at `https://texuli.com/mcp` (`functions/mcp.ts`, the `edge` and `site` operations), and the generated server card, llms Tools section and ops docs (`pnpm check:surfaces` fails on drift) | **Exists** from `0.9.0`, on npm (`@texuli/mcp` first published in `0.9.0`, in development); the remote is live with texuli.com, and a CI job compares its `tools/list` with the registry after each deploy | [`packages/tools/docs/mcp.md`](../packages/tools/docs/mcp.md), [`packages/mcp`](../packages/mcp/README.md) |
 | Design systems (PLAN_011): one JSON document per brand ([DESIGN_SYSTEMS](DESIGN_SYSTEMS.md)): the spec schema (`@texuli/spec/design-system`), the compiler, validator, importers, emitters, report and diff (`@texuli/tokens/design-system/*`), `DesignSystemProvider` and `applyDesignSystem` (`texuli/design-system`), the player's `designSystems`, the Astro option, conformance (`texuli ds check`, `@texuli/tools/ds-check`), the `ds.*` operations and the Design System Studio on texuli.com | **Exists** from `0.10.0`, on npm (ADR-021 to ADR-024); example brands in `examples/design-systems/` | [DESIGN_SYSTEMS](DESIGN_SYSTEMS.md), [`packages/tokens`](../packages/tokens/README.md) |
-| Multi-page static website (foundation, components, charts, media, guides, examples, showcase, themes; Astro 7 + Svelte islands) | **Exists**, builds statically, deployed at https://texuli.com (Cloudflare Pages) with three Pages Functions (`functions/`: agent-facing request shaping with the read-only JSON API, the remote MCP, and a same-origin Umami analytics proxy, off until the owner provisions it) | [`apps/website`](../apps/website/README.md) |
+| Multi-page static website (foundation, components, charts, media, guides, examples, showcase, themes; Astro 7 + Svelte islands) | **Exists**, builds statically, deployed at https://texuli.com (Cloudflare Pages) with three Pages Functions (`functions/`: agent-facing request shaping with the read-only JSON API, the remote MCP, and a same-origin Umami analytics proxy, off until the owner provisions it); Cloudflare Web Analytics is injected by the Cloudflare edge and allowed by the page CSP | [`apps/website`](../apps/website/README.md) |
 | npm 0.x release | **Done** — all 26 published packages in the 0.12 line (see [RELEASE](RELEASE.md)), every one at `0.12.3`: the `@texuli/pages` core entries off the deck model (G136; breaking for those core entries only) (after the 0.11 line, `0.11.0` to `0.11.5`, with Protoyard G125–G136 and the Final Review fixes; `0.10.0` for 26 packages, with design systems; the 0.9 line for 26 packages, the first release of `@texuli/mcp`; the 0.8 line for 25 packages, the first release of `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets`; `0.7.0` for 22 packages, the first release of `@texuli/document` and `@texuli/pages`; `0.6.0` for 20 packages; `0.5.0` for 20 packages, the first release of `@texuli/editor`; `0.4.0` for 19 packages, `0.3.0` for 18, `0.2.0` for 15 and the `0.1.0-next.0`–`next.3` previews), dist-tag `latest` (`next` is no longer maintained and stays on `0.12.1`), CI-published through npm trusted publishing with provenance | [RELEASE](RELEASE.md) |
 | npm stable release (1.0.0) | Planned; needs the developer's explicit go. texuli.com deploys from `main` (Cloudflare Pages) | — |
 

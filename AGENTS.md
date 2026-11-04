@@ -16,11 +16,15 @@ end to end and native for agents:
   into owned headless **primitives**;
 - with the **token** engine, those become styled **Texuli components** and
   layouts;
-- **domain packages** (data, charts, media, chat, content blocks) build on
-  the components;
+- **domain packages** (data, charts, media, chat, editor, forms, canvas,
+  workflows, content blocks, sheets, documents and pages, decks and
+  slides) build on the components;
 - the **agent catalog** renders agent output with no HTML sinks, and the
   blueprint contract (`@texuli/spec`) also feeds a Kotlin Multiplatform
-  twin in `native/`.
+  twin in `native/`;
+- agents reach it all through the **MCP server** (`@texuli/mcp` locally,
+  `https://texuli.com/mcp` remotely) and the **agent skill**
+  (`skills/texuli`).
 
 **Status: in development, pre-1.0.** All 26 published packages (all of
 `packages/` except `@texuli/examples`) are released on npm in the 0.12 line,
@@ -111,7 +115,7 @@ texuli/
 ├── apps/
 │   ├── website/         @texuli/website: texuli.com, Astro 7 + Svelte islands                  (README, docs/)
 │   └── agent/           @texuli/agent: the agent service (fake replay provider; not deployed)   (README, docs/)
-├── functions/           Cloudflare Pages Functions: _middleware.ts (Markdown twins, robots variant,
+├── functions/           Cloudflare Pages Functions: _middleware.ts (Markdown twins, robots.txt variants,
 │                        problem+json 404s, bot events), api/umami (same-origin analytics proxy)
 │                        and mcp.ts (the remote MCP at /mcp, stateless, edge and site operations)
 ├── native/              Gradle Kotlin Multiplatform twin: texuli-spec, texuli-compose, conformance (README, docs/)
