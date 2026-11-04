@@ -233,6 +233,17 @@ describe('Markdown twins: negotiation and rendition', () => {
         'https://texuli.com'
       )
     ).toBe('text\n\n```\n[link](/not/rewritten/)\n```\n\n[real](https://texuli.com/guides/)\n');
+    // A twin lives at another URL than its page (`/guides.md` for `/guides/`):
+    // relative links resolve against the page, or they would point elsewhere.
+    expect(
+      absolutizeMarkdownLinks(
+        'Start with [Getting started](./getting-started/), [the skill](../SKILL.md), [api](#api), [mail](mailto:a@example.com) and [ext](https://example.com/x).',
+        'https://texuli.com',
+        'https://texuli.com/guides/'
+      )
+    ).toBe(
+      'Start with [Getting started](https://texuli.com/guides/getting-started/), [the skill](https://texuli.com/SKILL.md), [api](https://texuli.com/guides/#api), [mail](mailto:a@example.com) and [ext](https://example.com/x).'
+    );
   });
 
   it('htmlToMarkdown renders lists one item per line and tables with one separator row', () => {

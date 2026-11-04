@@ -264,7 +264,11 @@ export function renderTwin(input: TwinInput): string {
   });
   const body = content.trim() || 'This page has no static text; see the section below.';
   const note = input.note ? `\n\n${input.note.trim()}` : '';
-  return absolutizeMarkdownLinks(`${header}${body}${note}\n`, input.origin);
+  return absolutizeMarkdownLinks(
+    `${header}${body}${note}\n`,
+    input.origin,
+    `${input.origin}${input.route}`
+  );
 }
 
 /** One page of the twin manifest's `pages` list (PLAN_011 T-ar-site-mcp). */
