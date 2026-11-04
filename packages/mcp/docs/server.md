@@ -32,12 +32,14 @@ requires (only `initialize` and `ping` answer before
 
 ## Local writes
 
-No operation writes files today. Operations that will (`ds.save`, file
-outputs of deck and document operations) must call the local write policy
-in `@texuli/tools` (`src/internal/local-write.ts`): an explicit path that
-resolves inside the working directory, never the directory itself, with
-`..` escapes, NUL bytes and symlinked components refused, and a new file
-unless overwriting is asked for.
+One operation writes a file today: `ds.save` (local doors only), which
+writes a validated design system as JSON. It and any later writer (such as
+file outputs of deck and document operations) go through the local write
+policy in `@texuli/tools` (`src/internal/local-write.ts`): an explicit path
+that resolves inside the working directory, never the directory itself,
+with `..` escapes, NUL bytes and symlinked components refused, and a new
+file unless overwriting is asked for. `ds.save` also accepts only `.json`
+files outside dot directories, `node_modules` and `package.json`.
 
 ## Tests
 
