@@ -70,8 +70,8 @@ Never `@texuli/core` root barrel for app code.
 | Astro sites | `@texuli/astro` (`texuli()` integration), `@texuli/astro/styles.css`, `@texuli/astro/site` (`defineSite`, `sitePageMeta`, `siteSitemap`), `@texuli/astro/layouts/ContentLayout`, `@texuli/astro/appearance` (`AppearanceSwitcher`; new in `0.5.0`) |
 | Paint a validated blueprint | `@texuli/player` (+ `@texuli/player/styles.css`) |
 | Drag and drop (Svelte) | `@texuli/primitives/sortable` (`Sortable`); views: `@texuli/data/board`, `@texuli/data/tree-view` |
-| Drag engine (framework-free) | `@texuli/drag/sortable`, `@texuli/drag/gesture`, `@texuli/drag/spatial`, `@texuli/drag/graph`, `@texuli/drag/messages`; in development, on npm as `0.12.3` |
-| Workflows | `@texuli/workflows/editor`, `@texuli/workflows/viewer`, `@texuli/workflows/inspector`, `@texuli/workflows/model`, `@texuli/workflows/layout`, `@texuli/workflows/spec-adapter`; in development, on npm as `0.12.3` |
+| Drag engine (framework-free) | `@texuli/drag/sortable`, `@texuli/drag/gesture`, `@texuli/drag/spatial`, `@texuli/drag/graph`, `@texuli/drag/messages`; in development, on npm as `0.13.0` |
+| Workflows | `@texuli/workflows/editor`, `@texuli/workflows/viewer`, `@texuli/workflows/inspector`, `@texuli/workflows/model`, `@texuli/workflows/layout`, `@texuli/workflows/spec-adapter`; in development, on npm as `0.13.0` |
 | Block documents | `@texuli/pages/editor` (`PageEditor`), `@texuli/pages/reader` (`PageReader`), `@texuli/pages/paged` (`PagedView`), `@texuli/pages/export` (`exportDocument`, `downloadBlob`), `@texuli/pages/collab` (`CollabEditor`, `createCollabSession`; lazy), `@texuli/pages/host` (`createDocumentPlayerHost`, `checkDocumentDraft`); the engine `@texuli/document/*` (`model`, `schema`, `ops`, `markdown`, `paged`, `docx`, `pdf`, `sync`, `collab`); in development, new in `0.7.0` |
 | Dates | `@texuli/date` (`CalendarDate`, Gregorian only) |
 | Class helpers from those packages | `texuli/cx` only |
@@ -97,7 +97,7 @@ end in [`../../design-systems/SKILL.md`](../../design-systems/SKILL.md).
 ## New in 0.11.0
 
 These APIs ship in `0.11.0`; the 0.10 line does not have them. Use them
-with `^0.12.0`.
+with `^0.13.0`.
 
 | Need | Use |
 | --- | --- |
@@ -142,7 +142,7 @@ with `^0.8.0` or later. The three packages are in development (pre-1.0).
 | A dashboard of widgets | `Dashboard` and `DashboardWidget` (`@texuli/data/dashboard`), `parseDashboard` for a saved layout (`@texuli/data/dashboard/engine`) |
 | Host data for generated views | `defineSource`, `createSourceRegistry` and `createSourceLoader` (`@texuli/core/data-source`), passed to `<Player sourceRegistry>`; a blueprint names a source with `$source`, never a URL |
 | One bounded expression language | `parseExpression` and `evaluateExpression` (`@texuli/core/expression`) |
-| Component labels from one catalog | `createI18n` (`@texuli/core/i18n`) and `setI18nContext` (`texuli`); label props still win, English is the only shipped language. On `main` (not on npm yet): one dictionary for every package with `LabelsProvider` or `setTexuliLabels` (`texuli/i18n`), typed with `TexuliLabels`, `BlocksMessageId` (`@texuli/blocks/i18n`) and `PagesMessageId` (`@texuli/pages`) |
+| Component labels from one catalog | `createI18n` (`@texuli/core/i18n`) and `setI18nContext` (`texuli`); label props still win, English is the only shipped language. New in `0.13.0`: one dictionary for every package with `LabelsProvider` or `setTexuliLabels` (`texuli/i18n`), typed with `TexuliLabels`, `BlocksMessageId` (`@texuli/blocks/i18n`) and `PagesMessageId` (`@texuli/pages`) |
 | Forms, canvases and sheets from an agent | `schema-form`, `canvas` and `spreadsheet` nodes (spec 0.8.0) validated with `checkForm: checkFormDraft`, `checkCanvas: checkCanvasDraft` and `checkSheet: checkSheetDraft`, and painted through `<Player formHost={createFormPlayerHost()} canvasHost={createCanvasPlayerHost()} sheetHost={createSheetPlayerHost()}>` (`@texuli/forms/host`, `@texuli/canvas/host`, `@texuli/sheets/host`); without the host check they are refused |
 | Email and PDF from a blueprint | `renderEmail` (`@texuli/tools/email`), `renderBlueprintPdf` (`@texuli/tools/print`) and the player's `print` mode |
 

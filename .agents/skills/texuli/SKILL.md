@@ -54,12 +54,12 @@ agent config, or publish packages without explicit consent (see
    Installing the skill does **not** install Texuli packages or a CLI.
 2. Confirm the workspace has Texuli (workspace packages `texuli`,
    `@texuli/core`, `@texuli/tokens`, …) before promising package imports.
-   All 26 published packages are on npm in the 0.12 line, every one at
-   `0.12.3`, published by CI
+   All 26 published packages are on npm in the 0.13 line, every one at
+   `0.13.0`, published by CI
    through npm trusted publishing with provenance under the `latest`
    dist-tag (`next` is no longer maintained and stays on `0.12.1`). They
    are pre-1.0: a new minor may break, and 1.0.0 will be the first stable
-   release. Install them plainly (`pnpm add texuli`) and pin `^0.12.0`; the
+   release. Install them plainly (`pnpm add texuli`) and pin `^0.13.0`; the
    workspace packages stay `private: true`. `@texuli/drag`,
    `@texuli/workflows`, `@texuli/deck`, `@texuli/slides`,
    `@texuli/editor`, `@texuli/document`, `@texuli/pages`,
@@ -67,7 +67,10 @@ agent config, or publish packages without explicit consent (see
    are in development, though on npm at the same version. `0.12.0` moved
    the `@texuli/pages` core entries off the deck model: `PageEditorCore`,
    `CollabEditorCore` and `createDocumentPlayerHostCore` need
-   `validateDeck` for inline decks. Which entry arrived in which release
+   `validateDeck` for inline decks. `0.13.0` breaks no API: it adds
+   blueprint spec 0.11.0 (design-system shadow levels, product tokens,
+   short palettes, soft inks; compiled hashes change) and one label
+   dictionary (`texuli/i18n`). Which entry arrived in which release
    (marked "new in `0.x.0`") is in [`router/packages.md`](router/packages.md);
    an app pinned to an older line must not use a newer entry. The breaking
    changes of each release, with their one-line migrations, are in

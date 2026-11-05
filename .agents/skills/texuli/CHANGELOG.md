@@ -15,6 +15,18 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The packages are on npm in the 0.13 line, every one at `0.13.0`, and
+  installs pin `^0.13.0`. `0.13.0` breaks no API: blueprint spec 0.11.0
+  adds the design-system fields `elevation.levels`, `extensions`, a
+  categorical palette of 1 to 8 colors and pinned `*SoftForeground` inks,
+  design-system compiler version 2 changes compiled hashes, and one label
+  dictionary (`LabelsProvider` and `setTexuliLabels` in `texuli/i18n`)
+  covers `texuli`, primitives, blocks and pages. The design-systems and
+  build-ui sub-skills say "new in `0.13.0`" instead of "on `main`", and
+  `router/packages.md` marks `texuli/i18n`, `@texuli/blocks/i18n` and
+  `@texuli/charts/heading` new in `0.13.0`. The upgrade sub-skill has a
+  "0.12 → 0.13" section.
+
 ## [0.3.17] — 2026-11-04
 
 ### Changes
