@@ -987,6 +987,32 @@ describe('dialog', () => {
       expect(source).not.toContain('--tx-color-danger');
       expect(source).toContain('var(--tx-destructive, crimson)');
     });
+
+    it('draws the dialog and sheet scrims from --tx-scrim at the scrim opacity, never the foreground (D-G-048)', () => {
+      for (const [file, selector, part] of [
+        ['dialog/dialog.css', '.tx-dialog__overlay', 'dialog'],
+        ['sheet/sheet.css', '.tx-sheet-overlay', 'sheet'],
+      ] as const) {
+        const source = readFileSync(
+          join(process.cwd(), 'packages/texuli/src/components', file),
+          'utf8'
+        );
+        const escaped = selector.replace('.', '\\.');
+        const backgrounds = [
+          ...source.matchAll(new RegExp(`${escaped}\\s*\\{([^}]*)\\}`, 'g')),
+        ].flatMap((match) =>
+          [...(match[1] ?? '').matchAll(/background:([^;]*);/g)].map((m) => m[1])
+        );
+        expect(backgrounds.length, file).toBeGreaterThan(0);
+        // A dark theme's foreground is light: mixing it made a light-gray scrim.
+        for (const background of backgrounds)
+          expect(background, file).not.toContain('--tx-foreground');
+        // Relative color drops the token's alpha, so only the opacity tokens set the strength.
+        expect(backgrounds.join(' ').replace(/\s+/g, ' '), file).toContain(
+          `rgb( from var(--tx-scrim, rgb(0 0 0)) r g b / var(--tx-${part}-scrim-opacity, var(--tx-opacity-scrim)) )`
+        );
+      }
+    });
   });
 });
 

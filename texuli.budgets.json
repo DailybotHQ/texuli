@@ -298,8 +298,8 @@
       "note": "FIX-position-pixel-snap: device-pixel snapping, transform-free layout box (tooltips landed ~3.3px off-center) and inset placement fix blurry and shifted panel text (lead decision 2026-10-23). Measured 5,557 B."
     },
     "@texuli/data": {
-      "gzip": 87680,
-      "note": "Root barrel aggregate of every data view (13 views at plan end); first-load cost is per view subpath. Raised from 48 KiB at 60,860 B with 11 views (lead decision 2026-10-23). PLAN_010 T-motion-adopt (ADR-013): 81920 -> 88256 B, measured + 4% rounded up to 64 B after Board and DataGrid layout motion (texuli/motion createListMotion, data-tx-row-id); the barrel also carries T-gaps-48-52 and T-gaps-53-69 grid work in this checkout (82,680 B at HEAD, already over 81,920 B); measured 84,861 B (82,680 B at HEAD). G86 (Protoyard): list motion loads lazily (2026-10-30): 88256 -> 87680 B, measured + 4% rounded up to 64 B; measured 84,261 B (84,899 B before); the Board, DataGrid and Dashboard take list motion through a small local shim that loads texuli/motion with import() only once a mounted list could animate a change (never with motion={false}, level none or reduced motion)."
+      "gzip": 91968,
+      "note": "Root barrel aggregate of every data view (13 views at plan end); first-load cost is per view subpath. Raised from 48 KiB at 60,860 B with 11 views (lead decision 2026-10-23). PLAN_010 T-motion-adopt (ADR-013): 81920 -> 88256 B, measured + 4% rounded up to 64 B after Board and DataGrid layout motion (texuli/motion createListMotion, data-tx-row-id); the barrel also carries T-gaps-48-52 and T-gaps-53-69 grid work in this checkout (82,680 B at HEAD, already over 81,920 B); measured 84,861 B (82,680 B at HEAD). G86 (Protoyard): list motion loads lazily (2026-10-30): 88256 -> 87680 B, measured + 4% rounded up to 64 B; measured 84,261 B (84,899 B before); the Board, DataGrid and Dashboard take list motion through a small local shim that loads texuli/motion with import() only once a mounted list could animate a change (never with motion={false}, level none or reduced motion). 0.14.0 (owner-approved 2026-11-05): 87680 -> 91968 B, measured + 4% (measured 88,376 B) for the TimelineView product features it re-exports (D-G-033)."
     },
     "@texuli/data/*": {
       "gzip": 12288,
@@ -338,8 +338,8 @@
       "note": "Editable grid composes the grid core (10.1 KiB) with the editing engine (validation, undo, TSV clipboard); measured 14,641 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 15,360 B to measured 15,808 B + 4% headroom; already over at T-01. Trimming stays a follow-up. PLAN_009 (2026-10-28, owner-consented release plan): 16448 -> 17280 B, measured + 4% after DataGrid paging, rowClass and toolbar/filters/bulkActions snippets (G7); measured 16,601 B. PLAN_010 T-motion-adopt (ADR-013): 17280 -> 18944 B, measured + 4% rounded up to 64 B after DataGrid row layout motion (texuli/motion createListMotion) together with the T-gaps-53-69 DataGrid changes it bundles; measured 18,188 B (16,663 B at HEAD). G86 (Protoyard): list motion loads lazily (2026-10-30): 18944 -> 18624 B, measured + 4% rounded up to 64 B; measured 17,889 B (18,224 B before); the DataGrid it bundles takes list motion through a small local shim that loads texuli/motion with import() only once a mounted grid could animate a change (never with motion={false}, level none or reduced motion). PLAN_011 T-gaps-107-110 (G107, contract amendment 13, trust mode; flagged to the lead): 18624 -> 20096 B, measured + 4% (measured 19,283 B; 18,528 B before, 96 B under the old cap): it bundles the grid core, which grew with the G107 drop-in table props."
     },
     "@texuli/data/timeline": {
-      "gzip": 11520,
-      "note": "Lead decision 2026-10-23: the timeline/Gantt view with its engine measured 9,647 B; the 8 KiB default was provisional. Owner decision 2026-10-27 (PLAN_007): raised to measured 11,019 B + 4% headroom; pointer moves run on the shared @texuli/drag engine (tracker and modifiers), inlined per entry."
+      "gzip": 12992,
+      "note": "Lead decision 2026-10-23: the timeline/Gantt view with its engine measured 9,647 B; the 8 KiB default was provisional. Owner decision 2026-10-27 (PLAN_007): raised to measured 11,019 B + 4% headroom; pointer moves run on the shared @texuli/drag engine (tracker and modifiers), inlined per entry. 0.14.0 (owner-approved 2026-11-05): 11520 -> 12992 B, measured + 4% (measured 12,459 B) for the TimelineView product features (D-G-033: project bands, collapsible groups with an add action, the selected row, markers)."
     },
     "@texuli/examples": {
       "gzip": 16384,
@@ -850,8 +850,8 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 0 B gzip, cap = measured + 4% headroom."
     },
     "@texuli/catalog/manifests/content": {
-      "gzip": 5120,
-      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 8,317 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 9,670 B + 4% headroom; manifests carry events, bindable and prop schemas, and each group ships the validator's checks. PLAN_010 T-release-060 (2026-10-29): 10112 -> 5120 B, tightened to measured + 4% (measured 4,915 B)."
+      "gzip": 5376,
+      "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 8,317 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 9,670 B + 4% headroom; manifests carry events, bindable and prop schemas, and each group ships the validator's checks. PLAN_010 T-release-060 (2026-10-29): 10112 -> 5120 B, tightened to measured + 4% (measured 4,915 B). 0.14.0 (owner-approved 2026-11-05): 5120 -> 5376 B, measured + 4% (measured 5,133 B) for srcDark and darkMode on the media image manifest (spec 0.12.0)."
     },
     "@texuli/catalog/player": {
       "gzip": 27776,

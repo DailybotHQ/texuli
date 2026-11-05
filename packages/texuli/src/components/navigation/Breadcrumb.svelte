@@ -115,7 +115,13 @@ function isCurrent(item: BreadcrumbItem, index: number): boolean {
           entry.item.href !== undefined ? safeHref(entry.item.href, hrefTrust) : undefined}
         <li class={breadcrumbItemClass()}>
           {#if href && !current}
-            <a class={breadcrumbLinkClass()} href={href} data-tx-breadcrumb-link>
+            <a
+              class={breadcrumbLinkClass()}
+              {href}
+              aria-label={entry.item.ariaLabel}
+              onclick={(event) => entry.item.onSelect?.(entry.item, event)}
+              data-tx-breadcrumb-link
+            >
               {entry.item.label}
             </a>
           {:else}

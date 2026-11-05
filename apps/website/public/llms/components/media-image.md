@@ -27,6 +27,8 @@
 | Name | Kind | Required | Trust | Default | Description |
 | --- | --- | --- | --- | --- | --- |
 | `src` | string | yes | untrusted | — | URL input is checked by the package URL policy. |
+| `srcDark` | string | no | untrusted | — | URL input is checked by the package URL policy. |
+| `darkMode` | enum(theme | system) | no | — | — | — |
 | `srcset` | string | no | — | — | — |
 | `sizes` | string | no | — | — | — |
 | `widths` | array | no | — | — | — |

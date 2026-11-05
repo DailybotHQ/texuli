@@ -10,7 +10,7 @@ additive: nothing existing is renamed or removed.
   (space, size, type, elevation, shape, layer, opacity, layout, icon, status, data-viz).
   123 are declared in `@texuli/tokens/base.css`; the
   28 data-viz tokens are emitted per theme.
-- **Component tokens:** 364 for 57 components
+- **Component tokens:** 365 for 57 components
   (`@texuli/tokens/components`), never declared.
 - **Renames:** 0 (`@texuli/tokens/renames.json`, schema
   `TOKEN_RENAMES_JSON_SCHEMA`).
@@ -215,7 +215,7 @@ Disabled, muted and scrim opacities.
 | --- | --- | --- | --- |
 | `--tx-opacity-disabled` | `0.5` | Disabled controls. | `var(--tx-opacity-disabled)` |
 | `--tx-opacity-muted` | `0.7` | Decorative icons such as select and menu chevrons. | `var(--tx-opacity-muted)` |
-| `--tx-opacity-scrim` | `45%` | Foreground mix of the dialog and sheet scrim. | `var(--tx-opacity-scrim)` |
+| `--tx-opacity-scrim` | `45%` | Opacity of the dialog and sheet --tx-scrim. | `var(--tx-opacity-scrim)` |
 
 ### Layout (`layout`)
 
@@ -387,6 +387,7 @@ A design system sets `components.<component>.<key>`; CSS reads it with the
 | `title-font-weight` | `--tx-card-title-font-weight` | `var(--tx-type-heading-weight)` | Title font weight. | `var(--tx-card-title-font-weight, var(--tx-type-heading-weight))` |
 | `title-line-height` | `--tx-card-title-line-height` | `var(--tx-type-label-line)` | Title line height. | `var(--tx-card-title-line-height, var(--tx-type-label-line))` |
 | `description-font-size` | `--tx-card-description-font-size` | `var(--tx-type-label-size)` | Description font size. | `var(--tx-card-description-font-size, var(--tx-type-label-size))` |
+| `font-size` | `--tx-card-font-size` | `var(--tx-type-label-size)` | Content font size (`.tx-card__content`). | `var(--tx-card-font-size, var(--tx-type-label-size))` |
 
 ### Carousel (`carousel`, `texuli/carousel`)
 
@@ -459,7 +460,7 @@ A design system sets `components.<component>.<key>`; CSS reads it with the
 | `title-font-weight` | `--tx-dialog-title-font-weight` | `var(--tx-type-heading-weight)` | Title font weight. | `var(--tx-dialog-title-font-weight, var(--tx-type-heading-weight))` |
 | `title-line-height` | `--tx-dialog-title-line-height` | `var(--tx-type-heading-line)` | Title line height. | `var(--tx-dialog-title-line-height, var(--tx-type-heading-line))` |
 | `alert-padding` | `--tx-dialog-alert-padding` | `var(--tx-space-5)` | Alert dialog padding. | `var(--tx-dialog-alert-padding, var(--tx-space-5))` |
-| `scrim-opacity` | `--tx-dialog-scrim-opacity` | `var(--tx-opacity-scrim)` | Foreground mix of the overlay scrim. | `var(--tx-dialog-scrim-opacity, var(--tx-opacity-scrim))` |
+| `scrim-opacity` | `--tx-dialog-scrim-opacity` | `var(--tx-opacity-scrim)` | Opacity of the overlay --tx-scrim. | `var(--tx-dialog-scrim-opacity, var(--tx-opacity-scrim))` |
 
 ### Empty state (`empty`, `texuli/empty`)
 
@@ -689,7 +690,7 @@ A design system sets `components.<component>.<key>`; CSS reads it with the
 | `title-font-size` | `--tx-sheet-title-font-size` | `var(--tx-type-heading-size)` | Title font size. | `var(--tx-sheet-title-font-size, var(--tx-type-heading-size))` |
 | `title-font-weight` | `--tx-sheet-title-font-weight` | `var(--tx-type-heading-weight)` | Title font weight. | `var(--tx-sheet-title-font-weight, var(--tx-type-heading-weight))` |
 | `title-line-height` | `--tx-sheet-title-line-height` | `var(--tx-type-heading-line)` | Title line height. | `var(--tx-sheet-title-line-height, var(--tx-type-heading-line))` |
-| `scrim-opacity` | `--tx-sheet-scrim-opacity` | `var(--tx-opacity-scrim)` | Foreground mix of the overlay scrim. | `var(--tx-sheet-scrim-opacity, var(--tx-opacity-scrim))` |
+| `scrim-opacity` | `--tx-sheet-scrim-opacity` | `var(--tx-opacity-scrim)` | Opacity of the overlay --tx-scrim. | `var(--tx-sheet-scrim-opacity, var(--tx-opacity-scrim))` |
 
 ### Sidebar (`sidebar`, `texuli/sidebar`)
 

@@ -23,24 +23,25 @@ let {
 }: Props = $props();
 
 const tabs = tabsContext.get();
+const selected = $derived(tabs.value() === value);
+const shouldRender = $derived(forceMount || selected);
 // A consumer id wins: the context records it, so every reference follows.
+// Only a rendered panel claims, so a tab never points at a missing one.
+const claim = () => (shouldRender ? (rest.id ?? '') : undefined);
 tabs.claimId(
   'content',
   untrack(() => value),
-  untrack(() => rest.id)
+  untrack(claim)
 );
 $effect(() => {
   const item = value;
-  tabs.claimId('content', item, rest.id);
+  tabs.claimId('content', item, claim());
   return () => tabs.claimId('content', item, undefined);
 });
 
-const selected = $derived(tabs.value() === value);
 const attrs = $derived(stateAttributes(selected ? 'active' : 'inactive'));
 const id = $derived(tabs.contentId(value));
 const labelledBy = $derived(tabs.triggerId(value));
-
-const shouldRender = $derived(forceMount || selected);
 </script>
 
 {#if shouldRender}

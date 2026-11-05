@@ -80,7 +80,7 @@ class DesignSystemFixtureTest {
         val error = assertFailsWith<SpecDecodeException> { DesignSystem.decode(document) }
         assertEquals("$.color.css", error.path)
         val wires = DesignSystemIssueCode.entries.map { it.wire }
-        assertTrue(wires.containsAll(listOf("unknown-key", "aa-text", "inline-bytes")))
-        assertEquals(13, DesignSystemIssueCode.entries.size)
+        assertTrue(wires.containsAll(listOf("unknown-key", "aa-text", "inline-bytes", "aa-non-text")))
+        assertEquals(14, DesignSystemIssueCode.entries.size)
     }
 }

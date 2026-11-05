@@ -225,7 +225,7 @@ per second. The spring tokens in `@texuli/tokens/motion` are precomputed with
 
 ## Not covered yet
 
-- Styled components use these texels through `texuli/motion` (the motion prop contract and `MotionProvider`, see `packages/texuli/docs/ui-motion.md`); the player plays blueprint node motion and the slides stage plays deck transitions through them. Collapsible, NavigationMenu, Select, Combobox and CommandPalette are not wired yet (planned).
+- Styled components use these texels through `texuli/motion` (the motion prop contract and `MotionProvider`, see `packages/texuli/docs/ui-motion.md`); looping motion (`MotionLoop`, `texuli/motion/loop`, new in `0.14.0`) is CSS keyframes in Texuli's stylesheet, not these texels, so it never needs the runtime; the player plays blueprint node motion and the slides stage plays deck transitions through them. Collapsible, NavigationMenu, Select, Combobox and CommandPalette are not wired yet (planned).
 - The spec's closed motion vocabulary for agents is planned (T-motion-spec).
 - Real-browser checks run through the adopting components' behavior suites;
   the unit tests here use a controllable Web Animations stand-in.

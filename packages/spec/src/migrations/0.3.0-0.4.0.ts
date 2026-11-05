@@ -1,3 +1,4 @@
+import { stampMigration } from './stamp.ts';
 import type { SpecMigration } from './types.ts';
 
 /**
@@ -7,8 +8,4 @@ import type { SpecMigration } from './types.ts';
  * steps, component). Every 0.3.0 envelope is a valid 0.4.0 envelope, so the
  * step only stamps `spec`.
  */
-export const migration030to040: SpecMigration = Object.freeze({
-  from: '0.3.0',
-  to: '0.4.0',
-  migrate: (envelope: Readonly<Record<string, unknown>>) => ({ ...envelope, spec: '0.4.0' }),
-});
+export const migration030to040: SpecMigration = stampMigration('0.3.0', '0.4.0');

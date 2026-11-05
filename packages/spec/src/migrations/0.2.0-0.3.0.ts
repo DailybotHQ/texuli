@@ -1,3 +1,4 @@
+import { stampMigration } from './stamp.ts';
 import type { SpecMigration } from './types.ts';
 
 /**
@@ -5,8 +6,4 @@ import type { SpecMigration } from './types.ts';
  * 0.3.0 envelope, so the step only stamps `spec`. Object spread keeps a
  * parsed `__proto__` key as an own property, so validation still refuses it.
  */
-export const migration020to030: SpecMigration = Object.freeze({
-  from: '0.2.0',
-  to: '0.3.0',
-  migrate: (envelope: Readonly<Record<string, unknown>>) => ({ ...envelope, spec: '0.3.0' }),
-});
+export const migration020to030: SpecMigration = stampMigration('0.2.0', '0.3.0');

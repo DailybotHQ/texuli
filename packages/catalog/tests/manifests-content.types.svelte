@@ -28,6 +28,10 @@ import type { Image } from '@texuli/media/image';
 import type { ComponentProps } from 'svelte';
 import { CONTENT_PROP_NAMES } from '../src/manifests/content/prop-names.ts';
 
+// App-level props a host sets in code, never through a manifest: a cartesian
+// chart's fixed `yDomain` (D-G-049, new in 0.14.0).
+type AppOnly<Props> = Omit<Props, 'yDomain'>;
+
 type ComponentPropsById = {
   'blocks-text': TextBlockViewProps;
   'blocks-data': DataBlockViewProps;
@@ -38,12 +42,12 @@ type ComponentPropsById = {
   'blocks-code': CodeBlockViewProps;
   'blocks-interactive': InteractiveBlockViewProps;
   'blocks-map': MapBlockViewProps;
-  'charts-area': ComponentProps<typeof AreaChart>;
-  'charts-bar': ComponentProps<typeof BarChart>;
-  'charts-cartesian': ComponentProps<typeof CartesianChart>;
-  'charts-combo': ComponentProps<typeof ComboChart>;
-  'charts-line': ComponentProps<typeof LineChart>;
-  'charts-stacked-bar': ComponentProps<typeof StackedBarChart>;
+  'charts-area': AppOnly<ComponentProps<typeof AreaChart>>;
+  'charts-bar': AppOnly<ComponentProps<typeof BarChart>>;
+  'charts-cartesian': AppOnly<ComponentProps<typeof CartesianChart>>;
+  'charts-combo': AppOnly<ComponentProps<typeof ComboChart>>;
+  'charts-line': AppOnly<ComponentProps<typeof LineChart>>;
+  'charts-stacked-bar': AppOnly<ComponentProps<typeof StackedBarChart>>;
   'charts-bullet': ComponentProps<typeof BulletChart>;
   'charts-gauge': ComponentProps<typeof Gauge>;
   'charts-progress-ring': ComponentProps<typeof ProgressRing>;
@@ -61,10 +65,7 @@ type ComponentPropsById = {
   'charts-pie': ComponentProps<typeof PieChart>;
   'charts-sunburst': ComponentProps<typeof SunburstChart>;
   'charts-treemap': ComponentProps<typeof TreemapChart>;
-  // srcDark and darkMode (new in 0.13.1) are not in the catalog yet: the
-  // catalog projection is normative for @texuli/spec, so exposing them to
-  // agents waits for the next spec version.
-  'media-image': Omit<ComponentProps<typeof Image>, 'srcDark' | 'darkMode'>;
+  'media-image': ComponentProps<typeof Image>;
   'media-composition-svg': ComponentProps<typeof CompositionSvg>;
   'media-composition-canvas': ComponentProps<typeof CompositionCanvas>;
 };

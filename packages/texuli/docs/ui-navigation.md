@@ -54,9 +54,42 @@ Links use `safeHref` (default developer trust). Unsafe hrefs render without `hre
 
 | Prop | Role |
 | --- | --- |
-| `items` | `{ label, href?, current? }[]` |
+| `items` | `{ label, href?, current?, ariaLabel?, onSelect? }[]` |
 | `maxItems` | Collapse middle crumbs into an ellipsis |
 | `hrefTrust` | URL policy tier for links |
+
+Item fields `ariaLabel` and `onSelect` are new in `0.14.0`:
+
+- **`ariaLabel`** names the link when its visible `label` is abbreviated
+  (it applies to links; the current page renders its `label`). Keep the
+  visible label inside the name (`Q3` → `Q3 planning`) so speech input
+  users can say what they see (WCAG 2.5.3).
+- **`onSelect(item, event)`** runs when the link is activated, a routing
+  hook for the host. Call `event.preventDefault()` to route client-side;
+  otherwise the link navigates normally. The `href` still goes through the
+  URL policy, and an unsafe one renders no link, so `onSelect` never runs
+  for it.
+
+```svelte
+<script lang="ts">
+  import { Breadcrumb, type BreadcrumbItem } from 'texuli/navigation';
+  import { goto } from '$app/navigation';
+
+  function route(item: BreadcrumbItem, event: MouseEvent): void {
+    if (event.metaKey || event.ctrlKey || !item.href) return; // new tab: let it navigate
+    event.preventDefault();
+    void goto(item.href);
+  }
+</script>
+
+<Breadcrumb
+  items={[
+    { label: 'Home', href: '/', onSelect: route },
+    { label: 'Q3', ariaLabel: 'Q3 planning', href: '/plans/q3', onSelect: route },
+    { label: 'Notes' },
+  ]}
+/>
+```
 
 ## Pagination
 

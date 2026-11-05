@@ -2,6 +2,7 @@
 import { Accordion, Collapsible, Tabs } from 'texuli/tabs-accordion';
 
 let tab = $state('overview');
+let view = $state('list');
 let faq = $state('ship');
 </script>
 
@@ -24,6 +25,20 @@ let faq = $state('ship');
       <p class="panel">Harbor Notes {item.label.toLowerCase()} (fictional).</p>
     {/snippet}
   </Tabs>
+
+  <h3>Tabs switching a host view</h3>
+  <Tabs
+    bind:value={view}
+    label="Issue view"
+    variant="pills"
+    items={[
+      { value: 'list', label: 'List', panelId: 'tabs-issue-view' },
+      { value: 'board', label: 'Board', panelId: 'tabs-issue-view' },
+    ]}
+  />
+  <section id="tabs-issue-view" class="panel" aria-label="Issues">
+    Showing the fictional issues as a {view}.
+  </section>
 
   <h3>Tabs (pills + enclosed, RTL)</h3>
   <div class="row" dir="rtl">

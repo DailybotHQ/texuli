@@ -89,17 +89,22 @@ Tier U never holds overlays, focus traps or shells:
 
 ## Today's catalog
 
-133 entries (`pnpm exec tsx packages/catalog/src/build/cli.ts --json`):
+170 entries from spec `0.12.0` (new in `0.14.0`; `pnpm exec tsx
+packages/catalog/src/build/cli.ts --json`):
 - `content`: 35 (nine `blocks-*` families, 23 charts and three media
   components);
-- `display`: 17 (including the `inline-text` node, audit G03);
-- `forms`: 28, app tier, not emittable (including `combobox` and
+- `display`: 18 (including the `inline-text` node, audit G03, and from
+  spec `0.12.0` `avatar-group-grid`);
+- `forms`: 30, app tier, not emittable (including `combobox` and
   `multi-select`, whose `filter` and `loadOptions` are function props a host
-  passes, never agent output);
+  passes, never agent output, and from spec `0.12.0` `code-field`, the one
+  form control from `@texuli/blocks`);
 - `layouts`: 27;
-- `overlays`: 26.
+- `overlays`: 26;
+- `state`: 11, `data`: 12, `composition`: 4, `chat`: 2, and one each in
+  `canvas`, `documents`, `schema-forms`, `sheets` and `workflows`.
 
-Emit tiers: 41 entries for developers and 41 in Tier U.
+Emit tiers: 75 entries for developers and 75 in Tier U.
 
 ## Tests
 

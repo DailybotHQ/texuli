@@ -41,6 +41,36 @@ export const CARTESIAN_X_KINDS: readonly CartesianXKind[] = Object.freeze([
 /** A host formatter for x values; it wins on the axis, live region, tooltip and table. */
 export type CartesianXFormatter = (value: number | string) => string;
 
+/** One end of a fixed y domain: a number, or `'auto'` (or omitted) for the data extent. */
+export type CartesianYDomainEnd = number | 'auto' | undefined;
+
+/** A fixed y domain, `[min, max]`; either end may fall back to the data. */
+export type CartesianYDomain = readonly [CartesianYDomainEnd, CartesianYDomainEnd];
+
+const finiteEnd = (value: unknown): number | undefined =>
+  typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+
+/**
+ * The y domain a cartesian chart paints: each finite end of `fixed` replaces
+ * the matching end of `data` (`'auto'`, undefined, NaN and infinities fall
+ * back to it). The result always has min < max: two fixed ends given in the
+ * wrong order are swapped, and an empty or crossed span keeps the fixed end
+ * and gives the other a tenth of its magnitude (at least 1).
+ */
+export function resolveYDomain(
+  data: readonly [number, number],
+  fixed: CartesianYDomain | undefined
+): [number, number] {
+  const min = finiteEnd(fixed?.[0]);
+  const max = finiteEnd(fixed?.[1]);
+  const lo = min ?? data[0];
+  const hi = max ?? data[1];
+  if (lo < hi) return [lo, hi];
+  if (lo > hi && min !== undefined && max !== undefined) return [hi, lo];
+  if (min === undefined && max !== undefined) return [hi - Math.max(1, Math.abs(hi) / 10), hi];
+  return [lo, lo + Math.max(1, Math.abs(lo) / 10)];
+}
+
 /**
  * Throw on an unknown `xKind`, or a `linear` or `time` axis whose x values are
  * not all numbers (a time axis takes epoch milliseconds).

@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright';
 import { expect } from '@playwright/test';
 import { defineRows, scenario } from '../harness/index.ts';
 import { expectFocus, gotoScenarioWith } from './common.ts';
@@ -85,6 +86,22 @@ scenario(
         await tab(page, 'Team').click();
         await expect(tab(page, 'Team')).toHaveAttribute('aria-selected', 'true');
         await expect(page.getByRole('tabpanel', { name: 'Team' })).toHaveText(/teammates/);
+      },
+    },
+    {
+      id: 'no-panels-axe',
+      title: 'tabs without panels omit aria-controls (or name the host region) and pass axe',
+      async run({ page }) {
+        await gotoScenarioWith(page, 'tabs', { panels: 'none' });
+        await expect(page.getByRole('tabpanel')).toHaveCount(0);
+        await expect(tab(page, 'Profile')).not.toHaveAttribute('aria-controls', /.*/);
+        await expect(tab(page, 'Team')).toHaveAttribute('aria-controls', 'team-view');
+        await tab(page, 'Team').click();
+        await expect(page.getByRole('region', { name: 'Team view' })).toHaveText(/team/);
+        const result = await new AxeBuilder({ page })
+          .include('[data-behavior="scenario"]')
+          .analyze();
+        expect(result.violations).toEqual([]);
       },
     },
   ])

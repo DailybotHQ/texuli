@@ -44,6 +44,22 @@ Styled disclosure surfaces on owned primitives (`@texuli/primitives/tabs`,
   is hidden from assistive technology and a visually hidden copy carries the
   name, so it is announced once
 - `orientation`: `horizontal` | `vertical`
+- **Tabs without panels** (new in `0.14.0`): without a `content` snippet no
+  panel is rendered, so the tabs carry no `aria-controls` (nothing dangles
+  for axe to flag). When the tabs switch a view the host renders itself,
+  give the item a `panelId` and `aria-controls` points at that region:
+
+  ```svelte
+  <Tabs bind:value={view} label="View" items={[
+    { value: 'list', label: 'List', panelId: 'issues-view' },
+    { value: 'board', label: 'Board', panelId: 'issues-view' },
+  ]} />
+  <section id="issues-view" aria-label="Issues">…</section>
+  ```
+- An item's `attributes` (new in `0.14.0`) puts `data-*` attributes on its
+  tab trigger, such as a test hook:
+  `{ value: 'billing', label: 'Billing', attributes: { 'data-testid': 'tab-billing' } }`.
+  Only `data-*` keys are typed, and Texuli's own attributes win
 - Roving focus and activation come from the tabs primitive
 - `bind:ref` binds the root element; extra attributes (`id`, `aria-*`,
   `data-*`, handlers) land on it. `Accordion` and `Collapsible` do the same.

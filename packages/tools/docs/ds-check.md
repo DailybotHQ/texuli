@@ -55,6 +55,16 @@ missing `--render` requirement).
 4. The guarantees re-checked over the compiled variables
    (`checkDesignSystemGuarantees`), so a compiled map that slipped a
    guarantee is refused too.
+5. From spec `0.12.0` (new in `0.14.0`, D-G-029), non-text contrast
+   (WCAG 1.4.11, `checkDesignSystemIndicators`): the sidebar's active fill
+   (`--tx-sidebar-primary`) at 3:1 against the sidebar fill. Below it, the
+   run is refused with `aa-non-text` at `$.vars.<mode>["--tx-sidebar-primary"]`.
+   The compiler derives an active fill the document does not pin, so this
+   catches a `color.roles.<mode>.sidebarPrimary` pin (or pins that leave no
+   3:1 fill) that would paint an invisible active item. The compiler also
+   lists `primary` on `background` below 3:1 in the run's `warnings` with
+   the same code; that one is advisory (a filled button is identified by its
+   label) and does not fail the run.
 
 Every run reports its contrast pairs per mode (with ratio and requirement),
 the solver's adjustments, the warnings, the inline bytes and the targets.
@@ -86,14 +96,15 @@ changes only with a new `version`.
 ## `--render`
 
 The render checks paint every **agent-emittable** catalog component (75 of
-the 168 manifests; the 93 app-tier components, such as overlays and app
+the 170 manifests; the 95 app-tier components, such as overlays and app
 chrome, are not painted by the player and are not on the sheet), each from
 its first manifest example through `@texuli/player`, inside one scope. For
 the base document and each checked variant, in each mode, the driver applies
 the compiled design system to that scope (`applyDesignSystem`) and asserts:
 
 - **axe** (WCAG 2.0 to 2.2, A and AA, scoped to the sheet): code `render-axe`;
-- **painted contrast:** every pair of the compiled report, painted through
+- **painted contrast:** every pair of the compiled report, and from spec
+  `0.12.0` the sidebar's active fill on the sidebar (3:1), painted through
   the cascade inside the scope and measured from the computed colors, meets
   its requirement: code `render-contrast` at the foreground's
   `$.vars.<mode>["--tx-…"]`;

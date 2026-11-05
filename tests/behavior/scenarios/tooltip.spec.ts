@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 import { defineRows, scenario } from '../harness/index.ts';
-import { expectFocus } from './common.ts';
+import { expectEvents, expectFocus } from './common.ts';
 
 const trigger = (page: import('@playwright/test').Page) =>
   page.getByRole('button', { name: 'Save draft' });
@@ -66,6 +66,19 @@ scenario(
         await expect(tip(page)).toBeVisible({ timeout: 2000 });
         await page.mouse.move(2, 2);
         await expect(tip(page)).toHaveCount(0, { timeout: 2000 });
+      },
+    },
+    {
+      id: 'disabled-tooltip-trigger-works',
+      title: 'a disabled tooltip never shows, and its trigger stays enabled and clickable',
+      async run({ page }) {
+        const publish = page.getByRole('button', { name: 'Publish' });
+        await expect(publish).toBeEnabled();
+        await publish.hover();
+        await publish.click();
+        await expectEvents(page, [{ name: 'publish' }]);
+        await page.waitForTimeout(400);
+        await expect(tip(page)).toHaveCount(0);
       },
     },
   ])

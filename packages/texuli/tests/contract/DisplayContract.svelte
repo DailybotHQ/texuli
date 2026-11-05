@@ -33,6 +33,7 @@ import {
 } from '../../src/components/separator-aspect/index.ts';
 import { Kpi, KpiRow, Stat } from '../../src/components/stat/index.ts';
 import { Timeline, TimelineItem } from '../../src/components/timeline/index.ts';
+import { MotionLoop } from '../../src/motion/loop/index.ts';
 import CustomIcon from '../fixtures/CustomIcon.svelte';
 
 let { p, refs }: HarnessProps = $props();
@@ -74,6 +75,7 @@ const k = (name: string) => `components/${name}`;
 <Code {...p(k('kbd-code/Code'))} bind:ref={refs[k('kbd-code/Code')]}>npm i</Code>
 <CopyButton value="npm i" {...p(k('kbd-code/CopyButton'))} bind:ref={refs[k('kbd-code/CopyButton')]} />
 <Kbd {...p(k('kbd-code/Kbd'))} bind:ref={refs[k('kbd-code/Kbd')]}>⌘K</Kbd>
+<MotionLoop preset="wave" {...p('motion/loop/MotionLoop')} bind:ref={refs['motion/loop/MotionLoop']}><span></span><span></span></MotionLoop>
 <Rating value={3} {...p(k('rating/Rating'))} bind:ref={refs[k('rating/Rating')]} />
 <AspectRatio {...p(k('separator-aspect/AspectRatio'))} bind:ref={refs[k('separator-aspect/AspectRatio')]}>Media</AspectRatio>
 <Separator {...p(k('separator-aspect/Separator'))} bind:ref={refs[k('separator-aspect/Separator')]} />

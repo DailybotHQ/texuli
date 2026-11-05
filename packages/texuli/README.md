@@ -17,9 +17,9 @@ layouts for dashboards, marketing pages, auth and settings, content and
 mobile.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.13.1`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.13.0`) may contain breaking
-> changes, so pin the exact version or use `^0.13.0`, which accepts only 0.13.x.
+> published to npm as `0.14.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.14.0`) may contain breaking
+> changes, so pin the exact version or use `^0.14.0`, which accepts only 0.14.x.
 
 ## Install
 
@@ -133,6 +133,9 @@ state). A `callerHandler` that is not a function is ignored.
 `@texuli/data` Board and DataGrid animate through `@texuli/core/motion`,
 instant under reduced motion and at level `none`
 ([ui-motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-motion.md)).
+`texuli/motion/loop` (new in `0.14.0`) holds `MotionLoop`, a looping motion
+(`pulse`, `wave`) on the motion tokens, static at rest under reduced motion
+and at level `none`, so an app needs no `@keyframes` of its own.
 
 `texuli/defaults` (new in `0.9.0`) holds
 `setDesignDefaults`: default `variant` and `size` props from a closed,

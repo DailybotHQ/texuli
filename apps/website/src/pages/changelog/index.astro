@@ -11,6 +11,18 @@ const current = texuliPackageVersion();
 
 const entries = [
   {
+    version: '0.14',
+    date: '2026-11',
+    items: [
+      'TimelineView in @texuli/data/timeline groups rows under header rows through getGroup, with date bands, bind:collapsed and onCollapsedChange, onGroupAdd, bind:selectedRow and onRowSelect, and vertical markers. The agent catalog lists the groups, markers and the bindable collapsed and selectedRow on data-timeline, with a new collapse event; onGroupAdd is not in the catalog.',
+      'Blueprint spec 0.12.0: a shadow layer takes an optional darkOpacity, the card content font size is a component token (components.card["font-size"], --tx-card-font-size), and the catalog gains the code-field and avatar-group-grid ids and the media-image srcDark and darkMode props. Every 0.11.0 document stays valid.',
+      'Design-system compiler version 3: compiled hashes change once, and sidebarPrimary is also derived under a color.roles primary pin (an explicit sidebarPrimary pin is kept and reported). The new aa-non-text code checks role fills at 3:1 (WCAG 1.4.11): an invisible active sidebar item fails texuli ds check, ds.validate and --render.',
+      'MotionLoop in texuli/motion/loop loops a pulse or a wave and stays still under reduced motion; it is not in the blueprint motion vocabulary, because a loop there could not be stopped.',
+      'registerIcons takes lazy loaders with a fallback; AlertDialog takes confirmDisabled; Breadcrumb items take ariaLabel and onSelect; tabs without a rendered panel omit aria-controls and take panelId; a disabled Tooltip keeps its trigger enabled; dialog and sheet scrims read --tx-scrim, so dark scrims are dark again.',
+      'No breaking API change; a 0.x minor because of the new spec and compiler version.',
+    ],
+  },
+  {
     version: '0.13',
     date: '2026-11',
     items: [

@@ -31,6 +31,10 @@
 | `dependencies` | array | no | — | — | — |
 | `zoom` | enum(day | week | month | quarter) | no | — | `"week"` | — |
 | `locale` | string | no | — | `"en"` | — |
+| `groups` | array | no | untrusted | — | Headers by task group, with optional bands. |
+| `collapsed` | array | no | — | — | — |
+| `selectedRow` | string | no | — | — | Selected task id; when set, rows are selectable. |
+| `markers` | array | no | untrusted | — | — |
 
 ### Examples
 

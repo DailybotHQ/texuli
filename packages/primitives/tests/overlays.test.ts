@@ -332,6 +332,8 @@ describe('tooltip', () => {
     it('does not open a disabled tooltip and restores the bound open state after dismissal', async () => {
       render(TooltipFixture);
       const disabled = screen.getByRole('button', { name: 'Disabled action' });
+      // A disabled tooltip leaves its trigger usable (D-G-042).
+      expect((disabled as HTMLButtonElement).disabled).toBe(false);
       await fireEvent.focusIn(disabled);
       expect(screen.queryByRole('tooltip')).toBeNull();
 

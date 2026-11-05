@@ -88,7 +88,7 @@ object DesignTokens {
     val Default: DesignTokenSet = DesignTokenSet(
         id = "texuli",
         version = "1.0.0",
-        hash = "fa5e3307e2e6390135ee6177bbd5663157dd49c1c9d440c641f2cadce5804266",
+        hash = "b75a7bb4d49dbc0621a5554f59f61a5c0e4c5d367a1bd14d5208de0c9fd1879a",
         fontSans = "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
         fontHeading = "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
         fontMono = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", monospace",
@@ -161,7 +161,7 @@ object DesignTokens {
     val Acme: DesignTokenSet = DesignTokenSet(
         id = "acme",
         version = "2.1.0",
-        hash = "61ccf0d3082d033fc38f09e0be1d18f41eb393aefbd2653b152e942d90f66ca3",
+        hash = "80076363d6cff88bf04e0e15b8f11f694ce01334e7c9c78a445de81901eaccd6",
         fontSans = "\"Acme Sans\", system-ui, sans-serif",
         fontHeading = "\"Acme Display\", \"Acme Sans\", system-ui",
         fontMono = "\"Acme Mono\", ui-monospace, monospace",

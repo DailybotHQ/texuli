@@ -27,7 +27,7 @@ measured box (server rendering) uses 640.
 Model helpers: `assertCartesianSeries` (throws on empty or duplicate ids,
 duplicate x values within a series, non-finite values, or mixed category and
 numeric x), `assertCartesianXKind`, `CARTESIAN_X_KINDS`, `cartesianXFormatter`,
-`resolveChartLocale`, `xDomain`, `windowCartesianSeries`, `createCartesianLayout`,
+`resolveChartLocale`, `resolveYDomain`, `xDomain`, `windowCartesianSeries`, `createCartesianLayout`,
 `toInteractionSeries`, `lineCoordinates`.
 
 ## Props
@@ -52,6 +52,8 @@ All five charts take the same props (`LineChart` shown).
 | `xKind` | `'linear'` \| `'category'` \| `'time'` | no | inferred | blueprint | How x values read: category bands, a linear number scale, or time (epoch milliseconds shown as dates). See [time x-axis](#time-x-axis). |
 | `formatX` | callback `(value: number \| string) => string` | no | — | developer | Formats x values on the axis, live region, tooltip and data table. |
 | `locale` | string (BCP 47) | no | runtime locale | blueprint | Language tag for dates and announced values. A malformed tag falls back to the runtime locale. |
+| `yDomain` | [number \| `'auto'`, number \| `'auto'`] | no | data extent | developer | Fixed y-axis domain `[min, max]`; an `'auto'` or omitted end follows the data. See [fixed y domain](#fixed-y-domain-and-value-format). New in `0.14.0`. |
+| `formatValue` | callback `(value: number) => string` | no | — | developer | Formats y values on the axis, live region, tooltip and data table. New in `0.14.0`. |
 | `onzoom` | callback `(domain: [number, number]) => void` | no | — | developer | Developer zoom event callback. |
 | `onbrush` | callback `(domain: [number, number], pixels: BrushRange) => void` | no | — | developer | Developer brush event callback. |
 | `onselect` | callback `(selection: ChartSelection) => void` | no | — | developer | Developer point-selection callback. |
@@ -90,6 +92,34 @@ Set `xKind="time"` when x values are epoch milliseconds (`Date.UTC(2026, 2, 1)`)
   (the catalog entries `charts-line`, `charts-area`, `charts-bar`,
   `charts-stacked-bar`, `charts-combo` and `charts-cartesian`).
 
+## Fixed y domain and value format
+
+New in `0.14.0`. Pin the y axis and format its values (code only, like
+`formatX`):
+
+```svelte
+<LineChart
+  title="Weekly completion rate"
+  description="Share of check-ins completed each week."
+  yDomain={[0, 100]}
+  formatValue={(value) => `${value}%`}
+  series={[{ id: 'rate', label: 'Rate', points: [{ x: 'W1', y: 82 }, { x: 'W2', y: 91 }] }]}
+/>
+```
+
+- **`yDomain`:** each finite end replaces that end of the data domain
+  exactly (no nice rounding); `'auto'`, an omitted end, `NaN` or an infinity
+  falls back to the data. Two fixed ends in the wrong order are swapped, and
+  an empty span keeps the fixed end and widens the other, so min < max
+  always. `[0, 'auto']` pins only the floor.
+- **Clipping:** marks outside the domain are cut at the plot edge (SVG and
+  canvas). The live region, tooltip and data table keep the true values.
+- **`formatValue`:** formats y values on the axis ticks, live region,
+  tooltip and data table (missing values still read "No value"), as the
+  compact charts' `formatValue` does.
+- `resolveYDomain(data, yDomain)` from `@texuli/charts/cartesian` is the
+  same resolution, framework-free.
+
 ## Scales and layout
 
 - **x:** a band scale over the x values in input order (numeric x sort
@@ -97,7 +127,7 @@ Set `xKind="time"` when x values are epoch milliseconds (`Date.UTC(2026, 2, 1)`)
   window instead; see [windowed series](charts-large-series.md). With
   `xKind="linear"` or `"time"`, x use a continuous scale with nice ticks.
 - **y:** a linear scale with nice bounds and about five ticks. Every kind except
-  `line` includes zero.
+  `line` includes zero. A fixed `yDomain` end replaces the nice bound.
 - **View box:** 640 × 320; the SVG scales down to its container.
 - **Renderer:** `auto` switches from SVG marks to canvas at 5,000 source points
   (`CANVAS_POINT_THRESHOLD`); see [canvas](charts-canvas.md).

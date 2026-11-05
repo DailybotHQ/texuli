@@ -16,11 +16,21 @@ by Texuli's Kotlin Multiplatform twin. The package is framework-free: no
 DOM, no Svelte, no Node APIs and no runtime dependencies.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.13.1`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.13.0`) may contain breaking
-> changes, so pin the exact version or use `^0.13.0`, which accepts only 0.13.x.
+> published to npm as `0.14.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.14.0`) may contain breaking
+> changes, so pin the exact version or use `^0.14.0`, which accepts only 0.14.x.
 
-> **New in `0.13.0`.** `@texuli/spec@0.13.0` carries **spec 0.11.0**
+> **New in `0.14.0`.** `@texuli/spec@0.14.0` carries **spec 0.12.0**
+> (digest
+> `049c93b4105fb765c2db5ff20272494f99fce52552aafaf85e00789fc1747a14`): the
+> app-tier catalog ids `avatar-group-grid` and `code-field`, the `srcDark`
+> and `darkMode` props of `media-image`, the `data-timeline` groups with
+> bands, markers, the bindable `collapsed` and `selectedRow` and the new
+> `collapse` event, a shadow layer's `darkOpacity`, the `aa-non-text`
+> design-system code and the card content `font-size` component key.
+> Every `0.11.0` envelope migrates by stamping `spec`.
+
+> **New in `0.13.0`.** `@texuli/spec@0.13.0` and `0.13.1` carried **spec 0.11.0**
 > (`@texuli/spec@0.10.0` to `@texuli/spec@0.12.3` carried spec `0.10.0`).
 > It extends the design-system document only: structured shadows per
 > elevation level (`elevation.levels`), product tokens (`extensions`) and a
@@ -98,7 +108,7 @@ import {
   validateInstance,
 } from '@texuli/spec';
 
-SPEC_VERSION;                         // the spec version: '0.11.0' in @texuli/spec@0.13.1
+SPEC_VERSION;                         // the spec version: '0.12.0' in @texuli/spec@0.14.0
 SPEC_COMPONENT_IDS.includes('alert'); // true: the closed component vocabulary
 
 // The dialect validator: a closed subset of JSON Schema 2020-12.
@@ -130,7 +140,7 @@ import { type Schema, type SpecCatalog, validateBlueprint } from '@texuli/spec';
 import { migrateBlueprint } from '@texuli/spec/migrate';
 import { validateWorkflowGraph } from '@texuli/spec/workflow';
 
-const migrated = migrateBlueprint(blueprint); // 0.2.0 → … → 0.10.0 → 0.11.0; never throws
+const migrated = migrateBlueprint(blueprint); // 0.2.0 → … → 0.11.0 → 0.12.0; never throws
 const result = validateBlueprint(migrated.blueprint, {
   blueprintSchema: blueprintSchemaJson as Schema,
   catalog: componentsJson as SpecCatalog,
@@ -301,9 +311,13 @@ written for (`spec`; omitted means 0.2.0). `migrateBlueprint`
 envelope up to the current spec with pure, per-version steps
 (`src/migrations/`: `0.2.0 → 0.3.0`, `0.3.0 → 0.4.0`, `0.4.0 → 0.5.0`,
 `0.5.0 → 0.6.0`, `0.6.0 → 0.7.0`, `0.7.0 → 0.8.0`, `0.8.0 → 0.9.0`,
-`0.9.0 → 0.10.0` and `0.10.0 → 0.11.0`, each of which
+`0.9.0 → 0.10.0`, `0.10.0 → 0.11.0` and `0.11.0 → 0.12.0`, each of which
 only stamps `spec`); a compatible version
-range is planned, not built. `@texuli/spec@0.13.1` carries spec `0.11.0` (digest
+range is planned, not built. `@texuli/spec@0.14.0` carries spec `0.12.0` (digest
+`049c93b4105fb765c2db5ff20272494f99fce52552aafaf85e00789fc1747a14`): two
+app-tier catalog ids, the `media-image` dark source, the `data-timeline`
+groups, markers and selection with the `collapse` event, and the
+design-system additions above. `@texuli/spec@0.13.0` and `0.13.1` carried spec `0.11.0` (digest
 `17845743d088b768c4441ea2196e5c350687533dbd0c95589cba938fb31fe993`), which
 extends the design-system document only (structured shadow levels, product
 tokens, a categorical palette of 1 to 8 colors and pinned soft inks; every
@@ -354,7 +368,7 @@ conformance harness) are in
 - Data-source bindings (spec 0.8.0; new in `0.8.0`):
   [source.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/source.md)
 - The design-system document (spec 0.10.0; new in `0.10.0`; extended in
-  spec 0.11.0, new in `0.13.0`):
+  spec 0.11.0, new in `0.13.0`, and spec 0.12.0, new in `0.14.0`):
   [design-system.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/design-system.md)
 - The Kotlin Multiplatform twin that consumes the generated models:
   [native/README.md](https://github.com/DailybotHQ/texuli/blob/main/native/README.md)

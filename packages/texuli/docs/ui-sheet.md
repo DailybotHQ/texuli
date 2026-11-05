@@ -126,6 +126,27 @@ to `false`.
 `Drawer` is always modal, so they have no effect there. The catalog
 manifests list them as host props.
 
+## Scrim color
+
+Fixed in `0.14.0` (D-G-048): the overlay behind `Sheet`, `Drawer` and `ResponsiveModal` takes its color from
+the theme's `--tx-scrim` (dark in light and dark modes) instead of
+`--tx-foreground`, so a dark theme no longer washes the page out with a
+light gray. The strength comes only from `--tx-sheet-scrim-opacity` (default
+`var(--tx-opacity-scrim)`, 45%): the overlay reads the red, green and blue of
+`--tx-scrim` and drops its own alpha, so the two never multiply. Engines
+without CSS relative colors mix `--tx-scrim` as is, so its own alpha makes
+the scrim fainter there (still dark). Under forced
+colors `--tx-scrim` is `Canvas`.
+
+A design-system document has no scrim color slot (only the sheet `scrim-opacity` token);
+set the color in host CSS on the theme scope:
+
+```css
+[data-tx-theme] {
+  --tx-scrim: oklch(0.2 0.03 260);
+}
+```
+
 ## Motion
 
 `motion` on `Sheet.Content`, `Drawer.Content`, `DetailPanel.Content` and
@@ -157,6 +178,6 @@ read expressions, is in
 | `--tx-sheet-title-font-size` | `var(--tx-type-heading-size)` | Title font size. |
 | `--tx-sheet-title-font-weight` | `var(--tx-type-heading-weight)` | Title font weight. |
 | `--tx-sheet-title-line-height` | `var(--tx-type-heading-line)` | Title line height. |
-| `--tx-sheet-scrim-opacity` | `var(--tx-opacity-scrim)` | Foreground mix of the overlay scrim. |
+| `--tx-sheet-scrim-opacity` | `var(--tx-opacity-scrim)` | Opacity of the overlay --tx-scrim. |
 
 <!-- tokens:end -->

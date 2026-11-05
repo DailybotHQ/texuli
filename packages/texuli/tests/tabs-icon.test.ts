@@ -61,3 +61,52 @@ describe('TabItem badge name (G54)', () => {
     }
   });
 });
+
+// D-G-041: tabs that switch a view elsewhere have no dangling aria-controls.
+
+describe('Tabs without panels (D-G-041)', () => {
+  afterEach(cleanup);
+
+  it('omits aria-controls without a panel and points it at an item panelId', () => {
+    const view = render(Tabs, {
+      props: {
+        label: 'Views',
+        items: [
+          { value: 'list', label: 'List' },
+          { value: 'board', label: 'Board', panelId: 'board-view' },
+        ],
+      },
+    });
+    expect(view.getByRole('tab', { name: 'List' }).hasAttribute('aria-controls')).toBe(false);
+    expect(view.getByRole('tab', { name: 'Board' }).getAttribute('aria-controls')).toBe(
+      'board-view'
+    );
+    expect(view.container.querySelector('[role="tabpanel"]')).toBeNull();
+  });
+});
+
+// D-G-050: an item's `data-*` attributes reach its trigger (a test hook).
+
+describe('TabItem attributes (D-G-050)', () => {
+  afterEach(cleanup);
+
+  it('passes item data-* attributes to the trigger without overriding Texuli hooks', () => {
+    const view = render(Tabs, {
+      props: {
+        label: 'Settings',
+        items: [
+          {
+            value: 'billing',
+            label: 'Billing',
+            attributes: { 'data-testid': 'tab-billing', 'data-tx-tabs-trigger': 'host' },
+          },
+          { value: 'plain', label: 'Plain' },
+        ],
+      },
+    });
+    const billing = view.getByTestId('tab-billing');
+    expect(billing).toBe(view.getByRole('tab', { name: 'Billing' }));
+    expect(billing.getAttribute('data-tx-tabs-trigger')).toBe('');
+    expect(view.getByRole('tab', { name: 'Plain' }).hasAttribute('data-testid')).toBe(false);
+  });
+});

@@ -288,6 +288,30 @@ export const multiSelectPropNames = comboboxPropNames.filter(
   (name) => name !== 'multiple'
 ) as readonly Exclude<(typeof comboboxPropNames)[number], 'multiple'>[];
 
+/**
+ * `@texuli/blocks/code-field` CodeField (D-G-022), the one form control
+ * outside `texuli`; new in 0.14.0 (spec 0.12.0).
+ */
+export const codeFieldPropNames = [
+  'value',
+  'language',
+  'label',
+  'labels',
+  'placeholder',
+  'name',
+  'readonly',
+  'disabled',
+  'rows',
+  'wrap',
+  'tabSize',
+  'indentWith',
+  'lineNumbers',
+  'highlightLimit',
+  'showKeyboardHint',
+  'onValueChange',
+  'class',
+] as const;
+
 /** Closed map of form component id → prop name list. */
 export const FORMS_PROP_NAMES = {
   button: buttonPropNames,
@@ -319,6 +343,7 @@ export const FORMS_PROP_NAMES = {
   combobox: comboboxPropNames,
   'multi-select': multiSelectPropNames,
   'time-field': timeFieldPropNames,
+  'code-field': codeFieldPropNames,
 } as const satisfies Record<string, readonly string[]>;
 
 export type FormsManifestId = keyof typeof FORMS_PROP_NAMES;

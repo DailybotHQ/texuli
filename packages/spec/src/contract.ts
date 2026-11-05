@@ -37,8 +37,19 @@ export const SPEC_ACTION_OPS = [
 ] as const;
 export type SpecActionOp = (typeof SPEC_ACTION_OPS)[number];
 
-/** The closed event vocabulary (catalog `$defs.eventName`). */
-export const SPEC_EVENT_NAMES = ['press', 'change', 'select', 'submit', 'dismiss', 'move'] as const;
+/**
+ * The closed event vocabulary (catalog `$defs.eventName`). `collapse` (spec
+ * 0.12.0) reports a group a view collapsed or expanded.
+ */
+export const SPEC_EVENT_NAMES = [
+  'press',
+  'change',
+  'select',
+  'submit',
+  'dismiss',
+  'move',
+  'collapse',
+] as const;
 export type SpecEventName = (typeof SPEC_EVENT_NAMES)[number];
 
 /** The `$ref` targets a catalog property schema may name. */

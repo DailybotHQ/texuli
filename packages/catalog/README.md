@@ -16,9 +16,9 @@ Svelte, use [`@texuli/player`](https://www.npmjs.com/package/@texuli/player),
 which is built on this package.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.13.1`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.13.0`) may contain breaking
-> changes, so pin the exact version or use `^0.13.0`, which accepts only 0.13.x.
+> published to npm as `0.14.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.14.0`) may contain breaking
+> changes, so pin the exact version or use `^0.14.0`, which accepts only 0.14.x.
 
 > **New in `0.4.0`.** The `chat`, `composition`, `data`, `state` and
 > `workflows` manifest groups (158 catalog ids, 66 of them agent-emittable;
@@ -144,6 +144,29 @@ grammar and renderer APIs. Import subpaths to keep bundles narrow.
   state surface rules refuse exactly what `@texuli/player` would refuse at
   paint time, and list item text refuses control, bidirectional and
   invisible formatting characters.
+
+## New in 0.14.0
+
+Ships in `0.14.0` (spec `0.12.0`); the `0.13.x` releases predate it:
+
+- Two app-tier manifests, neither agent-emittable: `avatar-group-grid` in
+  `@texuli/catalog/manifests/display` (texuli's `AvatarGroupGrid`,
+  D-G-024; `Avatar` and `AvatarGroup` stay planned), and `code-field` in
+  `@texuli/catalog/manifests/forms` (`CodeField` from
+  `@texuli/blocks/code-field`, D-G-022). The catalog has 170 ids, 75 of
+  them agent-emittable.
+- `media-image` lists `srcDark` (the dark-mode image: an image URL at the
+  untrusted tier, like `src`) and `darkMode` (`theme` or `system`,
+  D-G-023). The sink scan, the paint pass and the hostile harden pass
+  already police `srcDark` as an image URL at every tier.
+- `data-timeline` lists `groups` (at most 100 `{ id, label, band? }`
+  headers keyed by each task's `group`; a `band` is `{ start, end, label?,
+  tone? }` with ISO dates), `markers` (at most 50 `{ at, label, tone? }`),
+  and the bindable `collapsed` (at most 100 `{ id }` items, so a `list`
+  state fits) and `selectedRow` (D-G-033). Group and marker labels are
+  untrusted text of at most 120 characters, and tones are the data view
+  tones. It fires the new `collapse` event (the closed event vocabulary
+  gains it) with the group id, and `select` with the task id.
 
 ## New in 0.8.0
 

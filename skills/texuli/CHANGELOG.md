@@ -15,6 +15,18 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The packages are on npm in the 0.14 line, every one at `0.14.0`, and
+  installs pin `^0.14.0`. `0.14.0` breaks no API: blueprint spec 0.12.0
+  adds the `data-timeline` groups, markers and selection with the
+  `collapse` event, the `code-field` and `avatar-group-grid` ids, the
+  `media-image` dark source, a layer's `darkOpacity`, the card content font
+  size and the `aa-non-text` check, and design-system compiler version 3
+  changes compiled hashes once. The router names the 0.14 line and the
+  current spec, `components/references/install.md` lists what is new in
+  `0.14.0` (timeline groups, `MotionLoop`, lazy icons, `confirmDisabled`,
+  breadcrumb `ariaLabel` and `onSelect`, tab `panelId`), and the upgrade
+  sub-skill has a "0.13 → 0.14" section.
+
 ## [0.3.19] — 2026-11-05
 
 ### Changes

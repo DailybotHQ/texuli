@@ -30,7 +30,10 @@ let {
 
 const uid = $props.id();
 const baseId = `tx-tabs-${uid}`;
-/** Consumer ids claimed by triggers and panels (`trigger:<value>`), winning over the generated ones. */
+/**
+ * Consumer ids claimed by triggers and panels (`trigger:<value>`), winning
+ * over the generated ones; `''` marks a rendered panel without one.
+ */
 let claimedIds = $state<Record<string, string | undefined>>({});
 
 type TriggerReg = { value: string; element: HTMLElement; disabled: boolean };
@@ -57,8 +60,9 @@ function triggerId(tabValue: string): string {
   return claimedIds[`trigger:${tabValue}`] || `${baseId}-tab-${tabValue}`;
 }
 
-function contentId(tabValue: string): string {
-  return claimedIds[`content:${tabValue}`] || `${baseId}-panel-${tabValue}`;
+function contentId(tabValue: string): string | undefined {
+  const claimed = claimedIds[`content:${tabValue}`];
+  return claimed === undefined ? claimed : claimed || `${baseId}-panel-${tabValue}`;
 }
 
 tabsContext.set({
@@ -72,7 +76,7 @@ tabsContext.set({
   triggerId,
   contentId,
   claimId(part, tabValue, id) {
-    claimedIds[`${part}:${tabValue}`] = id || undefined;
+    claimedIds[`${part}:${tabValue}`] = id ?? undefined;
   },
   registerTrigger,
 });

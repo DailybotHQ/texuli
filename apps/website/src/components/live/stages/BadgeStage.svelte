@@ -4,9 +4,12 @@
 
 <script lang="ts">
 /**
- * Badge, Chip, Tag, Kbd, Code and the inline-text catalog node: the instance
- * the props panel drives, then every variant and state side by side.
+ * Badge, Chip, Tag, Kbd, Code, the avatar grid and the inline-text catalog
+ * node: the instance the props panel drives, then every variant and state
+ * side by side.
  */
+
+import { AvatarGroupGrid } from 'texuli/avatar';
 import { Badge, Chip, Tag } from 'texuli/badge';
 import { Button } from 'texuli/button';
 import { Code, CopyButton, Kbd } from 'texuli/kbd-code';
@@ -28,6 +31,15 @@ const VARIANTS = [
   'info',
   'neutral',
 ] as const;
+
+const CREW = [
+  { name: 'Ada Example' },
+  { name: 'Grace Sample' },
+  { name: 'Linus Demo' },
+  { name: 'Mina Placeholder' },
+  { name: 'Omar Fixture' },
+];
+const SIZES = ['xs', 'sm', 'md', 'lg'] as const;
 
 let selected = $state(true);
 let tags = $state(['Design', 'Research', 'Logistics']);
@@ -80,6 +92,16 @@ $effect(() => {
     <p class="row" aria-label="Every tag variant">
       {#each VARIANTS as variant (variant)}
         <Tag label={variant} {variant} />
+      {/each}
+    </p>
+  {:else if componentId === 'avatar-group-grid'}
+    <p class="row" aria-label="Two, three, four and more members">
+      {#each [2, 3, 4, 5] as count (count)}
+        <AvatarGroupGrid
+          items={CREW.slice(0, count)}
+          size={pick('size', SIZES, 'md')}
+          label={count === 3 ? str('label', '#launch') : undefined}
+        />
       {/each}
     </p>
   {:else if componentId === 'kbd'}

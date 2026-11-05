@@ -17,7 +17,17 @@ Authored catalog entries for display and feedback components in `texuli`:
 | `stepper` | Stepper |
 | `timeline` | Timeline (UI list, not Gantt) |
 | `kbd` / `code` | Kbd and Code |
+| `avatar-group-grid` | AvatarGroupGrid (`texuli/avatar`; new in `0.14.0`, spec 0.12.0) |
 | `inline-text` | No component: a catalog text node (audit G03) |
+
+`avatar-group-grid` takes `items` (`{ name, src?, srcset?, sizes?,
+status?, decorative? }`; `src` and `srcset` pass the image URL policy),
+`size` (`xs`, `sm`, `md`, `lg`), `label` (default: the member names) and
+`overflowLabel` (`{n}` is the hidden count). Its manifest lists no
+`srcTrust`. It is app tier, not agent-emittable. `Avatar` and
+`AvatarGroup` are still planned manifests: the `display` group was within
+a few bytes of its size budget, so this change adds only the grid that the
+consumer gap (D-G-024) asked for.
 
 Each manifest is validated with `defineCatalogManifest`. Tests assert
 `props[].name` equals the canonical lists in `prop-names.ts`, which mirror the

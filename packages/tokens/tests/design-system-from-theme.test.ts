@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { themeVariables } from '../src/css/apply.ts';
 import {
   checkDesignSystemGuarantees,
+  checkDesignSystemIndicators,
   compileDesignSystem,
   fromTheme,
   fromThemeWithReport,
@@ -67,7 +68,7 @@ describe('fromTheme: the zero-drift bridge', () => {
     ]);
   });
 
-  it('round-trips a sidebar painted in the primary, and a primary pin over it keeps the active item visible (D-G-015)', () => {
+  it('round-trips a sidebar painted in the primary, and keeps its active item visible, with or without a primary pin (D-G-015, D-G-027)', () => {
     const base = generateThemeFromSeed({ seed: '#4f46e5' });
     const theme = structuredClone(base);
     for (const mode of ['light', 'dark'] as const) {
@@ -79,13 +80,31 @@ describe('fromTheme: the zero-drift bridge', () => {
     if (!compiled.ok) throw new Error(JSON.stringify(compiled.errors[0]));
     for (const mode of ['light', 'dark'] as const) {
       const expected = resolved(themeVariables({ theme, mode }));
-      for (const name of [
-        '--tx-sidebar',
-        '--tx-sidebar-foreground',
-        '--tx-sidebar-primary',
-      ] as const)
+      for (const name of ['--tx-sidebar', '--tx-sidebar-foreground'] as const)
         expect(compiled.vars[mode]?.[name], `${mode} ${name}`).toBe(expected[name]);
+      // The theme's own active fill equals its sidebar.
+      expect(expected['--tx-sidebar-primary'], mode).toBe(expected['--tx-sidebar']);
     }
+    // Light leaves sidebarPrimary to the generator, so the compiler derives
+    // it (D-G-027) and reports the move. Dark pins it (the theme differs from
+    // the generator there), so it stays as written and is an aa-non-text finding.
+    expect(compiled.vars.light?.['--tx-sidebar-primary']).not.toBe(
+      compiled.vars.light?.['--tx-sidebar']
+    );
+    expect(compiled.report.adjustments).toContainEqual(
+      expect.objectContaining({ mode: 'light', variable: '--tx-sidebar-primary' })
+    );
+    expect(compiled.vars.dark?.['--tx-sidebar-primary']).toBe(compiled.vars.dark?.['--tx-sidebar']);
+    expect(compiled.report.warnings).toEqual([
+      expect.objectContaining({
+        code: 'aa-non-text',
+        mode: 'dark',
+        path: '$.color.roles.dark.sidebarPrimary',
+      }),
+    ]);
+    expect(checkDesignSystemIndicators(compiled).map((i) => i.path)).toEqual([
+      '$.vars.dark["--tx-sidebar-primary"]',
+    ]);
     // The consumer's bridge adds the brand as a primary pin: the copy would vanish, so it is derived.
     const pinned = structuredClone(document) as unknown as { color: Record<string, unknown> };
     pinned.color.pin = { primary: base.light.primary.default };

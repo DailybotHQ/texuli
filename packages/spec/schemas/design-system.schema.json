@@ -726,6 +726,9 @@
         "elevation": {
           "$ref": "#/$defs/elevationLevel"
         },
+        "font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
         "padding-block": {
           "$ref": "#/$defs/dimension"
         },
@@ -2790,7 +2793,7 @@
       "type": "object"
     },
     "issueCode": {
-      "description": "Every stable design-system code; aa-text, aa-focus and target-size are raised by the compiler.",
+      "description": "Every stable design-system code; aa-text, aa-focus, target-size and aa-non-text are raised by the compiler and its checks.",
       "enum": [
         "unknown-key",
         "invalid-type",
@@ -2804,7 +2807,8 @@
         "inline-bytes",
         "aa-text",
         "aa-focus",
-        "target-size"
+        "target-size",
+        "aa-non-text"
       ],
       "type": "string"
     },
@@ -3172,10 +3176,15 @@
     },
     "shadowLayer": {
       "additionalProperties": false,
-      "description": "One shadow layer (px): offsets x and y, blur, spread, the opacity of the shadow role color and inset. Compiled to a concrete box-shadow; never a raw CSS string.",
+      "description": "One shadow layer (px): offsets x and y, blur, spread, the opacity of the shadow role color, its dark-mode opacity (darkOpacity; omitted means opacity) and inset. Compiled to a concrete box-shadow; never a raw CSS string.",
       "properties": {
         "blur": {
           "maximum": 128,
+          "minimum": 0,
+          "type": "number"
+        },
+        "darkOpacity": {
+          "maximum": 1,
           "minimum": 0,
           "type": "number"
         },

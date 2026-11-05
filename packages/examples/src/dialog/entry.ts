@@ -25,10 +25,11 @@ export const dialogExamples = [
   defineExample({
     id: 'ui-dialog-states',
     title: 'Dialog and AlertDialog states',
-    description: 'Closed dialog trigger beside an open destructive confirm pattern.',
+    description:
+      'Closed dialog trigger beside an open destructive confirm, disabled until a typed confirmation matches.',
     tags: ['ui', 'dialog', 'alert-dialog', 'states'],
     component,
-    props: ['open', 'destructive', 'onConfirm'],
+    props: ['open', 'destructive', 'confirmDisabled', 'onConfirm'],
     load: () => import('./DialogStatesDemo.svelte'),
   }),
   defineExample({

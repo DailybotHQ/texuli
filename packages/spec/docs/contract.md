@@ -187,8 +187,10 @@ refuses. `0.2.0 → 0.3.0` is additive: it stamps `spec: "0.3.0"`. Every later s
 (`0.3.0 → 0.4.0`, `0.4.0 → 0.5.0`, `0.5.0 → 0.6.0`, the
 motion vocabulary in [motion.md](motion.md), `0.6.0 → 0.7.0`, node keys
 and documents, `0.7.0 → 0.8.0`, data sources, forms, canvases and sheets,
-`0.8.0 → 0.9.0`, a catalog projection refresh, and `0.9.0 → 0.10.0`, the
-design-system document) is additive and stamps only `spec` as well. The tests
+`0.8.0 → 0.9.0`, a catalog projection refresh, `0.9.0 → 0.10.0`, the
+design-system document, `0.10.0 → 0.11.0`, design-system fields, and
+`0.11.0 → 0.12.0`, catalog ids and props and design-system fields) is
+additive and stamps only `spec` as well. The tests
 check that `SPEC_MIGRATIONS` covers every consecutive pinned pair in
 `versions.json` from 0.2.0 to `SPEC_VERSION`. Inside a plan that has not
 published a spec version, later normative changes amend that version's pin
@@ -372,7 +374,8 @@ names are not checked.
 
 **Events and actions** (codes `unknown-event`, `action`). Node `on` maps an
 event to 1–8 actions run in order. Events are the closed vocabulary
-`press`, `change`, `select`, `submit`, `dismiss`, `move`, and each key must
+`press`, `change`, `select`, `submit`, `dismiss`, `move` and (from spec
+0.12.0) `collapse`, and each key must
 be one the component lists in `events`. Actions (`op`), with the fields
 each takes (anything else is refused):
 
@@ -503,3 +506,42 @@ were rewritten for the new acme hash. The envelope shape, the `$defs` of
 the blueprint schema and the diagnostic codes are unchanged; the `spec`
 enum gains `0.11.0`, and every committed golden and invalid fixture is
 stamped `0.11.0`. Rules: [design-system.md](design-system.md).
+
+## Spec 0.12.0: catalog ids and design-system fields from consumer gaps
+
+New in `0.14.0` (`@texuli/spec@0.14.0` carries spec `0.12.0`;
+`@texuli/spec@0.13.0` and `0.13.1` carried spec `0.11.0`). Digest
+`049c93b4105fb765c2db5ff20272494f99fce52552aafaf85e00789fc1747a14`.
+Additive, so the `0.11.0 → 0.12.0` migration stamps `spec` only:
+
+- the catalog gains two app-tier ids, `avatar-group-grid` (`texuli`,
+  D-G-024; `AvatarGroup` itself stays a planned manifest) and `code-field`
+  (`@texuli/blocks`, D-G-022), each `web-only` in
+  `catalog/capabilities.json` (none is agent-emittable, so the player
+  paints none of them);
+- `media-image` gains `srcDark` (an image URL at the untrusted tier, like
+  `src`; the sink scan, the paint pass and the hostile harden pass already
+  police it) and `darkMode` (`theme`, `system`; D-G-023);
+- `data-timeline` gains `groups` (at most 100 `{ id, label, band? }`
+  headers keyed by each task's `group`; a `band` is `{ start, end, label?,
+  tone? }` with ISO dates, drawn on the group's header row), `markers` (at
+  most 50 `{ at, label, tone? }`, `at` an ISO date or time), and the
+  bindable `collapsed` (at most 100 `{ id }` items, so a `list` state fits)
+  and `selectedRow` (D-G-033); labels are untrusted text of at most 120
+  characters and tones are the data view tones;
+- the closed event vocabulary (`$defs.eventName` in the catalog schema,
+  `SPEC_EVENT_NAMES`) gains `collapse`, which `data-timeline` fires with the
+  group id when a group collapses or expands;
+- the design-system document (`formatVersion` stays `1`) gains a shadow
+  layer's optional `darkOpacity` (D-G-028), and `$defs.issueCode` gains
+  `aa-non-text` (D-G-029), raised by `@texuli/tokens`, never by the spec;
+- `components.card` gains the optional `font-size` key (a type role, the
+  card content font size `--tx-card-font-size`, D-G-038).
+
+`catalog/components.json` was re-projected and the schema, the TypeScript
+and Kotlin projections, `acme` (which shows `darkOpacity`), the native
+design tokens and the native parity matrix were regenerated. The envelope
+shape and the blueprint `$defs` are unchanged (the catalog schema's
+`eventName` gains `collapse`); the `spec` enum gains
+`0.12.0`, and every committed golden and invalid fixture is stamped
+`0.12.0`.

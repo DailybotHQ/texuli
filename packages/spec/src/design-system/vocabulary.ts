@@ -48,8 +48,18 @@ export const DESIGN_SYSTEM_CODES = [
   'inline-bytes',
 ] as const;
 
-/** Guarantee codes the compiler raises (ADR-022); reserved here, never raised by the spec. */
-export const DESIGN_SYSTEM_COMPILER_CODES = ['aa-text', 'aa-focus', 'target-size'] as const;
+/**
+ * Guarantee codes the compiler raises (ADR-022); reserved here, never raised
+ * by the spec. `aa-non-text` (spec 0.12.0): a role fill below 3:1 against
+ * its container (WCAG 1.4.11), such as the sidebar's active fill on the
+ * sidebar.
+ */
+export const DESIGN_SYSTEM_COMPILER_CODES = [
+  'aa-text',
+  'aa-focus',
+  'target-size',
+  'aa-non-text',
+] as const;
 
 export type DesignSystemCode =
   | (typeof DESIGN_SYSTEM_CODES)[number]
@@ -147,7 +157,7 @@ export const DS_COMPONENT_TOKENS: Readonly<Record<string, string>> = {
   button:
     'height-sm:d height-md:d height-lg:d height-touch:d padding-inline-sm:d padding-inline-md:d padding-inline-lg:d gap:d radius:r font-size:t font-size-sm:t font-size-lg:t font-weight:t line-height:t icon-size:d border-width:b elevation:e disabled-opacity:o',
   'canvas-toolbar': 'gap:d padding:d button-radius:r button-font-size:t',
-  card: 'radius:r border-width:b elevation:e padding-inline:d padding-block:d background:c title-font-size:t title-font-weight:t title-line-height:t description-font-size:t',
+  card: 'radius:r border-width:b elevation:e padding-inline:d padding-block:d background:c title-font-size:t title-font-weight:t title-line-height:t description-font-size:t font-size:t',
   carousel: 'radius:r fallback-padding:d',
   'chart-frame': 'title-font-size:t',
   'chat-bubble': 'radius:r tail-radius:r padding-block:d padding-inline:d',
@@ -346,6 +356,7 @@ export const DS_DEFS: Readonly<Record<string, DsNode>> = {
     'blur!': ['n', 0, 128],
     spread: ['n', -64, 64],
     'opacity!': ['n', 0, 1],
+    darkOpacity: ['n', 0, 1],
     inset: ['b'],
   },
   extension: {

@@ -25,6 +25,9 @@ let notes = $state('Ship the Lumen Atlas pilot on Friday.');
 let summary = $state('A short summary of the release');
 let email = $state('');
 let time = $state<string | null>('09:30');
+let query = $state('select team, score\nfrom squads\nwhere active = true;');
+// CodeField bundles every grammar: load it only on its own stage.
+const codeField = () => import('@texuli/blocks/code-field');
 let errors = $state<Record<string, string>>({});
 let saved = $state('');
 
@@ -156,6 +159,19 @@ function validate(form: Record<string, string>): Record<string, string> {
         readonly={bool('readonly')}
       />
     </div>
+  {:else if componentId === 'code-field'}
+    {#await codeField() then { CodeField }}
+      <CodeField
+        bind:value={query}
+        label={str('label', 'Query')}
+        language={str('language', 'sql')}
+        rows={Math.min(12, Math.max(1, num('rows', 3)))}
+        wrap={bool('wrap')}
+        lineNumbers={bool('lineNumbers')}
+        disabled={bool('disabled')}
+        readonly={bool('readonly')}
+      />
+    {/await}
   {:else if componentId === 'time-field'}
     <TimeField
       bind:value={time}

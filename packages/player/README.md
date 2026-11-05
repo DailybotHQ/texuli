@@ -12,9 +12,9 @@ player never navigates, fetches or persists anything on its own.
 **In the stack:** layer L7: paints what the agent catalog (L6) validates against the `@texuli/spec` blueprint contract, with the `texuli` components and the domain packages. `@texuli/pages` and `@texuli/slides` embed it.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.13.1`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.13.0`) may contain breaking
-> changes, so pin the exact version or use `^0.13.0`, which accepts only 0.13.x.
+> published to npm as `0.14.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.14.0`) may contain breaking
+> changes, so pin the exact version or use `^0.14.0`, which accepts only 0.14.x.
 
 > **New in `0.4.0`.** Spec 0.3.0 and 0.4.0 envelopes (`state`, `flow`,
 > `bind`, `on` and the closed actions), the data view, chat display,
@@ -174,6 +174,17 @@ host that has both packages passes a `deckHost` to present a deck blueprint
 on that stage instead, and `chrome={false}` paints a component with no frame
 chrome, as the slides stage does for every component on a slide
 ([embedding](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/embedding.md)).
+
+## New in 0.14.0
+
+Ships in `0.14.0` (spec `0.12.0`); the `0.13.x` releases predate it. The `data-timeline`
+painter passes `groups` (header labels and bands), `markers`, `collapsed`
+and `selectedRow` to `TimelineView`. Bands with dates that do not parse,
+markers whose `at` does not parse and unknown tones are dropped. Rows
+become selectable once `selectedRow` is set or bound (an empty string
+selects none). Toggling a group writes `collapsed` back as `{ id }` items
+and runs `on.collapse` with the group id; selecting a row writes
+`selectedRow` and runs `on.select` with the task id.
 
 ## New in 0.8.0
 

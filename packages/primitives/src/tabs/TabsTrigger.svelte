@@ -8,6 +8,12 @@ import { tabsContext } from './context.ts';
 
 type Props = Omit<HTMLButtonAttributes, 'value' | 'disabled' | 'children'> & {
   value: string;
+  /**
+   * The id of the region this tab controls when the host renders it instead
+   * of a `Tabs.Content` (`aria-controls`). Without it and without a rendered
+   * panel, the tab omits `aria-controls`.
+   */
+  panelId?: string;
   disabled?: boolean | null;
   class?: string;
   children?: Snippet;
@@ -15,6 +21,7 @@ type Props = Omit<HTMLButtonAttributes, 'value' | 'disabled' | 'children'> & {
 
 let {
   value,
+  panelId,
   disabled = false,
   class: className,
   children,
@@ -41,7 +48,8 @@ const itemDisabled = $derived(Boolean(disabled) || tabs.disabled());
 const selected = $derived(tabs.value() === value);
 const attrs = $derived(stateAttributes(selected ? 'active' : 'inactive', itemDisabled));
 const id = $derived(tabs.triggerId(value));
-const controls = $derived(tabs.contentId(value));
+// No rendered panel and no host `panelId`: no `aria-controls` (D-G-041).
+const controls = $derived(panelId ?? tabs.contentId(value));
 
 let buttonEl = $state<HTMLButtonElement | null>(null);
 // `ref` follows the element the part binds for its own behavior.

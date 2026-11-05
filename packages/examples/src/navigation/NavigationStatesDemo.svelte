@@ -11,7 +11,7 @@ import { Breadcrumb, NavigationMenu, Pagination } from 'texuli/navigation';
       { label: 'Home', href: 'https://example.com/' },
       { label: 'Org', href: 'https://example.com/org' },
       { label: 'Team', href: 'https://example.com/team' },
-      { label: 'Project', href: 'https://example.com/project' },
+      { label: 'Proj', ariaLabel: 'Project', href: 'https://example.com/project' },
       { label: 'Settings' },
     ]}
   />

@@ -12,9 +12,11 @@ import {
   type CompiledDesignSystem,
   canonicalJson,
   checkDesignSystemGuarantees,
+  checkDesignSystemIndicators,
   compileDesignSystem,
   DESIGN_SYSTEM_ATTRIBUTES,
   type DesignSystemFailure,
+  evaluateDesignSystemIndicators,
   resolveDesignSystem,
   resolveDesignSystemSync,
   sha256Hex,
@@ -505,6 +507,7 @@ describe('@texuli/tokens/design-system/validate', () => {
       'aa-text',
       'aa-focus',
       'target-size',
+      'aa-non-text',
     ]);
     const compiled = ok(compileDesignSystem(await resolvedAcme(), { trust: 'developer' }));
     expect(validateEntry.checkDesignSystemGuarantees(compiled)).toEqual([]);
@@ -581,6 +584,23 @@ describe('the button label line height (C-G-014)', () => {
       );
       const light = compiled.vars.light as Record<string, string>;
       expect(light['--tx-button-line-height'], step).toBe(light[`--tx-type-${step}-line`]);
+    }
+  });
+});
+
+describe('the card content font size (D-G-038)', () => {
+  it('is the component token --tx-card-font-size, read by card.css and settable by a design system', () => {
+    const css = readFileSync(join(root, 'packages/texuli/src/components/card/card.css'), 'utf8');
+    expect(css).toContain('font-size: var(--tx-card-font-size, var(--tx-type-label-size));');
+    expect(COMPONENT_TOKENS.find((t) => t.token === '--tx-card-font-size')?.default).toBe(
+      'var(--tx-type-label-size)'
+    );
+    for (const step of ['label', 'body', 'caption']) {
+      const compiled = ok(
+        compileDesignSystem(doc({ components: { card: { 'font-size': step } } }))
+      );
+      const light = compiled.vars.light as Record<string, string>;
+      expect(light['--tx-card-font-size'], step).toBe(light[`--tx-type-${step}-size`]);
     }
   });
 });
@@ -909,5 +929,140 @@ describe('compileDesignSystem: the consumer format gaps (spec 0.11.0)', () => {
     expect(
       codes(compileDesignSystem(doc({ extensions: { gold: { light: 'red', dark: '#000' } } })))
     ).toEqual([['invalid-value', '$.extensions.gold.light']]);
+  });
+});
+
+describe('compileDesignSystem: the consumer gaps of spec 0.12.0', () => {
+  const vars = (compiled: CompiledDesignSystem, mode: 'light' | 'dark') =>
+    compiled.vars[mode] as Record<string, string>;
+  const nonText = (compiled: CompiledDesignSystem) =>
+    compiled.report.warnings.filter((w) => w.code === 'aa-non-text');
+
+  it('takes a layer’s darkOpacity in dark mode only, and leaves levels without one as before (D-G-028)', () => {
+    const plain = {
+      '2': [
+        { y: 2, blur: 6, opacity: 0.2 },
+        { y: 0, blur: 1, opacity: 0.1 },
+      ],
+    };
+    const split = {
+      '2': [
+        { y: 2, blur: 6, opacity: 0.2, darkOpacity: 0.6 },
+        { y: 0, blur: 1, opacity: 0.1 },
+      ],
+    };
+    const before = ok(compileDesignSystem(doc({ elevation: { levels: plain } })));
+    const after = ok(compileDesignSystem(doc({ elevation: { levels: split } })));
+    const light = vars(after, 'light');
+    const dark = vars(after, 'dark');
+    const shadow = (v: Record<string, string>) => parseDsColor(v['--tx-shadow'] as string)?.hex;
+    expect(light['--tx-elevation-2']).toBe(
+      `0 2px 6px 0 ${shadow(light)}33, 0 0 1px 0 ${shadow(light)}1a`
+    );
+    expect(dark['--tx-elevation-2']).toBe(
+      `0 2px 6px 0 ${shadow(dark)}99, 0 0 1px 0 ${shadow(dark)}1a`
+    );
+    // Light mode and every other variable are unchanged; only the dark level moves.
+    expect(light).toEqual(vars(before, 'light'));
+    expect({ ...dark, '--tx-elevation-2': '' }).toEqual({
+      ...vars(before, 'dark'),
+      '--tx-elevation-2': '',
+    });
+    for (const v of [light, dark]) expect(isSafeCompiledValue(v['--tx-elevation-2'])).toBe(true);
+    // Bounded like opacity.
+    for (const bad of [-0.1, 1.5, '0.5'])
+      expect(
+        codes(
+          compileDesignSystem(
+            doc({
+              elevation: { levels: { '1': [{ y: 1, blur: 2, opacity: 0.2, darkOpacity: bad }] } },
+            })
+          )
+        )[0]
+      ).toEqual([
+        typeof bad === 'string' ? 'invalid-type' : 'invalid-value',
+        '$.elevation.levels["1"][0].darkOpacity',
+      ]);
+  });
+
+  it('derives sidebarPrimary under a primary role pin too, and never moves a sidebarPrimary pin (D-G-027)', () => {
+    const roles = { light: { primary: '#4f46e5', sidebar: '#4f46e5' } };
+    for (const color of [
+      { brand: { seed: '#4f46e5' }, roles },
+      // A brand pin and a role pin of the primary: the role pin wins in light.
+      { brand: { seed: '#4f46e5' }, pin: { primary: '#4f46e5' }, roles },
+      { brand: { seed: '#0f766e' }, roles: { light: { primary: '#0f766e', sidebar: '#0f766e' } } },
+    ]) {
+      const compiled = ok(compileDesignSystem(doc({ color })));
+      const v = vars(compiled, 'light');
+      const fill = v['--tx-sidebar'] as string;
+      const active = v['--tx-sidebar-primary'] as string;
+      expect(active).not.toBe(fill);
+      expect(contrastRatio(active, fill)).toBeGreaterThanOrEqual(3);
+      expect(contrastRatio(v['--tx-primary-foreground'] as string, active)).toBeGreaterThanOrEqual(
+        4.5
+      );
+      expect(v['--tx-primary']).toBe(color.roles.light.primary);
+      expect(compiled.report.adjustments).toContainEqual(
+        expect.objectContaining({
+          mode: 'light',
+          variable: '--tx-sidebar-primary',
+          to: active,
+          path: '$.color.roles.light.sidebar',
+        })
+      );
+      expect(nonText(compiled)).toEqual([]);
+      expect(checkDesignSystemIndicators(compiled)).toEqual([]);
+    }
+    // An explicit sidebarPrimary pin stays as written: a finding, not a move.
+    const pinned = ok(
+      compileDesignSystem(
+        doc({
+          color: {
+            brand: { seed: '#4f46e5' },
+            roles: { light: { sidebarPrimary: '#4f46e5', sidebar: '#4f46e5' } },
+          },
+        })
+      )
+    );
+    expect(vars(pinned, 'light')['--tx-sidebar-primary']).toBe('#4f46e5');
+    expect(pinned.report.adjustments.filter((a) => a.variable === '--tx-sidebar-primary')).toEqual(
+      []
+    );
+    expect(nonText(pinned)).toEqual([
+      expect.objectContaining({ mode: 'light', path: '$.color.roles.light.sidebarPrimary' }),
+    ]);
+  });
+
+  it('checks role fills against their container at 3:1 (aa-non-text, D-G-029)', () => {
+    const compiled = ok(compileDesignSystem(doc()));
+    expect(checkDesignSystemIndicators(compiled)).toEqual([]);
+    expect(nonText(compiled)).toEqual([]);
+    for (const mode of compiled.modes)
+      expect(evaluateDesignSystemIndicators(vars(compiled, mode))).toEqual([
+        expect.objectContaining({ foreground: '--tx-sidebar-primary', pass: true, blocking: true }),
+        expect.objectContaining({ foreground: '--tx-primary', pass: true, blocking: false }),
+      ]);
+    // An active fill equal to the sidebar fill is refused by the indicator check.
+    const light = vars(compiled, 'light');
+    const invisible = {
+      ...compiled,
+      vars: { light: { ...light, '--tx-sidebar-primary': light['--tx-sidebar'] as string } },
+    };
+    expect(checkDesignSystemIndicators(invisible).map((i) => [i.code, i.path])).toEqual([
+      ['aa-non-text', '$.vars.light["--tx-sidebar-primary"]'],
+    ]);
+    // The guarantee re-check stays the compiler's own list: it never raises aa-non-text.
+    expect(checkDesignSystemGuarantees(invisible).map((i) => i.code)).not.toContain('aa-non-text');
+    // A light primary pin on a white page is advisory: a warning with the code, no refusal.
+    const yellow = ok(
+      compileDesignSystem(
+        doc({ color: { brand: { seed: '#4f46e5' }, pin: { primary: '#facc15' } } })
+      )
+    );
+    expect(nonText(yellow)).toEqual([
+      expect.objectContaining({ mode: 'light', path: '$.color.pin.primary' }),
+    ]);
+    expect(checkDesignSystemIndicators(yellow)).toEqual([]);
   });
 });

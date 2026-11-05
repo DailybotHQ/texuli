@@ -19,4 +19,16 @@ export type TabItem = {
   badgeLabel?: string;
   /** A decorative icon before the label: a built-in name or a Svelte SVG component. */
   icon?: IconRef;
+  /**
+   * The id of the host's own region this tab shows (`aria-controls`), for
+   * tabs without a `content` snippet. Without either, the tab has no
+   * `aria-controls` (new in `0.14.0`).
+   */
+  panelId?: string;
+  /**
+   * `data-*` attributes for this tab's trigger, such as a test hook
+   * (`{ 'data-testid': 'tab-billing' }`). Texuli's own attributes win
+   * (new in `0.14.0`).
+   */
+  attributes?: Record<`data-${string}`, string>;
 };

@@ -7,6 +7,7 @@ import type {
   CartesianSeries,
   CartesianXFormatter,
   CartesianXKind,
+  CartesianYDomain,
 } from './model.ts';
 
 /** Props shared by every thin cartesian chart wrapper. */
@@ -41,4 +42,11 @@ export type CartesianChartProps = {
   formatX?: CartesianXFormatter;
   /** BCP 47 tag for dates and announced values; default the runtime's locale. */
   locale?: string;
+  /**
+   * A fixed y domain, `[min, max]`; an `'auto'` or omitted end follows the
+   * data. Marks outside it are clipped; the data table keeps the true values.
+   */
+  yDomain?: CartesianYDomain;
+  /** Formats y values on the axis, live region, tooltip and data table (developer only). */
+  formatValue?: (value: number) => string;
 };
