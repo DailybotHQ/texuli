@@ -4,7 +4,7 @@ Back to [`../SKILL.md`](../SKILL.md).
 
 ## A. Use the packages
 
-The packages are on npm in the 0.13 line, every one at `0.13.0`, a pre-1.0 line
+The packages are on npm in the 0.13 line, every one at `0.13.1`, a pre-1.0 line
 (`latest` points to the newest, and `next` is no longer maintained and stays on `0.12.1`; 1.0.0 will be the first stable release). An app outside a
 Texuli checkout installs them plainly, for example
 `pnpm add texuli @texuli/tokens`, and pins the exact version or `^0.13.0`
@@ -14,7 +14,15 @@ runs the install; it uses the network). `@texuli/drag`,
 in `0.5.0`), `@texuli/document` and `@texuli/pages` (both first published
 in `0.7.0`), `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (all
 three first published in `0.8.0`) and `@texuli/mcp` (first published in
-`0.9.0`) are in development and on npm as `0.13.0`.
+`0.9.0`) are in development and on npm as `0.13.1`.
+
+New in `0.13.1` (an additive patch): `@texuli/blocks/code-field` (`CodeField`),
+`registerIcons` and `IconsProvider` in `texuli/icons`, `srcDark` and
+`darkMode` on `Image` (`@texuli/media/image`), and `AvatarGroupGrid`
+(`texuli/avatar`). They are not in `0.13.0`, so an app that uses them pins
+`^0.13.1`. `CodeField`, `srcDark` and `darkMode` are not in the agent
+catalog yet (they need the next spec minor).
+
 Inside this monorepo, an app depends on the workspace packages:
 
 ```json

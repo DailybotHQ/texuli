@@ -172,10 +172,11 @@ Full checklists: [`references/recipes.md`](references/recipes.md).
 | Form flow | `texuli/input`, field, button, stepper; forms manifests |
 | Slide / deck | Deck v2 from JSON or Markdown: `@texuli/deck` (model, markdown, authoring, templates; in development, on npm from `0.4.0`) presented by `@texuli/slides/stage` `DeckStage`, exported by `@texuli/slides/export`; 21 layout ids, `deck` CLI and MCP tool: [`references/decks.md`](references/decks.md). `@texuli/slides` `0.3.0` is the v1 model |
 | Media story | [`../media/SKILL.md`](../media/SKILL.md) + content card |
-| Drag and drop (lists, groups, boards, trees) | `@texuli/primitives/sortable`, `@texuli/data/board`, `@texuli/data/tree-view`; engine `@texuli/drag` (in development, on npm as `0.13.0`; `sortable` and the data drag migrations are new in `0.4.0`) |
-| Workflow editor or diagram | `@texuli/workflows` editor, viewer, inspector, model, layout (in development, on npm as `0.13.0`) |
+| Drag and drop (lists, groups, boards, trees) | `@texuli/primitives/sortable`, `@texuli/data/board`, `@texuli/data/tree-view`; engine `@texuli/drag` (in development, on npm as `0.13.1`; `sortable` and the data drag migrations are new in `0.4.0`) |
+| Workflow editor or diagram | `@texuli/workflows` editor, viewer, inspector, model, layout (in development, on npm as `0.13.1`) |
 | Block document editor, reader, pages, export, collaboration | `@texuli/pages` (`editor`, `reader`, `paged`, `export`, `collab`, `host`) on `@texuli/document` (in development, both new in `0.7.0`); an agent writes documents as data: [`../blueprints/SKILL.md`](../blueprints/SKILL.md) stage **I** |
 | Schema-driven form, infinite canvas, spreadsheet, dashboard | `@texuli/forms` (`SchemaForm`), `@texuli/canvas` (`editor`, `viewer`), `@texuli/sheets` (`view`), `@texuli/data/dashboard` (in development, all new in `0.8.0`); agents send them as `schema-form`, `canvas`, `spreadsheet` and `data-dashboard` nodes painted through the player's host seams: [`references/imports.md`](references/imports.md) |
+| Code input | `@texuli/blocks/code-field` `CodeField` (new in `0.13.1`) |
 | A whole stateful screen as JSON (an agent sends it) | [`../blueprints/SKILL.md`](../blueprints/SKILL.md) stage **G** |
 
 ## Labels and locale
@@ -242,7 +243,7 @@ composer streaming and `onStop`, `DataGrid` paging, toast `onSettle`,
 ## Local references
 
 - [`references/loop.md`](references/loop.md) — catalog → pick → compose → validate → render
-- [`references/recipes.md`](references/recipes.md) — seven interface recipes (drag and workflows included)
+- [`references/recipes.md`](references/recipes.md) — eight interface recipes (drag, workflows and the code field included)
 - [`references/decks.md`](references/decks.md) — deck generator: JSON, Markdown, `DeckStage`, print and PPTX, agent tools, the 21 layouts
 - [`references/gates.md`](references/gates.md) — offline commands
 - [`references/imports.md`](references/imports.md) — public import map

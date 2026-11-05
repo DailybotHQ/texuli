@@ -3,7 +3,7 @@
  * them, each with its honest status, its packages, the page that shows it
  * in full and the kind of demo or preview the hub paints. Plain data, so
  * the page and its tests share one source. Releases: 0.6.0 to 0.13.0 are
- * published on npm, and 0.13.0 is `latest` (the release line in
+ * published on npm, and 0.13.1 is `latest` (the release line in
  * docs/RELEASE.md).
  */
 
@@ -29,7 +29,8 @@ export const RELEASES: readonly Release[] = [
   {
     id: '0.13.0',
     title: '0.13.0: brand fields and one label dictionary',
-    status: 'Published on npm as 0.13.0, the current release (pre-1.0).',
+    status:
+      'Published on npm as 0.13.0; its patch 0.13.1, the current release (pre-1.0), adds icons registered by name, the CodeField block, a theme-aware dark image and a grid layout for avatar groups.',
     published: true,
     summary:
       'Gaps from the consumers Protoyard, Dailybot and Corag, all additive. Blueprint spec 0.11.0 extends the design-system document with shadow levels, product tokens (--tx-ext-<name>), a categorical palette of 1 to 8 colors and pinned soft inks, and design-system compiler version 2 changes compiled hashes while every 0.10.0 document stays valid. One label dictionary (LabelsProvider and setTexuliLabels in texuli/i18n) translates the built-in labels of texuli, primitives, blocks and pages. texuli ds check --render works in a consumer, chart titles rank by their section, and the timeline gains styling hooks.',

@@ -32,6 +32,16 @@ export const avatarExamples = [
     load: () => import('./AvatarStatesDemo.svelte'),
   }),
   defineExample({
+    id: 'ui-avatar-grid',
+    title: 'Avatar group grid',
+    description:
+      'AvatarGroupGrid (texuli/avatar): two to four faces collaged in one circle with a +N cell, by member count, size and in a group conversation list.',
+    tags: ['ui', 'avatar', 'layout'],
+    component: 'texuli/AvatarGroupGrid',
+    props: ['items', 'size', 'label'],
+    load: () => import('./AvatarGridDemo.svelte'),
+  }),
+  defineExample({
     id: 'ui-avatar-rtl',
     title: 'Avatar, right to left',
     description: 'Arabic labels and stacked group in a right-to-left layout.',

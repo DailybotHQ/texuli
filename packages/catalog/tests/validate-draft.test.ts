@@ -287,6 +287,14 @@ describe('validateDraft', () => {
         });
         expect(kept).toEqual([]);
       }
+      // judges Image's srcDark (no `src` suffix) as an image URL too
+      {
+        const refused = scanSinks({
+          id: 'media-image',
+          props: { src: 'https://example.com/a.webp', srcDark: 'http://evil.example/d.webp' },
+        }).map((f) => `${f.path}: ${f.message}`);
+        expect(refused).toEqual(['tree.props.srcDark: a URL the untrusted URL policy refuses']);
+      }
     });
   });
 

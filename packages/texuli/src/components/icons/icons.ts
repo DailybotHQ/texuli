@@ -1,6 +1,6 @@
-import { ICON_NAMES, type IconName } from './types.ts';
+import { type BuiltInIconName, ICON_NAMES } from './types.ts';
 
-const ICON_PATHS: Readonly<Record<IconName, string>> = {
+const ICON_PATHS: Readonly<Record<BuiltInIconName, string>> = {
   check: 'm5 12 4 4L19 6',
   'chevron-down': 'm6 9 6 6 6-6',
   'chevron-right': 'm9 18 6-6-6-6',
@@ -14,10 +14,10 @@ const ICON_PATHS: Readonly<Record<IconName, string>> = {
     'M12 9v4m0 4h.01M10.3 3.86 1.82 18.14A2 2 0 0 0 3.53 21h16.94a2 2 0 0 0 1.71-2.86L13.7 3.86a2 2 0 0 0-3.4 0Z',
 };
 
-export function isIconName(value: string): value is IconName {
+export function isIconName(value: string): value is BuiltInIconName {
   return (ICON_NAMES as readonly string[]).includes(value);
 }
 
-export function iconPath(name: IconName): string {
+export function iconPath(name: BuiltInIconName): string {
   return ICON_PATHS[name];
 }

@@ -21,6 +21,57 @@ localized `label` or `aria-label` to expose it as an image with an accessible
 name. Icons inherit `currentColor` and accept a consumer `class` after the
 base and size classes.
 
+## Register your own names
+
+New in `0.13.1`. An app adds its own vocabulary with `registerIcons`, then
+uses the names like the built-ins:
+
+```svelte
+<!-- +layout.svelte (or the app root) -->
+<script lang="ts">
+  import { Rocket } from '@lucide/svelte';
+  import { Icon, registerIcons } from 'texuli/icons';
+
+  registerIcons({
+    rocket: Rocket, // a Svelte SVG component (Lucide icons work as is)
+    spark: 'M12 3v18M3 12h18', // or the built-in shape: one path d on a 24x24 viewBox
+  });
+</script>
+
+<Icon icon="rocket" label="Launch" />
+```
+
+- **Values.** A Svelte SVG component (`IconComponent`), or a path `d` string
+  drawn like the built-ins (stroked, `currentColor`, 24×24 viewBox). The
+  string only ever becomes a `<path d>` attribute; nothing is parsed as
+  markup.
+- **Scope and SSR.** The registry lives in Svelte context, not in a module
+  global, so it is SSR-safe: a server render never sees another request's
+  icons. Call `registerIcons` in a component's script (the app root or a
+  layout); it covers every `Icon` below that component. `<IconsProvider
+  icons={…}>` does the same as a wrapper, renders no element and updates
+  its icons in place when `icons` changes. A nested registration layers over
+  the one above it: its names win, the rest fall through.
+- **Built-ins win.** The built-in names (`ICON_NAMES`) keep their glyphs, so
+  internal controls look the same under any registry.
+- **Unknown names** render nothing, as before.
+- **Types.** Augment `IconNames` so `icon` autocompletes and checks the
+  registered names (`IconName` is the built-in names plus these):
+
+  ```ts
+  declare module 'texuli/icons' {
+    interface IconNames {
+      rocket: true;
+      spark: true;
+    }
+  }
+  ```
+
+  Names that come from data at runtime can be cast (`name as IconName`).
+
+The prop stays `icon` (no `name` alias). A registered icon's `<svg>` carries
+`data-tx-icon="<name>"`.
+
 ## Optional Lucide bridge
 
 Texuli does not install or bundle Lucide. Consumers that already use

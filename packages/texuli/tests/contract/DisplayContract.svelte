@@ -7,7 +7,7 @@ import {
   Callout,
   ToneIcon,
 } from '../../src/components/alert/index.ts';
-import { Avatar, AvatarGroup } from '../../src/components/avatar/index.ts';
+import { Avatar, AvatarGroup, AvatarGroupGrid } from '../../src/components/avatar/index.ts';
 import { Badge, Chip, Tag } from '../../src/components/badge/index.ts';
 import { Button, ButtonGroup, IconButton } from '../../src/components/button/index.ts';
 import {
@@ -46,6 +46,7 @@ const k = (name: string) => `components/${name}`;
 <ToneIcon tone="success" {...p(k('alert/ToneIcon'))} bind:ref={refs[k('alert/ToneIcon')]} />
 <Avatar name="Ada Example" {...p(k('avatar/Avatar'))} bind:ref={refs[k('avatar/Avatar')]} />
 <AvatarGroup items={[{ name: 'Ada Example' }, { name: 'Lin Example' }]} {...p(k('avatar/AvatarGroup'))} bind:ref={refs[k('avatar/AvatarGroup')]} />
+<AvatarGroupGrid items={[{ name: 'Ada Example' }, { name: 'Lin Example' }]} {...p(k('avatar/AvatarGroupGrid'))} bind:ref={refs[k('avatar/AvatarGroupGrid')]} />
 <Badge {...p(k('badge/Badge'))} bind:ref={refs[k('badge/Badge')]}>New</Badge>
 <Chip label="Design" {...p(k('badge/Chip'))} bind:ref={refs[k('badge/Chip')]} />
 <Tag label="Draft" {...p(k('badge/Tag'))} bind:ref={refs[k('badge/Tag')]} />

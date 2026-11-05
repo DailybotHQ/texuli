@@ -1,6 +1,6 @@
 {
   "name": "@texuli/blocks",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "private": true,
   "description": "Content blocks: closed vocabulary, untrusted guard, formula AST and catalog metadata for pages, documents and slides.",
   "keywords": [
@@ -32,6 +32,11 @@
     "./code": {
       "types": "./src/code/index.ts",
       "default": "./src/code/index.ts"
+    },
+    "./code-field": {
+      "types": "./src/code/code-field-entry.ts",
+      "svelte": "./src/code/code-field-entry.ts",
+      "default": "./src/code/code-field-entry.ts"
     },
     "./code/engine": {
       "types": "./src/code/engine-entry.ts",
@@ -172,12 +177,12 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/core": "0.13.0",
-    "@texuli/tokens": "0.13.0",
-    "texuli": "0.13.0",
-    "@texuli/charts": "0.13.0",
-    "@texuli/data": "0.13.0",
-    "@texuli/media": "0.13.0"
+    "@texuli/core": "0.13.1",
+    "@texuli/tokens": "0.13.1",
+    "texuli": "0.13.1",
+    "@texuli/charts": "0.13.1",
+    "@texuli/data": "0.13.1",
+    "@texuli/media": "0.13.1"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

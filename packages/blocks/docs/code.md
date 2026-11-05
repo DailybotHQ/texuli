@@ -1,6 +1,6 @@
 # Code blocks
 
-**Package:** `@texuli/blocks` · **Entries:** `@texuli/blocks/code` (light), `@texuli/blocks/code/tokenizer` (engine), `@texuli/blocks/code/renderers` (Svelte), plus `loadCodeFamily()` from the package root.
+**Package:** `@texuli/blocks` · **Entries:** `@texuli/blocks/code` (light), `@texuli/blocks/code/tokenizer` (engine), `@texuli/blocks/code/renderers` (Svelte), `@texuli/blocks/code-field` (the editable field, new in `0.13.1`), plus `loadCodeFamily()` from the package root.
 
 A code block shows source text with syntax colors from an owned, linear-time
 tokenizer. Nothing becomes HTML: the tokenizer returns `{ kind, text }`
@@ -70,6 +70,104 @@ button behaves like the default one) and `copyStatus` (`idle`, `copying`,
 
 Labels (`resolveCodeBlockLabels`): `invalid`, `code` (the name of a block with no filename or language), `copy`, `copied`, `copyFailed`, `copyName` (a template with `{name}`, by default `Copy {name} code`), `copiedAnnouncement` and `copyFailedAnnouncement`.
 
+## Code field
+
+New in `0.13.1`. `CodeField` from `@texuli/blocks/code-field` is an editable,
+syntax-highlighted code field for forms and settings screens:
+
+```svelte
+<script lang="ts">
+  import { CodeField } from '@texuli/blocks/code-field';
+  let value = $state('const greeting = "hello";');
+</script>
+
+<CodeField bind:value language="ts" label="Snippet" lineNumbers name="snippet" />
+```
+
+**How it works.** A real `<textarea>` holds the text, the caret, the
+selection, undo and the form value. Its text is transparent, and it sits over
+an `aria-hidden` `<pre>` that prints the same text as token spans from the
+owned tokenizer: elements and text nodes, never HTML. Both layers share the
+font, line height, padding, tab size, white space and wrapping, with
+ligatures and kerning off. The overlay follows the textarea's scroll. Token
+colors are the code block's (`code.css`), without its bold and italic, so a
+heavier or slanted face cannot shift a glyph away from the caret. The field
+grows with its content, from `rows` lines; put it in a scroll container to
+cap its height.
+
+| Prop | Default | Meaning |
+| --- | --- | --- |
+| `value` | `''` | The source text (`bind:value`) |
+| `language` | none | A language id or alias, as for code blocks; anything else is plain text |
+| `label` | none | A visible `<label>` for the textarea. Or name it with `aria-label` or `aria-labelledby`; one of the three is required |
+| `placeholder`, `readonly`, `disabled`, `name`, `id`, `required`, `aria-*`, `data-*` | | Reach the textarea |
+| `oninput`, `onchange`, `onkeydown`, other DOM handlers | | Reach the textarea; the caller's handler runs first, and `preventDefault()` in `onkeydown` takes a key over |
+| `onValueChange` | none | Called with the new value after every edit |
+| `rows` | `4` | Visible lines before the field grows |
+| `wrap` | `false` | Wraps long lines instead of scrolling sideways |
+| `tabSize` | `2` | Columns per tab stop (1 to 8), and the spaces one Tab inserts |
+| `indentWith` | `'spaces'` | `'tab'` inserts one tab character |
+| `lineNumbers` | `false` | Decorative line numbers (`aria-hidden`); with `wrap`, each number is CSS content on its own line |
+| `highlightLimit` | `20000` | Characters past which highlighting turns off (at most 20,000) |
+| `showKeyboardHint` | `false` | Shows the keyboard hint under the field (it is always the textarea's description) |
+| `labels` | the dictionary | `{ keyboardHint }`; the default comes from `blocks.code-field.keyboard-hint` in the label dictionary (`@texuli/blocks/i18n`) |
+| `class`, `style`, `hidden` | | Land on the wrapper |
+| `ref`, `textareaRef` | | The wrapper and the textarea (bindable) |
+
+The entry also exports the edits behind the keys, as data
+(`indentEdit`, `newlineEdit`, `applyCodeFieldEdit`, `indentUnit`), the
+limits (`CODE_FIELD_HIGHLIGHT_LIMIT`, `CODE_FIELD_SYNC_LIMIT`) and the labels
+(`DEFAULT_CODE_FIELD_LABELS`, `resolveCodeFieldLabels`).
+
+**Keyboard.** The field captures Tab for indentation, so it follows the
+WAI-ARIA Authoring Practices advice for widgets that use Tab: a documented
+way out that does not trap keyboard users.
+
+| Key | Action |
+| --- | --- |
+| Tab | Indents: inserts one indent at the caret, or indents every selected line |
+| Shift+Tab | Outdents the current or selected lines |
+| Enter | A new line with the current line's indentation |
+| Escape, then Tab or Shift+Tab | Leaves the field (focus moves on as usual). Escape is not stopped, so a dialog around the field still closes on it |
+| Ctrl, Alt or Meta with Tab | Left to the browser |
+
+Edits go through the browser's editing commands, so undo and redo keep them.
+The textarea's description (`aria-describedby`) says "Tab inserts
+indentation. To leave the field, press Escape, then Tab." A `readonly` or
+`disabled` field captures no key and has no hint.
+
+**Large inputs.** Up to 4,000 characters the overlay re-tokenizes on every
+input. Past that, the work moves to the next animation frame, which runs
+before that frame is painted, so the overlay never shows stale text and a
+burst of inputs tokenizes once. Past `highlightLimit` (20,000 characters by
+default) there is no overlay and no line numbers: the textarea paints its own
+text, and typing stays fast.
+A `disabled` field also has no overlay: it shows the textarea's own text,
+dimmed, so it reads as inactive.
+
+**Server rendering and hydration.** The entry bundles every grammar, so the
+server HTML already holds the highlighted value, and it needs no inline
+style (strict CSP). Hydration keeps the server's textarea: text typed before
+the scripts arrive is kept, and the caret stays where it was.
+
+**Themes and forced colors.** The field reads the input and surface roles
+(`--tx-input`, `--tx-surface`, `--tx-ring`) and the token colors, so it
+follows light, dark and every library theme. In forced colors the overlay
+text is hidden and the textarea shows its own text in system colors.
+
+**Verified.** `packages/blocks/tests/code.test.ts` covers the edits, the
+binding, Tab, Shift+Tab, Enter and Escape, readonly and disabled, line
+numbers, wrapping, labels, the large-input fallback, the deferred
+tokenization and the absence of HTML sinks; `code-field-ssr.test.ts` covers
+the server HTML. `tests/e2e/code-field.spec.ts` runs on Chromium and WebKit:
+it photographs the field painting only the overlay's text and only the
+textarea's text, in one color, and requires the same pixels (no wrap, wrap,
+tabs and a sideways scroll; a 1px drift is caught). It also checks the keys,
+undo and hydration, axe in light and dark, and forced colors (Chromium). The
+`blocks-code-field` example has visual baselines (light and dark, Chromium
+and the Pixel 7) and renders under the strict CSP and on the server with
+every other example.
+
 ## Languages
 
 Grammars exist for `ts`, `js`, `json`, `bash`, `python`, `html`, `css`, `sql` and `yaml`, plus aliases: `typescript`, `tsx`, `javascript`, `jsx`, `mjs`, `sh`, `shell`, `zsh`, `console`, `py`, `xml`, `svg`, `svelte`, `vue`, `postgres`, `sqlite`, `mysql`, `yml` and more (`resolveCodeLanguage`). Any other language, including `text`, shows as plain text.
@@ -110,6 +208,7 @@ The renderer loads only the grammar of the block's language (`loadCodeGrammar`, 
 | `@texuli/blocks/code` (light entry: guard, labels, loader, styles) | 3.57 KiB + 1.16 KiB CSS (7.07 KiB lazy) | 20 KiB |
 | `@texuli/blocks/code/tokenizer` (every grammar) | 5.03 KiB | 16 KiB |
 | `@texuli/blocks/code/renderers` | 6.50 KiB + 1.16 KiB CSS | 12 KiB |
+| `@texuli/blocks/code-field` (measured 2026-11-04: the field and every grammar) | 8.44 KiB + 2.05 KiB CSS | 20 KiB (the `@texuli/blocks/*` default) |
 | `@texuli/blocks` root (every family) | 27.27 KiB | 32 KiB |
 
 When the code family landed, it grew the root from 13.04 to 14.22 KiB.

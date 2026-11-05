@@ -103,6 +103,16 @@ describe('untrusted at paint', () => {
       expect(props.href).toBe('javascript:alert(1)');
       expect(issues.map((i) => i.path)).toEqual(['props.href', 'props.block.items[1].src']);
     }
+    // polices Image's srcDark at paint, whatever tier the tree asked for
+    {
+      const issues: PaintUrlIssue[] = [];
+      const out = paintProps(
+        { trust: 'developer', srcDark: 'http://evil.example/d.webp', src: 'images/a.webp' },
+        issues
+      );
+      expect(out).toEqual({ trust: 'developer', src: 'images/a.webp' });
+      expect(issues.map((i) => i.path)).toEqual(['props.srcDark']);
+    }
     // polices every srcset candidate at paint, whatever the key case or depth
     {
       const issues: PaintUrlIssue[] = [];

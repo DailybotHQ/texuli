@@ -20,6 +20,7 @@
       "a11y-site-1.spec.ts",
       "astro-islands.spec.ts",
       "chat.spec.ts",
+      "media-image-dark.spec.ts",
       "pages-print.spec.ts",
       "player-streaming.spec.ts",
       "site-builder.spec.ts",
@@ -63,6 +64,7 @@
       "site-csp.spec.ts"
     ],
     [
+      "code-field.spec.ts",
       "csp.spec.ts",
       "gaps-80-85.spec.ts",
       "site-blocks-page.spec.ts",

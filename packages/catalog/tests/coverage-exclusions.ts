@@ -225,12 +225,19 @@ add(
 add(
   'texuli',
   'utility',
+  'An icon registry scope with no content of its own; the host registers its icon components or path data, and blueprints reference icons by name.',
+  ['IconsProvider']
+);
+add(
+  'texuli',
+  'utility',
   'Writes to the clipboard on press: host chrome next to code (manifest code).',
   ['CopyButton']
 );
 add('texuli', 'planned', 'Planned manifest: a display component with plain data props.', [
   'Avatar',
   'AvatarGroup',
+  'AvatarGroupGrid',
   'CardGrid',
   'Carousel',
   'KpiRow',
@@ -369,6 +376,12 @@ add(
 );
 
 // ── @texuli/blocks ─────────────────────────────────────────────
+add(
+  '@texuli/blocks',
+  'planned',
+  'Planned manifest (next spec minor): the editable code field (D-G-022) is a form control a blueprint will bind; a catalog id changes the spec contract, so it waits for the next spec version.',
+  ['CodeField']
+);
 add('@texuli/blocks', 'part', 'A renderer inside its block family (manifests blocks-*).', [
   'CalculatorBlock',
   'ChartBlockView',
@@ -394,5 +407,11 @@ export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(row
 // decisions log): DesignSystemProvider is a contentless scope like
 // MotionProvider; the host passes it a compiled design system. Raised to 212
 // for LabelsProvider (ADR-026), another contentless scope: the host passes it
-// a label dictionary.
-export const EXCLUSION_CEILING = 212;
+// a label dictionary. Raised to 213 for IconsProvider (D-G-021), another
+// contentless scope: the host passes it an icon registry. Raised to 214 for
+// CodeField (D-G-022, lead decision for 0.13.1): planned, its catalog id
+// waits for the next spec minor because it changes the spec contract.
+// Raised to 215 for AvatarGroupGrid (D-G-024, lead decision for 0.13.1),
+// planned alongside AvatarGroup: the same display data, a new catalog id
+// that waits for the next spec minor.
+export const EXCLUSION_CEILING = 215;

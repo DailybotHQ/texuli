@@ -6,6 +6,8 @@ import { createRawSnippet, flushSync, tick } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Alert from '../src/components/alert/Alert.svelte';
 import { alertRole } from '../src/components/alert/tones.ts';
+import AvatarGroup from '../src/components/avatar/AvatarGroup.svelte';
+import AvatarGroupGrid from '../src/components/avatar/AvatarGroupGrid.svelte';
 import { avatarInitials, avatarToneIndex, hashString } from '../src/components/avatar/initials.ts';
 import { avatarSrcset } from '../src/components/avatar/srcset.ts';
 import Chip from '../src/components/badge/Chip.svelte';
@@ -45,6 +47,7 @@ import {
 import { type NavIconName } from '../src/layouts/host/nav-model.ts';
 import AvatarFixture from './fixtures/AvatarFixture.svelte';
 import CustomIcon from './fixtures/CustomIcon.svelte';
+import IconsRegistryHarness from './fixtures/IconsRegistryHarness.svelte';
 import ResizableHarness from './fixtures/ResizableHarness.svelte';
 import ScrollAreaHarness from './fixtures/ScrollAreaHarness.svelte';
 import SeparatorAspectHarness from './fixtures/SeparatorAspectHarness.svelte';
@@ -220,6 +223,58 @@ describe('avatar', () => {
       const overflow = group.querySelector('[data-tx-avatar-group-overflow]');
       expect(overflow?.textContent).toBe('+2');
       expect(overflow?.getAttribute('aria-label')).toBe('+2');
+    });
+
+    it('collages up to four faces in one grid image named by the label or the members', () => {
+      const people = [
+        'Ada Example',
+        'Bea Harbor',
+        'Cal Orbit',
+        'Dee Quill',
+        'Eli North',
+        'Fay Reed',
+      ];
+      // [members, cells, faces, overflow text, initials per face]
+      const cases = [
+        [1, 1, 1, null, ['AE']],
+        [2, 2, 2, null, ['AE', 'BH']],
+        [3, 3, 3, null, ['AE', 'B', 'C']],
+        [4, 4, 4, null, ['A', 'B', 'C', 'D']],
+        [6, 4, 3, '+3', ['A', 'B', 'C']],
+      ] as const;
+      for (const [count, cells, faces, more, letters] of cases) {
+        const items = people.slice(0, count).map((name) => ({ name, status: 'online' as const }));
+        const view = render(AvatarGroupGrid, { props: { items, size: 'lg' } });
+        const group = view.getByRole('img', { name: items.map((i) => i.name).join(', ') });
+        expect(group.dataset.layout, `${count}`).toBe('grid');
+        expect(group.dataset.count, `${count}`).toBe(String(cells));
+        expect(group.classList.contains('tx-avatar-group--grid')).toBe(true);
+        const avatars = [...group.querySelectorAll<HTMLElement>('[data-tx-avatar]')];
+        expect(avatars.length, `${count}`).toBe(faces);
+        // Faces are hidden (the grid is the one image) and carry no status dot.
+        expect(avatars.every((a) => a.getAttribute('aria-hidden') === 'true')).toBe(true);
+        expect(group.querySelector('[data-tx-avatar-status]')).toBeNull();
+        expect(
+          avatars.map((a) => a.textContent?.trim()),
+          `${count}`
+        ).toEqual(letters);
+        const overflow = group.querySelector('[data-tx-avatar-group-overflow]');
+        expect(overflow?.textContent ?? null, `${count}`).toBe(more);
+        if (overflow) expect(overflow.getAttribute('aria-hidden')).toBe('true');
+        expect(view.queryAllByRole('img')).toHaveLength(1);
+        view.unmount();
+      }
+      render(AvatarGroupGrid, {
+        props: {
+          items: [{ name: 'Ada Example' }, { name: 'Bea Harbor' }],
+          label: 'Launch crew',
+        },
+      });
+      expect(screen.getByRole('img', { name: 'Launch crew' }).dataset.count).toBe('2');
+      // AvatarGroup stays the stack.
+      cleanup();
+      render(AvatarGroup, { props: { items: [{ name: 'Ada Example' }], label: 'Crew' } });
+      expect(screen.getByRole('group', { name: 'Crew' }).dataset.layout).toBeUndefined();
     });
   });
 
@@ -897,6 +952,31 @@ describe('icons', () => {
 
     it('renders nothing for a runtime name outside the built-in set', () => {
       const { container } = render(Icon, { props: { icon: 'unknown' as IconName } });
+      expect(container.querySelector('svg')).toBeNull();
+    });
+
+    it('renders registered names in their subtree only, components and path data, built-ins kept', async () => {
+      const view = render(IconsRegistryHarness, { props: { inner: { spark: 'M4 4h16' } } });
+      const outer = view.getByTestId('outer');
+      const rocket = within(outer).getByRole('img', { name: 'Rocket' });
+      expect(rocket.getAttribute('data-tx-icon')).toBe('rocket');
+      expect(rocket.getAttribute('width')).toBe('20');
+      const [, spark, check] = [...outer.querySelectorAll('svg')];
+      expect(spark?.getAttribute('data-tx-icon')).toBe('spark');
+      expect(spark?.getAttribute('aria-hidden')).toBe('true');
+      expect(spark?.querySelector('path')?.getAttribute('d')).toBe('M12 3v18M3 12h18');
+      expect(check?.querySelector('path')?.getAttribute('d')).toBe(iconPath('check'));
+      // The provider layers over registerIcons: its names win, the rest fall through.
+      const inner = view.getByTestId('inner');
+      const names = () =>
+        [...inner.querySelectorAll('svg')].map((svg) => svg.getAttribute('data-tx-icon'));
+      expect(inner.querySelector('svg path')?.getAttribute('d')).toBe('M4 4h16');
+      expect(names()).toEqual(['spark', 'rocket']);
+      await view.rerender({ inner: { spark: 'M2 2h20' } });
+      expect(inner.querySelector('svg path')?.getAttribute('d')).toBe('M2 2h20');
+      view.unmount();
+      // Context, not a module global: a render outside the registry knows no such name.
+      const { container } = render(Icon, { props: { icon: 'rocket' as IconName } });
       expect(container.querySelector('svg')).toBeNull();
     });
   });

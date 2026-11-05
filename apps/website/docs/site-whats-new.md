@@ -11,13 +11,14 @@ the home page hero)
 Every new package and capability of `0.6.0` to `0.13.0` on one page
 (PLAN_010 Amendment 8, PLAN_011 T-site-090 and T-site-0100), grouped by
 release with the status the repository states: `0.6.0` to `0.13.0` are
-published on npm, and `0.13.0` is current (pre-1.0), the published line of
+published on npm, and `0.13.1` is current (pre-1.0), the published line of
 `docs/RELEASE.md`. `0.11.0` (Protoyard G125–G127 and the Final Review
 fixes, with its patches `0.11.1` to `0.11.5`), `0.12.0` (Protoyard
 G136: the `@texuli/pages` core entries without the deck model, with its
 patches `0.12.1` to `0.12.3`) and `0.13.0` (the consumer gaps: blueprint
-spec `0.11.0` and one label dictionary) are listed with their status and
-no cards; their details are on `/changelog/`. The unit test requires the current release's status to
+spec `0.11.0` and one label dictionary, with its patch `0.13.1`: icon
+registration, `CodeField`, a theme-aware dark image and grid avatar
+groups) are listed with their status and no cards; their details are on `/changelog/`. The unit test requires the current release's status to
 say so, and a version in development (when the release line names one) to
 be marked as such. Each feature has a small demo or a preview and a link
 to its full page.

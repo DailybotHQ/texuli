@@ -211,6 +211,7 @@ export {
   focalPointPosition,
   IMAGE_FITS,
   IMAGE_LIMITS,
+  type ImageDarkMode,
   type ImageFetchPriority,
   type ImageFit,
   type ImageLabels,

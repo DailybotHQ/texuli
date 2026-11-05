@@ -15,6 +15,8 @@ import public subpaths only.
 | Dense data | `@texuli/data/*` views (grid, tree, board, calendar, timeline, files, …) |
 | Charts | `@texuli/charts/*` lazy families (`cartesian`, `compact`, `part-whole`, …) |
 | Theme | `enterprise-neutral` or themes skill search |
+| App icons | `registerIcons({ rocket: Rocket })` in the root (context, SSR-safe), then `<Icon icon="rocket">`; augment `IconNames` for types (new in `0.13.1`) |
+| Group avatars | `AvatarGroupGrid` (`texuli/avatar`): up to four faces in one circle, `+N` past four (new in `0.13.1`) |
 
 **Compose order:** shell → filter bar → KPI row → main visualization → detail
 drawer (if needed). Validate empty and loading states.
@@ -98,6 +100,7 @@ flatten them. A presenter screen is a second same-origin window linked with
 | Media | [`../../media/SKILL.md`](../../media/SKILL.md) — Image, Gallery, Video + captions |
 | Framing | `card` / content layouts |
 | URLs | `safeImageSrc` / `safeMediaSrc` on every src |
+| Light and dark artwork | `<Image src={light} srcDark={dark} alt>`: follows `data-tx-mode` / `.dark` over the OS; `darkMode="system"` for one `<picture>` download (new in `0.13.1`) |
 
 **Compose order:** story outline → media slots with policy-safe URLs →
 captions/chapters → export only if the brief asks (media export docs).
@@ -106,7 +109,7 @@ captions/chapters → export only if the brief asks (media export docs).
 
 **Brief shape:** reorder a list; move cards between columns; copy from a
 palette; reparent in a tree. `@texuli/drag` is in development and on npm
-as `0.13.0`.
+as `0.13.1`.
 
 | Need | Prefer |
 | --- | --- |
@@ -159,7 +162,7 @@ the behavior scenario `tests/behavior/scenarios/sortable.spec.ts`.
 
 **Brief shape:** an automation, approval or pipeline the person edits as
 nodes and edges, or a read-only diagram of one. `@texuli/workflows` is in
-development and on npm as `0.13.0`.
+development and on npm as `0.13.1`.
 
 ```svelte
 <script lang="ts">
@@ -201,6 +204,20 @@ refused op changes nothing; labels refuse control and bidi characters.
 
 **Gates:** `pnpm vitest run packages/workflows` and the behavior scenario
 `tests/behavior/scenarios/workflow-editor.spec.ts`.
+
+## 8. Code field
+
+New in `0.13.1`: typed code in a form (snippet, query, config).
+
+```svelte
+<CodeField bind:value language="sql" label="Query" lineNumbers name="query" />
+```
+
+- `import { CodeField } from '@texuli/blocks/code-field'`; name it with
+  `label`, `aria-label` or `aria-labelledby`.
+- **Keyboard:** Tab indents, Shift+Tab outdents, Enter keeps the indent;
+  Escape, then Tab, leaves the field.
+- Past 20,000 characters it is a plain textarea. Read-only code: the code block.
 
 ## Shared acceptance for every recipe
 

@@ -11,7 +11,7 @@ Svelte 5 component library by Dailybot, Inc.
 
 **In the stack:** layer L5, on the `@texuli/core` texels, the `@texuli/tokens` token engine, the `texuli` components and the `@texuli/charts`, `@texuli/data` and `@texuli/media` domain packages. The agent catalog, the player, `@texuli/pages`, `@texuli/slides`, `@texuli/astro` and `@texuli/tools` build on it.
 
-> **Status: 0.x release.** `@texuli/blocks` is published on npm as `0.13.0`, a
+> **Status: 0.x release.** `@texuli/blocks` is published on npm as `0.13.1`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
 > minor (`0.13.0`) may contain breaking changes, so pin the exact version or
 > use `^0.13.0`, which accepts only 0.13.x.
@@ -83,6 +83,7 @@ The package root exports a `load*Family()` renderer loader and a
 | Map | `map`: places and an optional route on an offline basemap | `@texuli/blocks/map`, `@texuli/blocks/map/engine`, `@texuli/blocks/map/renderers` |
 | Diagram | `flow`, `tree`, `board` and `terminal` diagrams | `@texuli/blocks/diagram`, `@texuli/blocks/diagram/engine`, `@texuli/blocks/diagram/renderers` |
 | Code | `code`, with syntax colors from an owned tokenizer | `@texuli/blocks/code`, `@texuli/blocks/code/engine`, `@texuli/blocks/code/tokenizer`, `@texuli/blocks/code/renderers` |
+| Code field | `CodeField`: an editable, syntax-highlighted textarea for forms (`<CodeField bind:value language="ts" />`; new in `0.13.1`) | `@texuli/blocks/code-field` |
 | Labels | `BLOCKS_MESSAGES_EN` (every block label id and its English default) and the `BlocksMessageId` union, for one dictionary set near the root with `setTexuliLabels` or `<LabelsProvider>` from `texuli` (ADR-026) | `@texuli/blocks/i18n` |
 
 In each family, the plain subpath is the light API (guards, labels, the lazy
@@ -94,6 +95,16 @@ The core vocabulary includes `safeParseBlocks` and `safeParseBlock`,
 `parseUntrustedBlocks`, `BLOCK_LIMITS`, `BLOCK_CATALOG` with
 `validateBlocksForAuthoring` (metadata for builders and agents), and the
 text helpers `walkBlocks`, `blockText` and `headingOutline`.
+
+## New in 0.13.1
+
+- **`CodeField`** (`@texuli/blocks/code-field`): an editable,
+  syntax-highlighted code field, `<CodeField bind:value language="ts" />`.
+  A real textarea (caret, selection, undo, form value) sits over the owned
+  tokenizer's output, printed as elements. Tab indents; Escape, then Tab,
+  leaves the field. It renders highlighted on the server, and turns
+  highlighting off past 20,000 characters
+  ([code](https://github.com/DailybotHQ/texuli/blob/main/packages/blocks/docs/code.md#code-field)).
 
 ## New in 0.9.0
 

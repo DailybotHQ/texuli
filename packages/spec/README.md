@@ -16,7 +16,7 @@ by Texuli's Kotlin Multiplatform twin. The package is framework-free: no
 DOM, no Svelte, no Node APIs and no runtime dependencies.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.13.0`, a pre-1.0 release (1.0.0 will be the first
+> published to npm as `0.13.1`, a pre-1.0 release (1.0.0 will be the first
 > stable release). Under 0.x, a new minor (`0.13.0`) may contain breaking
 > changes, so pin the exact version or use `^0.13.0`, which accepts only 0.13.x.
 
@@ -98,7 +98,7 @@ import {
   validateInstance,
 } from '@texuli/spec';
 
-SPEC_VERSION;                         // the spec version: '0.11.0' in @texuli/spec@0.13.0
+SPEC_VERSION;                         // the spec version: '0.11.0' in @texuli/spec@0.13.1
 SPEC_COMPONENT_IDS.includes('alert'); // true: the closed component vocabulary
 
 // The dialect validator: a closed subset of JSON Schema 2020-12.
@@ -303,7 +303,7 @@ envelope up to the current spec with pure, per-version steps
 `0.5.0 → 0.6.0`, `0.6.0 → 0.7.0`, `0.7.0 → 0.8.0`, `0.8.0 → 0.9.0`,
 `0.9.0 → 0.10.0` and `0.10.0 → 0.11.0`, each of which
 only stamps `spec`); a compatible version
-range is planned, not built. `@texuli/spec@0.13.0` carries spec `0.11.0` (digest
+range is planned, not built. `@texuli/spec@0.13.1` carries spec `0.11.0` (digest
 `17845743d088b768c4441ea2196e5c350687533dbd0c95589cba938fb31fe993`), which
 extends the design-system document only (structured shadow levels, product
 tokens, a categorical palette of 1 to 8 colors and pinned soft inks; every

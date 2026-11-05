@@ -1,6 +1,7 @@
 /// <reference types="node" />
 import { describe, expect, it } from 'vitest';
 import { hardCodedLabels } from '../../primitives/tests/support/i18n-coverage.ts';
+import { DEFAULT_CODE_FIELD_LABELS } from '../src/code/code-field.ts';
 import { DEFAULT_CODE_BLOCK_LABELS } from '../src/code/labels.ts';
 import { DEFAULT_DATA_BLOCK_LABELS } from '../src/data/labels.ts';
 import { DEFAULT_DIAGRAM_BLOCK_LABELS } from '../src/diagram/labels.ts';
@@ -30,6 +31,7 @@ describe('@texuli/blocks labels resolve through the dictionary in context (ADR-0
     for (const [prefix, labels] of [
       ['blocks.text', DEFAULT_TEXT_BLOCK_LABELS],
       ['blocks.code', DEFAULT_CODE_BLOCK_LABELS],
+      ['blocks.code-field', DEFAULT_CODE_FIELD_LABELS],
       ['blocks.map', DEFAULT_MAP_BLOCK_LABELS],
       ['blocks.interactive', DEFAULT_INTERACTIVE_BLOCK_LABELS],
       ['blocks.data', DEFAULT_DATA_BLOCK_LABELS],

@@ -26,7 +26,7 @@ another framework passes its own loaders and a paint adapter.
    placeholders.
 4. **Plan.** Each render node becomes a `PaintNode`:
    - a component, whose props passed the **untrusted URL policy again at
-     paint time**, at any depth (`href`, `src`, `poster`, `…Href`, `…Src`,
+     paint time**, at any depth (`href`, `src`, `srcDark`, `poster`, `…Href`, `…Src`,
      `…Url`, and `srcset` / `…Srcset`, where every candidate URL must pass the
      image policy or the whole value is removed), whatever tier validated the
      tree. A child that fills a named slot (audit G04) keeps its `slot`, so
