@@ -7,6 +7,8 @@ import type { MessageCatalog } from '@texuli/core/i18n';
  * this catalog equal to them. Placeholders such as `{name}` stay as written.
  */
 const MESSAGES = /* @__PURE__ */ Object.freeze({
+  'blocks.code-field.keyboard-hint':
+    'Tab inserts indentation. To leave the field, press Escape, then Tab.',
   'blocks.code.code': 'Code',
   'blocks.code.copied': 'Copied',
   'blocks.code.copied-announcement': 'Code copied to the clipboard.',

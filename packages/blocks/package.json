@@ -33,6 +33,11 @@
       "types": "./src/code/index.ts",
       "default": "./src/code/index.ts"
     },
+    "./code-field": {
+      "types": "./src/code/code-field-entry.ts",
+      "svelte": "./src/code/code-field-entry.ts",
+      "default": "./src/code/code-field-entry.ts"
+    },
     "./code/engine": {
       "types": "./src/code/engine-entry.ts",
       "default": "./src/code/engine-entry.ts"

@@ -9,6 +9,17 @@ import { loadAllFullLibraryThemes } from '@texuli/tokens/library-expand';
 import { createRawSnippet } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  applyCodeFieldEdit,
+  CODE_FIELD_HIGHLIGHT_LIMIT,
+  CODE_FIELD_SYNC_LIMIT,
+  CodeField,
+  DEFAULT_CODE_FIELD_LABELS,
+  indentEdit,
+  indentUnit,
+  newlineEdit,
+  resolveCodeFieldLabels,
+} from '../src/code/code-field-entry.ts';
+import {
   bashGrammar,
   CODE_TOKEN_KINDS,
   CODE_TOKENIZE_MAX_LENGTH,
@@ -53,7 +64,9 @@ import {
   getCatalogEntry,
   safeParseBlock,
 } from '../src/core/index.ts';
+import { BLOCKS_MESSAGES_EN } from '../src/i18n/index.ts';
 import * as root from '../src/index.ts';
+import CodeFieldHost from './fixtures/CodeFieldHost.svelte';
 
 /** `kind:text` for styled tokens, bare text for plain ones. */
 const compact = (tokens: readonly CodeToken[]) =>
@@ -1296,5 +1309,261 @@ describe('CodeBlockView header and toolbar snippets', () => {
       );
       cleanup();
     }
+  });
+});
+
+describe('code field edits (D-G-022)', () => {
+  it('indents, outdents and breaks lines as data, keeping the selection on the same text', () => {
+    const cases: {
+      value: string;
+      sel: [number, number];
+      unit?: string;
+      outdent?: boolean;
+      after: string | null;
+      next?: [number, number];
+    }[] = [
+      // A caret or a selection inside one line: one indent replaces it.
+      { value: 'ab', sel: [1, 1], after: 'a  b', next: [3, 3] },
+      { value: 'abc', sel: [1, 2], after: 'a  c', next: [3, 3] },
+      { value: 'ab', sel: [0, 0], unit: '\t', after: '\tab', next: [1, 1] },
+      // Across lines: every touched line, empty lines left alone.
+      { value: 'a\n\nb\nc', sel: [0, 4], after: '  a\n\n  b\nc', next: [0, 8] },
+      // A selection ending at a line start leaves that line alone.
+      { value: 'a\nb', sel: [0, 2], after: '  a\nb', next: [0, 4] },
+      // Shift+Tab: one indent (or one tab) per line, the caret clamped to the line start.
+      { value: '    a\n  b\n\tc', sel: [0, 12], outdent: true, after: '  a\nb\nc', next: [0, 7] },
+      { value: '  ab', sel: [1, 1], outdent: true, after: 'ab', next: [0, 0] },
+      { value: 'ab', sel: [1, 1], outdent: true, after: null },
+    ];
+    for (const { value, sel, unit = '  ', outdent = false, after, next } of cases) {
+      const edit = indentEdit(value, sel[0], sel[1], unit, outdent);
+      if (after === null) {
+        expect(edit, value).toBeNull();
+        continue;
+      }
+      if (!edit) throw new Error(`no edit for ${JSON.stringify(value)}`);
+      expect(applyCodeFieldEdit(value, edit), JSON.stringify(value)).toBe(after);
+      expect([edit.selectionStart, edit.selectionEnd], JSON.stringify(value)).toEqual(next);
+    }
+    // Enter keeps the indentation before the caret.
+    const enter = newlineEdit('  if (a) {', 10, 10);
+    expect(applyCodeFieldEdit('  if (a) {', enter)).toBe('  if (a) {\n  ');
+    expect(enter.selectionStart).toBe(13);
+    expect(applyCodeFieldEdit('\tx = 1', newlineEdit('\tx = 1', 1, 6))).toBe('\t\n\t');
+    expect([indentUnit('spaces', 4), indentUnit('tab', 4), indentUnit('spaces', 99)]).toEqual([
+      '    ',
+      '\t',
+      ' '.repeat(8),
+    ]);
+  });
+});
+
+describe('CodeField (D-G-022)', () => {
+  afterEach(() => cleanup());
+
+  const parts = (container: HTMLElement) => ({
+    root: container.querySelector('[data-tx-code-field]') as HTMLElement,
+    area: container.querySelector('textarea') as HTMLTextAreaElement,
+    pre: container.querySelector('pre'),
+  });
+  const overlayText = (pre: Element | null) =>
+    [...(pre?.querySelectorAll('.tx-code-field__text') ?? [])]
+      .map((line) => line.textContent)
+      .join('\n');
+  const type = async (area: HTMLTextAreaElement, value: string) => {
+    area.value = value;
+    await fireEvent.input(area);
+  };
+  const key = (area: HTMLTextAreaElement, init: KeyboardEventInit) =>
+    fireEvent.keyDown(area, { bubbles: true, cancelable: true, ...init });
+
+  it('binds the value and prints it highlighted as elements under an aria-hidden overlay, never as markup', async () => {
+    const changes: string[] = [];
+    const view = render(CodeFieldHost, {
+      props: {
+        initial: 'const a = "<b>x</b>";\n// note',
+        language: 'ts',
+        onValueChange: (next: string) => changes.push(next),
+        name: 'snippet',
+      },
+    });
+    const { root, area, pre } = parts(view.container);
+    expect(view.getByRole('textbox', { name: 'Snippet' })).toBe(area);
+    expect(area.value).toBe('const a = "<b>x</b>";\n// note');
+    expect(area.getAttribute('name')).toBe('snippet');
+    expect(area.getAttribute('spellcheck')).toBe('false');
+    expect(area.getAttribute('dir')).toBe('ltr');
+    expect(pre?.getAttribute('aria-hidden')).toBe('true');
+    expect(overlayText(pre)).toBe(area.value);
+    expect(pre?.querySelector('b')).toBeNull();
+    expect(pre?.querySelector('.tx-code-tok--keyword')?.textContent).toBe('const');
+    expect(pre?.querySelector('.tx-code-tok--string')?.textContent).toBe('"<b>x</b>"');
+    expect(root.getAttribute('data-grammar')).toBe('ts');
+    // Typing updates the bound value, the callback and the overlay.
+    await type(area, 'let b = 2;');
+    expect(view.container.querySelector('[data-bound]')?.textContent).toBe('let b = 2;');
+    expect(changes).toEqual(['let b = 2;']);
+    expect(overlayText(pre)).toBe('let b = 2;');
+    // The owner setting the value reaches the textarea and the overlay.
+    await fireEvent.click(view.getByRole('button', { name: 'Reset' }));
+    expect(area.value).toBe('let reset = 0;');
+    expect(overlayText(pre)).toBe('let reset = 0;');
+    // A trailing line break is an empty last line on both layers.
+    await type(area, 'a\n');
+    expect(pre?.querySelectorAll('.tx-code-field__line')).toHaveLength(2);
+    // Unknown languages print plain text.
+    cleanup();
+    const plain = render(CodeField, { props: { value: 'fn main() {}', language: 'rust' } });
+    expect(parts(plain.container).root.getAttribute('data-grammar')).toBe('none');
+    expect(plain.container.querySelector('[class^="tx-code-tok--"]')).toBeNull();
+  });
+
+  it('indents on Tab, keeps indentation on Enter, and lets Escape then Tab leave the field', async () => {
+    const view = render(CodeFieldHost, { props: { initial: 'a\nb', language: 'ts' } });
+    const { root, area } = parts(view.container);
+    expect(area.getAttribute('aria-describedby')).toBeTruthy();
+    const hint = view.container.querySelector(`#${area.getAttribute('aria-describedby')}`);
+    expect(hint?.textContent).toBe(DEFAULT_CODE_FIELD_LABELS.keyboardHint);
+    area.focus();
+    area.setSelectionRange(0, 3);
+    expect(await key(area, { key: 'Tab' })).toBe(false);
+    expect(area.value).toBe('  a\n  b');
+    expect(view.container.querySelector('[data-bound]')?.textContent).toBe('  a\n  b');
+    expect(await key(area, { key: 'Tab', shiftKey: true })).toBe(false);
+    expect(area.value).toBe('a\nb');
+    area.setSelectionRange(1, 1);
+    expect(await key(area, { key: 'Enter' })).toBe(false);
+    expect(area.value).toBe('a\n\nb');
+    // Escape arms the exit; Shift does not disarm it; the next Tab is not taken.
+    await key(area, { key: 'Escape' });
+    expect(root.hasAttribute('data-tab-released')).toBe(true);
+    await key(area, { key: 'Shift', shiftKey: true });
+    expect(await key(area, { key: 'Tab', shiftKey: true })).toBe(true);
+    expect(area.value).toBe('a\n\nb');
+    expect(root.hasAttribute('data-tab-released')).toBe(false);
+    // Any other key disarms it, and so does leaving the field.
+    await key(area, { key: 'Escape' });
+    await key(area, { key: 'ArrowLeft' });
+    expect(await key(area, { key: 'Tab' })).toBe(false);
+    await key(area, { key: 'Escape' });
+    await fireEvent.blur(area);
+    expect(root.hasAttribute('data-tab-released')).toBe(false);
+    // Modified Tab presses stay with the browser.
+    expect(await key(area, { key: 'Tab', ctrlKey: true })).toBe(true);
+    // A caller's preventDefault takes the key over.
+    cleanup();
+    const vetoed = render(CodeField, {
+      props: {
+        value: 'x',
+        'aria-label': 'Code',
+        onkeydown: (event: KeyboardEvent) => event.preventDefault(),
+      },
+    });
+    const vetoedArea = parts(vetoed.container).area;
+    await key(vetoedArea, { key: 'Tab' });
+    expect(vetoedArea.value).toBe('x');
+  });
+
+  it('keeps Tab with the browser when readonly or disabled, with tab indents and a tab size', async () => {
+    for (const flag of ['readonly', 'disabled'] as const) {
+      const view = render(CodeField, { props: { value: 'x', 'aria-label': 'Code', [flag]: true } });
+      const { root, area } = parts(view.container);
+      expect(area.hasAttribute(flag)).toBe(true);
+      expect(root.hasAttribute(`data-${flag}`)).toBe(true);
+      // Disabled paints the textarea's own text; readonly keeps the overlay.
+      expect(root.getAttribute('data-highlight')).toBe(flag === 'disabled' ? 'off' : 'on');
+      expect(area.hasAttribute('aria-describedby')).toBe(false);
+      expect(await key(area, { key: 'Tab' })).toBe(true);
+      expect(await key(area, { key: 'Enter' })).toBe(true);
+      expect(area.value).toBe('x');
+      cleanup();
+    }
+    const tabbed = render(CodeField, {
+      props: { value: 'x', 'aria-label': 'Code', indentWith: 'tab', tabSize: 4 },
+    });
+    const { root, area } = parts(tabbed.container);
+    expect(root.getAttribute('data-tab-size')).toBe('4');
+    area.setSelectionRange(0, 0);
+    await key(area, { key: 'Tab' });
+    expect(area.value).toBe('\tx');
+  });
+
+  it('draws decorative line numbers, wraps on request and takes translated labels', async () => {
+    const view = render(CodeField, {
+      props: {
+        value: Array.from({ length: 120 }, (_, i) => `line ${i}`).join('\n'),
+        'aria-label': 'Code',
+        lineNumbers: true,
+        labels: { keyboardHint: 'Tab sangra. Escape y Tab para salir.' },
+        showKeyboardHint: true,
+      },
+    });
+    const { root, area } = parts(view.container);
+    const gutter = view.container.querySelector('.tx-code-field__gutter');
+    expect(gutter?.getAttribute('aria-hidden')).toBe('true');
+    expect(gutter?.querySelectorAll('.tx-code-field__number')).toHaveLength(120);
+    expect(root.getAttribute('data-digits')).toBe('3');
+    expect(area.getAttribute('wrap')).toBe('off');
+    expect(view.getByText('Tab sangra. Escape y Tab para salir.').className).toBe(
+      'tx-code-field__hint'
+    );
+    cleanup();
+    const wrapped = render(CodeField, {
+      props: { value: 'a\nb', 'aria-label': 'Code', lineNumbers: true, wrap: true },
+    });
+    const w = parts(wrapped.container);
+    expect(w.root.getAttribute('data-wrap')).toBe('on');
+    expect(w.area.getAttribute('wrap')).toBe('soft');
+    // With wrapping the numbers are CSS content of each line, so the text stays the source.
+    expect(wrapped.container.querySelector('.tx-code-field__gutter')).toBeNull();
+    expect(w.pre?.querySelector('[data-line="2"]')?.textContent).toBe('b');
+  });
+
+  it('falls back to a plain textarea past the highlight limit and tokenizes long values once per frame', async () => {
+    const big = 'x'.repeat(CODE_FIELD_HIGHLIGHT_LIMIT + 1);
+    const view = render(CodeField, {
+      props: { value: big, language: 'ts', 'aria-label': 'Code', lineNumbers: true },
+    });
+    const { root, area, pre } = parts(view.container);
+    expect(root.getAttribute('data-highlight')).toBe('off');
+    expect(pre).toBeNull();
+    expect(view.container.querySelector('.tx-code-field__gutter')).toBeNull();
+    expect(area.value).toHaveLength(big.length);
+    // Back under the limit, the overlay returns.
+    await fireEvent.input(Object.assign(area, { value: 'const a = 1;' }));
+    expect(root.getAttribute('data-highlight')).toBe('on');
+    expect(overlayText(parts(view.container).pre)).toBe('const a = 1;');
+    cleanup();
+    // A custom limit.
+    const capped = render(CodeField, {
+      props: { value: 'const a = 1;', 'aria-label': 'Code', highlightLimit: 5 },
+    });
+    expect(parts(capped.container).root.getAttribute('data-highlight')).toBe('off');
+    cleanup();
+    // Long values: the overlay catches up on the next frame, and a burst tokenizes once.
+    const long = `const a = 1;\n${'// filler\n'.repeat(CODE_FIELD_SYNC_LIMIT / 10)}`;
+    const deferred = render(CodeField, { props: { value: long, 'aria-label': 'Code' } });
+    const d = parts(deferred.container);
+    expect(overlayText(d.pre)).toBe(long);
+    await fireEvent.input(Object.assign(d.area, { value: `${long}a` }));
+    await fireEvent.input(Object.assign(d.area, { value: `${long}ab` }));
+    await waitFor(() => expect(overlayText(parts(deferred.container).pre)).toBe(`${long}ab`));
+    expect(d.root.hasAttribute('data-pending')).toBe(false);
+  });
+
+  it('ships no HTML sinks and reads its default string from the label dictionary', () => {
+    const dir = join(import.meta.dirname, '..', 'src', 'code');
+    for (const file of ['CodeField.svelte', 'code-field.ts', 'code-field-entry.ts']) {
+      const text = readFileSync(join(dir, file), 'utf8');
+      expect(text, file).not.toMatch(
+        /innerHTML|outerHTML|insertAdjacentHTML|\{@html|\beval\s*\(|new\s+Function/
+      );
+    }
+    expect(BLOCKS_MESSAGES_EN.messages['blocks.code-field.keyboard-hint']).toBe(
+      DEFAULT_CODE_FIELD_LABELS.keyboardHint
+    );
+    expect(resolveCodeFieldLabels({ keyboardHint: 3 as unknown as string })).toEqual(
+      DEFAULT_CODE_FIELD_LABELS
+    );
   });
 });
