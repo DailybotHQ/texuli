@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.3.21] — 2026-11-05
+
+### Changes
+
+- chore(skill): packages on npm at 0.14.1
+
 - The packages are on npm at `0.14.1`, an additive patch: the `event`
   snippet, `maxEventsPerDay` and `onMoreEvents` on `CalendarView`, and
   `collapsedLanes` and `cellFooter` on `Board`. The components install
