@@ -219,17 +219,17 @@
     vertical-align: middle;
     inline-size: var(--tx-avatar-size-md, var(--tx-size-control-md));
     block-size: var(--tx-avatar-size-md, var(--tx-size-control-md));
-    font-size: 0.6rem;
+    font-size: 0.65rem;
   }
   .tx-avatar-group.tx-avatar-group--grid.tx-avatar-group--xs {
     inline-size: var(--tx-avatar-size-xs, var(--tx-size-icon-md));
     block-size: var(--tx-avatar-size-xs, var(--tx-size-icon-md));
-    font-size: 0.4rem;
+    font-size: 0.55rem;
   }
   .tx-avatar-group.tx-avatar-group--grid.tx-avatar-group--sm {
     inline-size: var(--tx-avatar-size-sm, var(--tx-size-control-xs));
     block-size: var(--tx-avatar-size-sm, var(--tx-size-control-xs));
-    font-size: 0.5rem;
+    font-size: 0.62rem;
   }
   .tx-avatar-group.tx-avatar-group--grid.tx-avatar-group--lg {
     inline-size: var(--tx-avatar-size-lg, var(--tx-space-12));
