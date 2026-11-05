@@ -344,6 +344,32 @@ test('data calendar: opens scrolled before paint, pointer create and drag (mirro
     }
   });
 
+  await test.step('P-T-01, P-T-02: snippet chips keep label in name; the more button opens the day by keyboard', async () => {
+    const MONTH = 'data-calendar-month';
+    await open(page, MONTH);
+    const host = page.locator(`[data-example="${MONTH}"]`);
+    await expect(host.locator('[data-calendar-event="pairing"] .booking')).toBeVisible();
+    const results = await new AxeBuilder({ page })
+      .include(`[data-example="${MONTH}"]`)
+      .withRules(['label-content-name-mismatch'])
+      .analyze();
+    expect(results.passes.length + results.violations.length).toBeGreaterThan(0);
+    problems.push(
+      ...results.violations.map(
+        (v) => `${MONTH} ${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(' | ')}`
+      )
+    );
+    problems.push(...(await axe(page, `[data-example="${MONTH}"]`)));
+    const more = host.getByRole('button', { name: '3 more events on November 5' });
+    await expect(more).toHaveText('3 more events');
+    await more.focus();
+    await page.keyboard.press('Enter');
+    await expect(host.locator('[data-calendar]')).toHaveAttribute('data-view', 'day');
+    await expect(host.locator('[data-day-column="2026-11-05"] [data-calendar-event]')).toHaveCount(
+      5
+    );
+  });
+
   await test.step('P1-16: event tones render from tokens', async () => {
     await openCalendar();
     const tones = await Promise.all(
@@ -440,6 +466,30 @@ test('data board and virtual list: the lazy move menu relocates a card; the acti
       'Moved Map the core flow to Done'
     );
     expect(await axe(page, '[data-example="data-board"]')).toEqual([]);
+  });
+
+  await test.step('P-T-03: a lane opens from its disclosure by keyboard and stays axe-clean', async () => {
+    const example = page.locator('[data-example="data-board-lanes"]');
+    await page.goto('/?fixture=data-board-lanes&mode=light', { waitUntil: 'networkidle' });
+    // Each column's toggle counts the cards its own cell hides.
+    const toggle = example.getByRole('button', { name: 'Mobile (2 hidden)', exact: true });
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false', { timeout: 20_000 });
+    await expect(example.getByText('Offline drafts')).toBeHidden();
+    await toggle.focus();
+    await page.keyboard.press('Enter');
+    await expect(example.getByRole('button', { name: /^Mobile/ })).toHaveCount(3);
+    for (const button of await example.getByRole('button', { name: /^Mobile/ }).all()) {
+      await expect(button).toHaveAttribute('aria-expanded', 'true');
+    }
+    await expect(
+      example.getByRole('list', { name: 'In progress, Mobile' }).getByText('Offline drafts')
+    ).toBeVisible();
+    expect(await axe(page, '[data-example="data-board-lanes"]')).toEqual([]);
+    // The cell footer knows its column and lane.
+    await example.getByRole('button', { name: 'Add to Done, Mobile' }).click();
+    await expect(example.getByRole('list', { name: 'Done, Mobile' })).toContainText(
+      'New mobile issue 1'
+    );
   });
 
   await test.step('P1-18: the active virtual-list row is marked, forced colors included', async () => {

@@ -315,3 +315,106 @@ describe('Board column descriptions, header snippet and column-only mode (G67, G
     expect(validateMove(grid, 'a', { columnId: 'todo', index: 1 }).ok).toBe(true);
   });
 });
+
+describe('Board collapsible lanes and cell footers (P-T-03, P-T-04)', () => {
+  const toggles = (lane: string) =>
+    screen.getAllByRole('button', { name: new RegExp(`^${lane}\\b`) }) as HTMLButtonElement[];
+
+  it('collapses a lane behind a disclosure that keeps it in the totals and WIP limits', async () => {
+    const { default: Harness } = await import('./fixtures/BoardLanesHarness.svelte');
+    const changes: string[][] = [];
+    const { container } = render(Harness, {
+      props: {
+        collapsed: ['api'],
+        onCollapsedLanesChange: (next: string[]) => changes.push([...next]),
+      },
+    });
+    const todo = container.querySelector('.tx-board__column') as HTMLElement;
+    for (const [expanded, apiCards] of [
+      [false, 0],
+      [true, 1],
+    ] as const) {
+      // One toggle per column, in the lane heading, for the whole lane.
+      for (const [index, button] of toggles('API').entries()) {
+        expect(button.closest('.tx-board__lane-title')?.tagName).toBe('H4');
+        expect(button.getAttribute('aria-expanded')).toBe(String(expanded));
+        const controlled = (button.getAttribute('aria-controls') ?? '').split(' ');
+        expect(controlled).toHaveLength(2);
+        const lists = controlled.map((id) => document.getElementById(id));
+        expect(lists.map((list) => list?.getAttribute('aria-label'))).toEqual([
+          'To do, API',
+          'Done, API',
+        ]);
+        expect(lists.every((list) => list?.hidden === !expanded)).toBe(true);
+        // Collapsed, the toggle shows how many cards its cell hides.
+        expect(button.textContent?.trim()).toBe(expanded ? 'API' : 'API (1 hidden)');
+        expect(lists[index]?.querySelectorAll('[data-board-card]').length).toBe(apiCards);
+      }
+      // The collapsed card still counts: To do is at its hard limit either way.
+      expect(todo.dataset.wip).toBe('blocked');
+      expect(todo.querySelector('.tx-board__count')?.textContent).toContain('2 cards, limit 2');
+      expect(screen.getAllByTestId('column-footer').map((f) => f.textContent)).toEqual([
+        'todo (2)',
+        'done (1)',
+      ]);
+      expect(toggles('Web')[0]?.getAttribute('aria-expanded')).toBe('true');
+      if (!expanded) await fireEvent.click(toggles('API')[1] as HTMLElement);
+    }
+    expect(changes).toEqual([[]]);
+    await fireEvent.click(toggles('API')[0] as HTMLElement);
+    expect(changes).toEqual([[], ['api']]);
+    expect(screen.getByTestId('collapsed').textContent).toBe('api');
+  });
+
+  it('opens a collapsed lane when a held card enters it, keeping the card focused', async () => {
+    const { default: Harness } = await import('./fixtures/BoardLanesHarness.svelte');
+    const changes: string[][] = [];
+    render(Harness, {
+      props: {
+        collapsed: ['api'],
+        labels: { hiddenCards: (count: number) => `${count} folded` },
+        onCollapsedLanesChange: (next: string[]) => changes.push([...next]),
+      },
+    });
+    expect(toggles('API')[0]?.textContent?.trim()).toBe('API (1 folded)');
+    const held = () => document.activeElement as HTMLElement;
+    screen.getByRole('button', { name: 'Drag Alpha task' }).focus();
+    await fireEvent.keyDown(held(), { key: ' ' });
+    await fireEvent.keyDown(held(), { key: 'ArrowDown', shiftKey: true });
+    expect(changes).toEqual([[]]);
+    expect(held().getAttribute('aria-label')).toBe('Drag Alpha task');
+    expect(screen.getByRole('list', { name: 'To do, API' }).contains(held())).toBe(true);
+    await fireEvent.keyDown(held(), { key: ' ' });
+    await waitFor(() =>
+      expect(
+        screen.getByRole('list', { name: 'To do, API' }).querySelectorAll('[data-board-card]')
+      ).toHaveLength(2)
+    );
+  });
+
+  it('renders a cell footer per column and lane, and per column without lanes', async () => {
+    const { default: Harness } = await import('./fixtures/BoardLanesHarness.svelte');
+    for (const [props, expected] of [
+      [{}, ['todo/web', 'todo/api', 'done/web', 'done/api']],
+      // A collapsed lane hides its cell footers with its cards.
+      [{ collapsed: ['api'] }, ['todo/web', 'done/web']],
+      // Without lanes the cell is the column, and the lane is DEFAULT_LANE (id '').
+      [{ lanes: false }, ['todo/', 'done/']],
+    ] as const) {
+      const { container } = render(Harness, {
+        props: { ...props, collapsed: [...(props.collapsed ?? [])] },
+      });
+      const footers = screen.getAllByTestId('cell-footer');
+      expect(footers.map((footer) => footer.textContent?.replace('Add to ', ''))).toEqual(expected);
+      // Each sits right after its cell's card list; the column footer stays last.
+      for (const footer of footers) {
+        expect(footer.parentElement?.previousElementSibling?.getAttribute('role')).toBe('list');
+      }
+      const column = container.querySelector('.tx-board__column') as HTMLElement;
+      expect(column.lastElementChild?.classList.contains('tx-board__column-footer')).toBe(true);
+      if (props.lanes === false)
+        expect(screen.queryAllByRole('button', { name: /^Web/ })).toEqual([]);
+      cleanup();
+    }
+  });
+});

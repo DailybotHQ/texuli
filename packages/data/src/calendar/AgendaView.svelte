@@ -1,9 +1,10 @@
 <script lang="ts">
+import type { Snippet } from 'svelte';
 import { addDays, daysBetween } from '../engines/calendar/index.ts';
 import EventButton from './EventButton.svelte';
 import type { CalendarFormats } from './model.ts';
 import { eventsOnDate } from './model.ts';
-import type { CalendarItem, CalendarLabels } from './types.ts';
+import type { CalendarEventContext, CalendarItem, CalendarLabels } from './types.ts';
 
 let {
   startDate,
@@ -17,6 +18,7 @@ let {
   onFocusDate,
   hintId,
   onCreateDay,
+  event,
 }: {
   startDate: string;
   endDate: string;
@@ -30,6 +32,7 @@ let {
   hintId?: string;
   /** Set when activating a date creates an all-day event. */
   onCreateDay?: (date: string) => void;
+  event?: Snippet<[CalendarItem, CalendarEventContext]>;
 } = $props();
 
 const days = $derived.by(() =>
@@ -62,7 +65,7 @@ const uid = $props.id();
       </h3>
       {#if day.items.length}
         <ul>
-          {#each day.items as item (item.key)}<li><EventButton {item} {fmt} {labels} {timeZone} {hintId} {onOpen} /></li>{/each}
+          {#each day.items as item (item.key)}<li><EventButton {item} {fmt} {labels} {timeZone} {hintId} view="agenda" content={event} {onOpen} /></li>{/each}
         </ul>
       {:else}<p class="tx-calendar__empty">{labels.empty}</p>{/if}
     </section>

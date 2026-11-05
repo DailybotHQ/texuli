@@ -4,7 +4,7 @@ Back to [`../SKILL.md`](../SKILL.md).
 
 ## A. Use the packages
 
-The packages are on npm in the 0.14 line, every one at `0.14.0`, a pre-1.0 line
+The packages are on npm in the 0.14 line, every one at `0.14.1`, a pre-1.0 line
 (`latest` points to the newest, and `next` is no longer maintained and stays on `0.12.1`; 1.0.0 will be the first stable release). An app outside a
 Texuli checkout installs them plainly, for example
 `pnpm add texuli @texuli/tokens`, and pins the exact version or `^0.14.0`
@@ -14,7 +14,7 @@ runs the install; it uses the network). `@texuli/drag`,
 in `0.5.0`), `@texuli/document` and `@texuli/pages` (both first published
 in `0.7.0`), `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (all
 three first published in `0.8.0`) and `@texuli/mcp` (first published in
-`0.9.0`) are in development and on npm as `0.14.0`.
+`0.9.0`) are in development and on npm as `0.14.1`.
 
 New in `0.13.1` (an additive patch): `@texuli/blocks/code-field` (`CodeField`),
 `registerIcons` and `IconsProvider` in `texuli/icons`, `srcDark` and
@@ -45,6 +45,22 @@ pins `^0.14.0`, and the `0.13.x` packages do not have them):
   `aa-non-text` check (`checkDesignSystemIndicators`,
   `evaluateDesignSystemIndicators`) and compiler version 3
   ([`../../design-systems/SKILL.md`](../../design-systems/SKILL.md)).
+
+New in `0.14.1` (an additive patch; an app that uses these pins `^0.14.1`):
+
+- `CalendarView` (`@texuli/data/calendar/view`): an `event` snippet,
+  `(item, { view, compact, time })`, for the chip content in every view.
+  The chip stays Texuli's button, named by the snippet's visible content
+  plus hidden details, so show the title and add no links or buttons.
+- Month view: `maxEventsPerDay` (default 3) and `onMoreEvents(date)`, which
+  makes "3 more events" a button named "3 more events on November 5"
+  (label `moreEventsOn`).
+- `Board` (`@texuli/data/board`): `bind:collapsedLanes` with
+  `onCollapsedLanesChange` (a disclosure in each lane heading; a collapsed
+  lane still counts in column totals and WIP limits; label `hiddenCards`),
+  and `cellFooter(column, lane)`, with `lane` `DEFAULT_LANE` without lanes.
+- Not in the agent catalog yet: `collapsedLanes`, `cellFooter` and
+  `maxEventsPerDay`. There is no `laneHeader` snippet.
 
 Behavior that changes on the move is in
 [`../../upgrade/SKILL.md`](../../upgrade/SKILL.md) ("0.13 → 0.14").

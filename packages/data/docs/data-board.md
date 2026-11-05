@@ -5,13 +5,14 @@
 **Engine:** `packages/data/src/engines/board/` (framework-free, also `./board/engine`)
 **View:** `packages/data/src/board/`
 **Tests:** `packages/data/tests/board.test.ts`, `packages/data/tests/engines.test.ts`
-**Example:** `data-board`
+**Examples:** `data-board`, `data-board-footer`, `data-board-lanes`
 
 ## Goal
 
 A kanban board over flat `{ id, columnId, rank }` cards with:
 
 - Columns from definitions (optional WIP soft/hard limits), optional swimlanes
+  that collapse behind a disclosure (new in `0.14.1`)
 - Pointer drag (4px threshold, pointer capture) on the `@texuli/drag/gesture`
   tracker, and a full keyboard move map
 - A per-card "Move …" menu as the pointing-device alternative (WCAG 2.5.7),
@@ -126,6 +127,58 @@ and 6, lanes on and off, one footer per column with its count).
 
 Test: the "Board column descriptions, header snippet and column-only mode
 (G67, G69)" block in `packages/data/tests/board.test.ts`.
+
+### Collapsible lanes and cell footers (P-T-03, P-T-04)
+
+New in `0.14.1`.
+
+- **`collapsedLanes`** (`string[]`, bindable, default `[]`) lists the ids of
+  collapsed lanes; `onCollapsedLanesChange(collapsedLanes)` reports every
+  change (the naming of the timeline's `collapsed` / `onCollapsedChange`).
+  With two or more lanes, each lane heading holds a disclosure button, one
+  per column, and any of them toggles the whole lane. A collapsed lane hides
+  only its cards and cell footers: its toggle shows how many cards that cell
+  hides (`labels.hiddenCards(count)`, default `"2 hidden"`), and its cards
+  stay in the board model, so they still count in the column totals, in
+  `columnFooter`'s `count` and in the WIP limits a move is checked against.
+  A board with one lane (or none) has no lane heading and ignores
+  `collapsedLanes`.
+- A card held by keyboard that enters a collapsed lane (Shift+ArrowUp or
+  ArrowDown) opens it, reported through `onCollapsedLanesChange`, so the card
+  stays visible and keeps focus. A pointer cannot drop into a collapsed lane
+  (it has no visible cell), and the Move menu only offers the card's own lane.
+- **`cellFooter(column, lane)`** renders at the end of each column-by-lane
+  cell, after its card list, so an in-lane "add card" knows both. Without
+  lanes the cell is the column and `lane` is `DEFAULT_LANE` (`{ id: '',
+  title: '' }`, exported), the same empty lane id `BoardMove.laneId` carries.
+  `columnFooter` keeps rendering once at the end of each column.
+
+```svelte
+<script lang="ts">
+  let collapsedLanes = $state<string[]>(['mobile']);
+</script>
+
+<Board {columns} lanes={[{ id: 'web', title: 'Web' }, { id: 'mobile', title: 'Mobile' }]}
+  items={issues} getLane={(issue) => issue.lane} bind:collapsedLanes
+  labels={{ hiddenCards: (count) => `${count} hidden` }} {/* other accessors */} {onMove}>
+  {#snippet card(issue)}<strong>{issue.title}</strong>{/snippet}
+  {#snippet cellFooter(column, lane)}
+    <button type="button" onclick={() => add(column.id, lane.id)}>Add to {column.title}, {lane.title}</button>
+  {/snippet}
+</Board>
+```
+
+Accessibility: the lane title is a heading (one level below the columns)
+holding a `button` with `aria-expanded` and `aria-controls`, which lists the
+lane's card list in every column (each list keeps its id while collapsed and
+is `hidden`). The button's name is the lane title, plus the hidden count
+while collapsed; the chevron is decorative (empty CSS alt text). Each card
+list stays a `list` named `<column>, <lane>`; the lane heading and the cell
+footer sit outside it.
+
+Example: `data-board-lanes`. Tests: the "Board collapsible lanes and cell
+footers (P-T-03, P-T-04)" block in `packages/data/tests/board.test.ts`, and
+the P-T-03 step in `tests/e2e/data.spec.ts` (keyboard toggle, axe).
 
 ### Saving moves
 

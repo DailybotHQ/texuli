@@ -20,6 +20,7 @@ const entries = [
       'MotionLoop in texuli/motion/loop loops a pulse or a wave and stays still under reduced motion; it is not in the blueprint motion vocabulary, because a loop there could not be stopped.',
       'registerIcons takes lazy loaders with a fallback; AlertDialog takes confirmDisabled; Breadcrumb items take ariaLabel and onSelect; tabs without a rendered panel omit aria-controls and take panelId; a disabled Tooltip keeps its trigger enabled; dialog and sheet scrims read --tx-scrim, so dark scrims are dark again.',
       'No breaking API change; a 0.x minor because of the new spec and compiler version.',
+      '0.14.1 (patch): CalendarView in @texuli/data/calendar/view takes an event snippet for the chip content in every view (the chip stays a button named by its visible content), and the month view takes maxEventsPerDay and onMoreEvents, which makes "3 more events" a button that opens the day; Board in @texuli/data/board takes bind:collapsedLanes with a disclosure toggle in each lane heading (a collapsed lane still counts in column totals and WIP limits) and a cellFooter(column, lane) snippet. Blueprint spec stays 0.12.0.',
     ],
   },
   {

@@ -10,7 +10,7 @@ WCAG AA report, and run the deck and document commands.
 **In the stack:** layer L9, the top: a thin bin over the stdio MCP server in `@texuli/tools` (L8), which reads the agent catalog (L6) and the `@texuli/tokens` themes.
 
 > **Status: in development (pre-1.0).** `@texuli/mcp` is published on npm
-> as `0.14.0`, with provenance (first published as `0.9.0`). Under 0.x a new minor
+> as `0.14.1`, with provenance (first published as `0.9.0`). Under 0.x a new minor
 > (`0.14.0`) may contain breaking changes, so pin the exact version or use
 > `^0.14.0`, which accepts only 0.14.x
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
