@@ -2546,7 +2546,7 @@
     },
     "dataVizPalette": {
       "additionalProperties": false,
-      "description": "One mode’s chart palette: 8 categorical, 9 sequential and 9 diverging colors.",
+      "description": "One mode’s chart palette: 1 to 8 categorical colors (the compiler derives the rest), 9 sequential and 9 diverging colors.",
       "properties": {
         "axis": {
           "$ref": "#/$defs/colorValue"
@@ -2556,7 +2556,7 @@
             "$ref": "#/$defs/colorValue"
           },
           "maxItems": 8,
-          "minItems": 8,
+          "minItems": 1,
           "type": "array"
         },
         "diverging": {
@@ -2612,8 +2612,20 @@
     },
     "elevation": {
       "additionalProperties": false,
-      "description": "Elevation style.",
+      "description": "Elevation style, and structured shadows per level (keys 1 to 5, 1 to 4 layers each) that replace --tx-elevation-<level>.",
       "properties": {
+        "levels": {
+          "additionalProperties": {
+            "items": {
+              "$ref": "#/$defs/shadowLayer"
+            },
+            "maxItems": 4,
+            "minItems": 1,
+            "type": "array"
+          },
+          "description": "At most 5 entries; keys match ^[1-5]$ and are never __proto__, constructor or prototype.",
+          "type": "object"
+        },
         "style": {
           "enum": ["flat", "soft", "crisp", "glow", "layered"],
           "type": "string"
@@ -2626,6 +2638,42 @@
       "maximum": 5,
       "minimum": 0,
       "type": "integer"
+    },
+    "extension": {
+      "additionalProperties": false,
+      "description": "A product token: a fill per mode and an optional on-color per mode (an empty on derives both). Compiled to --tx-ext-<name> and --tx-ext-<name>-foreground; the pair is contrast-checked in both modes.",
+      "properties": {
+        "dark": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "light": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "on": {
+          "$ref": "#/$defs/extensionOn"
+        }
+      },
+      "required": ["light", "dark"],
+      "type": "object"
+    },
+    "extensionOn": {
+      "additionalProperties": false,
+      "properties": {
+        "dark": {
+          "$ref": "#/$defs/colorValue"
+        },
+        "light": {
+          "$ref": "#/$defs/colorValue"
+        }
+      },
+      "type": "object"
+    },
+    "extensions": {
+      "additionalProperties": {
+        "$ref": "#/$defs/extension"
+      },
+      "description": "At most 32 entries; keys match ^(?=[a-z0-9-]{1,32}$)(?!.*-foreground$)[a-z][a-z0-9]*(?:-[a-z0-9]+)*$ and are never __proto__, constructor or prototype.",
+      "type": "object"
     },
     "fontFamily": {
       "additionalProperties": false,
@@ -3122,6 +3170,42 @@
       ],
       "type": "string"
     },
+    "shadowLayer": {
+      "additionalProperties": false,
+      "description": "One shadow layer (px): offsets x and y, blur, spread, the opacity of the shadow role color and inset. Compiled to a concrete box-shadow; never a raw CSS string.",
+      "properties": {
+        "blur": {
+          "maximum": 128,
+          "minimum": 0,
+          "type": "number"
+        },
+        "inset": {
+          "type": "boolean"
+        },
+        "opacity": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "spread": {
+          "maximum": 64,
+          "minimum": -64,
+          "type": "number"
+        },
+        "x": {
+          "maximum": 64,
+          "minimum": -64,
+          "type": "number"
+        },
+        "y": {
+          "maximum": 64,
+          "minimum": -64,
+          "type": "number"
+        }
+      },
+      "required": ["y", "blur", "opacity"],
+      "type": "object"
+    },
     "shape": {
       "additionalProperties": false,
       "description": "Shape: radius (px), radius scale and border width (px).",
@@ -3348,6 +3432,9 @@
         "elevation": {
           "$ref": "#/$defs/elevation"
         },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
         "icons": {
           "$ref": "#/$defs/icons"
         },
@@ -3440,6 +3527,9 @@
       "description": "texuli:<theme> or an exact id@x.y.z; never a range, a URL or a path. Cycles and chains deeper than 4 are refused.",
       "pattern": "^(?:texuli:[a-z][a-z0-9]*(?:-[a-z0-9]+)*|[a-z][a-z0-9]*(?:-[a-z0-9]+)*@(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?)$",
       "type": "string"
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
     },
     "format": {
       "const": "texuli/design-system"

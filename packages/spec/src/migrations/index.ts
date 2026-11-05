@@ -8,6 +8,7 @@ import { migration060to070 } from './0.6.0-0.7.0.ts';
 import { migration070to080 } from './0.7.0-0.8.0.ts';
 import { migration080to090 } from './0.8.0-0.9.0.ts';
 import { migration090to0100 } from './0.9.0-0.10.0.ts';
+import { migration0100to0110 } from './0.10.0-0.11.0.ts';
 import type { SpecMigration, SpecMigrationResult } from './types.ts';
 
 export type { SpecMigration, SpecMigrationResult };
@@ -25,6 +26,7 @@ export const SPEC_MIGRATIONS: readonly SpecMigration[] = Object.freeze([
   migration070to080,
   migration080to090,
   migration090to0100,
+  migration0100to0110,
 ]);
 
 /**

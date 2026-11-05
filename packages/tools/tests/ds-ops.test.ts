@@ -494,7 +494,7 @@ describe('blueprints and design systems', () => {
         format: 'texuli-blueprint',
         id: 'landing',
         status: 'draft',
-        spec: '0.10.0',
+        spec: '0.11.0',
         createdAt: '1970-01-01T00:00:00.000Z',
         designSystem: { ref: 'texuli:ocean' },
         tree: page,

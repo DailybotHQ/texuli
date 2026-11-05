@@ -29,7 +29,7 @@ import {
 } from '../contract/types.ts';
 import { fontSizes, shadows } from '../css/apply.ts';
 import { chartPaletteInputFor } from '../data-viz/index.ts';
-import { THEME_CONTRAST_PAIRS } from '../generator/contrast.ts';
+import { type ContrastPair, THEME_CONTRAST_PAIRS } from '../generator/contrast.ts';
 import {
   generateThemeFromSeed,
   hex,
@@ -39,7 +39,12 @@ import {
   seedOklch,
 } from '../generator/seed.ts';
 import { MOTION_EASINGS, type MotionEasingName, motionVariables } from '../motion/index.ts';
-import { deriveChartTokens, validateChartTokens } from '../palette/charts.ts';
+import {
+  CHART_CATEGORICAL_COUNT,
+  deriveChartTokens,
+  extendCategoricalColors,
+  validateChartTokens,
+} from '../palette/charts.ts';
 import { contrastRatio, relativeLuminance } from '../palette/contrast.ts';
 import { MOTION_PRESETS } from '../style-presets/presets.ts';
 import { BASE_SYSTEM_TOKENS, closingParen } from '../system/base.ts';
@@ -65,7 +70,10 @@ import {
 } from './resolve.ts';
 
 /** Bumped when the same document would compile to different output. */
-export const DESIGN_SYSTEM_COMPILER_VERSION = 1;
+// 2: spec 0.11.0 (a derived sidebarPrimary under a brand-filled sidebar, soft
+// fills held to a pinned ink, short categorical palettes, shadow levels and
+// product tokens).
+export const DESIGN_SYSTEM_COMPILER_VERSION = 2;
 
 export interface CompileDesignSystemOptions extends ResolveDesignSystemOptions {
   /** The modes to compile (one or both; an empty list is refused); defaults to `color.modes`, then light and dark. */
@@ -202,6 +210,55 @@ function tint(h: number, c: number, light: boolean, foreground: string, minimum:
   return { color, foreground: text };
 }
 
+/** UI boundaries (WCAG 1.4.11): the sidebar's active indicator against the sidebar fill. */
+const SIDEBAR_ACTIVE_MINIMUM = 3;
+
+/**
+ * The sidebar's active fill when the pinned primary would vanish on the
+ * sidebar: the primary's hue and chroma at the nearest lightness that keeps
+ * `ink` (the primary on-color) at the text minimum and reaches 3:1 against
+ * the sidebar, trying the side away from the ink first. When no lightness
+ * reaches 3:1, the one with the most contrast against the sidebar.
+ */
+function sidebarActive(primary: string, sidebar: string, ink: string, minimum: number): string {
+  const { l, c, h } = seedOklch(primary, 'Pin');
+  const away = relativeLuminance(ink) > relativeLuminance(primary) ? -1 : 1;
+  let best: string | undefined;
+  let bestRatio = -1;
+  for (let step = 1; step <= 100; step++)
+    for (const dir of [away, -away]) {
+      const candidate = hex(l + dir * step * 0.01, c, h);
+      if (contrastRatio(ink, candidate) < minimum) continue;
+      const ratio = contrastRatio(candidate, sidebar);
+      if (ratio >= SIDEBAR_ACTIVE_MINIMUM) return candidate;
+      if (ratio > bestRatio) {
+        bestRatio = ratio;
+        best = candidate;
+      }
+    }
+  return best ?? primary;
+}
+
+/** The soft fills whose body text is the page foreground (`foreground` on `<role>Soft`). */
+const SOFT_ROLES: readonly SemanticRole[] = [
+  'primarySoft',
+  'destructiveSoft',
+  'successSoft',
+  'warningSoft',
+  'infoSoft',
+];
+
+/**
+ * The soft fills of one mode that carry their own ink: the document pins
+ * `<role>SoftForeground` in `color.roles.<mode>`. The solver holds their fill
+ * to that ink only, never to the page foreground; when the page foreground
+ * then misses the target on the fill, the compiler writes
+ * `--tx-<role>-soft-body` (the ink), so body text on the fill follows it.
+ */
+function ownInkSoftRoles(rolePins: Doc): Set<SemanticRole> {
+  return new Set(SOFT_ROLES.filter((soft) => typeof rolePins[`${soft}Foreground`] === 'string'));
+}
+
 interface ColorResult {
   vars: Record<string, string>;
   sources: Record<string, string>;
@@ -226,6 +283,10 @@ function solveColors(
   }
   const pinned = new Map<SemanticRole, string>();
   const rolePins = rec(rec(color.roles)[mode]);
+  const ownInk = ownInkSoftRoles(rolePins);
+  const pairs: readonly ContrastPair[] = THEME_CONTRAST_PAIRS.filter(
+    (pair) => !(pair.foreground === 'foreground' && ownInk.has(pair.background))
+  );
   const hexOf = (role: SemanticRole): string => {
     const page = parseDsColor(value.background);
     const pageHex = page ? composite(page, '#ffffff') : '#ffffff';
@@ -246,6 +307,7 @@ function solveColors(
   };
 
   const pins = rec(color.pin);
+  let sidebarCopy: string | undefined;
   for (const [role, fg, soft, softFg] of PIN_ROLES) {
     const pin = pins[role];
     if (typeof pin !== 'string' || Object.hasOwn(rolePins, role)) continue;
@@ -256,6 +318,7 @@ function solveColors(
     if (role === 'primary' && !Object.hasOwn(rolePins, 'sidebarPrimary')) {
       value.sidebarPrimary = pin;
       pinned.set('sidebarPrimary', path);
+      sidebarCopy = path;
     }
     const fill = hexOf(role);
     if (fill === before) continue;
@@ -275,13 +338,30 @@ function solveColors(
     pinned.set(role, `$.color.roles.${mode}.${role}`);
   }
 
+  // The sidebar's active fill copies the pinned primary unless that copy
+  // would equal the sidebar fill or miss 3:1 against it (a sidebar painted in
+  // the brand color): then it is derived, and the solver may still move it.
+  if (sidebarCopy !== undefined) {
+    const sidebar = hexOf('sidebar');
+    const copy = hexOf('sidebarPrimary');
+    if (copy === sidebar || contrastRatio(copy, sidebar) < SIDEBAR_ACTIVE_MINIMUM) {
+      pinned.delete('sidebarPrimary');
+      set(
+        'sidebarPrimary',
+        sidebarActive(copy, sidebar, hexOf('primaryForeground'), minimum),
+        sidebarCopy,
+        'sidebar active fill: the pinned primary vanishes on the sidebar fill'
+      );
+    }
+  }
+
   // Move derived colors until every pair holds; pinned colors never move.
   const required = (kind: string) => (kind === 'text' ? minimum : 3);
   const partners = (role: SemanticRole, side: 'foreground' | 'background') =>
-    THEME_CONTRAST_PAIRS.filter((pair) => pair[side] === role);
+    pairs.filter((pair) => pair[side] === role);
   for (let pass = 0; pass < 4; pass++) {
     let moved = false;
-    for (const pair of THEME_CONTRAST_PAIRS) {
+    for (const pair of pairs) {
       const need = required(pair.kind);
       if (contrastRatio(hexOf(pair.foreground), hexOf(pair.background)) >= need) continue;
       const cause = pinned.get(pair.background) ?? pinned.get(pair.foreground) ?? '$.color.brand';
@@ -338,6 +418,24 @@ function solveColors(
       vars[semanticTokenToCssVar(role, state)] = v;
       if (path) sources[semanticTokenToCssVar(role, state)] = path;
     }
+  }
+  // Body text on a soft fill with its own ink follows that ink, but only
+  // where the page foreground misses the target on the fill.
+  for (const soft of ownInk) {
+    if (contrastRatio(hexOf('foreground'), hexOf(soft)) >= minimum) continue;
+    const ink = `${soft}Foreground` as SemanticRole;
+    const name = `${semanticTokenToCssVar(soft)}-body`;
+    const path = `$.color.roles.${mode}.${ink}`;
+    adjustments.push({
+      mode,
+      variable: name,
+      from: value.foreground,
+      to: value[ink],
+      path,
+      reason: `body text on ${soft} follows its pinned ink; the page foreground is below ${minimum}:1 on it`,
+    });
+    vars[name] = value[ink];
+    sources[name] = path;
   }
   return { vars, sources, hexOf };
 }
@@ -620,6 +718,40 @@ function inlineBytes(src: unknown): number {
   return (payload.length / 4) * 3 - (payload.endsWith('==') ? 2 : payload.endsWith('=') ? 1 : 0);
 }
 
+const px = (n: number) => (n === 0 ? '0' : `${num(n)}px`);
+const alphaByte = (alpha: number) =>
+  Math.round(Math.min(1, Math.max(0, alpha)) * 255)
+    .toString(16)
+    .padStart(2, '0');
+
+/**
+ * `elevation.levels` for one mode: each level's layers as a concrete
+ * `box-shadow` in the mode's shadow color (`--tx-shadow` without its alpha)
+ * at each layer's opacity. Numbers only, so the value is always safe.
+ */
+function elevationLevels(
+  doc: Doc,
+  shadow: string
+): { name: `--tx-${string}`; value: string; path: string }[] {
+  const levels = rec(rec(doc.elevation).levels);
+  const rgb = shadow.slice(0, 7);
+  return sortKeys(levels).map((level) => {
+    const layers = (Array.isArray(levels[level]) ? levels[level] : []) as Doc[];
+    const value = layers
+      .map((layer) => {
+        const n = (key: string) => (typeof layer[key] === 'number' ? (layer[key] as number) : 0);
+        const parts = [px(n('x')), px(n('y')), px(n('blur')), px(n('spread'))].join(' ');
+        return `${layer.inset === true ? 'inset ' : ''}${parts} ${rgb}${alphaByte(n('opacity'))}`;
+      })
+      .join(', ');
+    return {
+      name: `--tx-elevation-${level}` as const,
+      value,
+      path: at('$.elevation.levels', level),
+    };
+  });
+}
+
 const FONT_FORMAT: Record<string, DesignSystemFontFace['format']> = {
   woff2: 'woff2',
   woff: 'woff',
@@ -696,6 +828,7 @@ export function compileDesignSystem(
   const accent = seedHex(brand.accent, '$.color.brand.accent', warnings);
   const dataViz = rec(color.dataViz);
   const status = rec(color.status);
+  const extensions = rec(doc.extensions);
   const vars: CompiledDesignSystem['vars'] = {};
   const contrastReport: DesignSystemReport['contrast'] = {};
   const targets: DesignSystemTargetResult[] = [];
@@ -729,10 +862,51 @@ export function compileDesignSystem(
         draft[fgName] = next;
       }
     }
+    const shadow = parseDsColor(solved.vars['--tx-shadow'] ?? '')?.hex ?? '#000000';
+    for (const level of elevationLevels(doc, shadow)) {
+      draft[level.name] = level.value;
+      sources[level.name] = level.path;
+    }
+    for (const name of sortKeys(extensions)) {
+      const ext = rec(extensions[name]);
+      const path = at('$.extensions', name);
+      const variable = `--tx-ext-${name}`;
+      const fill = ext[mode] as string;
+      draft[variable] = fill;
+      sources[variable] = `${path}.${mode}`;
+      if (ext.on === undefined) continue;
+      const fgName = `${variable}-foreground`;
+      const on = rec(ext.on)[mode];
+      if (typeof on === 'string') {
+        draft[fgName] = on;
+        sources[fgName] = `${path}.on.${mode}`;
+        continue;
+      }
+      const fillHex = composite(
+        parseDsColor(fill) as NonNullable<ReturnType<typeof parseDsColor>>,
+        solved.hexOf('background')
+      );
+      const next = onColor(fillHex, minimum);
+      adjustments.push({
+        mode,
+        variable: fgName,
+        from: 'none',
+        to: next,
+        path: `${path}.on`,
+        reason: 'on-color derived for the product token',
+      });
+      draft[fgName] = next;
+    }
     const own = rec(dataViz[mode]);
+    const given = Array.isArray(own.categorical) ? (own.categorical as string[]) : undefined;
+    const short = given !== undefined && given.length < CHART_CATEGORICAL_COUNT;
     let charts: Doc;
+    let hexCategorical: string[] | undefined;
     // A partial palette (every list is optional) fills the rest from the derived one.
-    if (['categorical', 'sequential', 'diverging', 'grid', 'axis'].every((key) => key in own))
+    if (
+      !short &&
+      ['categorical', 'sequential', 'diverging', 'grid', 'axis'].every((key) => key in own)
+    )
       charts = own;
     else {
       const p = Object.fromEntries(
@@ -743,10 +917,35 @@ export function compileDesignSystem(
         const { h } = seedOklch(accent, 'Accent');
         input.chart3 = hex(mode === 'light' ? 0.58 : 0.72, 0.16, h);
       }
-      charts = { ...(deriveChartTokens(input, mode) as unknown as Doc), ...own };
+      const derived = deriveChartTokens(input, mode);
+      charts = { ...(derived as unknown as Doc), ...own };
+      if (given !== undefined && short) {
+        // A short categorical list keeps its colors as written and derives the rest.
+        const background = solved.hexOf('background');
+        const solid = given.map((c) =>
+          composite(parseDsColor(c) as NonNullable<ReturnType<typeof parseDsColor>>, background)
+        );
+        const full = extendCategoricalColors(solid, input, mode);
+        const path = `$.color.dataViz.${mode}.categorical`;
+        for (let i = given.length; i < full.length; i++)
+          adjustments.push({
+            mode,
+            variable: `--tx-chart-${i + 1}`,
+            from: derived.categorical[i] as string,
+            to: full[i] as string,
+            path,
+            reason: `categorical color derived from the ${given.length} given`,
+          });
+        charts.categorical = [...given, ...full.slice(given.length)];
+        hexCategorical = full;
+      }
       if (dataViz.cvdSafe === true)
-        for (const issue of validateChartTokens(charts as never, input, mode))
-          if (issue.kind === 'cvd-distance')
+        for (const issue of validateChartTokens(
+          { ...charts, categorical: hexCategorical ?? charts.categorical } as never,
+          input,
+          mode
+        ))
+          if (issue.kind === 'cvd-distance' && issue.list === 'categorical')
             warnings.push({
               path: `$.color.dataViz.${mode}`,
               message: `Categorical ${issue.indices.join(' and ')} are close for color-vision deficiencies.`,

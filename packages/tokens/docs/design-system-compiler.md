@@ -67,7 +67,7 @@ without the compiler or the color engine.
 
 | Field | Content |
 | --- | --- |
-| `vars[mode]` | A flat, key-sorted map of `--tx-*` names to concrete strings (no `var()`, no `url()`), for each compiled mode: every semantic role and its interaction states, every style variable `themeVariables` writes, every system token of contract v2 (space, size, type roles, elevation, shape, layers, opacity, layout, icons, status), the motion durations, easings and springs, the 28 data-viz tokens (always emitted for design systems), and only the component tokens the document sets. The acme fixture compiles to 310 variables per mode |
+| `vars[mode]` | A flat, key-sorted map of `--tx-*` names to concrete strings (no `var()`, no `url()`), for each compiled mode: every semantic role and its interaction states, every style variable `themeVariables` writes, every system token of contract v2 (space, size, type roles, elevation, shape, layers, opacity, layout, icons, status), the motion durations, easings and springs, the 28 data-viz tokens (always emitted for design systems), and only the component tokens the document sets. The acme fixture compiles to 315 variables per mode (310 before its spec 0.11.0 product tokens) |
 | `attrs` | The allowlisted attributes, mode-independent |
 | `fontFaces` | One entry per `typography.families.*.files[]`: `family` (the stack's first name), `src`, `format`, `weight`, `style`, `display`, `inline`, and a `preload` hint (`{ href, as: 'font', type, crossorigin: 'anonymous' }`) for same-origin files marked `preload` |
 | `assets` | `logo.{light,dark,mark,wordmark}` and `favicon`, as validated |
@@ -104,7 +104,12 @@ without the compiler or the color engine.
    7:1 text). With no brand, the seed is the `violet` library seed
    (`#7c3aed`). `brand.accent` sets the hue of the third data-viz series.
 2. **Brand pins** (`color.pin.*`) are kept exactly as the fill (and
-   `primary` also as `sidebarPrimary`). When a pin differs from the
+   `primary` also as `sidebarPrimary`, unless that copy would equal the
+   sidebar fill or miss 3:1 against it: then `sidebarPrimary` is derived
+   along the primary's hue, at the nearest lightness that keeps the
+   primary on-color at the text target and reaches 3:1 against the
+   sidebar, or the most distinct one when none can; spec 0.11.0, D-G-015).
+   When a pin differs from the
    generated fill, the solver picks its on-color (white or near-black, then
    pure black) and re-derives its soft tint and ink around the pin's hue.
 3. **Role pins** (`color.roles.<mode>.*`) override both and are never
@@ -114,13 +119,27 @@ without the compiler or the color engine.
    holds: the foreground first, else the background, along its own hue
    and chroma, until every pair it belongs to passes. Interaction states
    (hover, active, disabled, focus) are re-derived with the generator's
-   rule whenever a fill or its context changed.
+   rule whenever a fill or its context changed. A soft fill whose ink the
+   document pins (`color.roles.<mode>.<role>SoftForeground`) is held to
+   that ink only, not to the page foreground; when the page foreground
+   then misses the target on it, `--tx-<role>-soft-body` carries the ink
+   (an adjustment), the alert body and calendar events read it, and the
+   guarantee checks it in place of the page foreground (D-G-016).
 5. `color.status.*` sets the status fills; a status on-color that fails is
    replaced by a readable one. `color.dataViz.<mode>` sets the chart
    palette; without it, the palette is derived from the solved colors (as
    `dataVizVariables` does), and a palette that sets only some lists takes
-   the rest from the derived one. `cvdSafe: true` reports color-vision
-   conflicts of a derived palette as warnings.
+   the rest from the derived one. A categorical list of 1 to 7 colors
+   keeps them as written and derives the rest (free hues, 3:1 on the
+   surface and the page, separated from every earlier color), one
+   adjustment each at `$.color.dataViz.<mode>.categorical` (D-G-017).
+   `cvdSafe: true` reports color-vision conflicts of a derived or
+   completed palette as warnings.
+6. `extensions.<name>` writes `--tx-ext-<name>` per mode, and with `on`
+   `--tx-ext-<name>-foreground`: the mode's `on` color, or a derived one
+   (white or near-black; an adjustment). The pair is held to the text
+   target in both modes; a failure is `aa-text` at the pinned path
+   (`$.extensions.<name>.on.<mode>`, or the fill) (C-G-007).
 
 Every move is in `report.adjustments` with the field that caused it. A pair
 that still fails involves only pins; it is refused as `aa-text` (or
@@ -136,7 +155,7 @@ emitted as written.
 | `typography` | `--tx-font-sans`, `--tx-font-heading`, `--tx-font-mono` (names that are not CSS identifiers are double-quoted); the 13 `--tx-font-size-*` steps from `scale.ratio` and `scale.base`; role fields to `--tx-type-<role>-*`, except the anchors `body.weight`, `label.weight`, `heading.weight`, `display.weight`, `body.tracking` and `heading.tracking`, which set `--tx-font-weight-{body,medium,heading,bold}` and `--tx-letter-spacing-{body,heading}` |
 | `shape` | `--tx-radius` (px to rem), `--tx-radius-scale` and its steps, `--tx-border-width` |
 | `space` | `--tx-density`, `--tx-space-unit` and `--tx-space-1…12` (`base` × density) |
-| `elevation`, `surface` | `--tx-elevation-style`, the soft and float shadows and `--tx-elevation-0…5`; `--tx-surface-style`, `--tx-glass-opacity`, `--tx-glass-blur` |
+| `elevation`, `surface` | `--tx-elevation-style`, the soft and float shadows and `--tx-elevation-0…5`; each `levels.<1–5>` replaces `--tx-elevation-<level>` with its layers as a concrete `box-shadow` (`[inset ]x y blur spread #rrggbbaa`, the mode's `shadow` role color at the layer's opacity; D-G-018); `--tx-surface-style`, `--tx-glass-opacity`, `--tx-glass-blur` |
 | `motion` | `personality` picks a motion preset (none, subtle, standard, expressive) for `--tx-motion-fast/base/slow/slower` and `--tx-motion-easing`; `durations` and a named `easing` override it; the duration, easing and spring tokens follow (`none` makes them `0ms` and `linear`) |
 | `layout`, `icons` | Content and wide widths, breakpoints, grid columns and gutters; icon stroke, style and sizes |
 | `components` | Each set token becomes `--tx-<component>-<key>`, resolved through the system token it names (`radius: "full"` → `9999px`). A test sets every registry token to the step its default reads and checks the compiled value equals that default |
@@ -183,7 +202,7 @@ The spec's codes (`unknown-key`, `invalid-type`, `invalid-value`,
 
 | Code | When |
 | --- | --- |
-| `aa-text` | A text pair below the target, or a strong border or input below 3:1, that only pins can fix |
+| `aa-text` | A text pair below the target, or a strong border or input below 3:1, that only pins can fix; from spec 0.11.0 also a product token's on-color below the target (`$.extensions.<name>.on.<mode>`) |
 | `aa-focus` | The focus ring below 3:1 against the page or surface, or narrower than 2 px |
 | `target-size` | A pinned interactive size below `accessibility.targetMin` |
 

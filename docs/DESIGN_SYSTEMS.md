@@ -77,7 +77,7 @@ The document's shape is in [the spec doc](../packages/spec/docs/design-system.md
 identity (`format`, `formatVersion`, `id`, `version`, `name`), then
 optional sections (`extends`, `color`, `typography`, `shape`, `space`,
 `elevation`, `surface`, `motion`, `layout`, `icons`, `components`,
-`assets`, `voice`, `accessibility`, `variants`). Every object is closed,
+`assets`, `voice`, `accessibility`, `extensions`, `variants`). Every object is closed,
 lengths are numbers in px, and nothing is raw CSS.
 
 ### By hand
@@ -101,6 +101,73 @@ Pin a color (`color.pin.primary`) only when the brand requires that exact
 fill; pin a role (`color.roles.light.foreground`) only when it must never
 move. The solver then moves only what no pin holds, and refuses (`aa-text`)
 when only pins can fix a pair.
+
+### Brand-specific fields (spec 0.11.0)
+
+Spec `0.11.0` adds these to the document. It is in development on this
+branch: the published `@texuli/spec@0.12.3` carries spec `0.10.0`, which
+refuses them (`unknown-key`, or `invalid-value` for a short palette). Every
+0.10.0 document stays valid.
+
+```json
+{
+  "elevation": {
+    "style": "soft",
+    "levels": {
+      "1": [{ "y": 1, "blur": 2, "opacity": 0.08 }, { "y": 1, "blur": 3, "opacity": 0.1 }],
+      "3": [{ "y": 8, "blur": 24, "spread": -6, "opacity": 0.16 }]
+    }
+  },
+  "extensions": {
+    "brand-gold": { "light": "#fef3c7", "dark": "#78350f", "on": { "light": "#451a03", "dark": "#fffbeb" } },
+    "focus-band": { "light": "#e0e7ff", "dark": "#312e81", "on": {} },
+    "chart-stripe": { "light": "#c7d2fe", "dark": "#3730a3" }
+  },
+  "color": {
+    "brand": { "seed": "#4f46e5" },
+    "dataViz": { "light": { "categorical": ["#4f46e5", "#0ea5e9", "#f59e0b"] } }
+  }
+}
+```
+
+- **Shadows per level** (`elevation.levels`): keys `1` to `5`, each 1 to 4
+  layers of `y`, `blur` and `opacity` (required) and `x`, `spread` and
+  `inset` (optional). Offsets and spread are -64 to 64 px, blur 0 to 128
+  px, opacity 0 to 1. A level compiles to `--tx-elevation-<level>` as a
+  concrete `box-shadow` in the mode's `shadow` role color at each layer's
+  opacity (the role's own alpha is replaced, so the same opacity holds in
+  both modes); levels left out keep `elevation.style`'s shadows. There is
+  no raw CSS string anywhere.
+- **Product tokens** (`extensions`): up to 32 kebab-case names of at most
+  32 characters (never ending in `-foreground`), each a `light` and a
+  `dark` color and an optional `on`. They compile to `--tx-ext-<name>`
+  per mode. With `on`, they also compile `--tx-ext-<name>-foreground`:
+  the color given for the mode, or one derived for it (white or near
+  black, recorded in `report.adjustments`). The pair is held to the text
+  target in both modes; a pinned `on` that misses it is `aa-text` at
+  `$.extensions.<name>.on.<mode>`. Variants and patches may set them too.
+- **Short categorical palettes**: `color.dataViz.<mode>.categorical` takes
+  1 to 8 colors. The given colors stay exactly as written; the compiler
+  derives the rest deterministically (free hues, 3:1 on the surface and
+  the page, separated from every earlier color under normal and simulated
+  color-vision deficiency where a move can) and records each one in
+  `report.adjustments` (`path` `$.color.dataViz.<mode>.categorical`).
+  Sequential (9) and diverging (9) are unchanged.
+- **Soft fills with their own ink**: pin `color.roles.<mode>.<role>SoftForeground`
+  (`primary`, `destructive`, `success`, `warning`, `info`) and the soft
+  fill is held to that ink only, not to the page foreground, so a pastel
+  chip with dark text works in dark mode. When the page foreground then
+  misses the target on the fill, the compiler writes
+  `--tx-<role>-soft-body` (the ink), and the components that put body text
+  on soft fills (the alert body, calendar events) read it; the guarantee
+  checks the body ink, or the page foreground when it is absent.
+- **The sidebar's active fill**: `color.pin.primary` is copied into
+  `sidebarPrimary` unless the copy would equal the sidebar fill or miss
+  3:1 against it (a sidebar painted in the brand color). Then the compiler
+  derives it along the primary's hue: the nearest lightness that keeps the
+  primary on-color at the text target and reaches 3:1 against the
+  sidebar, or, when no lightness can, the one that stands out most. The
+  change is in `report.adjustments`.
 
 ### From what you already have
 
@@ -160,7 +227,7 @@ accepts capped ones.
 | `extends-depth` | A chain longer than 4 | Flatten the chain |
 | `url-refused` | A remote URL or scheme, `//`, traversal, SVG outside a relative path, a wrong media type, any `data:` URL at `untrusted` | A same-origin relative path (`brand/logo.svg`) |
 | `inline-bytes` | A `data:` URL over its cap (32 KiB per logo, 8 KiB favicon, 128 KiB per font) or over 256 KiB in total | Use a relative path, or a smaller file |
-| `aa-text` | A text pair below the target (4.5:1 AA, 7:1 AAA), or a strong border or input below 3:1, that only pins can fix | Unpin one of the colors the hint names, or pick a darker or lighter pin |
+| `aa-text` | A text pair below the target (4.5:1 AA, 7:1 AAA), or a strong border or input below 3:1, that only pins can fix; from spec 0.11.0 also a product token's on-color (`$.extensions.<name>.on.<mode>`) | Unpin one of the colors the hint names, or pick a darker or lighter pin; for a product token, leave that mode out of `on` so it is derived |
 | `aa-focus` | The focus ring below 3:1 against the page or surface, or `focusWidth` under 2 px | Unpin `ring` or widen the focus |
 | `target-size` | A pinned component size below `accessibility.targetMin` | Pick a size at or above the target |
 
@@ -298,7 +365,11 @@ in every mode and variant:
 - the focus ring at 3:1 against the page and the surface, at least 2 px
   wide;
 - interactive targets at `accessibility.targetMin` (control heights are
-  lifted to it; a pinned smaller size is refused).
+  lifted to it; a pinned smaller size is refused);
+- from spec `0.11.0`, every product token with an on-color
+  (`--tx-ext-<name>-foreground` on `--tx-ext-<name>`) at the text target,
+  and body text on a soft fill (`--tx-<role>-soft-body`, or the page
+  foreground without it) at the text target.
 
 It moves unpinned colors along their own hue to meet a pair and records
 every move in `report.adjustments`; it refuses only what pins make

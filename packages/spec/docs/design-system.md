@@ -11,6 +11,10 @@
 > `ds.*` operations, `blueprint.theme` and `texuli ds` in
 > [ds.md](../../tools/docs/ds.md).
 
+> **Spec 0.11.0 (in development, not yet released).** Additive:
+> `elevation.levels`, `extensions` and a categorical palette of 1 to 8
+> colors. Every 0.10.0 document stays valid; `formatVersion` stays `1`.
+
 The end-to-end guide (author, validate, apply, distribute, outputs) is
 [DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md).
 
@@ -52,15 +56,16 @@ lengths are numbers in px, and nothing is raw CSS.
 | Section | Fields |
 | --- | --- |
 | `extends` | `texuli:<theme>` or an exact `id@x.y.z` (never a range, a URL or a path) |
-| `color` | `brand` (`seed` required, `secondary`, `accent`, `neutral`), `pin` (exact brand colors), `roles.light` and `roles.dark` (the 50 semantic roles), `modes` (`light`, `dark`), `dataViz.light` and `dataViz.dark` (8 categorical, 9 sequential, 9 diverging, `grid`, `axis`) with `cvdSafe`, `status` |
+| `color` | `brand` (`seed` required, `secondary`, `accent`, `neutral`), `pin` (exact brand colors), `roles.light` and `roles.dark` (the 50 semantic roles), `modes` (`light`, `dark`), `dataViz.light` and `dataViz.dark` (1 to 8 categorical, the compiler derives the rest; 9 sequential, 9 diverging, `grid`, `axis`) with `cvdSafe`, `status` |
 | `typography` | `families.{sans,heading,mono,serif}` (`stack` of 1 to 8 names, `files` of up to 8 `{ src, weight, style, display, preload }`), `scale` (`base` 12–24, `ratio` 1.05–1.618), `roles.{display,title,heading,body,label,caption,code}` |
 | `shape` · `space` | `radius` 0–48, `radiusScale` 0–4, `borderWidth` 0–4 · `base` 2–8, `density` 0.75–1.25 |
-| `elevation` · `surface` · `motion` | `style` (flat, soft, crisp, glow, layered) · `style` (solid, glass), `glass` (`alpha` 0–1, `blur` 0–64) · `personality` (none, subtle, standard, expressive), `durations` (0–2,000 ms), a named `easing` |
+| `elevation` · `surface` · `motion` | `style` (flat, soft, crisp, glow, layered) and `levels` (keys `1`–`5`, each 1 to 4 layers of `y` and `x` −64–64, `blur` 0–128, `spread` −64–64, `opacity` 0–1, `inset`; `y`, `blur` and `opacity` required) · `style` (solid, glass), `glass` (`alpha` 0–1, `blur` 0–64) · `personality` (none, subtle, standard, expressive), `durations` (0–2,000 ms), a named `easing` |
 | `layout` · `icons` | `contentMax`, `wideMax`, `breakpoints`, `grid.columns` and `grid.gutter` per breakpoint · `style`, `stroke`, `size` |
 | `components` | Per component id (the token registry of `@texuli/tokens`, z-index left out, and the defaults vocabulary of `texuli`): each token key takes a value of its kind (a radius step, a space/control/icon/target step, a type role, a border step, an elevation level 0–5, an opacity step, a semantic role or a stroke width), and `defaults` takes `variant` and `size` |
 | `assets` | `logo.{light,dark,mark,wordmark}` and `favicon` |
 | `voice` | `tone` (up to 8 words), `lexicon` (up to 200 entries), `guidelines` (up to 12) — data only |
 | `accessibility` | `contrast` (AA, AAA), `targetMin` 24–64, `focus` (ring, outline, glow, inset), `focusWidth`, `focusOffset` |
+| `extensions` | Product tokens: up to 32 names (kebab-case, at most 32 characters, never ending in `-foreground`), each `{ light, dark, on? }` with `on` `{ light?, dark? }` (a mode left out, or an empty `on`, is derived by the compiler); compiled to `--tx-ext-<name>` and `--tx-ext-<name>-foreground` |
 | `variants` | Up to 16 named partial documents (`high-contrast`, `compact`, seasonal) of the sections above, orthogonal to mode; no identity, `extends` or nested `variants` |
 
 The full schema is
@@ -102,7 +107,7 @@ of `@texuli/core` at the same trust.
 | `extends-depth` | With `resolve`, a chain longer than 4 |
 | `url-refused` | A remote URL or scheme, `//`, traversal, an SVG or wrong media type, any data URL at `untrusted` |
 | `inline-bytes` | A data URL over its cap, or over the 256 KiB total |
-| `aa-text`, `aa-focus`, `target-size` | Raised by the compiler in `@texuli/tokens` ([ADR-022](../../../docs/DECISIONS.md#adr-022-design-system-guarantees-enforced-never-reported)); never by the spec |
+| `aa-text`, `aa-focus`, `target-size` | Raised by the compiler in `@texuli/tokens` (from spec 0.11.0, `aa-text` also covers a product token's on-color, at `$.extensions.<name>.on.<mode>`) ([ADR-022](../../../docs/DECISIONS.md#adr-022-design-system-guarantees-enforced-never-reported)); never by the spec |
 
 Paths start at `$`; keys that are not identifiers are quoted
 (`$.components["icon-button"].radius`). Issues stop at `maxErrors`

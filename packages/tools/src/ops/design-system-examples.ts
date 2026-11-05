@@ -257,7 +257,16 @@ export const DESIGN_SYSTEM_EXAMPLES: Readonly<Record<string, Readonly<Record<str
     },
     shape: { radius: 8, radiusScale: 1, borderWidth: 1 },
     space: { base: 4, density: 1 },
-    elevation: { style: 'soft' },
+    elevation: {
+      style: 'soft',
+      levels: {
+        '1': [
+          { y: 1, blur: 2, opacity: 0.08 },
+          { y: 1, blur: 3, opacity: 0.1 },
+        ],
+        '3': [{ x: 0, y: 8, blur: 24, spread: -6, opacity: 0.16 }],
+      },
+    },
     surface: { style: 'glass', glass: { alpha: 0.72, blur: 16 } },
     motion: {
       personality: 'standard',
@@ -307,6 +316,15 @@ export const DESIGN_SYSTEM_EXAMPLES: Readonly<Record<string, Readonly<Record<str
       guidelines: ['Write in the second person.', 'Prefer short sentences.'],
     },
     accessibility: { contrast: 'AA', targetMin: 24, focus: 'ring', focusWidth: 2, focusOffset: 2 },
+    extensions: {
+      'brand-gold': {
+        light: '#fef3c7',
+        dark: '#78350f',
+        on: { light: '#451a03', dark: '#fffbeb' },
+      },
+      'focus-band': { light: '#e0e7ff', dark: '#312e81', on: {} },
+      'chart-stripe': { light: '#c7d2fe', dark: '#3730a3' },
+    },
     variants: {
       'high-contrast': {
         accessibility: { contrast: 'AAA', focus: 'outline', focusWidth: 3 },
