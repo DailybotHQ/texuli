@@ -45,8 +45,9 @@ request body at 256 KB), 10 s.
   spec's (`unknown-key`, `invalid-type`, `invalid-value`, `required`,
   `format-version`, `extends-range`, `extends-cycle`, `extends-depth`,
   `url-refused`, `inline-bytes`) and the guarantees' (`aa-text`, `aa-focus`,
-  `target-size`), with `$`-rooted JSON paths, the same codes `texuli ds
-  check` prints. `ds.diff` tags each error with `source: "before"` or
+  `target-size`, and in `ds.validate` from spec `0.12.0` `aa-non-text`, the
+  sidebar's active fill below 3:1 on the sidebar), with `$`-rooted JSON
+  paths, the same codes `texuli ds check` prints. `ds.diff` tags each error with `source: "before"` or
   `"after"`; `ds.suggest` and `ds.import` add `invalid-input`,
   `input-limit` and `not-found` (an unknown theme id).
 - **Bases.** `extends: "texuli:<theme>"` loads from the theme library (lazy,

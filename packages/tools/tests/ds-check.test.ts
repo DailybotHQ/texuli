@@ -199,6 +199,22 @@ describe('texuli ds check (static)', () => {
         args: [
           await file('target.json', doc({ components: { button: { 'height-md': 'icon-sm' } } })),
         ],
+      },
+      // An invisible active sidebar item (D-G-029): the compiler only warns, the check refuses.
+      {
+        code: 'aa-non-text',
+        path: '$.vars.light["--tx-sidebar-primary"]',
+        args: [
+          await file(
+            'aa-non-text.json',
+            doc({
+              color: {
+                brand: { seed: '#4f46e5' },
+                roles: { light: { sidebar: '#4f46e5', sidebarPrimary: '#4f46e5' } },
+              },
+            })
+          ),
+        ],
       }
     );
     const seen = new Set<string>();
@@ -221,6 +237,7 @@ describe('texuli ds check (static)', () => {
     expect([...seen].sort()).toEqual(
       [
         'aa-focus',
+        'aa-non-text',
         'aa-text',
         'extends-cycle',
         'extends-depth',
@@ -490,19 +507,32 @@ describe('render findings', () => {
       ],
     };
     const calls: string[] = [];
+    const sent: { foreground: string; background: string; required: number }[][] = [];
     const page: DsCheckPage = {
       goto: async () => undefined,
       emulateMedia: async (options) => {
         calls.push(`media ${options.colorScheme}`);
       },
       waitForFunction: async () => true,
-      evaluate: (async (_fn: unknown, arg: unknown) =>
-        Array.isArray(arg) ? inspected : ['blocks-text']) as DsCheckPage['evaluate'],
+      evaluate: (async (_fn: unknown, arg: unknown) => {
+        if (!Array.isArray(arg)) return ['blocks-text'];
+        sent.push(arg[3] as (typeof sent)[number]);
+        return inspected;
+      }) as DsCheckPage['evaluate'],
     };
     const runs = await runDsRenderChecks(page, report.runs, {
       axe: async () => ['color-contrast (serious): .x'],
     });
     expect(calls).toEqual(['media light', 'media dark']);
+    // The painted pairs include the sidebar's active fill on the sidebar at 3:1 (D-G-029).
+    for (const pairs of sent)
+      expect(pairs).toContainEqual(
+        expect.objectContaining({
+          foreground: '--tx-sidebar-primary',
+          background: '--tx-sidebar',
+          required: 3,
+        })
+      );
     expect(runs.map((run) => [run.variant, run.mode, run.ok])).toEqual([
       [null, 'light', false],
       [null, 'dark', false],
