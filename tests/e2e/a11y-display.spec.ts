@@ -32,6 +32,7 @@ const DATA_EXAMPLES = [
   'data-grid-core',
   'data-timeline',
   'data-board',
+  'data-board-lanes',
   'data-calendar',
   'data-files',
   'data-virtual-list',

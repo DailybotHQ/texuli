@@ -442,6 +442,30 @@ test('data board and virtual list: the lazy move menu relocates a card; the acti
     expect(await axe(page, '[data-example="data-board"]')).toEqual([]);
   });
 
+  await test.step('P-T-03: a lane opens from its disclosure by keyboard and stays axe-clean', async () => {
+    const example = page.locator('[data-example="data-board-lanes"]');
+    await page.goto('/?fixture=data-board-lanes&mode=light', { waitUntil: 'networkidle' });
+    // Each column's toggle counts the cards its own cell hides.
+    const toggle = example.getByRole('button', { name: 'Mobile (2 hidden)', exact: true });
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false', { timeout: 20_000 });
+    await expect(example.getByText('Offline drafts')).toBeHidden();
+    await toggle.focus();
+    await page.keyboard.press('Enter');
+    await expect(example.getByRole('button', { name: /^Mobile/ })).toHaveCount(3);
+    for (const button of await example.getByRole('button', { name: /^Mobile/ }).all()) {
+      await expect(button).toHaveAttribute('aria-expanded', 'true');
+    }
+    await expect(
+      example.getByRole('list', { name: 'In progress, Mobile' }).getByText('Offline drafts')
+    ).toBeVisible();
+    expect(await axe(page, '[data-example="data-board-lanes"]')).toEqual([]);
+    // The cell footer knows its column and lane.
+    await example.getByRole('button', { name: 'Add to Done, Mobile' }).click();
+    await expect(example.getByRole('list', { name: 'Done, Mobile' })).toContainText(
+      'New mobile issue 1'
+    );
+  });
+
   await test.step('P1-18: the active virtual-list row is marked, forced colors included', async () => {
     for (const forced of [false, true]) {
       await page.emulateMedia({ forcedColors: forced ? 'active' : 'none' });
