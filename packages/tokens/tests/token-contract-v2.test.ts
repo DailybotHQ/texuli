@@ -954,7 +954,15 @@ describe('token contract v2: component registry', () => {
       .filter(
         (key) =>
           key &&
-          !['cx', 'defaults', 'design-system', 'i18n', 'motion', 'motion/loop', 'icons/lucide'].includes(key)
+          ![
+            'cx',
+            'defaults',
+            'design-system',
+            'i18n',
+            'motion',
+            'motion/loop',
+            'icons/lucide',
+          ].includes(key)
       )
       .filter((key) => !key.startsWith('layouts'));
     const subpaths = new Set(
