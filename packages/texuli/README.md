@@ -133,6 +133,9 @@ state). A `callerHandler` that is not a function is ignored.
 `@texuli/data` Board and DataGrid animate through `@texuli/core/motion`,
 instant under reduced motion and at level `none`
 ([ui-motion.md](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-motion.md)).
+`texuli/motion/loop` (new in `0.14.0`) holds `MotionLoop`, a looping motion
+(`pulse`, `wave`) on the motion tokens, static at rest under reduced motion
+and at level `none`, so an app needs no `@keyframes` of its own.
 
 `texuli/defaults` (new in `0.9.0`) holds
 `setDesignDefaults`: default `variant` and `size` props from a closed,

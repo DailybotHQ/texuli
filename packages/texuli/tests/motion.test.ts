@@ -1,15 +1,23 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { cleanup, fireEvent, render, screen } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { FakeAnimation } from '../../core/tests/motion-fakes.ts';
-import { SPEC_MOTION_DURATIONS, SPEC_MOTION_PRESETS } from '../../spec/src/motion.ts';
+import {
+  SPEC_MOTION_DURATIONS,
+  SPEC_MOTION_PRESETS,
+  SPEC_MOTION_STAGGERS,
+} from '../../spec/src/motion.ts';
 import { createToastStore } from '../src/components/toast/toast-store.ts';
 import {
   MOTION_DURATION_NAMES,
   MOTION_PRESETS,
   resolveComponentMotion,
 } from '../src/motion/contract.ts';
+import { MOTION_LOOP_STAGGERS, resolveMotionLoop } from '../src/motion/loop/index.ts';
 import { loadMotionRuntime } from '../src/motion/seam.ts';
+import LoopHarness from './fixtures/LoopHarness.svelte';
 import MotionHarness, { type MotionHarnessKind } from './fixtures/MotionHarness.svelte';
 
 // texuli/motion (ADR-013): every adopted component plays through
@@ -311,5 +319,90 @@ describe('layout motion', () => {
       accordion.unmount();
       expect(started).toHaveLength(0);
     }
+  });
+});
+
+describe('looping motion (texuli/motion/loop, D-G-046)', () => {
+  const loop = () => document.querySelector<HTMLElement>('[data-probe="loop"]');
+
+  it('speaks the spec duration and stagger names and rests unless it may move', () => {
+    expect([...MOTION_LOOP_STAGGERS]).toEqual([...SPEC_MOTION_STAGGERS]);
+    const base = {
+      preset: 'wave',
+      playing: true,
+      level: 'full',
+      reducedMotion: undefined,
+    } as const;
+    expect(resolveMotionLoop(base)).toEqual({ preset: 'wave', level: 'full' });
+    expect(resolveMotionLoop({ ...base, preset: '@keyframes x' })).toEqual({
+      preset: 'pulse',
+      level: 'full',
+    });
+    expect(resolveMotionLoop({ ...base, level: 'subtle' })?.level).toBe('subtle');
+    for (const rest of [{ playing: false }, { level: 'none' as const }, { reducedMotion: true }]) {
+      expect(resolveMotionLoop({ ...base, ...rest }), JSON.stringify(rest)).toBeNull();
+    }
+  });
+
+  it('marks the loop while playing, and drops it at rest (not playing, level none, reduced motion)', async () => {
+    const view = render(LoopHarness, { props: { preset: 'wave' } });
+    await settle();
+    expect(loop()?.getAttribute('data-tx-loop')).toBe('wave');
+    expect(loop()?.getAttribute('data-tx-loop-duration')).toBe('slow');
+    expect(loop()?.getAttribute('data-tx-loop-stagger')).toBe('fast');
+    expect(loop()?.children).toHaveLength(5);
+    await view.rerender({ preset: 'wave', playing: false });
+    await settle();
+    expect(loop()?.hasAttribute('data-tx-loop')).toBe(false);
+    await view.rerender({ preset: 'wave', playing: true });
+    await settle();
+    expect(loop()?.getAttribute('data-tx-loop')).toBe('wave');
+    view.unmount();
+
+    for (const props of [{ reducedMotion: true }, { level: 'none' as const }]) {
+      const rested = render(LoopHarness, { props });
+      await settle();
+      expect(loop()?.hasAttribute('data-tx-loop'), JSON.stringify(props)).toBe(false);
+      rested.unmount();
+    }
+    const subtle = render(LoopHarness, { props: { level: 'subtle', stagger: 'none' } });
+    await settle();
+    expect(loop()?.getAttribute('data-tx-loop')).toBe('pulse');
+    expect(loop()?.getAttribute('data-tx-loop-level')).toBe('subtle');
+    expect(loop()?.getAttribute('data-tx-loop-stagger')).toBe('none');
+    subtle.unmount();
+  });
+
+  it("animates only for prefers-reduced-motion: no-preference, on tokens, resting in the children's own style", () => {
+    const css = readFileSync(
+      join(process.cwd(), 'packages/texuli/src/motion/loop/loop.css'),
+      'utf8'
+    ).replace(/\/\*[\s\S]*?\*\//g, '');
+    const media = '@media (prefers-reduced-motion: no-preference) {';
+    const start = css.indexOf(media);
+    expect(start).toBeGreaterThan(0);
+    // Every animation declaration sits inside the no-preference block.
+    let depth = 0;
+    let end = start + media.length;
+    for (depth = 1; depth > 0; end += 1) {
+      if (css[end] === '{') depth += 1;
+      if (css[end] === '}') depth -= 1;
+    }
+    const inside = css.slice(start, end);
+    const outside = css.slice(0, start) + css.slice(end);
+    expect(outside).not.toMatch(/animation(-name)?\s*:/);
+    expect(inside).toMatch(
+      /animation:\s*tx-loop-pulse calc\(var\(--tx-loop-step, var\(--tx-motion-slow\)\) \* 4\)\s+var\(--tx-motion-ease-standard\) infinite;/
+    );
+    // No literal period or delay: every time is a token (0ms: no stagger).
+    expect(inside.replaceAll('0ms', '')).not.toMatch(/\d(ms|s)\b/);
+    // Only the middle frame: rest (0% and 100%) is the element's own style.
+    const frames = [...css.matchAll(/@keyframes (tx-loop-[a-z]+)\s*{\s*([^{]+){/g)];
+    expect(frames.map((match) => match[1])).toEqual([
+      'tx-loop-pulse',
+      'tx-loop-wave',
+      'tx-loop-fade',
+    ]);
+    for (const match of frames) expect(match[2]?.trim(), match[1]).toBe('50%');
   });
 });
