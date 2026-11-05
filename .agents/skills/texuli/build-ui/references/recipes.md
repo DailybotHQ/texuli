@@ -15,6 +15,8 @@ import public subpaths only.
 | Dense data | `@texuli/data/*` views (grid, tree, board, calendar, timeline, files, …) |
 | Charts | `@texuli/charts/*` lazy families (`cartesian`, `compact`, `part-whole`, …) |
 | Theme | `enterprise-neutral` or themes skill search |
+| App icons | `registerIcons({ rocket: Rocket })` in the root component (Svelte context, SSR-safe), then `<Icon icon="rocket">`; augment `IconNames` for types (new in `0.13.1`) |
+| Group avatars | `AvatarGroup layout="grid"`: up to four faces in one circle, `+N` past four (new in `0.13.1`) |
 
 **Compose order:** shell → filter bar → KPI row → main visualization → detail
 drawer (if needed). Validate empty and loading states.
@@ -98,6 +100,7 @@ flatten them. A presenter screen is a second same-origin window linked with
 | Media | [`../../media/SKILL.md`](../../media/SKILL.md) — Image, Gallery, Video + captions |
 | Framing | `card` / content layouts |
 | URLs | `safeImageSrc` / `safeMediaSrc` on every src |
+| Light and dark artwork | `<Image src={light} srcDark={dark} alt>`: follows `data-tx-mode` / `.dark` over the OS; `darkMode="system"` for one `<picture>` download (new in `0.13.1`) |
 
 **Compose order:** story outline → media slots with policy-safe URLs →
 captions/chapters → export only if the brief asks (media export docs).
