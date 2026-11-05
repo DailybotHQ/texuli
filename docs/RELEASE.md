@@ -134,6 +134,17 @@ additive:
   the existing opacity tokens), not the foreground, so dark scrims are dark
   again ([ui-dialog](../packages/texuli/docs/ui-dialog.md),
   [ui-sheet](../packages/texuli/docs/ui-sheet.md)).
+- **D-G-049: a fixed y domain and a value format on cartesian charts.**
+  `yDomain` (`[min, max]`, either end `'auto'`) and `formatValue` on
+  `CartesianChart` and the five cartesian charts; marks outside a fixed
+  domain are clipped, and the data table keeps the true values. App-level
+  props, not in the agent catalog
+  ([charts-cartesian](../packages/charts/docs/charts-cartesian.md)).
+- **D-G-050: `TabItem` `attributes`** put `data-*` attributes (for example
+  `data-testid`) on each tab trigger
+  ([ui-tabs-accordion](../packages/texuli/docs/ui-tabs-accordion.md)).
+- **D-G-031b** needs nothing more: `AlertDialog` `confirmDisabled` (D-G-031)
+  keeps a typed confirmation an `alertdialog`.
 
 **Size budgets.** Three rows in `texuli.budgets.json` were raised at
 measured + 4% (owner-approved; commit `2de88ae9`): `@texuli/data/timeline`
