@@ -102,6 +102,9 @@ each group with a header row, and its descriptor can carry a `band`:
   from the soft tokens (`--tx-<role>-soft` with the foreground ink, or
   `--tx-<role>-soft-body` when a design system sets it). Markers default to
   `neutral`.
+- **Blueprints.** From spec `0.12.0`, the `data-timeline` catalog id takes
+  `groups`, `markers`, and the bindable `collapsed` and `selectedRow`, and
+  fires `collapse` and `select` (see the `@texuli/catalog` README).
 - **Engine.** `timelineModel(...).groups` lists the visible rows by group,
   with each group's label and band. The types `TimelineGroup`,
   `TimelineBand`, `TimelineTone` and `TimelineMarker` and the `markerOffset`

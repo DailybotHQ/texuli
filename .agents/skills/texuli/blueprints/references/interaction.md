@@ -84,7 +84,7 @@ emits `card-moved` to the host.
 | `flow` | `{ views, initial, transitions }` | 1–16 views; transitions `{ from (a view or *), to, on, when? }`; `flow-view` shows only the current view; `flow-action` fires an event |
 | Bindings | `{"$state": name}`, `{"$data": name}` | Exactly one key. `$state` reads a declared variable at any depth in props; `$data` reads host data, read-only, only as a whole top-level prop |
 | `bind` (node) | prop → `{"$state": name}` | Two-way; only props the component lists as `bindable`, not also set in `props`, to a writable variable that fits |
-| `on` (node, the eventMap) | event → 1–8 actions | Events: `press`, `change`, `select`, `submit`, `dismiss`, `move`, and only those the component declares |
+| `on` (node, the eventMap) | event → 1–8 actions | Events: `press`, `change`, `select`, `submit`, `dismiss`, `move`, `collapse` (spec 0.12.0), and only those the component declares |
 | `reorder` (a container prop) | `{ bind, axis?, group?, accepts?, locked?, pull?, disabled? }` | Items are the bound list; `pull` is `move`, `clone` or `none`; a target takes a source's items when it shares or `accepts` its group |
 | `workflow-graph` (a node) | `label`, `graph`, `mode` (`view` or `edit`), `flow` (`LR` or `TB`) | `graph` is a spec workflow graph (closed node types and ports, ≤ 500 nodes, ≤ 2,000 edges, a cycle policy); bind `graph` to a `workflow` variable to edit it |
 
