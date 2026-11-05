@@ -10,6 +10,8 @@ export interface BoardLabels {
   /** Accessible name for the move menu popup. */
   moveMenuLabel: (itemLabel: string) => string;
   emptyCell: string;
+  /** Shown in a collapsed lane's toggle: how many of its cards the cell hides. */
+  hiddenCards: (count: number) => string;
   unplaced: string;
   savingMove: string;
   cardCount: (count: number, hardLimit?: number) => string;

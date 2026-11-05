@@ -75,6 +75,17 @@ interface OwnBoardProps<T> {
   /** Rendered in each column header after the title and count (actions, a menu, a hint), with the card count. */
   columnHeader?: Snippet<[BoardColumnDef, { count: number }]>;
   /**
+   * Rendered at the end of each column-by-lane cell (in-lane create), with the
+   * column and the lane. Without lanes, the lane is `DEFAULT_LANE` (`id: ''`).
+   */
+  cellFooter?: Snippet<[BoardColumnDef, BoardLaneDef]>;
+  /**
+   * Ids of collapsed lanes (bindable). A collapsed lane hides its cards behind
+   * a count; it still counts in column totals and WIP limits.
+   */
+  collapsedLanes?: string[];
+  onCollapsedLanesChange?: (collapsedLanes: string[]) => void;
+  /**
    * Level of the column headings (2–6, default 3). The board's hidden title
    * sits one level above (no heading at 2), swimlane titles one below.
    */
@@ -119,6 +130,7 @@ const DEFAULT_LABELS: BoardLabels = {
   moveMenu: (label) => `Move ${label}`,
   moveMenuLabel: (label) => `Move ${label} to…`,
   emptyCell: 'No cards',
+  hiddenCards: (count) => `${count} hidden`,
   unplaced: 'Cards outside configured columns',
   savingMove: 'Saving move',
   cardCount: (count, hardLimit) =>
@@ -147,6 +159,9 @@ let {
   card,
   columnFooter,
   columnHeader,
+  cellFooter,
+  collapsedLanes = $bindable([]),
+  onCollapsedLanesChange,
   headingLevel = 3,
   onMove,
   canMove,
@@ -203,17 +218,10 @@ const keyboardText = $derived.by((): BoardKeyboardText => {
     container: at.lane === null ? at.column : `${at.column}, ${at.lane}`,
   });
   const text: BoardKeyboardText = { ...labels.keyboard };
-  if (overrides.pickedUp !== undefined) {
-    text.pickedUp = (item, _where, at) => formatDragMessage(messages.pickedUp, values(item, at));
-  }
-  if (overrides.moved !== undefined) {
-    text.moved = (item, _where, at) => formatDragMessage(messages.moved, values(item, at));
-  }
-  if (overrides.dropped !== undefined) {
-    text.dropped = (item, _where, at) => formatDragMessage(messages.dropped, values(item, at));
-  }
-  if (overrides.cancelled !== undefined) {
-    text.cancelled = (item, _where, at) => formatDragMessage(messages.cancelled, values(item, at));
+  for (const key of ['pickedUp', 'moved', 'dropped', 'cancelled'] as const) {
+    if (overrides[key] !== undefined) {
+      text[key] = (item, _where, at) => formatDragMessage(messages[key], values(item, at));
+    }
   }
   return text;
 });
@@ -240,13 +248,19 @@ function rankOf(item: T): string {
   return getRank ? getRank(item) : (localRanks?.get(getId(item)) ?? '');
 }
 
+/** Column, lane and rank accessors that prefer a temporary placement. */
+function placed(at: typeof placements): Pick<BoardOptions<T>, 'column' | 'lane' | 'rank'> {
+  return {
+    column: (item) => at[getId(item)]?.columnId ?? getColumn(item),
+    lane: (item) => at[getId(item)]?.laneId ?? getLane?.(item) ?? '',
+    rank: (item) => at[getId(item)]?.rank ?? rankOf(item),
+  };
+}
 const options = $derived<BoardOptions<T>>({
   columns,
-  ...(lanes?.length ? { lanes, lane: (item: T) => getLane?.(item) ?? '' } : {}),
+  ...(lanes?.length ? { lanes } : {}),
   id: getId,
-  column: (item: T) => placements[getId(item)]?.columnId ?? getColumn(item),
-  lane: (item: T) => placements[getId(item)]?.laneId ?? getLane?.(item) ?? '',
-  rank: (item: T) => placements[getId(item)]?.rank ?? rankOf(item),
+  ...placed(placements),
   label: getLabel,
 });
 const rules = $derived<MoveRules<T>>({
@@ -254,6 +268,14 @@ const rules = $derived<MoveRules<T>>({
   ...(columnOnly ? { reorder: false } : {}),
 });
 const grid = $derived(groupBoard(items, options));
+const laned = $derived(grid.lanes.length > 1);
+
+function toggleLane(id: string): void {
+  collapsedLanes = collapsedLanes.includes(id)
+    ? collapsedLanes.filter((other) => other !== id)
+    : [...collapsedLanes, id];
+  onCollapsedLanesChange?.(collapsedLanes);
+}
 
 $effect(() => {
   const unresolved = Object.keys(placements).filter((id) => !pending[id]);
@@ -263,11 +285,9 @@ $effect(() => {
     const item = byId.get(id);
     const placement = placements[id];
     if (!item || !placement) return true;
-    const itemLane = lanes?.length ? (getLane?.(item) ?? '') : '';
-    const targetLane = lanes?.length ? placement.laneId : '';
     return (
       getColumn(item) === placement.columnId &&
-      itemLane === targetLane &&
+      (!lanes?.length || (getLane?.(item) ?? '') === placement.laneId) &&
       // Column-only boards keep no rank: the column (and lane) settle the move.
       (columnOnly || getRank?.(item) === placement.rank)
     );
@@ -290,12 +310,9 @@ const shown = $derived.by(() => {
     rules
   );
   if (!preview.ok || preview.unchanged) return grid;
-  const previewPlacements = { ...placements, ...placementsOf(preview.move) };
   return groupBoard(items, {
     ...options,
-    column: (item: T) => previewPlacements[getId(item)]?.columnId ?? getColumn(item),
-    lane: (item: T) => previewPlacements[getId(item)]?.laneId ?? getLane?.(item) ?? '',
-    rank: (item: T) => previewPlacements[getId(item)]?.rank ?? rankOf(item),
+    ...placed({ ...placements, ...placementsOf(preview.move) }),
   });
 });
 
@@ -311,9 +328,7 @@ async function focusCard(id: string, prefer: 'menu' | 'handle' = 'handle'): Prom
   await tick();
   // Menu close + DOM reorder can lag one frame behind the placement update.
   await new Promise<void>((resolve) => {
-    const win = document.defaultView;
-    if (win?.requestAnimationFrame) win.requestAnimationFrame(() => resolve());
-    else resolve();
+    document.defaultView?.requestAnimationFrame?.(() => resolve()) ?? resolve();
   });
   focusCardNow(id, prefer);
 }
@@ -328,7 +343,7 @@ function focusCardNow(id: string, prefer: 'menu' | 'handle' = 'handle'): boolean
   const menu = cardNode.querySelector<HTMLElement>('[data-board-move-menu]');
   const handle = cardNode.querySelector<HTMLElement>('[data-board-handle]');
   const target = prefer === 'menu' ? (menu ?? handle) : (handle ?? menu);
-  if (!target || typeof target.focus !== 'function') return false;
+  if (!target) return false;
   target.focus();
   return target.ownerDocument.activeElement === target;
 }
@@ -457,6 +472,9 @@ function onCardKey(event: KeyboardEvent, item: T): void {
   event.preventDefault();
   held = result.state;
   announce(result.announcement);
+  // A held card entering a collapsed lane opens it, so the card stays in view and focused.
+  const lane = held.mode === 'held' && grid.lanes[held.target.laneIndex]?.id;
+  if (lane && collapsedLanes.includes(lane)) toggleLane(lane);
   if (result.commit) {
     const itemToMove = itemById(result.commit.itemId);
     if (itemToMove) void commit(result.commit, itemToMove);
@@ -542,7 +560,7 @@ function startDrag(item: T, point: Point): void {
     item: getLabel(item),
     position: (cell?.items.findIndex((entry) => getId(entry) === id) ?? 0) + 1,
     total: cell?.items.length ?? 1,
-    container: `${column?.title ?? ''}${grid.lanes.length > 1 ? `, ${lane?.title ?? ''}` : ''}`,
+    container: `${column?.title ?? ''}${laned ? `, ${lane?.title}` : ''}`,
   };
   announce(formatDragMessage(messages.pickedUp, origin));
   moveDrag(point);
@@ -648,19 +666,31 @@ function dragFrom(id: string): Attachment<HTMLElement> {
           </header>
           {#each grid.lanes as lane, laneIndex (lane.id)}
             {@const shownCell = shown.cells[laneIndex]?.[columnIndex]}
-            {@const cellLabel = `${column.title}${grid.lanes.length > 1 ? `, ${lane.title}` : ''}`}
+            {@const open = !laned || !collapsedLanes.includes(lane.id)}
+            {#if laned}
+              <svelte:element this={`h${Math.min(6, level + 1)}`} class="tx-board__lane-title"
+                ><button
+                  type="button"
+                  class="tx-board__lane-toggle"
+                  aria-expanded={open}
+                  aria-controls={grid.columns.map((_, c) => `board-${uid}-${laneIndex}-${c}`).join(' ')}
+                  onclick={() => toggleLane(lane.id)}
+                  >{open ? lane.title : `${lane.title} (${labels.hiddenCards(shownCell?.items.length ?? 0)})`}</button
+                ></svelte:element>
+            {/if}
             <div
               class="tx-board__cell"
               role="list"
-              aria-label={cellLabel}
+              id="board-{uid}-{laneIndex}-{columnIndex}"
+              hidden={!open}
+              aria-label={laned ? `${column.title}, ${lane.title}` : column.title}
               aria-describedby={descriptionId}
               data-board-cell
               data-column-id={column.id}
               data-lane-id={lane.id}
               data-drop-target={drag?.target?.columnId === column.id && drag.target.laneId === lane.id ? 'true' : undefined}
             >
-              {#if grid.lanes.length > 1}<svelte:element this={`h${Math.min(6, level + 1)}`} class="tx-board__lane-title">{lane.title}</svelte:element>{/if}
-              {#if shownCell?.items.length}
+              {#if !open}{:else if shownCell?.items.length}
                 {#each shownCell.items as item (getId(item))}
                   {@const id = getId(item)}
                   {@const itemLabel = getLabel(item)}
@@ -726,6 +756,9 @@ function dragFrom(id: string): Attachment<HTMLElement> {
                 <div class="tx-board__empty" role="listitem">{labels.emptyCell}</div>
               {/if}
             </div>
+            {#if cellFooter && open}
+              <div class="tx-board__cell-footer">{@render cellFooter(column, lane)}</div>
+            {/if}
           {/each}
           {#if columnFooter}
             <footer class="tx-board__column-footer">{@render columnFooter(column, { count })}</footer>
@@ -858,10 +891,36 @@ function dragFrom(id: string): Attachment<HTMLElement> {
     .tx-board--comfortable .tx-board__cell { gap: var(--tx-space-2); }
     .tx-board--compact .tx-board__cell { gap: var(--tx-space-1); padding: calc(var(--tx-space-unit) * 1.5); }
 
+    .tx-board__cell[hidden] { display: none; }
+    .tx-board__cell-footer { padding: 0 var(--tx-space-2) var(--tx-space-2); }
+
     .tx-board__lane-title {
       margin: 0;
+      padding: var(--tx-space-2);
       font-size: var(--tx-type-label-size);
     }
+
+    .tx-board__lane-title + .tx-board__cell { padding-block-start: 0; }
+
+    .tx-board__lane-toggle {
+      min-block-size: 1.5rem;
+      border: 0;
+      padding: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    /* Decorative: the empty alt text keeps the chevron out of the button's name. */
+    .tx-board__lane-toggle::before {
+      content: '▾';
+      content: '▾' / '';
+      display: inline-block;
+      margin-inline-end: var(--tx-space-1);
+    }
+
+    .tx-board__lane-toggle[aria-expanded='false']::before { rotate: -90deg; }
 
     .tx-board__card {
       min-inline-size: 0;
@@ -919,6 +978,7 @@ function dragFrom(id: string): Attachment<HTMLElement> {
       line-height: 1;
     }
     .tx-board__scroller:focus-visible,
+    .tx-board__lane-toggle:focus-visible,
     .tx-board__handle:focus-visible,
     .tx-board__move-menu:focus-visible {
       outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
