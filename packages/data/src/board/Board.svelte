@@ -12,7 +12,7 @@ import {
 import { type Component, flushSync, type Snippet, tick, untrack } from 'svelte';
 import type { Attachment } from 'svelte/attachments';
 import type { HTMLAttributes } from 'svelte/elements';
-import { type ClassValue, cx, variants } from 'texuli/cx';
+import { type ClassValue, cx } from 'texuli/cx';
 import type { MotionProp } from 'texuli/motion';
 import {
   type BoardColumnDef,
@@ -75,6 +75,17 @@ interface OwnBoardProps<T> {
   /** Rendered in each column header after the title and count (actions, a menu, a hint), with the card count. */
   columnHeader?: Snippet<[BoardColumnDef, { count: number }]>;
   /**
+   * Rendered at the end of each column-by-lane cell (in-lane create), with the
+   * column and the lane. Without lanes, the lane is `DEFAULT_LANE` (`id: ''`).
+   */
+  cellFooter?: Snippet<[BoardColumnDef, BoardLaneDef]>;
+  /**
+   * Ids of collapsed lanes (bindable). A collapsed lane hides its cards behind
+   * a count; it still counts in column totals and WIP limits.
+   */
+  collapsedLanes?: string[];
+  onCollapsedLanesChange?: (collapsedLanes: string[]) => void;
+  /**
    * Level of the column headings (2–6, default 3). The board's hidden title
    * sits one level above (no heading at 2), swimlane titles one below.
    */
@@ -103,14 +114,6 @@ interface OwnBoardProps<T> {
 type BoardProps<T> = OwnBoardProps<T> &
   Omit<HTMLAttributes<HTMLElement>, keyof OwnBoardProps<T> | 'children'>;
 
-const rootClasses = variants({
-  base: 'tx-board',
-  variants: {
-    density: { comfortable: 'tx-board--comfortable', compact: 'tx-board--compact' },
-  },
-  defaultVariants: { density: 'comfortable' },
-});
-
 const DEFAULT_LABELS: BoardLabels = {
   board: 'Board',
   instructions:
@@ -119,6 +122,7 @@ const DEFAULT_LABELS: BoardLabels = {
   moveMenu: (label) => `Move ${label}`,
   moveMenuLabel: (label) => `Move ${label} to…`,
   emptyCell: 'No cards',
+  hiddenCards: (count) => `${count} hidden`,
   unplaced: 'Cards outside configured columns',
   savingMove: 'Saving move',
   cardCount: (count, hardLimit) =>
@@ -147,6 +151,9 @@ let {
   card,
   columnFooter,
   columnHeader,
+  cellFooter,
+  collapsedLanes = $bindable([]),
+  onCollapsedLanesChange,
   headingLevel = 3,
   onMove,
   canMove,
@@ -161,6 +168,7 @@ let {
 }: BoardProps<T> = $props();
 
 const uid = $props.id();
+const numbers = new Intl.NumberFormat();
 // Layout motion: measure the cards before `items` changes, play after it.
 const cardMotion = createLazyListMotion({
   motion: () => motion,
@@ -203,17 +211,10 @@ const keyboardText = $derived.by((): BoardKeyboardText => {
     container: at.lane === null ? at.column : `${at.column}, ${at.lane}`,
   });
   const text: BoardKeyboardText = { ...labels.keyboard };
-  if (overrides.pickedUp !== undefined) {
-    text.pickedUp = (item, _where, at) => formatDragMessage(messages.pickedUp, values(item, at));
-  }
-  if (overrides.moved !== undefined) {
-    text.moved = (item, _where, at) => formatDragMessage(messages.moved, values(item, at));
-  }
-  if (overrides.dropped !== undefined) {
-    text.dropped = (item, _where, at) => formatDragMessage(messages.dropped, values(item, at));
-  }
-  if (overrides.cancelled !== undefined) {
-    text.cancelled = (item, _where, at) => formatDragMessage(messages.cancelled, values(item, at));
+  for (const key of ['pickedUp', 'moved', 'dropped', 'cancelled'] as const) {
+    if (overrides[key] !== undefined) {
+      text[key] = (item, _where, at) => formatDragMessage(messages[key], values(item, at));
+    }
   }
   return text;
 });
@@ -223,7 +224,6 @@ let announcement = $state('');
 let placements = $state<Record<string, ReturnType<typeof placementsOf>[string]>>({});
 /** Lazy DropdownMenu chunk — shared for every card after first open/prefetch. */
 let MoveMenu = $state.raw<Component<MoveMenuProps> | undefined>();
-let menuReady = $state(false);
 /** Which card’s move menu is open (`itemId`), once the lazy menu is mounted. */
 let openMenuId = $state<string | null>(null);
 /** The pointer drag in progress (keyboard moves use `held`). */
@@ -240,13 +240,19 @@ function rankOf(item: T): string {
   return getRank ? getRank(item) : (localRanks?.get(getId(item)) ?? '');
 }
 
+/** Column, lane and rank accessors that prefer a temporary placement. */
+function placed(at: typeof placements): Pick<BoardOptions<T>, 'column' | 'lane' | 'rank'> {
+  return {
+    column: (item) => at[getId(item)]?.columnId ?? getColumn(item),
+    lane: (item) => at[getId(item)]?.laneId ?? getLane?.(item) ?? '',
+    rank: (item) => at[getId(item)]?.rank ?? rankOf(item),
+  };
+}
 const options = $derived<BoardOptions<T>>({
   columns,
-  ...(lanes?.length ? { lanes, lane: (item: T) => getLane?.(item) ?? '' } : {}),
+  ...(lanes?.length ? { lanes } : {}),
   id: getId,
-  column: (item: T) => placements[getId(item)]?.columnId ?? getColumn(item),
-  lane: (item: T) => placements[getId(item)]?.laneId ?? getLane?.(item) ?? '',
-  rank: (item: T) => placements[getId(item)]?.rank ?? rankOf(item),
+  ...placed(placements),
   label: getLabel,
 });
 const rules = $derived<MoveRules<T>>({
@@ -254,6 +260,14 @@ const rules = $derived<MoveRules<T>>({
   ...(columnOnly ? { reorder: false } : {}),
 });
 const grid = $derived(groupBoard(items, options));
+const laned = $derived(grid.lanes.length > 1);
+
+function toggleLane(id: string): void {
+  collapsedLanes = collapsedLanes.includes(id)
+    ? collapsedLanes.filter((other) => other !== id)
+    : [...collapsedLanes, id];
+  onCollapsedLanesChange?.(collapsedLanes);
+}
 
 $effect(() => {
   const unresolved = Object.keys(placements).filter((id) => !pending[id]);
@@ -263,11 +277,9 @@ $effect(() => {
     const item = byId.get(id);
     const placement = placements[id];
     if (!item || !placement) return true;
-    const itemLane = lanes?.length ? (getLane?.(item) ?? '') : '';
-    const targetLane = lanes?.length ? placement.laneId : '';
     return (
       getColumn(item) === placement.columnId &&
-      itemLane === targetLane &&
+      (!lanes?.length || (getLane?.(item) ?? '') === placement.laneId) &&
       // Column-only boards keep no rank: the column (and lane) settle the move.
       (columnOnly || getRank?.(item) === placement.rank)
     );
@@ -290,12 +302,9 @@ const shown = $derived.by(() => {
     rules
   );
   if (!preview.ok || preview.unchanged) return grid;
-  const previewPlacements = { ...placements, ...placementsOf(preview.move) };
   return groupBoard(items, {
     ...options,
-    column: (item: T) => previewPlacements[getId(item)]?.columnId ?? getColumn(item),
-    lane: (item: T) => previewPlacements[getId(item)]?.laneId ?? getLane?.(item) ?? '',
-    rank: (item: T) => previewPlacements[getId(item)]?.rank ?? rankOf(item),
+    ...placed({ ...placements, ...placementsOf(preview.move) }),
   });
 });
 
@@ -310,25 +319,22 @@ function itemById(id: string): T | undefined {
 async function focusCard(id: string, prefer: 'menu' | 'handle' = 'handle'): Promise<void> {
   await tick();
   // Menu close + DOM reorder can lag one frame behind the placement update.
-  await new Promise<void>((resolve) => {
-    const win = document.defaultView;
-    if (win?.requestAnimationFrame) win.requestAnimationFrame(() => resolve());
-    else resolve();
-  });
+  await new Promise(
+    (resolve) => document.defaultView?.requestAnimationFrame?.(resolve) ?? resolve(0)
+  );
   focusCardNow(id, prefer);
 }
 
 /** Focus a card's handle (or Move menu) as the DOM is now; whether it took focus. */
 function focusCardNow(id: string, prefer: 'menu' | 'handle' = 'handle'): boolean {
-  const root = ref;
-  const cardNode = [...(root?.querySelectorAll<HTMLElement>('[data-board-card]') ?? [])].find(
-    (node) => node.getAttribute('data-item-id') === id
+  const cardNode = [...(ref?.querySelectorAll<HTMLElement>('[data-board-card]') ?? [])].find(
+    (node) => node.dataset.itemId === id
   );
   if (!cardNode) return false;
   const menu = cardNode.querySelector<HTMLElement>('[data-board-move-menu]');
   const handle = cardNode.querySelector<HTMLElement>('[data-board-handle]');
   const target = prefer === 'menu' ? (menu ?? handle) : (handle ?? menu);
-  if (!target || typeof target.focus !== 'function') return false;
+  if (!target) return false;
   target.focus();
   return target.ownerDocument.activeElement === target;
 }
@@ -345,21 +351,11 @@ function destinationsFor(item: T): MoveMenuDestination[] {
   });
 }
 
-const MOVE_MENU_CHUNK = 'data:board:move-menu';
-
-function ensureMoveMenu(): Promise<Component<MoveMenuProps>> {
-  if (MoveMenu) return Promise.resolve(MoveMenu);
-  return lazyChunk(MOVE_MENU_CHUNK, () => import('./BoardMoveMenu.svelte')).then((module) => {
-    const component = module.default as unknown as Component<MoveMenuProps>;
-    MoveMenu = component;
-    menuReady = true;
-    return component;
-  });
-}
-
-/** Prefetch on focus/hover so the first open feels instant. */
-function prefetchMoveMenu(): void {
-  void ensureMoveMenu();
+/** Load the move menu once (`lazyChunk` caches it); focus and hover prefetch it. */
+function ensureMoveMenu(): Promise<unknown> {
+  return lazyChunk('data:board:move-menu', () => import('./BoardMoveMenu.svelte')).then(
+    (module) => (MoveMenu = module.default as unknown as Component<MoveMenuProps>)
+  );
 }
 
 async function openMoveMenu(item: T): Promise<void> {
@@ -387,12 +383,9 @@ async function commit(
     await onMove(move, item);
     await focusCard(move.itemId, focus);
   } catch {
-    const restored = { ...placements };
-    for (const [id, placement] of Object.entries(oldPlacements)) {
-      if (placement) restored[id] = placement;
-      else delete restored[id];
-    }
-    placements = restored;
+    const restored = { ...placements, ...oldPlacements };
+    for (const id in oldPlacements) if (!oldPlacements[id]) delete restored[id];
+    placements = restored as typeof placements;
     announce(labels.moveFailed(getLabel(item)));
     await focusCard(move.itemId, focus);
   } finally {
@@ -457,6 +450,9 @@ function onCardKey(event: KeyboardEvent, item: T): void {
   event.preventDefault();
   held = result.state;
   announce(result.announcement);
+  // A held card entering a collapsed lane opens it, so the card stays in view and focused.
+  const lane = held.mode === 'held' && grid.lanes[held.target.laneIndex]?.id;
+  if (lane && collapsedLanes.includes(lane)) toggleLane(lane);
   if (result.commit) {
     const itemToMove = itemById(result.commit.itemId);
     if (itemToMove) void commit(result.commit, itemToMove);
@@ -542,7 +538,7 @@ function startDrag(item: T, point: Point): void {
     item: getLabel(item),
     position: (cell?.items.findIndex((entry) => getId(entry) === id) ?? 0) + 1,
     total: cell?.items.length ?? 1,
-    container: `${column?.title ?? ''}${grid.lanes.length > 1 ? `, ${lane?.title ?? ''}` : ''}`,
+    container: `${column?.title ?? ''}${laned ? `, ${lane?.title}` : ''}`,
   };
   announce(formatDragMessage(messages.pickedUp, origin));
   moveDrag(point);
@@ -612,13 +608,20 @@ function dragFrom(id: string): Attachment<HTMLElement> {
 }
 </script>
 
+<!-- `data-board-move-menu-chunk` marks the root once the lazy move menu has loaded (tests await it). -->
 <section
   id="board-{uid}"
   {...rest}
   bind:this={ref}
-  class={cx(rootClasses({ density, class: className }), drag?.active && 'tx-board--dragging')}
+  class={cx(
+    'tx-board',
+    density === 'compact' ? 'tx-board--compact' : 'tx-board--comfortable',
+    className,
+    drag?.active && 'tx-board--dragging'
+  )}
   aria-labelledby={titleId}
   dir={dir}
+  data-board-move-menu-chunk={MoveMenu ? '' : undefined}
 >
   <svelte:element this={level > 2 ? `h${level - 1}` : 'p'} id={titleId} class="tx-board__sr-only">{labels.board}</svelte:element>
   <p id={instructionsId} class="tx-board__sr-only">{labels.instructions}</p>
@@ -633,9 +636,9 @@ function dragFrom(id: string): Attachment<HTMLElement> {
             <svelte:element this={`h${level}`} class="tx-board__column-title">{column.title}</svelte:element>
             <span class="tx-board__count" dir="ltr">
               <span aria-hidden="true"
-                ><bdi>{new Intl.NumberFormat().format(count)}</bdi>{#if column.wip?.hard
+                ><bdi>{numbers.format(count)}</bdi>{#if column.wip?.hard
                   !== undefined}<span>/</span
-                  ><bdi>{new Intl.NumberFormat().format(column.wip.hard)}</bdi>{/if}</span
+                  ><bdi>{numbers.format(column.wip.hard)}</bdi>{/if}</span
               >
               <span class="tx-board__sr-only">{labels.cardCount(count, column.wip?.hard)}</span>
             </span>
@@ -648,19 +651,31 @@ function dragFrom(id: string): Attachment<HTMLElement> {
           </header>
           {#each grid.lanes as lane, laneIndex (lane.id)}
             {@const shownCell = shown.cells[laneIndex]?.[columnIndex]}
-            {@const cellLabel = `${column.title}${grid.lanes.length > 1 ? `, ${lane.title}` : ''}`}
+            {@const open = !laned || !collapsedLanes.includes(lane.id)}
+            {#if laned}
+              <svelte:element this={`h${Math.min(6, level + 1)}`} class="tx-board__lane-title"
+                ><button
+                  type="button"
+                  class="tx-board__lane-toggle"
+                  aria-expanded={open}
+                  aria-controls={grid.columns.map((_, c) => `board-${uid}-${laneIndex}-${c}`).join(' ')}
+                  onclick={() => toggleLane(lane.id)}
+                  >{open ? lane.title : `${lane.title} (${labels.hiddenCards(shownCell?.items.length ?? 0)})`}</button
+                ></svelte:element>
+            {/if}
             <div
               class="tx-board__cell"
               role="list"
-              aria-label={cellLabel}
+              id="board-{uid}-{laneIndex}-{columnIndex}"
+              hidden={!open}
+              aria-label={laned ? `${column.title}, ${lane.title}` : column.title}
               aria-describedby={descriptionId}
               data-board-cell
               data-column-id={column.id}
               data-lane-id={lane.id}
               data-drop-target={drag?.target?.columnId === column.id && drag.target.laneId === lane.id ? 'true' : undefined}
             >
-              {#if grid.lanes.length > 1}<svelte:element this={`h${Math.min(6, level + 1)}`} class="tx-board__lane-title">{lane.title}</svelte:element>{/if}
-              {#if shownCell?.items.length}
+              {#if !open}{:else if shownCell?.items.length}
                 {#each shownCell.items as item (getId(item))}
                   {@const id = getId(item)}
                   {@const itemLabel = getLabel(item)}
@@ -695,8 +710,8 @@ function dragFrom(id: string): Attachment<HTMLElement> {
                           aria-haspopup="menu"
                           aria-expanded="false"
                           disabled={pending[id] || locked}
-                          onfocus={prefetchMoveMenu}
-                          onpointerenter={prefetchMoveMenu}
+                          onfocus={ensureMoveMenu}
+                          onpointerenter={ensureMoveMenu}
                           onclick={() => void openMoveMenu(item)}
                         >
                           <span class="tx-board__move-menu-glyph" aria-hidden="true">⋮</span>
@@ -726,6 +741,9 @@ function dragFrom(id: string): Attachment<HTMLElement> {
                 <div class="tx-board__empty" role="listitem">{labels.emptyCell}</div>
               {/if}
             </div>
+            {#if cellFooter && open}
+              <div class="tx-board__cell-footer">{@render cellFooter(column, lane)}</div>
+            {/if}
           {/each}
           {#if columnFooter}
             <footer class="tx-board__column-footer">{@render columnFooter(column, { count })}</footer>
@@ -743,10 +761,6 @@ function dragFrom(id: string): Attachment<HTMLElement> {
     </section>
   {/if}
   <p class="tx-board__status" role="status" aria-live="polite" aria-atomic="true">{announcement}</p>
-  <!-- Tests await this once the lazy move-menu chunk has mounted. -->
-  {#if menuReady}
-    <span class="tx-board__sr-only" data-board-move-menu-chunk="" data-ready="">Move menu ready</span>
-  {/if}
 </section>
 
 <style>
@@ -858,10 +872,36 @@ function dragFrom(id: string): Attachment<HTMLElement> {
     .tx-board--comfortable .tx-board__cell { gap: var(--tx-space-2); }
     .tx-board--compact .tx-board__cell { gap: var(--tx-space-1); padding: calc(var(--tx-space-unit) * 1.5); }
 
+    .tx-board__cell[hidden] { display: none; }
+    .tx-board__cell-footer { padding: 0 var(--tx-space-2) var(--tx-space-2); }
+
     .tx-board__lane-title {
       margin: 0;
+      padding: var(--tx-space-2);
       font-size: var(--tx-type-label-size);
     }
+
+    .tx-board__lane-title + .tx-board__cell { padding-block-start: 0; }
+
+    .tx-board__lane-toggle {
+      min-block-size: 1.5rem;
+      border: 0;
+      padding: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    /* Decorative: the empty alt text keeps the chevron out of the button's name. */
+    .tx-board__lane-toggle::before {
+      content: '▾';
+      content: '▾' / '';
+      display: inline-block;
+      margin-inline-end: var(--tx-space-1);
+    }
+
+    .tx-board__lane-toggle[aria-expanded='false']::before { rotate: -90deg; }
 
     .tx-board__card {
       min-inline-size: 0;
@@ -919,6 +959,7 @@ function dragFrom(id: string): Attachment<HTMLElement> {
       line-height: 1;
     }
     .tx-board__scroller:focus-visible,
+    .tx-board__lane-toggle:focus-visible,
     .tx-board__handle:focus-visible,
     .tx-board__move-menu:focus-visible {
       outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
