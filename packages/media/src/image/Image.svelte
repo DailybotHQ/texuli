@@ -181,7 +181,7 @@ $effect(() => {
         {@render img(sources, 'light')}
         {@render img(dark, 'dark')}
       {:else if dark}
-        <picture class="tx-image-picture">
+        <picture>
           <source media="(prefers-color-scheme: dark)" srcset={dark.srcset ?? dark.src} sizes={dark.srcset ? dark.sizes : undefined} />
           {@render img(sources)}
         </picture>
@@ -259,10 +259,6 @@ $effect(() => {
     }
     .tx-image[data-fit='scale-down'] .tx-image-img {
       object-fit: scale-down;
-    }
-    /* A <picture> (srcDark with darkMode="system") lays its image out as a direct child. */
-    .tx-image-picture {
-      display: contents;
     }
     /*
      * A theme pair (srcDark, darkMode="theme"): both images render and the
