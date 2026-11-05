@@ -487,10 +487,11 @@ harness supplies it on the TypeScript side, so fixtures compare equal).
   `round` and `clamp`). Which operands each `op` needs, and the formula
   limits, are checked by the runtime parser in `@texuli/blocks/formula`.
 
-## Spec 0.11.0: design-system fields from consumer gaps (in development)
+## Spec 0.11.0: design-system fields from consumer gaps
 
-Additive, so the `0.10.0 → 0.11.0` migration stamps `spec` only; not yet
-released (`@texuli/spec@0.12.3` carries spec `0.10.0`). The design-system
+New in `0.13.0` (`@texuli/spec@0.13.0` carries spec `0.11.0`;
+`@texuli/spec@0.10.0` to `@texuli/spec@0.12.3` carried spec `0.10.0`).
+Additive, so the `0.10.0 → 0.11.0` migration stamps `spec` only. The design-system
 document (`formatVersion` stays `1`, so it needs no document migration and
 every 0.10.0 document stays valid) gains `elevation.levels` (structured
 shadows per level, `$defs.shadowLayer`), `extensions` (product tokens,

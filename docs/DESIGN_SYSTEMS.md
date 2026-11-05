@@ -104,10 +104,10 @@ when only pins can fix a pair.
 
 ### Brand-specific fields (spec 0.11.0)
 
-Spec `0.11.0` adds these to the document. It is in development on this
-branch: the published `@texuli/spec@0.12.3` carries spec `0.10.0`, which
-refuses them (`unknown-key`, or `invalid-value` for a short palette). Every
-0.10.0 document stays valid.
+Spec `0.11.0` adds these to the document (new in `0.13.0`:
+`@texuli/spec@0.13.0` carries spec `0.11.0`). The `0.10.0` to `0.12.3`
+packages carry spec `0.10.0`, which refuses them (`unknown-key`, or
+`invalid-value` for a short palette). Every 0.10.0 document stays valid.
 
 ```json
 {
@@ -327,7 +327,7 @@ exports the document (and, optionally, its cached compiled form):
     "./design-system.json": "./design-system.json",
     "./design-system.compiled.json": "./design-system.compiled.json"
   },
-  "peerDependencies": { "@texuli/tokens": "^0.12.0" }
+  "peerDependencies": { "@texuli/tokens": "^0.13.0" }
 }
 ```
 

@@ -93,7 +93,7 @@ the cost of a component with no catalog in context to a few hundred bytes.
 
 ## Label dictionaries (ADR-026)
 
-> **Status: on `main`, not on npm yet** (it lands after `0.12.3`).
+> **Status: new in `0.13.0`.**
 
 A host that only needs one language does not have to build catalogs and
 loaders: it passes one flat dictionary of message ids, near the root, and

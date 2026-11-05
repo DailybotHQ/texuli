@@ -11,7 +11,7 @@
 > `ds.*` operations, `blueprint.theme` and `texuli ds` in
 > [ds.md](../../tools/docs/ds.md).
 
-> **Spec 0.11.0 (in development, not yet released).** Additive:
+> **Spec 0.11.0 (new in `0.13.0`).** Additive:
 > `elevation.levels`, `extensions` and a categorical palette of 1 to 8
 > colors. Every 0.10.0 document stays valid; `formatVersion` stays `1`.
 

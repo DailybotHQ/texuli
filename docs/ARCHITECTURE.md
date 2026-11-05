@@ -68,7 +68,7 @@ Not layers, because they consume the library:
 
 `@texuli/examples` is never packed (`NEVER_PACKED` in
 `scripts/packages.ts`); `pnpm verify:packages` packs the other 26, and all
-26 are released on npm in the 0.12 line, every one at `0.12.3`; `0.10.0` was the design-systems release and the 0.11 line added the Protoyard gaps G125–G136 and the Final Review fixes (among them `@texuli/document/schema-core`), and `0.12.0` moves the `@texuli/pages` core entries off the deck model (G136; breaking for those core entries only) (`@texuli/mcp`
+26 are released on npm in the 0.13 line, every one at `0.13.0`; `0.10.0` was the design-systems release and the 0.11 line added the Protoyard gaps G125–G136 and the Final Review fixes (among them `@texuli/document/schema-core`), `0.12.0` moves the `@texuli/pages` core entries off the deck model (G136; breaking for those core entries only), and `0.13.0` adds blueprint spec `0.11.0` and one label dictionary (ADR-026), with no breaking API change (`@texuli/mcp`
 was first released in `0.9.0`; the 0.8 line had 25 packages);
 `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/slides`,
 `@texuli/editor`, `@texuli/document`, `@texuli/pages`, `@texuli/forms`,
@@ -248,7 +248,7 @@ after each deploy of `main`.
 
 ## Decks: engine and stage
 
-ADR-009 splits presentations in two packages (both on npm as `0.12.3`;
+ADR-009 splits presentations in two packages (both on npm as `0.13.0`;
 `@texuli/deck` was first released in `0.4.0`):
 
 - **`@texuli/deck` (L0)** owns everything that is data: deck model v2
@@ -390,7 +390,7 @@ The pure decisions live in `apps/website/src/lib/` and are tested in
     way npm would publish it: `dist/` via `@sveltejs/package`, a derived
     manifest, publint and attw. It publishes nothing.
   - Workspace packages stay `private: true`; the publish workflow publishes
-    the 26 packable packages, `@texuli/mcp` included, to npm as the `0.12.3`
+    the 26 packable packages, `@texuli/mcp` included, to npm as the `0.13.0`
     release (dist-tag `latest`, through npm trusted publishing), with
     provenance; `next` is no longer maintained and stays on `0.12.1`
     ([RELEASE](RELEASE.md#dist-tags)).
