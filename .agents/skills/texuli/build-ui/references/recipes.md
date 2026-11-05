@@ -16,7 +16,7 @@ import public subpaths only.
 | Charts | `@texuli/charts/*` lazy families (`cartesian`, `compact`, `part-whole`, …) |
 | Theme | `enterprise-neutral` or themes skill search |
 | App icons | `registerIcons({ rocket: Rocket })` in the root (context, SSR-safe), then `<Icon icon="rocket">`; augment `IconNames` for types (new in `0.13.1`) |
-| Group avatars | `AvatarGroup layout="grid"`: up to four faces in one circle, `+N` past four (new in `0.13.1`) |
+| Group avatars | `AvatarGroupGrid` (`texuli/avatar`): up to four faces in one circle, `+N` past four (new in `0.13.1`) |
 
 **Compose order:** shell → filter bar → KPI row → main visualization → detail
 drawer (if needed). Validate empty and loading states.

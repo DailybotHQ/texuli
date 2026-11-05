@@ -6,9 +6,6 @@ import './avatar.css';
 export const AVATAR_SIZES = ['xs', 'sm', 'md', 'lg'] as const;
 export type AvatarSize = (typeof AVATAR_SIZES)[number];
 
-export const AVATAR_GROUP_LAYOUTS = ['stack', 'grid'] as const;
-export type AvatarGroupLayout = (typeof AVATAR_GROUP_LAYOUTS)[number];
-
 export const AVATAR_STATUSES = ['online', 'away', 'busy', 'offline'] as const;
 export type AvatarStatus = (typeof AVATAR_STATUSES)[number];
 
@@ -42,12 +39,8 @@ export const avatarGroupClass = variants({
       md: 'tx-avatar-group--md',
       lg: 'tx-avatar-group--lg',
     },
-    layout: {
-      stack: '',
-      grid: 'tx-avatar-group--grid',
-    },
   },
-  defaultVariants: { size: 'md', layout: 'stack' },
+  defaultVariants: { size: 'md' },
 });
 
 export const avatarStatusClass = variants({

@@ -90,8 +90,10 @@ It carries the gaps the consumer Dailybot found through Protoyard:
   the OS preference, and with the default lazy loading only the shown image
   downloads. `srcDark` passes the same URL policy, at the same tier, as
   `src` ([image](../packages/media/docs/image.md)).
-- **D-G-024: `AvatarGroup layout="grid"`.** A collage of up to four faces in
-  one circle, with `+N` past four
+- **D-G-024: `AvatarGroupGrid` (`texuli/avatar`).** A collage of up to four
+  faces in one circle, with `+N` past four. It is a component of its own
+  rather than an `AvatarGroup` layout, so the `texuli` root stays within its
+  size ceiling (the Protoyard ui package it replaces)
   ([ui-avatar](../packages/texuli/docs/ui-avatar.md)).
 
 **Known gaps in 0.13.1 (planned, not done).**

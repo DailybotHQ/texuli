@@ -152,7 +152,7 @@ describe('design defaults: the closed vocabulary', () => {
 
   it('every component with a variant or size prop reads its defaults, with the prop’s old fallback', () => {
     const wired = wiredComponents();
-    expect(wired.length).toBe(70);
+    expect(wired.length).toBe(71);
     for (const { file, id, fallbacks } of wired) {
       const props = Object.keys(fallbacks);
       expect(props.length, file).toBeGreaterThan(0);
@@ -234,6 +234,7 @@ const RENDER: Record<string, { component?: AnyComponent; props?: Record<string, 
     props: { 'aria-label': 'Plan', items: [{ value: 'a', label: 'A' }] },
   },
   'avatar/AvatarGroup.svelte': { props: { items: [{ name: 'Ada Lovelace' }] } },
+  'avatar/AvatarGroupGrid.svelte': { props: { items: [{ name: 'Ada Lovelace' }] } },
   'combobox/ComboboxField.svelte': { component: ComboboxHarness },
   'combobox/ComboboxInput.svelte': { component: ComboboxHarness },
   'combobox/ComboboxContent.svelte': { component: ComboboxHarness, props: { open: true } },

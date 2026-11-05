@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Alert from '../src/components/alert/Alert.svelte';
 import { alertRole } from '../src/components/alert/tones.ts';
 import AvatarGroup from '../src/components/avatar/AvatarGroup.svelte';
+import AvatarGroupGrid from '../src/components/avatar/AvatarGroupGrid.svelte';
 import { avatarInitials, avatarToneIndex, hashString } from '../src/components/avatar/initials.ts';
 import { avatarSrcset } from '../src/components/avatar/srcset.ts';
 import Chip from '../src/components/badge/Chip.svelte';
@@ -243,7 +244,7 @@ describe('avatar', () => {
       ] as const;
       for (const [count, cells, faces, more, letters] of cases) {
         const items = people.slice(0, count).map((name) => ({ name, status: 'online' as const }));
-        const view = render(AvatarGroup, { props: { items, layout: 'grid', max: 1, size: 'lg' } });
+        const view = render(AvatarGroupGrid, { props: { items, size: 'lg' } });
         const group = view.getByRole('img', { name: items.map((i) => i.name).join(', ') });
         expect(group.dataset.layout, `${count}`).toBe('grid');
         expect(group.dataset.count, `${count}`).toBe(String(cells));
@@ -263,15 +264,14 @@ describe('avatar', () => {
         expect(view.queryAllByRole('img')).toHaveLength(1);
         view.unmount();
       }
-      render(AvatarGroup, {
+      render(AvatarGroupGrid, {
         props: {
           items: [{ name: 'Ada Example' }, { name: 'Bea Harbor' }],
-          layout: 'grid',
           label: 'Launch crew',
         },
       });
       expect(screen.getByRole('img', { name: 'Launch crew' }).dataset.count).toBe('2');
-      // The stack stays the default.
+      // AvatarGroup stays the stack.
       cleanup();
       render(AvatarGroup, { props: { items: [{ name: 'Ada Example' }], label: 'Crew' } });
       expect(screen.getByRole('group', { name: 'Crew' }).dataset.layout).toBeUndefined();

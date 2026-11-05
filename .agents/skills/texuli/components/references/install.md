@@ -18,8 +18,8 @@ three first published in `0.8.0`) and `@texuli/mcp` (first published in
 
 New in `0.13.1` (an additive patch): `@texuli/blocks/code-field` (`CodeField`),
 `registerIcons` and `IconsProvider` in `texuli/icons`, `srcDark` and
-`darkMode` on `Image` (`@texuli/media/image`), and `AvatarGroup
-layout="grid"`. They are not in `0.13.0`, so an app that uses them pins
+`darkMode` on `Image` (`@texuli/media/image`), and `AvatarGroupGrid`
+(`texuli/avatar`). They are not in `0.13.0`, so an app that uses them pins
 `^0.13.1`. `CodeField`, `srcDark` and `darkMode` are not in the agent
 catalog yet (they need the next spec minor).
 

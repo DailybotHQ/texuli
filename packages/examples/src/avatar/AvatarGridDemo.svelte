@@ -1,8 +1,8 @@
 <script lang="ts">
-import { AVATAR_SIZES, AvatarGroup } from 'texuli/avatar';
+import { AVATAR_SIZES, AvatarGroupGrid } from 'texuli/avatar';
 
 /**
- * AvatarGroup `layout="grid"`: a 2x2 collage inside one avatar-sized circle,
+ * `AvatarGroupGrid`: a 2x2 collage inside one avatar-sized circle,
  * as group conversations show their members. Fictional Harbor names only.
  */
 const crew = [
@@ -27,7 +27,7 @@ const conversations = [
   <p class="row">
     {#each counts as count (count)}
       <span class="cell">
-        <AvatarGroup layout="grid" size="lg" items={crew.slice(0, count)} />
+        <AvatarGroupGrid size="lg" items={crew.slice(0, count)} />
         <span class="caption">{count} members</span>
       </span>
     {/each}
@@ -37,7 +37,7 @@ const conversations = [
   <p class="row">
     {#each AVATAR_SIZES as size (size)}
       <span class="cell">
-        <AvatarGroup layout="grid" {size} items={crew.slice(0, 4)} />
+        <AvatarGroupGrid {size} items={crew.slice(0, 4)} />
         <span class="caption">{size}</span>
       </span>
     {/each}
@@ -47,7 +47,7 @@ const conversations = [
   <ul class="list">
     {#each conversations as conversation (conversation.title)}
       <li>
-        <AvatarGroup layout="grid" items={conversation.members} label={conversation.title} />
+        <AvatarGroupGrid items={conversation.members} label={conversation.title} />
         <span>{conversation.title}</span>
       </li>
     {/each}

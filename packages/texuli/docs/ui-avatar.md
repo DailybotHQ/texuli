@@ -80,13 +80,19 @@ Stacked faces use negative `margin-inline-start` and a ring from
 `--tx-background`. When `label` is set, faces default to `decorative` so the
 group owns the accessible name.
 
-### Grid layout
+### Grid: `AvatarGroupGrid`
 
-New in `0.13.1`. `layout="grid"` collages the members inside one
-avatar-sized circle, the way a group conversation shows them:
+New in `0.13.1`. `AvatarGroupGrid` collages the members inside one
+avatar-sized circle, the way a group conversation shows them. It ships from
+`texuli/avatar` only (not the `texuli` root), so the root barrel stays
+within its size ceiling:
 
 ```svelte
-<AvatarGroup layout="grid" label="Launch crew" items={crew} />
+<script lang="ts">
+  import { AvatarGroupGrid } from 'texuli/avatar';
+</script>
+
+<AvatarGroupGrid label="Launch crew" items={crew} />
 ```
 
 | Members | Cells |
@@ -107,7 +113,8 @@ avatar-sized circle, the way a group conversation shows them:
   hidden members included. The cells are `aria-hidden`.
 - **Data attributes.** The root carries `data-layout="grid"` and
   `data-count` (the number of cells, 1 to 4).
-- `max` is ignored: the grid always shows at most four cells.
+- It takes `items`, `size`, `label`, `overflowLabel`, `class`, `ref` and
+  rest attributes; it always shows at most four cells.
 
 ## Examples
 

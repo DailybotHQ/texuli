@@ -42,16 +42,17 @@ let {
 
 const pixelSize = $derived(ICON_SIZES[size]);
 const lookup = iconLookup();
-const builtIn = $derived(typeof icon === 'string' && isIconName(icon) ? icon : undefined);
-/** A registered glyph; built-in names keep their own. Unknown names render nothing. */
-const registered = $derived(typeof icon === 'string' && !builtIn ? lookup(icon) : undefined);
-const name = $derived(builtIn ?? (registered !== undefined ? (icon as string) : undefined));
-const component = $derived(
-  typeof icon === 'function' ? icon : typeof registered === 'function' ? registered : undefined
+/**
+ * The glyph: a built-in path (built-in names keep their own glyphs), then a
+ * registered component or path, or the component passed in. Unknown names
+ * render nothing.
+ */
+const glyph = $derived(
+  typeof icon === 'string' ? (isIconName(icon) ? iconPath(icon) : lookup(icon)) : icon
 );
-const path = $derived(
-  builtIn ? iconPath(builtIn) : typeof registered === 'string' ? registered : undefined
-);
+const name = $derived(typeof icon === 'string' && glyph !== undefined ? icon : undefined);
+const component = $derived(typeof glyph === 'function' ? glyph : undefined);
+const path = $derived(typeof glyph === 'string' ? glyph : undefined);
 const accessibleName = $derived(label ?? ariaLabel);
 const classes = $derived(iconClass({ size, class: className }));
 /** Lucide-safe color: drop null so Component props stay assignable. */

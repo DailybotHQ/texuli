@@ -18,7 +18,7 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 - The packages are on npm at `0.13.1`, an additive patch: `CodeField` in
   `@texuli/blocks/code-field`, `registerIcons` and `IconsProvider` in
   `texuli/icons`, `srcDark` and `darkMode` on `Image`, and
-  `AvatarGroup layout="grid"`. The components install reference marks them
+  `AvatarGroupGrid` in `texuli/avatar`. The components install reference marks them
   new in `0.13.1` (pin `^0.13.1` to use them), `router/packages.md` marks
   `@texuli/blocks/code-field` new in `0.13.1`, and the build-ui recipes
   cover them. No upgrade notes: nothing breaks.

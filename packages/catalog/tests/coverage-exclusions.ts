@@ -237,6 +237,7 @@ add(
 add('texuli', 'planned', 'Planned manifest: a display component with plain data props.', [
   'Avatar',
   'AvatarGroup',
+  'AvatarGroupGrid',
   'CardGrid',
   'Carousel',
   'KpiRow',
@@ -410,4 +411,7 @@ export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(row
 // contentless scope: the host passes it an icon registry. Raised to 214 for
 // CodeField (D-G-022, lead decision for 0.13.1): planned, its catalog id
 // waits for the next spec minor because it changes the spec contract.
-export const EXCLUSION_CEILING = 214;
+// Raised to 215 for AvatarGroupGrid (D-G-024, lead decision for 0.13.1),
+// planned alongside AvatarGroup: the same display data, a new catalog id
+// that waits for the next spec minor.
+export const EXCLUSION_CEILING = 215;

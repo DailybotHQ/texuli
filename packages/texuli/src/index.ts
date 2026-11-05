@@ -221,7 +221,21 @@ export {
   type FileUploadVariant,
   fileUploadClass,
 } from './components/file-upload/index.ts';
-export * from './components/icons/index.ts';
+// IconsProvider and registerIcons ship from `texuli/icons` only, so apps that
+// never register icons do not pay for them in the root (D-G-021).
+export {
+  type BuiltInIconName,
+  ICON_NAMES,
+  Icon,
+  type IconComponent,
+  type IconComponentProps,
+  type IconGlyph,
+  type IconName,
+  type IconNames,
+  type IconRef,
+  type IconRegistry,
+  type IconSize,
+} from './components/icons/index.ts';
 export {
   autosizeTextarea,
   fieldVariants,
