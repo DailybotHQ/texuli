@@ -53,6 +53,35 @@ describe('dialog', () => {
       expect(screen.getByRole('alertdialog')).toBeTruthy();
     });
 
+    it('keeps the confirm disabled until a typed confirmation matches (D-G-031)', async () => {
+      const onConfirm = vi.fn();
+      render(AlertDialogHarness, { props: { open: false, onConfirm, confirmText: 'DELETE' } });
+      await fireEvent.click(screen.getByRole('button', { name: 'Delete project' }));
+      const dialog = await screen.findByRole('alertdialog', { name: 'Delete project?' });
+      // Cancel stays the safe initial focus.
+      await waitFor(() => {
+        expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Keep project' }));
+      });
+      const confirm = within(dialog).getByRole('button', { name: 'Delete' }) as HTMLButtonElement;
+      const input = within(dialog).getByRole('textbox', { name: 'Type DELETE to confirm' });
+      for (const [text, disabled] of [
+        ['DEL', true],
+        ['DELETE', false],
+      ] as const) {
+        await fireEvent.input(input, { target: { value: text } });
+        expect(confirm.disabled).toBe(disabled);
+        if (disabled) {
+          await fireEvent.click(confirm);
+          expect(onConfirm).not.toHaveBeenCalled();
+        }
+      }
+      await fireEvent.click(confirm);
+      await waitFor(() => {
+        expect(onConfirm).toHaveBeenCalledTimes(1);
+        expect(screen.queryByRole('alertdialog')).toBeNull();
+      });
+    });
+
     it('stays open while the confirm is pending; Escape cannot dismiss it', async () => {
       let resolveConfirm: (() => void) | undefined;
       const onConfirm = vi.fn(
