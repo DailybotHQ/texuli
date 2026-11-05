@@ -9,7 +9,9 @@
  *    (declarations are rewritten the same way). A sibling `generated/typescript/`
  *    tree, when present, is compiled into the matching `dist/generated/typescript/`
  *    path and its imports are mapped into that tree. Any declaration diagnostic
- *    fails the package.
+ *    fails the package. {@link PACKAGE_ASSETS} then adds the built assets a
+ *    package ships beside its code (`@texuli/tools`: the ds-check conformance
+ *    sheet, `scripts/ds-check-sheet.ts`).
  * 2. **Manifest**: derive the published `package.json` from the source one.
  *    Every `./src/**.ts` export target maps to `./dist/**.js` (`types` to
  *    `.d.ts`), `.svelte` and `.css` keep their names, `workspace:` ranges
@@ -38,6 +40,7 @@ import {
 } from 'node:fs';
 import { dirname, join, posix, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildDsCheckSheet, DS_CHECK_SHEET_DIST } from './ds-check-sheet.ts';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -45,6 +48,18 @@ export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
  * code. (@texuli/editor left this list in PLAN_009 G17, publishable from 0.5.0;
  * @texuli/pages left it in 0.7.0, its first release with @texuli/document.) */
 export const NEVER_PACKED: readonly string[] = ['@texuli/examples'];
+
+/**
+ * Built assets a package ships in its `dist/` beside the compiled source,
+ * by directory: each builder writes into the staged `dist` and returns its
+ * problems. `tools`: the conformance sheet `texuli ds check --render` serves
+ * by default (D-G-013), at `dist/ds-check/sheet/`.
+ */
+export const PACKAGE_ASSETS: Readonly<
+  Record<string, (dist: string, root: string) => Promise<string[]>>
+> = {
+  tools: (dist, root) => buildDsCheckSheet(join(dist, DS_CHECK_SHEET_DIST), root),
+};
 
 /** attw resolution kinds outside the ESM-only support policy. */
 export const IGNORED_RESOLUTIONS: readonly string[] = ['node10', 'node16-cjs'];
@@ -683,6 +698,8 @@ export async function verifyPackages(
   for (const pkg of selected) {
     const stage = join(out, 'stage', pkg.dir);
     const problems = await buildPackage(pkg, root, stage);
+    const assets = PACKAGE_ASSETS[pkg.dir];
+    if (assets) problems.push(...(await assets(join(stage, 'dist'), root)));
     const derived = publishManifest(pkg, versions);
     problems.push(...derived.problems);
     for (const stub of derived.stubs) writeFileSync(join(stage, stub), 'export {};\n');

@@ -15,7 +15,8 @@ checks what the browser actually shows.
 ```bash
 texuli ds check acme.json                       # static checks, a summary, exit 0 or 1
 texuli ds check acme.json --json                # the same as a stable JSON report
-texuli ds check acme.json --render              # plus axe, painted contrast and literal colors
+texuli ds check acme.json --render              # plus axe, painted contrast and literal colors (the built-in sheet)
+texuli ds check acme.json --render --sheet site/sheet.html   # a sheet page you built
 texuli ds check child.json --base base.json     # extends: "base@1.2.3" from a local file
 texuli ds check acme.json --mode dark --variant compact
 ```
@@ -31,7 +32,8 @@ texuli ds check acme.json --mode dark --variant compact
 | `--trust developer\|untrusted` | The validator's trust level (default `untrusted`, which refuses every `data:` URL; `developer` accepts capped ones) |
 | `--base <file>` | A document that `extends: "id@x.y.z"` names, keyed by its own `id` and `version`; repeatable. `texuli:<id>` bases load from the theme library |
 | `--render` | Add the render checks (below) |
-| `--url <page>` | With `--render`: check your own page instead of the repository sheet |
+| `--sheet builtin\|<page.html>` | With `--render`: the sheet to paint. `builtin` (the default) is the conformance sheet that ships inside `@texuli/tools`; a path is a built HTML page that installs the host, served with the files of its folder (below) |
+| `--url <page>` | With `--render`: check a page you serve yourself instead of a sheet (not with `--sheet`) |
 | `--known <file>` | With `--render`: a JSON array of findings you track, `[{ "component", "element", "property", "reason" }]` (at most 1 MB and 500 entries; `component` may be `*`, `element` and `property` are prefixes). They are reported as `known` and do not fail the run. A malformed list exits 2 |
 | `--strict` | With `--render`: known findings fail too |
 
@@ -120,16 +122,39 @@ render run and does not fail it, and `--strict` makes it fail, so a CI job
 can still see what it tracks. The repository's conformance spec fails when
 a library entry is no longer found, so the list cannot rot.
 
-**Requirements.** `--render` uses the Playwright of the project it runs in:
-`@playwright/test` (or `playwright`) with chromium installed
+**Requirements.** `--render` uses the Playwright of the project it runs in,
+resolved from the working directory first (so a strict pnpm install, where
+`@texuli/tools` cannot see your dev dependencies, still finds it):
+`playwright` (or `@playwright/test`) with chromium installed
 (`npx playwright install chromium`), and `@axe-core/playwright`.
 `@texuli/tools` does not depend on them. Without them the command exits 2
-and names what to install; the static checks never need them.
+and names the exact packages, for example:
 
-**The sheet.** Inside the Texuli repository the command serves
-`tests/fixtures/app/ds-conformance.html` with the repository's Vite. Outside
-it, pass `--url` to a page you serve that renders your components inside one
-element and installs the host:
+```text
+texuli ds check --render needs "playwright" and "@axe-core/playwright", which are not installed in this project. Install them as dev dependencies (npm install --save-dev playwright @axe-core/playwright; "@playwright/test" also works in place of "playwright"), then run "npx playwright install chromium". @texuli/tools does not depend on them, and the static checks run without them.
+```
+
+A Playwright without its chromium build also exits 2, with
+`npx playwright install chromium` to run. The static checks never need any
+of them.
+
+**The sheet.** The published `@texuli/tools` ships the conformance sheet at
+`dist/ds-check/sheet/` (`ds-conformance.html`, one script, one stylesheet,
+every catalog component and theme bundled in, and `THIRD_PARTY_NOTICES.md`,
+the license notices of the bundled dependencies), and `--render` serves it by
+default (`--sheet builtin`) from a read-only static server on `127.0.0.1`.
+It needs no bundler and no other Texuli package at run time, so it runs in
+any project that installs `@texuli/tools` from npm. `pnpm verify:packages`
+(which the publish workflow runs) builds it from the repository's
+`tests/fixtures/app/ds-conformance.html` with `scripts/ds-check-sheet.ts`,
+so it is the page the repository's conformance spec drives. A source
+checkout has no built sheet; there `--sheet builtin` serves the fixture app
+with the repository's Vite instead.
+
+To paint your own components, build a page that renders them inside one
+element and installs the host, then pass it with `--sheet <page.html>`
+(served with the files of its folder: GET only, nothing outside it) or
+serve it yourself and pass `--url <page>`:
 
 ```ts
 import { installDsCheckHost } from '@texuli/tools/ds-check/host';
@@ -160,9 +185,11 @@ expect(runs.every((run) => run.ok)).toBe(true);
 | `checkDesignSystem(doc, { modes?, variants?, trust?, bases?, file? })` | The static report (above); never throws on a JSON value |
 | `serializeDsCheckReport(report)` | The report without the compiled maps (what `--json` prints) |
 | `runDsRenderChecks(page, runs, { modes?, axe?, known?, strict?, timeoutMs? })` | The render runs on a page that installs the host |
-| `renderDesignSystemCheck(report, { url?, cwd?, … })` | Launches chromium (and the repository sheet) and adds `render` to the report; throws `DsCheckRequirementError` when a requirement is missing |
+| `renderDesignSystemCheck(report, { sheet?, url?, cwd?, load?, … })` | Launches chromium, serves the sheet (`builtin` by default) and adds `render` to the report; throws `DsCheckRequirementError` when a requirement is missing |
+| `resolveDsCheckSheet(sheet?, { cwd?, builtinDir? })`, `builtinSheetDir()`, `serveSheetDirectory(dir, page?)`, `startDsCheckSheet(source)` | Where a `--sheet` value points (the packaged sheet, the repository's fixture app in a source checkout, or a built page), and the read-only static server |
+| `loadRenderModules(load?)`, `projectModuleLoader(cwd?)`, `missingRenderPackagesMessage(names)`, `DS_CHECK_PLAYWRIGHT_PACKAGES`, `DS_CHECK_AXE_PACKAGE` | Load Playwright and axe from the project, or fail with the exact packages to install |
 | `renderIssues(run)` | One run's findings as report issues |
-| `playwrightAxeRunner()` | An axe runner over `@axe-core/playwright`, scoped to the sheet |
+| `playwrightAxeRunner(cwd?)` | An axe runner over `@axe-core/playwright`, scoped to the sheet |
 | `DS_CHECK_KNOWN_FINDINGS`, `knownFinding(literal, known?)`, `parseKnownFindings(value)` | The tracked library findings (none), the matcher, and the validator of a `--known` list |
 | `runDsCli(argv, io?)`, `parseDsCliArgs(argv)`, `formatDsCheckReport(report)` | The CLI |
 | `installDsCheckHost(scope, { ready? })` (`/ds-check/host`) | The in-page half |
@@ -172,8 +199,12 @@ expect(runs.every((run) => run.ok)).toBe(true);
 - `packages/tools/tests/ds-check.test.ts`: every refusal code (the spec's
   invalid fixtures and the three guarantees) reaches exit 1 and the JSON
   with its path; flags, exit 2, `--base`, `--variant`, `--mode`, `--known`
-  and `--strict`, the `--render` requirement message, and the render
-  findings' codes.
+  and `--strict`, `--sheet` (the packaged sheet first, a built page, the
+  static server's refusals), the exact packages a missing Playwright or axe
+  names, and the render findings' codes.
+- `scripts/tests/ds-check-sheet.test.ts`: `pnpm verify:packages` builds the
+  sheet into `@texuli/tools` at `dist/ds-check/sheet/` as one self-contained
+  page with its third-party license notices.
 - `tests/e2e/ds-conformance.spec.ts` (chromium): the acme, minimal and
   fictional protoyard-theme/v1 brands and six library themes, every mode,
   with no known finding, plus a planted literal and a broken pair that the

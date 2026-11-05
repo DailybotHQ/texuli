@@ -12,7 +12,7 @@ import { withoutHostChrome, withoutHostChromeLoaders } from '../src/host-chrome.
 import { frameStops } from '../src/keyboard.ts';
 import { DEFAULT_PLAYER_LABELS } from '../src/labels.ts';
 import { G20_LAYOUT_MANIFESTS, PLAYER_GRAMMAR_ROLES } from '../src/layout-manifests.ts';
-import { planFrames } from '../src/layouts/outline.ts';
+import { planFrames, planOutline } from '../src/layouts/outline.ts';
 import { PLAYER_LOADERS } from '../src/loaders.ts';
 import { applyMediaPolicy, TRUST_PINNED_IDS } from '../src/media-policy.ts';
 import { mountPlayer } from '../src/mount.ts';
@@ -1098,6 +1098,44 @@ describe('layout painters', () => {
           expect(screen.getByRole('heading', { level: 2, name: 'Revenue' })).toBeTruthy();
           expect(screen.getByRole('heading', { level: 3, name: 'Detail' })).toBeTruthy();
           expect(screen.getByRole('region', { name: 'Revenue' })).toBeTruthy();
+        }
+      );
+      await scenario(
+        'D-G-020: flow, geo and part-whole charts title one rank below their section, h3 with none',
+        async () => {
+          const pie = (title: string) => ({
+            id: 'charts-pie',
+            props: { title, description: 'Fictional split', data: [], labels: {} },
+          });
+          const tree = {
+            id: 'layout-page',
+            props: { title: 'Survey' },
+            children: [
+              pie('On the page'),
+              { id: 'layout-card', props: { title: 'Setup' }, children: [pie('In a card')] },
+              { id: 'layout-grid', props: {}, children: [pie('In a grid')] },
+            ],
+          };
+          const { titles } = planOutline([plan(tree.id, tree.props, tree.children)], 'p');
+          expect(Object.fromEntries(titles)).toEqual({
+            '0.children.0': 2,
+            '0.children.1.children.0': 3,
+            '0.children.2.children.0': 2,
+          });
+          // A fragment (a slide's component, a block) keeps the chart's h3.
+          expect([...planOutline([plan('charts-funnel', { title: 'Alone' })], 'p').titles]).toEqual(
+            [['0', 3]]
+          );
+          const validation = validateDraft(tree, {
+            catalog: createPlayerCatalog(),
+            tier: 'untrusted',
+            roles: PLAYER_GRAMMAR_ROLES,
+          });
+          expect(validation.diagnostics.filter((d) => d.check === 'grammar')).toEqual([]);
+          await paint(tree);
+          expect(screen.getByRole('heading', { level: 2, name: 'On the page' })).toBeTruthy();
+          expect(screen.getByRole('heading', { level: 3, name: 'In a card' })).toBeTruthy();
+          expect(screen.getByRole('heading', { level: 2, name: 'In a grid' })).toBeTruthy();
         }
       );
     });

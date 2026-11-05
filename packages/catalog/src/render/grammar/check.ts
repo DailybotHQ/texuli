@@ -1,5 +1,11 @@
 import type { RenderNode } from '../renderer/types.ts';
-import { isContainerRole, isInteractiveRole, resolveMeta, resolveNestedRole } from './roles.ts';
+import {
+  figureTitleLevel,
+  isContainerRole,
+  isInteractiveRole,
+  resolveMeta,
+  resolveNestedRole,
+} from './roles.ts';
 import type {
   GrammarComponentMeta,
   GrammarIssue,
@@ -308,6 +314,8 @@ function headingOf(
   if (meta.titleHeading !== undefined) {
     const title = props.title;
     if (typeof title !== 'string' || title.trim() === '') return null;
+    if (meta.titleHeading === 'figure')
+      return { level: figureTitleLevel(sectionLevel), section: false };
     const nested = meta.titleHeading === 'nested';
     return {
       level: nested ? Math.min(sectionLevel + 1, 6) : (meta.titleHeading as number),

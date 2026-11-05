@@ -1,4 +1,5 @@
 <script lang="ts">
+import { chartTitleLevel } from '../heading/index.ts';
 import GeoDataTable from './GeoDataTable.svelte';
 import {
   GEO_TABLE_LABELS,
@@ -30,6 +31,8 @@ let {
   width = 560,
   height = 320,
 }: Props = $props();
+// D-G-020: the host sets the title's rank (the player: one below the nearest titled section); h3 otherwise.
+const titleLevel = chartTitleLevel();
 const uid = $props.id();
 const tableLabels = $derived({ ...GEO_TABLE_LABELS, ...labels });
 const cells = $derived(geoCells(shape, width, height));
@@ -41,7 +44,7 @@ const rows = $derived(
 
 <figure class="geo-chart">
   <figcaption>
-    <h3>{title}</h3>
+    <svelte:element this={`h${titleLevel()}`}>{title}</svelte:element>
     <p>{description}</p>
   </figcaption>
   <svg direction="ltr" class="map" viewBox="0 0 {width} {height}" role="img" aria-labelledby="{uid}-title {uid}-description">
@@ -81,7 +84,7 @@ const rows = $derived(
 
 <style>
   .geo-chart { color: var(--tx-foreground, CanvasText); margin: 0; max-inline-size: 100%; }
-  figcaption h3 { font-size: var(--tx-type-body-size); margin-block: 0; }
+  figcaption :is(h2, h3, h4, h5, h6) { font-size: var(--tx-type-body-size); margin-block: 0; }
   figcaption p { color: var(--tx-muted-foreground, CanvasText); margin-block: var(--tx-space-1) var(--tx-space-3); }
   .map { display: block; inline-size: 100%; max-block-size: 24rem; }
   .legend { align-items: center; display: flex; font-size: var(--tx-type-caption-size); gap: var(--tx-space-2); justify-content: center; }
@@ -97,6 +100,6 @@ const rows = $derived(
   .legend .step-8 { background: var(--tx-chart-sequential-9, color-mix(in oklab, var(--tx-chart-1, var(--tx-primary, CanvasText)) 98%, var(--tx-background, Canvas))); }
   @media (forced-colors: active) { rect { fill: Canvas; stroke: CanvasText; } .legend li { background: Canvas; border: var(--tx-border-width-thin) solid CanvasText; } }
   @media (forced-colors: active) {
-    figcaption h3, figcaption p { color: CanvasText; }
+    figcaption :is(h2, h3, h4, h5, h6), figcaption p { color: CanvasText; }
   }
 </style>

@@ -52,7 +52,7 @@ import {
   safeLang,
 } from './labels.ts';
 import { PLAYER_GRAMMAR_ROLES } from './layout-manifests.ts';
-import { planFrames } from './layouts/outline.ts';
+import { planOutline } from './layouts/outline.ts';
 import {
   carryFlowView,
   carryStateSnapshot,
@@ -1080,6 +1080,7 @@ const adapter: PaintAdapter<PlayerPaintNode> = {
       component: component as Component<Record<string, unknown>>,
       children,
       ...(frames.has(node.path) ? { frame: frames.get(node.path) } : {}),
+      ...(outline.titles.has(node.path) ? { titleLevel: outline.titles.get(node.path) } : {}),
       ...(node.slot !== undefined ? { slot: node.slot } : {}),
       ...(node.motion ? { motion: node.motion, children: withStagger(children, node.motion) } : {}),
     };
@@ -1226,7 +1227,8 @@ const playerMotion = createPlayerMotion({
 });
 setPlayerMotion(playerMotion);
 // Heading ranks, frame ids and contents for content layouts, from the plan.
-let frames = $derived(planFrames(playerState?.plan ?? [], skipTargetId));
+const outline = $derived(planOutline(playerState?.plan ?? [], skipTargetId));
+const frames = $derived(outline.frames);
 
 let shownStatus = $derived<PlayerShownStatus>(
   previewing && streamPhase !== null

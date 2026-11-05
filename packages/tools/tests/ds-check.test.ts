@@ -1,22 +1,31 @@
 // @vitest-environment node
-import { mkdtemp, readdir, readFile, realpath, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readdir, readFile, realpath, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { parseRouterArgs, routerHelp } from '../src/cli/router.ts';
 import {
+  builtinSheetDir,
   checkDesignSystem,
+  DS_CHECK_AXE_PACKAGE,
+  DS_CHECK_BUILTIN_SHEET,
   DS_CHECK_KNOWN_FINDINGS,
+  DS_CHECK_PLAYWRIGHT_PACKAGES,
+  DS_CHECK_SHEET_PATH,
   type DsCheckPage,
   type DsCheckReport,
+  DsCheckRequirementError,
   findSheetApp,
   knownFinding,
+  loadRenderModules,
   parseDsCliArgs,
   parseKnownFindings,
   renderDesignSystemCheck,
   renderIssues,
+  resolveDsCheckSheet,
   runDsCli,
   runDsRenderChecks,
+  serveSheetDirectory,
 } from '../src/ds-check/index.ts';
 
 const FIXTURES = new URL('../../spec/fixtures/design-systems/', import.meta.url);
@@ -286,22 +295,113 @@ describe('texuli ds check (static)', () => {
     });
   });
 
-  it('--render names its requirement when there is no sheet page (outside the repository)', async () => {
-    const outside = await scratch();
-    expect(findSheetApp(outside)).toBeUndefined();
-    expect(findSheetApp(process.cwd())).toMatch(/tests[/\\]fixtures[/\\]app$/u);
+  it('--sheet picks the sheet: builtin by default, a built page, never with --url', () => {
+    expect(parseDsCliArgs(['check', 'a.json', '--render']).sheet).toBeUndefined();
+    expect(
+      parseDsCliArgs(['check', 'a.json', '--render', '--sheet', 'site/sheet.html'])
+    ).toMatchObject({ sheet: 'site/sheet.html', render: true });
+    expect(() => parseDsCliArgs(['check', 'a.json', '--sheet', 'builtin'])).toThrow(
+      /--sheet needs --render/u
+    );
+    expect(() =>
+      parseDsCliArgs(['check', 'a.json', '--render', '--sheet', 'x.html', '--url', 'http://a/'])
+    ).toThrow(/exclusive/u);
+  });
+
+  it('the built-in sheet is the packaged one, served as static files; outside it a clear requirement', async () => {
+    const root = await scratch();
+    // A published install: dist/ds-check/sheet/ beside render.js.
+    const packaged = join(root, 'dist', 'ds-check', 'sheet');
+    await mkdir(join(packaged, 'assets'), { recursive: true });
+    await writeFile(
+      join(packaged, DS_CHECK_SHEET_PATH),
+      '<!doctype html><script type="module" src="./assets/sheet.js"></script>'
+    );
+    await writeFile(join(packaged, 'assets', 'sheet.js'), 'globalThis.ok = 1;');
+    await writeFile(join(root, 'secret.txt'), 'outside');
+    // The packaged sheet wins over the repository's fixture app (cwd is the repository here).
+    expect(resolveDsCheckSheet(DS_CHECK_BUILTIN_SHEET, { builtinDir: packaged })).toEqual({
+      kind: 'static',
+      dir: packaged,
+      page: DS_CHECK_SHEET_PATH,
+      builtin: true,
+    });
+    // A source checkout has no built sheet next to render.ts; the repository serves it instead.
+    expect(builtinSheetDir()).toMatch(/src[/\\]ds-check[/\\]sheet[/\\]?$/u);
+    expect(resolveDsCheckSheet(DS_CHECK_BUILTIN_SHEET, { builtinDir: join(root, 'none') })).toEqual(
+      { kind: 'repository', app: findSheetApp(process.cwd()) }
+    );
+    // Neither: the requirement names the options.
+    expect(() =>
+      resolveDsCheckSheet(DS_CHECK_BUILTIN_SHEET, { builtinDir: join(root, 'none'), cwd: root })
+    ).toThrow(/built-in conformance sheet.*--sheet <page\.html>.*--url <page>/su);
+    // --sheet <page.html>: a built page, relative to cwd.
+    expect(
+      resolveDsCheckSheet(join('dist', 'ds-check', 'sheet', DS_CHECK_SHEET_PATH), { cwd: root })
+    ).toMatchObject({ kind: 'static', dir: packaged, builtin: false });
+    expect(() => resolveDsCheckSheet('secret.txt', { cwd: root })).toThrow(/not an HTML file/u);
+    expect(() => resolveDsCheckSheet('nope.html', { cwd: root })).toThrow(DsCheckRequirementError);
+
+    const server = await serveSheetDirectory(packaged);
+    try {
+      expect(server.url).toMatch(/^http:\/\/127\.0\.0\.1:\d+\/ds-conformance\.html$/u);
+      const page = await fetch(server.url);
+      expect(page.status).toBe(200);
+      expect(page.headers.get('content-type')).toMatch(/text\/html/u);
+      const script = await fetch(new URL('./assets/sheet.js', server.url));
+      expect([script.status, script.headers.get('content-type')]).toEqual([
+        200,
+        'text/javascript; charset=utf-8',
+      ]);
+      for (const path of ['/../secret.txt', '/%2e%2e/secret.txt', '/assets', '/missing.js'])
+        expect((await fetch(`${new URL(server.url).origin}${path}`)).status, path).toBe(404);
+      expect((await fetch(server.url, { method: 'POST' })).status).toBe(405);
+    } finally {
+      await server.close();
+    }
+  });
+
+  it('--render names the exact packages to install when Playwright or axe is missing (exit 2)', async () => {
+    const missing = (names: readonly string[]) => async (name: string) => {
+      if (names.includes(name)) throw new Error(`Cannot find module '${name}'`);
+      return name === DS_CHECK_AXE_PACKAGE
+        ? { default: class {} }
+        : { chromium: { launch: async () => ({}) } };
+    };
+    const both = [...DS_CHECK_PLAYWRIGHT_PACKAGES, DS_CHECK_AXE_PACKAGE];
+    await expect(loadRenderModules(missing(both))).rejects.toThrow(
+      /needs "playwright" and "@axe-core\/playwright", which are not installed.*npm install --save-dev playwright @axe-core\/playwright.*npx playwright install chromium/su
+    );
+    await expect(loadRenderModules(missing([DS_CHECK_AXE_PACKAGE]))).rejects.toThrow(
+      /needs "@axe-core\/playwright", which is not installed/u
+    );
+    await expect(loadRenderModules(missing(DS_CHECK_PLAYWRIGHT_PACKAGES))).rejects.toThrow(
+      /needs "playwright", which is not installed/u
+    );
+    // A caller that runs its own axe needs Playwright only.
+    await expect(
+      loadRenderModules(missing([DS_CHECK_AXE_PACKAGE]), { axe: false })
+    ).resolves.not.toHaveProperty('AxeBuilder');
+    // @playwright/test alone is enough.
+    await expect(loadRenderModules(missing(['playwright']))).resolves.toMatchObject({
+      chromium: expect.any(Object),
+    });
+
     const { err, io } = capture();
     const path = await file('minimal.json', await read('minimal.json'));
-    const result = await runDsCli(['check', path, '--render'], { ...io, cwd: outside });
+    const report = await checkDesignSystem(await read('minimal.json'));
+    await expect(renderDesignSystemCheck(report, { load: missing(both) })).rejects.toThrow(
+      DsCheckRequirementError
+    );
+    // The CLI resolves from the project (an empty folder here) before @texuli/tools itself.
+    const outside = await scratch();
+    const result = await runDsCli(['check', path, '--render', '--sheet', 'none.html'], {
+      ...io,
+      cwd: outside,
+    });
     expect(result.ok).toBe(false);
     expect(process.exitCode).toBe(2);
-    // Playwright is a dev dependency of this repository, so the sheet is what is missing here;
-    // without Playwright the message names Playwright instead (render.ts).
-    expect(err.join('')).toMatch(/needs a sheet page|needs Playwright/u);
-    expect(err.join('')).toContain('--url');
-    await expect(
-      renderDesignSystemCheck(await checkDesignSystem(await read('minimal.json')), { cwd: outside })
-    ).rejects.toThrow(/needs a sheet page|needs Playwright/u);
+    expect(err.join('')).toMatch(/not an HTML file|needs "playwright"/u);
   }, 30_000);
 });
 
