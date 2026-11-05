@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import Breadcrumb from '../src/components/navigation/Breadcrumb.svelte';
 import Stepper from '../src/components/stepper/Stepper.svelte';
 import { type StepperStep } from '../src/components/stepper/types.ts';
 import Tabs from '../src/components/tabs-accordion/Tabs.svelte';
@@ -29,6 +30,34 @@ describe('navigation', () => {
       expect(screen.getByRole('link', { name: 'Docs' }).getAttribute('href')).toContain(
         'example.com'
       );
+    });
+
+    it('names links by ariaLabel and calls onSelect, which may route client-side (D-G-032)', async () => {
+      const onSelect = vi.fn((_item: unknown, event: MouseEvent) => event.preventDefault());
+      render(Breadcrumb, {
+        props: {
+          items: [
+            { label: 'Home', href: 'https://example.com/' },
+            { label: 'Q3', ariaLabel: 'Q3 planning', href: '/q3', onSelect },
+            { label: 'Bad', href: 'javascript:alert(1)', onSelect },
+            { label: 'Notes' },
+          ],
+        },
+      });
+      const link = screen.getByRole('link', { name: 'Q3 planning' });
+      expect(link.getAttribute('href')).toBe('/q3');
+      expect(screen.getByRole('link', { name: 'Home' }).getAttribute('aria-label')).toBeNull();
+      // An unsafe href still renders no link.
+      expect(screen.queryByRole('link', { name: 'Bad' })).toBeNull();
+      const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+      link.dispatchEvent(event);
+      expect(onSelect).toHaveBeenCalledTimes(1);
+      expect(onSelect.mock.calls[0]?.[0]).toMatchObject({ label: 'Q3' });
+      expect(event.defaultPrevented).toBe(true);
+      // Without onSelect (or without preventDefault) the link navigates normally.
+      const plain = new MouseEvent('click', { bubbles: true, cancelable: true });
+      screen.getByRole('link', { name: 'Home' }).dispatchEvent(plain);
+      expect(plain.defaultPrevented).toBe(false);
     });
   });
 

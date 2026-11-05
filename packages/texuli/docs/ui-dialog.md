@@ -102,8 +102,46 @@ hotkey or `focus()`; Tab inside the dialog still cycles within the dialog.
 | `onCancel` | Called when cancel closes the dialog |
 | `confirmLabel` / `cancelLabel` | Action labels (translatable) |
 | `errorFallback` | Copy when a rejection has no message |
+| `confirmDisabled` | New in `0.14.0`. Disables the confirm action (native `disabled`, like `Button`'s `disabled`) while set, for example until a typed confirmation matches |
 
 AlertDialog does **not** close on outside pointer. Cancel is the default initial focus (safe choice). Confirm shows pending while `onConfirm` is in flight.
+
+### Typed confirmation
+
+Put the input in `children` and derive `confirmDisabled` from it. The
+dialog keeps `role="alertdialog"`, and Cancel stays the initial focus, as
+the APG alert dialog pattern recommends for a destructive action; Tab
+reaches the input next.
+
+```svelte
+<script lang="ts">
+  import { AlertDialog } from 'texuli/dialog';
+  import { Button } from 'texuli/button';
+  import { Input } from 'texuli/input';
+  let open = $state(false);
+  let typed = $state('');
+</script>
+
+<AlertDialog
+  bind:open
+  title="Delete project?"
+  description="Type DELETE to remove the Harbor Labs project."
+  confirmLabel="Delete"
+  destructive
+  confirmDisabled={typed !== 'DELETE'}
+  onOpenChange={(next) => {
+    if (!next) typed = '';
+  }}
+  onConfirm={async () => {
+    /* delete the project */
+  }}
+>
+  {#snippet trigger({ props })}
+    <Button {...props} variant="destructive">Delete project</Button>
+  {/snippet}
+  <Input bind:value={typed} aria-label="Type DELETE to confirm" autocomplete="off" />
+</AlertDialog>
+```
 
 ## Import
 

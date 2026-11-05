@@ -34,6 +34,11 @@ type OwnProps = {
   /** Styles the confirm action as destructive and shows a warning icon. */
   destructive?: boolean;
   /**
+   * Disables the confirm action while set, for example until a typed
+   * confirmation matches (new in `0.14.0`).
+   */
+  confirmDisabled?: boolean;
+  /**
    * May return a promise: the dialog shows pending on confirm and closes once
    * it resolves. On rejection the dialog stays open with an error message.
    */
@@ -94,6 +99,7 @@ let {
   confirmLabel: confirmLabelProp,
   cancelLabel: cancelLabelProp,
   destructive = false,
+  confirmDisabled = false,
   onConfirm,
   onCancel,
   trigger,
@@ -267,7 +273,7 @@ function cancel(): void {
         </AlertDialogPrimitive.Cancel>
         <AlertDialogPrimitive.Action
           class={confirmClass}
-          disabled={pending}
+          disabled={pending || confirmDisabled}
           aria-busy={pending || undefined}
           data-tx-alert-dialog-action=""
           data-loading={pending ? 'true' : undefined}
