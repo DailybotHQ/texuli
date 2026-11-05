@@ -56,6 +56,10 @@ Styled disclosure surfaces on owned primitives (`@texuli/primitives/tabs`,
   ]} />
   <section id="issues-view" aria-label="Issues">…</section>
   ```
+- An item's `attributes` (new in `0.14.0`) puts `data-*` attributes on its
+  tab trigger, such as a test hook:
+  `{ value: 'billing', label: 'Billing', attributes: { 'data-testid': 'tab-billing' } }`.
+  Only `data-*` keys are typed, and Texuli's own attributes win
 - Roving focus and activation come from the tabs primitive
 - `bind:ref` binds the root element; extra attributes (`id`, `aria-*`,
   `data-*`, handlers) land on it. `Accordion` and `Collapsible` do the same.

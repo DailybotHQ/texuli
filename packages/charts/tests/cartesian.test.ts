@@ -20,6 +20,7 @@ import {
   type CartesianSeries,
   createCartesianLayout,
   lineCoordinates,
+  resolveYDomain,
   windowCartesianSeries,
 } from '../src/cartesian/model.ts';
 import StackedBarChart from '../src/cartesian/StackedBarChart.svelte';
@@ -707,6 +708,114 @@ describe('Cartesian time x-axis (G97)', () => {
       expect((xs[2]! - xs[1]!) / (xs[1]! - xs[0]!), xKind).toBeCloseTo(9, 1);
       cleanup();
     }
+  });
+});
+
+describe('Cartesian fixed y domain and value format (D-G-049)', () => {
+  const percent: CartesianSeries[] = [
+    {
+      id: 'rate',
+      label: 'Rate',
+      points: [
+        { x: 'W1', y: 20 },
+        { x: 'W2', y: 150 },
+        { x: 'W3', y: 40 },
+      ],
+    },
+  ];
+  const yLabels = () =>
+    [...document.querySelectorAll('[data-chart-axis="y"] text')].map(
+      (text) => text.textContent?.trim() ?? ''
+    );
+
+  it('resolves each end from the host or the data, NaN-safe and always min < max', () => {
+    type End = number | 'auto' | undefined;
+    // [fixed min, fixed max, resolved min, resolved max] over data [10, 60].
+    const cases: [End, End, number, number][] = [
+      ['auto', 'auto', 10, 60],
+      [0, 100, 0, 100],
+      ['auto', 100, 10, 100],
+      [0, undefined, 0, 60],
+      [Number.NaN, Number.POSITIVE_INFINITY, 10, 60],
+      [100, 0, 0, 100],
+      [80, 'auto', 80, 88],
+      ['auto', 5, 4, 5],
+      [7, 7, 7, 8],
+    ];
+    expect(resolveYDomain([10, 60], undefined)).toEqual([10, 60]);
+    for (const [min, max, lo, hi] of cases) {
+      expect(resolveYDomain([10, 60], [min, max]), `${min} ${max}`).toEqual([lo, hi]);
+    }
+  });
+
+  it('pins the y axis, clips marks outside it, and formats y values on every surface', async () => {
+    for (const renderer of ['svg', 'canvas'] as const) {
+      const context = {
+        clearRect: vi.fn(),
+        setTransform: vi.fn(),
+        beginPath: vi.fn(),
+        moveTo: vi.fn(),
+        lineTo: vi.fn(),
+        stroke: vi.fn(),
+        fill: vi.fn(),
+        fillRect: vi.fn(),
+        closePath: vi.fn(),
+      } as unknown as CanvasRenderingContext2D;
+      const spy = vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(context);
+      render(LineChart, {
+        title: 'Weekly rate',
+        description: 'Rate by week.',
+        series: percent,
+        renderer,
+        yDomain: [0, 100],
+        formatValue: (value: number) => `${value}%`,
+      });
+      await waitForInteractiveChart(/Weekly rate/);
+      const labels = yLabels();
+      expect(labels[0], renderer).toBe('0%');
+      expect(labels.at(-1), renderer).toBe('100%');
+      expect(
+        labels.every((label) => label.endsWith('%')),
+        renderer
+      ).toBe(true);
+      if (renderer === 'svg') {
+        // 150 sits above the plot top: drawn unclamped, cut by the plot clip.
+        const line = document.querySelector('[data-line="rate"]');
+        const ys = [...(line?.getAttribute('d') ?? '').matchAll(/[ML]\s*[\d.]+[ ,]\s*(-?[\d.]+)/g)];
+        expect(Number(ys[1]?.[1])).toBeLessThan(18);
+        expect(line?.parentElement?.getAttribute('clip-path')).toMatch(/plot-clip/);
+      } else {
+        // The canvas layer is cut to the plot box (top margin 18 of 320).
+        await waitFor(() => expect(document.querySelector('canvas.marks')).toBeTruthy());
+        const layer = document.querySelector<HTMLElement>('.canvas-layer');
+        expect(layer?.getAttribute('style')).toMatch(/clip-path: inset\(5\.625% /);
+      }
+      const explorer = screen.getByRole('application', { name: /Weekly rate/ });
+      await fireEvent.focus(explorer);
+      await waitFor(() =>
+        expect(document.querySelector('[data-chart-live]')?.textContent).toContain(': 20%.')
+      );
+      expect(document.querySelector('[data-chart-tooltip]')?.textContent).toContain('20%');
+      await fireEvent.click(screen.getByRole('button', { name: 'Show data table' }));
+      const table = await screen.findByRole('table', { name: 'Weekly rate data' });
+      // The table keeps the true, out-of-domain value.
+      expect(table.textContent, renderer).toContain('150%');
+      spy.mockRestore();
+      cleanup();
+    }
+  }, 20_000);
+
+  it('keeps the nice data domain and plain numbers without the props', () => {
+    render(BarChart, {
+      title: 'Weekly rate',
+      description: 'Rate by week.',
+      series: percent,
+      interactive: false,
+    });
+    const labels = yLabels();
+    expect(labels[0]).toBe('0');
+    expect(labels.at(-1)).toBe('150');
+    expect(labels.some((label) => label.endsWith('%'))).toBe(false);
   });
 });
 

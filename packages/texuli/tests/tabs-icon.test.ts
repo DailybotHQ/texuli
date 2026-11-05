@@ -84,3 +84,29 @@ describe('Tabs without panels (D-G-041)', () => {
     expect(view.container.querySelector('[role="tabpanel"]')).toBeNull();
   });
 });
+
+// D-G-050: an item's `data-*` attributes reach its trigger (a test hook).
+
+describe('TabItem attributes (D-G-050)', () => {
+  afterEach(cleanup);
+
+  it('passes item data-* attributes to the trigger without overriding Texuli hooks', () => {
+    const view = render(Tabs, {
+      props: {
+        label: 'Settings',
+        items: [
+          {
+            value: 'billing',
+            label: 'Billing',
+            attributes: { 'data-testid': 'tab-billing', 'data-tx-tabs-trigger': 'host' },
+          },
+          { value: 'plain', label: 'Plain' },
+        ],
+      },
+    });
+    const billing = view.getByTestId('tab-billing');
+    expect(billing).toBe(view.getByRole('tab', { name: 'Billing' }));
+    expect(billing.getAttribute('data-tx-tabs-trigger')).toBe('');
+    expect(view.getByRole('tab', { name: 'Plain' }).hasAttribute('data-testid')).toBe(false);
+  });
+});
