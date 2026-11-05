@@ -1,5 +1,11 @@
 <script lang="ts">
-import { type Dependency, type TaskChange, TimelineView } from '@texuli/data/timeline';
+import {
+  type Dependency,
+  type TaskChange,
+  type TimelineBand,
+  type TimelineMarker,
+  TimelineView,
+} from '@texuli/data/timeline';
 
 interface DemoTask {
   id: string;
@@ -45,6 +51,20 @@ let tasks = $state<DemoTask[]>([
     group: 'Delivery',
   },
   {
+    id: 'pilot',
+    title: 'Pilot with two teams',
+    start: '2026-03-02',
+    end: '2026-03-05',
+    group: 'Rollout',
+  },
+  {
+    id: 'docs',
+    title: 'Publish help center',
+    start: '2026-03-06',
+    end: '2026-03-10',
+    group: 'Rollout',
+  },
+  {
     id: 'parking',
     title: 'Parking-lot idea',
     group: 'Backlog',
@@ -55,9 +75,34 @@ const dependencies: Dependency[] = [
   { from: 'brief', to: 'design', type: 'FS' },
   { from: 'design', to: 'build', type: 'FS' },
   { from: 'build', to: 'launch', type: 'FS' },
+  { from: 'launch', to: 'pilot', type: 'FS' },
+  { from: 'pilot', to: 'docs', type: 'FS' },
+];
+
+// Project bands: one phase per group, drawn on the group's header row.
+const bands: Record<string, TimelineBand> = {
+  Discovery: { start: '2026-02-02', end: '2026-02-13', label: 'Discovery phase', tone: 'info' },
+  Delivery: { start: '2026-02-16', end: '2026-03-02', label: 'Delivery phase', tone: 'success' },
+  Rollout: { start: '2026-03-02', end: '2026-03-10', label: 'Rollout phase', tone: 'neutral' },
+};
+const markers: TimelineMarker[] = [
+  { at: '2026-03-06', label: 'Review window ends', tone: 'warning' },
 ];
 
 let direction = $state<'ltr' | 'rtl'>('ltr');
+let collapsed = $state<string[]>(['rollout']);
+let selectedRow = $state<string | undefined>('design');
+let drafts = 0;
+
+function addTask(group: { label: string }): void {
+  drafts += 1;
+  // A draft has no dates yet, so it waits in the Unscheduled tray.
+  tasks = [
+    ...tasks,
+    { id: `draft-${drafts}`, title: `New ${group.label} task`, group: group.label },
+  ];
+  lastSave = `Added a draft to ${group.label}.`;
+}
 let lastSave = $state('No changes yet.');
 
 async function onReschedule(changes: readonly TaskChange[]): Promise<void> {
@@ -76,8 +121,9 @@ async function onReschedule(changes: readonly TaskChange[]): Promise<void> {
     <div>
       <h2 id="timeline-demo-title">Timeline and Gantt</h2>
       <p>
-        Fictional launch plan with dependencies, zoom, critical path and keyboard
-        rescheduling. Drag a bar or focus it and press Space, then arrows.
+        Fictional launch plan with phase bands, collapsible groups, a selected row, a
+        review-window marker, dependencies, zoom, critical path and keyboard rescheduling.
+        Drag a bar or focus it and press Space, then arrows.
       </p>
     </div>
     <label>
@@ -97,10 +143,19 @@ async function onReschedule(changes: readonly TaskChange[]): Promise<void> {
     getTitle={(task) => task.title}
     getProgress={(task) => task.progress}
     getGroup={(task) =>
-      task.group ? { id: task.group.toLowerCase(), label: task.group } : undefined}
+      task.group
+        ? { id: task.group.toLowerCase(), label: task.group, band: bands[task.group] }
+        : undefined}
+    {markers}
+    bind:collapsed
+    bind:selectedRow
+    onRowSelect={(task) => (lastSave = `Opened ${task.title} in the side panel.`)}
+    onGroupAdd={addTask}
     onReschedule={onReschedule}
   />
-  <p class="save" role="status">{lastSave}</p>
+  <p class="save" role="status">
+    {lastSave} Selected row: {tasks.find((task) => task.id === selectedRow)?.title ?? 'none'}.
+  </p>
 </section>
 
 <style>

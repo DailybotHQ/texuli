@@ -11,6 +11,7 @@ import {
   durationDays,
   type ScheduleTask,
   type TaskChange,
+  type TimelineGroup,
   type TimelineItem,
   timelineModel,
 } from '../engines/timeline/schedule.ts';
@@ -20,9 +21,11 @@ import {
   DEFAULT_TIMELINE_LABELS,
   dateOffset,
   HEADER_HEIGHT,
+  markerOffset,
   progressValue,
   ROW_HEIGHT,
   type TimelineLabels,
+  type TimelineMarker,
   type TimelineZoom,
   timelineRange,
   ZOOMS,
@@ -48,6 +51,12 @@ let {
   onRetry,
   getGroup,
   maxRows = 500,
+  collapsed = $bindable([]),
+  onCollapsedChange,
+  onGroupAdd,
+  selectedRow = $bindable(),
+  onRowSelect,
+  markers = [],
   labels: labelOverrides,
   class: className,
 }: {
@@ -67,8 +76,20 @@ let {
   onReschedule?: (changes: readonly TaskChange[]) => void | Promise<void>;
   onOpen?: (task: T) => void;
   onRetry?: () => void | Promise<void>;
-  getGroup?: (task: T) => { id: string; label: string } | undefined;
+  /** Groups rows under a disclosure header; a group's `band` spans that header. */
+  getGroup?: (task: T) => TimelineGroup | undefined;
   maxRows?: number;
+  /** Ids of collapsed groups; bind it or leave it uncontrolled. */
+  collapsed?: string[];
+  onCollapsedChange?: (collapsed: string[]) => void;
+  /** Shows an add action on every group header. */
+  onGroupAdd?: (group: TimelineGroup & { items: readonly T[] }) => void;
+  /** Id of the selected task; its row is highlighted and marked current. */
+  selectedRow?: string;
+  /** Makes rows selectable from the task list and the bar. */
+  onRowSelect?: (task: T) => void;
+  /** Vertical markers besides today, such as the end of a review window. */
+  markers?: readonly TimelineMarker[];
   /** Every user-facing string; defaults keep the original English copy. */
   labels?: Partial<TimelineLabels>;
   class?: ClassValue;
@@ -86,11 +107,37 @@ const today = $derived((now ?? new Date()).toISOString().slice(0, 10) as IsoDate
 let milestonesOnly = $state(false);
 const model = $derived(timelineModel(tasks, { getGroup, maxRows, milestonesOnly }));
 const visibleTasks = $derived(model.visible as (T & ScheduleTask)[]);
-const range = $derived(timelineRange(visibleTasks, today));
+type Group = (typeof model.groups)[number];
+type Row = { group: Group; task?: T & ScheduleTask };
+// With groups, every group opens with a header row; collapsed ones hide their tasks.
+const rows = $derived<Row[]>(
+  model.groups.flatMap((group) => [
+    ...(getGroup ? [{ group }] : []),
+    ...(collapsed.includes(group.id) ? [] : group.items.map((task) => ({ group, task }))),
+  ]) as Row[]
+);
+const rowIndex = $derived(new Map(rows.map((row, index) => [row.task?.id, index])));
+// Bands and valid markers widen the axis so they are never cut off.
+const range = $derived.by(() => {
+  const spans: ScheduleTask[] = [...visibleTasks];
+  for (const group of model.groups) if (group.band) spans.push({ id: '', ...group.band });
+  for (const marker of markers) {
+    const offset = markerOffset(marker.at, today);
+    if (!Number.isFinite(offset)) continue;
+    const day = addDays(today, Math.floor(offset));
+    spans.push({ id: '', start: day, end: day });
+  }
+  return timelineRange(spans, today);
+});
+const shownMarkers = $derived(
+  markers
+    .map((marker) => ({ ...marker, offset: markerOffset(marker.at, range.start) * width }))
+    .filter((marker) => Number.isFinite(marker.offset))
+);
 const width = $derived(DAY_WIDTH[zoom]);
 const totalDays = $derived(Math.max(1, daysBetween(range.start, range.end) + 1));
 const canvasWidth = $derived(totalDays * width);
-const axis = $derived(createAxis({ count: visibleTasks.length, size: ROW_HEIGHT }));
+const axis = $derived(createAxis({ count: rows.length, size: ROW_HEIGHT }));
 
 let scroller = $state<HTMLDivElement | undefined>();
 let scrollTop = $state(0);
@@ -133,6 +180,44 @@ const dayTicks = $derived.by(() => {
   return marks;
 });
 const todayOffset = $derived(dateOffset(today, range.start) * width);
+
+function rowKey(row: Row | undefined): string {
+  return row?.task ? `t:${row.task.id}` : `g:${row?.group.id}`;
+}
+
+function toggleGroup(id: string): void {
+  collapsed = collapsed.includes(id)
+    ? collapsed.filter((other) => other !== id)
+    : [...collapsed, id];
+  onCollapsedChange?.(collapsed);
+}
+
+function selectRow(task: T): void {
+  selectedRow = task.id;
+  onRowSelect?.(task);
+}
+
+/** The rendered task rows of a group, for its disclosure's `aria-controls`. */
+function controlled(group: Group): string | undefined {
+  const ids = visible.items
+    .filter((slot) => rows[slot.index]?.task && rows[slot.index]?.group === group)
+    .map((slot) => `${uid}-row-${slot.index}`);
+  return ids.join(' ') || undefined;
+}
+
+function spanStyle(start: IsoDate, end: IsoDate): string {
+  return `inset-inline-start:${dateOffset(start, range.start) * width}px;inline-size:${(daysBetween(start, end) + 1) * width}px`;
+}
+
+function formatWhen(at: IsoDate | Date): string {
+  return typeof at === 'string' && at.length === 10
+    ? formatDate(at)
+    : new Intl.DateTimeFormat(locale, {
+        dateStyle: 'long',
+        timeStyle: 'short',
+        timeZone: 'UTC',
+      }).format(new Date(at));
+}
 
 function scheduled(task: T & ScheduleTask): ScheduleTask {
   const change = previewById.get(task.id);
@@ -382,7 +467,7 @@ function tickWidth(): number {
           role="table"
           aria-label={labels.tasksTable(label)}
           aria-colcount="4"
-          aria-rowcount={visibleTasks.length + 1}
+          aria-rowcount={rows.length + 1}
         >
           <div class="table-head" role="row" aria-rowindex="1">
             <span role="columnheader">{labels.columns.task}</span>
@@ -391,31 +476,62 @@ function tickWidth(): number {
             <span role="columnheader">{labels.columns.duration}</span>
           </div>
           <div class="table-viewport" style:block-size="{Math.max(ROW_HEIGHT, viewportHeight)}px">
-            {#each visible.items as row (visibleTasks[row.index]?.id)}
-              {@const task = visibleTasks[row.index] as T & ScheduleTask}
-              {@const dates = scheduled(task)}
+            {#each visible.items as row (rowKey(rows[row.index]))}
+              {@const { group, task } = rows[row.index] as Row}
               <div
-                class="table-row"
+                class={['table-row', !task && 'group-row']}
                 role="row"
+                id="{uid}-row-{row.index}"
                 aria-rowindex={row.index + 2}
-                style:inset-block-start="{row.start - scrollTop}px"
-                style:block-size="{row.size}px"
-                data-task-row={task.id}
+                aria-current={task && selectedRow === task.id ? 'true' : undefined}
+                style="inset-block-start:{row.start - scrollTop}px;block-size:{row.size}px"
+                data-task-row={task?.id}
               >
+              {#if !task}
+                {@const open = !collapsed.includes(group.id)}
+                {@const name = group.label || labels.ungrouped}
+                  <span role="cell" aria-colspan="4">
+                    <button
+                      type="button"
+                      class="group-toggle"
+                      aria-expanded={open}
+                      aria-controls={open ? controlled(group) : undefined}
+                      onclick={() => toggleGroup(group.id)}
+                    >
+                      {name} <span class="group-count">{labels.groupCount(group.items.length)}</span>
+                    </button>
+                    {#if onGroupAdd}
+                      <button
+                        type="button"
+                        class="group-add"
+                        aria-label={labels.addToGroup(name)}
+                        onclick={() => onGroupAdd(group)}>{labels.add}</button
+                      >
+                    {/if}
+                  </span>
+              {:else}
+              {@const dates = scheduled(task)}
                 <span role="cell" class="task-name" title={getTitle(task)}>
-                  {#if getGroup}
-                    <span class="group-label">{getGroup(task)?.label}</span>
-                  {/if}
                   {#if critical.has(task.id)}
                     <span class="critical-mark" aria-label={labels.criticalPath}>●</span>
                   {/if}
-                  {getTitle(task)}
+                  {#if onRowSelect}
+                    <button
+                      type="button"
+                      class="row-select"
+                      aria-current={selectedRow === task.id ? 'true' : undefined}
+                      onclick={() => selectRow(task)}>{getTitle(task)}</button
+                    >
+                  {:else}
+                    {getTitle(task)}
+                  {/if}
                 </span>
                 <span role="cell">{dates.start}</span>
                 <span role="cell">{dates.end}</span>
                 <span role="cell"
                   >{labels.duration(durationDays(dates), task.milestone === true)}</span
                 >
+              {/if}
               </div>
             {/each}
           </div>
@@ -449,6 +565,18 @@ function tickWidth(): number {
                 <span class="today-chip" aria-hidden="true">{labels.todayLabel}</span>
               </div>
             {/if}
+            <!-- The line is the marker's border, so only its text reaches assistive tech. -->
+            {#each shownMarkers as marker, index (index)}
+              <div
+                class="marker"
+                data-timeline-marker
+                data-tone={marker.tone ?? 'neutral'}
+                style="inset-inline-start:{marker.offset}px"
+              >
+                <span aria-hidden="true">{marker.label}</span>
+                <span class="sr-only">{labels.marker(marker.label, formatWhen(marker.at))}</span>
+              </div>
+            {/each}
             <svg
               class="dependencies"
               aria-hidden="true"
@@ -469,8 +597,8 @@ function tickWidth(): number {
                 </marker>
               </defs>
               {#each dependencies as dependency (`${dependency.from}:${dependency.to}`)}
-                {@const fromIndex = visibleTasks.findIndex((task) => task.id === dependency.from)}
-                {@const toIndex = visibleTasks.findIndex((task) => task.id === dependency.to)}
+                {@const fromIndex = rowIndex.get(dependency.from) ?? -1}
+                {@const toIndex = rowIndex.get(dependency.to) ?? -1}
                 {@const fromTask = positionedTasks.find((task) => task.id === dependency.from)}
                 {@const toTask = positionedTasks.find((task) => task.id === dependency.to)}
                 {#if fromIndex >= visible.start && fromIndex < visible.end && toIndex >= visible.start && toIndex < visible.end && fromTask && toTask}
@@ -491,15 +619,33 @@ function tickWidth(): number {
                 {/if}
               {/each}
             </svg>
-            {#each visible.items as row (visibleTasks[row.index]?.id)}
-              {@const task = visibleTasks[row.index] as T & ScheduleTask}
+            {#each visible.items as row (rowKey(rows[row.index]))}
+              {@const { group, task } = rows[row.index] as Row}
+              <div
+                class={['bar-row', !task && 'group-row']}
+                data-bar-row={task?.id}
+                data-selected={task && selectedRow === task.id ? '' : undefined}
+                style="inset-block-start:{row.start + HEADER_HEIGHT}px;block-size:{row.size}px"
+              >
+              {#if !task}
+                  {#if group.band}
+                    {@const band = group.band}
+                    {@const bandLabel = band.label ?? group.label}
+                    <div
+                      class="band"
+                      data-band={group.id}
+                      data-tone={band.tone ?? 'primary'}
+                      style={spanStyle(band.start, band.end)}
+                    >
+                      <span aria-hidden="true">{bandLabel}</span>
+                      <span class="sr-only"
+                        >{labels.band(bandLabel, formatDate(band.start), formatDate(band.end))}</span
+                      >
+                    </div>
+                  {/if}
+              {:else}
               {@const change = previewById.get(task.id)}
               {@const shown = scheduled(task)}
-              <div
-                class="bar-row"
-                style:inset-block-start="{row.start + HEADER_HEIGHT}px"
-                style:block-size="{row.size}px"
-              >
                 <button
                   type="button"
                   class={cx(
@@ -513,13 +659,17 @@ function tickWidth(): number {
                   aria-roledescription={labels.reschedulableTask}
                   aria-busy={pending[task.id] ? 'true' : undefined}
                   aria-pressed={interaction?.id === task.id}
+                  aria-current={selectedRow === task.id ? 'true' : undefined}
                   disabled={!!pending[task.id]}
                   onpointerdown={(event) => begin(task, 'move', event)}
                   onpointermove={(event) => pointerTracker.move(event)}
                   onpointerup={(event) => pointerTracker.up(event)}
                   onpointercancel={(event) => pointerTracker.cancel(event)}
                   onkeydown={(event) => keyTask(task, event)}
-                  onclick={() => onOpen?.(task)}
+                  onclick={() => {
+                    if (onRowSelect) selectRow(task);
+                    onOpen?.(task);
+                  }}
                 >
                   <span class="progress" style:inline-size="{progressValue(getProgress(task))}%"
                   ></span>
@@ -545,6 +695,7 @@ function tickWidth(): number {
                     }}
                   ></span>
                 </button>
+              {/if}
               </div>
             {/each}
           </div>
@@ -672,9 +823,123 @@ function tickWidth(): number {
     font-size: 0.65rem;
     margin-inline-end: calc(var(--tx-space-unit) * 1.4);
   }
-  .group-label {
+  .group-row {
+    grid-template-columns: minmax(0, 1fr);
+    background: color-mix(in srgb, var(--tx-tl-line) 25%, var(--tx-tl-surface));
+  }
+  .group-row > span {
+    display: flex;
+    align-items: center;
+    gap: var(--tx-space-2);
+  }
+  .group-toggle,
+  .row-select {
+    border: 0;
+    background: none;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+  .group-toggle {
+    font-weight: 600;
+  }
+  .group-toggle::before {
+    content: '▾';
+    display: inline-block;
+    margin-inline-end: var(--tx-space-1);
+  }
+  .group-toggle[aria-expanded='false']::before {
+    rotate: -90deg;
+  }
+  .group-count {
     color: var(--tx-tl-muted);
-    margin-inline-end: calc(var(--tx-space-unit) * 1.4);
+    font-weight: 400;
+  }
+  .group-add {
+    margin-inline-start: auto;
+    font-size: inherit;
+    background: transparent;
+    border: var(--tx-border-width-thin) solid var(--tx-tl-line);
+    border-radius: var(--tx-shape-radius-md);
+    padding-inline: var(--tx-space-2);
+    color: inherit;
+    cursor: pointer;
+  }
+  .table-row[aria-current='true'],
+  .bar-row[data-selected] {
+    background: color-mix(in srgb, var(--tx-tl-accent) 12%, var(--tx-tl-surface));
+  }
+  /* A non-color cue that survives forced colors; the padding keeps text in place. */
+  .table-row[aria-current='true'] {
+    border-inline-start: var(--tx-border-width-thick) solid var(--tx-tl-accent);
+    padding-inline-start: calc(var(--tx-space-unit) * 2.6 - var(--tx-border-width-thick));
+  }
+  [data-tone] {
+    --tx-tl-tone: var(--tx-primary, Highlight);
+    --tx-tl-tone-fill: var(--tx-primary-soft, color-mix(in oklab, var(--tx-primary, Highlight) 12%, Canvas));
+    --tx-tl-tone-ink: var(--tx-primary-soft-body, var(--tx-tl-ink));
+  }
+  [data-tone='neutral'] {
+    --tx-tl-tone: var(--tx-muted-foreground, GrayText);
+    --tx-tl-tone-fill: var(--tx-muted, ButtonFace);
+    --tx-tl-tone-ink: var(--tx-tl-ink);
+  }
+  [data-tone='info'] {
+    --tx-tl-tone: var(--tx-info, Highlight);
+    --tx-tl-tone-fill: var(--tx-info-soft, color-mix(in oklab, var(--tx-info, Highlight) 12%, Canvas));
+    --tx-tl-tone-ink: var(--tx-info-soft-body, var(--tx-tl-ink));
+  }
+  [data-tone='success'] {
+    --tx-tl-tone: var(--tx-success, Highlight);
+    --tx-tl-tone-fill: var(--tx-success-soft, color-mix(in oklab, var(--tx-success, Highlight) 12%, Canvas));
+    --tx-tl-tone-ink: var(--tx-success-soft-body, var(--tx-tl-ink));
+  }
+  [data-tone='warning'] {
+    --tx-tl-tone: var(--tx-warning, Highlight);
+    --tx-tl-tone-fill: var(--tx-warning-soft, color-mix(in oklab, var(--tx-warning, Highlight) 12%, Canvas));
+    --tx-tl-tone-ink: var(--tx-warning-soft-body, var(--tx-tl-ink));
+  }
+  [data-tone='danger'] {
+    --tx-tl-tone: var(--tx-destructive, Mark);
+    --tx-tl-tone-fill: var(--tx-destructive-soft, color-mix(in oklab, var(--tx-destructive, Mark) 12%, Canvas));
+    --tx-tl-tone-ink: var(--tx-destructive-soft-body, var(--tx-tl-ink));
+  }
+  .band {
+    position: absolute;
+    inset-block: 9px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    padding-inline: var(--tx-space-2);
+    border-inline-start: var(--tx-border-width-thick) solid var(--tx-tl-tone);
+    border-radius: var(--tx-shape-radius-md);
+    background: var(--tx-tl-tone-fill);
+    color: var(--tx-tl-tone-ink);
+    font-size: 0.7rem;
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .marker {
+    position: absolute;
+    /* Below the sticky date head (HEADER_HEIGHT). */
+    inset-block: 48px 0;
+    z-index: 3;
+    border-inline-start: var(--tx-border-width-thick) dashed var(--tx-tl-tone);
+    pointer-events: none;
+  }
+  .marker > [aria-hidden] {
+    position: absolute;
+    inset-block-start: 1rem;
+    inset-inline-start: 0.15rem;
+    padding-inline: var(--tx-space-1);
+    border-radius: var(--tx-shape-radius-sm);
+    background: var(--tx-tl-surface);
+    color: var(--tx-tl-ink);
+    font-size: 0.62rem;
+    white-space: nowrap;
   }
   .canvas-scroll {
     min-inline-size: 0;
@@ -837,6 +1102,12 @@ function tickWidth(): number {
     .critical .progress {
       forced-color-adjust: none;
       background: CanvasText;
+    }
+    .table-row[aria-current='true'] {
+      border-inline-start-color: Highlight;
+    }
+    .band {
+      border: var(--tx-border-width-thin) solid CanvasText;
     }
   }
   .notice,

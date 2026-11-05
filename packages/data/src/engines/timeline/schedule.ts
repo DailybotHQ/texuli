@@ -33,9 +33,33 @@ export interface TimelineItem {
   milestone?: boolean;
 }
 
+/** Tones shared with the calendar's events. */
+export type TimelineTone = 'neutral' | 'primary' | 'info' | 'success' | 'warning' | 'danger';
+
+/** A labelled span on the time axis (a project or phase), inclusive. */
+export interface TimelineBand {
+  start: IsoDate;
+  end: IsoDate;
+  label?: string;
+  tone?: TimelineTone;
+}
+
+/** A row group; its optional `band` spans the group's header row. */
+export interface TimelineGroup {
+  id: string;
+  label: string;
+  band?: TimelineBand;
+}
+
 export interface TimelineModel<T extends TimelineItem> {
   unscheduled: T[];
   visible: T[];
+  /**
+   * The visible rows by group, in display order. A row without a group
+   * falls in the `all` group with an empty label. The first descriptor seen
+   * names a group; the first `band` seen draws it.
+   */
+  groups: (TimelineGroup & { items: T[] })[];
   truncatedCount: number;
   totalScheduled: number;
 }
@@ -48,7 +72,7 @@ export interface TimelineModel<T extends TimelineItem> {
 export function timelineModel<T extends TimelineItem>(
   items: readonly T[],
   options: {
-    getGroup?: (item: T) => { id: string; label: string } | undefined;
+    getGroup?: (item: T) => TimelineGroup | undefined;
     maxRows?: number;
     milestonesOnly?: boolean;
   } = {}
@@ -57,23 +81,37 @@ export function timelineModel<T extends TimelineItem>(
   if (!Number.isInteger(maxRows) || maxRows < 1)
     throw new RangeError('maxRows must be a positive integer');
   const unscheduled: T[] = [];
-  const groups = new Map<string, T[]>();
+  const groups = new Map<string, TimelineGroup & { items: T[] }>();
   for (const item of items) {
     if (!item.start || !item.end) {
       unscheduled.push(item);
       continue;
     }
     if (options.milestonesOnly && !item.milestone) continue;
-    const id = options.getGroup?.(item)?.id ?? 'all';
-    const group = groups.get(id) ?? [];
-    if (!groups.has(id)) groups.set(id, group);
-    group.push(item);
+    const descriptor = options.getGroup?.(item);
+    const id = descriptor?.id ?? 'all';
+    let group = groups.get(id);
+    if (!group) {
+      group = { id, label: descriptor?.label ?? '', items: [] };
+      groups.set(id, group);
+    }
+    if (!group.band && descriptor?.band) group.band = descriptor.band;
+    group.items.push(item);
   }
-  const ordered = [...groups.values()].flat();
+  const ordered = [...groups.values()].flatMap((group) => group.items);
   const visible = ordered.slice(0, maxRows);
+  // Truncation keeps whole groups in order, so trim each group to the cap.
+  let room = visible.length;
+  const shown: (TimelineGroup & { items: T[] })[] = [];
+  for (const group of groups.values()) {
+    if (room <= 0) break;
+    shown.push({ ...group, items: group.items.slice(0, room) });
+    room -= group.items.length;
+  }
   return {
     unscheduled,
     visible,
+    groups: shown,
     truncatedCount: ordered.length - visible.length,
     totalScheduled: ordered.length,
   };

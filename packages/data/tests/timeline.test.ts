@@ -197,3 +197,160 @@ describe('TimelineView', () => {
     }
   });
 });
+
+describe('TimelineView product features (D-G-033)', () => {
+  type GroupedTask = DemoTask & { team: string };
+  const grouped: GroupedTask[] = [
+    { ...(tasks[0] as DemoTask), team: 'Discovery' },
+    { ...(tasks[1] as DemoTask), team: 'Delivery' },
+    { ...(tasks[2] as DemoTask), team: 'Delivery' },
+  ];
+  // `render` cannot infer the view's generic, so the accessor takes the base item.
+  const getGroup = (task: TimelineItem) =>
+    (task as GroupedTask).team === 'Delivery'
+      ? {
+          id: 'delivery',
+          label: 'Delivery',
+          band: {
+            start: '2026-01-12',
+            end: '2026-01-26',
+            label: 'Pilot phase',
+            tone: 'info' as const,
+          },
+        }
+      : { id: 'discovery', label: 'Discovery' };
+  const base = {
+    tasks: grouped,
+    dependencies,
+    now: new Date('2026-01-15T12:00:00Z'),
+    label: 'Launch plan',
+    getGroup,
+  };
+
+  it('draws a group band on its header row with token tones and screen-reader dates', () => {
+    render(TimelineView, { props: base });
+    const band = document.querySelector('[data-band="delivery"]') as HTMLElement;
+    expect(band).toBeTruthy();
+    expect(band.getAttribute('data-tone')).toBe('info');
+    // week zoom: 16 px a day; the range starts 7 days before the first task (2026-01-05).
+    expect(band.style.getPropertyValue('inset-inline-start')).toBe(`${14 * 16}px`);
+    expect(band.style.getPropertyValue('inline-size')).toBe(`${15 * 16}px`);
+    expect(band.textContent).toContain('Pilot phase: January 12, 2026 to January 26, 2026');
+    expect(document.querySelector('[data-band="discovery"]')).toBeNull();
+  });
+
+  it('collapses groups through a disclosure button, controlled or not, and offers an add action', async () => {
+    const onCollapsedChange = vi.fn();
+    const onGroupAdd = vi.fn();
+    render(TimelineView, {
+      props: {
+        ...base,
+        onCollapsedChange,
+        onGroupAdd,
+        labels: { addToGroup: (g: string) => `New task in ${g}` },
+      },
+    });
+    const toggle = screen.getByRole('button', { name: /^Delivery/ });
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    const controls = toggle.getAttribute('aria-controls')?.split(' ') ?? [];
+    expect(controls.length).toBe(2);
+    for (const id of controls)
+      expect(document.getElementById(id)?.getAttribute('role')).toBe('row');
+    expect(document.querySelectorAll('[data-task-row]').length).toBe(3);
+
+    await fireEvent.click(toggle);
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(toggle.getAttribute('aria-controls')).toBeNull();
+    expect(onCollapsedChange).toHaveBeenLastCalledWith(['delivery']);
+    expect(document.querySelectorAll('[data-task-row]').length).toBe(1);
+    expect(document.querySelectorAll('.task-bar').length).toBe(1);
+    // The band stays on the collapsed header row.
+    expect(document.querySelector('[data-band="delivery"]')).toBeTruthy();
+
+    await fireEvent.click(screen.getByRole('button', { name: 'New task in Discovery' }));
+    expect(onGroupAdd).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'discovery', label: 'Discovery' })
+    );
+    cleanup();
+
+    // Controlled: a collapsed prop starts the group closed; without onGroupAdd there is no add action.
+    render(TimelineView, { props: { ...base, collapsed: ['discovery'] } });
+    expect(screen.getByRole('button', { name: /^Discovery/ }).getAttribute('aria-expanded')).toBe(
+      'false'
+    );
+    expect(screen.queryByRole('button', { name: /^Add to/ })).toBeNull();
+    expect(document.querySelector('[data-task-row="design"]')).toBeNull();
+  });
+
+  it('selects a row from the task list or the bar, highlights it and marks it current', async () => {
+    const onRowSelect = vi.fn();
+    render(TimelineView, { props: { ...base, selectedRow: 'design', onRowSelect } });
+    const current = () => [...document.querySelectorAll('[aria-current="true"]')];
+    expect(document.querySelector('[data-task-row="design"]')?.getAttribute('aria-current')).toBe(
+      'true'
+    );
+    expect(document.querySelector('[data-bar-row="design"]')?.hasAttribute('data-selected')).toBe(
+      true
+    );
+
+    await fireEvent.click(screen.getByRole('button', { name: 'Build prototype' }));
+    expect(onRowSelect).toHaveBeenLastCalledWith(expect.objectContaining({ id: 'build' }));
+    expect(document.querySelector('[data-task-row="design"]')?.hasAttribute('aria-current')).toBe(
+      false
+    );
+    // The row, its select button and its bar all report the selection.
+    expect(current().length).toBe(3);
+    expect(
+      current().every((node) => node.closest('[data-task-row="build"], [data-bar-row="build"]'))
+    ).toBe(true);
+
+    await fireEvent.click(screen.getByRole('button', { name: /^Ship milestone, / }));
+    expect(onRowSelect).toHaveBeenLastCalledWith(expect.objectContaining({ id: 'ship' }));
+    cleanup();
+
+    // Display only: without onRowSelect titles stay text, yet the selection still shows.
+    render(TimelineView, { props: { ...base, selectedRow: 'build' } });
+    expect(screen.queryByRole('button', { name: 'Build prototype' })).toBeNull();
+    expect(document.querySelector('[data-task-row="build"]')?.getAttribute('aria-current')).toBe(
+      'true'
+    );
+  });
+
+  it('draws markers at a date or an instant with accessible text and decorative lines', () => {
+    render(TimelineView, {
+      props: {
+        tasks,
+        now: new Date('2026-01-15T12:00:00Z'),
+        markers: [
+          { at: '2026-01-23', label: 'Review window ends', tone: 'warning' as const },
+          { at: new Date('2026-01-20T12:00:00Z'), label: 'Freeze' },
+          // Beyond the task range: the axis grows to include it.
+          { at: '2026-03-02', label: 'Retro' },
+        ],
+      },
+    });
+    const markers = [...document.querySelectorAll<HTMLElement>('[data-timeline-marker]')];
+    expect(markers.length).toBe(3);
+    const [review, freeze] = markers as [HTMLElement, HTMLElement];
+    expect(review.getAttribute('data-tone')).toBe('warning');
+    // Range starts 2025-12-29: 25 days to the 23rd, 22.5 to midday on the 20th.
+    expect(review.style.getPropertyValue('inset-inline-start')).toBe(`${25 * 16}px`);
+    expect(freeze.style.getPropertyValue('inset-inline-start')).toBe(`${22.5 * 16}px`);
+    // The line is a CSS border; the visible chip is hidden in favor of the full text.
+    expect(review.children.length).toBe(2);
+    expect(review.firstElementChild?.getAttribute('aria-hidden')).toBe('true');
+    expect(review.textContent).toContain('Review window ends, January 23, 2026');
+    expect(
+      document.querySelector('[data-timeline-marker] ~ [data-today-line], [data-today-line]')
+    ).toBeTruthy();
+    expect(document.querySelector('.canvas')?.getAttribute('style')).toMatch(
+      /inline-size: (\d+)px/
+    );
+    const width = Number(
+      /inline-size: (\d+)px/.exec(
+        document.querySelector('.canvas')?.getAttribute('style') ?? ''
+      )?.[1]
+    );
+    expect(width).toBeGreaterThan(63 * 16);
+  });
+});

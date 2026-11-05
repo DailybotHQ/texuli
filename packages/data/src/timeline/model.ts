@@ -1,5 +1,9 @@
 import { addDays, daysBetween, type IsoDate } from '../engines/calendar/dates.ts';
-import { durationDays, type ScheduleTask } from '../engines/timeline/schedule.ts';
+import {
+  durationDays,
+  type ScheduleTask,
+  type TimelineTone,
+} from '../engines/timeline/schedule.ts';
 
 export const ZOOMS = ['day', 'week', 'month', 'quarter'] as const;
 export type TimelineZoom = (typeof ZOOMS)[number];
@@ -43,6 +47,24 @@ export function timelineRange(
 /** Day offset of `date` from range `start` (0 = first day). */
 export function dateOffset(date: IsoDate, start: IsoDate): number {
   return daysBetween(start, date);
+}
+
+/**
+ * A vertical marker on the time axis, such as the end of a review window.
+ * `at` is a civil date (the start of that day) or an instant (a `Date` or an
+ * ISO date-time, placed at its UTC time of day).
+ */
+export interface TimelineMarker {
+  at: IsoDate | Date;
+  label: string;
+  tone?: TimelineTone;
+}
+
+/** Fractional day offset of a marker from range `start`; `NaN` when invalid. */
+export function markerOffset(at: IsoDate | Date, start: IsoDate): number {
+  const time =
+    typeof at === 'string' && at.length === 10 ? Date.parse(`${at}T00:00Z`) : +new Date(at);
+  return (time - Date.parse(`${start}T00:00Z`)) / 864e5;
 }
 
 export function dateAtOffset(start: IsoDate, offset: number): IsoDate {
@@ -108,6 +130,17 @@ export interface TimelineLabels {
   savingSuffix: string;
   /** The Duration cell; a milestone takes no days. */
   duration: (days: number, milestone: boolean) => string;
+  /** The header of rows without a group. */
+  ungrouped: string;
+  /** Visible task count on a group header ("2 tasks"). */
+  groupCount: (count: number) => string;
+  /** Visible text and accessible name of a group's add action. */
+  add: string;
+  addToGroup: (group: string) => string;
+  /** Screen-reader text of a band; dates arrive formatted for the locale. */
+  band: (label: string, start: string, end: string) => string;
+  /** Screen-reader text of a marker ("Review window ends, March 6, 2026"). */
+  marker: (label: string, when: string) => string;
 }
 
 export const DEFAULT_TIMELINE_LABELS: TimelineLabels = {
@@ -139,6 +172,12 @@ export const DEFAULT_TIMELINE_LABELS: TimelineLabels = {
   milestoneSuffix: 'milestone',
   savingSuffix: 'saving',
   duration: (days, milestone) => (milestone ? 'Milestone' : `${days} day${days === 1 ? '' : 's'}`),
+  ungrouped: 'Ungrouped',
+  groupCount: (count) => `${count} task${count === 1 ? '' : 's'}`,
+  add: 'Add',
+  addToGroup: (group) => `Add to ${group}`,
+  band: (label, start, end) => `${label}: ${start} to ${end}`,
+  marker: (label, when) => `${label}, ${when}`,
 };
 
 /**
