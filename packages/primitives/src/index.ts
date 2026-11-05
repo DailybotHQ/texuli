@@ -106,6 +106,7 @@ export {
 export {
   getI18nContext,
   PRIMITIVES_MESSAGES_EN,
+  type PrimitivesMessageId,
   setI18nContext,
   useMessages,
 } from './i18n/index.ts';
