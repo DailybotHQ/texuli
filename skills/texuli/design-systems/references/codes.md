@@ -18,7 +18,7 @@ document's rules or switch the trust level to get past one.
 | `extends-depth` | More than 4 hops of `extends` | Flatten the chain |
 | `url-refused` | A remote URL or scheme, `//`, `..`, SVG outside a relative path, a wrong media type, or any `data:` URL from an agent | A same-origin relative path such as `brand/logo.svg` |
 | `inline-bytes` | A `data:` URL over its cap (host documents only) | A relative path, or a smaller file |
-| `aa-text` | A text pair below the target (4.5:1 AA, 7:1 AAA), or a strong border or input below 3:1, that only pinned colors can fix | Remove the pin at the path (or one the hint names) so the solver can move it, or choose a darker or lighter pin |
+| `aa-text` | A text pair below the target (4.5:1 AA, 7:1 AAA), or a strong border or input below 3:1, that only pinned colors can fix; from spec 0.11.0 also a product token's on-color at `$.extensions.<name>.on.<mode>` | Remove the pin at the path (or one the hint names) so the solver can move it, or choose a darker or lighter pin; for a product token, drop that mode from `on` so the compiler derives it |
 | `aa-focus` | The focus ring below 3:1, or `focusWidth` under 2 | Unpin `ring`, or set `accessibility.focusWidth` to 2 or more |
 | `target-size` | A pinned component size below `accessibility.targetMin` | A size step at or above the target, or remove the pin |
 
