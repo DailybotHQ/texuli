@@ -54,7 +54,8 @@ uses the names like the built-ins:
   the one above it: its names win, the rest fall through.
 - **Built-ins win.** The built-in names (`ICON_NAMES`) keep their glyphs, so
   internal controls look the same under any registry.
-- **Unknown names** render nothing, as before.
+- **Unknown names** render nothing, unless the registry has a `fallback`
+  (below).
 - **Types.** Augment `IconNames` so `icon` autocompletes and checks the
   registered names (`IconName` is the built-in names plus these):
 
@@ -71,6 +72,47 @@ uses the names like the built-ins:
 
 The prop stays `icon` (no `name` alias). A registered icon's `<svg>` carries
 `data-tx-icon="<name>"`.
+
+## Lazy icons and a fallback
+
+New in `0.14.0`. A registered value can also be a loader, so a large icon set
+only downloads the glyphs a page draws. `fallback` (a built-in name or a
+glyph) is drawn for names the registry does not know, and for a lazy icon
+until it loads:
+
+```svelte
+<script lang="ts">
+  import { registerIcons } from 'texuli/icons';
+
+  registerIcons(
+    {
+      rocket: () => import('@lucide/svelte/icons/rocket'),
+      spark: () => Promise.resolve('M12 3v18M3 12h18'),
+    },
+    { fallback: 'info' }
+  );
+</script>
+```
+
+`<IconsProvider icons={…} fallback="info">` takes the same values.
+
+- **Loaders.** A loader takes no arguments and returns a promise of a module
+  whose default export is a glyph (what `import()` of a Lucide icon gives),
+  or of a glyph itself (`IconLoader`). It runs once per registry, the first
+  time an `Icon` asks for the name; every `Icon` with that name waits on the
+  same load and redraws when it lands.
+- **Until it loads** the `Icon` draws the fallback, or nothing without one.
+- **Errors.** A loader that rejects, throws or resolves to something that is
+  not a glyph is treated as missing: the fallback (or nothing) stays, and
+  nothing is thrown.
+- **SSR.** Nothing loads on the server: a lazy icon renders the fallback (or
+  nothing), and the first client render draws the same, so hydration
+  matches; the glyph replaces it once loaded.
+- **Nesting.** A nested registry's own glyphs win, then the ones above it;
+  the nearest `fallback` applies only when none of them has the name.
+- **Cost.** The loading and fallback logic ships with `registerIcons` and
+  `IconsProvider` in `texuli/icons`; the root `Icon` only reads the
+  registry, so apps that register nothing pay nothing.
 
 ## Optional Lucide bridge
 
