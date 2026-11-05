@@ -15,6 +15,16 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.3.19] — 2026-11-05
+
+### Changes
+
+- fix(texuli): keep the root barrel under the Protoyard ui ceiling
+- chore(skill): packages on npm at 0.13.1
+- fix(catalog): plan the CodeField manifest, and keep provider exclusions stable
+- docs(skill): code field recipe in build-ui, new in 0.13.1
+- docs(skill): build-ui recipes for icon names, dark images and grid avatars
+
 - The packages are on npm at `0.13.1`, an additive patch: `CodeField` in
   `@texuli/blocks/code-field`, `registerIcons` and `IconsProvider` in
   `texuli/icons`, `srcDark` and `darkMode` on `Image`, and
