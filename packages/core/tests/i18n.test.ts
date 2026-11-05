@@ -3,12 +3,17 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   CATALOG_LIMITS,
   createI18n,
+  createLabels,
   englishMessages,
   formatMessage,
   I18N_CONTEXT,
   interpolate,
   isPseudoLocalized,
+  type LabelDictionary,
+  layerI18n,
+  localizeLabels,
   type MessageCatalog,
+  mergeLabels,
   PSEUDO_LOCALE,
   parseCatalog,
   pseudoLocalize,
@@ -177,6 +182,72 @@ describe('core/i18n: runtime', () => {
     expect(isPseudoLocalized(out)).toBe(true);
     expect(out).toBe('⟦Rémóvé x⟧');
     expect(pseudoLocalize('Close {name}')).toBe('⟦Çlósé {name}⟧');
+  });
+});
+
+describe('core/i18n: label dictionaries (ADR-026)', () => {
+  const es: LabelDictionary<'texuli.dialog.close-label' | 'blocks.text.tones.info' | 'x.files'> = {
+    'texuli.dialog.close-label': 'Cerrar',
+    'blocks.text.tones.info': 'Información',
+    'x.files': { plural: 'count', one: '# archivo', other: '# archivos' },
+  };
+
+  it('merges left to right, skipping undefined dictionaries and values', () => {
+    const merged = mergeLabels(es, undefined, {
+      'texuli.dialog.close-label': 'Salir',
+      'x.files': undefined,
+    });
+    expect(merged['texuli.dialog.close-label']).toBe('Salir');
+    expect(merged['blocks.text.tones.info']).toBe('Información');
+    expect(Object.isFrozen(merged)).toBe(true);
+    expect(Object.getPrototypeOf(merged)).toBeNull();
+  });
+
+  it('builds a runtime that resolves the dictionary, then English, with the dictionary locale', () => {
+    const issues: unknown[] = [];
+    const i18n = createLabels({ ...es, 'bad id': 'x' } as LabelDictionary, {
+      locale: 'es',
+      onIssues: (_locale, found) => issues.push(...found),
+    });
+    expect(i18n.locale).toBe('es');
+    expect(i18n.t('texuli.dialog.close-label', 'Close')).toBe('Cerrar');
+    expect(i18n.t('texuli.toaster.label', 'Notifications')).toBe('Notifications');
+    expect(i18n.t('x.files', '', { count: 12000 })).toBe('12.000 archivos');
+    expect(issues).toHaveLength(1);
+    expect(createLabels(es, { locale: 'not a tag' }).locale).toBe('en');
+    expect(createLabels(undefined).t('a.b', 'Fallback')).toBe('Fallback');
+  });
+
+  it('layers an inner dictionary over an outer one: inner ids win, the rest fall through', () => {
+    const outer = createLabels(es, { locale: 'es' });
+    const inner = createLabels(
+      { 'texuli.dialog.close-label': 'Cerrar ventana' },
+      { locale: 'es', parent: outer }
+    );
+    expect(inner.t('texuli.dialog.close-label', 'Close')).toBe('Cerrar ventana');
+    expect(inner.t('blocks.text.tones.info', 'Info')).toBe('Información');
+    expect(inner.t('texuli.toaster.label', 'Notifications')).toBe('Notifications');
+    expect(inner.has('blocks.text.tones.info')).toBe(true);
+    const heard = vi.fn();
+    const off = inner.subscribe(heard);
+    outer.addCatalog({ locale: 'es', messages: { 'texuli.toaster.label': 'Notificaciones' } });
+    expect(heard).toHaveBeenCalledTimes(1);
+    expect(inner.t('texuli.toaster.label', 'Notifications')).toBe('Notificaciones');
+    off();
+    expect(layerI18n(outer, createI18n()).locale).toBe('es');
+  });
+
+  it('localizes nested label objects under prefix.key.subkey', () => {
+    const i18n = createLabels(es, { locale: 'es' });
+    const lookup = Object.assign(i18n.t, { has: i18n.has }) as Parameters<typeof localizeLabels>[0];
+    const labels = localizeLabels(lookup, 'blocks.text', {
+      invalid: 'This block could not be shown.',
+      tones: { info: 'Info', warning: 'Warning' },
+      sizes: ['a', 'b'],
+    });
+    expect(labels.tones).toEqual({ info: 'Información', warning: 'Warning' });
+    expect(labels.invalid).toBe('This block could not be shown.');
+    expect(labels.sizes).toEqual(['a', 'b']);
   });
 });
 
