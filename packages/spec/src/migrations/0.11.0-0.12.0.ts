@@ -1,3 +1,4 @@
+import { stampMigration } from './stamp.ts';
 import type { SpecMigration } from './types.ts';
 
 /**
@@ -9,8 +10,4 @@ import type { SpecMigration } from './types.ts';
  * envelope is unchanged, and every 0.11.0 blueprint and design-system
  * document stays valid, so the step only stamps `spec`.
  */
-export const migration0110to0120: SpecMigration = Object.freeze({
-  from: '0.11.0',
-  to: '0.12.0',
-  migrate: (envelope: Readonly<Record<string, unknown>>) => ({ ...envelope, spec: '0.12.0' }),
-});
+export const migration0110to0120: SpecMigration = stampMigration('0.11.0', '0.12.0');

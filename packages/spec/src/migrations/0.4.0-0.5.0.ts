@@ -1,3 +1,4 @@
+import { stampMigration } from './stamp.ts';
 import type { SpecMigration } from './types.ts';
 
 /**
@@ -6,8 +7,4 @@ import type { SpecMigration } from './types.ts';
  * ids and the app-tier time-field id. Every 0.4.0 envelope is a valid 0.5.0
  * envelope, so the step only stamps `spec`.
  */
-export const migration040to050: SpecMigration = Object.freeze({
-  from: '0.4.0',
-  to: '0.5.0',
-  migrate: (envelope: Readonly<Record<string, unknown>>) => ({ ...envelope, spec: '0.5.0' }),
-});
+export const migration040to050: SpecMigration = stampMigration('0.4.0', '0.5.0');
