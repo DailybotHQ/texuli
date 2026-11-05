@@ -25,10 +25,11 @@ export const navigationExamples = [
   defineExample({
     id: 'ui-navigation-states',
     title: 'Navigation states',
-    description: 'Collapsed breadcrumb, closed menu, blocked href and disabled pagination.',
+    description:
+      'Collapsed breadcrumb with an abbreviated crumb, closed menu, blocked href and disabled pagination.',
     tags: ['ui', 'navigation', 'states'],
     component,
-    props: ['maxItems', 'disabled'],
+    props: ['maxItems', 'ariaLabel', 'disabled'],
     load: () => import('./NavigationStatesDemo.svelte'),
   }),
   defineExample({

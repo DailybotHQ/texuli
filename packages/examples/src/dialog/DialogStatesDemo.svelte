@@ -1,14 +1,16 @@
 <script lang="ts">
 import { Button } from 'texuli/button';
 import { AlertDialog, Dialog } from 'texuli/dialog';
+import { Input } from 'texuli/input';
 
 let dialogOpen = $state(false);
 let alertOpen = $state(true);
+let typed = $state('');
 </script>
 
 <section data-example="ui-dialog-states" class="demo" aria-label="Dialog and alert states">
   <h2>Dialog and AlertDialog</h2>
-  <p>Closed dialog trigger beside an open destructive confirm.</p>
+  <p>Closed dialog trigger beside an open destructive confirm, held until DELETE is typed.</p>
   <div class="row">
     <Dialog
       bind:open={dialogOpen}
@@ -27,15 +29,17 @@ let alertOpen = $state(true);
     <AlertDialog
       bind:open={alertOpen}
       title="Delete project?"
-      description="This removes the Harbor Labs project from every member workspace."
+      description="Type DELETE to remove the Harbor Labs project from every member workspace."
       confirmLabel="Delete"
       cancelLabel="Keep project"
       destructive
+      confirmDisabled={typed !== 'DELETE'}
       onConfirm={() => undefined}
     >
       {#snippet trigger({ props })}
         <Button {...props} variant="destructive">Delete project</Button>
       {/snippet}
+      <Input bind:value={typed} aria-label="Type DELETE to confirm" autocomplete="off" />
     </AlertDialog>
   </div>
 </section>
