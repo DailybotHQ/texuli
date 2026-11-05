@@ -21,6 +21,7 @@ document's rules or switch the trust level to get past one.
 | `aa-text` | A text pair below the target (4.5:1 AA, 7:1 AAA), or a strong border or input below 3:1, that only pinned colors can fix; from spec 0.11.0 also a product token's on-color at `$.extensions.<name>.on.<mode>` | Remove the pin at the path (or one the hint names) so the solver can move it, or choose a darker or lighter pin; for a product token, drop that mode from `on` so the compiler derives it |
 | `aa-focus` | The focus ring below 3:1, or `focusWidth` under 2 | Unpin `ring`, or set `accessibility.focusWidth` to 2 or more |
 | `target-size` | A pinned component size below `accessibility.targetMin` | A size step at or above the target, or remove the pin |
+| `aa-non-text` | From spec 0.12.0 (`ds.validate`, `texuli ds check`): the sidebar's active fill below 3:1 on the sidebar, at `$.vars.<mode>["--tx-sidebar-primary"]`; the compiled `warnings` name the pinned path (and list `primary` on `background` below 3:1, advisory) | Remove `color.roles.<mode>.sidebarPrimary` so the compiler derives it, or pin a `sidebarPrimary` or `sidebar` that reaches 3:1 |
 
 Importers add `invalid-input` (not JSON or the wrong shape),
 `input-limit` (over 1 MiB, 50,000 values or 4096 × 4096 pixels) and, for
@@ -31,5 +32,5 @@ Importers add `invalid-input` (not JSON or the wrong shape),
 `.github/`, a `node_modules` segment or a `package.json` file).
 
 A typical repair takes two or three rounds: the spec's codes come first,
-and the guarantee codes (`aa-text`, `aa-focus`, `target-size`) appear once
+and the guarantee codes (`aa-text`, `aa-focus`, `target-size`, `aa-non-text`) appear once
 the document is well formed and compiles.

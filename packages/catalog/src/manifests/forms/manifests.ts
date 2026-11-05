@@ -4,6 +4,7 @@ import {
   buttonGroupPropNames,
   buttonPropNames,
   checkboxPropNames,
+  codeFieldPropNames,
   comboboxPropNames,
   descriptionPropNames,
   fieldErrorPropNames,
@@ -1005,11 +1006,44 @@ export const timeFieldManifest = /* @__PURE__ */ manifestData({
   related: ['field', 'input', 'form'],
 });
 
+export const codeFieldManifest = /* @__PURE__ */ manifestData({
+  id: 'code-field',
+  package: '@texuli/blocks',
+  label: 'CodeField',
+  summary: 'An editable, syntax-highlighted code textarea.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['Edit a snippet or query'],
+  dontUseWhen: ['Read-only code (use blocks-code)'],
+  a11y: 'A real textarea; Tab indents, Escape then Tab leaves.',
+  props: propsFrom(codeFieldPropNames, {
+    value: { kind: 'string', trust: 'untrusted' },
+    language: { kind: 'string', description: 'ts, python, yml…' },
+    label: { kind: 'string' },
+    labels: { kind: 'object' },
+    placeholder: { kind: 'string' },
+    name: { kind: 'string' },
+    readonly: { kind: 'boolean', default: false },
+    disabled: { kind: 'boolean', default: false },
+    rows: { kind: 'number', default: 4 },
+    wrap: { kind: 'boolean', default: false },
+    tabSize: { kind: 'number', default: 2 },
+    indentWith: { kind: 'enum', enumValues: ['spaces', 'tab'], default: 'spaces' },
+    lineNumbers: { kind: 'boolean', default: false },
+    highlightLimit: { kind: 'number' },
+    showKeyboardHint: { kind: 'boolean', default: false },
+    onValueChange: { kind: 'event' },
+    class: { kind: 'string' },
+  }),
+  examples: [{ id: 'sql', title: 'SQL', props: { language: 'sql', value: 'select 1;' } }],
+});
+
 /** Every form manifest in stable id order. */
 export const FORMS_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Object.freeze([
   buttonManifest,
   buttonGroupManifest,
   checkboxManifest,
+  codeFieldManifest,
   comboboxManifest,
   descriptionManifest,
   fieldManifest,

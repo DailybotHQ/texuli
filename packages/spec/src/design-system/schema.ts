@@ -39,7 +39,7 @@ const DESCRIPTIONS: Readonly<Record<string, string>> = {
   borderStep: 'A border width step.',
   elevationLevel: 'An elevation level.',
   shadowLayer:
-    'One shadow layer (px): offsets x and y, blur, spread, the opacity of the shadow role color and inset. Compiled to a concrete box-shadow; never a raw CSS string.',
+    'One shadow layer (px): offsets x and y, blur, spread, the opacity of the shadow role color, its dark-mode opacity (darkOpacity; omitted means opacity) and inset. Compiled to a concrete box-shadow; never a raw CSS string.',
   extension:
     'A product token: a fill per mode and an optional on-color per mode (an empty on derives both). Compiled to --tx-ext-<name> and --tx-ext-<name>-foreground; the pair is contrast-checked in both modes.',
   opacityStep: 'An opacity step.',
@@ -64,7 +64,7 @@ const DESCRIPTIONS: Readonly<Record<string, string>> = {
   variant:
     'A named variant (high-contrast, compact, seasonal): a closed partial document of sections, orthogonal to mode.',
   issueCode:
-    'Every stable design-system code; aa-text, aa-focus and target-size are raised by the compiler.',
+    'Every stable design-system code; aa-text, aa-focus, target-size and aa-non-text are raised by the compiler and its checks.',
   issue:
     'One design-system issue: a stable code, a JSON path from $, a message and an optional hint.',
 };

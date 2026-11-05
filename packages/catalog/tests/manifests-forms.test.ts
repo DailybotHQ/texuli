@@ -38,7 +38,8 @@ it('form manifests are a closed, frozen, app-tier set with schema parity, and co
   for (const manifest of FORMS_MANIFESTS) {
     expect(isCatalogManifest(manifest)).toBe(true);
     expect(Object.isFrozen(manifest)).toBe(true);
-    expect(manifest.package).toBe('texuli');
+    // CodeField (D-G-022) is the one form control that ships outside texuli.
+    expect(manifest.package).toBe(manifest.id === 'code-field' ? '@texuli/blocks' : 'texuli');
     expect(manifest.tier).toBe('app');
     expect(manifest.agentEmittable).toBe(false);
     expect(manifest.useWhen.length).toBeGreaterThan(0);

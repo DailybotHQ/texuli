@@ -116,6 +116,7 @@ export const STAGE_MAP: Readonly<Record<string, StageEntry>> = Object.freeze({
 
   // Display.
   alert: e('feedback', 'texuli/alert', 'Alert', 'md'),
+  'avatar-group-grid': e('badge', 'texuli/avatar', 'AvatarGroupGrid', 'sm'),
   badge: e('badge', 'texuli/badge', 'Badge', 'sm', { children: 'Shipped' }),
   banner: e('feedback', 'texuli/alert', 'Banner', 'md'),
   callout: e('feedback', 'texuli/alert', 'Callout', 'md'),
@@ -190,6 +191,7 @@ export const STAGE_MAP: Readonly<Record<string, StageEntry>> = Object.freeze({
   switch: e('choice', 'texuli/choice', 'Switch', 'sm'),
   'text-counter': e('field', 'texuli/input', 'TextCounter', 'sm'),
   textarea: e('field', 'texuli/input', 'Textarea', 'md'),
+  'code-field': e('field', '@texuli/blocks/code-field', 'CodeField', 'md'),
   'time-field': e('field', 'texuli/date', 'TimeField', 'sm'),
 
   // Layouts.

@@ -1,5 +1,5 @@
 {
-  "catalogHash": "1372c1dde6017747a7fd62bf309b2c30484effeae209585b46c97506b0a8842c",
+  "catalogHash": "e435634b3789f41681c482947be0b76698795a2eaf85ca5ddeedcc3d6a3c96c2",
   "components": [
     {
       "capability": "web-only",
@@ -286,6 +286,40 @@
         }
       ],
       "summary": "Desktop sidebar shell with mobile sheet drawer and main slot."
+    },
+    {
+      "capability": "web-only",
+      "emit": [],
+      "group": "display",
+      "id": "avatar-group-grid",
+      "label": "AvatarGroupGrid",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "array",
+          "name": "items",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "string",
+          "name": "overflowLabel"
+        },
+        {
+          "enumValues": ["xs", "sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        }
+      ],
+      "summary": "Up to four faces in one avatar circle, +N past four."
     },
     {
       "capability": "web-only",
@@ -2331,6 +2365,88 @@
         }
       ],
       "summary": "Inline or block code with escaped text (no HTML)."
+    },
+    {
+      "capability": "web-only",
+      "emit": [],
+      "group": "forms",
+      "id": "code-field",
+      "label": "CodeField",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "number",
+          "name": "highlightLimit"
+        },
+        {
+          "enumValues": ["spaces", "tab"],
+          "kind": "enum",
+          "name": "indentWith"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "kind": "string",
+          "name": "language"
+        },
+        {
+          "kind": "boolean",
+          "name": "lineNumbers"
+        },
+        {
+          "kind": "string",
+          "name": "name"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "kind": "string",
+          "name": "placeholder"
+        },
+        {
+          "kind": "boolean",
+          "name": "readonly"
+        },
+        {
+          "kind": "number",
+          "name": "rows"
+        },
+        {
+          "kind": "boolean",
+          "name": "showKeyboardHint"
+        },
+        {
+          "kind": "number",
+          "name": "tabSize"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        },
+        {
+          "kind": "boolean",
+          "name": "wrap"
+        }
+      ],
+      "summary": "An editable, syntax-highlighted code textarea."
     },
     {
       "capability": "web-only",
@@ -6261,6 +6377,11 @@
           "name": "class"
         },
         {
+          "enumValues": ["theme", "system"],
+          "kind": "enum",
+          "name": "darkMode"
+        },
+        {
           "enumValues": ["high", "low", "auto"],
           "kind": "enum",
           "name": "fetchPriority"
@@ -6328,6 +6449,10 @@
           "kind": "string",
           "name": "src",
           "required": true
+        },
+        {
+          "kind": "string",
+          "name": "srcDark"
         },
         {
           "kind": "string",

@@ -57,6 +57,7 @@ import {
   type DesignSystemMode,
   type DesignSystemPairResult,
   evaluateDesignSystemContrast,
+  evaluateDesignSystemIndicators,
   lengthPx,
   MIN_FOCUS_WIDTH,
   textMinimum,
@@ -73,7 +74,10 @@ import {
 // 2: spec 0.11.0 (a derived sidebarPrimary under a brand-filled sidebar, soft
 // fills held to a pinned ink, short categorical palettes, shadow levels and
 // product tokens).
-export const DESIGN_SYSTEM_COMPILER_VERSION = 2;
+// 3: spec 0.12.0 (sidebarPrimary derived whenever it is not role-pinned and
+// vanishes on the sidebar, also under a primary role pin, D-G-027; a layer's
+// darkOpacity, D-G-028; aa-non-text warnings, D-G-029).
+export const DESIGN_SYSTEM_COMPILER_VERSION = 3;
 
 export interface CompileDesignSystemOptions extends ResolveDesignSystemOptions {
   /** The modes to compile (one or both; an empty list is refused); defaults to `color.modes`, then light and dark. */
@@ -94,6 +98,10 @@ export interface DesignSystemAdjustment {
 export interface DesignSystemWarning {
   path: string;
   message: string;
+  /** A stable code when the warning is a finding (`aa-non-text`, spec 0.12.0). */
+  code?: 'aa-non-text';
+  /** The mode a finding was measured in. */
+  mode?: DesignSystemMode;
 }
 
 /** One `@font-face` to register, with a preload hint for same-origin files. */
@@ -338,19 +346,30 @@ function solveColors(
     pinned.set(role, `$.color.roles.${mode}.${role}`);
   }
 
-  // The sidebar's active fill copies the pinned primary unless that copy
-  // would equal the sidebar fill or miss 3:1 against it (a sidebar painted in
-  // the brand color): then it is derived, and the solver may still move it.
-  if (sidebarCopy !== undefined) {
+  // The sidebar's active fill (a copy of the pinned primary, or the generated
+  // one) is derived whenever it would equal the sidebar fill or miss 3:1
+  // against it (a sidebar painted in the brand color), along the primary's
+  // hue when the primary is pinned (a brand pin or a role pin, D-G-027); the
+  // solver may still move it. A role pin of sidebarPrimary itself never moves:
+  // the aa-non-text check reports it instead.
+  if (!Object.hasOwn(rolePins, 'sidebarPrimary')) {
     const sidebar = hexOf('sidebar');
-    const copy = hexOf('sidebarPrimary');
-    if (copy === sidebar || contrastRatio(copy, sidebar) < SIDEBAR_ACTIVE_MINIMUM) {
+    const active = hexOf('sidebarPrimary');
+    if (active === sidebar || contrastRatio(active, sidebar) < SIDEBAR_ACTIVE_MINIMUM) {
+      const primaryPath = pinned.get('primary');
       pinned.delete('sidebarPrimary');
       set(
         'sidebarPrimary',
-        sidebarActive(copy, sidebar, hexOf('primaryForeground'), minimum),
-        sidebarCopy,
-        'sidebar active fill: the pinned primary vanishes on the sidebar fill'
+        sidebarActive(
+          primaryPath ? hexOf('primary') : active,
+          sidebar,
+          hexOf('primaryForeground'),
+          minimum
+        ),
+        sidebarCopy ?? pinned.get('sidebar') ?? primaryPath ?? '$.color.brand.seed',
+        sidebarCopy !== undefined
+          ? 'sidebar active fill: the pinned primary vanishes on the sidebar fill'
+          : 'sidebar active fill: the primary vanishes on the sidebar fill'
       );
     }
   }
@@ -727,11 +746,13 @@ const alphaByte = (alpha: number) =>
 /**
  * `elevation.levels` for one mode: each level's layers as a concrete
  * `box-shadow` in the mode's shadow color (`--tx-shadow` without its alpha)
- * at each layer's opacity. Numbers only, so the value is always safe.
+ * at each layer's opacity (in dark mode its `darkOpacity` when set, D-G-028).
+ * Numbers only, so the value is always safe.
  */
 function elevationLevels(
   doc: Doc,
-  shadow: string
+  shadow: string,
+  mode: DesignSystemMode
 ): { name: `--tx-${string}`; value: string; path: string }[] {
   const levels = rec(rec(doc.elevation).levels);
   const rgb = shadow.slice(0, 7);
@@ -741,7 +762,11 @@ function elevationLevels(
       .map((layer) => {
         const n = (key: string) => (typeof layer[key] === 'number' ? (layer[key] as number) : 0);
         const parts = [px(n('x')), px(n('y')), px(n('blur')), px(n('spread'))].join(' ');
-        return `${layer.inset === true ? 'inset ' : ''}${parts} ${rgb}${alphaByte(n('opacity'))}`;
+        const alpha =
+          mode === 'dark' && typeof layer.darkOpacity === 'number'
+            ? layer.darkOpacity
+            : n('opacity');
+        return `${layer.inset === true ? 'inset ' : ''}${parts} ${rgb}${alphaByte(alpha)}`;
       })
       .join(', ');
     return {
@@ -863,7 +888,7 @@ export function compileDesignSystem(
       }
     }
     const shadow = parseDsColor(solved.vars['--tx-shadow'] ?? '')?.hex ?? '#000000';
-    for (const level of elevationLevels(doc, shadow)) {
+    for (const level of elevationLevels(doc, shadow, mode)) {
       draft[level.name] = level.value;
       sources[level.name] = level.path;
     }
@@ -987,6 +1012,18 @@ export function compileDesignSystem(
           : 'No pin is involved; report this document.',
         pairs: [pair],
         mode,
+      });
+    }
+    // Non-text indicators (WCAG 1.4.11, D-G-029) are findings, never
+    // refusals: checkDesignSystemIndicators (and texuli ds check) fails on
+    // the blocking ones.
+    for (const pair of evaluateDesignSystemIndicators(out)) {
+      if (pair.pass) continue;
+      warnings.push({
+        code: 'aa-non-text',
+        mode,
+        path: sources[pair.foreground] ?? sources[pair.background] ?? '$.color.brand.seed',
+        message: `${pair.foreground} on ${pair.background} is ${pair.ratio}:1 in ${mode}; ${pair.required}:1 is required${pair.blocking ? ' for a state indicator (WCAG 1.4.11)' : ' to see the fill (WCAG 1.4.11; advisory, since a filled button is also identified by its label)'}.`,
       });
     }
     if (mode === modes[0])

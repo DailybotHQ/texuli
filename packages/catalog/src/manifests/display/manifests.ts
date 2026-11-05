@@ -2,6 +2,7 @@ import { manifestData } from '../../manifest/data.ts';
 import type { CatalogManifest } from '../../manifest/types.ts';
 import {
   alertPropNames,
+  avatarGroupGridPropNames,
   badgePropNames,
   bannerPropNames,
   calloutPropNames,
@@ -598,6 +599,30 @@ export const timelineManifest = /* @__PURE__ */ manifestData({
   related: ['stepper'],
 });
 
+const avatarSizes = ['xs', 'sm', 'md', 'lg'] as const;
+
+export const avatarGroupGridManifest = /* @__PURE__ */ manifestData({
+  id: 'avatar-group-grid',
+  package: PKG,
+  label: 'AvatarGroupGrid',
+  summary: 'Up to four faces in one avatar circle, +N past four.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['A group chat shown as one avatar'],
+  dontUseWhen: ['A row of people (use AvatarGroup)'],
+  a11y: 'One image named by label or the member names.',
+  props: propsFrom(avatarGroupGridPropNames, {
+    items: { kind: 'array', required: true, description: '{ name, src?, srcset? }[]' },
+    size: { kind: 'enum', enumValues: avatarSizes, default: 'md' },
+    label: { kind: 'string', description: 'Accessible name' },
+    overflowLabel: { kind: 'string', default: '+{n}' },
+    class: { kind: 'string' },
+  }),
+  examples: [
+    { id: 'chat', title: 'Group chat', props: { items: [{ name: 'Ada' }, { name: 'Lin' }] } },
+  ],
+});
+
 export const kbdManifest = /* @__PURE__ */ manifestData({
   id: 'kbd',
   package: PKG,
@@ -702,6 +727,7 @@ export const codeManifest = /* @__PURE__ */ manifestData({
 /** Every display/feedback manifest in stable id order. */
 export const DISPLAY_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Object.freeze([
   alertManifest,
+  avatarGroupGridManifest,
   badgeManifest,
   bannerManifest,
   calloutManifest,
@@ -723,6 +749,7 @@ export const DISPLAY_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Obj
 /** Map of component id → expected prop names for type/schema parity tests. */
 export const DISPLAY_PROP_NAMES = /* @__PURE__ */ Object.freeze({
   alert: alertPropNames,
+  'avatar-group-grid': avatarGroupGridPropNames,
   badge: badgePropNames,
   banner: bannerPropNames,
   callout: calloutPropNames,

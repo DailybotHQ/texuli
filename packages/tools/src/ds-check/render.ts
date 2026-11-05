@@ -25,7 +25,10 @@ import { createRequire } from 'node:module';
 import type { AddressInfo } from 'node:net';
 import { basename, dirname, extname, join, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import type { CompiledDesignSystem } from '@texuli/tokens/design-system/compile';
+import {
+  type CompiledDesignSystem,
+  evaluateDesignSystemIndicators,
+} from '@texuli/tokens/design-system/compile';
 import { issueCodes } from './static.ts';
 import {
   DS_CHECK_GLOBAL,
@@ -206,7 +209,12 @@ export async function runDsRenderChecks(
     for (const mode of compiled.modes) {
       if (options.modes && !options.modes.includes(mode)) continue;
       await page.emulateMedia({ colorScheme: mode, reducedMotion: 'reduce' });
-      const pairs: DsInspectPair[] = (compiled.report.contrast[mode] ?? []).map((pair) => ({
+      // Every reported pair, and the blocking non-text indicators (D-G-029).
+      const vars = compiled.vars[mode] ?? {};
+      const pairs: DsInspectPair[] = [
+        ...(compiled.report.contrast[mode] ?? []),
+        ...evaluateDesignSystemIndicators(vars).filter((pair) => pair.blocking),
+      ].map((pair) => ({
         foreground: pair.foreground,
         background: pair.background,
         kind: pair.kind,

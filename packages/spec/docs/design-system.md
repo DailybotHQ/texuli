@@ -15,6 +15,10 @@
 > `elevation.levels`, `extensions` and a categorical palette of 1 to 8
 > colors. Every 0.10.0 document stays valid; `formatVersion` stays `1`.
 
+> **Spec 0.12.0 (new in `0.14.0`).** Additive: a shadow layer's optional
+> `darkOpacity` (0 to 1, its opacity in dark mode) and the `aa-non-text`
+> issue code. Every 0.11.0 document stays valid; `formatVersion` stays `1`.
+
 The end-to-end guide (author, validate, apply, distribute, outputs) is
 [DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md).
 
@@ -59,7 +63,7 @@ lengths are numbers in px, and nothing is raw CSS.
 | `color` | `brand` (`seed` required, `secondary`, `accent`, `neutral`), `pin` (exact brand colors), `roles.light` and `roles.dark` (the 50 semantic roles), `modes` (`light`, `dark`), `dataViz.light` and `dataViz.dark` (1 to 8 categorical, the compiler derives the rest; 9 sequential, 9 diverging, `grid`, `axis`) with `cvdSafe`, `status` |
 | `typography` | `families.{sans,heading,mono,serif}` (`stack` of 1 to 8 names, `files` of up to 8 `{ src, weight, style, display, preload }`), `scale` (`base` 12–24, `ratio` 1.05–1.618), `roles.{display,title,heading,body,label,caption,code}` |
 | `shape` · `space` | `radius` 0–48, `radiusScale` 0–4, `borderWidth` 0–4 · `base` 2–8, `density` 0.75–1.25 |
-| `elevation` · `surface` · `motion` | `style` (flat, soft, crisp, glow, layered) and `levels` (keys `1`–`5`, each 1 to 4 layers of `y` and `x` −64–64, `blur` 0–128, `spread` −64–64, `opacity` 0–1, `inset`; `y`, `blur` and `opacity` required) · `style` (solid, glass), `glass` (`alpha` 0–1, `blur` 0–64) · `personality` (none, subtle, standard, expressive), `durations` (0–2,000 ms), a named `easing` |
+| `elevation` · `surface` · `motion` | `style` (flat, soft, crisp, glow, layered) and `levels` (keys `1`–`5`, each 1 to 4 layers of `y` and `x` −64–64, `blur` 0–128, `spread` −64–64, `opacity` 0–1, `darkOpacity` 0–1 from spec 0.12.0, `inset`; `y`, `blur` and `opacity` required) · `style` (solid, glass), `glass` (`alpha` 0–1, `blur` 0–64) · `personality` (none, subtle, standard, expressive), `durations` (0–2,000 ms), a named `easing` |
 | `layout` · `icons` | `contentMax`, `wideMax`, `breakpoints`, `grid.columns` and `grid.gutter` per breakpoint · `style`, `stroke`, `size` |
 | `components` | Per component id (the token registry of `@texuli/tokens`, z-index left out, and the defaults vocabulary of `texuli`): each token key takes a value of its kind (a radius step, a space/control/icon/target step, a type role, a border step, an elevation level 0–5, an opacity step, a semantic role or a stroke width), and `defaults` takes `variant` and `size` |
 | `assets` | `logo.{light,dark,mark,wordmark}` and `favicon` |
@@ -108,6 +112,7 @@ of `@texuli/core` at the same trust.
 | `url-refused` | A remote URL or scheme, `//`, traversal, an SVG or wrong media type, any data URL at `untrusted` |
 | `inline-bytes` | A data URL over its cap, or over the 256 KiB total |
 | `aa-text`, `aa-focus`, `target-size` | Raised by the compiler in `@texuli/tokens` (from spec 0.11.0, `aa-text` also covers a product token's on-color, at `$.extensions.<name>.on.<mode>`) ([ADR-022](../../../docs/DECISIONS.md#adr-022-design-system-guarantees-enforced-never-reported)); never by the spec |
+| `aa-non-text` | From spec 0.12.0: a role fill below 3:1 against its container (WCAG 1.4.11), such as the sidebar's active fill on the sidebar. A warning in the compiler's report; raised by `checkDesignSystemIndicators` in `@texuli/tokens`, `texuli ds check` and `ds.validate`; never by the spec |
 
 Paths start at `$`; keys that are not identifiers are quoted
 (`$.components["icon-button"].radius`). Issues stop at `maxErrors`

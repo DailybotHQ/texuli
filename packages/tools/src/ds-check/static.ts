@@ -7,6 +7,7 @@
  */
 import {
   type CompiledDesignSystem,
+  checkDesignSystemIndicators,
   compileDesignSystem,
   type DesignSystemCompileIssue,
   loadLibraryBase,
@@ -131,9 +132,11 @@ export function issueCodes(issues: readonly DsCheckIssue[]): string[] {
 
 /**
  * Check a design-system document statically: the spec's validation, the
- * `extends` chain, the compile of the base and each variant, and the
+ * `extends` chain, the compile of the base and each variant, the
  * guarantees re-checked over the compiled variables (`aa-text`,
- * `aa-focus`, `target-size`). `ok` is false on any refusal.
+ * `aa-focus`, `target-size`), and the blocking non-text indicators
+ * (`aa-non-text`, such as the sidebar's active fill on the sidebar). `ok`
+ * is false on any refusal.
  */
 export async function checkDesignSystem(
   input: unknown,
@@ -187,9 +190,14 @@ export async function checkDesignSystem(
 
   // The guarantees, re-checked over what the compiler emitted: a compiled map
   // that passes compile but fails here is a compiler bug, and is refused too.
+  // Then the blocking non-text indicators (aa-non-text, WCAG 1.4.11): the
+  // compiler only warns about them, the check refuses them.
   for (const run of runs) {
     if (!run.compiled) continue;
-    for (const issue of checkDesignSystemGuarantees(run.compiled)) {
+    for (const issue of [
+      ...checkDesignSystemGuarantees(run.compiled),
+      ...checkDesignSystemIndicators(run.compiled),
+    ]) {
       errors.push(toIssue(issue, run.variant));
       run.ok = false;
     }

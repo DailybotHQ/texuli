@@ -79,7 +79,7 @@ describe('the design-system schema is generated and fresh', () => {
       ...DESIGN_SYSTEM_CODES,
       ...DESIGN_SYSTEM_COMPILER_CODES,
     ]);
-    expect(schema.$defs?.issueCode?.enum).toHaveLength(13);
+    expect(schema.$defs?.issueCode?.enum).toHaveLength(14);
     const ts = build.generated[`${TS_OUT}design-system.ts`] as string;
     const kt = build.generated[`${KOTLIN_OUT}DesignSystem.kt`] as string;
     expect(ts).toContain('export interface DesignSystem {');
@@ -223,6 +223,31 @@ describe('spec 0.11.0: elevation levels, product tokens and short categorical pa
     for (const [doc, issue] of invalid)
       expect(codes(validateDesignSystem(doc)), issue[1]).toEqual([issue]);
     expect(DESIGN_SYSTEM_LIMITS.extensions).toBe(32);
+  });
+});
+
+describe('spec 0.12.0: a shadow layer’s dark opacity and the aa-non-text code', () => {
+  it('accepts darkOpacity from 0 to 1 beside opacity, keeps 0.11.0 layers valid, and lists aa-non-text', () => {
+    const base = { ...minimal, color: { brand: { seed: '#4f46e5' } } };
+    const level = (layer: Record<string, unknown>) => ({
+      ...base,
+      elevation: { levels: { '2': [{ y: 4, blur: 12, opacity: 0.2, ...layer }] } },
+    });
+    for (const layer of [{}, { darkOpacity: 0 }, { darkOpacity: 0.55 }, { darkOpacity: 1 }]) {
+      const doc = level(layer);
+      expect(validateDesignSystem(doc), JSON.stringify(layer)).toEqual({ ok: true, errors: [] });
+      expect(validateInstance(schema, doc)).toEqual([]);
+    }
+    for (const [layer, code] of [
+      [{ darkOpacity: 1.01 }, 'invalid-value'],
+      [{ darkOpacity: -0.5 }, 'invalid-value'],
+      [{ darkOpacity: '0.5' }, 'invalid-type'],
+    ] as const)
+      expect(codes(validateDesignSystem(level(layer)))).toEqual([
+        [code, '$.elevation.levels["2"][0].darkOpacity'],
+      ]);
+    expect(DESIGN_SYSTEM_COMPILER_CODES).toContain('aa-non-text');
+    expect(schema.$defs?.issueCode?.enum).toContain('aa-non-text');
   });
 });
 

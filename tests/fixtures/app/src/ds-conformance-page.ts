@@ -19,7 +19,7 @@ import { DS_CHECK_COMPONENT_ATTRIBUTE, installDsCheckHost } from '@texuli/tools/
  * fixed library theme, so anything that reads a variable outside the scope
  * shows up as a color that does not follow the design system.
  *
- * App-tier components (overlays, navigation and app chrome: 93 of the 168
+ * App-tier components (overlays, navigation and app chrome: 95 of the 170
  * manifests) are not painted by the player and are not on this sheet.
  */
 

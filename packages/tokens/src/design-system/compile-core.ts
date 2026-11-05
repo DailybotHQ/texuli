@@ -31,17 +31,21 @@ export {
 export { fromTheme, fromThemeWithReport } from './from-theme-compiled.ts';
 export {
   checkDesignSystemGuarantees,
+  checkDesignSystemIndicators,
   DESIGN_SYSTEM_ATTRIBUTES,
+  DESIGN_SYSTEM_INDICATOR_PAIRS,
   DESIGN_SYSTEM_PAIRS,
   DESIGN_SYSTEM_TARGETS,
   type DesignSystemAttribute,
   type DesignSystemContrast,
   type DesignSystemGuaranteeInput,
+  type DesignSystemIndicatorResult,
   type DesignSystemMode,
   type DesignSystemPair,
   type DesignSystemPairResult,
   type DesignSystemTargets,
   evaluateDesignSystemContrast,
+  evaluateDesignSystemIndicators,
 } from './guarantees.ts';
 export { canonicalJson, sha256Hex } from './hash.ts';
 export {

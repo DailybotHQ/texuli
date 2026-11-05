@@ -140,12 +140,14 @@ export function extensionPairs(colors: Readonly<Record<string, string>>): Design
 /**
  * Every pair of {@link DESIGN_SYSTEM_PAIRS}, and every product token pair
  * ({@link extensionPairs}), present in `colors` (a `--tx-*` name to an
- * authored color). Translucent colors are composited over the pair's
- * background, and the background over `--tx-background`.
+ * authored color), or every pair of `pairs` when given. Translucent colors
+ * are composited over the pair's background, and the background over
+ * `--tx-background`.
  */
 export function evaluateDesignSystemContrast(
   colors: Readonly<Record<string, string>>,
-  contrast: DesignSystemContrast
+  contrast: DesignSystemContrast,
+  pairs: readonly DesignSystemPair[] = [...DESIGN_SYSTEM_PAIRS, ...extensionPairs(colors)]
 ): DesignSystemPairResult[] {
   const page = parseDsColor(colors['--tx-background'] ?? '')?.hex ?? '#ffffff';
   const solid = (name: string, under: string): string | undefined => {
@@ -153,7 +155,7 @@ export function evaluateDesignSystemContrast(
     return parsed ? composite(parsed, under) : undefined;
   };
   const results: DesignSystemPairResult[] = [];
-  for (const listed of [...DESIGN_SYSTEM_PAIRS, ...extensionPairs(colors)]) {
+  for (const listed of pairs) {
     const pair =
       listed.fallback !== undefined && colors[listed.foreground] === undefined
         ? { ...listed, foreground: listed.fallback }
@@ -232,5 +234,54 @@ export function checkDesignSystemGuarantees(
         });
     }
   }
+  return issues;
+}
+
+/**
+ * Role fills against the container they sit on (WCAG 1.4.11, 3:1; spec
+ * 0.12.0, D-G-029): the sidebar's active fill on the sidebar, which is the
+ * only sign of the current page, so it is `blocking`; and the primary fill on
+ * the page, which is advisory (a filled button is also identified by its
+ * label).
+ */
+export const DESIGN_SYSTEM_INDICATOR_PAIRS: readonly DesignSystemPair[] = [
+  { foreground: '--tx-sidebar-primary', background: '--tx-sidebar', kind: 'ui', states: false },
+  { foreground: '--tx-primary', background: '--tx-background', kind: 'ui', states: false },
+];
+
+/** One measured indicator pair, and whether it blocks. */
+export interface DesignSystemIndicatorResult extends DesignSystemPairResult {
+  blocking: boolean;
+}
+
+/** Every {@link DESIGN_SYSTEM_INDICATOR_PAIRS} pair present in `colors`, measured like the contrast pairs. */
+export function evaluateDesignSystemIndicators(
+  colors: Readonly<Record<string, string>>
+): DesignSystemIndicatorResult[] {
+  return evaluateDesignSystemContrast(colors, 'AA', DESIGN_SYSTEM_INDICATOR_PAIRS).map((pair) => ({
+    ...pair,
+    blocking: pair.background === '--tx-sidebar',
+  }));
+}
+
+/**
+ * The blocking indicators of a compiled (or cached) map below 3:1, per mode,
+ * as `aa-non-text` at `$.vars.<mode>["--tx-…"]`. The compiler never refuses
+ * them (a brand-filled sidebar can leave no 3:1 fill that keeps the primary
+ * ink readable); it lists every failing indicator in `report.warnings`, and
+ * `texuli ds check` fails on this list.
+ */
+export function checkDesignSystemIndicators(
+  input: Pick<DesignSystemGuaranteeInput, 'vars'>
+): DesignSystemIssue[] {
+  const issues: DesignSystemIssue[] = [];
+  for (const mode of ['light', 'dark'] as const)
+    for (const pair of evaluateDesignSystemIndicators(input.vars[mode] ?? {}))
+      if (pair.blocking && !pair.pass)
+        issues.push({
+          code: 'aa-non-text',
+          path: at(mode, pair.foreground),
+          message: `${pair.foreground} on ${pair.background} is ${pair.ratio}:1 in ${mode}; 3:1 is required.`,
+        });
   return issues;
 }

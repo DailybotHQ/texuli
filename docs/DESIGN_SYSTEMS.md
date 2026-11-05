@@ -169,6 +169,47 @@ packages carry spec `0.10.0`, which refuses them (`unknown-key`, or
   sidebar, or, when no lightness can, the one that stands out most. The
   change is in `report.adjustments`.
 
+### Spec 0.12.0: dark shadows and the sidebar's active fill
+
+New in `0.14.0`, which carries spec `0.12.0` (not published yet; the
+`0.13.x` packages carry spec `0.11.0`, which refuses `darkOpacity` as
+`unknown-key`). Every 0.11.0 document stays valid and compiles to the same
+variables.
+
+```json
+{
+  "elevation": {
+    "levels": {
+      "2": [
+        { "y": 2, "blur": 6, "opacity": 0.12, "darkOpacity": 0.48 },
+        { "y": 0, "blur": 1, "opacity": 0.08 }
+      ]
+    }
+  }
+}
+```
+
+- **Shadow alpha per mode** (D-G-028): a layer's optional `darkOpacity`
+  (0 to 1) is its opacity in dark mode; `opacity` stays the light one, and
+  the dark one when `darkOpacity` is absent. The compiled value is still a
+  concrete `box-shadow` of numbers (`0 2px 6px 0 #rrggbb7a` in dark).
+- **The sidebar's active fill under role pins** (D-G-027): `sidebarPrimary`
+  is derived whenever it would equal the sidebar fill or miss 3:1 against
+  it and the document does not pin `color.roles.<mode>.sidebarPrimary`
+  itself, whatever pinned the colors: `color.pin.primary`, or
+  `color.roles.<mode>.primary` and `color.roles.<mode>.sidebar` (before
+  0.14.0 only the brand pin was covered, so a primary role pin painted an
+  invisible active item). The derivation follows the primary's hue, as
+  above. A `sidebarPrimary` role pin never moves: it is reported instead.
+- **Non-text contrast** (D-G-029, `aa-non-text`): role fills against the
+  container they sit on, at 3:1 (WCAG 1.4.11): `sidebarPrimary` on
+  `sidebar` (the active item's only cue, so `texuli ds check` and
+  `ds.validate` refuse it) and `primary` on `background` (advisory: a
+  filled button is also identified by its label, so a light brand pin such
+  as a yellow primary stays valid). The compiler never refuses either one;
+  it lists each failing pair in `report.warnings` as
+  `{ code: "aa-non-text", mode, path, message }`, with the pinned path.
+
 ### From what you already have
 
 Every importer in `@texuli/tokens/design-system/import` is pure,
@@ -229,6 +270,7 @@ accepts capped ones.
 | `inline-bytes` | A `data:` URL over its cap (32 KiB per logo, 8 KiB favicon, 128 KiB per font) or over 256 KiB in total | Use a relative path, or a smaller file |
 | `aa-text` | A text pair below the target (4.5:1 AA, 7:1 AAA), or a strong border or input below 3:1, that only pins can fix; from spec 0.11.0 also a product token's on-color (`$.extensions.<name>.on.<mode>`) | Unpin one of the colors the hint names, or pick a darker or lighter pin; for a product token, leave that mode out of `on` so it is derived |
 | `aa-focus` | The focus ring below 3:1 against the page or surface, or `focusWidth` under 2 px | Unpin `ring` or widen the focus |
+| `aa-non-text` | From spec 0.12.0: the sidebar's active fill (`sidebarPrimary`) below 3:1 against the sidebar fill (WCAG 1.4.11), at `$.vars.<mode>["--tx-sidebar-primary"]`; raised by `texuli ds check` and `ds.validate` (`checkDesignSystemIndicators`), a warning in the compiler's report | Leave `color.roles.<mode>.sidebarPrimary` out so the compiler derives it, or pin a `sidebarPrimary` or `sidebar` that reaches 3:1 |
 | `target-size` | A pinned component size below `accessibility.targetMin` | Pick a size at or above the target |
 
 An agent repairs a refused document from the code and the path alone; the
@@ -376,6 +418,15 @@ every move in `report.adjustments`; it refuses only what pins make
 impossible. `checkDesignSystemGuarantees(compiled)` re-checks a cached
 compiled map without the compiler.
 
+From spec `0.12.0` (new in `0.14.0`), the sidebar's active fill is derived
+whenever it is not role-pinned and would vanish on the sidebar, and
+`checkDesignSystemIndicators(compiled)` (on
+`@texuli/tokens/design-system/compile` and `compile-core`) checks it at
+3:1 against the sidebar (`aa-non-text`). That check is not a compiler
+guarantee: when the pins leave no 3:1 fill that keeps the primary ink
+readable, the compile succeeds with an `aa-non-text` warning, and
+`texuli ds check` and `ds.validate` refuse it.
+
 ## Conformance
 
 ```bash
@@ -385,7 +436,8 @@ texuli ds check examples/design-systems/tumbletown.json --render   # paints the 
 
 `--render` paints every agent-emittable catalog component under the design
 system in headless chromium and checks axe, the painted contrast of every
-pair and colors that do not come from the design system. It paints the
+pair (from spec `0.12.0` also the sidebar's active fill on the sidebar)
+and colors that do not come from the design system. It paints the
 conformance sheet that ships inside `@texuli/tools`, so it runs in any
 project with `playwright` and `@axe-core/playwright` installed (the command
 names the packages when they are missing). In a CI job,

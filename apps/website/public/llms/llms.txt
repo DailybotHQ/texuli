@@ -92,6 +92,7 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [AlertDialog](components/alert-dialog.md): Modal confirm/cancel dialog for consequential actions.
 - [AnalyticsGrid](components/analytics-grid.md): Auto-fit KPI and widget grid for dashboard screens.
 - [AppNav](components/app-nav.md): Desktop sidebar shell with mobile sheet drawer and main slot.
+- [AvatarGroupGrid](components/avatar-group-grid.md): Up to four faces in one avatar circle, +N past four.
 - [Badge](components/badge.md): A compact status or category label.
 - [Banner](components/banner.md): Full-width notice across a page or app shell.
 - [Breadcrumb](components/breadcrumb.md): Hierarchy trail with URL-policy links.
@@ -102,6 +103,7 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [Checkbox](components/checkbox.md): A binary or indeterminate checkbox with optional label.
 - [Chip](components/chip.md): A toggleable filter chip (pressed state).
 - [Code](components/code.md): Inline or block code with escaped text (no HTML).
+- [CodeField](components/code-field.md): An editable, syntax-highlighted code textarea.
 - [Combobox](components/combobox.md): A text input that filters a list of options, for one value or several.
 - [CommandPalette](components/command-palette.md): Dialog-hosted command palette with search and recent items.
 - [ContentLayout](components/content-layout.md): Shared docs/blog/editorial reading frame with optional TOC.

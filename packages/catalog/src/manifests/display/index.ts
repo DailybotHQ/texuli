@@ -4,6 +4,7 @@
  */
 export {
   alertManifest,
+  avatarGroupGridManifest,
   badgeManifest,
   bannerManifest,
   calloutManifest,
@@ -25,6 +26,7 @@ export {
 } from './manifests.ts';
 export {
   alertPropNames,
+  avatarGroupGridPropNames,
   badgePropNames,
   bannerPropNames,
   calloutPropNames,

@@ -202,6 +202,38 @@
       "useWhen": ["Full app chrome with responsive navigation"]
     },
     {
+      "a11y": "One image named by label or the member names.",
+      "agentEmittable": false,
+      "dontUseWhen": ["A row of people (use AvatarGroup)"],
+      "emit": [],
+      "examples": [
+        {
+          "id": "chat",
+          "props": { "items": [{ "name": "Ada" }, { "name": "Lin" }] },
+          "title": "Group chat"
+        }
+      ],
+      "group": "display",
+      "id": "avatar-group-grid",
+      "label": "AvatarGroupGrid",
+      "package": "texuli",
+      "props": [
+        {
+          "description": "{ name, src?, srcset? }[]",
+          "kind": "array",
+          "name": "items",
+          "required": true
+        },
+        { "default": "md", "enumValues": ["xs", "sm", "md", "lg"], "kind": "enum", "name": "size" },
+        { "description": "Accessible name", "kind": "string", "name": "label" },
+        { "default": "+{n}", "kind": "string", "name": "overflowLabel" },
+        { "kind": "string", "name": "class" }
+      ],
+      "summary": "Up to four faces in one avatar circle, +N past four.",
+      "tier": "app",
+      "useWhen": ["A group chat shown as one avatar"]
+    },
+    {
       "a11y": [
         "Never convey meaning by color alone; pair with a word.",
         "In a catalog tree, set label (or put the word in an inline-text child)."
@@ -2190,6 +2222,46 @@
       "summary": "Inline or block code with escaped text (no HTML).",
       "tier": "app",
       "useWhen": ["Show a short code sample or token"]
+    },
+    {
+      "a11y": "A real textarea; Tab indents, Escape then Tab leaves.",
+      "agentEmittable": false,
+      "dontUseWhen": ["Read-only code (use blocks-code)"],
+      "emit": [],
+      "examples": [
+        { "id": "sql", "props": { "language": "sql", "value": "select 1;" }, "title": "SQL" }
+      ],
+      "group": "forms",
+      "id": "code-field",
+      "label": "CodeField",
+      "package": "@texuli/blocks",
+      "props": [
+        { "kind": "string", "name": "value", "trust": "untrusted" },
+        { "description": "ts, python, yml…", "kind": "string", "name": "language" },
+        { "kind": "string", "name": "label" },
+        { "kind": "object", "name": "labels" },
+        { "kind": "string", "name": "placeholder" },
+        { "kind": "string", "name": "name" },
+        { "default": false, "kind": "boolean", "name": "readonly" },
+        { "default": false, "kind": "boolean", "name": "disabled" },
+        { "default": 4, "kind": "number", "name": "rows" },
+        { "default": false, "kind": "boolean", "name": "wrap" },
+        { "default": 2, "kind": "number", "name": "tabSize" },
+        {
+          "default": "spaces",
+          "enumValues": ["spaces", "tab"],
+          "kind": "enum",
+          "name": "indentWith"
+        },
+        { "default": false, "kind": "boolean", "name": "lineNumbers" },
+        { "kind": "number", "name": "highlightLimit" },
+        { "default": false, "kind": "boolean", "name": "showKeyboardHint" },
+        { "kind": "event", "name": "onValueChange" },
+        { "kind": "string", "name": "class" }
+      ],
+      "summary": "An editable, syntax-highlighted code textarea.",
+      "tier": "app",
+      "useWhen": ["Edit a snippet or query"]
     },
     {
       "a11y": [
@@ -5816,6 +5888,13 @@
           "required": true,
           "trust": "untrusted"
         },
+        {
+          "description": "URL input is checked by the package URL policy.",
+          "kind": "string",
+          "name": "srcDark",
+          "trust": "untrusted"
+        },
+        { "enumValues": ["theme", "system"], "kind": "enum", "name": "darkMode" },
         { "kind": "string", "name": "srcset" },
         { "kind": "string", "name": "sizes" },
         { "kind": "array", "name": "widths" },
@@ -7581,6 +7660,7 @@
     ],
     "display": [
       "alert",
+      "avatar-group-grid",
       "badge",
       "banner",
       "callout",
@@ -7603,6 +7683,7 @@
       "button",
       "button-group",
       "checkbox",
+      "code-field",
       "combobox",
       "description",
       "field",

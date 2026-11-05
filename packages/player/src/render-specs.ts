@@ -1351,6 +1351,15 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
         required: true,
       },
       {
+        name: 'srcDark',
+        kind: 'string',
+      },
+      {
+        name: 'darkMode',
+        kind: 'enum',
+        enumValues: ['theme', 'system'],
+      },
+      {
         name: 'srcset',
         kind: 'string',
       },

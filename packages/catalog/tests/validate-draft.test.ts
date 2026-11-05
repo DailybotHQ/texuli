@@ -295,6 +295,24 @@ describe('validateDraft', () => {
         }).map((f) => `${f.path}: ${f.message}`);
         expect(refused).toEqual(['tree.props.srcDark: a URL the untrusted URL policy refuses']);
       }
+      // media-image lists srcDark and darkMode from spec 0.12.0 (D-G-023): a draft may set them
+      {
+        const image = (props: Record<string, unknown>) =>
+          validateDraft(
+            {
+              id: 'media-image',
+              props: { src: 'https://example.com/a.webp', alt: 'A harbor', ...props },
+            },
+            { catalog, frameRoots: false }
+          );
+        for (const darkMode of ['theme', 'system']) {
+          const result = image({ srcDark: 'https://example.com/a-dark.webp', darkMode });
+          expect(result.diagnostics, darkMode).toEqual([]);
+          expect(result.ok, darkMode).toBe(true);
+        }
+        expect(image({ darkMode: 'auto' }).ok).toBe(false);
+        expect(image({ srcDark: 'http://evil.example/d.webp' }).ok).toBe(false);
+      }
     });
   });
 

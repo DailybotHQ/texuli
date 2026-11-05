@@ -118,10 +118,11 @@ New in `0.13.1`. One image with a light and a dark source:
 - **Status.** The first image to load sets `loaded`. In `theme` mode, a load
   error on the image the theme hides is ignored.
 
-**Not in the agent catalog yet.** The `media-image` manifest does not list
-`srcDark` or `darkMode`: the catalog projection is normative for
-`@texuli/spec`, so agents get them with the next spec version. The catalog
-already polices a `srcDark` key at validation and paint time like `src`.
+**In the agent catalog from `0.14.0`.** The `media-image` manifest lists
+`srcDark` (untrusted tier, like `src`) and `darkMode` (`theme`, `system`)
+from spec `0.12.0` (new in `0.14.0`); the `0.13.x` catalog (spec `0.11.0`)
+does not. The catalog polices a `srcDark` key at validation and paint time
+like `src`, whatever tier the tree asks for.
 
 The `media-image-dark` example shows the page-theme pair, a forced dark
 scope and a forced light scope on the same page, and the `system` picture.
