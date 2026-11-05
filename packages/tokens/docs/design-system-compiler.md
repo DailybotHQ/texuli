@@ -52,7 +52,8 @@ if (compiled.ok) {
 | `loadLibraryBase('texuli:<id>')` | One library theme as a document whose `color.brand` is the theme's generator input |
 | `fromTheme(theme, { id?, version?, brand? })` · `fromThemeWithReport` | Any Texuli `Theme` as a valid document (see below); the report lists fields the closed vocabulary cannot carry |
 | `checkDesignSystemGuarantees(compiled)` | Re-checks a compiled (or cached) variable map: contrast pairs, focus width and targets, with `aa-text`, `aa-focus` and `target-size` and `$.vars.<mode>["--tx-…"]` paths. Also on `/validate` |
-| `evaluateDesignSystemContrast(vars, contrast)` | Every pair of `DESIGN_SYSTEM_PAIRS` with its ratio and requirement |
+| `evaluateDesignSystemContrast(vars, contrast, pairs?)` | Every pair of `DESIGN_SYSTEM_PAIRS` (or of `pairs`) with its ratio and requirement |
+| `checkDesignSystemIndicators(compiled)` · `evaluateDesignSystemIndicators(vars)` · `DESIGN_SYSTEM_INDICATOR_PAIRS` | New in `0.14.0` (spec 0.12.0, D-G-029): role fills against their container at 3:1 (WCAG 1.4.11): `--tx-sidebar-primary` on `--tx-sidebar` (`blocking`) and `--tx-primary` on `--tx-background` (advisory). The check returns an `aa-non-text` issue at `$.vars.<mode>["--tx-sidebar-primary"]` for each blocking pair below 3:1; `texuli ds check` and `ds.validate` refuse on it. On `compile` and `compile-core` only, so `/validate` stays within its size budget |
 | `DESIGN_SYSTEM_ATTRIBUTES` | The allowlist of `attrs` keys: `data-tx-ds`, `data-tx-ds-version`, `data-tx-ds-variant`, `data-tx-surface`, `data-tx-elevation`, `data-tx-focus-ring-style`, `data-tx-icon-style` |
 | `canonicalJson`, `sha256Hex` | The hash's canonical form (keys sorted at every depth) and a synchronous SHA-256 |
 
@@ -73,8 +74,8 @@ without the compiler or the color engine.
 | `assets` | `logo.{light,dark,mark,wordmark}` and `favicon`, as validated |
 | `defaults` | Component defaults (`{ button: { variant, size } }`) for `setDesignDefaults` |
 | `accessibility` | `{ contrast, targetMin }`: what the guarantees were held to |
-| `report` | `contrast[mode]` (every checked pair with its ratio), `adjustments` (mode, variable, from, to, the field that caused it, why), `warnings`, `inlineBytes` (decoded bytes of every `data:` font and asset) and `targets` |
-| `hash` | SHA-256 of the canonical resolved document, the variant, the modes, the trust level and `DESIGN_SYSTEM_COMPILER_VERSION`; key order never changes it |
+| `report` | `contrast[mode]` (every checked pair with its ratio), `adjustments` (mode, variable, from, to, the field that caused it, why), `warnings` (from spec 0.12.0, each failing non-text indicator is a warning `{ code: 'aa-non-text', mode, path, message }` with the pinned path), `inlineBytes` (decoded bytes of every `data:` font and asset) and `targets` |
+| `hash` | SHA-256 of the canonical resolved document, the variant, the modes, the trust level and `DESIGN_SYSTEM_COMPILER_VERSION` (3 from `0.14.0`, so every hash moves once even where the variables do not); key order never changes it |
 
 ## Resolution: `extends`, variants, patches
 
@@ -109,6 +110,13 @@ without the compiler or the color engine.
    along the primary's hue, at the nearest lightness that keeps the
    primary on-color at the text target and reaches 3:1 against the
    sidebar, or the most distinct one when none can; spec 0.11.0, D-G-015).
+   From spec 0.12.0 (new in `0.14.0`, D-G-027) the same derivation runs
+   whenever `sidebarPrimary` is not role-pinned and would vanish on the
+   sidebar, whatever pinned the colors (a `color.roles.<mode>.primary` and
+   `sidebar` pin of one color included), along the pinned primary's hue;
+   the adjustment's `path` names the sidebar pin (or the brand pin). A
+   `color.roles.<mode>.sidebarPrimary` pin is never moved; a failing one
+   is an `aa-non-text` warning.
    When a pin differs from the
    generated fill, the solver picks its on-color (white or near-black, then
    pure black) and re-derives its soft tint and ink around the pin's hue.
@@ -155,7 +163,7 @@ emitted as written.
 | `typography` | `--tx-font-sans`, `--tx-font-heading`, `--tx-font-mono` (names that are not CSS identifiers are double-quoted); the 13 `--tx-font-size-*` steps from `scale.ratio` and `scale.base`; role fields to `--tx-type-<role>-*`, except the anchors `body.weight`, `label.weight`, `heading.weight`, `display.weight`, `body.tracking` and `heading.tracking`, which set `--tx-font-weight-{body,medium,heading,bold}` and `--tx-letter-spacing-{body,heading}` |
 | `shape` | `--tx-radius` (px to rem), `--tx-radius-scale` and its steps, `--tx-border-width` |
 | `space` | `--tx-density`, `--tx-space-unit` and `--tx-space-1…12` (`base` × density) |
-| `elevation`, `surface` | `--tx-elevation-style`, the soft and float shadows and `--tx-elevation-0…5`; each `levels.<1–5>` replaces `--tx-elevation-<level>` with its layers as a concrete `box-shadow` (`[inset ]x y blur spread #rrggbbaa`, the mode's `shadow` role color at the layer's opacity; D-G-018); `--tx-surface-style`, `--tx-glass-opacity`, `--tx-glass-blur` |
+| `elevation`, `surface` | `--tx-elevation-style`, the soft and float shadows and `--tx-elevation-0…5`; each `levels.<1–5>` replaces `--tx-elevation-<level>` with its layers as a concrete `box-shadow` (`[inset ]x y blur spread #rrggbbaa`, the mode's `shadow` role color at the layer's opacity; D-G-018; in dark mode at its `darkOpacity` when the layer sets one, spec 0.12.0, D-G-028); `--tx-surface-style`, `--tx-glass-opacity`, `--tx-glass-blur` |
 | `motion` | `personality` picks a motion preset (none, subtle, standard, expressive) for `--tx-motion-fast/base/slow/slower` and `--tx-motion-easing`; `durations` and a named `easing` override it; the duration, easing and spring tokens follow (`none` makes them `0ms` and `linear`) |
 | `layout`, `icons` | Content and wide widths, breakpoints, grid columns and gutters; icon stroke, style and sizes |
 | `components` | Each set token becomes `--tx-<component>-<key>`, resolved through the system token it names (`radius: "full"` → `9999px`). A test sets every registry token to the step its default reads and checks the compiled value equals that default |
@@ -205,6 +213,7 @@ The spec's codes (`unknown-key`, `invalid-type`, `invalid-value`,
 | `aa-text` | A text pair below the target, or a strong border or input below 3:1, that only pins can fix; from spec 0.11.0 also a product token's on-color below the target (`$.extensions.<name>.on.<mode>`) |
 | `aa-focus` | The focus ring below 3:1 against the page or surface, or narrower than 2 px |
 | `target-size` | A pinned interactive size below `accessibility.targetMin` |
+| `aa-non-text` | From spec 0.12.0: never a compile refusal. A `report.warnings` entry for a role fill below 3:1 on its container (`sidebarPrimary` on `sidebar`, `primary` on `background`), and the code `checkDesignSystemIndicators` raises for the sidebar's active fill |
 
 ## Size and speed
 
