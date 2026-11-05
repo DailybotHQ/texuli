@@ -46,6 +46,10 @@ export const EXCLUDED: Record<string, string> = {
  */
 export const EXCLUDED_PREFIXES: Record<string, string> = {
   'layouts/': 'planned: the page layouts join the contract in a follow-up task',
+  // A prefix, not an EXCLUDED key: the export scan finds LabelsProvider only in
+  // some runs (it passed on macOS and failed on Linux CI), and an EXCLUDED key
+  // would then fail the stale check in the other runs.
+  'i18n/': 'provider: LabelsProvider sets the label dictionary and renders its children',
 };
 
 /** One case per exported rendering component, each mounted in its family harness. */

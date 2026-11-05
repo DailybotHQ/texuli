@@ -19,8 +19,8 @@
       "note": "@texuli/blocks/core holds every family parser plus the catalog metadata by contract (hosts that parse arbitrary documents use it); renderers no longer bundle it. Measured 20.88 KiB. PLAN_009 (2026-10-28, owner-consented release plan): 24576 -> 26176 B, measured + 4% after the new block field schemas (G21) and the linear-time Markdown parser that replaces the backtracking regexes; measured 25,166 B."
     },
     "@texuli/blocks/data/renderers": {
-      "gzip": 13632,
-      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 12,288 B + 4% headroom so platform drift does not flip it. PLAN_009 (2026-10-28, owner-consented release plan): 12800 -> 13632 B, measured + 4% after stat title, source and trend (G21); measured 13,052 B."
+      "gzip": 14208,
+      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 12,288 B + 4% headroom so platform drift does not flip it. PLAN_009 (2026-10-28, owner-consented release plan): 12800 -> 13632 B, measured + 4% after stat title, source and trend (G21); measured 13,052 B. 0.13.0 (owner-approved 2026-11-04): 13632 -> 14208 B, Linux CI measured + 4% (measured 13,654 B; macOS measures a few bytes less) for the label dictionary in context (ADR-026)."
     },
     "@texuli/blocks/formula": {
       "gzip": 3968,
@@ -657,8 +657,8 @@
       "note": "Styled component over the floating primitive(s) dialog, alert-dialog: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_009 (2026-10-28, owner-consented release plan): 17408 -> 18176 B, measured + 4% after the overlay layer stack and focus-exempt regions (G4), ref and rest props (G5) and handler composition (G26); measured 17,431 B in CI on Linux (16.99 KiB locally). PLAN_010 T-motion-adopt (ADR-013): 18176 -> 19968 B, measured + 4% rounded up to 64 B after the motion prop on Dialog and AlertDialog (texuli/motion seam; the runtime is a lazy chunk) over the primitive motion hooks; measured 19,155 B (17,699 B at HEAD). PLAN_011 T-scope-portals (ADR-023): 19968 -> 20928 B, measured + 4% rounded up to 64 B; measured 20,110 B (18.97 KiB at HEAD): the dialog portal follows the nearest token scope ([data-tx-scope]) through @texuli/core/portal createScopedPortal (scope resolution, a scoped portal root that mirrors the scope's data-tx-* attributes and inline variables through a MutationObserver), placed again before each open."
     },
     "texuli/layouts/content": {
-      "gzip": 13760,
-      "note": "PLAN_009 T-content-layout (G39): new public subpath for direct (declarative) ContentLayout use; the same component the docs/blog/editorial subpaths already load lazily (lazy gzip 12.23 KiB there) with the layout chrome and the TOC helpers. Measured 12,537 B gzip, 3.75 KiB CSS, cap = measured + 4% headroom. PLAN_010 T-targets (ADR-016): 13056 -> 13760 B at measured + 4% (measured 13,213 B): its navigation landmark names resolve through the @texuli/core/i18n message catalog (useMessages and the English-path formatter)."
+      "gzip": 14336,
+      "note": "PLAN_009 T-content-layout (G39): new public subpath for direct (declarative) ContentLayout use; the same component the docs/blog/editorial subpaths already load lazily (lazy gzip 12.23 KiB there) with the layout chrome and the TOC helpers. Measured 12,537 B gzip, 3.75 KiB CSS, cap = measured + 4% headroom. PLAN_010 T-targets (ADR-016): 13056 -> 13760 B at measured + 4% (measured 13,213 B): its navigation landmark names resolve through the @texuli/core/i18n message catalog (useMessages and the English-path formatter). 0.13.0 (owner-approved 2026-11-04): 13760 -> 14336 B, Linux CI measured + 4% (measured 13,764 B; macOS measures a few bytes less) for the label dictionary in context (ADR-026)."
     },
     "texuli/layouts/dashboard": {
       "gzip": 12800,
@@ -862,9 +862,9 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 14,156 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 16,236 B + 4% headroom; validation runs the spec 0.3.0 interaction checks and @texuli/spec/migrate. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 17,480 B + 4% headroom. PLAN_008 T-catalog-player (2026-10-28): validateDeckDraft and the deck v2 tree mapping joined this entry; measured 19,857 B gzip, cap = measured + 4% (was 18,240 B). PLAN_010 (2026-10-29, consented plan): 20652 -> 22016 B, measured + 4% after validateStreamNode (ADR-014) and the node motion check (ADR-013); measured 21,115 B. PLAN_010 T-doc-agents (consented plan): 22016 -> 23552 B, measured + 4% after the document check (host validator, borrowed catalog ids) and node keys (spec 0.7.0); measured 22,644 B. PLAN_010 0.8.0 integration (consented plan): 23552 -> 27072 B, measured + 4% after the spec 0.8.0 checks: the injected form check (checkForm and host validator names), the injected canvas check and the data-source binding check against the host's descriptors (@texuli/spec/source); measured 26,007 B. PLAN_011 T-ds-blueprint: 27072 -> 28480 (measured 27,337 B + 4%) for the design-system check on blueprint envelopes (ref grammar, closed shape, host checkDesignSystem hook)."
     },
     "@texuli/pages": {
-      "gzip": 102208,
+      "gzip": 106368,
       "cssGzip": 3648,
-      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the root barrel (editor + reader); measured 94,277 B, CSS 3,455 B. 0.11.5 (Protoyard G136): 98048 -> 102208 (CI Linux 98,219 B + 4%) for the validateDeck wrappers of @texuli/document/ops."
+      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the root barrel (editor + reader); measured 94,277 B, CSS 3,455 B. 0.11.5 (Protoyard G136): 98048 -> 102208 (CI Linux 98,219 B + 4%) for the validateDeck wrappers of @texuli/document/ops. 0.13.0 (owner-approved 2026-11-04): 102208 -> 106368 B, Linux CI measured + 4% (measured 102,249 B; macOS measures a few bytes less) for the label dictionary in context (ADR-026)."
     },
     "@texuli/pages/collab": {
       "gzip": 126080,
