@@ -61,10 +61,7 @@ type ComponentPropsById = {
   'charts-pie': ComponentProps<typeof PieChart>;
   'charts-sunburst': ComponentProps<typeof SunburstChart>;
   'charts-treemap': ComponentProps<typeof TreemapChart>;
-  // srcDark and darkMode (new in 0.13.1) are not in the catalog yet: the
-  // catalog projection is normative for @texuli/spec, so exposing them to
-  // agents waits for the next spec version.
-  'media-image': Omit<ComponentProps<typeof Image>, 'srcDark' | 'darkMode'>;
+  'media-image': ComponentProps<typeof Image>;
   'media-composition-svg': ComponentProps<typeof CompositionSvg>;
   'media-composition-canvas': ComponentProps<typeof CompositionCanvas>;
 };

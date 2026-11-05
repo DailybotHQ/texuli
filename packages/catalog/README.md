@@ -145,6 +145,21 @@ grammar and renderer APIs. Import subpaths to keep bundles narrow.
   paint time, and list item text refuses control, bidirectional and
   invisible formatting characters.
 
+## New in 0.14.0
+
+In development (spec `0.12.0`, not published yet):
+
+- Two app-tier manifests, neither agent-emittable: `avatar-group-grid` in
+  `@texuli/catalog/manifests/display` (texuli's `AvatarGroupGrid`,
+  D-G-024; `Avatar` and `AvatarGroup` stay planned), and `code-field` in
+  `@texuli/catalog/manifests/forms` (`CodeField` from
+  `@texuli/blocks/code-field`, D-G-022). The catalog has 170 ids, 75 of
+  them agent-emittable.
+- `media-image` lists `srcDark` (the dark-mode image: an image URL at the
+  untrusted tier, like `src`) and `darkMode` (`theme` or `system`,
+  D-G-023). The sink scan, the paint pass and the hostile harden pass
+  already police `srcDark` as an image URL at every tier.
+
 ## New in 0.8.0
 
 Ships in `0.8.0`; the `0.7.0` release predates it:

@@ -456,7 +456,8 @@ describe('inspector: choice', () => {
         // PLAN_009: the cohort table, notification inbox and filter builder add 8 (5 booleans).
         // PLAN_010 (spec 0.8.0): the dashboard adds density, gap, editable and compaction (1 boolean).
         // PLAN_011 T-gaps-96-98 (G97): the six cartesian chart ids add their xKind enum.
-        expect(CHOICE_PROPS.length).toBe(75);
+        // Spec 0.12.0 (0.14.0): media-image adds its darkMode enum (D-G-023).
+        expect(CHOICE_PROPS.length).toBe(76);
         expect(CHOICE_PROPS.filter((entry) => entry.prop.kind === 'boolean')).toHaveLength(17);
         const ids = new Set(CHOICE_PROPS.map((entry) => `${entry.id}.${entry.prop.name}`));
         for (const name of [

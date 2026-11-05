@@ -120,6 +120,15 @@ export const timelinePropNames = [
 
 export const kbdPropNames = ['label', 'class', 'children'] as const;
 
+/** `texuli/avatar` AvatarGroupGrid (D-G-024); new in 0.14.0 (spec 0.12.0). */
+export const avatarGroupGridPropNames = [
+  'items',
+  'size',
+  'label',
+  'overflowLabel',
+  'class',
+] as const;
+
 export const codePropNames = ['value', 'variant', 'language', 'class'] as const;
 
 /**

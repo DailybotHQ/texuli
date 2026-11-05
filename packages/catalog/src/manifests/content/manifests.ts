@@ -153,6 +153,7 @@ const ENUMS: Partial<Record<ContentManifestId, Record<string, readonly string[]>
   'charts-heatmap': { mode: ['light', 'dark'] },
   'charts-scatter': { mode: ['light', 'dark'] },
   'media-image': {
+    darkMode: ['theme', 'system'],
     fit: ['cover', 'contain', 'fill', 'none', 'scale-down'],
     loading: ['eager', 'lazy'],
     fetchPriority: ['high', 'low', 'auto'],
@@ -240,7 +241,7 @@ function propSchemas(id: ContentManifestId): CatalogManifest['props'] {
             trust: 'untrusted' as const,
           }
         : {}),
-      ...(name === 'src' || name === 'href'
+      ...(name === 'src' || name === 'href' || name === 'srcDark'
         ? {
             description: 'URL input is checked by the package URL policy.',
             trust: 'untrusted' as const,

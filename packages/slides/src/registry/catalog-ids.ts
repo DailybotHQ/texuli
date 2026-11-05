@@ -180,6 +180,7 @@ export const SLIDE_EXCLUDED_GROUPS: Readonly<
       'Developer-tier styled components with no player painter; slides paint the same content through the blocks families (callout, table, stat, code, timeline…).',
     ids: [
       'alert',
+      'avatar-group-grid',
       'badge',
       'banner',
       'callout',
@@ -264,6 +265,7 @@ export const SLIDE_EXCLUDED_GROUPS: Readonly<
       'button',
       'button-group',
       'checkbox',
+      'code-field',
       'combobox',
       'description',
       'field',

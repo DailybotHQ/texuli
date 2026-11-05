@@ -203,6 +203,8 @@ export const CONTENT_PROP_NAMES = {
   'charts-treemap': ['title', 'description', 'root', 'labels', 'width', 'height', 'padding'],
   'media-image': [
     'src',
+    'srcDark',
+    'darkMode',
     'srcset',
     'sizes',
     'widths',

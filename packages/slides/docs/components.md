@@ -87,10 +87,10 @@ for:
 
 | Group | Reason |
 | --- | --- |
-| `display` (17 ids: `alert`, `badge`, `callout`, `card`, `kpi`, `stat`, `table`, `timeline`, …) | Developer-tier styled components; slides paint the same content through the blocks families |
+| `display` (18 ids: `alert`, `badge`, `callout`, `card`, `kpi`, `stat`, `table`, `timeline`, …) | Developer-tier styled components; slides paint the same content through the blocks families |
 | `overlays` (26 ids: `dialog`, `drawer`, `popover`, `tooltip`, `command-palette`, …) | Overlays and app navigation need a focus trap, a portal and an Escape lifecycle owned by the host app |
 | `layouts` (21 ids: `layout-dashboard-grid`, `layout-sidebar`, `layout-wizard`, …) | Application shells and route hosts own routing and page chrome, which a slide never does |
-| `forms` (29 ids: `button`, `input`, `select`, `checkbox`, …) | Developer-tier form primitives with callbacks; slides use the `control-*` and `form-*` components |
+| `forms` (30 ids: `button`, `input`, `select`, `checkbox`, …) | Developer-tier form primitives with callbacks; slides use the `control-*` and `form-*` components |
 
 An excluded id fails deck validation with `component-excluded`, whose
 message carries the reason and whose fix points to a slide layout, a master
