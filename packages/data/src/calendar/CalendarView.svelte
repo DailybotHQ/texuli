@@ -2,7 +2,7 @@
 import { lazyChunk } from '@texuli/core/lazy';
 import { createPointerTracker } from '@texuli/drag/gesture';
 import { applyModifiers, snapToGrid } from '@texuli/drag/modifiers';
-import { type Component, tick } from 'svelte';
+import { type Component, type Snippet, tick } from 'svelte';
 import { type ClassValue } from 'texuli/cx';
 import {
   addDays,
@@ -39,7 +39,13 @@ import {
 } from '../engines/calendar/index.ts';
 import type { MoveMenuRequest } from './CalendarMoveMenu.svelte';
 import { describeWhen, formatCalendar } from './model.ts';
-import type { CalendarChange, CalendarItem, CalendarLabels, CalendarTone } from './types.ts';
+import type {
+  CalendarChange,
+  CalendarEventContext,
+  CalendarItem,
+  CalendarLabels,
+  CalendarTone,
+} from './types.ts';
 import { DEFAULT_CALENDAR_LABELS } from './types.ts';
 
 type CalendarProps<T> = {
@@ -95,6 +101,24 @@ type CalendarProps<T> = {
    * line is not in range; with it in range they open just above the line.
    */
   scrollToHour?: number;
+  /**
+   * Renders an event chip's content in every view (new in 0.14.1). The chip
+   * stays a button with the same keys, drag and move menu, named by this
+   * content followed by hidden details (time, date, how to open it). Render
+   * no interactive elements inside it, and show the title.
+   */
+  event?: Snippet<[CalendarItem<T>, CalendarEventContext]>;
+  /**
+   * Events shown per day in the month view before "N more events" (default
+   * 3, new in 0.14.1). `Infinity` shows them all.
+   */
+  maxEventsPerDay?: number;
+  /**
+   * Makes the month view's "N more events" a button, named "N more events
+   * on November 5" (`labels.moreEventsOn`), that calls this with the day
+   * (new in 0.14.1). Without it the text is not interactive.
+   */
+  onMoreEvents?: (date: IsoDate) => void;
   dir?: 'ltr' | 'rtl' | 'auto';
   class?: ClassValue;
 };
@@ -123,11 +147,16 @@ let {
   now,
   showYear = 'auto',
   scrollToHour = 8,
+  event,
+  maxEventsPerDay = 3,
+  onMoreEvents,
   dir = 'auto',
   class: className,
 }: CalendarProps<TData> = $props();
 
 const labels = $derived({ ...DEFAULT_CALENDAR_LABELS, ...labelOverrides });
+// The views render plain items; the app's snippet is typed with its data.
+const eventSnippet = $derived(event as Snippet<[CalendarItem, CalendarEventContext]> | undefined);
 // svelte-ignore state_referenced_locally -- seed the local navigation cursor from the anchor once.
 let at = $state<IsoDate>(anchor);
 // svelte-ignore state_referenced_locally -- seed roving focus from the initial anchor once.
@@ -663,7 +692,7 @@ const modeLabels = $derived.by(
     {#await lazyChunk('data:calendar:month', () => import('./MonthView.svelte'))}
       <p role="status" class="tx-calendar__loading">{labels.loading}</p>
     {:then { default: MonthView }}
-      <MonthView anchor={at} today={nowDate} {focusDate} {items} {fmt} {timeZone} weekStartsOn={firstWeekday} {labels} onOpen={(item) => onOpen?.(item as Occurrence<TData>)} {hintId} onFocusDate={(date) => (focusDate = date)} onCreateDay={canCreate ? (date) => create(daySlot(date)) : undefined} />
+      <MonthView anchor={at} today={nowDate} {focusDate} {items} {fmt} {timeZone} weekStartsOn={firstWeekday} {labels} onOpen={(item) => onOpen?.(item as Occurrence<TData>)} {hintId} onFocusDate={(date) => (focusDate = date)} onCreateDay={canCreate ? (date) => create(daySlot(date)) : undefined} event={eventSnippet} {maxEventsPerDay} {onMoreEvents} />
     {:catch}
       <p role="alert" class="tx-calendar__loading">{labels.loading}</p>
     {/await}
@@ -671,7 +700,7 @@ const modeLabels = $derived.by(
     {#await lazyChunk('data:calendar:agenda', () => import('./AgendaView.svelte'))}
       <p role="status" class="tx-calendar__loading">{labels.loading}</p>
     {:then { default: AgendaView }}
-      <AgendaView startDate={range.startDate} endDate={range.endDate} {focusDate} {items} {fmt} {timeZone} {labels} onOpen={(item) => onOpen?.(item as Occurrence<TData>)} {hintId} onFocusDate={(date) => (focusDate = date)} onCreateDay={canCreate ? (date) => create(daySlot(date)) : undefined} />
+      <AgendaView startDate={range.startDate} endDate={range.endDate} {focusDate} {items} {fmt} {timeZone} {labels} onOpen={(item) => onOpen?.(item as Occurrence<TData>)} {hintId} onFocusDate={(date) => (focusDate = date)} onCreateDay={canCreate ? (date) => create(daySlot(date)) : undefined} event={eventSnippet} />
     {:catch}
       <p role="alert" class="tx-calendar__loading">{labels.loading}</p>
     {/await}
@@ -679,7 +708,7 @@ const modeLabels = $derived.by(
     {#await lazyChunk('data:calendar:time-grid', () => import('./TimeGridView.svelte'))}
       <p role="status" class="tx-calendar__loading">{labels.loading}</p>
     {:then { default: TimeGridView }}
-      <TimeGridView dates={view === 'week' ? weekDates(at, firstWeekday) : [at]} {focusDate} {items} {fmt} {timeZone} {labels} onOpen={(item) => onOpen?.(item as Occurrence<TData>)} {hintId} onFocusDate={(date) => (focusDate = date)} {nowMs} {slotMinute} {slotMinutes} {scrollToHour} onCreateDay={canCreate ? (date) => create(daySlot(date)) : undefined} onCreateAt={canCreate ? createAt : undefined} />
+      <TimeGridView dates={view === 'week' ? weekDates(at, firstWeekday) : [at]} {focusDate} {items} {fmt} {timeZone} {labels} onOpen={(item) => onOpen?.(item as Occurrence<TData>)} {hintId} onFocusDate={(date) => (focusDate = date)} {nowMs} {slotMinute} {slotMinutes} {scrollToHour} onCreateDay={canCreate ? (date) => create(daySlot(date)) : undefined} onCreateAt={canCreate ? createAt : undefined} view={view === 'day' ? 'day' : 'week'} event={eventSnippet} />
     {:catch}
       <p role="alert" class="tx-calendar__loading">{labels.loading}</p>
     {/await}

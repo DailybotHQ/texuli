@@ -1,4 +1,4 @@
-import type { IsoDate, MoveChoiceId, Occurrence } from '../engines/calendar/index.ts';
+import type { CalendarView, IsoDate, MoveChoiceId, Occurrence } from '../engines/calendar/index.ts';
 
 export type CalendarTone = 'neutral' | 'primary' | 'info' | 'success' | 'warning' | 'danger';
 
@@ -13,6 +13,22 @@ export interface CalendarItem<TData = unknown> extends Occurrence<TData> {
   movable: boolean;
   /** Picked up with Space: shown where the arrow keys have taken it. */
   grabbed?: boolean;
+}
+
+/**
+ * What the `event` snippet receives with each event, besides the item
+ * (new in 0.14.1).
+ */
+export interface CalendarEventContext {
+  /** The view the event renders in. */
+  view: CalendarView;
+  /**
+   * A small chip: month cells, the time grid and its all-day row. The
+   * agenda's chips are full size.
+   */
+  compact: boolean;
+  /** The formatted time span ("1:00 PM – 2:00 PM"), or `labels.allDay`. */
+  time: string;
 }
 
 /** What `onChange` receives when an event is rescheduled. */
@@ -45,6 +61,12 @@ export interface CalendarLabels {
   empty: string;
   allDay: string;
   moreEvents: (count: number) => string;
+  /**
+   * Name of the month view's "more events" button (with `onMoreEvents`).
+   * `date` is the formatted day ("November 5"). Keep `moreEvents(count)` at
+   * its start so the visible text leads the name (new in 0.14.1).
+   */
+  moreEventsOn: (count: number, date: string) => string;
   eventCount: (count: number) => string;
   /** Appended to every event's accessible name. */
   openHint: string;
@@ -95,6 +117,7 @@ export const DEFAULT_CALENDAR_LABELS: CalendarLabels = {
   empty: 'No events scheduled.',
   allDay: 'All day',
   moreEvents: (count) => `${count} more events`,
+  moreEventsOn: (count, date) => `${count} more events on ${date}`,
   eventCount: (count) => `${count} event${count === 1 ? '' : 's'}`,
   openHint: 'press Enter to open',
   moveHint:

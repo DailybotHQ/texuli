@@ -1,5 +1,5 @@
 <script lang="ts">
-import { untrack } from 'svelte';
+import { type Snippet, untrack } from 'svelte';
 import {
   type IsoDate,
   layoutDay,
@@ -9,7 +9,7 @@ import {
 } from '../engines/calendar/index.ts';
 import EventButton from './EventButton.svelte';
 import type { CalendarFormats } from './model.ts';
-import type { CalendarItem, CalendarLabels } from './types.ts';
+import type { CalendarEventContext, CalendarItem, CalendarLabels } from './types.ts';
 
 let {
   dates,
@@ -27,6 +27,8 @@ let {
   onCreateDay,
   onCreateAt,
   scrollToHour = 8,
+  view = 'week',
+  event,
 }: {
   dates: IsoDate[];
   focusDate: IsoDate;
@@ -48,6 +50,8 @@ let {
   onCreateAt?: (date: IsoDate, minute: number) => void;
   /** The hour the grid opens at when today's "now" line is not in view. */
   scrollToHour?: number;
+  view?: 'week' | 'day';
+  event?: Snippet<[CalendarItem, CalendarEventContext]>;
 } = $props();
 
 const REM_PER_MINUTE = 3 / 60;
@@ -122,7 +126,7 @@ const timed = $derived(dates.map((date) => layoutDay(items, { date, timeZone }))
         if (event.target === event.currentTarget) onCreateDay?.(date);
       }}
     >
-      {#each allDay[index] ?? [] as item (item.key)}<EventButton {item} {fmt} {labels} {timeZone} {hintId} compact {onOpen} />{/each}
+      {#each allDay[index] ?? [] as item (item.key)}<EventButton {item} {fmt} {labels} {timeZone} {hintId} compact {view} content={event} {onOpen} />{/each}
     </div>
   {/each}
 </div>
@@ -159,7 +163,7 @@ const timed = $derived(dates.map((date) => layoutDay(items, { date, timeZone }))
               style={`inset-block-start: ${(layout.startMinute / 60) * 3}rem; block-size: ${Math.max(0.75, ((layout.endMinute - layout.startMinute) / 60) * 3)}rem; inset-inline-start: ${(layout.column / layout.columnCount) * 100}%; inline-size: calc(${100 / layout.columnCount}% - .15rem)`}
               data-continues-before={layout.continuesBefore || undefined}
               data-continues-after={layout.continuesAfter || undefined}
-            ><EventButton {item} {fmt} {labels} {timeZone} {hintId} compact {onOpen} /></div>
+            ><EventButton {item} {fmt} {labels} {timeZone} {hintId} compact {view} content={event} {onOpen} /></div>
           {/if}
         {/each}
       </section>

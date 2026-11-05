@@ -4,10 +4,11 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
+import { createRawSnippet } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import CalendarView from '../src/calendar/CalendarView.svelte';
 import { eventsOnDate, formatCalendar, occurrenceDates } from '../src/calendar/model.ts';
-import { type CalendarItem } from '../src/calendar/types.ts';
+import { type CalendarEventContext, type CalendarItem } from '../src/calendar/types.ts';
 import { type CalendarSeries, dayBounds, layoutDay } from '../src/engines/calendar/index.ts';
 
 afterEach(cleanup);
@@ -310,5 +311,112 @@ describe('calendar audit (T-62)', () => {
       await fireEvent.click(screen.getByRole('button', { name: 'Month' }));
       await waitFor(() => expect(screen.getByRole('grid', { name: /April 2026/ })).toBeTruthy());
     });
+  });
+});
+
+describe('calendar event snippet and month overflow (P-T-01, P-T-02)', () => {
+  it('renders the event snippet inside the chip in every view, keeping the button, its name and its keys', async () => {
+    const event = createRawSnippet(
+      (item: () => CalendarItem, context: () => CalendarEventContext) => ({
+        render: () =>
+          `<span data-custom-event="${context().view}" data-compact="${context().compact}">${item().title} · ${context().time}</span>`,
+      })
+    );
+    const expected = { month: true, week: true, day: true, agenda: false } as const;
+    for (const view of ['month', 'week', 'day', 'agenda'] as const) {
+      const onOpen = vi.fn();
+      render(CalendarView, {
+        props: {
+          events,
+          anchor: '2026-04-15',
+          today: '2026-04-15',
+          timeZone: 'UTC',
+          view,
+          event,
+          onOpen,
+          onChange: () => undefined,
+        },
+      });
+      await waitFor(() =>
+        expect(document.querySelectorAll('[data-calendar-event]').length).toBe(3)
+      );
+      for (const chip of document.querySelectorAll<HTMLElement>('[data-calendar-event]')) {
+        expect(chip.tagName, view).toBe('BUTTON');
+        const custom = chip.querySelector('[data-custom-event]');
+        expect(custom?.getAttribute('data-custom-event'), view).toBe(view);
+        expect(custom?.getAttribute('data-compact'), view).toBe(String(expected[view]));
+        // The default content is replaced, not added to.
+        expect(chip.querySelector('.tx-calendar__event-title'), view).toBeNull();
+        // Named by its content (so what it shows leads the name, WCAG 2.5.3),
+        // then the hidden details: time, date and how to open it.
+        expect(chip.hasAttribute('aria-label'), view).toBe(false);
+        const details = chip.querySelector('.tx-calendar__event-details')?.textContent ?? '';
+        expect(chip.textContent, view).toBe(`${custom?.textContent}${details}`);
+        expect(details, view).toMatch(/^, .+, \w+day, April 1\d, 2026, press Enter to open$/);
+        if (view !== 'agenda') expect(chip.getAttribute('aria-keyshortcuts'), view).toBeTruthy();
+      }
+      expect(document.querySelector('[data-custom-event]')?.textContent).toMatch(/ · /);
+      const review = screen.getByRole('button', {
+        name: /^Design review · 1:00 PM – 2:00 PM ?, 1:00 PM – 2:00 PM, Wednesday, April 15, 2026, press Enter to open$/,
+      });
+      await fireEvent.click(review);
+      expect(onOpen, view).toHaveBeenCalledOnce();
+      cleanup();
+    }
+  });
+
+  it('caps the month events per day and turns the overflow into a named button with onMoreEvents', async () => {
+    const busy: CalendarSeries<Details>[] = Array.from({ length: 5 }, (_, index) => ({
+      id: `busy-${index}`,
+      start: `2026-04-15T0${index + 1}:00:00Z`,
+      end: `2026-04-15T0${index + 1}:30:00Z`,
+      data: { title: `Session ${index + 1}` },
+    }));
+    const cell = () =>
+      document.querySelector<HTMLElement>('[role="gridcell"][data-date="2026-04-15"]');
+    const chips = () => cell()?.querySelectorAll('[data-calendar-event]').length;
+    const base = {
+      events: busy,
+      anchor: '2026-04-15',
+      today: '2026-04-15',
+      view: 'month' as const,
+    };
+
+    // Default: three chips and plain text, as before.
+    render(CalendarView, { props: base });
+    await waitFor(() => expect(chips()).toBe(3));
+    const text = cell()?.querySelector('.tx-calendar__more');
+    expect(text?.tagName).toBe('SPAN');
+    expect(text?.textContent).toBe('2 more events');
+    cleanup();
+
+    // A lower cap with onMoreEvents: a button, named with the day, that reports it.
+    const onMoreEvents = vi.fn();
+    render(CalendarView, { props: { ...base, maxEventsPerDay: 1, onMoreEvents } });
+    await waitFor(() => expect(chips()).toBe(1));
+    const more = screen.getByRole('button', { name: '4 more events on April 15' });
+    expect(more.textContent).toBe('4 more events');
+    expect(cell()?.contains(more)).toBe(true);
+    await fireEvent.click(more);
+    expect(onMoreEvents).toHaveBeenCalledWith('2026-04-15');
+    cleanup();
+
+    // The name comes from labels; Infinity shows every event and no overflow.
+    render(CalendarView, {
+      props: {
+        ...base,
+        maxEventsPerDay: 2,
+        onMoreEvents,
+        labels: {
+          moreEvents: (count: number) => `+${count}`,
+          moreEventsOn: (count: number, date: string) => `+${count}, ${date}`,
+        },
+      },
+    });
+    await waitFor(() => expect(screen.getByRole('button', { name: '+3, April 15' })).toBeTruthy());
+    cleanup();
+    render(CalendarView, { props: { ...base, maxEventsPerDay: Infinity, onMoreEvents } });
+    await waitFor(() => expect(chips()).toBe(5));
+    expect(cell()?.querySelector('.tx-calendar__more')).toBeNull();
   });
 });

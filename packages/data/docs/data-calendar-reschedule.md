@@ -1,4 +1,4 @@
-# Calendar rescheduling, creating and the clock
+# Calendar rescheduling, creating, the clock and event content
 
 **Package:** `@texuli/data`  
 **Lazy subpath:** `@texuli/data/calendar/view` (`CalendarView`)  
@@ -102,6 +102,64 @@ The week and day views open scrolled to a useful hour instead of midnight:
 - **Hook:** `[data-time-scroller]` carries `data-open-minute`, the minute
   it opened at.
 
+## Custom event content
+
+New in `0.14.1`. The `event` snippet renders an event chip's content in
+every view: the month cells, the week and day time grids, their all-day row
+and the agenda.
+
+```svelte
+<CalendarView {events} anchor="2026-04-15" timeZone="UTC">
+  {#snippet event(item, { view, compact, time })}
+    <strong>{item.title}</strong>
+    {#if !compact}<small>{time} · {item.data?.room}</small>{/if}
+  {/snippet}
+</CalendarView>
+```
+
+- **Arguments:** the item (`CalendarItem<T>`: the occurrence with its
+  `data`, plus `key`, `title`, `tone`, `movable` and `grabbed`) and a
+  `CalendarEventContext`:
+  - **`view`:** `'month'`, `'week'`, `'day'` or `'agenda'`;
+  - **`compact`:** `true` for the small chips (month cells, the time grid
+    and its all-day row), `false` in the agenda;
+  - **`time`:** the formatted span ("1:00 PM – 2:00 PM"), or
+    `labels.allDay`.
+- **What Texuli keeps:** the snippet replaces only the content. The chip
+  stays the same `<button>`, with its tone, `aria-describedby`,
+  `aria-keyshortcuts`, `aria-pressed` while grabbed, drag, Space grab, Alt
+  or Control plus arrow moves and the Move menu.
+- **Its name:** with a snippet the chip has no `aria-label`; it is named
+  by its content, followed by visually hidden details
+  (`.tx-calendar__event-details`: ", recurring, 1:00 PM – 2:00 PM,
+  Wednesday, April 15, 2026, press Enter to open", from `labels` and the
+  locale). Whatever the snippet shows therefore leads the name, so label in
+  name (WCAG 2.5.3) holds for any content. A fixed `aria-label` would not:
+  a room or a badge the snippet adds would be missing from it.
+- **Your part:** show the title, and render no interactive elements
+  (links, buttons, inputs), since the snippet sits in a button. Showing
+  `time` is fine; screen readers then hear it twice.
+- **Without it:** the default title, "recurring" and time.
+
+## Month overflow
+
+New in `0.14.1`. A month cell shows `maxEventsPerDay` events (default 3,
+the behavior before) and then "N more events":
+
+```svelte
+<CalendarView {events} anchor="2026-04-15" view="month" maxEventsPerDay={2} onMoreEvents={(date) => openDay(date)} />
+```
+
+- **`maxEventsPerDay`:** whole and non-negative; `Infinity` shows every
+  event, `0` only the "more" entry.
+- **Without `onMoreEvents`:** "N more events" is text, as before.
+- **With `onMoreEvents`:** it is a button (`[data-calendar-more]`, the day
+  as its value) that calls `onMoreEvents(date)` with the ISO day. Its
+  visible text is `labels.moreEvents(count)` ("3 more events") and its name
+  `labels.moreEventsOn(count, date)` ("3 more events on November 5", the
+  day in the calendar's locale), so the visible text leads the name. It is
+  in the tab order after the day's chips, and Enter and Space activate it.
+
 ## Titles and names
 
 - **Week and agenda titles,** with `showYear="auto"` (default):
@@ -158,6 +216,9 @@ use `splitSeries` from `@texuli/data/calendar`.
 | `now` | — | The app clock's instant: now line and default today. |
 | `scrollToHour` | `8` | The hour the week and day views open at when the now line is not in range. |
 | `showYear` | `'auto'` | `'always'` puts the year in every title; `'auto'` only when the range spans years or isn't the current year. |
+| `event` | — | Snippet `(item, { view, compact, time })` for an event chip's content, in every view (new in `0.14.1`). |
+| `maxEventsPerDay` | `3` | Events shown per month cell before "N more events" (new in `0.14.1`). |
+| `onMoreEvents(date)` | — | Makes "N more events" a button that reports the day (new in `0.14.1`). |
 
 **`CalendarChange`:**
 - **`id`:** the series id.
@@ -191,6 +252,15 @@ time across DST changes.
     can also drag it to another day or time.");
   - `aria-keyshortcuts` lists the Alt+Arrow and Control+Arrow keys and
     Shift+F10.
+- **Custom content:** with the `event` snippet the chip keeps its button,
+  description and keys, and is named by the snippet's content plus hidden
+  details (time, date, "press Enter to open"), so the visible text always
+  leads the name. The snippet must not add interactive elements, and should
+  show the title. The `data-calendar-month` example runs the
+  label-in-name rule over snippet chips in `tests/e2e/data.spec.ts`.
+- **More events:** with `onMoreEvents`, a button named "3 more events on
+  November 5" (`labels.moreEventsOn`) whose visible text ("3 more events")
+  starts the name.
 - **Move menu name:** "Move <title> to…". The menu is anchored by an
   invisible region over the chip, and focus returns to the chip.
 - **Announcements:** in a polite `role="status"` region inside the
@@ -229,6 +299,10 @@ rescheduling landed; the last column is 2026-10-24.
 | `@texuli/data/calendar` | 5.84 KiB | 7.00 KiB | 7.00 KiB |
 | `@texuli/data/calendar/view` | 6.61 KiB | 10.58 KiB (the Move menu, 24.44 KiB, is a lazy chunk) | 10.63 KiB + 3.23 KiB CSS (24.65 KiB lazy) |
 
+The `event` snippet and month overflow (`0.14.1`) take
+`@texuli/data/calendar/view` from 11.39 KiB to 11.50 KiB (3.51 KiB to
+3.58 KiB CSS), measured 2026-11-05; `@texuli/data/calendar` stays 7.00 KiB.
+
 ## Limits
 
 - **macOS:** Mission Control takes Control+Arrow, so Mac users use
@@ -245,5 +319,7 @@ rescheduling landed; the last column is 2026-10-24.
   time grid; swiping elsewhere does.
 - **No resizing:** changing an event's length (end-edge drag) is not
   supported.
-- **Month view:** only the first three events of a day are shown; the
-  "N more events" can't be dragged.
+- **Month view:** only the first `maxEventsPerDay` events of a day (three
+  by default) are shown, and the events behind "N more events" can't be
+  dragged from the cell. Showing them (a popover or the day view) is up to
+  the app, through `onMoreEvents`.

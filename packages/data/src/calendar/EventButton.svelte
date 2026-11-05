@@ -1,6 +1,8 @@
 <script lang="ts">
+import type { Snippet } from 'svelte';
+import type { CalendarView } from '../engines/calendar/index.ts';
 import { type CalendarFormats, eventName } from './model.ts';
-import type { CalendarItem, CalendarLabels } from './types.ts';
+import type { CalendarEventContext, CalendarItem, CalendarLabels } from './types.ts';
 
 let {
   item,
@@ -9,6 +11,8 @@ let {
   timeZone,
   hintId,
   compact = false,
+  view,
+  content,
   onOpen,
 }: {
   item: CalendarItem;
@@ -18,6 +22,10 @@ let {
   /** Id of the element that explains how to move an event. */
   hintId?: string;
   compact?: boolean;
+  /** The view the chip renders in (passed to `content`). */
+  view: CalendarView;
+  /** Replaces the chip's text; the button, its name and its keys stay. */
+  content?: Snippet<[CalendarItem, CalendarEventContext]>;
   onOpen?: (item: CalendarItem) => void;
 } = $props();
 
@@ -29,8 +37,11 @@ const MOVE_SHORTCUTS = ['Alt', 'Control']
   .join(' ');
 const time = $derived(fmt.span(item, labels.allDay));
 // The visible text (title, "recurring", time) leads the name in the same order
-// (WCAG 2.5.3 label in name); the date and how to open it follow.
-const name = $derived(eventName(fmt, item, labels, timeZone));
+// (WCAG 2.5.3 label in name); the date and how to open it follow. With the
+// app's snippet the name is the content itself, so whatever it shows leads,
+// followed by the same details in visually hidden text.
+const name = $derived(content ? undefined : eventName(fmt, item, labels, timeZone));
+const details = $derived(content ? eventName(fmt, item, labels, timeZone, false) : '');
 </script>
 
 <button
@@ -46,9 +57,11 @@ const name = $derived(eventName(fmt, item, labels, timeZone));
   aria-keyshortcuts={item.movable ? MOVE_SHORTCUTS : undefined}
   onclick={() => onOpen?.(item)}
 >
-  <span class="tx-calendar__event-title">{item.title}</span>
-  {#if item.recurring}<span class="tx-calendar__event-recurring">{labels.recurring}</span>{/if}
-  {#if !compact}<span class="tx-calendar__event-time">{time}</span>{/if}
+  {#if content}{@render content(item, { view, compact, time })}<span class="tx-calendar__event-details">, {details}</span>{:else}
+    <span class="tx-calendar__event-title">{item.title}</span>
+    {#if item.recurring}<span class="tx-calendar__event-recurring">{labels.recurring}</span>{/if}
+    {#if !compact}<span class="tx-calendar__event-time">{time}</span>{/if}
+  {/if}
 </button>
 
 <style>
@@ -57,7 +70,7 @@ const name = $derived(eventName(fmt, item, labels, timeZone));
    * tone, in light and dark. (They were utility classes, which render nothing
    * unless the host app ships that utility CSS, so every event was gray.)
    */
-  .tx-calendar__event { --tx-event-accent: var(--tx-border-strong, var(--tx-border, ButtonBorder)); --tx-event-fill: var(--tx-muted, ButtonFace); display: block; min-inline-size: 0; overflow: hidden; border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder); border-inline-start: 3px solid var(--tx-event-accent); border-radius: var(--tx-shape-radius-md); padding-block: calc(var(--tx-space-unit) * 0.8); padding-inline: calc(var(--tx-space-unit) * 1.6); background: var(--tx-event-fill); color: var(--tx-event-ink, var(--tx-foreground, CanvasText)); text-align: start; font: inherit; font-size: var(--tx-type-caption-size); line-height: 1.25; }
+  .tx-calendar__event { --tx-event-accent: var(--tx-border-strong, var(--tx-border, ButtonBorder)); --tx-event-fill: var(--tx-muted, ButtonFace); position: relative; display: block; min-inline-size: 0; overflow: hidden; border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder); border-inline-start: 3px solid var(--tx-event-accent); border-radius: var(--tx-shape-radius-md); padding-block: calc(var(--tx-space-unit) * 0.8); padding-inline: calc(var(--tx-space-unit) * 1.6); background: var(--tx-event-fill); color: var(--tx-event-ink, var(--tx-foreground, CanvasText)); text-align: start; font: inherit; font-size: var(--tx-type-caption-size); line-height: 1.25; }
   .tx-calendar__event[data-tone="primary"] { --tx-event-accent: var(--tx-primary, Highlight); --tx-event-ink: var(--tx-primary-soft-body, var(--tx-foreground, CanvasText)); --tx-event-fill: var(--tx-primary-soft, color-mix(in oklab, var(--tx-primary, Highlight) 12%, var(--tx-background, Canvas))); }
   .tx-calendar__event[data-tone="info"] { --tx-event-accent: var(--tx-info, Highlight); --tx-event-ink: var(--tx-info-soft-body, var(--tx-foreground, CanvasText)); --tx-event-fill: var(--tx-info-soft, color-mix(in oklab, var(--tx-info, Highlight) 12%, var(--tx-background, Canvas))); }
   .tx-calendar__event[data-tone="success"] { --tx-event-accent: var(--tx-success, Highlight); --tx-event-ink: var(--tx-success-soft-body, var(--tx-foreground, CanvasText)); --tx-event-fill: var(--tx-success-soft, color-mix(in oklab, var(--tx-success, Highlight) 12%, var(--tx-background, Canvas))); }
@@ -70,6 +83,7 @@ const name = $derived(eventName(fmt, item, labels, timeZone));
   .tx-calendar__event-title, .tx-calendar__event-time { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .tx-calendar__event-title { font-weight: 600; }
   .tx-calendar__event-time { color: var(--tx-muted-foreground, GrayText); }
+  .tx-calendar__event-details { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; margin: -1px; padding: 0; border: 0; }
   .tx-calendar__event--compact { padding-block: calc(var(--tx-space-unit) * 0.4); }
   @media (forced-colors: active) { .tx-calendar__event:global([data-dragging]) { outline: 2px dashed CanvasText; } }
 </style>

@@ -44,6 +44,7 @@ export function formatCalendar(locale: string, timeZone: string) {
   const date = utc({ weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
   const month = utc({ month: 'long', year: 'numeric' });
   const shortDate = utc({ month: 'short', day: 'numeric' });
+  const monthDay = utc({ month: 'long', day: 'numeric' });
   const shortDateYear = utc({ month: 'short', day: 'numeric', year: 'numeric' });
   const hour = utc({ hour: 'numeric' });
   return {
@@ -52,6 +53,8 @@ export function formatCalendar(locale: string, timeZone: string) {
     weekday: (value: IsoDate) => weekday.format(dateInstant(value)),
     longDate: (value: IsoDate) => date.format(dateInstant(value)),
     monthTitle: (value: IsoDate) => month.format(dateInstant(value)),
+    /** "November 5". */
+    monthDay: (value: IsoDate) => monthDay.format(dateInstant(value)),
     /**
      * "Apr 12 – Apr 18". The year is added when the range spans two years
      * ("Dec 28, 2026 – Jan 3, 2027") or is not `currentYear` ("Apr 12 – Apr 18, 2027"),
@@ -93,16 +96,18 @@ export function describeWhen(
  * (WCAG 2.5.3 label in name): the title, "recurring", the time ("All day" for
  * all-day events), then the date and how to open it. A compact chip shows only
  * the title and "recurring", which still lead. Every piece comes from `labels`
- * and the locale formats.
+ * and the locale formats. Without the title (`withTitle` false) it is the
+ * hidden part of a chip whose visible content is the app's `event` snippet.
  */
 export function eventName(
   fmt: CalendarFormats,
   item: Pick<Occurrence, 'start' | 'end' | 'allDay'> & { title: string; recurring: boolean },
   labels: Pick<CalendarLabels, 'allDay' | 'recurring' | 'openHint'>,
-  timeZone: string
+  timeZone: string,
+  withTitle = true
 ): string {
   return [
-    item.title,
+    withTitle ? item.title : '',
     item.recurring ? labels.recurring : '',
     fmt.span(item, labels.allDay),
     fmt.longDate(spanDates(item, timeZone).first),
