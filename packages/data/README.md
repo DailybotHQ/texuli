@@ -82,7 +82,7 @@ visible and announced string is translatable through `labels`.
 | `@texuli/data/board` | `Board`: columns and swimlanes with WIP limits, keyboard moves, column footers and heading levels |
 | `@texuli/data/dashboard` | `Dashboard` and `DashboardWidget`: a widget grid moved and resized by pointer, keyboard or an arrange toolbar, with breakpoints and a saved layout (new in `0.8.0`; [docs](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-dashboard.md)) |
 | `@texuli/data/calendar/view` | `CalendarView`: month, time-grid and agenda views with move and reschedule |
-| `@texuli/data/timeline` | `TimelineView`: virtualized Gantt timeline with dependencies, zoom and critical path |
+| `@texuli/data/timeline` | `TimelineView`: virtualized Gantt timeline with dependencies, zoom, critical path, collapsible groups with bands, row selection and markers |
 | `@texuli/data/map` | `MapView`: an offline, fictional vector basemap with markers, clusters, routes and fences |
 | `@texuli/data/activity` | `ActivityFeed`: day-grouped activity with avatars, reactions and pagination |
 | `@texuli/data/activity/inbox` | `NotificationInbox`: unread state, mark read and unread, mark all, item actions and arrival announcements |

@@ -1231,6 +1231,38 @@ function registerTimelineTests() {
         expect(model).toMatchObject({ totalScheduled: 4, truncatedCount: 1 });
       }
       {
+        // lists the visible rows by group, with the first band seen and the cap applied
+        const band = {
+          start: MON,
+          end: '2026-10-23' as const,
+          label: 'Phase',
+          tone: 'info' as const,
+        };
+        const model = timelineModel(
+          [
+            { id: 'a1', start: MON, end: MON, group: 'a' },
+            { id: 'b1', start: MON, end: MON, group: 'b' },
+            { id: 'a2', start: MON, end: MON, group: 'a' },
+            { id: 'b2', start: MON, end: MON, group: 'b' },
+          ],
+          {
+            getGroup: (row) =>
+              row.id === 'a2' ? { id: 'a', label: 'A', band } : { id: row.group, label: row.group },
+            maxRows: 3,
+          }
+        );
+        expect(
+          model.groups.map((group) => [group.id, group.label, group.items.map((row) => row.id)])
+        ).toEqual([
+          ['a', 'a', ['a1', 'a2']],
+          ['b', 'b', ['b1']],
+        ]);
+        expect(model.groups[0]?.band).toEqual(band);
+        expect(timelineModel([{ id: 'x', start: MON, end: MON }]).groups).toEqual([
+          { id: 'all', label: '', items: [{ id: 'x', start: MON, end: MON }] },
+        ]);
+      }
+      {
         // filters milestones without changing the unscheduled collection
         const model = timelineModel(
           [
