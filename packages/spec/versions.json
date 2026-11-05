@@ -69,9 +69,9 @@
     },
     {
       "specVersion": "0.12.0",
-      "specDigest": "e61ec55ad2b53019dbb934097271f89187829c0a457b763397cb7e2c2441ce78",
+      "specDigest": "4ffd35d9b96ae3a72cb5f74a5ae3c75f7a7a03833636f217ddba66973638abb7",
       "change": "minor",
-      "summary": "Additive (consumer gaps D-G-022 to D-G-024 and D-G-027 to D-G-029, in 0.14.0): the app-tier catalog ids avatar-group-grid (texuli) and code-field (@texuli/blocks), web-only; media-image gains srcDark (an image URL at the untrusted tier, like src) and darkMode (theme, system); the design-system $defs.shadowLayer gains an optional darkOpacity (0 to 1, the layer's opacity in dark mode; omitted means opacity) and $defs.issueCode gains aa-non-text (a role fill below 3:1 against its container, WCAG 1.4.11); acme shows darkOpacity; every 0.11.0 blueprint and design-system document stays valid and the blueprint envelope is unchanged; stamp-only migration 0.11.0→0.12.0"
+      "summary": "Additive (consumer gaps D-G-022 to D-G-024 and D-G-027 to D-G-029, in 0.14.0): the app-tier catalog ids avatar-group-grid (texuli) and code-field (@texuli/blocks), web-only; media-image gains srcDark (an image URL at the untrusted tier, like src) and darkMode (theme, system); the design-system $defs.shadowLayer gains an optional darkOpacity (0 to 1, the layer's opacity in dark mode; omitted means opacity) and $defs.issueCode gains aa-non-text (a role fill below 3:1 against its container, WCAG 1.4.11); components.card gains font-size (a type role, the card content font size, D-G-038); acme shows darkOpacity; every 0.11.0 blueprint and design-system document stays valid and the blueprint envelope is unchanged; stamp-only migration 0.11.0→0.12.0"
     }
   ]
 }

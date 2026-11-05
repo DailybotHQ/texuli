@@ -145,6 +145,7 @@ export const COMPONENT_TOKEN_FAMILIES: readonly ComponentTokenFamily[] = [
     ['title-font-weight', type('heading', 'weight'), 'Title font weight.'],
     ['title-line-height', type('label', 'line'), 'Title line height.'],
     ['description-font-size', type('label', 'size'), 'Description font size.'],
+    ['font-size', type('label', 'size'), 'Content font size (`.tx-card__content`).'],
   ]),
   family('carousel', 'carousel', 'Carousel', [
     ['radius', radius('lg'), 'Corner radius of the carousel and viewport.'],

@@ -27,7 +27,7 @@ Contract v2 adds two tiers on top of the three above, additively:
   `systemVar(name)` plainly, for example `var(--tx-z-modal)`. Themes emit the
   data-viz family (only for themes that carry chart colors; emitting it for
   every theme moves chart pixels and waits for a visual review).
-- **Component tokens** (`@texuli/tokens/components`): 364 tokens for 57
+- **Component tokens** (`@texuli/tokens/components`): 365 tokens for 57
   components (48 `texuli` families and 9 domain families: data grid, board,
   chart frame, chat bubble and composer, canvas toolbar, workflow node,
   sheet view and schema form), each defaulting to a system or theme token.

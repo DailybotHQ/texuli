@@ -269,6 +269,7 @@ const TODAY: Record<string, [string | null, Record<string, string>]> = {
       'title-font-weight': HEADING,
       'title-line-height': '1.25',
       'description-font-size': SM,
+      'font-size': SM,
     },
   ],
   carousel: [css('carousel'), { radius: 'var(--tx-radius, 0.5rem)', 'fallback-padding': '1rem' }],

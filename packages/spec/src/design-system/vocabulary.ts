@@ -157,7 +157,7 @@ export const DS_COMPONENT_TOKENS: Readonly<Record<string, string>> = {
   button:
     'height-sm:d height-md:d height-lg:d height-touch:d padding-inline-sm:d padding-inline-md:d padding-inline-lg:d gap:d radius:r font-size:t font-size-sm:t font-size-lg:t font-weight:t line-height:t icon-size:d border-width:b elevation:e disabled-opacity:o',
   'canvas-toolbar': 'gap:d padding:d button-radius:r button-font-size:t',
-  card: 'radius:r border-width:b elevation:e padding-inline:d padding-block:d background:c title-font-size:t title-font-weight:t title-line-height:t description-font-size:t',
+  card: 'radius:r border-width:b elevation:e padding-inline:d padding-block:d background:c title-font-size:t title-font-weight:t title-line-height:t description-font-size:t font-size:t',
   carousel: 'radius:r fallback-padding:d',
   'chart-frame': 'title-font-size:t',
   'chat-bubble': 'radius:r tail-radius:r padding-block:d padding-inline:d',

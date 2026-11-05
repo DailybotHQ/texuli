@@ -726,6 +726,9 @@
         "elevation": {
           "$ref": "#/$defs/elevationLevel"
         },
+        "font-size": {
+          "$ref": "#/$defs/typeRoleName"
+        },
         "padding-block": {
           "$ref": "#/$defs/dimension"
         },

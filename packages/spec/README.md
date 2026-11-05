@@ -22,10 +22,11 @@ DOM, no Svelte, no Node APIs and no runtime dependencies.
 
 > **New in `0.14.0` (in development, not published).** The workspace
 > carries **spec 0.12.0** (digest
-> `e61ec55ad2b53019dbb934097271f89187829c0a457b763397cb7e2c2441ce78`): the
+> `4ffd35d9b96ae3a72cb5f74a5ae3c75f7a7a03833636f217ddba66973638abb7`): the
 > app-tier catalog ids `avatar-group-grid` and `code-field`, the `srcDark`
-> and `darkMode` props of `media-image`, a shadow layer's `darkOpacity` and
-> the `aa-non-text` design-system code.
+> and `darkMode` props of `media-image`, a shadow layer's `darkOpacity`,
+> the `aa-non-text` design-system code and the card content `font-size`
+> component key.
 > Every `0.11.0` envelope migrates by stamping `spec`.
 
 > **New in `0.13.0`.** `@texuli/spec@0.13.0` carries **spec 0.11.0**
@@ -313,7 +314,7 @@ envelope up to the current spec with pure, per-version steps
 only stamps `spec`); a compatible version
 range is planned, not built. The workspace (new in `0.14.0`, not
 published yet) carries spec `0.12.0` (digest
-`e61ec55ad2b53019dbb934097271f89187829c0a457b763397cb7e2c2441ce78`): two
+`4ffd35d9b96ae3a72cb5f74a5ae3c75f7a7a03833636f217ddba66973638abb7`): two
 app-tier catalog ids, the `media-image` dark source and the
 design-system additions above. `@texuli/spec@0.13.1` carries spec `0.11.0` (digest
 `17845743d088b768c4441ea2196e5c350687533dbd0c95589cba938fb31fe993`), which

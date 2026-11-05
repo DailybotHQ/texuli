@@ -588,6 +588,23 @@ describe('the button label line height (C-G-014)', () => {
   });
 });
 
+describe('the card content font size (D-G-038)', () => {
+  it('is the component token --tx-card-font-size, read by card.css and settable by a design system', () => {
+    const css = readFileSync(join(root, 'packages/texuli/src/components/card/card.css'), 'utf8');
+    expect(css).toContain('font-size: var(--tx-card-font-size, var(--tx-type-label-size));');
+    expect(COMPONENT_TOKENS.find((t) => t.token === '--tx-card-font-size')?.default).toBe(
+      'var(--tx-type-label-size)'
+    );
+    for (const step of ['label', 'body', 'caption']) {
+      const compiled = ok(
+        compileDesignSystem(doc({ components: { card: { 'font-size': step } } }))
+      );
+      const light = compiled.vars.light as Record<string, string>;
+      expect(light['--tx-card-font-size'], step).toBe(light[`--tx-type-${step}-size`]);
+    }
+  });
+});
+
 describe('compileDesignSystem: partial data-viz palettes', () => {
   it('fills the lists a document leaves out from the derived palette instead of throwing', () => {
     const categorical = [
