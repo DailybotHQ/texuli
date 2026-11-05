@@ -15,6 +15,15 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.3.20] — 2026-11-05
+
+### Changes
+
+- chore(skill): 0.14.0 published, with the 0.13 to 0.14 upgrade notes
+- docs(skill): the collapse event and the timeline blueprint props
+- docs(skill): texuli has 76 subpath entries with texuli/motion/loop
+- docs(skill): design systems for spec 0.12.0 and the new catalog ids
+
 - The packages are on npm in the 0.14 line, every one at `0.14.0`, and
   installs pin `^0.14.0`. `0.14.0` breaks no API: blueprint spec 0.12.0
   adds the `data-timeline` groups, markers and selection with the
