@@ -3,6 +3,7 @@
  * pass a partial object to translate; functions build sentences so word
  * order stays the translator's.
  */
+import { englishMessages, type MessageLookup } from '@texuli/core/i18n';
 import type { DocumentBlockType, EmbedKind } from '@texuli/document/model';
 
 export interface PagesLabels {
@@ -27,6 +28,10 @@ export interface PagesLabels {
   slashFilter: string;
   slashEmpty: string;
   slashGroups: { text: string; layout: string; pages: string; embeds: string; blocks: string };
+  /** A list kind's slash menu name ("Bulleted list"). */
+  listKind: (kind: 'bullet' | 'ordered' | 'todo') => string;
+  /** A content block's slash menu name; `english` is the blocks catalog name. */
+  contentBlock: (type: string, english: string) => string;
   // Text rows
   textRow: (type: string) => string;
   toggleSummary: string;
@@ -62,6 +67,100 @@ export interface PagesLabels {
   editRefused: (reason: string) => string;
 }
 
+/**
+ * The label set for one message lookup (ADR-026): every string resolves as
+ * `messages('pages.<id>', english, values)`, so the label dictionary in
+ * context translates it (ids in `PAGES_MESSAGES_EN`, `{name}` placeholders,
+ * so word order stays the translator's). Block and embed names are their
+ * own ids (`pages.type-names.paragraph`), and a content block's slash name
+ * is `pages.content-block.<type>`. With `englishMessages` it is
+ * `DEFAULT_PAGES_LABELS`.
+ */
+export function pagesLabelsFor(messages: MessageLookup): PagesLabels {
+  const m = messages;
+  const type = (name: DocumentBlockType) => m(`pages.type-names.${name}`, TYPE_NAMES[name]);
+  const kind = (name: EmbedKind) => m(`pages.embed-names.${name}`, EMBED_NAMES[name]);
+  return {
+    editor: m('pages.editor', 'Page editor'),
+    reader: m('pages.reader', 'Page'),
+    breadcrumb: m('pages.breadcrumb', 'Breadcrumb'),
+    outline: m('pages.outline', 'On this page'),
+    designSystemRefused: m(
+      'pages.design-system-refused',
+      'The design system could not be applied. Showing the default theme.'
+    ),
+    blockType: (name, detail) =>
+      detail
+        ? m('pages.block-type-detail', '{type} {detail}', { type: type(name), detail })
+        : type(name),
+    handle: (name, excerpt) =>
+      excerpt ? m('pages.handle', '{type}: {excerpt}', { type: name, excerpt }) : name,
+    handleHelp: m(
+      'pages.handle-help',
+      'Press Space or Enter to pick the block up, the arrow keys to move it, Space or Enter to drop it and Escape to cancel. Alt+Up and Alt+Down move it at once. Delete removes it.'
+    ),
+    insertBelow: m('pages.insert-below', 'Insert a block below'),
+    slashMenu: m('pages.slash-menu', 'Insert block'),
+    slashFilter: m('pages.slash-filter', 'Filter block types'),
+    slashEmpty: m('pages.slash-empty', 'No block type matches.'),
+    slashGroups: {
+      text: m('pages.slash-groups.text', 'Text'),
+      layout: m('pages.slash-groups.layout', 'Layout'),
+      pages: m('pages.slash-groups.pages', 'Pages'),
+      embeds: m('pages.slash-groups.embeds', 'Embeds'),
+      blocks: m('pages.slash-groups.blocks', 'Content blocks'),
+    },
+    listKind: (name) => m(`pages.list-kinds.${name}`, LIST_NAMES[name]),
+    contentBlock: (name, english) => m(`pages.content-block.${name}`, english),
+    textRow: (name) => name,
+    toggleSummary: m('pages.toggle-summary', 'Toggle summary'),
+    calloutTitle: m('pages.callout-title', 'Callout title'),
+    columnsResize: (index) =>
+      m('pages.columns-resize', 'Resize columns {index} and {next}', { index, next: index + 1 }),
+    column: (index, count) => m('pages.column', 'Column {index} of {count}', { index, count }),
+    openPage: (title) => m('pages.open-page', 'Open page {title}', { title }),
+    embed: (name, title) =>
+      title ? m('pages.embed-titled', '{kind}: {title}', { kind: kind(name), title }) : kind(name),
+    untrusted: m('pages.untrusted', 'Untrusted content'),
+    refused: m('pages.refused', 'This embed was refused: it did not pass validation.'),
+    embedLoading: m('pages.embed-loading', 'Loading the embed'),
+    embedUnavailable: (name) =>
+      m(
+        'pages.embed-unavailable',
+        '{kind} embeds are not available here yet; the reference is kept.',
+        { kind: kind(name) }
+      ),
+    embedOff: (name) =>
+      m('pages.embed-off', '{kind} embeds are not shown here; the embed is kept.', {
+        kind: kind(name),
+      }),
+    blockRefused: m('pages.block-refused', 'This block was refused: it did not pass validation.'),
+    mediaFallback: (alt) =>
+      alt
+        ? m('pages.media-fallback-alt', 'Image: {alt}', { alt })
+        : m('pages.media-fallback', 'Image unavailable'),
+    done: m('pages.done', 'Done'),
+    notDone: m('pages.not-done', 'Not done'),
+    undo: m('pages.undo', 'Undo'),
+    redo: m('pages.redo', 'Redo'),
+    inserted: (name) => m('pages.inserted', '{type} inserted.', { type: name }),
+    removed: (name) => m('pages.removed', '{type} removed.', { type: name }),
+    moved: (label, position, total) =>
+      m('pages.moved', '{label} moved to position {position} of {total}.', {
+        label,
+        position,
+        total,
+      }),
+    cannotMove: (label) => m('pages.cannot-move', '{label} cannot move further.', { label }),
+    resized: (index, width) =>
+      m('pages.resized', 'Column {index} is {width} of 12 wide.', { index, width }),
+    undone: m('pages.undone', 'Undone.'),
+    redone: m('pages.redone', 'Redone.'),
+    nothingToUndo: m('pages.nothing-to-undo', 'Nothing to undo.'),
+    editRefused: (reason) => m('pages.edit-refused', 'Edit refused: {reason}', { reason }),
+  };
+}
+
 const TYPE_NAMES: Record<DocumentBlockType, string> = {
   paragraph: 'Paragraph',
   heading: 'Heading',
@@ -85,65 +184,22 @@ const EMBED_NAMES: Record<EmbedKind, string> = {
   canvas: 'Canvas',
 };
 
-export const DEFAULT_PAGES_LABELS: PagesLabels = {
-  editor: 'Page editor',
-  reader: 'Page',
-  breadcrumb: 'Breadcrumb',
-  outline: 'On this page',
-  designSystemRefused: 'The design system could not be applied. Showing the default theme.',
-  blockType: (type, detail) => (detail ? `${TYPE_NAMES[type]} ${detail}` : TYPE_NAMES[type]),
-  handle: (type, excerpt) => (excerpt ? `${type}: ${excerpt}` : type),
-  handleHelp:
-    'Press Space or Enter to pick the block up, the arrow keys to move it, Space or Enter to drop it and Escape to cancel. Alt+Up and Alt+Down move it at once. Delete removes it.',
-  insertBelow: 'Insert a block below',
-  slashMenu: 'Insert block',
-  slashFilter: 'Filter block types',
-  slashEmpty: 'No block type matches.',
-  slashGroups: {
-    text: 'Text',
-    layout: 'Layout',
-    pages: 'Pages',
-    embeds: 'Embeds',
-    blocks: 'Content blocks',
-  },
-  textRow: (type) => type,
-  toggleSummary: 'Toggle summary',
-  calloutTitle: 'Callout title',
-  columnsResize: (index) => `Resize columns ${index} and ${index + 1}`,
-  column: (index, count) => `Column ${index} of ${count}`,
-  openPage: (title) => `Open page ${title}`,
-  embed: (kind, title) => (title ? `${EMBED_NAMES[kind]}: ${title}` : EMBED_NAMES[kind]),
-  untrusted: 'Untrusted content',
-  refused: 'This embed was refused: it did not pass validation.',
-  embedLoading: 'Loading the embed',
-  embedUnavailable: (kind) =>
-    `${EMBED_NAMES[kind]} embeds are not available here yet; the reference is kept.`,
-  embedOff: (kind) => `${EMBED_NAMES[kind]} embeds are not shown here; the embed is kept.`,
-  blockRefused: 'This block was refused: it did not pass validation.',
-  mediaFallback: (alt) => (alt ? `Image: ${alt}` : 'Image unavailable'),
-  done: 'Done',
-  notDone: 'Not done',
-  undo: 'Undo',
-  redo: 'Redo',
-  inserted: (type) => `${type} inserted.`,
-  removed: (type) => `${type} removed.`,
-  moved: (label, position, total) => `${label} moved to position ${position} of ${total}.`,
-  cannotMove: (label) => `${label} cannot move further.`,
-  resized: (index, width) => `Column ${index} is ${width} of 12 wide.`,
-  undone: 'Undone.',
-  redone: 'Redone.',
-  nothingToUndo: 'Nothing to undo.',
-  editRefused: (reason) => `Edit refused: ${reason}`,
-};
+const LIST_NAMES = { bullet: 'Bulleted list', ordered: 'Numbered list', todo: 'To-do list' };
+
+export const DEFAULT_PAGES_LABELS: PagesLabels = pagesLabelsFor(englishMessages);
 
 /** Merge partial labels over the English defaults; empty strings never replace a default. */
-export function resolvePagesLabels(overrides?: Partial<PagesLabels>): PagesLabels {
-  const out: PagesLabels = { ...DEFAULT_PAGES_LABELS };
+export function resolvePagesLabels(
+  overrides?: Partial<PagesLabels>,
+  /** The defaults to merge over (`localizePagesLabels(useMessages())` in the views). */
+  defaults: PagesLabels = DEFAULT_PAGES_LABELS
+): PagesLabels {
+  const out: PagesLabels = { ...defaults };
   if (!overrides) return out;
   for (const [key, value] of Object.entries(overrides) as [keyof PagesLabels, unknown][]) {
     if (value === undefined || value === '' || value === null) continue;
     if (key === 'slashGroups' && typeof value === 'object') {
-      out.slashGroups = { ...DEFAULT_PAGES_LABELS.slashGroups, ...(value as object) };
+      out.slashGroups = { ...defaults.slashGroups, ...(value as object) };
       continue;
     }
     (out as unknown as Record<string, unknown>)[key] = value;

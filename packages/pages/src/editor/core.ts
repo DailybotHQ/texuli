@@ -23,7 +23,12 @@ export {
   planEmbed,
   wrappedBlockInput,
 } from '../shared/embeds.ts';
-export { DEFAULT_PAGES_LABELS, type PagesLabels, resolvePagesLabels } from '../shared/labels.ts';
+export {
+  DEFAULT_PAGES_LABELS,
+  type PagesLabels,
+  pagesLabelsFor,
+  resolvePagesLabels,
+} from '../shared/labels.ts';
 export { type MediaResolver, mediaSource, pageLinkHref } from '../shared/media.ts';
 export type { PagesPlayerLoader, PagesPlayerModule } from '../shared/player-loader.ts';
 export {

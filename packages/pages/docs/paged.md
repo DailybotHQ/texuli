@@ -87,7 +87,9 @@ numbers only); `pageName(geometry)` names the page of a geometry.
 `DEFAULT_PAGED_LABELS` and `resolvePagedLabels(overrides)`: `paged` (the
 root's name when the document has no title), `pageOf(page, total)` and
 `paginating` (the status while laying out). Empty values never replace a
-default.
+default. `pagedLabelsFor(lookup)` builds them from a `MessageLookup` (ids
+`pages.paged.<id>`; `pages.paged.page-of` is `"Page {page} of {total}"`), so
+the label dictionary in context (ADR-026) translates them.
 
 ## Stylesheet hooks
 

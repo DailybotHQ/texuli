@@ -5,6 +5,8 @@
  * subpaths.
  */
 export * from './editor/index.ts';
+// Every label id and its English default: what a label dictionary translates (ADR-026).
+export { PAGES_MESSAGES_EN, type PagesMessageId } from './i18n/index.ts';
 export {
   type DocumentOutlineOptions,
   documentOutline,

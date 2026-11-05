@@ -134,6 +134,6 @@ linear in the document.
 The reader also exports what it shares with the editor: `planEmbed`,
 `componentBlueprint`, `deckBlueprint`, `wrappedBlockInput`, `EmbedPlan`,
 `BlueprintNode`, `EmbedResolver`, `mediaSource`, `pageLinkHref`,
-`MediaResolver`, `DEFAULT_PAGES_LABELS`, `resolvePagesLabels`, `PagesLabels`
-and `PageRef`, plus the design-system types `PagesDesignSystems` and
+`MediaResolver`, `DEFAULT_PAGES_LABELS`, `resolvePagesLabels`, `PagesLabels`,
+`pagesLabelsFor` (see [editor](editor.md#labels)) and `PageRef`, plus the design-system types `PagesDesignSystems` and
 `PagesDesignSystemEvent` (see [editor](editor.md#embeds-and-media)).
