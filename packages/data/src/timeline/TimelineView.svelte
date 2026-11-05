@@ -982,7 +982,11 @@ function tickWidth(): number {
     inset-block-start: 0;
     inset-inline-start: 0.15rem;
     font-size: 0.62rem;
-    color: var(--tx-tl-critical);
+    /* The guaranteed destructive pair, so the label keeps AA over any row. */
+    padding-inline: 0.2rem;
+    border-radius: var(--tx-shape-radius-sm, 2px);
+    background: var(--tx-tl-critical);
+    color: var(--tx-tl-critical-fg);
     white-space: nowrap;
   }
   .dependencies {
