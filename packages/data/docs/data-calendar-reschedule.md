@@ -159,6 +159,11 @@ the behavior before) and then "N more events":
   `labels.moreEventsOn(count, date)` ("3 more events on November 5", the
   day in the calendar's locale), so the visible text leads the name. It is
   in the tab order after the day's chips, and Enter and Space activate it.
+- **Singular:** one hidden event reads "1 more event" (and "1 more event
+  on November 5") in the English defaults, new in `0.14.1`.
+- **Date buttons:** the month's date buttons reset the browser's button
+  look (border, fill, font, color) and follow the tokens; the focus ring
+  and today's filled circle stay.
 
 ## Titles and names
 

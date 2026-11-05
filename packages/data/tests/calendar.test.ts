@@ -278,6 +278,24 @@ describe('calendar audit (T-62)', () => {
     });
   });
 
+  describe('calendar audit: month date button reset', () => {
+    it('resets the browser button look on month dates and keeps their focus ring', () => {
+      const css = sourceOf('../src/calendar/MonthView.svelte');
+      const declared = css.match(/\.tx-calendar__date \{([^}]*)\}/)?.[1] ?? '';
+      for (const reset of [
+        /border:\s*0/,
+        /background:\s*transparent/,
+        /font:\s*inherit/,
+        /color:\s*inherit/,
+        /padding:\s*calc\(var\(--tx-space-unit\)/,
+      ])
+        expect(declared).toMatch(reset);
+      expect(css).toMatch(
+        /\.tx-calendar__date:focus-visible \{[^}]*outline:\s*var\(--tx-focus-ring-width, 2px\) solid var\(--tx-ring, Highlight\)/
+      );
+    });
+  });
+
   describe('calendar audit: forced colors and shadow token', () => {
     it('keeps the pressed view mode visible under forced colors; draws the drag shadow from the shadow token, not hardcoded black', () => {
       {
@@ -399,6 +417,16 @@ describe('calendar event snippet and month overflow (P-T-01, P-T-02)', () => {
     expect(cell()?.contains(more)).toBe(true);
     await fireEvent.click(more);
     expect(onMoreEvents).toHaveBeenCalledWith('2026-04-15');
+    cleanup();
+
+    // One hidden event reads in the singular, as text and as the button's name.
+    render(CalendarView, { props: { ...base, maxEventsPerDay: 4 } });
+    await waitFor(() => expect(chips()).toBe(4));
+    expect(cell()?.querySelector('.tx-calendar__more')?.textContent).toBe('1 more event');
+    cleanup();
+    render(CalendarView, { props: { ...base, maxEventsPerDay: 4, onMoreEvents } });
+    const single = await screen.findByRole('button', { name: '1 more event on April 15' });
+    expect(single.textContent).toBe('1 more event');
     cleanup();
 
     // The name comes from labels; Infinity shows every event and no overflow.

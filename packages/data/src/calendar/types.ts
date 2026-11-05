@@ -116,8 +116,8 @@ export const DEFAULT_CALENDAR_LABELS: CalendarLabels = {
   loading: 'Loading calendar view',
   empty: 'No events scheduled.',
   allDay: 'All day',
-  moreEvents: (count) => `${count} more events`,
-  moreEventsOn: (count, date) => `${count} more events on ${date}`,
+  moreEvents: (count) => `${count} more event${count === 1 ? '' : 's'}`,
+  moreEventsOn: (count, date) => `${count} more event${count === 1 ? '' : 's'} on ${date}`,
   eventCount: (count) => `${count} event${count === 1 ? '' : 's'}`,
   openHint: 'press Enter to open',
   moveHint:

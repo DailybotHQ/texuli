@@ -115,7 +115,8 @@ const weekdays = $derived(weeks[0]?.map((cell) => fmt.weekday(cell.date)) ?? [])
   .tx-calendar__month-week { min-block-size: 6rem; border-block-end: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder); }
   .tx-calendar__month-cell { display: flex; min-inline-size: 0; flex-direction: column; gap: calc(var(--tx-space-unit) * 0.8); overflow: hidden; border-inline-end: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder); padding: var(--tx-space-1); }
   .tx-calendar__outside { background: color-mix(in srgb, var(--tx-muted, Canvas) 45%, transparent); }
-  .tx-calendar__date { align-self: start; min-inline-size: 1.75rem; min-block-size: 1.5rem; border-radius: var(--tx-shape-radius-full); padding: calc(var(--tx-space-unit) * 0.8); color: inherit; text-align: center; font-size: var(--tx-type-caption-size); }
+  /* Reset the browser's button look (border, fill, font) so the date follows the tokens. */
+  .tx-calendar__date { align-self: start; min-inline-size: 1.75rem; min-block-size: 1.5rem; border: 0; border-radius: var(--tx-shape-radius-full); background: transparent; padding: calc(var(--tx-space-unit) * 0.8); color: inherit; text-align: center; font: inherit; font-size: var(--tx-type-caption-size); line-height: 1; }
   .tx-calendar__date:focus-visible { outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight); outline-offset: 2px; }
   .tx-calendar__today { background: var(--tx-primary, Highlight); color: var(--tx-primary-foreground, HighlightText); }
   .tx-calendar__more { color: var(--tx-muted-foreground, GrayText); font-size: .7rem; }
