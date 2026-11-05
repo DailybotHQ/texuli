@@ -72,6 +72,11 @@ to the initial easing (`ease`); `@texuli/core/motion` falls back to
   set every duration to `0ms` and every easing and spring to `linear`, and
   `themeVariables({ reducedMotion: true })` does the same for the theme's
   steps. `motionVariables({ reducedMotion: true })` returns the same values.
+- **Loops** (new in `0.14.0`): `MotionLoop` from `texuli/motion/loop` loops
+  over 4 × `--tx-motion-<step>` on `--tx-motion-ease-standard`, staggered
+  by `--tx-motion-fast` or `--tx-motion-base`, so a theme's durations set
+  its pace and a `0ms` duration leaves it at rest
+  ([ui-motion](../../texuli/docs/ui-motion.md#looping-motion-motionloop)).
 
 ## API
 

@@ -16,8 +16,9 @@
 > colors. Every 0.10.0 document stays valid; `formatVersion` stays `1`.
 
 > **Spec 0.12.0 (new in `0.14.0`).** Additive: a shadow layer's optional
-> `darkOpacity` (0 to 1, its opacity in dark mode) and the `aa-non-text`
-> issue code. Every 0.11.0 document stays valid; `formatVersion` stays `1`.
+> `darkOpacity` (0 to 1, its opacity in dark mode), the `aa-non-text`
+> issue code and `components.card["font-size"]` (a type role, the card
+> content font size). Every 0.11.0 document stays valid; `formatVersion` stays `1`.
 
 The end-to-end guide (author, validate, apply, distribute, outputs) is
 [DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md).
@@ -190,7 +191,7 @@ may name the design system it follows:
 ## Size
 
 The subpath measures 6.91 KiB gzipped (`pnpm size --filter spec`), over the
-4 KB target in the architecture: the closed component vocabulary (364 token
+4 KB target in the architecture: the closed component vocabulary (365 token
 keys for 67 components, plus the defaults lists) and the 50 roles are about
 4 KB on their own. The budget is measured + 4% (`texuli.budgets.json`).
 

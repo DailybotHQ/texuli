@@ -134,4 +134,36 @@ test.describe('motion on the shared runtime', () => {
       else expect(moved).toBeGreaterThan(0);
     });
   }
+
+  for (const reduced of [false, true]) {
+    test(`a voice waveform loops while playing${reduced ? ' (static under reduced motion)' : ''}`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ reducedMotion: reduced ? 'reduce' : 'no-preference' });
+      await page.goto('/?fixture=texuli-motion-loop&mode=light');
+      const waveform = page.locator('[data-example="texuli-motion-loop"] .tx-loop').first();
+      await expect(waveform).toHaveAttribute('data-tx-loop', 'wave', { timeout: 20_000 });
+      const bars = () =>
+        waveform.evaluate((root) =>
+          [...root.children].map((bar) => ({
+            name: getComputedStyle(bar).animationName,
+            running: bar.getAnimations().filter((a) => a.playState === 'running').length,
+            delay: getComputedStyle(bar).animationDelay,
+          }))
+        );
+      const playing = await bars();
+      expect(playing).toHaveLength(5);
+      if (reduced) {
+        // No animation at all: every bar sits at its rest height.
+        expect(playing.every((bar) => bar.name === 'none' && bar.running === 0)).toBe(true);
+      } else {
+        expect(playing.every((bar) => bar.name === 'tx-loop-wave' && bar.running === 1)).toBe(true);
+        // Staggered: each bar is one --tx-motion-fast step behind the previous one.
+        expect(new Set(playing.map((bar) => bar.delay)).size).toBe(5);
+      }
+      await page.getByRole('button', { name: 'Pause' }).click();
+      await expect(waveform).not.toHaveAttribute('data-tx-loop', /.*/);
+      expect((await bars()).every((bar) => bar.running === 0)).toBe(true);
+    });
+  }
 });

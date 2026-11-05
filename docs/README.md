@@ -526,7 +526,7 @@ agent kit [`.agents/README.md`](../.agents/README.md).
 | [ui-input](../packages/texuli/docs/ui-input.md) | Components: Input, InputGroup and Textarea |
 | [ui-kbd-code](../packages/texuli/docs/ui-kbd-code.md) | Kbd, Code and CopyButton |
 | [ui-menus](../packages/texuli/docs/ui-menus.md) | DropdownMenu, ContextMenu and Menubar |
-| [ui-motion](../packages/texuli/docs/ui-motion.md) | Motion: the motion prop and MotionProvider (new in `0.6.0`) |
+| [ui-motion](../packages/texuli/docs/ui-motion.md) | Motion: the motion prop and MotionProvider (new in `0.6.0`), and the looping `MotionLoop` (new in `0.14.0`) |
 | [ui-navigation](../packages/texuli/docs/ui-navigation.md) | NavigationMenu, Breadcrumb and Pagination |
 | [ui-number-pin](../packages/texuli/docs/ui-number-pin.md) | NumberField and PinInput |
 | [ui-popover](../packages/texuli/docs/ui-popover.md) | Popover and HoverCard |

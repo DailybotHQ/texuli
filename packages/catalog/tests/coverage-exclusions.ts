@@ -213,6 +213,12 @@ add(
 add(
   'texuli',
   'utility',
+  "A looping motion over the host's own children (D-G-046); app code ties it to state it owns (audio playing), and blueprint motion stays enter, exit, layout, stagger and duration (spec 0.6.0), with no loop to name.",
+  ['MotionLoop']
+);
+add(
+  'texuli',
+  'utility',
   'A design-system scope with no content of its own; it takes a compiled design system from the host, and blueprints reference design systems as data (ADR-023).',
   ['DesignSystemProvider']
 );
@@ -408,5 +414,7 @@ export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(row
 // planned alongside AvatarGroup: the same display data, a new catalog id
 // that waits for the next spec minor. Lowered to 213 with spec 0.12.0
 // (0.14.0): CodeField and AvatarGroupGrid have manifests (AvatarGroup stays
-// planned with Avatar).
-export const EXCLUSION_CEILING = 213;
+// planned with Avatar). Raised to 214 for MotionLoop (D-G-046, 0.14.0): a
+// motion utility over the host's children, like MotionProvider, with no
+// content of its own; a loop is not in the spec motion vocabulary.
+export const EXCLUSION_CEILING = 214;

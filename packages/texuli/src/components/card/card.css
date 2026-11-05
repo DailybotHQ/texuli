@@ -87,7 +87,7 @@
   .tx-card__content {
     padding-inline: var(--tx-card-padding-inline, var(--tx-space-5));
     padding-block: var(--tx-space-4);
-    font-size: var(--tx-type-label-size);
+    font-size: var(--tx-card-font-size, var(--tx-type-label-size));
   }
 
   .tx-card__content:first-child {

@@ -280,6 +280,11 @@
       "svelte": "./src/motion/index.ts",
       "default": "./src/motion/index.ts"
     },
+    "./motion/loop": {
+      "types": "./src/motion/loop/index.ts",
+      "svelte": "./src/motion/loop/index.ts",
+      "default": "./src/motion/loop/index.ts"
+    },
     "./navigation": {
       "types": "./src/components/navigation/index.ts",
       "svelte": "./src/components/navigation/index.ts",

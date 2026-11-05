@@ -169,7 +169,7 @@ packages carry spec `0.10.0`, which refuses them (`unknown-key`, or
   sidebar, or, when no lightness can, the one that stands out most. The
   change is in `report.adjustments`.
 
-### Spec 0.12.0: dark shadows and the sidebar's active fill
+### Spec 0.12.0: dark shadows, the sidebar's active fill and the card content size
 
 New in `0.14.0`, which carries spec `0.12.0` (not published yet; the
 `0.13.x` packages carry spec `0.11.0`, which refuses `darkOpacity` as
@@ -209,6 +209,17 @@ variables.
   as a yellow primary stays valid). The compiler never refuses either one;
   it lists each failing pair in `report.warnings` as
   `{ code: "aa-non-text", mode, path, message }`, with the pinned path.
+- **The card content font size** (D-G-038): `components.card["font-size"]`
+  takes a type role (`caption`, `label`, `body` …) and compiles to
+  `--tx-card-font-size` (`"body"` gives `var(--tx-type-body-size)`), which
+  `.tx-card__content` reads. Left out, the content keeps the label size it
+  had before. Like `components.button["line-height"]`, it is one key of
+  the closed component vocabulary (365 tokens for 57 components); spec
+  `0.11.0` refuses it as `unknown-key`.
+
+```json
+{ "components": { "card": { "font-size": "body" } } }
+```
 
 ### From what you already have
 

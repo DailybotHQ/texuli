@@ -269,6 +269,7 @@ const TODAY: Record<string, [string | null, Record<string, string>]> = {
       'title-font-weight': HEADING,
       'title-line-height': '1.25',
       'description-font-size': SM,
+      'font-size': SM,
     },
   ],
   carousel: [css('carousel'), { radius: 'var(--tx-radius, 0.5rem)', 'fallback-padding': '1rem' }],
@@ -953,7 +954,7 @@ describe('token contract v2: component registry', () => {
       .filter(
         (key) =>
           key &&
-          !['cx', 'defaults', 'design-system', 'i18n', 'motion', 'icons/lucide'].includes(key)
+          !['cx', 'defaults', 'design-system', 'i18n', 'motion', 'motion/loop', 'icons/lucide'].includes(key)
       )
       .filter((key) => !key.startsWith('layouts'));
     const subpaths = new Set(

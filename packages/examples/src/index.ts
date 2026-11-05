@@ -94,6 +94,7 @@ import './media-composition-canvas/entry.ts';
 import './media-video/entry.ts';
 import './media-video-edit/entry.ts';
 import './menus/entry.ts';
+import './motion-loop/entry.ts';
 import './navigation/entry.ts';
 import './number-pin/entry.ts';
 import './player-blueprint-preview/entry.ts';

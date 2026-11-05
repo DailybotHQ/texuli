@@ -511,7 +511,7 @@ stamped `0.11.0`. Rules: [design-system.md](design-system.md).
 
 New in `0.14.0` (not published yet; `@texuli/spec@0.13.0` and `0.13.1`
 carry spec `0.11.0`). Digest
-`f2a7c8158eaea962cbc7d3dc8de82541dc28b6d813887d7e362a3972ca56c645`.
+`049c93b4105fb765c2db5ff20272494f99fce52552aafaf85e00789fc1747a14`.
 Additive, so the `0.11.0 → 0.12.0` migration stamps `spec` only:
 
 - the catalog gains two app-tier ids, `avatar-group-grid` (`texuli`,
@@ -534,7 +534,9 @@ Additive, so the `0.11.0 → 0.12.0` migration stamps `spec` only:
   group id when a group collapses or expands;
 - the design-system document (`formatVersion` stays `1`) gains a shadow
   layer's optional `darkOpacity` (D-G-028), and `$defs.issueCode` gains
-  `aa-non-text` (D-G-029), raised by `@texuli/tokens`, never by the spec.
+  `aa-non-text` (D-G-029), raised by `@texuli/tokens`, never by the spec;
+- `components.card` gains the optional `font-size` key (a type role, the
+  card content font size `--tx-card-font-size`, D-G-038).
 
 `catalog/components.json` was re-projected and the schema, the TypeScript
 and Kotlin projections, `acme` (which shows `darkOpacity`), the native

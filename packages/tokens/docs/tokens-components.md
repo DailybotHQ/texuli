@@ -10,7 +10,7 @@ additive: nothing existing is renamed or removed.
   (space, size, type, elevation, shape, layer, opacity, layout, icon, status, data-viz).
   123 are declared in `@texuli/tokens/base.css`; the
   28 data-viz tokens are emitted per theme.
-- **Component tokens:** 364 for 57 components
+- **Component tokens:** 365 for 57 components
   (`@texuli/tokens/components`), never declared.
 - **Renames:** 0 (`@texuli/tokens/renames.json`, schema
   `TOKEN_RENAMES_JSON_SCHEMA`).
@@ -387,6 +387,7 @@ A design system sets `components.<component>.<key>`; CSS reads it with the
 | `title-font-weight` | `--tx-card-title-font-weight` | `var(--tx-type-heading-weight)` | Title font weight. | `var(--tx-card-title-font-weight, var(--tx-type-heading-weight))` |
 | `title-line-height` | `--tx-card-title-line-height` | `var(--tx-type-label-line)` | Title line height. | `var(--tx-card-title-line-height, var(--tx-type-label-line))` |
 | `description-font-size` | `--tx-card-description-font-size` | `var(--tx-type-label-size)` | Description font size. | `var(--tx-card-description-font-size, var(--tx-type-label-size))` |
+| `font-size` | `--tx-card-font-size` | `var(--tx-type-label-size)` | Content font size (`.tx-card__content`). | `var(--tx-card-font-size, var(--tx-type-label-size))` |
 
 ### Carousel (`carousel`, `texuli/carousel`)
 

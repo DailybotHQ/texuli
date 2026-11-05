@@ -1,0 +1,88 @@
+/**
+ * Looping motion (texuli/motion/loop, D-G-046): every direct child of a
+ * .tx-loop with data-tx-loop plays the preset forever. The period is 4 times
+ * a duration token, the curve is --tx-motion-ease-standard and the stagger
+ * a duration token per child (repeating every 8 children, negative so every
+ * child is already moving on the first frame).
+ *
+ * Rest is the children's own style: the keyframes name only their middle
+ * frame. Nothing moves without data-tx-loop (not playing, level none, a
+ * provider that forces reduced motion), under prefers-reduced-motion (the
+ * animation is declared only for no-preference), or inside a
+ * data-tx-motion="reduce" scope (base.css zeroes the duration and runs one
+ * iteration, which ends at rest).
+ * @layer tx.components so consumer utilities can override.
+ */
+@layer tx.components {
+  .tx-loop > * {
+    --tx-loop-index: 0;
+  }
+  .tx-loop > :nth-child(8n + 2) {
+    --tx-loop-index: 1;
+  }
+  .tx-loop > :nth-child(8n + 3) {
+    --tx-loop-index: 2;
+  }
+  .tx-loop > :nth-child(8n + 4) {
+    --tx-loop-index: 3;
+  }
+  .tx-loop > :nth-child(8n + 5) {
+    --tx-loop-index: 4;
+  }
+  .tx-loop > :nth-child(8n + 6) {
+    --tx-loop-index: 5;
+  }
+  .tx-loop > :nth-child(8n + 7) {
+    --tx-loop-index: 6;
+  }
+  .tx-loop > :nth-child(8n + 8) {
+    --tx-loop-index: 7;
+  }
+
+  .tx-loop[data-tx-loop-duration="fast"] {
+    --tx-loop-step: var(--tx-motion-fast);
+  }
+  .tx-loop[data-tx-loop-duration="base"] {
+    --tx-loop-step: var(--tx-motion-base);
+  }
+  .tx-loop[data-tx-loop-stagger="fast"] {
+    --tx-loop-stagger: var(--tx-motion-fast);
+  }
+  .tx-loop[data-tx-loop-stagger="base"] {
+    --tx-loop-stagger: var(--tx-motion-base);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tx-loop[data-tx-loop] > * {
+      animation: tx-loop-pulse calc(var(--tx-loop-step, var(--tx-motion-slow)) * 4)
+        var(--tx-motion-ease-standard) infinite;
+      animation-delay: calc(var(--tx-loop-index) * var(--tx-loop-stagger, 0ms) * -1);
+    }
+    .tx-loop[data-tx-loop="wave"] > * {
+      animation-name: tx-loop-wave;
+    }
+    .tx-loop[data-tx-loop-level="subtle"] > * {
+      animation-name: tx-loop-fade;
+    }
+  }
+
+  @keyframes tx-loop-pulse {
+    50% {
+      opacity: 0.55;
+      transform: scale(0.85);
+    }
+  }
+
+  @keyframes tx-loop-wave {
+    50% {
+      transform: scaleY(0.35);
+    }
+  }
+
+  /* Level subtle: no scale, the opacity alone. */
+  @keyframes tx-loop-fade {
+    50% {
+      opacity: 0.55;
+    }
+  }
+}
