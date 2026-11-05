@@ -40,6 +40,8 @@ function isUrlKey(key: string): boolean {
   return (
     lower === 'href' ||
     lower === 'src' ||
+    // Image's dark source (`srcDark`): an image URL that does not end in `src`.
+    lower === 'srcdark' ||
     lower === 'poster' ||
     lower.endsWith('href') ||
     lower.endsWith('src') ||

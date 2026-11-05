@@ -225,6 +225,12 @@ add(
 add(
   'texuli',
   'utility',
+  'An icon registry scope with no content of its own; the host registers its icon components or path data, and blueprints reference icons by name.',
+  ['IconsProvider']
+);
+add(
+  'texuli',
+  'utility',
   'Writes to the clipboard on press: host chrome next to code (manifest code).',
   ['CopyButton']
 );
@@ -394,5 +400,6 @@ export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(row
 // decisions log): DesignSystemProvider is a contentless scope like
 // MotionProvider; the host passes it a compiled design system. Raised to 212
 // for LabelsProvider (ADR-026), another contentless scope: the host passes it
-// a label dictionary.
-export const EXCLUSION_CEILING = 212;
+// a label dictionary. Raised to 213 for IconsProvider (D-G-021), another
+// contentless scope: the host passes it an icon registry.
+export const EXCLUSION_CEILING = 213;
