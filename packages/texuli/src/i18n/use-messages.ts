@@ -4,7 +4,14 @@
  * resolves instance prop → that catalog → its English default, and updates
  * when the locale changes (lazy locales included).
  */
-import { englishMessages, I18N_CONTEXT, type I18n, type MessageLookup } from '@texuli/core/i18n';
+import {
+  createLabels,
+  englishMessages,
+  I18N_CONTEXT,
+  type I18n,
+  type LabelDictionary,
+  type MessageLookup,
+} from '@texuli/core/i18n';
 import { getContext, hasContext, setContext } from 'svelte';
 import { createSubscriber } from 'svelte/reactivity';
 
@@ -37,4 +44,29 @@ export function useMessages(): MessageLookup {
     return i18n.has(id);
   };
   return lookup;
+}
+
+/** Options for `setTexuliLabels`. */
+export interface TexuliLabelsOptions {
+  /** The dictionary's BCP 47 locale (`es`, `es-CO`): plural rules and number formatting. Default `en`. */
+  locale?: string;
+}
+
+/**
+ * Translate every built-in Texuli label below this component at once
+ * (ADR-026): pass one dictionary of message ids (`TEXULI_MESSAGES_EN`,
+ * `PRIMITIVES_MESSAGES_EN` and each domain package's catalog list them).
+ * Precedence per label: the component's own prop, then this dictionary,
+ * then the English default. Called inside another dictionary's scope, it
+ * layers over it (its ids win, the rest fall through). Call it in a
+ * component's script, near the root; it is SSR-safe (context only, no
+ * globals). Returns the `I18n` it put in context.
+ */
+export function setTexuliLabels(labels: LabelDictionary, options: TexuliLabelsOptions = {}): I18n {
+  return setI18nContext(
+    createLabels(labels, {
+      ...(options.locale ? { locale: options.locale } : {}),
+      parent: getI18nContext() ?? null,
+    })
+  );
 }

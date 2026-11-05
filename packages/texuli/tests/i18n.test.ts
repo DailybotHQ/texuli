@@ -1,7 +1,7 @@
 /// <reference types="node" />
 
 import { render, screen } from '@testing-library/svelte';
-import { createI18n, isPseudoLocalized, PSEUDO_LOCALE } from '@texuli/core/i18n';
+import { createI18n, createLabels, isPseudoLocalized, PSEUDO_LOCALE } from '@texuli/core/i18n';
 import { tick } from 'svelte';
 import { describe, expect, it } from 'vitest';
 import {
@@ -15,8 +15,14 @@ import { DEFAULT_FILE_UPLOAD_LABELS } from '../src/components/file-upload/types.
 import { DEFAULT_RATING_LABELS } from '../src/components/rating/rating.ts';
 import { DEFAULT_TIMELINE_MESSAGES } from '../src/components/timeline/types.ts';
 import { TEXULI_MESSAGES_EN } from '../src/i18n/index.ts';
-import { Breadcrumb, Timeline } from '../src/index.ts';
+import { Breadcrumb, Pagination, Timeline } from '../src/index.ts';
+
+const PaginationRoot = Pagination.Root;
+
+import { DEFAULT_MOBILE_LABELS } from '../src/layouts/mobile/labels.ts';
 import I18nHarness from './I18nHarness.svelte';
+import LabelsProviderHarness from './LabelsProviderHarness.svelte';
+import SetLabelsHarness from './SetLabelsHarness.svelte';
 
 const SRC = 'packages/texuli/src';
 
@@ -35,6 +41,7 @@ describe('texuli labels resolve through @texuli/core/i18n (ADR-016)', () => {
         ['texuli.file-upload', DEFAULT_FILE_UPLOAD_LABELS],
         ['texuli.rating', DEFAULT_RATING_LABELS],
         ['texuli.timeline', DEFAULT_TIMELINE_MESSAGES],
+        ['texuli.mobile-layout', DEFAULT_MOBILE_LABELS],
       ])
     ).toEqual([]);
   });
@@ -89,5 +96,55 @@ describe('texuli labels resolve through @texuli/core/i18n (ADR-016)', () => {
     );
     expect(names.length).toBeGreaterThan(0);
     expect(names.filter((name) => !isPseudoLocalized(name))).toEqual([]);
+  });
+
+  it('LabelsProvider (ADR-026): prop, then the nearest dictionary, then outer ones, then English; updates live', async () => {
+    const outer = {
+      'texuli.breadcrumb.label': 'Ruta',
+      'texuli.timeline.label': 'Cronología',
+      'texuli.timeline.complete': 'Completado',
+    };
+    const inner = { 'texuli.timeline.complete': 'Terminado' };
+    const view = render(LabelsProviderHarness, { props: { outer, inner } });
+    expect(screen.getByRole('navigation', { name: 'Ruta' })).toBeTruthy();
+    // The inner dictionary wins for its id; the outer one fills the rest.
+    expect(screen.getByRole('list', { name: 'Cronología' })).toBeTruthy();
+    const words = [...view.container.querySelectorAll('.tx-timeline__sr-only')].map(
+      (node) => node.textContent
+    );
+    // The `messages` prop wins over both dictionaries.
+    expect(words).toEqual([', Terminado', ', Ahora mismo']);
+    await view.rerender({ outer: { ...outer, 'texuli.breadcrumb.label': 'Migas' }, inner });
+    await tick();
+    expect(screen.getByRole('navigation', { name: 'Migas' })).toBeTruthy();
+  });
+
+  it('setTexuliLabels puts one dictionary in context for styled components and primitives, over any outer one', () => {
+    const outer = createLabels(
+      { 'primitives.pagination.previous-button.label': 'Página anterior' },
+      { locale: 'es' }
+    );
+    render(I18nHarness, {
+      props: {
+        i18n: outer,
+        component: SetLabelsHarness as never,
+        props: {
+          labels: { 'primitives.pagination.label': 'Paginación' },
+          component: PaginationRoot as never,
+          props: { page: 2, pageCount: 5 },
+        },
+      },
+    });
+    const nav = screen.getByRole('navigation', { name: 'Paginación' });
+    // The outer dictionary fills the ids the inner one leaves out.
+    expect(nav.querySelector('[aria-label="Página anterior"]')).not.toBeNull();
+    render(SetLabelsHarness, {
+      props: {
+        labels: {},
+        component: Breadcrumb as never,
+        props: { items: [{ label: 'Inicio' }] },
+      },
+    });
+    expect(screen.getByRole('navigation', { name: 'Breadcrumb' })).toBeTruthy();
   });
 });

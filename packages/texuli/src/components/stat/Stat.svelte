@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { cx } from '../../internal/cx.ts';
 import { variants } from '../../internal/variants.ts';
 import TrendIcon from './TrendIcon.svelte';
@@ -10,7 +11,6 @@ import {
   resolveTrend,
   type Trend,
   trendToneClass,
-  trendWord,
 } from './trend.ts';
 import './stat.css';
 import { designDefaults } from '../../internal/design-defaults.ts';
@@ -65,10 +65,17 @@ let {
   ...rest
 }: Props = $props();
 
+const msg = useMessages();
 const resolvedTrend = $derived(resolveTrend(delta, trend));
 const deltaText = $derived(formatDelta(delta));
 const tone = $derived(trendToneClass(resolvedTrend, positive));
-const word = $derived(trendWord(resolvedTrend));
+const word = $derived(
+  resolvedTrend === 'up'
+    ? msg('texuli.stat.increased', 'Increased')
+    : resolvedTrend === 'down'
+      ? msg('texuli.stat.decreased', 'Decreased')
+      : msg('texuli.stat.no-change', 'No change')
+);
 </script>
 
 <article

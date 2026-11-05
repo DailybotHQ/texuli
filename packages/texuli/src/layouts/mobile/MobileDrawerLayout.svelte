@@ -1,12 +1,14 @@
 <script lang="ts">
+import { localizeLabels } from '@texuli/core/i18n';
 import { safeHref } from '@texuli/core/url-policy';
+import { useMessages } from '../../i18n/use-messages.ts';
 import LayoutChrome from '../host/LayoutChrome.svelte';
 import LayoutDrawer from '../host/LayoutDrawer.svelte';
 import { onNavigate } from '../host/layout-kit.ts';
 import NavIcon from '../host/NavIcon.svelte';
 import { navBadge, type ResolvedNavItem, resolveNav } from '../host/nav-model.ts';
 import type { LayoutProps } from '../host/registry.ts';
-import { mobileLabels } from './labels.ts';
+import { DEFAULT_MOBILE_LABELS, mobileLabels } from './labels.ts';
 import MobileFrame from './MobileFrame.svelte';
 import { currentHashPath, navCurrent, stackHeader } from './model.ts';
 
@@ -29,7 +31,10 @@ $effect(() => {
   return onNavigate(() => (hashPath = currentHashPath(root)), root);
 });
 
-const text = $derived(mobileLabels(options));
+const msg = useMessages();
+const text = $derived(
+  mobileLabels(options, localizeLabels(msg, 'texuli.mobile-layout', DEFAULT_MOBILE_LABELS))
+);
 const resolved = $derived(resolveNav(nav ?? { sections: [] }, path ?? hashPath));
 const header = $derived(
   stackHeader(resolved, path ?? hashPath, nav?.brand?.label ?? text.home, text.title)

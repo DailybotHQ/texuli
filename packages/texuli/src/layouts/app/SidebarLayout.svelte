@@ -58,7 +58,6 @@ const sections = $derived(appSidebarSections(resolved));
   <LayoutChrome part="skip" {mainId} {nav} {skipLabel} />
   <AppNav
     {sections}
-    label="Main"
     {menuLabel}
     closeLabel={closeLabel ?? msg('texuli.sidebar-layout.close-navigation', 'Close navigation')}
     hrefTrust="developer"

@@ -615,8 +615,13 @@ export {
   getI18nContext,
   setI18nContext,
   TEXULI_MESSAGES_EN,
+  type TexuliLabels,
+  type TexuliLabelsOptions,
+  type TexuliMessageId,
   useMessages,
 } from './i18n/index.ts';
+// LabelsProvider and setTexuliLabels ship from `texuli/i18n` only: they carry
+// the catalog runtime, which the root would otherwise always include (ADR-026).
 // The "caller first" handler order of every component (docs/STANDARDS.md), also in `texuli/cx`.
 export { chainHandlers, composeHandlers } from './internal/handlers.ts';
 export {

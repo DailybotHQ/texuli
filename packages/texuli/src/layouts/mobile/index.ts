@@ -11,7 +11,7 @@
  */
 
 export { default as BottomNav } from './BottomNav.svelte';
-export { type MobileLabels, mobileLabels } from './labels.ts';
+export { DEFAULT_MOBILE_LABELS, type MobileLabels, mobileLabels } from './labels.ts';
 export { default as MobileAppFrame } from './MobileAppFrame.svelte';
 export { default as MobileHeader } from './MobileHeader.svelte';
 export {

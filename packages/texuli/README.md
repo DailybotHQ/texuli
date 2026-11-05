@@ -154,6 +154,16 @@ props keep winning, and English stays the only shipped language
 (translations beyond English are planned)
 ([i18n](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/i18n.md)).
 
+## Labels and locale
+
+One label dictionary translates every built-in string of `texuli`,
+`@texuli/primitives`, `@texuli/blocks` and `@texuli/pages` at once:
+`<LabelsProvider labels={es} locale="es">` from `texuli/i18n` near the root, or
+`setTexuliLabels(es, { locale: 'es' })` in a component's script (ADR-026;
+on `main`, not on npm yet).
+A component's own label prop still wins
+([i18n](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/i18n.md#one-dictionary-for-every-package-adr-026)).
+
 ## New in 0.6.0
 
 Ships in `0.6.0`; the `0.5.0` release predates it. Under `0.x` the new minor

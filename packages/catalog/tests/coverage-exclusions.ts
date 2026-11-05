@@ -219,6 +219,12 @@ add(
 add(
   'texuli',
   'utility',
+  'A label dictionary scope with no content of its own; it translates the built-in labels of the components below (ADR-026), and blueprint text is data the agent writes.',
+  ['LabelsProvider']
+);
+add(
+  'texuli',
+  'utility',
   'Writes to the clipboard on press: host chrome next to code (manifest code).',
   ['CopyButton']
 );
@@ -386,5 +392,7 @@ export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(row
 // the host and MotionProvider a contentless utility. Raised to 211 in
 // PLAN_011 (lead decision under the plan's trust mode, recorded in its
 // decisions log): DesignSystemProvider is a contentless scope like
-// MotionProvider; the host passes it a compiled design system.
-export const EXCLUSION_CEILING = 211;
+// MotionProvider; the host passes it a compiled design system. Raised to 212
+// for LabelsProvider (ADR-026), another contentless scope: the host passes it
+// a label dictionary.
+export const EXCLUSION_CEILING = 212;
