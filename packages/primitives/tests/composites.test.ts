@@ -380,6 +380,29 @@ describe('tabs', () => {
       expect(security).toBeTruthy();
       expect(security?.hasAttribute('hidden')).toBe(true);
     });
+
+    it('points aria-controls only at a panel that exists, or at the host panelId (D-G-041)', async () => {
+      const cases: Array<[string, Record<string, unknown>, Record<string, string | null>]> = [
+        ['every panel rendered', {}, { profile: 'panel', security: 'panel', team: 'panel' }],
+        ['no panels', { panels: false }, { profile: null, security: null, team: null }],
+        ['host region', { panels: false, teamPanelId: 'team-view' }, { team: 'team-view' }],
+        ['active panel only', { forceMount: false }, { profile: 'panel', security: null }],
+      ];
+      for (const [name, props, expected] of cases) {
+        const view = render(TabsHarness, { props });
+        await tick();
+        for (const [value, target] of Object.entries(expected)) {
+          const tab = view.getByRole('tab', { name: new RegExp(value, 'i') });
+          const controls = tab.getAttribute('aria-controls');
+          if (target === null) expect(controls, `${name}: ${value}`).toBeNull();
+          else if (target === 'panel') {
+            const panel = controls ? document.getElementById(controls) : null;
+            expect(panel?.getAttribute('role'), `${name}: ${value}`).toBe('tabpanel');
+          } else expect(document.getElementById(controls ?? '')?.id, name).toBe(target);
+        }
+        view.unmount();
+      }
+    });
   });
 });
 

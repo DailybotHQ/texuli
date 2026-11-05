@@ -152,6 +152,7 @@ const triggerClass = $derived(tabsTriggerClass({ variant }));
       {#each items as item (item.value)}
         <TabsPrimitive.Trigger
           value={item.value}
+          panelId={item.panelId}
           disabled={item.disabled}
           class={triggerClass}
           data-tx-tabs-trigger=""
