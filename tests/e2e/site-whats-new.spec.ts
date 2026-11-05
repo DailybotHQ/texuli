@@ -11,7 +11,7 @@ import {
 
 /*
  * texuli.com /whats-new/ (PLAN_010 T-site-080, Amendment 8), in the
- * browser: the hub lists every feature of 0.6.0 to 0.13.0 under its
+ * browser: the hub lists every feature of 0.6.0 to 0.14.0 under its
  * release with an honest status, each with a demo or preview that works
  * (motion plays, a formula evaluates, a widget moves by keyboard, a form
  * validates, the locale switches, the canvas image and the email frame
@@ -67,7 +67,7 @@ test('every feature by release, each demo working, links that resolve; axe light
   await page.goto(`${origin()}/whats-new/`);
   await settle(page);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('What’s new in Texuli');
-  await expect(page.locator('[data-hub-release]')).toHaveCount(8);
+  await expect(page.locator('[data-hub-release]')).toHaveCount(9);
   await expect(page.locator('[data-hub-feature]')).toHaveCount(24);
   await expect(page.locator('[data-hub-release="0.8.0"] .hub__status')).toContainText(
     'Published on npm as 0.8.0'
@@ -93,11 +93,16 @@ test('every feature by release, each demo working, links that resolve; axe light
     'Published on npm as 0.12.0'
   );
   await expect(page.locator('[data-hub-release="0.12.0"] [data-hub-feature]')).toHaveCount(0);
-  // Consumer gaps: 0.13.0 is on the hub with its patch 0.13.1 as the current release, and no cards of its own.
+  // Consumer gaps: 0.13.0 is on the hub with its patch 0.13.1, and no cards of its own.
   await expect(page.locator('[data-hub-release="0.13.0"] .hub__status')).toContainText(
-    'its patch 0.13.1, the current release'
+    'its patch 0.13.1 adds'
   );
   await expect(page.locator('[data-hub-release="0.13.0"] [data-hub-feature]')).toHaveCount(0);
+  // Consumer gaps: 0.14.0 is on the hub as the current release, with no cards of its own.
+  await expect(page.locator('[data-hub-release="0.14.0"] .hub__status')).toContainText(
+    'Published on npm as 0.14.0, the current release'
+  );
+  await expect(page.locator('[data-hub-release="0.14.0"] [data-hub-feature]')).toHaveCount(0);
   // PLAN_011 T-site-0100: design systems, the studio, the ds tools, conformance, the
   // Protoyard gaps and the removals.
   await expect(page.locator('[data-hub-release="0.10.0"] [data-hub-feature]')).toHaveCount(6);

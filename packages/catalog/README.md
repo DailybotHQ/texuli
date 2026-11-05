@@ -16,9 +16,9 @@ Svelte, use [`@texuli/player`](https://www.npmjs.com/package/@texuli/player),
 which is built on this package.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.13.1`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.13.0`) may contain breaking
-> changes, so pin the exact version or use `^0.13.0`, which accepts only 0.13.x.
+> published to npm as `0.14.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.14.0`) may contain breaking
+> changes, so pin the exact version or use `^0.14.0`, which accepts only 0.14.x.
 
 > **New in `0.4.0`.** The `chat`, `composition`, `data`, `state` and
 > `workflows` manifest groups (158 catalog ids, 66 of them agent-emittable;
@@ -147,7 +147,7 @@ grammar and renderer APIs. Import subpaths to keep bundles narrow.
 
 ## New in 0.14.0
 
-In development (spec `0.12.0`, not published yet):
+Ships in `0.14.0` (spec `0.12.0`); the `0.13.x` releases predate it:
 
 - Two app-tier manifests, neither agent-emittable: `avatar-group-grid` in
   `@texuli/catalog/manifests/display` (texuli's `AvatarGroupGrid`,

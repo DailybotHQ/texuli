@@ -16,12 +16,12 @@ by Texuli's Kotlin Multiplatform twin. The package is framework-free: no
 DOM, no Svelte, no Node APIs and no runtime dependencies.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.13.1`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.13.0`) may contain breaking
-> changes, so pin the exact version or use `^0.13.0`, which accepts only 0.13.x.
+> published to npm as `0.14.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.14.0`) may contain breaking
+> changes, so pin the exact version or use `^0.14.0`, which accepts only 0.14.x.
 
-> **New in `0.14.0` (in development, not published).** The workspace
-> carries **spec 0.12.0** (digest
+> **New in `0.14.0`.** `@texuli/spec@0.14.0` carries **spec 0.12.0**
+> (digest
 > `049c93b4105fb765c2db5ff20272494f99fce52552aafaf85e00789fc1747a14`): the
 > app-tier catalog ids `avatar-group-grid` and `code-field`, the `srcDark`
 > and `darkMode` props of `media-image`, the `data-timeline` groups with
@@ -30,7 +30,7 @@ DOM, no Svelte, no Node APIs and no runtime dependencies.
 > design-system code and the card content `font-size` component key.
 > Every `0.11.0` envelope migrates by stamping `spec`.
 
-> **New in `0.13.0`.** `@texuli/spec@0.13.0` carries **spec 0.11.0**
+> **New in `0.13.0`.** `@texuli/spec@0.13.0` and `0.13.1` carried **spec 0.11.0**
 > (`@texuli/spec@0.10.0` to `@texuli/spec@0.12.3` carried spec `0.10.0`).
 > It extends the design-system document only: structured shadows per
 > elevation level (`elevation.levels`), product tokens (`extensions`) and a
@@ -108,7 +108,7 @@ import {
   validateInstance,
 } from '@texuli/spec';
 
-SPEC_VERSION;                         // the spec version: '0.12.0' from 0.14.0 ('0.11.0' in @texuli/spec@0.13.1)
+SPEC_VERSION;                         // the spec version: '0.12.0' in @texuli/spec@0.14.0
 SPEC_COMPONENT_IDS.includes('alert'); // true: the closed component vocabulary
 
 // The dialect validator: a closed subset of JSON Schema 2020-12.
@@ -313,12 +313,11 @@ envelope up to the current spec with pure, per-version steps
 `0.5.0 → 0.6.0`, `0.6.0 → 0.7.0`, `0.7.0 → 0.8.0`, `0.8.0 → 0.9.0`,
 `0.9.0 → 0.10.0`, `0.10.0 → 0.11.0` and `0.11.0 → 0.12.0`, each of which
 only stamps `spec`); a compatible version
-range is planned, not built. The workspace (new in `0.14.0`, not
-published yet) carries spec `0.12.0` (digest
+range is planned, not built. `@texuli/spec@0.14.0` carries spec `0.12.0` (digest
 `049c93b4105fb765c2db5ff20272494f99fce52552aafaf85e00789fc1747a14`): two
 app-tier catalog ids, the `media-image` dark source, the `data-timeline`
 groups, markers and selection with the `collapse` event, and the
-design-system additions above. `@texuli/spec@0.13.1` carries spec `0.11.0` (digest
+design-system additions above. `@texuli/spec@0.13.0` and `0.13.1` carried spec `0.11.0` (digest
 `17845743d088b768c4441ea2196e5c350687533dbd0c95589cba938fb31fe993`), which
 extends the design-system document only (structured shadow levels, product
 tokens, a categorical palette of 1 to 8 colors and pinned soft inks; every

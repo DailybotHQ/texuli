@@ -12,11 +12,11 @@ the CRDT sync core. It has no Svelte and no DOM: Node tools, agents and the
 **In the stack:** layer L1, on the `@texuli/core` texels and `@texuli/deck`. `@texuli/pages`, `@texuli/canvas` (CRDT sync) and `@texuli/tools` build on it.
 
 > **Status: in development (pre-1.0).** `@texuli/document` is published on
-> npm as `0.13.1`, with provenance (first published as `0.7.0`; built in PLAN_010,
+> npm as `0.14.0`, with provenance (first published as `0.7.0`; built in PLAN_010,
 > ADR-010 and ADR-011 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
-> Under 0.x a new minor (`0.13.0`) may contain breaking changes, so pin the
-> exact version or use `^0.13.0`, which accepts only 0.13.x
+> Under 0.x a new minor (`0.14.0`) may contain breaking changes, so pin the
+> exact version or use `^0.14.0`, which accepts only 0.14.x
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 It sits on layer L1: it imports `@texuli/core` (the editor text model, the

@@ -11,10 +11,10 @@ data-heavy product screens.
 
 **In the stack:** layer L4, a domain package on the `@texuli/core` texels, `@texuli/primitives`, `@texuli/drag`, the `@texuli/tokens` token engine and the `texuli` components. `@texuli/blocks`, `@texuli/sheets`, the agent catalog and the player build on it.
 
-> **Status: 0.x release.** `@texuli/data` is published on npm as `0.13.1`, a
+> **Status: 0.x release.** `@texuli/data` is published on npm as `0.14.0`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
-> minor (`0.13.0`) may contain breaking changes, so pin the exact version or
-> use `^0.13.0`, which accepts only 0.13.x.
+> minor (`0.14.0`) may contain breaking changes, so pin the exact version or
+> use `^0.14.0`, which accepts only 0.14.x.
 
 ## Install
 
@@ -182,7 +182,7 @@ Not in the `0.3.0` release:
 - **One drag engine.** The board, tree view, calendar, timeline and grid
   column moves run on
   [`@texuli/drag`](https://github.com/DailybotHQ/texuli/blob/main/packages/drag/README.md)
-  (in development, on npm in the 0.13 line; `@texuli/data` `0.3.0` predates this
+  (in development, on npm in the 0.14 line; `@texuli/data` `0.3.0` predates this
   migration):
   one pointer gesture tracker (capture, threshold, `pointercancel` as
   cancel). The board and tree view also announce moves from localized

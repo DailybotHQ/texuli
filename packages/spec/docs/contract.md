@@ -509,8 +509,8 @@ stamped `0.11.0`. Rules: [design-system.md](design-system.md).
 
 ## Spec 0.12.0: catalog ids and design-system fields from consumer gaps
 
-New in `0.14.0` (not published yet; `@texuli/spec@0.13.0` and `0.13.1`
-carry spec `0.11.0`). Digest
+New in `0.14.0` (`@texuli/spec@0.14.0` carries spec `0.12.0`;
+`@texuli/spec@0.13.0` and `0.13.1` carried spec `0.11.0`). Digest
 `049c93b4105fb765c2db5ff20272494f99fce52552aafaf85e00789fc1747a14`.
 Additive, so the `0.11.0 → 0.12.0` migration stamps `spec` only:
 

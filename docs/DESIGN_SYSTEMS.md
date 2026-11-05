@@ -171,8 +171,8 @@ packages carry spec `0.10.0`, which refuses them (`unknown-key`, or
 
 ### Spec 0.12.0: dark shadows, the sidebar's active fill and the card content size
 
-New in `0.14.0`, which carries spec `0.12.0` (not published yet; the
-`0.13.x` packages carry spec `0.11.0`, which refuses `darkOpacity` as
+New in `0.14.0`, which carries spec `0.12.0` (the `0.13.x` packages
+carry spec `0.11.0`, which refuses `darkOpacity` as
 `unknown-key`). Every 0.11.0 document stays valid and compiles to the same
 variables.
 
@@ -380,7 +380,7 @@ exports the document (and, optionally, its cached compiled form):
     "./design-system.json": "./design-system.json",
     "./design-system.compiled.json": "./design-system.compiled.json"
   },
-  "peerDependencies": { "@texuli/tokens": "^0.13.0" }
+  "peerDependencies": { "@texuli/tokens": "^0.14.0" }
 }
 ```
 

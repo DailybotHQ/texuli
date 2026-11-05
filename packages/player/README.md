@@ -12,9 +12,9 @@ player never navigates, fetches or persists anything on its own.
 **In the stack:** layer L7: paints what the agent catalog (L6) validates against the `@texuli/spec` blueprint contract, with the `texuli` components and the domain packages. `@texuli/pages` and `@texuli/slides` embed it.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.13.1`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.13.0`) may contain breaking
-> changes, so pin the exact version or use `^0.13.0`, which accepts only 0.13.x.
+> published to npm as `0.14.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.14.0`) may contain breaking
+> changes, so pin the exact version or use `^0.14.0`, which accepts only 0.14.x.
 
 > **New in `0.4.0`.** Spec 0.3.0 and 0.4.0 envelopes (`state`, `flow`,
 > `bind`, `on` and the closed actions), the data view, chat display,
@@ -177,7 +177,7 @@ chrome, as the slides stage does for every component on a slide
 
 ## New in 0.14.0
 
-In development (spec `0.12.0`, not published yet): the `data-timeline`
+Ships in `0.14.0` (spec `0.12.0`); the `0.13.x` releases predate it. The `data-timeline`
 painter passes `groups` (header labels and bands), `markers`, `collapsed`
 and `selectedRow` to `TimelineView`. Bands with dates that do not parse,
 markers whose `at` does not parse and unknown tones are dropped. Rows
