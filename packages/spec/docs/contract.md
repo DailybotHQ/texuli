@@ -374,7 +374,8 @@ names are not checked.
 
 **Events and actions** (codes `unknown-event`, `action`). Node `on` maps an
 event to 1–8 actions run in order. Events are the closed vocabulary
-`press`, `change`, `select`, `submit`, `dismiss`, `move`, and each key must
+`press`, `change`, `select`, `submit`, `dismiss`, `move` and (from spec
+0.12.0) `collapse`, and each key must
 be one the component lists in `events`. Actions (`op`), with the fields
 each takes (anything else is refused):
 
@@ -510,7 +511,7 @@ stamped `0.11.0`. Rules: [design-system.md](design-system.md).
 
 New in `0.14.0` (not published yet; `@texuli/spec@0.13.0` and `0.13.1`
 carry spec `0.11.0`). Digest
-`e61ec55ad2b53019dbb934097271f89187829c0a457b763397cb7e2c2441ce78`.
+`f2a7c8158eaea962cbc7d3dc8de82541dc28b6d813887d7e362a3972ca56c645`.
 Additive, so the `0.11.0 → 0.12.0` migration stamps `spec` only:
 
 - the catalog gains two app-tier ids, `avatar-group-grid` (`texuli`,
@@ -521,6 +522,16 @@ Additive, so the `0.11.0 → 0.12.0` migration stamps `spec` only:
 - `media-image` gains `srcDark` (an image URL at the untrusted tier, like
   `src`; the sink scan, the paint pass and the hostile harden pass already
   police it) and `darkMode` (`theme`, `system`; D-G-023);
+- `data-timeline` gains `groups` (at most 100 `{ id, label, band? }`
+  headers keyed by each task's `group`; a `band` is `{ start, end, label?,
+  tone? }` with ISO dates, drawn on the group's header row), `markers` (at
+  most 50 `{ at, label, tone? }`, `at` an ISO date or time), and the
+  bindable `collapsed` (at most 100 `{ id }` items, so a `list` state fits)
+  and `selectedRow` (D-G-033); labels are untrusted text of at most 120
+  characters and tones are the data view tones;
+- the closed event vocabulary (`$defs.eventName` in the catalog schema,
+  `SPEC_EVENT_NAMES`) gains `collapse`, which `data-timeline` fires with the
+  group id when a group collapses or expands;
 - the design-system document (`formatVersion` stays `1`) gains a shadow
   layer's optional `darkOpacity` (D-G-028), and `$defs.issueCode` gains
   `aa-non-text` (D-G-029), raised by `@texuli/tokens`, never by the spec.
@@ -528,6 +539,7 @@ Additive, so the `0.11.0 → 0.12.0` migration stamps `spec` only:
 `catalog/components.json` was re-projected and the schema, the TypeScript
 and Kotlin projections, `acme` (which shows `darkOpacity`), the native
 design tokens and the native parity matrix were regenerated. The envelope
-shape and the blueprint `$defs` are unchanged; the `spec` enum gains
+shape and the blueprint `$defs` are unchanged (the catalog schema's
+`eventName` gains `collapse`); the `spec` enum gains
 `0.12.0`, and every committed golden and invalid fixture is stamped
 `0.12.0`.

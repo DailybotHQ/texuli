@@ -69,9 +69,9 @@
     },
     {
       "specVersion": "0.12.0",
-      "specDigest": "e61ec55ad2b53019dbb934097271f89187829c0a457b763397cb7e2c2441ce78",
+      "specDigest": "f2a7c8158eaea962cbc7d3dc8de82541dc28b6d813887d7e362a3972ca56c645",
       "change": "minor",
-      "summary": "Additive (consumer gaps D-G-022 to D-G-024 and D-G-027 to D-G-029, in 0.14.0): the app-tier catalog ids avatar-group-grid (texuli) and code-field (@texuli/blocks), web-only; media-image gains srcDark (an image URL at the untrusted tier, like src) and darkMode (theme, system); the design-system $defs.shadowLayer gains an optional darkOpacity (0 to 1, the layer's opacity in dark mode; omitted means opacity) and $defs.issueCode gains aa-non-text (a role fill below 3:1 against its container, WCAG 1.4.11); acme shows darkOpacity; every 0.11.0 blueprint and design-system document stays valid and the blueprint envelope is unchanged; stamp-only migration 0.11.0→0.12.0"
+      "summary": "Additive (consumer gaps D-G-022 to D-G-024 and D-G-027 to D-G-029, in 0.14.0): the app-tier catalog ids avatar-group-grid (texuli) and code-field (@texuli/blocks), web-only; media-image gains srcDark (an image URL at the untrusted tier, like src) and darkMode (theme, system); data-timeline gains groups (at most 100 { id, label, band? } headers keyed by each task group; a band is { start, end, label?, tone? } with ISO dates), markers (at most 50 { at, label, tone? }), and the bindable collapsed (at most 100 { id } items) and selectedRow, and fires collapse; the closed event vocabulary ($defs.eventName) gains collapse; the design-system $defs.shadowLayer gains an optional darkOpacity (0 to 1, the layer's opacity in dark mode; omitted means opacity) and $defs.issueCode gains aa-non-text (a role fill below 3:1 against its container, WCAG 1.4.11); acme shows darkOpacity; every 0.11.0 blueprint and design-system document stays valid and the blueprint envelope is unchanged; stamp-only migration 0.11.0→0.12.0"
     }
   ]
 }

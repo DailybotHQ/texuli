@@ -143,9 +143,9 @@
       "additionalProperties": false
     },
     "eventName": {
-      "description": "The closed event vocabulary.",
+      "description": "The closed event vocabulary. collapse (spec 0.12.0) reports a group a view collapsed or expanded.",
       "type": "string",
-      "enum": ["press", "change", "select", "submit", "dismiss", "move"]
+      "enum": ["press", "change", "select", "submit", "dismiss", "move", "collapse"]
     },
     "deprecation": {
       "description": "Deprecated since a spec version; warns for one minor before removal.",

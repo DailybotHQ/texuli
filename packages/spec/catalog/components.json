@@ -1,5 +1,5 @@
 {
-  "catalogHash": "e435634b3789f41681c482947be0b76698795a2eaf85ca5ddeedcc3d6a3c96c2",
+  "catalogHash": "df09bb2bb6afef0a7c5349f8a4108c2d65065151078ac33264d15446f833f0d9",
   "components": [
     {
       "capability": "web-only",
@@ -3757,15 +3757,34 @@
       "summary": "Notifications, newest first, with unread state, mark read and unread, mark all read and an unread view."
     },
     {
-      "bindable": ["zoom"],
+      "bindable": ["collapsed", "selectedRow", "zoom"],
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
-      "events": ["change", "move", "select"],
+      "events": ["change", "collapse", "move", "select"],
       "group": "data",
       "id": "data-timeline",
       "label": "Project timeline",
       "placement": "content",
       "props": [
+        {
+          "kind": "array",
+          "name": "collapsed",
+          "schema": {
+            "items": {
+              "properties": {
+                "id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": ["id"],
+              "type": "object"
+            },
+            "maxItems": 100,
+            "type": "array"
+          }
+        },
         {
           "kind": "array",
           "name": "dependencies",
@@ -3795,6 +3814,53 @@
           }
         },
         {
+          "kind": "array",
+          "name": "groups",
+          "schema": {
+            "items": {
+              "properties": {
+                "band": {
+                  "properties": {
+                    "end": {
+                      "maxLength": 10,
+                      "minLength": 10,
+                      "type": "string"
+                    },
+                    "label": {
+                      "maxLength": 120,
+                      "type": "string"
+                    },
+                    "start": {
+                      "maxLength": 10,
+                      "minLength": 10,
+                      "type": "string"
+                    },
+                    "tone": {
+                      "enum": ["primary", "info", "success", "warning", "danger", "neutral"],
+                      "type": "string"
+                    }
+                  },
+                  "required": ["start", "end"],
+                  "type": "object"
+                },
+                "id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "label": {
+                  "maxLength": 120,
+                  "type": "string"
+                }
+              },
+              "required": ["id", "label"],
+              "type": "object"
+            },
+            "maxItems": 100,
+            "type": "array"
+          }
+        },
+        {
           "kind": "string",
           "name": "label",
           "required": true
@@ -3802,6 +3868,38 @@
         {
           "kind": "string",
           "name": "locale"
+        },
+        {
+          "kind": "array",
+          "name": "markers",
+          "schema": {
+            "items": {
+              "properties": {
+                "at": {
+                  "description": "An ISO 8601 date (2026-10-27) or time (2026-10-27T09:00:00Z).",
+                  "maxLength": 35,
+                  "minLength": 10,
+                  "type": "string"
+                },
+                "label": {
+                  "maxLength": 120,
+                  "type": "string"
+                },
+                "tone": {
+                  "enum": ["primary", "info", "success", "warning", "danger", "neutral"],
+                  "type": "string"
+                }
+              },
+              "required": ["at", "label"],
+              "type": "object"
+            },
+            "maxItems": 50,
+            "type": "array"
+          }
+        },
+        {
+          "kind": "string",
+          "name": "selectedRow"
         },
         {
           "kind": "array",

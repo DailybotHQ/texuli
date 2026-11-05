@@ -614,3 +614,115 @@ describe('the state surface module', () => {
     expect(LIST_TEXT_PATTERN).toBe(SPEC_PATTERNS.listText);
   });
 });
+
+describe('data-timeline groups, markers and selection (spec 0.12.0)', () => {
+  it('accepts bands, markers, the bound collapsed and selectedRow and on.collapse, and refuses hostile values', () => {
+    const real = { blueprintSchema, catalog: realCatalog };
+    const timeline = (patch: (props: Bag, e: Bag) => void = () => {}): Bag => {
+      const props: Bag = {
+        label: 'Rollout',
+        tasks: [
+          { id: 'r', title: 'Research', start: '2026-11-02', end: '2026-11-06', group: 'g1' },
+        ],
+        groups: [
+          {
+            id: 'g1',
+            label: 'Discovery',
+            band: { start: '2026-11-02', end: '2026-11-06', label: 'Phase 1', tone: 'info' },
+          },
+        ],
+        markers: [{ at: '2026-11-20T09:00:00Z', label: 'Review', tone: 'warning' }],
+      };
+      const e: Bag = {
+        ...clone(golden),
+        state: {
+          folded: { type: 'list', initial: [{ id: 'g1' }] },
+          picked: { type: 'string', initial: 'r' },
+        },
+        tree: {
+          id: 'layout-page',
+          props: { title: 'Plan' },
+          children: [
+            {
+              id: 'data-timeline',
+              props,
+              bind: { collapsed: { $state: 'folded' }, selectedRow: { $state: 'picked' } },
+              on: {
+                collapse: [{ op: 'emit', intent: 'group-toggled' }],
+                select: [{ op: 'setState', state: 'picked', fromEvent: 'value' }],
+              },
+            },
+          ],
+        },
+      };
+      patch(props, e);
+      return e;
+    };
+    expect(found(timeline(), real)).toEqual([]);
+    const at = '$.tree.children[0].props';
+    const cases: [string, (props: Bag, e: Bag) => void, string[]][] = [
+      [
+        'an over-long marker label',
+        (p) => (p.markers = [{ at: '2026-11-20', label: 'x'.repeat(121) }]),
+        [`prop-type ${at}.markers[0].label`],
+      ],
+      [
+        'an over-long group label',
+        (p) => ((p.groups as Bag[])[0] = { id: 'g1', label: 'x'.repeat(121) }),
+        [`prop-type ${at}.groups[0].label`],
+      ],
+      [
+        'an unknown marker tone',
+        (p) => (p.markers = [{ at: '2026-11-20', label: 'Review', tone: 'purple' }]),
+        [`prop-type ${at}.markers[0].tone`],
+      ],
+      [
+        'an unknown band tone',
+        (p) =>
+          ((p.groups as Bag[])[0] = {
+            id: 'g1',
+            label: 'Discovery',
+            band: { start: '2026-11-02', end: '2026-11-06', tone: 'purple' },
+          }),
+        [`prop-type ${at}.groups[0].band.tone`],
+      ],
+      [
+        'a band start with a time',
+        (p) =>
+          ((p.groups as Bag[])[0] = {
+            id: 'g1',
+            label: 'Discovery',
+            band: { start: '2026-11-02T09:00:00Z', end: '2026-11-06' },
+          }),
+        [`prop-type ${at}.groups[0].band.start`],
+      ],
+      [
+        'an unknown band field',
+        (p) =>
+          ((p.groups as Bag[])[0] = {
+            id: 'g1',
+            label: 'Discovery',
+            band: { start: '2026-11-02', end: '2026-11-06', color: 'red' },
+          }),
+        [`prop-type ${at}.groups[0].band.color`],
+      ],
+      [
+        'too many markers',
+        (p) =>
+          (p.markers = Array.from({ length: 51 }, (_, i) => ({
+            at: '2026-11-20',
+            label: `M${i}`,
+          }))),
+        [`prop-type ${at}.markers`],
+      ],
+      [
+        'collapsed bound to a string',
+        (_, e) => ((e.state as Bag).folded = { type: 'string', initial: 'g1' }),
+        ['binding $.tree.children[0].bind.collapsed'],
+      ],
+    ];
+    for (const [label, patch, expected] of cases) {
+      expect(found(timeline(patch), real), label).toEqual(expected);
+    }
+  });
+});

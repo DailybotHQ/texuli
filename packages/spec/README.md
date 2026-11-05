@@ -22,10 +22,12 @@ DOM, no Svelte, no Node APIs and no runtime dependencies.
 
 > **New in `0.14.0` (in development, not published).** The workspace
 > carries **spec 0.12.0** (digest
-> `e61ec55ad2b53019dbb934097271f89187829c0a457b763397cb7e2c2441ce78`): the
+> `f2a7c8158eaea962cbc7d3dc8de82541dc28b6d813887d7e362a3972ca56c645`): the
 > app-tier catalog ids `avatar-group-grid` and `code-field`, the `srcDark`
-> and `darkMode` props of `media-image`, a shadow layer's `darkOpacity` and
-> the `aa-non-text` design-system code.
+> and `darkMode` props of `media-image`, the `data-timeline` groups with
+> bands, markers, the bindable `collapsed` and `selectedRow` and the new
+> `collapse` event, a shadow layer's `darkOpacity` and the `aa-non-text`
+> design-system code.
 > Every `0.11.0` envelope migrates by stamping `spec`.
 
 > **New in `0.13.0`.** `@texuli/spec@0.13.0` carries **spec 0.11.0**
@@ -313,8 +315,9 @@ envelope up to the current spec with pure, per-version steps
 only stamps `spec`); a compatible version
 range is planned, not built. The workspace (new in `0.14.0`, not
 published yet) carries spec `0.12.0` (digest
-`e61ec55ad2b53019dbb934097271f89187829c0a457b763397cb7e2c2441ce78`): two
-app-tier catalog ids, the `media-image` dark source and the
+`f2a7c8158eaea962cbc7d3dc8de82541dc28b6d813887d7e362a3972ca56c645`): two
+app-tier catalog ids, the `media-image` dark source, the `data-timeline`
+groups, markers and selection with the `collapse` event, and the
 design-system additions above. `@texuli/spec@0.13.1` carries spec `0.11.0` (digest
 `17845743d088b768c4441ea2196e5c350687533dbd0c95589cba938fb31fe993`), which
 extends the design-system document only (structured shadow levels, product
