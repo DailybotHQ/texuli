@@ -20,6 +20,8 @@ let {
   xKind,
   formatX,
   locale,
+  yDomain,
+  formatValue,
 }: CartesianChartProps = $props();
 </script>
 
@@ -42,4 +44,6 @@ let {
   {xKind}
   {formatX}
   {locale}
+  {yDomain}
+  {formatValue}
 />

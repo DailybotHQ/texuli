@@ -19,6 +19,10 @@ const positiveNumber = {
   constraints: { finite: true, exclusiveMinimum: 0 },
 } as const;
 const nullableNumber = { kind: 'nullable', value: finiteNumber } as const;
+const yDomainEnd = {
+  kind: 'union',
+  variants: [finiteNumber, { kind: 'enum', enumValues: ['auto'] }],
+} as const;
 const stringOrNumber = {
   kind: 'union',
   variants: [nonEmptyString, finiteNumber],
@@ -377,6 +381,29 @@ const cartesianProps = [
     'BCP 47 language tag for dates and announced values; defaults to the runtime locale.',
     'localization',
     { kind: 'string', constraints: { nonEmpty: true } }
+  ),
+  prop(
+    'yDomain',
+    'Y domain',
+    'Fixed y-axis domain [min, max]; an auto end follows the data. Marks outside it are clipped.',
+    'axes',
+    {
+      kind: 'tuple',
+      items: [yDomainEnd, yDomainEnd],
+    },
+    false,
+    undefined,
+    'developer'
+  ),
+  prop(
+    'formatValue',
+    'Value formatter',
+    'Developer callback that formats y values on the axis, live region, tooltip and data table.',
+    'axes',
+    { kind: 'event', signature: '(value: number) => string' },
+    false,
+    undefined,
+    'developer'
   ),
   prop(
     'onzoom',

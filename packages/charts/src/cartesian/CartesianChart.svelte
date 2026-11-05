@@ -22,6 +22,7 @@ import {
   extent,
   formatTimeTick,
   linearScale,
+  niceDomain,
   stack,
   ticks,
   timeTicks,
@@ -36,10 +37,12 @@ import {
   type CartesianSeries,
   type CartesianXFormatter,
   type CartesianXKind,
+  type CartesianYDomain,
   cartesianXFormatter,
   createCartesianLayout,
   lineCoordinates,
   resolveChartLocale,
+  resolveYDomain,
   toInteractionSeries,
   windowCartesianSeries,
   xDomain,
@@ -78,6 +81,13 @@ interface Props {
   formatX?: CartesianXFormatter;
   /** BCP 47 tag for dates and announced values; default the runtime's locale. */
   locale?: string;
+  /**
+   * A fixed y domain, `[min, max]`; an `'auto'` or omitted end follows the
+   * data. Marks outside it are clipped; the data table keeps the true values.
+   */
+  yDomain?: CartesianYDomain;
+  /** Formats y values on the axis, live region, tooltip and data table. */
+  formatValue?: (value: number) => string;
 }
 
 let {
@@ -99,6 +109,8 @@ let {
   xKind,
   formatX,
   locale,
+  yDomain: fixedYDomain,
+  formatValue,
 }: Props = $props();
 
 const id = $props.id();
@@ -118,6 +130,13 @@ const plotRect = $derived({
 
 let tableOpen = $state(false);
 let hidden = $state(new Set<string>());
+
+// A fixed y domain clips canvas marks to the plot, as the SVG clip path does.
+const canvasClip = $derived(
+  fixedYDomain
+    ? `; clip-path: inset(${(margin.top / height) * 100}% ${(margin.right / width) * 100}% ${(margin.bottom / height) * 100}% ${(margin.left / width) * 100}%)`
+    : ''
+);
 
 const chartLocale = $derived(resolveChartLocale(locale));
 const numberFormat = $derived(new Intl.NumberFormat(chartLocale, { maximumFractionDigits: 2 }));
@@ -192,14 +211,14 @@ const model = $derived.by(() => {
       : rows.flat().filter((value): value is number => value !== null);
   const domain = extent(yValues) ?? [0, 1];
   const includeZero = kind !== 'line';
-  const yDomain: readonly [number, number] = includeZero
-    ? [Math.min(0, domain[0]), Math.max(0, domain[1])]
-    : domain;
+  const [y0, y1] = includeZero ? [Math.min(0, domain[0]), Math.max(0, domain[1])] : domain;
+  // The data domain rounds out to nice ticks; a host's fixed ends then replace it exactly.
   const yScale = linearScale({
-    domain:
-      yDomain[0] === yDomain[1] ? [Math.min(yDomain[0], 0), Math.max(yDomain[1], 1)] : yDomain,
+    domain: resolveYDomain(
+      y0 === y1 ? niceDomain(Math.min(y0, 0), Math.max(y1, 1), 10) : niceDomain(y0, y1, 10),
+      fixedYDomain
+    ),
     range: [height - margin.bottom, margin.top],
-    nice: true,
   });
   const yTicks = ticks(yScale.domain[0], yScale.domain[1], 5);
   const xPosition = (key: number | string) => {
@@ -363,7 +382,10 @@ const model = $derived.by(() => {
                 (category(String(value)) === undefined ? 0 : category.bandwidth() / 2)) -
             margin.left,
         }));
-  const yAxisTicks = yTicks.map((value) => ({ value, position: yScale(value) - margin.top }));
+  const yAxisTicks = yTicks.map((value) => ({
+    value: formatValue ? formatValue(value) : value,
+    position: yScale(value) - margin.top,
+  }));
   const pointLookups = series.map(
     (item) => new Map(item.points.map((point) => [point.x, point.y]))
   );
@@ -435,7 +457,8 @@ const model = $derived.by(() => {
     keys,
     formatters: {
       x: cartesianXFormatter({ xKind, formatX, locale: chartLocale, keys, fallback: display }),
-      y: (value: number | null) => display(value),
+      y: (value: number | null) =>
+        formatValue && value !== null ? formatValue(value) : display(value),
     } satisfies ChartFormatters,
     tickKeys,
     xAxisTicks,
@@ -669,7 +692,7 @@ const interactionModules = $derived(
           <!-- Shares the interactive plot's box (G96): capped at the layout width, so marks stay on the axes. -->
           <div
             class="canvas-layer"
-            style={`max-inline-size: ${width}px; aspect-ratio: ${width} / ${height}`}
+            style={`max-inline-size: ${width}px; aspect-ratio: ${width} / ${height}${canvasClip}`}
             aria-hidden="true"
           >
             <CanvasRenderer kind={kind} series={model.canvasSeries} {width} {height} />
@@ -756,7 +779,11 @@ const interactionModules = $derived(
       </svg>
       {#if model.useCanvas}
         <!-- The static SVG fills the figure, so its canvas does too, at the same aspect ratio. -->
-        <div class="canvas-layer" style={`aspect-ratio: ${width} / ${height}`} aria-hidden="true">
+        <div
+          class="canvas-layer"
+          style={`aspect-ratio: ${width} / ${height}${canvasClip}`}
+          aria-hidden="true"
+        >
           <CanvasRenderer kind={kind} series={model.canvasSeries} {width} {height} />
         </div>
       {/if}
