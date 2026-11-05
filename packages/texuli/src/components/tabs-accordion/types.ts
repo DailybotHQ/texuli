@@ -25,4 +25,10 @@ export type TabItem = {
    * `aria-controls` (new in `0.14.0`).
    */
   panelId?: string;
+  /**
+   * `data-*` attributes for this tab's trigger, such as a test hook
+   * (`{ 'data-testid': 'tab-billing' }`). Texuli's own attributes win
+   * (new in `0.14.0`).
+   */
+  attributes?: Record<`data-${string}`, string>;
 };
