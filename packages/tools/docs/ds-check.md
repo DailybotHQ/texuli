@@ -140,7 +140,8 @@ of them.
 
 **The sheet.** The published `@texuli/tools` ships the conformance sheet at
 `dist/ds-check/sheet/` (`ds-conformance.html`, one script, one stylesheet,
-every catalog component and theme bundled in), and `--render` serves it by
+every catalog component and theme bundled in, and `THIRD_PARTY_NOTICES.md`,
+the license notices of the bundled dependencies), and `--render` serves it by
 default (`--sheet builtin`) from a read-only static server on `127.0.0.1`.
 It needs no bundler and no other Texuli package at run time, so it runs in
 any project that installs `@texuli/tools` from npm. `pnpm verify:packages`
@@ -203,7 +204,7 @@ expect(runs.every((run) => run.ok)).toBe(true);
   names, and the render findings' codes.
 - `scripts/tests/ds-check-sheet.test.ts`: `pnpm verify:packages` builds the
   sheet into `@texuli/tools` at `dist/ds-check/sheet/` as one self-contained
-  page.
+  page with its third-party license notices.
 - `tests/e2e/ds-conformance.spec.ts` (chromium): the acme, minimal and
   fictional protoyard-theme/v1 brands and six library themes, every mode,
   with no known finding, plus a planted literal and a broken pair that the

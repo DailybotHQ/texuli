@@ -5,7 +5,8 @@
  * `tests/fixtures/app/ds-conformance.html`, the same page the repository's
  * conformance spec drives, with Vite into the packed `@texuli/tools` at
  * `dist/ds-check/sheet/`: one HTML page, one script and one stylesheet,
- * every catalog component and theme bundled in (no code splitting). The
+ * every catalog component and theme bundled in (no code splitting), and
+ * `THIRD_PARTY_NOTICES.md`, the license notices of the bundled dependencies. The
  * published `render.js` serves that folder with a read-only static server,
  * so a consumer needs neither a bundler nor any other Texuli package to run
  * the render check. Nothing is committed: the sheet is rebuilt from the
@@ -21,6 +22,12 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 /** The sheet page, as `@texuli/tools` names it (`DS_CHECK_SHEET_PATH`). */
 export const DS_CHECK_SHEET_PAGE = 'ds-conformance.html';
+
+/**
+ * The third-party license notices of the bundled dependencies (Vite's
+ * `build.license`), beside the page: the bundle strips their comments.
+ */
+export const DS_CHECK_SHEET_NOTICES = 'THIRD_PARTY_NOTICES.md';
 
 /** Where the sheet lands inside a package's `dist/` (beside `ds-check/render.js`). */
 export const DS_CHECK_SHEET_DIST = join('ds-check', 'sheet');
@@ -40,6 +47,12 @@ export function checkBuiltSheet(dir: string, page = DS_CHECK_SHEET_PAGE): string
   if (!refs.some((ref) => ref.endsWith('.js')))
     return [`ds-check sheet: ${page} references no script`];
   const problems: string[] = [];
+  const notices = join(dir, DS_CHECK_SHEET_NOTICES);
+  // Svelte's runtime is always in the bundle, so its notice must be too.
+  if (!existsSync(notices) || !/\bsvelte\b[\s\S]*\bMIT\b/u.test(readFileSync(notices, 'utf8')))
+    problems.push(
+      `ds-check sheet: ${DS_CHECK_SHEET_NOTICES} is missing or lists no svelte (MIT) notice`
+    );
   for (const ref of refs) {
     if (!ref.startsWith('./')) problems.push(`ds-check sheet: ${ref} is not a relative reference`);
     else if (!existsSync(join(dir, ref))) problems.push(`ds-check sheet: ${ref} is missing`);
@@ -67,6 +80,8 @@ export async function buildDsCheckSheet(outDir: string, root = ROOT): Promise<st
         outDir,
         emptyOutDir: true,
         target: 'esnext',
+        // The third-party license notices of every bundled dependency, beside the page.
+        license: { fileName: DS_CHECK_SHEET_NOTICES },
         // One script: no chunk to load lazily from a path the page cannot reach.
         chunkSizeWarningLimit: 8192,
         reportCompressedSize: false,
