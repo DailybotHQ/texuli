@@ -57,6 +57,16 @@ the one a host paints:
 - titled charts render a fixed rank: cartesian and matrix charts h2; flow,
   geo and part-whole charts h3. Compact charts render none.
 
+  So a flow, geo or part-whole chart placed directly under a titled page's
+  h1 skips a rank and is refused (`heading-skip`); in a titled card (h2) or
+  a slide it is valid. That includes the catalog's own examples of those
+  nine charts painted standalone in a page (D-G-020, open): the rule matches
+  what the component paints, and no prop sets the rank, so the fix (a rank
+  nested under the nearest titled section, h3 in a fragment) is a design
+  change across `@texuli/charts`, this grammar and the player.
+  `packages/player/tests/examples-paint.test.ts` paints every example inside
+  a titled `layout-page` and pins those nine refusals.
+
 A titled doc holding two h1 text blocks and an h4 reports two
 `heading-multiple-h1` issues and one `heading-skip`.
 

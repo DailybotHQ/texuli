@@ -10,8 +10,10 @@ import { testSheetHost } from './sheet-host.ts';
 
 /**
  * Every manifest example of every agent-emittable id paints in the Player
- * (happy-dom) with no placeholder and no node error. Examples that read a
- * `$state` list get it declared with two items.
+ * (happy-dom) with no placeholder, no node error and no refusal, standalone
+ * inside a titled `layout-page` (D-G-020: the page's h1 comes first, so an
+ * example whose heading skips a rank under it is refused). Examples that
+ * read a `$state` list get it declared with two items.
  */
 
 const entries = (await buildCatalog(CATALOG_GROUPS)).catalog.entries;
@@ -64,6 +66,32 @@ function contextFor(id: string, props: Readonly<Record<string, unknown>>) {
   return { state, flow, wrap };
 }
 
+/** The frames: an example of one is the root itself; anything else sits in a titled page. */
+const FRAMES = new Set(['layout-page', 'layout-doc', 'layout-deck']);
+
+/**
+ * D-G-020, open: these charts render their title as a fixed h3 (the catalog
+ * grammar's `titleHeading: 3`, the same rank the component paints), so
+ * standalone under the page's h1 they skip a rank and the player refuses
+ * them. The rule is right and no example prop sets the rank; the fix is a
+ * design decision (see packages/catalog/docs/render-grammar.md). Each is
+ * asserted to fail exactly so, so this list cannot rot: when one paints
+ * clean, remove it. Every other example must paint with no refusal.
+ */
+const KNOWN_PAGE_REFUSALS: Readonly<Record<string, readonly string[]>> = Object.fromEntries(
+  [
+    'charts-donut',
+    'charts-funnel',
+    'charts-geo-map',
+    'charts-geo-point-map',
+    'charts-network',
+    'charts-pie',
+    'charts-sankey',
+    'charts-sunburst',
+    'charts-treemap',
+  ].map((id) => [id, ['grammar:heading-skip Heading level jumps from h1 to h3.']])
+);
+
 /** Ids happy-dom cannot paint, with the reason (browser e2e covers them). */
 const DOM_LIMITS: Readonly<Record<string, string>> = {
   'media-composition-canvas': 'happy-dom has no 2D canvas context',
@@ -111,14 +139,20 @@ describe('every emittable example paints', () => {
               }
             : {}),
           ...(context.flow ? { flow: context.flow } : {}),
-          tree: context.wrap({ id: entry.id, props: example.props }),
+          tree: FRAMES.has(entry.id)
+            ? { id: entry.id, props: example.props }
+            : {
+                id: 'layout-page',
+                props: { title: `${entry.label} page` },
+                children: [context.wrap({ id: entry.id, props: example.props })],
+              },
         };
         const errors: string[] = [];
         const { container } = render(Player, {
           props: {
             blueprint,
             label: 'Parity',
-            // Examples are fragments: the frame-root rule is the only refusal allowed.
+            // Preview paints a refused draft too; the diagnostics below must still be empty.
             invalidPolicy: 'preview',
             // A document example (spec 0.7.0) is checked and painted through a document host.
             documentHost: testDocumentHost().host,
@@ -137,8 +171,7 @@ describe('every emittable example paints', () => {
               stateIssues: readonly { message: string }[];
             }) => {
               for (const d of event.diagnostics) {
-                if (d.severity === 'error' && d.check !== 'root')
-                  errors.push(`${d.check}:${d.code} ${d.message}`);
+                if (d.severity === 'error') errors.push(`${d.check}:${d.code} ${d.message}`);
               }
               for (const issue of event.stateIssues) errors.push(`state: ${issue.message}`);
             },
@@ -147,7 +180,7 @@ describe('every emittable example paints', () => {
         await expect
           .poll(() => container.querySelector('[data-tx-player-skeleton]'), { timeout: 15_000 })
           .toBeNull();
-        expect(errors).toEqual([]);
+        expect(errors).toEqual(KNOWN_PAGE_REFUSALS[entry.id] ?? []);
         expect(
           container.querySelector('[data-tx-player-error]'),
           container.innerHTML.slice(0, 400)
