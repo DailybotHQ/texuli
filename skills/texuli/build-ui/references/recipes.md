@@ -202,6 +202,21 @@ refused op changes nothing; labels refuse control and bidi characters.
 **Gates:** `pnpm vitest run packages/workflows` and the behavior scenario
 `tests/behavior/scenarios/workflow-editor.spec.ts`.
 
+## 8. Code field
+
+New in `0.13.1`: typed code in a form (snippet, query, config).
+
+```svelte
+<CodeField bind:value language="sql" label="Query" lineNumbers name="query" />
+```
+
+- `import { CodeField } from '@texuli/blocks/code-field'`; name it with
+  `label`, `aria-label` or `aria-labelledby`.
+- **Keyboard:** Tab indents, Shift+Tab outdents, Enter keeps the indent;
+  Escape, then Tab, leaves the field (the field describes this itself).
+- `wrap`, `tabSize`, `indentWith`, `readonly`, `disabled`, `rows`. Past
+  20,000 characters it is a plain textarea. Read-only code: the code block.
+
 ## Shared acceptance for every recipe
 
 - [ ] Primary path works with real handlers (no dead buttons)
