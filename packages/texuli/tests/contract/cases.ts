@@ -34,9 +34,6 @@ export const EXCLUDED: Record<string, string> = {
   'components/select/SelectPortal': 'placement: moves its children to the portal target',
   'components/select/SelectValue': 'text: renders the selected label or placeholder, no element',
   'motion/MotionProvider': 'provider: the motion level for its subtree, renders its children',
-  'i18n/LabelsProvider': 'provider: the label dictionary for its subtree, renders its children',
-  'components/icons/IconsProvider':
-    'provider: the icon registry for its subtree, renders its children',
 };
 
 /**
@@ -53,6 +50,9 @@ export const EXCLUDED_PREFIXES: Record<string, string> = {
   // some runs (it passed on macOS and failed on Linux CI), and an EXCLUDED key
   // would then fail the stale check in the other runs.
   'i18n/': 'provider: LabelsProvider sets the label dictionary and renders its children',
+  // The same for IconsProvider (D-G-021), another provider-only scope.
+  'components/icons/IconsProvider':
+    'provider: the icon registry for its subtree, renders its children',
 };
 
 /** One case per exported rendering component, each mounted in its family harness. */

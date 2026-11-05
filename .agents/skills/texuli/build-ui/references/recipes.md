@@ -15,7 +15,7 @@ import public subpaths only.
 | Dense data | `@texuli/data/*` views (grid, tree, board, calendar, timeline, files, …) |
 | Charts | `@texuli/charts/*` lazy families (`cartesian`, `compact`, `part-whole`, …) |
 | Theme | `enterprise-neutral` or themes skill search |
-| App icons | `registerIcons({ rocket: Rocket })` in the root component (Svelte context, SSR-safe), then `<Icon icon="rocket">`; augment `IconNames` for types (new in `0.13.1`) |
+| App icons | `registerIcons({ rocket: Rocket })` in the root (context, SSR-safe), then `<Icon icon="rocket">`; augment `IconNames` for types (new in `0.13.1`) |
 | Group avatars | `AvatarGroup layout="grid"`: up to four faces in one circle, `+N` past four (new in `0.13.1`) |
 
 **Compose order:** shell → filter bar → KPI row → main visualization → detail
@@ -216,9 +216,8 @@ New in `0.13.1`: typed code in a form (snippet, query, config).
 - `import { CodeField } from '@texuli/blocks/code-field'`; name it with
   `label`, `aria-label` or `aria-labelledby`.
 - **Keyboard:** Tab indents, Shift+Tab outdents, Enter keeps the indent;
-  Escape, then Tab, leaves the field (the field describes this itself).
-- `wrap`, `tabSize`, `indentWith`, `readonly`, `disabled`, `rows`. Past
-  20,000 characters it is a plain textarea. Read-only code: the code block.
+  Escape, then Tab, leaves the field.
+- Past 20,000 characters it is a plain textarea. Read-only code: the code block.
 
 ## Shared acceptance for every recipe
 
