@@ -178,6 +178,38 @@ Full checklists: [`references/recipes.md`](references/recipes.md).
 | Schema-driven form, infinite canvas, spreadsheet, dashboard | `@texuli/forms` (`SchemaForm`), `@texuli/canvas` (`editor`, `viewer`), `@texuli/sheets` (`view`), `@texuli/data/dashboard` (in development, all new in `0.8.0`); agents send them as `schema-form`, `canvas`, `spreadsheet` and `data-dashboard` nodes painted through the player's host seams: [`references/imports.md`](references/imports.md) |
 | A whole stateful screen as JSON (an agent sends it) | [`../blueprints/SKILL.md`](../blueprints/SKILL.md) stage **G** |
 
+## Labels and locale
+
+Every built-in string (close buttons, empty states, landmark names, block
+tone labels, the page outline) has a message id and an English default. To
+ship the UI in another language, pass one dictionary near the root; a
+component's own label prop still wins.
+
+- **On `main` (not on npm yet, after `0.12.3`):** `<LabelsProvider
+  labels={es} locale="es">` or `setTexuliLabels(es, { locale: 'es' })` from
+  `texuli/i18n` covers `texuli`, `@texuli/primitives`, `@texuli/blocks` and
+  `@texuli/pages`. Type it with `TexuliLabels` and the `BlocksMessageId` and
+  `PagesMessageId` unions; the ids and English text are in
+  `TEXULI_MESSAGES_EN`, `PRIMITIVES_MESSAGES_EN`, `BLOCKS_MESSAGES_EN`
+  (`@texuli/blocks/i18n`) and `PAGES_MESSAGES_EN` (`@texuli/pages`).
+- **On `0.12.3`:** `setI18nContext(createI18n({ locale: 'es', catalogs: [{
+  locale: 'es', messages: es }] }))` translates the `texuli` and primitives
+  ids; blocks and pages take their `labels` props.
+- Keep `{placeholders}` as written. Messages format numbers for the locale.
+  `@texuli/data`, `@texuli/chat`, `@texuli/media` and `@texuli/editor` still
+  need their `labels` props.
+
+```svelte
+<LabelsProvider locale="es" labels={{
+  'texuli.dialog.close-label': 'Cerrar',
+  'texuli.toaster.label': 'Notificaciones',
+  'blocks.text.tones.info': 'Información',
+  'pages.outline': 'En esta página',
+}}>
+  {@render children()}
+</LabelsProvider>
+```
+
 ## Offline gates for this skill pack
 
 ```bash
