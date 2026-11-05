@@ -2,8 +2,13 @@
 import type { Component } from 'svelte';
 import type { ChartBlock, ChartKind } from '../core/index.ts';
 import { isExtendedChartKind } from './chart-kinds.ts';
+import { type DataBlockLabels, DEFAULT_DATA_BLOCK_LABELS } from './labels.ts';
 
-let { block, mode = 'light' }: { block: ChartBlock; mode?: 'light' | 'dark' } = $props();
+let {
+  block,
+  mode = 'light',
+  labels = DEFAULT_DATA_BLOCK_LABELS,
+}: { block: ChartBlock; mode?: 'light' | 'dark'; labels?: DataBlockLabels } = $props();
 
 type ChartModule = Record<string, unknown>;
 
@@ -47,7 +52,6 @@ const components: Record<ChartKind, [keyof typeof families, string]> = {
   calendar: ['calendar', 'CalendarHeatmap'],
 };
 
-const PART_WHOLE_LABELS = { table: 'View data table', category: 'Category', value: 'Value' };
 /** The charts palette fallbacks for `--tx-chart-1` … `--tx-chart-8`. */
 const FALLBACKS = 'primary success info warning destructive secondary accent link'.split(' ');
 
@@ -82,7 +86,12 @@ const chartProps = $derived.by((): Record<string, unknown> => {
     description: block.description,
   };
   if (family === 'partWhole') {
-    props.labels = { ...PART_WHOLE_LABELS, ...(block.props?.labels as object | undefined) };
+    props.labels = {
+      table: labels.chartTable,
+      category: labels.chartCategory,
+      value: labels.chartValue,
+      ...(block.props?.labels as object | undefined),
+    };
   }
   if (!isExtendedChartKind(kind)) {
     // Inline kinds: top-level data (scatter keeps its `props.series` labels).
@@ -108,7 +117,7 @@ $effect(() => {
       if (!cancelled) Chart = mod[name as keyof typeof mod] as Component<Record<string, unknown>>;
     } catch (error) {
       if (!cancelled) {
-        loadError = error instanceof Error ? error.message : 'Chart failed to load';
+        loadError = error instanceof Error ? error.message : labels.chartLoadError;
       }
     }
   })();
@@ -128,7 +137,7 @@ $effect(() => {
 {:else if Chart}
   <Chart {...chartProps} />
 {:else}
-  <p class="tx-block-chart-loading" role="status">Loading chart…</p>
+  <p class="tx-block-chart-loading" role="status">{labels.chartLoading}</p>
 {/if}
 
 <style>

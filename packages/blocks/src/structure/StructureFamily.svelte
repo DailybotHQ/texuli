@@ -1,10 +1,12 @@
 <script lang="ts">
+import { localizeLabels } from '@texuli/core/i18n';
 import { Card, CardContent, CardHeader, CardTitle } from 'texuli/card';
+import { useMessages } from 'texuli/i18n';
 import { Accordion, Tabs } from 'texuli/tabs-accordion';
 import BlockIcon from '../icons/BlockIcon.svelte';
 import { checkStructureBlock } from './check.ts';
 import type { StructureBlockViewProps } from './family.ts';
-import { resolveStructureBlockLabels } from './labels.ts';
+import { DEFAULT_STRUCTURE_BLOCK_LABELS, resolveStructureBlockLabels } from './labels.ts';
 import NestedBlocks from './NestedBlocks.svelte';
 import SafeBody from './SafeBody.svelte';
 import './structure.css';
@@ -16,7 +18,13 @@ import './structure.css';
 let { block, labels, resolveIcon, resolveAvatar, oninvalid }: StructureBlockViewProps = $props();
 
 const check = $derived(checkStructureBlock(block));
-const text = $derived(resolveStructureBlockLabels(labels));
+const msg = useMessages();
+const text = $derived(
+  resolveStructureBlockLabels(
+    labels,
+    localizeLabels(msg, 'blocks.structure', DEFAULT_STRUCTURE_BLOCK_LABELS)
+  )
+);
 
 $effect(() => {
   if (!check.ok) oninvalid?.(check.issues);

@@ -38,8 +38,12 @@ export const DEFAULT_MAP_BLOCK_LABELS: Readonly<MapBlockLabels> = Object.freeze(
   offMap: 'outside the current view',
 });
 
-export function resolveMapBlockLabels(overrides: MapBlockLabelOverrides = {}): MapBlockLabels {
-  return { ...DEFAULT_MAP_BLOCK_LABELS, ...overrides };
+export function resolveMapBlockLabels(
+  overrides: MapBlockLabelOverrides = {},
+  /** The defaults to merge over (the view passes them localized through the catalog in context). */
+  defaults: Readonly<MapBlockLabels> = DEFAULT_MAP_BLOCK_LABELS
+): MapBlockLabels {
+  return { ...defaults, ...overrides };
 }
 
 /** Replaces `{name}` placeholders; unknown names stay as written. */

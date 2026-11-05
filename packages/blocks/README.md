@@ -83,6 +83,7 @@ The package root exports a `load*Family()` renderer loader and a
 | Map | `map`: places and an optional route on an offline basemap | `@texuli/blocks/map`, `@texuli/blocks/map/engine`, `@texuli/blocks/map/renderers` |
 | Diagram | `flow`, `tree`, `board` and `terminal` diagrams | `@texuli/blocks/diagram`, `@texuli/blocks/diagram/engine`, `@texuli/blocks/diagram/renderers` |
 | Code | `code`, with syntax colors from an owned tokenizer | `@texuli/blocks/code`, `@texuli/blocks/code/engine`, `@texuli/blocks/code/tokenizer`, `@texuli/blocks/code/renderers` |
+| Labels | `BLOCKS_MESSAGES_EN` (every block label id and its English default) and the `BlocksMessageId` union, for one dictionary set near the root with `setTexuliLabels` or `<LabelsProvider>` from `texuli` (ADR-026) | `@texuli/blocks/i18n` |
 
 In each family, the plain subpath is the light API (guards, labels, the lazy
 loader), `/engine` is framework-free logic, and `/renderers` gives you the

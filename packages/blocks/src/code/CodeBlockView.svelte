@@ -1,11 +1,13 @@
 <script lang="ts">
+import { localizeLabels } from '@texuli/core/i18n';
 import { onDestroy } from 'svelte';
+import { useMessages } from 'texuli/i18n';
 import { copyText } from 'texuli/kbd-code';
 import { checkCodeBlock } from './check.ts';
 import type { CodeBlockBarContext, CodeBlockViewProps } from './family.ts';
 import { loadCodeGrammar, resolveCodeLanguage } from './grammars.ts';
 import { resolveHighlightSteps } from './highlight.ts';
-import { fillCodeLabel, resolveCodeBlockLabels } from './labels.ts';
+import { DEFAULT_CODE_BLOCK_LABELS, fillCodeLabel, resolveCodeBlockLabels } from './labels.ts';
 import { activeHighlightIndex, codeTokenClass } from './token-styles.ts';
 import { type CodeToken, type Grammar, splitTokenLines, tokenize } from './tokenizer.ts';
 import './code.css';
@@ -31,7 +33,10 @@ let {
 }: CodeBlockViewProps = $props();
 
 const check = $derived(checkCodeBlock(block));
-const text = $derived(resolveCodeBlockLabels(labels));
+const msg = useMessages();
+const text = $derived(
+  resolveCodeBlockLabels(labels, localizeLabels(msg, 'blocks.code', DEFAULT_CODE_BLOCK_LABELS))
+);
 const uid = $props.id();
 const nameId = `tx-code-name-${uid}`;
 

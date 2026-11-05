@@ -1,8 +1,10 @@
 <script lang="ts">
+import { localizeLabels } from '@texuli/core/i18n';
 import { cx } from 'texuli/cx';
+import { useMessages } from 'texuli/i18n';
 import { checkMapBlock } from './check.ts';
 import type { MapBlockViewProps } from './family.ts';
-import { formatMapLabel, resolveMapBlockLabels } from './labels.ts';
+import { DEFAULT_MAP_BLOCK_LABELS, formatMapLabel, resolveMapBlockLabels } from './labels.ts';
 import {
   applyMapAction,
   basemapFeatures,
@@ -29,7 +31,10 @@ import {
 let { block, labels, locale, headingLevel = 3, oninvalid, onselect }: MapBlockViewProps = $props();
 
 const check = $derived(checkMapBlock(block));
-const text = $derived(resolveMapBlockLabels(labels));
+const msg = useMessages();
+const text = $derived(
+  resolveMapBlockLabels(labels, localizeLabels(msg, 'blocks.map', DEFAULT_MAP_BLOCK_LABELS))
+);
 const uid = $props.id();
 
 $effect(() => {

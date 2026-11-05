@@ -10,6 +10,8 @@ export type InteractiveBlockLabels = {
   quizIncorrect: string;
   calculatorResult: string;
   checklistProgress: string;
+  /** Accessible name of a checklist without a title. */
+  checklist: string;
 };
 
 export type InteractiveBlockLabelOverrides = Partial<InteractiveBlockLabels>;
@@ -26,10 +28,13 @@ export const DEFAULT_INTERACTIVE_BLOCK_LABELS: InteractiveBlockLabels = {
   quizIncorrect: 'Not quite',
   calculatorResult: 'Result',
   checklistProgress: 'Completed',
+  checklist: 'Checklist',
 };
 
 export function resolveInteractiveBlockLabels(
-  overrides?: InteractiveBlockLabelOverrides
+  overrides?: InteractiveBlockLabelOverrides,
+  /** The defaults to merge over (the view passes them localized through the catalog in context). */
+  defaults: Readonly<InteractiveBlockLabels> = DEFAULT_INTERACTIVE_BLOCK_LABELS
 ): InteractiveBlockLabels {
-  return { ...DEFAULT_INTERACTIVE_BLOCK_LABELS, ...overrides };
+  return { ...defaults, ...overrides };
 }
