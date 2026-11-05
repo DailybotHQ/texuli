@@ -4,6 +4,7 @@ import type { HrefTrust } from '@texuli/core/url-policy';
 import { type Snippet, setContext } from 'svelte';
 import type { HTMLOlAttributes } from 'svelte/elements';
 import { useMessages } from '../../i18n/use-messages.ts';
+import type { ClassValue } from '../../internal/cx.ts';
 import TimelineItem from './TimelineItem.svelte';
 import {
   DEFAULT_TIMELINE_MESSAGES,
@@ -27,6 +28,8 @@ type Props = Omit<HTMLOlAttributes, 'children'> & {
   messages?: Partial<TimelineMessages>;
   /** URL policy tier for item links: `developer` (app-authored) or `untrusted` (agent or user content). */
   hrefTrust?: HrefTrust;
+  /** Classes for every item's marker (data-driven and composed items); an item's own `markerClass` adds to it. */
+  markerClass?: ClassValue;
   /** Extra content inside each data-driven item, under its description. */
   item?: Snippet<[TimelineItemData, number]>;
   children?: Snippet;
@@ -38,6 +41,7 @@ let {
   label,
   messages: overrides,
   hrefTrust = 'developer',
+  markerClass,
   item,
   children,
   class: className,
@@ -56,6 +60,7 @@ $effect.pre(() => {
     ...stringsOnly(overrides),
   };
   context.hrefTrust = hrefTrust;
+  context.markerClass = markerClass;
 });
 setContext(TIMELINE_CONTEXT, context);
 
@@ -77,6 +82,7 @@ const horizontal = $derived(orientation === 'horizontal');
   bind:this={ref}
   class={timelineClass({ orientation, class: className })}
   data-tx-timeline
+  data-part="root"
   data-orientation={orientation}
   aria-label={label ?? context.messages.label}
   tabindex={horizontal ? 0 : undefined}

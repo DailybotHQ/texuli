@@ -34,8 +34,12 @@ export const DEFAULT_CODE_BLOCK_LABELS: Readonly<CodeBlockLabels> = /* @__PURE__
 export type CodeBlockLabelOverrides = Partial<CodeBlockLabels>;
 
 /** Merges host overrides over the English defaults; non-string overrides are ignored. */
-export function resolveCodeBlockLabels(overrides: CodeBlockLabelOverrides = {}): CodeBlockLabels {
-  const labels = { ...DEFAULT_CODE_BLOCK_LABELS };
+export function resolveCodeBlockLabels(
+  overrides: CodeBlockLabelOverrides = {},
+  /** The defaults to merge over (the view passes them localized through the catalog in context). */
+  defaults: Readonly<CodeBlockLabels> = DEFAULT_CODE_BLOCK_LABELS
+): CodeBlockLabels {
+  const labels = { ...defaults };
   for (const key of Object.keys(labels) as (keyof CodeBlockLabels)[]) {
     const value = overrides[key];
     if (typeof value === 'string') labels[key] = value;

@@ -19,7 +19,9 @@ export const DEFAULT_STRUCTURE_BLOCK_LABELS: StructureBlockLabels = {
 };
 
 export function resolveStructureBlockLabels(
-  overrides?: StructureBlockLabelOverrides
+  overrides?: StructureBlockLabelOverrides,
+  /** The defaults to merge over (the view passes them localized through the catalog in context). */
+  defaults: Readonly<StructureBlockLabels> = DEFAULT_STRUCTURE_BLOCK_LABELS
 ): StructureBlockLabels {
-  return { ...DEFAULT_STRUCTURE_BLOCK_LABELS, ...overrides };
+  return { ...defaults, ...overrides };
 }

@@ -22,6 +22,12 @@ const PROP_DEFAULT = /^\s+[a-zA-Z]+\s*=\s*'[A-Z][^']*[a-z][^']*',\s*$/;
 const INLINE_FALLBACK = /\?\? '[A-Z][^']*[a-z][^']*'/;
 /** A literal English accessible name (`aria-label="Primary"`). */
 const LITERAL_ARIA = /aria-label="[A-Z][a-z][^"{]*"/;
+/** A literal English label, title, placeholder or alt passed in markup (`label="Main"`). */
+const LITERAL_ATTR = /\s(?:label|title|placeholder|alt|aria-valuetext)="[A-Z][a-z][^"{]*"/;
+/** English text written straight into markup (`<summary>On this page</summary>`). */
+const LITERAL_TEXT = />[A-Z][a-z]+(?: [A-Za-z]+)*[.…!?]?<\//;
+/** An English fallback in a ternary (`typeof x === 'string' ? x : 'No data yet'`). */
+const TERNARY_FALLBACK = /\? [^:'"]+ : '[A-Z][a-z]+(?: [a-z]+)+[.…]?'/;
 const CALL = /\bmsg\(\s*'([^']+)',\s*'((?:[^'\\]|\\.)*)'/g;
 
 /** Lines that still hard-code an English label, as `file:line: text`. */
@@ -38,7 +44,10 @@ export function hardCodedLabels(srcDir: string): string[] {
       if (
         (inProps && PROP_DEFAULT.test(line)) ||
         INLINE_FALLBACK.test(line) ||
-        LITERAL_ARIA.test(line)
+        LITERAL_ARIA.test(line) ||
+        LITERAL_ATTR.test(line) ||
+        LITERAL_TEXT.test(line) ||
+        TERNARY_FALLBACK.test(line)
       ) {
         hits.push(`${relative(srcDir, file)}:${index + 1}: ${line.trim()}`);
       }

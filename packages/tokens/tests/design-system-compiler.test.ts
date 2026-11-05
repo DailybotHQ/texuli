@@ -565,6 +565,26 @@ describe('component tokens map through the registry', () => {
   });
 });
 
+describe('the button label line height (C-G-014)', () => {
+  it('is the component token --tx-button-line-height, read by button.css and settable by a design system', () => {
+    const css = readFileSync(
+      join(root, 'packages/texuli/src/components/button/button.css'),
+      'utf8'
+    );
+    expect(css).toContain('line-height: var(--tx-button-line-height, var(--tx-type-label-line));');
+    expect(COMPONENT_TOKENS.find((t) => t.token === '--tx-button-line-height')?.default).toBe(
+      'var(--tx-type-label-line)'
+    );
+    for (const step of ['label', 'heading', 'body']) {
+      const compiled = ok(
+        compileDesignSystem(doc({ components: { button: { 'line-height': step } } }))
+      );
+      const light = compiled.vars.light as Record<string, string>;
+      expect(light['--tx-button-line-height'], step).toBe(light[`--tx-type-${step}-line`]);
+    }
+  });
+});
+
 describe('compileDesignSystem: partial data-viz palettes', () => {
   it('fills the lists a document leaves out from the derived palette instead of throwing', () => {
     const categorical = [

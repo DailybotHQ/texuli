@@ -1,4 +1,5 @@
 <script lang="ts">
+import { countLabel, DEFAULT_DIAGRAM_BLOCK_LABELS, type DiagramBlockLabels } from './labels.ts';
 import { layoutTree } from './layout.ts';
 import type { TreeDiagram as TreeDiagramData } from './schema.ts';
 import { DIAGRAM_PAD, toneBorder } from './tones.ts';
@@ -7,7 +8,10 @@ import './diagram.css';
 /**
  * Tree: file-tree is a nested list; org is layoutTree elbows + sr list alt text.
  */
-let { block }: { block: TreeDiagramData } = $props();
+let {
+  block,
+  labels = DEFAULT_DIAGRAM_BLOCK_LABELS,
+}: { block: TreeDiagramData; labels?: DiagramBlockLabels } = $props();
 
 const layout = $derived(layoutTree(block));
 const byId = $derived(new Map(block.nodes.map((node) => [node.id, node])));
@@ -23,9 +27,9 @@ const roots = $derived(children.get(null) ?? []);
 const stageW = $derived(layout.width + DIAGRAM_PAD * 2);
 const stageH = $derived(layout.height + DIAGRAM_PAD * 2);
 const summary = $derived(
-  `${block.variant === 'org' ? 'Organization chart' : 'File tree'} with ${block.nodes.length} ${
-    block.nodes.length === 1 ? 'item' : 'items'
-  }`
+  block.variant === 'org'
+    ? countLabel(labels.orgSummaryOne, labels.orgSummaryOther, block.nodes.length)
+    : countLabel(labels.fileTreeSummaryOne, labels.fileTreeSummaryOther, block.nodes.length)
 );
 
 function elbow(from: string, to: string): string {

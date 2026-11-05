@@ -10,10 +10,14 @@ export const DEFAULT_MEDIA_BLOCK_LABELS: MediaBlockLabels = Object.freeze({
   galleryFallback: 'Image unavailable',
 });
 
-export function resolveMediaBlockLabels(overrides?: MediaBlockLabelOverrides): MediaBlockLabels {
-  if (!overrides) return DEFAULT_MEDIA_BLOCK_LABELS;
+export function resolveMediaBlockLabels(
+  overrides?: MediaBlockLabelOverrides,
+  /** The defaults to merge over (the view passes them localized through the catalog in context). */
+  defaults: Readonly<MediaBlockLabels> = DEFAULT_MEDIA_BLOCK_LABELS
+): MediaBlockLabels {
+  if (!overrides) return defaults;
   return {
-    invalid: overrides.invalid ?? DEFAULT_MEDIA_BLOCK_LABELS.invalid,
-    galleryFallback: overrides.galleryFallback ?? DEFAULT_MEDIA_BLOCK_LABELS.galleryFallback,
+    invalid: overrides.invalid ?? defaults.invalid,
+    galleryFallback: overrides.galleryFallback ?? defaults.galleryFallback,
   };
 }

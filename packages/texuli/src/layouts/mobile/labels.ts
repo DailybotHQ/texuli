@@ -18,21 +18,35 @@ export interface MobileLabels {
   home: string;
 }
 
+/** The English defaults (ids `texuli.mobile-layout.<key>`), translated through the catalog in context. */
+export const DEFAULT_MOBILE_LABELS: Readonly<Omit<MobileLabels, 'title'>> = Object.freeze({
+  back: 'Back',
+  more: 'More',
+  moreCurrent: '(contains the current page)',
+  tabs: 'Primary',
+  menu: 'Open navigation',
+  close: 'Close',
+  home: 'Home',
+});
+
 function read(options: LayoutOptions | undefined, key: string, fallback: string): string {
   const value = options?.[key];
   return typeof value === 'string' && value.trim() !== '' ? value : fallback;
 }
 
-export function mobileLabels(options: LayoutOptions | undefined): MobileLabels {
+export function mobileLabels(
+  options: LayoutOptions | undefined,
+  defaults: Readonly<Omit<MobileLabels, 'title'>> = DEFAULT_MOBILE_LABELS
+): MobileLabels {
   const title = options?.title;
   return {
     title: typeof title === 'string' && title.trim() !== '' ? title : undefined,
-    back: read(options, 'backLabel', 'Back'),
-    more: read(options, 'moreLabel', 'More'),
-    moreCurrent: read(options, 'moreCurrentLabel', '(contains the current page)'),
-    tabs: read(options, 'tabsLabel', 'Primary'),
-    menu: read(options, 'menuLabel', 'Open navigation'),
-    close: read(options, 'closeLabel', 'Close'),
-    home: read(options, 'homeLabel', 'Home'),
+    back: read(options, 'backLabel', defaults.back),
+    more: read(options, 'moreLabel', defaults.more),
+    moreCurrent: read(options, 'moreCurrentLabel', defaults.moreCurrent),
+    tabs: read(options, 'tabsLabel', defaults.tabs),
+    menu: read(options, 'menuLabel', defaults.menu),
+    close: read(options, 'closeLabel', defaults.close),
+    home: read(options, 'homeLabel', defaults.home),
   };
 }

@@ -30,7 +30,7 @@ const total = $derived(block.items.length);
   <p class="tx-block-interactive__prompt" aria-live="polite">
     {labels.checklistProgress}: {completed} / {total}
   </p>
-  <div class="tx-block-interactive__options" role="group" aria-label={block.title ?? 'Checklist'}>
+  <div class="tx-block-interactive__options" role="group" aria-label={block.title ?? labels.checklist}>
     {#each block.items as item (item.id)}
       <Checkbox
         checked={done[item.id] === true}

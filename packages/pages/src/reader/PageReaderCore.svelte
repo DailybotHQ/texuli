@@ -7,6 +7,7 @@
 import type { TexuliDocument } from '@texuli/document/model';
 import type { DeckPlayerHost } from '@texuli/player';
 import { untrack } from 'svelte';
+import { useMessages } from 'texuli/i18n';
 import Breadcrumb from '../shared/Breadcrumb.svelte';
 import { blockPainter, type PagesBlockHost, type PagesBlockSnippet } from '../shared/block-host.ts';
 import type {
@@ -15,7 +16,7 @@ import type {
   PagesLibraryBaseLoader,
 } from '../shared/design-system-types.ts';
 import type { EmbedResolver } from '../shared/embeds.ts';
-import { type PagesLabels, resolvePagesLabels } from '../shared/labels.ts';
+import { type PagesLabels, pagesLabelsFor, resolvePagesLabels } from '../shared/labels.ts';
 import type { MediaResolver } from '../shared/media.ts';
 import type { PagesPlayerLoader } from '../shared/player-loader.ts';
 import type { PageRef } from '../shared/types.ts';
@@ -115,7 +116,8 @@ let {
 
 const painter = $derived(blockPainter(blockHost, renderBlock));
 
-const labels = $derived(resolvePagesLabels(labelOverrides));
+const msg = useMessages();
+const labels = $derived(resolvePagesLabels(labelOverrides, pagesLabelsFor(msg)));
 const entries = $derived(documentOutline(doc, { prefix: anchorPrefix, anchorFor }));
 const anchors = $derived(new Map(entries.map((entry) => [entry.id, entry.anchor])));
 const title = $derived(doc.meta.title);

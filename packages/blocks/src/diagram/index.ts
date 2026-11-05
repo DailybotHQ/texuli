@@ -13,6 +13,12 @@ export {
   loadDiagramFamily,
 } from './family.ts';
 export {
+  DEFAULT_DIAGRAM_BLOCK_LABELS,
+  type DiagramBlockLabelOverrides,
+  type DiagramBlockLabels,
+  resolveDiagramBlockLabels,
+} from './labels.ts';
+export {
   type DiagramEdge,
   type DiagramLayout,
   type DiagramPosition,

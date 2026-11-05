@@ -1,10 +1,12 @@
 <script lang="ts">
+import { localizeLabels } from '@texuli/core/i18n';
 import { safeImageSrc } from '@texuli/core/url-policy';
+import { useMessages } from 'texuli/i18n';
 import BlockIcon from '../icons/BlockIcon.svelte';
 import { resolveBlockMediaSrc } from '../media/resolve.ts';
 import { checkTextBlock } from './check.ts';
 import type { TextBlockViewProps } from './family.ts';
-import { resolveTextBlockLabels } from './labels.ts';
+import { DEFAULT_TEXT_BLOCK_LABELS, resolveTextBlockLabels } from './labels.ts';
 import RichText from './RichText.svelte';
 
 /**
@@ -15,7 +17,10 @@ import RichText from './RichText.svelte';
 let { block, labels, resolveAvatar, resolveIcon, oninvalid }: TextBlockViewProps = $props();
 
 const check = $derived(checkTextBlock(block));
-const text = $derived(resolveTextBlockLabels(labels));
+const msg = useMessages();
+const text = $derived(
+  resolveTextBlockLabels(labels, localizeLabels(msg, 'blocks.text', DEFAULT_TEXT_BLOCK_LABELS))
+);
 
 $effect(() => {
   if (!check.ok) oninvalid?.(check.issues);

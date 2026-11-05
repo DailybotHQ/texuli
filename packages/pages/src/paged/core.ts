@@ -14,7 +14,12 @@ export type {
   PagesHostNode,
 } from '../shared/block-host.ts';
 export type { PagesPlayerLoader, PagesPlayerModule } from '../shared/player-loader.ts';
-export { DEFAULT_PAGED_LABELS, type PagedLabels, resolvePagedLabels } from './labels.ts';
+export {
+  DEFAULT_PAGED_LABELS,
+  type PagedLabels,
+  pagedLabelsFor,
+  resolvePagedLabels,
+} from './labels.ts';
 export { ATOMIC_SELECTOR, lineBottoms, measureUnit, splitPoints } from './measure.ts';
 export { default as PagedViewCore } from './PagedViewCore.svelte';
 export { adoptCustomPage, customPageRule, pageName } from './page-style.ts';

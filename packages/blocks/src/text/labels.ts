@@ -35,17 +35,19 @@ export const DEFAULT_TEXT_BLOCK_LABELS: Readonly<TextBlockLabels> = /* @__PURE__
 export function resolveTextBlockLabels(
   overrides: Partial<Omit<TextBlockLabels, 'tones'>> & {
     tones?: Partial<Record<BlockTone, string>>;
-  } = {}
+  } = {},
+  /** The defaults to merge over (the views pass them localized through the catalog in context). */
+  defaults: Readonly<TextBlockLabels> = DEFAULT_TEXT_BLOCK_LABELS
 ): TextBlockLabels {
-  const merged = { ...DEFAULT_TEXT_BLOCK_LABELS.tones };
+  const merged = { ...defaults.tones };
   for (const [tone, label] of Object.entries(overrides.tones ?? {})) {
     if (typeof label === 'string' && tone in merged) merged[tone as BlockTone] = label;
   }
   return {
-    invalid: overrides.invalid ?? DEFAULT_TEXT_BLOCK_LABELS.invalid,
-    codeBlock: overrides.codeBlock ?? DEFAULT_TEXT_BLOCK_LABELS.codeBlock,
-    taskDone: overrides.taskDone ?? DEFAULT_TEXT_BLOCK_LABELS.taskDone,
-    taskOpen: overrides.taskOpen ?? DEFAULT_TEXT_BLOCK_LABELS.taskOpen,
+    invalid: overrides.invalid ?? defaults.invalid,
+    codeBlock: overrides.codeBlock ?? defaults.codeBlock,
+    taskDone: overrides.taskDone ?? defaults.taskDone,
+    taskOpen: overrides.taskOpen ?? defaults.taskOpen,
     tones: merged,
   };
 }

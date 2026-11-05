@@ -142,7 +142,7 @@ with `^0.8.0` or later. The three packages are in development (pre-1.0).
 | A dashboard of widgets | `Dashboard` and `DashboardWidget` (`@texuli/data/dashboard`), `parseDashboard` for a saved layout (`@texuli/data/dashboard/engine`) |
 | Host data for generated views | `defineSource`, `createSourceRegistry` and `createSourceLoader` (`@texuli/core/data-source`), passed to `<Player sourceRegistry>`; a blueprint names a source with `$source`, never a URL |
 | One bounded expression language | `parseExpression` and `evaluateExpression` (`@texuli/core/expression`) |
-| Component labels from one catalog | `createI18n` (`@texuli/core/i18n`) and `setI18nContext` (`texuli`); label props still win, English is the only shipped language |
+| Component labels from one catalog | `createI18n` (`@texuli/core/i18n`) and `setI18nContext` (`texuli`); label props still win, English is the only shipped language. On `main` (not on npm yet): one dictionary for every package with `LabelsProvider` or `setTexuliLabels` (`texuli/i18n`), typed with `TexuliLabels`, `BlocksMessageId` (`@texuli/blocks/i18n`) and `PagesMessageId` (`@texuli/pages`) |
 | Forms, canvases and sheets from an agent | `schema-form`, `canvas` and `spreadsheet` nodes (spec 0.8.0) validated with `checkForm: checkFormDraft`, `checkCanvas: checkCanvasDraft` and `checkSheet: checkSheetDraft`, and painted through `<Player formHost={createFormPlayerHost()} canvasHost={createCanvasPlayerHost()} sheetHost={createSheetPlayerHost()}>` (`@texuli/forms/host`, `@texuli/canvas/host`, `@texuli/sheets/host`); without the host check they are refused |
 | Email and PDF from a blueprint | `renderEmail` (`@texuli/tools/email`), `renderBlueprintPdf` (`@texuli/tools/print`) and the player's `print` mode |
 

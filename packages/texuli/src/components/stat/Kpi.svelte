@@ -2,11 +2,12 @@
 import { type HrefTrust, safeHref } from '@texuli/core/url-policy';
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import { useMessages } from '../../i18n/use-messages.ts';
 import { cx } from '../../internal/cx.ts';
 import { variants } from '../../internal/variants.ts';
 import { formatKpi, type KpiUnit, kpiDelta } from './format.ts';
 import TrendIcon from './TrendIcon.svelte';
-import { type PositiveDirection, resolveTrend, trendToneClass, trendWord } from './trend.ts';
+import { type PositiveDirection, resolveTrend, trendToneClass } from './trend.ts';
 import './stat.css';
 import { designDefaults } from '../../internal/design-defaults.ts';
 
@@ -66,13 +67,22 @@ let {
 }: Props = $props();
 
 const uid = $props.id();
+const msg = useMessages();
 const change = $derived(kpiDelta(value, previous, unit, currency));
 const direction = $derived(resolveTrend(change?.absolute ?? null));
 const tone = $derived(trendToneClass(direction, positive));
-const word = $derived(trendWord(direction));
+const word = $derived(
+  direction === 'up'
+    ? msg('texuli.stat.increased', 'Increased')
+    : direction === 'down'
+      ? msg('texuli.stat.decreased', 'Decreased')
+      : msg('texuli.stat.no-change', 'No change')
+);
 const safe = $derived(href === undefined ? undefined : safeHref(href, hrefTrust));
 const isEmpty = $derived(!loading && (empty !== false || value === null || value === undefined));
-const emptyText = $derived(typeof empty === 'string' ? empty : 'No data yet');
+const emptyText = $derived(
+  typeof empty === 'string' ? empty : msg('texuli.kpi.empty', 'No data yet')
+);
 const formatted = $derived(formatKpi(value, unit, currency));
 </script>
 
