@@ -1,0 +1,267 @@
+/**
+ * Code field (D-G-022): a transparent-text textarea over an aria-hidden,
+ * highlighted <pre>. Both stack in one grid cell and share every metric that
+ * places a glyph: font, line height, padding, tab size, white space and
+ * wrapping, with ligatures and kerning off. Token colors come from code.css;
+ * bold and italic are dropped here, because a heavier or slanted face may
+ * have other advances than the textarea's text and drift the caret.
+ * @layer tx.components so consumer utilities can override.
+ */
+@layer tx.components {
+  .tx-code-field {
+    display: grid;
+    gap: var(--tx-space-1);
+    min-inline-size: 0;
+    tab-size: 2;
+  }
+
+  .tx-code-field[data-tab-size="1"] {
+    tab-size: 1;
+  }
+  .tx-code-field[data-tab-size="3"] {
+    tab-size: 3;
+  }
+  .tx-code-field[data-tab-size="4"] {
+    tab-size: 4;
+  }
+  .tx-code-field[data-tab-size="5"] {
+    tab-size: 5;
+  }
+  .tx-code-field[data-tab-size="6"] {
+    tab-size: 6;
+  }
+  .tx-code-field[data-tab-size="7"] {
+    tab-size: 7;
+  }
+  .tx-code-field[data-tab-size="8"] {
+    tab-size: 8;
+  }
+
+  .tx-code-field__label {
+    color: var(--tx-foreground, CanvasText);
+    font-family: var(--tx-font-sans, system-ui, sans-serif);
+    font-size: var(--tx-type-label-size);
+    font-weight: var(--tx-type-label-weight);
+    line-height: var(--tx-type-label-line);
+  }
+
+  .tx-code-field__hint {
+    color: var(--tx-muted-foreground, CanvasText);
+    font-family: var(--tx-font-sans, system-ui, sans-serif);
+    font-size: var(--tx-type-caption-size);
+  }
+
+  .tx-code-field__box {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    min-inline-size: 0;
+    border: var(--tx-input-border-width, var(--tx-border-width-thin)) solid
+      var(--tx-input, var(--tx-border, CanvasText));
+    border-radius: var(--tx-input-radius, var(--tx-shape-radius-lg));
+    background-color: var(--tx-surface, Canvas);
+    color: var(--tx-surface-foreground, CanvasText);
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+    font-size: 0.875em;
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1.5;
+    overflow: clip;
+    transition: border-color var(--tx-motion-fast, 150ms) var(--tx-motion-easing, ease);
+  }
+
+  .tx-code-field__box:focus-within {
+    border-color: var(--tx-ring, Highlight);
+    box-shadow: 0 0 0 var(--tx-focus-ring-width, 2px)
+      color-mix(in oklab, var(--tx-ring, Highlight) 30%, transparent);
+  }
+
+  .tx-code-field__box:has(.tx-code-field__input[aria-invalid="true"]) {
+    border-color: var(--tx-destructive, CanvasText);
+  }
+
+  .tx-code-field[data-disabled] .tx-code-field__box {
+    cursor: not-allowed;
+    opacity: var(--tx-input-disabled-opacity, var(--tx-opacity-disabled));
+  }
+
+  .tx-code-field__stack {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    min-inline-size: 0;
+  }
+
+  /* Everything that places a glyph is set the same on both layers. */
+  .tx-code-field__pre,
+  .tx-code-field__input {
+    grid-area: 1 / 1;
+    box-sizing: border-box;
+    min-inline-size: 0;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    padding-block: var(--tx-space-2);
+    padding-inline: var(--tx-space-3);
+    font: inherit;
+    font-kerning: none;
+    font-variant-ligatures: none;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-align: start;
+    text-indent: 0;
+    text-transform: none;
+    tab-size: inherit;
+    white-space: pre;
+    overflow-wrap: normal;
+    word-break: normal;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .tx-code-field__pre {
+    color: inherit;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .tx-code-field__code {
+    display: block;
+    font: inherit;
+  }
+
+  .tx-code-field__line,
+  .tx-code-field__text {
+    display: block;
+  }
+
+  /* An empty line still takes one line box, as in the textarea. */
+  .tx-code-field__text {
+    min-block-size: 1lh;
+  }
+
+  /* Keep advances equal to the textarea's: color only, never weight or slant. */
+  .tx-code-field__code [class^="tx-code-tok--"] {
+    font-weight: inherit;
+    font-style: inherit;
+  }
+
+  .tx-code-field__input {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    resize: none;
+    background: transparent;
+    color: transparent;
+    caret-color: var(--tx-surface-foreground, CanvasText);
+    outline: none;
+  }
+
+  .tx-code-field__input::placeholder {
+    color: var(--tx-muted-foreground, CanvasText);
+    opacity: 1;
+  }
+
+  .tx-code-field__input::selection {
+    background-color: color-mix(in oklab, var(--tx-primary, Highlight) 30%, transparent);
+    color: transparent;
+  }
+
+  .tx-code-field[data-wrap="on"] .tx-code-field__pre,
+  .tx-code-field[data-wrap="on"] .tx-code-field__input {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    overflow-x: hidden;
+  }
+
+  /* Past the highlight limit there is no overlay: the textarea paints its own text. */
+  .tx-code-field[data-highlight="off"] .tx-code-field__input {
+    color: inherit;
+  }
+
+  .tx-code-field[data-highlight="off"] .tx-code-field__input::selection {
+    color: inherit;
+  }
+
+  .tx-code-field[data-disabled] .tx-code-field__input {
+    cursor: not-allowed;
+  }
+
+  /* Line numbers. Without wrapping every line is one row: a gutter column. */
+  .tx-code-field[data-line-numbers][data-wrap="off"] .tx-code-field__box {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .tx-code-field__gutter {
+    overflow: hidden;
+    padding-block: var(--tx-space-2);
+    padding-inline: var(--tx-space-3) 0;
+    color: var(--tx-muted-foreground, CanvasText);
+    text-align: end;
+    user-select: none;
+  }
+
+  .tx-code-field__number {
+    display: block;
+    min-inline-size: 2ch;
+  }
+
+  /*
+   * With wrapping a line may take several rows, so each number sits in its
+   * line's own first column; the textarea's start padding covers it.
+   */
+  .tx-code-field[data-line-numbers] {
+    --tx-code-field-gutter: 4ch;
+  }
+  .tx-code-field[data-line-numbers][data-digits="3"] {
+    --tx-code-field-gutter: 5ch;
+  }
+  .tx-code-field[data-line-numbers][data-digits="4"] {
+    --tx-code-field-gutter: 6ch;
+  }
+  .tx-code-field[data-line-numbers][data-digits="5"] {
+    --tx-code-field-gutter: 7ch;
+  }
+  .tx-code-field[data-line-numbers][data-digits="6"] {
+    --tx-code-field-gutter: 8ch;
+  }
+
+  .tx-code-field[data-line-numbers][data-wrap="on"] .tx-code-field__input {
+    padding-inline-start: calc(var(--tx-space-3) + var(--tx-code-field-gutter));
+  }
+
+  .tx-code-field[data-line-numbers][data-wrap="on"] .tx-code-field__line {
+    display: grid;
+    grid-template-columns: var(--tx-code-field-gutter) minmax(0, 1fr);
+  }
+
+  .tx-code-field[data-line-numbers][data-wrap="on"] .tx-code-field__line::before {
+    box-sizing: border-box;
+    padding-inline-end: 1ch;
+    content: attr(data-line);
+    color: var(--tx-muted-foreground, CanvasText);
+    text-align: end;
+  }
+
+  /* Numbers are visual only. */
+  @supports (content: "a" / "") {
+    .tx-code-field[data-line-numbers][data-wrap="on"] .tx-code-field__line::before {
+      content: attr(data-line) / "";
+    }
+  }
+
+  @media (forced-colors: active) {
+    .tx-code-field__box {
+      border-color: CanvasText;
+    }
+    /* Show the textarea's own text in system colors; keep the line numbers. */
+    .tx-code-field__text {
+      visibility: hidden;
+    }
+    .tx-code-field__input {
+      color: CanvasText;
+    }
+    .tx-code-field__input::selection {
+      background-color: Highlight;
+      color: HighlightText;
+    }
+  }
+}
