@@ -1,4 +1,5 @@
 <script lang="ts">
+import Button from '../../src/components/button/Button.svelte';
 import { Tooltip, type TooltipSide } from '../../src/components/tooltip/index.ts';
 
 let {
@@ -8,6 +9,7 @@ let {
   open = false,
   disabled = false,
   label = 'Save draft',
+  onclick,
 }: {
   content?: string;
   shortcut?: string | readonly string[];
@@ -15,6 +17,7 @@ let {
   open?: boolean;
   disabled?: boolean;
   label?: string;
+  onclick?: () => void;
 } = $props();
 
 // Controlled open is driven only by the prop (tests force open when needed).
@@ -28,7 +31,7 @@ $effect(() => {
 <div data-tooltip-harness>
   <Tooltip {content} {shortcut} {side} {disabled} bind:open={isOpen}>
     {#snippet children({ props })}
-      <button type="button" {...props} data-tooltip-trigger>{label}</button>
+      <Button {...props} {onclick} data-tooltip-trigger>{label}</Button>
     {/snippet}
   </Tooltip>
 </div>

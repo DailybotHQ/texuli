@@ -48,8 +48,9 @@ const primitiveProps = $derived<TriggerNodeProps>({
   id: tooltip.triggerId,
   'aria-describedby': tooltip.isOpen() ? tooltip.contentId : undefined,
   'data-state': tooltip.isOpen() ? 'open' : 'closed',
-  'data-disabled': tooltip.isDisabled() ? '' : undefined,
-  disabled: tooltip.isDisabled(),
+  // A disabled tooltip only stays closed: the trigger keeps working, so only
+  // the trigger's own `disabled` reaches it.
+  'data-disabled': triggerDisabled ? '' : undefined,
   onpointerenter: (event) => {
     if (!triggerDisabled && rest['aria-disabled'] !== 'true') tooltip.pointerEnter(event);
   },
@@ -78,8 +79,7 @@ const forwarded = $derived.by(() => {
       .filter((value): value is string => typeof value === 'string' && value.trim() !== '')
       .join(' ') || undefined;
   merged['data-state'] = tooltip.isOpen() ? 'open' : 'closed';
-  merged['data-disabled'] = tooltip.isDisabled() ? '' : undefined;
-  merged.disabled = Boolean(triggerDisabled || tooltip.isDisabled());
+  if (triggerDisabled) merged.disabled = true;
   return merged;
 });
 

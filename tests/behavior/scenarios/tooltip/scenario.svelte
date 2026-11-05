@@ -14,4 +14,13 @@ import { behaviorEvent } from '../../harness/client/events.ts';
       Saves without publishing
     </Tooltip.Content>
   </Tooltip.Root>
+  <!-- A disabled tooltip only stays closed; its trigger still works (D-G-042). -->
+  <Tooltip.Root disabled>
+    <Tooltip.Trigger>
+      {#snippet child({ props })}
+        <button {...props} onclick={() => behaviorEvent('publish')}>Publish</button>
+      {/snippet}
+    </Tooltip.Trigger>
+    <Tooltip.Content side="top" sideOffset={6} data-behavior-layer>Publishes now</Tooltip.Content>
+  </Tooltip.Root>
 </Tooltip.Provider>
