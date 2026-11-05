@@ -46,6 +46,8 @@ The model: `resolveImageSources`, `buildSrcset`, `safeSizes`,
 | --- | --- | --- |
 | `src` | — | Untrusted by default: HTTPS or a relative path. |
 | `alt` | — | Required. `""` marks the image decorative. |
+| `srcDark` | — | New in `0.13.1`. The image for dark mode. It passes the same policy at the same `trust` tier, shares `alt`, and gets a srcset from `widths` + `loader` (an explicit `srcset` applies to `src` only). A blocked `srcDark` leaves the light image alone. See [Light and dark pair](#light-and-dark-pair). |
+| `darkMode` | `theme` | New in `0.13.1`. `theme`: follow the page's color mode. `system`: follow the OS preference only. |
 | `srcset` | — | Validated as a whole: one unsafe candidate drops the set. |
 | `widths` + `loader` | — | Generate `srcset` from `src`. Widths are deduplicated, sorted and capped at 16. Every generated URL must pass the policy, or the whole set is dropped; a throwing loader also drops it. |
 | `sizes` | — | Media conditions and lengths only. It is dropped when there is no srcset. |
@@ -86,6 +88,41 @@ The model: `resolveImageSources`, `buildSrcset`, `safeSizes`,
   `--tx-radius` and `--tx-motion-*`. Each has a system-color fallback, and
   forced colors map to `Canvas` / `CanvasText`.
 
+## Light and dark pair
+
+New in `0.13.1`. One image with a light and a dark source:
+
+```svelte
+<Image src="/brand/logo-light.svg" srcDark="/brand/logo-dark.svg" alt="Harbor Studio" />
+```
+
+- **`darkMode="theme"` (default).** Both images render, and CSS shows one.
+  The nearest color-mode scope picks it: a `.dark` or `.light` class, or
+  `data-tx-mode="dark"` / `"light"` (what `applyColorMode` and `applyTheme`
+  write). A forced mode wins over the OS preference, and nested scopes work,
+  because the choice is two inherited custom properties set on each scope.
+  Without a scope, `prefers-color-scheme` decides.
+- **`darkMode="system"`.** One `<picture>` with a
+  `<source media="(prefers-color-scheme: dark)">`. The browser downloads only
+  the image it shows, but an explicit theme switch on the page is ignored.
+  Use it when the page always follows the OS.
+- **Downloads.** In `theme` mode, keep the default `loading="lazy"`.
+  Chromium and WebKit did not request a lazy image hidden with
+  `display: none` (checked with Playwright), so only the shown image loads.
+  With `loading="eager"`, both images download. If the theme changes later,
+  the other image loads when it is first shown.
+- **Accessibility.** In `theme` mode the box is the one `role="img"` named by
+  `alt`, and both `<img>` carry `alt=""`. Only one image reaches assistive
+  tech, with or without CSS. A decorative pair (`alt=""`) exposes nothing. In
+  `system` mode the single `<img>` carries `alt`.
+- **Status.** The first image to load sets `loaded`. In `theme` mode, a load
+  error on the image the theme hides is ignored.
+
+The `media-image-dark` example shows the page-theme pair, a forced dark
+scope and a forced light scope on the same page, and the `system` picture.
+`tests/e2e/media-image-dark.spec.ts` checks which image shows for each OS
+preference and page mode in Chromium, WebKit and the Pixel 7.
+
 ## Examples
 
 `media-image` (`packages/examples/src/media-image/`) shows:
@@ -110,7 +147,8 @@ untrusted policy rightly rejects.
 ## Limits
 
 - **No `<picture>` art direction or format switching.** That means no
-  per-breakpoint sources and no AVIF/WebP `type` alternatives yet.
+  per-breakpoint sources and no AVIF/WebP `type` alternatives yet. The only
+  `<picture>` is the `srcDark` one in `darkMode="system"`.
 - **The loader is the host's job.** Texuli does not resize images.
 - **Errors before hydration.** A load error that happened before the
   component mounted (server-rendered markup) is not detected, because a

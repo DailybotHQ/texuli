@@ -87,6 +87,7 @@ import './media-gallery/entry.ts';
 import './media-generator-slot/entry.ts';
 import './media-image-editor/entry.ts';
 import './media-image/entry.ts';
+import './media-image-dark/entry.ts';
 import './media-composition-model/entry.ts';
 import './media-composition-canvas/entry.ts';
 import './media-video/entry.ts';

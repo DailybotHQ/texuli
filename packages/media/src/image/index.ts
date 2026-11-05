@@ -28,4 +28,4 @@ export {
   resolvePlaceholder,
   safeSizes,
 } from './model.ts';
-export type { ImageLabels, ImageProps, ImageStatus } from './types.ts';
+export type { ImageDarkMode, ImageLabels, ImageProps, ImageStatus } from './types.ts';

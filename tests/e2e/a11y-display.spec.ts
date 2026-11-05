@@ -48,7 +48,13 @@ const CHART_EXAMPLES = [
 ] as const;
 
 /** Media player and gallery examples. */
-const MEDIA_EXAMPLES = ['media-video', 'media-audio', 'media-gallery', 'media-image'] as const;
+const MEDIA_EXAMPLES = [
+  'media-video',
+  'media-audio',
+  'media-gallery',
+  'media-image',
+  'media-image-dark',
+] as const;
 
 const ALL_SWEEP = [
   ...DISPLAY_EXAMPLES,
