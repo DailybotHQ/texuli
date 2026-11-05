@@ -4,6 +4,7 @@ import { checkDesignSystemReference } from '../src/design-system/validate.ts';
 import type { Schema } from '../src/dialect.ts';
 import { migrateBlueprint } from '../src/migrations/index.ts';
 import { validateBlueprint } from '../src/validate.ts';
+import { SPEC_VERSION } from '../src/version.ts';
 import { build, json } from './helpers.ts';
 
 /**
@@ -61,11 +62,11 @@ describe('spec 0.10.0: the envelope design system', () => {
   });
 
   it('migrates older envelopes by stamping spec only', () => {
-    for (const from of ['0.9.0', '0.8.0']) {
+    for (const from of ['0.10.0', '0.9.0', '0.8.0']) {
       const { spec: _drop, designSystem: _ds, ...rest } = report;
       const input = { ...rest, spec: from };
       const result = migrateBlueprint(input);
-      expect(result.blueprint, from).toEqual({ ...input, spec: '0.10.0' });
+      expect(result.blueprint, from).toEqual({ ...input, spec: SPEC_VERSION });
       expect(Object.hasOwn(result.blueprint as object, 'designSystem')).toBe(false);
     }
     // A current envelope with a design system passes through untouched.

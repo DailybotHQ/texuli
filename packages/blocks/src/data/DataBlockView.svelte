@@ -1,4 +1,6 @@
 <script lang="ts">
+import { localizeLabels } from '@texuli/core/i18n';
+import { useMessages } from 'texuli/i18n';
 import { Stat } from 'texuli/stat';
 import {
   Table,
@@ -13,12 +15,15 @@ import {
 import ChartBlockView from './ChartBlockView.svelte';
 import { checkDataBlock } from './check.ts';
 import type { DataBlockViewProps } from './family.ts';
-import { resolveDataBlockLabels } from './labels.ts';
+import { DEFAULT_DATA_BLOCK_LABELS, resolveDataBlockLabels } from './labels.ts';
 
 let { block, labels, oninvalid, mode = 'light' }: DataBlockViewProps = $props();
 
 const check = $derived(checkDataBlock(block));
-const text = $derived(resolveDataBlockLabels(labels));
+const msg = useMessages();
+const text = $derived(
+  resolveDataBlockLabels(labels, localizeLabels(msg, 'blocks.data', DEFAULT_DATA_BLOCK_LABELS))
+);
 const uid = $props.id();
 const titleId = `tx-stat-title-${uid}`;
 // Trend sparklines load on first use: stat rows without a trend never download them.
@@ -108,7 +113,7 @@ function cellText(value: string | number | null): string {
     </div>
   {:else}
     <div class="tx-block tx-block-chart" data-tx-block="chart" data-tone={b.tone}>
-      <ChartBlockView block={b} {mode} />
+      <ChartBlockView block={b} {mode} labels={text} />
     </div>
   {/if}
 {/if}

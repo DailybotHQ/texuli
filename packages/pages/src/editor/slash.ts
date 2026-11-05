@@ -149,14 +149,14 @@ export function coreSlashItems(
     ),
     ...(
       [
-        ['bullet', 'Bulleted list', ['bullet', 'unordered', 'ul']],
-        ['ordered', 'Numbered list', ['numbered', 'ordered', 'ol']],
-        ['todo', 'To-do list', ['todo', 'task', 'checkbox', 'check']],
+        ['bullet', ['bullet', 'unordered', 'ul']],
+        ['ordered', ['numbered', 'ordered', 'ol']],
+        ['todo', ['todo', 'task', 'checkbox', 'check']],
       ] as const
     ).map(
-      ([kind, label, keywords]): SlashItem => ({
+      ([kind, keywords]): SlashItem => ({
         value: `list-${kind}`,
-        label,
+        label: labels.listKind(kind),
         group: 'text',
         keywords: ['list', ...keywords],
         create: (newId) => ({

@@ -91,6 +91,37 @@ the cost of a component with no catalog in context to a few hundred bytes.
 | `addCatalog(catalog)` | Add or merge a catalog; returns its issues |
 | `subscribe(listener)` | Change notifications; returns the unsubscribe function |
 
+## Label dictionaries (ADR-026)
+
+> **Status: new in `0.13.0`.**
+
+A host that only needs one language does not have to build catalogs and
+loaders: it passes one flat dictionary of message ids, near the root, and
+every built-in label of every Texuli package follows it.
+
+```ts
+import { createLabels, type LabelDictionary } from '@texuli/core/i18n';
+
+const es: LabelDictionary = {
+  'texuli.dialog.close-label': 'Cerrar',
+  'blocks.text.tones.info': 'Información',
+};
+const i18n = createLabels(es, { locale: 'es' });
+```
+
+| Export | What it does |
+| --- | --- |
+| `LabelDictionary<Id>` | `{ [id in Id]?: Message }`. The Svelte packages export their id unions (`TexuliMessageId`, `PrimitivesMessageId`, `BlocksMessageId`, `PagesMessageId`…), so a dictionary can be typed against exactly the ids that exist |
+| `mergeLabels(...dictionaries)` | Merge left to right (a later dictionary wins per id), skipping `undefined` dictionaries and values; returns a frozen, prototype-free object |
+| `createLabels(labels, options)` | An `I18n` whose catalog for `options.locale` (`CreateLabelsOptions`: `locale`, default `en`; `parent`; `onIssues`) is the dictionary, checked by `parseCatalog`. The locale drives plural rules and number formatting in messages |
+| `layerI18n(top, base)` | Stack two runtimes: ids `top` has resolve there, the rest through `base`; `subscribe` hears both. `createLabels` uses it when `parent` is set, so a nested dictionary overrides only its own ids |
+
+The Svelte side is `setTexuliLabels(labels, { locale })` and
+`<LabelsProvider>` in `texuli/i18n` (with only `@texuli/primitives`:
+`setI18nContext(createLabels(labels, { locale }))`); see [texuli i18n](../../texuli/docs/i18n.md).
+Precedence stays the same: the instance prop, then the dictionary, then
+the English default.
+
 ## Pseudo-locale
 
 Activating `PSEUDO_LOCALE` (`en-XA`) passes every resolved string, catalog

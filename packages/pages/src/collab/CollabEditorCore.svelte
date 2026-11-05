@@ -14,20 +14,26 @@ import type { DeckPayloadValidator } from '@texuli/document/schema-core';
 import { readDomSelection } from '@texuli/editor/editor';
 import type { DeckPlayerHost } from '@texuli/player';
 import { untrack } from 'svelte';
+import { useMessages } from 'texuli/i18n';
 import type { MotionProp } from 'texuli/motion';
 import PageEditorCore from '../editor/PageEditorCore.svelte';
 import type { ComponentEmbedOption } from '../editor/slash.ts';
 import type { PagesEditor } from '../editor/state.svelte.ts';
 import type { PagesBlockHost, PagesBlockSnippet } from '../shared/block-host.ts';
 import type { EmbedResolver } from '../shared/embeds.ts';
-import { type PagesLabels, resolvePagesLabels } from '../shared/labels.ts';
+import { type PagesLabels, pagesLabelsFor, resolvePagesLabels } from '../shared/labels.ts';
 import type { MediaResolver } from '../shared/media.ts';
 import type { PagesPlayerLoader } from '../shared/player-loader.ts';
 import type { PageRef } from '../shared/types.ts';
 import CollabOverlay from './CollabOverlay.svelte';
 import CollaboratorList from './CollaboratorList.svelte';
 import CommentSidebar from './CommentSidebar.svelte';
-import { type CollabLabels, landmarkPerson, resolveCollabLabels } from './labels.ts';
+import {
+  type CollabLabels,
+  collabLabelsFor,
+  landmarkPerson,
+  resolveCollabLabels,
+} from './labels.ts';
 import SuggestionList from './SuggestionList.svelte';
 import type { CollabSession, CommentDraft } from './session.svelte.ts';
 import VersionHistory from './VersionHistory.svelte';
@@ -108,11 +114,12 @@ let {
 }: Props = $props();
 
 const uid = $props.id();
-const strings = $derived(resolveCollabLabels(collabLabels));
+const msg = useMessages();
+const strings = $derived(resolveCollabLabels(collabLabels, collabLabelsFor(msg)));
 // Every landmark name carries this author's name (or the replica id), so two
 // editors on one page never repeat one (axe `landmark-unique`).
 const person = $derived(landmarkPerson(session));
-const pageStrings = $derived(resolvePagesLabels(labels));
+const pageStrings = $derived(resolvePagesLabels(labels, pagesLabelsFor(msg)));
 const editorLabels = $derived({
   ...labels,
   breadcrumb: strings.landmark(pageStrings.breadcrumb, person),

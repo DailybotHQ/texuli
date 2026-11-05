@@ -301,7 +301,7 @@ function safeNavHref(href: string): string | undefined {
 
     <aside class="tx-content-layout__toc" aria-label={msg('texuli.content-layout.on-this-page', 'On this page')}>
       <details open class="tx-content-layout__toc-details">
-        <summary>On this page</summary>
+        <summary>{msg('texuli.content-layout.on-this-page', 'On this page')}</summary>
         {#if tocItems.length}
           <ol>
             {#each tocItems as item (item.id)}
@@ -316,7 +316,7 @@ function safeNavHref(href: string): string | undefined {
             {/each}
           </ol>
         {:else}
-          <p class="tx-content-layout__toc-empty">Sections appear here as the article loads.</p>
+          <p class="tx-content-layout__toc-empty">{msg('texuli.content-layout.toc-empty', 'Sections appear here as the article loads.')}</p>
         {/if}
       </details>
     </aside>

@@ -172,11 +172,43 @@ Full checklists: [`references/recipes.md`](references/recipes.md).
 | Form flow | `texuli/input`, field, button, stepper; forms manifests |
 | Slide / deck | Deck v2 from JSON or Markdown: `@texuli/deck` (model, markdown, authoring, templates; in development, on npm from `0.4.0`) presented by `@texuli/slides/stage` `DeckStage`, exported by `@texuli/slides/export`; 21 layout ids, `deck` CLI and MCP tool: [`references/decks.md`](references/decks.md). `@texuli/slides` `0.3.0` is the v1 model |
 | Media story | [`../media/SKILL.md`](../media/SKILL.md) + content card |
-| Drag and drop (lists, groups, boards, trees) | `@texuli/primitives/sortable`, `@texuli/data/board`, `@texuli/data/tree-view`; engine `@texuli/drag` (in development, on npm as `0.12.3`; `sortable` and the data drag migrations are new in `0.4.0`) |
-| Workflow editor or diagram | `@texuli/workflows` editor, viewer, inspector, model, layout (in development, on npm as `0.12.3`) |
+| Drag and drop (lists, groups, boards, trees) | `@texuli/primitives/sortable`, `@texuli/data/board`, `@texuli/data/tree-view`; engine `@texuli/drag` (in development, on npm as `0.13.0`; `sortable` and the data drag migrations are new in `0.4.0`) |
+| Workflow editor or diagram | `@texuli/workflows` editor, viewer, inspector, model, layout (in development, on npm as `0.13.0`) |
 | Block document editor, reader, pages, export, collaboration | `@texuli/pages` (`editor`, `reader`, `paged`, `export`, `collab`, `host`) on `@texuli/document` (in development, both new in `0.7.0`); an agent writes documents as data: [`../blueprints/SKILL.md`](../blueprints/SKILL.md) stage **I** |
 | Schema-driven form, infinite canvas, spreadsheet, dashboard | `@texuli/forms` (`SchemaForm`), `@texuli/canvas` (`editor`, `viewer`), `@texuli/sheets` (`view`), `@texuli/data/dashboard` (in development, all new in `0.8.0`); agents send them as `schema-form`, `canvas`, `spreadsheet` and `data-dashboard` nodes painted through the player's host seams: [`references/imports.md`](references/imports.md) |
 | A whole stateful screen as JSON (an agent sends it) | [`../blueprints/SKILL.md`](../blueprints/SKILL.md) stage **G** |
+
+## Labels and locale
+
+Every built-in string (close buttons, empty states, landmark names, block
+tone labels, the page outline) has a message id and an English default. To
+ship the UI in another language, pass one dictionary near the root; a
+component's own label prop still wins.
+
+- **From `0.13.0`:** `<LabelsProvider
+  labels={es} locale="es">` or `setTexuliLabels(es, { locale: 'es' })` from
+  `texuli/i18n` covers `texuli`, `@texuli/primitives`, `@texuli/blocks` and
+  `@texuli/pages`. Type it with `TexuliLabels` and the `BlocksMessageId` and
+  `PagesMessageId` unions; the ids and English text are in
+  `TEXULI_MESSAGES_EN`, `PRIMITIVES_MESSAGES_EN`, `BLOCKS_MESSAGES_EN`
+  (`@texuli/blocks/i18n`) and `PAGES_MESSAGES_EN` (`@texuli/pages`).
+- **On `0.12.3` and earlier:** `setI18nContext(createI18n({ locale: 'es', catalogs: [{
+  locale: 'es', messages: es }] }))` translates the `texuli` and primitives
+  ids; blocks and pages take their `labels` props.
+- Keep `{placeholders}` as written. Messages format numbers for the locale.
+  `@texuli/data`, `@texuli/chat`, `@texuli/media` and `@texuli/editor` still
+  need their `labels` props.
+
+```svelte
+<LabelsProvider locale="es" labels={{
+  'texuli.dialog.close-label': 'Cerrar',
+  'texuli.toaster.label': 'Notificaciones',
+  'blocks.text.tones.info': 'Información',
+  'pages.outline': 'En esta página',
+}}>
+  {@render children()}
+</LabelsProvider>
+```
 
 ## Offline gates for this skill pack
 

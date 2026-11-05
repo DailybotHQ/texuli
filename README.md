@@ -40,15 +40,17 @@ Multiplatform twin), an MCP server and an agent skill.
 
 > **Status: in development, pre-1.0.** The screenshot above is the
 > texuli.com website, which deploys from `main` to Cloudflare Pages. The 26
-> published packages are released on npm in the 0.12 line,
-> every one at `0.12.3` (published by CI through npm trusted publishing with
+> published packages are released on npm in the 0.13 line,
+> every one at `0.13.0` (published by CI through npm trusted publishing with
 > provenance; `latest` points to it, and `next` is no longer maintained and
 > stays on `0.12.1`); `0.10.0` added design systems, the 0.11 line added the Protoyard
 > gaps G125–G136 and the Final Review fixes (square theme radii, password
 > `autocomplete` `off`, host heading anchors, `@texuli/document/schema-core`,
 > telephone inputs, live `disabled`), and `0.12.0` moves the `@texuli/pages`
 > core entries off the deck model (G136; breaking for those core entries
-> only). It is not a stable release:
+> only), and `0.13.0` adds blueprint spec `0.11.0` (design-system shadow
+> levels, product tokens and short palettes) and one label dictionary, with
+> no breaking API change. It is not a stable release:
 > under 0.x a new minor may contain breaking changes, and 1.0.0 will be
 > the first stable release.
 > The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
@@ -173,7 +175,7 @@ Texuli is designed to be built *by* agents as much as by people.
 | --- | --- | --- |
 | **Agent skill** | A distributable skill pack (`skills/texuli/`) that installs into Claude Code, Codex, Cursor and other hosts — pinned, checksum-verified, checked by `pnpm check:skill` | [Skill](skills/texuli/SKILL.md) |
 | **Agent catalog** | A declarative catalog of components and props. An agent emits catalog nodes; the renderer turns them into real components | [Catalog](packages/catalog/README.md) |
-| **Blueprints** | Whole interfaces as JSON (spec `0.10.0`): local state, flows, bindings and a closed action set, validated by `@texuli/spec` and painted by `@texuli/player`; 75 of the catalog's 168 ids are agent-emittable | [Spec](packages/spec/README.md) · [Player](packages/player/README.md) |
+| **Blueprints** | Whole interfaces as JSON (spec `0.11.0`): local state, flows, bindings and a closed action set, validated by `@texuli/spec` and painted by `@texuli/player`; 75 of the catalog's 168 ids are agent-emittable | [Spec](packages/spec/README.md) · [Player](packages/player/README.md) |
 | **No HTML sinks** | Never `{@html}`, `innerHTML`, `eval` or `new Function` on props, content or agent output. Structure is trusted; markup never is | [Security](docs/SECURITY.md) |
 | **Two-tier URL policy** | Every link and media source passes `safeHref` / `safeMediaSrc`: `developer` for app-authored props, `untrusted` for agent and user content | [URL policy](docs/SECURITY.md) |
 | **MCP server** | Every operation of one registry as an MCP tool: local over stdio (`npx -y @texuli/mcp`) and remote over Streamable HTTP at `https://texuli.com/mcp` (the edge and site operations, read-only, no key); the same operations run as `texuli <group> <verb>`. New in `0.9.0`; `@texuli/mcp` is in development | [MCP](packages/mcp/README.md) · [Tools](packages/tools/docs/mcp.md) |
@@ -205,10 +207,10 @@ every verified command.
 ## Honest boundaries
 
 - **No stable release yet.** The 26 published packages are on npm in the
-  0.12 line, a pre-1.0 release (`npm install texuli`; `latest` points to
-  `0.12.3`, and `next` is no longer maintained, see
-  [RELEASE](docs/RELEASE.md#dist-tags)). Under 0.x a new minor (`0.12.0`) may contain breaking
-  changes, so pin the exact version or use `^0.12.0`; 1.0.0 will be the
+  0.13 line, a pre-1.0 release (`npm install texuli`; `latest` points to
+  `0.13.0`, and `next` is no longer maintained, see
+  [RELEASE](docs/RELEASE.md#dist-tags)). Under 0.x a new minor (`0.13.0`) may contain breaking
+  changes, so pin the exact version or use `^0.13.0`; 1.0.0 will be the
   first stable release.
   The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
 - **texuli.com deploys from `main`** (Cloudflare Pages). Run it locally with

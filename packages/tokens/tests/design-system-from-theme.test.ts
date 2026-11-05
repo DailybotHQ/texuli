@@ -67,6 +67,36 @@ describe('fromTheme: the zero-drift bridge', () => {
     ]);
   });
 
+  it('round-trips a sidebar painted in the primary, and a primary pin over it keeps the active item visible (D-G-015)', () => {
+    const base = generateThemeFromSeed({ seed: '#4f46e5' });
+    const theme = structuredClone(base);
+    for (const mode of ['light', 'dark'] as const) {
+      theme[mode].sidebar = { default: base[mode].primary.default };
+      theme[mode].sidebarForeground = { default: base[mode].primaryForeground.default };
+    }
+    const document = fromTheme(theme);
+    const compiled = compileDesignSystem(document);
+    if (!compiled.ok) throw new Error(JSON.stringify(compiled.errors[0]));
+    for (const mode of ['light', 'dark'] as const) {
+      const expected = resolved(themeVariables({ theme, mode }));
+      for (const name of [
+        '--tx-sidebar',
+        '--tx-sidebar-foreground',
+        '--tx-sidebar-primary',
+      ] as const)
+        expect(compiled.vars[mode]?.[name], `${mode} ${name}`).toBe(expected[name]);
+    }
+    // The consumer's bridge adds the brand as a primary pin: the copy would vanish, so it is derived.
+    const pinned = structuredClone(document) as unknown as { color: Record<string, unknown> };
+    pinned.color.pin = { primary: base.light.primary.default };
+    const withPin = compileDesignSystem(pinned);
+    if (!withPin.ok) throw new Error(JSON.stringify(withPin.errors[0]));
+    expect(withPin.vars.light?.['--tx-sidebar-primary']).not.toBe(
+      withPin.vars.light?.['--tx-sidebar']
+    );
+    expect(checkDesignSystemGuarantees(withPin)).toEqual([]);
+  });
+
   it('keeps a unit on a square radius, so calc(var(--tx-radius) + 2px) stays valid (G128)', async () => {
     const themes = await loadAllFullLibraryThemes();
     const square = themes.filter(

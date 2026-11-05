@@ -21,6 +21,7 @@ export {
 } from './highlights.ts';
 export {
   type CollabLabels,
+  collabLabelsFor,
   DEFAULT_COLLAB_LABELS,
   landmarkPerson,
   resolveCollabLabels,

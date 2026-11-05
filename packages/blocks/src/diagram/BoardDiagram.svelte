@@ -1,16 +1,28 @@
 <script lang="ts">
+import {
+  countLabel,
+  DEFAULT_DIAGRAM_BLOCK_LABELS,
+  type DiagramBlockLabels,
+  fillDiagramLabel,
+} from './labels.ts';
 import type { BoardDiagram as BoardDiagramData } from './schema.ts';
 import { toneBorder } from './tones.ts';
 import './diagram.css';
 
 /** Board: columns of cards as labelled lists (structure is the text alternative). */
-let { block }: { block: BoardDiagramData } = $props();
+let {
+  block,
+  labels = DEFAULT_DIAGRAM_BLOCK_LABELS,
+}: { block: BoardDiagramData; labels?: DiagramBlockLabels } = $props();
 
 const cards = $derived(block.columns.reduce((sum, column) => sum + column.cards.length, 0));
+const cardCount = (count: number) =>
+  countLabel(labels.boardCardsOne, labels.boardCardsOther, count);
 const summary = $derived(
-  `Board with ${block.columns.length} ${block.columns.length === 1 ? 'column' : 'columns'} and ${cards} ${
-    cards === 1 ? 'card' : 'cards'
-  }`
+  fillDiagramLabel(labels.boardSummary, {
+    columns: countLabel(labels.boardColumnsOne, labels.boardColumnsOther, block.columns.length),
+    cards: cardCount(cards),
+  })
 );
 </script>
 
@@ -21,9 +33,10 @@ const summary = $derived(
       {#each block.columns as column (column.id)}
         <section
           class="tx-diagram-column"
-          aria-label="{column.title}, {column.cards.length} {column.cards.length === 1
-            ? 'card'
-            : 'cards'}"
+          aria-label={fillDiagramLabel(labels.boardColumn, {
+            title: column.title,
+            cards: cardCount(column.cards.length),
+          })}
           data-column={column.id}
         >
           <p class="tx-diagram-column__title" aria-hidden="true">
@@ -39,7 +52,7 @@ const summary = $derived(
               {/each}
             </ul>
           {:else}
-            <p class="tx-diagram-empty">No cards</p>
+            <p class="tx-diagram-empty">{labels.boardEmpty}</p>
           {/if}
         </section>
       {/each}

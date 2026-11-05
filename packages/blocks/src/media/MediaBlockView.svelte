@@ -1,8 +1,10 @@
 <script lang="ts">
+import { localizeLabels } from '@texuli/core/i18n';
 import { onMount } from 'svelte';
+import { useMessages } from 'texuli/i18n';
 import { checkMediaBlock } from './check.ts';
 import type { MediaBlockViewProps } from './family.ts';
-import { resolveMediaBlockLabels } from './labels.ts';
+import { DEFAULT_MEDIA_BLOCK_LABELS, resolveMediaBlockLabels } from './labels.ts';
 import { resolveBlockMediaSrc } from './resolve.ts';
 
 /**
@@ -13,7 +15,10 @@ import { resolveBlockMediaSrc } from './resolve.ts';
 let { block, labels, resolveAvatar, oninvalid }: MediaBlockViewProps = $props();
 
 const check = $derived(checkMediaBlock(block));
-const text = $derived(resolveMediaBlockLabels(labels));
+const msg = useMessages();
+const text = $derived(
+  resolveMediaBlockLabels(labels, localizeLabels(msg, 'blocks.media', DEFAULT_MEDIA_BLOCK_LABELS))
+);
 
 let reducedMotion = $state(false);
 let motionKnown = $state(false);

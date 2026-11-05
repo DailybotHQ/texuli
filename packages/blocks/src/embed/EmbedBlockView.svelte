@@ -1,4 +1,6 @@
 <script lang="ts">
+import { localizeLabels } from '@texuli/core/i18n';
+import { useMessages } from 'texuli/i18n';
 import EmbedApp from './EmbedApp.svelte';
 import type { EmbedBlockViewProps } from './family.ts';
 import { DEFAULT_EMBED_BLOCK_LABELS } from './family.ts';
@@ -7,7 +9,11 @@ import { checkEmbedBlock } from './schema.ts';
 
 let { block, mountEmbed, labels, oninvalid }: EmbedBlockViewProps = $props();
 const check = $derived(checkEmbedBlock(block));
-const text = $derived({ ...DEFAULT_EMBED_BLOCK_LABELS, ...labels });
+const msg = useMessages();
+const text = $derived({
+  ...localizeLabels(msg, 'blocks.embed', DEFAULT_EMBED_BLOCK_LABELS),
+  ...labels,
+});
 $effect(() => {
   if (!check.ok) oninvalid?.(check.issues);
 });

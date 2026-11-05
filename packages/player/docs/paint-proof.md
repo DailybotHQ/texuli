@@ -105,7 +105,7 @@ blueprint values only through these guards:
 | `locale` (deck) | `lang` | `safeLang`: a BCP 47-shaped tag, or nothing |
 | G20 `gap`, `align`, `wrap`, `ratio` (stack, row, split) | `data-*` attributes the CSS maps | Closed enums in the manifests (a free-text value fails `sanitizeProps`); the painter also falls back to a default token |
 | G20 `span`, `rowSpan` (tile) | `style` custom properties | Finite numbers clamped to integers 1–4 and 1–2 |
-| Heading rank | Element name `h1`–`h6` | Computed from the plan (`planFrames`), never read from props |
+| Heading rank | Element name `h1`–`h6` | Computed from the plan (`planOutline`), never read from props |
 | Frame `id`, contents `href` | Attributes | Player-generated from `$props.id()` and the tree path; blueprint text (such as `slideId`) never becomes an id |
 
 ## What the audit asserts

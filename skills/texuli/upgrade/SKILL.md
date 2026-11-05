@@ -141,6 +141,42 @@ Move the backup back into the host's skills folder and verify it with
 - **Offline-safe.** An unreachable network ends with a report, never a
   partial install.
 
+## Texuli packages 0.12 → 0.13: what to check
+
+This sub-skill never upgrades packages; moving an app from `^0.12.0` to
+`^0.13.0` is the developer's install ([`../components/SKILL.md`](../components/SKILL.md)).
+`0.13.0` breaks no public API; it is a minor because the blueprint spec
+moves to `0.11.0` and the design-system compiler to version `2`. Before the
+move, check the app for:
+
+- **Stored compiled design systems:** `DESIGN_SYSTEM_COMPILER_VERSION` is
+  `2`, so the compiled form and its hash change for every document.
+  Recompile cached `design-system.compiled.json` files and update any
+  snapshot or cache key that holds a hash. The document's `formatVersion`
+  stays `1`, and every `0.10.0` document stays valid.
+- **The sidebar fill:** `sidebarPrimary` is now derived when copying the
+  primary pin would equal the sidebar fill or fail contrast, so a sidebar
+  accent can change color.
+- **Soft fills:** a soft fill whose `*SoftForeground` is pinned is held
+  to that ink only, not to the page foreground, so its compiled fill can
+  differ from `0.12.x`; when the page foreground misses the target on it,
+  alert bodies and calendar event text follow `--tx-<role>-soft-body`.
+- **Blueprints and documents:** every `0.10.0` envelope migrates to
+  `0.11.0` by stamping `spec` (`migrateBlueprint`); the new
+  design-system fields (`elevation.levels`, `extensions`, a categorical
+  palette of 1 to 8 colors) are refused by `0.12.x` readers.
+- **Chart titles:** flow, geo and part-whole charts inside a section now
+  title themselves one rank below it (through `@texuli/charts/heading`)
+  instead of a fixed h3; heading-level snapshots may move.
+- **Labels (optional):** `LabelsProvider` or `setTexuliLabels` from
+  `texuli/i18n` replaces per-component `labels` props in `texuli`,
+  primitives, blocks and pages; a prop still wins. `@texuli/data`,
+  `@texuli/chat`, `@texuli/media` and `@texuli/editor` still need their
+  `labels` props.
+
+The full notes are in `docs/RELEASE.md` of the Texuli repository
+("0.13.0").
+
 ## Texuli packages 0.11 → 0.12: breaking changes
 
 This sub-skill never upgrades packages; moving an app from `^0.11.0` to

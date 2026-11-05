@@ -87,12 +87,15 @@ The grammar check and the paint share one outline:
 - a frame's title is the `h1`
 - a card's title sits one rank below the nearest titled frame around it
 - a heading block keeps its own `level`
-- a chart's title renders at the component's fixed rank: `h2` for cartesian
-  and matrix charts, `h3` for flow, geo and part-whole charts
+- a chart's title renders at the component's rank: a fixed `h2` for
+  cartesian and matrix charts; for flow, geo and part-whole charts one rank
+  below the nearest titled frame or card (`h2` under the page `h1`, `h3` in a
+  card), `h3` with nothing titled around them (D-G-020)
 
-So a donut placed directly under the page `h1` skips a rank and fails both
-`grammar` and `axe`. Put it in a titled card. A test checks that every
-reference paints exactly the outline the grammar checked.
+So a donut directly under the page `h1` is an `h2`, and in a titled card an
+`h3`. A heading block one rank too deep still skips a rank and fails both
+`grammar` and `axe`. A test checks that every reference paints exactly the
+outline the grammar checked.
 
 The paint mounts the content components through the element loaders
 (`@texuli/tools/elements`). The layouts become semantic containers: a frame

@@ -12,9 +12,9 @@ with an offline scorer measures how well an agent builds with the catalog.
 **In the stack:** layer L8, over the agent catalog, the `@texuli/tokens` token engine, `@texuli/blocks`, `@texuli/charts`, `@texuli/media`, `@texuli/deck` and `@texuli/document`. `@texuli/mcp` (L9) wraps its MCP server.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.12.3`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.12.0`) may contain breaking
-> changes, so pin the exact version or use `^0.12.0`, which accepts only 0.12.x.
+> published to npm as `0.13.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.13.0`) may contain breaking
+> changes, so pin the exact version or use `^0.13.0`, which accepts only 0.13.x.
 
 ## Install
 
@@ -131,7 +131,8 @@ read-only `document` tool; see
 document and reports the spec's codes, the guarantees and the contrast
 report (`--json`); `--render` also paints the agent-emittable catalog
 components under it in headless chromium (axe, painted contrast, literal
-colors). The `@texuli/tools/ds-check` subpath runs the same checks in your
+colors), from the conformance sheet this package ships (no bundler needed;
+your project installs `playwright` and `@axe-core/playwright`). The `@texuli/tools/ds-check` subpath runs the same checks in your
 own tests; see
 [ds-check.md](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ds-check.md).
 The `ds.*` operations (validate, compile to JSON, CSS, Tailwind, DTCG or

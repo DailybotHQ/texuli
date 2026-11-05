@@ -101,7 +101,10 @@ function updateQuery(value: string): void {
         .then(() => onSearch?.(value.trim()))
         .catch((cause: unknown) => {
           if (version !== requestVersion) return;
-          error = cause instanceof Error ? cause.message : 'Search failed';
+          error =
+            cause instanceof Error
+              ? cause.message
+              : msg('primitives.command.search-failed', 'Search failed');
           onSearchError?.(cause);
         })
         .finally(() => {

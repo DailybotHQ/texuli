@@ -1,5 +1,18 @@
 import type { GrammarComponentMeta, GrammarRoleCatalog } from './types.ts';
 
+/** The charts whose title rank follows the outline (`titleHeading: 'figure'`, D-G-020). */
+export const FIGURE_TITLE_CHART_IDS = Object.freeze([
+  'charts-funnel',
+  'charts-network',
+  'charts-sankey',
+  'charts-geo-map',
+  'charts-geo-point-map',
+  'charts-donut',
+  'charts-pie',
+  'charts-sunburst',
+  'charts-treemap',
+] as const);
+
 /**
  * Stable catalog ids for deck structure (G11). `deck` and `slide` are
  * agent-emittable catalog components; the rest name deck stage chrome and
@@ -52,8 +65,12 @@ export const DEFAULT_GRAMMAR_ROLES: readonly GrammarComponentMeta[] = Object.fre
     nestedRoles: [{ inside: [DECK_GRAMMAR_IDS.slide], role: 'static' }],
   },
   { id: DECK_GRAMMAR_IDS.upNext, role: 'landmark', landmark: 'region' },
-  // Charts render their title at a fixed rank (cartesian and matrix h2;
-  // flow, geo and part-whole h3); compact charts render no heading
+  // Charts render their title as a heading (compact charts render none):
+  // cartesian and matrix charts at a fixed h2; flow, geo and part-whole
+  // charts at the rank their host sets (`figure`, D-G-020): one below the
+  // nearest titled frame or card (h2 under a page's h1, h3 in a card), h3
+  // with nothing titled around them. The player sets that rank from the
+  // same outline (`planFrames`).
   ...(
     [
       'area',
@@ -69,20 +86,8 @@ export const DEFAULT_GRAMMAR_ROLES: readonly GrammarComponentMeta[] = Object.fre
   ).map(
     (name): GrammarComponentMeta => ({ id: `charts-${name}`, role: 'static', titleHeading: 2 })
   ),
-  ...(
-    [
-      'funnel',
-      'network',
-      'sankey',
-      'geo-map',
-      'geo-point-map',
-      'donut',
-      'pie',
-      'sunburst',
-      'treemap',
-    ] as const
-  ).map(
-    (name): GrammarComponentMeta => ({ id: `charts-${name}`, role: 'static', titleHeading: 3 })
+  ...FIGURE_TITLE_CHART_IDS.map(
+    (id): GrammarComponentMeta => ({ id, role: 'static', titleHeading: 'figure' })
   ),
   // Interactive
   {
@@ -250,4 +255,15 @@ export function isInteractiveRole(role: GrammarComponentMeta['role']): boolean {
 
 export function isContainerRole(role: GrammarComponentMeta['role']): boolean {
   return role === 'container' || role === 'landmark';
+}
+
+/** The rank of a `figure` title with no titled frame or card around it. */
+export const FIGURE_TITLE_FALLBACK = 3;
+
+/**
+ * The rank a `titleHeading: 'figure'` title renders at under `sectionLevel`
+ * (the rank of the nearest titled frame or card around it, 0 for none).
+ */
+export function figureTitleLevel(sectionLevel: number): number {
+  return sectionLevel <= 0 ? FIGURE_TITLE_FALLBACK : Math.min(sectionLevel + 1, 6);
 }

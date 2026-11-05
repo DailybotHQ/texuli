@@ -11,10 +11,10 @@ Svelte 5 component library by Dailybot, Inc.
 
 **In the stack:** layer L5, on the `@texuli/core` texels, the `@texuli/tokens` token engine, the `texuli` components and the `@texuli/charts`, `@texuli/data` and `@texuli/media` domain packages. The agent catalog, the player, `@texuli/pages`, `@texuli/slides`, `@texuli/astro` and `@texuli/tools` build on it.
 
-> **Status: 0.x release.** `@texuli/blocks` is published on npm as `0.12.3`, a
+> **Status: 0.x release.** `@texuli/blocks` is published on npm as `0.13.0`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
-> minor (`0.12.0`) may contain breaking changes, so pin the exact version or
-> use `^0.12.0`, which accepts only 0.12.x.
+> minor (`0.13.0`) may contain breaking changes, so pin the exact version or
+> use `^0.13.0`, which accepts only 0.13.x.
 
 ## Install
 
@@ -83,6 +83,7 @@ The package root exports a `load*Family()` renderer loader and a
 | Map | `map`: places and an optional route on an offline basemap | `@texuli/blocks/map`, `@texuli/blocks/map/engine`, `@texuli/blocks/map/renderers` |
 | Diagram | `flow`, `tree`, `board` and `terminal` diagrams | `@texuli/blocks/diagram`, `@texuli/blocks/diagram/engine`, `@texuli/blocks/diagram/renderers` |
 | Code | `code`, with syntax colors from an owned tokenizer | `@texuli/blocks/code`, `@texuli/blocks/code/engine`, `@texuli/blocks/code/tokenizer`, `@texuli/blocks/code/renderers` |
+| Labels | `BLOCKS_MESSAGES_EN` (every block label id and its English default) and the `BlocksMessageId` union, for one dictionary set near the root with `setTexuliLabels` or `<LabelsProvider>` from `texuli` (ADR-026) | `@texuli/blocks/i18n` |
 
 In each family, the plain subpath is the light API (guards, labels, the lazy
 loader), `/engine` is framework-free logic, and `/renderers` gives you the

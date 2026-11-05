@@ -10,8 +10,11 @@ import { testSheetHost } from './sheet-host.ts';
 
 /**
  * Every manifest example of every agent-emittable id paints in the Player
- * (happy-dom) with no placeholder and no node error. Examples that read a
- * `$state` list get it declared with two items.
+ * (happy-dom) with no placeholder, no node error and no refusal, standalone
+ * inside a titled `layout-page` (D-G-020: the page's h1 comes first, so an
+ * example whose heading skipped a rank under it would be refused; flow, geo
+ * and part-whole charts now title themselves h2 there). Examples that
+ * read a `$state` list get it declared with two items.
  */
 
 const entries = (await buildCatalog(CATALOG_GROUPS)).catalog.entries;
@@ -64,6 +67,9 @@ function contextFor(id: string, props: Readonly<Record<string, unknown>>) {
   return { state, flow, wrap };
 }
 
+/** The frames: an example of one is the root itself; anything else sits in a titled page. */
+const FRAMES = new Set(['layout-page', 'layout-doc', 'layout-deck']);
+
 /** Ids happy-dom cannot paint, with the reason (browser e2e covers them). */
 const DOM_LIMITS: Readonly<Record<string, string>> = {
   'media-composition-canvas': 'happy-dom has no 2D canvas context',
@@ -111,14 +117,20 @@ describe('every emittable example paints', () => {
               }
             : {}),
           ...(context.flow ? { flow: context.flow } : {}),
-          tree: context.wrap({ id: entry.id, props: example.props }),
+          tree: FRAMES.has(entry.id)
+            ? { id: entry.id, props: example.props }
+            : {
+                id: 'layout-page',
+                props: { title: `${entry.label} page` },
+                children: [context.wrap({ id: entry.id, props: example.props })],
+              },
         };
         const errors: string[] = [];
         const { container } = render(Player, {
           props: {
             blueprint,
             label: 'Parity',
-            // Examples are fragments: the frame-root rule is the only refusal allowed.
+            // Preview paints a refused draft too; the diagnostics below must still be empty.
             invalidPolicy: 'preview',
             // A document example (spec 0.7.0) is checked and painted through a document host.
             documentHost: testDocumentHost().host,
@@ -137,8 +149,7 @@ describe('every emittable example paints', () => {
               stateIssues: readonly { message: string }[];
             }) => {
               for (const d of event.diagnostics) {
-                if (d.severity === 'error' && d.check !== 'root')
-                  errors.push(`${d.check}:${d.code} ${d.message}`);
+                if (d.severity === 'error') errors.push(`${d.check}:${d.code} ${d.message}`);
               }
               for (const issue of event.stateIssues) errors.push(`state: ${issue.message}`);
             },

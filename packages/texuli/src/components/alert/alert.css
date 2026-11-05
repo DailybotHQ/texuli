@@ -133,11 +133,13 @@
 
   /*
    * Tones: contract soft fills + soft title ink (AA-gated). Body uses
-   * --tx-foreground on the soft surface. No color-mix on title/body.
+   * --tx-foreground on the soft surface, or the fill's own ink
+   * (--tx-<role>-soft-body) when a design system pins one the page
+   * foreground cannot read on. No color-mix on title/body.
    */
   .tx-alert--info {
     --tx-alert-title: var(--tx-info-soft-foreground, var(--tx-info, dodgerblue));
-    --tx-alert-body: var(--tx-foreground, CanvasText);
+    --tx-alert-body: var(--tx-info-soft-body, var(--tx-foreground, CanvasText));
     --tx-alert-accent: var(--tx-alert-title);
     border-color: var(--tx-info, dodgerblue);
     background-color: var(
@@ -147,7 +149,7 @@
   }
   .tx-alert--success {
     --tx-alert-title: var(--tx-success-soft-foreground, var(--tx-success, green));
-    --tx-alert-body: var(--tx-foreground, CanvasText);
+    --tx-alert-body: var(--tx-success-soft-body, var(--tx-foreground, CanvasText));
     --tx-alert-accent: var(--tx-alert-title);
     border-color: var(--tx-success, green);
     background-color: var(
@@ -157,7 +159,7 @@
   }
   .tx-alert--warning {
     --tx-alert-title: var(--tx-warning-soft-foreground, var(--tx-warning, darkorange));
-    --tx-alert-body: var(--tx-foreground, CanvasText);
+    --tx-alert-body: var(--tx-warning-soft-body, var(--tx-foreground, CanvasText));
     --tx-alert-accent: var(--tx-alert-title);
     border-color: var(--tx-warning, darkorange);
     background-color: var(
@@ -167,7 +169,7 @@
   }
   .tx-alert--error {
     --tx-alert-title: var(--tx-destructive-soft-foreground, var(--tx-destructive, crimson));
-    --tx-alert-body: var(--tx-foreground, CanvasText);
+    --tx-alert-body: var(--tx-destructive-soft-body, var(--tx-foreground, CanvasText));
     --tx-alert-accent: var(--tx-alert-title);
     border-color: var(--tx-destructive, crimson);
     background-color: var(
@@ -177,7 +179,7 @@
   }
   .tx-alert--brand {
     --tx-alert-title: var(--tx-primary-soft-foreground, var(--tx-primary, Highlight));
-    --tx-alert-body: var(--tx-foreground, CanvasText);
+    --tx-alert-body: var(--tx-primary-soft-body, var(--tx-foreground, CanvasText));
     --tx-alert-accent: var(--tx-alert-title);
     border-color: var(--tx-primary, Highlight);
     background-color: var(

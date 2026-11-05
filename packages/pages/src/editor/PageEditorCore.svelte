@@ -12,11 +12,12 @@ import type { DeckPayloadValidator } from '@texuli/document/schema-core';
 import type { DeckPlayerHost } from '@texuli/player';
 import { Sortable, type SortableMove } from '@texuli/primitives/sortable';
 import { untrack } from 'svelte';
+import { useMessages } from 'texuli/i18n';
 import type { MotionProp } from 'texuli/motion';
 import Breadcrumb from '../shared/Breadcrumb.svelte';
 import { blockPainter, type PagesBlockHost, type PagesBlockSnippet } from '../shared/block-host.ts';
 import type { EmbedResolver } from '../shared/embeds.ts';
-import { type PagesLabels, resolvePagesLabels } from '../shared/labels.ts';
+import { type PagesLabels, pagesLabelsFor, resolvePagesLabels } from '../shared/labels.ts';
 import type { MediaResolver } from '../shared/media.ts';
 import type { PagesPlayerLoader } from '../shared/player-loader.ts';
 import type { PageRef } from '../shared/types.ts';
@@ -119,13 +120,14 @@ let {
 }: Props = $props();
 
 const uid = $props.id();
-const labels = $derived(resolvePagesLabels(labelOverrides));
+const msg = useMessages();
+const labels = $derived(resolvePagesLabels(labelOverrides, pagesLabelsFor(msg)));
 const painter = $derived(blockPainter(blockHost, renderBlock));
 const pages = untrack(
   () =>
     new PagesEditor({
       document: doc,
-      labels: resolvePagesLabels(labelOverrides),
+      labels: resolvePagesLabels(labelOverrides, pagesLabelsFor(msg)),
       ...(announce ? { announce } : {}),
       onChange: (next, entry) => onChange?.(next, entry),
       validateDeck,
@@ -152,7 +154,12 @@ const items = $derived([
     pages: Boolean(createPage),
     decks: untrack(() => validateDeck) !== null,
   }),
-  ...blockItems,
+  // Content block names come from the blocks catalog; the dictionary can translate them.
+  ...blockItems.map((item) => ({
+    ...item,
+    label: labels.contentBlock(item.value.slice('block:'.length), item.label),
+    keywords: [...item.keywords, item.label],
+  })),
 ]);
 
 // The content block items (every @texuli/blocks family) load once a menu opens.

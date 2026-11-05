@@ -573,6 +573,7 @@ const ORDER = [
   'assets',
   'voice',
   'accessibility',
+  'extensions',
   'variants',
 ];
 

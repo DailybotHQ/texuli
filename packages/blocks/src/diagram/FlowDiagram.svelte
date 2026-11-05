@@ -1,4 +1,10 @@
 <script lang="ts">
+import {
+  countLabel,
+  DEFAULT_DIAGRAM_BLOCK_LABELS,
+  type DiagramBlockLabels,
+  fillDiagramLabel,
+} from './labels.ts';
 import { layoutFlow } from './layout.ts';
 import type { FlowDiagram as FlowDiagramData } from './schema.ts';
 import { DIAGRAM_PAD, toneBorder } from './tones.ts';
@@ -8,7 +14,10 @@ import './diagram.css';
  * Flow steps left to right from layoutFlow, joined by arrows, optional loop-back.
  * Ordered list is the text alternative; drawing is aria-hidden.
  */
-let { block }: { block: FlowDiagramData } = $props();
+let {
+  block,
+  labels = DEFAULT_DIAGRAM_BLOCK_LABELS,
+}: { block: FlowDiagramData; labels?: DiagramBlockLabels } = $props();
 
 const uid = $props.id();
 const arrow = `tx-flow-arrow-${uid}`;
@@ -17,9 +26,8 @@ const byId = $derived(new Map(layout.positions.map((p) => [p.id, p])));
 const stageW = $derived(layout.width + DIAGRAM_PAD * 2);
 const stageH = $derived(layout.height + DIAGRAM_PAD * 2);
 const summary = $derived(
-  `Flow with ${block.nodes.length} ${block.nodes.length === 1 ? 'step' : 'steps'}${
-    block.loopBack && block.nodes.length > 1 ? ', repeating from the last step to the first' : ''
-  }`
+  countLabel(labels.flowSummaryOne, labels.flowSummaryOther, block.nodes.length) +
+    (block.loopBack && block.nodes.length > 1 ? labels.flowLoopBack : '')
 );
 
 function edgePath(from: string, to: string, kind: string): string {
@@ -49,10 +57,16 @@ function nodeStyle(node: { x: number; y: number; width: number; height: number }
   <div class="tx-diagram__scroll" role="region" aria-label={summary} tabindex="0">
     <ol class="tx-diagram-sr">
       {#each block.nodes as node, index (node.id)}
-        <li>Step {index + 1} of {block.nodes.length}: {node.label}</li>
+        <li>
+          {fillDiagramLabel(labels.flowStep, {
+            index: index + 1,
+            total: block.nodes.length,
+            label: node.label,
+          })}
+        </li>
       {/each}
       {#if block.loopBack && block.nodes.length > 1}
-        <li>Then back to step 1: {block.nodes[0]?.label}</li>
+        <li>{fillDiagramLabel(labels.flowBack, { label: block.nodes[0]?.label ?? '' })}</li>
       {/if}
     </ol>
     <div

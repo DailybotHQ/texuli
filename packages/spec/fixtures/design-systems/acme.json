@@ -305,7 +305,11 @@
     "density": 1
   },
   "elevation": {
-    "style": "soft"
+    "style": "soft",
+    "levels": {
+      "1": [{ "y": 1, "blur": 2, "opacity": 0.08 }, { "y": 1, "blur": 3, "opacity": 0.1 }],
+      "3": [{ "x": 0, "y": 8, "blur": 24, "spread": -6, "opacity": 0.16 }]
+    }
   },
   "surface": {
     "style": "glass",
@@ -408,6 +412,15 @@
     "focus": "ring",
     "focusWidth": 2,
     "focusOffset": 2
+  },
+  "extensions": {
+    "brand-gold": {
+      "light": "#fef3c7",
+      "dark": "#78350f",
+      "on": { "light": "#451a03", "dark": "#fffbeb" }
+    },
+    "focus-band": { "light": "#e0e7ff", "dark": "#312e81", "on": {} },
+    "chart-stripe": { "light": "#c7d2fe", "dark": "#3730a3" }
   },
   "variants": {
     "high-contrast": {

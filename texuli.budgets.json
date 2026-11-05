@@ -11,16 +11,16 @@
       "note": "Default per-family cap (lead decision 2026-10-23): each lazy block family ships its validators and views; measured structure 16,860 B, data and media similar."
     },
     "@texuli/blocks/code/renderers": {
-      "gzip": 7168,
-      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard. PLAN_010 T-release-060 (2026-10-29): 12288 -> 7168 B, tightened to measured + 4% (measured 6,850 B)."
+      "gzip": 7616,
+      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard. PLAN_010 T-release-060 (2026-10-29): 12288 -> 7168 B, tightened to measured + 4% (measured 6,850 B). 0.13.0 (owner-approved 2026-11-04): 7168 -> 7616 B, measured + 4% (measured 7,270 B) for the translatable defaults read from the label dictionary in context (ADR-026: message ids, named placeholders and the lookup)."
     },
     "@texuli/blocks/core": {
       "gzip": 26176,
       "note": "@texuli/blocks/core holds every family parser plus the catalog metadata by contract (hosts that parse arbitrary documents use it); renderers no longer bundle it. Measured 20.88 KiB. PLAN_009 (2026-10-28, owner-consented release plan): 24576 -> 26176 B, measured + 4% after the new block field schemas (G21) and the linear-time Markdown parser that replaces the backtracking regexes; measured 25,166 B."
     },
     "@texuli/blocks/data/renderers": {
-      "gzip": 13632,
-      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 12,288 B + 4% headroom so platform drift does not flip it. PLAN_009 (2026-10-28, owner-consented release plan): 12800 -> 13632 B, measured + 4% after stat title, source and trend (G21); measured 13,052 B."
+      "gzip": 14208,
+      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 12,288 B + 4% headroom so platform drift does not flip it. PLAN_009 (2026-10-28, owner-consented release plan): 12800 -> 13632 B, measured + 4% after stat title, source and trend (G21); measured 13,052 B. 0.13.0 (owner-approved 2026-11-04): 13632 -> 14208 B, Linux CI measured + 4% (measured 13,654 B; macOS measures a few bytes less) for the label dictionary in context (ADR-026)."
     },
     "@texuli/blocks/formula": {
       "gzip": 3968,
@@ -32,16 +32,16 @@
       "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard. Interactive also carries the closed formula engine for calculators (measured 17.91 KiB). PLAN_010 T-release-060 (2026-10-29): 20480 -> 20096 B, tightened to measured + 4% (measured 19,295 B)."
     },
     "@texuli/blocks/media/renderers": {
-      "gzip": 5440,
-      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard. PLAN_010 T-release-060 (2026-10-29): 12288 -> 5440 B, tightened to measured + 4% (measured 5,223 B)."
+      "gzip": 5952,
+      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard. PLAN_010 T-release-060 (2026-10-29): 12288 -> 5440 B, tightened to measured + 4% (measured 5,223 B). 0.13.0 (owner-approved 2026-11-04): 5440 -> 5952 B, measured + 4% (measured 5,695 B) for the translatable defaults read from the label dictionary in context (ADR-026: message ids, named placeholders and the lookup)."
     },
     "@texuli/blocks/structure/renderers": {
       "gzip": 38080,
       "note": "Eager structure renderers include the styled Tabs, Accordion and Card components and the nested-block host; measured 32,051 B. Hosts that care about first load use the lazy @texuli/blocks/structure entry (lead decision 2026-10-23). PLAN_009 (2026-10-28, owner-consented release plan): 32768 -> 35840 B, measured + 4% after list, quote, callout, card and divider fields (G21), the linear-time Markdown parser and the avatar safeImageSrc re-check; measured 34,425 B. PLAN_010 T-release-060 (2026-10-29): 35840 -> 38080 B, measured + 4% (measured 36,556 B) after the 0.6.0 API contract (ref, rest attributes and composed handlers) and motion seams in the styled Tabs, Accordion and Card it bundles."
     },
     "@texuli/blocks/text/renderers": {
-      "gzip": 12288,
-      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard."
+      "gzip": 12864,
+      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard. 0.13.0 (owner-approved 2026-11-04): 12288 -> 12864 B, measured + 4% (measured 12,364 B) for the translatable defaults read from the label dictionary in context (ADR-026: message ids, named placeholders and the lookup)."
     },
     "@texuli/canvas": {
       "gzip": 50496,
@@ -579,12 +579,12 @@
       "note": "PLAN_011 T-ds-runtime (ADR-023; owner-approved new row): the lazy design-system runtime: applyDesignSystem (one cssText write of the compiled variable map, the allowlisted attributes and [data-tx-scope], lazy FontFace registration, a restoring dispose), designSystemStyle for SSR and designSystemAppearance for the no-flash replay, behind one shared value filter. It imports only the attribute allowlist (never the compiler, the validator or the color engine). ADR-023 target 2 KB gz. Measured 1,966 B, cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/tokens/design-system/compile": {
-      "gzip": 32064,
-      "note": "PLAN_011 T-ds-compiler (ADR-021, ADR-022; owner-approved new row): the lazy design-system compiler: extends resolution, variants and patches, the pinned-color contrast solver over the seed generator, guarantees, concrete variables per mode, fontFaces, assets, report and the SHA-256 hash. It bundles the @texuli/spec/design-system validator (about 7 KB) and the system token families; library themes for texuli:<id> load in lazy chunks (21.9 KB, not counted). Loaded only by the studio, CLI, builds and MCP; the @texuli/tokens root never imports it. Measured 30,780 B, cap = measured + 4% rounded up to 64 B."
+      "gzip": 34176,
+      "note": "PLAN_011 T-ds-compiler (ADR-021, ADR-022; owner-approved new row): the lazy design-system compiler: extends resolution, variants and patches, the pinned-color contrast solver over the seed generator, guarantees, concrete variables per mode, fontFaces, assets, report and the SHA-256 hash. It bundles the @texuli/spec/design-system validator (about 7 KB) and the system token families; library themes for texuli:<id> load in lazy chunks (21.9 KB, not counted). Loaded only by the studio, CLI, builds and MCP; the @texuli/tokens root never imports it. Measured 30,780 B, cap = measured + 4% rounded up to 64 B. 0.13.0 (owner-approved 2026-11-04): 32064 -> 34176 B, measured + 4% (measured 32,817 B) for the spec 0.11.0 design-system fields compiled (shadow levels, product tokens, short categorical palettes, pinned soft inks, the derived sidebar fill)."
     },
     "@texuli/tokens/design-system/compile-core": {
-      "gzip": 31488,
-      "note": "PLAN_011 T-gaps-125-127 (G127, lead-approved): new row at measured + 4%, rounded up to 64 B: the design-system compiler without the theme library (every export of design-system/compile except loadLibraryBase and resolveDesignSystem; resolveDesignSystemCore takes the texuli:<id> loader from its caller). Measured 30,245 B gzip with no lazy chunks, against 30,915 B plus 22,243 B of lazy library chunks for design-system/compile (30,814 B before the split, budget unchanged)."
+      "gzip": 33408,
+      "note": "PLAN_011 T-gaps-125-127 (G127, lead-approved): new row at measured + 4%, rounded up to 64 B: the design-system compiler without the theme library (every export of design-system/compile except loadLibraryBase and resolveDesignSystem; resolveDesignSystemCore takes the texuli:<id> loader from its caller). Measured 30,245 B gzip with no lazy chunks, against 30,915 B plus 22,243 B of lazy library chunks for design-system/compile (30,814 B before the split, budget unchanged). 0.13.0 (owner-approved 2026-11-04): 31488 -> 33408 B, measured + 4% (measured 32,093 B) for the spec 0.11.0 design-system fields compiled (shadow levels, product tokens, short categorical palettes, pinned soft inks, the derived sidebar fill)."
     },
     "@texuli/tokens/design-system/diff": {
       "gzip": 3584,
@@ -657,8 +657,8 @@
       "note": "Styled component over the floating primitive(s) dialog, alert-dialog: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_009 (2026-10-28, owner-consented release plan): 17408 -> 18176 B, measured + 4% after the overlay layer stack and focus-exempt regions (G4), ref and rest props (G5) and handler composition (G26); measured 17,431 B in CI on Linux (16.99 KiB locally). PLAN_010 T-motion-adopt (ADR-013): 18176 -> 19968 B, measured + 4% rounded up to 64 B after the motion prop on Dialog and AlertDialog (texuli/motion seam; the runtime is a lazy chunk) over the primitive motion hooks; measured 19,155 B (17,699 B at HEAD). PLAN_011 T-scope-portals (ADR-023): 19968 -> 20928 B, measured + 4% rounded up to 64 B; measured 20,110 B (18.97 KiB at HEAD): the dialog portal follows the nearest token scope ([data-tx-scope]) through @texuli/core/portal createScopedPortal (scope resolution, a scoped portal root that mirrors the scope's data-tx-* attributes and inline variables through a MutationObserver), placed again before each open."
     },
     "texuli/layouts/content": {
-      "gzip": 13760,
-      "note": "PLAN_009 T-content-layout (G39): new public subpath for direct (declarative) ContentLayout use; the same component the docs/blog/editorial subpaths already load lazily (lazy gzip 12.23 KiB there) with the layout chrome and the TOC helpers. Measured 12,537 B gzip, 3.75 KiB CSS, cap = measured + 4% headroom. PLAN_010 T-targets (ADR-016): 13056 -> 13760 B at measured + 4% (measured 13,213 B): its navigation landmark names resolve through the @texuli/core/i18n message catalog (useMessages and the English-path formatter)."
+      "gzip": 14336,
+      "note": "PLAN_009 T-content-layout (G39): new public subpath for direct (declarative) ContentLayout use; the same component the docs/blog/editorial subpaths already load lazily (lazy gzip 12.23 KiB there) with the layout chrome and the TOC helpers. Measured 12,537 B gzip, 3.75 KiB CSS, cap = measured + 4% headroom. PLAN_010 T-targets (ADR-016): 13056 -> 13760 B at measured + 4% (measured 13,213 B): its navigation landmark names resolve through the @texuli/core/i18n message catalog (useMessages and the English-path formatter). 0.13.0 (owner-approved 2026-11-04): 13760 -> 14336 B, Linux CI measured + 4% (measured 13,764 B; macOS measures a few bytes less) for the label dictionary in context (ADR-026)."
     },
     "texuli/layouts/dashboard": {
       "gzip": 12800,
@@ -862,9 +862,9 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 14,156 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 16,236 B + 4% headroom; validation runs the spec 0.3.0 interaction checks and @texuli/spec/migrate. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 17,480 B + 4% headroom. PLAN_008 T-catalog-player (2026-10-28): validateDeckDraft and the deck v2 tree mapping joined this entry; measured 19,857 B gzip, cap = measured + 4% (was 18,240 B). PLAN_010 (2026-10-29, consented plan): 20652 -> 22016 B, measured + 4% after validateStreamNode (ADR-014) and the node motion check (ADR-013); measured 21,115 B. PLAN_010 T-doc-agents (consented plan): 22016 -> 23552 B, measured + 4% after the document check (host validator, borrowed catalog ids) and node keys (spec 0.7.0); measured 22,644 B. PLAN_010 0.8.0 integration (consented plan): 23552 -> 27072 B, measured + 4% after the spec 0.8.0 checks: the injected form check (checkForm and host validator names), the injected canvas check and the data-source binding check against the host's descriptors (@texuli/spec/source); measured 26,007 B. PLAN_011 T-ds-blueprint: 27072 -> 28480 (measured 27,337 B + 4%) for the design-system check on blueprint envelopes (ref grammar, closed shape, host checkDesignSystem hook)."
     },
     "@texuli/pages": {
-      "gzip": 102208,
+      "gzip": 106368,
       "cssGzip": 3648,
-      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the root barrel (editor + reader); measured 94,277 B, CSS 3,455 B. 0.11.5 (Protoyard G136): 98048 -> 102208 (CI Linux 98,219 B + 4%) for the validateDeck wrappers of @texuli/document/ops."
+      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the root barrel (editor + reader); measured 94,277 B, CSS 3,455 B. 0.11.5 (Protoyard G136): 98048 -> 102208 (CI Linux 98,219 B + 4%) for the validateDeck wrappers of @texuli/document/ops. 0.13.0 (owner-approved 2026-11-04): 102208 -> 106368 B, Linux CI measured + 4% (measured 102,249 B; macOS measures a few bytes less) for the label dictionary in context (ADR-026)."
     },
     "@texuli/pages/collab": {
       "gzip": 126080,
@@ -877,9 +877,9 @@
       "note": "PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for CollabEditorCore on PageEditorCore (and every collab export) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 121,868 B, CSS 4,409 B; every lazy chunk 163,071 B gzip."
     },
     "@texuli/pages/editor": {
-      "gzip": 95296,
+      "gzip": 99712,
       "cssGzip": 3648,
-      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the the block editor: editor surface and the document validator that runs on every edit; the player and block renderers load lazily; measured 91,608 B, CSS 3,455 B."
+      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the the block editor: editor surface and the document validator that runs on every edit; the player and block renderers load lazily; measured 91,608 B, CSS 3,455 B. 0.13.0 (owner-approved 2026-11-04): 95296 -> 99712 B, measured + 4% (measured 95,852 B) for the translatable defaults read from the label dictionary in context (ADR-026: message ids, named placeholders and the lookup)."
     },
     "@texuli/pages/editor-core": {
       "gzip": 79744,
@@ -899,24 +899,24 @@
       "note": "0.12.0 (Protoyard G136): 30656 -> 14080 (measured 13,478 B + 4%): the core host validates with @texuli/document/schema-core and no longer carries @texuli/deck/model. PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for createDocumentPlayerHostCore (the document host on PageReaderCore) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 29,451 B; every lazy chunk 209,595 B gzip."
     },
     "@texuli/pages/paged": {
-      "gzip": 14080,
+      "gzip": 15296,
       "cssGzip": 3136,
-      "note": "PLAN_010 (ADR-010, ADR-011, ADR-016, consented plan): new row at measured + 4% for the paged view with print isolation; measured 12,761 B, CSS 3,000 B. PLAN_011 T-gap-123 (G123, trust mode): 13312 -> 14080 (measured 13,533 B + 4%; 12.93 KiB before) for PagedView as a wrapper that hands PagedViewCore the default player loader (the props spread), so paged-core can leave the player out."
+      "note": "PLAN_010 (ADR-010, ADR-011, ADR-016, consented plan): new row at measured + 4% for the paged view with print isolation; measured 12,761 B, CSS 3,000 B. PLAN_011 T-gap-123 (G123, trust mode): 13312 -> 14080 (measured 13,533 B + 4%; 12.93 KiB before) for PagedView as a wrapper that hands PagedViewCore the default player loader (the props spread), so paged-core can leave the player out. 0.13.0 (owner-approved 2026-11-04): 14080 -> 15296 B, measured + 4% (measured 14,703 B) for the translatable defaults read from the label dictionary in context (ADR-026: message ids, named placeholders and the lookup)."
     },
     "@texuli/pages/paged-core": {
-      "gzip": 13888,
+      "gzip": 15104,
       "cssGzip": 3200,
-      "note": "PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for PagedViewCore (and every paged export) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 13,351 B, CSS 3,047 B; every lazy chunk 144,388 B gzip."
+      "note": "PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for PagedViewCore (and every paged export) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 13,351 B, CSS 3,047 B; every lazy chunk 144,388 B gzip. 0.13.0 (owner-approved 2026-11-04): 13888 -> 15104 B, measured + 4% (measured 14,520 B) for the translatable defaults read from the label dictionary in context (ADR-026: message ids, named placeholders and the lookup)."
     },
     "@texuli/pages/reader": {
-      "gzip": 10368,
+      "gzip": 11584,
       "cssGzip": 2432,
-      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the read-only reader with outline; measured 8,718 B, CSS 2,296 B. PLAN_011 T-ds-blueprint: 9088 -> 9536 (measured 9,148 B + 4%) for a document's own designSystem applied to the reader root. PLAN_011 T-gaps-111-112 (G111, trust mode): 9536 -> 9984 (measured 9,577 B + 4%; 9,145 B before) for the host block renderer wiring (renderBlock and blockHost props, the lazy host-slot loader, the library views' refusal hand-off); the slot that decides and paints loads with import() only when a host is given. PLAN_011 T-gaps-125-127 (G127, lead-approved): 9984 -> 10368 B, measured + 4% (measured 9,955 B, 9,835 B before): PageReader passes the default theme library loader (loadPagesLibraryBase) for a design system's texuli:<theme> bases, now that the reader core takes it injected; the old cap left 29 B."
+      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the read-only reader with outline; measured 8,718 B, CSS 2,296 B. PLAN_011 T-ds-blueprint: 9088 -> 9536 (measured 9,148 B + 4%) for a document's own designSystem applied to the reader root. PLAN_011 T-gaps-111-112 (G111, trust mode): 9536 -> 9984 (measured 9,577 B + 4%; 9,145 B before) for the host block renderer wiring (renderBlock and blockHost props, the lazy host-slot loader, the library views' refusal hand-off); the slot that decides and paints loads with import() only when a host is given. PLAN_011 T-gaps-125-127 (G127, lead-approved): 9984 -> 10368 B, measured + 4% (measured 9,955 B, 9,835 B before): PageReader passes the default theme library loader (loadPagesLibraryBase) for a design system's texuli:<theme> bases, now that the reader core takes it injected; the old cap left 29 B. 0.13.0 (owner-approved 2026-11-04): 10368 -> 11584 B, measured + 4% (measured 11,125 B) for the translatable defaults read from the label dictionary in context (ADR-026: message ids, named placeholders and the lookup)."
     },
     "@texuli/pages/reader-core": {
-      "gzip": 10048,
+      "gzip": 11392,
       "cssGzip": 2432,
-      "note": "PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for PageReaderCore (and every reader export) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 9,654 B, CSS 2,333 B; every lazy chunk 201,810 B gzip."
+      "note": "PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for PageReaderCore (and every reader export) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 9,654 B, CSS 2,333 B; every lazy chunk 201,810 B gzip. 0.13.0 (owner-approved 2026-11-04): 10048 -> 11392 B, measured + 4% (measured 10,909 B) for the translatable defaults read from the label dictionary in context (ADR-026: message ids, named placeholders and the lookup)."
     },
     "@texuli/pages/styles.css": {
       "gzip": 64,

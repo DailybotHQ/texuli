@@ -77,7 +77,6 @@ const sections = $derived(appSidebarSections(resolved));
   <AppNav
     {sections}
     mainLandmark={!nested}
-    label="Main"
     {menuLabel}
     closeLabel={closeLabel ?? msg('texuli.dual-sidebar-layout.close-navigation', 'Close navigation')}
     hrefTrust="developer"

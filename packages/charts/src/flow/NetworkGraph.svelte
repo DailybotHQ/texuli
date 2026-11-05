@@ -1,5 +1,6 @@
 <script lang="ts">
 import { type ClassValue, cx } from 'texuli/cx';
+import { chartTitleLevel } from '../heading/index.ts';
 import { fitChartWidth } from '../math/layout/fit-width.ts';
 import FlowDataTable from './FlowDataTable.svelte';
 import {
@@ -33,6 +34,8 @@ let {
   labels,
   class: className,
 }: Props = $props();
+// D-G-020: the host sets the title's rank (the player: one below the nearest titled section); h3 otherwise.
+const titleLevel = chartTitleLevel();
 
 // Lays out at the figure's measured width, up to `width` (the preferred width).
 let measuredWidth = $state(0);
@@ -53,7 +56,7 @@ const nodeName = (id: string) => nodes.find((node) => node.id === id)?.label ?? 
 </script>
 
 <figure class={cx('flow-chart', className)}>
-  <figcaption><h3>{title}</h3><p>{summary}</p></figcaption>
+  <figcaption><svelte:element this={`h${titleLevel()}`}>{title}</svelte:element><p>{summary}</p></figcaption>
   <!-- Zero-height width probe: it tracks the figure width, and the chart re-laying out (its height) never re-notifies it. -->
   <div class="tx-chart-width-probe" aria-hidden="true" bind:clientWidth={measuredWidth}></div>
   {#if graph.value}
@@ -80,13 +83,13 @@ const nodeName = (id: string) => nodes.find((node) => node.id === id)?.label ?? 
 
 <style>
   .flow-chart { color: var(--tx-foreground, CanvasText); margin: 0; max-inline-size: 100%; }
-  figcaption h3 { font-size: var(--tx-type-body-size); margin-block: 0; }
+  figcaption :is(h2, h3, h4, h5, h6) { font-size: var(--tx-type-body-size); margin-block: 0; }
   figcaption p { color: var(--tx-muted-foreground, CanvasText); margin-block: var(--tx-space-1) var(--tx-space-3); }
   .flow-svg { display: block; inline-size: 100%; max-block-size: 32rem; overflow: visible; }
   /* Token-sized labels: the chart lays out at its drawn width, so user units are pixels. */
   .flow-svg text { fill: var(--tx-foreground, CanvasText); font: var(--tx-type-caption-size) var(--tx-font-sans, system-ui, sans-serif); }
   @media (forced-colors: active) { .flow-svg path { stroke: CanvasText; stroke-dasharray: 4 3; } .flow-svg circle { fill: Canvas; stroke: CanvasText; stroke-width: 2; } }
   @media (forced-colors: active) {
-    figcaption h3, figcaption p { color: CanvasText; }
+    figcaption :is(h2, h3, h4, h5, h6), figcaption p { color: CanvasText; }
   }
 </style>

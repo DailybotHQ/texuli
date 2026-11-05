@@ -145,10 +145,15 @@ finds a block's text element, and `supportsHighlights()` reports support.
 ## Labels
 
 `DEFAULT_COLLAB_LABELS` holds every string (`CollabLabels`);
-`resolveCollabLabels(overrides)` merges partial overrides (empty strings
-never replace a default). `landmark(name, person)` builds every landmark
-name (default `"<name> (<person>)"`); `landmarkPerson(session)` is the
-person it is called with.
+`resolveCollabLabels(overrides, defaults?)` merges partial overrides (empty
+strings never replace a default). `collabLabelsFor(lookup)` builds the
+labels from a `MessageLookup` (ids `pages.collab.<id>`, named placeholders
+such as `"Reply to {author}"`), so the label dictionary in context (ADR-026)
+translates them; `CollabEditor` calls it with `useMessages()`, and
+`DEFAULT_COLLAB_LABELS` is `collabLabelsFor(englishMessages)`.
+`landmark(name, person)` builds every landmark name (default
+`"<name> (<person>)"`); `landmarkPerson(session)` is the person it is called
+with.
 
 ## Styles
 

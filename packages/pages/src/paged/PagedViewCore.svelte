@@ -19,14 +19,15 @@ import {
 } from '@texuli/document/paged';
 import type { DeckPlayerHost } from '@texuli/player';
 import { tick } from 'svelte';
+import { useMessages } from 'texuli/i18n';
 import { documentOutline, type HeadingAnchorFor } from '../reader/outline.ts';
 import ReaderBlocks from '../reader/ReaderBlocks.svelte';
 import { blockPainter, type PagesBlockHost, type PagesBlockSnippet } from '../shared/block-host.ts';
 import type { EmbedResolver } from '../shared/embeds.ts';
-import { type PagesLabels, resolvePagesLabels } from '../shared/labels.ts';
+import { type PagesLabels, pagesLabelsFor, resolvePagesLabels } from '../shared/labels.ts';
 import type { MediaResolver } from '../shared/media.ts';
 import type { PagesPlayerLoader } from '../shared/player-loader.ts';
-import { type PagedLabels, resolvePagedLabels } from './labels.ts';
+import { type PagedLabels, pagedLabelsFor, resolvePagedLabels } from './labels.ts';
 import { measureUnit } from './measure.ts';
 import { adoptCustomPage, pageName } from './page-style.ts';
 import '../styles.css';
@@ -115,8 +116,9 @@ let {
 }: Props = $props();
 
 const painter = $derived(blockPainter(blockHost, renderBlock));
-const labels = $derived(resolvePagesLabels(labelOverrides));
-const pagedLabels = $derived(resolvePagedLabels(labelOverrides));
+const msg = useMessages();
+const labels = $derived(resolvePagesLabels(labelOverrides, pagesLabelsFor(msg)));
+const pagedLabels = $derived(resolvePagedLabels(labelOverrides, pagedLabelsFor(msg)));
 const settings = $derived(documentPageSettings(doc, pageOverrides));
 const geometry = $derived(pageGeometry(settings));
 const px = (points: number) => points * PX_PER_PT;

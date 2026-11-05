@@ -20,7 +20,7 @@ quick library theme instead, use [`../themes/SKILL.md`](../themes/SKILL.md).
 
 > **Released in `0.10.0`.** The document, compiler, runtime, importers,
 > the `ds.*` operations and `texuli ds` ship from `0.10.0` (install
-> `^0.12.0`); the 0.9 line does not have them, so an app pinned to
+> `^0.13.0`); the 0.9 line does not have them, so an app pinned to
 > `^0.9.0` moves up first ([`../upgrade/SKILL.md`](../upgrade/SKILL.md))
 > or stays on themes.
 
@@ -69,6 +69,17 @@ Guide (monorepo): `docs/DESIGN_SYSTEMS.md`. Reference: the document
    requires that exact fill.
 3. **Variants** (`high-contrast`, `compact`) are partial documents under
    `variants`; every variant compiles in light and dark.
+4. **Spec 0.11.0 fields** (new in `0.13.0`; the `0.10.0` to `0.12.3`
+   packages carry spec 0.10.0 and refuse them, so check the installed
+   version first): `elevation.levels` (keys `1`–`5`, each 1 to 4 layers of `y`,
+   `blur`, `opacity` and optional `x`, `spread`, `inset`; numbers in px,
+   never a CSS string), `extensions` (product tokens beyond the roles:
+   `{ "brand-gold": { "light": "#fef3c7", "dark": "#78350f", "on": {} } }`
+   compiles `--tx-ext-brand-gold` and a checked `-foreground`), and a
+   `color.dataViz.<mode>.categorical` of 1 to 8 colors (the compiler
+   derives the rest). To give a soft fill its own text color, pin
+   `color.roles.<mode>.<role>SoftForeground`: the fill is then held to
+   that ink, not to the page text.
 
 ## Validate and repair
 

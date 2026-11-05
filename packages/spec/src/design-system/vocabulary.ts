@@ -65,6 +65,8 @@ export const DESIGN_SYSTEM_LIMITS = Object.freeze({
   favicon: 8_192,
   font: 131_072,
   inlineTotal: 262_144,
+  extensions: 32,
+  shadowLayers: 4,
 });
 
 const ID = '[a-z][a-z0-9]*(?:-[a-z0-9]+)*';
@@ -92,6 +94,10 @@ export const DS_PATTERNS = {
   // biome-ignore lint/suspicious/noControlCharactersInRegex: text refuses control, bidi and invisible characters
   text: /^[^\u0000-\u001f\u007f-\u009f\u00ad\u061c\u180e\u200b-\u200f\u2028-\u202e\u2060-\u2069\ufeff\u{e0000}-\u{e007f}]*$/u,
   key: /^[a-z][a-z0-9-]{0,47}$/,
+  // A product token name: kebab-case, at most 32 characters, never ending in
+  // `-foreground` (that suffix names the paired on-color variable).
+  extension: /^(?=[a-z0-9-]{1,32}$)(?!.*-foreground$)[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/,
+  elevationLevel: /^[1-5]$/,
 };
 
 const P = DS_PATTERNS;
@@ -287,7 +293,7 @@ for (const [id, pairs] of Object.entries(DS_COMPONENT_TOKENS)) {
 }
 
 const sections: Record<string, DsNode> = keys(
-  'color typography shape space elevation surface motion layout icons components assets voice accessibility',
+  'color typography shape space elevation surface motion layout icons components assets voice accessibility extensions',
   ''
 );
 for (const name of Object.keys(sections)) sections[name] = name;
@@ -298,7 +304,7 @@ export const DS_DEFS: Readonly<Record<string, DsNode>> = {
   roleName: ['e', DS_ROLES],
   roleMap: keys(DS_ROLES, color),
   dataVizPalette: {
-    categorical: ['l', color, 8, 8],
+    categorical: ['l', color, 1, 8],
     sequential: ['l', color, 9, 9],
     diverging: ['l', color, 9, 9],
     grid: color,
@@ -334,6 +340,19 @@ export const DS_DEFS: Readonly<Record<string, DsNode>> = {
   ],
   borderStep: ['e', 'none thin thick'],
   elevationLevel: ['i', 0, 5],
+  shadowLayer: {
+    x: ['n', -64, 64],
+    'y!': ['n', -64, 64],
+    'blur!': ['n', 0, 128],
+    spread: ['n', -64, 64],
+    'opacity!': ['n', 0, 1],
+    inset: ['b'],
+  },
+  extension: {
+    'light!': color,
+    'dark!': color,
+    on: { light: color, dark: color },
+  },
   opacityStep: ['e', 'disabled muted scrim'],
   strokeWidth: ['n', 0.5, 4],
   asset: ['u', 'i', DESIGN_SYSTEM_LIMITS.logo],
@@ -357,7 +376,10 @@ export const DS_DEFS: Readonly<Record<string, DsNode>> = {
   },
   shape: { radius: ['n', 0, 48], radiusScale: ['n', 0, 4], borderWidth: ['n', 0, 4] },
   space: { base: ['n', 2, 8], density: ['n', 0.75, 1.25] },
-  elevation: { style: ['e', 'flat soft crisp glow layered'] },
+  elevation: {
+    style: ['e', 'flat soft crisp glow layered'],
+    levels: ['m', ['l', 'shadowLayer', 1, DESIGN_SYSTEM_LIMITS.shadowLayers], 5, P.elevationLevel],
+  },
   surface: { style: ['e', 'solid glass'], glass: { alpha: ['n', 0, 1], blur: ['n', 0, 64] } },
   motion: {
     personality: ['e', 'none subtle standard expressive'],
@@ -395,6 +417,7 @@ export const DS_DEFS: Readonly<Record<string, DsNode>> = {
     focusWidth: ['n', 1, 6],
     focusOffset: ['n', 0, 8],
   },
+  extensions: ['m', 'extension', DESIGN_SYSTEM_LIMITS.extensions, P.extension],
   variant: sections,
 };
 

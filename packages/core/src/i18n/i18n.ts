@@ -219,10 +219,13 @@ function kebab(key: string): string {
 
 /**
  * Resolve a component's English label object through the catalog: every
- * string label becomes `messages(`${prefix}.${kebab(key)}`, english)`. A
- * function label (`remove: (tag) => …`) stays as is unless the catalog has
- * its id, whose message then receives the arguments as `{0}`, `{1}`…
- * Callers spread their instance overrides on top (the instance prop wins).
+ * string label becomes `messages(`${prefix}.${kebab(key)}`, english)`, and
+ * a nested plain object (such as `tones: { info: 'Info' }`) resolves the
+ * same way under `${prefix}.${kebab(key)}`. A function label
+ * (`remove: (tag) => …`) stays as is unless the catalog has its id, whose
+ * message then receives the arguments as `{0}`, `{1}`… Arrays and other
+ * values pass through. Callers spread their instance overrides on top (the
+ * instance prop wins).
  */
 export function localizeLabels<T extends object>(
   messages: MessageLookup,
@@ -240,7 +243,14 @@ export function localizeLabels<T extends object>(
           '',
           Object.fromEntries(args.map((arg, index) => [String(index), arg as string]))
         );
-    } else out[key] = value;
+    } else if (isPlainObject(value)) out[key] = localizeLabels(messages, id, value);
+    else out[key] = value;
   }
   return out as T;
+}
+
+function isPlainObject(value: unknown): value is object {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+  const proto = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
 }

@@ -1,3 +1,4 @@
+import { figureTitleLevel } from '@texuli/catalog/render/grammar';
 import type { RenderNode } from '@texuli/catalog/render/renderer';
 import { CHART_TITLE_LEVELS, GOLDEN_FRAME_IDS, GOLDEN_HEADING_ID } from './catalog.ts';
 
@@ -8,7 +9,8 @@ import { CHART_TITLE_LEVELS, GOLDEN_FRAME_IDS, GOLDEN_HEADING_ID } from './catal
  * - a page, doc or deck `title` is the `h1`;
  * - a card `title` is one rank below the nearest titled frame around it;
  * - a heading text block keeps its own `level`;
- * - a chart `title` renders at the chart's fixed rank (`CHART_TITLE_LEVELS`).
+ * - a chart `title` renders at the chart's rank (`CHART_TITLE_LEVELS`): fixed,
+ *   or `figure`, one below the nearest titled frame or card (h3 with none).
  */
 
 export function isFrame(id: string): boolean {
@@ -60,7 +62,8 @@ export function projectOutline(roots: readonly RenderNode[], parentLevel = 0): R
         lead.push(heading(level));
       }
     } else if (title && CHART_TITLE_LEVELS[node.id]) {
-      lead.push(heading(CHART_TITLE_LEVELS[node.id] as number));
+      const rank = CHART_TITLE_LEVELS[node.id];
+      lead.push(heading(rank === 'figure' ? figureTitleLevel(parentLevel) : (rank as number)));
     }
     return {
       ...node,

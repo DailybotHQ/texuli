@@ -4,6 +4,7 @@ import {
   checkCompositionGrammar,
   DECK_GRAMMAR_IDS,
   defaultGrammarRoles,
+  figureTitleLevel,
   type GrammarComponentMeta,
   grammarIssueSeverity,
   grammarRolesFromList,
@@ -234,10 +235,24 @@ describe('catalog ids in the default roles (G15)', () => {
     }
     // ranks a nested card below its titled card and sees chart title ranks
     {
-      const skipped = [
+      // D-G-020: flow, geo and part-whole charts title one rank below the
+      // nearest titled frame or card (h2 under the page, h3 in a card), h3
+      // with none; cartesian charts stay h2 everywhere.
+      const figures = [
         component('layout-page', { title: 'Overview' }, [
           component('charts-donut', { title: 'Channel mix' }),
+          component('layout-card', { title: 'Flow' }, [
+            component('charts-funnel', { title: 'Signups' }),
+            heading(4, 'Below the funnel'),
+          ]),
         ]),
+      ];
+      // The h4 after the funnel is valid only because the funnel ranks h3 in the card.
+      expect(codes(figures)).toEqual([]);
+      expect(figureTitleLevel(0)).toBe(3);
+      expect([1, 2, 5, 6].map(figureTitleLevel)).toEqual([2, 3, 6, 6]);
+      const skipped = [
+        component('layout-page', { title: 'Overview' }, [heading(3, 'Channel mix')]),
       ];
       expect(codes(skipped)).toEqual(['0.children.0 heading-skip']);
 

@@ -91,7 +91,7 @@ const safeBrandHref = $derived(safeHref(brandHref, 'developer' as HrefTrust) ?? 
   {/snippet}
 
   {#snippet sections()}
-    <MarketingSection align="center" label="Plans">
+    <MarketingSection align="center" label={msg('texuli.pricing-layout.plans', 'Plans')}>
       <ul
         class="tx-pricing-grid"
         data-tx-pricing-grid=""

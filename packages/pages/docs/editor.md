@@ -301,8 +301,22 @@ with the same two props:
 ## Labels
 
 `DEFAULT_PAGES_LABELS` holds every string (`PagesLabels`);
-`resolvePagesLabels(overrides)` merges partial overrides (empty strings never
-replace a default).
+`resolvePagesLabels(overrides, defaults?)` merges partial overrides (empty
+strings never replace a default).
+
+Every default also follows the label dictionary in context (ADR-026; set it
+once with `setTexuliLabels` or `<LabelsProvider>` from `texuli`).
+`pagesLabelsFor(lookup)` builds `PagesLabels` from a `MessageLookup`: every
+string resolves as `lookup('pages.<id>', english, values)` with named
+placeholders, so a translation can reorder words (`pages.moved`:
+`"{label} moved to position {position} of {total}."`). Block and embed names
+have their own ids (`pages.type-names.paragraph`, `pages.embed-names.deck`),
+list kinds too (`pages.list-kinds.todo`), and a content block's slash menu
+name is `pages.content-block.<type>` (`pages.content-block.poll`). The
+editor, reader and paged view call it with `useMessages()`;
+`DEFAULT_PAGES_LABELS` is `pagesLabelsFor(englishMessages)`. Every id and
+its English text is in `PAGES_MESSAGES_EN` (`@texuli/pages`). A `labels`
+prop still wins over the dictionary.
 
 ## Not done yet
 

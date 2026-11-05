@@ -1,4 +1,5 @@
 <script lang="ts">
+import { setChartTitleLevel } from '@texuli/charts/heading';
 import type { Component } from 'svelte';
 import { getPlayerLabels, getPlayerSources } from './context.ts';
 import type { PlayerNodeError } from './errors.ts';
@@ -17,6 +18,10 @@ let {
 }: { node: PlayerPaintNode; onNodeError?: (error: PlayerNodeError) => void } = $props();
 
 const labels = getPlayerLabels();
+// D-G-020: a flow, geo or part-whole chart titles itself at the rank the
+// outline planned (one below the nearest titled section). Every node sets
+// it, so a node never inherits its ancestor's rank; unset means the chart's h3.
+setChartTitleLevel(() => (node.kind === 'component' ? node.titleLevel : undefined));
 // Spec 0.8.0: a node reading a host data source paints inside its source frame.
 const sources = getPlayerSources();
 const sourceBound = $derived(node.kind === 'component' && sources?.status(node.path) != null);

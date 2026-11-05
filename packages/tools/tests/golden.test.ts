@@ -477,10 +477,13 @@ it('grammar, axe and coverage checks fail on what they guard', async () => {
   await scenario(
     'axe: a painted heading-order break fails, and is skipped without a DOM runner',
     async () => {
-      // A part-whole chart renders an h3 title; directly under the page h1 that skips a rank.
+      // An h3 heading block directly under the page h1 skips a rank. (A
+      // part-whole chart there titles itself h2 since D-G-020.)
       const tree = variant('g19-survey-results', (t) => {
-        const pie = t.children[1]?.children?.[0] as CatalogTreeInput;
-        t.children = [pie];
+        t.children = [
+          { id: 'blocks-text', props: { block: { type: 'heading', level: 3, text: 'Setup' } } },
+          ...t.children,
+        ];
       });
       const withAxe = await failing('g19-survey-results', tree, true);
       expect(withAxe.failed).toContain('axe');

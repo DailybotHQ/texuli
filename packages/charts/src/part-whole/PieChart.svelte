@@ -1,4 +1,5 @@
 <script lang="ts">
+import { chartTitleLevel } from '../heading/index.ts';
 import Legend from '../interaction/Legend.svelte';
 import { arcPath, pie } from '../math/shapes/arc.ts';
 import {
@@ -32,6 +33,8 @@ let {
   innerRatio = 0,
   padAngle = 0.01,
 }: Props = $props();
+// D-G-020: the host sets the title's rank (the player: one below the nearest titled section); h3 otherwise.
+const titleLevel = chartTitleLevel();
 const tableLabels = $derived(partWholeTableLabels(labels));
 
 $effect.pre(() => {
@@ -76,7 +79,7 @@ const showCenterTotal = $derived(
 
 <figure class="part-whole">
   <figcaption>
-    <h3 id="{uid}-title">{title}</h3>
+    <svelte:element this={`h${titleLevel()}`} id="{uid}-title">{title}</svelte:element>
     <p id="{uid}-description">{description}</p>
   </figcaption>
   <svg
@@ -125,7 +128,7 @@ const showCenterTotal = $derived(
     max-inline-size: 100%;
   }
 
-  figcaption h3 {
+  figcaption :is(h2, h3, h4, h5, h6) {
     font-size: var(--tx-type-body-size);
     margin-block: 0;
   }
@@ -157,6 +160,6 @@ const showCenterTotal = $derived(
     }
   }
   @media (forced-colors: active) {
-    figcaption h3, figcaption p { color: CanvasText; }
+    figcaption :is(h2, h3, h4, h5, h6), figcaption p { color: CanvasText; }
   }
 </style>

@@ -17,9 +17,9 @@ layouts for dashboards, marketing pages, auth and settings, content and
 mobile.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.12.3`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.12.0`) may contain breaking
-> changes, so pin the exact version or use `^0.12.0`, which accepts only 0.12.x.
+> published to npm as `0.13.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.13.0`) may contain breaking
+> changes, so pin the exact version or use `^0.13.0`, which accepts only 0.13.x.
 
 ## Install
 
@@ -153,6 +153,16 @@ a catalog in context, `useMessages()` is the lookup components read, and
 props keep winning, and English stays the only shipped language
 (translations beyond English are planned)
 ([i18n](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/i18n.md)).
+
+## Labels and locale
+
+One label dictionary translates every built-in string of `texuli`,
+`@texuli/primitives`, `@texuli/blocks` and `@texuli/pages` at once:
+`<LabelsProvider labels={es} locale="es">` from `texuli/i18n` near the root, or
+`setTexuliLabels(es, { locale: 'es' })` in a component's script (ADR-026;
+new in `0.13.0`).
+A component's own label prop still wins
+([i18n](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/i18n.md#one-dictionary-for-every-package-adr-026)).
 
 ## New in 0.6.0
 
