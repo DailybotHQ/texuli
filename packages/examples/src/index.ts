@@ -4,6 +4,7 @@ import './astro-site-hero/entry.ts';
 import './avatar/entry.ts';
 import './badge/entry.ts';
 import './blocks-code/entries.ts';
+import './blocks-code-field/entry.ts';
 import './blocks-data/entries.ts';
 import './blocks-data-charts/entry.ts';
 import './blocks-diagram/entry.ts';
