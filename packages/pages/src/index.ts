@@ -18,4 +18,4 @@ export {
 } from './reader/index.ts';
 
 /** The package version (first published as `0.7.0`). */
-export const PAGES_PACKAGE_VERSION = '0.12.3';
+export const PAGES_PACKAGE_VERSION = '0.13.0';
