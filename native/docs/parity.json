@@ -1,9 +1,9 @@
 {
-  "specVersion": "0.11.0",
+  "specVersion": "0.12.0",
   "totals": {
-    "catalog": 168,
+    "catalog": 170,
     "painted": 52,
-    "placeholder": 116,
+    "placeholder": 118,
     "agentEmittable": 75,
     "agentEmittablePainted": 52,
     "semanticRules": 49,
@@ -43,7 +43,7 @@
     },
     {
       "group": "display",
-      "total": 17,
+      "total": 18,
       "painted": 0
     },
     {
@@ -53,7 +53,7 @@
     },
     {
       "group": "forms",
-      "total": 29,
+      "total": 30,
       "painted": 0
     },
     {
@@ -249,6 +249,18 @@
     {
       "id": "app-nav",
       "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
+      "id": "avatar-group-grid",
+      "group": "display",
       "capability": "web-only",
       "agentEmittable": false,
       "web": "renders",
@@ -789,6 +801,18 @@
     {
       "id": "code",
       "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
+      "id": "code-field",
+      "group": "forms",
       "capability": "web-only",
       "agentEmittable": false,
       "web": "renders",

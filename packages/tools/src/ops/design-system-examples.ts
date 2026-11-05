@@ -264,7 +264,7 @@ export const DESIGN_SYSTEM_EXAMPLES: Readonly<Record<string, Readonly<Record<str
           { y: 1, blur: 2, opacity: 0.08 },
           { y: 1, blur: 3, opacity: 0.1 },
         ],
-        '3': [{ x: 0, y: 8, blur: 24, spread: -6, opacity: 0.16 }],
+        '3': [{ x: 0, y: 8, blur: 24, spread: -6, opacity: 0.16, darkOpacity: 0.4 }],
       },
     },
     surface: { style: 'glass', glass: { alpha: 0.72, blur: 16 } },

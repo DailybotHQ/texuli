@@ -66,6 +66,12 @@
       "specDigest": "17845743d088b768c4441ea2196e5c350687533dbd0c95589cba938fb31fe993",
       "change": "minor",
       "summary": "Additive (consumer gaps D-G-015 to D-G-018 and C-G-007, design-system document only): elevation.levels, structured shadows per level (keys 1 to 5, 1 to 4 layers of bounded x, y, blur, spread, opacity and inset; $defs.shadowLayer) compiled to --tx-elevation-<level>; extensions, product tokens beyond the role set (at most 32 kebab-case names of at most 32 characters, never ending in -foreground, each { light, dark, on? }; $defs.extension) compiled to --tx-ext-<name> and --tx-ext-<name>-foreground; color.dataViz.<mode>.categorical accepts 1 to 8 colors (the compiler derives the rest); acme shows the new fields; every 0.10.0 design-system document stays valid and the blueprint envelope is unchanged; stamp-only migration 0.10.0→0.11.0"
+    },
+    {
+      "specVersion": "0.12.0",
+      "specDigest": "e61ec55ad2b53019dbb934097271f89187829c0a457b763397cb7e2c2441ce78",
+      "change": "minor",
+      "summary": "Additive (consumer gaps D-G-022 to D-G-024 and D-G-027 to D-G-029, in 0.14.0): the app-tier catalog ids avatar-group-grid (texuli) and code-field (@texuli/blocks), web-only; media-image gains srcDark (an image URL at the untrusted tier, like src) and darkMode (theme, system); the design-system $defs.shadowLayer gains an optional darkOpacity (0 to 1, the layer's opacity in dark mode; omitted means opacity) and $defs.issueCode gains aa-non-text (a role fill below 3:1 against its container, WCAG 1.4.11); acme shows darkOpacity; every 0.11.0 blueprint and design-system document stays valid and the blueprint envelope is unchanged; stamp-only migration 0.11.0→0.12.0"
     }
   ]
 }

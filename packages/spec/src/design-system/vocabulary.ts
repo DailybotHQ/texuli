@@ -48,8 +48,18 @@ export const DESIGN_SYSTEM_CODES = [
   'inline-bytes',
 ] as const;
 
-/** Guarantee codes the compiler raises (ADR-022); reserved here, never raised by the spec. */
-export const DESIGN_SYSTEM_COMPILER_CODES = ['aa-text', 'aa-focus', 'target-size'] as const;
+/**
+ * Guarantee codes the compiler raises (ADR-022); reserved here, never raised
+ * by the spec. `aa-non-text` (spec 0.12.0): a role fill below 3:1 against
+ * its container (WCAG 1.4.11), such as the sidebar's active fill on the
+ * sidebar.
+ */
+export const DESIGN_SYSTEM_COMPILER_CODES = [
+  'aa-text',
+  'aa-focus',
+  'target-size',
+  'aa-non-text',
+] as const;
 
 export type DesignSystemCode =
   | (typeof DESIGN_SYSTEM_CODES)[number]
@@ -346,6 +356,7 @@ export const DS_DEFS: Readonly<Record<string, DsNode>> = {
     'blur!': ['n', 0, 128],
     spread: ['n', -64, 64],
     'opacity!': ['n', 0, 1],
+    darkOpacity: ['n', 0, 1],
     inset: ['b'],
   },
   extension: {
