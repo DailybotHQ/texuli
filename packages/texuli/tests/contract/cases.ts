@@ -34,6 +34,9 @@ export const EXCLUDED: Record<string, string> = {
   'components/select/SelectPortal': 'placement: moves its children to the portal target',
   'components/select/SelectValue': 'text: renders the selected label or placeholder, no element',
   'motion/MotionProvider': 'provider: the motion level for its subtree, renders its children',
+  'i18n/LabelsProvider': 'provider: the label dictionary for its subtree, renders its children',
+  'components/icons/IconsProvider':
+    'provider: the icon registry for its subtree, renders its children',
 };
 
 /**

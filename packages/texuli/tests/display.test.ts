@@ -45,6 +45,7 @@ import {
 import { type NavIconName } from '../src/layouts/host/nav-model.ts';
 import AvatarFixture from './fixtures/AvatarFixture.svelte';
 import CustomIcon from './fixtures/CustomIcon.svelte';
+import IconsRegistryHarness from './fixtures/IconsRegistryHarness.svelte';
 import ResizableHarness from './fixtures/ResizableHarness.svelte';
 import ScrollAreaHarness from './fixtures/ScrollAreaHarness.svelte';
 import SeparatorAspectHarness from './fixtures/SeparatorAspectHarness.svelte';
@@ -897,6 +898,31 @@ describe('icons', () => {
 
     it('renders nothing for a runtime name outside the built-in set', () => {
       const { container } = render(Icon, { props: { icon: 'unknown' as IconName } });
+      expect(container.querySelector('svg')).toBeNull();
+    });
+
+    it('renders registered names in their subtree only, components and path data, built-ins kept', async () => {
+      const view = render(IconsRegistryHarness, { props: { inner: { spark: 'M4 4h16' } } });
+      const outer = view.getByTestId('outer');
+      const rocket = within(outer).getByRole('img', { name: 'Rocket' });
+      expect(rocket.getAttribute('data-tx-icon')).toBe('rocket');
+      expect(rocket.getAttribute('width')).toBe('20');
+      const [, spark, check] = [...outer.querySelectorAll('svg')];
+      expect(spark?.getAttribute('data-tx-icon')).toBe('spark');
+      expect(spark?.getAttribute('aria-hidden')).toBe('true');
+      expect(spark?.querySelector('path')?.getAttribute('d')).toBe('M12 3v18M3 12h18');
+      expect(check?.querySelector('path')?.getAttribute('d')).toBe(iconPath('check'));
+      // The provider layers over registerIcons: its names win, the rest fall through.
+      const inner = view.getByTestId('inner');
+      const names = () =>
+        [...inner.querySelectorAll('svg')].map((svg) => svg.getAttribute('data-tx-icon'));
+      expect(inner.querySelector('svg path')?.getAttribute('d')).toBe('M4 4h16');
+      expect(names()).toEqual(['spark', 'rocket']);
+      await view.rerender({ inner: { spark: 'M2 2h20' } });
+      expect(inner.querySelector('svg path')?.getAttribute('d')).toBe('M2 2h20');
+      view.unmount();
+      // Context, not a module global: a render outside the registry knows no such name.
+      const { container } = render(Icon, { props: { icon: 'rocket' as IconName } });
       expect(container.querySelector('svg')).toBeNull();
     });
   });
