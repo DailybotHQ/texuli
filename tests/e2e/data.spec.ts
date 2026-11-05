@@ -344,6 +344,32 @@ test('data calendar: opens scrolled before paint, pointer create and drag (mirro
     }
   });
 
+  await test.step('P-T-01, P-T-02: snippet chips keep label in name; the more button opens the day by keyboard', async () => {
+    const MONTH = 'data-calendar-month';
+    await open(page, MONTH);
+    const host = page.locator(`[data-example="${MONTH}"]`);
+    await expect(host.locator('[data-calendar-event="pairing"] .booking')).toBeVisible();
+    const results = await new AxeBuilder({ page })
+      .include(`[data-example="${MONTH}"]`)
+      .withRules(['label-content-name-mismatch'])
+      .analyze();
+    expect(results.passes.length + results.violations.length).toBeGreaterThan(0);
+    problems.push(
+      ...results.violations.map(
+        (v) => `${MONTH} ${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(' | ')}`
+      )
+    );
+    problems.push(...(await axe(page, `[data-example="${MONTH}"]`)));
+    const more = host.getByRole('button', { name: '3 more events on November 5' });
+    await expect(more).toHaveText('3 more events');
+    await more.focus();
+    await page.keyboard.press('Enter');
+    await expect(host.locator('[data-calendar]')).toHaveAttribute('data-view', 'day');
+    await expect(host.locator('[data-day-column="2026-11-05"] [data-calendar-event]')).toHaveCount(
+      5
+    );
+  });
+
   await test.step('P1-16: event tones render from tokens', async () => {
     await openCalendar();
     const tones = await Promise.all(
