@@ -63,6 +63,7 @@
       "site-csp.spec.ts"
     ],
     [
+      "code-field.spec.ts",
       "csp.spec.ts",
       "gaps-80-85.spec.ts",
       "site-blocks-page.spec.ts",
