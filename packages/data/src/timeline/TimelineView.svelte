@@ -845,8 +845,10 @@ function tickWidth(): number {
   .group-toggle {
     font-weight: 600;
   }
+  /* Decorative: the empty alt text keeps the chevron out of the button's name. */
   .group-toggle::before {
     content: '▾';
+    content: '▾' / '';
     display: inline-block;
     margin-inline-end: var(--tx-space-1);
   }
