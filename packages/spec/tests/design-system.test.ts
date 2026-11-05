@@ -141,6 +141,91 @@ describe('the design-system schema is generated and fresh', () => {
   });
 });
 
+describe('spec 0.11.0: elevation levels, product tokens and short categorical palettes', () => {
+  it('accepts the new fields, keeps 0.10.0 documents valid, and refuses out-of-bounds values', () => {
+    const base = { ...minimal, color: { brand: { seed: '#4f46e5' } } };
+    const layer = { y: 4, blur: 12, opacity: 0.2 };
+    const valid: Doc[] = [
+      // A 0.10.0 document: no new field, eight categorical colors.
+      {
+        ...base,
+        color: { ...base.color, dataViz: { light: { categorical: Array(8).fill('#111111') } } },
+      },
+      { ...base, color: { ...base.color, dataViz: { dark: { categorical: ['#4f46e5'] } } } },
+      {
+        ...base,
+        elevation: {
+          style: 'soft',
+          levels: {
+            '1': [layer],
+            '5': Array(4).fill({ ...layer, x: -64, spread: 64, inset: true }),
+          },
+        },
+      },
+      {
+        ...base,
+        extensions: {
+          'brand-gold': { light: '#fef3c7', dark: '#78350f', on: { dark: '#fffbeb' } },
+        },
+      },
+      {
+        ...base,
+        variants: {
+          compact: {
+            extensions: { gold: { light: '#fef3c7', dark: '#78350f' } },
+            elevation: { levels: { '2': [layer] } },
+          },
+        },
+      },
+    ];
+    for (const doc of valid) {
+      expect(validateDesignSystem(doc), JSON.stringify(doc)).toEqual({ ok: true, errors: [] });
+      expect(validateInstance(schema, doc)).toEqual([]);
+    }
+    const invalid: [Doc, [string, string]][] = [
+      [
+        { ...base, color: { ...base.color, dataViz: { light: { categorical: [] } } } },
+        ['invalid-value', '$.color.dataViz.light.categorical'],
+      ],
+      [
+        { ...base, elevation: { levels: { '0': [layer] } } },
+        ['invalid-value', '$.elevation.levels["0"]'],
+      ],
+      [
+        { ...base, elevation: { levels: { '1': Array(5).fill(layer) } } },
+        ['invalid-value', '$.elevation.levels["1"]'],
+      ],
+      [
+        { ...base, elevation: { levels: { '1': [{ ...layer, y: 65 }] } } },
+        ['invalid-value', '$.elevation.levels["1"][0].y'],
+      ],
+      [
+        { ...base, elevation: { levels: { '1': [{ y: 1, opacity: 0.2 }] } } },
+        ['required', '$.elevation.levels["1"][0].blur'],
+      ],
+      [
+        { ...base, elevation: { levels: { '1': [{ ...layer, css: '0 0 red' }] } } },
+        ['unknown-key', '$.elevation.levels["1"][0].css'],
+      ],
+      [
+        { ...base, extensions: { 'x-foreground': { light: '#fff', dark: '#000' } } },
+        ['invalid-value', '$.extensions["x-foreground"]'],
+      ],
+      [
+        { ...base, extensions: { gold: { light: '#fff' } } },
+        ['required', '$.extensions.gold.dark'],
+      ],
+      [
+        { ...base, extensions: { gold: { light: '#fff', dark: '#000', on: { light: 'url(x)' } } } },
+        ['invalid-value', '$.extensions.gold.on.light'],
+      ],
+    ];
+    for (const [doc, issue] of invalid)
+      expect(codes(validateDesignSystem(doc)), issue[1]).toEqual([issue]);
+    expect(DESIGN_SYSTEM_LIMITS.extensions).toBe(32);
+  });
+});
+
 describe('design-system fixtures', () => {
   it('accepts acme (every section) and minimal under validate and the dialect schema', () => {
     for (const section of Object.keys(DS_DEFS.variant as object))

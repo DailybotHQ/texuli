@@ -27,7 +27,8 @@ const DESCRIPTIONS: Readonly<Record<string, string>> = {
   colorValue: 'A color: #rgb, #rrggbb, #rrggbbaa or a numeric oklch(L C H[ / A]).',
   roleName: 'A semantic color role of the token contract.',
   roleMap: 'Explicit role pins for one mode: checked by the compiler, never moved (ADR-022).',
-  dataVizPalette: 'One mode’s chart palette: 8 categorical, 9 sequential and 9 diverging colors.',
+  dataVizPalette:
+    'One mode’s chart palette: 1 to 8 categorical colors (the compiler derives the rest), 9 sequential and 9 diverging colors.',
   fontFile: `A self-hosted font file: a same-origin relative path (.woff2, .woff, .ttf, .otf), or at developer trust a base64 data:font URL of at most ${DESIGN_SYSTEM_LIMITS.font} bytes.`,
   fontFamily: 'A family stack (1 to 8 names, quoted by the compiler) and its font files.',
   typeRole: 'A type role: family, size (px), weight, line height and tracking (em).',
@@ -37,6 +38,10 @@ const DESCRIPTIONS: Readonly<Record<string, string>> = {
   dimension: 'A space, control, icon or target size step.',
   borderStep: 'A border width step.',
   elevationLevel: 'An elevation level.',
+  shadowLayer:
+    'One shadow layer (px): offsets x and y, blur, spread, the opacity of the shadow role color and inset. Compiled to a concrete box-shadow; never a raw CSS string.',
+  extension:
+    'A product token: a fill per mode and an optional on-color per mode (an empty on derives both). Compiled to --tx-ext-<name> and --tx-ext-<name>-foreground; the pair is contrast-checked in both modes.',
   opacityStep: 'An opacity step.',
   strokeWidth: 'A stroke width in px.',
   asset: `An image: a same-origin relative path (png, jpg, gif, webp, avif, svg, ico; never .., \\, %, ?, # or //), or at developer trust a base64 data:image (png, jpeg, gif, webp, avif) of at most ${DESIGN_SYSTEM_LIMITS.logo} bytes. SVG renders only as <img>.`,
@@ -45,7 +50,8 @@ const DESCRIPTIONS: Readonly<Record<string, string>> = {
   typography: 'Typography: family stacks with font files, the scale and the type roles.',
   shape: 'Shape: radius (px), radius scale and border width (px).',
   space: 'Space: the base unit (px) and the density multiplier.',
-  elevation: 'Elevation style.',
+  elevation:
+    'Elevation style, and structured shadows per level (keys 1 to 5, 1 to 4 layers each) that replace --tx-elevation-<level>.',
   surface: 'Surface style and glass settings.',
   motion: 'Motion personality, durations (ms) and a named easing.',
   layout: 'Layout widths, breakpoints and the grid (px).',
@@ -54,6 +60,7 @@ const DESCRIPTIONS: Readonly<Record<string, string>> = {
   assets: 'Brand assets: logos and the favicon.',
   voice: 'Voice data: tone words, a lexicon (at most 200 entries) and guidelines.',
   accessibility: 'Accessibility targets: contrast, minimum target size and the focus style.',
+  extensions: `Product tokens beyond the role set: at most ${DESIGN_SYSTEM_LIMITS.extensions} kebab-case names (at most 32 characters, never ending in -foreground).`,
   variant:
     'A named variant (high-contrast, compact, seasonal): a closed partial document of sections, orthogonal to mode.',
   issueCode:

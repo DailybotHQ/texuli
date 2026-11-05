@@ -486,3 +486,19 @@ harness supplies it on the TypeScript side, so fixtures compare equal).
   are typed (except `value`, which is a number for `num` and a formula for
   `round` and `clamp`). Which operands each `op` needs, and the formula
   limits, are checked by the runtime parser in `@texuli/blocks/formula`.
+
+## Spec 0.11.0: design-system fields from consumer gaps (in development)
+
+Additive, so the `0.10.0 → 0.11.0` migration stamps `spec` only; not yet
+released (`@texuli/spec@0.12.3` carries spec `0.10.0`). The design-system
+document (`formatVersion` stays `1`, so it needs no document migration and
+every 0.10.0 document stays valid) gains `elevation.levels` (structured
+shadows per level, `$defs.shadowLayer`), `extensions` (product tokens,
+`$defs.extension`) and a `categorical` list of 1 to 8 colors. The
+vocabulary table changed, so the schema, the TypeScript and Kotlin
+projections and the `acme` fixture (which must show every section) were
+regenerated, and the native design tokens (`packages/spec/scripts/design-tokens.ts`)
+were rewritten for the new acme hash. The envelope shape, the `$defs` of
+the blueprint schema and the diagnostic codes are unchanged; the `spec`
+enum gains `0.11.0`, and every committed golden and invalid fixture is
+stamped `0.11.0`. Rules: [design-system.md](design-system.md).

@@ -20,6 +20,13 @@ DOM, no Svelte, no Node APIs and no runtime dependencies.
 > stable release). Under 0.x, a new minor (`0.12.0`) may contain breaking
 > changes, so pin the exact version or use `^0.12.0`, which accepts only 0.12.x.
 
+> **In development: spec 0.11.0.** This branch carries **spec 0.11.0**
+> (not yet released; `@texuli/spec@0.12.3` on npm carries spec `0.10.0`).
+> It extends the design-system document only: structured shadows per
+> elevation level (`elevation.levels`), product tokens (`extensions`) and a
+> categorical palette of 1 to 8 colors. Every `0.10.0` document stays
+> valid, and every `0.10.0` envelope migrates by stamping `spec`.
+
 > **New in `0.10.0`.** `@texuli/spec@0.10.0` carries **spec 0.10.0**: the
 > design-system document (`schemas/design-system.schema.json`, format
 > `texuli/design-system`) with its new `@texuli/spec/design-system`
@@ -91,7 +98,7 @@ import {
   validateInstance,
 } from '@texuli/spec';
 
-SPEC_VERSION;                         // the spec version: '0.10.0' in @texuli/spec@0.12.3
+SPEC_VERSION;                         // the spec version: '0.10.0' in @texuli/spec@0.12.3 ('0.11.0' in development)
 SPEC_COMPONENT_IDS.includes('alert'); // true: the closed component vocabulary
 
 // The dialect validator: a closed subset of JSON Schema 2020-12.
@@ -123,7 +130,7 @@ import { type Schema, type SpecCatalog, validateBlueprint } from '@texuli/spec';
 import { migrateBlueprint } from '@texuli/spec/migrate';
 import { validateWorkflowGraph } from '@texuli/spec/workflow';
 
-const migrated = migrateBlueprint(blueprint); // 0.2.0 → … → 0.9.0 → 0.10.0; never throws
+const migrated = migrateBlueprint(blueprint); // 0.2.0 → … → 0.10.0 → 0.11.0; never throws
 const result = validateBlueprint(migrated.blueprint, {
   blueprintSchema: blueprintSchemaJson as Schema,
   catalog: componentsJson as SpecCatalog,
@@ -293,8 +300,9 @@ written for (`spec`; omitted means 0.2.0). `migrateBlueprint`
 (`@texuli/spec/migrate`) brings an
 envelope up to the current spec with pure, per-version steps
 (`src/migrations/`: `0.2.0 → 0.3.0`, `0.3.0 → 0.4.0`, `0.4.0 → 0.5.0`,
-`0.5.0 → 0.6.0`, `0.6.0 → 0.7.0`, `0.7.0 → 0.8.0`, `0.8.0 → 0.9.0` and
-`0.9.0 → 0.10.0`, each of which only stamps `spec`); a compatible version
+`0.5.0 → 0.6.0`, `0.6.0 → 0.7.0`, `0.7.0 → 0.8.0`, `0.8.0 → 0.9.0`,
+`0.9.0 → 0.10.0` and, in development, `0.10.0 → 0.11.0`, each of which
+only stamps `spec`); a compatible version
 range is planned, not built. `@texuli/spec@0.12.3` carries spec `0.10.0` (digest
 `afcb9e3ed6b74b833a0f7477a657168621785ee98602ff582aa047e2d86aef17`), which adds the
 design-system document (PLAN_011 T-ds-spec) and the envelope's
@@ -340,7 +348,8 @@ conformance harness) are in
   node shells; new in `0.6.0`): [stream.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/stream.md)
 - Data-source bindings (spec 0.8.0; new in `0.8.0`):
   [source.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/source.md)
-- The design-system document (spec 0.10.0; new in `0.10.0`):
+- The design-system document (spec 0.10.0; new in `0.10.0`; extended in
+  spec 0.11.0, in development):
   [design-system.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/design-system.md)
 - The Kotlin Multiplatform twin that consumes the generated models:
   [native/README.md](https://github.com/DailybotHQ/texuli/blob/main/native/README.md)

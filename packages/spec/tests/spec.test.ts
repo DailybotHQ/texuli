@@ -575,6 +575,7 @@ describe('migrations', () => {
           '0.7.0->0.8.0',
           '0.8.0->0.9.0',
           '0.9.0->0.10.0',
+          '0.10.0->0.11.0',
         ],
       });
       expect(result.blueprint, path).toEqual({ ...input, spec: SPEC_VERSION });
@@ -626,6 +627,18 @@ describe('migrations', () => {
     expect(result.blueprint).toEqual({ ...input, spec: '0.10.0' });
     expect((result.blueprint as { tree: unknown }).tree).toBe(input.tree);
     expect(migrateBlueprint(result.blueprint, '0.10.0').applied).toEqual([]);
+  });
+
+  it('migrates a 0.10.0 envelope to 0.11.0 by stamping spec only (the additive design-system fields)', () => {
+    const input: Readonly<Record<string, unknown>> = Object.freeze({
+      ...json<Record<string, unknown>>('fixtures/golden/lego.json'),
+      spec: '0.10.0',
+    });
+    const result = migrateBlueprint(input, '0.11.0');
+    expect(result).toMatchObject({ from: '0.10.0', to: '0.11.0', applied: ['0.10.0->0.11.0'] });
+    expect(result.blueprint).toEqual({ ...input, spec: '0.11.0' });
+    expect((result.blueprint as { tree: unknown }).tree).toBe(input.tree);
+    expect(migrateBlueprint(result.blueprint, '0.11.0').applied).toEqual([]);
   });
 
   it('keeps workflow validation and migrations out of the root, in their own subpaths', () => {
