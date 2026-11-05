@@ -1975,3 +1975,78 @@ reflect this decision.
 - **How to reverse:** the painters are additive bindings in
   `NativeRegistry`; removing an id returns it to the placeholder, and the
   matrix and site counts follow automatically.
+
+## ADR-026: One label dictionary for every package
+
+- **Date:** 2026-11-04 · **Ratification:** proposed by the
+  component-labels lane (Protoyard and Corag gaps C-G-008, C-G-011,
+  C-G-012, C-G-015); the developer may override this decision.
+- **Context:** a Spanish-language product built on Texuli 0.12.3 could not
+  translate the built-in English strings. ADR-016 gave `texuli` and
+  `@texuli/primitives` a message catalog in context (`I18N_CONTEXT`), but
+  a host had to build an `I18n` with catalogs and loaders, the ids were
+  untyped strings, a few strings bypassed the catalog (the content layout's
+  "On this page" summary, `label="Main"` in two app layouts, Kpi's
+  "No data yet", the mobile layout labels, the stat trend words), and
+  `@texuli/blocks` and `@texuli/pages` (tone labels such as "Info" and
+  "Warning", the outline, the editor's toolbars and announcements) only
+  had per-component `labels` props. Protoyard wants one model it can pass
+  down once.
+- **Options:**
+  1. **Keep per-component `labels` props only.** No new API, but a host
+     has to thread a translation into every component, and strings that
+     have no prop stay English.
+  2. **A second, Svelte-only labels context** next to ADR-016's catalog.
+     Simple to call, but two resolution paths would drift, and primitives
+     could not read it without importing upward.
+  3. **One flat dictionary of message ids on top of ADR-016's catalog:**
+     the framework-free type and merge in `@texuli/core/i18n`
+     (`LabelDictionary`, `mergeLabels`, `createLabels`, `layerI18n`), one
+     call or provider (`setTexuliLabels` and `<LabelsProvider>` in
+     `texuli/i18n`; the `texuli` root exports only the types, so it does
+     not always carry the catalog runtime), and every package's English
+     catalog with a typed id union.
+- **Decision:** option 3.
+  - **Precedence:** the component's own prop (`closeLabel`, a key of
+    `labels` or `messages`), then the nearest dictionary in context, then
+    an outer one (a nested provider layers over its parent with
+    `layerI18n`), then the English default. SSR-safe: context only, no
+    module state.
+  - **Ids and types:** `texuli.*`, `primitives.*`, `blocks.*` and `pages.*`
+    (ADR-016's namespacing). `TEXULI_MESSAGES_EN`, `PRIMITIVES_MESSAGES_EN`,
+    `BLOCKS_MESSAGES_EN` (`@texuli/blocks/i18n`) and `PAGES_MESSAGES_EN`
+    (`@texuli/pages`) list every id with its English text, and their key
+    unions (`TexuliMessageId`, `PrimitivesMessageId`, `BlocksMessageId`,
+    `PagesMessageId`; `TexuliLabels` joins the first two) type a host's
+    dictionary. Tests keep each catalog equal to the defaults in the
+    sources.
+  - **Label objects:** `localizeLabels` now recurses into nested objects
+    (`blocks.text.tones.info`). The block families resolve their
+    `DEFAULT_*` objects through it, and the diagram family gained a label
+    object. The page labels are built by `pagesLabelsFor(lookup)`,
+    `pagedLabelsFor` and `collabLabelsFor`, where each sentence is a
+    message with named placeholders, so a translation can reorder words;
+    block, embed and list kind names have their own ids.
+  - **Domain packages** read the dictionary through `useMessages` from a
+    new `texuli/i18n` subpath, so a layer never imports upward.
+  - **Formatting:** messages format numbers with the dictionary's locale
+    (`Intl.NumberFormat`) and plural objects with `Intl.PluralRules`, as
+    ADR-016 does. No date formatting is added: date components keep their
+    own `locale` props.
+- **Why:** a single resolution path keeps one precedence rule and one
+  coverage test per package. A flat dictionary is the smallest thing a
+  host can pass, serialize and type-check. Keeping the framework-free part
+  in core lets primitives use it without an upward import.
+- **Consequences:**
+  - **Bytes:** a page reader, paged view or editor that resolves its labels
+    through the lookup costs about 0.6 to 1 KiB gzip more. `@texuli/pages/reader`,
+    `reader-core`, `paged`, `paged-core` and `editor` need larger budgets
+    (an owner decision).
+  - **Not covered yet:** `@texuli/data`, `@texuli/chat`, `@texuli/media` and
+    `@texuli/editor` keep their per-component `labels` props only; their
+    defaults do not follow the dictionary yet (planned).
+  - No translations ship; English stays the only built-in language.
+- **Reverse when:** a host needs per-component overrides only (drop the
+  provider and keep the props), or a standard message format (such as
+  `Intl.MessageFormat`) becomes available in every target. The ids and
+  English catalogs then carry over as its source.
