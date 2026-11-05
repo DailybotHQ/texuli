@@ -19,6 +19,8 @@ import type { ImageProps, ImageStatus } from './types.ts';
  */
 let {
   src,
+  srcDark,
+  darkMode = 'theme',
   srcset,
   sizes,
   widths,
@@ -43,6 +45,18 @@ let {
 }: ImageProps & { class?: ClassValue } = $props();
 
 const sources = $derived(resolveImageSources({ src, srcset, sizes, widths, loader, trust }));
+/**
+ * The dark source (D-G-023): the same image policy and trust tier as `src`,
+ * plus the loader's widths. A blocked `srcDark` leaves the light image alone.
+ */
+const darkSources = $derived(
+  sources.src && srcDark !== undefined && srcDark !== null && srcDark !== ''
+    ? resolveImageSources({ src: srcDark, sizes, widths, loader, trust })
+    : undefined
+);
+const dark = $derived(darkSources?.src ? darkSources : undefined);
+/** `theme`: two images, CSS shows the one the theme (or the OS) picks. */
+const pair = $derived(dark !== undefined && darkMode !== 'system');
 const size = $derived(intrinsicSize(width, height));
 const fill = $derived(normalizeFit(fit));
 const backdrop = $derived(resolvePlaceholder(placeholder, trust));
@@ -55,7 +69,7 @@ const unavailable = $derived(labels?.unavailable ?? 'Image unavailable');
 const cap = $derived(size ? `min(100%, ${size.width}px)` : undefined);
 
 /** The source a load or error event belongs to, so a new `src` starts over. */
-const key = $derived(`${sources.src ?? ''} ${sources.srcset ?? ''}`);
+const key = $derived(`${sources.src ?? ''} ${sources.srcset ?? ''} ${dark?.src ?? ''}`);
 let loadedKey = $state<string | undefined>();
 let failedKey = $state<string | undefined>();
 const status: ImageStatus = $derived(
@@ -63,8 +77,22 @@ const status: ImageStatus = $derived(
 );
 
 let element = $state<HTMLImageElement>();
+let darkElement = $state<HTMLImageElement>();
+
+function hidden(node: Element): boolean {
+  return typeof getComputedStyle === 'function' && getComputedStyle(node).display === 'none';
+}
 
 function settle(next: 'loaded' | 'error', event?: Event) {
+  // In a theme pair, a failure of the image the theme hides is not shown.
+  if (
+    next === 'error' &&
+    pair &&
+    event?.currentTarget instanceof Element &&
+    hidden(event.currentTarget)
+  ) {
+    return;
+  }
   if (next === 'loaded') loadedKey = key;
   else failedKey = key;
   if (event) (next === 'loaded' ? onload : onerror)?.(event);
@@ -73,14 +101,57 @@ function settle(next: 'loaded' | 'error', event?: Event) {
 // A cached image can finish loading before the listeners attach. Only a
 // decoded image counts: `complete` alone is also true for broken requests.
 $effect(() => {
-  const img = element;
-  if (img?.complete && img.naturalWidth > 0) settle('loaded');
+  for (const img of [element, darkElement]) {
+    if (img?.complete && img.naturalWidth > 0) settle('loaded');
+  }
 });
 
 $effect(() => {
   onstatus?.(status);
 });
 </script>
+
+{#snippet img(source: { src?: string; srcset?: string; sizes?: string }, scheme?: 'light' | 'dark')}
+  {#if scheme === 'dark'}
+    <img
+      bind:this={darkElement}
+      class="tx-image-img"
+      data-scheme="dark"
+      src={source.src}
+      srcset={source.srcset}
+      sizes={source.sizes}
+      alt=""
+      width={size?.width}
+      height={size?.height}
+      {loading}
+      fetchpriority={fetchPriority}
+      decoding="async"
+      referrerpolicy={trust === 'untrusted' ? 'no-referrer' : undefined}
+      style:object-position={position}
+      onload={(event) => settle('loaded', event)}
+      onerror={(event) => settle('error', event)}
+    />
+  {:else}
+    <img
+      bind:this={element}
+      class="tx-image-img"
+      data-scheme={scheme}
+      src={source.src}
+      srcset={source.srcset}
+      sizes={source.sizes}
+      alt={scheme ? '' : alt}
+      width={size?.width}
+      height={size?.height}
+      {loading}
+      fetchpriority={fetchPriority}
+      decoding="async"
+      referrerpolicy={trust === 'untrusted' ? 'no-referrer' : undefined}
+      style:object-position={position}
+      onload={(event) => settle('loaded', event)}
+      onerror={(event) => settle('error', event)}
+    />
+  {/if}
+{/snippet}
 
 {#snippet picture()}
   <span
@@ -92,6 +163,9 @@ $effect(() => {
     style:aspect-ratio={size?.ratio}
     style:max-inline-size={cap}
     style:background-color={backdrop.kind === 'color' && status === 'loading' ? backdrop.color : undefined}
+    data-pair={pair ? 'theme' : dark ? 'system' : undefined}
+    role={pair && alt && status !== 'blocked' && status !== 'error' ? 'img' : undefined}
+    aria-label={pair && alt && status !== 'blocked' && status !== 'error' ? alt : undefined}
   >
     {#if status === 'blocked' || status === 'error'}
       <span
@@ -103,23 +177,17 @@ $effect(() => {
         <span class="tx-image-fallback-text" aria-hidden="true">{unavailable}</span>
       </span>
     {:else}
-      <img
-        bind:this={element}
-        class="tx-image-img"
-        src={sources.src}
-        srcset={sources.srcset}
-        sizes={sources.sizes}
-        {alt}
-        width={size?.width}
-        height={size?.height}
-        {loading}
-        fetchpriority={fetchPriority}
-        decoding="async"
-        referrerpolicy={trust === 'untrusted' ? 'no-referrer' : undefined}
-        style:object-position={position}
-        onload={(event) => settle('loaded', event)}
-        onerror={(event) => settle('error', event)}
-      />
+      {#if pair && dark}
+        {@render img(sources, 'light')}
+        {@render img(dark, 'dark')}
+      {:else if dark}
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset={dark.srcset ?? dark.src} sizes={dark.srcset ? dark.sizes : undefined} />
+          {@render img(sources)}
+        </picture>
+      {:else}
+        {@render img(sources)}
+      {/if}
       {#if backdrop.kind === 'blur'}
         <img
           class="tx-image-blur"
@@ -175,22 +243,49 @@ $effect(() => {
     .tx-image-action[data-sized] {
       inline-size: 100%;
     }
-    .tx-image[data-sized] > .tx-image-img,
+    .tx-image[data-sized] .tx-image-img,
     .tx-image-blur {
       inline-size: 100%;
       block-size: 100%;
     }
-    .tx-image[data-fit='contain'] > .tx-image-img {
+    .tx-image[data-fit='contain'] .tx-image-img {
       object-fit: contain;
     }
-    .tx-image[data-fit='fill'] > .tx-image-img {
+    .tx-image[data-fit='fill'] .tx-image-img {
       object-fit: fill;
     }
-    .tx-image[data-fit='none'] > .tx-image-img {
+    .tx-image[data-fit='none'] .tx-image-img {
       object-fit: none;
     }
-    .tx-image[data-fit='scale-down'] > .tx-image-img {
+    .tx-image[data-fit='scale-down'] .tx-image-img {
       object-fit: scale-down;
+    }
+    /*
+     * A theme pair (srcDark, darkMode="theme"): both images render and the
+     * nearest color-mode scope picks one through two inherited switches. The OS
+     * preference sets them on the root; an explicit .dark / .light class or
+     * data-tx-mode (as applyColorMode writes) sets them on its own scope and
+     * wins, since the nearest ancestor's value is the one inherited.
+     */
+    .tx-image-img[data-scheme='light'] {
+      display: var(--_tx-image-light, block);
+    }
+    .tx-image-img[data-scheme='dark'] {
+      display: var(--_tx-image-dark, none);
+    }
+    @media (prefers-color-scheme: dark) {
+      :global(:where(:root)) {
+        --_tx-image-light: none;
+        --_tx-image-dark: block;
+      }
+    }
+    :global(:where(.dark, [data-tx-mode='dark'])) {
+      --_tx-image-light: none;
+      --_tx-image-dark: block;
+    }
+    :global(:where(.light, [data-tx-mode='light'])) {
+      --_tx-image-light: block;
+      --_tx-image-dark: none;
     }
     /* Blur-up: the tiny image sits on top and fades away once the full one loads. */
     .tx-image-blur {

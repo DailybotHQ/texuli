@@ -36,6 +36,35 @@ export const ICON_NAMES = [
   'warning',
 ] as const;
 
-export type IconName = (typeof ICON_NAMES)[number];
+/** One of the built-in icon names (`ICON_NAMES`). */
+export type BuiltInIconName = (typeof ICON_NAMES)[number];
+
+/**
+ * The names an app registers with `registerIcons` or `IconsProvider`. Empty by
+ * default; augment it so `<Icon icon>` autocompletes and checks them:
+ *
+ * ```ts
+ * declare module 'texuli/icons' {
+ *   interface IconNames {
+ *     rocket: true;
+ *   }
+ * }
+ * ```
+ */
+// biome-ignore lint/suspicious/noEmptyInterface: an augmentation point, filled by apps.
+export interface IconNames {}
+
+/** A built-in icon name, or a name an app registered (and declared in `IconNames`). */
+export type IconName = BuiltInIconName | Extract<keyof IconNames, string>;
 export type IconRef = IconName | IconComponent;
+
+/**
+ * Glyph data for a registered name: a Svelte SVG component (such as a Lucide
+ * icon), or the built-in shape, one path `d` string drawn stroked on a 24×24
+ * viewBox. The path is rendered as a `<path d>` attribute, never as markup.
+ */
+export type IconGlyph = IconComponent | string;
+
+/** Names to glyphs, as passed to `registerIcons` or `IconsProvider`. */
+export type IconRegistry = Readonly<Record<string, IconGlyph>>;
 export type IconSize = 'xs' | 'sm' | 'md' | 'lg';

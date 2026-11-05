@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" width="480" height="160" role="img">
+  <title>Fictional Harbor Studio wordmark, dark version</title>
+  <rect width="480" height="160" fill="#10161f"/>
+  <circle cx="80" cy="80" r="44" fill="#f4c58f"/>
+  <path d="M52 92h56M60 80h40M70 68h20" stroke="#10161f" stroke-width="8" stroke-linecap="round"/>
+  <rect x="148" y="58" width="280" height="18" rx="9" fill="#f4c58f"/>
+  <rect x="148" y="90" width="190" height="12" rx="6" fill="#9aa8b6"/>
+</svg>

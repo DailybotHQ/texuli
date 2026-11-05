@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { cleanup, fireEvent, render } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
 import { Image } from '../src/image/entry.ts';
@@ -406,5 +408,94 @@ describe('Image', () => {
       expect(box?.classList.contains('rounded')).toBe(true);
       expect(box?.classList.contains('hero')).toBe(true);
     }
+  });
+});
+
+describe('Image with srcDark', () => {
+  it('pairs a dark image by theme or by the OS, both through the policy, with one accessible image', async () => {
+    const DARK = 'https://images.example.com/harbor-dark.jpg';
+    {
+      // theme (default): both render, the box is the one named image
+      const { container, getAllByRole } = render(Image, {
+        src: PHOTO,
+        srcDark: DARK,
+        widths: [480],
+        loader: cdn,
+        alt: 'Harbor at dawn',
+      });
+      const box = container.querySelector<HTMLElement>('[data-tx-image]');
+      expect(box?.dataset.pair).toBe('theme');
+      expect(getAllByRole('img').map((node) => node.getAttribute('aria-label'))).toEqual([
+        'Harbor at dawn',
+      ]);
+      const [light, dark] = container.querySelectorAll('img');
+      expect([
+        light?.dataset.scheme,
+        light?.getAttribute('src'),
+        light?.getAttribute('alt'),
+      ]).toEqual(['light', PHOTO, '']);
+      expect([dark?.dataset.scheme, dark?.getAttribute('src'), dark?.getAttribute('alt')]).toEqual([
+        'dark',
+        DARK,
+        '',
+      ]);
+      expect(dark?.getAttribute('srcset')).toBe(`${DARK}?w=480 480w`);
+      expect(dark?.getAttribute('loading')).toBe('lazy');
+      expect(dark?.getAttribute('referrerpolicy')).toBe('no-referrer');
+      await fireEvent.load(dark as HTMLImageElement);
+      expect(box?.dataset.status).toBe('loaded');
+    }
+    cleanup();
+    {
+      // system: one <picture>, the dark source behind a prefers-color-scheme media query
+      const { container } = render(Image, {
+        src: PHOTO,
+        srcDark: DARK,
+        darkMode: 'system',
+        alt: 'Harbor at dawn',
+      });
+      const source = container.querySelector('picture > source');
+      expect(source?.getAttribute('media')).toBe('(prefers-color-scheme: dark)');
+      expect(source?.getAttribute('srcset')).toBe(DARK);
+      expect(container.querySelectorAll('img')).toHaveLength(1);
+      expect(container.querySelector('img')?.getAttribute('alt')).toBe('Harbor at dawn');
+      expect(container.querySelector<HTMLElement>('[data-tx-image]')?.dataset.pair).toBe('system');
+    }
+    cleanup();
+    {
+      // an unsafe srcDark (untrusted tier) leaves the plain light image; developer trust allows http
+      for (const bad of ['javascript:alert(1)', 'http://images.example.com/dark.jpg', DATA_PNG]) {
+        const { container } = render(Image, { src: PHOTO, srcDark: bad, alt: 'Harbor' });
+        expect(container.querySelectorAll('img'), bad).toHaveLength(1);
+        expect(container.querySelector('img')?.getAttribute('alt')).toBe('Harbor');
+        expect(container.innerHTML, bad).not.toContain(bad);
+        cleanup();
+      }
+      const dev = render(Image, {
+        src: 'http://localhost:5173/light.png',
+        srcDark: 'http://localhost:5173/dark.png',
+        alt: 'Hero',
+        trust: 'developer',
+      });
+      expect(dev.container.querySelectorAll('img')[1]?.getAttribute('src')).toBe(
+        'http://localhost:5173/dark.png'
+      );
+    }
+    cleanup();
+    {
+      // a decorative pair exposes nothing
+      const { container } = render(Image, { src: PHOTO, srcDark: DARK, alt: '' });
+      expect(container.querySelector('[role="img"]')).toBeNull();
+    }
+    // the stylesheet keys the pair on the theme scope, which wins over the OS preference
+    const css = readFileSync(join(__dirname, '../src/image/Image.svelte'), 'utf8');
+    for (const rule of [
+      '@media (prefers-color-scheme: dark) {\n      :global(:where(:root)) {',
+      ":global(:where(.dark, [data-tx-mode='dark'])) {",
+      ":global(:where(.light, [data-tx-mode='light'])) {",
+    ]) {
+      expect(css).toContain(rule);
+    }
+    expect(css.indexOf(':global(:where(:root))')).toBeLessThan(css.indexOf(':global(:where(.dark'));
   });
 });

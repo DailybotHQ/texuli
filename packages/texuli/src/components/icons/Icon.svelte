@@ -5,10 +5,14 @@ import { type ClassValue } from '../../internal/cx.ts';
 import { designDefaults } from '../../internal/design-defaults.ts';
 import { ICON_SIZES, iconClass } from './icon-variants.ts';
 import { iconPath, isIconName } from './icons.ts';
+import { iconLookup } from './registry.ts';
 import type { IconComponentProps, IconRef, IconSize } from './types.ts';
 
 type Props = Omit<SVGAttributes<SVGSVGElement>, 'class' | 'color'> & {
-  /** One of the built-in icons or a Svelte SVG component (such as a Lucide icon). */
+  /**
+   * A built-in icon name, a name registered with `registerIcons` or
+   * `IconsProvider`, or a Svelte SVG component (such as a Lucide icon).
+   */
   icon?: IconRef;
   size?: IconSize;
   /** Passed through to custom/Lucide components; Lucide accepts number | string. */
@@ -37,9 +41,17 @@ let {
 } = $props();
 
 const pixelSize = $derived(ICON_SIZES[size]);
-const name = $derived(typeof icon === 'string' && isIconName(icon) ? icon : undefined);
-const component = $derived(typeof icon === 'function' ? icon : undefined);
-const path = $derived(name ? iconPath(name) : undefined);
+const lookup = iconLookup();
+const builtIn = $derived(typeof icon === 'string' && isIconName(icon) ? icon : undefined);
+/** A registered glyph; built-in names keep their own. Unknown names render nothing. */
+const registered = $derived(typeof icon === 'string' && !builtIn ? lookup(icon) : undefined);
+const name = $derived(builtIn ?? (registered !== undefined ? (icon as string) : undefined));
+const component = $derived(
+  typeof icon === 'function' ? icon : typeof registered === 'function' ? registered : undefined
+);
+const path = $derived(
+  builtIn ? iconPath(builtIn) : typeof registered === 'string' ? registered : undefined
+);
 const accessibleName = $derived(label ?? ariaLabel);
 const classes = $derived(iconClass({ size, class: className }));
 /** Lucide-safe color: drop null so Component props stay assignable. */
@@ -72,7 +84,7 @@ const glyphProps = $derived({
   'aria-hidden': accessibleName ? undefined : ('true' as const),
   role: accessibleName ? ('img' as const) : undefined,
   'aria-label': accessibleName,
-  'data-tx-icon': 'custom' as const,
+  'data-tx-icon': name ?? 'custom',
 } satisfies IconComponentProps & {
   class?: ClassValue;
   'data-tx-icon'?: string;

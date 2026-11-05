@@ -24,6 +24,7 @@ const ASSIGN = /\s*=/y;
 const URL_KEYS = new Set([
   'href',
   'src',
+  'srcdark',
   'url',
   'poster',
   'srcurl',
