@@ -20,6 +20,7 @@ const DISPLAY_EXAMPLES = [
   'texuli-stepper',
   'texuli-timeline',
   'ui-avatar',
+  'ui-avatar-grid',
   'ui-carousel',
   'texuli-icons',
   'texuli-scroll-area',

@@ -5,8 +5,9 @@
  * component tokens (componentVar: one registry fallback) or system tokens
  * (systemVar: plain reads of the defaults base.css declares).
  * Kept literals: initials font sizes below the type scale (0.55rem, 0.65rem),
- * status dot sizes, the 2px tone and group rings and the group overlap margins
- * are proportional geometry of each avatar size, not design tokens.
+ * status dot sizes, the 2px tone and group rings, the group overlap margins
+ * and the grid layout's font sizes are proportional geometry of each avatar
+ * size, not design tokens.
  */
 @layer tx.components {
   .tx-avatar {
@@ -198,6 +199,67 @@
     font-size: var(--tx-font-size-sm, 0.875rem);
   }
 
+  /*
+   * Grid layout: up to four faces collaged inside one avatar-sized circle
+   * (data-count: 1 full, 2 halves, 3 a half and two quarters, 4 quarters).
+   * The selectors carry three classes so they win over the stack's overlap
+   * margins, rings and per-size face sizes above. The font sizes are
+   * proportional geometry of each size, like the initials sizes.
+   */
+  .tx-avatar-group.tx-avatar-group--grid {
+    display: inline-grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: var(--tx-border-width-thin);
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: var(--tx-avatar-radius, var(--tx-shape-radius-full));
+    background-color: var(--tx-background, Canvas);
+    vertical-align: middle;
+    inline-size: var(--tx-avatar-size-md, var(--tx-size-control-md));
+    block-size: var(--tx-avatar-size-md, var(--tx-size-control-md));
+    font-size: 0.6rem;
+  }
+  .tx-avatar-group.tx-avatar-group--grid.tx-avatar-group--xs {
+    inline-size: var(--tx-avatar-size-xs, var(--tx-size-icon-md));
+    block-size: var(--tx-avatar-size-xs, var(--tx-size-icon-md));
+    font-size: 0.4rem;
+  }
+  .tx-avatar-group.tx-avatar-group--grid.tx-avatar-group--sm {
+    inline-size: var(--tx-avatar-size-sm, var(--tx-size-control-xs));
+    block-size: var(--tx-avatar-size-sm, var(--tx-size-control-xs));
+    font-size: 0.5rem;
+  }
+  .tx-avatar-group.tx-avatar-group--grid.tx-avatar-group--lg {
+    inline-size: var(--tx-avatar-size-lg, var(--tx-space-12));
+    block-size: var(--tx-avatar-size-lg, var(--tx-space-12));
+    font-size: 0.75rem;
+  }
+  .tx-avatar-group.tx-avatar-group--grid > .tx-avatar,
+  .tx-avatar-group.tx-avatar-group--grid > .tx-avatar-group__overflow {
+    inline-size: auto;
+    block-size: auto;
+    min-inline-size: 0;
+    min-block-size: 0;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    font-size: inherit;
+  }
+  .tx-avatar-group.tx-avatar-group--grid .tx-avatar__surface {
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .tx-avatar-group.tx-avatar-group--grid[data-count="1"] > * {
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+  }
+  .tx-avatar-group.tx-avatar-group--grid[data-count="2"] > *,
+  .tx-avatar-group.tx-avatar-group--grid[data-count="3"] > :first-child {
+    grid-row: 1 / -1;
+  }
+
   @media (forced-colors: active) {
     .tx-avatar__surface,
     .tx-avatar__surface[data-tone] {
@@ -228,6 +290,9 @@
       border: 1px solid CanvasText;
       background-color: Canvas;
       color: CanvasText;
+    }
+    .tx-avatar-group.tx-avatar-group--grid {
+      background-color: CanvasText;
     }
   }
 }

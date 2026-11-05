@@ -6,6 +6,7 @@ import { createRawSnippet, flushSync, tick } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Alert from '../src/components/alert/Alert.svelte';
 import { alertRole } from '../src/components/alert/tones.ts';
+import AvatarGroup from '../src/components/avatar/AvatarGroup.svelte';
 import { avatarInitials, avatarToneIndex, hashString } from '../src/components/avatar/initials.ts';
 import { avatarSrcset } from '../src/components/avatar/srcset.ts';
 import Chip from '../src/components/badge/Chip.svelte';
@@ -221,6 +222,59 @@ describe('avatar', () => {
       const overflow = group.querySelector('[data-tx-avatar-group-overflow]');
       expect(overflow?.textContent).toBe('+2');
       expect(overflow?.getAttribute('aria-label')).toBe('+2');
+    });
+
+    it('collages up to four faces in one grid image named by the label or the members', () => {
+      const people = [
+        'Ada Example',
+        'Bea Harbor',
+        'Cal Orbit',
+        'Dee Quill',
+        'Eli North',
+        'Fay Reed',
+      ];
+      // [members, cells, faces, overflow text, initials per face]
+      const cases = [
+        [1, 1, 1, null, ['AE']],
+        [2, 2, 2, null, ['AE', 'BH']],
+        [3, 3, 3, null, ['AE', 'B', 'C']],
+        [4, 4, 4, null, ['A', 'B', 'C', 'D']],
+        [6, 4, 3, '+3', ['A', 'B', 'C']],
+      ] as const;
+      for (const [count, cells, faces, more, letters] of cases) {
+        const items = people.slice(0, count).map((name) => ({ name, status: 'online' as const }));
+        const view = render(AvatarGroup, { props: { items, layout: 'grid', max: 1, size: 'lg' } });
+        const group = view.getByRole('img', { name: items.map((i) => i.name).join(', ') });
+        expect(group.dataset.layout, `${count}`).toBe('grid');
+        expect(group.dataset.count, `${count}`).toBe(String(cells));
+        expect(group.classList.contains('tx-avatar-group--grid')).toBe(true);
+        const avatars = [...group.querySelectorAll<HTMLElement>('[data-tx-avatar]')];
+        expect(avatars.length, `${count}`).toBe(faces);
+        // Faces are hidden (the grid is the one image) and carry no status dot.
+        expect(avatars.every((a) => a.getAttribute('aria-hidden') === 'true')).toBe(true);
+        expect(group.querySelector('[data-tx-avatar-status]')).toBeNull();
+        expect(
+          avatars.map((a) => a.textContent?.trim()),
+          `${count}`
+        ).toEqual(letters);
+        const overflow = group.querySelector('[data-tx-avatar-group-overflow]');
+        expect(overflow?.textContent ?? null, `${count}`).toBe(more);
+        if (overflow) expect(overflow.getAttribute('aria-hidden')).toBe('true');
+        expect(view.queryAllByRole('img')).toHaveLength(1);
+        view.unmount();
+      }
+      render(AvatarGroup, {
+        props: {
+          items: [{ name: 'Ada Example' }, { name: 'Bea Harbor' }],
+          layout: 'grid',
+          label: 'Launch crew',
+        },
+      });
+      expect(screen.getByRole('img', { name: 'Launch crew' }).dataset.count).toBe('2');
+      // The stack stays the default.
+      cleanup();
+      render(AvatarGroup, { props: { items: [{ name: 'Ada Example' }], label: 'Crew' } });
+      expect(screen.getByRole('group', { name: 'Crew' }).dataset.layout).toBeUndefined();
     });
   });
 
