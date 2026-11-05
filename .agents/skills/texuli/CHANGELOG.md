@@ -15,6 +15,14 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.3.18] — 2026-11-05
+
+### Changes
+
+- chore(skill): 0.13.0 published, with the 0.12 to 0.13 upgrade notes
+- docs(skill): labels and locale in build-ui
+- docs(skill): teach the spec 0.11.0 design-system fields
+
 - The packages are on npm in the 0.13 line, every one at `0.13.0`, and
   installs pin `^0.13.0`. `0.13.0` breaks no API: blueprint spec 0.11.0
   adds the design-system fields `elevation.levels`, `extensions`, a
