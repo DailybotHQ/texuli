@@ -164,6 +164,27 @@ pickers and the Toaster render in place (in the top layer), so they inherit
 the subtree's theme without a portal. Checked by
 `tests/e2e/theme-scopes.spec.ts`.
 
+## Scrim color
+
+Fixed in `0.14.0` (D-G-048): the overlay behind `Dialog` and `AlertDialog` takes its color from
+the theme's `--tx-scrim` (dark in light and dark modes) instead of
+`--tx-foreground`, so a dark theme no longer washes the page out with a
+light gray. The strength comes only from `--tx-dialog-scrim-opacity` (default
+`var(--tx-opacity-scrim)`, 45%): the overlay reads the red, green and blue of
+`--tx-scrim` and drops its own alpha, so the two never multiply. Engines
+without CSS relative colors mix `--tx-scrim` as is, so its own alpha makes
+the scrim fainter there (still dark). Under forced
+colors `--tx-scrim` is `Canvas`.
+
+A design-system document has no scrim color slot (only the dialog `scrim-opacity` token);
+set the color in host CSS on the theme scope:
+
+```css
+[data-tx-theme] {
+  --tx-scrim: oklch(0.2 0.03 260);
+}
+```
+
 ## Rules
 
 - Logical CSS for padding, gaps and inline size; physical `top`/`left` only to keep the modal centered in LTR and RTL
@@ -203,6 +224,6 @@ read expressions, is in
 | `--tx-dialog-title-font-weight` | `var(--tx-type-heading-weight)` | Title font weight. |
 | `--tx-dialog-title-line-height` | `var(--tx-type-heading-line)` | Title line height. |
 | `--tx-dialog-alert-padding` | `var(--tx-space-5)` | Alert dialog padding. |
-| `--tx-dialog-scrim-opacity` | `var(--tx-opacity-scrim)` | Foreground mix of the overlay scrim. |
+| `--tx-dialog-scrim-opacity` | `var(--tx-opacity-scrim)` | Opacity of the overlay --tx-scrim. |
 
 <!-- tokens:end -->

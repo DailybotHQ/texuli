@@ -238,7 +238,7 @@ const LAYER: SystemToken[] = [
 const OPACITY: SystemToken[] = [
   token('--tx-opacity-disabled', '0.5', 'Disabled controls.'),
   token('--tx-opacity-muted', '0.7', 'Decorative icons such as select and menu chevrons.'),
-  token('--tx-opacity-scrim', '45%', 'Foreground mix of the dialog and sheet scrim.'),
+  token('--tx-opacity-scrim', '45%', 'Opacity of the dialog and sheet --tx-scrim.'),
 ];
 
 const BREAKPOINTS = ['base', 'sm', 'md', 'lg'] as const;
