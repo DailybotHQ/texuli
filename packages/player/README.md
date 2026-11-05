@@ -175,6 +175,17 @@ on that stage instead, and `chrome={false}` paints a component with no frame
 chrome, as the slides stage does for every component on a slide
 ([embedding](https://github.com/DailybotHQ/texuli/blob/main/packages/player/docs/embedding.md)).
 
+## New in 0.14.0
+
+In development (spec `0.12.0`, not published yet): the `data-timeline`
+painter passes `groups` (header labels and bands), `markers`, `collapsed`
+and `selectedRow` to `TimelineView`. Bands with dates that do not parse,
+markers whose `at` does not parse and unknown tones are dropped. Rows
+become selectable once `selectedRow` is set or bound (an empty string
+selects none). Toggling a group writes `collapsed` back as `{ id }` items
+and runs `on.collapse` with the group id; selecting a row writes
+`selectedRow` and runs `on.select` with the task id.
+
 ## New in 0.8.0
 
 Ships in `0.8.0`; the `0.7.0` release predates it: `schema-form` nodes (spec 0.8.0) paint
