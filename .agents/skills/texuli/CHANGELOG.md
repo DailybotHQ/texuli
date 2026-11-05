@@ -15,6 +15,13 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The packages are on npm at `0.14.1`, an additive patch: the `event`
+  snippet, `maxEventsPerDay` and `onMoreEvents` on `CalendarView`, and
+  `collapsedLanes` and `cellFooter` on `Board`. The components install
+  reference marks them new in `0.14.1` (pin `^0.14.1` to use them) and
+  notes they are not in the agent catalog yet. No upgrade notes: nothing
+  breaks.
+
 ## [0.3.20] — 2026-11-05
 
 ### Changes

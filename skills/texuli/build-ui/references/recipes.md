@@ -109,7 +109,7 @@ captions/chapters → export only if the brief asks (media export docs).
 
 **Brief shape:** reorder a list; move cards between columns; copy from a
 palette; reparent in a tree. `@texuli/drag` is in development and on npm
-as `0.14.0`.
+as `0.14.1`.
 
 | Need | Prefer |
 | --- | --- |
@@ -162,7 +162,7 @@ the behavior scenario `tests/behavior/scenarios/sortable.spec.ts`.
 
 **Brief shape:** an automation, approval or pipeline the person edits as
 nodes and edges, or a read-only diagram of one. `@texuli/workflows` is in
-development and on npm as `0.14.0`.
+development and on npm as `0.14.1`.
 
 ```svelte
 <script lang="ts">
