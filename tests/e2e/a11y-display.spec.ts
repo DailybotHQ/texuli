@@ -33,6 +33,7 @@ const DATA_EXAMPLES = [
   'data-timeline',
   'data-board',
   'data-calendar',
+  'data-calendar-month',
   'data-files',
   'data-virtual-list',
   'data-map',

@@ -3,4 +3,11 @@
 export type { CalendarSeries, CalendarSlot, Occurrence } from '../engines/calendar/index.ts';
 export { default as CalendarView } from './CalendarView.svelte';
 export type { CalendarMode } from './model.ts';
-export { type CalendarChange, type CalendarLabels, DEFAULT_CALENDAR_LABELS } from './types.ts';
+export {
+  type CalendarChange,
+  type CalendarEventContext,
+  type CalendarItem,
+  type CalendarLabels,
+  type CalendarTone,
+  DEFAULT_CALENDAR_LABELS,
+} from './types.ts';
