@@ -4,17 +4,17 @@ Back to [`../SKILL.md`](../SKILL.md).
 
 ## A. Use the packages
 
-The packages are on npm in the 0.13 line, every one at `0.13.1`, a pre-1.0 line
+The packages are on npm in the 0.14 line, every one at `0.14.0`, a pre-1.0 line
 (`latest` points to the newest, and `next` is no longer maintained and stays on `0.12.1`; 1.0.0 will be the first stable release). An app outside a
 Texuli checkout installs them plainly, for example
-`pnpm add texuli @texuli/tokens`, and pins the exact version or `^0.13.0`
-(for 0.x it accepts only 0.13.x, since a new minor may break) (the developer
+`pnpm add texuli @texuli/tokens`, and pins the exact version or `^0.14.0`
+(for 0.x it accepts only 0.14.x, since a new minor may break) (the developer
 runs the install; it uses the network). `@texuli/drag`,
 `@texuli/workflows`, `@texuli/deck`, `@texuli/slides`, `@texuli/editor` (first published
 in `0.5.0`), `@texuli/document` and `@texuli/pages` (both first published
 in `0.7.0`), `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (all
 three first published in `0.8.0`) and `@texuli/mcp` (first published in
-`0.9.0`) are in development and on npm as `0.13.1`.
+`0.9.0`) are in development and on npm as `0.14.0`.
 
 New in `0.13.1` (an additive patch): `@texuli/blocks/code-field` (`CodeField`),
 `registerIcons` and `IconsProvider` in `texuli/icons`, `srcDark` and
@@ -24,6 +24,30 @@ New in `0.13.1` (an additive patch): `@texuli/blocks/code-field` (`CodeField`),
 not in the `0.13.x` catalog; spec `0.12.0` (new in `0.14.0`) adds the
 `code-field` and `avatar-group-grid` ids (app tier) and the `media-image`
 `srcDark` and `darkMode` props.
+
+New in `0.14.0` (a `0.x` minor with no breaking API; an app that uses these
+pins `^0.14.0`, and the `0.13.x` packages do not have them):
+
+- `TimelineView` (`@texuli/data/timeline`): group header rows and bands
+  through `getGroup`, `bind:collapsed` with `onCollapsedChange`,
+  `onGroupAdd`, `bind:selectedRow` with `onRowSelect`, and `markers`
+  (`{ at, label, tone }`). In the catalog, `data-timeline` lists `groups`,
+  `markers`, the bindable `collapsed` and `selectedRow`, and the
+  `collapse` event; `onGroupAdd` is not in the catalog.
+- `MotionLoop` (`texuli/motion/loop`, presets `pulse` and `wave`), still
+  under reduced motion; not in the blueprint motion vocabulary.
+- Lazy icons: `registerIcons({ name: () => import(...) }, { fallback })`
+  and `IconsProvider` `fallback` (types `IconLoader`, `IconRegistryOptions`).
+- `AlertDialog` `confirmDisabled`; `Breadcrumb` items take `ariaLabel` and
+  `onSelect(item, event)`; tab items take `panelId`.
+- Design systems on spec `0.12.0`: a layer's `darkOpacity`,
+  `components.card["font-size"]` (the card content size), the
+  `aa-non-text` check (`checkDesignSystemIndicators`,
+  `evaluateDesignSystemIndicators`) and compiler version 3
+  ([`../../design-systems/SKILL.md`](../../design-systems/SKILL.md)).
+
+Behavior that changes on the move is in
+[`../../upgrade/SKILL.md`](../../upgrade/SKILL.md) ("0.13 → 0.14").
 
 Inside this monorepo, an app depends on the workspace packages:
 

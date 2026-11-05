@@ -1,6 +1,87 @@
-# Texuli packages: breaking changes in 0.8.0 and earlier
+# Texuli packages: breaking changes in 0.10.0 and earlier
 
-Back to [`../SKILL.md`](../SKILL.md), which has `0.10.0` and `0.9.0`.
+Back to [`../SKILL.md`](../SKILL.md), which has `0.11.0` and later.
+
+## 0.10.0: breaking changes
+
+This sub-skill never upgrades packages; moving an app from `^0.9.0` to
+`^0.10.0` is the developer's install ([`../../components/SKILL.md`](../../components/SKILL.md)).
+`0.10.0` adds design systems ([`../../design-systems/SKILL.md`](../../design-systems/SKILL.md));
+themes, scopes and every `--tx-*` read keep working, and an app that adopts
+no design system loads none of it. Before the move, check the app for:
+
+- **MCP tool names:** the seven 0.8 aliases are removed. A call is refused
+  with the operation to use (`-32602` from `tools/call`,
+  `unknown-operation` from `invoke()`), so move host prompts and
+  allowlists: `deck` → `deck.run`; `document` → `document.run`, or
+  `document.export` with `format: "pdf"` or `"docx"`; `catalog` →
+  `catalog.search`; `component` → `component.get`; `validate` →
+  `catalog.validate`; `example` → `example.search`; `theme` →
+  `theme.search` or `theme.get` (with `id`).
+- **Tree blocks:** `style` is removed; a `tree` block with `style` is
+  refused, alone or next to `variant`. Send `variant` (`file-tree` or
+  `org`).
+- **Spec 0.10.0:** validated drafts carry `spec: "0.10.0"`;
+  `validateDraft` migrates a `0.9.0` envelope (a stamp-only migration), and
+  a host that compares the `spec` string must accept `"0.10.0"`.
+- **Tokens CSS:** load `@texuli/tokens/base.css` or the new
+  `@texuli/tokens/system.css` (the system token defaults without the
+  reset). Component CSS reads the system tokens with no fallback, so a
+  host with its own reset that loads neither renders controls with no size.
+- **`@texuli/forms`:** an optional select shows a "None" choice that
+  clears it (set `clearable: false` to keep the old list). The date, time,
+  datetime, slider, tags, file, color and radio controls and the step
+  progress load per type on first use, behind a same-size placeholder
+  (`data-tx-pending`, `aria-busy`): pass `SCHEMA_FORM_CONTROLS` from
+  `@texuli/forms/controls` as `controls` to paint them at once (server
+  rendering), and let tests wait for them. `SchemaForm` focuses the
+  summary or the confirmation after any finished submit, including
+  `controller.submit()`.
+- **`@texuli/sheets`:** the cell editor loads lazily on the first Enter
+  (or F2); a host test awaits it before typing.
+- **`@texuli/pages` core entries:** `editor-core`, `reader-core`,
+  `paged-core`, `collab-core` and `host-core` have no default player
+  loader; live embeds paint only with the host's `loadPlayer` (for example
+  `() => import('@texuli/player')`). The default entries behave as before.
+
+New APIs in `0.10.0` are marked "new in `0.10.0`" in
+[`../../router/packages.md`](../../router/packages.md); the full notes are in
+`docs/RELEASE.md` of the Texuli repository ("0.10.0").
+
+## 0.9.0: breaking changes
+
+This sub-skill never upgrades packages; moving an app from `^0.8.0` to
+`^0.9.0` is the developer's install ([`../../components/SKILL.md`](../../components/SKILL.md)).
+`0.9.0` publishes `@texuli/mcp` for the first time. Before the move, check
+the app for:
+
+- **Spec 0.9.0:** validated drafts carry `spec: "0.9.0"` (a stamp-only
+  migration from `0.8.0`); a host that compares the string must accept it.
+- **A new catalog hash:** a host that pins `catalogHash` refuses envelopes
+  written for the 0.8 catalog (`catalog-mismatch`) until it pins the new
+  hash.
+- **MCP tool names:** the seven 0.8 names (`deck`, `document`, `catalog`,
+  `component`, `validate`, `example`, `theme`) are deprecated aliases in
+  `0.9.0` and removed in `0.10.0` (a call is refused with the name to
+  use); move host prompts and allowlists to the `group.verb` tools
+  ([`../../router/hosts.md`](../../router/hosts.md#mcp)). A stdio request before
+  `initialize` now gets `-32600`, not `-32002`.
+- **Token contract v2:** additive, `renames.json` is empty; component
+  tokens are read with their registry default and never declared, so set
+  them on a scope, and import `@texuli/tokens/base.css`, which declares the
+  system defaults. Default variants and sizes come from
+  `setDesignDefaults` (`texuli/defaults`); Select and Combobox follow them.
+- **A pending Button** is `aria-disabled` (its click suppressed), not
+  natively `disabled`; a test or selector that expected `disabled` needs an
+  update.
+- **Date controls** set `aria-invalid="true"` when a `Field` marks them
+  invalid, not only from their own `error` prop.
+- **Tree blocks** take `variant` (`file-tree` or `org`); `style` is an
+  alias through `0.9.x` and is refused from `0.10.0`.
+
+New APIs in `0.9.0` are marked "new in `0.9.0`" in
+[`../../router/packages.md`](../../router/packages.md); the full notes are in
+`docs/RELEASE.md` of the Texuli repository ("0.9.0").
 
 ## 0.8.0: breaking changes
 
