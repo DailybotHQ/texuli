@@ -46,9 +46,10 @@ let openDark = $state(true);
         <Button {...props} variant="secondary">Bottom</Button>
       {/snippet}
     </Tooltip>
+    <!-- A disabled tooltip only stays closed: its Button still works. -->
     <Tooltip content="Disabled tip" disabled>
       {#snippet children({ props })}
-        <Button {...props} variant="ghost" disabled>No tip</Button>
+        <Button {...props} variant="ghost">No tip</Button>
       {/snippet}
     </Tooltip>
   </div>

@@ -7,9 +7,11 @@ export {
   type IconComponent,
   type IconComponentProps,
   type IconGlyph,
+  type IconLoader,
   type IconName,
   type IconNames,
   type IconRef,
   type IconRegistry,
+  type IconRegistryOptions,
   type IconSize,
 } from './types.ts';

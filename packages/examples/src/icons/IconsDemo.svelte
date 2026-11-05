@@ -1,7 +1,10 @@
 <script lang="ts">
-import { ICON_NAMES, Icon } from 'texuli/icons';
+import { ICON_NAMES, Icon, type IconName, IconsProvider } from 'texuli/icons';
 import { LucideIcon } from 'texuli/icons/lucide';
 import ExampleGlyph from './ExampleGlyph.svelte';
+
+// A lazy glyph: loaded the first time an Icon draws the name.
+const lazyIcons = { favorite: () => import('./ExampleGlyph.svelte') };
 </script>
 
 <div class="demo" data-example="texuli-icons">
@@ -35,6 +38,16 @@ import ExampleGlyph from './ExampleGlyph.svelte';
       <LucideIcon icon={ExampleGlyph} label="Favorite" size="lg" />
       <Icon icon={ExampleGlyph} />
     </div>
+  </section>
+
+  <section>
+    <h2>Lazy registered icons and a fallback</h2>
+    <IconsProvider icons={lazyIcons} fallback="info">
+      <div class="icon-row">
+        <Icon icon={'favorite' as IconName} label="Favorite" />
+        <Icon icon={'not-registered' as IconName} />
+      </div>
+    </IconsProvider>
   </section>
 
   <section dir="rtl" lang="ar">

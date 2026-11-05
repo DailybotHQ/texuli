@@ -292,6 +292,20 @@ describe('tooltip', () => {
       expect(shortcuts?.querySelectorAll('[data-tx-kbd]').length).toBe(2);
       expect(getByRole('button', { name: 'Save draft' })).toBeTruthy();
     });
+
+    it('a disabled tooltip stays closed but its Button trigger still activates (D-G-042)', async () => {
+      const onclick = vi.fn();
+      const { getByRole, container } = render(TooltipHarness, {
+        props: { disabled: true, onclick },
+      });
+      const button = getByRole('button', { name: 'Save draft' }) as HTMLButtonElement;
+      expect(button.disabled).toBe(false);
+      expect(button.hasAttribute('data-disabled')).toBe(false);
+      await fireEvent.focusIn(button);
+      await fireEvent.click(button);
+      expect(onclick).toHaveBeenCalledOnce();
+      expect(container.ownerDocument.querySelector('[role="tooltip"]')).toBeNull();
+    });
   });
 });
 

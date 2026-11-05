@@ -61,3 +61,26 @@ describe('TabItem badge name (G54)', () => {
     }
   });
 });
+
+// D-G-041: tabs that switch a view elsewhere have no dangling aria-controls.
+
+describe('Tabs without panels (D-G-041)', () => {
+  afterEach(cleanup);
+
+  it('omits aria-controls without a panel and points it at an item panelId', () => {
+    const view = render(Tabs, {
+      props: {
+        label: 'Views',
+        items: [
+          { value: 'list', label: 'List' },
+          { value: 'board', label: 'Board', panelId: 'board-view' },
+        ],
+      },
+    });
+    expect(view.getByRole('tab', { name: 'List' }).hasAttribute('aria-controls')).toBe(false);
+    expect(view.getByRole('tab', { name: 'Board' }).getAttribute('aria-controls')).toBe(
+      'board-view'
+    );
+    expect(view.container.querySelector('[role="tabpanel"]')).toBeNull();
+  });
+});

@@ -47,6 +47,7 @@ import {
 import { type NavIconName } from '../src/layouts/host/nav-model.ts';
 import AvatarFixture from './fixtures/AvatarFixture.svelte';
 import CustomIcon from './fixtures/CustomIcon.svelte';
+import IconsLazyHarness from './fixtures/IconsLazyHarness.svelte';
 import IconsRegistryHarness from './fixtures/IconsRegistryHarness.svelte';
 import ResizableHarness from './fixtures/ResizableHarness.svelte';
 import ScrollAreaHarness from './fixtures/ScrollAreaHarness.svelte';
@@ -978,6 +979,39 @@ describe('icons', () => {
       // Context, not a module global: a render outside the registry knows no such name.
       const { container } = render(Icon, { props: { icon: 'rocket' as IconName } });
       expect(container.querySelector('svg')).toBeNull();
+    });
+
+    it('draws lazy icons once loaded (one load per registry), the fallback until then and on failure (D-G-039)', async () => {
+      const STAR = 'M12 3 14.8 9.2';
+      const rocket = vi.fn(() => Promise.resolve({ default: CustomIcon }));
+      const broken = vi.fn(() => Promise.reject(new Error('offline')));
+      const icons = {
+        rocket,
+        broken,
+        spark: () => Promise.resolve('M4 4h16'),
+        throws: () => {
+          throw new Error('no chunk');
+        },
+      };
+      const names = ['rocket', 'rocket', 'spark', 'broken', 'throws', 'unknown'];
+      const view = render(IconsLazyHarness, { props: { icons, fallback: 'info', names } });
+      const drawn = () =>
+        [...view.container.querySelectorAll('svg')].map((svg) => {
+          const d = svg.querySelector('path')?.getAttribute('d') ?? '';
+          return d.startsWith(STAR) ? 'custom' : d === iconPath('info') ? 'fallback' : d;
+        });
+      expect(drawn()).toEqual(Array(6).fill('fallback'));
+      await waitFor(() =>
+        expect(drawn()).toEqual(['custom', 'custom', 'M4 4h16', 'fallback', 'fallback', 'fallback'])
+      );
+      expect(rocket).toHaveBeenCalledOnce();
+      expect(broken).toHaveBeenCalledOnce();
+      // Without a fallback, a pending or unknown icon draws nothing.
+      view.unmount();
+      const bare = render(IconsLazyHarness, {
+        props: { icons: { later: () => new Promise<never>(() => {}) }, names: ['later', 'nope'] },
+      });
+      expect(bare.container.querySelector('svg')).toBeNull();
     });
   });
 });

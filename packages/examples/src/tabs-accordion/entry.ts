@@ -4,7 +4,7 @@ export const texuliTabsAccordionExample = defineExample({
   id: 'texuli-tabs-accordion',
   title: 'Tabs, Accordion and Collapsible',
   description:
-    'Styled tabs (line, pills, enclosed), bordered accordion and collapsible disclosure. Fictional Harbor Notes copy; RTL pills demo.',
+    'Styled tabs (line, pills, enclosed), bordered accordion and collapsible disclosure. Tabs that switch a host view (panelId). Fictional Harbor Notes copy; RTL pills demo.',
   tags: ['texuli', 'tabs', 'accordion', 'collapsible', 'a11y'],
   component: 'texuli/Tabs',
   props: ['items', 'value', 'variant', 'type', 'label'],

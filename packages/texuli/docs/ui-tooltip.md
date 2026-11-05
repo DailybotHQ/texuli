@@ -16,7 +16,7 @@ Styled tooltip on `@texuli/primitives/tooltip` and the token contract:
 | `shortcut` | Optional string or list of keys (rendered with `Kbd`) |
 | `side` / `align` / `sideOffset` | Placement (default top / center / 6) |
 | `delayDuration` | Open delay ms (default 300) |
-| `disabled` | Blocks open |
+| `disabled` | Keeps the tooltip closed; the trigger stays enabled (since `0.14.0`; before, it was disabled too) |
 | `open` | Bindable controlled open state |
 | `class` | Extra classes on the content |
 
@@ -24,6 +24,9 @@ Styled tooltip on `@texuli/primitives/tooltip` and the token contract:
 
 - Hover / focus opens; Escape closes (primitive dismiss)
 - Touch long-press open (primitive)
+- `disabled` only stops the tooltip from showing (new in `0.14.0`): the
+  trigger props carry no `disabled`, so a `Button` inside a disabled tooltip
+  still focuses and activates. Disable the control itself to disable it
 - Local `Provider` — no app shell required
 - Styles in `@layer tx.components` with inverted surface colors and forced-colors borders
 - Shortcut chips are decorative (`aria-hidden`); the accessible name is the text content via `aria-describedby` on the trigger

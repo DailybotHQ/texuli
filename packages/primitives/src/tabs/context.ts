@@ -13,8 +13,12 @@ export interface TabsContext {
   /** Base id for aria-controls / aria-labelledby pairing. */
   readonly baseId: () => string;
   triggerId(value: string): string;
-  contentId(value: string): string;
-  /** A trigger or panel records its consumer `id` (or clears it), so references use the effective id. */
+  /** The panel's id, or `undefined` while no panel is rendered for the tab. */
+  contentId(value: string): string | undefined;
+  /**
+   * A trigger or panel records its consumer `id` (or clears it), so references
+   * use the effective id. A rendered panel claims `''` without an id.
+   */
   claimId(part: 'trigger' | 'content', value: string, id: string | null | undefined): void;
   registerTrigger(entry: { value: string; element: HTMLElement; disabled: boolean }): () => void;
 }

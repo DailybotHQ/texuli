@@ -194,7 +194,7 @@ export const COMPONENT_TOKEN_FAMILIES: readonly ComponentTokenFamily[] = [
     ['title-font-weight', type('heading', 'weight'), 'Title font weight.'],
     ['title-line-height', type('heading', 'line'), 'Title line height.'],
     ['alert-padding', space(5), 'Alert dialog padding.'],
-    ['scrim-opacity', v('opacity-scrim'), 'Foreground mix of the overlay scrim.'],
+    ['scrim-opacity', v('opacity-scrim'), 'Opacity of the overlay --tx-scrim.'],
   ]),
   family('empty', 'empty', 'Empty state', [
     ['gap', space(3), 'Default size gap.'],
@@ -356,7 +356,7 @@ export const COMPONENT_TOKEN_FAMILIES: readonly ComponentTokenFamily[] = [
     ['title-font-size', type('heading', 'size'), 'Title font size.'],
     ['title-font-weight', type('heading', 'weight'), 'Title font weight.'],
     ['title-line-height', type('heading', 'line'), 'Title line height.'],
-    ['scrim-opacity', v('opacity-scrim'), 'Foreground mix of the overlay scrim.'],
+    ['scrim-opacity', v('opacity-scrim'), 'Opacity of the overlay --tx-scrim.'],
   ]),
   family('sidebar', 'sidebar', 'Sidebar', [
     ['font-size', v('font-size-sm'), 'Font size.'],

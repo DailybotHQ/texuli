@@ -65,6 +65,24 @@ export type IconRef = IconName | IconComponent;
  */
 export type IconGlyph = IconComponent | string;
 
-/** Names to glyphs, as passed to `registerIcons` or `IconsProvider`. */
-export type IconRegistry = Readonly<Record<string, IconGlyph>>;
+/**
+ * A lazy glyph (new in `0.14.0`): a function of no arguments that returns a
+ * promise of a module whose default export is a glyph, or of a glyph:
+ * `() => import('@lucide/svelte/icons/rocket')`. It runs once per registry,
+ * in the browser, the first time an `Icon` asks for its name.
+ */
+export type IconLoader = () => Promise<IconGlyph | { readonly default: IconGlyph }>;
+
+/** Names to glyphs or lazy loaders, as passed to `registerIcons` or `IconsProvider`. */
+export type IconRegistry = Readonly<Record<string, IconGlyph | IconLoader>>;
+
+/** Options for `registerIcons` (new in `0.14.0`). */
+export interface IconRegistryOptions {
+  /**
+   * Drawn for a name this registry (or one above it) does not know, and for
+   * a lazy icon until it loads or when it fails: a built-in icon name or a
+   * glyph. Without one, those icons render nothing.
+   */
+  fallback?: BuiltInIconName | IconGlyph;
+}
 export type IconSize = 'xs' | 'sm' | 'md' | 'lg';

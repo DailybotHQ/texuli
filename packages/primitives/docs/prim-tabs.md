@@ -20,7 +20,7 @@ import { Tabs } from '@texuli/primitives';
 | --- | --- | --- |
 | `Tabs.Root` | container | `bind:value`, `onValueChange`, `orientation` (horizontal default), `activationMode` (`automatic` \| `manual`), `loop` (default false), `disabled` |
 | `Tabs.List` | `tablist` | Roving focus; Home/End |
-| `Tabs.Trigger` | `tab` | `value`, `disabled`; `aria-selected`, `aria-controls`, `data-state` |
+| `Tabs.Trigger` | `tab` | `value`, `disabled`, `panelId`; `aria-selected`, `aria-controls` (only when a panel exists), `data-state` |
 | `Tabs.Content` | `tabpanel` | `value`; `forceMount` (default true, inactive `hidden`); `aria-labelledby` |
 
 ## Behavior
@@ -29,6 +29,11 @@ import { Tabs } from '@texuli/primitives';
 - **Manual**: arrows only move focus; Space/Enter or click selects.
 - Disabled triggers are skipped by roving focus.
 - Lazy panels: set `forceMount={false}` on `Content` to unmount inactive panels.
+- `aria-controls` (new in `0.14.0`): a trigger points at its panel only while
+  a `Tabs.Content` for it is rendered, so tabs without panels (or an
+  unmounted lazy panel) never reference a missing id. When the tab switches a
+  region the host renders, pass `panelId` (that region's id) and
+  `aria-controls` points there.
 
 ## Behavior
 
