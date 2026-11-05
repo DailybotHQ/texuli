@@ -34,6 +34,7 @@ export const CATALOG_EVENT_NAMES: readonly CatalogEventName[] = Object.freeze([
   'submit',
   'dismiss',
   'move',
+  'collapse',
 ]);
 
 /** The contract `$defs` a property schema may `$ref` (spec 0.3.0 `SPEC_PROP_REFS`). */

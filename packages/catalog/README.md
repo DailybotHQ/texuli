@@ -159,6 +159,14 @@ In development (spec `0.12.0`, not published yet):
   untrusted tier, like `src`) and `darkMode` (`theme` or `system`,
   D-G-023). The sink scan, the paint pass and the hostile harden pass
   already police `srcDark` as an image URL at every tier.
+- `data-timeline` lists `groups` (at most 100 `{ id, label, band? }`
+  headers keyed by each task's `group`; a `band` is `{ start, end, label?,
+  tone? }` with ISO dates), `markers` (at most 50 `{ at, label, tone? }`),
+  and the bindable `collapsed` (at most 100 `{ id }` items, so a `list`
+  state fits) and `selectedRow` (D-G-033). Group and marker labels are
+  untrusted text of at most 120 characters, and tones are the data view
+  tones. It fires the new `collapse` event (the closed event vocabulary
+  gains it) with the group id, and `select` with the task id.
 
 ## New in 0.8.0
 

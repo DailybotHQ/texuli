@@ -3633,10 +3633,10 @@
         "Rescheduling has a keyboard path; dependencies are listed as text"
       ],
       "agentEmittable": true,
-      "bindable": ["zoom"],
+      "bindable": ["zoom", "collapsed", "selectedRow"],
       "dontUseWhen": ["Point-in-time events: use timeline or data-calendar"],
       "emit": ["developer", "untrusted"],
-      "events": ["select", "move", "change"],
+      "events": ["select", "move", "change", "collapse"],
       "examples": [
         {
           "id": "launch",
@@ -3725,7 +3725,82 @@
           "kind": "enum",
           "name": "zoom"
         },
-        { "default": "en", "kind": "string", "name": "locale" }
+        { "default": "en", "kind": "string", "name": "locale" },
+        {
+          "description": "Headers by task group, with optional bands.",
+          "kind": "array",
+          "name": "groups",
+          "schema": {
+            "items": {
+              "properties": {
+                "band": {
+                  "properties": {
+                    "end": { "maxLength": 10, "minLength": 10, "type": "string" },
+                    "label": { "maxLength": 120, "type": "string" },
+                    "start": { "maxLength": 10, "minLength": 10, "type": "string" },
+                    "tone": {
+                      "enum": ["primary", "info", "success", "warning", "danger", "neutral"],
+                      "type": "string"
+                    }
+                  },
+                  "required": ["start", "end"],
+                  "type": "object"
+                },
+                "id": { "maxLength": 64, "minLength": 1, "type": "string" },
+                "label": { "maxLength": 120, "type": "string" }
+              },
+              "required": ["id", "label"],
+              "type": "object"
+            },
+            "maxItems": 100,
+            "type": "array"
+          },
+          "trust": "untrusted"
+        },
+        {
+          "kind": "array",
+          "name": "collapsed",
+          "schema": {
+            "items": {
+              "properties": { "id": { "maxLength": 64, "minLength": 1, "type": "string" } },
+              "required": ["id"],
+              "type": "object"
+            },
+            "maxItems": 100,
+            "type": "array"
+          }
+        },
+        {
+          "description": "Selected task id; when set, rows are selectable.",
+          "kind": "string",
+          "name": "selectedRow"
+        },
+        {
+          "kind": "array",
+          "name": "markers",
+          "schema": {
+            "items": {
+              "properties": {
+                "at": {
+                  "description": "An ISO 8601 date (2026-10-27) or time (2026-10-27T09:00:00Z).",
+                  "maxLength": 35,
+                  "minLength": 10,
+                  "type": "string"
+                },
+                "label": { "maxLength": 120, "type": "string" },
+                "tone": {
+                  "enum": ["primary", "info", "success", "warning", "danger", "neutral"],
+                  "type": "string"
+                }
+              },
+              "required": ["at", "label"],
+              "type": "object"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "trust": "untrusted"
+        }
       ],
       "related": ["data-calendar", "timeline"],
       "sourceable": ["tasks"],

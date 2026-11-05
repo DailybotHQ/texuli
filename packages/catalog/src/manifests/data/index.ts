@@ -21,6 +21,7 @@ const isoTime: CatalogValueSchema = {
   maxLength: 35,
   description: 'An ISO 8601 date (2026-10-27) or time (2026-10-27T09:00:00Z).',
 };
+const isoDate: CatalogValueSchema = { type: 'string', minLength: 10, maxLength: 10 };
 const list = (
   properties: Record<string, CatalogValueSchema>,
   required: string[],
@@ -45,6 +46,8 @@ const densityProp = (values: readonly string[]) => ({
 
 /** Tones the data views use for markers and events. */
 export const DATA_TONES = ['primary', 'info', 'success', 'warning', 'danger', 'neutral'] as const;
+
+const tone: CatalogValueSchema = { type: 'string', enum: [...DATA_TONES] };
 
 export const dataBoardManifest: CatalogManifest = /* @__PURE__ */ manifestData({
   id: 'data-board',
@@ -198,7 +201,7 @@ export const dataCalendarManifest: CatalogManifest = /* @__PURE__ */ manifestDat
           start: isoTime,
           end: isoTime,
           allDay: { type: 'boolean' },
-          tone: { type: 'string', enum: [...DATA_TONES] },
+          tone,
         },
         ['id', 'title', 'start', 'end']
       ),
@@ -397,7 +400,7 @@ export const dataMapManifest: CatalogManifest = /* @__PURE__ */ manifestData({
           lat: { type: 'number', minimum: -90, maximum: 90 },
           lng: { type: 'number', minimum: -180, maximum: 180 },
           detail: text(),
-          tone: { type: 'string', enum: [...DATA_TONES] },
+          tone,
         },
         ['id', 'label', 'lat', 'lng']
       ),
@@ -469,9 +472,49 @@ export const dataTimelineManifest: CatalogManifest = /* @__PURE__ */ manifestDat
       default: 'week',
     },
     { name: 'locale', kind: 'string', default: 'en' },
+    {
+      name: 'groups',
+      kind: 'array',
+      trust: 'untrusted',
+      description: 'Headers by task group, with optional bands.',
+      schema: list(
+        {
+          id,
+          label: text(120),
+          band: {
+            type: 'object',
+            properties: {
+              start: isoDate,
+              end: isoDate,
+              label: text(120),
+              tone,
+            },
+            required: ['start', 'end'],
+          },
+        },
+        ['id', 'label'],
+        100
+      ),
+    },
+    {
+      name: 'collapsed',
+      kind: 'array',
+      schema: list({ id }, ['id'], 100),
+    },
+    {
+      name: 'selectedRow',
+      kind: 'string',
+      description: 'Selected task id; when set, rows are selectable.',
+    },
+    {
+      name: 'markers',
+      kind: 'array',
+      trust: 'untrusted',
+      schema: list({ at: isoTime, label: text(120), tone }, ['at', 'label'], 50),
+    },
   ],
-  events: ['select', 'move', 'change'],
-  bindable: ['zoom'],
+  events: ['select', 'move', 'change', 'collapse'],
+  bindable: ['zoom', 'collapsed', 'selectedRow'],
   sourceable: ['tasks'],
   examples: [
     {

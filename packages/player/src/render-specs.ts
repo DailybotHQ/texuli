@@ -2427,11 +2427,27 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
         name: 'locale',
         kind: 'string',
       },
+      {
+        name: 'groups',
+        kind: 'array',
+      },
+      {
+        name: 'collapsed',
+        kind: 'array',
+      },
+      {
+        name: 'selectedRow',
+        kind: 'string',
+      },
+      {
+        name: 'markers',
+        kind: 'array',
+      },
     ],
     agentEmittable: true,
     emit: ['developer', 'untrusted'],
-    events: ['select', 'move', 'change'],
-    bindable: ['zoom'],
+    events: ['select', 'move', 'change', 'collapse'],
+    bindable: ['zoom', 'collapsed', 'selectedRow'],
     sourceable: ['tasks'],
   },
   {

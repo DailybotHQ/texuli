@@ -28,7 +28,14 @@ export type CatalogPropKind =
  * The closed event vocabulary a node's `on` may name (spec 0.3.0,
  * `SPEC_EVENT_NAMES`). A component lists the events it really fires.
  */
-export type CatalogEventName = 'press' | 'change' | 'select' | 'submit' | 'dismiss' | 'move';
+export type CatalogEventName =
+  | 'press'
+  | 'change'
+  | 'select'
+  | 'submit'
+  | 'dismiss'
+  | 'move'
+  | 'collapse';
 
 /**
  * A property schema for an `array` or `object` prop: the spec dialect
