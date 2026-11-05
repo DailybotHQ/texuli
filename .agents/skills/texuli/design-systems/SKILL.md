@@ -80,6 +80,12 @@ Guide (monorepo): `docs/DESIGN_SYSTEMS.md`. Reference: the document
    derives the rest). To give a soft fill its own text color, pin
    `color.roles.<mode>.<role>SoftForeground`: the fill is then held to
    that ink, not to the page text.
+5. **Spec 0.12.0** (new in `0.14.0`; `0.13.x` refuses it): a shadow
+   layer's optional `darkOpacity` (0 to 1) is its opacity in dark mode,
+   `{ "y": 2, "blur": 6, "opacity": 0.12, "darkOpacity": 0.48 }`. Leave
+   `color.roles.<mode>.sidebarPrimary` out: the compiler derives the
+   sidebar's active fill when the sidebar would hide it; a pinned one that
+   vanishes is refused as `aa-non-text`.
 
 ## Validate and repair
 
