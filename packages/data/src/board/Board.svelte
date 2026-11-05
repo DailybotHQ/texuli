@@ -12,7 +12,7 @@ import {
 import { type Component, flushSync, type Snippet, tick, untrack } from 'svelte';
 import type { Attachment } from 'svelte/attachments';
 import type { HTMLAttributes } from 'svelte/elements';
-import { type ClassValue, cx, variants } from 'texuli/cx';
+import { type ClassValue, cx } from 'texuli/cx';
 import type { MotionProp } from 'texuli/motion';
 import {
   type BoardColumnDef,
@@ -114,14 +114,6 @@ interface OwnBoardProps<T> {
 type BoardProps<T> = OwnBoardProps<T> &
   Omit<HTMLAttributes<HTMLElement>, keyof OwnBoardProps<T> | 'children'>;
 
-const rootClasses = variants({
-  base: 'tx-board',
-  variants: {
-    density: { comfortable: 'tx-board--comfortable', compact: 'tx-board--compact' },
-  },
-  defaultVariants: { density: 'comfortable' },
-});
-
 const DEFAULT_LABELS: BoardLabels = {
   board: 'Board',
   instructions:
@@ -176,6 +168,7 @@ let {
 }: BoardProps<T> = $props();
 
 const uid = $props.id();
+const numbers = new Intl.NumberFormat();
 // Layout motion: measure the cards before `items` changes, play after it.
 const cardMotion = createLazyListMotion({
   motion: () => motion,
@@ -231,7 +224,6 @@ let announcement = $state('');
 let placements = $state<Record<string, ReturnType<typeof placementsOf>[string]>>({});
 /** Lazy DropdownMenu chunk — shared for every card after first open/prefetch. */
 let MoveMenu = $state.raw<Component<MoveMenuProps> | undefined>();
-let menuReady = $state(false);
 /** Which card’s move menu is open (`itemId`), once the lazy menu is mounted. */
 let openMenuId = $state<string | null>(null);
 /** The pointer drag in progress (keyboard moves use `held`). */
@@ -327,17 +319,16 @@ function itemById(id: string): T | undefined {
 async function focusCard(id: string, prefer: 'menu' | 'handle' = 'handle'): Promise<void> {
   await tick();
   // Menu close + DOM reorder can lag one frame behind the placement update.
-  await new Promise<void>((resolve) => {
-    document.defaultView?.requestAnimationFrame?.(() => resolve()) ?? resolve();
-  });
+  await new Promise(
+    (resolve) => document.defaultView?.requestAnimationFrame?.(resolve) ?? resolve(0)
+  );
   focusCardNow(id, prefer);
 }
 
 /** Focus a card's handle (or Move menu) as the DOM is now; whether it took focus. */
 function focusCardNow(id: string, prefer: 'menu' | 'handle' = 'handle'): boolean {
-  const root = ref;
-  const cardNode = [...(root?.querySelectorAll<HTMLElement>('[data-board-card]') ?? [])].find(
-    (node) => node.getAttribute('data-item-id') === id
+  const cardNode = [...(ref?.querySelectorAll<HTMLElement>('[data-board-card]') ?? [])].find(
+    (node) => node.dataset.itemId === id
   );
   if (!cardNode) return false;
   const menu = cardNode.querySelector<HTMLElement>('[data-board-move-menu]');
@@ -360,21 +351,11 @@ function destinationsFor(item: T): MoveMenuDestination[] {
   });
 }
 
-const MOVE_MENU_CHUNK = 'data:board:move-menu';
-
-function ensureMoveMenu(): Promise<Component<MoveMenuProps>> {
-  if (MoveMenu) return Promise.resolve(MoveMenu);
-  return lazyChunk(MOVE_MENU_CHUNK, () => import('./BoardMoveMenu.svelte')).then((module) => {
-    const component = module.default as unknown as Component<MoveMenuProps>;
-    MoveMenu = component;
-    menuReady = true;
-    return component;
-  });
-}
-
-/** Prefetch on focus/hover so the first open feels instant. */
-function prefetchMoveMenu(): void {
-  void ensureMoveMenu();
+/** Load the move menu once (`lazyChunk` caches it); focus and hover prefetch it. */
+function ensureMoveMenu(): Promise<unknown> {
+  return lazyChunk('data:board:move-menu', () => import('./BoardMoveMenu.svelte')).then(
+    (module) => (MoveMenu = module.default as unknown as Component<MoveMenuProps>)
+  );
 }
 
 async function openMoveMenu(item: T): Promise<void> {
@@ -402,12 +383,9 @@ async function commit(
     await onMove(move, item);
     await focusCard(move.itemId, focus);
   } catch {
-    const restored = { ...placements };
-    for (const [id, placement] of Object.entries(oldPlacements)) {
-      if (placement) restored[id] = placement;
-      else delete restored[id];
-    }
-    placements = restored;
+    const restored = { ...placements, ...oldPlacements };
+    for (const id in oldPlacements) if (!oldPlacements[id]) delete restored[id];
+    placements = restored as typeof placements;
     announce(labels.moveFailed(getLabel(item)));
     await focusCard(move.itemId, focus);
   } finally {
@@ -630,13 +608,20 @@ function dragFrom(id: string): Attachment<HTMLElement> {
 }
 </script>
 
+<!-- `data-board-move-menu-chunk` marks the root once the lazy move menu has loaded (tests await it). -->
 <section
   id="board-{uid}"
   {...rest}
   bind:this={ref}
-  class={cx(rootClasses({ density, class: className }), drag?.active && 'tx-board--dragging')}
+  class={cx(
+    'tx-board',
+    density === 'compact' ? 'tx-board--compact' : 'tx-board--comfortable',
+    className,
+    drag?.active && 'tx-board--dragging'
+  )}
   aria-labelledby={titleId}
   dir={dir}
+  data-board-move-menu-chunk={MoveMenu ? '' : undefined}
 >
   <svelte:element this={level > 2 ? `h${level - 1}` : 'p'} id={titleId} class="tx-board__sr-only">{labels.board}</svelte:element>
   <p id={instructionsId} class="tx-board__sr-only">{labels.instructions}</p>
@@ -651,9 +636,9 @@ function dragFrom(id: string): Attachment<HTMLElement> {
             <svelte:element this={`h${level}`} class="tx-board__column-title">{column.title}</svelte:element>
             <span class="tx-board__count" dir="ltr">
               <span aria-hidden="true"
-                ><bdi>{new Intl.NumberFormat().format(count)}</bdi>{#if column.wip?.hard
+                ><bdi>{numbers.format(count)}</bdi>{#if column.wip?.hard
                   !== undefined}<span>/</span
-                  ><bdi>{new Intl.NumberFormat().format(column.wip.hard)}</bdi>{/if}</span
+                  ><bdi>{numbers.format(column.wip.hard)}</bdi>{/if}</span
               >
               <span class="tx-board__sr-only">{labels.cardCount(count, column.wip?.hard)}</span>
             </span>
@@ -725,8 +710,8 @@ function dragFrom(id: string): Attachment<HTMLElement> {
                           aria-haspopup="menu"
                           aria-expanded="false"
                           disabled={pending[id] || locked}
-                          onfocus={prefetchMoveMenu}
-                          onpointerenter={prefetchMoveMenu}
+                          onfocus={ensureMoveMenu}
+                          onpointerenter={ensureMoveMenu}
                           onclick={() => void openMoveMenu(item)}
                         >
                           <span class="tx-board__move-menu-glyph" aria-hidden="true">⋮</span>
@@ -776,10 +761,6 @@ function dragFrom(id: string): Attachment<HTMLElement> {
     </section>
   {/if}
   <p class="tx-board__status" role="status" aria-live="polite" aria-atomic="true">{announcement}</p>
-  <!-- Tests await this once the lazy move-menu chunk has mounted. -->
-  {#if menuReady}
-    <span class="tx-board__sr-only" data-board-move-menu-chunk="" data-ready="">Move menu ready</span>
-  {/if}
 </section>
 
 <style>
