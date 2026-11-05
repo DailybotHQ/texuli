@@ -29,18 +29,25 @@ export interface DesignSystemPair {
   kind: 'text' | 'ui' | 'focus';
   /** Also check the background's `-hover` and `-active` variables. */
   states: boolean;
+  /** The foreground to read when `foreground` is not in the map. */
+  fallback?: string;
 }
 
 /** Every contrast pair, as `--tx-*` names: the generator's guaranteed pairs plus the status set. */
 export const DESIGN_SYSTEM_PAIRS: readonly DesignSystemPair[] = [
-  ...THEME_CONTRAST_PAIRS.map(
-    (pair): DesignSystemPair => ({
-      foreground: semanticTokenToCssVar(pair.foreground),
-      background: semanticTokenToCssVar(pair.background),
+  ...THEME_CONTRAST_PAIRS.map((pair): DesignSystemPair => {
+    const background = semanticTokenToCssVar(pair.background);
+    // Body text on a soft fill: the fill's own ink when the document pinned
+    // one (`--tx-<role>-soft-body`), the page foreground otherwise.
+    const body = pair.foreground === 'foreground' && pair.background.endsWith('Soft');
+    return {
+      foreground: body ? `${background}-body` : semanticTokenToCssVar(pair.foreground),
+      background,
       kind: pair.foreground === 'ring' ? 'focus' : pair.kind,
       states: pair.states === true,
-    })
-  ),
+      ...(body ? { fallback: '--tx-foreground' } : {}),
+    };
+  }),
   ...['success', 'warning', 'danger', 'info', 'neutral'].flatMap((status): DesignSystemPair[] => [
     {
       foreground: `--tx-status-${status}-foreground`,
@@ -115,10 +122,26 @@ export interface DesignSystemPairResult {
 export const textMinimum = (contrast: DesignSystemContrast): number =>
   contrast === 'AAA' ? 7 : 4.5;
 
+const EXTENSION_INK = /^--tx-ext-([a-z0-9-]+)-foreground$/;
+
+/** The product token pairs of a map: `--tx-ext-<name>-foreground` on `--tx-ext-<name>`. */
+export function extensionPairs(colors: Readonly<Record<string, string>>): DesignSystemPair[] {
+  return Object.keys(colors)
+    .filter((name) => EXTENSION_INK.test(name))
+    .sort()
+    .map((foreground) => ({
+      foreground,
+      background: foreground.slice(0, -'-foreground'.length),
+      kind: 'text' as const,
+      states: false,
+    }));
+}
+
 /**
- * Every pair of {@link DESIGN_SYSTEM_PAIRS} present in `colors` (a `--tx-*`
- * name to an authored color). Translucent colors are composited over the
- * pair's background, and the background over `--tx-background`.
+ * Every pair of {@link DESIGN_SYSTEM_PAIRS}, and every product token pair
+ * ({@link extensionPairs}), present in `colors` (a `--tx-*` name to an
+ * authored color). Translucent colors are composited over the pair's
+ * background, and the background over `--tx-background`.
  */
 export function evaluateDesignSystemContrast(
   colors: Readonly<Record<string, string>>,
@@ -130,7 +153,11 @@ export function evaluateDesignSystemContrast(
     return parsed ? composite(parsed, under) : undefined;
   };
   const results: DesignSystemPairResult[] = [];
-  for (const pair of DESIGN_SYSTEM_PAIRS) {
+  for (const listed of [...DESIGN_SYSTEM_PAIRS, ...extensionPairs(colors)]) {
+    const pair =
+      listed.fallback !== undefined && colors[listed.foreground] === undefined
+        ? { ...listed, foreground: listed.fallback }
+        : listed;
     const backgrounds = pair.states
       ? [pair.background, `${pair.background}-hover`, `${pair.background}-active`]
       : [pair.background];

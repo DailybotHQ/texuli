@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { COMPONENT_TOKENS } from '../src/components/registry.ts';
 import { SEMANTIC_ROLES } from '../src/contract/semantic.ts';
+import { parseDsColor } from '../src/design-system/color.ts';
 import * as compileEntry from '../src/design-system/compile.ts';
 import {
   type CompiledDesignSystem,
@@ -19,7 +20,10 @@ import {
   sha256Hex,
 } from '../src/design-system/compile.ts';
 import * as compileCore from '../src/design-system/compile-core.ts';
+import { isSafeCompiledValue } from '../src/design-system/css-value.ts';
 import * as validateEntry from '../src/design-system/validate.ts';
+import { chartColorDistance } from '../src/palette/charts.ts';
+import { contrastRatio } from '../src/palette/contrast.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 type Doc = Record<string, unknown>;
@@ -630,5 +634,260 @@ describe('@texuli/tokens/design-system/compile-core (G127)', () => {
     expect(Object.keys(compileEntry).sort()).toEqual(
       [...Object.keys(compileCore), 'loadLibraryBase', 'resolveDesignSystem'].sort()
     );
+  });
+});
+
+describe('compileDesignSystem: the consumer format gaps (spec 0.11.0)', () => {
+  const vars = (compiled: CompiledDesignSystem, mode: 'light' | 'dark') =>
+    compiled.vars[mode] as Record<string, string>;
+
+  it('derives sidebarPrimary when the copied primary pin would vanish on the sidebar fill (D-G-015)', () => {
+    // [pin, sidebar fill]: the same color, a close one, and the default (neutral) sidebar.
+    for (const [pin, sidebar] of [
+      ['#4f46e5', '#4f46e5'],
+      ['#2563eb', '#3b82f6'],
+      ['#2563eb', undefined],
+    ] as const) {
+      const compiled = ok(
+        compileDesignSystem(
+          doc({
+            color: {
+              brand: { seed: pin },
+              pin: { primary: pin },
+              ...(sidebar ? { roles: { light: { sidebar }, dark: { sidebar } } } : {}),
+            },
+          })
+        )
+      );
+      for (const mode of compiled.modes) {
+        const v = vars(compiled, mode);
+        const active = v['--tx-sidebar-primary'] as string;
+        const fill = v['--tx-sidebar'] as string;
+        const ratio = contrastRatio(active, fill);
+        const derived = compiled.report.adjustments.find(
+          (a) => a.mode === mode && a.variable === '--tx-sidebar-primary'
+        );
+        if (sidebar === undefined) {
+          // A sidebar the pin already stands out on keeps the copy.
+          expect(active, mode).toBe(pin);
+          expect(derived, mode).toBeUndefined();
+          continue;
+        }
+        expect(active, `${pin} ${mode}`).not.toBe(fill);
+        expect(derived, mode).toMatchObject({ from: pin, path: '$.color.pin.primary' });
+        // 3:1 where the primary ink allows it; otherwise the most distinct fill that keeps the ink.
+        if (sidebar === '#3b82f6') expect(ratio, mode).toBeGreaterThanOrEqual(3);
+        else expect(ratio, mode).toBeGreaterThan(2.5);
+        expect(
+          contrastRatio(v['--tx-primary-foreground'] as string, active)
+        ).toBeGreaterThanOrEqual(4.5);
+        expect(v['--tx-primary'], mode).toBe(pin);
+      }
+      expect(checkDesignSystemGuarantees(compiled)).toEqual([]);
+    }
+  });
+
+  it('holds a soft fill with a pinned ink to that ink only, and body text follows the ink (D-G-016)', () => {
+    // A pastel chip with its own dark text in dark mode: the light page text cannot read on it.
+    const pastel = { successSoft: '#bbf7d0', successSoftForeground: '#052e16' };
+    const compiled = ok(
+      compileDesignSystem(doc({ color: { brand: { seed: '#4f46e5' }, roles: { dark: pastel } } }))
+    );
+    const dark = vars(compiled, 'dark');
+    expect(dark['--tx-success-soft']).toBe('#bbf7d0');
+    expect(dark['--tx-success-soft-foreground']).toBe('#052e16');
+    expect(dark['--tx-success-soft-body']).toBe('#052e16');
+    expect(contrastRatio(dark['--tx-foreground'] as string, '#bbf7d0')).toBeLessThan(4.5);
+    // Light mode pins nothing, so its page foreground still reads on every soft fill.
+    expect(Object.keys(vars(compiled, 'light')).filter((n) => n.endsWith('-soft-body'))).toEqual(
+      []
+    );
+    expect(compiled.report.adjustments).toContainEqual(
+      expect.objectContaining({
+        mode: 'dark',
+        variable: '--tx-success-soft-body',
+        path: '$.color.roles.dark.successSoftForeground',
+      })
+    );
+    // Every rendered pair holds: the guarantee reads the body ink, and without it the page foreground.
+    expect(checkDesignSystemGuarantees(compiled)).toEqual([]);
+    const { '--tx-success-soft-body': _, ...stripped } = dark;
+    expect(
+      checkDesignSystemGuarantees({ ...compiled, vars: { dark: stripped } }).map((i) => i.path)
+    ).toEqual(['$.vars.dark["--tx-foreground"]']);
+    // Without the ink pin the fill is still held to the page foreground.
+    const { successSoftForeground: _ink, ...fillOnly } = pastel;
+    expect(
+      compileDesignSystem(doc({ color: { brand: { seed: '#4f46e5' }, roles: { dark: fillOnly } } }))
+        .ok
+    ).toBe(false);
+  });
+
+  it('completes a short categorical palette deterministically, keeping the given colors (D-G-017)', () => {
+    for (const given of [['#4f46e5'], ['#4f46e5', '#0ea5e9', '#f59e0b'], ['oklch(0.6 0.15 30)']]) {
+      const source = doc({
+        color: {
+          brand: { seed: '#4f46e5' },
+          dataViz: { light: { categorical: given }, dark: { categorical: given }, cvdSafe: true },
+        },
+      });
+      const compiled = ok(compileDesignSystem(source));
+      expect(ok(compileDesignSystem(source)).vars).toEqual(compiled.vars);
+      for (const mode of compiled.modes) {
+        const v = vars(compiled, mode);
+        const chart = Array.from({ length: 8 }, (_, i) => v[`--tx-chart-${i + 1}`] as string);
+        expect(chart.slice(0, given.length), mode).toEqual(given);
+        const derived = chart.slice(given.length);
+        expect(new Set(chart).size, mode).toBe(8);
+        for (const [i, color] of derived.entries()) {
+          for (const surface of [v['--tx-surface'], v['--tx-background']])
+            expect(contrastRatio(color, surface as string), mode).toBeGreaterThanOrEqual(3);
+          for (const other of derived.slice(0, i))
+            expect(chartColorDistance(color, other), mode).toBeGreaterThanOrEqual(0.08);
+        }
+        expect(
+          compiled.report.adjustments
+            .filter((a) => a.mode === mode && a.path === `$.color.dataViz.${mode}.categorical`)
+            .map((a) => [a.variable, a.to])
+        ).toEqual(derived.map((color, i) => [`--tx-chart-${given.length + i + 1}`, color]));
+      }
+    }
+    // Eight stay exactly as written with no derivation; none and nine are refused.
+    const eight = ['#111111', '#222222', '#333333', '#444444', '#555555', '#666666', '#777777'];
+    const full = ok(
+      compileDesignSystem(
+        doc({
+          color: {
+            brand: { seed: '#4f46e5' },
+            dataViz: { light: { categorical: [...eight, '#888888'] } },
+          },
+        })
+      )
+    );
+    expect(full.report.adjustments.filter((a) => a.variable.startsWith('--tx-chart-'))).toEqual([]);
+    for (const list of [[], [...eight, '#888888', '#999999']])
+      expect(
+        codes(
+          compileDesignSystem(
+            doc({
+              color: { brand: { seed: '#4f46e5' }, dataViz: { light: { categorical: list } } },
+            })
+          )
+        )
+      ).toEqual([['invalid-value', '$.color.dataViz.light.categorical']]);
+  });
+
+  it('compiles structured elevation levels to safe shadows in the mode’s shadow color (D-G-018)', () => {
+    const levels = {
+      '1': [{ y: 1, blur: 2, opacity: 0.2 }],
+      '4': [
+        { x: -2, y: 12, blur: 32, spread: -8, opacity: 0.25 },
+        { y: 0, blur: 0, spread: 1, opacity: 1, inset: true },
+      ],
+    };
+    const compiled = ok(compileDesignSystem(doc({ elevation: { style: 'crisp', levels } })));
+    for (const mode of compiled.modes) {
+      const v = vars(compiled, mode);
+      const shadow = parseDsColor(v['--tx-shadow'] as string)?.hex;
+      expect(v['--tx-elevation-1'], mode).toBe(`0 1px 2px 0 ${shadow}33`);
+      expect(v['--tx-elevation-4'], mode).toBe(
+        `-2px 12px 32px -8px ${shadow}40, inset 0 0 0 1px ${shadow}ff`
+      );
+      // Levels the document leaves out keep the style's shadows.
+      expect(v['--tx-elevation-3'], mode).toBe(
+        ok(compileDesignSystem(doc({ elevation: { style: 'crisp' } }))).vars[mode]?.[
+          '--tx-elevation-3'
+        ]
+      );
+      for (const n of [1, 2, 3, 4, 5])
+        expect(isSafeCompiledValue(v[`--tx-elevation-${n}`])).toBe(true);
+    }
+    // Bounded numbers, closed layers and levels 1 to 5 only: never a raw CSS string.
+    for (const [bad, path] of [
+      [{ '1': [{ y: 1, blur: 500, opacity: 0.2 }] }, '$.elevation.levels["1"][0].blur'],
+      [{ '1': [{ y: 1, blur: 2, opacity: 1.5 }] }, '$.elevation.levels["1"][0].opacity'],
+      [{ '6': [{ y: 1, blur: 2, opacity: 0.2 }] }, '$.elevation.levels["6"]'],
+      [{ '1': [] }, '$.elevation.levels["1"]'],
+      [{ '1': '0 1px 2px red' }, '$.elevation.levels["1"]'],
+      [
+        { '1': [{ y: 1, blur: 2, opacity: 0.2, color: 'red' }] },
+        '$.elevation.levels["1"][0].color',
+      ],
+    ] as const)
+      expect(codes(compileDesignSystem(doc({ elevation: { levels: bad } })))[0]?.[1]).toBe(path);
+  });
+
+  it('compiles product tokens with checked on-colors in both modes (C-G-007)', () => {
+    const extensions = {
+      'brand-gold': {
+        light: '#fef3c7',
+        dark: '#78350f',
+        on: { light: '#451a03', dark: '#fffbeb' },
+      },
+      'focus-band': { light: '#e0e7ff', dark: '#312e81', on: {} },
+      stripe: { light: '#c7d2fe', dark: '#3730a3' },
+    };
+    const compiled = ok(compileDesignSystem(doc({ extensions })));
+    const light = vars(compiled, 'light');
+    const dark = vars(compiled, 'dark');
+    expect(light['--tx-ext-brand-gold']).toBe('#fef3c7');
+    expect(light['--tx-ext-brand-gold-foreground']).toBe('#451a03');
+    expect(dark['--tx-ext-brand-gold-foreground']).toBe('#fffbeb');
+    expect(light['--tx-ext-stripe']).toBe('#c7d2fe');
+    expect(light['--tx-ext-stripe-foreground']).toBeUndefined();
+    for (const [mode, v] of [
+      ['light', light],
+      ['dark', dark],
+    ] as const) {
+      const ink = v['--tx-ext-focus-band-foreground'] as string;
+      expect(contrastRatio(ink, v['--tx-ext-focus-band'] as string), mode).toBeGreaterThanOrEqual(
+        4.5
+      );
+      expect(compiled.report.adjustments).toContainEqual(
+        expect.objectContaining({ mode, variable: '--tx-ext-focus-band-foreground', to: ink })
+      );
+      expect(compiled.report.contrast[mode]).toContainEqual(
+        expect.objectContaining({ foreground: '--tx-ext-brand-gold-foreground', pass: true })
+      );
+    }
+    expect(checkDesignSystemGuarantees(compiled)).toEqual([]);
+    // A pinned on-color below the target is refused in the mode it fails, at its own path.
+    const failing = compileDesignSystem(
+      doc({
+        extensions: {
+          gold: { light: '#fef3c7', dark: '#78350f', on: { light: '#451a03', dark: '#92400e' } },
+        },
+      })
+    );
+    expect(codes(failing)).toEqual([['aa-text', '$.extensions.gold.on.dark']]);
+    // A tampered compiled map is caught by the guarantee re-check.
+    expect(
+      checkDesignSystemGuarantees({
+        ...compiled,
+        vars: { light: { ...light, '--tx-ext-brand-gold-foreground': '#fef3c7' } },
+      }).map((issue) => [issue.code, issue.path])
+    ).toEqual([['aa-text', '$.vars.light["--tx-ext-brand-gold-foreground"]']]);
+    // Names are kebab-case, at most 32 characters, never ending in -foreground; at most 32 tokens.
+    const token = { light: '#ffffff', dark: '#000000' };
+    for (const name of [
+      'Brand',
+      'brand_gold',
+      'gold-foreground',
+      `a${'b'.repeat(32)}`,
+      '__proto__',
+    ])
+      expect(codes(compileDesignSystem(doc({ extensions: { [name]: token } })))).toEqual([
+        [
+          'invalid-value',
+          `$.extensions${/^[A-Za-z_$][\w$]*$/.test(name) ? `.${name}` : `[${JSON.stringify(name)}]`}`,
+        ],
+      ]);
+    const many = Object.fromEntries(Array.from({ length: 33 }, (_, i) => [`t${i}`, token]));
+    expect(codes(compileDesignSystem(doc({ extensions: many })))).toEqual([
+      ['invalid-value', '$.extensions'],
+    ]);
+    expect(
+      codes(compileDesignSystem(doc({ extensions: { gold: { light: 'red', dark: '#000' } } })))
+    ).toEqual([['invalid-value', '$.extensions.gold.light']]);
   });
 });

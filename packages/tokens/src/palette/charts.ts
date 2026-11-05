@@ -248,10 +248,20 @@ function categorical(tokens: readonly string[], surfaces: readonly string[], mod
     out.push(separate(ensureContrast(original, surfaces, mode), out, surfaces, mode));
   }
   respaceGrays(out, surfaces, mode);
+  return fillCategorical(out, surfaces, mode);
+}
+
+/** `kept` plus derived colors up to 8: free hues, 3:1 on every surface, separated from all earlier ones. */
+function fillCategorical(
+  kept: readonly string[],
+  surfaces: readonly string[],
+  mode: ChartMode
+): string[] {
+  const out = [...kept];
   const chromatic = out.map(hexToOklch).filter((lch) => lch.c > ACHROMATIC);
   const hues = freeHues(
     chromatic.map((lch) => lch.h),
-    CHART_CATEGORICAL_COUNT - tokens.length
+    Math.max(0, CHART_CATEGORICAL_COUNT - kept.length)
   );
   const lightness = mode === 'light' ? 0.6 : 0.74;
   for (const hue of hues) {
@@ -260,6 +270,25 @@ function categorical(tokens: readonly string[], surfaces: readonly string[], mod
     out.push(separate(seed, out, surfaces, mode, [hue + 20, hue - 20, hue + 40, hue - 40]));
   }
   return out;
+}
+
+/**
+ * A short categorical list (1 to 8 hex colors) completed to 8: the given
+ * colors stay exactly as they are, and each derived one takes the hue
+ * farthest from the hues already used, reaches 3:1 on the palette's surface
+ * and background, and keeps the OKLab and color-vision distances from every
+ * earlier color where a lightness or nearby-hue move can. Deterministic.
+ */
+export function extendCategoricalColors(
+  given: readonly string[],
+  palette: Pick<ChartPaletteInput, 'surface' | 'background'>,
+  mode: ChartMode
+): string[] {
+  const kept = given.slice(0, CHART_CATEGORICAL_COUNT).map((color) => {
+    if (!parseHex(color)) throw new TypeError(`Chart colors must be hex, got "${color}"`);
+    return color.toLowerCase();
+  });
+  return fillCategorical(kept, surfacesOf(palette), mode);
 }
 
 function ramp(from: Oklch, to: Oklch, steps: number): string[] {
@@ -329,7 +358,7 @@ function diverging(
   return colors;
 }
 
-function surfacesOf(palette: ChartPaletteInput): string[] {
+function surfacesOf(palette: Pick<ChartPaletteInput, 'surface' | 'background'>): string[] {
   const list = [palette.surface, palette.background].filter((color) => parseHex(color) !== null);
   if (!list.length) throw new TypeError('Chart palettes need a hex surface or background');
   return list;
