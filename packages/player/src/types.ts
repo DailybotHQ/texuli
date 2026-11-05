@@ -15,6 +15,8 @@ export type PlayerPaintNode =
       children: readonly PlayerPaintNode[];
       /** Player-owned layout data for content layouts (heading rank, id, contents). */
       frame?: FrameInfo;
+      /** The heading rank of a `figure` title (flow, geo and part-whole charts; D-G-020). */
+      titleLevel?: number;
       /** The parent's named slot, when not the default one (audit G04). */
       slot?: string;
       /** The node's checked motion (spec 0.6.0): presets and token steps only. */

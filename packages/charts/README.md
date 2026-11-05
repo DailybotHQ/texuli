@@ -98,6 +98,7 @@ const keep = lttbIndices(xs, ys, 500); // downsample a long series to 500 points
 | `@texuli/charts/canvas` | A canvas renderer for dense series |
 | `@texuli/charts/colors` | Token-backed categorical, sequential and diverging color scales |
 | `@texuli/charts/schemas` | `chartPropSchemas`, the prop schema of every family, for builders and inspectors |
+| `@texuli/charts/heading` | `setChartTitleLevel`: the heading rank a host gives flow, geo and part-whole chart titles (`h3` without one) |
 
 **Data and math** (framework-free TypeScript):
 
@@ -173,6 +174,7 @@ Ships in `0.5.0`; the `0.4.0` release predates it:
   [interaction and keyboard](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-interaction.md),
   [annotations](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-annotations.md),
   [canvas](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-canvas.md),
+  [title heading rank](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-heading.md),
   [colors](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-colors.md),
   [prop schemas](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-schemas.md)
 - Guides:

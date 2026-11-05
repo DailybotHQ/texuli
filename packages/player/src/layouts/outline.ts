@@ -1,5 +1,5 @@
 import type { PaintNode } from '@texuli/catalog/player';
-import { resolveMeta, resolveNestedRole } from '@texuli/catalog/render/grammar';
+import { figureTitleLevel, resolveMeta, resolveNestedRole } from '@texuli/catalog/render/grammar';
 import { PLAYER_GRAMMAR_ROLES } from '../layout-manifests.ts';
 
 /** The agent-emittable content layouts the player paints (catalog `contentComposition`). */
@@ -60,15 +60,33 @@ function titleOf(props: Readonly<Record<string, unknown>>): string | null {
   return typeof title === 'string' && title.trim() !== '' ? title.trim() : null;
 }
 
+/** What {@link planOutline} plans: the layout frames, and the rank of every `figure` title. */
+export interface PlayerOutline {
+  frames: Map<string, FrameInfo>;
+  /**
+   * By tree path: the heading rank of each titled `titleHeading: 'figure'`
+   * node (flow, geo and part-whole charts), which the player hands the
+   * chart through `@texuli/charts/heading` (D-G-020).
+   */
+  titles: Map<string, number>;
+}
+
+/** The layout frames of {@link planOutline}. */
+export function planFrames(plan: readonly PaintNode[], idPrefix: string): Map<string, FrameInfo> {
+  return planOutline(plan, idPrefix).frames;
+}
+
 /**
  * Walk the paint plan the way `checkCompositionGrammar` walks the tree, so a
  * painted title gets exactly the rank the grammar checked: a fixed
- * `titleHeading` (page, doc, deck: 1) or `nested`, one rank below the
- * nearest titled frame around it (card, slide), capped at 6. Placeholders
- * are skipped, as they paint no heading.
+ * `titleHeading` (page, doc, deck: 1), `nested`, one rank below the nearest
+ * titled frame around it (card, slide), capped at 6, or `figure`, the same
+ * but h3 with no titled frame around it. Placeholders are skipped, as they
+ * paint no heading.
  */
-export function planFrames(plan: readonly PaintNode[], idPrefix: string): Map<string, FrameInfo> {
+export function planOutline(plan: readonly PaintNode[], idPrefix: string): PlayerOutline {
   const frames = new Map<string, FrameInfo>();
+  const titles = new Map<string, number>();
 
   function visit(
     node: PaintNode,
@@ -81,7 +99,9 @@ export function planFrames(plan: readonly PaintNode[], idPrefix: string): Map<st
     const title = titleOf(node.props);
     let level: number | null = null;
     let childSection = sectionLevel;
-    if (meta.titleHeading !== undefined && title !== null) {
+    if (meta.titleHeading === 'figure') {
+      if (title !== null) titles.set(node.path, figureTitleLevel(sectionLevel));
+    } else if (meta.titleHeading !== undefined && title !== null) {
       const nested = meta.titleHeading === 'nested';
       const rank = nested ? Math.min(sectionLevel + 1, 6) : (meta.titleHeading as number);
       level = rank;
@@ -109,5 +129,5 @@ export function planFrames(plan: readonly PaintNode[], idPrefix: string): Map<st
   }
 
   for (const node of plan) visit(node, 0, [], null);
-  return frames;
+  return { frames, titles };
 }

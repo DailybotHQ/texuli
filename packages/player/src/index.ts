@@ -180,7 +180,9 @@ export {
   type ContentLayoutId,
   type FrameInfo,
   isContentLayoutId,
+  type PlayerOutline,
   planFrames,
+  planOutline,
   type TocEntry,
 } from './layouts/outline.ts';
 export { PLAYER_LOADERS } from './loaders.ts';

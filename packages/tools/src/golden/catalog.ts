@@ -56,11 +56,13 @@ export function goldenRenderCatalog(): RenderCatalog {
 }
 
 /**
- * Heading rank each chart renders for its `title` (read from the components:
- * cartesian and matrix charts use `h2`; flow, geo and part-whole charts `h3`).
- * Compact charts render no heading.
+ * Heading rank each chart renders for its `title` (as the grammar's roles
+ * and the player paint it): cartesian and matrix charts a fixed `h2`; flow,
+ * geo and part-whole charts `'figure'`, one rank below the nearest titled
+ * frame or card (`h2` under a page's `h1`, `h3` in a card), `h3` with
+ * nothing titled around them (D-G-020). Compact charts render no heading.
  */
-export const CHART_TITLE_LEVELS: Readonly<Record<string, 2 | 3>> = Object.freeze({
+export const CHART_TITLE_LEVELS: Readonly<Record<string, 2 | 'figure'>> = Object.freeze({
   'charts-area': 2,
   'charts-bar': 2,
   'charts-cartesian': 2,
@@ -70,15 +72,15 @@ export const CHART_TITLE_LEVELS: Readonly<Record<string, 2 | 3>> = Object.freeze
   'charts-bubble': 2,
   'charts-heatmap': 2,
   'charts-scatter': 2,
-  'charts-funnel': 3,
-  'charts-network': 3,
-  'charts-sankey': 3,
-  'charts-geo-map': 3,
-  'charts-geo-point-map': 3,
-  'charts-donut': 3,
-  'charts-pie': 3,
-  'charts-sunburst': 3,
-  'charts-treemap': 3,
+  'charts-funnel': 'figure',
+  'charts-network': 'figure',
+  'charts-sankey': 'figure',
+  'charts-geo-map': 'figure',
+  'charts-geo-point-map': 'figure',
+  'charts-donut': 'figure',
+  'charts-pie': 'figure',
+  'charts-sunburst': 'figure',
+  'charts-treemap': 'figure',
 });
 
 /** The id the heading projection uses for every outline entry. */

@@ -167,7 +167,8 @@ runner enforces:
 
 In the `Player` it also checks:
 - the heading outline the grammar checked (page h1, card titles h2, chart
-  titles at their fixed ranks, no gauge heading);
+  titles at their ranks: cartesian h2, flow, geo and part-whole one below
+  their section, no gauge heading);
 - the 7 frame stops in reading order;
 - the KPI and table blocks;
 - no placeholders or node errors;
@@ -255,12 +256,17 @@ player passes these roles to `validateDraft`, so validation and painting rank
 headings the same way. Every value is a closed enum or a clamped integer, so
 no blueprint text reaches CSS.
 
-**Title headings use the grammar's own rule.** `planFrames` walks the paint
-plan with `resolveMeta`/`resolveNestedRole` from
-`@texuli/catalog/render/grammar`, the lookup `checkCompositionGrammar` uses:
+**Title headings use the grammar's own rule.** `planOutline` (and
+`planFrames`, its frames) walks the paint plan with
+`resolveMeta`/`resolveNestedRole` from `@texuli/catalog/render/grammar`, the
+lookup `checkCompositionGrammar` uses:
 - page, doc and deck titles are h1;
 - card and slide titles are one rank below the nearest titled frame around
   them (capped at h6);
+- flow, geo and part-whole chart titles (`titleHeading: 'figure'`) are one
+  rank below the nearest titled frame or card too, and h3 with none
+  (D-G-020); the player hands each chart its rank through
+  `@texuli/charts/heading` (Svelte context, never a prop);
 - an untitled frame opens no section.
 
 The painted rank is therefore the rank validation checked. Frame ids are

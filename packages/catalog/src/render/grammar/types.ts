@@ -47,11 +47,14 @@ export interface GrammarComponentMeta {
   headingBlockProp?: string;
   /**
    * The node renders a non-empty `title` prop as a heading: at this fixed
-   * rank, or `nested` for one rank below the nearest titled frame or card
-   * around it. A titled `nested` or rank-1 node also sets that rank for the
-   * headings nested inside it.
+   * rank, `nested` for one rank below the nearest titled frame or card
+   * around it, or `figure` for one rank below the nearest titled frame or
+   * card too, but h3 (`FIGURE_TITLE_FALLBACK`) when nothing titled is
+   * around it (a fragment, a slide), and without ranking anything below it
+   * (a chart: its host sets the rank, D-G-020). A titled `nested` or rank-1
+   * node also sets that rank for the headings nested inside it.
    */
-  titleHeading?: 1 | 2 | 3 | 4 | 5 | 6 | 'nested';
+  titleHeading?: 1 | 2 | 3 | 4 | 5 | 6 | 'nested' | 'figure';
   /** Landmark kind when `role` is `landmark` (or container that is a landmark). */
   landmark?: GrammarLandmark;
   /**

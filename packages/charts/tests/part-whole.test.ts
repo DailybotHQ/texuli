@@ -332,16 +332,21 @@ describe('part-whole charts', () => {
           filename: file,
           css: 'external',
         }).css?.code;
-        // Family contract shared with cartesian / histogram / calendar: 1rem h3
-        // and a spaced description. No bare h2 figure titles.
+        // Family contract shared with histogram / calendar: a 1rem title and a
+        // spaced description. The title is h3 unless its host ranks it (the
+        // player: one below the nearest titled section, D-G-020), so the style
+        // covers every rank a host can set, and no rank is hard-coded: no bare
+        // h2 figure titles outside a host that sets one (tests/heading.test.ts).
         expect(css, file).toMatch(
-          /figcaption[^{]*h3[^{]*\{[^}]*font-size:\s*var\(--tx-type-body-size\)/
+          /figcaption[^{]*:is\(h2[^{]*h3[^{]*h6[^{]*\)\s*\{[^}]*font-size:\s*var\(--tx-type-body-size\)/
         );
-        expect(css, file).toMatch(/figcaption[^{]*h3[^{]*\{[^}]*margin-block:\s*0/);
+        expect(css, file).toMatch(
+          /figcaption[^{]*:is\(h2[^{]*h3[^{]*h6[^{]*\)\s*\{[^}]*margin-block:\s*0/
+        );
         expect(css, file).toMatch(
           /figcaption[^{]*p[^{]*\{[^}]*margin-block:\s*var\(--tx-space-1\)\s+var\(--tx-space-3\)/
         );
-        expect(source, file).not.toMatch(/<h2[\s>]/);
+        expect(source, file).not.toMatch(/<h[23][\s>]/);
       }
     }
   }, 20_000);

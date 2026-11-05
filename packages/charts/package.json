@@ -79,6 +79,10 @@
       "svelte": "./src/geo/index.ts",
       "default": "./src/geo/index.ts"
     },
+    "./heading": {
+      "types": "./src/heading/index.ts",
+      "default": "./src/heading/index.ts"
+    },
     "./histogram": {
       "types": "./src/histogram/index.ts",
       "svelte": "./src/histogram/index.ts",
