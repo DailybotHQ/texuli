@@ -40,7 +40,7 @@ export const OUTPUT_SECTIONS: readonly OutputSection[] = [
     id: 'i18n',
     title: 'Every label from one message catalog',
     summary:
-      'Component labels resolve through @texuli/core/i18n: an instance prop first, then the catalog in context, then the English default next to the component. Locales load lazily, plurals and selects follow Intl, and catalogs from outside are validated. English is the only language Texuli ships; translations beyond English are planned, and hosts can load their own catalogs today.',
+      'Component labels resolve through @texuli/core/i18n: an instance prop first, then the catalog in context, then the English default next to the component. Locales load lazily, plurals and selects follow Intl, and catalogs from outside are validated. English is the default, and opt-in Spanish catalogs ship from 0.14.3; other translations are planned, and hosts can load their own catalogs today.',
   },
   {
     id: 'safety',

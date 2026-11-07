@@ -5,7 +5,8 @@
 **Packages:** `@texuli/tools/email`, `@texuli/tools/print`, `@texuli/player`
 (print mode), `@texuli/core/i18n`, `texuli` and `@texuli/primitives`
 labels; all new in `0.8.0` (the published `0.7.0` is without them);
-English is the only shipped language, translations beyond English are planned
+English is the default, opt-in Spanish catalogs ship from `0.14.3`, other
+translations are planned
 **Tests:** `apps/website/tests/site-output.test.ts`, `tests/e2e/site-output.spec.ts`
 
 ## Goal

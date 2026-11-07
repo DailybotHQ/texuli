@@ -1,6 +1,6 @@
 /**
  * /output-page/ (PLAN_010 T-site-080): honest status (new in 0.8.0, on
- * npm; English the only shipped language, translations planned),
+ * npm; English the default, opt-in Spanish from 0.14.3, other translations planned),
  * fictional data, no HTML sink anywhere in the site's output code (the
  * email is shown as text or as a static file in a sandboxed frame, never
  * through srcdoc or innerHTML), lazy islands, the drafts rendering and
@@ -55,9 +55,12 @@ describe('output page: copy and safety', () => {
     expect(copy).toContain('@texuli/core/i18n · new in ${OUTPUT_RELEASE}');
     expect(copy).toContain('<code>0.7.0</code> and earlier are without them');
     const i18n = OUTPUT_SECTIONS.find((entry) => entry.id === 'i18n')?.summary ?? '';
-    expect(i18n).toContain('English is the only language Texuli ships');
-    expect(i18n).toContain('translations beyond English are planned');
-    expect(read('components/output-site/locales/es.ts')).toContain('Texuli ships English only');
+    expect(i18n).toContain('English is the default');
+    expect(i18n).toContain('opt-in Spanish catalogs ship from 0.14.3');
+    expect(i18n).toContain('other translations are planned');
+    expect(read('components/output-site/locales/es.ts')).toContain(
+      'opt-in Spanish catalogs from 0.14.3'
+    );
     for (const [path, source] of SOURCES) {
       expect(source, path).not.toMatch(
         /not (?:yet )?published to npm|coming in 0\.8|unreleased|production[- ]ready/i

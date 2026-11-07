@@ -17,7 +17,7 @@ layouts for dashboards, marketing pages, auth and settings, content and
 mobile.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.14.2`, a pre-1.0 release (1.0.0 will be the first
+> published to npm as `0.14.3`, a pre-1.0 release (1.0.0 will be the first
 > stable release). Under 0.x, a new minor (`0.14.0`) may contain breaking
 > changes, so pin the exact version or use `^0.14.0`, which accepts only 0.14.x.
 
@@ -154,8 +154,8 @@ Ships in `0.8.0`; the `0.7.0` release predates it: component labels resolve thro
 `@texuli/core/i18n` message catalog (ADR-016). `setI18nContext(i18n)` puts
 a catalog in context, `useMessages()` is the lookup components read, and
 `TEXULI_MESSAGES_EN` lists every label id with its English default; label
-props keep winning, and English stays the only shipped language
-(translations beyond English are planned)
+props keep winning, and English is the default (opt-in Spanish catalogs
+from `0.14.3`; other translations are planned)
 ([i18n](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/i18n.md)).
 
 ## Labels and locale
