@@ -43,6 +43,7 @@ const SUBPATH_DOCS: Record<string, { doc: string; entry?: string; component?: st
   './export': { doc: 'docs/export.md', entry: 'src/export/index.ts' },
   './host': { doc: 'docs/host.md', entry: 'src/host/index.ts' },
   './host-core': { doc: 'docs/host.md', entry: 'src/host/core.ts' },
+  './i18n/es': { doc: 'docs/i18n.md', entry: 'src/i18n/es.ts' },
   './styles.css': { doc: 'docs/styles.md' },
 };
 const PLANNED: string[] = [];

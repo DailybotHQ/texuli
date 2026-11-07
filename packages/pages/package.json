@@ -85,6 +85,10 @@
       "svelte": "./src/collab/core.ts",
       "default": "./src/collab/core.ts"
     },
+    "./i18n/es": {
+      "types": "./src/i18n/es.ts",
+      "default": "./src/i18n/es.ts"
+    },
     "./styles.css": "./src/styles.css"
   },
   "scripts": {
