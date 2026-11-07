@@ -1,0 +1,39 @@
+/**
+ * The scrim behind Dialog, AlertDialog, Sheet and ResponsiveModal: one rule
+ * for both overlays (UG-36). Each component stylesheet sets --tx-scrim-alpha
+ * on its overlay from its own opacity token (--tx-dialog-scrim-opacity,
+ * --tx-sheet-scrim-opacity); this file paints it. Imported before the
+ * component stylesheets, and it owns every overlay background (forced colors
+ * included), so no rule elsewhere depends on the import order.
+ */
+@layer tx.components {
+  .tx-dialog__overlay,
+  .tx-sheet-overlay {
+    /* The theme's scrim color (--tx-scrim, dark in light and dark modes) at the
+       scrim opacity: relative color syntax drops the token's own alpha, so the
+       opacity tokens alone set the strength (D-G-048). Engines without
+       relative colors mix the token as is, so its alpha makes them fainter. */
+    background: color-mix(in srgb, var(--tx-scrim, rgb(0 0 0)) var(--tx-scrim-alpha), transparent);
+    /* Host hook (UG-30): a backdrop-filter value, e.g. blur(8px). none by default. */
+    backdrop-filter: var(--tx-scrim-blur, none);
+  }
+
+  @supports (color: rgb(from red r g b)) {
+    .tx-dialog__overlay,
+    .tx-sheet-overlay {
+      background: rgb(from var(--tx-scrim, rgb(0 0 0)) r g b / var(--tx-scrim-alpha));
+    }
+  }
+
+  @media (forced-colors: active) {
+    .tx-dialog__overlay {
+      background: CanvasText;
+      opacity: 0.35;
+    }
+
+    .tx-sheet-overlay {
+      background: Canvas;
+      opacity: 0.6;
+    }
+  }
+}

@@ -11,24 +11,8 @@
 @layer tx.components {
   .tx-dialog__overlay {
     box-sizing: border-box;
-    /* The theme's scrim color (--tx-scrim, dark in light and dark modes) at the
-       scrim opacity: relative color syntax drops the token's own alpha, so the
-       opacity tokens alone set the strength (D-G-048). Engines without
-       relative colors mix the token as is, so its alpha makes them fainter. */
-    background: color-mix(
-      in srgb,
-      var(--tx-scrim, rgb(0 0 0)) var(--tx-dialog-scrim-opacity, var(--tx-opacity-scrim)),
-      transparent
-    );
-  }
-
-  @supports (color: rgb(from red r g b)) {
-    .tx-dialog__overlay {
-      background: rgb(
-        from var(--tx-scrim, rgb(0 0 0)) r g b /
-        var(--tx-dialog-scrim-opacity, var(--tx-opacity-scrim))
-      );
-    }
+    /* Painted by internal/scrim.css, shared with the sheet overlay. */
+    --tx-scrim-alpha: var(--tx-dialog-scrim-opacity, var(--tx-opacity-scrim));
   }
 
   .tx-dialog,
@@ -265,11 +249,6 @@
   }
 
   @media (forced-colors: active) {
-    .tx-dialog__overlay {
-      background: CanvasText;
-      opacity: 0.35;
-    }
-
     .tx-dialog,
     .tx-alert-dialog {
       border-color: CanvasText;

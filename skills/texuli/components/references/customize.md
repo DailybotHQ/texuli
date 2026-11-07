@@ -53,6 +53,12 @@ them, and every component exposes stable hooks:
 </style>
 ```
 
+Keep `:global()`: a plain scoped `.checkout {}` never reaches the Button's
+root (it lacks your component's scope hash), and Svelte warns only when no
+element of your own has the class. Scope it under a local wrapper instead:
+`.toolbar :global(.checkout)`. `Button` has no unstyled variant; for
+near-native buttons use `variant="ghost"` (or `link`, no padding).
+
 Use logical properties (`inline-size`, `padding-inline`), and keep focus
 styles visible.
 

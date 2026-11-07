@@ -2,6 +2,7 @@ import { type ClassValue, cx } from '../../internal/cx.ts';
 import { variants } from '../../internal/variants.ts';
 // The recipe carries its styles: a consumer that composes the primitive with
 // these classes (without the styled component) still gets the CSS.
+import '../../internal/scrim.css';
 import './dialog.css';
 
 export const DIALOG_SIZES = ['sm', 'md', 'lg', 'xl'] as const;

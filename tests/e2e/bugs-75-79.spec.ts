@@ -13,6 +13,9 @@ import { expect, type Page, test } from '@playwright/test';
  *     content in the same frame (0s durations and delays).
  * G79 with a host `[hidden] { display: none !important }`, the lazy avatar
  *     image still loads and replaces the initials.
+ * UG-51 (0.14.2) a side Sheet, a side Drawer and a DetailPanel with short
+ *     content fill the viewport height; a contained DetailPanel fills its
+ *     pane (`?case=panels`).
  */
 
 async function open(page: Page, query: string): Promise<void> {
@@ -199,4 +202,40 @@ test('G79: the lazy avatar image loads under a host [hidden] { display: none !im
   // One accessible name, on the avatar root; the image adds none.
   await expect(page.getByRole('img', { name: 'Ada Example' })).toHaveCount(1);
   await expect(image).toBeVisible();
+});
+
+test('UG-51: side sheets fill the viewport height and a contained DetailPanel fills its pane', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1024, height: 700 });
+  await open(page, 'case=panels');
+  const viewport = 700;
+  for (const [trigger, title, close] of [
+    ['Open filters', 'Filters', 'Done'],
+    ['Open cart', 'Cart', 'Close cart'],
+    ['Show order', 'Order orbit-001', 'Close order'],
+  ] as const) {
+    await page.getByRole('button', { name: trigger }).click();
+    const panel = page.getByRole('dialog', { name: title });
+    await expect(panel).toBeVisible();
+    const box = await panel.boundingBox();
+    if (!box) throw new Error(`${title} not rendered`);
+    // Short content, yet the whole block size: top edge to bottom edge.
+    expect(Math.round(box.y), title).toBe(0);
+    expect(Math.round(box.height), title).toBe(viewport);
+    await panel.getByRole('button', { name: close }).click();
+    await expect(panel).toBeHidden();
+  }
+
+  await page.getByRole('button', { name: 'Show pane details' }).click();
+  const contained = page.getByRole('dialog', { name: 'Pane details' });
+  await expect(contained).toBeVisible();
+  const paneBox = await page.locator('[data-pane]').boundingBox();
+  const panelBox = await contained.boundingBox();
+  if (!paneBox || !panelBox) throw new Error('pane or panel not rendered');
+  // Inside the pane's border (1px), as tall as its padding box.
+  expect(Math.round(panelBox.y)).toBe(Math.round(paneBox.y + 1));
+  expect(Math.round(panelBox.height)).toBe(Math.round(paneBox.height - 2));
+  expect(panelBox.x).toBeGreaterThanOrEqual(paneBox.x);
+  expect(panelBox.x + panelBox.width).toBeLessThanOrEqual(paneBox.x + paneBox.width + 0.5);
 });
