@@ -98,6 +98,41 @@ describe('sidebar', () => {
       expect(nav?.hasAttribute('data-collapsed')).toBe(false);
     });
 
+    it('draws item.icon without an itemIcon snippet and reads badgeLabel in the link name', async () => {
+      const sections = [
+        {
+          items: [
+            {
+              id: 'inbox',
+              label: 'Inbox',
+              href: 'https://example.com/inbox',
+              icon: 'inbox',
+              badge: 3,
+              badgeLabel: '3 unread',
+            },
+            { id: 'notes', label: 'Notes', href: 'https://example.com/notes' },
+          ],
+        },
+      ];
+      for (const collapsed of [false, true]) {
+        const { container } = render(SidebarHarness, { props: { sections, collapsed } });
+        await waitFor(() =>
+          expect(container.querySelector('[data-tx-nav-icon="inbox"]')).not.toBeNull()
+        );
+        const inbox = screen.getByRole('link', { name: /^Inbox\s*\(3 unread\)$/ });
+        expect(inbox.querySelector('[data-tx-nav-icon="inbox"]')).not.toBeNull();
+        // Items without an icon keep their initials.
+        const notes = screen.getByRole('link', { name: /^Notes/ });
+        expect(notes.querySelector('.tx-sidebar__icon')?.textContent?.trim()).toBe('NO');
+        if (!collapsed) {
+          const badge = inbox.querySelector('.tx-sidebar__badge');
+          expect(badge?.textContent).toBe('3');
+          expect(badge?.getAttribute('aria-hidden')).toBe('true');
+        }
+        cleanup();
+      }
+    });
+
     it('strips unsafe hrefs via the URL policy', () => {
       render(SidebarHarness);
       const blocked = screen.getByText('Blocked').closest('[data-tx-sidebar-item]');

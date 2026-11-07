@@ -1,0 +1,25 @@
+/**
+ * IconButton badge (`badge` prop): a count on the end corner, drawn from
+ * `data-tx-badge` as generated content, so it is decorative; `badgeLabel`
+ * names it. Only IconButton imports this file. @layer tx.components; logical
+ * properties; colors from --tx-* tokens. Kept literals: the -0.25rem corner
+ * offset and the 1rem badge box are geometry, not design tokens.
+ */
+@layer tx.components {
+  .tx-button[data-tx-badge]::after {
+    content: attr(data-tx-badge);
+    position: absolute;
+    inset-block-start: -0.25rem;
+    inset-inline-end: -0.25rem;
+    min-inline-size: 1rem;
+    padding-inline: var(--tx-space-1);
+    border-radius: var(--tx-shape-radius-full);
+    background: var(--tx-icon-button-badge-bg, var(--tx-primary, Highlight));
+    color: var(--tx-icon-button-badge-fg, var(--tx-primary-foreground, HighlightText));
+    font-size: var(--tx-type-caption-size);
+    font-variant-numeric: tabular-nums;
+    line-height: 1rem;
+    text-align: center;
+    pointer-events: none;
+  }
+}

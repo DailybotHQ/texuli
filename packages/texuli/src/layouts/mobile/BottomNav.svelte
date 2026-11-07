@@ -57,6 +57,7 @@ const label = $derived(labelProp ?? msg('texuli.bottom-nav.label', 'Primary'));
           class="tx-mobile-tabs__tab"
           href={safeHref(item.href, hrefTrust)}
           aria-current={bottomNavCurrent(item)}
+          aria-label={item.badgeLabel && `${item.label} (${item.badgeLabel})`}
           data-tx-bottom-nav-item={item.id ?? item.href}
           onclick={onSelect ? (event) => onSelect(item, event) : undefined}
         >

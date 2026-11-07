@@ -4,6 +4,7 @@ import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue } from '../../internal/cx.ts';
+import type { NavIconRef } from '../../layouts/host/nav-model.ts';
 import { VisuallyHidden } from '../separator-aspect/index.ts';
 import { Tooltip } from '../tooltip/index.ts';
 import type { SidebarChildItem, SidebarItem, SidebarSection } from './types.ts';
@@ -32,7 +33,10 @@ type Props = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
   /** Brand / workspace slot. */
   header?: Snippet<[{ collapsed: boolean }]>;
   footer?: Snippet<[{ collapsed: boolean }]>;
-  /** Optional leading icon per item. */
+  /**
+   * Optional leading icon per item. Without it, an item's `icon` (a nav icon
+   * name or a Svelte icon component) is drawn, then its two-letter initials.
+   */
   itemIcon?: Snippet<[item: SidebarItem, collapsed: boolean]>;
   /**
    * Show the leading icon box when expanded (default `true`). Docs-style text
@@ -87,6 +91,19 @@ function currentOf(item: SidebarItem): 'page' | 'true' | undefined {
 const isActive = (item: SidebarItem) => Boolean(item.active || item.current);
 const groups = $derived<readonly SidebarSection[]>(sections ?? (items ? [{ items }] : []));
 
+// Item glyphs load on demand: the nav icon map stays out of the sidebar
+// chunk until an item has an `icon` and no `itemIcon` snippet draws it.
+let NavIcon = $state.raw<typeof import('../../layouts/host/NavIcon.svelte').default>();
+$effect(() => {
+  if (
+    !itemIcon &&
+    groups.some((group) =>
+      group.items.some((item) => item.icon || item.children?.some((child) => child.icon))
+    )
+  )
+    import('../../layouts/host/NavIcon.svelte').then((module) => (NavIcon = module.default));
+});
+
 const rootClass = $derived(
   sidebarClass({
     variant,
@@ -110,105 +127,76 @@ function hrefOf(item: Pick<SidebarItem, 'href'>): string | undefined {
 }
 </script>
 
+{#snippet icon(item: SidebarItem | SidebarChildItem, rail: boolean)}
+  <span class="tx-sidebar__icon" aria-hidden="true">
+    {#if itemIcon}
+      {@render itemIcon(item, rail)}
+    {:else if item.icon && NavIcon}
+      <NavIcon icon={item.icon as NavIconRef} />
+    {:else}
+      {shortOf(item)}
+    {/if}
+  </span>
+{/snippet}
+
+{#snippet badge(item: SidebarItem | SidebarChildItem, rail: boolean)}
+  {#if item.badge !== undefined}
+    {#if rail}
+      <span class="tx-sidebar__badge-dot" aria-hidden="true"></span>
+    {:else}
+      <span class="tx-sidebar__badge" aria-hidden={item.badgeLabel ? 'true' : undefined}>{item.badge}</span>
+    {/if}
+    {#if rail || item.badgeLabel}
+      <VisuallyHidden>({item.badgeLabel ?? item.badge})</VisuallyHidden>
+    {/if}
+  {/if}
+{/snippet}
+
+{#snippet link(item: SidebarItem | SidebarChildItem, href: string | undefined, props: object)}
+  <!-- A disabled or href-less item is a span with role="link" and aria-disabled. -->
+  <svelte:element
+    this={href ? 'a' : 'span'}
+    {...props}
+    {href}
+    class={sidebarItemClass({
+      active: isActive(item),
+      collapsed: isCollapsed,
+      disabled: Boolean(item.disabled),
+    })}
+    role={href ? undefined : 'link'}
+    aria-disabled={href ? undefined : 'true'}
+    aria-current={href ? currentOf(item) : undefined}
+    data-tx-sidebar-item
+    data-active={href && isActive(item) ? '' : undefined}
+  >
+    {#if isCollapsed || showIcons}
+      {@render icon(item, isCollapsed)}
+    {/if}
+    {#if isCollapsed}
+      <VisuallyHidden>{item.label}</VisuallyHidden>
+    {:else}
+      <span class="tx-sidebar__label">{item.label}</span>
+    {/if}
+    {#if href || !isCollapsed}
+      {@render badge(item, isCollapsed)}
+    {/if}
+  </svelte:element>
+{/snippet}
+
 {#snippet node(item: SidebarItem | SidebarChildItem)}
-  {@const href = hrefOf(item)}
-  {@const itemClass = sidebarItemClass({
-    active: isActive(item),
-    collapsed: isCollapsed,
-    disabled: Boolean(item.disabled),
-  })}
+  {@const href = item.disabled ? undefined : hrefOf(item)}
   {#if isCollapsed}
     <Tooltip content={item.label} side="right" disabled={item.disabled}>
       {#snippet children({ props })}
-        {#if href && !item.disabled}
-          <a
-            {...props}
-            {href}
-            class={itemClass}
-            aria-current={currentOf(item)}
-            data-tx-sidebar-item
-            data-active={isActive(item) ? '' : undefined}
-          >
-            <span class="tx-sidebar__icon" aria-hidden="true">
-              {#if itemIcon}
-                {@render itemIcon(item, true)}
-              {:else}
-                {shortOf(item)}
-              {/if}
-            </span>
-            <VisuallyHidden>{item.label}</VisuallyHidden>
-            {#if item.badge !== undefined}
-              <span class="tx-sidebar__badge-dot" aria-hidden="true"></span>
-              <VisuallyHidden>({item.badge})</VisuallyHidden>
-            {/if}
-          </a>
-        {:else}
-          <span
-            {...props}
-            class={itemClass}
-            role="link"
-            aria-disabled="true"
-            data-tx-sidebar-item
-          >
-            <span class="tx-sidebar__icon" aria-hidden="true">
-              {#if itemIcon}
-                {@render itemIcon(item, true)}
-              {:else}
-                {shortOf(item)}
-              {/if}
-            </span>
-            <VisuallyHidden>{item.label}</VisuallyHidden>
-          </span>
-        {/if}
+        {@render link(item, href, props)}
       {/snippet}
     </Tooltip>
-  {:else if href && !item.disabled}
-    <a
-      {href}
-      class={itemClass}
-      aria-current={currentOf(item)}
-      data-tx-sidebar-item
-      data-active={isActive(item) ? '' : undefined}
-    >
-      {#if showIcons}
-        <span class="tx-sidebar__icon" aria-hidden="true">
-          {#if itemIcon}
-            {@render itemIcon(item, false)}
-          {:else}
-            {shortOf(item)}
-          {/if}
-        </span>
-      {/if}
-      <span class="tx-sidebar__label">{item.label}</span>
-      {#if item.badge !== undefined}
-        <span class="tx-sidebar__badge">{item.badge}</span>
-      {/if}
-    </a>
-  {:else if item.children?.length}
+  {:else if !href && item.children?.length}
     <span class="tx-sidebar__item tx-sidebar__item--parent">
       <span class="tx-sidebar__label">{item.label}</span>
     </span>
   {:else}
-    <span
-      class={itemClass}
-      role="link"
-      aria-disabled="true"
-      data-tx-sidebar-item
-    >
-      {#if showIcons}
-        <span class="tx-sidebar__icon" aria-hidden="true">
-          {#if itemIcon}
-            {@render itemIcon(item, false)}
-          {:else}
-            {shortOf(item)}
-          {/if}
-        </span>
-      {/if}
-      <span class="tx-sidebar__label">{item.label}</span>
-      {#if item.badge !== undefined}
-        <span class="tx-sidebar__badge">{item.badge}</span>
-      {/if}
-    </span>
+    {@render link(item, href, {})}
   {/if}
 {/snippet}
 

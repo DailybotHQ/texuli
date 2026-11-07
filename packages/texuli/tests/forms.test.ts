@@ -428,6 +428,17 @@ describe('button', () => {
       expect(button.className).toContain('tx-button--icon');
       expect(button.getAttribute('aria-label')).toBe('Close dialog');
     });
+
+    it('draws badge as decoration and reads badgeLabel in the accessible name', () => {
+      const { getByRole } = render(IconButtonHarness, {
+        props: { label: 'Inbox', badge: 3, badgeLabel: '3 unread' },
+      });
+      const button = getByRole('button', { name: 'Inbox (3 unread)' });
+      expect(button.getAttribute('data-tx-badge')).toBe('3');
+      cleanup();
+      const plain = render(IconButtonHarness, { props: { label: 'Inbox', badge: 3 } });
+      expect(plain.getByRole('button', { name: 'Inbox' }).getAttribute('data-tx-badge')).toBe('3');
+    });
   });
 });
 

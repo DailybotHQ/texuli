@@ -72,6 +72,13 @@ contract (element defaults before `tx.base`; never unlayered global `a {}`).
 - Focus-visible ring from tokens
 - Disabled / busy block activation; busy keeps focus (`aria-disabled`, not native `disabled`)
 - IconButton requires `label` → `aria-label`
+- IconButton `badge` (a count or short status) draws a small decorative badge
+  on the end corner (CSS generated content from `data-tx-badge`); its
+  `badgeLabel` (`3 unread`) joins the name: `aria-label="Inbox (3 unread)"`.
+  Without `badgeLabel` the name stays `label`, so set it whenever the badge
+  carries information. Hooks: `--tx-icon-button-badge-bg` and
+  `--tx-icon-button-badge-fg` (default `--tx-primary` and
+  `--tx-primary-foreground`).
 - Forced-colors border fallbacks
 - Reduced motion stops the spinner animation
 
