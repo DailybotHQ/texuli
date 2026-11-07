@@ -45,7 +45,7 @@ floating content, groups, optional descriptions and leading icons.
 
 | Part | Role |
 | --- | --- |
-| `Root` | `value`, `open`, `items`, `name`, `size`, `variant` |
+| `Root` | `value`, `open`, `items`, `name`, `size`, `variant`, `block` |
 | `Trigger` | Combobox button with chevron |
 | `Value` | Selected label or placeholder |
 | `Content` | Floating listbox surface |
@@ -62,8 +62,16 @@ visible text, as in the example above, or `aria-label`).
 
 | Prop | Values |
 | --- | --- |
-| `variant` | `outline` (default), `soft` |
+| `variant` | `outline` (default), `soft`, `ghost` |
 | `size` | `sm`, `md`, `lg` |
+| `block` (Root) | `true` makes the field full width: the root and its trigger fill the container's inline size (default `false`) |
+
+`ghost` (new in `0.14.2`) has no border and no fill until hover (`--tx-muted`);
+the chevron stays, and focus and the open state keep the ring. Set it per
+instance on `Select.Root` and `Select.Trigger`. A design system cannot make
+it the default yet: `defaults.select.variant` accepts `outline` and `soft`
+(`SELECT_VARIANTS`), and `ghost` joins them with the next blueprint spec
+version.
 
 ## Rules
 

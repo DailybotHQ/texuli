@@ -7,8 +7,14 @@ import './select.css';
 export const SELECT_SIZES = ['sm', 'md', 'lg'] as const;
 export type SelectSize = (typeof SELECT_SIZES)[number];
 
+/** The variants a design system may set as the Select default (`defaults.select.variant`). */
 export const SELECT_VARIANTS = ['outline', 'soft'] as const;
-export type SelectVariant = (typeof SELECT_VARIANTS)[number];
+/**
+ * Trigger variants. `ghost` (borderless and transparent until hover) is set
+ * per instance; it joins the design-system defaults with the next blueprint
+ * spec version.
+ */
+export type SelectVariant = (typeof SELECT_VARIANTS)[number] | 'ghost';
 
 export const selectTriggerClass = variants({
   base: 'tx-select-trigger',
@@ -21,6 +27,7 @@ export const selectTriggerClass = variants({
     variant: {
       outline: 'tx-select-trigger--outline',
       soft: 'tx-select-trigger--soft',
+      ghost: 'tx-select-trigger--ghost',
     },
   },
   defaultVariants: {

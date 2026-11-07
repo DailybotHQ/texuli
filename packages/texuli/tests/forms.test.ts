@@ -677,6 +677,18 @@ describe('select', () => {
       expect(within(listbox).getByRole('group', { name: 'Plans' })).toBeTruthy();
     });
 
+    it('fills the inline size with block and draws the ghost trigger variant', () => {
+      const view = render(SelectFixture, { props: { variant: 'ghost', block: true } });
+      const root = view.container.querySelector('[data-tx-select-root]');
+      expect(root?.hasAttribute('data-block')).toBe(true);
+      const trigger = view.container.querySelector('[data-tx-select-trigger]');
+      expect(trigger?.classList.contains('tx-select-trigger--ghost')).toBe(true);
+      expect(trigger?.getAttribute('data-variant')).toBe('ghost');
+      cleanup();
+      const plain = render(SelectFixture);
+      expect(plain.container.querySelector('[data-block]')).toBeNull();
+    });
+
     it('keeps the separator out of the listbox semantics', async () => {
       render(SelectFixture, { props: { open: true, value: 'free' } });
       const listbox = await screen.findByRole('listbox');
