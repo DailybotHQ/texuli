@@ -120,6 +120,10 @@
       "svelte": "./src/i18n/index.ts",
       "default": "./src/i18n/index.ts"
     },
+    "./i18n/es": {
+      "types": "./src/i18n/es.ts",
+      "default": "./src/i18n/es.ts"
+    },
     "./icons": {
       "types": "./src/components/icons/index.ts",
       "svelte": "./src/components/icons/index.ts",
