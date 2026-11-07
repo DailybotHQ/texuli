@@ -41,6 +41,9 @@ Wraps `@texuli/primitives/toggle`. Logical CSS. No static `style=`.
   group element, and `bind:ref` binds it.
 - The Tab stop starts on the first pressed item, for `single` and `multiple`
   groups alike (no pressed item: the first enabled one).
+- `deselectable` (`single` groups, default `true`): pressing the pressed item
+  clears the value. Set `deselectable={false}` for a segmented control that
+  always keeps one value once chosen.
 
 ```svelte
 <form>
@@ -56,6 +59,16 @@ Wraps `@texuli/primitives/toggle`. Logical CSS. No static `style=`.
 - `variant`: `default` \| `outline`
 - `size`: `sm` \| `md` \| `lg`
 - Group `orientation`: `horizontal` \| `vertical`
+
+### CSS hooks
+
+Set on the toggle, the group or any ancestor; each falls back to what the
+pressed state draws today:
+
+- `--tx-toggle-on-bg` (`--tx-accent`, then `--tx-primary`): pressed fill;
+- `--tx-toggle-on-fg` (`--tx-accent-foreground`): pressed text and icon;
+- `--tx-toggle-on-border` (`--tx-accent`): pressed border of `outline` items
+  and wrapped chips.
 
 ## Example
 

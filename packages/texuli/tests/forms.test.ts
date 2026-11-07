@@ -1140,6 +1140,25 @@ describe('toggle', () => {
       await fireEvent.click(right);
       expect(right.getAttribute('aria-pressed')).toBe('true');
     });
+
+    it('clears a single value on a second press unless deselectable is false', async () => {
+      for (const [deselectable, after] of [
+        [undefined, 'false'],
+        [true, 'false'],
+        [false, 'true'],
+      ] as const) {
+        render(ToggleHarness, { props: { mode: 'group-single', deselectable } });
+        const center = screen.getByRole('button', { name: 'Center' });
+        await fireEvent.click(center);
+        expect(center.getAttribute('aria-pressed')).toBe('true');
+        await fireEvent.click(center);
+        expect(center.getAttribute('aria-pressed'), String(deselectable)).toBe(after);
+        // Another item still moves the value.
+        await fireEvent.click(screen.getByRole('button', { name: 'Left' }));
+        expect(center.getAttribute('aria-pressed')).toBe('false');
+        cleanup();
+      }
+    });
   });
 });
 
