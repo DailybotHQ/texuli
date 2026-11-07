@@ -15,6 +15,13 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.3.22] — 2026-11-07
+
+### Changes
+
+- chore(skill): packages on npm at 0.14.2
+- docs(skill): why the customize recipe keeps :global() for component classes
+
 - The packages are on npm at `0.14.2`, a patch: timeline `formatTick` and
   `initialDate`, `ToggleGroup` `deselectable`, `Select` `block` and
   `ghost`, sidebar icons and badge labels, an `IconButton` badge, new CSS
