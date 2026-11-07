@@ -36,8 +36,9 @@
     }
   }
 
+  /* Host hook: --tx-input-placeholder-fg (placeholder text color). */
   .tx-field::placeholder {
-    color: var(--tx-muted-foreground, GrayText);
+    color: var(--tx-input-placeholder-fg, var(--tx-muted-foreground, GrayText));
     opacity: 1;
   }
 
@@ -176,7 +177,7 @@
   }
 
   .tx-input-group__control::placeholder {
-    color: var(--tx-muted-foreground, GrayText);
+    color: var(--tx-input-placeholder-fg, var(--tx-muted-foreground, GrayText));
     opacity: 1;
   }
 

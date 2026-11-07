@@ -200,15 +200,16 @@
     flex: none;
   }
 
+  /* Host hooks: --tx-tabs-badge-bg and --tx-tabs-badge-fg. */
   .tx-tabs__badge {
     display: inline-flex;
     align-items: center;
     padding-inline: calc(var(--tx-space-unit) * 1.5);
     border-radius: var(--tx-shape-radius-full);
-    background-color: var(--tx-background, Canvas);
+    background-color: var(--tx-tabs-badge-bg, var(--tx-background, Canvas));
     font-size: var(--tx-type-caption-size);
     font-variant-numeric: tabular-nums;
-    color: var(--tx-muted-foreground, GrayText);
+    color: var(--tx-tabs-badge-fg, var(--tx-muted-foreground, GrayText));
   }
 
   .tx-tabs__sr-only {
