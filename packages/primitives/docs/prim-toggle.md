@@ -23,6 +23,15 @@ aligned with the WAI-ARIA Authoring Practices toggle button pattern.
 | --- | --- |
 | `pressed` / `defaultPressed` | Controlled or uncontrolled pressed state |
 | `onPressedChange` | Fires when the user toggles |
+
+Controlled state comes in two forms. `bind:pressed` alone: the toggle writes
+the new value back. `pressed={value}` with `onPressedChange`: the handler owns
+the state; the toggle reports the change and keeps rendering the `pressed` it
+is given, so a handler that ignores the change keeps `aria-pressed` as it was
+(UG-27, 0.14.2). With both `bind:pressed` and `onPressedChange`, set the value
+in the handler, or use a function binding
+(`bind:pressed={() => on, (next) => { on = next; save(next); }}`).
+`ToggleGroup` follows the same rule for `value` and `onValueChange`.
 | `disabled` | Blocks interaction |
 | `child` | Composition snippet receiving root attrs |
 

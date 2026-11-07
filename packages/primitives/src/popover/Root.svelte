@@ -2,6 +2,7 @@
 import type { OverlayController, OverlayDismissEvent } from '@texuli/core/overlay';
 import type { AnyPlacement } from '@texuli/core/position-math';
 import { type Snippet, setContext } from 'svelte';
+import { focusNeedsReturn } from '../internal/focus-return.ts';
 import type { PopoverContext } from './context.ts';
 import { POPOVER_CONTEXT } from './context.ts';
 import type { PopoverAlign, PopoverSide } from './types.ts';
@@ -129,7 +130,17 @@ const context: PopoverContext = {
   onOverlayOpenChange(next) {
     syncOpen(next);
     if (next && !modal) focusContent();
-    if (!next && !modal && restoreFocusOnClose) triggerElement?.focus({ preventScroll: true });
+    // Only when focus is lost or still inside the closing content: focus the
+    // app already moved elsewhere (another overlay opened in the same handler)
+    // stays, or that overlay would close on focus outside.
+    if (
+      !next &&
+      !modal &&
+      restoreFocusOnClose &&
+      focusNeedsReturn(contentElement, triggerElement)
+    ) {
+      triggerElement?.focus({ preventScroll: true });
+    }
     if (!next) restoreFocusOnClose = true;
   },
   onDismissRequest(event: OverlayDismissEvent) {

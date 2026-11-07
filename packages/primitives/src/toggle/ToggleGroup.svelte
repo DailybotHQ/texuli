@@ -43,8 +43,9 @@ function normalize(v: string | string[]): string[] {
 
 function setValue(next: string | string[]): void {
   if (Object.is(current, next)) return;
-  if (isControlled) value = next;
-  else localValue = next;
+  // Controlled with a handler: report and keep rendering the prop (see Toggle).
+  if (!isControlled) localValue = next;
+  else if (!onValueChange) value = next;
   onValueChange?.(next);
 }
 

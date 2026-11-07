@@ -50,11 +50,15 @@ The primitive supplies no visual theme or backdrop color. Consumers should provi
   marks itself `placed`. Content opens (and takes initial focus) only once
   it is placed, because moving a focused node blurs it in browsers. Before
   this fix, a dialog mounted with `open` (for example a lazily imported
-  command palette) ended with focus on `body`.
+  command palette) ended with focus on `body`. The Overlay (backdrop) waits
+  for `placed` too: shown in the top layer before the move, the move hid it
+  again without an event, so a dialog or sheet mounted open (a deep link)
+  painted no backdrop (UG-31, fixed in 0.14.2).
 - **Tests:** `packages/primitives/tests/overlays.test.ts`
   (`-t dialog-contained-focus`: dialog, alert dialog and sheet), plus the behavior rows
   `contained-backdrop-under-content` and `mounted-open-keeps-focus` in
-  `tests/behavior/scenarios/dialog.spec.ts`.
+  `tests/behavior/scenarios/dialog.spec.ts`, and `tests/e2e/overlays-0142.spec.ts`
+  (UG-31: a texuli Dialog and Sheet mounted open, panel above a painted backdrop).
 
 ## Motion hooks
 
