@@ -25,6 +25,7 @@ const DISPLAY_EXAMPLES = [
   'texuli-icons',
   'texuli-scroll-area',
   'texuli-tree',
+  'texuli-list-item',
 ] as const;
 
 /** Data view examples (including FIX-a11y-deferred set). */
