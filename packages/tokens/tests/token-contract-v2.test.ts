@@ -959,6 +959,7 @@ describe('token contract v2: component registry', () => {
             'defaults',
             'design-system',
             'i18n',
+            'i18n/es',
             'motion',
             'motion/loop',
             'icons/lucide',
