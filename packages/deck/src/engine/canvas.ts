@@ -2,7 +2,10 @@
  * Virtual canvas fit and letterboxing. Independent of browser globals.
  *
  * Aspects: 16:9 → 1280×720, 4:3 → 1024×768, 9:16 → 720×1280, 1:1 → 1080×1080.
- * `fit: 'contain' | 'container'` letterboxes; `cover` fills and may crop.
+ * `fit: 'contain' | 'container'` letterboxes; `cover` fills and may crop;
+ * `reflow` gives a landscape or square deck a narrower, portrait canvas on a
+ * portrait container, so layouts reflow into one column instead of
+ * letterboxing.
  */
 
 export const DECK_ASPECTS = ['16:9', '4:3', '9:16', '1:1'] as const;
@@ -19,7 +22,14 @@ export const DECK_CANVAS = Object.freeze({
 
 export type DeckCanvasSize = Readonly<{ width: number; height: number }>;
 
-export type DeckFitMode = 'contain' | 'cover' | 'container';
+export type DeckFitMode = 'contain' | 'cover' | 'container' | 'reflow';
+
+/**
+ * The canvas inline size of a reflowed slide (`fit: 'reflow'`): the 9:16
+ * canvas width, under the 48rem container query where the catalog layouts
+ * switch to one column.
+ */
+export const DECK_REFLOW_WIDTH = 720;
 
 export interface CanvasFit {
   /** Uniform scale applied to the virtual canvas. */
@@ -49,7 +59,11 @@ export function deckCanvasSize(aspect: unknown = DEFAULT_DECK_ASPECT): DeckCanva
 
 /**
  * Scale and letterbox a virtual canvas inside a container.
- * `container` is an alias of `contain` for embedded decks.
+ * `container` is an alias of `contain` for embedded decks. `reflow` acts as
+ * `contain` unless the container is portrait (taller than wide) and the deck
+ * canvas is not: then the canvas becomes `DECK_REFLOW_WIDTH` wide and as tall
+ * as the container's ratio asks, filling it with no letterbox, and the
+ * result's `fit` is `reflow` (otherwise `contain`).
  */
 export function fitDeckCanvas(
   containerWidth: number,
@@ -61,6 +75,20 @@ export function fitDeckCanvas(
   const canvas = DECK_CANVAS[resolvedAspect];
   const width = Number.isFinite(containerWidth) ? Math.max(0, containerWidth) : 0;
   const height = Number.isFinite(containerHeight) ? Math.max(0, containerHeight) : 0;
+  if (fit === 'reflow' && width > 0 && height > width && canvas.width >= canvas.height) {
+    const scale = width / DECK_REFLOW_WIDTH;
+    return {
+      scale,
+      width,
+      height,
+      offsetX: 0,
+      offsetY: 0,
+      canvasWidth: DECK_REFLOW_WIDTH,
+      canvasHeight: height / scale,
+      aspect: resolvedAspect,
+      fit: 'reflow',
+    };
+  }
   const mode: DeckFitMode =
     fit === 'cover' ? 'cover' : fit === 'container' ? 'container' : 'contain';
   const sx = canvas.width > 0 ? width / canvas.width : 0;
