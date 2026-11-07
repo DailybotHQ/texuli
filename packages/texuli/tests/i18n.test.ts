@@ -2,6 +2,7 @@
 
 import { render, screen } from '@testing-library/svelte';
 import { createI18n, createLabels, isPseudoLocalized, PSEUDO_LOCALE } from '@texuli/core/i18n';
+import { PRIMITIVES_MESSAGES_EN } from '@texuli/primitives';
 import { tick } from 'svelte';
 import { describe, expect, it } from 'vitest';
 import {
@@ -14,8 +15,9 @@ import { DEFAULT_DATE_RANGE_PRESET_LABELS } from '../src/components/date/presets
 import { DEFAULT_FILE_UPLOAD_LABELS } from '../src/components/file-upload/types.ts';
 import { DEFAULT_RATING_LABELS } from '../src/components/rating/rating.ts';
 import { DEFAULT_TIMELINE_MESSAGES } from '../src/components/timeline/types.ts';
+import { TEXULI_LABELS_ES } from '../src/i18n/es.ts';
 import { TEXULI_MESSAGES_EN } from '../src/i18n/index.ts';
-import { Breadcrumb, Pagination, Timeline } from '../src/index.ts';
+import { Breadcrumb, Dialog, Pagination, Timeline } from '../src/index.ts';
 
 const PaginationRoot = Pagination.Root;
 
@@ -146,5 +148,45 @@ describe('texuli labels resolve through @texuli/core/i18n (ADR-016)', () => {
       },
     });
     expect(screen.getByRole('navigation', { name: 'Breadcrumb' })).toBeTruthy();
+  });
+});
+
+describe('texuli/i18n/es: the Spanish catalog for texuli and the primitives', () => {
+  const english = {
+    ...TEXULI_MESSAGES_EN.messages,
+    ...PRIMITIVES_MESSAGES_EN.messages,
+  } as Readonly<Record<string, string>>;
+  const placeholders = (text: string) =>
+    (text.match(/\{[A-Za-z0-9_.-]{1,64}\}/g) ?? []).sort().join();
+
+  it('has every texuli and primitives id, the same placeholders, and no blank label', () => {
+    expect(Object.keys(TEXULI_LABELS_ES).sort()).toEqual(Object.keys(english).sort());
+    expect(Object.isFrozen(TEXULI_LABELS_ES)).toBe(true);
+    const drift = Object.entries(TEXULI_LABELS_ES).filter(
+      ([id, spanish]) =>
+        placeholders(spanish) !== placeholders(english[id] ?? '') || spanish.trim() === ''
+    );
+    expect(drift).toEqual([]);
+  });
+
+  it('renders a Dialog close button and a Pagination in Spanish through setTexuliLabels', () => {
+    render(SetLabelsHarness, {
+      props: {
+        labels: TEXULI_LABELS_ES,
+        component: Dialog as never,
+        props: { open: true, title: 'Ajustes' },
+      },
+    });
+    expect(screen.getByRole('button', { name: 'Cerrar' })).toBeTruthy();
+    render(SetLabelsHarness, {
+      props: {
+        labels: TEXULI_LABELS_ES,
+        component: PaginationRoot as never,
+        props: { page: 2, pageCount: 5 },
+      },
+    });
+    const nav = screen.getByRole('navigation', { name: 'Paginación' });
+    expect(nav.querySelector('[aria-label="Página anterior"]')).not.toBeNull();
+    expect(nav.querySelector('[aria-label="Página siguiente"]')).not.toBeNull();
   });
 });

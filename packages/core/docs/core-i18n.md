@@ -1,8 +1,10 @@
 # Core i18n
 
-> **Status: new in 0.8.0** (ADR-016). English is the only
-> language Texuli ships; translations beyond English are planned. Hosts
-> can load their own catalogs today.
+> **Status: new in 0.8.0** (ADR-016). English is the default; from
+> `0.14.3` opt-in Spanish catalogs ship in `texuli/i18n/es`,
+> `@texuli/blocks/i18n/es` and `@texuli/pages/i18n/es`, not reviewed by a
+> native speaker yet ([texuli i18n](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/i18n.md#spanish-catalogs-es)).
+> Other languages are planned; hosts can load their own catalogs today.
 
 `@texuli/core/i18n` is the message catalog every component label resolves
 through. It is framework-free: `texuli` and `@texuli/primitives` read an

@@ -167,6 +167,10 @@ One label dictionary translates every built-in string of `texuli`,
 new in `0.13.0`).
 A component's own label prop still wins
 ([i18n](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/i18n.md#one-dictionary-for-every-package-adr-026)).
+From `0.14.3`, opt-in Spanish catalogs cover every id: `TEXULI_LABELS_ES`
+(`texuli/i18n/es`, with the primitives), `BLOCKS_LABELS_ES` and
+`PAGES_LABELS_ES`; they have had no native-speaker review yet
+([Spanish catalogs](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/i18n.md#spanish-catalogs-es)).
 
 ## New in 0.6.0
 
