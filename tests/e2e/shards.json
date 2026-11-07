@@ -8,6 +8,7 @@
       "bugs-75-79.spec.ts",
       "canvas.spec.ts",
       "csp-report.spec.ts",
+      "overlays-0142.spec.ts",
       "pages-editor.spec.ts",
       "responsive-sweep.spec.ts",
       "site-docs-shell.spec.ts",
