@@ -85,6 +85,7 @@ The package root exports a `load*Family()` renderer loader and a
 | Code | `code`, with syntax colors from an owned tokenizer | `@texuli/blocks/code`, `@texuli/blocks/code/engine`, `@texuli/blocks/code/tokenizer`, `@texuli/blocks/code/renderers` |
 | Code field | `CodeField`: an editable, syntax-highlighted textarea for forms (`<CodeField bind:value language="ts" />`; new in `0.13.1`) | `@texuli/blocks/code-field` |
 | Labels | `BLOCKS_MESSAGES_EN` (every block label id and its English default) and the `BlocksMessageId` union, for one dictionary set near the root with `setTexuliLabels` or `<LabelsProvider>` from `texuli` (ADR-026) | `@texuli/blocks/i18n` |
+| Spanish labels | `BLOCKS_LABELS_ES`: every block label id in Spanish, opt-in, for `<LabelsProvider>` from `texuli/i18n` (from `0.14.3`; no native-speaker review yet; see the [texuli i18n guide](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/i18n.md#spanish-catalogs-es)) | `@texuli/blocks/i18n/es` |
 
 In each family, the plain subpath is the light API (guards, labels, the lazy
 loader), `/engine` is framework-free logic, and `/renderers` gives you the

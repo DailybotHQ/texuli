@@ -103,6 +103,10 @@
       "types": "./src/i18n/index.ts",
       "default": "./src/i18n/index.ts"
     },
+    "./i18n/es": {
+      "types": "./src/i18n/es.ts",
+      "default": "./src/i18n/es.ts"
+    },
     "./interactive": {
       "types": "./src/interactive/index.ts",
       "default": "./src/interactive/index.ts"
