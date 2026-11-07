@@ -126,9 +126,9 @@ describe('sidebar', () => {
         const notes = screen.getByRole('link', { name: /^Notes/ });
         expect(notes.querySelector('.tx-sidebar__icon')?.textContent?.trim()).toBe('NO');
         if (!collapsed) {
-          const badge = inbox.querySelector('.tx-sidebar__badge');
-          expect(badge?.textContent).toBe('3');
-          expect(badge?.getAttribute('aria-hidden')).toBe('true');
+          // The visible badge stays; the link's aria-label carries badgeLabel.
+          expect(inbox.querySelector('.tx-sidebar__badge')?.textContent).toBe('3');
+          expect(inbox.getAttribute('aria-label')).toBe('Inbox (3 unread)');
         }
         cleanup();
       }
