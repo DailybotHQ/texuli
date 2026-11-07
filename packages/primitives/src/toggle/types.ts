@@ -42,6 +42,12 @@ export type ToggleGroupRootProps = {
   /** Uncontrolled initial value. */
   defaultValue?: string | string[];
   onValueChange?: (value: string | string[]) => void;
+  /**
+   * `single` only: when `false`, pressing the pressed item keeps it pressed,
+   * so the group always holds a value once one is chosen. Default `true`
+   * (pressing the pressed item clears the value).
+   */
+  deselectable?: boolean;
   disabled?: boolean;
   loop?: boolean;
   orientation?: ToggleGroupOrientation;

@@ -11,6 +11,7 @@ let {
   disableRight = false,
   value,
   name,
+  deselectable,
 }: {
   type?: ToggleGroupType;
   onValueChange?: (value: string | string[]) => void;
@@ -19,6 +20,7 @@ let {
   disableRight?: boolean;
   value?: string | string[];
   name?: string;
+  deselectable?: boolean;
 } = $props();
 
 const items = untrack(() =>
@@ -36,7 +38,7 @@ const items = untrack(() =>
 </script>
 
 {#if value === undefined}
-  <ToggleGroup.Root {type} {onValueChange} {rovingFocus} aria-label={label}>
+  <ToggleGroup.Root {type} {onValueChange} {rovingFocus} {deselectable} aria-label={label}>
     {#each items as item (item.value)}
       <ToggleGroup.Item
         value={item.value}
