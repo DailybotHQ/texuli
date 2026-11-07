@@ -621,6 +621,24 @@ describe('control props (0.14.3)', () => {
   const readCss = (path: string) =>
     readFileSync(join(import.meta.dirname, '../src/components', path), 'utf8');
 
+  it('UG-28: labelContent renders inside the label and names Checkbox, Switch and Radio', () => {
+    const view = render(ControlPropsHarness);
+    for (const [role, name] of [
+      ['checkbox', 'Accept terms'],
+      ['switch', 'Notify terms'],
+      ['radio', 'Team terms'],
+    ] as const) {
+      const control = view.getByRole(role, { name });
+      const label = view.container.querySelector(`label[for="${control.id}"]`);
+      expect(label?.querySelector('strong')?.textContent, role).toBe(name.split(' ')[0]);
+      expect(label?.querySelector('a')?.getAttribute('href'), role).toBe(
+        'https://example.com/terms'
+      );
+    }
+    const accept = view.getByRole('checkbox', { name: 'Accept terms' });
+    expect(accept.getAttribute('aria-describedby')).toBe(`${accept.id}-description`);
+  });
+
   it('UG-40: Field counter appends value/max to the description the control reads', async () => {
     const view = render(ControlPropsHarness);
     const bio = view.getByRole('textbox', { name: 'Bio' }) as HTMLTextAreaElement;

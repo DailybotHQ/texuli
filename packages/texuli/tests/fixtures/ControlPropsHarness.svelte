@@ -1,13 +1,31 @@
 <script lang="ts">
 import { Button, IconButton } from '../../src/components/button/index.ts';
+import Checkbox from '../../src/components/choice/Checkbox.svelte';
+import Radio from '../../src/components/choice/Radio.svelte';
+import RadioGroup from '../../src/components/choice/RadioGroup.svelte';
+import Switch from '../../src/components/choice/Switch.svelte';
 import { Field } from '../../src/components/field/index.ts';
 import { Textarea } from '../../src/components/input/index.ts';
 import { NumberField } from '../../src/components/number-pin/index.ts';
 
-// 0.14.3 control props: Field counter, NumberField display,
+// 0.14.3 control props: labelContent, Field counter, NumberField display,
 // Button and IconButton iconSize (Avatar tone and shape: display.test.ts).
 let bio = $state('Short bio');
 </script>
+
+{#snippet rich(name: string)}<strong>{name}</strong> <a href="https://example.com/terms">terms</a>{/snippet}
+
+<Checkbox description="Required to continue">
+  {#snippet labelContent()}{@render rich('Accept')}{/snippet}
+</Checkbox>
+<Switch>
+  {#snippet labelContent()}{@render rich('Notify')}{/snippet}
+</Switch>
+<RadioGroup aria-label="Plan" value="team">
+  <Radio value="team">
+    {#snippet labelContent()}{@render rich('Team')}{/snippet}
+  </Radio>
+</RadioGroup>
 
 <Field label="Bio" description="Shown on your profile" counter={{ value: bio, max: 20 }}>
   {#snippet children(control)}
