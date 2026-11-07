@@ -85,6 +85,51 @@
     block-size: var(--tx-size-icon-sm);
   }
 
+  /* `tone`: an inline-start accent stripe and the icon chip in the tone's soft pair. */
+  .tx-stat[data-tone] {
+    border-inline-start-width: var(--tx-border-width-thick);
+    border-inline-start-color: var(--tx-stat-tone-accent, var(--tx-border, currentColor));
+  }
+
+  .tx-stat[data-tone] .tx-stat__icon {
+    background-color: var(--tx-stat-tone-fill, var(--tx-muted, Canvas));
+    color: var(--tx-stat-tone-ink, var(--tx-muted-foreground, GrayText));
+  }
+
+  .tx-stat[data-tone="primary"] {
+    --tx-stat-tone-accent: var(--tx-primary, Highlight);
+    --tx-stat-tone-fill: var(--tx-primary-soft, Canvas);
+    --tx-stat-tone-ink: var(--tx-primary-soft-foreground, CanvasText);
+  }
+
+  .tx-stat[data-tone="success"] {
+    --tx-stat-tone-accent: var(--tx-success, green);
+    --tx-stat-tone-fill: var(--tx-success-soft, Canvas);
+    --tx-stat-tone-ink: var(--tx-success-soft-foreground, CanvasText);
+  }
+
+  .tx-stat[data-tone="warning"] {
+    --tx-stat-tone-accent: var(--tx-warning, orange);
+    --tx-stat-tone-fill: var(--tx-warning-soft, Canvas);
+    --tx-stat-tone-ink: var(--tx-warning-soft-foreground, CanvasText);
+  }
+
+  .tx-stat[data-tone="destructive"] {
+    --tx-stat-tone-accent: var(--tx-destructive, crimson);
+    --tx-stat-tone-fill: var(--tx-destructive-soft, Canvas);
+    --tx-stat-tone-ink: var(--tx-destructive-soft-foreground, CanvasText);
+  }
+
+  .tx-stat[data-tone="info"] {
+    --tx-stat-tone-accent: var(--tx-info, dodgerblue);
+    --tx-stat-tone-fill: var(--tx-info-soft, Canvas);
+    --tx-stat-tone-ink: var(--tx-info-soft-foreground, CanvasText);
+  }
+
+  .tx-stat[data-tone="neutral"] {
+    --tx-stat-tone-accent: var(--tx-muted-foreground, GrayText);
+  }
+
   .tx-stat__value {
     margin: 0;
     font-family: var(--tx-font-heading, var(--tx-font-sans, system-ui, sans-serif));

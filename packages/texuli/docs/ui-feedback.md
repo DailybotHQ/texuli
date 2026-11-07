@@ -59,6 +59,16 @@ Without `label` the spinner is decorative. With `label` it is a polite status re
 
 Indicator width / arc use CSS custom properties (no static `style=` chrome). Motion stops under reduced motion.
 
+Host hooks (set on the `Progress` element or any ancestor):
+
+- `--tx-progress-track`: the color of the linear track and the circular
+  ring (default `var(--tx-muted)`).
+- `--tx-progress-fill`: the indicator color. A `tone` class sets it on the
+  root, so set it on the element itself to override the tone, for example
+  a design-system product token:
+  `<Progress value={60} style="--tx-progress-fill: var(--tx-ext-brand-gold)" />`.
+  A `tone="ext:<name>"` shorthand for this is planned, not built.
+
 ## Styles
 
 `@layer tx.components` in `feedback.css`. Logical properties. Forced-colors borders on tracks and skeletons.

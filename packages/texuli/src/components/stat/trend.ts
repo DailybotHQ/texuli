@@ -4,6 +4,9 @@
  * the word screen readers hear.
  */
 
+/** The accent of a Stat tile (`tone`). */
+export type StatTone = 'primary' | 'success' | 'warning' | 'destructive' | 'info' | 'neutral';
+
 export const TRENDS = ['up', 'down', 'neutral'] as const;
 export type Trend = (typeof TRENDS)[number];
 
