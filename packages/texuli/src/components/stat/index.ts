@@ -12,6 +12,7 @@ export {
   POSITIVE_DIRECTIONS,
   type PositiveDirection,
   resolveTrend,
+  type StatTone,
   TRENDS,
   type Trend,
   trendToneClass,

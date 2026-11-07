@@ -9,6 +9,7 @@ import {
   formatDelta,
   type PositiveDirection,
   resolveTrend,
+  type StatTone,
   type Trend,
   trendToneClass,
 } from './trend.ts';
@@ -36,6 +37,12 @@ type Props = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
   sparkline?: Snippet;
   /** Surface elevation. */
   variant?: 'elevated' | 'flat';
+  /**
+   * Accent of the tile: an inline-start stripe and the icon chip in the
+   * tone's soft pair (`neutral`: the stripe only). The trend color does not
+   * change.
+   */
+  tone?: StatTone;
 };
 
 const statClass = variants({
@@ -60,6 +67,7 @@ let {
   icon,
   sparkline,
   variant = txDefaults().variant ?? 'elevated',
+  tone: accent,
   class: className,
   ref = $bindable(null),
   ...rest
@@ -87,6 +95,7 @@ const word = $derived(
   data-tx-stat
   data-variant={variant}
   data-trend={resolvedTrend}
+  data-tone={accent}
   {...rest}
 >
   <div class="tx-stat__head">

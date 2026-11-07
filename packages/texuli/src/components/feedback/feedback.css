@@ -170,7 +170,7 @@
     overflow: hidden;
     inline-size: 100%;
     border-radius: var(--tx-progress-radius, var(--tx-shape-radius-full));
-    background-color: var(--tx-muted, Canvas);
+    background-color: var(--tx-progress-track, var(--tx-muted, Canvas));
   }
 
   .tx-progress--sm .tx-progress__track {
@@ -269,7 +269,7 @@
 
   .tx-progress__circle-track {
     fill: none;
-    stroke: var(--tx-muted, Canvas);
+    stroke: var(--tx-progress-track, var(--tx-muted, Canvas));
     stroke-width: 8;
   }
 

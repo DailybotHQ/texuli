@@ -12,6 +12,10 @@ type Props = {
   detailActive?: boolean;
   path?: string;
   options?: Record<string, string | number | boolean>;
+  /** SplitView `listWidth`, `breakpoint` and a `context` pane (UG-25). */
+  listWidth?: string;
+  breakpoint?: 'sm' | 'md' | 'lg';
+  withSplitContext?: boolean;
 };
 
 let {
@@ -20,6 +24,9 @@ let {
   detailActive = false,
   path = '/inbox/mentions',
   options,
+  listWidth,
+  breakpoint,
+  withSplitContext = false,
 }: Props = $props();
 
 registerAppLayouts();
@@ -59,7 +66,18 @@ const nav: NavModel = {
   <LayoutHost {layout} {nav} {path} {dir} {options} aside={context}>
     <p data-testid="screen-copy">Current routed screen.</p>
   </LayoutHost>
-  <SplitView listLabel="Threads" detailLabel="Selected thread" {detailActive}>
+  {#snippet splitContext()}
+    <p data-testid="split-context">Thread participants</p>
+  {/snippet}
+  <SplitView
+    listLabel="Threads"
+    detailLabel="Selected thread"
+    {detailActive}
+    {listWidth}
+    {breakpoint}
+    context={withSplitContext ? splitContext : undefined}
+    contextLabel="Thread context"
+  >
     {#snippet list()}
       <button type="button">Open thread</button>
     {/snippet}

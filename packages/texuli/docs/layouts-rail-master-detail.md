@@ -31,6 +31,24 @@ detail split: `list` (required), `detail` and `empty` snippets, `listLabel`
 is its root element; `class`, `id`, `aria-*`, `data-*`, `style` and handlers
 land there too.
 
+| Prop | Default | Notes |
+| --- | --- | --- |
+| `listWidth` | `minmax(15rem, 22.5rem)` | The list column once both panes show: a CSS length or track (`20rem`, `30%`, `minmax(16rem, 24rem)`), set as `--tx-split-view-list-width`. A value with `;`, `:`, braces, quotes or `url()` is ignored |
+| `breakpoint` | `md` | The container width from which list and detail show side by side: `sm` (40rem), `md` (56rem) or `lg` (72rem); narrower, one pane shows (`detailActive` picks it). Rendered as `data-breakpoint` only when given |
+| `context` | — | A third pane after the detail (properties, activity), shown only when the container is at least 72rem wide, in a 14rem to 20rem column with a border on its inline-start side. Below 72rem it is hidden, so offer its content another way there (a sheet or a disclosure in the detail) |
+| `contextLabel` | — | Names the context pane; with a name it is a region landmark like the list and detail, without one it is a plain section |
+
+```svelte
+<SplitView listLabel="Threads" listWidth="20rem" breakpoint="lg" contextLabel="Participants">
+  {#snippet list()}…{/snippet}
+  {#snippet detail()}…{/snippet}
+  {#snippet context()}…{/snippet}
+</SplitView>
+```
+
+Widths are container widths (the split is an `inline-size` container), not
+viewport widths.
+
 ## Example
 
 ```svelte

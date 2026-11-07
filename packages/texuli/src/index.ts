@@ -500,6 +500,7 @@ export {
   type PositiveDirection,
   resolveTrend,
   Stat,
+  type StatTone,
   TRENDS,
   type Trend,
   trendToneClass,

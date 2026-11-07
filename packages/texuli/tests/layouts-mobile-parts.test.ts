@@ -4,6 +4,8 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { BottomNavItem } from '../src/layouts/mobile/index.ts';
+import { BottomNav } from '../src/layouts/mobile/index.ts';
+import HeaderHarness from './fixtures/MobileHeaderHarness.svelte';
 import Harness from './fixtures/MobilePartsHarness.svelte';
 
 // G15: standalone BottomNav, MobileHeader and MobileAppFrame.
@@ -121,6 +123,86 @@ describe('MobileAppFrame unstyled sticky footer (G95)', () => {
     for (const declaration of [/padding:\s*0/, /border:\s*0/, /background:\s*none/]) {
       expect(rule).toMatch(declaration);
     }
+  });
+});
+
+describe('BottomNav action item (UG-22)', () => {
+  afterEach(cleanup);
+
+  it("marks the emphasis 'action' item, which stays a named link in the list and calls onSelect", async () => {
+    const onSelect = vi.fn((_item: BottomNavItem, event: MouseEvent) => event.preventDefault());
+    const withAction: BottomNavItem[] = [
+      ...items.slice(0, 2),
+      { href: '#/new', label: 'Create', icon: 'plus', emphasis: 'action' },
+    ];
+    render(BottomNav, { props: { items: withAction, label: 'Tabs', onSelect } });
+    const nav = screen.getByRole('navigation', { name: 'Tabs' });
+    const create = screen.getByRole('link', { name: 'Create' });
+    expect(create.closest('li')?.parentElement?.closest('nav')).toBe(nav);
+    expect(create.getAttribute('data-emphasis')).toBe('action');
+    expect(create.getAttribute('href')).toBe('#/new');
+    expect(nav.querySelectorAll('[data-emphasis]')).toHaveLength(1);
+    await fireEvent.click(create);
+    expect(onSelect).toHaveBeenCalledWith(withAction[2], expect.any(MouseEvent));
+    const css = readFileSync(
+      join(process.cwd(), 'packages/texuli/src/layouts/mobile/mobile.css'),
+      'utf8'
+    );
+    expect(css).toMatch(
+      /\[data-emphasis="action"\] \.tx-layout-nav-icon \{[^}]*background: var\(--tx-primary/
+    );
+  });
+});
+
+describe('MobileHeader eyebrow, leading and Close (UG-24)', () => {
+  afterEach(cleanup);
+
+  it('shows the eyebrow above the title and lets leading replace Back', () => {
+    render(HeaderHarness, {
+      props: { title: 'Deal 42', eyebrow: 'Pipeline', backHref: '#/deals', withLeading: true },
+    });
+    const banner = screen.getByRole('banner');
+    const eyebrow = screen.getByText('Pipeline');
+    const heading = screen.getByRole('heading', { name: 'Deal 42' });
+    expect(eyebrow.tagName).toBe('P');
+    expect(
+      eyebrow.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
+    expect(banner.firstElementChild).toBe(screen.getByRole('button', { name: 'Account' }));
+    expect(screen.queryByRole('link', { name: /Back/ })).toBeNull();
+  });
+
+  it('ends with a Close button or a safe Close link, named from the label dictionary', async () => {
+    const onClose = vi.fn();
+    const view = render(HeaderHarness, {
+      props: { title: 'New deal', onClose, withActions: true },
+    });
+    const close = screen.getByRole('button', { name: 'Close' });
+    const banner = screen.getByRole('banner');
+    // After the actions, as the header's last control.
+    expect(banner.querySelector('.tx-mobile-layout__actions')?.lastElementChild).toBe(close);
+    expect(screen.getByRole('button', { name: 'Edit' })).toBeTruthy();
+    expect(close.getAttribute('type')).toBe('button');
+    await fireEvent.click(close);
+    expect(onClose).toHaveBeenCalledTimes(1);
+
+    // rerender merges props: pass every one that changes.
+    await view.rerender({
+      onClose: undefined,
+      withActions: false,
+      closeHref: '#/deals',
+      closeLabel: 'Discard',
+    });
+    const link = screen.getByRole('link', { name: 'Discard' });
+    expect(link.getAttribute('href')).toBe('#/deals');
+    expect(screen.queryByRole('button', { name: 'Edit' })).toBeNull();
+
+    await view.rerender({ closeHref: 'javascript:alert(1)', closeLabel: undefined, onClose });
+    expect(screen.getByRole('button', { name: 'Close' }).hasAttribute('href')).toBe(false);
+    expect(document.querySelector('a[href^="javascript"]')).toBeNull();
+
+    await view.rerender({ closeHref: undefined, onClose: undefined });
+    expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
   });
 });
 

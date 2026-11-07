@@ -34,6 +34,7 @@ import { LucideIcon } from '../src/components/icons/lucide.ts';
 import { type IconName, type IconSize } from '../src/components/icons/types.ts';
 import Kpi from '../src/components/stat/Kpi.svelte';
 import KpiRow from '../src/components/stat/KpiRow.svelte';
+import Stat from '../src/components/stat/Stat.svelte';
 import { formatDelta, trendToneClass, trendWord } from '../src/components/stat/trend.ts';
 import { fillStackLabels, isScrollable } from '../src/components/table/labels.ts';
 import { Timeline, type TimelineItemData } from '../src/components/timeline/index.ts';
@@ -938,6 +939,47 @@ describe('feedback', () => {
       expect(bar.getAttribute('aria-valuetext')).toBe('Please wait');
       expect(view.container.querySelector('[data-state="indeterminate"]')).toBeTruthy();
       expect(view.container.querySelector('.tx-progress__indicator--indeterminate')).toBeTruthy();
+    });
+
+    it('paints the linear and circular track through the --tx-progress-track hook (UG-43)', () => {
+      const css = readFileSync(
+        join(process.cwd(), 'packages/texuli/src/components/feedback/feedback.css'),
+        'utf8'
+      );
+      for (const part of ['__track', '__circle-track']) {
+        const rule = new RegExp(`\\.tx-progress${part} \\{([^}]*)\\}`).exec(css)?.[1] ?? '';
+        expect(rule, part).toMatch(/var\(--tx-progress-track, var\(--tx-muted, Canvas\)\)/);
+      }
+    });
+  });
+
+  describe('Stat tone (UG-43)', () => {
+    it('marks the tile with its tone, styled per tone, and nothing without one', () => {
+      const css = readFileSync(
+        join(process.cwd(), 'packages/texuli/src/components/stat/stat.css'),
+        'utf8'
+      );
+      for (const tone of [
+        'primary',
+        'success',
+        'warning',
+        'destructive',
+        'info',
+        'neutral',
+      ] as const) {
+        const { container, unmount } = render(Stat, {
+          props: { label: 'Revenue', value: 4, tone },
+        });
+        expect(container.querySelector('[data-tx-stat]')?.getAttribute('data-tone')).toBe(tone);
+        expect(css, tone).toMatch(
+          new RegExp(`\\.tx-stat\\[data-tone="${tone}"\\] \\{[^}]*--tx-stat-tone-accent`)
+        );
+        unmount();
+      }
+      const plain = render(Stat, { props: { label: 'Revenue', value: 4 } });
+      expect(plain.container.querySelector('[data-tx-stat]')?.hasAttribute('data-tone')).toBe(
+        false
+      );
     });
   });
 });

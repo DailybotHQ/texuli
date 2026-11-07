@@ -26,6 +26,21 @@ Metric tiles with delta tone, comparison and a sparkline slot.
 - `positive`: which direction is good (`up` default; use `down` for churn/latency)
 - `icon` / `sparkline` snippets are decorative slots (sparkline is consumer-owned)
 - `variant`: `elevated` (default) | `flat`
+- `tone` (`StatTone`): `primary` | `success` | `warning` | `destructive` |
+  `info` | `neutral`. An accent for the tile, independent of the trend: a
+  thick inline-start stripe in the role color and the `icon` chip in the
+  role's soft pair (`--tx-<role>-soft` with its `-soft-foreground`;
+  `neutral` keeps the muted chip). It is decoration: the label and value
+  carry the meaning. Without `tone` the tile renders as before (no
+  `data-tone`). Hosts can restyle a tone through `--tx-stat-tone-accent`,
+  `--tx-stat-tone-fill` and `--tx-stat-tone-ink` on the tile. An
+  `ext:<name>` tone (a design-system product token) is planned, not built.
+
+```svelte
+<Stat label="Open tickets" value="96" tone="warning">
+  {#snippet icon()}<Icon icon="info" />{/snippet}
+</Stat>
+```
 
 ## KPI
 

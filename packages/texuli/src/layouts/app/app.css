@@ -209,13 +209,52 @@
     display: block;
   }
 
+  .tx-app-layout__split-context {
+    display: none;
+    min-inline-size: 0;
+    min-block-size: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    border-inline-start: 1px solid var(--tx-border, ButtonBorder);
+  }
+
+  /* Two panes from `breakpoint` (md by default); :where() keeps the specificity of one class. */
+  @container (min-width: 40rem) {
+    :where([data-breakpoint="sm"]) > .tx-app-layout__split-panes {
+      grid-template-columns: var(--tx-split-view-list-width, minmax(15rem, 22.5rem)) minmax(0, 1fr);
+    }
+
+    :where([data-breakpoint="sm"]) .tx-app-layout__split-list,
+    :where([data-breakpoint="sm"]) .tx-app-layout__split-detail {
+      display: block;
+    }
+  }
+
   @container (min-width: 56rem) {
+    :where(.tx-app-layout__split:not([data-breakpoint="lg"])) > .tx-app-layout__split-panes {
+      grid-template-columns: var(--tx-split-view-list-width, minmax(15rem, 22.5rem)) minmax(0, 1fr);
+    }
+
+    :where(.tx-app-layout__split:not([data-breakpoint="lg"])) .tx-app-layout__split-list,
+    :where(.tx-app-layout__split:not([data-breakpoint="lg"])) .tx-app-layout__split-detail {
+      display: block;
+    }
+  }
+
+  @container (min-width: 72rem) {
     .tx-app-layout__split-panes {
-      grid-template-columns: minmax(15rem, 22.5rem) minmax(0, 1fr);
+      grid-template-columns: var(--tx-split-view-list-width, minmax(15rem, 22.5rem)) minmax(0, 1fr);
+    }
+
+    .tx-app-layout__split-panes:has(> .tx-app-layout__split-context) {
+      grid-template-columns:
+        var(--tx-split-view-list-width, minmax(15rem, 22.5rem)) minmax(0, 1fr)
+        minmax(14rem, 20rem);
     }
 
     .tx-app-layout__split-list,
-    .tx-app-layout__split-detail {
+    .tx-app-layout__split-detail,
+    .tx-app-layout__split-context {
       display: block;
     }
   }
