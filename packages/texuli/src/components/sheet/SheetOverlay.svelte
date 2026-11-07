@@ -4,6 +4,7 @@ import type { ComponentProps } from 'svelte';
 import { type ClassValue, cx } from '../../internal/cx.ts';
 import type { MotionProp } from '../../motion/contract.ts';
 import { createOverlayMotion } from '../../motion/seam.ts';
+import '../../internal/scrim.css';
 import './sheet.css';
 
 type Props = ComponentProps<typeof Primitive.Overlay> & {

@@ -147,6 +147,25 @@ set the color in host CSS on the theme scope:
 }
 ```
 
+### Scrim blur
+
+Added in `0.14.2` (UG-30): `--tx-scrim-blur` is a host hook for a frosted
+scrim. It takes a `backdrop-filter` value and defaults to `none`, so nothing
+changes until you set it. The dialog and sheet overlays read it from one
+shared rule (`src/internal/scrim.css`), which also paints both scrims:
+
+```css
+[data-tx-theme] {
+  --tx-scrim-blur: blur(6px);
+}
+```
+
+It is a filter value, not a length, because even `blur(0)` gives the
+overlay a backdrop filter (a stacking context and a compositing layer). The
+color and opacity rules above are unchanged. Engines without
+`backdrop-filter` (Safari before 18 needs the `-webkit-` prefix, which is
+not set) just show the plain scrim.
+
 ## Motion
 
 `motion` on `Sheet.Content`, `Drawer.Content`, `DetailPanel.Content` and

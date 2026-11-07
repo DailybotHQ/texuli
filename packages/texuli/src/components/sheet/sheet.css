@@ -171,24 +171,8 @@
 
   .tx-sheet-overlay {
     z-index: calc(var(--tx-sheet-z-index, var(--tx-z-overlay)) - 1);
-    /* The theme's scrim color (--tx-scrim, dark in light and dark modes) at the
-       scrim opacity: relative color syntax drops the token's own alpha, so the
-       opacity tokens alone set the strength (D-G-048). Engines without
-       relative colors mix the token as is, so its alpha makes them fainter. */
-    background: color-mix(
-      in srgb,
-      var(--tx-scrim, rgb(0 0 0)) var(--tx-sheet-scrim-opacity, var(--tx-opacity-scrim)),
-      transparent
-    );
-  }
-
-  @supports (color: rgb(from red r g b)) {
-    .tx-sheet-overlay {
-      background: rgb(
-        from var(--tx-scrim, rgb(0 0 0)) r g b /
-        var(--tx-sheet-scrim-opacity, var(--tx-opacity-scrim))
-      );
-    }
+    /* Painted by internal/scrim.css, shared with the dialog overlay. */
+    --tx-scrim-alpha: var(--tx-sheet-scrim-opacity, var(--tx-opacity-scrim));
   }
 
   [data-drawer-handle] {
@@ -362,10 +346,6 @@
       background: Canvas;
     }
 
-    .tx-sheet-overlay {
-      background: Canvas;
-      opacity: 0.6;
-    }
     [data-drawer-handle] {
       background: CanvasText;
     }

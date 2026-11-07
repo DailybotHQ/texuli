@@ -22,6 +22,7 @@ import {
   dialogOverlayClass,
   dialogTitleClass,
 } from './variants.ts';
+import '../../internal/scrim.css';
 import './dialog.css';
 import { designDefaults } from '../../internal/design-defaults.ts';
 

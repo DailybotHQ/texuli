@@ -988,29 +988,46 @@ describe('dialog', () => {
       expect(source).toContain('var(--tx-destructive, crimson)');
     });
 
-    it('draws the dialog and sheet scrims from --tx-scrim at the scrim opacity, never the foreground (D-G-048)', () => {
-      for (const [file, selector, part] of [
-        ['dialog/dialog.css', '.tx-dialog__overlay', 'dialog'],
-        ['sheet/sheet.css', '.tx-sheet-overlay', 'sheet'],
+    it('paints the dialog and sheet scrims in one shared rule from --tx-scrim at each scrim opacity, with a none-by-default blur hook (D-G-048, UG-36, UG-30)', () => {
+      const src = join(process.cwd(), 'packages/texuli/src');
+      const read = (file: string) => readFileSync(join(src, file), 'utf8');
+      const flat = (text: string) => text.replace(/\s+/g, ' ');
+      const scrim = flat(read('internal/scrim.css'));
+      // One rule paints both overlays; a dark theme's foreground never mixes in.
+      expect(scrim).not.toContain('--tx-foreground');
+      expect(scrim).toContain('.tx-dialog__overlay, .tx-sheet-overlay { /* The theme');
+      expect(scrim).toContain(
+        'color-mix(in srgb, var(--tx-scrim, rgb(0 0 0)) var(--tx-scrim-alpha), transparent)'
+      );
+      // Relative color drops the token's alpha, so only the opacity tokens set the strength.
+      expect(scrim).toContain(
+        'rgb(from var(--tx-scrim, rgb(0 0 0)) r g b / var(--tx-scrim-alpha))'
+      );
+      expect(scrim.match(/@supports \(color: rgb\(from red r g b\)\)/g)).toHaveLength(1);
+      expect(scrim).toContain('backdrop-filter: var(--tx-scrim-blur, none);');
+      for (const [part, overlay] of [
+        ['dialog', '.tx-dialog__overlay'],
+        ['sheet', '.tx-sheet-overlay'],
       ] as const) {
-        const source = readFileSync(
-          join(process.cwd(), 'packages/texuli/src/components', file),
-          'utf8'
+        const css = flat(read(`components/${part}/${part}.css`));
+        // The component stylesheet only picks its opacity token; no second copy of the scrim.
+        expect(css, part).toContain(
+          `--tx-scrim-alpha: var(--tx-${part}-scrim-opacity, var(--tx-opacity-scrim));`
         );
-        const escaped = selector.replace('.', '\\.');
-        const backgrounds = [
-          ...source.matchAll(new RegExp(`${escaped}\\s*\\{([^}]*)\\}`, 'g')),
-        ].flatMap((match) =>
-          [...(match[1] ?? '').matchAll(/background:([^;]*);/g)].map((m) => m[1])
-        );
-        expect(backgrounds.length, file).toBeGreaterThan(0);
-        // A dark theme's foreground is light: mixing it made a light-gray scrim.
-        for (const background of backgrounds)
-          expect(background, file).not.toContain('--tx-foreground');
-        // Relative color drops the token's alpha, so only the opacity tokens set the strength.
-        expect(backgrounds.join(' ').replace(/\s+/g, ' '), file).toContain(
-          `rgb( from var(--tx-scrim, rgb(0 0 0)) r g b / var(--tx-${part}-scrim-opacity, var(--tx-opacity-scrim)) )`
-        );
+        expect(css, part).not.toContain('@supports');
+        expect(css, part).not.toMatch(new RegExp(`\\${overlay} \\{[^}]*background`));
+        // The shared stylesheet loads before the component one, wherever the overlay class comes from.
+        for (const file of [
+          `components/${part}/variants.ts`,
+          part === 'dialog'
+            ? 'components/dialog/Dialog.svelte'
+            : 'components/sheet/SheetOverlay.svelte',
+        ]) {
+          const source = read(file);
+          const shared = source.indexOf("import '../../internal/scrim.css';");
+          expect(shared, file).toBeGreaterThan(-1);
+          expect(shared, file).toBeLessThan(source.indexOf(`import './${part}.css';`));
+        }
       }
     });
   });

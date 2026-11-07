@@ -20,6 +20,7 @@ import {
   dialogOverlayClass,
   dialogTitleClass,
 } from './variants.ts';
+import '../../internal/scrim.css';
 import './dialog.css';
 import '../button/button.css';
 
