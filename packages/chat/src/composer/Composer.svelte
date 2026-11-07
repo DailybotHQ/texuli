@@ -38,6 +38,19 @@ interface OwnProps {
    */
   onkeydown?: (event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }) => void;
   class?: ClassValue;
+  /**
+   * `stack` (default) puts the actions row under the field; `row` keeps a
+   * single row with the field first and the actions (attachments, then the
+   * send or stop button) inline after it.
+   */
+  layout?: 'stack' | 'row';
+  /**
+   * `label` (default) shows the send text; `icon` draws an icon-only send
+   * button whose name is still `labels.send` (`labels.sending` while
+   * pending), as visually hidden text. For another glyph, render a custom
+   * send in `actions` with its `submit`.
+   */
+  sendButton?: 'label' | 'icon';
   /** The composer's root `form` (bindable). */
   ref?: HTMLFormElement | null;
 }
@@ -63,6 +76,8 @@ let {
   streaming = false,
   onStop,
   onkeydown,
+  layout,
+  sendButton,
   class: className,
   ref = $bindable(null),
   onsubmit: callerSubmit,
@@ -75,6 +90,7 @@ let error = $state(false);
 let composing = $state(false);
 const labels = $derived({ ...DEFAULT_COMPOSER_LABELS, ...labelOverrides });
 const busy = $derived(sending || pending);
+const iconOnly = $derived(sendButton === 'icon');
 const canSend = $derived(!disabled && !busy && !streaming && value.trim().length > 0);
 const hintId = `chat-composer-${id}-hint`;
 const errorId = `chat-composer-${id}-error`;
@@ -145,6 +161,7 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
   bind:this={ref}
   class={cx('tx-chat-composer', className)}
   data-tx-chat-composer
+  data-layout={layout}
   onsubmit={chainHandlers(callerSubmit, (event: SubmitEvent) => {
     event.preventDefault();
     void submit();
@@ -183,12 +200,13 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
         <Button
           type="submit"
           variant="outline"
-          size="sm"
+          size={iconOnly ? 'icon' : 'sm'}
           disabled={!canSend}
           loading={busy}
           loadingLabel={labels.sending}
+          data-icon-only={iconOnly || undefined}
         >
-          {labels.send}
+          {#if iconOnly}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m-7 7 7-7 7 7" /></svg><span class="visually-hidden">{labels.send}</span>{:else}{labels.send}{/if}
         </Button>
       {/if}
     </div>
@@ -266,6 +284,40 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
       flex-wrap: wrap;
       align-items: center;
       gap: var(--tx-space-2);
+    }
+
+    .tx-chat-composer[data-layout='row'] {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+
+    .tx-chat-composer[data-layout='row'] .tx-chat-composer__field {
+      flex: 1 1 12rem;
+      inline-size: auto;
+    }
+
+    .tx-chat-composer[data-layout='row'] .tx-chat-composer__actions {
+      flex: 0 0 auto;
+      justify-content: end;
+      gap: var(--tx-space-2);
+      padding-block-end: var(--tx-space-1);
+    }
+
+    .tx-chat-composer[data-layout='row'] .tx-chat-composer__attachments:empty {
+      display: none;
+    }
+
+    .tx-chat-composer[data-layout='row'] .tx-chat-composer__error {
+      flex-basis: 100%;
+    }
+
+    svg {
+      inline-size: 1rem;
+      block-size: 1rem;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
     }
 
     .tx-chat-composer__error {

@@ -648,6 +648,53 @@ describe('composer', () => {
     });
   });
 
+  describe('UG-41 row layout, icon-only send and kept drafts', () => {
+    it('lays out one row with an icon-only send named by labels.send; the default render keeps no layout attribute', async () => {
+      let release: (value: unknown) => void = () => {};
+      const onSubmit = vi.fn(() => new Promise((resolve) => (release = resolve)));
+      const { container } = render(Composer, {
+        props: { onSubmit, layout: 'row', sendButton: 'icon', value: 'Hi' },
+      });
+      const form = container.querySelector('form');
+      expect(form?.getAttribute('data-layout')).toBe('row');
+      const send = screen.getByRole('button', { name: 'Send message' });
+      expect(send.getAttribute('data-icon-only')).toBe('true');
+      expect(send.getAttribute('data-size')).toBe('icon');
+      expect(send.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
+      await fireEvent.click(send);
+      await waitFor(() =>
+        expect(screen.getByRole('button', { name: 'Sending message' })).toBeTruthy()
+      );
+      release(undefined);
+      await waitFor(() => expect(onSubmit).toHaveBeenCalledWith('Hi'));
+      cleanup();
+      const plain = render(Composer, { props: { onSubmit } });
+      expect(plain.container.querySelector('form')?.hasAttribute('data-layout')).toBe(false);
+      expect(
+        screen.getByRole('button', { name: 'Send message' }).hasAttribute('data-icon-only')
+      ).toBe(false);
+    });
+
+    it('keeps the draft when the handler returns false or rejects, and clears it on success', async () => {
+      const cases: Array<[string, () => unknown, string, boolean]> = [
+        ['false', () => false, 'Keep me', false],
+        ['async false', async () => false, 'Keep me too', false],
+        ['reject', () => Promise.reject(new Error('down')), 'Still here', true],
+        ['success', () => undefined, '', false],
+      ];
+      for (const [name, handler, expected, alert] of cases) {
+        render(Composer, { props: { onSubmit: handler, sendButton: 'icon', layout: 'row' } });
+        const field = screen.getByRole('textbox', { name: 'Message' }) as HTMLTextAreaElement;
+        await fireEvent.input(field, { target: { value: expected || 'Gone' } });
+        await fireEvent.keyDown(field, { key: 'Enter' });
+        await waitFor(() => expect(field.disabled, name).toBe(false));
+        expect(field.value, name).toBe(expected);
+        expect(Boolean(screen.queryByRole('alert')), name).toBe(alert);
+        cleanup();
+      }
+    });
+  });
+
   describe('G32 streaming stop, keydown hook and actions', () => {
     it('swaps send for a named Stop control while streaming; the button and Escape stop and keep focus in the field', async () => {
       const onSubmit = vi.fn();
