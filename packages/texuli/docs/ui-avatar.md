@@ -27,6 +27,8 @@ URL policy accepts.
 | `srcset` | — | Responsive candidates (`a.webp 1x, b.webp 2x` or `w` descriptors), used with `src`. Each candidate URL passes the image URL policy at `srcTrust`; refused or malformed candidates (and URLs holding a comma) are dropped, and candidates keep the first kept one's descriptor kind |
 | `sizes` | — | `sizes` for width descriptors (set only when a candidate is kept) |
 | `size` | `md` | `xs` \| `sm` \| `md` \| `lg` |
+| `tone` | — | New in `0.14.3`. `primary` \| `success` \| `warning` \| `destructive` \| `info` \| `neutral`: fills the initials surface with that theme pair instead of the seeded ring |
+| `shape` | — | New in `0.14.3`. `circle` \| `square` (`--tx-shape-radius-md`) for this avatar; omit for the theme's `--tx-avatar-radius` |
 | `status` | — | `online` \| `away` \| `busy` \| `offline` |
 | `decorative` | `false` | Hides the control from assistive tech |
 | `delayMs` | `0` | Primitive delay before revealing a loaded image |
@@ -46,6 +48,13 @@ test checks it in all 210 library themes, light and dark. The seeded tone
 (`data-tone`, from the name) is only a decorative inset ring in a chart color
 (`--tx-avatar-tone`), so it tells people apart without carrying the text
 contrast. Forced colors use `CanvasText` on `Canvas` and drop the ring.
+
+**Filled tones.** `tone` drops the ring and paints the surface with one of
+the theme's AA-gated background and foreground pairs (`--tx-success` with
+`--tx-success-foreground`, and so on; `neutral` is foreground on muted). The
+root carries `data-tone`, and forced colors keep `CanvasText` on `Canvas`.
+`shape` sets `--tx-avatar-radius` on the root (`data-shape`), so it wins over
+a design system's avatar radius for that one avatar.
 
 ## AvatarGroup
 

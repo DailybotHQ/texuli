@@ -4,7 +4,7 @@ import { type ClassValue } from '../../internal/cx.ts';
 import { designDefaults } from '../../internal/design-defaults.ts';
 import Button from './Button.svelte';
 import './icon-button.css';
-import type { ButtonSize, ButtonVariant } from './button-variants.ts';
+import type { ButtonIconSize, ButtonSize, ButtonVariant } from './button-variants.ts';
 
 type IconButtonProps = HTMLButtonAttributes &
   HTMLAnchorAttributes & {
@@ -13,6 +13,8 @@ type IconButtonProps = HTMLButtonAttributes &
     variant?: ButtonVariant;
     /** Defaults to the square `icon` size; larger sizes keep the square ratio. */
     size?: ButtonSize;
+    /** Icon box size for this control only (`xs`…`lg`); passed to Button. */
+    iconSize?: ButtonIconSize;
     href?: string | null;
     loading?: boolean;
     autoLoading?: boolean;

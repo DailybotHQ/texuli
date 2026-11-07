@@ -26,6 +26,8 @@ export const buttonVariants = variants({
 
 export type ButtonVariant = 'default' | 'secondary' | 'outline' | 'ghost' | 'destructive' | 'link';
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
+/** Per-instance icon box size: one of the `--tx-size-icon-*` steps. */
+export type ButtonIconSize = 'xs' | 'sm' | 'md' | 'lg';
 
 export const BUTTON_VARIANTS = [
   'default',

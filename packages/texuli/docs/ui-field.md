@@ -32,7 +32,36 @@ Layout wrapper that wires label, description, error and control ARIA.
 | `error` | When set, control gets `aria-invalid` and an alert error |
 | `required` / `disabled` | Field chrome + control props |
 | `orientation` | `vertical` (default) \| `horizontal` |
+| `counter` | New in `0.14.3`. `{ value, max }` for a text control with `maxlength`: appends `12/280` to the description (see below) |
 | `children` | Snippet receiving `FieldControl` — spread `control.props` onto the input |
+
+### Character counter
+
+`counter={{ value, max }}` appends `value.length/max` (`12/280`) to the
+description paragraph, after the description text when there is one. The
+control already names that paragraph in `aria-describedby`, so a screen
+reader reads the count with the description when the control gets focus. It
+is not a live region, so typing announces nothing on every keystroke; the
+control's own `maxlength` stops input at the limit. Set `maxlength` on the
+control yourself (Field does not pass it). The count is digits and a slash
+only, so it has no label to translate.
+
+```svelte
+<script lang="ts">
+  import { Field } from 'texuli/field';
+  import { Textarea } from 'texuli/input';
+  let bio = $state('');
+</script>
+
+<Field label="Bio" description="Shown on your profile." counter={{ value: bio, max: 280 }}>
+  {#snippet children(control)}
+    <Textarea {...control.props} bind:value={bio} maxlength={280} />
+  {/snippet}
+</Field>
+```
+
+For a countdown that appears near the limit, `TextCounter` (`texuli/input`)
+remains available.
 
 ### Custom controls: `useFieldLabel`
 

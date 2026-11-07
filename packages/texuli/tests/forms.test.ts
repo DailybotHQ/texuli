@@ -1,5 +1,7 @@
 /// <reference types="node" />
+import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import { join } from 'node:path';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
 import { CalendarDate } from '@texuli/primitives/calendar';
 import { tick } from 'svelte';
@@ -36,6 +38,7 @@ import ClassValueHarness from './fixtures/ClassValueHarness.svelte';
 import CodeHarness from './fixtures/CodeHarness.svelte';
 import ComboboxHarness from './fixtures/ComboboxHarness.svelte';
 import Fixture from './fixtures/ControlAriaFixture.svelte';
+import ControlPropsHarness from './fixtures/ControlPropsHarness.svelte';
 import CopyButtonHarness from './fixtures/CopyButtonHarness.svelte';
 import FieldLabelHarness from './fixtures/FieldLabelHarness.svelte';
 import FileUploadHarness from './fixtures/FileUploadHarness.svelte';
@@ -610,6 +613,54 @@ describe('choice', () => {
       await fireEvent.click(team);
       expect(onValueChange).toHaveBeenCalledWith('b');
     });
+  });
+});
+
+describe('control props (0.14.3)', () => {
+  afterEach(cleanup);
+  const readCss = (path: string) =>
+    readFileSync(join(import.meta.dirname, '../src/components', path), 'utf8');
+
+  it('UG-40: Field counter appends value/max to the description the control reads', async () => {
+    const view = render(ControlPropsHarness);
+    const bio = view.getByRole('textbox', { name: 'Bio' }) as HTMLTextAreaElement;
+    const description = document.getElementById(bio.getAttribute('aria-describedby') ?? '');
+    expect(description?.textContent?.trim()).toBe('Shown on your profile 9/20');
+    // Not a live region: nothing is announced on each keystroke.
+    expect(description?.getAttribute('aria-live')).toBeNull();
+    await fireEvent.input(bio, { target: { value: 'A longer profile bio' } });
+    expect(description?.textContent?.trim()).toBe('Shown on your profile 20/20');
+    // Without a description the counter alone is described.
+    const nick = view.getByRole('textbox', { name: 'Nickname' });
+    const counter = document.getElementById(nick.getAttribute('aria-describedby') ?? '');
+    expect(counter?.textContent?.trim()).toBe('0/12');
+  });
+
+  it('UG-44: NumberField display="output" shows the formatted value read-only', () => {
+    const view = render(ControlPropsHarness);
+    const total = view.getByRole('spinbutton', { name: 'Total' }) as HTMLInputElement;
+    expect(total.value).toBe('$1,234.50');
+    expect(total.readOnly).toBe(true);
+    const root = total.closest('[data-tx-number-field]');
+    expect(root?.classList.contains('tx-number-field--output')).toBe(true);
+    for (const stepper of root?.querySelectorAll('button') ?? []) {
+      expect((stepper as HTMLButtonElement).disabled).toBe(true);
+    }
+    expect(readCss('number-pin/number-pin.css')).toMatch(
+      /\.tx-number-field--output > \.tx-number-field__stepper \{\s*display: none;/
+    );
+  });
+
+  it('UG-32: iconSize sizes the icon box of one Button or IconButton', () => {
+    const view = render(ControlPropsHarness);
+    expect(view.getByRole('button', { name: 'Save' }).getAttribute('data-icon-size')).toBe('lg');
+    expect(view.getByRole('button', { name: 'Close' }).getAttribute('data-icon-size')).toBe('xs');
+    const css = readCss('button/button.css');
+    for (const size of ['xs', 'sm', 'md', 'lg']) {
+      expect(css, size).toContain(
+        `.tx-button[data-icon-size="${size}"] {\n    --tx-button-icon-size: var(--tx-size-icon-${size});`
+      );
+    }
   });
 });
 

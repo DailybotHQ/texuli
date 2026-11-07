@@ -58,6 +58,20 @@
     pointer-events: none;
   }
 
+  /* Per-instance icon size (`iconSize`): wins over the theme's button icon-size token. */
+  .tx-button[data-icon-size="xs"] {
+    --tx-button-icon-size: var(--tx-size-icon-xs);
+  }
+  .tx-button[data-icon-size="sm"] {
+    --tx-button-icon-size: var(--tx-size-icon-sm);
+  }
+  .tx-button[data-icon-size="md"] {
+    --tx-button-icon-size: var(--tx-size-icon-md);
+  }
+  .tx-button[data-icon-size="lg"] {
+    --tx-button-icon-size: var(--tx-size-icon-lg);
+  }
+
   /* Variants */
   .tx-button--default {
     color: var(--tx-primary-foreground, CanvasText);
