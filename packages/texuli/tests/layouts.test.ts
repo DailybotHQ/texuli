@@ -442,6 +442,43 @@ describe('layouts-app', () => {
       expect(screen.getByTestId('split-detail').textContent).toBe('Thread details');
     });
 
+    it('SplitView takes a list width, a breakpoint and a context pane (UG-25)', async () => {
+      const { container, rerender } = render(LayoutsAppHarness, {
+        props: { layout: 'sidebar', listWidth: 'minmax(16rem, 30%)', breakpoint: 'lg' },
+      });
+      const split = container.querySelector<HTMLElement>('[data-tx-split-view]');
+      expect(split?.getAttribute('data-breakpoint')).toBe('lg');
+      expect(split?.style.getPropertyValue('--tx-split-view-list-width')).toBe(
+        'minmax(16rem, 30%)'
+      );
+      expect(screen.queryByRole('region', { name: 'Thread context' })).toBeNull();
+
+      // A value that would leave the custom property is dropped.
+      for (const hostile of ['1rem; background: red', 'url(//evil.example/x)', '1rem}']) {
+        await rerender({ listWidth: hostile, breakpoint: undefined, withSplitContext: true });
+        expect(split?.style.getPropertyValue('--tx-split-view-list-width'), hostile).toBe('');
+      }
+      expect(split?.hasAttribute('data-breakpoint')).toBe(false);
+      const context = screen.getByRole('region', { name: 'Thread context' });
+      expect(context.parentElement?.lastElementChild).toBe(context);
+      expect(screen.getByTestId('split-context').textContent).toBe('Thread participants');
+
+      const css = readFileSync(
+        join(process.cwd(), 'packages/texuli/src/layouts/app/app.css'),
+        'utf8'
+      );
+      for (const [width, selector] of [
+        ['40rem', '[data-breakpoint="sm"]'],
+        ['56rem', ':not([data-breakpoint="lg"])'],
+        ['72rem', '.tx-app-layout__split-context'],
+      ] as const) {
+        const block =
+          css.split(`@container (min-width: ${width})`)[1]?.split('@container')[0] ?? '';
+        expect(block, width).toContain(selector);
+        expect(block, width).toContain('var(--tx-split-view-list-width, minmax(15rem, 22.5rem))');
+      }
+    });
+
     it('master-detail shows list and detail with a Back link when a leaf is selected', async () => {
       const { container } = render(LayoutsAppHarness, {
         props: { layout: 'master-detail' },
