@@ -12,7 +12,7 @@ Infinite possibilities.": an MIT Svelte 5 component library by Dailybot, Inc.
 **In the stack:** layer L4, a domain package on the `@texuli/core` editor texels, `@texuli/primitives`, the `@texuli/tokens` token engine and the `texuli` components. `@texuli/pages` builds on it.
 
 > **Status: in development (pre-1.0).** `@texuli/editor` is published on
-> npm as `0.14.1`, with provenance (first published as `0.5.0`; the publish
+> npm as `0.14.2`, with provenance (first published as `0.5.0`; the publish
 > workflow publishes it after `texuli`). Under 0.x a new minor (`0.14.0`) may contain
 > breaking changes, so pin the exact version or use `^0.14.0`, which accepts
 > only 0.14.x. The architecture

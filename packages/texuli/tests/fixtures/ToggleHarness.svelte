@@ -15,6 +15,7 @@ type Props = {
   disabled?: boolean;
   pressed?: boolean;
   wrap?: boolean;
+  deselectable?: boolean;
   onPressedChange?: (pressed: boolean) => void;
 };
 
@@ -26,6 +27,7 @@ let {
   disabled = false,
   pressed = $bindable(false),
   wrap = false,
+  deselectable,
   onPressedChange,
 }: Props = $props();
 </script>
@@ -35,7 +37,7 @@ let {
     {label}
   </Toggle>
 {:else if mode === 'group-single'}
-  <ToggleGroup type="single" variant="outline" size="sm" {wrap} aria-label="Align">
+  <ToggleGroup type="single" variant="outline" size="sm" {wrap} {deselectable} aria-label="Align">
     <ToggleGroupItem value="left" aria-label="Left">Left</ToggleGroupItem>
     <ToggleGroupItem value="center" aria-label="Center">Center</ToggleGroupItem>
     <ToggleGroupItem value="right" aria-label="Right">Right</ToggleGroupItem>

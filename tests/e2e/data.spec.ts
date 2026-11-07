@@ -410,6 +410,41 @@ test('data calendar: opens scrolled before paint, pointer create and drag (mirro
   expect(problems).toEqual([]);
 });
 
+test('data timeline: opens at today when work is current; day ticks never overlap (G-056)', async ({
+  page,
+  isMobile,
+}) => {
+  // Phones list the tasks and hide the canvas.
+  test.skip(isMobile, 'the time canvas is hidden on phones');
+  const ID = 'data-timeline';
+  await open(page, ID);
+  const scroller = page.locator(`[data-example="${ID}"] .canvas-scroll`);
+  // The example's clock (2026-02-18) falls inside its tasks.
+  await expect(scroller).toHaveAttribute('data-open-date', '2026-02-18');
+  expect(await scroller.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+  await expect(page.locator('[data-today-line]')).toBeInViewport();
+  expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true);
+
+  await page.getByRole('button', { name: 'Day', exact: true }).click();
+  const overlaps = await scroller.evaluate((element) => {
+    const ticks = [...element.querySelectorAll<HTMLElement>('.date-head span')];
+    const text = (tick: HTMLElement) => {
+      const range = document.createRange();
+      range.selectNodeContents(tick);
+      return range.getBoundingClientRect();
+    };
+    return ticks
+      .slice(0, -1)
+      .filter((tick, index) => {
+        const next = (ticks[index + 1] as HTMLElement).getBoundingClientRect();
+        return text(tick).right > next.left + 0.5;
+      })
+      .map((tick) => tick.textContent?.trim());
+  });
+  expect(overlaps).toEqual([]);
+  await expect(scroller.locator('.date-head span', { hasText: /^Mar 1$/ })).toHaveCount(1);
+});
+
 test('data board and virtual list: the lazy move menu relocates a card; the active row is marked in forced colors', async ({
   page,
 }) => {

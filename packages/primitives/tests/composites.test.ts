@@ -14,6 +14,7 @@ import {
 import ProgressRoot from '../src/progress/Progress.svelte';
 import { Separator } from '../src/separator/index.ts';
 import { type SplitterStorage } from '../src/splitter/index.ts';
+import { Toggle } from '../src/toggle/index.ts';
 import Fixture from './accordion-fixture.svelte';
 import MissingRoot from './accordion-missing-root-fixture.svelte';
 import CommandHarness from './CommandHarness.svelte';
@@ -411,6 +412,42 @@ describe('toggle', () => {
     cleanup();
   });
 
+  it('UG-27: a controlled value with a change handler (no bind:) reports the change and keeps the prop', async () => {
+    const cases = [
+      {
+        render: (onChange: (next: unknown) => void) =>
+          render(Toggle.Root, {
+            props: { pressed: false, onPressedChange: onChange, 'aria-label': 'Bold' },
+          }),
+        click: 'Bold',
+        expected: true,
+        pressed: [] as string[],
+      },
+      {
+        render: (onChange: (next: unknown) => void) =>
+          render(ToggleGroupFixture, {
+            props: { type: 'single', value: 'left', onValueChange: onChange, label: 'Align' },
+          }),
+        click: 'Right',
+        expected: 'right',
+        pressed: ['Left'],
+      },
+    ];
+    for (const entry of cases) {
+      const onChange = vi.fn();
+      entry.render(onChange);
+      await fireEvent.click(screen.getByRole('button', { name: entry.click }));
+      expect(onChange).toHaveBeenCalledWith(entry.expected);
+      expect(screen.getByRole('button', { name: entry.click }).getAttribute('aria-pressed')).toBe(
+        'false'
+      );
+      for (const name of entry.pressed) {
+        expect(screen.getByRole('button', { name }).getAttribute('aria-pressed')).toBe('true');
+      }
+      cleanup();
+    }
+  });
+
   describe('ToggleGroup', () => {
     it('single mode selects one item and allows clearing', async () => {
       const onValueChange = vi.fn();
@@ -431,6 +468,18 @@ describe('toggle', () => {
 
       await fireEvent.click(center);
       expect(onValueChange).toHaveBeenLastCalledWith('');
+      cleanup();
+
+      // deselectable={false}: pressing the pressed item keeps the value.
+      const kept = vi.fn();
+      render(ToggleGroupFixture, {
+        props: { type: 'single', onValueChange: kept, label: 'Align', deselectable: false },
+      });
+      const right = screen.getByRole('button', { name: 'Right' });
+      await fireEvent.click(right);
+      await fireEvent.click(right);
+      expect(kept.mock.calls).toEqual([['right']]);
+      expect(right.getAttribute('aria-pressed')).toBe('true');
     });
 
     it('submits a repeated pressed value once instead of throwing', () => {

@@ -12,6 +12,7 @@ let {
   value = $bindable<string | string[] | undefined>(undefined),
   defaultValue,
   onValueChange,
+  deselectable,
   disabled = false,
   loop = true,
   orientation = 'horizontal' as ToggleGroupOrientation,
@@ -43,8 +44,9 @@ function normalize(v: string | string[]): string[] {
 
 function setValue(next: string | string[]): void {
   if (Object.is(current, next)) return;
-  if (isControlled) value = next;
-  else localValue = next;
+  // Controlled with a handler: report and keep rendering the prop (see Toggle).
+  if (!isControlled) localValue = next;
+  else if (!onValueChange) value = next;
   onValueChange?.(next);
 }
 
@@ -63,7 +65,7 @@ function toggle(itemValue: string): void {
     setValue(next);
     return;
   }
-  setValue(current === itemValue ? '' : itemValue);
+  setValue(current !== itemValue || deselectable === false ? itemValue : '');
 }
 
 function register(_itemValue: string, _el: HTMLElement | null): void {}

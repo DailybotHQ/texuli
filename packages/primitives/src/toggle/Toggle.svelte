@@ -33,8 +33,11 @@ const isDisabled = $derived(Boolean(disabled));
 function setPressed(next: boolean): void {
   if (isDisabled) return;
   if (Object.is(isPressed, next)) return;
-  if (isControlled) pressed = next;
-  else localPressed = next;
+  // Controlled with a handler (`pressed={x} onPressedChange={…}`): report the
+  // change and keep rendering the prop; the handler owns the state. Writing
+  // an unbound prop would override it locally. `bind:pressed` alone updates.
+  if (!isControlled) localPressed = next;
+  else if (!onPressedChange) pressed = next;
   onPressedChange?.(next);
 }
 

@@ -4,6 +4,7 @@ import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue } from '../../internal/cx.ts';
+import type { NavIconRef } from '../../layouts/host/nav-model.ts';
 import { VisuallyHidden } from '../separator-aspect/index.ts';
 import { Tooltip } from '../tooltip/index.ts';
 import type { SidebarChildItem, SidebarItem, SidebarSection } from './types.ts';
@@ -32,7 +33,10 @@ type Props = Omit<HTMLAttributes<HTMLElement>, 'children'> & {
   /** Brand / workspace slot. */
   header?: Snippet<[{ collapsed: boolean }]>;
   footer?: Snippet<[{ collapsed: boolean }]>;
-  /** Optional leading icon per item. */
+  /**
+   * Optional leading icon per item. Without it, an item's `icon` (a nav icon
+   * name or a Svelte icon component) is drawn, then its two-letter initials.
+   */
   itemIcon?: Snippet<[item: SidebarItem, collapsed: boolean]>;
   /**
    * Show the leading icon box when expanded (default `true`). Docs-style text
@@ -87,6 +91,19 @@ function currentOf(item: SidebarItem): 'page' | 'true' | undefined {
 const isActive = (item: SidebarItem) => Boolean(item.active || item.current);
 const groups = $derived<readonly SidebarSection[]>(sections ?? (items ? [{ items }] : []));
 
+// Item glyphs load on demand: the nav icon map stays out of the sidebar
+// chunk until an item has an `icon` and no `itemIcon` snippet draws it.
+let NavIcon = $state.raw<typeof import('../../layouts/host/NavIcon.svelte').default>();
+$effect(() => {
+  if (
+    !itemIcon &&
+    groups.some((group) =>
+      group.items.some((item) => item.icon || item.children?.some((child) => child.icon))
+    )
+  )
+    import('../../layouts/host/NavIcon.svelte').then((module) => (NavIcon = module.default));
+});
+
 const rootClass = $derived(
   sidebarClass({
     variant,
@@ -132,6 +149,8 @@ function hrefOf(item: Pick<SidebarItem, 'href'>): string | undefined {
             <span class="tx-sidebar__icon" aria-hidden="true">
               {#if itemIcon}
                 {@render itemIcon(item, true)}
+              {:else if item.icon && NavIcon}
+                <NavIcon icon={item.icon as NavIconRef} />
               {:else}
                 {shortOf(item)}
               {/if}
@@ -139,7 +158,7 @@ function hrefOf(item: Pick<SidebarItem, 'href'>): string | undefined {
             <VisuallyHidden>{item.label}</VisuallyHidden>
             {#if item.badge !== undefined}
               <span class="tx-sidebar__badge-dot" aria-hidden="true"></span>
-              <VisuallyHidden>({item.badge})</VisuallyHidden>
+              <VisuallyHidden>({item.badgeLabel ?? item.badge})</VisuallyHidden>
             {/if}
           </a>
         {:else}
@@ -153,6 +172,8 @@ function hrefOf(item: Pick<SidebarItem, 'href'>): string | undefined {
             <span class="tx-sidebar__icon" aria-hidden="true">
               {#if itemIcon}
                 {@render itemIcon(item, true)}
+              {:else if item.icon && NavIcon}
+                <NavIcon icon={item.icon as NavIconRef} />
               {:else}
                 {shortOf(item)}
               {/if}
@@ -166,6 +187,7 @@ function hrefOf(item: Pick<SidebarItem, 'href'>): string | undefined {
     <a
       {href}
       class={itemClass}
+      aria-label={item.badgeLabel && `${item.label} (${item.badgeLabel})`}
       aria-current={currentOf(item)}
       data-tx-sidebar-item
       data-active={isActive(item) ? '' : undefined}
@@ -174,6 +196,8 @@ function hrefOf(item: Pick<SidebarItem, 'href'>): string | undefined {
         <span class="tx-sidebar__icon" aria-hidden="true">
           {#if itemIcon}
             {@render itemIcon(item, false)}
+          {:else if item.icon && NavIcon}
+            <NavIcon icon={item.icon as NavIconRef} />
           {:else}
             {shortOf(item)}
           {/if}
@@ -192,6 +216,7 @@ function hrefOf(item: Pick<SidebarItem, 'href'>): string | undefined {
     <span
       class={itemClass}
       role="link"
+      aria-label={item.badgeLabel && `${item.label} (${item.badgeLabel})`}
       aria-disabled="true"
       data-tx-sidebar-item
     >
@@ -199,6 +224,8 @@ function hrefOf(item: Pick<SidebarItem, 'href'>): string | undefined {
         <span class="tx-sidebar__icon" aria-hidden="true">
           {#if itemIcon}
             {@render itemIcon(item, false)}
+          {:else if item.icon && NavIcon}
+            <NavIcon icon={item.icon as NavIconRef} />
           {:else}
             {shortOf(item)}
           {/if}

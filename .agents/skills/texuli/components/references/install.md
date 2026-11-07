@@ -4,7 +4,7 @@ Back to [`../SKILL.md`](../SKILL.md).
 
 ## A. Use the packages
 
-The packages are on npm in the 0.14 line, every one at `0.14.1`, a pre-1.0 line
+The packages are on npm in the 0.14 line, every one at `0.14.2`, a pre-1.0 line
 (`latest` points to the newest, and `next` is no longer maintained and stays on `0.12.1`; 1.0.0 will be the first stable release). An app outside a
 Texuli checkout installs them plainly, for example
 `pnpm add texuli @texuli/tokens`, and pins the exact version or `^0.14.0`
@@ -14,7 +14,7 @@ runs the install; it uses the network). `@texuli/drag`,
 in `0.5.0`), `@texuli/document` and `@texuli/pages` (both first published
 in `0.7.0`), `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (all
 three first published in `0.8.0`) and `@texuli/mcp` (first published in
-`0.9.0`) are in development and on npm as `0.14.1`.
+`0.9.0`) are in development and on npm as `0.14.2`.
 
 New in `0.13.1` (an additive patch): `@texuli/blocks/code-field` (`CodeField`),
 `registerIcons` and `IconsProvider` in `texuli/icons`, `srcDark` and
@@ -61,6 +61,31 @@ New in `0.14.1` (an additive patch; an app that uses these pins `^0.14.1`):
   and `cellFooter(column, lane)`, with `lane` `DEFAULT_LANE` without lanes.
 - Not in the agent catalog yet: `collapsedLanes`, `cellFooter` and
   `maxEventsPerDay`. There is no `laneHeader` snippet.
+
+New in `0.14.2` (a patch; an app that uses these pins `^0.14.2`):
+
+- `TimelineView`: `formatTick(date, { zoom, locale, monthStart })` (compact
+  day-zoom labels by default) and `initialDate`; without it the timeline
+  opens at today when today is within the plan. Exports
+  `formatTimelineTick`, `timelineAnchor`, `TimelineTickContext`.
+- `ToggleGroup` `deselectable` (default `true`); `Select.Root` `block` and a
+  `ghost` trigger variant (per instance, not a design-system default);
+  `Sidebar` draws `item.icon`; `badgeLabel` on sidebar and bottom-nav
+  items; `IconButton` `badge` and `badgeLabel`.
+- Component CSS hooks (each falls back to the look before it): the pressed
+  toggle colors, radio size, ring and dot, the radio card alignment, the
+  switch thumb inset, the input placeholder color, tab badge colors, the
+  dialog close icon size, the PIN cell border, the `IconButton` badge
+  colors and a scrim blur (a `backdrop-filter` value, default `none`).
+  The `texuli` component docs name each one.
+- Fixes: a dialog or sheet mounted open shows its backdrop; side sheets,
+  drawers and `DetailPanel` fill their block size (a contained
+  `DetailPanel` needs a `position: relative` container).
+- Behavior: with `bind:pressed` and `onPressedChange` on `Toggle` (or
+  `bind:value` and `onValueChange` on `ToggleGroup`), the handler must set
+  the value; a controlled `pressed` with a handler renders the prop.
+- Not in the agent catalog yet: `initialDate`, `Select` `block` and
+  `ghost`, the `IconButton` badge.
 
 Behavior that changes on the move is in
 [`../../upgrade/SKILL.md`](../../upgrade/SKILL.md) ("0.13 → 0.14").

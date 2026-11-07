@@ -147,6 +147,43 @@ describe('measureEntry', () => {
     BUILD
   );
 
+  it(
+    'counts the CSS a module graph imports (a component importing its stylesheet, as texuli does) as cssGzip, and CSS behind import() as lazy',
+    async () => {
+      const dir = join(workspace, 'css-graph');
+      await mkdir(dir, { recursive: true });
+      // Distinct rules, so gzip cannot fold one stylesheet into another.
+      const rules = (prefix: string, count: number) =>
+        Array.from(
+          { length: count },
+          (_, i) => `.${prefix}-${i}{padding-inline:${i}px;inline-size:${i * 7}rem}`
+        ).join('\n');
+      await writeFile(join(dir, 'own.css'), rules('own', 4));
+      await writeFile(join(dir, 'shared.css'), rules('shared', 40));
+      await writeFile(join(dir, 'later.css'), rules('later', 400));
+      await writeFile(
+        join(dir, 'part.ts'),
+        "import './shared.css';\nexport const part = () => 'part';\n"
+      );
+      await writeFile(
+        join(dir, 'later.ts'),
+        "import './later.css';\nexport const later = () => 'later';\n"
+      );
+      await writeFile(
+        join(dir, 'entry.ts'),
+        "import './own.css';\nexport { part } from './part.ts';\nexport const load = () => import('./later.ts');\n"
+      );
+      const graph = await measureEntry({ file: join(dir, 'entry.ts'), css: false });
+      const own = await measureEntry({ file: join(dir, 'own.css'), css: true });
+      // The stylesheet two modules down is initial CSS too, not only the entry's own.
+      expect(graph.cssGzip).toBeGreaterThan(own.cssGzip);
+      expect(graph.lazyCssGzip).toBeGreaterThan(0);
+      // 400 lazy rules stay out of the initial number.
+      expect(graph.cssGzip).toBeLessThan(graph.lazyCssGzip);
+    },
+    BUILD
+  );
+
   it('treats svelte and its subpaths as external, and nothing else', () => {
     expect(isExternal('svelte')).toBe(true);
     expect(isExternal('svelte/internal/client')).toBe(true);
@@ -202,7 +239,8 @@ describe('budgets', () => {
       const rows = compare(
         [
           { id: '@fixture/widgets/button', measure: measure(1000, { cssGzip: 2000 }) },
-          { id: '@fixture/widgets/dialog', measure: measure(8000) },
+          // An exact row with no cssGzip budgets no CSS: its pattern's cssGzip does not apply.
+          { id: '@fixture/widgets/dialog', measure: measure(8000, { cssGzip: 9000 }) },
           { id: '@fixture/alpha', measure: measure(310) },
           { id: '@fixture/unknown', measure: measure(10) },
         ],
@@ -212,6 +250,7 @@ describe('budgets', () => {
       expect(byId['@fixture/widgets/button']?.status).toBe('over');
       expect(byId['@fixture/widgets/button']?.problems).toEqual(['css gzip 2000 B > 1024 B']);
       expect(byId['@fixture/widgets/dialog']?.status).toBe('ok');
+      expect(byId['@fixture/widgets/dialog']?.problems).toEqual([]);
       expect(byId['@fixture/alpha']?.status).toBe('larger-than-protoyard');
       expect(byId['@fixture/alpha']?.problems[0]).toMatch(/@protoyard\/ui 300 B/);
       expect(byId['@fixture/unknown']?.status).toBe('unbudgeted');

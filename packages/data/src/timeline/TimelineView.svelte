@@ -1,6 +1,7 @@
 <script lang="ts" generics="T extends TimelineItem">
 import { createPointerTracker } from '@texuli/drag/gesture';
 import { applyModifiers, restrictToAxis, snapToGrid } from '@texuli/drag/modifiers';
+import { untrack } from 'svelte';
 import { type ClassValue, cx } from 'texuli/cx';
 import { addDays, daysBetween, type IsoDate } from '../engines/calendar/dates.ts';
 import { createAxis, windowAxis } from '../engines/grid/virtual.ts';
@@ -20,13 +21,16 @@ import {
   DAY_WIDTH,
   DEFAULT_TIMELINE_LABELS,
   dateOffset,
+  formatTimelineTick,
   HEADER_HEIGHT,
   markerOffset,
   progressValue,
   ROW_HEIGHT,
   type TimelineLabels,
   type TimelineMarker,
+  type TimelineTickContext,
   type TimelineZoom,
+  timelineAnchor,
   timelineRange,
   ZOOMS,
 } from './model.ts';
@@ -57,6 +61,8 @@ let {
   selectedRow = $bindable(),
   onRowSelect,
   markers = [],
+  initialDate,
+  formatTick = formatTimelineTick,
   labels: labelOverrides,
   class: className,
 }: {
@@ -90,6 +96,14 @@ let {
   onRowSelect?: (task: T) => void;
   /** Vertical markers besides today, such as the end of a review window. */
   markers?: readonly TimelineMarker[];
+  /**
+   * The day the time axis opens at (read once, on mount): a civil date, a
+   * `Date` or an ISO date-time. Defaults to today when it falls within the
+   * tasks' span, else the earliest date.
+   */
+  initialDate?: IsoDate | Date;
+  /** Axis tick labels; the default is compact at day zoom ("Mar 1", "2"). */
+  formatTick?: (date: IsoDate, context: TimelineTickContext) => string;
   /** Every user-facing string; defaults keep the original English copy. */
   labels?: Partial<TimelineLabels>;
   class?: ClassValue;
@@ -117,9 +131,11 @@ const rows = $derived<Row[]>(
   ]) as Row[]
 );
 const rowIndex = $derived(new Map(rows.map((row, index) => [row.task?.id, index])));
-// Bands and valid markers widen the axis so they are never cut off.
+const anchor = $derived(timelineAnchor(visibleTasks, today, initialDate));
+// Bands, valid markers and the anchor widen the axis so they are never cut off.
 const range = $derived.by(() => {
   const spans: ScheduleTask[] = [...visibleTasks];
+  if (anchor) spans.push({ id: '', start: anchor, end: anchor });
   for (const group of model.groups) if (group.band) spans.push({ id: '', ...group.band });
   for (const marker of markers) {
     const offset = markerOffset(marker.at, today);
@@ -172,10 +188,11 @@ const activePreview = $derived.by(() => {
 const previewById = $derived(new Map(activePreview.map((change) => [change.id, change])));
 const dayTicks = $derived.by(() => {
   const step = zoom === 'day' ? 1 : zoom === 'week' ? 7 : zoom === 'month' ? 30 : 90;
-  const marks: { date: IsoDate; offset: number }[] = [];
+  const marks: { date: IsoDate; offset: number; monthStart: boolean }[] = [];
   for (let day = 0; day < totalDays; day += step) {
     const date = addDays(range.start, day);
-    marks.push({ date, offset: day * width });
+    const monthStart = marks.at(-1)?.date.slice(0, 7) !== date.slice(0, 7);
+    marks.push({ date, offset: day * width, monthStart });
   }
   return marks;
 });
@@ -389,6 +406,19 @@ function formatDate(date: string): string {
   }).format(new Date(`${date}T12:00:00Z`));
 }
 
+/**
+ * Opens the axis at `anchor` once, when the scroller mounts: instantly (no
+ * motion), a quarter of the viewport in so earlier work stays in sight, and
+ * never focusing. RTL scroll offsets run negative from the inline start.
+ */
+function openAt(element: HTMLElement): void {
+  untrack(() => {
+    if (!anchor) return;
+    const left = Math.max(0, dateOffset(anchor, range.start) * width - element.clientWidth / 4);
+    element.scrollTo?.({ left: direction === 'rtl' ? -left : left, behavior: 'instant' });
+  });
+}
+
 function tickWidth(): number {
   return Math.max(
     width,
@@ -536,7 +566,13 @@ function tickWidth(): number {
             {/each}
           </div>
         </div>
-        <div class="canvas-scroll" bind:this={scroller} onscroll={onScroll}>
+        <div
+          class="canvas-scroll"
+          data-open-date={anchor}
+          bind:this={scroller}
+          onscroll={onScroll}
+          {@attach openAt}
+        >
           <div
             class="canvas"
             style:inline-size="{canvasWidth}px"
@@ -548,7 +584,7 @@ function tickWidth(): number {
                   style:inset-inline-start="{tick.offset}px"
                   style:inline-size="{tickWidth()}px"
                 >
-                  {formatDate(tick.date)}
+                  {formatTick(tick.date, { zoom, locale, monthStart: tick.monthStart })}
                 </span>
               {/each}
             </div>

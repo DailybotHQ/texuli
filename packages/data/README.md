@@ -11,7 +11,7 @@ data-heavy product screens.
 
 **In the stack:** layer L4, a domain package on the `@texuli/core` texels, `@texuli/primitives`, `@texuli/drag`, the `@texuli/tokens` token engine and the `texuli` components. `@texuli/blocks`, `@texuli/sheets`, the agent catalog and the player build on it.
 
-> **Status: 0.x release.** `@texuli/data` is published on npm as `0.14.1`, a
+> **Status: 0.x release.** `@texuli/data` is published on npm as `0.14.2`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
 > minor (`0.14.0`) may contain breaking changes, so pin the exact version or
 > use `^0.14.0`, which accepts only 0.14.x.
@@ -82,7 +82,7 @@ visible and announced string is translatable through `labels`.
 | `@texuli/data/board` | `Board`: columns and swimlanes with WIP limits, keyboard moves, column footers and heading levels; collapsible lanes and cell footers (new in `0.14.1`) |
 | `@texuli/data/dashboard` | `Dashboard` and `DashboardWidget`: a widget grid moved and resized by pointer, keyboard or an arrange toolbar, with breakpoints and a saved layout (new in `0.8.0`; [docs](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-dashboard.md)) |
 | `@texuli/data/calendar/view` | `CalendarView`: month, time-grid and agenda views with move and reschedule, an `event` content snippet and month overflow (new in `0.14.1`) |
-| `@texuli/data/timeline` | `TimelineView`: virtualized Gantt timeline with dependencies, zoom, critical path, collapsible groups with bands, row selection and markers |
+| `@texuli/data/timeline` | `TimelineView`: virtualized Gantt timeline with dependencies, zoom, critical path, collapsible groups with bands, row selection and markers; compact day ticks, `formatTick` and an opening date (`initialDate`, today by default when in range; new in `0.14.2`) |
 | `@texuli/data/map` | `MapView`: an offline, fictional vector basemap with markers, clusters, routes and fences |
 | `@texuli/data/activity` | `ActivityFeed`: day-grouped activity with avatars, reactions and pagination |
 | `@texuli/data/activity/inbox` | `NotificationInbox`: unread state, mark read and unread, mark all, item actions and arrival announcements |

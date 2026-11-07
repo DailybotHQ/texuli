@@ -39,6 +39,7 @@ export {
   dateAtOffset,
   dateOffset,
   durationLabel,
+  formatTimelineTick,
   HEADER_HEIGHT,
   markerOffset,
   progressValue,
@@ -46,7 +47,9 @@ export {
   TASK_COLUMN_WIDTH,
   type TimelineLabels,
   type TimelineMarker,
+  type TimelineTickContext,
   type TimelineZoom,
+  timelineAnchor,
   timelineRange,
   ZOOMS,
 } from './model.ts';

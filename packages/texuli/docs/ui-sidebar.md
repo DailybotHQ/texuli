@@ -24,11 +24,18 @@ App chrome on `--tx-sidebar*` tokens:
 | `drawer` | Full-width host for mobile sheet |
 | `variant` | `default` \| `inset` |
 | `header` / `footer` | Snippets receiving `{ collapsed }` |
-| `itemIcon` | Optional leading icon snippet `(item, collapsed)` |
+| `itemIcon` | Optional leading icon snippet `(item, collapsed)`; without it, the item's `icon` is drawn, then two-letter initials |
 | `hrefTrust` | URL policy tier for item links (default `developer`) |
 
-Items: `{ id?, label, href?, active?, badge?, disabled?, shortLabel? }`.  
+Items: `{ id?, label, href?, active?, current?, badge?, badgeLabel?, disabled?, shortLabel?, icon?, children? }`.  
 `href` goes through `safeHref`. Active items use `aria-current="page"`. Collapsed badges become a primary dot + screen-reader text; item labels use tooltips.
+
+- `icon` (a nav icon name such as `inbox`, or a Svelte icon component) is
+  drawn when no `itemIcon` snippet is given. The glyphs load on demand, so
+  the first paint shows the initials until they arrive.
+- `badgeLabel` (`3 unread`) is the accessible text of the badge: the link is
+  read as `Inbox (3 unread)` while the visible badge keeps showing `3`
+  (hidden from assistive tech). Without it, the badge value is read.
 
 ### AppNav
 

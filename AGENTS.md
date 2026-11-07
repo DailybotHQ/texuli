@@ -28,7 +28,7 @@ end to end and native for agents:
 
 **Status: in development, pre-1.0.** All 26 published packages (all of
 `packages/` except `@texuli/examples`) are released on npm in the 0.14 line,
-every one at `0.14.1`, which the publish workflow publishes from `main`
+every one at `0.14.2`, which the publish workflow publishes from `main`
 after the merge through npm trusted publishing and points `latest` to
 (`next` is no longer maintained and stays on `0.12.1`); `0.10.0` added design
 systems (one JSON document per brand, [DESIGN_SYSTEMS](docs/DESIGN_SYSTEMS.md))
@@ -92,8 +92,8 @@ texuli/
 ├── packages/            layers point down only (scripts/check-layers.ts)
 │   ├── core/            L0 @texuli/core: texels (overlay engine, roving, positioning, URL policy…)  (README, docs/)
 │   ├── date/            L0 @texuli/date: Gregorian date arithmetic and locale week starts      (README)
-│   ├── deck/            L0 @texuli/deck: deck model v2 from JSON or Markdown, engine, authoring (in development, on npm as 0.14.1) (README, docs/)
-│   ├── drag/            L0 @texuli/drag: framework-free drag engine (in development, on npm as 0.14.1) (README, docs/)
+│   ├── deck/            L0 @texuli/deck: deck model v2 from JSON or Markdown, engine, authoring (in development, on npm as 0.14.2) (README, docs/)
+│   ├── drag/            L0 @texuli/drag: framework-free drag engine (in development, on npm as 0.14.2) (README, docs/)
 │   ├── primitives/      L1 @texuli/primitives: 42 owned headless primitives, APG patterns      (README, docs/)
 │   ├── document/        L1 @texuli/document: block document engine, ops, Markdown, CRDT sync (in development, on npm since 0.7.0) (README, docs/)
 │   ├── tokens/          L2 @texuli/tokens: OKLCH theme engine, --tx-* contract, 200+ themes, CSS (README, docs/)
@@ -111,7 +111,7 @@ texuli/
 │   ├── sheets/          L5 @texuli/sheets: spreadsheets, owned formula engine, CSV, sheet view (in development, first on npm as 0.8.0) (README, docs/)
 │   ├── catalog/         L6 @texuli/catalog: agent catalog + sink-free renderer                 (README, docs/)
 │   ├── player/          L7 @texuli/player: paint runtime for validated blueprints              (README, docs/)
-│   ├── slides/          L8 @texuli/slides: presentation stage on @texuli/deck, print, PPTX (in development, on npm as 0.14.1) (README, docs/)
+│   ├── slides/          L8 @texuli/slides: presentation stage on @texuli/deck, print, PPTX (in development, on npm as 0.14.2) (README, docs/)
 │   ├── tools/           L8 @texuli/tools: CLI, llms, A2UI, custom elements, golden set, MCP     (README, docs/)
 │   ├── astro/           L8 @texuli/astro: Astro integration, content layouts, sections          (README, docs/)
 │   ├── pages/           L8 @texuli/pages: block document editor and reader (in development, on npm since 0.7.0) (README, docs/)
@@ -234,8 +234,8 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     `@texuli/deck`, `@texuli/slides`, `@texuli/editor`, `@texuli/document`, `@texuli/pages`,
     `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets` and `@texuli/mcp`
     are still in development, and the blueprint spec in
-    `@texuli/spec@0.14.1` is `0.12.0`. `@texuli/examples`, the apps and
-    `native/` publish nothing. 0.14.1 is a pre-1.0 release, not stable
+    `@texuli/spec@0.14.2` is `0.12.0`. `@texuli/examples`, the apps and
+    `native/` publish nothing. 0.14.2 is a pre-1.0 release, not stable
     (1.0.0 will be the first stable release; `latest` tracks the newest
     release). texuli.com deploys from `main` (Cloudflare Pages), with the
     remote MCP at `https://texuli.com/mcp`; the agent service is not

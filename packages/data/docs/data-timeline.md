@@ -49,6 +49,51 @@ A time-scaled timeline / Gantt with:
 
 Pass a fixed `now` in tests and visual stories so the today line is stable.
 
+## Axis labels and opening date
+
+New in `0.14.2`.
+
+| Prop | Type | What it does |
+| --- | --- | --- |
+| `formatTick` | `(date: IsoDate, context: TimelineTickContext) => string` | Labels each axis tick. `context` is `{ zoom, locale, monthStart }`; `monthStart` is true on the first tick and on the first tick of every new month. Defaults to `formatTimelineTick`. |
+| `initialDate` | `IsoDate \| Date` | The day the time axis opens at: a civil date, a `Date`, or an ISO date-time (read in UTC). Read once, when the canvas mounts; the axis widens to include it. |
+
+- **Compact day ticks.** A day tick is 48px wide, so the default label at
+  day zoom is the day of month, with the short month only where a month
+  starts ("Dec 29", "30", "31", "Jan 1", "2"). Week, month and quarter ticks
+  keep the full date ("March 2, 2026"). Labels use `Intl.DateTimeFormat`
+  with `locale`, in UTC.
+- **Opening date.** Without `initialDate`, the axis opens at today when today
+  falls between the earliest task start and the latest task end; otherwise
+  it opens at its start, as before. This default changed in `0.14.2`:
+  earlier versions always opened at the start, so a plan with current work
+  opened with no bars in view. The opening day sits a quarter of the
+  viewport in from the inline start, so earlier work stays in sight. The
+  scroll is instant (no motion) and never moves focus. In RTL it scrolls
+  from the right edge (negative `scrollLeft`). Changing `zoom` later keeps
+  the scroll offset, as before.
+- **Hooks.** `formatTimelineTick`, `timelineAnchor` (the opening-date rule)
+  and the `TimelineTickContext` type are exported from
+  `@texuli/data/timeline`. The canvas scroller carries the opening day as
+  `data-open-date`.
+- **Blueprints.** The `data-timeline` catalog id does not take
+  `initialDate` yet (it needs a spec change); `formatTick` is a function, so
+  it stays app-only.
+
+```svelte
+<TimelineView
+  {tasks}
+  zoom="day"
+  initialDate="2026-02-16"
+  formatTick={(date, { zoom, locale }) =>
+    zoom === 'day'
+      ? new Intl.DateTimeFormat(locale, { weekday: 'narrow', timeZone: 'UTC' }).format(
+          new Date(`${date}T12:00:00Z`)
+        )
+      : date}
+/>
+```
+
 ## Groups, bands, selection and markers
 
 New in `0.14.0`. `getGroup` already ordered rows by group; it now also opens

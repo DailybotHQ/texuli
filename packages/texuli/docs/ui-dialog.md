@@ -185,6 +185,25 @@ set the color in host CSS on the theme scope:
 }
 ```
 
+### Scrim blur
+
+Added in `0.14.2` (UG-30): `--tx-scrim-blur` is a host hook for a frosted
+scrim. It takes a `backdrop-filter` value and defaults to `none`, so nothing
+changes until you set it. The dialog and sheet overlays read it from one
+shared rule (`src/internal/scrim.css`), which also paints both scrims:
+
+```css
+[data-tx-theme] {
+  --tx-scrim-blur: blur(6px);
+}
+```
+
+It is a filter value, not a length, because even `blur(0)` gives the
+overlay a backdrop filter (a stacking context and a compositing layer). The
+color and opacity rules above are unchanged. Engines without
+`backdrop-filter` (Safari before 18 needs the `-webkit-` prefix, which is
+not set) just show the plain scrim.
+
 ## Rules
 
 - Logical CSS for padding, gaps and inline size; physical `top`/`left` only to keep the modal centered in LTR and RTL
@@ -192,6 +211,8 @@ set the color in host CSS on the theme scope:
 - Layers: `@layer tx.components`
 - AA contrast in light, dark and forced-colors (token fallbacks + `forced-colors` rules)
 - Labels are props so hosts can translate them
+- The close glyph reads the `--tx-dialog-close-icon-size` hook (default: the
+  `sm` icon size, `--tx-icon-size-sm`, then `--tx-size-icon-sm`)
 
 ## Motion
 

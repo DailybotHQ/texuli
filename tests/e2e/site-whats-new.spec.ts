@@ -98,9 +98,9 @@ test('every feature by release, each demo working, links that resolve; axe light
     'its patch 0.13.1 adds'
   );
   await expect(page.locator('[data-hub-release="0.13.0"] [data-hub-feature]')).toHaveCount(0);
-  // Consumer gaps: 0.14.0 is on the hub with its patch 0.14.1 as the current release, and no cards of its own.
+  // Consumer gaps: 0.14.0 is on the hub with its patch 0.14.2 as the current release, and no cards of its own.
   await expect(page.locator('[data-hub-release="0.14.0"] .hub__status')).toContainText(
-    'its patch 0.14.1, the current release'
+    '0.14.2, the current release'
   );
   await expect(page.locator('[data-hub-release="0.14.0"] [data-hub-feature]')).toHaveCount(0);
   // PLAN_011 T-site-0100: design systems, the studio, the ds tools, conformance, the

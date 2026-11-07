@@ -54,6 +54,15 @@ describe('mobile parts (G15)', () => {
     expect(order).toEqual(['a', 'header', 'main', 'div.footer', 'nav']);
   });
 
+  it('reads badgeLabel in the tab name while the badge stays visible', () => {
+    const labelled = items.map((item) =>
+      item.badge === undefined ? item : { ...item, badgeLabel: '3 unread' }
+    );
+    render(Harness, { props: { items: labelled, backHref: '#/deals' } });
+    const inbox = screen.getByRole('link', { name: 'Inbox (3 unread)' });
+    expect(inbox.querySelector('.tx-mobile-tabs__badge')?.textContent).toBe('3');
+  });
+
   it('uses a Back button with onBack and no nested main landmark inside a page main', async () => {
     const onBack = vi.fn();
     render(Harness, { props: { items, onBack, nested: true } });

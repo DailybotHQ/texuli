@@ -15,6 +15,7 @@ let {
   variant = 'outline' as SelectVariant,
   disabled = false,
   placeholder = 'Choose a plan',
+  block,
 }: {
   open?: boolean;
   value?: string;
@@ -22,11 +23,12 @@ let {
   variant?: SelectVariant;
   disabled?: boolean;
   placeholder?: string;
+  block?: boolean;
 } = $props();
 </script>
 
 <span id="plan-label">Plan</span>
-<Select.Root bind:open bind:value {size} {variant} {disabled} name="plan" {items}>
+<Select.Root bind:open bind:value {size} {variant} {disabled} {block} name="plan" {items}>
   <Select.Trigger aria-labelledby="plan-label" {size} {variant}>
     <Select.Value {placeholder} />
   </Select.Trigger>

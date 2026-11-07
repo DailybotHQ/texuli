@@ -59,9 +59,9 @@ function stateFor(index: number, id: string): StepperStepState {
 }
 
 function statusPhrase(state: StepperStepState): string {
-  if (state === 'complete') return 'completed';
-  if (state === 'current') return 'current step';
-  return 'not started';
+  if (state === 'complete') return msg('texuli.stepper.complete', 'completed');
+  if (state === 'current') return msg('texuli.stepper.current', 'current step');
+  return msg('texuli.stepper.upcoming', 'not started');
 }
 </script>
 

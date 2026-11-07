@@ -428,6 +428,17 @@ describe('button', () => {
       expect(button.className).toContain('tx-button--icon');
       expect(button.getAttribute('aria-label')).toBe('Close dialog');
     });
+
+    it('draws badge as decoration and reads badgeLabel in the accessible name', () => {
+      const { getByRole } = render(IconButtonHarness, {
+        props: { label: 'Inbox', badge: 3, badgeLabel: '3 unread' },
+      });
+      const button = getByRole('button', { name: 'Inbox (3 unread)' });
+      expect(button.getAttribute('data-tx-badge')).toBe('3');
+      cleanup();
+      const plain = render(IconButtonHarness, { props: { label: 'Inbox', badge: 3 } });
+      expect(plain.getByRole('button', { name: 'Inbox' }).getAttribute('data-tx-badge')).toBe('3');
+    });
   });
 });
 
@@ -675,6 +686,18 @@ describe('select', () => {
       const listbox = await screen.findByRole('listbox');
       // APG listbox grouping: the group is named by its group label.
       expect(within(listbox).getByRole('group', { name: 'Plans' })).toBeTruthy();
+    });
+
+    it('fills the inline size with block and draws the ghost trigger variant', () => {
+      const view = render(SelectFixture, { props: { variant: 'ghost', block: true } });
+      const root = view.container.querySelector('[data-tx-select-root]');
+      expect(root?.hasAttribute('data-block')).toBe(true);
+      const trigger = view.container.querySelector('[data-tx-select-trigger]');
+      expect(trigger?.classList.contains('tx-select-trigger--ghost')).toBe(true);
+      expect(trigger?.getAttribute('data-variant')).toBe('ghost');
+      cleanup();
+      const plain = render(SelectFixture);
+      expect(plain.container.querySelector('[data-block]')).toBeNull();
     });
 
     it('keeps the separator out of the listbox semantics', async () => {
@@ -1139,6 +1162,25 @@ describe('toggle', () => {
       const right = screen.getByRole('button', { name: 'Right' });
       await fireEvent.click(right);
       expect(right.getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('clears a single value on a second press unless deselectable is false', async () => {
+      for (const [deselectable, after] of [
+        [undefined, 'false'],
+        [true, 'false'],
+        [false, 'true'],
+      ] as const) {
+        render(ToggleHarness, { props: { mode: 'group-single', deselectable } });
+        const center = screen.getByRole('button', { name: 'Center' });
+        await fireEvent.click(center);
+        expect(center.getAttribute('aria-pressed')).toBe('true');
+        await fireEvent.click(center);
+        expect(center.getAttribute('aria-pressed'), String(deselectable)).toBe(after);
+        // Another item still moves the value.
+        await fireEvent.click(screen.getByRole('button', { name: 'Left' }));
+        expect(center.getAttribute('aria-pressed')).toBe('false');
+        cleanup();
+      }
     });
   });
 });

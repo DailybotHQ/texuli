@@ -66,6 +66,37 @@ colors. The `texuli-sheet` example includes all size variants, logical sides,
 RTL, a drawer with snap points, a non-modal detail panel and the responsive
 modal.
 
+## Full height and contained panels
+
+Fixed in `0.14.2` (UG-51): a side `Sheet` or `Drawer` (`start`, `end`,
+`left`, `right`) and a `DetailPanel` fill the whole block size even with
+short content. Before, the browser's popover style (`block-size:
+fit-content`) made them only as tall as their content. Long content scrolls
+inside the surface, or inside `Body` when you use the parts.
+
+With `mode="contained"` and a `container` on the root, the surface is placed
+in the container (`position: absolute`) and fills its height, not the
+viewport's. The container must be a containing block. A `Sheet.Overlay`
+gives it `position: relative` while it is mounted; a `DetailPanel` has no
+overlay, so position the container yourself:
+
+```svelte
+<div class="pane" bind:this={pane}>…</div>
+{#if pane}
+  <DetailPanel.Root mode="contained" container={pane}>…</DetailPanel.Root>
+{/if}
+
+<style>
+  .pane {
+    position: relative;
+    block-size: 20rem;
+    overflow: hidden;
+  }
+</style>
+```
+
+Test: `UG-51` in `tests/e2e/bugs-75-79.spec.ts` (`?case=panels`).
+
 ## Parts: header, body, footer and close
 
 Every surface (`Sheet`, `Drawer`, `DetailPanel`, `ResponsiveModal`) takes the
@@ -146,6 +177,25 @@ set the color in host CSS on the theme scope:
   --tx-scrim: oklch(0.2 0.03 260);
 }
 ```
+
+### Scrim blur
+
+Added in `0.14.2` (UG-30): `--tx-scrim-blur` is a host hook for a frosted
+scrim. It takes a `backdrop-filter` value and defaults to `none`, so nothing
+changes until you set it. The dialog and sheet overlays read it from one
+shared rule (`src/internal/scrim.css`), which also paints both scrims:
+
+```css
+[data-tx-theme] {
+  --tx-scrim-blur: blur(6px);
+}
+```
+
+It is a filter value, not a length, because even `blur(0)` gives the
+overlay a backdrop filter (a stacking context and a compositing layer). The
+color and opacity rules above are unchanged. Engines without
+`backdrop-filter` (Safari before 18 needs the `-webkit-` prefix, which is
+not set) just show the plain scrim.
 
 ## Motion
 

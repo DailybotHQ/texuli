@@ -17,6 +17,11 @@ type OwnProps = {
   value?: string | string[];
   defaultValue?: string | string[];
   onValueChange?: (value: string | string[]) => void;
+  /**
+   * `single` only: `false` keeps the pressed item pressed when it is pressed
+   * again. Default `true`. Passed to the primitive through the rest props.
+   */
+  deselectable?: boolean;
   disabled?: boolean;
   loop?: boolean;
   orientation?: Orientation;

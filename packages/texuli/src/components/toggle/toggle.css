@@ -87,9 +87,13 @@
     color: var(--tx-foreground, CanvasText);
   }
 
+  /* Pressed state hooks: --tx-toggle-on-bg, --tx-toggle-on-fg and --tx-toggle-on-border. */
   .tx-toggle--default[data-state="on"] {
-    background-color: var(--tx-accent, var(--tx-primary, Highlight));
-    color: var(--tx-accent-foreground, var(--tx-primary-foreground, CanvasText));
+    background-color: var(--tx-toggle-on-bg, var(--tx-accent, var(--tx-primary, Highlight)));
+    color: var(
+      --tx-toggle-on-fg,
+      var(--tx-accent-foreground, var(--tx-primary-foreground, CanvasText))
+    );
   }
 
   .tx-toggle--outline {
@@ -104,9 +108,12 @@
   }
 
   .tx-toggle--outline[data-state="on"] {
-    background-color: var(--tx-accent, var(--tx-primary, Highlight));
-    border-color: var(--tx-accent, var(--tx-primary, Highlight));
-    color: var(--tx-accent-foreground, var(--tx-primary-foreground, CanvasText));
+    background-color: var(--tx-toggle-on-bg, var(--tx-accent, var(--tx-primary, Highlight)));
+    border-color: var(--tx-toggle-on-border, var(--tx-accent, var(--tx-primary, Highlight)));
+    color: var(
+      --tx-toggle-on-fg,
+      var(--tx-accent-foreground, var(--tx-primary-foreground, CanvasText))
+    );
   }
 
   /* Group shell (segmented control) */
@@ -201,7 +208,7 @@
 
   .tx-toggle-group--outline.tx-toggle-group--horizontal.tx-toggle-group--wrap
     .tx-toggle[data-state="on"] {
-    border-color: var(--tx-accent, var(--tx-primary, Highlight));
+    border-color: var(--tx-toggle-on-border, var(--tx-accent, var(--tx-primary, Highlight)));
   }
 
   .tx-toggle-group[data-disabled] {

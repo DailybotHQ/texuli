@@ -15,6 +15,14 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The packages are on npm at `0.14.2`, a patch: timeline `formatTick` and
+  `initialDate`, `ToggleGroup` `deselectable`, `Select` `block` and
+  `ghost`, sidebar icons and badge labels, an `IconButton` badge, new CSS
+  hooks, and fixes for overlays mounted open and full-height side panels.
+  The components install reference marks them new in `0.14.2` (pin
+  `^0.14.2` to use them), names the controlled-toggle behavior note, and
+  notes what the agent catalog does not expose yet.
+
 ## [0.3.21] — 2026-11-05
 
 ### Changes
