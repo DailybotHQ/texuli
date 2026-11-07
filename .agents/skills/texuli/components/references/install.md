@@ -4,7 +4,7 @@ Back to [`../SKILL.md`](../SKILL.md).
 
 ## A. Use the packages
 
-The packages are on npm in the 0.14 line, every one at `0.14.2`, a pre-1.0 line
+The packages are on npm in the 0.14 line, every one at `0.14.3`, a pre-1.0 line
 (`latest` points to the newest, and `next` is no longer maintained and stays on `0.12.1`; 1.0.0 will be the first stable release). An app outside a
 Texuli checkout installs them plainly, for example
 `pnpm add texuli @texuli/tokens`, and pins the exact version or `^0.14.0`
@@ -14,7 +14,7 @@ runs the install; it uses the network). `@texuli/drag`,
 in `0.5.0`), `@texuli/document` and `@texuli/pages` (both first published
 in `0.7.0`), `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (all
 three first published in `0.8.0`) and `@texuli/mcp` (first published in
-`0.9.0`) are in development and on npm as `0.14.2`.
+`0.9.0`) are in development and on npm as `0.14.3`.
 
 New in `0.13.1` (an additive patch): `@texuli/blocks/code-field` (`CodeField`),
 `registerIcons` and `IconsProvider` in `texuli/icons`, `srcDark` and
@@ -86,6 +86,26 @@ New in `0.14.2` (a patch; an app that uses these pins `^0.14.2`):
   the value; a controlled `pressed` with a handler renders the prop.
 - Not in the agent catalog yet: `initialDate`, `Select` `block` and
   `ghost`, the `IconButton` badge.
+
+New in `0.14.3` (a patch; an app that uses these pins `^0.14.3`):
+
+- Controls: `labelContent` snippet on `Checkbox`, `Radio` and `Switch`;
+  `Field` `counter={{ value, max }}` (in the description, read on focus,
+  not a live region); `NumberField.Root` `display="output"`; `Avatar`
+  `tone` and `shape`; `iconSize` (`xs` to `lg`) on `Button` and
+  `IconButton`.
+- Layouts: `BottomNav` item `emphasis: 'action'`; `MobileHeader`
+  `eyebrow`, `leading`, `closeHref` or `onClose` with `closeLabel`;
+  `SplitView` `listWidth`, `breakpoint`, `context` and `contextLabel`;
+  `Stat` `tone` and a `Progress` track hook.
+- `ListItem` from `texuli/list-item` only (not the root).
+- `Composer` `layout="row"` and `sendButton="icon"`; slides
+  `three-column-cards` icons from the host icon registry (register the
+  names); `DeckStage` `canvasFit="reflow"`.
+- Opt-in Spanish labels: `TEXULI_LABELS_ES` (`texuli/i18n/es`),
+  `BLOCKS_LABELS_ES`, `PAGES_LABELS_ES`, passed to `LabelsProvider`; no
+  native-speaker review yet.
+- Not in the agent catalog yet: these props and `ListItem`.
 
 Behavior that changes on the move is in
 [`../../upgrade/SKILL.md`](../../upgrade/SKILL.md) ("0.13 → 0.14").
