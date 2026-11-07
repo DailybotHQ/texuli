@@ -12,23 +12,27 @@ when a publish lands (published) or a new version opens (in development). -->
 Release line: published `0.14`
 
 All 26 published packages are on npm in the 0.14 line, every one at
-`0.14.1`, every internal `@texuli/*` pin exactly `0.14.1`. The blueprint
-spec in `@texuli/spec@0.14.1` is still `0.12.0` (no normative change),
+`0.14.2`, every internal `@texuli/*` pin exactly `0.14.2`. The blueprint
+spec in `@texuli/spec@0.14.2` is still `0.12.0` (no normative change),
 and the remote MCP server at `https://texuli.com/mcp` is live with the site.
 The publish workflow publishes from `main` after the merge of
-`release/0.14.1`, through npm trusted publishing (OIDC, no stored token),
+`release/0.14.2`, through npm trusted publishing (OIDC, no stored token),
 from the verified tarballs with signed provenance, and moves the `latest`
-dist-tag to `0.14.1`, so a bare `npm install texuli` or `pnpm add texuli`
+dist-tag to `0.14.2`, so a bare `npm install texuli` or `pnpm add texuli`
 gets it. `next` is no longer maintained and stays on `0.12.1` (see
 "Dist-tags" below). `@texuli/drag`,
 `@texuli/workflows`, `@texuli/deck`, `@texuli/slides`, `@texuli/editor`,
 `@texuli/document`, `@texuli/pages`, `@texuli/forms`, `@texuli/canvas`,
 `@texuli/sheets` and `@texuli/mcp` are still **in development** (pre-1.0). Nothing is in
-development beyond `0.14.1`; installs use the 0.14 line (`^0.14.0`).
+development beyond `0.14.2`; installs use the 0.14 line (`^0.14.0`).
 
-`0.14.1` is an additive patch: custom calendar event content, a month
-overflow button, collapsible board lanes and board cell footers (see
-"0.14.1" below), so `^0.14.0` installs pick it up. `0.14.0` was a `0.x`
+`0.14.2` is a patch: a dialog or sheet mounted open shows its backdrop,
+popovers keep focus that moved to another overlay, controlled toggles
+render their prop, timeline compact day ticks and an opening date, new
+component props and CSS hooks, and a smaller root entry (see "0.14.2"
+below), so `^0.14.0` installs pick it up. `0.14.1` was an additive patch:
+custom calendar event content, a month overflow button, collapsible board
+lanes and board cell footers (see "0.14.1" below). `0.14.0` was a `0.x`
 minor with no breaking API change: blueprint spec `0.12.0` and
 design-system compiler version 3 (compiled hashes change once) made it a
 minor (see "0.14.0" below), so `^0.13.0` and `~0.13.0` never pick it up.
@@ -69,6 +73,109 @@ versions into `main`). Publishing never overwrites a published version.
   `scripts/packages.ts`).
 - The apps (`apps/website`, `apps/agent`) and the native twin (`native/`)
   publish nothing.
+
+### 0.14.2
+
+A patch: every published package moves to `0.14.2` together, and every
+internal `@texuli/*` pin is exactly `0.14.2`. The blueprint spec stays
+`0.12.0` (`@texuli/spec@0.14.2` ships it, digest unchanged), and `^0.14.0`
+installs pick it up. It is additive or a fix, with no breaking API change;
+one behavior note on controlled toggles (UG-27) and one visible default on
+the timeline (G-056) follow below.
+
+**Overlays and focus (`@texuli/primitives`).**
+
+- **UG-31 / G-058: a `Dialog`, `AlertDialog` or `Sheet` mounted open shows
+  its backdrop.** The Overlay (backdrop) showed itself in the top layer at
+  once, and the Portal's move then hid it without an event, so a dialog
+  mounted open (a deep link) painted no backdrop. The Overlay now waits for
+  the Portal's `placed` flag, as the panel already did
+  ([prim-dialog](../packages/primitives/docs/prim-dialog.md)).
+- **A non-modal `Popover` or `Select` no longer pulls focus back to its
+  trigger** when the close ends and focus already moved to another overlay
+  (a menu, a second popover, opened in the same handler). Focus returns to
+  the trigger only when it is lost (on `body`) or still inside the closing
+  content. Only visible with exit motion, where `motion={{ exit: false }}`
+  was the workaround ([prim-popover](../packages/primitives/docs/prim-popover.md)).
+- **UG-27: a controlled `Toggle` renders its prop.** With `pressed` and
+  `onPressedChange` the handler owns the state, and a handler that ignores
+  the change keeps `aria-pressed` as it was; `ToggleGroup` follows the same
+  rule for `value` and `onValueChange`. Behavior note: `bind:pressed`
+  together with `onPressedChange` no longer writes the bound value by
+  itself; set it in the handler, or use a function binding
+  ([prim-toggle](../packages/primitives/docs/prim-toggle.md)).
+
+**Timeline (`@texuli/data/timeline`, G-056).** `TimelineView` takes
+`formatTick(date, { zoom, locale, monthStart })`, with compact day-zoom
+labels by default (the day of month, the short month where a month starts),
+and `initialDate`. Visible change: without `initialDate` it opens at today
+when today falls within the plan (before, always at its start). New exports:
+`formatTimelineTick`, `timelineAnchor` and the `TimelineTickContext` type
+([data-timeline](../packages/data/docs/data-timeline.md)).
+
+**Component props (`texuli`).**
+
+- UG-54: `ToggleGroup` `deselectable` (`single` groups, default `true`;
+  `false` keeps the pressed item pressed).
+- UG-20: `Select.Root` `block` (full width). G-059: the `Select` trigger
+  variant `ghost`, set per instance; it is not a design-system default
+  ([ui-select](../packages/texuli/docs/ui-select.md)).
+- UG-21: `Sidebar` draws `item.icon` when no `itemIcon` snippet is given.
+  UG-23: `badgeLabel` on `SidebarItem` and `BottomNavItem`, and `badge` and
+  `badgeLabel` on `IconButton` (the badge label joins the accessible name).
+- UG-26: the `Stepper` status phrases come from the label dictionary
+  (`texuli.stepper.complete`, `texuli.stepper.current`,
+  `texuli.stepper.upcoming`); English output is unchanged.
+
+**CSS hooks (`texuli`).** Each falls back to what was drawn before it:
+
+- UG-49: `--tx-toggle-on-bg`, `--tx-toggle-on-fg`, `--tx-toggle-on-border`.
+- UG-52: `--tx-radio-size`, `--tx-radio-ring`, `--tx-radio-dot-size`,
+  `--tx-radio-dot`, `--tx-switch-thumb-inset`, `--tx-input-placeholder-fg`,
+  `--tx-tabs-badge-bg`, `--tx-tabs-badge-fg`, `--tx-dialog-close-icon-size`
+  and `--tx-pin-input-cell-border`.
+- UG-55: `--tx-radio-card-align`.
+- `--tx-icon-button-badge-bg` and `--tx-icon-button-badge-fg`.
+- UG-30: `--tx-scrim-blur`, a `backdrop-filter` value on the dialog and
+  sheet scrims (default `none`)
+  ([ui-dialog](../packages/texuli/docs/ui-dialog.md)).
+
+**Panels and CSS.**
+
+- **UG-51: side `Sheet`s, `Drawer`s and `DetailPanel` fill their block
+  size** even with short content (the browser's popover style made them
+  only as tall as their content). A contained `DetailPanel` fills its
+  container, which needs `position: relative`
+  ([ui-sheet](../packages/texuli/docs/ui-sheet.md)).
+- UG-36 D: one shared scrim rule paints the dialog and sheet overlays
+  (rendered output unchanged).
+- G-060: the docs explain why a scoped class from the parent's `<style>`
+  never reaches a component's root, and how to reach it with `:global()`
+  under a local wrapper
+  ([using-with-your-css](../packages/texuli/docs/using-with-your-css.md)).
+- The `texuli` root entry is about 933 B smaller gzip (217,376 B to
+  216,443 B, `pnpm size` on macOS) through layer-ordered emission: the root
+  imports `@texuli/core` and `@texuli/primitives` first, and no code is
+  removed.
+
+**Known gaps in 0.14.2 (planned, not done).**
+
+- The agent catalog does not expose the new props yet: the timeline's
+  `initialDate`, `Select` `block` and `ghost`, and the `IconButton` badge.
+- `ghost` is not a design-system default for `Select`
+  (`defaults.select.variant`); it needs a blueprint spec bump.
+- `badgeLabel` is not on the layout navigation models yet.
+- CSS size budgets per `texuli/*` entry are proposed but not yet in
+  `texuli.budgets.json` (UG-36 E; `scripts/size.ts` already measures
+  `cssGzip`).
+- Per-component CSS (UG-36 A and B) is planned for `0.15.0`.
+- The blueprint spec stays `0.12.0`.
+
+**How it was integrated.** The branch `release/0.14.2` was opened from
+`main` after `0.14.1`, the lanes `fix/overlay-mount-focus`,
+`feat/timeline-anchor-ticks`, `feat/component-props-hooks`,
+`fix/scrim-panels-css` and `perf/root-trim-0142` merged into it, and its
+merge into `main` publishes it.
 
 ### 0.14.1
 
@@ -2473,7 +2580,11 @@ tools, astro, player, slides. `@texuli/deck` goes out before
 
 ### History
 
-- `0.14.1` (merged and published from `main` after the merge of
+- `0.14.2` (merged and published from `main` after the merge of
+  `release/0.14.2`): a patch for 26 packages, the overlay, toggle,
+  timeline and component gaps (see "0.14.2" above). Its tarballs ship
+  blueprint spec `0.12.0`.
+- `0.14.1` (2026-11-05 UTC; merged and published from `main` after the merge of
   `release/0.14.1`): an additive patch for 26 packages, the Protoyard gaps
   P-T-01 to P-T-04 (see "0.14.1" above). Its tarballs ship blueprint spec
   `0.12.0`.
@@ -2628,8 +2739,8 @@ default.
   and after 1.0.0 (owner decision 2026-10-27; before that, `latest` was
   reserved for 1.0.0 and stayed on the first upload, `0.1.0-next.0`). The
   publish workflow publishes every version with `--tag latest`. It names
-  `0.14.1` once the publish workflow runs after the merge of
-  `release/0.14.1` (`0.14.0` before that). Publishing a future
+  `0.14.2` once the publish workflow runs after the merge of
+  `release/0.14.2` (`0.14.1` before that). Publishing a future
   pre-release without moving `latest` needs a workflow change first.
 - **`next`** names `0.12.1`, and the workflow no longer moves it. npm
   trusted publishing, the workflow's only credential since 2026-11-02,
@@ -2649,7 +2760,7 @@ version.
 
 Task 172 made every published dependency an intentional semver range: the
 published package manifests pin internal `@texuli/*` dependencies to exact
-versions (for `0.14.1`, every internal pin is exactly `0.14.1`; compatibility
+versions (for `0.14.2`, every internal pin is exactly `0.14.2`; compatibility
 between Texuli packages is exact, per "Independent package versions" above), while the private development
 manifests (`apps/website`, `apps/agent`, `packages/examples`) keep the
 pnpm `workspace:` protocol. The release packer enforces that boundary
@@ -2669,14 +2780,14 @@ the package-to-package contract outside this repository.
 
 | Surface | Version | Where it is pinned |
 | --- | --- | --- |
-| 26 npm packages | `0.14.1` (dist-tag `latest`; `next` stays on `0.12.1`) | Each package manifest, with exact `0.14.1` internal pins; published by the publish workflow through npm trusted publishing after the merge of `release/0.14.1` (before it: `0.14.0` for 26 packages on 2026-11-05 UTC; `0.13.1` for 26 packages on 2026-11-05 UTC; `0.13.0` for 26 packages on 2026-11-05 UTC; `0.12.3` for 26 packages on 2026-11-03; `0.12.2` for 26 packages on 2026-11-02; `0.12.1` for 26 packages on 2026-11-02; `0.12.0` for 26 packages on 2026-11-01; `0.11.5` for 26 packages on 2026-11-01 UTC, the last of the 0.11 line; `0.11.4` for 26 packages on 2026-11-01 UTC; `0.11.3` for 26 packages on 2026-11-01 UTC; `0.11.2` for 26 packages on 2026-11-01 UTC; `0.11.1` for 26 packages on 2026-11-01 UTC; `0.11.0` for 26 packages on 2026-10-31 UTC; `0.10.0` for 26 packages on 2026-10-31 UTC; `0.9.0` for 26 packages on 2026-10-30 UTC; the 0.8 line for 25 packages, `0.8.0` on 2026-10-29 UTC plus the `0.8.x` patches in "0.8.x patch releases (G86)"; `0.7.0` for 22 packages on 2026-10-29 UTC; `0.6.0` for 20 packages on 2026-10-29 UTC; `0.5.0` for 20 packages on 2026-10-29 UTC; `0.4.0` for 19 packages on 2026-10-28; `0.3.0` for 16 packages on 2026-10-27 plus drag and workflows on 2026-10-28, run 40616266068; `0.2.0` for 15 packages on 2026-10-27; previews `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
-| `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets` | `0.14.1` (first published as `0.8.0`) | Each package manifest (and `FORMS_PACKAGE_VERSION`, `CANVAS_PACKAGE_VERSION`, `SHEETS_PACKAGE_VERSION`); `@texuli/forms` and `@texuli/canvas` are published after `@texuli/editor`, once `@texuli/core`, `@texuli/deck`, `@texuli/document`, `@texuli/drag` and `texuli` are out, and `@texuli/sheets` after `@texuli/blocks`, once `@texuli/date` and `@texuli/data` are out; no published package depends on them. In development (ADR-012, ADR-015), pre-1.0. |
-| `@texuli/document`, `@texuli/pages` | `0.14.1` (first published as `0.7.0`) | Each package manifest (and `PAGES_PACKAGE_VERSION`); `@texuli/document` is published after `@texuli/core` and `@texuli/deck` and before `@texuli/tools` and `@texuli/pages`, which depend on it; `@texuli/pages` after `@texuli/player`. In development (ADR-010, ADR-011), pre-1.0. |
-| `@texuli/editor` | `0.14.1` (first published as `0.5.0`) | `packages/editor/package.json` (and `EDITOR_PACKAGE_VERSION`); published after `texuli`, which it depends on. In development (ADR-003), pre-1.0. |
-| `@texuli/deck` | `0.14.1` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/document`, `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
-| `@texuli/drag`, `@texuli/workflows` | `0.14.1` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
-| `@texuli/mcp` | `0.14.1` (first published as `0.9.0`) | `packages/mcp/package.json`, with `@texuli/tools` pinned to exactly its own version; published right after `@texuli/tools`. In development (ADR-019), pre-1.0. |
-| Blueprint spec | `0.12.0`, digest `049c93b4105fb765c2db5ff20272494f99fce52552aafaf85e00789fc1747a14` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.14.0` and `@texuli/spec@0.14.1`; additive catalog ids (`code-field`, `avatar-group-grid`), `media-image` `srcDark` and `darkMode`, the `data-timeline` groups, markers, selection and `collapse` event, and design-system fields (`darkOpacity`, `aa-non-text`, the card content font size), a stamp-only migration from `0.11.0`. |
+| 26 npm packages | `0.14.2` (dist-tag `latest`; `next` stays on `0.12.1`) | Each package manifest, with exact `0.14.2` internal pins; published by the publish workflow through npm trusted publishing after the merge of `release/0.14.2` (before it: `0.14.1` for 26 packages on 2026-11-05 UTC; `0.14.0` for 26 packages on 2026-11-05 UTC; `0.13.1` for 26 packages on 2026-11-05 UTC; `0.13.0` for 26 packages on 2026-11-05 UTC; `0.12.3` for 26 packages on 2026-11-03; `0.12.2` for 26 packages on 2026-11-02; `0.12.1` for 26 packages on 2026-11-02; `0.12.0` for 26 packages on 2026-11-01; `0.11.5` for 26 packages on 2026-11-01 UTC, the last of the 0.11 line; `0.11.4` for 26 packages on 2026-11-01 UTC; `0.11.3` for 26 packages on 2026-11-01 UTC; `0.11.2` for 26 packages on 2026-11-01 UTC; `0.11.1` for 26 packages on 2026-11-01 UTC; `0.11.0` for 26 packages on 2026-10-31 UTC; `0.10.0` for 26 packages on 2026-10-31 UTC; `0.9.0` for 26 packages on 2026-10-30 UTC; the 0.8 line for 25 packages, `0.8.0` on 2026-10-29 UTC plus the `0.8.x` patches in "0.8.x patch releases (G86)"; `0.7.0` for 22 packages on 2026-10-29 UTC; `0.6.0` for 20 packages on 2026-10-29 UTC; `0.5.0` for 20 packages on 2026-10-29 UTC; `0.4.0` for 19 packages on 2026-10-28; `0.3.0` for 16 packages on 2026-10-27 plus drag and workflows on 2026-10-28, run 40616266068; `0.2.0` for 15 packages on 2026-10-27; previews `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
+| `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets` | `0.14.2` (first published as `0.8.0`) | Each package manifest (and `FORMS_PACKAGE_VERSION`, `CANVAS_PACKAGE_VERSION`, `SHEETS_PACKAGE_VERSION`); `@texuli/forms` and `@texuli/canvas` are published after `@texuli/editor`, once `@texuli/core`, `@texuli/deck`, `@texuli/document`, `@texuli/drag` and `texuli` are out, and `@texuli/sheets` after `@texuli/blocks`, once `@texuli/date` and `@texuli/data` are out; no published package depends on them. In development (ADR-012, ADR-015), pre-1.0. |
+| `@texuli/document`, `@texuli/pages` | `0.14.2` (first published as `0.7.0`) | Each package manifest (and `PAGES_PACKAGE_VERSION`); `@texuli/document` is published after `@texuli/core` and `@texuli/deck` and before `@texuli/tools` and `@texuli/pages`, which depend on it; `@texuli/pages` after `@texuli/player`. In development (ADR-010, ADR-011), pre-1.0. |
+| `@texuli/editor` | `0.14.2` (first published as `0.5.0`) | `packages/editor/package.json` (and `EDITOR_PACKAGE_VERSION`); published after `texuli`, which it depends on. In development (ADR-003), pre-1.0. |
+| `@texuli/deck` | `0.14.2` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/document`, `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
+| `@texuli/drag`, `@texuli/workflows` | `0.14.2` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
+| `@texuli/mcp` | `0.14.2` (first published as `0.9.0`) | `packages/mcp/package.json`, with `@texuli/tools` pinned to exactly its own version; published right after `@texuli/tools`. In development (ADR-019), pre-1.0. |
+| Blueprint spec | `0.12.0`, digest `049c93b4105fb765c2db5ff20272494f99fce52552aafaf85e00789fc1747a14` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.14.0`, `@texuli/spec@0.14.1` and `@texuli/spec@0.14.2`; additive catalog ids (`code-field`, `avatar-group-grid`), `media-image` `srcDark` and `darkMode`, the `data-timeline` groups, markers, selection and `collapse` event, and design-system fields (`darkOpacity`, `aa-non-text`, the card content font size), a stamp-only migration from `0.11.0`. |
 | Blueprint spec in `@texuli/spec@0.13.0` and `@texuli/spec@0.13.1` | `0.11.0`, digest `17845743d088b768c4441ea2196e5c350687533dbd0c95589cba938fb31fe993` | The 0.13 line's generated sources carry the `0.11.0` stamp; additive design-system fields (shadow levels, product tokens, short categorical palettes, soft inks), a stamp-only migration from `0.10.0`. |
 | Blueprint spec in `@texuli/spec@0.10.0` to `@texuli/spec@0.12.3` | `0.10.0`, digest `afcb9e3ed6b74b833a0f7477a657168621785ee98602ff582aa047e2d86aef17` | The 0.10, 0.11 and 0.12 lines' generated sources carry the `0.10.0` stamp (`@texuli/spec@0.10.0`, `0.11.0` to `0.11.5` and `0.12.0` to `0.12.3`); a stamp-only migration from `0.9.0`. |
 | Blueprint spec in `@texuli/spec@0.9.0` | `0.9.0`, digest `497df4d3b0c67d53483163ebd9bd73733b52caf5f8e2966478f1cf860e6f9d9d` | The 0.9 line's generated sources carry the `0.9.0` stamp. |
@@ -2735,12 +2846,12 @@ mcp, astro, player, pages, slides; `@texuli/editor` goes out from `0.5.0`,
 after `texuli`, `@texuli/document` and `@texuli/pages` from `0.7.0`,
 `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` from `0.8.0`, and
 `@texuli/mcp` from `0.9.0`).
-Every published package is `0.14.1`, and every internal dependency between
-them is pinned to exactly `0.14.1`; the workflow refuses to start publishing while any listed
+Every published package is `0.14.2`, and every internal dependency between
+them is pinned to exactly `0.14.2`; the workflow refuses to start publishing while any listed
 package is still `0.0.0`. `pnpm verify:packages` still refuses any
 `0.0.0` or `workspace:` range in a published manifest, the guard that keeps
 an unversioned dependency out. The publish loop skips versions npm already
-has, so a package changed after `0.14.1` needs a new version before its
+has, so a package changed after `0.14.2` needs a new version before its
 change reaches npm.
 
 Each outward wave must also pass its task's `pnpm verify:packages` gate and
@@ -2753,7 +2864,7 @@ new version rather than reusing a published version.
 ## Honesty in documentation
 
 The npm name reservation (`0.1.0-next.0`) was a prerelease publication by
-the owner, not a supported product release. `0.14.1` is a release but not a
+the owner, not a supported product release. `0.14.2` is a release but not a
 stable one: keep `private: true`, the pre-1.0 status, and the absence of a
 stable 1.0.0 clear until the corresponding approved stable release actually
 exists. A passing pack gate proves only that a tarball
@@ -2776,9 +2887,10 @@ packages were released, `skill-v0.3.15` when the `0.12.2` packages were
 released, `skill-v0.3.16` when the `0.12.3` packages were released,
 `skill-v0.3.18` when the `0.13.0` packages were released, `skill-v0.3.19`
 when the `0.13.1` packages were released, `skill-v0.3.20` when the
-`0.14.0` packages were released, and the latest tag when the `0.14.1`
-release notes are written; the skill release after the merge folds the
-pack's 0.14.1 changes into its own section). A checkout install is described in
+`0.14.0` packages were released, `skill-v0.3.21` when the `0.14.1`
+packages were released, and the latest tag when the `0.14.2` release
+notes are written; the skill release after the merge folds the pack's
+0.14.2 changes into its own section). A checkout install is described in
 [SKILL_INSTALLATION](SKILL_INSTALLATION.md).
 
 **Tags.** Skill releases are tagged `skill-vX.Y.Z`. No workflow triggers on
