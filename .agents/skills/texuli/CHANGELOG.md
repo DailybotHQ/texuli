@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.3.23] — 2026-11-07
+
+### Changes
+
+- chore(skill): packages on npm at 0.14.3
+
 - The packages are on npm at `0.14.3`, a patch: `labelContent` on choice
   controls, a `Field` counter, `NumberField` output display, `Avatar` tone
   and shape, `iconSize`, navigation and `SplitView` options, `Stat` tone,
