@@ -31,7 +31,7 @@ export const RELEASES: readonly Release[] = [
     id: '0.14.0',
     title: '0.14.0: timeline groups, non-text contrast and looping motion',
     status:
-      'Published on npm as 0.14.0; its patch 0.14.1 adds custom calendar event content, a month overflow button, collapsible board lanes and board cell footers, and its patch 0.14.2, the current release (pre-1.0), shows the backdrop of a dialog mounted open, keeps focus that moved to another overlay, adds timeline day ticks and an opening date, and new component props and CSS hooks.',
+      'Published on npm as 0.14.0; patch 0.14.1 adds calendar event content, month overflow, board lanes and cell footers; 0.14.2, the current release (pre-1.0), adds overlay fixes, timeline ticks and props.',
     published: true,
     summary:
       'Gaps from the consumers Protoyard and Dailybot, all additive. TimelineView groups rows under header bands with collapse, selection and markers, also in the agent catalog. Blueprint spec 0.12.0 adds a dark shadow alpha and the aa-non-text check (an invisible active sidebar item fails texuli ds check), and design-system compiler version 3 changes compiled hashes once while every 0.11.0 document stays valid. MotionLoop loops a pulse or a wave and stays still under reduced motion; icons load lazily; AlertDialog takes confirmDisabled and Breadcrumb items take ariaLabel and onSelect; dialog and sheet scrims are dark again in dark mode.',
