@@ -12,6 +12,7 @@ let {
   value = $bindable<string | string[] | undefined>(undefined),
   defaultValue,
   onValueChange,
+  deselectable,
   disabled = false,
   loop = true,
   orientation = 'horizontal' as ToggleGroupOrientation,
@@ -64,7 +65,7 @@ function toggle(itemValue: string): void {
     setValue(next);
     return;
   }
-  setValue(current === itemValue ? '' : itemValue);
+  setValue(current !== itemValue || deselectable === false ? itemValue : '');
 }
 
 function register(_itemValue: string, _el: HTMLElement | null): void {}

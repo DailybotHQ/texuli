@@ -468,6 +468,18 @@ describe('toggle', () => {
 
       await fireEvent.click(center);
       expect(onValueChange).toHaveBeenLastCalledWith('');
+      cleanup();
+
+      // deselectable={false}: pressing the pressed item keeps the value.
+      const kept = vi.fn();
+      render(ToggleGroupFixture, {
+        props: { type: 'single', onValueChange: kept, label: 'Align', deselectable: false },
+      });
+      const right = screen.getByRole('button', { name: 'Right' });
+      await fireEvent.click(right);
+      await fireEvent.click(right);
+      expect(kept.mock.calls).toEqual([['right']]);
+      expect(right.getAttribute('aria-pressed')).toBe('true');
     });
 
     it('submits a repeated pressed value once instead of throwing', () => {

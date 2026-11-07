@@ -3,6 +3,7 @@ import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements
 import { type ClassValue } from '../../internal/cx.ts';
 import { designDefaults } from '../../internal/design-defaults.ts';
 import Button from './Button.svelte';
+import './icon-button.css';
 import type { ButtonSize, ButtonVariant } from './button-variants.ts';
 
 type IconButtonProps = HTMLButtonAttributes &
@@ -16,6 +17,16 @@ type IconButtonProps = HTMLButtonAttributes &
     loading?: boolean;
     autoLoading?: boolean;
     disabled?: boolean;
+    /**
+     * A count or short status drawn as a small badge on the end corner
+     * (generated content: decorative, so pair it with `badgeLabel`).
+     */
+    badge?: string | number;
+    /**
+     * Accessible text for the badge (`3 unread`): the button is named
+     * `<label> (<badgeLabel>)` while the badge stays visible.
+     */
+    badgeLabel?: string;
     class?: ClassValue;
     children?: import('svelte').Snippet;
     /** The rendered root element (bindable). */
@@ -28,6 +39,8 @@ let {
   variant = txDefaults().variant ?? 'ghost',
   size = txDefaults().size ?? 'icon',
   loading = false,
+  badge,
+  badgeLabel,
   children,
   ref = $bindable(null),
   ...rest
@@ -41,7 +54,8 @@ let {
   {size}
   {loading}
   data-icon-only="true"
-  aria-label={label}
+  aria-label={badgeLabel ? `${label} (${badgeLabel})` : label}
+  data-tx-badge={badge}
   loadingLabel={label}
 >
   {@render children?.()}

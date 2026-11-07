@@ -16,6 +16,10 @@
     max-inline-size: 100%;
   }
 
+  .tx-select-root[data-block] {
+    inline-size: 100%;
+  }
+
   .tx-select-trigger {
     box-sizing: border-box;
     display: inline-flex;
@@ -58,9 +62,16 @@
     font-size: var(--tx-select-font-size-lg, var(--tx-type-body-size));
   }
 
-  .tx-select-trigger--soft {
+  .tx-select-trigger--soft,
+  .tx-select-trigger--ghost:hover:not(:disabled) {
     border-color: transparent;
     background-color: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
+  }
+
+  /* Ghost: no border or fill until hover (the soft fill); focus and open keep the ring. */
+  .tx-select-trigger--ghost {
+    border-color: transparent;
+    background-color: transparent;
   }
 
   .tx-select-trigger:focus-visible,

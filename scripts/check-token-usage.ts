@@ -266,6 +266,17 @@ export const ALLOWLIST: readonly AllowlistEntry[] = [
     reason: HOST_HOOK,
   },
   {
+    path: 'packages/texuli/src/components/choice/choice.css',
+    literals: [
+      '--tx-radio-size',
+      '--tx-radio-dot-size',
+      '--tx-switch-thumb-inset',
+      '--tx-radio-card-align',
+    ],
+    code: 'unknown-token',
+    reason: `${HOST_HOOK} Each falls back to the geometry the control drew before the hook (0.875rem small radio, 0.5rem and 0.375rem dots, 0.125rem thumb inset, flex-start card alignment).`,
+  },
+  {
     path: 'packages/texuli/src/components/select/select.css',
     literals: ['--tx-select-trigger-width'],
     code: 'unknown-token',

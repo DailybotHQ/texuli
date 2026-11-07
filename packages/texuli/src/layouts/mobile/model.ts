@@ -122,6 +122,12 @@ export interface BottomNavItem {
   icon?: NavIconRef;
   /** A count or short status, read as part of the link's name. */
   badge?: string | number;
+  /**
+   * Accessible text for the badge (`3 unread`): the link is then named
+   * `<label> (<badgeLabel>)` instead of reading the bare badge value, which
+   * stays visible.
+   */
+  badgeLabel?: string;
   /** `true` or `'page'`: the current screen; `'true'`: the current screen is below it. */
   current?: boolean | 'page' | 'true';
 }

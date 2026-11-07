@@ -13,6 +13,7 @@ import ShellHeaderProbe from './fixtures/ShellHeaderProbe.svelte';
 import SidebarHarness from './fixtures/SidebarHarness.svelte';
 import SidebarHeightHarness from './fixtures/SidebarHeightHarness.svelte';
 import ToolbarHarness from './fixtures/ToolbarHarness.svelte';
+import SetLabelsHarness from './SetLabelsHarness.svelte';
 import WizardHarness from './WizardHarness.svelte';
 
 // Navigation components and app shells: URL policy, current-page marking,
@@ -96,6 +97,41 @@ describe('sidebar', () => {
       expect(toggle.getAttribute('aria-expanded')).toBe('false');
       await fireEvent.click(toggle);
       expect(nav?.hasAttribute('data-collapsed')).toBe(false);
+    });
+
+    it('draws item.icon without an itemIcon snippet and reads badgeLabel in the link name', async () => {
+      const sections = [
+        {
+          items: [
+            {
+              id: 'inbox',
+              label: 'Inbox',
+              href: 'https://example.com/inbox',
+              icon: 'inbox',
+              badge: 3,
+              badgeLabel: '3 unread',
+            },
+            { id: 'notes', label: 'Notes', href: 'https://example.com/notes' },
+          ],
+        },
+      ];
+      for (const collapsed of [false, true]) {
+        const { container } = render(SidebarHarness, { props: { sections, collapsed } });
+        await waitFor(() =>
+          expect(container.querySelector('[data-tx-nav-icon="inbox"]')).not.toBeNull()
+        );
+        const inbox = screen.getByRole('link', { name: /^Inbox\s*\(3 unread\)$/ });
+        expect(inbox.querySelector('[data-tx-nav-icon="inbox"]')).not.toBeNull();
+        // Items without an icon keep their initials.
+        const notes = screen.getByRole('link', { name: /^Notes/ });
+        expect(notes.querySelector('.tx-sidebar__icon')?.textContent?.trim()).toBe('NO');
+        if (!collapsed) {
+          const badge = inbox.querySelector('.tx-sidebar__badge');
+          expect(badge?.textContent).toBe('3');
+          expect(badge?.getAttribute('aria-hidden')).toBe('true');
+        }
+        cleanup();
+      }
     });
 
     it('strips unsafe hrefs via the URL policy', () => {
@@ -204,6 +240,34 @@ describe('stepper', () => {
       expect(buttons.length).toBe(2);
       await fireEvent.click(buttons[0]!);
       expect(onStepClick).toHaveBeenCalledWith(0);
+    });
+
+    it('reads its status phrases from the label dictionary, English by default', () => {
+      const phrases = (container: HTMLElement) =>
+        [...container.querySelectorAll('.tx-stepper__sr')].map((node) => node.textContent);
+      const english = render(Stepper, { props: { steps: STEPS, current: 1 } });
+      expect(phrases(english.container)).toEqual([
+        '(completed)',
+        '(current step)',
+        '(not started)',
+      ]);
+      cleanup();
+      const spanish = render(SetLabelsHarness, {
+        props: {
+          labels: {
+            'texuli.stepper.complete': 'completado',
+            'texuli.stepper.current': 'paso actual',
+            'texuli.stepper.upcoming': 'sin empezar',
+          },
+          component: Stepper as never,
+          props: { steps: STEPS, current: 1 },
+        },
+      });
+      expect(phrases(spanish.container)).toEqual([
+        '(completado)',
+        '(paso actual)',
+        '(sin empezar)',
+      ]);
     });
   });
 

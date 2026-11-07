@@ -47,6 +47,8 @@ Consumer classes compose through `cx` / `variants` and win by source order in
 - **Clear:** always named with `clearLabel` (translatable).
 - **Character count:** `aria-live="polite"` region; visually shown near the limit while focused.
 - **RTL:** padding and absolute count use logical properties (`inline-size`, `inset-inline-end`).
+- **Placeholder color:** the `--tx-input-placeholder-fg` hook (Input, Textarea
+  and InputGroup controls) falls back to `--tx-muted-foreground`.
 
 ## Values, handlers and refs
 

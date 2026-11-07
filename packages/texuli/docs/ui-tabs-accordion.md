@@ -92,6 +92,10 @@ Styled disclosure surfaces on owned primitives (`@texuli/primitives/tabs`,
 
 `@layer tx.components` in `tabs-accordion.css`. Logical properties. Forced-colors borders on lists and accordion chrome.
 
+Tab badge hooks: `--tx-tabs-badge-bg` (default `--tx-background`) and
+`--tx-tabs-badge-fg` (default `--tx-muted-foreground`), set on the tabs or any
+ancestor.
+
 ## Motion
 
 - **Tabs** (`motion`, `layout` on by default): the active indicator glides

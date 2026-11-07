@@ -61,8 +61,10 @@ Root attributes: `role="button"`, `aria-pressed`, `data-state="on"|"off"`,
 | `rovingFocus` | Arrow-key focus (default true) |
 | `loop` | Wrap at ends (default true) |
 | `name` / `form` | Form field: one hidden `name=value` input per pressed item (none while disabled) |
+| `deselectable` | `single` only (default `true`): `false` keeps the pressed item pressed when it is activated again |
 
-Single mode: activating the pressed item clears the selection. Multiple mode
+Single mode: activating the pressed item clears the selection (unless
+`deselectable` is `false`). Multiple mode
 adds/removes values. Items mark `data-roving-item` for the attachment. The
 Tab stop starts on the first pressed item in both modes (no pressed item: the
 first enabled one).

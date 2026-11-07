@@ -11,6 +11,8 @@ type Props = ComponentProps<typeof PrimitiveRoot> & {
   value?: string;
   size?: SelectSize;
   variant?: SelectVariant;
+  /** Full-width field: the root and its trigger fill the container's inline size. */
+  block?: boolean;
 };
 
 const txDefaults = designDefaults('select');
@@ -20,6 +22,7 @@ let {
   value = $bindable(),
   size = txDefaults().size ?? 'md',
   variant = txDefaults().variant ?? 'outline',
+  block,
   onOpenChange,
   onValueChange,
   ...rest
@@ -36,7 +39,7 @@ function handleValueChange(next: string): void {
 }
 </script>
 
-<div class="tx-select-root" data-tx-select-root data-size={size} data-variant={variant}>
+<div class="tx-select-root" data-tx-select-root data-size={size} data-variant={variant} data-block={block || undefined}>
   <PrimitiveRoot
     bind:open
     bind:value

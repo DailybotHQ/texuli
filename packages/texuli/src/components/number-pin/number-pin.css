@@ -122,7 +122,9 @@
     inline-size: var(--tx-pin-input-cell-inline-size, var(--tx-size-control-lg));
     min-inline-size: var(--tx-size-control-sm);
     block-size: var(--tx-pin-input-cell-block-size, var(--tx-space-12));
-    border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+    /* Host hook: --tx-pin-input-cell-border (the idle cell border color). */
+    border: var(--tx-border-width-thin) solid
+      var(--tx-pin-input-cell-border, var(--tx-border, ButtonBorder));
     border-radius: var(--tx-pin-input-cell-radius, var(--tx-shape-radius-lg));
     color: var(--tx-foreground, CanvasText);
     background: var(--tx-surface, Canvas);

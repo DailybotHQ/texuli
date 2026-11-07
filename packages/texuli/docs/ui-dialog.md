@@ -192,6 +192,8 @@ set the color in host CSS on the theme scope:
 - Layers: `@layer tx.components`
 - AA contrast in light, dark and forced-colors (token fallbacks + `forced-colors` rules)
 - Labels are props so hosts can translate them
+- The close glyph reads the `--tx-dialog-close-icon-size` hook (default: the
+  `sm` icon size, `--tx-icon-size-sm`, then `--tx-size-icon-sm`)
 
 ## Motion
 

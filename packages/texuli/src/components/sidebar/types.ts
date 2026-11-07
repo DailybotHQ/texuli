@@ -29,6 +29,11 @@ export type SidebarItem = {
   current?: 'page' | 'section';
   /** Count or status chip; collapsed mode shows a dot + sr-only text. */
   badge?: string | number;
+  /**
+   * Accessible text for the badge (`3 unread`): read in the link's name in
+   * place of the bare badge value, which stays visible.
+   */
+  badgeLabel?: string;
   disabled?: boolean;
   /** Two-letter fallback when collapsed and no icon snippet is provided. */
   shortLabel?: string;

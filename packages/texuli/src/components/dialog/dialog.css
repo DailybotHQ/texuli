@@ -143,6 +143,12 @@
     cursor: pointer;
   }
 
+  /* Host hook: --tx-dialog-close-icon-size (the close glyph). */
+  .tx-dialog__close svg {
+    inline-size: var(--tx-dialog-close-icon-size, var(--tx-icon-size-sm, var(--tx-size-icon-sm)));
+    block-size: var(--tx-dialog-close-icon-size, var(--tx-icon-size-sm, var(--tx-size-icon-sm)));
+  }
+
   .tx-dialog__close:hover {
     background: color-mix(in srgb, var(--tx-dialog-fg) 8%, transparent);
     color: var(--tx-dialog-fg);

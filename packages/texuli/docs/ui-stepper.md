@@ -26,6 +26,10 @@ Progress navigation for a list of steps.
 | `label` | `string` | `aria-label` for the nav (default `"Progress"`) |
 
 States: `complete` | `current` | `upcoming` (data attributes + screen-reader phrases).
+The phrases come from the label dictionary (ADR-026): `texuli.stepper.complete`
+(`completed`), `texuli.stepper.current` (`current step`) and
+`texuli.stepper.upcoming` (`not started`), so `setTexuliLabels` or
+`LabelsProvider` translates them; English output is unchanged.
 
 ## Wizard
 
