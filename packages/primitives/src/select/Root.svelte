@@ -2,6 +2,7 @@
 import type { FormBridge } from '@texuli/core/form-bridge';
 import { createTypeahead } from '@texuli/core/roving';
 import { type Snippet, setContext } from 'svelte';
+import { focusNeedsReturn } from '../internal/focus-return.ts';
 import { SELECT_CONTEXT, type SelectContext, type SelectItemRecord } from './context.ts';
 import { attachSelectFormBridge } from './form.ts';
 
@@ -61,6 +62,7 @@ let triggerElement: HTMLElement | undefined;
 let highlighted = $state<string | null>(null);
 let formBridge: FormBridge | null = null;
 let restoreFocus = true;
+let contentElement: HTMLElement | undefined;
 const typeahead = createTypeahead();
 
 function getCatalogItems(): SelectItemRecord[] {
@@ -264,8 +266,8 @@ const context: SelectContext = {
     element.insertAdjacentElement('afterend', formBridge.input);
     formBridge.setValue(currentValue);
   },
-  registerContent() {
-    // reserved for future focus management inside the listbox
+  registerContent(element) {
+    contentElement = element;
   },
   registerItem(item) {
     const index = registered.findIndex((entry) => entry.value === item.value);
@@ -284,7 +286,11 @@ const context: SelectContext = {
   onOverlayOpenChange(next) {
     syncOpen(next);
     if (!next) {
-      if (restoreFocus) triggerElement?.focus({ preventScroll: true });
+      // Not when focus already moved to a live element outside the list
+      // (another overlay): pulling it back would close that overlay.
+      if (restoreFocus && focusNeedsReturn(contentElement, triggerElement)) {
+        triggerElement?.focus({ preventScroll: true });
+      }
       highlighted = null;
       typeahead.reset();
     }
