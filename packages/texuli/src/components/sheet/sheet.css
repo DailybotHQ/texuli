@@ -150,6 +150,17 @@
   .tx-detail-panel {
     inset-inline: auto;
     inline-size: min(var(--tx-sheet-inline-size, 28rem), 100vw);
+    /* UG-51: the top layer's popover style is block-size: fit-content; auto
+       lets the block insets stretch the panel to the viewport (or, contained,
+       its container) while its content scrolls inside. */
+    block-size: auto;
+  }
+
+  /* Contained (mode="contained"): placed in the container, not the viewport.
+     The container is the containing block: a backdrop positions it, and a
+     DetailPanel with no backdrop needs a positioned container. */
+  :is(.tx-sheet, .tx-drawer, .tx-detail-panel, .tx-responsive-modal)[data-tx-overlay="contained"] {
+    position: absolute;
   }
 
   .tx-detail-panel {

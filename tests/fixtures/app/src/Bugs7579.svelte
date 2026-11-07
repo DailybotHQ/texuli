@@ -5,6 +5,7 @@ import { Button } from 'texuli/button';
 import { Dialog } from 'texuli/dialog';
 import { Popover } from 'texuli/popover';
 import { Select } from 'texuli/select';
+import { DetailPanel, Drawer, Sheet } from 'texuli/sheet';
 import { createToastStore, Toaster } from 'texuli/toast';
 
 /*
@@ -14,6 +15,8 @@ import { createToastStore, Toaster } from 'texuli/toast';
  * G77 toaster: a page Toaster and a contained one inside a framed preview.
  * G78 reveal: a hidden container with nested transitioned levels.
  * G79 avatar: a lazy avatar image (the spec adds the host [hidden] rule).
+ * UG-51 panels: a side Sheet, a side Drawer and a DetailPanel with short
+ * content (top layer), and a DetailPanel contained in a framed pane.
  */
 
 let { which }: { which: string } = $props();
@@ -60,6 +63,9 @@ if (typeof window !== 'undefined') {
 
 // G78
 let revealed = $state(false);
+
+// UG-51
+let pane = $state<HTMLElement | null>(null);
 </script>
 
 {#if which === 'dialog-select'}
@@ -144,6 +150,52 @@ let revealed = $state(false);
       </div>
     </div>
   </section>
+{:else if which === 'panels'}
+  <section class="case" aria-label="Panels">
+    <Sheet.Root>
+      <Sheet.Trigger>Open filters</Sheet.Trigger>
+      <Sheet.Portal>
+        <Sheet.Overlay />
+        <Sheet.Content side="start" motion={false}>
+          <Sheet.Title>Filters</Sheet.Title>
+          <Sheet.Close>Done</Sheet.Close>
+        </Sheet.Content>
+      </Sheet.Portal>
+    </Sheet.Root>
+    <Drawer.Root>
+      <Drawer.Trigger>Open cart</Drawer.Trigger>
+      <Drawer.Portal>
+        <Drawer.Overlay />
+        <Drawer.Content side="end" motion={false}>
+          <Drawer.Title>Cart</Drawer.Title>
+          <Drawer.Close>Close cart</Drawer.Close>
+        </Drawer.Content>
+      </Drawer.Portal>
+    </Drawer.Root>
+    <DetailPanel.Root>
+      <DetailPanel.Trigger>Show order</DetailPanel.Trigger>
+      <DetailPanel.Portal>
+        <DetailPanel.Content motion={false}>
+          <DetailPanel.Title>Order orbit-001</DetailPanel.Title>
+          <DetailPanel.Close>Close order</DetailPanel.Close>
+        </DetailPanel.Content>
+      </DetailPanel.Portal>
+    </DetailPanel.Root>
+    <div class="pane" bind:this={pane} data-pane>
+      <p>Pane content.</p>
+    </div>
+    {#if pane}
+      <DetailPanel.Root mode="contained" container={pane}>
+        <DetailPanel.Trigger>Show pane details</DetailPanel.Trigger>
+        <DetailPanel.Portal>
+          <DetailPanel.Content size="sm" motion={false}>
+            <DetailPanel.Title>Pane details</DetailPanel.Title>
+            <DetailPanel.Close>Close pane details</DetailPanel.Close>
+          </DetailPanel.Content>
+        </DetailPanel.Portal>
+      </DetailPanel.Root>
+    {/if}
+  </section>
 {:else if which === 'avatar'}
   <section class="case" aria-label="Avatar">
     <Avatar name="Ada Example" src="https://avatars.example/ada.png" size="lg" />
@@ -167,6 +219,13 @@ let revealed = $state(false);
     block-size: 15rem;
     margin-block-start: 12rem;
     margin-inline-start: 12rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    overflow: hidden;
+  }
+  .pane {
+    position: relative;
+    inline-size: 40rem;
+    block-size: 20rem;
     border: 1px solid var(--tx-border, CanvasText);
     overflow: hidden;
   }

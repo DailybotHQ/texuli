@@ -66,6 +66,37 @@ colors. The `texuli-sheet` example includes all size variants, logical sides,
 RTL, a drawer with snap points, a non-modal detail panel and the responsive
 modal.
 
+## Full height and contained panels
+
+Fixed in `0.14.2` (UG-51): a side `Sheet` or `Drawer` (`start`, `end`,
+`left`, `right`) and a `DetailPanel` fill the whole block size even with
+short content. Before, the browser's popover style (`block-size:
+fit-content`) made them only as tall as their content. Long content scrolls
+inside the surface, or inside `Body` when you use the parts.
+
+With `mode="contained"` and a `container` on the root, the surface is placed
+in the container (`position: absolute`) and fills its height, not the
+viewport's. The container must be a containing block. A `Sheet.Overlay`
+gives it `position: relative` while it is mounted; a `DetailPanel` has no
+overlay, so position the container yourself:
+
+```svelte
+<div class="pane" bind:this={pane}>…</div>
+{#if pane}
+  <DetailPanel.Root mode="contained" container={pane}>…</DetailPanel.Root>
+{/if}
+
+<style>
+  .pane {
+    position: relative;
+    block-size: 20rem;
+    overflow: hidden;
+  }
+</style>
+```
+
+Test: `UG-51` in `tests/e2e/bugs-75-79.spec.ts` (`?case=panels`).
+
 ## Parts: header, body, footer and close
 
 Every surface (`Sheet`, `Drawer`, `DetailPanel`, `ResponsiveModal`) takes the
