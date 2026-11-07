@@ -1,15 +1,18 @@
 <script lang="ts">
 /**
- * `three-column-cards`: three parallel cards. The `icon` prop names a Texuli
- * icon; `@texuli/slides` does not depend on the icon set yet, so every card
- * shows its number in the icon tile (an open issue for the owner checkpoint).
+ * `three-column-cards`: three parallel cards. A card's `icon` names an icon
+ * the host registered in the Texuli icon registry (`registerIcons` or
+ * `IconsProvider` from `texuli/icons`); the tile draws that glyph, and shows
+ * the card's number when the name is missing or not registered (UG-38).
  */
 import { fitContent, fitText } from './fit.ts';
+import { useDeckIcons } from './icon.ts';
 import LayoutFrame from './LayoutFrame.svelte';
 import { type LayoutRendererProps, useLayoutSteps } from './steps.ts';
 
 let { slide, context }: LayoutRendererProps<'three-column-cards'> = $props();
 const steps = useLayoutSteps(() => context);
+const icons = useDeckIcons();
 let p = $derived(slide.props);
 </script>
 
@@ -21,13 +24,21 @@ let p = $derived(slide.props);
   {/if}
   <ul class="cards" data-slot="cards" {@attach fitContent()}>
     {#each p.cards as card, index (index)}
+      {@const glyph = icons(card.icon)}
       <li
         class="tx-deck-layout__panel card"
         data-slot="card"
         data-icon={card.icon}
         {...steps.at(['cards', index])}
       >
-        <span class="tile" aria-hidden="true">{index + 1}</span>
+        <span class="tile" aria-hidden="true">
+          {#if typeof glyph === 'function'}
+            {@const Glyph = glyph}
+            <Glyph class="glyph" aria-hidden="true" />
+          {:else if glyph}
+            <svg class="glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d={glyph} /></svg>
+          {:else}{index + 1}{/if}
+        </span>
         <h3 class="tx-deck-layout__lead heading">{card.heading}</h3>
         <p class="tx-deck-layout__text">{card.body}</p>
       </li>
@@ -64,6 +75,12 @@ let p = $derived(slide.props);
     font-family: var(--tx-font-heading, inherit);
     font-size: clamp(24px, 2.4cqi, 32px);
     font-weight: 700;
+  }
+
+  .tile :global(.glyph) {
+    inline-size: 55%;
+    block-size: 55%;
+    color: var(--tx-deck-accent);
   }
 
   .heading {

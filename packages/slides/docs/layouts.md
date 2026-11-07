@@ -119,9 +119,24 @@ Layout-specific behavior:
 - `chart` takes any Texuli chart kind as a chart block without `type`;
   `showTable` adds a plain data table under series charts. A spec the chart
   block parser refuses shows a note instead of a broken chart.
-- `three-column-cards` accepts an `icon` name, but `@texuli/slides` does not
-  depend on the icon set yet, so each card shows its number in the icon
-  tile.
+- `three-column-cards` draws each card's `icon` through the Texuli icon
+  registry (new in `0.14.3`, UG-38): register the names with `registerIcons`
+  or `<IconsProvider>` from `texuli/icons` above the stage, as a Svelte SVG
+  component (such as a Lucide icon), a 24×24 path, or a lazy loader. The
+  tile draws the glyph in the deck accent, decorative (`aria-hidden`); a
+  card without an icon, or with a name the registry does not know, keeps
+  its number. A lazy glyph shows the number on the server and the first
+  client render, then the glyph once it loads. `@texuli/slides` still does
+  not depend on `texuli`: it reads the registry from Svelte context
+  (the plain string key `texuli.icons` that `texuli/icons` shares across
+  package copies), so the ten built-in `Icon` names draw only when
+  the host registers them too.
+
+```svelte
+<IconsProvider icons={{ zap: Zap, compass: () => import('@lucide/svelte/icons/compass') }}>
+  <DeckStage {deck} renderers={layoutRenderers} />
+</IconsProvider>
+```
 
 ## Import and API
 
