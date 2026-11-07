@@ -76,8 +76,8 @@
     },
     "@texuli/forms": {
       "gzip": 58304,
-      "cssGzip": 5504,
-      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the root carries SchemaForm with every texuli field control it paints (input, select, date and time, slider, choice, tags, file upload, stepper), the model and the controller; consumers that only validate import ./model. Measured 79,802 B (CSS 8,472 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 8832 B before adoption): cssGzip 10368 -> 9792 B, measured + 4% (measured 9,403 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook. PLAN_011 T-gaps-113-121 (G119): tightened 83008 -> 58304 B and cssGzip 9792 -> 5504 B, measured + 4% (measured 56,004 B, CSS 5,267 B): the date, time, datetime, slider, tags, file, color and radio controls and the multi-step Stepper load per field type (lazy 49,503 B, CSS 5,382 B), so the root carries only the text, select and choice controls."
+      "cssGzip": 5760,
+      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the root carries SchemaForm with every texuli field control it paints (input, select, date and time, slider, choice, tags, file upload, stepper), the model and the controller; consumers that only validate import ./model. Measured 79,802 B (CSS 8,472 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 8832 B before adoption): cssGzip 10368 -> 9792 B, measured + 4% (measured 9,403 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook. PLAN_011 T-gaps-113-121 (G119): tightened 83008 -> 58304 B and cssGzip 9792 -> 5504 B, measured + 4% (measured 56,004 B, CSS 5,267 B): the date, time, datetime, slider, tags, file, color and radio controls and the multi-step Stepper load per field type (lazy 49,503 B, CSS 5,382 B), so the root carries only the text, select and choice controls. 0.14.3 (owner-approved 2026-11-07): cssGzip 5504 -> 5760 (measured 5,517 B + 4%) for the per-button iconSize rules in button.css, which the forms root bundles."
     },
     "@texuli/forms/controls": {
       "gzip": 52800,
@@ -162,8 +162,8 @@
       "note": "Framework-free chart math (scales, shapes, layouts, LTTB) measured at 12,073 B; the Protoyard charts engine it ports had no separate baseline. Tighten with --update. Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 12,288 B to measured 12,357 B + 4% headroom; already over at T-01. Trimming stays a follow-up."
     },
     "@texuli/chat": {
-      "gzip": 17536,
-      "note": "Provisional cap for the chat barrel (Protoyard chat measured 5.9 KB gzip across 6 files). PLAN_010 T-gaps-53-69 (G59, G70, G71): avatarSrcset, the full-width day separator row and the MessageList reading-position API (bind:anchor, onAnchorChange, restore across the virtual window); measured 16,808 B gzip, cap = measured + 4% rounded up to 64 B."
+      "gzip": 17792,
+      "note": "Provisional cap for the chat barrel (Protoyard chat measured 5.9 KB gzip across 6 files). PLAN_010 T-gaps-53-69 (G59, G70, G71): avatarSrcset, the full-width day separator row and the MessageList reading-position API (bind:anchor, onAnchorChange, restore across the virtual window); measured 16,808 B gzip, cap = measured + 4% rounded up to 64 B. 0.14.3 (owner-approved 2026-11-07, UG-41): 17536 -> 17792 for the Composer row layout and icon send button; measured 17,474 B on macOS, raised ahead of the Linux CI drift."
     },
     "@texuli/chat/*": {
       "gzip": 8192,
@@ -865,6 +865,10 @@
       "gzip": 106368,
       "cssGzip": 3648,
       "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the root barrel (editor + reader); measured 94,277 B, CSS 3,455 B. 0.11.5 (Protoyard G136): 98048 -> 102208 (CI Linux 98,219 B + 4%) for the validateDeck wrappers of @texuli/document/ops. 0.13.0 (owner-approved 2026-11-04): 102208 -> 106368 B, Linux CI measured + 4% (measured 102,249 B; macOS measures a few bytes less) for the label dictionary in context (ADR-026)."
+    },
+    "@texuli/pages/i18n/es": {
+      "gzip": 2688,
+      "note": "0.14.3 UG-37 (owner-approved 2026-11-07): new row at measured + 4% for the opt-in Spanish label catalog (data only, every PagesMessageId); measured 2,538 B."
     },
     "@texuli/pages/collab": {
       "gzip": 126080,
