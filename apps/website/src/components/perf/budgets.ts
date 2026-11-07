@@ -309,8 +309,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/guides/',
     reason:
-      'PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (22.5 KB of WebP on open, logo included); measured 94.8 KB page, limit 99 (+4% headroom).',
-    budget: { pageGzipKb: 99 },
+      'PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (22.5 KB of WebP on open, logo included); measured 94.8 KB page, limit 99 (+4% headroom). 0.14.2 (2026-11-07): the component CSS gains the shared scrim rule, the new CSS hooks and the IconButton badge (+0.6 KB of CSS, HTML and JS unchanged); CI on Linux measured 99.2 KB page, limit 104 (+4% headroom).',
+    budget: { pageGzipKb: 104 },
   },
 ]);
 
