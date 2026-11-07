@@ -67,6 +67,46 @@ export function markerOffset(at: IsoDate | Date, start: IsoDate): number {
   return (time - Date.parse(`${start}T00:00Z`)) / 864e5;
 }
 
+/** What a tick label formatter gets besides the tick's civil date. */
+export interface TimelineTickContext {
+  zoom: TimelineZoom;
+  locale: string;
+  /** The first tick, or the first tick in a new month. */
+  monthStart: boolean;
+}
+
+/**
+ * The default axis tick label. Day ticks are one day wide, so they show the
+ * day of month and name the month only where it starts ("Mar 1", "2", "3");
+ * wider ticks keep the full date ("March 2, 2026").
+ */
+export function formatTimelineTick(date: IsoDate, context: TimelineTickContext): string {
+  const day = context.zoom === 'day';
+  return new Intl.DateTimeFormat(context.locale, {
+    month: day ? (context.monthStart ? 'short' : undefined) : 'long',
+    day: 'numeric',
+    year: day ? undefined : 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${date}T12:00:00Z`));
+}
+
+/**
+ * The day the axis opens at: a valid `initialDate` (a civil date, a `Date` or
+ * an ISO date-time, read in UTC), else `today` when it falls between the
+ * earliest start and the latest end, else none (the axis opens at its start).
+ */
+export function timelineAnchor(
+  tasks: readonly ScheduleTask[],
+  today: IsoDate,
+  initialDate?: IsoDate | Date
+): IsoDate | undefined {
+  const offset = initialDate === undefined ? Number.NaN : markerOffset(initialDate, today);
+  if (Number.isFinite(offset)) return addDays(today, Math.floor(offset));
+  return tasks.some((task) => task.start <= today) && tasks.some((task) => task.end >= today)
+    ? today
+    : undefined;
+}
+
 export function dateAtOffset(start: IsoDate, offset: number): IsoDate {
   return addDays(start, Math.round(offset));
 }

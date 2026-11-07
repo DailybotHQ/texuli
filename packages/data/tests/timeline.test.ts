@@ -7,7 +7,9 @@ import {
   DAY_WIDTH,
   dateOffset,
   durationLabel,
+  formatTimelineTick,
   progressValue,
+  timelineAnchor,
   timelineRange,
   ZOOMS,
 } from '../src/timeline/model.ts';
@@ -352,5 +354,77 @@ describe('TimelineView product features (D-G-033)', () => {
       )?.[1]
     );
     expect(width).toBeGreaterThan(63 * 16);
+  });
+});
+
+describe('TimelineView axis labels and opening date (G-056)', () => {
+  it('formats compact day ticks, full wider ticks, and honors formatTick', () => {
+    const tick = (zoom: (typeof ZOOMS)[number], monthStart: boolean, locale = 'en') =>
+      formatTimelineTick('2026-03-01', { zoom, locale, monthStart });
+    expect(tick('day', true)).toBe('Mar 1');
+    expect(tick('day', false)).toBe('1');
+    expect(tick('week', false)).toBe('March 1, 2026');
+    expect(tick('day', true, 'de')).toBe('1. März');
+    render(TimelineView, {
+      props: { tasks, zoom: 'day' as const, now: new Date('2026-01-15T12:00:00Z') },
+    });
+    // Range starts 2025-12-29: the month shows on the first tick and on January 1.
+    const labels = [...document.querySelectorAll('.date-head span')].map((span) =>
+      span.textContent?.trim()
+    );
+    expect(labels.slice(0, 5)).toEqual(['Dec 29', '30', '31', 'Jan 1', '2']);
+    cleanup();
+    const formatTick = vi.fn((date: string, { zoom }: { zoom: string }) => `${zoom}:${date}`);
+    render(TimelineView, {
+      props: { tasks, formatTick, now: new Date('2026-01-15T12:00:00Z') },
+    });
+    expect(document.querySelector('.date-head span')?.textContent?.trim()).toBe('week:2025-12-29');
+    expect(formatTick).toHaveBeenCalledWith('2025-12-29', {
+      zoom: 'week',
+      locale: 'en',
+      monthStart: true,
+    });
+  });
+
+  it('opens at initialDate, else today within the tasks, else the start; mirrors in RTL', () => {
+    const span = [
+      { id: 'a', start: '2026-01-05', end: '2026-01-09' },
+      { id: 'b', start: '2026-01-20', end: '2026-01-26' },
+    ];
+    expect(timelineAnchor(span, '2026-01-15')).toBe('2026-01-15');
+    expect(timelineAnchor(span, '2026-03-15')).toBeUndefined();
+    expect(timelineAnchor(span, '2026-03-15', '2026-01-20')).toBe('2026-01-20');
+    expect(timelineAnchor(span, '2026-03-15', new Date('2026-01-21T23:00:00Z'))).toBe('2026-01-21');
+    expect(timelineAnchor(span, '2026-01-15', 'not-a-date' as never)).toBe('2026-01-15');
+
+    const scrolls: ScrollToOptions[] = [];
+    const native = Element.prototype.scrollTo;
+    Element.prototype.scrollTo = function scrollTo(this: Element, options?: unknown) {
+      if (this.matches('.canvas-scroll')) scrolls.push(options as ScrollToOptions);
+    } as Element['scrollTo'];
+    try {
+      const open = (props: Record<string, unknown>) => {
+        render(TimelineView, { props: { tasks, ...props } });
+        const date = document.querySelector('.canvas-scroll')?.getAttribute('data-open-date');
+        cleanup();
+        return date;
+      };
+      // Range starts 2025-12-29 at 16 px a day; happy-dom has no viewport width.
+      expect(open({ now: new Date('2026-01-15T12:00:00Z') })).toBe('2026-01-15');
+      expect(open({ now: new Date('2026-06-01T12:00:00Z') })).toBeNull();
+      expect(open({ now: new Date('2026-01-15T12:00:00Z'), initialDate: '2026-01-26' })).toBe(
+        '2026-01-26'
+      );
+      expect(
+        open({ now: new Date('2026-01-15T12:00:00Z'), initialDate: '2026-01-26', direction: 'rtl' })
+      ).toBe('2026-01-26');
+      expect(scrolls).toEqual([
+        { left: 17 * 16, behavior: 'instant' },
+        { left: 28 * 16, behavior: 'instant' },
+        { left: -28 * 16, behavior: 'instant' },
+      ]);
+    } finally {
+      Element.prototype.scrollTo = native;
+    }
   });
 });
