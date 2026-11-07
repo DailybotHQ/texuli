@@ -3,6 +3,7 @@ export { default as ButtonGroup } from './ButtonGroup.svelte';
 export {
   BUTTON_SIZES,
   BUTTON_VARIANTS,
+  type ButtonIconSize,
   type ButtonSize,
   type ButtonVariant,
   buttonVariants,

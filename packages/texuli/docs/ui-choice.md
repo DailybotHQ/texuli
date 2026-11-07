@@ -27,6 +27,25 @@ Styled choice controls on owned primitives (`@texuli/primitives/checkbox`,
 - `indeterminate` for mixed parent rows
 - Space toggles; disabled and invalid states use tokens
 
+### Rich labels: `labelContent`
+
+New in `0.14.3`. `Checkbox`, `Switch` and `Radio` take a `labelContent`
+snippet, rendered inside the same `<label for>` as `label`, so it names the
+control the same way. Use it instead of `label` when the label needs markup
+(emphasis, an icon, a link); both render when both are set. The snippet is
+your own markup, so pass any untrusted URL in it through `safeHref`
+(`@texuli/core/url-policy`). Card radios keep `label` and take rich content
+through `children`.
+
+```svelte
+<Checkbox description="Fictional terms only.">
+  {#snippet labelContent()}I agree to the <a href="https://example.com/terms">terms</a>{/snippet}
+</Checkbox>
+```
+
+A choice rendered with `labelContent` (or with `label`) carries one empty
+`<!---->` hydration anchor inside its `<label>` in server-rendered HTML.
+
 ## Switch
 
 ```svelte

@@ -10,8 +10,10 @@ import { avatarInitials, avatarToneIndex } from './initials.ts';
 import { avatarSrcset } from './srcset.ts';
 import {
   AVATAR_PIXELS,
+  type AvatarShape,
   type AvatarSize,
   type AvatarStatus,
+  type AvatarTone,
   avatarRootClass,
   avatarStatusClass,
 } from './variants.ts';
@@ -34,6 +36,14 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** The `sizes` attribute for width-descriptor candidates. */
   sizes?: string;
   size?: AvatarSize;
+  /**
+   * Fill the initials surface with a theme tone (`primary`, `success`,
+   * `warning`, `destructive`, `info` or `neutral`) instead of the seeded
+   * ring: each is a background and foreground pair the AA gate checks.
+   */
+  tone?: AvatarTone;
+  /** `circle` or `square` (the medium shape radius) for this avatar; omit for the theme's avatar radius. */
+  shape?: AvatarShape;
   /** Presence indicator. Omit for none. */
   status?: AvatarStatus;
   /**
@@ -58,6 +68,8 @@ let {
   srcset,
   sizes,
   size = txDefaults().size ?? 'md',
+  tone,
+  shape,
   status,
   decorative = false,
   delayMs = 0,
@@ -88,7 +100,7 @@ const label = $derived(
       : (ariaLabel ?? name)
 );
 const letters = $derived(initialsProp ?? avatarInitials(name));
-const tone = $derived(avatarToneIndex(name));
+const seededTone = $derived(avatarToneIndex(name));
 const pixels = $derived(AVATAR_PIXELS[size]);
 const safeSrcset = $derived(avatarSrcset(srcset, srcTrust));
 /** The primitive's image status: `error` (failed or refused) shows the initials. */
@@ -107,6 +119,8 @@ const rootClass = $derived(
   data-tx-avatar
   data-size={size}
   data-status={status}
+  data-tone={tone}
+  data-shape={shape}
   data-avatar={src && loadingStatus !== 'error' ? 'image' : 'initials'}
   role={decorative ? undefined : 'img'}
   aria-label={label}
@@ -116,7 +130,7 @@ const rootClass = $derived(
 >
   <AvatarPrimitive.Root
     class="tx-avatar__surface"
-    data-tone={tone}
+    data-tone={seededTone}
     {delayMs}
     bind:loadingStatus
     aria-hidden="true"

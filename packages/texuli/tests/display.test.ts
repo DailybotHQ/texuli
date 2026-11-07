@@ -6,6 +6,7 @@ import { createRawSnippet, flushSync, tick } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Alert from '../src/components/alert/Alert.svelte';
 import { alertRole } from '../src/components/alert/tones.ts';
+import Avatar from '../src/components/avatar/Avatar.svelte';
 import AvatarGroup from '../src/components/avatar/AvatarGroup.svelte';
 import AvatarGroupGrid from '../src/components/avatar/AvatarGroupGrid.svelte';
 import { avatarInitials, avatarToneIndex, hashString } from '../src/components/avatar/initials.ts';
@@ -279,6 +280,34 @@ describe('avatar', () => {
     });
   });
 
+  describe('Avatar tone and shape (UG-29)', () => {
+    it('marks the root for a filled tone and a per-instance shape, and adds nothing when unset', () => {
+      const view = render(Avatar, {
+        props: { name: 'Ada Example', tone: 'success', shape: 'square' },
+      });
+      const root = view.getByRole('img', { name: 'Ada Example' });
+      expect(root.getAttribute('data-tone')).toBe('success');
+      expect(root.getAttribute('data-shape')).toBe('square');
+      // The seeded ring tone stays on the surface; the fill rule drops the ring.
+      expect(root.querySelector('.tx-avatar__surface')?.getAttribute('data-tone')).toMatch(
+        /^[0-4]$/
+      );
+      cleanup();
+      const plain = render(Avatar, { props: { name: 'Bea Example' } });
+      const plainRoot = plain.getByRole('img', { name: 'Bea Example' });
+      expect(plainRoot.hasAttribute('data-tone')).toBe(false);
+      expect(plainRoot.hasAttribute('data-shape')).toBe(false);
+      const css = readFileSync(
+        join(import.meta.dirname, '../src/components/avatar/avatar.css'),
+        'utf8'
+      );
+      expect(css).toMatch(/\.tx-avatar\[data-tone\] \.tx-avatar__surface \{[^}]*box-shadow: none;/);
+      expect(css).toContain(
+        '.tx-avatar[data-shape="square"] {\n    --tx-avatar-radius: var(--tx-shape-radius-md);'
+      );
+    });
+  });
+
   describe('avatar initials contrast', () => {
     const css = readFileSync(
       join(import.meta.dirname, '../src/components/avatar/avatar.css'),
@@ -286,19 +315,39 @@ describe('avatar', () => {
     );
     const screenCss = css.slice(0, css.indexOf('@media (forced-colors: active)'));
 
-    it('paints initials only with the gated foreground-on-muted pair', () => {
-      // Every surface rule outside forced colors: background is muted, text is foreground.
+    it('paints initials only with AA-gated pairs: foreground on muted, or a tone pair', () => {
+      // Every surface rule outside forced colors: background is muted (or the
+      // tone fill), text is foreground (or the tone ink).
       const surfaceRules = [...screenCss.matchAll(/\.tx-avatar__surface[^{]*\{([^}]*)\}/g)].map(
         (m) => m[1] ?? ''
       );
       expect(surfaceRules.length).toBeGreaterThan(1);
       for (const body of surfaceRules) {
         for (const [, value] of body.matchAll(/(?<![-\w])background-color:\s*([^;]+);/g)) {
-          expect(value?.trim()).toBe('var(--tx-muted, Canvas)');
+          expect(['var(--tx-muted, Canvas)', 'var(--tx-avatar-fill)']).toContain(value?.trim());
         }
         for (const [, value] of body.matchAll(/(?<![-\w])color:\s*([^;]+);/g)) {
-          expect(value?.trim()).toBe('var(--tx-foreground, CanvasText)');
+          expect(['var(--tx-foreground, CanvasText)', 'var(--tx-avatar-ink)']).toContain(
+            value?.trim()
+          );
         }
+      }
+      // `tone` fills: each sets a background role and its own gated foreground.
+      const tones = [...screenCss.matchAll(/\.tx-avatar\[data-tone="(\w+)"\] \{([^}]*)\}/g)];
+      expect(tones.map((m) => m[1])).toEqual([
+        'primary',
+        'success',
+        'warning',
+        'destructive',
+        'info',
+        'neutral',
+      ]);
+      for (const [, tone, body] of tones) {
+        const fill = body?.match(/--tx-avatar-fill: var\(--tx-([\w-]+),/)?.[1];
+        const ink = body?.match(/--tx-avatar-ink: var\(--tx-([\w-]+),/)?.[1];
+        expect([fill, ink], tone).toEqual(
+          tone === 'neutral' ? ['muted', 'foreground'] : [tone, `${tone}-foreground`]
+        );
       }
       // The seeded tone never reaches the text pair (no translucent tints behind initials).
       expect(screenCss).not.toMatch(/\.tx-avatar__surface[^{]*\{[^}]*color-mix/);

@@ -30,6 +30,12 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'class' | 'value'
   incrementLabel?: string;
   decrementLabel?: string;
   onValueChange?: (value: number | null) => void;
+  /**
+   * `output` shows the value read-only as plain formatted text (same
+   * `locale` and `formatOptions`): the input is `readonly`, keeps its name
+   * and focus, and the field drops its border and steppers. Default `input`.
+   */
+  display?: 'input' | 'output';
   children?: Snippet;
 };
 
@@ -38,10 +44,20 @@ let {
   size = txDefaults().size ?? 'md',
   class: className,
   value = $bindable(),
+  display,
   ref = $bindable(null),
   ...props
 }: Props & RefProp = $props();
-const classes = $derived(cx(numberFieldClass({ size }), className));
+const classes = $derived(
+  cx(numberFieldClass({ size }), display === 'output' && 'tx-number-field--output', className)
+);
 </script>
 
-<Primitive.Root bind:ref {...props} bind:value class={classes} data-tx-number-field="" />
+<Primitive.Root
+  bind:ref
+  {...props}
+  readOnly={props.readOnly || display === 'output'}
+  bind:value
+  class={classes}
+  data-tx-number-field=""
+/>
