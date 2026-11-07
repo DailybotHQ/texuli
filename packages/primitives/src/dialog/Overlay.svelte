@@ -4,7 +4,7 @@ import type { HTMLAttributes } from 'svelte/elements';
 import { registerBackdrop } from '../internal/backdrop.ts';
 import { createBackdropPresence, type OverlayMotionHooks } from '../internal/motion-hold.ts';
 import type { RefProp } from '../internal/ref.ts';
-import { getDialogContext } from './context.ts';
+import { getDialogContext, getDialogPortalContext } from './context.ts';
 
 type PointerDownEvent = Parameters<NonNullable<HTMLAttributes<HTMLDivElement>['onpointerdown']>>[0];
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
@@ -15,6 +15,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
 
 let { children, onpointerdown, motionHooks, ref = $bindable(null), ...rest }: Props = $props();
 const context = getDialogContext();
+const portal = getDialogPortalContext();
 let isOpen = $state(context.open);
 let held = $state(false);
 let node: HTMLDivElement | null = null;
@@ -32,6 +33,10 @@ $effect(() => () => presence.dispose());
 
 function register(element: HTMLDivElement): () => void {
   node = element;
+  // Inside a Portal, register only once it is placed: a backdrop shown in the
+  // top layer and then moved by the portal leaves the top layer silently
+  // (removal hides a popover), so a dialog mounted open lost its backdrop.
+  if (portal && !portal.placed) return () => {};
   // Re-registers if the mode or the container changes.
   const release = registerBackdrop(element, {
     contained: context.mode === 'contained',
