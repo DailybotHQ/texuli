@@ -962,6 +962,9 @@ describe('token contract v2: component registry', () => {
             'motion',
             'motion/loop',
             'icons/lucide',
+            // No component tokens yet: a new family changes the design-system
+            // spec (DS_COMPONENT_TOKENS), planned with the next spec minor.
+            'list-item',
           ].includes(key)
       )
       .filter((key) => !key.startsWith('layouts'));

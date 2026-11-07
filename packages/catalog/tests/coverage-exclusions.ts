@@ -275,6 +275,12 @@ add('texuli', 'planned', 'Planned manifest: a toolbar of host actions (closed em
 add('texuli', 'planned', 'Planned manifest; data-tree-view covers trees from data today.', [
   'TreeView',
 ]);
+add(
+  'texuli',
+  'planned',
+  'Planned manifest: a list row (texuli/list-item, 0.14.3); a catalog id waits for the next spec minor.',
+  ['ListItem']
+);
 
 // ── @texuli/data ───────────────────────────────────────────────
 add('@texuli/data', 'painted-by', 'Painted by data-calendar.', ['CalendarView']);
@@ -417,4 +423,7 @@ export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(row
 // planned with Avatar). Raised to 214 for MotionLoop (D-G-046, 0.14.0): a
 // motion utility over the host's children, like MotionProvider, with no
 // content of its own; a loop is not in the spec motion vocabulary.
-export const EXCLUSION_CEILING = 214;
+// Raised to 215 for ListItem (UG-42, 0.14.3 patch lane): planned, like
+// CodeField was, because a new catalog id changes the spec contract and a
+// patch release cannot carry a spec minor.
+export const EXCLUSION_CEILING = 215;

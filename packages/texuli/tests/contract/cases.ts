@@ -92,6 +92,7 @@ export const CASES: ContractCase[] = [
   { key: 'components/kbd-code/Code', harness: DisplayContract },
   { key: 'components/kbd-code/CopyButton', harness: DisplayContract },
   { key: 'components/kbd-code/Kbd', harness: DisplayContract },
+  { key: 'components/list-item/ListItem', harness: DisplayContract },
   { key: 'motion/loop/MotionLoop', harness: DisplayContract },
   {
     key: 'components/rating/Rating',

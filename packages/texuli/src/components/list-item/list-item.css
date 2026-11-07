@@ -1,0 +1,112 @@
+/**
+ * List item: one row of a `<ul role="list" class="tx-list">`, with leading
+ * media, a title and description, trailing meta and trailing controls.
+ * @layer tx.components so consumer utilities can override.
+ * Reads system tokens (plain reads of the defaults base.css declares) and
+ * theme colors; it has no component tokens yet (planned).
+ * Kept literals: none besides the 0 resets.
+ */
+@layer tx.components {
+  .tx-list {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tx-list-item {
+    display: flex;
+    align-items: center;
+    gap: var(--tx-space-2);
+    min-inline-size: 0;
+    border-radius: var(--tx-shape-radius-md);
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-list-item__main {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: var(--tx-space-3);
+    min-inline-size: 0;
+    min-block-size: var(--tx-size-control-lg);
+    margin: 0;
+    border: 0;
+    border-radius: inherit;
+    background: none;
+    padding-block: var(--tx-space-2);
+    padding-inline: var(--tx-space-3);
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    text-decoration: none;
+  }
+
+  a.tx-list-item__main,
+  button.tx-list-item__main {
+    cursor: pointer;
+  }
+
+  a.tx-list-item__main:hover,
+  button.tx-list-item__main:hover:not(:disabled),
+  a.tx-list-item__main[aria-current="page"] {
+    background-color: var(--tx-muted, Canvas);
+  }
+
+  .tx-list-item__main:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: calc(var(--tx-focus-ring-width, 2px) * -1);
+  }
+
+  button.tx-list-item__main:disabled {
+    cursor: not-allowed;
+    opacity: var(--tx-opacity-disabled);
+  }
+
+  .tx-list-item__leading {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    color: var(--tx-muted-foreground, GrayText);
+  }
+
+  .tx-list-item__text {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: calc(var(--tx-space-unit) * 0.5);
+    min-inline-size: 0;
+  }
+
+  .tx-list-item__title {
+    overflow: hidden;
+    font-size: var(--tx-type-label-size);
+    font-weight: var(--tx-type-label-weight);
+    line-height: var(--tx-type-label-line);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tx-list-item__description {
+    color: var(--tx-muted-foreground, GrayText);
+    font-size: var(--tx-type-caption-size);
+    line-height: var(--tx-type-caption-line);
+  }
+
+  .tx-list-item__meta {
+    flex: none;
+    color: var(--tx-muted-foreground, GrayText);
+    font-size: var(--tx-type-caption-size);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tx-list-item__trailing {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--tx-space-1);
+    padding-inline-end: var(--tx-space-2);
+  }
+}
