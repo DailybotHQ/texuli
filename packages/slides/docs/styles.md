@@ -23,7 +23,7 @@ are never reordered visually; DOM order is reading order.
 | --- | --- |
 | `tx-deck-stage` | The stage root (region “Presentation: <title>”; `data-fullscreen` when fullscreen) |
 | `tx-deck-stage__main` | The column that holds the overview or the slide viewport |
-| `tx-deck-stage__viewport` | The letterboxed area the canvas scales into (`data-tx-deck-fit`: `pending` or `ready`; reads `--tx-deck-scale`, `--tx-deck-offset-x`, `--tx-deck-offset-y`) |
+| `tx-deck-stage__viewport` | The letterboxed area the canvas scales into (`data-tx-deck-fit`: `pending` or `ready`; `data-tx-deck-reflow` while `canvasFit="reflow"` reflows the canvas, which then also sets `--tx-deck-canvas-width` and `--tx-deck-canvas-height` here; reads `--tx-deck-scale`, `--tx-deck-offset-x`, `--tx-deck-offset-y`) |
 | `tx-deck-stage__canvas` | The fixed virtual canvas (1280 × 720 for 16:9; `data-width`, `data-height`), also used by thumbnails and presenter previews |
 | `tx-deck-stage__slide` | One mounted slide (`data-tx-deck-slide`, `data-tx-deck-layout`, `data-tx-deck-active`, `data-tx-deck-bg-tone`, `data-step`, `data-step-count`; `data-tx-deck-enter` and `data-tx-deck-direction` for the CSS fallback) |
 | `tx-deck-stage__slide-body` | A slide's content box inside the canvas |

@@ -83,7 +83,8 @@ Then import components from their subpaths:
 
 Each `texuli/<family>` subpath exports the family's Svelte components, its
 variant constants and its class helpers. The root entry (`texuli`)
-re-exports every family; subpaths keep bundles narrow.
+re-exports every family except `list-item` (subpath only); subpaths keep
+bundles narrow.
 
 ## What's inside
 
@@ -95,7 +96,7 @@ re-exports every family; subpaths keep bundles narrow.
 | Forms | `field` (Field, Label, Description, FieldError, Form), `input` (Input, InputGroup, Textarea), `choice` (Checkbox, Radio, Switch), `select`, `combobox` (Combobox, MultiSelect), `number-pin` (NumberField, PinInput), `slider`, `date` (Calendar, DatePicker, DateRangePicker, TimeField), `tags-color` (TagsInput, ColorPicker), `file-upload`, `rating` |
 | Overlays | `dialog` (Dialog, AlertDialog), `sheet` (Sheet, Drawer, DetailPanel, ResponsiveModal; `Header`, `Body`, `Footer` and `CloseButton` parts), `popover` (Popover, HoverCard), `tooltip`, `toast` (Toaster), `menus` (DropdownMenu, ContextMenu, Menubar), `command` (command palette) |
 | Navigation | `navigation` (NavigationMenu, Breadcrumb, Pagination), `sidebar` (Sidebar, AppNav), `tabs-accordion` (Tabs, Accordion, Collapsible), `stepper` (Stepper, Wizard), `toolbar`, `tree` (TreeView) |
-| Display | `card`, `alert` (Alert, Callout, Banner), `badge` (Badge, Tag, Chip), `avatar` (Avatar, AvatarGroup), `stat` (Stat, KPI), `table`, `timeline`, `carousel`, `empty` (EmptyState, ErrorState), `feedback` (Skeleton, Spinner, Progress) |
+| Display | `card`, `alert` (Alert, Callout, Banner), `badge` (Badge, Tag, Chip), `avatar` (Avatar, AvatarGroup), `stat` (Stat, KPI), `table`, `timeline`, `carousel`, `empty` (EmptyState, ErrorState), `feedback` (Skeleton, Spinner, Progress), `list-item` (ListItem; subpath only, not in the root entry) |
 | Structure | `separator-aspect` (Separator, AspectRatio, VisuallyHidden), `scroll-area`, `resizable` (resizable panels) |
 | Icons | `icons` (ten built-in SVG icons and the `Icon` component), `icons/lucide` (optional bridge for apps that already use `@lucide/svelte`) |
 

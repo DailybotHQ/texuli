@@ -136,6 +136,14 @@ interface Props {
   syncHash?: boolean;
   /** `container` (default) letterboxes inside the host box; `viewport` fills the window height. */
   fit?: 'viewport' | 'container';
+  /**
+   * How the canvas fits a portrait box (`DeckFitMode` from
+   * `@texuli/deck/engine`). `contain` (default) letterboxes the deck's
+   * canvas; `reflow` gives a landscape or square deck a narrower, portrait
+   * canvas there, so layouts reflow into one column and fill the box. With
+   * `fit="container"`, the box turns 9:16 on a portrait screen.
+   */
+  canvasFit?: 'contain' | 'reflow';
   /** URL policy tier for every link and media source painted. Default `untrusted`. */
   tier?: DeckMediaTrust;
   /** v1 name of `tier` (kept for existing hosts). */
@@ -253,6 +261,7 @@ let {
   deck,
   syncHash = true,
   fit = 'container',
+  canvasFit = 'contain',
   tier,
   mediaTrust,
   trustBadge = true,
@@ -522,7 +531,18 @@ let styleResolution = $derived(
     hostMode: mode,
   })
 );
-let canvas = $derived(deckCanvasSize(styleResolution.style.aspect));
+let designCanvas = $derived(deckCanvasSize(styleResolution.style.aspect));
+let canvasResult = $derived(
+  measured
+    ? fitDeckCanvas(measured.width, measured.height, styleResolution.style.aspect, canvasFit)
+    : undefined
+);
+// A reflowed canvas is the size layouts and renderers paint on.
+let canvas = $derived(
+  canvasResult?.fit === 'reflow'
+    ? { width: canvasResult.canvasWidth, height: canvasResult.canvasHeight }
+    : designCanvas
+);
 
 function themeFor(reference: ReturnType<typeof slideThemeReference>): Theme | null | undefined {
   if (!reference) return undefined;
@@ -628,17 +648,18 @@ let announcement = $derived.by(() => {
     : t('stage.announce', values);
 });
 let fitVars = $derived.by((): Record<string, string> => {
-  if (!measured) return {};
-  const result = fitDeckCanvas(
-    measured.width,
-    measured.height,
-    styleResolution.style.aspect,
-    'contain'
-  );
+  const result = canvasResult;
+  if (!result) return {};
   return {
     '--tx-deck-scale': String(result.scale),
     '--tx-deck-offset-x': `${result.offsetX}px`,
     '--tx-deck-offset-y': `${result.offsetY}px`,
+    ...(result.fit === 'reflow'
+      ? {
+          '--tx-deck-canvas-width': `${result.canvasWidth}px`,
+          '--tx-deck-canvas-height': `${result.canvasHeight}px`,
+        }
+      : {}),
   };
 });
 
@@ -1429,6 +1450,7 @@ $effect(() => {
   dir={localeInfo.dir}
   data-tx-deck={instance}
   data-tx-deck-fit-mode={fit}
+  data-tx-deck-canvas-fit={canvasFit === 'reflow' ? 'reflow' : undefined}
   data-tx-deck-motion={styleResolution.motion}
   data-tx-deck-aspect={styleResolution.style.aspect}
   data-tx-deck-toolbar={toolbarPosition === 'top' ? 'top' : 'bottom'}
@@ -1476,6 +1498,7 @@ $effect(() => {
           bind:this={viewport}
           class="tx-deck-stage__viewport"
           data-tx-deck-fit={measured ? 'ready' : 'pending'}
+          data-tx-deck-reflow={canvasResult?.fit === 'reflow' ? '' : undefined}
           use:deckCssVars={fitVars}
         >
           {#if !chrome && styleResolution.style.progress === 'top'}

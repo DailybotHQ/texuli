@@ -237,6 +237,66 @@ describe('DeckStage v2: input, canvas and the mounted window', () => {
       resetAll
     );
     await scenario(
+      'canvasFit="reflow" gives a portrait box a portrait canvas, and letterboxes otherwise (UG-39)',
+      async () => {
+        mockPreferences();
+        const observers: { callback: ResizeObserverCallback }[] = [];
+        vi.stubGlobal(
+          'ResizeObserver',
+          class {
+            callback: ResizeObserverCallback;
+            constructor(callback: ResizeObserverCallback) {
+              this.callback = callback;
+              observers.push(this);
+            }
+            observe() {}
+            disconnect() {}
+          }
+        );
+        const resize = (width: number, height: number) => {
+          for (const observer of observers) {
+            observer.callback(
+              [{ contentRect: { width, height } } as ResizeObserverEntry],
+              observer as unknown as ResizeObserver
+            );
+          }
+          flushSync();
+        };
+        const view = render(DeckStage, {
+          props: { deck: deckOf(sixSlides()), loadTheme: null, canvasFit: 'reflow' },
+        });
+        const stage = screen.getByRole('region', { name: /Presentation/ });
+        expect(stage.dataset.txDeckCanvasFit).toBe('reflow');
+        const viewport = view.container.querySelector<HTMLElement>('.tx-deck-stage__viewport');
+        const canvas = view.container.querySelector<HTMLElement>('[data-tx-deck-canvas]');
+        const vars = () =>
+          ['--tx-deck-canvas-width', '--tx-deck-canvas-height', '--tx-deck-scale'].map((name) =>
+            viewport?.style.getPropertyValue(name)
+          );
+        resize(390, 780);
+        expect(viewport?.hasAttribute('data-tx-deck-reflow')).toBe(true);
+        expect(vars()).toEqual(['720px', '1440px', String(390 / 720)]);
+        expect(viewport?.style.getPropertyValue('--tx-deck-offset-y')).toBe('0px');
+        expect([canvas?.dataset.width, canvas?.dataset.height]).toEqual(['720', '1440']);
+        // A landscape box letterboxes the design canvas again.
+        resize(1280, 720);
+        expect(viewport?.hasAttribute('data-tx-deck-reflow')).toBe(false);
+        expect(vars()).toEqual(['', '', '1']);
+        expect([canvas?.dataset.width, canvas?.dataset.height]).toEqual(['1280', '720']);
+        view.unmount();
+        // Without canvasFit, a portrait box letterboxes, and the stage carries no reflow hook.
+        const plain = render(DeckStage, { props: { deck: deckOf(sixSlides()), loadTheme: null } });
+        resize(390, 780);
+        const plainViewport = plain.container.querySelector<HTMLElement>(
+          '.tx-deck-stage__viewport'
+        );
+        expect(plain.container.querySelector('[data-tx-deck-canvas-fit]')).toBeNull();
+        expect(plainViewport?.hasAttribute('data-tx-deck-reflow')).toBe(false);
+        expect(plainViewport?.style.getPropertyValue('--tx-deck-offset-y')).not.toBe('0px');
+      },
+      resetAll
+    );
+    await scenario(
       'announces steps and slide titles from catalog layout props',
       async () => {
         mockPreferences();

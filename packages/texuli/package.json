@@ -270,6 +270,11 @@
       "svelte": "./src/layouts/shells/index.ts",
       "default": "./src/layouts/shells/index.ts"
     },
+    "./list-item": {
+      "types": "./src/components/list-item/index.ts",
+      "svelte": "./src/components/list-item/index.ts",
+      "default": "./src/components/list-item/index.ts"
+    },
     "./menus": {
       "types": "./src/components/menus/index.ts",
       "svelte": "./src/components/menus/index.ts",

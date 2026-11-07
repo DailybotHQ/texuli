@@ -44,6 +44,8 @@ import {
 } from '../src/layouts/index.ts';
 import DeckStage from '../src/stage/DeckStage.svelte';
 import { loadDefaultDeckRenderers } from '../src/stage/defaults.ts';
+import IconsDeckHarness from './fixtures/IconsDeckHarness.svelte';
+import ZapIcon from './fixtures/ZapIcon.svelte';
 import { scenario } from './scenario.ts';
 
 // The default renderer tables load on first use; preload them, as a host that paints at once does.
@@ -148,6 +150,39 @@ describe('every layout renders its sample on the stage', () => {
       expect(table?.textContent).toContain('Releases');
       expect(table?.textContent).toContain('31');
     });
+  });
+});
+
+describe('three-column-cards icons (UG-38)', () => {
+  it('draws registered icons (component, path, lazy) in the tiles and keeps the number otherwise', async () => {
+    const cards = [
+      { icon: 'zap', heading: 'Small', body: 'Ship the smallest useful change first.' },
+      { icon: 'compass', heading: 'Clear', body: 'One sentence explains every change.' },
+      { icon: 'not-registered', heading: 'Shared', body: 'Anyone on the team can release.' },
+    ];
+    const deck = deckOf([layoutSlide('three-column-cards', { title: 'Principles', cards })]);
+    const { container } = render(IconsDeckHarness, {
+      props: { deck, icons: { zap: ZapIcon, compass: async () => 'M12 2v20M2 12h20' } },
+    });
+    const frame = await painted(container, 'three-column-cards');
+    const tiles = () => [...frame.querySelectorAll<HTMLElement>('[data-slot="card"] .tile')];
+    await waitFor(() => expect(tiles()).toHaveLength(3));
+    const [zap, compass, missing] = tiles();
+    expect(zap?.querySelector('svg[data-zap]'), 'component glyph').not.toBeNull();
+    expect(zap?.textContent?.trim()).toBe('');
+    await waitFor(() =>
+      expect(compass?.querySelector('path')?.getAttribute('d')).toBe('M12 2v20M2 12h20')
+    );
+    expect(missing?.querySelector('svg')).toBeNull();
+    expect(missing?.textContent?.trim()).toBe('3');
+    for (const tile of tiles()) expect(tile.getAttribute('aria-hidden')).toBe('true');
+    // Without a registry every tile keeps its number, as before.
+    const plain = mount(deck);
+    const plainFrame = await painted(plain.container, 'three-column-cards');
+    expect(
+      [...plainFrame.querySelectorAll('[data-slot="card"] .tile')].map((t) => t.textContent?.trim())
+    ).toEqual(['1', '2', '3']);
+    expect(plainFrame.querySelector('[data-slot="card"] .tile svg')).toBeNull();
   });
 });
 

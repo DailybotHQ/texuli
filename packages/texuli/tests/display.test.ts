@@ -32,6 +32,7 @@ import { iconPath } from '../src/components/icons/icons.ts';
 import { ICON_NAMES } from '../src/components/icons/index.ts';
 import { LucideIcon } from '../src/components/icons/lucide.ts';
 import { type IconName, type IconSize } from '../src/components/icons/types.ts';
+import { ListItem } from '../src/components/list-item/index.ts';
 import Kpi from '../src/components/stat/Kpi.svelte';
 import KpiRow from '../src/components/stat/KpiRow.svelte';
 import Stat from '../src/components/stat/Stat.svelte';
@@ -51,6 +52,7 @@ import AvatarFixture from './fixtures/AvatarFixture.svelte';
 import CustomIcon from './fixtures/CustomIcon.svelte';
 import IconsLazyHarness from './fixtures/IconsLazyHarness.svelte';
 import IconsRegistryHarness from './fixtures/IconsRegistryHarness.svelte';
+import ListItemHarness from './fixtures/ListItemHarness.svelte';
 import ResizableHarness from './fixtures/ResizableHarness.svelte';
 import ScrollAreaHarness from './fixtures/ScrollAreaHarness.svelte';
 import SeparatorAspectHarness from './fixtures/SeparatorAspectHarness.svelte';
@@ -1612,5 +1614,63 @@ describe('resizable', () => {
       render(ResizableHarness, { props: { storage } });
       expect(handle().getAttribute('aria-valuenow')).toBe('40');
     });
+  });
+});
+
+describe('ListItem (UG-42)', () => {
+  afterEach(cleanup);
+
+  it('renders list rows as a link, a button or plain text, with trailing controls outside them', async () => {
+    const onSelect = vi.fn();
+    render(ListItemHarness, {
+      props: {
+        trailingLabel: 'More',
+        items: [
+          { title: 'Inbox', description: '3 new', meta: '09:41', href: '/inbox', current: true },
+          { title: 'Help', href: 'https://example.com/help', target: '_blank' },
+          { title: 'Archive', onSelect },
+          { title: 'Hostile', href: 'javascript:alert(1)', onSelect },
+          { title: 'Plain', icon: 'info' },
+        ],
+      },
+    });
+    const list = screen.getByRole('list', { name: 'Inbox' });
+    const rows = within(list).getAllByRole('listitem');
+    expect(rows).toHaveLength(5);
+    const inbox = within(rows[0] as HTMLElement).getByRole('link');
+    expect(inbox.getAttribute('href')).toBe('/inbox');
+    expect(inbox.getAttribute('aria-current')).toBe('page');
+    expect(inbox.textContent).toContain('3 new');
+    expect(inbox.textContent).toContain('09:41');
+    const help = within(rows[1] as HTMLElement).getByRole('link');
+    expect(help.getAttribute('rel')).toBe('noopener noreferrer');
+    await fireEvent.click(within(rows[2] as HTMLElement).getByRole('button', { name: 'Archive' }));
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    // A rejected href never becomes a link; onSelect takes over.
+    expect(within(rows[3] as HTMLElement).queryByRole('link')).toBeNull();
+    expect(rows[3]?.innerHTML).not.toContain('javascript:');
+    expect(within(rows[3] as HTMLElement).getByRole('button', { name: 'Hostile' })).toBeTruthy();
+    const plain = rows[4] as HTMLElement;
+    expect(plain.querySelector('a, button.tx-list-item__main')).toBeNull();
+    expect(plain.querySelector('.tx-list-item__leading svg')?.getAttribute('aria-hidden')).toBe(
+      'true'
+    );
+    // Trailing controls are siblings of the row control, never nested in it.
+    for (const row of rows) {
+      const more = within(row).getByRole('button', { name: 'More' });
+      expect(more.closest('.tx-list-item__main'), row.textContent ?? '').toBeNull();
+    }
+  });
+
+  it('renders no description, meta, leading or trailing markup when they are not given', () => {
+    const { container } = render(ListItem, { props: { title: 'Only a title' } });
+    const root = container.querySelector('li');
+    expect(root?.getAttribute('data-tx-list-item')).not.toBeNull();
+    expect(
+      root?.querySelector(
+        '.tx-list-item__description, .tx-list-item__meta, .tx-list-item__leading, .tx-list-item__trailing'
+      )
+    ).toBeNull();
+    expect(root?.textContent?.trim()).toBe('Only a title');
   });
 });

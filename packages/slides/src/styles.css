@@ -70,6 +70,14 @@
   border-radius: 0;
 }
 
+/* `canvasFit="reflow"` in a host box: a portrait screen gets a portrait box to reflow into. */
+@media (orientation: portrait) {
+  .tx-deck-stage[data-tx-deck-canvas-fit="reflow"][data-tx-deck-fit-mode="container"]
+    .tx-deck-stage__viewport {
+    aspect-ratio: 9 / 16;
+  }
+}
+
 /*
  * The virtual canvas. Physical `top`/`left` and the translate are on purpose:
  * the letterbox offsets are geometry measured in physical pixels, and the

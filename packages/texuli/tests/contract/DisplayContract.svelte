@@ -25,6 +25,7 @@ import { Progress, Skeleton, Spinner } from '../../src/components/feedback/index
 import { Icon } from '../../src/components/icons/index.ts';
 import { LucideIcon } from '../../src/components/icons/lucide.ts';
 import { Code, CopyButton, Kbd } from '../../src/components/kbd-code/index.ts';
+import { ListItem } from '../../src/components/list-item/index.ts';
 import { Rating } from '../../src/components/rating/index.ts';
 import {
   AspectRatio,
@@ -75,6 +76,7 @@ const k = (name: string) => `components/${name}`;
 <Code {...p(k('kbd-code/Code'))} bind:ref={refs[k('kbd-code/Code')]}>npm i</Code>
 <CopyButton value="npm i" {...p(k('kbd-code/CopyButton'))} bind:ref={refs[k('kbd-code/CopyButton')]} />
 <Kbd {...p(k('kbd-code/Kbd'))} bind:ref={refs[k('kbd-code/Kbd')]}>⌘K</Kbd>
+<ul role="list"><ListItem title="Inbox" description="3 new" {...p(k('list-item/ListItem'))} bind:ref={refs[k('list-item/ListItem')]} /></ul>
 <MotionLoop preset="wave" {...p('motion/loop/MotionLoop')} bind:ref={refs['motion/loop/MotionLoop']}><span></span><span></span></MotionLoop>
 <Rating value={3} {...p(k('rating/Rating'))} bind:ref={refs[k('rating/Rating')]} />
 <AspectRatio {...p(k('separator-aspect/AspectRatio'))} bind:ref={refs[k('separator-aspect/AspectRatio')]}>Media</AspectRatio>
