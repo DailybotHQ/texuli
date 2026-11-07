@@ -13,6 +13,7 @@ import ShellHeaderProbe from './fixtures/ShellHeaderProbe.svelte';
 import SidebarHarness from './fixtures/SidebarHarness.svelte';
 import SidebarHeightHarness from './fixtures/SidebarHeightHarness.svelte';
 import ToolbarHarness from './fixtures/ToolbarHarness.svelte';
+import SetLabelsHarness from './SetLabelsHarness.svelte';
 import WizardHarness from './WizardHarness.svelte';
 
 // Navigation components and app shells: URL policy, current-page marking,
@@ -239,6 +240,34 @@ describe('stepper', () => {
       expect(buttons.length).toBe(2);
       await fireEvent.click(buttons[0]!);
       expect(onStepClick).toHaveBeenCalledWith(0);
+    });
+
+    it('reads its status phrases from the label dictionary, English by default', () => {
+      const phrases = (container: HTMLElement) =>
+        [...container.querySelectorAll('.tx-stepper__sr')].map((node) => node.textContent);
+      const english = render(Stepper, { props: { steps: STEPS, current: 1 } });
+      expect(phrases(english.container)).toEqual([
+        '(completed)',
+        '(current step)',
+        '(not started)',
+      ]);
+      cleanup();
+      const spanish = render(SetLabelsHarness, {
+        props: {
+          labels: {
+            'texuli.stepper.complete': 'completado',
+            'texuli.stepper.current': 'paso actual',
+            'texuli.stepper.upcoming': 'sin empezar',
+          },
+          component: Stepper as never,
+          props: { steps: STEPS, current: 1 },
+        },
+      });
+      expect(phrases(spanish.container)).toEqual([
+        '(completado)',
+        '(paso actual)',
+        '(sin empezar)',
+      ]);
     });
   });
 
