@@ -1,5 +1,6 @@
 <script lang="ts">
 import { CheckboxRoot } from '@texuli/primitives/checkbox';
+import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { joinIds, splitRequiredControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
@@ -20,6 +21,12 @@ type Props = {
   id?: string;
   /** Visible label wired with `for`. */
   label?: string;
+  /**
+   * Rich label content (an icon, a link, emphasis) rendered inside the
+   * `<label>`, so it names the control the same way. Use it instead of
+   * `label` (both render when both are set).
+   */
+  labelContent?: Snippet;
   description?: string;
   size?: ChoiceSize;
   onCheckedChange?: (checked: boolean) => void;
@@ -43,6 +50,7 @@ let {
   required = false,
   id = `tx-checkbox-${uid}`,
   label,
+  labelContent,
   description,
   size = txDefaults().size ?? 'md',
   onCheckedChange,
@@ -61,7 +69,7 @@ const isRequired = $derived(required || split.required);
 const controlClass = $derived(
   choiceControlClass({
     size,
-    class: label ? undefined : className,
+    class: label || labelContent ? undefined : className,
   })
 );
 </script>
@@ -107,7 +115,7 @@ const controlClass = $derived(
   </CheckboxRoot>
 {/snippet}
 
-{#if label}
+{#if label || labelContent}
   <div
     bind:this={ref}
     class={cx('tx-choice', className)}
@@ -116,7 +124,7 @@ const controlClass = $derived(
   >
     <span class="tx-choice__hit">{@render box()}</span>
     <div class="tx-choice__copy">
-      <label class="tx-choice__label" for={id}>{label}</label>
+      <label class="tx-choice__label" for={id}>{label}{@render labelContent?.()}</label>
       {#if description}
         <p class="tx-choice__description" id="{id}-description">{description}</p>
       {/if}

@@ -34,9 +34,10 @@
  * - Swipe constants, `DECK_INTERACTIVE_ATTRIBUTE`, `DECK_CHROME_ATTRIBUTE`
  *
  * ### Canvas fit (`canvas.ts`)
- * - `DECK_CANVAS` / `deckCanvasSize(aspect)` / `fitDeckCanvas(w, h, aspect?, fit?)`
- *   Aspects 16:9, 4:3, 9:16, 1:1. Fit: `contain` | `cover` | `container`
- *   (`container` ≡ letterboxed contain for embedded decks).
+ * - `DECK_CANVAS` / `DECK_REFLOW_WIDTH` / `deckCanvasSize(aspect)` / `fitDeckCanvas(w, h, aspect?, fit?)`
+ *   Aspects 16:9, 4:3, 9:16, 1:1. Fit: `contain` | `cover` | `container` |
+ *   `reflow` (`container` ≡ letterboxed contain for embedded decks; `reflow`
+ *   gives a portrait container a portrait canvas).
  *
  * ### Motion (`motion.ts`)
  * - `resolveDeckTransition({ slide, style, motion, reducedMotion })`
@@ -88,6 +89,7 @@ export {
   type CanvasFit,
   DECK_ASPECTS,
   DECK_CANVAS,
+  DECK_REFLOW_WIDTH,
   DEFAULT_DECK_ASPECT,
   type DeckAspect,
   type DeckCanvasSize,

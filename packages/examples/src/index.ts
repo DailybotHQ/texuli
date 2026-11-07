@@ -80,6 +80,7 @@ import './layouts-marketing/entry.ts';
 import './layouts-shells/entry.ts';
 import './layouts-mobile/entry.ts';
 import './lego/entry.ts';
+import './list-item/entry.ts';
 import './media-animation/entry.ts';
 import './media-animation-timeline/entry.ts';
 import './media-audio/entry.ts';

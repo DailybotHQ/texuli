@@ -130,6 +130,12 @@ export interface BottomNavItem {
   badgeLabel?: string;
   /** `true` or `'page'`: the current screen; `'true'`: the current screen is below it. */
   current?: boolean | 'page' | 'true';
+  /**
+   * `'action'`: the bar's prominent action (a filled circle around the
+   * icon, such as `plus` for Create). It stays a link in the list; to open a
+   * sheet instead of navigating, call `event.preventDefault()` in `onSelect`.
+   */
+  emphasis?: 'action';
 }
 
 /** `aria-current` of a bottom-nav link. */

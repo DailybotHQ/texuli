@@ -16,7 +16,7 @@ which is built on these primitives. They are built from scratch on the
 not depend on any other component library.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.14.2`, a pre-1.0 release (1.0.0 will be the first
+> published to npm as `0.14.3`, a pre-1.0 release (1.0.0 will be the first
 > stable release). Under 0.x, a new minor (`0.14.0`) may contain breaking
 > changes, so pin the exact version or use `^0.14.0`, which accepts only 0.14.x.
 
@@ -131,8 +131,8 @@ from subpaths to keep bundles narrow.
 Ships in `0.8.0`; the `0.7.0` release predates it: the labels primitives write themselves
 resolve through the `@texuli/core/i18n` message catalog (ADR-016):
 `setI18nContext`, `useMessages` and `PRIMITIVES_MESSAGES_EN` (every label id
-with its English default); instance props keep winning, and English stays
-the only shipped language
+with its English default); instance props keep winning, and English is the
+default (opt-in Spanish catalogs from `0.14.3`, in `texuli/i18n/es`)
 ([i18n](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/i18n.md)).
 
 ### New in 0.6.0

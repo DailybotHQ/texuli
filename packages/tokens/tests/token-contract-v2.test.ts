@@ -959,9 +959,13 @@ describe('token contract v2: component registry', () => {
             'defaults',
             'design-system',
             'i18n',
+            'i18n/es',
             'motion',
             'motion/loop',
             'icons/lucide',
+            // No component tokens yet: a new family changes the design-system
+            // spec (DS_COMPONENT_TOKENS), planned with the next spec minor.
+            'list-item',
           ].includes(key)
       )
       .filter((key) => !key.startsWith('layouts'));

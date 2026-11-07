@@ -236,8 +236,17 @@ is 1024×768, 9:16 is 720×1280 and 1:1 is 1080×1080; `DEFAULT_DECK_ASPECT` is
 fall back to 16:9) and `isDeckAspect` tests one.
 `fitDeckCanvas(width, height, aspect?, fit?)` returns a `CanvasFit` (scale,
 rendered size, letterbox offsets, canvas size, aspect and mode). The
-`DeckFitMode` is `contain` (letterbox), `cover` (fill and crop) or
-`container` (letterboxed `contain`, for embedded decks).
+`DeckFitMode` is `contain` (letterbox), `cover` (fill and crop),
+`container` (letterboxed `contain`, for embedded decks) or `reflow` (new in
+`0.14.3`): on a portrait container (taller than wide) a 16:9, 4:3 or 1:1 deck
+gets a portrait canvas `DECK_REFLOW_WIDTH` (720) wide and as tall as the
+container's ratio asks, with no letterbox, and the result's `fit` is
+`reflow`; anywhere else it acts as `contain` and reports `contain`.
+
+```ts
+fitDeckCanvas(390, 780, '16:9', 'reflow');
+// { scale: 0.5416…, width: 390, height: 780, offsetX: 0, offsetY: 0, canvasWidth: 720, canvasHeight: 1440, aspect: '16:9', fit: 'reflow' }
+```
 
 ## Motion
 

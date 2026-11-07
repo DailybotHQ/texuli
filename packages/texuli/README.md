@@ -17,7 +17,7 @@ layouts for dashboards, marketing pages, auth and settings, content and
 mobile.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.14.2`, a pre-1.0 release (1.0.0 will be the first
+> published to npm as `0.14.3`, a pre-1.0 release (1.0.0 will be the first
 > stable release). Under 0.x, a new minor (`0.14.0`) may contain breaking
 > changes, so pin the exact version or use `^0.14.0`, which accepts only 0.14.x.
 
@@ -83,7 +83,8 @@ Then import components from their subpaths:
 
 Each `texuli/<family>` subpath exports the family's Svelte components, its
 variant constants and its class helpers. The root entry (`texuli`)
-re-exports every family; subpaths keep bundles narrow.
+re-exports every family except `list-item` (subpath only); subpaths keep
+bundles narrow.
 
 ## What's inside
 
@@ -95,7 +96,7 @@ re-exports every family; subpaths keep bundles narrow.
 | Forms | `field` (Field, Label, Description, FieldError, Form), `input` (Input, InputGroup, Textarea), `choice` (Checkbox, Radio, Switch), `select`, `combobox` (Combobox, MultiSelect), `number-pin` (NumberField, PinInput), `slider`, `date` (Calendar, DatePicker, DateRangePicker, TimeField), `tags-color` (TagsInput, ColorPicker), `file-upload`, `rating` |
 | Overlays | `dialog` (Dialog, AlertDialog), `sheet` (Sheet, Drawer, DetailPanel, ResponsiveModal; `Header`, `Body`, `Footer` and `CloseButton` parts), `popover` (Popover, HoverCard), `tooltip`, `toast` (Toaster), `menus` (DropdownMenu, ContextMenu, Menubar), `command` (command palette) |
 | Navigation | `navigation` (NavigationMenu, Breadcrumb, Pagination), `sidebar` (Sidebar, AppNav), `tabs-accordion` (Tabs, Accordion, Collapsible), `stepper` (Stepper, Wizard), `toolbar`, `tree` (TreeView) |
-| Display | `card`, `alert` (Alert, Callout, Banner), `badge` (Badge, Tag, Chip), `avatar` (Avatar, AvatarGroup), `stat` (Stat, KPI), `table`, `timeline`, `carousel`, `empty` (EmptyState, ErrorState), `feedback` (Skeleton, Spinner, Progress) |
+| Display | `card`, `alert` (Alert, Callout, Banner), `badge` (Badge, Tag, Chip), `avatar` (Avatar, AvatarGroup), `stat` (Stat, KPI), `table`, `timeline`, `carousel`, `empty` (EmptyState, ErrorState), `feedback` (Skeleton, Spinner, Progress), `list-item` (ListItem; subpath only, not in the root entry) |
 | Structure | `separator-aspect` (Separator, AspectRatio, VisuallyHidden), `scroll-area`, `resizable` (resizable panels) |
 | Icons | `icons` (ten built-in SVG icons and the `Icon` component), `icons/lucide` (optional bridge for apps that already use `@lucide/svelte`) |
 
@@ -153,8 +154,8 @@ Ships in `0.8.0`; the `0.7.0` release predates it: component labels resolve thro
 `@texuli/core/i18n` message catalog (ADR-016). `setI18nContext(i18n)` puts
 a catalog in context, `useMessages()` is the lookup components read, and
 `TEXULI_MESSAGES_EN` lists every label id with its English default; label
-props keep winning, and English stays the only shipped language
-(translations beyond English are planned)
+props keep winning, and English is the default (opt-in Spanish catalogs
+from `0.14.3`; other translations are planned)
 ([i18n](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/i18n.md)).
 
 ## Labels and locale
@@ -166,6 +167,10 @@ One label dictionary translates every built-in string of `texuli`,
 new in `0.13.0`).
 A component's own label prop still wins
 ([i18n](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/i18n.md#one-dictionary-for-every-package-adr-026)).
+From `0.14.3`, opt-in Spanish catalogs cover every id: `TEXULI_LABELS_ES`
+(`texuli/i18n/es`, with the primitives), `BLOCKS_LABELS_ES` and
+`PAGES_LABELS_ES`; they have had no native-speaker review yet
+([Spanish catalogs](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/i18n.md#spanish-catalogs-es)).
 
 ## New in 0.6.0
 

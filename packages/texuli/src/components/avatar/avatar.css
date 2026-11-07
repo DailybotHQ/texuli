@@ -84,6 +84,48 @@
   .tx-avatar__surface[data-tone="4"] {
     --tx-avatar-tone: var(--tx-chart-5, transparent);
   }
+  /*
+   * Filled tone (`tone`): the surface takes one of the theme's AA-gated
+   * background and foreground pairs and drops the seeded ring.
+   */
+  .tx-avatar[data-tone] .tx-avatar__surface {
+    background-color: var(--tx-avatar-fill);
+    color: var(--tx-avatar-ink);
+    box-shadow: none;
+  }
+  .tx-avatar[data-tone="primary"] {
+    --tx-avatar-fill: var(--tx-primary, Highlight);
+    --tx-avatar-ink: var(--tx-primary-foreground, HighlightText);
+  }
+  .tx-avatar[data-tone="success"] {
+    --tx-avatar-fill: var(--tx-success, Highlight);
+    --tx-avatar-ink: var(--tx-success-foreground, HighlightText);
+  }
+  .tx-avatar[data-tone="warning"] {
+    --tx-avatar-fill: var(--tx-warning, Highlight);
+    --tx-avatar-ink: var(--tx-warning-foreground, HighlightText);
+  }
+  .tx-avatar[data-tone="destructive"] {
+    --tx-avatar-fill: var(--tx-destructive, Highlight);
+    --tx-avatar-ink: var(--tx-destructive-foreground, HighlightText);
+  }
+  .tx-avatar[data-tone="info"] {
+    --tx-avatar-fill: var(--tx-info, Highlight);
+    --tx-avatar-ink: var(--tx-info-foreground, HighlightText);
+  }
+  .tx-avatar[data-tone="neutral"] {
+    --tx-avatar-fill: var(--tx-muted, Canvas);
+    --tx-avatar-ink: var(--tx-foreground, CanvasText);
+  }
+
+  /* Per-instance shape (`shape`): wins over the theme's avatar radius. */
+  .tx-avatar[data-shape="circle"] {
+    --tx-avatar-radius: var(--tx-shape-radius-full);
+  }
+  .tx-avatar[data-shape="square"] {
+    --tx-avatar-radius: var(--tx-shape-radius-md);
+  }
+
   .tx-avatar__image {
     display: block;
     inline-size: 100%;
@@ -262,7 +304,8 @@
 
   @media (forced-colors: active) {
     .tx-avatar__surface,
-    .tx-avatar__surface[data-tone] {
+    .tx-avatar__surface[data-tone],
+    .tx-avatar[data-tone] .tx-avatar__surface {
       border: 1px solid CanvasText;
       background-color: Canvas;
       color: CanvasText;

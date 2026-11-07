@@ -36,6 +36,7 @@ scoped styles.
 | `deck` | required | A v2 deck, or any input `migrateDeck` understands (Texuli v1, grammar tree, Protoyard), or a prepared deck (an `ok` result of `prepareDeck` or `prepareDeckV2`, see [prepared decks](#preparation-canvas-and-mounting)). An invalid deck shows its diagnostics and is never painted |
 | `syncHash` | `true` | Keep `#/<slide>/<step>` in the URL (`replaceState`) and follow `hashchange` and deep links. Only the first stage on a page claims the hash |
 | `fit` | `container` | `container` letterboxes the canvas inside the host box; `viewport` fills the window height |
+| `canvasFit` | `contain` | How the canvas fits a portrait box (new in `0.14.3`, UG-39): `contain` letterboxes; `reflow` gives a landscape or square deck a 720 px wide portrait canvas there, so layouts reflow into one column (see Canvas) |
 | `tier` | `untrusted` | URL policy tier for every link and media source painted (`DeckMediaTrust`) |
 | `mediaTrust` | — | v1 name of `tier`, kept for existing hosts |
 | `trustBadge` | `true` | Show the stage's trust badge, **Untrusted content** (`stage.untrustedBadge`, overridable through `messages`), at the inline start of the toolbar row when the paint tier is `untrusted`. The stage paints catalog components through players with `chrome={false}`, so this badge is the deck's trust signal; the `developer` tier never shows it. See [Trust badge](#trust-badge) |
@@ -220,6 +221,24 @@ scoped styles.
 - **Canvas:** a fixed virtual canvas (1280 × 720 for 16:9) is scaled into
   the stage with a `ResizeObserver` and letterboxed. CSS variables go on the
   stage root through `deckCssVars` (the CSSOM, never a static `style`).
+  With `canvasFit="reflow"`, a portrait box (taller than wide) gives a 16:9,
+  4:3 or 1:1 deck a portrait canvas instead (`fitDeckCanvas(…, 'reflow')`):
+  720 px wide (`DECK_REFLOW_WIDTH`, under the 48rem container query where
+  the catalog layouts turn to one column) and as tall as the box's ratio
+  asks, scaled to the box width with no letterbox. The viewport then carries
+  `data-tx-deck-reflow` and overrides `--tx-deck-canvas-width` and
+  `--tx-deck-canvas-height`; the canvas `data-width` and `data-height` and
+  the render context's `canvas` report the reflowed size. A landscape box,
+  or a 9:16 deck, letterboxes as before. With `fit="viewport"` the box is
+  the window, so a phone in portrait reflows; with `fit="container"` the
+  stage turns its box 9:16 on a portrait screen (`orientation: portrait`)
+  so there is something to reflow into. Free slides lay their blocks out in
+  flow, so they wrap to the narrower canvas too. The stage root carries `data-tx-deck-canvas-fit="reflow"` only when the option is
+  set, so the default render is unchanged.
+
+  ```svelte
+  <DeckStage {deck} fit="viewport" canvasFit="reflow" />
+  ```
 - **Mounting:** at most three slides are mounted (the active one and its
   neighbours, `inert` and hidden from assistive tech). While the browser is
   idle (`whenIdle`) the stage runs every table's `prefetch` for the next

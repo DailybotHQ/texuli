@@ -24,6 +24,13 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** Visually hide the label (it stays available to assistive tech). */
   hideLabel?: boolean;
   orientation?: FieldOrientation;
+  /**
+   * Character counter for a text control with `maxlength`: pass its value
+   * and the limit to append `12/280` to the description. The control names
+   * the description in `aria-describedby`, so the count is read with it on
+   * focus; it is not a live region (no announcement on every keystroke).
+   */
+  counter?: { value: string; max: number };
   class?: ClassValue;
   children: Snippet<[FieldControl]>;
 };
@@ -39,6 +46,7 @@ let {
   id = `field-${uid}`,
   hideLabel = false,
   orientation = 'vertical',
+  counter,
   class: className,
   children,
   ref = $bindable(null),
@@ -58,8 +66,9 @@ setFieldLabelContext({
 const errorId = $derived(`${id}-error`);
 const invalid = $derived(Boolean(error));
 const describedBy = $derived(
-  [description ? descriptionId : null, invalid ? errorId : null].filter(Boolean).join(' ') ||
-    undefined
+  [description || counter ? descriptionId : null, invalid ? errorId : null]
+    .filter(Boolean)
+    .join(' ') || undefined
 );
 const control: FieldControl = $derived({
   id,
@@ -92,8 +101,10 @@ const classes = $derived(cx(fieldRootClass({ orientation }), className));
   <div class="tx-field-control">
     {@render children(control)}
   </div>
-  {#if description}
-    <Description id={descriptionId}>{description}</Description>
+  {#if description || counter}
+    <Description id={descriptionId}
+      >{description}{counter ? ` ${counter.value.length}/${counter.max}` : ''}</Description
+    >
   {/if}
   <FieldError id={errorId} show={invalid}>{error}</FieldError>
 </div>

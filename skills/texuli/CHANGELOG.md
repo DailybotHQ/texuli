@@ -15,6 +15,14 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The packages are on npm at `0.14.3`, a patch: `labelContent` on choice
+  controls, a `Field` counter, `NumberField` output display, `Avatar` tone
+  and shape, `iconSize`, navigation and `SplitView` options, `Stat` tone,
+  `ListItem` at `texuli/list-item`, the `Composer` row layout, slides card
+  icons and reflow, and opt-in Spanish label catalogs. The components
+  install reference marks them new in `0.14.3` (pin `^0.14.3` to use
+  them), and the build-ui imports reference names the Spanish catalogs.
+
 ## [0.3.22] — 2026-11-07
 
 ### Changes

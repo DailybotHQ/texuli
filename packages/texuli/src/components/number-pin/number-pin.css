@@ -95,6 +95,21 @@
     min-inline-size: var(--tx-size-control-lg);
   }
 
+  /* `display="output"`: the formatted value as read-only text, no field chrome. */
+  .tx-number-field--output {
+    border: 0;
+    background: none;
+  }
+
+  .tx-number-field--output > .tx-number-field__stepper {
+    display: none;
+  }
+
+  .tx-number-field--output > .tx-number-field__input {
+    padding-inline: 0;
+    cursor: text;
+  }
+
   .tx-pin-input {
     position: relative;
     display: inline-flex;

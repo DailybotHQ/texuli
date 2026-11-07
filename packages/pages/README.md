@@ -13,7 +13,7 @@ persistence and sync share one history.
 **In the stack:** layer L8, on `@texuli/document` (L1), `@texuli/editor`, `@texuli/drag`, `@texuli/primitives`, the `texuli` components, `@texuli/blocks` and the player.
 
 > **Status: in development (pre-1.0).** `@texuli/pages` is published on npm
-> as `0.14.2`, with provenance (first published as `0.7.0`, with `@texuli/document`;
+> as `0.14.3`, with provenance (first published as `0.7.0`, with `@texuli/document`;
 > built in PLAN_010, ADR-011 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
 > Under 0.x a new minor (`0.14.0`) may contain breaking changes, so pin the
@@ -76,6 +76,7 @@ Keep the document in `$state.raw`: every change is a new immutable value.
 | `host` | `createDocumentPlayerHost`, the `documentHost` that lets `@texuli/player` paint agent `document` blueprints (spec 0.7.0) with the reader, and `checkDocumentDraft`, the document check for `validateDraft` | [host](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/host.md) |
 | `collab` | `CollabEditor` and its parts on a `CollabSession` of `@texuli/document/collab`: comments anchored to the text, suggestions with accept and reject, version history with restore, remote carets and an accessible collaborator list (import it lazily) | [collab](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/collab.md) |
 | `editor-core`, `reader-core`, `paged-core`, `collab-core`, `host-core` | `PageEditorCore`, `PageReaderCore`, `PagedViewCore`, `CollabEditorCore` and `createDocumentPlayerHostCore`: the same components and host with no default player loader, so a host that passes no `loadPlayer` has no `@texuli/player` reference in its build (G123; from `0.10.0`); `PageReaderCore` and `createDocumentPlayerHostCore` have no default `loadLibraryBase` either, so a design system's `texuli:<theme>` bases never reach the theme library unless the host passes `loadPagesLibraryBase` (G127; from `0.11.0`); `PageEditorCore`, `CollabEditorCore` and `createDocumentPlayerHostCore` validate without `@texuli/deck/model` and take `validateDeck` with no default, so inline decks are refused unless the host passes one such as `checkDeckPayload` (G136; from `0.12.0`) | [core entries](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/editor.md#core-entries-without-the-player) |
+| `i18n/es` | `PAGES_LABELS_ES`: every `@texuli/pages` label id in Spanish, for `<LabelsProvider>` from `texuli/i18n` (opt-in; from `0.14.3`; no native-speaker review yet) | [i18n](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/i18n.md) |
 | `styles.css` | The editor and reader stylesheet (both components import it) | [styles](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/styles.md) |
 
 ## What it does
@@ -167,6 +168,7 @@ Keep the document in `$state.raw`: every change is a new immutable value.
 - [Paged view and print](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/paged.md)
 - [Export](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/export.md)
 - [Collaboration](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/collab.md)
+- [Spanish labels](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/i18n.md)
 - [Styles](https://github.com/DailybotHQ/texuli/blob/main/packages/pages/docs/styles.md)
 - The document engine: [`@texuli/document`](https://github.com/DailybotHQ/texuli/blob/main/packages/document/README.md)
 - Decisions: ADR-010 (sync), ADR-011 (document packages), ADR-013 (motion) and ADR-016 (static outputs) in

@@ -6,6 +6,7 @@ import { createRawSnippet, flushSync, tick } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Alert from '../src/components/alert/Alert.svelte';
 import { alertRole } from '../src/components/alert/tones.ts';
+import Avatar from '../src/components/avatar/Avatar.svelte';
 import AvatarGroup from '../src/components/avatar/AvatarGroup.svelte';
 import AvatarGroupGrid from '../src/components/avatar/AvatarGroupGrid.svelte';
 import { avatarInitials, avatarToneIndex, hashString } from '../src/components/avatar/initials.ts';
@@ -31,8 +32,10 @@ import { iconPath } from '../src/components/icons/icons.ts';
 import { ICON_NAMES } from '../src/components/icons/index.ts';
 import { LucideIcon } from '../src/components/icons/lucide.ts';
 import { type IconName, type IconSize } from '../src/components/icons/types.ts';
+import { ListItem } from '../src/components/list-item/index.ts';
 import Kpi from '../src/components/stat/Kpi.svelte';
 import KpiRow from '../src/components/stat/KpiRow.svelte';
+import Stat from '../src/components/stat/Stat.svelte';
 import { formatDelta, trendToneClass, trendWord } from '../src/components/stat/trend.ts';
 import { fillStackLabels, isScrollable } from '../src/components/table/labels.ts';
 import { Timeline, type TimelineItemData } from '../src/components/timeline/index.ts';
@@ -49,6 +52,7 @@ import AvatarFixture from './fixtures/AvatarFixture.svelte';
 import CustomIcon from './fixtures/CustomIcon.svelte';
 import IconsLazyHarness from './fixtures/IconsLazyHarness.svelte';
 import IconsRegistryHarness from './fixtures/IconsRegistryHarness.svelte';
+import ListItemHarness from './fixtures/ListItemHarness.svelte';
 import ResizableHarness from './fixtures/ResizableHarness.svelte';
 import ScrollAreaHarness from './fixtures/ScrollAreaHarness.svelte';
 import SeparatorAspectHarness from './fixtures/SeparatorAspectHarness.svelte';
@@ -279,6 +283,34 @@ describe('avatar', () => {
     });
   });
 
+  describe('Avatar tone and shape (UG-29)', () => {
+    it('marks the root for a filled tone and a per-instance shape, and adds nothing when unset', () => {
+      const view = render(Avatar, {
+        props: { name: 'Ada Example', tone: 'success', shape: 'square' },
+      });
+      const root = view.getByRole('img', { name: 'Ada Example' });
+      expect(root.getAttribute('data-tone')).toBe('success');
+      expect(root.getAttribute('data-shape')).toBe('square');
+      // The seeded ring tone stays on the surface; the fill rule drops the ring.
+      expect(root.querySelector('.tx-avatar__surface')?.getAttribute('data-tone')).toMatch(
+        /^[0-4]$/
+      );
+      cleanup();
+      const plain = render(Avatar, { props: { name: 'Bea Example' } });
+      const plainRoot = plain.getByRole('img', { name: 'Bea Example' });
+      expect(plainRoot.hasAttribute('data-tone')).toBe(false);
+      expect(plainRoot.hasAttribute('data-shape')).toBe(false);
+      const css = readFileSync(
+        join(import.meta.dirname, '../src/components/avatar/avatar.css'),
+        'utf8'
+      );
+      expect(css).toMatch(/\.tx-avatar\[data-tone\] \.tx-avatar__surface \{[^}]*box-shadow: none;/);
+      expect(css).toContain(
+        '.tx-avatar[data-shape="square"] {\n    --tx-avatar-radius: var(--tx-shape-radius-md);'
+      );
+    });
+  });
+
   describe('avatar initials contrast', () => {
     const css = readFileSync(
       join(import.meta.dirname, '../src/components/avatar/avatar.css'),
@@ -286,19 +318,39 @@ describe('avatar', () => {
     );
     const screenCss = css.slice(0, css.indexOf('@media (forced-colors: active)'));
 
-    it('paints initials only with the gated foreground-on-muted pair', () => {
-      // Every surface rule outside forced colors: background is muted, text is foreground.
+    it('paints initials only with AA-gated pairs: foreground on muted, or a tone pair', () => {
+      // Every surface rule outside forced colors: background is muted (or the
+      // tone fill), text is foreground (or the tone ink).
       const surfaceRules = [...screenCss.matchAll(/\.tx-avatar__surface[^{]*\{([^}]*)\}/g)].map(
         (m) => m[1] ?? ''
       );
       expect(surfaceRules.length).toBeGreaterThan(1);
       for (const body of surfaceRules) {
         for (const [, value] of body.matchAll(/(?<![-\w])background-color:\s*([^;]+);/g)) {
-          expect(value?.trim()).toBe('var(--tx-muted, Canvas)');
+          expect(['var(--tx-muted, Canvas)', 'var(--tx-avatar-fill)']).toContain(value?.trim());
         }
         for (const [, value] of body.matchAll(/(?<![-\w])color:\s*([^;]+);/g)) {
-          expect(value?.trim()).toBe('var(--tx-foreground, CanvasText)');
+          expect(['var(--tx-foreground, CanvasText)', 'var(--tx-avatar-ink)']).toContain(
+            value?.trim()
+          );
         }
+      }
+      // `tone` fills: each sets a background role and its own gated foreground.
+      const tones = [...screenCss.matchAll(/\.tx-avatar\[data-tone="(\w+)"\] \{([^}]*)\}/g)];
+      expect(tones.map((m) => m[1])).toEqual([
+        'primary',
+        'success',
+        'warning',
+        'destructive',
+        'info',
+        'neutral',
+      ]);
+      for (const [, tone, body] of tones) {
+        const fill = body?.match(/--tx-avatar-fill: var\(--tx-([\w-]+),/)?.[1];
+        const ink = body?.match(/--tx-avatar-ink: var\(--tx-([\w-]+),/)?.[1];
+        expect([fill, ink], tone).toEqual(
+          tone === 'neutral' ? ['muted', 'foreground'] : [tone, `${tone}-foreground`]
+        );
       }
       // The seeded tone never reaches the text pair (no translucent tints behind initials).
       expect(screenCss).not.toMatch(/\.tx-avatar__surface[^{]*\{[^}]*color-mix/);
@@ -889,6 +941,47 @@ describe('feedback', () => {
       expect(bar.getAttribute('aria-valuetext')).toBe('Please wait');
       expect(view.container.querySelector('[data-state="indeterminate"]')).toBeTruthy();
       expect(view.container.querySelector('.tx-progress__indicator--indeterminate')).toBeTruthy();
+    });
+
+    it('paints the linear and circular track through the --tx-progress-track hook (UG-43)', () => {
+      const css = readFileSync(
+        join(process.cwd(), 'packages/texuli/src/components/feedback/feedback.css'),
+        'utf8'
+      );
+      for (const part of ['__track', '__circle-track']) {
+        const rule = new RegExp(`\\.tx-progress${part} \\{([^}]*)\\}`).exec(css)?.[1] ?? '';
+        expect(rule, part).toMatch(/var\(--tx-progress-track, var\(--tx-muted, Canvas\)\)/);
+      }
+    });
+  });
+
+  describe('Stat tone (UG-43)', () => {
+    it('marks the tile with its tone, styled per tone, and nothing without one', () => {
+      const css = readFileSync(
+        join(process.cwd(), 'packages/texuli/src/components/stat/stat.css'),
+        'utf8'
+      );
+      for (const tone of [
+        'primary',
+        'success',
+        'warning',
+        'destructive',
+        'info',
+        'neutral',
+      ] as const) {
+        const { container, unmount } = render(Stat, {
+          props: { label: 'Revenue', value: 4, tone },
+        });
+        expect(container.querySelector('[data-tx-stat]')?.getAttribute('data-tone')).toBe(tone);
+        expect(css, tone).toMatch(
+          new RegExp(`\\.tx-stat\\[data-tone="${tone}"\\] \\{[^}]*--tx-stat-tone-accent`)
+        );
+        unmount();
+      }
+      const plain = render(Stat, { props: { label: 'Revenue', value: 4 } });
+      expect(plain.container.querySelector('[data-tx-stat]')?.hasAttribute('data-tone')).toBe(
+        false
+      );
     });
   });
 });
@@ -1521,5 +1614,63 @@ describe('resizable', () => {
       render(ResizableHarness, { props: { storage } });
       expect(handle().getAttribute('aria-valuenow')).toBe('40');
     });
+  });
+});
+
+describe('ListItem (UG-42)', () => {
+  afterEach(cleanup);
+
+  it('renders list rows as a link, a button or plain text, with trailing controls outside them', async () => {
+    const onSelect = vi.fn();
+    render(ListItemHarness, {
+      props: {
+        trailingLabel: 'More',
+        items: [
+          { title: 'Inbox', description: '3 new', meta: '09:41', href: '/inbox', current: true },
+          { title: 'Help', href: 'https://example.com/help', target: '_blank' },
+          { title: 'Archive', onSelect },
+          { title: 'Hostile', href: 'javascript:alert(1)', onSelect },
+          { title: 'Plain', icon: 'info' },
+        ],
+      },
+    });
+    const list = screen.getByRole('list', { name: 'Inbox' });
+    const rows = within(list).getAllByRole('listitem');
+    expect(rows).toHaveLength(5);
+    const inbox = within(rows[0] as HTMLElement).getByRole('link');
+    expect(inbox.getAttribute('href')).toBe('/inbox');
+    expect(inbox.getAttribute('aria-current')).toBe('page');
+    expect(inbox.textContent).toContain('3 new');
+    expect(inbox.textContent).toContain('09:41');
+    const help = within(rows[1] as HTMLElement).getByRole('link');
+    expect(help.getAttribute('rel')).toBe('noopener noreferrer');
+    await fireEvent.click(within(rows[2] as HTMLElement).getByRole('button', { name: 'Archive' }));
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    // A rejected href never becomes a link; onSelect takes over.
+    expect(within(rows[3] as HTMLElement).queryByRole('link')).toBeNull();
+    expect(rows[3]?.innerHTML).not.toContain('javascript:');
+    expect(within(rows[3] as HTMLElement).getByRole('button', { name: 'Hostile' })).toBeTruthy();
+    const plain = rows[4] as HTMLElement;
+    expect(plain.querySelector('a, button.tx-list-item__main')).toBeNull();
+    expect(plain.querySelector('.tx-list-item__leading svg')?.getAttribute('aria-hidden')).toBe(
+      'true'
+    );
+    // Trailing controls are siblings of the row control, never nested in it.
+    for (const row of rows) {
+      const more = within(row).getByRole('button', { name: 'More' });
+      expect(more.closest('.tx-list-item__main'), row.textContent ?? '').toBeNull();
+    }
+  });
+
+  it('renders no description, meta, leading or trailing markup when they are not given', () => {
+    const { container } = render(ListItem, { props: { title: 'Only a title' } });
+    const root = container.querySelector('li');
+    expect(root?.getAttribute('data-tx-list-item')).not.toBeNull();
+    expect(
+      root?.querySelector(
+        '.tx-list-item__description, .tx-list-item__meta, .tx-list-item__leading, .tx-list-item__trailing'
+      )
+    ).toBeNull();
+    expect(root?.textContent?.trim()).toBe('Only a title');
   });
 });

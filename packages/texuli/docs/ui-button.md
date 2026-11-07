@@ -23,6 +23,18 @@ Styled controls on the `--tx-*` token contract and `@layer tx.components`:
 
 `sm` · `md` · `lg` · `icon` (IconButton always uses `icon`)
 
+### Icon size
+
+New in `0.14.3`. `iconSize` (`xs` · `sm` · `md` · `lg`, the
+`--tx-size-icon-*` steps) sizes the icon box of one `Button` or `IconButton`.
+It sets `data-icon-size`, which sets `--tx-button-icon-size` on that button,
+so it wins over the theme's `components.button["icon-size"]`. Omit it to keep
+the theme value.
+
+```svelte
+<IconButton label="Close" iconSize="md"><Icon name="x" /></IconButton>
+```
+
 ### Plain-text label
 
 `label` (optional string) gives the button plain text without a snippet. It is

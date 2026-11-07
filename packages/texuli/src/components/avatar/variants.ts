@@ -9,6 +9,12 @@ export type AvatarSize = (typeof AVATAR_SIZES)[number];
 export const AVATAR_STATUSES = ['online', 'away', 'busy', 'offline'] as const;
 export type AvatarStatus = (typeof AVATAR_STATUSES)[number];
 
+/** Filled tones: each paints a theme pair the AA gate checks, without the seeded ring. */
+export type AvatarTone = 'primary' | 'success' | 'warning' | 'destructive' | 'info' | 'neutral';
+
+/** Corner shape for one avatar; omit to keep the theme's `--tx-avatar-radius`. */
+export type AvatarShape = 'circle' | 'square';
+
 /** CSS pixel size for the image width/height attributes (avoids layout shift). */
 export const AVATAR_PIXELS: Record<AvatarSize, number> = {
   xs: 20,

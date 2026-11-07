@@ -94,7 +94,10 @@ export const threeColumnCardsProps = t.object({
   cards: t.array(
     t.object({
       ...steps,
-      /** A Texuli icon name; the stage draws no icon (and lint warns) for an unknown one. */
+      /**
+       * An icon name the host registered in the Texuli icon registry; the
+       * stage draws its glyph, or the card number for a missing or unknown name.
+       */
       icon: optionalShort(40),
       heading: short(80),
       body: short(280),

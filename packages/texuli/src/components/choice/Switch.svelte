@@ -1,5 +1,6 @@
 <script lang="ts">
 import { Switch as SwitchPrimitive } from '@texuli/primitives/switch';
+import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import { joinIds, splitControlProps } from '../../internal/control-props.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
@@ -16,6 +17,12 @@ type Props = {
   required?: boolean;
   id?: string;
   label?: string;
+  /**
+   * Rich label content (an icon, a link, emphasis) rendered inside the
+   * `<label>`, so it names the control the same way. Use it instead of
+   * `label` (both render when both are set).
+   */
+  labelContent?: Snippet;
   description?: string;
   size?: ChoiceSize;
   onCheckedChange?: (checked: boolean) => void;
@@ -36,6 +43,7 @@ let {
   required = false,
   id = `tx-switch-${uid}`,
   label,
+  labelContent,
   description,
   size = txDefaults().size ?? 'md',
   onCheckedChange,
@@ -51,7 +59,7 @@ const split = $derived(splitControlProps(rest));
 const controlClass = $derived(
   switchControlClass({
     size,
-    class: label ? undefined : className,
+    class: label || labelContent ? undefined : className,
   })
 );
 </script>
@@ -78,7 +86,7 @@ const controlClass = $derived(
   </SwitchPrimitive.Root>
 {/snippet}
 
-{#if label}
+{#if label || labelContent}
   <div
     bind:this={ref}
     class={cx('tx-choice tx-choice--switch', className)}
@@ -86,7 +94,7 @@ const controlClass = $derived(
     {...split.wrapper}
   >
     <div class="tx-choice__copy">
-      <label class="tx-choice__label" for={id}>{label}</label>
+      <label class="tx-choice__label" for={id}>{label}{@render labelContent?.()}</label>
       {#if description}
         <p class="tx-choice__description" id="{id}-description">{description}</p>
       {/if}

@@ -1,7 +1,8 @@
 /**
  * A Spanish catalog written for the /output-page/ demo, as a host would
  * write its own: it covers only the labels of the components in the demo.
- * Texuli ships English only; translations beyond English are planned. It
+ * Texuli also ships full opt-in Spanish catalogs from 0.14.3
+ * (texuli/i18n/es and others); this one stays small on purpose. It
  * is loaded lazily, the first time someone picks Spanish.
  */
 import type { MessageCatalog } from '@texuli/core/i18n';

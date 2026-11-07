@@ -22,6 +22,17 @@ keyboard spinbutton behavior, bounds, optional wheel stepping and native form
 submission. Set translated `incrementLabel` and `decrementLabel` on the root
 when the default English labels are not appropriate.
 
+New in `0.14.3`. `display="output"` on `NumberField.Root` shows the value as
+read-only text with the same `locale` and `formatOptions` formatting: the
+input becomes `readonly` (it keeps its name, focus and form value), and the
+field drops its border, background and steppers. The default is `input`.
+
+```svelte
+<NumberField.Root value={1234.5} locale="en-US" formatOptions={{ style: 'currency', currency: 'USD' }} display="output">
+  <NumberField.Input aria-label="Total" />
+</NumberField.Root>
+```
+
 ```svelte
 <script lang="ts">
   import { PinInput } from 'texuli/number-pin';

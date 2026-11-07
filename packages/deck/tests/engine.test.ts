@@ -9,6 +9,7 @@ import {
   DECK_CONTROLS,
   DECK_ESCAPE_ORDER,
   DECK_MESSAGES,
+  DECK_REFLOW_WIDTH,
   decideDeckInput,
   fitDeckCanvas,
   formatDeckHash,
@@ -462,6 +463,39 @@ describe('virtual canvas fit', () => {
       canvasWidth: 1280,
       canvasHeight: 720,
     });
+  });
+
+  it('reflows a landscape or square deck into a portrait canvas on a portrait container (UG-39)', () => {
+    // A phone in portrait: the 16:9 deck fills it, no letterbox.
+    expect(fitDeckCanvas(390, 780, '16:9', 'reflow')).toEqual({
+      scale: 390 / DECK_REFLOW_WIDTH,
+      width: 390,
+      height: 780,
+      offsetX: 0,
+      offsetY: 0,
+      canvasWidth: DECK_REFLOW_WIDTH,
+      canvasHeight: 1440,
+      aspect: '16:9',
+      fit: 'reflow',
+    });
+    expect(fitDeckCanvas(600, 900, '1:1', 'reflow')).toMatchObject({
+      canvasWidth: 720,
+      fit: 'reflow',
+    });
+    // Landscape or square containers, portrait decks and empty boxes keep contain.
+    for (const [w, h, aspect] of [
+      [1000, 1000, '16:9'],
+      [1280, 720, '4:3'],
+      [390, 780, '9:16'],
+      [0, 0, '16:9'],
+    ] as const) {
+      const fit = fitDeckCanvas(w, h, aspect, 'reflow');
+      expect(fit, `${w}x${h} ${aspect}`).toEqual({
+        ...fitDeckCanvas(w, h, aspect),
+        fit: 'contain',
+      });
+    }
+    expect(DECK_REFLOW_WIDTH).toBe(DECK_CANVAS['9:16'].width);
   });
 });
 

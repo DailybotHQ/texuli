@@ -6,6 +6,7 @@ import { DEFAULT_CODE_BLOCK_LABELS } from '../src/code/labels.ts';
 import { DEFAULT_DATA_BLOCK_LABELS } from '../src/data/labels.ts';
 import { DEFAULT_DIAGRAM_BLOCK_LABELS } from '../src/diagram/labels.ts';
 import { DEFAULT_EMBED_BLOCK_LABELS } from '../src/embed/engine.ts';
+import { BLOCKS_LABELS_ES } from '../src/i18n/es.ts';
 import { BLOCKS_MESSAGES_EN } from '../src/i18n/index.ts';
 import { DEFAULT_INTERACTIVE_BLOCK_LABELS } from '../src/interactive/labels.ts';
 import { DEFAULT_MAP_BLOCK_LABELS } from '../src/map/labels.ts';
@@ -14,6 +15,9 @@ import { DEFAULT_STRUCTURE_BLOCK_LABELS } from '../src/structure/labels.ts';
 import { DEFAULT_TEXT_BLOCK_LABELS } from '../src/text/labels.ts';
 
 const kebab = (key: string) => key.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`);
+
+/** The `{name}` placeholders of a message, sorted (repeats kept). */
+const placeholders = (text: string) => (text.match(/\{[A-Za-z0-9_.-]{1,64}\}/g) ?? []).sort();
 
 function flatten(prefix: string, labels: object, out: Record<string, string>) {
   for (const [key, value] of Object.entries(labels)) {
@@ -44,5 +48,17 @@ describe('@texuli/blocks labels resolve through the dictionary in context (ADR-0
     }
     expect(Object.keys(expected).length).toBeGreaterThan(80);
     expect({ ...BLOCKS_MESSAGES_EN.messages }).toEqual(expected);
+  });
+
+  it('BLOCKS_LABELS_ES (@texuli/blocks/i18n/es) has every id, the same placeholders, and no blank label', () => {
+    const english = BLOCKS_MESSAGES_EN.messages as Readonly<Record<string, string>>;
+    expect(Object.keys(BLOCKS_LABELS_ES).sort()).toEqual(Object.keys(english).sort());
+    expect(Object.isFrozen(BLOCKS_LABELS_ES)).toBe(true);
+    const drift = Object.entries(BLOCKS_LABELS_ES).filter(
+      ([id, spanish]) =>
+        placeholders(spanish).join() !== placeholders(english[id] ?? '').join() ||
+        (spanish.trim() === '') !== ((english[id] ?? '').trim() === '')
+    );
+    expect(drift).toEqual([]);
   });
 });

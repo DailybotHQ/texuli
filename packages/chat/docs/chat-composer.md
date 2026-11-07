@@ -15,6 +15,30 @@ localized `labels.sendError`. Unexpected exception details are not shown.
 Successful sends clear the draft. Override any `ComposerLabels` field for
 translated input, placeholder, keyboard hint, send, pending, and error text.
 
+The draft is kept on every failure: a handler that returns `false` (or
+resolves to `false`) keeps it silently, and a handler that throws or
+rejects keeps it and shows the error. Only a handler that completes with any
+other value clears the field. This contract is unchanged since the first
+release.
+
+## Row layout and icon-only send (UG-41)
+
+- `layout="row"` keeps the composer on one row: the field first, then the
+  attachments and the send or stop button inline after it (the visual order
+  follows the DOM and focus order). A send error wraps onto its own line.
+  The default, `layout="stack"` (or no `layout`), keeps the actions row under
+  the field, and the form then carries no `data-layout` attribute.
+- `sendButton="icon"` draws a square, icon-only send button (an arrow glyph,
+  `aria-hidden`). Its accessible name is still `labels.send` ("Send
+  message"), rendered as visually hidden text, so a translated
+  `ComposerLabels` names it; while a send is pending it is named
+  `labels.sending`. For another glyph, render a custom send in the `actions`
+  snippet and call its `submit`.
+
+```svelte
+<Composer layout="row" sendButton="icon" onSubmit={send} />
+```
+
 ## `ref` and other attributes
 
 `Composer`'s `bind:ref` is its root `form`; `id`, `aria-*`, `data-*`,

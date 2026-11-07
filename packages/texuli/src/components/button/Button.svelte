@@ -2,7 +2,12 @@
 import { type HrefTrust, safeHref } from '@texuli/core/url-policy';
 import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from '../../internal/cx.ts';
-import { type ButtonSize, type ButtonVariant, buttonVariants } from './button-variants.ts';
+import {
+  type ButtonIconSize,
+  type ButtonSize,
+  type ButtonVariant,
+  buttonVariants,
+} from './button-variants.ts';
 import './button.css';
 import { designDefaults } from '../../internal/design-defaults.ts';
 
@@ -10,6 +15,11 @@ type ButtonProps = HTMLButtonAttributes &
   HTMLAnchorAttributes & {
     variant?: ButtonVariant;
     size?: ButtonSize;
+    /**
+     * Icon box size for this button only (`xs`…`lg`, the `--tx-size-icon-*`
+     * steps). Omit to keep the theme's `components.button["icon-size"]`.
+     */
+    iconSize?: ButtonIconSize;
     /** Destination when rendering as a link. Filtered by the URL policy. */
     href?: string | null;
     /** Trust tier for `href` (default `developer` for app-authored props). */
@@ -38,6 +48,7 @@ let {
   class: className,
   variant = txDefaults().variant ?? 'default',
   size = txDefaults().size ?? 'md',
+  iconSize,
   href = undefined,
   hrefTrust = 'developer',
   type = 'button',
@@ -118,6 +129,7 @@ function handleClick(event: any): void {
     data-tx-button
     data-variant={variant}
     data-size={size}
+    data-icon-size={iconSize}
     {...rest}
     onclick={handleClick}
   >
@@ -134,6 +146,7 @@ function handleClick(event: any): void {
     data-tx-button
     data-variant={variant}
     data-size={size}
+    data-icon-size={iconSize}
     data-href-blocked="true"
     {...rest}
   >
@@ -155,6 +168,7 @@ function handleClick(event: any): void {
     data-tx-button
     data-variant={variant}
     data-size={size}
+    data-icon-size={iconSize}
     {...rest}
     onclick={handleClick}
   >

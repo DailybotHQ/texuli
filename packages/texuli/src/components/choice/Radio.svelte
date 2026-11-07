@@ -14,6 +14,12 @@ type Props = {
   disabled?: boolean;
   id?: string;
   label?: string;
+  /**
+   * Rich label content rendered inside the `<label>`, so it names the radio
+   * the same way. Use it instead of `label` (both render when both are
+   * set). Card radios keep `label` and take rich content through `children`.
+   */
+  labelContent?: Snippet;
   description?: string;
   size?: ChoiceSize;
   /** Card chrome when used inside a card RadioGroup. */
@@ -32,6 +38,7 @@ let {
   disabled = false,
   id = `tx-radio-${uid}`,
   label,
+  labelContent,
   description,
   size = txDefaults().size ?? 'md',
   card = false,
@@ -86,7 +93,7 @@ const controlClass = $derived(choiceControlClass({ size, class: 'tx-choice-contr
       {@render children?.()}
     </div>
   </label>
-{:else if label}
+{:else if label || labelContent}
   <div
     bind:this={ref}
     class={cx('tx-choice', className)}
@@ -109,7 +116,7 @@ const controlClass = $derived(choiceControlClass({ size, class: 'tx-choice-contr
       </RadioGroupPrimitive.Item>
     </span>
     <div class="tx-choice__copy">
-      <label class="tx-choice__label" for={id}>{label}</label>
+      <label class="tx-choice__label" for={id}>{label}{@render labelContent?.()}</label>
       {#if description}
         <p class="tx-choice__description" id="{id}-description">{description}</p>
       {/if}
