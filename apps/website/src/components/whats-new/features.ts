@@ -3,7 +3,7 @@
  * them, each with its honest status, its packages, the page that shows it
  * in full and the kind of demo or preview the hub paints. Plain data, so
  * the page and its tests share one source. Releases: 0.6.0 to 0.14.0 are
- * published on npm, and 0.14.3 is `latest` (the release line in
+ * published on npm, and 0.14.4 is `latest` (the release line in
  * docs/RELEASE.md).
  */
 
@@ -31,7 +31,7 @@ export const RELEASES: readonly Release[] = [
     id: '0.14.0',
     title: '0.14.0: timeline groups, non-text contrast and looping motion',
     status:
-      'Published on npm as 0.14.0; 0.14.1 adds calendar and board options; 0.14.2 overlay fixes and timeline ticks; 0.14.3, the current release (pre-1.0), control, nav and Spanish label options.',
+      'Published on npm as 0.14.0; 0.14.1 to 0.14.3 add calendar, overlay, control, nav and Spanish label options; 0.14.4, the current release (pre-1.0), keeps the timeline date.',
     published: true,
     summary:
       'Gaps from the consumers Protoyard and Dailybot, all additive. TimelineView groups rows under header bands with collapse, selection and markers, also in the agent catalog. Blueprint spec 0.12.0 adds a dark shadow alpha and the aa-non-text check (an invisible active sidebar item fails texuli ds check), and design-system compiler version 3 changes compiled hashes once while every 0.11.0 document stays valid. MotionLoop loops a pulse or a wave and stays still under reduced motion; icons load lazily; AlertDialog takes confirmDisabled and Breadcrumb items take ariaLabel and onSelect; dialog and sheet scrims are dark again in dark mode.',
