@@ -56,7 +56,7 @@ New in `0.14.2`.
 | Prop | Type | What it does |
 | --- | --- | --- |
 | `formatTick` | `(date: IsoDate, context: TimelineTickContext) => string` | Labels each axis tick. `context` is `{ zoom, locale, monthStart }`; `monthStart` is true on the first tick and on the first tick of every new month. Defaults to `formatTimelineTick`. |
-| `initialDate` | `IsoDate \| Date` | The day the time axis opens at: a civil date, a `Date`, or an ISO date-time (read in UTC). Read once, when the canvas mounts; the axis widens to include it. |
+| `initialDate` | `IsoDate \| Date` | The day the time axis opens at: a civil date, a `Date`, or an ISO date-time (read in UTC). Followed until the reader scrolls: rows that arrive after mount still open there; the axis widens to include it. |
 
 - **Compact day ticks.** A day tick is 48px wide, so the default label at
   day zoom is the day of month, with the short month only where a month
@@ -70,8 +70,17 @@ New in `0.14.2`.
   opened with no bars in view. The opening day sits a quarter of the
   viewport in from the inline start, so earlier work stays in sight. The
   scroll is instant (no motion) and never moves focus. In RTL it scrolls
-  from the right edge (negative `scrollLeft`). Changing `zoom` later keeps
-  the scroll offset, as before.
+  from the right edge (negative `scrollLeft`). Since `0.14.4` the view
+  holds that day in place: rows that arrive after mount (an asynchronous
+  load) and `zoom` changes scroll it back to the same spot. Once the reader
+  scrolls, the day they scrolled to is held instead. Before `0.14.4` the
+  opening date was applied once, on mount, and zoom kept the pixel offset.
+- **`scrollToDate(date)`.** The component exports
+  `scrollToDate(date: IsoDate | Date)`: bind the instance
+  (`bind:this={timeline}`) and call it to place `date` where the opening
+  day sits. It counts as the reader's choice, so later rows and zoom
+  changes keep that date. An invalid date does nothing; a date outside the
+  axis scrolls to the nearest end.
 - **Hooks.** `formatTimelineTick`, `timelineAnchor` (the opening-date rule)
   and the `TimelineTickContext` type are exported from
   `@texuli/data/timeline`. The canvas scroller carries the opening day as

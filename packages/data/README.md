@@ -82,7 +82,7 @@ visible and announced string is translatable through `labels`.
 | `@texuli/data/board` | `Board`: columns and swimlanes with WIP limits, keyboard moves, column footers and heading levels; collapsible lanes and cell footers (new in `0.14.1`) |
 | `@texuli/data/dashboard` | `Dashboard` and `DashboardWidget`: a widget grid moved and resized by pointer, keyboard or an arrange toolbar, with breakpoints and a saved layout (new in `0.8.0`; [docs](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-dashboard.md)) |
 | `@texuli/data/calendar/view` | `CalendarView`: month, time-grid and agenda views with move and reschedule, an `event` content snippet and month overflow (new in `0.14.1`) |
-| `@texuli/data/timeline` | `TimelineView`: virtualized Gantt timeline with dependencies, zoom, critical path, collapsible groups with bands, row selection and markers; compact day ticks, `formatTick` and an opening date (`initialDate`, today by default when in range; new in `0.14.2`) |
+| `@texuli/data/timeline` | `TimelineView`: virtualized Gantt timeline with dependencies, zoom, critical path, collapsible groups with bands, row selection and markers; compact day ticks, `formatTick` and an opening date (`initialDate`, today by default when in range; new in `0.14.2`), held as rows arrive and zoom changes, and `scrollToDate` (`0.14.4`) |
 | `@texuli/data/map` | `MapView`: an offline, fictional vector basemap with markers, clusters, routes and fences |
 | `@texuli/data/activity` | `ActivityFeed`: day-grouped activity with avatars, reactions and pagination |
 | `@texuli/data/activity/inbox` | `NotificationInbox`: unread state, mark read and unread, mark all, item actions and arrival announcements |
