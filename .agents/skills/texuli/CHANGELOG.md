@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.3.24] — 2026-11-08
+
+### Changes
+
+- chore(skill): packages on npm at 0.14.4
+
 - The packages are on npm at `0.14.4`, a patch: `TimelineView` holds its
   opening day as rows arrive and as the zoom changes, and exports
   `scrollToDate`. The components install reference marks it new in
