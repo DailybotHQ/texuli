@@ -1,0 +1,122 @@
+import type { CanvasDocument } from '@texuli/canvas/model';
+
+/** Deterministic, fictional three-stage launch board for the canvas Solution demo. */
+export function launchPlanFixture(): CanvasDocument {
+  return {
+    format: 'texuli-canvas',
+    formatVersion: 1,
+    meta: { title: 'Launch plan', locale: 'en' },
+    grid: 8,
+    shapes: [
+      {
+        id: 'explore',
+        type: 'frame',
+        title: 'Explore',
+        x: 0,
+        y: 0,
+        width: 416,
+        height: 256,
+        children: [
+          {
+            id: 'interviews',
+            type: 'sticky',
+            x: 24,
+            y: 48,
+            width: 168,
+            height: 144,
+            text: 'Talk to twelve customers',
+            color: 'yellow',
+          },
+          {
+            id: 'prototype',
+            type: 'sticky',
+            x: 216,
+            y: 48,
+            width: 168,
+            height: 144,
+            text: 'Test the first prototype',
+            color: 'pink',
+          },
+        ],
+      },
+      {
+        id: 'decide',
+        type: 'frame',
+        title: 'Decide',
+        x: 496,
+        y: 0,
+        width: 416,
+        height: 256,
+        children: [
+          {
+            id: 'scope',
+            type: 'sticky',
+            x: 520,
+            y: 48,
+            width: 168,
+            height: 144,
+            text: 'Choose the beta scope',
+            color: 'blue',
+          },
+          {
+            id: 'quality',
+            type: 'sticky',
+            x: 712,
+            y: 48,
+            width: 168,
+            height: 144,
+            text: 'Write the quality bar',
+            color: 'green',
+          },
+        ],
+      },
+      {
+        id: 'build',
+        type: 'frame',
+        title: 'Build',
+        x: 992,
+        y: 0,
+        width: 416,
+        height: 256,
+        children: [
+          {
+            id: 'implementation',
+            type: 'sticky',
+            x: 1016,
+            y: 48,
+            width: 168,
+            height: 144,
+            text: 'Build the beta',
+            color: 'purple',
+          },
+          {
+            id: 'release',
+            type: 'sticky',
+            x: 1208,
+            y: 48,
+            width: 168,
+            height: 144,
+            text: 'Prepare the release',
+            color: 'orange',
+          },
+        ],
+      },
+    ],
+    connectors: [
+      {
+        id: 'explore-to-decide',
+        from: { shape: 'prototype' },
+        to: { shape: 'scope' },
+        routing: 'elbow',
+        endCap: 'arrow',
+      },
+      {
+        id: 'decide-to-build',
+        from: { shape: 'quality' },
+        to: { shape: 'implementation' },
+        routing: 'curved',
+        endCap: 'arrow',
+      },
+    ],
+  };
+}
