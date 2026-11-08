@@ -2050,3 +2050,150 @@ reflect this decision.
   provider and keep the props), or a standard message format (such as
   `Intl.MessageFormat`) becomes available in every target. The ids and
   English catalogs then carry over as its source.
+
+## ADR-027: Solutions, capabilities, components and products
+
+- **Date:** 2026-11-08 · **Ratification:** proposed by the PLAN_015 lead from the
+  maturity audits (`.dwp/plans/PLAN_015_…/analysis_results/audit/sol-*.md`); pending
+  the developer's approval.
+- **Context:** texuli.com presents full systems (slides, documents, workflows) and single
+  pieces (buttons, charts) with the same `*-page` pattern. The ecosystem vision asks for a
+  Solutions catalog with landings per complete system, without dressing a widget up as a
+  system or a product as a library.
+- **Options:**
+  1. **Promote every domain package** to a Solution landing. Maximal marketing, but it
+     calls a forms runtime a "builder" and a chart family a "dashboard product".
+  2. **No new taxonomy;** improve the `*-page` routes in place. Cheap, but systems stay
+     indistinguishable from components and nothing is shareable as "the slides engine".
+  3. **Four kinds with a promotion rule:** *Solutions* (a public model and API, a complete
+     user task demonstrable today, composed parts, an adoption path and docs),
+     *capabilities* (cross-cutting engines: drag, motion, output), *component families*
+     (charts, media, blocks, primitives, components), and *products built with Texuli*
+     (own brand and domain, shown as case studies).
+- **Decision:** option 3. Promoted in this wave: **Slides** (`@texuli/deck` +
+  `@texuli/slides`), **Documents** (`@texuli/document` + `@texuli/pages`, with the rich-text
+  editor inside), **Workflows**, **Canvas** and **Sheets**. Not promoted: Forms (a schema
+  runtime, not a builder), Editor and Pages as separate Solutions (they live under
+  Documents), Dashboards, Chat, Charts, Media, Motion, Blocks, Drag and Output. Products
+  (Protoyard first) appear under Built with Texuli and keep their own domains.
+- **Why:** each promoted system passes the rule on audited evidence; each rejected one
+  fails a named criterion (no builder, no composed system, or a cross-cutting engine).
+- **Consequences:** five landings, a status vocabulary (available · in development ·
+  experimental · planned) on every entry, and no landing promises a hosted or cloud
+  version of a Solution.
+- **Reverse when:** a rejected package gains the missing criterion (for example a visual
+  forms builder over `SchemaForm`); promote it with a new landing, never by renaming a page.
+
+## ADR-028: URLs and canonicals for Solutions, docs and products
+
+- **Date:** 2026-11-08 · **Ratification:** proposed by the PLAN_015 lead from
+  `audit/routes.md`, `audit/url-migration-map.md` and `audit/nav-search.md`; pending the
+  developer's approval.
+- **Context:** the site has 463 sitemap URLs, `*-page` routes linked from package READMEs,
+  the skill and search, docs under `/guides/` (`DOCS_HOME`, the skill's
+  `documentation_url`), and no HTTP redirect mechanism (`Astro.redirect` answers 200).
+- **Options:**
+  1. **`/docs/…` tree for everything** (the vision's sketch). Duplicates `/guides/` and the
+     component references, and breaks sticky links.
+  2. **Keep every URL.** No risk, but no shareable `/solutions/<slug>/`.
+  3. **New families only where intent changes:** `/solutions/` and `/solutions/<slug>/`
+     for the five Solutions; their technical docs at `/guides/solutions/<slug>/`;
+     `/built-with/` and `/built-with/<product>/`; everything else keeps its URL.
+- **Decision:** option 3. Component references stay canonical at
+  `/component-pages/<id>/`, primitives at `/primitives-page/<id>/`, capabilities and
+  families at their current URLs, `/native/`, `/guides/`, `/mcp`, `/skill/`, `/llms.txt`
+  unchanged. Redirects are real HTTP 301s from a typed map, served by Cloudflare Pages
+  `public/_redirects` for HTML and by `functions/_middleware.ts` for `.md` twins and
+  `Accept: text/markdown`; one hop, query kept, both slash forms. The first wave redirects
+  only `/slides-page/`, `/documents-page/`, `/workflows-page/`, `/canvas-page/` and
+  `/sheets-page/` to their `/solutions/<slug>/`, after each landing ships;
+  `/workflows-page/json/` keeps its URL.
+- **Why:** shareable names where the intent is new, zero churn elsewhere, and the
+  one-hop rule protects public deep links and agents.
+- **Consequences:** package READMEs, `TWIN_NOTES`, `SITE_PAGES`, nav and `llms.txt` move in
+  the same wave as each 301; tests assert status, `Location`, query and twins.
+- **Reverse when:** a family needs renaming (for example `/component-pages/` → `/components/`);
+  that is a separate typed map with its own tests, never a chain.
+
+## ADR-029: One typed Solutions registry
+
+- **Date:** 2026-11-08 · **Ratification:** proposed by the PLAN_015 lead; pending the
+  developer's approval.
+- **Context:** the catalog page, the home Solutions band, the nav group, `llms.txt`, the
+  machine-readable index and each landing need the same facts (name, status, packages,
+  docs, demo, platforms). Typed copy would drift.
+- **Options:**
+  1. **Astro content collections** (Markdown/MDX frontmatter). Familiar, but the site's
+     sections already use TypeScript data modules that tests import without a build.
+  2. **TypeScript modules with a validator:** `apps/website/src/data/solutions/`
+     (`schema.ts`, one `entries/<slug>.ts` per Solution, `index.ts`, `validate.ts`).
+  3. **Derive everything from package manifests.** Honest for packages, but cannot hold
+     copy, demo ids or limits.
+- **Decision:** option 2, with products in a sibling `apps/website/src/data/products/`. The
+  validator fails the build on an unknown package or subpath (checked against
+  `packages/*/package.json` names and `exports`), a status outside the vocabulary, a
+  route or docs path that does not exist, or a platform status without evidence. Package
+  versions and native statuses are derived (manifests, `native/docs/parity.json`), never
+  typed. API reference stays in package docs; the registry links, never copies.
+- **Why:** one source the tests read directly, the same pattern as `home-content.ts`.
+- **Consequences:** every consumer imports the registry; the index route
+  `/solutions/index.json` and `llms.txt` are generated from it.
+- **Reverse when:** non-developers must edit Solutions content; move entries to a
+  collection that the same validator checks.
+
+## ADR-030: Interactive demo islands on Solution landings
+
+- **Date:** 2026-11-08 · **Ratification:** proposed by the PLAN_015 lead; pending the
+  developer's approval. Narrows the "Static by design" rule of
+  `apps/website/docs/site-landing.md` for Solution landings only.
+- **Context:** a Solution landing must let a visitor touch the real system. The home stays
+  static by design; the `*-page` routes already ship several `client:visible` islands
+  within measured budgets (`components/perf/budgets.ts`).
+- **Options:**
+  1. **Static landings with links to the old demo pages.** Light, but "look, don't touch".
+  2. **One real demo island per landing,** server-rendered first, hydrated when visible,
+     inside the route budget of the page it replaces.
+  3. **Many islands per landing** (as on `/slides-page/`). Rich, but heavier and harder to
+     keep honest.
+- **Decision:** option 2. Each `/solutions/<slug>/` has one primary demo island
+  (`client:visible`), a static SSR preview of the same fixture before hydration, a
+  `Reset`, keyboard and touch operation, `View source` where the model allows, no network
+  and no secrets, behind the shared demo frame (error fallback, reduced motion). Extra
+  islands only on interaction. Budgets: each landing inherits the measured budget of the
+  `*-page` it replaces (`/slides-page/` page 168 KB, JS 60 KB, HTML 27 KB;
+  `/documents-page/` page 174 KB; `/workflows-page/` page 132 KB, JS 96 KB;
+  `/canvas-page/` page 169 KB; `/sheets-page/` page 186 KB, HTML 31 KB gzip);
+  `/solutions/`, `/built-with/` and the guides pages stay island-free on the default budget;
+  `/native/` may add one demo island within the default budget; the home stays static
+  (Home 2.2 adds no island). Any raise follows the owner rule: measured + 4% with a reason.
+- **Why:** a real demo is the proof; inheriting the replaced page's budget means no
+  regression for visitors.
+- **Consequences:** `site-landing.md` records the exception; `site-perf.spec.ts` gains the
+  new routes; islands follow the build-time CSP like today's.
+- **Reverse when:** a demo cannot fit its budget; it moves behind an "Open the full demo"
+  link to the existing page instead of growing the landing.
+
+## ADR-031: Global navigation for the ecosystem
+
+- **Date:** 2026-11-08 · **Ratification:** proposed by the PLAN_015 lead from
+  `audit/nav-search.md`; pending the developer's approval.
+- **Context:** the landing header (on `/` and `/native/`) shows Docs, two platform doors,
+  GitHub and Get started; docs pages rely on the sidebar built from `NAV_GROUPS`, and the
+  phone drawer exists only on docs pages.
+- **Options:**
+  1. **Seven top items everywhere** (`Solutions · Components · Native · Themes · Agents ·
+     Docs · GitHub`), docs header included. Consistent, but crowds the docs header.
+  2. **Seven items on the landing header** used by `/`, `/native/`, `/solutions/…` and
+     `/built-with/…`, plus a `Solutions` group in `NAV_GROUPS` for the docs sidebar,
+     drawer, breadcrumbs, footer and `llms.txt`.
+  3. **A `Platforms` menu** replacing Native. Fewer items, but hides Native behind a menu.
+- **Decision:** option 2. Targets: Solutions → `/solutions/`, Components →
+  `/component-pages/`, Native → `/native/`, Themes → `/gallery-themes/`, Agents →
+  `/agents-page/`, Docs → `/guides/`, GitHub → the repository. From 64rem the items show
+  inline; below, one keyboard-operable menu lists them (no hover-only); search and theme
+  stay. `NAV_GROUPS` gains `solutions` (the five landings) and `built-with`; the footer,
+  `siteLlmsSections` and breadcrumbs follow.
+- **Why:** Native and Solutions become first-class without changing the docs reading mode.
+- **Consequences:** `site-ia.spec.ts`, `site-responsive.spec.ts` and the build guards update;
+  `public/llms.txt` regenerates.
+- **Reverse when:** analytics show the docs header needs the same links; add them there.
