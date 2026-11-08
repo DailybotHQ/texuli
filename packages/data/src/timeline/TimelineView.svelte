@@ -20,6 +20,7 @@ import {
   axisPixel,
   DAY_WIDTH,
   DEFAULT_TIMELINE_LABELS,
+  dateAtOffset,
   dateOffset,
   formatTimelineTick,
   HEADER_HEIGHT,
@@ -97,9 +98,10 @@ let {
   /** Vertical markers besides today, such as the end of a review window. */
   markers?: readonly TimelineMarker[];
   /**
-   * The day the time axis opens at (read once, on mount): a civil date, a
-   * `Date` or an ISO date-time. Defaults to today when it falls within the
-   * tasks' span, else the earliest date.
+   * The day the time axis opens at: a civil date, a `Date` or an ISO
+   * date-time. Defaults to today when it falls within the tasks' span, else
+   * the earliest date. Followed until the reader scrolls (rows that arrive
+   * later still open there); `scrollToDate` moves it on demand.
    */
   initialDate?: IsoDate | Date;
   /** Axis tick labels; the default is compact at day zoom ("Mar 1", "2"). */
@@ -394,6 +396,12 @@ function onScroll(event: Event): void {
   const element = event.currentTarget as HTMLDivElement;
   scrollTop = element.scrollTop;
   viewportHeight = element.clientHeight || 440;
+  const left = Math.abs(element.scrollLeft);
+  if (Math.abs(left - placed) > 1) {
+    scrolled = true;
+    placed = Number.NaN;
+    focus = dateAtOffset(range.start, (left + element.clientWidth / 4) / width);
+  }
 }
 
 /** Full month names in `locale` so task bars announce e.g. "June 2, 2026". */
@@ -406,17 +414,41 @@ function formatDate(date: string): string {
   }).format(new Date(`${date}T12:00:00Z`));
 }
 
+// The day held a quarter of the viewport in: the anchor until the reader
+// scrolls, then the day they scrolled to. Rows arriving later and zoom
+// changes place it again; `placed` tells our scrolls from theirs.
+let scrolled = false;
+let focus: IsoDate | undefined;
+let placed = Number.NaN;
+
+function place(element: HTMLElement, day: IsoDate): void {
+  const left = Math.max(0, dateOffset(day, range.start) * width - element.clientWidth / 4);
+  element.scrollTo?.({ left: direction === 'rtl' ? -left : left, behavior: 'instant' });
+  placed = Math.abs(element.scrollLeft);
+}
+
 /**
- * Opens the axis at `anchor` once, when the scroller mounts: instantly (no
- * motion), a quarter of the viewport in so earlier work stays in sight, and
- * never focusing. RTL scroll offsets run negative from the inline start.
+ * Opens the axis at `anchor` (instantly, never focusing) and keeps the held
+ * day in place while rows or zoom change. RTL scroll offsets run
+ * negative from the inline start.
  */
-function openAt(element: HTMLElement): void {
-  untrack(() => {
-    if (!anchor) return;
-    const left = Math.max(0, dateOffset(anchor, range.start) * width - element.clientWidth / 4);
-    element.scrollTo?.({ left: direction === 'rtl' ? -left : left, behavior: 'instant' });
-  });
+$effect(() => {
+  const element = scroller;
+  const opening = anchor;
+  if (element && range.start && width)
+    untrack(() => {
+      if (!scrolled && opening) focus = opening;
+      if (focus) place(element, focus);
+    });
+});
+
+/** Scrolls the axis so `date` sits where the opening day does; the reader's choice from then on. */
+export function scrollToDate(date: IsoDate | Date): void {
+  const day = timelineAnchor([], today, date);
+  if (!day) return;
+  scrolled = true;
+  focus = day;
+  if (scroller) place(scroller, day);
 }
 
 function tickWidth(): number {
@@ -571,7 +603,6 @@ function tickWidth(): number {
           data-open-date={anchor}
           bind:this={scroller}
           onscroll={onScroll}
-          {@attach openAt}
         >
           <div
             class="canvas"

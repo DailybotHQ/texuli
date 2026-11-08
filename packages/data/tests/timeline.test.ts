@@ -427,4 +427,42 @@ describe('TimelineView axis labels and opening date (G-056)', () => {
       Element.prototype.scrollTo = native;
     }
   });
+
+  it('keeps the opening day as rows arrive and zoom changes, until the reader scrolls; scrollToDate moves it', async () => {
+    const scrolls: number[] = [];
+    const native = Element.prototype.scrollTo;
+    Element.prototype.scrollTo = function scrollTo(this: Element, options?: unknown) {
+      if (this.matches('.canvas-scroll')) scrolls.push((options as ScrollToOptions).left ?? 0);
+    } as Element['scrollTo'];
+    try {
+      const now = new Date('2026-03-01T12:00:00Z');
+      const late = [{ id: 'late', title: 'Late', start: '2026-01-20', end: '2026-01-26' }];
+      const view = render(TimelineView, {
+        props: { tasks: late, now, initialDate: '2026-01-22', zoom: 'day' },
+      });
+      // Rows load later and widen the axis back to 2025-12-29: 2026-01-22 stays in view.
+      await view.rerender({ tasks: [...late, ...tasks] });
+      // Week zoom (16 px a day) keeps the same day.
+      await view.rerender({ zoom: 'week' });
+      expect(scrolls).toEqual([
+        dateOffset('2026-01-22', timelineRange(late, '2026-03-01').start) * DAY_WIDTH.day,
+        24 * DAY_WIDTH.day,
+        24 * DAY_WIDTH.week,
+      ]);
+
+      // The reader scrolls 160 px (day 10, 2026-01-08): later changes keep that day.
+      const scroller = document.querySelector('.canvas-scroll') as HTMLElement;
+      scroller.scrollLeft = 160;
+      await fireEvent.scroll(scroller);
+      await view.rerender({ zoom: 'day' });
+      expect(scrolls.at(-1)).toBe(10 * DAY_WIDTH.day);
+
+      view.component.scrollToDate('2026-01-15');
+      expect(scrolls.at(-1)).toBe(17 * DAY_WIDTH.day);
+      view.component.scrollToDate('not-a-date' as never);
+      expect(scrolls).toHaveLength(5);
+    } finally {
+      Element.prototype.scrollTo = native;
+    }
+  });
 });
