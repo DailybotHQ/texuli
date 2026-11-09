@@ -59,6 +59,7 @@ it('form manifests are a closed, frozen, app-tier set with schema parity, and co
     const required: ButtonProp[] = [
       'variant',
       'size',
+      'tone',
       'href',
       'hrefTrust',
       'type',

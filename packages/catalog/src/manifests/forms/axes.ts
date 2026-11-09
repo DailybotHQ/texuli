@@ -13,7 +13,7 @@ type AxisStamp = {
  */
 export const FORMS_AXIS_STAMP: Readonly<Record<string, AxisStamp>> = {
   button: {
-    axes: { variant: 'variant', size: 'size' },
+    axes: { variant: 'variant', size: 'size', tone: 'tone' },
     states: ['hover', 'focus-visible', 'disabled', 'loading'],
   },
   'button-group': { states: ['focus-visible'] },

@@ -26,6 +26,8 @@ export const buttonVariants = variants({
 
 export type ButtonVariant = 'default' | 'secondary' | 'outline' | 'ghost' | 'destructive' | 'link';
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
+/** Status color independent of variant (ADR-032). Composes with every variant. */
+export type ButtonTone = 'default' | 'destructive' | 'success' | 'warning';
 /** Per-instance icon box size: one of the `--tx-size-icon-*` steps. */
 export type ButtonIconSize = 'xs' | 'sm' | 'md' | 'lg';
 
@@ -39,3 +41,10 @@ export const BUTTON_VARIANTS = [
 ] as const satisfies readonly ButtonVariant[];
 
 export const BUTTON_SIZES = ['sm', 'md', 'lg', 'icon'] as const satisfies readonly ButtonSize[];
+
+export const BUTTON_TONES = [
+  'default',
+  'destructive',
+  'success',
+  'warning',
+] as const satisfies readonly ButtonTone[];

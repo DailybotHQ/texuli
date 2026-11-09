@@ -5,6 +5,7 @@ import { type ClassValue, cx } from '../../internal/cx.ts';
 import {
   type ButtonIconSize,
   type ButtonSize,
+  type ButtonTone,
   type ButtonVariant,
   buttonVariants,
 } from './button-variants.ts';
@@ -15,6 +16,13 @@ type ButtonProps = HTMLButtonAttributes &
   HTMLAnchorAttributes & {
     variant?: ButtonVariant;
     size?: ButtonSize;
+    /**
+     * Status color, independent of `variant` (default · destructive · success ·
+     * warning). Composes with outline, ghost, link and the filled variants so
+     * `outline` + `destructive` exists. The `destructive` variant still paints
+     * a filled destructive button when `tone` is omitted.
+     */
+    tone?: ButtonTone;
     /**
      * Icon box size for this button only (`xs`…`lg`, the `--tx-size-icon-*`
      * steps). Omit to keep the theme's `components.button["icon-size"]`.
@@ -48,6 +56,7 @@ let {
   class: className,
   variant = txDefaults().variant ?? 'default',
   size = txDefaults().size ?? 'md',
+  tone = 'default',
   iconSize,
   href = undefined,
   hrefTrust = 'developer',
@@ -133,6 +142,7 @@ function handleClick(event: any): void {
     data-tx-component="button"
     data-tx-variant={variant}
     data-tx-size={size}
+    data-tx-tone={tone}
     {...rest}
     onclick={handleClick}
   >
@@ -154,6 +164,7 @@ function handleClick(event: any): void {
     data-tx-component="button"
     data-tx-variant={variant}
     data-tx-size={size}
+    data-tx-tone={tone}
     {...rest}
   >
     {@render content()}
@@ -178,6 +189,7 @@ function handleClick(event: any): void {
     data-tx-component="button"
     data-tx-variant={variant}
     data-tx-size={size}
+    data-tx-tone={tone}
     {...rest}
     onclick={handleClick}
   >
