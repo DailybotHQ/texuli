@@ -80,6 +80,7 @@
       "site-gallery-themes.spec.ts",
       "site-guides.spec.ts",
       "site-live-primitives.spec.ts",
+      "site-native.spec.ts",
       "site-output.spec.ts",
       "site-slides.spec.ts",
       "site-visual.spec.ts",
