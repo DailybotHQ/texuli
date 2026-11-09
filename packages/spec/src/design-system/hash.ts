@@ -119,7 +119,8 @@ function withoutApproval(value: unknown): unknown {
  */
 export function designSystemContentHash(doc: unknown): string {
   if (!isRecord(doc)) return sha256Hex(canonicalJson(doc));
-  const view = withoutApproval(doc) as Record<string, unknown>;
+  // A copy: `withoutApproval` returns the document itself when it has no approval.
+  const view = { ...(withoutApproval(doc) as Record<string, unknown>) };
   if (Array.isArray(doc.library)) view.library = doc.library.map(withoutApproval);
   return sha256Hex(canonicalJson(view));
 }

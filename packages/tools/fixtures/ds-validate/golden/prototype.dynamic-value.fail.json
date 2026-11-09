@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "codes": [],
+  "findings": [
+    {
+      "code": "dynamic-value",
+      "severity": "warning",
+      "area": "prototype-components",
+      "path": "src/Page.svelte:6:3"
+    }
+  ]
+}

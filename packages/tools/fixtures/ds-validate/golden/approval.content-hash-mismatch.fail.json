@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "codes": ["content-hash-mismatch"],
+  "findings": [
+    {
+      "code": "content-hash-mismatch",
+      "severity": "error",
+      "area": "approval",
+      "path": "$.approval.contentHash"
+    }
+  ]
+}

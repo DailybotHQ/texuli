@@ -1,0 +1,41 @@
+{
+  "ok": false,
+  "codes": ["aa-focus", "aa-text"],
+  "findings": [
+    {
+      "code": "aa-text",
+      "severity": "error",
+      "area": "contrast",
+      "path": "$.color.brand.seed",
+      "mode": "light"
+    },
+    {
+      "code": "aa-text",
+      "severity": "error",
+      "area": "contrast",
+      "path": "$.color.brand.seed",
+      "mode": "light"
+    },
+    {
+      "code": "aa-text",
+      "severity": "error",
+      "area": "contrast",
+      "path": "$.color.brand.seed",
+      "mode": "light"
+    },
+    {
+      "code": "aa-text",
+      "severity": "error",
+      "area": "contrast",
+      "path": "$.color.brand.seed",
+      "mode": "light"
+    },
+    {
+      "code": "aa-focus",
+      "severity": "error",
+      "area": "contrast",
+      "path": "$.color.roles.light.ring",
+      "mode": "light"
+    }
+  ]
+}

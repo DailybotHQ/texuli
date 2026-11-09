@@ -1,0 +1,13 @@
+{
+  "ok": false,
+  "codes": ["css-utility-not-allowed"],
+  "findings": [
+    {
+      "code": "css-utility-not-allowed",
+      "severity": "error",
+      "area": "prototype-css",
+      "path": "src/Page.svelte:85",
+      "value": "text-red-500"
+    }
+  ]
+}

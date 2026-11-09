@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "codes": ["catalog-extension"],
+  "findings": [
+    {
+      "code": "catalog-extension",
+      "severity": "error",
+      "area": "catalog",
+      "path": "extensions[0]"
+    }
+  ]
+}

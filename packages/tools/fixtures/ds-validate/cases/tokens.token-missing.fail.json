@@ -1,0 +1,11 @@
+{
+  "description": "A cached compiled map missing a token.",
+  "code": "token-missing",
+  "expect": "fail",
+  "compiled": {
+    "light": {
+      "--tx-background": "#ffffff",
+      "--tx-chart-1": "#0e7490"
+    }
+  }
+}

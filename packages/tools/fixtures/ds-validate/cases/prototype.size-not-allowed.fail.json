@@ -1,0 +1,36 @@
+{
+  "description": "A disallowed size.",
+  "code": "size-not-allowed",
+  "expect": "fail",
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "color": {
+      "brand": {
+        "seed": "#0e7490"
+      }
+    },
+    "allow": {
+      "button": {
+        "variants": ["default", "outline"],
+        "sizes": ["sm", "md"],
+        "tones": ["default"],
+        "states": ["hover", "focus-visible", "disabled"]
+      },
+      "card": {},
+      "data-grid": {
+        "densities": ["compact"]
+      }
+    }
+  },
+  "options": {
+    "prototype": {
+      "files": {
+        "src/Page.svelte": "<script lang=\"ts\">\n  import { Button, Card } from 'texuli';\n</script>\n\n<Card>\n  <Button size=\"lg\">Big</Button>\n</Card>\n"
+      }
+    }
+  }
+}

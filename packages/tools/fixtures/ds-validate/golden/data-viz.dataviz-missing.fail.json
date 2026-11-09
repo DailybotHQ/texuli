@@ -1,0 +1,230 @@
+{
+  "ok": false,
+  "codes": ["dataviz-missing", "token-missing"],
+  "findings": [
+    {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-accent\"]",
+      "mode": "light"
+    },
+    {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-accent-active\"]",
+      "mode": "light"
+    },
+    {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-accent-disabled\"]",
+      "mode": "light"
+    },
+    {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-accent-focus\"]",
+      "mode": "light"
+    },
+    {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-accent-foreground\"]",
+      "mode": "light"
+    },
+    {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-accent-hover\"]",
+      "mode": "light"
+    },
+    {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-border\"]",
+      "mode": "light"
+    },
+    {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-border-strong\"]",
+      "mode": "light"
+    },
+    {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-border-width\"]",
+      "mode": "light"
+    },
+    {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-border-width-thick\"]",
+      "mode": "light"
+    },
+    {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-border-width-thin\"]",
+      "mode": "light"
+    },
+    {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-canvas\"]",
+      "mode": "light"
+    },
+    {
+      "code": "dataviz-missing",
+      "severity": "error",
+      "area": "data-viz",
+      "path": "$.compiled.vars.light[\"--tx-chart-1\"]",
+      "mode": "light"
+    },
+    {
+      "code": "dataviz-missing",
+      "severity": "error",
+      "area": "data-viz",
+      "path": "$.compiled.vars.light[\"--tx-chart-2\"]",
+      "mode": "light"
+    },
+    {
+      "code": "dataviz-missing",
+      "severity": "error",
+      "area": "data-viz",
+      "path": "$.compiled.vars.light[\"--tx-chart-3\"]",
+      "mode": "light"
+    },
+    {
+      "code": "dataviz-missing",
+      "severity": "error",
+      "area": "data-viz",
+      "path": "$.compiled.vars.light[\"--tx-chart-4\"]",
+      "mode": "light"
+    },
+    {
+      "code": "dataviz-missing",
+      "severity": "error",
+      "area": "data-viz",
+      "path": "$.compiled.vars.light[\"--tx-chart-5\"]",
+      "mode": "light"
+    },
+    {
+      "code": "dataviz-missing",
+      "severity": "error",
+      "area": "data-viz",
+      "path": "$.compiled.vars.light[\"--tx-chart-6\"]",
+      "mode": "light"
+    },
+    {
+      "code": "dataviz-missing",
+      "severity": "error",
+      "area": "data-viz",
+      "path": "$.compiled.vars.light[\"--tx-chart-7\"]",
+      "mode": "light"
+    },
+    {
+      "code": "dataviz-missing",
+      "severity": "error",
+      "area": "data-viz",
+      "path": "$.compiled.vars.light[\"--tx-chart-8\"]",
+      "mode": "light"
+    },
+    {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-chart-axis\"]",
+      "mode": "light"
+    },
+    {
+      "code": "dataviz-missing",
+      "severity": "error",
+      "area": "data-viz",
+      "path": "$.compiled.vars.light[\"--tx-chart-diverging-1\"]",
+      "mode": "light"
+    },
+    {
+      "code": "dataviz-missing",
+      "severity": "error",
+      "area": "data-viz",
+      "path": "$.compiled.vars.light[\"--tx-chart-diverging-2\"]",
+      "mode": "light"
+    },
+    {
+      "code": "dataviz-missing",
+      "severity": "error",
+      "area": "data-viz",
+      "path": "$.compiled.vars.light[\"--tx-chart-diverging-3\"]",
+      "mode": "light"
+    },
+    {
+      "code": "dataviz-missing",
+      "severity": "error",
+      "area": "data-viz",
+      "path": "$.compiled.vars.light[\"--tx-chart-diverging-4\"]",
+      "mode": "light"
+    },
+    {
+      "code": "dataviz-missing",
+      "severity": "error",
+      "area": "data-viz",
+      "path": "$.compiled.vars.light[\"--tx-chart-diverging-5\"]",
+      "mode": "light"
+    },
+    {
+      "code": "dataviz-missing",
+      "severity": "error",
+      "area": "data-viz",
+      "path": "$.compiled.vars.light[\"--tx-chart-diverging-6\"]",
+      "mode": "light"
+    },
+    {
+      "code": "dataviz-missing",
+      "severity": "error",
+      "area": "data-viz",
+      "path": "$.compiled.vars.light[\"--tx-chart-diverging-7\"]",
+      "mode": "light"
+    },
+    {
+      "code": "dataviz-missing",
+      "severity": "error",
+      "area": "data-viz",
+      "path": "$.compiled.vars.light[\"--tx-chart-diverging-8\"]",
+      "mode": "light"
+    },
+    {
+      "code": "dataviz-missing",
+      "severity": "error",
+      "area": "data-viz",
+      "path": "$.compiled.vars.light[\"--tx-chart-diverging-9\"]",
+      "mode": "light"
+    },
+    {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-chart-grid\"]",
+      "mode": "light"
+    },
+    {
+      "code": "dataviz-missing",
+      "severity": "error",
+      "area": "data-viz",
+      "path": "$.compiled.vars.light[\"--tx-chart-sequential-1\"]",
+      "mode": "light"
+    }
+  ]
+}

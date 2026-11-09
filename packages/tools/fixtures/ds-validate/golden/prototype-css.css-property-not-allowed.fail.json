@@ -1,0 +1,13 @@
+{
+  "ok": false,
+  "codes": ["css-property-not-allowed"],
+  "findings": [
+    {
+      "code": "css-property-not-allowed",
+      "severity": "error",
+      "area": "prototype-css",
+      "path": "src/Page.svelte:style@106:18",
+      "value": "color"
+    }
+  ]
+}

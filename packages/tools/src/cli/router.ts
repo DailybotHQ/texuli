@@ -74,6 +74,14 @@ export const LEGACY_COMMANDS: readonly LegacyCommand[] = Object.freeze([
   },
   { usage: 'ds hash <file>', summary: 'Print the content hashes and check the stored ones' },
   {
+    usage: 'ds pack <file>',
+    summary: 'Pack a document, library sources and history into a portable bundle (--out)',
+  },
+  {
+    usage: 'ds unpack <bundle.json>',
+    summary: 'Unpack a portable design-system bundle (--out); sources are never executed',
+  },
+  {
     usage: 'ds check <file>',
     summary:
       'Check a design-system document: codes, guarantees, contrast report (--json, --render, --mode, --variant)',

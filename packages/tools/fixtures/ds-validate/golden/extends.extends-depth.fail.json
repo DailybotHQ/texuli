@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "codes": ["extends-depth"],
+  "findings": [
+    {
+      "code": "extends-depth",
+      "severity": "error",
+      "area": "extends",
+      "path": "$.extends"
+    }
+  ]
+}

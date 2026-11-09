@@ -1,0 +1,13 @@
+{
+  "ok": false,
+  "codes": ["unknown-variant"],
+  "findings": [
+    {
+      "code": "unknown-variant",
+      "severity": "error",
+      "area": "prototype-components",
+      "path": "src/Page.svelte:6:3",
+      "value": "sparkly"
+    }
+  ]
+}

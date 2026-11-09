@@ -1,0 +1,17 @@
+{
+  "description": "A version that is not semver. (fixed)",
+  "code": "invalid-value",
+  "expect": "pass",
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "color": {
+      "brand": {
+        "seed": "#0e7490"
+      }
+    }
+  }
+}
