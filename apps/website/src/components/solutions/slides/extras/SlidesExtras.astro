@@ -1,0 +1,22 @@
+---
+/**
+ * Closing blocks of the Slides landing: recipes, agents, platforms, related
+ * Solutions and next steps. Each block is the shared component; this file
+ * only supplies the slides entry and the copy in extras-content.ts.
+ */
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionAgents from '../../shared/platforms/SolutionAgents.astro';
+import SolutionPlatforms from '../../shared/platforms/SolutionPlatforms.astro';
+import SolutionNextSteps from '../../shared/resources/SolutionNextSteps.astro';
+import SolutionRecipes from '../../shared/resources/SolutionRecipes.astro';
+import SolutionRelated from '../../shared/resources/SolutionRelated.astro';
+import { SLIDES_AGENTS, SLIDES_NEXT, SLIDES_PLATFORMS, SLIDES_RECIPES } from './extras-content.ts';
+
+const entry = getSolution('slides');
+---
+
+<SolutionRecipes entry={entry} {...SLIDES_RECIPES} />
+<SolutionAgents entry={entry} {...SLIDES_AGENTS} />
+<SolutionPlatforms entry={entry} {...SLIDES_PLATFORMS} />
+<SolutionRelated entry={entry} />
+<SolutionNextSteps entry={entry} {...SLIDES_NEXT} />
