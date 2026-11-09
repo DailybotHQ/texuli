@@ -27,7 +27,6 @@ import {
   LOCKED_STATIC_CODES,
   type LockedAllowManifest,
   type LockedCatalog,
-  type LockedUsage,
   usageFromBlueprint,
   usageFromSource,
 } from './locked-static.ts';
@@ -55,7 +54,8 @@ export type DsFullArea =
   | 'tokens'
   | 'catalog'
   | 'prototype-components'
-  | 'prototype-css';
+  | 'prototype-css'
+  | 'prototype-limits';
 
 /** One finding: a stable code, its severity, its area, a path and a fix hint. */
 export interface DsFullFinding {
@@ -133,6 +133,33 @@ export const DS_FULL_CODES = [
 
 /** The most findings one report returns. */
 export const DS_FULL_MAX_FINDINGS = 256;
+
+/**
+ * Bounds on an untrusted prototype. A file over `fileBytes` (UTF-8) is not scanned and gets
+ * one `file-too-large` error; files past `files` or past `totalBytes` in all, and blueprints
+ * past `blueprints`, are not scanned and get one `prototype-too-large` error each kind.
+ * Scanning stops once the report holds `DS_FULL_MAX_FINDINGS` findings (`findings-capped`).
+ * An unscanned file is an error, never a pass: the lock cannot be verified on it.
+ */
+export const DS_FULL_PROTOTYPE_LIMITS = Object.freeze({
+  fileBytes: 512 * 1024,
+  files: 500,
+  totalBytes: 8 * 1024 * 1024,
+  blueprints: 100,
+});
+
+/** The codes of the prototype bounds (raised on oversized input, not by a fixture document). */
+export const DS_FULL_LIMIT_CODES = [
+  'file-too-large',
+  'prototype-too-large',
+  'findings-capped',
+] as const;
+
+/** UTF-8 byte length, cheaply bounded: a string longer than `cap` code units is over `cap` bytes. */
+function utf8Bytes(text: string, cap: number): number {
+  if (text.length > cap) return text.length;
+  return new TextEncoder().encode(text).length;
+}
 
 const SPEC_STRUCTURE = new Set([
   'unknown-key',
@@ -447,73 +474,166 @@ export async function checkDesignSystemFull(
     if (run.compiled) findings.push(...compiledFindings(run.compiled.vars, variant));
   }
 
-  // The prototype: components and props against the allow manifest, then the CSS policy.
+  // The prototype: components and props against the allow manifest, then the CSS policy,
+  // within the bounds of DS_FULL_PROTOTYPE_LIMITS (untrusted input).
   let prototype: DsFullReport['prototype'];
   if (options.prototype) {
-    const files = options.prototype.files ?? {};
-    const blueprints = options.prototype.blueprints ?? {};
+    const limits = DS_FULL_PROTOTYPE_LIMITS;
+    const files = isRecord(options.prototype.files) ? options.prototype.files : {};
+    const blueprints = isRecord(options.prototype.blueprints) ? options.prototype.blueprints : {};
     const lockedCatalog = catalog as unknown as LockedCatalog;
     const allowManifest: LockedAllowManifest =
       isRecord(doc) && isRecord(doc.allow)
         ? { allow: doc.allow as LockedAllowManifest['allow'] }
         : {};
-    const usages: LockedUsage[] = [
-      ...Object.keys(files)
-        .sort()
-        .filter((path) => /\.(svelte|[cm]?[jt]sx?)$/.test(path))
-        .flatMap((path) => usageFromSource(path, files[path] as string, lockedCatalog)),
-      ...Object.keys(blueprints)
-        .sort()
-        .flatMap((name) =>
-          usageFromBlueprint(blueprints[name]).map((usage) => ({
-            ...usage,
-            location: { path: `${name}#${usage.location.path ?? '$'}` },
-          }))
-        ),
-    ];
-    const used = checkLockedUsage(usages, { catalog: lockedCatalog, allowManifest });
-    for (const [list, severity] of [
-      [used.errors, 'error'],
-      [used.warnings, 'warning'],
-    ] as const)
-      for (const issue of list)
-        findings.push({
-          code: issue.code,
-          severity,
-          area: 'prototype-components',
-          path: issue.path,
-          message: issue.message,
-          hint: hintOf(issue.code, issue.hint),
-          component: issue.component,
-          ...(issue.value !== undefined ? { value: issue.value } : {}),
-        });
-    if (allowManifest.allow)
-      for (const path of Object.keys(files).sort()) {
-        const css = checkLockedCssSource(files[path] as string, path);
-        for (const issue of css.errors)
+    const full = () => findings.length >= DS_FULL_MAX_FINDINGS;
+    const limit = (
+      code: (typeof DS_FULL_LIMIT_CODES)[number],
+      path: string,
+      message: string,
+      hint: string
+    ) =>
+      findings.push({
+        code,
+        severity: code === 'findings-capped' ? 'warning' : 'error',
+        area: 'prototype-limits',
+        path,
+        message,
+        hint,
+      });
+
+    // Which files are read: in path order, each under the per-file cap, within the count
+    // and total-bytes caps.
+    const scan: { path: string; text: string }[] = [];
+    let total = 0;
+    let skipped = 0;
+    for (const path of Object.keys(files).sort()) {
+      const text = files[path];
+      if (typeof text !== 'string') continue;
+      const bytes = utf8Bytes(text, limits.fileBytes);
+      if (bytes > limits.fileBytes) {
+        limit(
+          'file-too-large',
+          path,
+          `${path} is over ${limits.fileBytes} bytes; it was not scanned.`,
+          'Split the file: a locked prototype is checked file by file, and an unscanned file cannot pass.'
+        );
+        continue;
+      }
+      if (scan.length >= limits.files || total + bytes > limits.totalBytes) {
+        skipped += 1;
+        continue;
+      }
+      total += bytes;
+      scan.push({ path, text });
+    }
+    if (skipped > 0)
+      limit(
+        'prototype-too-large',
+        'files',
+        `${skipped} file(s) were not scanned: at most ${limits.files} files and ${limits.totalBytes} bytes per check.`,
+        'Check the prototype in parts, or remove generated and vendored files from the input.'
+      );
+    const blueprintNames = Object.keys(blueprints).sort();
+    if (blueprintNames.length > limits.blueprints)
+      limit(
+        'prototype-too-large',
+        'blueprints',
+        `${blueprintNames.length - limits.blueprints} blueprint(s) were not checked: at most ${limits.blueprints} per check.`,
+        'Check the blueprints in parts.'
+      );
+
+    const components: Record<string, number> = {};
+    const record = (used: ReturnType<typeof checkLockedUsage>) => {
+      for (const [id, count] of Object.entries(used.components))
+        components[id] = (components[id] ?? 0) + count;
+      for (const [list, severity] of [
+        [used.errors, 'error'],
+        [used.warnings, 'warning'],
+      ] as const)
+        for (const issue of list)
           findings.push({
             code: issue.code,
-            severity: 'error',
-            area: 'prototype-css',
+            severity,
+            area: 'prototype-components',
             path: issue.path,
             message: issue.message,
-            hint: 'Locked prototypes use layout utilities on the token scale only; style through the design system’s components.',
-            value: issue.value,
+            hint: hintOf(issue.code, issue.hint),
+            component: issue.component,
+            ...(issue.value !== undefined ? { value: issue.value } : {}),
           });
+    };
+    const units: (() => void)[] = [
+      ...scan
+        .filter(({ path }) => /\.(svelte|[cm]?[jt]sx?)$/.test(path))
+        .map(
+          ({ path, text }) =>
+            () =>
+              record(
+                checkLockedUsage(usageFromSource(path, text, lockedCatalog), {
+                  catalog: lockedCatalog,
+                  allowManifest,
+                })
+              )
+        ),
+      ...blueprintNames.slice(0, limits.blueprints).map(
+        (name) => () =>
+          record(
+            checkLockedUsage(
+              usageFromBlueprint(blueprints[name]).map((usage) => ({
+                ...usage,
+                location: { path: `${name}#${usage.location.path ?? '$'}` },
+              })),
+              { catalog: lockedCatalog, allowManifest }
+            )
+          )
+      ),
+      ...(allowManifest.allow
+        ? scan.map(({ path, text }) => () => {
+            for (const issue of checkLockedCssSource(text, path).errors)
+              findings.push({
+                code: issue.code,
+                severity: 'error',
+                area: 'prototype-css',
+                path: issue.path,
+                message: issue.message,
+                hint: 'Locked prototypes use layout utilities on the token scale only; style through the design system’s components.',
+                value: issue.value,
+              });
+          })
+        : []),
+    ];
+    for (const [index, unit] of units.entries()) {
+      if (full()) {
+        limit(
+          'findings-capped',
+          'prototype',
+          `The report reached ${DS_FULL_MAX_FINDINGS} findings; ${units.length - index} remaining check(s) of the prototype did not run.`,
+          'Fix the findings shown and check again.'
+        );
+        break;
       }
+      unit();
+    }
     prototype = {
       files: Object.keys(files).length,
-      blueprints: Object.keys(blueprints).length,
-      components: used.components,
+      blueprints: blueprintNames.length,
+      components,
     };
   }
 
   const rank: Record<DsFullSeverity, number> = { error: 0, warning: 1, info: 2 };
-  const ordered = findings
-    .map((finding, index) => ({ finding, index }))
-    .sort((a, b) => rank[a.finding.severity] - rank[b.finding.severity] || a.index - b.index)
-    .map((entry) => entry.finding)
-    .slice(0, DS_FULL_MAX_FINDINGS);
+  // The cap notice always survives the cut, last.
+  const notice = findings.find((f) => f.code === 'findings-capped');
+  const ordered = [
+    ...findings
+      .filter((f) => f !== notice)
+      .map((finding, index) => ({ finding, index }))
+      .sort((a, b) => rank[a.finding.severity] - rank[b.finding.severity] || a.index - b.index)
+      .map((entry) => entry.finding)
+      .slice(0, DS_FULL_MAX_FINDINGS - (notice ? 1 : 0)),
+    ...(notice ? [notice] : []),
+  ];
   const errors = ordered.filter((f) => f.severity === 'error');
   return {
     format: DS_FULL_FORMAT,
@@ -539,4 +659,5 @@ export const DS_FULL_KNOWN_CODES: Readonly<Record<string, readonly string[]>> = 
   locked: DS_CHECK_LOCKED_CODES,
   prototypeComponents: [...LOCKED_STATIC_CODES, 'dynamic-value'],
   prototypeCss: LOCKED_CSS_CODES,
+  prototypeLimits: DS_FULL_LIMIT_CODES,
 });
