@@ -21,8 +21,17 @@ import {
   withBase,
 } from './site.ts';
 
-/** `apps/website/src/pages`, resolved from this module so Vitest and Astro agree. */
-const PAGES_DIR = join(import.meta.dirname, '../../pages');
+/**
+ * `apps/website/src/pages` on disk. `astro build` runs from `apps/website` and bundles this
+ * module into a chunk folder (so `import.meta.dirname` no longer points here); Vitest runs from
+ * the repository root. Try both working directories, then this module's folder (tsx scripts).
+ */
+const PAGES_DIR =
+  [
+    join(process.cwd(), 'src/pages'),
+    join(process.cwd(), 'apps/website/src/pages'),
+    join(import.meta.dirname, '../../pages'),
+  ].find((dir) => existsSync(join(dir, 'index.astro'))) ?? join(process.cwd(), 'src/pages');
 
 /**
  * Whether a site-relative path has an Astro page today. Used so the header
