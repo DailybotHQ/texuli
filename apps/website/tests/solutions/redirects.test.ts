@@ -43,14 +43,24 @@ describe('the applied Solution redirect map (ADR-028, first wave)', () => {
     for (const entry of SOLUTIONS) {
       const from = entry.replaces ?? '';
       const twin = `${entry.route.slice(0, -1)}.md`;
-      expect(resolveSolutionRedirect(`${from.slice(0, -1)}.md`, '', {})).toEqual({
+      expect(resolveSolutionRedirect(`${from.slice(0, -1)}.md`, '', {})).toMatchObject({
         location: twin,
         status: 301,
       });
-      expect(resolveSolutionRedirect(from, '?a=1', {})).toEqual({
+      expect(resolveSolutionRedirect(from, '?a=1', {})).toMatchObject({
         location: `${entry.route}?a=1`,
         status: 301,
       });
     }
+  });
+
+  it('varies on Accept (HTML or twin) and moves index.html in the same single hop', () => {
+    const hit = resolveSolutionRedirect('/slides-page/', '', { accept: 'text/markdown' });
+    expect(hit?.headers).toEqual({ location: '/solutions/slides.md', vary: 'Accept' });
+    expect(resolveSolutionRedirect('/slides-page/index.html', '?q=1', {})).toMatchObject({
+      location: '/solutions/slides/?q=1',
+      status: 301,
+    });
+    expect(resolveSolutionRedirect('/workflows-page/json/index.html', '', {})).toBeNull();
   });
 });

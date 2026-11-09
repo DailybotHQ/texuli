@@ -24,14 +24,28 @@ import {
 /**
  * `apps/website/src/pages` on disk. `astro build` runs from `apps/website` and bundles this
  * module into a chunk folder (so `import.meta.dirname` no longer points here); Vitest runs from
- * the repository root. Try both working directories, then this module's folder (tsx scripts).
+ * the repository root. The candidates are tried lazily, in that order, and a miss is an error:
+ * a silent fallback would drop every conditional nav, footer and home link from the build.
  */
-const PAGES_DIR =
-  [
-    join(process.cwd(), 'src/pages'),
-    join(process.cwd(), 'apps/website/src/pages'),
-    join(import.meta.dirname, '../../pages'),
-  ].find((dir) => existsSync(join(dir, 'index.astro'))) ?? join(process.cwd(), 'src/pages');
+let pagesDir: string | undefined;
+function pagesDirectory(): string {
+  if (pagesDir) return pagesDir;
+  const candidates = [
+    () => join(process.cwd(), 'src/pages'),
+    () => join(process.cwd(), 'apps/website/src/pages'),
+    () => (import.meta.dirname ? join(import.meta.dirname, '../../pages') : ''),
+  ];
+  for (const candidate of candidates) {
+    const dir = candidate();
+    if (dir && existsSync(join(dir, 'index.astro'))) {
+      pagesDir = dir;
+      return dir;
+    }
+  }
+  throw new Error(
+    `siteRouteExists: no src/pages folder found from ${process.cwd()}; run the build from apps/website or the repository root`
+  );
+}
 
 /**
  * Whether a site-relative path has an Astro page today. Used so the header
@@ -41,7 +55,8 @@ export function siteRouteExists(href: string): boolean {
   const path = href.split('#')[0]?.split('?')[0] ?? '';
   if (!path.startsWith('/') || path.startsWith('//')) return false;
   const rel = path.replace(/^\/+|\/+$/g, '');
-  const folder = rel === '' ? PAGES_DIR : join(PAGES_DIR, rel);
+  const root = pagesDirectory();
+  const folder = rel === '' ? root : join(root, rel);
   return existsSync(join(folder, 'index.astro')) || existsSync(`${folder}.astro`);
 }
 

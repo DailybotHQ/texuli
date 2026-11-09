@@ -77,6 +77,8 @@ export const SOLUTION_REDIRECTS: readonly SolutionRedirect[] = [
 export interface SolutionRedirectHit {
   readonly location: string;
   readonly status: 301;
+  /** The destination depends on Accept (HTML or Markdown twin), so caches must key on it. */
+  readonly headers: Readonly<{ location: string; vary: 'Accept' }>;
 }
 
 /** Rules that may ship: flagged on and whose target route exists. */
@@ -115,6 +117,7 @@ function canonicalizePagePath(pathname: string): string | null {
   if (!pathname.startsWith('/') || pathname.startsWith('//')) return null;
   let path = pathname;
   if (path.toLowerCase().endsWith('.md')) path = path.slice(0, -3);
+  else if (path.toLowerCase().endsWith('/index.html')) path = path.slice(0, -'index.html'.length);
   if (path.length === 0) return null;
   return path.endsWith('/') ? path : `${path}/`;
 }
@@ -137,7 +140,8 @@ export function resolveSolutionRedirect(
   const twin = pathname.toLowerCase().endsWith('.md') || prefersMarkdown(options.accept ?? null);
   const dest = twin ? markdownTwinFor(rule.to) : rule.to;
   if (!dest) return null;
-  return { location: `${dest}${search}`, status: 301 };
+  const location = `${dest}${search}`;
+  return { location, status: 301, headers: { location, vary: 'Accept' } };
 }
 
 /** The pieces of the Pages environment this middleware touches. */
@@ -219,10 +223,7 @@ export const onRequest = async (context: Context): Promise<Response> => {
     accept: context.request.headers.get('accept'),
   });
   if (moved) {
-    return new Response(null, {
-      status: moved.status,
-      headers: { location: moved.location },
-    });
+    return new Response(null, { status: moved.status, headers: moved.headers });
   }
   const userAgent = context.request.headers.get('user-agent');
   // robots.txt has two renderings: auditing tools see the stripped variant,

@@ -86,22 +86,24 @@ describe('Solution redirect map (ADR-028)', () => {
     const rules: SolutionRedirect[] = [
       { from: '/slides-page/', to: '/solutions/slides/', enabled: true },
     ];
-    expect(resolveSolutionRedirect('/slides-page/', '', { rules })).toEqual({
+    expect(resolveSolutionRedirect('/slides-page/', '', { rules })).toMatchObject({
       location: '/solutions/slides/',
       status: 301,
     });
-    expect(resolveSolutionRedirect('/slides-page', '?q=1', { rules })).toEqual({
+    expect(resolveSolutionRedirect('/slides-page', '?q=1', { rules })).toMatchObject({
       location: '/solutions/slides/?q=1',
       status: 301,
     });
-    expect(resolveSolutionRedirect('/slides-page.md', '', { rules })).toEqual({
+    expect(resolveSolutionRedirect('/slides-page.md', '', { rules })).toMatchObject({
       location: '/solutions/slides.md',
       status: 301,
     });
     expect(
       resolveSolutionRedirect('/slides-page/', '', { rules, accept: 'text/markdown' })
-    ).toEqual({ location: '/solutions/slides.md', status: 301 });
-    expect(resolveSolutionRedirect('/slides-page/', '', { rules: SOLUTION_REDIRECTS })).toEqual({
+    ).toMatchObject({ location: '/solutions/slides.md', status: 301 });
+    expect(
+      resolveSolutionRedirect('/slides-page/', '', { rules: SOLUTION_REDIRECTS })
+    ).toMatchObject({
       location: '/solutions/slides/',
       status: 301,
     });

@@ -2,7 +2,7 @@
  * Copy and facts for the Protoyard case study (`/built-with/protoyard/`, vision §40.3,
  * §18.2). The product record (name, status, domain, offerings and evidence) comes from
  * `data/products` (`PROTOYARD`). The verified capabilities and the Texuli packages come
- * from the current Protoyard capability audit: Protoyard 1.5.0, published on npm, built on
+ * from the Protoyard capability audit of 2026-11-08: Protoyard 1.5.0 (local checkout), built on
  * Texuli 0.14.2. Each claim on this page carries the id of its audit row in `source`, so
  * the test can check them all. Protoyard Cloud is roadmap only: it renders under a
  * "Roadmap" heading with a planned badge and is never called available.
@@ -57,13 +57,13 @@ export const PROTOYARD_PAGE = {
     id: 'built-with-protoyard-today',
     title: 'What works today',
     intro:
-      'The open-source local version, verified against Protoyard 1.5.0. Each item is a command of the published CLI.',
+      'The open-source local version, as audited on 8 November 2026 (Protoyard 1.5.0). Each item is a command of its CLI.',
   },
   built: {
     id: 'built-with-protoyard-built',
     title: 'What is built with Texuli',
     intro:
-      'The published Protoyard 1.5.0 kits declare these Texuli 0.14.2 packages. Protoyard keeps its own blueprint format and player.',
+      'In the 8 November 2026 audit, Protoyard 1.5.0 kits declare these Texuli 0.14.2 packages. Protoyard keeps its own blueprint format and player.',
   },
   roadmap: {
     id: 'built-with-protoyard-roadmap',
@@ -117,7 +117,7 @@ export const PROTOYARD_TODAY: readonly ProtoyardClaim[] = [
   },
 ];
 
-/** The Texuli packages Protoyard 1.5.0's published kits declare (audit package table). */
+/** The Texuli packages Protoyard 1.5.0's kits declare (audit package table, 2026-11-08). */
 export const PROTOYARD_TEXULI_PACKAGES: readonly string[] = [
   'texuli',
   '@texuli/core',

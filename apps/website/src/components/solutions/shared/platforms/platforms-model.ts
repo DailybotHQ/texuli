@@ -1,8 +1,9 @@
 /**
  * View models for the status badge, the Platforms block and the Agents block (ADR-029).
- * Statuses come from the registry entry, whose native statuses `validate.ts` caps at
- * `native/docs/parity.json`. This module never raises a status, and it refuses a native
- * status above "planned" that has no evidence, so a bad entry fails the build.
+ * Statuses come from the registry entry; `validate.ts` checks its native statuses against
+ * `native/docs/parity.json` in `registry-validator.test.ts` (part of `pnpm test`, not the
+ * build). This module never raises a status, and it refuses a native status above "planned"
+ * that has no evidence, which fails the build.
  */
 import { safeHref } from '@texuli/core/url-policy';
 import {
