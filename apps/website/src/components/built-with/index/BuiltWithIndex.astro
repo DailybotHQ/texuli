@@ -9,6 +9,9 @@
  */
 import { safeHref } from '@texuli/core/url-policy';
 import { withBase } from '../../foundation/site.ts';
+import { illustrationFor } from '../../landing/illustrations.ts';
+import SiteIllustration from '../../landing/SiteIllustration.astro';
+import TexelMark from '../../sections/home/TexelMark.astro';
 import StatusBadge from '../../solutions/shared/platforms/StatusBadge.astro';
 import { BUILT_WITH_PAGE, builtWithGroups } from './index-content.ts';
 
@@ -20,18 +23,30 @@ const resolveHref = (href: string): string | undefined => {
   return safe === undefined ? undefined : withBase(base, safe);
 };
 const tiles = Array.from({ length: 24 }, (_, index) => ((index * 5 + 2) % 9) % 5);
+const artRegistered = illustrationFor(page.hero.art) !== undefined;
 ---
 
 <div class="built-with" data-tx-built-with-index="">
   <header class="built-with__hero" aria-labelledby={page.hero.id}>
     <div class="built-with__inner built-with__hero-grid">
       <div class="built-with__hero-copy">
-        <p class="built-with__eyebrow">{page.hero.eyebrow}</p>
+        <p class="built-with__eyebrow">
+          <TexelMark count={3} />
+          <span>{page.hero.eyebrow}</span>
+        </p>
         <h1 id={page.hero.id}>{page.hero.title}</h1>
         <p class="built-with__lede">{page.hero.lede}</p>
       </div>
-      <div class="built-with__mosaic" aria-hidden="true" data-art-fallback="page-built-with">
-        {tiles.map((tone) => (tone === 0 ? <i /> : <i class={`t${tone}`} />))}
+      <div class="built-with__art">
+        {
+          artRegistered ? (
+            <SiteIllustration art={page.hero.art} />
+          ) : (
+            <div class="built-with__mosaic" aria-hidden="true" data-art-fallback="page-built-with">
+              {tiles.map((tone) => (tone === 0 ? <i /> : <i class={`t${tone}`} />))}
+            </div>
+          )
+        }
       </div>
     </div>
   </header>
@@ -88,7 +103,25 @@ const tiles = Array.from({ length: 24 }, (_, index) => ((index * 5 + 2) % 9) % 5
 
 <style>
   .built-with {
-    --bw-accent: var(--home-accent-text, var(--tx-primary));
+    --home-accent: #6d4aff;
+    --home-accent-text: #5b3ae6;
+    --home-accent-ink: #ffffff;
+    --home-ground: linear-gradient(160deg, #f4f0ff 0%, #fbf8ff 45%, #fff4ee 100%);
+    --home-tint: color-mix(in oklab, #6d4aff 6%, var(--tx-background));
+    --bw-accent: var(--home-accent-text);
+  }
+  :global(:root[data-tx-mode='dark']) .built-with {
+    --home-accent-text: #b9a8ff;
+    --home-ground:
+      radial-gradient(120% 90% at 85% 0%, rgb(109 74 255 / 0.22), transparent 60%),
+      var(--tx-background);
+    --home-tint: color-mix(in oklab, #6d4aff 10%, var(--tx-background));
+  }
+  :global(:root[data-tx-mode='high-contrast']) .built-with {
+    --home-accent: var(--tx-foreground);
+    --home-accent-text: var(--tx-foreground);
+    --home-ground: var(--tx-background);
+    --home-tint: var(--tx-background);
   }
   .built-with__inner {
     max-inline-size: 76rem;
@@ -96,9 +129,9 @@ const tiles = Array.from({ length: 24 }, (_, index) => ((index * 5 + 2) % 9) % 5
     padding-inline: clamp(1rem, 4vw, 1.5rem);
   }
   .built-with__hero {
-    padding-block: clamp(2rem, 6vw, 4.5rem);
+    padding-block: clamp(2.5rem, 7vw, 5rem);
     border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 60%, transparent);
-    background: color-mix(in oklab, var(--bw-accent) 6%, var(--tx-background));
+    background: var(--home-ground);
   }
   .built-with__hero-grid {
     display: grid;
@@ -116,20 +149,45 @@ const tiles = Array.from({ length: 24 }, (_, index) => ((index * 5 + 2) % 9) % 5
     justify-items: start;
   }
   .built-with__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
     margin: 0;
-    color: var(--bw-accent);
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    padding-block: 0.3rem;
+    padding-inline: 0.85rem;
+    border: 1px solid color-mix(in oklab, var(--home-accent) 35%, transparent);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--home-accent) 8%, var(--tx-background));
+    color: var(--tx-foreground);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
   }
   .built-with h1 {
     margin: 0;
     color: var(--tx-foreground);
-    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    font-size: clamp(2.75rem, 9vw, 5.25rem);
     font-weight: 800;
-    line-height: 1;
-    letter-spacing: -0.035em;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+  }
+  .built-with__art {
+    position: relative;
+    isolation: isolate;
+    min-inline-size: 0;
+  }
+  .built-with__art::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--home-accent) 22%, transparent),
+      transparent
+    );
+    pointer-events: none;
   }
   .built-with__lede {
     margin: 0;
@@ -165,7 +223,7 @@ const tiles = Array.from({ length: 24 }, (_, index) => ((index * 5 + 2) % 9) % 5
     background: var(--bw-accent);
   }
   .built-with__group {
-    padding-block: clamp(2.5rem, 7vw, 4.5rem);
+    padding-block: clamp(3rem, 8vw, 6rem);
   }
   .built-with__group + .built-with__group {
     border-block-start: 1px solid color-mix(in oklab, var(--tx-border) 55%, transparent);
@@ -254,7 +312,8 @@ const tiles = Array.from({ length: 24 }, (_, index) => ((index * 5 + 2) % 9) % 5
     .built-with__card {
       border-color: CanvasText;
     }
-    .built-with__mosaic {
+    .built-with__mosaic,
+    .built-with__art::before {
       display: none;
     }
   }

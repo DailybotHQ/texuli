@@ -46,6 +46,7 @@ export const PROTOYARD_PAGE = {
     title: 'Protoyard',
     lede: 'Build prototypes that behave like real apps. Open-source local prototyping today, built on Texuli components and themes.',
     cta: { label: 'Visit protoyard.app', href: PROTOYARD_SITE },
+    art: 'built-with-protoyard',
   },
   job: {
     id: 'built-with-protoyard-job',

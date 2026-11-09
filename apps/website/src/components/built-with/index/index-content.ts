@@ -26,6 +26,7 @@ export const BUILT_WITH_PAGE = {
     eyebrow: 'Products',
     title: 'Built with Texuli',
     lede: 'Products built with Texuli keep their own brand and domain. Each card shows what is available today and what is only planned.',
+    art: 'page-built-with',
   },
   groups: {
     owner: {

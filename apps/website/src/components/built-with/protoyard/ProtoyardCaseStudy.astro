@@ -11,6 +11,9 @@
 import { safeHref } from '@texuli/core/url-policy';
 import { siteRouteExists } from '../../foundation/nav-data.ts';
 import { withBase } from '../../foundation/site.ts';
+import { illustrationFor } from '../../landing/illustrations.ts';
+import SiteIllustration from '../../landing/SiteIllustration.astro';
+import TexelMark from '../../sections/home/TexelMark.astro';
 import StatusBadge from '../../solutions/shared/platforms/StatusBadge.astro';
 import {
   PROTOYARD_PAGE,
@@ -32,13 +35,17 @@ const resolveHref = (href: string): string | undefined => {
 };
 const pathway = PROTOYARD_PATHWAY_LINKS.filter((link) => siteRouteExists(link.href));
 const tiles = Array.from({ length: 30 }, (_, index) => ((index * 7 + 3) % 11) % 5);
+const artRegistered = illustrationFor(page.hero.art) !== undefined;
 ---
 
 <article class="protoyard" data-tx-built-with="protoyard">
   <header class="protoyard__hero" aria-labelledby={page.hero.id}>
     <div class="protoyard__inner protoyard__hero-grid">
       <div class="protoyard__hero-copy">
-        <p class="protoyard__eyebrow">{page.hero.eyebrow}</p>
+        <p class="protoyard__eyebrow">
+          <TexelMark count={3} />
+          <span>{page.hero.eyebrow}</span>
+        </p>
         <h1 id={page.hero.id}>{page.hero.title}</h1>
         <p class="protoyard__lede">{page.hero.lede}</p>
         <p class="protoyard__status">
@@ -54,8 +61,16 @@ const tiles = Array.from({ length: 30 }, (_, index) => ((index * 7 + 3) % 11) % 
           )
         }
       </div>
-      <div class="protoyard__mosaic" aria-hidden="true" data-art-fallback="built-with-protoyard">
-        {tiles.map((tone) => (tone === 0 ? <i /> : <i class={`t${tone}`} />))}
+      <div class="protoyard__art">
+        {
+          artRegistered ? (
+            <SiteIllustration art={page.hero.art} />
+          ) : (
+            <div class="protoyard__mosaic" aria-hidden="true" data-art-fallback="built-with-protoyard">
+              {tiles.map((tone) => (tone === 0 ? <i /> : <i class={`t${tone}`} />))}
+            </div>
+          )
+        }
       </div>
     </div>
   </header>
@@ -136,7 +151,24 @@ const tiles = Array.from({ length: 30 }, (_, index) => ((index * 7 + 3) % 11) % 
 
 <style>
   .protoyard {
-    --py-accent: var(--home-accent-text, var(--tx-primary));
+    --home-accent: #6d4aff;
+    --home-accent-text: #5b3ae6;
+    --home-ground: linear-gradient(160deg, #f4f0ff 0%, #fbf8ff 45%, #fff4ee 100%);
+    --home-tint: color-mix(in oklab, #6d4aff 6%, var(--tx-background));
+    --py-accent: var(--home-accent-text);
+  }
+  :global(:root[data-tx-mode='dark']) .protoyard {
+    --home-accent-text: #b9a8ff;
+    --home-ground:
+      radial-gradient(120% 90% at 85% 0%, rgb(109 74 255 / 0.22), transparent 60%),
+      var(--tx-background);
+    --home-tint: color-mix(in oklab, #6d4aff 10%, var(--tx-background));
+  }
+  :global(:root[data-tx-mode='high-contrast']) .protoyard {
+    --home-accent: var(--tx-foreground);
+    --home-accent-text: var(--tx-foreground);
+    --home-ground: var(--tx-background);
+    --home-tint: var(--tx-background);
   }
   .protoyard__inner {
     max-inline-size: 76rem;
@@ -147,9 +179,9 @@ const tiles = Array.from({ length: 30 }, (_, index) => ((index * 7 + 3) % 11) % 
     max-inline-size: 52rem;
   }
   .protoyard__hero {
-    padding-block: clamp(2rem, 6vw, 4.5rem);
+    padding-block: clamp(2.5rem, 7vw, 5rem);
     border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 60%, transparent);
-    background: color-mix(in oklab, var(--py-accent) 6%, var(--tx-background));
+    background: var(--home-ground);
   }
   .protoyard__hero-grid {
     display: grid;
@@ -167,20 +199,45 @@ const tiles = Array.from({ length: 30 }, (_, index) => ((index * 7 + 3) % 11) % 
     justify-items: start;
   }
   .protoyard__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
     margin: 0;
-    color: var(--py-accent);
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    padding-block: 0.3rem;
+    padding-inline: 0.85rem;
+    border: 1px solid color-mix(in oklab, var(--home-accent) 35%, transparent);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--home-accent) 8%, var(--tx-background));
+    color: var(--tx-foreground);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
   }
   .protoyard h1 {
     margin: 0;
     color: var(--tx-foreground);
-    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    font-size: clamp(2.75rem, 9vw, 5.25rem);
     font-weight: 800;
-    line-height: 1;
-    letter-spacing: -0.035em;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+  }
+  .protoyard__art {
+    position: relative;
+    isolation: isolate;
+    min-inline-size: 0;
+  }
+  .protoyard__art::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--home-accent) 22%, transparent),
+      transparent
+    );
+    pointer-events: none;
   }
   .protoyard__lede {
     margin: 0;
@@ -238,10 +295,10 @@ const tiles = Array.from({ length: 30 }, (_, index) => ((index * 7 + 3) % 11) % 
     background: var(--py-accent);
   }
   .protoyard__band {
-    padding-block: clamp(2.5rem, 7vw, 5rem);
+    padding-block: clamp(3rem, 8vw, 6rem);
   }
   .protoyard__band--raised {
-    background: color-mix(in oklab, var(--tx-muted) 45%, var(--tx-background));
+    background: var(--home-tint);
     border-block: 1px solid color-mix(in oklab, var(--tx-border) 55%, transparent);
   }
   .protoyard h2 {
@@ -332,7 +389,8 @@ const tiles = Array.from({ length: 30 }, (_, index) => ((index * 7 + 3) % 11) % 
     .protoyard__packages code {
       border-color: CanvasText;
     }
-    .protoyard__mosaic {
+    .protoyard__mosaic,
+    .protoyard__art::before {
       display: none;
     }
   }

@@ -58,6 +58,8 @@ export interface CatalogCard {
   readonly onNative: boolean;
   readonly landing: string | undefined;
   readonly docs: string | undefined;
+  /** The Solution landing's hero plate (`solution-<slug>-hero`). */
+  readonly art: string;
 }
 
 /** One card per registry entry, in catalog order. */
@@ -86,6 +88,7 @@ export function catalogCards(
       onNative: native !== 'planned',
       landing: exists(entry.route) ? entry.route : undefined,
       docs: exists(entry.docs) ? entry.docs : undefined,
+      art: `solution-${entry.slug}-hero`,
     };
   });
 }

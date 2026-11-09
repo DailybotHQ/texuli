@@ -11,6 +11,7 @@ import { safeHref } from '@texuli/core/url-policy';
 import { withBase } from '../../../foundation/site.ts';
 import { illustrationFor } from '../../../landing/illustrations.ts';
 import SiteIllustration from '../../../landing/SiteIllustration.astro';
+import TexelMark from '../../../sections/home/TexelMark.astro';
 import HeroTexels from '../../../solutions/shared/hero/HeroTexels.astro';
 import StatusBadge from '../../../solutions/shared/platforms/StatusBadge.astro';
 import { NATIVE_HERO, nativeHeroStatus } from './hero-content.ts';
@@ -32,7 +33,10 @@ const registered = illustrationFor(NATIVE_HERO.art.slot) !== undefined;
 <section class="native-hero22" aria-labelledby={NATIVE_HERO.ids.heading} data-tx-native-hero="">
   <div class="native-hero22__inner">
     <div class="native-hero22__copy">
-      <p class="native-hero22__eyebrow">{NATIVE_HERO.eyebrow}</p>
+      <p class="native-hero22__eyebrow">
+        <TexelMark count={3} />
+        <span>{NATIVE_HERO.eyebrow}</span>
+      </p>
       <h1 id={NATIVE_HERO.ids.heading}>
         {NATIVE_HERO.title.lead}{' '}
         <span class="native-hero22__accent">{NATIVE_HERO.title.accent}</span>
@@ -71,13 +75,15 @@ const registered = illustrationFor(NATIVE_HERO.art.slot) !== undefined;
       </div>
     </div>
     <div class="native-hero22__art">
-      {
-        registered ? (
-          <SiteIllustration art={NATIVE_HERO.art.slot} />
-        ) : (
-          <HeroTexels art={NATIVE_HERO.art.slot} alt={NATIVE_HERO.art.alt} />
-        )
-      }
+      <div class="native-hero22__plate">
+        {
+          registered ? (
+            <SiteIllustration art={NATIVE_HERO.art.slot} />
+          ) : (
+            <HeroTexels art={NATIVE_HERO.art.slot} alt={NATIVE_HERO.art.alt} />
+          )
+        }
+      </div>
     </div>
   </div>
 </section>
@@ -124,6 +130,9 @@ const registered = illustrationFor(NATIVE_HERO.art.slot) !== undefined;
     min-inline-size: 0;
   }
   .native-hero22__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
     margin: 0;
     padding-block: 0.3rem;
     padding-inline: 0.85rem;
@@ -138,10 +147,10 @@ const registered = illustrationFor(NATIVE_HERO.art.slot) !== undefined;
   .native-hero22 h1 {
     margin: 0;
     color: var(--tx-foreground);
-    font-size: clamp(2.5rem, 8vw, 4.75rem);
+    font-size: clamp(2.75rem, 9vw, 5.25rem);
     font-weight: 800;
-    line-height: 1;
-    letter-spacing: -0.035em;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
     text-wrap: balance;
   }
   .native-hero22__accent {
@@ -239,6 +248,26 @@ const registered = illustrationFor(NATIVE_HERO.art.slot) !== undefined;
     outline-offset: 3px;
   }
   .native-hero22__art {
+    position: relative;
+    isolation: isolate;
+    min-inline-size: 0;
+    padding-block: clamp(0.75rem, 3vw, 1.5rem);
+  }
+  .native-hero22__art::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--nh-accent) 22%, transparent),
+      transparent
+    );
+    pointer-events: none;
+  }
+  .native-hero22__plate {
+    position: relative;
     min-inline-size: 0;
   }
   @media (max-width: 30rem) {
@@ -250,6 +279,9 @@ const registered = illustrationFor(NATIVE_HERO.art.slot) !== undefined;
   @media (forced-colors: active) {
     .native-hero22__cta {
       border-color: LinkText;
+    }
+    .native-hero22__art::before {
+      display: none;
     }
   }
 </style>
