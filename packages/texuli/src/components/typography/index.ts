@@ -3,6 +3,8 @@
  * components a locked prototype uses instead of typography and visual utilities. Each is a
  * catalog component with its axes, states and root attributes.
  */
+
+export type { ColorRef } from '../../internal/color-ref.ts';
 export { default as Box } from './Box.svelte';
 export { default as Heading } from './Heading.svelte';
 export { default as Prose } from './Prose.svelte';
@@ -11,6 +13,7 @@ export {
   BOX_BORDERS,
   BOX_ELEMENTS,
   BOX_ELEVATIONS,
+  BOX_FILLS,
   BOX_PADDINGS,
   BOX_RADII,
   BOX_SURFACES,

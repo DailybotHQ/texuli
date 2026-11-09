@@ -335,6 +335,11 @@
     background-color: var(--tx-primary-soft, Canvas);
     color: var(--tx-primary-soft-foreground, CanvasText);
   }
+  /* A checked ColorRef can override any surface without accepting raw CSS. */
+  .tx-box[data-tx-tone]:not([data-tx-tone="none"]) {
+    background-color: var(--tx-box-fill);
+    color: var(--tx-box-ink);
+  }
   /* A sticky header over scrolling content: the page background at the glass opacity,
      blurred behind. Without backdrop-filter or with reduced transparency it is opaque. */
   .tx-box--surface-translucent {

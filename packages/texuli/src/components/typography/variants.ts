@@ -1,3 +1,4 @@
+import { DATA_COLORS, ROLE_COLORS } from '../../internal/color-ref.ts';
 import { variants } from '../../internal/variants.ts';
 // The recipes carry their styles: a consumer that uses these classes on its own
 // elements (without the components) still gets the CSS.
@@ -103,6 +104,9 @@ export const BOX_SURFACES = [
   'translucent',
 ] as const;
 export type BoxSurface = (typeof BOX_SURFACES)[number];
+
+/** A no-fill default plus the shared token-only palette and data-viz references. */
+export const BOX_FILLS = ['none', ...DATA_COLORS, ...ROLE_COLORS] as const;
 
 /** A value of a closed list, or the fallback (a hostile or stale prop never reaches a class). */
 export function oneOf<T extends string | number>(
