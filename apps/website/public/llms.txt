@@ -30,6 +30,7 @@ Embeddable open-source systems that complete a task end to end.
 - [Solutions index (JSON)](https://texuli.com/solutions/index.json): The registry facts as JSON.
 - [Slides](https://texuli.com/solutions/slides/): Write decks as JSON or Markdown and present them in the browser. Status: in development.
 - [Slides docs](https://texuli.com/guides/solutions/slides/)
+- [Documents](https://texuli.com/solutions/documents/): Edit, read, paginate and export block documents. Status: in development.
 - [Documents docs](https://texuli.com/guides/solutions/documents/)
 - [Workflows docs](https://texuli.com/guides/solutions/workflows/)
 - [Canvas docs](https://texuli.com/guides/solutions/canvas/)
