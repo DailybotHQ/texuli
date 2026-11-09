@@ -214,7 +214,6 @@ describe('slots awaiting their artwork', () => {
 describe('platform page banners', () => {
   it('gives every platform page an on-style banner slot', () => {
     const banners: Record<string, string> = {
-      'native/index.astro': 'art="page-native"',
       'web-and-native/index.astro': 'art="page-web-and-native"',
       'design-systems/index.astro': 'art="page-design-systems"',
       'mcp-server/index.astro': 'art="page-mcp"',

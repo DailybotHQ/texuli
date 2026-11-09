@@ -27,6 +27,7 @@ The two-runtimes story: the architecture page and the native landing.
 Kotlin Multiplatform and Compose: what exists, honestly.
 
 - [Texuli Native](https://texuli.com/native/): The same catalog, rendered by Compose through Kotlin Multiplatform. Status: in development.
+- [Native compatibility](https://texuli.com/native/compatibility/): What the Compose renderer paints today, from the parity matrix.
 
 ## Solutions
 
