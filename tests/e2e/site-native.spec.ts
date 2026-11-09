@@ -146,7 +146,8 @@ test('/native/compatibility/ is a captioned table with row headers and working f
   await settle(page);
 
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Native compatibility');
-  await expect(page.locator('a[href="/native/"]').first()).toBeVisible();
+  // The link back lives in the page content (the sidebar copy is a hidden drawer on phones).
+  await expect(page.locator('main a[href="/native/"]').first()).toBeVisible();
   const table = page.locator('table.native-matrix__table');
   await expect(table.locator('caption')).toContainText('Web and native compatibility for spec');
   await expect(table.locator('thead th[scope="col"]')).toHaveCount(6);
