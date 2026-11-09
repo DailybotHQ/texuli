@@ -1,0 +1,14 @@
+---
+/**
+ * The Canvas signature stories: the shared SolutionStories block with the canvas
+ * registry entry and the copy in `stories-content.ts`. Every claim is backed by
+ * `CANVAS_STORY_EVIDENCE`, which the unit test checks against the repository.
+ */
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionStories from '../../shared/story/SolutionStories.astro';
+import { CANVAS_STORIES } from './stories-content.ts';
+
+const entry = getSolution('canvas');
+---
+
+<SolutionStories entry={entry} {...CANVAS_STORIES} />
