@@ -110,7 +110,9 @@ const TARGETS = [
 test('the landing header fits across its breakpoints, and flagged links are at least 24px', async ({
   page,
 }) => {
-  for (const width of [360, 400, 641, 700, 767, 769, 800, 900, 1023, 1025, 1100, 1153, 1279, 1280]) {
+  for (const width of [
+    360, 400, 641, 700, 767, 769, 800, 900, 1023, 1025, 1100, 1153, 1279, 1280,
+  ]) {
     await visit(page, '/', width);
     const header = await page.evaluate(() => {
       const root = document.querySelector('[data-tx-site-header]');
