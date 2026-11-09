@@ -90,7 +90,7 @@
     "fixtures/workflow/invalid/unknown-node-type.json": "763c245014cf1dffda938b44dd0dd00bcd92108b83a2986d9107e2663487dec1",
     "schemas/blueprint.schema.json": "67788024c4505a9ed3e8a9ce8ecb9c169fe17556866337c048b12babd6e3764f",
     "schemas/canvas.schema.json": "d2f73644ff38feef2f768da9470640a3375450211a9fd7b90f507c4dd48b5b63",
-    "schemas/catalog.schema.json": "189194f86a9caf0c31a62a840b561c44077d4b0c15f6412c42a4c8c98b042011",
+    "schemas/catalog.schema.json": "669dbe74a245b2f40e16c8b74cbd903f213518a477e12eb5f647a871fbc56415",
     "schemas/design-system.schema.json": "1b9e6929ed4c7b233ae04d86991ef86d59dab513bb6ca233d693cde181f0a84c",
     "schemas/diagnostics.schema.json": "7de3c9490dae2ce193fe159b4a20191234626e68d6a736b99eda7524b52b5240",
     "schemas/document.schema.json": "e42c8f3c3bf7b2e10f7a57fd1d163f9daed59c16ae98bae950d01f5b66517c44",

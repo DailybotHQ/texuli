@@ -59,6 +59,28 @@ export interface CatalogValueSchema {
   $ref?: string;
 }
 
+/**
+ * The styling axes a component may expose (ADR-032). Each names one of the
+ * component's `enum` props; the projection into `@texuli/spec` derives the
+ * axis values from that prop's `enumValues` and its default from the prop's
+ * `default`.
+ */
+export type CatalogAxisName = 'variant' | 'size' | 'tone' | 'density';
+
+/** The closed list of observable states a component can show (ADR-032). */
+export type CatalogStateName =
+  | 'hover'
+  | 'focus-visible'
+  | 'active'
+  | 'disabled'
+  | 'loading'
+  | 'invalid'
+  | 'selected'
+  | 'expanded'
+  | 'checked'
+  | 'open'
+  | 'readonly';
+
 /** Deprecated since a spec version; warns for one minor before removal. */
 export interface CatalogDeprecation {
   since: string;
@@ -150,6 +172,13 @@ export interface CatalogManifest {
    * whose items are rows.
    */
   sourceable?: readonly string[];
+  /**
+   * Styling axes (ADR-032): axis name → the `enum` prop that drives it. The
+   * prop must declare `enumValues` and a `default` among them.
+   */
+  axes?: Readonly<Partial<Record<CatalogAxisName, string>>>;
+  /** Observable states the component paints (ADR-032), from the closed list. */
+  states?: readonly CatalogStateName[];
   deprecated?: CatalogDeprecation;
 }
 

@@ -1,5 +1,10 @@
 import { buildSpec, EXTERNAL_SCHEMAS } from './build.ts';
-import { CAPABILITIES, type SpecCatalog, type SpecDeprecation } from './catalog.ts';
+import {
+  CAPABILITIES,
+  checkCatalogVariants,
+  type SpecCatalog,
+  type SpecDeprecation,
+} from './catalog.ts';
 import { checkPropSchema, defCollisions } from './contract.ts';
 import { checkSchemaDocument, isRecord, type Schema, validateInstance } from './dialect.ts';
 import type { SpecSourceDescriptor } from './source.ts';
@@ -20,9 +25,12 @@ export interface ConformanceIssue {
     | 'contract'
     | 'prop-schema'
     | 'deprecation'
-    | 'workflow';
+    | 'workflow'
+    | 'variants';
   path: string;
   message: string;
+  /** A stable code, when the check has one (`variants`: `CATALOG_VARIANTS_CODES`). */
+  code?: string;
 }
 
 /**
@@ -107,6 +115,14 @@ export function checkConformance(
   }
 
   issues.push(...checkCatalogContract(catalog));
+  for (const issue of checkCatalogVariants(catalog)) {
+    issues.push({
+      check: 'variants',
+      path: 'catalog/components.json',
+      message: `${issue.path} ${issue.code}: ${issue.message}`,
+      code: issue.code,
+    });
+  }
 
   let build: ReturnType<typeof buildSpec> | undefined;
   try {

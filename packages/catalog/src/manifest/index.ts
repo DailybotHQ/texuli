@@ -5,12 +5,14 @@
 
 export { manifestData } from './data.ts';
 export type {
+  CatalogAxisName,
   CatalogDeprecation,
   CatalogEventName,
   CatalogExample,
   CatalogManifest,
   CatalogPropKind,
   CatalogPropSchema,
+  CatalogStateName,
   CatalogTier,
   CatalogValueSchema,
   ManifestDiagnostic,
@@ -18,8 +20,10 @@ export type {
   ManifestValidation,
 } from './types.ts';
 export {
+  CATALOG_AXIS_NAMES,
   CATALOG_EVENT_NAMES,
   CATALOG_SCHEMA_REFS,
+  CATALOG_STATE_NAMES,
   CatalogManifestError,
   defineCatalogManifest,
   isCatalogManifest,
