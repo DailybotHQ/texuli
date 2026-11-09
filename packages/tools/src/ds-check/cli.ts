@@ -21,9 +21,11 @@ import { extname, relative, resolve } from 'node:path';
 import type { SpecCatalog } from '@texuli/spec';
 import { loadSpecCatalog } from '../ops/catalog.ts';
 import { checkDesignSystemFull, type DsFullReport } from './full.ts';
+import { renderLockedDesignSystemCheck } from './locked-render.ts';
 import {
   DS_CHECK_BUILTIN_SHEET,
   DsCheckRequirementError,
+  type DsModuleLoader,
   parseKnownFindings,
   renderDesignSystemCheck,
 } from './render.ts';
@@ -268,6 +270,8 @@ export interface DsCliIo {
   stdout?: { write(chunk: string): unknown };
   stderr?: { write(chunk: string): unknown };
   cwd?: string;
+  /** How `--render` loads Playwright and axe (default: from the project in `cwd`); tests stub the browser here. */
+  load?: DsModuleLoader;
 }
 
 export type DsCliReport = DsCheckReport | DsFullReport;
@@ -399,20 +403,45 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
         ...(prototype ? { prototype } : {}),
         ...(args.trust ? { trust: args.trust } : {}),
       });
-      if (args.render && full.check.runs.some((run) => run.compiled)) {
+      // The full report keeps a serialized check (no compiled variables), so the
+      // render check compiles the runs again to paint them.
+      const live = args.render
+        ? await checkDesignSystem(doc, {
+            file: args.file as string,
+            bases,
+            catalog,
+            ...(args.modes ? { modes: args.modes } : {}),
+            ...(args.variants ? { variants: args.variants } : {}),
+            ...(args.trust ? { trust: args.trust } : {}),
+          })
+        : undefined;
+      if (live?.runs.some((run) => run.compiled)) {
         const known =
           args.known === undefined
             ? undefined
             : parseKnownFindings(await readJsonFile(args.known, 'The known findings'));
-        const rendered = await renderDesignSystemCheck(full.check, {
-          ...(args.url ? { url: args.url } : {}),
-          ...(args.sheet ? { sheet: args.sheet } : {}),
-          ...(known ? { known } : {}),
-          ...(args.strict ? { strict: true } : {}),
-          ...(args.modes ? { modes: args.modes } : {}),
-          ...(io.cwd ? { cwd: io.cwd } : {}),
-        });
-        const renderFindings = rendered.errors.map((issue) => ({
+        // The locked render check: chart, map and canvas marks are exempt from the
+        // per-pixel literal check, and a page you serve (--url) is mapped against allow.
+        const allow =
+          doc !== null && typeof doc === 'object' && !Array.isArray(doc)
+            ? (doc as { allow?: unknown }).allow
+            : undefined;
+        const { report: rendered, locked } = await renderLockedDesignSystemCheck(
+          live,
+          allow !== null && typeof allow === 'object' && !Array.isArray(allow)
+            ? { allow: allow as Record<string, unknown> }
+            : undefined,
+          {
+            ...(args.url ? { url: args.url } : {}),
+            ...(args.sheet ? { sheet: args.sheet } : {}),
+            ...(known ? { known } : {}),
+            ...(args.strict ? { strict: true } : {}),
+            ...(args.modes ? { modes: args.modes } : {}),
+            ...(io.cwd ? { cwd: io.cwd } : {}),
+            ...(io.load ? { load: io.load } : {}),
+          }
+        );
+        const renderFindings = locked.errors.map((issue) => ({
           code: issue.code,
           severity: 'error' as const,
           area:
@@ -421,19 +450,31 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
               : ('prototype-components' as const),
           path: issue.path,
           message: issue.message,
-          hint: issue.hint ?? 'Fix the browser finding, then rerun the render check.',
+          hint:
+            issue.hint ??
+            (issue.code === 'unmapped'
+              ? 'Build the control from an allowed catalog component.'
+              : issue.code === 'not-allowed'
+                ? 'Use a component the allow set lists, or ask the design reviewer to allow it.'
+                : 'Fix the browser finding, then rerun the render check.'),
           ...(issue.mode ? { mode: issue.mode } : {}),
           ...(issue.variant ? { variant: issue.variant } : {}),
         }));
         full = {
           ...full,
-          ok: full.ok && rendered.ok,
+          ok: full.ok && locked.ok,
           codes: [
             ...new Set([...full.codes, ...renderFindings.map((finding) => finding.code)]),
           ].sort(),
           summary: { ...full.summary, errors: full.summary.errors + renderFindings.length },
           findings: [...full.findings, ...renderFindings],
-          check: rendered as DsFullReport['check'],
+          check: {
+            ...full.check,
+            ok: full.check.ok && locked.ok,
+            codes: [...new Set([...full.check.codes, ...locked.codes])].sort(),
+            errors: [...full.check.errors, ...locked.errors],
+            ...(rendered.render ? { render: rendered.render } : {}),
+          },
         };
       }
       report = full;
@@ -459,6 +500,7 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
           ...(args.strict ? { strict: true } : {}),
           ...(args.modes ? { modes: args.modes } : {}),
           ...(io.cwd ? { cwd: io.cwd } : {}),
+          ...(io.load ? { load: io.load } : {}),
         });
     }
   } catch (error) {

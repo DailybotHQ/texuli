@@ -15,6 +15,10 @@
  * - {@link renderDesignSystemCheck}: launches chromium and serves the
  *   conformance sheet that ships in this package (or a page you built, or
  *   `url`) itself; what `--render` runs.
+ * - {@link renderLockedDesignSystemCheck}: what `--locked --render` runs: the
+ *   render checks with chart, map and canvas marks exempt from the per-pixel
+ *   literal check, and on a page you serve (`url`) {@link checkLockedRenderTree}
+ *   against the allow set (`unmapped`, `not-allowed`).
  */
 export {
   DS_CHECK_PROTOTYPE_SYMLINK,
@@ -25,6 +29,7 @@ export {
 } from './cli.ts';
 export * from './css-policy.ts';
 export * from './full.ts';
+export * from './locked-render.ts';
 export * from './locked-static.ts';
 export {
   DS_MAP_CODES,
@@ -66,6 +71,7 @@ export {
   runDsRenderChecks,
   serveSheetDirectory,
   startDsCheckSheet,
+  withDsCheckPage,
 } from './render.ts';
 export {
   checkDesignSystem,
