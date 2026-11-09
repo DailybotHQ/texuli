@@ -42,7 +42,7 @@ test('drag page: one engine moves list, board and canvas items by keyboard and p
   await page.goto(`${origin()}/drag-page/`);
   await settle(page);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-    'One drag engine, every surface'
+    'Drag, drop, and build interactions'
   );
   await hydrated(page, '.workbench');
 

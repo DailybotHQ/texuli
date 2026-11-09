@@ -1,10 +1,13 @@
 /**
- * Build-time navigation model (T-site-ia): `NAV_GROUPS` from `site.ts` with
- * the guides (reading order) and the component and primitive lists (from the
- * catalog, alphabetical) expanded, plus the sidebar sections, the pager and
- * the docs-page test. Imported only by `.astro` files, so islands never
- * bundle the catalog.
+ * Build-time navigation model (T-site-ia, ADR-031): `NAV_GROUPS` from `site.ts`
+ * with the guides (reading order) and the component and primitive lists (from
+ * the catalog, alphabetical) expanded, plus the sidebar sections, the pager,
+ * the docs-page test, and the landing global nav. Imported only by `.astro`
+ * files, so islands never bundle the catalog.
  */
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+import { SOLUTIONS } from '../../data/solutions/index.ts';
 import { COMPONENT_PAGES } from '../component-pages/load-manifests.ts';
 import { GUIDES_SECTIONS } from '../guides/nav.ts';
 import { PRIMITIVES } from '../primitives-page/primitives.ts';
@@ -14,13 +17,107 @@ import {
   type NavLink,
   navState,
   normalizePath,
+  REPOSITORY_URL,
   withBase,
 } from './site.ts';
+
+/**
+ * `apps/website/src/pages` on disk. `astro build` runs from `apps/website` and bundles this
+ * module into a chunk folder (so `import.meta.dirname` no longer points here); Vitest runs from
+ * the repository root. The candidates are tried lazily, in that order, and a miss is an error:
+ * a silent fallback would drop every conditional nav, footer and home link from the build.
+ */
+let pagesDir: string | undefined;
+function pagesDirectory(): string {
+  if (pagesDir) return pagesDir;
+  const candidates = [
+    () => join(process.cwd(), 'src/pages'),
+    () => join(process.cwd(), 'apps/website/src/pages'),
+    () => (import.meta.dirname ? join(import.meta.dirname, '../../pages') : ''),
+  ];
+  for (const candidate of candidates) {
+    const dir = candidate();
+    if (dir && existsSync(join(dir, 'index.astro'))) {
+      pagesDir = dir;
+      return dir;
+    }
+  }
+  throw new Error(
+    `siteRouteExists: no src/pages folder found from ${process.cwd()}; run the build from apps/website or the repository root`
+  );
+}
+
+/**
+ * Whether a site-relative path has an Astro page today. Used so the header
+ * never ships a Solutions or Built-with href before its page exists (ADR-031).
+ */
+export function siteRouteExists(href: string): boolean {
+  const path = href.split('#')[0]?.split('?')[0] ?? '';
+  if (!path.startsWith('/') || path.startsWith('//')) return false;
+  const rel = path.replace(/^\/+|\/+$/g, '');
+  const root = pagesDirectory();
+  const folder = rel === '' ? root : join(root, rel);
+  return existsSync(join(folder, 'index.astro')) || existsSync(`${folder}.astro`);
+}
+
+/** One item of the ADR-031 landing header. */
+export interface LandingNavItem {
+  readonly label: string;
+  readonly href: string;
+  /** GitHub: an https URL, rendered through the URL policy. */
+  readonly external?: boolean;
+}
+
+/**
+ * The seven-item contract (ADR-031). `LANDING_NAV` drops any site path whose
+ * page is not in `src/pages/` yet, so `/solutions/` appears when that route ships.
+ */
+export const LANDING_NAV_CONTRACT: readonly LandingNavItem[] = [
+  { label: 'Solutions', href: '/solutions/' },
+  { label: 'Components', href: '/component-pages/' },
+  { label: 'Native', href: '/native/' },
+  { label: 'Themes', href: '/gallery-themes/' },
+  { label: 'Agents', href: '/agents-page/' },
+  { label: 'Docs', href: '/guides/' },
+  { label: 'GitHub', href: REPOSITORY_URL, external: true },
+];
+
+/** Landing header items whose routes exist (GitHub always). Desktop and phone share this list. */
+export const LANDING_NAV: readonly LandingNavItem[] = LANDING_NAV_CONTRACT.filter(
+  (item) => item.external === true || siteRouteExists(item.href)
+);
+
+/**
+ * Sidebar Solutions links from the registry (ADR-029), in catalog order. A Solution is
+ * listed only when its landing page exists.
+ */
+export function solutionNavLinks(): NavLink[] {
+  const links: NavLink[] = [];
+  if (siteRouteExists('/solutions/')) links.push({ href: '/solutions/', label: 'Explore all' });
+  for (const entry of SOLUTIONS) {
+    if (siteRouteExists(entry.route)) links.push({ href: entry.route, label: entry.name });
+  }
+  return links;
+}
 
 export interface ResolvedNavGroup {
   id: string;
   label: string;
   links: readonly NavLink[];
+}
+
+/**
+ * The group ADR-031 adds to the docs sidebar (after Platform) once its pages exist: the
+ * Solutions catalog and Built with Texuli. Kept to two links because the sidebar renders on
+ * every docs page and several sit at their HTML budget; the header and footer link each
+ * landing.
+ */
+export function ecosystemNavGroups(): ResolvedNavGroup[] {
+  const links: NavLink[] = [];
+  if (siteRouteExists('/solutions/')) links.push({ href: '/solutions/', label: 'All Solutions' });
+  if (siteRouteExists('/built-with/'))
+    links.push({ href: '/built-with/', label: 'Built with Texuli' });
+  return links.length > 0 ? [{ id: 'solutions', label: 'Solutions', links }] : [];
 }
 
 const byLabel = (a: NavLink, b: NavLink) => a.label.localeCompare(b.label, 'en');
@@ -81,15 +178,20 @@ function expanded(kind: NavGroup['expand']): NavLink[] {
 }
 
 /** Every group with its generated links. */
-export const SITE_NAV_GROUPS: readonly ResolvedNavGroup[] = NAV_GROUPS.map((group) => ({
-  id: group.id,
-  label: group.label,
-  links: [
-    ...group.links.slice(0, group.expandAt ?? group.links.length),
-    ...expanded(group.expand),
-    ...group.links.slice(group.expandAt ?? group.links.length),
-  ],
-}));
+export const SITE_NAV_GROUPS: readonly ResolvedNavGroup[] = NAV_GROUPS.flatMap((group) => {
+  const resolved: ResolvedNavGroup = {
+    id: group.id,
+    label: group.label,
+    links: [
+      ...group.links.slice(0, group.expandAt ?? group.links.length),
+      ...expanded(group.expand),
+      ...group.links.slice(group.expandAt ?? group.links.length),
+    ],
+  };
+  // ADR-031: the Solutions and Built with groups follow Platform, from the registry, once
+  // their pages exist.
+  return group.id === 'platform' ? [resolved, ...ecosystemNavGroups()] : [resolved];
+});
 
 /** Every navigation link in sidebar order: the pager's reading order. */
 export const SITE_NAV_ORDER: readonly (NavLink & { href: string })[] = SITE_NAV_GROUPS.flatMap(

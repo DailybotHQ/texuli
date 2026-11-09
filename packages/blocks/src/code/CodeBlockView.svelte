@@ -103,11 +103,12 @@ const bar = $derived<CodeBlockBarContext>({
 </script>
 
 {#if !check.ok}
-  <p class="tx-block tx-block-invalid" role="note" data-tx-block="invalid">{text.invalid}</p>
+  <p class="tx-block tx-block-invalid" role="note" data-tx-block="invalid" data-tx-component="blocks-code">{text.invalid}</p>
 {:else}
   <figure
     class="tx-block tx-code"
     data-tx-block="code"
+    data-tx-component="blocks-code"
     data-lang={lang}
     data-grammar={lang === undefined ? undefined : (resolveCodeLanguage(lang) ?? 'none')}
     data-tokenized={tokenized || undefined}

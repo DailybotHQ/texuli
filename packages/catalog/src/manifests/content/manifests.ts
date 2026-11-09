@@ -1,5 +1,6 @@
 import { manifestData } from '../../manifest/data.ts';
 import type { CatalogManifest } from '../../manifest/types.ts';
+import { stampContentAxes } from './axes.ts';
 import { CONTENT_PROP_NAMES, type ContentManifestId } from './prop-names.ts';
 
 type PropKind = CatalogManifest['props'][number]['kind'];
@@ -218,6 +219,7 @@ function propSchemas(id: ContentManifestId): CatalogManifest['props'] {
       kind: propKind(id, name),
       ...(required.has(name) ? { required: true } : {}),
       ...(enumValues ? { enumValues } : {}),
+      ...(id === 'charts-sparkline' && name === 'variant' ? { default: 'line' } : {}),
       ...(name.startsWith('on') || EVENT_PROPS.has(name)
         ? {
             description:
@@ -390,7 +392,9 @@ function makeManifest(id: ContentManifestId): CatalogManifest {
 }
 
 export const CONTENT_MANIFESTS = /* @__PURE__ */ Object.freeze(
-  /* @__PURE__ */ (Object.keys(CONTENT_PROP_NAMES) as ContentManifestId[]).map(makeManifest)
+  /* @__PURE__ */ (Object.keys(CONTENT_PROP_NAMES) as ContentManifestId[]).map((id) =>
+    stampContentAxes(makeManifest(id))
+  )
 );
 
 export const CONTENT_PROP_NAME_MAP = CONTENT_PROP_NAMES;

@@ -10,6 +10,14 @@
  */
 
 export {
+  ALLOW_MANIFEST_SPEC_VERSION,
+  type CompileAllowManifestOptions,
+  compileAllowManifest,
+  type DesignSystemAllowManifest,
+  type DesignSystemAllowManifestEntry,
+  type DesignSystemAllowManifestLibraryEntry,
+} from './allow-manifest.ts';
+export {
   type CompileDesignSystemOptions,
   type CompiledDesignSystem,
   compileDesignSystem,

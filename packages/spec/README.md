@@ -16,11 +16,27 @@ by Texuli's Kotlin Multiplatform twin. The package is framework-free: no
 DOM, no Svelte, no Node APIs and no runtime dependencies.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.14.4`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.14.0`) may contain breaking
-> changes, so pin the exact version or use `^0.14.0`, which accepts only 0.14.x.
+> published to npm as `0.15.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.15.0`) may contain breaking
+> changes, so pin the exact version or use `^0.15.0`, which accepts only 0.15.x.
 
-> **New in `0.14.0`.** `@texuli/spec@0.14.0` carries **spec 0.12.0**
+> **New in `0.15.0`.** `@texuli/spec@0.15.0` carries **spec 0.13.0**
+> (digest
+> `37897e1b4d669ca0f32ba49b4960c921e860c1bacb38a9f29a1072389708ffae`):
+> locked design systems (ADR-032). The design-system document gains the
+> optional `allow` (catalog ids, `<ns>:<id>` included, with their enabled
+> variants, sizes, tones, densities and states), `library` and `approval`
+> sections, validated with stable codes; `checkDesignSystemAllow`,
+> `designSystemContentHash`, `approveDesignSystem` and
+> `initLockedDesignSystem` are in `@texuli/spec/design-system`, with the
+> `data-tx-*` root attribute names and `dsRootAttributes`. Catalog components
+> gain optional `axes`, `states` and `imports`; host catalog extensions
+> (`$defs.extension`) merge through `mergeCatalogs`. The blueprint allow check
+> and the contract schemas (allow manifest, ds-check report, design-system
+> bundle) ship in it as in development (completed in `0.16.0`). A stamp-only
+> migration from `0.12.0`; every 0.12.0 blueprint and document stays valid.
+
+> **New in `0.14.0`.** `@texuli/spec@0.14.0` carried **spec 0.12.0**
 > (digest
 > `049c93b4105fb765c2db5ff20272494f99fce52552aafaf85e00789fc1747a14`): the
 > app-tier catalog ids `avatar-group-grid` and `code-field`, the `srcDark`
@@ -108,7 +124,7 @@ import {
   validateInstance,
 } from '@texuli/spec';
 
-SPEC_VERSION;                         // the spec version: '0.12.0' in @texuli/spec@0.14.4
+SPEC_VERSION;                         // the spec version: '0.13.0' in @texuli/spec@0.15.0
 SPEC_COMPONENT_IDS.includes('alert'); // true: the closed component vocabulary
 
 // The dialect validator: a closed subset of JSON Schema 2020-12.
@@ -140,7 +156,7 @@ import { type Schema, type SpecCatalog, validateBlueprint } from '@texuli/spec';
 import { migrateBlueprint } from '@texuli/spec/migrate';
 import { validateWorkflowGraph } from '@texuli/spec/workflow';
 
-const migrated = migrateBlueprint(blueprint); // 0.2.0 → … → 0.11.0 → 0.12.0; never throws
+const migrated = migrateBlueprint(blueprint); // 0.2.0 → … → 0.12.0 → 0.13.0; never throws
 const result = validateBlueprint(migrated.blueprint, {
   blueprintSchema: blueprintSchemaJson as Schema,
   catalog: componentsJson as SpecCatalog,
@@ -311,9 +327,12 @@ written for (`spec`; omitted means 0.2.0). `migrateBlueprint`
 envelope up to the current spec with pure, per-version steps
 (`src/migrations/`: `0.2.0 → 0.3.0`, `0.3.0 → 0.4.0`, `0.4.0 → 0.5.0`,
 `0.5.0 → 0.6.0`, `0.6.0 → 0.7.0`, `0.7.0 → 0.8.0`, `0.8.0 → 0.9.0`,
-`0.9.0 → 0.10.0`, `0.10.0 → 0.11.0` and `0.11.0 → 0.12.0`, each of which
+`0.9.0 → 0.10.0`, `0.10.0 → 0.11.0`, `0.11.0 → 0.12.0` and `0.12.0 → 0.13.0`, each of which
 only stamps `spec`); a compatible version
-range is planned, not built. `@texuli/spec@0.14.4` carries spec `0.12.0` (digest
+range is planned, not built. `@texuli/spec@0.15.0` carries spec `0.13.0` (digest
+`37897e1b4d669ca0f32ba49b4960c921e860c1bacb38a9f29a1072389708ffae`): locked
+design systems and catalog axes, states, imports and extensions (above).
+`@texuli/spec@0.14.0` to `0.14.4` carried spec `0.12.0` (digest
 `049c93b4105fb765c2db5ff20272494f99fce52552aafaf85e00789fc1747a14`): two
 app-tier catalog ids, the `media-image` dark source, the `data-timeline`
 groups, markers and selection with the `collapse` event, and the
@@ -368,7 +387,8 @@ conformance harness) are in
 - Data-source bindings (spec 0.8.0; new in `0.8.0`):
   [source.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/source.md)
 - The design-system document (spec 0.10.0; new in `0.10.0`; extended in
-  spec 0.11.0, new in `0.13.0`, and spec 0.12.0, new in `0.14.0`):
+  spec 0.11.0, new in `0.13.0`, spec 0.12.0, new in `0.14.0`, and spec 0.13.0
+  with the locked sections, new in `0.15.0`):
   [design-system.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/design-system.md)
 - The Kotlin Multiplatform twin that consumes the generated models:
   [native/README.md](https://github.com/DailybotHQ/texuli/blob/main/native/README.md)

@@ -1,0 +1,24 @@
+{
+  "description": "Prototype-polluting keys at the root, in allow and in a library entry: refused, never merged into Object.prototype.",
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "__proto__": { "polluted": true },
+    "constructor": { "prototype": { "polluted": true } },
+    "allow": { "__proto__": {}, "button": { "__proto__": { "polluted": true } } },
+    "library": [
+      {
+        "id": "pricing-card",
+        "name": "Pricing card",
+        "purpose": "One plan.",
+        "version": "0.1.0",
+        "status": "draft",
+        "composes": ["card"],
+        "__proto__": { "polluted": true }
+      }
+    ]
+  }
+}

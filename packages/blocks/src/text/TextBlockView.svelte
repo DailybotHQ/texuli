@@ -39,11 +39,11 @@ const avatarSrc = (source: string | undefined) => {
 </script>
 
 {#if !check.ok}
-  <p class="tx-block tx-block-invalid" role="note" data-tx-block="invalid">{text.invalid}</p>
+  <p class="tx-block tx-block-invalid" role="note" data-tx-block="invalid" data-tx-component="blocks-text">{text.invalid}</p>
 {:else}
   {@const b = check.block}
   {#if b.type === 'heading'}
-    <hgroup class="tx-block tx-heading" data-tx-block="heading" data-tone={b.tone} data-align={b.align}>
+    <hgroup class="tx-block tx-heading" data-tx-block="heading" data-tx-component="blocks-text" data-tone={b.tone} data-align={b.align}>
       {#if b.eyebrow}<p class="tx-heading-eyebrow">{b.eyebrow}</p>{/if}
       <svelte:element this={`h${b.level}`} class="tx-heading-title" id={b.id}>{b.text}</svelte:element>
       {#if b.subtitle}<p class="tx-heading-subtitle">{b.subtitle}</p>{/if}
@@ -52,6 +52,7 @@ const avatarSrc = (source: string | undefined) => {
     <div
       class="tx-block tx-text"
       data-tx-block="text"
+      data-tx-component="blocks-text"
       data-tone={b.tone}
       data-size={b.size}
       data-align={b.align}
@@ -64,6 +65,7 @@ const avatarSrc = (source: string | undefined) => {
       this={marker === 'number' ? 'ol' : 'ul'}
       class="tx-block tx-list"
       data-tx-block="list"
+      data-tx-component="blocks-text"
       data-tone={b.tone}
       data-style={marker}
     >
@@ -82,7 +84,7 @@ const avatarSrc = (source: string | undefined) => {
     </svelte:element>
   {:else if b.type === 'quote'}
     {@const portrait = avatarSrc(b.avatar)}
-    <figure class="tx-block tx-quote" data-tx-block="quote" data-tone={b.tone}>
+    <figure class="tx-block tx-quote" data-tx-block="quote" data-tx-component="blocks-text" data-tone={b.tone}>
       <blockquote class="tx-quote-body"><RichText source={b.quote} labels={text} /></blockquote>
       {#if b.cite || b.role || portrait}
         <figcaption class="tx-quote-cite">
@@ -106,7 +108,7 @@ const avatarSrc = (source: string | undefined) => {
     </figure>
   {:else}
     {@const tone = b.tone ?? 'neutral'}
-    <div class="tx-block tx-callout" role="note" data-tx-block="callout" data-tone={tone}>
+    <div class="tx-block tx-callout" role="note" data-tx-block="callout" data-tx-component="blocks-text" data-tone={tone}>
       {#if text.tones[tone] || b.title || b.icon}
         <p class="tx-callout-head">
           <BlockIcon name={b.icon} {resolveIcon} class="tx-callout-icon" />

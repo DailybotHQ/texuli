@@ -389,6 +389,22 @@ function propSchemaExpr(schema: SpecPropSchema): string {
   return `SpecPropSchema(${args.join(', ')})`;
 }
 
+/** A component's styling axes (spec 0.13.0) as a `SpecAxes` constructor call. */
+function axesExpr(axes: NonNullable<SpecCatalog['components'][number]['axes']>): string {
+  const args: string[] = [];
+  for (const name of ['variant', 'size', 'tone', 'density'] as const) {
+    const axis = axes[name];
+    if (!axis) continue;
+    args.push(
+      `${name} = SpecAxis(prop = ${kotlinString(axis.prop)}, values = listOf(${axis.values.map(kotlinString).join(', ')}), default = ${kotlinString(axis.default)})`
+    );
+  }
+  return `SpecAxes(${args.join(', ')})`;
+}
+
+/** Components per generated `partN()` function of `SpecVocabulary` (the JVM method limit). */
+export const VOCABULARY_CHUNK = 16;
+
 /** The catalog vocabulary as a Kotlin registry of `SpecComponent` values. */
 export function vocabularyToKotlin(catalog: SpecCatalog, stamp: Stamp): string {
   const ids = catalog.components.map((c) => c.id);
@@ -401,9 +417,12 @@ export function vocabularyToKotlin(catalog: SpecCatalog, stamp: Stamp): string {
     'object SpecVocabulary {',
     `${INDENT}const val CATALOG_HASH: String = ${kotlinString(catalog.catalogHash)}`,
     '',
-    `${INDENT}val components: List<SpecComponent> = listOf(`,
   ];
+  // Each component's lines start at one of these indexes (chunked below).
+  const head = lines.length;
+  const starts: number[] = [];
   for (const c of catalog.components) {
+    starts.push(lines.length);
     lines.push(
       `${INDENT}${INDENT}SpecComponent(`,
       `${INDENT}${INDENT}${INDENT}id = ${kotlinString(c.id)},`,
@@ -455,12 +474,48 @@ export function vocabularyToKotlin(catalog: SpecCatalog, stamp: Stamp): string {
         `${INDENT}${INDENT}${INDENT}sourceable = listOf(${c.sourceable.map(kotlinString).join(', ')}),`
       );
     }
+    // Spec 0.13.0 (ADR-032): emitted only when present, so older catalogs stay byte-stable.
+    if (c.axes) lines.push(`${INDENT}${INDENT}${INDENT}axes = ${axesExpr(c.axes)},`);
+    if (c.states) {
+      lines.push(
+        `${INDENT}${INDENT}${INDENT}states = listOf(${c.states.map((s) => `SpecStateName.${upperSnake(s)}`).join(', ')}),`
+      );
+    }
+    if (c.imports && c.imports.length > 0) {
+      const items = c.imports.map(
+        (item) =>
+          `SpecImport(module = ${kotlinString(item.module)}, exports = listOf(${item.exports.map(kotlinString).join(', ')}))`
+      );
+      lines.push(`${INDENT}${INDENT}${INDENT}imports = listOf(${items.join(', ')}),`);
+    }
     if (c.deprecated)
       lines.push(`${INDENT}${INDENT}${INDENT}deprecated = ${deprecationExpr(c.deprecated)},`);
     lines.push(`${INDENT}${INDENT}),`);
   }
+  // A JVM method holds at most 64 KB of bytecode, and one listOf over every component (with
+  // its props, axes and states) outgrows a class initializer. Each chunk is its own method.
+  const body = lines.splice(head);
+  const chunks: string[][] = [];
+  for (let i = 0; i < starts.length; i += VOCABULARY_CHUNK) {
+    const from = (starts[i] as number) - head;
+    const to =
+      i + VOCABULARY_CHUNK < starts.length
+        ? (starts[i + VOCABULARY_CHUNK] as number) - head
+        : body.length;
+    chunks.push(body.slice(from, to));
+  }
   lines.push(
-    `${INDENT})`,
+    `${INDENT}val components: List<SpecComponent> = ${chunks.length ? chunks.map((_, i) => `part${i}()`).join(' + ') : 'emptyList()'}`
+  );
+  chunks.forEach((chunk, i) => {
+    lines.push(
+      '',
+      `${INDENT}private fun part${i}(): List<SpecComponent> = listOf(`,
+      ...chunk,
+      `${INDENT})`
+    );
+  });
+  lines.push(
     '',
     `${INDENT}fun component(id: String): SpecComponent? = components.firstOrNull { it.id == id }`,
     '}',

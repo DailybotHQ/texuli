@@ -30,5 +30,5 @@ const hasLabel = $derived(typeof label === 'string' && label.length > 0);
 </script>
 
 <span bind:this={ref} class={badgeClass({ variant, class: className })} data-tx-badge data-variant={variant} {...rest}
-  >{#if hasLabel}{label}{:else}{@render children?.()}{/if}</span
+   data-tx-component="badge" data-tx-variant={variant}>{#if hasLabel}{label}{:else}{@render children?.()}{/if}</span
 >

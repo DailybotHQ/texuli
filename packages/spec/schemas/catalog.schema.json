@@ -20,12 +20,130 @@
   "required": ["catalogHash", "components"],
   "additionalProperties": false,
   "$defs": {
+    "extension": {
+      "description": "A host catalog extension (spec 0.13.0, ADR-032): the host library's own components in the catalog's component shape, ids namespaced <namespace>:<id>, each composing catalog ids. mergeCatalogs checks it against the Texuli catalog.",
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "const": "texuli/catalog-extension"
+        },
+        "version": {
+          "type": "integer",
+          "const": 1
+        },
+        "namespace": {
+          "description": "2 to 16 lowercase letters and digits; texuli is reserved.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]{1,15}$"
+        },
+        "components": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/component"
+          }
+        }
+      },
+      "required": ["format", "version", "namespace", "components"],
+      "additionalProperties": false
+    },
+    "axes": {
+      "description": "The styling axes of a component (ADR-032, spec 0.13.0): each is derived from one of its enum props, so values equal that prop's enumValues and default is one of them. Omitted: the component has no styling axis.",
+      "type": "object",
+      "properties": {
+        "variant": {
+          "$ref": "#/$defs/axis"
+        },
+        "size": {
+          "$ref": "#/$defs/axis"
+        },
+        "tone": {
+          "$ref": "#/$defs/axis"
+        },
+        "density": {
+          "$ref": "#/$defs/axis"
+        }
+      },
+      "additionalProperties": false
+    },
+    "axis": {
+      "description": "One styling axis: the enum prop that drives it, its values (the prop's enumValues, in order) and the value used when the prop is omitted.",
+      "type": "object",
+      "properties": {
+        "prop": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+        },
+        "values": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          }
+        },
+        "default": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      },
+      "required": ["prop", "values", "default"],
+      "additionalProperties": false
+    },
+    "import": {
+      "description": "One module specifier a host or checker can import, and the export names that belong to this catalog id (the component, its compound parts, and co-located helpers). The subpath and the root barrel are listed separately when both export the name.",
+      "type": "object",
+      "properties": {
+        "module": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(@texuli/[a-z0-9-]+|texuli)(/[A-Za-z0-9._-]+)*$"
+        },
+        "exports": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+          }
+        }
+      },
+      "required": ["module", "exports"],
+      "additionalProperties": false
+    },
+    "stateName": {
+      "description": "The closed list of observable states (ADR-032, spec 0.13.0).",
+      "type": "string",
+      "enum": [
+        "hover",
+        "focus-visible",
+        "active",
+        "disabled",
+        "loading",
+        "invalid",
+        "selected",
+        "expanded",
+        "checked",
+        "open",
+        "readonly"
+      ]
+    },
     "component": {
       "type": "object",
       "properties": {
         "id": {
+          "description": "A Texuli catalog id (kebab-case), or in a host extension (spec 0.13.0) a namespaced <ns>:<id>.",
           "type": "string",
-          "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+          "pattern": "^(?=.{1,64}$)([a-z][a-z0-9]{1,15}:)?[a-z][a-z0-9]*(-[a-z0-9]+)*$"
         },
         "label": {
           "type": "string",
@@ -87,6 +205,35 @@
           "items": {
             "type": "string",
             "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+          }
+        },
+        "axes": {
+          "$ref": "#/$defs/axes"
+        },
+        "composes": {
+          "description": "Extension components only (spec 0.13.0): catalog ids this host component is built from; each resolves in the merged catalog. Empty means a leaf built from host primitives.",
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 32,
+          "items": {
+            "type": "string",
+            "pattern": "^(?=.{1,64}$)([a-z][a-z0-9]{1,15}:)?[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+          }
+        },
+        "states": {
+          "description": "The observable states the component paints (ADR-032, spec 0.13.0), from the closed stateName list, each at most once. Omitted: no observable state.",
+          "type": "array",
+          "maxItems": 11,
+          "items": {
+            "$ref": "#/$defs/stateName"
+          }
+        },
+        "imports": {
+          "description": "Module specifiers and export names that belong to this catalog id, including compound parts. A static checker maps any of these imports to this id. Omitted: the id has no public package export.",
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/import"
           }
         },
         "deprecated": {

@@ -1,0 +1,18 @@
+{
+  "description": "Bidi overrides, zero-width and control characters in names, ids and the approver: refused as invalid values.",
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harbor\u200bline",
+    "version": "1.0.0",
+    "name": "Harbor\u202Eenil",
+    "allow": { "butto\u200dn": {}, "card": { "variants": ["fl\u0000at"] } },
+    "approval": {
+      "status": "approved",
+      "approvedBy": "Reviewer\u2066\u0007",
+      "approvedAt": "2026-11-09T14:30:00Z",
+      "version": "1.0.0",
+      "contentHash": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  }
+}

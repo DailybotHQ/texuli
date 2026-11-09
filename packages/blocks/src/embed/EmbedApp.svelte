@@ -99,7 +99,7 @@ function onFrameKeydown(event: KeyboardEvent) {
 onDestroy(close);
 </script>
 
-<section class="tx-embed-app" data-tx-block="embed-app" data-tx-embed-started={started} aria-label={block.title}>
+<section class="tx-embed-app" data-tx-block="embed-app" data-tx-component="blocks-embed" data-tx-embed-started={started} aria-label={block.title}>
   <header class="tx-embed-header">
     <h3>{block.title}</h3>
     {#if started}<button type="button" onclick={close}>{labels.close}</button>{/if}

@@ -25,7 +25,7 @@ let safeStep = $derived(
 );
 </script>
 
-<div class="tx-player-control tx-player-control--slider" data-tx-player-control="slider">
+<div class="tx-player-control tx-player-control--slider" data-tx-component="control-slider" data-tx-player-control="slider">
   <label for={id}>{label}</label>
   <input
     {id}

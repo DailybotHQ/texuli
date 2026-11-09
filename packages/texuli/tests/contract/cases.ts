@@ -49,6 +49,8 @@ export const EXCLUDED: Record<string, string> = {
  */
 export const EXCLUDED_PREFIXES: Record<string, string> = {
   'layouts/': 'planned: the page layouts join the contract in a follow-up task',
+  'ds-kit/':
+    'planned: the design-system kit (ADR-032) is a read-only page of sections, not a control; it joins the contract once its sections land (T4)',
 };
 
 /** One case per exported rendering component, each mounted in its family harness. */
@@ -109,6 +111,10 @@ export const CASES: ContractCase[] = [
   { key: 'components/stat/Stat', harness: DisplayContract },
   { key: 'components/timeline/Timeline', harness: DisplayContract },
   { key: 'components/timeline/TimelineItem', harness: DisplayContract },
+  { key: 'components/typography/Heading', harness: DisplayContract },
+  { key: 'components/typography/Text', harness: DisplayContract },
+  { key: 'components/typography/Prose', harness: DisplayContract },
+  { key: 'components/typography/Box', harness: DisplayContract },
   { key: 'components/field/Form', harness: FormsContract },
   {
     key: 'components/field/Field',

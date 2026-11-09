@@ -1,0 +1,199 @@
+---
+/**
+ * The shell of every `/solutions/<slug>/` landing (PLAN_015 T-f-layout; ADR-027, ADR-030,
+ * ADR-031). It sits on `BaseLayout` in landing mode (the landing header, a full-width main,
+ * no sidebar) and draws, in the order documented in `./types.ts`:
+ *
+ *   breadcrumbs → hero → sticky subnav → demo → stories → how → quickstart → recipes
+ *   (optional) → agents → platforms → next steps
+ *
+ * Each block arrives through the named slot of its section, so the blocks keep their own
+ * headings and props while the layout owns the anchor ids, the subnav, the breadcrumb
+ * trail and the band rhythm: the home's tokens, alternating tints, hairlines, a closing
+ * ground band and the CSS-only scroll reveal. `checkLandingContent` runs at build time:
+ * inconsistent content fails the build instead of shipping.
+ *
+ * Islands and CSP (ADR-030): the layout ships no script. The `demo` slot is the landing's
+ * only island slot: the page passes its demo frame, which mounts one `client:visible`
+ * island. The build-time CSP integration (`src/components/security/csp.ts`) hashes Astro's
+ * island boot code and the island's injected Svelte styles per route, so nothing here needs
+ * `unsafe-inline`. Every other slot must be static markup.
+ */
+import type { SolutionEntry } from '../../../data/solutions/schema.ts';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SolutionBreadcrumbs from './subnav/SolutionBreadcrumbs.astro';
+import SolutionSubnav from './subnav/SolutionSubnav.astro';
+import { SOLUTION_SECTION_IDS, solutionSections, solutionSectionTones } from './subnav/sections.ts';
+import { checkLandingContent, type SolutionLandingContent } from './types.ts';
+
+interface Props {
+  entry: SolutionEntry;
+  content: SolutionLandingContent;
+  /** Defaults to "<name> — Texuli Solutions". */
+  title?: string;
+  /** Defaults to the entry's tagline. */
+  description?: string;
+  /** Structured data (schema.org), code-authored: see src/lib/schema.ts. */
+  jsonLd?: Record<string, unknown>;
+}
+
+const { entry, content, title, description, jsonLd } = Astro.props;
+const issues = checkLandingContent(entry, content);
+if (issues.length > 0) {
+  throw new Error(`Solution landing "${entry.slug}" is inconsistent: ${issues.join('; ')}`);
+}
+const sections = solutionSections(content);
+const tones = solutionSectionTones(sections);
+const ids = SOLUTION_SECTION_IDS;
+---
+
+<BaseLayout
+  title={title ?? `${entry.name} — Texuli Solutions`}
+  description={description ?? entry.tagline}
+  landing
+  jsonLd={jsonLd}
+>
+  <div
+    class="landing solution"
+    data-tx-landing=""
+    data-solution={entry.slug}
+    data-solution-status={entry.status}
+  >
+    <SolutionBreadcrumbs entry={entry} />
+    <div id={ids.hero} class="solution-section solution-section--hero" data-solution-section="hero">
+      <slot name="hero" />
+    </div>
+    <SolutionSubnav entry={entry} content={content} />
+    <div
+      id={ids.demo}
+      class="solution-section"
+      data-solution-section="demo"
+      data-tone={tones.demo}
+      data-solution-island=""
+    >
+      <slot name="demo" />
+    </div>
+    <div id={ids.stories} class="solution-section" data-solution-section="stories" data-tone={tones.stories}>
+      <slot name="stories" />
+    </div>
+    <div id={ids.how} class="solution-section" data-solution-section="how" data-tone={tones.how}>
+      <slot name="how" />
+    </div>
+    <div
+      id={ids.quickstart}
+      class="solution-section"
+      data-solution-section="quickstart"
+      data-tone={tones.quickstart}
+    >
+      <slot name="quickstart" />
+    </div>
+    {
+      content.recipes && (
+        <div id={ids.recipes} class="solution-section" data-solution-section="recipes" data-tone={tones.recipes}>
+          <slot name="recipes" />
+        </div>
+      )
+    }
+    <div id={ids.agents} class="solution-section" data-solution-section="agents" data-tone={tones.agents}>
+      <slot name="agents" />
+    </div>
+    <div
+      id={ids.platforms}
+      class="solution-section"
+      data-solution-section="platforms"
+      data-tone={tones.platforms}
+    >
+      <slot name="platforms" />
+    </div>
+    <div id={ids.next} class="solution-section" data-solution-section="next" data-tone={tones.next}>
+      <slot name="next" />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /*
+   * The home's landing tokens (components/sections/home/home.css), so every shared block
+   * reads the same accent, ground and tint as the home bands: violet accent, lilac text
+   * accent in the dark theme, the lavender-to-peach ground, and site tokens in high contrast.
+   */
+  .solution {
+    --solution-subnav-height: 3rem;
+    --home-accent: #6d4aff;
+    --home-accent-text: #5b3ae6;
+    --home-accent-ink: #ffffff;
+    --home-warm: #ff8a4c;
+    --home-ground: linear-gradient(160deg, #f4f0ff 0%, #fbf8ff 45%, #fff4ee 100%);
+    --home-tint: color-mix(in oklab, #6d4aff 6%, var(--tx-background));
+    --solution-band-raised: var(--home-tint);
+  }
+  :global(:root[data-tx-mode='dark']) .solution {
+    --home-accent-text: #b9a8ff;
+    --home-ground:
+      radial-gradient(120% 90% at 85% 0%, rgb(109 74 255 / 0.22), transparent 60%),
+      var(--tx-background);
+    --home-tint: color-mix(in oklab, #6d4aff 10%, var(--tx-background));
+  }
+  :global(:root[data-tx-mode='high-contrast']) .solution {
+    --home-accent: var(--tx-foreground);
+    --home-accent-text: var(--tx-foreground);
+    --home-accent-ink: var(--tx-background);
+    --home-ground: var(--tx-background);
+    --home-tint: var(--tx-background);
+  }
+  /* Full-width bands with the home's block rhythm; a hairline separates each band. */
+  .solution-section {
+    /* Anchors land below the sticky header and the sticky subnav. */
+    scroll-margin-block-start: calc(var(--site-header-height) + var(--solution-subnav-height) + 0.75rem);
+    padding-block: clamp(3rem, 8vw, 6rem);
+    border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 60%, transparent);
+  }
+  .solution-section--hero {
+    padding-block: 0;
+    border-block-end: 0;
+  }
+  .solution-section[data-tone='raised'] {
+    background: var(--solution-band-raised);
+  }
+  /* The closing band takes the hero's ground, like the home's two-path close. */
+  .solution-section[data-solution-section='next'] {
+    background: var(--home-ground);
+    border-block-end: 0;
+  }
+  /*
+   * Scroll reveal, as on the home: each band after the hero rises 1.5rem as it enters the
+   * viewport. CSS only (no island), opt-in motion behind prefers-reduced-motion and a
+   * scroll-timeline support check, and translate only (no opacity), so nothing is ever
+   * hidden or low-contrast. The demo island is left still: a transform would become the
+   * containing block of anything it positions as fixed.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .solution-section:not(.solution-section--hero):not([data-solution-island]) {
+        /* Longhands on purpose (see pages/index.astro): the minifier would fold a full
+           shorthand plus animation-timeline into one shorthand Chromium rejects. */
+        animation-name: solution-rise;
+        animation-timing-function: var(--site-motion-linked-easing);
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 60%;
+      }
+    }
+  }
+  @keyframes solution-rise {
+    from {
+      translate: 0 1.5rem;
+    }
+    to {
+      translate: 0 0;
+    }
+  }
+  @media (forced-colors: active) {
+    .solution-section,
+    .solution-section[data-tone='raised'],
+    .solution-section[data-solution-section='next'] {
+      background: Canvas;
+      border-block-end-color: CanvasText;
+    }
+  }
+</style>

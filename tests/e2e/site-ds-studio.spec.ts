@@ -24,6 +24,7 @@ import { extname, join, normalize, resolve } from 'node:path';
 import { deflateRawSync } from 'node:zlib';
 import { expect, type Locator, type Page, test } from '@playwright/test';
 import { dtcgFixture, tokensStudioFixture } from '@texuli/tokens/design-system/fixtures';
+import { designSystemContentHash } from '../../packages/spec/src/design-system/hash.ts';
 import { axeViolations } from './support/site.ts';
 
 const DIST = resolve('apps/website/dist');
@@ -323,6 +324,59 @@ test('every export downloads valid content', async ({ page }) => {
   await expect(page.locator('[data-tx-ds-export-note]')).toContainText(
     'Downloaded acme.email.html'
   );
+  expect(await violations(page)).toEqual([]);
+});
+
+test('authors a locked system from the catalog, previews it, and exports the CLI content hash', async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  const network = await watch(page);
+  await open(page);
+  await tap(page.locator('[data-tx-locked-studio-open]'));
+  const locked = page.locator('[data-tx-locked-studio]');
+  await expect(locked).toBeVisible();
+  await expect(locked.locator('[data-tx-locked-approval]')).toContainText('Approval status: Draft');
+
+  await locked.locator('#locked-id').fill('studio-test');
+  await locked.locator('#locked-name').fill('Studio test brand');
+  await locked.locator('#locked-component').selectOption('button');
+  await tap(locked.locator('[data-tx-locked-add-component]'));
+  await tap(locked.locator('[data-tx-locked-add-library]'));
+  await tap(locked.locator('[data-tx-locked-validate]'));
+  await expect(locked.locator('[data-tx-locked-status]')).toContainText('Draft validates locally');
+  await expect(locked.locator('[data-tx-locked-kit-preview]')).toBeVisible();
+  await expect(locked.locator('[data-tx-locked-kit-preview]')).toContainText('Components');
+
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    tap(locked.locator('[data-tx-locked-export]')),
+  ]);
+  expect(download.suggestedFilename()).toBe('studio-test.design-system.json');
+  const exported = JSON.parse(
+    await locked.locator('[data-tx-locked-export-text]').inputValue()
+  ) as {
+    approval: { contentHash: string; status: string };
+    allow: Record<string, { variants?: string[] }>;
+    library: Array<{ status: string; composes: string[] }>;
+  };
+  expect(exported.approval.status).toBe('draft');
+  expect(exported.allow.button?.variants).toContain('default');
+  expect(exported.library[0]?.status).toBe('draft');
+  expect(exported.library[0]?.composes).toEqual(['button']);
+  expect(exported.approval.contentHash).toBe(designSystemContentHash(exported));
+  expect(network.foreign).toEqual([]);
+  expect(await violations(page)).toEqual([]);
+  expect(await axeViolations(page)).toEqual([]);
+
+  await locked.locator('#locked-import').setInputFiles({
+    name: 'hostile.design-system.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify({ ...exported, extends: 'https://evil.example/theme' })),
+  });
+  await expect(locked.locator('[data-tx-locked-status]')).toContainText('Import refused');
+  await expect(locked.locator('[data-tx-locked-issues]')).toContainText('url-refused');
+  expect(network.foreign).toEqual([]);
   expect(await violations(page)).toEqual([]);
 });
 

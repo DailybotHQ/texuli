@@ -1,0 +1,150 @@
+---
+/**
+ * The compatibility summary on /native/: the platform rows and per-group counts, both
+ * derived from the generated parity data, with a link to the full component-by-component
+ * matrix on its own static route. Static markup, no island; links pass the URL policy.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../../foundation/site.ts';
+import {
+  NATIVE_MATRIX_GROUP_COUNTS,
+  NATIVE_MATRIX_PLATFORMS,
+  NATIVE_MATRIX_ROUTE,
+  NATIVE_MATRIX_TOTALS,
+  NATIVE_MATRIX_VERSION,
+  nativeMatrixKey,
+} from './matrix-data.ts';
+
+const base = import.meta.env.BASE_URL;
+const matrixHref = (() => {
+  const safe = safeHref(NATIVE_MATRIX_ROUTE, 'developer');
+  return safe === undefined ? undefined : withBase(base, safe);
+})();
+---
+
+<section
+  class="native-matrix-summary"
+  aria-labelledby="native-matrix-title"
+  data-tx-native-matrix-summary=""
+  data-spec-version={NATIVE_MATRIX_VERSION}
+>
+  <div class="native-matrix-summary__heading">
+    <p class="native-matrix-summary__eyebrow">Generated from parity and trace files · Spec {NATIVE_MATRIX_VERSION}</p>
+    <h2 id="native-matrix-title">Compatibility, honestly</h2>
+    <p>
+      Statuses come from the versioned native parity catalog and checked-in conformance traces.{' '}
+      {NATIVE_MATRIX_TOTALS.painted} of {NATIVE_MATRIX_TOTALS.catalog} catalog components paint in
+      Compose Desktop; every other one paints a visible placeholder.
+    </p>
+  </div>
+
+  <ul class="native-matrix-summary__platforms" role="list" aria-label="Platform status">
+    {
+      NATIVE_MATRIX_PLATFORMS.map((platform) => (
+        <li data-platform-status={platform.status}>
+          <div class="native-matrix-summary__platform-heading">
+            <h3>{platform.target}</h3>
+            <span class="native-matrix-summary__badge" data-status={nativeMatrixKey(platform.status)}>
+              {platform.status}
+            </span>
+          </div>
+          <p>{platform.detail}</p>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div
+    class="native-matrix-summary__table-wrap"
+    tabindex="0"
+    role="region"
+    aria-label="Scrollable compatibility counts by group"
+  >
+    <table class="native-matrix-summary__table">
+      <caption>Catalog components by group: how many paint in Compose Desktop and how many have a conformance trace.</caption>
+      <thead>
+        <tr>
+          <th scope="col">Group</th>
+          <th scope="col">Components</th>
+          <th scope="col">Paint in Compose Desktop</th>
+          <th scope="col">Conformance traced</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          NATIVE_MATRIX_GROUP_COUNTS.map((row) => (
+            <tr data-group={nativeMatrixKey(row.group)}>
+              <th scope="row">{row.group}</th>
+              <td>{row.total}</td>
+              <td>{row.painted}</td>
+              <td>{row.traced}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  {
+    matrixHref && (
+      <p class="native-matrix-summary__more">
+        <a href={matrixHref} data-tx-native-matrix-link="">
+          See every component in the full compatibility matrix
+          <span aria-hidden="true">&nbsp;→</span>
+        </a>
+      </p>
+    )
+  }
+</section>
+
+<style>
+  .native-matrix-summary {
+    display: grid;
+    gap: 1.25rem;
+    max-inline-size: 78rem;
+    margin-inline: auto;
+    padding: clamp(2.5rem, 7vw, 5rem) clamp(1rem, 4vw, 1.5rem);
+    color: var(--tx-foreground, CanvasText);
+  }
+  .native-matrix-summary__heading { max-inline-size: 48rem; }
+  .native-matrix-summary__heading > p:last-child { color: var(--tx-muted-foreground, GrayText); line-height: 1.55; }
+  .native-matrix-summary__eyebrow {
+    margin: 0 0 0.45rem;
+    color: var(--tx-muted-foreground, GrayText);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .native-matrix-summary h2 { margin: 0; font-size: clamp(1.65rem, 4vw, 2.4rem); line-height: 1.15; }
+  .native-matrix-summary h3 { margin: 0; font-size: 1rem; }
+  .native-matrix-summary__platforms {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .native-matrix-summary__platforms li {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    min-inline-size: 0;
+    padding: 0.9rem;
+    border: 1px solid var(--tx-border, GrayText);
+    border-radius: var(--tx-radius, 0.75rem);
+    background: var(--tx-surface, Canvas);
+  }
+  .native-matrix-summary__platforms p { margin: 0; color: var(--tx-muted-foreground, GrayText); line-height: 1.5; }
+  .native-matrix-summary__platform-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+  .native-matrix-summary__badge { display: inline-flex; padding: 0.15rem 0.5rem; border: 1px solid var(--tx-border, GrayText); border-radius: 999px; font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
+  .native-matrix-summary__badge[data-status='partial'], .native-matrix-summary__badge[data-status='experimental'] { border-style: dashed; }
+  .native-matrix-summary__badge[data-status='planned'], .native-matrix-summary__badge[data-status='unsupported'] { color: var(--tx-muted-foreground, GrayText); }
+  .native-matrix-summary__table-wrap { max-inline-size: 100%; overflow: auto; border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-radius, 0.75rem); }
+  .native-matrix-summary__table-wrap:focus-visible { outline: 2px solid var(--tx-ring, Highlight); outline-offset: 3px; }
+  .native-matrix-summary__table { inline-size: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .native-matrix-summary__table caption { padding: 0.75rem; color: var(--tx-muted-foreground, GrayText); text-align: start; }
+  .native-matrix-summary__table th, .native-matrix-summary__table td { padding: 0.45rem 0.75rem; border-block-start: 1px solid var(--tx-border, GrayText); text-align: start; }
+  .native-matrix-summary__more { margin: 0; }
+  .native-matrix-summary__more a { font-weight: 700; color: var(--home-accent-text, var(--tx-primary, LinkText)); text-underline-offset: 0.2em; }
+</style>

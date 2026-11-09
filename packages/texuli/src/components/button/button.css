@@ -136,6 +136,103 @@
     text-decoration: underline;
   }
 
+  /* Tone is independent of variant (ADR-032). `default` keeps the variant's
+     tokens. The `destructive` variant is unchanged when tone is default. */
+  .tx-button[data-tx-tone="destructive"] {
+    --tx-button-tone: var(--tx-destructive, Mark);
+    --tx-button-tone-foreground: var(--tx-destructive-foreground, CanvasText);
+    --tx-button-tone-hover: var(--tx-destructive-hover, var(--tx-destructive, Mark));
+    --tx-button-tone-soft: var(
+      --tx-destructive-soft,
+      color-mix(in srgb, var(--tx-destructive, Mark) 14%, var(--tx-surface, Canvas))
+    );
+  }
+  .tx-button[data-tx-tone="success"] {
+    --tx-button-tone: var(--tx-success, green);
+    --tx-button-tone-foreground: var(--tx-success-foreground, Canvas);
+    --tx-button-tone-hover: var(--tx-success-hover, var(--tx-success, green));
+    --tx-button-tone-soft: var(
+      --tx-success-soft,
+      color-mix(in srgb, var(--tx-success, green) 14%, var(--tx-surface, Canvas))
+    );
+  }
+  .tx-button[data-tx-tone="warning"] {
+    --tx-button-tone: var(--tx-warning, orange);
+    --tx-button-tone-foreground: var(--tx-warning-foreground, CanvasText);
+    --tx-button-tone-hover: var(--tx-warning-hover, var(--tx-warning, orange));
+    --tx-button-tone-soft: var(
+      --tx-warning-soft,
+      color-mix(in srgb, var(--tx-warning, orange) 14%, var(--tx-surface, Canvas))
+    );
+  }
+
+  .tx-button--default:is(
+    [data-tx-tone="destructive"],
+    [data-tx-tone="success"],
+    [data-tx-tone="warning"]
+  ),
+  .tx-button--secondary:is(
+    [data-tx-tone="destructive"],
+    [data-tx-tone="success"],
+    [data-tx-tone="warning"]
+  ) {
+    color: var(--tx-button-tone-foreground);
+    background-color: var(--tx-button-tone);
+    box-shadow: var(--tx-button-elevation, var(--tx-elevation-1));
+  }
+  .tx-button--default:is(
+    [data-tx-tone="destructive"],
+    [data-tx-tone="success"],
+    [data-tx-tone="warning"]
+  ):hover:not(:disabled):not([aria-disabled="true"]),
+  .tx-button--secondary:is(
+    [data-tx-tone="destructive"],
+    [data-tx-tone="success"],
+    [data-tx-tone="warning"]
+  ):hover:not(:disabled):not([aria-disabled="true"]) {
+    background-color: var(--tx-button-tone-hover);
+    color: var(--tx-button-tone-foreground);
+  }
+
+  .tx-button--outline:is(
+    [data-tx-tone="destructive"],
+    [data-tx-tone="success"],
+    [data-tx-tone="warning"]
+  ) {
+    border-color: var(--tx-button-tone);
+    color: var(--tx-button-tone);
+    background-color: var(--tx-surface, Canvas);
+  }
+  .tx-button--outline:is(
+    [data-tx-tone="destructive"],
+    [data-tx-tone="success"],
+    [data-tx-tone="warning"]
+  ):hover:not(:disabled):not([aria-disabled="true"]) {
+    background-color: var(--tx-button-tone-soft);
+    color: var(--tx-button-tone);
+  }
+
+  .tx-button--ghost:is(
+    [data-tx-tone="destructive"],
+    [data-tx-tone="success"],
+    [data-tx-tone="warning"]
+  ),
+  .tx-button--link:is(
+    [data-tx-tone="destructive"],
+    [data-tx-tone="success"],
+    [data-tx-tone="warning"]
+  ) {
+    color: var(--tx-button-tone);
+  }
+  .tx-button--ghost:is(
+    [data-tx-tone="destructive"],
+    [data-tx-tone="success"],
+    [data-tx-tone="warning"]
+  ):hover:not(:disabled):not([aria-disabled="true"]) {
+    background-color: var(--tx-button-tone-soft);
+    color: var(--tx-button-tone);
+  }
+
   .tx-button--link-size {
     block-size: auto;
     min-block-size: 0;
@@ -144,18 +241,18 @@
   }
 
   /* Sizes — touch target ≥ 44px below sm; logical min-block-size */
-  .tx-button--sm {
+  .tx-button--sm:not(.tx-button--link) {
     min-block-size: var(--tx-button-height-sm, var(--tx-size-control-sm));
     padding-inline: var(--tx-button-padding-inline-sm, var(--tx-space-3));
     font-size: var(--tx-button-font-size-sm, var(--tx-type-caption-size));
   }
 
-  .tx-button--md {
+  .tx-button--md:not(.tx-button--link) {
     min-block-size: var(--tx-button-height-md, var(--tx-size-control-md));
     padding-inline: var(--tx-button-padding-inline-md, var(--tx-space-4));
   }
 
-  .tx-button--lg {
+  .tx-button--lg:not(.tx-button--link) {
     min-block-size: var(--tx-button-height-lg, var(--tx-size-control-lg));
     padding-inline: var(--tx-button-padding-inline-lg, var(--tx-space-6));
     font-size: var(--tx-button-font-size-lg, var(--tx-type-body-size));
@@ -175,8 +272,8 @@
   }
 
   @media (max-width: 639px) {
-    .tx-button--sm,
-    .tx-button--md,
+    .tx-button--sm:not(.tx-button--link),
+    .tx-button--md:not(.tx-button--link),
     .tx-button--icon {
       min-block-size: var(--tx-button-height-touch, var(--tx-size-target-touch));
     }

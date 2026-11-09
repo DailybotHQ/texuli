@@ -2,6 +2,7 @@
  * Catalog manifests for form components in `texuli`.
  * Build-time only — the sink-free renderer must not import this module.
  */
+export { FORMS_AXIS_STAMP, stampFormsAxes } from './axes.ts';
 export {
   buttonGroupManifest,
   buttonManifest,
@@ -13,6 +14,7 @@ export {
   FORMS_PROP_NAME_MAP,
   fieldErrorManifest,
   fieldManifest,
+  fileUploadManifest,
   formManifest,
   formsManifestsById,
   iconButtonManifest,
@@ -20,8 +22,11 @@ export {
   inputManifest,
   labelManifest,
   multiSelectManifest,
+  numberFieldManifest,
+  pinInputManifest,
   radioGroupManifest,
   radioManifest,
+  ratingManifest,
   selectContentManifest,
   selectGroupManifest,
   selectItemManifest,
@@ -33,9 +38,11 @@ export {
   selectValueManifest,
   selectViewportManifest,
   switchManifest,
+  tagsInputManifest,
   textareaManifest,
   textCounterManifest,
   timeFieldManifest,
+  toggleGroupManifest,
 } from './manifests.ts';
 export {
   buttonGroupPropNames,
@@ -48,14 +55,18 @@ export {
   type FormsManifestId,
   fieldErrorPropNames,
   fieldPropNames,
+  fileUploadPropNames,
   formPropNames,
   iconButtonPropNames,
   inputGroupPropNames,
   inputPropNames,
   labelPropNames,
   multiSelectPropNames,
+  numberFieldPropNames,
+  pinInputPropNames,
   radioGroupPropNames,
   radioPropNames,
+  ratingPropNames,
   selectContentPropNames,
   selectGroupPropNames,
   selectItemPropNames,
@@ -67,7 +78,9 @@ export {
   selectValuePropNames,
   selectViewportPropNames,
   switchPropNames,
+  tagsInputPropNames,
   textareaPropNames,
   textCounterPropNames,
   timeFieldPropNames,
+  toggleGroupPropNames,
 } from './prop-names.ts';

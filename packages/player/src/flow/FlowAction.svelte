@@ -11,6 +11,7 @@ let available = $derived(access?.can(event) === true);
 <button
   type="button"
   class="tx-player-flow-action"
+  data-tx-component="flow-action"
   data-tx-player-flow-action={event}
   aria-disabled={!available}
   onclick={() => {

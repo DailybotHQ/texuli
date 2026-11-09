@@ -1,0 +1,36 @@
+{
+  "description": "Edited after approval. (fixed)",
+  "code": "content-hash-mismatch",
+  "expect": "pass",
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "color": {
+      "brand": {
+        "seed": "#0e7490"
+      }
+    },
+    "allow": {
+      "button": {
+        "variants": ["default", "outline"],
+        "sizes": ["sm", "md"],
+        "tones": ["default"],
+        "states": ["hover", "focus-visible", "disabled"]
+      },
+      "card": {},
+      "data-grid": {
+        "densities": ["compact"]
+      }
+    },
+    "approval": {
+      "status": "approved",
+      "approvedBy": "Design reviewer",
+      "approvedAt": "2026-11-09T14:30:00Z",
+      "version": "1.0.0",
+      "contentHash": "b7aeb309c6dcf94045fce397ca488112fdf7fec249031e652842aa89976752d6"
+    }
+  }
+}

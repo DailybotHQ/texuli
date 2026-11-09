@@ -1,8 +1,11 @@
 /**
- * texuli.com landing copy and data (PLAN_012). The bands, their copy and
- * their routes are fixed by the plan's landing IA; every count is computed
- * from the source it links to, never typed in. Copy budgets are pinned by
- * apps/website/tests/landing.test.ts.
+ * texuli.com landing copy and data. `HOME_BANDS` is the one source of the band order
+ * (Home 2.2: nine bands carrying the ten storyboard messages); every count is computed
+ * from the source it links to, never typed in. The Home 2.2 sections keep their own copy
+ * modules beside them (`hero-22/`, `web-native/`, `solutions/`, `agents-22/`,
+ * `built-with/`, `final-22/`); the bands kept from the first landing (pitch, the brand
+ * story, the accessible story with the proof row) read their copy here. Copy budgets are
+ * pinned by apps/website/tests/landing.test.ts.
  */
 import { NATIVE_SLICE } from '../native/native-parity.ts';
 import { countAllThemes, loadHeroProof } from './home-data.ts';
@@ -77,14 +80,14 @@ export const HOME_PITCH = {
   title: 'Small pieces. Infinite possibilities.',
   body:
     'Texuli starts from texels: tiny, framework-free behaviors. They compose into owned ' +
-    'primitives, primitives into styled components, and components into whole applications. ' +
+    'primitives, primitives into styled components, and components into complete Solutions. ' +
     'Every layer is yours to read, theme and extend.',
   slot: 'home-pieces',
   steps: [
     { label: 'Texels', href: '/web-and-native/#how-layered' },
     { label: 'Primitives', href: '/primitives-page/' },
     { label: 'Components', href: '/component-pages/' },
-    { label: 'Apps', href: '/showcase/' },
+    { label: 'Solutions', href: '/solutions/' },
   ] satisfies readonly HomeStep[],
 } as const;
 
@@ -103,48 +106,28 @@ export interface HomeStory {
 }
 
 /**
- * Bands 3–7, in order. The art alternates sides (end, start, end, …);
- * `{themeCount}` and `{painted}`/`{total}` are filled from their sources.
+ * Home 2.2 band order (`audit/home-storyboard.md` §3), the one source `index.astro` and the
+ * landing test follow. Each band names the storyboard targets it carries: T5 ("same
+ * contracts, platform-native experiences") rides with T3 in the Web & Native band, as the
+ * storyboard decided, so nine bands carry all ten messages.
+ */
+export const HOME_BANDS = [
+  { id: 'hero', component: 'HomeHero22', targets: ['T1'] },
+  { id: 'pieces', component: 'HomePitch', targets: ['T2'] },
+  { id: 'web-native', component: 'HomeWebNative', targets: ['T3', 'T5'] },
+  { id: 'solutions', component: 'HomeSolutions', targets: ['T4'] },
+  { id: 'agents', component: 'HomeAgents22', targets: ['T6'] },
+  { id: 'design-systems', component: 'HomeStories', targets: ['T7'] },
+  { id: 'built-with', component: 'HomeBuiltWith', targets: ['T8'] },
+  { id: 'own', component: 'LandingStory', targets: ['T9'] },
+  { id: 'final', component: 'HomeFinal22', targets: ['T10'] },
+] as const;
+
+/**
+ * The story bands kept from the first landing that `HomeStories` renders: the brand story
+ * (T7, design systems across platforms). `{themeCount}` is filled from the theme library.
  */
 export const HOME_STORIES: readonly HomeStory[] = [
-  {
-    id: 'universal',
-    kicker: 'Universal',
-    title: 'One library. Every interface.',
-    body:
-      'Dashboards, documents, chat, forms, spreadsheets, slides and canvases come from the ' +
-      'same pieces, so a whole product speaks one design language.',
-    slot: 'home-universe',
-    chips: [
-      { label: 'Data and dashboards', href: '/dashboards-page/' },
-      { label: 'Charts', href: '/charts-page/' },
-      { label: 'Media', href: '/media-page/' },
-      { label: 'Chat', href: '/agent-chat/' },
-      { label: 'Forms', href: '/forms-page/' },
-      { label: 'Sheets', href: '/sheets-page/' },
-      { label: 'Canvas', href: '/canvas-page/' },
-      { label: 'Documents', href: '/documents-page/' },
-      { label: 'Slides', href: '/slides-page/' },
-      { label: 'Workflows', href: '/workflows-page/' },
-    ],
-  },
-  {
-    id: 'web-native',
-    kicker: 'Web + native',
-    title: 'Svelte on the web. Native next.',
-    body:
-      'One blueprint contract describes the interface. Svelte 5 renders it on the web today; ' +
-      'a Kotlin Multiplatform renderer validates the same contract and paints a growing slice natively.',
-    slot: 'home-web-native',
-    points: [
-      { label: 'Svelte 5 on the web: every component' },
-      {
-        label: 'Kotlin Multiplatform: in development, {painted} of {total} components paint today',
-      },
-      { label: 'One spec, shared conformance fixtures', href: '/native/' },
-    ],
-    actions: [{ href: '/web-and-native/', label: 'See web and native side by side', role: 'text' }],
-  },
   {
     id: 'brand',
     kicker: 'Your brand',
@@ -158,35 +141,26 @@ export const HOME_STORIES: readonly HomeStory[] = [
       { href: '/gallery-themes/', label: 'Theme gallery', role: 'text' },
     ],
   },
-  {
-    id: 'agents',
-    kicker: 'For agents',
-    title: 'Built for agents.',
-    body:
-      'Agents describe interfaces as data against a closed catalog; Texuli validates and renders ' +
-      'them with no HTML sinks. Agents never ship code, and every page has a Markdown twin.',
-    slot: 'home-agents',
-    points: [
-      { label: 'MCP server, local and remote', href: '/mcp-server/' },
-      { label: 'The agent catalog', href: '/agents-page/' },
-      { label: 'The agent skill', href: '/skill/' },
-    ],
-  },
-  {
-    id: 'accessible',
-    kicker: 'Accessible',
-    title: 'Accessible and owned.',
-    body:
-      'Every primitive is built in-house on WAI-ARIA patterns and tested with keyboards and ' +
-      'screen readers. No third-party UI dependency, and a size budget on every entry.',
-    slot: 'home-accessible',
-    points: [
-      { label: 'Accessibility guide', href: '/guides/accessibility/' },
-      { label: 'Owned primitives', href: '/primitives-page/' },
-      { label: 'Performance budgets', href: '/guides/performance/' },
-    ],
-  },
 ];
+
+/**
+ * T9, "Made to own and extend": the accessible story, with the computed proof row
+ * (`loadHomeProof`) rendered inside it as the band's proof (the former proof band merged in).
+ */
+export const HOME_OWN: HomeStory = {
+  id: 'accessible',
+  kicker: 'Yours to own',
+  title: 'Accessible and owned.',
+  body:
+    'Every primitive is built in-house on WAI-ARIA patterns and tested with keyboards and ' +
+    'screen readers. MIT licensed, no third-party UI dependency, and a size budget on every entry.',
+  slot: 'home-accessible',
+  points: [
+    { label: 'Accessibility guide', href: '/guides/accessibility/' },
+    { label: 'Owned primitives', href: '/primitives-page/' },
+    { label: 'Performance budgets', href: '/guides/performance/' },
+  ],
+};
 
 /** Fill `{name}` placeholders; an unknown name throws so copy cannot ship a raw brace. */
 export function fillCopy(text: string, values: Readonly<Record<string, number | string>>): string {

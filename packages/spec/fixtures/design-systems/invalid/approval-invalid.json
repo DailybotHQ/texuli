@@ -1,0 +1,15 @@
+{
+  "description": "An approved document without who approved or when (ADR-032).",
+  "expect": [["approval-invalid", "$.approval"]],
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "approval": {
+      "status": "approved",
+      "version": "1.0.0"
+    }
+  }
+}

@@ -1,0 +1,291 @@
+---
+/**
+ * Home 2.2 "Built with Texuli" band: kicker, h2 and body beside the art, then one card per
+ * listed product with its status, its offerings split into "Today" and "Roadmap" (each with
+ * a status badge), the case-study link when that page exists and the product's own domain.
+ * The `home-built-with` slot is not registered yet, so the art column paints a decorative
+ * texel mosaic. Static markup, no island; internal links pass the URL policy with the site
+ * base, the external domain passes it at the developer tier. Wiring into the home page
+ * belongs to the home integration task.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../../foundation/site.ts';
+import { illustrationFor } from '../../../landing/illustrations.ts';
+import SiteIllustration from '../../../landing/SiteIllustration.astro';
+import StatusBadge from '../../../solutions/shared/platforms/StatusBadge.astro';
+import {
+  HOME_BUILT_WITH_COPY,
+  homeBuiltWithCards,
+  homeBuiltWithIndex,
+} from './built-with-content.ts';
+
+const base = import.meta.env.BASE_URL;
+const copy = HOME_BUILT_WITH_COPY;
+const cards = homeBuiltWithCards();
+const index = homeBuiltWithIndex();
+const artRegistered = illustrationFor(copy.art) !== undefined;
+const resolveHref = (href: string): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  return safe === undefined ? undefined : withBase(base, safe);
+};
+const tiles = Array.from({ length: 30 }, (_, i) => ((i * 7 + 1) % 10) % 5);
+---
+
+<section class="home-built-with" aria-labelledby={copy.id} data-tx-home-built-with="">
+  <div class="home-built-with__inner">
+    <div class="home-built-with__head">
+      <div class="home-built-with__copy">
+        <p class="home-built-with__kicker">{copy.kicker}</p>
+        <h2 id={copy.id}>{copy.title}</h2>
+        <p class="home-built-with__body">{copy.body}</p>
+        {
+          index && (
+            <a class="home-cta home-cta--secondary" href={resolveHref(index.href)}>
+              {index.label}
+            </a>
+          )
+        }
+      </div>
+      <div class="home-built-with__art">
+        {
+          artRegistered ? (
+            <SiteIllustration art={copy.art} />
+          ) : (
+            <div class="home-built-with__mosaic" aria-hidden="true" data-art-fallback={copy.art}>
+              {tiles.map((tone) => (tone === 0 ? <i /> : <i class={`t${tone}`} />))}
+            </div>
+          )
+        }
+      </div>
+    </div>
+    <ul class="home-built-with__cards" role="list">
+      {
+        cards.map((card) => (
+          <li class="home-built-with__card" data-product={card.id} data-status={card.status}>
+            <div class="home-built-with__card-head">
+              <h3>{card.name}</h3>
+              <StatusBadge status={card.status} context={card.name} />
+            </div>
+            <p class="home-built-with__summary">{card.summary}</p>
+            <div class="home-built-with__offers">
+              {card.today.length > 0 && (
+                <div data-offers="today">
+                  <p class="home-built-with__label">{copy.today}</p>
+                  <ul role="list">
+                    {card.today.map((offer) => (
+                      <li>
+                        <span>{offer.label}</span>
+                        <StatusBadge status={offer.status} context={offer.label} />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {card.roadmap.length > 0 && (
+                <div data-offers="roadmap">
+                  <p class="home-built-with__label">{copy.roadmap}</p>
+                  <ul role="list">
+                    {card.roadmap.map((offer) => (
+                      <li>
+                        <span>{offer.label}</span>
+                        <StatusBadge status={offer.status} context={offer.label} />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+            <div class="home-built-with__links">
+              {card.caseStudy && (
+                <a href={resolveHref(card.caseStudy)}>
+                  Read the {card.name} case study<span aria-hidden="true">&nbsp;→</span>
+                </a>
+              )}
+              {card.site && (
+                <a href={card.site.href} rel="noopener">
+                  {card.site.label}
+                  <span aria-hidden="true">&nbsp;↗</span>
+                </a>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .home-built-with {
+    --hbw-accent: var(--home-accent-text, var(--tx-primary));
+    border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 60%, transparent);
+  }
+  .home-built-with__inner {
+    display: grid;
+    gap: clamp(1.75rem, 5vw, 3rem);
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-block: clamp(3rem, 8vw, 6rem);
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  .home-built-with__head {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    align-items: center;
+  }
+  @media (min-width: 56rem) {
+    .home-built-with__head {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    }
+    .home-built-with__art {
+      order: -1;
+    }
+  }
+  .home-built-with__copy {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+    max-inline-size: 34rem;
+  }
+  .home-built-with__kicker {
+    margin: 0;
+    color: var(--hbw-accent);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .home-built-with h2 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(1.9rem, 5vw, 3rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+  .home-built-with__body {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: clamp(1rem, 2.2vw, 1.15rem);
+    line-height: 1.55;
+  }
+  .home-built-with__art {
+    min-inline-size: 0;
+  }
+  .home-built-with__mosaic {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.4rem;
+    aspect-ratio: 16 / 10;
+    padding: clamp(0.75rem, 3vw, 1.5rem);
+    border: 1px solid color-mix(in oklab, var(--tx-border) 70%, transparent);
+    border-radius: 1rem;
+    background: var(--tx-background);
+  }
+  .home-built-with__mosaic i {
+    border-radius: 0.35rem;
+    background: color-mix(in oklab, var(--hbw-accent) 6%, transparent);
+  }
+  .home-built-with__mosaic i.t1 {
+    background: color-mix(in oklab, var(--hbw-accent) 18%, transparent);
+  }
+  .home-built-with__mosaic i.t2 {
+    background: color-mix(in oklab, var(--hbw-accent) 35%, transparent);
+  }
+  .home-built-with__mosaic i.t3 {
+    background: color-mix(in oklab, var(--hbw-accent) 60%, transparent);
+  }
+  .home-built-with__mosaic i.t4 {
+    background: var(--hbw-accent);
+  }
+  .home-built-with__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .home-built-with__card {
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    border-radius: 0.875rem;
+    background: var(--tx-background);
+  }
+  .home-built-with__card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .home-built-with h3 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: 1.3rem;
+    font-weight: 750;
+  }
+  .home-built-with__summary {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    line-height: 1.5;
+  }
+  .home-built-with__offers {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .home-built-with__label {
+    margin: 0;
+    margin-block-end: 0.35rem;
+    color: var(--tx-muted-foreground);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .home-built-with__offers ul {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .home-built-with__offers li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.35rem 0.5rem;
+    color: var(--tx-foreground);
+    font-size: 0.9rem;
+  }
+  .home-built-with__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+  }
+  .home-built-with__links a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.5rem;
+    color: var(--hbw-accent);
+    font-weight: 700;
+    text-underline-offset: 0.2em;
+  }
+  .home-built-with__links a:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  @media (forced-colors: active) {
+    .home-built-with__card {
+      border-color: CanvasText;
+    }
+    .home-built-with__mosaic {
+      display: none;
+    }
+  }
+</style>

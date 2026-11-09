@@ -1,0 +1,23 @@
+{
+  "description": "A pinned foreground unreadable on its background. (fixed)",
+  "code": "aa-text",
+  "expect": "pass",
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "color": {
+      "brand": {
+        "seed": "#0e7490"
+      },
+      "roles": {
+        "light": {
+          "background": "#ffffff",
+          "foreground": "#1f2937"
+        }
+      }
+    }
+  }
+}

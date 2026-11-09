@@ -16,6 +16,6 @@ let { children, class: className, open = $bindable(false), ...rest }: Props = $p
   class={className}
   data-tx-dropdown-menu
   data-state={open ? 'open' : 'closed'}
->
+ data-tx-component="dropdown-menu">
   <Primitive bind:open {...rest}>{@render children?.()}</Primitive>
 </div>

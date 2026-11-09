@@ -112,7 +112,7 @@ const WARNINGS: JsonSchema = {
 };
 const IDENTITY = {
   id: { type: 'string' },
-  version: { type: 'string' },
+  version: { type: ['string', 'number'] },
   name: { type: 'string' },
   hash: { type: 'string', pattern: '^[0-9a-f]{64}$' },
 } as const;
@@ -152,10 +152,45 @@ export const dsValidate: Operation = defineOperation({
   name: 'ds.validate',
   title: 'Validate a design system',
   summary:
-    "Validate a design-system document: the spec's closed schema, the extends chain, then a compile of the document and its high-contrast variant with the guarantees enforced (text contrast, focus ring, target size). Returns valid, the distinct codes, every error with its JSON path and hint, the compiler warnings and the hash.",
+    "Validate a design-system document. Set full to run the complete locked-design-system validator, including catalog allow sets, extensions and an optional prototype's component and CSS policy checks. Returns every finding with stable code, severity, area, path and fix hint; the full mode is read-only and does not execute prototype sources.",
   input: {
     type: 'object',
-    properties: { document: DOCUMENT, ...COMPILE_INPUT },
+    properties: {
+      document: DOCUMENT,
+      ...COMPILE_INPUT,
+      full: {
+        type: 'boolean',
+        default: false,
+        description:
+          'Run the full locked-design-system validator. Static only; use a local CLI --render for browser runtime checks.',
+      },
+      report: {
+        type: 'boolean',
+        default: false,
+        description:
+          'Mark this as report-only progress tracking. The operation always returns findings as data; valid still reflects the validator verdict.',
+      },
+      strict: {
+        type: 'boolean',
+        default: false,
+        description: 'In full mode, treat warnings as failures in the valid verdict.',
+      },
+      catalog: {
+        type: 'object',
+        description: 'Optional spec catalog object; defaults to the bundled Texuli catalog.',
+      },
+      extensions: {
+        type: 'array',
+        maxItems: 16,
+        items: { type: 'object' },
+        description: 'Optional host catalog extensions to check and merge.',
+      },
+      prototype: {
+        type: 'object',
+        description:
+          'Optional bounded prototype data: { files: { path: sourceText }, blueprints: { name: blueprint } }. Sources are scanned as text and never executed.',
+      },
+    },
     required: ['document'],
     additionalProperties: false,
   },
@@ -168,12 +203,19 @@ export const dsValidate: Operation = defineOperation({
       errors: ISSUES,
       warnings: WARNINGS,
       variants: { type: 'array', items: { type: 'string' } },
+      ok: { type: 'boolean' },
+      document: { type: 'object' },
+      summary: { type: 'object', additionalProperties: true },
+      findings: { type: 'array', items: { type: 'object', additionalProperties: true } },
+      check: { type: 'object', additionalProperties: true },
+      prototype: { type: 'object', additionalProperties: true },
+      reportOnly: { type: 'boolean' },
     },
-    required: ['valid', 'codes', 'errors', 'warnings', 'variants'],
+    required: ['valid'],
   },
   annotations: READ_ONLY,
   runtime: 'edge',
-  limits: { inputBytes: DS_INPUT_BYTES, timeMs: TIME_MS },
+  limits: { inputBytes: DS_INPUT_BYTES, items: 16, timeMs: TIME_MS },
   examples: [
     { title: 'The smallest document', input: { document: MINIMAL_DESIGN_SYSTEM } },
     {
@@ -539,7 +581,7 @@ export const dsSave: Operation = defineOperation({
   name: 'ds.save',
   title: 'Save a design system to a file',
   summary:
-    'Validate a design-system document (as ds.validate does) and write it as two-space JSON to the explicit .json path you pass, inside the working directory: traversal, symlinks, dot directories and dotfiles, node_modules, package.json and an existing file without overwrite are refused. Local doors only. Returns saved, the relative path and bytes written, or errors with stable codes.',
+    'Validate a design-system document (as ds.validate does) and write it as two-space JSON to an explicit .json path inside the working directory (traversal, symlinks, dot paths, node_modules, package.json and existing files without overwrite are refused). Anything marked approved is refused (approval-human-only). Local doors only. Returns saved, the path and bytes, or errors with stable codes.',
   input: {
     type: 'object',
     properties: {
@@ -596,6 +638,6 @@ export const dsSave: Operation = defineOperation({
         'runtime-unavailable',
         'ds.save needs a door that writes local files (texuli-mcp or the texuli CLI).'
       );
-    return (await run()).runSave(input, context.files);
+    return (await run()).runSave(input, context.files, context.approve === true);
   },
 });

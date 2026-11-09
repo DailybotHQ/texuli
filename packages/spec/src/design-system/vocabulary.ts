@@ -15,6 +15,8 @@
  * source · `['x']` an `extends` reference.
  */
 
+import { DS_LOCKED_DEFS } from './types-locked.ts';
+
 export type DsNode =
   | string
   | { readonly [key: string]: DsNode }
@@ -34,7 +36,21 @@ export type DsObject = { readonly [key: string]: DsNode };
 export const DESIGN_SYSTEM_FORMAT = 'texuli/design-system';
 export const DESIGN_SYSTEM_FORMAT_VERSION = 1;
 
-/** Stable codes `validate` and `migrate` raise (ADR-021). */
+/**
+ * Catalog-membership codes `checkDesignSystemAllow` raises (ADR-032). The
+ * bundled validator never carries the catalog; these codes still live on the
+ * shared issue enum so Kotlin `DesignSystemIssueCode` follows.
+ */
+export const DESIGN_SYSTEM_ALLOW_CODES = [
+  'unknown-component',
+  'unknown-variant',
+  'unknown-size',
+  'unknown-tone',
+  'unknown-density',
+  'unknown-state',
+] as const;
+
+/** Stable codes `validate` and `migrate` raise (ADR-021, ADR-032). */
 export const DESIGN_SYSTEM_CODES = [
   'unknown-key',
   'invalid-type',
@@ -46,6 +62,8 @@ export const DESIGN_SYSTEM_CODES = [
   'extends-depth',
   'url-refused',
   'inline-bytes',
+  'approval-invalid',
+  ...DESIGN_SYSTEM_ALLOW_CODES,
 ] as const;
 
 /**
@@ -303,7 +321,7 @@ for (const [id, pairs] of Object.entries(DS_COMPONENT_TOKENS)) {
 }
 
 const sections: Record<string, DsNode> = keys(
-  'color typography shape space elevation surface motion layout icons components assets voice accessibility extensions',
+  'color typography shape space elevation surface motion layout icons components assets voice accessibility extensions allow',
   ''
 );
 for (const name of Object.keys(sections)) sections[name] = name;
@@ -430,6 +448,8 @@ export const DS_DEFS: Readonly<Record<string, DsNode>> = {
   },
   extensions: ['m', 'extension', DESIGN_SYSTEM_LIMITS.extensions, P.extension],
   variant: sections,
+  // ADR-032: allow (a section), library and approval (root keys only).
+  ...DS_LOCKED_DEFS,
 };
 
 /** The document root. */
@@ -445,5 +465,7 @@ export const DS_ROOT: DsObject = {
   tags: ['l', ['s', /^[a-z0-9][a-z0-9-]{0,31}$/, 32], 0, 16, 1],
   extends: ['x'],
   ...sections,
+  library: 'library',
+  approval: 'approval',
   variants: ['m', 'variant', 16, P.key],
 };

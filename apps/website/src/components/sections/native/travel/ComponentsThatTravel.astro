@@ -1,0 +1,91 @@
+---
+import { safeHref } from '@texuli/core/url-policy';
+import { REPOSITORY_URL } from '../../../foundation/site.ts';
+import {
+  NATIVE_COMPONENT_SOURCE,
+  NATIVE_COMPONENT_TRAVEL,
+  NATIVE_PARITY_SOURCE,
+  NATIVE_TRAVEL_STEPS,
+} from './travel-content.ts';
+
+const codeHref = (path: string) => safeHref(`${REPOSITORY_URL}/blob/main/${path}`, 'developer');
+---
+
+<section class="native-travel" aria-labelledby="native-travel-title" data-tx-native-travel="">
+  <div class="native-travel__heading">
+    <p class="native-travel__eyebrow">Shared intent · target-specific rendering</p>
+    <h2 id="native-travel-title">How components travel</h2>
+    <p>
+      A catalog node keeps its validated meaning as a blueprint crosses the web and Kotlin toolchains.
+      The renderers can differ: semantic and functional equivalence matters more than matching pixels.
+    </p>
+  </div>
+
+  <ol class="native-travel__steps" aria-label="Blueprint path from catalog to renderer">
+    {NATIVE_TRAVEL_STEPS.map((step) => {
+      const href = codeHref(step.path);
+      return (
+        <li class="native-travel__step">
+          <h3>{step.title}</h3>
+          <p>{step.detail}</p>
+          {href && <a href={href}>View source</a>}
+        </li>
+      );
+    })}
+  </ol>
+
+  <div class="native-travel__components">
+    <h3>Examples with current trace evidence</h3>
+    <p>
+      These entries appear in the generated parity data and checked-in conformance traces.
+      A component status describes that node; it does not claim that a complete native editor exists.
+    </p>
+    <ul class="native-travel__component-list">
+      {NATIVE_COMPONENT_TRAVEL.map((component) => (
+        <li class="native-travel__component" data-component-id={component.id}>
+          <div class="native-travel__component-title">
+            <h4>{component.label}</h4>
+            <code>{component.id}</code>
+          </div>
+          <p>{component.summary}</p>
+          <dl class="native-travel__statuses">
+            <div><dt>Web</dt><dd>{component.web}</dd></div>
+            <div><dt>Compose Desktop</dt><dd>{component.composeDesktop}</dd></div>
+            <div><dt>Conformance</dt><dd>{component.conformance}</dd></div>
+          </dl>
+          <ul class="native-travel__links" aria-label={`${component.id} evidence`}>
+            {[NATIVE_COMPONENT_SOURCE, NATIVE_PARITY_SOURCE, ...component.traces].map((path) => {
+              const href = codeHref(path);
+              return <li>{href ? <a href={href}>{path}</a> : <code>{path}</code>}</li>;
+            })}
+          </ul>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .native-travel { display: grid; gap: 1.5rem; max-inline-size: 78rem; margin-inline: auto; padding: clamp(2.5rem, 7vw, 5rem) clamp(1rem, 4vw, 1.5rem); color: var(--tx-foreground, CanvasText); }
+  .native-travel__heading { max-inline-size: 48rem; }
+  .native-travel__eyebrow { margin: 0 0 0.45rem; color: var(--tx-muted-foreground, GrayText); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.05em; }
+  .native-travel h2 { margin: 0; font-size: clamp(1.65rem, 4vw, 2.4rem); line-height: 1.15; }
+  .native-travel__heading > p:last-child, .native-travel__components > p { color: var(--tx-muted-foreground, GrayText); line-height: 1.55; }
+  .native-travel h3 { margin: 0; font-size: 1.2rem; }
+  .native-travel__steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: 0.75rem; margin: 0; padding: 0; list-style: none; counter-reset: travel-step; }
+  .native-travel__step { display: grid; align-content: start; gap: 0.55rem; min-inline-size: 0; padding: 1rem; border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-radius, 0.75rem); background: var(--tx-surface, Canvas); counter-increment: travel-step; }
+  .native-travel__step::before { content: counter(travel-step, decimal-leading-zero); color: var(--tx-muted-foreground, GrayText); font-size: 0.8rem; font-weight: 700; }
+  .native-travel__step h3 { font-size: 1.05rem; }
+  .native-travel__step p, .native-travel__component p { margin: 0; line-height: 1.5; }
+  .native-travel__components { display: grid; gap: 0.75rem; }
+  .native-travel__component-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: 0.75rem; margin: 0; padding: 0; list-style: none; }
+  .native-travel__component { display: grid; align-content: start; gap: 0.75rem; min-inline-size: 0; padding: 1rem; border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-radius, 0.75rem); background: var(--tx-surface, Canvas); }
+  .native-travel__component-title { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.3rem 0.75rem; }
+  .native-travel__component-title h4 { margin: 0; font-size: 1.05rem; }
+  .native-travel__component-title code, .native-travel__links { overflow-wrap: anywhere; }
+  .native-travel__statuses { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; margin: 0; }
+  .native-travel__statuses div { display: grid; gap: 0.1rem; }
+  .native-travel__statuses dt { color: var(--tx-muted-foreground, GrayText); font-size: 0.8rem; }
+  .native-travel__statuses dd { margin: 0; font-weight: 700; }
+  .native-travel__links { display: flex; flex-wrap: wrap; gap: 0.4rem 0.8rem; margin: 0; padding: 0; list-style: none; font-size: 0.82rem; }
+</style>

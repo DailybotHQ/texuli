@@ -52,7 +52,7 @@ function nodeStyle(node: { x: number; y: number; width: number; height: number }
 }
 </script>
 
-<figure class="tx-diagram" data-tx-diagram="flow">
+<figure class="tx-diagram" data-tx-diagram="flow" data-tx-component="blocks-diagram">
   <!-- svelte-ignore a11y_no_noninteractive_tabindex -- wide flow scrolls; keyboard users must reach it (WCAG 2.1.1). -->
   <div class="tx-diagram__scroll" role="region" aria-label={summary} tabindex="0">
     <ol class="tx-diagram-sr">

@@ -12,9 +12,9 @@ player never navigates, fetches or persists anything on its own.
 **In the stack:** layer L7: paints what the agent catalog (L6) validates against the `@texuli/spec` blueprint contract, with the `texuli` components and the domain packages. `@texuli/pages` and `@texuli/slides` embed it.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.14.4`, a pre-1.0 release (1.0.0 will be the first
-> stable release). Under 0.x, a new minor (`0.14.0`) may contain breaking
-> changes, so pin the exact version or use `^0.14.0`, which accepts only 0.14.x.
+> published to npm as `0.15.0`, a pre-1.0 release (1.0.0 will be the first
+> stable release). Under 0.x, a new minor (`0.15.0`) may contain breaking
+> changes, so pin the exact version or use `^0.15.0`, which accepts only 0.15.x.
 
 > **New in `0.4.0`.** Spec 0.3.0 and 0.4.0 envelopes (`state`, `flow`,
 > `bind`, `on` and the closed actions), the data view, chat display,

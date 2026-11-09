@@ -31,7 +31,7 @@ const classes = $derived(
 );
 </script>
 
-<PrimitiveTrigger bind:ref class={classes} data-tx-select-trigger data-size={size} data-variant={variant} {...rest}>
+<PrimitiveTrigger bind:ref class={classes} data-tx-select-trigger data-size={size} data-variant={variant} {...rest} data-tx-component="select-trigger" data-tx-size={size} data-tx-variant={variant}>
   <span class="tx-select-trigger__body">
     {@render children?.()}
   </span>

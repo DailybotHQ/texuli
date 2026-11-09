@@ -29,6 +29,6 @@ const classes = $derived(
 );
 </script>
 
-<PrimitiveContent bind:ref class={classes} data-tx-select-content data-size={size} {...rest}>
+<PrimitiveContent bind:ref class={classes} data-tx-select-content data-size={size} {...rest} data-tx-component="select-content" data-tx-size={size}>
   {@render children?.()}
 </PrimitiveContent>

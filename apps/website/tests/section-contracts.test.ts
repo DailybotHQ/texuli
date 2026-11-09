@@ -20,6 +20,7 @@ import { LAYERS as GUARD_LAYERS } from '../../../scripts/check-layers.ts';
 import * as layers from '../src/components/sections/architecture/layers-data.ts';
 import * as parity from '../src/components/sections/architecture/parity-data.ts';
 import * as portability from '../src/components/sections/architecture/portability-content.ts';
+import { HERO_22 } from '../src/components/sections/home/hero-22/hero-content.ts';
 import * as home from '../src/components/sections/home/home-content.ts';
 import * as nativeEvidence from '../src/components/sections/native/native-evidence-data.ts';
 import * as nativeHero from '../src/components/sections/native/native-hero-content.ts';
@@ -231,8 +232,9 @@ describe('links and sinks', () => {
   it('every section link is a path-only on-site route that exists', () => {
     const hrefs = [
       ...home.HOME_HERO.actions,
+      ...HERO_22.actions,
       ...home.HOME_PITCH.steps,
-      ...home.HOME_STORIES.flatMap((story) => [
+      ...[...home.HOME_STORIES, home.HOME_OWN].flatMap((story) => [
         ...(story.points ?? []).flatMap((point) =>
           point.href === undefined ? [] : [{ href: point.href }]
         ),

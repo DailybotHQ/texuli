@@ -1,0 +1,68 @@
+/**
+ * The kit's library and changes sections (`texuli/ds-kit`, ADR-032): layout and chrome only,
+ * from the token contract. Previews paint with the design system's own components.
+ * @layer tx.components so consumer utilities can override.
+ */
+@layer tx.components {
+  .tx-ds-kit__library-entry {
+    padding: var(--tx-space-4);
+    border: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+    border-radius: var(--tx-shape-radius-md);
+  }
+  .tx-ds-kit__library-entry[aria-current="true"] {
+    border-width: var(--tx-border-width-thick);
+  }
+  .tx-ds-kit__approval-badge {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--tx-space-2);
+    align-items: center;
+    margin: 0;
+  }
+  .tx-ds-kit__library-meta {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: var(--tx-space-1) var(--tx-space-3);
+    margin: 0;
+  }
+  .tx-ds-kit__library-meta dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+  .tx-ds-kit__library-composes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--tx-space-1) var(--tx-space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .tx-ds-kit__library-previews {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: var(--tx-space-3);
+  }
+  .tx-ds-kit__library-preview {
+    display: grid;
+    gap: var(--tx-space-2);
+    margin: 0;
+    padding: var(--tx-space-3);
+    border: var(--tx-border-width-thin) dashed var(--tx-border, currentColor);
+    border-radius: var(--tx-shape-radius-md);
+  }
+  .tx-ds-kit-changes ul {
+    display: grid;
+    gap: var(--tx-space-1);
+    margin: 0;
+    padding-inline-start: var(--tx-space-5);
+  }
+  .tx-ds-kit-changes code,
+  .tx-ds-kit__library-meta code {
+    overflow-wrap: anywhere;
+  }
+  @media print {
+    .tx-ds-kit__library-preview {
+      break-inside: avoid;
+    }
+  }
+}

@@ -12,12 +12,15 @@ import { BASE_SYSTEM_TOKEN_NAMES, TYPE_ROLES } from '../../tokens/src/system/nam
 import { KOTLIN_OUT, TS_OUT } from '../src/build.ts';
 import {
   applyDesignSystemPatch,
+  checkDesignSystemAllow,
   checkDesignSystemReference,
+  DESIGN_SYSTEM_ALLOW_CODES,
   DESIGN_SYSTEM_CODES,
   DESIGN_SYSTEM_COMPILER_CODES,
   DESIGN_SYSTEM_LIMITS,
   DESIGN_SYSTEM_MIGRATIONS,
   type DesignSystem,
+  type DesignSystemAllowCatalog,
   type DesignSystemPatch,
   migrateDesignSystem,
   validateDesignSystem,
@@ -79,7 +82,9 @@ describe('the design-system schema is generated and fresh', () => {
       ...DESIGN_SYSTEM_CODES,
       ...DESIGN_SYSTEM_COMPILER_CODES,
     ]);
-    expect(schema.$defs?.issueCode?.enum).toHaveLength(14);
+    expect(schema.$defs?.issueCode?.enum).toHaveLength(
+      DESIGN_SYSTEM_CODES.length + DESIGN_SYSTEM_COMPILER_CODES.length
+    );
     const ts = build.generated[`${TS_OUT}design-system.ts`] as string;
     const kt = build.generated[`${KOTLIN_OUT}DesignSystem.kt`] as string;
     expect(ts).toContain('export interface DesignSystem {');
@@ -271,12 +276,18 @@ describe('design-system fixtures', () => {
         expect: [string, string][];
         trust?: 'developer';
         resolve?: Record<string, unknown>;
+        catalog?: DesignSystemAllowCatalog;
         document: unknown;
       }>(path);
       const resolve = fixture.resolve
         ? (ref: string) => (fixture.resolve as Record<string, unknown>)[ref]
         : undefined;
-      const result = validateDesignSystem(fixture.document, { trust: fixture.trust, resolve });
+      const allowCode =
+        fixture.expect[0] &&
+        (DESIGN_SYSTEM_ALLOW_CODES as readonly string[]).includes(fixture.expect[0][0]);
+      const result = allowCode
+        ? checkDesignSystemAllow(fixture.document, fixture.catalog as DesignSystemAllowCatalog)
+        : validateDesignSystem(fixture.document, { trust: fixture.trust, resolve });
       expect(codes(result), path).toEqual(fixture.expect);
       for (const [code] of fixture.expect) seen.add(code);
     }

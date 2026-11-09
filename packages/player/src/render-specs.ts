@@ -2154,22 +2154,6 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
     events: ['move'],
   },
   {
-    id: 'chat-thread',
-    label: 'Chat thread',
-    props: [
-      {
-        name: 'label',
-        kind: 'string',
-      },
-      {
-        name: 'children',
-        kind: 'slot',
-      },
-    ],
-    agentEmittable: true,
-    emit: ['developer', 'untrusted'],
-  },
-  {
     id: 'chat-message',
     label: 'Chat message',
     props: [
@@ -2199,6 +2183,78 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
     ],
     agentEmittable: true,
     emit: ['developer', 'untrusted'],
+  },
+  {
+    id: 'chat-thread',
+    label: 'Chat thread',
+    props: [
+      {
+        name: 'label',
+        kind: 'string',
+      },
+      {
+        name: 'children',
+        kind: 'slot',
+      },
+    ],
+    agentEmittable: true,
+    emit: ['developer', 'untrusted'],
+  },
+  {
+    id: 'composer',
+    label: 'Composer',
+    props: [
+      {
+        name: 'value',
+        kind: 'string',
+      },
+      {
+        name: 'onSubmit',
+        kind: 'event',
+        required: true,
+      },
+      {
+        name: 'disabled',
+        kind: 'boolean',
+      },
+      {
+        name: 'sending',
+        kind: 'boolean',
+      },
+      {
+        name: 'maxRows',
+        kind: 'number',
+      },
+      {
+        name: 'maxLength',
+        kind: 'number',
+      },
+      {
+        name: 'streaming',
+        kind: 'boolean',
+      },
+      {
+        name: 'onStop',
+        kind: 'event',
+      },
+      {
+        name: 'layout',
+        kind: 'enum',
+        enumValues: ['stack', 'row'],
+      },
+      {
+        name: 'sendButton',
+        kind: 'enum',
+        enumValues: ['label', 'icon'],
+      },
+      {
+        name: 'class',
+        kind: 'string',
+      },
+    ],
+    agentEmittable: false,
+    emit: ['developer'],
+    events: ['submit'],
   },
   {
     id: 'data-board',

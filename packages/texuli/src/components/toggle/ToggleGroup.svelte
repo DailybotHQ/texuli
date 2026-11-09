@@ -115,6 +115,9 @@ const classes = $derived(
   class={classes}
   aria-label={ariaLabel}
   aria-labelledby={ariaLabelledby}
+  data-tx-component="toggle-group"
+  data-tx-variant={variant}
+  data-tx-size={size}
 >
   {@render children?.()}
 </ToggleGroupPrimitive.Root>

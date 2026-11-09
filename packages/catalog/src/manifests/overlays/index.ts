@@ -3,6 +3,7 @@
  * Build-time only — the sink-free renderer must not import this module.
  * Tier app, never agent-emittable.
  */
+export { OVERLAYS_AXIS_STAMP, stampOverlaysAxes } from './axes.ts';
 export {
   alertDialogManifest,
   appNavManifest,

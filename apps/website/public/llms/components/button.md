@@ -32,6 +32,7 @@
 | --- | --- | --- | --- | --- | --- |
 | `variant` | enum(default | secondary | outline | ghost | destructive | link) | no | — | `"default"` | — |
 | `size` | enum(sm | md | lg | icon) | no | — | `"md"` | — |
+| `tone` | enum(default | destructive | success | warning) | no | — | `"default"` | — |
 | `href` | string | no | developer | — | Optional link target (URL policy) |
 | `hrefTrust` | enum(developer | untrusted) | no | — | `"developer"` | — |
 | `type` | enum(button | submit | reset) | no | — | `"button"` | — |
@@ -51,6 +52,16 @@
 ```json
 {
   "variant": "default"
+}
+```
+
+#### Outline destructive button (`outline-destructive`)
+
+```json
+{
+  "variant": "outline",
+  "tone": "destructive",
+  "label": "Delete"
 }
 ```
 

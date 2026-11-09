@@ -68,7 +68,7 @@ Not layers, because they consume the library:
 
 `@texuli/examples` is never packed (`NEVER_PACKED` in
 `scripts/packages.ts`); `pnpm verify:packages` packs the other 26, and all
-26 are released on npm in the 0.14 line, every one at `0.14.4`; `0.10.0` was the design-systems release and the 0.11 line added the Protoyard gaps G125–G136 and the Final Review fixes (among them `@texuli/document/schema-core`), `0.12.0` moves the `@texuli/pages` core entries off the deck model (G136; breaking for those core entries only), `0.13.0` adds blueprint spec `0.11.0` and one label dictionary (ADR-026), and `0.14.0` adds blueprint spec `0.12.0` and the Protoyard and Dailybot consumer gaps, with no breaking API change (`@texuli/mcp`
+26 are released on npm in the 0.15 line, every one at `0.15.0`; `0.10.0` was the design-systems release and the 0.11 line added the Protoyard gaps G125–G136 and the Final Review fixes (among them `@texuli/document/schema-core`), `0.12.0` moves the `@texuli/pages` core entries off the deck model (G136; breaking for those core entries only), `0.13.0` adds blueprint spec `0.11.0` and one label dictionary (ADR-026), and `0.14.0` adds blueprint spec `0.12.0` and the Protoyard and Dailybot consumer gaps, with no breaking API change (`@texuli/mcp`
 was first released in `0.9.0`; the 0.8 line had 25 packages);
 `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/slides`,
 `@texuli/editor`, `@texuli/document`, `@texuli/pages`, `@texuli/forms`,
@@ -189,7 +189,7 @@ agent output (JSON) ─► @texuli/spec migrate + validate (closed vocabulary, s
                     ─► @texuli/player painters ─► URL policy ('untrusted') on every link and source
 ```
 
-- **Catalog groups.** `@texuli/catalog` builds 170 ids from manifest groups:
+- **Catalog groups.** `@texuli/catalog` builds 194 ids from manifest groups:
   `content`, `display`, `forms`, `layouts`, `overlays`, (new in `0.4.0`)
   `composition`, `data`, `chat`, `state` and `workflows`, (new in `0.7.0`)
   `documents`, whose `document` id carries a Texuli document as data,
@@ -248,7 +248,7 @@ after each deploy of `main`.
 
 ## Decks: engine and stage
 
-ADR-009 splits presentations in two packages (both on npm as `0.14.4`;
+ADR-009 splits presentations in two packages (both on npm as `0.15.0`;
 `@texuli/deck` was first released in `0.4.0`):
 
 - **`@texuli/deck` (L0)** owns everything that is data: deck model v2
@@ -352,6 +352,11 @@ static site with `client:visible` islands:
 - themes (gallery, switcher, studio, color explorer);
 - the playground, search, showcase and examples;
 - the agents and skill pages;
+- the Solution landings (`/solutions/<slug>/`, one demo island each, built from the
+  typed registry in `apps/website/src/data/solutions/`), their docs under
+  `/guides/solutions/<slug>/`, the `/solutions/` catalog and `/solutions/index.json`;
+- Built with Texuli (`/built-with/`, products with their own brand and domain) and
+  `/native/` with `/native/compatibility/` (ADR-027 to ADR-031);
 - SEO with compile-time social images.
 
 It imports the workspace packages directly, so a broken component breaks
@@ -363,7 +368,9 @@ It imports the workspace packages directly, so a broken component breaks
   `Cache-Control: no-store` (the built policy, or a stripped variant for
   Lighthouse-family audits, `apps/website/src/lib/robots-variants.ts`),
   serves a Markdown 404 to agents (`problem+json` under `/api/` and for JSON clients), and
-  sends bot-hit and `markdown_request` events; every other request gets the
+  sends bot-hit and `markdown_request` events, and moves the Markdown twins of
+  the `*-page` routes that `apps/website/public/_redirects` 301s to their Solution
+  landings (ADR-028); every other request gets the
   static asset response back untouched, so its `_headers` (CSP, and
   `Vary: Accept` on every page with a twin) survive;
 - `api/umami/[[path]].ts` is the same-origin Umami analytics proxy, on in
@@ -390,7 +397,7 @@ The pure decisions live in `apps/website/src/lib/` and are tested in
     way npm would publish it: `dist/` via `@sveltejs/package`, a derived
     manifest, publint and attw. It publishes nothing.
   - Workspace packages stay `private: true`; the publish workflow publishes
-    the 26 packable packages, `@texuli/mcp` included, to npm as the `0.14.4`
+    the 26 packable packages, `@texuli/mcp` included, to npm as the `0.15.0`
     release (dist-tag `latest`, through npm trusted publishing), with
     provenance; `next` is no longer maintained and stays on `0.12.1`
     ([RELEASE](RELEASE.md#dist-tags)).

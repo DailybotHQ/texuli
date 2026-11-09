@@ -394,7 +394,7 @@ test('the vocabulary: every block type, every slash item and every embed kind, r
   await expect(page.locator('[data-documents-embed="canvas"]')).toContainText('planned');
   await expect(page.getByRole('link', { name: 'Canvas', exact: true }).last()).toHaveAttribute(
     'href',
-    '/canvas-page/'
+    '/solutions/canvas/'
   );
   expect(await axeViolations(page)).toEqual([]);
 });

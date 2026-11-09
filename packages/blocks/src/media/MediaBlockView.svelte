@@ -44,7 +44,7 @@ function imageAlt(decorative: boolean | undefined, alt: string | undefined): str
 </script>
 
 {#if !check.ok}
-  <p class="tx-block tx-block-invalid" role="note" data-tx-block="invalid">{text.invalid}</p>
+  <p class="tx-block tx-block-invalid" role="note" data-tx-block="invalid" data-tx-component="blocks-media">{text.invalid}</p>
 {:else}
   {@const b = check.block}
   {#if b.type === 'image' || b.type === 'figure'}
@@ -52,6 +52,7 @@ function imageAlt(decorative: boolean | undefined, alt: string | undefined): str
     <figure
       class="tx-block tx-media-figure"
       data-tx-block={b.type}
+      data-tx-component="blocks-media"
       data-tone={b.tone}
       data-fit={b.fit ?? 'cover'}
     >
@@ -85,7 +86,7 @@ function imageAlt(decorative: boolean | undefined, alt: string | undefined): str
     {@const src = resolveBlockMediaSrc(b.src, 'video')}
     {@const poster = b.poster ? resolveBlockMediaSrc(b.poster, 'image', resolveAvatar) : undefined}
     {@const canAutoplay = b.autoplay === true && b.muted === true && motionKnown && !reducedMotion}
-    <figure class="tx-block tx-media-figure" data-tx-block="video" data-tone={b.tone}>
+    <figure class="tx-block tx-media-figure" data-tx-block="video" data-tx-component="blocks-media" data-tone={b.tone}>
       {#if src}
         <video
           {src}
@@ -114,6 +115,7 @@ function imageAlt(decorative: boolean | undefined, alt: string | undefined): str
     <section
       class="tx-block tx-media-gallery"
       data-tx-block="gallery"
+      data-tx-component="blocks-media"
       data-tone={b.tone}
       data-columns={columns}
       aria-label={b.title}

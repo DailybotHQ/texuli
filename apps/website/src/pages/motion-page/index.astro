@@ -11,6 +11,7 @@ import * as coreMotion from '@texuli/core/motion';
 import * as springMotion from '@texuli/core/motion/spring';
 import * as tokensMotion from '@texuli/tokens/motion';
 import * as texuliMotion from 'texuli/motion';
+import { siteRouteExists } from '../../components/foundation/nav-data.ts';
 import GuideCode from '../../components/guides/GuideCode.astro';
 import { MOTION_ADOPTERS } from '../../components/motion-site/adopters.ts';
 import BlueprintDemo from '../../components/motion-site/BlueprintDemo.svelte';
@@ -46,6 +47,48 @@ const section = (id: string) => {
   if (!entry) throw new Error(`Unknown motion section ${id}`);
   return entry;
 };
+
+/** `*-page` routes that a Solution landing will replace; do not link them here. */
+const REPLACED_DEMOS = [
+  '/slides-page/',
+  '/documents-page/',
+  '/workflows-page/',
+  '/canvas-page/',
+  '/sheets-page/',
+];
+
+const related = (
+  [
+    {
+      name: 'Drag and drop',
+      note: 'Capability. Same reduced-motion contract on pointer and keyboard moves.',
+      href: '/drag-page/',
+    },
+    {
+      name: 'Forms',
+      note: 'Schema-driven runtime; step flows can move with the same motion tokens.',
+      href: '/forms-page/',
+    },
+    {
+      name: 'Accessibility',
+      note: 'Keyboard, labels and WCAG 2.x contrast, including reduced motion.',
+      href: '/guides/accessibility/',
+    },
+  ] as const
+).filter((item) => siteRouteExists(item.href));
+
+function showcaseHref(href: string): string | undefined {
+  if (href.startsWith('#')) return href;
+  const path = href.split('#')[0] ?? '';
+  const canonical = path.endsWith('/') ? path : `${path}/`;
+  if (REPLACED_DEMOS.includes(canonical)) return undefined;
+  return siteRouteExists(href) ? href : undefined;
+}
+
+const adopters = MOTION_ADOPTERS.map((adopter) => ({
+  ...adopter,
+  href: showcaseHref(adopter.live),
+}));
 
 /** The public surface, read from the packages at build time (values only; types are erased). */
 const INVENTORY = [
@@ -83,14 +126,15 @@ await run.finished; // "finished", or "instant" under reduced motion`;
 >
   <div class="motion-page" data-tx-motion-page="">
     <header class="motion-page__hero">
+      <p class="taxonomy">Capability</p>
       <p class="eyebrow">texuli/motion · in development · on npm from {MOTION_RELEASE}</p>
       <h1>Motion that respects the reader</h1>
       <p class="lead">
         One small runtime moves every Texuli surface: overlays enter and leave, lists glide, a card
         grows into its detail view, timelines play on one clock, springs settle. The browser does the
-        interpolation through the Web Animations API, and reduced motion is instant by construction.
-        The motion system is in development and on npm from <code>{MOTION_RELEASE}</code>, a pre-1.0
-        release; <code>0.5.0</code> and earlier are without it.
+        interpolation through the Web Animations API. Reduced motion
+        (<code>prefers-reduced-motion</code>) is instant by construction, and the settings below can
+        force reduced motion on every demo. The motion system is in development and on npm from <code>{MOTION_RELEASE}</code>, a pre-1.0 release; <code>0.5.0</code> and earlier are without it.
       </p>
       <ol class="pieces" aria-label="The pieces of @texuli/core/motion">
         {
@@ -103,6 +147,27 @@ await run.finished; // "finished", or "instant" under reduced motion`;
         }
       </ol>
     </header>
+
+    <section class="related" aria-labelledby="related-title">
+      <h2 id="related-title">A capability inside larger systems</h2>
+      <p>
+        <code>texuli/motion</code> is an embeddable animation runtime, not a hosted motion product.
+        Solution landings that use it are planned. Until those routes ship, the demos on this page
+        and the capability pages below are the live surface. Your application owns when motion runs;
+        the runtime only paints.
+      </p>
+      <ul class="related__list">
+        {
+          related.map((item) => (
+            <li>
+              <strong>{item.name}</strong>
+              <span>{item.note}</span>
+              <a href={item.href}>{item.name}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
 
     <nav class="toc" aria-label="Sections on this page">
       <ul>
@@ -151,7 +216,7 @@ await run.finished; // "finished", or "instant" under reduced motion`;
           </thead>
           <tbody>
             {
-              MOTION_ADOPTERS.map((adopter) => (
+              adopters.map((adopter) => (
                 <tr>
                   <th scope="row">{adopter.component}</th>
                   <td>
@@ -159,8 +224,10 @@ await run.finished; // "finished", or "instant" under reduced motion`;
                   </td>
                   <td>{adopter.motion}</td>
                   <td>
-                    {adopter.live ? (
-                      <a href={adopter.live}>{adopter.live.startsWith('#') ? 'On this page' : adopter.live}</a>
+                    {adopter.href ? (
+                      <a href={adopter.href}>
+                        {adopter.href.startsWith('#') ? 'On this page' : adopter.href}
+                      </a>
                     ) : (
                       'Its showcase page is planned'
                     )}
@@ -396,6 +463,12 @@ await run.finished; // "finished", or "instant" under reduced motion`;
     display: grid;
     gap: 0.75rem;
   }
+  .taxonomy {
+    margin: 0;
+    color: var(--tx-muted-foreground, CanvasText);
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
   .eyebrow {
     margin: 0;
     font-size: 0.75rem;
@@ -448,6 +521,47 @@ await run.finished; // "finished", or "instant" under reduced motion`;
     list-style: none;
   }
   .toc a {
+    color: var(--tx-link, LinkText);
+  }
+  .related {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 1rem;
+    background: var(--tx-surface, Canvas);
+  }
+  .related h2,
+  .related p {
+    margin: 0;
+  }
+  .related h2 {
+    font-size: 1.25rem;
+  }
+  .related > p {
+    max-inline-size: 52rem;
+  }
+  .related__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .related__list li {
+    display: grid;
+    align-content: start;
+    gap: 0.35rem;
+    padding: 0.75rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 0.75rem;
+  }
+  .related__list span {
+    color: var(--tx-muted-foreground, CanvasText);
+    font-size: 0.8125rem;
+  }
+  .related__list a {
     color: var(--tx-link, LinkText);
   }
   .demo {

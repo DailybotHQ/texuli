@@ -1,0 +1,59 @@
+/**
+ * The kit's components matrix (`texuli/ds-kit`, ADR-032): layout and chrome only, from the
+ * token contract. Samples paint with the design system's own components.
+ * @layer tx.components so consumer utilities can override.
+ */
+@layer tx.components {
+  .tx-ds-kit__matrix-component {
+    padding-block-end: var(--tx-space-4);
+    border-block-end: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+  }
+  .tx-ds-kit__matrix-modes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: var(--tx-space-4);
+  }
+  .tx-ds-kit__matrix-mode {
+    display: grid;
+    gap: var(--tx-space-3);
+    align-content: start;
+    min-inline-size: 0;
+  }
+  .tx-ds-kit__strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--tx-space-3);
+  }
+  .tx-ds-kit__cell {
+    display: grid;
+    gap: var(--tx-space-1);
+    justify-items: start;
+    margin: 0;
+    padding: var(--tx-space-2);
+    min-inline-size: 0;
+  }
+  .tx-ds-kit__cell figcaption {
+    color: var(--tx-muted-foreground, GrayText);
+    font-size: var(--tx-font-size-xs, 0.75rem);
+  }
+  .tx-ds-kit__disallowed {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--tx-space-2);
+    align-items: center;
+    margin: 0;
+  }
+  .tx-ds-kit__matrix-disallowed {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--tx-space-1) var(--tx-space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media print {
+    .tx-ds-kit__matrix-component {
+      break-inside: avoid;
+    }
+  }
+}

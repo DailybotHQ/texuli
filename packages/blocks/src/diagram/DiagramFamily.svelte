@@ -37,7 +37,7 @@ $effect(() => {
 </script>
 
 {#if !parsed.success}
-  <p class="tx-diagram-fallback" role="note" data-tx-diagram-invalid>
+  <p class="tx-diagram-fallback" role="note" data-tx-diagram-invalid data-tx-component="blocks-diagram">
     {text.invalid}
   </p>
 {:else if parsed.data.type === 'flow'}
@@ -49,5 +49,5 @@ $effect(() => {
 {:else if parsed.data.type === 'terminal'}
   <TerminalDiagram block={parsed.data} labels={text} />
 {:else}
-  <p class="tx-diagram-fallback" role="note">{text.unsupported}</p>
+  <p class="tx-diagram-fallback" role="note" data-tx-component="blocks-diagram">{text.unsupported}</p>
 {/if}

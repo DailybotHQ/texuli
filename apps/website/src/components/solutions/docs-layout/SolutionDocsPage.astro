@@ -1,0 +1,75 @@
+---
+/**
+ * One Solution's technical docs page (ADR-028): every `/guides/solutions/<slug>/` route
+ * renders its parsed Markdown sections through this component, so the five docs pages
+ * stay thin. Blocks come from the closed Markdown subset in
+ * `src/content/solution-docs/parse.ts` and render as elements (no HTML sink, no island).
+ */
+import type { DocBlock } from '../../../content/solution-docs/parse.ts';
+import type { SolutionEntry } from '../../../data/solutions/schema.ts';
+import GuideCode from '../../guides/GuideCode.astro';
+import { GUIDE_LANGUAGES, type GuideLanguage } from '../../guides/highlight.ts';
+import SolutionDocsLayout from './SolutionDocsLayout.astro';
+
+interface Props {
+  entry: SolutionEntry;
+  title: string;
+  description: string;
+  sections: readonly Readonly<{ id: string; blocks: readonly DocBlock[] }>[];
+}
+
+const { entry, title, description, sections } = Astro.props;
+
+const toc = sections.flatMap((section) =>
+  section.blocks
+    .filter((block): block is Extract<DocBlock, { type: 'h2' }> => block.type === 'h2')
+    .map((block) => ({ id: block.id, label: block.text, level: 2 as const }))
+);
+
+const asLang = (lang: string): GuideLanguage =>
+  (GUIDE_LANGUAGES as readonly string[]).includes(lang) ? (lang as GuideLanguage) : 'auto';
+
+/** Each code region needs a unique accessible name (axe landmark-unique): its section and position. */
+const codeLabels = new Map<DocBlock, string>();
+for (const section of sections) {
+  let heading = entry.name;
+  let count = 0;
+  for (const block of section.blocks) {
+    if (block.type === 'h2') {
+      heading = block.text;
+      count = 0;
+    } else if (block.type === 'code') {
+      count += 1;
+      codeLabels.set(block, `${heading}: ${block.lang} sample ${count}`);
+    }
+  }
+}
+---
+
+<SolutionDocsLayout {entry} {title} {description} {toc}>
+  {
+    sections.map((section) => (
+      <section data-solution-doc={`${entry.slug}:${section.id}`}>
+        {section.blocks.map((block) =>
+          block.type === 'h2' ? (
+            <h2 id={block.id}>{block.text}</h2>
+          ) : block.type === 'p' ? (
+            <p>
+              {block.parts.map((part) => (part.kind === 'code' ? <code>{part.text}</code> : part.text))}
+            </p>
+          ) : block.type === 'ul' ? (
+            <ul>
+              {block.items.map((item) => (
+                <li>
+                  {item.map((part) => (part.kind === 'code' ? <code>{part.text}</code> : part.text))}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <GuideCode code={block.code} lang={asLang(block.lang)} label={codeLabels.get(block) ?? `${block.lang} sample`} />
+          )
+        )}
+      </section>
+    ))
+  }
+</SolutionDocsLayout>

@@ -1,0 +1,77 @@
+<script lang="ts">
+/**
+ * Heading (ADR-032): a section or page title. `level` picks the semantic `<h1>`…`<h6>`;
+ * `size` picks the visual size from the design system's type scale, independent of the
+ * level, so the document outline and the visual hierarchy never fight. Tones and sizes are
+ * `--tx-*` tokens only; a locked prototype keeps its hierarchy without typography utilities.
+ */
+import type { HTMLAttributes } from 'svelte/elements';
+import { cx } from '../../internal/cx.ts';
+import {
+  HEADING_LEVELS,
+  HEADING_SIZES,
+  HEADING_TONES,
+  HEADING_TRACKINGS,
+  type HeadingLevel,
+  type HeadingSize,
+  type HeadingTone,
+  type HeadingTracking,
+  headingClass,
+  headingSizeOf,
+  oneOf,
+} from './variants.ts';
+
+type Props = HTMLAttributes<HTMLHeadingElement> & {
+  /** The semantic level: renders `<h1>`…`<h6>`. Default 2. */
+  level?: HeadingLevel;
+  /** The visual size (`display`, `4xl`, `3xl`, `2xl`, `xl`, `lg`, `md`, `sm`). Default: from the level (1 xl, 2 lg, 3 md, 4–6 sm). */
+  size?: HeadingSize;
+  /** Scale the size down on narrow screens: fluid from two steps below up to the size. */
+  responsive?: boolean;
+  /** Letter spacing: `default` (the role's) or `tight` (`--tx-letter-spacing-tight`). */
+  tracking?: HeadingTracking;
+  /** `default` or `muted`. Default `default`. */
+  tone?: HeadingTone;
+  /** One line with an ellipsis; the full text stays in the accessibility tree. */
+  truncate?: boolean;
+  /** Plain-text heading, rendered as escaped text; replaces `children` when non-empty. */
+  label?: string;
+  /** The rendered element (bindable). */
+  ref?: HTMLHeadingElement | null;
+};
+
+let {
+  ref = $bindable(null),
+  level: levelProp = 2,
+  size: sizeProp,
+  responsive = false,
+  tracking: trackingProp = 'default',
+  tone: toneProp = 'default',
+  truncate = false,
+  label,
+  class: className,
+  children,
+  ...rest
+}: Props = $props();
+
+const level = $derived(oneOf(HEADING_LEVELS, levelProp, 2));
+const size = $derived(oneOf(HEADING_SIZES, sizeProp, headingSizeOf(level)));
+const tone = $derived(oneOf(HEADING_TONES, toneProp, 'default'));
+const tracking = $derived(oneOf(HEADING_TRACKINGS, trackingProp, 'default'));
+const hasLabel = $derived(typeof label === 'string' && label.length > 0);
+</script>
+
+<svelte:element
+  this={`h${level}`}
+  bind:this={ref}
+  {...rest}
+  class={cx(
+    headingClass({ size, tone, tracking }),
+    responsive === true && 'tx-heading--responsive',
+    truncate && 'tx-type--truncate',
+    className
+  )}
+  data-tx-component="heading"
+  data-tx-size={size}
+  data-tx-tone={tone}
+>{#if hasLabel}{label}{:else}{@render children?.()}{/if}</svelte:element>

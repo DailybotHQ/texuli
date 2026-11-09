@@ -1,0 +1,31 @@
+{
+  "description": "An allowed state the component does not have.",
+  "code": "unknown-state",
+  "expect": "fail",
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "color": {
+      "brand": {
+        "seed": "#0e7490"
+      }
+    },
+    "allow": {
+      "button": {
+        "variants": ["default", "outline"],
+        "sizes": ["sm", "md"],
+        "tones": ["default"],
+        "states": ["hover", "focus-visible", "disabled"]
+      },
+      "card": {
+        "states": ["loading"]
+      },
+      "data-grid": {
+        "densities": ["compact"]
+      }
+    }
+  }
+}

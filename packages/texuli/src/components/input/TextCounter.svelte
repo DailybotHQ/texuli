@@ -106,7 +106,7 @@ function onInputValue(next: string) {
   {...split.wrapper}
   class={cx('tx-input-shell', className)}
   data-tx-text-counter=""
->
+ data-tx-component="text-counter">
   {#if label}
     <label class="tx-input-shell__label" for={fieldId}>{label}</label>
   {/if}

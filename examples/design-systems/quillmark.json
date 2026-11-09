@@ -41,5 +41,23 @@
     "lexicon": { "post": "essay", "author": "contributor" },
     "guidelines": ["Write in full sentences.", "Prefer plain words over jargon."]
   },
-  "accessibility": { "contrast": "AA", "targetMin": 24, "focus": "outline", "focusWidth": 2 }
+  "accessibility": { "contrast": "AA", "targetMin": 24, "focus": "outline", "focusWidth": 2 },
+  "allow": {
+    "button": {},
+    "card": {}
+  },
+  "library": [
+    {
+      "id": "essay-header",
+      "name": "Essay header",
+      "purpose": "Title, contributor and deck for one essay.",
+      "version": "0.1.0",
+      "status": "draft",
+      "composes": ["card"]
+    }
+  ],
+  "approval": {
+    "status": "draft",
+    "version": "1.0.0"
+  }
 }

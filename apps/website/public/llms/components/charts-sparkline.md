@@ -30,7 +30,7 @@
 | `label` | string | yes | — | — | — |
 | `description` | string | no | — | — | — |
 | `period` | string | no | — | — | — |
-| `variant` | enum(line | area | bar) | no | — | — | — |
+| `variant` | enum(line | area | bar) | no | — | `"line"` | — |
 | `format` | object | no | — | — | — |
 | `height` | number | no | — | — | — |
 | `showLast` | boolean | no | — | — | — |

@@ -3,6 +3,7 @@ import type { Snippet } from 'svelte';
 import { type ClassValue } from 'texuli/cx';
 
 type Props = {
+  'data-tx-component'?: string;
   title: string;
   description: string;
   mode?: 'light' | 'dark';
@@ -16,6 +17,7 @@ type Props = {
 };
 
 let {
+  'data-tx-component': componentId,
   title,
   description,
   mode = 'light',
@@ -39,6 +41,7 @@ $effect(() => {
 
 <figure
   class="chart {className}"
+  data-tx-component={componentId}
   data-kind={kind}
   data-mode={mode}
   data-tx-matrix=""

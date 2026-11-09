@@ -161,6 +161,7 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
   bind:this={ref}
   class={cx('tx-chat-composer', className)}
   data-tx-chat-composer
+  data-tx-component="composer"
   data-layout={layout}
   onsubmit={chainHandlers(callerSubmit, (event: SubmitEvent) => {
     event.preventDefault();

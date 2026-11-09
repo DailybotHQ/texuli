@@ -1,0 +1,109 @@
+---
+import KitPage from '../../../components/design-systems/kit/KitPage.svelte';
+import { loadKitPage } from '../../../components/design-systems/kit/kit-content.ts';
+import { withBase } from '../../../components/foundation/site.ts';
+/**
+ * /design-systems/kit/ — the design-system kit (PLAN_016 T-t4-site, ADR-032, kit API §6): a
+ * whole design system on one page, rendered by `DesignSystemKit` from `texuli/ds-kit` for the
+ * fictional example brand Ledgerline. The document, its compiled output, its allow manifest
+ * and the catalog are built at build time (`loadKitPage`); the kit is server-rendered and
+ * hydrates when visible (the mode switch and the matrix's lazy samples). No request at run
+ * time, no HTML sink.
+ */
+import GuideCode from '../../../components/guides/GuideCode.astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { techArticleJsonLd } from '../../../lib/schema.ts';
+
+const base = import.meta.env.BASE_URL;
+const link = (path: string) => withBase(base, path);
+const data = await loadKitPage();
+const title = 'Design system kit';
+const description =
+  'A whole design system on one page: foundations, voice, every allowed component in light and dark, its own components and its approval, rendered by texuli/ds-kit for a fictional example brand.';
+const jsonLd = techArticleJsonLd(title, description, '/design-systems/kit/');
+
+const embed = `<script lang="ts">
+  import { DesignSystemKit } from 'texuli/ds-kit';
+  import catalog from './catalog/components.json'; // packages/spec/catalog/components.json
+  import doc from './design-system.json';
+  import compiled from './dist/compiled.json';      // texuli ds compile --format json
+</script>
+
+<DesignSystemKit document={doc} {compiled} allow={compiled.allowManifest} {catalog} />`;
+---
+
+<BaseLayout {title} {description} {jsonLd}>
+  <article class="ds-kit-page">
+    <header class="ds-kit-page__intro">
+      <h1>{title}</h1>
+      <p>
+        The kit renders a design system from data: its foundations in light and dark, its voice,
+        every component it allows in each allowed variant, size and state, its own components and
+        its approval record. Below is <strong>{data.name} {data.version}</strong>, a fictional
+        example brand, locked to {data.allowedCount} of the {data.catalogCount} catalog
+        components.
+      </p>
+      <p>
+        The kit is in development, like the locked design systems it shows. An approval it
+        displays is declared in the document: the kit checks the content hash, but only a reviewed
+        commit proves who approved. See the <a href={link('/design-systems/')}>design systems hub</a>{' '}
+        for the example brands side by side.
+      </p>
+    </header>
+
+    <section class="ds-kit-page__embed" aria-labelledby="ds-kit-embed">
+      <h2 id="ds-kit-embed">Use it in your app</h2>
+      <p>
+        Pass the document, its compiled output (with the allow manifest) and the catalog. Library
+        components arrive as snippets keyed by library id; components from packages above{' '}
+        <code>texuli</code> arrive as sample snippets keyed by catalog id.
+      </p>
+      <GuideCode code={embed} lang="html" label="Embed the kit" />
+    </section>
+
+    <div class="ds-kit-page__kit">
+      <KitPage
+        client:visible
+        document={data.document as never}
+        compiled={data.compiled}
+        allow={data.allow}
+        catalog={data.catalog}
+      />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .ds-kit-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--tx-space-8, 2rem);
+    max-inline-size: 80rem;
+    margin-inline: auto;
+    padding-block: var(--tx-space-8, 2rem);
+    padding-inline: var(--tx-space-4, 1rem);
+  }
+  .ds-kit-page__intro,
+  .ds-kit-page__embed {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--tx-space-3, 0.75rem);
+    min-inline-size: 0;
+    max-inline-size: 48rem;
+  }
+  .ds-kit-page h1,
+  .ds-kit-page h2,
+  .ds-kit-page p {
+    margin: 0;
+  }
+  /* A code sample scrolls inside its own box (it is a focusable region). */
+  .ds-kit-page :global(pre) {
+    max-inline-size: 100%;
+    overflow-x: auto;
+  }
+  .ds-kit-page__kit {
+    min-inline-size: 0;
+    max-inline-size: 100%;
+    overflow-wrap: anywhere;
+  }
+</style>

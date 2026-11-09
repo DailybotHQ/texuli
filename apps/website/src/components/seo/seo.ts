@@ -10,7 +10,20 @@ export const OG_IMAGE_HEIGHT = 630;
 /** Built social images live under `/og/`, one PNG per page. */
 export const OG_DIRECTORY = 'og';
 /** Pages never listed in the sitemap nor given a social image. */
-export const SEO_EXCLUDED = new Set(['/404/', '/404.html']);
+/**
+ * Routes kept out of the sitemap: the 404 page, and the `*-page` routes that 301 to their
+ * Solution landings (ADR-028; `public/_redirects`). Those pages still build until a later
+ * cleanup, but the redirect wins on Cloudflare Pages, so they are not canonical.
+ */
+export const SEO_EXCLUDED = new Set([
+  '/404/',
+  '/404.html',
+  '/slides-page/',
+  '/documents-page/',
+  '/workflows-page/',
+  '/canvas-page/',
+  '/sheets-page/',
+]);
 
 /** Normalizes a page pathname to `/a/b/` (or `/`), without the base path. */
 export function normalizePagePath(pathname: string, base = '/'): string {

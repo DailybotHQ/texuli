@@ -152,7 +152,7 @@ const ctx = $derived<FilterBuilderContext>({
 });
 </script>
 
-<div bind:this={root} class={cx('tx-filter-builder', className)} data-tx-filter-builder>
+<div bind:this={root} class={cx('tx-filter-builder', className)} data-tx-component="data-filter-builder" data-tx-filter-builder>
   <FilterBuilderGroup group={value} path={[]} position={1} {ctx} />
   <p class="tx-filter-builder__sr-only" role="status" aria-live="polite">{announcement}</p>
 </div>

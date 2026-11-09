@@ -31,4 +31,4 @@ const sheetMotion = createOverlayMotion({
 const classes = $derived(cx(detailPanelContentClass({ size }), className));
 </script>
 
-<Primitive.Content bind:ref {...rest} motionHooks={sheetMotion} {side} class={classes} data-tx-detail-panel="" data-size={size} />
+<Primitive.Content bind:ref {...rest} motionHooks={sheetMotion} {side} class={classes} data-tx-detail-panel="" data-size={size}  data-tx-component="detail-panel" data-tx-size={size}/>

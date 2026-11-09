@@ -958,6 +958,9 @@ describe('token contract v2: component registry', () => {
             'cx',
             'defaults',
             'design-system',
+            // The design-system kit (ADR-032) is a page of sections, not a styled control:
+            // it reads system tokens only and owns no component tokens.
+            'ds-kit',
             'i18n',
             'i18n/es',
             'motion',
@@ -966,6 +969,9 @@ describe('token contract v2: component registry', () => {
             // No component tokens yet: a new family changes the design-system
             // spec (DS_COMPONENT_TOKENS), planned with the next spec minor.
             'list-item',
+            // Typography and surfaces (ADR-032) read system tokens and role inks only: no
+            // component tokens, so no registry family.
+            'typography',
           ].includes(key)
       )
       .filter((key) => !key.startsWith('layouts'));
@@ -1270,7 +1276,8 @@ describe('token contract v2: schema, Tailwind and data-viz', () => {
         }
       }
     }
-  });
+    // 210 themes x 2 modes: seconds alone, far slower when parallel lanes load the machine.
+  }, 60_000);
 
   it('a theme’s own charts win, and themeVariables output is unchanged for chart-less themes', async () => {
     const theme = await loadLibraryTheme('enterprise-neutral');

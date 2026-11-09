@@ -161,7 +161,7 @@ object DesignTokens {
     val Acme: DesignTokenSet = DesignTokenSet(
         id = "acme",
         version = "2.1.0",
-        hash = "80076363d6cff88bf04e0e15b8f11f694ce01334e7c9c78a445de81901eaccd6",
+        hash = "7c8f92293b24ba556faaa1810ef1895d2f3aa3a980437c089326f4236d9c9670",
         fontSans = "\"Acme Sans\", system-ui, sans-serif",
         fontHeading = "\"Acme Display\", \"Acme Sans\", system-ui",
         fontMono = "\"Acme Mono\", ui-monospace, monospace",

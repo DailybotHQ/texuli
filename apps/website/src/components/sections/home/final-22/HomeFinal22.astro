@@ -1,0 +1,148 @@
+---
+/**
+ * Home 2.2 closing band: "Build your next interface." with two path cards, "Integrate a
+ * Solution" and "Prototype with Protoyard", over the `home-final` band art (light and dark
+ * files, handled by `SiteIllustration`). Copy and links live in `final-content.ts`.
+ * Static markup, no island and no install line (the hero carries the one copy command).
+ * Internal links pass the URL policy with the site base; the external product site passes
+ * it at the developer tier. Wiring into the home page belongs to the home integration task.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../../foundation/site.ts';
+import SiteIllustration from '../../../landing/SiteIllustration.astro';
+import StatusBadge from '../../../solutions/shared/platforms/StatusBadge.astro';
+import { FINAL_22_COPY, finalPaths } from './final-content.ts';
+
+const base = import.meta.env.BASE_URL;
+const copy = FINAL_22_COPY;
+const paths = finalPaths();
+const resolveHref = (href: string, external = false): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  if (safe === undefined) return undefined;
+  return external ? safe : withBase(base, safe);
+};
+---
+
+<section class="home-final22" aria-labelledby={copy.id} data-tx-home-final="">
+  <div class="home-final22__inner">
+    <div class="home-final22__head">
+      <h2 id={copy.id}>{copy.title}</h2>
+      <p>{copy.sub}</p>
+    </div>
+    <ul class="home-final22__paths" role="list">
+      {
+        paths.map((path) => (
+          <li class="home-final22__path" data-path={path.id}>
+            <div class="home-final22__path-head">
+              <h3>{path.title}</h3>
+              {path.status && <StatusBadge status={path.status.status} context={path.status.label} />}
+            </div>
+            <p>{path.body}</p>
+            <div class="home-final22__actions">
+              {path.links.map((link) => (
+                <a
+                  href={resolveHref(link.href, link.external)}
+                  class={`home-cta home-cta--${link.role}`}
+                  rel={link.external ? 'noopener' : undefined}
+                >
+                  {link.label}
+                  {link.role === 'text' && (
+                    <span aria-hidden="true">{link.external ? ' ↗' : ' →'}</span>
+                  )}
+                </a>
+              ))}
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="home-final22__art">
+      <SiteIllustration art={copy.art} />
+    </div>
+  </div>
+</section>
+
+<style>
+  .home-final22 {
+    background: var(--home-ground, transparent);
+  }
+  .home-final22__inner {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-block: clamp(3rem, 8vw, 6rem) 0;
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  .home-final22__head {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: center;
+    text-align: center;
+  }
+  .home-final22 h2 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+  .home-final22__head p {
+    margin: 0;
+    max-inline-size: 38rem;
+    color: var(--tx-muted-foreground);
+    font-size: clamp(1rem, 2.2vw, 1.2rem);
+    line-height: 1.5;
+  }
+  .home-final22__paths {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .home-final22__path {
+    display: grid;
+    align-content: start;
+    gap: 0.85rem;
+    padding: clamp(1.1rem, 3vw, 1.5rem);
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    border-radius: 1rem;
+    background: var(--tx-background);
+  }
+  .home-final22__path-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .home-final22 h3 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: 1.35rem;
+    font-weight: 750;
+  }
+  .home-final22__path p {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    line-height: 1.5;
+  }
+  .home-final22__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+  }
+  .home-final22__art {
+    min-inline-size: 0;
+  }
+  @media (forced-colors: active) {
+    .home-final22__path {
+      border-color: CanvasText;
+    }
+  }
+</style>

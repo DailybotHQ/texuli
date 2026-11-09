@@ -9,6 +9,10 @@
  * menu inline and block size limits are tuned geometry off the token steps.
  */
 @layer tx.components {
+  .tx-select-portal {
+    display: contents;
+  }
+
   .tx-select-root {
     display: inline-flex;
     flex-direction: column;

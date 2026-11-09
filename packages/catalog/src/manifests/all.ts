@@ -5,7 +5,7 @@
  *
  * The groups and names must match every folder of `src/manifests/` (what
  * `discoverManifestGroups()` in `@texuli/catalog/build/node` finds, sorted
- * by name), so `buildCatalog(ALL_MANIFEST_GROUPS)` has the same hash as the
+ * by name), so `buildCatalogWithImports(ALL_MANIFEST_GROUPS)` has the same hash as the
  * site's `catalog-<sha256>.json`; `tests/manifests-all.test.ts` checks it.
  * This file is not a folder on purpose: discovery reads folders only.
  */

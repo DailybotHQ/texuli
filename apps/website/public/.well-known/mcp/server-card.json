@@ -3,7 +3,7 @@
   "serverInfo": {
     "name": "texuli",
     "title": "Texuli MCP Server",
-    "version": "0.14.4",
+    "version": "0.15.0",
     "description": "Every Texuli operation as an MCP tool: search the component catalog, read manifests and examples, validate manifests and blueprints, search, read and preview themes, and run deck and document commands. Local over stdio (npx -y @texuli/mcp, the edge and node operations) or remote over Streamable HTTP (https://texuli.com/mcp, the edge operations plus the site operations that list, read and search texuli.com's pages as Markdown). Read-only: nothing is stored, fetched from the network or modified.",
     "documentation": "https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/mcp.md"
   },
@@ -138,7 +138,7 @@
     {
       "name": "ds.validate",
       "title": "Validate a design system",
-      "description": "Validate a design-system document: the spec's closed schema, the extends chain, then a compile of the document and its high-contrast variant with the guarantees enforced (text contrast, focus ring, target size). Returns valid, the distinct codes, every error with its JSON path and hint, the compiler warnings and the hash.",
+      "description": "Validate a design-system document. Set full to run the complete locked-design-system validator, including catalog allow sets, extensions and an optional prototype's component and CSS policy checks. Returns every finding with stable code, severity, area, path and fix hint; the full mode is read-only and does not execute prototype sources.",
       "runtime": "edge",
       "remote": true,
       "local": true,
@@ -181,6 +181,33 @@
       "readOnly": true
     },
     {
+      "name": "ds.generate",
+      "title": "Generate a design-system draft",
+      "description": "Combine a brand brief, token JSON, site CSS, logo pixels and/or a Texuli theme into a validated design-system draft. Returns the document, every reported loss, automatic AA repairs and guarantee results; it never saves or approves the draft.",
+      "runtime": "edge",
+      "remote": true,
+      "local": true,
+      "readOnly": true
+    },
+    {
+      "name": "ds.allow",
+      "title": "List allowed components for a locked design system",
+      "description": "Build the allow section of a locked design system from the catalog: a preset (minimal, a documented core; all, every component) or the ids you name, each with every variant, size, tone, density and state the catalog declares. Narrow it, put it under \"allow\" and run ds.validate. Returns allow, count, unknown ids and the minimal preset ids.",
+      "runtime": "edge",
+      "remote": true,
+      "local": true,
+      "readOnly": true
+    },
+    {
+      "name": "ds.bundle",
+      "title": "Pack or unpack a portable design-system bundle",
+      "description": "Pack a design-system document with its library sources and release history into one JSON bundle, or unpack a bundle and return those parts. Returns ok, the bundle or the document, allowManifest, librarySources and history; hash mismatches, oversized sources and path-traversing ids are refused with stable codes. Sources are never executed.",
+      "runtime": "edge",
+      "remote": true,
+      "local": true,
+      "readOnly": true
+    },
+    {
       "name": "ds.diff",
       "title": "Diff two design systems",
       "description": "Compile two design-system documents (before is the baseline) and compare them: every added, removed or changed --tx-* variable per mode, contrast pairs that regressed below the target, changed component defaults and attributes. Returns valid, identical, the summary counts and each list, or errors tagged with their side.",
@@ -201,7 +228,7 @@
     {
       "name": "ds.save",
       "title": "Save a design system to a file",
-      "description": "Validate a design-system document (as ds.validate does) and write it as two-space JSON to the explicit .json path you pass, inside the working directory: traversal, symlinks, dot directories and dotfiles, node_modules, package.json and an existing file without overwrite are refused. Local doors only. Returns saved, the relative path and bytes written, or errors with stable codes.",
+      "description": "Validate a design-system document (as ds.validate does) and write it as two-space JSON to an explicit .json path inside the working directory (traversal, symlinks, dot paths, node_modules, package.json and existing files without overwrite are refused). Anything marked approved is refused (approval-human-only). Local doors only. Returns saved, the path and bytes, or errors with stable codes.",
       "runtime": "node",
       "remote": false,
       "local": true,

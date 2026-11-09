@@ -37,6 +37,7 @@ const shellClass = $derived(cx('tx-composition-svg', className));
 {#if result.ok}
   <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
   <figure
+    data-tx-component="media-composition-svg"
     class={shellClass}
     data-tx-composition-svg="true"
     data-tx-composition-ok="true"
@@ -49,6 +50,7 @@ const shellClass = $derived(cx('tx-composition-svg', className));
 {:else}
   <div
     class={cx(shellClass, 'tx-composition-svg--error')}
+    data-tx-component="media-composition-svg"
     role="alert"
     data-tx-composition-svg="true"
     data-tx-composition-ok="false"

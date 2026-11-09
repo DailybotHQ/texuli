@@ -5,6 +5,11 @@
  * - {@link checkDesignSystem}: the static checks (validate, `extends`,
  *   compile of the base and its variants, the guarantees re-checked), with
  *   the spec's stable codes and JSON paths. Pure; no browser.
+ * - {@link checkDesignSystemFull}: every check in one report (structure, extends, allow vs
+ *   the merged catalog, approval and hash, contrast, data-viz palette, tokens, and with a
+ *   prototype the locked static and CSS-policy findings), each with a severity and a hint.
+ * - {@link mapDesignSystemTree}: list interactive elements not inside an
+ *   allowed catalog root, and roots outside the allow manifest.
  * - {@link runDsRenderChecks}: the render checks on a Playwright page you
  *   already opened on a sheet that installs `@texuli/tools/ds-check/host`.
  * - {@link renderDesignSystemCheck}: launches chromium and serves the
@@ -12,6 +17,20 @@
  *   `url`) itself; what `--render` runs.
  */
 export { type DsCliArgs, formatDsCheckReport, parseDsCliArgs, runDsCli } from './cli.ts';
+export * from './css-policy.ts';
+export * from './full.ts';
+export * from './locked-static.ts';
+export {
+  DS_MAP_CODES,
+  DS_MAP_MAX_ISSUES,
+  DS_MAP_NOT_ALLOWED,
+  DS_MAP_UNMAPPED,
+  type DsMapAllowManifest,
+  type DsMapOptions,
+  type DsMapReport,
+  dsMapSelector,
+  mapDesignSystemTree,
+} from './map.ts';
 export {
   builtinSheetDir,
   DS_CHECK_AXE_PACKAGE,

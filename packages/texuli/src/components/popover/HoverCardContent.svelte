@@ -55,6 +55,9 @@ const classes = $derived(
   data-tx-hover-card-content
   data-variant={variant}
   data-size={size}
+  data-tx-component="hover-card-content"
+  data-tx-variant={variant}
+  data-tx-size={size}
   {...rest}
 >
   {#if arrow}

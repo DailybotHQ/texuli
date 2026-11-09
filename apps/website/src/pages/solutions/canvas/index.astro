@@ -1,0 +1,49 @@
+---
+import CanvasDemo from '../../../components/solutions/canvas/demo/CanvasDemo.svelte';
+import CanvasPreview from '../../../components/solutions/canvas/demo/CanvasPreview.svelte';
+import CanvasHero from '../../../components/solutions/canvas/hero/CanvasHero.astro';
+import CanvasHow from '../../../components/solutions/canvas/how/CanvasHow.astro';
+import CanvasQuickstart from '../../../components/solutions/canvas/quickstart/CanvasQuickstart.astro';
+import CanvasStories from '../../../components/solutions/canvas/stories/CanvasStories.astro';
+/**
+ * `/solutions/canvas/` — the Canvas Solution landing. SolutionLayout orders its sections
+ * and checks their copy against the registry entry. Its only island is the visible Canvas
+ * demo, paired with a server-rendered preview of the same fixture.
+ */
+import SolutionDemoFrame from '../../../components/solutions/shared/demo-frame/SolutionDemoFrame.astro';
+import SolutionAgents from '../../../components/solutions/shared/platforms/SolutionAgents.astro';
+import SolutionPlatforms from '../../../components/solutions/shared/platforms/SolutionPlatforms.astro';
+import SolutionNextSteps from '../../../components/solutions/shared/resources/SolutionNextSteps.astro';
+import SolutionRecipes from '../../../components/solutions/shared/resources/SolutionRecipes.astro';
+import SolutionRelated from '../../../components/solutions/shared/resources/SolutionRelated.astro';
+import SolutionLayout from '../../../components/solutions/shared/SolutionLayout.astro';
+import { techArticleJsonLd } from '../../../lib/schema.ts';
+import { CANVAS_LANDING as content, CANVAS_ENTRY as entry } from './_content.ts';
+
+const title = 'Canvas — an embeddable whiteboard';
+const description = entry.tagline;
+---
+
+<SolutionLayout
+  {entry}
+  {content}
+  {title}
+  {description}
+  jsonLd={techArticleJsonLd(title, description, entry.route)}
+>
+  <CanvasHero slot="hero" />
+  <SolutionDemoFrame slot="demo" {entry} {...content.demo}>
+    <CanvasPreview slot="preview" />
+    <CanvasDemo slot="demo" client:visible />
+  </SolutionDemoFrame>
+  <CanvasStories slot="stories" />
+  <CanvasHow slot="how" />
+  <CanvasQuickstart slot="quickstart" />
+  <SolutionRecipes slot="recipes" {entry} {...content.recipes!} />
+  <SolutionAgents slot="agents" {entry} {...content.agents} />
+  <SolutionPlatforms slot="platforms" {entry} {...content.platforms} />
+  <Fragment slot="next">
+    <SolutionRelated {entry} />
+    <SolutionNextSteps {entry} {...content.next} />
+  </Fragment>
+</SolutionLayout>

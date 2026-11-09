@@ -4,6 +4,7 @@
  */
 export {
   buildCatalog,
+  buildCatalogWithImports,
   CATALOG_FORMAT,
   CATALOG_VERSION,
   type Catalog,

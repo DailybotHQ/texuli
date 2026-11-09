@@ -1,0 +1,311 @@
+---
+/**
+ * /native/ "One blueprint, many renderers": a static HTML diagram (blueprint →
+ * @texuli/spec → web player, Compose Desktop, Android, iOS), with planned renderers drawn
+ * dashed and labelled "planned", and a native <details> "View JSON blueprint" that shows a
+ * real golden fixture. The diagram is text in lists; the connectors are decorative and the
+ * figcaption is the one-sentence text alternative. No island, no HTML sinks; links pass the
+ * URL policy (developer tier).
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import StatusBadge from '../../../solutions/shared/platforms/StatusBadge.astro';
+import { blueprintDiagram } from './blueprint-content.ts';
+
+const view = blueprintDiagram();
+const links = view.links.map((link) => ({ ...link, href: safeHref(link.href, 'developer') }));
+---
+
+<section class="native-blueprint" aria-labelledby={view.headingId} data-tx-native-blueprint="">
+  <div class="native-blueprint__inner">
+    <div class="native-blueprint__head">
+      <h2 id={view.headingId}>{view.title}</h2>
+      <p class="native-blueprint__lede">{view.lede}</p>
+    </div>
+    <figure class="native-blueprint__diagram" data-tx-blueprint-diagram="">
+      <figcaption class="native-blueprint__caption">{view.summary}</figcaption>
+      <ol class="native-blueprint__flow" role="list">
+        <li class="native-blueprint__node native-blueprint__node--source" data-tier="blueprint">
+          <span class="native-blueprint__kicker">Blueprint</span>
+          <strong>JSON tree</strong>
+          <span class="native-blueprint__note"><code>{view.blueprintId}</code></span>
+        </li>
+        <li class="native-blueprint__node native-blueprint__node--contract" data-tier="contract">
+          <span class="native-blueprint__kicker">Contract</span>
+          <strong><code>@texuli/spec</code></strong>
+          <span class="native-blueprint__note">Spec {view.specVersion}: TypeScript and Kotlin</span>
+        </li>
+        <li class="native-blueprint__tier" data-tier="renderers">
+          <span class="native-blueprint__kicker" id="native-blueprint-renderers">Renderers</span>
+          <ul class="native-blueprint__renderers" role="list" aria-labelledby="native-blueprint-renderers">
+            {
+              view.renderers.map((renderer) => (
+                <li
+                  class:list={[
+                    'native-blueprint__node',
+                    'native-blueprint__node--renderer',
+                    { 'native-blueprint__node--planned': renderer.planned },
+                  ]}
+                  data-tx-renderer={renderer.id}
+                  data-status={renderer.status}
+                >
+                  <strong>{renderer.name}</strong>
+                  <StatusBadge status={renderer.status} />
+                  {renderer.via && <span class="native-blueprint__note">{renderer.via}</span>}
+                  <span class="native-blueprint__detail">{renderer.detail}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </li>
+      </ol>
+    </figure>
+    <details class="native-blueprint__json" data-tx-blueprint-json="">
+      <summary>View JSON blueprint</summary>
+      <div class="native-blueprint__json-body">
+        <table class="native-blueprint__table">
+          <caption>Components in this blueprint</caption>
+          <thead>
+            <tr><th scope="col">Component</th><th scope="col">Web</th><th scope="col">Compose Desktop</th></tr>
+          </thead>
+          <tbody>
+            {
+              view.components.map((c) => (
+                <tr>
+                  <th scope="row"><code>{c.id}</code></th>
+                  <td>{c.web}</td>
+                  <td>{c.composeDesktop}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+        <pre class="native-blueprint__code" tabindex="0" aria-label="Blueprint JSON"><code>{view.json}</code></pre>
+        <ul class="native-blueprint__links" role="list">
+          {links.map((link) => link.href && <li><a href={link.href}>{link.label}</a></li>)}
+        </ul>
+      </div>
+    </details>
+  </div>
+</section>
+
+<style>
+  .native-blueprint {
+    --nb-accent: var(--home-accent, #6d4aff);
+    --nb-accent-text: var(--home-accent-text, #5b3ae6);
+    --nb-accent-ink: var(--home-accent-ink, #ffffff);
+    padding-block: clamp(2.5rem, 7vw, 5rem);
+  }
+  :global(:root[data-tx-mode='dark']) .native-blueprint {
+    --nb-accent-text: var(--home-accent-text, #b9a8ff);
+  }
+  .native-blueprint__inner {
+    display: grid;
+    gap: clamp(1.25rem, 3vw, 2rem);
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  .native-blueprint__head {
+    display: grid;
+    gap: 0.6rem;
+    max-inline-size: 46rem;
+  }
+  .native-blueprint h2 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(1.75rem, 4.5vw, 2.6rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+  .native-blueprint__lede {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: clamp(1rem, 2.2vw, 1.15rem);
+    line-height: 1.55;
+  }
+  .native-blueprint code {
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+    font-size: 0.88em;
+    overflow-wrap: anywhere;
+  }
+  .native-blueprint__diagram {
+    margin: 0;
+    padding: clamp(1rem, 3vw, 1.75rem);
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    border-radius: calc(var(--tx-radius, 0.5rem) * 1.5);
+    background: var(--tx-background);
+  }
+  .native-blueprint__caption {
+    margin-block-end: 1.25rem;
+    color: var(--tx-muted-foreground);
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+  .native-blueprint__flow {
+    display: grid;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 60rem) {
+    .native-blueprint__flow {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 0.8fr) minmax(0, 2fr);
+      align-items: center;
+    }
+  }
+  .native-blueprint__flow > li {
+    position: relative;
+  }
+  /* Decorative connectors: down on one column, across on wide screens. */
+  .native-blueprint__flow > li + li::before {
+    content: '';
+    position: absolute;
+    inset-block-start: -1.2rem;
+    inset-inline-start: 50%;
+    inline-size: 2px;
+    block-size: 0.9rem;
+    background: color-mix(in oklab, var(--nb-accent) 55%, transparent);
+  }
+  @media (min-width: 60rem) {
+    .native-blueprint__flow > li + li::before {
+      inset-block-start: 50%;
+      inset-inline-start: -1.2rem;
+      inline-size: 0.9rem;
+      block-size: 2px;
+    }
+  }
+  .native-blueprint__node {
+    display: grid;
+    gap: 0.3rem;
+    align-content: start;
+    padding: 0.9rem;
+    border: 1px solid color-mix(in oklab, var(--nb-accent) 35%, var(--tx-border));
+    border-radius: 0.75rem;
+    background: color-mix(in oklab, var(--nb-accent) 6%, var(--tx-background));
+    color: var(--tx-foreground);
+    min-inline-size: 0;
+  }
+  .native-blueprint__node--contract {
+    border-color: transparent;
+    background: var(--nb-accent);
+    color: var(--nb-accent-ink);
+  }
+  .native-blueprint__node--contract .native-blueprint__kicker,
+  .native-blueprint__node--contract .native-blueprint__note {
+    color: var(--nb-accent-ink);
+  }
+  .native-blueprint__node--planned {
+    border-style: dashed;
+    border-color: color-mix(in oklab, var(--tx-muted-foreground) 55%, transparent);
+    background: transparent;
+    color: var(--tx-muted-foreground);
+  }
+  .native-blueprint__kicker {
+    color: var(--tx-muted-foreground);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .native-blueprint__tier {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .native-blueprint__renderers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .native-blueprint__node :global(.status-badge) {
+    justify-self: start;
+  }
+  .native-blueprint__note {
+    color: var(--tx-muted-foreground);
+    font-size: 0.82rem;
+  }
+  .native-blueprint__detail {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+  .native-blueprint__json {
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    border-radius: calc(var(--tx-radius, 0.5rem) * 1.5);
+    background: var(--tx-background);
+  }
+  .native-blueprint__json summary {
+    padding: 0.9rem 1.1rem;
+    color: var(--nb-accent-text);
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .native-blueprint__json summary:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+    border-radius: inherit;
+  }
+  .native-blueprint__json-body {
+    display: grid;
+    gap: 1rem;
+    padding: 0 1.1rem 1.1rem;
+    min-inline-size: 0;
+  }
+  .native-blueprint__table {
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  .native-blueprint__table caption {
+    padding-block-end: 0.4rem;
+    color: var(--tx-muted-foreground);
+    text-align: start;
+  }
+  .native-blueprint__table th,
+  .native-blueprint__table td {
+    padding: 0.35rem 0.9rem 0.35rem 0;
+    border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 70%, transparent);
+    text-align: start;
+  }
+  .native-blueprint__code {
+    max-block-size: 24rem;
+    margin: 0;
+    padding: 1rem;
+    overflow: auto;
+    border-radius: 0.6rem;
+    background: color-mix(in oklab, var(--tx-muted) 55%, var(--tx-background));
+    color: var(--tx-foreground);
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+  .native-blueprint__code:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .native-blueprint__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .native-blueprint__links a {
+    color: var(--nb-accent-text);
+    font-weight: 600;
+    text-underline-offset: 0.2em;
+  }
+  @media (forced-colors: active) {
+    .native-blueprint__node--contract {
+      border: 1px solid CanvasText;
+      background: Canvas;
+      color: CanvasText;
+    }
+    .native-blueprint__flow > li + li::before {
+      background: CanvasText;
+    }
+  }
+</style>

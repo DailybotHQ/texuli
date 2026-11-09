@@ -1,25 +1,45 @@
 import { manifestData } from '../../manifest/data.ts';
 import type { CatalogManifest } from '../../manifest/types.ts';
+import { stampDisplayAxes } from './axes.ts';
 import {
+  accordionPropNames,
   alertPropNames,
   avatarGroupGridPropNames,
+  avatarPropNames,
   badgePropNames,
   bannerPropNames,
+  boxPropNames,
   calloutPropNames,
   cardPropNames,
+  carouselPropNames,
   chipPropNames,
   codePropNames,
   emptyStatePropNames,
   errorStatePropNames,
+  headingPropNames,
+  iconPropNames,
   inlineTextPropNames,
   kbdPropNames,
   kpiPropNames,
+  listItemPropNames,
+  progressPropNames,
+  prosePropNames,
+  separatorPropNames,
+  skeletonPropNames,
+  spinnerPropNames,
   statPropNames,
   stepperPropNames,
   tablePropNames,
+  tabsPropNames,
   tagPropNames,
+  textPropNames,
   timelinePropNames,
 } from './prop-names.ts';
+
+/* @__NO_SIDE_EFFECTS__ */
+function defineDisplayManifest(input: CatalogManifest): Readonly<CatalogManifest> {
+  return stampDisplayAxes(manifestData(input));
+}
 
 const PKG = 'texuli';
 
@@ -66,11 +86,313 @@ const badgeVariants = [
 
 const alertTones = ['info', 'success', 'warning', 'error', 'brand', 'neutral'] as const;
 
-export const cardManifest = /* @__PURE__ */ manifestData({
+const headingSizes = ['display', '4xl', '3xl', '2xl', 'xl', 'lg', 'md', 'sm'] as const;
+const tabsVariants = ['line', 'pills', 'enclosed'] as const;
+const accordionVariants = ['default', 'bordered'] as const;
+const textTones = [
+  'default',
+  'muted',
+  'subtle',
+  'primary',
+  'success',
+  'warning',
+  'destructive',
+  'info',
+  'inherit',
+] as const;
+
+/** Heading (ADR-032): the semantic level and a visual size from the type scale. */
+export const headingManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'heading',
+  package: PKG,
+  label: 'Heading',
+  summary: 'A page title or section heading: a semantic h1–h6 with a size from the type scale.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: [
+    'Title a page, a section or a panel',
+    'Keep visual hierarchy in a locked prototype, where typography utilities are refused',
+  ],
+  dontUseWhen: ['Body copy, labels or captions (use text)', 'Long-form content (use prose)'],
+  a11y: [
+    'Renders the semantic heading element for its level; pick levels in document order.',
+    'size changes only the look, never the level announced to assistive technology.',
+  ],
+  props: propsFrom(headingPropNames, {
+    level: {
+      kind: 'number',
+      default: 2,
+      description: 'The semantic level, 1 to 6: renders <h1>…<h6>',
+    },
+    size: {
+      kind: 'enum',
+      enumValues: headingSizes,
+      default: 'lg',
+      description:
+        'Visual size, independent of the level (default from the level: 1 xl, 2 lg, 3 md, 4–6 sm); 2xl, 3xl and 4xl are hero and section titles between xl and display',
+    },
+    responsive: {
+      kind: 'boolean',
+      default: false,
+      description:
+        'Scale the size down on narrow screens: fluid from two scale steps below up to the size',
+    },
+    tracking: {
+      kind: 'enum',
+      enumValues: ['default', 'tight'],
+      default: 'default',
+      description: "Letter spacing: the role's own, or tight (--tx-letter-spacing-tight)",
+    },
+    tone: { kind: 'enum', enumValues: ['default', 'muted'], default: 'default' },
+    truncate: { kind: 'boolean', default: false, description: 'One line with an ellipsis' },
+    label: {
+      kind: 'string',
+      description: 'Plain-text heading, escaped; replaces children when both are given',
+    },
+    class: { kind: 'string' },
+    children: { kind: 'slot', description: 'The heading text' },
+  }),
+  examples: [
+    {
+      id: 'page-title',
+      title: 'Page title',
+      props: { level: 1, size: 'xl', label: 'Quarterly report' },
+    },
+    {
+      id: 'section',
+      title: 'Muted section heading',
+      props: { level: 2, size: 'md', tone: 'muted', label: 'Details' },
+    },
+    {
+      id: 'hero',
+      title: 'Responsive hero title',
+      props: {
+        level: 1,
+        size: '4xl',
+        responsive: true,
+        tracking: 'tight',
+        label: 'Plan the quarter',
+      },
+    },
+  ],
+  related: ['text', 'prose'],
+});
+
+/** Text (ADR-032): body copy, labels, captions and small print. */
+export const textManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'text',
+  package: PKG,
+  label: 'Text',
+  summary: 'Body copy, labels and small print with a size, tone and weight from the design system.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: [
+    'Body text, helper text, captions, muted or small print',
+    'Text with a status ink (success, warning, destructive, info) next to a word that says it',
+  ],
+  dontUseWhen: ['A title or section heading (use heading)', 'Long-form content (use prose)'],
+  a11y: [
+    'Never renders a heading element: as is p, span, div, label, small or strong.',
+    'A tone never carries meaning alone; the words say it.',
+  ],
+  props: propsFrom(textPropNames, {
+    as: {
+      kind: 'enum',
+      enumValues: ['p', 'span', 'div', 'label', 'small', 'strong'],
+      default: 'p',
+    },
+    size: {
+      kind: 'enum',
+      enumValues: ['figure', 'lg', 'md', 'sm', 'xs', 'inherit'],
+      default: 'md',
+      description:
+        "figure is a large number outside stat (the title size of the type scale); inherit takes the parent's size and line height",
+    },
+    tone: { kind: 'enum', enumValues: textTones, default: 'default' },
+    weight: { kind: 'enum', enumValues: ['regular', 'medium', 'semibold'], default: 'regular' },
+    truncate: { kind: 'boolean', default: false, description: 'One line with an ellipsis' },
+    lineClamp: { kind: 'number', description: 'Clamp to 1 to 10 lines with an ellipsis' },
+    align: { kind: 'enum', enumValues: ['start', 'center', 'end'], default: 'start' },
+    mono: { kind: 'boolean', default: false, description: "The design system's code family" },
+    tabular: {
+      kind: 'boolean',
+      default: false,
+      description: 'Tabular figures (font-variant-numeric: tabular-nums) for numbers that line up',
+    },
+    transform: {
+      kind: 'enum',
+      enumValues: ['none', 'uppercase', 'lowercase', 'capitalize'],
+      default: 'none',
+    },
+    tracking: {
+      kind: 'enum',
+      enumValues: ['normal', 'wide'],
+      default: 'normal',
+      description: 'Letter spacing; wide is the eyebrow tracking (--tx-letter-spacing-wide)',
+    },
+    for: { kind: 'string', description: 'With as="label": the id of the labelled control' },
+    label: {
+      kind: 'string',
+      description: 'Plain text, escaped; replaces children when both are given',
+    },
+    class: { kind: 'string' },
+    children: { kind: 'slot', description: 'The text' },
+  }),
+  examples: [
+    {
+      id: 'muted',
+      title: 'Muted helper text',
+      props: { size: 'sm', tone: 'muted', label: 'Updated an hour ago' },
+    },
+    {
+      id: 'caption',
+      title: 'Small print',
+      props: { as: 'small', size: 'xs', tone: 'subtle', label: 'Prices exclude tax.' },
+    },
+    {
+      id: 'eyebrow',
+      title: 'Eyebrow (overline)',
+      props: {
+        as: 'span',
+        size: 'xs',
+        tone: 'muted',
+        transform: 'uppercase',
+        tracking: 'wide',
+        label: 'Revenue',
+      },
+    },
+    {
+      id: 'figure',
+      title: 'Large figure',
+      props: { as: 'span', size: 'figure', tabular: true, label: '1,284' },
+    },
+    {
+      id: 'inherit',
+      title: 'Nested text that inherits',
+      props: { as: 'span', size: 'inherit', tone: 'inherit', weight: 'semibold', label: 'Pro' },
+    },
+  ],
+  related: ['heading', 'prose', 'inline-text'],
+});
+
+/** Prose (ADR-032): long-form reading rhythm from the design system. */
+export const proseManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'prose',
+  package: PKG,
+  label: 'Prose',
+  summary:
+    "Long-form text with the design system's reading rhythm: measure, spacing, headings, lists.",
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['Articles, docs, descriptions and other long text written as markup'],
+  dontUseWhen: ['One line or a short label (use text)', 'A block document (use document)'],
+  a11y: 'Keeps the host markup and its semantics; a 65ch measure keeps lines readable.',
+  props: propsFrom(prosePropNames, {
+    as: { kind: 'enum', enumValues: ['div', 'article', 'section'], default: 'div' },
+    size: { kind: 'enum', enumValues: ['md', 'lg'], default: 'md' },
+    class: { kind: 'string' },
+    children: { kind: 'slot', description: 'The long-form markup (paragraphs, headings, lists)' },
+  }),
+  examples: [{ id: 'article', title: 'Article body', props: { as: 'article', size: 'md' } }],
+  related: ['heading', 'text'],
+});
+
+/** Box (ADR-032): padding, radius, border, elevation and surface from tokens. */
+export const boxManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'box',
+  package: PKG,
+  label: 'Box',
+  summary: 'A panel or region with padding, radius, border, elevation and surface from tokens.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: [
+    'Frame a group of content as a bordered or filled panel',
+    'Space and surface a region in a locked prototype, where visual utilities are refused',
+  ],
+  dontUseWhen: ['A clickable surface (use card with href)', 'Page layout (use a layout)'],
+  a11y: 'Not interactive. Use as="section" or "aside" with a heading for a landmark-like region.',
+  props: propsFrom(boxPropNames, {
+    as: {
+      kind: 'enum',
+      enumValues: ['div', 'section', 'article', 'aside', 'header', 'footer'],
+      default: 'div',
+    },
+    padding: { kind: 'enum', enumValues: ['none', 'sm', 'md', 'lg', 'xl'], default: 'md' },
+    radius: { kind: 'enum', enumValues: ['none', 'sm', 'md', 'lg', 'xl', 'full'], default: 'md' },
+    border: {
+      kind: 'enum',
+      enumValues: ['none', 'default', 'strong', 'block-start', 'block-end'],
+      default: 'none',
+      description:
+        'All sides, or one logical side (block-start, block-end) for an app header or footer',
+    },
+    elevation: { kind: 'enum', enumValues: ['none', 'sm', 'md', 'lg'], default: 'none' },
+    surface: {
+      kind: 'enum',
+      enumValues: [
+        'transparent',
+        'default',
+        'muted',
+        'subtle',
+        'elevated',
+        'primary',
+        'brand',
+        'translucent',
+      ],
+      default: 'transparent',
+      description:
+        'The fill (the variant axis): primary is the solid primary with its on-color, brand the soft primary tint, translucent the glass opacity and blur for sticky headers',
+    },
+    class: { kind: 'string' },
+    children: { kind: 'slot', description: 'The panel content' },
+  }),
+  examples: [
+    {
+      id: 'bordered',
+      title: 'Bordered panel',
+      props: { padding: 'lg', border: 'default', surface: 'default' },
+    },
+    {
+      id: 'muted',
+      title: 'Muted region',
+      props: { padding: 'md', radius: 'lg', surface: 'muted' },
+    },
+    {
+      id: 'app-header',
+      title: 'App header (no card chrome)',
+      props: {
+        as: 'header',
+        padding: 'md',
+        radius: 'none',
+        border: 'block-end',
+        surface: 'default',
+      },
+    },
+    {
+      id: 'logo-tile',
+      title: 'Brand logo tile',
+      props: { padding: 'md', radius: 'lg', surface: 'primary' },
+    },
+    {
+      id: 'sticky-header',
+      title: 'Translucent sticky header',
+      props: {
+        as: 'header',
+        padding: 'md',
+        radius: 'none',
+        border: 'block-end',
+        surface: 'translucent',
+      },
+    },
+  ],
+  related: ['card', 'heading', 'text'],
+});
+
+export const cardManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'card',
   package: PKG,
   label: 'Card',
-  summary: 'A surface for grouping related content with optional link behavior.',
+  summary: 'A surface for grouping related content with optional stretched-link behavior.',
   tier: 'app',
   agentEmittable: false,
   useWhen: ['Group related content in a bordered surface', 'Make a whole tile a single link'],
@@ -79,7 +401,7 @@ export const cardManifest = /* @__PURE__ */ manifestData({
     'A data grid of many rows (use table)',
   ],
   a11y: [
-    'When href is set, the card is a real link with an accessible name',
+    'When href is set, one real link covers the card; nested actions sit above it',
     'Rejected href schemes render as a non-interactive surface',
   ],
   props: propsFrom(cardPropNames, {
@@ -95,7 +417,11 @@ export const cardManifest = /* @__PURE__ */ manifestData({
       enumValues: ['developer', 'untrusted'],
       default: 'developer',
     },
-    linkLabel: { kind: 'string', description: 'Accessible name when the card is a link' },
+    linkLabel: { kind: 'string', description: 'Accessible name of the stretched primary link' },
+    actions: {
+      kind: 'slot',
+      description: 'Secondary actions (pin, menu) above the stretched link',
+    },
     class: { kind: 'string', description: 'Extra classes' },
   }),
   examples: [
@@ -117,7 +443,7 @@ export const cardManifest = /* @__PURE__ */ manifestData({
   related: ['button', 'stat'],
 });
 
-export const badgeManifest = /* @__PURE__ */ manifestData({
+export const badgeManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'badge',
   package: PKG,
   label: 'Badge',
@@ -150,7 +476,7 @@ export const badgeManifest = /* @__PURE__ */ manifestData({
   related: ['tag', 'chip', 'inline-text'],
 });
 
-export const tagManifest = /* @__PURE__ */ manifestData({
+export const tagManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'tag',
   package: PKG,
   label: 'Tag',
@@ -174,7 +500,7 @@ export const tagManifest = /* @__PURE__ */ manifestData({
   related: ['badge', 'chip'],
 });
 
-export const chipManifest = /* @__PURE__ */ manifestData({
+export const chipManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'chip',
   package: PKG,
   label: 'Chip',
@@ -202,7 +528,7 @@ export const chipManifest = /* @__PURE__ */ manifestData({
   related: ['badge', 'tag', 'button'],
 });
 
-export const tableManifest = /* @__PURE__ */ manifestData({
+export const tableManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'table',
   package: PKG,
   label: 'Table',
@@ -276,7 +602,7 @@ const alertSharedDetail = {
   class: { kind: 'string' as const },
 };
 
-export const alertManifest = /* @__PURE__ */ manifestData({
+export const alertManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'alert',
   package: PKG,
   label: 'Alert',
@@ -297,7 +623,7 @@ export const alertManifest = /* @__PURE__ */ manifestData({
   related: ['callout', 'banner', 'error-state'],
 });
 
-export const calloutManifest = /* @__PURE__ */ manifestData({
+export const calloutManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'callout',
   package: PKG,
   label: 'Callout',
@@ -318,7 +644,7 @@ export const calloutManifest = /* @__PURE__ */ manifestData({
   related: ['alert', 'banner'],
 });
 
-export const bannerManifest = /* @__PURE__ */ manifestData({
+export const bannerManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'banner',
   package: PKG,
   label: 'Banner',
@@ -344,7 +670,7 @@ export const bannerManifest = /* @__PURE__ */ manifestData({
   related: ['alert', 'callout'],
 });
 
-export const statManifest = /* @__PURE__ */ manifestData({
+export const statManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'stat',
   package: PKG,
   label: 'Stat',
@@ -389,7 +715,7 @@ export const statManifest = /* @__PURE__ */ manifestData({
   related: ['kpi', 'card'],
 });
 
-export const kpiManifest = /* @__PURE__ */ manifestData({
+export const kpiManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'kpi',
   package: PKG,
   label: 'KPI',
@@ -443,7 +769,7 @@ export const kpiManifest = /* @__PURE__ */ manifestData({
   related: ['stat', 'card'],
 });
 
-export const emptyStateManifest = /* @__PURE__ */ manifestData({
+export const emptyStateManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'empty-state',
   package: PKG,
   label: 'Empty state',
@@ -471,7 +797,7 @@ export const emptyStateManifest = /* @__PURE__ */ manifestData({
   related: ['error-state', 'table'],
 });
 
-export const errorStateManifest = /* @__PURE__ */ manifestData({
+export const errorStateManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'error-state',
   package: PKG,
   label: 'Error state',
@@ -503,7 +829,7 @@ export const errorStateManifest = /* @__PURE__ */ manifestData({
   related: ['empty-state', 'alert'],
 });
 
-export const stepperManifest = /* @__PURE__ */ manifestData({
+export const stepperManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'stepper',
   package: PKG,
   label: 'Stepper',
@@ -548,7 +874,7 @@ export const stepperManifest = /* @__PURE__ */ manifestData({
   related: ['timeline', 'layout-wizard'],
 });
 
-export const timelineManifest = /* @__PURE__ */ manifestData({
+export const timelineManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'timeline',
   package: PKG,
   label: 'Timeline',
@@ -601,7 +927,7 @@ export const timelineManifest = /* @__PURE__ */ manifestData({
 
 const avatarSizes = ['xs', 'sm', 'md', 'lg'] as const;
 
-export const avatarGroupGridManifest = /* @__PURE__ */ manifestData({
+export const avatarGroupGridManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'avatar-group-grid',
   package: PKG,
   label: 'AvatarGroupGrid',
@@ -623,7 +949,242 @@ export const avatarGroupGridManifest = /* @__PURE__ */ manifestData({
   ],
 });
 
-export const kbdManifest = /* @__PURE__ */ manifestData({
+const iconSizes = ['xs', 'sm', 'md', 'lg'] as const;
+const iconTones = [
+  'default',
+  'primary',
+  'success',
+  'warning',
+  'destructive',
+  'info',
+  'neutral',
+] as const;
+const feedbackSizes = ['sm', 'md', 'lg'] as const;
+const feedbackTones = ['primary', 'success', 'warning', 'destructive', 'info', 'neutral'] as const;
+
+/** One catalog id for every icon set (built-in texuli names and Lucide). */
+export const iconManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'icon',
+  package: PKG,
+  label: 'Icon',
+  summary: 'A glyph by name or Lucide component; allowing icon allows every icon set.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['A decorative or labelled glyph next to a control or a list row'],
+  dontUseWhen: ['A pressable control (use icon-button)', 'Navigation chrome (use nav-icon)'],
+  a11y: [
+    'With a label it is an image; without a label it is decorative (aria-hidden).',
+    'Unknown names render nothing.',
+  ],
+  props: propsFrom(iconPropNames, {
+    icon: { kind: 'string', description: 'Built-in name, registered name, or a Lucide component' },
+    size: { kind: 'enum', enumValues: iconSizes, default: 'md' },
+    tone: { kind: 'enum', enumValues: iconTones, default: 'default' },
+    label: { kind: 'string', description: 'Accessible name; omit for decorative' },
+    class: { kind: 'string' },
+  }),
+  examples: [
+    { id: 'search', title: 'Search glyph', props: { icon: 'search', label: 'Search' } },
+    { id: 'muted', title: 'Muted chevron', props: { icon: 'chevron-down', tone: 'neutral' } },
+  ],
+  related: ['icon-button', 'nav-icon'],
+});
+
+export const avatarManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'avatar',
+  package: PKG,
+  label: 'Avatar',
+  summary: 'A face or initials for one person, with an optional presence status.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['Show who wrote a message, who owns a task, or who is in a thread'],
+  dontUseWhen: ['A group of faces in one circle (use avatar-group-grid)'],
+  a11y: ['Named by the person unless decorative.', 'Image URLs pass the untrusted image policy.'],
+  props: propsFrom(avatarPropNames, {
+    name: { kind: 'string', required: true, trust: 'untrusted' },
+    src: { kind: 'string', trust: 'untrusted' },
+    srcTrust: { kind: 'enum', enumValues: ['developer', 'untrusted'], default: 'untrusted' },
+    srcset: { kind: 'string', trust: 'untrusted' },
+    sizes: { kind: 'string' },
+    size: { kind: 'enum', enumValues: avatarSizes, default: 'md' },
+    tone: {
+      kind: 'enum',
+      enumValues: ['primary', 'success', 'warning', 'destructive', 'info', 'neutral'],
+    },
+    shape: { kind: 'enum', enumValues: ['circle', 'square'] },
+    status: { kind: 'enum', enumValues: ['online', 'away', 'busy', 'offline'] },
+    decorative: { kind: 'boolean', default: false },
+    delayMs: { kind: 'number', default: 0 },
+    initials: { kind: 'string' },
+    class: { kind: 'string' },
+  }),
+  examples: [{ id: 'person', title: 'Named person', props: { name: 'Ada Example', size: 'md' } }],
+  related: ['avatar-group-grid', 'list-item'],
+});
+
+export const skeletonManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'skeleton',
+  package: PKG,
+  label: 'Skeleton',
+  summary: 'A placeholder bar or circle while content loads.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['Reserve space for text or an avatar that has not arrived yet'],
+  dontUseWhen: ['A determinate load (use progress)', 'A live status (use spinner)'],
+  a11y: 'Decorative (aria-hidden); pair it with a live status elsewhere if the wait matters.',
+  props: propsFrom(skeletonPropNames, {
+    size: { kind: 'enum', enumValues: feedbackSizes, default: 'md' },
+    circle: { kind: 'boolean', default: false },
+    class: { kind: 'string' },
+  }),
+  examples: [
+    { id: 'line', title: 'Text line', props: { size: 'md' } },
+    { id: 'face', title: 'Avatar placeholder', props: { size: 'md', circle: true } },
+  ],
+  related: ['spinner', 'progress'],
+});
+
+export const spinnerManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'spinner',
+  package: PKG,
+  label: 'Spinner',
+  summary: 'An indeterminate wait indicator, labelled or decorative.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['Show that a short action is in progress'],
+  dontUseWhen: ['A known percent (use progress)', 'A layout placeholder (use skeleton)'],
+  a11y: 'With a label it is a live status; without a label it is decorative.',
+  props: propsFrom(spinnerPropNames, {
+    label: { kind: 'string' },
+    size: { kind: 'enum', enumValues: feedbackSizes, default: 'md' },
+    tone: { kind: 'enum', enumValues: feedbackTones, default: 'primary' },
+    class: { kind: 'string' },
+  }),
+  examples: [{ id: 'saving', title: 'Saving', props: { label: 'Saving', size: 'sm' } }],
+  related: ['progress', 'skeleton'],
+});
+
+export const progressManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'progress',
+  package: PKG,
+  label: 'Progress',
+  summary: 'A linear or circular progress bar, determinate or indeterminate.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['Show how far a task has gone, or that it is still running'],
+  dontUseWhen: ['A short wait with no value (use spinner)'],
+  a11y: 'A progressbar named by label or ariaLabel; null value is indeterminate.',
+  props: propsFrom(progressPropNames, {
+    value: { kind: 'number', default: 0, description: 'Current value; omit or null while unknown' },
+    max: { kind: 'number', default: 100 },
+    min: { kind: 'number', default: 0 },
+    label: { kind: 'string' },
+    ariaLabel: { kind: 'string' },
+    showValue: { kind: 'boolean', default: false },
+    tone: { kind: 'enum', enumValues: feedbackTones, default: 'primary' },
+    size: { kind: 'enum', enumValues: feedbackSizes, default: 'md' },
+    shape: { kind: 'enum', enumValues: ['linear', 'circular'], default: 'linear' },
+    loadingLabel: { kind: 'string' },
+    class: { kind: 'string' },
+  }),
+  examples: [
+    { id: 'upload', title: 'Upload', props: { value: 40, label: 'Upload', showValue: true } },
+  ],
+  related: ['spinner', 'skeleton'],
+});
+
+export const carouselManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'carousel',
+  package: PKG,
+  label: 'Carousel',
+  summary: 'A labelled region of slides with previous, next and a picker.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['A few slides the person pages through, such as quotes or screenshots'],
+  dontUseWhen: ['A gallery of images with a lightbox (use media-image)', 'Tabs (use tabs)'],
+  a11y: 'APG carousel: a named region, arrow keys, and a tablist when dots are shown.',
+  props: propsFrom(carouselPropNames, {
+    items: {
+      kind: 'array',
+      required: true,
+      description: '{ id, label }[] in display order',
+    },
+    index: { kind: 'number', default: 0 },
+    label: { kind: 'string' },
+    showControls: { kind: 'boolean', default: true },
+    showDots: { kind: 'boolean', default: true },
+    controls: { kind: 'enum', enumValues: ['below', 'overlay'], default: 'below' },
+    loop: { kind: 'boolean', default: true },
+    class: { kind: 'string' },
+  }),
+  examples: [
+    {
+      id: 'quotes',
+      title: 'Quotes',
+      props: {
+        label: 'Customer quotes',
+        items: [
+          { id: 'a', label: 'Ada Example' },
+          { id: 'b', label: 'Lin Example' },
+        ],
+      },
+    },
+  ],
+  related: ['card'],
+});
+
+export const separatorManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'separator',
+  package: PKG,
+  label: 'Separator',
+  summary: 'A horizontal or vertical divider on the token scale.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['Split two blocks of content visually'],
+  dontUseWhen: ['A menu divider (use the menu separator)', 'A list item (use list-item)'],
+  a11y: 'Decorative by default (hidden from assistive technology); set decorative false for a semantic boundary.',
+  props: propsFrom(separatorPropNames, {
+    orientation: { kind: 'enum', enumValues: ['horizontal', 'vertical'], default: 'horizontal' },
+    decorative: { kind: 'boolean', default: true },
+    variant: { kind: 'enum', enumValues: ['default', 'subtle', 'strong'], default: 'default' },
+    class: { kind: 'string' },
+  }),
+  examples: [{ id: 'rule', title: 'Horizontal rule', props: { variant: 'subtle' } }],
+  related: ['box'],
+});
+
+export const listItemManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'list-item',
+  package: PKG,
+  label: 'ListItem',
+  summary: 'A list row with a title, optional description, icon and trailing meta.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['A settings row, an inbox row, or a navigation list of links'],
+  dontUseWhen: ['A data table (use table)', 'A kanban card (use data-board)'],
+  a11y: 'A listitem; with href it is a link, with onSelect a button. Trailing controls sit outside the main control.',
+  props: propsFrom(listItemPropNames, {
+    title: { kind: 'string', trust: 'untrusted' },
+    description: { kind: 'string', trust: 'untrusted' },
+    meta: { kind: 'string', trust: 'untrusted' },
+    icon: { kind: 'string', description: 'Built-in or registered icon name' },
+    href: { kind: 'string', trust: 'untrusted' },
+    hrefTrust: { kind: 'enum', enumValues: ['developer', 'untrusted'], default: 'developer' },
+    current: { kind: 'boolean', default: false },
+    disabled: { kind: 'boolean', default: false },
+    class: { kind: 'string' },
+  }),
+  examples: [
+    {
+      id: 'inbox',
+      title: 'Inbox row',
+      props: { title: 'Quarterly notes', description: 'Ada Example', meta: '2h', icon: 'info' },
+    },
+  ],
+  related: ['icon', 'avatar'],
+});
+
+export const kbdManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'kbd',
   package: PKG,
   label: 'Kbd',
@@ -655,7 +1216,7 @@ export const kbdManifest = /* @__PURE__ */ manifestData({
  * component: the host paints `text` as one escaped text node, and the
  * renderer drops any children it is given.
  */
-export const inlineTextManifest = /* @__PURE__ */ manifestData({
+export const inlineTextManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'inline-text',
   package: '@texuli/catalog',
   label: 'Inline text',
@@ -690,7 +1251,7 @@ export const inlineTextManifest = /* @__PURE__ */ manifestData({
   related: ['button', 'label', 'badge', 'kbd'],
 });
 
-export const codeManifest = /* @__PURE__ */ manifestData({
+export const codeManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'code',
   package: PKG,
   label: 'Code',
@@ -724,46 +1285,173 @@ export const codeManifest = /* @__PURE__ */ manifestData({
   related: ['kbd'],
 });
 
+/** Tabs (ADR-032): a tab list with panels. App chrome; agents never emit it. */
+export const tabsManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'tabs',
+  package: PKG,
+  label: 'Tabs',
+  summary: 'A tab list that shows one panel at a time.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['Switch between peer views of the same page'],
+  dontUseWhen: [
+    'A sequence of steps (use stepper or wizard)',
+    'Mobile app destinations (use bottom-nav)',
+  ],
+  a11y: [
+    'Tab list is labelled; arrow keys move among tabs; the selected tab is aria-selected',
+    'Each tab names its panel',
+  ],
+  props: propsFrom(tabsPropNames, {
+    items: {
+      kind: 'array',
+      required: true,
+      description: 'Tabs: value, label, optional badge and panel',
+    },
+    value: { kind: 'string', description: 'The selected tab value' },
+    onValueChange: { kind: 'event', description: 'Selected tab changed' },
+    label: { kind: 'string', description: 'Accessible name of the tab list' },
+    variant: { kind: 'enum', enumValues: [...tabsVariants], default: 'line' },
+    orientation: { kind: 'enum', enumValues: ['horizontal', 'vertical'], default: 'horizontal' },
+    activationMode: { kind: 'enum', enumValues: ['automatic', 'manual'], default: 'automatic' },
+    loop: { kind: 'boolean', default: false },
+    disabled: { kind: 'boolean', default: false },
+    class: { kind: 'string' },
+    content: { kind: 'slot', description: 'Panel body for each item' },
+  }),
+  examples: [
+    {
+      id: 'line',
+      title: 'Line tabs',
+      props: {
+        variant: 'line',
+        items: [
+          { value: 'overview', label: 'Overview' },
+          { value: 'activity', label: 'Activity' },
+        ],
+        value: 'overview',
+      },
+    },
+  ],
+  related: ['accordion', 'stepper'],
+  events: ['select'],
+});
+
+/** Accordion (ADR-032): stacked disclosure. App chrome; agents never emit it. */
+export const accordionManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'accordion',
+  package: PKG,
+  label: 'Accordion',
+  summary: 'Stacked sections that expand and collapse one or more panels.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['FAQs and grouped detail the reader opens on demand'],
+  dontUseWhen: ['Peer views of one page (use tabs)', 'A multi-step flow (use wizard)'],
+  a11y: [
+    'Each header is a button that names its panel; expanded state is exposed',
+    'Heading level is set so the outline stays valid',
+  ],
+  props: propsFrom(accordionPropNames, {
+    items: {
+      kind: 'array',
+      required: true,
+      description: 'Sections: value, title, optional content',
+    },
+    type: { kind: 'enum', enumValues: ['single', 'multiple'], default: 'single' },
+    value: { kind: 'unknown', description: 'Open value or values' },
+    onValueChange: { kind: 'event', description: 'Open value changed' },
+    collapsible: { kind: 'boolean', default: true },
+    headingLevel: { kind: 'number', default: 3 },
+    variant: { kind: 'enum', enumValues: [...accordionVariants], default: 'default' },
+    disabled: { kind: 'boolean', default: false },
+    class: { kind: 'string' },
+    content: { kind: 'slot', description: 'Panel body for each item' },
+  }),
+  examples: [
+    {
+      id: 'faq',
+      title: 'FAQ',
+      props: {
+        headingLevel: 3,
+        items: [
+          { value: 'hours', title: 'Hours', content: 'Weekdays 9–17.' },
+          { value: 'fees', title: 'Fees', content: 'No booking fee.' },
+        ],
+      },
+    },
+  ],
+  related: ['tabs', 'stepper'],
+  events: ['collapse'],
+});
+
 /** Every display/feedback manifest in stable id order. */
 export const DISPLAY_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Object.freeze([
+  accordionManifest,
   alertManifest,
+  avatarManifest,
   avatarGroupGridManifest,
   badgeManifest,
   bannerManifest,
+  boxManifest,
   calloutManifest,
   cardManifest,
+  carouselManifest,
   chipManifest,
   codeManifest,
   emptyStateManifest,
   errorStateManifest,
+  headingManifest,
+  iconManifest,
   inlineTextManifest,
   kbdManifest,
+  listItemManifest,
   kpiManifest,
+  progressManifest,
+  proseManifest,
+  separatorManifest,
+  skeletonManifest,
+  spinnerManifest,
   statManifest,
   stepperManifest,
   tableManifest,
+  tabsManifest,
   tagManifest,
+  textManifest,
   timelineManifest,
 ]);
 
 /** Map of component id → expected prop names for type/schema parity tests. */
 export const DISPLAY_PROP_NAMES = /* @__PURE__ */ Object.freeze({
+  accordion: accordionPropNames,
   alert: alertPropNames,
+  avatar: avatarPropNames,
   'avatar-group-grid': avatarGroupGridPropNames,
   badge: badgePropNames,
   banner: bannerPropNames,
+  box: boxPropNames,
   callout: calloutPropNames,
   card: cardPropNames,
+  carousel: carouselPropNames,
   chip: chipPropNames,
   code: codePropNames,
   'empty-state': emptyStatePropNames,
   'error-state': errorStatePropNames,
+  heading: headingPropNames,
+  icon: iconPropNames,
   'inline-text': inlineTextPropNames,
   kbd: kbdPropNames,
   kpi: kpiPropNames,
+  'list-item': listItemPropNames,
+  progress: progressPropNames,
+  prose: prosePropNames,
+  separator: separatorPropNames,
+  skeleton: skeletonPropNames,
+  spinner: spinnerPropNames,
   stat: statPropNames,
   stepper: stepperPropNames,
   table: tablePropNames,
+  tabs: tabsPropNames,
   tag: tagPropNames,
+  text: textPropNames,
   timeline: timelinePropNames,
 } as const);

@@ -26,6 +26,6 @@ let {
     .filter(Boolean)
     .join(' ')}
   {...rest}
->
+ data-tx-component="multi-select">
   {@render children?.()}
 </ComboboxRoot>

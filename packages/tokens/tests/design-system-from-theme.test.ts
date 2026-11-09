@@ -280,7 +280,8 @@ describe('property: random valid documents', () => {
     }
     expect(compiled).toBeGreaterThan(80);
     expect(compiled + refused).toBe(120);
-  });
+    // 120 compiles: about 5 s alone locally, far slower when parallel lanes load the machine.
+  }, 60_000);
 });
 
 describe('laziness: the root never reaches the compiler', () => {

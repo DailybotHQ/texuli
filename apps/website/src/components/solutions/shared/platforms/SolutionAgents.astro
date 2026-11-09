@@ -1,0 +1,160 @@
+---
+/**
+ * Agents section of a Solution landing (`SolutionAgentsProps`): a title, a short body and
+ * the agent surfaces this Solution exposes (MCP tools, catalog components, skill paths),
+ * each with its status badge, then links to the site's MCP, skill and agents pages. Static.
+ */
+import type { SolutionAgentsProps } from '../types.ts';
+import {
+  AGENT_LINKS,
+  agentSurfaceViews,
+  resolveSiteHref,
+  sectionHeadingId,
+} from './platforms-model.ts';
+import StatusBadge from './StatusBadge.astro';
+
+type Props = SolutionAgentsProps;
+
+const { entry, title, body, surfaces } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const views = agentSurfaceViews(surfaces);
+const headingId = sectionHeadingId(entry.slug, 'agents');
+const links = AGENT_LINKS.map((link) => ({
+  label: link.label,
+  href: resolveSiteHref(link.href, base),
+}));
+---
+
+<section class="solution-agents" aria-labelledby={headingId} data-solution-agents={entry.slug}>
+  <div class="solution-agents__inner">
+    <div class="solution-agents__copy">
+      <h2 id={headingId}>{title}</h2>
+      <p class="solution-agents__body">{body}</p>
+      <ul class="solution-agents__links" role="list">
+        {
+          links.map((link) => (
+            <li>
+              <a href={link.href}>
+                {link.label}
+                <span aria-hidden="true">&nbsp;→</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    {
+      views.length > 0 && (
+        <ul class="solution-agents__surfaces" role="list" aria-label="Agent surfaces">
+          {views.map((view) => (
+            <li class="solution-agents__surface" data-status={view.badge.status}>
+              <div class="solution-agents__surface-head">
+                <code>{view.label}</code>
+                <StatusBadge status={view.badge.status} context={view.label} />
+              </div>
+              <p>{view.detail}</p>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .solution-agents__inner {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  @media (min-width: 56rem) {
+    .solution-agents__inner {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      align-items: start;
+    }
+  }
+  .solution-agents__copy {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+    max-inline-size: 34rem;
+  }
+  .solution-agents h2 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(1.75rem, 4.5vw, 2.6rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+  .solution-agents__body {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: clamp(1rem, 2.2vw, 1.1rem);
+    line-height: 1.55;
+  }
+  .solution-agents__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-weight: 650;
+  }
+  .solution-agents__links a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.5rem;
+    color: var(--tx-foreground);
+    text-underline-offset: 0.2em;
+  }
+  .solution-agents__links a:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .solution-agents__surfaces {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .solution-agents__surface {
+    display: grid;
+    gap: 0.4rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    border-radius: 0.75rem;
+    background: var(--tx-background);
+  }
+  .solution-agents__surface[data-status='planned'] {
+    border-style: dashed;
+  }
+  .solution-agents__surface-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .solution-agents__surface code {
+    color: var(--tx-foreground);
+    font-size: 0.9rem;
+    font-weight: 650;
+    overflow-wrap: anywhere;
+  }
+  .solution-agents__surface p {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  @media (forced-colors: active) {
+    .solution-agents__surface {
+      border-color: CanvasText;
+    }
+  }
+</style>

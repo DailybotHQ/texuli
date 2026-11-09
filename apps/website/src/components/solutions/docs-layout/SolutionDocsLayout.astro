@@ -1,0 +1,58 @@
+---
+/**
+ * Shared template for `/guides/solutions/<slug>/` (ADR-028). It sits on
+ * `GuidesShell` (BaseLayout plus the docs sidebar, pager and Copy page). The
+ * layout owns the back-to-overview link to the Solution landing; each slug page
+ * supplies the article body through the default slot. No island, no HTML sink.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import type { SolutionEntry } from '../../../data/solutions/schema.ts';
+import { withBase } from '../../foundation/site.ts';
+import GuidesShell from '../../guides/GuidesShell.astro';
+import type { TocEntry } from '../../guides/nav.ts';
+import { solutionDocsBackLink } from './nav.ts';
+
+interface Props {
+  entry: SolutionEntry;
+  /** Defaults to "<name> docs". */
+  title?: string;
+  /** Defaults to the entry's tagline. */
+  description?: string;
+  toc?: readonly TocEntry[];
+}
+
+const { entry, title, description, toc } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const back = solutionDocsBackLink(entry);
+const backSafe = safeHref(back.href, 'developer');
+const backHref = backSafe === undefined ? undefined : withBase(base, backSafe);
+---
+
+<GuidesShell title={title ?? `${entry.name} docs`} description={description ?? entry.tagline} {toc}>
+  {
+    backHref && (
+      <p class="solution-docs-back">
+        <a href={backHref} data-solution-docs-back={entry.slug}>
+          {back.label}
+        </a>
+      </p>
+    )
+  }
+  <slot />
+</GuidesShell>
+
+<style>
+  .solution-docs-back {
+    margin-block: 0 1.25rem;
+  }
+  .solution-docs-back a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    color: var(--tx-foreground);
+  }
+  .solution-docs-back a:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+</style>

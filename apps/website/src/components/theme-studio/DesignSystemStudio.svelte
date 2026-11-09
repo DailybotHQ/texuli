@@ -59,6 +59,7 @@ import StudioField from './StudioField.svelte';
 type Engine = typeof import('./ds-engine.ts');
 type Previews = typeof import('./StudioPreviews.svelte').default;
 type Report = typeof import('./StudioReport.svelte').default;
+type LockedStudio = typeof import('../ds-studio/LockedDesignSystemStudio.svelte').default;
 type Diff = ReturnType<Engine['diffStudio']>;
 type Mode = 'light' | 'dark';
 
@@ -85,6 +86,8 @@ let toolRoot = $state<HTMLElement>();
 // design system they paint (neither is useful before it arrives).
 let PreviewsView = $state<Previews | null>(null);
 let ReportView = $state<Report | null>(null);
+let LockedStudioView = $state<LockedStudio | null>(null);
+let activeStudio = $state<'tokens' | 'locked'>('tokens');
 
 // Start inputs.
 let seedInput = $state('#2b6ce0');
@@ -143,6 +146,7 @@ function loadEngine(): Promise<Engine> {
 
 /** The first sign of intent inside the studio starts loading the compiler. */
 function warm(): void {
+  if (activeStudio !== 'tokens') return;
   void loadEngine().catch(() => undefined);
 }
 
@@ -600,6 +604,14 @@ function onStudioKey(event: KeyboardEvent): void {
 function toggle(id: string, event: Event): void {
   open = { ...open, [id]: (event.currentTarget as HTMLDetailsElement).open };
 }
+
+async function openLockedStudio(): Promise<void> {
+  activeStudio = 'locked';
+  if (!LockedStudioView) {
+    const module = await import('../ds-studio/LockedDesignSystemStudio.svelte');
+    LockedStudioView = module.default;
+  }
+}
 </script>
 
 <svelte:window onkeydown={onStudioKey} onhashchange={onHashChange} />
@@ -613,6 +625,17 @@ function toggle(id: string, event: Event): void {
   onfocusin={warm}
   onpointerdown={warm}
 >
+  <nav class="studio-modes" aria-label="Design system studio mode">
+    <Button type="button" variant={activeStudio === 'tokens' ? 'default' : 'outline'} aria-pressed={activeStudio === 'tokens'} onclick={() => (activeStudio = 'tokens')}>Token editor</Button>
+    <Button type="button" variant={activeStudio === 'locked' ? 'default' : 'outline'} aria-pressed={activeStudio === 'locked'} data-tx-locked-studio-open="" onclick={() => void openLockedStudio()}>Locked design system</Button>
+  </nav>
+  {#if activeStudio === 'locked'}
+    {#if LockedStudioView}
+      <LockedStudioView onclose={() => (activeStudio = 'tokens')} />
+    {:else}
+      <p class="status" role="status">Loading the locked design-system editor…</p>
+    {/if}
+  {:else}
   <p class="status" role="status" data-tx-ds-status="">{status}</p>
   <p class="visually-hidden" role="status" data-tx-ds-contrast-live="">{contrastNote}</p>
 
@@ -1078,9 +1101,11 @@ function toggle(id: string, event: Event): void {
       </section>
     </div>
   </div>
+  {/if}
 </div>
 
 <style>
+  .studio-modes { display: flex; flex-wrap: wrap; gap: 0.5rem; }
   .studio {
     display: grid;
     gap: 1rem;

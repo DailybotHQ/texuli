@@ -75,6 +75,7 @@ without the compiler or the color engine.
 | `defaults` | Component defaults (`{ button: { variant, size } }`) for `setDesignDefaults` |
 | `accessibility` | `{ contrast, targetMin }`: what the guarantees were held to |
 | `report` | `contrast[mode]` (every checked pair with its ratio), `adjustments` (mode, variable, from, to, the field that caused it, why), `warnings` (from spec 0.12.0, each failing non-text indicator is a warning `{ code: 'aa-non-text', mode, path, message }` with the pinned path), `inlineBytes` (decoded bytes of every `data:` font and asset) and `targets` |
+| `allowManifest` | Spec 0.13.0 (new in `0.15.0`): the allow manifest checkers read ([ADR-032](../../../docs/DECISIONS.md#adr-032-locked-design-systems)): `allow` (the effective allowed set after `extends`, variants and patches; absent when not locked), `library` (`{ id, version, status }` per entry), `version`, `contentHash` (`designSystemContentHash` of the document as written, not the merge), `specVersion` (`0.13.0`) and `catalogDigest` (when the caller passes `options.catalogDigest`; the compiler never loads the catalog). `emitCss` never reads it, so a document compiles to the same CSS with or without `allow`; `emitCompiledJson` (`texuli ds compile --format json`) includes it |
 | `hash` | SHA-256 of the canonical resolved document, the variant, the modes, the trust level and `DESIGN_SYSTEM_COMPILER_VERSION` (3 from `0.14.0`, so every hash moves once even where the variables do not); key order never changes it |
 
 ## Resolution: `extends`, variants, patches
@@ -97,6 +98,12 @@ without the compiler or the color engine.
   document invalid is refused with `source: "variant:<name>"` or
   `"patch:<i>"`.
 - Variants are orthogonal to mode: every variant compiles for every mode.
+- Spec 0.13.0: `allow` and `library` merge like the other sections. An
+  `allow` entry the child does not mention is inherited; a list the child
+  writes replaces the base's list (`["outline"]` narrows, `[]` allows none),
+  and the lists it leaves out stay; `null` in a patch removes an entry. A
+  child `library` replaces the base's. `approval` is not a merged section:
+  it belongs to the top document only.
 
 ## Color: the generator, pins and the solver
 

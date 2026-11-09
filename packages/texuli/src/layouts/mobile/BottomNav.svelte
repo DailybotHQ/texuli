@@ -49,6 +49,7 @@ const label = $derived(labelProp ?? msg('texuli.bottom-nav.label', 'Primary'));
   class={cx('tx-mobile-tabs', fixed && 'tx-mobile-tabs--fixed', className)}
   aria-label={label}
   data-tx-bottom-nav=""
+  data-tx-component="bottom-nav"
 >
   <ul class="tx-mobile-tabs__list">
     {#each items as item (item.id ?? item.href)}

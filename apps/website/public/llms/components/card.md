@@ -1,6 +1,6 @@
 # Card
 
-> A surface for grouping related content with optional link behavior.
+> A surface for grouping related content with optional stretched-link behavior.
 
 - **id:** `card`
 - **package:** `texuli`
@@ -21,7 +21,7 @@
 
 ### Accessibility
 
-- When href is set, the card is a real link with an accessible name
+- When href is set, one real link covers the card; nested actions sit above it
 - Rejected href schemes render as a non-interactive surface
 
 ### Props
@@ -31,7 +31,8 @@
 | `variant` | enum(elevated | flat) | no | — | `"elevated"` | Visual elevation |
 | `href` | string | no | developer | — | Optional link target (URL policy) |
 | `hrefTrust` | enum(developer | untrusted) | no | — | `"developer"` | — |
-| `linkLabel` | string | no | — | — | Accessible name when the card is a link |
+| `linkLabel` | string | no | — | — | Accessible name of the stretched primary link |
+| `actions` | slot | no | — | — | Secondary actions (pin, menu) above the stretched link |
 | `class` | string | no | — | — | Extra classes |
 
 ### Examples

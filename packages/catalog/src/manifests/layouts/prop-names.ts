@@ -223,6 +223,41 @@ export const deckSlidePropNames = [
 ] as const;
 export const gridLayoutPropNames = ['columns', 'gap', 'children', 'class'] as const;
 
+export const bottomNavPropNames = [
+  'items',
+  'label',
+  'fixed',
+  'hrefTrust',
+  'onSelect',
+  'class',
+] as const;
+
+export const mobileAppFramePropNames = [
+  'skipLabel',
+  'mainId',
+  'mainElement',
+  'resetScrollOnNavigate',
+  'stickyFooterUnstyled',
+  'class',
+] as const;
+
+export const mobileHeaderPropNames = [
+  'title',
+  'eyebrow',
+  'subtitle',
+  'titleAs',
+  'backHref',
+  'onBack',
+  'backLabel',
+  'backTarget',
+  'hrefTrust',
+  'closeHref',
+  'onClose',
+  'closeLabel',
+  'sticky',
+  'class',
+] as const;
+
 export const LAYOUTS_PROP_NAMES = {
   'layout-host': layoutHostPropNames,
   'layout-chrome': layoutChromePropNames,
@@ -252,6 +287,9 @@ export const LAYOUTS_PROP_NAMES = {
   'layout-deck': deckLayoutPropNames,
   'deck-slide': deckSlidePropNames,
   'layout-grid': gridLayoutPropNames,
+  'bottom-nav': bottomNavPropNames,
+  'mobile-app-frame': mobileAppFramePropNames,
+  'mobile-header': mobileHeaderPropNames,
 } as const;
 
 export type LayoutsManifestId = keyof typeof LAYOUTS_PROP_NAMES;

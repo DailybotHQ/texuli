@@ -41,6 +41,9 @@ const classes = $derived(
     class={classes}
     role="status"
     data-tx-spinner
+    data-tx-component="spinner"
+    data-tx-size={size}
+    data-tx-tone={tone}
     data-size={size}
     data-tone={tone}
     {...rest}
@@ -54,6 +57,9 @@ const classes = $derived(
     class={classes}
     aria-hidden="true"
     data-tx-spinner
+    data-tx-component="spinner"
+    data-tx-size={size}
+    data-tx-tone={tone}
     data-size={size}
     data-tone={tone}
     {...rest}

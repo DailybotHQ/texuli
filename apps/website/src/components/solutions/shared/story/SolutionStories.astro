@@ -1,0 +1,281 @@
+---
+/**
+ * Signature stories of a Solution landing (`SolutionStoriesProps`, ADR-027): a section title,
+ * then one band per story with copy beside art. Bands alternate the art between the inline
+ * end and start; on narrow screens the copy leads and the art follows. Each story has an h3,
+ * a short body, an optional status badge (see `storyStatus`) and capability chips resolved
+ * from the registry entry, after the home's growing texel mark. The art is the story's slot
+ * (by default the reserved `solution-<slug>-story-<n>`, see `../art/art-slots.ts`) when the
+ * illustrations manifest registers it, or a decorative texel mosaic until then; registered
+ * art loads lazily (only the home hero is a priority slot).
+ *
+ * Static markup: no script, no island, no HTML sink, and no style attribute. The section
+ * keeps a transparent background so `SolutionLayout`'s band tone shows through.
+ */
+import { illustrationFor } from '../../../landing/illustrations.ts';
+import SiteIllustration from '../../../landing/SiteIllustration.astro';
+import TexelMark from '../../../sections/home/TexelMark.astro';
+import { storyArtSlot } from '../art/art-slots.ts';
+import type { SolutionStoriesProps } from '../types.ts';
+import {
+  chipStatus,
+  mosaicTones,
+  storyArt,
+  storyCapabilities,
+  storyIds,
+  storySide,
+  storyStatus,
+} from './story-model.ts';
+
+type Props = SolutionStoriesProps;
+
+const { entry, title, stories } = Astro.props;
+const ids = storyIds(entry.slug, stories);
+const bands = stories.map((story, index) => {
+  const capabilities = storyCapabilities(entry, story);
+  const status = storyStatus(entry, story, capabilities);
+  return {
+    story,
+    id: ids.story[index],
+    side: storySide(index),
+    capabilities,
+    status,
+    shown: status ?? entry.status,
+    mark: Math.min(index + 1, 5),
+    art: storyArt(
+      { art: storyArtSlot(entry.slug, story, index) },
+      (slot) => illustrationFor(slot) !== undefined
+    ),
+    tones: mosaicTones(`${entry.slug}:${story.id}`),
+  };
+});
+---
+
+<section class="solution-stories" aria-labelledby={ids.section} data-solution-stories={entry.slug}>
+  <div class="solution-stories__inner">
+    <h2 id={ids.section} class="solution-stories__title">{title}</h2>
+    <div class="solution-stories__list">
+      {
+        bands.map((band) => (
+          <article
+            class:list={['solution-story', `solution-story--art-${band.side}`]}
+            aria-labelledby={band.id}
+            data-solution-story={band.story.id}
+            data-art-side={band.side}
+          >
+            <div class="solution-story__copy">
+              <div class="solution-story__kicker">
+                <TexelMark count={band.mark} />
+                {band.status && (
+                  <p class="solution-story__status" data-status={band.status}>
+                    <span class="solution-story__status-dot" aria-hidden="true" />
+                    {band.status}
+                  </p>
+                )}
+              </div>
+              <h3 id={band.id}>{band.story.title}</h3>
+              <p class="solution-story__body">{band.story.body}</p>
+              {band.capabilities.length > 0 && (
+                <ul class="solution-story__chips" role="list" aria-label="Capabilities">
+                  {band.capabilities.map((capability) => {
+                    const extra = chipStatus(capability, band.shown);
+                    return (
+                      <li class="solution-story__chip" data-capability={capability.id} data-status={capability.status}>
+                        <span>{capability.title}</span>
+                        {extra && <span class="solution-story__chip-status">({extra})</span>}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+            <div class="solution-story__art" data-art-slot={band.art?.slot ?? 'mosaic'}>
+              {band.art ? (
+                <SiteIllustration art={band.art.slot} />
+              ) : (
+                <div class="solution-story__mosaic" aria-hidden="true" data-art-fallback="">
+                  {band.tones.map((tone) => (tone === 0 ? <i /> : <i class={`t${tone}`} />))}
+                </div>
+              )}
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .solution-stories {
+    --story-accent: var(--home-accent, var(--tx-primary));
+    --story-accent-text: var(--home-accent-text, var(--tx-primary));
+  }
+  .solution-stories__inner {
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  .solution-stories__title {
+    margin: 0;
+    margin-block-end: clamp(1.5rem, 4vw, 2.5rem);
+    color: var(--tx-foreground);
+    font-size: clamp(1.9rem, 5vw, 3rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+  .solution-stories__list {
+    display: grid;
+    gap: clamp(2.5rem, 7vw, 5rem);
+  }
+  .solution-story {
+    display: grid;
+    gap: clamp(1.25rem, 4vw, 3rem);
+    align-items: center;
+  }
+  /* One column keeps the source order: the copy leads on small screens. */
+  @media (min-width: 56rem) {
+    .solution-story {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    }
+    .solution-story--art-start {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    }
+    .solution-story--art-start .solution-story__art {
+      order: -1;
+    }
+  }
+  .solution-story__copy {
+    display: grid;
+    gap: 0.9rem;
+    justify-items: start;
+    max-inline-size: 34rem;
+  }
+  .solution-story__kicker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    min-block-size: 1.5rem;
+  }
+  .solution-story h3 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(1.5rem, 3.8vw, 2.35rem);
+    font-weight: 750;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .solution-story__body {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: clamp(1rem, 2.2vw, 1.1rem);
+    line-height: 1.55;
+  }
+  .solution-story__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+    padding-block: 0.15rem;
+    padding-inline: 0.6rem;
+    border: 1px solid color-mix(in oklab, var(--story-accent) 35%, var(--tx-border));
+    border-radius: 999px;
+    color: var(--tx-foreground);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .solution-story__status-dot {
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    border: 2px solid var(--story-accent-text);
+    border-radius: 999px;
+  }
+  .solution-story__status[data-status='available'] .solution-story__status-dot {
+    background: var(--story-accent-text);
+  }
+  .solution-story__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .solution-story__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-block-size: 2rem;
+    padding-inline: 0.8rem;
+    border: 1px solid color-mix(in oklab, var(--story-accent) 30%, var(--tx-border));
+    border-radius: 999px;
+    background: var(--tx-background);
+    color: var(--tx-foreground);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .solution-story__chip-status {
+    color: var(--tx-muted-foreground);
+    font-weight: 500;
+  }
+  /* The art sits on a soft accent glow, like the home plates; decorative only. */
+  .solution-story__art {
+    position: relative;
+    isolation: isolate;
+    min-inline-size: 0;
+  }
+  .solution-story__art::before {
+    content: '';
+    position: absolute;
+    inset: -8% 0;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--story-accent) 16%, transparent),
+      transparent
+    );
+    pointer-events: none;
+  }
+  .solution-story__mosaic {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.35rem;
+    aspect-ratio: 4 / 3;
+    padding: clamp(0.75rem, 3vw, 1.5rem);
+    border: 1px solid color-mix(in oklab, var(--tx-border) 70%, transparent);
+    border-radius: 1rem;
+    background: color-mix(in oklab, var(--story-accent) 5%, var(--tx-background));
+  }
+  .solution-story__mosaic i {
+    border-radius: 0.3rem;
+    background: color-mix(in oklab, var(--story-accent) 6%, transparent);
+  }
+  .solution-story__mosaic i.t1 {
+    background: color-mix(in oklab, var(--story-accent) 18%, transparent);
+  }
+  .solution-story__mosaic i.t2 {
+    background: color-mix(in oklab, var(--story-accent) 35%, transparent);
+  }
+  .solution-story__mosaic i.t3 {
+    background: color-mix(in oklab, var(--story-accent) 60%, transparent);
+  }
+  .solution-story__mosaic i.t4 {
+    background: var(--story-accent);
+  }
+  @media (forced-colors: active) {
+    .solution-story__chip,
+    .solution-story__status {
+      border-color: CanvasText;
+    }
+    .solution-story__mosaic,
+    .solution-story__art::before {
+      display: none;
+    }
+  }
+</style>

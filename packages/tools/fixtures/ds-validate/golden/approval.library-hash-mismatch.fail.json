@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "codes": ["library-hash-mismatch"],
+  "findings": [
+    {
+      "code": "library-hash-mismatch",
+      "severity": "error",
+      "area": "approval",
+      "path": "$.library[0].approval.contentHash"
+    }
+  ]
+}

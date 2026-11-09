@@ -107,7 +107,7 @@ const interactionSeries = $derived(
 );
 </script>
 
-<MatrixFrame bind:measuredWidth {title} {description} {mode} kind="scatter" class={className}>
+<MatrixFrame data-tx-component="charts-scatter" bind:measuredWidth {title} {description} {mode} kind="scatter" class={className}>
   <MatrixPlot
     label="{title}. {description}"
     series={interactionSeries}
@@ -118,7 +118,7 @@ const interactionSeries = $derived(
     {interactive}
     {hidden}
   >
-    <g transform="translate({margin.left} {margin.top})">
+<g transform="translate({margin.left} {margin.top})">
       <Axis
         orientation="y"
         ticks={yAxisTicks}

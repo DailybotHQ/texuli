@@ -31,7 +31,7 @@
 | `rows` | array | yes | — | — | Rows: an id and one display string per column id (the column kind sorts it). |
 | `searchable` | boolean | no | — | `false` | — |
 | `selectable` | boolean | no | — | `false` | — |
-| `density` | enum(compact | default | comfortable) | no | — | — | — |
+| `density` | enum(compact | default | comfortable) | no | — | `"default"` | — |
 
 ### Examples
 

@@ -52,9 +52,14 @@ export const LEGACY_COMMANDS: readonly LegacyCommand[] = Object.freeze([
   },
   {
     usage: 'ds init <file>',
-    summary: 'Write a new design-system document (--brand "<one-liner>")',
+    summary:
+      'Write a new design-system document (--brand "<one-liner>"; --locked [--preset all|minimal|<file>])',
   },
-  { usage: 'ds validate <file>', summary: 'Validate a design-system document (ds.validate)' },
+  {
+    usage: 'ds validate <file>',
+    summary:
+      'Validate a design-system document (ds.validate); --locked adds catalog and prototype checks, --report records findings without failing',
+  },
   {
     usage: 'ds compile <file>',
     summary: 'Compile it to JSON, CSS, a Tailwind preset, DTCG or Tokens Studio (--format, --out)',
@@ -65,6 +70,20 @@ export const LEGACY_COMMANDS: readonly LegacyCommand[] = Object.freeze([
   {
     usage: 'ds import <file|text>',
     summary: 'Import DTCG, Tokens Studio, a role palette, a theme or a one-liner (--from, --out)',
+  },
+  {
+    usage: 'ds approve <file>',
+    summary:
+      'Validate, then stamp approval and its contentHash (--by <name>; a reviewed commit is the guarantee)',
+  },
+  { usage: 'ds hash <file>', summary: 'Print the content hashes and check the stored ones' },
+  {
+    usage: 'ds pack <file>',
+    summary: 'Pack a document, library sources and history into a portable bundle (--out)',
+  },
+  {
+    usage: 'ds unpack <bundle.json>',
+    summary: 'Unpack a portable design-system bundle (--out); sources are never executed',
   },
   {
     usage: 'ds check <file>',

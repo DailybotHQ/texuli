@@ -56,7 +56,7 @@ $effect(() => {
 });
 </script>
 
-<canvas bind:this={canvas} class="marks" width={width} height={height} aria-hidden="true"></canvas>
+<canvas data-tx-component="charts-canvas-renderer" bind:this={canvas} class="marks" width={width} height={height} aria-hidden="true"></canvas>
 
 <style>
   .marks { display: block; inline-size: 100%; block-size: auto; inset: 0; pointer-events: none; position: absolute; }

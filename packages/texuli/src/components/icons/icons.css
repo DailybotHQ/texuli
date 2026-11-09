@@ -37,4 +37,23 @@
     inline-size: var(--tx-icon-size-lg, var(--tx-size-icon-lg));
     block-size: var(--tx-icon-size-lg, var(--tx-size-icon-lg));
   }
+
+  .tx-icon--primary {
+    color: var(--tx-primary, Highlight);
+  }
+  .tx-icon--success {
+    color: var(--tx-success, green);
+  }
+  .tx-icon--warning {
+    color: var(--tx-warning, olive);
+  }
+  .tx-icon--destructive {
+    color: var(--tx-destructive, crimson);
+  }
+  .tx-icon--info {
+    color: var(--tx-info, Highlight);
+  }
+  .tx-icon--neutral {
+    color: var(--tx-muted-foreground, GrayText);
+  }
 }

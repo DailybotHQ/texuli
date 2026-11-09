@@ -20,6 +20,13 @@
 > issue code and `components.card["font-size"]` (a type role, the card
 > content font size). Every 0.11.0 document stays valid; `formatVersion` stays `1`.
 
+> **Spec 0.13.0 (new in `0.15.0`).** Additive
+> ([ADR-032](../../../docs/DECISIONS.md#adr-032-locked-design-systems)):
+> the optional `allow`, `library` and `approval` sections (a locked design
+> system, below), the `approval-invalid` code and the catalog-membership
+> codes of `checkDesignSystemAllow`. Every 0.12.0 document stays valid;
+> `formatVersion` stays `1`.
+
 The end-to-end guide (author, validate, apply, distribute, outputs) is
 [DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md).
 
@@ -98,6 +105,50 @@ every data URL, and SVG is a relative path only. Remote URLs are always
 refused. Tests check that every accepted image also passes `safeImageSrc`
 of `@texuli/core` at the same trust.
 
+## Locked design systems (spec 0.13.0)
+
+Three optional root sections, described end to end in
+[DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md#locked-design-systems):
+
+| Section | Shape | Limits |
+| --- | --- | --- |
+| `allow` | A map of catalog id to `{ variants?, sizes?, tones?, densities?, states? }`. An omitted list allows every value the catalog lists; an empty list allows none; an id not listed is not allowed | 4096 ids, 32 values per list (`DS_LOCKED_LIMITS`) |
+| `library` | `[{ id, name, purpose, version, status, composes, approval? }]`: the design system's own components; `composes` names catalog ids | 64 entries, 32 `composes` each |
+| `approval` | `{ status: "draft" \| "approved", version, approvedBy?, approvedAt?, contentHash? }`: top document only, never inherited through `extends` | `contentHash` is 64 lowercase hex |
+
+The structural validator checks the shapes and `approval-invalid` (an
+`approved` document without `approvedBy` and `approvedAt`, or an `approved`
+library entry without its own approval). Catalog membership needs the
+catalog, so it is a separate pure function the bundled validator never
+carries: `checkDesignSystemAllow(doc, catalog)` (codes `unknown-component`,
+`unknown-variant`, `unknown-size`, `unknown-tone`, `unknown-density`,
+`unknown-state`, at the `allow` or `library[].composes` path).
+
+`approveDesignSystem(doc, { by, at?, version? })` validates first and
+stamps `approval` with `status: "approved"`, who, when and the
+`contentHash`; it returns stable codes instead of throwing. It records who
+approved; **it cannot prove it**. `APPROVAL_NOTE` says so in one sentence
+that tools print: the guarantee is a reviewed commit of the document by its
+`CODEOWNERS`.
+
+`designSystemContentHash(doc)` is the SHA-256 of the canonical JSON
+(`canonicalJson`: sorted keys, no whitespace; `sha256Hex`) of the document
+without `approval` (`APPROVAL_HASH_EXCLUDED`), with every library entry also
+without its own `approval`; `libraryEntryContentHash(entry)` is the same for
+one entry. Key order never changes a hash.
+
+`initLockedDesignSystem({ id, name, …, preset?, catalog })` makes a new
+locked draft from the `minimal` preset (`MINIMAL_LOCKED_COMPONENTS`), `all`
+(`LOCKED_PRESETS`) or an explicit `allow` section, checked against the
+catalog it is given; `lockedAllowPreset` and `fullAllowEntry` build the
+sections.
+
+Root attributes: `DS_COMPONENT_ATTRIBUTE` (`data-tx-component`),
+`DS_VARIANT_ATTRIBUTE`, `DS_SIZE_ATTRIBUTE`, `DS_TONE_ATTRIBUTE`,
+`DS_DENSITY_ATTRIBUTE` and `dsRootAttributes(id, axes)`, the attributes
+every catalog component root carries so a checker maps an element to its
+component.
+
 ## Codes
 
 | Code | When |
@@ -113,6 +164,8 @@ of `@texuli/core` at the same trust.
 | `url-refused` | A remote URL or scheme, `//`, traversal, an SVG or wrong media type, any data URL at `untrusted` |
 | `inline-bytes` | A data URL over its cap, or over the 256 KiB total |
 | `aa-text`, `aa-focus`, `target-size` | Raised by the compiler in `@texuli/tokens` (from spec 0.11.0, `aa-text` also covers a product token's on-color, at `$.extensions.<name>.on.<mode>`) ([ADR-022](../../../docs/DECISIONS.md#adr-022-design-system-guarantees-enforced-never-reported)); never by the spec |
+| `approval-invalid` | From spec 0.13.0: an `approved` document without `approvedBy` and `approvedAt`, or an `approved` library entry without its own approval |
+| `unknown-component`, `unknown-variant`, `unknown-size`, `unknown-tone`, `unknown-density`, `unknown-state` | From spec 0.13.0: raised by `checkDesignSystemAllow` (not by `validateDesignSystem`): an `allow` id or value, or a `library[].composes` id, that the catalog does not list |
 | `aa-non-text` | From spec 0.12.0: a role fill below 3:1 against its container (WCAG 1.4.11), such as the sidebar's active fill on the sidebar. A warning in the compiler's report; raised by `checkDesignSystemIndicators` in `@texuli/tokens`, `texuli ds check` and `ds.validate`; never by the spec |
 
 Paths start at `$`; keys that are not identifiers are quoted
@@ -130,7 +183,12 @@ values.
 | `applyDesignSystemPatch(base, patch)` | Pure merge: objects merge, arrays and scalars replace, `null` removes, reserved keys are skipped. Validate the result again |
 | `migrateDesignSystem(doc)` | `{ ok: true, document, from, to, applied }` or `{ ok: false, errors: [issue] }`; pure and total. `DESIGN_SYSTEM_MIGRATIONS` is empty for `formatVersion` 1 |
 | `checkDesignSystemReference(value, options?)` | The blueprint's (and a document's) `designSystem`, `$defs.designSystemReference`: exactly one of `ref` and `inline`; `inline` runs through `validateDesignSystem`. Fits `validateDraft`'s `checkDesignSystem` as is |
-| Constants | `DESIGN_SYSTEM_FORMAT`, `DESIGN_SYSTEM_FORMAT_VERSION`, `DESIGN_SYSTEM_CODES`, `DESIGN_SYSTEM_COMPILER_CODES`, `DESIGN_SYSTEM_LIMITS` |
+| `checkDesignSystemAllow(doc, catalog)` | Spec 0.13.0: `{ ok, errors }` for the catalog membership of `allow` and `library[].composes`; the catalog is an argument (`{ components: [{ id, axes?, states? }] }`); total, at most 64 issues |
+| `approveDesignSystem(doc, options)`, `APPROVAL_NOTE` | Spec 0.13.0: stamp an approval with its content hash (records, never proves, who approved) |
+| `designSystemContentHash(doc)`, `libraryEntryContentHash(entry)`, `canonicalJson`, `sha256Hex`, `APPROVAL_HASH_EXCLUDED` | Spec 0.13.0: the approval hashes |
+| `initLockedDesignSystem(options)`, `lockedAllowPreset`, `fullAllowEntry`, `LOCKED_PRESETS`, `MINIMAL_LOCKED_COMPONENTS` | Spec 0.13.0: a new locked draft from a preset over the catalog |
+| `dsRootAttributes(id, axes)`, `DS_*_ATTRIBUTE` | Spec 0.13.0: the component root attributes |
+| Constants | `DESIGN_SYSTEM_FORMAT`, `DESIGN_SYSTEM_FORMAT_VERSION`, `DESIGN_SYSTEM_CODES`, `DESIGN_SYSTEM_ALLOW_CODES`, `DESIGN_SYSTEM_COMPILER_CODES`, `DESIGN_SYSTEM_LIMITS` |
 | Types | `DesignSystem` and every section type (generated), `DesignSystemIssue`, `DesignSystemPatch`, `DesignSystemValidation` |
 
 Kotlin: `DesignSystem.kt` in `generated/kotlin/` holds the same types with

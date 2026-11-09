@@ -211,6 +211,41 @@ function walk(r: Run, node: DsNode, v: unknown, path: string, depth: number): un
   }
 }
 
+/**
+ * Locked-section rules that the closed vocabulary cannot express: an
+ * `approved` document or library entry needs who and when (ADR-032). Catalog
+ * membership is `checkDesignSystemAllow`, not here.
+ */
+function checkLocked(r: Run, doc: Record<string, unknown>): undefined {
+  if (r.e.length >= r.max) return;
+  const approval = doc.approval;
+  if (isRecord(approval) && approval.status === 'approved') {
+    const by = approval.approvedBy;
+    const when = approval.approvedAt;
+    if (typeof by !== 'string' || by.length === 0 || typeof when !== 'string' || when.length === 0)
+      add(
+        r,
+        'approval-invalid',
+        '$.approval',
+        'An approved document needs approvedBy and approvedAt.'
+      );
+  }
+  const library = doc.library;
+  if (!Array.isArray(library)) return;
+  for (let i = 0; i < library.length && r.e.length < r.max; i++) {
+    const entry = library[i];
+    if (!isRecord(entry) || entry.status !== 'approved') continue;
+    const nested = entry.approval;
+    if (!isRecord(nested) || nested.status !== 'approved')
+      add(
+        r,
+        'approval-invalid',
+        at('$.library', i),
+        'An approved library entry needs its own approval.'
+      );
+  }
+}
+
 const start = (options: DesignSystemValidateOptions, patch: boolean): Run => ({
   e: [],
   max: Math.max(1, Math.min(LIMITS.errors, options.maxErrors ?? LIMITS.errors)),
@@ -251,6 +286,7 @@ export function validateDesignSystem(
   const version = versionIssue(doc);
   if (version) return done({ ...r, e: [version] });
   walk(r, DS_ROOT, doc, '$', 0);
+  checkLocked(r, doc);
   let ref = doc.extends;
   const seen = new Set([`${doc.id}@${doc.version}`]);
   for (

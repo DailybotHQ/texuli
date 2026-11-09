@@ -2050,3 +2050,214 @@ reflect this decision.
   provider and keep the props), or a standard message format (such as
   `Intl.MessageFormat`) becomes available in every target. The ids and
   English catalogs then carry over as its source.
+
+## ADR-027: Solutions, capabilities, components and products
+
+- **Date:** 2026-11-08 · **Ratification:** proposed by the PLAN_015 lead from the
+  maturity audits (`.dwp/plans/PLAN_015_…/analysis_results/audit/sol-*.md`); approved by the developer on 2026-11-08.
+- **Context:** texuli.com presents full systems (slides, documents, workflows) and single
+  pieces (buttons, charts) with the same `*-page` pattern. The ecosystem vision asks for a
+  Solutions catalog with landings per complete system, without dressing a widget up as a
+  system or a product as a library.
+- **Options:**
+  1. **Promote every domain package** to a Solution landing. Maximal marketing, but it
+     calls a forms runtime a "builder" and a chart family a "dashboard product".
+  2. **No new taxonomy;** improve the `*-page` routes in place. Cheap, but systems stay
+     indistinguishable from components and nothing is shareable as "the slides engine".
+  3. **Four kinds with a promotion rule:** *Solutions* (a public model and API, a complete
+     user task demonstrable today, composed parts, an adoption path and docs),
+     *capabilities* (cross-cutting engines: drag, motion, output), *component families*
+     (charts, media, blocks, primitives, components), and *products built with Texuli*
+     (own brand and domain, shown as case studies).
+- **Decision:** option 3. Promoted in this wave: **Slides** (`@texuli/deck` +
+  `@texuli/slides`), **Documents** (`@texuli/document` + `@texuli/pages`, with the rich-text
+  editor inside), **Workflows**, **Canvas** and **Sheets**. Not promoted: Forms (a schema
+  runtime, not a builder), Editor and Pages as separate Solutions (they live under
+  Documents), Dashboards, Chat, Charts, Media, Motion, Blocks, Drag and Output. Products
+  (Protoyard first) appear under Built with Texuli and keep their own domains.
+- **Why:** each promoted system passes the rule on audited evidence; each rejected one
+  fails a named criterion (no builder, no composed system, or a cross-cutting engine).
+- **Consequences:** five landings, a status vocabulary (available · in development ·
+  experimental · planned) on every entry, and no landing promises a hosted or cloud
+  version of a Solution.
+- **Reverse when:** a rejected package gains the missing criterion (for example a visual
+  forms builder over `SchemaForm`); promote it with a new landing, never by renaming a page.
+
+## ADR-028: URLs and canonicals for Solutions, docs and products
+
+- **Date:** 2026-11-08 · **Ratification:** proposed by the PLAN_015 lead from
+  `audit/routes.md`, `audit/url-migration-map.md` and `audit/nav-search.md`; approved by the developer on 2026-11-08.
+- **Context:** the site has 463 sitemap URLs, `*-page` routes linked from package READMEs,
+  the skill and search, docs under `/guides/` (`DOCS_HOME`, the skill's
+  `documentation_url`), and no HTTP redirect mechanism (`Astro.redirect` answers 200).
+- **Options:**
+  1. **`/docs/…` tree for everything** (the vision's sketch). Duplicates `/guides/` and the
+     component references, and breaks sticky links.
+  2. **Keep every URL.** No risk, but no shareable `/solutions/<slug>/`.
+  3. **New families only where intent changes:** `/solutions/` and `/solutions/<slug>/`
+     for the five Solutions; their technical docs at `/guides/solutions/<slug>/`;
+     `/built-with/` and `/built-with/<product>/`; everything else keeps its URL.
+- **Decision:** option 3. Component references stay canonical at
+  `/component-pages/<id>/`, primitives at `/primitives-page/<id>/`, capabilities and
+  families at their current URLs, `/native/`, `/guides/`, `/mcp`, `/skill/`, `/llms.txt`
+  unchanged. Redirects are real HTTP 301s from a typed map, served by Cloudflare Pages
+  `public/_redirects` for HTML and by `functions/_middleware.ts` for `.md` twins and
+  `Accept: text/markdown`; one hop, query kept, both slash forms. The first wave redirects
+  only `/slides-page/`, `/documents-page/`, `/workflows-page/`, `/canvas-page/` and
+  `/sheets-page/` to their `/solutions/<slug>/`, after each landing ships;
+  `/workflows-page/json/` keeps its URL.
+- **Why:** shareable names where the intent is new, zero churn elsewhere, and the
+  one-hop rule protects public deep links and agents.
+- **Consequences:** package READMEs, `TWIN_NOTES`, `SITE_PAGES`, nav and `llms.txt` move in
+  the same wave as each 301; tests assert status, `Location`, query and twins.
+- **Reverse when:** a family needs renaming (for example `/component-pages/` → `/components/`);
+  that is a separate typed map with its own tests, never a chain.
+
+## ADR-029: One typed Solutions registry
+
+- **Date:** 2026-11-08 · **Ratification:** proposed by the PLAN_015 lead; approved by the developer on 2026-11-08.
+- **Context:** the catalog page, the home Solutions band, the nav group, `llms.txt`, the
+  machine-readable index and each landing need the same facts (name, status, packages,
+  docs, demo, platforms). Typed copy would drift.
+- **Options:**
+  1. **Astro content collections** (Markdown/MDX frontmatter). Familiar, but the site's
+     sections already use TypeScript data modules that tests import without a build.
+  2. **TypeScript modules with a validator:** `apps/website/src/data/solutions/`
+     (`schema.ts`, one `entries/<slug>.ts` per Solution, `index.ts`, `validate.ts`).
+  3. **Derive everything from package manifests.** Honest for packages, but cannot hold
+     copy, demo ids or limits.
+- **Decision:** option 2, with products in a sibling `apps/website/src/data/products/`. The
+  validator fails the build on an unknown package or subpath (checked against
+  `packages/*/package.json` names and `exports`), a status outside the vocabulary, a
+  route or docs path that does not exist, or a platform status without evidence. Package
+  versions and native statuses are derived (manifests, `native/docs/parity.json`), never
+  typed. API reference stays in package docs; the registry links, never copies.
+- **Why:** one source the tests read directly, the same pattern as `home-content.ts`.
+- **Consequences:** every consumer imports the registry; the index route
+  `/solutions/index.json` and `llms.txt` are generated from it.
+- **Reverse when:** non-developers must edit Solutions content; move entries to a
+  collection that the same validator checks.
+
+## ADR-030: Interactive demo islands on Solution landings
+
+- **Date:** 2026-11-08 · **Ratification:** proposed by the PLAN_015 lead; approved by the developer on 2026-11-08. Narrows the "Static by design" rule of
+  `apps/website/docs/site-landing.md` for Solution landings only.
+- **Context:** a Solution landing must let a visitor touch the real system. The home stays
+  static by design; the `*-page` routes already ship several `client:visible` islands
+  within measured budgets (`components/perf/budgets.ts`).
+- **Options:**
+  1. **Static landings with links to the old demo pages.** Light, but "look, don't touch".
+  2. **One real demo island per landing,** server-rendered first, hydrated when visible,
+     inside the route budget of the page it replaces.
+  3. **Many islands per landing** (as on `/slides-page/`). Rich, but heavier and harder to
+     keep honest.
+- **Decision:** option 2. Each `/solutions/<slug>/` has one primary demo island
+  (`client:visible`), a static SSR preview of the same fixture before hydration, a
+  `Reset`, keyboard and touch operation, `View source` where the model allows, no network
+  and no secrets, behind the shared demo frame (error fallback, reduced motion). Extra
+  islands only on interaction. Budgets: each landing inherits the measured budget of the
+  `*-page` it replaces (`/slides-page/` page 168 KB, JS 60 KB, HTML 27 KB;
+  `/documents-page/` page 174 KB; `/workflows-page/` page 132 KB, JS 96 KB;
+  `/canvas-page/` page 169 KB; `/sheets-page/` page 186 KB, HTML 31 KB gzip);
+  `/solutions/`, `/built-with/` and the guides pages stay island-free on the default budget;
+  `/native/` may add one demo island within the default budget; the home stays static
+  (Home 2.2 adds no island). Any raise follows the owner rule: measured + 4% with a reason.
+- **Why:** a real demo is the proof; inheriting the replaced page's budget means no
+  regression for visitors.
+- **Consequences:** `site-landing.md` records the exception; `site-perf.spec.ts` gains the
+  new routes; islands follow the build-time CSP like today's.
+- **Reverse when:** a demo cannot fit its budget; it moves behind an "Open the full demo"
+  link to the existing page instead of growing the landing.
+
+## ADR-031: Global navigation for the ecosystem
+
+- **Date:** 2026-11-08 · **Ratification:** proposed by the PLAN_015 lead from
+  `audit/nav-search.md`; approved by the developer on 2026-11-08.
+- **Context:** the landing header (on `/` and `/native/`) shows Docs, two platform doors,
+  GitHub and Get started; docs pages rely on the sidebar built from `NAV_GROUPS`, and the
+  phone drawer exists only on docs pages.
+- **Options:**
+  1. **Seven top items everywhere** (`Solutions · Components · Native · Themes · Agents ·
+     Docs · GitHub`), docs header included. Consistent, but crowds the docs header.
+  2. **Seven items on the landing header** used by `/`, `/native/`, `/solutions/…` and
+     `/built-with/…`, plus a `Solutions` group in `NAV_GROUPS` for the docs sidebar,
+     drawer, breadcrumbs, footer and `llms.txt`.
+  3. **A `Platforms` menu** replacing Native. Fewer items, but hides Native behind a menu.
+- **Decision:** option 2. Targets: Solutions → `/solutions/`, Components →
+  `/component-pages/`, Native → `/native/`, Themes → `/gallery-themes/`, Agents →
+  `/agents-page/`, Docs → `/guides/`, GitHub → the repository. From 64rem the items show
+  inline; below, one keyboard-operable menu lists them (no hover-only); search and theme
+  stay. `NAV_GROUPS` gains `solutions` (the five landings) and `built-with`; the footer,
+  `siteLlmsSections` and breadcrumbs follow.
+- **Why:** Native and Solutions become first-class without changing the docs reading mode.
+- **Consequences:** `site-ia.spec.ts`, `site-responsive.spec.ts` and the build guards update;
+  `public/llms.txt` regenerates.
+- **Reverse when:** analytics show the docs header needs the same links; add them there.
+
+## ADR-032: Locked design systems
+
+- **Date:** 2026-11-09 · **Ratification:** owner-approved joint plan with Protoyard (Texuli T1–T5,
+  Protoyard P0–P4), relayed by the consumer lead; design by the Texuli lead from the PLAN_016 audits.
+- **Context:** a consumer builds many prototypes with coding agents, each meant to follow one brand
+  design system. Tokens and Texuli components enforce the look, but nothing stops an agent from
+  inventing UI (local styled components, restyled controls, visual utilities, inline styles, variants
+  the brand never defined), and a designer has no single place to review a design system. Consumers
+  need a lock: an approved, versioned statement of which components and variants a design system
+  allows, a catalog that lists every component's variants, sizes and states, a way to map rendered
+  elements back to components, a page that renders the whole design system, and checker functions.
+- **Options:**
+  1. Reuse `$.components` (the component token registry) for the allowed set. Rejected: that key is
+     a closed registry of about 50 token ids, not the 170 catalog ids, and two meanings would share
+     one section.
+  2. A separate policy file referenced by the document. Rejected: two artifacts to approve and keep in
+     step; the hash would not cover the policy.
+  3. **New optional document sections** `allow`, `library` and `approval`, validated structurally by
+     `validateDesignSystem` and checked against the catalog by a separate pure function.
+- **Decision:** option 3.
+  - `allow`: per catalog id, the enabled `variants`, `sizes`, `tones`, `densities` and `states`
+    (arrays; an omitted list allows every value; an empty list allows none). A component not listed
+    is not allowed once `allow` exists. Arrays replace on `extends`, patches and variants (a child
+    narrows explicitly); `allow` and `library` inherit through `extends` like other sections.
+  - `library`: the design system's own components — `id`, `name`, `purpose`, `version`, `status`
+    (`draft` | `approved`), `composes` (the allowed catalog ids it uses) and its own approval fields.
+    The code lives with the consumer (for example Protoyard's `design-systems/<id>/components/`);
+    Texuli validates the declared entry, the consumer checks the code against it.
+  - `approval`: `status` (`draft` | `approved`), `approvedBy`, `approvedAt`, `version` and
+    `contentHash`, on the document and per library entry. It is **top-document only**: it never
+    inherits through `extends`. `contentHash` is the SHA-256 of the canonical JSON (sorted keys, no
+    whitespace, the existing `canonicalJson`/`sha256Hex`, moved from `@texuli/tokens` into
+    `@texuli/spec/design-system` and re-exported) of the document without its whole `approval`
+    section (the version lives in the document's own `version`); per library entry, over the entry
+    without its `approval`. Agreed with the Protoyard lead on 2026-11-09.
+    The CLI can verify the hash; it cannot prove who approved — a human commit reviewed through
+    CODEOWNERS is the guarantee, and the docs say so.
+  - Catalog membership (unknown id, a variant, size or state the catalog does not list) is checked by
+    `checkDesignSystemAllow(doc, catalog)` in `@texuli/spec/design-system`, not inside the bundled
+    validator, so the validator's budget does not carry the 191 KB catalog.
+  - The compiler emits an **allow manifest** beside the CSS (`allow`, library ids, `version`,
+    `contentHash`, catalog spec version). A disallowed variant is **flagged by checkers and never
+    removed at runtime**; component code is the same under every design system; 0.12.0 documents
+    compile to the same CSS.
+  - Catalog: each component gains optional `axes` (`variant`, `size`, `tone`, `density`, each
+    `{ prop, values, default }` derived from its enum prop) and `states` (a closed list:
+    hover, focus-visible, active, disabled, loading, invalid, selected, expanded, checked, open,
+    readonly), authored in the catalog manifests (`packages/catalog/src/manifests/**`) and projected
+    into `packages/spec/catalog/components.json`. A test fails when an axis drifts from its prop.
+  - Root attributes: every catalog component root carries `data-tx-component="<catalog id>"` and,
+    where it has the axis, `data-tx-variant`, `data-tx-size`, `data-tx-tone`, `data-tx-density`
+    (names exported from `@texuli/spec/design-system`). Wrappers forward them; components with no
+    own element (`inline-text`, `data-dashboard-widget`) are documented exceptions.
+  - Blueprint spec 0.13.0 (additive: stamp-only migration, no `formatVersion` bump); new issue codes
+    reach the generated TS and Kotlin vocabularies with one invalid fixture each. Texuli 0.15.0 ships
+    the document, catalog and attributes (T1–T3); 0.16.0 ships the kit page (`texuli/ds-kit`) and the
+    checker core in `@texuli/tools/ds-check` (T4–T5). Protoyard owns commands, binding, lock
+    enforcement in builds and the agent workflow.
+- **Why:** one approved artifact with one hash; additive and backward compatible; the checker
+  receives the catalog as data so no layer imports upward and no bundle grows past its budget;
+  attributes let a browser check map any element to a component without component internals.
+- **Consequences:** every catalog component and its wrappers change (attributes); the catalog schema
+  and its Kotlin twin gain optional fields; `@texuli/tokens/hash` re-exports from `@texuli/spec`; the
+  allow manifest becomes a public output consumers depend on.
+- **Reverse when:** consumers enforce design systems through another mechanism (drop `allow` and the
+  manifest; the attributes stay useful for analytics and tests), or the catalog widens past the agent
+  catalog, which extends `axes`/`states` rather than replacing them.

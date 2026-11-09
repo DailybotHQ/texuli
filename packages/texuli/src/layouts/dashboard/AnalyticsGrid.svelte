@@ -47,7 +47,7 @@ const safeMinItem = $derived(Math.max(120, Math.floor(minItem)));
   style:--tx-analytics-columns={safeColumns}
   style:--tx-analytics-min="{safeMinItem}px"
   style:--tx-analytics-gap={gap}
->
+ data-tx-component="analytics-grid">
   <div class="tx-analytics-grid__items">
     {@render children()}
   </div>

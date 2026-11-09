@@ -173,6 +173,9 @@ const onpointerleave = () => (hover = null);
     aria-label={(rest['aria-label'] as string | undefined) ??
       formatRatingLabel(text.display, { value: current, max: count }, locale)}
     data-tx-rating="display"
+    data-tx-component="rating"
+    data-tx-size={size}
+    data-tx-tone={tone}
   >
     <span class="tx-rating__stars">
       {#each stars as index (index)}
@@ -182,7 +185,7 @@ const onpointerleave = () => (hover = null);
     {#if showValue}<span class="tx-rating__value" aria-hidden="true">{summary}</span>{/if}
   </div>
 {:else}
-  <div bind:this={ref} {...wrapperAttrs} class={classes} data-tx-rating="input" data-disabled={disabled ? '' : undefined}>
+  <div bind:this={ref} {...wrapperAttrs} class={classes} data-tx-rating="input" data-tx-component="rating" data-tx-size={size} data-tx-tone={tone} data-disabled={disabled ? '' : undefined}>
     <span class={cx('tx-rating__label', hideLabel && 'tx-rating__label--hidden')} id={`${uid}-label`}>{text.label}</span>
     <RadioGroupPrimitive.Root
       {...controlAttrs}

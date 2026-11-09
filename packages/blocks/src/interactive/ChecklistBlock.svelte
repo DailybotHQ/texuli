@@ -23,7 +23,7 @@ const completed = $derived(Object.values(done).filter(Boolean).length);
 const total = $derived(block.items.length);
 </script>
 
-<div class="tx-block-interactive" data-tx-block="checklist" data-tone={block.tone}>
+<div class="tx-block-interactive" data-tx-block="checklist" data-tx-component="blocks-interactive" data-tone={block.tone}>
   {#if block.title}
     <h3 class="tx-block-interactive__title">{block.title}</h3>
   {/if}

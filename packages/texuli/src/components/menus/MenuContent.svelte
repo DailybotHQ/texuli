@@ -49,6 +49,6 @@ const classes = $derived(
   data-size={size}
   data-variant={variant}
   {...rest}
->
+ data-tx-component="dropdown-menu-content" data-tx-size={size} data-tx-variant={variant}>
   {@render children?.()}
 </Primitive>

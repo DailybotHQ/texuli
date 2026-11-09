@@ -990,7 +990,7 @@ const designSystemDashboard: Session = {
           expect(data.valid).toBe(true);
           expect(data.blueprint).toMatchObject({
             format: 'texuli-blueprint',
-            spec: '0.12.0',
+            spec: '0.13.0',
             status: 'draft',
           });
           expect(data.blueprint.tree.id).toBe('data-dashboard');
@@ -1024,6 +1024,94 @@ const designSystemDashboard: Session = {
     const hash = ctx.data('validate').hash;
     expect(ctx.data('css').hash).toBe(hash);
     expect(ctx.data('preview').hash).toBe(hash);
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Job: a locked design system, left as a draft for a person to approve (ADR-032).
+// ---------------------------------------------------------------------------
+
+/** The brand's own component, declared in the library as a draft. */
+const PRICING_CARD = {
+  id: 'pricing-card',
+  name: 'Pricing card',
+  purpose: 'One plan of Example Co. with its price and a call to action.',
+  version: '0.1.0',
+  status: 'draft',
+  composes: ['card', 'button', 'badge'],
+} as const;
+
+/** The locked draft: the suggestion, the minimal allow preset narrowed, a library entry, a draft approval. */
+function lockedDocument(ctx: SessionContext): Json {
+  const suggested = ctx.data('suggest').document;
+  const allow = structuredClone(ctx.data('allow').allow);
+  return {
+    ...suggested,
+    allow,
+    library: [PRICING_CARD],
+    approval: { status: 'draft', version: suggested.version },
+  };
+}
+
+const lockedDesignSystem: Session = {
+  name: 'a locked design system as a draft: create-design-system (locked) → ds.suggest → ds.allow → ds.validate',
+  steps: [
+    toolsStep,
+    {
+      label: 'prompt',
+      method: 'prompts/get',
+      params: {
+        name: 'create-design-system',
+        arguments: { brief: BRAND.brief, locked: 'minimal' },
+      },
+      expect(result, ctx) {
+        const text = result.messages[0].content.text as string;
+        expect(text).toContain('ds.allow');
+        expect(text).toContain('"status": "draft"');
+        expect(text).toMatch(/Never set "status": "approved"/u);
+        expect(text).toContain('texuli ds approve');
+        for (const tool of backtickedTools(text)) {
+          expect(texuliOps.get(tool), tool).toBeDefined();
+          if (ctx.door === 'stdio' || texuliOps.get(tool)?.runtime !== 'node')
+            expect(listedTools(ctx), tool).toContain(tool);
+        }
+      },
+    },
+    {
+      label: 'suggest',
+      method: 'tools/call',
+      params: call('ds.suggest', { seed: BRAND.seed, id: BRAND.id, name: BRAND.name }),
+      expect(result) {
+        expect(result.structuredContent.valid).toBe(true);
+      },
+    },
+    {
+      label: 'allow',
+      method: 'tools/call',
+      params: call('ds.allow', { preset: 'minimal' }),
+      expect(result) {
+        const data = result.structuredContent;
+        expect(data.unknown).toEqual([]);
+        expect(data.count).toBe(Object.keys(data.allow).length);
+        for (const id of PRICING_CARD.composes) expect(Object.keys(data.allow), id).toContain(id);
+      },
+    },
+    (ctx) => [
+      {
+        label: 'validate',
+        method: 'tools/call',
+        params: call('ds.validate', { document: lockedDocument(ctx) }),
+        expect(result) {
+          expect(result.structuredContent).toMatchObject({ valid: true, codes: [], errors: [] });
+        },
+      },
+    ],
+  ],
+  final(ctx) {
+    const doc = lockedDocument(ctx);
+    expect(doc.approval.status).toBe('draft');
+    expect(doc.library.every((entry: Json) => entry.status === 'draft')).toBe(true);
+    expect(JSON.stringify(doc)).not.toMatch(/approvedBy|approvedAt|contentHash/u);
   },
 };
 
@@ -1240,6 +1328,7 @@ export const SESSIONS: readonly Session[] = [
   markdownDeck,
   readTheSite,
   designSystemDashboard,
+  lockedDesignSystem,
   dtcgImport,
   repairRefused,
 ];

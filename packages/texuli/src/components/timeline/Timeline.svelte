@@ -87,7 +87,7 @@ const horizontal = $derived(orientation === 'horizontal');
   aria-label={label ?? context.messages.label}
   tabindex={horizontal ? 0 : undefined}
   {...rest}
->
+ data-tx-component="timeline">
   {#if items}
     {#each items as entry, index (entry.id ?? index)}
       <TimelineItem

@@ -22,10 +22,11 @@ export async function primaryNav(page: Page): Promise<Locator> {
  * Docs link into the docs shell, where the primary navigation lives.
  */
 export async function enterDocsFromLanding(page: Page): Promise<void> {
-  await page
-    .locator('[data-tx-site-header]')
-    .getByRole('link', { name: 'Docs', exact: true })
-    .click();
+  const header = page.locator('[data-tx-site-header]');
+  // ADR-031: below 64rem the global nav lives behind the landing menu button.
+  const menu = header.locator('[data-landing-menu]');
+  if (await menu.isVisible()) await menu.click();
+  await header.getByRole('link', { name: 'Docs', exact: true }).click();
   await page.waitForURL(/\/guides\/$/);
 }
 

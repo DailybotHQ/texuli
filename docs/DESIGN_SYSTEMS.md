@@ -5,7 +5,11 @@
 > `ds.*` operations, `texuli ds` and the example brands) ships in the 0.10
 > line on npm; 0.9.0 had none of it (it has token contract v2, component
 > tokens, hooks and design defaults, the plumbing this builds on). Items
-> marked **planned** are not built yet.
+> marked **planned** are not built yet. [Locked design systems](#locked-design-systems)
+> (blueprint spec `0.13.0`, ADR-032) are new in `0.15.0`: the document,
+> the catalog, the allow manifest and the CLI. The kit (`texuli/ds-kit`)
+> and the locked checkers ship in `0.15.0` as **in development** and are
+> completed in `0.16.0`.
 
 A design system describes a brand once, as **one closed JSON document**,
 and every Texuli surface follows it: styled components, layouts and domain
@@ -24,7 +28,9 @@ Decisions:
 [ADR-023](DECISIONS.md#adr-023-design-system-runtime-and-scoping) (runtime
 and scoping),
 [ADR-024](DECISIONS.md#adr-024-design-systems-on-every-surface) (every
-surface). Reference docs: [the document](../packages/spec/docs/design-system.md),
+surface),
+[ADR-032](DECISIONS.md#adr-032-locked-design-systems) (locked design
+systems). Reference docs: [the document](../packages/spec/docs/design-system.md),
 [the compiler](../packages/tokens/docs/design-system-compiler.md),
 [importers, emitters, report and diff](../packages/tokens/docs/design-system-io.md),
 [the runtime](../packages/tokens/docs/design-system-runtime.md),
@@ -70,6 +76,113 @@ Why `examples/` and not a package: the spec's fixtures
 of the normative spec, and the tokens fixtures subpath ships to adopters'
 tests. Example brands are neither: they are documentation that tests load
 by path, so they live at the repository root, outside every package.
+
+## Create a locked design system, end to end
+
+This is the whole path from nothing to an approved, locked design system that a consumer
+such as Protoyard can pin. The brand here is fictional (Harborline, `example.com`). Each
+step names the CLI command, the MCP operation an agent uses, and the Studio control on
+texuli.com; every one of them exists today. Locked design systems are **in development**
+(spec 0.13.0, ADR-032).
+
+1. **Start from what you have.** A brief, a token file, CSS, a logo or a library theme:
+
+   ```bash
+   texuli ds generate --from-tokens tokens/brand.tokens.json --from-css src/brand.css -o design-systems/harborline.ds.json
+   ```
+
+   Add `--brief` with a short quoted description (for example a teal `#0e7490`, Inter,
+   rounded and calm), `--from-logo` with sampled logo pixels or `--from-theme` with a
+   library theme.
+
+   The report lists every value an importer dropped or a later source overwrote
+   (`report.losses`) and every color the AA solver moved, with its reason
+   (`report.repairs`). Read both: a repair is a brand color that changed. Agents call
+   `ds.generate` (draft only, never saved or approved); in the Studio
+   (`/theme-studio/`) start from a library theme, a one-liner or an imported file.
+   Details: [From what you already have](#from-what-you-already-have).
+2. **Tune the tokens.** Edit the sections by hand ([By hand](#by-hand)), or override with
+   patches and variants ([Override](#override-patches-and-variants)). `texuli ds preview`
+   and `ds.preview` show a static snapshot.
+3. **Lock it: the allowed set.** Decide which catalog components, variants, sizes, tones,
+   densities and states the brand allows:
+
+   ```bash
+   texuli ds init design-systems/harborline.locked.ds.json --locked --preset minimal
+   ```
+
+   Narrow the lists, or merge the `allow` section into your generated document. Agents
+   call `ds.allow` (a preset or named ids, with every value the catalog declares); the
+   Studio's **Locked design system** editor picks components and values from the catalog.
+   A component not listed is not allowed; an omitted list allows every value; an empty list
+   allows none ([The allowed set](#the-allowed-set-allow)). Host component libraries that
+   are not in the Texuli catalog join as namespaced catalog extensions (`<ns>:<id>`,
+   [What Texuli checks, what the consumer wires](#what-texuli-checks-what-the-consumer-wires)).
+4. **Declare the brand's own components.** Each `library` entry names its id, purpose,
+   version, `status: "draft"` and the allowed catalog ids it `composes`; the code lives
+   with the consumer ([The design system's own components](#the-design-systems-own-components-library)).
+5. **Validate until it passes.**
+
+   ```bash
+   texuli ds validate design-systems/harborline.locked.ds.json --locked --json
+   ```
+
+   Every finding has a stable code, a severity, a path and a fix hint: structure, `allow`
+   against the catalog, approval and hashes, AA contrast (text, focus, non-text), target
+   sizes, the data-viz palette and token completeness. Agents call `ds.validate`; in the
+   Studio, press **Validate and preview**. Fix every error ([Validate](#validate)).
+6. **Review it whole.** Render the design system with `texuli/ds-kit` (foundations in light
+   and dark, voice, every allowed component in every allowed variant, size and state, the
+   library and the approval record) in your app, or see the example on texuli.com at
+   [/design-systems/kit/](https://texuli.com/design-systems/kit/)
+   ([See the whole design system](#see-the-whole-design-system)).
+7. **Approve: a person, a commit, CODEOWNERS.** The reviewer runs:
+
+   ```bash
+   texuli ds approve design-systems/harborline.locked.ds.json --by design-reviewer --version 1.0.0
+   git add design-systems/harborline.locked.ds.json && git commit -m "design: approve Harborline 1.0.0"
+   ```
+
+   `ds approve` validates first, refuses an invalid document, then stamps
+   `approval { status: "approved", approvedBy, approvedAt, version, contentHash }`. **The
+   CLI cannot prove who approved**: `approvedBy` is what was typed. The guarantee is the
+   reviewed commit, with the `design-systems/` folder owned by the design reviewer in
+   `CODEOWNERS`. Agents never approve: `ds.save` refuses an approved document
+   (`approval-human-only`), the `create-design-system` prompt stops at a draft, and the
+   Studio exports a draft only. `texuli ds hash` prints the content hash and exits 1 when
+   the file changed after approval ([Approval and the content hash](#approval-and-the-content-hash)).
+8. **Version and hand it over.** Bump `version` for every approved change (semver: a
+   narrower allowed set or a removed library entry is a breaking change for prototypes).
+   Pack the document with its library sources and release history for the consumer:
+
+   ```bash
+   texuli ds pack design-systems/harborline.locked.ds.json --out dist/harborline-1.0.0.bundle.json
+   texuli ds diff design-systems/harborline-0.9.0.ds.json design-systems/harborline.locked.ds.json
+   ```
+
+   Agents call `ds.bundle`. The consumer pins the exact version (a binding never takes a
+   range) and moves it with an explicit command; `ds-kit` shows what changed between the
+   pinned version and the new one ([Exact version pinning](#exact-version-pinning)).
+9. **Check locked prototypes.** In the consumer's CI:
+
+   ```bash
+   texuli ds validate design-systems/harborline.locked.ds.json --locked --prototype ./src --json
+   ```
+
+   It reads sources and blueprints (never executes them) for components and props outside
+   the allowed set and for the locked CSS policy (layout utilities on the token scale
+   only). Add `--report` to list the findings and exit 0 while existing prototypes
+   migrate ([Locked-mode rules for consumers](#locked-mode-rules-for-consumers)).
+
+| Step | CLI | MCP (agents) | Studio (`/theme-studio/`) |
+| --- | --- | --- | --- |
+| Start | `texuli ds generate`, `ds import`, `ds init --brand` | `ds.generate`, `ds.import`, `ds.suggest` | Library theme, one-liner or file import |
+| Lock | `texuli ds init --locked --preset …` | `ds.allow` | **Locked design system** editor |
+| Validate | `texuli ds validate --locked` | `ds.validate` | **Validate and preview** |
+| Review | `texuli ds preview`; `texuli/ds-kit` in your app | `ds.preview` | The preview after validating |
+| Approve | `texuli ds approve --by <name>`, then a reviewed commit | Never (draft only) | Never (exports a draft) |
+| Hand over | `texuli ds pack`, `ds diff`, `ds hash` | `ds.bundle`, `ds.diff` | Export draft JSON |
+| Check prototypes | `texuli ds validate --locked --prototype <dir>` | `ds.validate` (with a prototype) | — |
 
 ## Author
 
@@ -238,6 +351,17 @@ errors }`.
 | A logo's RGBA pixels | `importLogoPixels` (dominant colors, then the seed engine) | `ds.suggest` `pixels` | — |
 | One seed, or up to three brand colors | `importBrand` | `ds.suggest` `seed` or `colors` | — |
 
+For a combined starting point, `generateDesignSystem({ brief?, tokens?, css?,
+logoPixels?, theme? })` merges bounded inputs, fills defaults, validates and
+compiles a draft. Later sources take precedence; overwritten values and
+unmapped importer values appear in `report.losses`. Automatic accessibility
+adjustments are listed in `report.repairs` with reasons, and
+`report.guarantees` records the result. The MCP/CLI operation
+`ds.generate` exposes this as draft-only pure compute; it never
+saves or approves a document. The CLI equivalent is
+`texuli ds generate --brief … --from-tokens … --from-css … --from-logo … -o
+<file>` and writes the document with its report.
+
 A DTCG or Tokens Studio file written by `emitDtcg` or `emitTokensStudio`
 round-trips losslessly (document → file → document), because what is not a
 token travels in `$extensions["com.texuli.design-system"]`.
@@ -246,9 +370,12 @@ token travels in `$extensions["com.texuli.design-system"]`.
 
 The MCP prompt `create-design-system` (brief, optional `base` theme and
 `contrast`) walks an agent through the loop: read
-`texuli://design-system/acme`, start from `ds.import` or `ds.suggest`,
-write the sections, `ds.validate` until valid, check `ds.contrast` and
-`ds.preview`, then deliver. A brand URL is an agent-side step at most: the
+`texuli://design-system/acme`, use `ds.generate` for combined
+inputs, review losses and automatic AA repairs, then `ds.validate` until
+valid, check `ds.contrast` and `ds.preview`, and deliver a draft. Reference
+screenshots are an agent vision step: the agent interprets them and proposes
+a brief or other generator inputs. No importer reads screenshots, and no
+image is silently imported. A brand URL is an agent-side step at most: the
 compiler never fetches. The skill's [design-systems sub-skill](../skills/texuli/design-systems/SKILL.md)
 is the same loop for hosts with skills.
 
@@ -283,6 +410,9 @@ accepts capped ones.
 | `aa-focus` | The focus ring below 3:1 against the page or surface, or `focusWidth` under 2 px | Unpin `ring` or widen the focus |
 | `aa-non-text` | From spec 0.12.0: the sidebar's active fill (`sidebarPrimary`) below 3:1 against the sidebar fill (WCAG 1.4.11), at `$.vars.<mode>["--tx-sidebar-primary"]`; raised by `texuli ds check` and `ds.validate` (`checkDesignSystemIndicators`), a warning in the compiler's report | Leave `color.roles.<mode>.sidebarPrimary` out so the compiler derives it, or pin a `sidebarPrimary` or `sidebar` that reaches 3:1 |
 | `target-size` | A pinned component size below `accessibility.targetMin` | Pick a size at or above the target |
+| `approval-invalid` | From spec 0.13.0: an `approved` document without `approvedBy` and `approvedAt`, or an `approved` library entry without its own approval | Approve with `texuli ds approve`, or set the status back to `draft` |
+| `unknown-component`, `unknown-variant`, `unknown-size`, `unknown-tone`, `unknown-density`, `unknown-state` | From spec 0.13.0: an `allow` id, or a value of one of its lists, that the catalog does not list; also a `library[].composes` id. Raised by `checkDesignSystemAllow` and `texuli ds check`, not by the bundled validator | Use a catalog id and the values its `axes` and `states` list (`ds.allow` lists them) |
+| `content-hash-mismatch`, `library-hash-mismatch` | Raised by `texuli ds check` only: the `contentHash` an approval records no longer matches the document (or the library entry). It changed after approval | Review the change, then approve again with `texuli ds approve` |
 
 An agent repairs a refused document from the code and the path alone; the
 agent evals (`tests/agent-evals/sessions.ts`) prove it on a document with
@@ -380,7 +510,7 @@ exports the document (and, optionally, its cached compiled form):
     "./design-system.json": "./design-system.json",
     "./design-system.compiled.json": "./design-system.compiled.json"
   },
-  "peerDependencies": { "@texuli/tokens": "^0.14.0" }
+  "peerDependencies": { "@texuli/tokens": "^0.15.0" }
 }
 ```
 
@@ -443,7 +573,20 @@ readable, the compile succeeds with an `aa-non-text` warning, and
 ```bash
 texuli ds check examples/design-systems/tumbletown.json --json     # stable codes, exit 0 or 1
 texuli ds check examples/design-systems/tumbletown.json --render   # paints the catalog in chromium
+texuli ds validate brand.json --locked --prototype ./src --json   # full static prototype scan
+texuli ds validate brand.json --locked --prototype ./src --report --json
 ```
+
+`texuli ds validate <file>` runs document validation and its compiled
+guarantees. Add `--locked` to run the full locked-design-system validator;
+`--prototype <dir>` also scans local Svelte, TypeScript, JavaScript, CSS and
+blueprint JSON sources as text without executing them. `--catalog`,
+`--json`, `--render`, `--strict` and `--report` on `ds validate` select the
+full mode as well. `--report` requires `--locked`. Exit codes are `0` for a
+valid result or report-only run, `1` for an enforced finding, and `2` when
+the command cannot run (bad arguments, unreadable input, missing browser
+dependencies). See the [full check reference](../packages/tools/docs/ds-check.md)
+for every code, severity, input bound and exemption.
 
 `--render` paints every agent-emittable catalog component under the design
 system in headless chromium and checks axe, the painted contrast of every
@@ -455,6 +598,270 @@ names the packages when they are missing). In a CI job,
 `@texuli/tools/ds-check` runs the same checks from your own tests
 (`checkDesignSystem` for the static half, `runDsRenderChecks` on a page you
 opened). Details: [ds-check.md](../packages/tools/docs/ds-check.md).
+
+## Locked design systems
+
+> **Status: new in `0.15.0`.** Blueprint spec `0.13.0`
+> ([ADR-032](DECISIONS.md#adr-032-locked-design-systems)). Items marked
+> **in development** ship in `0.15.0` and are completed in `0.16.0`; items
+> marked **planned** do not exist yet. Existing documents are unaffected: without `allow` a design
+> system is not locked, and a `0.12.0` document compiles to the same CSS.
+
+A locked design system says which Texuli components, variants, sizes and
+states a product may use, which components of its own it has, and who
+approved that version. Three optional sections of the same document carry
+it, so one file and one hash cover the whole policy.
+
+### The allowed set: `allow`
+
+```json
+{
+  "allow": {
+    "button": { "variants": ["default", "outline"], "sizes": ["sm", "md"], "states": [] },
+    "card": {},
+    "input": { "sizes": ["md"] }
+  }
+}
+```
+
+- The keys are catalog component ids
+  (`packages/spec/catalog/components.json`). Once `allow` exists, a
+  component it does not list is **not allowed**.
+- Each entry may list `variants`, `sizes`, `tones`, `densities` and
+  `states`. An **omitted** list allows every value the catalog lists for
+  that component; an **empty** list allows none.
+- The catalog says what exists: from spec `0.13.0` each component carries
+  its `axes` (`variant`, `size`, `tone`, `density`, each with the enum prop
+  that drives it, its values and its default) and its `states`, from the
+  closed list `hover`, `focus-visible`, `active`, `disabled`, `loading`,
+  `invalid`, `selected`, `expanded`, `checked`, `open`, `readonly`
+  ([contract](../packages/spec/docs/contract.md)).
+- Catalog membership is checked by `checkDesignSystemAllow(doc, catalog)`
+  (`@texuli/spec/design-system`), which takes the catalog as data so the
+  bundled validator never carries it, and by `texuli ds check` (codes in
+  the [Validate](#validate) table).
+- `extends`, variants and patches: entries inherit from the base; a child
+  that lists an axis **replaces** that list (it narrows explicitly), keeps
+  the lists it does not mention, and `null` in a patch removes an entry.
+- A disabled variant is **flagged, never removed at runtime**: component
+  code and the emitted CSS are the same under every design system.
+
+### The design system's own components: `library`
+
+```json
+{
+  "library": [
+    {
+      "id": "kpi-strip",
+      "name": "KPI strip",
+      "purpose": "A row of figures for the day's ledger.",
+      "version": "0.1.0",
+      "status": "draft",
+      "composes": ["card", "button"]
+    }
+  ]
+}
+```
+
+At most 64 entries. `composes` names the allowed catalog ids the entry is
+built from. The code lives with the consumer (for example a
+`design-systems/<id>/components/` folder); Texuli validates the declared
+entry, the consumer checks the code against it. An entry has its own
+`status` and, once approved, its own `approval`.
+
+### Approval and the content hash
+
+```json
+{
+  "approval": {
+    "status": "approved",
+    "approvedBy": "Design reviewer",
+    "approvedAt": "2026-11-09T14:30:00Z",
+    "version": "1.2.0",
+    "contentHash": "<64 hex characters>"
+  }
+}
+```
+
+- `contentHash` is the SHA-256 of the canonical JSON (sorted keys, no
+  whitespace) of the document **without its `approval`**, with every
+  library entry also without its own `approval`
+  (`designSystemContentHash`, `libraryEntryContentHash`). Approving an
+  entry never moves the document hash; any other edit does.
+- `approval` belongs to the top document only: it is never inherited
+  through `extends`.
+- An `approved` document needs `approvedBy` and `approvedAt`
+  (`approval-invalid` otherwise).
+
+**The CLI cannot prove who approved.** `approvedBy` is text anyone can
+type, and `texuli ds approve` records it; it does not authenticate it. The
+guarantee is a human git commit of the document, reviewed by the design
+system's owners through `CODEOWNERS`, for example:
+
+```text
+# .github/CODEOWNERS
+/design-systems/  @example-org/design-reviewers
+```
+
+with branch protection that requires their review. The content hash makes
+the approved bytes checkable afterwards: `texuli ds check` refuses a
+document edited after approval (`content-hash-mismatch`).
+
+### The commands
+
+```bash
+texuli ds init brand.ds.json --locked --preset minimal   # a draft with an allow section (minimal, all or a JSON file)
+texuli ds approve brand.ds.json --by design-reviewer      # validates, then stamps approval and contentHash
+texuli ds hash brand.ds.json                             # prints the hashes; exit 1 when a stored one differs
+texuli ds check examples/design-systems/ledgerline.json  # allowed set, approval, hashes, guarantees
+```
+
+- `ds init --locked` writes `approval: { status: "draft" }`; the `minimal`
+  preset is `MINIMAL_LOCKED_COMPONENTS` (actions, form controls, text and
+  status, containers, overlays and page layouts), `all` is the whole
+  catalog.
+- `ds approve` is the one door that writes an approved document. Agents
+  cannot: `ds.save` refuses a document or library entry marked approved
+  (`approval-human-only`), and the `create-design-system` prompt keeps
+  approval as a draft and hands it to a person.
+- `ds check` checks `allow` against the agent catalog (`--catalog
+  <components.json>` for another one), reports the allowed set, the
+  approval as declared and each hash, and exits 1 on any refusal
+  ([ds-check.md](../packages/tools/docs/ds-check.md)).
+- `ds validate brand.json --locked --prototype ./src --json` scans the
+  document and prototype sources for catalog membership, allowed component
+  axes/states and the locked CSS policy. It does not execute the app. Add
+  `--report` to record the complete findings and counts without enforcing
+  them, or `--render` to add the catalog conformance sheet's browser checks.
+- Agents list a valid `allow` section with `ds.allow` (from a preset or
+  named ids, with every axis and state the catalog declares).
+
+The three example brands are locked drafts: each has an `allow` section, a
+library entry and `approval.status: "draft"`.
+
+### The allow manifest
+
+The compiler emits an **allow manifest** beside the CSS, as
+`compiled.allowManifest` (and in `texuli ds compile --format json`):
+
+| Field | Meaning |
+| --- | --- |
+| `allow` | The effective allowed set after `extends`, variants and patches (absent when not locked) |
+| `library` | Each library entry's `id`, `version` and `status` |
+| `version` | The document's version |
+| `contentHash` | `designSystemContentHash` of the document as written |
+| `specVersion` | The blueprint spec the manifest follows (`0.13.0`) |
+| `catalogDigest` | The catalog hash, when the caller passed one |
+
+`emitCss` never reads it, so a document with or without `allow` compiles
+to the same stylesheet. Checkers and consumers read the manifest instead of
+re-resolving the document.
+
+### Exact version pinning
+
+A consumer pins one exact design-system version: `extends` and blueprint
+`ref`s take only an exact `id@x.y.z` (a range is `extends-range`), and the
+allow manifest carries `version` and `contentHash`, so a binding can refuse
+a manifest that is not the one it pinned. Moving to a new version is an
+explicit step on the consumer's side (for Protoyard, its own command);
+Texuli's part is `ds.diff`, the hashes, and the kit's change list between
+two versions (below).
+
+### Mapping rendered elements to components
+
+Every catalog component root carries `data-tx-component="<catalog id>"`
+and, where the component has the axis, `data-tx-variant`, `data-tx-size`,
+`data-tx-tone` and `data-tx-density`. The names and
+`dsRootAttributes(id, axes)` come from `@texuli/spec/design-system`.
+Components with no element of their own (`inline-text`,
+`data-dashboard-widget`) are the documented exceptions. A checker maps any
+element back to its component without component internals.
+
+### Locked-mode rules for consumers
+
+These are the owner's rules for locked prototypes. `@texuli/tools/ds-check`
+enforces them (**in development**: in the `0.15.0` tarballs, completed in
+`0.16.0`). Every check, code and
+exemption: [ds-check.md](../packages/tools/docs/ds-check.md).
+
+- **Only allowed components.** UI is built from components in the allow
+  set and the design system's own library; no local styled components, no
+  restyled controls. `checkLockedUsage` reads Svelte/TypeScript sources
+  and blueprints (`not-allowed`, `variant-not-allowed`,
+  `size-not-allowed`, `tone-not-allowed`, `density-not-allowed`,
+  `state-not-allowed`, plus the catalog `unknown-*` codes). A value the
+  reader cannot see (`variant={x}`) is a `dynamic-value` warning.
+- **Layout-only utilities.** The closed list is
+  `LOCKED_LAYOUT_UTILITY_RULES`: `display` (flex, grid, block, inline,
+  hidden), flex direction, wrap, grow, shrink and basis, grid columns,
+  rows, span and flow, align, justify, place and order, gap, padding,
+  margin, space-x/y, width, height, min/max and size, position and inset,
+  overflow, z-index from tokens, and `sr-only`. Forbidden: color,
+  background, border, ring, outline, radius, shadow, typography (font,
+  text size, weight, leading, tracking), opacity, filters, transforms,
+  transitions, and **any arbitrary value**. Codes:
+  `css-utility-not-allowed`, `css-arbitrary-value`,
+  `css-property-not-allowed`, `css-literal-color`, `css-inline-style`,
+  `css-dynamic-class`.
+- **Charts, maps and canvas.** Exempt from the per-pixel fill/stroke
+  check on SVG marks (`canvas`, `data-map`, `charts-*`), because their
+  marks are data; they must still be catalog components fed by the design
+  system's data-viz palette and tokens, and their chrome (legends, axis
+  text, controls) is checked like any other component.
+- **Existing prototypes.** Only new prototypes are locked; existing ones
+  migrate on demand. `texuli ds validate brand.json --locked --prototype
+  ./src --report --json` lists every finding and exits 0 so the JSON is a
+  progress baseline. Without `--report`, an error finding exits 1.
+- **Render check.** Required in CI for locked prototypes, on demand
+  locally. `texuli ds check --render` paints the catalog under a design
+  system (axe, painted contrast, colors that do not come from it).
+  `mapDesignSystemTree` flags interactive elements outside a catalog
+  root (`unmapped`) and roots outside `allow` (`not-allowed`). Render
+  cost is a Chromium launch per run; Playwright and axe are project
+  dependencies.
+
+### What Texuli checks, what the consumer wires
+
+Texuli checks the design-system document (`allow` against the catalog,
+approval hashes, AA guarantees, data-viz palette, token completeness)
+and, when given a prototype, its sources, blueprints and CSS. The
+consumer (Protoyard or any host) wires:
+
+1. The locked document and the catalog. Optional namespaced host
+   extensions (`mergeCatalogs`, ids `<ns>:<id>`; the full report code is
+   `catalog-extension`).
+2. Prototype files and blueprints into
+   `checkDesignSystemFull({ prototype: { files, blueprints } })`, or point
+   `texuli ds validate --locked --prototype <dir>` at a local source tree.
+   The bounded reader scans text and never executes it.
+3. A painted page whose catalog roots carry `data-tx-component`. Install
+   `installDsCheckHost`, then map the tree and run the locked render
+   checks. Pure-CSS restyles with no catalog import are outside the
+   static reader; the CSS policy still refuses forbidden utilities in
+   files you pass, and the runtime map catches unmapped interactive
+   elements on a painted page.
+4. CI: run `texuli ds validate brand.json --locked --prototype ./src
+   --json` to enforce document and static source checks. Add `--render` to
+   check the bundled catalog conformance sheet; this does not render the
+   consumer app. In consumer browser tests, call `mapDesignSystemTree` and
+   `runLockedRenderChecks` on the app's painted page to check its controls,
+   chrome and axe results. Use `--report --json` during migration to save a
+   non-enforcing baseline.
+
+The CLI cannot prove who approved. Details and the complete code table:
+[ds-check.md](../packages/tools/docs/ds-check.md).
+
+### See the whole design system
+
+`texuli/ds-kit` renders a design system on one page from data: the
+foundations (every token, light and dark), voice and rules, every allowed
+component in each allowed variant, size and state (disallowed values are
+marked, never rendered), the library with its approval badges, and the
+changes between two versions, with the approval record and its hash check
+in the header. texuli.com shows a fictional example brand with it at
+`/design-systems/kit/`. Both ship in `0.15.0` as **in development** and
+are completed in `0.16.0`. The
+decision is recorded in ADR-032.
 
 ## Outputs
 

@@ -36,6 +36,6 @@ let {
   aria-pressed={selected}
   {disabled}
   {...rest}
->
+ data-tx-component="chip" data-tx-variant={variant}>
   {label}
 </button>

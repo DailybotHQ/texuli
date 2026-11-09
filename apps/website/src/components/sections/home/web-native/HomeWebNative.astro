@@ -1,0 +1,192 @@
+---
+/**
+ * Home 2.2 "Web & Native" band (vision §49.3), meant for the first half of the home: the
+ * eyebrow, h2, body and a status line beside the `home-web-native` plate, then three
+ * platform cards (web, Compose Desktop, Android and iOS) with statuses and counts from the
+ * generated compatibility data, and the call to action to the native page. No Web/Native
+ * switch: native has no production renderer for a shared demo, so the band does not fake
+ * one. Static markup, no island; links resolve through the URL policy (developer tier).
+ * Wiring into the home page belongs to the home integration task.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../../foundation/site.ts';
+import SiteIllustration from '../../../landing/SiteIllustration.astro';
+import StatusBadge from '../../../solutions/shared/platforms/StatusBadge.astro';
+import { WEB_NATIVE_COPY, webNativeActions, webNativeCards } from './web-native-content.ts';
+
+const base = import.meta.env.BASE_URL;
+const copy = WEB_NATIVE_COPY;
+const cards = webNativeCards();
+const actions = webNativeActions();
+const resolveHref = (href: string): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  return safe === undefined ? undefined : withBase(base, safe);
+};
+---
+
+<section class="home-web-native" aria-labelledby={copy.id} data-tx-home-web-native="">
+  <div class="home-web-native__inner">
+    <div class="home-web-native__head">
+      <div class="home-web-native__copy">
+        <p class="home-web-native__eyebrow">{copy.eyebrow}</p>
+        <h2 id={copy.id}>{copy.title}</h2>
+        <p class="home-web-native__body">{copy.body}</p>
+        <p class="home-web-native__status" data-tx-native-status="">
+          <span class="home-web-native__dot" aria-hidden="true"></span>
+          {copy.status}
+        </p>
+        <div class="home-web-native__actions">
+          {
+            actions.map((action) => (
+              <a href={resolveHref(action.href)} class={`home-cta home-cta--${action.role}`}>
+                {action.label}
+                {action.role === 'text' && <span aria-hidden="true">&nbsp;→</span>}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+      <div class="home-web-native__art">
+        <SiteIllustration art={copy.art} />
+      </div>
+    </div>
+    <ul class="home-web-native__cards" role="list">
+      {
+        cards.map((card) => (
+          <li class="home-web-native__card" data-platform={card.id} data-status={card.status}>
+            <div class="home-web-native__card-head">
+              <h3>{card.title}</h3>
+              <StatusBadge status={card.status} context={card.title} />
+            </div>
+            <p>{card.body}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .home-web-native {
+    background: var(--home-tint, transparent);
+    border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 60%, transparent);
+  }
+  .home-web-native__inner {
+    display: grid;
+    gap: clamp(1.75rem, 5vw, 3rem);
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-block: clamp(3rem, 8vw, 6rem);
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  .home-web-native__head {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    align-items: center;
+  }
+  @media (min-width: 56rem) {
+    .home-web-native__head {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    }
+    .home-web-native__art {
+      order: -1;
+    }
+  }
+  .home-web-native__copy {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+    max-inline-size: 34rem;
+  }
+  .home-web-native__eyebrow {
+    margin: 0;
+    color: var(--home-accent-text, var(--tx-primary));
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .home-web-native h2 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(1.9rem, 5vw, 3rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+  .home-web-native__body {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: clamp(1rem, 2.2vw, 1.15rem);
+    line-height: 1.55;
+  }
+  .home-web-native__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: 0.9rem;
+    font-weight: 650;
+  }
+  .home-web-native__dot {
+    inline-size: 0.55rem;
+    block-size: 0.55rem;
+    border: 2px solid var(--home-accent-text, var(--tx-primary));
+    border-radius: 999px;
+  }
+  .home-web-native__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+  }
+  .home-web-native__art {
+    min-inline-size: 0;
+  }
+  .home-web-native__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .home-web-native__card {
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    padding: 1.1rem;
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    border-radius: 0.875rem;
+    background: var(--tx-background);
+  }
+  .home-web-native__card[data-status='planned'] {
+    border-style: dashed;
+  }
+  .home-web-native__card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .home-web-native h3 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: 1.15rem;
+    font-weight: 750;
+  }
+  .home-web-native__card p {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: 0.925rem;
+    line-height: 1.5;
+  }
+  @media (forced-colors: active) {
+    .home-web-native__card {
+      border-color: CanvasText;
+    }
+  }
+</style>

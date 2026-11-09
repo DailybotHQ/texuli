@@ -1,6 +1,83 @@
 {
-  "catalogHash": "df09bb2bb6afef0a7c5349f8a4108c2d65065151078ac33264d15446f833f0d9",
+  "catalogHash": "c3a5f1a2ad103d59e7dfa8f3131ebd11d8bf99be366aba18b18aa6010d023557",
   "components": [
+    {
+      "axes": {
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "bordered"]
+        }
+      },
+      "capability": "web-only",
+      "emit": [],
+      "events": ["collapse"],
+      "group": "display",
+      "id": "accordion",
+      "imports": [
+        {
+          "exports": ["Accordion"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Accordion"],
+          "module": "texuli/tabs-accordion"
+        }
+      ],
+      "label": "Accordion",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "collapsible"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "content"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "number",
+          "name": "headingLevel"
+        },
+        {
+          "kind": "array",
+          "name": "items",
+          "required": true
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "enumValues": ["single", "multiple"],
+          "kind": "enum",
+          "name": "type"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "value"
+        },
+        {
+          "enumValues": ["default", "bordered"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "states": ["hover", "focus-visible", "disabled", "expanded"],
+      "summary": "Stacked sections that expand and collapse one or more panels."
+    },
     {
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
@@ -29,10 +106,27 @@
       "summary": "Groups fields whose submit proposes one named action intent to the host."
     },
     {
+      "axes": {
+        "tone": {
+          "default": "info",
+          "prop": "tone",
+          "values": ["info", "success", "warning", "error", "brand", "neutral"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "alert",
+      "imports": [
+        {
+          "exports": ["Alert", "AlertSurface", "ToneIcon"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Alert", "AlertSurface", "ToneIcon"],
+          "module": "texuli/alert"
+        }
+      ],
       "label": "Alert",
       "placement": "app",
       "props": [
@@ -90,6 +184,7 @@
           "name": "tone"
         }
       ],
+      "states": ["hover", "focus-visible"],
       "summary": "Inline feedback for a page section (status or error)."
     },
     {
@@ -97,6 +192,22 @@
       "emit": [],
       "group": "overlays",
       "id": "alert-dialog",
+      "imports": [
+        {
+          "exports": ["AlertDialog"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "AlertDialog",
+            "alertDialogActionsClass",
+            "alertDialogContentClass",
+            "alertDialogErrorClass",
+            "alertDialogIconClass"
+          ],
+          "module": "texuli/dialog"
+        }
+      ],
       "label": "AlertDialog",
       "placement": "app",
       "props": [
@@ -160,6 +271,7 @@
           "name": "trigger"
         }
       ],
+      "states": ["focus-visible", "open"],
       "summary": "Modal confirm/cancel dialog for consequential actions."
     },
     {
@@ -167,6 +279,16 @@
       "emit": [],
       "group": "layouts",
       "id": "analytics-grid",
+      "imports": [
+        {
+          "exports": ["AnalyticsGrid"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["AnalyticsGrid"],
+          "module": "texuli/layouts/dashboard"
+        }
+      ],
       "label": "AnalyticsGrid",
       "placement": "app",
       "props": [
@@ -205,10 +327,27 @@
       "summary": "Auto-fit KPI and widget grid for dashboard screens."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "inset"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "app-nav",
+      "imports": [
+        {
+          "exports": ["AppNav"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["AppNav"],
+          "module": "texuli/sidebar"
+        }
+      ],
       "label": "AppNav",
       "placement": "app",
       "props": [
@@ -285,13 +424,129 @@
           "name": "variant"
         }
       ],
+      "states": ["focus-visible", "expanded", "open"],
       "summary": "Desktop sidebar shell with mobile sheet drawer and main slot."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["xs", "sm", "md", "lg"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "avatar",
+      "imports": [
+        {
+          "exports": ["Avatar"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "AVATAR_PIXELS",
+            "AVATAR_SIZES",
+            "AVATAR_STATUSES",
+            "Avatar",
+            "AvatarShape",
+            "AvatarSize",
+            "AvatarStatus",
+            "AvatarTone",
+            "avatarInitials",
+            "avatarRootClass",
+            "avatarSrcset",
+            "avatarStatusClass",
+            "avatarToneIndex",
+            "hashString"
+          ],
+          "module": "texuli/avatar"
+        }
+      ],
+      "label": "Avatar",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "decorative"
+        },
+        {
+          "kind": "number",
+          "name": "delayMs"
+        },
+        {
+          "kind": "string",
+          "name": "initials"
+        },
+        {
+          "kind": "string",
+          "name": "name",
+          "required": true
+        },
+        {
+          "enumValues": ["circle", "square"],
+          "kind": "enum",
+          "name": "shape"
+        },
+        {
+          "enumValues": ["xs", "sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "kind": "string",
+          "name": "sizes"
+        },
+        {
+          "kind": "string",
+          "name": "src"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "srcTrust"
+        },
+        {
+          "kind": "string",
+          "name": "srcset"
+        },
+        {
+          "enumValues": ["online", "away", "busy", "offline"],
+          "kind": "enum",
+          "name": "status"
+        },
+        {
+          "enumValues": ["primary", "success", "warning", "destructive", "info", "neutral"],
+          "kind": "enum",
+          "name": "tone"
+        }
+      ],
+      "summary": "A face or initials for one person, with an optional presence status."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["xs", "sm", "md", "lg"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "avatar-group-grid",
+      "imports": [
+        {
+          "exports": ["AvatarGroup", "AvatarGroupGrid", "AvatarGroupItem", "avatarGroupClass"],
+          "module": "texuli/avatar"
+        }
+      ],
       "label": "AvatarGroupGrid",
       "placement": "app",
       "props": [
@@ -322,10 +577,36 @@
       "summary": "Up to four faces in one avatar circle, +N past four."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": [
+            "default",
+            "secondary",
+            "outline",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "badge",
+      "imports": [
+        {
+          "exports": ["Badge"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Badge"],
+          "module": "texuli/badge"
+        }
+      ],
       "label": "Badge",
       "placement": "app",
       "props": [
@@ -358,13 +639,31 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "selected"],
       "summary": "A compact status or category label."
     },
     {
+      "axes": {
+        "tone": {
+          "default": "info",
+          "prop": "tone",
+          "values": ["info", "success", "warning", "error", "brand", "neutral"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "banner",
+      "imports": [
+        {
+          "exports": ["Banner"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Banner"],
+          "module": "texuli/alert"
+        }
+      ],
       "label": "Banner",
       "placement": "app",
       "props": [
@@ -429,6 +728,20 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-code",
+      "imports": [
+        {
+          "exports": ["loadCodeFamily"],
+          "module": "@texuli/blocks"
+        },
+        {
+          "exports": ["loadCodeFamily"],
+          "module": "@texuli/blocks/code"
+        },
+        {
+          "exports": ["CodeBlockView"],
+          "module": "@texuli/blocks/code/renderers"
+        }
+      ],
       "label": "Code blocks",
       "placement": "content",
       "props": [
@@ -467,6 +780,15 @@
           "name": "step"
         }
       ],
+      "states": [
+        "hover",
+        "focus-visible",
+        "disabled",
+        "loading",
+        "invalid",
+        "selected",
+        "readonly"
+      ],
       "summary": "Validated, highlighted code."
     },
     {
@@ -474,6 +796,20 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-data",
+      "imports": [
+        {
+          "exports": ["loadDataFamily"],
+          "module": "@texuli/blocks"
+        },
+        {
+          "exports": ["loadDataFamily"],
+          "module": "@texuli/blocks/data"
+        },
+        {
+          "exports": ["ChartBlockView", "DataBlockView"],
+          "module": "@texuli/blocks/data/renderers"
+        }
+      ],
       "label": "Data blocks",
       "placement": "content",
       "props": [
@@ -504,6 +840,16 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-diagram",
+      "imports": [
+        {
+          "exports": ["loadDiagramFamily"],
+          "module": "@texuli/blocks"
+        },
+        {
+          "exports": ["loadDiagramFamily"],
+          "module": "@texuli/blocks/diagram"
+        }
+      ],
       "label": "Diagram blocks",
       "placement": "content",
       "props": [
@@ -518,6 +864,7 @@
           "name": "oninvalid"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "Validated flow, tree, board and terminal diagrams."
     },
     {
@@ -525,6 +872,20 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-embed",
+      "imports": [
+        {
+          "exports": ["loadEmbedFamily"],
+          "module": "@texuli/blocks"
+        },
+        {
+          "exports": ["loadEmbedFamily"],
+          "module": "@texuli/blocks/embed"
+        },
+        {
+          "exports": ["EmbedApp", "EmbedBlockView", "LinkPreview"],
+          "module": "@texuli/blocks/embed/renderers"
+        }
+      ],
       "label": "Embed blocks",
       "placement": "content",
       "props": [
@@ -548,6 +909,7 @@
           "name": "oninvalid"
         }
       ],
+      "states": ["focus-visible", "disabled", "loading"],
       "summary": "Validated link previews (URL policy) and embed-app shells. Texuli never runs app JSON; hosts mount via mountEmbed with a sandboxed iframe contract."
     },
     {
@@ -555,6 +917,42 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-interactive",
+      "imports": [
+        {
+          "exports": [
+            "CalculatorBlock",
+            "ChecklistBlock",
+            "PollBlock",
+            "QuizBlock",
+            "loadInteractiveFamily"
+          ],
+          "module": "@texuli/blocks"
+        },
+        {
+          "exports": [
+            "CalculatorBlock",
+            "ChecklistBlock",
+            "PollBlock",
+            "QuizBlock",
+            "loadInteractiveFamily"
+          ],
+          "module": "@texuli/blocks/interactive"
+        },
+        {
+          "exports": ["CalculatorBlock", "ChecklistBlock", "PollBlock", "QuizBlock"],
+          "module": "@texuli/blocks/interactive/engine"
+        },
+        {
+          "exports": [
+            "CalculatorBlock",
+            "ChecklistBlock",
+            "InteractiveBlockView",
+            "PollBlock",
+            "QuizBlock"
+          ],
+          "module": "@texuli/blocks/interactive/renderers"
+        }
+      ],
       "label": "Interactive blocks",
       "placement": "content",
       "props": [
@@ -573,6 +971,7 @@
           "name": "oninvalid"
         }
       ],
+      "states": ["disabled", "checked"],
       "summary": "Validated polls, quizzes, calculators and checklists."
     },
     {
@@ -580,6 +979,20 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-map",
+      "imports": [
+        {
+          "exports": ["loadMapFamily"],
+          "module": "@texuli/blocks"
+        },
+        {
+          "exports": ["loadMapFamily"],
+          "module": "@texuli/blocks/map"
+        },
+        {
+          "exports": ["MapBlockView"],
+          "module": "@texuli/blocks/map/renderers"
+        }
+      ],
       "label": "Map blocks",
       "placement": "content",
       "props": [
@@ -606,6 +1019,7 @@
           "name": "oninvalid"
         }
       ],
+      "states": ["focus-visible", "active", "selected"],
       "summary": "Validated map points and routes."
     },
     {
@@ -613,6 +1027,20 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-media",
+      "imports": [
+        {
+          "exports": ["loadMediaFamily"],
+          "module": "@texuli/blocks"
+        },
+        {
+          "exports": ["loadMediaFamily"],
+          "module": "@texuli/blocks/media"
+        },
+        {
+          "exports": ["MediaBlockView"],
+          "module": "@texuli/blocks/media/renderers"
+        }
+      ],
       "label": "Media blocks",
       "placement": "content",
       "props": [
@@ -636,6 +1064,7 @@
           "name": "resolveAvatar"
         }
       ],
+      "states": ["invalid"],
       "summary": "Validated image, figure, video and gallery content blocks."
     },
     {
@@ -643,6 +1072,20 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-structure",
+      "imports": [
+        {
+          "exports": ["loadStructureFamily"],
+          "module": "@texuli/blocks"
+        },
+        {
+          "exports": ["loadStructureFamily"],
+          "module": "@texuli/blocks/structure"
+        },
+        {
+          "exports": ["StructureFamily"],
+          "module": "@texuli/blocks/structure/renderers"
+        }
+      ],
       "label": "Structure blocks",
       "placement": "content",
       "props": [
@@ -661,6 +1104,7 @@
           "name": "oninvalid"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "Validated layouts and calls to action."
     },
     {
@@ -668,6 +1112,20 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-text",
+      "imports": [
+        {
+          "exports": ["loadTextFamily"],
+          "module": "@texuli/blocks"
+        },
+        {
+          "exports": ["loadTextFamily"],
+          "module": "@texuli/blocks/text"
+        },
+        {
+          "exports": ["RichText", "TextBlockView"],
+          "module": "@texuli/blocks/text/renderers"
+        }
+      ],
       "label": "Text blocks",
       "placement": "content",
       "props": [
@@ -686,13 +1144,181 @@
           "name": "oninvalid"
         }
       ],
+      "states": ["focus-visible", "invalid", "checked", "open"],
       "summary": "Validated heading, paragraph, list, quote and callout content."
     },
     {
       "capability": "web-only",
       "emit": [],
+      "group": "layouts",
+      "id": "bottom-nav",
+      "imports": [
+        {
+          "exports": ["BottomNav"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["BottomNav"],
+          "module": "texuli/layouts/mobile"
+        }
+      ],
+      "label": "BottomNav",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "fixed"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "hrefTrust"
+        },
+        {
+          "kind": "array",
+          "name": "items",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onSelect"
+        }
+      ],
+      "summary": "A mobile tab bar of destinations. Host chrome; agents never emit it."
+    },
+    {
+      "axes": {
+        "variant": {
+          "default": "transparent",
+          "prop": "surface",
+          "values": [
+            "transparent",
+            "default",
+            "muted",
+            "subtle",
+            "elevated",
+            "primary",
+            "brand",
+            "translucent"
+          ]
+        }
+      },
+      "capability": "web-only",
+      "emit": [],
+      "group": "display",
+      "id": "box",
+      "imports": [
+        {
+          "exports": ["Box", "BoxBorder", "BoxElevation", "BoxPadding", "BoxRadius", "BoxSurface"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "BOX_BORDERS",
+            "BOX_ELEMENTS",
+            "BOX_ELEVATIONS",
+            "BOX_PADDINGS",
+            "BOX_RADII",
+            "BOX_SURFACES",
+            "Box",
+            "BoxBorder",
+            "BoxElement",
+            "BoxElevation",
+            "BoxPadding",
+            "BoxRadius",
+            "BoxSurface",
+            "boxClass"
+          ],
+          "module": "texuli/typography"
+        }
+      ],
+      "label": "Box",
+      "placement": "app",
+      "props": [
+        {
+          "enumValues": ["div", "section", "article", "aside", "header", "footer"],
+          "kind": "enum",
+          "name": "as"
+        },
+        {
+          "enumValues": ["none", "default", "strong", "block-start", "block-end"],
+          "kind": "enum",
+          "name": "border"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["none", "sm", "md", "lg"],
+          "kind": "enum",
+          "name": "elevation"
+        },
+        {
+          "enumValues": ["none", "sm", "md", "lg", "xl"],
+          "kind": "enum",
+          "name": "padding"
+        },
+        {
+          "enumValues": ["none", "sm", "md", "lg", "xl", "full"],
+          "kind": "enum",
+          "name": "radius"
+        },
+        {
+          "enumValues": [
+            "transparent",
+            "default",
+            "muted",
+            "subtle",
+            "elevated",
+            "primary",
+            "brand",
+            "translucent"
+          ],
+          "kind": "enum",
+          "name": "surface"
+        }
+      ],
+      "summary": "A panel or region with padding, radius, border, elevation and surface from tokens."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        }
+      },
+      "capability": "web-only",
+      "emit": [],
       "group": "overlays",
       "id": "breadcrumb",
+      "imports": [
+        {
+          "exports": ["Breadcrumb"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Breadcrumb"],
+          "module": "texuli/navigation"
+        }
+      ],
       "label": "Breadcrumb",
       "placement": "app",
       "props": [
@@ -734,13 +1360,41 @@
           "name": "size"
         }
       ],
+      "states": ["hover", "focus-visible", "selected"],
       "summary": "Hierarchy trail with URL-policy links."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg", "icon"]
+        },
+        "tone": {
+          "default": "default",
+          "prop": "tone",
+          "values": ["default", "destructive", "success", "warning"]
+        },
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "secondary", "outline", "ghost", "destructive", "link"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "button",
+      "imports": [
+        {
+          "exports": ["Button"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Button"],
+          "module": "texuli/button"
+        }
+      ],
       "label": "Button",
       "placement": "app",
       "props": [
@@ -794,6 +1448,11 @@
           "name": "size"
         },
         {
+          "enumValues": ["default", "destructive", "success", "warning"],
+          "kind": "enum",
+          "name": "tone"
+        },
+        {
           "enumValues": ["button", "submit", "reset"],
           "kind": "enum",
           "name": "type"
@@ -804,6 +1463,7 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "loading"],
       "summary": "A pressable action control with loading and optional link rendering."
     },
     {
@@ -811,6 +1471,16 @@
       "emit": [],
       "group": "forms",
       "id": "button-group",
+      "imports": [
+        {
+          "exports": ["ButtonGroup"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["ButtonGroup"],
+          "module": "texuli/button"
+        }
+      ],
       "label": "ButtonGroup",
       "placement": "app",
       "props": [
@@ -838,13 +1508,31 @@
           "name": "orientation"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "Groups related buttons with shared borders and orientation."
     },
     {
+      "axes": {
+        "tone": {
+          "default": "info",
+          "prop": "tone",
+          "values": ["info", "success", "warning", "error", "brand", "neutral"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "callout",
+      "imports": [
+        {
+          "exports": ["Callout"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Callout"],
+          "module": "texuli/alert"
+        }
+      ],
       "label": "Callout",
       "placement": "app",
       "props": [
@@ -909,6 +1597,20 @@
       "emit": ["developer", "untrusted"],
       "group": "canvas",
       "id": "canvas",
+      "imports": [
+        {
+          "exports": ["CanvasEditor", "CanvasViewer"],
+          "module": "@texuli/canvas"
+        },
+        {
+          "exports": ["CanvasEditor"],
+          "module": "@texuli/canvas/editor"
+        },
+        {
+          "exports": ["CanvasViewer"],
+          "module": "@texuli/canvas/viewer"
+        }
+      ],
       "label": "Canvas",
       "placement": "content",
       "props": [
@@ -925,16 +1627,73 @@
           "name": "label"
         }
       ],
+      "states": [
+        "hover",
+        "focus-visible",
+        "active",
+        "disabled",
+        "selected",
+        "expanded",
+        "checked",
+        "open",
+        "readonly"
+      ],
       "summary": "A whiteboard or diagram as data: shapes, sticky notes, text, frames, groups and connectors on an infinite canvas."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "elevated",
+          "prop": "variant",
+          "values": ["elevated", "flat"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "card",
+      "imports": [
+        {
+          "exports": [
+            "Card",
+            "CardContent",
+            "CardDescription",
+            "CardFooter",
+            "CardHeader",
+            "CardMedia",
+            "CardTitle"
+          ],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "CARD_GAPS",
+            "CARD_VARIANTS",
+            "Card",
+            "CardContent",
+            "CardDescription",
+            "CardFooter",
+            "CardGrid",
+            "CardGridGap",
+            "CardGridGapValue",
+            "CardHeader",
+            "CardMedia",
+            "CardTitle",
+            "CardVariant",
+            "cardClass",
+            "cardGridClass"
+          ],
+          "module": "texuli/card"
+        }
+      ],
       "label": "Card",
       "placement": "app",
       "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "actions"
+        },
         {
           "extension": "web",
           "kind": "string",
@@ -959,13 +1718,97 @@
           "name": "variant"
         }
       ],
-      "summary": "A surface for grouping related content with optional link behavior."
+      "states": ["hover", "focus-visible"],
+      "summary": "A surface for grouping related content with optional stretched-link behavior."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "carousel",
+      "imports": [
+        {
+          "exports": ["Carousel", "CarouselControlsPlacement", "CarouselItem", "CarouselMessages"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "Autoplay",
+            "AutoplayHold",
+            "AutoplayOptions",
+            "Carousel",
+            "CarouselControlsPlacement",
+            "CarouselDirection",
+            "CarouselItem",
+            "CarouselMessages",
+            "DEFAULT_AUTOPLAY_INTERVAL",
+            "DEFAULT_CAROUSEL_MESSAGES",
+            "MIN_AUTOPLAY_INTERVAL",
+            "canStep",
+            "carouselVariants",
+            "createAutoplay",
+            "formatMessage",
+            "resolveCarouselMessages",
+            "resolveIndex",
+            "resolveInterval",
+            "swipeStep"
+          ],
+          "module": "texuli/carousel"
+        }
+      ],
+      "label": "Carousel",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["below", "overlay"],
+          "kind": "enum",
+          "name": "controls"
+        },
+        {
+          "kind": "number",
+          "name": "index"
+        },
+        {
+          "kind": "array",
+          "name": "items",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "boolean",
+          "name": "loop"
+        },
+        {
+          "kind": "boolean",
+          "name": "showControls"
+        },
+        {
+          "kind": "boolean",
+          "name": "showDots"
+        }
+      ],
+      "states": ["hover", "focus-visible", "selected"],
+      "summary": "A labelled region of slides with previous, next and a picker."
     },
     {
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-area",
+      "imports": [
+        {
+          "exports": ["AreaChart"],
+          "module": "@texuli/charts/cartesian"
+        }
+      ],
       "label": "Area chart",
       "placement": "content",
       "props": [
@@ -1033,6 +1876,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-bar",
+      "imports": [
+        {
+          "exports": ["BarChart"],
+          "module": "@texuli/charts/cartesian"
+        }
+      ],
       "label": "Bar chart",
       "placement": "content",
       "props": [
@@ -1100,6 +1949,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-bubble",
+      "imports": [
+        {
+          "exports": ["BubbleChart"],
+          "module": "@texuli/charts/matrix"
+        }
+      ],
       "label": "Bubble chart",
       "placement": "content",
       "props": [
@@ -1156,6 +2011,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-bullet",
+      "imports": [
+        {
+          "exports": ["BulletChart"],
+          "module": "@texuli/charts/compact"
+        }
+      ],
       "label": "Bullet chart",
       "placement": "content",
       "props": [
@@ -1201,6 +2062,23 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-canvas-renderer",
+      "imports": [
+        {
+          "exports": [
+            "CANVAS_POINT_THRESHOLD",
+            "CanvasBar",
+            "CanvasChartKind",
+            "CanvasPoint",
+            "CanvasRenderer",
+            "CanvasRendererMode",
+            "CanvasSeries",
+            "downsampleCanvasPoints",
+            "drawCanvasChart",
+            "useCanvas"
+          ],
+          "module": "@texuli/charts/canvas"
+        }
+      ],
       "label": "Canvas chart renderer",
       "placement": "content",
       "props": [
@@ -1233,6 +2111,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-cartesian",
+      "imports": [
+        {
+          "exports": ["CartesianChart"],
+          "module": "@texuli/charts/cartesian"
+        }
+      ],
       "label": "Cartesian chart",
       "placement": "content",
       "props": [
@@ -1299,6 +2183,7 @@
           "name": "xKind"
         }
       ],
+      "states": ["open"],
       "summary": "The general line, area, bar, stacked bar or combo chart renderer."
     },
     {
@@ -1306,6 +2191,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-combo",
+      "imports": [
+        {
+          "exports": ["ComboChart"],
+          "module": "@texuli/charts/cartesian"
+        }
+      ],
       "label": "Combo chart",
       "placement": "content",
       "props": [
@@ -1373,6 +2264,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-donut",
+      "imports": [
+        {
+          "exports": ["DonutChart"],
+          "module": "@texuli/charts/part-whole"
+        }
+      ],
       "label": "Donut chart",
       "placement": "content",
       "props": [
@@ -1416,6 +2313,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-funnel",
+      "imports": [
+        {
+          "exports": ["FunnelChart"],
+          "module": "@texuli/charts/flow"
+        }
+      ],
       "label": "Funnel chart",
       "placement": "content",
       "props": [
@@ -1463,6 +2366,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-gauge",
+      "imports": [
+        {
+          "exports": ["Gauge"],
+          "module": "@texuli/charts/compact"
+        }
+      ],
       "label": "Gauge chart",
       "placement": "content",
       "props": [
@@ -1520,6 +2429,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-geo-map",
+      "imports": [
+        {
+          "exports": ["GeoMap"],
+          "module": "@texuli/charts/geo"
+        }
+      ],
       "label": "Geographic map",
       "placement": "content",
       "props": [
@@ -1562,6 +2477,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-geo-point-map",
+      "imports": [
+        {
+          "exports": ["GeoPointMap"],
+          "module": "@texuli/charts/geo"
+        }
+      ],
       "label": "Geographic point map",
       "placement": "content",
       "props": [
@@ -1604,6 +2525,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-heatmap",
+      "imports": [
+        {
+          "exports": ["HeatmapChart"],
+          "module": "@texuli/charts/matrix"
+        }
+      ],
       "label": "Heatmap",
       "placement": "content",
       "props": [
@@ -1656,6 +2583,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-line",
+      "imports": [
+        {
+          "exports": ["LineChart"],
+          "module": "@texuli/charts/cartesian"
+        }
+      ],
       "label": "Line chart",
       "placement": "content",
       "props": [
@@ -1723,6 +2656,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-network",
+      "imports": [
+        {
+          "exports": ["NetworkGraph"],
+          "module": "@texuli/charts/flow"
+        }
+      ],
       "label": "Network graph",
       "placement": "content",
       "props": [
@@ -1770,6 +2709,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-pie",
+      "imports": [
+        {
+          "exports": ["PieChart"],
+          "module": "@texuli/charts/part-whole"
+        }
+      ],
       "label": "Pie chart",
       "placement": "content",
       "props": [
@@ -1813,6 +2758,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-progress-ring",
+      "imports": [
+        {
+          "exports": ["ProgressRing"],
+          "module": "@texuli/charts/compact"
+        }
+      ],
       "label": "Progress ring",
       "placement": "content",
       "props": [
@@ -1858,6 +2809,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-sankey",
+      "imports": [
+        {
+          "exports": ["SankeyChart"],
+          "module": "@texuli/charts/flow"
+        }
+      ],
       "label": "Sankey chart",
       "placement": "content",
       "props": [
@@ -1905,6 +2862,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-scatter",
+      "imports": [
+        {
+          "exports": ["ScatterChart"],
+          "module": "@texuli/charts/matrix"
+        }
+      ],
       "label": "Scatter chart",
       "placement": "content",
       "props": [
@@ -1957,10 +2920,27 @@
       "summary": "A quantitative scatter plot with an accessible data table."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "line",
+          "prop": "variant",
+          "values": ["line", "area", "bar"]
+        }
+      },
       "capability": "unknown",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-sparkline",
+      "imports": [
+        {
+          "exports": ["Sparkline"],
+          "module": "@texuli/charts/compact"
+        },
+        {
+          "exports": ["ChartFormatSpec", "CompactChartLabels", "Sparkline", "barsPaths"],
+          "module": "@texuli/charts/sparkline-lite"
+        }
+      ],
       "label": "Sparkline",
       "placement": "content",
       "props": [
@@ -2004,6 +2984,7 @@
           "name": "variant"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "A compact line, area or bar trend chart."
     },
     {
@@ -2011,6 +2992,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-stacked-bar",
+      "imports": [
+        {
+          "exports": ["StackedBarChart"],
+          "module": "@texuli/charts/cartesian"
+        }
+      ],
       "label": "Stacked bar chart",
       "placement": "content",
       "props": [
@@ -2078,6 +3065,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-sunburst",
+      "imports": [
+        {
+          "exports": ["SunburstChart"],
+          "module": "@texuli/charts/part-whole"
+        }
+      ],
       "label": "Sunburst chart",
       "placement": "content",
       "props": [
@@ -2121,6 +3114,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-treemap",
+      "imports": [
+        {
+          "exports": ["TreemapChart"],
+          "module": "@texuli/charts/part-whole"
+        }
+      ],
       "label": "Treemap chart",
       "placement": "content",
       "props": [
@@ -2164,6 +3163,12 @@
       "emit": ["developer", "untrusted"],
       "group": "chat",
       "id": "chat-message",
+      "imports": [
+        {
+          "exports": ["ChatMessage", "ChatMessageDisplay"],
+          "module": "@texuli/chat"
+        }
+      ],
       "label": "Chat message",
       "placement": "content",
       "props": [
@@ -2199,6 +3204,40 @@
       "emit": ["developer", "untrusted"],
       "group": "chat",
       "id": "chat-thread",
+      "imports": [
+        {
+          "exports": [
+            "CHAT_DISPLAY_LOADERS",
+            "CHAT_DISPLAY_ROLES",
+            "CHAT_DISPLAY_ROLE_LABELS",
+            "ChatAuthor",
+            "ChatDisplayRole",
+            "ChatMessageActions",
+            "ChatMessageStatus",
+            "ChatReadingAnchor",
+            "ChatStreamEvent",
+            "ChatThread",
+            "ChatThreadDisplay",
+            "ComposerActionContext",
+            "ComposerLabels",
+            "DEFAULT_COMPOSER_LABELS",
+            "MAX_STREAM_BODY",
+            "MESSAGE_STATUS_TONES",
+            "MessageGroup",
+            "MessageList",
+            "MessageListLabels",
+            "MessageStatusTone",
+            "MessageTextPart",
+            "TypingIndicator",
+            "TypingLabels",
+            "applyChatStreamEvent",
+            "groupMessages",
+            "messageTokens",
+            "parseMessageText"
+          ],
+          "module": "@texuli/chat"
+        }
+      ],
       "label": "Chat thread",
       "placement": "content",
       "props": [
@@ -2212,13 +3251,31 @@
           "name": "label"
         }
       ],
+      "states": ["disabled"],
       "summary": "Read-only conversation transcript of chat-message nodes, without a composer."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "checkbox",
+      "imports": [
+        {
+          "exports": ["Checkbox"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Checkbox"],
+          "module": "texuli/choice"
+        }
+      ],
       "label": "Checkbox",
       "placement": "app",
       "props": [
@@ -2287,13 +3344,40 @@
           "name": "value"
         }
       ],
+      "states": ["focus-visible", "disabled", "invalid", "checked"],
       "summary": "A binary or indeterminate checkbox with optional label."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "outline",
+          "prop": "variant",
+          "values": [
+            "default",
+            "secondary",
+            "outline",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "chip",
+      "imports": [
+        {
+          "exports": ["Chip"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Chip"],
+          "module": "texuli/badge"
+        }
+      ],
       "label": "Chip",
       "placement": "app",
       "props": [
@@ -2335,13 +3419,31 @@
           "name": "variant"
         }
       ],
+      "states": ["active", "disabled", "selected"],
       "summary": "A toggleable filter chip (pressed state)."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "inline",
+          "prop": "variant",
+          "values": ["inline", "block"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "code",
+      "imports": [
+        {
+          "exports": ["Code"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Code"],
+          "module": "texuli/kbd-code"
+        }
+      ],
       "label": "Code",
       "placement": "app",
       "props": [
@@ -2364,6 +3466,7 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled"],
       "summary": "Inline or block code with escaped text (no HTML)."
     },
     {
@@ -2371,6 +3474,25 @@
       "emit": [],
       "group": "forms",
       "id": "code-field",
+      "imports": [
+        {
+          "exports": [
+            "CODE_FIELD_HIGHLIGHT_LIMIT",
+            "CODE_FIELD_SYNC_LIMIT",
+            "CodeField",
+            "CodeFieldEdit",
+            "CodeFieldLabels",
+            "CodeFieldProps",
+            "DEFAULT_CODE_FIELD_LABELS",
+            "applyCodeFieldEdit",
+            "indentEdit",
+            "indentUnit",
+            "newlineEdit",
+            "resolveCodeFieldLabels"
+          ],
+          "module": "@texuli/blocks/code-field"
+        }
+      ],
       "label": "CodeField",
       "placement": "app",
       "props": [
@@ -2446,13 +3568,51 @@
           "name": "wrap"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "invalid", "readonly"],
       "summary": "An editable, syntax-highlighted code textarea."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "outline",
+          "prop": "variant",
+          "values": ["outline", "soft"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "combobox",
+      "imports": [
+        {
+          "exports": ["Combobox"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "Combobox",
+            "ComboboxChip",
+            "ComboboxChips",
+            "ComboboxContent",
+            "ComboboxEmpty",
+            "ComboboxError",
+            "ComboboxField",
+            "ComboboxInput",
+            "ComboboxItem",
+            "ComboboxLoading",
+            "ComboboxPortal",
+            "ComboboxRoot",
+            "ComboboxTrigger",
+            "ComboboxViewport"
+          ],
+          "module": "texuli/combobox"
+        }
+      ],
       "label": "Combobox",
       "placement": "app",
       "props": [
@@ -2552,13 +3712,80 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "invalid", "selected", "open"],
       "summary": "A text input that filters a list of options, for one value or several."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "outline",
+          "prop": "variant",
+          "values": ["outline", "soft"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "command-palette",
+      "imports": [
+        {
+          "exports": [
+            "Command",
+            "CommandEmpty",
+            "CommandGroup",
+            "CommandGroupHeading",
+            "CommandGroupItems",
+            "CommandInput",
+            "CommandItem",
+            "CommandList",
+            "CommandLoading",
+            "CommandPalette",
+            "CommandRoot",
+            "CommandTrigger"
+          ],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "COMMAND_SIZES",
+            "COMMAND_VARIANTS",
+            "Command",
+            "CommandEmpty",
+            "CommandGroup",
+            "CommandGroupHeading",
+            "CommandGroupItems",
+            "CommandInput",
+            "CommandItem",
+            "CommandItemData",
+            "CommandList",
+            "CommandLoading",
+            "CommandPalette",
+            "CommandPaletteSearch",
+            "CommandPaletteSelect",
+            "CommandRoot",
+            "CommandSize",
+            "CommandTrigger",
+            "CommandVariant",
+            "commandEmptyClass",
+            "commandGroupClass",
+            "commandGroupHeadingClass",
+            "commandInputClass",
+            "commandInputRowClass",
+            "commandItemClass",
+            "commandListClass",
+            "commandLoadingClass",
+            "commandPaletteClass",
+            "commandRootClass",
+            "commandTriggerClass"
+          ],
+          "module": "texuli/command"
+        }
+      ],
       "label": "CommandPalette",
       "placement": "app",
       "props": [
@@ -2645,13 +3872,106 @@
           "name": "variant"
         }
       ],
+      "states": ["focus-visible", "disabled", "selected", "open"],
       "summary": "Dialog-hosted command palette with search and recent items."
+    },
+    {
+      "capability": "web-only",
+      "emit": [],
+      "events": ["submit"],
+      "group": "chat",
+      "id": "composer",
+      "imports": [
+        {
+          "exports": ["Composer"],
+          "module": "@texuli/chat"
+        }
+      ],
+      "label": "Composer",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "enumValues": ["stack", "row"],
+          "kind": "enum",
+          "name": "layout"
+        },
+        {
+          "kind": "number",
+          "name": "maxLength"
+        },
+        {
+          "kind": "number",
+          "name": "maxRows"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onStop"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onSubmit",
+          "required": true
+        },
+        {
+          "enumValues": ["label", "icon"],
+          "kind": "enum",
+          "name": "sendButton"
+        },
+        {
+          "kind": "boolean",
+          "name": "sending"
+        },
+        {
+          "kind": "boolean",
+          "name": "streaming"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        }
+      ],
+      "states": ["disabled", "loading"],
+      "summary": "The host reply box for a chat thread. Host chrome; agents never emit it."
     },
     {
       "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "content-layout",
+      "imports": [
+        {
+          "exports": [
+            "ActiveHeadingEntry",
+            "BuildTocOptions",
+            "ContentLayout",
+            "DEFAULT_READING_LINE",
+            "DEFAULT_TOC_LEVELS",
+            "TocEntry",
+            "TocHeading",
+            "TocItem",
+            "TocLevel",
+            "TrackActiveHeadingOptions",
+            "buildToc",
+            "headingSlug",
+            "normalizeTocEntries",
+            "resolveTocLevels",
+            "tocSelector",
+            "trackActiveHeading"
+          ],
+          "module": "texuli/layouts/content"
+        }
+      ],
       "label": "ContentLayout",
       "placement": "app",
       "props": [
@@ -2694,6 +4014,7 @@
           "name": "storageKey"
         }
       ],
+      "states": ["hover", "focus-visible", "selected"],
       "summary": "Shared docs/blog/editorial reading frame with optional TOC."
     },
     {
@@ -2701,6 +4022,16 @@
       "emit": [],
       "group": "overlays",
       "id": "context-menu",
+      "imports": [
+        {
+          "exports": ["ContextMenu"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["ContextMenu", "ContextMenuContent", "ContextMenuRoot"],
+          "module": "texuli/menus"
+        }
+      ],
       "label": "ContextMenu",
       "placement": "app",
       "props": [
@@ -2719,6 +4050,7 @@
           "name": "open"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "selected", "checked", "open"],
       "summary": "Pointer-anchored menu (right-click, long-press, Menu key)."
     },
     {
@@ -2726,6 +4058,12 @@
       "emit": [],
       "group": "overlays",
       "id": "context-menu-trigger",
+      "imports": [
+        {
+          "exports": ["ContextMenuTrigger"],
+          "module": "texuli/menus"
+        }
+      ],
       "label": "ContextMenu.Trigger",
       "placement": "app",
       "props": [
@@ -2744,6 +4082,7 @@
           "name": "disabled"
         }
       ],
+      "states": ["disabled", "open"],
       "summary": "Region that opens the context menu."
     },
     {
@@ -2766,6 +4105,7 @@
           "required": true
         }
       ],
+      "states": ["disabled", "checked"],
       "summary": "A segmented choice that sets an enum state variable to one of its values."
     },
     {
@@ -2792,6 +4132,7 @@
           "required": true
         }
       ],
+      "states": ["disabled"],
       "summary": "A text field that sets a string state variable, capped at its declared length."
     },
     {
@@ -2818,6 +4159,7 @@
           "name": "step"
         }
       ],
+      "states": ["disabled"],
       "summary": "A range input that sets a number state variable within its declared min and max."
     },
     {
@@ -2840,15 +4182,77 @@
           "required": true
         }
       ],
+      "states": ["disabled", "checked"],
       "summary": "A switch that sets a boolean state variable."
     },
     {
+      "axes": {
+        "density": {
+          "default": "comfortable",
+          "prop": "density",
+          "values": ["comfortable", "compact"]
+        }
+      },
       "bindable": ["items"],
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "events": ["move"],
       "group": "data",
       "id": "data-board",
+      "imports": [
+        {
+          "exports": ["Board"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": [
+            "Board",
+            "BoardCell",
+            "BoardColumnDef",
+            "BoardGrid",
+            "BoardKeyboardText",
+            "BoardLabelOverrides",
+            "BoardLabels",
+            "BoardLaneDef",
+            "BoardMove",
+            "BoardOptions",
+            "BoardPlacement",
+            "BoardPosition",
+            "BoardPositionValues",
+            "DEFAULT_BOARD_KEYBOARD_TEXT",
+            "DEFAULT_LANE",
+            "DEFAULT_MOVE_MENU_TEXT",
+            "IDLE",
+            "KeyboardMoveState",
+            "MoveIntentResult",
+            "MoveKey",
+            "MoveMenuDestination",
+            "MoveMenuText",
+            "MoveResult",
+            "MoveRules",
+            "MoveTarget",
+            "RankError",
+            "WipEvaluation",
+            "WipLimit",
+            "WipStatus",
+            "assertRank",
+            "compareRanks",
+            "describePosition",
+            "evaluateWip",
+            "groupBoard",
+            "isRank",
+            "moveIntent",
+            "moveMenuDestinations",
+            "pickUp",
+            "placementsOf",
+            "positionValues",
+            "rankBetween",
+            "rankSequence",
+            "validateMove"
+          ],
+          "module": "@texuli/data/board"
+        }
+      ],
       "label": "Board",
       "placement": "content",
       "props": [
@@ -2966,6 +4370,7 @@
         }
       ],
       "sourceable": ["items"],
+      "states": ["focus-visible", "active", "disabled", "expanded", "open"],
       "summary": "A kanban board: cards in columns (and optional swimlanes), moved by drag, keyboard or a move menu, with work-in-progress limits."
     },
     {
@@ -2975,6 +4380,16 @@
       "events": ["change", "move", "select"],
       "group": "data",
       "id": "data-calendar",
+      "imports": [
+        {
+          "exports": ["CalendarView"],
+          "module": "@texuli/data/calendar"
+        },
+        {
+          "exports": ["CalendarView"],
+          "module": "@texuli/data/calendar/view"
+        }
+      ],
       "label": "Calendar",
       "placement": "content",
       "props": [
@@ -3049,13 +4464,55 @@
         }
       ],
       "sourceable": ["events"],
+      "states": ["hover", "focus-visible", "active", "disabled", "selected", "open", "readonly"],
       "summary": "Events on a month, week, day or agenda view; people open, and when allowed move, events."
     },
     {
+      "axes": {
+        "density": {
+          "default": "compact",
+          "prop": "density",
+          "values": ["compact", "default", "comfortable"]
+        }
+      },
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "data",
       "id": "data-cohort-table",
+      "imports": [
+        {
+          "exports": ["CohortTable"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": [
+            "COHORT_HEAT_TOKENS",
+            "CohortCell",
+            "CohortCellValue",
+            "CohortHeatScale",
+            "CohortHeatStep",
+            "CohortHeatText",
+            "CohortHeatToken",
+            "CohortRow",
+            "CohortTable",
+            "CohortTableLabels",
+            "CohortValueKind",
+            "DEFAULT_COHORT_TABLE_LABELS",
+            "DEFAULT_HEAT_TEXT",
+            "HEAT_LEVELS",
+            "HEAT_SCALE_LIMITS",
+            "HEAT_TEXT_MINIMUM",
+            "cellValue",
+            "cohortAverages",
+            "formatCohortValue",
+            "heatLevel",
+            "heatMax",
+            "periodCount",
+            "resolveHeatScale"
+          ],
+          "module": "@texuli/data/cohort"
+        }
+      ],
       "label": "Cohort table",
       "placement": "content",
       "props": [
@@ -3148,12 +4605,25 @@
       "summary": "A retention table: one row per cohort, one column per period after it started, as rates or counts, with optional heat tints and an averages row."
     },
     {
+      "axes": {
+        "density": {
+          "default": "default",
+          "prop": "density",
+          "values": ["compact", "default", "comfortable"]
+        }
+      },
       "bindable": ["layout"],
       "capability": "unknown",
       "emit": ["developer", "untrusted"],
       "events": ["change"],
       "group": "data",
       "id": "data-dashboard",
+      "imports": [
+        {
+          "exports": ["Dashboard"],
+          "module": "@texuli/data/dashboard"
+        }
+      ],
       "label": "Dashboard",
       "placement": "content",
       "props": [
@@ -3259,6 +4729,7 @@
         }
       ],
       "sourceable": ["layout"],
+      "states": ["hover", "focus-visible", "active"],
       "summary": "A widget grid people can rearrange: data-dashboard-widget children on columns and rows, moved and resized by drag or keyboard, reflowing on narrow screens."
     },
     {
@@ -3266,6 +4737,12 @@
       "emit": ["developer", "untrusted"],
       "group": "data",
       "id": "data-dashboard-widget",
+      "imports": [
+        {
+          "exports": ["DashboardWidget"],
+          "module": "@texuli/data/dashboard"
+        }
+      ],
       "label": "Dashboard widget",
       "placement": "content",
       "props": [
@@ -3345,12 +4822,52 @@
       "summary": "One titled widget of a data-dashboard, placed on the grid; its child is any content node, such as a chart, a KPI or a grid bound to a host data source."
     },
     {
+      "axes": {
+        "density": {
+          "default": "comfortable",
+          "prop": "density",
+          "values": ["comfortable", "compact"]
+        }
+      },
       "bindable": ["layout"],
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "events": ["change", "select"],
       "group": "data",
       "id": "data-files",
+      "imports": [
+        {
+          "exports": ["FileBrowser"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": [
+            "FileBrowser",
+            "FileBrowserLabels",
+            "FileBrowserLayout",
+            "FileCategory",
+            "FileEntry",
+            "FilePreviewModel",
+            "ThumbnailOptions",
+            "breadcrumbs",
+            "categoryOf",
+            "childrenOf",
+            "descendantIds",
+            "extensionOf",
+            "formatSize",
+            "hashId",
+            "moveFocusIndex",
+            "moveProblem",
+            "nameProblem",
+            "previewOf",
+            "thumbnailSvg",
+            "thumbnailUrl",
+            "toggleSelectedId",
+            "uniqueName"
+          ],
+          "module": "@texuli/data/files"
+        }
+      ],
       "label": "File browser",
       "placement": "content",
       "props": [
@@ -3418,6 +4935,7 @@
         }
       ],
       "sourceable": ["entries"],
+      "states": ["focus-visible", "active", "selected"],
       "summary": "Folders and files in a grid or list with breadcrumbs, selection and type previews."
     },
     {
@@ -3426,6 +4944,65 @@
       "events": ["change"],
       "group": "data",
       "id": "data-filter-builder",
+      "imports": [
+        {
+          "exports": ["FilterBuilder"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": [
+            "DEFAULT_FILTER_BUILDER_LABELS",
+            "FILTER_LIMITS",
+            "FILTER_SEGMENT_LIMITS",
+            "FILTER_VALUE_EDITORS",
+            "FilterAnyOperator",
+            "FilterBuilder",
+            "FilterBuilderLabels",
+            "FilterCondition",
+            "FilterCustomOperatorId",
+            "FilterField",
+            "FilterFieldGroup",
+            "FilterFieldOption",
+            "FilterGroup",
+            "FilterIssue",
+            "FilterNode",
+            "FilterOperator",
+            "FilterOperatorDef",
+            "FilterPath",
+            "FilterSegment",
+            "FilterValue",
+            "FilterValueEditor",
+            "OPERATORS_BY_TYPE",
+            "addCondition",
+            "addGroup",
+            "applyFilter",
+            "catalogSchema",
+            "changeField",
+            "changeOperator",
+            "changeValue",
+            "compileCatalogFilter",
+            "defaultValue",
+            "depthOf",
+            "emptyFilter",
+            "filterIssues",
+            "groupFields",
+            "isComplete",
+            "newCondition",
+            "nodeAt",
+            "operatorsFor",
+            "optionLabel",
+            "optionValue",
+            "parseFilter",
+            "parseSegment",
+            "pruneFilter",
+            "removeAt",
+            "resolveFilterBuilderLabels",
+            "serializeSegment",
+            "setCombinator"
+          ],
+          "module": "@texuli/data/filter-builder"
+        }
+      ],
       "label": "Filter builder",
       "placement": "content",
       "props": [
@@ -3517,14 +5094,55 @@
           "name": "value"
         }
       ],
+      "states": ["focus-visible", "disabled", "invalid"],
       "summary": "Nested and/or groups of conditions (field, operator by field type, value) that people add, edit and remove."
     },
     {
+      "axes": {
+        "density": {
+          "default": "default",
+          "prop": "density",
+          "values": ["compact", "default", "comfortable"]
+        }
+      },
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "events": ["change", "select"],
       "group": "data",
       "id": "data-grid",
+      "imports": [
+        {
+          "exports": ["DataGrid"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": [
+            "CellPosition",
+            "DEFAULT_DATA_GRID_LABELS",
+            "DataGrid",
+            "DataGridBreakpoint",
+            "DataGridBulkContext",
+            "DataGridColumn",
+            "DataGridColumnInput",
+            "DataGridEmptyContext",
+            "DataGridLabels",
+            "GridRowsOptions",
+            "MoveCellOptions",
+            "ariaSort",
+            "breakpointWidth",
+            "cellText",
+            "clampCell",
+            "gridRows",
+            "inferColumnType",
+            "moveCell",
+            "nextSort",
+            "resolveDataGridColumns",
+            "resolveDataGridLabels",
+            "searchRows"
+          ],
+          "module": "@texuli/data/grid-core"
+        }
+      ],
       "label": "Data grid",
       "placement": "content",
       "props": [
@@ -3610,6 +5228,15 @@
         }
       ],
       "sourceable": ["rows"],
+      "states": [
+        "hover",
+        "focus-visible",
+        "disabled",
+        "loading",
+        "selected",
+        "checked",
+        "readonly"
+      ],
       "summary": "A sortable, searchable grid of rows and typed columns; virtualized for long lists."
     },
     {
@@ -3618,6 +5245,20 @@
       "events": ["select"],
       "group": "data",
       "id": "data-map",
+      "imports": [
+        {
+          "exports": ["MapView"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": ["MapView"],
+          "module": "@texuli/data/geo"
+        },
+        {
+          "exports": ["MapView"],
+          "module": "@texuli/data/map"
+        }
+      ],
       "label": "Map",
       "placement": "content",
       "props": [
@@ -3674,6 +5315,7 @@
           }
         }
       ],
+      "states": ["hover", "focus-visible", "active", "selected"],
       "summary": "Places as markers on an offline vector basemap, clustered when close, with a place list beside it."
     },
     {
@@ -3683,6 +5325,29 @@
       "events": ["change", "select"],
       "group": "data",
       "id": "data-notification-inbox",
+      "imports": [
+        {
+          "exports": ["NotificationInbox"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": [
+            "DEFAULT_INBOX_LABELS",
+            "InboxFilter",
+            "InboxNotification",
+            "InboxReadChangeContext",
+            "NotificationInbox",
+            "NotificationInboxLabels",
+            "filterInbox",
+            "markAllRead",
+            "newArrivals",
+            "resolveInboxLabels",
+            "setRead",
+            "unreadCount"
+          ],
+          "module": "@texuli/data/activity/inbox"
+        }
+      ],
       "label": "Notification inbox",
       "placement": "content",
       "props": [
@@ -3754,6 +5419,7 @@
         }
       ],
       "sourceable": ["items"],
+      "states": ["focus-visible", "active", "disabled", "loading"],
       "summary": "Notifications, newest first, with unread state, mark read and unread, mark all read and an unread view."
     },
     {
@@ -3763,6 +5429,16 @@
       "events": ["change", "collapse", "move", "select"],
       "group": "data",
       "id": "data-timeline",
+      "imports": [
+        {
+          "exports": ["TimelineView"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": ["TimelineView"],
+          "module": "@texuli/data/timeline"
+        }
+      ],
       "label": "Project timeline",
       "placement": "content",
       "props": [
@@ -3956,15 +5632,33 @@
         }
       ],
       "sourceable": ["tasks"],
+      "states": ["focus-visible", "active", "disabled", "loading", "selected", "expanded", "open"],
       "summary": "Tasks as bars over days, weeks, months or quarters, with dependencies and progress."
     },
     {
+      "axes": {
+        "density": {
+          "default": "comfortable",
+          "prop": "density",
+          "values": ["comfortable", "compact"]
+        }
+      },
       "bindable": ["items"],
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "events": ["move", "select"],
       "group": "data",
       "id": "data-tree-view",
+      "imports": [
+        {
+          "exports": ["TreeDataView"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": ["TreeDataView"],
+          "module": "@texuli/data/tree-view"
+        }
+      ],
       "label": "Tree view",
       "placement": "content",
       "props": [
@@ -4017,6 +5711,16 @@
         }
       ],
       "sourceable": ["items"],
+      "states": [
+        "focus-visible",
+        "active",
+        "disabled",
+        "loading",
+        "invalid",
+        "selected",
+        "expanded",
+        "checked"
+      ],
       "summary": "A hierarchy of items people expand, select and reorder or re-parent by drag or keyboard."
     },
     {
@@ -4103,6 +5807,16 @@
       "emit": [],
       "group": "forms",
       "id": "description",
+      "imports": [
+        {
+          "exports": ["Description"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Description"],
+          "module": "texuli/field"
+        }
+      ],
       "label": "Description",
       "placement": "app",
       "props": [
@@ -4117,13 +5831,31 @@
           "name": "class"
         }
       ],
+      "states": ["disabled"],
       "summary": "Help text associated with a field control."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg", "xl"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "detail-panel",
+      "imports": [
+        {
+          "exports": ["DetailPanel", "DetailPanelContent"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["DetailPanel", "DetailPanelContent"],
+          "module": "texuli/sheet"
+        }
+      ],
       "label": "DetailPanel",
       "placement": "app",
       "props": [
@@ -4156,13 +5888,55 @@
           "name": "size"
         }
       ],
+      "states": ["hover", "focus-visible"],
       "summary": "Non-modal detail panel alongside content."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg", "xl"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "dialog",
+      "imports": [
+        {
+          "exports": [
+            "DIALOG_SIZES",
+            "Dialog",
+            "DialogSize",
+            "dialogBodyClass",
+            "dialogCloseClass",
+            "dialogContentClass",
+            "dialogDescriptionClass",
+            "dialogFooterClass",
+            "dialogHeaderClass",
+            "dialogOverlayClass",
+            "dialogTitleClass"
+          ],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "DIALOG_SIZES",
+            "Dialog",
+            "DialogSize",
+            "dialogBodyClass",
+            "dialogCloseClass",
+            "dialogContentClass",
+            "dialogDescriptionClass",
+            "dialogFooterClass",
+            "dialogHeaderClass",
+            "dialogOverlayClass",
+            "dialogTitleClass"
+          ],
+          "module": "texuli/dialog"
+        }
+      ],
       "label": "Dialog",
       "placement": "app",
       "props": [
@@ -4218,6 +5992,7 @@
           "name": "trigger"
         }
       ],
+      "states": ["hover", "focus-visible", "open"],
       "summary": "Modal dialog with title, optional description, body and footer."
     },
     {
@@ -4225,6 +6000,20 @@
       "emit": ["developer", "untrusted"],
       "group": "documents",
       "id": "document",
+      "imports": [
+        {
+          "exports": ["PageEditor", "PageReader"],
+          "module": "@texuli/pages"
+        },
+        {
+          "exports": ["PageEditor"],
+          "module": "@texuli/pages/editor"
+        },
+        {
+          "exports": ["PageReader"],
+          "module": "@texuli/pages/reader"
+        }
+      ],
       "label": "Document",
       "placement": "content",
       "props": [
@@ -4245,13 +6034,31 @@
           "name": "outline"
         }
       ],
+      "states": ["checked", "open"],
       "summary": "A block document (a brief, a report, notes or a page) as data: headings, paragraphs, lists, callouts, columns, content blocks and embedded components."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg", "xl"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "drawer",
+      "imports": [
+        {
+          "exports": ["Drawer", "DrawerContent"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Drawer", "DrawerContent"],
+          "module": "texuli/sheet"
+        }
+      ],
       "label": "Drawer",
       "placement": "app",
       "props": [
@@ -4284,6 +6091,7 @@
           "name": "size"
         }
       ],
+      "states": ["hover", "focus-visible"],
       "summary": "Bottom or edge drawer with optional drag dismiss."
     },
     {
@@ -4291,6 +6099,29 @@
       "emit": [],
       "group": "overlays",
       "id": "dropdown-menu",
+      "imports": [
+        {
+          "exports": ["DropdownMenu"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "DropdownMenu",
+            "DropdownMenuPortal",
+            "DropdownMenuRoot",
+            "MenuCheckboxItem",
+            "MenuGroup",
+            "MenuLabel",
+            "MenuRadioGroup",
+            "MenuRadioItem",
+            "MenuSeparator",
+            "MenuSub",
+            "MenuSubContent",
+            "MenuSubTrigger"
+          ],
+          "module": "texuli/menus"
+        }
+      ],
       "label": "DropdownMenu",
       "placement": "app",
       "props": [
@@ -4309,13 +6140,32 @@
           "name": "open"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "selected", "checked", "open"],
       "summary": "Menu button pattern with items, checkboxes, radios and submenus."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "soft"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "dropdown-menu-content",
+      "imports": [
+        {
+          "exports": ["MenuContent"],
+          "module": "texuli/menus"
+        }
+      ],
       "label": "DropdownMenu.Content",
       "placement": "app",
       "props": [
@@ -4354,6 +6204,7 @@
           "name": "variant"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "Floating menu surface for dropdown items."
     },
     {
@@ -4361,6 +6212,12 @@
       "emit": [],
       "group": "overlays",
       "id": "dropdown-menu-item",
+      "imports": [
+        {
+          "exports": ["MenuItem"],
+          "module": "texuli/menus"
+        }
+      ],
       "label": "DropdownMenu.Item",
       "placement": "app",
       "props": [
@@ -4405,13 +6262,32 @@
           "name": "textValue"
         }
       ],
+      "states": ["disabled", "selected"],
       "summary": "Menu item with optional icon and shortcut chrome."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "soft"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "dropdown-menu-trigger",
+      "imports": [
+        {
+          "exports": ["DropdownMenuTrigger"],
+          "module": "texuli/menus"
+        }
+      ],
       "label": "DropdownMenu.Trigger",
       "placement": "app",
       "props": [
@@ -4439,10 +6315,27 @@
       "summary": "Styled button that opens a dropdown menu."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "empty-state",
+      "imports": [
+        {
+          "exports": ["EmptyState"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["EmptyState"],
+          "module": "texuli/empty"
+        }
+      ],
       "label": "Empty state",
       "placement": "app",
       "props": [
@@ -4483,6 +6376,16 @@
       "emit": [],
       "group": "display",
       "id": "error-state",
+      "imports": [
+        {
+          "exports": ["ErrorState"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["ErrorState"],
+          "module": "texuli/empty"
+        }
+      ],
       "label": "Error state",
       "placement": "app",
       "props": [
@@ -4521,6 +6424,16 @@
       "emit": [],
       "group": "forms",
       "id": "field",
+      "imports": [
+        {
+          "exports": ["Field"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Field"],
+          "module": "texuli/field"
+        }
+      ],
       "label": "Field",
       "placement": "app",
       "props": [
@@ -4570,6 +6483,7 @@
           "name": "required"
         }
       ],
+      "states": ["disabled", "invalid"],
       "summary": "Label, description and error wiring for a single control."
     },
     {
@@ -4577,6 +6491,16 @@
       "emit": [],
       "group": "forms",
       "id": "field-error",
+      "imports": [
+        {
+          "exports": ["FieldError"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["FieldError"],
+          "module": "texuli/field"
+        }
+      ],
       "label": "FieldError",
       "placement": "app",
       "props": [
@@ -4598,6 +6522,108 @@
       "summary": "An alert-role error message for a field."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "compact"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "file-upload",
+      "imports": [
+        {
+          "exports": [
+            "FILE_UPLOAD_VARIANTS",
+            "FileUpload",
+            "FileUploadLabels",
+            "FileUploadProgressMap",
+            "FileUploadVariant"
+          ],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "FILE_UPLOAD_VARIANTS",
+            "FileUpload",
+            "FileUploadLabels",
+            "FileUploadProgressMap",
+            "FileUploadVariant",
+            "fileUploadClass"
+          ],
+          "module": "texuli/file-upload"
+        }
+      ],
+      "label": "FileUpload",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "string",
+          "name": "accept"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "array",
+          "name": "files"
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "kind": "number",
+          "name": "maxFiles"
+        },
+        {
+          "kind": "number",
+          "name": "maxSize"
+        },
+        {
+          "kind": "boolean",
+          "name": "multiple"
+        },
+        {
+          "kind": "string",
+          "name": "name"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onFileRemove"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onFilesAdd"
+        },
+        {
+          "kind": "boolean",
+          "name": "required"
+        },
+        {
+          "kind": "boolean",
+          "name": "showPreviews"
+        },
+        {
+          "enumValues": ["default", "compact"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "states": ["focus-visible", "disabled", "invalid"],
+      "summary": "A labelled drop zone and file list for choosing local files."
+    },
+    {
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "events": ["press"],
@@ -4617,6 +6643,7 @@
           "required": true
         }
       ],
+      "states": ["disabled"],
       "summary": "A button that fires one declared flow event, such as next or back."
     },
     {
@@ -4649,6 +6676,16 @@
       "emit": [],
       "group": "forms",
       "id": "form",
+      "imports": [
+        {
+          "exports": ["Form"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Form"],
+          "module": "texuli/field"
+        }
+      ],
       "label": "Form",
       "placement": "app",
       "props": [
@@ -4779,6 +6816,7 @@
           "required": true
         }
       ],
+      "states": ["invalid"],
       "summary": "A named, validated field bound to a declared local-state variable."
     },
     {
@@ -4795,7 +6833,94 @@
           "required": true
         }
       ],
+      "states": ["disabled"],
       "summary": "Proposes the form's action with its fields' values; disabled while a receipt is pending."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "lg",
+          "prop": "size",
+          "values": ["display", "4xl", "3xl", "2xl", "xl", "lg", "md", "sm"]
+        },
+        "tone": {
+          "default": "default",
+          "prop": "tone",
+          "values": ["default", "muted"]
+        }
+      },
+      "capability": "web-only",
+      "emit": [],
+      "group": "display",
+      "id": "heading",
+      "imports": [
+        {
+          "exports": ["Heading", "HeadingLevel", "HeadingSize", "HeadingTone"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "HEADING_LEVELS",
+            "HEADING_SIZES",
+            "HEADING_TONES",
+            "HEADING_TRACKINGS",
+            "Heading",
+            "HeadingLevel",
+            "HeadingSize",
+            "HeadingTone",
+            "HeadingTracking",
+            "headingClass",
+            "headingSizeOf"
+          ],
+          "module": "texuli/typography"
+        }
+      ],
+      "label": "Heading",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "number",
+          "name": "level"
+        },
+        {
+          "kind": "boolean",
+          "name": "responsive"
+        },
+        {
+          "enumValues": ["display", "4xl", "3xl", "2xl", "xl", "lg", "md", "sm"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": ["default", "muted"],
+          "kind": "enum",
+          "name": "tone"
+        },
+        {
+          "enumValues": ["default", "tight"],
+          "kind": "enum",
+          "name": "tracking"
+        },
+        {
+          "kind": "boolean",
+          "name": "truncate"
+        }
+      ],
+      "summary": "A page title or section heading: a semantic h1–h6 with a size from the type scale."
     },
     {
       "capability": "web-only",
@@ -4816,6 +6941,7 @@
           "required": true
         }
       ],
+      "states": ["focus-visible"],
       "summary": "Reserves a named place where the host app mounts its own component."
     },
     {
@@ -4823,6 +6949,16 @@
       "emit": [],
       "group": "overlays",
       "id": "hover-card",
+      "imports": [
+        {
+          "exports": ["HoverCard", "HoverCardRoot", "HoverCardTrigger"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["HoverCard", "HoverCardRoot", "HoverCardTrigger"],
+          "module": "texuli/popover"
+        }
+      ],
       "label": "HoverCard",
       "placement": "app",
       "props": [
@@ -4836,13 +6972,36 @@
           "name": "open"
         }
       ],
+      "states": ["open"],
       "summary": "Preview panel that opens on hover or focus."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "elevated",
+          "prop": "variant",
+          "values": ["elevated", "flat"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "hover-card-content",
+      "imports": [
+        {
+          "exports": ["HoverCardContent"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["HoverCardContent"],
+          "module": "texuli/popover"
+        }
+      ],
       "label": "HoverCard.Content",
       "placement": "app",
       "props": [
@@ -4874,10 +7033,113 @@
       "summary": "Styled hover-card surface."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["xs", "sm", "md", "lg"]
+        },
+        "tone": {
+          "default": "default",
+          "prop": "tone",
+          "values": ["default", "primary", "success", "warning", "destructive", "info", "neutral"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "icon",
+      "imports": [
+        {
+          "exports": ["Icon"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "BuiltInIconName",
+            "ICON_NAMES",
+            "ICON_SIZES",
+            "ICON_TONES",
+            "Icon",
+            "IconComponent",
+            "IconComponentProps",
+            "IconGlyph",
+            "IconLoader",
+            "IconName",
+            "IconNames",
+            "IconRef",
+            "IconRegistry",
+            "IconRegistryOptions",
+            "IconSize",
+            "IconTone",
+            "iconClass"
+          ],
+          "module": "texuli/icons"
+        },
+        {
+          "exports": ["LucideIcon", "LucideIconComponent"],
+          "module": "texuli/icons/lucide"
+        }
+      ],
+      "label": "Icon",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "icon"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "enumValues": ["xs", "sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": [
+            "default",
+            "primary",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ],
+          "kind": "enum",
+          "name": "tone"
+        }
+      ],
+      "summary": "A glyph by name or Lucide component; allowing icon allows every icon set."
+    },
+    {
+      "axes": {
+        "variant": {
+          "default": "ghost",
+          "prop": "variant",
+          "values": ["default", "secondary", "outline", "ghost", "destructive", "link"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "icon-button",
+      "imports": [
+        {
+          "exports": ["IconButton"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["IconButton"],
+          "module": "texuli/button"
+        }
+      ],
       "label": "IconButton",
       "placement": "app",
       "props": [
@@ -4918,6 +7180,7 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "loading"],
       "summary": "An icon-only button that requires an accessible name."
     },
     {
@@ -4941,6 +7204,16 @@
       "emit": [],
       "group": "forms",
       "id": "input",
+      "imports": [
+        {
+          "exports": ["Input"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Input"],
+          "module": "texuli/input"
+        }
+      ],
       "label": "Input",
       "placement": "app",
       "props": [
@@ -4994,6 +7267,7 @@
           "name": "value"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "invalid", "readonly"],
       "summary": "A single-line text (or file) control with optional clear."
     },
     {
@@ -5001,6 +7275,16 @@
       "emit": [],
       "group": "forms",
       "id": "input-group",
+      "imports": [
+        {
+          "exports": ["InputGroup"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["InputGroup"],
+          "module": "texuli/input"
+        }
+      ],
       "label": "InputGroup",
       "placement": "app",
       "props": [
@@ -5068,6 +7352,7 @@
           "name": "value"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "invalid", "readonly"],
       "summary": "An input with start/end adornments and optional clear."
     },
     {
@@ -5075,6 +7360,16 @@
       "emit": [],
       "group": "display",
       "id": "kbd",
+      "imports": [
+        {
+          "exports": ["Kbd"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Kbd"],
+          "module": "texuli/kbd-code"
+        }
+      ],
       "label": "Kbd",
       "placement": "app",
       "props": [
@@ -5093,13 +7388,31 @@
           "name": "label"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled"],
       "summary": "Inline keyboard key affordance."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "elevated",
+          "prop": "variant",
+          "values": ["elevated", "flat"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "kpi",
+      "imports": [
+        {
+          "exports": ["Kpi"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Kpi"],
+          "module": "texuli/stat"
+        }
+      ],
       "label": "KPI",
       "placement": "app",
       "props": [
@@ -5168,13 +7481,31 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "loading"],
       "summary": "A formatted metric with unit, previous-period delta and optional link."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "label",
+      "imports": [
+        {
+          "exports": ["Label"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Label"],
+          "module": "texuli/field"
+        }
+      ],
       "label": "Label",
       "placement": "app",
       "props": [
@@ -5202,6 +7533,7 @@
           "name": "srOnly"
         }
       ],
+      "states": ["disabled", "invalid"],
       "summary": "A form label with optional required marker and sr-only mode."
     },
     {
@@ -5209,6 +7541,16 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-auth-split",
+      "imports": [
+        {
+          "exports": ["AuthSplitLayout"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["AuthSplitLayout"],
+          "module": "texuli/layouts/auth-settings"
+        }
+      ],
       "label": "Auth split layout",
       "placement": "app",
       "props": [
@@ -5258,6 +7600,7 @@
           "name": "panelLabel"
         }
       ],
+      "states": ["selected"],
       "summary": "Sign-in form column plus brand panel."
     },
     {
@@ -5265,6 +7608,12 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-blog",
+      "imports": [
+        {
+          "exports": ["LayoutProps", "loadBlogLayout"],
+          "module": "texuli/layouts/content/blog"
+        }
+      ],
       "label": "Blog layout",
       "placement": "app",
       "props": [
@@ -5333,6 +7682,16 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-chrome",
+      "imports": [
+        {
+          "exports": ["LayoutChrome"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["LayoutChrome"],
+          "module": "texuli/layouts/host/chrome"
+        }
+      ],
       "label": "LayoutChrome",
       "placement": "app",
       "props": [
@@ -5369,6 +7728,7 @@
           "name": "skipLabel"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "Shared brand, actions, user and skip-link chrome for desktop layouts."
     },
     {
@@ -5376,6 +7736,25 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-dashboard-grid",
+      "imports": [
+        {
+          "exports": ["DashboardGridLayout"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["DashboardGridLayout", "loadDashboardGrid"],
+          "module": "texuli/layouts/dashboard"
+        },
+        {
+          "exports": [
+            "DASHBOARD_LAYOUT_IDS",
+            "loadDashboardGrid",
+            "registerDashboardLayouts",
+            "unregisterDashboardLayouts"
+          ],
+          "module": "texuli/layouts/dashboard/register"
+        }
+      ],
       "label": "Dashboard grid layout",
       "placement": "app",
       "props": [
@@ -5417,6 +7796,7 @@
           "name": "storageKey"
         }
       ],
+      "states": ["hover", "focus-visible", "selected"],
       "summary": "Top chrome plus container-query widget grid."
     },
     {
@@ -5526,6 +7906,12 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-docs",
+      "imports": [
+        {
+          "exports": ["LayoutProps", "loadDocsLayout"],
+          "module": "texuli/layouts/content/docs"
+        }
+      ],
       "label": "Docs layout",
       "placement": "app",
       "props": [
@@ -5569,6 +7955,16 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-drawer",
+      "imports": [
+        {
+          "exports": ["LayoutDrawer"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["LayoutDrawer"],
+          "module": "texuli/layouts/host/drawer"
+        }
+      ],
       "label": "LayoutDrawer",
       "placement": "app",
       "props": [
@@ -5591,6 +7987,7 @@
           "name": "open"
         }
       ],
+      "states": ["focus-visible", "open"],
       "summary": "Mobile navigation drawer built on the dialog primitive."
     },
     {
@@ -5598,6 +7995,16 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-dual-sidebar",
+      "imports": [
+        {
+          "exports": ["loadDualSidebar"],
+          "module": "texuli/layouts/app"
+        },
+        {
+          "exports": ["default"],
+          "module": "texuli/layouts/app/dual-sidebar"
+        }
+      ],
       "label": "Dual sidebar layout",
       "placement": "app",
       "props": [
@@ -5646,6 +8053,7 @@
           "name": "storageKey"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "Primary nav plus optional context aside."
     },
     {
@@ -5653,6 +8061,12 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-editorial",
+      "imports": [
+        {
+          "exports": ["LayoutProps", "loadEditorialLayout"],
+          "module": "texuli/layouts/content/editorial"
+        }
+      ],
       "label": "Editorial layout",
       "placement": "app",
       "props": [
@@ -5725,6 +8139,16 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-host",
+      "imports": [
+        {
+          "exports": ["LayoutHost"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["LayoutHost"],
+          "module": "texuli/layouts/host"
+        }
+      ],
       "label": "LayoutHost",
       "placement": "app",
       "props": [
@@ -5792,6 +8216,7 @@
           "name": "storageKey"
         }
       ],
+      "states": ["loading"],
       "summary": "Resolves a layout id, applies width fallbacks, and keeps one stable screen outlet."
     },
     {
@@ -5799,6 +8224,24 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-landing",
+      "imports": [
+        {
+          "exports": ["LandingLayout"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["LandingLayout"],
+          "module": "texuli/layouts/marketing"
+        },
+        {
+          "exports": ["LandingLayout"],
+          "module": "texuli/layouts/marketing/entry"
+        },
+        {
+          "exports": ["LandingLayout", "MarketingCta", "MarketingNavLink"],
+          "module": "texuli/layouts/marketing/landing"
+        }
+      ],
       "label": "Landing layout",
       "placement": "app",
       "props": [
@@ -5838,6 +8281,7 @@
           "name": "sections"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "Standalone marketing landing composition."
     },
     {
@@ -5845,6 +8289,29 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-marketing",
+      "imports": [
+        {
+          "exports": ["MarketingLayout"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["MarketingLayout"],
+          "module": "texuli/layouts/marketing"
+        },
+        {
+          "exports": ["MarketingLayout", "loadMarketing"],
+          "module": "texuli/layouts/marketing/entry"
+        },
+        {
+          "exports": [
+            "MARKETING_LAYOUT_IDS",
+            "loadMarketing",
+            "registerMarketingLayouts",
+            "unregisterMarketingLayouts"
+          ],
+          "module": "texuli/layouts/marketing/register"
+        }
+      ],
       "label": "Marketing layout",
       "placement": "app",
       "props": [
@@ -5922,6 +8389,7 @@
           "name": "storageKey"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "Marketing page frame with hero, sections and footer slots."
     },
     {
@@ -5958,6 +8426,24 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-pricing",
+      "imports": [
+        {
+          "exports": ["PricingLayout"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["PricingLayout"],
+          "module": "texuli/layouts/marketing"
+        },
+        {
+          "exports": ["PricingLayout"],
+          "module": "texuli/layouts/marketing/entry"
+        },
+        {
+          "exports": ["PricingLayout", "PricingTier", "formatPriceCents", "normalizePricingTiers"],
+          "module": "texuli/layouts/marketing/pricing"
+        }
+      ],
       "label": "Pricing layout",
       "placement": "app",
       "props": [
@@ -5988,6 +8474,7 @@
           "name": "title"
         }
       ],
+      "states": ["focus-visible", "selected"],
       "summary": "Pricing plans grid with title and footnote."
     },
     {
@@ -6025,6 +8512,16 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-settings",
+      "imports": [
+        {
+          "exports": ["SettingsLayout"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SettingsLayout"],
+          "module": "texuli/layouts/auth-settings"
+        }
+      ],
       "label": "Settings layout",
       "placement": "app",
       "props": [
@@ -6078,6 +8575,7 @@
           "name": "title"
         }
       ],
+      "states": ["hover", "focus-visible", "selected"],
       "summary": "Settings section list plus detail pane."
     },
     {
@@ -6085,6 +8583,16 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-sidebar",
+      "imports": [
+        {
+          "exports": ["loadSidebar"],
+          "module": "texuli/layouts/app"
+        },
+        {
+          "exports": ["default"],
+          "module": "texuli/layouts/app/sidebar"
+        }
+      ],
       "label": "Sidebar layout",
       "placement": "app",
       "props": [
@@ -6133,6 +8641,7 @@
           "name": "storageKey"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "App sidebar column with responsive drawer fallback."
     },
     {
@@ -6215,6 +8724,16 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-top-nav",
+      "imports": [
+        {
+          "exports": ["loadTopNav"],
+          "module": "texuli/layouts/app"
+        },
+        {
+          "exports": ["default"],
+          "module": "texuli/layouts/app/top-nav"
+        }
+      ],
       "label": "Top navigation layout",
       "placement": "app",
       "props": [
@@ -6263,6 +8782,7 @@
           "name": "storageKey"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "selected"],
       "summary": "Horizontal top navigation with optional mobile menu."
     },
     {
@@ -6270,6 +8790,20 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-wizard",
+      "imports": [
+        {
+          "exports": ["Wizard", "WizardLayout"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["WizardLayout"],
+          "module": "texuli/layouts/auth-settings"
+        },
+        {
+          "exports": ["Wizard"],
+          "module": "texuli/stepper"
+        }
+      ],
       "label": "Wizard layout",
       "placement": "app",
       "props": [
@@ -6347,13 +8881,122 @@
           "name": "validate"
         }
       ],
+      "states": ["focus-visible", "disabled", "selected"],
       "summary": "Centered onboarding wizard frame with steps."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "list-item",
+      "imports": [
+        {
+          "exports": ["ListItem"],
+          "module": "texuli/list-item"
+        }
+      ],
+      "label": "ListItem",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "current"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "string",
+          "name": "href"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "hrefTrust"
+        },
+        {
+          "kind": "string",
+          "name": "icon"
+        },
+        {
+          "kind": "string",
+          "name": "meta"
+        },
+        {
+          "kind": "string",
+          "name": "title"
+        }
+      ],
+      "states": ["hover", "focus-visible", "disabled", "selected"],
+      "summary": "A list row with a title, optional description, icon and trailing meta."
     },
     {
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "media-composition-canvas",
+      "imports": [
+        {
+          "exports": ["CompositionCanvas"],
+          "module": "@texuli/media"
+        },
+        {
+          "exports": [
+            "CANVAS_LIMITS",
+            "CompositionCanvas",
+            "CompositionCanvasLabels",
+            "CompositionCanvasTarget",
+            "CompositionContext2D",
+            "CompositionImage",
+            "CompositionImageLoader",
+            "CompositionTextItem",
+            "CompositionViewport",
+            "DEFAULT_COMPOSITION_CANVAS_LABELS",
+            "DrawCompositionOptions",
+            "DrawReport",
+            "DrawSkipReason",
+            "IDENTITY",
+            "LoadCompositionImagesOptions",
+            "LoadedCompositionImages",
+            "Matrix",
+            "Rect",
+            "RenderCompositionOptions",
+            "RenderCompositionResult",
+            "ScratchSurface",
+            "VIEWPORT_LIMITS",
+            "ViewportAction",
+            "applyMatrix",
+            "applyViewportAction",
+            "canvasBackingSize",
+            "clampViewport",
+            "describeComposition",
+            "fitImage",
+            "initialViewport",
+            "intersects",
+            "layerBounds",
+            "layerMatrix",
+            "linearGradientLine",
+            "multiply",
+            "panViewport",
+            "radialGradientCircle",
+            "resolveCompositionCanvasLabels",
+            "viewportKeyAction",
+            "wrapText",
+            "zoomViewport"
+          ],
+          "module": "@texuli/media/composition-canvas"
+        }
+      ],
       "label": "Canvas composition",
       "placement": "content",
       "props": [
@@ -6403,6 +9046,7 @@
           "name": "trust"
         }
       ],
+      "states": ["focus-visible", "disabled"],
       "summary": "A validated layered composition rendered to a canvas."
     },
     {
@@ -6410,6 +9054,27 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "media-composition-svg",
+      "imports": [
+        {
+          "exports": ["CompositionSvg"],
+          "module": "@texuli/media"
+        },
+        {
+          "exports": [
+            "CompositionSvg",
+            "CompositionSvgResult",
+            "RenderCompositionSvgOptions",
+            "SvgChild",
+            "SvgElementNode",
+            "compositionToSvgString",
+            "escapeXml",
+            "isSafeAttrName",
+            "renderCompositionSvg",
+            "serializeSvg"
+          ],
+          "module": "@texuli/media/composition-svg"
+        }
+      ],
       "label": "SVG composition",
       "placement": "content",
       "props": [
@@ -6450,6 +9115,7 @@
           "name": "validate"
         }
       ],
+      "states": ["focus-visible", "invalid"],
       "summary": "A validated, structured vector composition."
     },
     {
@@ -6457,6 +9123,25 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "media-image",
+      "imports": [
+        {
+          "exports": [
+            "IMAGE_FITS",
+            "IMAGE_LIMITS",
+            "Image",
+            "buildSrcset",
+            "focalPointPosition",
+            "intrinsicSize",
+            "normalizeFit",
+            "normalizeFocalPoint",
+            "normalizeWidths",
+            "resolveImageSources",
+            "resolvePlaceholder",
+            "safeSizes"
+          ],
+          "module": "@texuli/media/image"
+        }
+      ],
       "label": "Responsive image",
       "placement": "content",
       "props": [
@@ -6570,6 +9255,7 @@
           "name": "widths"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "A responsive image with URL validation, loading states and actions."
     },
     {
@@ -6577,6 +9263,16 @@
       "emit": [],
       "group": "overlays",
       "id": "menubar",
+      "imports": [
+        {
+          "exports": ["Menubar"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Menubar", "MenubarContent", "MenubarMenu", "MenubarRoot"],
+          "module": "texuli/menus"
+        }
+      ],
       "label": "Menubar",
       "placement": "app",
       "props": [
@@ -6604,13 +9300,32 @@
           "name": "value"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "selected", "checked", "open"],
       "summary": "Application menubar with roving top-level items."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "soft"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "menubar-trigger",
+      "imports": [
+        {
+          "exports": ["MenubarTrigger"],
+          "module": "texuli/menus"
+        }
+      ],
       "label": "Menubar.Trigger",
       "placement": "app",
       "props": [
@@ -6639,13 +9354,166 @@
           "name": "variant"
         }
       ],
+      "states": ["disabled"],
       "summary": "Top-level menubar item that opens a menu."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "mobile-app-frame",
+      "imports": [
+        {
+          "exports": ["MobileAppFrame"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["MobileAppFrame"],
+          "module": "texuli/layouts/mobile"
+        }
+      ],
+      "label": "MobileAppFrame",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["main", "div"],
+          "kind": "enum",
+          "name": "mainElement"
+        },
+        {
+          "kind": "string",
+          "name": "mainId"
+        },
+        {
+          "kind": "boolean",
+          "name": "resetScrollOnNavigate"
+        },
+        {
+          "kind": "string",
+          "name": "skipLabel"
+        },
+        {
+          "kind": "boolean",
+          "name": "stickyFooterUnstyled"
+        }
+      ],
+      "summary": "A phone-sized app frame: skip link, header, scrolling screen, optional footer and bottom nav. Host chrome; agents never emit it."
     },
     {
       "capability": "web-only",
       "emit": [],
+      "group": "layouts",
+      "id": "mobile-header",
+      "imports": [
+        {
+          "exports": ["MobileHeader"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["MobileHeader"],
+          "module": "texuli/layouts/mobile"
+        }
+      ],
+      "label": "MobileHeader",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "string",
+          "name": "backHref"
+        },
+        {
+          "kind": "string",
+          "name": "backLabel"
+        },
+        {
+          "kind": "string",
+          "name": "backTarget"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "closeHref"
+        },
+        {
+          "kind": "string",
+          "name": "closeLabel"
+        },
+        {
+          "kind": "string",
+          "name": "eyebrow"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "hrefTrust"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onBack"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onClose"
+        },
+        {
+          "kind": "boolean",
+          "name": "sticky"
+        },
+        {
+          "kind": "string",
+          "name": "subtitle"
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "enumValues": ["h1", "h2", "p", "div"],
+          "kind": "enum",
+          "name": "titleAs"
+        }
+      ],
+      "summary": "A mobile stack header with back, title and actions. Host chrome; agents never emit it."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "outline",
+          "prop": "variant",
+          "values": ["outline", "soft"]
+        }
+      },
+      "capability": "web-only",
+      "emit": [],
       "group": "forms",
       "id": "multi-select",
+      "imports": [
+        {
+          "exports": ["MultiSelect"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["MultiSelect", "MultiSelectRoot"],
+          "module": "texuli/combobox"
+        }
+      ],
       "label": "MultiSelect",
       "placement": "app",
       "props": [
@@ -6741,6 +9609,7 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "invalid", "selected", "open"],
       "summary": "A combobox for several values, shown as removable chips."
     },
     {
@@ -6748,6 +9617,16 @@
       "emit": [],
       "group": "layouts",
       "id": "nav-icon",
+      "imports": [
+        {
+          "exports": ["NavIcon"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["NavIcon"],
+          "module": "texuli/layouts/host/chrome"
+        }
+      ],
       "label": "NavIcon",
       "placement": "app",
       "props": [
@@ -6773,6 +9652,36 @@
       "emit": [],
       "group": "overlays",
       "id": "navigation-menu",
+      "imports": [
+        {
+          "exports": [
+            "NavigationMenu",
+            "NavigationMenuContent",
+            "NavigationMenuIndicator",
+            "NavigationMenuItem",
+            "NavigationMenuLink",
+            "NavigationMenuList",
+            "NavigationMenuRoot",
+            "NavigationMenuTrigger",
+            "NavigationMenuViewport"
+          ],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "NavigationMenu",
+            "NavigationMenuContent",
+            "NavigationMenuIndicator",
+            "NavigationMenuItem",
+            "NavigationMenuLink",
+            "NavigationMenuList",
+            "NavigationMenuRoot",
+            "NavigationMenuTrigger",
+            "NavigationMenuViewport"
+          ],
+          "module": "texuli/navigation"
+        }
+      ],
       "label": "NavigationMenu",
       "placement": "app",
       "props": [
@@ -6810,13 +9719,146 @@
           "name": "value"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "selected", "open"],
       "summary": "Site or app navigation with expandable triggers and links."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "number-field",
+      "imports": [
+        {
+          "exports": [
+            "NumberField",
+            "NumberFieldDecrement",
+            "NumberFieldIncrement",
+            "NumberFieldInput",
+            "NumberFieldRoot"
+          ],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "NUMBER_PIN_SIZES",
+            "NumberField",
+            "NumberFieldDecrement",
+            "NumberFieldIncrement",
+            "NumberFieldInput",
+            "NumberFieldRoot",
+            "NumberPinSize",
+            "numberFieldClass"
+          ],
+          "module": "texuli/number-pin"
+        }
+      ],
+      "label": "NumberField",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "enumValues": ["input", "output"],
+          "kind": "enum",
+          "name": "display"
+        },
+        {
+          "kind": "number",
+          "name": "max"
+        },
+        {
+          "kind": "number",
+          "name": "min"
+        },
+        {
+          "kind": "string",
+          "name": "name"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "kind": "boolean",
+          "name": "readOnly"
+        },
+        {
+          "kind": "boolean",
+          "name": "required"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "kind": "number",
+          "name": "step"
+        },
+        {
+          "kind": "number",
+          "name": "value"
+        }
+      ],
+      "states": ["focus-visible", "disabled", "invalid", "readonly"],
+      "summary": "A numeric value with optional steppers, min, max and locale formatting."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "outline",
+          "prop": "variant",
+          "values": ["outline", "soft"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "pagination",
+      "imports": [
+        {
+          "exports": [
+            "Pagination",
+            "PaginationEllipsis",
+            "PaginationNext",
+            "PaginationPage",
+            "PaginationPrevious",
+            "PaginationRoot"
+          ],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "Pagination",
+            "PaginationEllipsis",
+            "PaginationNext",
+            "PaginationPage",
+            "PaginationPrevious",
+            "PaginationRoot"
+          ],
+          "module": "texuli/navigation"
+        }
+      ],
       "label": "Pagination",
       "placement": "app",
       "props": [
@@ -6859,13 +9901,89 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "selected"],
       "summary": "Page controls for long lists."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "pin-input",
+      "imports": [
+        {
+          "exports": ["PinInput", "PinInputCell", "PinInputRoot"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["PinInput", "PinInputCell", "PinInputRoot", "pinInputClass"],
+          "module": "texuli/number-pin"
+        }
+      ],
+      "label": "PinInput",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "boolean",
+          "name": "mask"
+        },
+        {
+          "kind": "number",
+          "name": "maxlength"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onComplete"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        }
+      ],
+      "states": ["focus-visible", "disabled", "invalid"],
+      "summary": "A one-time code of fixed length, one cell per character."
     },
     {
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "popover",
+      "imports": [
+        {
+          "exports": ["Popover", "PopoverClose", "PopoverRoot", "PopoverTrigger"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Popover", "PopoverClose", "PopoverRoot", "PopoverTrigger"],
+          "module": "texuli/popover"
+        }
+      ],
       "label": "Popover",
       "placement": "app",
       "props": [
@@ -6884,13 +10002,36 @@
           "name": "open"
         }
       ],
+      "states": ["open"],
       "summary": "Non-modal floating panel anchored to a trigger."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "elevated",
+          "prop": "variant",
+          "values": ["elevated", "flat"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "popover-content",
+      "imports": [
+        {
+          "exports": ["PopoverContent"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["PopoverContent"],
+          "module": "texuli/popover"
+        }
+      ],
       "label": "Popover.Content",
       "placement": "app",
       "props": [
@@ -6941,10 +10082,173 @@
       "summary": "Styled popover surface with optional arrow."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "tone": {
+          "default": "primary",
+          "prop": "tone",
+          "values": ["primary", "success", "warning", "destructive", "info", "neutral"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "progress",
+      "imports": [
+        {
+          "exports": ["Progress", "ProgressShape"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "FEEDBACK_SIZES",
+            "FEEDBACK_TONES",
+            "FeedbackSize",
+            "FeedbackTone",
+            "PROGRESS_SHAPES",
+            "Progress",
+            "ProgressShape",
+            "progressClass"
+          ],
+          "module": "texuli/feedback"
+        }
+      ],
+      "label": "Progress",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "string",
+          "name": "ariaLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "string",
+          "name": "loadingLabel"
+        },
+        {
+          "kind": "number",
+          "name": "max"
+        },
+        {
+          "kind": "number",
+          "name": "min"
+        },
+        {
+          "enumValues": ["linear", "circular"],
+          "kind": "enum",
+          "name": "shape"
+        },
+        {
+          "kind": "boolean",
+          "name": "showValue"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": ["primary", "success", "warning", "destructive", "info", "neutral"],
+          "kind": "enum",
+          "name": "tone"
+        },
+        {
+          "kind": "number",
+          "name": "value"
+        }
+      ],
+      "states": ["loading"],
+      "summary": "A linear or circular progress bar, determinate or indeterminate."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["md", "lg"]
+        }
+      },
+      "capability": "web-only",
+      "emit": [],
+      "group": "display",
+      "id": "prose",
+      "imports": [
+        {
+          "exports": ["Prose", "ProseSize"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "PROSE_ELEMENTS",
+            "PROSE_SIZES",
+            "Prose",
+            "ProseElement",
+            "ProseSize",
+            "proseClass"
+          ],
+          "module": "texuli/typography"
+        }
+      ],
+      "label": "Prose",
+      "placement": "app",
+      "props": [
+        {
+          "enumValues": ["div", "article", "section"],
+          "kind": "enum",
+          "name": "as"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        }
+      ],
+      "summary": "Long-form text with the design system's reading rhythm: measure, spacing, headings, lists."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "radio",
+      "imports": [
+        {
+          "exports": ["Radio"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Radio"],
+          "module": "texuli/choice"
+        }
+      ],
       "label": "Radio",
       "placement": "app",
       "props": [
@@ -6989,13 +10293,36 @@
           "required": true
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "invalid", "checked"],
       "summary": "One option inside a RadioGroup."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md"]
+        },
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "card"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "radio-group",
+      "imports": [
+        {
+          "exports": ["RadioGroup"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["RadioGroup"],
+          "module": "texuli/choice"
+        }
+      ],
       "label": "RadioGroup",
       "placement": "app",
       "props": [
@@ -7058,13 +10385,145 @@
           "name": "variant"
         }
       ],
+      "states": ["disabled", "readonly"],
       "summary": "A set of exclusive radio options with keyboard roving."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "tone": {
+          "default": "warning",
+          "prop": "tone",
+          "values": ["warning", "primary", "neutral"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "rating",
+      "imports": [
+        {
+          "exports": ["Rating", "RatingLabels", "RatingSize", "RatingTone", "formatRatingLabel"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "DEFAULT_RATING_LABELS",
+            "RATING_MAX_LIMIT",
+            "RATING_SIZES",
+            "RATING_TONES",
+            "Rating",
+            "RatingLabels",
+            "RatingSize",
+            "RatingTone",
+            "clampDisplay",
+            "formatRatingLabel",
+            "normalizeMax",
+            "normalizeValue",
+            "ratingClass",
+            "ratingSteps",
+            "starFill"
+          ],
+          "module": "texuli/rating"
+        }
+      ],
+      "label": "Rating",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "boolean",
+          "name": "allowHalf"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "clearable"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "boolean",
+          "name": "display"
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "kind": "number",
+          "name": "max"
+        },
+        {
+          "kind": "string",
+          "name": "name"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "kind": "boolean",
+          "name": "readonly"
+        },
+        {
+          "kind": "boolean",
+          "name": "required"
+        },
+        {
+          "kind": "boolean",
+          "name": "showValue"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": ["warning", "primary", "neutral"],
+          "kind": "enum",
+          "name": "tone"
+        },
+        {
+          "kind": "number",
+          "name": "value"
+        }
+      ],
+      "states": ["focus-visible", "disabled", "checked", "readonly"],
+      "summary": "A star rating the person sets, or a read-only average."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg", "xl"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "responsive-modal",
+      "imports": [
+        {
+          "exports": ["ResponsiveModal", "ResponsiveModalContent"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["ResponsiveModal", "ResponsiveModalContent"],
+          "module": "texuli/sheet"
+        }
+      ],
       "label": "ResponsiveModal",
       "placement": "app",
       "props": [
@@ -7089,6 +10548,7 @@
           "name": "size"
         }
       ],
+      "states": ["hover", "focus-visible"],
       "summary": "Dialog on large screens, drawer/sheet on small screens."
     },
     {
@@ -7097,6 +10557,12 @@
       "events": ["submit"],
       "group": "schema-forms",
       "id": "schema-form",
+      "imports": [
+        {
+          "exports": ["SchemaForm"],
+          "module": "@texuli/forms"
+        }
+      ],
       "label": "Schema form",
       "placement": "content",
       "props": [
@@ -7118,6 +10584,7 @@
           }
         }
       ],
+      "states": ["disabled", "loading", "readonly"],
       "summary": "A whole form as data: typed fields in sections or steps, conditional logic, named formats and cross-field rules, painted with texuli controls; submitting proposes one action intent to the host."
     },
     {
@@ -7125,6 +10592,16 @@
       "emit": [],
       "group": "layouts",
       "id": "screen-outlet",
+      "imports": [
+        {
+          "exports": ["ScreenOutlet"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["ScreenOutlet"],
+          "module": "texuli/layouts/host"
+        }
+      ],
       "label": "ScreenOutlet",
       "placement": "app",
       "props": [
@@ -7143,10 +10620,32 @@
       "summary": "Stable screen mount point that survives layout switches."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "outline",
+          "prop": "variant",
+          "values": ["outline", "soft"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "select",
+      "imports": [
+        {
+          "exports": ["Select", "SelectRoot"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Select", "SelectRoot"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "Select",
       "placement": "app",
       "props": [
@@ -7221,13 +10720,31 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "invalid", "selected", "open"],
       "summary": "A single-value select root with size and variant chrome."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "select-content",
+      "imports": [
+        {
+          "exports": ["SelectContent"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SelectContent"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "Select.Content",
       "placement": "app",
       "props": [
@@ -7254,6 +10771,16 @@
       "emit": [],
       "group": "forms",
       "id": "select-group",
+      "imports": [
+        {
+          "exports": ["SelectGroup"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SelectGroup"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "Select.Group",
       "placement": "app",
       "props": [
@@ -7275,6 +10802,16 @@
       "emit": [],
       "group": "forms",
       "id": "select-item",
+      "imports": [
+        {
+          "exports": ["SelectItem"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SelectItem"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "Select.Item",
       "placement": "app",
       "props": [
@@ -7311,6 +10848,7 @@
           "required": true
         }
       ],
+      "states": ["hover", "disabled", "selected"],
       "summary": "One selectable option inside Select.Content."
     },
     {
@@ -7318,6 +10856,16 @@
       "emit": [],
       "group": "forms",
       "id": "select-label",
+      "imports": [
+        {
+          "exports": ["SelectLabel"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SelectLabel"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "Select.Label",
       "placement": "app",
       "props": [
@@ -7339,6 +10887,16 @@
       "emit": [],
       "group": "forms",
       "id": "select-portal",
+      "imports": [
+        {
+          "exports": ["SelectPortal"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SelectPortal"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "Select.Portal",
       "placement": "app",
       "props": [
@@ -7355,6 +10913,16 @@
       "emit": [],
       "group": "forms",
       "id": "select-separator",
+      "imports": [
+        {
+          "exports": ["SelectSeparator"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SelectSeparator"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "Select.Separator",
       "placement": "app",
       "props": [
@@ -7367,10 +10935,32 @@
       "summary": "A visual divider between Select groups or items."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "outline",
+          "prop": "variant",
+          "values": ["outline", "soft"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "select-trigger",
+      "imports": [
+        {
+          "exports": ["SelectTrigger"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SelectTrigger"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "Select.Trigger",
       "placement": "app",
       "props": [
@@ -7395,6 +10985,7 @@
           "name": "variant"
         }
       ],
+      "states": ["focus-visible", "disabled", "invalid", "open"],
       "summary": "The button that opens a Select listbox."
     },
     {
@@ -7402,6 +10993,16 @@
       "emit": [],
       "group": "forms",
       "id": "select-value",
+      "imports": [
+        {
+          "exports": ["SelectValue"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SelectValue"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "Select.Value",
       "placement": "app",
       "props": [
@@ -7427,6 +11028,16 @@
       "emit": [],
       "group": "forms",
       "id": "select-viewport",
+      "imports": [
+        {
+          "exports": ["SelectViewport"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SelectViewport"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "Select.Viewport",
       "placement": "app",
       "props": [
@@ -7444,10 +11055,99 @@
       "summary": "Scrollable viewport inside Select.Content."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "subtle", "strong"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "separator",
+      "imports": [
+        {
+          "exports": ["Separator"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "SEPARATOR_ORIENTATIONS",
+            "SEPARATOR_VARIANTS",
+            "Separator",
+            "SeparatorOrientation",
+            "SeparatorVariant",
+            "separatorClass"
+          ],
+          "module": "texuli/separator-aspect"
+        }
+      ],
+      "label": "Separator",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "decorative"
+        },
+        {
+          "enumValues": ["horizontal", "vertical"],
+          "kind": "enum",
+          "name": "orientation"
+        },
+        {
+          "enumValues": ["default", "subtle", "strong"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "A horizontal or vertical divider on the token scale."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg", "xl"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "sheet",
+      "imports": [
+        {
+          "exports": [
+            "Panel",
+            "Sheet",
+            "SheetBody",
+            "SheetCloseButton",
+            "SheetContent",
+            "SheetFooter",
+            "SheetHeader",
+            "SheetOverlay"
+          ],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "Panel",
+            "Sheet",
+            "SheetBody",
+            "SheetCloseButton",
+            "SheetContent",
+            "SheetFooter",
+            "SheetHeader",
+            "SheetOverlay"
+          ],
+          "module": "texuli/sheet"
+        }
+      ],
       "label": "Sheet",
       "placement": "app",
       "props": [
@@ -7484,13 +11184,31 @@
           "name": "size"
         }
       ],
+      "states": ["hover", "focus-visible"],
       "summary": "Edge-anchored modal panel (drawer-like sheet)."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "inset"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "sidebar",
+      "imports": [
+        {
+          "exports": ["Sidebar"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Sidebar"],
+          "module": "texuli/sidebar"
+        }
+      ],
       "label": "Sidebar",
       "placement": "app",
       "props": [
@@ -7557,7 +11275,51 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "selected", "expanded"],
       "summary": "Collapsible app rail with sections, badges and safe links."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "skeleton",
+      "imports": [
+        {
+          "exports": ["Skeleton"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Skeleton", "skeletonClass"],
+          "module": "texuli/feedback"
+        }
+      ],
+      "label": "Skeleton",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "boolean",
+          "name": "circle"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        }
+      ],
+      "states": ["loading"],
+      "summary": "A placeholder bar or circle while content loads."
     },
     {
       "capability": "web-only",
@@ -7590,13 +11352,73 @@
           }
         }
       ],
+      "states": ["hover", "focus-visible", "disabled"],
       "summary": "A list whose items are a bound list variable; people reorder it by drag or keyboard, and lists sharing a group exchange items."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "tone": {
+          "default": "primary",
+          "prop": "tone",
+          "values": ["primary", "success", "warning", "destructive", "info", "neutral"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "spinner",
+      "imports": [
+        {
+          "exports": ["Spinner"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Spinner", "spinnerClass"],
+          "module": "texuli/feedback"
+        }
+      ],
+      "label": "Spinner",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": ["primary", "success", "warning", "destructive", "info", "neutral"],
+          "kind": "enum",
+          "name": "tone"
+        }
+      ],
+      "states": ["loading"],
+      "summary": "An indeterminate wait indicator, labelled or decorative."
     },
     {
       "capability": "web-only",
       "emit": [],
       "group": "layouts",
       "id": "split-view",
+      "imports": [
+        {
+          "exports": ["default"],
+          "module": "texuli/layouts/app/split-view"
+        }
+      ],
       "label": "SplitView",
       "placement": "app",
       "props": [
@@ -7634,6 +11456,7 @@
           "name": "listLabel"
         }
       ],
+      "states": ["hover", "focus-visible", "selected", "expanded"],
       "summary": "Master-detail split with list and detail panes."
     },
     {
@@ -7641,6 +11464,16 @@
       "emit": ["developer", "untrusted"],
       "group": "sheets",
       "id": "spreadsheet",
+      "imports": [
+        {
+          "exports": ["SheetView"],
+          "module": "@texuli/sheets"
+        },
+        {
+          "exports": ["SheetView"],
+          "module": "@texuli/sheets/view"
+        }
+      ],
       "label": "Spreadsheet",
       "placement": "content",
       "props": [
@@ -7657,13 +11490,31 @@
           }
         }
       ],
+      "states": ["focus-visible", "active", "readonly"],
       "summary": "A spreadsheet as data: tabs of cells holding numbers, text, booleans and formulas that recalculate."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "elevated",
+          "prop": "variant",
+          "values": ["elevated", "flat"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "stat",
+      "imports": [
+        {
+          "exports": ["Stat"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Stat"],
+          "module": "texuli/stat"
+        }
+      ],
       "label": "Stat",
       "placement": "app",
       "props": [
@@ -7716,6 +11567,7 @@
           "name": "variant"
         }
       ],
+      "states": ["hover"],
       "summary": "A single metric with optional delta, trend and sparkline slot."
     },
     {
@@ -7723,6 +11575,16 @@
       "emit": [],
       "group": "display",
       "id": "stepper",
+      "imports": [
+        {
+          "exports": ["Stepper"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Stepper"],
+          "module": "texuli/stepper"
+        }
+      ],
       "label": "Stepper",
       "placement": "app",
       "props": [
@@ -7760,13 +11622,31 @@
           "required": true
         }
       ],
+      "states": ["focus-visible", "selected"],
       "summary": "Horizontal or vertical progress through ordered steps."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "switch",
+      "imports": [
+        {
+          "exports": ["Switch"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Switch"],
+          "module": "texuli/choice"
+        }
+      ],
       "label": "Switch",
       "placement": "app",
       "props": [
@@ -7822,13 +11702,66 @@
           "name": "value"
         }
       ],
+      "states": ["disabled", "checked"],
       "summary": "An immediate on/off setting control."
     },
     {
+      "axes": {
+        "density": {
+          "default": "default",
+          "prop": "density",
+          "values": ["compact", "default", "comfortable"]
+        },
+        "variant": {
+          "default": "plain",
+          "prop": "variant",
+          "values": ["plain", "striped", "grid"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "table",
+      "imports": [
+        {
+          "exports": [
+            "Table",
+            "TableBody",
+            "TableCaption",
+            "TableCell",
+            "TableEmpty",
+            "TableFooter",
+            "TableHead",
+            "TableHeader",
+            "TableRow"
+          ],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "TABLE_ALIGNS",
+            "TABLE_DENSITIES",
+            "TABLE_STACKS",
+            "TABLE_VARIANTS",
+            "Table",
+            "TableAlign",
+            "TableBody",
+            "TableCaption",
+            "TableCell",
+            "TableDensity",
+            "TableEmpty",
+            "TableFooter",
+            "TableHead",
+            "TableHeader",
+            "TableRow",
+            "TableStack",
+            "TableVariant",
+            "fillStackLabels",
+            "tableClass"
+          ],
+          "module": "texuli/table"
+        }
+      ],
       "label": "Table",
       "placement": "app",
       "props": [
@@ -7873,13 +11806,121 @@
           "name": "wrapperClass"
         }
       ],
+      "states": ["focus-visible", "loading"],
       "summary": "A responsive data table with density, stacking and sticky header options."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "line",
+          "prop": "variant",
+          "values": ["line", "pills", "enclosed"]
+        }
+      },
+      "capability": "web-only",
+      "emit": [],
+      "events": ["select"],
+      "group": "display",
+      "id": "tabs",
+      "imports": [
+        {
+          "exports": ["Tabs"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Tabs"],
+          "module": "texuli/tabs-accordion"
+        }
+      ],
+      "label": "Tabs",
+      "placement": "app",
+      "props": [
+        {
+          "enumValues": ["automatic", "manual"],
+          "kind": "enum",
+          "name": "activationMode"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "content"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "array",
+          "name": "items",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "boolean",
+          "name": "loop"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "enumValues": ["horizontal", "vertical"],
+          "kind": "enum",
+          "name": "orientation"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        },
+        {
+          "enumValues": ["line", "pills", "enclosed"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "states": ["hover", "focus-visible", "disabled", "selected"],
+      "summary": "A tab list that shows one panel at a time."
+    },
+    {
+      "axes": {
+        "variant": {
+          "default": "secondary",
+          "prop": "variant",
+          "values": [
+            "default",
+            "secondary",
+            "outline",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
       "id": "tag",
+      "imports": [
+        {
+          "exports": ["Tag"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Tag"],
+          "module": "texuli/badge"
+        }
+      ],
       "label": "Tag",
       "placement": "app",
       "props": [
@@ -7921,13 +11962,231 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "loading"],
       "summary": "A labeled chip that can be removed."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "tags-input",
+      "imports": [
+        {
+          "exports": ["TagsInput"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["TagsInput"],
+          "module": "texuli/tags-color"
+        }
+      ],
+      "label": "TagsInput",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "delimiter"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "number",
+          "name": "max"
+        },
+        {
+          "kind": "string",
+          "name": "name"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "kind": "string",
+          "name": "placeholder"
+        },
+        {
+          "kind": "boolean",
+          "name": "readonly"
+        },
+        {
+          "kind": "boolean",
+          "name": "required"
+        },
+        {
+          "kind": "array",
+          "name": "value"
+        }
+      ],
+      "states": ["focus-visible", "disabled", "invalid", "readonly"],
+      "summary": "A list of tags the person types, pastes or removes."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["figure", "lg", "md", "sm", "xs", "inherit"]
+        },
+        "tone": {
+          "default": "default",
+          "prop": "tone",
+          "values": [
+            "default",
+            "muted",
+            "subtle",
+            "primary",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "inherit"
+          ]
+        }
+      },
+      "capability": "web-only",
+      "emit": [],
+      "group": "display",
+      "id": "text",
+      "imports": [
+        {
+          "exports": ["Text", "TextElement", "TextSize", "TextTone", "TextWeight"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "TEXT_ALIGNS",
+            "TEXT_ELEMENTS",
+            "TEXT_SIZES",
+            "TEXT_TONES",
+            "TEXT_TRACKINGS",
+            "TEXT_TRANSFORMS",
+            "TEXT_WEIGHTS",
+            "Text",
+            "TextAlign",
+            "TextElement",
+            "TextSize",
+            "TextTone",
+            "TextTracking",
+            "TextTransform",
+            "TextWeight",
+            "textClass"
+          ],
+          "module": "texuli/typography"
+        }
+      ],
+      "label": "Text",
+      "placement": "app",
+      "props": [
+        {
+          "enumValues": ["start", "center", "end"],
+          "kind": "enum",
+          "name": "align"
+        },
+        {
+          "enumValues": ["p", "span", "div", "label", "small", "strong"],
+          "kind": "enum",
+          "name": "as"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "for"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "number",
+          "name": "lineClamp"
+        },
+        {
+          "kind": "boolean",
+          "name": "mono"
+        },
+        {
+          "enumValues": ["figure", "lg", "md", "sm", "xs", "inherit"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "kind": "boolean",
+          "name": "tabular"
+        },
+        {
+          "enumValues": [
+            "default",
+            "muted",
+            "subtle",
+            "primary",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "inherit"
+          ],
+          "kind": "enum",
+          "name": "tone"
+        },
+        {
+          "enumValues": ["normal", "wide"],
+          "kind": "enum",
+          "name": "tracking"
+        },
+        {
+          "enumValues": ["none", "uppercase", "lowercase", "capitalize"],
+          "kind": "enum",
+          "name": "transform"
+        },
+        {
+          "kind": "boolean",
+          "name": "truncate"
+        },
+        {
+          "enumValues": ["regular", "medium", "semibold"],
+          "kind": "enum",
+          "name": "weight"
+        }
+      ],
+      "summary": "Body copy, labels and small print with a size, tone and weight from the design system."
     },
     {
       "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "text-counter",
+      "imports": [
+        {
+          "exports": ["TextCounter"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["TextCounter"],
+          "module": "texuli/input"
+        }
+      ],
       "label": "TextCounter",
       "placement": "app",
       "props": [
@@ -8007,6 +12266,7 @@
           "name": "value"
         }
       ],
+      "states": ["disabled", "invalid", "readonly"],
       "summary": "An input or textarea that shows remaining characters near the limit."
     },
     {
@@ -8014,6 +12274,16 @@
       "emit": [],
       "group": "forms",
       "id": "textarea",
+      "imports": [
+        {
+          "exports": ["Textarea"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Textarea"],
+          "module": "texuli/input"
+        }
+      ],
       "label": "Textarea",
       "placement": "app",
       "props": [
@@ -8053,13 +12323,48 @@
           "name": "value"
         }
       ],
+      "states": ["disabled", "readonly"],
       "summary": "A multi-line text control with optional autosize."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
       "id": "time-field",
+      "imports": [
+        {
+          "exports": ["TimeField"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "Calendar",
+            "DATE_SIZES",
+            "DEFAULT_DATE_RANGE_PRESET_LABELS",
+            "DateLabels",
+            "DatePicker",
+            "DateRangePicker",
+            "DateRangePickerPanelContext",
+            "DateRangePreset",
+            "DateRangePresetLabels",
+            "DateSize",
+            "TimeField",
+            "dateCalendarClass",
+            "dateFieldClass",
+            "dateRangePresets",
+            "localToday",
+            "matchingPreset"
+          ],
+          "module": "texuli/date"
+        }
+      ],
       "label": "TimeField",
       "placement": "app",
       "props": [
@@ -8124,6 +12429,7 @@
           "name": "value"
         }
       ],
+      "states": ["hover", "focus-visible", "active", "disabled", "invalid", "selected"],
       "summary": "A labelled time of day typed or stepped by segment (hour, minute, AM/PM), with a 24-hour HH:mm value."
     },
     {
@@ -8131,6 +12437,30 @@
       "emit": [],
       "group": "display",
       "id": "timeline",
+      "imports": [
+        {
+          "exports": ["Timeline", "TimelineItem"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "DEFAULT_TIMELINE_MESSAGES",
+            "TIMELINE_ORIENTATIONS",
+            "TIMELINE_STATUSES",
+            "TIMELINE_TONES",
+            "Timeline",
+            "TimelineItem",
+            "TimelineItemData",
+            "TimelineMessages",
+            "TimelineOrientation",
+            "TimelineStatus",
+            "TimelineTone",
+            "timelineClass",
+            "timelineItemClass"
+          ],
+          "module": "texuli/timeline"
+        }
+      ],
       "label": "Timeline",
       "placement": "app",
       "props": [
@@ -8167,6 +12497,7 @@
           "name": "orientation"
         }
       ],
+      "states": ["focus-visible", "selected"],
       "summary": "Vertical or horizontal chronological list of events."
     },
     {
@@ -8174,6 +12505,38 @@
       "emit": [],
       "group": "overlays",
       "id": "toaster",
+      "imports": [
+        {
+          "exports": ["Toaster"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "DEFAULT_TOAST_ACTION_ERROR",
+            "DEFAULT_TOAST_DURATION",
+            "MAX_TOASTS",
+            "PromiseToastMessages",
+            "TOASTER_POSITIONS",
+            "TOAST_KINDS",
+            "ToastAction",
+            "ToastAnnouncement",
+            "ToastItem",
+            "ToastKind",
+            "ToastOptions",
+            "ToastSettleReason",
+            "ToastStore",
+            "Toaster",
+            "ToasterPosition",
+            "createToastStore",
+            "getToastStore",
+            "resetToastStore",
+            "toast",
+            "toastItemClass",
+            "toasterClass"
+          ],
+          "module": "texuli/toast"
+        }
+      ],
       "label": "Toaster",
       "placement": "app",
       "props": [
@@ -8212,13 +12575,112 @@
           "name": "store"
         }
       ],
+      "states": ["hover", "focus-visible"],
       "summary": "Live region that renders toast notifications from the shared store."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "outline"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "toggle-group",
+      "imports": [
+        {
+          "exports": ["ToggleGroup", "ToggleGroupItem"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["ToggleGroup", "ToggleGroupItem"],
+          "module": "texuli/toggle"
+        }
+      ],
+      "label": "ToggleGroup",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "string",
+          "name": "name"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "enumValues": ["horizontal", "vertical"],
+          "kind": "enum",
+          "name": "orientation"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": ["single", "multiple"],
+          "kind": "enum",
+          "name": "type"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        },
+        {
+          "enumValues": ["default", "outline"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "states": ["focus-visible", "disabled"],
+      "summary": "A group of toggle buttons: one value, or several."
     },
     {
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
       "id": "tooltip",
+      "imports": [
+        {
+          "exports": ["Tooltip"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "TOOLTIP_ALIGNS",
+            "TOOLTIP_SIDES",
+            "Tooltip",
+            "TooltipAlign",
+            "TooltipSide",
+            "tooltipContentClass"
+          ],
+          "module": "texuli/tooltip"
+        }
+      ],
       "label": "Tooltip",
       "placement": "app",
       "props": [
@@ -8269,6 +12731,7 @@
           "name": "sideOffset"
         }
       ],
+      "states": ["disabled", "open"],
       "summary": "Short delayed hint on hover or focus."
     },
     {
@@ -8278,6 +12741,20 @@
       "events": ["change", "select"],
       "group": "workflows",
       "id": "workflow-graph",
+      "imports": [
+        {
+          "exports": ["WorkflowEditor", "WorkflowViewer"],
+          "module": "@texuli/workflows"
+        },
+        {
+          "exports": ["WorkflowEditor"],
+          "module": "@texuli/workflows/editor"
+        },
+        {
+          "exports": ["WorkflowViewer"],
+          "module": "@texuli/workflows/viewer"
+        }
+      ],
       "label": "Workflow graph",
       "placement": "content",
       "props": [
@@ -8304,6 +12781,15 @@
           "kind": "enum",
           "name": "mode"
         }
+      ],
+      "states": [
+        "focus-visible",
+        "disabled",
+        "invalid",
+        "selected",
+        "expanded",
+        "checked",
+        "readonly"
       ],
       "summary": "A workflow of typed nodes and edges (automations, pipelines, approvals, state diagrams), read-only or editable."
     }

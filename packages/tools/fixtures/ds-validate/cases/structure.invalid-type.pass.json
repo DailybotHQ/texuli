@@ -1,0 +1,17 @@
+{
+  "description": "A name that is not a string. (fixed)",
+  "code": "invalid-type",
+  "expect": "pass",
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "color": {
+      "brand": {
+        "seed": "#0e7490"
+      }
+    }
+  }
+}

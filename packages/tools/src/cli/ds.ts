@@ -4,14 +4,26 @@
  * files as arguments, each running one registry operation, so the CLI, the
  * local MCP and the remote MCP give the same results:
  *
- *     texuli ds init <file> [--brand "<one-liner>"] [--id <id>] [--name <name>] [--overwrite]
- *     texuli ds validate <file> [--trust t] [--variant v] [--base <file>]...
+ *     texuli ds init <file> [--brand "<one-liner>"] [--id <id>] [--name <name>] [--locked [--preset all|minimal|<allow.json>]] [--overwrite]
+ *     texuli ds validate <file> [--trust t] [--variant v] [--base <file>]... [--locked] [--prototype <dir>] [--catalog <file>] [--json] [--render] [--strict] [--report]
  *     texuli ds compile <file> [--format f] [--mode m] [--variant v] [--base <file>]... [--out <path> [--overwrite]]
  *     texuli ds export <file> --format css|tailwind|dtcg|tokens-studio --out <path> [--selector s] [--dark d] [--overwrite]
  *     texuli ds preview <file> [--format svg|html] [--mode m] [--variant v] [--out <path> [--overwrite]]
  *     texuli ds diff <before> <after> [--mode m] [--base <file>]...
  *     texuli ds import <file|text> --from brand|dtcg|tokens-studio|role-palette|theme [--id] [--name] [--version] [--out <path> [--overwrite]]
+ *     texuli ds generate [--brief <text>] [--from-tokens <file>] [--from-css <file>] [--from-logo <pixels.json>] [--from-theme <file>] [-o <file>]
+ *     texuli ds approve <file> --by <name> [--version <x.y.z>] [--trust t] [--base <file>]...
+ *     texuli ds hash <file>
+ *     texuli ds pack <file> --out <bundle.json> [--sources <file>] [--history <file>] [--overwrite]
+ *     texuli ds unpack <bundle.json> [--out <path> [--overwrite]]
  *     texuli ds check <file> …                       (the conformance check, ds-check/cli.ts)
+ *
+ * `init --locked` adds an `allow` section from a preset (ADR-032; `all` and
+ * `minimal` come from the catalog, see ds-create/presets.ts). `approve`
+ * validates the document first, refuses an invalid one, then stamps
+ * `approval` with its `contentHash` in place; `hash` prints the content hashes
+ * and exits 1 when a stored one does not match. Neither proves who approved:
+ * a reviewed commit (CODEOWNERS) is the guarantee.
  *
  * Output is the operation's JSON on stdout; with `--out`, the content
  * (CSS, preset, token file, preview or document) is written through the
@@ -22,8 +34,23 @@
  */
 import { readFile, stat } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { canonicalJson, packBundle, unpackBundle } from '@texuli/spec/design-system';
+import { generateDesignSystem } from '@texuli/tokens/design-system/generate';
+import { DESIGN_SYSTEM_IMPORT_LIMITS } from '@texuli/tokens/design-system/import';
+import { type DesignSystem, validateDesignSystem } from '@texuli/tokens/design-system/validate';
 import { DS_CHECK_MAX_BYTES, DS_CHECK_USAGE, parseDsCliArgs, runDsCli } from '../ds-check/cli.ts';
+import {
+  APPROVAL_NOTE,
+  allowFromJson,
+  allowPreset,
+  hashReport,
+  PRESET_NAMES,
+  type PresetName,
+  presetComponentsFromBuild,
+  stampApproval,
+} from '../ds-create/index.ts';
 import { localFiles } from '../internal/local-write.ts';
+import { loadOpsCatalog } from '../ops/catalog.ts';
 import { LOCAL_RUNTIMES, texuliOps } from '../ops/index.ts';
 
 /** The `ds` commands, in help order. */
@@ -35,18 +62,28 @@ export const DS_COMMANDS = [
   'preview',
   'diff',
   'import',
+  'generate',
+  'approve',
+  'hash',
+  'pack',
+  'unpack',
   'check',
 ] as const;
 export type DsCommand = (typeof DS_COMMANDS)[number];
 
 export const DS_USAGE = [
-  'Usage: texuli ds init <file> [--brand "<one-liner>"] [--id <id>] [--name <name>] [--overwrite]',
-  '       texuli ds validate <file> [--trust developer|untrusted] [--variant <name>] [--base <file>]...',
+  'Usage: texuli ds init <file> [--brand "<one-liner>"] [--id <id>] [--name <name>] [--locked [--preset all|minimal|<allow.json>]] [--overwrite]',
+  '       texuli ds validate <file> [--trust developer|untrusted] [--variant <name>] [--base <file>]... [--locked] [--prototype <dir>] [--catalog <components.json>] [--json] [--render] [--strict] [--report]',
   '       texuli ds compile <file> [--format json|css|tailwind|dtcg|tokens-studio] [--mode light|dark] [--variant <name>] [--base <file>]... [--out <path> [--overwrite]]',
   '       texuli ds export <file> --format css|tailwind|dtcg|tokens-studio --out <path> [--selector <s>] [--dark class|attribute|media] [--overwrite]',
   '       texuli ds preview <file> [--format svg|html] [--mode light|dark] [--variant <name>] [--out <path> [--overwrite]]',
   '       texuli ds diff <before> <after> [--mode light|dark] [--base <file>]...',
   '       texuli ds import <file|text> --from brand|dtcg|tokens-studio|role-palette|theme [--id <id>] [--name <name>] [--version <x.y.z>] [--out <path> [--overwrite]]',
+  '       texuli ds generate [--brief <text>] [--from-tokens <file>] [--from-css <file>] [--from-logo <pixels.json>] [--from-theme <file>] [-o <file> [--overwrite]]',
+  '       texuli ds approve <file> --by <name> [--version <x.y.z>] [--trust developer|untrusted] [--base <file>]...',
+  '       texuli ds hash <file>',
+  '       texuli ds pack <file> --out <bundle.json> [--sources <file>] [--history <file>] [--overwrite]',
+  '       texuli ds unpack <bundle.json> [--out <path> [--overwrite]]',
   `       ${DS_CHECK_USAGE.replace('Usage: ', '')}`,
 ].join('\n');
 
@@ -57,17 +94,35 @@ export interface DsCommandArgs {
   flags: Record<string, string>;
   bases: string[];
   overwrite: boolean;
+  /** `init --locked`: add an `allow` section (ADR-032). */
+  locked: boolean;
 }
 
 /** The value flags each command accepts (`--base` repeats and `--overwrite` takes none). */
 const FLAGS: Record<DsCommandArgs['command'], readonly string[]> = {
-  init: ['brand', 'id', 'name'],
-  validate: ['trust', 'variant', 'base'],
+  init: ['brand', 'id', 'name', 'preset'],
+  validate: ['trust', 'variant', 'base', 'prototype', 'catalog'],
   compile: ['format', 'mode', 'variant', 'trust', 'base', 'out', 'selector', 'dark'],
   export: ['format', 'mode', 'variant', 'trust', 'base', 'out', 'selector', 'dark'],
   preview: ['format', 'mode', 'variant', 'trust', 'base', 'out', 'title'],
   diff: ['mode', 'variant', 'trust', 'base'],
   import: ['from', 'id', 'name', 'version', 'trust', 'out'],
+  generate: [
+    'brief',
+    'from-tokens',
+    'from-css',
+    'from-logo',
+    'from-theme',
+    'id',
+    'name',
+    'version',
+    'trust',
+    'out',
+  ],
+  approve: ['by', 'version', 'trust', 'base'],
+  hash: [],
+  pack: ['sources', 'history', 'out'],
+  unpack: ['out'],
 };
 const POSITIONALS: Record<DsCommandArgs['command'], number> = {
   init: 1,
@@ -77,6 +132,11 @@ const POSITIONALS: Record<DsCommandArgs['command'], number> = {
   preview: 1,
   diff: 2,
   import: 1,
+  generate: 0,
+  approve: 1,
+  hash: 1,
+  pack: 1,
+  unpack: 1,
 };
 const CHOICES: Record<string, readonly string[]> = {
   trust: ['developer', 'untrusted'],
@@ -108,12 +168,38 @@ export function parseDsArgs(
   if (!(DS_COMMANDS as readonly string[]).includes(command))
     throw new TypeError(`Unknown ds command "${command}". Run texuli ds --help.`);
   const name = command as DsCommandArgs['command'];
-  const parsed: DsCommandArgs = { command: name, args: [], flags: {}, bases: [], overwrite: false };
+  const parsed: DsCommandArgs = {
+    command: name,
+    args: [],
+    flags: {},
+    bases: [],
+    overwrite: false,
+    locked: false,
+  };
   for (let index = 0; index < rest.length; index++) {
     const arg = rest[index] as string;
     if (arg === '--help' || arg === '-h') return { command: 'help', argv: [...argv] };
     if (arg === '--overwrite') {
       parsed.overwrite = true;
+      continue;
+    }
+    if (arg === '-o') {
+      if (name !== 'generate') throw new TypeError('Flag -o belongs to ds generate.');
+      const value = rest[++index];
+      if (value === undefined || value.startsWith('--'))
+        throw new TypeError('Flag -o needs a value.');
+      parsed.flags.out = value;
+      continue;
+    }
+    if (arg === '--locked') {
+      if (name !== 'init' && name !== 'validate')
+        throw new TypeError('Flag --locked belongs to ds init or ds validate.');
+      parsed.locked = true;
+      continue;
+    }
+    if (['--json', '--render', '--strict', '--report'].includes(arg)) {
+      if (name !== 'validate') throw new TypeError(`Flag ${arg} belongs to ds validate.`);
+      parsed.flags[arg.slice(2)] = 'true';
       continue;
     }
     if (arg.startsWith('--')) {
@@ -140,7 +226,16 @@ export function parseDsArgs(
   if (name === 'export' && (!parsed.flags.format || !parsed.flags.out))
     throw new TypeError('ds export needs --format and --out.');
   if (name === 'import' && !parsed.flags.from) throw new TypeError('ds import needs --from.');
-  if (parsed.overwrite && name !== 'init' && parsed.flags.out === undefined)
+  if (name === 'approve' && !parsed.flags.by?.trim())
+    throw new TypeError('ds approve needs --by <name>.');
+  if (name === 'validate' && parsed.flags.report === 'true' && !parsed.locked)
+    throw new TypeError('Flag --report needs --locked.');
+  if (name === 'validate' && parsed.flags.strict === 'true' && parsed.flags.render !== 'true')
+    throw new TypeError('Flag --strict needs --render.');
+  if (name === 'pack' && !parsed.flags.out) throw new TypeError('ds pack needs --out.');
+  if (parsed.flags.preset !== undefined && !parsed.locked)
+    throw new TypeError('Flag --preset needs --locked.');
+  if (parsed.overwrite && name !== 'init' && name !== 'approve' && parsed.flags.out === undefined)
     throw new TypeError('Flag --overwrite needs --out.');
   return parsed;
 }
@@ -265,6 +360,11 @@ async function plan(
           ...compileFlags(args, bases),
         },
       };
+    case 'approve':
+    case 'hash':
+    case 'pack':
+    case 'unpack':
+      throw new TypeError(`ds ${args.command} does not run one operation.`);
     default: {
       // brand: the argument is the one-liner; theme: a library id unless it names a file.
       const from = flags.from as string;
@@ -305,13 +405,61 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
   }
   if (args.command === 'help') {
     stdout.write(
-      `${DS_USAGE}\n\nAuthor and check design-system documents. Each command runs a registry operation (ds.import, ds.validate, ds.compile, ds.preview, ds.diff) and prints its JSON; --out writes the content instead (a new file inside the working directory; --overwrite replaces one). check is the conformance check (texuli ds check --help).\nExit 0 valid, 1 refused, 2 could not run.\n`
+      `${DS_USAGE}\n\nAuthor and check design-system documents. Import, validate, compile, preview and diff print their operation JSON; --out writes the result through the local file policy. generate composes the available inputs and writes the document plus <out>.report.json; -o is its output shorthand. check is the conformance check (texuli ds check --help). Locked validation accepts --prototype <dir>, --catalog <components.json>, --json, and --render; --report lists findings and exits 0 for migration tracking.\nExit 0 valid or report-only, 1 refused/finding, 2 could not run. The check cannot prove who approved a document.\n`
     );
     return { ok: true };
   }
   if (args.command === 'check') {
     const result = await runDsCli(args.argv, io);
     return result.ok ? { ok: true } : { ok: false, error: result.error };
+  }
+  if (
+    args.command === 'validate' &&
+    (args.locked ||
+      ['catalog', 'json', 'render', 'strict', 'report', 'prototype'].some(
+        (flag) => args.flags[flag] !== undefined
+      ))
+  ) {
+    const cwd = io.cwd ?? process.cwd();
+    const result = await runDsCli(
+      [
+        'check',
+        resolve(cwd, args.args[0] as string),
+        '--locked',
+        ...(args.flags.trust ? ['--trust', args.flags.trust] : []),
+        ...(args.flags.variant ? ['--variant', args.flags.variant] : []),
+        ...args.bases.flatMap((base) => ['--base', resolve(cwd, base)]),
+        ...(args.flags.catalog ? ['--catalog', resolve(cwd, args.flags.catalog)] : []),
+        ...(args.flags.prototype ? ['--prototype', resolve(cwd, args.flags.prototype)] : []),
+        ...(args.flags.json === 'true' ? ['--json'] : []),
+        ...(args.flags.render === 'true' ? ['--render'] : []),
+        ...(args.flags.strict === 'true' ? ['--strict'] : []),
+        ...(args.flags.report === 'true' ? ['--report'] : []),
+      ],
+      io
+    );
+    return result.ok ? { ok: true } : { ok: false, error: result.error };
+  }
+  if (args.command === 'generate') {
+    try {
+      return await runGenerate(args, io);
+    } catch (error) {
+      return cannotRun(error instanceof Error ? error.message : String(error));
+    }
+  }
+  if (args.command === 'approve' || args.command === 'hash') {
+    try {
+      return args.command === 'hash' ? await runHash(args, io) : await runApprove(args, io);
+    } catch (error) {
+      return cannotRun(error instanceof Error ? error.message : String(error));
+    }
+  }
+  if (args.command === 'pack' || args.command === 'unpack') {
+    try {
+      return args.command === 'pack' ? await runPack(args, io) : await runUnpack(args, io);
+    } catch (error) {
+      return cannotRun(error instanceof Error ? error.message : String(error));
+    }
   }
   let step: Awaited<ReturnType<typeof plan>>;
   try {
@@ -343,9 +491,17 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
   }
   // A document goes through ds.save (validated again, written as two-space JSON).
   if (step.content === 'document') {
+    let document = output.document as Record<string, unknown>;
+    if (args.locked) {
+      try {
+        document = { ...document, allow: await lockedAllow(args, io.cwd ?? process.cwd()) };
+      } catch (error) {
+        return cannotRun(error instanceof Error ? error.message : String(error));
+      }
+    }
     const saved = await texuliOps.invoke(
       'ds.save',
-      { path: out, document: output.document, overwrite: args.overwrite },
+      { path: out, document, overwrite: args.overwrite },
       { runtimes: LOCAL_RUNTIMES, files }
     );
     const result = saved.ok ? (saved.output as Record<string, unknown>) : undefined;
@@ -370,4 +526,275 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
     `${JSON.stringify({ ok: true, operation: step.operation, format: output.format, out: written.relative, bytes: written.bytes }, null, 2)}\n`
   );
   return { ok: true, out: written.relative };
+}
+
+/** Run the local, bounded design-system generation pipeline and save its loss/repair report. */
+async function runGenerate(args: DsCommandArgs, io: DsIo): Promise<DsResult> {
+  const cwd = io.cwd ?? process.cwd();
+  const stdout = io.stdout ?? process.stdout;
+  const stderr = io.stderr ?? process.stderr;
+  const readInput = async (flag: string) => {
+    const path = args.flags[flag];
+    return path === undefined ? undefined : await readText(resolve(cwd, path));
+  };
+  const [tokens, css, logoText, theme] = await Promise.all([
+    readInput('from-tokens'),
+    readInput('from-css'),
+    readInput('from-logo'),
+    readInput('from-theme'),
+  ]);
+  let logoPixels: unknown;
+  if (logoText !== undefined) {
+    try {
+      logoPixels = JSON.parse(logoText) as unknown;
+    } catch {
+      throw new SyntaxError('--from-logo must be JSON containing pixel data `{ "data": [...] }`.');
+    }
+  }
+  const generated = generateDesignSystem(
+    {
+      ...(args.flags.brief !== undefined ? { brief: args.flags.brief } : {}),
+      ...(tokens !== undefined ? { tokens } : {}),
+      ...(css !== undefined ? { css } : {}),
+      ...(logoPixels !== undefined
+        ? { logoPixels: logoPixels as { data: ArrayLike<number> } }
+        : {}),
+      ...(theme !== undefined ? { theme } : {}),
+    },
+    {
+      ...(args.flags.id ? { id: args.flags.id } : {}),
+      ...(args.flags.name ? { name: args.flags.name } : {}),
+      ...(args.flags.version ? { version: args.flags.version } : {}),
+      ...(args.flags.trust === 'developer' ? { trust: 'developer' as const } : {}),
+      maxBytes: DESIGN_SYSTEM_IMPORT_LIMITS.bytes,
+    }
+  );
+  if (!generated.ok) {
+    const refusal = {
+      ok: false,
+      operation: 'ds.generate',
+      errors: generated.errors,
+      report: generated.report,
+    };
+    stdout.write(`${JSON.stringify(refusal, null, 2)}\n`);
+    process.exitCode = 1;
+    return { ok: false, error: `Generation refused: ${JSON.stringify(generated.errors)}` };
+  }
+  const result = {
+    ok: true,
+    operation: 'ds.generate',
+    document: generated.document,
+    report: generated.report,
+  };
+  const outputPath = args.flags.out;
+  if (outputPath === undefined) {
+    stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    return { ok: true };
+  }
+  const files = localFiles(io.cwd ? { cwd: io.cwd } : {});
+  const reportPath = `${outputPath}.report.json`;
+  const reportWrite = await files.write(
+    reportPath,
+    `${JSON.stringify(generated.report, null, 2)}\n`,
+    {
+      overwrite: args.overwrite,
+    }
+  );
+  if (!reportWrite.ok) {
+    stderr.write(`${reportWrite.error} (${reportWrite.code})\n`);
+    process.exitCode = 1;
+    return { ok: false, error: reportWrite.error };
+  }
+  const documentWrite = await files.write(
+    outputPath,
+    `${JSON.stringify(generated.document, null, 2)}\n`,
+    { overwrite: args.overwrite }
+  );
+  if (!documentWrite.ok) {
+    stderr.write(`${documentWrite.error} (${documentWrite.code})\n`);
+    process.exitCode = 1;
+    return { ok: false, error: documentWrite.error };
+  }
+  stdout.write(
+    `${JSON.stringify({ ok: true, operation: 'ds.generate', out: documentWrite.relative, report: reportWrite.relative }, null, 2)}\n`
+  );
+  return { ok: true, out: documentWrite.relative };
+}
+
+/** The `allow` section `init --locked` writes: a catalog preset (default `minimal`) or a JSON file. */
+async function lockedAllow(args: DsCommandArgs, cwd: string): Promise<Record<string, unknown>> {
+  const preset = args.flags.preset ?? 'minimal';
+  if ((PRESET_NAMES as readonly string[]).includes(preset)) {
+    const build = await loadOpsCatalog();
+    return allowPreset(presetComponentsFromBuild(build.catalog.entries), preset as PresetName);
+  }
+  return allowFromJson(await readJsonFile(resolve(cwd, preset)));
+}
+
+/** `ds approve`: validate, refuse an invalid document, then stamp `approval` in place through ds.save. */
+async function runApprove(args: DsCommandArgs, io: DsIo): Promise<DsResult> {
+  const stdout = io.stdout ?? process.stdout;
+  const cwd = io.cwd ?? process.cwd();
+  const file = args.args[0] as string;
+  const bases = await readBases(args.bases.map((path) => resolve(cwd, path)));
+  const read = (await readJsonFile(resolve(cwd, file))) as Record<string, unknown>;
+  const document = args.flags.version ? { ...read, version: args.flags.version } : read;
+  const runtime = { runtimes: LOCAL_RUNTIMES, files: localFiles({ cwd }) };
+  const refuse = (body: Record<string, unknown>, error: string): DsResult => {
+    stdout.write(`${JSON.stringify({ ok: false, operation: 'ds.approve', ...body }, null, 2)}\n`);
+    process.exitCode = 1;
+    return { ok: false, error };
+  };
+  const checked = await texuliOps.invoke(
+    'ds.validate',
+    { document, ...compileFlags(args, bases) },
+    runtime
+  );
+  if (!checked.ok) return refuse({ error: checked.error }, checked.error.message);
+  const verdict = checked.output as Record<string, unknown>;
+  if (verdict.valid !== true)
+    return refuse(
+      {
+        valid: false,
+        errors: verdict.errors ?? [],
+        note: 'Nothing was approved: fix the document first.',
+      },
+      `Refused: ${JSON.stringify(verdict.errors ?? [])}`
+    );
+  const stamped = stampApproval(document as unknown as DesignSystem, {
+    by: args.flags.by as string,
+    ...(args.flags.version ? { version: args.flags.version } : {}),
+  });
+  const again = validateDesignSystem(
+    stamped,
+    args.flags.trust === 'developer' ? { trust: 'developer' } : {}
+  );
+  if (!again.ok)
+    return refuse(
+      { valid: false, errors: again.errors },
+      `Refused: ${JSON.stringify(again.errors)}`
+    );
+  // The one human door that may write an approved document (ADR-032).
+  const saved = await texuliOps.invoke(
+    'ds.save',
+    { path: file, document: stamped, overwrite: true },
+    { ...runtime, approve: true }
+  );
+  const result = saved.ok ? (saved.output as Record<string, unknown>) : undefined;
+  if (result?.saved !== true)
+    return refuse(
+      { saved: false, errors: result?.errors ?? saved },
+      `Not saved: ${JSON.stringify(result?.errors ?? saved)}`
+    );
+  stdout.write(
+    `${JSON.stringify({ ok: true, operation: 'ds.approve', path: result.path, approval: stamped.approval, note: APPROVAL_NOTE }, null, 2)}\n`
+  );
+  return { ok: true, out: result.path as string };
+}
+
+function prettyCanonical(value: unknown): string {
+  return `${JSON.stringify(JSON.parse(canonicalJson(value)), null, 2)}\n`;
+}
+
+function asList(value: unknown, label: string): unknown[] {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) throw new TypeError(`${label} must be a JSON array.`);
+  return value;
+}
+
+/** `ds pack`: document + optional sources and history into one bundle JSON file. */
+async function runPack(args: DsCommandArgs, io: DsIo): Promise<DsResult> {
+  const stdout = io.stdout ?? process.stdout;
+  const stderr = io.stderr ?? process.stderr;
+  const cwd = io.cwd ?? process.cwd();
+  const at = (path: string) => resolve(cwd, path);
+  const document = await readJsonFile(at(args.args[0] as string));
+  const sources = args.flags.sources
+    ? asList(await readJsonFile(at(args.flags.sources)), '--sources')
+    : [];
+  const history = args.flags.history
+    ? asList(await readJsonFile(at(args.flags.history)), '--history')
+    : [];
+  const packed = packBundle({
+    document,
+    librarySources: sources as { id: string; version: string; source: string; language?: string }[],
+    history: history as {
+      version: string;
+      contentHash: string;
+      changelog?: string;
+      approvedAt?: string;
+      approvedBy?: string;
+      status?: 'approved' | 'draft';
+    }[],
+  });
+  if (!packed.ok) {
+    stdout.write(
+      `${JSON.stringify({ ok: false, operation: 'ds.pack', errors: packed.errors }, null, 2)}\n`
+    );
+    process.exitCode = 1;
+    return { ok: false, error: `Refused: ${JSON.stringify(packed.errors)}` };
+  }
+  const files = localFiles(io.cwd ? { cwd: io.cwd } : {});
+  const written = await files.write(args.flags.out as string, prettyCanonical(packed.bundle), {
+    overwrite: args.overwrite,
+  });
+  if (!written.ok) {
+    stderr.write(`${written.error} (${written.code})\n`);
+    process.exitCode = 1;
+    return { ok: false, error: written.error };
+  }
+  stdout.write(
+    `${JSON.stringify({ ok: true, operation: 'ds.pack', out: written.relative, bytes: written.bytes }, null, 2)}\n`
+  );
+  return { ok: true, out: written.relative };
+}
+
+/** `ds unpack`: validate a bundle and write (or print) its parts. Sources are never executed. */
+async function runUnpack(args: DsCommandArgs, io: DsIo): Promise<DsResult> {
+  const stdout = io.stdout ?? process.stdout;
+  const stderr = io.stderr ?? process.stderr;
+  const cwd = io.cwd ?? process.cwd();
+  const unpacked = unpackBundle(await readJsonFile(resolve(cwd, args.args[0] as string)));
+  if (!unpacked.ok) {
+    stdout.write(
+      `${JSON.stringify({ ok: false, operation: 'ds.unpack', errors: unpacked.errors }, null, 2)}\n`
+    );
+    process.exitCode = 1;
+    return { ok: false, error: `Refused: ${JSON.stringify(unpacked.errors)}` };
+  }
+  const body = {
+    document: unpacked.document,
+    allowManifest: unpacked.allowManifest,
+    librarySources: unpacked.librarySources,
+    history: unpacked.history,
+  };
+  const out = args.flags.out;
+  if (out === undefined) {
+    stdout.write(`${JSON.stringify({ ok: true, operation: 'ds.unpack', ...body }, null, 2)}\n`);
+    return { ok: true };
+  }
+  const files = localFiles(io.cwd ? { cwd: io.cwd } : {});
+  const written = await files.write(out, prettyCanonical(body), { overwrite: args.overwrite });
+  if (!written.ok) {
+    stderr.write(`${written.error} (${written.code})\n`);
+    process.exitCode = 1;
+    return { ok: false, error: written.error };
+  }
+  stdout.write(
+    `${JSON.stringify({ ok: true, operation: 'ds.unpack', out: written.relative, bytes: written.bytes }, null, 2)}\n`
+  );
+  return { ok: true, out: written.relative };
+}
+
+/** `ds hash`: the content hashes, checked against the stored ones; exit 1 on a mismatch. */
+async function runHash(args: DsCommandArgs, io: DsIo): Promise<DsResult> {
+  const stdout = io.stdout ?? process.stdout;
+  const cwd = io.cwd ?? process.cwd();
+  const report = hashReport(await readJsonFile(resolve(cwd, args.args[0] as string)));
+  stdout.write(`${JSON.stringify({ operation: 'ds.hash', ...report }, null, 2)}\n`);
+  if (!report.ok) {
+    process.exitCode = 1;
+    return { ok: false, error: 'A stored contentHash does not match the document.' };
+  }
+  return { ok: true };
 }

@@ -178,12 +178,12 @@ export const createDesignSystemPrompt: McpPrompt = {
   name: 'create-design-system',
   title: 'Create a design system from a brief',
   description:
-    'Turn a brand brief (colors, fonts, mood, an existing token file or a library theme) into a validated Texuli design-system document: start from an importer or a suggestion, write the sections, validate with ds.validate and fix every code until it passes, then report contrast and a preview. Returns the step-by-step loop with the brief filled in.',
+    'Turn a brand brief, token file, stylesheet, logo pixels or library theme into a proposed Texuli design-system draft. The agent may inspect reference screenshots with its own vision and translate observations into proposed generator inputs; screenshots are never silently imported. Review the generator loss and repair report, validate the draft, then report contrast and a preview. Approval stays human.',
   arguments: [
     {
       name: 'brief',
       description:
-        'The brand in plain words: name, colors, fonts, shape, density, mood, audience, e.g. "Harborline: teal #0e7490, Inter, rounded, calm".',
+        'The brand in plain words: name, colors, fonts, shape, density, mood, audience, e.g. "Harborline: teal #0e7490, Inter, rounded, calm". If screenshots are supplied, inspect them yourself and use only your observations to propose generator inputs.',
       required: true,
     },
     {
@@ -197,9 +197,26 @@ export const createDesignSystemPrompt: McpPrompt = {
       description: 'The contrast target: AA (4.5:1 text, the default) or AAA (7:1 text).',
       enum: ['AA', 'AAA'],
     },
+    {
+      name: 'locked',
+      description:
+        'Lock the design system to the components it allows (ADR-032): minimal (a documented core), all (every catalog component) or custom (the components the brief names). Omit for an unlocked document.',
+      enum: ['minimal', 'all', 'custom'],
+    },
   ],
   render(args) {
     const contrast = args.contrast ?? 'AA';
+    const locked = args.locked;
+    const allowCall =
+      locked === 'custom'
+        ? 'call `ds.allow` with { "components": [the catalog ids the brief needs] } (find ids with `catalog.search`)'
+        : `call \`ds.allow\` with { "preset": "${locked ?? 'minimal'}" }`;
+    const lockStep = locked
+      ? `
+4. Lock it. ${allowCall} and put its allow under "allow": a component not listed is not allowed, an omitted list allows every value the catalog lists, an empty list allows none; narrow variants, sizes, tones, densities and states to what the brand uses. Declare the brand's own components under "library", each { "id", "name", "purpose", "version", "status": "draft", "composes": [allowed catalog ids] }. Add "approval": { "status": "draft", "version": <the document version> }.
+5. Approval stays human. Never set "status": "approved" on the document or a library entry, and never write approvedBy, approvedAt or contentHash: ds.save refuses an approved document (approval-human-only). Tell the user the next step is a person's: review the file, run \`texuli ds approve <file> --by <name>\` and commit it for the CODEOWNERS review (the CLI cannot prove who approved; the reviewed commit is the guarantee).`
+      : '';
+    const n = (step: number) => (locked ? step + 2 : step);
     const base = args.base
       ? `Extend the library theme "${args.base}": set "extends": "texuli:${args.base}" and override only what the brief changes (texuli://design-system/${args.base} is that base as a document).`
       : 'If a library theme is close to the brief (`theme.search`, then `theme.preview`), extend it with "extends": "texuli:<id>"; otherwise start from the brand colors alone.';
@@ -215,13 +232,13 @@ Contrast target: ${contrast}.
 Follow this loop and show your work at each step.
 
 1. Learn the shape. Read texuli://design-system/acme (every section, fictional) and texuli://design-system/minimal (the smallest valid document). Every object is closed; lengths are numbers in px; colors are #hex or numeric oklch(); nothing is raw CSS.
-2. Start. If the brand already has a token file, call \`ds.import\` with from "dtcg", "tokens-studio", "role-palette" or "theme". If you have colors or a logo, call \`ds.suggest\` with seed, colors (seed, secondary, accent) or pixels. Otherwise call \`ds.import\` with from "brand" and a one-liner built from the brief ("name …, brand #…, font …, rounded, compact, calm"). Read every warning: each names a value that was dropped.
-3. Write. ${base} Set the identity (format "texuli/design-system", formatVersion 1, a lowercase id, a semver version, a name), accessibility.contrast "${contrast}", then only the sections the brief asks for: typography families and scale, shape.radius, space.density, elevation, surface, motion.personality, components defaults. Pin a role (color.roles.light.primary …) only when the brand requires that exact color.
-4. Validate. Call \`ds.validate\` with { "document": <your document> } and fix every error by its code and path until valid is true: unknown-key (remove the key; the hint lists the allowed ones), invalid-type and invalid-value (fix the value at the path), required (add the identity field or color.brand.seed), extends-range (an exact id@x.y.z or texuli:<theme>), url-refused (a same-origin relative path, never a remote URL or a data: URL), aa-text and aa-focus (the pairs and the hint name the pinned colors that fail: unpin one or pick a darker or lighter pin), aa-non-text (the sidebar's active fill below 3:1 on the sidebar: leave color.roles.<mode>.sidebarPrimary out so it is derived, or pin one that stands out), target-size (a component size at or above accessibility.targetMin). Never deliver a document that has not passed.
-5. Check. Call \`ds.contrast\` and report the failing count per mode (it must be 0) and the solver adjustments. Call \`ds.preview\` (format "svg") for a snapshot to show.
-6. Deliver the document as JSON, the codes you fixed, and how the host uses it: \`ds.compile\` with format "css" or "tailwind" for a stylesheet, \`blueprint.theme\` to put it on a blueprint, \`ds.save\` (local server only) or \`texuli ds init\` and \`texuli ds validate\` in a project.
+2. Propose inputs. If reference screenshots are available, inspect them using your own vision capabilities and describe the observed palette, typography, spacing, shape and mood as a brand brief. Screenshots are not an importer input: never claim they were read by a tool or silently imported. Use \`ds.generate\` with any available brief, DTCG or Tokens Studio JSON, CSS text, logo pixels or Texuli theme. It combines inputs into a draft and reports dropped or overwritten values as losses, automatic AA changes as repairs, and the guarantee result. Review every loss and repair; inputs are bounded and are not fetched or executed. Existing \`ds.import\` and \`ds.suggest\` remain available for focused imports or palette suggestions.
+3. Review and write. ${base} Treat generated content as a draft, set or confirm identity and accessibility.contrast "${contrast}", then adjust only sections the brief asks for: typography families and scale, shape.radius, space.density, elevation, surface, motion.personality, components defaults. Pin a role (color.roles.light.primary …) only when the brand requires that exact color.${lockStep}
+${n(4)}. Validate. Call \`ds.validate\` with { "document": <your document> } and fix every error by its code and path until valid is true: unknown-key (remove the key; the hint lists the allowed ones), invalid-type and invalid-value (fix the value at the path), required (add the identity field or color.brand.seed), extends-range (an exact id@x.y.z or texuli:<theme>), url-refused (a same-origin relative path, never a remote URL or a data: URL), aa-text and aa-focus (the pairs and the hint name the pinned colors that fail: unpin one or pick a darker or lighter pin), aa-non-text (the sidebar's active fill below 3:1 on the sidebar: leave color.roles.<mode>.sidebarPrimary out so it is derived, or pin one that stands out), target-size (a component size at or above accessibility.targetMin). Never deliver a document that has not passed.
+${n(5)}. Check. Call \`ds.contrast\` and report the failing count per mode (it must be 0) and the solver adjustments. Call \`ds.preview\` (format "svg") for a snapshot to show.
+${n(6)}. Deliver the document as JSON, the codes you fixed, and how the host uses it: \`ds.compile\` with format "css" or "tailwind" for a stylesheet, \`blueprint.theme\` to put it on a blueprint, \`ds.save\` (local server only) or \`texuli ds init\` and \`texuli ds validate\` in a project.
 
-Rules: data only (no CSS strings, scripts or remote URLs), fictional names and example.com, no network, and never claim a document passes without a \`ds.validate\` result that says so.`),
+Rules: data only (no CSS strings, scripts or remote URLs), fictional names and example.com, no network, and never claim a document passes without a \`ds.validate\` result that says so${locked ? ', or that it is approved' : ''}.`),
       ],
     };
   },

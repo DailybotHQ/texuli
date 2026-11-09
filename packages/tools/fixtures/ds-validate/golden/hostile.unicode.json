@@ -1,0 +1,54 @@
+{
+  "ok": false,
+  "codes": ["content-hash-mismatch", "invalid-value", "unknown-component", "unknown-variant"],
+  "findings": [
+    {
+      "code": "invalid-value",
+      "severity": "error",
+      "area": "structure",
+      "path": "$.id"
+    },
+    {
+      "code": "invalid-value",
+      "severity": "error",
+      "area": "structure",
+      "path": "$.name"
+    },
+    {
+      "code": "invalid-value",
+      "severity": "error",
+      "area": "structure",
+      "path": "$.allow[\"butto\u200dn\"]"
+    },
+    {
+      "code": "invalid-value",
+      "severity": "error",
+      "area": "structure",
+      "path": "$.allow.card.variants[0]"
+    },
+    {
+      "code": "invalid-value",
+      "severity": "error",
+      "area": "approval",
+      "path": "$.approval.approvedBy"
+    },
+    {
+      "code": "unknown-component",
+      "severity": "error",
+      "area": "allow",
+      "path": "$.allow[\"butto\u200dn\"]"
+    },
+    {
+      "code": "unknown-variant",
+      "severity": "error",
+      "area": "allow",
+      "path": "$.allow.card.variants[0]"
+    },
+    {
+      "code": "content-hash-mismatch",
+      "severity": "error",
+      "area": "approval",
+      "path": "$.approval.contentHash"
+    }
+  ]
+}

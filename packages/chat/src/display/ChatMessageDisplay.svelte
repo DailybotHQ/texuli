@@ -38,6 +38,7 @@ let roleLabel = $derived(CHAT_DISPLAY_ROLE_LABELS[role] ?? '');
 </script>
 
 <article
+  data-tx-component="chat-message"
   class="tx-chat-display-message"
   data-role={role}
   data-tx-chat-display-message

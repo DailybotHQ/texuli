@@ -56,4 +56,4 @@ function onInput(event: Event & { currentTarget: EventTarget & HTMLTextAreaEleme
   data-tx-autosize={autosize ? 'true' : undefined}
   {...rest}
   oninput={onInput}
-></textarea>
+ data-tx-component="textarea"></textarea>

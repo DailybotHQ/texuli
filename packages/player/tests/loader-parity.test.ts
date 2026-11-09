@@ -23,6 +23,7 @@ export const NOT_PAINTED: Readonly<Record<string, string>> = Object.freeze({
     'Planned: form inputs become emittable once audited with spec 0.3.0 bind and on; action-form and form-field paint forms today.',
   display:
     'Planned: app-tier display components (button, badge, alert…) become emittable once audited; blocks-* paint content today.',
+  chat: 'The composer is host chrome (player design §8): a blueprint never supplies one. chat-thread and chat-message paint transcripts.',
 });
 
 const build = await buildCatalog(await discoverManifestGroups());

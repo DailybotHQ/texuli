@@ -1,0 +1,22 @@
+{
+  "description": "A remote logo URL.",
+  "code": "url-refused",
+  "expect": "fail",
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "color": {
+      "brand": {
+        "seed": "#0e7490"
+      }
+    },
+    "assets": {
+      "logo": {
+        "light": "https://example.com/logo.png"
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+---
+/**
+ * The Workflows landing hero: the shared SolutionHero with the workflows registry entry
+ * and the copy in `hero-content.ts`. The art is the entry's `solution-workflows-hero`
+ * plate; until that slot and its WebP land, the hero paints the texel mosaic. The
+ * `page-workflows` banner (3:1) is not reused here: the hero column is a 6:5 plate and a
+ * banner would letterbox.
+ */
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionHero from '../../shared/hero/SolutionHero.astro';
+import { WORKFLOWS_HERO } from './hero-content.ts';
+
+const entry = getSolution('workflows');
+---
+
+<SolutionHero entry={entry} {...WORKFLOWS_HERO} />

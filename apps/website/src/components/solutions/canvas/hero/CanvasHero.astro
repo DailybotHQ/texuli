@@ -1,0 +1,14 @@
+---
+/**
+ * Canvas landing hero: the shared static SolutionHero with the canvas registry entry.
+ * Its entry selects the `solution-canvas-hero` plate; the texel mosaic is the fallback
+ * until the art slot is registered.
+ */
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionHero from '../../shared/hero/SolutionHero.astro';
+import { CANVAS_HERO } from './hero-content.ts';
+
+const entry = getSolution('canvas');
+---
+
+<SolutionHero entry={entry} {...CANVAS_HERO} />

@@ -64,7 +64,7 @@ const tabs = $derived(active?.children ?? []);
   bind:this={root}
   class={cx('tx-app-layout', 'tx-app-layout--top-nav', className)}
   data-tx-app-layout="top-nav"
->
+ data-tx-component="layout-top-nav">
   <LayoutChrome part="skip" {mainId} {nav} {skipLabel} />
   <header class="tx-app-layout__top-header">
     <div class="tx-app-layout__top-row">

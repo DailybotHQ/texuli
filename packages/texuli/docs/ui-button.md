@@ -2,7 +2,7 @@
 
 **Package:** `texuli`  
 **Import:** `import { Button, IconButton, ButtonGroup } from 'texuli/button'`  
-**Tests:** `packages/texuli/tests/forms.test.ts`, `packages/texuli/tests/contracts.test.ts`  
+**Tests:** `packages/texuli/tests/forms.test.ts`, `packages/texuli/tests/contracts.test.ts`, `packages/texuli/tests/button-tone.test.ts`  
 **Example:** `texuli-button` (`packages/examples/src/button/`)
 
 ## Contract
@@ -18,6 +18,24 @@ Styled controls on the `--tx-*` token contract and `@layer tx.components`:
 ### Variants
 
 `default` · `secondary` · `outline` · `ghost` · `destructive` · `link`
+
+The `destructive` variant is a filled destructive button. It still works when
+`tone` is omitted.
+
+### Tone
+
+`default` · `destructive` · `success` · `warning`
+
+Tone is independent of variant and token-driven (`--tx-destructive`,
+`--tx-success`, `--tx-warning`). It composes with `default`, `secondary`,
+`outline`, `ghost` and `link`, so an outline destructive button is
+`variant="outline" tone="destructive"`. The root carries `data-tx-tone`.
+A design-system `allow` list can enable or refuse each tone.
+
+```svelte
+<Button variant="outline" tone="destructive" label="Delete" />
+<Button variant="destructive" label="Delete" />
+```
 
 ### Sizes
 

@@ -1,0 +1,287 @@
+// @vitest-environment node
+/**
+ * Agent evals for the shipped Solutions: "build a slide deck / document / workflow / canvas
+ * / sheet". Each scenario is what an agent that starts from texuli.com would do, scripted
+ * with no model and no network:
+ *
+ * 1. read `/llms.txt` and follow its Solutions section to `/solutions/index.json`;
+ * 2. find the Solution in the index (status, packages, docs URL);
+ * 3. read the docs page through the remote MCP's `site.read` (`functions/mcp.ts` with a
+ *    fake site built from the committed sources, see `solutions-site.ts`);
+ * 4. build with the MCP operations that exist, on both doors (local stdio and the remote
+ *    Function), and check the result with the server's own validators.
+ *
+ * Canvas and Sheets have no MCP validator: `blueprint.validate` refuses their nodes with a
+ * stable code, and the scenario checks that the agent is pointed to the package that holds
+ * the validator instead. That is the honest path today.
+ */
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { describe, expect, it } from 'vitest';
+import { SOLUTIONS } from '../../../apps/website/src/data/solutions/index.ts';
+import type { SolutionSlug } from '../../../apps/website/src/data/solutions/schema.ts';
+import { onRequest } from '../../../functions/mcp.ts';
+import { assertEdgeParity, type Json, runSession, type Session } from '../harness.ts';
+import { llmsSection, SITE, solutionsSite } from './solutions-site.ts';
+
+const REPO = resolve(import.meta.dirname, '../../..');
+const call = (name: string, args: Json) => ({ name, arguments: args });
+
+/** Steps 1–3: llms.txt → index.json → the docs page over the remote MCP. */
+async function discover(slug: SolutionSlug) {
+  const site = solutionsSite();
+  const get = async (url: string) => {
+    expect(url.startsWith(`${SITE}/`), url).toBe(true);
+    const response = await site.fetch(new Request(url));
+    expect(response.status, url).toBe(200);
+    return response.text();
+  };
+
+  // 1. llms.txt names the index and the Solution.
+  const llms = await get(`${SITE}/llms.txt`);
+  const links = llmsSection(llms, 'Solutions');
+  const indexLink = links.find((link) => link.title === 'Solutions index (JSON)');
+  expect(indexLink?.url).toBe(`${SITE}/solutions/index.json`);
+
+  // 2. The index holds the Solution's facts.
+  const index = JSON.parse(await get(indexLink?.url ?? '')) as Json;
+  expect(index.format).toBe('texuli/solutions-index-v1');
+  const entry = index.solutions.find((s: Json) => s.slug === slug);
+  expect(entry, `${slug} in the index`).toBeDefined();
+  expect(links.map((link) => link.url)).toContain(entry.url);
+  expect(entry.docs).toBe(`${SITE}/guides/solutions/${slug}/`);
+  // Honest status: in development, native planned.
+  expect(['available', 'in development', 'experimental', 'planned']).toContain(entry.status);
+  for (const platform of entry.platforms)
+    if (platform.platform !== 'web') expect(platform.status).toBe('planned');
+
+  // 3. The docs page, read the way a remote agent reads it.
+  const docsPath = new URL(entry.docs).pathname;
+  const response = await onRequest({
+    request: new Request(`${SITE}/mcp`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        accept: 'application/json, text/event-stream',
+        'cf-connecting-ip': '203.0.113.200',
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'tools/call',
+        params: call('site.read', { path: docsPath }),
+      }),
+    }),
+    env: { ASSETS: site },
+  });
+  expect(response.status).toBe(200);
+  const rpc = (await response.json()) as Json;
+  expect(rpc.result.isError ?? false, JSON.stringify(rpc.result).slice(0, 300)).toBe(false);
+  const docs = rpc.result.structuredContent;
+  expect(docs.path).toBe(docsPath);
+  // The docs name every package the index lists.
+  for (const pkg of entry.packages) expect(docs.markdown, pkg.name).toContain(pkg.name);
+  expect(site.requested).toEqual(
+    expect.arrayContaining([
+      '/llms.txt',
+      '/solutions/index.json',
+      `${docsPath.replace(/\/$/, '')}.md`,
+    ])
+  );
+  return { entry, docs: docs.markdown as string };
+}
+
+/** Step 4 on both doors, with the edge results compared between them. */
+async function build(session: Session) {
+  const stdio = await runSession(session, 'stdio');
+  const remote = await runSession(session, 'remote');
+  const compared = assertEdgeParity(session.name, stdio, remote);
+  expect(compared).toBeGreaterThan(0);
+}
+
+const DECK_MARKDOWN = `---
+title: Example Co. quarterly review
+---
+
+# Quarterly review
+
+What shipped and what is next for Example Co.
+
+---
+
+# Highlights
+
+- Fictional launch on time
+- Docs ready on day one
+`;
+
+const DOCUMENT_MARKDOWN = `# Example Co. launch brief
+
+A fictional brief for the next release.
+
+## Goals
+
+- Ship the reader
+- Keep the editor fast
+`;
+
+/** The workflow graph the spec ships as its golden example (fictional). */
+const PIPELINE = JSON.parse(
+  readFileSync(resolve(REPO, 'packages/spec/fixtures/workflow/golden/pipeline.json'), 'utf8')
+) as Json;
+
+describe('agent builds each shipped Solution from llms.txt → index → docs → MCP', () => {
+  it('covers every Solution in the registry', () => {
+    expect(SOLUTIONS.map((s) => s.slug).sort()).toEqual(
+      ['canvas', 'documents', 'sheets', 'slides', 'workflows'].sort()
+    );
+  });
+
+  it('build a slide deck: deck.run from-markdown → lint → to-markdown', async () => {
+    const { entry, docs } = await discover('slides');
+    expect(entry.packages.map((p: Json) => p.name)).toEqual(['@texuli/deck', '@texuli/slides']);
+    expect(docs).toMatch(/Markdown/);
+    await build({
+      name: 'slides deck',
+      steps: [
+        {
+          label: 'convert',
+          method: 'tools/call',
+          params: call('deck.run', { command: 'from-markdown', markdown: DECK_MARKDOWN }),
+          expect(result) {
+            const out = result.structuredContent.result;
+            expect(out.ok).toBe(true);
+            expect(out.deck.formatVersion).toBe(2);
+            expect(out.deck.slides.length).toBe(2);
+          },
+        },
+        {
+          label: 'lint',
+          method: 'tools/call',
+          params: (ctx) =>
+            call('deck.run', { command: 'lint', deck: ctx.data('convert').result.deck }),
+        },
+        {
+          label: 'back',
+          method: 'tools/call',
+          params: (ctx) =>
+            call('deck.run', { command: 'to-markdown', deck: ctx.data('convert').result.deck }),
+          expect(result) {
+            expect(JSON.stringify(result.structuredContent)).toContain('Quarterly review');
+          },
+        },
+      ],
+      final(ctx) {
+        expect(ctx.data('convert').result.issues).toEqual([]);
+      },
+    });
+  });
+
+  it('build a document: document.run from-markdown → validate', async () => {
+    const { entry, docs } = await discover('documents');
+    expect(entry.packages.map((p: Json) => p.name)).toContain('@texuli/document');
+    expect(docs).toMatch(/document/i);
+    await build({
+      name: 'documents brief',
+      steps: [
+        {
+          label: 'convert',
+          method: 'tools/call',
+          params: call('document.run', { command: 'from-markdown', markdown: DOCUMENT_MARKDOWN }),
+          expect(result) {
+            const out = result.structuredContent.result;
+            expect(out.ok).toBe(true);
+            expect(out.document.format).toBe('texuli-document');
+            expect(out.document.blocks.length).toBeGreaterThan(2);
+          },
+        },
+        {
+          label: 'validate',
+          method: 'tools/call',
+          params: (ctx) =>
+            call('document.run', {
+              command: 'validate',
+              document: ctx.data('convert').result.document,
+            }),
+        },
+      ],
+      final(ctx) {
+        expect(ctx.data('validate').result.ok).toBe(true);
+        expect(ctx.data('validate').result.issues).toEqual([]);
+      },
+    });
+  });
+
+  it('build a workflow: catalog.search → blueprint.validate a workflow-graph page', async () => {
+    const { entry, docs } = await discover('workflows');
+    expect(entry.packages.map((p: Json) => p.name)).toContain('@texuli/workflows');
+    expect(docs).toMatch(/workflow/i);
+    await build({
+      name: 'workflows graph',
+      steps: [
+        {
+          label: 'search',
+          method: 'tools/call',
+          params: call('catalog.search', { query: 'workflow graph' }),
+          expect(result) {
+            expect(JSON.stringify(result.structuredContent)).toContain('workflow-graph');
+          },
+        },
+        {
+          label: 'validate',
+          method: 'tools/call',
+          params: call('blueprint.validate', {
+            draft: {
+              id: 'layout-page',
+              props: { title: 'Example Co. release pipeline' },
+              children: [
+                {
+                  id: 'workflow-graph',
+                  props: { label: 'Release pipeline', mode: 'view', graph: PIPELINE },
+                },
+              ],
+            },
+          }),
+        },
+      ],
+      final(ctx) {
+        expect(ctx.data('validate').valid).toBe(true);
+        expect(ctx.data('validate').diagnostics).toEqual([]);
+      },
+    });
+  });
+
+  for (const [slug, id, code, pkg] of [
+    ['canvas', 'canvas', 'canvas-unchecked', '@texuli/canvas'],
+    ['sheets', 'spreadsheet', 'sheet-unchecked', '@texuli/sheets'],
+  ] as const) {
+    it(`build a ${slug === 'canvas' ? 'canvas' : 'sheet'}: blueprint.validate refuses the node (${code}), so the agent uses ${pkg}`, async () => {
+      const { entry, docs } = await discover(slug);
+      expect(entry.packages.map((p: Json) => p.name)).toContain(pkg);
+      // The docs tell the agent where the model and its validator live.
+      expect(docs).toContain(pkg);
+      const prop = id === 'canvas' ? 'canvas' : 'sheet';
+      await build({
+        name: `${slug} refusal`,
+        steps: [
+          {
+            label: 'validate',
+            method: 'tools/call',
+            params: call('blueprint.validate', {
+              draft: {
+                id: 'layout-page',
+                props: { title: 'Example Co.' },
+                children: [{ id, props: { label: 'Example', [prop]: {} } }],
+              },
+            }),
+          },
+        ],
+        final(ctx) {
+          const result = ctx.data('validate');
+          expect(result.valid).toBe(false);
+          expect(result.diagnostics.map((d: Json) => d.code)).toContain(code);
+        },
+      });
+    });
+  }
+});

@@ -1,0 +1,54 @@
+---
+/**
+ * SolutionRelated: the other Solutions from the registry, in catalog order, each with its
+ * tagline and status. A card links only when that Solution's landing page exists, so the
+ * block never links a route that has not shipped. Static markup, no island.
+ */
+import { SOLUTIONS } from '../../../../data/solutions/index.ts';
+import type { SolutionEntry } from '../../../../data/solutions/schema.ts';
+import './resources.css';
+import { liveSolutionRoutes, relatedSolutions } from './resources-model.ts';
+
+interface Props {
+  entry: SolutionEntry;
+  /** Defaults to "More Solutions". */
+  title?: string;
+}
+
+const { entry, title = 'More Solutions' } = Astro.props;
+const pages = Object.keys(import.meta.glob('../../../../pages/solutions/*/index.astro'));
+const related = relatedSolutions(
+  entry,
+  SOLUTIONS,
+  liveSolutionRoutes(pages),
+  import.meta.env.BASE_URL
+);
+const headingId = `solution-related-${entry.slug}`;
+---
+
+<section
+  class="solution-res solution-related"
+  aria-labelledby={headingId}
+  data-tx-solution-related={entry.slug}
+>
+  <div class="solution-res__inner">
+    <div class="solution-res__head">
+      <h2 id={headingId}>{title}</h2>
+    </div>
+    <ul class="solution-res__grid" role="list">
+      {
+        related.map((other) => (
+          <li class="solution-res__card" data-tx-related={other.slug}>
+            <h3>{other.href ? <a href={other.href}>{other.name}</a> : other.name}</h3>
+            <p>{other.tagline}</p>
+            <p class="solution-res__status" data-status={other.status}>
+              <span class="solution-res__dot" aria-hidden="true" />
+              <span class="solution-res__sr">Status: </span>
+              {other.status}
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

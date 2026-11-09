@@ -181,6 +181,7 @@ $effect(() => () => disposeSystem?.());
 <article
   bind:this={element}
   class={['tx-pages', 'tx-pages-reader', className]}
+  data-tx-component="document"
   data-tx-pages-design-system={systemStatus}
   aria-label={title || labels.reader}
   {...(doc.meta.locale ? { lang: doc.meta.locale } : {})}

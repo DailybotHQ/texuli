@@ -15,6 +15,11 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The packages are on npm at `0.15.0`, a `0.x` minor with no breaking API
+  change: locked design systems (blueprint spec `0.13.0`), the typography
+  components and button tone. The components install reference marks them
+  new in `0.15.0` and names what is still in development.
+
 ## [0.3.24] — 2026-11-08
 
 ### Changes

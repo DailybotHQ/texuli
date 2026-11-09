@@ -83,7 +83,7 @@ function onMove(move: SortableMove): boolean {
   </Sortable.List>
 {/snippet}
 
-<div class="tx-player-sortable" data-axis={info?.axis ?? 'vertical'}>
+<div class="tx-player-sortable" data-tx-component="sortable-list" data-axis={info?.axis ?? 'vertical'}>
   {#if scope}
     {#if info}
       {@render list()}

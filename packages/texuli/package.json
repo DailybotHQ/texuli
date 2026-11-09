@@ -1,6 +1,6 @@
 {
   "name": "texuli",
-  "version": "0.14.4",
+  "version": "0.15.0",
   "private": true,
   "description": "Styled Texuli components, layouts and shells.",
   "keywords": [
@@ -89,6 +89,11 @@
       "types": "./src/design-system/index.ts",
       "svelte": "./src/design-system/index.ts",
       "default": "./src/design-system/index.ts"
+    },
+    "./ds-kit": {
+      "types": "./src/ds-kit/index.ts",
+      "svelte": "./src/ds-kit/index.ts",
+      "default": "./src/ds-kit/index.ts"
     },
     "./dialog": {
       "types": "./src/components/dialog/index.ts",
@@ -403,15 +408,20 @@
       "types": "./src/components/tree/index.ts",
       "svelte": "./src/components/tree/index.ts",
       "default": "./src/components/tree/index.ts"
+    },
+    "./typography": {
+      "types": "./src/components/typography/index.ts",
+      "svelte": "./src/components/typography/index.ts",
+      "default": "./src/components/typography/index.ts"
     }
   },
   "scripts": {
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/core": "0.14.4",
-    "@texuli/primitives": "0.14.4",
-    "@texuli/tokens": "0.14.4"
+    "@texuli/core": "0.15.0",
+    "@texuli/primitives": "0.15.0",
+    "@texuli/tokens": "0.15.0"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

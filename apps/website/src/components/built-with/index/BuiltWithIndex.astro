@@ -1,0 +1,320 @@
+---
+/**
+ * The `/built-with/` index: a hero (h1, lede, decorative texel mosaic until the
+ * `page-built-with` art is registered), then one section per group (the Texuli team, the
+ * community) with a card per listed product: name, summary, status badge, offerings with
+ * their own badges, a link to the case study when it exists and the product's own site.
+ * Copy and views live in `index-content.ts`. Static markup, no island; internal links pass
+ * the URL policy with the site base, the external site passes it at the developer tier.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../foundation/site.ts';
+import { illustrationFor } from '../../landing/illustrations.ts';
+import SiteIllustration from '../../landing/SiteIllustration.astro';
+import TexelMark from '../../sections/home/TexelMark.astro';
+import StatusBadge from '../../solutions/shared/platforms/StatusBadge.astro';
+import { BUILT_WITH_PAGE, builtWithGroups } from './index-content.ts';
+
+const base = import.meta.env.BASE_URL;
+const page = BUILT_WITH_PAGE;
+const groups = builtWithGroups();
+const resolveHref = (href: string): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  return safe === undefined ? undefined : withBase(base, safe);
+};
+const tiles = Array.from({ length: 24 }, (_, index) => ((index * 5 + 2) % 9) % 5);
+const artRegistered = illustrationFor(page.hero.art) !== undefined;
+---
+
+<div class="built-with" data-tx-built-with-index="">
+  <header class="built-with__hero" aria-labelledby={page.hero.id}>
+    <div class="built-with__inner built-with__hero-grid">
+      <div class="built-with__hero-copy">
+        <p class="built-with__eyebrow">
+          <TexelMark count={3} />
+          <span>{page.hero.eyebrow}</span>
+        </p>
+        <h1 id={page.hero.id}>{page.hero.title}</h1>
+        <p class="built-with__lede">{page.hero.lede}</p>
+      </div>
+      <div class="built-with__art">
+        {
+          artRegistered ? (
+            <SiteIllustration art={page.hero.art} />
+          ) : (
+            <div class="built-with__mosaic" aria-hidden="true" data-art-fallback="page-built-with">
+              {tiles.map((tone) => (tone === 0 ? <i /> : <i class={`t${tone}`} />))}
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </header>
+
+  {
+    groups.map(({ group, cards }) => {
+      const meta = page.groups[group];
+      return (
+        <section class="built-with__group" aria-labelledby={meta.id} data-group={group}>
+          <div class="built-with__inner">
+            <h2 id={meta.id}>{meta.title}</h2>
+            {cards.length === 0 ? (
+              <p class="built-with__empty">{meta.empty}</p>
+            ) : (
+              <ul class="built-with__cards" role="list">
+                {cards.map((card) => (
+                  <li class="built-with__card" data-product={card.id} data-status={card.status}>
+                    <div class="built-with__card-head">
+                      <h3>{card.name}</h3>
+                      <StatusBadge status={card.status} context={card.name} />
+                    </div>
+                    <p class="built-with__summary">{card.summary}</p>
+                    <ul class="built-with__offerings" role="list" aria-label={`${card.name} offerings`}>
+                      {card.offerings.map((offering) => (
+                        <li data-status={offering.status}>
+                          <span>{offering.label}</span>
+                          <StatusBadge status={offering.status} context={offering.label} />
+                        </li>
+                      ))}
+                    </ul>
+                    <div class="built-with__links">
+                      {card.caseStudy && (
+                        <a href={resolveHref(card.caseStudy)}>
+                          Read the case study<span aria-hidden="true">&nbsp;→</span>
+                        </a>
+                      )}
+                      {card.site && (
+                        <a href={card.site.href} rel="noopener">
+                          {card.site.label}
+                          <span aria-hidden="true">&nbsp;↗</span>
+                        </a>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </section>
+      );
+    })
+  }
+</div>
+
+<style>
+  .built-with {
+    --home-accent: #6d4aff;
+    --home-accent-text: #5b3ae6;
+    --home-accent-ink: #ffffff;
+    --home-ground: linear-gradient(160deg, #f4f0ff 0%, #fbf8ff 45%, #fff4ee 100%);
+    --home-tint: color-mix(in oklab, #6d4aff 6%, var(--tx-background));
+    --bw-accent: var(--home-accent-text);
+  }
+  :global(:root[data-tx-mode='dark']) .built-with {
+    --home-accent-text: #b9a8ff;
+    --home-ground:
+      radial-gradient(120% 90% at 85% 0%, rgb(109 74 255 / 0.22), transparent 60%),
+      var(--tx-background);
+    --home-tint: color-mix(in oklab, #6d4aff 10%, var(--tx-background));
+  }
+  :global(:root[data-tx-mode='high-contrast']) .built-with {
+    --home-accent: var(--tx-foreground);
+    --home-accent-text: var(--tx-foreground);
+    --home-ground: var(--tx-background);
+    --home-tint: var(--tx-background);
+  }
+  .built-with__inner {
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  .built-with__hero {
+    padding-block: clamp(2.5rem, 7vw, 5rem);
+    border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 60%, transparent);
+    background: var(--home-ground);
+  }
+  .built-with__hero-grid {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: center;
+  }
+  @media (min-width: 56rem) {
+    .built-with__hero-grid {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+    }
+  }
+  .built-with__hero-copy {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+  .built-with__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0;
+    padding-block: 0.3rem;
+    padding-inline: 0.85rem;
+    border: 1px solid color-mix(in oklab, var(--home-accent) 35%, transparent);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--home-accent) 8%, var(--tx-background));
+    color: var(--tx-foreground);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .built-with h1 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(2.75rem, 9vw, 5.25rem);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+  }
+  .built-with__art {
+    position: relative;
+    isolation: isolate;
+    min-inline-size: 0;
+  }
+  .built-with__art::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--home-accent) 22%, transparent),
+      transparent
+    );
+    pointer-events: none;
+  }
+  .built-with__lede {
+    margin: 0;
+    max-inline-size: 38rem;
+    color: var(--tx-muted-foreground);
+    font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+    line-height: 1.5;
+  }
+  .built-with__mosaic {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.4rem;
+    aspect-ratio: 3 / 2;
+    padding: clamp(0.75rem, 3vw, 1.25rem);
+    border: 1px solid color-mix(in oklab, var(--tx-border) 70%, transparent);
+    border-radius: 1rem;
+    background: var(--tx-background);
+  }
+  .built-with__mosaic i {
+    border-radius: 0.35rem;
+    background: color-mix(in oklab, var(--bw-accent) 6%, transparent);
+  }
+  .built-with__mosaic i.t1 {
+    background: color-mix(in oklab, var(--bw-accent) 18%, transparent);
+  }
+  .built-with__mosaic i.t2 {
+    background: color-mix(in oklab, var(--bw-accent) 35%, transparent);
+  }
+  .built-with__mosaic i.t3 {
+    background: color-mix(in oklab, var(--bw-accent) 60%, transparent);
+  }
+  .built-with__mosaic i.t4 {
+    background: var(--bw-accent);
+  }
+  .built-with__group {
+    padding-block: clamp(3rem, 8vw, 6rem);
+  }
+  .built-with__group + .built-with__group {
+    border-block-start: 1px solid color-mix(in oklab, var(--tx-border) 55%, transparent);
+  }
+  .built-with h2 {
+    margin: 0;
+    margin-block-end: 1.25rem;
+    color: var(--tx-foreground);
+    font-size: clamp(1.6rem, 4vw, 2.3rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+  .built-with__empty {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+  }
+  .built-with__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .built-with__card {
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    border-radius: 0.875rem;
+    background: var(--tx-background);
+  }
+  .built-with__card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .built-with h3 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: 1.3rem;
+    font-weight: 750;
+  }
+  .built-with__summary {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    line-height: 1.5;
+  }
+  .built-with__offerings {
+    display: grid;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.9rem;
+  }
+  .built-with__offerings li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.35rem 0.5rem;
+    color: var(--tx-foreground);
+  }
+  .built-with__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+  }
+  .built-with__links a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.5rem;
+    color: var(--bw-accent);
+    font-weight: 700;
+    text-underline-offset: 0.2em;
+  }
+  .built-with__links a:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  @media (forced-colors: active) {
+    .built-with__card {
+      border-color: CanvasText;
+    }
+    .built-with__mosaic,
+    .built-with__art::before {
+      display: none;
+    }
+  }
+</style>

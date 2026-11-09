@@ -25,6 +25,7 @@ let {
 }: CartesianChartProps = $props();
 </script>
 
+<div data-tx-component="charts-line" class="tx-chart-ds-root">
 <CartesianChart
   kind="line"
   {title}
@@ -47,3 +48,11 @@ let {
   {yDomain}
   {formatValue}
 />
+</div>
+
+<style>
+  /* The design-system root marker (ADR-032) adds no box. */
+  .tx-chart-ds-root {
+    display: contents;
+  }
+</style>

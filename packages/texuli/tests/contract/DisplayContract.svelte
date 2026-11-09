@@ -34,6 +34,7 @@ import {
 } from '../../src/components/separator-aspect/index.ts';
 import { Kpi, KpiRow, Stat } from '../../src/components/stat/index.ts';
 import { Timeline, TimelineItem } from '../../src/components/timeline/index.ts';
+import { Box, Heading, Prose, Text } from '../../src/components/typography/index.ts';
 import { MotionLoop } from '../../src/motion/loop/index.ts';
 import CustomIcon from '../fixtures/CustomIcon.svelte';
 
@@ -86,6 +87,10 @@ const k = (name: string) => `components/${name}`;
   <Kpi label="Users" value={12} {...p(k('stat/Kpi'))} bind:ref={refs[k('stat/Kpi')]} />
 </KpiRow>
 <Stat label="Revenue" value="$1" {...p(k('stat/Stat'))} bind:ref={refs[k('stat/Stat')]} />
+<Heading level={2} {...p(k('typography/Heading'))} bind:ref={refs[k('typography/Heading')]}>Title</Heading>
+<Text {...p(k('typography/Text'))} bind:ref={refs[k('typography/Text')]}>Body</Text>
+<Prose {...p(k('typography/Prose'))} bind:ref={refs[k('typography/Prose')]}><p>Long form</p></Prose>
+<Box {...p(k('typography/Box'))} bind:ref={refs[k('typography/Box')]}>Panel</Box>
 <Timeline {...p(k('timeline/Timeline'))} bind:ref={refs[k('timeline/Timeline')]}>
   <TimelineItem title="Created" {...p(k('timeline/TimelineItem'))} bind:ref={refs[k('timeline/TimelineItem')]} />
 </Timeline>

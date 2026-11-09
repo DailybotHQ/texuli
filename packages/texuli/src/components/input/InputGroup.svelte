@@ -85,7 +85,7 @@ function clear() {
   data-tx-disabled={disabled ? 'true' : undefined}
   data-tx-invalid={invalid ? 'true' : undefined}
   {...children ? { ...rest, id } : split.wrapper}
->
+ data-tx-component="input-group">
   {#if start}
     <span class="tx-input-group__adornment" data-tx-slot="start">
       {@render start()}

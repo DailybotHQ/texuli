@@ -1,0 +1,13 @@
+{
+  "ok": false,
+  "codes": ["css-arbitrary-value"],
+  "findings": [
+    {
+      "code": "css-arbitrary-value",
+      "severity": "error",
+      "area": "prototype-css",
+      "path": "src/Page.svelte:85",
+      "value": "w-[37px]"
+    }
+  ]
+}

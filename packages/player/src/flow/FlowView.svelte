@@ -11,6 +11,7 @@ let active = $derived(access?.view() === name);
 {#if active}
   <section
     class="tx-player-flow-view"
+    data-tx-component="flow-view"
     data-tx-player-flow-view={name}
     aria-label={label?.trim() || name}
     tabindex="-1"

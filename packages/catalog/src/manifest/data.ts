@@ -1,9 +1,12 @@
 import type {
+  CatalogAxisName,
   CatalogDeprecation,
   CatalogEventName,
   CatalogExample,
+  CatalogImport,
   CatalogManifest,
   CatalogPropSchema,
+  CatalogStateName,
   CatalogTier,
 } from './types.ts';
 
@@ -41,6 +44,15 @@ export function manifestData(input: CatalogManifest): Readonly<CatalogManifest> 
       : {}),
     ...(Array.isArray(input.sourceable) && input.sourceable.length > 0
       ? { sourceable: input.sourceable as string[] }
+      : {}),
+    ...(input.axes !== null && typeof input.axes === 'object'
+      ? { axes: { ...input.axes } as Partial<Record<CatalogAxisName, string>> }
+      : {}),
+    ...(Array.isArray(input.states) && input.states.length > 0
+      ? { states: [...input.states] as CatalogStateName[] }
+      : {}),
+    ...(Array.isArray(input.imports) && input.imports.length > 0
+      ? { imports: input.imports as readonly CatalogImport[] }
       : {}),
     ...(input.deprecated !== null && typeof input.deprecated === 'object'
       ? { deprecated: input.deprecated as CatalogDeprecation }

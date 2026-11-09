@@ -612,6 +612,8 @@ function dragFrom(id: string): Attachment<HTMLElement> {
 <section
   id="board-{uid}"
   {...rest}
+  data-tx-component="data-board"
+  data-tx-density={density}
   bind:this={ref}
   class={cx(
     'tx-board',

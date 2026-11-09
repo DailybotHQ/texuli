@@ -71,18 +71,13 @@ export const NAV_GROUPS: readonly NavGroup[] = [
       { href: '/component-pages/', label: 'Overview' },
       { href: '/gallery-components/', label: 'Gallery' },
       { href: '/examples/', label: 'Examples' },
-      { href: '/slides-page/', label: 'Slides' },
       { href: '/editor-page/', label: 'Editor' },
       { href: '/drag-page/', label: 'Drag and drop' },
       { href: '/motion-page/', label: 'Motion' },
-      { href: '/documents-page/', label: 'Documents' },
       // The 0.8.0 feature pages (new in 0.8.0; the new packages are in development).
       { href: '/forms-page/', label: 'Forms' },
-      { href: '/canvas-page/', label: 'Canvas' },
-      { href: '/sheets-page/', label: 'Sheets' },
       { href: '/dashboards-page/', label: 'Dashboards' },
       { href: '/output-page/', label: 'Email, PDF and i18n' },
-      { href: '/workflows-page/', label: 'Workflow editor' },
       { href: '/workflows-page/json/', label: 'JSON live preview' },
     ],
     expand: 'components',
@@ -99,6 +94,8 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     links: [
       // PLAN_011 T-site-0100: the design systems hub (released in 0.10.0).
       { href: '/design-systems/', label: 'Design systems' },
+      // PLAN_016 T-t4-site: the design-system kit (texuli/ds-kit) for an example brand.
+      { href: '/design-systems/kit/', label: 'Design system kit' },
       { href: '/gallery-themes/', label: 'Theme gallery' },
       { href: '/theme-switcher/', label: 'Switcher' },
       { href: '/theme-studio/', label: 'Studio' },

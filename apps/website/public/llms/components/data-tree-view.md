@@ -30,7 +30,7 @@
 | `label` | string | yes | untrusted | — | Accessible name of the view. |
 | `items` | array | yes | — | — | Flat items; parent names the parent item (none for a root). |
 | `checkboxes` | boolean | no | — | `true` | — |
-| `density` | enum(comfortable | compact) | no | — | — | — |
+| `density` | enum(comfortable | compact) | no | — | `"comfortable"` | — |
 
 ### Examples
 

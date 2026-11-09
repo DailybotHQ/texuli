@@ -43,6 +43,9 @@ add('texuli', 'part', 'A part of card (manifest card).', [
   'CardTitle',
 ]);
 add('texuli', 'part', 'A part of alert (manifest alert).', ['AlertSurface', 'ToneIcon']);
+add('texuli', 'part', 'A part of icon (manifest icon); the Lucide set of the same id.', [
+  'LucideIcon',
+]);
 add('texuli', 'part', 'A part of combobox or multi-select (manifests combobox, multi-select).', [
   'ComboboxChip',
   'ComboboxChips',
@@ -143,22 +146,29 @@ add('texuli', 'part', 'A part of table (manifest table).', [
   'TableRow',
 ]);
 add('texuli', 'part', 'A part of timeline (manifest timeline).', ['TimelineItem']);
-add('texuli', 'part', 'A part of number field or pin input; the parent is planned below.', [
+add('texuli', 'part', 'A part of number-field (manifest number-field).', [
   'NumberFieldDecrement',
   'NumberFieldIncrement',
   'NumberFieldInput',
   'NumberFieldRoot',
+]);
+add('texuli', 'part', 'A part of pin-input (manifest pin-input).', [
   'PinInputCell',
   'PinInputRoot',
 ]);
-add('texuli', 'part', 'A part of toggle group or toolbar; the parent is planned below.', [
-  'ToggleGroupItem',
-  'ToolbarButton',
-  'ToolbarGroup',
-  'ToolbarGroupItem',
-  'ToolbarLink',
-  'ToolbarSeparator',
-]);
+add(
+  'texuli',
+  'part',
+  'A part of toggle-group (manifest toggle-group) or toolbar; toolbar is planned below.',
+  [
+    'ToggleGroupItem',
+    'ToolbarButton',
+    'ToolbarGroup',
+    'ToolbarGroupItem',
+    'ToolbarLink',
+    'ToolbarSeparator',
+  ]
+);
 add(
   'texuli',
   'part',
@@ -172,12 +182,9 @@ add(
   [
     'AppShell',
     'AuthSplitHostLayout',
-    'BottomNav',
     'DrawerScope',
     'MasterDetailLayout',
-    'MobileAppFrame',
     'MobileDrawerLayout',
-    'MobileHeader',
     'MobileTabsLayout',
     'RailLayout',
     'WizardHostLayout',
@@ -189,19 +196,25 @@ add(
   'A section of the marketing layout (manifest layout-marketing), placed by the host.',
   ['MarketingSection', 'MarketingSectionHeader']
 );
-add('texuli', 'chrome', 'Uploading files is host chrome: a blueprint never asks for local files.', [
-  'FileUpload',
-]);
 add(
   'texuli',
-  'utility',
-  'Icons are referenced by name inside other components (icon-button, nav-icon).',
-  ['Icon', 'LucideIcon']
+  'chrome',
+  'The design-system UI kit (texuli/ds-kit) is a host page that renders a design-system document, never blueprint data.',
+  [
+    'ApprovalBadge',
+    'DesignSystemKit',
+    'KitApproval',
+    'KitChanges',
+    'KitFoundations',
+    'KitLibrary',
+    'KitMatrix',
+    'KitModeSwitch',
+    'KitVoice',
+  ]
 );
 add('texuli', 'utility', 'A layout or accessibility helper with no content of its own.', [
   'AspectRatio',
   'ScrollArea',
-  'Separator',
   'VisuallyHidden',
 ]);
 add(
@@ -241,33 +254,23 @@ add(
   ['CopyButton']
 );
 add('texuli', 'planned', 'Planned manifest: a display component with plain data props.', [
-  'Avatar',
   'AvatarGroup',
   'CardGrid',
-  'Carousel',
   'KpiRow',
-  'Progress',
-  'Skeleton',
-  'Spinner',
 ]);
 add(
   'texuli',
   'planned',
   'Planned manifest: disclosure or wizard structure with a bindable open value.',
-  ['Accordion', 'Collapsible', 'Tabs', 'Wizard']
+  ['Collapsible', 'Wizard']
 );
 add('texuli', 'planned', 'Planned manifest: an input with a bindable value (spec 0.3.0 bind).', [
   'Calendar',
   'ColorPicker',
   'DatePicker',
   'DateRangePicker',
-  'NumberField',
-  'PinInput',
-  'Rating',
   'Slider',
-  'TagsInput',
   'Toggle',
-  'ToggleGroup',
 ]);
 add('texuli', 'planned', 'Planned manifest: a toolbar of host actions (closed emit intents).', [
   'Toolbar',
@@ -275,13 +278,6 @@ add('texuli', 'planned', 'Planned manifest: a toolbar of host actions (closed em
 add('texuli', 'planned', 'Planned manifest; data-tree-view covers trees from data today.', [
   'TreeView',
 ]);
-add(
-  'texuli',
-  'planned',
-  'Planned manifest: a list row (texuli/list-item, 0.14.3); a catalog id waits for the next spec minor.',
-  ['ListItem']
-);
-
 // ── @texuli/data ───────────────────────────────────────────────
 add('@texuli/data', 'painted-by', 'Painted by data-calendar.', ['CalendarView']);
 add('@texuli/data', 'painted-by', 'Painted by data-map.', ['MapView']);
@@ -300,12 +296,6 @@ add('@texuli/data', 'planned', 'Planned manifest: an activity feed with reaction
 
 // ── @texuli/chat ───────────────────────────────────────────────
 add('@texuli/chat', 'part', 'A part of the live chat thread.', ['MessageList', 'TypingIndicator']);
-add(
-  '@texuli/chat',
-  'chrome',
-  'The composer is host chrome (player design §8): a blueprint never supplies one.',
-  ['Composer']
-);
 add(
   '@texuli/chat',
   'planned',
@@ -426,4 +416,14 @@ export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(row
 // Raised to 215 for ListItem (UG-42, 0.14.3 patch lane): planned, like
 // CodeField was, because a new catalog id changes the spec contract and a
 // patch release cannot carry a spec minor.
-export const EXCLUSION_CEILING = 215;
+// Raised to 219 for the design-system UI kit pages (PLAN_016 T4, lead decision): host
+// pages that render a design-system document, never blueprint data. Raised to 222
+// for the kit's library and changes sections (KitLibrary, KitChanges, ApprovalBadge;
+// PLAN_016 T-t4-library), the same kit chrome, to 223 for KitVoice (T-t4-voice), and
+// to 224 for KitMatrix (T-t4-matrix). Lowered to 219 in PLAN_016 T-widen-app:
+// Accordion, Tabs, BottomNav, MobileHeader and Composer gained manifests
+// (host chrome stays non-emittable; the allow set governs them). Lowered
+// again in PLAN_016 T-widen-display: Icon, Avatar, Skeleton, Progress, Spinner,
+// Carousel, Separator and ListItem became catalog ids (LucideIcon is a part of
+// icon). Combined ceiling is the live row count.
+export const EXCLUSION_CEILING = 204;

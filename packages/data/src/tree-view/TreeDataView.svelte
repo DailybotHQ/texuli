@@ -573,6 +573,8 @@ function dropTargetFor(row: FlatNode<T>): boolean {
 
 <section
   id="tree-view-{uid}"
+  data-tx-component="data-tree-view"
+  data-tx-density={density}
   class={cx(
     'tx-tree-view',
     density === 'compact' && 'tx-tree-view--compact',

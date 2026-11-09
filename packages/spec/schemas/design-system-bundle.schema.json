@@ -1,0 +1,259 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://texuli.example/spec/schemas/design-system-bundle.schema.json",
+  "title": "DesignSystemBundle",
+  "description": "A portable design-system unit (format texuli/design-system-bundle, version 1): the document, its library component sources as text, the allow manifest and the release history (approved versions with changelog entries). Bounded untrusted input; hashes are verified; sources are never executed. packBundle/unpackBundle/validateBundle live in @texuli/spec/design-system.",
+  "type": "object",
+  "properties": {
+    "allowManifest": {
+      "$ref": "#/$defs/allowManifest"
+    },
+    "document": {
+      "$ref": "#/$defs/document"
+    },
+    "format": {
+      "const": "texuli/design-system-bundle"
+    },
+    "history": {
+      "description": "Approved versions with changelog entries, oldest first. At most 32.",
+      "items": {
+        "$ref": "#/$defs/historyEntry"
+      },
+      "maxItems": 32,
+      "type": "array"
+    },
+    "librarySources": {
+      "description": "Library component sources as text. At most 64. Never executed.",
+      "items": {
+        "$ref": "#/$defs/librarySource"
+      },
+      "maxItems": 64,
+      "type": "array"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": ["format", "version", "document", "allowManifest", "librarySources", "history"],
+  "additionalProperties": false,
+  "$defs": {
+    "allowEntry": {
+      "additionalProperties": false,
+      "description": "The enabled values of one catalog component. An omitted list allows every catalog value; an empty list allows none.",
+      "properties": {
+        "densities": {
+          "items": {
+            "maxLength": 48,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 32,
+          "type": "array"
+        },
+        "sizes": {
+          "items": {
+            "maxLength": 48,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 32,
+          "type": "array"
+        },
+        "states": {
+          "items": {
+            "maxLength": 48,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 32,
+          "type": "array"
+        },
+        "tones": {
+          "items": {
+            "maxLength": 48,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 32,
+          "type": "array"
+        },
+        "variants": {
+          "items": {
+            "maxLength": 48,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 32,
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "allowManifest": {
+      "additionalProperties": false,
+      "description": "The allow manifest packed beside the document (same shape as schemas/allow-manifest.schema.json).",
+      "properties": {
+        "allow": {
+          "additionalProperties": {
+            "$ref": "#/$defs/allowEntry"
+          },
+          "type": "object"
+        },
+        "catalogDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "contentHash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "extensions": {
+          "items": {
+            "maxLength": 16,
+            "pattern": "^[a-z][a-z0-9]{1,15}$",
+            "type": "string"
+          },
+          "maxItems": 16,
+          "type": "array"
+        },
+        "library": {
+          "items": {
+            "$ref": "#/$defs/libraryEntry"
+          },
+          "maxItems": 64,
+          "type": "array"
+        },
+        "specVersion": {
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+          "type": "string"
+        },
+        "version": {
+          "maxLength": 64,
+          "type": "string"
+        }
+      },
+      "required": ["version", "contentHash", "specVersion"],
+      "type": "object"
+    },
+    "document": {
+      "additionalProperties": {},
+      "description": "The packed design-system document (format texuli/design-system). Extra fields are the rest of the document; validateDesignSystem checks them.",
+      "properties": {
+        "format": {
+          "const": "texuli/design-system"
+        },
+        "formatVersion": {
+          "const": 1
+        },
+        "id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 120,
+          "type": "string"
+        },
+        "version": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": ["format", "id", "version"],
+      "type": "object"
+    },
+    "historyEntry": {
+      "additionalProperties": false,
+      "description": "One approved version in the release history.",
+      "properties": {
+        "approvedAt": {
+          "maxLength": 32,
+          "pattern": "^\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\\d|3[01])T(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d{1,3})?)?Z$",
+          "type": "string"
+        },
+        "approvedBy": {
+          "maxLength": 120,
+          "type": "string"
+        },
+        "changelog": {
+          "description": "What changed in this approved version. Untrusted text; never executed.",
+          "maxLength": 4000,
+          "type": "string"
+        },
+        "contentHash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "status": {
+          "enum": ["approved", "draft"],
+          "type": "string"
+        },
+        "version": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": ["version", "contentHash"],
+      "type": "object"
+    },
+    "libraryEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        },
+        "status": {
+          "maxLength": 32,
+          "minLength": 1,
+          "type": "string"
+        },
+        "version": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": ["id", "version", "status"],
+      "type": "object"
+    },
+    "librarySource": {
+      "additionalProperties": false,
+      "description": "One library component's source as text. contentHash is the SHA-256 of source. Never executed.",
+      "properties": {
+        "contentHash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        },
+        "language": {
+          "description": "A hint for the source language (svelte, css, ts). Ignored at unpack.",
+          "maxLength": 32,
+          "pattern": "^[a-z][a-z0-9+-]{0,31}$",
+          "type": "string"
+        },
+        "source": {
+          "description": "The component source as text. Bounded untrusted input; never executed.",
+          "maxLength": 65536,
+          "type": "string"
+        },
+        "version": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": ["id", "version", "source", "contentHash"],
+      "type": "object"
+    },
+    "sha256": {
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    }
+  }
+}

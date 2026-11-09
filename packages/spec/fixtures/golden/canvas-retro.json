@@ -13,7 +13,7 @@
   },
   "tier": "untrusted",
   "profile": "web",
-  "spec": "0.12.0",
+  "spec": "0.13.0",
   "tree": {
     "key": "retro",
     "id": "canvas",

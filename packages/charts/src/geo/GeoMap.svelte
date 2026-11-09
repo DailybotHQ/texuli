@@ -42,7 +42,7 @@ const rows = $derived(
 );
 </script>
 
-<figure class="geo-chart">
+<figure class="geo-chart" data-tx-component="charts-geo-map">
   <figcaption>
     <svelte:element this={`h${titleLevel()}`}>{title}</svelte:element>
     <p>{description}</p>

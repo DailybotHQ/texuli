@@ -1,0 +1,378 @@
+/**
+ * Heading, Text, Prose and Box (ADR-032, locked prototypes): typography and surfaces
+ * from the design system, so a prototype keeps its hierarchy without typography or
+ * visual utilities. @layer tx.components so consumer utilities can override.
+ * Token contract v2: system tokens are read plain (base.css declares them); role
+ * colors, the font-size scale and the wide and tight tracking keep a fallback. Kept literals:
+ * the 0 resets, the 65ch reading measure, the 0.08em wide and -0.02em tight tracking
+ * fallbacks, and the 2.5vw slope of the responsive heading (its ends are scale tokens).
+ */
+@layer tx.components {
+  /* Heading: the size is the design system's type scale, independent of the level. */
+  .tx-heading {
+    margin: 0;
+    font-family: var(--tx-type-heading-family);
+    font-weight: var(--tx-type-heading-weight);
+    line-height: var(--tx-type-heading-line);
+    letter-spacing: var(--tx-type-heading-tracking);
+    text-wrap: balance;
+  }
+  .tx-heading--display {
+    --tx-heading-size: var(--tx-type-display-size);
+    --tx-heading-min: var(--tx-font-size-2xl, 1.5rem);
+    font-family: var(--tx-type-display-family);
+    font-size: var(--tx-type-display-size);
+    font-weight: var(--tx-type-display-weight);
+    line-height: var(--tx-type-display-line);
+    letter-spacing: var(--tx-type-display-tracking);
+  }
+  /* Hero and section titles between the title and display: the font-size scale with the
+     display role's family, weight, line height and tracking. */
+  .tx-heading--4xl {
+    --tx-heading-size: var(--tx-font-size-4xl, 2.25rem);
+    --tx-heading-min: var(--tx-font-size-2xl, 1.5rem);
+  }
+  .tx-heading--3xl {
+    --tx-heading-size: var(--tx-font-size-3xl, 1.875rem);
+    --tx-heading-min: var(--tx-font-size-xl, 1.25rem);
+  }
+  .tx-heading--2xl {
+    --tx-heading-size: var(--tx-font-size-2xl, 1.5rem);
+    --tx-heading-min: var(--tx-font-size-lg, 1.125rem);
+  }
+  .tx-heading--4xl,
+  .tx-heading--3xl,
+  .tx-heading--2xl {
+    font-family: var(--tx-type-display-family);
+    font-size: var(--tx-heading-size);
+    font-weight: var(--tx-type-display-weight);
+    line-height: var(--tx-type-display-line);
+    letter-spacing: var(--tx-type-display-tracking);
+  }
+  .tx-heading--xl {
+    --tx-heading-size: var(--tx-type-title-size);
+    --tx-heading-min: var(--tx-font-size-lg, 1.125rem);
+    font-family: var(--tx-type-title-family);
+    font-size: var(--tx-type-title-size);
+    font-weight: var(--tx-type-title-weight);
+    line-height: var(--tx-type-title-line);
+    letter-spacing: var(--tx-type-title-tracking);
+  }
+  .tx-heading--lg {
+    --tx-heading-size: var(--tx-type-heading-size);
+    --tx-heading-min: var(--tx-font-size-base, 1rem);
+    font-size: var(--tx-type-heading-size);
+  }
+  .tx-heading--md {
+    --tx-heading-size: var(--tx-font-size-lg, 1.125rem);
+    --tx-heading-min: var(--tx-font-size-base, 1rem);
+    font-size: var(--tx-font-size-lg, 1.125rem);
+  }
+  .tx-heading--sm {
+    --tx-heading-size: var(--tx-font-size-base, 1rem);
+    --tx-heading-min: var(--tx-font-size-base, 1rem);
+    font-size: var(--tx-font-size-base, 1rem);
+  }
+  /* Responsive: fluid from about two scale steps below up to the size, never past either. */
+  .tx-heading.tx-heading--responsive {
+    font-size: clamp(
+      var(--tx-heading-min),
+      calc(var(--tx-heading-min) + 2.5vw),
+      var(--tx-heading-size)
+    );
+  }
+  .tx-heading.tx-heading--tracking-tight {
+    letter-spacing: var(--tx-letter-spacing-tight, -0.02em);
+  }
+
+  /* Text: body copy, labels and small print; never a heading. */
+  .tx-text {
+    margin: 0;
+    font-family: var(--tx-type-body-family);
+    line-height: var(--tx-type-body-line);
+    letter-spacing: var(--tx-type-body-tracking);
+  }
+  .tx-text--figure {
+    font-size: var(--tx-type-title-size);
+    font-weight: var(--tx-type-title-weight);
+    line-height: var(--tx-type-title-line);
+    letter-spacing: var(--tx-type-title-tracking);
+  }
+  .tx-text--lg {
+    font-size: var(--tx-font-size-lg, 1.125rem);
+  }
+  .tx-text--md {
+    font-size: var(--tx-type-body-size);
+  }
+  .tx-text--sm {
+    font-size: var(--tx-font-size-sm, 0.875rem);
+  }
+  .tx-text--xs {
+    font-size: var(--tx-type-caption-size);
+    line-height: var(--tx-type-caption-line);
+  }
+  /* Nested text takes the size and line height of its parent (a heading, a label). */
+  .tx-text.tx-text--inherit {
+    font-size: inherit;
+    line-height: inherit;
+  }
+  .tx-text--weight-regular {
+    font-weight: var(--tx-type-body-weight);
+  }
+  .tx-text--weight-medium {
+    font-weight: var(--tx-font-weight-medium, 500);
+  }
+  .tx-text--weight-semibold {
+    font-weight: var(--tx-type-heading-weight);
+  }
+  .tx-text--align-start {
+    text-align: start;
+  }
+  .tx-text--align-center {
+    text-align: center;
+  }
+  .tx-text--align-end {
+    text-align: end;
+  }
+  .tx-text--mono {
+    font-family: var(--tx-type-code-family);
+  }
+  .tx-text--tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .tx-text--transform-none {
+    text-transform: none;
+  }
+  .tx-text--transform-uppercase {
+    text-transform: uppercase;
+  }
+  .tx-text--transform-lowercase {
+    text-transform: lowercase;
+  }
+  .tx-text--transform-capitalize {
+    text-transform: capitalize;
+  }
+  .tx-text--tracking-wide {
+    letter-spacing: var(--tx-letter-spacing-wide, 0.08em);
+  }
+
+  /* Tones: role inks that hold the text contrast target on the page. */
+  .tx-type-tone--default {
+    color: var(--tx-foreground, CanvasText);
+  }
+  .tx-type-tone--muted {
+    color: var(--tx-muted-foreground, GrayText);
+  }
+  .tx-type-tone--subtle {
+    color: var(--tx-subtle-foreground, GrayText);
+  }
+  .tx-type-tone--primary {
+    color: var(--tx-primary-soft-foreground, LinkText);
+  }
+  .tx-type-tone--success {
+    color: var(--tx-success-soft-foreground, CanvasText);
+  }
+  .tx-type-tone--warning {
+    color: var(--tx-warning-soft-foreground, CanvasText);
+  }
+  .tx-type-tone--destructive {
+    color: var(--tx-destructive-soft-foreground, CanvasText);
+  }
+  .tx-type-tone--info {
+    color: var(--tx-info-soft-foreground, CanvasText);
+  }
+  .tx-type-tone--inherit {
+    color: inherit;
+  }
+
+  .tx-type--truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tx-type--clamp {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--tx-text-line-clamp);
+    line-clamp: var(--tx-text-line-clamp);
+    overflow: hidden;
+  }
+
+  /* Prose: long-form rhythm from the design system's type roles and space scale. */
+  .tx-prose {
+    max-inline-size: 65ch;
+    color: var(--tx-foreground, CanvasText);
+    font-family: var(--tx-type-body-family);
+    font-size: var(--tx-type-body-size);
+    line-height: var(--tx-type-body-line);
+  }
+  .tx-prose--lg {
+    font-size: var(--tx-font-size-lg, 1.125rem);
+  }
+  .tx-prose > :where(*) {
+    margin-block: 0;
+  }
+  .tx-prose > :where(* + *) {
+    margin-block-start: var(--tx-space-4);
+  }
+  .tx-prose :where(h1, h2, h3, h4, h5, h6) {
+    font-family: var(--tx-type-heading-family);
+    font-weight: var(--tx-type-heading-weight);
+    line-height: var(--tx-type-heading-line);
+    letter-spacing: var(--tx-type-heading-tracking);
+  }
+  .tx-prose > :where(h1, h2, h3, h4, h5, h6):not(:first-child) {
+    margin-block-start: var(--tx-space-8);
+  }
+  .tx-prose :where(h1) {
+    font-size: var(--tx-type-title-size);
+  }
+  .tx-prose :where(h2) {
+    font-size: var(--tx-type-heading-size);
+  }
+  .tx-prose :where(h3, h4, h5, h6) {
+    font-size: var(--tx-font-size-lg, 1.125rem);
+  }
+  .tx-prose :where(ul, ol) {
+    padding-inline-start: var(--tx-space-6);
+  }
+  .tx-prose :where(li + li) {
+    margin-block-start: var(--tx-space-2);
+  }
+  .tx-prose :where(code) {
+    font-family: var(--tx-type-code-family);
+    font-size: var(--tx-type-code-size);
+  }
+  .tx-prose :where(blockquote) {
+    padding-inline-start: var(--tx-space-4);
+    border-inline-start: var(--tx-border-width-thick) solid var(--tx-border, currentColor);
+    color: var(--tx-muted-foreground, GrayText);
+  }
+  .tx-prose :where(a) {
+    color: var(--tx-link, LinkText);
+  }
+
+  /* Box: padding, radius, border, elevation and surface from tokens. */
+  .tx-box {
+    box-sizing: border-box;
+    min-inline-size: 0;
+  }
+  .tx-box--pad-none {
+    padding: 0;
+  }
+  .tx-box--pad-sm {
+    padding: var(--tx-space-2);
+  }
+  .tx-box--pad-md {
+    padding: var(--tx-space-4);
+  }
+  .tx-box--pad-lg {
+    padding: var(--tx-space-6);
+  }
+  .tx-box--pad-xl {
+    padding: var(--tx-space-8);
+  }
+  .tx-box--radius-none {
+    border-radius: var(--tx-shape-radius-none);
+  }
+  .tx-box--radius-sm {
+    border-radius: var(--tx-shape-radius-sm);
+  }
+  .tx-box--radius-md {
+    border-radius: var(--tx-shape-radius-md);
+  }
+  .tx-box--radius-lg {
+    border-radius: var(--tx-shape-radius-lg);
+  }
+  .tx-box--radius-xl {
+    border-radius: var(--tx-shape-radius-xl);
+  }
+  .tx-box--radius-full {
+    border-radius: var(--tx-shape-radius-full);
+  }
+  .tx-box--border-default {
+    border: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+  }
+  .tx-box--border-strong {
+    border: var(--tx-border-width-thin) solid var(--tx-border-strong, currentColor);
+  }
+  .tx-box--border-block-start {
+    border-block-start: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+  }
+  .tx-box--border-block-end {
+    border-block-end: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+  }
+  .tx-box--elevation-sm {
+    box-shadow: var(--tx-elevation-1);
+  }
+  .tx-box--elevation-md {
+    box-shadow: var(--tx-elevation-2);
+  }
+  .tx-box--elevation-lg {
+    box-shadow: var(--tx-elevation-4);
+  }
+  .tx-box--surface-default {
+    background-color: var(--tx-surface, Canvas);
+    color: var(--tx-surface-foreground, CanvasText);
+  }
+  .tx-box--surface-muted {
+    background-color: var(--tx-muted, Canvas);
+    color: var(--tx-foreground, CanvasText);
+  }
+  .tx-box--surface-subtle {
+    background-color: var(--tx-subtle, Canvas);
+    color: var(--tx-subtle-foreground, CanvasText);
+  }
+  .tx-box--surface-elevated {
+    background-color: var(--tx-elevated, Canvas);
+    color: var(--tx-elevated-foreground, CanvasText);
+  }
+  .tx-box--surface-primary {
+    background-color: var(--tx-primary, Canvas);
+    color: var(--tx-primary-foreground, CanvasText);
+  }
+  .tx-box--surface-brand {
+    background-color: var(--tx-primary-soft, Canvas);
+    color: var(--tx-primary-soft-foreground, CanvasText);
+  }
+  /* A sticky header over scrolling content: the page background at the glass opacity,
+     blurred behind. Without backdrop-filter or with reduced transparency it is opaque. */
+  .tx-box--surface-translucent {
+    background-color: var(--tx-background, Canvas);
+    color: var(--tx-foreground, CanvasText);
+  }
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    .tx-box--surface-translucent {
+      background-color: color-mix(
+        in oklab,
+        var(--tx-background, Canvas) var(--tx-surface-glass-alpha),
+        transparent
+      );
+      -webkit-backdrop-filter: blur(var(--tx-surface-glass-blur));
+      backdrop-filter: blur(var(--tx-surface-glass-blur));
+    }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .tx-box--surface-translucent {
+      background-color: var(--tx-background, Canvas);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .tx-box--border-none.tx-box--surface-default,
+    .tx-box--border-none.tx-box--surface-muted,
+    .tx-box--border-none.tx-box--surface-subtle,
+    .tx-box--border-none.tx-box--surface-elevated,
+    .tx-box--border-none.tx-box--surface-primary,
+    .tx-box--border-none.tx-box--surface-brand,
+    .tx-box--border-none.tx-box--surface-translucent {
+      outline: 1px solid CanvasText;
+    }
+    .tx-box--surface-translucent {
+      background-color: Canvas;
+      backdrop-filter: none;
+    }
+  }
+}

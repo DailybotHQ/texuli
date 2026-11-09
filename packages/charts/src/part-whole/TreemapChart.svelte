@@ -47,7 +47,7 @@ const legendItems = $derived(
 );
 </script>
 
-<figure class="part-whole">
+<figure class="part-whole" data-tx-component="charts-treemap">
   <figcaption>
     <svelte:element this={`h${titleLevel()}`} id="{uid}-title">{title}</svelte:element>
     <p id="{uid}-description">{description}</p>

@@ -1,5 +1,10 @@
 import { buildSpec, EXTERNAL_SCHEMAS } from './build.ts';
-import { CAPABILITIES, type SpecCatalog, type SpecDeprecation } from './catalog.ts';
+import {
+  CAPABILITIES,
+  checkCatalogVariants,
+  type SpecCatalog,
+  type SpecDeprecation,
+} from './catalog.ts';
 import { checkPropSchema, defCollisions } from './contract.ts';
 import { checkSchemaDocument, isRecord, type Schema, validateInstance } from './dialect.ts';
 import type { SpecSourceDescriptor } from './source.ts';
@@ -20,9 +25,12 @@ export interface ConformanceIssue {
     | 'contract'
     | 'prop-schema'
     | 'deprecation'
-    | 'workflow';
+    | 'workflow'
+    | 'variants';
   path: string;
   message: string;
+  /** A stable code, when the check has one (`variants`: `CATALOG_VARIANTS_CODES`). */
+  code?: string;
 }
 
 /**
@@ -107,6 +115,14 @@ export function checkConformance(
   }
 
   issues.push(...checkCatalogContract(catalog));
+  for (const issue of checkCatalogVariants(catalog)) {
+    issues.push({
+      check: 'variants',
+      path: 'catalog/components.json',
+      message: `${issue.path} ${issue.code}: ${issue.message}`,
+      code: issue.code,
+    });
+  }
 
   let build: ReturnType<typeof buildSpec> | undefined;
   try {
@@ -228,6 +244,14 @@ export function checkCatalogContract(
   };
   for (const component of catalog?.components ?? []) {
     expired(component.id, component.deprecated);
+    // Namespaced ids and composes belong to host extensions (mergeCatalogs), never to Texuli's own catalog.
+    if (component.id.includes(':') || component.composes !== undefined) {
+      issues.push({
+        check: 'catalog',
+        path,
+        message: `${component.id}: a namespaced id or composes is for host extensions only`,
+      });
+    }
     const portable = new Set(component.props.filter((p) => !p.extension).map((p) => p.name));
     for (const name of component.bindable ?? []) {
       if (!portable.has(name)) {

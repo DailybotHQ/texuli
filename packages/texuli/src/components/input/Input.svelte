@@ -133,12 +133,14 @@ function clear() {
       onchange?.(event);
     }}
     oninput={onInput}
+    data-tx-component="input"
   />
 {:else if clearable}
   <div
     class="tx-input-group"
     data-tx-disabled={disabled ? 'true' : undefined}
     data-tx-input-clearable=""
+    data-tx-component="input"
   >
     <input
       bind:this={ref}
@@ -151,6 +153,7 @@ function clear() {
       {...rest}
       {onchange}
       oninput={onInput}
+      data-tx-component="input"
     />
     {#if showClear}
       <span class="tx-input-group__adornment">
@@ -172,5 +175,6 @@ function clear() {
     {...rest}
     {onchange}
     oninput={onInput}
+    data-tx-component="input"
   />
 {/if}

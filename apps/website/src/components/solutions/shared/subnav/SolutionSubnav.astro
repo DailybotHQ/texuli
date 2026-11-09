@@ -1,0 +1,117 @@
+---
+/**
+ * The sticky in-page subnav of a Solution landing: one link per rendered section after the
+ * hero, then the docs route. Static: plain anchors with CSS `position: sticky` under the
+ * site header, so it ships no JavaScript. On narrow screens the list scrolls inline
+ * instead of wrapping, and every link keeps a 24px target.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import type { SolutionEntry } from '../../../../data/solutions/schema.ts';
+import { withBase } from '../../../foundation/site.ts';
+import type { SolutionLandingContent } from '../types.ts';
+import { solutionSubnavItems } from './sections.ts';
+
+interface Props {
+  entry: SolutionEntry;
+  content: SolutionLandingContent;
+}
+
+const { entry, content } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const items = solutionSubnavItems(content);
+const docsSafe = safeHref(entry.docs, 'developer');
+const docsHref = docsSafe === undefined ? undefined : withBase(base, docsSafe);
+---
+
+<nav class="solution-subnav" aria-label={`${entry.name} page sections`} data-solution-subnav="">
+  <div class="solution-subnav__inner">
+    <span class="solution-subnav__name" aria-hidden="true">{entry.name}</span>
+    <ol class="solution-subnav__list">
+      {
+        items.map((item) => (
+          <li>
+            <a class="solution-subnav__link" href={item.href} data-solution-subnav-link={item.key}>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+      <li>
+        <a class="solution-subnav__link solution-subnav__link--docs" href={docsHref} data-solution-subnav-link="docs">
+          Docs<span aria-hidden="true">&nbsp;→</span>
+        </a>
+      </li>
+    </ol>
+  </div>
+</nav>
+
+<style>
+  .solution-subnav {
+    position: sticky;
+    inset-block-start: var(--site-header-height);
+    z-index: 5;
+    border-block: 1px solid color-mix(in oklab, var(--tx-border) 70%, transparent);
+    background: color-mix(in oklab, var(--tx-background) 92%, transparent);
+    backdrop-filter: blur(8px);
+  }
+  .solution-subnav__inner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    max-inline-size: 76rem;
+    min-block-size: var(--solution-subnav-height, 3rem);
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  .solution-subnav__name {
+    flex: none;
+    color: var(--tx-foreground);
+    font-size: 0.9rem;
+    font-weight: 750;
+  }
+  .solution-subnav__list {
+    display: flex;
+    flex: 1 1 auto;
+    gap: 0.25rem 1rem;
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+    list-style: none;
+    scrollbar-width: thin;
+    white-space: nowrap;
+  }
+  .solution-subnav__link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.5rem;
+    padding-block: 0.25rem;
+    color: var(--tx-muted-foreground);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .solution-subnav__link:hover {
+    color: var(--tx-foreground);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .solution-subnav__link:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .solution-subnav__link--docs {
+    color: var(--tx-primary);
+  }
+  @media (max-width: 40rem) {
+    .solution-subnav__name {
+      display: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .solution-subnav {
+      background: Canvas;
+      backdrop-filter: none;
+    }
+  }
+</style>

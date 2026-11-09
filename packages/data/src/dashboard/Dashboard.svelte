@@ -463,6 +463,7 @@ const gridStyle = $derived({ columns: active.columns, row: `${safeRow}px` });
 
 <section
   id={rootId}
+  data-tx-component="data-dashboard"
   class={cx('tx-dashboard', dragging && 'tx-dashboard--dragging', className)}
   aria-label={label}
   data-breakpoint={active.id}
@@ -492,6 +493,7 @@ const gridStyle = $derived({ columns: active.columns, row: `${safeRow}px` });
         {@const holding = grab?.id === item.id ? grab.mode : null}
         <li
           class="tx-dashboard__widget"
+          data-tx-component="data-dashboard-widget"
           data-dashboard-widget
           data-widget-id={item.id}
           data-held={holding ?? undefined}

@@ -39,7 +39,7 @@ function next(): void {
 }
 </script>
 
-<div class="tx-block-interactive" data-tx-block="quiz" data-tone={block.tone}>
+<div class="tx-block-interactive" data-tx-block="quiz" data-tx-component="blocks-interactive" data-tone={block.tone}>
   {#if block.title}
     <h3 class="tx-block-interactive__title">{block.title}</h3>
   {/if}

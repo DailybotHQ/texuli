@@ -1,0 +1,14 @@
+---
+/**
+ * The Sheets signature stories: the shared SolutionStories block with the sheets registry
+ * entry and the copy in `stories-content.ts`. Every claim is backed by
+ * `SHEETS_STORY_EVIDENCE`, which the unit test checks against the repository.
+ */
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionStories from '../../shared/story/SolutionStories.astro';
+import { SHEETS_STORIES } from './stories-content.ts';
+
+const entry = getSolution('sheets');
+---
+
+<SolutionStories entry={entry} {...SHEETS_STORIES} />
