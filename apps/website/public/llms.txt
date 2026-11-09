@@ -26,6 +26,8 @@ The two-runtimes story: the architecture page and the native landing.
 
 Embeddable open-source systems that complete a task end to end.
 
+- [All Solutions](https://texuli.com/solutions/): The catalog, with each Solution’s status and platforms.
+- [Solutions index (JSON)](https://texuli.com/solutions/index.json): The registry facts as JSON.
 - [Slides](https://texuli.com/solutions/slides/): Write decks as JSON or Markdown and present them in the browser. Status: in development.
 - [Slides docs](https://texuli.com/guides/solutions/slides/)
 - [Documents docs](https://texuli.com/guides/solutions/documents/)
