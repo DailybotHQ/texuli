@@ -53,7 +53,8 @@ describe('catalog imports (exactly one owner)', () => {
   const live = new Set<string>();
   /** Value exports only (components, functions, constants): not types. */
   const liveValues = new Set<string>();
-  for (const pkg of COMPONENT_PACKAGES.map((entry) => entry.name)) {
+  const auditedPackages = [...COMPONENT_PACKAGES.map((entry) => entry.name), '@texuli/primitives'];
+  for (const pkg of auditedPackages) {
     for (const [subpath, file] of resolver.entries(pkg)) {
       const module = moduleOf(pkg, subpath);
       const values = new Set(resolver.exportsOf(file).keys());
@@ -178,5 +179,56 @@ describe('catalog imports (exactly one owner)', () => {
     expect(owners.get('texuli/card::CardHeader')).toBe('card');
     expect(owners.get('texuli::Button')).toBe('button');
     expect(owners.get('texuli/button::Button')).toBe('button');
+  });
+
+  it('maps every sheet and navigation compound export to its owning catalog id', () => {
+    const cases: readonly [string, string, readonly string[]][] = [
+      ['texuli/sheet', 'detail-panel', ['DetailPanel', 'DetailPanelContent']],
+      ['texuli/sheet', 'drawer', ['Drawer', 'DrawerContent']],
+      ['texuli/sheet', 'responsive-modal', ['ResponsiveModal', 'ResponsiveModalContent']],
+      [
+        'texuli/sheet',
+        'sheet',
+        [
+          'Panel',
+          'Sheet',
+          'SheetBody',
+          'SheetCloseButton',
+          'SheetContent',
+          'SheetFooter',
+          'SheetHeader',
+          'SheetOverlay',
+        ],
+      ],
+      [
+        'texuli/navigation',
+        'navigation-menu',
+        [
+          'NavigationMenu',
+          'NavigationMenuContent',
+          'NavigationMenuIndicator',
+          'NavigationMenuItem',
+          'NavigationMenuLink',
+          'NavigationMenuList',
+          'NavigationMenuRoot',
+          'NavigationMenuTrigger',
+          'NavigationMenuViewport',
+        ],
+      ],
+      [
+        'texuli/navigation',
+        'pagination',
+        [
+          'Pagination',
+          'PaginationEllipsis',
+          'PaginationNext',
+          'PaginationPage',
+          'PaginationPrevious',
+          'PaginationRoot',
+        ],
+      ],
+    ];
+    for (const [module, id, exports] of cases)
+      for (const name of exports) expect(owners.get(keyOf(module, name)), name).toBe(id);
   });
 });

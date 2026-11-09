@@ -129,8 +129,15 @@ describe('mergeCatalogs', () => {
       components: [{ ...one.components[0], composes: ['acme:kpi-strip'] }],
     };
     expect(codes([self])).toEqual(['extension-composes']);
-    const none = { ...acme(), components: [{ ...one.components[0], composes: [] }] };
-    expect(codes([none])).toEqual(['extension-composes']);
+    const leaf = { ...acme(), components: [{ ...one.components[0], composes: [] }] };
+    expect(validateInstance(extensionSchema, leaf)).toEqual([]);
+    const mergedLeaf = mergeCatalogs(texuli, [leaf]);
+    expect(mergedLeaf.ok).toBe(true);
+    expect(
+      mergedLeaf.catalog.components.find((component) => component.id === 'acme:kpi-strip')
+    ).toMatchObject({ composes: [] });
+    const missing = { ...acme(), components: [{ ...one.components[0], composes: undefined }] };
+    expect(codes([missing])).toEqual(['extension-composes']);
     expect(CATALOG_EXTENSION_CODES).toContain('extension-composes');
   });
 

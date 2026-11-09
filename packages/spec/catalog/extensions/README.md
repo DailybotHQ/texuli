@@ -36,8 +36,8 @@ published). Texuli ships no extension: hosts publish theirs (for example
 - **Host code only:** each component is `placement: "app"`, `emit: []` and
   `capability: "web-only"`, so no agent emits it and no blueprint carries it. It has no events,
   bindings or sources.
-- **`composes`:** 1 to 32 catalog ids the component is built from: Texuli ids or ids of any
-  merged extension, never itself.
+- **`composes`:** up to 32 catalog ids the component is built from: Texuli ids or ids of any
+  merged extension, never itself. An empty list marks a leaf built directly on host primitives.
 - **Axes and states:** the same contract as the catalog. Each axis equals its enum prop's
   values with its default among them; states come from the closed list.
 
@@ -53,7 +53,7 @@ bad extension whole, with one of these codes:
 | `extension-namespace` | A missing, malformed or reserved namespace |
 | `extension-id` | An id outside its namespace, or not kebab-case |
 | `extension-collision` | An id declared twice, or a namespace merged twice |
-| `extension-composes` | `composes` empty, too long, naming itself, naming an id the merged catalog lacks, or naming a refused extension's id |
+| `extension-composes` | `composes` is missing or malformed, too long, names itself, names an id the merged catalog lacks, or names a refused extension's id |
 | `extension-props` | Props that are not `{ name, kind, required?, enumValues? }` with unique names |
 | `extension-axis` | An axis that drifts from its prop |
 | `extension-state` | A state outside the list, or a repeat |

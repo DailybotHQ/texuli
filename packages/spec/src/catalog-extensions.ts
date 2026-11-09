@@ -1,7 +1,8 @@
 /**
  * Host catalog extensions (ADR-032, spec 0.13.0): a host library publishes its own components
  * in the catalog's component shape, with ids namespaced `<namespace>:<id>` and a `composes`
- * list of the catalog ids each is built from. `mergeCatalogs(texuli, extensions)` checks every
+ * list of the catalog ids each is built from (empty for a leaf built from host primitives).
+ * `mergeCatalogs(texuli, extensions)` checks every
  * extension against the Texuli catalog and returns one catalog that design systems
  * (`checkDesignSystemAllow`), the allow manifest and the kit read, so an `allow` section can
  * enable or disable `acme:kpi-strip` like `button`.
@@ -289,14 +290,13 @@ export function mergeCatalogs(texuli: SpecCatalog, extensions: readonly unknown[
       const composes = entry.composes;
       if (
         !Array.isArray(composes) ||
-        composes.length === 0 ||
         composes.length > CATALOG_EXTENSION_LIMITS.composes ||
         !composes.every((c) => typeof c === 'string')
       ) {
         push(
           'extension-composes',
           `${path}.composes`,
-          `An extension component composes 1 to ${CATALOG_EXTENSION_LIMITS.composes} catalog ids.`
+          `An extension component composes at most ${CATALOG_EXTENSION_LIMITS.composes} catalog ids; an empty list marks a leaf built from host primitives.`
         );
         return;
       }
