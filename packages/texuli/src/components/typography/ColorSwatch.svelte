@@ -33,6 +33,7 @@ let {
 
 const size = $derived(oneOf(COLOR_SWATCH_SIZES, sizeProp, 'md'));
 const resolved = $derived(isColorRef(color) ? color : undefined);
+const categoryColor = $derived(resolved);
 const fill = $derived(resolved ? colorRefVar(resolved) : undefined);
 const ink = $derived(resolved ? colorRefInk(resolved) : undefined);
 const hasLabel = $derived(typeof label === 'string' && label.length > 0);
@@ -45,6 +46,6 @@ const hasLabel = $derived(typeof label === 'string' && label.length > 0);
   style:--tx-swatch-fill={fill}
   style:--tx-swatch-ink={ink}
   data-tx-component="color-swatch"
-  data-tx-variant={resolved}
+  data-tx-color={categoryColor}
   data-tx-size={size}
 >{#if hasLabel}{label}{:else}{@render children?.()}{/if}</span>

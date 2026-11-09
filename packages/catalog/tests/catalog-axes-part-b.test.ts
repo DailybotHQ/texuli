@@ -141,7 +141,7 @@ const EXPECTED: Readonly<Record<string, Expected>> = {
   },
   banner: { axes: { tone: 'tone' } },
   box: { axes: { variant: 'surface' } },
-  'color-swatch': { axes: { variant: 'color', size: 'size' } },
+  'color-swatch': { axes: { color: 'color', size: 'size' } },
   heading: { axes: { size: 'size', tone: 'tone' } },
   link: { states: ['hover', 'focus-visible'] },
   prose: { axes: { size: 'size' } },
