@@ -10,7 +10,8 @@ import { inputModeFor, isPartialNumber } from './number.ts';
 /**
  * The spinbutton (APG): ArrowUp/ArrowDown step, PageUp/PageDown step by
  * `largeStep`, Home/End go to min/max. Typing edits a draft that commits
- * (parsed for the locale, clamped) on Enter or blur; keystrokes that cannot
+ * (parsed for the locale, clamped) on Enter or blur (the root's `commit`
+ * picks Enter and blur, blur only, or every keystroke); keystrokes that cannot
  * lead to a number are refused. Name it with a label (`for` its id) or
  * `aria-label`.
  */
@@ -61,7 +62,7 @@ function onkeydown(event: KeyboardEvent) {
       field.toBound('max');
       break;
     case 'Enter':
-      field.commit();
+      if (field.commitMode !== 'blur') field.commit();
       return;
     default:
       return;

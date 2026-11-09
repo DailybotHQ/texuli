@@ -22,6 +22,19 @@ keyboard spinbutton behavior, bounds, optional wheel stepping and native form
 submission. Set translated `incrementLabel` and `decrementLabel` on the root
 when the default English labels are not appropriate.
 
+New in `0.16.0` (in development). `commit` on `NumberField.Root` picks when
+typed text commits and `onValueChange` runs: `enter` (the default, the
+behavior before) on Enter and on blur, `blur` on blur only, `input` on every
+keystroke that parses (the text stays as typed until blur formats it).
+Steppers, the arrow keys, PageUp/PageDown and Home/End commit at once in
+every mode.
+
+```svelte
+<NumberField.Root bind:value={qty} commit="input" onValueChange={preview}>
+  <NumberField.Input aria-label="Quantity" />
+</NumberField.Root>
+```
+
 New in `0.14.3`. `display="output"` on `NumberField.Root` shows the value as
 read-only text with the same `locale` and `formatOptions` formatting: the
 input becomes `readonly` (it keeps its name, focus and form value), and the

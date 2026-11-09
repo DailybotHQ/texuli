@@ -287,6 +287,125 @@
   }
 
   /*
+   * Plain appearance (`appearance="plain"`): no control chrome, so inline-edit
+   * text lines up with the copy around it. Keyboard focus is an outline (the
+   * shadow ring needs the border); invalid keeps a destructive underline.
+   */
+  .tx-field.tx-field--plain,
+  .tx-input-group.tx-input-group--plain {
+    border-width: 0;
+    border-radius: var(--tx-shape-radius-sm);
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  .tx-field.tx-field--plain {
+    padding-inline: 0;
+  }
+
+  .tx-textarea.tx-field--plain {
+    min-block-size: 0;
+    resize: none;
+  }
+
+  .tx-input-group--plain .tx-input-group__control {
+    padding-inline-start: 0;
+  }
+
+  .tx-field.tx-field--plain:focus-visible,
+  .tx-input-group.tx-input-group--plain:focus-within {
+    box-shadow: none;
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  .tx-field.tx-field--plain[aria-invalid="true"],
+  .tx-input-group.tx-input-group--plain[data-tx-invalid="true"] {
+    box-shadow: inset 0 calc(-1 * var(--tx-border-width-thin)) 0 var(--tx-destructive, crimson);
+  }
+
+  .tx-field.tx-field--plain[aria-invalid="true"]:focus-visible,
+  .tx-input-group.tx-input-group--plain[data-tx-invalid="true"]:focus-within {
+    outline-color: var(--tx-destructive, crimson);
+  }
+
+  /*
+   * Type-scale sizes (`size`): every size but `control` takes its family,
+   * size, weight, line height and tracking from the type roles, like Heading
+   * and Text, and the control height follows the text.
+   */
+  :is(.tx-field, .tx-input-group)[data-tx-size="xs"] {
+    --tx-field-type-family: var(--tx-type-body-family);
+    --tx-field-type-size: var(--tx-type-caption-size);
+    --tx-field-type-weight: var(--tx-type-body-weight);
+    --tx-field-type-line: var(--tx-type-caption-line);
+    --tx-field-type-tracking: var(--tx-type-body-tracking);
+  }
+
+  :is(.tx-field, .tx-input-group)[data-tx-size="sm"],
+  :is(.tx-field, .tx-input-group)[data-tx-size="md"] {
+    --tx-field-type-family: var(--tx-type-body-family);
+    --tx-field-type-size: var(--tx-font-size-sm, 0.875rem);
+    --tx-field-type-weight: var(--tx-type-body-weight);
+    --tx-field-type-line: var(--tx-type-body-line);
+    --tx-field-type-tracking: var(--tx-type-body-tracking);
+  }
+
+  :is(.tx-field, .tx-input-group)[data-tx-size="md"] {
+    --tx-field-type-size: var(--tx-type-body-size);
+  }
+
+  :is(.tx-field, .tx-input-group)[data-tx-size="lg"] {
+    --tx-field-type-family: var(--tx-type-heading-family);
+    --tx-field-type-size: var(--tx-type-heading-size);
+    --tx-field-type-weight: var(--tx-type-heading-weight);
+    --tx-field-type-line: var(--tx-type-heading-line);
+    --tx-field-type-tracking: var(--tx-type-heading-tracking);
+  }
+
+  :is(.tx-field, .tx-input-group)[data-tx-size="xl"] {
+    --tx-field-type-family: var(--tx-type-title-family);
+    --tx-field-type-size: var(--tx-type-title-size);
+    --tx-field-type-weight: var(--tx-type-title-weight);
+    --tx-field-type-line: var(--tx-type-title-line);
+    --tx-field-type-tracking: var(--tx-type-title-tracking);
+  }
+
+  :is(.tx-field, .tx-input-group)[data-tx-size="2xl"],
+  :is(.tx-field, .tx-input-group)[data-tx-size="3xl"],
+  :is(.tx-field, .tx-input-group)[data-tx-size="4xl"],
+  :is(.tx-field, .tx-input-group)[data-tx-size="display"] {
+    --tx-field-type-family: var(--tx-type-display-family);
+    --tx-field-type-size: var(--tx-type-display-size);
+    --tx-field-type-weight: var(--tx-type-display-weight);
+    --tx-field-type-line: var(--tx-type-display-line);
+    --tx-field-type-tracking: var(--tx-type-display-tracking);
+  }
+
+  :is(.tx-field, .tx-input-group)[data-tx-size="2xl"] {
+    --tx-field-type-size: var(--tx-font-size-2xl, 1.5rem);
+  }
+
+  :is(.tx-field, .tx-input-group)[data-tx-size="3xl"] {
+    --tx-field-type-size: var(--tx-font-size-3xl, 1.875rem);
+  }
+
+  :is(.tx-field, .tx-input-group)[data-tx-size="4xl"] {
+    --tx-field-type-size: var(--tx-font-size-4xl, 2.25rem);
+  }
+
+  .tx-field[data-tx-size]:not([data-tx-size="control"]),
+  .tx-input-group[data-tx-size]:not([data-tx-size="control"]) .tx-input-group__control {
+    block-size: auto;
+    min-block-size: 0;
+    font-family: var(--tx-field-type-family);
+    font-size: var(--tx-field-type-size);
+    font-weight: var(--tx-field-type-weight);
+    line-height: var(--tx-field-type-line);
+    letter-spacing: var(--tx-field-type-tracking);
+  }
+
+  /*
    * Tier-3 hook: `data-tx-input-style` on any ancestor sets the input tokens.
    * `default` keeps the theme look; `compact` and `comfortable` move the
    * height and inline padding one control step down or up (from 640 px; below

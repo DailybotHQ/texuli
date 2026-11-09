@@ -39,6 +39,7 @@ export const FORMS_AXIS_STAMP: Readonly<Record<string, AxisStamp>> = {
     states: ['hover', 'focus-visible', 'disabled', 'loading'],
   },
   input: {
+    axes: { variant: 'appearance', size: 'textSize' },
     states: ['hover', 'focus-visible', 'disabled', 'invalid', 'readonly'],
   },
   'input-group': {
@@ -84,7 +85,10 @@ export const FORMS_AXIS_STAMP: Readonly<Record<string, AxisStamp>> = {
     states: ['focus-visible', 'disabled', 'invalid', 'readonly'],
   },
   'text-counter': { states: ['disabled', 'invalid', 'readonly'] },
-  textarea: { states: ['disabled', 'readonly'] },
+  textarea: {
+    axes: { variant: 'appearance', size: 'textSize' },
+    states: ['disabled', 'readonly'],
+  },
   'time-field': {
     axes: { size: 'size' },
     states: ['hover', 'focus-visible', 'active', 'disabled', 'invalid', 'selected'],

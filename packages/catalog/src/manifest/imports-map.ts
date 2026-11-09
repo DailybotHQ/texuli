@@ -2218,6 +2218,7 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
     module: '@texuli/primitives/number-field',
     exports: [
       'NumberFieldContextValue',
+      'NumberFieldCommit',
       'NumberFieldDecrement',
       'NumberFieldIncrement',
       'NumberFieldInput',
@@ -6232,7 +6233,10 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
   },
   { module: 'texuli/i18n/es', exports: ['TEXULI_LABELS_ES'] },
   { module: 'texuli/icons', exports: ['IconsProvider', 'registerIcons'] },
-  { module: 'texuli/input', exports: ['autosizeTextarea', 'fieldVariants'] },
+  {
+    module: 'texuli/input',
+    exports: ['FieldAppearance', 'FieldSize', 'autosizeTextarea', 'fieldVariants'],
+  },
   {
     module: 'texuli/kbd-code',
     exports: [
