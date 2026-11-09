@@ -39,5 +39,24 @@
     "lexicon": { "account": "player profile" },
     "guidelines": ["Celebrate small wins.", "Never shame a mistake."]
   },
-  "accessibility": { "contrast": "AA", "targetMin": 44, "focus": "glow", "focusWidth": 3 }
+  "accessibility": { "contrast": "AA", "targetMin": 44, "focus": "glow", "focusWidth": 3 },
+  "allow": {
+    "button": {},
+    "card": {},
+    "badge": {}
+  },
+  "library": [
+    {
+      "id": "score-chip",
+      "name": "Score chip",
+      "purpose": "A round chip that shows a player's score.",
+      "version": "0.1.0",
+      "status": "draft",
+      "composes": ["badge", "button"]
+    }
+  ],
+  "approval": {
+    "status": "draft",
+    "version": "1.0.0"
+  }
 }

@@ -34,6 +34,25 @@
     "guidelines": ["Lead with the number.", "Name the period every figure covers."]
   },
   "accessibility": { "contrast": "AA", "targetMin": 24, "focus": "ring", "focusWidth": 2 },
+  "allow": {
+    "button": {},
+    "card": {},
+    "input": {}
+  },
+  "library": [
+    {
+      "id": "kpi-strip",
+      "name": "KPI strip",
+      "purpose": "A row of figures for the day's ledger.",
+      "version": "0.1.0",
+      "status": "draft",
+      "composes": ["card", "button"]
+    }
+  ],
+  "approval": {
+    "status": "draft",
+    "version": "2.3.0"
+  },
   "variants": {
     "high-contrast": {
       "accessibility": { "contrast": "AAA", "focus": "outline", "focusWidth": 3 },
