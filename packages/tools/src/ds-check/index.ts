@@ -14,6 +14,7 @@
  *   `url`) itself; what `--render` runs.
  */
 export { type DsCliArgs, formatDsCheckReport, parseDsCliArgs, runDsCli } from './cli.ts';
+export * from './locked-static.ts';
 export {
   DS_MAP_CODES,
   DS_MAP_MAX_ISSUES,
