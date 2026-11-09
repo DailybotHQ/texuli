@@ -588,16 +588,16 @@ export interface RenderDesignSystemCheckOptions extends DsRenderOptions {
 }
 
 /**
- * Add the render checks to a static report: launch headless chromium, open
- * the sheet (the built-in conformance sheet by default, a page you built
- * with `sheet`, or `url`), and run {@link runDsRenderChecks} for every
- * compiled run. Throws a {@link DsCheckRequirementError} when Playwright,
- * axe, chromium or a sheet is missing.
+ * Launch headless chromium, open the sheet (the built-in conformance sheet by
+ * default, a page you built with `sheet`, or `url`) and run `fn` on that page;
+ * the browser and the sheet server are closed afterwards. Throws a
+ * {@link DsCheckRequirementError} when Playwright, axe, chromium or a sheet is
+ * missing. {@link renderDesignSystemCheck} and the locked render check use it.
  */
-export async function renderDesignSystemCheck(
-  report: DsCheckReport,
-  options: RenderDesignSystemCheckOptions = {}
-): Promise<DsCheckReport> {
+export async function withDsCheckPage<T>(
+  options: RenderDesignSystemCheckOptions,
+  fn: (page: DsCheckPage, context: { url: string; axe: DsAxeRunner }) => Promise<T>
+): Promise<T> {
   const cwd = options.cwd ?? process.cwd();
   const modules = await loadRenderModules(options.load ?? projectModuleLoader(cwd), {
     axe: options.axe === undefined,
@@ -621,6 +621,25 @@ export async function renderDesignSystemCheck(
     // axe needs a page of an explicit context.
     const page = await (await browser.newContext()).newPage();
     await page.goto(url, { timeout: options.timeoutMs ?? 60_000 });
+    return await fn(page, { url, axe });
+  } finally {
+    await browser.close();
+    await server?.close();
+  }
+}
+
+/**
+ * Add the render checks to a static report: launch headless chromium, open
+ * the sheet (the built-in conformance sheet by default, a page you built
+ * with `sheet`, or `url`), and run {@link runDsRenderChecks} for every
+ * compiled run. Throws a {@link DsCheckRequirementError} when Playwright,
+ * axe, chromium or a sheet is missing.
+ */
+export async function renderDesignSystemCheck(
+  report: DsCheckReport,
+  options: RenderDesignSystemCheckOptions = {}
+): Promise<DsCheckReport> {
+  return withDsCheckPage(options, async (page, { url, axe }) => {
     const runs = await runDsRenderChecks(page, report.runs, { ...options, axe });
     const render: DsRenderReport = { ok: runs.every((run) => run.ok), url, runs };
     const errors = [...report.errors, ...runs.flatMap(renderIssues)];
@@ -631,8 +650,5 @@ export async function renderDesignSystemCheck(
       errors,
       render,
     };
-  } finally {
-    await browser.close();
-    await server?.close();
-  }
+  });
 }

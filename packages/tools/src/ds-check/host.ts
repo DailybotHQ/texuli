@@ -8,6 +8,9 @@
  *
  * - `apply(compiled, mode)` puts a compiled design system on the scope
  *   (`applyDesignSystem`, one style write) and waits for fonts and two frames;
+ * - `map({ allow })` lists interactive elements outside a catalog component
+ *   root and roots the locked allow set does not list (`mapDesignSystemTree`
+ *   on the scope; what `--locked --render` reads from a prototype page);
  * - `inspect({ pairs })` measures, in the browser:
  *   - every contrast pair of the compiled report, painted through the
  *     cascade inside the scope (`color: var(fg)` on `background: var(bg)`),
@@ -24,6 +27,7 @@
  * of names that match `--tx-[a-z0-9-]+`.
  */
 import { type ApplicableDesignSystem, applyDesignSystem } from '@texuli/tokens/design-system/apply';
+import { type DsMapAllowManifest, type DsMapReport, mapDesignSystemTree } from './map.ts';
 import {
   DS_CHECK_COMPONENT_ATTRIBUTE,
   DS_CHECK_GLOBAL,
@@ -41,6 +45,8 @@ export interface DsCheckHost {
   ready(): Promise<string[]>;
   apply(compiled: ApplicableDesignSystem, mode: DsCheckMode): Promise<void>;
   inspect(input: { pairs: readonly DsInspectPair[] }): Promise<DsInspectResult>;
+  /** Maps the scope's controls through their catalog roots and the locked allow set. */
+  map(input: DsMapAllowManifest): DsMapReport;
 }
 
 export interface DsCheckHostOptions {
@@ -294,6 +300,12 @@ export function installDsCheckHost(
       applyDesignSystem(scope, compiled, { mode, fonts: true });
       current = { compiled, mode };
       await settle();
+    },
+    map(input) {
+      return mapDesignSystemTree(
+        scope,
+        input?.allow ? { allowManifest: { allow: input.allow } } : {}
+      );
     },
     async inspect({ pairs }) {
       const literals: DsRenderLiteral[] = [];

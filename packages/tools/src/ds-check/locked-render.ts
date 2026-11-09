@@ -1,7 +1,21 @@
 /** Locked-mode runtime checks: catalog ownership plus token-backed rendering and axe. */
 import { type DsMapAllowManifest, type DsMapReport, mapDesignSystemTree } from './map.ts';
-import { type DsRenderOptions, renderIssues, runDsRenderChecks } from './render.ts';
-import type { DsCheckIssue, DsCheckRun, DsRenderRun } from './types.ts';
+import {
+  type DsCheckPage,
+  type DsRenderOptions,
+  type RenderDesignSystemCheckOptions,
+  renderIssues,
+  runDsRenderChecks,
+  withDsCheckPage,
+} from './render.ts';
+import { issueCodes } from './static.ts';
+import {
+  DS_CHECK_GLOBAL,
+  type DsCheckIssue,
+  type DsCheckReport,
+  type DsCheckRun,
+  type DsRenderRun,
+} from './types.ts';
 
 export const DS_LOCKED_RENDER_EXEMPT_IDS = ['canvas', 'data-map', 'charts-*'] as const;
 
@@ -73,4 +87,77 @@ export async function runLockedRenderChecks(
     mapping,
     runs: checked,
   };
+}
+
+/** A mapping with nothing to report: the page was a conformance sheet, not a prototype. */
+const NOT_MAPPED: DsMapReport = { ok: true, codes: [], errors: [] };
+
+/**
+ * Map the page's ds-check scope in the browser (the host's `map`, i.e.
+ * {@link checkLockedRenderTree} on the live DOM) against the locked allow set.
+ */
+export async function mapLockedRenderPage(
+  page: DsCheckPage,
+  allowManifest: DsMapAllowManifest = {},
+  options: { timeoutMs?: number } = {}
+): Promise<DsMapReport> {
+  await page.waitForFunction((name) => name in globalThis, DS_CHECK_GLOBAL, {
+    timeout: options.timeoutMs ?? 60_000,
+  });
+  return page.evaluate(
+    ([name, allow]) => {
+      const host = (
+        globalThis as unknown as Record<
+          string,
+          { map?(input: { allow?: unknown }): DsMapReport } | undefined
+        >
+      )[name];
+      if (!host?.map) throw new Error('The page has no ds-check host with map().');
+      return host.map(allow === undefined ? {} : { allow });
+    },
+    [DS_CHECK_GLOBAL, allowManifest.allow] as const
+  );
+}
+
+export interface LockedRenderCheckResult {
+  /** The ds check report with the locked render findings merged in, and `render` set. */
+  readonly report: DsCheckReport;
+  readonly locked: LockedRenderReport;
+  /**
+   * Whether the page was mapped against the allow set: only a page you serve
+   * (`url`, your prototype). The conformance sheet paints every catalog
+   * component by design, so it is not mapped.
+   */
+  readonly mapped: boolean;
+}
+
+/**
+ * The locked render check behind `ds check --locked --render` and
+ * `ds validate --locked --render`: open the sheet or `url` like
+ * {@link renderDesignSystemCheck}, map a `url` page against the allow set,
+ * then run {@link runLockedRenderChecks} (chart, map and canvas marks exempt
+ * from the per-pixel literal check, see {@link DS_LOCKED_RENDER_EXEMPT_IDS}).
+ */
+export async function renderLockedDesignSystemCheck(
+  report: DsCheckReport,
+  allowManifest: DsMapAllowManifest | undefined,
+  options: RenderDesignSystemCheckOptions = {}
+): Promise<LockedRenderCheckResult> {
+  const mapped = options.url !== undefined;
+  return withDsCheckPage(options, async (page, { url, axe }) => {
+    const mapping = mapped ? await mapLockedRenderPage(page, allowManifest, options) : NOT_MAPPED;
+    const locked = await runLockedRenderChecks(page, report.runs, mapping, { ...options, axe });
+    const errors = [...report.errors, ...locked.errors];
+    return {
+      report: {
+        ...report,
+        ok: report.ok && locked.ok,
+        codes: issueCodes(errors),
+        errors,
+        render: { ok: locked.ok, url, runs: locked.runs },
+      },
+      locked,
+      mapped,
+    };
+  });
 }
