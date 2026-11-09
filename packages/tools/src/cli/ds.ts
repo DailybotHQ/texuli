@@ -11,6 +11,7 @@
  *     texuli ds preview <file> [--format svg|html] [--mode m] [--variant v] [--out <path> [--overwrite]]
  *     texuli ds diff <before> <after> [--mode m] [--base <file>]...
  *     texuli ds import <file|text> --from brand|dtcg|tokens-studio|role-palette|theme [--id] [--name] [--version] [--out <path> [--overwrite]]
+ *     texuli ds generate [--brief <text>] [--from-tokens <file>] [--from-css <file>] [--from-logo <pixels.json>] [--from-theme <file>] [-o <file>]
  *     texuli ds approve <file> --by <name> [--version <x.y.z>] [--trust t] [--base <file>]...
  *     texuli ds hash <file>
  *     texuli ds check <file> …                       (the conformance check, ds-check/cli.ts)
@@ -31,6 +32,8 @@
  */
 import { readFile, stat } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { generateDesignSystem } from '@texuli/tokens/design-system/compile-core';
+import { DESIGN_SYSTEM_IMPORT_LIMITS } from '@texuli/tokens/design-system/import';
 import { type DesignSystem, validateDesignSystem } from '@texuli/tokens/design-system/validate';
 import { DS_CHECK_MAX_BYTES, DS_CHECK_USAGE, parseDsCliArgs, runDsCli } from '../ds-check/cli.ts';
 import {
@@ -56,6 +59,7 @@ export const DS_COMMANDS = [
   'preview',
   'diff',
   'import',
+  'generate',
   'approve',
   'hash',
   'check',
@@ -70,6 +74,7 @@ export const DS_USAGE = [
   '       texuli ds preview <file> [--format svg|html] [--mode light|dark] [--variant <name>] [--out <path> [--overwrite]]',
   '       texuli ds diff <before> <after> [--mode light|dark] [--base <file>]...',
   '       texuli ds import <file|text> --from brand|dtcg|tokens-studio|role-palette|theme [--id <id>] [--name <name>] [--version <x.y.z>] [--out <path> [--overwrite]]',
+  '       texuli ds generate [--brief <text>] [--from-tokens <file>] [--from-css <file>] [--from-logo <pixels.json>] [--from-theme <file>] [-o <file> [--overwrite]]',
   '       texuli ds approve <file> --by <name> [--version <x.y.z>] [--trust developer|untrusted] [--base <file>]...',
   '       texuli ds hash <file>',
   `       ${DS_CHECK_USAGE.replace('Usage: ', '')}`,
@@ -95,6 +100,18 @@ const FLAGS: Record<DsCommandArgs['command'], readonly string[]> = {
   preview: ['format', 'mode', 'variant', 'trust', 'base', 'out', 'title'],
   diff: ['mode', 'variant', 'trust', 'base'],
   import: ['from', 'id', 'name', 'version', 'trust', 'out'],
+  generate: [
+    'brief',
+    'from-tokens',
+    'from-css',
+    'from-logo',
+    'from-theme',
+    'id',
+    'name',
+    'version',
+    'trust',
+    'out',
+  ],
   approve: ['by', 'version', 'trust', 'base'],
   hash: [],
 };
@@ -106,6 +123,7 @@ const POSITIONALS: Record<DsCommandArgs['command'], number> = {
   preview: 1,
   diff: 2,
   import: 1,
+  generate: 0,
   approve: 1,
   hash: 1,
 };
@@ -152,6 +170,14 @@ export function parseDsArgs(
     if (arg === '--help' || arg === '-h') return { command: 'help', argv: [...argv] };
     if (arg === '--overwrite') {
       parsed.overwrite = true;
+      continue;
+    }
+    if (arg === '-o') {
+      if (name !== 'generate') throw new TypeError('Flag -o belongs to ds generate.');
+      const value = rest[++index];
+      if (value === undefined || value.startsWith('--'))
+        throw new TypeError('Flag -o needs a value.');
+      parsed.flags.out = value;
       continue;
     }
     if (arg === '--locked') {
@@ -355,13 +381,20 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
   }
   if (args.command === 'help') {
     stdout.write(
-      `${DS_USAGE}\n\nAuthor and check design-system documents. Each command runs a registry operation (ds.import, ds.validate, ds.compile, ds.preview, ds.diff) and prints its JSON; --out writes the content instead (a new file inside the working directory; --overwrite replaces one). check is the conformance check (texuli ds check --help).\nExit 0 valid, 1 refused, 2 could not run.\n`
+      `${DS_USAGE}\n\nAuthor and check design-system documents. Import, validate, compile, preview and diff print their operation JSON; --out writes the result through the local file policy. generate composes the available inputs and writes the document plus <out>.report.json; -o is its output shorthand. check is the conformance check (texuli ds check --help).\nExit 0 valid, 1 refused, 2 could not run.\n`
     );
     return { ok: true };
   }
   if (args.command === 'check') {
     const result = await runDsCli(args.argv, io);
     return result.ok ? { ok: true } : { ok: false, error: result.error };
+  }
+  if (args.command === 'generate') {
+    try {
+      return await runGenerate(args, io);
+    } catch (error) {
+      return cannotRun(error instanceof Error ? error.message : String(error));
+    }
   }
   if (args.command === 'approve' || args.command === 'hash') {
     try {
@@ -435,6 +468,99 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
     `${JSON.stringify({ ok: true, operation: step.operation, format: output.format, out: written.relative, bytes: written.bytes }, null, 2)}\n`
   );
   return { ok: true, out: written.relative };
+}
+
+/** Run the local, bounded design-system generation pipeline and save its loss/repair report. */
+async function runGenerate(args: DsCommandArgs, io: DsIo): Promise<DsResult> {
+  const cwd = io.cwd ?? process.cwd();
+  const stdout = io.stdout ?? process.stdout;
+  const stderr = io.stderr ?? process.stderr;
+  const readInput = async (flag: string) => {
+    const path = args.flags[flag];
+    return path === undefined ? undefined : await readText(resolve(cwd, path));
+  };
+  const [tokens, css, logoText, theme] = await Promise.all([
+    readInput('from-tokens'),
+    readInput('from-css'),
+    readInput('from-logo'),
+    readInput('from-theme'),
+  ]);
+  let logoPixels: unknown;
+  if (logoText !== undefined) {
+    try {
+      logoPixels = JSON.parse(logoText) as unknown;
+    } catch {
+      throw new SyntaxError('--from-logo must be JSON containing pixel data `{ "data": [...] }`.');
+    }
+  }
+  const generated = generateDesignSystem(
+    {
+      ...(args.flags.brief !== undefined ? { brief: args.flags.brief } : {}),
+      ...(tokens !== undefined ? { tokens } : {}),
+      ...(css !== undefined ? { css } : {}),
+      ...(logoPixels !== undefined
+        ? { logoPixels: logoPixels as { data: ArrayLike<number> } }
+        : {}),
+      ...(theme !== undefined ? { theme } : {}),
+    },
+    {
+      ...(args.flags.id ? { id: args.flags.id } : {}),
+      ...(args.flags.name ? { name: args.flags.name } : {}),
+      ...(args.flags.version ? { version: args.flags.version } : {}),
+      ...(args.flags.trust === 'developer' ? { trust: 'developer' as const } : {}),
+      maxBytes: DESIGN_SYSTEM_IMPORT_LIMITS.bytes,
+    }
+  );
+  if (!generated.ok) {
+    const refusal = {
+      ok: false,
+      operation: 'ds.generate',
+      errors: generated.errors,
+      report: generated.report,
+    };
+    stdout.write(`${JSON.stringify(refusal, null, 2)}\n`);
+    process.exitCode = 1;
+    return { ok: false, error: `Generation refused: ${JSON.stringify(generated.errors)}` };
+  }
+  const result = {
+    ok: true,
+    operation: 'ds.generate',
+    document: generated.document,
+    report: generated.report,
+  };
+  const outputPath = args.flags.out;
+  if (outputPath === undefined) {
+    stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    return { ok: true };
+  }
+  const files = localFiles(io.cwd ? { cwd: io.cwd } : {});
+  const reportPath = `${outputPath}.report.json`;
+  const reportWrite = await files.write(
+    reportPath,
+    `${JSON.stringify(generated.report, null, 2)}\n`,
+    {
+      overwrite: args.overwrite,
+    }
+  );
+  if (!reportWrite.ok) {
+    stderr.write(`${reportWrite.error} (${reportWrite.code})\n`);
+    process.exitCode = 1;
+    return { ok: false, error: reportWrite.error };
+  }
+  const documentWrite = await files.write(
+    outputPath,
+    `${JSON.stringify(generated.document, null, 2)}\n`,
+    { overwrite: args.overwrite }
+  );
+  if (!documentWrite.ok) {
+    stderr.write(`${documentWrite.error} (${documentWrite.code})\n`);
+    process.exitCode = 1;
+    return { ok: false, error: documentWrite.error };
+  }
+  stdout.write(
+    `${JSON.stringify({ ok: true, operation: 'ds.generate', out: documentWrite.relative, report: reportWrite.relative }, null, 2)}\n`
+  );
+  return { ok: true, out: documentWrite.relative };
 }
 
 /** The `allow` section `init --locked` writes: a catalog preset (default `minimal`) or a JSON file. */
