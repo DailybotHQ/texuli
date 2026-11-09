@@ -110,7 +110,7 @@ const TARGETS = [
 test('the landing header fits across its breakpoints, and flagged links are at least 24px', async ({
   page,
 }) => {
-  for (const width of [360, 400, 641, 700, 767, 769, 800, 900, 1023, 1025, 1100, 1280]) {
+  for (const width of [360, 400, 641, 700, 767, 769, 800, 900, 1023, 1025, 1100, 1153, 1279, 1280]) {
     await visit(page, '/', width);
     const header = await page.evaluate(() => {
       const root = document.querySelector('[data-tx-site-header]');
@@ -135,16 +135,19 @@ test('the landing header fits across its breakpoints, and flagged links are at l
       return {
         past,
         wrapped,
-        doors: visible('nav.platform-links'),
-        repo: visible('[data-repo-door]'),
+        // ADR-031: the global nav (Solutions · Components · Native · Themes · Agents · Docs ·
+        // GitHub) is inline from 64rem; below, the landing menu lists the same items.
+        doors: visible('nav.global-nav'),
+        repo: visible('nav.global-nav a[href*="github.com"]'),
         start: visible('.get-started'),
       };
     });
     expect(header.past, `${width}px: header elements past the viewport`).toEqual([]);
     expect(header.wrapped, `${width}px: a header link wraps`).toBe(false);
-    expect(header.doors, `${width}px: platform doors`).toBe(width > 768);
+    expect(header.doors, `${width}px: global nav inline`).toBe(width > 1024);
     expect(header.repo, `${width}px: GitHub door`).toBe(width > 1024);
-    expect(header.start, `${width}px: Get started`).toBe(width > 1024);
+    // Get started joins from 80rem (1280px); below it Docs in the nav covers it.
+    expect(header.start, `${width}px: Get started`).toBe(width >= 1280);
   }
   for (const width of [360, 1280]) {
     for (const [path, selector] of TARGETS) {
