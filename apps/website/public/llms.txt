@@ -100,6 +100,7 @@ The headless, APG-aligned primitives beneath the styled components; every primit
 Design systems (one JSON document per brand; new in 0.10.0), the OKLCH theme engine, the interactive theme tools and the design token reference.
 
 - [Design systems](https://texuli.com/design-systems/)
+- [Design system kit](https://texuli.com/design-systems/kit/)
 - [Theme gallery](https://texuli.com/gallery-themes/)
 - [Switcher](https://texuli.com/theme-switcher/)
 - [Studio](https://texuli.com/theme-studio/)

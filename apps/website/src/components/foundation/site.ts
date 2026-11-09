@@ -94,6 +94,8 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     links: [
       // PLAN_011 T-site-0100: the design systems hub (released in 0.10.0).
       { href: '/design-systems/', label: 'Design systems' },
+      // PLAN_016 T-t4-site: the design-system kit (texuli/ds-kit) for an example brand.
+      { href: '/design-systems/kit/', label: 'Design system kit' },
       { href: '/gallery-themes/', label: 'Theme gallery' },
       { href: '/theme-switcher/', label: 'Switcher' },
       { href: '/theme-studio/', label: 'Studio' },
