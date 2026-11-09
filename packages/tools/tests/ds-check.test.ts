@@ -1,5 +1,14 @@
 // @vitest-environment node
-import { mkdir, mkdtemp, readdir, readFile, realpath, rm, writeFile } from 'node:fs/promises';
+import {
+  mkdir,
+  mkdtemp,
+  readdir,
+  readFile,
+  realpath,
+  rm,
+  symlink,
+  writeFile,
+} from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -11,6 +20,7 @@ import {
   DS_CHECK_BUILTIN_SHEET,
   DS_CHECK_KNOWN_FINDINGS,
   DS_CHECK_PLAYWRIGHT_PACKAGES,
+  DS_CHECK_PROTOTYPE_SYMLINK,
   DS_CHECK_SHEET_PATH,
   type DsCheckPage,
   type DsCheckReport,
@@ -121,6 +131,20 @@ describe('texuli ds check (static)', () => {
       /^PASS minimal@1\.0\.0\n {2}base light: (\d+)\/\1 contrast pairs pass/u
     );
     expect(minimal.text).not.toContain('high-contrast');
+  });
+
+  it('refuses a symlink --prototype root with prototype-symlink', async () => {
+    const root = await scratch();
+    const real = join(root, 'src');
+    await mkdir(real);
+    await writeFile(join(real, 'App.svelte'), '<p>ok</p>');
+    const link = join(root, 'proto');
+    await symlink(real, link);
+    const run = await check([await file('brand.json', doc()), '--locked', '--prototype', link]);
+    expect(run.code).toBe(2);
+    expect(run.err).toContain(DS_CHECK_PROTOTYPE_SYMLINK);
+    expect(run.err).toContain('Prototype symlinks are refused');
+    expect(run.result.ok).toBe(false);
   });
 
   it('narrows with --mode and --variant, and refuses a variant the document does not declare', async () => {

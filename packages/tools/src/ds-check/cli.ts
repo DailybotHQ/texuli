@@ -16,7 +16,7 @@
  * (`content-hash-mismatch`, `library-hash-mismatch`). It reports the allowed
  * set and the approval status as declared; it cannot prove who approved.
  */
-import { readdir, readFile, stat } from 'node:fs/promises';
+import { lstat, readdir, readFile, stat } from 'node:fs/promises';
 import { extname, relative, resolve } from 'node:path';
 import type { SpecCatalog } from '@texuli/spec';
 import { loadSpecCatalog } from '../ops/catalog.ts';
@@ -37,6 +37,9 @@ import type { DsCheckMode, DsCheckReport } from './types.ts';
 
 /** The largest design-system file the CLI reads. */
 export const DS_CHECK_MAX_BYTES = 1_000_000;
+
+/** Stable code when `--prototype` is a symlink (the root or an entry). */
+export const DS_CHECK_PROTOTYPE_SYMLINK = 'prototype-symlink';
 
 export const DS_CHECK_USAGE =
   'Usage: texuli ds check <file> [--locked [--report]] [--prototype <dir>] [--json] [--render] [--mode light|dark|all] [--variant <name>]... [--trust developer|untrusted] [--base <file>]... [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict] [--catalog <components.json>]';
@@ -285,6 +288,10 @@ export async function loadAllowCatalog(): Promise<SpecCatalog> {
   return loadSpecCatalog();
 }
 
+function refusePrototypeSymlink(name: string): never {
+  throw new TypeError(`${DS_CHECK_PROTOTYPE_SYMLINK}: Prototype symlinks are refused: ${name}.`);
+}
+
 /** Read a bounded prototype tree without following symlinks or executing source files. */
 async function readPrototypeDirectory(path: string) {
   const root = resolve(path);
@@ -296,7 +303,7 @@ async function readPrototypeDirectory(path: string) {
     for (const entry of entries) {
       const absolute = resolve(directory, entry.name);
       const name = relative(root, absolute).split('\\').join('/');
-      if (entry.isSymbolicLink()) throw new TypeError(`Prototype symlinks are refused: ${name}.`);
+      if (entry.isSymbolicLink()) refusePrototypeSymlink(name);
       if (entry.isDirectory()) {
         await walk(absolute);
         continue;
@@ -338,8 +345,9 @@ async function readPrototypeDirectory(path: string) {
       }
     }
   };
-  const info = await stat(root);
-  if (!info.isDirectory()) throw new TypeError(`Prototype ${path} is not a directory.`);
+  const rootInfo = await lstat(root);
+  if (rootInfo.isSymbolicLink()) refusePrototypeSymlink(path);
+  if (!rootInfo.isDirectory()) throw new TypeError(`Prototype ${path} is not a directory.`);
   await walk(root);
   return { files, blueprints };
 }

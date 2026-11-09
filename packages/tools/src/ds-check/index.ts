@@ -16,7 +16,13 @@
  *   conformance sheet that ships in this package (or a page you built, or
  *   `url`) itself; what `--render` runs.
  */
-export { type DsCliArgs, formatDsCheckReport, parseDsCliArgs, runDsCli } from './cli.ts';
+export {
+  DS_CHECK_PROTOTYPE_SYMLINK,
+  type DsCliArgs,
+  formatDsCheckReport,
+  parseDsCliArgs,
+  runDsCli,
+} from './cli.ts';
 export * from './css-policy.ts';
 export * from './full.ts';
 export * from './locked-static.ts';
