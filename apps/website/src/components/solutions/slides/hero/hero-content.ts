@@ -15,6 +15,6 @@ export const SLIDES_HERO: Omit<SolutionHeroProps, 'entry'> = {
   lede: 'Write a deck in JSON or Markdown, check it against one model, then present it with layouts and a presenter view, or print it and export PPTX.',
   ctas: [
     { kind: 'primary', label: 'Try the live deck', href: `#${SOLUTION_SECTION_IDS.demo}` },
-    { kind: 'secondary', label: 'See the Slides demo page', href: '/slides-page/' },
+    { kind: 'secondary', label: 'Start building', href: `#${SOLUTION_SECTION_IDS.quickstart}` },
   ],
 };
