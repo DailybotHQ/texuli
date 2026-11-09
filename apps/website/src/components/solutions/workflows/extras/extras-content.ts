@@ -70,7 +70,7 @@ export const WORKFLOWS_PLATFORMS: Omit<SolutionPlatformsProps, 'entry'> = {
 
 export const WORKFLOWS_NEXT: Omit<SolutionNextStepsProps, 'entry'> = {
   links: [
-    { label: 'Read the docs', href: '/guides/solutions/workflows/' },
+    { label: 'Build your first workflow graph', href: '/guides/solutions/workflows/' },
     { label: '@texuli/workflows on npm', href: 'https://www.npmjs.com/package/@texuli/workflows' },
   ],
 };

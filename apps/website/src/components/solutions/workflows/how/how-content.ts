@@ -14,31 +14,32 @@
 import type { SolutionHowProps } from '../../shared/types.ts';
 
 export const WORKFLOWS_HOW: Omit<SolutionHowProps, 'entry'> = {
-  title: 'From a typed graph to a laid-out editor.',
+  title: 'From typed graph to editable view.',
+  art: { slot: 'solution-workflows-how', variant: 'band' },
   steps: [
     {
       title: 'Model',
-      body: 'Declare closed node types, then add nodes and edges as operations. Every operation is checked against ports and cycle policy.',
+      body: 'Define node types, then apply validated operations to build the graph.',
       package: '@texuli/workflows',
     },
     {
       title: 'Lay out',
-      body: 'A deterministic layered layout places the graph, left to right or top to bottom.',
+      body: 'Place nodes deterministically, left to right or top to bottom.',
       package: '@texuli/workflows',
     },
     {
       title: 'Edit',
-      body: 'The editor adds a toolbar, a palette, a canvas and history. The canvas moves nodes with the drag engine.',
+      body: 'Use the canvas or keyboard outline; wire undo and redo through workflow history.',
       package: '@texuli/workflows',
     },
     {
       title: 'Inspect',
-      body: 'The inspector shows the selected node so you can edit its fields without the canvas.',
+      body: 'Edit the selected node’s typed props in the inspector.',
       package: '@texuli/workflows',
     },
     {
       title: 'View',
-      body: 'The viewer is read-only, with an accessible outline of the same graph.',
+      body: 'Show the same graph as a read-only figure that lists where each node leads.',
       package: '@texuli/workflows',
     },
   ],
