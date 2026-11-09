@@ -1,5 +1,5 @@
 import type { GenerateDesignSystemInput } from '@texuli/tokens/design-system/compile-core';
-import type { Operation } from '../ops/types.ts';
+import type { Operation } from './types.ts';
 
 const issue = {
   type: 'object' as const,
@@ -31,7 +31,7 @@ const report = {
 
 /** Draft-only MCP adapter for the deterministic tokens generator. */
 export const designSystemGenerate: Operation = {
-  name: 'design_system.generate',
+  name: 'ds.generate',
   title: 'Generate a design-system draft',
   summary:
     'Combine a brand brief, token JSON, site CSS, logo pixels and/or a Texuli theme into a validated design-system draft. Returns the document, every reported loss, automatic AA repairs and guarantee results; it never saves or approves the draft.',

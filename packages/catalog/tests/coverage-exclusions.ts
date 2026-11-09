@@ -43,6 +43,9 @@ add('texuli', 'part', 'A part of card (manifest card).', [
   'CardTitle',
 ]);
 add('texuli', 'part', 'A part of alert (manifest alert).', ['AlertSurface', 'ToneIcon']);
+add('texuli', 'part', 'A part of icon (manifest icon); the Lucide set of the same id.', [
+  'LucideIcon',
+]);
 add('texuli', 'part', 'A part of combobox or multi-select (manifests combobox, multi-select).', [
   'ComboboxChip',
   'ComboboxChips',
@@ -206,16 +209,9 @@ add(
 add('texuli', 'chrome', 'Uploading files is host chrome: a blueprint never asks for local files.', [
   'FileUpload',
 ]);
-add(
-  'texuli',
-  'utility',
-  'Icons are referenced by name inside other components (icon-button, nav-icon).',
-  ['Icon', 'LucideIcon']
-);
 add('texuli', 'utility', 'A layout or accessibility helper with no content of its own.', [
   'AspectRatio',
   'ScrollArea',
-  'Separator',
   'VisuallyHidden',
 ]);
 add(
@@ -255,14 +251,9 @@ add(
   ['CopyButton']
 );
 add('texuli', 'planned', 'Planned manifest: a display component with plain data props.', [
-  'Avatar',
   'AvatarGroup',
   'CardGrid',
-  'Carousel',
   'KpiRow',
-  'Progress',
-  'Skeleton',
-  'Spinner',
 ]);
 add(
   'texuli',
@@ -289,13 +280,6 @@ add('texuli', 'planned', 'Planned manifest: a toolbar of host actions (closed em
 add('texuli', 'planned', 'Planned manifest; data-tree-view covers trees from data today.', [
   'TreeView',
 ]);
-add(
-  'texuli',
-  'planned',
-  'Planned manifest: a list row (texuli/list-item, 0.14.3); a catalog id waits for the next spec minor.',
-  ['ListItem']
-);
-
 // ── @texuli/data ───────────────────────────────────────────────
 add('@texuli/data', 'painted-by', 'Painted by data-calendar.', ['CalendarView']);
 add('@texuli/data', 'painted-by', 'Painted by data-map.', ['MapView']);
@@ -440,5 +424,8 @@ export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(row
 // PLAN_016 T-t4-library), the same kit chrome, to 223 for KitVoice (T-t4-voice), and
 // to 224 for KitMatrix (T-t4-matrix). Lowered to 219 in PLAN_016 T-widen-app:
 // Accordion, Tabs, BottomNav, MobileHeader and Composer gained manifests
-// (host chrome stays non-emittable; the allow set governs them).
-export const EXCLUSION_CEILING = 219;
+// (host chrome stays non-emittable; the allow set governs them). Lowered
+// again in PLAN_016 T-widen-display: Icon, Avatar, Skeleton, Progress, Spinner,
+// Carousel, Separator and ListItem became catalog ids (LucideIcon is a part of
+// icon). Combined ceiling is the live row count.
+export const EXCLUSION_CEILING = 211;

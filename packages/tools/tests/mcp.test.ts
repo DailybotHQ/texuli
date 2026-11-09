@@ -8,7 +8,6 @@ import {
   MCP_PROTOCOL_VERSION,
   runMcpStdio,
 } from '../src/mcp/index.ts';
-import { TEXULI_OPERATIONS } from '../src/ops/index.ts';
 import { scenario } from './scenario.ts';
 
 type Response = {
@@ -100,6 +99,7 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
         'ds.contrast',
         'ds.suggest',
         'ds.import',
+        'ds.generate',
         'ds.allow',
         'ds.diff',
         'ds.preview',
@@ -237,7 +237,7 @@ it('reports tool and protocol errors and speaks newline-delimited JSON-RPC on st
       ) as { version: string };
       expect(messages[0]?.result?.serverInfo).toEqual({ name: 'texuli', version });
       expect(version).not.toBe('0.0.0');
-      expect(messages[1]?.result?.tools).toHaveLength(23);
+      expect(messages[1]?.result?.tools).toHaveLength(24);
     }
   );
 });

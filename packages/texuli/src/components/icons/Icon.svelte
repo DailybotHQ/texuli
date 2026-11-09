@@ -6,7 +6,7 @@ import { designDefaults } from '../../internal/design-defaults.ts';
 import { ICON_SIZES, iconClass } from './icon-variants.ts';
 import { iconPath, isIconName } from './icons.ts';
 import { iconLookup } from './registry.ts';
-import type { IconComponentProps, IconRef, IconSize } from './types.ts';
+import type { IconComponentProps, IconRef, IconSize, IconTone } from './types.ts';
 
 type Props = Omit<SVGAttributes<SVGSVGElement>, 'class' | 'color'> & {
   /**
@@ -15,6 +15,7 @@ type Props = Omit<SVGAttributes<SVGSVGElement>, 'class' | 'color'> & {
    */
   icon?: IconRef;
   size?: IconSize;
+  tone?: IconTone;
   /** Passed through to custom/Lucide components; Lucide accepts number | string. */
   strokeWidth?: number | string;
   /** Optional color; `null` is normalized away before spreading onto Lucide. */
@@ -28,6 +29,7 @@ const txDefaults = designDefaults('icon');
 let {
   icon,
   size = txDefaults().size ?? 'md',
+  tone = txDefaults().tone ?? 'default',
   strokeWidth = 2,
   color = undefined,
   label,
@@ -54,7 +56,7 @@ const name = $derived(typeof icon === 'string' && glyph !== undefined ? icon : u
 const component = $derived(typeof glyph === 'function' ? glyph : undefined);
 const path = $derived(typeof glyph === 'string' ? glyph : undefined);
 const accessibleName = $derived(label ?? ariaLabel);
-const classes = $derived(iconClass({ size, class: className }));
+const classes = $derived(iconClass({ size, tone, class: className }));
 /** Lucide-safe color: drop null so Component props stay assignable. */
 const glyphColor = $derived(color === null || color === undefined ? undefined : color);
 
@@ -86,9 +88,15 @@ const glyphProps = $derived({
   role: accessibleName ? ('img' as const) : undefined,
   'aria-label': accessibleName,
   'data-tx-icon': name ?? 'custom',
+  'data-tx-component': 'icon',
+  'data-tx-size': size,
+  'data-tx-tone': tone,
 } satisfies IconComponentProps & {
   class?: ClassValue;
   'data-tx-icon'?: string;
+  'data-tx-component'?: string;
+  'data-tx-size'?: IconSize;
+  'data-tx-tone'?: IconTone;
 });
 </script>
 
@@ -109,6 +117,9 @@ const glyphProps = $derived({
     role={accessibleName ? 'img' : undefined}
     aria-label={accessibleName}
     data-tx-icon={name}
+    data-tx-component="icon"
+    data-tx-size={size}
+    data-tx-tone={tone}
   >
     <path d={path} />
   </svg>

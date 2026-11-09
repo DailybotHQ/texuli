@@ -43,6 +43,14 @@ export const DISPLAY_AXIS_STAMP: Readonly<Record<string, Stamp>> = {
   },
   tag: { axes: { variant: 'variant' }, states: ['hover', 'focus-visible', 'disabled', 'loading'] },
   timeline: { states: ['focus-visible', 'selected'] },
+  icon: { axes: { size: 'size', tone: 'tone' } },
+  avatar: { axes: { size: 'size' } },
+  skeleton: { axes: { size: 'size' }, states: ['loading'] },
+  spinner: { axes: { size: 'size', tone: 'tone' }, states: ['loading'] },
+  progress: { axes: { size: 'size', tone: 'tone' }, states: ['loading'] },
+  carousel: { states: ['hover', 'focus-visible', 'selected'] },
+  separator: { axes: { variant: 'variant' } },
+  'list-item': { states: ['hover', 'focus-visible', 'disabled', 'selected'] },
 };
 
 export function stampDisplayAxes(manifest: CatalogManifest): CatalogManifest {

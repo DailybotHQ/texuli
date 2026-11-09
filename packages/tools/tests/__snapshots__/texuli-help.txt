@@ -19,6 +19,7 @@ Operations (the @texuli/tools registry; the same names are MCP tools):
   ds contrast               Report design-system contrast
   ds suggest                Suggest a design system
   ds import                 Import a design system
+  ds generate               Generate a design-system draft
   ds allow                  List allowed components for a locked design system
   ds diff                   Diff two design systems
   ds preview                Preview a design system
@@ -126,6 +127,7 @@ Operations:
   ds contrast               Report design-system contrast [ds.contrast]
   ds suggest                Suggest a design system [ds.suggest]
   ds import                 Import a design system [ds.import]
+  ds generate               Generate a design-system draft [ds.generate]
   ds allow                  List allowed components for a locked design system [ds.allow]
   ds diff                   Diff two design systems [ds.diff]
   ds preview                Preview a design system [ds.preview]
@@ -403,6 +405,22 @@ Arguments (JSON object keys):
 
 Limits: input up to 1048576 bytes, 10000 ms budget.
 Example (A brand one-liner): texuli ds import --json '{"from":"brand","input":"name Harborline, brand #0e7490, accent #f59e0b, font Inter, rounded, compact"}'
+
+----
+Usage: texuli ds generate [--json <object> | --file <path>] [--out <path>]
+
+Generate a design-system draft (ds.generate, runtime edge)
+Combine a brand brief, token JSON, site CSS, logo pixels and/or a Texuli theme into a validated design-system draft. Returns the document, every reported loss, automatic AA repairs and guarantee results; it never saves or approves the draft.
+
+Arguments (JSON object keys):
+  brief: string.
+  tokens: string | object.
+  css: string.
+  logoPixels: object.
+  theme: string | object.
+
+Limits: input up to 1048576 bytes, 10000 ms budget.
+Example (A brand brief with CSS tokens): texuli ds generate --json '{"brief":"A calm fictional studio with teal, rounded cards and compact spacing","css":":root { --brand: #0e7490; --radius: 10px; --space: 4px; }"}'
 
 ----
 Usage: texuli ds allow [--json <object> | --file <path>] [--out <path>]

@@ -1,12 +1,85 @@
 # Texuli — full agent docs
 
-> Complete catalog documentation generated from manifests (170 components).
+> Complete catalog documentation generated from manifests (187 components).
 
 ## Blueprint envelope
 
 A tree may travel in a blueprint envelope (`"format": "texuli-blueprint"`, `"version": 1`, `"spec"`, `"catalog"`, `"status": "draft"`, `"tree"`). Hosts validate it with `validateDraft` from `@texuli/catalog/validate` and paint it with `@texuli/player`.
 
 Design system (spec 0.10.0, from 0.10.0): the envelope may carry `"designSystem"`, exactly one of `{"ref": "acme@2.1.0"}` (an exact `id@x.y.z` the host resolves, or `"texuli:<theme>"` for a library theme) and `{"inline": {"format": "texuli/design-system", "formatVersion": 1, "id", "version", "name", …}}` (a whole design-system document: colors, typography, shape, space and the other closed sections; never CSS). Never a version range, a URL, a path or a `data:` URL. The player applies it to its root; when it cannot (nothing resolves it, or the compiler refuses it for contrast, targets or URLs), the content paints in the default theme with a notice. Validation reports `check: "design-system"` with codes such as `extends-range`, `url-refused` and `unknown-key` and paths under `$.designSystem`.
+
+---
+
+# Accordion
+
+> Stacked sections that expand and collapse one or more panels.
+
+- **id:** `accordion`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- FAQs and grouped detail the reader opens on demand
+
+### Don't use when
+
+- Peer views of one page (use tabs)
+- A multi-step flow (use wizard)
+
+### Accessibility
+
+- Each header is a button that names its panel; expanded state is exposed
+- Heading level is set so the outline stays valid
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `items` | array | yes | — | — | Sections: value, title, optional content |
+| `type` | enum(single | multiple) | no | — | `"single"` | — |
+| `value` | unknown | no | — | — | Open value or values |
+| `onValueChange` | event | no | — | — | Open value changed |
+| `collapsible` | boolean | no | — | `true` | — |
+| `headingLevel` | number | no | — | `3` | — |
+| `variant` | enum(default | bordered) | no | — | `"default"` | — |
+| `disabled` | boolean | no | — | `false` | — |
+| `class` | string | no | — | — | — |
+| `content` | slot | no | — | — | Panel body for each item |
+
+### Examples
+
+#### FAQ (`faq`)
+
+```json
+{
+  "headingLevel": 3,
+  "items": [
+    {
+      "value": "hours",
+      "title": "Hours",
+      "content": "Weekdays 9–17."
+    },
+    {
+      "value": "fees",
+      "title": "Fees",
+      "content": "No booking fee."
+    }
+  ]
+}
+```
+
+### Related
+
+- [`tabs`](components/tabs.md)
+- [`stepper`](components/stepper.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
 
 ---
 
@@ -310,6 +383,70 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 - [`sidebar`](components/sidebar.md)
 - [`sheet`](components/sheet.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Avatar
+
+> A face or initials for one person, with an optional presence status.
+
+- **id:** `avatar`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Show who wrote a message, who owns a task, or who is in a thread
+
+### Don't use when
+
+- A group of faces in one circle (use avatar-group-grid)
+
+### Accessibility
+
+- Named by the person unless decorative.
+- Image URLs pass the untrusted image policy.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `name` | string | yes | untrusted | — | — |
+| `src` | string | no | untrusted | — | — |
+| `srcTrust` | enum(developer | untrusted) | no | — | `"untrusted"` | — |
+| `srcset` | string | no | untrusted | — | — |
+| `sizes` | string | no | — | — | — |
+| `size` | enum(xs | sm | md | lg) | no | — | `"md"` | — |
+| `tone` | enum(primary | success | warning | destructive | info | neutral) | no | — | — | — |
+| `shape` | enum(circle | square) | no | — | — | — |
+| `status` | enum(online | away | busy | offline) | no | — | — | — |
+| `decorative` | boolean | no | — | `false` | — |
+| `delayMs` | number | no | — | `0` | — |
+| `initials` | string | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Named person (`person`)
+
+```json
+{
+  "name": "Ada Example",
+  "size": "md"
+}
+```
+
+### Related
+
+- [`avatar-group-grid`](components/avatar-group-grid.md)
+- [`list-item`](components/list-item.md)
 
 ---
 
@@ -1008,6 +1145,157 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 ---
 
+# BottomNav
+
+> A mobile tab bar of destinations. Host chrome; agents never emit it.
+
+- **id:** `bottom-nav`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- Primary destinations on a phone-sized app shell
+
+### Don't use when
+
+- In-page tabs (use tabs)
+- Desktop sidebar navigation (use layout-sidebar)
+
+### Accessibility
+
+- A labelled nav landmark; the current destination uses aria-current, not color alone.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `items` | array | yes | — | — | Destinations: href, label, optional icon and badge |
+| `label` | string | no | — | — | Accessible name of the landmark |
+| `fixed` | boolean | no | — | `false` | — |
+| `hrefTrust` | enum(developer | untrusted) | no | — | `"developer"` | — |
+| `onSelect` | event | no | — | — | A destination was activated |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Primary destinations (`primary`)
+
+```json
+{
+  "items": [
+    {
+      "id": "home",
+      "href": "/home",
+      "label": "Home"
+    },
+    {
+      "id": "inbox",
+      "href": "/inbox",
+      "label": "Inbox"
+    }
+  ]
+}
+```
+
+### Related
+
+- [`mobile-header`](components/mobile-header.md)
+- [`tabs`](components/tabs.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Box
+
+> A panel or region with padding, radius, border, elevation and surface from tokens.
+
+- **id:** `box`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Frame a group of content as a bordered or filled panel
+- Space and surface a region in a locked prototype, where visual utilities are refused
+
+### Don't use when
+
+- A clickable surface (use card with href)
+- Page layout (use a layout)
+
+### Accessibility
+
+- Not interactive. Use as="section" or "aside" with a heading for a landmark-like region.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `as` | enum(div | section | article | aside | header | footer) | no | — | `"div"` | — |
+| `padding` | enum(none | sm | md | lg | xl) | no | — | `"md"` | — |
+| `radius` | enum(none | sm | md | lg | xl | full) | no | — | `"md"` | — |
+| `border` | enum(none | default | strong | block-start | block-end) | no | — | `"none"` | All sides, or one logical side (block-start, block-end) for an app header or footer |
+| `elevation` | enum(none | sm | md | lg) | no | — | `"none"` | — |
+| `surface` | enum(transparent | default | muted | subtle | elevated) | no | — | `"transparent"` | The fill (the variant axis) |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | The panel content |
+
+### Examples
+
+#### Bordered panel (`bordered`)
+
+```json
+{
+  "padding": "lg",
+  "border": "default",
+  "surface": "default"
+}
+```
+
+#### Muted region (`muted`)
+
+```json
+{
+  "padding": "md",
+  "radius": "lg",
+  "surface": "muted"
+}
+```
+
+#### App header (no card chrome) (`app-header`)
+
+```json
+{
+  "as": "header",
+  "padding": "md",
+  "radius": "none",
+  "border": "block-end",
+  "surface": "default"
+}
+```
+
+### Related
+
+- [`card`](components/card.md)
+- [`heading`](components/heading.md)
+- [`text`](components/text.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
 # Breadcrumb
 
 > Hierarchy trail with URL-policy links.
@@ -1111,6 +1399,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | --- | --- | --- | --- | --- | --- |
 | `variant` | enum(default | secondary | outline | ghost | destructive | link) | no | — | `"default"` | — |
 | `size` | enum(sm | md | lg | icon) | no | — | `"md"` | — |
+| `tone` | enum(default | destructive | success | warning) | no | — | `"default"` | — |
 | `href` | string | no | developer | — | Optional link target (URL policy) |
 | `hrefTrust` | enum(developer | untrusted) | no | — | `"developer"` | — |
 | `type` | enum(button | submit | reset) | no | — | `"button"` | — |
@@ -1130,6 +1419,16 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 ```json
 {
   "variant": "default"
+}
+```
+
+#### Outline destructive button (`outline-destructive`)
+
+```json
+{
+  "variant": "outline",
+  "tone": "destructive",
+  "label": "Delete"
 }
 ```
 
@@ -1449,6 +1748,73 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 - [`button`](components/button.md)
 - [`stat`](components/stat.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Carousel
+
+> A labelled region of slides with previous, next and a picker.
+
+- **id:** `carousel`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- A few slides the person pages through, such as quotes or screenshots
+
+### Don't use when
+
+- A gallery of images with a lightbox (use media-image)
+- Tabs (use tabs)
+
+### Accessibility
+
+- APG carousel: a named region, arrow keys, and a tablist when dots are shown.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `items` | array | yes | — | — | { id, label }[] in display order |
+| `index` | number | no | — | `0` | — |
+| `label` | string | no | — | — | — |
+| `showControls` | boolean | no | — | `true` | — |
+| `showDots` | boolean | no | — | `true` | — |
+| `controls` | enum(below | overlay) | no | — | `"below"` | — |
+| `loop` | boolean | no | — | `true` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Quotes (`quotes`)
+
+```json
+{
+  "label": "Customer quotes",
+  "items": [
+    {
+      "id": "a",
+      "label": "Ada Example"
+    },
+    {
+      "id": "b",
+      "label": "Lin Example"
+    }
+  ]
+}
+```
+
+### Related
+
+- [`card`](components/card.md)
 
 ---
 
@@ -3270,6 +3636,68 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 - [`dialog`](components/dialog.md)
 - [`dropdown-menu`](components/dropdown-menu.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Composer
+
+> The host reply box for a chat thread. Host chrome; agents never emit it.
+
+- **id:** `composer`
+- **package:** `@texuli/chat`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `chat`
+
+### Use when
+
+- The person replies in a live chat the host owns
+
+### Don't use when
+
+- A read-only transcript (use chat-thread)
+- A form (use action-form or schema-form)
+
+### Accessibility
+
+- The field is labelled; Enter sends and Escape stops a stream
+- Pending send is announced; the send control stays named while streaming
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `value` | string | no | untrusted | — | Draft text. |
+| `onSubmit` | event | yes | — | — | Send the draft. |
+| `disabled` | boolean | no | — | `false` | — |
+| `sending` | boolean | no | — | `false` | — |
+| `maxRows` | number | no | — | `6` | — |
+| `maxLength` | number | no | — | — | — |
+| `streaming` | boolean | no | — | `false` | — |
+| `onStop` | event | no | — | — | Stop a streaming reply. |
+| `layout` | enum(stack | row) | no | — | `"stack"` | — |
+| `sendButton` | enum(label | icon) | no | — | `"label"` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Reply box (`reply`)
+
+```json
+{
+  "layout": "stack"
+}
+```
+
+### Related
+
+- [`chat-thread`](components/chat-thread.md)
+- [`chat-message`](components/chat-message.md)
 
 ---
 
@@ -5689,6 +6117,78 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 ---
 
+# Heading
+
+> A page title or section heading: a semantic h1–h6 with a size from the type scale.
+
+- **id:** `heading`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Title a page, a section or a panel
+- Keep visual hierarchy in a locked prototype, where typography utilities are refused
+
+### Don't use when
+
+- Body copy, labels or captions (use text)
+- Long-form content (use prose)
+
+### Accessibility
+
+- Renders the semantic heading element for its level; pick levels in document order.
+- size changes only the look, never the level announced to assistive technology.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `level` | number | no | — | `2` | The semantic level, 1 to 6: renders <h1>…<h6> |
+| `size` | enum(display | xl | lg | md | sm) | no | — | `"lg"` | Visual size, independent of the level (default from the level: 1 xl, 2 lg, 3 md, 4–6 sm) |
+| `tone` | enum(default | muted) | no | — | `"default"` | — |
+| `truncate` | boolean | no | — | `false` | One line with an ellipsis |
+| `label` | string | no | — | — | Plain-text heading, escaped; replaces children when both are given |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | The heading text |
+
+### Examples
+
+#### Page title (`page-title`)
+
+```json
+{
+  "level": 1,
+  "size": "xl",
+  "label": "Quarterly report"
+}
+```
+
+#### Muted section heading (`section`)
+
+```json
+{
+  "level": 2,
+  "size": "md",
+  "tone": "muted",
+  "label": "Details"
+}
+```
+
+### Related
+
+- [`text`](components/text.md)
+- [`prose`](components/prose.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
 # Host region
 
 > Reserves a named place where the host app mounts its own component.
@@ -5836,6 +6336,72 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 ### Related
 
 - [`hover-card`](components/hover-card.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Icon
+
+> A glyph by name or Lucide component; allowing icon allows every icon set.
+
+- **id:** `icon`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- A decorative or labelled glyph next to a control or a list row
+
+### Don't use when
+
+- A pressable control (use icon-button)
+- Navigation chrome (use nav-icon)
+
+### Accessibility
+
+- With a label it is an image; without a label it is decorative (aria-hidden).
+- Unknown names render nothing.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `icon` | string | no | — | — | Built-in name, registered name, or a Lucide component |
+| `size` | enum(xs | sm | md | lg) | no | — | `"md"` | — |
+| `tone` | enum(default | primary | success | warning | destructive | info | neutral) | no | — | `"default"` | — |
+| `label` | string | no | — | — | Accessible name; omit for decorative |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Search glyph (`search`)
+
+```json
+{
+  "icon": "search",
+  "label": "Search"
+}
+```
+
+#### Muted chevron (`muted`)
+
+```json
+{
+  "icon": "chevron-down",
+  "tone": "neutral"
+}
+```
+
+### Related
+
+- [`icon-button`](components/icon-button.md)
+- [`nav-icon`](components/nav-icon.md)
 
 ---
 
@@ -7743,6 +8309,68 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 ---
 
+# ListItem
+
+> A list row with a title, optional description, icon and trailing meta.
+
+- **id:** `list-item`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- A settings row, an inbox row, or a navigation list of links
+
+### Don't use when
+
+- A data table (use table)
+- A kanban card (use data-board)
+
+### Accessibility
+
+- A listitem; with href it is a link, with onSelect a button. Trailing controls sit outside the main control.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | no | untrusted | — | — |
+| `description` | string | no | untrusted | — | — |
+| `meta` | string | no | untrusted | — | — |
+| `icon` | string | no | — | — | Built-in or registered icon name |
+| `href` | string | no | untrusted | — | — |
+| `hrefTrust` | enum(developer | untrusted) | no | — | `"developer"` | — |
+| `current` | boolean | no | — | `false` | — |
+| `disabled` | boolean | no | — | `false` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Inbox row (`inbox`)
+
+```json
+{
+  "title": "Quarterly notes",
+  "description": "Ada Example",
+  "meta": "2h",
+  "icon": "info"
+}
+```
+
+### Related
+
+- [`icon`](components/icon.md)
+- [`avatar`](components/avatar.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
 # Canvas composition
 
 > A validated layered composition rendered to a canvas.
@@ -8027,6 +8655,69 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 ### Related
 
 - [`menubar`](components/menubar.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# MobileHeader
+
+> A mobile stack header with back, title and actions. Host chrome; agents never emit it.
+
+- **id:** `mobile-header`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `layouts`
+
+### Use when
+
+- The top of a phone-sized screen that can go back
+
+### Don't use when
+
+- Desktop app chrome (use layout-top-nav or layout-sidebar)
+
+### Accessibility
+
+- The title is a heading by default; Back and Close are named.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `title` | string | yes | — | — | — |
+| `eyebrow` | string | no | — | — | — |
+| `subtitle` | string | no | — | — | — |
+| `titleAs` | enum(h1 | h2 | p | div) | no | — | `"h1"` | — |
+| `backHref` | string | no | developer | — | — |
+| `onBack` | event | no | — | — | — |
+| `backLabel` | string | no | — | — | — |
+| `backTarget` | string | no | — | — | — |
+| `hrefTrust` | enum(developer | untrusted) | no | — | `"developer"` | — |
+| `closeHref` | string | no | developer | — | — |
+| `onClose` | event | no | — | — | — |
+| `closeLabel` | string | no | — | — | — |
+| `sticky` | boolean | no | — | `true` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Inbox header (`inbox`)
+
+```json
+{
+  "title": "Inbox",
+  "backHref": "/home"
+}
+```
+
+### Related
+
+- [`bottom-nav`](components/bottom-nav.md)
 
 ---
 
@@ -8381,6 +9072,123 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 ### Related
 
 - [`popover`](components/popover.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Progress
+
+> A linear or circular progress bar, determinate or indeterminate.
+
+- **id:** `progress`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Show how far a task has gone, or that it is still running
+
+### Don't use when
+
+- A short wait with no value (use spinner)
+
+### Accessibility
+
+- A progressbar named by label or ariaLabel; null value is indeterminate.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `value` | number | no | — | `0` | Current value; omit or null while unknown |
+| `max` | number | no | — | `100` | — |
+| `min` | number | no | — | `0` | — |
+| `label` | string | no | — | — | — |
+| `ariaLabel` | string | no | — | — | — |
+| `showValue` | boolean | no | — | `false` | — |
+| `tone` | enum(primary | success | warning | destructive | info | neutral) | no | — | `"primary"` | — |
+| `size` | enum(sm | md | lg) | no | — | `"md"` | — |
+| `shape` | enum(linear | circular) | no | — | `"linear"` | — |
+| `loadingLabel` | string | no | — | — | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Upload (`upload`)
+
+```json
+{
+  "value": 40,
+  "label": "Upload",
+  "showValue": true
+}
+```
+
+### Related
+
+- [`spinner`](components/spinner.md)
+- [`skeleton`](components/skeleton.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Prose
+
+> Long-form text with the design system's reading rhythm: measure, spacing, headings, lists.
+
+- **id:** `prose`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Articles, docs, descriptions and other long text written as markup
+
+### Don't use when
+
+- One line or a short label (use text)
+- A block document (use document)
+
+### Accessibility
+
+- Keeps the host markup and its semantics; a 65ch measure keeps lines readable.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `as` | enum(div | article | section) | no | — | `"div"` | — |
+| `size` | enum(md | lg) | no | — | `"md"` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | The long-form markup (paragraphs, headings, lists) |
+
+### Examples
+
+#### Article body (`article`)
+
+```json
+{
+  "as": "article",
+  "size": "md"
+}
+```
+
+### Related
+
+- [`heading`](components/heading.md)
+- [`text`](components/text.md)
 
 ---
 
@@ -9259,6 +10067,59 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 ---
 
+# Separator
+
+> A horizontal or vertical divider on the token scale.
+
+- **id:** `separator`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Split two blocks of content visually
+
+### Don't use when
+
+- A menu divider (use the menu separator)
+- A list item (use list-item)
+
+### Accessibility
+
+- Decorative by default (hidden from assistive technology); set decorative false for a semantic boundary.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `orientation` | enum(horizontal | vertical) | no | — | `"horizontal"` | — |
+| `decorative` | boolean | no | — | `true` | — |
+| `variant` | enum(default | subtle | strong) | no | — | `"default"` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Horizontal rule (`rule`)
+
+```json
+{
+  "variant": "subtle"
+}
+```
+
+### Related
+
+- [`box`](components/box.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
 # Sheet
 
 > Edge-anchored modal panel (drawer-like sheet).
@@ -9393,6 +10254,68 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 ---
 
+# Skeleton
+
+> A placeholder bar or circle while content loads.
+
+- **id:** `skeleton`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Reserve space for text or an avatar that has not arrived yet
+
+### Don't use when
+
+- A determinate load (use progress)
+- A live status (use spinner)
+
+### Accessibility
+
+- Decorative (aria-hidden); pair it with a live status elsewhere if the wait matters.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `size` | enum(sm | md | lg) | no | — | `"md"` | — |
+| `circle` | boolean | no | — | `false` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Text line (`line`)
+
+```json
+{
+  "size": "md"
+}
+```
+
+#### Avatar placeholder (`face`)
+
+```json
+{
+  "size": "md",
+  "circle": true
+}
+```
+
+### Related
+
+- [`spinner`](components/spinner.md)
+- [`progress`](components/progress.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
 # Sortable list
 
 > A list whose items are a bound list variable; people reorder it by drag or keyboard, and lists sharing a group exchange items.
@@ -9448,6 +10371,61 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 - [`data-board`](components/data-board.md)
 - [`blocks-structure`](components/blocks-structure.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Spinner
+
+> An indeterminate wait indicator, labelled or decorative.
+
+- **id:** `spinner`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Show that a short action is in progress
+
+### Don't use when
+
+- A known percent (use progress)
+- A layout placeholder (use skeleton)
+
+### Accessibility
+
+- With a label it is a live status; without a label it is decorative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | no | — | — | — |
+| `size` | enum(sm | md | lg) | no | — | `"md"` | — |
+| `tone` | enum(primary | success | warning | destructive | info | neutral) | no | — | `"primary"` | — |
+| `class` | string | no | — | — | — |
+
+### Examples
+
+#### Saving (`saving`)
+
+```json
+{
+  "label": "Saving",
+  "size": "sm"
+}
+```
+
+### Related
+
+- [`progress`](components/progress.md)
+- [`skeleton`](components/skeleton.md)
 
 ---
 
@@ -9861,6 +10839,79 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 ---
 
+# Tabs
+
+> A tab list that shows one panel at a time.
+
+- **id:** `tabs`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Switch between peer views of the same page
+
+### Don't use when
+
+- A sequence of steps (use stepper or wizard)
+- Mobile app destinations (use bottom-nav)
+
+### Accessibility
+
+- Tab list is labelled; arrow keys move among tabs; the selected tab is aria-selected
+- Each tab names its panel
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `items` | array | yes | — | — | Tabs: value, label, optional badge and panel |
+| `value` | string | no | — | — | The selected tab value |
+| `onValueChange` | event | no | — | — | Selected tab changed |
+| `label` | string | no | — | — | Accessible name of the tab list |
+| `variant` | enum(line | pills | enclosed) | no | — | `"line"` | — |
+| `orientation` | enum(horizontal | vertical) | no | — | `"horizontal"` | — |
+| `activationMode` | enum(automatic | manual) | no | — | `"automatic"` | — |
+| `loop` | boolean | no | — | `false` | — |
+| `disabled` | boolean | no | — | `false` | — |
+| `class` | string | no | — | — | — |
+| `content` | slot | no | — | — | Panel body for each item |
+
+### Examples
+
+#### Line tabs (`line`)
+
+```json
+{
+  "variant": "line",
+  "items": [
+    {
+      "value": "overview",
+      "label": "Overview"
+    },
+    {
+      "value": "activity",
+      "label": "Activity"
+    }
+  ],
+  "value": "overview"
+}
+```
+
+### Related
+
+- [`accordion`](components/accordion.md)
+- [`stepper`](components/stepper.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
 # Tag
 
 > A labeled chip that can be removed.
@@ -9911,6 +10962,111 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 - [`badge`](components/badge.md)
 - [`chip`](components/chip.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Text
+
+> Body copy, labels and small print with a size, tone and weight from the design system.
+
+- **id:** `text`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Body text, helper text, captions, muted or small print
+- Text with a status ink (success, warning, destructive, info) next to a word that says it
+
+### Don't use when
+
+- A title or section heading (use heading)
+- Long-form content (use prose)
+
+### Accessibility
+
+- Never renders a heading element: as is p, span, div, label, small or strong.
+- A tone never carries meaning alone; the words say it.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `as` | enum(p | span | div | label | small | strong) | no | — | `"p"` | — |
+| `size` | enum(figure | lg | md | sm | xs) | no | — | `"md"` | figure is a large number outside stat (the title size of the type scale) |
+| `tone` | enum(default | muted | subtle | primary | success | warning | destructive | info) | no | — | `"default"` | — |
+| `weight` | enum(regular | medium | semibold) | no | — | `"regular"` | — |
+| `truncate` | boolean | no | — | `false` | One line with an ellipsis |
+| `lineClamp` | number | no | — | — | Clamp to 1 to 10 lines with an ellipsis |
+| `align` | enum(start | center | end) | no | — | `"start"` | — |
+| `mono` | boolean | no | — | `false` | The design system's code family |
+| `tabular` | boolean | no | — | `false` | Tabular figures (font-variant-numeric: tabular-nums) for numbers that line up |
+| `transform` | enum(none | uppercase | lowercase | capitalize) | no | — | `"none"` | — |
+| `tracking` | enum(normal | wide) | no | — | `"normal"` | Letter spacing; wide is the eyebrow tracking (--tx-letter-spacing-wide) |
+| `for` | string | no | — | — | With as="label": the id of the labelled control |
+| `label` | string | no | — | — | Plain text, escaped; replaces children when both are given |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | The text |
+
+### Examples
+
+#### Muted helper text (`muted`)
+
+```json
+{
+  "size": "sm",
+  "tone": "muted",
+  "label": "Updated an hour ago"
+}
+```
+
+#### Small print (`caption`)
+
+```json
+{
+  "as": "small",
+  "size": "xs",
+  "tone": "subtle",
+  "label": "Prices exclude tax."
+}
+```
+
+#### Eyebrow (overline) (`eyebrow`)
+
+```json
+{
+  "as": "span",
+  "size": "xs",
+  "tone": "muted",
+  "transform": "uppercase",
+  "tracking": "wide",
+  "label": "Revenue"
+}
+```
+
+#### Large figure (`figure`)
+
+```json
+{
+  "as": "span",
+  "size": "figure",
+  "tabular": true,
+  "label": "1,284"
+}
+```
+
+### Related
+
+- [`heading`](components/heading.md)
+- [`prose`](components/prose.md)
+- [`inline-text`](components/inline-text.md)
 
 ---
 

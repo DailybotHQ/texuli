@@ -88,24 +88,30 @@ Ids agents may emit into a catalog tree (subject to tier rules). Untrusted model
 
 Developer-authored UI. Not agent-emittable by default (overlays, forms, display chrome).
 
+- [Accordion](components/accordion.md): Stacked sections that expand and collapse one or more panels.
 - [Alert](components/alert.md): Inline feedback for a page section (status or error).
 - [AlertDialog](components/alert-dialog.md): Modal confirm/cancel dialog for consequential actions.
 - [AnalyticsGrid](components/analytics-grid.md): Auto-fit KPI and widget grid for dashboard screens.
 - [AppNav](components/app-nav.md): Desktop sidebar shell with mobile sheet drawer and main slot.
+- [Avatar](components/avatar.md): A face or initials for one person, with an optional presence status.
 - [AvatarGroupGrid](components/avatar-group-grid.md): Up to four faces in one avatar circle, +N past four.
 - [Badge](components/badge.md): A compact status or category label.
 - [Banner](components/banner.md): Full-width notice across a page or app shell.
+- [BottomNav](components/bottom-nav.md): A mobile tab bar of destinations. Host chrome; agents never emit it.
+- [Box](components/box.md): A panel or region with padding, radius, border, elevation and surface from tokens.
 - [Breadcrumb](components/breadcrumb.md): Hierarchy trail with URL-policy links.
 - [Button](components/button.md): A pressable action control with loading and optional link rendering.
 - [ButtonGroup](components/button-group.md): Groups related buttons with shared borders and orientation.
 - [Callout](components/callout.md): Emphasized documentation-style tip with a strong start edge.
 - [Card](components/card.md): A surface for grouping related content with optional link behavior.
+- [Carousel](components/carousel.md): A labelled region of slides with previous, next and a picker.
 - [Checkbox](components/checkbox.md): A binary or indeterminate checkbox with optional label.
 - [Chip](components/chip.md): A toggleable filter chip (pressed state).
 - [Code](components/code.md): Inline or block code with escaped text (no HTML).
 - [CodeField](components/code-field.md): An editable, syntax-highlighted code textarea.
 - [Combobox](components/combobox.md): A text input that filters a list of options, for one value or several.
 - [CommandPalette](components/command-palette.md): Dialog-hosted command palette with search and recent items.
+- [Composer](components/composer.md): The host reply box for a chat thread. Host chrome; agents never emit it.
 - [ContentLayout](components/content-layout.md): Shared docs/blog/editorial reading frame with optional TOC.
 - [ContextMenu](components/context-menu.md): Pointer-anchored menu (right-click, long-press, Menu key).
 - [ContextMenu.Trigger](components/context-menu-trigger.md): Region that opens the context menu.
@@ -122,8 +128,10 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [Field](components/field.md): Label, description and error wiring for a single control.
 - [FieldError](components/field-error.md): An alert-role error message for a field.
 - [Form](components/form.md): A form shell with layout, validation hook and error map.
+- [Heading](components/heading.md): A page title or section heading: a semantic h1–h6 with a size from the type scale.
 - [HoverCard](components/hover-card.md): Preview panel that opens on hover or focus.
 - [HoverCard.Content](components/hover-card-content.md): Styled hover-card surface.
+- [Icon](components/icon.md): A glyph by name or Lucide component; allowing icon allows every icon set.
 - [IconButton](components/icon-button.md): An icon-only button that requires an accessible name.
 - [Inline text](components/inline-text.md): A plain text run for the slot of a slot-only component (button, label, badge).
 - [Input](components/input.md): A single-line text (or file) control with optional clear.
@@ -147,14 +155,18 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [Sidebar layout](components/layout-sidebar.md): App sidebar column with responsive drawer fallback.
 - [Top navigation layout](components/layout-top-nav.md): Horizontal top navigation with optional mobile menu.
 - [Wizard layout](components/layout-wizard.md): Centered onboarding wizard frame with steps.
+- [ListItem](components/list-item.md): A list row with a title, optional description, icon and trailing meta.
 - [Menubar](components/menubar.md): Application menubar with roving top-level items.
 - [Menubar.Trigger](components/menubar-trigger.md): Top-level menubar item that opens a menu.
+- [MobileHeader](components/mobile-header.md): A mobile stack header with back, title and actions. Host chrome; agents never emit it.
 - [MultiSelect](components/multi-select.md): A combobox for several values, shown as removable chips.
 - [NavIcon](components/nav-icon.md): Renders a nav model icon by name or component.
 - [NavigationMenu](components/navigation-menu.md): Site or app navigation with expandable triggers and links.
 - [Pagination](components/pagination.md): Page controls for long lists.
 - [Popover](components/popover.md): Non-modal floating panel anchored to a trigger.
 - [Popover.Content](components/popover-content.md): Styled popover surface with optional arrow.
+- [Progress](components/progress.md): A linear or circular progress bar, determinate or indeterminate.
+- [Prose](components/prose.md): Long-form text with the design system's reading rhythm: measure, spacing, headings, lists.
 - [Radio](components/radio.md): One option inside a RadioGroup.
 - [RadioGroup](components/radio-group.md): A set of exclusive radio options with keyboard roving.
 - [ResponsiveModal](components/responsive-modal.md): Dialog on large screens, drawer/sheet on small screens.
@@ -169,14 +181,19 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [Select.Trigger](components/select-trigger.md): The button that opens a Select listbox.
 - [Select.Value](components/select-value.md): Shows the selected label or a placeholder inside the trigger.
 - [Select.Viewport](components/select-viewport.md): Scrollable viewport inside Select.Content.
+- [Separator](components/separator.md): A horizontal or vertical divider on the token scale.
 - [Sheet](components/sheet.md): Edge-anchored modal panel (drawer-like sheet).
 - [Sidebar](components/sidebar.md): Collapsible app rail with sections, badges and safe links.
+- [Skeleton](components/skeleton.md): A placeholder bar or circle while content loads.
+- [Spinner](components/spinner.md): An indeterminate wait indicator, labelled or decorative.
 - [SplitView](components/split-view.md): Master-detail split with list and detail panes.
 - [Stat](components/stat.md): A single metric with optional delta, trend and sparkline slot.
 - [Stepper](components/stepper.md): Horizontal or vertical progress through ordered steps.
 - [Switch](components/switch.md): An immediate on/off setting control.
 - [Table](components/table.md): A responsive data table with density, stacking and sticky header options.
+- [Tabs](components/tabs.md): A tab list that shows one panel at a time.
 - [Tag](components/tag.md): A labeled chip that can be removed.
+- [Text](components/text.md): Body copy, labels and small print with a size, tone and weight from the design system.
 - [TextCounter](components/text-counter.md): An input or textarea that shows remaining characters near the limit.
 - [Textarea](components/textarea.md): A multi-line text control with optional autosize.
 - [TimeField](components/time-field.md): A labelled time of day typed or stepped by segment (hour, minute, AM/PM), with a 24-hour HH:mm value.

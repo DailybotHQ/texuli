@@ -46,6 +46,7 @@ const EXPECTED = [
   'ds.contrast',
   'ds.suggest',
   'ds.import',
+  'ds.generate',
   'ds.allow',
   'ds.diff',
   'ds.preview',

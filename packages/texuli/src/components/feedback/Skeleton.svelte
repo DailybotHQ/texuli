@@ -31,6 +31,8 @@ let {
   })}
   aria-hidden="true"
   data-tx-skeleton
+  data-tx-component="skeleton"
+  data-tx-size={size}
   data-size={size}
   data-circle={circle ? 'true' : undefined}
   {...rest}

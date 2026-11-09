@@ -613,6 +613,47 @@ export const MCP_SERVER_DATA = {
       example: 'A brand one-liner',
     },
     {
+      name: 'ds.generate',
+      title: 'Generate a design-system draft',
+      summary:
+        'Combine a brand brief, token JSON, site CSS, logo pixels and/or a Texuli theme into a validated design-system draft. Returns the document, every reported loss, automatic AA repairs and guarantee results; it never saves or approves the draft.',
+      runtime: 'edge',
+      remote: true,
+      local: true,
+      limits: {
+        inputBytes: 1048576,
+        timeMs: 10000,
+      },
+      arguments: [
+        {
+          name: 'brief',
+          required: false,
+          description: '',
+        },
+        {
+          name: 'tokens',
+          required: false,
+          description: '',
+        },
+        {
+          name: 'css',
+          required: false,
+          description: '',
+        },
+        {
+          name: 'logoPixels',
+          required: false,
+          description: '',
+        },
+        {
+          name: 'theme',
+          required: false,
+          description: '',
+        },
+      ],
+      example: 'A brand brief with CSS tokens',
+    },
+    {
       name: 'ds.allow',
       title: 'List allowed components for a locked design system',
       summary:
@@ -1037,7 +1078,7 @@ export const MCP_SERVER_DATA = {
       uri: 'texuli://catalog',
       title: 'Component catalog',
       description:
-        'The content-addressed Texuli component catalog (catalog-320e3edf83d2…, 170 components): every manifest with props, examples, useWhen, dontUseWhen and emit tiers. The exact bytes hash to the catalog id.',
+        'The content-addressed Texuli component catalog (catalog-bcdf18540a82…, 187 components): every manifest with props, examples, useWhen, dontUseWhen and emit tiers. The exact bytes hash to the catalog id.',
       mimeType: 'application/json',
     },
     {

@@ -86,3 +86,11 @@ export interface IconRegistryOptions {
   fallback?: BuiltInIconName | IconGlyph;
 }
 export type IconSize = 'xs' | 'sm' | 'md' | 'lg';
+export type IconTone =
+  | 'default'
+  | 'primary'
+  | 'success'
+  | 'warning'
+  | 'destructive'
+  | 'info'
+  | 'neutral';

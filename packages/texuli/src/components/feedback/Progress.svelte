@@ -98,6 +98,9 @@ const circleStyle = $derived(
   bind:this={ref}
   class={rootClass}
   data-tx-progress
+  data-tx-component="progress"
+  data-tx-size={size}
+  data-tx-tone={tone}
   data-shape={shape}
   data-tone={tone}
   data-size={size}

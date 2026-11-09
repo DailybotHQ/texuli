@@ -244,6 +244,14 @@ export function checkCatalogContract(
   };
   for (const component of catalog?.components ?? []) {
     expired(component.id, component.deprecated);
+    // Namespaced ids and composes belong to host extensions (mergeCatalogs), never to Texuli's own catalog.
+    if (component.id.includes(':') || component.composes !== undefined) {
+      issues.push({
+        check: 'catalog',
+        path,
+        message: `${component.id}: a namespaced id or composes is for host extensions only`,
+      });
+    }
     const portable = new Set(component.props.filter((p) => !p.extension).map((p) => p.name));
     for (const name of component.bindable ?? []) {
       if (!portable.has(name)) {
