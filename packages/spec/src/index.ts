@@ -30,6 +30,18 @@ export {
   WEB_ONLY_PROP_NAMES,
 } from './catalog.ts';
 export {
+  CATALOG_EXTENSION_CODES,
+  CATALOG_EXTENSION_FORMAT,
+  CATALOG_EXTENSION_LIMITS,
+  CATALOG_EXTENSION_VERSION,
+  CATALOG_NAMESPACE,
+  type CatalogExtensionCode,
+  type CatalogExtensionIssue,
+  type MergedCatalog,
+  mergeCatalogs,
+  RESERVED_NAMESPACES,
+} from './catalog-extensions.ts';
+export {
   ACTION_FIELDS,
   contractRoot,
   DATA_BINDING_KEY,

@@ -40,7 +40,10 @@ type Props = {
   catalog: KitCatalog;
   /** The resolved allow manifest; omitted or without `allow`: unlocked. */
   allow?: KitAllowManifest;
-  /** Live samples for catalog ids the kit cannot import, keyed by catalog id. */
+  /**
+   * Live samples for catalog ids the kit cannot import, keyed by catalog id: L4+ packages, and
+   * host extension components (`<ns>:<id>` from `mergeCatalogs`; pass the merged catalog).
+   */
   samples?: Readonly<Record<string, Snippet<[KitSampleContext]>>>;
   /** `grid` (default): variants × sizes plus strips; `full`: the whole product, capped. */
   matrix?: 'grid' | 'full';
@@ -174,6 +177,7 @@ const hasPseudo = (component: MatrixComponent) =>
       aria-labelledby={`${cid}-title`}
       aria-current={currentItem === component.id ? 'true' : undefined}
       data-tx-ds-kit-component={component.id}
+      data-tx-ds-kit-extension={component.id.includes(':') ? component.id.split(':')[0] : undefined}
     >
       <svelte:element this={h2} id={`${cid}-title`} class="tx-ds-kit__subtitle">
         {component.label} <code class="tx-ds-kit__muted">{component.id}</code>

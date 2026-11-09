@@ -20,6 +20,35 @@
   "required": ["catalogHash", "components"],
   "additionalProperties": false,
   "$defs": {
+    "extension": {
+      "description": "A host catalog extension (spec 0.13.0, ADR-032): the host library's own components in the catalog's component shape, ids namespaced <namespace>:<id>, each composing catalog ids. mergeCatalogs checks it against the Texuli catalog.",
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "const": "texuli/catalog-extension"
+        },
+        "version": {
+          "type": "integer",
+          "const": 1
+        },
+        "namespace": {
+          "description": "2 to 16 lowercase letters and digits; texuli is reserved.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]{1,15}$"
+        },
+        "components": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/component"
+          }
+        }
+      },
+      "required": ["format", "version", "namespace", "components"],
+      "additionalProperties": false
+    },
     "axes": {
       "description": "The styling axes of a component (ADR-032, spec 0.13.0): each is derived from one of its enum props, so values equal that prop's enumValues and default is one of them. Omitted: the component has no styling axis.",
       "type": "object",
@@ -112,8 +141,9 @@
       "type": "object",
       "properties": {
         "id": {
+          "description": "A Texuli catalog id (kebab-case), or in a host extension (spec 0.13.0) a namespaced <ns>:<id>.",
           "type": "string",
-          "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+          "pattern": "^(?=.{1,64}$)([a-z][a-z0-9]{1,15}:)?[a-z][a-z0-9]*(-[a-z0-9]+)*$"
         },
         "label": {
           "type": "string",
@@ -179,6 +209,16 @@
         },
         "axes": {
           "$ref": "#/$defs/axes"
+        },
+        "composes": {
+          "description": "Extension components only (spec 0.13.0): the catalog ids this host component is built from; each resolves in the merged catalog.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "type": "string",
+            "pattern": "^(?=.{1,64}$)([a-z][a-z0-9]{1,15}:)?[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+          }
         },
         "states": {
           "description": "The observable states the component paints (ADR-032, spec 0.13.0), from the closed stateName list, each at most once. Omitted: no observable state.",

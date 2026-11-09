@@ -49,8 +49,14 @@ const SEMVER =
 
 /** Patterns of the locked sections (also written into the schema). */
 export const DS_LOCKED_PATTERNS = {
-  /** A catalog component id or a library entry id (kebab-case, at most 48 characters). */
+  /** A library entry id (kebab-case, at most 48 characters). */
   componentId: new RegExp(`^(?=.{1,48}$)${ID}$`),
+  /**
+   * A catalog id in `allow` or `composes`: a Texuli id (`button`) or a host extension id
+   * namespaced `<ns>:<id>` (`acme:kpi-strip`; the namespace 2 to 16 lowercase letters and
+   * digits), at most 64 characters (ADR-032, catalog extensions).
+   */
+  catalogId: new RegExp(`^(?=.{1,64}$)(?:[a-z][a-z0-9]{1,15}:)?${ID}$`),
   /** One axis value as the catalog writes it (an enum prop value, for example `sm` or `h1`). */
   axisValue: /^[A-Za-z0-9][A-Za-z0-9_-]{0,47}$/,
   semver: new RegExp(`^${SEMVER}$`),
@@ -80,7 +86,7 @@ export const DS_LOCKED_DEFS: Readonly<Record<string, DsNode>> = {
     densities: axis,
     states: ['l', 'componentState', 0, DS_COMPONENT_STATES.length, 1],
   },
-  allow: ['m', 'allowEntry', L.allowComponents, P.componentId],
+  allow: ['m', 'allowEntry', L.allowComponents, P.catalogId],
   approval: {
     'status!': 'approvalStatus',
     approvedBy: ['t', 120],
@@ -94,7 +100,7 @@ export const DS_LOCKED_DEFS: Readonly<Record<string, DsNode>> = {
     'purpose!': ['t', 300],
     'version!': ['s', P.semver, 64],
     'status!': 'approvalStatus',
-    'composes!': ['l', ['s', P.componentId, 48], 1, L.composes, 1],
+    'composes!': ['l', ['s', P.catalogId, 64], 1, L.composes, 1],
     approval: 'approval',
   },
   library: ['l', 'libraryEntry', 0, L.library],

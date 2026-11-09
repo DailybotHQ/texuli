@@ -40,11 +40,27 @@ export interface DesignSystemAllowManifest {
   readonly contentHash: string;
   readonly specVersion: string;
   readonly catalogDigest?: string;
+  /**
+   * The host extension namespaces of the merged catalog the manifest was compiled against
+   * (`mergeCatalogs` in `@texuli/spec`), sorted; absent without extensions.
+   */
+  readonly extensions?: readonly string[];
+}
+
+/** The part of a merged catalog (`mergeCatalogs(texuli, extensions)`) the manifest records. */
+export interface AllowManifestCatalog {
+  readonly catalog: { readonly catalogHash: string };
+  readonly extensions?: readonly { readonly namespace: string }[];
 }
 
 export interface CompileAllowManifestOptions {
   /** Catalog hash from the caller; never loaded here. */
   catalogDigest?: string;
+  /**
+   * The merged catalog (Texuli plus host extensions, from `mergeCatalogs`): its hash becomes
+   * `catalogDigest` (unless one is given) and its namespaces `extensions`. Never loaded here.
+   */
+  catalog?: AllowManifestCatalog;
   /** Effective document after extends, variant and patches; source metadata stays from `doc`. */
   resolvedDocument?: unknown;
 }
@@ -110,13 +126,31 @@ export function compileAllowManifest(
   const allow = copyAllow(effective.allow);
   const library = copyLibrary(effective.library);
   const version = typeof record.version === 'string' ? record.version : '';
+  const namespaces = Array.isArray(options.catalog?.extensions)
+    ? [
+        ...new Set(
+          options.catalog.extensions
+            .map((entry) => (isRecord(entry) ? entry.namespace : undefined))
+            .filter(
+              (ns): ns is string => typeof ns === 'string' && /^[a-z][a-z0-9]{1,15}$/.test(ns)
+            )
+        ),
+      ]
+        .sort()
+        .slice(0, 16)
+    : [];
   const manifest: DesignSystemAllowManifest = {
     ...(allow ? { allow } : {}),
     ...(library ? { library } : {}),
     version,
     contentHash: designSystemContentHash(doc),
     specVersion: ALLOW_MANIFEST_SPEC_VERSION,
-    ...(typeof options.catalogDigest === 'string' ? { catalogDigest: options.catalogDigest } : {}),
+    ...(typeof options.catalogDigest === 'string'
+      ? { catalogDigest: options.catalogDigest }
+      : typeof options.catalog?.catalog?.catalogHash === 'string'
+        ? { catalogDigest: options.catalog.catalog.catalogHash }
+        : {}),
+    ...(namespaces.length > 0 ? { extensions: namespaces } : {}),
   };
   return manifest;
 }
