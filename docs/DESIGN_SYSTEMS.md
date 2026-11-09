@@ -77,6 +77,113 @@ of the normative spec, and the tokens fixtures subpath ships to adopters'
 tests. Example brands are neither: they are documentation that tests load
 by path, so they live at the repository root, outside every package.
 
+## Create a locked design system, end to end
+
+This is the whole path from nothing to an approved, locked design system that a consumer
+such as Protoyard can pin. The brand here is fictional (Harborline, `example.com`). Each
+step names the CLI command, the MCP operation an agent uses, and the Studio control on
+texuli.com; every one of them exists today. Locked design systems are **in development**
+(spec 0.13.0, ADR-032).
+
+1. **Start from what you have.** A brief, a token file, CSS, a logo or a library theme:
+
+   ```bash
+   texuli ds generate --from-tokens tokens/brand.tokens.json --from-css src/brand.css -o design-systems/harborline.ds.json
+   ```
+
+   Add `--brief` with a short quoted description (for example a teal `#0e7490`, Inter,
+   rounded and calm), `--from-logo` with sampled logo pixels or `--from-theme` with a
+   library theme.
+
+   The report lists every value an importer dropped or a later source overwrote
+   (`report.losses`) and every color the AA solver moved, with its reason
+   (`report.repairs`). Read both: a repair is a brand color that changed. Agents call
+   `ds.generate` (draft only, never saved or approved); in the Studio
+   (`/theme-studio/`) start from a library theme, a one-liner or an imported file.
+   Details: [From what you already have](#from-what-you-already-have).
+2. **Tune the tokens.** Edit the sections by hand ([By hand](#by-hand)), or override with
+   patches and variants ([Override](#override-patches-and-variants)). `texuli ds preview`
+   and `ds.preview` show a static snapshot.
+3. **Lock it: the allowed set.** Decide which catalog components, variants, sizes, tones,
+   densities and states the brand allows:
+
+   ```bash
+   texuli ds init design-systems/harborline.locked.ds.json --locked --preset minimal
+   ```
+
+   Narrow the lists, or merge the `allow` section into your generated document. Agents
+   call `ds.allow` (a preset or named ids, with every value the catalog declares); the
+   Studio's **Locked design system** editor picks components and values from the catalog.
+   A component not listed is not allowed; an omitted list allows every value; an empty list
+   allows none ([The allowed set](#the-allowed-set-allow)). Host component libraries that
+   are not in the Texuli catalog join as namespaced catalog extensions (`<ns>:<id>`,
+   [What Texuli checks, what the consumer wires](#what-texuli-checks-what-the-consumer-wires)).
+4. **Declare the brand's own components.** Each `library` entry names its id, purpose,
+   version, `status: "draft"` and the allowed catalog ids it `composes`; the code lives
+   with the consumer ([The design system's own components](#the-design-systems-own-components-library)).
+5. **Validate until it passes.**
+
+   ```bash
+   texuli ds validate design-systems/harborline.locked.ds.json --locked --json
+   ```
+
+   Every finding has a stable code, a severity, a path and a fix hint: structure, `allow`
+   against the catalog, approval and hashes, AA contrast (text, focus, non-text), target
+   sizes, the data-viz palette and token completeness. Agents call `ds.validate`; in the
+   Studio, press **Validate and preview**. Fix every error ([Validate](#validate)).
+6. **Review it whole.** Render the design system with `texuli/ds-kit` (foundations in light
+   and dark, voice, every allowed component in every allowed variant, size and state, the
+   library and the approval record) in your app, or see the example on texuli.com at
+   [/design-systems/kit/](https://texuli.com/design-systems/kit/)
+   ([See the whole design system](#see-the-whole-design-system)).
+7. **Approve: a person, a commit, CODEOWNERS.** The reviewer runs:
+
+   ```bash
+   texuli ds approve design-systems/harborline.locked.ds.json --by design-reviewer --version 1.0.0
+   git add design-systems/harborline.locked.ds.json && git commit -m "design: approve Harborline 1.0.0"
+   ```
+
+   `ds approve` validates first, refuses an invalid document, then stamps
+   `approval { status: "approved", approvedBy, approvedAt, version, contentHash }`. **The
+   CLI cannot prove who approved**: `approvedBy` is what was typed. The guarantee is the
+   reviewed commit, with the `design-systems/` folder owned by the design reviewer in
+   `CODEOWNERS`. Agents never approve: `ds.save` refuses an approved document
+   (`approval-human-only`), the `create-design-system` prompt stops at a draft, and the
+   Studio exports a draft only. `texuli ds hash` prints the content hash and exits 1 when
+   the file changed after approval ([Approval and the content hash](#approval-and-the-content-hash)).
+8. **Version and hand it over.** Bump `version` for every approved change (semver: a
+   narrower allowed set or a removed library entry is a breaking change for prototypes).
+   Pack the document with its library sources and release history for the consumer:
+
+   ```bash
+   texuli ds pack design-systems/harborline.locked.ds.json --out dist/harborline-1.0.0.bundle.json
+   texuli ds diff design-systems/harborline-0.9.0.ds.json design-systems/harborline.locked.ds.json
+   ```
+
+   Agents call `ds.bundle`. The consumer pins the exact version (a binding never takes a
+   range) and moves it with an explicit command; `ds-kit` shows what changed between the
+   pinned version and the new one ([Exact version pinning](#exact-version-pinning)).
+9. **Check locked prototypes.** In the consumer's CI:
+
+   ```bash
+   texuli ds validate design-systems/harborline.locked.ds.json --locked --prototype ./src --json
+   ```
+
+   It reads sources and blueprints (never executes them) for components and props outside
+   the allowed set and for the locked CSS policy (layout utilities on the token scale
+   only). Add `--report` to list the findings and exit 0 while existing prototypes
+   migrate ([Locked-mode rules for consumers](#locked-mode-rules-for-consumers)).
+
+| Step | CLI | MCP (agents) | Studio (`/theme-studio/`) |
+| --- | --- | --- | --- |
+| Start | `texuli ds generate`, `ds import`, `ds init --brand` | `ds.generate`, `ds.import`, `ds.suggest` | Library theme, one-liner or file import |
+| Lock | `texuli ds init --locked --preset …` | `ds.allow` | **Locked design system** editor |
+| Validate | `texuli ds validate --locked` | `ds.validate` | **Validate and preview** |
+| Review | `texuli ds preview`; `texuli/ds-kit` in your app | `ds.preview` | The preview after validating |
+| Approve | `texuli ds approve --by <name>`, then a reviewed commit | Never (draft only) | Never (exports a draft) |
+| Hand over | `texuli ds pack`, `ds diff`, `ds hash` | `ds.bundle`, `ds.diff` | Export draft JSON |
+| Check prototypes | `texuli ds validate --locked --prototype <dir>` | `ds.validate` (with a prototype) | — |
+
 ## Author
 
 The document's shape is in [the spec doc](../packages/spec/docs/design-system.md):
@@ -746,11 +853,13 @@ The CLI cannot prove who approved. Details and the complete code table:
 ### See the whole design system
 
 `texuli/ds-kit` renders a design system on one page from data: the
-foundations (every token, light and dark), voice and rules, the library
-with its approval badges, and the changes between two versions, with the
-approval record and its hash check in the header. It is **in
-development** (`0.16.0`); the component matrix and the texuli.com kit page
-are **planned**. The decision is recorded in ADR-032.
+foundations (every token, light and dark), voice and rules, every allowed
+component in each allowed variant, size and state (disallowed values are
+marked, never rendered), the library with its approval badges, and the
+changes between two versions, with the approval record and its hash check
+in the header. texuli.com shows a fictional example brand with it at
+`/design-systems/kit/`. Both are **in development** (`0.16.0`). The
+decision is recorded in ADR-032.
 
 ## Outputs
 
