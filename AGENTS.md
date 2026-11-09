@@ -51,8 +51,8 @@ consumer gaps, with no breaking API change; `0.15.0` adds blueprint spec
 components (`Heading`, `Text`, `Prose`, `Box`), button tone and a wider
 catalog, with no breaking API change; the design-system kit
 (`texuli/ds-kit`), `ds generate` and the importers, the locked checkers in
-`@texuli/tools/ds-check`, the contract schemas and the blueprint allow
-check ship in it as in development and are completed in `0.16.0`.
+`@texuli/tools/ds-check`, portable design-system bundles, the contract
+schemas and the blueprint allow check ship in it as in development and are completed in `0.16.0`.
 `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/slides`,
 `@texuli/editor`, `@texuli/document`, `@texuli/pages`, `@texuli/forms`,
 `@texuli/canvas`, `@texuli/sheets` and `@texuli/mcp` are still in development

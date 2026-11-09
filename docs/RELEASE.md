@@ -197,8 +197,16 @@ has, and who approved that version.
   `@texuli/tokens/design-system/import`.
 - `@texuli/tools/ds-check`: the locked static checker, the CSS policy (the
   owner's layout-only utilities), the interactive-element mapper and
-  `checkDesignSystemFull`; the locked runtime checks and a report mode are
-  planned.
+  `checkDesignSystemFull` (with a conformance corpus of one failing and one
+  fixed input per issue code), and the locked runtime check core (catalog
+  ownership of rendered controls plus the token-backed render check; not
+  exported yet); a report mode is planned.
+- Portable design-system bundles: `packBundle`, `unpackBundle` and
+  `validateBundle` in `@texuli/spec/design-system` carry a document, library
+  sources as text, the allow manifest and release history in one JSON unit
+  (hashes verified, oversized and path-traversing input refused), with
+  `texuli ds pack`, `texuli ds unpack` and the read-only `ds.bundle`
+  operation.
 - The contract schemas (allow manifest, ds-check report and design-system
   bundle, with TypeScript and Kotlin projections) and the blueprint check
   against an allow manifest.
@@ -212,8 +220,8 @@ has, and who approved that version.
 `import` 27,072 to 30,976 B; `@texuli/catalog` 57,024 to 59,648 B and its
 manifest entries; `functions/mcp` 232,576 to 238,400 B.
 
-**Known gaps in 0.15.0 (planned, not done).** The locked runtime checks and
-report mode, the in-development items above, the native painters for the new
+**Known gaps in 0.15.0 (planned, not done).** The report mode, the locked
+runtime checks in `texuli ds check`, the in-development items above, the native painters for the new
 catalog ids (they paint a placeholder), and the gaps listed under 0.14.3
 that remain open.
 

@@ -684,7 +684,9 @@ design system and a prototype).
 - **Render check.** Required in CI for locked prototypes, on demand
   locally. `texuli ds check --render` already paints the catalog under a
   design system (axe, painted contrast, colors that do not come from it);
-  the locked-mode runtime checks are **planned** (`0.16.0`).
+  the locked-mode runtime check core is **in development** in
+  `@texuli/tools` (in the `0.15.0` tarballs, not exported yet), and its
+  wiring into `texuli ds check` is **planned** (`0.16.0`).
 
 ### See the whole design system
 
