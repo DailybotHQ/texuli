@@ -2084,8 +2084,9 @@ reflect this decision.
     `contentHash`, on the document and per library entry. It is **top-document only**: it never
     inherits through `extends`. `contentHash` is the SHA-256 of the canonical JSON (sorted keys, no
     whitespace, the existing `canonicalJson`/`sha256Hex`, moved from `@texuli/tokens` into
-    `@texuli/spec/design-system` and re-exported) of the document without `approval.status`,
-    `approval.approvedBy` and `approval.approvedAt`; per entry, over the entry minus the same fields.
+    `@texuli/spec/design-system` and re-exported) of the document without its whole `approval`
+    section (the version lives in the document's own `version`); per library entry, over the entry
+    without its `approval`. Agreed with the Protoyard lead on 2026-11-09.
     The CLI can verify the hash; it cannot prove who approved — a human commit reviewed through
     CODEOWNERS is the guarantee, and the docs say so.
   - Catalog membership (unknown id, a variant, size or state the catalog does not list) is checked by

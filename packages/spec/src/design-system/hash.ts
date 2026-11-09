@@ -93,39 +93,25 @@ export function sha256Hex(text: string): string {
   return Array.from(h, (x) => x.toString(16).padStart(8, '0')).join('');
 }
 
-/** The fields an approval excludes from its own hash (ADR-032). */
-export const APPROVAL_HASH_EXCLUDED = [
-  'status',
-  'approvedBy',
-  'approvedAt',
-  'contentHash',
-] as const;
+/** What the content hash leaves out (ADR-032): the whole approval section. */
+export const APPROVAL_HASH_EXCLUDED = ['approval'] as const;
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
-/** `approval` without its excluded fields; dropped when nothing else is left. */
-function withoutApprovalFields(approval: unknown): unknown {
-  if (!isRecord(approval)) return approval;
-  const kept: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(approval))
-    if (!(APPROVAL_HASH_EXCLUDED as readonly string[]).includes(key)) kept[key] = value;
-  return Object.keys(kept).length > 0 ? kept : undefined;
-}
-
-/** A library entry as its hash sees it: its `approval` without the excluded fields. */
-function entryForHash(entry: unknown): unknown {
-  if (!isRecord(entry) || !Object.hasOwn(entry, 'approval')) return entry;
-  return { ...entry, approval: withoutApprovalFields(entry.approval) };
+/** A value without its `approval` section (ADR-032: the hash covers everything else). */
+function withoutApproval(value: unknown): unknown {
+  if (!isRecord(value) || !Object.hasOwn(value, 'approval')) return value;
+  const { approval: _approval, ...rest } = value;
+  return rest;
 }
 
 /**
  * The content hash of a design-system document (ADR-032): lowercase hex
- * SHA-256 of the canonical JSON of the document without `approval.status`,
- * `approval.approvedBy`, `approval.approvedAt` and `approval.contentHash` (the
- * hash cannot cover itself). Library entries count without the same fields of
- * their own `approval`, so approving an entry never moves the document hash;
- * everything else, `approval.version` included, does.
+ * SHA-256 of the canonical JSON of the document without its whole `approval`
+ * section (the hash cannot cover itself; the version lives in the document's
+ * own `version`). Library entries count without their own `approval`, so
+ * approving an entry never moves the document hash; everything else does.
  *
  * Pure and total over JSON values; it never mutates its input. It hashes the
  * document as written (call it before `extends` resolution: the approval
@@ -133,17 +119,15 @@ function entryForHash(entry: unknown): unknown {
  */
 export function designSystemContentHash(doc: unknown): string {
   if (!isRecord(doc)) return sha256Hex(canonicalJson(doc));
-  const view: Record<string, unknown> = { ...doc };
-  if (Object.hasOwn(doc, 'approval')) view.approval = withoutApprovalFields(doc.approval);
-  if (Array.isArray(doc.library)) view.library = doc.library.map(entryForHash);
+  const view = withoutApproval(doc) as Record<string, unknown>;
+  if (Array.isArray(doc.library)) view.library = doc.library.map(withoutApproval);
   return sha256Hex(canonicalJson(view));
 }
 
 /**
  * The content hash of one library entry (ADR-032): lowercase hex SHA-256 of
- * the canonical JSON of the entry without `approval.status`,
- * `approval.approvedBy`, `approval.approvedAt` and `approval.contentHash`.
+ * the canonical JSON of the entry without its `approval`.
  */
 export function libraryEntryContentHash(entry: unknown): string {
-  return sha256Hex(canonicalJson(entryForHash(entry)));
+  return sha256Hex(canonicalJson(withoutApproval(entry)));
 }

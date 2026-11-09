@@ -108,16 +108,12 @@ const clone = <T>(value: T): T => structuredClone(value);
 type Loose = Record<string, any>;
 
 describe('designSystemContentHash', () => {
-  it('is SHA-256 of the canonical JSON without the approval fields (a pinned vector)', () => {
-    const { approval, library, ...rest } = doc;
+  it('is SHA-256 of the canonical JSON without the approval section (a pinned vector)', () => {
+    const { approval: _approval, library, ...rest } = doc;
     const expected = nodeSha(
       canonicalJson({
         ...rest,
-        approval: { version: approval?.version },
-        library: library?.map(({ approval: entryApproval, ...entry }) => ({
-          ...entry,
-          approval: { version: entryApproval?.version },
-        })),
+        library: library?.map(({ approval: _entryApproval, ...entry }) => entry),
       })
     );
     expect(designSystemContentHash(doc)).toBe(expected);
@@ -128,7 +124,7 @@ describe('designSystemContentHash', () => {
         approval: { ...doc.approval, contentHash: designSystemContentHash(doc) },
       }).ok
     ).toBe(true);
-    expect(APPROVAL_HASH_EXCLUDED).toEqual(['status', 'approvedBy', 'approvedAt', 'contentHash']);
+    expect(APPROVAL_HASH_EXCLUDED).toEqual(['approval']);
   });
 
   it('ignores key order at every depth', () => {
@@ -204,18 +200,6 @@ describe('designSystemContentHash', () => {
         },
       ],
       [
-        'a library approval version',
-        (d) => {
-          d.library[0].approval.version = '0.3.1';
-        },
-      ],
-      [
-        'the approved version',
-        (d) => {
-          d.approval.version = '1.3.0';
-        },
-      ],
-      [
         'a new section',
         (d) => {
           d.voice = { tone: ['calm'] };
@@ -245,11 +229,9 @@ describe('designSystemContentHash', () => {
 describe('libraryEntryContentHash', () => {
   const entry = doc.library?.[0] as NonNullable<DesignSystem['library']>[number];
 
-  it('is SHA-256 of the canonical JSON of the entry without its approval fields', () => {
-    const { approval, ...rest } = entry;
-    expect(libraryEntryContentHash(entry)).toBe(
-      nodeSha(canonicalJson({ ...rest, approval: { version: approval?.version } }))
-    );
+  it('is SHA-256 of the canonical JSON of the entry without its approval', () => {
+    const { approval: _approval, ...rest } = entry;
+    expect(libraryEntryContentHash(entry)).toBe(nodeSha(canonicalJson(rest)));
     expect(libraryEntryContentHash(reversed(entry))).toBe(libraryEntryContentHash(entry));
   });
 
