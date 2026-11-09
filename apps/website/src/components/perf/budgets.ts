@@ -349,6 +349,12 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
     budget: { pageGzipKb: 122 },
   },
   {
+    route: '/native/compatibility/',
+    reason:
+      'The full native compatibility matrix moved off /native/ (decisions/native-budget.md): a static, server-rendered table with one compact row per catalog component, CSS-only filters and no island, inside the docs shell. Measured 2026-11-08: 247.5 KB raw and 17.9 KB gzip of HTML (+4% headroom on raw; gzip fits the default).',
+    budget: { htmlRawKb: 258 },
+  },
+  {
     route: '/guides/',
     reason:
       'PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (22.5 KB of WebP on open, logo included); measured 94.8 KB page, limit 99 (+4% headroom). 0.14.2 (2026-11-07): the component CSS gains the shared scrim rule, the new CSS hooks and the IconButton badge (+0.6 KB of CSS, HTML and JS unchanged); CI on Linux measured 99.2 KB page, limit 104 (+4% headroom).',

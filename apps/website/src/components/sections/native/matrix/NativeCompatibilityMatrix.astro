@@ -77,6 +77,14 @@ const statusId = (status: string) => `native-matrix-status-${nativeMatrixKey(sta
     </div>
   </fieldset>
 
+  <p class="native-matrix__source">
+    Every row comes from the generated parity catalog:{' '}
+    {NATIVE_MATRIX_ROWS.slice(0, 1).map((row) => {
+      const href = codeHref(row.evidence.parity);
+      return href ? <a href={href}>{row.evidence.parity}</a> : <code>{row.evidence.parity}</code>;
+    })}
+  </p>
+
   <p class="native-matrix__totals" data-tx-native-matrix-totals="">
     {NATIVE_MATRIX_TOTALS.catalog} catalog components · {NATIVE_MATRIX_TOTALS.painted} paint in Compose Desktop · {NATIVE_MATRIX_TOTALS.placeholder} placeholders
   </p>
@@ -96,7 +104,7 @@ const statusId = (status: string) => `native-matrix-status-${nativeMatrixKey(sta
           <th scope="col">Web</th>
           <th scope="col">Compose Desktop</th>
           <th scope="col">Conformance</th>
-          <th scope="col">Evidence</th>
+          <th scope="col">Conformance traces</th>
         </tr>
       </thead>
       <tbody>
@@ -112,18 +120,14 @@ const statusId = (status: string) => `native-matrix-status-${nativeMatrixKey(sta
             <td><span class="native-matrix__badge" data-status={nativeMatrixKey(row.web)}>{row.web}</span></td>
             <td><span class="native-matrix__badge" data-status={nativeMatrixKey(row.composeDesktop)}>{row.composeDesktop}</span></td>
             <td><span class="native-matrix__badge" data-status={nativeMatrixKey(row.conformance)}>{row.conformance}</span></td>
-            <td>
-              <ul class="native-matrix__evidence" aria-label={`${row.id} evidence`}>
-                <li>
-                  {codeHref(row.evidence.parity) ? (
-                    <a href={codeHref(row.evidence.parity)}>Parity catalog</a>
-                  ) : <code>{row.evidence.parity}</code>}
-                </li>
-                {row.evidence.traces.map((path) => {
-                  const href = codeHref(path);
-                  return <li>{href ? <a href={href}>Conformance trace</a> : <code>{path}</code>}</li>;
-                })}
-              </ul>
+            <td class="native-matrix__traces">
+              {row.evidence.traces.length === 0
+                ? '—'
+                : row.evidence.traces.map((path, index) => {
+                    const href = codeHref(path);
+                    const name = `Trace ${index + 1}`;
+                    return href ? <a href={href} aria-label={`${name} for ${row.id}`}>{name}</a> : <code>{path}</code>;
+                  })}
             </td>
           </tr>
         ))}
@@ -190,12 +194,14 @@ const statusId = (status: string) => `native-matrix-status-${nativeMatrixKey(sta
   .native-matrix__filter-set label { display: inline-flex; align-items: center; gap: 0.35rem; min-block-size: 2rem; cursor: pointer; }
   .native-matrix__filter-set input { accent-color: var(--tx-primary, #6842d8); }
   .native-matrix__filter-label { min-inline-size: 4rem; font-weight: 700; }
+  .native-matrix__source { margin: 0; font-size: 0.9rem; }
+  .native-matrix__traces a + a { margin-inline-start: 0.5rem; }
   .native-matrix__totals { margin: 0; color: var(--tx-muted-foreground, GrayText); font-size: 0.9rem; }
   .native-matrix__table-wrap { max-inline-size: 100%; overflow: auto; border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-radius, 0.75rem); }
   .native-matrix__table-wrap:focus-visible { outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight); outline-offset: 3px; }
-  .native-matrix__table { inline-size: 100%; min-inline-size: 58rem; border-collapse: collapse; text-align: start; }
+  .native-matrix__table { inline-size: 100%; min-inline-size: 46rem; border-collapse: collapse; text-align: start; }
   .native-matrix__table caption { padding: 0.75rem; color: var(--tx-muted-foreground, GrayText); text-align: start; }
-  .native-matrix__table th, .native-matrix__table td { padding: 0.65rem 0.75rem; border-block-start: 1px solid var(--tx-border, GrayText); vertical-align: top; }
+  .native-matrix__table th, .native-matrix__table td { padding: 0.4rem 0.6rem; border-block-start: 1px solid var(--tx-border, GrayText); vertical-align: top; }
   .native-matrix__table thead th { background: var(--tx-surface, Canvas); text-align: start; }
   .native-matrix__row:nth-child(even) { background: color-mix(in oklab, var(--tx-surface, Canvas) 72%, transparent); }
   .native-matrix__row th[scope='row'] { font-family: var(--tx-font-mono, ui-monospace, monospace); text-align: start; }

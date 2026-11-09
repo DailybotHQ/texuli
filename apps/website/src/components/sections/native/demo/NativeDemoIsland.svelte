@@ -1,5 +1,19 @@
 <script lang="ts">
-/** Small controls hydrate on visibility; the validated web paint is server-rendered. */
+/**
+ * Small controls hydrate on visibility. "Render with the web player" imports
+ * `@texuli/player` on request and paints the validated fixture, so the page itself carries
+ * no player stylesheet until someone asks for the live render.
+ */
+import type { Component } from 'svelte';
+
+type PlayerProps = {
+  blueprint: unknown;
+  tier: 'untrusted';
+  status: 'draft';
+  label: string;
+  landmarks: boolean;
+};
+
 type Props = {
   blueprintJson: string;
   traceJson: string;
@@ -10,6 +24,29 @@ let { blueprintJson, traceJson, specVersion }: Props = $props();
 let jsonVisible = $state(false);
 let traceVisible = $state(false);
 let announcement = $state('');
+let Player = $state<Component<PlayerProps> | null>(null);
+let playerLoading = $state(false);
+let playerFailed = $state(false);
+const blueprint = $derived(JSON.parse(blueprintJson) as unknown);
+
+async function renderWithPlayer(): Promise<void> {
+  if (Player || playerLoading) return;
+  playerLoading = true;
+  announcement = 'Loading the web player…';
+  try {
+    const [module] = await Promise.all([
+      import('@texuli/player'),
+      import('@texuli/player/styles.css'),
+    ]);
+    Player = module.Player as unknown as Component<PlayerProps>;
+    announcement = 'The web player painted the validated fixture.';
+  } catch {
+    playerFailed = true;
+    announcement = 'The web player could not load. The outline above shows the same report.';
+  } finally {
+    playerLoading = false;
+  }
+}
 
 $effect(() => {
   announcement = `Validated @texuli/spec ${specVersion} fixture ready.`;
@@ -27,12 +64,16 @@ async function copyBlueprint(): Promise<void> {
 function reset(): void {
   jsonVisible = false;
   traceVisible = false;
+  Player = null;
   announcement = `Demo reset. Validated @texuli/spec ${specVersion} fixture ready.`;
 }
 </script>
 
 <section class="native-demo-island" aria-label="Blueprint controls and evidence" data-tx-native-demo-island="">
   <div class="native-demo-island__controls" role="group" aria-label="Blueprint demo actions">
+    <button type="button" onclick={renderWithPlayer} disabled={playerLoading || playerFailed}>
+      {Player ? 'Rendered with the web player' : 'Render with the web player'}
+    </button>
     <button type="button" onclick={copyBlueprint}>Copy validated JSON</button>
     <button type="button" aria-expanded={jsonVisible} onclick={() => (jsonVisible = !jsonVisible)}>
       {jsonVisible ? 'Hide JSON' : 'View JSON'}
@@ -46,6 +87,19 @@ function reset(): void {
   <p class="native-demo-island__status" role="status" aria-live="polite" aria-atomic="true">
     {announcement}
   </p>
+
+  {#if Player}
+    {@const WebPlayer = Player}
+    <section class="native-demo-island__player" aria-label="Live web player rendering">
+      <WebPlayer
+        {blueprint}
+        tier="untrusted"
+        status="draft"
+        label="Web rendering of the validated report blueprint"
+        landmarks={false}
+      />
+    </section>
+  {/if}
 
   {#if jsonVisible}
     <section class="native-demo-island__source" aria-label="Validated blueprint JSON">
@@ -118,6 +172,7 @@ function reset(): void {
     font-size: 0.9rem;
   }
 
+  .native-demo-island__player,
   .native-demo-island__source,
   .native-demo-island__trace {
     min-inline-size: 0;

@@ -96,8 +96,8 @@ test('the landing header on desktop and phone, the native door, and a guide in t
     .getByRole('link', { name: 'Native', exact: true })
     .click();
   await expect(page).toHaveURL(/\/native\/$/);
-  await expect(page.locator('#native-hero-title')).toHaveText(
-    'The same catalog, rendered by Compose.'
+  await expect(page.locator('#native-hero-22-title')).toHaveText(
+    'Your interface language, beyond the browser.'
   );
 
   await page.goto(`${origin()}/guides/theming/`);

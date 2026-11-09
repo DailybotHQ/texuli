@@ -153,8 +153,17 @@ const actions = view.actions.map((action) => ({ ...action, href: resolveHref(act
       align-items: center;
     }
   }
+  .native-principles__copy,
   .native-principles__art {
     min-inline-size: 0;
+  }
+  .native-principles__surfaces li {
+    overflow-wrap: anywhere;
+  }
+  @media (max-width: 30rem) {
+    .native-principles__surfaces li {
+      grid-template-columns: 1fr;
+    }
   }
   .native-principles__actions {
     display: flex;

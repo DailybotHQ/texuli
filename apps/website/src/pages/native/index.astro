@@ -10,22 +10,25 @@
  *   05 how the renderer consumes it     WhyKmp, "How the renderer consumes the contract"
  *   06 components that travel           ComponentsThatTravel
  *   07 complex solutions, shared intent ComplexSolutionsTravel
- *   09 honest compatibility matrix      NativeCompatibilityMatrix (generated from parity.json)
+ *   09 honest compatibility matrix      NativeMatrixSummary (platform rows, per-group counts) and
+ *                                       a link to /native/compatibility/ (the full generated matrix)
  *   11 what exists and what is planned  NativeEvidenceRoadmap (kept from the first /native/)
  *      questions                        NativeFaq
  *   08 native should feel native,
  *   10 humans and agents on every target,
  *   12 start building                   NativePrinciples (one section, three parts)
  *
+ * The page-native banner is not shown: with the matrix moved and the demo CSS trimmed, the
+ * page still measured over its 122 KB cap with it (decisions/native-budget.md, step 3).
+ *
  * Every status and count is derived (compatibility data, parity.json, registry), never typed
  * here. JSON-LD stays Organization-only: nothing native is installable yet.
  */
-import PageBanner from '../../components/landing/PageBanner.astro';
 import BlueprintDiagram from '../../components/sections/native/blueprint/BlueprintDiagram.astro';
 import NativeDemo from '../../components/sections/native/demo/NativeDemo.astro';
 import NativeFaq from '../../components/sections/native/faq/NativeFaq.astro';
 import NativeHero from '../../components/sections/native/hero/NativeHero.astro';
-import NativeCompatibilityMatrix from '../../components/sections/native/matrix/NativeCompatibilityMatrix.astro';
+import NativeMatrixSummary from '../../components/sections/native/matrix/NativeMatrixSummary.astro';
 import NativeEvidenceRoadmap from '../../components/sections/native/NativeEvidenceRoadmap.astro';
 import NativePrinciples from '../../components/sections/native/principles/NativePrinciples.astro';
 import ComplexSolutionsTravel from '../../components/sections/native/travel/ComplexSolutionsTravel.astro';
@@ -41,25 +44,15 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 >
   <div class="landing native-page" data-tx-landing="" data-tx-native-page="">
     <NativeHero />
-    <div class="native-banner">
-      <PageBanner art="page-native" />
-    </div>
     <BlueprintDiagram />
     <NativeDemo />
     <WhyKmp />
     <ComponentsThatTravel />
     <ComplexSolutionsTravel />
-    <NativeCompatibilityMatrix />
+    <NativeMatrixSummary />
     <NativeEvidenceRoadmap />
     <NativeFaq />
     <NativePrinciples />
   </div>
 </BaseLayout>
 
-<style>
-  .native-banner {
-    inline-size: min(100% - 2rem, 72rem);
-    margin-inline: auto;
-    padding-block-start: clamp(1rem, 3vw, 2rem);
-  }
-</style>

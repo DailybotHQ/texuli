@@ -28,3 +28,27 @@ export const NATIVE_MATRIX_STATUSES = [
   'Unsupported',
   'Not applicable',
 ] as const;
+
+/** The full matrix lives on its own static route; /native/ links it from the summary. */
+export const NATIVE_MATRIX_ROUTE = '/native/compatibility/';
+
+export interface NativeMatrixGroupCount {
+  readonly group: string;
+  readonly total: number;
+  /** Components that paint in Compose Desktop (supported or partial). */
+  readonly painted: number;
+  /** Components with a checked-in conformance trace. */
+  readonly traced: number;
+}
+
+/** Per-group counts for the /native/ summary, derived from the generated rows. */
+export const NATIVE_MATRIX_GROUP_COUNTS: readonly NativeMatrixGroupCount[] =
+  NATIVE_MATRIX_GROUPS.map((group) => {
+    const rows = NATIVE_MATRIX_ROWS.filter((row) => row.group === group);
+    return {
+      group,
+      total: rows.length,
+      painted: rows.filter((row) => row.composeDesktop !== 'Unsupported').length,
+      traced: rows.filter((row) => row.evidence.traces.length > 0).length,
+    };
+  });
