@@ -23,6 +23,7 @@ let checked = $derived(access?.read(stateName) === true);
   class="tx-player-control tx-player-control--toggle"
   role="switch"
   aria-checked={checked}
+  data-tx-component="control-toggle"
   data-tx-player-control="toggle"
   disabled={!access}
   onclick={() => write(!checked)}

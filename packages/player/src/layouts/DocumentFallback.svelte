@@ -16,7 +16,7 @@ const title = $derived.by(() => {
 });
 </script>
 
-<article class="tx-player-document" aria-label={title || undefined} data-tx-player-document-fallback>
+<article class="tx-player-document" aria-label={title || undefined} data-tx-component="document" data-tx-player-document-fallback>
   {#if title}<p class="tx-player-document__title">{title}</p>{/if}
   <p class="tx-player-document__note">{labels().documentNeedsHost}</p>
 </article>

@@ -12,6 +12,7 @@ let pending = $derived(form?.pending() === true);
 <button
   type="submit"
   class="tx-player-form-submit"
+  data-tx-component="form-submit"
   data-tx-player-form-submit
   aria-disabled={pending || !actions?.available()}
   disabled={pending}

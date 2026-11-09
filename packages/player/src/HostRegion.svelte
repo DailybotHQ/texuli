@@ -27,11 +27,11 @@ const host = $derived(claimed && claimedName !== null ? regions?.get(claimedName
 </script>
 
 {#if host}
-  <div class="tx-player__host-region" role="group" aria-label={text} data-tx-player-host-region={claimedName}>
+  <div class="tx-player__host-region" role="group" aria-label={text} data-tx-component="host-region" data-tx-player-host-region={claimedName}>
     {@render host()}
   </div>
 {:else}
-  <div class="tx-player__host-region" data-tx-player-host-region-missing={claimedName ?? ''}>
+  <div class="tx-player__host-region" data-tx-component="host-region" data-tx-player-host-region-missing={claimedName ?? ''}>
     <p>{text}</p>
     <p class="tx-player__host-region-note">
       {claimedName !== null && regions?.get(claimedName) ? labels().hostRegionDuplicate : labels().hostRegionMissing}

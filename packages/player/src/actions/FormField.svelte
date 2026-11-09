@@ -78,7 +78,7 @@ function onInput(event: Event): void {
 }
 </script>
 
-<div class="tx-player-form-field" data-tx-player-field={name} data-invalid={error ? '' : undefined}>
+<div class="tx-player-form-field" data-tx-component="form-field" data-tx-player-field={name} data-invalid={error ? '' : undefined}>
   <label for={id}>{label}{#if required}<span aria-hidden="true"> *</span>{/if}</label>
   {#if kind === 'multiline'}
     <textarea

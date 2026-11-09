@@ -103,6 +103,7 @@ function jump(event: MouseEvent, frameId: string): void {
     id={txFrame?.frameId}
     aria-labelledby={title && level !== null ? headingId : undefined}
     aria-label={title && level !== null ? undefined : variant === 'deck-slide' ? 'Slide' : 'Content card'}
+    data-tx-component={variant}
     data-tx-player-frame
     data-tx-player-path={txFrame?.path}
     tabindex="-1"
@@ -121,6 +122,7 @@ function jump(event: MouseEvent, frameId: string): void {
     this={landmarks() ? 'main' : 'section'}
     class="tx-player-layout tx-player-layout--page"
     id={txFrame?.frameId}
+    data-tx-component="layout-page"
     data-tx-player-frame
     data-tx-player-path={txFrame?.path}
     tabindex="-1"
@@ -135,6 +137,7 @@ function jump(event: MouseEvent, frameId: string): void {
     id={txFrame?.frameId}
     aria-labelledby={title && level !== null ? headingId : undefined}
     lang={variant === 'layout-deck' ? deckLang : undefined}
+    data-tx-component={variant}
     data-tx-player-frame
     data-tx-player-path={txFrame?.path}
     tabindex="-1"
@@ -158,6 +161,7 @@ function jump(event: MouseEvent, frameId: string): void {
   <div
     class="tx-player-layout tx-player-layout--{variant.slice('layout-'.length)}"
     id={txFrame?.frameId}
+    data-tx-component={variant}
     data-tx-player-frame
     data-tx-player-path={txFrame?.path}
     data-gap={gapToken}
@@ -174,6 +178,7 @@ function jump(event: MouseEvent, frameId: string): void {
     id={txFrame?.frameId}
     aria-labelledby={title && level !== null ? headingId : undefined}
     aria-label={title && level !== null ? undefined : 'Tile'}
+    data-tx-component="layout-tile"
     data-tx-player-frame
     data-tx-player-path={txFrame?.path}
     tabindex="-1"
@@ -186,6 +191,7 @@ function jump(event: MouseEvent, frameId: string): void {
   <div
     class="tx-player-layout tx-player-layout--grid"
     id={txFrame?.frameId}
+    data-tx-component="layout-grid"
     data-tx-player-frame
     data-tx-player-path={txFrame?.path}
     tabindex="-1"
