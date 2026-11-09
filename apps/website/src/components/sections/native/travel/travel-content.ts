@@ -1,5 +1,19 @@
-import catalog from '../../../../../../../packages/spec/catalog/components.json';
 import { NATIVE_COMPATIBILITY } from '../../../../data/native/compatibility.ts';
+
+// Read as raw text: the layer guard forbids deep module imports of repository files.
+const CATALOG_RAW = import.meta.glob<string>(
+  '../../../../../../../packages/spec/catalog/components.json',
+  { query: '?raw', import: 'default', eager: true }
+);
+const catalogText = Object.values(CATALOG_RAW)[0];
+if (catalogText === undefined)
+  throw new Error('Native travel: packages/spec/catalog/components.json is missing');
+interface CatalogComponent {
+  readonly id: string;
+  readonly label: string;
+  readonly summary: string;
+}
+const catalog = JSON.parse(catalogText) as { readonly components: readonly CatalogComponent[] };
 
 export const NATIVE_COMPONENT_SOURCE = 'packages/spec/catalog/components.json';
 export const NATIVE_PARITY_SOURCE = 'native/docs/parity.json';

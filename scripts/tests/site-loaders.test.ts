@@ -175,8 +175,8 @@ describe('docs shell nav', () => {
           '/docs-shell/',
           '/docs-shell/getting-started/',
           '/docs-shell/navigation/',
-          '/slides-page/',
-          '/slides-page/#package-docs',
+          '/solutions/slides/',
+          '/guides/solutions/slides/',
           '/examples/slides-tour/',
           '/showcase/slide-deck/',
           '/editor-page/',
@@ -188,7 +188,7 @@ describe('docs shell nav', () => {
       expect(docsPager('/docs-shell/').next?.href).toBe('/docs-shell/getting-started/');
       expect(docsPager('/docs-shell/getting-started/').prev?.href).toBe('/docs-shell/');
       expect(docsPager('/docs-shell/getting-started/').next?.href).toBe('/docs-shell/navigation/');
-      expect(docsPager('/docs-shell/navigation/').next?.href).toBe('/slides-page/');
+      expect(docsPager('/docs-shell/navigation/').next?.href).toBe('/solutions/slides/');
       expect(docsPager('/showcase/slide-deck/').next?.href).toBe('/editor-page/');
       expect(docsPager('/examples/editor-toolbar/').next).toBeUndefined();
       expect(docsPager('/unknown/').current).toBeUndefined();
@@ -211,6 +211,12 @@ describe('guides nav', () => {
           '/guides/accessibility/',
           '/guides/rtl-i18n/',
           '/guides/forms/',
+          // ADR-028: the Solutions docs group sits before Scale.
+          '/guides/solutions/slides/',
+          '/guides/solutions/documents/',
+          '/guides/solutions/workflows/',
+          '/guides/solutions/canvas/',
+          '/guides/solutions/sheets/',
           '/guides/performance/',
         ]);
         expect(new Set(hrefs).size).toBe(hrefs.length);
@@ -222,7 +228,7 @@ describe('guides nav', () => {
         expect(guidesPager('/guides/').prev).toBeUndefined();
         expect(guidesPager('/guides/').next?.href).toBe('/guides/getting-started/');
         expect(guidesPager('/guides/performance/').next).toBeUndefined();
-        expect(guidesPager('/guides/performance/').prev?.href).toBe('/guides/forms/');
+        expect(guidesPager('/guides/performance/').prev?.href).toBe('/guides/solutions/sheets/');
         expect(guidesPager('/unknown/').current).toBeUndefined();
 
         const flatCount = flattenGuidesNav().length;

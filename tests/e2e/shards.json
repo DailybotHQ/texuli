@@ -57,6 +57,7 @@
     ],
     [
       "a11y-site-3.spec.ts",
+      "a11y-site-solutions.spec.ts",
       "a11y-slides.spec.ts",
       "data.spec.ts",
       "slides-print.spec.ts",

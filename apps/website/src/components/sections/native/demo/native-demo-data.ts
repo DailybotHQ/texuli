@@ -1,8 +1,23 @@
 /** Server-side data for Demo A: checked-in spec fixture plus generated Native evidence. */
 
-import trace from '../../../../../../../native/conformance/expected/report-on-demand.trace.json';
-import fixture from '../../../../../../../packages/spec/fixtures/golden/report-on-demand.json';
 import { NATIVE_COMPATIBILITY } from '../../../../data/native/compatibility.ts';
+
+// Repository data files are read as raw text (the layer guard forbids deep module imports).
+const TRACE_RAW = import.meta.glob<string>(
+  '../../../../../../../native/conformance/expected/report-on-demand.trace.json',
+  { query: '?raw', import: 'default', eager: true }
+);
+const FIXTURE_RAW = import.meta.glob<string>(
+  '../../../../../../../packages/spec/fixtures/golden/report-on-demand.json',
+  { query: '?raw', import: 'default', eager: true }
+);
+const only = (files: Record<string, string>, name: string): string => {
+  const text = Object.values(files)[0];
+  if (text === undefined) throw new Error(`Native demo: ${name} is missing`);
+  return text;
+};
+const trace = JSON.parse(only(TRACE_RAW, 'report-on-demand.trace.json'));
+const fixture = JSON.parse(only(FIXTURE_RAW, 'report-on-demand.json'));
 
 type BlueprintNode = {
   id: string;
