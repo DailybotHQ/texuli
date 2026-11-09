@@ -48,6 +48,7 @@
       "site-playground.spec.ts",
       "site-solution-documents.spec.ts",
       "site-solution-slides.spec.ts",
+      "site-solution-workflows.spec.ts",
       "site-tokens.spec.ts"
     ],
     [

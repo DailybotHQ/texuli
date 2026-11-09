@@ -27,11 +27,11 @@ function finish(result: WorkflowDemoResult, message: string): void {
   announcement = `${message} ${graph.nodes.length} steps and ${graph.edges.length} connections.`;
 }
 
-function selectNode(id: string): void {
+function selectNode(id: string, announce = true): void {
   if (!model.selectNode(id)) return;
   selectedNodeId = id;
   labelDraft = graph.nodes.find((node) => node.id === id)?.label ?? '';
-  announcement = `${labelDraft} selected.`;
+  if (announce) announcement = `${labelDraft} selected.`;
 }
 
 function handleNodeKeydown(event: KeyboardEvent, id: string): void {
@@ -58,7 +58,7 @@ function addStep(): void {
   finish(result, 'Notification step added.');
   if (result.ok) {
     const id = result.graph.nodes.at(-1)?.id;
-    if (id) selectNode(id);
+    if (id) selectNode(id, false);
   }
 }
 
@@ -107,8 +107,12 @@ function reset(): void {
 }
 </script>
 
-<section class="workflow-demo" aria-label="Interactive expense approval workflow">
-  <div class="workflow-demo__toolbar" aria-label="Workflow actions">
+<section
+  class="workflow-demo"
+  data-tx-workflows-demo=""
+  aria-label="Interactive expense approval workflow"
+>
+  <div class="workflow-demo__toolbar" role="group" aria-label="Workflow actions">
     <button type="button" onclick={addStep}>Add notification</button>
     <button type="button" onclick={autoLayout}>Auto layout</button>
     <button type="button" onclick={undo} disabled={!model.canUndo}>Undo</button>
@@ -151,7 +155,6 @@ function reset(): void {
               type="button"
               class="workflow-demo__step"
               aria-pressed={selectedNodeId === node.id}
-              aria-label={`${node.label}, step ${index + 1}`}
               onclick={() => selectNode(node.id)}
               onkeydown={(event) => handleNodeKeydown(event, node.id)}
             >
@@ -176,7 +179,15 @@ function reset(): void {
     </div>
   </div>
 
-  <pre id="workflow-demo-source" class="workflow-demo__source" hidden={!sourceVisible}><code>{source}</code></pre>
+  <div
+    id="workflow-demo-source"
+    class="workflow-demo__source"
+    role="region"
+    aria-label="Workflow source as JSON"
+    hidden={!sourceVisible}
+  >
+    <pre tabindex="0"><code>{source}</code></pre>
+  </div>
 </section>
 
 <style>
@@ -287,6 +298,9 @@ function reset(): void {
     min-inline-size: 0;
   }
   .workflow-demo__source {
+    margin: 0;
+  }
+  .workflow-demo__source pre {
     max-block-size: 18rem;
     overflow: auto;
     margin: 0;
@@ -315,7 +329,7 @@ function reset(): void {
   @media (forced-colors: active) {
     .workflow-demo button,
     .workflow-demo input,
-    .workflow-demo__source {
+    .workflow-demo__source pre {
       border-color: ButtonText;
     }
   }
