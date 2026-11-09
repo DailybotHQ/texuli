@@ -7,9 +7,17 @@ import './typography.css';
 export const HEADING_LEVELS = [1, 2, 3, 4, 5, 6] as const;
 export type HeadingLevel = (typeof HEADING_LEVELS)[number];
 
-/** Heading sizes, independent of the level (the visual scale of the design system). */
-export const HEADING_SIZES = ['display', 'xl', 'lg', 'md', 'sm'] as const;
+/**
+ * Heading sizes, independent of the level (the visual scale of the design system). `2xl`,
+ * `3xl` and `4xl` sit between the title (`xl`) and `display`: hero and section titles on the
+ * font-size scale (`--tx-font-size-2xl`…`4xl`), with the display role's family and weight.
+ */
+export const HEADING_SIZES = ['display', '4xl', '3xl', '2xl', 'xl', 'lg', 'md', 'sm'] as const;
 export type HeadingSize = (typeof HEADING_SIZES)[number];
+
+/** Heading tracking: the role's own (`default`) or `tight` (`--tx-letter-spacing-tight`). */
+export const HEADING_TRACKINGS = ['default', 'tight'] as const;
+export type HeadingTracking = (typeof HEADING_TRACKINGS)[number];
 
 export const HEADING_TONES = ['default', 'muted'] as const;
 export type HeadingTone = (typeof HEADING_TONES)[number];
@@ -23,8 +31,11 @@ export function headingSizeOf(level: HeadingLevel): HeadingSize {
 export const TEXT_ELEMENTS = ['p', 'span', 'div', 'label', 'small', 'strong'] as const;
 export type TextElement = (typeof TEXT_ELEMENTS)[number];
 
-/** `figure` is a large number outside Stat (the title size of the type scale). */
-export const TEXT_SIZES = ['figure', 'lg', 'md', 'sm', 'xs'] as const;
+/**
+ * `figure` is a large number outside Stat (the title size of the type scale); `inherit`
+ * takes the size and line height of the parent (nested text inside a heading or a label).
+ */
+export const TEXT_SIZES = ['figure', 'lg', 'md', 'sm', 'xs', 'inherit'] as const;
 export type TextSize = (typeof TEXT_SIZES)[number];
 
 export const TEXT_TONES = [
@@ -36,6 +47,7 @@ export const TEXT_TONES = [
   'warning',
   'destructive',
   'info',
+  'inherit',
 ] as const;
 export type TextTone = (typeof TEXT_TONES)[number];
 
@@ -74,8 +86,22 @@ export type BoxBorder = (typeof BOX_BORDERS)[number];
 export const BOX_ELEVATIONS = ['none', 'sm', 'md', 'lg'] as const;
 export type BoxElevation = (typeof BOX_ELEVATIONS)[number];
 
-/** The surface fill: the Box's `variant` axis in the catalog. */
-export const BOX_SURFACES = ['transparent', 'default', 'muted', 'subtle', 'elevated'] as const;
+/**
+ * The surface fill: the Box's `variant` axis in the catalog. `primary` is the solid primary
+ * fill with its on-color, `brand` the soft primary tint with its ink (logo tiles, brand
+ * marks), and `translucent` the background at the glass opacity with the glass blur (sticky
+ * headers over scrolling content).
+ */
+export const BOX_SURFACES = [
+  'transparent',
+  'default',
+  'muted',
+  'subtle',
+  'elevated',
+  'primary',
+  'brand',
+  'translucent',
+] as const;
 export type BoxSurface = (typeof BOX_SURFACES)[number];
 
 /** A value of a closed list, or the fallback (a hostile or stale prop never reaches a class). */
@@ -95,8 +121,9 @@ export const headingClass = variants({
   variants: {
     size: map(HEADING_SIZES, 'tx-heading--'),
     tone: map(HEADING_TONES, 'tx-type-tone--'),
+    tracking: map(HEADING_TRACKINGS, 'tx-heading--tracking-'),
   },
-  defaultVariants: { size: 'lg', tone: 'default' },
+  defaultVariants: { size: 'lg', tone: 'default', tracking: 'default' },
 });
 
 export const textClass = variants({

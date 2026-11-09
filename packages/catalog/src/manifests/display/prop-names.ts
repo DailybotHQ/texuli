@@ -141,6 +141,8 @@ export const inlineTextPropNames = ['text'] as const;
 export const headingPropNames = [
   'level',
   'size',
+  'responsive',
+  'tracking',
   'tone',
   'truncate',
   'label',
