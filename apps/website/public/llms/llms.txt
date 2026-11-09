@@ -103,7 +103,7 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [Button](components/button.md): A pressable action control with loading and optional link rendering.
 - [ButtonGroup](components/button-group.md): Groups related buttons with shared borders and orientation.
 - [Callout](components/callout.md): Emphasized documentation-style tip with a strong start edge.
-- [Card](components/card.md): A surface for grouping related content with optional link behavior.
+- [Card](components/card.md): A surface for grouping related content with optional stretched-link behavior.
 - [Carousel](components/carousel.md): A labelled region of slides with previous, next and a picker.
 - [Checkbox](components/checkbox.md): A binary or indeterminate checkbox with optional label.
 - [Chip](components/chip.md): A toggleable filter chip (pressed state).
@@ -127,6 +127,7 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [Error state](components/error-state.md): Full-panel failure with optional retry.
 - [Field](components/field.md): Label, description and error wiring for a single control.
 - [FieldError](components/field-error.md): An alert-role error message for a field.
+- [FileUpload](components/file-upload.md): A labelled drop zone and file list for choosing local files.
 - [Form](components/form.md): A form shell with layout, validation hook and error map.
 - [Heading](components/heading.md): A page title or section heading: a semantic h1–h6 with a size from the type scale.
 - [HoverCard](components/hover-card.md): Preview panel that opens on hover or focus.
@@ -158,17 +159,21 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [ListItem](components/list-item.md): A list row with a title, optional description, icon and trailing meta.
 - [Menubar](components/menubar.md): Application menubar with roving top-level items.
 - [Menubar.Trigger](components/menubar-trigger.md): Top-level menubar item that opens a menu.
+- [MobileAppFrame](components/mobile-app-frame.md): A phone-sized app frame: skip link, header, scrolling screen, optional footer and bottom nav. Host chrome; agents never emit it.
 - [MobileHeader](components/mobile-header.md): A mobile stack header with back, title and actions. Host chrome; agents never emit it.
 - [MultiSelect](components/multi-select.md): A combobox for several values, shown as removable chips.
 - [NavIcon](components/nav-icon.md): Renders a nav model icon by name or component.
 - [NavigationMenu](components/navigation-menu.md): Site or app navigation with expandable triggers and links.
+- [NumberField](components/number-field.md): A numeric value with optional steppers, min, max and locale formatting.
 - [Pagination](components/pagination.md): Page controls for long lists.
+- [PinInput](components/pin-input.md): A one-time code of fixed length, one cell per character.
 - [Popover](components/popover.md): Non-modal floating panel anchored to a trigger.
 - [Popover.Content](components/popover-content.md): Styled popover surface with optional arrow.
 - [Progress](components/progress.md): A linear or circular progress bar, determinate or indeterminate.
 - [Prose](components/prose.md): Long-form text with the design system's reading rhythm: measure, spacing, headings, lists.
 - [Radio](components/radio.md): One option inside a RadioGroup.
 - [RadioGroup](components/radio-group.md): A set of exclusive radio options with keyboard roving.
+- [Rating](components/rating.md): A star rating the person sets, or a read-only average.
 - [ResponsiveModal](components/responsive-modal.md): Dialog on large screens, drawer/sheet on small screens.
 - [ScreenOutlet](components/screen-outlet.md): Stable screen mount point that survives layout switches.
 - [Select](components/select.md): A single-value select root with size and variant chrome.
@@ -193,12 +198,14 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [Table](components/table.md): A responsive data table with density, stacking and sticky header options.
 - [Tabs](components/tabs.md): A tab list that shows one panel at a time.
 - [Tag](components/tag.md): A labeled chip that can be removed.
+- [TagsInput](components/tags-input.md): A list of tags the person types, pastes or removes.
 - [Text](components/text.md): Body copy, labels and small print with a size, tone and weight from the design system.
 - [TextCounter](components/text-counter.md): An input or textarea that shows remaining characters near the limit.
 - [Textarea](components/textarea.md): A multi-line text control with optional autosize.
 - [TimeField](components/time-field.md): A labelled time of day typed or stepped by segment (hour, minute, AM/PM), with a 24-hour HH:mm value.
 - [Timeline](components/timeline.md): Vertical or horizontal chronological list of events.
 - [Toaster](components/toaster.md): Live region that renders toast notifications from the shared store.
+- [ToggleGroup](components/toggle-group.md): A group of toggle buttons: one value, or several.
 - [Tooltip](components/tooltip.md): Short delayed hint on hover or focus.
 
 ## Blueprint envelope

@@ -29,8 +29,8 @@
 | Name | Kind | Required | Trust | Default | Description |
 | --- | --- | --- | --- | --- | --- |
 | `as` | enum(p | span | div | label | small | strong) | no | — | `"p"` | — |
-| `size` | enum(figure | lg | md | sm | xs) | no | — | `"md"` | figure is a large number outside stat (the title size of the type scale) |
-| `tone` | enum(default | muted | subtle | primary | success | warning | destructive | info) | no | — | `"default"` | — |
+| `size` | enum(figure | lg | md | sm | xs | inherit) | no | — | `"md"` | figure is a large number outside stat (the title size of the type scale); inherit takes the parent's size and line height |
+| `tone` | enum(default | muted | subtle | primary | success | warning | destructive | info | inherit) | no | — | `"default"` | — |
 | `weight` | enum(regular | medium | semibold) | no | — | `"regular"` | — |
 | `truncate` | boolean | no | — | `false` | One line with an ellipsis |
 | `lineClamp` | number | no | — | — | Clamp to 1 to 10 lines with an ellipsis |
@@ -88,6 +88,18 @@
   "size": "figure",
   "tabular": true,
   "label": "1,284"
+}
+```
+
+#### Nested text that inherits (`inherit`)
+
+```json
+{
+  "as": "span",
+  "size": "inherit",
+  "tone": "inherit",
+  "weight": "semibold",
+  "label": "Pro"
 }
 ```
 
