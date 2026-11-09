@@ -48,6 +48,7 @@
       "site-playground.spec.ts",
       "site-solution-canvas.spec.ts",
       "site-solution-documents.spec.ts",
+      "site-solution-sheets.spec.ts",
       "site-solution-slides.spec.ts",
       "site-tokens.spec.ts"
     ],
