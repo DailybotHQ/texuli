@@ -34,7 +34,7 @@
       "additionalProperties": {
         "$ref": "#/$defs/allowEntry"
       },
-      "description": "At most 256 entries; keys match ^(?=.{1,48}$)[a-z][a-z0-9]*(?:-[a-z0-9]+)*$ and are never __proto__, constructor or prototype.",
+      "description": "At most 256 entries; keys match ^(?=.{1,64}$)(?:[a-z][a-z0-9]{1,15}:)?[a-z][a-z0-9]*(?:-[a-z0-9]+)*$ and are never __proto__, constructor or prototype.",
       "type": "object"
     },
     "allowEntry": {
@@ -3052,8 +3052,8 @@
         "composes": {
           "description": "Unique items.",
           "items": {
-            "maxLength": 48,
-            "pattern": "^(?=.{1,48}$)[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+            "maxLength": 64,
+            "pattern": "^(?=.{1,64}$)(?:[a-z][a-z0-9]{1,15}:)?[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
             "type": "string"
           },
           "maxItems": 32,

@@ -12,8 +12,8 @@ export const KIT_LIMITS = Object.freeze({
   lexiconRows: 200,
   /** Library entries. */
   libraryEntries: 64,
-  /** Catalog components in the matrix. */
-  components: 256,
+  /** Catalog components in the matrix: the Texuli catalog plus host extensions (`mergeCatalogs`). */
+  components: 512,
   /** Live samples per component in the full matrix. */
   cellsPerComponent: 128,
   /** Tokens of one mode in the foundations. */

@@ -96,13 +96,19 @@ export interface DesignSystemKitProps {
   compiled?: KitCompiled;
   /** The resolved allow manifest. */
   allow?: KitAllowManifest;
-  /** The catalog vocabulary (`@texuli/spec/catalog/components.json`), as data. */
+  /**
+   * The catalog vocabulary (`@texuli/spec/catalog/components.json`), as data, or the merged
+   * catalog `mergeCatalogs(texuli, extensions)` returns when the host has extension components.
+   */
   catalog?: KitCatalog;
   /** The version to compare against (Changes). */
   previous?: { document: DesignSystem; compiled?: KitCompiled };
   /** Live previews of the design system's own components, keyed by library id. */
   library?: Readonly<Record<string, KitLibrarySnippet>>;
-  /** Live samples for catalog ids the kit cannot import, keyed by catalog id. */
+  /**
+   * Live samples for catalog ids the kit cannot import, keyed by catalog id: L4+ packages, and
+   * host extension components (`<ns>:<id>` from `mergeCatalogs`; pass the merged catalog).
+   */
   samples?: Readonly<Record<string, Snippet<[KitSampleContext]>>>;
   /** Components: `grid` (default, variants × sizes plus strips) or `full` (the capped product). */
   matrix?: 'grid' | 'full';
