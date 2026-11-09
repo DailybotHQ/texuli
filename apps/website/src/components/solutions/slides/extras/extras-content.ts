@@ -16,8 +16,8 @@ export const SLIDES_RECIPES: Omit<SolutionRecipesProps, 'entry'> = {
   recipes: [
     {
       title: 'Present a deck in the browser',
-      summary: 'Mount DeckStage on the current Slides demo page with a fixture deck.',
-      href: '/slides-page/',
+      summary: 'Mount DeckStage with a fixture deck, step by step in the Slides docs.',
+      href: '/guides/solutions/slides/',
     },
     {
       title: 'Install the packages',
@@ -61,7 +61,6 @@ export const SLIDES_PLATFORMS: Omit<SolutionPlatformsProps, 'entry'> = {
 export const SLIDES_NEXT: Omit<SolutionNextStepsProps, 'entry'> = {
   links: [
     { label: 'Read the docs', href: '/guides/solutions/slides/' },
-    { label: 'Current demo page', href: '/slides-page/' },
     { label: '@texuli/slides on npm', href: 'https://www.npmjs.com/package/@texuli/slides' },
   ],
 };

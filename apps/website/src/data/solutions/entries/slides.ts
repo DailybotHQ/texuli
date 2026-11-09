@@ -69,7 +69,6 @@ export const slides: SolutionEntry = {
   ],
   links: [
     { label: 'Read the docs', href: '/guides/solutions/slides/' },
-    { label: 'Current demo page', href: '/slides-page/' },
     { label: '@texuli/slides on npm', href: 'https://www.npmjs.com/package/@texuli/slides' },
   ],
 };

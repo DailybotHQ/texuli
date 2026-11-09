@@ -83,7 +83,8 @@ describe('Slides extras', () => {
     const view = nextStepsView({ entry, ...SLIDES_NEXT });
     expect(SLIDES_NEXT.links.some((link) => link.href === entry.docs)).toBe(true);
     expect(view.links[0]).toMatchObject({ href: '/guides/solutions/slides/', kind: 'primary' });
-    expect(view.links.some((link) => link.href === '/slides-page/')).toBe(true);
+    // /slides-page/ redirects here once the landing ships (ADR-028), so no block links it.
+    expect(view.links.some((link) => link.href === '/slides-page/')).toBe(false);
   });
 
   it('composes the five shared blocks statically', () => {
