@@ -1,22 +1,27 @@
 ---
-import HomeFinal from '../components/sections/home/HomeFinal.astro';
-import HomeHero from '../components/sections/home/HomeHero.astro';
+import HomeAgents22 from '../components/sections/home/agents-22/HomeAgents22.astro';
+import HomeBuiltWith from '../components/sections/home/built-with/HomeBuiltWith.astro';
+import HomeFinal22 from '../components/sections/home/final-22/HomeFinal22.astro';
 import HomePitch from '../components/sections/home/HomePitch.astro';
-import HomeProof from '../components/sections/home/HomeProof.astro';
-import HomeQuickstart from '../components/sections/home/HomeQuickstart.astro';
 import HomeStories from '../components/sections/home/HomeStories.astro';
+import HomeHero22 from '../components/sections/home/hero-22/HomeHero22.astro';
+import { HOME_OWN, HOME_PROOF, loadHomeProof } from '../components/sections/home/home-content.ts';
+import LandingStory from '../components/sections/home/LandingStory.astro';
+import HomeSolutions from '../components/sections/home/solutions/HomeSolutions.astro';
+import HomeWebNative from '../components/sections/home/web-native/HomeWebNative.astro';
 import '../components/sections/home/home.css';
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../components/foundation/site.ts';
 /**
- * texuli.com home (PLAN_012): the illustrated landing in ten bands, in the
- * order of the plan's landing IA: hero, pitch, five story bands (Universal,
- * Web + native, Your brand, For agents, Accessible), a computed proof band,
- * the quickstart and the final call to action. Copy lives in
- * `components/sections/home/home-content.ts`; illustration slots in
- * `data/illustrations.json` (docs/ILLUSTRATIONS.md). JSON-LD per the
- * T-site-ia contract, unchanged. The bands below the hero rise in on scroll
- * (PLAN_006 T-79 row 13): CSS only, behind
- * `prefers-reduced-motion: no-preference` and a scroll-timeline support
- * check, translate only so contrast and visibility never depend on it.
+ * texuli.com home (Home 2.2): nine static bands carrying the ten storyboard messages, in
+ * the order of `HOME_BANDS` (components/sections/home/home-content.ts): hero, small pieces,
+ * Web & Native (first half), complete Solutions, humans and agents, design systems, built
+ * with Texuli, accessible and owned (with the computed proof row), and the two-path close.
+ * No client island (ADR-030). Copy lives beside each section; the kept bands read
+ * home-content.ts. JSON-LD per the T-site-ia contract, unchanged. The bands below the hero
+ * rise in on scroll: CSS only, behind `prefers-reduced-motion: no-preference` and a
+ * scroll-timeline support check, translate only so contrast and visibility never depend
+ * on it.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { libraryJsonLd } from '../lib/schema';
@@ -25,6 +30,13 @@ const HOME_TITLE = 'Build any interface, for web and native';
 const HOME_DESCRIPTION =
   'One owned, accessible Svelte 5 component library to build any interface, safe for ' +
   'agents, with a Kotlin Multiplatform renderer in development.';
+
+const base = import.meta.env.BASE_URL;
+const proof = await loadHomeProof();
+const resolveHref = (href: string): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  return safe === undefined ? undefined : withBase(base, safe);
+};
 ---
 
 <BaseLayout
@@ -34,12 +46,28 @@ const HOME_DESCRIPTION =
   jsonLd={libraryJsonLd()}
 >
   <div class="landing" data-tx-landing="">
-    <HomeHero />
+    <HomeHero22 />
     <HomePitch />
+    <HomeWebNative />
+    <HomeSolutions />
+    <HomeAgents22 />
     <HomeStories />
-    <HomeProof />
-    <HomeQuickstart />
-    <HomeFinal />
+    <HomeBuiltWith />
+    <LandingStory story={HOME_OWN} index={2} side="start">
+      <ul class="home-own-proof" role="list" aria-label={HOME_PROOF.label}>
+        {
+          proof.map((stat) => (
+            <li data-tx-proof={stat.id}>
+              <a href={resolveHref(stat.href)}>
+                <span class="home-own-proof__value">{stat.value}</span>
+                <span class="home-own-proof__label">{stat.label}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </LandingStory>
+    <HomeFinal22 />
   </div>
 </BaseLayout>
 

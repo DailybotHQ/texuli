@@ -12,8 +12,8 @@ import {
   LISTED_PRODUCTS,
   PRODUCTS,
   PROTOYARD,
-  RONIN_BUILDER,
   type ProductEntry,
+  RONIN_BUILDER,
 } from '../../src/data/products/index.ts';
 
 const WEBSITE = resolve(import.meta.dirname, '../..');
@@ -39,12 +39,17 @@ describe('/built-with/ data', () => {
   it('copies status and offerings from the record, so Protoyard Cloud stays planned', () => {
     const card = productCard(PROTOYARD);
     expect(card.status).toBe(PROTOYARD.status);
-    expect(card.offerings).toEqual(PROTOYARD.offerings.map((o) => ({ label: o.label, status: o.status })));
+    expect(card.offerings).toEqual(
+      PROTOYARD.offerings.map((o) => ({ label: o.label, status: o.status }))
+    );
     expect(card.offerings.find((o) => o.label === 'Protoyard Cloud')?.status).toBe('planned');
   });
 
   it('links the product domain through the URL policy, and nothing for a product without one', () => {
-    expect(productCard(PROTOYARD).site).toEqual({ href: 'https://protoyard.app', label: 'protoyard.app' });
+    expect(productCard(PROTOYARD).site).toEqual({
+      href: 'https://protoyard.app',
+      label: 'protoyard.app',
+    });
     const noDomain: ProductEntry = { ...PROTOYARD, domain: null };
     expect(productCard(noDomain).site).toBeUndefined();
   });
@@ -55,7 +60,8 @@ describe('/built-with/ data', () => {
     expect(productCard(PROTOYARD).caseStudy).toBe('/built-with/protoyard/');
     expect(productCard(PROTOYARD, () => false).caseStudy).toBeUndefined();
     for (const { cards } of builtWithGroups())
-      for (const card of cards) if (card.caseStudy) expect(siteRouteExists(card.caseStudy)).toBe(true);
+      for (const card of cards)
+        if (card.caseStudy) expect(siteRouteExists(card.caseStudy)).toBe(true);
   });
 
   it('states the brand rule in the intro and names no plan or unlisted product', () => {
@@ -91,6 +97,8 @@ describe('/built-with/ page and markup', () => {
     expect(markup).not.toMatch(/\sstyle=/);
     expect(markup).toContain('href={resolveHref(card.caseStudy)}');
     expect(markup).toContain('href={card.site.href} rel="noopener"');
-    expect(styles).not.toMatch(/margin-(left|right)|padding-(left|right)|\b(left|right|top|bottom):/);
+    expect(styles).not.toMatch(
+      /margin-(left|right)|padding-(left|right)|\b(left|right|top|bottom):/
+    );
   });
 });

@@ -46,6 +46,7 @@
       "site-keyboard.spec.ts",
       "site-motion.spec.ts",
       "site-playground.spec.ts",
+      "site-solution-canvas.spec.ts",
       "site-solution-documents.spec.ts",
       "site-solution-slides.spec.ts",
       "site-tokens.spec.ts"
