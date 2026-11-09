@@ -1,0 +1,198 @@
+---
+/**
+ * SolutionHero (ADR-030): the first block of every Solution landing. An eyebrow, an
+ * HTML h1, a lede, the status from the registry entry, one or two calls to action and
+ * the plate art. Static markup, no client island. Every href passes the URL policy
+ * (developer tier: app-authored routes). The art goes through SiteIllustration, which
+ * paints the texel mosaic while the file is missing; a slot not yet registered in
+ * `illustrations.json` paints the same motif from HeroTexels.
+ */
+import SiteIllustration from '../../../landing/SiteIllustration.astro';
+import type { SolutionHeroProps } from '../types.ts';
+import HeroTexels from './HeroTexels.astro';
+import { solutionHeroView } from './hero-model.ts';
+
+type Props = SolutionHeroProps;
+
+const view = solutionHeroView(Astro.props, import.meta.env.BASE_URL);
+---
+
+<section
+  class="solution-hero"
+  aria-labelledby={view.headingId}
+  data-tx-solution-hero={Astro.props.entry.slug}
+>
+  <div class="solution-hero__inner">
+    <div class="solution-hero__copy">
+      <p class="solution-hero__eyebrow" data-tx-solution-eyebrow="">{view.eyebrow}</p>
+      <h1 id={view.headingId}>{view.title}</h1>
+      <p class="solution-hero__lede">{view.lede}</p>
+      <p class="solution-hero__status" data-tx-solution-status={view.status}>
+        <span class="solution-hero__dot" aria-hidden="true"></span>
+        <span>{view.statusText}</span>
+      </p>
+      <div class="solution-hero__actions">
+        {
+          view.ctas.map((cta) => (
+            <a
+              href={cta.href}
+              class={`solution-hero__cta solution-hero__cta--${cta.kind}`}
+              data-tx-solution-cta={cta.kind}
+            >
+              {cta.label}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+    <div class="solution-hero__art">
+      {
+        view.artRegistered ? (
+          <SiteIllustration art={view.art.slot} />
+        ) : (
+          <HeroTexels art={view.art.slot} alt={view.artAlt} />
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .solution-hero {
+    --sh-accent: var(--home-accent, #6d4aff);
+    --sh-accent-text: var(--home-accent-text, #5b3ae6);
+    --sh-accent-ink: var(--home-accent-ink, #ffffff);
+    background: var(
+      --home-ground,
+      linear-gradient(
+        160deg,
+        color-mix(in oklab, #6d4aff 7%, var(--tx-background)) 0%,
+        var(--tx-background) 50%,
+        color-mix(in oklab, #ff8a4c 6%, var(--tx-background)) 100%
+      )
+    );
+    border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 60%, transparent);
+  }
+  :global(:root[data-tx-mode='dark']) .solution-hero {
+    --sh-accent-text: var(--home-accent-text, #b9a8ff);
+  }
+  .solution-hero__inner {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-block: clamp(2rem, 6vw, 4.5rem);
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  @media (min-width: 60rem) {
+    .solution-hero__inner {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+      align-items: center;
+      min-block-size: min(40rem, calc(100svh - 4rem));
+    }
+  }
+  .solution-hero__copy {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+    max-inline-size: 36rem;
+    min-inline-size: 0;
+  }
+  .solution-hero__eyebrow {
+    margin: 0;
+    padding-block: 0.3rem;
+    padding-inline: 0.85rem;
+    border: 1px solid color-mix(in oklab, var(--sh-accent) 35%, transparent);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--sh-accent) 8%, var(--tx-background));
+    color: var(--tx-foreground);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .solution-hero h1 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+  .solution-hero__lede {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+    line-height: 1.5;
+  }
+  .solution-hero__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .solution-hero__dot {
+    inline-size: 0.55rem;
+    block-size: 0.55rem;
+    border-radius: 999px;
+    background: var(--tx-success, var(--sh-accent));
+  }
+  .solution-hero__status:not([data-tx-solution-status='available']) .solution-hero__dot {
+    border: 2px solid var(--sh-accent-text);
+    background: transparent;
+  }
+  .solution-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+  }
+  .solution-hero__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: 2.75rem;
+    padding-inline: 1.25rem;
+    border: 1px solid transparent;
+    border-radius: 0.65rem;
+    font-weight: 650;
+    text-decoration: none;
+  }
+  .solution-hero__cta--primary {
+    background: var(--sh-accent);
+    color: var(--sh-accent-ink);
+    box-shadow: 0 0.5rem 1.5rem -0.75rem var(--sh-accent);
+  }
+  .solution-hero__cta--primary:hover {
+    background: color-mix(in oklab, var(--sh-accent) 88%, black);
+  }
+  .solution-hero__cta--secondary {
+    border-color: var(--tx-border);
+    background: var(--tx-background);
+    color: var(--tx-foreground);
+  }
+  .solution-hero__cta--secondary:hover {
+    background: color-mix(in oklab, var(--tx-muted) 50%, var(--tx-background));
+  }
+  .solution-hero__cta:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 3px;
+  }
+  .solution-hero__art {
+    min-inline-size: 0;
+  }
+  @media (max-width: 30rem) {
+    .solution-hero__cta {
+      flex: 1 1 100%;
+    }
+  }
+  @media (forced-colors: active) {
+    .solution-hero__cta {
+      border-color: LinkText;
+    }
+  }
+</style>
