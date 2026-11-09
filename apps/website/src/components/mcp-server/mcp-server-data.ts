@@ -1037,7 +1037,7 @@ export const MCP_SERVER_DATA = {
       uri: 'texuli://catalog',
       title: 'Component catalog',
       description:
-        'The content-addressed Texuli component catalog (catalog-e9b3b93bdc10…, 170 components): every manifest with props, examples, useWhen, dontUseWhen and emit tiers. The exact bytes hash to the catalog id.',
+        'The content-addressed Texuli component catalog (catalog-320e3edf83d2…, 170 components): every manifest with props, examples, useWhen, dontUseWhen and emit tiers. The exact bytes hash to the catalog id.',
       mimeType: 'application/json',
     },
     {
@@ -1191,13 +1191,13 @@ export const MCP_SERVER_DATA = {
       name: 'create-design-system',
       title: 'Create a design system from a brief',
       description:
-        'Turn a brand brief (colors, fonts, mood, an existing token file or a library theme) into a validated Texuli design-system document: start from an importer or a suggestion, write the sections, optionally lock it (an allow section from ds.allow, library entries, a draft approval), validate with ds.validate and fix every code until it passes, then report contrast and a preview. Approval stays human: the agent never marks it approved. Returns the step-by-step loop with the brief filled in.',
+        'Turn a brand brief, token file, stylesheet, logo pixels or library theme into a proposed Texuli design-system draft. The agent may inspect reference screenshots with its own vision and translate observations into proposed generator inputs; screenshots are never silently imported. Review the generator loss and repair report, validate the draft, then report contrast and a preview. Approval stays human.',
       arguments: [
         {
           name: 'brief',
           required: true,
           description:
-            'The brand in plain words: name, colors, fonts, shape, density, mood, audience, e.g. "Harborline: teal #0e7490, Inter, rounded, calm".',
+            'The brand in plain words: name, colors, fonts, shape, density, mood, audience, e.g. "Harborline: teal #0e7490, Inter, rounded, calm". If screenshots are supplied, inspect them yourself and use only your observations to propose generator inputs.',
         },
         {
           name: 'base',

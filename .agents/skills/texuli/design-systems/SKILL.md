@@ -48,7 +48,19 @@ Guide (monorepo): `docs/DESIGN_SYSTEMS.md`. Reference: the document
 
 ## Author
 
-1. **Start from what exists** (the MCP tool, or the CLI in a checkout):
+1. **Generate a draft from proposed inputs.** When the developer supplies
+   reference screenshots, inspect them with your own vision capabilities and
+   translate observations into a proposed brief or other generator inputs.
+   Screenshots are not read or imported by Texuli. Use design_system.generate
+   for any combination of a brief, DTCG or Tokens Studio JSON, CSS text, logo
+   pixels and a Texuli theme. It returns a draft plus `report.losses`
+   (dropped or overwritten values), `report.repairs` (automatic AA
+   adjustments and why) and `report.guarantees`; inspect every entry. Inputs
+   are bounded, and CSS is never fetched or executed. The operation does not
+   save or approve anything. The CLI equivalent is `texuli ds generate` with
+   `--brief`, `--from-tokens`, `--from-css`, `--from-logo` or `--from-theme`
+   and `-o <file>`; it writes the document and report.
+2. **Start from focused importers when useful** (the MCP tools, or the CLI in a checkout):
 
    | The developer has | Call |
    | --- | --- |
@@ -59,17 +71,18 @@ Guide (monorepo): `docs/DESIGN_SYSTEMS.md`. Reference: the document
    | A flat role palette (light and dark roles) | `ds.import` `from` `role-palette` |
    | A Texuli theme | `ds.import` `{ "from": "theme", "input": "ocean" }`, or `"extends": "texuli:ocean"` |
 
-   Read every warning: each names a value that was dropped and why.
-2. **Write only what the brief asks for**: identity (`id` lowercase with
+   Read every warning: each names a value that was dropped and why. These
+   tools remain useful for focused conversions and palette suggestions.
+3. **Write only what the brief asks for**: identity (`id` lowercase with
    hyphens, semver `version`, `name`), `color.brand.seed` (plus
    `secondary`, `accent`, `neutral`), then `typography.families`,
    `shape.radius`, `space.density`, `elevation.style`, `motion.personality`,
    `components.<id>.defaults`, `accessibility` (`contrast` AA or AAA,
    `targetMin`). Pin a color (`color.pin.primary`) only when the brand
    requires that exact fill.
-3. **Variants** (`high-contrast`, `compact`) are partial documents under
+4. **Variants** (`high-contrast`, `compact`) are partial documents under
    `variants`; every variant compiles in light and dark.
-4. **Spec 0.11.0 fields** (new in `0.13.0`; the `0.10.0` to `0.12.3`
+5. **Spec 0.11.0 fields** (new in `0.13.0`; the `0.10.0` to `0.12.3`
    packages carry spec 0.10.0 and refuse them, so check the installed
    version first): `elevation.levels` (keys `1`–`5`, each 1 to 4 layers of `y`,
    `blur`, `opacity` and optional `x`, `spread`, `inset`; numbers in px,
@@ -80,7 +93,7 @@ Guide (monorepo): `docs/DESIGN_SYSTEMS.md`. Reference: the document
    derives the rest). To give a soft fill its own text color, pin
    `color.roles.<mode>.<role>SoftForeground`: the fill is then held to
    that ink, not to the page text.
-5. **Spec 0.12.0** (new in `0.14.0`; `0.13.x` refuses it): a shadow
+6. **Spec 0.12.0** (new in `0.14.0`; `0.13.x` refuses it): a shadow
    layer's optional `darkOpacity` (0 to 1) is its opacity in dark mode,
    `{ "y": 2, "blur": 6, "opacity": 0.12, "darkOpacity": 0.48 }`. Leave
    `color.roles.<mode>.sidebarPrimary` out: the compiler derives the

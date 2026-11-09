@@ -244,6 +244,17 @@ errors }`.
 | A logo's RGBA pixels | `importLogoPixels` (dominant colors, then the seed engine) | `ds.suggest` `pixels` | — |
 | One seed, or up to three brand colors | `importBrand` | `ds.suggest` `seed` or `colors` | — |
 
+For a combined starting point, `generateDesignSystem({ brief?, tokens?, css?,
+logoPixels?, theme? })` merges bounded inputs, fills defaults, validates and
+compiles a draft. Later sources take precedence; overwritten values and
+unmapped importer values appear in `report.losses`. Automatic accessibility
+adjustments are listed in `report.repairs` with reasons, and
+`report.guarantees` records the result. The MCP operation
+`design_system.generate` exposes this as draft-only pure compute; it never
+saves or approves a document. The CLI equivalent is
+`texuli ds generate --brief … --from-tokens … --from-css … --from-logo … -o
+<file>` and writes the document with its report.
+
 A DTCG or Tokens Studio file written by `emitDtcg` or `emitTokensStudio`
 round-trips losslessly (document → file → document), because what is not a
 token travels in `$extensions["com.texuli.design-system"]`.
@@ -252,9 +263,12 @@ token travels in `$extensions["com.texuli.design-system"]`.
 
 The MCP prompt `create-design-system` (brief, optional `base` theme and
 `contrast`) walks an agent through the loop: read
-`texuli://design-system/acme`, start from `ds.import` or `ds.suggest`,
-write the sections, `ds.validate` until valid, check `ds.contrast` and
-`ds.preview`, then deliver. A brand URL is an agent-side step at most: the
+`texuli://design-system/acme`, use `design_system.generate` for combined
+inputs, review losses and automatic AA repairs, then `ds.validate` until
+valid, check `ds.contrast` and `ds.preview`, and deliver a draft. Reference
+screenshots are an agent vision step: the agent interprets them and proposes
+a brief or other generator inputs. No importer reads screenshots, and no
+image is silently imported. A brand URL is an agent-side step at most: the
 compiler never fetches. The skill's [design-systems sub-skill](../skills/texuli/design-systems/SKILL.md)
 is the same loop for hosts with skills.
 
