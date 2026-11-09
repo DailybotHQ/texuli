@@ -101,6 +101,7 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
         'ds.import',
         'ds.generate',
         'ds.allow',
+        'ds.bundle',
         'ds.diff',
         'ds.preview',
         'ds.save',
@@ -237,7 +238,7 @@ it('reports tool and protocol errors and speaks newline-delimited JSON-RPC on st
       ) as { version: string };
       expect(messages[0]?.result?.serverInfo).toEqual({ name: 'texuli', version });
       expect(version).not.toBe('0.0.0');
-      expect(messages[1]?.result?.tools).toHaveLength(24);
+      expect(messages[1]?.result?.tools).toHaveLength(25);
     }
   );
 });

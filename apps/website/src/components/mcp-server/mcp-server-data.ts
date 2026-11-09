@@ -683,6 +683,46 @@ export const MCP_SERVER_DATA = {
       example: 'The minimal preset',
     },
     {
+      name: 'ds.bundle',
+      title: 'Pack or unpack a portable design-system bundle',
+      summary:
+        'Pack a design-system document with its library sources and release history into one JSON bundle, or unpack a bundle and return those parts. Returns ok, the bundle or the document, allowManifest, librarySources and history; hash mismatches, oversized sources and path-traversing ids are refused with stable codes. Sources are never executed.',
+      runtime: 'edge',
+      remote: true,
+      local: true,
+      limits: {
+        inputBytes: 1048576,
+        timeMs: 10000,
+        items: 64,
+      },
+      arguments: [
+        {
+          name: 'bundle',
+          required: false,
+          description:
+            'A texuli/design-system-bundle object to unpack (format, version 1, document, allowManifest, librarySources, history).',
+        },
+        {
+          name: 'document',
+          required: false,
+          description: 'A texuli/design-system document to pack. Ignored when bundle is set.',
+        },
+        {
+          name: 'librarySources',
+          required: false,
+          description:
+            'Library component sources as text: { id, version, source, language? }. Ignored when bundle is set.',
+        },
+        {
+          name: 'history',
+          required: false,
+          description:
+            'Approved versions with changelog entries: { version, contentHash, changelog?, status?, approvedBy?, approvedAt? }. Ignored when bundle is set.',
+        },
+      ],
+      example: 'Pack a minimal document',
+    },
+    {
       name: 'ds.diff',
       title: 'Diff two design systems',
       summary:

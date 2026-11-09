@@ -199,6 +199,15 @@
       "readOnly": true
     },
     {
+      "name": "ds.bundle",
+      "title": "Pack or unpack a portable design-system bundle",
+      "description": "Pack a design-system document with its library sources and release history into one JSON bundle, or unpack a bundle and return those parts. Returns ok, the bundle or the document, allowManifest, librarySources and history; hash mismatches, oversized sources and path-traversing ids are refused with stable codes. Sources are never executed.",
+      "runtime": "edge",
+      "remote": true,
+      "local": true,
+      "readOnly": true
+    },
+    {
       "name": "ds.diff",
       "title": "Diff two design systems",
       "description": "Compile two design-system documents (before is the baseline) and compare them: every added, removed or changed --tx-* variable per mode, contrast pairs that regressed below the target, changed component defaults and attributes. Returns valid, identical, the summary counts and each list, or errors tagged with their side.",

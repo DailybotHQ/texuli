@@ -48,6 +48,7 @@ const EXPECTED = [
   'ds.import',
   'ds.generate',
   'ds.allow',
+  'ds.bundle',
   'ds.diff',
   'ds.preview',
   'ds.save',

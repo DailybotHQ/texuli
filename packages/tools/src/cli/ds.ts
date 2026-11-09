@@ -14,6 +14,8 @@
  *     texuli ds generate [--brief <text>] [--from-tokens <file>] [--from-css <file>] [--from-logo <pixels.json>] [--from-theme <file>] [-o <file>]
  *     texuli ds approve <file> --by <name> [--version <x.y.z>] [--trust t] [--base <file>]...
  *     texuli ds hash <file>
+ *     texuli ds pack <file> --out <bundle.json> [--sources <file>] [--history <file>] [--overwrite]
+ *     texuli ds unpack <bundle.json> [--out <path> [--overwrite]]
  *     texuli ds check <file> …                       (the conformance check, ds-check/cli.ts)
  *
  * `init --locked` adds an `allow` section from a preset (ADR-032; `all` and
@@ -32,6 +34,7 @@
  */
 import { readFile, stat } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { canonicalJson, packBundle, unpackBundle } from '@texuli/spec/design-system';
 import { generateDesignSystem } from '@texuli/tokens/design-system/compile-core';
 import { DESIGN_SYSTEM_IMPORT_LIMITS } from '@texuli/tokens/design-system/import';
 import { type DesignSystem, validateDesignSystem } from '@texuli/tokens/design-system/validate';
@@ -62,6 +65,8 @@ export const DS_COMMANDS = [
   'generate',
   'approve',
   'hash',
+  'pack',
+  'unpack',
   'check',
 ] as const;
 export type DsCommand = (typeof DS_COMMANDS)[number];
@@ -77,6 +82,8 @@ export const DS_USAGE = [
   '       texuli ds generate [--brief <text>] [--from-tokens <file>] [--from-css <file>] [--from-logo <pixels.json>] [--from-theme <file>] [-o <file> [--overwrite]]',
   '       texuli ds approve <file> --by <name> [--version <x.y.z>] [--trust developer|untrusted] [--base <file>]...',
   '       texuli ds hash <file>',
+  '       texuli ds pack <file> --out <bundle.json> [--sources <file>] [--history <file>] [--overwrite]',
+  '       texuli ds unpack <bundle.json> [--out <path> [--overwrite]]',
   `       ${DS_CHECK_USAGE.replace('Usage: ', '')}`,
 ].join('\n');
 
@@ -114,6 +121,8 @@ const FLAGS: Record<DsCommandArgs['command'], readonly string[]> = {
   ],
   approve: ['by', 'version', 'trust', 'base'],
   hash: [],
+  pack: ['sources', 'history', 'out'],
+  unpack: ['out'],
 };
 const POSITIONALS: Record<DsCommandArgs['command'], number> = {
   init: 1,
@@ -126,6 +135,8 @@ const POSITIONALS: Record<DsCommandArgs['command'], number> = {
   generate: 0,
   approve: 1,
   hash: 1,
+  pack: 1,
+  unpack: 1,
 };
 const CHOICES: Record<string, readonly string[]> = {
   trust: ['developer', 'untrusted'],
@@ -211,6 +222,7 @@ export function parseDsArgs(
   if (name === 'import' && !parsed.flags.from) throw new TypeError('ds import needs --from.');
   if (name === 'approve' && !parsed.flags.by?.trim())
     throw new TypeError('ds approve needs --by <name>.');
+  if (name === 'pack' && !parsed.flags.out) throw new TypeError('ds pack needs --out.');
   if (parsed.flags.preset !== undefined && !parsed.locked)
     throw new TypeError('Flag --preset needs --locked.');
   if (parsed.overwrite && name !== 'init' && name !== 'approve' && parsed.flags.out === undefined)
@@ -340,6 +352,8 @@ async function plan(
       };
     case 'approve':
     case 'hash':
+    case 'pack':
+    case 'unpack':
       throw new TypeError(`ds ${args.command} does not run one operation.`);
     default: {
       // brand: the argument is the one-liner; theme: a library id unless it names a file.
@@ -399,6 +413,13 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
   if (args.command === 'approve' || args.command === 'hash') {
     try {
       return args.command === 'hash' ? await runHash(args, io) : await runApprove(args, io);
+    } catch (error) {
+      return cannotRun(error instanceof Error ? error.message : String(error));
+    }
+  }
+  if (args.command === 'pack' || args.command === 'unpack') {
+    try {
+      return args.command === 'pack' ? await runPack(args, io) : await runUnpack(args, io);
     } catch (error) {
       return cannotRun(error instanceof Error ? error.message : String(error));
     }
@@ -632,6 +653,100 @@ async function runApprove(args: DsCommandArgs, io: DsIo): Promise<DsResult> {
     `${JSON.stringify({ ok: true, operation: 'ds.approve', path: result.path, approval: stamped.approval, note: APPROVAL_NOTE }, null, 2)}\n`
   );
   return { ok: true, out: result.path as string };
+}
+
+function prettyCanonical(value: unknown): string {
+  return `${JSON.stringify(JSON.parse(canonicalJson(value)), null, 2)}\n`;
+}
+
+function asList(value: unknown, label: string): unknown[] {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) throw new TypeError(`${label} must be a JSON array.`);
+  return value;
+}
+
+/** `ds pack`: document + optional sources and history into one bundle JSON file. */
+async function runPack(args: DsCommandArgs, io: DsIo): Promise<DsResult> {
+  const stdout = io.stdout ?? process.stdout;
+  const stderr = io.stderr ?? process.stderr;
+  const cwd = io.cwd ?? process.cwd();
+  const at = (path: string) => resolve(cwd, path);
+  const document = await readJsonFile(at(args.args[0] as string));
+  const sources = args.flags.sources
+    ? asList(await readJsonFile(at(args.flags.sources)), '--sources')
+    : [];
+  const history = args.flags.history
+    ? asList(await readJsonFile(at(args.flags.history)), '--history')
+    : [];
+  const packed = packBundle({
+    document,
+    librarySources: sources as { id: string; version: string; source: string; language?: string }[],
+    history: history as {
+      version: string;
+      contentHash: string;
+      changelog?: string;
+      approvedAt?: string;
+      approvedBy?: string;
+      status?: 'approved' | 'draft';
+    }[],
+  });
+  if (!packed.ok) {
+    stdout.write(
+      `${JSON.stringify({ ok: false, operation: 'ds.pack', errors: packed.errors }, null, 2)}\n`
+    );
+    process.exitCode = 1;
+    return { ok: false, error: `Refused: ${JSON.stringify(packed.errors)}` };
+  }
+  const files = localFiles(io.cwd ? { cwd: io.cwd } : {});
+  const written = await files.write(args.flags.out as string, prettyCanonical(packed.bundle), {
+    overwrite: args.overwrite,
+  });
+  if (!written.ok) {
+    stderr.write(`${written.error} (${written.code})\n`);
+    process.exitCode = 1;
+    return { ok: false, error: written.error };
+  }
+  stdout.write(
+    `${JSON.stringify({ ok: true, operation: 'ds.pack', out: written.relative, bytes: written.bytes }, null, 2)}\n`
+  );
+  return { ok: true, out: written.relative };
+}
+
+/** `ds unpack`: validate a bundle and write (or print) its parts. Sources are never executed. */
+async function runUnpack(args: DsCommandArgs, io: DsIo): Promise<DsResult> {
+  const stdout = io.stdout ?? process.stdout;
+  const stderr = io.stderr ?? process.stderr;
+  const cwd = io.cwd ?? process.cwd();
+  const unpacked = unpackBundle(await readJsonFile(resolve(cwd, args.args[0] as string)));
+  if (!unpacked.ok) {
+    stdout.write(
+      `${JSON.stringify({ ok: false, operation: 'ds.unpack', errors: unpacked.errors }, null, 2)}\n`
+    );
+    process.exitCode = 1;
+    return { ok: false, error: `Refused: ${JSON.stringify(unpacked.errors)}` };
+  }
+  const body = {
+    document: unpacked.document,
+    allowManifest: unpacked.allowManifest,
+    librarySources: unpacked.librarySources,
+    history: unpacked.history,
+  };
+  const out = args.flags.out;
+  if (out === undefined) {
+    stdout.write(`${JSON.stringify({ ok: true, operation: 'ds.unpack', ...body }, null, 2)}\n`);
+    return { ok: true };
+  }
+  const files = localFiles(io.cwd ? { cwd: io.cwd } : {});
+  const written = await files.write(out, prettyCanonical(body), { overwrite: args.overwrite });
+  if (!written.ok) {
+    stderr.write(`${written.error} (${written.code})\n`);
+    process.exitCode = 1;
+    return { ok: false, error: written.error };
+  }
+  stdout.write(
+    `${JSON.stringify({ ok: true, operation: 'ds.unpack', out: written.relative, bytes: written.bytes }, null, 2)}\n`
+  );
+  return { ok: true, out: written.relative };
 }
 
 /** `ds hash`: the content hashes, checked against the stored ones; exit 1 on a mismatch. */
