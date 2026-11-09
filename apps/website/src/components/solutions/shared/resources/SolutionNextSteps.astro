@@ -1,0 +1,161 @@
+---
+/**
+ * SolutionNextSteps (`SolutionNextStepsProps`, ADR-030): the closing call-to-action band
+ * of a Solution landing, at the home final band's level: a large centered h2, the entry's
+ * tagline, the docs link as the primary call to action, then the other links, over the
+ * `home-final` band art. Static markup, no island, no HTML sinks; every href passes the
+ * URL policy (developer tier).
+ */
+import SiteIllustration from '../../../landing/SiteIllustration.astro';
+import type { SolutionNextStepsProps } from '../types.ts';
+import { nextStepsView } from './resources-model.ts';
+
+type Props = SolutionNextStepsProps;
+
+const view = nextStepsView(Astro.props, import.meta.env.BASE_URL);
+---
+
+<section
+  class="solution-next"
+  aria-labelledby={view.headingId}
+  data-tx-solution-next={Astro.props.entry.slug}
+>
+  <div class="solution-next__inner">
+    <div class="solution-next__copy">
+      <h2 id={view.headingId}>{view.title}</h2>
+      <p>{view.sub}</p>
+      <div class="solution-next__actions">
+        {
+          view.links.map((link) => (
+            <a
+              href={link.href}
+              class={`solution-next__cta solution-next__cta--${link.kind}`}
+              data-tx-next-link={link.kind}
+            >
+              {link.label}
+              {link.kind === 'text' && <span aria-hidden="true">&nbsp;→</span>}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+    <div class="solution-next__art">
+      <SiteIllustration art="home-final" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .solution-next {
+    --sn-accent: var(--home-accent, #6d4aff);
+    --sn-accent-text: var(--home-accent-text, #5b3ae6);
+    --sn-accent-ink: var(--home-accent-ink, #ffffff);
+    background: var(
+      --home-ground,
+      linear-gradient(
+        160deg,
+        color-mix(in oklab, #6d4aff 7%, var(--tx-background)) 0%,
+        var(--tx-background) 50%,
+        color-mix(in oklab, #ff8a4c 6%, var(--tx-background)) 100%
+      )
+    );
+  }
+  :global(:root[data-tx-mode='dark']) .solution-next {
+    --sn-accent-text: var(--home-accent-text, #b9a8ff);
+  }
+  .solution-next__inner {
+    display: grid;
+    gap: 2rem;
+    justify-items: center;
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-block: clamp(3rem, 8vw, 6rem) 0;
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+    text-align: center;
+  }
+  .solution-next__copy {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 1rem;
+    justify-items: center;
+    max-inline-size: 40rem;
+  }
+  .solution-next h2 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(2.25rem, 7vw, 4rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+  .solution-next__copy p {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: clamp(1rem, 2.4vw, 1.2rem);
+  }
+  .solution-next__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem 1rem;
+  }
+  .solution-next__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: 2.75rem;
+    padding-inline: 1.25rem;
+    border: 1px solid transparent;
+    border-radius: 0.65rem;
+    font-weight: 650;
+    text-decoration: none;
+  }
+  .solution-next__cta--primary {
+    background: var(--sn-accent);
+    color: var(--sn-accent-ink);
+    box-shadow: 0 0.5rem 1.5rem -0.75rem var(--sn-accent);
+  }
+  .solution-next__cta--primary:hover {
+    background: color-mix(in oklab, var(--sn-accent) 88%, black);
+  }
+  .solution-next__cta--secondary {
+    border-color: var(--tx-border);
+    background: var(--tx-background);
+    color: var(--tx-foreground);
+  }
+  .solution-next__cta--secondary:hover {
+    background: color-mix(in oklab, var(--tx-muted) 50%, var(--tx-background));
+  }
+  .solution-next__cta--text {
+    min-block-size: 1.5rem;
+    padding-inline: 0;
+    color: var(--sn-accent-text);
+  }
+  .solution-next__cta--text:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .solution-next__cta:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 3px;
+  }
+  /* The art's upper sky is empty by design: pull it up under the copy, as the home band does. */
+  .solution-next__art {
+    inline-size: 100%;
+    margin-block-start: -6%;
+  }
+  @media (max-width: 30rem) {
+    .solution-next__cta--primary,
+    .solution-next__cta--secondary {
+      flex: 1 1 100%;
+    }
+  }
+  @media (forced-colors: active) {
+    .solution-next__cta {
+      border-color: LinkText;
+    }
+  }
+</style>
