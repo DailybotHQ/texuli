@@ -55,7 +55,11 @@ export const LEGACY_COMMANDS: readonly LegacyCommand[] = Object.freeze([
     summary:
       'Write a new design-system document (--brand "<one-liner>"; --locked [--preset all|minimal|<file>])',
   },
-  { usage: 'ds validate <file>', summary: 'Validate a design-system document (ds.validate)' },
+  {
+    usage: 'ds validate <file>',
+    summary:
+      'Validate a design-system document (ds.validate); --locked adds catalog and prototype checks, --report records findings without failing',
+  },
   {
     usage: 'ds compile <file>',
     summary: 'Compile it to JSON, CSS, a Tailwind preset, DTCG or Tokens Studio (--format, --out)',

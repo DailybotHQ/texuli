@@ -138,7 +138,7 @@
     {
       "name": "ds.validate",
       "title": "Validate a design system",
-      "description": "Validate a design-system document: the spec's closed schema, the extends chain, then a compile of the document and its high-contrast variant with the guarantees enforced (text contrast, focus ring, target size). Returns valid, the distinct codes, every error with its JSON path and hint, the compiler warnings and the hash.",
+      "description": "Validate a design-system document. Set full to run the complete locked-design-system validator, including catalog allow sets, extensions and an optional prototype's component and CSS policy checks. Returns every finding with stable code, severity, area, path and fix hint; the full mode is read-only and does not execute prototype sources.",
       "runtime": "edge",
       "remote": true,
       "local": true,
