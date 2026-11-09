@@ -9,6 +9,7 @@
 export const buttonPropNames = [
   'variant',
   'size',
+  'tone',
   'href',
   'hrefTrust',
   'type',

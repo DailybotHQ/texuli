@@ -68,6 +68,7 @@ function propsFrom(
 
 const buttonVariants = ['default', 'secondary', 'outline', 'ghost', 'destructive', 'link'] as const;
 const buttonSizes = ['sm', 'md', 'lg', 'icon'] as const;
+const buttonTones = ['default', 'destructive', 'success', 'warning'] as const;
 const choiceSizes = ['sm', 'md'] as const;
 const selectSizes = ['sm', 'md', 'lg'] as const;
 const selectVariants = ['outline', 'soft'] as const;
@@ -97,6 +98,7 @@ export const buttonManifest = /* @__PURE__ */ stampFormsAxes(
     props: propsFrom(buttonPropNames, {
       variant: { kind: 'enum', enumValues: buttonVariants, default: 'default' },
       size: { kind: 'enum', enumValues: buttonSizes, default: 'md' },
+      tone: { kind: 'enum', enumValues: buttonTones, default: 'default' },
       href: {
         kind: 'string',
         description: 'Optional link target (URL policy)',
@@ -130,6 +132,11 @@ export const buttonManifest = /* @__PURE__ */ stampFormsAxes(
     }),
     examples: [
       { id: 'default', title: 'Default button', props: { variant: 'default' } },
+      {
+        id: 'outline-destructive',
+        title: 'Outline destructive button',
+        props: { variant: 'outline', tone: 'destructive', label: 'Delete' },
+      },
       { id: 'loading', title: 'Loading button', props: { loading: true, loadingLabel: 'Saving' } },
       {
         id: 'labelled',

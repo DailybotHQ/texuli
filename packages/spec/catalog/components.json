@@ -1,5 +1,5 @@
 {
-  "catalogHash": "e9b3b93bdc10d149662b526e6080fa3a351988969a8f2b4d85a6f38e522bf9a9",
+  "catalogHash": "0222d64397b33bdcca050953c171db4ea09097992916eaea2c4f44585a5707a1",
   "components": [
     {
       "capability": "web-only",
@@ -815,6 +815,11 @@
           "prop": "size",
           "values": ["sm", "md", "lg", "icon"]
         },
+        "tone": {
+          "default": "default",
+          "prop": "tone",
+          "values": ["default", "destructive", "success", "warning"]
+        },
         "variant": {
           "default": "default",
           "prop": "variant",
@@ -876,6 +881,11 @@
           "enumValues": ["sm", "md", "lg", "icon"],
           "kind": "enum",
           "name": "size"
+        },
+        {
+          "enumValues": ["default", "destructive", "success", "warning"],
+          "kind": "enum",
+          "name": "tone"
         },
         {
           "enumValues": ["button", "submit", "reset"],

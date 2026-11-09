@@ -136,6 +136,73 @@
     text-decoration: underline;
   }
 
+  /* Tone is independent of variant (ADR-032). `default` keeps the variant's
+     tokens. The `destructive` variant is unchanged when tone is default. */
+  .tx-button[data-tx-tone="destructive"] {
+    --tx-button-tone: var(--tx-destructive, Mark);
+    --tx-button-tone-foreground: var(--tx-destructive-foreground, CanvasText);
+    --tx-button-tone-hover: var(--tx-destructive-hover, var(--tx-destructive, Mark));
+    --tx-button-tone-soft: var(
+      --tx-destructive-soft,
+      color-mix(in srgb, var(--tx-destructive, Mark) 14%, var(--tx-surface, Canvas))
+    );
+  }
+  .tx-button[data-tx-tone="success"] {
+    --tx-button-tone: var(--tx-success, green);
+    --tx-button-tone-foreground: var(--tx-success-foreground, Canvas);
+    --tx-button-tone-hover: var(--tx-success-hover, var(--tx-success, green));
+    --tx-button-tone-soft: var(
+      --tx-success-soft,
+      color-mix(in srgb, var(--tx-success, green) 14%, var(--tx-surface, Canvas))
+    );
+  }
+  .tx-button[data-tx-tone="warning"] {
+    --tx-button-tone: var(--tx-warning, orange);
+    --tx-button-tone-foreground: var(--tx-warning-foreground, CanvasText);
+    --tx-button-tone-hover: var(--tx-warning-hover, var(--tx-warning, orange));
+    --tx-button-tone-soft: var(
+      --tx-warning-soft,
+      color-mix(in srgb, var(--tx-warning, orange) 14%, var(--tx-surface, Canvas))
+    );
+  }
+
+  .tx-button--default:not([data-tx-tone="default"]),
+  .tx-button--secondary:not([data-tx-tone="default"]) {
+    color: var(--tx-button-tone-foreground);
+    background-color: var(--tx-button-tone);
+    box-shadow: var(--tx-button-elevation, var(--tx-elevation-1));
+  }
+  .tx-button--default:not([data-tx-tone="default"]):hover:not(:disabled):not(
+    [aria-disabled="true"]
+  ),
+  .tx-button--secondary:not([data-tx-tone="default"]):hover:not(:disabled):not(
+    [aria-disabled="true"]
+  ) {
+    background-color: var(--tx-button-tone-hover);
+    color: var(--tx-button-tone-foreground);
+  }
+
+  .tx-button--outline:not([data-tx-tone="default"]) {
+    border-color: var(--tx-button-tone);
+    color: var(--tx-button-tone);
+    background-color: var(--tx-surface, Canvas);
+  }
+  .tx-button--outline:not([data-tx-tone="default"]):hover:not(:disabled):not(
+    [aria-disabled="true"]
+  ) {
+    background-color: var(--tx-button-tone-soft);
+    color: var(--tx-button-tone);
+  }
+
+  .tx-button--ghost:not([data-tx-tone="default"]),
+  .tx-button--link:not([data-tx-tone="default"]) {
+    color: var(--tx-button-tone);
+  }
+  .tx-button--ghost:not([data-tx-tone="default"]):hover:not(:disabled):not([aria-disabled="true"]) {
+    background-color: var(--tx-button-tone-soft);
+    color: var(--tx-button-tone);
+  }
+
   .tx-button--link-size {
     block-size: auto;
     min-block-size: 0;
