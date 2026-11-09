@@ -41,6 +41,8 @@ const allow: KitAllowManifest = {
     button: {
       variants: ['default', 'outline'],
       sizes: ['sm', 'md', 'lg'],
+      // Pinned: the catalog gives button a tone axis, and an omitted list allows every tone.
+      tones: ['default'],
       states: ['hover', 'disabled'],
     },
     badge: {},
@@ -117,17 +119,17 @@ describe('matrix model', () => {
     const grid = matrixCells(button);
     expect(grid.view).toBe('grid');
     expect(grid.cells.filter((c) => c.kind === 'grid').map((c) => c.key)).toEqual([
-      'variant=default,size=sm',
-      'variant=default,size=md',
-      'variant=default,size=lg',
-      'variant=outline,size=sm',
-      'variant=outline,size=md',
-      'variant=outline,size=lg',
+      'variant=default,size=sm,tone=default',
+      'variant=default,size=md,tone=default',
+      'variant=default,size=lg,tone=default',
+      'variant=outline,size=sm,tone=default',
+      'variant=outline,size=md,tone=default',
+      'variant=outline,size=lg,tone=default',
     ]);
     // Hover is a pseudo-state: one live sample, not a static cell.
     expect(staticStates(button)).toEqual(['disabled']);
     expect(grid.cells.filter((c) => c.kind === 'state').map((c) => c.key)).toEqual([
-      'variant=default,size=md,state=disabled',
+      'variant=default,size=md,tone=default,state=disabled',
     ]);
     expect(matrixCells(component('data-grid')).cells.map((c) => c.key)).toEqual([
       'density=compact',
@@ -139,10 +141,35 @@ describe('matrix model', () => {
     ]);
   });
 
+  it('adds a strip per other allowed tone, after the grid, at the default variant and size', () => {
+    const toned = matrixModel(catalog, {
+      version: '1.0.0',
+      allow: {
+        button: {
+          variants: ['default'],
+          sizes: ['md'],
+          tones: ['default', 'destructive'],
+          states: [],
+        },
+      },
+    }).enabled[0];
+    if (!toned) throw new Error('button');
+    expect(matrixCells(toned).cells.map((c) => [c.kind, c.key])).toEqual([
+      ['grid', 'variant=default,size=md,tone=default'],
+      ['tone', 'variant=default,size=md,tone=destructive'],
+    ]);
+    // Full: every allowed combination of the four axes.
+    expect(matrixCells(toned, 'full').cells.map((c) => c.key)).toEqual([
+      'variant=default,size=md,tone=default',
+      'variant=default,size=md,tone=destructive',
+    ]);
+  });
+
   it('builds the full product, and falls back to the grid over the cap', () => {
     const full = matrixCells(component('button'), 'full');
     expect(full).toMatchObject({ view: 'full', capped: false });
-    expect(full.cells).toHaveLength(2 * 3 * 2);
+    // Two variants × three sizes × one tone, each at rest and disabled.
+    expect(full.cells).toHaveLength(2 * 3 * 1 * 2);
     const wide: MatrixComponent = {
       id: 'wide',
       label: 'Wide',
@@ -226,7 +253,7 @@ describe('KitMatrix', () => {
     expect(new Set(variants)).toEqual(new Set(['default', 'outline']));
     // The disabled cell really is disabled.
     const disabled = container.querySelector(
-      '[data-tx-ds-kit-cell="variant=default,size=md,state=disabled"] [data-tx-component="button"]'
+      '[data-tx-ds-kit-cell="variant=default,size=md,tone=default,state=disabled"] [data-tx-component="button"]'
     );
     expect(
       disabled?.hasAttribute('disabled') || disabled?.getAttribute('aria-disabled') === 'true'
@@ -317,7 +344,9 @@ describe('KitMatrix', () => {
         modeView: 'light',
       },
     });
-    expect(container.querySelectorAll('[data-tx-ds-kit-cell-kind="full"]')).toHaveLength(2 * 3 * 2);
+    expect(container.querySelectorAll('[data-tx-ds-kit-cell-kind="full"]')).toHaveLength(
+      2 * 3 * 1 * 2
+    );
   });
 });
 

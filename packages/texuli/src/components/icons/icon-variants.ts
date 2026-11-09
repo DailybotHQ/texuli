@@ -28,8 +28,9 @@ export const iconClass = variants({
       md: 'tx-icon--md',
       lg: 'tx-icon--lg',
     },
+    // The default tone adds no class (the icon keeps currentColor), like the other components.
     tone: {
-      default: 'tx-icon--default',
+      default: '',
       primary: 'tx-icon--primary',
       success: 'tx-icon--success',
       warning: 'tx-icon--warning',

@@ -38,9 +38,6 @@
     block-size: var(--tx-icon-size-lg, var(--tx-size-icon-lg));
   }
 
-  .tx-icon--default {
-    color: currentColor;
-  }
   .tx-icon--primary {
     color: var(--tx-primary, Highlight);
   }

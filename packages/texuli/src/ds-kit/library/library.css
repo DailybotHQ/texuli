@@ -5,24 +5,24 @@
  */
 @layer tx.components {
   .tx-ds-kit__library-entry {
-    padding: var(--tx-space-4, 1rem);
-    border: var(--tx-border-width-thin, 1px) solid var(--tx-border, currentColor);
-    border-radius: var(--tx-shape-radius-md, 0.375rem);
+    padding: var(--tx-space-4);
+    border: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+    border-radius: var(--tx-shape-radius-md);
   }
   .tx-ds-kit__library-entry[aria-current="true"] {
-    border-width: var(--tx-border-width-thick, 2px);
+    border-width: var(--tx-border-width-thick);
   }
   .tx-ds-kit__approval-badge {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--tx-space-2, 0.5rem);
+    gap: var(--tx-space-2);
     align-items: center;
     margin: 0;
   }
   .tx-ds-kit__library-meta {
     display: grid;
     grid-template-columns: max-content 1fr;
-    gap: var(--tx-space-1, 0.25rem) var(--tx-space-3, 0.75rem);
+    gap: var(--tx-space-1) var(--tx-space-3);
     margin: 0;
   }
   .tx-ds-kit__library-meta dd {
@@ -32,7 +32,7 @@
   .tx-ds-kit__library-composes {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--tx-space-1, 0.25rem) var(--tx-space-3, 0.75rem);
+    gap: var(--tx-space-1) var(--tx-space-3);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -40,21 +40,21 @@
   .tx-ds-kit__library-previews {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
-    gap: var(--tx-space-3, 0.75rem);
+    gap: var(--tx-space-3);
   }
   .tx-ds-kit__library-preview {
     display: grid;
-    gap: var(--tx-space-2, 0.5rem);
+    gap: var(--tx-space-2);
     margin: 0;
-    padding: var(--tx-space-3, 0.75rem);
-    border: var(--tx-border-width-thin, 1px) dashed var(--tx-border, currentColor);
-    border-radius: var(--tx-shape-radius-md, 0.375rem);
+    padding: var(--tx-space-3);
+    border: var(--tx-border-width-thin) dashed var(--tx-border, currentColor);
+    border-radius: var(--tx-shape-radius-md);
   }
   .tx-ds-kit-changes ul {
     display: grid;
-    gap: var(--tx-space-1, 0.25rem);
+    gap: var(--tx-space-1);
     margin: 0;
-    padding-inline-start: var(--tx-space-5, 1.25rem);
+    padding-inline-start: var(--tx-space-5);
   }
   .tx-ds-kit-changes code,
   .tx-ds-kit__library-meta code {
