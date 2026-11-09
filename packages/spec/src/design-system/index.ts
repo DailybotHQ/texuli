@@ -15,6 +15,12 @@ export {
   type DesignSystemAllowCode,
 } from './allow.ts';
 export {
+  APPROVAL_NOTE,
+  type ApproveDesignSystemOptions,
+  type ApproveDesignSystemResult,
+  approveDesignSystem,
+} from './approve.ts';
+export {
   type DesignSystemRootAttributes,
   type DesignSystemRootAxes,
   DS_COMPONENT_ATTRIBUTE,
@@ -31,6 +37,16 @@ export {
   libraryEntryContentHash,
   sha256Hex,
 } from './hash.ts';
+export {
+  fullAllowEntry,
+  type InitLockedDesignSystemOptions,
+  type InitLockedDesignSystemResult,
+  initLockedDesignSystem,
+  LOCKED_PRESETS,
+  type LockedPreset,
+  lockedAllowPreset,
+  MINIMAL_LOCKED_COMPONENTS,
+} from './init.ts';
 export {
   applyDesignSystemPatch,
   checkDesignSystemReference,
