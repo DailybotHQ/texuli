@@ -195,7 +195,8 @@ const statusId = (status: string) => `native-matrix-status-${nativeMatrixKey(sta
   .native-matrix__filter-set input { accent-color: var(--tx-primary, #6842d8); }
   .native-matrix__filter-label { min-inline-size: 4rem; font-weight: 700; }
   .native-matrix__source { margin: 0; font-size: 0.9rem; }
-  .native-matrix__traces a + a { margin-inline-start: 0.5rem; }
+  .native-matrix__traces a { display: inline-flex; align-items: center; justify-content: center; min-inline-size: 24px; min-block-size: 24px; padding-inline: 0.2rem; }
+  .native-matrix__traces a + a { margin-inline-start: 0.35rem; }
   .native-matrix__totals { margin: 0; color: var(--tx-muted-foreground, GrayText); font-size: 0.9rem; }
   .native-matrix__table-wrap { max-inline-size: 100%; overflow: auto; border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-radius, 0.75rem); }
   .native-matrix__table-wrap:focus-visible { outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight); outline-offset: 3px; }
