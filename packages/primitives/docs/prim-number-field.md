@@ -38,6 +38,9 @@ field) and the context. It has no role and sets `data-disabled`,
 `data-readonly`, `data-required` and `data-empty`. Props:
 
 - `value` (bindable), `defaultValue`, `onValueChange`;
+- `commit` (`NumberFieldCommit`): when typed text commits, `enter` (default:
+  Enter and blur), `blur` (blur only) or `input` (every keystroke that
+  parses; the text stays as typed until blur);
 - `min`, `max`, `step` (default 1), `largeStep` (default `step × 10`),
   `snapOnStep`;
 - `locale`, `formatOptions` (any `Intl.NumberFormatOptions`);
@@ -75,10 +78,12 @@ custom `<input>` registers itself for focus and the form bridge.
 | ArrowUp / ArrowDown | ± `step`. Off the grid, the first press lands on the grid in that direction (1.5 → 2 or 1). An empty field starts at `min` (or 0), within range. |
 | PageUp / PageDown | ± `largeStep` from the value, snapped to the `step` grid, clamped |
 | Home / End | `min` / `max`; left alone when the bound is undefined |
-| Enter | Commit the typed text |
+| Enter | Commit the typed text (not with `commit="blur"`) |
 | With Alt, Ctrl or Meta, or during IME composition | Ignored |
 
-**Typing.** Edits are a draft; Enter or blur commits. The draft is parsed
+**Typing.** Edits are a draft; Enter or blur commits (with `commit="blur"`
+only blur; with `commit="input"` each keystroke that parses commits too, and
+an emptied field commits `null`). The draft is parsed
 **for the locale and options**, then clamped, and snapped to the grid with
 `snapOnStep`. Text that does not parse reverts, and an empty field commits
 `null`. A keystroke that cannot lead to a number (`beforeinput`) is refused.

@@ -1,5 +1,5 @@
 {
-  "catalogHash": "0d8b2019c75ee1cf2ae959011ea3a77e9779172e028560e10e5be354ae3646d3",
+  "catalogHash": "50108e1fe10b7a8b956605c01f4d3e41799cc6e27a1a6a5c3981d2aaacd570f0",
   "components": [
     {
       "axes": {
@@ -7452,6 +7452,18 @@
       "summary": "A plain text run for the slot of a slot-only component (button, label, badge)."
     },
     {
+      "axes": {
+        "size": {
+          "default": "control",
+          "prop": "textSize",
+          "values": ["control", "xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl", "display"]
+        },
+        "variant": {
+          "default": "default",
+          "prop": "appearance",
+          "values": ["default", "plain"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
@@ -7469,6 +7481,11 @@
       "label": "Input",
       "placement": "app",
       "props": [
+        {
+          "enumValues": ["default", "plain"],
+          "kind": "enum",
+          "name": "appearance"
+        },
         {
           "extension": "web",
           "kind": "string",
@@ -7509,6 +7526,11 @@
           "extension": "web",
           "kind": "unknown",
           "name": "ref"
+        },
+        {
+          "enumValues": ["control", "xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl", "display"],
+          "kind": "enum",
+          "name": "textSize"
         },
         {
           "kind": "string",
@@ -10164,6 +10186,11 @@
           "name": "class"
         },
         {
+          "enumValues": ["enter", "blur", "input"],
+          "kind": "enum",
+          "name": "commit"
+        },
+        {
           "kind": "boolean",
           "name": "disabled"
         },
@@ -12704,6 +12731,18 @@
       "summary": "An input or textarea that shows remaining characters near the limit."
     },
     {
+      "axes": {
+        "size": {
+          "default": "control",
+          "prop": "textSize",
+          "values": ["control", "xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl", "display"]
+        },
+        "variant": {
+          "default": "default",
+          "prop": "appearance",
+          "values": ["default", "plain"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
@@ -12721,6 +12760,11 @@
       "label": "Textarea",
       "placement": "app",
       "props": [
+        {
+          "enumValues": ["default", "plain"],
+          "kind": "enum",
+          "name": "appearance"
+        },
         {
           "kind": "boolean",
           "name": "autosize"
@@ -12751,6 +12795,11 @@
         {
           "kind": "number",
           "name": "rows"
+        },
+        {
+          "enumValues": ["control", "xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl", "display"],
+          "kind": "enum",
+          "name": "textSize"
         },
         {
           "kind": "string",

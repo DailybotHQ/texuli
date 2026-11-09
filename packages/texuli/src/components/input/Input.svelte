@@ -2,7 +2,13 @@
 import type { HTMLInputAttributes } from 'svelte/elements';
 import { useMessages } from '../../i18n/use-messages.ts';
 import { type ClassValue, cx } from '../../internal/cx.ts';
-import { fieldVariants } from './field-classes.ts';
+import {
+  type FieldAppearance,
+  type FieldSize,
+  fieldAppearance,
+  fieldSize,
+  fieldVariants,
+} from './field-classes.ts';
 import './field.css';
 
 type Props = Omit<HTMLInputAttributes, 'value' | 'files' | 'class' | 'type'> & {
@@ -26,6 +32,19 @@ type Props = Omit<HTMLInputAttributes, 'value' | 'files' | 'class' | 'type'> & {
   /** Runs on every edit with the field's text (for numeric types too). */
   onValueChange?: (value: string) => void;
   onClear?: () => void;
+  /**
+   * `default` is the bordered control; `plain` drops the control chrome
+   * (border, fill, shadow, inline padding) for inline-edit text. Focus stays
+   * visible as an outline.
+   */
+  appearance?: FieldAppearance;
+  /**
+   * Text size: `control` (default, the form-control size) or a type-scale
+   * size (`xs`, `sm`, `md` body, `lg` heading, `xl` title, `2xl`–`4xl`,
+   * `display`) for inline-edit titles and bodies. Named `textSize` so the
+   * native `size` attribute (width in characters) keeps working.
+   */
+  textSize?: FieldSize;
 };
 
 let {
@@ -40,6 +59,8 @@ let {
   readonly = false,
   onValueChange,
   onClear,
+  appearance: appearanceProp = 'default',
+  textSize: textSizeProp = 'control',
   oninput,
   onchange,
   ...rest
@@ -47,7 +68,10 @@ let {
 const msg = useMessages();
 const clearLabel = $derived(clearLabelProp ?? msg('texuli.input.clear-label', 'Clear'));
 
-const classes = $derived(fieldVariants({ control: 'input', class: className }));
+const appearance = $derived(fieldAppearance(appearanceProp));
+const textSize = $derived(fieldSize(textSizeProp));
+const plain = $derived(appearance === 'plain' ? 'tx-field--plain' : undefined);
+const classes = $derived(fieldVariants({ control: 'input', class: [plain, className] }));
 const numeric = $derived(type === 'number' || type === 'range');
 const showClear = $derived(
   clearable && type !== 'file' && !disabled && !readonly && value !== null && value !== ''
@@ -134,10 +158,14 @@ function clear() {
     }}
     oninput={onInput}
     data-tx-component="input"
+    data-tx-variant={appearance}
+    data-tx-size={textSize}
   />
 {:else if clearable}
   <div
-    class="tx-input-group"
+    class={cx('tx-input-group', appearance === 'plain' && 'tx-input-group--plain')}
+    data-tx-variant={appearance}
+    data-tx-size={textSize}
     data-tx-disabled={disabled ? 'true' : undefined}
     data-tx-input-clearable=""
     data-tx-component="input"
@@ -176,5 +204,7 @@ function clear() {
     {onchange}
     oninput={onInput}
     data-tx-component="input"
+    data-tx-variant={appearance}
+    data-tx-size={textSize}
   />
 {/if}

@@ -8,6 +8,9 @@
 
 export type NumberFormatOptions = Intl.NumberFormatOptions;
 
+/** When a NumberField commits typed text: Enter and blur, blur only, or every parsing keystroke. */
+export type NumberFieldCommit = 'enter' | 'blur' | 'input';
+
 interface LocaleSymbols {
   group: Set<string>;
   decimal: string;

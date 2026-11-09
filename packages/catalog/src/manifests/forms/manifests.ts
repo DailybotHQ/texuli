@@ -241,11 +241,29 @@ export const inputManifest = /* @__PURE__ */ stampFormsAxes(
       readonly: { kind: 'boolean', default: false },
       onValueChange: { kind: 'event' },
       onClear: { kind: 'event' },
+      appearance: {
+        kind: 'enum',
+        enumValues: ['default', 'plain'],
+        default: 'default',
+        description: 'plain drops the control chrome for inline-edit text; focus stays visible',
+      },
+      textSize: {
+        kind: 'enum',
+        enumValues: ['control', 'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl', 'display'],
+        default: 'control',
+        description:
+          'control (form-control size) or a type-scale size for inline-edit titles and bodies',
+      },
       class: { kind: 'string' },
     }),
     examples: [
       { id: 'text', title: 'Text input', props: { type: 'text', clearable: true } },
       { id: 'email', title: 'Email input', props: { type: 'email' } },
+      {
+        id: 'inline-title',
+        title: 'Inline-edit title',
+        props: { appearance: 'plain', textSize: 'xl' },
+      },
     ],
     related: ['input-group', 'textarea', 'field', 'text-counter'],
   })
@@ -302,6 +320,19 @@ export const textareaManifest = /* @__PURE__ */ stampFormsAxes(
       readonly: { kind: 'boolean', default: false },
       rows: { kind: 'number', default: 3 },
       onValueChange: { kind: 'event' },
+      appearance: {
+        kind: 'enum',
+        enumValues: ['default', 'plain'],
+        default: 'default',
+        description: 'plain drops the control chrome for inline-edit text; focus stays visible',
+      },
+      textSize: {
+        kind: 'enum',
+        enumValues: ['control', 'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl', 'display'],
+        default: 'control',
+        description:
+          'control (form-control size) or a type-scale size for inline-edit titles and bodies',
+      },
       class: { kind: 'string' },
     }),
     examples: [{ id: 'autosize', title: 'Autosize textarea', props: { autosize: true, rows: 3 } }],
@@ -1172,6 +1203,12 @@ export const numberFieldManifest = /* @__PURE__ */ stampFormsAxes(
       name: { kind: 'string' },
       size: { kind: 'enum', enumValues: ['sm', 'md', 'lg'], default: 'md' },
       display: { kind: 'enum', enumValues: ['input', 'output'], default: 'input' },
+      commit: {
+        kind: 'enum',
+        enumValues: ['enter', 'blur', 'input'],
+        default: 'enter',
+        description: 'When typed text commits: Enter and blur, blur only, or every keystroke',
+      },
       onValueChange: { kind: 'event' },
       class: { kind: 'string' },
     }),

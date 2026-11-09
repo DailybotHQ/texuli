@@ -53,6 +53,8 @@ export const inputPropNames = [
   'readonly',
   'onValueChange',
   'onClear',
+  'appearance',
+  'textSize',
   'class',
 ] as const;
 
@@ -81,6 +83,8 @@ export const textareaPropNames = [
   'readonly',
   'rows',
   'onValueChange',
+  'appearance',
+  'textSize',
   'class',
 ] as const;
 
@@ -295,6 +299,7 @@ export const numberFieldPropNames = [
   'name',
   'size',
   'display',
+  'commit',
   'onValueChange',
   'class',
 ] as const;

@@ -31,6 +31,12 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'class' | 'value'
   decrementLabel?: string;
   onValueChange?: (value: number | null) => void;
   /**
+   * When typed text commits and `onValueChange` runs: `input` on every
+   * keystroke that parses, `blur` on blur only, `enter` (default) on Enter
+   * and on blur. Steppers and arrow keys commit at once in every mode.
+   */
+  commit?: 'input' | 'blur' | 'enter';
+  /**
    * `output` shows the value read-only as plain formatted text (same
    * `locale` and `formatOptions`): the input is `readonly`, keeps its name
    * and focus, and the field drops its border and steppers. Default `input`.

@@ -10,6 +10,7 @@ import {
   clampNumber,
   formatNumber,
   largeStepNumber,
+  type NumberFieldCommit,
   type NumberFormatOptions,
   parseNumber,
   snapToStep,
@@ -46,6 +47,13 @@ type NumberFieldRootProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   incrementLabel?: string;
   decrementLabel?: string;
   onValueChange?: (value: number | null) => void;
+  /**
+   * When typed text commits (and `onValueChange` runs): `enter` (default) on
+   * Enter and on blur, `blur` on blur only, `input` on every keystroke that
+   * parses (the text stays as typed until blur). Steppers, arrow keys,
+   * PageUp/PageDown and Home/End commit at once in every mode.
+   */
+  commit?: NumberFieldCommit;
   child?: ChildSnippet<Record<string, unknown>>;
   children?: Snippet;
 };
@@ -70,6 +78,7 @@ let {
   incrementLabel: incrementLabelProp,
   decrementLabel: decrementLabelProp,
   onValueChange,
+  commit: commitMode = 'enter',
   child,
   children,
   ref = $bindable(null),
@@ -96,13 +105,13 @@ let inputElement = $state<HTMLInputElement | null>(null);
 const safeStep = $derived(step > 0 && Number.isFinite(step) ? step : 1);
 const valueText = $derived(formatNumber(current, locale, formatOptions));
 
-function setValue(next: number | null): void {
+function setValue(next: number | null, keepDraft = false): void {
   if (disabled || readOnly) return;
   const normalized =
     next === null
       ? null
       : clampNumber(snapOnStep ? snapToStep(next, safeStep, min) : next, min, max);
-  draft = null;
+  if (!keepDraft) draft = null;
   if (Object.is(normalized, current)) return;
   localValue = normalized;
   value = normalized;
@@ -174,8 +183,21 @@ const context: NumberFieldContextValue = {
   get valueText() {
     return valueText;
   },
+  get commitMode() {
+    return commitMode === 'input' || commitMode === 'blur' ? commitMode : 'enter';
+  },
   setDraft(text) {
-    if (!disabled && !readOnly) draft = text;
+    if (disabled || readOnly) return;
+    draft = text;
+    if (context.commitMode !== 'input') return;
+    // Live commit: a keystroke that parses updates the value; the text stays
+    // as typed (no reformat under the caret) until blur commits it.
+    if (text.trim() === '') {
+      setValue(null, true);
+      return;
+    }
+    const parsed = parseNumber(text, locale, formatOptions);
+    if (parsed.ok) setValue(parsed.value, true);
   },
   commit,
   stepBy(direction, large = false) {
