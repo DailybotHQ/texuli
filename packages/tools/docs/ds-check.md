@@ -19,7 +19,13 @@ texuli ds check acme.json --render              # plus axe, painted contrast and
 texuli ds check acme.json --render --sheet site/sheet.html   # a sheet page you built
 texuli ds check child.json --base base.json     # extends: "base@1.2.3" from a local file
 texuli ds check acme.json --mode dark --variant compact
+texuli ds check brand.json --catalog components.json   # allow checked against another catalog
 ```
+
+> **Locked design systems (spec 0.13.0, built, not published; planned for
+> `0.15.0`).** The check also reports the allowed set, the approval and the
+> content hashes ([below](#locked-design-systems)); it cannot prove who
+> approved.
 
 ## Flags
 
@@ -36,6 +42,7 @@ texuli ds check acme.json --mode dark --variant compact
 | `--url <page>` | With `--render`: check a page you serve yourself instead of a sheet (not with `--sheet`) |
 | `--known <file>` | With `--render`: a JSON array of findings you track, `[{ "component", "element", "property", "reason" }]` (at most 1 MB and 500 entries; `component` may be `*`, `element` and `property` are prefixes). They are reported as `known` and do not fail the run. A malformed list exits 2 |
 | `--strict` | With `--render`: known findings fail too |
+| `--catalog <components.json>` | The catalog `allow` is checked against (`{ components: [{ id, axes?, states? }] }`, for example `@texuli/spec`'s `catalog/components.json` or a stub). Default: the agent catalog `@texuli/tools` builds. A file without a `components` list exits 2 |
 
 **Exit codes:** `0` every check passed; `1` a refusal or a render finding;
 `2` the check could not run (a bad flag, an unreadable or non-JSON file, or a
@@ -66,8 +73,49 @@ missing `--render` requirement).
    the same code; that one is advisory (a filled button is identified by its
    label) and does not fail the run.
 
+6. Spec `0.13.0` (locked design systems, ADR-032): the `allow` section and
+   `library[].composes` against the catalog (`checkDesignSystemAllow`:
+   `unknown-component`, `unknown-variant`, `unknown-size`, `unknown-tone`,
+   `unknown-density`, `unknown-state`), then the content hash each approval
+   records (`content-hash-mismatch` at `$.approval.contentHash`,
+   `library-hash-mismatch` at `$.library[<i>].approval.contentHash`).
+
 Every run reports its contrast pairs per mode (with ratio and requirement),
 the solver's adjustments, the warnings, the inline bytes and the targets.
+
+## Locked design systems
+
+Every report has a `locked` section, and the summary prints it:
+
+```text
+  locked: 2 components allowed (checked against the catalog)
+  library: primary-cta
+  approval: approved (version 1.2.0, declared by design-reviewer, at 2026-11-09T12:00:00Z)
+  content hash 9f3c…: matches the approval
+  library primary-cta: approved, hash matches
+```
+
+| Field | Meaning |
+| --- | --- |
+| `locked` | The document has an `allow` section |
+| `allowed` | The allowed catalog ids, sorted (empty when not locked) |
+| `library` | The library entry ids |
+| `catalogChecked` | `allow` was checked against a catalog (always, from the CLI) |
+| `approval` | `status` (`approved`, `draft`, `none` or `unknown`), `version`, `approvedBy` and `approvedAt` **as declared**, the computed `contentHash`, and the `stored` hash with `matches` when one is recorded |
+| `entries` | Each library entry's `id`, `status`, `contentHash`, `stored` and `matches` |
+
+A draft is reported, never refused. A recorded hash that no longer matches
+is refused: the document (or entry) changed after it was approved; review
+the change and approve again (`texuli ds approve`). **The check cannot
+prove who approved**: `approvedBy` is text the approver typed. The
+guarantee is a human commit of the document reviewed through `CODEOWNERS`
+([DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md#approval-and-the-content-hash)).
+`texuli ds hash <file>` prints the same hashes ([ds.md](ds.md)).
+
+In your own code, `checkDesignSystem(doc, { catalog, hashes: true })` gives
+the same report; without `hashes` a stale approval is reported in
+`locked.approval.matches` but not refused (that is how `ds.validate` and
+`ds approve` call it: re-approving is what fixes a stale hash).
 
 ## The JSON report
 
@@ -85,7 +133,10 @@ the solver's adjustments, the warnings, the inline bytes and the targets.
   "runs": [{ "variant": null, "ok": true, "modes": ["light", "dark"], "hash": "…",
              "contrast": { "light": [/* every pair */] }, "adjustments": [], "warnings": [],
              "inlineBytes": 0, "targets": [] }],
-  "render": { "ok": true, "url": "…", "runs": [/* with --render, below */] }
+  "render": { "ok": true, "url": "…", "runs": [/* with --render, below */] },
+  "locked": { "locked": true, "allowed": ["button", "card"], "library": [], "catalogChecked": true,
+              "approval": { "status": "draft", "version": "2.1.0", "contentHash": "…" },
+              "entries": [] }
 }
 ```
 
