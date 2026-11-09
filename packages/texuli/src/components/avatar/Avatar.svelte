@@ -18,6 +18,12 @@ import {
   avatarStatusClass,
 } from './variants.ts';
 import './avatar.css';
+import {
+  type CategoryColor,
+  colorRefInk,
+  colorRefVar,
+  isCategoryColor,
+} from '../../internal/color-ref.ts';
 import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
@@ -36,12 +42,10 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** The `sizes` attribute for width-descriptor candidates. */
   sizes?: string;
   size?: AvatarSize;
-  /**
-   * Fill the initials surface with a theme tone (`primary`, `success`,
-   * `warning`, `destructive`, `info` or `neutral`) instead of the seeded
-   * ring: each is a background and foreground pair the AA gate checks.
-   */
+  /** Fill the initials surface with a semantic role tone instead of the seeded ring. */
   tone?: AvatarTone;
+  /** Closed data-viz category color; `none` preserves tone or seeded styling. */
+  color?: CategoryColor;
   /** `circle` or `square` (the medium shape radius) for this avatar; omit for the theme's avatar radius. */
   shape?: AvatarShape;
   /** Presence indicator. Omit for none. */
@@ -69,6 +73,7 @@ let {
   sizes,
   size = txDefaults().size ?? 'md',
   tone,
+  color = 'none',
   shape,
   status,
   decorative = false,
@@ -103,6 +108,7 @@ const letters = $derived(initialsProp ?? avatarInitials(name));
 const seededTone = $derived(avatarToneIndex(name));
 const pixels = $derived(AVATAR_PIXELS[size]);
 const safeSrcset = $derived(avatarSrcset(srcset, srcTrust));
+const categoryColor = $derived(isCategoryColor(color) && color !== 'none' ? color : undefined);
 /** The primitive's image status: `error` (failed or refused) shows the initials. */
 let loadingStatus = $state<AvatarImageLoadingStatus>('loading');
 const rootClass = $derived(
@@ -123,6 +129,9 @@ const rootClass = $derived(
   data-size={size}
   data-status={status}
   data-tone={tone}
+  data-tx-color={categoryColor}
+  style:--tx-category-fill={categoryColor ? colorRefVar(categoryColor) : undefined}
+  style:--tx-category-ink={categoryColor ? colorRefInk(categoryColor) : undefined}
   data-shape={shape}
   data-avatar={src && loadingStatus !== 'error' ? 'image' : 'initials'}
   role={decorative ? undefined : 'img'}

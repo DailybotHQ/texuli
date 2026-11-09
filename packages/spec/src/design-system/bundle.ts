@@ -31,7 +31,7 @@ export const DESIGN_SYSTEM_BUNDLE_LIMITS = Object.freeze({
 });
 
 const RESERVED = new Set(['__proto__', 'constructor', 'prototype']);
-const AXIS = ['variants', 'sizes', 'tones', 'densities', 'states'] as const;
+const AXIS = ['variants', 'sizes', 'tones', 'densities', 'colors', 'states'] as const;
 const SHA256 = /^[0-9a-f]{64}$/;
 const SEMVER = /^[0-9]+\.[0-9]+\.[0-9]+$/;
 const SAFE_ID = /^(?=.{1,64}$)[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;

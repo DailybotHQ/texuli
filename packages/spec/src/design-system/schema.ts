@@ -29,7 +29,7 @@ const DS_LOCKED_DESCRIPTIONS: Readonly<Record<string, string>> = {
   approvalStatus: 'An approval state: draft or approved.',
   componentState: 'A component state of the catalog’s closed state vocabulary.',
   allowEntry:
-    'The enabled values of one catalog component: variants, sizes, tones, densities and states. An omitted list allows every value the catalog lists; an empty list allows none. Values are checked against the catalog by checkDesignSystemAllow.',
+    'The enabled values of one catalog component: variants, sizes, tones, densities, colors and states. An omitted list allows every value the catalog lists; an empty list allows none. Values are checked against the catalog by checkDesignSystemAllow.',
   allow: `The allowed set (ADR-032): at most ${DS_LOCKED_LIMITS.allowComponents} catalog component ids, each with its enabled values. Once present, a component not listed is not allowed. Arrays replace on extends, variants and patches.`,
   approval:
     'Approval metadata: status, who and when (approvedAt is an ISO 8601 UTC date-time), the approved version and the contentHash (lowercase hex SHA-256 of the canonical JSON without status, approvedBy and approvedAt). Never inherited through extends. A tool can verify the hash; it cannot prove who approved.',

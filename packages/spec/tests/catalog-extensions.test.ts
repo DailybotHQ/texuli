@@ -43,9 +43,13 @@ const acme = () => ({
       capability: 'web-only',
       props: [
         { name: 'tone', kind: 'enum', enumValues: ['neutral', 'brand'] },
+        { name: 'color', kind: 'enum', enumValues: ['none', 'chart-1'] },
         { name: 'items', kind: 'array', required: true },
       ],
-      axes: { tone: { prop: 'tone', values: ['neutral', 'brand'], default: 'neutral' } },
+      axes: {
+        tone: { prop: 'tone', values: ['neutral', 'brand'], default: 'neutral' },
+        color: { prop: 'color', values: ['none', 'chart-1'], default: 'none' },
+      },
       states: ['hover', 'focus-visible'],
       composes: ['card', 'stat', 'text'],
     },
@@ -92,7 +96,7 @@ describe('mergeCatalogs', () => {
       states: ['hover', 'focus-visible'],
     });
     // Props sorted, like the projection; ids sorted across the merge.
-    expect(strip?.props.map((p) => p.name)).toEqual(['items', 'tone']);
+    expect(strip?.props.map((p) => p.name)).toEqual(['color', 'items', 'tone']);
     const ids = merged.catalog.components.map((c) => c.id);
     expect(ids).toEqual([...ids].sort());
     expect(merged.extensions).toEqual([
@@ -230,7 +234,11 @@ describe('allow sets over the merged catalog', () => {
 
   it('accepts namespaced allow keys and library composes in the document', () => {
     const locked = doc({
-      allow: { button: {}, 'acme:kpi-strip': { tones: ['brand'] }, 'acme:pricing-card': {} },
+      allow: {
+        button: {},
+        'acme:kpi-strip': { tones: ['brand'], colors: ['none'] },
+        'acme:pricing-card': {},
+      },
       library: [
         {
           id: 'plan-picker',

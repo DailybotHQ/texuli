@@ -42,7 +42,7 @@ describe('compileAllowManifest', () => {
       ...minimal,
       version: '1.2.0',
       allow: {
-        button: { variants: ['default', 'outline'], sizes: ['sm'] },
+        button: { variants: ['default', 'outline'], sizes: ['sm'], colors: ['chart-2'] },
         card: {},
       },
       library: [
@@ -59,7 +59,7 @@ describe('compileAllowManifest', () => {
     const manifest = compileAllowManifest(doc, { catalogDigest: 'ab'.repeat(32) });
     expect(manifest).toEqual({
       allow: {
-        button: { variants: ['default', 'outline'], sizes: ['sm'] },
+        button: { variants: ['default', 'outline'], sizes: ['sm'], colors: ['chart-2'] },
         card: {},
       },
       library: [{ id: 'pricing-card', version: '0.3.0', status: 'draft' }],

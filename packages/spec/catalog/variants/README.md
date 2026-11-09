@@ -23,7 +23,7 @@ here, or in its manifest.
 }
 ```
 
-- **`axes`**: `variant`, `size`, `tone` and `density` only. Each names one of the component's
+- **`axes`**: `variant`, `size`, `tone`, `density` and `color`. Each names one of the component's
   `enum` props. The projection copies the prop's `enumValues` as the axis `values`, and takes the
   `default` from the prop's manifest default. Write `{ "prop", "default" }` only when the prop
   declares no default. Other enums (`orientation`, `side`, `mode`…) stay plain props.

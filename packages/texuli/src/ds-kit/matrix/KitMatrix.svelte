@@ -2,7 +2,7 @@
 /**
  * KitMatrix (kit API §5.2, §11.4): every enabled control of the design system, light and
  * dark, from the allow manifest and the catalog. Per component: the variant × size grid as a
- * table, then a strip per prop-backed state, tone and density, and one live sample for the
+ * table, then a strip per prop-backed state, tone, density and color, and one live sample for the
  * pseudo-states (hover, focus, press). Disallowed values are marked as text, never rendered
  * (flagged, not removed: ADR-032); disallowed components are listed. Deterministic (catalog,
  * axis value and state order) with `data-tx-ds-kit-*` attributes on every cell; the samples

@@ -112,7 +112,7 @@ Three optional root sections, described end to end in
 
 | Section | Shape | Limits |
 | --- | --- | --- |
-| `allow` | A map of catalog id to `{ variants?, sizes?, tones?, densities?, states? }`. An omitted list allows every value the catalog lists; an empty list allows none; an id not listed is not allowed | 4096 ids, 32 values per list (`DS_LOCKED_LIMITS`) |
+| `allow` | A map of catalog id to `{ variants?, sizes?, tones?, densities?, colors?, states? }`. An omitted list allows every value the catalog lists; an empty list allows none; an id not listed is not allowed | 4096 ids, 32 values per list (`DS_LOCKED_LIMITS`) |
 | `library` | `[{ id, name, purpose, version, status, composes, approval? }]`: the design system's own components; `composes` names catalog ids | 64 entries, 32 `composes` each |
 | `approval` | `{ status: "draft" \| "approved", version, approvedBy?, approvedAt?, contentHash? }`: top document only, never inherited through `extends` | `contentHash` is 64 lowercase hex |
 
@@ -121,7 +121,7 @@ The structural validator checks the shapes and `approval-invalid` (an
 library entry without its own approval). Catalog membership needs the
 catalog, so it is a separate pure function the bundled validator never
 carries: `checkDesignSystemAllow(doc, catalog)` (codes `unknown-component`,
-`unknown-variant`, `unknown-size`, `unknown-tone`, `unknown-density`,
+`unknown-variant`, `unknown-size`, `unknown-tone`, `unknown-density`, `unknown-color`,
 `unknown-state`, at the `allow` or `library[].composes` path).
 
 `approveDesignSystem(doc, { by, at?, version? })` validates first and
@@ -165,7 +165,7 @@ component.
 | `inline-bytes` | A data URL over its cap, or over the 256 KiB total |
 | `aa-text`, `aa-focus`, `target-size` | Raised by the compiler in `@texuli/tokens` (from spec 0.11.0, `aa-text` also covers a product token's on-color, at `$.extensions.<name>.on.<mode>`) ([ADR-022](../../../docs/DECISIONS.md#adr-022-design-system-guarantees-enforced-never-reported)); never by the spec |
 | `approval-invalid` | From spec 0.13.0: an `approved` document without `approvedBy` and `approvedAt`, or an `approved` library entry without its own approval |
-| `unknown-component`, `unknown-variant`, `unknown-size`, `unknown-tone`, `unknown-density`, `unknown-state` | From spec 0.13.0: raised by `checkDesignSystemAllow` (not by `validateDesignSystem`): an `allow` id or value, or a `library[].composes` id, that the catalog does not list |
+| `unknown-component`, `unknown-variant`, `unknown-size`, `unknown-tone`, `unknown-density`, `unknown-color`, `unknown-state` | From spec 0.13.0: raised by `checkDesignSystemAllow` (not by `validateDesignSystem`): an `allow` id or value, or a `library[].composes` id, that the catalog does not list |
 | `aa-non-text` | From spec 0.12.0: a role fill below 3:1 against its container (WCAG 1.4.11), such as the sidebar's active fill on the sidebar. A warning in the compiler's report; raised by `checkDesignSystemIndicators` in `@texuli/tokens`, `texuli ds check` and `ds.validate`; never by the spec |
 
 Paths start at `$`; keys that are not identifiers are quoted

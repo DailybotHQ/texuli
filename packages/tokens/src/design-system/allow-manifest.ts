@@ -14,7 +14,7 @@ import { designSystemContentHash } from '@texuli/spec/design-system';
 export const ALLOW_MANIFEST_SPEC_VERSION = '0.13.0';
 
 const RESERVED = new Set(['__proto__', 'constructor', 'prototype']);
-const AXIS = ['variants', 'sizes', 'tones', 'densities', 'states'] as const;
+const AXIS = ['variants', 'sizes', 'tones', 'densities', 'colors', 'states'] as const;
 const ALLOW_CAP = 4096;
 const AXIS_CAP = 32;
 const LIBRARY_CAP = 64;
@@ -24,6 +24,7 @@ export interface DesignSystemAllowManifestEntry {
   readonly sizes?: readonly string[];
   readonly tones?: readonly string[];
   readonly densities?: readonly string[];
+  readonly colors?: readonly string[];
   readonly states?: readonly string[];
 }
 

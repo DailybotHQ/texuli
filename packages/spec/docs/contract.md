@@ -23,7 +23,7 @@ fixtures are not part of the npm package.
 | Path | What it holds |
 | --- | --- |
 | `schemas/` | The normative JSON schemas: `blueprint` (envelope v1, local state, flow and the node tree), `catalog`, `diagnostics`, `manifest`, `workflow` (workflow graphs), and from 0.7.0 `document`, `@texuli/document`'s JSON Schema export pinned by digest (`EXTERNAL_SCHEMAS`: not in the dialect, no projection; `packages/catalog/tests/validate-document.test.ts` keeps it equal to `documentJsonSchema()`), and from 0.8.0 `canvas`, `@texuli/canvas`'s export pinned the same way (`packages/catalog/tests/validate-canvas.test.ts` keeps it equal to `canvasJsonSchema()`; the blueprint's `$defs.canvas` checks a `canvas` node's envelope), and from 0.10.0 `design-system` (the design-system document, generated from `src/design-system/vocabulary.ts` by `scripts/design-system-schema.ts`; in the dialect, projected like the others) |
-| `catalog/components.json` | The closed vocabulary, projected from the built catalog: id, label, summary, group, placement (`app`/`content`), emit tiers, capability and props, and from 0.13.0 the optional `axes` (variant, size, tone, density) and `states` (ADR-032) |
+| `catalog/components.json` | The closed vocabulary, projected from the built catalog: id, label, summary, group, placement (`app`/`content`), emit tiers, capability and props, and from 0.13.0 the optional `axes` (variant, size, tone, density, color) and `states` (ADR-032) |
 | `catalog/variants/*.json` | Per-group sources of `axes` and `states` (0.13.0), merged by `bootstrap-catalog.ts` with the manifests' own; format and codes in [catalog/variants/README.md](../catalog/variants/README.md) |
 | `catalog/capabilities.json` | Reviewed capability claims. Empty: no id is audited portable yet, so every capability is `unknown` (ADR-003) |
 | `fixtures/golden/` | The blueprints that must validate (fictional data), among them a report, a dashboard, a proactive deck and a report with a named slot and a `when` condition (0.2.0 envelopes), and five 0.3.0 interfaces: `app-dashboard` (filters bound to state), `mobile-flow` (flow views, forms, `flowGo`), `sortable-board` (reorder groups, locked, clone, `on.move`), `workflow-builder` (an edit-mode `workflow-graph` bound to state) and `lego` (layouts, a data board, charts, media, blocks, a sortable palette and outline, and a workflow editor in one tree), and from 0.10.0 `brand-report` (a design-system `ref`) and `brand-deck` (a deck with an inline design system). `@texuli/player`'s `golden.test.ts` and `lego.test.ts` paint them |
@@ -127,7 +127,7 @@ pnpm exec tsx packages/spec/scripts/generate.ts --check    # fail on drift
 
 A component may declare `axes` and `states` (ADR-032):
 
-- **`axes`:** `variant`, `size`, `tone` and `density`, each `{ prop, values, default }`. It is
+- **`axes`:** `variant`, `size`, `tone`, `density` and `color`, each `{ prop, values, default }`. It is
   derived from one enum prop, so `values` equals that prop's `enumValues` and `default` is one of
   them.
 - **`states`:** a duplicate-free subset of the closed `stateName` list (`hover`, `focus-visible`,

@@ -213,7 +213,7 @@ export const createDesignSystemPrompt: McpPrompt = {
         : `call \`ds.allow\` with { "preset": "${locked ?? 'minimal'}" }`;
     const lockStep = locked
       ? `
-4. Lock it. ${allowCall} and put its allow under "allow": a component not listed is not allowed, an omitted list allows every value the catalog lists, an empty list allows none; narrow variants, sizes, tones, densities and states to what the brand uses. Declare the brand's own components under "library", each { "id", "name", "purpose", "version", "status": "draft", "composes": [allowed catalog ids] }. Add "approval": { "status": "draft", "version": <the document version> }.
+4. Lock it. ${allowCall} and put its allow under "allow": a component not listed is not allowed, an omitted list allows every value the catalog lists, an empty list allows none; narrow variants, sizes, tones, densities, colors and states to what the brand uses. Declare the brand's own components under "library", each { "id", "name", "purpose", "version", "status": "draft", "composes": [allowed catalog ids] }. Add "approval": { "status": "draft", "version": <the document version> }.
 5. Approval stays human. Never set "status": "approved" on the document or a library entry, and never write approvedBy, approvedAt or contentHash: ds.save refuses an approved document (approval-human-only). Tell the user the next step is a person's: review the file, run \`texuli ds approve <file> --by <name>\` and commit it for the CODEOWNERS review (the CLI cannot prove who approved; the reviewed commit is the guarantee).`
       : '';
     const n = (step: number) => (locked ? step + 2 : step);

@@ -17,7 +17,7 @@ import type { DsNode } from './vocabulary.ts';
 export const DS_LOCKED_LIMITS = Object.freeze({
   /** Components in `allow`; bounded above merged Texuli and extension catalogs. */
   allowComponents: 4096,
-  /** Values in one `allow` axis list (variants, sizes, tones or densities). */
+  /** Values in one `allow` axis list (variants, sizes, tones, densities or colors). */
   axisValues: 32,
   /** Entries in `library`. */
   library: 64,
@@ -84,6 +84,7 @@ export const DS_LOCKED_DEFS: Readonly<Record<string, DsNode>> = {
     sizes: axis,
     tones: axis,
     densities: axis,
+    colors: axis,
     states: ['l', 'componentState', 0, DS_COMPONENT_STATES.length, 1],
   },
   allow: ['m', 'allowEntry', L.allowComponents, P.catalogId],

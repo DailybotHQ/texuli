@@ -34,6 +34,7 @@ export const CATALOG_AXIS_NAMES: readonly CatalogAxisName[] = Object.freeze([
   'size',
   'tone',
   'density',
+  'color',
 ]);
 
 /** The closed list of observable states (ADR-032, spec `stateName`). */
