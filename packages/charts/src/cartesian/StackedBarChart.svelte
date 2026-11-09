@@ -25,6 +25,7 @@ let {
 }: CartesianChartProps = $props();
 </script>
 
+<div data-tx-component="charts-stacked-bar" style="display: contents">
 <CartesianChart
   kind="stacked-bar"
   {title}
@@ -47,3 +48,4 @@ let {
   {yDomain}
   {formatValue}
 />
+</div>

@@ -5,4 +5,6 @@ import PieChart from './PieChart.svelte';
 let props: ComponentProps<typeof PieChart> = $props();
 </script>
 
-<PieChart {...props} innerRatio={props.innerRatio ?? 0.58} />
+<div data-tx-component="charts-donut" style="display: contents">
+  <PieChart {...props} innerRatio={props.innerRatio ?? 0.58} />
+</div>

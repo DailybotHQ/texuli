@@ -338,6 +338,7 @@ const surfaceHint = $derived(
 
 <section
   class={cx('map-view', `list-${listPlacement}`, className)}
+  data-tx-component="data-map"
   dir={direction}
   data-map-view
   data-list-placement={listPlacement}

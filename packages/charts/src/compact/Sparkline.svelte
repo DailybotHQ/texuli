@@ -72,7 +72,7 @@ const describe = $derived(
 );
 </script>
 
-<figure class="compact-chart">
+<figure class="compact-chart" data-tx-component="charts-sparkline" data-tx-variant={variant}>
   <svg direction="ltr" class="sparkline" role="img" aria-label={label} viewBox="0 0 {width} {safeHeight}" preserveAspectRatio="none">
     <title>{label}</title>
     <desc>{describe}</desc>

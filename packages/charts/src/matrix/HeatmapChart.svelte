@@ -98,7 +98,7 @@ const interactionSeries = $derived(
 );
 </script>
 
-<MatrixFrame bind:measuredWidth {title} {description} {mode} kind="heatmap" class={className}>
+<MatrixFrame data-tx-component="charts-heatmap" bind:measuredWidth {title} {description} {mode} kind="heatmap" class={className}>
   <MatrixPlot
     label="{title}. {description}"
     series={interactionSeries}
@@ -108,7 +108,7 @@ const interactionSeries = $derived(
     {formatters}
     {interactive}
   >
-    <g transform="translate({margin.left} {margin.top})">
+<g transform="translate({margin.left} {margin.top})">
       <Axis orientation="y" ticks={yAxisTicks} length={plot.height} />
     </g>
     <g transform="translate({margin.left} {height - margin.bottom})">

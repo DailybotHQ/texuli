@@ -55,7 +55,7 @@ const summary = $derived(
 const nodeName = (id: string) => nodes.find((node) => node.id === id)?.label ?? id;
 </script>
 
-<figure class={cx('flow-chart', className)}>
+<figure class={cx('flow-chart', className)} data-tx-component="charts-network">
   <figcaption><svelte:element this={`h${titleLevel()}`}>{title}</svelte:element><p>{summary}</p></figcaption>
   <!-- Zero-height width probe: it tracks the figure width, and the chart re-laying out (its height) never re-notifies it. -->
   <div class="tx-chart-width-probe" aria-hidden="true" bind:clientWidth={measuredWidth}></div>

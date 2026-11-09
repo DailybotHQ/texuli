@@ -461,6 +461,7 @@ function tickWidth(): number {
 
 <section
   class={cx('tx-timeline', className)}
+  data-tx-component="data-timeline"
   data-timeline
   data-zoom={zoom}
   data-direction={direction}

@@ -200,6 +200,8 @@ function thumbSrc(entry: FileEntry): string {
 
 <section
   id="files-{uid}"
+  data-tx-component="data-files"
+  data-tx-density={density}
   class={cx(
     'tx-files',
     density === 'compact' && 'tx-files--compact',

@@ -51,7 +51,7 @@ const description = $derived(
 const text = $derived(chartLabels(labels));
 </script>
 
-<figure class="compact-chart">
+<figure class="compact-chart" data-tx-component="charts-progress-ring">
   <svg direction="ltr" class="progress-ring" role="img" aria-label={label} viewBox="{-diameter / 2} {-diameter / 2} {diameter} {diameter}">
     <title>{label}</title><desc>{description}</desc>
     <path class="track" d={arcPath({ innerRadius: radius - ringWidth / 2, outerRadius: radius + ringWidth / 2, startAngle: 0, endAngle: Math.PI * 2 })} />

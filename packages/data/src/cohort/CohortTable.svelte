@@ -142,6 +142,8 @@ $effect(() => {
 
 <div
   bind:this={root}
+  data-tx-component="data-cohort-table"
+  data-tx-density={density}
   class={cx('tx-cohort', className)}
   data-tx-cohort
   data-heat={heat || undefined}

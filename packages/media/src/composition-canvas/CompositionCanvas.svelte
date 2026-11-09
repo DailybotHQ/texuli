@@ -184,7 +184,7 @@ function onkeydown(event: KeyboardEvent) {
 }
 </script>
 
-<figure class="tx-composition-canvas" data-tx-media="composition-canvas">
+<figure class="tx-composition-canvas" data-tx-component="media-composition-canvas" data-tx-media="composition-canvas">
   {#if engineFailed}
     <p class="tx-composition-canvas-note" role="note">{text.unsupported}</p>
   {:else if !validation}

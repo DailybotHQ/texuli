@@ -526,6 +526,8 @@ function handleFocusIn(event: FocusEvent): void {
 <div
   {...rest}
   bind:this={ref}
+  data-tx-component="data-grid"
+  data-tx-density={density}
   class={cx('tx-data-grid', className)}
   data-tx-data-grid
   data-virtual={virtual || undefined}

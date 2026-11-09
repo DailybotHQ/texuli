@@ -202,7 +202,7 @@ function when(item: T): { iso: string; label: string } {
   {/if}
 {/snippet}
 
-<section class={cx('tx-inbox', className)} aria-labelledby="{uid}-title" data-tx-inbox>
+<section class={cx('tx-inbox', className)} data-tx-component="data-notification-inbox" aria-labelledby="{uid}-title" data-tx-inbox>
   <header class="tx-inbox__header">
     <svelte:element
       this={`h${Math.min(6, Math.max(2, Math.trunc(headingLevel) || 2))}`}
