@@ -148,17 +148,40 @@ export const textClass = variants({
 
 export const proseClass = variants({
   base: 'tx-prose',
-  variants: { size: map(PROSE_SIZES, 'tx-prose--') },
+  variants: {
+    size: {
+      md: 'tx-prose--md',
+      lg: 'tx-prose--lg',
+    },
+  },
   defaultVariants: { size: 'md' },
 });
 
 export const boxClass = variants({
   base: 'tx-box',
   variants: {
-    padding: map(BOX_PADDINGS, 'tx-box--pad-'),
-    radius: map(BOX_RADII, 'tx-box--radius-'),
+    padding: {
+      none: 'tx-box--pad-none',
+      sm: 'tx-box--pad-sm',
+      md: 'tx-box--pad-md',
+      lg: 'tx-box--pad-lg',
+      xl: 'tx-box--pad-xl',
+    },
+    radius: {
+      none: 'tx-box--radius-none',
+      sm: 'tx-box--radius-sm',
+      md: 'tx-box--radius-md',
+      lg: 'tx-box--radius-lg',
+      xl: 'tx-box--radius-xl',
+      full: 'tx-box--radius-full',
+    },
     border: map(BOX_BORDERS, 'tx-box--border-'),
-    elevation: map(BOX_ELEVATIONS, 'tx-box--elevation-'),
+    elevation: {
+      none: 'tx-box--elevation-none',
+      sm: 'tx-box--elevation-sm',
+      md: 'tx-box--elevation-md',
+      lg: 'tx-box--elevation-lg',
+    },
     surface: map(BOX_SURFACES, 'tx-box--surface-'),
   },
   defaultVariants: {

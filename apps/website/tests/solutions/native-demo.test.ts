@@ -34,7 +34,7 @@ describe('Native Demo A', () => {
         catalog: specCatalog as unknown as SpecCatalog,
       })
     ).toEqual({ ok: true, diagnostics: [] });
-    expect(NATIVE_DEMO_SPEC_VERSION).toBe('0.12.0');
+    expect(NATIVE_DEMO_SPEC_VERSION).toBe('0.13.0');
     expect(NATIVE_DEMO_FIXTURE.id).toBe('report-week-42');
     expect(NATIVE_DEMO_FIXTURE_JSON).toContain('Delivery report, week 42');
     expect(NATIVE_DEMO_FIXTURE_JSON).toContain('charts-stacked-bar');

@@ -260,7 +260,9 @@ describe('KitLibrary', () => {
     const { container } = render(KitLibrary, {
       props: {
         document: {
-          library: [{ ...pricingCard, name: '<img src=x onerror=alert(1)>', purpose: '‮evil' }],
+          library: [
+            { ...pricingCard, name: '<img src=x onerror=alert(1)>', purpose: '\u202Eevil' },
+          ],
         },
       },
     });
