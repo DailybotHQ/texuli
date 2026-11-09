@@ -162,6 +162,22 @@ const MESSAGES = {
   'texuli.ds-kit.library.purpose': 'Propósito',
   'texuli.ds-kit.library.status': 'Estado',
   'texuli.ds-kit.library.unknown-id': 'no está en el catálogo',
+  'texuli.ds-kit.matrix.capped':
+    'Demasiadas combinaciones para la vista completa: se muestra la cuadrícula.',
+  'texuli.ds-kit.matrix.default': 'predeterminado',
+  'texuli.ds-kit.matrix.grid-label': '{0}: variantes por tamaño, {1}',
+  'texuli.ds-kit.matrix.host-sample': 'Muestra en vivo aportada por la aplicación anfitriona',
+  'texuli.ds-kit.matrix.issues': 'No está en el catálogo',
+  'texuli.ds-kit.matrix.live': 'Pasa el puntero, enfoca o pulsa esta muestra',
+  'texuli.ds-kit.matrix.locked': '{0} componentes permitidos por este sistema de diseño.',
+  'texuli.ds-kit.matrix.not-allowed': 'No permitido',
+  'texuli.ds-kit.matrix.not-in-system': 'No está en este sistema de diseño',
+  'texuli.ds-kit.matrix.state-in-app':
+    'Se ve en una aplicación en vivo: este estado no tiene una propiedad que fijar.',
+  'texuli.ds-kit.matrix.states': 'estados',
+  'texuli.ds-kit.matrix.unlocked':
+    'Desbloqueado: se permiten todos los componentes del catálogo ({0}).',
+  'texuli.ds-kit.matrix.variant-size': 'Variante / tamaño',
   'texuli.ds-kit.mode-both': 'Ambos',
   'texuli.ds-kit.mode-dark': 'Oscuro',
   'texuli.ds-kit.mode-legend': 'Modo de color',

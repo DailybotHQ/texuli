@@ -104,6 +104,10 @@ export interface DesignSystemKitProps {
   library?: Readonly<Record<string, KitLibrarySnippet>>;
   /** Live samples for catalog ids the kit cannot import, keyed by catalog id. */
   samples?: Readonly<Record<string, Snippet<[KitSampleContext]>>>;
+  /** Components: `grid` (default, variants × sizes plus strips) or `full` (the capped product). */
+  matrix?: 'grid' | 'full';
+  /** List the components the design system does not allow (never as samples). Default true. */
+  showDisallowed?: boolean;
   /** Which sections, in which order. Default: every section the kit can show. */
   sections?: readonly KitSectionId[];
   /** Light and dark side by side, or one mode (bindable). Default `both`. */

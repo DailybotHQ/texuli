@@ -200,6 +200,7 @@ add(
     'KitChanges',
     'KitFoundations',
     'KitLibrary',
+    'KitMatrix',
     'KitModeSwitch',
     'KitVoice',
   ]
@@ -444,5 +445,6 @@ export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(row
 // Raised to 219 for the design-system UI kit pages (PLAN_016 T4, lead decision): host
 // pages that render a design-system document, never blueprint data. Raised to 222
 // for the kit's library and changes sections (KitLibrary, KitChanges, ApprovalBadge;
-// PLAN_016 T-t4-library), the same kit chrome, and to 223 for KitVoice (T-t4-voice).
-export const EXCLUSION_CEILING = 223;
+// PLAN_016 T-t4-library), the same kit chrome, to 223 for KitVoice (T-t4-voice), and
+// to 224 for KitMatrix (T-t4-matrix).
+export const EXCLUSION_CEILING = 224;
