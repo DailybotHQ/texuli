@@ -17,6 +17,8 @@
  * `error.data.supported`. A request without that `_meta` version behaves as
  * before.
  */
+
+import { checkBlueprintAllow } from '@texuli/spec/design-system';
 import {
   type InvokeFailure,
   LOCAL_RUNTIMES,
@@ -109,6 +111,109 @@ const invalidParams = (message: string) => new RpcFailure(MCP_ERROR_CODES.invali
 
 function isObject(value: unknown): value is JsonObject {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/** Resolve the inline or locally known design-system document for a blueprint operation. */
+async function designSystemForBlueprint(
+  value: unknown
+): Promise<Record<string, unknown> | undefined> {
+  if (!isObject(value)) return;
+  let document: unknown;
+  try {
+    if (isObject(value.inline)) document = value.inline;
+    else if (typeof value.ref === 'string') {
+      const ref = value.ref;
+      const id = ref.startsWith('texuli:') ? ref.slice(7) : ref.split('@')[0];
+      if (!id) return;
+      const source = await import('../ops/design-system-run.ts');
+      document = await source.designSystemDocument(id);
+      if (
+        !ref.startsWith('texuli:') &&
+        isObject(document) &&
+        `${document.id}@${document.version}` !== ref
+      )
+        return;
+    } else return;
+    if (!isObject(document)) return;
+    if (typeof document.extends !== 'string') return document;
+
+    const { resolveDesignSystemSync, loadLibraryBase } = await import(
+      '@texuli/tokens/design-system/compile'
+    );
+    const { designSystemDocument } = await import('../ops/design-system-run.ts');
+    const bases = new Map<string, unknown>();
+    let current: unknown = document;
+    for (let depth = 0; depth < 4 && isObject(current); depth++) {
+      const ref = current.extends;
+      if (typeof ref !== 'string' || bases.has(ref)) break;
+      let base: unknown;
+      if (ref.startsWith('texuli:')) base = await loadLibraryBase(ref);
+      else {
+        const [baseId] = ref.split('@');
+        base = baseId ? await designSystemDocument(baseId) : undefined;
+        if (isObject(base) && `${base.id}@${base.version}` !== ref) base = undefined;
+      }
+      if (base === undefined) break;
+      bases.set(ref, base);
+      current = base;
+    }
+    const resolved = resolveDesignSystemSync(document, {
+      resolve: (ref) => bases.get(ref),
+      trust: 'untrusted',
+    });
+    return resolved.ok ? (resolved.document as unknown as Record<string, unknown>) : document;
+  } catch {
+    return isObject(document) ? document : undefined;
+  }
+}
+
+/** The design system and tree supplied to either blueprint operation. */
+async function lockedBlueprintInput(
+  name: string,
+  args: unknown,
+  output: unknown
+): Promise<{ blueprint: unknown; manifest: unknown } | undefined> {
+  if (!isObject(args)) return;
+  let blueprint: unknown;
+  let designSystemRef: unknown;
+  if (name === 'blueprint.validate') {
+    blueprint = args.draft;
+    if (isObject(args.draft)) designSystemRef = args.draft.designSystem;
+  } else if (name === 'blueprint.theme') {
+    blueprint =
+      isObject(output) && output.blueprint !== undefined ? output.blueprint : args.blueprint;
+    designSystemRef = args.designSystem;
+  } else return;
+
+  const document = await designSystemForBlueprint(designSystemRef);
+  if (!document || !isObject(document.allow)) return;
+  return { blueprint, manifest: { allow: document.allow } };
+}
+
+/** Add locked-component diagnostics to a successful MCP operation result. */
+async function reportLockedBlueprint(
+  name: string,
+  args: unknown,
+  output: unknown
+): Promise<unknown> {
+  const locked = await lockedBlueprintInput(name, args, output);
+  if (!locked || !isObject(output)) return output;
+  const result = checkBlueprintAllow(locked.blueprint, locked.manifest);
+  if (result.ok) return output;
+  const diagnostics = Array.isArray(output.diagnostics) ? output.diagnostics : [];
+  const added = result.errors.map((issue: { code: string; path: string; message: string }) => ({
+    check: 'design-system-allow',
+    code: issue.code,
+    severity: 'error' as const,
+    path: issue.path,
+    message: issue.message,
+  }));
+  return {
+    ...output,
+    valid: false,
+    ...(output.status === 'valid' ? { status: 'invalid' } : {}),
+    diagnostics: [...diagnostics, ...added],
+  };
 }
 
 function validId(id: unknown): id is JsonRpcId {
@@ -288,9 +393,12 @@ export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
       ...(options.files ? { files: options.files } : {}),
     });
     if (outcome.ok) {
+      const output = await reportLockedBlueprint(name, params.arguments ?? {}, outcome.output);
       return {
-        content: [{ type: 'text', text: JSON.stringify(outcome.output) }],
-        ...(atLeast(version, '2025-06-18') ? { structuredContent: outcome.output } : {}),
+        content: [{ type: 'text', text: JSON.stringify(output) }],
+        ...(atLeast(version, '2025-06-18') && isObject(output)
+          ? { structuredContent: output }
+          : {}),
       };
     }
     const error: InvokeFailure['error'] = outcome.error;

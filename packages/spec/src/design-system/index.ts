@@ -30,6 +30,7 @@ export {
   DS_VARIANT_ATTRIBUTE,
   dsRootAttributes,
 } from './attributes.ts';
+export { checkBlueprintAllow } from './blueprint-allow.ts';
 export {
   APPROVAL_HASH_EXCLUDED,
   canonicalJson,
