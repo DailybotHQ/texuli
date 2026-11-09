@@ -426,6 +426,18 @@ export const DESIGN_SYSTEM_EXAMPLES: Readonly<Record<string, Readonly<Record<str
       guidelines: ['Write in full sentences.', 'Prefer plain words over jargon.'],
     },
     accessibility: { contrast: 'AA', targetMin: 24, focus: 'outline', focusWidth: 2 },
+    allow: { button: {}, card: {} },
+    library: [
+      {
+        id: 'essay-header',
+        name: 'Essay header',
+        purpose: 'Title, contributor and deck for one essay.',
+        version: '0.1.0',
+        status: 'draft',
+        composes: ['card'],
+      },
+    ],
+    approval: { status: 'draft', version: '1.0.0' },
   },
   ledgerline: {
     format: 'texuli/design-system',
@@ -462,6 +474,18 @@ export const DESIGN_SYSTEM_EXAMPLES: Readonly<Record<string, Readonly<Record<str
       guidelines: ['Lead with the number.', 'Name the period every figure covers.'],
     },
     accessibility: { contrast: 'AA', targetMin: 24, focus: 'ring', focusWidth: 2 },
+    allow: { button: {}, card: {}, input: {} },
+    library: [
+      {
+        id: 'kpi-strip',
+        name: 'KPI strip',
+        purpose: "A row of figures for the day's ledger.",
+        version: '0.1.0',
+        status: 'draft',
+        composes: ['card', 'button'],
+      },
+    ],
+    approval: { status: 'draft', version: '2.3.0' },
     variants: {
       'high-contrast': {
         accessibility: { contrast: 'AAA', focus: 'outline', focusWidth: 3 },
@@ -508,5 +532,17 @@ export const DESIGN_SYSTEM_EXAMPLES: Readonly<Record<string, Readonly<Record<str
       guidelines: ['Celebrate small wins.', 'Never shame a mistake.'],
     },
     accessibility: { contrast: 'AA', targetMin: 44, focus: 'glow', focusWidth: 3 },
+    allow: { button: {}, card: {}, badge: {} },
+    library: [
+      {
+        id: 'score-chip',
+        name: 'Score chip',
+        purpose: "A round chip that shows a player's score.",
+        version: '0.1.0',
+        status: 'draft',
+        composes: ['badge', 'button'],
+      },
+    ],
+    approval: { status: 'draft', version: '1.0.0' },
   },
 };
