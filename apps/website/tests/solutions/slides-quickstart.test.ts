@@ -81,11 +81,12 @@ describe('Slides quickstart', () => {
 
     const json = parseDeck(SLIDES_JSON_DECK);
     expect(json.ok).toBe(true);
-    if (json.ok) expect(json.deck.slides.map((slide) => slide.id)).toEqual(['opening', 'adoption']);
+    if (json.ok)
+      expect(json.deck?.slides.map((slide) => slide.id)).toEqual(['opening', 'adoption']);
 
     const markdown = parseDeckMarkdown(SLIDES_MARKDOWN_DECK, { validateBlock: validateDeckBlock });
     expect(markdown.ok).toBe(true);
-    if (markdown.ok) expect(markdown.deck.slides[0]?.id).toBe('opening');
+    if (markdown.ok) expect(markdown.deck?.slides[0]?.id).toBe('opening');
 
     expect(typeof DeckStage).toBe('function');
   });

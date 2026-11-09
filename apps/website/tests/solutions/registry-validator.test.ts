@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { SolutionEntry } from '../../src/data/solutions/schema.ts';
 import { validateSolutionRegistry } from '../../src/data/solutions/validate.ts';
@@ -35,11 +37,21 @@ const slides: SolutionEntry = {
   links: [{ label: 'Docs', href: '/guides/solutions/slides/' }],
 };
 
+const PAGES = resolve(import.meta.dirname, '../../src/pages');
+/** The fixture's routes that have no page yet: pages ship during PLAN_015, so this is computed. */
+const MISSING_ROUTES = [
+  ['[0].docs', 'guides/solutions/slides'],
+  ['[0].route', 'solutions/slides'],
+]
+  .filter(([, dir]) => !existsSync(resolve(PAGES, dir as string, 'index.astro')))
+  .map(([path]) => path as string)
+  .sort();
+
 describe('Solutions registry file-system validator', () => {
   it('accepts a fixture whose packages, subpaths, evidence and native statuses match the checkout', () => {
     const result = validateSolutionRegistry([slides]);
     expect(result.issues).toEqual([]);
-    expect(result.planned.map((issue) => issue.path).sort()).toEqual(['[0].docs', '[0].route']);
+    expect(result.planned.map((issue) => issue.path).sort()).toEqual(MISSING_ROUTES);
   });
 
   it('rejects a package name that is not in packages/*/package.json', () => {
@@ -112,11 +124,11 @@ describe('Solutions registry file-system validator', () => {
   it('treats missing landing and docs pages as planned unless requireRoutes is set', () => {
     const allowed = validateSolutionRegistry([slides]);
     expect(allowed.issues).toEqual([]);
-    expect(allowed.planned.length).toBe(2);
+    expect(allowed.planned.map((issue) => issue.path).sort()).toEqual(MISSING_ROUTES);
 
     const required = validateSolutionRegistry([slides], { requireRoutes: true });
     expect(required.planned).toEqual([]);
-    expect(required.issues.map((issue) => issue.path).sort()).toEqual(['[0].docs', '[0].route']);
+    expect(required.issues.map((issue) => issue.path).sort()).toEqual(MISSING_ROUTES);
   });
 
   it('still surfaces schema issues from checkSolutionRegistry', () => {

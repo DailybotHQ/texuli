@@ -32,7 +32,7 @@ export function parseInline(text: string): DocInline[] {
   return parts;
 }
 
-/** Parse the closed Markdown subset used by the Slides docs. */
+/** Parse the closed Markdown subset used by every Solution's docs. */
 export function parseDocMarkdown(source: string): DocBlock[] {
   const blocks: DocBlock[] = [];
   const lines = source.replace(/\r\n/g, '\n').split('\n');

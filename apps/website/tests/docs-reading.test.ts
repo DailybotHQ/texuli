@@ -706,8 +706,9 @@ describe('guide live islands', () => {
     .map((file) => file.replace(/\.svelte$/, ''))
     .sort();
 
+  // `guides/solutions/<slug>/` holds the Solution docs family (ADR-028), not reading guides.
   const pages = readdirSync(pagesDir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
+    .filter((entry) => entry.isDirectory() && entry.name !== 'solutions')
     .map((entry) => ({
       slug: entry.name,
       source: readFileSync(join(pagesDir, entry.name, 'index.astro'), 'utf8'),

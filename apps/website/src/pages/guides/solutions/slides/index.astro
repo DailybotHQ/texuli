@@ -3,13 +3,13 @@
  * `/guides/solutions/slides/` — Slides technical docs (ADR-028). Content lives
  * in `src/content/solution-docs/slides/`. Back-to-overview is the landing route.
  */
-import GuideCode from '../../../../../components/guides/GuideCode.astro';
-import type { GuideLanguage } from '../../../../../components/guides/highlight.ts';
-import { GUIDE_LANGUAGES } from '../../../../../components/guides/highlight.ts';
-import SolutionDocsLayout from '../../../../../components/solutions/docs-layout/SolutionDocsLayout.astro';
-import { loadSlidesDocs } from '../../../../../content/solution-docs/slides/index.ts';
-import type { DocBlock } from '../../../../../content/solution-docs/slides/parse.ts';
-import { getSolution } from '../../../../../data/solutions/index.ts';
+import GuideCode from '../../../../components/guides/GuideCode.astro';
+import type { GuideLanguage } from '../../../../components/guides/highlight.ts';
+import { GUIDE_LANGUAGES } from '../../../../components/guides/highlight.ts';
+import SolutionDocsLayout from '../../../../components/solutions/docs-layout/SolutionDocsLayout.astro';
+import type { DocBlock } from '../../../../content/solution-docs/parse.ts';
+import { loadSlidesDocs } from '../../../../content/solution-docs/slides/index.ts';
+import { getSolution } from '../../../../data/solutions/index.ts';
 
 const entry = getSolution('slides');
 const sections = loadSlidesDocs();

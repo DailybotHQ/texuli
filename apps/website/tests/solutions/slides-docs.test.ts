@@ -2,8 +2,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { siteRouteExists } from '../../src/components/foundation/nav-data.ts';
+import { parseDocMarkdown } from '../../src/content/solution-docs/parse.ts';
 import { loadSlidesDocs, SLIDES_DOC_FILES } from '../../src/content/solution-docs/slides/index.ts';
-import { parseDocMarkdown } from '../../src/content/solution-docs/slides/parse.ts';
 import { getSolution } from '../../src/data/solutions/index.ts';
 
 const WEBSITE = resolve(import.meta.dirname, '../..');

@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { type DocBlock, parseDocMarkdown } from './parse.ts';
+import { type DocBlock, parseDocMarkdown } from '../parse.ts';
 
 export const SLIDES_DOC_FILES = [
   'overview',
