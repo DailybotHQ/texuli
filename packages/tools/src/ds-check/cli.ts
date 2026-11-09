@@ -2,27 +2,43 @@
 /**
  * `texuli ds check <file> [--json] [--render] [--mode light|dark|all]
  * [--variant <name>]… [--trust developer|untrusted] [--base <file>]…
- * [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict]`.
+ * [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict]
+ * [--catalog <components.json>]`.
  *
  * Exit codes: 0 when every check passes, 1 on any refusal or render
  * finding, 2 when the check could not run (a bad flag, an unreadable file,
  * or a missing `--render` requirement).
+ *
+ * Locked design systems (ADR-032): the check reads the agent catalog and
+ * refuses `allow` ids or values it does not list (`unknown-component`,
+ * `unknown-variant`, `unknown-size`, `unknown-tone`, `unknown-density`,
+ * `unknown-state`), and a recorded content hash that no longer matches
+ * (`content-hash-mismatch`, `library-hash-mismatch`). It reports the allowed
+ * set and the approval status as declared; it cannot prove who approved.
  */
 import { readFile, stat } from 'node:fs/promises';
+import type { DesignSystemAllowCatalog } from '@texuli/spec/design-system';
+import { presetComponentsFromBuild } from '../ds-create/presets.ts';
+import { loadOpsCatalog } from '../ops/catalog.ts';
 import {
   DS_CHECK_BUILTIN_SHEET,
   DsCheckRequirementError,
   parseKnownFindings,
   renderDesignSystemCheck,
 } from './render.ts';
-import { checkDesignSystem, serializeDsCheckReport } from './static.ts';
+import {
+  checkDesignSystem,
+  type DsCheckLockedReport,
+  type DsLockedReport,
+  serializeDsCheckReport,
+} from './static.ts';
 import type { DsCheckMode, DsCheckReport } from './types.ts';
 
 /** The largest design-system file the CLI reads. */
 export const DS_CHECK_MAX_BYTES = 1_000_000;
 
 export const DS_CHECK_USAGE =
-  'Usage: texuli ds check <file> [--json] [--render] [--mode light|dark|all] [--variant <name>]... [--trust developer|untrusted] [--base <file>]... [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict]';
+  'Usage: texuli ds check <file> [--json] [--render] [--mode light|dark|all] [--variant <name>]... [--trust developer|untrusted] [--base <file>]... [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict] [--catalog <components.json>]';
 
 export interface DsCliArgs {
   command: 'check';
@@ -39,6 +55,8 @@ export interface DsCliArgs {
   /** A JSON file of known findings (`[{ component, element, property, reason }]`). */
   known?: string;
   strict: boolean;
+  /** The catalog `allow` is checked against (default: the agent catalog `@texuli/tools` builds). */
+  catalog?: string;
   help: boolean;
 }
 
@@ -85,6 +103,7 @@ export function parseDsCliArgs(argv: readonly string[]): DsCliArgs {
     else if (arg === '--sheet') args.sheet = value();
     else if (arg === '--url') args.url = value();
     else if (arg === '--known') args.known = value();
+    else if (arg === '--catalog') args.catalog = value();
     else if (arg.startsWith('-')) throw new TypeError(`Unknown ds check flag "${arg}".`);
     else if (args.file === undefined) args.file = arg;
     else throw new TypeError(`ds check takes one file; got "${args.file}" and "${arg}".`);
@@ -112,8 +131,41 @@ async function readJsonFile(path: string, what: string): Promise<unknown> {
   }
 }
 
+/** The locked-design-system lines of the summary: allowed set, approval and hashes (ADR-032). */
+export function formatLockedReport(locked: DsLockedReport): string[] {
+  const lines: string[] = [];
+  lines.push(
+    locked.locked
+      ? `  locked: ${locked.allowed.length} components allowed${locked.catalogChecked ? ' (checked against the catalog)' : ''}`
+      : '  not locked: no allow section'
+  );
+  if (locked.library.length > 0) lines.push(`  library: ${locked.library.join(', ')}`);
+  const { approval } = locked;
+  const declared = [
+    approval.version ? `version ${approval.version}` : '',
+    approval.approvedBy ? `declared by ${approval.approvedBy}` : '',
+    approval.approvedAt ? `at ${approval.approvedAt}` : '',
+  ].filter(Boolean);
+  lines.push(`  approval: ${approval.status}${declared.length ? ` (${declared.join(', ')})` : ''}`);
+  lines.push(
+    `  content hash ${approval.contentHash}: ${
+      approval.matches === undefined
+        ? 'none recorded'
+        : approval.matches
+          ? 'matches the approval'
+          : 'does not match the approval'
+    }`
+  );
+  for (const entry of locked.entries)
+    if (entry.matches !== undefined)
+      lines.push(
+        `  library ${entry.id ?? '?'}: ${entry.status ?? 'unknown'}, hash ${entry.matches ? 'matches' : 'does not match'}`
+      );
+  return lines;
+}
+
 /** The human summary `ds check` prints without `--json`. */
-export function formatDsCheckReport(report: DsCheckReport): string {
+export function formatDsCheckReport(report: DsCheckReport | DsCheckLockedReport): string {
   const name = [report.document.id, report.document.version].filter(Boolean).join('@');
   const lines = [`${report.ok ? 'PASS' : 'FAIL'} ${name || report.file || 'design system'}`];
   for (const run of report.runs) {
@@ -138,6 +190,7 @@ export function formatDsCheckReport(report: DsCheckReport): string {
     lines.push(
       `  render ${run.variant ?? 'base'} ${run.mode}: ${run.components.length} components, ${run.checked} elements, ${run.axe.length} axe, ${run.pairs.filter((p) => !p.pass).length} contrast, ${run.literals.length} literal findings (${run.known.length} known)`
     );
+  if ('locked' in report) lines.push(...formatLockedReport(report.locked));
   for (const error of report.errors)
     lines.push(
       `  ${error.code} ${error.path}${error.variant ? ` (variant ${error.variant})` : ''}${error.mode ? ` [${error.mode}]` : ''}: ${error.message}${error.hint ? ` ${error.hint}` : ''}`
@@ -154,6 +207,22 @@ export interface DsCliIo {
 export type DsCliResult =
   | { ok: true; report?: DsCheckReport }
   | { ok: false; error: string; report?: DsCheckReport };
+
+/** A `--catalog` file: `{ components: [...] }` (the spec's `components.json` or a stub). */
+function catalogOf(value: unknown, path: string): DesignSystemAllowCatalog {
+  const components = (value as { components?: unknown } | null)?.components;
+  if (!Array.isArray(components))
+    throw new TypeError(`The catalog ${path} has no components list.`);
+  return { components } as DesignSystemAllowCatalog;
+}
+
+/** The agent catalog as `checkDesignSystemAllow` reads it (axes and states per component). */
+export async function loadAllowCatalog(): Promise<{
+  components: ReturnType<typeof presetComponentsFromBuild>;
+}> {
+  const build = await loadOpsCatalog();
+  return { components: presetComponentsFromBuild(build.catalog.entries) };
+}
 
 /** Run `texuli ds …`; sets `process.exitCode` (1 refusal, 2 could not run); never throws. */
 export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promise<DsCliResult> {
@@ -172,7 +241,7 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
   }
   if (args.help) {
     stdout.write(
-      `${DS_CHECK_USAGE}\n\nValidate, compile and check a design-system document: the spec's codes, the guarantees (aa-text, aa-focus, target-size) and the contrast report, for the base document and its high-contrast variant. --render also paints every agent-emittable catalog component under it in a headless browser and checks axe, the painted contrast and colors that do not follow the design system; known findings (none in the library; --known <file> adds your own) are listed and do not fail unless --strict.\n\n--render paints the conformance sheet that ships inside @texuli/tools (--sheet ${DS_CHECK_BUILTIN_SHEET}, the default; no bundler needed). --sheet <page.html> serves a page you built that installs @texuli/tools/ds-check/host, and --url <page> checks a page you serve. It needs "playwright" (or "@playwright/test") and "@axe-core/playwright" as dev dependencies of your project, and chromium (npx playwright install chromium); the static checks need neither.\nExit 0 pass, 1 refusal or finding, 2 could not run.\n`
+      `${DS_CHECK_USAGE}\n\nValidate, compile and check a design-system document: the spec's codes, the guarantees (aa-text, aa-focus, target-size) and the contrast report, for the base document and its high-contrast variant. --render also paints every agent-emittable catalog component under it in a headless browser and checks axe, the painted contrast and colors that do not follow the design system; known findings (none in the library; --known <file> adds your own) are listed and do not fail unless --strict.\n\n--render paints the conformance sheet that ships inside @texuli/tools (--sheet ${DS_CHECK_BUILTIN_SHEET}, the default; no bundler needed). --sheet <page.html> serves a page you built that installs @texuli/tools/ds-check/host, and --url <page> checks a page you serve. It needs "playwright" (or "@playwright/test") and "@axe-core/playwright" as dev dependencies of your project, and chromium (npx playwright install chromium); the static checks need neither.\n\nLocked design systems (ADR-032): the allow section is checked against the agent catalog, or --catalog <components.json> (unknown-component, unknown-variant, unknown-size, unknown-tone, unknown-density, unknown-state); the report lists the allowed set and the approval as declared, and refuses a recorded content hash that no longer matches (content-hash-mismatch, library-hash-mismatch). texuli ds hash prints the hashes. The check cannot prove who approved: a reviewed commit is the guarantee.\nExit 0 pass, 1 refusal or finding, 2 could not run.\n`
     );
     return { ok: true };
   }
@@ -190,6 +259,11 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
     report = await checkDesignSystem(doc, {
       file: args.file as string,
       bases,
+      hashes: true,
+      catalog:
+        args.catalog === undefined
+          ? await loadAllowCatalog()
+          : catalogOf(await readJsonFile(args.catalog, 'The catalog'), args.catalog),
       ...(args.modes ? { modes: args.modes } : {}),
       ...(args.variants ? { variants: args.variants } : {}),
       ...(args.trust ? { trust: args.trust } : {}),

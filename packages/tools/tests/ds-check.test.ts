@@ -163,11 +163,14 @@ describe('texuli ds check (static)', () => {
         document: unknown;
         resolve?: Record<string, unknown>;
         trust?: string;
+        catalog?: unknown;
       };
       const args = [await file(name, fixture.document)];
       for (const [ref, base] of Object.entries(fixture.resolve ?? {}))
         args.push('--base', await file(`base-${ref}.json`, base));
       if (fixture.trust) args.push('--trust', fixture.trust);
+      // Allow fixtures carry the catalog stub they are checked against (ADR-032).
+      if (fixture.catalog) args.push('--catalog', await file(`catalog-${name}`, fixture.catalog));
       const [code, path] = fixture.expect[0] as [string, string];
       cases.push({ code, path, args });
     }
@@ -239,6 +242,7 @@ describe('texuli ds check (static)', () => {
         'aa-focus',
         'aa-non-text',
         'aa-text',
+        'approval-invalid',
         'extends-cycle',
         'extends-depth',
         'extends-range',
@@ -248,7 +252,13 @@ describe('texuli ds check (static)', () => {
         'invalid-value',
         'required',
         'target-size',
+        'unknown-component',
+        'unknown-density',
         'unknown-key',
+        'unknown-size',
+        'unknown-state',
+        'unknown-tone',
+        'unknown-variant',
         'url-refused',
       ].sort()
     );
