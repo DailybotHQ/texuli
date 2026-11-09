@@ -4,14 +4,23 @@
  * files as arguments, each running one registry operation, so the CLI, the
  * local MCP and the remote MCP give the same results:
  *
- *     texuli ds init <file> [--brand "<one-liner>"] [--id <id>] [--name <name>] [--overwrite]
+ *     texuli ds init <file> [--brand "<one-liner>"] [--id <id>] [--name <name>] [--locked [--preset all|minimal|<allow.json>]] [--overwrite]
  *     texuli ds validate <file> [--trust t] [--variant v] [--base <file>]...
  *     texuli ds compile <file> [--format f] [--mode m] [--variant v] [--base <file>]... [--out <path> [--overwrite]]
  *     texuli ds export <file> --format css|tailwind|dtcg|tokens-studio --out <path> [--selector s] [--dark d] [--overwrite]
  *     texuli ds preview <file> [--format svg|html] [--mode m] [--variant v] [--out <path> [--overwrite]]
  *     texuli ds diff <before> <after> [--mode m] [--base <file>]...
  *     texuli ds import <file|text> --from brand|dtcg|tokens-studio|role-palette|theme [--id] [--name] [--version] [--out <path> [--overwrite]]
+ *     texuli ds approve <file> --by <name> [--version <x.y.z>] [--trust t] [--base <file>]...
+ *     texuli ds hash <file>
  *     texuli ds check <file> …                       (the conformance check, ds-check/cli.ts)
+ *
+ * `init --locked` adds an `allow` section from a preset (ADR-032; `all` and
+ * `minimal` come from the catalog, see ds-create/presets.ts). `approve`
+ * validates the document first, refuses an invalid one, then stamps
+ * `approval` with its `contentHash` in place; `hash` prints the content hashes
+ * and exits 1 when a stored one does not match. Neither proves who approved:
+ * a reviewed commit (CODEOWNERS) is the guarantee.
  *
  * Output is the operation's JSON on stdout; with `--out`, the content
  * (CSS, preset, token file, preview or document) is written through the
@@ -22,8 +31,20 @@
  */
 import { readFile, stat } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { type DesignSystem, validateDesignSystem } from '@texuli/tokens/design-system/validate';
 import { DS_CHECK_MAX_BYTES, DS_CHECK_USAGE, parseDsCliArgs, runDsCli } from '../ds-check/cli.ts';
+import {
+  APPROVAL_NOTE,
+  allowFromJson,
+  allowPreset,
+  hashReport,
+  PRESET_NAMES,
+  type PresetName,
+  presetComponentsFromBuild,
+  stampApproval,
+} from '../ds-create/index.ts';
 import { localFiles } from '../internal/local-write.ts';
+import { loadOpsCatalog } from '../ops/catalog.ts';
 import { LOCAL_RUNTIMES, texuliOps } from '../ops/index.ts';
 
 /** The `ds` commands, in help order. */
@@ -35,18 +56,22 @@ export const DS_COMMANDS = [
   'preview',
   'diff',
   'import',
+  'approve',
+  'hash',
   'check',
 ] as const;
 export type DsCommand = (typeof DS_COMMANDS)[number];
 
 export const DS_USAGE = [
-  'Usage: texuli ds init <file> [--brand "<one-liner>"] [--id <id>] [--name <name>] [--overwrite]',
+  'Usage: texuli ds init <file> [--brand "<one-liner>"] [--id <id>] [--name <name>] [--locked [--preset all|minimal|<allow.json>]] [--overwrite]',
   '       texuli ds validate <file> [--trust developer|untrusted] [--variant <name>] [--base <file>]...',
   '       texuli ds compile <file> [--format json|css|tailwind|dtcg|tokens-studio] [--mode light|dark] [--variant <name>] [--base <file>]... [--out <path> [--overwrite]]',
   '       texuli ds export <file> --format css|tailwind|dtcg|tokens-studio --out <path> [--selector <s>] [--dark class|attribute|media] [--overwrite]',
   '       texuli ds preview <file> [--format svg|html] [--mode light|dark] [--variant <name>] [--out <path> [--overwrite]]',
   '       texuli ds diff <before> <after> [--mode light|dark] [--base <file>]...',
   '       texuli ds import <file|text> --from brand|dtcg|tokens-studio|role-palette|theme [--id <id>] [--name <name>] [--version <x.y.z>] [--out <path> [--overwrite]]',
+  '       texuli ds approve <file> --by <name> [--version <x.y.z>] [--trust developer|untrusted] [--base <file>]...',
+  '       texuli ds hash <file>',
   `       ${DS_CHECK_USAGE.replace('Usage: ', '')}`,
 ].join('\n');
 
@@ -57,17 +82,21 @@ export interface DsCommandArgs {
   flags: Record<string, string>;
   bases: string[];
   overwrite: boolean;
+  /** `init --locked`: add an `allow` section (ADR-032). */
+  locked: boolean;
 }
 
 /** The value flags each command accepts (`--base` repeats and `--overwrite` takes none). */
 const FLAGS: Record<DsCommandArgs['command'], readonly string[]> = {
-  init: ['brand', 'id', 'name'],
+  init: ['brand', 'id', 'name', 'preset'],
   validate: ['trust', 'variant', 'base'],
   compile: ['format', 'mode', 'variant', 'trust', 'base', 'out', 'selector', 'dark'],
   export: ['format', 'mode', 'variant', 'trust', 'base', 'out', 'selector', 'dark'],
   preview: ['format', 'mode', 'variant', 'trust', 'base', 'out', 'title'],
   diff: ['mode', 'variant', 'trust', 'base'],
   import: ['from', 'id', 'name', 'version', 'trust', 'out'],
+  approve: ['by', 'version', 'trust', 'base'],
+  hash: [],
 };
 const POSITIONALS: Record<DsCommandArgs['command'], number> = {
   init: 1,
@@ -77,6 +106,8 @@ const POSITIONALS: Record<DsCommandArgs['command'], number> = {
   preview: 1,
   diff: 2,
   import: 1,
+  approve: 1,
+  hash: 1,
 };
 const CHOICES: Record<string, readonly string[]> = {
   trust: ['developer', 'untrusted'],
@@ -108,12 +139,24 @@ export function parseDsArgs(
   if (!(DS_COMMANDS as readonly string[]).includes(command))
     throw new TypeError(`Unknown ds command "${command}". Run texuli ds --help.`);
   const name = command as DsCommandArgs['command'];
-  const parsed: DsCommandArgs = { command: name, args: [], flags: {}, bases: [], overwrite: false };
+  const parsed: DsCommandArgs = {
+    command: name,
+    args: [],
+    flags: {},
+    bases: [],
+    overwrite: false,
+    locked: false,
+  };
   for (let index = 0; index < rest.length; index++) {
     const arg = rest[index] as string;
     if (arg === '--help' || arg === '-h') return { command: 'help', argv: [...argv] };
     if (arg === '--overwrite') {
       parsed.overwrite = true;
+      continue;
+    }
+    if (arg === '--locked') {
+      if (name !== 'init') throw new TypeError('Flag --locked belongs to ds init.');
+      parsed.locked = true;
       continue;
     }
     if (arg.startsWith('--')) {
@@ -140,7 +183,11 @@ export function parseDsArgs(
   if (name === 'export' && (!parsed.flags.format || !parsed.flags.out))
     throw new TypeError('ds export needs --format and --out.');
   if (name === 'import' && !parsed.flags.from) throw new TypeError('ds import needs --from.');
-  if (parsed.overwrite && name !== 'init' && parsed.flags.out === undefined)
+  if (name === 'approve' && !parsed.flags.by?.trim())
+    throw new TypeError('ds approve needs --by <name>.');
+  if (parsed.flags.preset !== undefined && !parsed.locked)
+    throw new TypeError('Flag --preset needs --locked.');
+  if (parsed.overwrite && name !== 'init' && name !== 'approve' && parsed.flags.out === undefined)
     throw new TypeError('Flag --overwrite needs --out.');
   return parsed;
 }
@@ -265,6 +312,9 @@ async function plan(
           ...compileFlags(args, bases),
         },
       };
+    case 'approve':
+    case 'hash':
+      throw new TypeError(`ds ${args.command} does not run one operation.`);
     default: {
       // brand: the argument is the one-liner; theme: a library id unless it names a file.
       const from = flags.from as string;
@@ -313,6 +363,13 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
     const result = await runDsCli(args.argv, io);
     return result.ok ? { ok: true } : { ok: false, error: result.error };
   }
+  if (args.command === 'approve' || args.command === 'hash') {
+    try {
+      return args.command === 'hash' ? await runHash(args, io) : await runApprove(args, io);
+    } catch (error) {
+      return cannotRun(error instanceof Error ? error.message : String(error));
+    }
+  }
   let step: Awaited<ReturnType<typeof plan>>;
   try {
     step = await plan(args, io.cwd ?? process.cwd());
@@ -343,9 +400,17 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
   }
   // A document goes through ds.save (validated again, written as two-space JSON).
   if (step.content === 'document') {
+    let document = output.document as Record<string, unknown>;
+    if (args.locked) {
+      try {
+        document = { ...document, allow: await lockedAllow(args, io.cwd ?? process.cwd()) };
+      } catch (error) {
+        return cannotRun(error instanceof Error ? error.message : String(error));
+      }
+    }
     const saved = await texuliOps.invoke(
       'ds.save',
-      { path: out, document: output.document, overwrite: args.overwrite },
+      { path: out, document, overwrite: args.overwrite },
       { runtimes: LOCAL_RUNTIMES, files }
     );
     const result = saved.ok ? (saved.output as Record<string, unknown>) : undefined;
@@ -370,4 +435,87 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
     `${JSON.stringify({ ok: true, operation: step.operation, format: output.format, out: written.relative, bytes: written.bytes }, null, 2)}\n`
   );
   return { ok: true, out: written.relative };
+}
+
+/** The `allow` section `init --locked` writes: a catalog preset (default `minimal`) or a JSON file. */
+async function lockedAllow(args: DsCommandArgs, cwd: string): Promise<Record<string, unknown>> {
+  const preset = args.flags.preset ?? 'minimal';
+  if ((PRESET_NAMES as readonly string[]).includes(preset)) {
+    const build = await loadOpsCatalog();
+    return allowPreset(presetComponentsFromBuild(build.catalog.entries), preset as PresetName);
+  }
+  return allowFromJson(await readJsonFile(resolve(cwd, preset)));
+}
+
+/** `ds approve`: validate, refuse an invalid document, then stamp `approval` in place through ds.save. */
+async function runApprove(args: DsCommandArgs, io: DsIo): Promise<DsResult> {
+  const stdout = io.stdout ?? process.stdout;
+  const cwd = io.cwd ?? process.cwd();
+  const file = args.args[0] as string;
+  const bases = await readBases(args.bases.map((path) => resolve(cwd, path)));
+  const read = (await readJsonFile(resolve(cwd, file))) as Record<string, unknown>;
+  const document = args.flags.version ? { ...read, version: args.flags.version } : read;
+  const runtime = { runtimes: LOCAL_RUNTIMES, files: localFiles({ cwd }) };
+  const refuse = (body: Record<string, unknown>, error: string): DsResult => {
+    stdout.write(`${JSON.stringify({ ok: false, operation: 'ds.approve', ...body }, null, 2)}\n`);
+    process.exitCode = 1;
+    return { ok: false, error };
+  };
+  const checked = await texuliOps.invoke(
+    'ds.validate',
+    { document, ...compileFlags(args, bases) },
+    runtime
+  );
+  if (!checked.ok) return refuse({ error: checked.error }, checked.error.message);
+  const verdict = checked.output as Record<string, unknown>;
+  if (verdict.valid !== true)
+    return refuse(
+      {
+        valid: false,
+        errors: verdict.errors ?? [],
+        note: 'Nothing was approved: fix the document first.',
+      },
+      `Refused: ${JSON.stringify(verdict.errors ?? [])}`
+    );
+  const stamped = stampApproval(document as unknown as DesignSystem, {
+    by: args.flags.by as string,
+    ...(args.flags.version ? { version: args.flags.version } : {}),
+  });
+  const again = validateDesignSystem(
+    stamped,
+    args.flags.trust === 'developer' ? { trust: 'developer' } : {}
+  );
+  if (!again.ok)
+    return refuse(
+      { valid: false, errors: again.errors },
+      `Refused: ${JSON.stringify(again.errors)}`
+    );
+  const saved = await texuliOps.invoke(
+    'ds.save',
+    { path: file, document: stamped, overwrite: true },
+    runtime
+  );
+  const result = saved.ok ? (saved.output as Record<string, unknown>) : undefined;
+  if (result?.saved !== true)
+    return refuse(
+      { saved: false, errors: result?.errors ?? saved },
+      `Not saved: ${JSON.stringify(result?.errors ?? saved)}`
+    );
+  stdout.write(
+    `${JSON.stringify({ ok: true, operation: 'ds.approve', path: result.path, approval: stamped.approval, note: APPROVAL_NOTE }, null, 2)}\n`
+  );
+  return { ok: true, out: result.path as string };
+}
+
+/** `ds hash`: the content hashes, checked against the stored ones; exit 1 on a mismatch. */
+async function runHash(args: DsCommandArgs, io: DsIo): Promise<DsResult> {
+  const stdout = io.stdout ?? process.stdout;
+  const cwd = io.cwd ?? process.cwd();
+  const report = hashReport(await readJsonFile(resolve(cwd, args.args[0] as string)));
+  stdout.write(`${JSON.stringify({ operation: 'ds.hash', ...report }, null, 2)}\n`);
+  if (!report.ok) {
+    process.exitCode = 1;
+    return { ok: false, error: 'A stored contentHash does not match the document.' };
+  }
+  return { ok: true };
 }
