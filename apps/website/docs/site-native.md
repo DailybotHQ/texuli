@@ -1,73 +1,55 @@
-# texuli.com native landing
+# Texuli Native site pages
 
 **App:** `apps/website`
-**Page:** `/native/`
-**Route source:** `src/pages/native/index.astro`
-**Sections:** `src/components/sections/native/` (built by T-45..T-47, assembled by T-48)
-**Task:** PLAN_006 T-31 (scaffold), T-45..T-48 (sections + assembly)
+**Pages:** `/native/` and `/native/compatibility/`
+**Landing source:** `src/pages/native/index.astro`
+**Compatibility source:** `src/pages/native/compatibility/index.astro`
+**Sections:** `src/components/sections/native/`
+**Compatibility data:** `src/data/native/compatibility.ts`
 
-## What this page is
+## Native landing
 
-The native-focused landing: the Kotlin Multiplatform story, the honest
-status (Compose renderer in development, conformance-tested, not on
-Maven), the spec-contract seam and the roadmap granularity from
-`native/README.md`. A landing about the native runtime — **not** a fenced
-sub-site: it shares the shell system, theme, CSP and analytics of the one
-site (subsite-ia-routes.md, "Sub-site boundaries").
+`/native/` introduces Texuli's Kotlin Multiplatform work and shows the current maturity plainly. The web renderer is available. The Compose renderer is in development and paints a subset of the catalog. The shared spec builds for JVM and iOS; Compose Desktop is the current UI target. Android and Compose iOS renderers are planned, and no native artifact is published.
 
-## Shell
+The page is assembled in this order:
 
-`BaseLayout` with `landing` — the landing header (logo, Docs, the
-Platform doors, search, switch, Get started), full-width main, no
-sidebar. Header decisions are owned by `site-foundation`/
-`site-sidebar-nav`; the IA decisions live in
-`.dwp/plans/PLAN_006_website_marketing_seo_analytics/analysis_results/subsite-ia-nav.md`.
+1. Native status and starting points.
+2. A real blueprint fixture and its contract.
+3. One interactive web and Compose Desktop demo.
+4. Why the project uses Kotlin Multiplatform.
+5. Components that travel across the shared blueprint.
+6. Complex solutions and their current native status.
+7. A compatibility summary by platform and component group.
+8. Repository evidence and the planned-work ledger.
+9. Frequently asked questions.
+10. Principles and next steps for building.
 
-## Sections (top to bottom, as shipped)
+All component counts and statuses come from compatibility data generated from the parity catalog and conformance evidence. The page does not hand-type those values.
 
-Each section is a static Astro component fed by a shared, unit-tested
-content module; the page (`pages/native/index.astro`) mounts them in
-blueprint order inside the landing wrapper. The hero's `h1` is the
-page's only `h1`.
+## Compatibility reference
 
-1. Hero + status — `NativeHeroStatus.astro` + `native-hero-content.ts`
-   (T-45): the one-contract claim, the honest eyebrow, two calls to
-   action, and the "What exists today" ledger (shipped / in development /
-   planned, with the planned marker on planned rows).
-2. Why Kotlin Multiplatform — `WhyKmp.astro` + `why-kmp-content.ts`
-   (T-46): the runtime story, every claim cited to the guide or
-   `native/README.md`, with verbatim Kotlin excerpts as named,
-   keyboard-scrollable code regions.
-3. Evidence + roadmap — `NativeEvidenceRoadmap.astro` +
-   `native-evidence-data.ts` (T-47): the real native modules at their
-   repo paths, the shipped/planned split under the visible "Planned"
-   heading, and on-site links only.
+The full component table lives at `/native/compatibility/`. It is a static page in the docs shell with CSS-only group and status filters, evidence links, and no hydrated island. The native landing keeps a compact platform and group summary with a link to this table.
 
-No lorem, no fake screenshots, no dates presented as promises, no
-"coming soon".
+The split keeps the larger table from overwhelming the landing's page budget. `/native/` has a 122 KB gzip page budget and permits at most one island; that island is the demo, loaded when visible. The compatibility route has its own budget and remains static.
 
-## Metadata contract (T-17)
+## Sources of truth
 
-- Title: `Texuli native — the same catalog, rendered by Compose`
-- Description: what the contract drives, in-development status named
-- Canonical self; OG set from SeoHead; OG art: the Native badge from `ogAreaFor` (T-21)
-- JSON-LD: **Organization only** — nothing installable exists, so a
-  SoftwareApplication node would be dishonest
+- `native/docs/parity.json` is generated from the spec catalog and native registry by `scripts/native-parity.ts`.
+- `native/conformance/expected/` contains checked-in golden and parity traces.
+- `src/data/native/compatibility.ts` derives component and platform statuses from the parity data, Gradle targets, native source files, and those traces.
+- `native/texuli-spec/build.gradle.kts` configures JVM and iOS targets. `native/texuli-compose/build.gradle.kts` configures the JVM target used by Compose Desktop.
+- `native/README.md` and `native/docs/ADOPTION.md` describe the native modules and adoption limits in detail.
 
-## Gates
+The full table and evidence paths are also recorded in `native/docs/PARITY.md`. To refresh and check its generated source, run `pnpm exec tsx scripts/native-parity.ts --check` from the repository root.
 
-- `pnpm build` (website)
-- Content: `apps/website/tests/section-contracts.test.ts` (the hero, status
-  ledger, runtime story and evidence content modules: claims anchored in
-  their files, links that are real routes, honesty); the status separator in
-  `apps/website/tests/docs-reading.test.ts`. The page has no spec of its own
-  since the 2026-10-27 trim; its head is in the SEO audit and its links in
-  the link audit (`tests/e2e/site-seo.spec.ts`), and it fits 360 and 768 px,
-  right to left too (`tests/e2e/site-responsive.spec.ts`)
-- IA reachability: `tests/e2e/site-ia.spec.ts` (landing-shell route #2;
-  one interaction from the home header)
-- a11y: covered by the sitewide sweep (`tests/e2e/a11y-site-<n>.spec.ts`,
-  every built page)
-- Per-route a11y/site-perf budget registration for `/native/`:
-  **planned** — the budgets file is owner-held, so the entry is proposed
-  at the wave close (T-93/T-98), never edited by a lane
+## Supporting documentation content
+
+The verified native documentation source files are in `src/content/native-docs/`: `getting-started.md`, `architecture.md`, `compatibility.md`, and `testing.md`. They cover the local checkout workflow, module and target boundaries, the generated support matrix, and the checks available today. They do not imply that unpublished native modules can be consumed from an external project.
+
+## Validation
+
+- `pnpm build` runs the website type check and static build.
+- `pnpm --filter @texuli/website typecheck` runs Astro diagnostics.
+- `pnpm vitest run apps/website/tests/solutions/native-page.test.ts apps/website/tests/solutions/native-matrix.test.ts` checks the landing assembly, island limit, generated counts, matrix rows, and evidence links.
+- `pnpm exec tsx scripts/native-parity.ts --check` verifies the generated parity document.
+- `./native/gradlew -p native check` runs the native build and its configured tests when JDK 21 and the required Kotlin/Native toolchain are available.
