@@ -1,0 +1,26 @@
+{
+  "description": "An allow tone the catalog component does not list.",
+  "expect": [["unknown-tone", "$.allow.badge.tones[0]"]],
+  "catalog": {
+    "components": [
+      {
+        "id": "badge",
+        "axes": {
+          "tone": { "values": ["success", "warning"] }
+        }
+      }
+    ]
+  },
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "allow": {
+      "badge": {
+        "tones": ["rainbow"]
+      }
+    }
+  }
+}

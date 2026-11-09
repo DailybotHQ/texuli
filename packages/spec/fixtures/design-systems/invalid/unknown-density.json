@@ -1,0 +1,26 @@
+{
+  "description": "An allow density the catalog component does not list.",
+  "expect": [["unknown-density", "$.allow[\"data-grid\"].densities[0]"]],
+  "catalog": {
+    "components": [
+      {
+        "id": "data-grid",
+        "axes": {
+          "density": { "values": ["comfortable"] }
+        }
+      }
+    ]
+  },
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "allow": {
+      "data-grid": {
+        "densities": ["ultra"]
+      }
+    }
+  }
+}

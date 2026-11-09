@@ -1,0 +1,26 @@
+{
+  "description": "An allow variant the catalog component does not list.",
+  "expect": [["unknown-variant", "$.allow.button.variants[0]"]],
+  "catalog": {
+    "components": [
+      {
+        "id": "button",
+        "axes": {
+          "variant": { "values": ["default", "outline"] }
+        }
+      }
+    ]
+  },
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "allow": {
+      "button": {
+        "variants": ["ghost"]
+      }
+    }
+  }
+}

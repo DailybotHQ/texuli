@@ -1,0 +1,24 @@
+{
+  "description": "An allow id that is not in the catalog (checkDesignSystemAllow).",
+  "expect": [["unknown-component", "$.allow[\"ghost-widget\"]"]],
+  "catalog": {
+    "components": [
+      {
+        "id": "button",
+        "axes": {
+          "variant": { "values": ["default", "outline"] }
+        }
+      }
+    ]
+  },
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "allow": {
+      "ghost-widget": {}
+    }
+  }
+}
