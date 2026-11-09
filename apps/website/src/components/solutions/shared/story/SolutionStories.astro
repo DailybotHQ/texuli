@@ -4,14 +4,18 @@
  * then one band per story with copy beside art. Bands alternate the art between the inline
  * end and start; on narrow screens the copy leads and the art follows. Each story has an h3,
  * a short body, an optional status badge (see `storyStatus`) and capability chips resolved
- * from the registry entry. The art is the story's registered illustration slot, or a
- * decorative texel mosaic until the artwork is registered.
+ * from the registry entry, after the home's growing texel mark. The art is the story's slot
+ * (by default the reserved `solution-<slug>-story-<n>`, see `../art/art-slots.ts`) when the
+ * illustrations manifest registers it, or a decorative texel mosaic until then; registered
+ * art loads lazily (only the home hero is a priority slot).
  *
  * Static markup: no script, no island, no HTML sink, and no style attribute. The section
  * keeps a transparent background so `SolutionLayout`'s band tone shows through.
  */
 import { illustrationFor } from '../../../landing/illustrations.ts';
 import SiteIllustration from '../../../landing/SiteIllustration.astro';
+import TexelMark from '../../../sections/home/TexelMark.astro';
+import { storyArtSlot } from '../art/art-slots.ts';
 import type { SolutionStoriesProps } from '../types.ts';
 import {
   chipStatus,
@@ -37,7 +41,11 @@ const bands = stories.map((story, index) => {
     capabilities,
     status,
     shown: status ?? entry.status,
-    art: storyArt(story, (slot) => illustrationFor(slot) !== undefined),
+    mark: Math.min(index + 1, 5),
+    art: storyArt(
+      { art: storyArtSlot(entry.slug, story, index) },
+      (slot) => illustrationFor(slot) !== undefined
+    ),
     tones: mosaicTones(`${entry.slug}:${story.id}`),
   };
 });
@@ -56,12 +64,15 @@ const bands = stories.map((story, index) => {
             data-art-side={band.side}
           >
             <div class="solution-story__copy">
-              {band.status && (
-                <p class="solution-story__status" data-status={band.status}>
-                  <span class="solution-story__status-dot" aria-hidden="true" />
-                  {band.status}
-                </p>
-              )}
+              <div class="solution-story__kicker">
+                <TexelMark count={band.mark} />
+                {band.status && (
+                  <p class="solution-story__status" data-status={band.status}>
+                    <span class="solution-story__status-dot" aria-hidden="true" />
+                    {band.status}
+                  </p>
+                )}
+              </div>
               <h3 id={band.id}>{band.story.title}</h3>
               <p class="solution-story__body">{band.story.body}</p>
               {band.capabilities.length > 0 && (
@@ -78,7 +89,7 @@ const bands = stories.map((story, index) => {
                 </ul>
               )}
             </div>
-            <div class="solution-story__art">
+            <div class="solution-story__art" data-art-slot={band.art?.slot ?? 'mosaic'}>
               {band.art ? (
                 <SiteIllustration art={band.art.slot} />
               ) : (
@@ -141,10 +152,17 @@ const bands = stories.map((story, index) => {
     justify-items: start;
     max-inline-size: 34rem;
   }
+  .solution-story__kicker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    min-block-size: 1.5rem;
+  }
   .solution-story h3 {
     margin: 0;
     color: var(--tx-foreground);
-    font-size: clamp(1.4rem, 3.4vw, 2rem);
+    font-size: clamp(1.5rem, 3.8vw, 2.35rem);
     font-weight: 750;
     line-height: 1.15;
     letter-spacing: -0.02em;
@@ -205,8 +223,24 @@ const bands = stories.map((story, index) => {
     color: var(--tx-muted-foreground);
     font-weight: 500;
   }
+  /* The art sits on a soft accent glow, like the home plates; decorative only. */
   .solution-story__art {
+    position: relative;
+    isolation: isolate;
     min-inline-size: 0;
+  }
+  .solution-story__art::before {
+    content: '';
+    position: absolute;
+    inset: -8% 0;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--story-accent) 16%, transparent),
+      transparent
+    );
+    pointer-events: none;
   }
   .solution-story__mosaic {
     display: grid;
@@ -239,7 +273,8 @@ const bands = stories.map((story, index) => {
     .solution-story__status {
       border-color: CanvasText;
     }
-    .solution-story__mosaic {
+    .solution-story__mosaic,
+    .solution-story__art::before {
       display: none;
     }
   }

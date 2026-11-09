@@ -9,8 +9,9 @@
  *
  * Each block arrives through the named slot of its section, so the blocks keep their own
  * headings and props while the layout owns the anchor ids, the subnav, the breadcrumb
- * trail and the band rhythm. `checkLandingContent` runs at build time: inconsistent content
- * fails the build instead of shipping.
+ * trail and the band rhythm: the home's tokens, alternating tints, hairlines, a closing
+ * ground band and the CSS-only scroll reveal. `checkLandingContent` runs at build time:
+ * inconsistent content fails the build instead of shipping.
  *
  * Islands and CSP (ADR-030): the layout ships no script. The `demo` slot is the landing's
  * only island slot: the page passes its demo frame, which mounts one `client:visible`
@@ -111,26 +112,88 @@ const ids = SOLUTION_SECTION_IDS;
 </BaseLayout>
 
 <style>
+  /*
+   * The home's landing tokens (components/sections/home/home.css), so every shared block
+   * reads the same accent, ground and tint as the home bands: violet accent, lilac text
+   * accent in the dark theme, the lavender-to-peach ground, and site tokens in high contrast.
+   */
   .solution {
     --solution-subnav-height: 3rem;
-    --solution-band-raised: color-mix(in oklab, var(--tx-muted) 45%, var(--tx-background));
+    --home-accent: #6d4aff;
+    --home-accent-text: #5b3ae6;
+    --home-accent-ink: #ffffff;
+    --home-warm: #ff8a4c;
+    --home-ground: linear-gradient(160deg, #f4f0ff 0%, #fbf8ff 45%, #fff4ee 100%);
+    --home-tint: color-mix(in oklab, #6d4aff 6%, var(--tx-background));
+    --solution-band-raised: var(--home-tint);
   }
+  :global(:root[data-tx-mode='dark']) .solution {
+    --home-accent-text: #b9a8ff;
+    --home-ground:
+      radial-gradient(120% 90% at 85% 0%, rgb(109 74 255 / 0.22), transparent 60%),
+      var(--tx-background);
+    --home-tint: color-mix(in oklab, #6d4aff 10%, var(--tx-background));
+  }
+  :global(:root[data-tx-mode='high-contrast']) .solution {
+    --home-accent: var(--tx-foreground);
+    --home-accent-text: var(--tx-foreground);
+    --home-accent-ink: var(--tx-background);
+    --home-ground: var(--tx-background);
+    --home-tint: var(--tx-background);
+  }
+  /* Full-width bands with the home's block rhythm; a hairline separates each band. */
   .solution-section {
     /* Anchors land below the sticky header and the sticky subnav. */
     scroll-margin-block-start: calc(var(--site-header-height) + var(--solution-subnav-height) + 0.75rem);
-    padding-block: clamp(2.5rem, 7vw, 5rem);
+    padding-block: clamp(3rem, 8vw, 6rem);
+    border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 60%, transparent);
   }
   .solution-section--hero {
-    padding-block: clamp(1rem, 3vw, 2rem) clamp(2rem, 5vw, 3.5rem);
+    padding-block: 0;
+    border-block-end: 0;
   }
   .solution-section[data-tone='raised'] {
     background: var(--solution-band-raised);
-    border-block: 1px solid color-mix(in oklab, var(--tx-border) 55%, transparent);
+  }
+  /* The closing band takes the hero's ground, like the home's two-path close. */
+  .solution-section[data-solution-section='next'] {
+    background: var(--home-ground);
+    border-block-end: 0;
+  }
+  /*
+   * Scroll reveal, as on the home: each band after the hero rises 1.5rem as it enters the
+   * viewport. CSS only (no island), opt-in motion behind prefers-reduced-motion and a
+   * scroll-timeline support check, and translate only (no opacity), so nothing is ever
+   * hidden or low-contrast. The demo island is left still: a transform would become the
+   * containing block of anything it positions as fixed.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .solution-section:not(.solution-section--hero):not([data-solution-island]) {
+        /* Longhands on purpose (see pages/index.astro): the minifier would fold a full
+           shorthand plus animation-timeline into one shorthand Chromium rejects. */
+        animation-name: solution-rise;
+        animation-timing-function: var(--site-motion-linked-easing);
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 60%;
+      }
+    }
+  }
+  @keyframes solution-rise {
+    from {
+      translate: 0 1.5rem;
+    }
+    to {
+      translate: 0 0;
+    }
   }
   @media (forced-colors: active) {
-    .solution-section[data-tone='raised'] {
+    .solution-section,
+    .solution-section[data-tone='raised'],
+    .solution-section[data-solution-section='next'] {
       background: Canvas;
-      border-block-color: CanvasText;
+      border-block-end-color: CanvasText;
     }
   }
 </style>

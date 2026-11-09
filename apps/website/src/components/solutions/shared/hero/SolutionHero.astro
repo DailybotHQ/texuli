@@ -6,8 +6,13 @@
  * (developer tier: app-authored routes). The art goes through SiteIllustration, which
  * paints the texel mosaic while the file is missing; a slot not yet registered in
  * `illustrations.json` paints the same motif from HeroTexels.
+ *
+ * Composition at the home hero's level: the landing ground, an eyebrow pill with the texel
+ * mark, large display type, a status pill, and the art on a glowing plate with a few loose
+ * decorative texels (aria-hidden, CSS only, no motion).
  */
 import SiteIllustration from '../../../landing/SiteIllustration.astro';
+import TexelMark from '../../../sections/home/TexelMark.astro';
 import type { SolutionHeroProps } from '../types.ts';
 import HeroTexels from './HeroTexels.astro';
 import { solutionHeroView } from './hero-model.ts';
@@ -24,7 +29,10 @@ const view = solutionHeroView(Astro.props, import.meta.env.BASE_URL);
 >
   <div class="solution-hero__inner">
     <div class="solution-hero__copy">
-      <p class="solution-hero__eyebrow" data-tx-solution-eyebrow="">{view.eyebrow}</p>
+      <p class="solution-hero__eyebrow" data-tx-solution-eyebrow="">
+        <TexelMark count={3} />
+        <span>{view.eyebrow}</span>
+      </p>
       <h1 id={view.headingId}>{view.title}</h1>
       <p class="solution-hero__lede">{view.lede}</p>
       <p class="solution-hero__status" data-tx-solution-status={view.status}>
@@ -46,13 +54,18 @@ const view = solutionHeroView(Astro.props, import.meta.env.BASE_URL);
       </div>
     </div>
     <div class="solution-hero__art">
-      {
-        view.artRegistered ? (
-          <SiteIllustration art={view.art.slot} />
-        ) : (
-          <HeroTexels art={view.art.slot} alt={view.artAlt} />
-        )
-      }
+      <div class="solution-hero__plate">
+        {
+          view.artRegistered ? (
+            <SiteIllustration art={view.art.slot} />
+          ) : (
+            <HeroTexels art={view.art.slot} alt={view.artAlt} />
+          )
+        }
+      </div>
+      <span class="solution-hero__loose solution-hero__loose--a" aria-hidden="true"></span>
+      <span class="solution-hero__loose solution-hero__loose--b" aria-hidden="true"></span>
+      <span class="solution-hero__loose solution-hero__loose--c" aria-hidden="true"></span>
     </div>
   </div>
 </section>
@@ -81,14 +94,14 @@ const view = solutionHeroView(Astro.props, import.meta.env.BASE_URL);
     gap: clamp(1.5rem, 4vw, 3rem);
     max-inline-size: 76rem;
     margin-inline: auto;
-    padding-block: clamp(2rem, 6vw, 4.5rem);
+    padding-block: clamp(2.5rem, 7vw, 5rem);
     padding-inline: clamp(1rem, 4vw, 1.5rem);
   }
   @media (min-width: 60rem) {
     .solution-hero__inner {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
       align-items: center;
-      min-block-size: min(40rem, calc(100svh - 4rem));
+      min-block-size: min(44rem, calc(100svh - 7rem));
     }
   }
   .solution-hero__copy {
@@ -99,6 +112,9 @@ const view = solutionHeroView(Astro.props, import.meta.env.BASE_URL);
     min-inline-size: 0;
   }
   .solution-hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
     margin: 0;
     padding-block: 0.3rem;
     padding-inline: 0.85rem;
@@ -113,24 +129,30 @@ const view = solutionHeroView(Astro.props, import.meta.env.BASE_URL);
   .solution-hero h1 {
     margin: 0;
     color: var(--tx-foreground);
-    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    font-size: clamp(2.75rem, 9vw, 5.25rem);
     font-weight: 800;
-    line-height: 1.02;
-    letter-spacing: -0.035em;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
     text-wrap: balance;
     overflow-wrap: anywhere;
   }
   .solution-hero__lede {
     margin: 0;
     color: var(--tx-muted-foreground);
-    font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+    font-size: clamp(1.1rem, 2.5vw, 1.3rem);
     line-height: 1.5;
+    max-inline-size: 34rem;
   }
   .solution-hero__status {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
     margin: 0;
+    padding-block: 0.25rem;
+    padding-inline: 0.75rem;
+    border: 1px solid color-mix(in oklab, var(--sh-accent) 30%, var(--tx-border));
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--tx-background) 80%, transparent);
     color: var(--tx-foreground);
     font-size: 0.9rem;
     font-weight: 600;
@@ -182,8 +204,57 @@ const view = solutionHeroView(Astro.props, import.meta.env.BASE_URL);
     outline: 2px solid var(--tx-ring);
     outline-offset: 3px;
   }
+  /* The plate: the art on a soft accent glow, with three loose texels around it. */
   .solution-hero__art {
+    position: relative;
+    isolation: isolate;
     min-inline-size: 0;
+    padding-block: clamp(0.75rem, 3vw, 1.5rem);
+  }
+  .solution-hero__art::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--sh-accent) 22%, transparent),
+      transparent
+    );
+    pointer-events: none;
+  }
+  .solution-hero__plate {
+    position: relative;
+    min-inline-size: 0;
+  }
+  .solution-hero__loose {
+    position: absolute;
+    z-index: 1;
+    inline-size: clamp(0.9rem, 2.2vw, 1.4rem);
+    aspect-ratio: 1;
+    border-radius: 22%;
+    background: var(--sh-accent);
+    box-shadow: 0 0.4rem 1rem -0.5rem var(--sh-accent);
+    pointer-events: none;
+  }
+  .solution-hero__loose--a {
+    inset-block-start: 0;
+    inset-inline-start: 6%;
+  }
+  .solution-hero__loose--b {
+    inset-block-end: 4%;
+    inset-inline-end: 3%;
+    inline-size: clamp(0.7rem, 1.6vw, 1rem);
+    background: var(--home-warm, oklch(0.76 0.15 50));
+    box-shadow: none;
+  }
+  .solution-hero__loose--c {
+    inset-block-start: 14%;
+    inset-inline-end: 0;
+    inline-size: clamp(0.55rem, 1.2vw, 0.8rem);
+    background: color-mix(in oklab, var(--sh-accent) 45%, var(--tx-background));
+    box-shadow: none;
   }
   @media (max-width: 30rem) {
     .solution-hero__cta {
@@ -193,6 +264,10 @@ const view = solutionHeroView(Astro.props, import.meta.env.BASE_URL);
   @media (forced-colors: active) {
     .solution-hero__cta {
       border-color: LinkText;
+    }
+    .solution-hero__art::before,
+    .solution-hero__loose {
+      display: none;
     }
   }
 </style>
