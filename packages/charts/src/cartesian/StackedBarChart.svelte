@@ -25,7 +25,7 @@ let {
 }: CartesianChartProps = $props();
 </script>
 
-<div data-tx-component="charts-stacked-bar" style="display: contents">
+<div data-tx-component="charts-stacked-bar" class="tx-chart-ds-root">
 <CartesianChart
   kind="stacked-bar"
   {title}
@@ -49,3 +49,10 @@ let {
   {formatValue}
 />
 </div>
+
+<style>
+  /* The design-system root marker (ADR-032) adds no box. */
+  .tx-chart-ds-root {
+    display: contents;
+  }
+</style>
