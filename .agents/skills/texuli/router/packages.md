@@ -3,7 +3,7 @@
 Every workspace package, its layer and its public entries. Layers point down
 only: a package imports only from lower layers (the repository's
 `scripts/check-layers.ts` enforces it). **All 26 published packages are on
-npm in the 0.14 line (see docs/RELEASE.md)** (published by CI through npm trusted publishing with provenance; `latest`
+npm in the 0.15 line (see docs/RELEASE.md)** (published by CI through npm trusted publishing with provenance; `latest`
 points to the newest, and `next` is no longer maintained; pre-1.0, not stable; the workspace packages stay
 `private: true`), so install them plainly (`pnpm add texuli`), import them in
 a Texuli workspace, or copy components with the CLI
@@ -77,7 +77,7 @@ the 0.8 MCP tool aliases and the tree block's `style`
 **New in `0.11.0`.** The entries marked "new in `0.11.0`" below
 (`@texuli/tokens/library-ids`, `@texuli/tokens/design-system/compile-core`,
 `@texuli/player/design-system-core`) and `loadDesignSystemCompilerCore()`
-in `texuli/design-system` are not in the 0.10 line; install `^0.14.0` to
+in `texuli/design-system` are not in the 0.10 line; install `^0.15.0` to
 use them. `0.11.0` also drops the default theme library loaders from the
 slides and pages core entries ([`../upgrade/SKILL.md`](../upgrade/SKILL.md)).
 
