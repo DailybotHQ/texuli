@@ -1,12 +1,12 @@
-# Heading, Text, Prose and Box
+# Heading, Text, Prose, Box and Mark
 
 **Package:** `texuli` · **Import:** `texuli/typography` or `texuli` · **Status:** built for
 blueprint spec `0.13.0`, not published (planned for `0.15.0`)
 
 Typography and surfaces from the design system, driven by `--tx-*` tokens only. A locked
 prototype ([DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md#locked-design-systems)) refuses
-typography and visual utilities, so these four catalog components are how it keeps titles,
-section headings, muted and small text, long-form text and bordered panels.
+typography and visual utilities, so these catalog components are how it keeps titles,
+section headings, muted and small text, long-form text, bordered panels and search highlights.
 
 | Component | Catalog id | Role | Axes (catalog) |
 | --- | --- | --- | --- |
@@ -14,6 +14,7 @@ section headings, muted and small text, long-form text and bordered panels.
 | `Text` | `text` | Body copy, labels, captions, small print, eyebrows and large figures; never a heading | `size`, `tone` |
 | `Prose` | `prose` | Long-form markup with the design system's reading rhythm | `size` |
 | `Box` | `box` | A panel or region: padding, radius, border, elevation and surface | `variant` (the `surface` prop) |
+| `Mark` | `mark` | An inline search highlight from a role's soft tokens | `tone` |
 
 None of them has an observable state (no hover, focus or disabled styling), so the catalog
 lists no `states` for them. Each root carries `data-tx-component` and its axis attributes
@@ -58,7 +59,7 @@ Heading and Text also take `label`: plain text rendered as escaped text that rep
 | Prop | Values | Default |
 | --- | --- | --- |
 | `level` | `1`–`6`: the element (`<h1>`…`<h6>`) | `2` |
-| `size` | `display` (the display role), `4xl`, `3xl`, `2xl` (hero and section titles), `xl` (title role), `lg` (heading role), `md`, `sm` | from the level: 1 `xl`, 2 `lg`, 3 `md`, 4–6 `sm` |
+| `size` | `display` (the display role), `4xl`, `3xl`, `2xl` (hero and section titles), `xl` (title role), `lg` (heading role), `md`, `sm`, `xs` (`--tx-font-size-sm`, 0.875rem: a small card title) | from the level: 1 `xl`, 2 `lg`, 3 `md`, 4–6 `sm` |
 | `responsive` | scale the size down on narrow screens | `false` |
 | `tracking` | `default` (the role's), `tight` (`--tx-letter-spacing-tight`, -0.02em when the design system does not set it) | `default` |
 | `tone` | `default`, `muted` | `default` |
@@ -92,6 +93,8 @@ smaller step.
 | `mono` | the code family | `false` |
 | `align` | `start`, `center`, `end` (logical) | `start` |
 | `truncate` | one line with an ellipsis | `false` |
+| `italic` | italic | `false` |
+| `strikethrough` | `text-decoration-line: line-through` | `false` |
 | `lineClamp` | 1–10 lines with an ellipsis (other values are ignored) | — |
 | `for` | with `as="label"`: the labelled control's id | — |
 
@@ -123,14 +126,17 @@ styles. The content is the host's markup (children); Prose never renders HTML fr
 | `as` | `div`, `section`, `article`, `aside`, `header`, `footer` | `div` |
 | `padding` | `none`, `sm`, `md`, `lg`, `xl` (space scale) | `md` |
 | `radius` | `none`, `sm`, `md`, `lg`, `xl`, `full` (shape radius) | `md` |
-| `border` | `none`, `default`, `strong`, or one logical side: `block-start`, `block-end` | `none` |
+| `border` | `none`, `default`, `strong`, or one logical side: `block-start`, `block-end`, `inline-start`, `inline-end` | `none` |
 | `elevation` | `none`, `sm`, `md`, `lg` (elevation levels 1, 2, 4) | `none` |
-| `surface` | `transparent`, `default`, `muted`, `subtle`, `elevated`, `primary`, `brand`, `translucent` | `transparent` |
+| `surface` | `transparent`, `default`, `muted`, `subtle`, `elevated`, `canvas` (page background, `--tx-background`), `primary`, `brand`, `translucent` | `transparent` |
 
 An app header or footer without card chrome is `radius="none"` with one border side
-(`border="block-end"`). Box is not interactive; use Card with `href` for a clickable surface.
-In forced colors a filled Box without a border keeps a 1px outline.
+(`border="block-end"`). A rail uses `border="inline-start"` or `inline-end`. Box is not
+interactive; use Card with `href` for a clickable surface. In forced colors a filled Box
+without a border keeps a 1px outline.
 
+- `canvas` is the page background (`--tx-background` with `--tx-foreground`): the area
+  behind cards, not the card surface.
 - `primary` is the solid primary fill with its on-color (`--tx-primary`,
   `--tx-primary-foreground`): a logo tile or a brand mark.
 - `brand` is the soft primary tint with its ink (`--tx-primary-soft`,
@@ -143,7 +149,27 @@ In forced colors a filled Box without a border keeps a 1px outline.
 ```svelte
 <Box as="header" padding="md" radius="none" border="block-end" surface="translucent">…</Box>
 <Box padding="md" radius="lg" surface="primary">…</Box>
+<Box padding="lg" radius="none" surface="canvas">…</Box>
 ```
+
+## Mark
+
+| Prop | Values | Default |
+| --- | --- | --- |
+| `tone` | `warning` (search hit), `primary`, `success`, `info` | `warning` |
+| `label` | plain text, escaped | — |
+
+Renders a real `<mark>`. Each tone reads that role's soft fill and ink
+(`--tx-warning-soft` / `--tx-warning-soft-foreground`, and the same for primary, success
+and info). Forced colors use `Highlight` / `HighlightText`. Struck text stays on Text
+(`strikethrough`); a status chip stays on Badge.
+
+```svelte
+<Text as="span">Results for <Mark label="quarter" /> reports</Text>
+```
+
+A compact bar in a card is `charts-sparkline` with `variant="bar"` (`@texuli/charts`), not
+a new catalog id.
 
 ## Tokens
 
@@ -165,8 +191,10 @@ tokens of its own.
 
 `packages/texuli/tests/typography.test.ts` (elements, classes and attributes, hostile values,
 eyebrow and figure, line clamp, labels, Box border sides, token reads, catalog axes against the
-component constants, root attributes and the allow set) and
+component constants, root attributes and the allow set),
 `packages/texuli/tests/typography-2.test.ts` (the `primary`, `brand` and `translucent`
 surfaces, the `2xl`–`4xl` sizes, `responsive`, `tight` tracking, Text `inherit`, the catalog
-and the allow set). The `texuli-typography` example has
-visual baselines in light and dark, desktop and mobile.
+and the allow set) and `packages/texuli/tests/protoyard-round3.test.ts` (Box `canvas` and
+inline borders, Heading `xs`, Text italic and strikethrough, Mark tones, density-independent
+layout widths). The `texuli-typography` example has visual baselines in light and dark,
+desktop and mobile.

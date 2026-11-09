@@ -22,6 +22,8 @@ import {
   kbdPropNames,
   kpiPropNames,
   listItemPropNames,
+  listPropNames,
+  markPropNames,
   progressPropNames,
   prosePropNames,
   separatorPropNames,
@@ -86,7 +88,7 @@ const badgeVariants = [
 
 const alertTones = ['info', 'success', 'warning', 'error', 'brand', 'neutral'] as const;
 
-const headingSizes = ['display', '4xl', '3xl', '2xl', 'xl', 'lg', 'md', 'sm'] as const;
+const headingSizes = ['display', '4xl', '3xl', '2xl', 'xl', 'lg', 'md', 'sm', 'xs'] as const;
 const tabsVariants = ['line', 'pills', 'enclosed'] as const;
 const accordionVariants = ['default', 'bordered'] as const;
 const textTones = [
@@ -129,7 +131,7 @@ export const headingManifest = /* @__PURE__ */ defineDisplayManifest({
       enumValues: headingSizes,
       default: 'lg',
       description:
-        'Visual size, independent of the level (default from the level: 1 xl, 2 lg, 3 md, 4–6 sm); 2xl, 3xl and 4xl are hero and section titles between xl and display',
+        'Visual size, independent of the level (default from the level: 1 xl, 2 lg, 3 md, 4–6 sm); xs is ~0.875rem for small card titles; 2xl–4xl sit between xl and display',
     },
     responsive: {
       kind: 'boolean',
@@ -173,6 +175,11 @@ export const headingManifest = /* @__PURE__ */ defineDisplayManifest({
         tracking: 'tight',
         label: 'Plan the quarter',
       },
+    },
+    {
+      id: 'card-title',
+      title: 'Small card title',
+      props: { level: 3, size: 'xs', label: 'Open tasks' },
     },
   ],
   related: ['text', 'prose'],
@@ -230,6 +237,8 @@ export const textManifest = /* @__PURE__ */ defineDisplayManifest({
       default: 'normal',
       description: 'Letter spacing; wide is the eyebrow tracking (--tx-letter-spacing-wide)',
     },
+    italic: { kind: 'boolean', default: false },
+    strikethrough: { kind: 'boolean', default: false, description: 'Line-through' },
     for: { kind: 'string', description: 'With as="label": the id of the labelled control' },
     label: {
       kind: 'string',
@@ -271,8 +280,13 @@ export const textManifest = /* @__PURE__ */ defineDisplayManifest({
       title: 'Nested text that inherits',
       props: { as: 'span', size: 'inherit', tone: 'inherit', weight: 'semibold', label: 'Pro' },
     },
+    {
+      id: 'struck',
+      title: 'Struck price',
+      props: { as: 'span', strikethrough: true, tone: 'muted', label: '$48' },
+    },
   ],
-  related: ['heading', 'prose', 'inline-text'],
+  related: ['heading', 'prose', 'inline-text', 'mark'],
 });
 
 /** Prose (ADR-032): long-form reading rhythm from the design system. */
@@ -321,10 +335,18 @@ export const boxManifest = /* @__PURE__ */ defineDisplayManifest({
     radius: { kind: 'enum', enumValues: ['none', 'sm', 'md', 'lg', 'xl', 'full'], default: 'md' },
     border: {
       kind: 'enum',
-      enumValues: ['none', 'default', 'strong', 'block-start', 'block-end'],
+      enumValues: [
+        'none',
+        'default',
+        'strong',
+        'block-start',
+        'block-end',
+        'inline-start',
+        'inline-end',
+      ],
       default: 'none',
       description:
-        'All sides, or one logical side (block-start, block-end) for an app header or footer',
+        'All sides, or one logical side (block-start, block-end, inline-start, inline-end)',
     },
     elevation: { kind: 'enum', enumValues: ['none', 'sm', 'md', 'lg'], default: 'none' },
     surface: {
@@ -335,6 +357,7 @@ export const boxManifest = /* @__PURE__ */ defineDisplayManifest({
         'muted',
         'subtle',
         'elevated',
+        'canvas',
         'primary',
         'brand',
         'translucent',
@@ -372,6 +395,11 @@ export const boxManifest = /* @__PURE__ */ defineDisplayManifest({
       id: 'logo-tile',
       title: 'Brand logo tile',
       props: { padding: 'md', radius: 'lg', surface: 'primary' },
+    },
+    {
+      id: 'page-canvas',
+      title: 'Page canvas',
+      props: { as: 'div', padding: 'lg', radius: 'none', surface: 'canvas' },
     },
     {
       id: 'sticky-header',
@@ -1172,6 +1200,7 @@ export const listItemManifest = /* @__PURE__ */ defineDisplayManifest({
     hrefTrust: { kind: 'enum', enumValues: ['developer', 'untrusted'], default: 'developer' },
     current: { kind: 'boolean', default: false },
     disabled: { kind: 'boolean', default: false },
+    divided: { kind: 'boolean', default: false, description: 'Hairline under this row' },
     class: { kind: 'string' },
   }),
   examples: [
@@ -1181,7 +1210,50 @@ export const listItemManifest = /* @__PURE__ */ defineDisplayManifest({
       props: { title: 'Quarterly notes', description: 'Ada Example', meta: '2h', icon: 'info' },
     },
   ],
-  related: ['icon', 'avatar'],
+  related: ['icon', 'avatar', 'list'],
+});
+
+export const listManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'list',
+  package: PKG,
+  label: 'List',
+  summary: 'A list of ListItem rows; divided draws a token hairline between them.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['A stack of settings, inbox or navigation rows'],
+  dontUseWhen: ['A data table (use table)', 'Prose lists (use prose)'],
+  a11y: 'A ul of listitems. Dividers are decorative.',
+  props: propsFrom(listPropNames, {
+    divided: { kind: 'boolean', default: false },
+    class: { kind: 'string' },
+    children: { kind: 'slot', description: 'ListItem rows' },
+  }),
+  examples: [{ id: 'inbox', title: 'Divided inbox', props: { divided: true } }],
+  related: ['list-item'],
+});
+
+export const markManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'mark',
+  package: PKG,
+  label: 'Mark',
+  summary: 'An inline highlight for search results, from role soft tokens.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['Highlight a search match inside a title or body'],
+  dontUseWhen: ['A status badge (use badge)', 'Struck text (use text strikethrough)'],
+  a11y: 'A real mark element; the words still say the match. Forced colors use Highlight.',
+  props: propsFrom(markPropNames, {
+    tone: {
+      kind: 'enum',
+      enumValues: ['warning', 'primary', 'success', 'info'],
+      default: 'warning',
+    },
+    label: { kind: 'string', description: 'Plain text, escaped' },
+    class: { kind: 'string' },
+    children: { kind: 'slot' },
+  }),
+  examples: [{ id: 'search', title: 'Search hit', props: { tone: 'warning', label: 'quarter' } }],
+  related: ['text', 'heading'],
 });
 
 export const kbdManifest = /* @__PURE__ */ defineDisplayManifest({
@@ -1404,8 +1476,10 @@ export const DISPLAY_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Obj
   iconManifest,
   inlineTextManifest,
   kbdManifest,
-  listItemManifest,
   kpiManifest,
+  listManifest,
+  listItemManifest,
+  markManifest,
   progressManifest,
   proseManifest,
   separatorManifest,
@@ -1441,7 +1515,9 @@ export const DISPLAY_PROP_NAMES = /* @__PURE__ */ Object.freeze({
   'inline-text': inlineTextPropNames,
   kbd: kbdPropNames,
   kpi: kpiPropNames,
+  list: listPropNames,
   'list-item': listItemPropNames,
+  mark: markPropNames,
   progress: progressPropNames,
   prose: prosePropNames,
   separator: separatorPropNames,

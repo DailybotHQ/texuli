@@ -1,0 +1,26 @@
+/**
+ * Layout width utilities (ADR-032): pane and column inline-size from rem and
+ * layout max-width tokens, never the spacing scale. Spacing (and Tailwind
+ * spacing that reads the space unit) multiplies density; these widths do not,
+ * so a sidebar stays 20rem when density is compact or spacious.
+ * @layer tx.components so host utilities can override.
+ */
+@layer tx.components {
+  .tx-w-content {
+    max-inline-size: var(--tx-layout-content-max);
+  }
+  .tx-w-wide {
+    max-inline-size: var(--tx-layout-wide-max);
+  }
+  .tx-w-full {
+    inline-size: var(--tx-layout-full-max);
+  }
+  .tx-w-pane {
+    inline-size: 20rem;
+    max-inline-size: 100%;
+  }
+  .tx-w-column {
+    inline-size: 16rem;
+    max-inline-size: 100%;
+  }
+}

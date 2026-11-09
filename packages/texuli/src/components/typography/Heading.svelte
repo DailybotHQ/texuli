@@ -24,7 +24,7 @@ import {
 type Props = HTMLAttributes<HTMLHeadingElement> & {
   /** The semantic level: renders `<h1>`…`<h6>`. Default 2. */
   level?: HeadingLevel;
-  /** The visual size (`display`, `4xl`, `3xl`, `2xl`, `xl`, `lg`, `md`, `sm`). Default: from the level (1 xl, 2 lg, 3 md, 4–6 sm). */
+  /** The visual size (`display`, `4xl`, `3xl`, `2xl`, `xl`, `lg`, `md`, `sm`, `xs` ~0.875rem). Default: from the level (1 xl, 2 lg, 3 md, 4–6 sm). */
   size?: HeadingSize;
   /** Scale the size down on narrow screens: fluid from two steps below up to the size. */
   responsive?: boolean;

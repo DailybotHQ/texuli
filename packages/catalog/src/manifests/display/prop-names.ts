@@ -170,6 +170,8 @@ export const textPropNames = [
   'tabular',
   'transform',
   'tracking',
+  'italic',
+  'strikethrough',
   'for',
   'label',
   'class',
@@ -269,6 +271,8 @@ export const carouselPropNames = [
 
 export const separatorPropNames = ['orientation', 'decorative', 'variant', 'class'] as const;
 
+export const listPropNames = ['divided', 'class', 'children'] as const;
+
 export const listItemPropNames = [
   'title',
   'description',
@@ -278,5 +282,8 @@ export const listItemPropNames = [
   'hrefTrust',
   'current',
   'disabled',
+  'divided',
   'class',
 ] as const;
+
+export const markPropNames = ['tone', 'label', 'class', 'children'] as const;

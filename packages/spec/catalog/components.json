@@ -1,5 +1,5 @@
 {
-  "catalogHash": "c3a5f1a2ad103d59e7dfa8f3131ebd11d8bf99be366aba18b18aa6010d023557",
+  "catalogHash": "5a33d402d47198c05d7d1c893d7151ff0f2cd9e56b54724b6ed26b3b151f1cce",
   "components": [
     {
       "axes": {
@@ -1207,6 +1207,7 @@
             "muted",
             "subtle",
             "elevated",
+            "canvas",
             "primary",
             "brand",
             "translucent"
@@ -1251,7 +1252,15 @@
           "name": "as"
         },
         {
-          "enumValues": ["none", "default", "strong", "block-start", "block-end"],
+          "enumValues": [
+            "none",
+            "default",
+            "strong",
+            "block-start",
+            "block-end",
+            "inline-start",
+            "inline-end"
+          ],
           "kind": "enum",
           "name": "border"
         },
@@ -1287,6 +1296,7 @@
             "muted",
             "subtle",
             "elevated",
+            "canvas",
             "primary",
             "brand",
             "translucent"
@@ -6841,7 +6851,7 @@
         "size": {
           "default": "lg",
           "prop": "size",
-          "values": ["display", "4xl", "3xl", "2xl", "xl", "lg", "md", "sm"]
+          "values": ["display", "4xl", "3xl", "2xl", "xl", "lg", "md", "sm", "xs"]
         },
         "tone": {
           "default": "default",
@@ -6901,7 +6911,7 @@
           "name": "responsive"
         },
         {
-          "enumValues": ["display", "4xl", "3xl", "2xl", "xl", "lg", "md", "sm"],
+          "enumValues": ["display", "4xl", "3xl", "2xl", "xl", "lg", "md", "sm", "xs"],
           "kind": "enum",
           "name": "size"
         },
@@ -8888,8 +8898,47 @@
       "capability": "unknown",
       "emit": [],
       "group": "display",
+      "id": "list",
+      "imports": [
+        {
+          "exports": ["List"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["List"],
+          "module": "texuli/list-item"
+        }
+      ],
+      "label": "List",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "divided"
+        }
+      ],
+      "summary": "A list of ListItem rows; divided draws a token hairline between them."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
       "id": "list-item",
       "imports": [
+        {
+          "exports": ["ListItem"],
+          "module": "texuli"
+        },
         {
           "exports": ["ListItem"],
           "module": "texuli/list-item"
@@ -8916,6 +8965,10 @@
           "name": "disabled"
         },
         {
+          "kind": "boolean",
+          "name": "divided"
+        },
+        {
           "kind": "string",
           "name": "href"
         },
@@ -8939,6 +8992,53 @@
       ],
       "states": ["hover", "focus-visible", "disabled", "selected"],
       "summary": "A list row with a title, optional description, icon and trailing meta."
+    },
+    {
+      "axes": {
+        "tone": {
+          "default": "warning",
+          "prop": "tone",
+          "values": ["warning", "primary", "success", "info"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "mark",
+      "imports": [
+        {
+          "exports": ["Mark", "MarkTone"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["MARK_TONES", "Mark", "MarkTone", "markClass"],
+          "module": "texuli/typography"
+        }
+      ],
+      "label": "Mark",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "enumValues": ["warning", "primary", "success", "info"],
+          "kind": "enum",
+          "name": "tone"
+        }
+      ],
+      "summary": "An inline highlight for search results, from role soft tokens."
     },
     {
       "capability": "web-only",
@@ -12115,6 +12215,10 @@
           "name": "for"
         },
         {
+          "kind": "boolean",
+          "name": "italic"
+        },
+        {
           "kind": "string",
           "name": "label"
         },
@@ -12130,6 +12234,10 @@
           "enumValues": ["figure", "lg", "md", "sm", "xs", "inherit"],
           "kind": "enum",
           "name": "size"
+        },
+        {
+          "kind": "boolean",
+          "name": "strikethrough"
         },
         {
           "kind": "boolean",

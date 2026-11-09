@@ -1001,7 +1001,21 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli/layouts/auth-settings', exports: ['WizardLayout'] },
     { module: 'texuli/stepper', exports: ['Wizard'] },
   ],
-  'list-item': [{ module: 'texuli/list-item', exports: ['ListItem'] }],
+  list: [
+    { module: 'texuli', exports: ['List'] },
+    { module: 'texuli/list-item', exports: ['List'] },
+  ],
+  'list-item': [
+    { module: 'texuli', exports: ['ListItem'] },
+    { module: 'texuli/list-item', exports: ['ListItem'] },
+  ],
+  mark: [
+    { module: 'texuli', exports: ['Mark', 'MarkTone'] },
+    {
+      module: 'texuli/typography',
+      exports: ['MARK_TONES', 'Mark', 'MarkTone', 'markClass'],
+    },
+  ],
   'media-composition-canvas': [
     { module: '@texuli/media', exports: ['CompositionCanvas'] },
     {
@@ -5562,6 +5576,7 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'LAYOUTS',
       'LAYOUT_IDS',
       'LAYOUT_REGISTRY',
+      'LAYOUT_WIDTH_UTILITIES',
       'LayoutComponent',
       'LayoutEntry',
       'LayoutId',

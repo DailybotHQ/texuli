@@ -5,6 +5,7 @@
  */
 export { default as Box } from './Box.svelte';
 export { default as Heading } from './Heading.svelte';
+export { default as Mark } from './Mark.svelte';
 export { default as Prose } from './Prose.svelte';
 export { default as Text } from './Text.svelte';
 export {
@@ -31,6 +32,9 @@ export {
   type HeadingTracking,
   headingClass,
   headingSizeOf,
+  MARK_TONES,
+  type MarkTone,
+  markClass,
   PROSE_ELEMENTS,
   PROSE_SIZES,
   type ProseElement,
