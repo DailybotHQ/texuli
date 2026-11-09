@@ -4,9 +4,9 @@
  * without `allow` compiles to the same stylesheet. Disabled variants stay
  * in the CSS and are flagged here as empty lists (allow none).
  *
- * Built from the source document (not the resolved merge): `contentHash` is
- * `designSystemContentHash` of the file as written. The catalog is never
- * imported; pass `catalogDigest` when the caller has one.
+ * Allow and library values come from the resolved document when supplied;
+ * `contentHash` and `version` still identify the source document as written.
+ * The catalog is never imported; pass `catalogDigest` when the caller has one.
  */
 import { designSystemContentHash } from '@texuli/spec/design-system';
 
@@ -45,6 +45,8 @@ export interface DesignSystemAllowManifest {
 export interface CompileAllowManifestOptions {
   /** Catalog hash from the caller; never loaded here. */
   catalogDigest?: string;
+  /** Effective document after extends, variant and patches; source metadata stays from `doc`. */
+  resolvedDocument?: unknown;
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -104,8 +106,9 @@ export function compileAllowManifest(
   options: CompileAllowManifestOptions = {}
 ): DesignSystemAllowManifest {
   const record = isRecord(doc) ? doc : {};
-  const allow = copyAllow(record.allow);
-  const library = copyLibrary(record.library);
+  const effective = isRecord(options.resolvedDocument) ? options.resolvedDocument : record;
+  const allow = copyAllow(effective.allow);
+  const library = copyLibrary(effective.library);
   const version = typeof record.version === 'string' ? record.version : '';
   const manifest: DesignSystemAllowManifest = {
     ...(allow ? { allow } : {}),

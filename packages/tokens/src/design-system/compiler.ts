@@ -1133,7 +1133,10 @@ export function compileDesignSystem(
         trust: options.trust ?? 'untrusted',
       })
     ),
-    allowManifest: compileAllowManifest(input, { catalogDigest: options.catalogDigest }),
+    allowManifest: compileAllowManifest(input, {
+      catalogDigest: options.catalogDigest,
+      resolvedDocument: doc,
+    }),
   };
 }
 

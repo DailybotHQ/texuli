@@ -79,6 +79,8 @@ const SECTIONS = [
   'voice',
   'accessibility',
   'extensions',
+  'allow',
+  'library',
   'variants',
 ] as const;
 
