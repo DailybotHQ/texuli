@@ -11,7 +11,7 @@ import { mkdir, readdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { CatalogManifest } from '../manifest/types.ts';
-import { buildCatalog, type CatalogBuild, type ManifestGroup } from './build.ts';
+import { buildCatalogWithImports, type CatalogBuild, type ManifestGroup } from './build.ts';
 
 /** The package's own manifest folders. */
 export const MANIFESTS_DIR = fileURLToPath(new URL('../manifests/', import.meta.url));
@@ -71,7 +71,7 @@ export async function writeCatalog(
   outDir: string,
   dir: string = MANIFESTS_DIR
 ): Promise<CatalogBuild & { path: string }> {
-  const build = await buildCatalog(await discoverManifestGroups(dir));
+  const build = await buildCatalogWithImports(await discoverManifestGroups(dir));
   await mkdir(outDir, { recursive: true });
   const path = join(outDir, build.fileName);
   await writeFile(path, build.json);

@@ -150,6 +150,22 @@ export async function buildCatalog(groups: readonly ManifestGroup[]): Promise<Ca
   return { catalog, json, hash, fileName: catalogFileName(hash) };
 }
 
+/** Build with package-import ownership metadata for tools and site artifacts. */
+export async function buildCatalogWithImports(
+  groups: readonly ManifestGroup[]
+): Promise<CatalogBuild> {
+  const { IMPORTS_BY_ID } = await import('../manifest/imports-map.ts');
+  const enriched = groups.map((group) => ({
+    ...group,
+    manifests: group.manifests.map((manifest) => {
+      if (manifest.imports?.length) return manifest;
+      const imports = IMPORTS_BY_ID[manifest.id];
+      return imports?.length ? { ...manifest, imports } : manifest;
+    }),
+  }));
+  return buildCatalog(enriched);
+}
+
 /**
  * Checks a stored catalog against its name: the content's SHA-256 must be
  * the hash in `catalog-<hash>.json`. Returns the parsed catalog, or `null`

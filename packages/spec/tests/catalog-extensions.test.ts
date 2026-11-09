@@ -21,7 +21,6 @@ import {
 import { checkConformance } from '../src/conformance.ts';
 import { checkDesignSystemAllow, validateDesignSystem } from '../src/design-system/index.ts';
 import { type Schema, validateInstance } from '../src/dialect.ts';
-import * as root from '../src/index.ts';
 import { committedOutputs, json, normative } from './helpers.ts';
 
 const texuli = json<SpecCatalog>('catalog/components.json');
@@ -105,7 +104,6 @@ describe('mergeCatalogs', () => {
     expect(mergeCatalogs(texuli, [acme()]).catalog.catalogHash).toBe(merged.catalog.catalogHash);
     // Nothing to merge: the Texuli catalog, unchanged.
     expect(mergeCatalogs(texuli, []).catalog).toEqual(texuli);
-    expect(root.mergeCatalogs).toBe(mergeCatalogs);
   });
 
   it('refuses collisions, unknown composes and bad namespaces with stable codes', () => {

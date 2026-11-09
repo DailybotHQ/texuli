@@ -18,7 +18,7 @@
  * no browser, no file system, no network.
  */
 import type { SpecCatalog } from '@texuli/spec';
-import { mergeCatalogs } from '@texuli/spec';
+import { mergeCatalogs } from '@texuli/spec/catalog-extensions';
 import { compileDesignSystem } from '@texuli/tokens/design-system/compile-core';
 import { contrastRatio } from '@texuli/tokens/palette';
 import { checkLockedCssSource, LOCKED_CSS_CODES } from './css-policy.ts';

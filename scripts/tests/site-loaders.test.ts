@@ -154,7 +154,7 @@ import {
   type ThemeCatalogEntry,
   themeCssVariableNames,
 } from '../../apps/website/src/components/theme-switcher/library.ts';
-import { buildCatalog } from '../../packages/catalog/src/build/build.ts';
+import { buildCatalogWithImports } from '../../packages/catalog/src/build/build.ts';
 import { discoverManifestGroups } from '../../packages/catalog/src/build/node.ts';
 import { validateAnimation } from '../../packages/media/src/animation/index.ts';
 import { validateComposition } from '../../packages/media/src/composition-model/index.ts';
@@ -1355,7 +1355,7 @@ describe('agents page snapshots', () => {
   const PUBLIC = join(import.meta.dirname, '../../apps/website/public');
 
   describe('agents page snapshots', async () => {
-    const build = await buildCatalog(await discoverManifestGroups());
+    const build = await buildCatalogWithImports(await discoverManifestGroups());
 
     it('public/catalog/catalog.json is the current catalog, and its README names its hash; public/llms is the current llms bundle', () => {
       // public/catalog/catalog.json is the current catalog, and its README names its hash
