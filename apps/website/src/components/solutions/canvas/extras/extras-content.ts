@@ -60,7 +60,7 @@ export const CANVAS_PLATFORMS: Omit<SolutionPlatformsProps, 'entry'> = {
 
 export const CANVAS_NEXT: Omit<SolutionNextStepsProps, 'entry'> = {
   links: [
-    { label: 'Read the docs', href: '/guides/solutions/canvas/' },
+    { label: 'Build with the Canvas API', href: '/guides/solutions/canvas/' },
     { label: '@texuli/canvas on npm', href: 'https://www.npmjs.com/package/@texuli/canvas' },
   ],
 };

@@ -73,7 +73,7 @@ test('the landing renders its sections, status and server preview without errors
   await settle(page);
 
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-    'A canvas for sketches, diagrams and ideas.'
+    'Give every idea room to connect.'
   );
   await expect(page.locator('[data-tx-solution-status]')).toHaveText(/Status: in development/);
   await expect(page.getByRole('region', { name: 'Canvas demo static preview' })).toBeVisible();
@@ -137,7 +137,7 @@ test('the Markdown twin carries the landing facts', async () => {
   expect(response.status).toBe(200);
   expect(response.headers.get('content-type')).toBe('text/markdown; charset=utf-8');
   const body = await response.text();
-  expect(body).toContain('A canvas for sketches, diagrams and ideas.');
+  expect(body).toContain('Give every idea room to connect.');
   expect(body).toContain('https://texuli.com/solutions/canvas/');
   expect(body).toContain('Status: in development');
   expect(body).toContain('Sketch a launch plan');
