@@ -22,7 +22,7 @@ type Props = HTMLAttributes<HTMLSpanElement> & {
 };
 
 let {
-  color,
+  color = 'primary',
   size: sizeProp = 'md',
   label,
   class: className,
