@@ -5,6 +5,7 @@
  * Content composition layouts (`card`, `page`, `doc`, `deck`, `grid`) are
  * agent-emittable (Tier U). App shells and chrome layouts are never emittable.
  */
+export { LAYOUTS_AXIS_STAMP, stampLayoutsAxes } from './axes.ts';
 export {
   analyticsGridManifest,
   cardLayoutManifest,
