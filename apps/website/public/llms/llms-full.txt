@@ -1,6 +1,6 @@
 # Texuli — full agent docs
 
-> Complete catalog documentation generated from manifests (194 components).
+> Complete catalog documentation generated from manifests (199 components).
 
 ## Blueprint envelope
 
@@ -425,6 +425,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `sizes` | string | no | — | — | — |
 | `size` | enum(xs | sm | md | lg) | no | — | `"md"` | — |
 | `tone` | enum(primary | success | warning | destructive | info | neutral) | no | — | — | — |
+| `color` | enum(none | chart-1 | chart-2 | chart-3 | chart-4 | chart-5 | chart-6 | chart-7 | chart-8) | no | — | `"none"` | — |
 | `shape` | enum(circle | square) | no | — | — | — |
 | `status` | enum(online | away | busy | offline) | no | — | — | — |
 | `decorative` | boolean | no | — | `false` | — |
@@ -540,6 +541,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | Name | Kind | Required | Trust | Default | Description |
 | --- | --- | --- | --- | --- | --- |
 | `variant` | enum(default | secondary | outline | success | warning | destructive | info | neutral) | no | — | `"default"` | — |
+| `color` | enum(none | chart-1 | chart-2 | chart-3 | chart-4 | chart-5 | chart-6 | chart-7 | chart-8) | no | — | `"none"` | — |
 | `label` | string | no | — | — | Plain-text badge word, escaped; replaces children when both are given |
 | `class` | string | no | — | — | — |
 | `children` | slot | no | — | — | The badge word (an inline-text node in a tree) |
@@ -1244,9 +1246,9 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `as` | enum(div | section | article | aside | header | footer) | no | — | `"div"` | — |
 | `padding` | enum(none | sm | md | lg | xl) | no | — | `"md"` | — |
 | `radius` | enum(none | sm | md | lg | xl | full) | no | — | `"md"` | — |
-| `border` | enum(none | default | strong | block-start | block-end) | no | — | `"none"` | All sides, or one logical side (block-start, block-end) for an app header or footer |
+| `border` | enum(none | default | strong | block-start | block-end | inline-start | inline-end | dashed) | no | — | `"none"` | All sides, one logical side (block-start, block-end, inline-start, inline-end), or dashed |
 | `elevation` | enum(none | sm | md | lg) | no | — | `"none"` | — |
-| `surface` | enum(transparent | default | muted | subtle | elevated | primary | brand | translucent) | no | — | `"transparent"` | The fill (the variant axis): primary is the solid primary with its on-color, brand the soft primary tint, translucent the glass opacity and blur for sticky headers |
+| `surface` | enum(transparent | default | muted | subtle | elevated | canvas | primary | brand | translucent) | no | — | `"transparent"` | The fill (the variant axis): primary is the solid primary with its on-color, brand the soft primary tint, translucent the glass opacity and blur for sticky headers |
 | `class` | string | no | — | — | — |
 | `children` | slot | no | — | — | The panel content |
 
@@ -1294,6 +1296,17 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 }
 ```
 
+#### Page canvas (`page-canvas`)
+
+```json
+{
+  "as": "div",
+  "padding": "lg",
+  "radius": "none",
+  "surface": "canvas"
+}
+```
+
 #### Translucent sticky header (`sticky-header`)
 
 ```json
@@ -1303,6 +1316,16 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
   "radius": "none",
   "border": "block-end",
   "surface": "translucent"
+}
+```
+
+#### Dashed panel (`dashed`)
+
+```json
+{
+  "padding": "md",
+  "border": "dashed",
+  "surface": "default"
 }
 ```
 
@@ -3517,6 +3540,73 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 ---
 
+# Color swatch
+
+> A chip of a closed palette, role or data-viz color with contrast ink from tokens. Never free CSS.
+
+- **id:** `color-swatch`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Show a named token or series color in a legend, key or palette
+
+### Don't use when
+
+- A status label (use badge)
+- A long-form color name in a sentence (use text)
+
+### Accessibility
+
+- Pair the fill with a text label; never convey the color by fill alone.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `color` | enum(chart-1 | chart-2 | chart-3 | chart-4 | chart-5 | chart-6 | chart-7 | chart-8 | primary | secondary | success | warning | destructive | info | neutral) | no | — | `"primary"` | Closed color reference (chart-1…8 or a role token) |
+| `size` | enum(sm | md | lg) | no | — | `"md"` | — |
+| `label` | string | no | — | — | Plain-text label, escaped |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | Rich label content; replaced by a non-empty label |
+
+### Examples
+
+#### Primary swatch (`primary`)
+
+```json
+{
+  "color": "primary",
+  "label": "Primary"
+}
+```
+
+#### Chart series (`series`)
+
+```json
+{
+  "color": "chart-1",
+  "size": "md",
+  "label": "North"
+}
+```
+
+### Related
+
+- [`badge`](components/badge.md)
+- [`box`](components/box.md)
+- [`text`](components/text.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
 # Combobox
 
 > A text input that filters a list of options, for one value or several.
@@ -5014,6 +5104,84 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 ---
 
+# Virtual list view
+
+> A windowed list of any length: only the visible rows are in the page, measured as they render, and each is announced with its position.
+
+- **id:** `data-virtual-list`
+- **package:** `@texuli/data`
+- **tier:** `content`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `data`
+
+### Use when
+
+- Show a long feed, log or result list (hundreds to tens of thousands of rows)
+- Let people pick one row from a long list by keyboard
+
+### Don't use when
+
+- Rows with columns: use data-grid
+- A short list: use list
+- Rows with their own buttons or links: a listbox option holds no controls
+
+### Accessibility
+
+- A WAI-ARIA listbox with one tab stop; aria-activedescendant names the active row
+- Every row carries aria-setsize and aria-posinset, so its position in the full list is announced
+- Arrow keys, Home, End, Page Up and Page Down move; Enter, Space or a click selects
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | string | yes | untrusted | — | Accessible name of the view. |
+| `items` | array | yes | — | — | The rows; a row snippet in host code may render any item shape. |
+| `size` | enum(sm | md | lg | fill) | no | — | `"md"` | Viewport height: sm, md or lg, or fill to take the parent height. |
+| `density` | enum(compact | default | comfortable) | no | — | `"default"` | — |
+| `estimateSize` | number | no | — | `40` | Row height in px used until a row has been measured. |
+| `overscan` | number | no | — | `3` | Rows rendered before and after the viewport (at most 50). |
+| `selected` | string | no | — | — | The selected row id. |
+| `emptyLabel` | string | no | untrusted | `"No items"` | — |
+
+### Examples
+
+#### Team feed (`feed`)
+
+```json
+{
+  "label": "Team feed",
+  "items": [
+    {
+      "id": "u1",
+      "label": "Release notes drafted",
+      "description": "Docs team, example.com"
+    },
+    {
+      "id": "u2",
+      "label": "Onboarding flow reviewed"
+    },
+    {
+      "id": "u3",
+      "label": "Quarterly plan shared",
+      "description": "Planning, example.com"
+    }
+  ]
+}
+```
+
+### Related
+
+- [`data-grid`](components/data-grid.md)
+- [`data-notification-inbox`](components/data-notification-inbox.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
 # Deck slide
 
 > One slide in a deck: a title, content blocks and speaker notes.
@@ -6235,7 +6403,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | Name | Kind | Required | Trust | Default | Description |
 | --- | --- | --- | --- | --- | --- |
 | `level` | number | no | — | `2` | The semantic level, 1 to 6: renders <h1>…<h6> |
-| `size` | enum(display | 4xl | 3xl | 2xl | xl | lg | md | sm) | no | — | `"lg"` | Visual size, independent of the level (default from the level: 1 xl, 2 lg, 3 md, 4–6 sm); 2xl, 3xl and 4xl are hero and section titles between xl and display |
+| `size` | enum(display | 4xl | 3xl | 2xl | xl | lg | md | sm | xs) | no | — | `"lg"` | Visual size, independent of the level (default from the level: 1 xl, 2 lg, 3 md, 4–6 sm); xs is ~0.875rem for small card titles; 2xl–4xl sit between xl and display |
 | `responsive` | boolean | no | — | `false` | Scale the size down on narrow screens: fluid from two scale steps below up to the size |
 | `tracking` | enum(default | tight) | no | — | `"default"` | Letter spacing: the role's own, or tight (--tx-letter-spacing-tight) |
 | `tone` | enum(default | muted) | no | — | `"default"` | — |
@@ -6276,6 +6444,16 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
   "responsive": true,
   "tracking": "tight",
   "label": "Plan the quarter"
+}
+```
+
+#### Small card title (`card-title`)
+
+```json
+{
+  "level": 3,
+  "size": "xs",
+  "label": "Open tasks"
 }
 ```
 
@@ -8410,6 +8588,130 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 ---
 
+# Link
+
+> An inline sentence link. Underline and color come from link tokens; href is filtered by the URL policy.
+
+- **id:** `link`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- A word or phrase inside a sentence that navigates
+
+### Don't use when
+
+- A button-shaped control (use button with href)
+- A whole card (use card with href)
+
+### Accessibility
+
+- Renders one real link that wraps in the line
+- http(s) destinations, external, and target=_blank add rel=noopener noreferrer
+- A refused href renders as text, never a dead link
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `href` | string | yes | developer | — | Destination (URL policy) |
+| `hrefTrust` | enum(developer | untrusted) | no | — | `"developer"` | — |
+| `external` | boolean | no | — | `false` | Adds rel=noopener noreferrer (also added for http(s) and target=_blank) |
+| `target` | string | no | — | — | Link target; _blank always adds noopener noreferrer |
+| `rel` | string | no | — | — | Extra rel tokens; noopener/noreferrer are merged when needed |
+| `label` | string | no | — | — | Plain-text label, escaped |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | Rich link text; replaced by a non-empty label |
+
+### Examples
+
+#### Inline sentence link (`inline`)
+
+```json
+{
+  "href": "https://example.com/guide",
+  "label": "the harbor guide"
+}
+```
+
+#### External link (`external`)
+
+```json
+{
+  "href": "https://example.com/docs",
+  "external": true,
+  "label": "Docs"
+}
+```
+
+### Related
+
+- [`button`](components/button.md)
+- [`prose`](components/prose.md)
+- [`text`](components/text.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# List
+
+> A list of ListItem rows; divided draws a token hairline between them.
+
+- **id:** `list`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- A stack of settings, inbox or navigation rows
+
+### Don't use when
+
+- A data table (use table)
+- Prose lists (use prose)
+
+### Accessibility
+
+- A ul of listitems. Dividers are decorative.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `divided` | boolean | no | — | `false` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | ListItem rows |
+
+### Examples
+
+#### Divided inbox (`inbox`)
+
+```json
+{
+  "divided": true
+}
+```
+
+### Related
+
+- [`list-item`](components/list-item.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
 # ListItem
 
 > A list row with a title, optional description, icon and trailing meta.
@@ -8446,6 +8748,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `hrefTrust` | enum(developer | untrusted) | no | — | `"developer"` | — |
 | `current` | boolean | no | — | `false` | — |
 | `disabled` | boolean | no | — | `false` | — |
+| `divided` | boolean | no | — | `false` | Hairline under this row |
 | `class` | string | no | — | — | — |
 
 ### Examples
@@ -8465,6 +8768,62 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 - [`icon`](components/icon.md)
 - [`avatar`](components/avatar.md)
+- [`list`](components/list.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
+# Mark
+
+> An inline highlight for search results, from role soft tokens.
+
+- **id:** `mark`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:** 
+- **group:** `display`
+
+### Use when
+
+- Highlight a search match inside a title or body
+
+### Don't use when
+
+- A status badge (use badge)
+- Struck text (use text strikethrough)
+
+### Accessibility
+
+- A real mark element; the words still say the match. Forced colors use Highlight.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `tone` | enum(warning | primary | success | info) | no | — | `"warning"` | — |
+| `label` | string | no | — | — | Plain text, escaped |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | — |
+
+### Examples
+
+#### Search hit (`search`)
+
+```json
+{
+  "tone": "warning",
+  "label": "quarter"
+}
+```
+
+### Related
+
+- [`text`](components/text.md)
+- [`heading`](components/heading.md)
 
 ---
 
@@ -11290,6 +11649,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | --- | --- | --- | --- | --- | --- |
 | `label` | string | yes | — | — | Visible label |
 | `variant` | enum(default | secondary | outline | success | warning | destructive | info | neutral) | no | — | `"secondary"` | — |
+| `color` | enum(none | chart-1 | chart-2 | chart-3 | chart-4 | chart-5 | chart-6 | chart-7 | chart-8) | no | — | `"none"` | — |
 | `removeLabel` | string | no | — | `"Remove"` | — |
 | `onRemove` | event | no | — | — | Called when remove is activated |
 | `disabled` | boolean | no | — | `false` | — |
@@ -11423,6 +11783,8 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `tabular` | boolean | no | — | `false` | Tabular figures (font-variant-numeric: tabular-nums) for numbers that line up |
 | `transform` | enum(none | uppercase | lowercase | capitalize) | no | — | `"none"` | — |
 | `tracking` | enum(normal | wide) | no | — | `"normal"` | Letter spacing; wide is the eyebrow tracking (--tx-letter-spacing-wide) |
+| `italic` | boolean | no | — | `false` | — |
+| `strikethrough` | boolean | no | — | `false` | Line-through |
 | `for` | string | no | — | — | With as="label": the id of the labelled control |
 | `label` | string | no | — | — | Plain text, escaped; replaces children when both are given |
 | `class` | string | no | — | — | — |
@@ -11487,11 +11849,23 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 }
 ```
 
+#### Struck price (`struck`)
+
+```json
+{
+  "as": "span",
+  "strikethrough": true,
+  "tone": "muted",
+  "label": "$48"
+}
+```
+
 ### Related
 
 - [`heading`](components/heading.md)
 - [`prose`](components/prose.md)
 - [`inline-text`](components/inline-text.md)
+- [`mark`](components/mark.md)
 
 ---
 

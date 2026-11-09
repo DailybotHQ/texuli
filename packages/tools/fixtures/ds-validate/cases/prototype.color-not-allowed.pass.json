@@ -1,0 +1,34 @@
+{
+  "description": "A disallowed category color. (fixed)",
+  "code": "color-not-allowed",
+  "expect": "pass",
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "color": {
+      "brand": {
+        "seed": "#0e7490"
+      }
+    },
+    "allow": {
+      "badge": {
+        "variants": ["default"],
+        "colors": ["none"]
+      },
+      "card": {},
+      "data-grid": {
+        "densities": ["compact"]
+      }
+    }
+  },
+  "options": {
+    "prototype": {
+      "files": {
+        "src/Page.svelte": "<script lang=\"ts\">\n  import { Badge, Card } from 'texuli';\n</script>\n\n<Card>\n  <Badge color=\"none\">North</Badge>\n</Card>\n"
+      }
+    }
+  }
+}

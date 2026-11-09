@@ -693,7 +693,7 @@ export const MCP_SERVER_DATA = {
       name: 'ds.allow',
       title: 'List allowed components for a locked design system',
       summary:
-        'Build the allow section of a locked design system from the catalog: a preset (minimal, a documented core; all, every component) or the ids you name, each with every variant, size, tone, density and state the catalog declares. Narrow it, put it under "allow" and run ds.validate. Returns allow, count, unknown ids and the minimal preset ids.',
+        'Build the allow section of a locked design system from the catalog: a preset (minimal, a documented core; all, every component) or the ids you name, each with every variant, size, tone, density, color and state the catalog declares. Narrow it, put it under "allow" and run ds.validate. Returns allow, count, unknown ids and the minimal preset ids.',
       runtime: 'edge',
       remote: true,
       local: true,
@@ -1154,7 +1154,7 @@ export const MCP_SERVER_DATA = {
       uri: 'texuli://catalog',
       title: 'Component catalog',
       description:
-        'The content-addressed Texuli component catalog (catalog-c3a5f1a2ad10…, 194 components): every manifest with props, examples, useWhen, dontUseWhen and emit tiers. The exact bytes hash to the catalog id.',
+        'The content-addressed Texuli component catalog (catalog-0d8b2019c75e…, 199 components): every manifest with props, examples, useWhen, dontUseWhen and emit tiers. The exact bytes hash to the catalog id.',
       mimeType: 'application/json',
     },
     {

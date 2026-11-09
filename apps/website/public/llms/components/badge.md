@@ -28,6 +28,7 @@
 | Name | Kind | Required | Trust | Default | Description |
 | --- | --- | --- | --- | --- | --- |
 | `variant` | enum(default | secondary | outline | success | warning | destructive | info | neutral) | no | — | `"default"` | — |
+| `color` | enum(none | chart-1 | chart-2 | chart-3 | chart-4 | chart-5 | chart-6 | chart-7 | chart-8) | no | — | `"none"` | — |
 | `label` | string | no | — | — | Plain-text badge word, escaped; replaces children when both are given |
 | `class` | string | no | — | — | — |
 | `children` | slot | no | — | — | The badge word (an inline-text node in a tree) |
