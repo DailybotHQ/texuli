@@ -15,8 +15,8 @@ import type { DsNode } from './vocabulary.ts';
 
 /** Caps of the locked sections (counts of entries and items). */
 export const DS_LOCKED_LIMITS = Object.freeze({
-  /** Components in `allow` (the agent catalog lists 170 today). */
-  allowComponents: 256,
+  /** Components in `allow`; bounded above merged Texuli and extension catalogs. */
+  allowComponents: 4096,
   /** Values in one `allow` axis list (variants, sizes, tones or densities). */
   axisValues: 32,
   /** Entries in `library`. */

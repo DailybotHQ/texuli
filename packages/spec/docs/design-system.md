@@ -112,7 +112,7 @@ Three optional root sections, described end to end in
 
 | Section | Shape | Limits |
 | --- | --- | --- |
-| `allow` | A map of catalog id to `{ variants?, sizes?, tones?, densities?, states? }`. An omitted list allows every value the catalog lists; an empty list allows none; an id not listed is not allowed | 256 ids, 32 values per list (`DS_LOCKED_LIMITS`) |
+| `allow` | A map of catalog id to `{ variants?, sizes?, tones?, densities?, states? }`. An omitted list allows every value the catalog lists; an empty list allows none; an id not listed is not allowed | 4096 ids, 32 values per list (`DS_LOCKED_LIMITS`) |
 | `library` | `[{ id, name, purpose, version, status, composes, approval? }]`: the design system's own components; `composes` names catalog ids | 64 entries, 32 `composes` each |
 | `approval` | `{ status: "draft" \| "approved", version, approvedBy?, approvedAt?, contentHash? }`: top document only, never inherited through `extends` | `contentHash` is 64 lowercase hex |
 

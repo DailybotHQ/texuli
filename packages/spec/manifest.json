@@ -98,7 +98,7 @@
     "schemas/blueprint.schema.json": "2d91b3d6b84cdc0172d98906cbd71369539ddd67143f9e98e30c87d72440734b",
     "schemas/canvas.schema.json": "d2f73644ff38feef2f768da9470640a3375450211a9fd7b90f507c4dd48b5b63",
     "schemas/catalog.schema.json": "0bc7abcc768cd6a3272161279e2deaab8fbdba85a31b15975b98f5dc9ef428f8",
-    "schemas/design-system.schema.json": "ab120b7a34d5f03e656d6197daab80641fb58d229b21aaa3da7ac891e58ac39b",
+    "schemas/design-system.schema.json": "6f922cb286ef6d6a6062672f1912cc78c843a5b5a66faa6b8630390e90c18682",
     "schemas/diagnostics.schema.json": "7de3c9490dae2ce193fe159b4a20191234626e68d6a736b99eda7524b52b5240",
     "schemas/document.schema.json": "e42c8f3c3bf7b2e10f7a57fd1d163f9daed59c16ae98bae950d01f5b66517c44",
     "schemas/manifest.schema.json": "f9450e0a01268647d61b64a1834646663730fb07a0534167be0de50b39dc17ea",
