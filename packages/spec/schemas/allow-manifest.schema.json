@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://texuli.example/spec/schemas/allow-manifest.schema.json",
+  "title": "AllowManifest",
+  "description": "The allow manifest a compiled design system carries beside its CSS (ADR-032). Checkers read it; emitCss never does. version and contentHash identify the source document as written; specVersion names the blueprint spec. allow and library come from the resolved document when supplied.",
+  "type": "object",
+  "properties": {
+    "allow": {
+      "additionalProperties": {
+        "$ref": "#/$defs/allowEntry"
+      },
+      "description": "At most 256 catalog ids; an omitted list on an entry allows every catalog value, an empty list allows none. Keys are never __proto__, constructor or prototype.",
+      "type": "object"
+    },
+    "catalogDigest": {
+      "description": "SHA-256 of the merged catalog the manifest was compiled against.",
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "contentHash": {
+      "description": "SHA-256 of the source document as written (canonical JSON).",
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "extensions": {
+      "description": "Host extension namespaces of the merged catalog, sorted; absent without extensions. At most 16.",
+      "items": {
+        "maxLength": 16,
+        "pattern": "^[a-z][a-z0-9]{1,15}$",
+        "type": "string"
+      },
+      "maxItems": 16,
+      "type": "array"
+    },
+    "library": {
+      "description": "The design system's own components as recorded on the manifest. At most 64.",
+      "items": {
+        "$ref": "#/$defs/libraryEntry"
+      },
+      "maxItems": 64,
+      "type": "array"
+    },
+    "specVersion": {
+      "description": "The blueprint spec version this manifest names (ADR-032).",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "type": "string"
+    },
+    "version": {
+      "description": "The source document version as written.",
+      "maxLength": 64,
+      "type": "string"
+    }
+  },
+  "required": ["version", "contentHash", "specVersion"],
+  "additionalProperties": false,
+  "$defs": {
+    "allowEntry": {
+      "additionalProperties": false,
+      "description": "The enabled values of one catalog component. An omitted list allows every catalog value; an empty list allows none. At most 32 values per axis.",
+      "properties": {
+        "densities": {
+          "items": {
+            "$ref": "#/$defs/axisValue"
+          },
+          "maxItems": 32,
+          "type": "array"
+        },
+        "sizes": {
+          "items": {
+            "$ref": "#/$defs/axisValue"
+          },
+          "maxItems": 32,
+          "type": "array"
+        },
+        "states": {
+          "items": {
+            "$ref": "#/$defs/axisValue"
+          },
+          "maxItems": 32,
+          "type": "array"
+        },
+        "tones": {
+          "items": {
+            "$ref": "#/$defs/axisValue"
+          },
+          "maxItems": 32,
+          "type": "array"
+        },
+        "variants": {
+          "items": {
+            "$ref": "#/$defs/axisValue"
+          },
+          "maxItems": 32,
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "axisValue": {
+      "maxLength": 48,
+      "minLength": 1,
+      "type": "string"
+    },
+    "libraryEntry": {
+      "additionalProperties": false,
+      "description": "One library component recorded on the manifest: id, version and status as written.",
+      "properties": {
+        "id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        },
+        "status": {
+          "maxLength": 32,
+          "minLength": 1,
+          "type": "string"
+        },
+        "version": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": ["id", "version", "status"],
+      "type": "object"
+    }
+  }
+}

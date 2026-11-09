@@ -1,0 +1,551 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://texuli.example/spec/schemas/ds-check-report.schema.json",
+  "title": "DsCheckReport",
+  "description": "The JSON shape texuli ds check prints (format texuli/ds-check, version 1), including the locked-design-system section (ADR-032). The compiled maps are omitted. variant is null on the base document run.",
+  "type": "object",
+  "properties": {
+    "codes": {
+      "description": "The distinct codes of errors, sorted.",
+      "items": {
+        "maxLength": 64,
+        "type": "string"
+      },
+      "maxItems": 64,
+      "type": "array"
+    },
+    "document": {
+      "$ref": "#/$defs/document"
+    },
+    "errors": {
+      "items": {
+        "$ref": "#/$defs/issue"
+      },
+      "maxItems": 256,
+      "type": "array"
+    },
+    "file": {
+      "description": "The checked file, when the CLI read one.",
+      "maxLength": 1024,
+      "type": "string"
+    },
+    "format": {
+      "const": "texuli/ds-check"
+    },
+    "locked": {
+      "$ref": "#/$defs/locked"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "render": {
+      "$ref": "#/$defs/render"
+    },
+    "runs": {
+      "items": {
+        "$ref": "#/$defs/run"
+      },
+      "maxItems": 32,
+      "type": "array"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": ["format", "version", "ok", "document", "codes", "errors", "runs", "locked"],
+  "additionalProperties": false,
+  "$defs": {
+    "adjustment": {
+      "additionalProperties": false,
+      "description": "A color the solver chose instead of the generated one.",
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "mode": {
+          "$ref": "#/$defs/mode"
+        },
+        "path": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "variable": {
+          "type": "string"
+        }
+      },
+      "required": ["mode", "variable", "from", "to", "path", "reason"],
+      "type": "object"
+    },
+    "approval": {
+      "additionalProperties": false,
+      "description": "The approval record as reported. The check cannot prove who approved.",
+      "properties": {
+        "approvedAt": {
+          "maxLength": 32,
+          "type": "string"
+        },
+        "approvedBy": {
+          "maxLength": 120,
+          "type": "string"
+        },
+        "contentHash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "matches": {
+          "description": "true or false when a hash is recorded; absent when none is.",
+          "type": "boolean"
+        },
+        "status": {
+          "enum": ["approved", "draft", "none", "unknown"],
+          "type": "string"
+        },
+        "stored": {
+          "$ref": "#/$defs/sha256"
+        },
+        "version": {
+          "maxLength": 64,
+          "type": "string"
+        }
+      },
+      "required": ["status", "contentHash"],
+      "type": "object"
+    },
+    "contrast": {
+      "additionalProperties": false,
+      "description": "Contrast pairs per compiled mode.",
+      "properties": {
+        "dark": {
+          "items": {
+            "$ref": "#/$defs/pair"
+          },
+          "type": "array"
+        },
+        "light": {
+          "items": {
+            "$ref": "#/$defs/pair"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "document": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 64,
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 120,
+          "type": "string"
+        },
+        "version": {
+          "maxLength": 64,
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "issue": {
+      "additionalProperties": false,
+      "description": "A refusal: a spec code, a guarantee code, a locked-hash code, or a render finding.",
+      "properties": {
+        "code": {
+          "maxLength": 64,
+          "type": "string"
+        },
+        "hint": {
+          "maxLength": 2000,
+          "type": "string"
+        },
+        "message": {
+          "maxLength": 2000,
+          "type": "string"
+        },
+        "mode": {
+          "$ref": "#/$defs/mode"
+        },
+        "pairs": {
+          "items": {
+            "$ref": "#/$defs/pair"
+          },
+          "maxItems": 64,
+          "type": "array"
+        },
+        "path": {
+          "maxLength": 512,
+          "type": "string"
+        },
+        "source": {
+          "maxLength": 256,
+          "type": "string"
+        },
+        "variant": {
+          "maxLength": 64,
+          "type": "string"
+        }
+      },
+      "required": ["code", "path", "message"],
+      "type": "object"
+    },
+    "libraryEntry": {
+      "additionalProperties": false,
+      "description": "One library entry's approval and hash as reported.",
+      "properties": {
+        "contentHash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "id": {
+          "maxLength": 64,
+          "type": "string"
+        },
+        "matches": {
+          "type": "boolean"
+        },
+        "status": {
+          "maxLength": 32,
+          "type": "string"
+        },
+        "stored": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "required": ["contentHash"],
+      "type": "object"
+    },
+    "locked": {
+      "additionalProperties": false,
+      "description": "The allowed set, the approval and the hash checks of a document (ADR-032).",
+      "properties": {
+        "allowed": {
+          "description": "The allowed catalog ids, sorted (empty when not locked).",
+          "items": {
+            "maxLength": 64,
+            "type": "string"
+          },
+          "maxItems": 256,
+          "type": "array"
+        },
+        "approval": {
+          "$ref": "#/$defs/approval"
+        },
+        "catalogChecked": {
+          "description": "Whether allow was checked against a catalog.",
+          "type": "boolean"
+        },
+        "entries": {
+          "items": {
+            "$ref": "#/$defs/libraryEntry"
+          },
+          "maxItems": 64,
+          "type": "array"
+        },
+        "library": {
+          "description": "The library entry ids, in document order.",
+          "items": {
+            "maxLength": 64,
+            "type": "string"
+          },
+          "maxItems": 64,
+          "type": "array"
+        },
+        "locked": {
+          "description": "True when the document has an allow section.",
+          "type": "boolean"
+        }
+      },
+      "required": ["locked", "allowed", "library", "catalogChecked", "approval", "entries"],
+      "type": "object"
+    },
+    "mode": {
+      "enum": ["light", "dark"],
+      "type": "string"
+    },
+    "pair": {
+      "additionalProperties": false,
+      "description": "One contrast pair from the compiler.",
+      "properties": {
+        "background": {
+          "type": "string"
+        },
+        "foreground": {
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/pairKind"
+        },
+        "pass": {
+          "type": "boolean"
+        },
+        "ratio": {
+          "type": "number"
+        },
+        "required": {
+          "type": "number"
+        }
+      },
+      "required": ["foreground", "background", "kind", "ratio", "required", "pass"],
+      "type": "object"
+    },
+    "pairKind": {
+      "enum": ["text", "ui", "focus"],
+      "type": "string"
+    },
+    "render": {
+      "additionalProperties": false,
+      "description": "What the in-page host measured.",
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        },
+        "runs": {
+          "items": {
+            "$ref": "#/$defs/renderRun"
+          },
+          "maxItems": 32,
+          "type": "array"
+        },
+        "url": {
+          "maxLength": 2048,
+          "type": "string"
+        }
+      },
+      "required": ["ok", "url", "runs"],
+      "type": "object"
+    },
+    "renderLiteral": {
+      "additionalProperties": false,
+      "description": "A painted color that did not follow the design system's variables.",
+      "properties": {
+        "component": {
+          "type": "string"
+        },
+        "element": {
+          "type": "string"
+        },
+        "property": {
+          "type": "string"
+        },
+        "reason": {
+          "description": "Set on a known finding; omitted on a literal that fails the run.",
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": ["component", "element", "property", "value"],
+      "type": "object"
+    },
+    "renderPair": {
+      "additionalProperties": false,
+      "description": "One contrast pair measured in the browser.",
+      "properties": {
+        "background": {
+          "type": "string"
+        },
+        "foreground": {
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/pairKind"
+        },
+        "pass": {
+          "type": "boolean"
+        },
+        "ratio": {
+          "type": "number"
+        },
+        "reported": {
+          "type": "number"
+        },
+        "required": {
+          "type": "number"
+        }
+      },
+      "required": ["foreground", "background", "kind", "required", "ratio", "reported", "pass"],
+      "type": "object"
+    },
+    "renderRun": {
+      "additionalProperties": false,
+      "description": "One render of the sheet: a variant in a mode. variant is null for the base document.",
+      "properties": {
+        "axe": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 256,
+          "type": "array"
+        },
+        "checked": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "components": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 256,
+          "type": "array"
+        },
+        "known": {
+          "items": {
+            "$ref": "#/$defs/renderLiteral"
+          },
+          "maxItems": 256,
+          "type": "array"
+        },
+        "literals": {
+          "items": {
+            "$ref": "#/$defs/renderLiteral"
+          },
+          "maxItems": 256,
+          "type": "array"
+        },
+        "mode": {
+          "$ref": "#/$defs/mode"
+        },
+        "ok": {
+          "type": "boolean"
+        },
+        "pairs": {
+          "items": {
+            "$ref": "#/$defs/renderPair"
+          },
+          "maxItems": 256,
+          "type": "array"
+        },
+        "variant": {
+          "description": "The variant name, or null for the base document."
+        }
+      },
+      "required": [
+        "variant",
+        "mode",
+        "ok",
+        "components",
+        "pairs",
+        "literals",
+        "checked",
+        "axe",
+        "known"
+      ],
+      "type": "object"
+    },
+    "run": {
+      "additionalProperties": false,
+      "description": "One compiled selection. variant is null for the base document. compiled is omitted from JSON.",
+      "properties": {
+        "adjustments": {
+          "items": {
+            "$ref": "#/$defs/adjustment"
+          },
+          "maxItems": 256,
+          "type": "array"
+        },
+        "contrast": {
+          "$ref": "#/$defs/contrast"
+        },
+        "hash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "inlineBytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "modes": {
+          "items": {
+            "$ref": "#/$defs/mode"
+          },
+          "maxItems": 2,
+          "type": "array"
+        },
+        "ok": {
+          "type": "boolean"
+        },
+        "targets": {
+          "items": {
+            "$ref": "#/$defs/target"
+          },
+          "maxItems": 64,
+          "type": "array"
+        },
+        "variant": {
+          "description": "The variant name, or null for the base document."
+        },
+        "warnings": {
+          "items": {
+            "$ref": "#/$defs/warning"
+          },
+          "maxItems": 64,
+          "type": "array"
+        }
+      },
+      "required": [
+        "variant",
+        "ok",
+        "modes",
+        "contrast",
+        "adjustments",
+        "warnings",
+        "inlineBytes",
+        "targets"
+      ],
+      "type": "object"
+    },
+    "sha256": {
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "target": {
+      "additionalProperties": false,
+      "description": "One target-size measurement.",
+      "properties": {
+        "pass": {
+          "type": "boolean"
+        },
+        "px": {
+          "type": "number"
+        },
+        "required": {
+          "type": "number"
+        },
+        "variable": {
+          "type": "string"
+        }
+      },
+      "required": ["variable", "px", "required", "pass"],
+      "type": "object"
+    },
+    "warning": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "maxLength": 64,
+          "type": "string"
+        },
+        "message": {
+          "maxLength": 2000,
+          "type": "string"
+        },
+        "mode": {
+          "$ref": "#/$defs/mode"
+        },
+        "path": {
+          "maxLength": 512,
+          "type": "string"
+        }
+      },
+      "required": ["path", "message"],
+      "type": "object"
+    }
+  }
+}
