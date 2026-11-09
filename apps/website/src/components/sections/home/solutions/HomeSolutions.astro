@@ -1,0 +1,200 @@
+---
+/**
+ * Home 2.2 "Complete Solutions" band: a kicker, the h2, a short body and the `home-universe`
+ * plate, then one card per registry Solution with its tagline, status and platform tags
+ * (Web and Native, from the entry). Cards link a landing only when its page exists, else
+ * the current demo page (see `solutions-content.ts`). Static markup, no island; every link
+ * resolves through the URL policy (developer tier). Wiring into the home page belongs to
+ * the home integration task.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../../foundation/site.ts';
+import SiteIllustration from '../../../landing/SiteIllustration.astro';
+import StatusBadge from '../../../solutions/shared/platforms/StatusBadge.astro';
+import {
+  HOME_SOLUTIONS_COPY,
+  homeSolutionCards,
+  homeSolutionsCatalog,
+} from './solutions-content.ts';
+
+const base = import.meta.env.BASE_URL;
+const cards = homeSolutionCards();
+const catalog = homeSolutionsCatalog();
+const resolveHref = (href: string): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  return safe === undefined ? undefined : withBase(base, safe);
+};
+const copy = HOME_SOLUTIONS_COPY;
+---
+
+<section class="home-solutions" aria-labelledby={copy.id} data-tx-home-solutions="">
+  <div class="home-solutions__inner">
+    <div class="home-solutions__head">
+      <div class="home-solutions__copy">
+        <p class="home-solutions__kicker">{copy.kicker}</p>
+        <h2 id={copy.id}>{copy.title}</h2>
+        <p class="home-solutions__body">{copy.body}</p>
+        {
+          catalog && (
+            <a class="home-cta home-cta--secondary" href={resolveHref(catalog.href)}>
+              {catalog.label}
+            </a>
+          )
+        }
+      </div>
+      <div class="home-solutions__art">
+        <SiteIllustration art={copy.art} />
+      </div>
+    </div>
+    <ul class="home-solutions__cards" role="list">
+      {
+        cards.map((card) => (
+          <li class="home-solutions__card" data-solution={card.slug} data-status={card.status}>
+            <h3>{card.name}</h3>
+            <p class="home-solutions__tagline">{card.tagline}</p>
+            <ul class="home-solutions__tags" role="list" aria-label={`${card.name} platforms`}>
+              <li data-platform="web">
+                <span aria-hidden="true">Web</span>
+                <StatusBadge status={card.web} context="Web" />
+              </li>
+              <li data-platform="native">
+                <span aria-hidden="true">Native</span>
+                <StatusBadge status={card.native} context="Native" />
+              </li>
+            </ul>
+            {card.link && (
+              <a
+                class="home-solutions__link"
+                href={resolveHref(card.link.href)}
+                data-link-kind={card.link.kind}
+              >
+                {card.link.label}
+                <span aria-hidden="true">&nbsp;→</span>
+              </a>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .home-solutions {
+    border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 60%, transparent);
+  }
+  .home-solutions__inner {
+    display: grid;
+    gap: clamp(1.75rem, 5vw, 3rem);
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-block: clamp(3rem, 8vw, 6rem);
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  .home-solutions__head {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    align-items: center;
+  }
+  @media (min-width: 56rem) {
+    .home-solutions__head {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    }
+  }
+  .home-solutions__copy {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+    max-inline-size: 34rem;
+  }
+  .home-solutions__kicker {
+    margin: 0;
+    color: var(--home-accent-text, var(--tx-primary));
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .home-solutions h2 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(1.9rem, 5vw, 3rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+  .home-solutions__body {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: clamp(1rem, 2.2vw, 1.15rem);
+    line-height: 1.55;
+  }
+  .home-solutions__art {
+    min-inline-size: 0;
+  }
+  .home-solutions__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13.5rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .home-solutions__card {
+    display: grid;
+    grid-template-rows: auto 1fr auto auto;
+    gap: 0.65rem;
+    padding: 1.1rem;
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    border-radius: 0.875rem;
+    background: var(--tx-background);
+  }
+  .home-solutions h3 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: 1.15rem;
+    font-weight: 750;
+  }
+  .home-solutions__tagline {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: 0.925rem;
+    line-height: 1.5;
+  }
+  .home-solutions__tags {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .home-solutions__tags li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--tx-foreground);
+    font-size: 0.8rem;
+    font-weight: 650;
+  }
+  .home-solutions__tags li > span[aria-hidden] {
+    min-inline-size: 3.25rem;
+  }
+  .home-solutions__link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.5rem;
+    color: var(--home-accent-text, var(--tx-primary));
+    font-weight: 650;
+    text-underline-offset: 0.2em;
+  }
+  .home-solutions__link:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  @media (forced-colors: active) {
+    .home-solutions__card {
+      border-color: CanvasText;
+    }
+  }
+</style>
