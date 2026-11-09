@@ -67,8 +67,7 @@ export const PROTOYARD_PAGE = {
   roadmap: {
     id: 'built-with-protoyard-roadmap',
     title: 'Roadmap',
-    intro:
-      'Planned, not available. Nothing below is part of the open-source version today.',
+    intro: 'Planned, not available. Nothing below is part of the open-source version today.',
   },
   pathway: {
     id: 'built-with-protoyard-pathway',

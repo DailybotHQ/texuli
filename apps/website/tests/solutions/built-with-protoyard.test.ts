@@ -66,7 +66,9 @@ describe('Protoyard claims cite the audit', () => {
       .map(([row]) => row);
     expect(PROTOYARD_ROADMAP.map((item) => item.source).sort()).toEqual(missing.sort());
     const cloud = PROTOYARD_ROADMAP.find((item) => item.title === 'Protoyard Cloud');
-    expect(cloud?.body).toMatch(/shared, multiplayer workspace where teams turn ideas into products/);
+    expect(cloud?.body).toMatch(
+      /shared, multiplayer workspace where teams turn ideas into products/
+    );
   });
 
   it('keeps the product record honest: the local version available, Cloud planned, public evidence only', () => {
@@ -109,7 +111,9 @@ describe('links', () => {
     expect(safeHref(PROTOYARD_SITE, 'developer')).toBe(PROTOYARD_SITE);
     expect(component).toContain("const external = safeHref(page.hero.cta.href, 'developer');");
     expect(markup).toContain('rel="noopener"');
-    expect(component).toContain('PROTOYARD_PATHWAY_LINKS.filter((link) => siteRouteExists(link.href))');
+    expect(component).toContain(
+      'PROTOYARD_PATHWAY_LINKS.filter((link) => siteRouteExists(link.href))'
+    );
     const kept = PROTOYARD_PATHWAY_LINKS.filter((link) => siteRouteExists(link.href));
     expect(kept.length).toBeGreaterThan(0);
     for (const link of kept) expect(siteRouteExists(link.href), link.href).toBe(true);
@@ -140,6 +144,8 @@ describe('page and markup', () => {
     for (const source of [markup, page]) expect(source).not.toMatch(/client:[a-z]+/);
     expect(component).not.toMatch(/<script\b|set:html|\{@html|innerHTML/);
     expect(markup).not.toMatch(/\sstyle=/);
-    expect(styles).not.toMatch(/margin-(left|right)|padding-(left|right)|\b(left|right|top|bottom):/);
+    expect(styles).not.toMatch(
+      /margin-(left|right)|padding-(left|right)|\b(left|right|top|bottom):/
+    );
   });
 });
