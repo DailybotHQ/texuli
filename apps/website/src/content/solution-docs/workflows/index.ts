@@ -1,6 +1,4 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { type DocBlock, parseDocMarkdown } from '../parse.ts';
+import { type DocBlock, docSource, parseDocMarkdown } from '../parse.ts';
 
 export const WORKFLOWS_DOC_FILES = [
   'overview',
@@ -20,12 +18,16 @@ export interface WorkflowsDocSection {
   readonly blocks: readonly DocBlock[];
 }
 
-const DIR = import.meta.dirname;
+const FILES: Readonly<Record<string, string>> = import.meta.glob('./*.md', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
 
 /** Load every Workflows docs Markdown file, in reading order. */
 export function loadWorkflowsDocs(): readonly WorkflowsDocSection[] {
   return WORKFLOWS_DOC_FILES.map((id) => {
-    const source = readFileSync(join(DIR, `${id}.md`), 'utf8');
+    const source = docSource(FILES, id);
     return { id, source, blocks: parseDocMarkdown(source) };
   });
 }

@@ -86,3 +86,14 @@ export function parseDocMarkdown(source: string): DocBlock[] {
   }
   return blocks;
 }
+
+/**
+ * Reads one docs file from the map that `import.meta.glob('./*.md', { query: '?raw' })`
+ * returns. The glob inlines the Markdown at build time, so the docs render from the bundle
+ * (reading files next to the module fails once Astro moves it into a chunk).
+ */
+export function docSource(files: Readonly<Record<string, string>>, id: string): string {
+  const source = files[`./${id}.md`];
+  if (source === undefined) throw new Error(`Solution docs: ${id}.md is missing`);
+  return source;
+}
