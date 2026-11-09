@@ -133,7 +133,8 @@ has, and who approved that version.
 - A fix found before release (`0acc60c6`): `designSystemContentHash` no
   longer writes the stripped library back into a document without an
   `approval`, so `library-hash-mismatch` fires; `checkDesignSystemFull`
-  refuses documents nested deeper than 64 levels.
+  refuses documents nested deeper than 64 levels, and (`613bb88b`) bounds its
+  scan of an untrusted prototype's files.
 
 **The catalog (`@texuli/catalog`, `components.json`).**
 
