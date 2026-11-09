@@ -1,0 +1,51 @@
+---
+/**
+ * `/solutions/slides/` — the Slides Solution landing (ADR-027, ADR-028, ADR-030), the
+ * pilot every Solution landing follows. `SolutionLayout` orders the sections and checks the
+ * content against the registry entry; the only island is the Slides demo (client:visible),
+ * with a server-rendered preview of the same fixture.
+ */
+
+import SolutionDemoFrame from '../../../components/solutions/shared/demo-frame/SolutionDemoFrame.astro';
+import SolutionAgents from '../../../components/solutions/shared/platforms/SolutionAgents.astro';
+import SolutionPlatforms from '../../../components/solutions/shared/platforms/SolutionPlatforms.astro';
+import SolutionNextSteps from '../../../components/solutions/shared/resources/SolutionNextSteps.astro';
+import SolutionRecipes from '../../../components/solutions/shared/resources/SolutionRecipes.astro';
+import SolutionRelated from '../../../components/solutions/shared/resources/SolutionRelated.astro';
+import SolutionLayout from '../../../components/solutions/shared/SolutionLayout.astro';
+import SlidesDemo from '../../../components/solutions/slides/demo/SlidesDemo.svelte';
+import SlidesDemoPreview from '../../../components/solutions/slides/demo/SlidesDemoPreview.svelte';
+import SlidesHero from '../../../components/solutions/slides/hero/SlidesHero.astro';
+import SlidesHow from '../../../components/solutions/slides/how/SlidesHow.astro';
+import SlidesQuickstart from '../../../components/solutions/slides/quickstart/SlidesQuickstart.astro';
+import SlidesStories from '../../../components/solutions/slides/stories/SlidesStories.astro';
+import { techArticleJsonLd } from '../../../lib/schema.ts';
+import { SLIDES_LANDING as content, SLIDES_ENTRY as entry } from './_content.ts';
+
+const title = 'Slides — decks written as data';
+const description = entry.tagline;
+---
+
+<SolutionLayout
+  {entry}
+  {content}
+  {title}
+  {description}
+  jsonLd={techArticleJsonLd(title, description, entry.route)}
+>
+  <SlidesHero slot="hero" />
+  <SolutionDemoFrame slot="demo" {entry} {...content.demo}>
+    <SlidesDemoPreview slot="preview" />
+    <SlidesDemo slot="demo" client:visible />
+  </SolutionDemoFrame>
+  <SlidesStories slot="stories" />
+  <SlidesHow slot="how" />
+  <SlidesQuickstart slot="quickstart" />
+  <SolutionRecipes slot="recipes" {entry} {...content.recipes!} />
+  <SolutionAgents slot="agents" {entry} {...content.agents} />
+  <SolutionPlatforms slot="platforms" {entry} {...content.platforms} />
+  <Fragment slot="next">
+    <SolutionRelated {entry} />
+    <SolutionNextSteps {entry} {...content.next} />
+  </Fragment>
+</SolutionLayout>

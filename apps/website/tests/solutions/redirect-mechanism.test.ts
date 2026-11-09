@@ -52,12 +52,14 @@ describe('Solution redirect map (ADR-028)', () => {
     expect(solutionRedirectGraphIssues(enabled)).toEqual([]);
   });
 
-  it('emits no redirect whose target page is missing, so the live map is empty until landings ship', () => {
-    for (const rule of SOLUTION_REDIRECTS) {
-      expect(landingExists(rule.to), rule.to).toBe(false);
-    }
-    expect(activeSolutionRedirects(SOLUTION_REDIRECTS, landingExists)).toEqual([]);
-    expect(activeSolutionRedirects(enabled, landingExists)).toEqual([]);
+  it('emits no redirect whose target page is missing', () => {
+    const shipped = enabled.filter((rule) => landingExists(rule.to));
+    expect(activeSolutionRedirects(enabled, landingExists)).toEqual(shipped);
+    expect(
+      activeSolutionRedirects(SOLUTION_REDIRECTS, landingExists).every((rule) =>
+        landingExists(rule.to)
+      )
+    ).toBe(true);
     expect(activeSolutionRedirects(enabled, () => true)).toHaveLength(5);
   });
 

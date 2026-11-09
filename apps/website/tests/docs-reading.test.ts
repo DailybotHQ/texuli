@@ -306,8 +306,9 @@ describe('reading pages', () => {
       .map((line) => (line.trim().split(/\s/)[0] ?? '').replace(/\/$/, ''))
       .filter((name) => name.length > 0);
 
+    // Solution docs (ADR-028) are a reference family in the sidebar, not reading guides.
     const expected = flattenGuidesNav()
-      .filter((link) => link.href !== '/guides/')
+      .filter((link) => link.href !== '/guides/' && !link.href.startsWith('/guides/solutions/'))
       .map((link) => link.href.replace('/guides/', '').replace(/\/$/, ''));
 
     it("lists every shipped guide once, in the sidebar's reading order", () => {
@@ -316,7 +317,7 @@ describe('reading pages', () => {
       // matches the sidebar sections the shell actually renders
       {
         const sidebarItems = GUIDES_SECTIONS.flatMap((section) => section.items)
-          .filter((item) => item.href !== '/guides/')
+          .filter((item) => item.href !== '/guides/' && !item.href.startsWith('/guides/solutions/'))
           .map((item) => item.href.replace('/guides/', '').replace(/\/$/, ''));
         expect(tree).toEqual(sidebarItems);
       }

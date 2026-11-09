@@ -55,10 +55,15 @@ describe('Solution docs route plumbing (ADR-028)', () => {
     expect(group.label).toBe('Solutions');
     expect(group.items.map((item) => item.href)).toEqual(SOLUTIONS.map((entry) => entry.docs));
     expect(group.items.map((item) => item.label)).toEqual(SOLUTIONS.map((entry) => entry.name));
-    const spliced = withSolutionDocsNav(GUIDES_SECTIONS, SOLUTIONS);
+    const base = GUIDES_SECTIONS.filter((section) => section.label !== 'Solutions');
+    const spliced = withSolutionDocsNav(base, SOLUTIONS);
     const scale = spliced.findIndex((section) => section.label === 'Scale');
     expect(spliced[scale - 1]?.label).toBe('Solutions');
-    expect(GUIDES_SECTIONS.some((section) => section.label === 'Solutions')).toBe(false);
+    // The guides sidebar ships the group once, before Scale.
+    expect(GUIDES_SECTIONS.filter((section) => section.label === 'Solutions')).toHaveLength(1);
+    expect(GUIDES_SECTIONS.map((section) => section.label)).toEqual(
+      spliced.map((section) => section.label)
+    );
   });
 });
 
