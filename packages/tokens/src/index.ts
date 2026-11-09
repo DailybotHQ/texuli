@@ -2,11 +2,6 @@
 export * from './aa-gate/index.ts';
 export * from './contract/index.ts';
 export * from './css/index.ts';
-export { importSiteCss } from './design-system/import-css.ts';
-export type {
-  DesignSystemImportLoss,
-  DesignSystemImportResultWithLosses,
-} from './design-system/token-formats.ts';
 export * from './forced-colors/index.ts';
 export * from './generator/index.ts';
 export * from './library-expand/index.ts';

@@ -605,4 +605,6 @@ export function importLogoPixels(
   return { ...withLossReport(result), palette: result.ok ? palette : [] } as LogoPaletteResult;
 }
 
+/** The site-CSS and fonts importer (T-gen-css); exported beside the other importers, never from the package root. */
+export { importSiteCss } from './import-css.ts';
 export type { DesignSystem };

@@ -56,7 +56,6 @@ export {
   evaluateDesignSystemIndicators,
 } from './guarantees.ts';
 export { canonicalJson, sha256Hex } from './hash.ts';
-export { importSiteCss } from './import-css.ts';
 export {
   type DesignSystemCompileIssue,
   type DesignSystemFailure,
@@ -68,7 +67,3 @@ export {
   resolveDesignSystemCore,
   resolveDesignSystemSync,
 } from './resolve.ts';
-export type {
-  DesignSystemImportLoss,
-  DesignSystemImportResultWithLosses,
-} from './token-formats.ts';

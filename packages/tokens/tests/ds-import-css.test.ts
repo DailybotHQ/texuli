@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { importSiteCss as importFromCompileCore } from '../src/design-system/compile-core.ts';
+import { importSiteCss as importFromSubpath } from '../src/design-system/import.ts';
 import { importSiteCss } from '../src/design-system/import-css.ts';
 import type { DesignSystemImportLoss } from '../src/design-system/token-formats.ts';
 import { validateDesignSystem } from '../src/design-system/validate.ts';
-import { importSiteCss as importFromRoot } from '../src/index.ts';
+import * as root from '../src/index.ts';
 
 function assertLossShape(losses: DesignSystemImportLoss[]) {
   for (const loss of losses) {
@@ -16,9 +16,9 @@ function assertLossShape(losses: DesignSystemImportLoss[]) {
 }
 
 describe('site CSS importer', () => {
-  it('is exported from compiler core and package root', () => {
-    expect(importFromCompileCore).toBe(importSiteCss);
-    expect(importFromRoot).toBe(importSiteCss);
+  it('is exported from the import subpath, never from the package root (size budget)', () => {
+    expect(importFromSubpath).toBe(importSiteCss);
+    expect('importSiteCss' in root).toBe(false);
   });
 
   it('imports colors, type, fonts, radius, spacing and motion from fictional site CSS', () => {
