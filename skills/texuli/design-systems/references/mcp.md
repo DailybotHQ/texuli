@@ -14,6 +14,7 @@ false` and `errors` (codes in [`codes.md`](codes.md)), not a tool error.
 
 | Tool | Input | Returns |
 | --- | --- | --- |
+| design_system.generate | any combination of `brief`, `tokens`, `css`, `logoPixels`, `theme` | draft document or refusal, `report.losses`, automatic AA `report.repairs`, `report.guarantees` |
 | `ds.validate` | `document`, `trust`, `variant`, `bases` | `valid`, `codes`, `errors`, `warnings`, `hash` |
 | `ds.compile` | `document`, `format` (`json`, `css`, `tailwind`, `dtcg`, `tokens-studio`), `selector`, `dark`, `mode` | `content` (text), `mediaType`, `hash` |
 | `ds.contrast` | `document`, `mode` | per mode `total`, `failing`, `pairs`; `adjustments` |
@@ -30,8 +31,13 @@ document's codes come back under `$.designSystem`.
 ## Prompt
 
 `create-design-system` (`brief`, optional `base` theme id and `contrast`
-`AA` or `AAA`) returns the authoring loop: read the examples, import or
-suggest, write, validate and repair, check contrast and preview, deliver.
+`AA` or `AAA`) returns the authoring loop: read the examples, propose inputs
+from a brief, token file, stylesheet, logo pixels or Texuli theme with
+design_system.generate, inspect each loss and automatic AA repair, validate,
+check contrast and preview, deliver a draft. Reference screenshots are
+interpreted by the agent's own vision step and converted to proposed inputs;
+the tool never silently imports screenshots, fetches inputs or saves the
+generated document.
 
 ## Resources
 
