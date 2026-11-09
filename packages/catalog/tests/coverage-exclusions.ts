@@ -189,6 +189,12 @@ add(
   'A section of the marketing layout (manifest layout-marketing), placed by the host.',
   ['MarketingSection', 'MarketingSectionHeader']
 );
+add(
+  'texuli',
+  'chrome',
+  'The design-system UI kit (texuli/ds-kit) is a host page that renders a design-system document, never blueprint data.',
+  ['DesignSystemKit', 'KitApproval', 'KitFoundations', 'KitModeSwitch']
+);
 add('texuli', 'chrome', 'Uploading files is host chrome: a blueprint never asks for local files.', [
   'FileUpload',
 ]);
@@ -426,4 +432,6 @@ export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(row
 // Raised to 215 for ListItem (UG-42, 0.14.3 patch lane): planned, like
 // CodeField was, because a new catalog id changes the spec contract and a
 // patch release cannot carry a spec minor.
-export const EXCLUSION_CEILING = 215;
+// Raised to 219 for the design-system UI kit pages (PLAN_016 T4, lead decision): host
+// pages that render a design-system document, never blueprint data.
+export const EXCLUSION_CEILING = 219;
