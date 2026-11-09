@@ -9,8 +9,7 @@
 **Example:** `data-virtual-list-view` (the engine on its own: `data-virtual-list`)
 
 `VirtualListView` renders a list of any length as a window: only the rows in
-view, plus a few before and after, are in the page. It is **in development**
-(ADR-032), built for locked design systems: a page uses it with no inline
+view, plus a few before and after, are in the page. It is new in `0.16.0` (ADR-032), built for locked design systems: a page uses it with no inline
 style of its own.
 
 ## Usage

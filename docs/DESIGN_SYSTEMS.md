@@ -7,9 +7,11 @@
 > tokens, hooks and design defaults, the plumbing this builds on). Items
 > marked **planned** are not built yet. [Locked design systems](#locked-design-systems)
 > (blueprint spec `0.13.0`, ADR-032) are new in `0.15.0`: the document,
-> the catalog, the allow manifest and the CLI. The kit (`texuli/ds-kit`)
-> and the locked checkers ship in `0.15.0` as **in development** and are
-> completed in `0.16.0`.
+> the catalog, the allow manifest and the CLI. The kit (`texuli/ds-kit`),
+> `ds generate` and the importers, the locked checkers, portable bundles
+> and the contract schemas are released in `0.16.0` (they shipped in
+> `0.15.0` as in development), with blueprint spec `0.14.0` (the category
+> `color` axis and `allow.colors`).
 
 A design system describes a brand once, as **one closed JSON document**,
 and every Texuli surface follows it: styled components, layouts and domain
@@ -82,8 +84,8 @@ by path, so they live at the repository root, outside every package.
 This is the whole path from nothing to an approved, locked design system that a consumer
 such as Protoyard can pin. The brand here is fictional (Harborline, `example.com`). Each
 step names the CLI command, the MCP operation an agent uses, and the Studio control on
-texuli.com; every one of them exists today. Locked design systems are **in development**
-(spec 0.13.0, ADR-032).
+texuli.com; every one of them exists today. Locked design systems are released (spec 0.13.0 in `0.15.0`,
+the kit, the generator and the full checks in `0.16.0`; ADR-032).
 
 1. **Start from what you have.** A brief, a token file, CSS, a logo or a library theme:
 
@@ -510,7 +512,7 @@ exports the document (and, optionally, its cached compiled form):
     "./design-system.json": "./design-system.json",
     "./design-system.compiled.json": "./design-system.compiled.json"
   },
-  "peerDependencies": { "@texuli/tokens": "^0.15.0" }
+  "peerDependencies": { "@texuli/tokens": "^0.16.0" }
 }
 ```
 
@@ -602,9 +604,9 @@ opened). Details: [ds-check.md](../packages/tools/docs/ds-check.md).
 ## Locked design systems
 
 > **Status: new in `0.15.0`.** Blueprint spec `0.13.0`
-> ([ADR-032](DECISIONS.md#adr-032-locked-design-systems)). Items marked
-> **in development** ship in `0.15.0` and are completed in `0.16.0`; items
-> marked **planned** do not exist yet. Existing documents are unaffected: without `allow` a design
+> ([ADR-032](DECISIONS.md#adr-032-locked-design-systems)). The kit, `ds generate`, the full locked validator, bundles, the contract schemas and the
+> blueprint allow check, shipped in `0.15.0` as in development, are released in `0.16.0`
+> (with spec `0.14.0`); items marked **planned** do not exist yet. Existing documents are unaffected: without `allow` a design
 > system is not locked, and a `0.12.0` document compiles to the same CSS.
 
 A locked design system says which Texuli components, variants, sizes and
@@ -780,8 +782,7 @@ element back to its component without component internals.
 ### Locked-mode rules for consumers
 
 These are the owner's rules for locked prototypes. `@texuli/tools/ds-check`
-enforces them (**in development**: in the `0.15.0` tarballs, completed in
-`0.16.0`). Every check, code and
+enforces them (released in `0.16.0`). Every check, code and
 exemption: [ds-check.md](../packages/tools/docs/ds-check.md).
 
 - **Only allowed components.** UI is built from components in the allow
@@ -859,8 +860,8 @@ component in each allowed variant, size and state (disallowed values are
 marked, never rendered), the library with its approval badges, and the
 changes between two versions, with the approval record and its hash check
 in the header. texuli.com shows a fictional example brand with it at
-`/design-systems/kit/`. Both ship in `0.15.0` as **in development** and
-are completed in `0.16.0`. The
+`/design-systems/kit/`. Both are released in `0.16.0` (they shipped in
+`0.15.0` as in development). The
 decision is recorded in ADR-032.
 
 ## Outputs

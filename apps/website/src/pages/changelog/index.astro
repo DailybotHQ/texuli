@@ -11,6 +11,17 @@ const current = texuliPackageVersion();
 
 const entries = [
   {
+    version: '0.16',
+    date: '2026-11',
+    items: [
+      'Released (shipped in 0.15.0 as in development): the design-system kit (texuli/ds-kit, /design-systems/kit/), texuli ds generate and the importers, texuli ds validate, the locked checkers in @texuli/tools/ds-check (ds check --locked, and --report for a baseline), portable design-system bundles (ds pack, ds unpack, ds.bundle), the contract schemas (allow manifest, ds-check report, bundle), checkBlueprintAllow and the Studio locked editor. The locked runtime check core is in the source and not exported yet.',
+      'Blueprint spec 0.14.0: catalog axes gain color, the category color (none or chart-1 to chart-8) on avatar, badge, color-swatch and tag, and the allow section gains colors (unknown-color). The catalog grows from 194 to 199 ids (color-swatch, data-virtual-list, link, list, mark; 75 stay agent-emittable). Every 0.13.0 document stays valid.',
+      'VirtualListView in @texuli/data/virtual-list, a windowed listbox. Mark, Link and ColorSwatch in texuli/typography; Heading size xs; Text italic and strikethrough; Prose lists. Box gains fill (chart and role colors), the soft tone surfaces, the canvas surface, inline-side borders and a dashed border. List in texuli/list-item; Avatar, Badge and Tag take color; Badge text uses tabular figures; layout-width utilities.',
+      'Input and Textarea take appearance (plain: no control chrome, for inline-edit titles and bodies; focus stays visible) and textSize on the type scale; NumberField takes commit (enter, blur or input). A fix before release: Button tone rules key on a named tone, so a host-written button link keeps its color.',
+      'No breaking API change; a 0.x minor because of the new spec.',
+    ],
+  },
+  {
     version: '0.15',
     date: '2026-11',
     items: [
@@ -19,7 +30,7 @@ const entries = [
       "The agent catalog lists each component's styling axes, observable states and public imports, and grows from 170 to 194 ids (typography, display, app and input components, governed by allow; 75 stay agent-emittable). mergeCatalogs merges host catalog extensions with stable refusal codes, and every catalog component root carries data-tx-component and its axis attributes.",
       'Heading, Text, Prose and Box in texuli/typography set type and surfaces from --tx-* tokens; Button and IconButton take tone (default, destructive, success, warning), independent of variant. A link-variant Button keeps its text size (a fix before release).',
       'texuli ds init --locked, ds approve (the only door that writes an approved document), ds hash, and ds check reports the allowed set, the approval as declared and stale content hashes; ds.allow lists an allow section, and ds.save refuses an approved document. A fix before release: designSystemContentHash no longer mutates a document without approval, so library-hash-mismatch fires.',
-      'In development, completed in 0.16.0: the design-system kit (texuli/ds-kit, /design-systems/kit/), texuli ds generate and the importers, the locked checkers in @texuli/tools/ds-check, portable design-system bundles (ds pack, ds unpack, ds.bundle), the contract schemas, the blueprint allow check and the Studio for locked systems.',
+      'In development in 0.15.0, released in 0.16.0: the design-system kit (texuli/ds-kit, /design-systems/kit/), texuli ds generate and the importers, the locked checkers in @texuli/tools/ds-check, portable design-system bundles (ds pack, ds unpack, ds.bundle), the contract schemas, the blueprint allow check and the Studio for locked systems.',
       'No breaking API change; a 0.x minor because of the new spec.',
     ],
   },

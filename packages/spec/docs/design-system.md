@@ -27,7 +27,7 @@
 > codes of `checkDesignSystemAllow`. Every 0.12.0 document stays valid;
 > `formatVersion` stays `1`.
 
-> **Spec 0.14.0 (in development for `0.16.0`, not published).** Additive:
+> **Spec 0.14.0 (new in `0.16.0`).** Additive:
 > `allow` entries gain `colors` (the category color axis of a catalog
 > component) and `checkDesignSystemAllow` gains `unknown-color`. Every
 > 0.13.0 document stays valid; `formatVersion` stays `1`.
