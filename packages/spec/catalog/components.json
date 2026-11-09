@@ -1,5 +1,5 @@
 {
-  "catalogHash": "9e3feca8f5ef2eba445c533f68b3c6aae24479cd8b1b93a55d020d5dfc282195",
+  "catalogHash": "0d8b2019c75ee1cf2ae959011ea3a77e9779172e028560e10e5be354ae3646d3",
   "components": [
     {
       "axes": {
@@ -3644,12 +3644,7 @@
     },
     {
       "axes": {
-        "size": {
-          "default": "md",
-          "prop": "size",
-          "values": ["sm", "md", "lg"]
-        },
-        "variant": {
+        "color": {
           "default": "primary",
           "prop": "color",
           "values": [
@@ -3669,6 +3664,11 @@
             "info",
             "neutral"
           ]
+        },
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
         }
       },
       "capability": "unknown",

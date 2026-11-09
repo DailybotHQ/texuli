@@ -95,7 +95,7 @@ describe('ColorSwatch', () => {
     });
     const swatch = container.querySelector('[data-tx-component="color-swatch"]') as HTMLElement;
     expect(swatch.textContent).toBe('North');
-    expect(swatch.getAttribute('data-tx-variant')).toBe('chart-1');
+    expect(swatch.getAttribute('data-tx-color')).toBe('chart-1');
     expect(swatch.getAttribute('data-tx-size')).toBe('md');
     expect(swatch.style.getPropertyValue('--tx-swatch-fill')).toBe(colorRefVar('chart-1'));
     expect(swatch.style.getPropertyValue('--tx-swatch-ink')).toBe(colorRefInk('chart-1'));
@@ -108,12 +108,12 @@ describe('ColorSwatch', () => {
       expect(isColorRef(hostile)).toBe(false);
       const { container } = render(ColorSwatch, { props: { color: hostile, label: 'X' } });
       const swatch = container.querySelector('[data-tx-component="color-swatch"]') as HTMLElement;
-      expect(swatch.getAttribute('data-tx-variant')).toBeNull();
+      expect(swatch.getAttribute('data-tx-color')).toBeNull();
       expect(swatch.getAttribute('style') ?? '').not.toContain(String(hostile));
       cleanup();
     }
-    expect(colorSwatchManifest.axes?.variant).toBe('color');
-    expect(component('color-swatch')?.axes?.variant?.prop).toBe('color');
+    expect(colorSwatchManifest.axes?.color).toBe('color');
+    expect(component('color-swatch')?.axes?.color?.prop).toBe('color');
   });
 });
 
