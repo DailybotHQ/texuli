@@ -1,5 +1,5 @@
 {
-  "catalogHash": "7148ffc74182e71602261c50b598b664e2d40b451825d39a06c467ad979f9b88",
+  "catalogHash": "f648e092f836488eded4f9fc8858147fc8875969d3309e5c89e1a571a3069ad0",
   "components": [
     {
       "capability": "web-only",
@@ -2760,6 +2760,7 @@
           "name": "storageKey"
         }
       ],
+      "states": ["hover", "focus-visible", "selected"],
       "summary": "Shared docs/blog/editorial reading frame with optional TOC."
     },
     {
@@ -2834,6 +2835,7 @@
           "required": true
         }
       ],
+      "states": ["disabled", "checked"],
       "summary": "A segmented choice that sets an enum state variable to one of its values."
     },
     {
@@ -2860,6 +2862,7 @@
           "required": true
         }
       ],
+      "states": ["disabled"],
       "summary": "A text field that sets a string state variable, capped at its declared length."
     },
     {
@@ -2886,6 +2889,7 @@
           "name": "step"
         }
       ],
+      "states": ["disabled"],
       "summary": "A range input that sets a number state variable within its declared min and max."
     },
     {
@@ -2908,9 +2912,17 @@
           "required": true
         }
       ],
+      "states": ["disabled", "checked"],
       "summary": "A switch that sets a boolean state variable."
     },
     {
+      "axes": {
+        "density": {
+          "default": "comfortable",
+          "prop": "density",
+          "values": ["comfortable", "compact"]
+        }
+      },
       "bindable": ["items"],
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
@@ -3034,6 +3046,7 @@
         }
       ],
       "sourceable": ["items"],
+      "states": ["focus-visible", "active", "disabled", "expanded", "open"],
       "summary": "A kanban board: cards in columns (and optional swimlanes), moved by drag, keyboard or a move menu, with work-in-progress limits."
     },
     {
@@ -3117,9 +3130,17 @@
         }
       ],
       "sourceable": ["events"],
+      "states": ["hover", "focus-visible", "active", "disabled", "selected", "open", "readonly"],
       "summary": "Events on a month, week, day or agenda view; people open, and when allowed move, events."
     },
     {
+      "axes": {
+        "density": {
+          "default": "compact",
+          "prop": "density",
+          "values": ["compact", "default", "comfortable"]
+        }
+      },
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "data",
@@ -3216,6 +3237,13 @@
       "summary": "A retention table: one row per cohort, one column per period after it started, as rates or counts, with optional heat tints and an averages row."
     },
     {
+      "axes": {
+        "density": {
+          "default": "default",
+          "prop": "density",
+          "values": ["compact", "default", "comfortable"]
+        }
+      },
       "bindable": ["layout"],
       "capability": "unknown",
       "emit": ["developer", "untrusted"],
@@ -3327,6 +3355,7 @@
         }
       ],
       "sourceable": ["layout"],
+      "states": ["hover", "focus-visible", "active"],
       "summary": "A widget grid people can rearrange: data-dashboard-widget children on columns and rows, moved and resized by drag or keyboard, reflowing on narrow screens."
     },
     {
@@ -3413,6 +3442,13 @@
       "summary": "One titled widget of a data-dashboard, placed on the grid; its child is any content node, such as a chart, a KPI or a grid bound to a host data source."
     },
     {
+      "axes": {
+        "density": {
+          "default": "comfortable",
+          "prop": "density",
+          "values": ["comfortable", "compact"]
+        }
+      },
       "bindable": ["layout"],
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
@@ -3486,6 +3522,7 @@
         }
       ],
       "sourceable": ["entries"],
+      "states": ["focus-visible", "active", "selected"],
       "summary": "Folders and files in a grid or list with breadcrumbs, selection and type previews."
     },
     {
@@ -3585,9 +3622,17 @@
           "name": "value"
         }
       ],
+      "states": ["focus-visible", "disabled", "invalid"],
       "summary": "Nested and/or groups of conditions (field, operator by field type, value) that people add, edit and remove."
     },
     {
+      "axes": {
+        "density": {
+          "default": "default",
+          "prop": "density",
+          "values": ["compact", "default", "comfortable"]
+        }
+      },
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "events": ["change", "select"],
@@ -3678,6 +3723,15 @@
         }
       ],
       "sourceable": ["rows"],
+      "states": [
+        "hover",
+        "focus-visible",
+        "disabled",
+        "loading",
+        "selected",
+        "checked",
+        "readonly"
+      ],
       "summary": "A sortable, searchable grid of rows and typed columns; virtualized for long lists."
     },
     {
@@ -3742,6 +3796,7 @@
           }
         }
       ],
+      "states": ["hover", "focus-visible", "active", "selected"],
       "summary": "Places as markers on an offline vector basemap, clustered when close, with a place list beside it."
     },
     {
@@ -3822,6 +3877,7 @@
         }
       ],
       "sourceable": ["items"],
+      "states": ["focus-visible", "active", "disabled", "loading"],
       "summary": "Notifications, newest first, with unread state, mark read and unread, mark all read and an unread view."
     },
     {
@@ -4024,9 +4080,17 @@
         }
       ],
       "sourceable": ["tasks"],
+      "states": ["focus-visible", "active", "disabled", "loading", "selected", "expanded", "open"],
       "summary": "Tasks as bars over days, weeks, months or quarters, with dependencies and progress."
     },
     {
+      "axes": {
+        "density": {
+          "default": "comfortable",
+          "prop": "density",
+          "values": ["comfortable", "compact"]
+        }
+      },
       "bindable": ["items"],
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
@@ -4085,6 +4149,16 @@
         }
       ],
       "sourceable": ["items"],
+      "states": [
+        "focus-visible",
+        "active",
+        "disabled",
+        "loading",
+        "invalid",
+        "selected",
+        "expanded",
+        "checked"
+      ],
       "summary": "A hierarchy of items people expand, select and reorder or re-parent by drag or keyboard."
     },
     {
@@ -4738,6 +4812,7 @@
           "required": true
         }
       ],
+      "states": ["disabled"],
       "summary": "A button that fires one declared flow event, such as next or back."
     },
     {
@@ -4900,6 +4975,7 @@
           "required": true
         }
       ],
+      "states": ["invalid"],
       "summary": "A named, validated field bound to a declared local-state variable."
     },
     {
@@ -4916,6 +4992,7 @@
           "required": true
         }
       ],
+      "states": ["disabled"],
       "summary": "Proposes the form's action with its fields' values; disabled while a receipt is pending."
     },
     {
@@ -4937,6 +5014,7 @@
           "required": true
         }
       ],
+      "states": ["focus-visible"],
       "summary": "Reserves a named place where the host app mounts its own component."
     },
     {
@@ -5410,6 +5488,7 @@
           "name": "panelLabel"
         }
       ],
+      "states": ["selected"],
       "summary": "Sign-in form column plus brand panel."
     },
     {
@@ -5521,6 +5600,7 @@
           "name": "skipLabel"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "Shared brand, actions, user and skip-link chrome for desktop layouts."
     },
     {
@@ -5569,6 +5649,7 @@
           "name": "storageKey"
         }
       ],
+      "states": ["hover", "focus-visible", "selected"],
       "summary": "Top chrome plus container-query widget grid."
     },
     {
@@ -5743,6 +5824,7 @@
           "name": "open"
         }
       ],
+      "states": ["focus-visible", "open"],
       "summary": "Mobile navigation drawer built on the dialog primitive."
     },
     {
@@ -5798,6 +5880,7 @@
           "name": "storageKey"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "Primary nav plus optional context aside."
     },
     {
@@ -5944,6 +6027,7 @@
           "name": "storageKey"
         }
       ],
+      "states": ["loading"],
       "summary": "Resolves a layout id, applies width fallbacks, and keeps one stable screen outlet."
     },
     {
@@ -5990,6 +6074,7 @@
           "name": "sections"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "Standalone marketing landing composition."
     },
     {
@@ -6074,6 +6159,7 @@
           "name": "storageKey"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "Marketing page frame with hero, sections and footer slots."
     },
     {
@@ -6140,6 +6226,7 @@
           "name": "title"
         }
       ],
+      "states": ["focus-visible", "selected"],
       "summary": "Pricing plans grid with title and footnote."
     },
     {
@@ -6230,6 +6317,7 @@
           "name": "title"
         }
       ],
+      "states": ["hover", "focus-visible", "selected"],
       "summary": "Settings section list plus detail pane."
     },
     {
@@ -6285,6 +6373,7 @@
           "name": "storageKey"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "App sidebar column with responsive drawer fallback."
     },
     {
@@ -6415,6 +6504,7 @@
           "name": "storageKey"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "selected"],
       "summary": "Horizontal top navigation with optional mobile menu."
     },
     {
@@ -6499,6 +6589,7 @@
           "name": "validate"
         }
       ],
+      "states": ["focus-visible", "disabled", "selected"],
       "summary": "Centered onboarding wizard frame with steps."
     },
     {
@@ -7353,6 +7444,7 @@
           }
         }
       ],
+      "states": ["disabled", "loading", "readonly"],
       "summary": "A whole form as data: typed fields in sections or steps, conditional logic, named formats and cross-field rules, painted with texuli controls; submitting proposes one action intent to the host."
     },
     {
@@ -7875,6 +7967,7 @@
           }
         }
       ],
+      "states": ["hover", "focus-visible", "disabled"],
       "summary": "A list whose items are a bound list variable; people reorder it by drag or keyboard, and lists sharing a group exchange items."
     },
     {
@@ -7919,6 +8012,7 @@
           "name": "listLabel"
         }
       ],
+      "states": ["hover", "focus-visible", "selected", "expanded"],
       "summary": "Master-detail split with list and detail panes."
     },
     {
@@ -7942,6 +8036,7 @@
           }
         }
       ],
+      "states": ["focus-visible", "active", "readonly"],
       "summary": "A spreadsheet as data: tabs of cells holding numbers, text, booleans and formulas that recalculate."
     },
     {
@@ -8609,6 +8704,15 @@
           "kind": "enum",
           "name": "mode"
         }
+      ],
+      "states": [
+        "focus-visible",
+        "disabled",
+        "invalid",
+        "selected",
+        "expanded",
+        "checked",
+        "readonly"
       ],
       "summary": "A workflow of typed nodes and edges (automations, pipelines, approvals, state diagrams), read-only or editable."
     }

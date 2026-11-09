@@ -3,6 +3,7 @@
  * paints (spec 0.3.0). Build-time only — the sink-free renderer must not
  * import this module. A subpath group: the catalog root does not re-export it.
  */
+export { STATE_AXIS_STAMP, stampStateAxes } from './axes.ts';
 export {
   AUTOCOMPLETE_ALLOWLIST,
   actionFormManifest,
