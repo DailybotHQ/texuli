@@ -4,7 +4,18 @@
  * re-check the ADR-022 guarantees over the compiled variables. Pure apart
  * from the lazy library-theme load for `extends: "texuli:<id>"`; never
  * throws on a JSON value.
+ *
+ * Locked design systems (ADR-032): with a `catalog`, the `allow` section and
+ * `library[].composes` are checked against it (`checkDesignSystemAllow`:
+ * `unknown-component`, `unknown-variant`, `unknown-size`, `unknown-tone`,
+ * `unknown-density`, `unknown-state`). Every check reports `locked`: the
+ * allowed set, the approval status and whether each recorded content hash
+ * still matches; with `hashes`, a stored hash that does not match is refused
+ * (`content-hash-mismatch`, `library-hash-mismatch`). The check cannot prove
+ * who approved: a reviewed commit is the guarantee.
  */
+
+import { checkDesignSystemAllow, type DesignSystemAllowCatalog } from '@texuli/spec/design-system';
 import {
   type CompiledDesignSystem,
   checkDesignSystemIndicators,
@@ -16,6 +27,7 @@ import {
   checkDesignSystemGuarantees,
   DESIGN_SYSTEM_LIMITS,
 } from '@texuli/tokens/design-system/validate';
+import { hashReport } from '../ds-create/approve.ts';
 import {
   DS_CHECK_FORMAT,
   DS_CHECK_VERSION,
@@ -46,6 +58,131 @@ export interface DsCheckOptions {
   bases?: Readonly<Record<string, unknown>> | ((ref: string) => unknown | Promise<unknown>);
   /** The file name to put in the report. */
   file?: string;
+  /**
+   * The catalog the `allow` section is checked against (ADR-032): the spec
+   * catalog, or any `{ components: [{ id, axes?, states? }] }`. Omitted: the
+   * allowed set is reported but not checked for catalog membership.
+   */
+  catalog?: DesignSystemAllowCatalog;
+  /**
+   * Refuse a recorded content hash that no longer matches (`content-hash-mismatch`,
+   * `library-hash-mismatch`). `texuli ds check` sets it; `ds.validate` (and so `ds approve`,
+   * which replaces a stale approval) does not: a stale approval is not a malformed document.
+   * The hashes are reported in `locked` either way.
+   */
+  hashes?: boolean;
+}
+
+/** Codes the locked-design-system checks raise besides the spec's allow codes. */
+export const DS_CHECK_LOCKED_CODES = ['content-hash-mismatch', 'library-hash-mismatch'] as const;
+
+/** The approval and the allowed set of a design system, as `ds check` reports them. */
+export interface DsLockedReport {
+  /** True when the document has an `allow` section (only allowed components may be used). */
+  locked: boolean;
+  /** The allowed catalog ids, sorted (empty when not locked). */
+  allowed: string[];
+  /** The library entry ids, in document order. */
+  library: string[];
+  /** Whether `allow` was checked against a catalog. */
+  catalogChecked: boolean;
+  approval: {
+    /** `none` when the document has no `approval` record. */
+    status: 'approved' | 'draft' | 'none' | 'unknown';
+    version?: string;
+    /** As declared: the check cannot prove who approved. */
+    approvedBy?: string;
+    approvedAt?: string;
+    /** The content hash of the document as written. */
+    contentHash: string;
+    /** The hash the approval records, if any. */
+    stored?: string;
+    /** `true`/`false` when a hash is recorded; absent when none is. */
+    matches?: boolean;
+  };
+  /** Each library entry's approval and hash. */
+  entries: {
+    id?: string;
+    status?: string;
+    contentHash: string;
+    stored?: string;
+    matches?: boolean;
+  }[];
+}
+
+/** A `ds check` report with the locked-design-system section. */
+export type DsCheckLockedReport = DsCheckReport & { locked: DsLockedReport };
+
+const text = (value: unknown, max = 200): string | undefined =>
+  typeof value === 'string' ? value.slice(0, max) : undefined;
+
+/** The allowed set, the approval and the hash checks of a document (ADR-032). */
+export function lockedReport(
+  input: unknown,
+  catalogChecked: boolean
+): { report: DsLockedReport; errors: DsCheckIssue[] } {
+  const doc = isRecord(input) ? input : {};
+  const hashes = hashReport(input);
+  const record = isRecord(doc.approval) ? doc.approval : undefined;
+  const status = !record
+    ? 'none'
+    : record.status === 'approved' || record.status === 'draft'
+      ? record.status
+      : 'unknown';
+  const library = Array.isArray(doc.library) ? doc.library.slice(0, 64) : [];
+  const errors: DsCheckIssue[] = [];
+  if (hashes.matches === false)
+    errors.push({
+      code: 'content-hash-mismatch',
+      path: '$.approval.contentHash',
+      message: 'The recorded content hash does not match the document: it changed after approval.',
+      hint: 'Review the change, then re-approve (texuli ds approve) to record the new hash.',
+    });
+  hashes.library.slice(0, 64).forEach((entry, index) => {
+    if (entry.matches === false)
+      errors.push({
+        code: 'library-hash-mismatch',
+        path: `$.library[${index}].approval.contentHash`,
+        message: 'The recorded content hash does not match this library entry.',
+        hint: 'Review the entry, then re-approve it.',
+      });
+  });
+  return {
+    report: {
+      locked: isRecord(doc.allow),
+      allowed: isRecord(doc.allow)
+        ? Object.keys(doc.allow)
+            .filter((id) => !['__proto__', 'constructor', 'prototype'].includes(id))
+            .sort()
+            .slice(0, 256)
+        : [],
+      library: library
+        .map((entry) => (isRecord(entry) ? text(entry.id, 48) : undefined))
+        .filter((id): id is string => id !== undefined),
+      catalogChecked,
+      approval: {
+        status,
+        ...(record && text(record.version, 64) ? { version: text(record.version, 64) } : {}),
+        ...(record && text(record.approvedBy) ? { approvedBy: text(record.approvedBy) } : {}),
+        ...(record && text(record.approvedAt, 64)
+          ? { approvedAt: text(record.approvedAt, 64) }
+          : {}),
+        contentHash: hashes.contentHash,
+        ...(hashes.stored !== undefined ? { stored: hashes.stored, matches: hashes.matches } : {}),
+      },
+      entries: hashes.library.slice(0, 64).map((entry, index) => {
+        const raw = library[index];
+        const entryStatus = isRecord(raw) ? text(raw.status, 32) : undefined;
+        return {
+          ...(entry.id ? { id: entry.id } : {}),
+          ...(entryStatus ? { status: entryStatus } : {}),
+          contentHash: entry.contentHash,
+          ...(entry.stored !== undefined ? { stored: entry.stored, matches: entry.matches } : {}),
+        };
+      }),
+    },
+    errors,
+  };
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -141,7 +278,7 @@ export function issueCodes(issues: readonly DsCheckIssue[]): string[] {
 export async function checkDesignSystem(
   input: unknown,
   options: DsCheckOptions = {}
-): Promise<DsCheckReport> {
+): Promise<DsCheckLockedReport> {
   const errors: DsCheckIssue[] = [];
   const runs: DsCheckRun[] = [];
   const doc = isRecord(input) ? input : {};
@@ -203,6 +340,15 @@ export async function checkDesignSystem(
     }
   }
 
+  // Locked design systems (ADR-032): catalog membership of `allow`, then the
+  // approval's content hashes.
+  if (options.catalog) {
+    for (const issue of checkDesignSystemAllow(input, options.catalog).errors)
+      errors.push({ code: issue.code, path: issue.path, message: issue.message });
+  }
+  const locked = lockedReport(input, options.catalog !== undefined);
+  if (options.hashes) errors.push(...locked.errors);
+
   return {
     format: DS_CHECK_FORMAT,
     version: DS_CHECK_VERSION,
@@ -212,6 +358,7 @@ export async function checkDesignSystem(
     codes: issueCodes(errors),
     errors,
     runs,
+    locked: locked.report,
   };
 }
 
