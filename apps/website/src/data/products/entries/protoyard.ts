@@ -1,9 +1,9 @@
 import type { ProductEntry } from '../schema.ts';
 
-const audit =
-  '.dwp/plans/PLAN_015_ecosystem_solutions_native_site/analysis_results/audit/protoyard-capabilities-current.md';
-const facts =
-  '.dwp/plans/PLAN_015_ecosystem_solutions_native_site/analysis_results/audit/facts.md#F-51';
+/** Public sources only: the npm package, the product's own docs and the ADR. */
+const npm = 'https://www.npmjs.com/package/protoyard';
+const docs = 'https://protoyard.app/docs';
+const adr = 'docs/DECISIONS.md#adr-027-solutions-capabilities-components-and-products';
 
 export const PROTOYARD: ProductEntry = {
   id: 'protoyard',
@@ -31,14 +31,18 @@ export const PROTOYARD: ProductEntry = {
   ],
   evidence: [
     {
-      source: audit,
+      source: npm,
       claim:
-        'The current Protoyard 1.5.0 audit verifies local authoring, variant iteration, validation and prototype export; it records Cloud as absent.',
+        'Protoyard 1.5.0 is published on npm, built on Texuli 0.14.2; its CLI covers local authoring, variant iteration, validation and prototype export.',
     },
     {
-      source: facts,
+      source: docs,
+      claim: 'The public engine guides for the open-source local version.',
+    },
+    {
+      source: adr,
       claim:
-        'The local open-source version may be described only from verified functionality; Protoyard Cloud must never be marked available.',
+        'Products built with Texuli keep their own brand and domain and use the status vocabulary; Protoyard Cloud is planned, not available.',
     },
   ],
 };

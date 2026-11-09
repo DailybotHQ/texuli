@@ -1,11 +1,7 @@
 import type { ProductEntry } from '../schema.ts';
 
-const audit =
-  '.dwp/plans/PLAN_015_ecosystem_solutions_native_site/analysis_results/audit/protoyard-capabilities-current.md';
-const vision =
-  '.dwp/plans/PLAN_015_ecosystem_solutions_native_site/analysis_results/SOURCE_SUPERPROMPT_2_2.md#18.3';
-const facts =
-  '.dwp/plans/PLAN_015_ecosystem_solutions_native_site/analysis_results/audit/facts.md#F-51';
+/** Public sources only. No public page describes Ronin Builder yet; the ADR sets the rules. */
+const adr = 'docs/DECISIONS.md#adr-027-solutions-capabilities-components-and-products';
 
 export const RONIN_BUILDER: ProductEntry = {
   id: 'ronin-builder',
@@ -26,16 +22,9 @@ export const RONIN_BUILDER: ProductEntry = {
   ],
   evidence: [
     {
-      source: audit,
-      claim: 'Ronin Builder is absent from the current Protoyard consumer checkout.',
-    },
-    {
-      source: vision,
-      claim: 'Ronin Builder is described as a concept, not as an available product.',
-    },
-    {
-      source: facts,
-      claim: 'Ronin Builder must never be shown as available on texuli.com.',
+      source: adr,
+      claim:
+        'Every product entry carries a status from the vocabulary; Ronin Builder is a planned concept, unlisted and never shown as available.',
     },
   ],
 };

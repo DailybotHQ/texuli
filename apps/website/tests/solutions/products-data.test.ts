@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   assertProductEntries,
@@ -8,18 +10,23 @@ import {
   RONIN_BUILDER,
 } from '../../src/data/products/index.ts';
 
-const CURRENT_PROTOYARD_AUDIT =
-  '.dwp/plans/PLAN_015_ecosystem_solutions_native_site/analysis_results/audit/protoyard-capabilities-current.md';
-const FACTS_F51 =
-  '.dwp/plans/PLAN_015_ecosystem_solutions_native_site/analysis_results/audit/facts.md#F-51';
+const REPO = resolve(import.meta.dirname, '../../../..');
+const ADR_027 = 'docs/DECISIONS.md#adr-027-solutions-capabilities-components-and-products';
+
+/** A public source: an https URL, or a committed repository file (never git-ignored `.dwp/`). */
+function isPublicSource(source: string): boolean {
+  if (source.startsWith('https://')) return true;
+  if (source.startsWith('.dwp/')) return false;
+  return existsSync(resolve(REPO, source.split('#')[0] ?? ''));
+}
 
 describe('Built with Texuli product data', () => {
-  it('validates every product and cites the current audit and facts', () => {
+  it('validates every product and cites only public sources, including the products ADR', () => {
     expect(() => assertProductEntries(PRODUCTS)).not.toThrow();
     for (const product of PRODUCTS) {
       const sources = product.evidence.map(({ source }) => source);
-      expect(sources).toContain(CURRENT_PROTOYARD_AUDIT);
-      expect(sources).toContain(FACTS_F51);
+      for (const source of sources) expect(isPublicSource(source), source).toBe(true);
+      expect(sources).toContain(ADR_027);
       expect(product.evidence.every(({ claim }) => claim.trim().length > 0)).toBe(true);
     }
   });
