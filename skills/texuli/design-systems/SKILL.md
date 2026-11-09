@@ -41,8 +41,10 @@ Guide (monorepo): `docs/DESIGN_SYSTEMS.md`. Reference: the document
   names from `texuli://design-system/acme`, which shows every section.
 - **Fictional brands only** (`example.com`, "Example Co."); never a real
   company's name, colors or logo.
-- **Never claim it passes** without a `ds.validate` (or `texuli ds
-  validate`) result with `valid: true`.
+- **Never claim it passes** without a validator result. For ordinary
+  validation, check MCP `valid: true` or CLI exit code 0. In full MCP mode,
+  also inspect `summary` and `findings`; in full CLI JSON require `ok: true`.
+  A report-only run exits 0 even with findings and is not a passing verdict.
 - **Nothing activates.** Saving needs an explicit path (`ds.save`, local
   only); a blueprint stays a `draft` until its owner activates it.
 
@@ -109,6 +111,27 @@ validate again, until `valid` is true. The codes and their fixes:
 [`references/codes.md`](references/codes.md). Then call `ds.contrast`: every
 mode must report `failing: 0`.
 
+For a locked design system, request the full validator with MCP
+`ds.validate` `{ "document": …, "full": true }`. Add `prototype` as bounded
+data (`{ "files": { "src/App.svelte": "…" }, "blueprints": { … } }`) to
+check source components, static props, blueprints and locked CSS. It reads
+source text; it never executes it. `catalog` can replace the bundled
+catalog, `extensions` adds checked host catalog entries, and `strict: true`
+promotes warnings to errors in `valid`. `report: true` marks a progress
+report; findings are always returned and `valid` still carries the verdict.
+MCP full mode has no browser runtime check.
+
+In a local checkout, use `texuli ds validate <file> --locked` for full
+document validation and `--prototype <dir>` to scan a local prototype tree.
+`--json` emits the full report and counts. `--report` prints all findings
+and exits 0 for migration tracking, even when the report's `ok` is false;
+do not treat that exit code as a pass. `--render` adds Chromium checks for
+the catalog conformance sheet, not the consumer application's own page.
+CLI `--strict` applies to known findings in that render check. Exit codes:
+0 valid or report-only, 1 enforced findings, 2 unable to run. The complete
+code, severity, exemption and input-limit reference is
+`packages/tools/docs/ds-check.md` in the Texuli repository.
+
 ## Apply and export
 
 | Goal | Call |
@@ -134,6 +157,7 @@ texuli ds validate design-systems/example.ds.json
 texuli ds compile design-systems/example.ds.json --format css --out dist/example.css
 texuli ds preview design-systems/example.ds.json --out review/example.svg
 texuli ds check design-systems/example.ds.json --json
+texuli ds validate design-systems/example.ds.json --locked --prototype ./src --json
 ```
 
 Exit codes: 0 valid, 1 refused, 2 could not run. MCP tools, prompt and
