@@ -1,5 +1,6 @@
 import { manifestData } from '../../manifest/data.ts';
 import type { CatalogManifest } from '../../manifest/types.ts';
+import { stampDisplayAxes } from './axes.ts';
 import {
   alertPropNames,
   avatarGroupGridPropNames,
@@ -20,6 +21,11 @@ import {
   tagPropNames,
   timelinePropNames,
 } from './prop-names.ts';
+
+/* @__NO_SIDE_EFFECTS__ */
+function defineDisplayManifest(input: CatalogManifest): Readonly<CatalogManifest> {
+  return stampDisplayAxes(manifestData(input));
+}
 
 const PKG = 'texuli';
 
@@ -66,7 +72,7 @@ const badgeVariants = [
 
 const alertTones = ['info', 'success', 'warning', 'error', 'brand', 'neutral'] as const;
 
-export const cardManifest = /* @__PURE__ */ manifestData({
+export const cardManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'card',
   package: PKG,
   label: 'Card',
@@ -117,7 +123,7 @@ export const cardManifest = /* @__PURE__ */ manifestData({
   related: ['button', 'stat'],
 });
 
-export const badgeManifest = /* @__PURE__ */ manifestData({
+export const badgeManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'badge',
   package: PKG,
   label: 'Badge',
@@ -150,7 +156,7 @@ export const badgeManifest = /* @__PURE__ */ manifestData({
   related: ['tag', 'chip', 'inline-text'],
 });
 
-export const tagManifest = /* @__PURE__ */ manifestData({
+export const tagManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'tag',
   package: PKG,
   label: 'Tag',
@@ -174,7 +180,7 @@ export const tagManifest = /* @__PURE__ */ manifestData({
   related: ['badge', 'chip'],
 });
 
-export const chipManifest = /* @__PURE__ */ manifestData({
+export const chipManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'chip',
   package: PKG,
   label: 'Chip',
@@ -202,7 +208,7 @@ export const chipManifest = /* @__PURE__ */ manifestData({
   related: ['badge', 'tag', 'button'],
 });
 
-export const tableManifest = /* @__PURE__ */ manifestData({
+export const tableManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'table',
   package: PKG,
   label: 'Table',
@@ -276,7 +282,7 @@ const alertSharedDetail = {
   class: { kind: 'string' as const },
 };
 
-export const alertManifest = /* @__PURE__ */ manifestData({
+export const alertManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'alert',
   package: PKG,
   label: 'Alert',
@@ -297,7 +303,7 @@ export const alertManifest = /* @__PURE__ */ manifestData({
   related: ['callout', 'banner', 'error-state'],
 });
 
-export const calloutManifest = /* @__PURE__ */ manifestData({
+export const calloutManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'callout',
   package: PKG,
   label: 'Callout',
@@ -318,7 +324,7 @@ export const calloutManifest = /* @__PURE__ */ manifestData({
   related: ['alert', 'banner'],
 });
 
-export const bannerManifest = /* @__PURE__ */ manifestData({
+export const bannerManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'banner',
   package: PKG,
   label: 'Banner',
@@ -344,7 +350,7 @@ export const bannerManifest = /* @__PURE__ */ manifestData({
   related: ['alert', 'callout'],
 });
 
-export const statManifest = /* @__PURE__ */ manifestData({
+export const statManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'stat',
   package: PKG,
   label: 'Stat',
@@ -389,7 +395,7 @@ export const statManifest = /* @__PURE__ */ manifestData({
   related: ['kpi', 'card'],
 });
 
-export const kpiManifest = /* @__PURE__ */ manifestData({
+export const kpiManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'kpi',
   package: PKG,
   label: 'KPI',
@@ -443,7 +449,7 @@ export const kpiManifest = /* @__PURE__ */ manifestData({
   related: ['stat', 'card'],
 });
 
-export const emptyStateManifest = /* @__PURE__ */ manifestData({
+export const emptyStateManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'empty-state',
   package: PKG,
   label: 'Empty state',
@@ -471,7 +477,7 @@ export const emptyStateManifest = /* @__PURE__ */ manifestData({
   related: ['error-state', 'table'],
 });
 
-export const errorStateManifest = /* @__PURE__ */ manifestData({
+export const errorStateManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'error-state',
   package: PKG,
   label: 'Error state',
@@ -503,7 +509,7 @@ export const errorStateManifest = /* @__PURE__ */ manifestData({
   related: ['empty-state', 'alert'],
 });
 
-export const stepperManifest = /* @__PURE__ */ manifestData({
+export const stepperManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'stepper',
   package: PKG,
   label: 'Stepper',
@@ -548,7 +554,7 @@ export const stepperManifest = /* @__PURE__ */ manifestData({
   related: ['timeline', 'layout-wizard'],
 });
 
-export const timelineManifest = /* @__PURE__ */ manifestData({
+export const timelineManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'timeline',
   package: PKG,
   label: 'Timeline',
@@ -601,7 +607,7 @@ export const timelineManifest = /* @__PURE__ */ manifestData({
 
 const avatarSizes = ['xs', 'sm', 'md', 'lg'] as const;
 
-export const avatarGroupGridManifest = /* @__PURE__ */ manifestData({
+export const avatarGroupGridManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'avatar-group-grid',
   package: PKG,
   label: 'AvatarGroupGrid',
@@ -623,7 +629,7 @@ export const avatarGroupGridManifest = /* @__PURE__ */ manifestData({
   ],
 });
 
-export const kbdManifest = /* @__PURE__ */ manifestData({
+export const kbdManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'kbd',
   package: PKG,
   label: 'Kbd',
@@ -655,7 +661,7 @@ export const kbdManifest = /* @__PURE__ */ manifestData({
  * component: the host paints `text` as one escaped text node, and the
  * renderer drops any children it is given.
  */
-export const inlineTextManifest = /* @__PURE__ */ manifestData({
+export const inlineTextManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'inline-text',
   package: '@texuli/catalog',
   label: 'Inline text',
@@ -690,7 +696,7 @@ export const inlineTextManifest = /* @__PURE__ */ manifestData({
   related: ['button', 'label', 'badge', 'kbd'],
 });
 
-export const codeManifest = /* @__PURE__ */ manifestData({
+export const codeManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'code',
   package: PKG,
   label: 'Code',
