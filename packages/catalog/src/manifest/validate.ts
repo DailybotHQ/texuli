@@ -713,6 +713,106 @@ function validateAxesAndStates(
   }
 }
 
+const IMPORT_MODULE = /^(@texuli\/[a-z0-9-]+|texuli)(\/[A-Za-z0-9._-]+)*$/;
+const IMPORT_EXPORT = /^[A-Za-z_][A-Za-z0-9_]*$/;
+const IMPORTS_CAP = 16;
+const IMPORT_EXPORTS_CAP = 64;
+
+function validateImports(input: Record<string, unknown>, diagnostics: ManifestDiagnostic[]): void {
+  if (input.imports === undefined) return;
+  if (!Array.isArray(input.imports) || input.imports.length > IMPORTS_CAP) {
+    issue(
+      diagnostics,
+      'invalid-type',
+      ['imports'],
+      `"imports" must be an array of at most ${IMPORTS_CAP} { module, exports } entries.`,
+      'List each public module that exports this catalog id.'
+    );
+    return;
+  }
+  const modules = new Set<string>();
+  input.imports.forEach((entry, i) => {
+    if (!isRecord(entry)) {
+      issue(
+        diagnostics,
+        'invalid-import',
+        ['imports', i],
+        'Each import is { module, exports }.',
+        'Name the package subpath and the export names that belong here.'
+      );
+      return;
+    }
+    for (const key of Object.keys(entry)) {
+      if (key !== 'module' && key !== 'exports') {
+        issue(
+          diagnostics,
+          'unknown-field',
+          ['imports', i, key],
+          `Unknown field "${key}".`,
+          'An import has only module and exports.'
+        );
+      }
+    }
+    const moduleName = entry.module;
+    if (
+      typeof moduleName !== 'string' ||
+      !IMPORT_MODULE.test(moduleName) ||
+      moduleName.length > 128
+    ) {
+      issue(
+        diagnostics,
+        'invalid-import',
+        ['imports', i, 'module'],
+        'module is a texuli or @texuli/* specifier.',
+        'Use texuli/button or @texuli/data/grid, not a relative path.'
+      );
+    } else if (modules.has(moduleName)) {
+      issue(
+        diagnostics,
+        'duplicate-import',
+        ['imports', i, 'module'],
+        `Module "${moduleName}" repeats.`,
+        'Merge the export lists for that module.'
+      );
+    } else {
+      modules.add(moduleName);
+    }
+    const exported = entry.exports;
+    if (!Array.isArray(exported) || exported.length < 1 || exported.length > IMPORT_EXPORTS_CAP) {
+      issue(
+        diagnostics,
+        'invalid-import',
+        ['imports', i, 'exports'],
+        `"exports" is 1 to ${IMPORT_EXPORTS_CAP} export names.`,
+        'List every name this catalog id owns on that module.'
+      );
+      return;
+    }
+    const names = new Set<string>();
+    exported.forEach((name, j) => {
+      if (typeof name !== 'string' || !IMPORT_EXPORT.test(name) || name.length > 64) {
+        issue(
+          diagnostics,
+          'invalid-import',
+          ['imports', i, 'exports', j],
+          'Export names are JavaScript identifiers.',
+          'Use Button, not default or a string path.'
+        );
+      } else if (names.has(name)) {
+        issue(
+          diagnostics,
+          'duplicate-import',
+          ['imports', i, 'exports', j],
+          `Export "${name}" repeats.`,
+          'List it once.'
+        );
+      } else {
+        names.add(name);
+      }
+    });
+  });
+}
+
 /**
  * Validate one authored catalog manifest. Safe for untrusted JSON input:
  * never throws on shape alone; returns diagnostics.
@@ -1082,6 +1182,7 @@ export function validateCatalogManifest(input: unknown): ManifestValidation {
     }
   }
   validateAxesAndStates(input, diagnostics);
+  validateImports(input, diagnostics);
   if (input.deprecated !== undefined) {
     const problem = deprecationProblem(input.deprecated);
     if (problem)
@@ -1108,6 +1209,7 @@ export function validateCatalogManifest(input: unknown): ManifestValidation {
     'sourceable',
     'axes',
     'states',
+    'imports',
     'deprecated',
   ]);
   for (const key of Object.keys(input)) {
@@ -1154,6 +1256,31 @@ export function validateCatalogManifests(inputs: readonly unknown[]): ManifestVa
         );
       } else {
         seen.set(input.id, i);
+      }
+    }
+  });
+
+  const owners = new Map<string, { id: string; index: number }>();
+  inputs.forEach((input, i) => {
+    if (!isRecord(input) || !Array.isArray(input.imports) || typeof input.id !== 'string') return;
+    for (const entry of input.imports) {
+      if (!isRecord(entry) || typeof entry.module !== 'string' || !Array.isArray(entry.exports))
+        continue;
+      for (const name of entry.exports) {
+        if (typeof name !== 'string') continue;
+        const key = `${entry.module}\0${name}`;
+        const previous = owners.get(key);
+        if (previous && previous.id !== input.id) {
+          issue(
+            diagnostics,
+            'duplicate-import',
+            [i, 'imports'],
+            `Export "${name}" of "${entry.module}" belongs to "${previous.id}" and "${input.id}".`,
+            'Each public export maps to exactly one catalog id.'
+          );
+        } else if (!previous) {
+          owners.set(key, { id: input.id, index: i });
+        }
       }
     }
   });

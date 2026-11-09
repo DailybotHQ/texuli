@@ -66,6 +66,31 @@
       "required": ["prop", "values", "default"],
       "additionalProperties": false
     },
+    "import": {
+      "description": "One module specifier a host or checker can import, and the export names that belong to this catalog id (the component, its compound parts, and co-located helpers). The subpath and the root barrel are listed separately when both export the name.",
+      "type": "object",
+      "properties": {
+        "module": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^(@texuli/[a-z0-9-]+|texuli)(/[A-Za-z0-9._-]+)*$"
+        },
+        "exports": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+          }
+        }
+      },
+      "required": ["module", "exports"],
+      "additionalProperties": false
+    },
     "stateName": {
       "description": "The closed list of observable states (ADR-032, spec 0.13.0).",
       "type": "string",
@@ -161,6 +186,14 @@
           "maxItems": 11,
           "items": {
             "$ref": "#/$defs/stateName"
+          }
+        },
+        "imports": {
+          "description": "Module specifiers and export names that belong to this catalog id, including compound parts. A static checker maps any of these imports to this id. Omitted: the id has no public package export.",
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/import"
           }
         },
         "deprecated": {

@@ -58,6 +58,8 @@ export interface BuiltCatalogLike {
     axes?: Readonly<Partial<Record<SpecAxisName, string>>>;
     /** ADR-032: the observable states (authored in the manifest). */
     states?: readonly string[];
+    /** Public module + export names that belong to this catalog id. */
+    imports?: readonly { readonly module: string; readonly exports: readonly string[] }[];
     props: readonly {
       name: string;
       kind: SpecPropKind;
@@ -122,6 +124,14 @@ export function projectCatalog(
         ...(entry.sourceable?.length ? { sourceable: [...entry.sourceable].sort() } : {}),
         ...(axes ? { axes } : {}),
         ...(states ? { states } : {}),
+        ...(entry.imports && entry.imports.length > 0
+          ? {
+              imports: entry.imports.map((item) => ({
+                module: item.module,
+                exports: [...item.exports],
+              })),
+            }
+          : {}),
         ...(entry.deprecated ? { deprecated: { ...entry.deprecated } } : {}),
       };
     });
