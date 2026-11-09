@@ -189,7 +189,9 @@ const nativeLinks = siteRouteExists('/native/') ? [{ href: '/native/', label: 'N
   </div>
 </footer>
 
-<style>
+<style is:global>
+  /* Global but rooted at .site-footer: a scoped style would stamp a data-astro-cid
+     attribute on every footer element of every page (about 1.5 KB of HTML each). */
   .site-footer {
     padding-block: 1.75rem;
     padding-inline: 1rem;
@@ -197,13 +199,13 @@ const nativeLinks = siteRouteExists('/native/') ? [{ href: '/native/', label: 'N
     color: var(--tx-muted-foreground);
     font-size: 0.875rem;
   }
-  .site-footer__inner {
+  .site-footer .site-footer__inner {
     display: grid;
     gap: 0.75rem;
     max-inline-size: 72rem;
     margin-inline: auto;
   }
-  ul {
+  .site-footer ul {
     display: flex;
     flex-wrap: wrap;
     gap: 0.35rem 1rem;
@@ -211,19 +213,19 @@ const nativeLinks = siteRouteExists('/native/') ? [{ href: '/native/', label: 'N
     padding: 0;
     list-style: none;
   }
-  .site-footer__products {
+  .site-footer .site-footer__products {
     font-weight: 600;
   }
-  nav {
+  .site-footer nav {
     display: grid;
     gap: 0.75rem;
   }
-  .site-footer__columns {
+  .site-footer .site-footer__columns {
     display: grid;
     gap: 1rem;
     grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
   }
-  .site-footer__column h2 {
+  .site-footer .site-footer__column h2 {
     margin: 0;
     color: var(--tx-foreground);
     font-size: 0.75rem;
@@ -231,64 +233,64 @@ const nativeLinks = siteRouteExists('/native/') ? [{ href: '/native/', label: 'N
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
-  .site-footer__column ul {
+  .site-footer .site-footer__column ul {
     flex-direction: column;
     gap: 0;
   }
-  a {
+  .site-footer a {
     color: var(--tx-link);
     text-decoration: none;
     min-block-size: 2.5rem;
     display: inline-flex;
     align-items: center;
   }
-  a:hover {
+  .site-footer a:hover {
     text-decoration: underline;
   }
-  a:focus-visible {
+  .site-footer a:focus-visible {
     outline: 2px solid var(--tx-ring);
     outline-offset: 2px;
   }
-  p {
+  .site-footer p {
     margin: 0;
     max-inline-size: 46rem;
     line-height: 1.5;
   }
-  .site-footer__status strong {
+  .site-footer .site-footer__status strong {
     color: var(--tx-foreground);
   }
-  code {
+  .site-footer code {
     font-size: 0.85em;
   }
   /* The Dailybot credit: muted and small, wrapping under the status line. */
-  .site-footer__credit {
+  .site-footer .site-footer__credit {
     justify-self: start;
     flex-wrap: wrap;
     gap: 0.5rem;
     max-inline-size: 100%;
     color: var(--tx-muted-foreground);
   }
-  .site-footer__credit:hover {
+  .site-footer .site-footer__credit:hover {
     text-decoration: none;
     opacity: 0.8;
   }
-  .site-footer__kicker {
+  .site-footer .site-footer__kicker {
     font-size: 0.75rem;
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
-  .site-footer__credit img {
+  .site-footer .site-footer__credit img {
     block-size: 1.25rem;
     inline-size: auto;
     max-inline-size: 100%;
   }
-  .site-footer__credit-dark {
+  .site-footer .site-footer__credit-dark {
     display: none;
   }
-  :global(:root[data-tx-mode='dark']) .site-footer__credit-light {
+  :root[data-tx-mode='dark'] .site-footer .site-footer__credit-light {
     display: none;
   }
-  :global(:root[data-tx-mode='dark']) .site-footer__credit-dark {
+  :root[data-tx-mode='dark'] .site-footer .site-footer__credit-dark {
     display: block;
   }
   /* Forced colors never recolor the SVG artwork and the forced Canvas follows
@@ -296,21 +298,21 @@ const nativeLinks = siteRouteExists('/native/') ? [{ href: '/native/', label: 'N
      prefers-color-scheme, the BrandLogo rule (PLAN_006 P2-6). */
   @media (forced-colors: active) {
     .site-footer__credit-light,
-    :global(:root[data-tx-mode]) .site-footer__credit-light {
+    :root[data-tx-mode] .site-footer .site-footer__credit-light {
       display: block;
     }
     .site-footer__credit-dark,
-    :global(:root[data-tx-mode]) .site-footer__credit-dark {
+    :root[data-tx-mode] .site-footer .site-footer__credit-dark {
       display: none;
     }
   }
   @media (forced-colors: active) and (prefers-color-scheme: dark) {
     .site-footer__credit-light,
-    :global(:root[data-tx-mode]) .site-footer__credit-light {
+    :root[data-tx-mode] .site-footer .site-footer__credit-light {
       display: none;
     }
     .site-footer__credit-dark,
-    :global(:root[data-tx-mode]) .site-footer__credit-dark {
+    :root[data-tx-mode] .site-footer .site-footer__credit-dark {
       display: block;
     }
   }
