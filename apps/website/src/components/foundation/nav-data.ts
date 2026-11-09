@@ -7,7 +7,7 @@
  */
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { SOLUTION_SLUGS, type SolutionSlug } from '../../data/solutions/schema.ts';
+import { SOLUTIONS } from '../../data/solutions/index.ts';
 import { COMPONENT_PAGES } from '../component-pages/load-manifests.ts';
 import { GUIDES_SECTIONS } from '../guides/nav.ts';
 import { PRIMITIVES } from '../primitives-page/primitives.ts';
@@ -63,24 +63,15 @@ export const LANDING_NAV: readonly LandingNavItem[] = LANDING_NAV_CONTRACT.filte
   (item) => item.external === true || siteRouteExists(item.href)
 );
 
-const SOLUTION_NAV_LABELS: Readonly<Record<SolutionSlug, string>> = {
-  slides: 'Slides',
-  documents: 'Documents',
-  workflows: 'Workflows',
-  canvas: 'Canvas',
-  sheets: 'Sheets',
-};
-
 /**
- * Sidebar Solutions links from the promoted slugs (schema.ts until
- * `data/solutions/index.ts` merges). A slug is listed only when its landing page exists.
+ * Sidebar Solutions links from the registry (ADR-029), in catalog order. A Solution is
+ * listed only when its landing page exists.
  */
 export function solutionNavLinks(): NavLink[] {
   const links: NavLink[] = [];
   if (siteRouteExists('/solutions/')) links.push({ href: '/solutions/', label: 'Explore all' });
-  for (const slug of SOLUTION_SLUGS) {
-    const href = `/solutions/${slug}/`;
-    if (siteRouteExists(href)) links.push({ href, label: SOLUTION_NAV_LABELS[slug] });
+  for (const entry of SOLUTIONS) {
+    if (siteRouteExists(entry.route)) links.push({ href: entry.route, label: entry.name });
   }
   return links;
 }
