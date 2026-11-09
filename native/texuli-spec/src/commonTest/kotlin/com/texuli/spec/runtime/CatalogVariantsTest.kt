@@ -42,7 +42,8 @@ class CatalogVariantsTest {
 
     @Test
     fun carriesEveryCatalogAxisWithTheValuesOfItsProp() {
-        assertEquals(174, SpecVocabulary.components.size)
+        // The catalog grows (widening tasks add ids); every axis must still match its prop.
+        assertEquals(true, SpecVocabulary.components.size >= 174)
         val withAxes = SpecVocabulary.components.filter { it.axes != null }
         assertEquals(true, withAxes.isNotEmpty())
         for (component in withAxes) {

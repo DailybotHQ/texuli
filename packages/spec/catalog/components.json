@@ -1,5 +1,5 @@
 {
-  "catalogHash": "387e93a554a7cda7075cfe260afb907725c03ecc274aa4dcbd668c0c5cf333ce",
+  "catalogHash": "a2f97e1879dd06e022aca8bfa5f8f376ecaf78867f3efb70c85c87fe6d73149c",
   "components": [
     {
       "capability": "web-only",
@@ -117,27 +117,16 @@
       "id": "alert-dialog",
       "imports": [
         {
-          "exports": ["AlertDialog", "Dialog"],
+          "exports": ["AlertDialog"],
           "module": "texuli"
         },
         {
           "exports": [
             "AlertDialog",
-            "DIALOG_SIZES",
-            "Dialog",
-            "DialogSize",
             "alertDialogActionsClass",
             "alertDialogContentClass",
             "alertDialogErrorClass",
-            "alertDialogIconClass",
-            "dialogBodyClass",
-            "dialogCloseClass",
-            "dialogContentClass",
-            "dialogDescriptionClass",
-            "dialogFooterClass",
-            "dialogHeaderClass",
-            "dialogOverlayClass",
-            "dialogTitleClass"
+            "alertDialogIconClass"
           ],
           "module": "texuli/dialog"
         }
@@ -662,6 +651,20 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-code",
+      "imports": [
+        {
+          "exports": ["loadCodeFamily"],
+          "module": "@texuli/blocks"
+        },
+        {
+          "exports": ["loadCodeFamily"],
+          "module": "@texuli/blocks/code"
+        },
+        {
+          "exports": ["CodeBlockView"],
+          "module": "@texuli/blocks/code/renderers"
+        }
+      ],
       "label": "Code blocks",
       "placement": "content",
       "props": [
@@ -716,6 +719,20 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-data",
+      "imports": [
+        {
+          "exports": ["loadDataFamily"],
+          "module": "@texuli/blocks"
+        },
+        {
+          "exports": ["loadDataFamily"],
+          "module": "@texuli/blocks/data"
+        },
+        {
+          "exports": ["ChartBlockView", "DataBlockView"],
+          "module": "@texuli/blocks/data/renderers"
+        }
+      ],
       "label": "Data blocks",
       "placement": "content",
       "props": [
@@ -746,6 +763,16 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-diagram",
+      "imports": [
+        {
+          "exports": ["loadDiagramFamily"],
+          "module": "@texuli/blocks"
+        },
+        {
+          "exports": ["loadDiagramFamily"],
+          "module": "@texuli/blocks/diagram"
+        }
+      ],
       "label": "Diagram blocks",
       "placement": "content",
       "props": [
@@ -768,6 +795,20 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-embed",
+      "imports": [
+        {
+          "exports": ["loadEmbedFamily"],
+          "module": "@texuli/blocks"
+        },
+        {
+          "exports": ["loadEmbedFamily"],
+          "module": "@texuli/blocks/embed"
+        },
+        {
+          "exports": ["EmbedApp", "EmbedBlockView", "LinkPreview"],
+          "module": "@texuli/blocks/embed/renderers"
+        }
+      ],
       "label": "Embed blocks",
       "placement": "content",
       "props": [
@@ -799,6 +840,42 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-interactive",
+      "imports": [
+        {
+          "exports": [
+            "CalculatorBlock",
+            "ChecklistBlock",
+            "PollBlock",
+            "QuizBlock",
+            "loadInteractiveFamily"
+          ],
+          "module": "@texuli/blocks"
+        },
+        {
+          "exports": [
+            "CalculatorBlock",
+            "ChecklistBlock",
+            "PollBlock",
+            "QuizBlock",
+            "loadInteractiveFamily"
+          ],
+          "module": "@texuli/blocks/interactive"
+        },
+        {
+          "exports": ["CalculatorBlock", "ChecklistBlock", "PollBlock", "QuizBlock"],
+          "module": "@texuli/blocks/interactive/engine"
+        },
+        {
+          "exports": [
+            "CalculatorBlock",
+            "ChecklistBlock",
+            "InteractiveBlockView",
+            "PollBlock",
+            "QuizBlock"
+          ],
+          "module": "@texuli/blocks/interactive/renderers"
+        }
+      ],
       "label": "Interactive blocks",
       "placement": "content",
       "props": [
@@ -825,6 +902,20 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-map",
+      "imports": [
+        {
+          "exports": ["loadMapFamily"],
+          "module": "@texuli/blocks"
+        },
+        {
+          "exports": ["loadMapFamily"],
+          "module": "@texuli/blocks/map"
+        },
+        {
+          "exports": ["MapBlockView"],
+          "module": "@texuli/blocks/map/renderers"
+        }
+      ],
       "label": "Map blocks",
       "placement": "content",
       "props": [
@@ -859,6 +950,20 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-media",
+      "imports": [
+        {
+          "exports": ["loadMediaFamily"],
+          "module": "@texuli/blocks"
+        },
+        {
+          "exports": ["loadMediaFamily"],
+          "module": "@texuli/blocks/media"
+        },
+        {
+          "exports": ["MediaBlockView"],
+          "module": "@texuli/blocks/media/renderers"
+        }
+      ],
       "label": "Media blocks",
       "placement": "content",
       "props": [
@@ -890,6 +995,20 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-structure",
+      "imports": [
+        {
+          "exports": ["loadStructureFamily"],
+          "module": "@texuli/blocks"
+        },
+        {
+          "exports": ["loadStructureFamily"],
+          "module": "@texuli/blocks/structure"
+        },
+        {
+          "exports": ["StructureFamily"],
+          "module": "@texuli/blocks/structure/renderers"
+        }
+      ],
       "label": "Structure blocks",
       "placement": "content",
       "props": [
@@ -916,6 +1035,20 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "blocks-text",
+      "imports": [
+        {
+          "exports": ["loadTextFamily"],
+          "module": "@texuli/blocks"
+        },
+        {
+          "exports": ["loadTextFamily"],
+          "module": "@texuli/blocks/text"
+        },
+        {
+          "exports": ["RichText", "TextBlockView"],
+          "module": "@texuli/blocks/text/renderers"
+        }
+      ],
       "label": "Text blocks",
       "placement": "content",
       "props": [
@@ -1320,6 +1453,20 @@
       "emit": ["developer", "untrusted"],
       "group": "canvas",
       "id": "canvas",
+      "imports": [
+        {
+          "exports": ["CanvasEditor", "CanvasViewer"],
+          "module": "@texuli/canvas"
+        },
+        {
+          "exports": ["CanvasEditor"],
+          "module": "@texuli/canvas/editor"
+        },
+        {
+          "exports": ["CanvasViewer"],
+          "module": "@texuli/canvas/viewer"
+        }
+      ],
       "label": "Canvas",
       "placement": "content",
       "props": [
@@ -2229,6 +2376,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-heatmap",
+      "imports": [
+        {
+          "exports": ["HeatmapChart"],
+          "module": "@texuli/charts/matrix"
+        }
+      ],
       "label": "Heatmap",
       "placement": "content",
       "props": [
@@ -2861,6 +3014,12 @@
       "emit": ["developer", "untrusted"],
       "group": "chat",
       "id": "chat-message",
+      "imports": [
+        {
+          "exports": ["ChatMessage", "ChatMessageDisplay"],
+          "module": "@texuli/chat"
+        }
+      ],
       "label": "Chat message",
       "placement": "content",
       "props": [
@@ -2904,9 +3063,7 @@
             "CHAT_DISPLAY_ROLE_LABELS",
             "ChatAuthor",
             "ChatDisplayRole",
-            "ChatMessage",
             "ChatMessageActions",
-            "ChatMessageDisplay",
             "ChatMessageStatus",
             "ChatReadingAnchor",
             "ChatStreamEvent",
@@ -4006,6 +4163,16 @@
       "events": ["change", "move", "select"],
       "group": "data",
       "id": "data-calendar",
+      "imports": [
+        {
+          "exports": ["CalendarView"],
+          "module": "@texuli/data/calendar"
+        },
+        {
+          "exports": ["CalendarView"],
+          "module": "@texuli/data/calendar/view"
+        }
+      ],
       "label": "Calendar",
       "placement": "content",
       "props": [
@@ -4861,6 +5028,20 @@
       "events": ["select"],
       "group": "data",
       "id": "data-map",
+      "imports": [
+        {
+          "exports": ["MapView"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": ["MapView"],
+          "module": "@texuli/data/geo"
+        },
+        {
+          "exports": ["MapView"],
+          "module": "@texuli/data/map"
+        }
+      ],
       "label": "Map",
       "placement": "content",
       "props": [
@@ -5031,6 +5212,16 @@
       "events": ["change", "collapse", "move", "select"],
       "group": "data",
       "id": "data-timeline",
+      "imports": [
+        {
+          "exports": ["TimelineView"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": ["TimelineView"],
+          "module": "@texuli/data/timeline"
+        }
+      ],
       "label": "Project timeline",
       "placement": "content",
       "props": [
@@ -5241,6 +5432,16 @@
       "events": ["move", "select"],
       "group": "data",
       "id": "data-tree-view",
+      "imports": [
+        {
+          "exports": ["TreeDataView"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": ["TreeDataView"],
+          "module": "@texuli/data/tree-view"
+        }
+      ],
       "label": "Tree view",
       "placement": "content",
       "props": [
@@ -5485,6 +5686,40 @@
       "emit": [],
       "group": "overlays",
       "id": "dialog",
+      "imports": [
+        {
+          "exports": [
+            "DIALOG_SIZES",
+            "Dialog",
+            "DialogSize",
+            "dialogBodyClass",
+            "dialogCloseClass",
+            "dialogContentClass",
+            "dialogDescriptionClass",
+            "dialogFooterClass",
+            "dialogHeaderClass",
+            "dialogOverlayClass",
+            "dialogTitleClass"
+          ],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "DIALOG_SIZES",
+            "Dialog",
+            "DialogSize",
+            "dialogBodyClass",
+            "dialogCloseClass",
+            "dialogContentClass",
+            "dialogDescriptionClass",
+            "dialogFooterClass",
+            "dialogHeaderClass",
+            "dialogOverlayClass",
+            "dialogTitleClass"
+          ],
+          "module": "texuli/dialog"
+        }
+      ],
       "label": "Dialog",
       "placement": "app",
       "props": [
@@ -5548,6 +5783,20 @@
       "emit": ["developer", "untrusted"],
       "group": "documents",
       "id": "document",
+      "imports": [
+        {
+          "exports": ["PageEditor", "PageReader"],
+          "module": "@texuli/pages"
+        },
+        {
+          "exports": ["PageEditor"],
+          "module": "@texuli/pages/editor"
+        },
+        {
+          "exports": ["PageReader"],
+          "module": "@texuli/pages/reader"
+        }
+      ],
       "label": "Document",
       "placement": "content",
       "props": [
@@ -5585,11 +5834,11 @@
       "id": "drawer",
       "imports": [
         {
-          "exports": ["DrawerContent"],
+          "exports": ["Drawer", "DrawerContent"],
           "module": "texuli"
         },
         {
-          "exports": ["DrawerContent"],
+          "exports": ["Drawer", "DrawerContent"],
           "module": "texuli/sheet"
         }
       ],
@@ -7378,16 +7627,12 @@
       "id": "layout-drawer",
       "imports": [
         {
-          "exports": ["Drawer", "LayoutDrawer"],
+          "exports": ["LayoutDrawer"],
           "module": "texuli"
         },
         {
           "exports": ["LayoutDrawer"],
           "module": "texuli/layouts/host/drawer"
-        },
-        {
-          "exports": ["Drawer"],
-          "module": "texuli/sheet"
         }
       ],
       "label": "LayoutDrawer",
@@ -7424,6 +7669,10 @@
         {
           "exports": ["loadDualSidebar"],
           "module": "texuli/layouts/app"
+        },
+        {
+          "exports": ["default"],
+          "module": "texuli/layouts/app/dual-sidebar"
         }
       ],
       "label": "Dual sidebar layout",
@@ -8006,16 +8255,12 @@
       "id": "layout-sidebar",
       "imports": [
         {
-          "exports": ["Sidebar"],
-          "module": "texuli"
-        },
-        {
           "exports": ["loadSidebar"],
           "module": "texuli/layouts/app"
         },
         {
-          "exports": ["Sidebar"],
-          "module": "texuli/sidebar"
+          "exports": ["default"],
+          "module": "texuli/layouts/app/sidebar"
         }
       ],
       "label": "Sidebar layout",
@@ -8149,6 +8394,16 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-top-nav",
+      "imports": [
+        {
+          "exports": ["loadTopNav"],
+          "module": "texuli/layouts/app"
+        },
+        {
+          "exports": ["default"],
+          "module": "texuli/layouts/app/top-nav"
+        }
+      ],
       "label": "Top navigation layout",
       "placement": "app",
       "props": [
@@ -8791,16 +9046,12 @@
       "id": "multi-select",
       "imports": [
         {
-          "exports": ["MultiSelect", "Select"],
+          "exports": ["MultiSelect"],
           "module": "texuli"
         },
         {
           "exports": ["MultiSelect", "MultiSelectRoot"],
           "module": "texuli/combobox"
-        },
-        {
-          "exports": ["Select"],
-          "module": "texuli/select"
         }
       ],
       "label": "MultiSelect",
@@ -9571,6 +9822,12 @@
       "events": ["submit"],
       "group": "schema-forms",
       "id": "schema-form",
+      "imports": [
+        {
+          "exports": ["SchemaForm"],
+          "module": "@texuli/forms"
+        }
+      ],
       "label": "Schema form",
       "placement": "content",
       "props": [
@@ -9646,11 +9903,11 @@
       "id": "select",
       "imports": [
         {
-          "exports": ["SelectRoot"],
+          "exports": ["Select", "SelectRoot"],
           "module": "texuli"
         },
         {
-          "exports": ["SelectRoot"],
+          "exports": ["Select", "SelectRoot"],
           "module": "texuli/select"
         }
       ],
@@ -10207,6 +10464,16 @@
       "emit": [],
       "group": "overlays",
       "id": "sidebar",
+      "imports": [
+        {
+          "exports": ["Sidebar"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Sidebar"],
+          "module": "texuli/sidebar"
+        }
+      ],
       "label": "Sidebar",
       "placement": "app",
       "props": [
@@ -10411,6 +10678,12 @@
       "emit": [],
       "group": "layouts",
       "id": "split-view",
+      "imports": [
+        {
+          "exports": ["default"],
+          "module": "texuli/layouts/app/split-view"
+        }
+      ],
       "label": "SplitView",
       "placement": "app",
       "props": [
@@ -10456,6 +10729,16 @@
       "emit": ["developer", "untrusted"],
       "group": "sheets",
       "id": "spreadsheet",
+      "imports": [
+        {
+          "exports": ["SheetView"],
+          "module": "@texuli/sheets"
+        },
+        {
+          "exports": ["SheetView"],
+          "module": "@texuli/sheets/view"
+        }
+      ],
       "label": "Spreadsheet",
       "placement": "content",
       "props": [
@@ -11491,6 +11774,20 @@
       "events": ["change", "select"],
       "group": "workflows",
       "id": "workflow-graph",
+      "imports": [
+        {
+          "exports": ["WorkflowEditor", "WorkflowViewer"],
+          "module": "@texuli/workflows"
+        },
+        {
+          "exports": ["WorkflowEditor"],
+          "module": "@texuli/workflows/editor"
+        },
+        {
+          "exports": ["WorkflowViewer"],
+          "module": "@texuli/workflows/viewer"
+        }
+      ],
       "label": "Workflow graph",
       "placement": "content",
       "props": [
