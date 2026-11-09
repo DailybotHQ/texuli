@@ -1,21 +1,21 @@
 {
   "dialect": "https://json-schema.org/draft/2020-12/schema",
   "files": {
-    "generated/kotlin/com/texuli/spec/Blueprint.kt": "67ebe88f508a41e73a0c33a5043d71d987b1eafcfec6f5d872be10f92724c676",
-    "generated/kotlin/com/texuli/spec/CatalogSchema.kt": "ccf6d814e7637f9ece0627067681e948ccb7721aae276e86e1a5b6cadb1e1878",
-    "generated/kotlin/com/texuli/spec/DesignSystem.kt": "3a5179e7a8e3d18d0850d2923b2506f21c8118b7efb8f059f60407806ae281c0",
-    "generated/kotlin/com/texuli/spec/Diagnostics.kt": "2fa84c9e8c883fbbf0084028b39ab434b4c80fc392781e8ffffe6f2008baaed6",
-    "generated/kotlin/com/texuli/spec/Json.kt": "06d7d07d04fd5e69da197a22b31c2479459486e14d66f45939b985f8dfe988aa",
-    "generated/kotlin/com/texuli/spec/Manifest.kt": "32ca48d25252c28320f0105b8eafe5e6ef30d6ea24ef3c3d1f34afb28de23f4f",
-    "generated/kotlin/com/texuli/spec/Vocabulary.kt": "36c76db0907fc41255c7479f5ed88e05daf2a09d2b993c875145025d3638d644",
-    "generated/kotlin/com/texuli/spec/Workflow.kt": "0ef638bf56f12c28f863096671eeffe451a94f6b105c07ed014033f10bfc8900",
-    "generated/typescript/blueprint.ts": "30e2c593a4b6349c003fcb5489368e8dd1ec4c758a990323d74dca448adcf79c",
-    "generated/typescript/catalog-schema.ts": "10a16e722a3fe756608b632a6d61c4ad46b88b5e85dff4bb83314ee9dd900269",
-    "generated/typescript/design-system.ts": "28c90820020c31857cbb418f863ac276f0edc73412e4a2d28c8b4f2c8d18528d",
-    "generated/typescript/diagnostics.ts": "4aacce8a34973bf71b13a54742a54f17fb39592195410ca6a9293a82eedc99c1",
-    "generated/typescript/manifest.ts": "4c582d29b10a675c48db2e75040aa7ba97dacf9ca005f7a4c11cd223a62c9175",
-    "generated/typescript/vocabulary.ts": "056181f43867d3b59fa3818528e85dd958c26cdf7b7b2b7a564f8fdeee15ecaf",
-    "generated/typescript/workflow.ts": "3a7cae0c6482867867178cc039cf0bd55ed1841532907e4280efcfa5af32b6f8"
+    "generated/kotlin/com/texuli/spec/Blueprint.kt": "61b64bfd575abe7f8a853439a35164186268a8c7a7a70d6304fcd9201035dd30",
+    "generated/kotlin/com/texuli/spec/CatalogSchema.kt": "fe89cb7318e47d6d8c8651f8e83af1929180d9dd7592e71e03b99d631807e98d",
+    "generated/kotlin/com/texuli/spec/DesignSystem.kt": "b6430430d33d0438891a0e2b7e99f496e6f46b8bbfd2dfda61f3664bebe6d2cd",
+    "generated/kotlin/com/texuli/spec/Diagnostics.kt": "6463ad071d5a4138147ad4866caa6e09b0fdeafaadf77e75bcef7c7dae57f32c",
+    "generated/kotlin/com/texuli/spec/Json.kt": "b152a43e24db983696c95bb6709359c99d0f38a024708af72fd12e9d7da765c1",
+    "generated/kotlin/com/texuli/spec/Manifest.kt": "936ba0f3d8b8993a18f46e91f1cb4f0e235ea19c1115f44c01110df3b90b080a",
+    "generated/kotlin/com/texuli/spec/Vocabulary.kt": "2d6cea50963c8baff7a49b57ea627bbad99c47e63e62e37f03c72b64957f186e",
+    "generated/kotlin/com/texuli/spec/Workflow.kt": "2b764945586b41cbfa12f61fe412db50367c6b5b37971517a43feb9ac85278c8",
+    "generated/typescript/blueprint.ts": "142db073483723471812b7142980731f608284f00a42daf3adb672d5f0693f95",
+    "generated/typescript/catalog-schema.ts": "94eae706de92436efe60c94c8f49bb5b45fc62998bf78c4e61e6a6e88cbd9326",
+    "generated/typescript/design-system.ts": "87d65bc5f08bcc45b3fcb47aada7b6e05778f3d432488d6ed20b6122befe5a15",
+    "generated/typescript/diagnostics.ts": "2a27710fcdca98ab95ebe0e291015c3a184bae4d2bde9be5c418614c51cb7458",
+    "generated/typescript/manifest.ts": "d8f70fe587b9bcac99e73e9fd4b06d24c21c997297b19066a19357a971a1cd9b",
+    "generated/typescript/vocabulary.ts": "ac011d3b77b1e95e6c4755436b5c16d03b164eae3cd43f70367eb6fc0d701b9b",
+    "generated/typescript/workflow.ts": "b8ff141d9cab41403680dfea13024d37e3c5684f24101869dcb9902d3f9a46f7"
   },
   "specVersion": "0.13.0"
 }
