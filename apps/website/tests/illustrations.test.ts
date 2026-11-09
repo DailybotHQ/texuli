@@ -141,8 +141,13 @@ describe('illustration prompts', () => {
       expect(prompt.split(/\s+/).length, entry.slot).toBeGreaterThanOrEqual(90);
       expect(prompt, entry.slot).toMatch(/^Subject: /);
       expect(prompt, entry.slot).toContain('isometric');
-      for (const hex of ['#F7F5FB', '#6D4AFF', '#B9A8FF', '#FF8A4C', '#F4F0FF', '#FFF4EE'])
+      for (const hex of ['#F7F5FB', '#6D4AFF', '#B9A8FF', '#FF8A4C'])
         expect(prompt, `${entry.slot} ${hex}`).toContain(hex);
+      // Background: the lavender-to-peach ground of the first slots, or the transparent
+      // background ILLUSTRATIONS.md now asks of every file.
+      const gradient = prompt.includes('#F4F0FF') && prompt.includes('#FFF4EE');
+      const transparent = prompt.includes('Background: true transparent alpha');
+      expect(gradient || transparent, `${entry.slot} background`).toBe(true);
       expect(prompt, entry.slot).toContain('No text: absolutely no letters, words, numbers');
       expect(prompt, entry.slot).toContain(`exactly ${entry.width}x${entry.height} pixels`);
       expect(prompt, entry.slot).toContain(`saved as ${entry.file}`);
@@ -152,6 +157,57 @@ describe('illustration prompts', () => {
 
   it('keeps the generated prompts doc in sync with the manifest', () => {
     expect(readFileSync(PROMPTS_DOC, 'utf8')).toBe(renderPromptsDoc(ILLUSTRATIONS));
+  });
+});
+
+describe('slots awaiting their artwork', () => {
+  const NEW_SLOTS = [
+    'solution-slides-hero',
+    'solution-documents-hero',
+    'solution-workflows-hero',
+    'solution-canvas-hero',
+    'solution-sheets-hero',
+    'native-hero',
+    'page-built-with',
+    'home-built-with',
+    'built-with-protoyard',
+    'page-solutions',
+    'native-shared-blueprint',
+    'native-parity',
+    'native-solutions',
+    'native-agents',
+    'native-start',
+  ];
+
+  it('registers every new slot with its size, variant and a transparent-background prompt', () => {
+    for (const slot of NEW_SLOTS) {
+      const entry = illustrationFor(slot);
+      expect(entry, slot).toBeDefined();
+      if (!entry) continue;
+      expect(entry.file).toBe(`${slot}.webp`);
+      expect(entry.priority, slot).toBeUndefined();
+      expect(entry.prompt, slot).toContain('Background: true transparent alpha');
+      const expected = slot.startsWith('page-')
+        ? { variant: 'banner', width: 1920, height: 640 }
+        : slot === 'native-start'
+          ? { variant: 'plate', width: 1200, height: 800 }
+          : slot.endsWith('-hero')
+            ? { variant: 'plate', width: 1200, height: 1000 }
+            : { variant: 'plate', width: 1600, height: 1000 };
+      expect({ variant: entry.variant, width: entry.width, height: entry.height }, slot).toEqual(
+        expected
+      );
+      if (entry.variant === 'banner') expect(entry.fileDark, slot).toBeUndefined();
+      else expect(entry.fileDark, slot).toBe(`${slot}-dark.webp`);
+    }
+  });
+
+  it('ships no file yet, so each slot paints the texel mosaic fallback', () => {
+    const files = new Set(readdirSync(resolve(WEBSITE, 'src/assets/illustrations')));
+    for (const slot of NEW_SLOTS) expect(files.has(`${slot}.webp`), slot).toBe(false);
+    const source = read('src/components/landing/SiteIllustration.astro');
+    expect(source).toContain("data-tx-illustration-ready={hasFile ? 'file' : 'fallback'}");
+    expect(source).toContain('class="site-illustration__texels"');
   });
 });
 
