@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { projectLiveCatalog } from '../scripts/bootstrap-catalog.ts';
 import { buildSpec, EXTERNAL_SCHEMAS, KOTLIN_OUT, TS_OUT } from '../src/build.ts';
 import { canonicalJson, sha256 } from '../src/canonical.ts';
-import type { SpecCatalog } from '../src/catalog.ts';
+import { checkCatalogVariants, type SpecCatalog } from '../src/catalog.ts';
 import { kotlinProperty, kotlinString, schemaToKotlin } from '../src/codegen/kotlin.ts';
 import { checkConformance } from '../src/conformance.ts';
 import {
@@ -351,6 +351,14 @@ describe('parity with the web packages', () => {
         ['class', 'className', 'style', 'renderer'].includes(prop.name);
       expect(prop.extension === 'web', `${prop.name} (${prop.kind})`).toBe(webOnly);
     }
+  });
+
+  it('carries axes and states for all 170 components without axis drift', async () => {
+    const catalog = json<SpecCatalog>('catalog/components.json');
+    expect(catalog.components).toHaveLength(170);
+    expect(catalog).toEqual(await projectLiveCatalog());
+    expect(checkCatalogVariants(catalog)).toEqual([]);
+    expect(catalog.components.some((component) => component.axes || component.states)).toBe(true);
   });
 });
 
