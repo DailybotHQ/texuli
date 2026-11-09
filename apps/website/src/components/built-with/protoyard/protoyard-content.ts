@@ -146,7 +146,7 @@ export interface ProtoyardRoadmapItem {
 export const PROTOYARD_ROADMAP: readonly ProtoyardRoadmapItem[] = [
   {
     title: 'Protoyard Cloud',
-    body: 'Collaborative prototyping in the cloud: like a collaborative Figma for turning ideas into products, with multiplayer editing and hosted agents.',
+    body: 'Collaborative prototyping in the cloud: a shared, multiplayer workspace where teams turn ideas into products, with hosted agents.',
     status: 'planned',
     source: 'boundaries',
   },

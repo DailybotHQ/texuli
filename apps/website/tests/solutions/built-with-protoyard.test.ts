@@ -66,7 +66,7 @@ describe('Protoyard claims cite the audit', () => {
       .map(([row]) => row);
     expect(PROTOYARD_ROADMAP.map((item) => item.source).sort()).toEqual(missing.sort());
     const cloud = PROTOYARD_ROADMAP.find((item) => item.title === 'Protoyard Cloud');
-    expect(cloud?.body).toMatch(/collaborative Figma for turning ideas into products/);
+    expect(cloud?.body).toMatch(/shared, multiplayer workspace where teams turn ideas into products/);
   });
 
   it('keeps the product record honest: the local version available, Cloud planned, public evidence only', () => {
