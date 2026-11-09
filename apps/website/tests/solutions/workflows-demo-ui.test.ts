@@ -29,14 +29,14 @@ describe('workflow solution demo island', () => {
     expect(screen.getByText('4 steps · 3 connections')).toBeTruthy();
     await fireEvent.click(screen.getByRole('button', { name: 'Add notification' }));
     expect(screen.getByText('5 steps · 3 connections')).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Notify requester, step 5' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: '5 Notify requester' })).toBeTruthy();
 
     const editor = screen.getByRole('form');
     await fireEvent.input(within(editor).getByLabelText('Step label'), {
       target: { value: 'Send approval update' },
     });
     await fireEvent.click(within(editor).getByRole('button', { name: 'Update label' }));
-    expect(screen.getByRole('button', { name: 'Send approval update, step 5' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: '5 Send approval update' })).toBeTruthy();
     expect(screen.getByRole('status').textContent).toContain('Step label updated.');
 
     await fireEvent.click(screen.getByRole('button', { name: 'Auto layout' }));
@@ -46,17 +46,17 @@ describe('workflow solution demo island', () => {
 
     await fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
     expect(screen.getByText('4 steps · 3 connections')).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Send approval update, step 5' })).toBeNull();
+    expect(screen.queryByRole('button', { name: '5 Send approval update' })).toBeNull();
     expect(screen.getByRole('status').textContent).toContain('reset to its starting example');
   });
 
   it('supports arrow-key step navigation and exposes the current graph as text', async () => {
     render(WorkflowsDemo);
-    const first = screen.getByRole('button', { name: 'Submit expense, step 1' });
+    const first = screen.getByRole('button', { name: '1 Submit expense' });
     first.focus();
     await fireEvent.keyDown(first, { key: 'ArrowDown' });
 
-    const second = screen.getByRole('button', { name: 'Manager review, step 2' });
+    const second = screen.getByRole('button', { name: '2 Manager review' });
     expect(document.activeElement).toBe(second);
     expect(second.getAttribute('aria-pressed')).toBe('true');
 

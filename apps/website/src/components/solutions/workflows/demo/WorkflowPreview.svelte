@@ -8,8 +8,10 @@ import {
 const graph = createExpenseApprovalGraph();
 </script>
 
-<WorkflowViewer
-  {graph}
-  registry={EXPENSE_APPROVAL_REGISTRY}
-  label="Expense approval workflow preview"
-/>
+<div data-tx-workflows-demo-preview="expense-approval">
+  <WorkflowViewer
+    {graph}
+    registry={EXPENSE_APPROVAL_REGISTRY}
+    label="Expense approval workflow preview"
+  />
+</div>
