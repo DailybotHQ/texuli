@@ -151,11 +151,14 @@ has, and who approved that version.
   `FileUpload`, `TagsInput`, `PinInput`, `NumberField`, and the
   `MobileAppFrame` host chrome), each app-tier and governed by `allow`. 75
   ids stay agent-emittable; host chrome never is. The catalog maps the
-  public primitive exports to the ids they render.
+  public `texuli` and `@texuli/primitives` exports to the ids they render, in
+  the new `@texuli/catalog/imports` subpath, kept off the manifest entries
+  for static allow checks.
 - **Host catalog extensions:** a host library publishes its own components as
   a `texuli/catalog-extension` (ids `<ns>:<id>`, each composing catalog ids);
   an empty `composes` marks a leaf built directly on host primitives;
-  `mergeCatalogs(texuli, extensions)` (`@texuli/spec`) merges them with
+  `mergeCatalogs(texuli, extensions)` (`@texuli/spec`, also the new
+  `@texuli/spec/catalog-extensions` subpath) merges them with
   stable refusal codes (`extension-collision`, `extension-composes` and
   seven more) over bounded input, and allow sets, the allow manifest and the
   kit read the merged catalog
@@ -181,6 +184,9 @@ has, and who approved that version.
 - A linked `Card` keeps one real anchor stretched over the surface; pin and
   menu actions inside it sit above it in tab order.
 - `Icon` takes `tone`; a design system's component defaults never set it.
+- A fix found before release (`241b4468`): a `link` variant `Button` keeps
+  its inline text sizing; the size rules (`sm`, `md`, `lg`) no longer
+  override it.
 - `Button` and `IconButton` take `tone` (`default`, `destructive`,
   `success`, `warning`), independent of `variant`, so an outline destructive
   button exists; the `destructive` variant still paints as before.
@@ -208,7 +214,8 @@ has, and who approved that version.
   its compiled guarantees, or with `--locked` and `--prototype <dir>` the full
   validator over a local prototype's sources).
 - `texuli ds generate`, `ds.generate` and the design-system generation
-  pipeline; the site-CSS importer and import-loss reports in
+  pipeline (`@texuli/tokens/design-system/generate`); the site-CSS importer
+  and import-loss reports in
   `@texuli/tokens/design-system/import`.
 - `@texuli/tools/ds-check`: the locked static checker, the CSS policy (the
   owner's layout-only utilities), the interactive-element mapper and
@@ -229,13 +236,34 @@ has, and who approved that version.
   against an allow manifest.
 - The Design System Studio for locked systems.
 
-**Budgets (lead-approved, measured + 4%, rounded to 64 B).** `texuli` root
-217,920 to 224,256 B; new `texuli/ds-kit` 27,520 B; `@texuli/spec/design-system`
-7,360 to 13,376 B; `@texuli/spec/codegen` 22,720 to 24,256 B;
-`@texuli/tokens/design-system/validate` 10,304 to 11,264 B,
-`compile` 34,176 to 35,200 B, `compile-core` 33,408 to 34,624 B and
-`import` 27,072 to 30,976 B; `@texuli/catalog` 57,024 to 59,648 B and its
-manifest entries; `functions/mcp` 232,576 to 238,400 B.
+**Budgets (lead-approved under the developer's standing grant, measured + 2%,
+rounded to 64 B; `texuli.budgets.json`).** Optional catalog metadata and
+design-system generation moved off the hot entries first (`bc7b3cd5`), then
+the caps were set (`24f908ac`):
+
+- `texuli` root 217,920 to 224,256 B; `texuli/tabs-accordion` 14,336 to
+  14,720 B; new `texuli/ds-kit` 27,520 B.
+- `@texuli/catalog` 57,024 to 69,312 B; `manifest` 5,888 to 7,296 B;
+  `manifests/all` 45,312 to 56,832 B; `manifests/display` 6,592 to
+  12,800 B, `forms` 9,344 to 11,712 B, `layouts` 7,168 to 8,192 B, `data`
+  8,192 to 8,768 B, `overlays` 7,552 to 7,872 B, `content` 5,376 to
+  5,568 B, `state` 4,032 to 4,224 B, `documents` 1,664 to 1,792 B; new rows
+  `build` 8,768 B, `build/node` 8,704 B and `imports` 27,968 B. The catalog
+  widened from 170 to 194 ids with axes, states and imports.
+- `@texuli/spec/design-system` 7,360 to 16,064 B (hashes, allow check,
+  approval, locked init, blueprint allow check, bundles);
+  `@texuli/spec/codegen` 22,720 to 24,256 B; new
+  `@texuli/spec/catalog-extensions` 4,544 B.
+- `@texuli/tokens/design-system/validate` 10,304 to 11,264 B, `compile`
+  34,176 to 35,200 B, `compile-core` 33,408 to 34,624 B, `import` 27,072 to
+  30,976 B; new `generate` 49,664 B (the generation pipeline bundles the
+  importers and the compiler on purpose; `compile` stays free of
+  importers).
+- CSS: `@texuli/forms` 5,760 to 5,952 B, `@texuli/charts/cartesian` 832 to
+  896 B.
+- `functions/mcp` 232,576 to 262,400 B: the remote MCP serves the wider
+  catalog and the `ds.generate`, `ds.validate` and `ds.bundle`
+  operations.
 
 **Known gaps in 0.15.0 (planned, not done).** The in-development items
 above, the native painters for the new
