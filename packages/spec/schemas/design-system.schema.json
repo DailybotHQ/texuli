@@ -30,6 +30,104 @@
       },
       "type": "object"
     },
+    "allow": {
+      "additionalProperties": {
+        "$ref": "#/$defs/allowEntry"
+      },
+      "description": "At most 256 entries; keys match ^(?=.{1,48}$)[a-z][a-z0-9]*(?:-[a-z0-9]+)*$ and are never __proto__, constructor or prototype.",
+      "type": "object"
+    },
+    "allowEntry": {
+      "additionalProperties": false,
+      "description": "The enabled values of one catalog component: variants, sizes, tones, densities and states. An omitted list allows every value the catalog lists; an empty list allows none. Values are checked against the catalog by checkDesignSystemAllow.",
+      "properties": {
+        "densities": {
+          "description": "Unique items.",
+          "items": {
+            "maxLength": 48,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,47}$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "type": "array"
+        },
+        "sizes": {
+          "description": "Unique items.",
+          "items": {
+            "maxLength": 48,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,47}$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "type": "array"
+        },
+        "states": {
+          "description": "Unique items.",
+          "items": {
+            "$ref": "#/$defs/componentState"
+          },
+          "maxItems": 11,
+          "type": "array"
+        },
+        "tones": {
+          "description": "Unique items.",
+          "items": {
+            "maxLength": 48,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,47}$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "type": "array"
+        },
+        "variants": {
+          "description": "Unique items.",
+          "items": {
+            "maxLength": 48,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,47}$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "approval": {
+      "additionalProperties": false,
+      "description": "Approval metadata: status, who and when (approvedAt is an ISO 8601 UTC date-time), the approved version and the contentHash (lowercase hex SHA-256 of the canonical JSON without status, approvedBy and approvedAt). Never inherited through extends. A tool can verify the hash; it cannot prove who approved.",
+      "properties": {
+        "approvedAt": {
+          "maxLength": 32,
+          "pattern": "^\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\\d|3[01])T(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d{1,3})?)?Z$",
+          "type": "string"
+        },
+        "approvedBy": {
+          "maxLength": 120,
+          "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f\\u00ad\\u061c\\u180e\\u200b-\\u200f\\u2028-\\u202e\\u2060-\\u2069\\ufeff\\u{e0000}-\\u{e007f}]*$",
+          "type": "string"
+        },
+        "contentHash": {
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/approvalStatus"
+        },
+        "version": {
+          "maxLength": 64,
+          "pattern": "^(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$",
+          "type": "string"
+        }
+      },
+      "required": ["status", "version"],
+      "type": "object"
+    },
+    "approvalStatus": {
+      "description": "An approval state: draft or approved.",
+      "enum": ["draft", "approved"],
+      "type": "string"
+    },
     "asset": {
       "description": "At most 32768 bytes inline; data URLs need developer trust.",
       "pattern": "^(?:(?:\\.?\\/)?(?:[A-Za-z0-9_-][A-Za-z0-9_.-]*\\/)*[A-Za-z0-9_-][A-Za-z0-9_.-]*\\.(?:png|jpe?g|gif|webp|avif|svg|ico)|data:image\\/(?:png|jpeg|gif|webp|avif);base64,[A-Za-z0-9+/]+={0,2})$",
@@ -204,6 +302,23 @@
       "description": "A color: #rgb, #rrggbb, #rrggbbaa or a numeric oklch(L C H[ / A]).",
       "maxLength": 64,
       "pattern": "^(?:#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})|oklch\\((?:\\d{1,3}(?:\\.\\d{1,6})?|\\.\\d{1,6})%? (?:\\d{1,3}(?:\\.\\d{1,6})?|\\.\\d{1,6}) (?:\\d{1,3}(?:\\.\\d{1,6})?|\\.\\d{1,6})(?: \\/ (?:\\d{1,3}(?:\\.\\d{1,6})?|\\.\\d{1,6})%?)?\\))$",
+      "type": "string"
+    },
+    "componentState": {
+      "description": "A component state of the catalog’s closed state vocabulary.",
+      "enum": [
+        "hover",
+        "focus-visible",
+        "active",
+        "disabled",
+        "loading",
+        "invalid",
+        "selected",
+        "expanded",
+        "checked",
+        "open",
+        "readonly"
+      ],
       "type": "string"
     },
     "components": {
@@ -2912,6 +3027,59 @@
       },
       "type": "object"
     },
+    "library": {
+      "description": "The design system’s own components: at most 64 entries.",
+      "items": {
+        "$ref": "#/$defs/libraryEntry"
+      },
+      "maxItems": 64,
+      "type": "array"
+    },
+    "libraryEntry": {
+      "additionalProperties": false,
+      "description": "One of the design system’s own components: id, name, purpose, version, status, the allowed catalog ids it composes and its own approval. The code lives with the consumer.",
+      "properties": {
+        "approval": {
+          "$ref": "#/$defs/approval"
+        },
+        "composes": {
+          "description": "Unique items.",
+          "items": {
+            "maxLength": 48,
+            "pattern": "^(?=.{1,48}$)[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "type": "array"
+        },
+        "id": {
+          "maxLength": 48,
+          "pattern": "^(?=.{1,48}$)[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 80,
+          "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f\\u00ad\\u061c\\u180e\\u200b-\\u200f\\u2028-\\u202e\\u2060-\\u2069\\ufeff\\u{e0000}-\\u{e007f}]*$",
+          "type": "string"
+        },
+        "purpose": {
+          "maxLength": 300,
+          "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f\\u00ad\\u061c\\u180e\\u200b-\\u200f\\u2028-\\u202e\\u2060-\\u2069\\ufeff\\u{e0000}-\\u{e007f}]*$",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/approvalStatus"
+        },
+        "version": {
+          "maxLength": 64,
+          "pattern": "^(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$",
+          "type": "string"
+        }
+      },
+      "required": ["id", "name", "purpose", "version", "status", "composes"],
+      "type": "object"
+    },
     "motion": {
       "additionalProperties": false,
       "description": "Motion personality, durations (ms) and a named easing.",
@@ -3429,6 +3597,9 @@
         "accessibility": {
           "$ref": "#/$defs/accessibility"
         },
+        "allow": {
+          "$ref": "#/$defs/allow"
+        },
         "assets": {
           "$ref": "#/$defs/assets"
         },
@@ -3515,6 +3686,12 @@
     "accessibility": {
       "$ref": "#/$defs/accessibility"
     },
+    "allow": {
+      "$ref": "#/$defs/allow"
+    },
+    "approval": {
+      "$ref": "#/$defs/approval"
+    },
     "assets": {
       "$ref": "#/$defs/assets"
     },
@@ -3556,6 +3733,9 @@
     },
     "layout": {
       "$ref": "#/$defs/layout"
+    },
+    "library": {
+      "$ref": "#/$defs/library"
     },
     "license": {
       "maxLength": 80,

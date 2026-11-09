@@ -1,6 +1,7 @@
 import { pascal } from '../codegen/shared.ts';
 import type { Schema } from '../dialect.ts';
 import { DIALECT_URI } from '../dialect.ts';
+import { DS_LOCKED_LIMITS } from './types-locked.ts';
 import {
   DESIGN_SYSTEM_CODES,
   DESIGN_SYSTEM_COMPILER_CODES,
@@ -22,6 +23,20 @@ import {
  * data URLs, inline byte caps, the `extends` chain) are described here and
  * enforced by `validateDesignSystem`.
  */
+
+/** Descriptions of the locked definitions (ADR-032); kept here so the validator bundle never carries them. */
+const DS_LOCKED_DESCRIPTIONS: Readonly<Record<string, string>> = {
+  approvalStatus: 'An approval state: draft or approved.',
+  componentState: 'A component state of the catalog’s closed state vocabulary.',
+  allowEntry:
+    'The enabled values of one catalog component: variants, sizes, tones, densities and states. An omitted list allows every value the catalog lists; an empty list allows none. Values are checked against the catalog by checkDesignSystemAllow.',
+  allow: `The allowed set (ADR-032): at most ${DS_LOCKED_LIMITS.allowComponents} catalog component ids, each with its enabled values. Once present, a component not listed is not allowed. Arrays replace on extends, variants and patches.`,
+  approval:
+    'Approval metadata: status, who and when (approvedAt is an ISO 8601 UTC date-time), the approved version and the contentHash (lowercase hex SHA-256 of the canonical JSON without status, approvedBy and approvedAt). Never inherited through extends. A tool can verify the hash; it cannot prove who approved.',
+  libraryEntry:
+    'One of the design system’s own components: id, name, purpose, version, status, the allowed catalog ids it composes and its own approval. The code lives with the consumer.',
+  library: `The design system’s own components: at most ${DS_LOCKED_LIMITS.library} entries.`,
+};
 
 const DESCRIPTIONS: Readonly<Record<string, string>> = {
   colorValue: 'A color: #rgb, #rrggbb, #rrggbbaa or a numeric oklch(L C H[ / A]).',
@@ -67,6 +82,7 @@ const DESCRIPTIONS: Readonly<Record<string, string>> = {
     'Every stable design-system code; aa-text, aa-focus, target-size and aa-non-text are raised by the compiler and its checks.',
   issue:
     'One design-system issue: a stable code, a JSON path from $, a message and an optional hint.',
+  ...DS_LOCKED_DESCRIPTIONS,
 };
 
 function source(node: readonly ['u', 'i' | 'f', number]): Schema {
