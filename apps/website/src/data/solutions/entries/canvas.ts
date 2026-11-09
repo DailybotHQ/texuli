@@ -64,7 +64,6 @@ export const canvas: SolutionEntry = {
   ],
   links: [
     { label: 'Read the docs', href: '/guides/solutions/canvas/' },
-    { label: 'Current demo page', href: '/canvas-page/' },
     { label: '@texuli/canvas on npm', href: 'https://www.npmjs.com/package/@texuli/canvas' },
   ],
 };
