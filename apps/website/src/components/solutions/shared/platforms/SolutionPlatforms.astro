@@ -1,0 +1,145 @@
+---
+/**
+ * Platforms section of a Solution landing (`SolutionPlatformsProps`, ADR-029): one row per
+ * platform the registry entry lists (web, Compose Desktop, Android, iOS), each with its
+ * status badge, a factual renderer line and its evidence files linked on GitHub. The
+ * statuses are the entry's; `validate.ts` caps native ones at `native/docs/parity.json`,
+ * and `platformRows` refuses a native status above planned without evidence. Static.
+ */
+import type { SolutionPlatformsProps } from '../types.ts';
+import {
+  PLATFORM_LINKS,
+  platformRows,
+  resolveSiteHref,
+  sectionHeadingId,
+} from './platforms-model.ts';
+import StatusBadge from './StatusBadge.astro';
+
+type Props = SolutionPlatformsProps;
+
+const { entry, title } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const rows = platformRows(entry);
+const headingId = sectionHeadingId(entry.slug, 'platforms');
+const nativeHref = resolveSiteHref(PLATFORM_LINKS.native.href, base);
+---
+
+<section class="solution-platforms" aria-labelledby={headingId} data-solution-platforms={entry.slug}>
+  <div class="solution-platforms__inner">
+    <h2 id={headingId}>{title}</h2>
+    <ul class="solution-platforms__list" role="list">
+      {
+        rows.map((row) => (
+          <li class="solution-platforms__row" data-platform={row.platform} data-status={row.badge.status}>
+            <div class="solution-platforms__head">
+              <h3>{row.name}</h3>
+              <StatusBadge status={row.badge.status} context={row.name} />
+            </div>
+            <p class="solution-platforms__renderer">{row.renderer}</p>
+            {row.evidence.length > 0 && (
+              <ul class="solution-platforms__evidence" role="list" aria-label={`${row.name} evidence`}>
+                {row.evidence.map((item) => (
+                  <li>
+                    <a href={item.href} rel="noopener">
+                      <code>{item.path}</code>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+    <p class="solution-platforms__more">
+      <a href={nativeHref}>{PLATFORM_LINKS.native.label}<span aria-hidden="true">&nbsp;→</span></a>
+    </p>
+  </div>
+</section>
+
+<style>
+  .solution-platforms__inner {
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  .solution-platforms h2 {
+    margin: 0;
+    margin-block-end: clamp(1.25rem, 3vw, 2rem);
+    color: var(--tx-foreground);
+    font-size: clamp(1.75rem, 4.5vw, 2.6rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+  .solution-platforms__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .solution-platforms__row {
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    padding: 1.1rem;
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    border-radius: 0.875rem;
+    background: var(--tx-background);
+  }
+  .solution-platforms__row[data-status='planned'] {
+    border-style: dashed;
+  }
+  .solution-platforms__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .solution-platforms h3 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: 1.1rem;
+    font-weight: 750;
+  }
+  .solution-platforms__renderer {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: 0.925rem;
+    line-height: 1.5;
+  }
+  .solution-platforms__evidence {
+    display: grid;
+    gap: 0.3rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8rem;
+  }
+  .solution-platforms__evidence a,
+  .solution-platforms__more a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.5rem;
+    color: var(--tx-foreground);
+    text-underline-offset: 0.2em;
+    overflow-wrap: anywhere;
+  }
+  .solution-platforms__more {
+    margin: 0;
+    margin-block-start: 1.25rem;
+    font-weight: 650;
+  }
+  .solution-platforms a:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  @media (forced-colors: active) {
+    .solution-platforms__row {
+      border-color: CanvasText;
+    }
+  }
+</style>
