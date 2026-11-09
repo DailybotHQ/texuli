@@ -121,8 +121,14 @@ $effect(() => {
   if (active >= items.length) active = items.length - 1;
 });
 
+// The window recomputes on every row measurement; report the range only when
+// it moves, so an infinite loader is not called again for the same rows.
+let reported: { start: number; end: number } | undefined;
 $effect(() => {
-  onRangeChange?.({ start: view.start, end: view.end });
+  const { start, end } = view;
+  if (reported?.start === start && reported.end === end) return;
+  reported = { start, end };
+  onRangeChange?.({ start, end });
 });
 
 /** Measures the scroll viewport (the listbox) and follows its size. */

@@ -128,6 +128,51 @@ describe('windowing 10,000 rows', () => {
     scrollTo(container, 40 * 100);
     expect(onRangeChange).toHaveBeenLastCalledWith({ start: 97, end: 113 });
   });
+
+  it('reports a range once when rows are measured without scrolling', () => {
+    // Rows measure 41 px on mount, then resize one by one to 42 px (each
+    // ResizeObserver callback its own flush). Every measurement recomputes the
+    // window, but rows 0..12 stay the rendered range, so it is reported once.
+    const resized: ResizeObserverCallback[] = [];
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        constructor(callback: ResizeObserverCallback) {
+          resized.push(callback);
+        }
+        observe(): void {}
+        disconnect(): void {}
+      }
+    );
+    let rowHeight = 41;
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+      this: HTMLElement
+    ) {
+      const height = this.dataset.index === undefined ? 0 : rowHeight;
+      return {
+        height,
+        width: 300,
+        top: 0,
+        left: 0,
+        right: 300,
+        bottom: height,
+        x: 0,
+        y: 0,
+      } as DOMRect;
+    });
+    const onRangeChange = vi.fn();
+    render(VirtualListView, { props: { items: TEN_THOUSAND, label: 'Feed', onRangeChange } });
+    flushSync();
+    rowHeight = 42;
+    for (const callback of [...resized]) {
+      callback([], {} as ResizeObserver);
+      flushSync();
+    }
+    expect(resized.length).toBeGreaterThan(5);
+    expect(onRangeChange).toHaveBeenCalledTimes(1);
+    expect(onRangeChange).toHaveBeenCalledWith({ start: 0, end: 13 });
+    vi.unstubAllGlobals();
+  });
 });
 
 describe('keyboard: the APG listbox pattern', () => {
