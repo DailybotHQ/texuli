@@ -1,7 +1,7 @@
 /**
  * `@texuli/tokens/design-system/import` (T-ds-io): turn what a company
- * already has into a valid design-system document, plus warnings. Every
- * importer is pure, synchronous and deterministic, and never throws: input
+ * already has into a valid design-system document, warnings and a uniform
+ * loss report. Each importer is pure, synchronous and deterministic, and never throws: input
  * it cannot read is `{ ok: false, errors }` with a code (`invalid-input`,
  * `input-limit`, or the spec's validation codes); each value it refuses or
  * cannot place is a warning, and the import goes on without it. Results are
@@ -19,7 +19,6 @@ import {
   at,
   DESIGN_SYSTEM_IMPORT_LIMITS,
   type DesignSystemImportOptions,
-  type DesignSystemImportResult,
   documentRoot,
   failInput,
   finalize,
@@ -39,6 +38,7 @@ import {
   toStack,
   Warnings,
 } from './io.ts';
+import { type DesignSystemImportResultWithLosses, withLossReport } from './token-formats.ts';
 
 export {
   DESIGN_SYSTEM_IMPORT_ERRORS,
@@ -50,7 +50,13 @@ export {
   type DesignSystemImportWarning,
   type DesignSystemImportWarningCode,
 } from './io.ts';
-export { DESIGN_SYSTEM_EXTENSION, importDtcg, importTokensStudio } from './token-formats.ts';
+export {
+  DESIGN_SYSTEM_EXTENSION,
+  type DesignSystemImportLoss,
+  type DesignSystemImportResultWithLosses,
+  importDtcg,
+  importTokensStudio,
+} from './token-formats.ts';
 
 const NEUTRALS = ['zinc', 'slate', 'stone', 'gray', 'warm', 'cool', 'tinted'];
 const ELEVATIONS = ['flat', 'soft', 'crisp', 'glow', 'layered'];
@@ -138,9 +144,9 @@ const STACKS: Readonly<Record<string, readonly string[]>> = {
 export function importBrand(
   text: string,
   options: DesignSystemImportOptions = {}
-): DesignSystemImportResult {
+): DesignSystemImportResultWithLosses {
   const warnings = new Warnings();
-  return guard(warnings, () => {
+  const result = guard(warnings, () => {
     if (typeof text !== 'string') return failInput(warnings, 'A brand one-liner is text.');
     if (text.length > 1_000)
       return failInput(warnings, 'A brand one-liner is at most 1,000 characters.', 'input-limit');
@@ -296,6 +302,7 @@ export function importBrand(
     for (const key of Object.keys(sections)) doc[key] = sections[key] as Json;
     return finalize(ordered(doc), warnings, options);
   });
+  return withLossReport(result);
 }
 
 /** One mode's chart colors in a flat palette (the document's data-viz palette). */
@@ -378,9 +385,9 @@ export function paletteRole(key: string): string | undefined {
 export function importRolePalette(
   input: unknown,
   options: DesignSystemImportOptions = {}
-): DesignSystemImportResult {
+): DesignSystemImportResultWithLosses {
   const warnings = new Warnings();
-  return guard(warnings, () => {
+  const result = guard(warnings, () => {
     const root = readJson(input, warnings, options.maxBytes ?? DESIGN_SYSTEM_IMPORT_LIMITS.bytes);
     if (!isObject(root) || !isObject(root.light))
       return failInput(warnings, 'A role palette is an object with a `light` role map.');
@@ -485,6 +492,7 @@ export function importRolePalette(
     }
     return finalize(ordered(doc), warnings, options);
   });
+  return withLossReport(result);
 }
 
 /** Options of {@link importTheme}. */
@@ -506,9 +514,9 @@ export interface ImportThemeOptions extends DesignSystemImportOptions {
 export function importTheme(
   input: unknown,
   options: ImportThemeOptions = {}
-): DesignSystemImportResult {
+): DesignSystemImportResultWithLosses {
   const warnings = new Warnings();
-  return guard(warnings, () => {
+  const result = guard(warnings, () => {
     const root = readJson(input, warnings, options.maxBytes ?? DESIGN_SYSTEM_IMPORT_LIMITS.bytes);
     const theme = validateTheme(root);
     if (!theme.ok)
@@ -533,6 +541,7 @@ export function importTheme(
     }
     return finalize(doc, warnings, options);
   });
+  return withLossReport(result);
 }
 
 /** Pixels as `ImageData` holds them: RGBA, 4 values a pixel. */
@@ -540,7 +549,7 @@ export interface LogoPixels {
   data: ArrayLike<number>;
 }
 
-export type LogoPaletteResult = DesignSystemImportResult & {
+export type LogoPaletteResult = DesignSystemImportResultWithLosses & {
   /** The dominant colors, most common first (only on success). */
   palette: DominantColor[];
 };
@@ -593,7 +602,7 @@ export function importLogoPixels(
     doc.color = { brand: { ...seeds } };
     return finalize(doc, warnings, options);
   });
-  return { ...result, palette: result.ok ? palette : [] } as LogoPaletteResult;
+  return { ...withLossReport(result), palette: result.ok ? palette : [] } as LogoPaletteResult;
 }
 
 export type { DesignSystem };

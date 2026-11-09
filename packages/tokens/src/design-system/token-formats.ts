@@ -47,6 +47,30 @@ import {
   Warnings,
 } from './io.ts';
 
+/** One imported value the importer could not preserve. */
+export interface DesignSystemImportLoss {
+  path: string;
+  reason: string;
+  value?: Json;
+}
+
+/** The common result shape exposed by every design-system importer. */
+export type DesignSystemImportResultWithLosses = DesignSystemImportResult & {
+  losses: DesignSystemImportLoss[];
+};
+
+/** Project importer warnings into the stable loss-report contract. */
+export function withLossReport<T extends DesignSystemImportResult>(
+  result: T
+): T & { losses: DesignSystemImportLoss[] } {
+  return {
+    ...result,
+    losses: result.warnings
+      .filter((warning) => warning.code !== 'default')
+      .map(({ path, message }) => ({ path, reason: message })),
+  };
+}
+
 /** The `$extensions` key that carries the non-token part of the document. */
 export const DESIGN_SYSTEM_EXTENSION = 'com.texuli.design-system';
 
@@ -446,15 +470,16 @@ function build(
 export function importDtcg(
   input: unknown,
   options: DesignSystemImportOptions = {}
-): DesignSystemImportResult {
+): DesignSystemImportResultWithLosses {
   const warnings = new Warnings();
-  return guard(warnings, () => {
+  const result = guard(warnings, () => {
     const root = readJson(input, warnings, options.maxBytes ?? DESIGN_SYSTEM_IMPORT_LIMITS.bytes);
     if (!isObject(root)) return failInput(warnings, 'A DTCG file is a JSON object.');
     const tokens: RawToken[] = [];
     collect(root, '$', false, undefined, tokens);
     return build(root, tokens, warnings, options);
   });
+  return withLossReport(result);
 }
 
 const modeOf = (set: string): 'light' | 'dark' | undefined =>
@@ -473,9 +498,9 @@ const modeOf = (set: string): 'light' | 'dark' | undefined =>
 export function importTokensStudio(
   input: unknown,
   options: DesignSystemImportOptions = {}
-): DesignSystemImportResult {
+): DesignSystemImportResultWithLosses {
   const warnings = new Warnings();
-  return guard(warnings, () => {
+  const result = guard(warnings, () => {
     const root = readJson(input, warnings, options.maxBytes ?? DESIGN_SYSTEM_IMPORT_LIMITS.bytes);
     if (!isObject(root)) return failInput(warnings, 'A Tokens Studio file is a JSON object.');
     const metadata = isObject(root.$metadata) ? root.$metadata : {};
@@ -490,4 +515,5 @@ export function importTokensStudio(
     }
     return build(root, tokens, warnings, options);
   });
+  return withLossReport(result);
 }
