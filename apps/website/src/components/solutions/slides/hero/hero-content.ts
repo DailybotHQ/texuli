@@ -12,7 +12,7 @@ import type { SolutionHeroProps } from '../../shared/types.ts';
 export const SLIDES_HERO: Omit<SolutionHeroProps, 'entry'> = {
   eyebrow: 'Solution · Slides',
   title: 'Decks written as data, presented on the web.',
-  lede: 'Write a deck in JSON or Markdown, check it against one model, then present it with layouts and a presenter view, or print it and export PPTX.',
+  lede: 'Write a deck in JSON or Markdown and see every issue before you present. Run it on any screen with a presenter view, then print a PDF or export PPTX.',
   ctas: [
     { kind: 'primary', label: 'Try the live deck', href: `#${SOLUTION_SECTION_IDS.demo}` },
     { kind: 'secondary', label: 'Start building', href: `#${SOLUTION_SECTION_IDS.quickstart}` },

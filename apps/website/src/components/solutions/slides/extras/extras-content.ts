@@ -60,7 +60,7 @@ export const SLIDES_PLATFORMS: Omit<SolutionPlatformsProps, 'entry'> = {
 
 export const SLIDES_NEXT: Omit<SolutionNextStepsProps, 'entry'> = {
   links: [
-    { label: 'Read the docs', href: '/guides/solutions/slides/' },
-    { label: '@texuli/slides on npm', href: 'https://www.npmjs.com/package/@texuli/slides' },
+    { label: 'Read the Slides guide', href: '/guides/solutions/slides/' },
+    { label: 'Install @texuli/slides', href: 'https://www.npmjs.com/package/@texuli/slides' },
   ],
 };

@@ -9,7 +9,8 @@
  * `packages/slides/README.md`): one model written as JSON or Markdown, `parseDeck` reports
  * every issue and never throws, the engine's navigation and presenter protocol, the stage's
  * scaling canvas, input, overview, presenter window and layouts, print to PDF through the
- * browser and a local PPTX export. No counts are stated, so nothing drifts.
+ * browser and a local PPTX export. No counts are stated, so nothing drifts. The band under
+ * the steps is the `solution-slides-how` illustration (texel mosaic until the WebP lands).
  */
 import type { SolutionHowProps } from '../../shared/types.ts';
 
@@ -18,30 +19,31 @@ export const SLIDES_HOW: Omit<SolutionHowProps, 'entry'> = {
   steps: [
     {
       title: 'Author',
-      body: 'Write the deck as JSON, or in the closed deck Markdown dialect. Both sources produce the same deck, and Markdown round-trips back.',
+      body: 'Write the deck as JSON or in the deck Markdown dialect. Both produce the same deck, and Markdown round-trips.',
       package: '@texuli/deck',
     },
     {
       title: 'Parse and validate',
-      body: 'One model checks every slide and reports every issue at once, each with a code, a path and a fix. It never throws.',
+      body: 'One model checks every slide and reports every issue at once, with a code, a path and a fix. It never throws.',
       package: '@texuli/deck',
     },
     {
       title: 'Navigate',
-      body: 'A framework-free engine runs slides and steps, vertical stacks, hash routes and the presenter protocol, with no DOM.',
+      body: 'A framework-free engine runs slides, steps, vertical stacks, hash routes and the presenter protocol, with no DOM.',
       package: '@texuli/deck',
     },
     {
       title: 'Present',
-      body: 'The Svelte stage scales a fixed canvas to any screen, with keyboard and touch input, an overview, a presenter window and built-in layouts.',
+      body: 'The Svelte stage scales a fixed canvas to any screen, with keyboard and touch, an overview, a presenter window and layouts.',
       package: '@texuli/slides',
     },
     {
       title: 'Print and export',
-      body: 'Print one page per slide and save it as PDF from the browser, or export an editable PPTX locally, with a report of what it leaves out.',
+      body: 'Print one page per slide to PDF from the browser, or export an editable PPTX that reports what it leaves out.',
       package: '@texuli/slides',
     },
   ],
+  art: { slot: 'solution-slides-how', variant: 'band' },
 };
 
 /** Per step (same order): the subpath export it uses and the capability it demonstrates. */
