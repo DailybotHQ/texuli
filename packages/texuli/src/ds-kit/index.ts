@@ -48,3 +48,13 @@ export type {
   KitSectionId,
   KitState,
 } from './shared/types.ts';
+export { default as KitVoice } from './voice/KitVoice.svelte';
+export {
+  type VoiceAccessibility,
+  type VoiceLexiconRow,
+  type VoiceModel,
+  type VoiceRules,
+  type VoiceText,
+  voiceItems,
+  voiceModel,
+} from './voice/model.ts';

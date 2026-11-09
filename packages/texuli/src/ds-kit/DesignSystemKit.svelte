@@ -7,8 +7,8 @@
  * switch shows light and dark side by side or one at a time (§4). Every section and item has
  * a stable `id` for deep links. No network, no HTML sinks: document text is rendered as text.
  *
- * Sections land one task at a time (T4): Foundations is mounted here; Voice, Components,
- * Library and Changes join as their tasks merge (each adds its mount and its availability).
+ * Sections land one task at a time (T4): Foundations and Voice are mounted here;
+ * Components, Library and Changes join as their tasks merge.
  */
 import { useMessages } from '../i18n/use-messages.ts';
 import KitFoundations, { foundationLabel } from './foundations/KitFoundations.svelte';
@@ -19,6 +19,8 @@ import KitModeSwitch from './shared/KitModeSwitch.svelte';
 import { kitText } from './shared/limits.ts';
 import { kitItemId, kitPrefix, kitSectionId, kitVisibleSections } from './shared/navigation.ts';
 import type { DesignSystemKitProps, KitSectionId } from './shared/types.ts';
+import KitVoice, { voiceLabel } from './voice/KitVoice.svelte';
+import { voiceItems, voiceModel } from './voice/model.ts';
 import './shared/ds-kit.css';
 
 let {
@@ -44,9 +46,10 @@ const name = $derived(
 const version = $derived(kitText((doc as { version?: unknown })?.version, 64)?.text);
 const approval = $derived(kitApproval(doc));
 const foundations = $derived(compiled ? foundationsModel(compiled) : undefined);
+const voice = $derived(voiceModel(doc));
 
 /** The sections this build of the kit can show for the data it has. */
-const available = $derived<KitSectionId[]>(compiled ? ['foundations'] : []);
+const available = $derived<KitSectionId[]>(compiled ? ['foundations', 'voice'] : ['voice']);
 const visible = $derived(kitVisibleSections(sections, available));
 
 const items = (section: KitSectionId): { id: string; label: string }[] =>
@@ -55,7 +58,9 @@ const items = (section: KitSectionId): { id: string; label: string }[] =>
         ...item,
         label: foundationLabel(msg, item.id),
       }))
-    : [];
+    : section === 'voice'
+      ? voiceItems(voice).map((item) => ({ ...item, label: voiceLabel(msg, item.id) }))
+      : [];
 
 // Uncontrolled navigation keeps its own place; controlled navigation reads the props.
 let ownSection = $state<KitSectionId | undefined>(undefined);
@@ -161,6 +166,13 @@ const sectionLevel = $derived((headingLevel + 1) as 3 | 4);
         headingLevel={sectionLevel}
         idPrefix={prefix}
         currentItem={activeSection === 'foundations' ? activeItem : undefined}
+      />
+    {:else if section.id === 'voice'}
+      <KitVoice
+        document={doc}
+        headingLevel={sectionLevel}
+        idPrefix={prefix}
+        currentItem={activeSection === 'voice' ? activeItem : undefined}
       />
     {/if}
   {/each}

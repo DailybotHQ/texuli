@@ -329,8 +329,10 @@ describe('DesignSystemKit: navigation and modes', () => {
       [KIT_SECTIONS[1], KIT_SECTIONS[0]]
     );
     const { container } = render(DesignSystemKit, { document: doc });
-    expect(container.querySelector('nav')).toBeNull();
-    expect(container.querySelector('[data-tx-ds-kit-section]')).toBeNull();
+    expect(container.querySelector('[data-tx-ds-kit-nav="voice"]')).not.toBeNull();
+    expect(container.querySelector('[data-tx-ds-kit-nav="foundations"]')).toBeNull();
+    expect(container.querySelector('[data-tx-ds-kit-section="voice"]')).not.toBeNull();
+    expect(container.querySelector('[data-tx-ds-kit-section="foundations"]')).toBeNull();
   });
 });
 
