@@ -27,6 +27,11 @@
 > codes of `checkDesignSystemAllow`. Every 0.12.0 document stays valid;
 > `formatVersion` stays `1`.
 
+> **Spec 0.14.0 (in development for `0.16.0`, not published).** Additive:
+> `allow` entries gain `colors` (the category color axis of a catalog
+> component) and `checkDesignSystemAllow` gains `unknown-color`. Every
+> 0.13.0 document stays valid; `formatVersion` stays `1`.
+
 The end-to-end guide (author, validate, apply, distribute, outputs) is
 [DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md).
 
@@ -165,7 +170,7 @@ component.
 | `inline-bytes` | A data URL over its cap, or over the 256 KiB total |
 | `aa-text`, `aa-focus`, `target-size` | Raised by the compiler in `@texuli/tokens` (from spec 0.11.0, `aa-text` also covers a product token's on-color, at `$.extensions.<name>.on.<mode>`) ([ADR-022](../../../docs/DECISIONS.md#adr-022-design-system-guarantees-enforced-never-reported)); never by the spec |
 | `approval-invalid` | From spec 0.13.0: an `approved` document without `approvedBy` and `approvedAt`, or an `approved` library entry without its own approval |
-| `unknown-component`, `unknown-variant`, `unknown-size`, `unknown-tone`, `unknown-density`, `unknown-color`, `unknown-state` | From spec 0.13.0: raised by `checkDesignSystemAllow` (not by `validateDesignSystem`): an `allow` id or value, or a `library[].composes` id, that the catalog does not list |
+| `unknown-component`, `unknown-variant`, `unknown-size`, `unknown-tone`, `unknown-density`, `unknown-color`, `unknown-state` | From spec 0.13.0 (`unknown-color` from 0.14.0): raised by `checkDesignSystemAllow` (not by `validateDesignSystem`): an `allow` id or value, or a `library[].composes` id, that the catalog does not list |
 | `aa-non-text` | From spec 0.12.0: a role fill below 3:1 against its container (WCAG 1.4.11), such as the sidebar's active fill on the sidebar. A warning in the compiler's report; raised by `checkDesignSystemIndicators` in `@texuli/tokens`, `texuli ds check` and `ds.validate`; never by the spec |
 
 Paths start at `$`; keys that are not identifiers are quoted

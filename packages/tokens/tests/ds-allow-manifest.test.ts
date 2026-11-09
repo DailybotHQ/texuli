@@ -65,7 +65,7 @@ describe('compileAllowManifest', () => {
       library: [{ id: 'pricing-card', version: '0.3.0', status: 'draft' }],
       version: '1.2.0',
       contentHash: designSystemContentHash(doc),
-      specVersion: '0.13.0',
+      specVersion: '0.14.0',
       catalogDigest: 'ab'.repeat(32),
     });
     expect(ALLOW_MANIFEST_SPEC_VERSION).toBe(SPEC_VERSION);
@@ -75,7 +75,7 @@ describe('compileAllowManifest', () => {
     expect(compileAllowManifest(minimal)).toEqual({
       version: '1.0.0',
       contentHash: designSystemContentHash(minimal),
-      specVersion: '0.13.0',
+      specVersion: '0.14.0',
     });
     const hostile = JSON.parse(
       `{"format":"texuli/design-system","formatVersion":1,"id":"a","version":"1.0.0","name":"A","allow":{"__proto__":{"variants":["x"]},"button":{"variants":["default"]}}}`

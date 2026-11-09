@@ -206,6 +206,13 @@ has, and who approved that version.
 
 **In development (in the `0.15.0` tarballs, completed in `0.16.0`).**
 
+- Blueprint spec `0.14.0` is open on the development branch for `0.16.0`
+  and is not published: the category `color` axis and the design-system
+  `allow` colors (`unknown-color`), and the catalog ids added after the
+  `0.15.0` cut (`color-swatch`, `data-virtual-list`, `link`, `list`,
+  `mark`). It is additive, and the `0.13.0 → 0.14.0` step only stamps
+  `spec`. `@texuli/spec@0.15.0` keeps spec `0.13.0` with its published
+  digest.
 - `texuli/ds-kit`: a whole design system on one page (foundations, voice and
   rules, the component matrix, the library with approval badges and the
   changes between two versions), and its texuli.com page
