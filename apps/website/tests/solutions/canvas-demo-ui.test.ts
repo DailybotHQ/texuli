@@ -75,7 +75,7 @@ describe('canvas solution demo island', () => {
     expect(source).toContain('{source}');
     expect(source).toContain("import { CanvasViewer } from '@texuli/canvas/viewer'");
     expect(islandBudgetFor('/solutions/canvas/')).toBe(1);
-    expect(budgetFor('/solutions/canvas/').pageGzipKb).toBe(169);
+    expect(budgetFor('/solutions/canvas/').pageGzipKb).toBe(177);
     expect(budgetFor('/solutions/canvas/').jsGzipKb).toBe(64);
   });
 });

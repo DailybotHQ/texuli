@@ -102,8 +102,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/solutions/documents/',
     reason:
-      'ADR-030: this landing replaces /documents-page/ and inherits its current 174 KB page cap.',
-    budget: { pageGzipKb: 174 },
+      'ADR-030: this landing replaces /documents-page/ and inherits its current 182 KB page cap (174 KB until 0.15.0 widened the catalog).',
+    budget: { pageGzipKb: 182 },
   },
   {
     route: '/forms-page/',
@@ -120,8 +120,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/solutions/canvas/',
     reason:
-      'ADR-030: this landing replaces /canvas-page/ and inherits its current 169 KB page cap.',
-    budget: { pageGzipKb: 169 },
+      'ADR-030: this landing replaces /canvas-page/ and inherits its current 177 KB page cap (169 KB until 0.15.0 widened the catalog).',
+    budget: { pageGzipKb: 177 },
   },
   {
     route: '/sheets-page/',
