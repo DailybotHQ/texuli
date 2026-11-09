@@ -127,7 +127,7 @@ function handleInput(event: Event & { currentTarget: EventTarget & HTMLFormEleme
   {...rest}
   oninput={handleInput}
   {@attach bindRef}
->
+ data-tx-component="form">
   {#if formLevelError}
     {#if formError}
       {@render formError(formLevelError)}

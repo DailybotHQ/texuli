@@ -99,7 +99,7 @@ function itemActive(item: ResolvedNavItem): boolean {
   data-tx-layout="dashboard-grid"
   data-dense={dense ? 'true' : 'false'}
   style:--tx-dashboard-gap={gap}
->
+ data-tx-component="layout-dashboard-grid">
   <LayoutChrome part="skip" {mainId} />
 
   <header class="tx-layout-dashboard__header" data-tx-layout-chrome="header">

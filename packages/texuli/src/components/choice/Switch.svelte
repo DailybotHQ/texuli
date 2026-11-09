@@ -92,7 +92,7 @@ const controlClass = $derived(
     class={cx('tx-choice tx-choice--switch', className)}
     data-tx-choice-field="switch"
     {...split.wrapper}
-  >
+   data-tx-component="switch" data-tx-size={size}>
     <div class="tx-choice__copy">
       <label class="tx-choice__label" for={id}>{label}{@render labelContent?.()}</label>
       {#if description}

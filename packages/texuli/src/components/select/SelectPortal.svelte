@@ -5,6 +5,6 @@ import type { Snippet } from 'svelte';
 let { children }: { children?: Snippet } = $props();
 </script>
 
-<PrimitivePortal>
-  {@render children?.()}
-</PrimitivePortal>
+<span class="tx-select-portal" data-tx-component="select-portal">
+  <PrimitivePortal>{@render children?.()}</PrimitivePortal>
+</span>

@@ -58,6 +58,9 @@ const classes = $derived(
   data-tx-popover-content
   data-variant={variant}
   data-size={size}
+  data-tx-component="popover-content"
+  data-tx-variant={variant}
+  data-tx-size={size}
   {...rest}
 >
   {#if arrow}

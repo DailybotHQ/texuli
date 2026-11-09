@@ -68,6 +68,8 @@ const controlClass = $derived(choiceControlClass({ size, class: 'tx-choice-contr
     for={id}
     data-tx-choice-field="radio-card"
     {...split.wrapper}
+    data-tx-component="radio"
+    data-tx-size={size}
   >
     <span class="tx-radio-card__control">
       <RadioGroupPrimitive.Item
@@ -99,6 +101,8 @@ const controlClass = $derived(choiceControlClass({ size, class: 'tx-choice-contr
     class={cx('tx-choice', className)}
     data-tx-choice-field="radio"
     {...split.wrapper}
+    data-tx-component="radio"
+    data-tx-size={size}
   >
     <span class="tx-choice__hit">
       <RadioGroupPrimitive.Item
@@ -109,6 +113,8 @@ const controlClass = $derived(choiceControlClass({ size, class: 'tx-choice-contr
         class={controlClass}
         aria-describedby={describedBy}
         data-tx-choice="radio"
+    data-tx-component="radio"
+    data-tx-size={size}
       >
         {#snippet children({ checked })}
           {#if checked}<span class="tx-choice-control__dot"></span>{/if}

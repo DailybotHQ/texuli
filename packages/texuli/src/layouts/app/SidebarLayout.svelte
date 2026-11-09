@@ -54,7 +54,7 @@ const sections = $derived(appSidebarSections(resolved));
 <div
   class={cx('tx-app-layout', 'tx-app-layout--sidebar', className)}
   data-tx-app-layout="sidebar"
->
+ data-tx-component="layout-sidebar">
   <LayoutChrome part="skip" {mainId} {nav} {skipLabel} />
   <AppNav
     {sections}

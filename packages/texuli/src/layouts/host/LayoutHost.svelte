@@ -189,7 +189,7 @@ $effect(() => {
   data-ready={Layout && loadedFor === effectiveLayout && !loading ? 'true' : 'false'}
   style:container-type="inline-size"
   dir={dir}
->
+ data-tx-component="layout-host">
   {#if Layout && loadedFor === effectiveLayout}
     <Layout
       {mountScreen}

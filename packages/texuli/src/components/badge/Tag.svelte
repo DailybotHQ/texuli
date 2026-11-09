@@ -67,7 +67,7 @@ async function remove(): Promise<void> {
   data-tx-tag
   data-variant={variant}
   {...rest}
->
+ data-tx-component="tag" data-tx-variant={variant}>
   <span class="tx-tag__label">{label}</span>
   {#if onRemove}
     <button

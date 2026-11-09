@@ -22,6 +22,7 @@ let { class: className, placeholder = 'Select…', children: content, ...rest }:
       })}
       data-tx-select-value
       data-placeholder={!label ? '' : undefined}
+      data-tx-component="select-value"
     >
       {#if content}
         {@render content({ value, label })}

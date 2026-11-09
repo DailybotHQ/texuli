@@ -96,7 +96,7 @@ const classes = $derived(cx(fieldRootClass({ orientation }), className));
   data-disabled={disabled ? '' : undefined}
   data-required={required ? '' : undefined}
   {...rest}
->
+ data-tx-component="field">
   <Label id={labelId} for={id} {required} srOnly={hideLabel}>{label}</Label>
   <div class="tx-field-control">
     {@render children(control)}

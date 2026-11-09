@@ -76,7 +76,7 @@ $effect(() => {
   aria-label={nested ? 'Authentication layout' : undefined}
   tabindex={nested ? 0 : undefined}
 >
-  <section class="tx-auth-split__form" aria-label={formLabel}>
+  <section class="tx-auth-split__form" aria-label={formLabel} data-tx-component="layout-auth-split">
     <div class="tx-auth-split__form-inner">
       {#if brand}
         <div class="tx-auth-split__brand-mark">{@render brand()}</div>

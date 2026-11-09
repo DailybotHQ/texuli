@@ -99,7 +99,7 @@ const describedBy = $derived(
   data-tx-time
   data-invalid={invalid ? 'true' : undefined}
   data-disabled={disabled ? 'true' : undefined}
->
+ data-tx-component="time-field" data-tx-size={size}>
   {#if showLabel}<span class="tx-date__label" aria-hidden="true">{label}{#if isRequired}<span class="tx-date__required"> *</span>{/if}</span>{/if}
   <div class="tx-date__control">
     <Primitive.Root

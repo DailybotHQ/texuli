@@ -24,5 +24,5 @@ const classes = $derived(cx(fieldErrorClass(), className));
     data-tx-field-error=""
     role="alert"
     {...rest}
-  >{@render children?.()}</p>
+   data-tx-component="field-error">{@render children?.()}</p>
 {/if}

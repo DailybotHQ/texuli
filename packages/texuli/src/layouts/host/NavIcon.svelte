@@ -48,7 +48,7 @@ const glyph = $derived(typeof icon === 'string' ? navIconPath(icon) : undefined)
     aria-label={label}
     data-tx-nav-icon={icon}
     data-known={glyph.known ? 'true' : 'false'}
-  >
+   data-tx-component="nav-icon">
     <path d={glyph.path} />
   </svg>
 {/if}

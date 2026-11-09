@@ -244,6 +244,8 @@ function hrefOf(item: Pick<SidebarItem, 'href'>): string | undefined {
   class={rootClass}
   aria-label={label}
   data-tx-sidebar
+  data-tx-component="sidebar"
+  data-tx-variant={variant}
   data-variant={variant}
   data-collapsed={isCollapsed ? '' : undefined}
   data-drawer={drawer ? '' : undefined}

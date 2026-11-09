@@ -26,6 +26,6 @@ const classes = $derived(menubarRootClass({ class: className }));
   data-tx-menubar
   bind:value
   {...rest}
->
+ data-tx-component="menubar">
   {@render children?.()}
 </MenubarPrimitive.Root>

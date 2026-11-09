@@ -122,7 +122,7 @@ $effect(() => {
   tabindex={scrollable ? 0 : undefined}
   data-tx-table-wrap
   data-scrollable={scrollable ? 'true' : undefined}
->
+ data-tx-component="table" data-tx-variant={variant} data-tx-density={density}>
   <table
     bind:this={table}
     class={tableClass({

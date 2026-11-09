@@ -30,7 +30,7 @@ let {
 const classes = $derived(cx(labelClass({ size }), srOnly && 'tx-label--sr', className));
 </script>
 
-<label bind:this={ref} class={classes} data-tx-label="" data-required={required ? '' : undefined} {...rest}>
+<label bind:this={ref} class={classes} data-tx-label="" data-required={required ? '' : undefined} {...rest} data-tx-component="label" data-tx-size={size}>
   {@render children?.()}
   {#if required}<span class="tx-label__required" aria-hidden="true">*</span>{/if}
 </label>

@@ -14,7 +14,7 @@ let { class: className, ref = $bindable(null), ...rest }: Props = $props();
 
 <!--
   Decorative: a listbox may contain only options and groups, so the rule is
-  hidden from assistive tech instead of being an <hr> (role separator).
+  hidden from assistive tech instead of being an <hr data-tx-component="select-separator"> (role separator).
 -->
 <div
   bind:this={ref}

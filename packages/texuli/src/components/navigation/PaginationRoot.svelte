@@ -81,7 +81,7 @@ const digitsStyle = (ctx: PaginationSnippetProps) =>
   {siblings}
   {boundaries}
   {...rest}
->
+ data-tx-component="pagination" data-tx-size={size} data-tx-variant={variant}>
   {#snippet children(given)}
     {@const ctx = tokensFor(given)}
     {#if children}

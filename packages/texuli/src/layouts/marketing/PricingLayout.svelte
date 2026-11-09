@@ -50,7 +50,7 @@ const cta = $derived(headerCta);
 const safeBrandHref = $derived(safeHref(brandHref, 'developer' as HrefTrust) ?? '#/');
 </script>
 
-<MarketingLayout class={cx(className)} {footer}>
+<MarketingLayout class={cx(className)} {footer} data-tx-component="layout-pricing">
   {#snippet brand()}
     <a class="tx-marketing-layout__nav-link" href={safeBrandHref} data-tx-pricing-brand="">{brandLabel}</a>
   {/snippet}

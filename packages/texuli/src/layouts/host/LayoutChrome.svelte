@@ -61,7 +61,7 @@ function focusMain(event: MouseEvent): void {
     class={cx('tx-layout-chrome-skip', className)}
     data-tx-layout-chrome="skip"
     onclick={focusMain}
-  >
+   data-tx-component="layout-chrome">
     {skipLabel}
   </a>
 {:else if part === 'brand' && nav?.brand}

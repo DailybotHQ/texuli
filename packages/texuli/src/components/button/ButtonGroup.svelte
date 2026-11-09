@@ -35,6 +35,6 @@ const classes = $derived(cx('tx-button-group', className));
   data-orientation={orientation}
   data-attached={attached ? 'true' : 'false'}
   {...rest}
->
+ data-tx-component="button-group">
   {@render children?.()}
 </div>

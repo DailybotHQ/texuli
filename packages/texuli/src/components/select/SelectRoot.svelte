@@ -39,7 +39,7 @@ function handleValueChange(next: string): void {
 }
 </script>
 
-<div class="tx-select-root" data-tx-select-root data-size={size} data-variant={variant} data-block={block || undefined}>
+<div class="tx-select-root" data-tx-select-root data-size={size} data-variant={variant} data-block={block || undefined} data-tx-component="select" data-tx-size={size} data-tx-variant={variant}>
   <PrimitiveRoot
     bind:open
     bind:value

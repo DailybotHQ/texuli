@@ -15,6 +15,6 @@ let { children, class: className, ref = $bindable(null), ...rest }: Props = $pro
   class={cx('tx-select-viewport', className)}
   data-tx-select-viewport
   {...rest}
->
+ data-tx-component="select-viewport">
   {@render children?.()}
 </PrimitiveViewport>

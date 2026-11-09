@@ -38,7 +38,7 @@ const retryLabel = $derived(retryLabelProp ?? msg('texuli.error-state.retry-labe
   class={cx('tx-error', className)}
   data-tx-error
   {...rest}
->
+ data-tx-component="error-state">
   <div class="tx-error__icon" aria-hidden="true" data-tx-error-icon>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
       <circle cx="12" cy="12" r="9" />

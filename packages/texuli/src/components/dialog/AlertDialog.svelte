@@ -236,7 +236,7 @@ function cancel(): void {
       motionHooks={panelMotion}
       {@attach bindRef}
     >
-      <div class="tx-alert-dialog__row">
+      <div class="tx-alert-dialog__row" data-tx-component="alert-dialog">
         {#if destructive}
           <div class={alertDialogIconClass()} aria-hidden="true" data-tx-alert-dialog-icon="">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

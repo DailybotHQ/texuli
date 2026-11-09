@@ -292,7 +292,7 @@ function runAction(item: ToastItem): void {
     onpointerleave={chainHandlers(onpointerleave, pointerLeave)}
     onfocusin={chainHandlers(onfocusin, focusIn)}
     onfocusout={chainHandlers(onfocusout, focusOut)}
-  >
+   data-tx-component="toaster">
     <!-- No top-layer region while empty: it would sit at the viewport corner (G77). -->
     <ToastViewport
       class="tx-toaster__viewport"

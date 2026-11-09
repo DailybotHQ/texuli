@@ -32,6 +32,6 @@ const classes = $derived(
 );
 </script>
 
-<Primitive bind:ref class={classes} data-tx-dropdown-menu-trigger data-size={size} data-variant={variant} {...rest}>
+<Primitive bind:ref class={classes} data-tx-dropdown-menu-trigger data-size={size} data-variant={variant} {...rest} data-tx-component="dropdown-menu-trigger" data-tx-size={size} data-tx-variant={variant}>
   {@render children?.()}
 </Primitive>

@@ -274,6 +274,9 @@ onMount(() => {
       class="tx-command-palette__content {paletteClasses}"
       data-tx-command-palette
       data-size={size}
+      data-tx-component="command-palette"
+      data-tx-size={size}
+      data-tx-variant={variant}
       onCloseAutoFocus={(event) => {
         const target = returnFocusTo;
         returnFocusTo = null;

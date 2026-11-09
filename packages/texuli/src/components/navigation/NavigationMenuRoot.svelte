@@ -43,6 +43,6 @@ function handleValueChange(next: string): void {
   bind:value
   onValueChange={handleValueChange}
   {...rest}
->
+ data-tx-component="navigation-menu">
   {@render children?.()}
 </Primitive.Root>

@@ -16,6 +16,6 @@ let { children, class: className, open = $bindable(false), ...rest }: Props = $p
   class={className}
   data-tx-context-menu
   data-state={open ? 'open' : 'closed'}
->
+ data-tx-component="context-menu">
   <ContextMenu.Root bind:open {...rest}>{@render children?.()}</ContextMenu.Root>
 </div>

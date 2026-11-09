@@ -20,4 +20,4 @@ $effect(() => {
 });
 </script>
 
-<div bind:this={outlet} data-tx-layout-screen="">{@render children()}</div>
+<div bind:this={outlet} data-tx-layout-screen="" data-tx-component="screen-outlet">{@render children()}</div>

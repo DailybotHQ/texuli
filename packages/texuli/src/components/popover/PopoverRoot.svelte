@@ -15,7 +15,7 @@ function handleOpenChange(next: boolean): void {
 }
 </script>
 
-<div data-tx-popover-root class="tx-popover-root">
+<div data-tx-popover-root class="tx-popover-root" data-tx-component="popover">
   <PrimitiveRoot bind:open onOpenChange={handleOpenChange} {...rest}>
     {@render children?.()}
   </PrimitiveRoot>

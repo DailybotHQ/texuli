@@ -14,6 +14,6 @@ let { children, class: className, ref = $bindable(null), ...rest }: Props = $pro
 const classes = $derived(contextTriggerClass({ class: className }));
 </script>
 
-<ContextMenu.Trigger bind:ref class={classes} data-tx-context-menu-trigger {...rest}>
+<ContextMenu.Trigger bind:ref class={classes} data-tx-context-menu-trigger {...rest} data-tx-component="context-menu-trigger">
   {@render children?.()}
 </ContextMenu.Trigger>

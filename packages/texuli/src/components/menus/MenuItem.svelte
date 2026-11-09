@@ -47,7 +47,7 @@ const classes = $derived(
   {...rest}
 >
   {#if icon}
-    <span class={menuIconClass()} data-tx-menu-icon aria-hidden="true">{@render icon()}</span>
+    <span class={menuIconClass()} data-tx-menu-icon aria-hidden="true" data-tx-component="dropdown-menu-item">{@render icon()}</span>
   {/if}
   <span class="tx-menu-item__label">{@render children?.()}</span>
   {#if shortcut}

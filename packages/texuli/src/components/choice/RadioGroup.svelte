@@ -81,7 +81,7 @@ const classes = $derived(
   data-variant={variant}
   {...rest}
   {@attach bindRef}
->
+ data-tx-component="radio-group" data-tx-variant={variant} data-tx-size={size}>
   {#if items}
     {#each items as item (item.value)}
       <Radio

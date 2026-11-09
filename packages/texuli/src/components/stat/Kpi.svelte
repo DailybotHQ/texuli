@@ -102,7 +102,7 @@ const formatted = $derived(formatKpi(value, unit, currency));
   aria-labelledby="{uid}-label"
   aria-busy={loading ? 'true' : undefined}
   {...rest}
->
+ data-tx-component="kpi" data-tx-variant={variant}>
   <p class="tx-stat__label" id="{uid}-label" data-tx-stat-label>
     {#if safe}
       <a href={safe} class="tx-stat__label-link" aria-describedby="{uid}-value">{label}</a>

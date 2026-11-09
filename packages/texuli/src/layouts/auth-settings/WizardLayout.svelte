@@ -74,7 +74,7 @@ $effect(() => {
   aria-label={nested ? (title ?? msg('texuli.wizard-layout.wizard', 'Wizard')) : undefined}
   tabindex={nested ? 0 : undefined}
 >
-  <div class="tx-wizard-layout__frame">
+  <div class="tx-wizard-layout__frame" data-tx-component="layout-wizard">
     <header class="tx-wizard-layout__header">
       {@render brand?.()}
       {#if title}
