@@ -9,6 +9,16 @@
 
 export type * from '../../generated/typescript/design-system.ts';
 export {
+  type DesignSystemRootAttributes,
+  type DesignSystemRootAxes,
+  DS_COMPONENT_ATTRIBUTE,
+  DS_DENSITY_ATTRIBUTE,
+  DS_SIZE_ATTRIBUTE,
+  DS_TONE_ATTRIBUTE,
+  DS_VARIANT_ATTRIBUTE,
+  dsRootAttributes,
+} from './attributes.ts';
+export {
   applyDesignSystemPatch,
   checkDesignSystemReference,
   DESIGN_SYSTEM_MIGRATIONS,
