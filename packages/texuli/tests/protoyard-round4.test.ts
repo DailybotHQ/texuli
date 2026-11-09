@@ -2,10 +2,10 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { cleanup, render } from '@testing-library/svelte';
 import { afterEach, describe, expect, it } from 'vitest';
-import { boxManifest } from '../../catalog/src/manifests/display/index.ts';
 import { IMPORTS_BY_ID } from '../../catalog/src/manifest/imports-map.ts';
-import { colorRefInk, colorRefVar, DATA_COLORS, ROLE_COLORS } from '../src/internal/color-ref.ts';
+import { boxManifest } from '../../catalog/src/manifests/display/index.ts';
 import { BOX_FILLS, BOX_SURFACES, Box } from '../src/components/typography/index.ts';
+import { colorRefInk, colorRefVar, DATA_COLORS, ROLE_COLORS } from '../src/internal/color-ref.ts';
 
 const css = readFileSync(
   resolve(process.cwd(), 'packages/texuli/src/components/typography/typography.css'),
