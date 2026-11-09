@@ -182,6 +182,87 @@ export const dataTreeViewManifest: CatalogManifest = /* @__PURE__ */ stampDataAx
   })
 );
 
+/** Viewport heights and row densities of `VirtualListView` (kept equal by a test). */
+export const VIRTUAL_LIST_SIZES = ['sm', 'md', 'lg', 'fill'] as const;
+export const VIRTUAL_LIST_DENSITIES = ['compact', 'default', 'comfortable'] as const;
+
+export const dataVirtualListManifest: CatalogManifest = /* @__PURE__ */ stampDataAxes(
+  manifestData({
+    id: 'data-virtual-list',
+    package: PKG,
+    label: 'Virtual list view',
+    summary:
+      'A windowed list of any length: only the visible rows are in the page, measured as they render, and each is announced with its position.',
+    tier: 'content',
+    // Host code renders rows through a snippet; the player has no painter yet.
+    agentEmittable: false,
+    useWhen: [
+      'Show a long feed, log or result list (hundreds to tens of thousands of rows)',
+      'Let people pick one row from a long list by keyboard',
+    ],
+    dontUseWhen: [
+      'Rows with columns: use data-grid',
+      'A short list: use list',
+      'Rows with their own buttons or links: a listbox option holds no controls',
+    ],
+    a11y: [
+      'A WAI-ARIA listbox with one tab stop; aria-activedescendant names the active row',
+      'Every row carries aria-setsize and aria-posinset, so its position in the full list is announced',
+      'Arrow keys, Home, End, Page Up and Page Down move; Enter, Space or a click selects',
+    ],
+    props: [
+      labelProp,
+      {
+        name: 'items',
+        kind: 'array',
+        required: true,
+        description: 'The rows; a row snippet in host code may render any item shape.',
+        schema: list({ id, label: text(), description: text(400) }, ['id', 'label']),
+      },
+      {
+        name: 'size',
+        kind: 'enum',
+        enumValues: VIRTUAL_LIST_SIZES,
+        default: 'md',
+        description: 'Viewport height: sm, md or lg, or fill to take the parent height.',
+      },
+      densityProp(VIRTUAL_LIST_DENSITIES, 'default'),
+      {
+        name: 'estimateSize',
+        kind: 'number',
+        default: 40,
+        description: 'Row height in px used until a row has been measured.',
+      },
+      {
+        name: 'overscan',
+        kind: 'number',
+        default: 3,
+        description: 'Rows rendered before and after the viewport (at most 50).',
+      },
+      { name: 'selected', kind: 'string', description: 'The selected row id.' },
+      { name: 'emptyLabel', kind: 'string', trust: 'untrusted' as const, default: 'No items' },
+    ],
+    events: ['select'],
+    bindable: ['selected'],
+    sourceable: ['items'],
+    examples: [
+      {
+        id: 'feed',
+        title: 'Team feed',
+        props: {
+          label: 'Team feed',
+          items: [
+            { id: 'u1', label: 'Release notes drafted', description: 'Docs team, example.com' },
+            { id: 'u2', label: 'Onboarding flow reviewed' },
+            { id: 'u3', label: 'Quarterly plan shared', description: 'Planning, example.com' },
+          ],
+        },
+      },
+    ],
+    related: ['data-grid', 'data-notification-inbox'],
+  })
+);
+
 export const dataCalendarManifest: CatalogManifest = /* @__PURE__ */ stampDataAxes(
   manifestData({
     id: 'data-calendar',
@@ -992,6 +1073,7 @@ export const dataDashboardWidgetManifest: CatalogManifest = /* @__PURE__ */ stam
 export const DATA_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Object.freeze([
   dataBoardManifest,
   dataTreeViewManifest,
+  dataVirtualListManifest,
   dataCalendarManifest,
   dataGridManifest,
   dataFilesManifest,
@@ -1010,6 +1092,7 @@ export const DATA_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Object
 export const DATA_GRAMMAR_ROLES: readonly GrammarComponentMeta[] = Object.freeze([
   { id: 'data-board', role: 'interactive' },
   { id: 'data-tree-view', role: 'interactive' },
+  { id: 'data-virtual-list', role: 'interactive' },
   { id: 'data-calendar', role: 'interactive' },
   { id: 'data-grid', role: 'interactive' },
   { id: 'data-files', role: 'interactive' },

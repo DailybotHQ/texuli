@@ -1,5 +1,5 @@
 {
-  "catalogHash": "38e851b0184f4c8dab464b1b680b693b2c070b1d9a1be6d04ee2377581b13dcb",
+  "catalogHash": "61c20db1dc6834de5dbd7fa1884e8a8e2c94a77b86d54ee0ab7f1b11a7c8394d",
   "components": [
     {
       "axes": {
@@ -1207,6 +1207,7 @@
             "muted",
             "subtle",
             "elevated",
+            "canvas",
             "primary",
             "brand",
             "translucent"
@@ -1251,7 +1252,16 @@
           "name": "as"
         },
         {
-          "enumValues": ["none", "default", "strong", "block-start", "block-end", "dashed"],
+          "enumValues": [
+            "none",
+            "default",
+            "strong",
+            "block-start",
+            "block-end",
+            "inline-start",
+            "inline-end",
+            "dashed"
+          ],
           "kind": "enum",
           "name": "border"
         },
@@ -1287,6 +1297,7 @@
             "muted",
             "subtle",
             "elevated",
+            "canvas",
             "primary",
             "brand",
             "translucent"
@@ -5809,6 +5820,102 @@
       "summary": "A hierarchy of items people expand, select and reorder or re-parent by drag or keyboard."
     },
     {
+      "axes": {
+        "density": {
+          "default": "default",
+          "prop": "density",
+          "values": ["compact", "default", "comfortable"]
+        },
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg", "fill"]
+        }
+      },
+      "bindable": ["selected"],
+      "capability": "web-only",
+      "emit": [],
+      "events": ["select"],
+      "group": "data",
+      "id": "data-virtual-list",
+      "imports": [
+        {
+          "exports": ["VirtualListView"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": ["VirtualListView"],
+          "module": "@texuli/data/virtual-list"
+        }
+      ],
+      "label": "Virtual list view",
+      "placement": "content",
+      "props": [
+        {
+          "enumValues": ["compact", "default", "comfortable"],
+          "kind": "enum",
+          "name": "density"
+        },
+        {
+          "kind": "string",
+          "name": "emptyLabel"
+        },
+        {
+          "kind": "number",
+          "name": "estimateSize"
+        },
+        {
+          "kind": "array",
+          "name": "items",
+          "required": true,
+          "schema": {
+            "items": {
+              "properties": {
+                "description": {
+                  "maxLength": 400,
+                  "type": "string"
+                },
+                "id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "label": {
+                  "maxLength": 200,
+                  "type": "string"
+                }
+              },
+              "required": ["id", "label"],
+              "type": "object"
+            },
+            "maxItems": 500,
+            "type": "array"
+          }
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "overscan"
+        },
+        {
+          "kind": "string",
+          "name": "selected"
+        },
+        {
+          "enumValues": ["sm", "md", "lg", "fill"],
+          "kind": "enum",
+          "name": "size"
+        }
+      ],
+      "sourceable": ["items"],
+      "states": ["hover", "focus-visible", "active", "selected"],
+      "summary": "A windowed list of any length: only the visible rows are in the page, measured as they render, and each is announced with its position."
+    },
+    {
       "capability": "unknown",
       "emit": ["developer", "untrusted"],
       "group": "layouts",
@@ -6926,7 +7033,7 @@
         "size": {
           "default": "lg",
           "prop": "size",
-          "values": ["display", "4xl", "3xl", "2xl", "xl", "lg", "md", "sm"]
+          "values": ["display", "4xl", "3xl", "2xl", "xl", "lg", "md", "sm", "xs"]
         },
         "tone": {
           "default": "default",
@@ -6986,7 +7093,7 @@
           "name": "responsive"
         },
         {
-          "enumValues": ["display", "4xl", "3xl", "2xl", "xl", "lg", "md", "sm"],
+          "enumValues": ["display", "4xl", "3xl", "2xl", "xl", "lg", "md", "sm", "xs"],
           "kind": "enum",
           "name": "size"
         },
@@ -9027,8 +9134,47 @@
       "capability": "unknown",
       "emit": [],
       "group": "display",
+      "id": "list",
+      "imports": [
+        {
+          "exports": ["List"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["List"],
+          "module": "texuli/list-item"
+        }
+      ],
+      "label": "List",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "divided"
+        }
+      ],
+      "summary": "A list of ListItem rows; divided draws a token hairline between them."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
       "id": "list-item",
       "imports": [
+        {
+          "exports": ["ListItem"],
+          "module": "texuli"
+        },
         {
           "exports": ["ListItem"],
           "module": "texuli/list-item"
@@ -9055,6 +9201,10 @@
           "name": "disabled"
         },
         {
+          "kind": "boolean",
+          "name": "divided"
+        },
+        {
           "kind": "string",
           "name": "href"
         },
@@ -9078,6 +9228,53 @@
       ],
       "states": ["hover", "focus-visible", "disabled", "selected"],
       "summary": "A list row with a title, optional description, icon and trailing meta."
+    },
+    {
+      "axes": {
+        "tone": {
+          "default": "warning",
+          "prop": "tone",
+          "values": ["warning", "primary", "success", "info"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "mark",
+      "imports": [
+        {
+          "exports": ["Mark", "MarkTone"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["MARK_TONES", "Mark", "MarkTone", "markClass"],
+          "module": "texuli/typography"
+        }
+      ],
+      "label": "Mark",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "enumValues": ["warning", "primary", "success", "info"],
+          "kind": "enum",
+          "name": "tone"
+        }
+      ],
+      "summary": "An inline highlight for search results, from role soft tokens."
     },
     {
       "capability": "web-only",
@@ -12254,6 +12451,10 @@
           "name": "for"
         },
         {
+          "kind": "boolean",
+          "name": "italic"
+        },
+        {
           "kind": "string",
           "name": "label"
         },
@@ -12269,6 +12470,10 @@
           "enumValues": ["figure", "lg", "md", "sm", "xs", "inherit"],
           "kind": "enum",
           "name": "size"
+        },
+        {
+          "kind": "boolean",
+          "name": "strikethrough"
         },
         {
           "kind": "boolean",

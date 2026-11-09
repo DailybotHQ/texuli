@@ -1,5 +1,5 @@
 /**
- * `texuli/typography` (ADR-032): Heading, Text, Prose, Box, Link and ColorSwatch,
+ * `texuli/typography` (ADR-032): Heading, Text, Prose, Box, Mark, Link and ColorSwatch,
  * the typography and surface components a locked prototype uses instead of
  * typography and visual utilities. Each is a catalog component with its axes,
  * states and root attributes.
@@ -8,6 +8,7 @@ export { default as Box } from './Box.svelte';
 export { default as ColorSwatch } from './ColorSwatch.svelte';
 export { default as Heading } from './Heading.svelte';
 export { default as Link } from './Link.svelte';
+export { default as Mark } from './Mark.svelte';
 export { default as Prose } from './Prose.svelte';
 export { default as Text } from './Text.svelte';
 export {
@@ -36,6 +37,9 @@ export {
   type HeadingTracking,
   headingClass,
   headingSizeOf,
+  MARK_TONES,
+  type MarkTone,
+  markClass,
   PROSE_ELEMENTS,
   PROSE_SIZES,
   type ProseElement,

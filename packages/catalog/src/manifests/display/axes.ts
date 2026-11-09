@@ -52,7 +52,9 @@ export const DISPLAY_AXIS_STAMP: Readonly<Record<string, Stamp>> = {
   progress: { axes: { size: 'size', tone: 'tone' }, states: ['loading'] },
   carousel: { states: ['hover', 'focus-visible', 'selected'] },
   separator: { axes: { variant: 'variant' } },
+  list: {},
   'list-item': { states: ['hover', 'focus-visible', 'disabled', 'selected'] },
+  mark: { axes: { tone: 'tone' } },
 };
 
 export function stampDisplayAxes(manifest: CatalogManifest): CatalogManifest {

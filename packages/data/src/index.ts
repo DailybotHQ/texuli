@@ -87,8 +87,13 @@ export {
   type VirtualListDirection,
   type VirtualListItem,
   type VirtualListKey,
+  type VirtualListKeyValue,
   type VirtualListNavigationOptions,
   type VirtualListOptions,
   type VirtualListOrientation,
+  type VirtualListRowContext,
+  VirtualListView,
+  type VirtualListViewDensity,
+  type VirtualListViewSize,
   type VirtualListWindow,
 } from './virtual-list/index.ts';

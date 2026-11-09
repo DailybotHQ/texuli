@@ -25,7 +25,7 @@ import { Progress, Skeleton, Spinner } from '../../src/components/feedback/index
 import { Icon } from '../../src/components/icons/index.ts';
 import { LucideIcon } from '../../src/components/icons/lucide.ts';
 import { Code, CopyButton, Kbd } from '../../src/components/kbd-code/index.ts';
-import { ListItem } from '../../src/components/list-item/index.ts';
+import { List, ListItem } from '../../src/components/list-item/index.ts';
 import { Rating } from '../../src/components/rating/index.ts';
 import {
   AspectRatio,
@@ -34,7 +34,7 @@ import {
 } from '../../src/components/separator-aspect/index.ts';
 import { Kpi, KpiRow, Stat } from '../../src/components/stat/index.ts';
 import { Timeline, TimelineItem } from '../../src/components/timeline/index.ts';
-import { Box, Heading, Prose, Text } from '../../src/components/typography/index.ts';
+import { Box, Heading, Mark, Prose, Text } from '../../src/components/typography/index.ts';
 import { MotionLoop } from '../../src/motion/loop/index.ts';
 import CustomIcon from '../fixtures/CustomIcon.svelte';
 
@@ -77,7 +77,9 @@ const k = (name: string) => `components/${name}`;
 <Code {...p(k('kbd-code/Code'))} bind:ref={refs[k('kbd-code/Code')]}>npm i</Code>
 <CopyButton value="npm i" {...p(k('kbd-code/CopyButton'))} bind:ref={refs[k('kbd-code/CopyButton')]} />
 <Kbd {...p(k('kbd-code/Kbd'))} bind:ref={refs[k('kbd-code/Kbd')]}>⌘K</Kbd>
-<ul role="list"><ListItem title="Inbox" description="3 new" {...p(k('list-item/ListItem'))} bind:ref={refs[k('list-item/ListItem')]} /></ul>
+<List {...p(k('list-item/List'))} bind:ref={refs[k('list-item/List')]}>
+  <ListItem title="Inbox" description="3 new" {...p(k('list-item/ListItem'))} bind:ref={refs[k('list-item/ListItem')]} />
+</List>
 <MotionLoop preset="wave" {...p('motion/loop/MotionLoop')} bind:ref={refs['motion/loop/MotionLoop']}><span></span><span></span></MotionLoop>
 <Rating value={3} {...p(k('rating/Rating'))} bind:ref={refs[k('rating/Rating')]} />
 <AspectRatio {...p(k('separator-aspect/AspectRatio'))} bind:ref={refs[k('separator-aspect/AspectRatio')]}>Media</AspectRatio>
@@ -91,6 +93,7 @@ const k = (name: string) => `components/${name}`;
 <Text {...p(k('typography/Text'))} bind:ref={refs[k('typography/Text')]}>Body</Text>
 <Prose {...p(k('typography/Prose'))} bind:ref={refs[k('typography/Prose')]}><p>Long form</p></Prose>
 <Box {...p(k('typography/Box'))} bind:ref={refs[k('typography/Box')]}>Panel</Box>
+<Mark {...p(k('typography/Mark'))} bind:ref={refs[k('typography/Mark')]}>hit</Mark>
 <Timeline {...p(k('timeline/Timeline'))} bind:ref={refs[k('timeline/Timeline')]}>
   <TimelineItem title="Created" {...p(k('timeline/TimelineItem'))} bind:ref={refs[k('timeline/TimelineItem')]} />
 </Timeline>

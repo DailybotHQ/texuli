@@ -4,6 +4,7 @@
  * from the design system's tokens, the one way a locked prototype frames content without
  * visual utilities. Not interactive: use Card for a clickable surface. For an app header or
  * footer, use `radius="none"` with a single logical border side (`border="block-end"`).
+ * `surface="canvas"` is the page background. `border="inline-start"` / `inline-end` mark a rail.
  */
 import type { HTMLAttributes } from 'svelte/elements';
 import { cx } from '../../internal/cx.ts';
@@ -31,11 +32,11 @@ type Props = HTMLAttributes<HTMLElement> & {
   padding?: BoxPadding;
   /** Shape radius: `none`, `sm`, `md` (default), `lg`, `xl`, `full`. */
   radius?: BoxRadius;
-  /** `none` (default), `default` or `strong` (all sides), one logical side (`block-start`, `block-end`), or `dashed` (token dashed border). */
+  /** `none` (default), `default` or `strong` (all sides), one logical side (`block-start`, `block-end`, `inline-start`, `inline-end`), or `dashed`. */
   border?: BoxBorder;
   /** Elevation shadow: `none` (default), `sm`, `md`, `lg`. */
   elevation?: BoxElevation;
-  /** The fill: `transparent` (default), `default` (surface), `muted`, `subtle`, `elevated`, `primary` (solid, with its on-color), `brand` (soft primary tint) or `translucent` (glass opacity and blur, for sticky headers). */
+  /** The fill: `transparent` (default), `default` (surface), `muted`, `subtle`, `elevated`, `canvas` (page background), `primary` (solid, with its on-color), `brand` (soft primary tint) or `translucent` (glass opacity and blur, for sticky headers). */
   surface?: BoxSurface;
   /** The rendered element (bindable). */
   ref?: HTMLElement | null;

@@ -118,6 +118,8 @@ const rootFiles = {
   rating: 'components/rating/Rating.svelte',
   'tags-input': 'components/tags-color/TagsInput.svelte',
   'toggle-group': 'components/toggle/ToggleGroup.svelte',
+  list: 'components/list-item/List.svelte',
+  mark: 'components/typography/Mark.svelte',
 } as const;
 const axisFiles = {
   alert: 'components/alert/AlertSurface.svelte',
@@ -230,6 +232,8 @@ const axisFiles = {
   rating: 'components/rating/Rating.svelte',
   'tags-input': 'components/tags-color/TagsInput.svelte',
   'toggle-group': 'components/toggle/ToggleGroup.svelte',
+  list: 'components/list-item/List.svelte',
+  mark: 'components/typography/Mark.svelte',
 } as const;
 const groupA = ALL_MANIFEST_GROUPS.flatMap((group) => group.manifests).filter(
   (entry) => entry.package === 'texuli' && Object.hasOwn(rootFiles, entry.id)
@@ -240,8 +244,8 @@ const source = (file: string) =>
 
 describe('Texuli group A catalog root attributes', () => {
   it('covers every group A catalog id from the root audit', () => {
-    expect(groupA).toHaveLength(110);
-    expect(new Set(groupA.map((entry) => entry.id)).size).toBe(110);
+    expect(groupA).toHaveLength(112);
+    expect(new Set(groupA.map((entry) => entry.id)).size).toBe(112);
   });
 
   it.each(groupA)('$id root declares its component id and enum axes', (entry) => {

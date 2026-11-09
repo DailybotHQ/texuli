@@ -73,6 +73,11 @@
     --tx-heading-min: var(--tx-font-size-base, 1rem);
     font-size: var(--tx-font-size-base, 1rem);
   }
+  .tx-heading--xs {
+    --tx-heading-size: var(--tx-font-size-sm, 0.875rem);
+    --tx-heading-min: var(--tx-font-size-sm, 0.875rem);
+    font-size: var(--tx-font-size-sm, 0.875rem);
+  }
   /* Responsive: fluid from about two scale steps below up to the size, never past either. */
   .tx-heading.tx-heading--responsive {
     font-size: clamp(
@@ -154,6 +159,12 @@
   }
   .tx-text--tracking-wide {
     letter-spacing: var(--tx-letter-spacing-wide, 0.08em);
+  }
+  .tx-text--italic {
+    font-style: italic;
+  }
+  .tx-text--strike {
+    text-decoration-line: line-through;
   }
 
   /* Tones: role inks that hold the text contrast target on the page. */
@@ -368,6 +379,12 @@
   .tx-box--border-block-end {
     border-block-end: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
   }
+  .tx-box--border-inline-start {
+    border-inline-start: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+  }
+  .tx-box--border-inline-end {
+    border-inline-end: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+  }
   .tx-box--border-dashed {
     border: var(--tx-border-width-thin) dashed var(--tx-border, currentColor);
   }
@@ -395,6 +412,10 @@
   .tx-box--surface-elevated {
     background-color: var(--tx-elevated, Canvas);
     color: var(--tx-elevated-foreground, CanvasText);
+  }
+  .tx-box--surface-canvas {
+    background-color: var(--tx-background, Canvas);
+    color: var(--tx-foreground, CanvasText);
   }
   .tx-box--surface-primary {
     background-color: var(--tx-primary, Canvas);
@@ -434,6 +455,7 @@
     .tx-box--border-none.tx-box--surface-muted,
     .tx-box--border-none.tx-box--surface-subtle,
     .tx-box--border-none.tx-box--surface-elevated,
+    .tx-box--border-none.tx-box--surface-canvas,
     .tx-box--border-none.tx-box--surface-primary,
     .tx-box--border-none.tx-box--surface-brand,
     .tx-box--border-none.tx-box--surface-translucent {
@@ -451,6 +473,37 @@
       background-color: Canvas;
       color: CanvasText;
       outline: 1px solid CanvasText;
+    }
+  }
+
+  /* Mark: inline highlight for search results, from role soft tokens. */
+  .tx-mark {
+    padding-inline: 0.15em;
+    border-radius: var(--tx-shape-radius-sm);
+    color: var(--tx-warning-soft-foreground, CanvasText);
+    background-color: var(--tx-warning-soft, Canvas);
+  }
+  .tx-mark--warning {
+    color: var(--tx-warning-soft-foreground, CanvasText);
+    background-color: var(--tx-warning-soft, Canvas);
+  }
+  .tx-mark--primary {
+    color: var(--tx-primary-soft-foreground, CanvasText);
+    background-color: var(--tx-primary-soft, Canvas);
+  }
+  .tx-mark--success {
+    color: var(--tx-success-soft-foreground, CanvasText);
+    background-color: var(--tx-success-soft, Canvas);
+  }
+  .tx-mark--info {
+    color: var(--tx-info-soft-foreground, CanvasText);
+    background-color: var(--tx-info-soft, Canvas);
+  }
+  @media (forced-colors: active) {
+    .tx-mark {
+      color: HighlightText;
+      background-color: Highlight;
+      forced-color-adjust: none;
     }
   }
 }

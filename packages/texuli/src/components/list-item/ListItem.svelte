@@ -43,6 +43,8 @@ interface OwnProps {
   onSelect?: () => void;
   /** Disables the `onSelect` button. */
   disabled?: boolean;
+  /** Draw a hairline under this row (when not inside a divided List). */
+  divided?: boolean;
   class?: ClassValue;
   /** The root `li` (bindable). */
   ref?: HTMLLIElement | null;
@@ -64,6 +66,7 @@ let {
   current = false,
   onSelect,
   disabled = false,
+  divided = false,
   class: className,
   ref = $bindable(null),
   ...rest
@@ -85,7 +88,13 @@ const safe = $derived(href ? safeHref(href, hrefTrust) : undefined);
   {#if meta}<span class="tx-list-item__meta">{meta}</span>{/if}
 {/snippet}
 
-<li {...rest} bind:this={ref} class={cx('tx-list-item', className)} data-tx-list-item data-tx-component="list-item">
+<li
+  {...rest}
+  bind:this={ref}
+  class={cx('tx-list-item', divided && 'tx-list-item--divided', className)}
+  data-tx-list-item
+  data-tx-component="list-item"
+>
   {#if safe}
     <a
       class="tx-list-item__main"
