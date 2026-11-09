@@ -509,6 +509,7 @@ const draftText = $derived(
 <form
   bind:this={ref}
   {...rest}
+  data-tx-component="schema-form"
   id={base}
   class={cx('tx-forms', className)}
   aria-labelledby={rest['aria-label'] ? undefined : `${base}-title`}

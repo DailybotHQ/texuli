@@ -250,6 +250,7 @@ const describedByIds = $derived(
   {style}
   {hidden}
   data-tx-code-field=""
+  data-tx-component="code-field"
   data-lang={language}
   data-grammar={language === undefined ? undefined : (grammar ?? 'none')}
   data-highlight={highlighted ? 'on' : 'off'}

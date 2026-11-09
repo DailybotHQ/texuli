@@ -173,7 +173,12 @@ function apply(rowId: string, columnKey: string, value: unknown): void {
 }
 </script>
 
-<div class={cx('tx-sheets-view', className)} data-tx-sheets-view>
+<div
+  class={cx('tx-sheets-view', className)}
+  data-tx-sheets-view
+  data-tx-component="spreadsheet"
+  data-tx-density={density}
+>
   {#if workbook.sheets.length > 1}
     <div class="tx-sheets-view__tabs" role="group" aria-label={text.sheets}>
       {#each workbook.sheets as tab (tab.id)}

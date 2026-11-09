@@ -20,7 +20,7 @@ $effect(() => {
 </script>
 
 {#if !check.ok}
-  <p class="tx-embed-invalid" data-tx-block="invalid" role="note">{text.invalid}</p>
+  <p class="tx-embed-invalid" data-tx-block="invalid" data-tx-component="blocks-embed" role="note">{text.invalid}</p>
 {:else if check.block.type === 'embed-app'}
   <EmbedApp block={check.block} {mountEmbed} labels={text} />
 {:else}

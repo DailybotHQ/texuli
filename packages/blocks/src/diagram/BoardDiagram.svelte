@@ -26,7 +26,7 @@ const summary = $derived(
 );
 </script>
 
-<figure class="tx-diagram" data-tx-diagram="board">
+<figure class="tx-diagram" data-tx-diagram="board" data-tx-component="blocks-diagram">
   <!-- svelte-ignore a11y_no_noninteractive_tabindex -- wide board scrolls; keyboard users must reach it. -->
   <div class="tx-diagram__scroll" role="region" aria-label={summary} tabindex="0">
     <div class="tx-diagram-board">

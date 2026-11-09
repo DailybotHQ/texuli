@@ -98,7 +98,7 @@ function nodeStyle(node: { x: number; y: number; width: number; height: number }
   {/if}
 {/snippet}
 
-<figure class="tx-diagram" data-tx-diagram="tree" data-variant={block.variant}>
+<figure class="tx-diagram" data-tx-diagram="tree" data-tx-component="blocks-diagram" data-variant={block.variant}>
   {#if block.variant === 'file-tree'}
     <div class="tx-diagram-filetree">
       <ul aria-label={summary}>

@@ -15,7 +15,7 @@ let {
 const commands = $derived(block.lines.filter((line) => line.kind === 'prompt').length);
 </script>
 
-<figure class="tx-diagram" data-tx-diagram="terminal">
+<figure class="tx-diagram" data-tx-diagram="terminal" data-tx-component="blocks-diagram">
   <div class="tx-diagram-terminal">
     <div class="tx-diagram-terminal__chrome" aria-hidden="true">
       <span class="tx-diagram-terminal__dot"></span>

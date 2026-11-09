@@ -57,7 +57,7 @@ const counts = $derived.by(() => {
 const total = $derived(submitted ? Math.max(1, selected.length) : 1);
 </script>
 
-<div class="tx-block-interactive" data-tx-block="poll" data-tone={block.tone}>
+<div class="tx-block-interactive" data-tx-block="poll" data-tx-component="blocks-interactive" data-tone={block.tone}>
   <p class="tx-block-interactive__prompt" id={qId}>{block.question}</p>
 
   {#if multi}

@@ -95,7 +95,7 @@ function context(node: WorkflowNode): WorkflowNodeContext {
 }
 </script>
 
-<figure class={['tx-workflow-viewer', className]} aria-labelledby={`${uid}-caption`} bind:clientWidth={available} dir={dir}>
+<figure class={['tx-workflow-viewer', className]} data-tx-component="workflow-graph" aria-labelledby={`${uid}-caption`} bind:clientWidth={available} dir={dir}>
   <figcaption id={`${uid}-caption`} class="tx-workflow-viewer__caption">{label ?? formatLabel(labels.viewer)}</figcaption>
   <div class="tx-workflow-viewer__frame" style:block-size={`${height * scale}px`}>
     <!-- World coordinates are physical; the stage is scaled as a whole. -->
