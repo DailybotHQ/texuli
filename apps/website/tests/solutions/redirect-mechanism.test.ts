@@ -46,7 +46,8 @@ describe('Solution redirect map (ADR-028)', () => {
       '/solutions/canvas/',
       '/solutions/sheets/',
     ]);
-    expect(SOLUTION_REDIRECTS.every((rule) => rule.enabled === false)).toBe(true);
+    // The first wave shipped: every *-page move is on (ADR-028).
+    expect(SOLUTION_REDIRECTS.every((rule) => rule.enabled)).toBe(true);
     expect(SOLUTION_REDIRECT_KEEP).toEqual(['/workflows-page/json/']);
     expect(solutionRedirectGraphIssues(SOLUTION_REDIRECTS)).toEqual([]);
     expect(solutionRedirectGraphIssues(enabled)).toEqual([]);
@@ -63,7 +64,7 @@ describe('Solution redirect map (ADR-028)', () => {
     expect(activeSolutionRedirects(enabled, () => true)).toHaveLength(5);
   });
 
-  it('keeps public/_redirects in sync with the active map (comments only today)', () => {
+  it('keeps public/_redirects in sync with the active map', () => {
     const file = readFileSync(REDIRECTS_FILE, 'utf8');
     expect(activeLines(file)).toEqual(
       activeLines(
@@ -100,6 +101,9 @@ describe('Solution redirect map (ADR-028)', () => {
     expect(
       resolveSolutionRedirect('/slides-page/', '', { rules, accept: 'text/markdown' })
     ).toEqual({ location: '/solutions/slides.md', status: 301 });
-    expect(resolveSolutionRedirect('/slides-page/', '', { rules: SOLUTION_REDIRECTS })).toBeNull();
+    expect(resolveSolutionRedirect('/slides-page/', '', { rules: SOLUTION_REDIRECTS })).toEqual({
+      location: '/solutions/slides/',
+      status: 301,
+    });
   });
 });

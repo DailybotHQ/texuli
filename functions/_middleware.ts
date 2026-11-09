@@ -67,11 +67,11 @@ export interface SolutionRedirect {
 export const SOLUTION_REDIRECT_KEEP = ['/workflows-page/json/'] as const;
 
 export const SOLUTION_REDIRECTS: readonly SolutionRedirect[] = [
-  { from: '/slides-page/', to: '/solutions/slides/', enabled: false },
-  { from: '/documents-page/', to: '/solutions/documents/', enabled: false },
-  { from: '/workflows-page/', to: '/solutions/workflows/', enabled: false },
-  { from: '/canvas-page/', to: '/solutions/canvas/', enabled: false },
-  { from: '/sheets-page/', to: '/solutions/sheets/', enabled: false },
+  { from: '/slides-page/', to: '/solutions/slides/', enabled: true },
+  { from: '/documents-page/', to: '/solutions/documents/', enabled: true },
+  { from: '/workflows-page/', to: '/solutions/workflows/', enabled: true },
+  { from: '/canvas-page/', to: '/solutions/canvas/', enabled: true },
+  { from: '/sheets-page/', to: '/solutions/sheets/', enabled: true },
 ];
 
 export interface SolutionRedirectHit {
