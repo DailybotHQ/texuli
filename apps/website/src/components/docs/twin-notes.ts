@@ -31,6 +31,8 @@ export interface TwinNote {
   /** Workspace packages whose README documents the feature (`tokens`). */
   packages: readonly string[];
   links?: readonly NoteLink[];
+  /** What the feature does not do today (Solution landings: the registry's limits). */
+  limits?: readonly string[];
 }
 
 const REPO = 'https://github.com/DailybotHQ/texuli/blob/main';
@@ -245,9 +247,11 @@ export function agentNoteMarkdown(
     '',
     `${note.demo} The live parts run in the browser and are not in this Markdown; the operations below do the same work through the read-only MCP server at ${origin}/mcp (no sign-in; see ${origin}/auth.md).`,
     '',
-    `MCP operations ([reference](${OPS_DOC})):`,
-    '',
   ];
+  if (note.limits?.length) {
+    lines.push('Limits today:', '', ...note.limits.map((limit) => `- ${limit}`), '');
+  }
+  lines.push(`MCP operations ([reference](${OPS_DOC})):`, '');
   for (const name of note.operations) {
     const operation = byName.get(name);
     if (!operation) throw new Error(`twin note for ${route} names unknown operation ${name}`);

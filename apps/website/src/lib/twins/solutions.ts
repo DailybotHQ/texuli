@@ -215,6 +215,7 @@ export interface RegistryTwinNote {
   readonly operations: readonly string[];
   readonly packages: readonly string[];
   readonly links: readonly Readonly<{ label: string; href: string }>[];
+  readonly limits: readonly string[];
 }
 
 function escapeRegExp(text: string): string {
@@ -236,6 +237,7 @@ export function solutionTwinNotes(
         operations: SOLUTION_OPERATIONS[entry.slug],
         packages: [...new Set(entry.packages.map((pkg) => packageDir(pkg.name)))],
         links: exists(entry.docs) ? [{ label: `${entry.name} docs`, href: entry.docs }] : [],
+        limits: entry.limits,
       };
     });
 }
