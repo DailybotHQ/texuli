@@ -181,6 +181,15 @@
       "readOnly": true
     },
     {
+      "name": "ds.generate",
+      "title": "Generate a design-system draft",
+      "description": "Combine a brand brief, token JSON, site CSS, logo pixels and/or a Texuli theme into a validated design-system draft. Returns the document, every reported loss, automatic AA repairs and guarantee results; it never saves or approves the draft.",
+      "runtime": "edge",
+      "remote": true,
+      "local": true,
+      "readOnly": true
+    },
+    {
       "name": "ds.allow",
       "title": "List allowed components for a locked design system",
       "description": "Build the allow section of a locked design system from the catalog: a preset (minimal, a documented core; all, every component) or the ids you name, each with every variant, size, tone, density and state the catalog declares. Narrow it, put it under \"allow\" and run ds.validate. Returns allow, count, unknown ids and the minimal preset ids.",

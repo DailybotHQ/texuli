@@ -1,6 +1,6 @@
 # Texuli — full agent docs
 
-> Complete catalog documentation generated from manifests (170 components).
+> Complete catalog documentation generated from manifests (174 components).
 
 ## Blueprint envelope
 
@@ -71,7 +71,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `display`
 
 ### Use when
@@ -136,7 +136,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -204,7 +204,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -260,7 +260,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -325,7 +325,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `display`
 
 ### Use when
@@ -381,7 +381,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `display`
 
 ### Use when
@@ -446,7 +446,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `display`
 
 ### Use when
@@ -1008,6 +1008,90 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 ---
 
+# Box
+
+> A panel or region with padding, radius, border, elevation and surface from tokens.
+
+- **id:** `box`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:**
+- **group:** `display`
+
+### Use when
+
+- Frame a group of content as a bordered or filled panel
+- Space and surface a region in a locked prototype, where visual utilities are refused
+
+### Don't use when
+
+- A clickable surface (use card with href)
+- Page layout (use a layout)
+
+### Accessibility
+
+- Not interactive. Use as="section" or "aside" with a heading for a landmark-like region.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `as` | enum(div | section | article | aside | header | footer) | no | — | `"div"` | — |
+| `padding` | enum(none | sm | md | lg | xl) | no | — | `"md"` | — |
+| `radius` | enum(none | sm | md | lg | xl | full) | no | — | `"md"` | — |
+| `border` | enum(none | default | strong | block-start | block-end) | no | — | `"none"` | All sides, or one logical side (block-start, block-end) for an app header or footer |
+| `elevation` | enum(none | sm | md | lg) | no | — | `"none"` | — |
+| `surface` | enum(transparent | default | muted | subtle | elevated) | no | — | `"transparent"` | The fill (the variant axis) |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | The panel content |
+
+### Examples
+
+#### Bordered panel (`bordered`)
+
+```json
+{
+  "padding": "lg",
+  "border": "default",
+  "surface": "default"
+}
+```
+
+#### Muted region (`muted`)
+
+```json
+{
+  "padding": "md",
+  "radius": "lg",
+  "surface": "muted"
+}
+```
+
+#### App header (no card chrome) (`app-header`)
+
+```json
+{
+  "as": "header",
+  "padding": "md",
+  "radius": "none",
+  "border": "block-end",
+  "surface": "default"
+}
+```
+
+### Related
+
+- [`card`](components/card.md)
+- [`heading`](components/heading.md)
+- [`text`](components/text.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
 # Breadcrumb
 
 > Hierarchy trail with URL-policy links.
@@ -1016,7 +1100,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -1085,7 +1169,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -1111,6 +1195,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | --- | --- | --- | --- | --- | --- |
 | `variant` | enum(default | secondary | outline | ghost | destructive | link) | no | — | `"default"` | — |
 | `size` | enum(sm | md | lg | icon) | no | — | `"md"` | — |
+| `tone` | enum(default | destructive | success | warning) | no | — | `"default"` | — |
 | `href` | string | no | developer | — | Optional link target (URL policy) |
 | `hrefTrust` | enum(developer | untrusted) | no | — | `"developer"` | — |
 | `type` | enum(button | submit | reset) | no | — | `"button"` | — |
@@ -1130,6 +1215,16 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 ```json
 {
   "variant": "default"
+}
+```
+
+#### Outline destructive button (`outline-destructive`)
+
+```json
+{
+  "variant": "outline",
+  "tone": "destructive",
+  "label": "Delete"
 }
 ```
 
@@ -1172,7 +1267,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -1228,7 +1323,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `display`
 
 ### Use when
@@ -1397,7 +1492,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `display`
 
 ### Use when
@@ -2887,7 +2982,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -2962,7 +3057,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `display`
 
 ### Use when
@@ -3020,7 +3115,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `display`
 
 ### Use when
@@ -3074,7 +3169,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `@texuli/blocks`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -3136,7 +3231,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -3215,7 +3310,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -3285,7 +3380,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -3346,7 +3441,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -3396,7 +3491,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -4636,7 +4731,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -4686,7 +4781,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -4741,7 +4836,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -4913,7 +5008,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -4968,7 +5063,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -5023,7 +5118,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -5079,7 +5174,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -5137,7 +5232,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -5189,7 +5284,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `display`
 
 ### Use when
@@ -5246,7 +5341,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `display`
 
 ### Use when
@@ -5303,7 +5398,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -5369,7 +5464,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -5524,7 +5619,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -5689,6 +5784,78 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 ---
 
+# Heading
+
+> A page title or section heading: a semantic h1–h6 with a size from the type scale.
+
+- **id:** `heading`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:**
+- **group:** `display`
+
+### Use when
+
+- Title a page, a section or a panel
+- Keep visual hierarchy in a locked prototype, where typography utilities are refused
+
+### Don't use when
+
+- Body copy, labels or captions (use text)
+- Long-form content (use prose)
+
+### Accessibility
+
+- Renders the semantic heading element for its level; pick levels in document order.
+- size changes only the look, never the level announced to assistive technology.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `level` | number | no | — | `2` | The semantic level, 1 to 6: renders <h1>…<h6> |
+| `size` | enum(display | xl | lg | md | sm) | no | — | `"lg"` | Visual size, independent of the level (default from the level: 1 xl, 2 lg, 3 md, 4–6 sm) |
+| `tone` | enum(default | muted) | no | — | `"default"` | — |
+| `truncate` | boolean | no | — | `false` | One line with an ellipsis |
+| `label` | string | no | — | — | Plain-text heading, escaped; replaces children when both are given |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | The heading text |
+
+### Examples
+
+#### Page title (`page-title`)
+
+```json
+{
+  "level": 1,
+  "size": "xl",
+  "label": "Quarterly report"
+}
+```
+
+#### Muted section heading (`section`)
+
+```json
+{
+  "level": 2,
+  "size": "md",
+  "tone": "muted",
+  "label": "Details"
+}
+```
+
+### Related
+
+- [`text`](components/text.md)
+- [`prose`](components/prose.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
 # Host region
 
 > Reserves a named place where the host app mounts its own component.
@@ -5751,7 +5918,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -5800,7 +5967,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -5851,7 +6018,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -5908,7 +6075,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `@texuli/catalog`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `display`
 
 ### Use when
@@ -5973,7 +6140,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -6047,7 +6214,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -6110,7 +6277,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `display`
 
 ### Use when
@@ -6168,7 +6335,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `display`
 
 ### Use when
@@ -6235,7 +6402,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -6290,7 +6457,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -6350,7 +6517,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -6464,7 +6631,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -6521,7 +6688,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -6703,7 +6870,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -6762,7 +6929,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -6817,7 +6984,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -6875,7 +7042,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -6989,7 +7156,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -7049,7 +7216,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -7102,7 +7269,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -7221,7 +7388,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -7336,7 +7503,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -7402,7 +7569,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -7620,7 +7787,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -7678,7 +7845,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -7937,7 +8104,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -7991,7 +8158,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -8042,7 +8209,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -8117,7 +8284,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -8168,7 +8335,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -8226,7 +8393,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -8284,7 +8451,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -8339,7 +8506,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -8388,6 +8555,61 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 ---
 
+# Prose
+
+> Long-form text with the design system's reading rhythm: measure, spacing, headings, lists.
+
+- **id:** `prose`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:**
+- **group:** `display`
+
+### Use when
+
+- Articles, docs, descriptions and other long text written as markup
+
+### Don't use when
+
+- One line or a short label (use text)
+- A block document (use document)
+
+### Accessibility
+
+- Keeps the host markup and its semantics; a 65ch measure keeps lines readable.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `as` | enum(div | article | section) | no | — | `"div"` | — |
+| `size` | enum(md | lg) | no | — | `"md"` | — |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | The long-form markup (paragraphs, headings, lists) |
+
+### Examples
+
+#### Article body (`article`)
+
+```json
+{
+  "as": "article",
+  "size": "md"
+}
+```
+
+### Related
+
+- [`heading`](components/heading.md)
+- [`text`](components/text.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
 # Radio
 
 > One option inside a RadioGroup.
@@ -8396,7 +8618,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -8455,7 +8677,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -8529,7 +8751,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -8687,7 +8909,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -8735,7 +8957,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -8808,7 +9030,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -8861,7 +9083,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -8910,7 +9132,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -8969,7 +9191,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -9017,7 +9239,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -9064,7 +9286,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -9112,7 +9334,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -9166,7 +9388,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -9218,7 +9440,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -9267,7 +9489,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -9325,7 +9547,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -9463,7 +9685,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `layouts`
 
 ### Use when
@@ -9611,7 +9833,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `display`
 
 ### Use when
@@ -9673,7 +9895,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `display`
 
 ### Use when
@@ -9744,7 +9966,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -9805,7 +10027,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `display`
 
 ### Use when
@@ -9869,7 +10091,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `display`
 
 ### Use when
@@ -9918,6 +10140,111 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 ---
 
+# Text
+
+> Body copy, labels and small print with a size, tone and weight from the design system.
+
+- **id:** `text`
+- **package:** `texuli`
+- **tier:** `app`
+- **agent emittable:** no
+- **emit:**
+- **group:** `display`
+
+### Use when
+
+- Body text, helper text, captions, muted or small print
+- Text with a status ink (success, warning, destructive, info) next to a word that says it
+
+### Don't use when
+
+- A title or section heading (use heading)
+- Long-form content (use prose)
+
+### Accessibility
+
+- Never renders a heading element: as is p, span, div, label, small or strong.
+- A tone never carries meaning alone; the words say it.
+
+### Props
+
+| Name | Kind | Required | Trust | Default | Description |
+| --- | --- | --- | --- | --- | --- |
+| `as` | enum(p | span | div | label | small | strong) | no | — | `"p"` | — |
+| `size` | enum(figure | lg | md | sm | xs) | no | — | `"md"` | figure is a large number outside stat (the title size of the type scale) |
+| `tone` | enum(default | muted | subtle | primary | success | warning | destructive | info) | no | — | `"default"` | — |
+| `weight` | enum(regular | medium | semibold) | no | — | `"regular"` | — |
+| `truncate` | boolean | no | — | `false` | One line with an ellipsis |
+| `lineClamp` | number | no | — | — | Clamp to 1 to 10 lines with an ellipsis |
+| `align` | enum(start | center | end) | no | — | `"start"` | — |
+| `mono` | boolean | no | — | `false` | The design system's code family |
+| `tabular` | boolean | no | — | `false` | Tabular figures (font-variant-numeric: tabular-nums) for numbers that line up |
+| `transform` | enum(none | uppercase | lowercase | capitalize) | no | — | `"none"` | — |
+| `tracking` | enum(normal | wide) | no | — | `"normal"` | Letter spacing; wide is the eyebrow tracking (--tx-letter-spacing-wide) |
+| `for` | string | no | — | — | With as="label": the id of the labelled control |
+| `label` | string | no | — | — | Plain text, escaped; replaces children when both are given |
+| `class` | string | no | — | — | — |
+| `children` | slot | no | — | — | The text |
+
+### Examples
+
+#### Muted helper text (`muted`)
+
+```json
+{
+  "size": "sm",
+  "tone": "muted",
+  "label": "Updated an hour ago"
+}
+```
+
+#### Small print (`caption`)
+
+```json
+{
+  "as": "small",
+  "size": "xs",
+  "tone": "subtle",
+  "label": "Prices exclude tax."
+}
+```
+
+#### Eyebrow (overline) (`eyebrow`)
+
+```json
+{
+  "as": "span",
+  "size": "xs",
+  "tone": "muted",
+  "transform": "uppercase",
+  "tracking": "wide",
+  "label": "Revenue"
+}
+```
+
+#### Large figure (`figure`)
+
+```json
+{
+  "as": "span",
+  "size": "figure",
+  "tabular": true,
+  "label": "1,284"
+}
+```
+
+### Related
+
+- [`heading`](components/heading.md)
+- [`prose`](components/prose.md)
+- [`inline-text`](components/inline-text.md)
+
+---
+
+_Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `@texuli/tools/llms`._
+
+---
+
 # TextCounter
 
 > An input or textarea that shows remaining characters near the limit.
@@ -9926,7 +10253,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -9996,7 +10323,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -10055,7 +10382,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `forms`
 
 ### Use when
@@ -10124,7 +10451,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `display`
 
 ### Use when
@@ -10201,7 +10528,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when
@@ -10256,7 +10583,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 - **package:** `texuli`
 - **tier:** `app`
 - **agent emittable:** no
-- **emit:** 
+- **emit:**
 - **group:** `overlays`
 
 ### Use when

@@ -51,10 +51,11 @@ Guide (monorepo): `docs/DESIGN_SYSTEMS.md`. Reference: the document
 1. **Generate a draft from proposed inputs.** When the developer supplies
    reference screenshots, inspect them with your own vision capabilities and
    translate observations into a proposed brief or other generator inputs.
-   Screenshots are not read or imported by Texuli. Use design_system.generate
-   for any combination of a brief, DTCG or Tokens Studio JSON, CSS text, logo
-   pixels and a Texuli theme. It returns a draft plus `report.losses`
-   (dropped or overwritten values), `report.repairs` (automatic AA
+   Screenshots are not read or imported by Texuli. Translate observations
+   into a brief, then use `ds.generate` with any combination of that brief,
+   DTCG or Tokens Studio JSON, CSS text, logo pixels and a Texuli theme. It
+   returns a draft plus `report.losses` (dropped or overwritten values),
+   `report.repairs` (automatic AA
    adjustments and why) and `report.guarantees`; inspect every entry. Inputs
    are bounded, and CSS is never fetched or executed. The operation does not
    save or approve anything. The CLI equivalent is `texuli ds generate` with
