@@ -1,12 +1,32 @@
 ---
+import chartsPackage from '../../../../../packages/charts/package.json';
 /**
  * /charts-page/ — every @texuli/charts family with contracts and live demos.
  */
 import ChartFamilyFrame from '../../components/charts-page/ChartFamilyFrame.astro';
 import FamilyDemo from '../../components/charts-page/FamilyDemo.svelte';
 import { CHART_FAMILIES } from '../../components/charts-page/families.ts';
+import { siteRouteExists } from '../../components/foundation/nav-data.ts';
 import PageBanner from '../../components/landing/PageBanner.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const related = [
+  {
+    label: 'Dashboards reference',
+    href: '/dashboards-page/',
+    note: 'See charts alongside the dashboard widget grid; this reference is not a complete dashboard builder.',
+  },
+  {
+    label: 'Slides Solution',
+    href: '/solutions/slides/',
+    note: 'Use chart content as part of a presentation.',
+  },
+  {
+    label: 'All Solutions',
+    href: '/solutions/',
+    note: 'Explore the promoted end-to-end Solutions.',
+  },
+].filter((item) => siteRouteExists(item.href));
 ---
 
 <BaseLayout
@@ -15,9 +35,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 >
   <div class="charts-page" data-tx-charts-page="">
     <header class="charts-page__header">
-      <p class="eyebrow">@texuli/charts</p>
+      <p class="taxonomy">Capability family</p>
+      <p class="eyebrow"><code>@texuli/charts</code> · Available on npm · {chartsPackage.version} · pre-1.0</p>
       <PageBanner art="page-charts" />
-  <h1>Charts gallery</h1>
+      <h1>Charts gallery</h1>
       <p class="lead">
         Interactive examples for every chart family, each with its data contract. For Svelte 5 apps
         that need accessible, themed charts: install <code>@texuli/charts</code> and import one
@@ -25,6 +46,23 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         Notes metrics only. Theme tokens drive light and dark; nothing leaves this origin.
       </p>
     </header>
+
+    <section class="related" aria-labelledby="charts-related-title" data-tx-charts-related="">
+      <h2 id="charts-related-title">A chart family, not a dashboard builder</h2>
+      <p>
+        Charts provide reusable visualization components and math. A complete dashboard also needs
+        data, layout, filters, and host-owned widget composition. The pages below show the current
+        references and Solutions that use charts; they do not change the family’s capability status.
+      </p>
+      <ul>
+        {related.map((item) => (
+          <li>
+            <a href={item.href}>{item.label}</a>
+            <span>{item.note}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
 
     <nav class="toc" aria-label="Chart families">
       <ul>
@@ -62,6 +100,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     text-transform: uppercase;
     color: var(--tx-foreground);
   }
+  .taxonomy {
+    margin: 0 0 0.25rem;
+    color: var(--tx-muted-foreground, GrayText);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
   h1 {
     margin: 0;
     font-size: clamp(1.75rem, 4vw, 2.5rem);
@@ -84,4 +130,17 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   .toc a {
     color: var(--tx-link, LinkText);
   }
+  .related {
+    display: grid;
+    gap: 0.6rem;
+    padding: 1rem;
+    border: 1px solid var(--tx-border, GrayText);
+    border-radius: var(--tx-radius, 0.75rem);
+    background: var(--tx-surface, Canvas);
+  }
+  .related h2 { margin: 0; font-size: 1.25rem; }
+  .related p { margin: 0; max-inline-size: 52rem; color: var(--tx-muted-foreground, GrayText); }
+  .related ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 0.65rem; margin: 0; padding: 0; list-style: none; }
+  .related li { display: grid; align-content: start; gap: 0.25rem; padding: 0.75rem; border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-radius, 0.5rem); }
+  .related span { color: var(--tx-muted-foreground, GrayText); font-size: 0.9rem; }
 </style>
