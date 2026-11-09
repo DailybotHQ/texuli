@@ -52,7 +52,8 @@ export const LEGACY_COMMANDS: readonly LegacyCommand[] = Object.freeze([
   },
   {
     usage: 'ds init <file>',
-    summary: 'Write a new design-system document (--brand "<one-liner>")',
+    summary:
+      'Write a new design-system document (--brand "<one-liner>"; --locked [--preset all|minimal|<file>])',
   },
   { usage: 'ds validate <file>', summary: 'Validate a design-system document (ds.validate)' },
   {
@@ -66,6 +67,12 @@ export const LEGACY_COMMANDS: readonly LegacyCommand[] = Object.freeze([
     usage: 'ds import <file|text>',
     summary: 'Import DTCG, Tokens Studio, a role palette, a theme or a one-liner (--from, --out)',
   },
+  {
+    usage: 'ds approve <file>',
+    summary:
+      'Validate, then stamp approval and its contentHash (--by <name>; a reviewed commit is the guarantee)',
+  },
+  { usage: 'ds hash <file>', summary: 'Print the content hashes and check the stored ones' },
   {
     usage: 'ds check <file>',
     summary:
