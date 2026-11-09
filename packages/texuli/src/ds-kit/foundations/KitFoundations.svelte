@@ -138,7 +138,7 @@ const logos = $derived(
 
       <!-- A scrollable region is focusable so keyboard users can scroll it (axe scrollable-region-focusable). -->
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-      <div class="tx-ds-kit__table-wrap" role="region" aria-labelledby={`${gid}-title`} tabindex="0">
+      <div class="tx-ds-kit__table-wrap" role="region" aria-label={msg('texuli.ds-kit.foundations.token-table', '{0} tokens', { 0: foundationLabel(msg, group.id) })} tabindex="0">
         <table class="tx-ds-kit__table">
           <thead>
             <tr>

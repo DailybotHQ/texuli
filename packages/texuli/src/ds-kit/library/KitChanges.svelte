@@ -62,7 +62,7 @@ const groupLabel = (id: (typeof groups)[number]) =>
     : id === 'allow'
       ? msg('texuli.ds-kit.changes.allow', 'Allowed components')
       : id === 'library'
-        ? msg('texuli.ds-kit.changes.library', 'Library')
+        ? msg('texuli.ds-kit.changes.library', 'Library entries')
         : msg('texuli.ds-kit.changes.approval', 'Approval');
 </script>
 
