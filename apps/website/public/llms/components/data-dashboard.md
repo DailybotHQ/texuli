@@ -32,7 +32,7 @@
 | --- | --- | --- | --- | --- | --- |
 | `label` | string | yes | untrusted | — | Accessible name of the view. |
 | `columns` | number | no | — | `12` | Columns of the widest grid (1 to 24). Narrower screens reflow onto at most 6 columns from 640 px and one column below. |
-| `density` | enum(compact | default | comfortable) | no | — | — | — |
+| `density` | enum(compact | default | comfortable) | no | — | `"default"` | — |
 | `gap` | enum(none | small | medium | large) | no | — | — | — |
 | `editable` | boolean | no | — | `false` | Shows the move and resize handles. |
 | `compaction` | enum(vertical | none) | no | — | `"vertical"` | "vertical" floats widgets up to close gaps; "none" keeps gaps. |

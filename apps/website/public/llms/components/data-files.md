@@ -29,7 +29,7 @@
 | `label` | string | yes | untrusted | — | Accessible name of the view. |
 | `entries` | array | yes | — | — | Files and folders; parent names the folder (none for the root). |
 | `layout` | enum(grid | list) | no | — | `"grid"` | — |
-| `density` | enum(comfortable | compact) | no | — | — | — |
+| `density` | enum(comfortable | compact) | no | — | `"comfortable"` | — |
 
 ### Examples
 

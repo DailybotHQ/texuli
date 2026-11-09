@@ -2565,7 +2565,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `label` | string | yes | — | — | — |
 | `description` | string | no | — | — | — |
 | `period` | string | no | — | — | — |
-| `variant` | enum(line | area | bar) | no | — | — | — |
+| `variant` | enum(line | area | bar) | no | — | `"line"` | — |
 | `format` | object | no | — | — | — |
 | `height` | number | no | — | — | — |
 | `showLast` | boolean | no | — | — | — |
@@ -3251,7 +3251,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `loadingLabel` | string | no | — | — | — |
 | `errorLabel` | string | no | — | — | — |
 | `size` | enum(sm | md | lg) | no | — | `"md"` | — |
-| `variant` | enum(outline | soft) | no | — | `"default"` | — |
+| `variant` | enum(outline | soft) | no | — | `"outline"` | — |
 | `class` | string | no | — | — | — |
 
 ### Examples
@@ -3682,7 +3682,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `columns` | array | yes | — | — | — |
 | `items` | array | yes | — | — | Cards: each names its column (and lane); rank orders cards within a cell. |
 | `lanes` | array | no | — | — | — |
-| `density` | enum(comfortable | compact) | no | — | — | — |
+| `density` | enum(comfortable | compact) | no | — | `"comfortable"` | — |
 
 ### Examples
 
@@ -3940,7 +3940,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | --- | --- | --- | --- | --- | --- |
 | `label` | string | yes | untrusted | — | Accessible name of the view. |
 | `columns` | number | no | — | `12` | Columns of the widest grid (1 to 24). Narrower screens reflow onto at most 6 columns from 640 px and one column below. |
-| `density` | enum(compact | default | comfortable) | no | — | — | — |
+| `density` | enum(compact | default | comfortable) | no | — | `"default"` | — |
 | `gap` | enum(none | small | medium | large) | no | — | — | — |
 | `editable` | boolean | no | — | `false` | Shows the move and resize handles. |
 | `compaction` | enum(vertical | none) | no | — | `"vertical"` | "vertical" floats widgets up to close gaps; "none" keeps gaps. |
@@ -4062,7 +4062,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `label` | string | yes | untrusted | — | Accessible name of the view. |
 | `entries` | array | yes | — | — | Files and folders; parent names the folder (none for the root). |
 | `layout` | enum(grid | list) | no | — | `"grid"` | — |
-| `density` | enum(comfortable | compact) | no | — | — | — |
+| `density` | enum(comfortable | compact) | no | — | `"comfortable"` | — |
 
 ### Examples
 
@@ -4217,7 +4217,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `rows` | array | yes | — | — | Rows: an id and one display string per column id (the column kind sorts it). |
 | `searchable` | boolean | no | — | `false` | — |
 | `selectable` | boolean | no | — | `false` | — |
-| `density` | enum(compact | default | comfortable) | no | — | — | — |
+| `density` | enum(compact | default | comfortable) | no | — | `"default"` | — |
 
 ### Examples
 
@@ -4525,7 +4525,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `label` | string | yes | untrusted | — | Accessible name of the view. |
 | `items` | array | yes | — | — | Flat items; parent names the parent item (none for a root). |
 | `checkboxes` | boolean | no | — | `true` | — |
-| `density` | enum(comfortable | compact) | no | — | — | — |
+| `density` | enum(comfortable | compact) | no | — | `"comfortable"` | — |
 
 ### Examples
 

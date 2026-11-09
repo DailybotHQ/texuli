@@ -31,7 +31,7 @@
 | `columns` | array | yes | — | — | — |
 | `items` | array | yes | — | — | Cards: each names its column (and lane); rank orders cards within a cell. |
 | `lanes` | array | no | — | — | — |
-| `density` | enum(comfortable | compact) | no | — | — | — |
+| `density` | enum(comfortable | compact) | no | — | `"comfortable"` | — |
 
 ### Examples
 

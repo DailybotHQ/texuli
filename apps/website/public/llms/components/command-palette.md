@@ -42,7 +42,7 @@
 | `loadingLabel` | string | no | — | — | — |
 | `errorLabel` | string | no | — | — | — |
 | `size` | enum(sm | md | lg) | no | — | `"md"` | — |
-| `variant` | enum(outline | soft) | no | — | `"default"` | — |
+| `variant` | enum(outline | soft) | no | — | `"outline"` | — |
 | `class` | string | no | — | — | — |
 
 ### Examples
