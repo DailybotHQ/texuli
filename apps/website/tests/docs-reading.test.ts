@@ -750,6 +750,8 @@ describe('site navigation model', () => {
     expect(SITE_NAV_GROUPS.map((group) => group.label)).toEqual([
       'Get started',
       'Platform',
+      'Solutions',
+      'Built with Texuli',
       'Components',
       'Primitives',
       'Themes',

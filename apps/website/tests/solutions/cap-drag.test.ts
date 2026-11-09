@@ -21,7 +21,6 @@ describe('Drag capability page', () => {
     );
     expect(PAGE).not.toContain('/capabilities/drag-and-drop/');
     expect(PAGE).not.toContain('PLAN_');
-    expect(PAGE).not.toMatch(/href=["']\/solutions\//);
   });
 
   it('states the package status honestly and keeps the real demo sections', () => {
@@ -52,12 +51,11 @@ describe('Drag capability page', () => {
     );
   });
 
-  it('marks the future Solution landings as planned and links only to current demos', () => {
-    expect(COPY).toContain('Solution landings are planned. Until those routes ship');
-    for (const route of ['/canvas-page/', '/workflows-page/', '/slides-page/']) {
-      expect(PAGE).toContain(`href="${route}"`);
+  it('links the shipped Solution landings, never the *-page routes they replace', () => {
+    for (const slug of ['canvas', 'workflows', 'slides']) {
+      expect(PAGE).toContain(`href="/solutions/${slug}/"`);
+      expect(PAGE).not.toContain(`href="/${slug}-page/"`);
     }
-    expect(PAGE).not.toMatch(/href=["']\/solutions\//);
   });
 
   it('keeps every demo island lazy and the page sink-free', () => {

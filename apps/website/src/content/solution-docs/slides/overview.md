@@ -2,7 +2,7 @@
 
 Slides is a complete present-a-deck system: `@texuli/deck` holds the framework-free model v2, JSON and Markdown codecs, navigation engine and templates; `@texuli/slides` is the Svelte 5 stage on top of it (layouts, presenter, print and PPTX). Both packages are published as `0.14.4` and are **in development** (pre-1.0). Pin the exact version or use `^0.14.0`.
 
-The live demo on this site is `/slides-page/`. The technical docs you are reading live at `/guides/solutions/slides/`.
+The live demo on this site is on the Slides landing, `/solutions/slides/`. The technical docs you are reading live at `/guides/solutions/slides/`.
 
 ## What you get
 

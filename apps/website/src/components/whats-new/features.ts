@@ -198,7 +198,7 @@ export const FEATURES: readonly Feature[] = [
     packages: ['@texuli/document'],
     summary:
       'A block document format with typed operations and undo, Markdown in and out, pagination, DOCX and PDF writers, and an owned CRDT for collaboration.',
-    href: '/documents-page/',
+    href: '/solutions/documents/',
     linkLabel: 'The documents showcase',
     demo: 'preview',
   },
@@ -209,7 +209,7 @@ export const FEATURES: readonly Feature[] = [
     packages: ['@texuli/pages'],
     summary:
       'A Notion-like editor with a slash menu of every block, drag by keyboard too, nested pages, comments, suggestions, versions and remote carets.',
-    href: '/documents-page/#workbench',
+    href: '/solutions/documents/',
     linkLabel: 'Edit a page',
     demo: 'preview',
   },
@@ -220,7 +220,7 @@ export const FEATURES: readonly Feature[] = [
     packages: ['@texuli/canvas'],
     summary:
       'An infinite canvas with shapes, connectors, frames, snapping and a full keyboard model, collaboration on the document CRDT, and SVG and PNG export.',
-    href: '/canvas-page/',
+    href: '/solutions/canvas/',
     linkLabel: 'Draw on the canvas',
     demo: 'preview',
   },
@@ -242,7 +242,7 @@ export const FEATURES: readonly Feature[] = [
     packages: ['@texuli/sheets'],
     summary:
       'An owned formula engine with a closed function set, incremental recalculation, cycle and limit errors, and CSV that neutralizes formula injection.',
-    href: '/sheets-page/',
+    href: '/solutions/sheets/',
     linkLabel: 'The sheets showcase',
     demo: 'live',
   },

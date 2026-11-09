@@ -102,12 +102,7 @@ export interface ResolvedNavGroup {
   links: readonly NavLink[];
 }
 
-/**
- * Groups ADR-031 adds to the docs sidebar once their pages exist. Not folded
- * into `SITE_NAV_GROUPS` here: `docs-reading.test.ts` pins the current seven
- * group labels, and `NAV_GROUPS` in `site.ts` is a shared file (patch in the
- * lane result).
- */
+/** Groups ADR-031 adds to the docs sidebar (after Platform) once their pages exist. */
 export function ecosystemNavGroups(): ResolvedNavGroup[] {
   const groups: ResolvedNavGroup[] = [];
   const solutions = solutionNavLinks();
@@ -175,15 +170,20 @@ function expanded(kind: NavGroup['expand']): NavLink[] {
 }
 
 /** Every group with its generated links. */
-export const SITE_NAV_GROUPS: readonly ResolvedNavGroup[] = NAV_GROUPS.map((group) => ({
-  id: group.id,
-  label: group.label,
-  links: [
-    ...group.links.slice(0, group.expandAt ?? group.links.length),
-    ...expanded(group.expand),
-    ...group.links.slice(group.expandAt ?? group.links.length),
-  ],
-}));
+export const SITE_NAV_GROUPS: readonly ResolvedNavGroup[] = NAV_GROUPS.flatMap((group) => {
+  const resolved: ResolvedNavGroup = {
+    id: group.id,
+    label: group.label,
+    links: [
+      ...group.links.slice(0, group.expandAt ?? group.links.length),
+      ...expanded(group.expand),
+      ...group.links.slice(group.expandAt ?? group.links.length),
+    ],
+  };
+  // ADR-031: the Solutions and Built with groups follow Platform, from the registry, once
+  // their pages exist.
+  return group.id === 'platform' ? [resolved, ...ecosystemNavGroups()] : [resolved];
+});
 
 /** Every navigation link in sidebar order: the pager's reading order. */
 export const SITE_NAV_ORDER: readonly (NavLink & { href: string })[] = SITE_NAV_GROUPS.flatMap(
