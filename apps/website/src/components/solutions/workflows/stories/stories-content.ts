@@ -11,27 +11,21 @@ export const WORKFLOWS_STORIES: Omit<SolutionStoriesProps, 'entry'> = {
   stories: [
     {
       id: 'graph-model',
-      title: 'Every change is checked',
+      title: 'Stop invalid changes before they land.',
       body: 'Node types are declared up front. Each operation checks ports, directions, data types and the cycle policy. A refused operation changes nothing, so people and agents can correct a graph before it is stored.',
       capabilities: ['graph-model'],
     },
     {
       id: 'layout',
-      title: 'A layout you can replay',
-      body: 'A deterministic layered auto-layout places nodes left to right or top to bottom, and it is aware of right-to-left writing. Apply the moves as ordinary operations.',
+      title: 'Place the graph predictably.',
+      body: 'Deterministic layered layout places nodes left to right or top to bottom, including right-to-left writing. Apply its moves as ordinary operations.',
       capabilities: ['layout'],
     },
     {
       id: 'author',
-      title: 'Author with history',
-      body: 'The editor has a toolbar, a palette, a canvas, a minimap, an inspector and an outline. Each change comes back as an event. Undo and redo live on the host through the history helper.',
+      title: 'Edit visually. Keep control of history.',
+      body: 'Build with a toolbar, palette, canvas, minimap, inspector and keyboard outline. Changes come back to your app; wire undo and redo through the history helper.',
       capabilities: ['author'],
-    },
-    {
-      id: 'view',
-      title: 'Read it as a figure',
-      body: 'The viewer is a read-only figure whose nodes say where each one leads. The outline is a treegrid that can read the whole graph without the canvas.',
-      capabilities: ['view'],
     },
   ],
 };
@@ -98,24 +92,6 @@ export const WORKFLOWS_STORY_EVIDENCE: Readonly<Record<string, readonly StoryCla
       claim: 'The landing demo uses a fictional expense-approval graph',
       source: 'apps/website/src/components/solutions/workflows/demo/fixtures/expense-approval.ts',
       marker: 'expense-approval',
-    },
-  ],
-  view: [
-    {
-      claim: 'A read-only figure whose nodes say where each one leads',
-      source: 'packages/workflows/README.md',
-      marker: 'a read-only figure whose nodes are a list that says where each one leads',
-    },
-    {
-      claim: 'A treegrid outline without the canvas',
-      source: 'packages/workflows/README.md',
-      marker:
-        'The outline is a WAI-ARIA treegrid that reads and edits the whole graph without the canvas',
-    },
-    {
-      claim: 'The viewer is tested',
-      source: 'packages/workflows/tests/viewer.test.ts',
-      marker: 'WorkflowViewer',
     },
   ],
 };

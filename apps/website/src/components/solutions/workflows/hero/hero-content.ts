@@ -14,7 +14,7 @@ import type { SolutionHeroProps } from '../../shared/types.ts';
 export const WORKFLOWS_HERO: Omit<SolutionHeroProps, 'entry'> = {
   eyebrow: 'Solution · Workflows',
   title: 'Workflow graphs you can draw, check and embed.',
-  lede: 'Model approvals, pipelines and state diagrams as typed nodes and edges, lay them out automatically, and edit them on a canvas or in a keyboard outline. Your app runs them.',
+  lede: 'Model approvals as typed nodes and edges, validate edits, and shape the graph with automatic layout, a canvas or a keyboard outline. Your app runs them.',
   ctas: [
     { kind: 'primary', label: 'Edit the approval flow', href: `#${SOLUTION_SECTION_IDS.demo}` },
     { kind: 'secondary', label: 'Start building', href: `#${SOLUTION_SECTION_IDS.quickstart}` },
