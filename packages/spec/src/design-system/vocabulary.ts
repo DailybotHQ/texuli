@@ -15,6 +15,8 @@
  * source · `['x']` an `extends` reference.
  */
 
+import { DS_LOCKED_DEFS } from './types-locked.ts';
+
 export type DsNode =
   | string
   | { readonly [key: string]: DsNode }
@@ -303,7 +305,7 @@ for (const [id, pairs] of Object.entries(DS_COMPONENT_TOKENS)) {
 }
 
 const sections: Record<string, DsNode> = keys(
-  'color typography shape space elevation surface motion layout icons components assets voice accessibility extensions',
+  'color typography shape space elevation surface motion layout icons components assets voice accessibility extensions allow',
   ''
 );
 for (const name of Object.keys(sections)) sections[name] = name;
@@ -430,6 +432,8 @@ export const DS_DEFS: Readonly<Record<string, DsNode>> = {
   },
   extensions: ['m', 'extension', DESIGN_SYSTEM_LIMITS.extensions, P.extension],
   variant: sections,
+  // ADR-032: allow (a section), library and approval (root keys only).
+  ...DS_LOCKED_DEFS,
 };
 
 /** The document root. */
@@ -445,5 +449,7 @@ export const DS_ROOT: DsObject = {
   tags: ['l', ['s', /^[a-z0-9][a-z0-9-]{0,31}$/, 32], 0, 16, 1],
   extends: ['x'],
   ...sections,
+  library: 'library',
+  approval: 'approval',
   variants: ['m', 'variant', 16, P.key],
 };
