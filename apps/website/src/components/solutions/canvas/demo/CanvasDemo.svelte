@@ -278,6 +278,12 @@ function reset(): void {
     white-space: pre;
   }
   @media (min-width: 58rem) {
+    .canvas-demo__toolbar {
+      position: sticky;
+      inset-block-start: calc(var(--site-header-height, 56px) + 3rem);
+      z-index: 6;
+      background: var(--tx-background, Canvas);
+    }
     .canvas-demo__layout {
       grid-template-columns: minmax(0, 1.5fr) minmax(15rem, 0.8fr);
       align-items: start;
