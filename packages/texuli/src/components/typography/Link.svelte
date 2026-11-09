@@ -6,7 +6,7 @@
  * `noopener noreferrer`. A refused href renders as text, never a dead link.
  */
 import { type HrefTrust, safeHref } from '@texuli/core/url-policy';
-import type { HTMLAnchorAttributes } from 'svelte/elements';
+import type { HTMLAnchorAttributes, HTMLAttributes } from 'svelte/elements';
 import { cx } from '../../internal/cx.ts';
 import './typography.css';
 
@@ -83,7 +83,11 @@ function linkRelationship(
     data-tx-component="link"
   >{@render text()}</a>
 {:else}
-  <span bind:this={ref} class={cx('tx-link', className)} data-tx-component="link" data-href-blocked="true"
-    >{@render text()}</span
-  >
+  <span
+    bind:this={ref}
+    {...(rest as HTMLAttributes<HTMLSpanElement>)}
+    class={cx('tx-link', className)}
+    data-tx-component="link"
+    data-href-blocked="true"
+  >{@render text()}</span>
 {/if}

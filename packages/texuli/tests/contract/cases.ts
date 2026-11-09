@@ -117,6 +117,8 @@ export const CASES: ContractCase[] = [
   { key: 'components/typography/Prose', harness: DisplayContract },
   { key: 'components/typography/Box', harness: DisplayContract },
   { key: 'components/typography/Mark', harness: DisplayContract },
+  { key: 'components/typography/ColorSwatch', harness: DisplayContract },
+  { key: 'components/typography/Link', harness: DisplayContract },
   { key: 'components/field/Form', harness: FormsContract },
   {
     key: 'components/field/Field',
