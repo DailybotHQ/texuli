@@ -5,20 +5,24 @@ import { expect, test } from '@playwright/test';
 import { DIST, serveDist, settle } from './support/site.ts';
 
 /*
- * texuli.com information architecture (T-site-ia), in the browser: a slim
- * landing header (logo, Docs, platform doors, GitHub, search, theme, Get
- * started; no sidebar) that collapses to logo and Docs on a phone, the native
- * landing one click from the home header, and a guide inside the docs shell
- * (one navigation, its group open, the shared pager); and every other built
- * page carries the docs shell (read from the built HTML). The groups and reading
- * order are unit-tested in apps/website/tests/docs-reading.test.ts; every
- * built nav target is checked by the link audit in site-seo.spec.ts.
+ * texuli.com information architecture, in the browser: the ADR-031 landing
+ * header (Solutions · Components · Native · Themes · Agents · Docs · GitHub)
+ * inline on desktop and in a keyboard menu at 390 px, the native landing one
+ * click from that header, a guide inside the docs shell (one navigation, its
+ * group open, the shared pager); docs pages carry the shell and landings carry
+ * the landing header (read from the built HTML). The groups and reading order
+ * are unit-tested in apps/website/tests/docs-reading.test.ts; every built nav
+ * target is checked by the link audit in site-seo.spec.ts.
  */
 
 const origin = serveDist();
-const DOORS = [
-  { name: 'Web + native', href: '/web-and-native/' },
+const GLOBAL_NAV = [
+  { name: 'Solutions', href: '/solutions/' },
+  { name: 'Components', href: '/component-pages/' },
   { name: 'Native', href: '/native/' },
+  { name: 'Themes', href: '/gallery-themes/' },
+  { name: 'Agents', href: '/agents-page/' },
+  { name: 'Docs', href: '/guides/' },
   { name: 'GitHub', href: 'https://github.com/DailybotHQ/texuli' },
 ];
 
@@ -36,12 +40,21 @@ function docsRoutes(dir = DIST): string[] {
 test('the landing header on desktop and phone, the native door, and a guide in the shell', async ({
   page,
 }) => {
-  // Every page but the landings carries the shell: sidebar, docs header, menu.
+  // Docs pages carry the shell. Landings (home, /native/, /solutions/…, /built-with/…)
+  // carry the ADR-031 header and no sidebar.
   const routes = docsRoutes();
   expect(routes.length).toBeGreaterThan(150);
-  const bare = routes.filter((route) => {
+  const misclassified = routes.filter((route) => {
     const html = readFileSync(join(DIST, route, 'index.html'), 'utf8');
     const header = html.match(/<header class="site-header"[\s\S]*?<\/header>/)?.[0] ?? '';
+    const landing = header.includes('data-variant="landing"');
+    if (landing) {
+      return !(
+        header.includes('data-global-nav') &&
+        header.includes('data-landing-menu') &&
+        !html.includes('data-tx-site-sidebar')
+      );
+    }
     return !(
       html.includes('data-tx-site-sidebar') &&
       header.includes('data-variant="docs"') &&
@@ -49,7 +62,7 @@ test('the landing header on desktop and phone, the native door, and a guide in t
       !/<nav\b/.test(header)
     );
   });
-  expect(bare).toEqual([]);
+  expect(misclassified).toEqual([]);
 
   const foreign: string[] = [];
   page.on('request', (request) => {
@@ -62,24 +75,29 @@ test('the landing header on desktop and phone, the native door, and a guide in t
     const header = page.locator('[data-tx-site-header]');
     await expect(header).toHaveAttribute('data-variant', 'landing');
     await expect(header.getByRole('link', { name: 'Texuli home' })).toHaveAttribute('href', '/');
-    await expect(header.getByRole('link', { name: 'Docs', exact: true })).toHaveAttribute(
-      'href',
-      '/guides/'
-    );
-    for (const door of DOORS) {
-      const link = header.locator(`a[href="${door.href}"]`);
-      await expect(link).toHaveText(door.name);
-      if (phone) await expect(link).toBeHidden();
-      else await expect(link).toBeVisible();
+    const nav = header.getByRole('navigation', { name: 'Global' });
+    const menu = header.locator('[data-landing-menu]');
+    if (phone) {
+      await expect(menu).toBeVisible();
+      await expect(nav).toBeHidden();
+      await menu.click();
+      await expect(menu).toHaveAttribute('aria-expanded', 'true');
+      await expect(nav).toBeVisible();
+    } else {
+      await expect(menu).toBeHidden();
+      await expect(nav).toBeVisible();
+    }
+    for (const item of GLOBAL_NAV) {
+      await expect(nav.getByRole('link', { name: item.name, exact: true })).toHaveAttribute(
+        'href',
+        item.href
+      );
     }
     await expect(header.locator('astro-island:not([ssr]) [data-tx-site-search]')).toBeVisible();
     await expect(header.getByRole('group', { name: 'Appearance' })).toBeVisible();
-    // Only global utilities: up to 48rem only the logo and Docs remain.
-    expect(await header.getByRole('link').count()).toBe(phone ? 2 : 6);
     await expect(page.locator('[data-tx-site-sidebar]')).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Copy page' })).toHaveCount(0);
     if (phone) {
-      // The hero carries the platform paths and the footer carries GitHub.
       for (const href of ['/native/', '/web-and-native/'])
         await expect(page.locator(`main a[href="${href}"]`).first()).toBeVisible();
       await expect(
@@ -92,7 +110,8 @@ test('the landing header on desktop and phone, the native door, and a guide in t
   await page.goto(`${origin()}/`);
   await settle(page);
   await page
-    .getByRole('navigation', { name: 'Platform' })
+    .locator('[data-tx-site-header]')
+    .getByRole('navigation', { name: 'Global' })
     .getByRole('link', { name: 'Native', exact: true })
     .click();
   await expect(page).toHaveURL(/\/native\/$/);
