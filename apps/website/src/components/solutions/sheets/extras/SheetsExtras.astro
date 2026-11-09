@@ -1,0 +1,22 @@
+---
+/**
+ * Closing blocks of the Sheets landing: recipes, agents, platforms, related
+ * Solutions and next steps. Each block is the shared component; this file
+ * only supplies the sheets entry and the copy in extras-content.ts.
+ */
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionAgents from '../../shared/platforms/SolutionAgents.astro';
+import SolutionPlatforms from '../../shared/platforms/SolutionPlatforms.astro';
+import SolutionNextSteps from '../../shared/resources/SolutionNextSteps.astro';
+import SolutionRecipes from '../../shared/resources/SolutionRecipes.astro';
+import SolutionRelated from '../../shared/resources/SolutionRelated.astro';
+import { SHEETS_AGENTS, SHEETS_NEXT, SHEETS_PLATFORMS, SHEETS_RECIPES } from './extras-content.ts';
+
+const entry = getSolution('sheets');
+---
+
+<SolutionRecipes entry={entry} {...SHEETS_RECIPES} />
+<SolutionAgents entry={entry} {...SHEETS_AGENTS} />
+<SolutionPlatforms entry={entry} {...SHEETS_PLATFORMS} />
+<SolutionRelated entry={entry} />
+<SolutionNextSteps entry={entry} {...SHEETS_NEXT} />
