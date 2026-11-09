@@ -19,6 +19,13 @@ export {
   dsRootAttributes,
 } from './attributes.ts';
 export {
+  APPROVAL_HASH_EXCLUDED,
+  canonicalJson,
+  designSystemContentHash,
+  libraryEntryContentHash,
+  sha256Hex,
+} from './hash.ts';
+export {
   applyDesignSystemPatch,
   checkDesignSystemReference,
   DESIGN_SYSTEM_MIGRATIONS,
