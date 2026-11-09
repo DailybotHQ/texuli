@@ -86,6 +86,7 @@ async function onSubmit(event: SubmitEvent): Promise<void> {
   class="tx-player-action-form"
   aria-label={label}
   aria-describedby={receipt ? receiptId : undefined}
+  data-tx-component="action-form"
   data-tx-player-action-form={action}
   data-status={status ?? undefined}
   novalidate

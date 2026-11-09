@@ -26,7 +26,7 @@ function onKeydown(event: KeyboardEvent): void {
 }
 </script>
 
-<div class="tx-player-control tx-player-control--filter" data-tx-player-control="filter">
+<div class="tx-player-control tx-player-control--filter" data-tx-component="control-filter" data-tx-player-control="filter">
   <label for={id}>{label}</label>
   <input
     {id}

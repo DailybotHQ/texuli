@@ -52,6 +52,7 @@ function onKeydown(event: KeyboardEvent): void {
   class="tx-player-control tx-player-control--choice"
   role="radiogroup"
   aria-label={label}
+  data-tx-component="control-choice"
   data-tx-player-control="choice"
   tabindex="-1"
   onkeydown={onKeydown}
