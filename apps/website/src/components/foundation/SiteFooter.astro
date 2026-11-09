@@ -1,8 +1,9 @@
 ---
 /**
- * Site footer: the product row (derived from NAV_GROUPS, T-32), the project
- * row (agent surfaces, changelog, the repository, license and brand) and
- * the status line for Dailybot, Inc.
+ * Site footer: ecosystem columns (Solutions, Native, Built with Texuli) for
+ * routes that exist, the product row (derived from NAV_GROUPS, T-32), the
+ * project row (agent surfaces, changelog, the repository, license and brand)
+ * and the status line for Dailybot, Inc.
  *
  * T-79 (core punch list rows 3, 4, 9, 14): the status line states the
  * release truth from docs/RELEASE.md — pre-1.0 packages on npm, no stable
@@ -20,6 +21,8 @@
  * tab, like every other external link on the site.
  */
 import { safeHref } from '@texuli/core/url-policy';
+import { LISTED_PRODUCTS } from '../../data/products/index.ts';
+import { siteRouteExists, solutionNavLinks } from './nav-data.ts';
 import { NAV_GROUPS, REPOSITORY_URL, withBase } from './site.ts';
 
 const base = import.meta.env.BASE_URL;
@@ -62,11 +65,77 @@ const productLinks = PRODUCT_GROUP_IDS.flatMap((id) => {
   const label = id === 'platform' ? 'Native' : group.label;
   return href ? [{ href, label }] : [];
 });
+
+/** Solutions landings that already have a page (ADR-031). Empty until those routes ship. */
+const solutionLinks = solutionNavLinks();
+
+/**
+ * Built with Texuli: the catalog index, then listed products whose case-study
+ * page exists. Ronin Builder stays out until it is listed and has a route.
+ */
+const builtWithLinks = [
+  ...(siteRouteExists('/built-with/') ? [{ href: '/built-with/', label: 'Explore all' }] : []),
+  ...LISTED_PRODUCTS.filter((product) => siteRouteExists(`/built-with/${product.id}/`)).map(
+    (product) => ({ href: `/built-with/${product.id}/`, label: product.name })
+  ),
+];
+
+const nativeLinks = siteRouteExists('/native/') ? [{ href: '/native/', label: 'Native' }] : [];
 ---
 
 <footer class="site-footer" data-tx-site-footer="">
   <div class="site-footer__inner">
     <nav aria-label="Footer">
+      {
+        (solutionLinks.length > 0 || nativeLinks.length > 0 || builtWithLinks.length > 0) && (
+          <div class="site-footer__columns">
+            {
+              solutionLinks.length > 0 && (
+                <div class="site-footer__column">
+                  <h2>Solutions</h2>
+                  <ul>
+                    {solutionLinks.map((link) =>
+                      link.href ? (
+                        <li>
+                          <a href={withBase(base, link.href)}>{link.label}</a>
+                        </li>
+                      ) : null
+                    )}
+                  </ul>
+                </div>
+              )
+            }
+            {
+              nativeLinks.length > 0 && (
+                <div class="site-footer__column">
+                  <h2>Native</h2>
+                  <ul>
+                    {nativeLinks.map((link) => (
+                      <li>
+                        <a href={withBase(base, link.href)}>{link.label}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )
+            }
+            {
+              builtWithLinks.length > 0 && (
+                <div class="site-footer__column">
+                  <h2>Built with Texuli</h2>
+                  <ul>
+                    {builtWithLinks.map((link) => (
+                      <li>
+                        <a href={withBase(base, link.href)}>{link.label}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )
+            }
+          </div>
+        )
+      }
       <ul class="site-footer__products">
         {
           productLinks.map((link) => (
@@ -147,7 +216,24 @@ const productLinks = PRODUCT_GROUP_IDS.flatMap((id) => {
   }
   nav {
     display: grid;
-    gap: 0.35rem;
+    gap: 0.75rem;
+  }
+  .site-footer__columns {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  }
+  .site-footer__column h2 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .site-footer__column ul {
+    flex-direction: column;
+    gap: 0;
   }
   a {
     color: var(--tx-link);
