@@ -58,20 +58,33 @@ Heading and Text also take `label`: plain text rendered as escaped text that rep
 | Prop | Values | Default |
 | --- | --- | --- |
 | `level` | `1`–`6`: the element (`<h1>`…`<h6>`) | `2` |
-| `size` | `display` (the display role), `xl` (title role), `lg` (heading role), `md`, `sm` | from the level: 1 `xl`, 2 `lg`, 3 `md`, 4–6 `sm` |
+| `size` | `display` (the display role), `4xl`, `3xl`, `2xl` (hero and section titles), `xl` (title role), `lg` (heading role), `md`, `sm` | from the level: 1 `xl`, 2 `lg`, 3 `md`, 4–6 `sm` |
+| `responsive` | scale the size down on narrow screens | `false` |
+| `tracking` | `default` (the role's), `tight` (`--tx-letter-spacing-tight`, -0.02em when the design system does not set it) | `default` |
 | `tone` | `default`, `muted` | `default` |
 | `truncate` | one line with an ellipsis | `false` |
 
 `size` changes only the look; assistive technology hears the level. Pick levels in document
 order and use `size` for the visual hierarchy.
 
+`2xl`, `3xl` and `4xl` take `--tx-font-size-2xl`, `-3xl` and `-4xl` from the type scale with
+the display role's family, weight, line height and tracking, so a hero title follows the
+design system's display weight. With `responsive`, the size is fluid:
+`clamp(min, min + 2.5vw, size)`, where `min` is about two scale steps below the size (for
+`4xl` and `display`, `--tx-font-size-2xl`). It never grows past the size or shrinks below the
+smaller step.
+
+```svelte
+<Heading level={1} size="4xl" responsive tracking="tight" label="Plan the quarter" />
+```
+
 ## Text
 
 | Prop | Values | Default |
 | --- | --- | --- |
 | `as` | `p`, `span`, `div`, `label`, `small`, `strong` (never a heading) | `p` |
-| `size` | `figure` (a large number outside Stat: the title size), `lg`, `md` (body), `sm`, `xs` (caption) | `md` |
-| `tone` | `default`, `muted`, `subtle`, `primary`, `success`, `warning`, `destructive`, `info` | `default` |
+| `size` | `figure` (a large number outside Stat: the title size), `lg`, `md` (body), `sm`, `xs` (caption), `inherit` (the parent's size and line height) | `md` |
+| `tone` | `default`, `muted`, `subtle`, `primary`, `success`, `warning`, `destructive`, `info`, `inherit` (the parent's color) | `default` |
 | `weight` | `regular`, `medium`, `semibold` | `regular` |
 | `transform` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` |
 | `tracking` | `normal`, `wide` (`--tx-letter-spacing-wide`, 0.08em when the design system does not set it) | `normal` |
@@ -81,6 +94,9 @@ order and use `size` for the visual hierarchy.
 | `truncate` | one line with an ellipsis | `false` |
 | `lineClamp` | 1–10 lines with an ellipsis (other values are ignored) | — |
 | `for` | with `as="label"`: the labelled control's id | — |
+
+**Nested text** inside a heading or a label is `size="inherit" tone="inherit"`: it keeps the
+parent's size, line height and color and changes only what it sets (a weight, a transform).
 
 An **eyebrow** (overline) is `size="xs" tone="muted" transform="uppercase" tracking="wide"`.
 A **large figure** is `size="figure" tabular`. The tones are role inks that hold the text
@@ -109,18 +125,32 @@ styles. The content is the host's markup (children); Prose never renders HTML fr
 | `radius` | `none`, `sm`, `md`, `lg`, `xl`, `full` (shape radius) | `md` |
 | `border` | `none`, `default`, `strong`, or one logical side: `block-start`, `block-end` | `none` |
 | `elevation` | `none`, `sm`, `md`, `lg` (elevation levels 1, 2, 4) | `none` |
-| `surface` | `transparent`, `default`, `muted`, `subtle`, `elevated` | `transparent` |
+| `surface` | `transparent`, `default`, `muted`, `subtle`, `elevated`, `primary`, `brand`, `translucent` | `transparent` |
 
 An app header or footer without card chrome is `radius="none"` with one border side
 (`border="block-end"`). Box is not interactive; use Card with `href` for a clickable surface.
 In forced colors a filled Box without a border keeps a 1px outline.
+
+- `primary` is the solid primary fill with its on-color (`--tx-primary`,
+  `--tx-primary-foreground`): a logo tile or a brand mark.
+- `brand` is the soft primary tint with its ink (`--tx-primary-soft`,
+  `--tx-primary-soft-foreground`).
+- `translucent` is the page background at the glass opacity (`--tx-surface-glass-alpha`) with
+  the glass blur behind (`--tx-surface-glass-blur`): a sticky header over scrolling content.
+  Without `backdrop-filter`, with `prefers-reduced-transparency: reduce` and in forced colors
+  it is opaque.
+
+```svelte
+<Box as="header" padding="md" radius="none" border="block-end" surface="translucent">…</Box>
+<Box padding="md" radius="lg" surface="primary">…</Box>
+```
 
 ## Tokens
 
 Styles live in `@layer tx.components` (`typography.css`). System tokens are read plain
 (`--tx-type-*`, `--tx-space-*`, `--tx-shape-radius-*`, `--tx-elevation-*`,
 `--tx-border-width-*`); role colors, the `--tx-font-size-*` scale and
-`--tx-letter-spacing-wide` keep a fallback. No literal color. The family has no component
+`--tx-letter-spacing-wide` and `-tight` keep a fallback (the glass tokens are read plain). No literal color. The family has no component
 tokens of its own.
 
 ## A11y
@@ -135,5 +165,8 @@ tokens of its own.
 
 `packages/texuli/tests/typography.test.ts` (elements, classes and attributes, hostile values,
 eyebrow and figure, line clamp, labels, Box border sides, token reads, catalog axes against the
-component constants, root attributes and the allow set). The `texuli-typography` example has
+component constants, root attributes and the allow set) and
+`packages/texuli/tests/typography-2.test.ts` (the `primary`, `brand` and `translucent`
+surfaces, the `2xl`–`4xl` sizes, `responsive`, `tight` tracking, Text `inherit`, the catalog
+and the allow set). The `texuli-typography` example has
 visual baselines in light and dark, desktop and mobile.

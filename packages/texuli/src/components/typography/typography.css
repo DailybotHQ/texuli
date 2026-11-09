@@ -3,8 +3,9 @@
  * from the design system, so a prototype keeps its hierarchy without typography or
  * visual utilities. @layer tx.components so consumer utilities can override.
  * Token contract v2: system tokens are read plain (base.css declares them); role
- * colors, the font-size scale and the wide tracking keep a fallback. Kept literals:
- * the 0 resets, the 65ch reading measure and the 0.08em wide-tracking fallback.
+ * colors, the font-size scale and the wide and tight tracking keep a fallback. Kept literals:
+ * the 0 resets, the 65ch reading measure, the 0.08em wide and -0.02em tight tracking
+ * fallbacks, and the 2.5vw slope of the responsive heading (its ends are scale tokens).
  */
 @layer tx.components {
   /* Heading: the size is the design system's type scale, independent of the level. */
@@ -17,13 +18,40 @@
     text-wrap: balance;
   }
   .tx-heading--display {
+    --tx-heading-size: var(--tx-type-display-size);
+    --tx-heading-min: var(--tx-font-size-2xl, 1.5rem);
     font-family: var(--tx-type-display-family);
     font-size: var(--tx-type-display-size);
     font-weight: var(--tx-type-display-weight);
     line-height: var(--tx-type-display-line);
     letter-spacing: var(--tx-type-display-tracking);
   }
+  /* Hero and section titles between the title and display: the font-size scale with the
+     display role's family, weight, line height and tracking. */
+  .tx-heading--4xl {
+    --tx-heading-size: var(--tx-font-size-4xl, 2.25rem);
+    --tx-heading-min: var(--tx-font-size-2xl, 1.5rem);
+  }
+  .tx-heading--3xl {
+    --tx-heading-size: var(--tx-font-size-3xl, 1.875rem);
+    --tx-heading-min: var(--tx-font-size-xl, 1.25rem);
+  }
+  .tx-heading--2xl {
+    --tx-heading-size: var(--tx-font-size-2xl, 1.5rem);
+    --tx-heading-min: var(--tx-font-size-lg, 1.125rem);
+  }
+  .tx-heading--4xl,
+  .tx-heading--3xl,
+  .tx-heading--2xl {
+    font-family: var(--tx-type-display-family);
+    font-size: var(--tx-heading-size);
+    font-weight: var(--tx-type-display-weight);
+    line-height: var(--tx-type-display-line);
+    letter-spacing: var(--tx-type-display-tracking);
+  }
   .tx-heading--xl {
+    --tx-heading-size: var(--tx-type-title-size);
+    --tx-heading-min: var(--tx-font-size-lg, 1.125rem);
     font-family: var(--tx-type-title-family);
     font-size: var(--tx-type-title-size);
     font-weight: var(--tx-type-title-weight);
@@ -31,13 +59,30 @@
     letter-spacing: var(--tx-type-title-tracking);
   }
   .tx-heading--lg {
+    --tx-heading-size: var(--tx-type-heading-size);
+    --tx-heading-min: var(--tx-font-size-base, 1rem);
     font-size: var(--tx-type-heading-size);
   }
   .tx-heading--md {
+    --tx-heading-size: var(--tx-font-size-lg, 1.125rem);
+    --tx-heading-min: var(--tx-font-size-base, 1rem);
     font-size: var(--tx-font-size-lg, 1.125rem);
   }
   .tx-heading--sm {
+    --tx-heading-size: var(--tx-font-size-base, 1rem);
+    --tx-heading-min: var(--tx-font-size-base, 1rem);
     font-size: var(--tx-font-size-base, 1rem);
+  }
+  /* Responsive: fluid from about two scale steps below up to the size, never past either. */
+  .tx-heading.tx-heading--responsive {
+    font-size: clamp(
+      var(--tx-heading-min),
+      calc(var(--tx-heading-min) + 2.5vw),
+      var(--tx-heading-size)
+    );
+  }
+  .tx-heading.tx-heading--tracking-tight {
+    letter-spacing: var(--tx-letter-spacing-tight, -0.02em);
   }
 
   /* Text: body copy, labels and small print; never a heading. */
@@ -65,6 +110,11 @@
   .tx-text--xs {
     font-size: var(--tx-type-caption-size);
     line-height: var(--tx-type-caption-line);
+  }
+  /* Nested text takes the size and line height of its parent (a heading, a label). */
+  .tx-text.tx-text--inherit {
+    font-size: inherit;
+    line-height: inherit;
   }
   .tx-text--weight-regular {
     font-weight: var(--tx-type-body-weight);
@@ -130,6 +180,9 @@
   }
   .tx-type-tone--info {
     color: var(--tx-info-soft-foreground, CanvasText);
+  }
+  .tx-type-tone--inherit {
+    color: inherit;
   }
 
   .tx-type--truncate {
@@ -274,13 +327,52 @@
     background-color: var(--tx-elevated, Canvas);
     color: var(--tx-elevated-foreground, CanvasText);
   }
+  .tx-box--surface-primary {
+    background-color: var(--tx-primary, Canvas);
+    color: var(--tx-primary-foreground, CanvasText);
+  }
+  .tx-box--surface-brand {
+    background-color: var(--tx-primary-soft, Canvas);
+    color: var(--tx-primary-soft-foreground, CanvasText);
+  }
+  /* A sticky header over scrolling content: the page background at the glass opacity,
+     blurred behind. Without backdrop-filter or with reduced transparency it is opaque. */
+  .tx-box--surface-translucent {
+    background-color: var(--tx-background, Canvas);
+    color: var(--tx-foreground, CanvasText);
+  }
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    .tx-box--surface-translucent {
+      background-color: color-mix(
+        in oklab,
+        var(--tx-background, Canvas) var(--tx-surface-glass-alpha),
+        transparent
+      );
+      -webkit-backdrop-filter: blur(var(--tx-surface-glass-blur));
+      backdrop-filter: blur(var(--tx-surface-glass-blur));
+    }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .tx-box--surface-translucent {
+      background-color: var(--tx-background, Canvas);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
 
   @media (forced-colors: active) {
     .tx-box--border-none.tx-box--surface-default,
     .tx-box--border-none.tx-box--surface-muted,
     .tx-box--border-none.tx-box--surface-subtle,
-    .tx-box--border-none.tx-box--surface-elevated {
+    .tx-box--border-none.tx-box--surface-elevated,
+    .tx-box--border-none.tx-box--surface-primary,
+    .tx-box--border-none.tx-box--surface-brand,
+    .tx-box--border-none.tx-box--surface-translucent {
       outline: 1px solid CanvasText;
+    }
+    .tx-box--surface-translucent {
+      background-color: Canvas;
+      backdrop-filter: none;
     }
   }
 }

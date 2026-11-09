@@ -1,5 +1,5 @@
 {
-  "catalogHash": "0e7cd5cfc85f2343456eaba439dd2b4818613185cd4155463c8d11e93980a563",
+  "catalogHash": "c3a5f1a2ad103d59e7dfa8f3131ebd11d8bf99be366aba18b18aa6010d023557",
   "components": [
     {
       "axes": {
@@ -1201,7 +1201,16 @@
         "variant": {
           "default": "transparent",
           "prop": "surface",
-          "values": ["transparent", "default", "muted", "subtle", "elevated"]
+          "values": [
+            "transparent",
+            "default",
+            "muted",
+            "subtle",
+            "elevated",
+            "primary",
+            "brand",
+            "translucent"
+          ]
         }
       },
       "capability": "web-only",
@@ -1272,7 +1281,16 @@
           "name": "radius"
         },
         {
-          "enumValues": ["transparent", "default", "muted", "subtle", "elevated"],
+          "enumValues": [
+            "transparent",
+            "default",
+            "muted",
+            "subtle",
+            "elevated",
+            "primary",
+            "brand",
+            "translucent"
+          ],
           "kind": "enum",
           "name": "surface"
         }
@@ -6823,7 +6841,7 @@
         "size": {
           "default": "lg",
           "prop": "size",
-          "values": ["display", "xl", "lg", "md", "sm"]
+          "values": ["display", "4xl", "3xl", "2xl", "xl", "lg", "md", "sm"]
         },
         "tone": {
           "default": "default",
@@ -6845,10 +6863,12 @@
             "HEADING_LEVELS",
             "HEADING_SIZES",
             "HEADING_TONES",
+            "HEADING_TRACKINGS",
             "Heading",
             "HeadingLevel",
             "HeadingSize",
             "HeadingTone",
+            "HeadingTracking",
             "headingClass",
             "headingSizeOf"
           ],
@@ -6877,7 +6897,11 @@
           "name": "level"
         },
         {
-          "enumValues": ["display", "xl", "lg", "md", "sm"],
+          "kind": "boolean",
+          "name": "responsive"
+        },
+        {
+          "enumValues": ["display", "4xl", "3xl", "2xl", "xl", "lg", "md", "sm"],
           "kind": "enum",
           "name": "size"
         },
@@ -6885,6 +6909,11 @@
           "enumValues": ["default", "muted"],
           "kind": "enum",
           "name": "tone"
+        },
+        {
+          "enumValues": ["default", "tight"],
+          "kind": "enum",
+          "name": "tracking"
         },
         {
           "kind": "boolean",
@@ -12009,7 +12038,7 @@
         "size": {
           "default": "md",
           "prop": "size",
-          "values": ["figure", "lg", "md", "sm", "xs"]
+          "values": ["figure", "lg", "md", "sm", "xs", "inherit"]
         },
         "tone": {
           "default": "default",
@@ -12022,7 +12051,8 @@
             "success",
             "warning",
             "destructive",
-            "info"
+            "info",
+            "inherit"
           ]
         }
       },
@@ -12097,7 +12127,7 @@
           "name": "mono"
         },
         {
-          "enumValues": ["figure", "lg", "md", "sm", "xs"],
+          "enumValues": ["figure", "lg", "md", "sm", "xs", "inherit"],
           "kind": "enum",
           "name": "size"
         },
@@ -12114,7 +12144,8 @@
             "success",
             "warning",
             "destructive",
-            "info"
+            "info",
+            "inherit"
           ],
           "kind": "enum",
           "name": "tone"

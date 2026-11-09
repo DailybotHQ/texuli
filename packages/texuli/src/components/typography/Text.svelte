@@ -30,9 +30,9 @@ import {
 type Props = HTMLAttributes<HTMLElement> & {
   /** The element: `p` (default), `span`, `div`, `label`, `small` or `strong`. Never a heading. */
   as?: TextElement;
-  /** `figure` (a large number), `lg`, `md` (default), `sm` or `xs`. */
+  /** `figure` (a large number), `lg`, `md` (default), `sm`, `xs`, or `inherit` (the parent's size and line height). */
   size?: TextSize;
-  /** The ink: `default`, `muted`, `subtle`, `primary`, `success`, `warning`, `destructive`, `info`. */
+  /** The ink: `default`, `muted`, `subtle`, `primary`, `success`, `warning`, `destructive`, `info`, or `inherit` (the parent's color). */
   tone?: TextTone;
   /** `regular` (default), `medium` or `semibold`. */
   weight?: TextWeight;
