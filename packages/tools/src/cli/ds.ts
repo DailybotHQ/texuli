@@ -35,7 +35,7 @@
 import { readFile, stat } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { canonicalJson, packBundle, unpackBundle } from '@texuli/spec/design-system';
-import { generateDesignSystem } from '@texuli/tokens/design-system/compile-core';
+import { generateDesignSystem } from '@texuli/tokens/design-system/generate';
 import { DESIGN_SYSTEM_IMPORT_LIMITS } from '@texuli/tokens/design-system/import';
 import { type DesignSystem, validateDesignSystem } from '@texuli/tokens/design-system/validate';
 import { DS_CHECK_MAX_BYTES, DS_CHECK_USAGE, parseDsCliArgs, runDsCli } from '../ds-check/cli.ts';

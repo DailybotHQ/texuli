@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   buildCatalog,
+  buildCatalogWithImports,
   type CatalogBuild,
   CatalogBuildError,
   canonicalJson,
@@ -255,7 +256,7 @@ describe('the real catalog', () => {
         const groups = await discoverManifestGroups();
         expect(groups.map((group) => group.name)).toEqual(folders);
         expect(folders).toEqual(expect.arrayContaining(['content', 'display', 'forms']));
-        build = await buildCatalog(groups);
+        build = await buildCatalogWithImports(groups);
         for (const group of groups) {
           expect(build.catalog.groups[group.name]).toEqual(group.manifests.map((m) => m.id).sort());
           expect(group.manifests.length).toBeGreaterThan(0);

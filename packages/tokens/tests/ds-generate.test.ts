@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { generateDesignSystem as generateFromCore } from '../src/design-system/compile-core.ts';
 import { compileDesignSystem } from '../src/design-system/compiler.ts';
 import { generateDesignSystem } from '../src/design-system/generate.ts';
 import { checkDesignSystemGuarantees } from '../src/design-system/guarantees.ts';
@@ -20,10 +19,6 @@ const inputs = {
 } as const;
 
 describe('generateDesignSystem', () => {
-  it('is exported from the compiler-core entry without entering the package root', () => {
-    expect(generateFromCore).toBe(generateDesignSystem);
-  });
-
   it('produces a complete, validated, compiled document for every source combination', () => {
     const keys = Object.keys(inputs) as (keyof typeof inputs)[];
     for (let mask = 0; mask < 1 << keys.length; mask++) {

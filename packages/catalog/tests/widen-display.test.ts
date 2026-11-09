@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { NON_COMPONENT_IMPORTS } from '../src/manifest/imports-map.ts';
+import { IMPORTS_BY_ID, NON_COMPONENT_IMPORTS } from '../src/manifest/imports-map.ts';
 import { ALL_MANIFEST_GROUPS } from '../src/manifests/all.ts';
 import { DISPLAY_MANIFESTS } from '../src/manifests/display/index.ts';
 import { CATALOG_EXCLUSIONS } from './coverage-exclusions.ts';
@@ -46,7 +46,7 @@ describe('catalog widen display', () => {
       expect(manifest, id).toBeDefined();
       expect(byId.get(id)?.id, id).toBe(id);
       expect(manifest?.examples.length, id).toBeGreaterThan(0);
-      expect(manifest?.imports?.length, id).toBeGreaterThan(0);
+      expect(IMPORTS_BY_ID[id]?.length, id).toBeGreaterThan(0);
     }
     expect(byId.get('icon')?.axes).toEqual({ size: 'size', tone: 'tone' });
     expect(CATALOG_EXCLUSIONS.map((row) => row.key)).not.toContain('texuli::Icon');

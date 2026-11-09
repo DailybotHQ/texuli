@@ -1,4 +1,4 @@
-import type { GenerateDesignSystemInput } from '@texuli/tokens/design-system/compile-core';
+import type { GenerateDesignSystemInput } from '@texuli/tokens/design-system/generate';
 import type { Operation } from './types.ts';
 
 const issue = {
@@ -76,7 +76,7 @@ export const designSystemGenerate: Operation = {
     },
   ],
   async handler(input) {
-    const { generateDesignSystem } = await import('@texuli/tokens/design-system/compile-core');
+    const { generateDesignSystem } = await import('@texuli/tokens/design-system/generate');
     const generationInput = {
       ...(input.brief === undefined ? {} : { brief: input.brief }),
       ...(input.tokens === undefined ? {} : { tokens: input.tokens }),

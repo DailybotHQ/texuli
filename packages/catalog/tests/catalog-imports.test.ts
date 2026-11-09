@@ -3,7 +3,12 @@ import { readFileSync } from 'node:fs';
 import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 import { COMPONENT_PACKAGES, ExportResolver } from '../../../scripts/coverage-matrix.ts';
-import { NO_COMPONENT_EXPORT, NON_COMPONENT_IMPORTS } from '../src/manifest/imports-map.ts';
+import { buildCatalogWithImports } from '../src/build/build.ts';
+import {
+  IMPORTS_BY_ID,
+  NO_COMPONENT_EXPORT,
+  NON_COMPONENT_IMPORTS,
+} from '../src/manifest/imports-map.ts';
 import { ALL_MANIFEST_GROUPS } from '../src/manifests/all.ts';
 
 const ROOT = new URL('../../../', import.meta.url).pathname;
@@ -67,10 +72,11 @@ describe('catalog imports (exactly one owner)', () => {
     }
   }
 
+  const manifests = ALL_MANIFEST_GROUPS.flatMap((group) => group.manifests);
   const owners = new Map<string, string>();
   const duplicate: string[] = [];
-  for (const manifest of ALL_MANIFEST_GROUPS.flatMap((group) => group.manifests)) {
-    for (const entry of manifest.imports ?? []) {
+  for (const manifest of manifests) {
+    for (const entry of IMPORTS_BY_ID[manifest.id] ?? []) {
       for (const name of entry.exports) {
         const key = keyOf(entry.module, name);
         const previous = owners.get(key);
@@ -99,7 +105,6 @@ describe('catalog imports (exactly one owner)', () => {
     exportsCache.set(module, names);
     return names;
   };
-  const manifests = ALL_MANIFEST_GROUPS.flatMap((group) => group.manifests);
   const pascal = (id: string) =>
     id
       .split('-')
@@ -125,6 +130,13 @@ describe('catalog imports (exactly one owner)', () => {
     expect(unmapped, 'unmapped exports').toEqual([]);
     expect(missing, 'catalog imports that are not package exports').toEqual([]);
     expect(overlap, 'exports claimed as both a catalog id and non-component').toEqual([]);
+  });
+
+  it('adds import ownership during catalog build instead of carrying the full map in every group', async () => {
+    expect(manifests.every((manifest) => manifest.imports === undefined)).toBe(true);
+    const built = await buildCatalogWithImports(ALL_MANIFEST_GROUPS);
+    const card = built.catalog.entries.find((entry) => entry.id === 'card');
+    expect(card?.imports).toEqual(IMPORTS_BY_ID.card);
   });
 
   it('gives an export named PascalCase(id) in the id’s own package to that id', () => {
@@ -158,7 +170,9 @@ describe('catalog imports (exactly one owner)', () => {
 
   it('gives every catalog id its imports, or a reason it has no component export', () => {
     const ids = manifests.map((manifest) => manifest.id);
-    const withImports = manifests.filter((m) => (m.imports ?? []).length > 0).map((m) => m.id);
+    const withImports = manifests
+      .filter((manifest) => (IMPORTS_BY_ID[manifest.id] ?? []).length > 0)
+      .map((manifest) => manifest.id);
     const reasoned = Object.keys(NO_COMPONENT_EXPORT);
     expect(ids.filter((id) => !withImports.includes(id) && !reasoned.includes(id))).toEqual([]);
     expect(reasoned.filter((id) => withImports.includes(id))).toEqual([]);

@@ -49,6 +49,10 @@
       "types": "./src/manifest/index.ts",
       "default": "./src/manifest/index.ts"
     },
+    "./imports": {
+      "types": "./src/manifest/imports.ts",
+      "default": "./src/manifest/imports.ts"
+    },
     "./manifests/content": {
       "types": "./src/manifests/content/index.ts",
       "default": "./src/manifests/content/index.ts"

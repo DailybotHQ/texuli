@@ -1,4 +1,4 @@
-import { buildCatalog, type CatalogBuild } from '@texuli/catalog/build';
+import { buildCatalogWithImports, type CatalogBuild } from '@texuli/catalog/build';
 import { ALL_MANIFEST_GROUPS } from '@texuli/catalog/manifests/all';
 
 let cached: Promise<CatalogBuild> | undefined;
@@ -11,6 +11,6 @@ let cached: Promise<CatalogBuild> | undefined;
  * the site's `catalog-<sha256>.json`. Built once.
  */
 export function loadCatalog(): Promise<CatalogBuild> {
-  cached ??= buildCatalog(ALL_MANIFEST_GROUPS);
+  cached ??= buildCatalogWithImports(ALL_MANIFEST_GROUPS);
   return cached;
 }

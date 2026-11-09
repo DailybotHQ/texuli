@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { buildCatalog } from '@texuli/catalog/build';
+import { buildCatalogWithImports } from '@texuli/catalog/build';
 import { discoverManifestGroups } from '@texuli/catalog/build/node';
 import { ALL_MANIFEST_GROUPS } from '@texuli/catalog/manifests/all';
 import { describe, expect, it } from 'vitest';
@@ -8,12 +8,12 @@ import { build } from './helpers.ts';
 
 describe('catalog and tool schema', () => {
   it('builds the same catalog as the file-system build (same hash as the site)', async () => {
-    const reference = await buildCatalog(await discoverManifestGroups());
+    const reference = await buildCatalogWithImports(await discoverManifestGroups());
     expect(build.hash).toBe(reference.hash);
   });
 
   it('builds from the shared static list in @texuli/catalog/manifests/all', async () => {
-    expect(build.hash).toBe((await buildCatalog(ALL_MANIFEST_GROUPS)).hash);
+    expect(build.hash).toBe((await buildCatalogWithImports(ALL_MANIFEST_GROUPS)).hash);
     const source = readFileSync(new URL('../src/catalog.ts', import.meta.url), 'utf8');
     expect(source).toContain("from '@texuli/catalog/manifests/all'");
     expect(source).not.toMatch(/from '@texuli\/catalog\/manifests\/(?!all')/u);
