@@ -1,0 +1,324 @@
+---
+/**
+ * SolutionHow (ADR-030): the "how it works" block of a Solution landing. Numbered steps,
+ * each naming the package that does it, beside a "Built from Texuli" diagram: the
+ * Solution, the entry's packages (highest layer first) and the Texuli packages they build
+ * on. The diagram is HTML text in lists, so screen readers read it as is; the connectors
+ * are decorative CSS and the figcaption gives the one-sentence summary. Static markup, no
+ * island, no HTML sinks; every link passes the URL policy (developer tier).
+ */
+import type { SolutionHowProps } from '../types.ts';
+import { architectureView } from './architecture-model.ts';
+
+type Props = SolutionHowProps;
+
+const view = architectureView(Astro.props);
+---
+
+<section
+  class="solution-how"
+  aria-labelledby={view.headingId}
+  data-tx-solution-how={Astro.props.entry.slug}
+>
+  <div class="solution-how__inner">
+    <h2 id={view.headingId}>{view.title}</h2>
+    <div class="solution-how__grid">
+      <ol class="solution-how__steps" role="list">
+        {
+          view.steps.map((step) => (
+            <li class="solution-how__step" data-tx-how-step={step.index}>
+              <span class="solution-how__num" aria-hidden="true">{step.index}</span>
+              <div class="solution-how__step-text">
+                <h3>{step.title}</h3>
+                <p>{step.body}</p>
+                {step.package && (
+                  <p class="solution-how__step-pkg">
+                    <span class="solution-how__sr">Package: </span>
+                    <code>{step.package}</code>
+                  </p>
+                )}
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <figure class="solution-how__diagram" data-tx-architecture="">
+        <figcaption class="solution-how__caption">{view.summary}</figcaption>
+        <div class="solution-how__tier solution-how__tier--solution" data-tier="solution">
+          <p class="solution-how__tier-label">Solution</p>
+          <p class="solution-how__solution">{view.solution}</p>
+        </div>
+        <div class="solution-how__tier" data-tier="packages">
+          <p class="solution-how__tier-label" id={`${view.headingId}-packages`}>Packages</p>
+          <ul class="solution-how__cards" role="list" aria-labelledby={`${view.headingId}-packages`}>
+            {
+              view.packages.map((pkg) => (
+                <li class="solution-how__card" data-tx-architecture-package={pkg.name}>
+                  <span class="solution-how__layer" title={`Layer ${pkg.layer}`}>
+                    {pkg.layerLabel}
+                  </span>
+                  {pkg.href ? (
+                    <a class="solution-how__name" href={pkg.href}>
+                      <code>{pkg.name}</code>
+                    </a>
+                  ) : (
+                    <code class="solution-how__name">{pkg.name}</code>
+                  )}
+                  <span class="solution-how__role">{pkg.role}</span>
+                  {pkg.subpaths.length > 0 && (
+                    <span class="solution-how__subpaths">
+                      <span class="solution-how__sr">Subpaths: </span>
+                      {pkg.subpaths.join(' · ')}
+                    </span>
+                  )}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        {
+          view.foundation.length > 0 && (
+            <div class="solution-how__tier solution-how__tier--foundation" data-tier="foundation">
+              <p class="solution-how__tier-label" id={`${view.headingId}-foundation`}>
+                Built on
+              </p>
+              <ul
+                class="solution-how__chips"
+                role="list"
+                aria-labelledby={`${view.headingId}-foundation`}
+              >
+                {view.foundation.map((pkg) => (
+                  <li class="solution-how__chip" data-tx-architecture-foundation={pkg.name}>
+                    <span class="solution-how__layer">{pkg.layerLabel}</span>
+                    <code>{pkg.name}</code>
+                    <span class="solution-how__sr"> ({pkg.label})</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+      </figure>
+    </div>
+  </div>
+</section>
+
+<style>
+  .solution-how {
+    --sh-accent: var(--home-accent, #6d4aff);
+    --sh-accent-text: var(--home-accent-text, #5b3ae6);
+  }
+  :global(:root[data-tx-mode='dark']) .solution-how {
+    --sh-accent-text: var(--home-accent-text, #b9a8ff);
+  }
+  .solution-how__inner {
+    display: grid;
+    gap: clamp(1.25rem, 3vw, 2rem);
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  .solution-how h2 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(1.75rem, 4.5vw, 2.6rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+  .solution-how__grid {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3rem);
+  }
+  @media (min-width: 60rem) {
+    .solution-how__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      align-items: start;
+    }
+  }
+  .solution-how__steps {
+    display: grid;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .solution-how__step {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    gap: 0.9rem;
+  }
+  .solution-how__num {
+    display: grid;
+    place-items: center;
+    inline-size: 2.25rem;
+    block-size: 2.25rem;
+    border-radius: 0.6rem;
+    background: color-mix(in oklab, var(--sh-accent) 12%, var(--tx-background));
+    color: var(--sh-accent-text);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+  .solution-how__step-text {
+    display: grid;
+    gap: 0.35rem;
+    min-inline-size: 0;
+  }
+  .solution-how h3 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+  .solution-how__step-text p {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    line-height: 1.55;
+  }
+  .solution-how code {
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+    font-size: 0.85em;
+    overflow-wrap: anywhere;
+  }
+  .solution-how__step-pkg code {
+    color: var(--sh-accent-text);
+  }
+  .solution-how__diagram {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: clamp(1rem, 3vw, 1.5rem);
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    border-radius: calc(var(--tx-radius, 0.5rem) * 1.5);
+    background: var(--tx-background);
+    min-inline-size: 0;
+  }
+  .solution-how__caption {
+    margin-block-end: 1rem;
+    color: var(--tx-muted-foreground);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  .solution-how__tier {
+    position: relative;
+    display: grid;
+    gap: 0.5rem;
+    padding-block: 0.9rem;
+  }
+  /* Decorative connector between tiers. */
+  .solution-how__tier + .solution-how__tier::before {
+    content: '';
+    position: absolute;
+    inset-block-start: -0.4rem;
+    inset-inline-start: 50%;
+    inline-size: 2px;
+    block-size: 1.2rem;
+    background: color-mix(in oklab, var(--sh-accent) 45%, transparent);
+  }
+  .solution-how__tier-label {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .solution-how__solution {
+    margin: 0;
+    padding-block: 0.7rem;
+    padding-inline: 1rem;
+    border-radius: 0.65rem;
+    background: var(--sh-accent);
+    color: var(--home-accent-ink, #ffffff);
+    font-size: 1.1rem;
+    font-weight: 800;
+    text-align: center;
+  }
+  .solution-how__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .solution-how__card {
+    display: grid;
+    gap: 0.3rem;
+    align-content: start;
+    padding: 0.8rem;
+    border: 1px solid color-mix(in oklab, var(--sh-accent) 35%, var(--tx-border));
+    border-radius: 0.65rem;
+    background: color-mix(in oklab, var(--sh-accent) 6%, var(--tx-background));
+    min-inline-size: 0;
+  }
+  .solution-how__name {
+    color: var(--tx-foreground);
+    font-weight: 700;
+    text-underline-offset: 0.2em;
+  }
+  a.solution-how__name:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+  }
+  .solution-how__role {
+    color: var(--tx-foreground);
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+  .solution-how__subpaths {
+    color: var(--tx-muted-foreground);
+    font-family: var(--tx-font-mono, ui-monospace, monospace);
+    font-size: 0.75rem;
+    overflow-wrap: anywhere;
+  }
+  .solution-how__layer {
+    justify-self: start;
+    padding-inline: 0.4rem;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--tx-muted) 80%, var(--tx-background));
+    color: var(--tx-muted-foreground);
+    font-size: 0.7rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .solution-how__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .solution-how__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding-block: 0.3rem;
+    padding-inline: 0.55rem;
+    border: 1px solid var(--tx-border);
+    border-radius: 0.5rem;
+    background: color-mix(in oklab, var(--tx-muted) 40%, var(--tx-background));
+    color: var(--tx-foreground);
+  }
+  .solution-how__sr {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  @media (forced-colors: active) {
+    .solution-how__solution {
+      border: 1px solid CanvasText;
+      background: Canvas;
+      color: CanvasText;
+    }
+    .solution-how__tier + .solution-how__tier::before {
+      background: CanvasText;
+    }
+  }
+</style>
