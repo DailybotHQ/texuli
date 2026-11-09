@@ -1,5 +1,5 @@
 {
-  "catalogHash": "0222d64397b33bdcca050953c171db4ea09097992916eaea2c4f44585a5707a1",
+  "catalogHash": "320e3edf83d23719dd01faa9b4ae591b95cac916b03cad6b6c9efa928d5d8d6d",
   "components": [
     {
       "capability": "web-only",
@@ -40,6 +40,16 @@
       "emit": [],
       "group": "display",
       "id": "alert",
+      "imports": [
+        {
+          "exports": ["Alert", "AlertSurface", "ToneIcon"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Alert", "AlertSurface", "ToneIcon"],
+          "module": "texuli/alert"
+        }
+      ],
       "label": "Alert",
       "placement": "app",
       "props": [
@@ -105,6 +115,33 @@
       "emit": [],
       "group": "overlays",
       "id": "alert-dialog",
+      "imports": [
+        {
+          "exports": ["AlertDialog", "Dialog"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "AlertDialog",
+            "DIALOG_SIZES",
+            "Dialog",
+            "DialogSize",
+            "alertDialogActionsClass",
+            "alertDialogContentClass",
+            "alertDialogErrorClass",
+            "alertDialogIconClass",
+            "dialogBodyClass",
+            "dialogCloseClass",
+            "dialogContentClass",
+            "dialogDescriptionClass",
+            "dialogFooterClass",
+            "dialogHeaderClass",
+            "dialogOverlayClass",
+            "dialogTitleClass"
+          ],
+          "module": "texuli/dialog"
+        }
+      ],
       "label": "AlertDialog",
       "placement": "app",
       "props": [
@@ -176,6 +213,16 @@
       "emit": [],
       "group": "layouts",
       "id": "analytics-grid",
+      "imports": [
+        {
+          "exports": ["AnalyticsGrid"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["AnalyticsGrid"],
+          "module": "texuli/layouts/dashboard"
+        }
+      ],
       "label": "AnalyticsGrid",
       "placement": "app",
       "props": [
@@ -225,6 +272,16 @@
       "emit": [],
       "group": "overlays",
       "id": "app-nav",
+      "imports": [
+        {
+          "exports": ["AppNav"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["AppNav"],
+          "module": "texuli/sidebar"
+        }
+      ],
       "label": "AppNav",
       "placement": "app",
       "props": [
@@ -316,6 +373,31 @@
       "emit": [],
       "group": "display",
       "id": "avatar-group-grid",
+      "imports": [
+        {
+          "exports": [
+            "AVATAR_PIXELS",
+            "AVATAR_SIZES",
+            "AVATAR_STATUSES",
+            "Avatar",
+            "AvatarGroup",
+            "AvatarGroupGrid",
+            "AvatarGroupItem",
+            "AvatarShape",
+            "AvatarSize",
+            "AvatarStatus",
+            "AvatarTone",
+            "avatarGroupClass",
+            "avatarInitials",
+            "avatarRootClass",
+            "avatarSrcset",
+            "avatarStatusClass",
+            "avatarToneIndex",
+            "hashString"
+          ],
+          "module": "texuli/avatar"
+        }
+      ],
       "label": "AvatarGroupGrid",
       "placement": "app",
       "props": [
@@ -366,6 +448,16 @@
       "emit": [],
       "group": "display",
       "id": "badge",
+      "imports": [
+        {
+          "exports": ["Badge"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Badge"],
+          "module": "texuli/badge"
+        }
+      ],
       "label": "Badge",
       "placement": "app",
       "props": [
@@ -413,6 +505,16 @@
       "emit": [],
       "group": "display",
       "id": "banner",
+      "imports": [
+        {
+          "exports": ["Banner"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Banner"],
+          "module": "texuli/alert"
+        }
+      ],
       "label": "Banner",
       "placement": "app",
       "props": [
@@ -764,6 +866,16 @@
       "emit": [],
       "group": "overlays",
       "id": "breadcrumb",
+      "imports": [
+        {
+          "exports": ["Breadcrumb"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Breadcrumb"],
+          "module": "texuli/navigation"
+        }
+      ],
       "label": "Breadcrumb",
       "placement": "app",
       "props": [
@@ -830,6 +942,16 @@
       "emit": [],
       "group": "forms",
       "id": "button",
+      "imports": [
+        {
+          "exports": ["Button"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Button"],
+          "module": "texuli/button"
+        }
+      ],
       "label": "Button",
       "placement": "app",
       "props": [
@@ -906,6 +1028,16 @@
       "emit": [],
       "group": "forms",
       "id": "button-group",
+      "imports": [
+        {
+          "exports": ["ButtonGroup"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["ButtonGroup"],
+          "module": "texuli/button"
+        }
+      ],
       "label": "ButtonGroup",
       "placement": "app",
       "props": [
@@ -948,6 +1080,16 @@
       "emit": [],
       "group": "display",
       "id": "callout",
+      "imports": [
+        {
+          "exports": ["Callout"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Callout"],
+          "module": "texuli/alert"
+        }
+      ],
       "label": "Callout",
       "placement": "app",
       "props": [
@@ -1053,6 +1195,40 @@
       "emit": [],
       "group": "display",
       "id": "card",
+      "imports": [
+        {
+          "exports": [
+            "Card",
+            "CardContent",
+            "CardDescription",
+            "CardFooter",
+            "CardHeader",
+            "CardMedia",
+            "CardTitle"
+          ],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "CARD_GAPS",
+            "CARD_VARIANTS",
+            "Card",
+            "CardContent",
+            "CardDescription",
+            "CardFooter",
+            "CardGrid",
+            "CardGridGap",
+            "CardGridGapValue",
+            "CardHeader",
+            "CardMedia",
+            "CardTitle",
+            "CardVariant",
+            "cardClass",
+            "cardGridClass"
+          ],
+          "module": "texuli/card"
+        }
+      ],
       "label": "Card",
       "placement": "app",
       "props": [
@@ -1088,6 +1264,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-area",
+      "imports": [
+        {
+          "exports": ["AreaChart"],
+          "module": "@texuli/charts/cartesian"
+        }
+      ],
       "label": "Area chart",
       "placement": "content",
       "props": [
@@ -1155,6 +1337,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-bar",
+      "imports": [
+        {
+          "exports": ["BarChart"],
+          "module": "@texuli/charts/cartesian"
+        }
+      ],
       "label": "Bar chart",
       "placement": "content",
       "props": [
@@ -1222,6 +1410,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-bubble",
+      "imports": [
+        {
+          "exports": ["BubbleChart"],
+          "module": "@texuli/charts/matrix"
+        }
+      ],
       "label": "Bubble chart",
       "placement": "content",
       "props": [
@@ -1278,6 +1472,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-bullet",
+      "imports": [
+        {
+          "exports": ["BulletChart"],
+          "module": "@texuli/charts/compact"
+        }
+      ],
       "label": "Bullet chart",
       "placement": "content",
       "props": [
@@ -1323,6 +1523,23 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-canvas-renderer",
+      "imports": [
+        {
+          "exports": [
+            "CANVAS_POINT_THRESHOLD",
+            "CanvasBar",
+            "CanvasChartKind",
+            "CanvasPoint",
+            "CanvasRenderer",
+            "CanvasRendererMode",
+            "CanvasSeries",
+            "downsampleCanvasPoints",
+            "drawCanvasChart",
+            "useCanvas"
+          ],
+          "module": "@texuli/charts/canvas"
+        }
+      ],
       "label": "Canvas chart renderer",
       "placement": "content",
       "props": [
@@ -1355,6 +1572,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-cartesian",
+      "imports": [
+        {
+          "exports": ["CartesianChart"],
+          "module": "@texuli/charts/cartesian"
+        }
+      ],
       "label": "Cartesian chart",
       "placement": "content",
       "props": [
@@ -1429,6 +1652,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-combo",
+      "imports": [
+        {
+          "exports": ["ComboChart"],
+          "module": "@texuli/charts/cartesian"
+        }
+      ],
       "label": "Combo chart",
       "placement": "content",
       "props": [
@@ -1496,6 +1725,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-donut",
+      "imports": [
+        {
+          "exports": ["DonutChart"],
+          "module": "@texuli/charts/part-whole"
+        }
+      ],
       "label": "Donut chart",
       "placement": "content",
       "props": [
@@ -1539,6 +1774,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-funnel",
+      "imports": [
+        {
+          "exports": ["FunnelChart"],
+          "module": "@texuli/charts/flow"
+        }
+      ],
       "label": "Funnel chart",
       "placement": "content",
       "props": [
@@ -1586,6 +1827,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-gauge",
+      "imports": [
+        {
+          "exports": ["Gauge"],
+          "module": "@texuli/charts/compact"
+        }
+      ],
       "label": "Gauge chart",
       "placement": "content",
       "props": [
@@ -1643,6 +1890,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-geo-map",
+      "imports": [
+        {
+          "exports": ["GeoMap"],
+          "module": "@texuli/charts/geo"
+        }
+      ],
       "label": "Geographic map",
       "placement": "content",
       "props": [
@@ -1685,6 +1938,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-geo-point-map",
+      "imports": [
+        {
+          "exports": ["GeoPointMap"],
+          "module": "@texuli/charts/geo"
+        }
+      ],
       "label": "Geographic point map",
       "placement": "content",
       "props": [
@@ -1779,6 +2038,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-line",
+      "imports": [
+        {
+          "exports": ["LineChart"],
+          "module": "@texuli/charts/cartesian"
+        }
+      ],
       "label": "Line chart",
       "placement": "content",
       "props": [
@@ -1846,6 +2111,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-network",
+      "imports": [
+        {
+          "exports": ["NetworkGraph"],
+          "module": "@texuli/charts/flow"
+        }
+      ],
       "label": "Network graph",
       "placement": "content",
       "props": [
@@ -1893,6 +2164,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-pie",
+      "imports": [
+        {
+          "exports": ["PieChart"],
+          "module": "@texuli/charts/part-whole"
+        }
+      ],
       "label": "Pie chart",
       "placement": "content",
       "props": [
@@ -1936,6 +2213,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-progress-ring",
+      "imports": [
+        {
+          "exports": ["ProgressRing"],
+          "module": "@texuli/charts/compact"
+        }
+      ],
       "label": "Progress ring",
       "placement": "content",
       "props": [
@@ -1981,6 +2264,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-sankey",
+      "imports": [
+        {
+          "exports": ["SankeyChart"],
+          "module": "@texuli/charts/flow"
+        }
+      ],
       "label": "Sankey chart",
       "placement": "content",
       "props": [
@@ -2028,6 +2317,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-scatter",
+      "imports": [
+        {
+          "exports": ["ScatterChart"],
+          "module": "@texuli/charts/matrix"
+        }
+      ],
       "label": "Scatter chart",
       "placement": "content",
       "props": [
@@ -2091,6 +2386,16 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-sparkline",
+      "imports": [
+        {
+          "exports": ["Sparkline"],
+          "module": "@texuli/charts/compact"
+        },
+        {
+          "exports": ["ChartFormatSpec", "CompactChartLabels", "Sparkline", "barsPaths"],
+          "module": "@texuli/charts/sparkline-lite"
+        }
+      ],
       "label": "Sparkline",
       "placement": "content",
       "props": [
@@ -2142,6 +2447,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-stacked-bar",
+      "imports": [
+        {
+          "exports": ["StackedBarChart"],
+          "module": "@texuli/charts/cartesian"
+        }
+      ],
       "label": "Stacked bar chart",
       "placement": "content",
       "props": [
@@ -2209,6 +2520,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-sunburst",
+      "imports": [
+        {
+          "exports": ["SunburstChart"],
+          "module": "@texuli/charts/part-whole"
+        }
+      ],
       "label": "Sunburst chart",
       "placement": "content",
       "props": [
@@ -2252,6 +2569,12 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "charts-treemap",
+      "imports": [
+        {
+          "exports": ["TreemapChart"],
+          "module": "@texuli/charts/part-whole"
+        }
+      ],
       "label": "Treemap chart",
       "placement": "content",
       "props": [
@@ -2330,6 +2653,43 @@
       "emit": ["developer", "untrusted"],
       "group": "chat",
       "id": "chat-thread",
+      "imports": [
+        {
+          "exports": [
+            "CHAT_DISPLAY_LOADERS",
+            "CHAT_DISPLAY_ROLES",
+            "CHAT_DISPLAY_ROLE_LABELS",
+            "ChatAuthor",
+            "ChatDisplayRole",
+            "ChatMessage",
+            "ChatMessageActions",
+            "ChatMessageDisplay",
+            "ChatMessageStatus",
+            "ChatReadingAnchor",
+            "ChatStreamEvent",
+            "ChatThread",
+            "ChatThreadDisplay",
+            "Composer",
+            "ComposerActionContext",
+            "ComposerLabels",
+            "DEFAULT_COMPOSER_LABELS",
+            "MAX_STREAM_BODY",
+            "MESSAGE_STATUS_TONES",
+            "MessageGroup",
+            "MessageList",
+            "MessageListLabels",
+            "MessageStatusTone",
+            "MessageTextPart",
+            "TypingIndicator",
+            "TypingLabels",
+            "applyChatStreamEvent",
+            "groupMessages",
+            "messageTokens",
+            "parseMessageText"
+          ],
+          "module": "@texuli/chat"
+        }
+      ],
       "label": "Chat thread",
       "placement": "content",
       "props": [
@@ -2358,6 +2718,16 @@
       "emit": [],
       "group": "forms",
       "id": "checkbox",
+      "imports": [
+        {
+          "exports": ["Checkbox"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Checkbox"],
+          "module": "texuli/choice"
+        }
+      ],
       "label": "Checkbox",
       "placement": "app",
       "props": [
@@ -2450,6 +2820,16 @@
       "emit": [],
       "group": "display",
       "id": "chip",
+      "imports": [
+        {
+          "exports": ["Chip"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Chip"],
+          "module": "texuli/badge"
+        }
+      ],
       "label": "Chip",
       "placement": "app",
       "props": [
@@ -2506,6 +2886,16 @@
       "emit": [],
       "group": "display",
       "id": "code",
+      "imports": [
+        {
+          "exports": ["Code"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Code"],
+          "module": "texuli/kbd-code"
+        }
+      ],
       "label": "Code",
       "placement": "app",
       "props": [
@@ -2536,6 +2926,25 @@
       "emit": [],
       "group": "forms",
       "id": "code-field",
+      "imports": [
+        {
+          "exports": [
+            "CODE_FIELD_HIGHLIGHT_LIMIT",
+            "CODE_FIELD_SYNC_LIMIT",
+            "CodeField",
+            "CodeFieldEdit",
+            "CodeFieldLabels",
+            "CodeFieldProps",
+            "DEFAULT_CODE_FIELD_LABELS",
+            "applyCodeFieldEdit",
+            "indentEdit",
+            "indentUnit",
+            "newlineEdit",
+            "resolveCodeFieldLabels"
+          ],
+          "module": "@texuli/blocks/code-field"
+        }
+      ],
       "label": "CodeField",
       "placement": "app",
       "props": [
@@ -2631,6 +3040,31 @@
       "emit": [],
       "group": "forms",
       "id": "combobox",
+      "imports": [
+        {
+          "exports": ["Combobox"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "Combobox",
+            "ComboboxChip",
+            "ComboboxChips",
+            "ComboboxContent",
+            "ComboboxEmpty",
+            "ComboboxError",
+            "ComboboxField",
+            "ComboboxInput",
+            "ComboboxItem",
+            "ComboboxLoading",
+            "ComboboxPortal",
+            "ComboboxRoot",
+            "ComboboxTrigger",
+            "ComboboxViewport"
+          ],
+          "module": "texuli/combobox"
+        }
+      ],
       "label": "Combobox",
       "placement": "app",
       "props": [
@@ -2750,6 +3184,60 @@
       "emit": [],
       "group": "overlays",
       "id": "command-palette",
+      "imports": [
+        {
+          "exports": [
+            "Command",
+            "CommandEmpty",
+            "CommandGroup",
+            "CommandGroupHeading",
+            "CommandGroupItems",
+            "CommandInput",
+            "CommandItem",
+            "CommandList",
+            "CommandLoading",
+            "CommandPalette",
+            "CommandRoot",
+            "CommandTrigger"
+          ],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "COMMAND_SIZES",
+            "COMMAND_VARIANTS",
+            "Command",
+            "CommandEmpty",
+            "CommandGroup",
+            "CommandGroupHeading",
+            "CommandGroupItems",
+            "CommandInput",
+            "CommandItem",
+            "CommandItemData",
+            "CommandList",
+            "CommandLoading",
+            "CommandPalette",
+            "CommandPaletteSearch",
+            "CommandPaletteSelect",
+            "CommandRoot",
+            "CommandSize",
+            "CommandTrigger",
+            "CommandVariant",
+            "commandEmptyClass",
+            "commandGroupClass",
+            "commandGroupHeadingClass",
+            "commandInputClass",
+            "commandInputRowClass",
+            "commandItemClass",
+            "commandListClass",
+            "commandLoadingClass",
+            "commandPaletteClass",
+            "commandRootClass",
+            "commandTriggerClass"
+          ],
+          "module": "texuli/command"
+        }
+      ],
       "label": "CommandPalette",
       "placement": "app",
       "props": [
@@ -2844,6 +3332,29 @@
       "emit": [],
       "group": "layouts",
       "id": "content-layout",
+      "imports": [
+        {
+          "exports": [
+            "ActiveHeadingEntry",
+            "BuildTocOptions",
+            "ContentLayout",
+            "DEFAULT_READING_LINE",
+            "DEFAULT_TOC_LEVELS",
+            "TocEntry",
+            "TocHeading",
+            "TocItem",
+            "TocLevel",
+            "TrackActiveHeadingOptions",
+            "buildToc",
+            "headingSlug",
+            "normalizeTocEntries",
+            "resolveTocLevels",
+            "tocSelector",
+            "trackActiveHeading"
+          ],
+          "module": "texuli/layouts/content"
+        }
+      ],
       "label": "ContentLayout",
       "placement": "app",
       "props": [
@@ -2894,6 +3405,16 @@
       "emit": [],
       "group": "overlays",
       "id": "context-menu",
+      "imports": [
+        {
+          "exports": ["ContextMenu"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["ContextMenu", "ContextMenuContent", "ContextMenuRoot"],
+          "module": "texuli/menus"
+        }
+      ],
       "label": "ContextMenu",
       "placement": "app",
       "props": [
@@ -2920,6 +3441,12 @@
       "emit": [],
       "group": "overlays",
       "id": "context-menu-trigger",
+      "imports": [
+        {
+          "exports": ["ContextMenuTrigger"],
+          "module": "texuli/menus"
+        }
+      ],
       "label": "ContextMenu.Trigger",
       "placement": "app",
       "props": [
@@ -3055,6 +3582,60 @@
       "events": ["move"],
       "group": "data",
       "id": "data-board",
+      "imports": [
+        {
+          "exports": ["Board"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": [
+            "Board",
+            "BoardCell",
+            "BoardColumnDef",
+            "BoardGrid",
+            "BoardKeyboardText",
+            "BoardLabelOverrides",
+            "BoardLabels",
+            "BoardLaneDef",
+            "BoardMove",
+            "BoardOptions",
+            "BoardPlacement",
+            "BoardPosition",
+            "BoardPositionValues",
+            "DEFAULT_BOARD_KEYBOARD_TEXT",
+            "DEFAULT_LANE",
+            "DEFAULT_MOVE_MENU_TEXT",
+            "IDLE",
+            "KeyboardMoveState",
+            "MoveIntentResult",
+            "MoveKey",
+            "MoveMenuDestination",
+            "MoveMenuText",
+            "MoveResult",
+            "MoveRules",
+            "MoveTarget",
+            "RankError",
+            "WipEvaluation",
+            "WipLimit",
+            "WipStatus",
+            "assertRank",
+            "compareRanks",
+            "describePosition",
+            "evaluateWip",
+            "groupBoard",
+            "isRank",
+            "moveIntent",
+            "moveMenuDestinations",
+            "pickUp",
+            "placementsOf",
+            "positionValues",
+            "rankBetween",
+            "rankSequence",
+            "validateMove"
+          ],
+          "module": "@texuli/data/board"
+        }
+      ],
       "label": "Board",
       "placement": "content",
       "props": [
@@ -3271,6 +3852,40 @@
       "emit": ["developer", "untrusted"],
       "group": "data",
       "id": "data-cohort-table",
+      "imports": [
+        {
+          "exports": ["CohortTable"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": [
+            "COHORT_HEAT_TOKENS",
+            "CohortCell",
+            "CohortCellValue",
+            "CohortHeatScale",
+            "CohortHeatStep",
+            "CohortHeatText",
+            "CohortHeatToken",
+            "CohortRow",
+            "CohortTable",
+            "CohortTableLabels",
+            "CohortValueKind",
+            "DEFAULT_COHORT_TABLE_LABELS",
+            "DEFAULT_HEAT_TEXT",
+            "HEAT_LEVELS",
+            "HEAT_SCALE_LIMITS",
+            "HEAT_TEXT_MINIMUM",
+            "cellValue",
+            "cohortAverages",
+            "formatCohortValue",
+            "heatLevel",
+            "heatMax",
+            "periodCount",
+            "resolveHeatScale"
+          ],
+          "module": "@texuli/data/cohort"
+        }
+      ],
       "label": "Cohort table",
       "placement": "content",
       "props": [
@@ -3376,6 +3991,12 @@
       "events": ["change"],
       "group": "data",
       "id": "data-dashboard",
+      "imports": [
+        {
+          "exports": ["Dashboard"],
+          "module": "@texuli/data/dashboard"
+        }
+      ],
       "label": "Dashboard",
       "placement": "content",
       "props": [
@@ -3489,6 +4110,12 @@
       "emit": ["developer", "untrusted"],
       "group": "data",
       "id": "data-dashboard-widget",
+      "imports": [
+        {
+          "exports": ["DashboardWidget"],
+          "module": "@texuli/data/dashboard"
+        }
+      ],
       "label": "Dashboard widget",
       "placement": "content",
       "props": [
@@ -3581,6 +4208,39 @@
       "events": ["change", "select"],
       "group": "data",
       "id": "data-files",
+      "imports": [
+        {
+          "exports": ["FileBrowser"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": [
+            "FileBrowser",
+            "FileBrowserLabels",
+            "FileBrowserLayout",
+            "FileCategory",
+            "FileEntry",
+            "FilePreviewModel",
+            "ThumbnailOptions",
+            "breadcrumbs",
+            "categoryOf",
+            "childrenOf",
+            "descendantIds",
+            "extensionOf",
+            "formatSize",
+            "hashId",
+            "moveFocusIndex",
+            "moveProblem",
+            "nameProblem",
+            "previewOf",
+            "thumbnailSvg",
+            "thumbnailUrl",
+            "toggleSelectedId",
+            "uniqueName"
+          ],
+          "module": "@texuli/data/files"
+        }
+      ],
       "label": "File browser",
       "placement": "content",
       "props": [
@@ -3657,6 +4317,65 @@
       "events": ["change"],
       "group": "data",
       "id": "data-filter-builder",
+      "imports": [
+        {
+          "exports": ["FilterBuilder"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": [
+            "DEFAULT_FILTER_BUILDER_LABELS",
+            "FILTER_LIMITS",
+            "FILTER_SEGMENT_LIMITS",
+            "FILTER_VALUE_EDITORS",
+            "FilterAnyOperator",
+            "FilterBuilder",
+            "FilterBuilderLabels",
+            "FilterCondition",
+            "FilterCustomOperatorId",
+            "FilterField",
+            "FilterFieldGroup",
+            "FilterFieldOption",
+            "FilterGroup",
+            "FilterIssue",
+            "FilterNode",
+            "FilterOperator",
+            "FilterOperatorDef",
+            "FilterPath",
+            "FilterSegment",
+            "FilterValue",
+            "FilterValueEditor",
+            "OPERATORS_BY_TYPE",
+            "addCondition",
+            "addGroup",
+            "applyFilter",
+            "catalogSchema",
+            "changeField",
+            "changeOperator",
+            "changeValue",
+            "compileCatalogFilter",
+            "defaultValue",
+            "depthOf",
+            "emptyFilter",
+            "filterIssues",
+            "groupFields",
+            "isComplete",
+            "newCondition",
+            "nodeAt",
+            "operatorsFor",
+            "optionLabel",
+            "optionValue",
+            "parseFilter",
+            "parseSegment",
+            "pruneFilter",
+            "removeAt",
+            "resolveFilterBuilderLabels",
+            "serializeSegment",
+            "setCombinator"
+          ],
+          "module": "@texuli/data/filter-builder"
+        }
+      ],
       "label": "Filter builder",
       "placement": "content",
       "props": [
@@ -3764,6 +4483,39 @@
       "events": ["change", "select"],
       "group": "data",
       "id": "data-grid",
+      "imports": [
+        {
+          "exports": ["DataGrid"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": [
+            "CellPosition",
+            "DEFAULT_DATA_GRID_LABELS",
+            "DataGrid",
+            "DataGridBreakpoint",
+            "DataGridBulkContext",
+            "DataGridColumn",
+            "DataGridColumnInput",
+            "DataGridEmptyContext",
+            "DataGridLabels",
+            "GridRowsOptions",
+            "MoveCellOptions",
+            "ariaSort",
+            "breakpointWidth",
+            "cellText",
+            "clampCell",
+            "gridRows",
+            "inferColumnType",
+            "moveCell",
+            "nextSort",
+            "resolveDataGridColumns",
+            "resolveDataGridLabels",
+            "searchRows"
+          ],
+          "module": "@texuli/data/grid-core"
+        }
+      ],
       "label": "Data grid",
       "placement": "content",
       "props": [
@@ -3932,6 +4684,29 @@
       "events": ["change", "select"],
       "group": "data",
       "id": "data-notification-inbox",
+      "imports": [
+        {
+          "exports": ["NotificationInbox"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": [
+            "DEFAULT_INBOX_LABELS",
+            "InboxFilter",
+            "InboxNotification",
+            "InboxReadChangeContext",
+            "NotificationInbox",
+            "NotificationInboxLabels",
+            "filterInbox",
+            "markAllRead",
+            "newArrivals",
+            "resolveInboxLabels",
+            "setRead",
+            "unreadCount"
+          ],
+          "module": "@texuli/data/activity/inbox"
+        }
+      ],
       "label": "Notification inbox",
       "placement": "content",
       "props": [
@@ -4371,6 +5146,16 @@
       "emit": [],
       "group": "forms",
       "id": "description",
+      "imports": [
+        {
+          "exports": ["Description"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Description"],
+          "module": "texuli/field"
+        }
+      ],
       "label": "Description",
       "placement": "app",
       "props": [
@@ -4400,6 +5185,16 @@
       "emit": [],
       "group": "overlays",
       "id": "detail-panel",
+      "imports": [
+        {
+          "exports": ["DetailPanel", "DetailPanelContent"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["DetailPanel", "DetailPanelContent"],
+          "module": "texuli/sheet"
+        }
+      ],
       "label": "DetailPanel",
       "placement": "app",
       "props": [
@@ -4545,6 +5340,16 @@
       "emit": [],
       "group": "overlays",
       "id": "drawer",
+      "imports": [
+        {
+          "exports": ["DrawerContent"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["DrawerContent"],
+          "module": "texuli/sheet"
+        }
+      ],
       "label": "Drawer",
       "placement": "app",
       "props": [
@@ -4585,6 +5390,29 @@
       "emit": [],
       "group": "overlays",
       "id": "dropdown-menu",
+      "imports": [
+        {
+          "exports": ["DropdownMenu"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "DropdownMenu",
+            "DropdownMenuPortal",
+            "DropdownMenuRoot",
+            "MenuCheckboxItem",
+            "MenuGroup",
+            "MenuLabel",
+            "MenuRadioGroup",
+            "MenuRadioItem",
+            "MenuSeparator",
+            "MenuSub",
+            "MenuSubContent",
+            "MenuSubTrigger"
+          ],
+          "module": "texuli/menus"
+        }
+      ],
       "label": "DropdownMenu",
       "placement": "app",
       "props": [
@@ -4623,6 +5451,12 @@
       "emit": [],
       "group": "overlays",
       "id": "dropdown-menu-content",
+      "imports": [
+        {
+          "exports": ["MenuContent"],
+          "module": "texuli/menus"
+        }
+      ],
       "label": "DropdownMenu.Content",
       "placement": "app",
       "props": [
@@ -4669,6 +5503,12 @@
       "emit": [],
       "group": "overlays",
       "id": "dropdown-menu-item",
+      "imports": [
+        {
+          "exports": ["MenuItem"],
+          "module": "texuli/menus"
+        }
+      ],
       "label": "DropdownMenu.Item",
       "placement": "app",
       "props": [
@@ -4733,6 +5573,12 @@
       "emit": [],
       "group": "overlays",
       "id": "dropdown-menu-trigger",
+      "imports": [
+        {
+          "exports": ["DropdownMenuTrigger"],
+          "module": "texuli/menus"
+        }
+      ],
       "label": "DropdownMenu.Trigger",
       "placement": "app",
       "props": [
@@ -4771,6 +5617,16 @@
       "emit": [],
       "group": "display",
       "id": "empty-state",
+      "imports": [
+        {
+          "exports": ["EmptyState"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["EmptyState"],
+          "module": "texuli/empty"
+        }
+      ],
       "label": "Empty state",
       "placement": "app",
       "props": [
@@ -4811,6 +5667,16 @@
       "emit": [],
       "group": "display",
       "id": "error-state",
+      "imports": [
+        {
+          "exports": ["ErrorState"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["ErrorState"],
+          "module": "texuli/empty"
+        }
+      ],
       "label": "Error state",
       "placement": "app",
       "props": [
@@ -4849,6 +5715,16 @@
       "emit": [],
       "group": "forms",
       "id": "field",
+      "imports": [
+        {
+          "exports": ["Field"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Field"],
+          "module": "texuli/field"
+        }
+      ],
       "label": "Field",
       "placement": "app",
       "props": [
@@ -4906,6 +5782,16 @@
       "emit": [],
       "group": "forms",
       "id": "field-error",
+      "imports": [
+        {
+          "exports": ["FieldError"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["FieldError"],
+          "module": "texuli/field"
+        }
+      ],
       "label": "FieldError",
       "placement": "app",
       "props": [
@@ -4979,6 +5865,16 @@
       "emit": [],
       "group": "forms",
       "id": "form",
+      "imports": [
+        {
+          "exports": ["Form"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Form"],
+          "module": "texuli/field"
+        }
+      ],
       "label": "Form",
       "placement": "app",
       "props": [
@@ -5156,6 +6052,16 @@
       "emit": [],
       "group": "overlays",
       "id": "hover-card",
+      "imports": [
+        {
+          "exports": ["HoverCard", "HoverCardRoot", "HoverCardTrigger"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["HoverCard", "HoverCardRoot", "HoverCardTrigger"],
+          "module": "texuli/popover"
+        }
+      ],
       "label": "HoverCard",
       "placement": "app",
       "props": [
@@ -5189,6 +6095,16 @@
       "emit": [],
       "group": "overlays",
       "id": "hover-card-content",
+      "imports": [
+        {
+          "exports": ["HoverCardContent"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["HoverCardContent"],
+          "module": "texuli/popover"
+        }
+      ],
       "label": "HoverCard.Content",
       "placement": "app",
       "props": [
@@ -5231,6 +6147,16 @@
       "emit": [],
       "group": "forms",
       "id": "icon-button",
+      "imports": [
+        {
+          "exports": ["IconButton"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["IconButton"],
+          "module": "texuli/button"
+        }
+      ],
       "label": "IconButton",
       "placement": "app",
       "props": [
@@ -5295,6 +6221,16 @@
       "emit": [],
       "group": "forms",
       "id": "input",
+      "imports": [
+        {
+          "exports": ["Input"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Input"],
+          "module": "texuli/input"
+        }
+      ],
       "label": "Input",
       "placement": "app",
       "props": [
@@ -5356,6 +6292,16 @@
       "emit": [],
       "group": "forms",
       "id": "input-group",
+      "imports": [
+        {
+          "exports": ["InputGroup"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["InputGroup"],
+          "module": "texuli/input"
+        }
+      ],
       "label": "InputGroup",
       "placement": "app",
       "props": [
@@ -5431,6 +6377,16 @@
       "emit": [],
       "group": "display",
       "id": "kbd",
+      "imports": [
+        {
+          "exports": ["Kbd"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Kbd"],
+          "module": "texuli/kbd-code"
+        }
+      ],
       "label": "Kbd",
       "placement": "app",
       "props": [
@@ -5464,6 +6420,16 @@
       "emit": [],
       "group": "display",
       "id": "kpi",
+      "imports": [
+        {
+          "exports": ["Kpi"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Kpi"],
+          "module": "texuli/stat"
+        }
+      ],
       "label": "KPI",
       "placement": "app",
       "props": [
@@ -5547,6 +6513,16 @@
       "emit": [],
       "group": "forms",
       "id": "label",
+      "imports": [
+        {
+          "exports": ["Label"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Label"],
+          "module": "texuli/field"
+        }
+      ],
       "label": "Label",
       "placement": "app",
       "props": [
@@ -5582,6 +6558,16 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-auth-split",
+      "imports": [
+        {
+          "exports": ["AuthSplitLayout"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["AuthSplitLayout"],
+          "module": "texuli/layouts/auth-settings"
+        }
+      ],
       "label": "Auth split layout",
       "placement": "app",
       "props": [
@@ -5639,6 +6625,12 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-blog",
+      "imports": [
+        {
+          "exports": ["LayoutProps", "loadBlogLayout"],
+          "module": "texuli/layouts/content/blog"
+        }
+      ],
       "label": "Blog layout",
       "placement": "app",
       "props": [
@@ -5707,6 +6699,16 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-chrome",
+      "imports": [
+        {
+          "exports": ["LayoutChrome"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["LayoutChrome"],
+          "module": "texuli/layouts/host/chrome"
+        }
+      ],
       "label": "LayoutChrome",
       "placement": "app",
       "props": [
@@ -5751,6 +6753,25 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-dashboard-grid",
+      "imports": [
+        {
+          "exports": ["DashboardGridLayout"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["DashboardGridLayout", "loadDashboardGrid"],
+          "module": "texuli/layouts/dashboard"
+        },
+        {
+          "exports": [
+            "DASHBOARD_LAYOUT_IDS",
+            "loadDashboardGrid",
+            "registerDashboardLayouts",
+            "unregisterDashboardLayouts"
+          ],
+          "module": "texuli/layouts/dashboard/register"
+        }
+      ],
       "label": "Dashboard grid layout",
       "placement": "app",
       "props": [
@@ -5902,6 +6923,12 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-docs",
+      "imports": [
+        {
+          "exports": ["LayoutProps", "loadDocsLayout"],
+          "module": "texuli/layouts/content/docs"
+        }
+      ],
       "label": "Docs layout",
       "placement": "app",
       "props": [
@@ -5945,6 +6972,20 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-drawer",
+      "imports": [
+        {
+          "exports": ["Drawer", "LayoutDrawer"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["LayoutDrawer"],
+          "module": "texuli/layouts/host/drawer"
+        },
+        {
+          "exports": ["Drawer"],
+          "module": "texuli/sheet"
+        }
+      ],
       "label": "LayoutDrawer",
       "placement": "app",
       "props": [
@@ -5975,6 +7016,12 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-dual-sidebar",
+      "imports": [
+        {
+          "exports": ["loadDualSidebar"],
+          "module": "texuli/layouts/app"
+        }
+      ],
       "label": "Dual sidebar layout",
       "placement": "app",
       "props": [
@@ -6031,6 +7078,12 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-editorial",
+      "imports": [
+        {
+          "exports": ["LayoutProps", "loadEditorialLayout"],
+          "module": "texuli/layouts/content/editorial"
+        }
+      ],
       "label": "Editorial layout",
       "placement": "app",
       "props": [
@@ -6103,6 +7156,16 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-host",
+      "imports": [
+        {
+          "exports": ["LayoutHost"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["LayoutHost"],
+          "module": "texuli/layouts/host"
+        }
+      ],
       "label": "LayoutHost",
       "placement": "app",
       "props": [
@@ -6178,6 +7241,24 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-landing",
+      "imports": [
+        {
+          "exports": ["LandingLayout"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["LandingLayout"],
+          "module": "texuli/layouts/marketing"
+        },
+        {
+          "exports": ["LandingLayout"],
+          "module": "texuli/layouts/marketing/entry"
+        },
+        {
+          "exports": ["LandingLayout", "MarketingCta", "MarketingNavLink"],
+          "module": "texuli/layouts/marketing/landing"
+        }
+      ],
       "label": "Landing layout",
       "placement": "app",
       "props": [
@@ -6225,6 +7306,29 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-marketing",
+      "imports": [
+        {
+          "exports": ["MarketingLayout"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["MarketingLayout"],
+          "module": "texuli/layouts/marketing"
+        },
+        {
+          "exports": ["MarketingLayout", "loadMarketing"],
+          "module": "texuli/layouts/marketing/entry"
+        },
+        {
+          "exports": [
+            "MARKETING_LAYOUT_IDS",
+            "loadMarketing",
+            "registerMarketingLayouts",
+            "unregisterMarketingLayouts"
+          ],
+          "module": "texuli/layouts/marketing/register"
+        }
+      ],
       "label": "Marketing layout",
       "placement": "app",
       "props": [
@@ -6339,6 +7443,24 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-pricing",
+      "imports": [
+        {
+          "exports": ["PricingLayout"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["PricingLayout"],
+          "module": "texuli/layouts/marketing"
+        },
+        {
+          "exports": ["PricingLayout"],
+          "module": "texuli/layouts/marketing/entry"
+        },
+        {
+          "exports": ["PricingLayout", "PricingTier", "formatPriceCents", "normalizePricingTiers"],
+          "module": "texuli/layouts/marketing/pricing"
+        }
+      ],
       "label": "Pricing layout",
       "placement": "app",
       "props": [
@@ -6407,6 +7529,16 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-settings",
+      "imports": [
+        {
+          "exports": ["SettingsLayout"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SettingsLayout"],
+          "module": "texuli/layouts/auth-settings"
+        }
+      ],
       "label": "Settings layout",
       "placement": "app",
       "props": [
@@ -6468,6 +7600,20 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-sidebar",
+      "imports": [
+        {
+          "exports": ["Sidebar"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["loadSidebar"],
+          "module": "texuli/layouts/app"
+        },
+        {
+          "exports": ["Sidebar"],
+          "module": "texuli/sidebar"
+        }
+      ],
       "label": "Sidebar layout",
       "placement": "app",
       "props": [
@@ -6655,6 +7801,20 @@
       "emit": [],
       "group": "layouts",
       "id": "layout-wizard",
+      "imports": [
+        {
+          "exports": ["Wizard", "WizardLayout"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["WizardLayout"],
+          "module": "texuli/layouts/auth-settings"
+        },
+        {
+          "exports": ["Wizard"],
+          "module": "texuli/stepper"
+        }
+      ],
       "label": "Wizard layout",
       "placement": "app",
       "props": [
@@ -6740,6 +7900,58 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "media-composition-canvas",
+      "imports": [
+        {
+          "exports": ["CompositionCanvas"],
+          "module": "@texuli/media"
+        },
+        {
+          "exports": [
+            "CANVAS_LIMITS",
+            "CompositionCanvas",
+            "CompositionCanvasLabels",
+            "CompositionCanvasTarget",
+            "CompositionContext2D",
+            "CompositionImage",
+            "CompositionImageLoader",
+            "CompositionTextItem",
+            "CompositionViewport",
+            "DEFAULT_COMPOSITION_CANVAS_LABELS",
+            "DrawCompositionOptions",
+            "DrawReport",
+            "DrawSkipReason",
+            "IDENTITY",
+            "LoadCompositionImagesOptions",
+            "LoadedCompositionImages",
+            "Matrix",
+            "Rect",
+            "RenderCompositionOptions",
+            "RenderCompositionResult",
+            "ScratchSurface",
+            "VIEWPORT_LIMITS",
+            "ViewportAction",
+            "applyMatrix",
+            "applyViewportAction",
+            "canvasBackingSize",
+            "clampViewport",
+            "describeComposition",
+            "fitImage",
+            "initialViewport",
+            "intersects",
+            "layerBounds",
+            "layerMatrix",
+            "linearGradientLine",
+            "multiply",
+            "panViewport",
+            "radialGradientCircle",
+            "resolveCompositionCanvasLabels",
+            "viewportKeyAction",
+            "wrapText",
+            "zoomViewport"
+          ],
+          "module": "@texuli/media/composition-canvas"
+        }
+      ],
       "label": "Canvas composition",
       "placement": "content",
       "props": [
@@ -6797,6 +8009,27 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "media-composition-svg",
+      "imports": [
+        {
+          "exports": ["CompositionSvg"],
+          "module": "@texuli/media"
+        },
+        {
+          "exports": [
+            "CompositionSvg",
+            "CompositionSvgResult",
+            "RenderCompositionSvgOptions",
+            "SvgChild",
+            "SvgElementNode",
+            "compositionToSvgString",
+            "escapeXml",
+            "isSafeAttrName",
+            "renderCompositionSvg",
+            "serializeSvg"
+          ],
+          "module": "@texuli/media/composition-svg"
+        }
+      ],
       "label": "SVG composition",
       "placement": "content",
       "props": [
@@ -6845,6 +8078,25 @@
       "emit": ["developer", "untrusted"],
       "group": "content",
       "id": "media-image",
+      "imports": [
+        {
+          "exports": [
+            "IMAGE_FITS",
+            "IMAGE_LIMITS",
+            "Image",
+            "buildSrcset",
+            "focalPointPosition",
+            "intrinsicSize",
+            "normalizeFit",
+            "normalizeFocalPoint",
+            "normalizeWidths",
+            "resolveImageSources",
+            "resolvePlaceholder",
+            "safeSizes"
+          ],
+          "module": "@texuli/media/image"
+        }
+      ],
       "label": "Responsive image",
       "placement": "content",
       "props": [
@@ -6966,6 +8218,16 @@
       "emit": [],
       "group": "overlays",
       "id": "menubar",
+      "imports": [
+        {
+          "exports": ["Menubar"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Menubar", "MenubarContent", "MenubarMenu", "MenubarRoot"],
+          "module": "texuli/menus"
+        }
+      ],
       "label": "Menubar",
       "placement": "app",
       "props": [
@@ -7013,6 +8275,12 @@
       "emit": [],
       "group": "overlays",
       "id": "menubar-trigger",
+      "imports": [
+        {
+          "exports": ["MenubarTrigger"],
+          "module": "texuli/menus"
+        }
+      ],
       "label": "Menubar.Trigger",
       "placement": "app",
       "props": [
@@ -7061,6 +8329,20 @@
       "emit": [],
       "group": "forms",
       "id": "multi-select",
+      "imports": [
+        {
+          "exports": ["MultiSelect", "Select"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["MultiSelect", "MultiSelectRoot"],
+          "module": "texuli/combobox"
+        },
+        {
+          "exports": ["Select"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "MultiSelect",
       "placement": "app",
       "props": [
@@ -7164,6 +8446,36 @@
       "emit": [],
       "group": "layouts",
       "id": "nav-icon",
+      "imports": [
+        {
+          "exports": ["Icon", "NavIcon"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "BuiltInIconName",
+            "ICON_NAMES",
+            "Icon",
+            "IconComponent",
+            "IconComponentProps",
+            "IconGlyph",
+            "IconLoader",
+            "IconName",
+            "IconNames",
+            "IconRef",
+            "IconRegistry",
+            "IconRegistryOptions",
+            "IconSize",
+            "IconsProvider",
+            "registerIcons"
+          ],
+          "module": "texuli/icons"
+        },
+        {
+          "exports": ["NavIcon"],
+          "module": "texuli/layouts/host/chrome"
+        }
+      ],
       "label": "NavIcon",
       "placement": "app",
       "props": [
@@ -7189,6 +8501,36 @@
       "emit": [],
       "group": "overlays",
       "id": "navigation-menu",
+      "imports": [
+        {
+          "exports": [
+            "NavigationMenu",
+            "NavigationMenuContent",
+            "NavigationMenuIndicator",
+            "NavigationMenuItem",
+            "NavigationMenuLink",
+            "NavigationMenuList",
+            "NavigationMenuRoot",
+            "NavigationMenuTrigger",
+            "NavigationMenuViewport"
+          ],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "NavigationMenu",
+            "NavigationMenuContent",
+            "NavigationMenuIndicator",
+            "NavigationMenuItem",
+            "NavigationMenuLink",
+            "NavigationMenuList",
+            "NavigationMenuRoot",
+            "NavigationMenuTrigger",
+            "NavigationMenuViewport"
+          ],
+          "module": "texuli/navigation"
+        }
+      ],
       "label": "NavigationMenu",
       "placement": "app",
       "props": [
@@ -7246,6 +8588,30 @@
       "emit": [],
       "group": "overlays",
       "id": "pagination",
+      "imports": [
+        {
+          "exports": [
+            "Pagination",
+            "PaginationEllipsis",
+            "PaginationNext",
+            "PaginationPage",
+            "PaginationPrevious",
+            "PaginationRoot"
+          ],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "Pagination",
+            "PaginationEllipsis",
+            "PaginationNext",
+            "PaginationPage",
+            "PaginationPrevious",
+            "PaginationRoot"
+          ],
+          "module": "texuli/navigation"
+        }
+      ],
       "label": "Pagination",
       "placement": "app",
       "props": [
@@ -7296,6 +8662,16 @@
       "emit": [],
       "group": "overlays",
       "id": "popover",
+      "imports": [
+        {
+          "exports": ["Popover", "PopoverClose", "PopoverRoot", "PopoverTrigger"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Popover", "PopoverClose", "PopoverRoot", "PopoverTrigger"],
+          "module": "texuli/popover"
+        }
+      ],
       "label": "Popover",
       "placement": "app",
       "props": [
@@ -7334,6 +8710,16 @@
       "emit": [],
       "group": "overlays",
       "id": "popover-content",
+      "imports": [
+        {
+          "exports": ["PopoverContent"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["PopoverContent"],
+          "module": "texuli/popover"
+        }
+      ],
       "label": "Popover.Content",
       "placement": "app",
       "props": [
@@ -7395,6 +8781,16 @@
       "emit": [],
       "group": "forms",
       "id": "radio",
+      "imports": [
+        {
+          "exports": ["Radio"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Radio"],
+          "module": "texuli/choice"
+        }
+      ],
       "label": "Radio",
       "placement": "app",
       "props": [
@@ -7459,6 +8855,16 @@
       "emit": [],
       "group": "forms",
       "id": "radio-group",
+      "imports": [
+        {
+          "exports": ["RadioGroup"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["RadioGroup"],
+          "module": "texuli/choice"
+        }
+      ],
       "label": "RadioGroup",
       "placement": "app",
       "props": [
@@ -7536,6 +8942,16 @@
       "emit": [],
       "group": "overlays",
       "id": "responsive-modal",
+      "imports": [
+        {
+          "exports": ["ResponsiveModal", "ResponsiveModalContent"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["ResponsiveModal", "ResponsiveModalContent"],
+          "module": "texuli/sheet"
+        }
+      ],
       "label": "ResponsiveModal",
       "placement": "app",
       "props": [
@@ -7598,6 +9014,16 @@
       "emit": [],
       "group": "layouts",
       "id": "screen-outlet",
+      "imports": [
+        {
+          "exports": ["ScreenOutlet"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["ScreenOutlet"],
+          "module": "texuli/layouts/host"
+        }
+      ],
       "label": "ScreenOutlet",
       "placement": "app",
       "props": [
@@ -7632,6 +9058,16 @@
       "emit": [],
       "group": "forms",
       "id": "select",
+      "imports": [
+        {
+          "exports": ["SelectRoot"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SelectRoot"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "Select",
       "placement": "app",
       "props": [
@@ -7721,6 +9157,16 @@
       "emit": [],
       "group": "forms",
       "id": "select-content",
+      "imports": [
+        {
+          "exports": ["SelectContent"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SelectContent"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "Select.Content",
       "placement": "app",
       "props": [
@@ -7747,6 +9193,16 @@
       "emit": [],
       "group": "forms",
       "id": "select-group",
+      "imports": [
+        {
+          "exports": ["SelectGroup"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SelectGroup"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "Select.Group",
       "placement": "app",
       "props": [
@@ -7768,6 +9224,16 @@
       "emit": [],
       "group": "forms",
       "id": "select-item",
+      "imports": [
+        {
+          "exports": ["SelectItem"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SelectItem"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "Select.Item",
       "placement": "app",
       "props": [
@@ -7812,6 +9278,16 @@
       "emit": [],
       "group": "forms",
       "id": "select-label",
+      "imports": [
+        {
+          "exports": ["SelectLabel"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SelectLabel"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "Select.Label",
       "placement": "app",
       "props": [
@@ -7833,6 +9309,16 @@
       "emit": [],
       "group": "forms",
       "id": "select-portal",
+      "imports": [
+        {
+          "exports": ["SelectPortal"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SelectPortal"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "Select.Portal",
       "placement": "app",
       "props": [
@@ -7849,6 +9335,33 @@
       "emit": [],
       "group": "forms",
       "id": "select-separator",
+      "imports": [
+        {
+          "exports": ["SelectSeparator", "Separator"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SelectSeparator"],
+          "module": "texuli/select"
+        },
+        {
+          "exports": [
+            "ASPECT_RATIOS",
+            "AspectRatio",
+            "AspectRatioValue",
+            "SEPARATOR_ORIENTATIONS",
+            "SEPARATOR_VARIANTS",
+            "Separator",
+            "SeparatorOrientation",
+            "SeparatorVariant",
+            "VisuallyHidden",
+            "aspectRatioClass",
+            "separatorClass",
+            "visuallyHiddenClass"
+          ],
+          "module": "texuli/separator-aspect"
+        }
+      ],
       "label": "Select.Separator",
       "placement": "app",
       "props": [
@@ -7877,6 +9390,16 @@
       "emit": [],
       "group": "forms",
       "id": "select-trigger",
+      "imports": [
+        {
+          "exports": ["SelectTrigger"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SelectTrigger"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "Select.Trigger",
       "placement": "app",
       "props": [
@@ -7909,6 +9432,16 @@
       "emit": [],
       "group": "forms",
       "id": "select-value",
+      "imports": [
+        {
+          "exports": ["SelectValue"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SelectValue"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "Select.Value",
       "placement": "app",
       "props": [
@@ -7934,6 +9467,16 @@
       "emit": [],
       "group": "forms",
       "id": "select-viewport",
+      "imports": [
+        {
+          "exports": ["SelectViewport"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["SelectViewport"],
+          "module": "texuli/select"
+        }
+      ],
       "label": "Select.Viewport",
       "placement": "app",
       "props": [
@@ -7962,6 +9505,34 @@
       "emit": [],
       "group": "overlays",
       "id": "sheet",
+      "imports": [
+        {
+          "exports": [
+            "Panel",
+            "Sheet",
+            "SheetBody",
+            "SheetCloseButton",
+            "SheetContent",
+            "SheetFooter",
+            "SheetHeader",
+            "SheetOverlay"
+          ],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "Panel",
+            "Sheet",
+            "SheetBody",
+            "SheetCloseButton",
+            "SheetContent",
+            "SheetFooter",
+            "SheetHeader",
+            "SheetOverlay"
+          ],
+          "module": "texuli/sheet"
+        }
+      ],
       "label": "Sheet",
       "placement": "app",
       "props": [
@@ -8197,6 +9768,16 @@
       "emit": [],
       "group": "display",
       "id": "stat",
+      "imports": [
+        {
+          "exports": ["Stat"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Stat"],
+          "module": "texuli/stat"
+        }
+      ],
       "label": "Stat",
       "placement": "app",
       "props": [
@@ -8257,6 +9838,16 @@
       "emit": [],
       "group": "display",
       "id": "stepper",
+      "imports": [
+        {
+          "exports": ["Stepper"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Stepper"],
+          "module": "texuli/stepper"
+        }
+      ],
       "label": "Stepper",
       "placement": "app",
       "props": [
@@ -8309,6 +9900,16 @@
       "emit": [],
       "group": "forms",
       "id": "switch",
+      "imports": [
+        {
+          "exports": ["Switch"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Switch"],
+          "module": "texuli/choice"
+        }
+      ],
       "label": "Switch",
       "placement": "app",
       "props": [
@@ -8384,6 +9985,46 @@
       "emit": [],
       "group": "display",
       "id": "table",
+      "imports": [
+        {
+          "exports": [
+            "Table",
+            "TableBody",
+            "TableCaption",
+            "TableCell",
+            "TableEmpty",
+            "TableFooter",
+            "TableHead",
+            "TableHeader",
+            "TableRow"
+          ],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "TABLE_ALIGNS",
+            "TABLE_DENSITIES",
+            "TABLE_STACKS",
+            "TABLE_VARIANTS",
+            "Table",
+            "TableAlign",
+            "TableBody",
+            "TableCaption",
+            "TableCell",
+            "TableDensity",
+            "TableEmpty",
+            "TableFooter",
+            "TableHead",
+            "TableHeader",
+            "TableRow",
+            "TableStack",
+            "TableVariant",
+            "fillStackLabels",
+            "tableClass"
+          ],
+          "module": "texuli/table"
+        }
+      ],
       "label": "Table",
       "placement": "app",
       "props": [
@@ -8452,6 +10093,16 @@
       "emit": [],
       "group": "display",
       "id": "tag",
+      "imports": [
+        {
+          "exports": ["Tag"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Tag"],
+          "module": "texuli/badge"
+        }
+      ],
       "label": "Tag",
       "placement": "app",
       "props": [
@@ -8501,6 +10152,16 @@
       "emit": [],
       "group": "forms",
       "id": "text-counter",
+      "imports": [
+        {
+          "exports": ["TextCounter"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["TextCounter"],
+          "module": "texuli/input"
+        }
+      ],
       "label": "TextCounter",
       "placement": "app",
       "props": [
@@ -8588,6 +10249,16 @@
       "emit": [],
       "group": "forms",
       "id": "textarea",
+      "imports": [
+        {
+          "exports": ["Textarea"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Textarea"],
+          "module": "texuli/input"
+        }
+      ],
       "label": "Textarea",
       "placement": "app",
       "props": [
@@ -8642,6 +10313,33 @@
       "emit": [],
       "group": "forms",
       "id": "time-field",
+      "imports": [
+        {
+          "exports": ["TimeField"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "Calendar",
+            "DATE_SIZES",
+            "DEFAULT_DATE_RANGE_PRESET_LABELS",
+            "DateLabels",
+            "DatePicker",
+            "DateRangePicker",
+            "DateRangePickerPanelContext",
+            "DateRangePreset",
+            "DateRangePresetLabels",
+            "DateSize",
+            "TimeField",
+            "dateCalendarClass",
+            "dateFieldClass",
+            "dateRangePresets",
+            "localToday",
+            "matchingPreset"
+          ],
+          "module": "texuli/date"
+        }
+      ],
       "label": "TimeField",
       "placement": "app",
       "props": [
@@ -8714,6 +10412,30 @@
       "emit": [],
       "group": "display",
       "id": "timeline",
+      "imports": [
+        {
+          "exports": ["Timeline", "TimelineItem"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "DEFAULT_TIMELINE_MESSAGES",
+            "TIMELINE_ORIENTATIONS",
+            "TIMELINE_STATUSES",
+            "TIMELINE_TONES",
+            "Timeline",
+            "TimelineItem",
+            "TimelineItemData",
+            "TimelineMessages",
+            "TimelineOrientation",
+            "TimelineStatus",
+            "TimelineTone",
+            "timelineClass",
+            "timelineItemClass"
+          ],
+          "module": "texuli/timeline"
+        }
+      ],
       "label": "Timeline",
       "placement": "app",
       "props": [
@@ -8758,6 +10480,38 @@
       "emit": [],
       "group": "overlays",
       "id": "toaster",
+      "imports": [
+        {
+          "exports": ["Toaster"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "DEFAULT_TOAST_ACTION_ERROR",
+            "DEFAULT_TOAST_DURATION",
+            "MAX_TOASTS",
+            "PromiseToastMessages",
+            "TOASTER_POSITIONS",
+            "TOAST_KINDS",
+            "ToastAction",
+            "ToastAnnouncement",
+            "ToastItem",
+            "ToastKind",
+            "ToastOptions",
+            "ToastSettleReason",
+            "ToastStore",
+            "Toaster",
+            "ToasterPosition",
+            "createToastStore",
+            "getToastStore",
+            "resetToastStore",
+            "toast",
+            "toastItemClass",
+            "toasterClass"
+          ],
+          "module": "texuli/toast"
+        }
+      ],
       "label": "Toaster",
       "placement": "app",
       "props": [
@@ -8804,6 +10558,23 @@
       "emit": [],
       "group": "overlays",
       "id": "tooltip",
+      "imports": [
+        {
+          "exports": ["Tooltip"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "TOOLTIP_ALIGNS",
+            "TOOLTIP_SIDES",
+            "Tooltip",
+            "TooltipAlign",
+            "TooltipSide",
+            "tooltipContentClass"
+          ],
+          "module": "texuli/tooltip"
+        }
+      ],
       "label": "Tooltip",
       "placement": "app",
       "props": [

@@ -475,6 +475,13 @@ export function vocabularyToKotlin(catalog: SpecCatalog, stamp: Stamp): string {
         `${INDENT}${INDENT}${INDENT}states = listOf(${c.states.map((s) => `SpecStateName.${upperSnake(s)}`).join(', ')}),`
       );
     }
+    if (c.imports && c.imports.length > 0) {
+      const items = c.imports.map(
+        (item) =>
+          `SpecImport(module = ${kotlinString(item.module)}, exports = listOf(${item.exports.map(kotlinString).join(', ')}))`
+      );
+      lines.push(`${INDENT}${INDENT}${INDENT}imports = listOf(${items.join(', ')}),`);
+    }
     if (c.deprecated)
       lines.push(`${INDENT}${INDENT}${INDENT}deprecated = ${deprecationExpr(c.deprecated)},`);
     lines.push(`${INDENT}${INDENT}),`);

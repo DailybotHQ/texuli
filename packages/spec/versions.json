@@ -75,7 +75,7 @@
     },
     {
       "specVersion": "0.13.0",
-      "specDigest": "b6b9e03ff340151f4975a376f9abc94a86aaed4f1cfe2eaff9899a57f6528383",
+      "specDigest": "10a196e6750fca9816c8efd2033122a7bc8e7d1f7a2549166e240868cebadb60",
       "change": "minor",
       "summary": "Additive (ADR-032, locked design systems; the open 0.13.0 pin, amended by each task until the release publishes): the design-system document gains the optional allow section (per catalog id, the enabled variants, sizes, tones, densities and states; an omitted list allows every value, an empty list allows none; a component not listed is not allowed once allow exists), library (the design system's own components: id, name, purpose, version, status draft or approved, composes and their own approval) and approval (status, approvedBy, approvedAt, version and contentHash, top-document only, never inherited through extends); a catalog component gains the optional axes (variant, size, tone and density, each { prop, values, default } derived from one of its enum props) and states (the closed list hover, focus-visible, active, disabled, loading, invalid, selected, expanded, checked, open, readonly), projected from the catalog manifests and the per-group catalog/variants files; every 0.12.0 blueprint and design-system document stays valid and the blueprint envelope is unchanged; stamp-only migration 0.12.0→0.13.0"
     }

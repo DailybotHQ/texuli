@@ -111,6 +111,16 @@ export interface CatalogPropSchema {
   deprecated?: CatalogDeprecation;
 }
 
+/**
+ * One public module that exports this catalog id: the package subpath (and
+ * the root barrel when the same names are re-exported there). `exports`
+ * lists every name that belongs to the component, including compound parts.
+ */
+export interface CatalogImport {
+  readonly module: string;
+  readonly exports: readonly string[];
+}
+
 /** A concrete usage sample (props only; no live Svelte in the manifest). */
 export interface CatalogExample {
   /** Stable example id within the component (`kebab-case`). */
@@ -179,6 +189,12 @@ export interface CatalogManifest {
   axes?: Readonly<Partial<Record<CatalogAxisName, string>>>;
   /** Observable states the component paints (ADR-032), from the closed list. */
   states?: readonly CatalogStateName[];
+  /**
+   * Public imports that resolve to this catalog id (the component, compound
+   * parts, and co-located helpers). A static checker maps `module` + export
+   * name onto this id with no other lookup.
+   */
+  imports?: readonly CatalogImport[];
   deprecated?: CatalogDeprecation;
 }
 

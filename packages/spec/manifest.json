@@ -2,7 +2,7 @@
   "dialect": "https://json-schema.org/draft/2020-12/schema",
   "files": {
     "catalog/capabilities.json": "9072574d676b15f5b015082d29f0a9f58c7b9f93b137a63a1caed5e0037bd479",
-    "catalog/components.json": "908ef6c4ebe21bcc079129f24591e00bae1351c703031672233678cd33ced2b5",
+    "catalog/components.json": "66667d8eb848586fb3b4fc391ad1711c10e76c1f4aefa32af4c0db1b312a94a4",
     "fixtures/design-systems/acme.json": "07928b374d70ce2b7f08adaf855fdb9040b8305b10e463381843793d2174ca04",
     "fixtures/design-systems/invalid/approval-invalid.json": "3fcb59b0e54f13819be3244129604c4bf2c5cf99d578ba51580abeeba563b096",
     "fixtures/design-systems/invalid/extends-cycle.json": "64ed3a6f116ce9c8ce88890681828e4d482a3076773f1d60194194d42bae8775",
@@ -97,7 +97,7 @@
     "fixtures/workflow/invalid/unknown-node-type.json": "763c245014cf1dffda938b44dd0dd00bcd92108b83a2986d9107e2663487dec1",
     "schemas/blueprint.schema.json": "2d91b3d6b84cdc0172d98906cbd71369539ddd67143f9e98e30c87d72440734b",
     "schemas/canvas.schema.json": "d2f73644ff38feef2f768da9470640a3375450211a9fd7b90f507c4dd48b5b63",
-    "schemas/catalog.schema.json": "669dbe74a245b2f40e16c8b74cbd903f213518a477e12eb5f647a871fbc56415",
+    "schemas/catalog.schema.json": "3ae70db205d50b396eec509d33f63257a5f225a0b678e1a11ee854a54d40d2d0",
     "schemas/design-system.schema.json": "9f4099e007de96865c563a78b37398aafac56ae7c6470811b7bcda32ee390041",
     "schemas/diagnostics.schema.json": "7de3c9490dae2ce193fe159b4a20191234626e68d6a736b99eda7524b52b5240",
     "schemas/document.schema.json": "e42c8f3c3bf7b2e10f7a57fd1d163f9daed59c16ae98bae950d01f5b66517c44",
