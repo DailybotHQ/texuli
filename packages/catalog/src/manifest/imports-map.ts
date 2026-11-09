@@ -11,26 +11,15 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli/alert', exports: ['Alert', 'AlertSurface', 'ToneIcon'] },
   ],
   'alert-dialog': [
-    { module: 'texuli', exports: ['AlertDialog', 'Dialog'] },
+    { module: 'texuli', exports: ['AlertDialog'] },
     {
       module: 'texuli/dialog',
       exports: [
         'AlertDialog',
-        'DIALOG_SIZES',
-        'Dialog',
-        'DialogSize',
         'alertDialogActionsClass',
         'alertDialogContentClass',
         'alertDialogErrorClass',
         'alertDialogIconClass',
-        'dialogBodyClass',
-        'dialogCloseClass',
-        'dialogContentClass',
-        'dialogDescriptionClass',
-        'dialogFooterClass',
-        'dialogHeaderClass',
-        'dialogOverlayClass',
-        'dialogTitleClass',
       ],
     },
   ],
@@ -78,6 +67,84 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli', exports: ['Banner'] },
     { module: 'texuli/alert', exports: ['Banner'] },
   ],
+  'blocks-code': [
+    { module: '@texuli/blocks', exports: ['loadCodeFamily'] },
+    { module: '@texuli/blocks/code', exports: ['loadCodeFamily'] },
+    { module: '@texuli/blocks/code/renderers', exports: ['CodeBlockView'] },
+  ],
+  'blocks-data': [
+    { module: '@texuli/blocks', exports: ['loadDataFamily'] },
+    { module: '@texuli/blocks/data', exports: ['loadDataFamily'] },
+    { module: '@texuli/blocks/data/renderers', exports: ['ChartBlockView', 'DataBlockView'] },
+  ],
+  'blocks-diagram': [
+    { module: '@texuli/blocks', exports: ['loadDiagramFamily'] },
+    { module: '@texuli/blocks/diagram', exports: ['loadDiagramFamily'] },
+  ],
+  'blocks-embed': [
+    { module: '@texuli/blocks', exports: ['loadEmbedFamily'] },
+    { module: '@texuli/blocks/embed', exports: ['loadEmbedFamily'] },
+    {
+      module: '@texuli/blocks/embed/renderers',
+      exports: ['EmbedApp', 'EmbedBlockView', 'LinkPreview'],
+    },
+  ],
+  'blocks-interactive': [
+    {
+      module: '@texuli/blocks',
+      exports: [
+        'CalculatorBlock',
+        'ChecklistBlock',
+        'PollBlock',
+        'QuizBlock',
+        'loadInteractiveFamily',
+      ],
+    },
+    {
+      module: '@texuli/blocks/interactive',
+      exports: [
+        'CalculatorBlock',
+        'ChecklistBlock',
+        'PollBlock',
+        'QuizBlock',
+        'loadInteractiveFamily',
+      ],
+    },
+    {
+      module: '@texuli/blocks/interactive/engine',
+      exports: ['CalculatorBlock', 'ChecklistBlock', 'PollBlock', 'QuizBlock'],
+    },
+    {
+      module: '@texuli/blocks/interactive/renderers',
+      exports: [
+        'CalculatorBlock',
+        'ChecklistBlock',
+        'InteractiveBlockView',
+        'PollBlock',
+        'QuizBlock',
+      ],
+    },
+  ],
+  'blocks-map': [
+    { module: '@texuli/blocks', exports: ['loadMapFamily'] },
+    { module: '@texuli/blocks/map', exports: ['loadMapFamily'] },
+    { module: '@texuli/blocks/map/renderers', exports: ['MapBlockView'] },
+  ],
+  'blocks-media': [
+    { module: '@texuli/blocks', exports: ['loadMediaFamily'] },
+    { module: '@texuli/blocks/media', exports: ['loadMediaFamily'] },
+    { module: '@texuli/blocks/media/renderers', exports: ['MediaBlockView'] },
+  ],
+  'blocks-structure': [
+    { module: '@texuli/blocks', exports: ['loadStructureFamily'] },
+    { module: '@texuli/blocks/structure', exports: ['loadStructureFamily'] },
+    { module: '@texuli/blocks/structure/renderers', exports: ['StructureFamily'] },
+  ],
+  'blocks-text': [
+    { module: '@texuli/blocks', exports: ['loadTextFamily'] },
+    { module: '@texuli/blocks/text', exports: ['loadTextFamily'] },
+    { module: '@texuli/blocks/text/renderers', exports: ['RichText', 'TextBlockView'] },
+  ],
   box: [
     {
       module: 'texuli',
@@ -119,35 +186,10 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli', exports: ['Callout'] },
     { module: 'texuli/alert', exports: ['Callout'] },
   ],
-  carousel: [
-    {
-      module: 'texuli',
-      exports: ['Carousel', 'CarouselControlsPlacement', 'CarouselItem', 'CarouselMessages'],
-    },
-    {
-      module: 'texuli/carousel',
-      exports: [
-        'Autoplay',
-        'AutoplayHold',
-        'AutoplayOptions',
-        'Carousel',
-        'CarouselControlsPlacement',
-        'CarouselDirection',
-        'CarouselItem',
-        'CarouselMessages',
-        'DEFAULT_AUTOPLAY_INTERVAL',
-        'DEFAULT_CAROUSEL_MESSAGES',
-        'MIN_AUTOPLAY_INTERVAL',
-        'canStep',
-        'carouselVariants',
-        'createAutoplay',
-        'formatMessage',
-        'resolveCarouselMessages',
-        'resolveIndex',
-        'resolveInterval',
-        'swipeStep',
-      ],
-    },
+  canvas: [
+    { module: '@texuli/canvas', exports: ['CanvasEditor', 'CanvasViewer'] },
+    { module: '@texuli/canvas/editor', exports: ['CanvasEditor'] },
+    { module: '@texuli/canvas/viewer', exports: ['CanvasViewer'] },
   ],
   card: [
     {
@@ -183,6 +225,36 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
       ],
     },
   ],
+  carousel: [
+    {
+      module: 'texuli',
+      exports: ['Carousel', 'CarouselControlsPlacement', 'CarouselItem', 'CarouselMessages'],
+    },
+    {
+      module: 'texuli/carousel',
+      exports: [
+        'Autoplay',
+        'AutoplayHold',
+        'AutoplayOptions',
+        'Carousel',
+        'CarouselControlsPlacement',
+        'CarouselDirection',
+        'CarouselItem',
+        'CarouselMessages',
+        'DEFAULT_AUTOPLAY_INTERVAL',
+        'DEFAULT_CAROUSEL_MESSAGES',
+        'MIN_AUTOPLAY_INTERVAL',
+        'canStep',
+        'carouselVariants',
+        'createAutoplay',
+        'formatMessage',
+        'resolveCarouselMessages',
+        'resolveIndex',
+        'resolveInterval',
+        'swipeStep',
+      ],
+    },
+  ],
   'charts-area': [{ module: '@texuli/charts/cartesian', exports: ['AreaChart'] }],
   'charts-bar': [{ module: '@texuli/charts/cartesian', exports: ['BarChart'] }],
   'charts-bubble': [{ module: '@texuli/charts/matrix', exports: ['BubbleChart'] }],
@@ -211,6 +283,7 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
   'charts-gauge': [{ module: '@texuli/charts/compact', exports: ['Gauge'] }],
   'charts-geo-map': [{ module: '@texuli/charts/geo', exports: ['GeoMap'] }],
   'charts-geo-point-map': [{ module: '@texuli/charts/geo', exports: ['GeoPointMap'] }],
+  'charts-heatmap': [{ module: '@texuli/charts/matrix', exports: ['HeatmapChart'] }],
   'charts-line': [{ module: '@texuli/charts/cartesian', exports: ['LineChart'] }],
   'charts-network': [{ module: '@texuli/charts/flow', exports: ['NetworkGraph'] }],
   'charts-pie': [{ module: '@texuli/charts/part-whole', exports: ['PieChart'] }],
@@ -227,6 +300,7 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
   'charts-stacked-bar': [{ module: '@texuli/charts/cartesian', exports: ['StackedBarChart'] }],
   'charts-sunburst': [{ module: '@texuli/charts/part-whole', exports: ['SunburstChart'] }],
   'charts-treemap': [{ module: '@texuli/charts/part-whole', exports: ['TreemapChart'] }],
+  'chat-message': [{ module: '@texuli/chat', exports: ['ChatMessage', 'ChatMessageDisplay'] }],
   'chat-thread': [
     {
       module: '@texuli/chat',
@@ -236,9 +310,7 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
         'CHAT_DISPLAY_ROLE_LABELS',
         'ChatAuthor',
         'ChatDisplayRole',
-        'ChatMessage',
         'ChatMessageActions',
-        'ChatMessageDisplay',
         'ChatMessageStatus',
         'ChatReadingAnchor',
         'ChatStreamEvent',
@@ -450,6 +522,10 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
       ],
     },
   ],
+  'data-calendar': [
+    { module: '@texuli/data/calendar', exports: ['CalendarView'] },
+    { module: '@texuli/data/calendar/view', exports: ['CalendarView'] },
+  ],
   'data-cohort-table': [
     { module: '@texuli/data', exports: ['CohortTable'] },
     {
@@ -599,6 +675,11 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
       ],
     },
   ],
+  'data-map': [
+    { module: '@texuli/data', exports: ['MapView'] },
+    { module: '@texuli/data/geo', exports: ['MapView'] },
+    { module: '@texuli/data/map', exports: ['MapView'] },
+  ],
   'data-notification-inbox': [
     { module: '@texuli/data', exports: ['NotificationInbox'] },
     {
@@ -619,6 +700,14 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
       ],
     },
   ],
+  'data-timeline': [
+    { module: '@texuli/data', exports: ['TimelineView'] },
+    { module: '@texuli/data/timeline', exports: ['TimelineView'] },
+  ],
+  'data-tree-view': [
+    { module: '@texuli/data', exports: ['TreeDataView'] },
+    { module: '@texuli/data/tree-view', exports: ['TreeDataView'] },
+  ],
   description: [
     { module: 'texuli', exports: ['Description'] },
     { module: 'texuli/field', exports: ['Description'] },
@@ -627,9 +716,48 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli', exports: ['DetailPanel', 'DetailPanelContent'] },
     { module: 'texuli/sheet', exports: ['DetailPanel', 'DetailPanelContent'] },
   ],
+  dialog: [
+    {
+      module: 'texuli',
+      exports: [
+        'DIALOG_SIZES',
+        'Dialog',
+        'DialogSize',
+        'dialogBodyClass',
+        'dialogCloseClass',
+        'dialogContentClass',
+        'dialogDescriptionClass',
+        'dialogFooterClass',
+        'dialogHeaderClass',
+        'dialogOverlayClass',
+        'dialogTitleClass',
+      ],
+    },
+    {
+      module: 'texuli/dialog',
+      exports: [
+        'DIALOG_SIZES',
+        'Dialog',
+        'DialogSize',
+        'dialogBodyClass',
+        'dialogCloseClass',
+        'dialogContentClass',
+        'dialogDescriptionClass',
+        'dialogFooterClass',
+        'dialogHeaderClass',
+        'dialogOverlayClass',
+        'dialogTitleClass',
+      ],
+    },
+  ],
+  document: [
+    { module: '@texuli/pages', exports: ['PageEditor', 'PageReader'] },
+    { module: '@texuli/pages/editor', exports: ['PageEditor'] },
+    { module: '@texuli/pages/reader', exports: ['PageReader'] },
+  ],
   drawer: [
-    { module: 'texuli', exports: ['DrawerContent'] },
-    { module: 'texuli/sheet', exports: ['DrawerContent'] },
+    { module: 'texuli', exports: ['Drawer', 'DrawerContent'] },
+    { module: 'texuli/sheet', exports: ['Drawer', 'DrawerContent'] },
   ],
   'dropdown-menu': [
     { module: 'texuli', exports: ['DropdownMenu'] },
@@ -691,6 +819,14 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
       ],
     },
   ],
+  'hover-card': [
+    { module: 'texuli', exports: ['HoverCard', 'HoverCardRoot', 'HoverCardTrigger'] },
+    { module: 'texuli/popover', exports: ['HoverCard', 'HoverCardRoot', 'HoverCardTrigger'] },
+  ],
+  'hover-card-content': [
+    { module: 'texuli', exports: ['HoverCardContent'] },
+    { module: 'texuli/popover', exports: ['HoverCardContent'] },
+  ],
   icon: [
     { module: 'texuli', exports: ['Icon'] },
     {
@@ -717,14 +853,6 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     },
     { module: 'texuli/icons/lucide', exports: ['LucideIcon', 'LucideIconComponent'] },
   ],
-  'hover-card': [
-    { module: 'texuli', exports: ['HoverCard', 'HoverCardRoot', 'HoverCardTrigger'] },
-    { module: 'texuli/popover', exports: ['HoverCard', 'HoverCardRoot', 'HoverCardTrigger'] },
-  ],
-  'hover-card-content': [
-    { module: 'texuli', exports: ['HoverCardContent'] },
-    { module: 'texuli/popover', exports: ['HoverCardContent'] },
-  ],
   'icon-button': [
     { module: 'texuli', exports: ['IconButton'] },
     { module: 'texuli/button', exports: ['IconButton'] },
@@ -749,7 +877,6 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli', exports: ['Label'] },
     { module: 'texuli/field', exports: ['Label'] },
   ],
-  'list-item': [{ module: 'texuli/list-item', exports: ['ListItem'] }],
   'layout-auth-split': [
     { module: 'texuli', exports: ['AuthSplitLayout'] },
     { module: 'texuli/layouts/auth-settings', exports: ['AuthSplitLayout'] },
@@ -778,11 +905,13 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli/layouts/content/docs', exports: ['LayoutProps', 'loadDocsLayout'] },
   ],
   'layout-drawer': [
-    { module: 'texuli', exports: ['Drawer', 'LayoutDrawer'] },
+    { module: 'texuli', exports: ['LayoutDrawer'] },
     { module: 'texuli/layouts/host/drawer', exports: ['LayoutDrawer'] },
-    { module: 'texuli/sheet', exports: ['Drawer'] },
   ],
-  'layout-dual-sidebar': [{ module: 'texuli/layouts/app', exports: ['loadDualSidebar'] }],
+  'layout-dual-sidebar': [
+    { module: 'texuli/layouts/app', exports: ['loadDualSidebar'] },
+    { module: 'texuli/layouts/app/dual-sidebar', exports: ['default'] },
+  ],
   'layout-editorial': [
     { module: 'texuli/layouts/content/editorial', exports: ['LayoutProps', 'loadEditorialLayout'] },
   ],
@@ -827,15 +956,19 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli/layouts/auth-settings', exports: ['SettingsLayout'] },
   ],
   'layout-sidebar': [
-    { module: 'texuli', exports: ['Sidebar'] },
     { module: 'texuli/layouts/app', exports: ['loadSidebar'] },
-    { module: 'texuli/sidebar', exports: ['Sidebar'] },
+    { module: 'texuli/layouts/app/sidebar', exports: ['default'] },
+  ],
+  'layout-top-nav': [
+    { module: 'texuli/layouts/app', exports: ['loadTopNav'] },
+    { module: 'texuli/layouts/app/top-nav', exports: ['default'] },
   ],
   'layout-wizard': [
     { module: 'texuli', exports: ['Wizard', 'WizardLayout'] },
     { module: 'texuli/layouts/auth-settings', exports: ['WizardLayout'] },
     { module: 'texuli/stepper', exports: ['Wizard'] },
   ],
+  'list-item': [{ module: 'texuli/list-item', exports: ['ListItem'] }],
   'media-composition-canvas': [
     { module: '@texuli/media', exports: ['CompositionCanvas'] },
     {
@@ -931,9 +1064,8 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
   ],
   'menubar-trigger': [{ module: 'texuli/menus', exports: ['MenubarTrigger'] }],
   'multi-select': [
-    { module: 'texuli', exports: ['MultiSelect', 'Select'] },
+    { module: 'texuli', exports: ['MultiSelect'] },
     { module: 'texuli/combobox', exports: ['MultiSelect', 'MultiSelectRoot'] },
-    { module: 'texuli/select', exports: ['Select'] },
   ],
   'nav-icon': [
     { module: 'texuli', exports: ['NavIcon'] },
@@ -1046,35 +1178,14 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli', exports: ['ResponsiveModal', 'ResponsiveModalContent'] },
     { module: 'texuli/sheet', exports: ['ResponsiveModal', 'ResponsiveModalContent'] },
   ],
+  'schema-form': [{ module: '@texuli/forms', exports: ['SchemaForm'] }],
   'screen-outlet': [
     { module: 'texuli', exports: ['ScreenOutlet'] },
     { module: 'texuli/layouts/host', exports: ['ScreenOutlet'] },
   ],
-  separator: [
-    { module: 'texuli', exports: ['Separator'] },
-    {
-      module: 'texuli/separator-aspect',
-      exports: [
-        'SEPARATOR_ORIENTATIONS',
-        'SEPARATOR_VARIANTS',
-        'Separator',
-        'SeparatorOrientation',
-        'SeparatorVariant',
-        'separatorClass',
-      ],
-    },
-  ],
-  skeleton: [
-    { module: 'texuli', exports: ['Skeleton'] },
-    { module: 'texuli/feedback', exports: ['Skeleton', 'skeletonClass'] },
-  ],
-  spinner: [
-    { module: 'texuli', exports: ['Spinner'] },
-    { module: 'texuli/feedback', exports: ['Spinner', 'spinnerClass'] },
-  ],
   select: [
-    { module: 'texuli', exports: ['SelectRoot'] },
-    { module: 'texuli/select', exports: ['SelectRoot'] },
+    { module: 'texuli', exports: ['Select', 'SelectRoot'] },
+    { module: 'texuli/select', exports: ['Select', 'SelectRoot'] },
   ],
   'select-content': [
     { module: 'texuli', exports: ['SelectContent'] },
@@ -1112,6 +1223,20 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli', exports: ['SelectViewport'] },
     { module: 'texuli/select', exports: ['SelectViewport'] },
   ],
+  separator: [
+    { module: 'texuli', exports: ['Separator'] },
+    {
+      module: 'texuli/separator-aspect',
+      exports: [
+        'SEPARATOR_ORIENTATIONS',
+        'SEPARATOR_VARIANTS',
+        'Separator',
+        'SeparatorOrientation',
+        'SeparatorVariant',
+        'separatorClass',
+      ],
+    },
+  ],
   sheet: [
     {
       module: 'texuli',
@@ -1139,6 +1264,23 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
         'SheetOverlay',
       ],
     },
+  ],
+  sidebar: [
+    { module: 'texuli', exports: ['Sidebar'] },
+    { module: 'texuli/sidebar', exports: ['Sidebar'] },
+  ],
+  skeleton: [
+    { module: 'texuli', exports: ['Skeleton'] },
+    { module: 'texuli/feedback', exports: ['Skeleton', 'skeletonClass'] },
+  ],
+  spinner: [
+    { module: 'texuli', exports: ['Spinner'] },
+    { module: 'texuli/feedback', exports: ['Spinner', 'spinnerClass'] },
+  ],
+  'split-view': [{ module: 'texuli/layouts/app/split-view', exports: ['default'] }],
+  spreadsheet: [
+    { module: '@texuli/sheets', exports: ['SheetView'] },
+    { module: '@texuli/sheets/view', exports: ['SheetView'] },
   ],
   stat: [
     { module: 'texuli', exports: ['Stat'] },
@@ -1316,6 +1458,62 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
       ],
     },
   ],
+  'workflow-graph': [
+    { module: '@texuli/workflows', exports: ['WorkflowEditor', 'WorkflowViewer'] },
+    { module: '@texuli/workflows/editor', exports: ['WorkflowEditor'] },
+    { module: '@texuli/workflows/viewer', exports: ['WorkflowViewer'] },
+  ],
+};
+
+/**
+ * Catalog ids with no public Svelte export, and why: blueprint nodes the player paints and
+ * the plain text node. Every other catalog id has `imports` (the catalog-imports gate checks both).
+ */
+export const NO_COMPONENT_EXPORT: Readonly<Record<string, string>> = {
+  'action-form':
+    'A blueprint state, flow or action node painted by @texuli/player; no public component export.',
+  'control-choice':
+    'A blueprint state, flow or action node painted by @texuli/player; no public component export.',
+  'control-filter':
+    'A blueprint state, flow or action node painted by @texuli/player; no public component export.',
+  'control-slider':
+    'A blueprint state, flow or action node painted by @texuli/player; no public component export.',
+  'control-toggle':
+    'A blueprint state, flow or action node painted by @texuli/player; no public component export.',
+  'deck-slide':
+    'A blueprint content layout painted by @texuli/player from the blueprint (ContentLayout); no public component export.',
+  'flow-action':
+    'A blueprint state, flow or action node painted by @texuli/player; no public component export.',
+  'flow-view':
+    'A blueprint state, flow or action node painted by @texuli/player; no public component export.',
+  'form-field':
+    'A blueprint state, flow or action node painted by @texuli/player; no public component export.',
+  'form-submit':
+    'A blueprint state, flow or action node painted by @texuli/player; no public component export.',
+  'host-region':
+    'A blueprint state, flow or action node painted by @texuli/player; no public component export.',
+  'inline-text':
+    'A plain text node: the host paints `text` as one escaped text node inside its parent; no component.',
+  'layout-card':
+    'A blueprint content layout painted by @texuli/player from the blueprint (ContentLayout); no public component export.',
+  'layout-deck':
+    'A blueprint content layout painted by @texuli/player from the blueprint (ContentLayout); no public component export.',
+  'layout-doc':
+    'A blueprint content layout painted by @texuli/player from the blueprint (ContentLayout); no public component export.',
+  'layout-grid':
+    'A blueprint content layout painted by @texuli/player from the blueprint (ContentLayout); no public component export.',
+  'layout-page':
+    'A blueprint content layout painted by @texuli/player from the blueprint (ContentLayout); no public component export.',
+  'layout-row':
+    'A blueprint content layout painted by @texuli/player from the blueprint (ContentLayout); no public component export.',
+  'layout-split':
+    'A blueprint content layout painted by @texuli/player from the blueprint (ContentLayout); no public component export.',
+  'layout-stack':
+    'A blueprint content layout painted by @texuli/player from the blueprint (ContentLayout); no public component export.',
+  'layout-tile':
+    'A blueprint content layout painted by @texuli/player from the blueprint (ContentLayout); no public component export.',
+  'sortable-list':
+    'A blueprint state, flow or action node painted by @texuli/player; no public component export.',
 };
 
 /**
@@ -1324,19 +1522,6 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
  * remaining subpath export here.
  */
 export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
-  { module: 'texuli', exports: ['SafeArea'] },
-  {
-    module: 'texuli/separator-aspect',
-    exports: [
-      'ASPECT_RATIOS',
-      'AspectRatio',
-      'AspectRatioValue',
-      'VisuallyHidden',
-      'aspectRatioClass',
-      'visuallyHiddenClass',
-    ],
-  },
-  { module: 'texuli/icons', exports: ['IconsProvider', 'registerIcons'] },
   {
     module: '@texuli/blocks',
     exports: [
@@ -1352,8 +1537,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'BLOCK_TYPES',
       'BlockIconResolver',
       'CODE_BLOCK_TYPES',
-      'CalculatorBlock',
-      'ChecklistBlock',
       'CodeBlockBarContext',
       'CodeBlockCheck',
       'CodeBlockLabelOverrides',
@@ -1415,8 +1598,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'MediaBlockViewProps',
       'MediaFamilyBlock',
       'MediaFamilyBlockType',
-      'PollBlock',
-      'QuizBlock',
       'STRUCTURE_BLOCK_TYPES',
       'StructureBlockCheck',
       'StructureBlockLabelOverrides',
@@ -1467,15 +1648,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'isTextFamilyBlock',
       'isUnsafeTextCharacter',
       'listCatalogTypes',
-      'loadCodeFamily',
-      'loadDataFamily',
-      'loadDiagramFamily',
-      'loadEmbedFamily',
-      'loadInteractiveFamily',
-      'loadMapFamily',
-      'loadMediaFamily',
-      'loadStructureFamily',
-      'loadTextFamily',
       'normalizeLineSeparators',
       'parseBlockBase',
       'parseBlockId',
@@ -1522,7 +1694,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'codeTokenClass',
       'fillCodeLabel',
       'isCodeFamilyBlock',
-      'loadCodeFamily',
       'loadCodeGrammar',
       'resolveCodeBlockLabels',
       'resolveCodeLanguage',
@@ -1555,7 +1726,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'resolveCodeLanguage',
     ],
   },
-  { module: '@texuli/blocks/code/renderers', exports: ['CodeBlockView'] },
   {
     module: '@texuli/blocks/code/tokenizer',
     exports: [
@@ -1736,7 +1906,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'checkDataBlock',
       'isDataFamilyBlock',
       'isExtendedChartKind',
-      'loadDataFamily',
       'parseChartBlock',
       'parseDataBlock',
       'parseKpiBlock',
@@ -1790,7 +1959,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'resolveDataBlockLabels',
     ],
   },
-  { module: '@texuli/blocks/data/renderers', exports: ['ChartBlockView', 'DataBlockView'] },
   {
     module: '@texuli/blocks/diagram',
     exports: [
@@ -1825,7 +1993,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'layoutFlow',
       'layoutTerminal',
       'layoutTree',
-      'loadDiagramFamily',
       'parseDiagram',
       'resolveDiagramBlockLabels',
       'toneBorder',
@@ -1893,7 +2060,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'createSandboxedEmbedIframe',
       'createSandboxedEmbedMount',
       'embedIframeSandbox',
-      'loadEmbedFamily',
       'resolveEmbedFrameSrc',
       'safeParseEmbedBlock',
     ],
@@ -1930,10 +2096,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
     ],
   },
   {
-    module: '@texuli/blocks/embed/renderers',
-    exports: ['EmbedApp', 'EmbedBlockView', 'LinkPreview'],
-  },
-  {
     module: '@texuli/blocks/formula',
     exports: [
       'ArithmeticOp',
@@ -1962,9 +2124,7 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
     module: '@texuli/blocks/interactive',
     exports: [
       'ArithmeticOp',
-      'CalculatorBlock',
       'CalculatorInput',
-      'ChecklistBlock',
       'ChecklistItem',
       'ComparisonOp',
       'Condition',
@@ -1986,9 +2146,7 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'InteractiveFamilyBlockType',
       'NumberFormula',
       'ParseFormulaOptions',
-      'PollBlock',
       'PollOption',
-      'QuizBlock',
       'QuizOption',
       'QuizQuestion',
       'checkInteractiveBlock',
@@ -1999,7 +2157,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'formulaJsonPath',
       'formulaVariables',
       'isInteractiveFamilyBlock',
-      'loadInteractiveFamily',
       'parseFormula',
       'parseInteractiveBlock',
       'resolveInteractiveBlockLabels',
@@ -2010,9 +2167,7 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
     module: '@texuli/blocks/interactive/engine',
     exports: [
       'ArithmeticOp',
-      'CalculatorBlock',
       'CalculatorInput',
-      'ChecklistBlock',
       'ChecklistItem',
       'ComparisonOp',
       'Condition',
@@ -2034,9 +2189,7 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'InteractiveFamilyBlockType',
       'NumberFormula',
       'ParseFormulaOptions',
-      'PollBlock',
       'PollOption',
-      'QuizBlock',
       'QuizOption',
       'QuizQuestion',
       'checkInteractiveBlock',
@@ -2051,16 +2204,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'parseInteractiveBlock',
       'resolveInteractiveBlockLabels',
       'roundTo',
-    ],
-  },
-  {
-    module: '@texuli/blocks/interactive/renderers',
-    exports: [
-      'CalculatorBlock',
-      'ChecklistBlock',
-      'InteractiveBlockView',
-      'PollBlock',
-      'QuizBlock',
     ],
   },
   {
@@ -2081,7 +2224,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'checkMapBlock',
       'formatMapLabel',
       'isMapBlock',
-      'loadMapFamily',
       'parseMapBlock',
       'resolveMapBlockLabels',
     ],
@@ -2123,7 +2265,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'toneClass',
     ],
   },
-  { module: '@texuli/blocks/map/renderers', exports: ['MapBlockView'] },
   {
     module: '@texuli/blocks/media',
     exports: [
@@ -2137,7 +2278,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'MediaFamilyBlockType',
       'checkMediaBlock',
       'isMediaFamilyBlock',
-      'loadMediaFamily',
       'resolveBlockMediaSrc',
       'resolveMediaBlockLabels',
     ],
@@ -2159,7 +2299,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'resolveMediaBlockLabels',
     ],
   },
-  { module: '@texuli/blocks/media/renderers', exports: ['MediaBlockView'] },
   {
     module: '@texuli/blocks/structure',
     exports: [
@@ -2185,7 +2324,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'TabsPanel',
       'checkStructureBlock',
       'isStructureFamilyBlock',
-      'loadStructureFamily',
       'parseAccordionBlock',
       'parseCardsBlock',
       'parseGridBlock',
@@ -2227,7 +2365,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'resolveStructureBlockLabels',
     ],
   },
-  { module: '@texuli/blocks/structure/renderers', exports: ['StructureFamily'] },
   {
     module: '@texuli/blocks/text',
     exports: [
@@ -2242,7 +2379,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'TextFamilyBlockType',
       'checkTextBlock',
       'isTextFamilyBlock',
-      'loadTextFamily',
       'resolveTextBlockLabels',
     ],
   },
@@ -2277,7 +2413,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'parseMarkdown',
     ],
   },
-  { module: '@texuli/blocks/text/renderers', exports: ['RichText', 'TextBlockView'] },
   {
     module: '@texuli/charts',
     exports: [
@@ -2733,7 +2868,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'ChartAnnotation',
       'ChartAxisValue',
       'HeatmapCell',
-      'HeatmapChart',
       'HeatmapLayout',
       'MatrixFrame',
       'MatrixKind',
@@ -2945,11 +3079,8 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'InfiniteLoader',
       'InfiniteLoaderOptions',
       'InfiniteLoaderStatus',
-      'MapView',
       'NotificationInboxLabels',
-      'TimelineView',
       'TimelineZoom',
-      'TreeDataView',
       'TreeDataViewLabels',
       'TreeMove',
       'TreePlacement',
@@ -3119,7 +3250,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'CalendarMove',
       'CalendarSeries',
       'CalendarSlot',
-      'CalendarView',
       'DayLayoutItem',
       'DayLayoutOptions',
       'EditScope',
@@ -3203,7 +3333,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'CalendarSeries',
       'CalendarSlot',
       'CalendarTone',
-      'CalendarView',
       'DEFAULT_CALENDAR_LABELS',
       'Occurrence',
     ],
@@ -3354,7 +3483,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'MIN_ZOOM',
       'MapPoint',
       'MapSize',
-      'MapView',
       'PORT_MERIDIAN',
       'Ring',
       'RingSchema',
@@ -3560,7 +3688,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'MapRoute',
       'MapSize',
       'MapTone',
-      'MapView',
       'MarkerShape',
       'PositionedCluster',
       'PositionedMarker',
@@ -3602,7 +3729,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'TimelineModel',
       'TimelineTickContext',
       'TimelineTone',
-      'TimelineView',
       'TimelineZoom',
       'TopoResult',
       'WorkCalendar',
@@ -3684,7 +3810,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'FlatNode',
       'FlattenOptions',
       'TreeAccessors',
-      'TreeDataView',
       'TreeDataViewLabels',
       'TreeIndex',
       'TreeMove',
@@ -4355,6 +4480,7 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'validateVideoEdit',
     ],
   },
+  { module: 'texuli', exports: ['SafeArea'] },
   {
     module: 'texuli',
     exports: [
@@ -4429,12 +4555,10 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'DEFAULT_RATING_LABELS',
       'DEFAULT_TIMELINE_MESSAGES',
       'DEFAULT_TOAST_DURATION',
-      'DIALOG_SIZES',
       'DateLabels',
       'DatePicker',
       'DateRangePicker',
       'DateRangePreset',
-      'DialogSize',
       'DrawerScope',
       'FEEDBACK_SIZES',
       'FEEDBACK_TONES',
@@ -4711,14 +4835,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'dateRangePresets',
       'descriptionClass',
       'detailPanelContentClass',
-      'dialogBodyClass',
-      'dialogCloseClass',
-      'dialogContentClass',
-      'dialogDescriptionClass',
-      'dialogFooterClass',
-      'dialogHeaderClass',
-      'dialogOverlayClass',
-      'dialogTitleClass',
       'drawerContentClass',
       'fieldErrorClass',
       'fieldMessage',
@@ -5120,7 +5236,7 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
     ],
   },
   { module: 'texuli/i18n/es', exports: ['TEXULI_LABELS_ES'] },
-
+  { module: 'texuli/icons', exports: ['IconsProvider', 'registerIcons'] },
   { module: 'texuli/input', exports: ['autosizeTextarea', 'fieldVariants'] },
   {
     module: 'texuli/kbd-code',
@@ -5138,10 +5254,7 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'kbdClass',
     ],
   },
-  {
-    module: 'texuli/layouts/app',
-    exports: ['loadMasterDetail', 'loadRail', 'loadTopNav', 'registerAppLayouts'],
-  },
+  { module: 'texuli/layouts/app', exports: ['loadMasterDetail', 'loadRail', 'registerAppLayouts'] },
   {
     module: 'texuli/layouts/auth-settings',
     exports: [
@@ -5293,7 +5406,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'setAppShellContext',
     ],
   },
-
   {
     module: 'texuli/menus',
     exports: [
@@ -5485,6 +5597,17 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'selectSeparatorClass',
       'selectTriggerClass',
       'selectValueClass',
+    ],
+  },
+  {
+    module: 'texuli/separator-aspect',
+    exports: [
+      'ASPECT_RATIOS',
+      'AspectRatio',
+      'AspectRatioValue',
+      'VisuallyHidden',
+      'aspectRatioClass',
+      'visuallyHiddenClass',
     ],
   },
   {

@@ -4,7 +4,7 @@
  */
 
 export { manifestData } from './data.ts';
-export { IMPORTS_BY_ID, NON_COMPONENT_IMPORTS } from './imports-map.ts';
+export { IMPORTS_BY_ID, NO_COMPONENT_EXPORT, NON_COMPONENT_IMPORTS } from './imports-map.ts';
 export type {
   CatalogAxisName,
   CatalogDeprecation,
