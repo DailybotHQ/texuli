@@ -8,7 +8,7 @@ type AxisStamp = {
 
 /**
  * Part C axes and states for the state group (ADR-032). None of these ids
- * have a variant/size/tone/density enum. States are confirmed against the
+ * have a variant/size/tone/density/color enum. States are confirmed against the
  * player control source.
  */
 export const STATE_AXIS_STAMP: Readonly<Record<string, AxisStamp>> = {

@@ -39,3 +39,21 @@ describe('Button link variant sizing', () => {
     }
   );
 });
+
+describe('Button tone rules and host markup', () => {
+  it.each([
+    ['no tone attribute', ''],
+    ['an unknown tone', ' data-tx-tone="neon"'],
+  ])('keeps the variant colors on a host-authored button with %s', (_name, attribute) => {
+    document.documentElement.style.setProperty('--tx-primary-foreground', 'rgb(255, 255, 255)');
+    document.body.innerHTML = `<a class="tx-button tx-button--default tx-button--md"${attribute} href="#start">Start</a>`;
+    const link = document.querySelector('a') as HTMLElement;
+    expect(window.getComputedStyle(link).color).toBe('rgb(255, 255, 255)');
+    document.documentElement.style.removeProperty('--tx-primary-foreground');
+    document.body.innerHTML = '';
+  });
+
+  it('keys every tone rule on a named tone, never on the absence of default', () => {
+    expect(buttonStyles).not.toContain(':not([data-tx-tone="default"])');
+  });
+});

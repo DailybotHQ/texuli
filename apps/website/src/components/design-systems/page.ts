@@ -9,7 +9,7 @@ export type Surface = 'dashboard' | 'slide' | 'document' | 'email';
 
 /** The honest status: design systems shipped in 0.10.0, a pre-1.0 release. */
 export const DS_STATUS =
-  'Design systems shipped in 0.10.0 and are on npm in the 0.14 line (texuli@^0.14.0 and @texuli/tokens@^0.14.0), a pre-1.0 release: under 0.x a new minor may contain breaking changes. Earlier lines have the theme engine and token contract v2, but not the design-system document, its compiler or the texuli ds commands.';
+  'Design systems shipped in 0.10.0 and are on npm in the 0.15 line (texuli@^0.15.0 and @texuli/tokens@^0.15.0), a pre-1.0 release: under 0.x a new minor may contain breaking changes. Earlier lines have the theme engine and token contract v2, but not the design-system document, its compiler or the texuli ds commands.';
 
 export interface SurfaceEntry {
   id: Surface;

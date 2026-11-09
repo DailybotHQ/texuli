@@ -58,6 +58,7 @@ const AXIS_LISTS = [
   ['size', 'sizes'],
   ['tone', 'tones'],
   ['density', 'densities'],
+  ['color', 'colors'],
 ] as const;
 const STATES: ReadonlySet<string> = new Set(DS_COMPONENT_STATES);
 

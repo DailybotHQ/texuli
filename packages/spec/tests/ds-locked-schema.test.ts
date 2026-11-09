@@ -150,8 +150,8 @@ describe('locked design systems: malformed shapes', () => {
     ],
     [
       'an unknown allow field',
-      { allow: { button: { colors: ['red'] } } },
-      [['unknown-key', '$.allow.button.colors']],
+      { allow: { button: { shapes: ['round'] } } },
+      [['unknown-key', '$.allow.button.shapes']],
     ],
     [
       'an axis that is not a list',

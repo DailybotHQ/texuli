@@ -47,6 +47,7 @@ export const DESIGN_SYSTEM_ALLOW_CODES = [
   'unknown-size',
   'unknown-tone',
   'unknown-density',
+  'unknown-color',
   'unknown-state',
 ] as const;
 

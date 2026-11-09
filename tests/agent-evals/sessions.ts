@@ -990,7 +990,7 @@ const designSystemDashboard: Session = {
           expect(data.valid).toBe(true);
           expect(data.blueprint).toMatchObject({
             format: 'texuli-blueprint',
-            spec: '0.13.0',
+            spec: '0.14.0',
             status: 'draft',
           });
           expect(data.blueprint.tree.id).toBe('data-dashboard');

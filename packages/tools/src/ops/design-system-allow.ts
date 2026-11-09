@@ -2,7 +2,7 @@
  * `ds.allow` (ADR-032): the `allow` section of a locked design system, from
  * the catalog. An agent picks a preset (`minimal`, a documented core, or
  * `all`, every catalog component) or names the components it needs, and
- * gets each one with the full variants, sizes, tones, densities and states
+ * gets each one with the full variants, sizes, tones, densities, colors and states
  * the catalog declares, ready to narrow and paste into the document. Read
  * only; the catalog is the one `catalog.*` reads.
  */
@@ -24,7 +24,7 @@ export const dsAllow: Operation = defineOperation({
   name: 'ds.allow',
   title: 'List allowed components for a locked design system',
   summary:
-    'Build the allow section of a locked design system from the catalog: a preset (minimal, a documented core; all, every component) or the ids you name, each with every variant, size, tone, density and state the catalog declares. Narrow it, put it under "allow" and run ds.validate. Returns allow, count, unknown ids and the minimal preset ids.',
+    'Build the allow section of a locked design system from the catalog: a preset (minimal, a documented core; all, every component) or the ids you name, each with every variant, size, tone, density, color and state the catalog declares. Narrow it, put it under "allow" and run ds.validate. Returns allow, count, unknown ids and the minimal preset ids.',
   input: {
     type: 'object',
     properties: {
@@ -50,7 +50,7 @@ export const dsAllow: Operation = defineOperation({
     properties: {
       allow: {
         type: 'object',
-        description: 'Catalog id → { variants?, sizes?, tones?, densities?, states? }.',
+        description: 'Catalog id → { variants?, sizes?, tones?, densities?, colors?, states? }.',
       },
       count: { type: 'integer', minimum: 0 },
       unknown: { type: 'array', items: { type: 'string' } },

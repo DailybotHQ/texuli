@@ -57,6 +57,11 @@ export const SOURCE_SHAPES: Readonly<Record<string, SourceShape>> = Object.freez
     fields: ['id', 'label', 'parent', 'rank'],
     maxItems: 500,
   },
+  'data-virtual-list.items': {
+    kind: 'records',
+    fields: ['id', 'label', 'description'],
+    maxItems: 500,
+  },
 });
 
 /** The shape of a catalog id's prop, or `undefined` when it is not sourceable. */

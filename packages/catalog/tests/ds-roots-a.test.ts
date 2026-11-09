@@ -29,6 +29,7 @@ const rootFiles = {
   checkbox: 'components/choice/Checkbox.svelte',
   chip: 'components/badge/Chip.svelte',
   code: 'components/kbd-code/Code.svelte',
+  'color-swatch': 'components/typography/ColorSwatch.svelte',
   combobox: 'components/combobox/ComboboxRoot.svelte',
   'command-palette': 'components/command/CommandPalette.svelte',
   'content-layout': 'layouts/content/ContentLayout.svelte',
@@ -55,6 +56,7 @@ const rootFiles = {
   kbd: 'components/kbd-code/Kbd.svelte',
   kpi: 'components/stat/Kpi.svelte',
   label: 'components/field/Label.svelte',
+  link: 'components/typography/Link.svelte',
   'layout-auth-split': 'layouts/auth-settings/AuthSplitLayout.svelte',
   'layout-blog': 'layouts/content/BlogLayout.svelte',
   'layout-chrome': 'layouts/host/LayoutChrome.svelte',
@@ -116,6 +118,8 @@ const rootFiles = {
   rating: 'components/rating/Rating.svelte',
   'tags-input': 'components/tags-color/TagsInput.svelte',
   'toggle-group': 'components/toggle/ToggleGroup.svelte',
+  list: 'components/list-item/List.svelte',
+  mark: 'components/typography/Mark.svelte',
 } as const;
 const axisFiles = {
   alert: 'components/alert/AlertSurface.svelte',
@@ -139,6 +143,7 @@ const axisFiles = {
   checkbox: 'components/choice/Checkbox.svelte',
   chip: 'components/badge/Chip.svelte',
   code: 'components/kbd-code/Code.svelte',
+  'color-swatch': 'components/typography/ColorSwatch.svelte',
   combobox: 'components/combobox/ComboboxRoot.svelte',
   'command-palette': 'components/command/CommandPalette.svelte',
   'content-layout': 'layouts/content/ContentLayout.svelte',
@@ -165,6 +170,7 @@ const axisFiles = {
   kbd: 'components/kbd-code/Kbd.svelte',
   kpi: 'components/stat/Kpi.svelte',
   label: 'components/field/Label.svelte',
+  link: 'components/typography/Link.svelte',
   'layout-auth-split': 'layouts/auth-settings/AuthSplitLayout.svelte',
   'layout-blog': 'layouts/content/ContentLayout.svelte',
   'layout-chrome': 'layouts/host/LayoutChrome.svelte',
@@ -226,6 +232,8 @@ const axisFiles = {
   rating: 'components/rating/Rating.svelte',
   'tags-input': 'components/tags-color/TagsInput.svelte',
   'toggle-group': 'components/toggle/ToggleGroup.svelte',
+  list: 'components/list-item/List.svelte',
+  mark: 'components/typography/Mark.svelte',
 } as const;
 const groupA = ALL_MANIFEST_GROUPS.flatMap((group) => group.manifests).filter(
   (entry) => entry.package === 'texuli' && Object.hasOwn(rootFiles, entry.id)
@@ -236,15 +244,16 @@ const source = (file: string) =>
 
 describe('Texuli group A catalog root attributes', () => {
   it('covers every group A catalog id from the root audit', () => {
-    expect(groupA).toHaveLength(108);
-    expect(new Set(groupA.map((entry) => entry.id)).size).toBe(108);
+    expect(groupA).toHaveLength(112);
+    expect(new Set(groupA.map((entry) => entry.id)).size).toBe(112);
   });
 
   it.each(groupA)('$id root declares its component id and enum axes', (entry) => {
     const example = entry.examples[0];
     const props: Record<string, unknown> = { ...(example?.props ?? {}) };
     const axes = entry.props.filter(
-      (prop) => prop.kind === 'enum' && ['variant', 'size', 'tone', 'density'].includes(prop.name)
+      (prop) =>
+        prop.kind === 'enum' && ['variant', 'size', 'tone', 'density', 'color'].includes(prop.name)
     );
     for (const axis of axes) props[axis.name] = axis.enumValues?.[0] ?? axis.default;
 
@@ -258,9 +267,13 @@ describe('Texuli group A catalog root attributes', () => {
     expect(paintSource).toContain(`data-tx-component="${entry.id}"`);
     const rootSource = source(axisFiles[entry.id as keyof typeof axisFiles]);
     for (const axis of axes) {
-      expect(rootSource, `${entry.id} ${axis.name}`).toContain(
-        `data-tx-${axis.name}={${axis.name}}`
-      );
+      if (axis.name === 'color') {
+        expect(rootSource, `${entry.id} color`).toContain('data-tx-color={categoryColor}');
+      } else {
+        expect(rootSource, `${entry.id} ${axis.name}`).toContain(
+          `data-tx-${axis.name}={${axis.name}}`
+        );
+      }
     }
   });
 });

@@ -22,6 +22,10 @@ export const ROLE_COLORS = [
 ] as const;
 
 export type ColorRef = (typeof DATA_COLORS)[number] | (typeof ROLE_COLORS)[number];
+export type DataColorRef = (typeof DATA_COLORS)[number];
+export type CategoryColor = 'none' | DataColorRef;
+
+export const CATEGORY_COLORS = ['none', ...DATA_COLORS] as const;
 
 const DATA_COLOR_FALLBACKS: Record<(typeof DATA_COLORS)[number], string> = {
   'chart-1': '--tx-primary',
@@ -51,6 +55,16 @@ export function isColorRef(value: unknown): value is ColorRef {
     ((DATA_COLORS as readonly string[]).includes(value) ||
       (ROLE_COLORS as readonly string[]).includes(value))
   );
+}
+
+/** True only for the data-viz references used by the category color axis. */
+export function isDataColorRef(value: unknown): value is DataColorRef {
+  return typeof value === 'string' && (DATA_COLORS as readonly string[]).includes(value);
+}
+
+/** True only for the explicit category axis, including its appearance-preserving default. */
+export function isCategoryColor(value: unknown): value is CategoryColor {
+  return typeof value === 'string' && (CATEGORY_COLORS as readonly string[]).includes(value);
 }
 
 /** Resolve a color reference to a themed token, with the catalog fallback chain. */

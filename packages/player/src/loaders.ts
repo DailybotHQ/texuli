@@ -96,6 +96,7 @@ export const PLAYER_LOADERS: Readonly<Record<string, PlayerLoader>> = Object.fre
   'data-dashboard': async () => (await import('./painters/DataDashboardPainter.svelte')).default,
   'data-dashboard-widget': async () =>
     (await import('./painters/DataDashboardWidgetPainter.svelte')).default,
+  // data-virtual-list: host code renders rows through a snippet; no painter yet.
   'chat-thread': async () => (await import('@texuli/chat')).ChatThreadDisplay,
   'chat-message': async () => (await import('@texuli/chat')).ChatMessageDisplay,
   'sortable-list': async () => (await import('./painters/SortableListPainter.svelte')).default,

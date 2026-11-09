@@ -30,9 +30,9 @@
 | `as` | enum(div | section | article | aside | header | footer) | no | — | `"div"` | — |
 | `padding` | enum(none | sm | md | lg | xl) | no | — | `"md"` | — |
 | `radius` | enum(none | sm | md | lg | xl | full) | no | — | `"md"` | — |
-| `border` | enum(none | default | strong | block-start | block-end) | no | — | `"none"` | All sides, or one logical side (block-start, block-end) for an app header or footer |
+| `border` | enum(none | default | strong | block-start | block-end | inline-start | inline-end | dashed) | no | — | `"none"` | All sides, one logical side (block-start, block-end, inline-start, inline-end), or dashed |
 | `elevation` | enum(none | sm | md | lg) | no | — | `"none"` | — |
-| `surface` | enum(transparent | default | muted | subtle | elevated | primary | brand | translucent) | no | — | `"transparent"` | The fill (the variant axis): primary is the solid primary with its on-color, brand the soft primary tint, translucent the glass opacity and blur for sticky headers |
+| `surface` | enum(transparent | default | muted | subtle | elevated | canvas | primary | brand | translucent) | no | — | `"transparent"` | The fill (the variant axis): primary is the solid primary with its on-color, brand the soft primary tint, translucent the glass opacity and blur for sticky headers |
 | `class` | string | no | — | — | — |
 | `children` | slot | no | — | — | The panel content |
 
@@ -80,6 +80,17 @@
 }
 ```
 
+#### Page canvas (`page-canvas`)
+
+```json
+{
+  "as": "div",
+  "padding": "lg",
+  "radius": "none",
+  "surface": "canvas"
+}
+```
+
 #### Translucent sticky header (`sticky-header`)
 
 ```json
@@ -89,6 +100,16 @@
   "radius": "none",
   "border": "block-end",
   "surface": "translucent"
+}
+```
+
+#### Dashed panel (`dashed`)
+
+```json
+{
+  "padding": "md",
+  "border": "dashed",
+  "surface": "default"
 }
 ```
 

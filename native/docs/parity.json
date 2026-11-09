@@ -1,9 +1,9 @@
 {
-  "specVersion": "0.13.0",
+  "specVersion": "0.14.0",
   "totals": {
-    "catalog": 194,
+    "catalog": 199,
     "painted": 52,
-    "placeholder": 142,
+    "placeholder": 147,
     "agentEmittable": 75,
     "agentEmittablePainted": 52,
     "semanticRules": 49,
@@ -38,12 +38,12 @@
     },
     {
       "group": "data",
-      "total": 12,
+      "total": 13,
       "painted": 12
     },
     {
       "group": "display",
-      "total": 32,
+      "total": 36,
       "painted": 0
     },
     {
@@ -883,6 +883,18 @@
       "parityTrace": false
     },
     {
+      "id": "color-swatch",
+      "group": "display",
+      "capability": "unknown",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
       "id": "combobox",
       "group": "forms",
       "capability": "web-only",
@@ -1145,6 +1157,18 @@
       "semanticRule": true,
       "golden": false,
       "parityTrace": true
+    },
+    {
+      "id": "data-virtual-list",
+      "group": "data",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "deck-slide",
@@ -1831,7 +1855,43 @@
       "parityTrace": false
     },
     {
+      "id": "link",
+      "group": "display",
+      "capability": "unknown",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
+      "id": "list",
+      "group": "display",
+      "capability": "unknown",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
       "id": "list-item",
+      "group": "display",
+      "capability": "unknown",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
+      "id": "mark",
       "group": "display",
       "capability": "unknown",
       "agentEmittable": false,

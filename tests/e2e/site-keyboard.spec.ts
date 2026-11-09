@@ -67,12 +67,14 @@ async function walkTabStops(
 }
 
 /** One page per class from the T-88 walk (walks/keyboard.md). */
+// Limits sit well above each page's real stop count (0.15.0 measured 298-396 for the long
+// classes: the button page grew with tone examples); a trap never ends, so it still trips.
 const PAGE_CLASSES: ReadonlyArray<{ path: string; limit: number }> = [
   { path: '/', limit: 200 },
-  { path: '/guides/getting-started/', limit: 400 },
-  { path: '/component-pages/button/', limit: 400 },
-  { path: '/theme-studio/', limit: 400 },
-  { path: '/__missing__/', limit: 400 },
+  { path: '/guides/getting-started/', limit: 600 },
+  { path: '/component-pages/button/', limit: 600 },
+  { path: '/theme-studio/', limit: 600 },
+  { path: '/__missing__/', limit: 600 },
 ];
 
 test('every page class: the skip link reaches main, Tab walks to the end without a drop, Shift+Tab retraces', async ({

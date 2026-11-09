@@ -8,7 +8,7 @@
  * Locked design systems (ADR-032): with a `catalog`, the `allow` section and
  * `library[].composes` are checked against it (`checkDesignSystemAllow`:
  * `unknown-component`, `unknown-variant`, `unknown-size`, `unknown-tone`,
- * `unknown-density`, `unknown-state`). Every check reports `locked`: the
+ * `unknown-density`, `unknown-color`, `unknown-state`). Every check reports `locked`: the
  * allowed set, the approval status and whether each recorded content hash
  * still matches; with `hashes`, a stored hash that does not match is refused
  * (`content-hash-mismatch`, `library-hash-mismatch`). The check cannot prove

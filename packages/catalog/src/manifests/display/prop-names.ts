@@ -13,11 +13,12 @@ export const cardPropNames = [
   'class',
 ] as const;
 
-export const badgePropNames = ['variant', 'label', 'class', 'children'] as const;
+export const badgePropNames = ['variant', 'color', 'label', 'class', 'children'] as const;
 
 export const tagPropNames = [
   'label',
   'variant',
+  'color',
   'removeLabel',
   'onRemove',
   'disabled',
@@ -170,6 +171,8 @@ export const textPropNames = [
   'tabular',
   'transform',
   'tracking',
+  'italic',
+  'strikethrough',
   'for',
   'label',
   'class',
@@ -191,6 +194,21 @@ export const boxPropNames = [
   'class',
   'children',
 ] as const;
+
+/** `texuli/typography`: an inline sentence link. */
+export const linkPropNames = [
+  'href',
+  'hrefTrust',
+  'external',
+  'target',
+  'rel',
+  'label',
+  'class',
+  'children',
+] as const;
+
+/** `texuli/typography`: a closed token or data-viz color chip. */
+export const colorSwatchPropNames = ['color', 'size', 'label', 'class', 'children'] as const;
 
 /** `texuli/tabs-accordion`: a tab list with panels. */
 export const tabsPropNames = [
@@ -231,6 +249,7 @@ export const avatarPropNames = [
   'sizes',
   'size',
   'tone',
+  'color',
   'shape',
   'status',
   'decorative',
@@ -270,6 +289,8 @@ export const carouselPropNames = [
 
 export const separatorPropNames = ['orientation', 'decorative', 'variant', 'class'] as const;
 
+export const listPropNames = ['divided', 'class', 'children'] as const;
+
 export const listItemPropNames = [
   'title',
   'description',
@@ -279,5 +300,8 @@ export const listItemPropNames = [
   'hrefTrust',
   'current',
   'disabled',
+  'divided',
   'class',
 ] as const;
+
+export const markPropNames = ['tone', 'label', 'class', 'children'] as const;

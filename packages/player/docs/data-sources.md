@@ -68,7 +68,9 @@ load lazily, only when one of these props is set.
 The catalog's `sourceable` list (spec 0.8.0): `data-grid.rows`,
 `data-board.items`, `data-tree-view.items`, `data-calendar.events`,
 `data-files.entries`, `data-timeline.tasks`,
-`data-notification-inbox.items` and, from spec 0.8.0 (new in 0.8.0),
+`data-notification-inbox.items`, `data-virtual-list.items` (id, label,
+description; at most 500; the player has no painter yet, so a bound list
+does not paint) and, from spec 0.8.0 (new in 0.8.0),
 `data-dashboard.layout` (a host source that persists a dashboard's layout:
 one record per widget, `id` the `widgetId`, with `x`, `y`, `w`, `h`, the
 `min`/`max` sizes and `locked` in grid units, at most 200). A `$source` binding anywhere else (another

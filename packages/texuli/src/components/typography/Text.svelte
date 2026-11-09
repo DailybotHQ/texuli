@@ -50,6 +50,10 @@ type Props = HTMLAttributes<HTMLElement> & {
   transform?: TextTransform;
   /** Letter spacing: `normal` (default) or `wide` (the `--tx-letter-spacing-wide` token). */
   tracking?: TextTracking;
+  /** Italic. */
+  italic?: boolean;
+  /** Strikethrough (`text-decoration-line: line-through`). */
+  strikethrough?: boolean;
   /** With `as="label"`: the id of the control it labels. */
   for?: string;
   /** Plain text, rendered as escaped text; replaces `children` when non-empty. */
@@ -71,6 +75,8 @@ let {
   tabular = false,
   transform: transformProp = 'none',
   tracking: trackingProp = 'normal',
+  italic = false,
+  strikethrough = false,
   for: htmlFor,
   label,
   class: className,
@@ -104,6 +110,8 @@ const hasLabel = $derived(typeof label === 'string' && label.length > 0);
     tabular && 'tx-text--tabular',
     truncate && !lines && 'tx-type--truncate',
     lines && 'tx-type--clamp',
+    italic && 'tx-text--italic',
+    strikethrough && 'tx-text--strike',
     className
   )}
   style:--tx-text-line-clamp={lines}

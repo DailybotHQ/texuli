@@ -35,7 +35,7 @@ const catalog: DesignSystemAllowCatalog = {
     },
     {
       id: 'badge',
-      axes: { tone: { values: ['success', 'warning'] } },
+      axes: { tone: { values: ['success', 'warning'] }, color: { values: ['none', 'chart-1'] } },
     },
     {
       id: 'data-grid',
@@ -111,7 +111,7 @@ describe('checkDesignSystemAllow', () => {
         withDoc({
           allow: {
             button: { variants: ['default'], sizes: ['sm'], states: ['hover'] },
-            badge: { tones: ['success'] },
+            badge: { tones: ['success'], colors: ['none'] },
             'data-grid': { densities: ['compact'] },
             card: {},
           },
@@ -147,6 +147,9 @@ describe('checkDesignSystemAllow', () => {
         )
       )
     ).toEqual([['unknown-density', '$.allow["data-grid"].densities[0]']]);
+    expect(
+      codes(checkDesignSystemAllow(withDoc({ allow: { badge: { colors: ['rainbow'] } } }), catalog))
+    ).toEqual([['unknown-color', '$.allow.badge.colors[0]']]);
     expect(
       codes(
         checkDesignSystemAllow(withDoc({ allow: { button: { states: ['loading'] } } }), catalog)

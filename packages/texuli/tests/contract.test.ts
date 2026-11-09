@@ -11,6 +11,8 @@ import {
   exportedComponents,
 } from '../../primitives/tests/support/contract.ts';
 import { createContractRefs } from '../../primitives/tests/support/contract-refs.svelte.ts';
+import List from '../src/components/list-item/List.svelte';
+import Mark from '../src/components/typography/Mark.svelte';
 import { CASES, EXCLUDED, EXCLUDED_PREFIXES } from './contract/cases.ts';
 import FieldRuleContract from './contract/FieldRuleContract.svelte';
 
@@ -22,9 +24,28 @@ import FieldRuleContract from './contract/FieldRuleContract.svelte';
 const components = import.meta.glob<{ default: unknown }>('../src/**/*.svelte', { eager: true });
 const entryModules = import.meta.glob<Record<string, unknown>>('../src/**/*.ts', { eager: true });
 
+/** Glob keys are `../src/…` here; a cached transform may use an absolute `/src/` path. */
+function sourceKey(path: string): string {
+  return path
+    .replace(/\\/g, '/')
+    .replace(/^.*\/src\//, '')
+    .replace(/\.svelte$/, '');
+}
+
 const sources = new Map<unknown, string>();
 for (const [path, module] of Object.entries(components)) {
-  sources.set(module.default, path.replace('../src/', '').replace(/\.svelte$/, ''));
+  if (module.default == null) continue;
+  sources.set(module.default, sourceKey(path));
+}
+// New files can miss a stale `import.meta.glob` of this importer (the glob lives in
+// this file, which did not change when List.svelte and Mark.svelte landed). Register
+// them by identity with the barrel re-exports `exportedComponents` walks.
+sources.set(List, 'components/list-item/List');
+sources.set(Mark, 'components/typography/Mark');
+
+function entryModule(file: string): Record<string, unknown> | undefined {
+  const local = file.replace('./src/', '../src/');
+  return entryModules[local] ?? entryModules[file];
 }
 
 /** The modules behind package.json `exports` (TypeScript entries and direct `.svelte` ones). */
@@ -38,7 +59,7 @@ function exportEntries(): Record<string, unknown>[] {
     const local = file.replace('./src/', '../src/');
     if (file.endsWith('.svelte')) entries.push({ default: components[local]?.default });
     else if (file.endsWith('.ts')) {
-      const module = entryModules[local];
+      const module = entryModule(file);
       if (!module) throw new Error(`export ${file} did not load`);
       entries.push(module);
     }
@@ -55,6 +76,10 @@ const prefixed = (key: string) =>
 describe('component API contract', () => {
   it('covers every exported component (a case or a documented exclusion)', () => {
     expect(exported.size).toBeGreaterThan(150);
+    expect(exported.has('components/list-item/List')).toBe(true);
+    expect(exported.has('components/typography/Mark')).toBe(true);
+    expect(byKey.has('components/list-item/List')).toBe(true);
+    expect(byKey.has('components/typography/Mark')).toBe(true);
     const missing = [...exported.keys()].filter(
       (key) => !byKey.has(key) && !(key in EXCLUDED) && !prefixed(key)
     );

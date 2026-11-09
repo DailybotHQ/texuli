@@ -164,6 +164,7 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
         'BoxRadius',
         'BoxSurface',
         'BOX_FILLS',
+        'BOX_SURFACES',
         'ColorRef',
       ],
     },
@@ -365,6 +366,12 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
   code: [
     { module: 'texuli', exports: ['Code'] },
     { module: 'texuli/kbd-code', exports: ['Code'] },
+  ],
+  'color-swatch': [
+    {
+      module: 'texuli/typography',
+      exports: ['COLOR_SWATCH_SIZES', 'ColorSwatch', 'ColorSwatchSize'],
+    },
   ],
   'code-field': [
     {
@@ -727,6 +734,10 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: '@texuli/data', exports: ['TreeDataView'] },
     { module: '@texuli/data/tree-view', exports: ['TreeDataView'] },
   ],
+  'data-virtual-list': [
+    { module: '@texuli/data', exports: ['VirtualListView'] },
+    { module: '@texuli/data/virtual-list', exports: ['VirtualListView'] },
+  ],
   description: [
     { module: 'texuli', exports: ['Description'] },
     { module: 'texuli/field', exports: ['Description'] },
@@ -1012,7 +1023,22 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli/layouts/auth-settings', exports: ['WizardLayout'] },
     { module: 'texuli/stepper', exports: ['Wizard'] },
   ],
-  'list-item': [{ module: 'texuli/list-item', exports: ['ListItem'] }],
+  link: [{ module: 'texuli/typography', exports: ['Link'] }],
+  list: [
+    { module: 'texuli', exports: ['List'] },
+    { module: 'texuli/list-item', exports: ['List'] },
+  ],
+  'list-item': [
+    { module: 'texuli', exports: ['ListItem'] },
+    { module: 'texuli/list-item', exports: ['ListItem'] },
+  ],
+  mark: [
+    { module: 'texuli', exports: ['Mark', 'MarkTone'] },
+    {
+      module: 'texuli/typography',
+      exports: ['MARK_TONES', 'Mark', 'MarkTone', 'markClass'],
+    },
+  ],
   'media-composition-canvas': [
     { module: '@texuli/media', exports: ['CompositionCanvas'] },
     {
@@ -4077,9 +4103,13 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'VirtualListDirection',
       'VirtualListItem',
       'VirtualListKey',
+      'VirtualListKeyValue',
       'VirtualListNavigationOptions',
       'VirtualListOptions',
       'VirtualListOrientation',
+      'VirtualListRowContext',
+      'VirtualListViewDensity',
+      'VirtualListViewSize',
       'VirtualListWindow',
       'ZOOMS',
       'applyFilter',
@@ -4833,10 +4863,22 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'VirtualListNavigationOptions',
       'VirtualListOptions',
       'VirtualListOrientation',
+      'VIRTUAL_LIST_DENSITIES',
+      'VIRTUAL_LIST_SIZES',
+      'VirtualListKeyValue',
+      'VirtualListRowContext',
+      'VirtualListViewDensity',
+      'VirtualListViewSize',
       'VirtualListWindow',
       'createInfiniteLoader',
       'createVirtualList',
       'nextVirtualListIndex',
+      'normalizeVirtualListDensity',
+      'normalizeVirtualListSize',
+      'viewportFallback',
+      'virtualListDescriptionOf',
+      'virtualListKeyOf',
+      'virtualListLabelOf',
     ],
   },
   {
@@ -5573,6 +5615,7 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'LAYOUTS',
       'LAYOUT_IDS',
       'LAYOUT_REGISTRY',
+      'LAYOUT_WIDTH_UTILITIES',
       'LayoutComponent',
       'LayoutEntry',
       'LayoutId',

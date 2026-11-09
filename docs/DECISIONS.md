@@ -2214,7 +2214,7 @@ reflect this decision.
   3. **New optional document sections** `allow`, `library` and `approval`, validated structurally by
      `validateDesignSystem` and checked against the catalog by a separate pure function.
 - **Decision:** option 3.
-  - `allow`: per catalog id, the enabled `variants`, `sizes`, `tones`, `densities` and `states`
+  - `allow`: per catalog id, the enabled `variants`, `sizes`, `tones`, `densities`, `colors` and `states`
     (arrays; an omitted list allows every value; an empty list allows none). A component not listed
     is not allowed once `allow` exists. Arrays replace on `extends`, patches and variants (a child
     narrows explicitly); `allow` and `library` inherit through `extends` like other sections.
@@ -2238,13 +2238,14 @@ reflect this decision.
     `contentHash`, catalog spec version). A disallowed variant is **flagged by checkers and never
     removed at runtime**; component code is the same under every design system; 0.12.0 documents
     compile to the same CSS.
-  - Catalog: each component gains optional `axes` (`variant`, `size`, `tone`, `density`, each
+  - Catalog: each component gains optional `axes` (`variant`, `size`, `tone`, `density`, `color`, each
     `{ prop, values, default }` derived from its enum prop) and `states` (a closed list:
     hover, focus-visible, active, disabled, loading, invalid, selected, expanded, checked, open,
     readonly), authored in the catalog manifests (`packages/catalog/src/manifests/**`) and projected
     into `packages/spec/catalog/components.json`. A test fails when an axis drifts from its prop.
   - Root attributes: every catalog component root carries `data-tx-component="<catalog id>"` and,
-    where it has the axis, `data-tx-variant`, `data-tx-size`, `data-tx-tone`, `data-tx-density`
+    where it has the axis, `data-tx-variant`, `data-tx-size`, `data-tx-tone`, `data-tx-density`,
+    `data-tx-color` (the category palette; `none` keeps the existing appearance and is omitted)
     (names exported from `@texuli/spec/design-system`). Wrappers forward them; components with no
     own element (`inline-text`, `data-dashboard-widget`) are documented exceptions.
   - Blueprint spec 0.13.0 (additive: stamp-only migration, no `formatVersion` bump); new issue codes

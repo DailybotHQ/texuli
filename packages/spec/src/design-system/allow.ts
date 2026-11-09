@@ -1,6 +1,6 @@
 /**
  * Catalog membership of a design-system `allow` list (ADR-032): unknown
- * component ids, and variant / size / tone / density / state values the
+ * component ids, and variant / size / tone / density / color / state values the
  * component's axes or states do not list. Pure and total over JSON values;
  * the catalog is an argument, never imported, so the bundled validator does
  * not carry it.
@@ -22,6 +22,7 @@ export interface DesignSystemAllowCatalogComponent {
     readonly size?: { readonly values?: readonly string[] };
     readonly tone?: { readonly values?: readonly string[] };
     readonly density?: { readonly values?: readonly string[] };
+    readonly color?: { readonly values?: readonly string[] };
   };
   readonly states?: readonly string[];
 }
@@ -38,6 +39,7 @@ const AXES = [
   ['sizes', 'size', 'unknown-size'],
   ['tones', 'tone', 'unknown-tone'],
   ['densities', 'density', 'unknown-density'],
+  ['colors', 'color', 'unknown-color'],
 ] as const;
 
 const at = (path: string, key: string | number): string =>

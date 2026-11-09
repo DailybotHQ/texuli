@@ -18,7 +18,7 @@
       "code": "invalid-value",
       "severity": "error",
       "area": "structure",
-      "path": "$.allow[\"butto‍n\"]"
+      "path": "$.allow[\"butto\u200dn\"]"
     },
     {
       "code": "invalid-value",
@@ -36,7 +36,7 @@
       "code": "unknown-component",
       "severity": "error",
       "area": "allow",
-      "path": "$.allow[\"butto‍n\"]"
+      "path": "$.allow[\"butto\u200dn\"]"
     },
     {
       "code": "unknown-variant",

@@ -1,6 +1,6 @@
 // @vitest-environment node
 /**
- * Example brands at spec 0.13.0 (T-t1-examples, ADR-032): each has an
+ * Example brands at spec 0.14.0 (T-t1-examples, ADR-032): each has an
  * allowed set, a library entry and draft approval, validates, and compiles
  * an allow manifest.
  */
@@ -39,7 +39,7 @@ async function compile(doc: Doc): Promise<CompiledDesignSystem> {
   return result;
 }
 
-describe('example brands at spec 0.13.0', () => {
+describe('example brands at spec 0.14.0', () => {
   it('are the three fictional brands, one file each', () => {
     const files = readdirSync(dir)
       .filter((file) => file.endsWith('.json'))
@@ -48,7 +48,7 @@ describe('example brands at spec 0.13.0', () => {
   });
 
   it('each validates with an allowed set, a library entry and draft approval', () => {
-    expect(ALLOW_MANIFEST_SPEC_VERSION).toBe('0.13.0');
+    expect(ALLOW_MANIFEST_SPEC_VERSION).toBe('0.14.0');
     for (const id of BRANDS) {
       const doc = load(id);
       expect(doc.id).toBe(id);
@@ -60,7 +60,7 @@ describe('example brands at spec 0.13.0', () => {
     }
   });
 
-  it('each compiles an allow manifest at spec 0.13.0', async () => {
+  it('each compiles an allow manifest at spec 0.14.0', async () => {
     for (const id of BRANDS) {
       const doc = load(id);
       const compiled = await compile(doc);

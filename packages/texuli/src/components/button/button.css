@@ -166,39 +166,69 @@
     );
   }
 
-  .tx-button--default:not([data-tx-tone="default"]),
-  .tx-button--secondary:not([data-tx-tone="default"]) {
+  .tx-button--default:is(
+    [data-tx-tone="destructive"],
+    [data-tx-tone="success"],
+    [data-tx-tone="warning"]
+  ),
+  .tx-button--secondary:is(
+    [data-tx-tone="destructive"],
+    [data-tx-tone="success"],
+    [data-tx-tone="warning"]
+  ) {
     color: var(--tx-button-tone-foreground);
     background-color: var(--tx-button-tone);
     box-shadow: var(--tx-button-elevation, var(--tx-elevation-1));
   }
-  .tx-button--default:not([data-tx-tone="default"]):hover:not(:disabled):not(
-    [aria-disabled="true"]
-  ),
-  .tx-button--secondary:not([data-tx-tone="default"]):hover:not(:disabled):not(
-    [aria-disabled="true"]
-  ) {
+  .tx-button--default:is(
+    [data-tx-tone="destructive"],
+    [data-tx-tone="success"],
+    [data-tx-tone="warning"]
+  ):hover:not(:disabled):not([aria-disabled="true"]),
+  .tx-button--secondary:is(
+    [data-tx-tone="destructive"],
+    [data-tx-tone="success"],
+    [data-tx-tone="warning"]
+  ):hover:not(:disabled):not([aria-disabled="true"]) {
     background-color: var(--tx-button-tone-hover);
     color: var(--tx-button-tone-foreground);
   }
 
-  .tx-button--outline:not([data-tx-tone="default"]) {
+  .tx-button--outline:is(
+    [data-tx-tone="destructive"],
+    [data-tx-tone="success"],
+    [data-tx-tone="warning"]
+  ) {
     border-color: var(--tx-button-tone);
     color: var(--tx-button-tone);
     background-color: var(--tx-surface, Canvas);
   }
-  .tx-button--outline:not([data-tx-tone="default"]):hover:not(:disabled):not(
-    [aria-disabled="true"]
-  ) {
+  .tx-button--outline:is(
+    [data-tx-tone="destructive"],
+    [data-tx-tone="success"],
+    [data-tx-tone="warning"]
+  ):hover:not(:disabled):not([aria-disabled="true"]) {
     background-color: var(--tx-button-tone-soft);
     color: var(--tx-button-tone);
   }
 
-  .tx-button--ghost:not([data-tx-tone="default"]),
-  .tx-button--link:not([data-tx-tone="default"]) {
+  .tx-button--ghost:is(
+    [data-tx-tone="destructive"],
+    [data-tx-tone="success"],
+    [data-tx-tone="warning"]
+  ),
+  .tx-button--link:is(
+    [data-tx-tone="destructive"],
+    [data-tx-tone="success"],
+    [data-tx-tone="warning"]
+  ) {
     color: var(--tx-button-tone);
   }
-  .tx-button--ghost:not([data-tx-tone="default"]):hover:not(:disabled):not([aria-disabled="true"]) {
+  .tx-button--ghost:is(
+    [data-tx-tone="destructive"],
+    [data-tx-tone="success"],
+    [data-tx-tone="warning"]
+  ):hover:not(:disabled):not([aria-disabled="true"]) {
     background-color: var(--tx-button-tone-soft);
     color: var(--tx-button-tone);
   }

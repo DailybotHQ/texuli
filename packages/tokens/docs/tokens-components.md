@@ -223,7 +223,7 @@ Content widths, container breakpoints, grid columns and gutters. CSS cannot read
 
 | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- |
-| `--tx-layout-content-max` | `72ch` | Readable prose width (content layouts). | `var(--tx-layout-content-max)` |
+| `--tx-layout-content-max` | `72ch` | Readable prose width (content layouts). Rem, ch and % layout widths do not multiply --tx-density; gutters still read the space scale. | `var(--tx-layout-content-max)` |
 | `--tx-layout-wide-max` | `80rem` | Wide page sections (marketing layouts). | `var(--tx-layout-wide-max)` |
 | `--tx-layout-full-max` | `100%` | Full-bleed sections. | `var(--tx-layout-full-max)` |
 | `--tx-layout-breakpoint-sm` | `36rem` | Small container breakpoint (2 grid columns). | `var(--tx-layout-breakpoint-sm)` |

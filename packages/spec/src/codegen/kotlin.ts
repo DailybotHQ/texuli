@@ -392,7 +392,7 @@ function propSchemaExpr(schema: SpecPropSchema): string {
 /** A component's styling axes (spec 0.13.0) as a `SpecAxes` constructor call. */
 function axesExpr(axes: NonNullable<SpecCatalog['components'][number]['axes']>): string {
   const args: string[] = [];
-  for (const name of ['variant', 'size', 'tone', 'density'] as const) {
+  for (const name of ['variant', 'size', 'tone', 'density', 'color'] as const) {
     const axis = axes[name];
     if (!axis) continue;
     args.push(

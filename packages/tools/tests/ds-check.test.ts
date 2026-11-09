@@ -252,6 +252,7 @@ describe('texuli ds check (static)', () => {
         'invalid-value',
         'required',
         'target-size',
+        'unknown-color',
         'unknown-component',
         'unknown-density',
         'unknown-key',

@@ -33,6 +33,7 @@
 | `sizes` | string | no | — | — | — |
 | `size` | enum(xs | sm | md | lg) | no | — | `"md"` | — |
 | `tone` | enum(primary | success | warning | destructive | info | neutral) | no | — | — | — |
+| `color` | enum(none | chart-1 | chart-2 | chart-3 | chart-4 | chart-5 | chart-6 | chart-7 | chart-8) | no | — | `"none"` | — |
 | `shape` | enum(circle | square) | no | — | — | — |
 | `status` | enum(online | away | busy | offline) | no | — | — | — |
 | `decorative` | boolean | no | — | `false` | — |
