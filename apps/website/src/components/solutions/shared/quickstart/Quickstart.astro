@@ -1,0 +1,142 @@
+---
+import type { SolutionQuickstartProps } from '../types.ts';
+
+const { entry, title, install, samples, verifiedBy } = Astro.props as SolutionQuickstartProps;
+const blocks = [install, ...samples];
+---
+
+<section class="quickstart" aria-labelledby={`quickstart-${entry.slug}-title`} data-quickstart={entry.slug}>
+  <header class="quickstart__header">
+    <p class="quickstart__eyebrow">Build with {entry.name}</p>
+    <h2 id={`quickstart-${entry.slug}-title`}>{title}</h2>
+  </header>
+  <div class="quickstart__samples">
+    {blocks.map((sample, index) => (
+      <article class="quickstart__sample" data-language={sample.language}>
+        <div class="quickstart__sample-header">
+          <h3>{sample.label}</h3>
+          <button
+            type="button"
+            class="quickstart__copy"
+            data-quickstart-copy={index}
+            aria-label={`Copy ${sample.label}`}
+          >
+            Copy
+          </button>
+        </div>
+        <pre><code class={`language-${sample.language}`}>{sample.code}</code></pre>
+        <p class="quickstart__status" role="status" data-quickstart-status={index}></p>
+      </article>
+    ))}
+  </div>
+  <p class="quickstart__verified">Verified by <code>{verifiedBy}</code></p>
+</section>
+
+<script>
+  import { copyQuickstartSample } from './copy.ts';
+
+  for (const host of document.querySelectorAll<HTMLElement>('[data-quickstart]')) {
+    if (host.dataset.quickstartWired) continue;
+    host.dataset.quickstartWired = 'true';
+
+    for (const button of host.querySelectorAll<HTMLButtonElement>('[data-quickstart-copy]')) {
+      button.addEventListener('click', () => {
+        const index = button.dataset.quickstartCopy;
+        const code = host.querySelector<HTMLElement>(`[data-quickstart-copy="${index}"]`)
+          ?.closest('.quickstart__sample')
+          ?.querySelector('code')?.textContent ?? '';
+        const status = host.querySelector<HTMLElement>(`[data-quickstart-status="${index}"]`);
+        void copyQuickstartSample(code, (text) => navigator.clipboard.writeText(text), (message) => {
+          if (status) status.textContent = message;
+        });
+      });
+    }
+  }
+</script>
+
+<style>
+  .quickstart {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .quickstart__header,
+  .quickstart__sample-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .quickstart__eyebrow {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: 0.8rem;
+    font-weight: 650;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .quickstart h2,
+  .quickstart h3 {
+    margin: 0;
+  }
+  .quickstart h2 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+  }
+  .quickstart__samples {
+    display: grid;
+    gap: 1rem;
+  }
+  .quickstart__sample {
+    min-inline-size: 0;
+    overflow: hidden;
+    border: 1px solid var(--tx-border);
+    border-radius: 0.75rem;
+    background: var(--tx-background);
+  }
+  .quickstart__sample-header {
+    padding: 0.75rem 1rem;
+    border-block-end: 1px solid var(--tx-border);
+  }
+  .quickstart h3 {
+    font-size: 0.95rem;
+  }
+  .quickstart__copy {
+    min-block-size: 2.25rem;
+    padding-inline: 0.75rem;
+    border: 1px solid var(--tx-border);
+    border-radius: 0.45rem;
+    background: var(--tx-background);
+    color: var(--tx-foreground);
+    font: inherit;
+    cursor: pointer;
+  }
+  .quickstart__copy:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .quickstart pre {
+    overflow: auto;
+    margin: 0;
+    padding: 1rem;
+    color: var(--tx-foreground);
+    font: 0.875rem/1.6 var(--tx-font-mono, ui-monospace, monospace);
+    tab-size: 2;
+  }
+  .quickstart__status,
+  .quickstart__verified {
+    margin: 0;
+    padding: 0 1rem 0.75rem;
+    color: var(--tx-muted-foreground);
+    font-size: 0.8rem;
+    overflow-wrap: anywhere;
+  }
+  .quickstart__verified {
+    padding: 0;
+  }
+  @media (forced-colors: active) {
+    .quickstart__sample,
+    .quickstart__sample-header,
+    .quickstart__copy {
+      border-color: CanvasText;
+    }
+  }
+</style>
