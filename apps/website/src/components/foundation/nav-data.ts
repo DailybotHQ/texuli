@@ -85,31 +85,24 @@ export function solutionNavLinks(): NavLink[] {
   return links;
 }
 
-function builtWithNavLinks(): NavLink[] {
-  const links: NavLink[] = [];
-  if (siteRouteExists('/built-with/')) {
-    links.push({ href: '/built-with/', label: 'Built with Texuli' });
-  }
-  if (siteRouteExists('/built-with/protoyard/')) {
-    links.push({ href: '/built-with/protoyard/', label: 'Protoyard' });
-  }
-  return links;
-}
-
 export interface ResolvedNavGroup {
   id: string;
   label: string;
   links: readonly NavLink[];
 }
 
-/** Groups ADR-031 adds to the docs sidebar (after Platform) once their pages exist. */
+/**
+ * The group ADR-031 adds to the docs sidebar (after Platform) once its pages exist: the
+ * Solutions catalog and Built with Texuli. Kept to two links because the sidebar renders on
+ * every docs page and several sit at their HTML budget; the header and footer link each
+ * landing.
+ */
 export function ecosystemNavGroups(): ResolvedNavGroup[] {
-  const groups: ResolvedNavGroup[] = [];
-  const solutions = solutionNavLinks();
-  if (solutions.length > 0) groups.push({ id: 'solutions', label: 'Solutions', links: solutions });
-  const built = builtWithNavLinks();
-  if (built.length > 0) groups.push({ id: 'built-with', label: 'Built with Texuli', links: built });
-  return groups;
+  const links: NavLink[] = [];
+  if (siteRouteExists('/solutions/')) links.push({ href: '/solutions/', label: 'All Solutions' });
+  if (siteRouteExists('/built-with/'))
+    links.push({ href: '/built-with/', label: 'Built with Texuli' });
+  return links.length > 0 ? [{ id: 'solutions', label: 'Solutions', links }] : [];
 }
 
 const byLabel = (a: NavLink, b: NavLink) => a.label.localeCompare(b.label, 'en');

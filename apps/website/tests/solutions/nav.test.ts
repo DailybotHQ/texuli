@@ -57,11 +57,11 @@ describe('ADR-031 landing nav contract', () => {
       const href = `/solutions/${slug}/`;
       expect(links.some((link) => link.href === href)).toBe(siteRouteExists(href));
     }
-    expect(ecosystemNavGroups().some((group) => group.id === 'solutions')).toBe(
-      solutionNavLinks().length > 0
-    );
-    expect(ecosystemNavGroups().some((group) => group.id === 'built-with')).toBe(
-      siteRouteExists('/built-with/') || siteRouteExists('/built-with/protoyard/')
+    // The sidebar keeps one compact group: the catalog and Built with Texuli (budget note in nav-data.ts).
+    const sidebar = ecosystemNavGroups();
+    expect(sidebar.map((group) => group.id)).toEqual(['solutions']);
+    expect(sidebar[0]?.links.map((link) => link.href)).toEqual(
+      ['/solutions/', '/built-with/'].filter((href) => siteRouteExists(href))
     );
   });
 });

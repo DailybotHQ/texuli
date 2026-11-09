@@ -751,7 +751,6 @@ describe('site navigation model', () => {
       'Get started',
       'Platform',
       'Solutions',
-      'Built with Texuli',
       'Components',
       'Primitives',
       'Themes',
