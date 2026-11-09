@@ -1,0 +1,136 @@
+---
+/**
+ * The shell of every `/solutions/<slug>/` landing (PLAN_015 T-f-layout; ADR-027, ADR-030,
+ * ADR-031). It sits on `BaseLayout` in landing mode (the landing header, a full-width main,
+ * no sidebar) and draws, in the order documented in `./types.ts`:
+ *
+ *   breadcrumbs → hero → sticky subnav → demo → stories → how → quickstart → recipes
+ *   (optional) → agents → platforms → next steps
+ *
+ * Each block arrives through the named slot of its section, so the blocks keep their own
+ * headings and props while the layout owns the anchor ids, the subnav, the breadcrumb
+ * trail and the band rhythm. `checkLandingContent` runs at build time: inconsistent content
+ * fails the build instead of shipping.
+ *
+ * Islands and CSP (ADR-030): the layout ships no script. The `demo` slot is the landing's
+ * only island slot: the page passes its demo frame, which mounts one `client:visible`
+ * island. The build-time CSP integration (`src/components/security/csp.ts`) hashes Astro's
+ * island boot code and the island's injected Svelte styles per route, so nothing here needs
+ * `unsafe-inline`. Every other slot must be static markup.
+ */
+import type { SolutionEntry } from '../../../data/solutions/schema.ts';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SolutionBreadcrumbs from './subnav/SolutionBreadcrumbs.astro';
+import SolutionSubnav from './subnav/SolutionSubnav.astro';
+import { SOLUTION_SECTION_IDS, solutionSections, solutionSectionTones } from './subnav/sections.ts';
+import { checkLandingContent, type SolutionLandingContent } from './types.ts';
+
+interface Props {
+  entry: SolutionEntry;
+  content: SolutionLandingContent;
+  /** Defaults to "<name> — Texuli Solutions". */
+  title?: string;
+  /** Defaults to the entry's tagline. */
+  description?: string;
+  /** Structured data (schema.org), code-authored: see src/lib/schema.ts. */
+  jsonLd?: Record<string, unknown>;
+}
+
+const { entry, content, title, description, jsonLd } = Astro.props;
+const issues = checkLandingContent(entry, content);
+if (issues.length > 0) {
+  throw new Error(`Solution landing "${entry.slug}" is inconsistent: ${issues.join('; ')}`);
+}
+const sections = solutionSections(content);
+const tones = solutionSectionTones(sections);
+const ids = SOLUTION_SECTION_IDS;
+---
+
+<BaseLayout
+  title={title ?? `${entry.name} — Texuli Solutions`}
+  description={description ?? entry.tagline}
+  landing
+  jsonLd={jsonLd}
+>
+  <div
+    class="landing solution"
+    data-tx-landing=""
+    data-solution={entry.slug}
+    data-solution-status={entry.status}
+  >
+    <SolutionBreadcrumbs entry={entry} />
+    <div id={ids.hero} class="solution-section solution-section--hero" data-solution-section="hero">
+      <slot name="hero" />
+    </div>
+    <SolutionSubnav entry={entry} content={content} />
+    <div
+      id={ids.demo}
+      class="solution-section"
+      data-solution-section="demo"
+      data-tone={tones.demo}
+      data-solution-island=""
+    >
+      <slot name="demo" />
+    </div>
+    <div id={ids.stories} class="solution-section" data-solution-section="stories" data-tone={tones.stories}>
+      <slot name="stories" />
+    </div>
+    <div id={ids.how} class="solution-section" data-solution-section="how" data-tone={tones.how}>
+      <slot name="how" />
+    </div>
+    <div
+      id={ids.quickstart}
+      class="solution-section"
+      data-solution-section="quickstart"
+      data-tone={tones.quickstart}
+    >
+      <slot name="quickstart" />
+    </div>
+    {
+      content.recipes && (
+        <div id={ids.recipes} class="solution-section" data-solution-section="recipes" data-tone={tones.recipes}>
+          <slot name="recipes" />
+        </div>
+      )
+    }
+    <div id={ids.agents} class="solution-section" data-solution-section="agents" data-tone={tones.agents}>
+      <slot name="agents" />
+    </div>
+    <div
+      id={ids.platforms}
+      class="solution-section"
+      data-solution-section="platforms"
+      data-tone={tones.platforms}
+    >
+      <slot name="platforms" />
+    </div>
+    <div id={ids.next} class="solution-section" data-solution-section="next" data-tone={tones.next}>
+      <slot name="next" />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .solution {
+    --solution-subnav-height: 3rem;
+    --solution-band-raised: color-mix(in oklab, var(--tx-muted) 45%, var(--tx-background));
+  }
+  .solution-section {
+    /* Anchors land below the sticky header and the sticky subnav. */
+    scroll-margin-block-start: calc(var(--site-header-height) + var(--solution-subnav-height) + 0.75rem);
+    padding-block: clamp(2.5rem, 7vw, 5rem);
+  }
+  .solution-section--hero {
+    padding-block: clamp(1rem, 3vw, 2rem) clamp(2rem, 5vw, 3.5rem);
+  }
+  .solution-section[data-tone='raised'] {
+    background: var(--solution-band-raised);
+    border-block: 1px solid color-mix(in oklab, var(--tx-border) 55%, transparent);
+  }
+  @media (forced-colors: active) {
+    .solution-section[data-tone='raised'] {
+      background: Canvas;
+      border-block-color: CanvasText;
+    }
+  }
+</style>
