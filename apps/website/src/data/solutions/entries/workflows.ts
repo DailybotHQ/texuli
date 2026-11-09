@@ -64,7 +64,7 @@ export const workflows: SolutionEntry = {
   ],
   links: [
     { label: 'Read the docs', href: '/guides/solutions/workflows/' },
-    { label: 'Current demo page', href: '/workflows-page/' },
+    { label: 'JSON blueprint preview', href: '/workflows-page/json/' },
     { label: '@texuli/workflows on npm', href: 'https://www.npmjs.com/package/@texuli/workflows' },
   ],
 };
