@@ -132,6 +132,41 @@ CLI `--strict` applies to known findings in that render check. Exit codes:
 code, severity, exemption and input-limit reference is
 `packages/tools/docs/ds-check.md` in the Texuli repository.
 
+## Lock, review and hand over (locked design systems, in development)
+
+A locked design system also lists what a brand allows (ADR-032). The whole
+path, end to end, is the guide's "Create a locked design system, end to end"
+section in `docs/DESIGN_SYSTEMS.md`. Your part as an agent:
+
+1. **The allowed set.** Call `ds.allow` with `{ "preset": "minimal" }` (or
+   `"all"`, or `{ "components": ["button", "card", …] }`). It returns every
+   variant, size, tone, density and state the catalog declares; narrow the
+   lists to the brief and put the result under `allow`. A component not
+   listed is not allowed; an omitted list allows every value; an empty list
+   allows none. Host library components join as checked catalog
+   `extensions` (`<ns>:<id>`) on `ds.validate`.
+2. **The library.** Each `library` entry names its id, purpose, version,
+   `status: "draft"` and the allowed catalog ids it `composes`.
+3. **Validate** with `ds.validate` `{ "document": …, "full": true }` until
+   `valid` is true.
+4. **Review.** Tell the developer to look at it whole: `texuli/ds-kit` in
+   their app, or the example at `https://texuli.com/design-systems/kit/`.
+5. **Never approve.** Leave `approval` out (or `status: "draft"`);
+   `ds.save` refuses an approved document (`approval-human-only`). Hand the
+   next step to a person: review the file, run
+   `texuli ds approve <file> --by <name> --version <x.y.z>` and commit it
+   for the CODEOWNERS review. The CLI cannot prove who approved; the
+   reviewed commit is the guarantee. Never say a document is approved
+   because a file says so.
+6. **Hand over.** `ds.bundle` `{ "document": …, "librarySources": […],
+   "history": […] }` packs a portable bundle (`{ "bundle": … }` unpacks
+   one); the CLI is `texuli ds pack <file> --out <bundle.json>`. Consumers
+   pin the exact version and check their prototypes with
+   `texuli ds validate <file> --locked --prototype ./src`.
+
+The `create-design-system` prompt takes `locked` (`minimal`, `all` or
+`custom`) and stops at a draft.
+
 ## Apply and export
 
 | Goal | Call |
@@ -158,6 +193,9 @@ texuli ds compile design-systems/example.ds.json --format css --out dist/example
 texuli ds preview design-systems/example.ds.json --out review/example.svg
 texuli ds check design-systems/example.ds.json --json
 texuli ds validate design-systems/example.ds.json --locked --prototype ./src --json
+texuli ds init design-systems/example.locked.ds.json --locked --preset minimal
+texuli ds approve design-systems/example.locked.ds.json --by design-reviewer   # a person, then a reviewed commit
+texuli ds hash design-systems/example.locked.ds.json
 ```
 
 Exit codes: 0 valid, 1 refused, 2 could not run. MCP tools, prompt and
