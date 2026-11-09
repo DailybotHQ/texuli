@@ -32,8 +32,11 @@ Embeddable open-source systems that complete a task end to end.
 - [Slides docs](https://texuli.com/guides/solutions/slides/)
 - [Documents](https://texuli.com/solutions/documents/): Edit, read, paginate and export block documents. Status: in development.
 - [Documents docs](https://texuli.com/guides/solutions/documents/)
+- [Workflows](https://texuli.com/solutions/workflows/): Author and view workflow graphs inside your app. Status: in development.
 - [Workflows docs](https://texuli.com/guides/solutions/workflows/)
+- [Canvas](https://texuli.com/solutions/canvas/): An embeddable whiteboard with shapes, connectors and export. Status: in development.
 - [Canvas docs](https://texuli.com/guides/solutions/canvas/)
+- [Sheets](https://texuli.com/solutions/sheets/): An embeddable spreadsheet with formulas and CSV. Status: in development.
 - [Sheets docs](https://texuli.com/guides/solutions/sheets/)
 
 ## Built with Texuli
