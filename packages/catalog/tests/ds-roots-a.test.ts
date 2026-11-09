@@ -244,7 +244,8 @@ describe('Texuli group A catalog root attributes', () => {
     const example = entry.examples[0];
     const props: Record<string, unknown> = { ...(example?.props ?? {}) };
     const axes = entry.props.filter(
-      (prop) => prop.kind === 'enum' && ['variant', 'size', 'tone', 'density'].includes(prop.name)
+      (prop) =>
+        prop.kind === 'enum' && ['variant', 'size', 'tone', 'density', 'color'].includes(prop.name)
     );
     for (const axis of axes) props[axis.name] = axis.enumValues?.[0] ?? axis.default;
 
@@ -258,9 +259,13 @@ describe('Texuli group A catalog root attributes', () => {
     expect(paintSource).toContain(`data-tx-component="${entry.id}"`);
     const rootSource = source(axisFiles[entry.id as keyof typeof axisFiles]);
     for (const axis of axes) {
-      expect(rootSource, `${entry.id} ${axis.name}`).toContain(
-        `data-tx-${axis.name}={${axis.name}}`
-      );
+      if (axis.name === 'color') {
+        expect(rootSource, `${entry.id} color`).toContain('data-tx-color={categoryColor}');
+      } else {
+        expect(rootSource, `${entry.id} ${axis.name}`).toContain(
+          `data-tx-${axis.name}={${axis.name}}`
+        );
+      }
     }
   });
 });

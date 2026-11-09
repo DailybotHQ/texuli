@@ -6,6 +6,7 @@ export const DS_VARIANT_ATTRIBUTE = 'data-tx-variant';
 export const DS_SIZE_ATTRIBUTE = 'data-tx-size';
 export const DS_TONE_ATTRIBUTE = 'data-tx-tone';
 export const DS_DENSITY_ATTRIBUTE = 'data-tx-density';
+export const DS_COLOR_ATTRIBUTE = 'data-tx-color';
 
 const catalogIds = new Set<string>(SPEC_COMPONENT_IDS);
 
@@ -14,6 +15,7 @@ export interface DesignSystemRootAxes {
   readonly size?: string;
   readonly tone?: string;
   readonly density?: string;
+  readonly color?: string;
 }
 
 export interface DesignSystemRootAttributes {
@@ -22,6 +24,7 @@ export interface DesignSystemRootAttributes {
   readonly [DS_SIZE_ATTRIBUTE]?: string;
   readonly [DS_TONE_ATTRIBUTE]?: string;
   readonly [DS_DENSITY_ATTRIBUTE]?: string;
+  readonly [DS_COLOR_ATTRIBUTE]?: string;
 }
 
 /**
@@ -44,5 +47,8 @@ export function dsRootAttributes(
     ...(axes?.size === undefined ? {} : { [DS_SIZE_ATTRIBUTE]: axes.size }),
     ...(axes?.tone === undefined ? {} : { [DS_TONE_ATTRIBUTE]: axes.tone }),
     ...(axes?.density === undefined ? {} : { [DS_DENSITY_ATTRIBUTE]: axes.density }),
+    ...(axes?.color === undefined || axes.color === 'none'
+      ? {}
+      : { [DS_COLOR_ATTRIBUTE]: axes.color }),
   };
 }

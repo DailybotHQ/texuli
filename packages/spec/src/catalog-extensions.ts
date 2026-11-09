@@ -345,7 +345,7 @@ export function mergeCatalogs(texuli: SpecCatalog, extensions: readonly unknown[
           isRecord(entry.axes) &&
           Object.entries(entry.axes).every(
             ([axis, value]) =>
-              ['variant', 'size', 'tone', 'density'].includes(axis) &&
+              ['variant', 'size', 'tone', 'density', 'color'].includes(axis) &&
               isRecord(value) &&
               typeof value.prop === 'string' &&
               Array.isArray(value.values) &&

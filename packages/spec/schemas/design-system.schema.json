@@ -39,8 +39,18 @@
     },
     "allowEntry": {
       "additionalProperties": false,
-      "description": "The enabled values of one catalog component: variants, sizes, tones, densities and states. An omitted list allows every value the catalog lists; an empty list allows none. Values are checked against the catalog by checkDesignSystemAllow.",
+      "description": "The enabled values of one catalog component: variants, sizes, tones, densities, colors and states. An omitted list allows every value the catalog lists; an empty list allows none. Values are checked against the catalog by checkDesignSystemAllow.",
       "properties": {
+        "colors": {
+          "description": "Unique items.",
+          "items": {
+            "maxLength": 48,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,47}$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "type": "array"
+        },
         "densities": {
           "description": "Unique items.",
           "items": {
@@ -2926,6 +2936,7 @@
         "unknown-size",
         "unknown-tone",
         "unknown-density",
+        "unknown-color",
         "unknown-state",
         "aa-text",
         "aa-focus",

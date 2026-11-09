@@ -35,6 +35,7 @@ export const PRESET_AXES = {
   size: 'sizes',
   tone: 'tones',
   density: 'densities',
+  color: 'colors',
 } as const;
 export type PresetAxis = keyof typeof PRESET_AXES;
 

@@ -8,6 +8,7 @@ const manifest = {
       sizes: ['md'],
       tones: ['neutral'],
       densities: ['comfortable'],
+      colors: ['none'],
       states: ['disabled'],
     },
   },
@@ -81,6 +82,13 @@ describe('checkBlueprintAllow', () => {
     expect(result.errors.map(({ code, path }) => [code, path])).toEqual([
       ['unknown-variant', '$.props.variant'],
       ['unknown-state', '$.props.loading'],
+    ]);
+  });
+
+  it('refuses a category color omitted from the allow list', () => {
+    const result = checkBlueprintAllow({ id: 'card', props: { color: 'chart-1' } }, manifest);
+    expect(result.errors.map(({ code, path }) => [code, path])).toEqual([
+      ['unknown-color', '$.props.color'],
     ]);
   });
 

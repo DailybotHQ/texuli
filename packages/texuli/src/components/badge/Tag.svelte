@@ -3,12 +3,20 @@ import type { HTMLAttributes } from 'svelte/elements';
 import { useMessages } from '../../i18n/use-messages.ts';
 import { type BadgeVariant, tagClass } from './variants.ts';
 import './badge.css';
+import {
+  type CategoryColor,
+  colorRefInk,
+  colorRefVar,
+  isCategoryColor,
+} from '../../internal/color-ref.ts';
 import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = HTMLAttributes<HTMLSpanElement> & {
   /** Visible label (required word; never color alone). */
   label: string;
   variant?: BadgeVariant;
+  /** Closed data-viz category color; `none` preserves the variant appearance. */
+  color?: CategoryColor;
   /**
    * Accessible name of the remove button, which always names the tag.
    * A string is a template: `{label}` is replaced by the tag's label, and a
@@ -30,6 +38,7 @@ let {
   ref = $bindable(null),
   label,
   variant = txDefaults().variant ?? 'secondary',
+  color = 'none',
   removeLabel: removeLabelProp,
   onRemove,
   disabled = false,
@@ -42,6 +51,7 @@ const removeLabel = $derived(removeLabelProp ?? msg('texuli.tag.remove-label', '
 let pending = $state(false);
 
 const removeName = $derived(tagRemoveName(removeLabel, label));
+const categoryColor = $derived(isCategoryColor(color) && color !== 'none' ? color : undefined);
 
 function tagRemoveName(template: string | ((label: string) => string), tag: string): string {
   if (typeof template === 'function') return template(tag);
@@ -67,7 +77,9 @@ async function remove(): Promise<void> {
   data-tx-tag
   data-variant={variant}
   {...rest}
- data-tx-component="tag" data-tx-variant={variant}>
+ data-tx-component="tag" data-tx-variant={variant} data-tx-color={categoryColor}
+ style:--tx-category-fill={categoryColor ? colorRefVar(categoryColor) : undefined}
+ style:--tx-category-ink={categoryColor ? colorRefInk(categoryColor) : undefined}>
   <span class="tx-tag__label">{label}</span>
   {#if onRemove}
     <button

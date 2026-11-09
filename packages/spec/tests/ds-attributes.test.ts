@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  DS_COLOR_ATTRIBUTE,
   DS_COMPONENT_ATTRIBUTE,
   DS_DENSITY_ATTRIBUTE,
   DS_SIZE_ATTRIBUTE,
@@ -16,12 +17,14 @@ describe('@texuli/spec/design-system root attributes', () => {
       DS_SIZE_ATTRIBUTE,
       DS_TONE_ATTRIBUTE,
       DS_DENSITY_ATTRIBUTE,
+      DS_COLOR_ATTRIBUTE,
     ]).toEqual([
       'data-tx-component',
       'data-tx-variant',
       'data-tx-size',
       'data-tx-tone',
       'data-tx-density',
+      'data-tx-color',
     ]);
   });
 
@@ -41,6 +44,7 @@ describe('@texuli/spec/design-system root attributes', () => {
         size: 'lg',
         tone: 'danger',
         density: 'compact',
+        color: 'chart-3',
       })
     ).toEqual({
       'data-tx-component': 'button',
@@ -48,7 +52,12 @@ describe('@texuli/spec/design-system root attributes', () => {
       'data-tx-size': 'lg',
       'data-tx-tone': 'danger',
       'data-tx-density': 'compact',
+      'data-tx-color': 'chart-3',
     });
+  });
+
+  it('omits the category color default', () => {
+    expect(dsRootAttributes('badge', { color: 'none' })).toEqual({ 'data-tx-component': 'badge' });
   });
 
   it.each(['made-up-component', '', '../button'])('refuses a non-catalog id: %s', (id) => {

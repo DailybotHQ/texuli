@@ -1,5 +1,5 @@
 {
-  "catalogHash": "c3a5f1a2ad103d59e7dfa8f3131ebd11d8bf99be366aba18b18aa6010d023557",
+  "catalogHash": "b3637b401e8e995300473f2ff0c41cdaa0cee2dcfcf8e16378a012199371f9bd",
   "components": [
     {
       "axes": {
@@ -429,6 +429,21 @@
     },
     {
       "axes": {
+        "color": {
+          "default": "none",
+          "prop": "color",
+          "values": [
+            "none",
+            "chart-1",
+            "chart-2",
+            "chart-3",
+            "chart-4",
+            "chart-5",
+            "chart-6",
+            "chart-7",
+            "chart-8"
+          ]
+        },
         "size": {
           "default": "md",
           "prop": "size",
@@ -471,6 +486,21 @@
           "extension": "web",
           "kind": "string",
           "name": "class"
+        },
+        {
+          "enumValues": [
+            "none",
+            "chart-1",
+            "chart-2",
+            "chart-3",
+            "chart-4",
+            "chart-5",
+            "chart-6",
+            "chart-7",
+            "chart-8"
+          ],
+          "kind": "enum",
+          "name": "color"
         },
         {
           "kind": "boolean",
@@ -578,6 +608,21 @@
     },
     {
       "axes": {
+        "color": {
+          "default": "none",
+          "prop": "color",
+          "values": [
+            "none",
+            "chart-1",
+            "chart-2",
+            "chart-3",
+            "chart-4",
+            "chart-5",
+            "chart-6",
+            "chart-7",
+            "chart-8"
+          ]
+        },
         "variant": {
           "default": "default",
           "prop": "variant",
@@ -619,6 +664,21 @@
           "extension": "web",
           "kind": "string",
           "name": "class"
+        },
+        {
+          "enumValues": [
+            "none",
+            "chart-1",
+            "chart-2",
+            "chart-3",
+            "chart-4",
+            "chart-5",
+            "chart-6",
+            "chart-7",
+            "chart-8"
+          ],
+          "kind": "enum",
+          "name": "color"
         },
         {
           "kind": "string",
@@ -11892,6 +11952,21 @@
     },
     {
       "axes": {
+        "color": {
+          "default": "none",
+          "prop": "color",
+          "values": [
+            "none",
+            "chart-1",
+            "chart-2",
+            "chart-3",
+            "chart-4",
+            "chart-5",
+            "chart-6",
+            "chart-7",
+            "chart-8"
+          ]
+        },
         "variant": {
           "default": "secondary",
           "prop": "variant",
@@ -11928,6 +12003,21 @@
           "extension": "web",
           "kind": "string",
           "name": "class"
+        },
+        {
+          "enumValues": [
+            "none",
+            "chart-1",
+            "chart-2",
+            "chart-3",
+            "chart-4",
+            "chart-5",
+            "chart-6",
+            "chart-7",
+            "chart-8"
+          ],
+          "kind": "enum",
+          "name": "color"
         },
         {
           "kind": "boolean",

@@ -121,7 +121,7 @@ const EXPECTED: Readonly<Record<string, Expected>> = {
   'media-composition-svg': { states: ['focus-visible', 'invalid'] },
   'media-image': { states: ['focus-visible'] },
   alert: { axes: { tone: 'tone' }, states: ['hover', 'focus-visible'] },
-  avatar: { axes: { size: 'size' } },
+  avatar: { axes: { size: 'size', color: 'color' } },
   'avatar-group-grid': { axes: { size: 'size' } },
   carousel: { states: ['hover', 'focus-visible', 'selected'] },
   icon: { axes: { size: 'size', tone: 'tone' } },
@@ -131,7 +131,7 @@ const EXPECTED: Readonly<Record<string, Expected>> = {
   skeleton: { axes: { size: 'size' }, states: ['loading'] },
   spinner: { axes: { size: 'size', tone: 'tone' }, states: ['loading'] },
   badge: {
-    axes: { variant: 'variant' },
+    axes: { variant: 'variant', color: 'color' },
     states: ['hover', 'focus-visible', 'disabled', 'selected'],
   },
   banner: { axes: { tone: 'tone' } },
@@ -156,7 +156,10 @@ const EXPECTED: Readonly<Record<string, Expected>> = {
     axes: { variant: 'variant', density: 'density' },
     states: ['focus-visible', 'loading'],
   },
-  tag: { axes: { variant: 'variant' }, states: ['hover', 'focus-visible', 'disabled', 'loading'] },
+  tag: {
+    axes: { variant: 'variant', color: 'color' },
+    states: ['hover', 'focus-visible', 'disabled', 'loading'],
+  },
   timeline: { states: ['focus-visible', 'selected'] },
   document: { states: ['checked', 'open'] },
 };

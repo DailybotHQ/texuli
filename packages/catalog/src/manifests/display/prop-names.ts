@@ -13,11 +13,12 @@ export const cardPropNames = [
   'class',
 ] as const;
 
-export const badgePropNames = ['variant', 'label', 'class', 'children'] as const;
+export const badgePropNames = ['variant', 'color', 'label', 'class', 'children'] as const;
 
 export const tagPropNames = [
   'label',
   'variant',
+  'color',
   'removeLabel',
   'onRemove',
   'disabled',
@@ -230,6 +231,7 @@ export const avatarPropNames = [
   'sizes',
   'size',
   'tone',
+  'color',
   'shape',
   'status',
   'decorative',

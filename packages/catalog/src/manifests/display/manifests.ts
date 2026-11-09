@@ -42,6 +42,17 @@ function defineDisplayManifest(input: CatalogManifest): Readonly<CatalogManifest
 }
 
 const PKG = 'texuli';
+const CATEGORY_COLOR_VALUES = [
+  'none',
+  'chart-1',
+  'chart-2',
+  'chart-3',
+  'chart-4',
+  'chart-5',
+  'chart-6',
+  'chart-7',
+  'chart-8',
+] as const;
 
 /* @__NO_SIDE_EFFECTS__ */
 function propsFrom(
@@ -462,6 +473,7 @@ export const badgeManifest = /* @__PURE__ */ defineDisplayManifest({
       enumValues: badgeVariants,
       default: 'default',
     },
+    color: { kind: 'enum', enumValues: CATEGORY_COLOR_VALUES, default: 'none' },
     label: {
       kind: 'string',
       description: 'Plain-text badge word, escaped; replaces children when both are given',
@@ -489,6 +501,7 @@ export const tagManifest = /* @__PURE__ */ defineDisplayManifest({
   props: propsFrom(tagPropNames, {
     label: { kind: 'string', required: true, description: 'Visible label' },
     variant: { kind: 'enum', enumValues: badgeVariants, default: 'secondary' },
+    color: { kind: 'enum', enumValues: CATEGORY_COLOR_VALUES, default: 'none' },
     removeLabel: { kind: 'string', default: 'Remove' },
     onRemove: { kind: 'event', description: 'Called when remove is activated' },
     disabled: { kind: 'boolean', default: false },
@@ -1011,6 +1024,7 @@ export const avatarManifest = /* @__PURE__ */ defineDisplayManifest({
       kind: 'enum',
       enumValues: ['primary', 'success', 'warning', 'destructive', 'info', 'neutral'],
     },
+    color: { kind: 'enum', enumValues: CATEGORY_COLOR_VALUES, default: 'none' },
     shape: { kind: 'enum', enumValues: ['circle', 'square'] },
     status: { kind: 'enum', enumValues: ['online', 'away', 'busy', 'offline'] },
     decorative: { kind: 'boolean', default: false },

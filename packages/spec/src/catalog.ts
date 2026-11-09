@@ -143,7 +143,7 @@ export function projectCatalog(
 /* ------------------------------------------------------------------------ */
 
 /** The styling axes, in their canonical order. */
-export const SPEC_AXIS_NAMES = ['variant', 'size', 'tone', 'density'] as const;
+export const SPEC_AXIS_NAMES = ['variant', 'size', 'tone', 'density', 'color'] as const;
 export type SpecAxisName = (typeof SPEC_AXIS_NAMES)[number];
 
 /** The closed list of observable states, in their canonical order (`$defs.stateName`). */

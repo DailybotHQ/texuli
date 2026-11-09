@@ -65,7 +65,7 @@ export interface CatalogValueSchema {
  * axis values from that prop's `enumValues` and its default from the prop's
  * `default`.
  */
-export type CatalogAxisName = 'variant' | 'size' | 'tone' | 'density';
+export type CatalogAxisName = 'variant' | 'size' | 'tone' | 'density' | 'color';
 
 /** The closed list of observable states a component can show (ADR-032). */
 export type CatalogStateName =

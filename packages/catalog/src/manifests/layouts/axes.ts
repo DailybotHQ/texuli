@@ -8,7 +8,7 @@ type AxisStamp = {
 
 /**
  * Part C axes and states for the layouts group (ADR-032). No layout has a
- * variant/size/tone/density enum. States are confirmed against the layout
+ * variant/size/tone/density/color enum. States are confirmed against the layout
  * CSS/ARIA; Sidebar.svelte and Card.svelte scans on the shell ids are dropped.
  */
 export const LAYOUTS_AXIS_STAMP: Readonly<Record<string, AxisStamp>> = {

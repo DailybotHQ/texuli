@@ -9,6 +9,7 @@ const AXES = [
   ['size', 'sizes', 'unknown-size'],
   ['tone', 'tones', 'unknown-tone'],
   ['density', 'densities', 'unknown-density'],
+  ['color', 'colors', 'unknown-color'],
 ] as const;
 const STATE_PROPS = [
   ['hover', 'hover'],

@@ -40,6 +40,7 @@ import { CompositionCanvas } from '../../media/src/composition-canvas/index.ts';
 import { CompositionSvg } from '../../media/src/composition-svg/index.ts';
 import Image from '../../media/src/image/Image.svelte';
 import {
+  DS_COLOR_ATTRIBUTE,
   DS_COMPONENT_ATTRIBUTE,
   DS_DENSITY_ATTRIBUTE,
   DS_SIZE_ATTRIBUTE,
@@ -95,12 +96,13 @@ const GROUP_B_IDS = [
 ] as const;
 
 type GroupBId = (typeof GROUP_B_IDS)[number];
-type Axis = 'variant' | 'size' | 'tone' | 'density';
+type Axis = 'variant' | 'size' | 'tone' | 'density' | 'color';
 const ATTRIBUTE_FOR_AXIS: Readonly<Record<Axis, string>> = {
   variant: DS_VARIANT_ATTRIBUTE,
   size: DS_SIZE_ATTRIBUTE,
   tone: DS_TONE_ATTRIBUTE,
   density: DS_DENSITY_ATTRIBUTE,
+  color: DS_COLOR_ATTRIBUTE,
 };
 const COMPONENTS = {
   'charts-area': AreaChart,
@@ -257,7 +259,7 @@ describe('Group B catalog component root attributes', () => {
       expect(root, entry.id).not.toBeNull();
       expect(root?.getAttribute(DS_COMPONENT_ATTRIBUTE), entry.id).toBe(entry.id);
 
-      for (const axis of ['variant', 'size', 'tone', 'density'] as const) {
+      for (const axis of ['variant', 'size', 'tone', 'density', 'color'] as const) {
         const prop = entry.props.find(
           (candidate) => candidate.name === axis && candidate.kind === 'enum'
         );
