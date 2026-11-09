@@ -213,7 +213,7 @@ describe('approveDesignSystem', () => {
     expect(codes(approveDesignSystem(draft(), { by: '  ', at }))).toEqual([
       ['invalid-value', '$.approval.approvedBy'],
     ]);
-    expect(codes(approveDesignSystem(draft(), { by: 'evil‮name', at }))).toEqual([
+    expect(codes(approveDesignSystem(draft(), { by: 'evil\u202Ename', at }))).toEqual([
       ['invalid-value', '$.approval.approvedBy'],
     ]);
     expect(codes(approveDesignSystem(draft(), { by: 'A', at: '09/11/2026' }))).toEqual([

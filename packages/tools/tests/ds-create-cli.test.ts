@@ -322,7 +322,7 @@ describe('texuli ds init --locked, approve and hash', () => {
     expect(await readFile(join(cwd, 'bad.ds.json'), 'utf8')).toBe(invalid);
 
     await writeFile(join(cwd, 'ok.ds.json'), JSON.stringify(base));
-    const badName = await ds('approve', 'ok.ds.json', '--by', 'evil‮name');
+    const badName = await ds('approve', 'ok.ds.json', '--by', 'evil\u202Ename');
     expect(badName.code).toBe(1);
     expect(JSON.parse(await readFile(join(cwd, 'ok.ds.json'), 'utf8'))).toEqual(base);
 

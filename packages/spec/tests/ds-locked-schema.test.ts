@@ -261,7 +261,7 @@ describe('locked design systems: malformed shapes', () => {
     ],
     [
       'approvedBy with a bidi override',
-      { approval: { status: 'draft', version: '1.0.0', approvedBy: 'evil‮name' } },
+      { approval: { status: 'draft', version: '1.0.0', approvedBy: 'evil\u202Ename' } },
       [['invalid-value', '$.approval.approvedBy']],
     ],
   ];
