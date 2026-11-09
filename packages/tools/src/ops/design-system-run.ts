@@ -496,9 +496,43 @@ export function savePathRefusal(
   return undefined;
 }
 
-export async function runSave(input: Input, files: LocalFiles) {
+/**
+ * The approval marks an agent may not write (ADR-032): `approval.status`
+ * `approved` on the document, and `status` or `approval.status` `approved` on
+ * a library entry. Approval stays human: `texuli ds approve` stamps it after a
+ * review, and a reviewed commit (CODEOWNERS) is the guarantee.
+ */
+export function approvalMarks(
+  document: unknown
+): { code: string; path: string; message: string }[] {
+  const isRecord = (value: unknown): value is Record<string, unknown> =>
+    typeof value === 'object' && value !== null && !Array.isArray(value);
+  if (!isRecord(document)) return [];
+  const marks: { code: string; path: string; message: string }[] = [];
+  const mark = (path: string) =>
+    marks.push({
+      code: 'approval-human-only',
+      path,
+      message:
+        'Only a person approves a design system: keep status "draft"; a reviewer runs texuli ds approve and commits the file.',
+    });
+  if (isRecord(document.approval) && document.approval.status === 'approved')
+    mark('$.approval.status');
+  if (Array.isArray(document.library))
+    document.library.forEach((entry, index) => {
+      if (!isRecord(entry)) return;
+      if (entry.status === 'approved') mark(`$.library[${index}].status`);
+      if (isRecord(entry.approval) && entry.approval.status === 'approved')
+        mark(`$.library[${index}].approval.status`);
+    });
+  return marks;
+}
+
+export async function runSave(input: Input, files: LocalFiles, approve = false) {
   const check = await runValidate(input);
   if (!check.valid) return { saved: false, errors: check.errors };
+  const marks = approve ? [] : approvalMarks(input.document);
+  if (marks.length > 0) return { saved: false, errors: marks };
   const text = savedText(input.document);
   const path = input.path as string;
   const refused = (code: string, message: string) => ({

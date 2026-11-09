@@ -19,6 +19,7 @@ Operations (the @texuli/tools registry; the same names are MCP tools):
   ds contrast               Report design-system contrast
   ds suggest                Suggest a design system
   ds import                 Import a design system
+  ds allow                  List allowed components for a locked design system
   ds diff                   Diff two design systems
   ds preview                Preview a design system
   ds save                   Save a design system to a file (node only)
@@ -125,6 +126,7 @@ Operations:
   ds contrast               Report design-system contrast [ds.contrast]
   ds suggest                Suggest a design system [ds.suggest]
   ds import                 Import a design system [ds.import]
+  ds allow                  List allowed components for a locked design system [ds.allow]
   ds diff                   Diff two design systems [ds.diff]
   ds preview                Preview a design system [ds.preview]
   ds save                   Save a design system to a file [ds.save]
@@ -403,6 +405,19 @@ Limits: input up to 1048576 bytes, 10000 ms budget.
 Example (A brand one-liner): texuli ds import --json '{"from":"brand","input":"name Harborline, brand #0e7490, accent #f59e0b, font Inter, rounded, compact"}'
 
 ----
+Usage: texuli ds allow [--json <object> | --file <path>] [--out <path>]
+
+List allowed components for a locked design system (ds.allow, runtime edge)
+Build the allow section of a locked design system from the catalog: a preset (minimal, a documented core; all, every component) or the ids you name, each with every variant, size, tone, density and state the catalog declares. Narrow it, put it under "allow" and run ds.validate. Returns allow, count, unknown ids and the minimal preset ids.
+
+Arguments (JSON object keys):
+  preset: "all" | "minimal". minimal (a documented core: actions, form controls, text and status, containers, overlays and page layouts) or all (every catalog component). Ignored when components is set.
+  components: array. Catalog component ids to allow, e.g. ["button", "card", "data-grid"] (find ids with catalog.search).
+
+Limits: input up to 32768 bytes, at most 256 items, 10000 ms budget.
+Example (The minimal preset): texuli ds allow --json '{"preset":"minimal"}'
+
+----
 Usage: texuli ds diff [--json <object> | --file <path>] [--out <path>]
 
 Diff two design systems (ds.diff, runtime edge)
@@ -440,7 +455,7 @@ Example (An SVG snapshot): texuli ds preview --json '{"document":{"format":"texu
 Usage: texuli ds save [--json <object> | --file <path>] [--out <path>]
 
 Save a design system to a file (ds.save, runtime node)
-Validate a design-system document (as ds.validate does) and write it as two-space JSON to the explicit .json path you pass, inside the working directory: traversal, symlinks, dot directories and dotfiles, node_modules, package.json and an existing file without overwrite are refused. Local doors only. Returns saved, the relative path and bytes written, or errors with stable codes.
+Validate a design-system document (as ds.validate does) and write it as two-space JSON to an explicit .json path inside the working directory (traversal, symlinks, dot paths, node_modules, package.json and existing files without overwrite are refused). Anything marked approved is refused (approval-human-only). Local doors only. Returns saved, the path and bytes, or errors with stable codes.
 
 Arguments (JSON object keys):
   path (required): string. Where to write, relative to the working directory (e.g. design-systems/harborline.ds.json): a .json file outside dot directories and node_modules, never package.json.

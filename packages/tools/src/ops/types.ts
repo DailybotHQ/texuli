@@ -83,6 +83,12 @@ export interface OperationContext {
   site?: SiteContext;
   /** The local writer, when the door writes files (the stdio MCP and the CLI pass it). */
   files?: LocalFiles;
+  /**
+   * True only from a human door that stamps approvals (`texuli ds approve`,
+   * ADR-032). The MCP doors never pass it, so `ds.save` refuses a document an
+   * agent marked approved.
+   */
+  approve?: boolean;
 }
 
 /** One agent-facing capability, declared once and served by every door. */
@@ -169,4 +175,6 @@ export interface InvokeOptions {
   site?: SiteContext;
   /** The local writer `ds.save` uses; only the local doors pass it. */
   files?: LocalFiles;
+  /** Lets `ds.save` write an approved document: `texuli ds approve` only, never an MCP door (ADR-032). */
+  approve?: boolean;
 }

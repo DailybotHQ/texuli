@@ -20,6 +20,7 @@ import {
   dsSuggest,
   dsValidate,
 } from './design-system.ts';
+import { dsAllow } from './design-system-allow.ts';
 import { documentExport, documentRun } from './document.ts';
 import { createOperationRegistry } from './registry.ts';
 import { sitePages, siteRead, siteSearch } from './site.ts';
@@ -109,6 +110,7 @@ export const TEXULI_OPERATIONS: readonly Operation[] = Object.freeze([
   dsContrast,
   dsSuggest,
   dsImport,
+  dsAllow,
   dsDiff,
   dsPreview,
   dsSave,

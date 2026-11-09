@@ -490,10 +490,11 @@ async function runApprove(args: DsCommandArgs, io: DsIo): Promise<DsResult> {
       { valid: false, errors: again.errors },
       `Refused: ${JSON.stringify(again.errors)}`
     );
+  // The one human door that may write an approved document (ADR-032).
   const saved = await texuliOps.invoke(
     'ds.save',
     { path: file, document: stamped, overwrite: true },
-    runtime
+    { ...runtime, approve: true }
   );
   const result = saved.ok ? (saved.output as Record<string, unknown>) : undefined;
   if (result?.saved !== true)
