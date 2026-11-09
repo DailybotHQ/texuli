@@ -34,7 +34,15 @@ import {
 } from '../../src/components/separator-aspect/index.ts';
 import { Kpi, KpiRow, Stat } from '../../src/components/stat/index.ts';
 import { Timeline, TimelineItem } from '../../src/components/timeline/index.ts';
-import { Box, Heading, Mark, Prose, Text } from '../../src/components/typography/index.ts';
+import {
+  Box,
+  ColorSwatch,
+  Heading,
+  Link,
+  Mark,
+  Prose,
+  Text,
+} from '../../src/components/typography/index.ts';
 import { MotionLoop } from '../../src/motion/loop/index.ts';
 import CustomIcon from '../fixtures/CustomIcon.svelte';
 
@@ -94,6 +102,8 @@ const k = (name: string) => `components/${name}`;
 <Prose {...p(k('typography/Prose'))} bind:ref={refs[k('typography/Prose')]}><p>Long form</p></Prose>
 <Box {...p(k('typography/Box'))} bind:ref={refs[k('typography/Box')]}>Panel</Box>
 <Mark {...p(k('typography/Mark'))} bind:ref={refs[k('typography/Mark')]}>hit</Mark>
+<ColorSwatch color="primary" {...p(k('typography/ColorSwatch'))} bind:ref={refs[k('typography/ColorSwatch')]}>North</ColorSwatch>
+<Link href="https://example.com/guide" {...p(k('typography/Link'))} bind:ref={refs[k('typography/Link')]}>guide</Link>
 <Timeline {...p(k('timeline/Timeline'))} bind:ref={refs[k('timeline/Timeline')]}>
   <TimelineItem title="Created" {...p(k('timeline/TimelineItem'))} bind:ref={refs[k('timeline/TimelineItem')]} />
 </Timeline>
