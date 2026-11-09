@@ -1,0 +1,13 @@
+{
+  "ok": false,
+  "codes": ["unknown-density"],
+  "findings": [
+    {
+      "code": "unknown-density",
+      "severity": "error",
+      "area": "prototype-components",
+      "path": "src/Page.svelte:7:3",
+      "value": "airy"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "ok": false,
+  "codes": ["unknown-state"],
+  "findings": [
+    {
+      "code": "unknown-state",
+      "severity": "error",
+      "area": "prototype-components",
+      "path": "src/Page.svelte:6:3",
+      "value": "loading"
+    }
+  ]
+}

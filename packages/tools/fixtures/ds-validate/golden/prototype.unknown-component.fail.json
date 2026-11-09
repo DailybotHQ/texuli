@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "codes": ["unknown-component"],
+  "findings": [
+    {
+      "code": "unknown-component",
+      "severity": "error",
+      "area": "prototype-components",
+      "path": "home#$.tree.children[0]"
+    }
+  ]
+}

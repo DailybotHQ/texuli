@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "codes": ["invalid-type"],
+  "findings": [
+    {
+      "code": "invalid-type",
+      "severity": "error",
+      "area": "structure",
+      "path": "$.name"
+    }
+  ]
+}

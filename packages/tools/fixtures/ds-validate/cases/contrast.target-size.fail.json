@@ -1,0 +1,22 @@
+{
+  "description": "A button height pinned to an icon step, below the minimum target.",
+  "code": "target-size",
+  "expect": "fail",
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "color": {
+      "brand": {
+        "seed": "#0e7490"
+      }
+    },
+    "components": {
+      "button": {
+        "height-sm": "icon-sm"
+      }
+    }
+  }
+}

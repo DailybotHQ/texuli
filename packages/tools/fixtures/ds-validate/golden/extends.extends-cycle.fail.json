@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "codes": ["extends-cycle"],
+  "findings": [
+    {
+      "code": "extends-cycle",
+      "severity": "error",
+      "area": "extends",
+      "path": "$.extends"
+    }
+  ]
+}

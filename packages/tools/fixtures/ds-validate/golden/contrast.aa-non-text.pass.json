@@ -1,0 +1,13 @@
+{
+  "ok": true,
+  "codes": [],
+  "findings": [
+    {
+      "code": "color-adjusted",
+      "severity": "info",
+      "area": "contrast",
+      "path": "$.color.roles.light.sidebar",
+      "mode": "light"
+    }
+  ]
+}

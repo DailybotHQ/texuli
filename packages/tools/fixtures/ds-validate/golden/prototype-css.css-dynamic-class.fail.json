@@ -1,0 +1,13 @@
+{
+  "ok": false,
+  "codes": ["css-dynamic-class"],
+  "findings": [
+    {
+      "code": "css-dynamic-class",
+      "severity": "error",
+      "area": "prototype-css",
+      "path": "src/Page.svelte:85",
+      "value": "kind"
+    }
+  ]
+}

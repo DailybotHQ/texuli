@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "codes": ["format-version"],
+  "findings": [
+    {
+      "code": "format-version",
+      "severity": "error",
+      "area": "structure",
+      "path": "$.formatVersion"
+    }
+  ]
+}

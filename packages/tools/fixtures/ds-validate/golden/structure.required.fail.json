@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "codes": ["required"],
+  "findings": [
+    {
+      "code": "required",
+      "severity": "error",
+      "area": "structure",
+      "path": "$.name"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "codes": ["unknown-key"],
+  "findings": [
+    {
+      "code": "unknown-key",
+      "severity": "error",
+      "area": "structure",
+      "path": "$.colour"
+    }
+  ]
+}

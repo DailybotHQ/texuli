@@ -1,0 +1,90 @@
+{
+  "ok": false,
+  "codes": ["aa-text"],
+  "findings": [
+    {
+      "code": "aa-text",
+      "severity": "error",
+      "area": "contrast",
+      "path": "$.color.roles.light.foreground",
+      "mode": "light"
+    },
+    {
+      "code": "aa-text",
+      "severity": "error",
+      "area": "contrast",
+      "path": "$.color.brand.seed",
+      "mode": "light"
+    },
+    {
+      "code": "aa-text",
+      "severity": "error",
+      "area": "contrast",
+      "path": "$.color.brand.seed",
+      "mode": "light"
+    },
+    {
+      "code": "aa-text",
+      "severity": "error",
+      "area": "contrast",
+      "path": "$.color.brand.seed",
+      "mode": "light"
+    },
+    {
+      "code": "aa-text",
+      "severity": "error",
+      "area": "contrast",
+      "path": "$.color.brand.seed",
+      "mode": "light"
+    },
+    {
+      "code": "aa-text",
+      "severity": "error",
+      "area": "contrast",
+      "path": "$.color.brand.seed",
+      "mode": "light"
+    },
+    {
+      "code": "aa-text",
+      "severity": "error",
+      "area": "contrast",
+      "path": "$.color.brand.seed",
+      "mode": "light"
+    },
+    {
+      "code": "aa-text",
+      "severity": "error",
+      "area": "contrast",
+      "path": "$.color.brand.seed",
+      "mode": "light"
+    },
+    {
+      "code": "aa-text",
+      "severity": "error",
+      "area": "contrast",
+      "path": "$.color.brand.seed",
+      "mode": "light"
+    },
+    {
+      "code": "aa-text",
+      "severity": "error",
+      "area": "contrast",
+      "path": "$.color.brand.seed",
+      "mode": "light"
+    },
+    {
+      "code": "aa-text",
+      "severity": "error",
+      "area": "contrast",
+      "path": "$.color.brand.seed",
+      "mode": "light"
+    },
+    {
+      "code": "aa-text",
+      "severity": "error",
+      "area": "contrast",
+      "path": "$.color.brand.seed",
+      "mode": "light"
+    }
+  ]
+}

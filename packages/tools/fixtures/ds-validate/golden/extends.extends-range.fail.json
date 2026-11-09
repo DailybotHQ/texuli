@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "codes": ["extends-range"],
+  "findings": [
+    {
+      "code": "extends-range",
+      "severity": "error",
+      "area": "extends",
+      "path": "$.extends"
+    }
+  ]
+}

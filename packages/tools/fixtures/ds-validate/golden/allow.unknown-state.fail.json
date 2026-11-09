@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "codes": ["unknown-state"],
+  "findings": [
+    {
+      "code": "unknown-state",
+      "severity": "error",
+      "area": "allow",
+      "path": "$.allow.card.states[0]"
+    }
+  ]
+}

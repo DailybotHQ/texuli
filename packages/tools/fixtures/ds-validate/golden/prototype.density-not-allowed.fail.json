@@ -1,0 +1,13 @@
+{
+  "ok": false,
+  "codes": ["density-not-allowed"],
+  "findings": [
+    {
+      "code": "density-not-allowed",
+      "severity": "error",
+      "area": "prototype-components",
+      "path": "src/Page.svelte:7:3",
+      "value": "comfortable"
+    }
+  ]
+}

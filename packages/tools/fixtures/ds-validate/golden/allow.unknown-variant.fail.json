@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "codes": ["unknown-variant"],
+  "findings": [
+    {
+      "code": "unknown-variant",
+      "severity": "error",
+      "area": "allow",
+      "path": "$.allow.button.variants[0]"
+    }
+  ]
+}

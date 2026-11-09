@@ -1,0 +1,45 @@
+{
+  "description": "A blueprint node the catalog does not list.",
+  "code": "unknown-component",
+  "expect": "fail",
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "color": {
+      "brand": {
+        "seed": "#0e7490"
+      }
+    },
+    "allow": {
+      "button": {
+        "variants": ["default", "outline"],
+        "sizes": ["sm", "md"],
+        "tones": ["default"],
+        "states": ["hover", "focus-visible", "disabled"]
+      },
+      "card": {},
+      "data-grid": {
+        "densities": ["compact"]
+      }
+    }
+  },
+  "options": {
+    "prototype": {
+      "blueprints": {
+        "home": {
+          "tree": {
+            "id": "card",
+            "children": [
+              {
+                "id": "no-such"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

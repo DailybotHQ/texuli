@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "codes": ["target-size"],
+  "findings": [
+    {
+      "code": "target-size",
+      "severity": "error",
+      "area": "contrast",
+      "path": "$.components.button[\"height-sm\"]"
+    }
+  ]
+}

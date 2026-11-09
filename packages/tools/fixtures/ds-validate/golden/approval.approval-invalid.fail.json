@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "codes": ["approval-invalid"],
+  "findings": [
+    {
+      "code": "approval-invalid",
+      "severity": "error",
+      "area": "approval",
+      "path": "$.approval"
+    }
+  ]
+}

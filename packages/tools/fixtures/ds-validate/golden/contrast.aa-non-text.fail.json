@@ -1,0 +1,19 @@
+{
+  "ok": false,
+  "codes": ["aa-non-text"],
+  "findings": [
+    {
+      "code": "aa-non-text",
+      "severity": "error",
+      "area": "contrast",
+      "path": "$.vars.light[\"--tx-sidebar-primary\"]"
+    },
+    {
+      "code": "aa-non-text",
+      "severity": "warning",
+      "area": "contrast",
+      "path": "$.color.roles.light.sidebarPrimary",
+      "mode": "light"
+    }
+  ]
+}
