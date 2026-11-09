@@ -7,9 +7,9 @@
 > tokens, hooks and design defaults, the plumbing this builds on). Items
 > marked **planned** are not built yet. [Locked design systems](#locked-design-systems)
 > (blueprint spec `0.13.0`, ADR-032) are built on `main`'s next line and
-> are **not published yet**: they are planned for `0.15.0` (the document,
-> the catalog, the allow manifest and the CLI) and `0.16.0` (the kit page
-> and the checker core).
+> are **not published yet**: `0.15.0` is the document, the catalog, the
+> allow manifest and the CLI; `0.16.0` is the kit page and the checker
+> core (`texuli ds check --locked`, `@texuli/tools/ds-check`).
 
 A design system describes a brand once, as **one closed JSON document**,
 and every Texuli surface follows it: styled components, layouts and domain
@@ -504,9 +504,9 @@ it, so one file and one hash cover the whole policy.
 }
 ```
 
-- The keys are catalog component ids (`packages/spec/catalog/components.json`,
-  170 today). Once `allow` exists, a component it does not list is **not
-  allowed**.
+- The keys are catalog component ids
+  (`packages/spec/catalog/components.json`). Once `allow` exists, a
+  component it does not list is **not allowed**.
 - Each entry may list `variants`, `sizes`, `tones`, `densities` and
   `states`. An **omitted** list allows every value the catalog lists for
   that component; an **empty** list allows none.
@@ -654,33 +654,71 @@ element back to its component without component internals.
 
 ### Locked-mode rules for consumers
 
-These are the owner's rules for locked prototypes. Texuli states them here
-as the contract; the checker that enforces them in Texuli is **planned**
-(`@texuli/tools/ds-check`, `0.16.0`).
+These are the owner's rules for locked prototypes. `@texuli/tools/ds-check`
+enforces them (built, not published; `0.16.0`). Every check, code and
+exemption: [ds-check.md](../packages/tools/docs/ds-check.md).
 
 - **Only allowed components.** UI is built from components in the allow
   set and the design system's own library; no local styled components, no
-  restyled controls.
-- **Layout-only utilities.** Allowed, on the token scale only: `display`
-  (flex, grid, block, inline, hidden), flex direction, wrap, grow, shrink
-  and basis, grid columns, rows, span and flow, align, justify, place and
-  order, gap, padding, margin, space-x/y, width, height, min/max and size,
-  position and inset, overflow, z-index from tokens, and `sr-only`.
-  Forbidden: color, background, border, ring, outline, radius, shadow,
-  typography (font, text size, weight, leading, tracking), opacity,
-  filters, transforms, transitions, and **any arbitrary value**.
-- **Charts, maps and canvas.** Exempt from the per-pixel computed-style
-  check, because their marks are data; they must still be catalog
-  components fed by the design system's data-viz palette and tokens, and
-  their chrome (legends, axis text, controls) is checked like any other
-  component.
+  restyled controls. `checkLockedUsage` reads Svelte/TypeScript sources
+  and blueprints (`not-allowed`, `variant-not-allowed`,
+  `size-not-allowed`, `tone-not-allowed`, `density-not-allowed`,
+  `state-not-allowed`, plus the catalog `unknown-*` codes). A value the
+  reader cannot see (`variant={x}`) is a `dynamic-value` warning.
+- **Layout-only utilities.** The closed list is
+  `LOCKED_LAYOUT_UTILITY_RULES`: `display` (flex, grid, block, inline,
+  hidden), flex direction, wrap, grow, shrink and basis, grid columns,
+  rows, span and flow, align, justify, place and order, gap, padding,
+  margin, space-x/y, width, height, min/max and size, position and inset,
+  overflow, z-index from tokens, and `sr-only`. Forbidden: color,
+  background, border, ring, outline, radius, shadow, typography (font,
+  text size, weight, leading, tracking), opacity, filters, transforms,
+  transitions, and **any arbitrary value**. Codes:
+  `css-utility-not-allowed`, `css-arbitrary-value`,
+  `css-property-not-allowed`, `css-literal-color`, `css-inline-style`,
+  `css-dynamic-class`.
+- **Charts, maps and canvas.** Exempt from the per-pixel fill/stroke
+  check on SVG marks (`canvas`, `data-map`, `charts-*`), because their
+  marks are data; they must still be catalog components fed by the design
+  system's data-viz palette and tokens, and their chrome (legends, axis
+  text, controls) is checked like any other component.
 - **Existing prototypes.** Only new prototypes are locked; existing ones
-  migrate on demand, and a report mode lists violations without failing
-  (**planned** with the checker).
+  migrate on demand. `texuli ds check --locked --report --json` lists
+  every finding and exits 0 so the JSON is a progress baseline. Without
+  `--report`, a finding exits 1.
 - **Render check.** Required in CI for locked prototypes, on demand
-  locally. `texuli ds check --render` already paints the catalog under a
-  design system (axe, painted contrast, colors that do not come from it);
-  the locked-mode runtime checks are **planned**.
+  locally. `texuli ds check --render` paints the catalog under a design
+  system (axe, painted contrast, colors that do not come from it).
+  `mapDesignSystemTree` flags interactive elements outside a catalog
+  root (`unmapped`) and roots outside `allow` (`not-allowed`). Render
+  cost is a Chromium launch per run; Playwright and axe are project
+  dependencies.
+
+### What Texuli checks, what the consumer wires
+
+Texuli checks the design-system document (`allow` against the catalog,
+approval hashes, AA guarantees, data-viz palette, token completeness)
+and, when given a prototype, its sources, blueprints and CSS. The
+consumer (Protoyard or any host) wires:
+
+1. The locked document and the catalog. Optional namespaced host
+   extensions (`mergeCatalogs`, ids `<ns>:<id>`; the full report code is
+   `catalog-extension`).
+2. Prototype files and blueprints into
+   `checkDesignSystemFull({ prototype: { files, blueprints } })`. The
+   CLI `--locked` flag does not walk a source tree.
+3. A painted page whose catalog roots carry `data-tx-component`. Install
+   `installDsCheckHost`, then map the tree and run the locked render
+   checks. Pure-CSS restyles with no catalog import are outside the
+   static reader; the CSS policy still refuses forbidden utilities in
+   files you pass, and the runtime map catches unmapped interactive
+   elements on a painted page.
+4. CI: `texuli ds check brand.json --locked --render` for the document
+   and the catalog sheet; your tests call `checkDesignSystemFull` with
+   the prototype. Existing screens keep `--locked --report`.
+
+The CLI cannot prove who approved. Details and the complete code table:
+[ds-check.md](../packages/tools/docs/ds-check.md).
 
 ### See the whole design system
 
