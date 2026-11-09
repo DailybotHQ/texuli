@@ -1273,7 +1273,8 @@ describe('token contract v2: schema, Tailwind and data-viz', () => {
         }
       }
     }
-  });
+    // 210 themes x 2 modes: seconds alone, far slower when parallel lanes load the machine.
+  }, 60_000);
 
   it('a theme’s own charts win, and themeVariables output is unchanged for chart-less themes', async () => {
     const theme = await loadLibraryTheme('enterprise-neutral');
