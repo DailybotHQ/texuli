@@ -1,0 +1,14 @@
+---
+/**
+ * The Workflows signature stories: the shared SolutionStories block with the workflows
+ * registry entry and the copy in `stories-content.ts`. Every claim is backed by
+ * `WORKFLOWS_STORY_EVIDENCE`, which the unit test checks against the repository.
+ */
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionStories from '../../shared/story/SolutionStories.astro';
+import { WORKFLOWS_STORIES } from './stories-content.ts';
+
+const entry = getSolution('workflows');
+---
+
+<SolutionStories entry={entry} {...WORKFLOWS_STORIES} />
