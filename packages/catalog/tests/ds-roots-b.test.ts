@@ -33,6 +33,7 @@ import { DataGrid } from '../../data/src/grid-core/index.ts';
 import { MapView } from '../../data/src/map/index.ts';
 import { TimelineView } from '../../data/src/timeline/index.ts';
 import { TreeDataView } from '../../data/src/tree-view/index.ts';
+import { VirtualListView } from '../../data/src/virtual-list/index.ts';
 import BoardHarness from '../../data/tests/fixtures/BoardHarness.svelte';
 import DashboardHarness from '../../data/tests/fixtures/DashboardHarness.svelte';
 import TreeDataViewHarness from '../../data/tests/fixtures/TreeDataViewHarness.svelte';
@@ -89,6 +90,7 @@ const GROUP_B_IDS = [
   'data-notification-inbox',
   'data-timeline',
   'data-tree-view',
+  'data-virtual-list',
   'media-composition-canvas',
   'media-composition-svg',
   'media-image',
@@ -140,6 +142,7 @@ const COMPONENTS = {
   'data-notification-inbox': NotificationInbox,
   'data-timeline': TimelineView,
   'data-tree-view': TreeDataView,
+  'data-virtual-list': VirtualListView,
   'media-composition-canvas': CompositionCanvas,
   'media-composition-svg': CompositionSvg,
   'media-image': Image,
