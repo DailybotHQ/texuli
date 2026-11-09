@@ -1,0 +1,15 @@
+---
+/**
+ * The Documents signature stories: the shared SolutionStories block with the documents
+ * registry entry and the copy in `stories-content.ts`. The reading story reuses the
+ * `page-documents` illustration; the others paint the texel mosaic. Every claim is backed
+ * by `DOCUMENTS_STORY_EVIDENCE`, which the unit test checks against the repository.
+ */
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionStories from '../../shared/story/SolutionStories.astro';
+import { DOCUMENTS_STORIES } from './stories-content.ts';
+
+const entry = getSolution('documents');
+---
+
+<SolutionStories entry={entry} {...DOCUMENTS_STORIES} />
