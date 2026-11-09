@@ -8,10 +8,10 @@ import type { SolutionHeroProps } from '../../shared/types.ts';
 
 export const CANVAS_HERO: Omit<SolutionHeroProps, 'entry'> = {
   eyebrow: 'Solution · Canvas',
-  title: 'A canvas for sketches, diagrams and ideas.',
-  lede: 'Arrange shapes, text and connectors, edit with a keyboard-friendly tree, and export your board as SVG or PNG.',
+  title: 'Give every idea room to connect.',
+  lede: 'Shape ideas into a board, move through it with the keyboard, then export SVG or PNG. Your app owns persistence, image hosting and collaboration transport.',
   ctas: [
-    { kind: 'primary', label: 'Try the canvas', href: `#${SOLUTION_SECTION_IDS.demo}` },
-    { kind: 'secondary', label: 'Start building', href: `#${SOLUTION_SECTION_IDS.quickstart}` },
+    { kind: 'primary', label: 'Sketch a launch plan', href: `#${SOLUTION_SECTION_IDS.demo}` },
+    { kind: 'secondary', label: 'Build with Canvas', href: `#${SOLUTION_SECTION_IDS.quickstart}` },
   ],
 };

@@ -19,7 +19,7 @@ const view = solutionHeroView({ entry, ...CANVAS_HERO });
 describe('Canvas hero', () => {
   it('renders the headline, eyebrow and a short lede', () => {
     expect(view.eyebrow).toBe('Solution · Canvas');
-    expect(view.title).toBe('A canvas for sketches, diagrams and ideas.');
+    expect(view.title).toBe('Give every idea room to connect.');
     expect(view.headingId).toBe('solution-hero-canvas');
     expect(wordCount(view.title)).toBeLessThanOrEqual(10);
     expect(wordCount(view.lede)).toBeLessThanOrEqual(30);

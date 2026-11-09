@@ -15,31 +15,32 @@
 import type { SolutionHowProps } from '../../shared/types.ts';
 
 export const CANVAS_HOW: Omit<SolutionHowProps, 'entry'> = {
-  title: 'From a board of shapes to a file.',
+  title: 'From shape model to SVG or PNG.',
+  art: { slot: 'solution-canvas-how', variant: 'band' },
   steps: [
     {
       title: 'Model',
-      body: 'Typed shapes, connectors, groups and frames, with operations and an op log.',
+      body: 'Define shapes and connectors as validated data with reversible operations.',
       package: '@texuli/canvas',
     },
     {
       title: 'Edit',
-      body: 'The editor is the drawing surface: toolbar, pan, zoom, snapping and transforms.',
+      body: 'Edit on a canvas with pan, zoom, snapping and transforms.',
       package: '@texuli/canvas',
     },
     {
       title: 'View',
-      body: 'The viewer is read-only and exposes the structure as text, with a shape tree.',
+      body: 'Show a read-only canvas with its structure as text and a shape tree.',
       package: '@texuli/canvas',
     },
     {
       title: 'Sync',
-      body: 'Replicas stay in step through the document sync adapter. Your app supplies the transport.',
+      body: 'Sync replicas through the document adapter; your app supplies transport.',
       package: '@texuli/canvas',
     },
     {
       title: 'Export',
-      body: 'Write the board as SVG or PNG with escaped markup and the URL policy on images.',
+      body: 'Export SVG or browser-rendered PNG; image URLs follow the URL policy.',
       package: '@texuli/canvas',
     },
   ],
