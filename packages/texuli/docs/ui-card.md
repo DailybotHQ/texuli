@@ -6,7 +6,7 @@ Surface container with optional media, header, body, footer and auto-fit grid.
 
 | Export | Role |
 | --- | --- |
-| `Card` | Root surface; optional `href` for a clickable card (URL policy) |
+| `Card` | Root surface; optional `href` for a stretched primary link (URL policy) |
 | `CardMedia` | Image banner (`safeImageSrc`) |
 | `CardHeader` / `CardTitle` / `CardDescription` | Title block (`CardTitle` is a real heading level) |
 | `CardContent` | Body |
@@ -20,12 +20,22 @@ Surface container with optional media, header, body, footer and auto-fit grid.
 
 ## Clickable card
 
+A linked card is a `div` with one real `<a>` that covers the surface through
+a `::after` pseudo-element. Nested interactive controls are not inside that
+link: pass them as `actions` so they stack above it (`--tx-card-actions-z`)
+and follow it in tab order. Hover uses `--tx-card-hover-border` and
+`--tx-card-hover-elevation`.
+
 ```svelte
 <Card href="https://example.com/item" linkLabel="Open item">
   <CardHeader>
     <CardTitle>Item</CardTitle>
     <CardDescription>Fictional summary.</CardDescription>
   </CardHeader>
+  {#snippet actions()}
+    <Button variant="ghost" size="icon" aria-label="Pin item">Pin</Button>
+    <Button variant="ghost" size="icon" aria-label="Item menu">Menu</Button>
+  {/snippet}
 </Card>
 ```
 
@@ -78,7 +88,12 @@ caller `style` is added after the grid's own declarations, so
 
 ## Styles
 
-`@layer tx.components` in `card.css`. Import `@texuli/tokens/base.css` at the app root. Logical properties (`padding-inline`, `border-block-start`, …).
+`@layer tx.components` in `card.css`. Import `@texuli/tokens/base.css` at the app root. Logical properties (`padding-inline`, `border-block-start`, `inset`, …).
+
+A linked card’s hover fill and elevation read `--tx-card-hover-border` and
+`--tx-card-hover-elevation`. The stretched link and the actions row stack
+with `--tx-card-link-z` (default 1) and `--tx-card-actions-z` (default 2)
+inside the card’s isolation context.
 
 The content section (`CardContent`, `.tx-card__content`) is set in the
 label size by default. Change it with `--tx-card-font-size` on a scope

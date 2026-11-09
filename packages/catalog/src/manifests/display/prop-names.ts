@@ -4,7 +4,14 @@
  * Keep in sync with the Svelte `Props` / `$props()` surfaces in `texuli`.
  */
 
-export const cardPropNames = ['variant', 'href', 'hrefTrust', 'linkLabel', 'class'] as const;
+export const cardPropNames = [
+  'variant',
+  'href',
+  'hrefTrust',
+  'linkLabel',
+  'actions',
+  'class',
+] as const;
 
 export const badgePropNames = ['variant', 'label', 'class', 'children'] as const;
 
