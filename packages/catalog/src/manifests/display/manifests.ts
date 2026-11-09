@@ -336,7 +336,7 @@ export const cardManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'card',
   package: PKG,
   label: 'Card',
-  summary: 'A surface for grouping related content with optional link behavior.',
+  summary: 'A surface for grouping related content with optional stretched-link behavior.',
   tier: 'app',
   agentEmittable: false,
   useWhen: ['Group related content in a bordered surface', 'Make a whole tile a single link'],
@@ -345,7 +345,7 @@ export const cardManifest = /* @__PURE__ */ defineDisplayManifest({
     'A data grid of many rows (use table)',
   ],
   a11y: [
-    'When href is set, the card is a real link with an accessible name',
+    'When href is set, one real link covers the card; nested actions sit above it',
     'Rejected href schemes render as a non-interactive surface',
   ],
   props: propsFrom(cardPropNames, {
@@ -361,7 +361,11 @@ export const cardManifest = /* @__PURE__ */ defineDisplayManifest({
       enumValues: ['developer', 'untrusted'],
       default: 'developer',
     },
-    linkLabel: { kind: 'string', description: 'Accessible name when the card is a link' },
+    linkLabel: { kind: 'string', description: 'Accessible name of the stretched primary link' },
+    actions: {
+      kind: 'slot',
+      description: 'Secondary actions (pin, menu) above the stretched link',
+    },
     class: { kind: 'string', description: 'Extra classes' },
   }),
   examples: [
