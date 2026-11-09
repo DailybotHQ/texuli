@@ -422,6 +422,13 @@
     "focus-band": { "light": "#e0e7ff", "dark": "#312e81", "on": {} },
     "chart-stripe": { "light": "#c7d2fe", "dark": "#3730a3" }
   },
+  "allow": {
+    "button": {
+      "variants": ["default", "secondary", "outline", "ghost"],
+      "sizes": ["sm", "md", "lg"]
+    },
+    "card": {}
+  },
   "variants": {
     "high-contrast": {
       "accessibility": {
