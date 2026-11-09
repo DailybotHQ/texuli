@@ -88,7 +88,8 @@ describe('Solution quickstart block', () => {
       'function compileSample'
     );
     expect(component).toContain('SolutionQuickstartProps');
-    expect(component).toContain('<pre><code');
+    // The scrollable sample is focusable for keyboard users (axe: scrollable-region-focusable).
+    expect(component).toContain('<pre tabindex="0"><code');
     expect(component).toContain('{sample.code}');
     expect(component).toContain('Verified by <code>{verifiedBy}</code>');
     expect(component).toContain('role="status"');

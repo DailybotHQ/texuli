@@ -24,7 +24,7 @@ const blocks = [install, ...samples];
             Copy
           </button>
         </div>
-        <pre><code class={`language-${sample.language}`}>{sample.code}</code></pre>
+        <pre tabindex="0"><code class={`language-${sample.language}`}>{sample.code}</code></pre>
         <p class="quickstart__status" role="status" data-quickstart-status={index}></p>
       </article>
     ))}

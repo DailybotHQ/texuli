@@ -38,7 +38,7 @@ const themeName = (theme: SlidesDemoSnapshot['theme']): string =>
   <button type="button" aria-pressed={snapshot.playing} onclick={() => onAction({ type: 'play' })}>
     {snapshot.playing ? 'Pause slides' : 'Play slides'}
   </button>
-  <button type="button" aria-label={`Change theme from ${themeName(snapshot.theme)}`} onclick={() => onAction({ type: 'theme' })}>
+  <button type="button" onclick={() => onAction({ type: 'theme' })}>
     Theme: {themeName(snapshot.theme)}
   </button>
   <button type="button" aria-pressed={snapshot.sourceVisible} onclick={() => onAction({ type: 'view-source' })}>

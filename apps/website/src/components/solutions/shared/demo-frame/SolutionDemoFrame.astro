@@ -19,7 +19,7 @@ const hasSource = Astro.slots.has('source');
 >
   <header class="solution-demo__header">
     <h2 id={headingId}>{title}</h2>
-    <div class="solution-demo__actions" aria-label="Demo actions">
+    <div class="solution-demo__actions" role="group" aria-label="Demo actions">
       <slot name="actions" />
       {
         hasSource && (
@@ -34,7 +34,7 @@ const hasSource = Astro.slots.has('source');
     </div>
   </header>
 
-  <div class="solution-demo__try" aria-label="Try this">
+  <div class="solution-demo__try" role="group" aria-label="Try this">
     <p class="solution-demo__try-title">Try this</p>
     <ul>
       {tryThis.map((action) => <li>{action}</li>)}

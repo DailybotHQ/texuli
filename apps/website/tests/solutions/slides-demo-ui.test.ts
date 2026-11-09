@@ -55,8 +55,8 @@ describe('Slides Solution demo island', () => {
     );
     await fireEvent.click(screen.getByRole('button', { name: 'Pause slides' }));
 
-    await fireEvent.click(screen.getByRole('button', { name: 'Change theme from ocean' }));
-    expect(screen.getByRole('button', { name: 'Change theme from graphite' })).toBeTruthy();
+    await fireEvent.click(screen.getByRole('button', { name: /^Theme: ocean$/i }));
+    expect(screen.getByRole('button', { name: /^Theme: graphite$/i })).toBeTruthy();
 
     await fireEvent.click(screen.getByRole('button', { name: 'View source' }));
     expect(screen.getByRole('region', { name: 'Deck source as JSON' }).textContent).toContain(
