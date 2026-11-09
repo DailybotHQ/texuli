@@ -1,6 +1,6 @@
 ---
 /**
- * Home 2.2 hero (PLAN_015 T-home-hero): an eyebrow, the pinned accent h1, a
+ * Home 2.2 hero: an eyebrow with the "What's new" link, the pinned accent h1, a
  * short subhead, a platform status line (Web available, Native in
  * development), three calls to action (Explore solutions, Explore native,
  * Get started), the install line, the computed proof row and the eager
@@ -28,16 +28,21 @@ const resolveHref = (href: string): string | undefined => {
 <section class="hero22" aria-labelledby={HERO_22_IDS.heading} data-tx-home-hero="">
   <div class="hero22__inner">
     <div class="hero22__copy">
-      <p class="hero22__eyebrow" data-tx-hero-eyebrow="">
-        {
-          HERO_22.eyebrow.map((item, index) => (
-            <>
-              {index > 0 && <span class="hero22__sep" aria-hidden="true"> · </span>}
-              <span>{item}</span>
-            </>
-          ))
-        }
-      </p>
+      <div class="hero22__top">
+        <p class="hero22__eyebrow" data-tx-hero-eyebrow="">
+          {
+            HERO_22.eyebrow.map((item, index) => (
+              <>
+                {index > 0 && <span class="hero22__sep" aria-hidden="true"> · </span>}
+                <span>{item}</span>
+              </>
+            ))
+          }
+        </p>
+        <a class="hero22__news" href={resolveHref(HERO_22.news.href)} data-tx-hero-news=""
+          >{HERO_22.news.label}<span aria-hidden="true">&nbsp;→</span></a
+        >
+      </div>
       <h1 id={HERO_22_IDS.heading}>
         {HERO_22.title.lead}{' '}
         <span class="hero22__accent">{HERO_22.title.accent}</span>
@@ -113,6 +118,25 @@ const resolveHref = (href: string): string | undefined => {
     justify-items: start;
     max-inline-size: 36rem;
     min-inline-size: 0;
+  }
+  .hero22__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+  }
+  .hero22__news {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.5rem;
+    color: var(--home-accent-text);
+    font-size: 0.85rem;
+    font-weight: 650;
+    text-underline-offset: 0.2em;
+  }
+  .hero22__news:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
   }
   .hero22__eyebrow {
     margin: 0;

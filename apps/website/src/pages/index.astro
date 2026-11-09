@@ -59,7 +59,7 @@ const resolveHref = (href: string): string | undefined => {
           proof.map((stat) => (
             <li data-tx-proof={stat.id}>
               <a href={resolveHref(stat.href)}>
-                <span class="home-own-proof__value">{stat.value}</span>
+                <span class="home-own-proof__value">{stat.value}</span>{' '}
                 <span class="home-own-proof__label">{stat.label}</span>
               </a>
             </li>

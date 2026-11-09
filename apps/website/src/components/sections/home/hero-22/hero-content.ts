@@ -49,4 +49,6 @@ export const HERO_22 = {
     { href: '/native/', label: 'Explore native', role: 'secondary' },
     { href: '/guides/getting-started/', label: 'Get started', role: 'text' },
   ] satisfies readonly HeroAction[],
+  /** The release hub, beside the eyebrow (no version number to drift). */
+  news: { href: '/whats-new/', label: 'What’s new' },
 } as const;
