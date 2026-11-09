@@ -1,0 +1,163 @@
+---
+/**
+ * Static frame for one Solution demo. The page owns the lazy client island in
+ * the `demo` slot; this component only supplies its accessible, SSR markup.
+ */
+import type { SolutionDemoFrameProps } from '../types.ts';
+
+const { entry, title, tryThis, label } = Astro.props as SolutionDemoFrameProps;
+const headingId = `solution-demo-${entry.slug}-heading`;
+const previewId = `solution-demo-${entry.slug}-preview`;
+const hasSource = Astro.slots.has('source');
+---
+
+<section
+  class="solution-demo"
+  aria-labelledby={headingId}
+  data-tx-solution-demo={entry.slug}
+  data-tx-demo-budget-probe={entry.slug}
+>
+  <header class="solution-demo__header">
+    <h2 id={headingId}>{title}</h2>
+    <div class="solution-demo__actions" aria-label="Demo actions">
+      <slot name="actions" />
+      {
+        hasSource && (
+          <details class="solution-demo__source">
+            <summary>View source</summary>
+            <div class="solution-demo__source-content">
+              <slot name="source" />
+            </div>
+          </details>
+        )
+      }
+    </div>
+  </header>
+
+  <div class="solution-demo__try" aria-label="Try this">
+    <p class="solution-demo__try-title">Try this</p>
+    <ul>
+      {tryThis.map((action) => <li>{action}</li>)}
+    </ul>
+  </div>
+
+  <p class="solution-demo__reset-hint">
+    Use Reset to return to the starting example.
+  </p>
+
+  <div class="solution-demo__preview" id={previewId} role="region" aria-label={`${label} static preview`}>
+    <slot name="preview" />
+  </div>
+
+  <div class="solution-demo__island" role="region" aria-label={label}>
+    <slot name="demo" />
+  </div>
+
+  <noscript>
+    <p class="solution-demo__fallback">
+      JavaScript is unavailable, so the interactive demo cannot load. The static preview remains above.
+    </p>
+  </noscript>
+  <slot name="error">
+    <p class="solution-demo__fallback" role="status">
+      If the interactive demo cannot load, use the static preview above.
+    </p>
+  </slot>
+</section>
+
+<style>
+  .solution-demo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    min-inline-size: 0;
+    padding: clamp(1rem, 3vw, 1.5rem);
+    border: 1px solid var(--tx-border, GrayText);
+    border-radius: var(--tx-radius, 0.75rem);
+    color: var(--tx-foreground, CanvasText);
+    background: var(--tx-surface, Canvas);
+    scroll-behavior: auto;
+  }
+
+  .solution-demo__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+  }
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  h2 {
+    font-size: clamp(1.25rem, 3vw, 1.6rem);
+    line-height: 1.2;
+  }
+
+  .solution-demo__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .solution-demo__source summary {
+    cursor: pointer;
+  }
+
+  .solution-demo__source-content {
+    max-inline-size: 100%;
+    overflow: auto;
+  }
+
+  .solution-demo__try,
+  .solution-demo__preview,
+  .solution-demo__island {
+    min-inline-size: 0;
+    max-inline-size: 100%;
+  }
+
+  .solution-demo__try-title {
+    font-weight: 650;
+  }
+
+  .solution-demo__try ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin: 0.5rem 0 0;
+    padding-inline-start: 1.25rem;
+  }
+
+  .solution-demo__reset-hint,
+  .solution-demo__fallback {
+    color: var(--tx-muted-foreground, GrayText);
+    font-size: 0.875rem;
+  }
+
+  .solution-demo__preview,
+  .solution-demo__island {
+    padding: clamp(0.75rem, 2vw, 1.25rem);
+    border: 1px solid var(--tx-border, GrayText);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-background, Canvas);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .solution-demo,
+    .solution-demo * {
+      scroll-behavior: auto;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .solution-demo,
+    .solution-demo__preview,
+    .solution-demo__island {
+      border-color: CanvasText;
+    }
+  }
+</style>
