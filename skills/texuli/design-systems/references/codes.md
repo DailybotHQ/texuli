@@ -6,6 +6,15 @@ check` has a stable `code`, a `$`-rooted JSON `path`, a `message` and
 often a `hint`. Repair from the code and the path; never loosen the
 document's rules or switch the trust level to get past one.
 
+The full locked validator (`ds.validate` with `full: true`, or
+`texuli ds validate <file> --locked`) also emits findings for prototype
+components, CSS policy, data-viz completeness, tokens, catalog extensions,
+render checks and bounded-input limits. Those findings carry an `area`,
+`severity` and `hint`; warning and info findings do not fail the full
+verdict unless MCP `strict: true` promotes warnings. The complete full-mode
+code/severity table and all exemptions are in
+`packages/tools/docs/ds-check.md` in the Texuli repository.
+
 | Code | Means | Fix |
 | --- | --- | --- |
 | `unknown-key` | A key outside a closed object (also `__proto__`, `constructor`, `prototype`) | Remove the key at the path; the hint lists the allowed keys |
