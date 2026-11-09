@@ -51,8 +51,8 @@ function reset(): void {
 }
 </script>
 
-<section class="sheets-demo" aria-label="Interactive Project budget spreadsheet">
-  <div class="sheets-demo__toolbar" aria-label="Spreadsheet actions">
+<section class="sheets-demo" aria-label="Interactive Project budget spreadsheet" data-tx-sheets-demo="">
+  <div class="sheets-demo__toolbar" role="group" aria-label="Spreadsheet actions">
     <button type="button" onclick={() => dispatch({ type: 'add-line-item' })}>Add line item</button>
     <button type="button" onclick={() => dispatch({ type: 'toggle-formulas' })}>
       {state.showFormulas ? 'Hide formula details' : 'Show formula details'}
@@ -102,7 +102,13 @@ function reset(): void {
     </section>
   {/if}
 
-  <pre id="sheets-demo-source" class="sheets-demo__source" hidden={!sourceVisible}><code>{source}</code></pre>
+  <pre
+    id="sheets-demo-source"
+    class="sheets-demo__source"
+    hidden={!sourceVisible}
+    tabindex="0"
+    aria-label="Workbook source as JSON"
+  ><code>{source}</code></pre>
 </section>
 
 <style>
