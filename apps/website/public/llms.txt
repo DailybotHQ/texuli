@@ -37,6 +37,7 @@ Embeddable open-source systems that complete a task end to end.
 
 Products built on Texuli, each with its own brand and domain.
 
+- [Built with Texuli](https://texuli.com/built-with/)
 - [Protoyard](https://texuli.com/built-with/protoyard/): Open-source local prototyping for exploring and validating software prototypes. Status: available.
 
 ## Guides
