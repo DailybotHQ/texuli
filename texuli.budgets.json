@@ -599,16 +599,16 @@
       "note": "PLAN_011 T-ds-io (owner-approved new row): the fictional protoyard-theme/v1-shaped palette, DTCG and Tokens Studio fixtures, published so Protoyard's adapter tests run against the same files Texuli proves losslessness with (architecture B.13). Test data only. The @texuli/tokens root never imports it (root unchanged at 40,820 B). Measured 2,693 B, cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/tokens/design-system/import": {
-      "gzip": 27072,
-      "note": "PLAN_011 T-ds-io (owner-approved new row): the lazy importers (brand one-liner, W3C DTCG, Tokens Studio, flat role palette, Texuli Theme, logo pixels). Every importer validates its result, so the @texuli/spec/design-system validator (about 7 KB) is in each; importTheme adds the theme validator and the seed generator (about 8 KB). Named imports tree-shake per importer: importDtcg alone bundles to about 12.5 KB, importLogoPixels about 9.8 KB, importTheme about 17.8 KB, so a further split would save real consumers nothing. Loaded only by the studio, CLI and MCP. The @texuli/tokens root never imports it (root unchanged at 40,820 B). Measured 26,026 B, cap = measured + 4% rounded up to 64 B."
+      "gzip": 27200,
+      "note": "PLAN_011 T-ds-io (owner-approved new row): the lazy importers (brand one-liner, W3C DTCG, Tokens Studio, flat role palette, Texuli Theme, logo pixels). Every importer validates its result, so the @texuli/spec/design-system validator (about 7 KB) is in each; importTheme adds the theme validator and the seed generator (about 8 KB). Named imports tree-shake per importer: importDtcg alone bundles to about 12.5 KB, importLogoPixels about 9.8 KB, importTheme about 17.8 KB, so a further split would save real consumers nothing. Loaded only by the studio, CLI and MCP. The @texuli/tokens root never imports it (root unchanged at 40,820 B). Measured 26,026 B, cap = measured + 4% rounded up to 64 B. PLAN_016 (ADR-032, developer standing grant 2026-11-09): importers validate with the larger 0.13.0 validator. Measured 27,108 B, cap rounded up to 64 B."
     },
     "@texuli/tokens/design-system/report": {
       "gzip": 4672,
       "note": "PLAN_011 T-ds-io (owner-approved new row): the lazy static report page (swatches, type ramp, component sheet, contrast table, adjustments, warnings), built as strings with escaping by construction (no sinks), plus emitCss for its one stylesheet. The @texuli/tokens root never imports it (root unchanged at 40,820 B). Measured 4,432 B, cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/tokens/design-system/validate": {
-      "gzip": 10304,
-      "note": "PLAN_011 T-ds-compiler (ADR-022; owner-approved new row): the spec's validateDesignSystem, patch and migrate (7.1 KB on their own, see @texuli/spec/design-system) plus checkDesignSystemGuarantees over compiled variables (contrast pairs, focus width, targets) and DESIGN_SYSTEM_ATTRIBUTES, without the compiler or the color engine. Measured 9,850 B, cap = measured + 4% rounded up to 64 B."
+      "gzip": 11264,
+      "note": "PLAN_011 T-ds-compiler (ADR-022; owner-approved new row): the spec's validateDesignSystem, patch and migrate (7.1 KB on their own, see @texuli/spec/design-system) plus checkDesignSystemGuarantees over compiled variables (contrast pairs, focus width, targets) and DESIGN_SYSTEM_ATTRIBUTES, without the compiler or the color engine. Measured 9,850 B, cap = measured + 4% rounded up to 64 B. PLAN_016 (ADR-032, developer standing grant 2026-11-09): the allow, library and approval sections and the approval-invalid check grow the validator (the catalog membership check stays outside, in checkDesignSystemAllow). Measured 11,021 B, cap = measured + 2% rounded up to 64 B."
     },
     "@texuli/tokens/renames": {
       "gzip": 448,
