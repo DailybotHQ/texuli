@@ -1,0 +1,177 @@
+---
+import { safeHref } from '@texuli/core/url-policy';
+import NativeDemoIsland from './NativeDemoIsland.svelte';
+import NativeDemoPreview from './NativeDemoPreview.svelte';
+import {
+  NATIVE_DEMO_FIXTURE_JSON,
+  NATIVE_DEMO_PARITY,
+  NATIVE_DEMO_SPEC_VERSION,
+  NATIVE_DEMO_TRACE_JSON,
+} from './native-demo-data.ts';
+
+const codeHref = (path: string) =>
+  safeHref(`https://github.com/DailybotHQ/texuli/blob/main/${path}`, 'developer');
+const fixturePath = 'packages/spec/fixtures/golden/report-on-demand.json';
+const tracePath = 'native/conformance/expected/report-on-demand.trace.json';
+---
+
+<section class="native-demo" aria-labelledby="native-demo-title" data-tx-native-demo-section="">
+  <div class="native-demo__heading">
+    <p class="native-demo__eyebrow">One validated blueprint</p>
+    <h2 id="native-demo-title">A report, one contract and two kinds of evidence</h2>
+    <p>
+      This checked-in <code>@texuli/spec</code> {NATIVE_DEMO_SPEC_VERSION} fixture is validated and painted by the web player.
+      The Compose Desktop side is shown from its recorded conformance trace and parity metadata, not as a fabricated native preview.
+    </p>
+    <p class="native-demo__validated" data-tx-native-demo-validation="">
+      Validated by the <code>@texuli/spec</code> golden suite · {NATIVE_DEMO_SPEC_VERSION}
+    </p>
+  </div>
+
+  <div class="native-demo__columns">
+    <article class="native-demo__panel" aria-labelledby="native-demo-web-title">
+      <h3 id="native-demo-web-title">Web player · rendered from the fixture</h3>
+      <NativeDemoPreview />
+    </article>
+
+    <article class="native-demo__panel" aria-labelledby="native-demo-compose-title">
+      <h3 id="native-demo-compose-title">Compose Desktop · parity and trace evidence</h3>
+      <p>Each row is derived from the generated parity matrix and the checked-in fixture trace.</p>
+      <ul class="native-demo__parity" data-tx-native-demo-parity="">
+        {NATIVE_DEMO_PARITY.map((item) => {
+          const traceHref = codeHref(item.tracePath);
+          const parityHref = codeHref(item.paritySource);
+          return (
+            <li data-component-id={item.id}>
+              <code>{item.id}</code>
+              <span>Web: {item.web}</span>
+              <span>Compose Desktop: {item.composeDesktop}</span>
+              <span>Conformance: {item.conformance}</span>
+              {traceHref && <a href={traceHref}>Kotlin trace</a>}
+              {parityHref && <a href={parityHref}>Parity source</a>}
+            </li>
+          );
+        })}
+      </ul>
+      <p class="native-demo__note">The Kotlin side here is recorded semantic evidence; it is not a rendered Compose screen.</p>
+    </article>
+  </div>
+
+  <div class="native-demo__source-links">
+    {codeHref(fixturePath) && <a href={codeHref(fixturePath)}>Open the spec fixture source</a>}
+    {codeHref(tracePath) && <a href={codeHref(tracePath)}>Open the Compose conformance trace</a>}
+  </div>
+
+  <NativeDemoIsland
+    client:visible
+    blueprintJson={NATIVE_DEMO_FIXTURE_JSON}
+    traceJson={NATIVE_DEMO_TRACE_JSON}
+    specVersion={NATIVE_DEMO_SPEC_VERSION}
+  />
+</section>
+
+<style>
+  .native-demo {
+    display: grid;
+    gap: 1.25rem;
+    max-inline-size: 78rem;
+    margin-inline: auto;
+    padding: clamp(2.5rem, 7vw, 5rem) clamp(1rem, 4vw, 1.5rem);
+    color: var(--tx-foreground, CanvasText);
+  }
+
+  .native-demo__heading {
+    max-inline-size: 48rem;
+  }
+
+  .native-demo__eyebrow {
+    margin: 0 0 0.5rem;
+    color: var(--tx-accent-foreground, var(--tx-primary, #6842d8));
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .native-demo h2 {
+    margin: 0;
+    font-size: clamp(1.65rem, 4vw, 2.4rem);
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  .native-demo__heading > p:not(.native-demo__eyebrow) {
+    color: var(--tx-muted-foreground, GrayText);
+    line-height: 1.55;
+  }
+
+  .native-demo__validated {
+    font-weight: 700;
+  }
+
+  .native-demo__columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 25rem), 1fr));
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .native-demo__panel {
+    min-inline-size: 0;
+    padding: clamp(0.85rem, 2vw, 1.25rem);
+    border: 1px solid var(--tx-border, GrayText);
+    border-radius: var(--tx-radius, 0.75rem);
+    background: var(--tx-surface, Canvas);
+  }
+
+  .native-demo__panel h3 {
+    margin-block: 0 0.8rem;
+    font-size: 1.1rem;
+  }
+
+  .native-demo__panel > p,
+  .native-demo__note {
+    color: var(--tx-muted-foreground, GrayText);
+    line-height: 1.5;
+  }
+
+  .native-demo__parity {
+    display: grid;
+    gap: 0.65rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .native-demo__parity li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.35rem 0.7rem;
+    padding-block: 0.65rem;
+    border-block-end: 1px solid var(--tx-border, GrayText);
+    overflow-wrap: anywhere;
+  }
+
+  .native-demo__parity li > code {
+    grid-column: 1 / -1;
+    font-weight: 700;
+  }
+
+  .native-demo__parity span,
+  .native-demo__parity a,
+  .native-demo__source-links a {
+    font-size: 0.9rem;
+  }
+
+  .native-demo__source-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+  }
+
+  @media (max-width: 34rem) {
+    .native-demo__parity li {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
