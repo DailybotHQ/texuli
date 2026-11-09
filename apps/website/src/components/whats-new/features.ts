@@ -34,7 +34,7 @@ export const RELEASES: readonly Release[] = [
     status: 'Published on npm as 0.15.0, the current release (pre-1.0).',
     published: true,
     summary:
-      "Locked design systems for the consumers Protoyard and Dailybot, with no breaking API change. Blueprint spec 0.13.0 lets a design system name the components, variants, sizes and states a product may use (allow), its own components (library) and the approval of each version (approval, with a content hash); texuli ds init --locked, ds approve, ds hash and ds check keep it honest, and an approval records who approved but cannot prove it. The catalog lists each component's axes, states and imports, grows to 187 ids and merges host extensions (<ns>:<id>). Heading, Text, Prose and Box set type and surfaces from tokens, and Button takes a tone. The design-system kit, ds generate, the importers and the locked checkers are in development, completed in 0.16.0.",
+      "Locked design systems for the consumers Protoyard and Dailybot, with no breaking API change. Blueprint spec 0.13.0 lets a design system name the components, variants, sizes and states a product may use (allow), its own components (library) and the approval of each version (approval, with a content hash); texuli ds init --locked, ds approve, ds hash and ds check keep it honest, and an approval records who approved but cannot prove it. The catalog lists each component's axes, states and imports, grows to 194 ids and merges host extensions (<ns>:<id>). Heading, Text, Prose and Box set type and surfaces from tokens, and Button takes a tone. The design-system kit, ds generate, the importers and the locked checkers are in development, completed in 0.16.0.",
   },
   {
     id: '0.14.0',

@@ -89,7 +89,7 @@ the catalog and its operations in an agent's hands.
 6. **Whole interfaces as JSON.** A blueprint (spec 0.13.0; interaction since 0.3.0) declares local
    state, flows, two-way bindings and a closed action set, so an agent can
    send a working dashboard, form flow, sortable board or workflow builder
-   as data. All 75 agent-emittable ids of the 187-id catalog paint in the
+   as data. All 75 agent-emittable ids of the 194-id catalog paint in the
    player, and a blueprint that validates always paints (the spec, catalog,
    player and Kotlin validators share the state surface rules).
 7. **One drag engine.** `@texuli/drag` plans every drag as data (sortable

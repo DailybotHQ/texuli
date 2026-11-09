@@ -92,7 +92,7 @@ versions into `main`). Publishing never overwrites a published version.
 A `0.x` minor with no breaking API change: every published package moves to
 `0.15.0` together, and every internal `@texuli/*` pin is exactly `0.15.0`.
 Blueprint spec `0.13.0` (digest
-`69f524e69cb6721d8a96dfae77ed41016f86c2245cfec894d4dd590639b29a0c`) makes it a
+`37897e1b4d669ca0f32ba49b4960c921e860c1bacb38a9f29a1072389708ffae`) makes it a
 minor, so `^0.14.0` and `~0.14.0` never pick it up. Every `0.12.0` blueprint
 and design-system document stays valid (a stamp-only migration), a document
 without the new sections compiles to the same CSS, and no package export was
@@ -143,14 +143,18 @@ has, and who approved that version.
   observable `states` from a closed list of 11, and the public `imports` that
   render it (or, for blueprint-only nodes, a recorded reason); a test fails
   when an axis drifts from its prop.
-- The catalog grows from 170 to 187 ids: the typography components
+- The catalog grows from 170 to 194 ids: the typography components
   (`heading`, `text`, `prose`, `box`), a display set (`icon`, every icon
   included, `avatar`, `skeleton`, `progress`, `spinner`, `carousel`,
-  `separator`, `list-item`) and an app set (`tabs`, `accordion`, `composer`,
-  `mobile-header`, `bottom-nav`), each app-tier and governed by `allow`. 75
-  ids stay agent-emittable; host chrome never is.
+  `separator`, `list-item`), an app set (`tabs`, `accordion`, `composer`,
+  `mobile-header`, `bottom-nav`) and an input set (`ToggleGroup`, `Rating`,
+  `FileUpload`, `TagsInput`, `PinInput`, `NumberField`, and the
+  `MobileAppFrame` host chrome), each app-tier and governed by `allow`. 75
+  ids stay agent-emittable; host chrome never is. The catalog maps the
+  public primitive exports to the ids they render.
 - **Host catalog extensions:** a host library publishes its own components as
   a `texuli/catalog-extension` (ids `<ns>:<id>`, each composing catalog ids);
+  an empty `composes` marks a leaf built directly on host primitives;
   `mergeCatalogs(texuli, extensions)` (`@texuli/spec`) merges them with
   stable refusal codes (`extension-collision`, `extension-composes` and
   seven more) over bounded input, and allow sets, the allow manifest and the
@@ -168,8 +172,15 @@ has, and who approved that version.
   with a size independent of the level), `Text` (body, labels, small print,
   eyebrows and large tabular figures; never a heading), `Prose` (long-form
   rhythm) and `Box` (padding, radius, a full or single logical border side,
-  elevation and surface), all from `--tx-*` tokens
+  elevation and surface, including `primary`, `brand` and a `translucent`
+  glass surface that stays opaque without backdrop-filter, with reduced
+  transparency and in forced colors), all from `--tx-*` tokens; `Heading`
+  sizes `4xl`, `3xl` and `2xl` with fluid `responsive` sizing and `tight`
+  tracking, and `Text` size and tone `inherit`
   ([ui-typography](../packages/texuli/docs/ui-typography.md)).
+- A linked `Card` keeps one real anchor stretched over the surface; pin and
+  menu actions inside it sit above it in tab order.
+- `Icon` takes `tone`; a design system's component defaults never set it.
 - `Button` and `IconButton` take `tone` (`default`, `destructive`,
   `success`, `warning`), independent of `variant`, so an outline destructive
   button exists; the `destructive` variant still paints as before.
@@ -193,6 +204,9 @@ has, and who approved that version.
   rules, the component matrix, the library with approval badges and the
   changes between two versions), and its texuli.com page
   `/design-systems/kit/`.
+- `texuli ds validate <file>` (the author-facing command: the document and
+  its compiled guarantees, or with `--locked` and `--prototype <dir>` the full
+  validator over a local prototype's sources).
 - `texuli ds generate`, `ds.generate` and the design-system generation
   pipeline; the site-CSS importer and import-loss reports in
   `@texuli/tokens/design-system/import`.
@@ -3095,7 +3109,7 @@ the package-to-package contract outside this repository.
 | `@texuli/deck` | `0.15.0` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/document`, `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
 | `@texuli/drag`, `@texuli/workflows` | `0.15.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
 | `@texuli/mcp` | `0.15.0` (first published as `0.9.0`) | `packages/mcp/package.json`, with `@texuli/tools` pinned to exactly its own version; published right after `@texuli/tools`. In development (ADR-019), pre-1.0. |
-| Blueprint spec | `0.13.0`, digest `69f524e69cb6721d8a96dfae77ed41016f86c2245cfec894d4dd590639b29a0c` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.15.0`; locked design systems (the design-system `allow`, `library` and `approval` sections), catalog `axes`, `states` and `imports`, host catalog extensions (`$defs.extension`, `<ns>:<id>`), 17 new catalog ids, and the contract schemas (in development), a stamp-only migration from `0.12.0`. |
+| Blueprint spec | `0.13.0`, digest `37897e1b4d669ca0f32ba49b4960c921e860c1bacb38a9f29a1072389708ffae` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.15.0`; locked design systems (the design-system `allow`, `library` and `approval` sections), catalog `axes`, `states` and `imports`, host catalog extensions (`$defs.extension`, `<ns>:<id>`), 17 new catalog ids, and the contract schemas (in development), a stamp-only migration from `0.12.0`. |
 | Blueprint spec in `@texuli/spec@0.14.0` to `@texuli/spec@0.14.4` | `0.12.0`, digest `049c93b4105fb765c2db5ff20272494f99fce52552aafaf85e00789fc1747a14` | The 0.14 line's generated sources carry the `0.12.0` stamp; additive catalog ids (`code-field`, `avatar-group-grid`), `media-image` `srcDark` and `darkMode`, the `data-timeline` groups, markers, selection and `collapse` event, and design-system fields (`darkOpacity`, `aa-non-text`, the card content font size), a stamp-only migration from `0.11.0`. |
 | Blueprint spec in `@texuli/spec@0.13.0` and `@texuli/spec@0.13.1` | `0.11.0`, digest `17845743d088b768c4441ea2196e5c350687533dbd0c95589cba938fb31fe993` | The 0.13 line's generated sources carry the `0.11.0` stamp; additive design-system fields (shadow levels, product tokens, short categorical palettes, soft inks), a stamp-only migration from `0.10.0`. |
 | Blueprint spec in `@texuli/spec@0.10.0` to `@texuli/spec@0.12.3` | `0.10.0`, digest `afcb9e3ed6b74b833a0f7477a657168621785ee98602ff582aa047e2d86aef17` | The 0.10, 0.11 and 0.12 lines' generated sources carry the `0.10.0` stamp (`@texuli/spec@0.10.0`, `0.11.0` to `0.11.5` and `0.12.0` to `0.12.3`); a stamp-only migration from `0.9.0`. |

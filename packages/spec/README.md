@@ -22,7 +22,7 @@ DOM, no Svelte, no Node APIs and no runtime dependencies.
 
 > **New in `0.15.0`.** `@texuli/spec@0.15.0` carries **spec 0.13.0**
 > (digest
-> `69f524e69cb6721d8a96dfae77ed41016f86c2245cfec894d4dd590639b29a0c`):
+> `37897e1b4d669ca0f32ba49b4960c921e860c1bacb38a9f29a1072389708ffae`):
 > locked design systems (ADR-032). The design-system document gains the
 > optional `allow` (catalog ids, `<ns>:<id>` included, with their enabled
 > variants, sizes, tones, densities and states), `library` and `approval`
@@ -330,7 +330,7 @@ envelope up to the current spec with pure, per-version steps
 `0.9.0 → 0.10.0`, `0.10.0 → 0.11.0`, `0.11.0 → 0.12.0` and `0.12.0 → 0.13.0`, each of which
 only stamps `spec`); a compatible version
 range is planned, not built. `@texuli/spec@0.15.0` carries spec `0.13.0` (digest
-`69f524e69cb6721d8a96dfae77ed41016f86c2245cfec894d4dd590639b29a0c`): locked
+`37897e1b4d669ca0f32ba49b4960c921e860c1bacb38a9f29a1072389708ffae`): locked
 design systems and catalog axes, states, imports and extensions (above).
 `@texuli/spec@0.14.0` to `0.14.4` carried spec `0.12.0` (digest
 `049c93b4105fb765c2db5ff20272494f99fce52552aafaf85e00789fc1747a14`): two

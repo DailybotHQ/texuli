@@ -189,7 +189,7 @@ agent output (JSON) ─► @texuli/spec migrate + validate (closed vocabulary, s
                     ─► @texuli/player painters ─► URL policy ('untrusted') on every link and source
 ```
 
-- **Catalog groups.** `@texuli/catalog` builds 187 ids from manifest groups:
+- **Catalog groups.** `@texuli/catalog` builds 194 ids from manifest groups:
   `content`, `display`, `forms`, `layouts`, `overlays`, (new in `0.4.0`)
   `composition`, `data`, `chat`, `state` and `workflows`, (new in `0.7.0`)
   `documents`, whose `document` id carries a Texuli document as data,
