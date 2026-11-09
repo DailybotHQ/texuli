@@ -5,13 +5,14 @@
  * a card links its case study only when that page exists, and its own site through the URL
  * policy. Products are grouped by who builds them: the Texuli team, then the community.
  */
+
+import { safeHref } from '@texuli/core/url-policy';
 import {
   LISTED_PRODUCTS,
   type ProductEntry,
   type ProductGroup,
   type ProductStatus,
 } from '../../../data/products/index.ts';
-import { safeHref } from '@texuli/core/url-policy';
 import { siteRouteExists } from '../../foundation/nav-data.ts';
 
 export type RouteExists = (route: string) => boolean;
@@ -58,7 +59,10 @@ export function caseStudyRoute(product: Pick<ProductEntry, 'id'>): string {
 }
 
 /** One card view; never adds a status, offering or domain the record does not hold. */
-export function productCard(product: ProductEntry, exists: RouteExists = siteRouteExists): ProductCardView {
+export function productCard(
+  product: ProductEntry,
+  exists: RouteExists = siteRouteExists
+): ProductCardView {
   const siteHref = product.domain ? safeHref(`https://${product.domain}`, 'developer') : undefined;
   const route = caseStudyRoute(product);
   return {

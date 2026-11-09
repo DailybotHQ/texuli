@@ -1,12 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { siteRouteExists } from '../../src/components/foundation/nav-data.ts';
 import {
   CATALOG_PAGE,
   catalogCards,
   filterCounts,
 } from '../../src/components/solutions/catalog/catalog-content.ts';
-import { siteRouteExists } from '../../src/components/foundation/nav-data.ts';
 import { platformRows } from '../../src/components/solutions/shared/platforms/platforms-model.ts';
 import { SOLUTIONS } from '../../src/data/solutions/index.ts';
 import type { SolutionEntry } from '../../src/data/solutions/schema.ts';
@@ -39,7 +39,11 @@ describe('/solutions/ catalog content', () => {
       expect(card.native, card.slug).toBe('planned');
       expect(card.onNative).toBe(false);
     }
-    expect(filterCounts(catalogCards())).toEqual({ all: SOLUTIONS.length, web: SOLUTIONS.length, native: 0 });
+    expect(filterCounts(catalogCards())).toEqual({
+      all: SOLUTIONS.length,
+      web: SOLUTIONS.length,
+      native: 0,
+    });
   });
 
   it('puts a Solution under Native only when an entry lists a native status past planned', () => {
@@ -48,7 +52,11 @@ describe('/solutions/ catalog content', () => {
       ...base,
       platforms: [
         { platform: 'web', status: 'in development', evidence: [] },
-        { platform: 'compose-desktop', status: 'experimental', evidence: ['native/docs/parity.json'] },
+        {
+          platform: 'compose-desktop',
+          status: 'experimental',
+          evidence: ['native/docs/parity.json'],
+        },
       ],
     };
     const [card] = catalogCards(() => false, [withDesktop]);
@@ -83,16 +91,24 @@ describe('/solutions/ catalog content', () => {
 describe('/solutions/ filters without JavaScript', () => {
   it('offers All, Web and Native as in-page links to anchors placed before the filters and the list', () => {
     expect(markup).toContain('<span id={anchor(filter.id)} class="sol-catalog__anchor" />');
-    expect(markup).toContain('href={`#${anchor(filter.id)}`}');
-    expect(markup.indexOf('sol-catalog__anchor')).toBeLessThan(markup.indexOf('sol-catalog__filters'));
-    expect(markup.indexOf('sol-catalog__filters')).toBeLessThan(markup.indexOf('sol-catalog__cards'));
+    expect(markup).toMatch(/href=\{`#\$\{anchor\(filter\.id\)\}`\}/);
+    expect(markup.indexOf('sol-catalog__anchor')).toBeLessThan(
+      markup.indexOf('sol-catalog__filters')
+    );
+    expect(markup.indexOf('sol-catalog__filters')).toBeLessThan(
+      markup.indexOf('sol-catalog__cards')
+    );
     expect(markup).toContain('aria-label={page.filters.label}');
   });
 
   it('hides off-filter cards and shows the native note with CSS :target only', () => {
     expect(styles).toMatch(/#solutions-web:target ~ \.sol-catalog__cards \[data-on-web='false'\]/);
-    expect(styles).toMatch(/#solutions-native:target ~ \.sol-catalog__cards \[data-on-native='false'\]/);
-    expect(styles).toMatch(/#solutions-native:target ~ \.sol-catalog__native-empty \{\s*display: block;/);
+    expect(styles).toMatch(
+      /#solutions-native:target ~ \.sol-catalog__cards \[data-on-native='false'\]/
+    );
+    expect(styles).toMatch(
+      /#solutions-native:target ~ \.sol-catalog__native-empty \{\s*display: block;/
+    );
     expect(markup).toContain('data-on-web={String(card.onWeb)}');
     expect(markup).toContain('data-on-native={String(card.onNative)}');
   });
@@ -122,7 +138,9 @@ describe('/solutions/ page and markup', () => {
     expect(markup).toContain('href={resolveHref(card.docs)}');
     expect(component).toContain("safeHref(href, 'developer')");
     expect(markup).not.toMatch(/\sstyle=/);
-    expect(styles).not.toMatch(/margin-(left|right)|padding-(left|right)|\b(left|right|top|bottom):/);
+    expect(styles).not.toMatch(
+      /margin-(left|right)|padding-(left|right)|\b(left|right|top|bottom):/
+    );
   });
 
   it('uses the page-solutions art when registered, else a decorative mosaic', () => {
