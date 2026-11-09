@@ -90,6 +90,11 @@
       "svelte": "./src/design-system/index.ts",
       "default": "./src/design-system/index.ts"
     },
+    "./ds-kit": {
+      "types": "./src/ds-kit/index.ts",
+      "svelte": "./src/ds-kit/index.ts",
+      "default": "./src/ds-kit/index.ts"
+    },
     "./dialog": {
       "types": "./src/components/dialog/index.ts",
       "svelte": "./src/components/dialog/index.ts",

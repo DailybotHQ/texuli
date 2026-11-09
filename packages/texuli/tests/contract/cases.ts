@@ -49,6 +49,8 @@ export const EXCLUDED: Record<string, string> = {
  */
 export const EXCLUDED_PREFIXES: Record<string, string> = {
   'layouts/': 'planned: the page layouts join the contract in a follow-up task',
+  'ds-kit/':
+    'planned: the design-system kit (ADR-032) is a read-only page of sections, not a control; it joins the contract once its sections land (T4)',
 };
 
 /** One case per exported rendering component, each mounted in its family harness. */
