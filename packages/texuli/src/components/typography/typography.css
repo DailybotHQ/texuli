@@ -235,6 +235,19 @@
   }
   .tx-prose :where(ul, ol) {
     padding-inline-start: var(--tx-space-6);
+    list-style-position: outside;
+  }
+  .tx-prose :where(ul) {
+    list-style-type: disc;
+  }
+  .tx-prose :where(ol) {
+    list-style-type: decimal;
+  }
+  .tx-prose :where(ul ul) {
+    list-style-type: circle;
+  }
+  .tx-prose :where(li::marker) {
+    color: var(--tx-muted-foreground, GrayText);
   }
   .tx-prose :where(li + li) {
     margin-block-start: var(--tx-space-2);
@@ -250,6 +263,59 @@
   }
   .tx-prose :where(a) {
     color: var(--tx-link, LinkText);
+  }
+
+  /* Inline link: wraps in a sentence; underline and color from link tokens. */
+  .tx-link {
+    display: inline;
+    color: var(--tx-link, LinkText);
+    text-decoration-line: underline;
+    text-decoration-thickness: var(--tx-border-width-thin);
+    text-decoration-color: var(--tx-link, LinkText);
+    text-underline-offset: var(--tx-space-1);
+    overflow-wrap: anywhere;
+  }
+  .tx-link:hover {
+    color: var(--tx-link-hover, LinkText);
+    text-decoration-color: var(--tx-link-hover, LinkText);
+  }
+  .tx-link:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  /* Color swatch: a closed token or data-viz color with contrast ink. */
+  .tx-color-swatch {
+    --tx-swatch-fill: var(--tx-muted, Canvas);
+    --tx-swatch-ink: var(--tx-muted-foreground, GrayText);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    border-radius: var(--tx-shape-radius-sm);
+    border: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+    background-color: var(--tx-swatch-fill);
+    color: var(--tx-swatch-ink);
+    font-size: var(--tx-font-size-xs, 0.75rem);
+    line-height: 1;
+    overflow-wrap: anywhere;
+  }
+  .tx-color-swatch--sm {
+    inline-size: var(--tx-size-icon-sm);
+    block-size: var(--tx-size-icon-sm);
+  }
+  .tx-color-swatch--md {
+    inline-size: var(--tx-size-icon-md);
+    block-size: var(--tx-size-icon-md);
+  }
+  .tx-color-swatch--lg {
+    inline-size: var(--tx-size-icon-lg);
+    block-size: var(--tx-size-icon-lg);
+  }
+  .tx-color-swatch:not(:empty) {
+    inline-size: auto;
+    min-inline-size: var(--tx-size-icon-md);
+    padding-inline: var(--tx-space-2);
   }
 
   /* Box: padding, radius, border, elevation and surface from tokens. */
@@ -301,6 +367,9 @@
   }
   .tx-box--border-block-end {
     border-block-end: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+  }
+  .tx-box--border-dashed {
+    border: var(--tx-border-width-thin) dashed var(--tx-border, currentColor);
   }
   .tx-box--elevation-sm {
     box-shadow: var(--tx-elevation-1);
@@ -373,6 +442,15 @@
     .tx-box--surface-translucent {
       background-color: Canvas;
       backdrop-filter: none;
+    }
+    .tx-link {
+      color: LinkText;
+      text-decoration-color: LinkText;
+    }
+    .tx-color-swatch {
+      background-color: Canvas;
+      color: CanvasText;
+      outline: 1px solid CanvasText;
     }
   }
 }

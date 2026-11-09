@@ -355,6 +355,12 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli', exports: ['Code'] },
     { module: 'texuli/kbd-code', exports: ['Code'] },
   ],
+  'color-swatch': [
+    {
+      module: 'texuli/typography',
+      exports: ['COLOR_SWATCH_SIZES', 'ColorSwatch', 'ColorSwatchSize'],
+    },
+  ],
   'code-field': [
     {
       module: '@texuli/blocks/code-field',
@@ -1001,6 +1007,7 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli/layouts/auth-settings', exports: ['WizardLayout'] },
     { module: 'texuli/stepper', exports: ['Wizard'] },
   ],
+  link: [{ module: 'texuli/typography', exports: ['Link'] }],
   'list-item': [{ module: 'texuli/list-item', exports: ['ListItem'] }],
   'media-composition-canvas': [
     { module: '@texuli/media', exports: ['CompositionCanvas'] },

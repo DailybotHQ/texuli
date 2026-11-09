@@ -70,6 +70,9 @@ export type ProseSize = (typeof PROSE_SIZES)[number];
 export const PROSE_ELEMENTS = ['div', 'article', 'section'] as const;
 export type ProseElement = (typeof PROSE_ELEMENTS)[number];
 
+export const COLOR_SWATCH_SIZES = ['sm', 'md', 'lg'] as const;
+export type ColorSwatchSize = (typeof COLOR_SWATCH_SIZES)[number];
+
 export const BOX_ELEMENTS = ['div', 'section', 'article', 'aside', 'header', 'footer'] as const;
 export type BoxElement = (typeof BOX_ELEMENTS)[number];
 
@@ -79,8 +82,15 @@ export type BoxPadding = (typeof BOX_PADDINGS)[number];
 export const BOX_RADII = ['none', 'sm', 'md', 'lg', 'xl', 'full'] as const;
 export type BoxRadius = (typeof BOX_RADII)[number];
 
-/** A full border, or one logical side only (`block-start`, `block-end`) for app headers and footers. */
-export const BOX_BORDERS = ['none', 'default', 'strong', 'block-start', 'block-end'] as const;
+/** A full border, one logical side (`block-start`, `block-end`), or a dashed token border. */
+export const BOX_BORDERS = [
+  'none',
+  'default',
+  'strong',
+  'block-start',
+  'block-end',
+  'dashed',
+] as const;
 export type BoxBorder = (typeof BOX_BORDERS)[number];
 
 export const BOX_ELEVATIONS = ['none', 'sm', 'md', 'lg'] as const;
@@ -175,7 +185,14 @@ export const boxClass = variants({
       xl: 'tx-box--radius-xl',
       full: 'tx-box--radius-full',
     },
-    border: map(BOX_BORDERS, 'tx-box--border-'),
+    border: {
+      none: 'tx-box--border-none',
+      default: 'tx-box--border-default',
+      strong: 'tx-box--border-strong',
+      'block-start': 'tx-box--border-block-start',
+      'block-end': 'tx-box--border-block-end',
+      dashed: 'tx-box--border-dashed',
+    },
     elevation: {
       none: 'tx-box--elevation-none',
       sm: 'tx-box--elevation-sm',

@@ -14,6 +14,7 @@ import {
   carouselPropNames,
   chipPropNames,
   codePropNames,
+  colorSwatchPropNames,
   emptyStatePropNames,
   errorStatePropNames,
   headingPropNames,
@@ -21,6 +22,7 @@ import {
   inlineTextPropNames,
   kbdPropNames,
   kpiPropNames,
+  linkPropNames,
   listItemPropNames,
   progressPropNames,
   prosePropNames,
@@ -321,10 +323,10 @@ export const boxManifest = /* @__PURE__ */ defineDisplayManifest({
     radius: { kind: 'enum', enumValues: ['none', 'sm', 'md', 'lg', 'xl', 'full'], default: 'md' },
     border: {
       kind: 'enum',
-      enumValues: ['none', 'default', 'strong', 'block-start', 'block-end'],
+      enumValues: ['none', 'default', 'strong', 'block-start', 'block-end', 'dashed'],
       default: 'none',
       description:
-        'All sides, or one logical side (block-start, block-end) for an app header or footer',
+        'All sides, one logical side (block-start, block-end), or dashed (token dashed border)',
     },
     elevation: { kind: 'enum', enumValues: ['none', 'sm', 'md', 'lg'], default: 'none' },
     surface: {
@@ -384,8 +386,130 @@ export const boxManifest = /* @__PURE__ */ defineDisplayManifest({
         surface: 'translucent',
       },
     },
+    {
+      id: 'dashed',
+      title: 'Dashed panel',
+      props: { padding: 'md', border: 'dashed', surface: 'default' },
+    },
   ],
   related: ['card', 'heading', 'text'],
+});
+
+const SWATCH_COLORS = [
+  'chart-1',
+  'chart-2',
+  'chart-3',
+  'chart-4',
+  'chart-5',
+  'chart-6',
+  'chart-7',
+  'chart-8',
+  'primary',
+  'secondary',
+  'success',
+  'warning',
+  'destructive',
+  'info',
+  'neutral',
+] as const;
+
+/** ColorSwatch (ADR-032): a closed token or data-viz color chip with contrast ink. */
+export const colorSwatchManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'color-swatch',
+  package: PKG,
+  label: 'Color swatch',
+  summary:
+    'A chip of a closed palette, role or data-viz color with contrast ink from tokens. Never free CSS.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['Show a named token or series color in a legend, key or palette'],
+  dontUseWhen: ['A status label (use badge)', 'A long-form color name in a sentence (use text)'],
+  a11y: 'Pair the fill with a text label; never convey the color by fill alone.',
+  props: propsFrom(colorSwatchPropNames, {
+    color: {
+      kind: 'enum',
+      enumValues: [...SWATCH_COLORS],
+      default: 'primary',
+      description: 'Closed color reference (chart-1…8 or a role token)',
+    },
+    size: { kind: 'enum', enumValues: ['sm', 'md', 'lg'], default: 'md' },
+    label: { kind: 'string', description: 'Plain-text label, escaped' },
+    class: { kind: 'string' },
+    children: { kind: 'slot', description: 'Rich label content; replaced by a non-empty label' },
+  }),
+  examples: [
+    { id: 'primary', title: 'Primary swatch', props: { color: 'primary', label: 'Primary' } },
+    {
+      id: 'series',
+      title: 'Chart series',
+      props: { color: 'chart-1', size: 'md', label: 'North' },
+    },
+  ],
+  related: ['badge', 'box', 'text'],
+});
+
+/** Link (ADR-032): an inline sentence link with safeHref and a token underline. */
+export const linkManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'link',
+  package: PKG,
+  label: 'Link',
+  summary:
+    'An inline sentence link. Underline and color come from link tokens; href is filtered by the URL policy.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['A word or phrase inside a sentence that navigates'],
+  dontUseWhen: [
+    'A button-shaped control (use button with href)',
+    'A whole card (use card with href)',
+  ],
+  a11y: [
+    'Renders one real link that wraps in the line',
+    'http(s) destinations, external, and target=_blank add rel=noopener noreferrer',
+    'A refused href renders as text, never a dead link',
+  ],
+  props: propsFrom(linkPropNames, {
+    href: {
+      kind: 'string',
+      required: true,
+      description: 'Destination (URL policy)',
+      trust: 'developer',
+    },
+    hrefTrust: {
+      kind: 'enum',
+      enumValues: ['developer', 'untrusted'],
+      default: 'developer',
+    },
+    external: {
+      kind: 'boolean',
+      default: false,
+      description: 'Adds rel=noopener noreferrer (also added for http(s) and target=_blank)',
+    },
+    target: { kind: 'string', description: 'Link target; _blank always adds noopener noreferrer' },
+    rel: {
+      kind: 'string',
+      description: 'Extra rel tokens; noopener/noreferrer are merged when needed',
+    },
+    label: { kind: 'string', description: 'Plain-text label, escaped' },
+    class: { kind: 'string' },
+    children: { kind: 'slot', description: 'Rich link text; replaced by a non-empty label' },
+  }),
+  examples: [
+    {
+      id: 'inline',
+      title: 'Inline sentence link',
+      props: { href: 'https://example.com/guide', label: 'the harbor guide' },
+    },
+    {
+      id: 'external',
+      title: 'External link',
+      props: {
+        href: 'https://example.com/docs',
+        external: true,
+        label: 'Docs',
+      },
+    },
+  ],
+  related: ['button', 'prose', 'text'],
 });
 
 export const cardManifest = /* @__PURE__ */ defineDisplayManifest({
@@ -1398,14 +1522,16 @@ export const DISPLAY_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Obj
   carouselManifest,
   chipManifest,
   codeManifest,
+  colorSwatchManifest,
   emptyStateManifest,
   errorStateManifest,
   headingManifest,
   iconManifest,
   inlineTextManifest,
   kbdManifest,
-  listItemManifest,
   kpiManifest,
+  linkManifest,
+  listItemManifest,
   progressManifest,
   proseManifest,
   separatorManifest,
@@ -1434,6 +1560,7 @@ export const DISPLAY_PROP_NAMES = /* @__PURE__ */ Object.freeze({
   carousel: carouselPropNames,
   chip: chipPropNames,
   code: codePropNames,
+  'color-swatch': colorSwatchPropNames,
   'empty-state': emptyStatePropNames,
   'error-state': errorStatePropNames,
   heading: headingPropNames,
@@ -1441,6 +1568,7 @@ export const DISPLAY_PROP_NAMES = /* @__PURE__ */ Object.freeze({
   'inline-text': inlineTextPropNames,
   kbd: kbdPropNames,
   kpi: kpiPropNames,
+  link: linkPropNames,
   'list-item': listItemPropNames,
   progress: progressPropNames,
   prose: prosePropNames,

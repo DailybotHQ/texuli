@@ -1,12 +1,13 @@
-# Heading, Text, Prose and Box
+# Heading, Text, Prose, Box, Link and ColorSwatch
 
-**Package:** `texuli` · **Import:** `texuli/typography` or `texuli` · **Status:** built for
+**Package:** `texuli` · **Import:** `texuli/typography` (`Heading`, `Text`, `Prose` and `Box` are also on `texuli`) · **Status:** built for
 blueprint spec `0.13.0`, not published (planned for `0.15.0`)
 
 Typography and surfaces from the design system, driven by `--tx-*` tokens only. A locked
 prototype ([DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md#locked-design-systems)) refuses
-typography and visual utilities, so these four catalog components are how it keeps titles,
-section headings, muted and small text, long-form text and bordered panels.
+typography and visual utilities, so these catalog components are how it keeps titles,
+section headings, muted and small text, long-form text, bordered panels, inline links and
+named color chips.
 
 | Component | Catalog id | Role | Axes (catalog) |
 | --- | --- | --- | --- |
@@ -14,22 +15,24 @@ section headings, muted and small text, long-form text and bordered panels.
 | `Text` | `text` | Body copy, labels, captions, small print, eyebrows and large figures; never a heading | `size`, `tone` |
 | `Prose` | `prose` | Long-form markup with the design system's reading rhythm | `size` |
 | `Box` | `box` | A panel or region: padding, radius, border, elevation and surface | `variant` (the `surface` prop) |
+| `Link` | `link` | An inline sentence link; `href` through `safeHref` | hover, focus-visible |
+| `ColorSwatch` | `color-swatch` | A closed palette, role or data-viz color chip with contrast ink | `variant` (the `color` prop), `size` |
 
-None of them has an observable state (no hover, focus or disabled styling), so the catalog
-lists no `states` for them. Each root carries `data-tx-component` and its axis attributes
-(`data-tx-size`, `data-tx-tone`, and `data-tx-variant` for Box), so a checker maps any
+Heading, Text, Prose and Box have no observable state. Link lists hover and focus-visible.
+Each root carries `data-tx-component` and its axis attributes
+(`data-tx-size`, `data-tx-tone`, and `data-tx-variant` for Box and ColorSwatch), so a checker maps any
 rendered element back to its component, and an `allow` section enables or narrows them like
 any other catalog component:
 
 ```json
-{ "allow": { "heading": { "sizes": ["xl", "lg", "md"] }, "text": { "tones": ["default", "muted"] }, "box": {}, "prose": {} } }
+{ "allow": { "heading": { "sizes": ["xl", "lg", "md"] }, "text": { "tones": ["default", "muted"] }, "box": {}, "prose": {}, "link": {}, "color-swatch": {} } }
 ```
 
 ## Usage
 
 ```svelte
 <script lang="ts">
-  import { Box, Heading, Prose, Text } from 'texuli/typography';
+  import { Box, ColorSwatch, Heading, Link, Prose, Text } from 'texuli/typography';
 </script>
 
 <Box as="header" radius="none" border="block-end" surface="default">
@@ -45,9 +48,12 @@ any other catalog component:
 
 <Heading level={2} size="md" tone="muted">Details</Heading>
 <Prose as="article">
-  <p>Example Co. closed the quarter ahead of plan.</p>
+  <p>Example Co. closed the quarter ahead of plan. See <Link href="https://example.com/guide" label="the harbor guide" />.</p>
   <ul><li>Reports load from a cached query.</li></ul>
+  <ol><li>Review the north pier.</li></ol>
 </Prose>
+<ColorSwatch color="chart-1" label="North" />
+<Box padding="md" border="dashed" surface="default">Dashed panel</Box>
 ```
 
 Heading and Text also take `label`: plain text rendered as escaped text that replaces
@@ -114,7 +120,9 @@ would fail AA). A tone never carries meaning alone: the words say it.
 
 A 65ch measure, the body role, block spacing from the space scale (`--tx-space-4`, more before
 headings), heading sizes from the title and heading roles, list indent, quote and inline code
-styles. The content is the host's markup (children); Prose never renders HTML from a string.
+styles. Unordered lists use `disc` markers and ordered lists use `decimal`, with
+`--tx-muted-foreground` marker ink, so bullets and numbers show under every theme. The content
+is the host's markup (children); Prose never renders HTML from a string.
 
 ## Box
 
@@ -123,7 +131,7 @@ styles. The content is the host's markup (children); Prose never renders HTML fr
 | `as` | `div`, `section`, `article`, `aside`, `header`, `footer` | `div` |
 | `padding` | `none`, `sm`, `md`, `lg`, `xl` (space scale) | `md` |
 | `radius` | `none`, `sm`, `md`, `lg`, `xl`, `full` (shape radius) | `md` |
-| `border` | `none`, `default`, `strong`, or one logical side: `block-start`, `block-end` | `none` |
+| `border` | `none`, `default`, `strong`, one logical side (`block-start`, `block-end`), or `dashed` | `none` |
 | `elevation` | `none`, `sm`, `md`, `lg` (elevation levels 1, 2, 4) | `none` |
 | `surface` | `transparent`, `default`, `muted`, `subtle`, `elevated`, `primary`, `brand`, `translucent` | `transparent` |
 
@@ -143,6 +151,44 @@ In forced colors a filled Box without a border keeps a 1px outline.
 ```svelte
 <Box as="header" padding="md" radius="none" border="block-end" surface="translucent">…</Box>
 <Box padding="md" radius="lg" surface="primary">…</Box>
+<Box padding="md" border="dashed">…</Box>
+```
+
+`border="dashed"` is `--tx-border-width-thin` dashed `--tx-border`.
+
+## Link
+
+| Prop | Values | Default |
+| --- | --- | --- |
+| `href` | destination, filtered by `safeHref` | required |
+| `hrefTrust` | `developer` (app-authored props), `untrusted` | `developer` |
+| `external` | add `rel="noopener noreferrer"` | `false` |
+| `target` | link target; `_blank` also adds `noopener noreferrer` | — |
+| `label` | plain text, escaped | — |
+
+The link is `display: inline` so it wraps inside a sentence. Color and underline come from
+`--tx-link` and `--tx-border-width-thin`. An http(s) href, `external`, or `target="_blank"`
+adds `rel="noopener noreferrer"`. A refused href (`javascript:`, a blocked scheme) renders as
+text with `data-href-blocked`, never a dead link.
+
+```svelte
+See <Link href="https://example.com/guide" label="the harbor guide" />.
+```
+
+## ColorSwatch
+
+| Prop | Values | Default |
+| --- | --- | --- |
+| `color` | `chart-1`…`chart-8`, or `primary`, `secondary`, `success`, `warning`, `destructive`, `info`, `neutral` | `primary` in the catalog; invalid values drop the fill |
+| `size` | `sm`, `md`, `lg` | `md` |
+| `label` | plain text, escaped | — |
+
+Fill and contrast ink come from the same closed color-reference type as the Box data fill and
+the label palette (`colorRefVar` / `colorRefInk`). A value that is not a registered name
+(`#fff`, `red`, a CSS function) never becomes a declaration.
+
+```svelte
+<ColorSwatch color="chart-1" label="North" />
 ```
 
 ## Tokens
@@ -168,5 +214,6 @@ eyebrow and figure, line clamp, labels, Box border sides, token reads, catalog a
 component constants, root attributes and the allow set) and
 `packages/texuli/tests/typography-2.test.ts` (the `primary`, `brand` and `translucent`
 surfaces, the `2xl`–`4xl` sizes, `responsive`, `tight` tracking, Text `inherit`, the catalog
-and the allow set). The `texuli-typography` example has
-visual baselines in light and dark, desktop and mobile.
+and the allow set) and `packages/texuli/tests/protoyard-round5.test.ts` (Prose list markers,
+inline `Link` with `safeHref`, `ColorSwatch` token colors, dashed Box borders). The
+`texuli-typography` example has visual baselines in light and dark, desktop and mobile.

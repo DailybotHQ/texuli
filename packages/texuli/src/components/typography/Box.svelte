@@ -31,7 +31,7 @@ type Props = HTMLAttributes<HTMLElement> & {
   padding?: BoxPadding;
   /** Shape radius: `none`, `sm`, `md` (default), `lg`, `xl`, `full`. */
   radius?: BoxRadius;
-  /** `none` (default), `default` or `strong` (all sides), or one logical side: `block-start`, `block-end` (an app header without card chrome). */
+  /** `none` (default), `default` or `strong` (all sides), one logical side (`block-start`, `block-end`), or `dashed` (token dashed border). */
   border?: BoxBorder;
   /** Elevation shadow: `none` (default), `sm`, `md`, `lg`. */
   elevation?: BoxElevation;

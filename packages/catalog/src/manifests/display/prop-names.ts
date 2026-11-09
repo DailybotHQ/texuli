@@ -191,6 +191,21 @@ export const boxPropNames = [
   'children',
 ] as const;
 
+/** `texuli/typography`: an inline sentence link. */
+export const linkPropNames = [
+  'href',
+  'hrefTrust',
+  'external',
+  'target',
+  'rel',
+  'label',
+  'class',
+  'children',
+] as const;
+
+/** `texuli/typography`: a closed token or data-viz color chip. */
+export const colorSwatchPropNames = ['color', 'size', 'label', 'class', 'children'] as const;
+
 /** `texuli/tabs-accordion`: a tab list with panels. */
 export const tabsPropNames = [
   'items',
