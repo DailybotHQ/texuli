@@ -389,6 +389,19 @@ function propSchemaExpr(schema: SpecPropSchema): string {
   return `SpecPropSchema(${args.join(', ')})`;
 }
 
+/** A component's styling axes (spec 0.13.0) as a `SpecAxes` constructor call. */
+function axesExpr(axes: NonNullable<SpecCatalog['components'][number]['axes']>): string {
+  const args: string[] = [];
+  for (const name of ['variant', 'size', 'tone', 'density'] as const) {
+    const axis = axes[name];
+    if (!axis) continue;
+    args.push(
+      `${name} = SpecAxis(prop = ${kotlinString(axis.prop)}, values = listOf(${axis.values.map(kotlinString).join(', ')}), default = ${kotlinString(axis.default)})`
+    );
+  }
+  return `SpecAxes(${args.join(', ')})`;
+}
+
 /** The catalog vocabulary as a Kotlin registry of `SpecComponent` values. */
 export function vocabularyToKotlin(catalog: SpecCatalog, stamp: Stamp): string {
   const ids = catalog.components.map((c) => c.id);
@@ -453,6 +466,13 @@ export function vocabularyToKotlin(catalog: SpecCatalog, stamp: Stamp): string {
     if (c.sourceable) {
       lines.push(
         `${INDENT}${INDENT}${INDENT}sourceable = listOf(${c.sourceable.map(kotlinString).join(', ')}),`
+      );
+    }
+    // Spec 0.13.0 (ADR-032): emitted only when present, so older catalogs stay byte-stable.
+    if (c.axes) lines.push(`${INDENT}${INDENT}${INDENT}axes = ${axesExpr(c.axes)},`);
+    if (c.states) {
+      lines.push(
+        `${INDENT}${INDENT}${INDENT}states = listOf(${c.states.map((s) => `SpecStateName.${upperSnake(s)}`).join(', ')}),`
       );
     }
     if (c.deprecated)
