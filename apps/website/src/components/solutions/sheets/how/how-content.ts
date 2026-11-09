@@ -8,26 +8,27 @@
 import type { SolutionHowProps } from '../../shared/types.ts';
 
 export const SHEETS_HOW: Omit<SolutionHowProps, 'entry'> = {
-  title: 'From workbook model to accessible grid.',
+  title: 'From a workbook to a grid you can edit.',
+  art: { slot: 'solution-sheets-how', variant: 'band' },
   steps: [
     {
       title: 'Model',
-      body: 'Validate a workbook document and keep edits in a framework-free sheet model.',
+      body: 'Validate a workbook and keep every edit in a framework-free model.',
       package: '@texuli/sheets',
     },
     {
       title: 'Calculate',
-      body: 'Evaluate formulas and recalculate dependent cells with the owned formula engine.',
+      body: 'Evaluate formulas and recalculate every dependent cell.',
       package: '@texuli/sheets',
     },
     {
       title: 'Edit',
-      body: 'Use the accessible grid, formula bar, and keyboard controls to work with a sheet.',
+      body: 'Work the accessible grid and formula bar from the keyboard.',
       package: '@texuli/sheets',
     },
     {
       title: 'Exchange',
-      body: 'Import and export CSV, with formula injection neutralized during export.',
+      body: 'Import and export CSV. Export neutralizes formula injection.',
       package: '@texuli/sheets',
     },
   ],
