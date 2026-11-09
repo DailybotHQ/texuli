@@ -42,7 +42,8 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli', exports: ['AppNav'] },
     { module: 'texuli/sidebar', exports: ['AppNav'] },
   ],
-  'avatar-group-grid': [
+  avatar: [
+    { module: 'texuli', exports: ['Avatar'] },
     {
       module: 'texuli/avatar',
       exports: [
@@ -50,14 +51,10 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
         'AVATAR_SIZES',
         'AVATAR_STATUSES',
         'Avatar',
-        'AvatarGroup',
-        'AvatarGroupGrid',
-        'AvatarGroupItem',
         'AvatarShape',
         'AvatarSize',
         'AvatarStatus',
         'AvatarTone',
-        'avatarGroupClass',
         'avatarInitials',
         'avatarRootClass',
         'avatarSrcset',
@@ -65,6 +62,12 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
         'avatarToneIndex',
         'hashString',
       ],
+    },
+  ],
+  'avatar-group-grid': [
+    {
+      module: 'texuli/avatar',
+      exports: ['AvatarGroup', 'AvatarGroupGrid', 'AvatarGroupItem', 'avatarGroupClass'],
     },
   ],
   badge: [
@@ -115,6 +118,36 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
   callout: [
     { module: 'texuli', exports: ['Callout'] },
     { module: 'texuli/alert', exports: ['Callout'] },
+  ],
+  carousel: [
+    {
+      module: 'texuli',
+      exports: ['Carousel', 'CarouselControlsPlacement', 'CarouselItem', 'CarouselMessages'],
+    },
+    {
+      module: 'texuli/carousel',
+      exports: [
+        'Autoplay',
+        'AutoplayHold',
+        'AutoplayOptions',
+        'Carousel',
+        'CarouselControlsPlacement',
+        'CarouselDirection',
+        'CarouselItem',
+        'CarouselMessages',
+        'DEFAULT_AUTOPLAY_INTERVAL',
+        'DEFAULT_CAROUSEL_MESSAGES',
+        'MIN_AUTOPLAY_INTERVAL',
+        'canStep',
+        'carouselVariants',
+        'createAutoplay',
+        'formatMessage',
+        'resolveCarouselMessages',
+        'resolveIndex',
+        'resolveInterval',
+        'swipeStep',
+      ],
+    },
   ],
   card: [
     {
@@ -658,6 +691,32 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
       ],
     },
   ],
+  icon: [
+    { module: 'texuli', exports: ['Icon'] },
+    {
+      module: 'texuli/icons',
+      exports: [
+        'BuiltInIconName',
+        'ICON_NAMES',
+        'ICON_SIZES',
+        'ICON_TONES',
+        'Icon',
+        'IconComponent',
+        'IconComponentProps',
+        'IconGlyph',
+        'IconLoader',
+        'IconName',
+        'IconNames',
+        'IconRef',
+        'IconRegistry',
+        'IconRegistryOptions',
+        'IconSize',
+        'IconTone',
+        'iconClass',
+      ],
+    },
+    { module: 'texuli/icons/lucide', exports: ['LucideIcon', 'LucideIconComponent'] },
+  ],
   'hover-card': [
     { module: 'texuli', exports: ['HoverCard', 'HoverCardRoot', 'HoverCardTrigger'] },
     { module: 'texuli/popover', exports: ['HoverCard', 'HoverCardRoot', 'HoverCardTrigger'] },
@@ -690,6 +749,7 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli', exports: ['Label'] },
     { module: 'texuli/field', exports: ['Label'] },
   ],
+  'list-item': [{ module: 'texuli/list-item', exports: ['ListItem'] }],
   'layout-auth-split': [
     { module: 'texuli', exports: ['AuthSplitLayout'] },
     { module: 'texuli/layouts/auth-settings', exports: ['AuthSplitLayout'] },
@@ -876,27 +936,7 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli/select', exports: ['Select'] },
   ],
   'nav-icon': [
-    { module: 'texuli', exports: ['Icon', 'NavIcon'] },
-    {
-      module: 'texuli/icons',
-      exports: [
-        'BuiltInIconName',
-        'ICON_NAMES',
-        'Icon',
-        'IconComponent',
-        'IconComponentProps',
-        'IconGlyph',
-        'IconLoader',
-        'IconName',
-        'IconNames',
-        'IconRef',
-        'IconRegistry',
-        'IconRegistryOptions',
-        'IconSize',
-        'IconsProvider',
-        'registerIcons',
-      ],
-    },
+    { module: 'texuli', exports: ['NavIcon'] },
     { module: 'texuli/layouts/host/chrome', exports: ['NavIcon'] },
   ],
   'navigation-menu': [
@@ -964,6 +1004,22 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli', exports: ['PopoverContent'] },
     { module: 'texuli/popover', exports: ['PopoverContent'] },
   ],
+  progress: [
+    { module: 'texuli', exports: ['Progress', 'ProgressShape'] },
+    {
+      module: 'texuli/feedback',
+      exports: [
+        'FEEDBACK_SIZES',
+        'FEEDBACK_TONES',
+        'FeedbackSize',
+        'FeedbackTone',
+        'PROGRESS_SHAPES',
+        'Progress',
+        'ProgressShape',
+        'progressClass',
+      ],
+    },
+  ],
   prose: [
     { module: 'texuli', exports: ['Prose', 'ProseSize'] },
     {
@@ -994,6 +1050,28 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli', exports: ['ScreenOutlet'] },
     { module: 'texuli/layouts/host', exports: ['ScreenOutlet'] },
   ],
+  separator: [
+    { module: 'texuli', exports: ['Separator'] },
+    {
+      module: 'texuli/separator-aspect',
+      exports: [
+        'SEPARATOR_ORIENTATIONS',
+        'SEPARATOR_VARIANTS',
+        'Separator',
+        'SeparatorOrientation',
+        'SeparatorVariant',
+        'separatorClass',
+      ],
+    },
+  ],
+  skeleton: [
+    { module: 'texuli', exports: ['Skeleton'] },
+    { module: 'texuli/feedback', exports: ['Skeleton', 'skeletonClass'] },
+  ],
+  spinner: [
+    { module: 'texuli', exports: ['Spinner'] },
+    { module: 'texuli/feedback', exports: ['Spinner', 'spinnerClass'] },
+  ],
   select: [
     { module: 'texuli', exports: ['SelectRoot'] },
     { module: 'texuli/select', exports: ['SelectRoot'] },
@@ -1019,25 +1097,8 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli/select', exports: ['SelectPortal'] },
   ],
   'select-separator': [
-    { module: 'texuli', exports: ['SelectSeparator', 'Separator'] },
+    { module: 'texuli', exports: ['SelectSeparator'] },
     { module: 'texuli/select', exports: ['SelectSeparator'] },
-    {
-      module: 'texuli/separator-aspect',
-      exports: [
-        'ASPECT_RATIOS',
-        'AspectRatio',
-        'AspectRatioValue',
-        'SEPARATOR_ORIENTATIONS',
-        'SEPARATOR_VARIANTS',
-        'Separator',
-        'SeparatorOrientation',
-        'SeparatorVariant',
-        'VisuallyHidden',
-        'aspectRatioClass',
-        'separatorClass',
-        'visuallyHiddenClass',
-      ],
-    },
   ],
   'select-trigger': [
     { module: 'texuli', exports: ['SelectTrigger'] },
@@ -1263,6 +1324,19 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
  * remaining subpath export here.
  */
 export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
+  { module: 'texuli', exports: ['SafeArea'] },
+  {
+    module: 'texuli/separator-aspect',
+    exports: [
+      'ASPECT_RATIOS',
+      'AspectRatio',
+      'AspectRatioValue',
+      'VisuallyHidden',
+      'aspectRatioClass',
+      'visuallyHiddenClass',
+    ],
+  },
+  { module: 'texuli/icons', exports: ['IconsProvider', 'registerIcons'] },
   {
     module: '@texuli/blocks',
     exports: [
@@ -4302,7 +4376,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'AspectRatio',
       'AspectRatioValue',
       'AuthSplitHostLayout',
-      'Avatar',
       'AvatarGroup',
       'AvatarGroupItem',
       'AvatarSize',
@@ -4332,10 +4405,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'CardGridGap',
       'CardGridGapValue',
       'CardVariant',
-      'Carousel',
-      'CarouselControlsPlacement',
-      'CarouselItem',
-      'CarouselMessages',
       'ChoiceSize',
       'ClipboardLike',
       'CodeVariant',
@@ -4458,8 +4527,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'PopoverVariant',
       'PositiveDirection',
       'PricingTier',
-      'Progress',
-      'ProgressShape',
       'PromiseToastMessages',
       'RADIO_ORIENTATIONS',
       'RADIO_VARIANTS',
@@ -4502,10 +4569,8 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'SidebarItem',
       'SidebarSection',
       'SidebarVariant',
-      'Skeleton',
       'Slider',
       'SliderSize',
-      'Spinner',
       'StackHeader',
       'StatTone',
       'StepperOrientation',
@@ -4833,30 +4898,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
     ],
   },
   {
-    module: 'texuli/carousel',
-    exports: [
-      'Autoplay',
-      'AutoplayHold',
-      'AutoplayOptions',
-      'Carousel',
-      'CarouselControlsPlacement',
-      'CarouselDirection',
-      'CarouselItem',
-      'CarouselMessages',
-      'DEFAULT_AUTOPLAY_INTERVAL',
-      'DEFAULT_CAROUSEL_MESSAGES',
-      'MIN_AUTOPLAY_INTERVAL',
-      'canStep',
-      'carouselVariants',
-      'createAutoplay',
-      'formatMessage',
-      'resolveCarouselMessages',
-      'resolveIndex',
-      'resolveInterval',
-      'swipeStep',
-    ],
-  },
-  {
     module: 'texuli/choice',
     exports: [
       'CHOICE_SIZES',
@@ -5029,23 +5070,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
     ],
   },
   {
-    module: 'texuli/feedback',
-    exports: [
-      'FEEDBACK_SIZES',
-      'FEEDBACK_TONES',
-      'FeedbackSize',
-      'FeedbackTone',
-      'PROGRESS_SHAPES',
-      'Progress',
-      'ProgressShape',
-      'Skeleton',
-      'Spinner',
-      'progressClass',
-      'skeletonClass',
-      'spinnerClass',
-    ],
-  },
-  {
     module: 'texuli/field',
     exports: [
       'FIELD_ORIENTATIONS',
@@ -5096,7 +5120,7 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
     ],
   },
   { module: 'texuli/i18n/es', exports: ['TEXULI_LABELS_ES'] },
-  { module: 'texuli/icons/lucide', exports: ['LucideIcon', 'LucideIconComponent'] },
+
   { module: 'texuli/input', exports: ['autosizeTextarea', 'fieldVariants'] },
   {
     module: 'texuli/kbd-code',
@@ -5269,7 +5293,7 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'setAppShellContext',
     ],
   },
-  { module: 'texuli/list-item', exports: ['ListItem'] },
+
   {
     module: 'texuli/menus',
     exports: [

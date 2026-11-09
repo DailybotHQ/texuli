@@ -45,21 +45,29 @@ const PART_B_GROUP_IDS = {
   ],
   display: [
     'alert',
+    'avatar',
     'avatar-group-grid',
     'badge',
     'banner',
     'box',
     'callout',
     'card',
+    'carousel',
     'chip',
     'code',
     'empty-state',
     'error-state',
     'heading',
+    'icon',
     'inline-text',
     'kbd',
     'kpi',
+    'list-item',
+    'progress',
     'prose',
+    'separator',
+    'skeleton',
+    'spinner',
     'stat',
     'stepper',
     'table',
@@ -106,7 +114,15 @@ const EXPECTED: Readonly<Record<string, Expected>> = {
   'media-composition-svg': { states: ['focus-visible', 'invalid'] },
   'media-image': { states: ['focus-visible'] },
   alert: { axes: { tone: 'tone' }, states: ['hover', 'focus-visible'] },
+  avatar: { axes: { size: 'size' } },
   'avatar-group-grid': { axes: { size: 'size' } },
+  carousel: { states: ['hover', 'focus-visible', 'selected'] },
+  icon: { axes: { size: 'size', tone: 'tone' } },
+  'list-item': { states: ['hover', 'focus-visible', 'disabled', 'selected'] },
+  progress: { axes: { size: 'size', tone: 'tone' }, states: ['loading'] },
+  separator: { axes: { variant: 'variant' } },
+  skeleton: { axes: { size: 'size' }, states: ['loading'] },
+  spinner: { axes: { size: 'size', tone: 'tone' }, states: ['loading'] },
   badge: {
     axes: { variant: 'variant' },
     states: ['hover', 'focus-visible', 'disabled', 'selected'],
@@ -146,8 +162,8 @@ describe('catalog axes part B (content, display, chat, documents, canvas)', () =
       'display',
       'documents',
     ]);
-    expect(manifests).toHaveLength(61);
-    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(61);
+    expect(manifests).toHaveLength(69);
+    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(69);
     for (const group of groups) {
       expect(group.manifests.map((manifest) => manifest.id).sort(), group.name).toEqual(
         [...PART_B_GROUP_IDS[group.name as keyof typeof PART_B_GROUP_IDS]].sort()

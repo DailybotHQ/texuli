@@ -1,5 +1,5 @@
 {
-  "catalogHash": "616de643410159d6b2f37148aa7a955236c9b984032ca744ac528fe1711d9ba2",
+  "catalogHash": "387e93a554a7cda7075cfe260afb907725c03ecc274aa4dcbd668c0c5cf333ce",
   "components": [
     {
       "capability": "web-only",
@@ -369,25 +369,25 @@
           "values": ["xs", "sm", "md", "lg"]
         }
       },
-      "capability": "web-only",
+      "capability": "unknown",
       "emit": [],
       "group": "display",
-      "id": "avatar-group-grid",
+      "id": "avatar",
       "imports": [
+        {
+          "exports": ["Avatar"],
+          "module": "texuli"
+        },
         {
           "exports": [
             "AVATAR_PIXELS",
             "AVATAR_SIZES",
             "AVATAR_STATUSES",
             "Avatar",
-            "AvatarGroup",
-            "AvatarGroupGrid",
-            "AvatarGroupItem",
             "AvatarShape",
             "AvatarSize",
             "AvatarStatus",
             "AvatarTone",
-            "avatarGroupClass",
             "avatarInitials",
             "avatarRootClass",
             "avatarSrcset",
@@ -395,6 +395,89 @@
             "avatarToneIndex",
             "hashString"
           ],
+          "module": "texuli/avatar"
+        }
+      ],
+      "label": "Avatar",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "decorative"
+        },
+        {
+          "kind": "number",
+          "name": "delayMs"
+        },
+        {
+          "kind": "string",
+          "name": "initials"
+        },
+        {
+          "kind": "string",
+          "name": "name",
+          "required": true
+        },
+        {
+          "enumValues": ["circle", "square"],
+          "kind": "enum",
+          "name": "shape"
+        },
+        {
+          "enumValues": ["xs", "sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "kind": "string",
+          "name": "sizes"
+        },
+        {
+          "kind": "string",
+          "name": "src"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "srcTrust"
+        },
+        {
+          "kind": "string",
+          "name": "srcset"
+        },
+        {
+          "enumValues": ["online", "away", "busy", "offline"],
+          "kind": "enum",
+          "name": "status"
+        },
+        {
+          "enumValues": ["primary", "success", "warning", "destructive", "info", "neutral"],
+          "kind": "enum",
+          "name": "tone"
+        }
+      ],
+      "summary": "A face or initials for one person, with an optional presence status."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["xs", "sm", "md", "lg"]
+        }
+      },
+      "capability": "web-only",
+      "emit": [],
+      "group": "display",
+      "id": "avatar-group-grid",
+      "imports": [
+        {
+          "exports": ["AvatarGroup", "AvatarGroupGrid", "AvatarGroupItem", "avatarGroupClass"],
           "module": "texuli/avatar"
         }
       ],
@@ -1341,6 +1424,83 @@
       ],
       "states": ["hover", "focus-visible"],
       "summary": "A surface for grouping related content with optional link behavior."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "carousel",
+      "imports": [
+        {
+          "exports": ["Carousel", "CarouselControlsPlacement", "CarouselItem", "CarouselMessages"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "Autoplay",
+            "AutoplayHold",
+            "AutoplayOptions",
+            "Carousel",
+            "CarouselControlsPlacement",
+            "CarouselDirection",
+            "CarouselItem",
+            "CarouselMessages",
+            "DEFAULT_AUTOPLAY_INTERVAL",
+            "DEFAULT_CAROUSEL_MESSAGES",
+            "MIN_AUTOPLAY_INTERVAL",
+            "canStep",
+            "carouselVariants",
+            "createAutoplay",
+            "formatMessage",
+            "resolveCarouselMessages",
+            "resolveIndex",
+            "resolveInterval",
+            "swipeStep"
+          ],
+          "module": "texuli/carousel"
+        }
+      ],
+      "label": "Carousel",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["below", "overlay"],
+          "kind": "enum",
+          "name": "controls"
+        },
+        {
+          "kind": "number",
+          "name": "index"
+        },
+        {
+          "kind": "array",
+          "name": "items",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "boolean",
+          "name": "loop"
+        },
+        {
+          "kind": "boolean",
+          "name": "showControls"
+        },
+        {
+          "kind": "boolean",
+          "name": "showDots"
+        }
+      ],
+      "states": ["hover", "focus-visible", "selected"],
+      "summary": "A labelled region of slides with previous, next and a picker."
     },
     {
       "capability": "web-only",
@@ -6295,6 +6455,92 @@
     },
     {
       "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["xs", "sm", "md", "lg"]
+        },
+        "tone": {
+          "default": "default",
+          "prop": "tone",
+          "values": ["default", "primary", "success", "warning", "destructive", "info", "neutral"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "icon",
+      "imports": [
+        {
+          "exports": ["Icon"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "BuiltInIconName",
+            "ICON_NAMES",
+            "ICON_SIZES",
+            "ICON_TONES",
+            "Icon",
+            "IconComponent",
+            "IconComponentProps",
+            "IconGlyph",
+            "IconLoader",
+            "IconName",
+            "IconNames",
+            "IconRef",
+            "IconRegistry",
+            "IconRegistryOptions",
+            "IconSize",
+            "IconTone",
+            "iconClass"
+          ],
+          "module": "texuli/icons"
+        },
+        {
+          "exports": ["LucideIcon", "LucideIconComponent"],
+          "module": "texuli/icons/lucide"
+        }
+      ],
+      "label": "Icon",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "icon"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "enumValues": ["xs", "sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": [
+            "default",
+            "primary",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ],
+          "kind": "enum",
+          "name": "tone"
+        }
+      ],
+      "summary": "A glyph by name or Lucide component; allowing icon allows every icon set."
+    },
+    {
+      "axes": {
         "variant": {
           "default": "ghost",
           "prop": "variant",
@@ -8054,6 +8300,62 @@
       "summary": "Centered onboarding wizard frame with steps."
     },
     {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "list-item",
+      "imports": [
+        {
+          "exports": ["ListItem"],
+          "module": "texuli/list-item"
+        }
+      ],
+      "label": "ListItem",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "current"
+        },
+        {
+          "kind": "string",
+          "name": "description"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "string",
+          "name": "href"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "hrefTrust"
+        },
+        {
+          "kind": "string",
+          "name": "icon"
+        },
+        {
+          "kind": "string",
+          "name": "meta"
+        },
+        {
+          "kind": "string",
+          "name": "title"
+        }
+      ],
+      "states": ["hover", "focus-visible", "disabled", "selected"],
+      "summary": "A list row with a title, optional description, icon and trailing meta."
+    },
+    {
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "content",
@@ -8606,28 +8908,8 @@
       "id": "nav-icon",
       "imports": [
         {
-          "exports": ["Icon", "NavIcon"],
+          "exports": ["NavIcon"],
           "module": "texuli"
-        },
-        {
-          "exports": [
-            "BuiltInIconName",
-            "ICON_NAMES",
-            "Icon",
-            "IconComponent",
-            "IconComponentProps",
-            "IconGlyph",
-            "IconLoader",
-            "IconName",
-            "IconNames",
-            "IconRef",
-            "IconRegistry",
-            "IconRegistryOptions",
-            "IconSize",
-            "IconsProvider",
-            "registerIcons"
-          ],
-          "module": "texuli/icons"
         },
         {
           "exports": ["NavIcon"],
@@ -8926,6 +9208,97 @@
         }
       ],
       "summary": "Styled popover surface with optional arrow."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "tone": {
+          "default": "primary",
+          "prop": "tone",
+          "values": ["primary", "success", "warning", "destructive", "info", "neutral"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "progress",
+      "imports": [
+        {
+          "exports": ["Progress", "ProgressShape"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "FEEDBACK_SIZES",
+            "FEEDBACK_TONES",
+            "FeedbackSize",
+            "FeedbackTone",
+            "PROGRESS_SHAPES",
+            "Progress",
+            "ProgressShape",
+            "progressClass"
+          ],
+          "module": "texuli/feedback"
+        }
+      ],
+      "label": "Progress",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "string",
+          "name": "ariaLabel"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "string",
+          "name": "loadingLabel"
+        },
+        {
+          "kind": "number",
+          "name": "max"
+        },
+        {
+          "kind": "number",
+          "name": "min"
+        },
+        {
+          "enumValues": ["linear", "circular"],
+          "kind": "enum",
+          "name": "shape"
+        },
+        {
+          "kind": "boolean",
+          "name": "showValue"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": ["primary", "success", "warning", "destructive", "info", "neutral"],
+          "kind": "enum",
+          "name": "tone"
+        },
+        {
+          "kind": "number",
+          "name": "value"
+        }
+      ],
+      "states": ["loading"],
+      "summary": "A linear or circular progress bar, determinate or indeterminate."
     },
     {
       "axes": {
@@ -9550,29 +9923,12 @@
       "id": "select-separator",
       "imports": [
         {
-          "exports": ["SelectSeparator", "Separator"],
+          "exports": ["SelectSeparator"],
           "module": "texuli"
         },
         {
           "exports": ["SelectSeparator"],
           "module": "texuli/select"
-        },
-        {
-          "exports": [
-            "ASPECT_RATIOS",
-            "AspectRatio",
-            "AspectRatioValue",
-            "SEPARATOR_ORIENTATIONS",
-            "SEPARATOR_VARIANTS",
-            "Separator",
-            "SeparatorOrientation",
-            "SeparatorVariant",
-            "VisuallyHidden",
-            "aspectRatioClass",
-            "separatorClass",
-            "visuallyHiddenClass"
-          ],
-          "module": "texuli/separator-aspect"
         }
       ],
       "label": "Select.Separator",
@@ -9705,6 +10061,60 @@
         }
       ],
       "summary": "Scrollable viewport inside Select.Content."
+    },
+    {
+      "axes": {
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "subtle", "strong"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "separator",
+      "imports": [
+        {
+          "exports": ["Separator"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "SEPARATOR_ORIENTATIONS",
+            "SEPARATOR_VARIANTS",
+            "Separator",
+            "SeparatorOrientation",
+            "SeparatorVariant",
+            "separatorClass"
+          ],
+          "module": "texuli/separator-aspect"
+        }
+      ],
+      "label": "Separator",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "decorative"
+        },
+        {
+          "enumValues": ["horizontal", "vertical"],
+          "kind": "enum",
+          "name": "orientation"
+        },
+        {
+          "enumValues": ["default", "subtle", "strong"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "summary": "A horizontal or vertical divider on the token scale."
     },
     {
       "axes": {
@@ -9867,6 +10277,49 @@
       "summary": "Collapsible app rail with sections, badges and safe links."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "skeleton",
+      "imports": [
+        {
+          "exports": ["Skeleton"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Skeleton", "skeletonClass"],
+          "module": "texuli/feedback"
+        }
+      ],
+      "label": "Skeleton",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "boolean",
+          "name": "circle"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        }
+      ],
+      "states": ["loading"],
+      "summary": "A placeholder bar or circle while content loads."
+    },
+    {
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "events": ["move"],
@@ -9899,6 +10352,59 @@
       ],
       "states": ["hover", "focus-visible", "disabled"],
       "summary": "A list whose items are a bound list variable; people reorder it by drag or keyboard, and lists sharing a group exchange items."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "tone": {
+          "default": "primary",
+          "prop": "tone",
+          "values": ["primary", "success", "warning", "destructive", "info", "neutral"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "spinner",
+      "imports": [
+        {
+          "exports": ["Spinner"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Spinner", "spinnerClass"],
+          "module": "texuli/feedback"
+        }
+      ],
+      "label": "Spinner",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": ["primary", "success", "warning", "destructive", "info", "neutral"],
+          "kind": "enum",
+          "name": "tone"
+        }
+      ],
+      "states": ["loading"],
+      "summary": "An indeterminate wait indicator, labelled or decorative."
     },
     {
       "capability": "web-only",

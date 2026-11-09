@@ -181,3 +181,64 @@ export const boxPropNames = [
   'class',
   'children',
 ] as const;
+
+export const iconPropNames = ['icon', 'size', 'tone', 'label', 'class'] as const;
+
+export const avatarPropNames = [
+  'name',
+  'src',
+  'srcTrust',
+  'srcset',
+  'sizes',
+  'size',
+  'tone',
+  'shape',
+  'status',
+  'decorative',
+  'delayMs',
+  'initials',
+  'class',
+] as const;
+
+export const skeletonPropNames = ['size', 'circle', 'class'] as const;
+
+export const spinnerPropNames = ['label', 'size', 'tone', 'class'] as const;
+
+export const progressPropNames = [
+  'value',
+  'max',
+  'min',
+  'label',
+  'ariaLabel',
+  'showValue',
+  'tone',
+  'size',
+  'shape',
+  'loadingLabel',
+  'class',
+] as const;
+
+export const carouselPropNames = [
+  'items',
+  'index',
+  'label',
+  'showControls',
+  'showDots',
+  'controls',
+  'loop',
+  'class',
+] as const;
+
+export const separatorPropNames = ['orientation', 'decorative', 'variant', 'class'] as const;
+
+export const listItemPropNames = [
+  'title',
+  'description',
+  'meta',
+  'icon',
+  'href',
+  'hrefTrust',
+  'current',
+  'disabled',
+  'class',
+] as const;

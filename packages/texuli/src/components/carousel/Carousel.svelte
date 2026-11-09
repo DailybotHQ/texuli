@@ -287,6 +287,7 @@ const status = $derived(formatMessage(t.status, { index: active + 1, total: coun
   aria-label={label ?? t.carousel}
   tabindex={multiple && !showControls && !showDots ? 0 : undefined}
   data-tx-carousel
+  data-tx-component="carousel"
   data-controls={controls}
   data-index={active}
   data-playing={playing ? 'true' : undefined}
