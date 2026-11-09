@@ -8,6 +8,7 @@
  */
 
 export type * from '../../generated/typescript/design-system.ts';
+export type * from '../../generated/typescript/design-system-bundle.ts';
 export {
   checkDesignSystemAllow,
   type DesignSystemAllowCatalog,
@@ -31,6 +32,25 @@ export {
   dsRootAttributes,
 } from './attributes.ts';
 export { checkBlueprintAllow } from './blueprint-allow.ts';
+export {
+  allowManifestFromDocument,
+  bundleCanonicalJson,
+  DESIGN_SYSTEM_BUNDLE_CODES,
+  DESIGN_SYSTEM_BUNDLE_FORMAT,
+  DESIGN_SYSTEM_BUNDLE_LIMITS,
+  DESIGN_SYSTEM_BUNDLE_VERSION,
+  type DesignSystemBundleCode,
+  type DesignSystemBundleIssue,
+  type DesignSystemBundleValidation,
+  type PackBundleInput,
+  type PackBundleResult,
+  type PackHistoryEntry,
+  type PackLibrarySource,
+  packBundle,
+  type UnpackBundleResult,
+  unpackBundle,
+  validateBundle,
+} from './bundle.ts';
 export {
   APPROVAL_HASH_EXCLUDED,
   canonicalJson,

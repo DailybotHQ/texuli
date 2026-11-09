@@ -21,6 +21,7 @@ Operations (the @texuli/tools registry; the same names are MCP tools):
   ds import                 Import a design system
   ds generate               Generate a design-system draft
   ds allow                  List allowed components for a locked design system
+  ds bundle                 Pack or unpack a portable design-system bundle
   ds diff                   Diff two design systems
   ds preview                Preview a design system
   ds save                   Save a design system to a file (node only)
@@ -40,6 +41,8 @@ Commands:
   ds import <file|text>     Import DTCG, Tokens Studio, a role palette, a theme or a one-liner (--from, --out)
   ds approve <file>         Validate, then stamp approval and its contentHash (--by <name>; a reviewed commit is the guarantee)
   ds hash <file>            Print the content hashes and check the stored ones
+  ds pack <file>            Pack a document, library sources and history into a portable bundle (--out)
+  ds unpack <bundle.json>   Unpack a portable design-system bundle (--out); sources are never executed
   ds check <file>           Check a design-system document: codes, guarantees, contrast report (--json, --render, --mode, --variant)
   mcp                       Run the local MCP server over stdio (every operation)
   init                      Wire Texuli tokens and CSS into a Vite, Astro or SvelteKit project
@@ -129,6 +132,7 @@ Operations:
   ds import                 Import a design system [ds.import]
   ds generate               Generate a design-system draft [ds.generate]
   ds allow                  List allowed components for a locked design system [ds.allow]
+  ds bundle                 Pack or unpack a portable design-system bundle [ds.bundle]
   ds diff                   Diff two design systems [ds.diff]
   ds preview                Preview a design system [ds.preview]
   ds save                   Save a design system to a file [ds.save]
@@ -143,6 +147,8 @@ Commands:
   ds import <file|text>     Import DTCG, Tokens Studio, a role palette, a theme or a one-liner (--from, --out)
   ds approve <file>         Validate, then stamp approval and its contentHash (--by <name>; a reviewed commit is the guarantee)
   ds hash <file>            Print the content hashes and check the stored ones
+  ds pack <file>            Pack a document, library sources and history into a portable bundle (--out)
+  ds unpack <bundle.json>   Unpack a portable design-system bundle (--out); sources are never executed
   ds check <file>           Check a design-system document: codes, guarantees, contrast report (--json, --render, --mode, --variant)
 
 Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
@@ -434,6 +440,21 @@ Arguments (JSON object keys):
 
 Limits: input up to 32768 bytes, at most 256 items, 10000 ms budget.
 Example (The minimal preset): texuli ds allow --json '{"preset":"minimal"}'
+
+----
+Usage: texuli ds bundle [--json <object> | --file <path>] [--out <path>]
+
+Pack or unpack a portable design-system bundle (ds.bundle, runtime edge)
+Pack a design-system document with its library sources and release history into one JSON bundle, or unpack a bundle and return those parts. Returns ok, the bundle or the document, allowManifest, librarySources and history; hash mismatches, oversized sources and path-traversing ids are refused with stable codes. Sources are never executed.
+
+Arguments (JSON object keys):
+  bundle: object. A texuli/design-system-bundle object to unpack (format, version 1, document, allowManifest, librarySources, history).
+  document: object. A texuli/design-system document to pack. Ignored when bundle is set.
+  librarySources: array. Library component sources as text: { id, version, source, language? }. Ignored when bundle is set.
+  history: array. Approved versions with changelog entries: { version, contentHash, changelog?, status?, approvedBy?, approvedAt? }. Ignored when bundle is set.
+
+Limits: input up to 1048576 bytes, at most 64 items, 10000 ms budget.
+Example (Pack a minimal document): texuli ds bundle --json '{"document":{"format":"texuli/design-system","formatVersion":1,"id":"harborline","version":"1.0.0","name":"Harborline","color":{"brand":{"seed":"#0e7490"}}}}'
 
 ----
 Usage: texuli ds diff [--json <object> | --file <path>] [--out <path>]

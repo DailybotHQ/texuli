@@ -21,6 +21,7 @@ import {
   dsValidate,
 } from './design-system.ts';
 import { dsAllow } from './design-system-allow.ts';
+import { dsBundle } from './design-system-bundle.ts';
 import { designSystemGenerate } from './design-system-generate.ts';
 import { documentExport, documentRun } from './document.ts';
 import { createOperationRegistry } from './registry.ts';
@@ -113,6 +114,7 @@ export const TEXULI_OPERATIONS: readonly Operation[] = Object.freeze([
   dsImport,
   designSystemGenerate,
   dsAllow,
+  dsBundle,
   dsDiff,
   dsPreview,
   dsSave,
