@@ -1,0 +1,18 @@
+---
+/**
+ * /solutions/ — the Solutions catalog (ADR-027, ADR-029; ADR-031 landing header). A
+ * landing-shell page over `components/solutions/catalog/`: every registry Solution with
+ * its status per platform, All / Web / Native filters without JavaScript, and links to
+ * landings and docs only when those pages exist. Island-free on the default budget
+ * (ADR-030). The registry facts are also served as JSON at `/solutions/index.json`.
+ */
+import { CATALOG_PAGE } from '../../components/solutions/catalog/catalog-content.ts';
+import SolutionsCatalog from '../../components/solutions/catalog/SolutionsCatalog.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title={CATALOG_PAGE.title} description={CATALOG_PAGE.description} landing>
+  <div class="landing" data-tx-landing="">
+    <SolutionsCatalog />
+  </div>
+</BaseLayout>
