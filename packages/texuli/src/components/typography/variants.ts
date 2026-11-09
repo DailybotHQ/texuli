@@ -12,7 +12,17 @@ export type HeadingLevel = (typeof HEADING_LEVELS)[number];
  * `3xl` and `4xl` sit between the title (`xl`) and `display`: hero and section titles on the
  * font-size scale (`--tx-font-size-2xl`…`4xl`), with the display role's family and weight.
  */
-export const HEADING_SIZES = ['display', '4xl', '3xl', '2xl', 'xl', 'lg', 'md', 'sm'] as const;
+export const HEADING_SIZES = [
+  'display',
+  '4xl',
+  '3xl',
+  '2xl',
+  'xl',
+  'lg',
+  'md',
+  'sm',
+  'xs',
+] as const;
 export type HeadingSize = (typeof HEADING_SIZES)[number];
 
 /** Heading tracking: the role's own (`default`) or `tight` (`--tx-letter-spacing-tight`). */
@@ -79,8 +89,16 @@ export type BoxPadding = (typeof BOX_PADDINGS)[number];
 export const BOX_RADII = ['none', 'sm', 'md', 'lg', 'xl', 'full'] as const;
 export type BoxRadius = (typeof BOX_RADII)[number];
 
-/** A full border, or one logical side only (`block-start`, `block-end`) for app headers and footers. */
-export const BOX_BORDERS = ['none', 'default', 'strong', 'block-start', 'block-end'] as const;
+/** A full border, or one logical side (`block-*` for headers, `inline-*` for rails). */
+export const BOX_BORDERS = [
+  'none',
+  'default',
+  'strong',
+  'block-start',
+  'block-end',
+  'inline-start',
+  'inline-end',
+] as const;
 export type BoxBorder = (typeof BOX_BORDERS)[number];
 
 export const BOX_ELEVATIONS = ['none', 'sm', 'md', 'lg'] as const;
@@ -98,11 +116,16 @@ export const BOX_SURFACES = [
   'muted',
   'subtle',
   'elevated',
+  'canvas',
   'primary',
   'brand',
   'translucent',
 ] as const;
 export type BoxSurface = (typeof BOX_SURFACES)[number];
+
+/** Mark (search highlight): fill from a role's soft token. */
+export const MARK_TONES = ['warning', 'primary', 'success', 'info'] as const;
+export type MarkTone = (typeof MARK_TONES)[number];
 
 /** A value of a closed list, or the fallback (a hostile or stale prop never reaches a class). */
 export function oneOf<T extends string | number>(
@@ -115,6 +138,12 @@ export function oneOf<T extends string | number>(
 
 const map = <T extends string>(list: readonly T[], prefix: string) =>
   Object.fromEntries(list.map((value) => [value, `${prefix}${value}`])) as Record<T, string>;
+
+export const markClass = variants({
+  base: 'tx-mark',
+  variants: { tone: map(MARK_TONES, 'tx-mark--') },
+  defaultVariants: { tone: 'warning' },
+});
 
 export const headingClass = variants({
   base: 'tx-heading',

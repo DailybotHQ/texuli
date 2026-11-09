@@ -99,7 +99,7 @@ describe('Box surfaces: primary, brand and translucent', () => {
 
 describe('Heading: 2xl–4xl, responsive, tight tracking, display weight', () => {
   it('orders the sizes from display down, with 4xl, 3xl and 2xl between display and xl', () => {
-    expect(HEADING_SIZES).toEqual(['display', '4xl', '3xl', '2xl', 'xl', 'lg', 'md', 'sm']);
+    expect(HEADING_SIZES).toEqual(['display', '4xl', '3xl', '2xl', 'xl', 'lg', 'md', 'sm', 'xs']);
     expect(component('heading')?.axes?.size?.values).toEqual([...HEADING_SIZES]);
   });
 
