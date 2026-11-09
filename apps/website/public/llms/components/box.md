@@ -1,6 +1,6 @@
 # Box
 
-> A panel or region with padding, radius, border, elevation and surface from tokens.
+> A panel or region with layout options and token-based surface or color-reference fill.
 
 - **id:** `box`
 - **package:** `texuli`
@@ -32,7 +32,8 @@
 | `radius` | enum(none | sm | md | lg | xl | full) | no | — | `"md"` | — |
 | `border` | enum(none | default | strong | block-start | block-end | inline-start | inline-end | dashed) | no | — | `"none"` | All sides, one logical side (block-start, block-end, inline-start, inline-end), or dashed |
 | `elevation` | enum(none | sm | md | lg) | no | — | `"none"` | — |
-| `surface` | enum(transparent | default | muted | subtle | elevated | canvas | primary | brand | translucent) | no | — | `"transparent"` | The fill (the variant axis): primary is the solid primary with its on-color, brand the soft primary tint, translucent the glass opacity and blur for sticky headers |
+| `surface` | enum(transparent | default | muted | subtle | elevated | canvas | primary | brand | success | warning | destructive | info | primary-soft | translucent) | no | — | `"transparent"` | The surface (the variant axis): primary is solid, the semantic tones and primary-soft use soft token fills with AA ink, and translucent is glass for sticky headers |
+| `fill` | enum(none | chart-1 | chart-2 | chart-3 | chart-4 | chart-5 | chart-6 | chart-7 | chart-8 | primary | secondary | success | warning | destructive | info | neutral) | no | — | `"none"` | Optional closed token reference (chart-1 through chart-8 or a semantic color role); never a CSS color or arbitrary value |
 | `class` | string | no | — | — | — |
 | `children` | slot | no | — | — | The panel content |
 

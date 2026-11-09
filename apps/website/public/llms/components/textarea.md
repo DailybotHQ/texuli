@@ -32,6 +32,8 @@
 | `readonly` | boolean | no | — | `false` | — |
 | `rows` | number | no | — | `3` | — |
 | `onValueChange` | event | no | — | — | — |
+| `appearance` | enum(default | plain) | no | — | `"default"` | plain drops the control chrome for inline-edit text; focus stays visible |
+| `textSize` | enum(control | xs | sm | md | lg | xl | 2xl | 3xl | 4xl | display) | no | — | `"control"` | control (form-control size) or a type-scale size for inline-edit titles and bodies |
 | `class` | string | no | — | — | — |
 
 ### Examples

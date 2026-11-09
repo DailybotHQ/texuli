@@ -1216,7 +1216,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 
 # Box
 
-> A panel or region with padding, radius, border, elevation and surface from tokens.
+> A panel or region with layout options and token-based surface or color-reference fill.
 
 - **id:** `box`
 - **package:** `texuli`
@@ -1248,7 +1248,8 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `radius` | enum(none | sm | md | lg | xl | full) | no | — | `"md"` | — |
 | `border` | enum(none | default | strong | block-start | block-end | inline-start | inline-end | dashed) | no | — | `"none"` | All sides, one logical side (block-start, block-end, inline-start, inline-end), or dashed |
 | `elevation` | enum(none | sm | md | lg) | no | — | `"none"` | — |
-| `surface` | enum(transparent | default | muted | subtle | elevated | canvas | primary | brand | translucent) | no | — | `"transparent"` | The fill (the variant axis): primary is the solid primary with its on-color, brand the soft primary tint, translucent the glass opacity and blur for sticky headers |
+| `surface` | enum(transparent | default | muted | subtle | elevated | canvas | primary | brand | success | warning | destructive | info | primary-soft | translucent) | no | — | `"transparent"` | The surface (the variant axis): primary is solid, the semantic tones and primary-soft use soft token fills with AA ink, and translucent is glass for sticky headers |
+| `fill` | enum(none | chart-1 | chart-2 | chart-3 | chart-4 | chart-5 | chart-6 | chart-7 | chart-8 | primary | secondary | success | warning | destructive | info | neutral) | no | — | `"none"` | Optional closed token reference (chart-1 through chart-8 or a semantic color role); never a CSS color or arbitrary value |
 | `class` | string | no | — | — | — |
 | `children` | slot | no | — | — | The panel content |
 
@@ -6850,6 +6851,8 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `readonly` | boolean | no | — | `false` | — |
 | `onValueChange` | event | no | — | — | — |
 | `onClear` | event | no | — | — | — |
+| `appearance` | enum(default | plain) | no | — | `"default"` | plain drops the control chrome for inline-edit text; focus stays visible |
+| `textSize` | enum(control | xs | sm | md | lg | xl | 2xl | 3xl | 4xl | display) | no | — | `"control"` | control (form-control size) or a type-scale size for inline-edit titles and bodies |
 | `class` | string | no | — | — | — |
 
 ### Examples
@@ -6868,6 +6871,15 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 ```json
 {
   "type": "email"
+}
+```
+
+#### Inline-edit title (`inline-title`)
+
+```json
+{
+  "appearance": "plain",
+  "textSize": "xl"
 }
 ```
 
@@ -9464,6 +9476,7 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `name` | string | no | — | — | — |
 | `size` | enum(sm | md | lg) | no | — | `"md"` | — |
 | `display` | enum(input | output) | no | — | `"input"` | — |
+| `commit` | enum(enter | blur | input) | no | — | `"enter"` | When typed text commits: Enter and blur, blur only, or every keystroke |
 | `onValueChange` | event | no | — | — | — |
 | `class` | string | no | — | — | — |
 
@@ -11977,6 +11990,8 @@ _Generated from the Texuli catalog manifest. Do not hand-edit; regenerate with `
 | `readonly` | boolean | no | — | `false` | — |
 | `rows` | number | no | — | `3` | — |
 | `onValueChange` | event | no | — | — | — |
+| `appearance` | enum(default | plain) | no | — | `"default"` | plain drops the control chrome for inline-edit text; focus stays visible |
+| `textSize` | enum(control | xs | sm | md | lg | xl | 2xl | 3xl | 4xl | display) | no | — | `"control"` | control (form-control size) or a type-scale size for inline-edit titles and bodies |
 | `class` | string | no | — | — | — |
 
 ### Examples

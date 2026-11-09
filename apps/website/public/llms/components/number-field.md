@@ -36,6 +36,7 @@
 | `name` | string | no | — | — | — |
 | `size` | enum(sm | md | lg) | no | — | `"md"` | — |
 | `display` | enum(input | output) | no | — | `"input"` | — |
+| `commit` | enum(enter | blur | input) | no | — | `"enter"` | When typed text commits: Enter and blur, blur only, or every keystroke |
 | `onValueChange` | event | no | — | — | — |
 | `class` | string | no | — | — | — |
 

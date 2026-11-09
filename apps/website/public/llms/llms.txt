@@ -98,7 +98,7 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [Badge](components/badge.md): A compact status or category label.
 - [Banner](components/banner.md): Full-width notice across a page or app shell.
 - [BottomNav](components/bottom-nav.md): A mobile tab bar of destinations. Host chrome; agents never emit it.
-- [Box](components/box.md): A panel or region with padding, radius, border, elevation and surface from tokens.
+- [Box](components/box.md): A panel or region with layout options and token-based surface or color-reference fill.
 - [Breadcrumb](components/breadcrumb.md): Hierarchy trail with URL-policy links.
 - [Button](components/button.md): A pressable action control with loading and optional link rendering.
 - [ButtonGroup](components/button-group.md): Groups related buttons with shared borders and orientation.
