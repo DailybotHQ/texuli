@@ -48,6 +48,7 @@ import {
 import { contrastRatio, relativeLuminance } from '../palette/contrast.ts';
 import { MOTION_PRESETS } from '../style-presets/presets.ts';
 import { BASE_SYSTEM_TOKENS, closingParen } from '../system/base.ts';
+import { compileAllowManifest, type DesignSystemAllowManifest } from './allow-manifest.ts';
 import { composite, onColor, parseDsColor } from './color.ts';
 import { DEFAULT_DESIGN_SYSTEM_SEED, formatFontStack } from './from-theme.ts';
 import {
@@ -82,6 +83,8 @@ export const DESIGN_SYSTEM_COMPILER_VERSION = 3;
 export interface CompileDesignSystemOptions extends ResolveDesignSystemOptions {
   /** The modes to compile (one or both; an empty list is refused); defaults to `color.modes`, then light and dark. */
   modes?: readonly DesignSystemMode[];
+  /** Catalog digest to copy onto the allow manifest; the compiler never loads the catalog. */
+  catalogDigest?: string;
 }
 
 /** A color the solver chose instead of the generated one. */
@@ -157,6 +160,12 @@ export interface CompiledDesignSystem {
   report: DesignSystemReport;
   /** SHA-256 over the canonical resolved document, variant, modes, trust and compiler version. */
   hash: string;
+  /**
+   * Allow manifest checkers read (ADR-032). Beside the CSS: `allow`, library
+   * ids, `version`, `contentHash`, `specVersion`. `emitCss` ignores it, so
+   * existing documents keep byte-identical stylesheets.
+   */
+  allowManifest: DesignSystemAllowManifest;
 }
 
 type Doc = Record<string, unknown>;
@@ -1124,6 +1133,7 @@ export function compileDesignSystem(
         trust: options.trust ?? 'untrusted',
       })
     ),
+    allowManifest: compileAllowManifest(input, { catalogDigest: options.catalogDigest }),
   };
 }
 
