@@ -80,14 +80,15 @@
       "site-blocks-page.spec.ts",
       "site-component-pages.spec.ts",
       "site-documents.spec.ts",
+      "site-ds-kit.spec.ts",
       "site-gallery-themes.spec.ts",
       "site-guides.spec.ts",
       "site-live-primitives.spec.ts",
+      "site-mcp.spec.ts",
       "site-native.spec.ts",
       "site-output.spec.ts",
       "site-slides.spec.ts",
-      "site-visual.spec.ts",
-      "site-mcp.spec.ts"
+      "site-visual.spec.ts"
     ],
     [
       "a11y-forms.spec.ts",
