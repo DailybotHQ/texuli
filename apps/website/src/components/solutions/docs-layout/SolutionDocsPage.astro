@@ -28,6 +28,22 @@ const toc = sections.flatMap((section) =>
 
 const asLang = (lang: string): GuideLanguage =>
   (GUIDE_LANGUAGES as readonly string[]).includes(lang) ? (lang as GuideLanguage) : 'auto';
+
+/** Each code region needs a unique accessible name (axe landmark-unique): its section and position. */
+const codeLabels = new Map<DocBlock, string>();
+for (const section of sections) {
+  let heading = entry.name;
+  let count = 0;
+  for (const block of section.blocks) {
+    if (block.type === 'h2') {
+      heading = block.text;
+      count = 0;
+    } else if (block.type === 'code') {
+      count += 1;
+      codeLabels.set(block, `${heading}: ${block.lang} sample ${count}`);
+    }
+  }
+}
 ---
 
 <SolutionDocsLayout {entry} {title} {description} {toc}>
@@ -50,7 +66,7 @@ const asLang = (lang: string): GuideLanguage =>
               ))}
             </ul>
           ) : (
-            <GuideCode code={block.code} lang={asLang(block.lang)} label={`${block.lang} sample`} />
+            <GuideCode code={block.code} lang={asLang(block.lang)} label={codeLabels.get(block) ?? `${block.lang} sample`} />
           )
         )}
       </section>
