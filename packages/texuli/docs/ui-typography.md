@@ -15,7 +15,7 @@ inline links and named color chips.
 | `Heading` | `heading` | A semantic `<h1>`…`<h6>` with a size independent of the level | `size`, `tone` |
 | `Text` | `text` | Body copy, labels, captions, small print, eyebrows and large figures; never a heading | `size`, `tone` |
 | `Prose` | `prose` | Long-form markup with the design system's reading rhythm | `size` |
-| `Box` | `box` | A panel or region: padding, radius, border, elevation and surface | `variant` (the `surface` prop) |
+| `Box` | `box` | A panel or region: padding, radius, border, elevation, surface and token-reference fill | `variant` (the `surface` prop), `tone` (the `fill` prop) |
 | `Mark` | `mark` | An inline search highlight from a role's soft tokens | `tone` |
 | `Link` | `link` | An inline sentence link; `href` through `safeHref` | hover, focus-visible |
 | `ColorSwatch` | `color-swatch` | A closed palette, role or data-viz color chip with contrast ink | `variant` (the `color` prop), `size` |
@@ -137,7 +137,8 @@ is the host's markup (children); Prose never renders HTML from a string.
 | `radius` | `none`, `sm`, `md`, `lg`, `xl`, `full` (shape radius) | `md` |
 | `border` | `none`, `default`, `strong`, one logical side (`block-start`, `block-end`, `inline-start`, `inline-end`), or `dashed` | `none` |
 | `elevation` | `none`, `sm`, `md`, `lg` (elevation levels 1, 2, 4) | `none` |
-| `surface` | `transparent`, `default`, `muted`, `subtle`, `elevated`, `canvas` (page background, `--tx-background`), `primary`, `brand`, `translucent` | `transparent` |
+| `surface` | `transparent`, `default`, `muted`, `subtle`, `elevated`, `canvas` (page background), `primary`, `brand`, `success`, `warning`, `destructive`, `info`, `primary-soft`, `translucent` | `transparent` |
+| `fill` | `none`, `chart-1`…`chart-8`, `primary`, `secondary`, `success`, `warning`, `destructive`, `info`, `neutral` | `none` |
 
 An app header or footer without card chrome is `radius="none"` with one border side
 (`border="block-end"`). A rail uses `border="inline-start"` or `inline-end`. Box is not
@@ -150,6 +151,11 @@ without a border keeps a 1px outline.
   `--tx-primary-foreground`): a logo tile or a brand mark.
 - `brand` is the soft primary tint with its ink (`--tx-primary-soft`,
   `--tx-primary-soft-foreground`).
+- `success`, `warning`, `destructive` and `info` use their corresponding `*-soft` and
+  `*-soft-foreground` tokens. `primary-soft` names that soft primary surface explicitly.
+  These foreground tokens keep text at the designed accessible contrast for each fill.
+- `fill` selects a chart or semantic token reference through the shared `ColorRef` palette;
+  it overrides the selected surface and never accepts CSS values.
 - `translucent` is the page background at the glass opacity (`--tx-surface-glass-alpha`) with
   the glass blur behind (`--tx-surface-glass-blur`): a sticky header over scrolling content.
   Without `backdrop-filter`, with `prefers-reduced-transparency: reduce` and in forced colors
@@ -158,6 +164,9 @@ without a border keeps a 1px outline.
 ```svelte
 <Box as="header" padding="md" radius="none" border="block-end" surface="translucent">…</Box>
 <Box padding="md" radius="lg" surface="primary">…</Box>
+<Box padding="md" radius="lg" surface="success">Saved successfully</Box>
+<Box padding="md" radius="lg" surface="destructive">Could not save</Box>
+<Box padding="md" radius="lg" fill="chart-1">Revenue</Box>
 <Box padding="lg" radius="none" surface="canvas">…</Box>
 <Box padding="md" border="dashed">…</Box>
 ```

@@ -156,7 +156,17 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
   box: [
     {
       module: 'texuli',
-      exports: ['Box', 'BoxBorder', 'BoxElevation', 'BoxPadding', 'BoxRadius', 'BoxSurface'],
+      exports: [
+        'Box',
+        'BoxBorder',
+        'BoxElevation',
+        'BoxPadding',
+        'BoxRadius',
+        'BoxSurface',
+        'BOX_FILLS',
+        'BOX_SURFACES',
+        'ColorRef',
+      ],
     },
     {
       module: 'texuli/typography',
@@ -171,6 +181,8 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
         'BoxBorder',
         'BoxElement',
         'BoxElevation',
+        'BOX_FILLS',
+        'ColorRef',
         'BoxPadding',
         'BoxRadius',
         'BoxSurface',

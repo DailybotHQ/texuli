@@ -1,5 +1,5 @@
 {
-  "catalogHash": "0d8b2019c75ee1cf2ae959011ea3a77e9779172e028560e10e5be354ae3646d3",
+  "catalogHash": "64d14221c0ef3e180fc34778cb9d42913ce2cfa26c276b59858f0e91660e12e8",
   "components": [
     {
       "axes": {
@@ -1258,6 +1258,28 @@
     },
     {
       "axes": {
+        "tone": {
+          "default": "none",
+          "prop": "fill",
+          "values": [
+            "none",
+            "chart-1",
+            "chart-2",
+            "chart-3",
+            "chart-4",
+            "chart-5",
+            "chart-6",
+            "chart-7",
+            "chart-8",
+            "primary",
+            "secondary",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ]
+        },
         "variant": {
           "default": "transparent",
           "prop": "surface",
@@ -1270,6 +1292,11 @@
             "canvas",
             "primary",
             "brand",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "primary-soft",
             "translucent"
           ]
         }
@@ -1280,7 +1307,17 @@
       "id": "box",
       "imports": [
         {
-          "exports": ["Box", "BoxBorder", "BoxElevation", "BoxPadding", "BoxRadius", "BoxSurface"],
+          "exports": [
+            "Box",
+            "BoxBorder",
+            "BoxElevation",
+            "BoxPadding",
+            "BoxRadius",
+            "BoxSurface",
+            "BOX_FILLS",
+            "BOX_SURFACES",
+            "ColorRef"
+          ],
           "module": "texuli"
         },
         {
@@ -1295,6 +1332,8 @@
             "BoxBorder",
             "BoxElement",
             "BoxElevation",
+            "BOX_FILLS",
+            "ColorRef",
             "BoxPadding",
             "BoxRadius",
             "BoxSurface",
@@ -1341,6 +1380,28 @@
           "name": "elevation"
         },
         {
+          "enumValues": [
+            "none",
+            "chart-1",
+            "chart-2",
+            "chart-3",
+            "chart-4",
+            "chart-5",
+            "chart-6",
+            "chart-7",
+            "chart-8",
+            "primary",
+            "secondary",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ],
+          "kind": "enum",
+          "name": "fill"
+        },
+        {
           "enumValues": ["none", "sm", "md", "lg", "xl"],
           "kind": "enum",
           "name": "padding"
@@ -1360,13 +1421,18 @@
             "canvas",
             "primary",
             "brand",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "primary-soft",
             "translucent"
           ],
           "kind": "enum",
           "name": "surface"
         }
       ],
-      "summary": "A panel or region with padding, radius, border, elevation and surface from tokens."
+      "summary": "A panel or region with layout options and token-based surface or color-reference fill."
     },
     {
       "axes": {

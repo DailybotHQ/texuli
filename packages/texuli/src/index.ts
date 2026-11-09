@@ -642,12 +642,15 @@ export {
 } from './components/tree/index.ts';
 // Typography and surfaces for locked prototypes (ADR-032); the subpath is `texuli/typography`.
 export {
+  BOX_FILLS,
+  BOX_SURFACES,
   Box,
   type BoxBorder,
   type BoxElevation,
   type BoxPadding,
   type BoxRadius,
   type BoxSurface,
+  type ColorRef,
   Heading,
   type HeadingLevel,
   type HeadingSize,

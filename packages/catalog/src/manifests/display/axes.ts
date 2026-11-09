@@ -20,7 +20,7 @@ export const DISPLAY_AXIS_STAMP: Readonly<Record<string, Stamp>> = {
   },
   banner: { axes: { tone: 'tone' } },
   // Typography and surfaces (ADR-032): static, no observable state.
-  box: { axes: { variant: 'surface' } },
+  box: { axes: { variant: 'surface', tone: 'fill' } },
   'color-swatch': { axes: { color: 'color', size: 'size' } },
   heading: { axes: { size: 'size', tone: 'tone' } },
   link: { states: ['hover', 'focus-visible'] },

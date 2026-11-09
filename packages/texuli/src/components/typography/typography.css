@@ -425,6 +425,31 @@
     background-color: var(--tx-primary-soft, Canvas);
     color: var(--tx-primary-soft-foreground, CanvasText);
   }
+  .tx-box--surface-success {
+    background-color: var(--tx-success-soft, Canvas);
+    color: var(--tx-success-soft-foreground, CanvasText);
+  }
+  .tx-box--surface-warning {
+    background-color: var(--tx-warning-soft, Canvas);
+    color: var(--tx-warning-soft-foreground, CanvasText);
+  }
+  .tx-box--surface-destructive {
+    background-color: var(--tx-destructive-soft, Canvas);
+    color: var(--tx-destructive-soft-foreground, CanvasText);
+  }
+  .tx-box--surface-info {
+    background-color: var(--tx-info-soft, Canvas);
+    color: var(--tx-info-soft-foreground, CanvasText);
+  }
+  .tx-box--surface-primary-soft {
+    background-color: var(--tx-primary-soft, Canvas);
+    color: var(--tx-primary-soft-foreground, CanvasText);
+  }
+  /* A checked ColorRef can override any surface without accepting raw CSS. */
+  .tx-box[data-tx-tone]:not([data-tx-tone="none"]) {
+    background-color: var(--tx-box-fill);
+    color: var(--tx-box-ink);
+  }
   /* A sticky header over scrolling content: the page background at the glass opacity,
      blurred behind. Without backdrop-filter or with reduced transparency it is opaque. */
   .tx-box--surface-translucent {
@@ -458,6 +483,11 @@
     .tx-box--border-none.tx-box--surface-canvas,
     .tx-box--border-none.tx-box--surface-primary,
     .tx-box--border-none.tx-box--surface-brand,
+    .tx-box--border-none.tx-box--surface-success,
+    .tx-box--border-none.tx-box--surface-warning,
+    .tx-box--border-none.tx-box--surface-destructive,
+    .tx-box--border-none.tx-box--surface-info,
+    .tx-box--border-none.tx-box--surface-primary-soft,
     .tx-box--border-none.tx-box--surface-translucent {
       outline: 1px solid CanvasText;
     }

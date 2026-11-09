@@ -7,11 +7,13 @@
  * `surface="canvas"` is the page background. `border="inline-start"` / `inline-end` mark a rail.
  */
 import type { HTMLAttributes } from 'svelte/elements';
+import { type ColorRef, colorRefInk, colorRefVar, isColorRef } from '../../internal/color-ref.ts';
 import { cx } from '../../internal/cx.ts';
 import {
   BOX_BORDERS,
   BOX_ELEMENTS,
   BOX_ELEVATIONS,
+  BOX_FILLS,
   BOX_PADDINGS,
   BOX_RADII,
   BOX_SURFACES,
@@ -38,6 +40,8 @@ type Props = HTMLAttributes<HTMLElement> & {
   elevation?: BoxElevation;
   /** The fill: `transparent` (default), `default` (surface), `muted`, `subtle`, `elevated`, `canvas` (page background), `primary` (solid, with its on-color), `brand` (soft primary tint) or `translucent` (glass opacity and blur, for sticky headers). */
   surface?: BoxSurface;
+  /** A token-only fill (`chart-1`…`chart-8` or a semantic color role); `none` keeps the surface fill. */
+  fill?: ColorRef | 'none';
   /** The rendered element (bindable). */
   ref?: HTMLElement | null;
 };
@@ -50,6 +54,7 @@ let {
   border: borderProp = 'none',
   elevation: elevationProp = 'none',
   surface: surfaceProp = 'transparent',
+  fill: fillProp = 'none',
   class: className,
   children,
   ...rest
@@ -61,6 +66,10 @@ const radius = $derived(oneOf(BOX_RADII, radiusProp, 'md'));
 const border = $derived(oneOf(BOX_BORDERS, borderProp, 'none'));
 const elevation = $derived(oneOf(BOX_ELEVATIONS, elevationProp, 'none'));
 const surface = $derived(oneOf(BOX_SURFACES, surfaceProp, 'transparent'));
+const fill = $derived(oneOf(BOX_FILLS, fillProp, 'none'));
+const fillRef = $derived(fill !== 'none' && isColorRef(fill) ? fill : undefined);
+const fillColor = $derived(fillRef === undefined ? undefined : colorRefVar(fillRef));
+const fillInk = $derived(fillRef === undefined ? undefined : colorRefInk(fillRef));
 </script>
 
 <svelte:element
@@ -70,4 +79,7 @@ const surface = $derived(oneOf(BOX_SURFACES, surfaceProp, 'transparent'));
   class={cx(boxClass({ padding, radius, border, elevation, surface }), className)}
   data-tx-component="box"
   data-tx-variant={surface}
+  data-tx-tone={fill}
+  style:--tx-box-fill={fillColor}
+  style:--tx-box-ink={fillInk}
 >{@render children?.()}</svelte:element>

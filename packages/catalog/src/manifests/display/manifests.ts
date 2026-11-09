@@ -100,6 +100,40 @@ const badgeVariants = [
 ] as const;
 
 const alertTones = ['info', 'success', 'warning', 'error', 'brand', 'neutral'] as const;
+const boxFills = [
+  'none',
+  'chart-1',
+  'chart-2',
+  'chart-3',
+  'chart-4',
+  'chart-5',
+  'chart-6',
+  'chart-7',
+  'chart-8',
+  'primary',
+  'secondary',
+  'success',
+  'warning',
+  'destructive',
+  'info',
+  'neutral',
+] as const;
+const boxSurfaces = [
+  'transparent',
+  'default',
+  'muted',
+  'subtle',
+  'elevated',
+  'canvas',
+  'primary',
+  'brand',
+  'success',
+  'warning',
+  'destructive',
+  'info',
+  'primary-soft',
+  'translucent',
+] as const;
 
 const headingSizes = ['display', '4xl', '3xl', '2xl', 'xl', 'lg', 'md', 'sm', 'xs'] as const;
 const tabsVariants = ['line', 'pills', 'enclosed'] as const;
@@ -324,12 +358,12 @@ export const proseManifest = /* @__PURE__ */ defineDisplayManifest({
   related: ['heading', 'text'],
 });
 
-/** Box (ADR-032): padding, radius, border, elevation and surface from tokens. */
+/** Box (ADR-032): padding, radius, border, elevation, surface and closed token fill. */
 export const boxManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'box',
   package: PKG,
   label: 'Box',
-  summary: 'A panel or region with padding, radius, border, elevation and surface from tokens.',
+  summary: 'A panel or region with layout options and token-based surface or color-reference fill.',
   tier: 'app',
   agentEmittable: false,
   useWhen: [
@@ -365,20 +399,17 @@ export const boxManifest = /* @__PURE__ */ defineDisplayManifest({
     elevation: { kind: 'enum', enumValues: ['none', 'sm', 'md', 'lg'], default: 'none' },
     surface: {
       kind: 'enum',
-      enumValues: [
-        'transparent',
-        'default',
-        'muted',
-        'subtle',
-        'elevated',
-        'canvas',
-        'primary',
-        'brand',
-        'translucent',
-      ],
+      enumValues: boxSurfaces,
       default: 'transparent',
       description:
-        'The fill (the variant axis): primary is the solid primary with its on-color, brand the soft primary tint, translucent the glass opacity and blur for sticky headers',
+        'The surface (the variant axis): primary is solid, the semantic tones and primary-soft use soft token fills with AA ink, and translucent is glass for sticky headers',
+    },
+    fill: {
+      kind: 'enum',
+      enumValues: boxFills,
+      default: 'none',
+      description:
+        'Optional closed token reference (chart-1 through chart-8 or a semantic color role); never a CSS color or arbitrary value',
     },
     class: { kind: 'string' },
     children: { kind: 'slot', description: 'The panel content' },

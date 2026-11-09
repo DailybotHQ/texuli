@@ -190,6 +190,7 @@ export const boxPropNames = [
   'border',
   'elevation',
   'surface',
+  'fill',
   'class',
   'children',
 ] as const;
