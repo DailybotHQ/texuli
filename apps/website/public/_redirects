@@ -1,0 +1,16 @@
+# Cloudflare Pages redirects (ADR-028).
+# Generated from SOLUTION_REDIRECTS in functions/_middleware.ts.
+# Only enabled rules whose target page exists are emitted.
+# The five *-page moves stay commented until each /solutions/<slug>/ landing ships.
+# /workflows-page/json/ is kept and is never a source.
+#
+# /slides-page /solutions/slides/ 301
+# /slides-page/ /solutions/slides/ 301
+# /documents-page /solutions/documents/ 301
+# /documents-page/ /solutions/documents/ 301
+# /workflows-page /solutions/workflows/ 301
+# /workflows-page/ /solutions/workflows/ 301
+# /canvas-page /solutions/canvas/ 301
+# /canvas-page/ /solutions/canvas/ 301
+# /sheets-page /solutions/sheets/ 301
+# /sheets-page/ /solutions/sheets/ 301

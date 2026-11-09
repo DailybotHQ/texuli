@@ -23,7 +23,10 @@
  * any other shaping (PLAN_011 T-ar-api).
  */
 
-import { prefersMarkdown } from '../apps/website/src/components/docs/markdown-negotiation.ts';
+import {
+  markdownTwinFor,
+  prefersMarkdown,
+} from '../apps/website/src/components/docs/markdown-negotiation.ts';
 import {
   DISCOVERY_FILE_TYPES,
   discoveryLinks,
@@ -49,6 +52,93 @@ import {
   stripDirectivesForStrictParsers,
 } from '../apps/website/src/lib/robots-variants.ts';
 import { createApiLimiter, handleApiRequest } from './_lib/api-endpoint.ts';
+
+/**
+ * First-wave Solution moves (ADR-028). `enabled` stays false until the landing
+ * exists; `activeSolutionRedirects` also refuses a target that is not on disk.
+ * `/workflows-page/json/` is kept and is never a source.
+ */
+export interface SolutionRedirect {
+  readonly from: string;
+  readonly to: string;
+  readonly enabled: boolean;
+}
+
+export const SOLUTION_REDIRECT_KEEP = ['/workflows-page/json/'] as const;
+
+export const SOLUTION_REDIRECTS: readonly SolutionRedirect[] = [
+  { from: '/slides-page/', to: '/solutions/slides/', enabled: false },
+  { from: '/documents-page/', to: '/solutions/documents/', enabled: false },
+  { from: '/workflows-page/', to: '/solutions/workflows/', enabled: false },
+  { from: '/canvas-page/', to: '/solutions/canvas/', enabled: false },
+  { from: '/sheets-page/', to: '/solutions/sheets/', enabled: false },
+];
+
+export interface SolutionRedirectHit {
+  readonly location: string;
+  readonly status: 301;
+}
+
+/** Rules that may ship: flagged on and whose target route exists. */
+export function activeSolutionRedirects(
+  rules: readonly SolutionRedirect[],
+  targetExists: (to: string) => boolean
+): SolutionRedirect[] {
+  return rules.filter((rule) => rule.enabled && targetExists(rule.to));
+}
+
+/** Cloudflare Pages `_redirects` lines: both slash forms, one hop, 301. */
+export function formatCloudflareRedirects(rules: readonly SolutionRedirect[]): string {
+  const lines: string[] = [];
+  for (const rule of rules) {
+    const bare = rule.from.endsWith('/') ? rule.from.slice(0, -1) : rule.from;
+    lines.push(`${bare} ${rule.to} 301`);
+    lines.push(`${rule.from} ${rule.to} 301`);
+  }
+  return lines.join('\n');
+}
+
+export function solutionRedirectGraphIssues(rules: readonly SolutionRedirect[]): string[] {
+  const sources = new Set(rules.map((rule) => rule.from));
+  const issues: string[] = [];
+  for (const rule of rules) {
+    if (rule.from === rule.to) issues.push(`loop ${rule.from}`);
+    if (sources.has(rule.to)) issues.push(`chain ${rule.from} → ${rule.to}`);
+    if (SOLUTION_REDIRECT_KEEP.includes(rule.from as (typeof SOLUTION_REDIRECT_KEEP)[number])) {
+      issues.push(`kept path ${rule.from} must not redirect`);
+    }
+  }
+  return issues;
+}
+
+function canonicalizePagePath(pathname: string): string | null {
+  if (!pathname.startsWith('/') || pathname.startsWith('//')) return null;
+  let path = pathname;
+  if (path.toLowerCase().endsWith('.md')) path = path.slice(0, -3);
+  if (path.length === 0) return null;
+  return path.endsWith('/') ? path : `${path}/`;
+}
+
+/**
+ * One-hop 301 for a moved `*-page` path, its `.md` twin, or an Accept:
+ * text/markdown request. Query is kept. Returns null when the rule is off.
+ */
+export function resolveSolutionRedirect(
+  pathname: string,
+  search: string,
+  options: { accept?: string | null; rules?: readonly SolutionRedirect[] } = {}
+): SolutionRedirectHit | null {
+  const rules = (options.rules ?? SOLUTION_REDIRECTS).filter((rule) => rule.enabled);
+  const canonical = canonicalizePagePath(pathname);
+  if (!canonical) return null;
+  if ((SOLUTION_REDIRECT_KEEP as readonly string[]).includes(canonical)) return null;
+  const rule = rules.find((entry) => entry.from === canonical);
+  if (!rule) return null;
+  const twin = pathname.toLowerCase().endsWith('.md') || prefersMarkdown(options.accept ?? null);
+  const dest = twin ? markdownTwinFor(rule.to) : rule.to;
+  if (!dest) return null;
+  return { location: `${dest}${search}`, status: 301 };
+}
 
 /** The pieces of the Pages environment this middleware touches. */
 interface Env {
@@ -123,6 +213,15 @@ export const onRequest = async (context: Context): Promise<Response> => {
         asset.search = '';
         return context.env.ASSETS.fetch(new Request(asset, { headers }));
       },
+    });
+  }
+  const moved = resolveSolutionRedirect(url.pathname, url.search, {
+    accept: context.request.headers.get('accept'),
+  });
+  if (moved) {
+    return new Response(null, {
+      status: moved.status,
+      headers: { location: moved.location },
     });
   }
   const userAgent = context.request.headers.get('user-agent');
