@@ -12,7 +12,6 @@ export {
   type StampApprovalOptions,
   stampApproval,
 } from './approve.ts';
-export { designSystemContentHash, libraryEntryContentHash } from './content-hash.ts';
 export {
   type AllowEntry,
   type AllowSection,

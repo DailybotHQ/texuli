@@ -650,6 +650,9 @@ importers:
       '@texuli/media':
         specifier: 0.14.4
         version: link:../media
+      '@texuli/spec':
+        specifier: 0.14.4
+        version: link:../spec
       '@texuli/tokens':
         specifier: 0.14.4
         version: link:../tokens

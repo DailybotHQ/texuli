@@ -2,7 +2,7 @@
  * ADR-032 creation commands: `texuli ds init --locked [--preset …]`,
  * `texuli ds approve` and `texuli ds hash`, and their pure helpers.
  */
-import { mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readdir, readFile, realpath, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { validateDesignSystem } from '@texuli/tokens/design-system/validate';
@@ -17,10 +17,8 @@ import {
   APPROVAL_NOTE,
   allowFromJson,
   allowPreset,
-  designSystemContentHash,
   fullAllowEntry,
   hashReport,
-  libraryEntryContentHash,
   MINIMAL_PRESET_IDS,
   presetComponentsFromBuild,
   stampApproval,
@@ -150,18 +148,11 @@ describe('approval and hashes', () => {
     ],
   };
 
-  it('computes exactly the spec content hashes', () => {
-    const variants: unknown[] = [
-      doc,
-      { ...doc, approval: { status: 'approved', version: '1.0.0', contentHash: 'a'.repeat(64) } },
-      { ...doc, approval: { status: 'draft' } },
-      { approval: 'x', library: 'y' },
-      null,
-      [1, 2],
-    ];
-    for (const value of variants)
-      expect(designSystemContentHash(value)).toBe(specContentHash(value));
-    expect(libraryEntryContentHash(doc.library[0])).toBe(specEntryHash(doc.library[0]));
+  it('has one hash implementation: the spec content hashes', async () => {
+    const files = await readdir(join(import.meta.dirname, '../src/ds-create'));
+    expect(files).not.toContain('content-hash.ts');
+    expect(hashReport(doc).contentHash).toBe(specContentHash(doc));
+    expect(hashReport(doc).library[0]?.contentHash).toBe(specEntryHash(doc.library[0]));
   });
 
   it('stamps an approval whose hash verifies, without mutating the input', () => {

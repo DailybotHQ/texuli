@@ -13,8 +13,18 @@
  * the catalog lists is allowed. An axis whose values exceed the schema's caps
  * (more than 32, or a value outside `^[A-Za-z0-9][A-Za-z0-9_-]{0,47}$`) is
  * left out for the same reason, so a preset is always a valid section.
+ *
+ * The preset logic is `lockedAllowPreset` and `fullAllowEntry` of
+ * `@texuli/spec/design-system` (the library functions consumers call); this
+ * module adds the built-catalog projection and the preset-file reader.
  */
-import type { DesignSystem } from '@texuli/tokens/design-system/validate';
+import {
+  type DesignSystem,
+  LOCKED_PRESETS,
+  lockedAllowPreset,
+  MINIMAL_LOCKED_COMPONENTS,
+  fullAllowEntry as specFullAllowEntry,
+} from '@texuli/spec/design-system';
 
 export type AllowSection = NonNullable<DesignSystem['allow']>;
 export type AllowEntry = AllowSection[string];
@@ -43,59 +53,11 @@ export interface BuiltPresetEntry {
   props: readonly { name: string; enumValues?: readonly string[] }[];
 }
 
-export const PRESET_NAMES = ['all', 'minimal'] as const;
+export const PRESET_NAMES = LOCKED_PRESETS;
 export type PresetName = (typeof PRESET_NAMES)[number];
 
-/**
- * The `minimal` preset: a core most product screens need. Ids that a catalog
- * does not list are skipped, so the preset stays valid as the catalog moves.
- */
-export const MINIMAL_PRESET_IDS: readonly string[] = Object.freeze([
-  // actions
-  'button',
-  'icon-button',
-  // form controls
-  'form',
-  'field',
-  'label',
-  'input',
-  'textarea',
-  'select',
-  'checkbox',
-  'radio-group',
-  'switch',
-  // text and status
-  'badge',
-  'alert',
-  'empty-state',
-  'stat',
-  'table',
-  // containers and overlays
-  'card',
-  'dialog',
-  'tooltip',
-  // page layouts
-  'layout-page',
-  'layout-stack',
-  'layout-row',
-  'layout-grid',
-]);
-
-const AXIS_VALUE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,47}$/;
-const MAX_AXIS_VALUES = 32;
-const STATES = new Set([
-  'hover',
-  'focus-visible',
-  'active',
-  'disabled',
-  'loading',
-  'invalid',
-  'selected',
-  'expanded',
-  'checked',
-  'open',
-  'readonly',
-]);
+/** The `minimal` preset ids (`MINIMAL_LOCKED_COMPONENTS` of `@texuli/spec/design-system`). */
+export const MINIMAL_PRESET_IDS: readonly string[] = MINIMAL_LOCKED_COMPONENTS;
 
 /** Project built catalog entries into preset components: axis values from each axis's enum prop. */
 export function presetComponentsFromBuild(entries: readonly BuiltPresetEntry[]): PresetComponent[] {
@@ -114,32 +76,17 @@ export function presetComponentsFromBuild(entries: readonly BuiltPresetEntry[]):
   });
 }
 
-/** One component's full `allow` entry: every axis value and state it declares, within the caps. */
+/** One component's full `allow` entry (`fullAllowEntry` of `@texuli/spec/design-system`). */
 export function fullAllowEntry(component: PresetComponent): AllowEntry {
-  const entry: Record<string, string[]> = {};
-  for (const [axis, list] of Object.entries(PRESET_AXES) as [PresetAxis, string][]) {
-    const values = [...new Set(component.axes?.[axis]?.values ?? [])];
-    if (values.length === 0 || values.length > MAX_AXIS_VALUES) continue;
-    if (!values.every((value) => AXIS_VALUE.test(value))) continue;
-    entry[list] = values;
-  }
-  const states = [...new Set(component.states ?? [])].filter((state) => STATES.has(state));
-  if (states.length > 0) entry.states = states;
-  return entry as AllowEntry;
+  return specFullAllowEntry(component);
 }
 
-/** The `allow` section of a preset, keys sorted by id. */
+/** The `allow` section of a preset (`lockedAllowPreset` of `@texuli/spec/design-system`). */
 export function allowPreset(
   components: readonly PresetComponent[],
   preset: PresetName
 ): AllowSection {
-  const wanted = preset === 'minimal' ? new Set(MINIMAL_PRESET_IDS) : undefined;
-  const allow: Record<string, AllowEntry> = {};
-  for (const component of [...components].sort((a, b) => (a.id < b.id ? -1 : 1))) {
-    if (wanted && !wanted.has(component.id)) continue;
-    allow[component.id] = fullAllowEntry(component);
-  }
-  return allow;
+  return lockedAllowPreset({ components }, preset);
 }
 
 /**

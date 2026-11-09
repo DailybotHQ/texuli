@@ -101,6 +101,7 @@
     "@texuli/core": "0.14.4",
     "@texuli/catalog": "0.14.4",
     "@texuli/tokens": "0.14.4",
+    "@texuli/spec": "0.14.4",
     "@texuli/blocks": "0.14.4",
     "@texuli/charts": "0.14.4",
     "@texuli/media": "0.14.4",

@@ -7,11 +7,14 @@
  * guarantee is a human commit of the document, reviewed through CODEOWNERS
  * ({@link APPROVAL_NOTE}).
  */
-import type { DesignSystem } from '@texuli/tokens/design-system/validate';
-import { designSystemContentHash, libraryEntryContentHash } from './content-hash.ts';
+import {
+  approveDesignSystem,
+  type DesignSystem,
+  designSystemContentHash,
+  libraryEntryContentHash,
+} from '@texuli/spec/design-system';
 
-export const APPROVAL_NOTE =
-  'ds approve records who approved and when; it cannot prove it. The guarantee is a reviewed commit of this file by its CODEOWNERS.';
+export { APPROVAL_NOTE } from '@texuli/spec/design-system';
 
 export interface StampApprovalOptions {
   /** Who approved (free text, at most 120 characters). */
@@ -23,30 +26,28 @@ export interface StampApprovalOptions {
 }
 
 /**
- * The document with `approval` stamped: `status: approved`, `approvedBy`,
- * `approvedAt`, `version` and the `contentHash` of the stamped document. Never
- * mutates its input. Library entries keep their own approvals.
+ * The document with `approval` stamped by `approveDesignSystem` of
+ * `@texuli/spec/design-system`. When the stamp itself is refused (a name with
+ * control or bidi characters, a version that is not semver), the unhashed
+ * stamp comes back so the caller's validation reports it with its code and
+ * path. Throws only when `by` is empty.
  */
 export function stampApproval(doc: DesignSystem, options: StampApprovalOptions): DesignSystem {
   const by = options.by.trim();
   if (by.length === 0) throw new TypeError('ds approve needs --by <name>.');
+  const at = options.at ?? new Date();
+  const result = approveDesignSystem(doc, {
+    by,
+    at,
+    ...(options.version ? { version: options.version } : {}),
+  });
+  if (result.ok) return result.document;
   const version = options.version ?? doc.version;
-  const stamped: DesignSystem = {
+  return {
     ...doc,
     version,
-    approval: {
-      status: 'approved',
-      approvedBy: by,
-      approvedAt: (options.at ?? new Date()).toISOString(),
-      version,
-    },
-  };
-  return {
-    ...stamped,
-    approval: { ...stamped.approval, contentHash: designSystemContentHash(stamped) } as NonNullable<
-      DesignSystem['approval']
-    >,
-  };
+    approval: { status: 'approved', approvedBy: by, approvedAt: at.toISOString(), version },
+  } as DesignSystem;
 }
 
 export interface HashCheck {
