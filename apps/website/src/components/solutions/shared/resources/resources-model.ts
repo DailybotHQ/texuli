@@ -1,18 +1,13 @@
 /**
  * View models for the closing blocks of a Solution landing (ADR-030): recipes
- * (`SolutionRecipesProps`), agents (`SolutionAgentsProps`), related Solutions (from the
- * registry) and next steps with the final call-to-action band (`SolutionNextStepsProps`).
+ * (`SolutionRecipesProps`), related Solutions (from the registry) and next steps with the final call-to-action band (`SolutionNextStepsProps`).
  * Every href passes the URL policy (developer tier) through `resolveHeroHref`. A related
  * Solution links only when its landing page exists, so no block links a route that has
  * not shipped. Kept out of the components so the rules are unit-tested.
  */
 import type { SolutionEntry, SolutionStatus } from '../../../../data/solutions/schema.ts';
 import { resolveHeroHref } from '../hero/hero-model.ts';
-import type {
-  SolutionAgentsProps,
-  SolutionNextStepsProps,
-  SolutionRecipesProps,
-} from '../types.ts';
+import type { SolutionNextStepsProps, SolutionRecipesProps } from '../types.ts';
 
 const isText = (value: string): boolean => value.trim().length > 0;
 
@@ -52,30 +47,6 @@ export function recipesView(props: SolutionRecipesProps, base = '/'): RecipesVie
         external: /^https:/i.test(recipe.href),
       };
     }),
-  };
-}
-
-export interface AgentsView {
-  readonly headingId: string;
-  readonly title: string;
-  readonly body: string;
-  readonly surfaces: readonly Readonly<{ label: string; detail: string; status: SolutionStatus }>[];
-}
-
-export function agentsView(props: SolutionAgentsProps): AgentsView {
-  if (!isText(props.title) || !isText(props.body)) {
-    throw new Error('SolutionAgents: needs a title and a body');
-  }
-  for (const surface of props.surfaces) {
-    if (!isText(surface.label) || !isText(surface.detail)) {
-      throw new Error('SolutionAgents: every surface needs a label and a detail');
-    }
-  }
-  return {
-    headingId: `solution-agents-${props.entry.slug}`,
-    title: props.title,
-    body: props.body,
-    surfaces: props.surfaces,
   };
 }
 

@@ -2,7 +2,6 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
-  agentsView,
   liveSolutionRoutes,
   nextStepsView,
   recipesView,
@@ -14,7 +13,6 @@ const DIR = resolve(import.meta.dirname, '../../src/components/solutions/shared/
 const read = (name: string): string => readFileSync(resolve(DIR, name), 'utf8');
 const BLOCKS = {
   recipes: read('SolutionRecipes.astro'),
-  agents: read('SolutionAgents.astro'),
   related: read('SolutionRelated.astro'),
   next: read('SolutionNextSteps.astro'),
 };
@@ -56,37 +54,6 @@ describe('SolutionRecipes view', () => {
         recipes: [{ title: 'x', summary: 'y', href: 'javascript:alert(1)' }],
       })
     ).toThrow(/unsafe href/);
-  });
-});
-
-describe('SolutionAgents view', () => {
-  it('keeps each surface with its status and refuses empty copy', () => {
-    const surfaces = [
-      {
-        label: 'catalog.validate',
-        detail: 'Checks a blueprint.',
-        status: 'in development' as const,
-      },
-    ];
-    const view = agentsView({
-      entry: slides,
-      title: 'Agents',
-      body: 'Agents write decks.',
-      surfaces,
-    });
-    expect(view.headingId).toBe('solution-agents-slides');
-    expect(view.surfaces).toEqual(surfaces);
-    expect(() => agentsView({ entry: slides, title: 'Agents', body: '', surfaces })).toThrow(
-      /title and a body/
-    );
-    expect(() =>
-      agentsView({
-        entry: slides,
-        title: 'A',
-        body: 'B',
-        surfaces: [{ label: 'x', detail: ' ', status: 'planned' }],
-      })
-    ).toThrow(/label and a detail/);
   });
 });
 
@@ -158,7 +125,6 @@ describe('closing blocks markup', () => {
 
   it('wires each block to its view and the final band to the home-final art', () => {
     expect(BLOCKS.recipes).toContain('href={recipe.href}');
-    expect(BLOCKS.agents).toContain('data-status={surface.status}');
     expect(BLOCKS.related).toContain(
       "import.meta.glob('../../../../pages/solutions/*/index.astro')"
     );
