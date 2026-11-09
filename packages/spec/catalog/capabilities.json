@@ -65,6 +65,7 @@
   "data-notification-inbox": "web-only",
   "data-timeline": "web-only",
   "data-tree-view": "web-only",
+  "data-virtual-list": "web-only",
   "description": "web-only",
   "detail-panel": "web-only",
   "dialog": "web-only",
