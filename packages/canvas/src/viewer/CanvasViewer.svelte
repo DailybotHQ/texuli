@@ -100,7 +100,7 @@ const links = $derived(
 );
 </script>
 
-<figure bind:this={ref} {...rest} class={['tx-canvas-viewer', className]} {dir}>
+<figure bind:this={ref} {...rest} data-tx-component="canvas" class={['tx-canvas-viewer', className]} {dir}>
   <svg
     class="tx-canvas-viewer__svg"
     role="img"

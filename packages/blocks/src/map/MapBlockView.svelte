@@ -102,9 +102,9 @@ function select(id: string) {
 </script>
 
 {#if !check.ok || !map || !basemap}
-  <p class="tx-map-invalid" role="note" data-tx-block="invalid">{text.invalid}</p>
+  <p class="tx-map-invalid" role="note" data-tx-block="invalid" data-tx-component="blocks-map">{text.invalid}</p>
 {:else}
-  <div class={cx('tx-map')} data-tx-block="map" role="group" aria-labelledby={`${uid}-name`}>
+  <div class={cx('tx-map')} data-tx-block="map" data-tx-component="blocks-map" role="group" aria-labelledby={`${uid}-name`}>
     {#if map.title}
       <svelte:element this={`h${headingLevel}`} class="tx-map-title">{map.title}</svelte:element>
     {/if}

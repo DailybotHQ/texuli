@@ -27,7 +27,7 @@ $effect(() => {
 </script>
 
 {#if !check.ok}
-  <p class="tx-block tx-block-invalid" role="note" data-tx-block="invalid">{text.invalid}</p>
+  <p class="tx-block tx-block-invalid" role="note" data-tx-block="invalid" data-tx-component="blocks-interactive">{text.invalid}</p>
 {:else if check.block.type === 'poll'}
   <PollBlockView block={check.block} labels={text} />
 {:else if check.block.type === 'quiz'}

@@ -36,13 +36,14 @@ function colsAttr(n: number | undefined, fallback: number): string {
 </script>
 
 {#if !check.ok}
-  <p class="tx-block-invalid" role="note" data-tx-block="invalid">{text.invalid}</p>
+  <p class="tx-block-invalid" role="note" data-tx-block="invalid" data-tx-component="blocks-structure">{text.invalid}</p>
 {:else}
   {@const b = check.block}
   {#if b.type === 'columns'}
     <div
       class="tx-structure-columns"
       data-tx-block="columns"
+      data-tx-component="blocks-structure"
       data-cols={colsAttr(b.columns.length, 2)}
       data-tone={b.tone}
       role="group"
@@ -58,6 +59,7 @@ function colsAttr(n: number | undefined, fallback: number): string {
     <section
       class="tx-block"
       data-tx-block="grid"
+      data-tx-component="blocks-structure"
       data-tone={b.tone}
       aria-label={b.title ?? text.gridLabel}
     >
@@ -80,7 +82,7 @@ function colsAttr(n: number | undefined, fallback: number): string {
   {:else if b.type === 'tabs'}
     {@const items = b.panels.map((panel) => ({ value: panel.id, label: panel.label }))}
     {@const initial = b.defaultPanel ?? b.panels[0]?.id ?? ''}
-    <div class="tx-structure-tabs" data-tx-block="tabs" data-tone={b.tone} data-block-id={b.id}>
+    <div class="tx-structure-tabs" data-tx-block="tabs" data-tx-component="blocks-structure" data-tone={b.tone} data-block-id={b.id}>
       <Tabs items={items} value={initial} label={b.label} variant="line">
         {#snippet content(item)}
           {@const panel = b.panels.find((p) => p.id === item.value)}
@@ -101,6 +103,7 @@ function colsAttr(n: number | undefined, fallback: number): string {
     <div
       class="tx-structure-accordion"
       data-tx-block="accordion"
+      data-tx-component="blocks-structure"
       data-tone={b.tone}
       data-block-id={b.id}
       role="group"
@@ -119,6 +122,7 @@ function colsAttr(n: number | undefined, fallback: number): string {
     <section
       class="tx-block"
       data-tx-block="cards"
+      data-tx-component="blocks-structure"
       data-tone={b.tone}
       aria-label={b.title ?? text.cardsLabel}
     >
@@ -152,12 +156,13 @@ function colsAttr(n: number | undefined, fallback: number): string {
     </section>
   {:else if b.type === 'divider'}
     {#if b.variant === 'space'}
-      <div class="tx-structure-divider-space" data-tx-block="divider" data-variant="space" aria-hidden="true"></div>
+      <div class="tx-structure-divider-space" data-tx-block="divider" data-tx-component="blocks-structure" data-variant="space" aria-hidden="true"></div>
     {:else if b.label}
       <!-- A named separator: the visible label is its accessible name (separator children are presentational). -->
       <div
         class="tx-structure-divider-labeled"
         data-tx-block="divider"
+        data-tx-component="blocks-structure"
         data-tone={b.tone}
         role="separator"
         aria-label={b.label}
@@ -165,12 +170,13 @@ function colsAttr(n: number | undefined, fallback: number): string {
         <span class="tx-structure-divider-label">{b.label}</span>
       </div>
     {:else}
-      <hr class="tx-structure-divider" data-tx-block="divider" data-tone={b.tone} />
+      <hr class="tx-structure-divider" data-tx-block="divider" data-tx-component="blocks-structure" data-tone={b.tone} />
     {/if}
   {:else if b.type === 'cta'}
     <nav
       class="tx-structure-cta"
       data-tx-block="cta"
+      data-tx-component="blocks-structure"
       data-tone={b.tone}
       aria-label={text.ctaLabel}
     >

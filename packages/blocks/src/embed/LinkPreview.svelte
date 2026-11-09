@@ -12,7 +12,7 @@ let { block, labels }: Props = $props();
 const href = $derived(safeHref(block.href, 'untrusted'));
 </script>
 
-<article class="tx-link-preview" data-tx-block="link-preview">
+<article class="tx-link-preview" data-tx-block="link-preview" data-tx-component="blocks-embed">
   <div class="tx-link-copy">
     {#if block.site}<p class="tx-link-site">{block.site}</p>{/if}
     <h3>{block.title}</h3>

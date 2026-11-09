@@ -40,11 +40,11 @@ function cellText(value: string | number | null): string {
 </script>
 
 {#if !check.ok}
-  <p class="tx-block tx-block-invalid" role="note" data-tx-block="invalid">{text.invalid}</p>
+  <p class="tx-block tx-block-invalid" role="note" data-tx-block="invalid" data-tx-component="blocks-data">{text.invalid}</p>
 {:else}
   {@const b = check.block}
   {#if b.type === 'table'}
-    <div class="tx-block tx-block-table" data-tx-block="table" data-tone={b.tone}>
+    <div class="tx-block tx-block-table" data-tx-block="table" data-tx-component="blocks-data" data-tone={b.tone}>
       <Table
         label={b.caption ? undefined : text.tableSummary}
         aria-label={b.caption ? undefined : text.tableSummary}
@@ -82,6 +82,7 @@ function cellText(value: string | number | null): string {
       class:tx-block-stat={b.type === 'stat'}
       class:tx-block-kpi={b.type === 'kpi'}
       data-tx-block={b.type}
+      data-tx-component="blocks-data"
       data-tone={b.tone}
       role="group"
       aria-label={title ? undefined : b.type === 'kpi' ? text.kpiGroup : text.statGroup}
@@ -112,7 +113,7 @@ function cellText(value: string | number | null): string {
       {#if source}<p class="tx-stat-source">{source}</p>{/if}
     </div>
   {:else}
-    <div class="tx-block tx-block-chart" data-tx-block="chart" data-tone={b.tone}>
+    <div class="tx-block tx-block-chart" data-tx-block="chart" data-tx-component="blocks-data" data-tone={b.tone}>
       <ChartBlockView block={b} {mode} labels={text} />
     </div>
   {/if}
