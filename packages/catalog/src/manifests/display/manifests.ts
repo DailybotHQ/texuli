@@ -6,19 +6,23 @@ import {
   avatarGroupGridPropNames,
   badgePropNames,
   bannerPropNames,
+  boxPropNames,
   calloutPropNames,
   cardPropNames,
   chipPropNames,
   codePropNames,
   emptyStatePropNames,
   errorStatePropNames,
+  headingPropNames,
   inlineTextPropNames,
   kbdPropNames,
   kpiPropNames,
+  prosePropNames,
   statPropNames,
   stepperPropNames,
   tablePropNames,
   tagPropNames,
+  textPropNames,
   timelinePropNames,
 } from './prop-names.ts';
 
@@ -71,6 +75,250 @@ const badgeVariants = [
 ] as const;
 
 const alertTones = ['info', 'success', 'warning', 'error', 'brand', 'neutral'] as const;
+
+const headingSizes = ['display', 'xl', 'lg', 'md', 'sm'] as const;
+const textTones = [
+  'default',
+  'muted',
+  'subtle',
+  'primary',
+  'success',
+  'warning',
+  'destructive',
+  'info',
+] as const;
+
+/** Heading (ADR-032): the semantic level and a visual size from the type scale. */
+export const headingManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'heading',
+  package: PKG,
+  label: 'Heading',
+  summary: 'A page title or section heading: a semantic h1–h6 with a size from the type scale.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: [
+    'Title a page, a section or a panel',
+    'Keep visual hierarchy in a locked prototype, where typography utilities are refused',
+  ],
+  dontUseWhen: ['Body copy, labels or captions (use text)', 'Long-form content (use prose)'],
+  a11y: [
+    'Renders the semantic heading element for its level; pick levels in document order.',
+    'size changes only the look, never the level announced to assistive technology.',
+  ],
+  props: propsFrom(headingPropNames, {
+    level: {
+      kind: 'number',
+      default: 2,
+      description: 'The semantic level, 1 to 6: renders <h1>…<h6>',
+    },
+    size: {
+      kind: 'enum',
+      enumValues: headingSizes,
+      default: 'lg',
+      description:
+        'Visual size, independent of the level (default from the level: 1 xl, 2 lg, 3 md, 4–6 sm)',
+    },
+    tone: { kind: 'enum', enumValues: ['default', 'muted'], default: 'default' },
+    truncate: { kind: 'boolean', default: false, description: 'One line with an ellipsis' },
+    label: {
+      kind: 'string',
+      description: 'Plain-text heading, escaped; replaces children when both are given',
+    },
+    class: { kind: 'string' },
+    children: { kind: 'slot', description: 'The heading text' },
+  }),
+  examples: [
+    {
+      id: 'page-title',
+      title: 'Page title',
+      props: { level: 1, size: 'xl', label: 'Quarterly report' },
+    },
+    {
+      id: 'section',
+      title: 'Muted section heading',
+      props: { level: 2, size: 'md', tone: 'muted', label: 'Details' },
+    },
+  ],
+  related: ['text', 'prose'],
+});
+
+/** Text (ADR-032): body copy, labels, captions and small print. */
+export const textManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'text',
+  package: PKG,
+  label: 'Text',
+  summary: 'Body copy, labels and small print with a size, tone and weight from the design system.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: [
+    'Body text, helper text, captions, muted or small print',
+    'Text with a status ink (success, warning, destructive, info) next to a word that says it',
+  ],
+  dontUseWhen: ['A title or section heading (use heading)', 'Long-form content (use prose)'],
+  a11y: [
+    'Never renders a heading element: as is p, span, div, label, small or strong.',
+    'A tone never carries meaning alone; the words say it.',
+  ],
+  props: propsFrom(textPropNames, {
+    as: {
+      kind: 'enum',
+      enumValues: ['p', 'span', 'div', 'label', 'small', 'strong'],
+      default: 'p',
+    },
+    size: {
+      kind: 'enum',
+      enumValues: ['figure', 'lg', 'md', 'sm', 'xs'],
+      default: 'md',
+      description: 'figure is a large number outside stat (the title size of the type scale)',
+    },
+    tone: { kind: 'enum', enumValues: textTones, default: 'default' },
+    weight: { kind: 'enum', enumValues: ['regular', 'medium', 'semibold'], default: 'regular' },
+    truncate: { kind: 'boolean', default: false, description: 'One line with an ellipsis' },
+    lineClamp: { kind: 'number', description: 'Clamp to 1 to 10 lines with an ellipsis' },
+    align: { kind: 'enum', enumValues: ['start', 'center', 'end'], default: 'start' },
+    mono: { kind: 'boolean', default: false, description: "The design system's code family" },
+    tabular: {
+      kind: 'boolean',
+      default: false,
+      description: 'Tabular figures (font-variant-numeric: tabular-nums) for numbers that line up',
+    },
+    transform: {
+      kind: 'enum',
+      enumValues: ['none', 'uppercase', 'lowercase', 'capitalize'],
+      default: 'none',
+    },
+    tracking: {
+      kind: 'enum',
+      enumValues: ['normal', 'wide'],
+      default: 'normal',
+      description: 'Letter spacing; wide is the eyebrow tracking (--tx-letter-spacing-wide)',
+    },
+    for: { kind: 'string', description: 'With as="label": the id of the labelled control' },
+    label: {
+      kind: 'string',
+      description: 'Plain text, escaped; replaces children when both are given',
+    },
+    class: { kind: 'string' },
+    children: { kind: 'slot', description: 'The text' },
+  }),
+  examples: [
+    {
+      id: 'muted',
+      title: 'Muted helper text',
+      props: { size: 'sm', tone: 'muted', label: 'Updated an hour ago' },
+    },
+    {
+      id: 'caption',
+      title: 'Small print',
+      props: { as: 'small', size: 'xs', tone: 'subtle', label: 'Prices exclude tax.' },
+    },
+    {
+      id: 'eyebrow',
+      title: 'Eyebrow (overline)',
+      props: {
+        as: 'span',
+        size: 'xs',
+        tone: 'muted',
+        transform: 'uppercase',
+        tracking: 'wide',
+        label: 'Revenue',
+      },
+    },
+    {
+      id: 'figure',
+      title: 'Large figure',
+      props: { as: 'span', size: 'figure', tabular: true, label: '1,284' },
+    },
+  ],
+  related: ['heading', 'prose', 'inline-text'],
+});
+
+/** Prose (ADR-032): long-form reading rhythm from the design system. */
+export const proseManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'prose',
+  package: PKG,
+  label: 'Prose',
+  summary:
+    "Long-form text with the design system's reading rhythm: measure, spacing, headings, lists.",
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['Articles, docs, descriptions and other long text written as markup'],
+  dontUseWhen: ['One line or a short label (use text)', 'A block document (use document)'],
+  a11y: 'Keeps the host markup and its semantics; a 65ch measure keeps lines readable.',
+  props: propsFrom(prosePropNames, {
+    as: { kind: 'enum', enumValues: ['div', 'article', 'section'], default: 'div' },
+    size: { kind: 'enum', enumValues: ['md', 'lg'], default: 'md' },
+    class: { kind: 'string' },
+    children: { kind: 'slot', description: 'The long-form markup (paragraphs, headings, lists)' },
+  }),
+  examples: [{ id: 'article', title: 'Article body', props: { as: 'article', size: 'md' } }],
+  related: ['heading', 'text'],
+});
+
+/** Box (ADR-032): padding, radius, border, elevation and surface from tokens. */
+export const boxManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'box',
+  package: PKG,
+  label: 'Box',
+  summary: 'A panel or region with padding, radius, border, elevation and surface from tokens.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: [
+    'Frame a group of content as a bordered or filled panel',
+    'Space and surface a region in a locked prototype, where visual utilities are refused',
+  ],
+  dontUseWhen: ['A clickable surface (use card with href)', 'Page layout (use a layout)'],
+  a11y: 'Not interactive. Use as="section" or "aside" with a heading for a landmark-like region.',
+  props: propsFrom(boxPropNames, {
+    as: {
+      kind: 'enum',
+      enumValues: ['div', 'section', 'article', 'aside', 'header', 'footer'],
+      default: 'div',
+    },
+    padding: { kind: 'enum', enumValues: ['none', 'sm', 'md', 'lg', 'xl'], default: 'md' },
+    radius: { kind: 'enum', enumValues: ['none', 'sm', 'md', 'lg', 'xl', 'full'], default: 'md' },
+    border: {
+      kind: 'enum',
+      enumValues: ['none', 'default', 'strong', 'block-start', 'block-end'],
+      default: 'none',
+      description:
+        'All sides, or one logical side (block-start, block-end) for an app header or footer',
+    },
+    elevation: { kind: 'enum', enumValues: ['none', 'sm', 'md', 'lg'], default: 'none' },
+    surface: {
+      kind: 'enum',
+      enumValues: ['transparent', 'default', 'muted', 'subtle', 'elevated'],
+      default: 'transparent',
+      description: 'The fill (the variant axis)',
+    },
+    class: { kind: 'string' },
+    children: { kind: 'slot', description: 'The panel content' },
+  }),
+  examples: [
+    {
+      id: 'bordered',
+      title: 'Bordered panel',
+      props: { padding: 'lg', border: 'default', surface: 'default' },
+    },
+    {
+      id: 'muted',
+      title: 'Muted region',
+      props: { padding: 'md', radius: 'lg', surface: 'muted' },
+    },
+    {
+      id: 'app-header',
+      title: 'App header (no card chrome)',
+      props: {
+        as: 'header',
+        padding: 'md',
+        radius: 'none',
+        border: 'block-end',
+        surface: 'default',
+      },
+    },
+  ],
+  related: ['card', 'heading', 'text'],
+});
 
 export const cardManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'card',
@@ -736,19 +984,23 @@ export const DISPLAY_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Obj
   avatarGroupGridManifest,
   badgeManifest,
   bannerManifest,
+  boxManifest,
   calloutManifest,
   cardManifest,
   chipManifest,
   codeManifest,
   emptyStateManifest,
   errorStateManifest,
+  headingManifest,
   inlineTextManifest,
   kbdManifest,
   kpiManifest,
+  proseManifest,
   statManifest,
   stepperManifest,
   tableManifest,
   tagManifest,
+  textManifest,
   timelineManifest,
 ]);
 
@@ -758,18 +1010,22 @@ export const DISPLAY_PROP_NAMES = /* @__PURE__ */ Object.freeze({
   'avatar-group-grid': avatarGroupGridPropNames,
   badge: badgePropNames,
   banner: bannerPropNames,
+  box: boxPropNames,
   callout: calloutPropNames,
   card: cardPropNames,
   chip: chipPropNames,
   code: codePropNames,
   'empty-state': emptyStatePropNames,
   'error-state': errorStatePropNames,
+  heading: headingPropNames,
   'inline-text': inlineTextPropNames,
   kbd: kbdPropNames,
   kpi: kpiPropNames,
+  prose: prosePropNames,
   stat: statPropNames,
   stepper: stepperPropNames,
   table: tablePropNames,
   tag: tagPropNames,
+  text: textPropNames,
   timeline: timelinePropNames,
 } as const);

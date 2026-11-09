@@ -9,6 +9,10 @@ import type { RenderComponentSpec } from '../src/render/renderer/types.ts';
 
 const rootFiles = {
   alert: 'components/alert/Alert.svelte',
+  box: 'components/typography/Box.svelte',
+  heading: 'components/typography/Heading.svelte',
+  prose: 'components/typography/Prose.svelte',
+  text: 'components/typography/Text.svelte',
   'alert-dialog': 'components/dialog/AlertDialog.svelte',
   'analytics-grid': 'layouts/dashboard/AnalyticsGrid.svelte',
   'app-nav': 'components/sidebar/AppNav.svelte',
@@ -104,6 +108,10 @@ const rootFiles = {
 } as const;
 const axisFiles = {
   alert: 'components/alert/AlertSurface.svelte',
+  box: 'components/typography/Box.svelte',
+  heading: 'components/typography/Heading.svelte',
+  prose: 'components/typography/Prose.svelte',
+  text: 'components/typography/Text.svelte',
   'alert-dialog': 'components/dialog/AlertDialog.svelte',
   'analytics-grid': 'layouts/dashboard/AnalyticsGrid.svelte',
   'app-nav': 'components/sidebar/AppNav.svelte',
@@ -206,8 +214,8 @@ const source = (file: string) =>
 
 describe('Texuli group A catalog root attributes', () => {
   it('covers every group A catalog id from the root audit', () => {
-    expect(groupA).toHaveLength(93);
-    expect(new Set(groupA.map((entry) => entry.id)).size).toBe(93);
+    expect(groupA).toHaveLength(97);
+    expect(new Set(groupA.map((entry) => entry.id)).size).toBe(97);
   });
 
   it.each(groupA)('$id root declares its component id and enum axes', (entry) => {

@@ -22,9 +22,9 @@ describe('catalog variants source (ADR-032)', () => {
   const byId = new Map(committed.components.map((component) => [component.id, component]));
 
   it('covers every catalog id once', () => {
-    expect(committed.components).toHaveLength(170);
-    expect(manifests).toHaveLength(170);
-    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(170);
+    expect(committed.components).toHaveLength(174);
+    expect(manifests).toHaveLength(174);
+    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(174);
     expect([...byId.keys()].sort()).toEqual(
       manifests
         .map((manifest) => manifest.id)

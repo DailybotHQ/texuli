@@ -408,6 +408,11 @@
       "types": "./src/components/tree/index.ts",
       "svelte": "./src/components/tree/index.ts",
       "default": "./src/components/tree/index.ts"
+    },
+    "./typography": {
+      "types": "./src/components/typography/index.ts",
+      "svelte": "./src/components/typography/index.ts",
+      "default": "./src/components/typography/index.ts"
     }
   },
   "scripts": {

@@ -75,6 +75,31 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli', exports: ['Banner'] },
     { module: 'texuli/alert', exports: ['Banner'] },
   ],
+  box: [
+    {
+      module: 'texuli',
+      exports: ['Box', 'BoxBorder', 'BoxElevation', 'BoxPadding', 'BoxRadius', 'BoxSurface'],
+    },
+    {
+      module: 'texuli/typography',
+      exports: [
+        'BOX_BORDERS',
+        'BOX_ELEMENTS',
+        'BOX_ELEVATIONS',
+        'BOX_PADDINGS',
+        'BOX_RADII',
+        'BOX_SURFACES',
+        'Box',
+        'BoxBorder',
+        'BoxElement',
+        'BoxElevation',
+        'BoxPadding',
+        'BoxRadius',
+        'BoxSurface',
+        'boxClass',
+      ],
+    },
+  ],
   breadcrumb: [
     { module: 'texuli', exports: ['Breadcrumb'] },
     { module: 'texuli/navigation', exports: ['Breadcrumb'] },
@@ -616,6 +641,23 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli', exports: ['Form'] },
     { module: 'texuli/field', exports: ['Form'] },
   ],
+  heading: [
+    { module: 'texuli', exports: ['Heading', 'HeadingLevel', 'HeadingSize', 'HeadingTone'] },
+    {
+      module: 'texuli/typography',
+      exports: [
+        'HEADING_LEVELS',
+        'HEADING_SIZES',
+        'HEADING_TONES',
+        'Heading',
+        'HeadingLevel',
+        'HeadingSize',
+        'HeadingTone',
+        'headingClass',
+        'headingSizeOf',
+      ],
+    },
+  ],
   'hover-card': [
     { module: 'texuli', exports: ['HoverCard', 'HoverCardRoot', 'HoverCardTrigger'] },
     { module: 'texuli/popover', exports: ['HoverCard', 'HoverCardRoot', 'HoverCardTrigger'] },
@@ -922,6 +964,20 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli', exports: ['PopoverContent'] },
     { module: 'texuli/popover', exports: ['PopoverContent'] },
   ],
+  prose: [
+    { module: 'texuli', exports: ['Prose', 'ProseSize'] },
+    {
+      module: 'texuli/typography',
+      exports: [
+        'PROSE_ELEMENTS',
+        'PROSE_SIZES',
+        'Prose',
+        'ProseElement',
+        'ProseSize',
+        'proseClass',
+      ],
+    },
+  ],
   radio: [
     { module: 'texuli', exports: ['Radio'] },
     { module: 'texuli/choice', exports: ['Radio'] },
@@ -1078,6 +1134,30 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
   tag: [
     { module: 'texuli', exports: ['Tag'] },
     { module: 'texuli/badge', exports: ['Tag'] },
+  ],
+  text: [
+    { module: 'texuli', exports: ['Text', 'TextElement', 'TextSize', 'TextTone', 'TextWeight'] },
+    {
+      module: 'texuli/typography',
+      exports: [
+        'TEXT_ALIGNS',
+        'TEXT_ELEMENTS',
+        'TEXT_SIZES',
+        'TEXT_TONES',
+        'TEXT_TRACKINGS',
+        'TEXT_TRANSFORMS',
+        'TEXT_WEIGHTS',
+        'Text',
+        'TextAlign',
+        'TextElement',
+        'TextSize',
+        'TextTone',
+        'TextTracking',
+        'TextTransform',
+        'TextWeight',
+        'textClass',
+      ],
+    },
   ],
   'text-counter': [
     { module: 'texuli', exports: ['TextCounter'] },

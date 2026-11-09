@@ -126,6 +126,7 @@ import './toggle/entry.ts';
 import './toolbar/entry.ts';
 import './tooltip/entry.ts';
 import './tree/entry.ts';
+import './typography/entry.ts';
 import './workflows-editor/entry.ts';
 import './workflows-state-machine/entry.ts';
 import './workflows-viewer/entry.ts';
@@ -174,6 +175,7 @@ export type {
   ExampleMeta,
   ExampleModule,
 } from './types.ts';
+export { texuliTypographyExample } from './typography/entry.ts';
 export { workflowsEditorExample } from './workflows-editor/entry.ts';
 export { workflowsStateMachineExample } from './workflows-state-machine/entry.ts';
 export { workflowsViewerExample } from './workflows-viewer/entry.ts';

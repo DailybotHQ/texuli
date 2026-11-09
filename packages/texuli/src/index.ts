@@ -639,6 +639,26 @@ export {
   treeViewClass,
   type VisibleTreeNode,
 } from './components/tree/index.ts';
+// Typography and surfaces for locked prototypes (ADR-032); the subpath is `texuli/typography`.
+export {
+  Box,
+  type BoxBorder,
+  type BoxElevation,
+  type BoxPadding,
+  type BoxRadius,
+  type BoxSurface,
+  Heading,
+  type HeadingLevel,
+  type HeadingSize,
+  type HeadingTone,
+  Prose,
+  type ProseSize,
+  Text,
+  type TextElement,
+  type TextSize,
+  type TextTone,
+  type TextWeight,
+} from './components/typography/index.ts';
 export {
   getI18nContext,
   setI18nContext,
