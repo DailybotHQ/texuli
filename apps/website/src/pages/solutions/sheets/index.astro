@@ -1,0 +1,51 @@
+---
+/**
+ * `/solutions/sheets/` — the Sheets Solution landing (ADR-027, ADR-028, ADR-030).
+ * `SolutionLayout` orders the sections and checks the content against the registry
+ * entry; the only island is the Sheets demo (client:visible), with a server-rendered
+ * preview of the same fixture.
+ */
+
+import SolutionDemoFrame from '../../../components/solutions/shared/demo-frame/SolutionDemoFrame.astro';
+import SolutionAgents from '../../../components/solutions/shared/platforms/SolutionAgents.astro';
+import SolutionPlatforms from '../../../components/solutions/shared/platforms/SolutionPlatforms.astro';
+import SolutionNextSteps from '../../../components/solutions/shared/resources/SolutionNextSteps.astro';
+import SolutionRecipes from '../../../components/solutions/shared/resources/SolutionRecipes.astro';
+import SolutionRelated from '../../../components/solutions/shared/resources/SolutionRelated.astro';
+import SolutionLayout from '../../../components/solutions/shared/SolutionLayout.astro';
+import SheetsDemo from '../../../components/solutions/sheets/demo/SheetsDemo.svelte';
+import SheetsPreview from '../../../components/solutions/sheets/demo/SheetsPreview.svelte';
+import SheetsHero from '../../../components/solutions/sheets/hero/SheetsHero.astro';
+import SheetsHow from '../../../components/solutions/sheets/how/SheetsHow.astro';
+import SheetsQuickstart from '../../../components/solutions/sheets/quickstart/SheetsQuickstart.astro';
+import SheetsStories from '../../../components/solutions/sheets/stories/SheetsStories.astro';
+import { techArticleJsonLd } from '../../../lib/schema.ts';
+import { SHEETS_LANDING as content, SHEETS_ENTRY as entry } from './_content.ts';
+
+const title = 'Sheets — a spreadsheet with formulas';
+const description = entry.tagline;
+---
+
+<SolutionLayout
+  {entry}
+  {content}
+  {title}
+  {description}
+  jsonLd={techArticleJsonLd(title, description, entry.route)}
+>
+  <SheetsHero slot="hero" />
+  <SolutionDemoFrame slot="demo" {entry} {...content.demo}>
+    <SheetsPreview slot="preview" />
+    <SheetsDemo slot="demo" client:visible />
+  </SolutionDemoFrame>
+  <SheetsStories slot="stories" />
+  <SheetsHow slot="how" />
+  <SheetsQuickstart slot="quickstart" />
+  <SolutionRecipes slot="recipes" {entry} {...content.recipes!} />
+  <SolutionAgents slot="agents" {entry} {...content.agents} />
+  <SolutionPlatforms slot="platforms" {entry} {...content.platforms} />
+  <Fragment slot="next">
+    <SolutionRelated {entry} />
+    <SolutionNextSteps {entry} {...content.next} />
+  </Fragment>
+</SolutionLayout>
