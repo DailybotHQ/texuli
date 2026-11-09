@@ -1,6 +1,6 @@
 ---
 /**
- * Site footer: ecosystem columns (Solutions, Native, Built with Texuli) for
+ * Site footer: ecosystem columns (Solutions, Built with Texuli; Native stays in the product row) for
  * routes that exist, the product row (derived from NAV_GROUPS, T-32), the
  * project row (agent surfaces, changelog, the repository, license and brand)
  * and the status line for Dailybot, Inc.
@@ -79,15 +79,13 @@ const builtWithLinks = [
     (product) => ({ href: `/built-with/${product.id}/`, label: product.name })
   ),
 ];
-
-const nativeLinks = siteRouteExists('/native/') ? [{ href: '/native/', label: 'Native' }] : [];
 ---
 
 <footer class="site-footer" data-tx-site-footer="">
   <div class="site-footer__inner">
     <nav aria-label="Footer">
       {
-        (solutionLinks.length > 0 || nativeLinks.length > 0 || builtWithLinks.length > 0) && (
+        (solutionLinks.length > 0 || builtWithLinks.length > 0) && (
           <div class="site-footer__columns">
             {
               solutionLinks.length > 0 && (
@@ -101,20 +99,6 @@ const nativeLinks = siteRouteExists('/native/') ? [{ href: '/native/', label: 'N
                         </li>
                       ) : null
                     )}
-                  </ul>
-                </div>
-              )
-            }
-            {
-              nativeLinks.length > 0 && (
-                <div class="site-footer__column">
-                  <h2>Native</h2>
-                  <ul>
-                    {nativeLinks.map((link) => (
-                      <li>
-                        <a href={withBase(base, link.href)}>{link.label}</a>
-                      </li>
-                    ))}
                   </ul>
                 </div>
               )

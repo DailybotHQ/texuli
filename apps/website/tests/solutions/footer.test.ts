@@ -18,7 +18,8 @@ describe('footer ecosystem columns (ADR-031)', () => {
     expect(footer).toContain('siteRouteExists');
     expect(footer).toContain('LISTED_PRODUCTS');
     expect(footer).toContain('<h2>Solutions</h2>');
-    expect(footer).toContain('<h2>Native</h2>');
+    // Native is linked once, from the product row (no duplicate column).
+    expect(footer).not.toContain('<h2>Native</h2>');
     expect(footer).toContain('<h2>Built with Texuli</h2>');
     expect(footer).not.toMatch(/PLAN_015|Deep Work Plan/i);
   });
