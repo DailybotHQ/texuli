@@ -20,6 +20,8 @@ describe('Drag capability page', () => {
       'returns validated moves as data; your application applies them and owns state, history and permissions'
     );
     expect(PAGE).not.toContain('/capabilities/drag-and-drop/');
+    expect(PAGE).not.toContain('PLAN_');
+    expect(PAGE).not.toMatch(/href=["']\/solutions\//);
   });
 
   it('states the package status honestly and keeps the real demo sections', () => {
@@ -50,21 +52,12 @@ describe('Drag capability page', () => {
     );
   });
 
-  it('marks future Solution links as planned and offers the current demos meanwhile', () => {
-    const expected = [
-      { slug: 'canvas', current: '/canvas-page/' },
-      { slug: 'workflows', current: '/workflows-page/' },
-      { slug: 'slides', current: '/slides-page/' },
-    ];
-    const cards = [...PAGE.matchAll(/<li>([\s\S]*?)<\/li>/g)].map(([, card]) => card ?? '');
-
-    for (const { slug, current } of expected) {
-      const card = cards.find((entry) => entry.includes(`href="/solutions/${slug}/"`));
-      expect(card, `${slug} Solution card`).toBeDefined();
-      expect(card).toContain('Solution landing planned in PLAN_015');
-      expect(card).toContain(`href="${current}"`);
-      expect(card).toContain('Coming with PLAN_015');
+  it('marks the future Solution landings as planned and links only to current demos', () => {
+    expect(COPY).toContain('Solution landings are planned. Until those routes ship');
+    for (const route of ['/canvas-page/', '/workflows-page/', '/slides-page/']) {
+      expect(PAGE).toContain(`href="${route}"`);
     }
+    expect(PAGE).not.toMatch(/href=["']\/solutions\//);
   });
 
   it('keeps every demo island lazy and the page sink-free', () => {
