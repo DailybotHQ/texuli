@@ -86,7 +86,7 @@ const badgeVariants = [
 
 const alertTones = ['info', 'success', 'warning', 'error', 'brand', 'neutral'] as const;
 
-const headingSizes = ['display', 'xl', 'lg', 'md', 'sm'] as const;
+const headingSizes = ['display', '4xl', '3xl', '2xl', 'xl', 'lg', 'md', 'sm'] as const;
 const tabsVariants = ['line', 'pills', 'enclosed'] as const;
 const accordionVariants = ['default', 'bordered'] as const;
 const textTones = [
@@ -98,6 +98,7 @@ const textTones = [
   'warning',
   'destructive',
   'info',
+  'inherit',
 ] as const;
 
 /** Heading (ADR-032): the semantic level and a visual size from the type scale. */
@@ -128,7 +129,19 @@ export const headingManifest = /* @__PURE__ */ defineDisplayManifest({
       enumValues: headingSizes,
       default: 'lg',
       description:
-        'Visual size, independent of the level (default from the level: 1 xl, 2 lg, 3 md, 4–6 sm)',
+        'Visual size, independent of the level (default from the level: 1 xl, 2 lg, 3 md, 4–6 sm); 2xl, 3xl and 4xl are hero and section titles between xl and display',
+    },
+    responsive: {
+      kind: 'boolean',
+      default: false,
+      description:
+        'Scale the size down on narrow screens: fluid from two scale steps below up to the size',
+    },
+    tracking: {
+      kind: 'enum',
+      enumValues: ['default', 'tight'],
+      default: 'default',
+      description: "Letter spacing: the role's own, or tight (--tx-letter-spacing-tight)",
     },
     tone: { kind: 'enum', enumValues: ['default', 'muted'], default: 'default' },
     truncate: { kind: 'boolean', default: false, description: 'One line with an ellipsis' },
@@ -149,6 +162,17 @@ export const headingManifest = /* @__PURE__ */ defineDisplayManifest({
       id: 'section',
       title: 'Muted section heading',
       props: { level: 2, size: 'md', tone: 'muted', label: 'Details' },
+    },
+    {
+      id: 'hero',
+      title: 'Responsive hero title',
+      props: {
+        level: 1,
+        size: '4xl',
+        responsive: true,
+        tracking: 'tight',
+        label: 'Plan the quarter',
+      },
     },
   ],
   related: ['text', 'prose'],
@@ -179,9 +203,10 @@ export const textManifest = /* @__PURE__ */ defineDisplayManifest({
     },
     size: {
       kind: 'enum',
-      enumValues: ['figure', 'lg', 'md', 'sm', 'xs'],
+      enumValues: ['figure', 'lg', 'md', 'sm', 'xs', 'inherit'],
       default: 'md',
-      description: 'figure is a large number outside stat (the title size of the type scale)',
+      description:
+        "figure is a large number outside stat (the title size of the type scale); inherit takes the parent's size and line height",
     },
     tone: { kind: 'enum', enumValues: textTones, default: 'default' },
     weight: { kind: 'enum', enumValues: ['regular', 'medium', 'semibold'], default: 'regular' },
@@ -241,6 +266,11 @@ export const textManifest = /* @__PURE__ */ defineDisplayManifest({
       title: 'Large figure',
       props: { as: 'span', size: 'figure', tabular: true, label: '1,284' },
     },
+    {
+      id: 'inherit',
+      title: 'Nested text that inherits',
+      props: { as: 'span', size: 'inherit', tone: 'inherit', weight: 'semibold', label: 'Pro' },
+    },
   ],
   related: ['heading', 'prose', 'inline-text'],
 });
@@ -299,9 +329,19 @@ export const boxManifest = /* @__PURE__ */ defineDisplayManifest({
     elevation: { kind: 'enum', enumValues: ['none', 'sm', 'md', 'lg'], default: 'none' },
     surface: {
       kind: 'enum',
-      enumValues: ['transparent', 'default', 'muted', 'subtle', 'elevated'],
+      enumValues: [
+        'transparent',
+        'default',
+        'muted',
+        'subtle',
+        'elevated',
+        'primary',
+        'brand',
+        'translucent',
+      ],
       default: 'transparent',
-      description: 'The fill (the variant axis)',
+      description:
+        'The fill (the variant axis): primary is the solid primary with its on-color, brand the soft primary tint, translucent the glass opacity and blur for sticky headers',
     },
     class: { kind: 'string' },
     children: { kind: 'slot', description: 'The panel content' },
@@ -328,6 +368,22 @@ export const boxManifest = /* @__PURE__ */ defineDisplayManifest({
         surface: 'default',
       },
     },
+    {
+      id: 'logo-tile',
+      title: 'Brand logo tile',
+      props: { padding: 'md', radius: 'lg', surface: 'primary' },
+    },
+    {
+      id: 'sticky-header',
+      title: 'Translucent sticky header',
+      props: {
+        as: 'header',
+        padding: 'md',
+        radius: 'none',
+        border: 'block-end',
+        surface: 'translucent',
+      },
+    },
   ],
   related: ['card', 'heading', 'text'],
 });
@@ -336,7 +392,7 @@ export const cardManifest = /* @__PURE__ */ defineDisplayManifest({
   id: 'card',
   package: PKG,
   label: 'Card',
-  summary: 'A surface for grouping related content with optional link behavior.',
+  summary: 'A surface for grouping related content with optional stretched-link behavior.',
   tier: 'app',
   agentEmittable: false,
   useWhen: ['Group related content in a bordered surface', 'Make a whole tile a single link'],
@@ -345,7 +401,7 @@ export const cardManifest = /* @__PURE__ */ defineDisplayManifest({
     'A data grid of many rows (use table)',
   ],
   a11y: [
-    'When href is set, the card is a real link with an accessible name',
+    'When href is set, one real link covers the card; nested actions sit above it',
     'Rejected href schemes render as a non-interactive surface',
   ],
   props: propsFrom(cardPropNames, {
@@ -361,7 +417,11 @@ export const cardManifest = /* @__PURE__ */ defineDisplayManifest({
       enumValues: ['developer', 'untrusted'],
       default: 'developer',
     },
-    linkLabel: { kind: 'string', description: 'Accessible name when the card is a link' },
+    linkLabel: { kind: 'string', description: 'Accessible name of the stretched primary link' },
+    actions: {
+      kind: 'slot',
+      description: 'Secondary actions (pin, menu) above the stretched link',
+    },
     class: { kind: 'string', description: 'Extra classes' },
   }),
   examples: [

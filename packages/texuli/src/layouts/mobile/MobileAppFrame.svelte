@@ -117,7 +117,13 @@ function focusScreen(event: MouseEvent): void {
 }
 </script>
 
-<div {...rest} bind:this={ref} class={cx('tx-mobile-frame', className)} data-tx-mobile-frame="">
+<div
+  {...rest}
+  bind:this={ref}
+  class={cx('tx-mobile-frame', className)}
+  data-tx-mobile-frame=""
+  data-tx-component="mobile-app-frame"
+>
   <a class="tx-mobile-frame__skip" href={`#${screenId}`} onclick={focusScreen}>{skipLabel}</a>
   {@render header?.()}
   <svelte:element

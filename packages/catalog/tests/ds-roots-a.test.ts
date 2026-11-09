@@ -109,6 +109,13 @@ const rootFiles = {
   timeline: 'components/timeline/Timeline.svelte',
   toaster: 'components/toast/Toaster.svelte',
   tooltip: 'components/tooltip/Tooltip.svelte',
+  'file-upload': 'components/file-upload/FileUpload.svelte',
+  'mobile-app-frame': 'layouts/mobile/MobileAppFrame.svelte',
+  'number-field': 'components/number-pin/NumberFieldRoot.svelte',
+  'pin-input': 'components/number-pin/PinInputRoot.svelte',
+  rating: 'components/rating/Rating.svelte',
+  'tags-input': 'components/tags-color/TagsInput.svelte',
+  'toggle-group': 'components/toggle/ToggleGroup.svelte',
 } as const;
 const axisFiles = {
   alert: 'components/alert/AlertSurface.svelte',
@@ -212,6 +219,13 @@ const axisFiles = {
   timeline: 'components/timeline/Timeline.svelte',
   toaster: 'components/toast/Toaster.svelte',
   tooltip: 'components/tooltip/Tooltip.svelte',
+  'file-upload': 'components/file-upload/FileUpload.svelte',
+  'mobile-app-frame': 'layouts/mobile/MobileAppFrame.svelte',
+  'number-field': 'components/number-pin/NumberFieldRoot.svelte',
+  'pin-input': 'components/number-pin/PinInputRoot.svelte',
+  rating: 'components/rating/Rating.svelte',
+  'tags-input': 'components/tags-color/TagsInput.svelte',
+  'toggle-group': 'components/toggle/ToggleGroup.svelte',
 } as const;
 const groupA = ALL_MANIFEST_GROUPS.flatMap((group) => group.manifests).filter(
   (entry) => entry.package === 'texuli' && Object.hasOwn(rootFiles, entry.id)
@@ -222,8 +236,8 @@ const source = (file: string) =>
 
 describe('Texuli group A catalog root attributes', () => {
   it('covers every group A catalog id from the root audit', () => {
-    expect(groupA).toHaveLength(101);
-    expect(new Set(groupA.map((entry) => entry.id)).size).toBe(101);
+    expect(groupA).toHaveLength(108);
+    expect(new Set(groupA.map((entry) => entry.id)).size).toBe(108);
   });
 
   it.each(groupA)('$id root declares its component id and enum axes', (entry) => {

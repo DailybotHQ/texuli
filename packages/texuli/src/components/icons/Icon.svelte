@@ -29,7 +29,7 @@ const txDefaults = designDefaults('icon');
 let {
   icon,
   size = txDefaults().size ?? 'md',
-  tone = txDefaults().tone ?? 'default',
+  tone = 'default',
   strokeWidth = 2,
   color = undefined,
   label,

@@ -50,7 +50,7 @@ it('display manifests are a closed, frozen, app-tier set with schema parity', ()
   {
     // Compile-time anchor: cardPropNames is the contract Card authors extend.
     type CardProp = (typeof cardPropNames)[number];
-    const required: CardProp[] = ['variant', 'href', 'hrefTrust', 'linkLabel', 'class'];
+    const required: CardProp[] = ['variant', 'href', 'hrefTrust', 'linkLabel', 'actions', 'class'];
     expect(required).toEqual([...DISPLAY_PROP_NAMES.card]);
   }
   // rejects unknown example props against the schema

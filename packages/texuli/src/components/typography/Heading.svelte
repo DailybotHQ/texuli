@@ -11,9 +11,11 @@ import {
   HEADING_LEVELS,
   HEADING_SIZES,
   HEADING_TONES,
+  HEADING_TRACKINGS,
   type HeadingLevel,
   type HeadingSize,
   type HeadingTone,
+  type HeadingTracking,
   headingClass,
   headingSizeOf,
   oneOf,
@@ -22,8 +24,12 @@ import {
 type Props = HTMLAttributes<HTMLHeadingElement> & {
   /** The semantic level: renders `<h1>`…`<h6>`. Default 2. */
   level?: HeadingLevel;
-  /** The visual size (`display`, `xl`, `lg`, `md`, `sm`). Default: from the level (1 xl, 2 lg, 3 md, 4–6 sm). */
+  /** The visual size (`display`, `4xl`, `3xl`, `2xl`, `xl`, `lg`, `md`, `sm`). Default: from the level (1 xl, 2 lg, 3 md, 4–6 sm). */
   size?: HeadingSize;
+  /** Scale the size down on narrow screens: fluid from two steps below up to the size. */
+  responsive?: boolean;
+  /** Letter spacing: `default` (the role's) or `tight` (`--tx-letter-spacing-tight`). */
+  tracking?: HeadingTracking;
   /** `default` or `muted`. Default `default`. */
   tone?: HeadingTone;
   /** One line with an ellipsis; the full text stays in the accessibility tree. */
@@ -38,6 +44,8 @@ let {
   ref = $bindable(null),
   level: levelProp = 2,
   size: sizeProp,
+  responsive = false,
+  tracking: trackingProp = 'default',
   tone: toneProp = 'default',
   truncate = false,
   label,
@@ -49,6 +57,7 @@ let {
 const level = $derived(oneOf(HEADING_LEVELS, levelProp, 2));
 const size = $derived(oneOf(HEADING_SIZES, sizeProp, headingSizeOf(level)));
 const tone = $derived(oneOf(HEADING_TONES, toneProp, 'default'));
+const tracking = $derived(oneOf(HEADING_TRACKINGS, trackingProp, 'default'));
 const hasLabel = $derived(typeof label === 'string' && label.length > 0);
 </script>
 
@@ -56,7 +65,12 @@ const hasLabel = $derived(typeof label === 'string' && label.length > 0);
   this={`h${level}`}
   bind:this={ref}
   {...rest}
-  class={cx(headingClass({ size, tone }), truncate && 'tx-type--truncate', className)}
+  class={cx(
+    headingClass({ size, tone, tracking }),
+    responsive === true && 'tx-heading--responsive',
+    truncate && 'tx-type--truncate',
+    className
+  )}
   data-tx-component="heading"
   data-tx-size={size}
   data-tx-tone={tone}

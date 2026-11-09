@@ -16,10 +16,10 @@
  * (`content-hash-mismatch`, `library-hash-mismatch`). It reports the allowed
  * set and the approval status as declared; it cannot prove who approved.
  */
-import { readFile, stat } from 'node:fs/promises';
+import { readdir, readFile, stat } from 'node:fs/promises';
+import { extname, relative, resolve } from 'node:path';
 import type { SpecCatalog } from '@texuli/spec';
-import { presetComponentsFromBuild } from '../ds-create/presets.ts';
-import { loadOpsCatalog } from '../ops/catalog.ts';
+import { loadSpecCatalog } from '../ops/catalog.ts';
 import { checkDesignSystemFull, type DsFullReport } from './full.ts';
 import {
   DS_CHECK_BUILTIN_SHEET,
@@ -39,7 +39,7 @@ import type { DsCheckMode, DsCheckReport } from './types.ts';
 export const DS_CHECK_MAX_BYTES = 1_000_000;
 
 export const DS_CHECK_USAGE =
-  'Usage: texuli ds check <file> [--locked [--report]] [--json] [--render] [--mode light|dark|all] [--variant <name>]... [--trust developer|untrusted] [--base <file>]... [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict] [--catalog <components.json>]';
+  'Usage: texuli ds check <file> [--locked [--report]] [--prototype <dir>] [--json] [--render] [--mode light|dark|all] [--variant <name>]... [--trust developer|untrusted] [--base <file>]... [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict] [--catalog <components.json>]';
 
 export interface DsCliArgs {
   command: 'check';
@@ -60,6 +60,8 @@ export interface DsCliArgs {
   strict: boolean;
   /** The catalog `allow` is checked against (default: the agent catalog `@texuli/tools` builds). */
   catalog?: string;
+  /** Source tree scanned as a locked prototype. */
+  prototype?: string;
   help: boolean;
 }
 
@@ -111,6 +113,7 @@ export function parseDsCliArgs(argv: readonly string[]): DsCliArgs {
     else if (arg === '--url') args.url = value();
     else if (arg === '--known') args.known = value();
     else if (arg === '--catalog') args.catalog = value();
+    else if (arg === '--prototype') args.prototype = value();
     else if (arg.startsWith('-')) throw new TypeError(`Unknown ds check flag "${arg}".`);
     else if (args.file === undefined) args.file = arg;
     else throw new TypeError(`ds check takes one file; got "${args.file}" and "${arg}".`);
@@ -279,11 +282,66 @@ function catalogOf(value: unknown, path: string): SpecCatalog {
 
 /** The spec catalog projection needed by the locked checker, built from bundled manifests. */
 export async function loadAllowCatalog(): Promise<SpecCatalog> {
-  const build = await loadOpsCatalog();
-  return {
-    catalogHash: build.hash,
-    components: presetComponentsFromBuild(build.catalog.entries),
-  } as unknown as SpecCatalog;
+  return loadSpecCatalog();
+}
+
+/** Read a bounded prototype tree without following symlinks or executing source files. */
+async function readPrototypeDirectory(path: string) {
+  const root = resolve(path);
+  const files: Record<string, string> = {};
+  const blueprints: Record<string, unknown> = {};
+  let totalBytes = 0;
+  const walk = async (directory: string): Promise<void> => {
+    const entries = await readdir(directory, { withFileTypes: true });
+    for (const entry of entries) {
+      const absolute = resolve(directory, entry.name);
+      const name = relative(root, absolute).split('\\').join('/');
+      if (entry.isSymbolicLink()) throw new TypeError(`Prototype symlinks are refused: ${name}.`);
+      if (entry.isDirectory()) {
+        await walk(absolute);
+        continue;
+      }
+      if (!entry.isFile()) continue;
+      const extension = extname(entry.name).toLowerCase();
+      if (
+        !['.svelte', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.css', '.json'].includes(
+          extension
+        )
+      )
+        continue;
+      if (Object.keys(files).length + Object.keys(blueprints).length >= 500)
+        throw new RangeError('The prototype has more than 500 source files.');
+      const info = await stat(absolute);
+      if (info.size > 512 * 1024) {
+        if (extension === '.json')
+          throw new RangeError(`Prototype JSON ${name} exceeds the 512 KB scan limit.`);
+        const marker = ' '.repeat(512 * 1024 + 1);
+        totalBytes += marker.length;
+        if (totalBytes > 8 * 1024 * 1024)
+          throw new RangeError('The prototype source exceeds 8 MB.');
+        files[name] = marker;
+        continue;
+      }
+      totalBytes += info.size;
+      if (totalBytes > 8 * 1024 * 1024) throw new RangeError('The prototype source exceeds 8 MB.');
+      const text = await readFile(absolute, 'utf8');
+      if (extension === '.json') {
+        try {
+          const value = JSON.parse(text) as unknown;
+          if (typeof value === 'object' && value !== null && 'tree' in value)
+            blueprints[name] = value;
+        } catch {
+          // JSON files which are not blueprint fixtures are not part of the source scan.
+        }
+      } else {
+        files[name] = text;
+      }
+    }
+  };
+  const info = await stat(root);
+  if (!info.isDirectory()) throw new TypeError(`Prototype ${path} is not a directory.`);
+  await walk(root);
+  return { files, blueprints };
 }
 
 /** Run `texuli ds …`; sets `process.exitCode` (1 refusal, 2 could not run); never throws. */
@@ -322,12 +380,15 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
       args.catalog === undefined
         ? await loadAllowCatalog()
         : catalogOf(await readJsonFile(args.catalog, 'The catalog'), args.catalog);
-    if (args.locked) {
+    if (args.locked || args.prototype !== undefined) {
+      const prototype =
+        args.prototype === undefined ? undefined : await readPrototypeDirectory(args.prototype);
       let full = await checkDesignSystemFull(doc, {
         catalog,
         base: bases,
         file: args.file as string,
         hashes: true,
+        ...(prototype ? { prototype } : {}),
         ...(args.trust ? { trust: args.trust } : {}),
       });
       if (args.render && full.check.runs.some((run) => run.compiled)) {

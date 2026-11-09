@@ -2,7 +2,7 @@
   "dialect": "https://json-schema.org/draft/2020-12/schema",
   "files": {
     "catalog/capabilities.json": "fe033021ae0d247f5d5157a8baa52cf9c17cd47442cf4caf9e0fe9bf31e19baf",
-    "catalog/components.json": "b024d79a29ee9be5c95d77a0d6c2d6773c101e459b29793f4939992385f26b88",
+    "catalog/components.json": "bd77629c4b2e11fcad1976fc943fa88b27fac9af3e1bad1a41b0f372202be794",
     "fixtures/design-systems/acme.json": "07928b374d70ce2b7f08adaf855fdb9040b8305b10e463381843793d2174ca04",
     "fixtures/design-systems/invalid/approval-invalid.json": "3fcb59b0e54f13819be3244129604c4bf2c5cf99d578ba51580abeeba563b096",
     "fixtures/design-systems/invalid/extends-cycle.json": "64ed3a6f116ce9c8ce88890681828e4d482a3076773f1d60194194d42bae8775",
@@ -98,7 +98,7 @@
     "schemas/allow-manifest.schema.json": "4cb4d41a6f96fb0d124459054799c17f0b6d3d2b237c8a73946f7b7dea5a5b2f",
     "schemas/blueprint.schema.json": "2d91b3d6b84cdc0172d98906cbd71369539ddd67143f9e98e30c87d72440734b",
     "schemas/canvas.schema.json": "d2f73644ff38feef2f768da9470640a3375450211a9fd7b90f507c4dd48b5b63",
-    "schemas/catalog.schema.json": "0bc7abcc768cd6a3272161279e2deaab8fbdba85a31b15975b98f5dc9ef428f8",
+    "schemas/catalog.schema.json": "328b0a8270a5bb8e0cf227875ab149cfbef357de4e3d1e5d2490cc1416ff8c22",
     "schemas/design-system-bundle.schema.json": "75ed8f550a788c0e68a753b6dc30e652bb13ca292197d9a57275a4a110b10218",
     "schemas/design-system.schema.json": "6f922cb286ef6d6a6062672f1912cc78c843a5b5a66faa6b8630390e90c18682",
     "schemas/diagnostics.schema.json": "7de3c9490dae2ce193fe159b4a20191234626e68d6a736b99eda7524b52b5240",

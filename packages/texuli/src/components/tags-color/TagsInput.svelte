@@ -116,6 +116,7 @@ const split = $derived(splitControlProps(rest));
   {labels}
   class={cx('tx-tags-input', className)}
   aria-label={label}
+  data-tx-component="tags-input"
   data-tx-tags-input=""
   {...split.wrapper}
 >

@@ -1,5 +1,5 @@
 {
-  "catalogHash": "bcdf18540a827bbffc0e643ee579c7518bc8eaa4154ac4fa6bc2e773fafb855f",
+  "catalogHash": "c3a5f1a2ad103d59e7dfa8f3131ebd11d8bf99be366aba18b18aa6010d023557",
   "components": [
     {
       "axes": {
@@ -1201,7 +1201,16 @@
         "variant": {
           "default": "transparent",
           "prop": "surface",
-          "values": ["transparent", "default", "muted", "subtle", "elevated"]
+          "values": [
+            "transparent",
+            "default",
+            "muted",
+            "subtle",
+            "elevated",
+            "primary",
+            "brand",
+            "translucent"
+          ]
         }
       },
       "capability": "web-only",
@@ -1272,7 +1281,16 @@
           "name": "radius"
         },
         {
-          "enumValues": ["transparent", "default", "muted", "subtle", "elevated"],
+          "enumValues": [
+            "transparent",
+            "default",
+            "muted",
+            "subtle",
+            "elevated",
+            "primary",
+            "brand",
+            "translucent"
+          ],
           "kind": "enum",
           "name": "surface"
         }
@@ -1673,6 +1691,11 @@
       "props": [
         {
           "extension": "web",
+          "kind": "slot",
+          "name": "actions"
+        },
+        {
+          "extension": "web",
           "kind": "string",
           "name": "class"
         },
@@ -1696,7 +1719,7 @@
         }
       ],
       "states": ["hover", "focus-visible"],
-      "summary": "A surface for grouping related content with optional link behavior."
+      "summary": "A surface for grouping related content with optional stretched-link behavior."
     },
     {
       "capability": "unknown",
@@ -6499,6 +6522,108 @@
       "summary": "An alert-role error message for a field."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "compact"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "file-upload",
+      "imports": [
+        {
+          "exports": [
+            "FILE_UPLOAD_VARIANTS",
+            "FileUpload",
+            "FileUploadLabels",
+            "FileUploadProgressMap",
+            "FileUploadVariant"
+          ],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "FILE_UPLOAD_VARIANTS",
+            "FileUpload",
+            "FileUploadLabels",
+            "FileUploadProgressMap",
+            "FileUploadVariant",
+            "fileUploadClass"
+          ],
+          "module": "texuli/file-upload"
+        }
+      ],
+      "label": "FileUpload",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "string",
+          "name": "accept"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "array",
+          "name": "files"
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "kind": "number",
+          "name": "maxFiles"
+        },
+        {
+          "kind": "number",
+          "name": "maxSize"
+        },
+        {
+          "kind": "boolean",
+          "name": "multiple"
+        },
+        {
+          "kind": "string",
+          "name": "name"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onFileRemove"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onFilesAdd"
+        },
+        {
+          "kind": "boolean",
+          "name": "required"
+        },
+        {
+          "kind": "boolean",
+          "name": "showPreviews"
+        },
+        {
+          "enumValues": ["default", "compact"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "states": ["focus-visible", "disabled", "invalid"],
+      "summary": "A labelled drop zone and file list for choosing local files."
+    },
+    {
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "events": ["press"],
@@ -6716,7 +6841,7 @@
         "size": {
           "default": "lg",
           "prop": "size",
-          "values": ["display", "xl", "lg", "md", "sm"]
+          "values": ["display", "4xl", "3xl", "2xl", "xl", "lg", "md", "sm"]
         },
         "tone": {
           "default": "default",
@@ -6738,10 +6863,12 @@
             "HEADING_LEVELS",
             "HEADING_SIZES",
             "HEADING_TONES",
+            "HEADING_TRACKINGS",
             "Heading",
             "HeadingLevel",
             "HeadingSize",
             "HeadingTone",
+            "HeadingTracking",
             "headingClass",
             "headingSizeOf"
           ],
@@ -6770,7 +6897,11 @@
           "name": "level"
         },
         {
-          "enumValues": ["display", "xl", "lg", "md", "sm"],
+          "kind": "boolean",
+          "name": "responsive"
+        },
+        {
+          "enumValues": ["display", "4xl", "3xl", "2xl", "xl", "lg", "md", "sm"],
           "kind": "enum",
           "name": "size"
         },
@@ -6778,6 +6909,11 @@
           "enumValues": ["default", "muted"],
           "kind": "enum",
           "name": "tone"
+        },
+        {
+          "enumValues": ["default", "tight"],
+          "kind": "enum",
+          "name": "tracking"
         },
         {
           "kind": "boolean",
@@ -9222,6 +9358,53 @@
       "summary": "Top-level menubar item that opens a menu."
     },
     {
+      "capability": "unknown",
+      "emit": [],
+      "group": "layouts",
+      "id": "mobile-app-frame",
+      "imports": [
+        {
+          "exports": ["MobileAppFrame"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["MobileAppFrame"],
+          "module": "texuli/layouts/mobile"
+        }
+      ],
+      "label": "MobileAppFrame",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["main", "div"],
+          "kind": "enum",
+          "name": "mainElement"
+        },
+        {
+          "kind": "string",
+          "name": "mainId"
+        },
+        {
+          "kind": "boolean",
+          "name": "resetScrollOnNavigate"
+        },
+        {
+          "kind": "string",
+          "name": "skipLabel"
+        },
+        {
+          "kind": "boolean",
+          "name": "stickyFooterUnstyled"
+        }
+      ],
+      "summary": "A phone-sized app frame: skip link, header, scrolling screen, optional footer and bottom nav. Host chrome; agents never emit it."
+    },
+    {
       "capability": "web-only",
       "emit": [],
       "group": "layouts",
@@ -9545,6 +9728,102 @@
           "default": "md",
           "prop": "size",
           "values": ["sm", "md", "lg"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "number-field",
+      "imports": [
+        {
+          "exports": [
+            "NumberField",
+            "NumberFieldDecrement",
+            "NumberFieldIncrement",
+            "NumberFieldInput",
+            "NumberFieldRoot"
+          ],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "NUMBER_PIN_SIZES",
+            "NumberField",
+            "NumberFieldDecrement",
+            "NumberFieldIncrement",
+            "NumberFieldInput",
+            "NumberFieldRoot",
+            "NumberPinSize",
+            "numberFieldClass"
+          ],
+          "module": "texuli/number-pin"
+        }
+      ],
+      "label": "NumberField",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "enumValues": ["input", "output"],
+          "kind": "enum",
+          "name": "display"
+        },
+        {
+          "kind": "number",
+          "name": "max"
+        },
+        {
+          "kind": "number",
+          "name": "min"
+        },
+        {
+          "kind": "string",
+          "name": "name"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "kind": "boolean",
+          "name": "readOnly"
+        },
+        {
+          "kind": "boolean",
+          "name": "required"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "kind": "number",
+          "name": "step"
+        },
+        {
+          "kind": "number",
+          "name": "value"
+        }
+      ],
+      "states": ["focus-visible", "disabled", "invalid", "readonly"],
+      "summary": "A numeric value with optional steppers, min, max and locale formatting."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
         },
         "variant": {
           "default": "outline",
@@ -9624,6 +9903,71 @@
       ],
       "states": ["hover", "focus-visible", "disabled", "selected"],
       "summary": "Page controls for long lists."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "pin-input",
+      "imports": [
+        {
+          "exports": ["PinInput", "PinInputCell", "PinInputRoot"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["PinInput", "PinInputCell", "PinInputRoot", "pinInputClass"],
+          "module": "texuli/number-pin"
+        }
+      ],
+      "label": "PinInput",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "boolean",
+          "name": "mask"
+        },
+        {
+          "kind": "number",
+          "name": "maxlength"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onComplete"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        }
+      ],
+      "states": ["focus-visible", "disabled", "invalid"],
+      "summary": "A one-time code of fixed length, one cell per character."
     },
     {
       "capability": "web-only",
@@ -10043,6 +10387,120 @@
       ],
       "states": ["disabled", "readonly"],
       "summary": "A set of exclusive radio options with keyboard roving."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "tone": {
+          "default": "warning",
+          "prop": "tone",
+          "values": ["warning", "primary", "neutral"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "rating",
+      "imports": [
+        {
+          "exports": ["Rating", "RatingLabels", "RatingSize", "RatingTone", "formatRatingLabel"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "DEFAULT_RATING_LABELS",
+            "RATING_MAX_LIMIT",
+            "RATING_SIZES",
+            "RATING_TONES",
+            "Rating",
+            "RatingLabels",
+            "RatingSize",
+            "RatingTone",
+            "clampDisplay",
+            "formatRatingLabel",
+            "normalizeMax",
+            "normalizeValue",
+            "ratingClass",
+            "ratingSteps",
+            "starFill"
+          ],
+          "module": "texuli/rating"
+        }
+      ],
+      "label": "Rating",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "boolean",
+          "name": "allowHalf"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "clearable"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "boolean",
+          "name": "display"
+        },
+        {
+          "kind": "object",
+          "name": "labels"
+        },
+        {
+          "kind": "number",
+          "name": "max"
+        },
+        {
+          "kind": "string",
+          "name": "name"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "kind": "boolean",
+          "name": "readonly"
+        },
+        {
+          "kind": "boolean",
+          "name": "required"
+        },
+        {
+          "kind": "boolean",
+          "name": "showValue"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": ["warning", "primary", "neutral"],
+          "kind": "enum",
+          "name": "tone"
+        },
+        {
+          "kind": "number",
+          "name": "value"
+        }
+      ],
+      "states": ["focus-visible", "disabled", "checked", "readonly"],
+      "summary": "A star rating the person sets, or a read-only average."
     },
     {
       "axes": {
@@ -11508,11 +11966,79 @@
       "summary": "A labeled chip that can be removed."
     },
     {
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "tags-input",
+      "imports": [
+        {
+          "exports": ["TagsInput"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["TagsInput"],
+          "module": "texuli/tags-color"
+        }
+      ],
+      "label": "TagsInput",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "delimiter"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "number",
+          "name": "max"
+        },
+        {
+          "kind": "string",
+          "name": "name"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "kind": "string",
+          "name": "placeholder"
+        },
+        {
+          "kind": "boolean",
+          "name": "readonly"
+        },
+        {
+          "kind": "boolean",
+          "name": "required"
+        },
+        {
+          "kind": "array",
+          "name": "value"
+        }
+      ],
+      "states": ["focus-visible", "disabled", "invalid", "readonly"],
+      "summary": "A list of tags the person types, pastes or removes."
+    },
+    {
       "axes": {
         "size": {
           "default": "md",
           "prop": "size",
-          "values": ["figure", "lg", "md", "sm", "xs"]
+          "values": ["figure", "lg", "md", "sm", "xs", "inherit"]
         },
         "tone": {
           "default": "default",
@@ -11525,7 +12051,8 @@
             "success",
             "warning",
             "destructive",
-            "info"
+            "info",
+            "inherit"
           ]
         }
       },
@@ -11600,7 +12127,7 @@
           "name": "mono"
         },
         {
-          "enumValues": ["figure", "lg", "md", "sm", "xs"],
+          "enumValues": ["figure", "lg", "md", "sm", "xs", "inherit"],
           "kind": "enum",
           "name": "size"
         },
@@ -11617,7 +12144,8 @@
             "success",
             "warning",
             "destructive",
-            "info"
+            "info",
+            "inherit"
           ],
           "kind": "enum",
           "name": "tone"
@@ -12049,6 +12577,87 @@
       ],
       "states": ["hover", "focus-visible"],
       "summary": "Live region that renders toast notifications from the shared store."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "outline"]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "forms",
+      "id": "toggle-group",
+      "imports": [
+        {
+          "exports": ["ToggleGroup", "ToggleGroupItem"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["ToggleGroup", "ToggleGroupItem"],
+          "module": "texuli/toggle"
+        }
+      ],
+      "label": "ToggleGroup",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "string",
+          "name": "name"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "enumValues": ["horizontal", "vertical"],
+          "kind": "enum",
+          "name": "orientation"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": ["single", "multiple"],
+          "kind": "enum",
+          "name": "type"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        },
+        {
+          "enumValues": ["default", "outline"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "states": ["focus-visible", "disabled"],
+      "summary": "A group of toggle buttons: one value, or several."
     },
     {
       "capability": "web-only",

@@ -466,7 +466,20 @@ readable, the compile succeeds with an `aa-non-text` warning, and
 ```bash
 texuli ds check examples/design-systems/tumbletown.json --json     # stable codes, exit 0 or 1
 texuli ds check examples/design-systems/tumbletown.json --render   # paints the catalog in chromium
+texuli ds validate brand.json --locked --prototype ./src --json   # full static prototype scan
+texuli ds validate brand.json --locked --prototype ./src --report --json
 ```
+
+`texuli ds validate <file>` runs document validation and its compiled
+guarantees. Add `--locked` to run the full locked-design-system validator;
+`--prototype <dir>` also scans local Svelte, TypeScript, JavaScript, CSS and
+blueprint JSON sources as text without executing them. `--catalog`,
+`--json`, `--render`, `--strict` and `--report` on `ds validate` select the
+full mode as well. `--report` requires `--locked`. Exit codes are `0` for a
+valid result or report-only run, `1` for an enforced finding, and `2` when
+the command cannot run (bad arguments, unreadable input, missing browser
+dependencies). See the [full check reference](../packages/tools/docs/ds-check.md)
+for every code, severity, input bound and exemption.
 
 `--render` paints every agent-emittable catalog component under the design
 system in headless chromium and checks axe, the painted contrast of every
@@ -608,6 +621,11 @@ texuli ds check examples/design-systems/ledgerline.json  # allowed set, approval
   <components.json>` for another one), reports the allowed set, the
   approval as declared and each hash, and exits 1 on any refusal
   ([ds-check.md](../packages/tools/docs/ds-check.md)).
+- `ds validate brand.json --locked --prototype ./src --json` scans the
+  document and prototype sources for catalog membership, allowed component
+  axes/states and the locked CSS policy. It does not execute the app. Add
+  `--report` to record the complete findings and counts without enforcing
+  them, or `--render` to add the catalog conformance sheet's browser checks.
 - Agents list a valid `allow` section with `ds.allow` (from a preset or
   named ids, with every axis and state the catalog declares).
 
@@ -684,9 +702,9 @@ exemption: [ds-check.md](../packages/tools/docs/ds-check.md).
   system's data-viz palette and tokens, and their chrome (legends, axis
   text, controls) is checked like any other component.
 - **Existing prototypes.** Only new prototypes are locked; existing ones
-  migrate on demand. `texuli ds check --locked --report --json` lists
-  every finding and exits 0 so the JSON is a progress baseline. Without
-  `--report`, a finding exits 1.
+  migrate on demand. `texuli ds validate brand.json --locked --prototype
+  ./src --report --json` lists every finding and exits 0 so the JSON is a
+  progress baseline. Without `--report`, an error finding exits 1.
 - **Render check.** Required in CI for locked prototypes, on demand
   locally. `texuli ds check --render` paints the catalog under a design
   system (axe, painted contrast, colors that do not come from it).
@@ -706,17 +724,22 @@ consumer (Protoyard or any host) wires:
    extensions (`mergeCatalogs`, ids `<ns>:<id>`; the full report code is
    `catalog-extension`).
 2. Prototype files and blueprints into
-   `checkDesignSystemFull({ prototype: { files, blueprints } })`. The
-   CLI `--locked` flag does not walk a source tree.
+   `checkDesignSystemFull({ prototype: { files, blueprints } })`, or point
+   `texuli ds validate --locked --prototype <dir>` at a local source tree.
+   The bounded reader scans text and never executes it.
 3. A painted page whose catalog roots carry `data-tx-component`. Install
    `installDsCheckHost`, then map the tree and run the locked render
    checks. Pure-CSS restyles with no catalog import are outside the
    static reader; the CSS policy still refuses forbidden utilities in
    files you pass, and the runtime map catches unmapped interactive
    elements on a painted page.
-4. CI: `texuli ds check brand.json --locked --render` for the document
-   and the catalog sheet; your tests call `checkDesignSystemFull` with
-   the prototype. Existing screens keep `--locked --report`.
+4. CI: run `texuli ds validate brand.json --locked --prototype ./src
+   --json` to enforce document and static source checks. Add `--render` to
+   check the bundled catalog conformance sheet; this does not render the
+   consumer app. In consumer browser tests, call `mapDesignSystemTree` and
+   `runLockedRenderChecks` on the app's painted page to check its controls,
+   chrome and axe results. Use `--report --json` during migration to save a
+   non-enforcing baseline.
 
 The CLI cannot prove who approved. Details and the complete code table:
 [ds-check.md](../packages/tools/docs/ds-check.md).

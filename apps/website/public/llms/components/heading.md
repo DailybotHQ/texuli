@@ -29,7 +29,9 @@
 | Name | Kind | Required | Trust | Default | Description |
 | --- | --- | --- | --- | --- | --- |
 | `level` | number | no | — | `2` | The semantic level, 1 to 6: renders <h1>…<h6> |
-| `size` | enum(display | xl | lg | md | sm) | no | — | `"lg"` | Visual size, independent of the level (default from the level: 1 xl, 2 lg, 3 md, 4–6 sm) |
+| `size` | enum(display | 4xl | 3xl | 2xl | xl | lg | md | sm) | no | — | `"lg"` | Visual size, independent of the level (default from the level: 1 xl, 2 lg, 3 md, 4–6 sm); 2xl, 3xl and 4xl are hero and section titles between xl and display |
+| `responsive` | boolean | no | — | `false` | Scale the size down on narrow screens: fluid from two scale steps below up to the size |
+| `tracking` | enum(default | tight) | no | — | `"default"` | Letter spacing: the role's own, or tight (--tx-letter-spacing-tight) |
 | `tone` | enum(default | muted) | no | — | `"default"` | — |
 | `truncate` | boolean | no | — | `false` | One line with an ellipsis |
 | `label` | string | no | — | — | Plain-text heading, escaped; replaces children when both are given |
@@ -56,6 +58,18 @@
   "size": "md",
   "tone": "muted",
   "label": "Details"
+}
+```
+
+#### Responsive hero title (`hero`)
+
+```json
+{
+  "level": 1,
+  "size": "4xl",
+  "responsive": true,
+  "tracking": "tight",
+  "label": "Plan the quarter"
 }
 ```
 

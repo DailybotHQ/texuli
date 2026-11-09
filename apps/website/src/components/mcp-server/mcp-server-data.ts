@@ -364,7 +364,7 @@ export const MCP_SERVER_DATA = {
       name: 'ds.validate',
       title: 'Validate a design system',
       summary:
-        "Validate a design-system document: the spec's closed schema, the extends chain, then a compile of the document and its high-contrast variant with the guarantees enforced (text contrast, focus ring, target size). Returns valid, the distinct codes, every error with its JSON path and hint, the compiler warnings and the hash.",
+        "Validate a design-system document. Set full to run the complete locked-design-system validator, including catalog allow sets, extensions and an optional prototype's component and CSS policy checks. Returns every finding with stable code, severity, area, path and fix hint; the full mode is read-only and does not execute prototype sources.",
       runtime: 'edge',
       remote: true,
       local: true,
@@ -395,6 +395,39 @@ export const MCP_SERVER_DATA = {
           required: false,
           description:
             'Documents for extends: "id@x.y.z", keyed by "id@version". "texuli:<theme>" bases load from the theme library; nothing is fetched.',
+        },
+        {
+          name: 'full',
+          required: false,
+          description:
+            'Run the full locked-design-system validator. Static only; use a local CLI --render for browser runtime checks.',
+        },
+        {
+          name: 'report',
+          required: false,
+          description:
+            'Mark this as report-only progress tracking. The operation always returns findings as data; valid still reflects the validator verdict.',
+        },
+        {
+          name: 'strict',
+          required: false,
+          description: 'In full mode, treat warnings as failures in the valid verdict.',
+        },
+        {
+          name: 'catalog',
+          required: false,
+          description: 'Optional spec catalog object; defaults to the bundled Texuli catalog.',
+        },
+        {
+          name: 'extensions',
+          required: false,
+          description: 'Optional host catalog extensions to check and merge.',
+        },
+        {
+          name: 'prototype',
+          required: false,
+          description:
+            'Optional bounded prototype data: { files: { path: sourceText }, blueprints: { name: blueprint } }. Sources are scanned as text and never executed.',
         },
       ],
       example: 'The smallest document',
@@ -1118,7 +1151,7 @@ export const MCP_SERVER_DATA = {
       uri: 'texuli://catalog',
       title: 'Component catalog',
       description:
-        'The content-addressed Texuli component catalog (catalog-bcdf18540a82…, 187 components): every manifest with props, examples, useWhen, dontUseWhen and emit tiers. The exact bytes hash to the catalog id.',
+        'The content-addressed Texuli component catalog (catalog-c3a5f1a2ad10…, 194 components): every manifest with props, examples, useWhen, dontUseWhen and emit tiers. The exact bytes hash to the catalog id.',
       mimeType: 'application/json',
     },
     {

@@ -32,7 +32,7 @@
 | `radius` | enum(none | sm | md | lg | xl | full) | no | — | `"md"` | — |
 | `border` | enum(none | default | strong | block-start | block-end) | no | — | `"none"` | All sides, or one logical side (block-start, block-end) for an app header or footer |
 | `elevation` | enum(none | sm | md | lg) | no | — | `"none"` | — |
-| `surface` | enum(transparent | default | muted | subtle | elevated) | no | — | `"transparent"` | The fill (the variant axis) |
+| `surface` | enum(transparent | default | muted | subtle | elevated | primary | brand | translucent) | no | — | `"transparent"` | The fill (the variant axis): primary is the solid primary with its on-color, brand the soft primary tint, translucent the glass opacity and blur for sticky headers |
 | `class` | string | no | — | — | — |
 | `children` | slot | no | — | — | The panel content |
 
@@ -67,6 +67,28 @@
   "radius": "none",
   "border": "block-end",
   "surface": "default"
+}
+```
+
+#### Brand logo tile (`logo-tile`)
+
+```json
+{
+  "padding": "md",
+  "radius": "lg",
+  "surface": "primary"
+}
+```
+
+#### Translucent sticky header (`sticky-header`)
+
+```json
+{
+  "as": "header",
+  "padding": "md",
+  "radius": "none",
+  "border": "block-end",
+  "surface": "translucent"
 }
 ```
 

@@ -1,4 +1,4 @@
-# Design-system conformance: `texuli ds check` and `@texuli/tools/ds-check`
+# Design-system validation: `texuli ds validate`, `texuli ds check` and `@texuli/tools/ds-check`
 
 > **Status: released in `0.10.0`.** The command and the
 > `@texuli/tools/ds-check` and `@texuli/tools/ds-check/host` subpaths ship
@@ -25,13 +25,28 @@ texuli ds check acme.json --locked --report --json    # list every finding, exit
 texuli ds check acme.json --locked --render           # plus the catalog sheet in chromium
 ```
 
-> **Locked design systems (spec 0.13.0, new in `0.15.0`).** The check also
-> reports the allowed set, the approval and the content hashes
-> ([below](#locked-design-systems)). `--locked` (in development, completed
-> in `0.16.0`) runs the full validator: data-viz and token completeness too,
-> and `--report` lists every finding with exit 0. Pass a prototype to
-> `checkDesignSystemFull` for the component and CSS-policy checks. The check
-> cannot prove who approved.
+> **Locked design systems (spec 0.13.0, new in `0.15.0`).** The check
+> reports the allowed set, the approval and the content hashes.
+> `--locked` (in development, completed in `0.16.0`) runs the full validator
+> ([below](#locked-design-systems)): the allowed set, the approval, the
+> content hashes, data-viz and token completeness. `texuli ds validate`
+> exposes that validator and can scan a local prototype source directory.
+> The check cannot prove who approved.
+
+`texuli ds validate <file>` is the author-facing command. With no full-mode
+flags it validates the document and its compiled guarantees. `--locked`
+selects the full validator; `--prototype <dir>` supplies source text for
+component and CSS-policy checks. Flags specific to the full report
+(`--catalog`, `--json`, `--render`, `--strict`, or `--report`) also select
+locked mode. `--report` requires `--locked`. `ds check` remains the
+lower-level conformance interface and accepts the same full-check flags.
+
+```bash
+texuli ds validate brand.json
+texuli ds validate brand.json --locked --prototype ./src --json
+texuli ds validate brand.json --locked --prototype ./src --report --json
+texuli ds validate brand.json --locked --prototype ./src --render
+```
 
 ## Flags
 
@@ -50,6 +65,7 @@ texuli ds check acme.json --locked --render           # plus the catalog sheet i
 | `--strict` | With `--render`: known findings fail too |
 | `--catalog <components.json>` | The catalog `allow` is checked against (`{ components: [{ id, axes?, states? }] }`, for example `@texuli/spec`'s `catalog/components.json` or a stub). Default: the agent catalog `@texuli/tools` builds. A file without a `components` list exits 2 |
 | `--locked` | Run the full locked-design-system validator (`checkDesignSystemFull`): the static checks, data-viz, tokens, allow, approval and hashes, with findings counted by area, route and component |
+| `--prototype <dir>` | With `ds validate` or `ds check --locked`: read bounded Svelte, TypeScript, JavaScript, CSS and blueprint JSON files from a local directory. Source is scanned as text and never executed; symlinks are refused. JSON is included when it contains a blueprint `tree`. |
 | `--report` | With `--locked` only: print the complete findings (readable or `--json`) and exit 0, so a saved JSON file is a progress baseline. Without `--locked` the flag is refused |
 
 **Exit codes:** `0` every check passed, or `--locked --report` listed
@@ -247,6 +263,21 @@ the locked component checks and, for a locked design system, the CSS policy. Eve
 has a stable `code`, a `severity` (`error`, `warning`, `info`), an `area`, a `path` and a
 `hint`; the `ds check` report rides along unchanged as `check`.
 
+`texuli ds validate <file> --locked` runs this full validator. Add
+`--prototype <dir>` to scan a local source directory: `.svelte`, `.ts`,
+`.tsx`, `.js`, `.jsx`, `.mjs`, `.cjs`, `.css` and `.json` files are read as
+text, and JSON files are scanned as blueprints when they contain a `tree`.
+No source code is executed. Symlinks are refused. Flags `--catalog`,
+`--json`, `--render`, `--strict` and `--report` on `ds validate` also select
+locked mode. `--report` requires `--locked`.
+
+`--render` paints the catalog conformance sheet (or a page selected by
+`--sheet` / `--url`); it does not run the consumer's prototype application.
+Consumer CI passes prototype text and blueprints to
+`checkDesignSystemFull({ prototype: { files, blueprints } })` and wires its
+own browser page to `mapDesignSystemTree` and `runLockedRenderChecks`. The
+MCP `ds.validate` full mode performs static checks only.
+
 A prototype is untrusted input, so the scan is bounded (`DS_FULL_PROTOTYPE_LIMITS`):
 
 | Bound | Value | When exceeded |
@@ -264,12 +295,14 @@ read. Inside one source, at most 10,000 component usages are read and at most 64
 corpus (`packages/tools/fixtures/ds-validate/`, `tests/ds-validate-corpus.test.ts`) covers
 every other code with a failing and a passing fixture and a golden report.
 
-`texuli ds check --locked` calls `checkDesignSystemFull` on the document
-and the catalog. It does not read a prototype directory: pass
-`prototype: { files, blueprints }` from your own tests (the consumer
-wires that). `--locked --render` then adds the catalog-sheet render
-findings (`render-axe`, `render-contrast`, `render-literal`,
-`render-empty`) to the same report.
+`texuli ds validate --locked --prototype <dir>` calls
+`checkDesignSystemFull` on the document, catalog and statically scanned
+prototype. The directory reader accepts source and blueprint file types
+listed above; it does not execute the consumer application. `--render`
+adds browser findings from the catalog conformance sheet or selected page,
+not from the prototype's live app. Consumers wire their own rendered page
+to `mapDesignSystemTree` and `runLockedRenderChecks`. MCP full mode is
+static-only.
 
 `--locked --report` prints every finding with counts by area, route and
 component and exits 0. `--json` adds a `counts` object so a saved file is
@@ -365,8 +398,41 @@ Every code the checker raises today:
 | Prototype components | `not-allowed`, `variant-not-allowed`, `size-not-allowed`, `tone-not-allowed`, `density-not-allowed`, `state-not-allowed`, plus the allow `unknown-*` codes, and `dynamic-value` (warning) |
 | Prototype CSS | `css-utility-not-allowed`, `css-arbitrary-value`, `css-property-not-allowed`, `css-literal-color`, `css-inline-style`, `css-dynamic-class` |
 | Prototype limits | `file-too-large`, `prototype-too-large`, `findings-capped` |
-| Runtime map | `unmapped`, `not-allowed` |
+| Consumer runtime map | `unmapped`, `not-allowed` |
 | Render | `render-axe`, `render-contrast`, `render-literal`, `render-empty` |
+
+### Severity and verdict
+
+In full mode, document structure, extends, allow, approval, catalog,
+contrast, token, prototype-component, prototype-CSS, prototype-limit and
+render findings are errors except where stated below. Any error makes
+`ok` false. Warnings and info are reported but do not fail `ok`.
+
+| Code(s) | Severity | Check |
+| --- | --- | --- |
+| `unknown-key`, `invalid-type`, `invalid-value`, `required`, `format-version`, `url-refused`, `inline-bytes`, `extends-range`, `extends-cycle`, `extends-depth` | error | Document shape, trust policy and base resolution. |
+| `unknown-component`, `unknown-variant`, `unknown-size`, `unknown-tone`, `unknown-density`, `unknown-state` | error | Allow entries or prototype usages refer to ids/values absent from the merged catalog. |
+| `approval-invalid`, `content-hash-mismatch`, `library-hash-mismatch` | error | Invalid approval or a recorded digest that no longer matches. |
+| `aa-text`, `aa-focus`, `aa-non-text`, `target-size` | error for failed guarantees; `aa-non-text` may also be a compiler warning | A pinned guarantee fails. The compiler's low contrast advisory for a primary fill on the page background is non-blocking. |
+| `dataviz-missing`, `token-missing` | error | Compiled output lacks a required data-viz color or token. |
+| `dataviz-duplicate`, `dataviz-contrast` | warning | Categorical chart colors repeat or fall below 3:1 against the background. |
+| `catalog-extension` | error | A host catalog extension is refused and excluded. |
+| `not-allowed`, `variant-not-allowed`, `size-not-allowed`, `tone-not-allowed`, `density-not-allowed`, `state-not-allowed` | error | A prototype component or value falls outside the allow set. |
+| `dynamic-value` | warning | A component property is dynamic and cannot be proven statically. |
+| `css-utility-not-allowed`, `css-arbitrary-value`, `css-property-not-allowed`, `css-literal-color`, `css-inline-style`, `css-dynamic-class` | error | A source uses a forbidden CSS rule or an uninspectable value. |
+| `file-too-large`, `prototype-too-large` | error | An input exceeded a scan limit and cannot be verified. |
+| `findings-capped` | warning | The 256-finding cap stopped remaining prototype checks. |
+| `unmapped` (consumer runtime map), `not-allowed` (prototype or runtime map) | error | A painted tree has an interactive element outside a component root or uses a root outside the allow set. |
+| `render-axe`, `render-contrast`, `render-literal`, `render-empty` | error | The render check finds an axe/contrast/literal-color issue or paints no content. |
+| `color-adjusted` | info | The compiler moved a color to meet a guarantee; inspect the path and values. |
+| Other compiler warning codes and `compile-warning` | warning | A non-blocking compiler advisory. |
+
+`aa-non-text` can have two severities: a failed indicator guarantee is an
+error, while the compiler's advisory about the primary fill against the
+page background is a warning. CLI `--report` changes only the exit code; it
+does not change severities or the report's `ok`. In MCP full mode,
+`strict: true` promotes warnings to errors in `valid`. CLI `--strict`
+applies to known findings in the browser render check.
 
 `DS_FULL_KNOWN_CODES` in `full.ts` groups the document and prototype
 codes. The ds-validate corpus has a failing and a passing fixture for
@@ -403,15 +469,19 @@ or any host) supplies:
    or `--catalog`). Optional host extensions (`extensions` on
    `checkDesignSystemFull`).
 2. Prototype files and blueprints (`prototype.files`,
-   `prototype.blueprints`). The CLI `--locked` flag does not walk a
-   source tree.
+   `prototype.blueprints`), or use `texuli ds validate --locked
+   --prototype <dir>` to scan a local tree as bounded text.
 3. A painted page for runtime: catalog roots carry `data-tx-component`
    (and variant/size/tone/density where they apply). Install
    `installDsCheckHost` on the sheet, then `mapDesignSystemTree` and
    `runLockedRenderChecks` (or `runDsRenderChecks` plus your own filter).
-4. CI: `texuli ds check brand.json --locked --render` for the document
-   and the catalog sheet; your test calls `checkDesignSystemFull` with
-   the prototype. Existing screens use `--locked --report --json`.
+4. CI: run `texuli ds validate brand.json --locked --prototype ./src
+   --json` to enforce document and static source checks. Add `--render` to
+   check the bundled catalog conformance sheet; this does not render the
+   consumer app. In consumer browser tests, call `mapDesignSystemTree` and
+   `runLockedRenderChecks` on the app's painted page to check its controls,
+   chrome and axe results. Use `--report --json` during migration to save a
+   non-enforcing baseline.
 
 ```ts
 import {

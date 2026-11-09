@@ -10,14 +10,18 @@ import {
   descriptionPropNames,
   fieldErrorPropNames,
   fieldPropNames,
+  fileUploadPropNames,
   formPropNames,
   iconButtonPropNames,
   inputGroupPropNames,
   inputPropNames,
   labelPropNames,
   multiSelectPropNames,
+  numberFieldPropNames,
+  pinInputPropNames,
   radioGroupPropNames,
   radioPropNames,
+  ratingPropNames,
   selectContentPropNames,
   selectGroupPropNames,
   selectItemPropNames,
@@ -29,9 +33,11 @@ import {
   selectValuePropNames,
   selectViewportPropNames,
   switchPropNames,
+  tagsInputPropNames,
   textareaPropNames,
   textCounterPropNames,
   timeFieldPropNames,
+  toggleGroupPropNames,
 } from './prop-names.ts';
 
 const PKG = 'texuli';
@@ -1112,6 +1118,201 @@ export const codeFieldManifest = /* @__PURE__ */ stampFormsAxes(
   })
 );
 
+export const fileUploadManifest = /* @__PURE__ */ stampFormsAxes(
+  manifestData({
+    id: 'file-upload',
+    package: PKG,
+    label: 'FileUpload',
+    summary: 'A labelled drop zone and file list for choosing local files.',
+    tier: 'app',
+    agentEmittable: false,
+    useWhen: ['The person attaches files to a form the host owns'],
+    dontUseWhen: ['Remote media the agent names as URLs (use media-image)'],
+    a11y: 'A real file input; the drop zone is named; rejected files are listed with a reason.',
+    props: propsFrom(fileUploadPropNames, {
+      files: { kind: 'array', description: 'Accepted files (bind:files)' },
+      accept: { kind: 'string', description: 'A native accept filter, e.g. image/*' },
+      maxSize: { kind: 'number', description: 'Largest file in bytes' },
+      maxFiles: { kind: 'number' },
+      multiple: { kind: 'boolean', default: true },
+      disabled: { kind: 'boolean', default: false },
+      required: { kind: 'boolean', default: false },
+      name: { kind: 'string' },
+      variant: { kind: 'enum', enumValues: ['default', 'compact'], default: 'default' },
+      showPreviews: { kind: 'boolean', default: true },
+      labels: { kind: 'object' },
+      onFilesAdd: { kind: 'event' },
+      onFileRemove: { kind: 'event' },
+      class: { kind: 'string' },
+    }),
+    examples: [{ id: 'images', title: 'Images', props: { accept: 'image/*', multiple: true } }],
+    related: ['field', 'form'],
+  })
+);
+
+export const numberFieldManifest = /* @__PURE__ */ stampFormsAxes(
+  manifestData({
+    id: 'number-field',
+    package: PKG,
+    label: 'NumberField',
+    summary: 'A numeric value with optional steppers, min, max and locale formatting.',
+    tier: 'app',
+    agentEmittable: false,
+    useWhen: ['A quantity, amount or count the person types or steps'],
+    dontUseWhen: ['A time of day (use time-field)', 'A PIN or code (use pin-input)'],
+    a11y: 'A labelled spinbutton; steppers are named Increment and Decrement.',
+    props: propsFrom(numberFieldPropNames, {
+      value: { kind: 'number', description: 'The value, or null when empty (bind:value)' },
+      min: { kind: 'number' },
+      max: { kind: 'number' },
+      step: { kind: 'number', default: 1 },
+      disabled: { kind: 'boolean', default: false },
+      readOnly: { kind: 'boolean', default: false },
+      required: { kind: 'boolean', default: false },
+      name: { kind: 'string' },
+      size: { kind: 'enum', enumValues: ['sm', 'md', 'lg'], default: 'md' },
+      display: { kind: 'enum', enumValues: ['input', 'output'], default: 'input' },
+      onValueChange: { kind: 'event' },
+      class: { kind: 'string' },
+    }),
+    examples: [
+      { id: 'quantity', title: 'Quantity', props: { value: 2, min: 0, max: 99, name: 'qty' } },
+    ],
+    related: ['field', 'input', 'pin-input'],
+  })
+);
+
+export const pinInputManifest = /* @__PURE__ */ stampFormsAxes(
+  manifestData({
+    id: 'pin-input',
+    package: PKG,
+    label: 'PinInput',
+    summary: 'A one-time code of fixed length, one cell per character.',
+    tier: 'app',
+    agentEmittable: false,
+    useWhen: ['A short confirmation or PIN the person types'],
+    dontUseWhen: ['A free numeric quantity (use number-field)'],
+    a11y: 'One real input; cells are presentational. Paste fills every cell.',
+    props: propsFrom(pinInputPropNames, {
+      value: { kind: 'string', description: 'The code so far (bind:value)' },
+      maxlength: { kind: 'number', default: 4 },
+      mask: { kind: 'boolean', default: false },
+      disabled: { kind: 'boolean', default: false },
+      size: { kind: 'enum', enumValues: ['sm', 'md', 'lg'], default: 'md' },
+      onValueChange: { kind: 'event' },
+      onComplete: { kind: 'event' },
+      class: { kind: 'string' },
+    }),
+    examples: [{ id: 'otp', title: 'One-time code', props: { maxlength: 6 } }],
+    related: ['field', 'input', 'number-field'],
+  })
+);
+
+export const ratingManifest = /* @__PURE__ */ stampFormsAxes(
+  manifestData({
+    id: 'rating',
+    package: PKG,
+    label: 'Rating',
+    summary: 'A star rating the person sets, or a read-only average.',
+    tier: 'app',
+    agentEmittable: false,
+    useWhen: ['A score out of five (or up to ten) stars'],
+    dontUseWhen: ['A binary like/unlike (use a toggle)'],
+    a11y: 'A labelled radio group; arrows move and select. Display mode is a named image.',
+    props: propsFrom(ratingPropNames, {
+      value: { kind: 'number', default: 0 },
+      max: { kind: 'number', default: 5 },
+      allowHalf: { kind: 'boolean', default: false },
+      display: { kind: 'boolean', default: false },
+      clearable: { kind: 'boolean', default: false },
+      readonly: { kind: 'boolean', default: false },
+      disabled: { kind: 'boolean', default: false },
+      required: { kind: 'boolean', default: false },
+      name: { kind: 'string' },
+      size: { kind: 'enum', enumValues: ['sm', 'md', 'lg'], default: 'md' },
+      tone: { kind: 'enum', enumValues: ['warning', 'primary', 'neutral'], default: 'warning' },
+      showValue: { kind: 'boolean', default: false },
+      labels: { kind: 'object' },
+      onValueChange: { kind: 'event' },
+      class: { kind: 'string' },
+    }),
+    examples: [{ id: 'review', title: 'Review', props: { value: 4, max: 5, name: 'rating' } }],
+    related: ['field', 'radio-group'],
+  })
+);
+
+export const tagsInputManifest = /* @__PURE__ */ stampFormsAxes(
+  manifestData({
+    id: 'tags-input',
+    package: PKG,
+    label: 'TagsInput',
+    summary: 'A list of tags the person types, pastes or removes.',
+    tier: 'app',
+    agentEmittable: false,
+    useWhen: ['A short list of labels or keywords'],
+    dontUseWhen: ['A single choice from a closed list (use select or combobox)'],
+    a11y: 'A labelled group; the text input is named. Remove buttons are named.',
+    props: propsFrom(tagsInputPropNames, {
+      value: { kind: 'array', description: 'The tags (bind:value)' },
+      delimiter: { kind: 'string', default: ',' },
+      max: { kind: 'number' },
+      disabled: { kind: 'boolean', default: false },
+      readonly: { kind: 'boolean', default: false },
+      required: { kind: 'boolean', default: false },
+      name: { kind: 'string' },
+      label: { kind: 'string' },
+      placeholder: { kind: 'string' },
+      onValueChange: { kind: 'event' },
+      class: { kind: 'string' },
+    }),
+    examples: [
+      { id: 'topics', title: 'Topics', props: { value: ['design', 'tokens'], label: 'Topics' } },
+    ],
+    related: ['field', 'combobox', 'multi-select'],
+  })
+);
+
+export const toggleGroupManifest = /* @__PURE__ */ stampFormsAxes(
+  manifestData({
+    id: 'toggle-group',
+    package: PKG,
+    label: 'ToggleGroup',
+    summary: 'A group of toggle buttons: one value, or several.',
+    tier: 'app',
+    agentEmittable: false,
+    useWhen: ['A small closed set of filters or views the person toggles'],
+    dontUseWhen: [
+      'A single on/off (use switch or toggle)',
+      'A long list of options (use checkbox)',
+    ],
+    a11y: 'A labelled toolbar of toggle buttons; arrows move, Space presses.',
+    props: propsFrom(toggleGroupPropNames, {
+      type: { kind: 'enum', enumValues: ['single', 'multiple'], default: 'single' },
+      value: { kind: 'string', description: 'Pressed value, or an array when type is multiple' },
+      disabled: { kind: 'boolean', default: false },
+      orientation: {
+        kind: 'enum',
+        enumValues: ['horizontal', 'vertical'],
+        default: 'horizontal',
+      },
+      variant: { kind: 'enum', enumValues: ['default', 'outline'], default: 'default' },
+      size: { kind: 'enum', enumValues: ['sm', 'md', 'lg'], default: 'md' },
+      name: { kind: 'string' },
+      onValueChange: { kind: 'event' },
+      class: { kind: 'string' },
+      children: { kind: 'slot' },
+    }),
+    examples: [
+      {
+        id: 'align',
+        title: 'Alignment',
+        props: { type: 'single', value: 'start' },
+      },
+    ],
+    related: ['button-group', 'radio-group'],
+  })
+);
+
 /** Every form manifest in stable id order. */
 export const FORMS_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Object.freeze([
   buttonManifest,
@@ -1144,6 +1345,12 @@ export const FORMS_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Objec
   textCounterManifest,
   textareaManifest,
   timeFieldManifest,
+  fileUploadManifest,
+  numberFieldManifest,
+  pinInputManifest,
+  ratingManifest,
+  tagsInputManifest,
+  toggleGroupManifest,
 ]);
 
 /** Map of component id → expected prop names for type/schema parity tests. */

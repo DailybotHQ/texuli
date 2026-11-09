@@ -35,7 +35,7 @@ type Props = HTMLAttributes<HTMLElement> & {
   border?: BoxBorder;
   /** Elevation shadow: `none` (default), `sm`, `md`, `lg`. */
   elevation?: BoxElevation;
-  /** The fill: `transparent` (default), `default` (surface), `muted`, `subtle`, `elevated`. */
+  /** The fill: `transparent` (default), `default` (surface), `muted`, `subtle`, `elevated`, `primary` (solid, with its on-color), `brand` (soft primary tint) or `translucent` (glass opacity and blur, for sticky headers). */
   surface?: BoxSurface;
   /** The rendered element (bindable). */
   ref?: HTMLElement | null;

@@ -8,12 +8,12 @@ import { ALL_MANIFEST_GROUPS } from '../src/manifests/all.ts';
 const DOCUMENTED_ROOT_EXCEPTIONS = ['data-dashboard-widget', 'inline-text'] as const;
 
 describe('catalog design-system root coverage', () => {
-  it('runs the root-render checks for all 187 catalog ids and lists both documented exceptions', () => {
+  it('runs the root-render checks for all 194 catalog ids and lists both documented exceptions', () => {
     const entries = ALL_MANIFEST_GROUPS.flatMap((group) => group.manifests);
     const ids = entries.map((entry) => entry.id);
 
-    expect(ids).toHaveLength(187);
-    expect(new Set(ids).size).toBe(187);
+    expect(ids).toHaveLength(194);
+    expect(new Set(ids).size).toBe(194);
     expect(DOCUMENTED_ROOT_EXCEPTIONS).toEqual(['data-dashboard-widget', 'inline-text']);
     for (const id of DOCUMENTED_ROOT_EXCEPTIONS) expect(ids).toContain(id);
   });

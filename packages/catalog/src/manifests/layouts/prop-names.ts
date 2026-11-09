@@ -232,6 +232,15 @@ export const bottomNavPropNames = [
   'class',
 ] as const;
 
+export const mobileAppFramePropNames = [
+  'skipLabel',
+  'mainId',
+  'mainElement',
+  'resetScrollOnNavigate',
+  'stickyFooterUnstyled',
+  'class',
+] as const;
+
 export const mobileHeaderPropNames = [
   'title',
   'eyebrow',
@@ -279,6 +288,7 @@ export const LAYOUTS_PROP_NAMES = {
   'deck-slide': deckSlidePropNames,
   'layout-grid': gridLayoutPropNames,
   'bottom-nav': bottomNavPropNames,
+  'mobile-app-frame': mobileAppFramePropNames,
   'mobile-header': mobileHeaderPropNames,
 } as const;
 
