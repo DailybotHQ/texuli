@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import Avatar from '../src/components/avatar/Avatar.svelte';
 import Badge from '../src/components/badge/Badge.svelte';
 import Tag from '../src/components/badge/Tag.svelte';
+import ColorSwatch from '../src/components/typography/ColorSwatch.svelte';
 import {
   colorRefInk,
   colorRefVar,
@@ -13,6 +14,34 @@ import {
   isColorRef,
   ROLE_COLORS,
 } from '../src/internal/color-ref.ts';
+
+const catalog = JSON.parse(
+  readFileSync(join(process.cwd(), 'packages/spec/catalog/components.json'), 'utf8')
+) as {
+  components: {
+    id: string;
+    axes?: Record<string, { prop: string; default: string; values: string[] }>;
+  }[];
+};
+
+const colorAxisCases = [
+  {
+    id: 'badge',
+    render: () => render(Badge, { props: { label: 'Status' } }).container.firstElementChild,
+  },
+  {
+    id: 'tag',
+    render: () => render(Tag, { props: { label: 'Category' } }).container.firstElementChild,
+  },
+  {
+    id: 'avatar',
+    render: () => render(Avatar, { props: { name: 'Ada Example' } }).container.firstElementChild,
+  },
+  {
+    id: 'color-swatch',
+    render: () => render(ColorSwatch, { props: { label: 'Primary' } }).container.firstElementChild,
+  },
+];
 
 describe('closed label color references', () => {
   it('accepts only registered data and role colors', () => {
@@ -81,4 +110,19 @@ describe('closed label color references', () => {
     expect(badge?.hasAttribute('data-tx-color')).toBe(false);
     expect(badge?.getAttribute('style') ?? '').not.toContain('red');
   });
+
+  it.each(colorAxisCases)(
+    '$id renders the default declared by the catalog color axis',
+    ({ id, render: renderCase }) => {
+      const axis = catalog.components.find((component) => component.id === id)?.axes?.color;
+      expect(axis?.prop).toBe('color');
+      expect(axis?.default).toBeDefined();
+
+      const root = renderCase();
+      expect(root?.getAttribute('data-tx-color') ?? 'none').toBe(axis?.default);
+      if (id === 'color-swatch') {
+        expect(root?.getAttribute('style')).toContain('--tx-swatch-fill: var(--tx-primary)');
+      }
+    }
+  );
 });
