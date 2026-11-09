@@ -95,6 +95,7 @@
       "site-live-gallery.spec.ts",
       "site-live-generation.spec.ts",
       "site-media-page.spec.ts",
+      "site-redirects.spec.ts",
       "site-responsive.spec.ts",
       "site-search.spec.ts",
       "site-theme-switcher.spec.ts",
