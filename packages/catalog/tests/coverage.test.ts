@@ -142,6 +142,7 @@ describe('catalog coverage gate', () => {
       'data-notification-inbox',
       'data-timeline',
       'data-tree-view',
+      'data-virtual-list',
     ]);
     expect(groups.chat).toEqual(['chat-message', 'chat-thread', 'composer']);
     expect(groups.workflows).toEqual(['workflow-graph']);

@@ -88,7 +88,7 @@ visible and announced string is translatable through `labels`.
 | `@texuli/data/activity/inbox` | `NotificationInbox`: unread state, mark read and unread, mark all, item actions and arrival announcements |
 | `@texuli/data/cohort` | `CohortTable`: a cohort retention table with row and period headers, readable numbers and heat cells |
 | `@texuli/data/files` | `FileBrowser`: grid or list browser with breadcrumbs, previews and multi-select |
-| `@texuli/data/virtual-list` | `createVirtualList` and `createInfiniteLoader` for windowed lists |
+| `@texuli/data/virtual-list` | `createVirtualList` and `createInfiniteLoader` for windowed lists, and `VirtualListView` (catalog `data-virtual-list`, in development): a windowed APG listbox that renders rows through a snippet ([docs](docs/data-virtual-list.md)) |
 
 **Engines** (framework-free TypeScript, no Svelte needed):
 

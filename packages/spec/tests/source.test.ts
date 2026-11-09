@@ -83,6 +83,7 @@ describe('spec 0.8.0: data-source bindings', () => {
       'data-notification-inbox': ['items'],
       'data-timeline': ['tasks'],
       'data-tree-view': ['items'],
+      'data-virtual-list': ['items'],
     });
     for (const component of catalog.components) {
       for (const name of component.sourceable ?? []) {
