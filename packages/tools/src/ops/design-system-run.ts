@@ -529,10 +529,12 @@ export function approvalMarks(
 }
 
 export async function runSave(input: Input, files: LocalFiles, approve = false) {
-  const check = await runValidate(input);
-  if (!check.valid) return { saved: false, errors: check.errors };
+  // An approval mark is refused first: an agent always learns that approval is human, even when
+  // the same mark is also structurally incomplete (approval-invalid).
   const marks = approve ? [] : approvalMarks(input.document);
   if (marks.length > 0) return { saved: false, errors: marks };
+  const check = await runValidate(input);
+  if (!check.valid) return { saved: false, errors: check.errors };
   const text = savedText(input.document);
   const path = input.path as string;
   const refused = (code: string, message: string) => ({
