@@ -4,8 +4,8 @@
 
 <script lang="ts">
 /**
- * Badge, Chip, Tag, Kbd, Code, the avatar grid and the inline-text catalog
- * node: the instance the props panel drives, then every variant and state
+ * Badge, Chip, Tag, Kbd, Code, the avatar grid, the inline-text catalog
+ * node, and the typography and surface components (Heading, Text, Prose, Box): the instance the props panel drives, then every variant and state
  * side by side.
  */
 
@@ -13,13 +13,14 @@ import { AvatarGroupGrid } from 'texuli/avatar';
 import { Badge, Chip, Tag } from 'texuli/badge';
 import { Button } from 'texuli/button';
 import { Code, CopyButton, Kbd } from 'texuli/kbd-code';
+import { Box, Heading, Prose, Text } from 'texuli/typography';
 import { readers, type StageValues } from './values.ts';
 
 type Props = { componentId: string; values: StageValues };
 
 let { componentId, values }: Props = $props();
 
-const { str, bool, pick } = readers(() => values);
+const { str, num, bool, pick } = readers(() => values);
 
 const VARIANTS = [
   'default',
@@ -107,6 +108,57 @@ $effect(() => {
   {:else if componentId === 'kbd'}
     <p class="row">Press <Kbd>⌘</Kbd> + <Kbd>K</Kbd> to search, or <Kbd>Esc</Kbd> to close.</p>
     <p class="row"><Kbd>Shift</Kbd> <Kbd>Enter</Kbd> <Kbd>↑</Kbd> <Kbd>↓</Kbd></p>
+  {:else if componentId === 'heading'}
+    {@const level = Math.min(6, Math.max(1, Math.round(num('level', 2)))) as 1 | 2 | 3 | 4 | 5 | 6}
+    <Heading
+      {level}
+      size={pick('size', ['display', 'xl', 'lg', 'md', 'sm'] as const, 'lg')}
+      tone={pick('tone', ['default', 'muted'] as const, 'default')}
+      truncate={bool('truncate', false)}
+      label={str('label', 'Quarterly report')}
+    />
+    <div class="column" aria-label="Every heading size at level 3">
+      {#each ['display', 'xl', 'lg', 'md', 'sm'] as const as size (size)}
+        <Heading level={3} {size} label={`Size ${size}`} />
+      {/each}
+    </div>
+  {:else if componentId === 'text'}
+    <Text
+      size={pick('size', ['figure', 'lg', 'md', 'sm', 'xs'] as const, 'md')}
+      tone={pick('tone', ['default', 'muted', 'subtle', 'primary', 'success', 'warning', 'destructive', 'info'] as const, 'default')}
+      weight={pick('weight', ['regular', 'medium', 'semibold'] as const, 'regular')}
+      transform={pick('transform', ['none', 'uppercase', 'lowercase', 'capitalize'] as const, 'none')}
+      tracking={pick('tracking', ['normal', 'wide'] as const, 'normal')}
+      tabular={bool('tabular', false)}
+      mono={bool('mono', false)}
+      label={str('label', 'Updated an hour ago')}
+    />
+    <div class="column" aria-label="An eyebrow, a figure and every tone">
+      <Text size="xs" tone="muted" transform="uppercase" tracking="wide">Revenue</Text>
+      <Text size="figure" tabular weight="semibold">$1,284,300</Text>
+      {#each ['muted', 'subtle', 'primary', 'success', 'warning', 'destructive', 'info'] as const as tone (tone)}
+        <Text size="sm" {tone}>{tone}</Text>
+      {/each}
+    </div>
+  {:else if componentId === 'prose'}
+    <Prose size={pick('size', ['md', 'lg'] as const, 'md')}>
+      <p>Example Co. closed the quarter ahead of plan.</p>
+      <h3>What changed</h3>
+      <ul>
+        <li>Reports load from a cached query.</li>
+        <li>Teams share dashboards with read-only links.</li>
+      </ul>
+    </Prose>
+  {:else if componentId === 'box'}
+    <Box
+      padding={pick('padding', ['none', 'sm', 'md', 'lg', 'xl'] as const, 'md')}
+      radius={pick('radius', ['none', 'sm', 'md', 'lg', 'xl', 'full'] as const, 'md')}
+      border={pick('border', ['none', 'default', 'strong', 'block-start', 'block-end'] as const, 'default')}
+      elevation={pick('elevation', ['none', 'sm', 'md', 'lg'] as const, 'none')}
+      surface={pick('surface', ['transparent', 'default', 'muted', 'subtle', 'elevated'] as const, 'default')}
+    >
+      <Text size="sm">A panel from tokens.</Text>
+    </Box>
   {:else if componentId === 'inline-text'}
     {@const text = str('text', 'Save changes')}
     <p class="row"><Button>{text}</Button></p>
@@ -139,6 +191,10 @@ $effect(() => {
     align-items: center;
     gap: 0.5rem;
     margin: 0;
+  }
+  .column {
+    display: grid;
+    gap: 0.25rem;
   }
   .reset {
     min-block-size: 2rem;

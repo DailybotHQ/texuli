@@ -402,6 +402,9 @@ function axesExpr(axes: NonNullable<SpecCatalog['components'][number]['axes']>):
   return `SpecAxes(${args.join(', ')})`;
 }
 
+/** Components per generated `partN()` function of `SpecVocabulary` (the JVM method limit). */
+export const VOCABULARY_CHUNK = 16;
+
 /** The catalog vocabulary as a Kotlin registry of `SpecComponent` values. */
 export function vocabularyToKotlin(catalog: SpecCatalog, stamp: Stamp): string {
   const ids = catalog.components.map((c) => c.id);
@@ -414,9 +417,12 @@ export function vocabularyToKotlin(catalog: SpecCatalog, stamp: Stamp): string {
     'object SpecVocabulary {',
     `${INDENT}const val CATALOG_HASH: String = ${kotlinString(catalog.catalogHash)}`,
     '',
-    `${INDENT}val components: List<SpecComponent> = listOf(`,
   ];
+  // Each component's lines start at one of these indexes (chunked below).
+  const head = lines.length;
+  const starts: number[] = [];
   for (const c of catalog.components) {
+    starts.push(lines.length);
     lines.push(
       `${INDENT}${INDENT}SpecComponent(`,
       `${INDENT}${INDENT}${INDENT}id = ${kotlinString(c.id)},`,
@@ -486,8 +492,30 @@ export function vocabularyToKotlin(catalog: SpecCatalog, stamp: Stamp): string {
       lines.push(`${INDENT}${INDENT}${INDENT}deprecated = ${deprecationExpr(c.deprecated)},`);
     lines.push(`${INDENT}${INDENT}),`);
   }
+  // A JVM method holds at most 64 KB of bytecode, and one listOf over every component (with
+  // its props, axes and states) outgrows a class initializer. Each chunk is its own method.
+  const body = lines.splice(head);
+  const chunks: string[][] = [];
+  for (let i = 0; i < starts.length; i += VOCABULARY_CHUNK) {
+    const from = (starts[i] as number) - head;
+    const to =
+      i + VOCABULARY_CHUNK < starts.length
+        ? (starts[i + VOCABULARY_CHUNK] as number) - head
+        : body.length;
+    chunks.push(body.slice(from, to));
+  }
   lines.push(
-    `${INDENT})`,
+    `${INDENT}val components: List<SpecComponent> = ${chunks.length ? chunks.map((_, i) => `part${i}()`).join(' + ') : 'emptyList()'}`
+  );
+  chunks.forEach((chunk, i) => {
+    lines.push(
+      '',
+      `${INDENT}private fun part${i}(): List<SpecComponent> = listOf(`,
+      ...chunk,
+      `${INDENT})`
+    );
+  });
+  lines.push(
     '',
     `${INDENT}fun component(id: String): SpecComponent? = components.firstOrNull { it.id == id }`,
     '}',

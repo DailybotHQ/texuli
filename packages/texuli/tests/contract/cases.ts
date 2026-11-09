@@ -111,6 +111,10 @@ export const CASES: ContractCase[] = [
   { key: 'components/stat/Stat', harness: DisplayContract },
   { key: 'components/timeline/Timeline', harness: DisplayContract },
   { key: 'components/timeline/TimelineItem', harness: DisplayContract },
+  { key: 'components/typography/Heading', harness: DisplayContract },
+  { key: 'components/typography/Text', harness: DisplayContract },
+  { key: 'components/typography/Prose', harness: DisplayContract },
+  { key: 'components/typography/Box', harness: DisplayContract },
   { key: 'components/field/Form', harness: FormsContract },
   {
     key: 'components/field/Field',

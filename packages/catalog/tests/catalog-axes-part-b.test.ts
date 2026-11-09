@@ -48,19 +48,23 @@ const PART_B_GROUP_IDS = {
     'avatar-group-grid',
     'badge',
     'banner',
+    'box',
     'callout',
     'card',
     'chip',
     'code',
     'empty-state',
     'error-state',
+    'heading',
     'inline-text',
     'kbd',
     'kpi',
+    'prose',
     'stat',
     'stepper',
     'table',
     'tag',
+    'text',
     'timeline',
   ],
   documents: ['document'],
@@ -108,6 +112,10 @@ const EXPECTED: Readonly<Record<string, Expected>> = {
     states: ['hover', 'focus-visible', 'disabled', 'selected'],
   },
   banner: { axes: { tone: 'tone' } },
+  box: { axes: { variant: 'surface' } },
+  heading: { axes: { size: 'size', tone: 'tone' } },
+  prose: { axes: { size: 'size' } },
+  text: { axes: { size: 'size', tone: 'tone' } },
   callout: { axes: { tone: 'tone' } },
   card: { axes: { variant: 'variant' }, states: ['hover', 'focus-visible'] },
   chip: { axes: { variant: 'variant' }, states: ['active', 'disabled', 'selected'] },
@@ -138,8 +146,8 @@ describe('catalog axes part B (content, display, chat, documents, canvas)', () =
       'display',
       'documents',
     ]);
-    expect(manifests).toHaveLength(57);
-    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(57);
+    expect(manifests).toHaveLength(61);
+    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(61);
     for (const group of groups) {
       expect(group.manifests.map((manifest) => manifest.id).sort(), group.name).toEqual(
         [...PART_B_GROUP_IDS[group.name as keyof typeof PART_B_GROUP_IDS]].sort()

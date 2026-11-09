@@ -969,6 +969,9 @@ describe('token contract v2: component registry', () => {
             // No component tokens yet: a new family changes the design-system
             // spec (DS_COMPONENT_TOKENS), planned with the next spec minor.
             'list-item',
+            // Typography and surfaces (ADR-032) read system tokens and role inks only: no
+            // component tokens, so no registry family.
+            'typography',
           ].includes(key)
       )
       .filter((key) => !key.startsWith('layouts'));

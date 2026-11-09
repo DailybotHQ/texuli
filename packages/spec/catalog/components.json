@@ -1,5 +1,5 @@
 {
-  "catalogHash": "320e3edf83d23719dd01faa9b4ae591b95cac916b03cad6b6c9efa928d5d8d6d",
+  "catalogHash": "616de643410159d6b2f37148aa7a955236c9b984032ca744ac528fe1711d9ba2",
   "components": [
     {
       "capability": "web-only",
@@ -853,6 +853,89 @@
       ],
       "states": ["focus-visible", "invalid", "checked", "open"],
       "summary": "Validated heading, paragraph, list, quote and callout content."
+    },
+    {
+      "axes": {
+        "variant": {
+          "default": "transparent",
+          "prop": "surface",
+          "values": ["transparent", "default", "muted", "subtle", "elevated"]
+        }
+      },
+      "capability": "web-only",
+      "emit": [],
+      "group": "display",
+      "id": "box",
+      "imports": [
+        {
+          "exports": ["Box", "BoxBorder", "BoxElevation", "BoxPadding", "BoxRadius", "BoxSurface"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "BOX_BORDERS",
+            "BOX_ELEMENTS",
+            "BOX_ELEVATIONS",
+            "BOX_PADDINGS",
+            "BOX_RADII",
+            "BOX_SURFACES",
+            "Box",
+            "BoxBorder",
+            "BoxElement",
+            "BoxElevation",
+            "BoxPadding",
+            "BoxRadius",
+            "BoxSurface",
+            "boxClass"
+          ],
+          "module": "texuli/typography"
+        }
+      ],
+      "label": "Box",
+      "placement": "app",
+      "props": [
+        {
+          "enumValues": ["div", "section", "article", "aside", "header", "footer"],
+          "kind": "enum",
+          "name": "as"
+        },
+        {
+          "enumValues": ["none", "default", "strong", "block-start", "block-end"],
+          "kind": "enum",
+          "name": "border"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["none", "sm", "md", "lg"],
+          "kind": "enum",
+          "name": "elevation"
+        },
+        {
+          "enumValues": ["none", "sm", "md", "lg", "xl"],
+          "kind": "enum",
+          "name": "padding"
+        },
+        {
+          "enumValues": ["none", "sm", "md", "lg", "xl", "full"],
+          "kind": "enum",
+          "name": "radius"
+        },
+        {
+          "enumValues": ["transparent", "default", "muted", "subtle", "elevated"],
+          "kind": "enum",
+          "name": "surface"
+        }
+      ],
+      "summary": "A panel or region with padding, radius, border, elevation and surface from tokens."
     },
     {
       "axes": {
@@ -6026,6 +6109,81 @@
       "summary": "Proposes the form's action with its fields' values; disabled while a receipt is pending."
     },
     {
+      "axes": {
+        "size": {
+          "default": "lg",
+          "prop": "size",
+          "values": ["display", "xl", "lg", "md", "sm"]
+        },
+        "tone": {
+          "default": "default",
+          "prop": "tone",
+          "values": ["default", "muted"]
+        }
+      },
+      "capability": "web-only",
+      "emit": [],
+      "group": "display",
+      "id": "heading",
+      "imports": [
+        {
+          "exports": ["Heading", "HeadingLevel", "HeadingSize", "HeadingTone"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "HEADING_LEVELS",
+            "HEADING_SIZES",
+            "HEADING_TONES",
+            "Heading",
+            "HeadingLevel",
+            "HeadingSize",
+            "HeadingTone",
+            "headingClass",
+            "headingSizeOf"
+          ],
+          "module": "texuli/typography"
+        }
+      ],
+      "label": "Heading",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "number",
+          "name": "level"
+        },
+        {
+          "enumValues": ["display", "xl", "lg", "md", "sm"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "enumValues": ["default", "muted"],
+          "kind": "enum",
+          "name": "tone"
+        },
+        {
+          "kind": "boolean",
+          "name": "truncate"
+        }
+      ],
+      "summary": "A page title or section heading: a semantic h1–h6 with a size from the type scale."
+    },
+    {
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
       "group": "state",
@@ -8774,6 +8932,61 @@
         "size": {
           "default": "md",
           "prop": "size",
+          "values": ["md", "lg"]
+        }
+      },
+      "capability": "web-only",
+      "emit": [],
+      "group": "display",
+      "id": "prose",
+      "imports": [
+        {
+          "exports": ["Prose", "ProseSize"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "PROSE_ELEMENTS",
+            "PROSE_SIZES",
+            "Prose",
+            "ProseElement",
+            "ProseSize",
+            "proseClass"
+          ],
+          "module": "texuli/typography"
+        }
+      ],
+      "label": "Prose",
+      "placement": "app",
+      "props": [
+        {
+          "enumValues": ["div", "article", "section"],
+          "kind": "enum",
+          "name": "as"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": ["md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        }
+      ],
+      "summary": "Long-form text with the design system's reading rhythm: measure, spacing, headings, lists."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
           "values": ["sm", "md"]
         }
       },
@@ -10146,6 +10359,143 @@
       ],
       "states": ["hover", "focus-visible", "disabled", "loading"],
       "summary": "A labeled chip that can be removed."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["figure", "lg", "md", "sm", "xs"]
+        },
+        "tone": {
+          "default": "default",
+          "prop": "tone",
+          "values": [
+            "default",
+            "muted",
+            "subtle",
+            "primary",
+            "success",
+            "warning",
+            "destructive",
+            "info"
+          ]
+        }
+      },
+      "capability": "web-only",
+      "emit": [],
+      "group": "display",
+      "id": "text",
+      "imports": [
+        {
+          "exports": ["Text", "TextElement", "TextSize", "TextTone", "TextWeight"],
+          "module": "texuli"
+        },
+        {
+          "exports": [
+            "TEXT_ALIGNS",
+            "TEXT_ELEMENTS",
+            "TEXT_SIZES",
+            "TEXT_TONES",
+            "TEXT_TRACKINGS",
+            "TEXT_TRANSFORMS",
+            "TEXT_WEIGHTS",
+            "Text",
+            "TextAlign",
+            "TextElement",
+            "TextSize",
+            "TextTone",
+            "TextTracking",
+            "TextTransform",
+            "TextWeight",
+            "textClass"
+          ],
+          "module": "texuli/typography"
+        }
+      ],
+      "label": "Text",
+      "placement": "app",
+      "props": [
+        {
+          "enumValues": ["start", "center", "end"],
+          "kind": "enum",
+          "name": "align"
+        },
+        {
+          "enumValues": ["p", "span", "div", "label", "small", "strong"],
+          "kind": "enum",
+          "name": "as"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "for"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "number",
+          "name": "lineClamp"
+        },
+        {
+          "kind": "boolean",
+          "name": "mono"
+        },
+        {
+          "enumValues": ["figure", "lg", "md", "sm", "xs"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "kind": "boolean",
+          "name": "tabular"
+        },
+        {
+          "enumValues": [
+            "default",
+            "muted",
+            "subtle",
+            "primary",
+            "success",
+            "warning",
+            "destructive",
+            "info"
+          ],
+          "kind": "enum",
+          "name": "tone"
+        },
+        {
+          "enumValues": ["normal", "wide"],
+          "kind": "enum",
+          "name": "tracking"
+        },
+        {
+          "enumValues": ["none", "uppercase", "lowercase", "capitalize"],
+          "kind": "enum",
+          "name": "transform"
+        },
+        {
+          "kind": "boolean",
+          "name": "truncate"
+        },
+        {
+          "enumValues": ["regular", "medium", "semibold"],
+          "kind": "enum",
+          "name": "weight"
+        }
+      ],
+      "summary": "Body copy, labels and small print with a size, tone and weight from the design system."
     },
     {
       "capability": "web-only",

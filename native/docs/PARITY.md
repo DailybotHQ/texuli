@@ -11,9 +11,9 @@ every other component paints a visible placeholder. Native is in development.
 
 | Measure | Count |
 | --- | --- |
-| Catalog components | 170 |
+| Catalog components | 174 |
 | Painted natively | 52 |
-| Placeholder natively | 118 |
+| Placeholder natively | 122 |
 | Agent-emittable components | 75 |
 | Agent-emittable and painted natively | 52 |
 | Painted read-only (interactive on the web) | 9 |
@@ -25,7 +25,7 @@ every other component paints a visible placeholder. Native is in development.
 
 So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes**
 (validation, label interpolation and the golden semantic traces match); **for painting, not yet**
-(52 of 170 components).
+(52 of 174 components).
 
 ## Capabilities
 
@@ -52,7 +52,7 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | composition | 4 | 4 |
 | content | 35 | 30 |
 | data | 12 | 12 |
-| display | 18 | 0 |
+| display | 22 | 0 |
 | documents | 1 | 0 |
 | forms | 30 | 0 |
 | layouts | 27 | 6 |
@@ -83,6 +83,7 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `blocks-media` | content | yes | renders | painted | — | — | yes |
 | `blocks-structure` | content | yes | renders | painted | — | — | yes |
 | `blocks-text` | content | yes | renders | painted | — | yes | yes |
+| `box` | display | — | renders | placeholder | — | — | — |
 | `breadcrumb` | overlays | — | renders | placeholder | — | — | — |
 | `button` | forms | — | renders | placeholder | — | — | — |
 | `button-group` | forms | — | renders | placeholder | — | — | — |
@@ -158,6 +159,7 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `form` | forms | — | renders | placeholder | — | — | — |
 | `form-field` | state | yes | renders | placeholder | — | yes | — |
 | `form-submit` | state | yes | renders | placeholder | — | yes | — |
+| `heading` | display | — | renders | placeholder | — | — | — |
 | `host-region` | state | yes | renders | placeholder | — | — | — |
 | `hover-card` | overlays | — | renders | placeholder | — | — | — |
 | `hover-card-content` | overlays | — | renders | placeholder | — | — | — |
@@ -204,6 +206,7 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `pagination` | overlays | — | renders | placeholder | — | — | — |
 | `popover` | overlays | — | renders | placeholder | — | — | — |
 | `popover-content` | overlays | — | renders | placeholder | — | — | — |
+| `prose` | display | — | renders | placeholder | — | — | — |
 | `radio` | forms | — | renders | placeholder | — | — | — |
 | `radio-group` | forms | — | renders | placeholder | — | — | — |
 | `responsive-modal` | overlays | — | renders | placeholder | — | — | — |
@@ -229,6 +232,7 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `switch` | forms | — | renders | placeholder | — | — | — |
 | `table` | display | — | renders | placeholder | — | — | — |
 | `tag` | display | — | renders | placeholder | — | — | — |
+| `text` | display | — | renders | placeholder | — | — | — |
 | `text-counter` | forms | — | renders | placeholder | — | — | — |
 | `textarea` | forms | — | renders | placeholder | — | — | — |
 | `time-field` | forms | — | renders | placeholder | — | — | — |

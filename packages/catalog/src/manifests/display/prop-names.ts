@@ -136,3 +136,48 @@ export const codePropNames = ['value', 'variant', 'language', 'class'] as const;
  * `text` as one escaped text node inside its parent's slot.
  */
 export const inlineTextPropNames = ['text'] as const;
+
+/** `texuli/typography` (ADR-032): titles and section headings, `<h1>`…`<h6>`. */
+export const headingPropNames = [
+  'level',
+  'size',
+  'tone',
+  'truncate',
+  'label',
+  'class',
+  'children',
+] as const;
+
+/** `texuli/typography`: body copy, labels and small print; never a heading. */
+export const textPropNames = [
+  'as',
+  'size',
+  'tone',
+  'weight',
+  'truncate',
+  'lineClamp',
+  'align',
+  'mono',
+  'tabular',
+  'transform',
+  'tracking',
+  'for',
+  'label',
+  'class',
+  'children',
+] as const;
+
+/** `texuli/typography`: long-form reading rhythm. */
+export const prosePropNames = ['as', 'size', 'class', 'children'] as const;
+
+/** `texuli/typography`: a token-driven panel. */
+export const boxPropNames = [
+  'as',
+  'padding',
+  'radius',
+  'border',
+  'elevation',
+  'surface',
+  'class',
+  'children',
+] as const;

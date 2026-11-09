@@ -15,6 +15,11 @@ export const DISPLAY_AXIS_STAMP: Readonly<Record<string, Stamp>> = {
     states: ['hover', 'focus-visible', 'disabled', 'selected'],
   },
   banner: { axes: { tone: 'tone' } },
+  // Typography and surfaces (ADR-032): static, no observable state.
+  box: { axes: { variant: 'surface' } },
+  heading: { axes: { size: 'size', tone: 'tone' } },
+  prose: { axes: { size: 'size' } },
+  text: { axes: { size: 'size', tone: 'tone' } },
   callout: { axes: { tone: 'tone' } },
   card: { axes: { variant: 'variant' }, states: ['hover', 'focus-visible'] },
   chip: { axes: { variant: 'variant' }, states: ['active', 'disabled', 'selected'] },

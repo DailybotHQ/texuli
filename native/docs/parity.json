@@ -1,9 +1,9 @@
 {
   "specVersion": "0.13.0",
   "totals": {
-    "catalog": 170,
+    "catalog": 174,
     "painted": 52,
-    "placeholder": 118,
+    "placeholder": 122,
     "agentEmittable": 75,
     "agentEmittablePainted": 52,
     "semanticRules": 49,
@@ -43,7 +43,7 @@
     },
     {
       "group": "display",
-      "total": 18,
+      "total": 22,
       "painted": 0
     },
     {
@@ -401,6 +401,18 @@
       "semanticRule": false,
       "golden": true,
       "parityTrace": true
+    },
+    {
+      "id": "box",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
     },
     {
       "id": "breadcrumb",
@@ -1303,6 +1315,18 @@
       "parityTrace": false
     },
     {
+      "id": "heading",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
       "id": "host-region",
       "group": "state",
       "capability": "web-only",
@@ -1855,6 +1879,18 @@
       "parityTrace": false
     },
     {
+      "id": "prose",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
       "id": "radio",
       "group": "forms",
       "capability": "web-only",
@@ -2144,6 +2180,18 @@
     },
     {
       "id": "tag",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
+      "id": "text",
       "group": "display",
       "capability": "web-only",
       "agentEmittable": false,

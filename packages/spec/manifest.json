@@ -1,8 +1,8 @@
 {
   "dialect": "https://json-schema.org/draft/2020-12/schema",
   "files": {
-    "catalog/capabilities.json": "9072574d676b15f5b015082d29f0a9f58c7b9f93b137a63a1caed5e0037bd479",
-    "catalog/components.json": "66667d8eb848586fb3b4fc391ad1711c10e76c1f4aefa32af4c0db1b312a94a4",
+    "catalog/capabilities.json": "aeacdcffaccffd5d9edb823ba6f8d692fb2fe2a36bb9fce3efa50e703689dcf3",
+    "catalog/components.json": "8c911b83114d02c7a99c0a3070029d8e05e93c4143436ea375ca7e8d9bffd0a3",
     "fixtures/design-systems/acme.json": "07928b374d70ce2b7f08adaf855fdb9040b8305b10e463381843793d2174ca04",
     "fixtures/design-systems/invalid/approval-invalid.json": "3fcb59b0e54f13819be3244129604c4bf2c5cf99d578ba51580abeeba563b096",
     "fixtures/design-systems/invalid/extends-cycle.json": "64ed3a6f116ce9c8ce88890681828e4d482a3076773f1d60194194d42bae8775",
