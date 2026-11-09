@@ -2198,7 +2198,6 @@ reflect this decision.
 
 - **Date:** 2026-11-09 · **Ratification:** owner-approved joint plan with Protoyard (Texuli T1–T5,
   Protoyard P0–P4), relayed by the consumer lead; design by the Texuli lead from the PLAN_016 audits.
-  (ADR-027 to ADR-031 are taken by the site work on another branch.)
 - **Context:** a consumer builds many prototypes with coding agents, each meant to follow one brand
   design system. Tokens and Texuli components enforce the look, but nothing stops an agent from
   inventing UI (local styled components, restyled controls, visual utilities, inline styles, variants
