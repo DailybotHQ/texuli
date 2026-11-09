@@ -81,7 +81,6 @@ export const documents: SolutionEntry = {
   ],
   links: [
     { label: 'Read the docs', href: '/guides/solutions/documents/' },
-    { label: 'Current demo page', href: '/documents-page/' },
     { label: '@texuli/pages on npm', href: 'https://www.npmjs.com/package/@texuli/pages' },
   ],
 };

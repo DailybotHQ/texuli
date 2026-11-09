@@ -1,0 +1,51 @@
+---
+/**
+ * `/solutions/documents/` — the Documents Solution landing (ADR-027, ADR-028, ADR-030),
+ * built on the Slides pilot. `SolutionLayout` orders the sections and checks the content
+ * against the registry entry; the only island is the Documents demo (client:visible),
+ * with a server-rendered reader preview of the same fixture.
+ */
+
+import DocumentsDemo from '../../../components/solutions/documents/demo/DocumentsDemo.svelte';
+import DocumentsDemoPreview from '../../../components/solutions/documents/demo/DocumentsDemoPreview.svelte';
+import DocumentsHero from '../../../components/solutions/documents/hero/DocumentsHero.astro';
+import DocumentsHow from '../../../components/solutions/documents/how/DocumentsHow.astro';
+import DocumentsQuickstart from '../../../components/solutions/documents/quickstart/DocumentsQuickstart.astro';
+import DocumentsStories from '../../../components/solutions/documents/stories/DocumentsStories.astro';
+import SolutionDemoFrame from '../../../components/solutions/shared/demo-frame/SolutionDemoFrame.astro';
+import SolutionAgents from '../../../components/solutions/shared/platforms/SolutionAgents.astro';
+import SolutionPlatforms from '../../../components/solutions/shared/platforms/SolutionPlatforms.astro';
+import SolutionNextSteps from '../../../components/solutions/shared/resources/SolutionNextSteps.astro';
+import SolutionRecipes from '../../../components/solutions/shared/resources/SolutionRecipes.astro';
+import SolutionRelated from '../../../components/solutions/shared/resources/SolutionRelated.astro';
+import SolutionLayout from '../../../components/solutions/shared/SolutionLayout.astro';
+import { techArticleJsonLd } from '../../../lib/schema.ts';
+import { DOCUMENTS_LANDING as content, DOCUMENTS_ENTRY as entry } from './_content.ts';
+
+const title = 'Documents — edit, read and export block documents';
+const description = entry.tagline;
+---
+
+<SolutionLayout
+  {entry}
+  {content}
+  {title}
+  {description}
+  jsonLd={techArticleJsonLd(title, description, entry.route)}
+>
+  <DocumentsHero slot="hero" />
+  <SolutionDemoFrame slot="demo" {entry} {...content.demo}>
+    <DocumentsDemoPreview slot="preview" />
+    <DocumentsDemo slot="demo" client:visible />
+  </SolutionDemoFrame>
+  <DocumentsStories slot="stories" />
+  <DocumentsHow slot="how" />
+  <DocumentsQuickstart slot="quickstart" />
+  <SolutionRecipes slot="recipes" {entry} {...content.recipes!} />
+  <SolutionAgents slot="agents" {entry} {...content.agents} />
+  <SolutionPlatforms slot="platforms" {entry} {...content.platforms} />
+  <Fragment slot="next">
+    <SolutionRelated {entry} />
+    <SolutionNextSteps {entry} {...content.next} />
+  </Fragment>
+</SolutionLayout>
