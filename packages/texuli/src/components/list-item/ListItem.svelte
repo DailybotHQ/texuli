@@ -85,7 +85,7 @@ const safe = $derived(href ? safeHref(href, hrefTrust) : undefined);
   {#if meta}<span class="tx-list-item__meta">{meta}</span>{/if}
 {/snippet}
 
-<li {...rest} bind:this={ref} class={cx('tx-list-item', className)} data-tx-list-item>
+<li {...rest} bind:this={ref} class={cx('tx-list-item', className)} data-tx-list-item data-tx-component="list-item">
   {#if safe}
     <a
       class="tx-list-item__main"

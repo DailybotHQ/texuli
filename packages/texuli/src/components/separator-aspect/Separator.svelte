@@ -51,6 +51,8 @@ const primitiveOrientation = $derived(orientation as PrimitiveOrientation);
   {decorative}
   class={classes}
   data-tx-separator
+  data-tx-component="separator"
+  data-tx-variant={variant}
   data-variant={variant}
   {...rest}
 />

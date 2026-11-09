@@ -117,6 +117,9 @@ const rootClass = $derived(
   bind:this={ref}
   class={rootClass}
   data-tx-avatar
+  data-tx-component="avatar"
+  data-tx-size={size}
+  data-tx-tone={tone}
   data-size={size}
   data-status={status}
   data-tone={tone}
