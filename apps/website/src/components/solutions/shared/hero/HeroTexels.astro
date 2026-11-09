@@ -1,0 +1,76 @@
+---
+/**
+ * The texel plate a Solution hero paints while its slot is not yet in
+ * `src/data/illustrations.json` (SiteIllustration refuses unknown slots). Same
+ * motif and palette as SiteIllustration's missing-file fallback, plate ratio.
+ */
+import { heroTexels } from './hero-model.ts';
+
+interface Props {
+  art: string;
+  alt: string;
+}
+
+const { art, alt } = Astro.props;
+const tiles = heroTexels(art);
+---
+
+<figure class="hero-texels" data-tx-illustration={art} data-tx-illustration-variant="plate" data-tx-illustration-ready="pending">
+  <div class="hero-texels__frame" role="img" aria-label={alt}>
+    <div class="hero-texels__grid" aria-hidden="true">
+      {tiles.map((tone) => (tone === 0 ? <i /> : <i class={`t${tone}`} />))}
+    </div>
+  </div>
+</figure>
+
+<style>
+  .hero-texels {
+    margin: 0;
+    inline-size: 100%;
+  }
+  .hero-texels__frame {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    border-radius: calc(var(--tx-radius, 0.5rem) * 1.25);
+    background:
+      radial-gradient(90% 120% at 100% 0%, rgb(109 74 255 / 0.14), transparent 60%),
+      color-mix(in oklab, var(--tx-muted) 60%, var(--tx-background));
+  }
+  .hero-texels__grid {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    align-content: center;
+    gap: clamp(4px, 1.1vw, 10px);
+    padding: clamp(10px, 3vw, 28px);
+  }
+  .hero-texels__grid > :global(i) {
+    aspect-ratio: 1;
+    border: 1px solid color-mix(in oklab, var(--tx-border) 70%, transparent);
+    border-radius: 22%;
+  }
+  .hero-texels__grid > :global(.t1) {
+    background: color-mix(in oklab, #b9a8ff 22%, var(--tx-background));
+  }
+  .hero-texels__grid > :global(.t2) {
+    border-color: transparent;
+    background: color-mix(in oklab, #b9a8ff 55%, var(--tx-background));
+  }
+  .hero-texels__grid > :global(.t3) {
+    border-color: transparent;
+    background: #6d4aff;
+  }
+  .hero-texels__grid > :global(.t4) {
+    border-color: transparent;
+    background: oklch(0.76 0.15 50);
+  }
+  @media (forced-colors: active) {
+    .hero-texels__grid > :global(.t3),
+    .hero-texels__grid > :global(.t4) {
+      background: CanvasText;
+    }
+  }
+</style>
