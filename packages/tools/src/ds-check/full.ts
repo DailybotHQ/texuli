@@ -307,6 +307,69 @@ export function compiledFindings(
   return out;
 }
 
+/** The deepest a document may nest before the validator refuses it unread (the spec walks 16). */
+export const DS_FULL_MAX_DEPTH = 64;
+
+/** True when `value` nests deeper than `max` objects or arrays (iterative: never overflows). */
+export function depthExceeds(value: unknown, max: number): boolean {
+  const stack: [unknown, number][] = [[value, 0]];
+  let seen = 0;
+  while (stack.length > 0) {
+    const [node, depth] = stack.pop() as [unknown, number];
+    if (node === null || typeof node !== 'object') continue;
+    if (depth > max) return true;
+    if (++seen > 200_000) return true;
+    for (const child of Object.values(node as Record<string, unknown>))
+      stack.push([child, depth + 1]);
+  }
+  return false;
+}
+
+function refusedReport(
+  doc: unknown,
+  findings: DsFullFinding[],
+  options: DsFullOptions
+): DsFullReport {
+  const record = isRecord(doc) ? doc : {};
+  const text = (v: unknown) => (typeof v === 'string' ? v.slice(0, 120) : undefined);
+  const document = {
+    ...(text(record.id) ? { id: text(record.id) } : {}),
+    ...(text(record.version) ? { version: text(record.version) } : {}),
+    ...(text(record.name) ? { name: text(record.name) } : {}),
+  };
+  const refusal: DsFullFinding = {
+    code: 'invalid-value',
+    severity: 'error',
+    area: 'structure',
+    path: '$',
+    message: `The document nests deeper than ${DS_FULL_MAX_DEPTH} levels or holds too many values; it was not read.`,
+    hint: 'A design-system document is a few levels deep: remove the nested data.',
+  };
+  const all = [...findings.filter((f) => f.severity === 'error'), refusal];
+  const check = {
+    format: 'texuli/ds-check',
+    version: 1,
+    ok: false,
+    document,
+    codes: ['invalid-value'],
+    errors: [
+      { code: refusal.code, path: refusal.path, message: refusal.message, hint: refusal.hint },
+    ],
+    runs: [],
+  } as unknown as DsCheckLockedReport;
+  return {
+    format: DS_FULL_FORMAT,
+    version: DS_FULL_VERSION,
+    ok: false,
+    ...(options.file ? { file: options.file } : {}),
+    document,
+    codes: [...new Set(all.map((f) => f.code))].sort(),
+    summary: { errors: all.length, warnings: 0, info: 0 },
+    findings: all,
+    check,
+  };
+}
+
 /**
  * Run every check over a design system and, optionally, a prototype; one report with every
  * finding (stable code, severity, area, path, fix hint). Never throws on JSON values.
@@ -331,6 +394,8 @@ export async function checkDesignSystemFull(
   const catalog = merged.catalog;
 
   // The design system: structure, extends, allow, approval, compile (ds check).
+  // A document too deep for the hash and the compile fails closed with a finding.
+  if (depthExceeds(doc, DS_FULL_MAX_DEPTH)) return refusedReport(doc, findings, options);
   const raw = await checkDesignSystem(doc, {
     catalog,
     trust: options.trust ?? 'untrusted',
