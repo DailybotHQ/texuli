@@ -18,7 +18,7 @@ export const SHEETS_RECIPES: Omit<SolutionRecipesProps, 'entry'> = {
   title: 'Recipes',
   recipes: [
     {
-      title: 'Embed the sheet view',
+      title: 'Drop a grid into your app',
       summary:
         'Load a workbook, evaluate formulas, and show the grid, step by step in the Sheets docs.',
       href: '/guides/solutions/sheets/',
@@ -60,7 +60,7 @@ export const SHEETS_PLATFORMS: Omit<SolutionPlatformsProps, 'entry'> = {
 
 export const SHEETS_NEXT: Omit<SolutionNextStepsProps, 'entry'> = {
   links: [
-    { label: 'Read the docs', href: '/guides/solutions/sheets/' },
-    { label: '@texuli/sheets on npm', href: 'https://www.npmjs.com/package/@texuli/sheets' },
+    { label: 'Read the Sheets docs', href: '/guides/solutions/sheets/' },
+    { label: 'Install @texuli/sheets', href: 'https://www.npmjs.com/package/@texuli/sheets' },
   ],
 };

@@ -9,9 +9,9 @@ import type { SolutionHeroProps } from '../../shared/types.ts';
 export const SHEETS_HERO: Omit<SolutionHeroProps, 'entry'> = {
   eyebrow: 'Solution · Sheets',
   title: 'A spreadsheet with formulas built to recalculate.',
-  lede: 'Model a workbook with an owned formula engine, edit its grid with keyboard controls, and move data in or out as CSV.',
+  lede: 'An owned formula engine, a keyboard grid, and CSV that will not inject formulas.',
   ctas: [
-    { kind: 'primary', label: 'Explore the budget', href: `#${SOLUTION_SECTION_IDS.demo}` },
-    { kind: 'secondary', label: 'Start building', href: `#${SOLUTION_SECTION_IDS.quickstart}` },
+    { kind: 'primary', label: 'See it recalculate', href: `#${SOLUTION_SECTION_IDS.demo}` },
+    { kind: 'secondary', label: 'Start from code', href: `#${SOLUTION_SECTION_IDS.quickstart}` },
   ],
 };

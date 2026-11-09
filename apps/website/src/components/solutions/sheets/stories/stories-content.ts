@@ -8,25 +8,28 @@
 import type { SolutionStoriesProps } from '../../shared/types.ts';
 
 export const SHEETS_STORIES: Omit<SolutionStoriesProps, 'entry'> = {
-  title: 'What a sheet can do',
+  title: 'What you can ship in a sheet',
   stories: [
     {
       id: 'formulas',
-      title: 'Formulas that stay in bounds',
-      body: 'An owned formula engine parses into the shared expression AST. Dependents recalculate. The language is closed: nothing builds a reference from text or reaches the host except the clock you pass.',
+      title: 'Totals follow every edit',
+      body: 'An owned engine parses formulas into the shared AST. Dependents recalculate. The language is closed: no reference from text, and nothing reaches the host except the clock you pass.',
       capabilities: ['formulas'],
+      art: { slot: 'solution-sheets-story-1', variant: 'plate' },
     },
     {
       id: 'edit',
-      title: 'Edits keep formulas consistent',
+      title: 'Move rows without breaking formulas',
       body: 'Structural edits rewrite references. The workbook engine keeps computed values current. Values paint as text. There is no HTML sink.',
       capabilities: ['edit'],
+      art: { slot: 'solution-sheets-story-2', variant: 'plate' },
     },
     {
       id: 'csv',
-      title: 'CSV that does not inject formulas',
+      title: 'Hand off CSV that stays inert',
       body: 'Import keeps formula-looking fields as text unless you opt in. Export neutralizes formula injection so a spreadsheet tool will not run them.',
       capabilities: ['csv'],
+      art: { slot: 'solution-sheets-story-3', variant: 'plate' },
     },
     {
       id: 'collaboration',

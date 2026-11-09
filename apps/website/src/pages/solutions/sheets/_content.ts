@@ -26,7 +26,7 @@ export const SHEETS_DEMO: Omit<SolutionDemoFrameProps, 'entry'> = {
   title: 'Plan a project budget',
   label: 'Sheets demo',
   tryThis: [
-    'Select a cell and change a quantity or unit price; the totals recalculate.',
+    'Change a quantity or unit price; the row and grand totals recalculate.',
     'Toggle formulas to see the owned engine’s expressions as data.',
     'Add a line item, then reset to restore the fixture workbook.',
   ],

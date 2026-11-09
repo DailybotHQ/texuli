@@ -60,8 +60,8 @@ describe('Sheets stories', () => {
     const copy = JSON.stringify(SHEETS_STORIES);
     expect(copy).not.toMatch(/\b(available|stable|production[- ]ready|1\.0)\b/i);
     expect(copy).not.toMatch(/PLAN_|T-sheets/);
-    expect(copy).not.toMatch(/\d/);
     for (const story of SHEETS_STORIES.stories) {
+      expect(`${story.title} ${story.body}`, story.id).not.toMatch(/\d/);
       expect(story.body.split(/\s+/).length, story.id).toBeLessThanOrEqual(45);
       expect(story.status).toBeUndefined();
     }
