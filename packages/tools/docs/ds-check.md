@@ -229,6 +229,32 @@ The host exposes `window.texuliDsCheck` (`ready`, `apply`, `inspect`),
 switches off transitions and animations inside the scope, and builds no
 markup from strings.
 
+## The full validator and its input bounds
+
+`checkDesignSystemFull(doc, { catalog, extensions?, base?, prototype?, trust?, hashes? })`
+(`@texuli/tools/ds-check`) runs every check in one call: the static checks above, the
+data-viz palette and token completeness, and, with a `prototype` (`{ files, blueprints }`),
+the locked component checks and, for a locked design system, the CSS policy. Every finding
+has a stable `code`, a `severity` (`error`, `warning`, `info`), an `area`, a `path` and a
+`hint`; the `ds check` report rides along unchanged as `check`.
+
+A prototype is untrusted input, so the scan is bounded (`DS_FULL_PROTOTYPE_LIMITS`):
+
+| Bound | Value | When exceeded |
+| --- | --- | --- |
+| One file | 512 KB (UTF-8) | `file-too-large` (error) at the file's path; the file is not scanned |
+| Files per check | 500 | `prototype-too-large` (error) at `files`; the rest are not scanned |
+| Bytes per check | 8 MB in all | `prototype-too-large` (error) at `files`; the rest are not scanned |
+| Blueprints per check | 100 | `prototype-too-large` (error) at `blueprints`; the rest are not checked |
+| Findings per report | 256 | `findings-capped` (warning, always the last finding) at `prototype`; the remaining checks do not run |
+
+An unscanned file is an error, never a pass: the lock cannot be verified on what was not
+read. Inside one source, at most 10,000 component usages are read and at most 64 errors and
+64 warnings are kept. A document nested deeper than 64 levels is refused unread
+(`invalid-value` at `$`). The codes are listed in `DS_FULL_LIMIT_CODES`; the conformance
+corpus (`packages/tools/fixtures/ds-validate/`, `tests/ds-validate-corpus.test.ts`) covers
+every other code with a failing and a passing fixture and a golden report.
+
 ## In your own tests
 
 ```ts
