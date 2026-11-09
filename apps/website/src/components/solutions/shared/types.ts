@@ -45,6 +45,7 @@ export interface SolutionStory {
   readonly body: string;
   /** Capability ids from the entry this story demonstrates. */
   readonly capabilities: readonly string[];
+  /** Defaults to the reserved `solution-<slug>-story-<n>` slot; unregistered paints the mosaic. */
   readonly art?: SolutionArtSlot;
   readonly status?: SolutionStatus;
 }
@@ -66,6 +67,11 @@ export interface SolutionHowProps {
   readonly entry: SolutionEntry;
   readonly title: string;
   readonly steps: readonly SolutionHowStep[];
+  /**
+   * Full-width band under the steps. Defaults to the reserved `solution-<slug>-how` slot;
+   * nothing renders until `illustrations.json` registers it (see `art/art-slots.ts`).
+   */
+  readonly art?: SolutionArtSlot;
 }
 
 export interface SolutionCodeSample {

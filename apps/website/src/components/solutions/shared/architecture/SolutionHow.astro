@@ -6,13 +6,20 @@
  * on. The diagram is HTML text in lists, so screen readers read it as is; the connectors
  * are decorative CSS and the figcaption gives the one-sentence summary. Static markup, no
  * island, no HTML sinks; every link passes the URL policy (developer tier).
+ *
+ * Under the steps, an optional full-width art band: `art`, or the reserved
+ * `solution-<slug>-how` slot. It renders only once `illustrations.json` registers the slot
+ * (alt text from the manifest, lazy loading), so an unregistered slot adds nothing.
  */
+import SiteIllustration from '../../../landing/SiteIllustration.astro';
+import { howArt } from '../art/art-slots.ts';
 import type { SolutionHowProps } from '../types.ts';
 import { architectureView } from './architecture-model.ts';
 
 type Props = SolutionHowProps;
 
 const view = architectureView(Astro.props);
+const art = howArt(Astro.props.entry.slug, Astro.props.art);
 ---
 
 <section
@@ -100,6 +107,13 @@ const view = architectureView(Astro.props);
         }
       </figure>
     </div>
+    {
+      art && (
+        <div class="solution-how__band" data-tx-how-art={art.slot}>
+          <SiteIllustration art={art.slot} />
+        </div>
+      )
+    }
   </div>
 </section>
 
@@ -121,7 +135,7 @@ const view = architectureView(Astro.props);
   .solution-how h2 {
     margin: 0;
     color: var(--tx-foreground);
-    font-size: clamp(1.75rem, 4.5vw, 2.6rem);
+    font-size: clamp(1.9rem, 5vw, 3rem);
     font-weight: 800;
     line-height: 1.1;
     letter-spacing: -0.025em;
@@ -302,6 +316,10 @@ const view = architectureView(Astro.props);
     border-radius: 0.5rem;
     background: color-mix(in oklab, var(--tx-muted) 40%, var(--tx-background));
     color: var(--tx-foreground);
+  }
+  .solution-how__band {
+    min-inline-size: 0;
+    margin-block-start: clamp(0.5rem, 2vw, 1.5rem);
   }
   .solution-how__sr {
     position: absolute;
