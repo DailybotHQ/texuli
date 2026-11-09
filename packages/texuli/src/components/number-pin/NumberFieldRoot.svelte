@@ -59,5 +59,7 @@ const classes = $derived(
   readOnly={props.readOnly || display === 'output'}
   bind:value
   class={classes}
+  data-tx-component="number-field"
+  data-tx-size={size}
   data-tx-number-field=""
 />

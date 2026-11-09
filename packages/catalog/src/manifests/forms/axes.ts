@@ -30,6 +30,10 @@ export const FORMS_AXIS_STAMP: Readonly<Record<string, AxisStamp>> = {
   },
   description: { states: ['disabled'] },
   field: { states: ['disabled', 'invalid'] },
+  'file-upload': {
+    axes: { variant: 'variant' },
+    states: ['focus-visible', 'disabled', 'invalid'],
+  },
   'icon-button': {
     axes: { variant: 'variant' },
     states: ['hover', 'focus-visible', 'disabled', 'loading'],
@@ -45,6 +49,14 @@ export const FORMS_AXIS_STAMP: Readonly<Record<string, AxisStamp>> = {
     axes: { variant: 'variant', size: 'size' },
     states: ['hover', 'focus-visible', 'disabled', 'invalid', 'selected', 'open'],
   },
+  'number-field': {
+    axes: { size: 'size' },
+    states: ['focus-visible', 'disabled', 'invalid', 'readonly'],
+  },
+  'pin-input': {
+    axes: { size: 'size' },
+    states: ['focus-visible', 'disabled', 'invalid'],
+  },
   radio: {
     axes: { size: 'size' },
     states: ['hover', 'focus-visible', 'disabled', 'invalid', 'checked'],
@@ -52,6 +64,10 @@ export const FORMS_AXIS_STAMP: Readonly<Record<string, AxisStamp>> = {
   'radio-group': {
     axes: { variant: 'variant', size: 'size' },
     states: ['disabled', 'readonly'],
+  },
+  rating: {
+    axes: { size: 'size', tone: 'tone' },
+    states: ['focus-visible', 'disabled', 'checked', 'readonly'],
   },
   select: {
     axes: { variant: 'variant', size: 'size' },
@@ -64,11 +80,18 @@ export const FORMS_AXIS_STAMP: Readonly<Record<string, AxisStamp>> = {
     states: ['focus-visible', 'disabled', 'invalid', 'open'],
   },
   switch: { axes: { size: 'size' }, states: ['disabled', 'checked'] },
+  'tags-input': {
+    states: ['focus-visible', 'disabled', 'invalid', 'readonly'],
+  },
   'text-counter': { states: ['disabled', 'invalid', 'readonly'] },
   textarea: { states: ['disabled', 'readonly'] },
   'time-field': {
     axes: { size: 'size' },
     states: ['hover', 'focus-visible', 'active', 'disabled', 'invalid', 'selected'],
+  },
+  'toggle-group': {
+    axes: { variant: 'variant', size: 'size' },
+    states: ['focus-visible', 'disabled'],
   },
 };
 

@@ -214,6 +214,8 @@ function itemProgress(file: File): number | null | undefined {
 <div bind:this={ref}
   class={rootClass}
   data-tx-file-upload
+  data-tx-component="file-upload"
+  data-tx-variant={variant}
   data-variant={variant}
   {...wrapperAttrs}
   onchangecapture={chainHandlers(onchangecapture, snapshot)}

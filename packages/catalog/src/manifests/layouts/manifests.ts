@@ -21,6 +21,7 @@ import {
   layoutDrawerPropNames,
   layoutHostPropNames,
   marketingLayoutPropNames,
+  mobileAppFramePropNames,
   mobileHeaderPropNames,
   navIconPropNames,
   pageLayoutPropNames,
@@ -304,7 +305,32 @@ export const mobileHeaderManifest = /* @__PURE__ */ stampLayoutsAxes(
     examples: [
       { id: 'inbox', title: 'Inbox header', props: { title: 'Inbox', backHref: '/home' } },
     ],
-    related: ['bottom-nav'],
+    related: ['bottom-nav', 'mobile-app-frame'],
+  })
+);
+
+export const mobileAppFrameManifest = /* @__PURE__ */ stampLayoutsAxes(
+  manifestData({
+    id: 'mobile-app-frame',
+    package: PKG,
+    label: 'MobileAppFrame',
+    summary:
+      'A phone-sized app frame: skip link, header, scrolling screen, optional footer and bottom nav. Host chrome; agents never emit it.',
+    tier: 'app',
+    agentEmittable: false,
+    useWhen: ['The host shell of a phone-sized app'],
+    dontUseWhen: ['In-page content (use layout-page)', 'Desktop chrome (use layout-sidebar)'],
+    a11y: 'A skip link to the screen; the screen is a main landmark unless nested.',
+    props: propsFrom(mobileAppFramePropNames, {
+      skipLabel: { kind: 'string' },
+      mainId: { kind: 'string' },
+      mainElement: { kind: 'enum', enumValues: ['main', 'div'], default: 'main' },
+      resetScrollOnNavigate: { kind: 'boolean', default: true },
+      stickyFooterUnstyled: { kind: 'boolean', default: false },
+      class: { kind: 'string' },
+    }),
+    examples: [{ id: 'phone', title: 'Phone frame', props: { mainId: 'screen' } }],
+    related: ['bottom-nav', 'mobile-header'],
   })
 );
 
@@ -934,6 +960,7 @@ export const LAYOUTS_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Obj
     layoutSidebarManifest,
     layoutTopNavManifest,
     layoutWizardManifest,
+    mobileAppFrameManifest,
     mobileHeaderManifest,
     navIconManifest,
     pageLayoutManifest,
