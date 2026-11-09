@@ -1,0 +1,24 @@
+{
+  "description": "An allow state the catalog component does not list.",
+  "expect": [["unknown-state", "$.allow.button.states[0]"]],
+  "catalog": {
+    "components": [
+      {
+        "id": "button",
+        "states": ["hover", "disabled"]
+      }
+    ]
+  },
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "allow": {
+      "button": {
+        "states": ["loading"]
+      }
+    }
+  }
+}

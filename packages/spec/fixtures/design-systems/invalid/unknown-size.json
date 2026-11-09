@@ -1,0 +1,26 @@
+{
+  "description": "An allow size on a component that has no size axis.",
+  "expect": [["unknown-size", "$.allow.button.sizes[0]"]],
+  "catalog": {
+    "components": [
+      {
+        "id": "button",
+        "axes": {
+          "variant": { "values": ["default"] }
+        }
+      }
+    ]
+  },
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "allow": {
+      "button": {
+        "sizes": ["sm"]
+      }
+    }
+  }
+}

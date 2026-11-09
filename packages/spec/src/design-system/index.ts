@@ -9,6 +9,12 @@
 
 export type * from '../../generated/typescript/design-system.ts';
 export {
+  checkDesignSystemAllow,
+  type DesignSystemAllowCatalog,
+  type DesignSystemAllowCatalogComponent,
+  type DesignSystemAllowCode,
+} from './allow.ts';
+export {
   type DesignSystemRootAttributes,
   type DesignSystemRootAxes,
   DS_COMPONENT_ATTRIBUTE,
@@ -39,6 +45,7 @@ export {
   validateDesignSystemPatch,
 } from './validate.ts';
 export {
+  DESIGN_SYSTEM_ALLOW_CODES,
   DESIGN_SYSTEM_CODES,
   DESIGN_SYSTEM_COMPILER_CODES,
   DESIGN_SYSTEM_FORMAT,
