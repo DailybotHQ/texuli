@@ -19,7 +19,7 @@ type StageProps = {
   clickToAdvance: boolean;
   autoSlideMs: number;
   initialSlideId: string;
-  coverHeadingLevel: 3;
+  coverHeadingLevel: 2;
   namespace: string;
   defaultRenderers: false;
   renderers: DeckRenderers;
@@ -193,7 +193,7 @@ onDestroy(() => {
       clickToAdvance={false}
       autoSlideMs={0}
       initialSlideId={snapshot.location.slideId}
-      coverHeadingLevel={3}
+      coverHeadingLevel={2}
       namespace="slides-solution-demo"
       bind:controller={stageController}
       onSlideChange={handleStageChange}

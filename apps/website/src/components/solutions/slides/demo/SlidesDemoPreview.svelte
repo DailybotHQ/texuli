@@ -24,7 +24,7 @@ const renderers = { ...layoutRenderers, validateBlock: validateDeckBlock };
     loadTheme={loadDeckLibraryTheme}
     autofocus={false}
     clickToAdvance={false}
-    coverHeadingLevel={3}
+    coverHeadingLevel={2}
     namespace="slides-solution-preview"
     chrome={previewChrome}
   />
