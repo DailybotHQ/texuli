@@ -14,9 +14,9 @@ import type { SolutionHeroProps } from '../../shared/types.ts';
 export const DOCUMENTS_HERO: Omit<SolutionHeroProps, 'entry'> = {
   eyebrow: 'Solution · Documents',
   title: 'Documents you can edit, read and export.',
-  lede: 'Edit block documents with undo, read them in a reader view, paginate them, export Markdown, DOCX and PDF, and merge edits from several replicas.',
+  lede: 'One block model behind the editor, the reader and every export. Each edit can be undone, and Markdown, DOCX and PDF come from the same source.',
   ctas: [
     { kind: 'primary', label: 'Edit the live report', href: `#${SOLUTION_SECTION_IDS.demo}` },
-    { kind: 'secondary', label: 'Start building', href: `#${SOLUTION_SECTION_IDS.quickstart}` },
+    { kind: 'secondary', label: 'Get started', href: `#${SOLUTION_SECTION_IDS.quickstart}` },
   ],
 };

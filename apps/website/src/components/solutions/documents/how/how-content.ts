@@ -10,26 +10,29 @@
  * editor's toolbar, link dialog, safe paste and Markdown, the page editor's slash menu
  * and keyboard block drag, the read-only reader, Markdown import and export, the owned
  * DOCX and PDF writers, `exportDocument` in pages, and the CRDT sync core. Paged-view
- * editing is planned and not claimed. No counts are stated.
+ * editing is planned and not claimed. No counts are stated. The last step also carries the
+ * collaboration story (comments, suggestions and version history in the pages README).
+ * The art band is the reserved `solution-documents-how` slot.
  */
 import type { SolutionHowProps } from '../../shared/types.ts';
 
 export const DOCUMENTS_HOW: Omit<SolutionHowProps, 'entry'> = {
   title: 'From blocks to a finished document.',
+  art: { slot: 'solution-documents-how', variant: 'band' },
   steps: [
     {
       title: 'Author',
-      body: 'Build a document from typed blocks with persisted ids, or load one from an agent or a file through the untrusted loader.',
+      body: 'Compose typed blocks with persisted ids, or load a document from an agent or a file through the untrusted loader.',
       package: '@texuli/document',
     },
     {
       title: 'Edit with operations',
-      body: 'Every change is a typed operation with an exact inverse, kept in one op log, so undo and redo share one history.',
+      body: 'Every change is a typed operation with an exact inverse in one op log, so undo and redo share one history.',
       package: '@texuli/document',
     },
     {
       title: 'Write rich text',
-      body: 'The rich text editor brings a formatting toolbar, a link dialog, safe paste, and Markdown in and out.',
+      body: 'A formatting toolbar, a link dialog, safe paste, and Markdown in and out.',
       package: '@texuli/editor',
     },
     {
@@ -39,12 +42,12 @@ export const DOCUMENTS_HOW: Omit<SolutionHowProps, 'entry'> = {
     },
     {
       title: 'Export',
-      body: 'Export Markdown, and write DOCX and PDF with writers Texuli owns; the pages export entry hands the result to the browser.',
+      body: 'Markdown, DOCX and PDF from writers Texuli owns; the pages export entry hands the file to the browser.',
       package: '@texuli/document',
     },
     {
       title: 'Sync, if you need it',
-      body: 'Merge edits from several replicas through the CRDT sync core. Your app supplies the transport.',
+      body: 'The CRDT sync core merges edits from several replicas; the collaborative editor adds comments, suggestions and version history. Your app supplies the transport.',
       package: '@texuli/document',
     },
   ],

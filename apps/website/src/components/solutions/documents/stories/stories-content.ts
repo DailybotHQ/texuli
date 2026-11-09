@@ -5,36 +5,33 @@
  * contains the named marker (a README, a test or the demo fixture). The test checks that
  * every cited file exists and contains its marker. Paged-view editing is planned, so the
  * reading story names that capability and the shared block shows its planned chip.
+ *
+ * Three stories, in the order of their art (edit, read, export). With no `art` of their
+ * own, each paints its reserved `solution-documents-story-<n>` slot
+ * (`shared/art/art-slots.ts`). Collaboration is told by the last how-it-works step.
  */
 import type { SolutionStoriesProps } from '../../shared/types.ts';
 
 export const DOCUMENTS_STORIES: Omit<SolutionStoriesProps, 'entry'> = {
-  title: 'What a document can do',
+  title: 'One document. Every way to work with it.',
   stories: [
     {
       id: 'edit',
-      title: 'Every edit can be undone',
+      title: 'Edit without fear: every change can be undone',
       body: 'Each change is a typed operation with an exact inverse, kept in one op log, so undo and redo always work. The editor adds a slash menu of every block type and block drag with keyboard equivalents.',
       capabilities: ['edit'],
     },
     {
       id: 'read',
-      title: 'Read it, or see it on real pages',
+      title: 'From the editor to the reader to the printed page',
       body: 'A read-only reader gives headings anchors and an outline. The paged view lays the same document out on real pages with headers and footers, and prints one sheet per page. Editing in the paged view is planned.',
       capabilities: ['read', 'paged-editing'],
-      art: { slot: 'page-documents', variant: 'banner' },
     },
     {
       id: 'export',
-      title: 'Markdown, DOCX and PDF from one source',
-      body: 'Import and export Markdown, and write DOCX and PDF with writers Texuli owns, all from the same block document.',
+      title: 'One source, three formats',
+      body: 'Import and export Markdown, and write DOCX and PDF with writers Texuli owns. Every format comes from the same block document, so nothing is converted by hand.',
       capabilities: ['export'],
-    },
-    {
-      id: 'collaborate',
-      title: 'Work on it together',
-      body: 'A CRDT sync core merges edits from several replicas. The collaborative editor adds comments anchored to the text, suggestions to accept or reject, and version history with restore. Your app supplies the transport.',
-      capabilities: ['collaborate'],
     },
   ],
 };
@@ -125,37 +122,5 @@ export const DOCUMENTS_STORY_EVIDENCE: Readonly<Record<string, readonly StoryCla
       marker: 'docx',
     },
     { claim: 'PDF output is tested', source: 'packages/document/tests/pdf.test.ts', marker: 'pdf' },
-  ],
-  collaborate: [
-    {
-      claim: 'A CRDT sync core',
-      source: 'packages/document/README.md',
-      marker: 'the CRDT sync core',
-    },
-    {
-      claim: 'Comments anchored to the text',
-      source: 'packages/pages/README.md',
-      marker: 'comments anchored to the text',
-    },
-    {
-      claim: 'Suggestions with accept and reject',
-      source: 'packages/pages/README.md',
-      marker: 'suggestions with accept and reject',
-    },
-    {
-      claim: 'Version history with restore',
-      source: 'packages/pages/README.md',
-      marker: 'version history with restore',
-    },
-    {
-      claim: 'Replicas converge',
-      source: 'packages/document/tests/collab-convergence.test.ts',
-      marker: 'converge',
-    },
-    {
-      claim: 'The host app supplies the transport (no hosted service)',
-      source: 'apps/website/src/data/solutions/entries/documents.ts',
-      marker: 'Collaboration needs a transport from the host app',
-    },
   ],
 };
