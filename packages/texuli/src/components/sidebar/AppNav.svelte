@@ -118,7 +118,7 @@ const rootClass = $derived(
   data-mobile-open={mobileOpen ? '' : undefined}
   data-drawer-ready={drawerReady ? 'true' : 'false'}
   {...rest}
->
+ data-tx-component="app-nav" data-tx-variant={variant}>
   <div class="tx-app-nav__sidebar" data-tx-app-nav-sidebar>
     <Sidebar
       {items}

@@ -72,7 +72,7 @@ const selectedDetail = $derived(detailActive && hasDetail);
   data-breakpoint={breakpoint}
   style:--tx-split-view-list-width={listTrack}
   {...rest}
->
+ data-tx-component="split-view">
   <div class="tx-app-layout__split-panes">
     <section class="tx-app-layout__split-list" aria-label={listLabel}>{@render list()}</section>
     <section class="tx-app-layout__split-detail" aria-label={detailLabel}>

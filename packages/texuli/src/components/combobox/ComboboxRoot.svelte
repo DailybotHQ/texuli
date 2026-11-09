@@ -10,6 +10,7 @@ import './combobox.css';
 import { designDefaults } from '../../internal/design-defaults.ts';
 
 type Props = PrimitiveRootProps & {
+  'data-tx-component'?: string;
   children?: Snippet;
   size?: ComboboxSize;
   variant?: ComboboxVariant;
@@ -25,6 +26,7 @@ let {
   inputValue = $bindable(),
   size = txDefaults().size ?? 'md',
   variant = txDefaults().variant ?? 'outline',
+  'data-tx-component': componentAttribute,
   class: className,
   ...rest
 }: Props = $props();
@@ -43,6 +45,10 @@ const classes = $derived(
   data-size={size}
   data-variant={variant}
   data-multiple={multiple ? 'true' : undefined}
+ data-tx-component="combobox"
+  {...(componentAttribute ? { 'data-tx-component': componentAttribute } : {})}
+  data-tx-size={size}
+  data-tx-variant={variant}
 >
   <PrimitiveRoot bind:open bind:value bind:inputValue {multiple} {...rest}>
     {@render children?.()}

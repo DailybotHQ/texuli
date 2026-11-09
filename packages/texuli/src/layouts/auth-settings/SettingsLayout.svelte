@@ -85,7 +85,7 @@ async function backToList(): Promise<void> {
   data-tx-layout="settings"
   data-tx-settings-layout
   data-mode={mode}
->
+ data-tx-component="layout-settings">
   <header class="tx-settings-layout__header">
     <h1 class="tx-settings-layout__title">{title}</h1>
     {#if description}

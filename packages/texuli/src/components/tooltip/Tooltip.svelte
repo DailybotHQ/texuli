@@ -89,6 +89,7 @@ const contentClass = $derived(
       {sideOffset}
       class={contentClass}
       data-tx-tooltip
+      data-tx-component="tooltip"
       motionHooks={tooltipMotion}
     >
       <span class="tx-tooltip__body">

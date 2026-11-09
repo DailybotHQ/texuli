@@ -130,6 +130,9 @@ function handleClick(event: any): void {
     data-variant={variant}
     data-size={size}
     data-icon-size={iconSize}
+    data-tx-component="button"
+    data-tx-variant={variant}
+    data-tx-size={size}
     {...rest}
     onclick={handleClick}
   >
@@ -148,6 +151,9 @@ function handleClick(event: any): void {
     data-size={size}
     data-icon-size={iconSize}
     data-href-blocked="true"
+    data-tx-component="button"
+    data-tx-variant={variant}
+    data-tx-size={size}
     {...rest}
   >
     {@render content()}
@@ -169,6 +175,9 @@ function handleClick(event: any): void {
     data-variant={variant}
     data-size={size}
     data-icon-size={iconSize}
+    data-tx-component="button"
+    data-tx-variant={variant}
+    data-tx-size={size}
     {...rest}
     onclick={handleClick}
   >

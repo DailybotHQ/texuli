@@ -97,7 +97,7 @@ const word = $derived(
   data-trend={resolvedTrend}
   data-tone={accent}
   {...rest}
->
+ data-tx-component="stat" data-tx-variant={variant}>
   <div class="tx-stat__head">
     <p class="tx-stat__label" data-tx-stat-label>{label}</p>
     {#if icon}

@@ -11,6 +11,7 @@ import './marketing.css';
  * optional sections and footer. Logical CSS; RTL via inherited `dir`.
  */
 type Props = {
+  'data-tx-component'?: string;
   /** LayoutHost integration; the stable routed screen mounts in the main column. */
   mountScreen?: LayoutProps['mountScreen'];
   /** Accepted for LayoutHost compatibility; marketing pages usually use slots. */
@@ -48,6 +49,7 @@ let {
   heroLabel: heroLabelProp,
   contentLabel: contentLabelProp,
   class: className,
+  ...rest
 }: Props = $props();
 const msg = useMessages();
 const navigationLabel = $derived(
@@ -76,6 +78,8 @@ $effect(() => {
   bind:this={root}
   class={cx('tx-marketing-layout', className)}
   data-tx-marketing-layout=""
+ data-tx-component="layout-marketing"
+  {...rest}
 >
   <header class="tx-marketing-layout__header">
     <div class="tx-marketing-layout__header-inner">

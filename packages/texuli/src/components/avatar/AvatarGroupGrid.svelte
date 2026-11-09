@@ -60,7 +60,7 @@ function quarter(index: number): boolean {
   data-layout="grid"
   data-count={cells}
   {...rest}
->
+ data-tx-component="avatar-group-grid" data-tx-size={size}>
   {#each visible as item, index (item.name + String(index))}
     <Avatar
       name={item.name}

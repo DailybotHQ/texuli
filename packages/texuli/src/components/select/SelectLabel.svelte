@@ -17,6 +17,6 @@ let { children, class: className, ref = $bindable(null), ...rest }: Props = $pro
   that group (select group context → aria-labelledby). Like the primitive,
   it must sit inside a Select.Group.
 -->
-<PrimitiveGroupLabel bind:ref class={selectLabelClass({ class: className })} data-tx-select-label {...rest}>
+<PrimitiveGroupLabel bind:ref class={selectLabelClass({ class: className })} data-tx-select-label {...rest} data-tx-component="select-label">
   {@render children?.()}
 </PrimitiveGroupLabel>

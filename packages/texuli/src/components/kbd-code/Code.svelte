@@ -47,7 +47,7 @@ const text = $derived(typeof value === 'string' ? value : undefined);
     class="tx-code-block"
     data-tx-code-block
     data-language={language || undefined}
-  ><code
+   data-tx-component="code" data-tx-variant={variant}><code
       bind:this={ref}
       class={classes}
       data-tx-code
@@ -64,6 +64,8 @@ const text = $derived(typeof value === 'string' ? value : undefined);
     data-tx-code
     data-variant="inline"
     data-language={language || undefined}
+    data-tx-component="code"
+    data-tx-variant={variant}
     {...rest}
     >{#if text !== undefined}{text}{:else}{@render children?.()}{/if}</code
   >

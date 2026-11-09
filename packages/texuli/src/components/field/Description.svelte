@@ -15,4 +15,4 @@ let { class: className, children, ref = $bindable(null), ...rest }: Props = $pro
 const classes = $derived(cx(descriptionClass(), className));
 </script>
 
-<p bind:this={ref} class={classes} data-tx-description="" {...rest}>{@render children?.()}</p>
+<p bind:this={ref} class={classes} data-tx-description="" {...rest} data-tx-component="description">{@render children?.()}</p>

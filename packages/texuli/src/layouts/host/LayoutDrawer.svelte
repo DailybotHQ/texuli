@@ -37,7 +37,7 @@ function setOpen(next: boolean): void {
 }
 </script>
 
-<div bind:this={root} data-tx-layout-drawer-root="">
+<div bind:this={root} data-tx-layout-drawer-root="" data-tx-component="layout-drawer">
   <Dialog.Root bind:open onOpenChange={setOpen}>
     <Dialog.Portal>
       <Dialog.Overlay class="tx-layout-drawer-overlay" data-tx-layout-drawer-overlay="" />

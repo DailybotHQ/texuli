@@ -32,4 +32,4 @@ const sheetMotion = createOverlayMotion({
 const classes = $derived(cx(drawerContentClass({ size }), className));
 </script>
 
-<Primitive.Content bind:ref {...rest} motionHooks={sheetMotion} {side} bind:activeSnapPoint class={classes} data-tx-drawer="" data-size={size} />
+<Primitive.Content bind:ref {...rest} motionHooks={sheetMotion} {side} bind:activeSnapPoint class={classes} data-tx-drawer="" data-size={size}  data-tx-component="drawer" data-tx-size={size}/>

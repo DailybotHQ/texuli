@@ -38,6 +38,6 @@ const classes = $derived(
   data-size={size}
   data-variant={variant}
   {...rest}
->
+ data-tx-component="menubar-trigger" data-tx-size={size} data-tx-variant={variant}>
   {@render children?.()}
 </MenubarPrimitive.Trigger>

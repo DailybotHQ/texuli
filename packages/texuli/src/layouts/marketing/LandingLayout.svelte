@@ -57,7 +57,7 @@ const secondary = $derived(normalizeCta(secondaryCta));
 const safeBrandHref = $derived(safeHref(brandHref, 'developer' as HrefTrust) ?? '#/');
 </script>
 
-<MarketingLayout class={cx(className)} {navigationLabel} {sections} {footer}>
+<MarketingLayout class={cx(className)} {navigationLabel} {sections} {footer} data-tx-component="layout-landing">
   {#snippet brand()}
     {#if brandSlot}
       {@render brandSlot()}

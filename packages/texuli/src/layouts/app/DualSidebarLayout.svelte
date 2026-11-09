@@ -68,7 +68,7 @@ const sections = $derived(appSidebarSections(resolved));
   bind:this={root}
   class={cx('tx-app-layout', 'tx-app-layout--three-pane', className)}
   data-tx-app-layout="three-pane"
->
+ data-tx-component="layout-dual-sidebar">
   <LayoutChrome part="skip" {mainId} {nav} {skipLabel} />
   <!--
     One main landmark: AppNav's, unless the layout already sits inside a page

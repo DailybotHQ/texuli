@@ -72,7 +72,7 @@ function statusPhrase(state: StepperStepState): string {
   class={stepperClass({ orientation, class: className })}
   data-tx-stepper
   data-orientation={orientation}
->
+ data-tx-component="stepper">
   <ol class="tx-stepper__list">
     {#each steps as step, index (step.id)}
       {@const state = stateFor(index, step.id)}

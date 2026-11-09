@@ -15,7 +15,7 @@ function handleOpenChange(next: boolean): void {
 }
 </script>
 
-<div data-tx-hover-card-root class="tx-hover-card-root">
+<div data-tx-hover-card-root class="tx-hover-card-root" data-tx-component="hover-card">
   <PrimitiveRoot bind:open onOpenChange={handleOpenChange} {...rest}>
     {@render children?.()}
   </PrimitiveRoot>

@@ -23,5 +23,5 @@ const hasLabel = $derived(typeof label === 'string' && label.length > 0);
 </script>
 
 <kbd bind:this={ref} class={classes} data-tx-kbd {...rest}
-  >{#if hasLabel}{label}{:else}{@render children?.()}{/if}</kbd
+   data-tx-component="kbd">{#if hasLabel}{label}{:else}{@render children?.()}{/if}</kbd
 >

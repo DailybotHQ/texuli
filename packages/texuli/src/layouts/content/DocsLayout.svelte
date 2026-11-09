@@ -5,4 +5,4 @@ import ContentLayout from './ContentLayout.svelte';
 let props: LayoutProps = $props();
 </script>
 
-<ContentLayout kind="docs" {...props} />
+<ContentLayout kind="docs" {...props}  data-tx-component="layout-docs"/>

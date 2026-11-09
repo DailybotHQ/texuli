@@ -17,6 +17,6 @@ let { children, class: className, ref = $bindable(null), ...rest }: Props = $pro
   the Select.Label inside it publishes its id through the select group
   context and the primitive wires `aria-labelledby` (APG listbox grouping).
 -->
-<PrimitiveGroup bind:ref class={selectGroupClass({ class: className })} data-tx-select-group {...rest}>
+<PrimitiveGroup bind:ref class={selectGroupClass({ class: className })} data-tx-select-group {...rest} data-tx-component="select-group">
   {@render children?.()}
 </PrimitiveGroup>

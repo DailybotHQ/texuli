@@ -41,7 +41,7 @@ const classes = $derived(
   {disabled}
   {...rest}
 >
-  <span class="tx-select-item__check" aria-hidden="true">
+  <span class="tx-select-item__check" aria-hidden="true" data-tx-component="select-item">
     <svg viewBox="0 0 16 16" width="16" height="16" focusable="false">
       <path
         d="M3.5 8.25 6.75 11.5 12.5 4.75"

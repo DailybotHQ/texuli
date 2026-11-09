@@ -59,6 +59,6 @@ let {
   aria-label={badgeLabel ? `${label} (${badgeLabel})` : label}
   data-tx-badge={badge}
   loadingLabel={label}
->
+ data-tx-component="icon-button">
   {@render children?.()}
 </Button>

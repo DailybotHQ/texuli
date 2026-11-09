@@ -121,7 +121,7 @@ const controlClass = $derived(
     class={cx('tx-choice', className)}
     data-tx-choice-field="checkbox"
     {...split.wrapper}
-  >
+   data-tx-component="checkbox" data-tx-size={size}>
     <span class="tx-choice__hit">{@render box()}</span>
     <div class="tx-choice__copy">
       <label class="tx-choice__label" for={id}>{label}{@render labelContent?.()}</label>

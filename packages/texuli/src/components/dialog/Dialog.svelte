@@ -171,6 +171,8 @@ function setOpen(next: boolean): void {
       class={contentClass}
       data-tx-dialog=""
       data-size={size}
+      data-tx-component="dialog"
+      data-tx-size={size}
       data-state={open ? 'open' : 'closed'}
       motionHooks={panelMotion}
       {@attach bindRef}

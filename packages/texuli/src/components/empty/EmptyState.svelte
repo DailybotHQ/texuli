@@ -51,7 +51,7 @@ let {
   data-tx-empty
   data-size={size}
   {...rest}
->
+ data-tx-component="empty-state" data-tx-size={size}>
   <div class="tx-empty__icon" aria-hidden="true" data-tx-empty-icon>
     {#if illustration}
       {@render illustration()}

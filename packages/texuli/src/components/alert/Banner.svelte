@@ -8,4 +8,4 @@ type Props = Omit<ComponentProps<typeof AlertSurface>, 'layout'>;
 let { ref = $bindable(null), ...rest }: Props = $props();
 </script>
 
-<AlertSurface layout="banner" bind:ref {...rest} />
+<AlertSurface layout="banner" bind:ref {...rest}  data-tx-component="banner"/>

@@ -99,7 +99,7 @@ function isCurrent(item: BreadcrumbItem, index: number): boolean {
   data-tx-breadcrumb
   data-size={size}
   aria-label={label}
->
+ data-tx-component="breadcrumb" data-tx-size={size}>
   <ol class={breadcrumbListClass()}>
     {#each display as entry, i (entry.kind === 'ellipsis' ? `e-${i}` : entry.index)}
       {#if entry.kind === 'ellipsis'}

@@ -21,6 +21,7 @@ import './content.css';
 
 type Kind = 'docs' | 'blog' | 'editorial';
 type Props = {
+  'data-tx-component'?: string;
   kind: Kind;
   /**
    * Imperative mount (the layout-host contract): called once with the
@@ -77,6 +78,7 @@ let {
   path,
   options,
   class: className,
+  ...rest
 }: Props = $props();
 const msg = useMessages();
 let screenTarget = $state<HTMLElement>();
@@ -235,6 +237,8 @@ function safeNavHref(href: string): string | undefined {
   bind:this={root}
   class={cx('tx-content-layout', className)}
   data-tx-content-layout={kind}
+ data-tx-component="content-layout"
+  {...rest}
 >
   <header class="tx-content-layout__header">
     <LayoutChrome part="skip" mainId={mainId} />

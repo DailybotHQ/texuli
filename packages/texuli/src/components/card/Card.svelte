@@ -88,7 +88,7 @@ const classes = $derived(
     data-interactive="true"
     aria-label={linkLabel}
     {...rest as HTMLAttributes<HTMLAnchorElement>}
-  >
+   data-tx-component="card" data-tx-variant={variant}>
     {@render children?.()}
   </a>
 {:else}
@@ -97,6 +97,8 @@ const classes = $derived(
     class={classes}
     data-tx-card
     data-variant={variant}
+    data-tx-component="card"
+    data-tx-variant={variant}
     {...rest as HTMLAttributes<HTMLDivElement>}
   >
     {@render children?.()}

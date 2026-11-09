@@ -30,4 +30,4 @@ const sheetMotion = createOverlayMotion({
 const classes = $derived(cx(responsiveModalContentClass({ size }), className));
 </script>
 
-<Primitive.Content bind:ref {...rest} motionHooks={sheetMotion} class={classes} data-tx-responsive-modal="" data-size={size} />
+<Primitive.Content bind:ref {...rest} motionHooks={sheetMotion} class={classes} data-tx-responsive-modal="" data-size={size}  data-tx-component="responsive-modal" data-tx-size={size}/>

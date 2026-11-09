@@ -31,4 +31,4 @@ const sheetMotion = createOverlayMotion({
 const classes = $derived(cx(sheetContentClass({ size }), className));
 </script>
 
-<Primitive.Content bind:ref {...rest} motionHooks={sheetMotion} {side} class={classes} data-tx-sheet="" data-size={size} />
+<Primitive.Content bind:ref {...rest} motionHooks={sheetMotion} {side} class={classes} data-tx-sheet="" data-size={size}  data-tx-component="sheet" data-tx-size={size}/>
