@@ -1,6 +1,7 @@
 import { buildCatalog, type CatalogBuild } from '@texuli/catalog/build';
 import { validateCatalogManifest, validateCatalogManifests } from '@texuli/catalog/manifest';
 import { ALL_MANIFEST_GROUPS } from '@texuli/catalog/manifests/all';
+import type { SpecCatalog, SpecComponent } from '@texuli/spec';
 import { defineOperation } from './registry.ts';
 import type { JsonSchema } from './schema.ts';
 import { type Operation, OperationError } from './types.ts';
@@ -26,6 +27,42 @@ let cached: Promise<CatalogBuild> | undefined;
 export function loadOpsCatalog(): Promise<CatalogBuild> {
   cached ??= buildCatalog(ALL_MANIFEST_GROUPS);
   return cached;
+}
+
+/** Project the built catalog into the spec shape consumed by full design-system checks. */
+export async function loadSpecCatalog(): Promise<SpecCatalog> {
+  const build = await loadOpsCatalog();
+  const components = build.catalog.entries.map((entry) => {
+    const axes: NonNullable<SpecComponent['axes']> = {};
+    for (const axis of ['variant', 'size', 'tone', 'density'] as const) {
+      const propName = entry.axes?.[axis];
+      const prop = entry.props.find((candidate) => candidate.name === propName);
+      const values = prop?.enumValues;
+      if (propName && prop && values?.length) {
+        const fallback = values[0] as string;
+        const value = prop.default;
+        axes[axis] = {
+          prop: propName,
+          values,
+          default: typeof value === 'string' && values.includes(value) ? value : fallback,
+        };
+      }
+    }
+    return {
+      id: entry.id,
+      label: entry.label,
+      summary: entry.summary,
+      group: entry.group,
+      placement: entry.tier,
+      emit: entry.emit,
+      capability: 'unknown',
+      props: entry.props,
+      ...(entry.imports?.length ? { imports: entry.imports } : {}),
+      ...(Object.keys(axes).length ? { axes } : {}),
+      ...(entry.states?.length ? { states: entry.states } : {}),
+    } satisfies SpecComponent;
+  });
+  return { catalogHash: build.hash, components };
 }
 
 const limitSchema: JsonSchema = {

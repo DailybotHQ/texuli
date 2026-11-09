@@ -5,7 +5,7 @@
  * local MCP and the remote MCP give the same results:
  *
  *     texuli ds init <file> [--brand "<one-liner>"] [--id <id>] [--name <name>] [--locked [--preset all|minimal|<allow.json>]] [--overwrite]
- *     texuli ds validate <file> [--trust t] [--variant v] [--base <file>]...
+ *     texuli ds validate <file> [--trust t] [--variant v] [--base <file>]... [--locked] [--prototype <dir>] [--catalog <file>] [--json] [--render] [--strict] [--report]
  *     texuli ds compile <file> [--format f] [--mode m] [--variant v] [--base <file>]... [--out <path> [--overwrite]]
  *     texuli ds export <file> --format css|tailwind|dtcg|tokens-studio --out <path> [--selector s] [--dark d] [--overwrite]
  *     texuli ds preview <file> [--format svg|html] [--mode m] [--variant v] [--out <path> [--overwrite]]
@@ -73,7 +73,7 @@ export type DsCommand = (typeof DS_COMMANDS)[number];
 
 export const DS_USAGE = [
   'Usage: texuli ds init <file> [--brand "<one-liner>"] [--id <id>] [--name <name>] [--locked [--preset all|minimal|<allow.json>]] [--overwrite]',
-  '       texuli ds validate <file> [--trust developer|untrusted] [--variant <name>] [--base <file>]...',
+  '       texuli ds validate <file> [--trust developer|untrusted] [--variant <name>] [--base <file>]... [--locked] [--prototype <dir>] [--catalog <components.json>] [--json] [--render] [--strict] [--report]',
   '       texuli ds compile <file> [--format json|css|tailwind|dtcg|tokens-studio] [--mode light|dark] [--variant <name>] [--base <file>]... [--out <path> [--overwrite]]',
   '       texuli ds export <file> --format css|tailwind|dtcg|tokens-studio --out <path> [--selector <s>] [--dark class|attribute|media] [--overwrite]',
   '       texuli ds preview <file> [--format svg|html] [--mode light|dark] [--variant <name>] [--out <path> [--overwrite]]',
@@ -101,7 +101,7 @@ export interface DsCommandArgs {
 /** The value flags each command accepts (`--base` repeats and `--overwrite` takes none). */
 const FLAGS: Record<DsCommandArgs['command'], readonly string[]> = {
   init: ['brand', 'id', 'name', 'preset'],
-  validate: ['trust', 'variant', 'base'],
+  validate: ['trust', 'variant', 'base', 'prototype', 'catalog'],
   compile: ['format', 'mode', 'variant', 'trust', 'base', 'out', 'selector', 'dark'],
   export: ['format', 'mode', 'variant', 'trust', 'base', 'out', 'selector', 'dark'],
   preview: ['format', 'mode', 'variant', 'trust', 'base', 'out', 'title'],
@@ -192,8 +192,14 @@ export function parseDsArgs(
       continue;
     }
     if (arg === '--locked') {
-      if (name !== 'init') throw new TypeError('Flag --locked belongs to ds init.');
+      if (name !== 'init' && name !== 'validate')
+        throw new TypeError('Flag --locked belongs to ds init or ds validate.');
       parsed.locked = true;
+      continue;
+    }
+    if (['--json', '--render', '--strict', '--report'].includes(arg)) {
+      if (name !== 'validate') throw new TypeError(`Flag ${arg} belongs to ds validate.`);
+      parsed.flags[arg.slice(2)] = 'true';
       continue;
     }
     if (arg.startsWith('--')) {
@@ -222,6 +228,10 @@ export function parseDsArgs(
   if (name === 'import' && !parsed.flags.from) throw new TypeError('ds import needs --from.');
   if (name === 'approve' && !parsed.flags.by?.trim())
     throw new TypeError('ds approve needs --by <name>.');
+  if (name === 'validate' && parsed.flags.report === 'true' && !parsed.locked)
+    throw new TypeError('Flag --report needs --locked.');
+  if (name === 'validate' && parsed.flags.strict === 'true' && parsed.flags.render !== 'true')
+    throw new TypeError('Flag --strict needs --render.');
   if (name === 'pack' && !parsed.flags.out) throw new TypeError('ds pack needs --out.');
   if (parsed.flags.preset !== undefined && !parsed.locked)
     throw new TypeError('Flag --preset needs --locked.');
@@ -395,12 +405,39 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
   }
   if (args.command === 'help') {
     stdout.write(
-      `${DS_USAGE}\n\nAuthor and check design-system documents. Import, validate, compile, preview and diff print their operation JSON; --out writes the result through the local file policy. generate composes the available inputs and writes the document plus <out>.report.json; -o is its output shorthand. check is the conformance check (texuli ds check --help).\nExit 0 valid, 1 refused, 2 could not run.\n`
+      `${DS_USAGE}\n\nAuthor and check design-system documents. Import, validate, compile, preview and diff print their operation JSON; --out writes the result through the local file policy. generate composes the available inputs and writes the document plus <out>.report.json; -o is its output shorthand. check is the conformance check (texuli ds check --help). Locked validation accepts --prototype <dir>, --catalog <components.json>, --json, and --render; --report lists findings and exits 0 for migration tracking.\nExit 0 valid or report-only, 1 refused/finding, 2 could not run. The check cannot prove who approved a document.\n`
     );
     return { ok: true };
   }
   if (args.command === 'check') {
     const result = await runDsCli(args.argv, io);
+    return result.ok ? { ok: true } : { ok: false, error: result.error };
+  }
+  if (
+    args.command === 'validate' &&
+    (args.locked ||
+      ['catalog', 'json', 'render', 'strict', 'report', 'prototype'].some(
+        (flag) => args.flags[flag] !== undefined
+      ))
+  ) {
+    const cwd = io.cwd ?? process.cwd();
+    const result = await runDsCli(
+      [
+        'check',
+        resolve(cwd, args.args[0] as string),
+        '--locked',
+        ...(args.flags.trust ? ['--trust', args.flags.trust] : []),
+        ...(args.flags.variant ? ['--variant', args.flags.variant] : []),
+        ...args.bases.flatMap((base) => ['--base', resolve(cwd, base)]),
+        ...(args.flags.catalog ? ['--catalog', resolve(cwd, args.flags.catalog)] : []),
+        ...(args.flags.prototype ? ['--prototype', resolve(cwd, args.flags.prototype)] : []),
+        ...(args.flags.json === 'true' ? ['--json'] : []),
+        ...(args.flags.render === 'true' ? ['--render'] : []),
+        ...(args.flags.strict === 'true' ? ['--strict'] : []),
+        ...(args.flags.report === 'true' ? ['--report'] : []),
+      ],
+      io
+    );
     return result.ok ? { ok: true } : { ok: false, error: result.error };
   }
   if (args.command === 'generate') {

@@ -8,6 +8,8 @@
  * the same). Pure and deterministic: no time, no randomness, no network;
  * only `ds.save` writes, through the door's local writer.
  */
+
+import type { SpecCatalog } from '@texuli/spec';
 import {
   type CompiledDesignSystem,
   compileDesignSystem,
@@ -40,8 +42,10 @@ import {
   type DesignSystem,
 } from '@texuli/tokens/design-system/validate';
 import { getFullThemeMeta, loadFullLibraryTheme } from '@texuli/tokens/library-expand';
+import { checkDesignSystemFull, type DsFullFinding } from '../ds-check/full.ts';
 import { checkDesignSystem, loadDesignSystemBases, toIssue } from '../ds-check/static.ts';
 import type { DsCheckIssue, DsCheckMode } from '../ds-check/types.ts';
+import { loadSpecCatalog } from './catalog.ts';
 import { DESIGN_SYSTEM_EXAMPLES } from './design-system-examples.ts';
 import { previewSvg } from './design-system-preview.ts';
 import { PREVIEW_TOKENS } from './themes.ts';
@@ -125,6 +129,15 @@ const identity = (compiled: CompiledDesignSystem) => ({
 // ─── ds.validate ───────────────────────────────────────────────────────────
 
 export async function runValidate(input: Input) {
+  if (
+    input.full === true ||
+    input.report === true ||
+    input.strict === true ||
+    input.catalog !== undefined ||
+    input.extensions !== undefined ||
+    input.prototype !== undefined
+  )
+    return runFullValidate(input);
   const variant = typeof input.variant === 'string' ? input.variant : undefined;
   const report = await checkDesignSystem(input.document, {
     trust: trustOf(input),
@@ -140,6 +153,53 @@ export async function runValidate(input: Input) {
     errors: report.errors,
     warnings: base?.warnings ?? [],
     variants: report.runs.flatMap((run) => (run.variant ? [run.variant] : [])),
+  };
+}
+
+/** Full, framework-free locked validator exposed through the shared MCP operation. */
+async function runFullValidate(input: Input) {
+  const catalog =
+    isRecord(input.catalog) && Array.isArray(input.catalog.components)
+      ? (input.catalog as unknown as SpecCatalog)
+      : await loadSpecCatalog();
+  let report = await checkDesignSystemFull(input.document, {
+    catalog,
+    ...(Array.isArray(input.extensions) ? { extensions: input.extensions } : {}),
+    base: basesOf(input),
+    trust: trustOf(input),
+    hashes: true,
+    ...(isRecord(input.prototype) ? { prototype: input.prototype } : {}),
+  });
+  if (input.strict === true && report.summary.warnings > 0) {
+    const findings = report.findings.map(
+      (finding): DsFullFinding =>
+        finding.severity === 'warning' ? { ...finding, severity: 'error' } : finding
+    );
+    report = {
+      ...report,
+      ok: false,
+      codes: [
+        ...new Set(findings.filter((item) => item.severity === 'error').map((item) => item.code)),
+      ].sort(),
+      summary: {
+        errors: report.summary.errors + report.summary.warnings,
+        warnings: 0,
+        info: report.summary.info,
+      },
+      findings,
+    };
+  }
+  return {
+    ...report,
+    valid: report.ok,
+    errors: report.findings
+      .filter((finding) => finding.severity === 'error')
+      .map(({ code, path, message, hint }) => ({ code, path, message, hint })),
+    warnings: report.findings
+      .filter((finding) => finding.severity === 'warning')
+      .map(({ code, path, message }) => ({ code, path, message })),
+    variants: report.check.runs.flatMap((run) => (run.variant ? [run.variant] : [])),
+    reportOnly: input.report === true,
   };
 }
 

@@ -208,10 +208,13 @@ describe('texuli ds init --locked, approve and hash', () => {
       flags: { by: 'Ana', version: '1.1.0' },
     });
     expect(parseDsArgs(['hash', 'a.json'])).toMatchObject({ command: 'hash', args: ['a.json'] });
+    expect(parseDsArgs(['validate', 'a.json', '--locked'])).toMatchObject({
+      command: 'validate',
+      locked: true,
+    });
     for (const [argv, message] of [
       [['approve', 'a.json'], /needs --by/u],
       [['init', 'a.json', '--preset', 'all'], /--preset needs --locked/u],
-      [['validate', 'a.json', '--locked'], /--locked belongs to ds init/u],
       [['hash'], /takes one argument/u],
     ] as const)
       expect(() => parseDsArgs(argv), argv.join(' ')).toThrow(message);
