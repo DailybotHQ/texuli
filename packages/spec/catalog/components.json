@@ -1,6 +1,83 @@
 {
-  "catalogHash": "a2f97e1879dd06e022aca8bfa5f8f376ecaf78867f3efb70c85c87fe6d73149c",
+  "catalogHash": "bcdf18540a827bbffc0e643ee579c7518bc8eaa4154ac4fa6bc2e773fafb855f",
   "components": [
+    {
+      "axes": {
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "bordered"]
+        }
+      },
+      "capability": "web-only",
+      "emit": [],
+      "events": ["collapse"],
+      "group": "display",
+      "id": "accordion",
+      "imports": [
+        {
+          "exports": ["Accordion"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Accordion"],
+          "module": "texuli/tabs-accordion"
+        }
+      ],
+      "label": "Accordion",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "collapsible"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "content"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "number",
+          "name": "headingLevel"
+        },
+        {
+          "kind": "array",
+          "name": "items",
+          "required": true
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "enumValues": ["single", "multiple"],
+          "kind": "enum",
+          "name": "type"
+        },
+        {
+          "extension": "web",
+          "kind": "unknown",
+          "name": "value"
+        },
+        {
+          "enumValues": ["default", "bordered"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "states": ["hover", "focus-visible", "disabled", "expanded"],
+      "summary": "Stacked sections that expand and collapse one or more panels."
+    },
     {
       "capability": "web-only",
       "emit": ["developer", "untrusted"],
@@ -1069,6 +1146,55 @@
       ],
       "states": ["focus-visible", "invalid", "checked", "open"],
       "summary": "Validated heading, paragraph, list, quote and callout content."
+    },
+    {
+      "capability": "web-only",
+      "emit": [],
+      "group": "layouts",
+      "id": "bottom-nav",
+      "imports": [
+        {
+          "exports": ["BottomNav"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["BottomNav"],
+          "module": "texuli/layouts/mobile"
+        }
+      ],
+      "label": "BottomNav",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "fixed"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "hrefTrust"
+        },
+        {
+          "kind": "array",
+          "name": "items",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onSelect"
+        }
+      ],
+      "summary": "A mobile tab bar of destinations. Host chrome; agents never emit it."
     },
     {
       "axes": {
@@ -3069,7 +3195,6 @@
             "ChatStreamEvent",
             "ChatThread",
             "ChatThreadDisplay",
-            "Composer",
             "ComposerActionContext",
             "ComposerLabels",
             "DEFAULT_COMPOSER_LABELS",
@@ -3726,6 +3851,75 @@
       ],
       "states": ["focus-visible", "disabled", "selected", "open"],
       "summary": "Dialog-hosted command palette with search and recent items."
+    },
+    {
+      "capability": "web-only",
+      "emit": [],
+      "events": ["submit"],
+      "group": "chat",
+      "id": "composer",
+      "imports": [
+        {
+          "exports": ["Composer"],
+          "module": "@texuli/chat"
+        }
+      ],
+      "label": "Composer",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "enumValues": ["stack", "row"],
+          "kind": "enum",
+          "name": "layout"
+        },
+        {
+          "kind": "number",
+          "name": "maxLength"
+        },
+        {
+          "kind": "number",
+          "name": "maxRows"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onStop"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onSubmit",
+          "required": true
+        },
+        {
+          "enumValues": ["label", "icon"],
+          "kind": "enum",
+          "name": "sendButton"
+        },
+        {
+          "kind": "boolean",
+          "name": "sending"
+        },
+        {
+          "kind": "boolean",
+          "name": "streaming"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        }
+      ],
+      "states": ["disabled", "loading"],
+      "summary": "The host reply box for a chat thread. Host chrome; agents never emit it."
     },
     {
       "capability": "web-only",
@@ -9028,6 +9222,89 @@
       "summary": "Top-level menubar item that opens a menu."
     },
     {
+      "capability": "web-only",
+      "emit": [],
+      "group": "layouts",
+      "id": "mobile-header",
+      "imports": [
+        {
+          "exports": ["MobileHeader"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["MobileHeader"],
+          "module": "texuli/layouts/mobile"
+        }
+      ],
+      "label": "MobileHeader",
+      "placement": "app",
+      "props": [
+        {
+          "kind": "string",
+          "name": "backHref"
+        },
+        {
+          "kind": "string",
+          "name": "backLabel"
+        },
+        {
+          "kind": "string",
+          "name": "backTarget"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "string",
+          "name": "closeHref"
+        },
+        {
+          "kind": "string",
+          "name": "closeLabel"
+        },
+        {
+          "kind": "string",
+          "name": "eyebrow"
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "hrefTrust"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onBack"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onClose"
+        },
+        {
+          "kind": "boolean",
+          "name": "sticky"
+        },
+        {
+          "kind": "string",
+          "name": "subtitle"
+        },
+        {
+          "kind": "string",
+          "name": "title",
+          "required": true
+        },
+        {
+          "enumValues": ["h1", "h2", "p", "div"],
+          "kind": "enum",
+          "name": "titleAs"
+        }
+      ],
+      "summary": "A mobile stack header with back, title and actions. Host chrome; agents never emit it."
+    },
+    {
       "axes": {
         "size": {
           "default": "md",
@@ -11073,6 +11350,87 @@
       ],
       "states": ["focus-visible", "loading"],
       "summary": "A responsive data table with density, stacking and sticky header options."
+    },
+    {
+      "axes": {
+        "variant": {
+          "default": "line",
+          "prop": "variant",
+          "values": ["line", "pills", "enclosed"]
+        }
+      },
+      "capability": "web-only",
+      "emit": [],
+      "events": ["select"],
+      "group": "display",
+      "id": "tabs",
+      "imports": [
+        {
+          "exports": ["Tabs"],
+          "module": "texuli"
+        },
+        {
+          "exports": ["Tabs"],
+          "module": "texuli/tabs-accordion"
+        }
+      ],
+      "label": "Tabs",
+      "placement": "app",
+      "props": [
+        {
+          "enumValues": ["automatic", "manual"],
+          "kind": "enum",
+          "name": "activationMode"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "content"
+        },
+        {
+          "kind": "boolean",
+          "name": "disabled"
+        },
+        {
+          "kind": "array",
+          "name": "items",
+          "required": true
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "boolean",
+          "name": "loop"
+        },
+        {
+          "extension": "web",
+          "kind": "event",
+          "name": "onValueChange"
+        },
+        {
+          "enumValues": ["horizontal", "vertical"],
+          "kind": "enum",
+          "name": "orientation"
+        },
+        {
+          "kind": "string",
+          "name": "value"
+        },
+        {
+          "enumValues": ["line", "pills", "enclosed"],
+          "kind": "enum",
+          "name": "variant"
+        }
+      ],
+      "states": ["hover", "focus-visible", "disabled", "selected"],
+      "summary": "A tab list that shows one panel at a time."
     },
     {
       "axes": {

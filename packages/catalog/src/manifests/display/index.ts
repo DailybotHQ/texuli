@@ -3,6 +3,7 @@
  * Build-time only — the sink-free renderer must not import this module.
  */
 export {
+  accordionManifest,
   alertManifest,
   avatarGroupGridManifest,
   avatarManifest,
@@ -32,11 +33,13 @@ export {
   statManifest,
   stepperManifest,
   tableManifest,
+  tabsManifest,
   tagManifest,
   textManifest,
   timelineManifest,
 } from './manifests.ts';
 export {
+  accordionPropNames,
   alertPropNames,
   avatarGroupGridPropNames,
   avatarPropNames,
@@ -64,6 +67,7 @@ export {
   statPropNames,
   stepperPropNames,
   tablePropNames,
+  tabsPropNames,
   tagPropNames,
   textPropNames,
   timelinePropNames,

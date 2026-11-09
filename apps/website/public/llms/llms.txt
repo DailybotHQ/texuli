@@ -88,6 +88,7 @@ Ids agents may emit into a catalog tree (subject to tier rules). Untrusted model
 
 Developer-authored UI. Not agent-emittable by default (overlays, forms, display chrome).
 
+- [Accordion](components/accordion.md): Stacked sections that expand and collapse one or more panels.
 - [Alert](components/alert.md): Inline feedback for a page section (status or error).
 - [AlertDialog](components/alert-dialog.md): Modal confirm/cancel dialog for consequential actions.
 - [AnalyticsGrid](components/analytics-grid.md): Auto-fit KPI and widget grid for dashboard screens.
@@ -96,6 +97,7 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [AvatarGroupGrid](components/avatar-group-grid.md): Up to four faces in one avatar circle, +N past four.
 - [Badge](components/badge.md): A compact status or category label.
 - [Banner](components/banner.md): Full-width notice across a page or app shell.
+- [BottomNav](components/bottom-nav.md): A mobile tab bar of destinations. Host chrome; agents never emit it.
 - [Box](components/box.md): A panel or region with padding, radius, border, elevation and surface from tokens.
 - [Breadcrumb](components/breadcrumb.md): Hierarchy trail with URL-policy links.
 - [Button](components/button.md): A pressable action control with loading and optional link rendering.
@@ -109,6 +111,7 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [CodeField](components/code-field.md): An editable, syntax-highlighted code textarea.
 - [Combobox](components/combobox.md): A text input that filters a list of options, for one value or several.
 - [CommandPalette](components/command-palette.md): Dialog-hosted command palette with search and recent items.
+- [Composer](components/composer.md): The host reply box for a chat thread. Host chrome; agents never emit it.
 - [ContentLayout](components/content-layout.md): Shared docs/blog/editorial reading frame with optional TOC.
 - [ContextMenu](components/context-menu.md): Pointer-anchored menu (right-click, long-press, Menu key).
 - [ContextMenu.Trigger](components/context-menu-trigger.md): Region that opens the context menu.
@@ -155,6 +158,7 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [ListItem](components/list-item.md): A list row with a title, optional description, icon and trailing meta.
 - [Menubar](components/menubar.md): Application menubar with roving top-level items.
 - [Menubar.Trigger](components/menubar-trigger.md): Top-level menubar item that opens a menu.
+- [MobileHeader](components/mobile-header.md): A mobile stack header with back, title and actions. Host chrome; agents never emit it.
 - [MultiSelect](components/multi-select.md): A combobox for several values, shown as removable chips.
 - [NavIcon](components/nav-icon.md): Renders a nav model icon by name or component.
 - [NavigationMenu](components/navigation-menu.md): Site or app navigation with expandable triggers and links.
@@ -187,6 +191,7 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [Stepper](components/stepper.md): Horizontal or vertical progress through ordered steps.
 - [Switch](components/switch.md): An immediate on/off setting control.
 - [Table](components/table.md): A responsive data table with density, stacking and sticky header options.
+- [Tabs](components/tabs.md): A tab list that shows one panel at a time.
 - [Tag](components/tag.md): A labeled chip that can be removed.
 - [Text](components/text.md): Body copy, labels and small print with a size, tone and weight from the design system.
 - [TextCounter](components/text-counter.md): An input or textarea that shows remaining characters near the limit.

@@ -8,6 +8,7 @@
 export { LAYOUTS_AXIS_STAMP, stampLayoutsAxes } from './axes.ts';
 export {
   analyticsGridManifest,
+  bottomNavManifest,
   cardLayoutManifest,
   contentLayoutManifest,
   deckLayoutManifest,
@@ -33,6 +34,7 @@ export {
   layoutsManifestsById,
   layoutTopNavManifest,
   layoutWizardManifest,
+  mobileHeaderManifest,
   navIconManifest,
   pageLayoutManifest,
   screenOutletManifest,
@@ -42,6 +44,7 @@ export {
   analyticsGridPropNames,
   authSplitLayoutPropNames,
   blogLayoutPropNames,
+  bottomNavPropNames,
   cardLayoutPropNames,
   contentLayoutPropNames,
   dashboardGridLayoutPropNames,
@@ -59,6 +62,7 @@ export {
   layoutDrawerPropNames,
   layoutHostPropNames,
   marketingLayoutPropNames,
+  mobileHeaderPropNames,
   navIconPropNames,
   pageLayoutPropNames,
   pricingLayoutPropNames,

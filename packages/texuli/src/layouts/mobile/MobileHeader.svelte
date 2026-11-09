@@ -91,6 +91,7 @@ const backName = $derived(backTarget ? `${backLabel}: ${backTarget}` : undefined
     className
   )}
   data-tx-mobile-header=""
+  data-tx-component="mobile-header"
 >
   {#if leading}
     {@render leading()}

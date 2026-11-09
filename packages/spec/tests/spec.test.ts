@@ -359,9 +359,9 @@ describe('parity with the web packages', () => {
     }
   });
 
-  it('carries axes and states for all 182 components without axis drift', async () => {
+  it('carries axes and states for all 187 components without axis drift', async () => {
     const catalog = json<SpecCatalog>('catalog/components.json');
-    expect(catalog.components).toHaveLength(182);
+    expect(catalog.components).toHaveLength(187);
     expect(catalog).toEqual(await projectLiveCatalog());
     expect(checkCatalogVariants(catalog)).toEqual([]);
     expect(catalog.components.some((component) => component.axes || component.states)).toBe(true);

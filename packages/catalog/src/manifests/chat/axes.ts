@@ -4,6 +4,7 @@ import type { CatalogManifest, CatalogStateName } from '../../manifest/types.ts'
 const CHAT_AXIS_STAMP: Readonly<Record<string, { readonly states?: readonly CatalogStateName[] }>> =
   {
     'chat-thread': { states: ['disabled'] },
+    composer: { states: ['disabled', 'loading'] },
   };
 
 export function stampChatAxes(manifest: CatalogManifest): CatalogManifest {

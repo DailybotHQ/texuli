@@ -175,12 +175,10 @@ add(
   [
     'AppShell',
     'AuthSplitHostLayout',
-    'BottomNav',
     'DrawerScope',
     'MasterDetailLayout',
     'MobileAppFrame',
     'MobileDrawerLayout',
-    'MobileHeader',
     'MobileTabsLayout',
     'RailLayout',
     'WizardHostLayout',
@@ -261,7 +259,7 @@ add(
   'texuli',
   'planned',
   'Planned manifest: disclosure or wizard structure with a bindable open value.',
-  ['Accordion', 'Collapsible', 'Tabs', 'Wizard']
+  ['Collapsible', 'Wizard']
 );
 add('texuli', 'planned', 'Planned manifest: an input with a bindable value (spec 0.3.0 bind).', [
   'Calendar',
@@ -300,12 +298,6 @@ add('@texuli/data', 'planned', 'Planned manifest: an activity feed with reaction
 
 // ── @texuli/chat ───────────────────────────────────────────────
 add('@texuli/chat', 'part', 'A part of the live chat thread.', ['MessageList', 'TypingIndicator']);
-add(
-  '@texuli/chat',
-  'chrome',
-  'The composer is host chrome (player design §8): a blueprint never supplies one.',
-  ['Composer']
-);
 add(
   '@texuli/chat',
   'planned',
@@ -430,7 +422,10 @@ export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(row
 // pages that render a design-system document, never blueprint data. Raised to 222
 // for the kit's library and changes sections (KitLibrary, KitChanges, ApprovalBadge;
 // PLAN_016 T-t4-library), the same kit chrome, to 223 for KitVoice (T-t4-voice), and
-// to 224 for KitMatrix (T-t4-matrix). Lowered to 215 in PLAN_016 T-widen-display:
-// Icon, LucideIcon, Avatar, Skeleton, Progress, Spinner, Carousel, Separator
-// and ListItem became catalog ids. LucideIcon is a part of icon (216).
-export const EXCLUSION_CEILING = 216;
+// to 224 for KitMatrix (T-t4-matrix). Lowered to 219 in PLAN_016 T-widen-app:
+// Accordion, Tabs, BottomNav, MobileHeader and Composer gained manifests
+// (host chrome stays non-emittable; the allow set governs them). Lowered
+// again in PLAN_016 T-widen-display: Icon, Avatar, Skeleton, Progress, Spinner,
+// Carousel, Separator and ListItem became catalog ids (LucideIcon is a part of
+// icon). Combined ceiling is the live row count.
+export const EXCLUSION_CEILING = 211;
