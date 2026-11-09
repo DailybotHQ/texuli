@@ -218,7 +218,12 @@ describe('DesignSystemKit: approval header', () => {
         contentHash: hash,
       },
     } as DesignSystem;
-    expect(kitApproval(doc)).toMatchObject({ present: false, hash: 'missing' });
+    // The example brand ships a draft approval; drop it for the no-record case.
+    const { approval: _draft, ...unapproved } = doc as DesignSystem & { approval?: unknown };
+    expect(kitApproval(unapproved as DesignSystem)).toMatchObject({
+      present: false,
+      hash: 'missing',
+    });
     expect(kitApproval(approved)).toMatchObject({ status: 'approved', hash: 'matches' });
     const edited = { ...approved, name: 'Ledgerline edited' } as DesignSystem;
     expect(kitApproval(edited).hash).toBe('differs');
@@ -238,9 +243,15 @@ describe('DesignSystemKit: approval header', () => {
     );
     cleanup();
 
-    render(DesignSystemKit, { document: doc, compiled });
+    render(DesignSystemKit, { document: unapproved as DesignSystem, compiled });
     expect(screen.getByRole('region', { name: 'Design system approval' }).textContent).toContain(
       'Not approved'
+    );
+    cleanup();
+
+    render(DesignSystemKit, { document: doc, compiled });
+    expect(screen.getByRole('region', { name: 'Design system approval' }).textContent).toContain(
+      'Draft'
     );
   });
 

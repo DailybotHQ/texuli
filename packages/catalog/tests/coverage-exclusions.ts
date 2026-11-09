@@ -193,7 +193,16 @@ add(
   'texuli',
   'chrome',
   'The design-system UI kit (texuli/ds-kit) is a host page that renders a design-system document, never blueprint data.',
-  ['DesignSystemKit', 'KitApproval', 'KitFoundations', 'KitModeSwitch']
+  [
+    'ApprovalBadge',
+    'DesignSystemKit',
+    'KitApproval',
+    'KitChanges',
+    'KitFoundations',
+    'KitLibrary',
+    'KitModeSwitch',
+    'KitVoice',
+  ]
 );
 add('texuli', 'chrome', 'Uploading files is host chrome: a blueprint never asks for local files.', [
   'FileUpload',
@@ -433,5 +442,7 @@ export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(row
 // CodeField was, because a new catalog id changes the spec contract and a
 // patch release cannot carry a spec minor.
 // Raised to 219 for the design-system UI kit pages (PLAN_016 T4, lead decision): host
-// pages that render a design-system document, never blueprint data.
-export const EXCLUSION_CEILING = 219;
+// pages that render a design-system document, never blueprint data. Raised to 222
+// for the kit's library and changes sections (KitLibrary, KitChanges, ApprovalBadge;
+// PLAN_016 T-t4-library), the same kit chrome, and to 223 for KitVoice (T-t4-voice).
+export const EXCLUSION_CEILING = 223;

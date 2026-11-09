@@ -18,6 +18,26 @@ export {
   foundationsModel,
 } from './foundations/model.ts';
 export {
+  ApprovalBadge,
+  changesModel,
+  KIT_ALLOW_LISTS,
+  type KitAllowChange,
+  type KitAllowList,
+  type KitApprovalChange,
+  type KitChangeKind,
+  KitChanges,
+  type KitChangesModel,
+  type KitComposeState,
+  KitLibrary,
+  type KitLibraryChange,
+  type KitLibraryItem,
+  type KitLibraryModel,
+  type KitVersion,
+  kitEntryApproval,
+  kitEntryContentHash,
+  libraryModel,
+} from './library/index.ts';
+export {
   type KitApprovalView,
   type KitHashCheck,
   kitApproval,
