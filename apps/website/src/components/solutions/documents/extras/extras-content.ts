@@ -72,7 +72,8 @@ export const DOCUMENTS_PLATFORMS: Omit<SolutionPlatformsProps, 'entry'> = {
 
 export const DOCUMENTS_NEXT: Omit<SolutionNextStepsProps, 'entry'> = {
   links: [
-    { label: 'Read the docs', href: '/guides/solutions/documents/' },
+    { label: 'Read the Documents guide', href: '/guides/solutions/documents/' },
+    { label: 'Edit the live report', href: '#demo' },
     { label: '@texuli/pages on npm', href: 'https://www.npmjs.com/package/@texuli/pages' },
   ],
 };
