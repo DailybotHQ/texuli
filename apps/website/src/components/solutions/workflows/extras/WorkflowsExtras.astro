@@ -1,0 +1,27 @@
+---
+/**
+ * Closing blocks of the Workflows landing: recipes, agents, platforms, related
+ * Solutions and next steps. Each block is the shared component; this file
+ * only supplies the workflows entry and the copy in extras-content.ts.
+ */
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionAgents from '../../shared/platforms/SolutionAgents.astro';
+import SolutionPlatforms from '../../shared/platforms/SolutionPlatforms.astro';
+import SolutionNextSteps from '../../shared/resources/SolutionNextSteps.astro';
+import SolutionRecipes from '../../shared/resources/SolutionRecipes.astro';
+import SolutionRelated from '../../shared/resources/SolutionRelated.astro';
+import {
+  WORKFLOWS_AGENTS,
+  WORKFLOWS_NEXT,
+  WORKFLOWS_PLATFORMS,
+  WORKFLOWS_RECIPES,
+} from './extras-content.ts';
+
+const entry = getSolution('workflows');
+---
+
+<SolutionRecipes entry={entry} {...WORKFLOWS_RECIPES} />
+<SolutionAgents entry={entry} {...WORKFLOWS_AGENTS} />
+<SolutionPlatforms entry={entry} {...WORKFLOWS_PLATFORMS} />
+<SolutionRelated entry={entry} />
+<SolutionNextSteps entry={entry} {...WORKFLOWS_NEXT} />
