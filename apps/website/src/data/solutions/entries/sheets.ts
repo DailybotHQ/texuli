@@ -63,7 +63,6 @@ export const sheets: SolutionEntry = {
   ],
   links: [
     { label: 'Read the docs', href: '/guides/solutions/sheets/' },
-    { label: 'Current demo page', href: '/sheets-page/' },
     { label: '@texuli/sheets on npm', href: 'https://www.npmjs.com/package/@texuli/sheets' },
   ],
 };
