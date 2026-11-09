@@ -38,6 +38,27 @@ export {
   libraryModel,
 } from './library/index.ts';
 export {
+  builtinSample,
+  KIT_BUILTIN_SAMPLES,
+  type KitBuiltinSample,
+  KitMatrix,
+  MATRIX_AXES,
+  MATRIX_STATES,
+  type MatrixAxis,
+  type MatrixCell,
+  type MatrixCellKind,
+  type MatrixCells,
+  type MatrixComponent,
+  type MatrixIssue,
+  type MatrixModel,
+  matrixAttributes,
+  matrixCells,
+  matrixModel,
+  matrixProps,
+  PSEUDO_STATES,
+  staticStates,
+} from './matrix/index.ts';
+export {
   type KitApprovalView,
   type KitHashCheck,
   kitApproval,

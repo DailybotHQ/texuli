@@ -7,9 +7,9 @@
  * switch shows light and dark side by side or one at a time (§4). Every section and item has
  * a stable `id` for deep links. No network, no HTML sinks: document text is rendered as text.
  *
- * Sections land one task at a time (T4): Foundations, Voice, Library (when the document
- * declares entries) and Changes (when `previous` is given) are mounted here; Components
- * joins as its task merges.
+ * Sections (T4): Foundations (with
+ * `compiled`), Voice, Components (with `catalog`), Library (when the document declares
+ * entries) and Changes (when `previous` is given).
  */
 import { useMessages } from '../i18n/use-messages.ts';
 import KitFoundations, { foundationLabel } from './foundations/KitFoundations.svelte';
@@ -17,6 +17,8 @@ import { foundationItems, foundationsModel } from './foundations/model.ts';
 import KitChanges from './library/KitChanges.svelte';
 import KitLibrary from './library/KitLibrary.svelte';
 import { libraryModel } from './library/model.ts';
+import KitMatrix from './matrix/KitMatrix.svelte';
+import { matrixModel } from './matrix/model.ts';
 import { kitApproval } from './shared/approval.ts';
 import KitApproval from './shared/KitApproval.svelte';
 import KitModeSwitch from './shared/KitModeSwitch.svelte';
@@ -34,6 +36,9 @@ let {
   catalog,
   previous,
   library,
+  samples,
+  matrix = 'grid',
+  showDisallowed = true,
   sections,
   modeView = $bindable('both'),
   currentSection,
@@ -58,9 +63,11 @@ const voice = $derived(voiceModel(doc));
 
 /** The sections this build of the kit can show for the data it has. */
 const libraryItems = $derived(libraryModel(doc, allow, catalog).items);
+const matrixItems = $derived(catalog ? matrixModel(catalog, allow).enabled : []);
 const available = $derived<KitSectionId[]>([
   ...(compiled ? (['foundations'] as const) : []),
   'voice',
+  ...(catalog ? (['matrix'] as const) : []),
   ...(libraryItems.length > 0 ? (['library'] as const) : []),
   ...(previous ? (['changes'] as const) : []),
 ]);
@@ -76,7 +83,9 @@ const items = (section: KitSectionId): { id: string; label: string }[] =>
       ? voiceItems(voice).map((item) => ({ ...item, label: voiceLabel(msg, item.id) }))
       : section === 'library'
         ? libraryItems.map((item) => ({ id: item.id, label: item.name }))
-        : [];
+        : section === 'matrix'
+          ? matrixItems.map((item) => ({ id: item.id, label: item.label }))
+          : [];
 
 // Uncontrolled navigation keeps its own place; controlled navigation reads the props.
 let ownSection = $state<KitSectionId | undefined>(undefined);
@@ -189,6 +198,18 @@ const sectionLevel = $derived((headingLevel + 1) as 3 | 4);
         headingLevel={sectionLevel}
         idPrefix={prefix}
         currentItem={activeSection === 'voice' ? activeItem : undefined}
+      />
+    {:else if section.id === 'matrix' && catalog}
+      <KitMatrix
+        {catalog}
+        {allow}
+        {samples}
+        {matrix}
+        {showDisallowed}
+        {modeView}
+        headingLevel={sectionLevel}
+        idPrefix={prefix}
+        currentItem={activeSection === 'matrix' ? activeItem : undefined}
       />
     {:else if section.id === 'library'}
       <KitLibrary
