@@ -44,7 +44,7 @@ The full table and evidence paths are also recorded in `native/docs/PARITY.md`. 
 
 ## Supporting documentation content
 
-The verified native documentation source files are in `src/content/native-docs/`: `getting-started.md`, `architecture.md`, `compatibility.md`, and `testing.md`. They cover the local checkout workflow, module and target boundaries, the generated support matrix, and the checks available today. They do not imply that unpublished native modules can be consumed from an external project.
+The verified native documentation source files are in `src/content/native-docs/`: `getting-started.md`, `architecture.md`, `compatibility.md`, and `testing.md`. They cover the local checkout workflow, module and target boundaries, the generated support matrix, and the checks available today. They do not imply that unpublished native modules can be consumed from an external project. They are source notes for a later docs route and are not rendered as pages yet.
 
 ## Validation
 

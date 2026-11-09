@@ -352,6 +352,11 @@ static site with `client:visible` islands:
 - themes (gallery, switcher, studio, color explorer);
 - the playground, search, showcase and examples;
 - the agents and skill pages;
+- the Solution landings (`/solutions/<slug>/`, one demo island each, built from the
+  typed registry in `apps/website/src/data/solutions/`), their docs under
+  `/guides/solutions/<slug>/`, the `/solutions/` catalog and `/solutions/index.json`;
+- Built with Texuli (`/built-with/`, products with their own brand and domain) and
+  `/native/` with `/native/compatibility/` (ADR-027 to ADR-031);
 - SEO with compile-time social images.
 
 It imports the workspace packages directly, so a broken component breaks
@@ -363,7 +368,9 @@ It imports the workspace packages directly, so a broken component breaks
   `Cache-Control: no-store` (the built policy, or a stripped variant for
   Lighthouse-family audits, `apps/website/src/lib/robots-variants.ts`),
   serves a Markdown 404 to agents (`problem+json` under `/api/` and for JSON clients), and
-  sends bot-hit and `markdown_request` events; every other request gets the
+  sends bot-hit and `markdown_request` events, and moves the Markdown twins of
+  the `*-page` routes that `apps/website/public/_redirects` 301s to their Solution
+  landings (ADR-028); every other request gets the
   static asset response back untouched, so its `_headers` (CSP, and
   `Vary: Accept` on every page with a twin) survive;
 - `api/umami/[[path]].ts` is the same-origin Umami analytics proxy, on in
