@@ -41,8 +41,20 @@ class CatalogVariantsTest {
     }
 
     @Test
-    fun keepsTheVocabularyWithoutAxesUntilTheCatalogDeclaresThem() {
-        assertEquals(170, SpecVocabulary.components.size)
-        assertEquals(true, SpecVocabulary.components.all { it.axes == null && it.states == null })
+    fun carriesEveryCatalogAxisWithTheValuesOfItsProp() {
+        assertEquals(174, SpecVocabulary.components.size)
+        val withAxes = SpecVocabulary.components.filter { it.axes != null }
+        assertEquals(true, withAxes.isNotEmpty())
+        for (component in withAxes) {
+            val axes = component.axes ?: continue
+            for (axis in listOfNotNull(axes.variant, axes.size, axes.tone, axes.density)) {
+                val prop = component.props.first { it.name == axis.prop }
+                assertEquals(prop.enumValues, axis.values, "${component.id}.${axis.prop}")
+                assertEquals(true, axis.default in axis.values, "${component.id}.${axis.prop} default")
+            }
+        }
+        val heading = SpecVocabulary.component("heading")
+        assertEquals(listOf("display", "xl", "lg", "md", "sm"), heading?.axes?.size?.values)
+        assertNull(heading?.states)
     }
 }
