@@ -80,6 +80,9 @@ export type ProseSize = (typeof PROSE_SIZES)[number];
 export const PROSE_ELEMENTS = ['div', 'article', 'section'] as const;
 export type ProseElement = (typeof PROSE_ELEMENTS)[number];
 
+export const COLOR_SWATCH_SIZES = ['sm', 'md', 'lg'] as const;
+export type ColorSwatchSize = (typeof COLOR_SWATCH_SIZES)[number];
+
 export const BOX_ELEMENTS = ['div', 'section', 'article', 'aside', 'header', 'footer'] as const;
 export type BoxElement = (typeof BOX_ELEMENTS)[number];
 
@@ -89,7 +92,7 @@ export type BoxPadding = (typeof BOX_PADDINGS)[number];
 export const BOX_RADII = ['none', 'sm', 'md', 'lg', 'xl', 'full'] as const;
 export type BoxRadius = (typeof BOX_RADII)[number];
 
-/** A full border, or one logical side (`block-*` for headers, `inline-*` for rails). */
+/** A full border, one logical side (`block-*` for headers, `inline-*` for rails), or dashed. */
 export const BOX_BORDERS = [
   'none',
   'default',
@@ -98,6 +101,7 @@ export const BOX_BORDERS = [
   'block-end',
   'inline-start',
   'inline-end',
+  'dashed',
 ] as const;
 export type BoxBorder = (typeof BOX_BORDERS)[number];
 
@@ -204,7 +208,16 @@ export const boxClass = variants({
       xl: 'tx-box--radius-xl',
       full: 'tx-box--radius-full',
     },
-    border: map(BOX_BORDERS, 'tx-box--border-'),
+    border: {
+      none: 'tx-box--border-none',
+      default: 'tx-box--border-default',
+      strong: 'tx-box--border-strong',
+      'block-start': 'tx-box--border-block-start',
+      'block-end': 'tx-box--border-block-end',
+      'inline-start': 'tx-box--border-inline-start',
+      'inline-end': 'tx-box--border-inline-end',
+      dashed: 'tx-box--border-dashed',
+    },
     elevation: {
       none: 'tx-box--elevation-none',
       sm: 'tx-box--elevation-sm',

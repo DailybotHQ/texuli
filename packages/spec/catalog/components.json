@@ -1,5 +1,5 @@
 {
-  "catalogHash": "c53bda820fd916130e6467bb0f0c99271ea909e815f05ba0d89d864d8080c04e",
+  "catalogHash": "61c20db1dc6834de5dbd7fa1884e8a8e2c94a77b86d54ee0ab7f1b11a7c8394d",
   "components": [
     {
       "axes": {
@@ -1259,7 +1259,8 @@
             "block-start",
             "block-end",
             "inline-start",
-            "inline-end"
+            "inline-end",
+            "dashed"
           ],
           "kind": "enum",
           "name": "border"
@@ -3580,6 +3581,91 @@
       ],
       "states": ["hover", "focus-visible", "disabled", "invalid", "readonly"],
       "summary": "An editable, syntax-highlighted code textarea."
+    },
+    {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "primary",
+          "prop": "color",
+          "values": [
+            "chart-1",
+            "chart-2",
+            "chart-3",
+            "chart-4",
+            "chart-5",
+            "chart-6",
+            "chart-7",
+            "chart-8",
+            "primary",
+            "secondary",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ]
+        }
+      },
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "color-swatch",
+      "imports": [
+        {
+          "exports": ["COLOR_SWATCH_SIZES", "ColorSwatch", "ColorSwatchSize"],
+          "module": "texuli/typography"
+        }
+      ],
+      "label": "Color swatch",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "enumValues": [
+            "chart-1",
+            "chart-2",
+            "chart-3",
+            "chart-4",
+            "chart-5",
+            "chart-6",
+            "chart-7",
+            "chart-8",
+            "primary",
+            "secondary",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ],
+          "kind": "enum",
+          "name": "color"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "enumValues": ["sm", "md", "lg"],
+          "kind": "enum",
+          "name": "size"
+        }
+      ],
+      "summary": "A chip of a closed palette, role or data-viz color with contrast ink from tokens. Never free CSS."
     },
     {
       "axes": {
@@ -8989,6 +9075,60 @@
       ],
       "states": ["focus-visible", "disabled", "selected"],
       "summary": "Centered onboarding wizard frame with steps."
+    },
+    {
+      "capability": "unknown",
+      "emit": [],
+      "group": "display",
+      "id": "link",
+      "imports": [
+        {
+          "exports": ["Link"],
+          "module": "texuli/typography"
+        }
+      ],
+      "label": "Link",
+      "placement": "app",
+      "props": [
+        {
+          "extension": "web",
+          "kind": "slot",
+          "name": "children"
+        },
+        {
+          "extension": "web",
+          "kind": "string",
+          "name": "class"
+        },
+        {
+          "kind": "boolean",
+          "name": "external"
+        },
+        {
+          "kind": "string",
+          "name": "href",
+          "required": true
+        },
+        {
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "hrefTrust"
+        },
+        {
+          "kind": "string",
+          "name": "label"
+        },
+        {
+          "kind": "string",
+          "name": "rel"
+        },
+        {
+          "kind": "string",
+          "name": "target"
+        }
+      ],
+      "states": ["hover", "focus-visible"],
+      "summary": "An inline sentence link. Underline and color come from link tokens; href is filtered by the URL policy."
     },
     {
       "capability": "unknown",

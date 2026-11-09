@@ -29,6 +29,7 @@ const rootFiles = {
   checkbox: 'components/choice/Checkbox.svelte',
   chip: 'components/badge/Chip.svelte',
   code: 'components/kbd-code/Code.svelte',
+  'color-swatch': 'components/typography/ColorSwatch.svelte',
   combobox: 'components/combobox/ComboboxRoot.svelte',
   'command-palette': 'components/command/CommandPalette.svelte',
   'content-layout': 'layouts/content/ContentLayout.svelte',
@@ -55,6 +56,7 @@ const rootFiles = {
   kbd: 'components/kbd-code/Kbd.svelte',
   kpi: 'components/stat/Kpi.svelte',
   label: 'components/field/Label.svelte',
+  link: 'components/typography/Link.svelte',
   'layout-auth-split': 'layouts/auth-settings/AuthSplitLayout.svelte',
   'layout-blog': 'layouts/content/BlogLayout.svelte',
   'layout-chrome': 'layouts/host/LayoutChrome.svelte',
@@ -141,6 +143,7 @@ const axisFiles = {
   checkbox: 'components/choice/Checkbox.svelte',
   chip: 'components/badge/Chip.svelte',
   code: 'components/kbd-code/Code.svelte',
+  'color-swatch': 'components/typography/ColorSwatch.svelte',
   combobox: 'components/combobox/ComboboxRoot.svelte',
   'command-palette': 'components/command/CommandPalette.svelte',
   'content-layout': 'layouts/content/ContentLayout.svelte',
@@ -167,6 +170,7 @@ const axisFiles = {
   kbd: 'components/kbd-code/Kbd.svelte',
   kpi: 'components/stat/Kpi.svelte',
   label: 'components/field/Label.svelte',
+  link: 'components/typography/Link.svelte',
   'layout-auth-split': 'layouts/auth-settings/AuthSplitLayout.svelte',
   'layout-blog': 'layouts/content/ContentLayout.svelte',
   'layout-chrome': 'layouts/host/LayoutChrome.svelte',
@@ -240,8 +244,8 @@ const source = (file: string) =>
 
 describe('Texuli group A catalog root attributes', () => {
   it('covers every group A catalog id from the root audit', () => {
-    expect(groupA).toHaveLength(110);
-    expect(new Set(groupA.map((entry) => entry.id)).size).toBe(110);
+    expect(groupA).toHaveLength(112);
+    expect(new Set(groupA.map((entry) => entry.id)).size).toBe(112);
   });
 
   it.each(groupA)('$id root declares its component id and enum axes', (entry) => {

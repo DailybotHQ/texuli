@@ -32,7 +32,7 @@ type Props = HTMLAttributes<HTMLElement> & {
   padding?: BoxPadding;
   /** Shape radius: `none`, `sm`, `md` (default), `lg`, `xl`, `full`. */
   radius?: BoxRadius;
-  /** `none` (default), `default` or `strong` (all sides), or one logical side: `block-start`, `block-end`, `inline-start`, `inline-end`. */
+  /** `none` (default), `default` or `strong` (all sides), one logical side (`block-start`, `block-end`, `inline-start`, `inline-end`), or `dashed`. */
   border?: BoxBorder;
   /** Elevation shadow: `none` (default), `sm`, `md`, `lg`. */
   elevation?: BoxElevation;

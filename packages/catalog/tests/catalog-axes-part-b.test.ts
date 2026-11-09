@@ -56,6 +56,7 @@ const PART_B_GROUP_IDS = {
     'carousel',
     'chip',
     'code',
+    'color-swatch',
     'empty-state',
     'error-state',
     'heading',
@@ -63,6 +64,7 @@ const PART_B_GROUP_IDS = {
     'inline-text',
     'kbd',
     'kpi',
+    'link',
     'list',
     'list-item',
     'mark',
@@ -139,7 +141,9 @@ const EXPECTED: Readonly<Record<string, Expected>> = {
   },
   banner: { axes: { tone: 'tone' } },
   box: { axes: { variant: 'surface' } },
+  'color-swatch': { axes: { variant: 'color', size: 'size' } },
   heading: { axes: { size: 'size', tone: 'tone' } },
+  link: { states: ['hover', 'focus-visible'] },
   prose: { axes: { size: 'size' } },
   text: { axes: { size: 'size', tone: 'tone' } },
   callout: { axes: { tone: 'tone' } },
@@ -176,8 +180,8 @@ describe('catalog axes part B (content, display, chat, documents, canvas)', () =
       'display',
       'documents',
     ]);
-    expect(manifests).toHaveLength(74);
-    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(74);
+    expect(manifests).toHaveLength(76);
+    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(76);
     for (const group of groups) {
       expect(group.manifests.map((manifest) => manifest.id).sort(), group.name).toEqual(
         [...PART_B_GROUP_IDS[group.name as keyof typeof PART_B_GROUP_IDS]].sort()
