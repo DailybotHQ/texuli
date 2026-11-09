@@ -1,39 +1,58 @@
 ---
 /**
- * /native/ — the native-focused landing (sub-site IA decision 2, owned by
- * analysis_results/subsite-ia-routes.md). Landing shell, not a fenced
- * sub-site: it shares the shell system, theme, CSP and analytics of the one
- * site. Assembled (PLAN_006 T-48) from the three committed G7 sections in
- * blueprint order (narrative-blueprint.md §5 "Native landing"): hero +
- * status (T-45), why Kotlin Multiplatform (T-46), evidence + roadmap
- * (T-47). Every section is static markup fed by its shared, unit-tested
- * content module; the hero's h1 is the page's only h1, and each section's
- * h2 continues the heading ladder without skips.
+ * /native/ — Texuli Native, "Beyond the browser". The page keeps its URL and assembles the
+ * twelve moments of the native story from the sections in `components/sections/native/`:
  *
- * Metadata per the T-17 contract (analysis_results/subsite-ia-nav.md §3):
- * JSON-LD is Organization-only — nothing installable exists yet, so a
- * SoftwareApplication node would be dishonest. Canonical and the OG set are
- * emitted by SeoHead; the sitemap picks the route up via the build pipeline.
+ *   01 hero and platform status         NativeHero
+ *   02 one blueprint, many renderers    BlueprintDiagram (a real golden fixture)
+ *   03 web and native side by side      NativeDemo (the only island, client:visible)
+ *   04 why share a foundation           WhyKmp (kept from the first /native/)
+ *   05 how the renderer consumes it     WhyKmp, "How the renderer consumes the contract"
+ *   06 components that travel           ComponentsThatTravel
+ *   07 complex solutions, shared intent ComplexSolutionsTravel
+ *   09 honest compatibility matrix      NativeCompatibilityMatrix (generated from parity.json)
+ *   11 what exists and what is planned  NativeEvidenceRoadmap (kept from the first /native/)
+ *      questions                        NativeFaq
+ *   08 native should feel native,
+ *   10 humans and agents on every target,
+ *   12 start building                   NativePrinciples (one section, three parts)
+ *
+ * Every status and count is derived (compatibility data, parity.json, registry), never typed
+ * here. JSON-LD stays Organization-only: nothing native is installable yet.
  */
 import PageBanner from '../../components/landing/PageBanner.astro';
+import BlueprintDiagram from '../../components/sections/native/blueprint/BlueprintDiagram.astro';
+import NativeDemo from '../../components/sections/native/demo/NativeDemo.astro';
+import NativeFaq from '../../components/sections/native/faq/NativeFaq.astro';
+import NativeHero from '../../components/sections/native/hero/NativeHero.astro';
+import NativeCompatibilityMatrix from '../../components/sections/native/matrix/NativeCompatibilityMatrix.astro';
 import NativeEvidenceRoadmap from '../../components/sections/native/NativeEvidenceRoadmap.astro';
-import NativeHeroStatus from '../../components/sections/native/NativeHeroStatus.astro';
+import NativePrinciples from '../../components/sections/native/principles/NativePrinciples.astro';
+import ComplexSolutionsTravel from '../../components/sections/native/travel/ComplexSolutionsTravel.astro';
+import ComponentsThatTravel from '../../components/sections/native/travel/ComponentsThatTravel.astro';
 import WhyKmp from '../../components/sections/native/WhyKmp.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout
-  title="Texuli native — the same catalog, rendered by Compose"
-  description="The Texuli contract renders native surfaces with Compose through Kotlin Multiplatform. In development, conformance-tested, and open about its status."
+  title="Texuli Native — your interface language, beyond the browser"
+  description="One blueprint contract for web and native. The web is available today; the Compose renderer is in development and paints a read-only slice; Android and iOS are planned."
   landing
 >
-  <div class="landing" data-tx-landing="">
+  <div class="landing native-page" data-tx-landing="" data-tx-native-page="">
+    <NativeHero />
     <div class="native-banner">
       <PageBanner art="page-native" />
     </div>
-    <NativeHeroStatus />
+    <BlueprintDiagram />
+    <NativeDemo />
     <WhyKmp />
+    <ComponentsThatTravel />
+    <ComplexSolutionsTravel />
+    <NativeCompatibilityMatrix />
     <NativeEvidenceRoadmap />
+    <NativeFaq />
+    <NativePrinciples />
   </div>
 </BaseLayout>
 
