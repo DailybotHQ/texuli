@@ -53,7 +53,15 @@ let {
 const classes = $derived(cx(pinInputClass({ size }), className));
 </script>
 
-<Primitive.Root bind:ref {...props} bind:value bind:inputRef class={classes}>
+<Primitive.Root
+  bind:ref
+  {...props}
+  bind:value
+  bind:inputRef
+  class={classes}
+  data-tx-component="pin-input"
+  data-tx-size={size}
+>
   {#snippet children(state)}
     <div class="tx-pin-input__cells" aria-hidden="true">
       {@render children?.(state)}

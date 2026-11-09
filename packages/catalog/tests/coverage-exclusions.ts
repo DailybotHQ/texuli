@@ -146,22 +146,29 @@ add('texuli', 'part', 'A part of table (manifest table).', [
   'TableRow',
 ]);
 add('texuli', 'part', 'A part of timeline (manifest timeline).', ['TimelineItem']);
-add('texuli', 'part', 'A part of number field or pin input; the parent is planned below.', [
+add('texuli', 'part', 'A part of number-field (manifest number-field).', [
   'NumberFieldDecrement',
   'NumberFieldIncrement',
   'NumberFieldInput',
   'NumberFieldRoot',
+]);
+add('texuli', 'part', 'A part of pin-input (manifest pin-input).', [
   'PinInputCell',
   'PinInputRoot',
 ]);
-add('texuli', 'part', 'A part of toggle group or toolbar; the parent is planned below.', [
-  'ToggleGroupItem',
-  'ToolbarButton',
-  'ToolbarGroup',
-  'ToolbarGroupItem',
-  'ToolbarLink',
-  'ToolbarSeparator',
-]);
+add(
+  'texuli',
+  'part',
+  'A part of toggle-group (manifest toggle-group) or toolbar; toolbar is planned below.',
+  [
+    'ToggleGroupItem',
+    'ToolbarButton',
+    'ToolbarGroup',
+    'ToolbarGroupItem',
+    'ToolbarLink',
+    'ToolbarSeparator',
+  ]
+);
 add(
   'texuli',
   'part',
@@ -177,7 +184,6 @@ add(
     'AuthSplitHostLayout',
     'DrawerScope',
     'MasterDetailLayout',
-    'MobileAppFrame',
     'MobileDrawerLayout',
     'MobileTabsLayout',
     'RailLayout',
@@ -206,9 +212,6 @@ add(
     'KitVoice',
   ]
 );
-add('texuli', 'chrome', 'Uploading files is host chrome: a blueprint never asks for local files.', [
-  'FileUpload',
-]);
 add('texuli', 'utility', 'A layout or accessibility helper with no content of its own.', [
   'AspectRatio',
   'ScrollArea',
@@ -266,13 +269,8 @@ add('texuli', 'planned', 'Planned manifest: an input with a bindable value (spec
   'ColorPicker',
   'DatePicker',
   'DateRangePicker',
-  'NumberField',
-  'PinInput',
-  'Rating',
   'Slider',
-  'TagsInput',
   'Toggle',
-  'ToggleGroup',
 ]);
 add('texuli', 'planned', 'Planned manifest: a toolbar of host actions (closed emit intents).', [
   'Toolbar',
@@ -428,4 +426,4 @@ export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(row
 // again in PLAN_016 T-widen-display: Icon, Avatar, Skeleton, Progress, Spinner,
 // Carousel, Separator and ListItem became catalog ids (LucideIcon is a part of
 // icon). Combined ceiling is the live row count.
-export const EXCLUSION_CEILING = 211;
+export const EXCLUSION_CEILING = 204;

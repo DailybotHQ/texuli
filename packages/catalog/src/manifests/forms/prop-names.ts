@@ -267,6 +267,94 @@ export const comboboxPropNames = [
   'children',
 ] as const;
 
+export const fileUploadPropNames = [
+  'files',
+  'accept',
+  'maxSize',
+  'maxFiles',
+  'multiple',
+  'disabled',
+  'required',
+  'name',
+  'variant',
+  'showPreviews',
+  'labels',
+  'onFilesAdd',
+  'onFileRemove',
+  'class',
+] as const;
+
+export const numberFieldPropNames = [
+  'value',
+  'min',
+  'max',
+  'step',
+  'disabled',
+  'readOnly',
+  'required',
+  'name',
+  'size',
+  'display',
+  'onValueChange',
+  'class',
+] as const;
+
+export const pinInputPropNames = [
+  'value',
+  'maxlength',
+  'mask',
+  'disabled',
+  'size',
+  'onValueChange',
+  'onComplete',
+  'class',
+] as const;
+
+export const ratingPropNames = [
+  'value',
+  'max',
+  'allowHalf',
+  'display',
+  'clearable',
+  'readonly',
+  'disabled',
+  'required',
+  'name',
+  'size',
+  'tone',
+  'showValue',
+  'labels',
+  'onValueChange',
+  'class',
+] as const;
+
+export const tagsInputPropNames = [
+  'value',
+  'delimiter',
+  'max',
+  'disabled',
+  'readonly',
+  'required',
+  'name',
+  'label',
+  'placeholder',
+  'onValueChange',
+  'class',
+] as const;
+
+export const toggleGroupPropNames = [
+  'type',
+  'value',
+  'disabled',
+  'orientation',
+  'variant',
+  'size',
+  'name',
+  'onValueChange',
+  'class',
+  'children',
+] as const;
+
 export const timeFieldPropNames = [
   'label',
   'description',
@@ -345,6 +433,12 @@ export const FORMS_PROP_NAMES = {
   'multi-select': multiSelectPropNames,
   'time-field': timeFieldPropNames,
   'code-field': codeFieldPropNames,
+  'file-upload': fileUploadPropNames,
+  'number-field': numberFieldPropNames,
+  'pin-input': pinInputPropNames,
+  rating: ratingPropNames,
+  'tags-input': tagsInputPropNames,
+  'toggle-group': toggleGroupPropNames,
 } as const satisfies Record<string, readonly string[]>;
 
 export type FormsManifestId = keyof typeof FORMS_PROP_NAMES;

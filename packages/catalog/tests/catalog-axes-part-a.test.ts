@@ -16,8 +16,8 @@ describe('catalog axes part A (forms, overlays)', () => {
 
   it('covers every forms and overlays catalog id once', () => {
     expect(groups.map((group) => group.name).sort()).toEqual(['forms', 'overlays']);
-    expect(manifests).toHaveLength(56);
-    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(56);
+    expect(manifests).toHaveLength(62);
+    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(62);
   });
 
   it('lists the expected axes and states, with axis values equal to the prop enum', () => {

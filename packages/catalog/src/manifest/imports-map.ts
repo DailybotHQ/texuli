@@ -806,6 +806,29 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli', exports: ['FieldError'] },
     { module: 'texuli/field', exports: ['FieldError'] },
   ],
+  'file-upload': [
+    {
+      module: 'texuli',
+      exports: [
+        'FILE_UPLOAD_VARIANTS',
+        'FileUpload',
+        'FileUploadLabels',
+        'FileUploadProgressMap',
+        'FileUploadVariant',
+      ],
+    },
+    {
+      module: 'texuli/file-upload',
+      exports: [
+        'FILE_UPLOAD_VARIANTS',
+        'FileUpload',
+        'FileUploadLabels',
+        'FileUploadProgressMap',
+        'FileUploadVariant',
+        'fileUploadClass',
+      ],
+    },
+  ],
   form: [
     { module: 'texuli', exports: ['Form'] },
     { module: 'texuli/field', exports: ['Form'] },
@@ -1071,6 +1094,10 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     },
   ],
   'menubar-trigger': [{ module: 'texuli/menus', exports: ['MenubarTrigger'] }],
+  'mobile-app-frame': [
+    { module: 'texuli', exports: ['MobileAppFrame'] },
+    { module: 'texuli/layouts/mobile', exports: ['MobileAppFrame'] },
+  ],
   'mobile-header': [
     { module: 'texuli', exports: ['MobileHeader'] },
     { module: 'texuli/layouts/mobile', exports: ['MobileHeader'] },
@@ -1082,6 +1109,31 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
   'nav-icon': [
     { module: 'texuli', exports: ['NavIcon'] },
     { module: 'texuli/layouts/host/chrome', exports: ['NavIcon'] },
+  ],
+  'number-field': [
+    {
+      module: 'texuli',
+      exports: [
+        'NumberField',
+        'NumberFieldDecrement',
+        'NumberFieldIncrement',
+        'NumberFieldInput',
+        'NumberFieldRoot',
+      ],
+    },
+    {
+      module: 'texuli/number-pin',
+      exports: [
+        'NUMBER_PIN_SIZES',
+        'NumberField',
+        'NumberFieldDecrement',
+        'NumberFieldIncrement',
+        'NumberFieldInput',
+        'NumberFieldRoot',
+        'NumberPinSize',
+        'numberFieldClass',
+      ],
+    },
   ],
   'navigation-menu': [
     {
@@ -1137,6 +1189,13 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
       ],
     },
   ],
+  'pin-input': [
+    { module: 'texuli', exports: ['PinInput', 'PinInputCell', 'PinInputRoot'] },
+    {
+      module: 'texuli/number-pin',
+      exports: ['PinInput', 'PinInputCell', 'PinInputRoot', 'pinInputClass'],
+    },
+  ],
   popover: [
     { module: 'texuli', exports: ['Popover', 'PopoverClose', 'PopoverRoot', 'PopoverTrigger'] },
     {
@@ -1185,6 +1244,32 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
   'radio-group': [
     { module: 'texuli', exports: ['RadioGroup'] },
     { module: 'texuli/choice', exports: ['RadioGroup'] },
+  ],
+  rating: [
+    {
+      module: 'texuli',
+      exports: ['Rating', 'RatingLabels', 'RatingSize', 'RatingTone', 'formatRatingLabel'],
+    },
+    {
+      module: 'texuli/rating',
+      exports: [
+        'DEFAULT_RATING_LABELS',
+        'RATING_MAX_LIMIT',
+        'RATING_SIZES',
+        'RATING_TONES',
+        'Rating',
+        'RatingLabels',
+        'RatingSize',
+        'RatingTone',
+        'clampDisplay',
+        'formatRatingLabel',
+        'normalizeMax',
+        'normalizeValue',
+        'ratingClass',
+        'ratingSteps',
+        'starFill',
+      ],
+    },
   ],
   'responsive-modal': [
     { module: 'texuli', exports: ['ResponsiveModal', 'ResponsiveModalContent'] },
@@ -1354,6 +1439,10 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     { module: 'texuli', exports: ['Tag'] },
     { module: 'texuli/badge', exports: ['Tag'] },
   ],
+  'tags-input': [
+    { module: 'texuli', exports: ['TagsInput'] },
+    { module: 'texuli/tags-color', exports: ['TagsInput'] },
+  ],
   text: [
     { module: 'texuli', exports: ['Text', 'TextElement', 'TextSize', 'TextTone', 'TextWeight'] },
     {
@@ -1458,6 +1547,13 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
         'toastItemClass',
         'toasterClass',
       ],
+    },
+  ],
+  'toggle-group': [
+    { module: 'texuli', exports: ['ToggleGroup', 'ToggleGroupItem'] },
+    {
+      module: 'texuli/toggle',
+      exports: ['ToggleGroup', 'ToggleGroupItem'],
     },
   ],
   tooltip: [
@@ -5441,17 +5537,12 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'FEEDBACK_SIZES',
       'FEEDBACK_TONES',
       'FIELD_ORIENTATIONS',
-      'FILE_UPLOAD_VARIANTS',
       'FeedbackSize',
       'FeedbackTone',
       'FieldControl',
       'FieldErrorMap',
       'FieldLabelContext',
       'FieldOrientation',
-      'FileUpload',
-      'FileUploadLabels',
-      'FileUploadProgressMap',
-      'FileUploadVariant',
       'ICON_NAMES',
       'IconComponent',
       'IconComponentProps',
@@ -5491,7 +5582,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'MarketingSectionAlign',
       'MenuSize',
       'MenuVariant',
-      'MobileAppFrame',
       'MotionDurationName',
       'MotionLevel',
       'MotionPreset',
@@ -5509,11 +5599,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'NavSection',
       'NavSize',
       'NavUser',
-      'NumberField',
-      'NumberFieldDecrement',
-      'NumberFieldIncrement',
-      'NumberFieldInput',
-      'NumberFieldRoot',
       'NumberPinSize',
       'PAGINATION_VARIANTS',
       'POPOVER_SIZES',
@@ -5521,9 +5606,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'POSITIVE_DIRECTIONS',
       'PROGRESS_SHAPES',
       'PaginationVariant',
-      'PinInput',
-      'PinInputCell',
-      'PinInputRoot',
       'PopoverSize',
       'PopoverVariant',
       'PositiveDirection',
@@ -5538,10 +5620,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'RadioOption',
       'RadioOrientation',
       'RadioVariant',
-      'Rating',
-      'RatingLabels',
-      'RatingSize',
-      'RatingTone',
       'ResizableHandle',
       'ResizableHandleSize',
       'ResizablePanel',
@@ -5604,7 +5682,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'TableVariant',
       'TabsOrientation',
       'TabsVariant',
-      'TagsInput',
       'TexuliLabels',
       'TexuliLabelsOptions',
       'TexuliMessageId',
@@ -5621,8 +5698,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'ToastSettleReason',
       'ToastStore',
       'Toggle',
-      'ToggleGroup',
-      'ToggleGroupItem',
       'ToggleSize',
       'ToggleVariant',
       'Toolbar',
@@ -5723,7 +5798,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'formatDelta',
       'formatKpi',
       'formatPriceCents',
-      'formatRatingLabel',
       'getAppShellContext',
       'getFieldLabelContext',
       'getI18nContext',
@@ -6087,17 +6161,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
     ],
   },
   {
-    module: 'texuli/file-upload',
-    exports: [
-      'FILE_UPLOAD_VARIANTS',
-      'FileUpload',
-      'FileUploadLabels',
-      'FileUploadProgressMap',
-      'FileUploadVariant',
-      'fileUploadClass',
-    ],
-  },
-  {
     module: 'texuli/i18n',
     exports: [
       'LabelsProvider',
@@ -6245,7 +6308,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'MOBILE_LAYOUTS',
       'MOBILE_LAYOUT_IDS',
       'MOBILE_TAB_LIMIT',
-      'MobileAppFrame',
       'MobileLabels',
       'StackHeader',
       'bottomNavCurrent',
@@ -6378,23 +6440,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
     ],
   },
   {
-    module: 'texuli/number-pin',
-    exports: [
-      'NUMBER_PIN_SIZES',
-      'NumberField',
-      'NumberFieldDecrement',
-      'NumberFieldIncrement',
-      'NumberFieldInput',
-      'NumberFieldRoot',
-      'NumberPinSize',
-      'PinInput',
-      'PinInputCell',
-      'PinInputRoot',
-      'numberFieldClass',
-      'pinInputClass',
-    ],
-  },
-  {
     module: 'texuli/popover',
     exports: [
       'POPOVER_SIZES',
@@ -6408,26 +6453,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'popoverCloseClass',
       'popoverContentClass',
       'popoverTriggerClass',
-    ],
-  },
-  {
-    module: 'texuli/rating',
-    exports: [
-      'DEFAULT_RATING_LABELS',
-      'RATING_MAX_LIMIT',
-      'RATING_SIZES',
-      'RATING_TONES',
-      'Rating',
-      'RatingLabels',
-      'RatingSize',
-      'RatingTone',
-      'clampDisplay',
-      'formatRatingLabel',
-      'normalizeMax',
-      'normalizeValue',
-      'ratingClass',
-      'ratingSteps',
-      'starFill',
     ],
   },
   {
@@ -6564,15 +6589,13 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'tabsTriggerClass',
     ],
   },
-  { module: 'texuli/tags-color', exports: ['ColorPicker', 'ColorSwatch', 'TagsInput'] },
+  { module: 'texuli/tags-color', exports: ['ColorPicker', 'ColorSwatch'] },
   {
     module: 'texuli/toggle',
     exports: [
       'TOGGLE_SIZES',
       'TOGGLE_VARIANTS',
       'Toggle',
-      'ToggleGroup',
-      'ToggleGroupItem',
       'ToggleSize',
       'ToggleVariant',
       'toggleClass',
