@@ -38,7 +38,12 @@ describe('SolutionHero view model', () => {
   });
 
   it('flags slots that illustrations.json registers and uses an art override', () => {
-    expect(solutionHeroView(props()).artRegistered).toBe(false);
+    // solution-<slug>-hero is registered; with no file yet, SiteIllustration paints the mosaic.
+    expect(solutionHeroView(props()).artRegistered).toBe(true);
+    expect(
+      solutionHeroView(props({ art: { slot: 'unregistered-slot', variant: 'plate' } }))
+        .artRegistered
+    ).toBe(false);
     const view = solutionHeroView(props({ art: { slot: 'page-slides', variant: 'banner' } }));
     expect(view.artRegistered).toBe(true);
     expect(view.art.slot).toBe('page-slides');

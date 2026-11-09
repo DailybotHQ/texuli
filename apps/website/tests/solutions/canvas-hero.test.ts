@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { illustrationFor } from '../../src/components/landing/illustrations.ts';
 import { wordCount } from '../../src/components/sections/home/home-content.ts';
 import { CANVAS_HERO } from '../../src/components/solutions/canvas/hero/hero-content.ts';
 import { solutionHeroView } from '../../src/components/solutions/shared/hero/hero-model.ts';
@@ -46,8 +47,8 @@ describe('Canvas hero', () => {
     expect(entry.art.hero).toEqual({ slot: 'solution-canvas-hero', variant: 'plate' });
     expect(CANVAS_HERO.art).toBeUndefined();
     expect(view.art).toEqual({ slot: 'solution-canvas-hero', variant: 'plate' });
-    expect(view.artRegistered).toBe(false);
-    expect(view.artAlt).toBe('Illustration of Canvas, made of small texels.');
+    expect(view.artRegistered).toBe(true);
+    expect(view.artAlt).toBe(illustrationFor('solution-canvas-hero')?.alt);
   });
 
   it('composes the shared static SolutionHero with the canvas entry', () => {

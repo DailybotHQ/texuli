@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { illustrationFor } from '../../src/components/landing/illustrations.ts';
 import { wordCount } from '../../src/components/sections/home/home-content.ts';
 import { solutionHeroView } from '../../src/components/solutions/shared/hero/hero-model.ts';
 import { SOLUTION_SECTION_IDS } from '../../src/components/solutions/shared/subnav/sections.ts';
@@ -46,8 +47,8 @@ describe('Sheets hero', () => {
     expect(entry.art.hero).toEqual({ slot: 'solution-sheets-hero', variant: 'plate' });
     expect(SHEETS_HERO.art).toBeUndefined();
     expect(view.art).toEqual({ slot: 'solution-sheets-hero', variant: 'plate' });
-    expect(view.artRegistered).toBe(false);
-    expect(view.artAlt).toBe('Illustration of Sheets, made of small texels.');
+    expect(view.artRegistered).toBe(true);
+    expect(view.artAlt).toBe(illustrationFor('solution-sheets-hero')?.alt);
   });
 
   it('composes the shared static SolutionHero with the Sheets entry', () => {
