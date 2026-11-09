@@ -31,11 +31,11 @@ it('lists a read-only draft generator and reports losses, AA repairs and guarant
     name: string;
     annotations?: Record<string, boolean>;
   }[];
-  const generator = tools.find((tool) => tool.name === 'design_system.generate');
+  const generator = tools.find((tool) => tool.name === 'ds.generate');
   expect(generator?.annotations).toMatchObject({ readOnlyHint: true, destructiveHint: false });
 
   const called = await rpc(handle, 'tools/call', {
-    name: 'design_system.generate',
+    name: 'ds.generate',
     arguments: {
       brief: 'Fictional Harborline, teal #0e7490, rounded, compact',
       css: ':root { --brand: #0e7490; --radius: 10px; --space: 4px; }',
@@ -66,7 +66,7 @@ it('lists a read-only draft generator and reports losses, AA repairs and guarant
 it('refuses oversized input at the MCP operation boundary', async () => {
   const handle = await ready();
   const called = await rpc(handle, 'tools/call', {
-    name: 'design_system.generate',
+    name: 'ds.generate',
     arguments: { css: 'x'.repeat(1_048_577) },
   });
   expect(called.error).toBeUndefined();

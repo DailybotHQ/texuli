@@ -249,8 +249,8 @@ logoPixels?, theme? })` merges bounded inputs, fills defaults, validates and
 compiles a draft. Later sources take precedence; overwritten values and
 unmapped importer values appear in `report.losses`. Automatic accessibility
 adjustments are listed in `report.repairs` with reasons, and
-`report.guarantees` records the result. The MCP operation
-`design_system.generate` exposes this as draft-only pure compute; it never
+`report.guarantees` records the result. The MCP/CLI operation
+`ds.generate` exposes this as draft-only pure compute; it never
 saves or approves a document. The CLI equivalent is
 `texuli ds generate --brief … --from-tokens … --from-css … --from-logo … -o
 <file>` and writes the document with its report.
@@ -263,7 +263,7 @@ token travels in `$extensions["com.texuli.design-system"]`.
 
 The MCP prompt `create-design-system` (brief, optional `base` theme and
 `contrast`) walks an agent through the loop: read
-`texuli://design-system/acme`, use `design_system.generate` for combined
+`texuli://design-system/acme`, use `ds.generate` for combined
 inputs, review losses and automatic AA repairs, then `ds.validate` until
 valid, check `ds.contrast` and `ds.preview`, and deliver a draft. Reference
 screenshots are an agent vision step: the agent interprets them and proposes

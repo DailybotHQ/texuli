@@ -95,6 +95,7 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [AvatarGroupGrid](components/avatar-group-grid.md): Up to four faces in one avatar circle, +N past four.
 - [Badge](components/badge.md): A compact status or category label.
 - [Banner](components/banner.md): Full-width notice across a page or app shell.
+- [Box](components/box.md): A panel or region with padding, radius, border, elevation and surface from tokens.
 - [Breadcrumb](components/breadcrumb.md): Hierarchy trail with URL-policy links.
 - [Button](components/button.md): A pressable action control with loading and optional link rendering.
 - [ButtonGroup](components/button-group.md): Groups related buttons with shared borders and orientation.
@@ -122,6 +123,7 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [Field](components/field.md): Label, description and error wiring for a single control.
 - [FieldError](components/field-error.md): An alert-role error message for a field.
 - [Form](components/form.md): A form shell with layout, validation hook and error map.
+- [Heading](components/heading.md): A page title or section heading: a semantic h1–h6 with a size from the type scale.
 - [HoverCard](components/hover-card.md): Preview panel that opens on hover or focus.
 - [HoverCard.Content](components/hover-card-content.md): Styled hover-card surface.
 - [IconButton](components/icon-button.md): An icon-only button that requires an accessible name.
@@ -155,6 +157,7 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [Pagination](components/pagination.md): Page controls for long lists.
 - [Popover](components/popover.md): Non-modal floating panel anchored to a trigger.
 - [Popover.Content](components/popover-content.md): Styled popover surface with optional arrow.
+- [Prose](components/prose.md): Long-form text with the design system's reading rhythm: measure, spacing, headings, lists.
 - [Radio](components/radio.md): One option inside a RadioGroup.
 - [RadioGroup](components/radio-group.md): A set of exclusive radio options with keyboard roving.
 - [ResponsiveModal](components/responsive-modal.md): Dialog on large screens, drawer/sheet on small screens.
@@ -177,6 +180,7 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [Switch](components/switch.md): An immediate on/off setting control.
 - [Table](components/table.md): A responsive data table with density, stacking and sticky header options.
 - [Tag](components/tag.md): A labeled chip that can be removed.
+- [Text](components/text.md): Body copy, labels and small print with a size, tone and weight from the design system.
 - [TextCounter](components/text-counter.md): An input or textarea that shows remaining characters near the limit.
 - [Textarea](components/textarea.md): A multi-line text control with optional autosize.
 - [TimeField](components/time-field.md): A labelled time of day typed or stepped by segment (hour, minute, AM/PM), with a 24-hour HH:mm value.

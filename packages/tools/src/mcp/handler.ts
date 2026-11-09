@@ -20,7 +20,6 @@
 
 import { checkBlueprintAllow } from '@texuli/spec/design-system';
 import {
-  createOperationRegistry,
   type InvokeFailure,
   LOCAL_RUNTIMES,
   type LocalFiles,
@@ -32,7 +31,6 @@ import {
   TOOLS_VERSION,
   texuliOps,
 } from '../ops/index.ts';
-import { designSystemGenerate } from './design-system-generate.ts';
 import { TEXULI_PROMPTS } from './prompts.ts';
 import {
   type JsonObject,
@@ -99,7 +97,7 @@ const MAX_VERSION_LENGTH = 64;
 const DEFAULT_ARGUMENT_LENGTH = 10_000;
 
 const INSTRUCTIONS =
-  "Texuli is a Svelte 5 component library with a closed agent catalog. Tools are group.verb operations: search the component catalog (catalog.search), read manifests (component.get) and worked examples (example.search), list content block types and read the shape and examples of each (block.list, block.schema), validate blueprint drafts (blueprint.validate) and catalog manifests, search, read and preview themes with their WCAG AA report, author design systems (design_system.generate returns a draft and its loss, repair and guarantee report; ds.validate, ds.compile, ds.contrast, ds.suggest, ds.import, ds.diff, ds.preview, and blueprint.theme apply one to a blueprint), and run deck and document commands. Every tool states its limits and returns structured JSON; failures are isError results with a stable code (invalid-input, input-too-large, not-found, runtime-unavailable, timeout …), and a refused design system is a valid: false result with the spec's codes and JSON paths. Resources: texuli://catalog, texuli://llms/full, texuli://component/{id}, texuli://docs/{slug}, texuli://theme/{id}, texuli://design-system/{id} and texuli://schema/{name}. Prompts build-ui, theme-blueprint, create-design-system and convert-deck walk through the main jobs. The remote endpoint also lists site.pages, site.read and site.search, which list, read (as Markdown) and search the pages of texuli.com. The 0.8 tool names (catalog, component, validate, example, theme, deck, document) were removed in 0.10.0; a call names the operation to use instead. Nothing reaches the network; the only write is ds.save, on the local server, to an explicit path inside the working directory.";
+  "Texuli is a Svelte 5 component library with a closed agent catalog. Tools are group.verb operations: search the component catalog (catalog.search), read manifests (component.get) and worked examples (example.search), list content block types and read the shape and examples of each (block.list, block.schema), validate blueprint drafts (blueprint.validate) and catalog manifests, search, read and preview themes with their WCAG AA report, author design systems (ds.generate returns a draft and its loss, repair and guarantee report; ds.validate, ds.compile, ds.contrast, ds.suggest, ds.import, ds.diff, ds.preview, and blueprint.theme apply one to a blueprint), and run deck and document commands. Every tool states its limits and returns structured JSON; failures are isError results with a stable code (invalid-input, input-too-large, not-found, runtime-unavailable, timeout …), and a refused design system is a valid: false result with the spec's codes and JSON paths. Resources: texuli://catalog, texuli://llms/full, texuli://component/{id}, texuli://docs/{slug}, texuli://theme/{id}, texuli://design-system/{id} and texuli://schema/{name}. Prompts build-ui, theme-blueprint, create-design-system and convert-deck walk through the main jobs. The remote endpoint also lists site.pages, site.read and site.search, which list, read (as Markdown) and search the pages of texuli.com. The 0.8 tool names (catalog, component, validate, example, theme, deck, document) were removed in 0.10.0; a call names the operation to use instead. Nothing reaches the network; the only write is ds.save, on the local server, to an explicit path inside the working directory.";
 
 type Failure = { code: number; message: string; data?: unknown };
 class RpcFailure extends Error {
@@ -321,13 +319,7 @@ const variableOf = (template: McpResourceTemplate) =>
  * offered.
  */
 export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
-  const registry = options.registry
-    ? options.registry
-    : createOperationRegistry(
-        [...texuliOps.list(), designSystemGenerate],
-        texuliOps.aliases(),
-        texuliOps.removed()
-      );
+  const registry = options.registry ?? texuliOps;
   const mode = options.mode ?? 'stateful';
   const runtimes = options.runtimes ?? LOCAL_RUNTIMES;
   const pageSize = Math.max(1, Math.floor(options.pageSize ?? DEFAULT_PAGE_SIZE));
