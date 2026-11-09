@@ -101,7 +101,7 @@ function reset(): void {
 </script>
 
 <section class="canvas-demo" aria-label="Interactive launch plan canvas">
-  <div class="canvas-demo__toolbar" aria-label="Canvas actions">
+  <div class="canvas-demo__toolbar" role="group" aria-label="Canvas actions">
     <button type="button" onclick={addNote}>Add priority note</button>
     <button type="button" onclick={() => moveSelected({ x: -16, y: 0 })}>Move left</button>
     <button type="button" onclick={() => moveSelected({ x: 16, y: 0 })}>Move right</button>
@@ -162,7 +162,9 @@ function reset(): void {
     </div>
   </div>
 
-  <pre id="canvas-demo-source" class="canvas-demo__source" hidden={!sourceVisible}><code>{source}</code></pre>
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+  <!-- The source can scroll horizontally and vertically, so keyboard users need a named focus target. -->
+  <pre id="canvas-demo-source" class="canvas-demo__source" role="region" aria-label="Canvas source as JSON" tabindex="0" hidden={!sourceVisible}><code>{source}</code></pre>
 </section>
 
 <style>
