@@ -52,6 +52,10 @@ export const DATA_AXIS_STAMP: Readonly<Record<string, AxisStamp>> = {
       'checked',
     ],
   },
+  'data-virtual-list': {
+    axes: { size: 'size', density: 'density' },
+    states: ['hover', 'focus-visible', 'active', 'selected'],
+  },
 };
 
 /** Applies the part-C stamp. Components with neither axes nor states stay unchanged. */

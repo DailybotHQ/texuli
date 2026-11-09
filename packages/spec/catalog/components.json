@@ -1,5 +1,5 @@
 {
-  "catalogHash": "5a33d402d47198c05d7d1c893d7151ff0f2cd9e56b54724b6ed26b3b151f1cce",
+  "catalogHash": "c53bda820fd916130e6467bb0f0c99271ea909e815f05ba0d89d864d8080c04e",
   "components": [
     {
       "axes": {
@@ -5732,6 +5732,102 @@
         "checked"
       ],
       "summary": "A hierarchy of items people expand, select and reorder or re-parent by drag or keyboard."
+    },
+    {
+      "axes": {
+        "density": {
+          "default": "default",
+          "prop": "density",
+          "values": ["compact", "default", "comfortable"]
+        },
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg", "fill"]
+        }
+      },
+      "bindable": ["selected"],
+      "capability": "web-only",
+      "emit": [],
+      "events": ["select"],
+      "group": "data",
+      "id": "data-virtual-list",
+      "imports": [
+        {
+          "exports": ["VirtualListView"],
+          "module": "@texuli/data"
+        },
+        {
+          "exports": ["VirtualListView"],
+          "module": "@texuli/data/virtual-list"
+        }
+      ],
+      "label": "Virtual list view",
+      "placement": "content",
+      "props": [
+        {
+          "enumValues": ["compact", "default", "comfortable"],
+          "kind": "enum",
+          "name": "density"
+        },
+        {
+          "kind": "string",
+          "name": "emptyLabel"
+        },
+        {
+          "kind": "number",
+          "name": "estimateSize"
+        },
+        {
+          "kind": "array",
+          "name": "items",
+          "required": true,
+          "schema": {
+            "items": {
+              "properties": {
+                "description": {
+                  "maxLength": 400,
+                  "type": "string"
+                },
+                "id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "label": {
+                  "maxLength": 200,
+                  "type": "string"
+                }
+              },
+              "required": ["id", "label"],
+              "type": "object"
+            },
+            "maxItems": 500,
+            "type": "array"
+          }
+        },
+        {
+          "kind": "string",
+          "name": "label",
+          "required": true
+        },
+        {
+          "kind": "number",
+          "name": "overscan"
+        },
+        {
+          "kind": "string",
+          "name": "selected"
+        },
+        {
+          "enumValues": ["sm", "md", "lg", "fill"],
+          "kind": "enum",
+          "name": "size"
+        }
+      ],
+      "sourceable": ["items"],
+      "states": ["hover", "focus-visible", "active", "selected"],
+      "summary": "A windowed list of any length: only the visible rows are in the page, measured as they render, and each is announced with its position."
     },
     {
       "capability": "unknown",
