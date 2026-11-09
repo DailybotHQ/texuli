@@ -16,6 +16,8 @@ import {
   checkDesignSystemFull,
   compiledFindings,
   DS_FULL_CODES,
+  DS_FULL_LIMIT_CODES,
+  DS_FULL_PROTOTYPE_LIMITS,
   type DsFullFinding,
   type DsFullOptions,
   LOCKED_CSS_CODES,
@@ -244,5 +246,91 @@ describe('hostile documents fail closed', () => {
     );
     expect(report.ok).toBe(false);
     expect(report.findings.length).toBeLessThanOrEqual(256);
+    // The 1.4 MB file is over the per-file cap: refused unread, as an error.
+    expect(report.findings.filter((f) => f.code === 'file-too-large')).toMatchObject([
+      { severity: 'error', area: 'prototype-limits', path: 'src/Big.svelte' },
+    ]);
+  });
+
+  it('finishes a hostile prototype scan well under a second', async () => {
+    const big = `<script>import { Button } from 'texuli';</script>${'<Button variant="ghost">x</Button>'.repeat(40_000)}`;
+    // Just under the per-file cap: about 14,000 tags read in full, with fast line lookups.
+    const near = `<script>import { Button } from 'texuli';</script>\n${'<Button variant="ghost">x</Button>\n'.repeat(14_000)}`;
+    expect(near.length).toBeLessThan(DS_FULL_PROTOTYPE_LIMITS.fileBytes);
+    const doc = {
+      ...base,
+      color: { brand: { seed: '#0e7490' } },
+      allow: { button: { variants: ['default'] } },
+    };
+    await checkDesignSystemFull(doc, { catalog }); // warm the compiler and the catalog index
+    const started = performance.now();
+    const report = await checkDesignSystemFull(doc, {
+      catalog,
+      prototype: { files: { 'src/Big.svelte': big, 'src/Near.svelte': near } },
+    });
+    expect(performance.now() - started).toBeLessThan(1000);
+    expect(
+      report.findings.some((f) => f.code === 'file-too-large' && f.path === 'src/Big.svelte')
+    ).toBe(true);
+    expect(
+      report.findings.some(
+        (f) => f.code === 'variant-not-allowed' && f.path.startsWith('src/Near.svelte')
+      )
+    ).toBe(true);
+  });
+
+  it('caps the files, the total bytes, the blueprints and the findings of a prototype', async () => {
+    const doc = {
+      ...base,
+      color: { brand: { seed: '#0e7490' } },
+      allow: { button: { variants: ['default'] } },
+    };
+    const small = `<script>import { Button } from 'texuli';</script>\n<Button variant="ghost">x</Button>\n`;
+    const many = Object.fromEntries(
+      Array.from({ length: DS_FULL_PROTOTYPE_LIMITS.files + 3 }, (_, i) => [
+        `src/P${String(i).padStart(4, '0')}.svelte`,
+        small,
+      ])
+    );
+    const count = await checkDesignSystemFull(doc, { catalog, prototype: { files: many } });
+    expect(count.findings.find((f) => f.code === 'prototype-too-large')).toMatchObject({
+      severity: 'error',
+      area: 'prototype-limits',
+      path: 'files',
+      message: expect.stringContaining('3 file(s)'),
+    });
+    const chunk = `<script>import { Button } from 'texuli';</script>\n${' '.repeat(DS_FULL_PROTOTYPE_LIMITS.fileBytes - 100)}`;
+    const heavy = Object.fromEntries(
+      Array.from({ length: 20 }, (_, i) => [`src/H${i}.svelte`, chunk])
+    );
+    const bytes = await checkDesignSystemFull(doc, { catalog, prototype: { files: heavy } });
+    expect(bytes.findings.some((f) => f.code === 'prototype-too-large' && f.path === 'files')).toBe(
+      true
+    );
+    const blueprints = Object.fromEntries(
+      Array.from({ length: DS_FULL_PROTOTYPE_LIMITS.blueprints + 1 }, (_, i) => [
+        `b${i}`,
+        { tree: { id: 'button' } },
+      ])
+    );
+    const bp = await checkDesignSystemFull(doc, { catalog, prototype: { blueprints } });
+    expect(
+      bp.findings.some((f) => f.code === 'prototype-too-large' && f.path === 'blueprints')
+    ).toBe(true);
+    // Ten files with 100 disallowed variants each: the report stops at the finding cap.
+    const noisy = `<script>import { Button } from 'texuli';</script>\n${'<Button variant="ghost">x</Button>\n'.repeat(100)}`;
+    const capped = await checkDesignSystemFull(doc, {
+      catalog,
+      prototype: {
+        files: Object.fromEntries(
+          Array.from({ length: 10 }, (_, i) => [`src/N${i}.svelte`, noisy])
+        ),
+      },
+    });
+    expect(capped.findings.length).toBeLessThanOrEqual(256);
+    expect(capped.summary.warnings + capped.summary.errors).toBeGreaterThan(0);
+    expect(capped.findings.some((f) => f.code === 'findings-capped')).toBe(true);
+    for (const code of ['file-too-large', 'prototype-too-large', 'findings-capped'])
+      expect(DS_FULL_LIMIT_CODES).toContain(code);
   });
 });

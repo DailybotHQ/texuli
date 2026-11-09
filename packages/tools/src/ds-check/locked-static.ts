@@ -63,6 +63,8 @@ export type LockedStaticCode = (typeof LOCKED_STATIC_CODES)[number];
 export const LOCKED_STATIC_MAX_ISSUES = 64;
 /** The largest source text the reader scans, in characters. */
 export const LOCKED_STATIC_MAX_SOURCE = 1_000_000;
+/** The most component usages one source yields (the rest of the file is not read). */
+export const LOCKED_STATIC_MAX_USAGES = 10_000;
 
 /** One catalog component as the checker reads it (`packages/spec/catalog/components.json`). */
 export interface LockedCatalogComponent {
@@ -174,15 +176,24 @@ export function importedComponents(
   return locals;
 }
 
-/** Line and column (1-based) of an offset. */
-function position(source: string, offset: number): { line: number; column: number } {
-  let line = 1;
-  let last = -1;
-  for (let i = source.indexOf('\n'); i !== -1 && i < offset; i = source.indexOf('\n', i + 1)) {
-    line += 1;
-    last = i;
-  }
-  return { line, column: offset - last };
+/**
+ * A line and column (1-based) finder for one source: the line starts are computed once, and
+ * each lookup is a binary search, so locating n tags in a file is O(n log lines), not
+ * O(n × size).
+ */
+function positions(source: string): (offset: number) => { line: number; column: number } {
+  const starts = [0];
+  for (let i = source.indexOf('\n'); i !== -1; i = source.indexOf('\n', i + 1)) starts.push(i + 1);
+  return (offset) => {
+    let low = 0;
+    let high = starts.length - 1;
+    while (low < high) {
+      const mid = (low + high + 1) >> 1;
+      if ((starts[mid] as number) <= offset) low = mid;
+      else high = mid - 1;
+    }
+    return { line: low + 1, column: offset - (starts[low] as number) + 1 };
+  };
 }
 
 /** The end of a `{…}` expression starting at `start` (balanced braces, strings skipped). */
@@ -281,18 +292,20 @@ export function usageFromSource(
   if (locals.size === 0) return [];
   const usages: LockedUsage[] = [];
   const used = new Set<string>();
+  const position = positions(text);
   const markupStart = text.lastIndexOf('</script>');
   const markup = markupStart === -1 && !file.endsWith('.svelte') ? '' : text;
   const from = markupStart === -1 ? 0 : markupStart;
   const tag = /<([A-Z][\w$]*(?:\.[\w$]+)?)(?=[\s/>])/g;
   tag.lastIndex = from;
   for (let match = tag.exec(markup); match; match = tag.exec(markup)) {
+    if (usages.length >= LOCKED_STATIC_MAX_USAGES) break;
     const name = match[1] as string;
     const id = locals.get(name);
     if (!id) continue;
     used.add(name);
     const { props, end } = readAttributes(markup, match.index + match[0].length);
-    usages.push({ component: id, props, location: { file, ...position(text, match.index) } });
+    usages.push({ component: id, props, location: { file, ...position(match.index) } });
     tag.lastIndex = end;
   }
   for (const [name, id] of locals) {
@@ -301,7 +314,7 @@ export function usageFromSource(
     usages.push({
       component: id,
       props: {},
-      location: { file, ...position(text, Math.max(at, 0)) },
+      location: { file, ...position(Math.max(at, 0)) },
     });
   }
   return usages;
@@ -366,7 +379,7 @@ export function checkLockedUsage(
     message: string,
     extra: { value?: string; hint?: string } = {}
   ) => {
-    if (list === errors && errors.length >= LOCKED_STATIC_MAX_ISSUES) return;
+    if (list.length >= LOCKED_STATIC_MAX_ISSUES) return;
     list.push({
       code,
       path: locationText(usage.location),
@@ -379,6 +392,9 @@ export function checkLockedUsage(
   };
 
   for (const usage of usages) {
+    // Past the error cap nothing new can be reported: stop reading.
+    if (errors.length >= LOCKED_STATIC_MAX_ISSUES && warnings.length >= LOCKED_STATIC_MAX_ISSUES)
+      break;
     components[usage.component] = (components[usage.component] ?? 0) + 1;
     const component = byId.get(usage.component);
     if (!component) {
