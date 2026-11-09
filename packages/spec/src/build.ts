@@ -34,6 +34,24 @@ export const SCHEMA_UNITS = [
   { name: 'manifest', prefix: 'Spec', ts: 'manifest.ts', kt: 'Manifest.kt' },
   { name: 'workflow', prefix: '', ts: 'workflow.ts', kt: 'Workflow.kt' },
   { name: 'design-system', prefix: 'DesignSystem', ts: 'design-system.ts', kt: 'DesignSystem.kt' },
+  {
+    name: 'allow-manifest',
+    prefix: 'AllowManifest',
+    ts: 'allow-manifest.ts',
+    kt: 'AllowManifest.kt',
+  },
+  {
+    name: 'ds-check-report',
+    prefix: 'DsCheck',
+    ts: 'ds-check-report.ts',
+    kt: 'DsCheckReport.kt',
+  },
+  {
+    name: 'design-system-bundle',
+    prefix: 'DesignSystemBundle',
+    ts: 'design-system-bundle.ts',
+    kt: 'DesignSystemBundle.kt',
+  },
 ] as const;
 
 export const TS_OUT = 'generated/typescript/';

@@ -85,14 +85,14 @@ describe('canonical JSON and sha256', () => {
 describe('the closed dialect', () => {
   it('accepts every committed schema and refuses keywords, open objects, refs and dialects', () => {
     const schemas = Object.keys(normative).filter((p) => p.startsWith('schemas/'));
-    expect(schemas).toHaveLength(8);
+    expect(schemas).toHaveLength(11);
     // The pinned document and canvas schemas are their engines' exports: pinned, not in the dialect.
     expect(EXTERNAL_SCHEMAS).toEqual([
       'schemas/canvas.schema.json',
       'schemas/document.schema.json',
     ]);
     const dialect = schemas.filter((path) => !EXTERNAL_SCHEMAS.includes(path));
-    expect(dialect).toHaveLength(6);
+    expect(dialect).toHaveLength(9);
     for (const path of dialect) expect(checkSchemaDocument(json(path)), path).toEqual([]);
     expect(checkSchemaDocument(json('schemas/document.schema.json')).length).toBeGreaterThan(0);
     expect(checkSchemaDocument(json('schemas/canvas.schema.json')).length).toBeGreaterThan(0);
@@ -169,18 +169,24 @@ describe('deterministic generation', () => {
     const shuffled = Object.fromEntries(Object.entries(normative).reverse());
     expect(buildSpec(shuffled)).toEqual(build);
     expect(Object.keys(build.generated)).toEqual([
+      `${KOTLIN_OUT}AllowManifest.kt`,
       `${KOTLIN_OUT}Blueprint.kt`,
       `${KOTLIN_OUT}CatalogSchema.kt`,
       `${KOTLIN_OUT}DesignSystem.kt`,
+      `${KOTLIN_OUT}DesignSystemBundle.kt`,
       `${KOTLIN_OUT}Diagnostics.kt`,
+      `${KOTLIN_OUT}DsCheckReport.kt`,
       `${KOTLIN_OUT}Json.kt`,
       `${KOTLIN_OUT}Manifest.kt`,
       `${KOTLIN_OUT}Vocabulary.kt`,
       `${KOTLIN_OUT}Workflow.kt`,
+      `${TS_OUT}allow-manifest.ts`,
       `${TS_OUT}blueprint.ts`,
       `${TS_OUT}catalog-schema.ts`,
+      `${TS_OUT}design-system-bundle.ts`,
       `${TS_OUT}design-system.ts`,
       `${TS_OUT}diagnostics.ts`,
+      `${TS_OUT}ds-check-report.ts`,
       `${TS_OUT}manifest.ts`,
       `${TS_OUT}vocabulary.ts`,
       `${TS_OUT}workflow.ts`,
@@ -237,7 +243,7 @@ function code(text: string): string {
 
 describe('generated Kotlin (text artifacts; no Kotlin toolchain here)', () => {
   it('is well formed, defines every type it references, decodes closed and escapes strings', () => {
-    expect(kotlin).toHaveLength(8);
+    expect(kotlin).toHaveLength(11);
     for (const [path, text] of kotlin) {
       expect(text, path).toContain('\npackage com.texuli.spec\n');
       expect(text, path).not.toContain('\t');
