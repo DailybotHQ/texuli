@@ -181,6 +181,15 @@
       "readOnly": true
     },
     {
+      "name": "ds.allow",
+      "title": "List allowed components for a locked design system",
+      "description": "Build the allow section of a locked design system from the catalog: a preset (minimal, a documented core; all, every component) or the ids you name, each with every variant, size, tone, density and state the catalog declares. Narrow it, put it under \"allow\" and run ds.validate. Returns allow, count, unknown ids and the minimal preset ids.",
+      "runtime": "edge",
+      "remote": true,
+      "local": true,
+      "readOnly": true
+    },
+    {
       "name": "ds.diff",
       "title": "Diff two design systems",
       "description": "Compile two design-system documents (before is the baseline) and compare them: every added, removed or changed --tx-* variable per mode, contrast pairs that regressed below the target, changed component defaults and attributes. Returns valid, identical, the summary counts and each list, or errors tagged with their side.",
@@ -201,7 +210,7 @@
     {
       "name": "ds.save",
       "title": "Save a design system to a file",
-      "description": "Validate a design-system document (as ds.validate does) and write it as two-space JSON to the explicit .json path you pass, inside the working directory: traversal, symlinks, dot directories and dotfiles, node_modules, package.json and an existing file without overwrite are refused. Local doors only. Returns saved, the relative path and bytes written, or errors with stable codes.",
+      "description": "Validate a design-system document (as ds.validate does) and write it as two-space JSON to an explicit .json path inside the working directory (traversal, symlinks, dot paths, node_modules, package.json and existing files without overwrite are refused). Anything marked approved is refused (approval-human-only). Local doors only. Returns saved, the path and bytes, or errors with stable codes.",
       "runtime": "node",
       "remote": false,
       "local": true,

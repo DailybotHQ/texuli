@@ -539,7 +539,7 @@ export const dsSave: Operation = defineOperation({
   name: 'ds.save',
   title: 'Save a design system to a file',
   summary:
-    'Validate a design-system document (as ds.validate does) and write it as two-space JSON to the explicit .json path you pass, inside the working directory: traversal, symlinks, dot directories and dotfiles, node_modules, package.json and an existing file without overwrite are refused. Local doors only. Returns saved, the relative path and bytes written, or errors with stable codes.',
+    'Validate a design-system document (as ds.validate does) and write it as two-space JSON to an explicit .json path inside the working directory (traversal, symlinks, dot paths, node_modules, package.json and existing files without overwrite are refused). Anything marked approved is refused (approval-human-only). Local doors only. Returns saved, the path and bytes, or errors with stable codes.',
   input: {
     type: 'object',
     properties: {
@@ -596,6 +596,6 @@ export const dsSave: Operation = defineOperation({
         'runtime-unavailable',
         'ds.save needs a door that writes local files (texuli-mcp or the texuli CLI).'
       );
-    return (await run()).runSave(input, context.files);
+    return (await run()).runSave(input, context.files, context.approve === true);
   },
 });

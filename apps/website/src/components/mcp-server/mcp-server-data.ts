@@ -613,6 +613,35 @@ export const MCP_SERVER_DATA = {
       example: 'A brand one-liner',
     },
     {
+      name: 'ds.allow',
+      title: 'List allowed components for a locked design system',
+      summary:
+        'Build the allow section of a locked design system from the catalog: a preset (minimal, a documented core; all, every component) or the ids you name, each with every variant, size, tone, density and state the catalog declares. Narrow it, put it under "allow" and run ds.validate. Returns allow, count, unknown ids and the minimal preset ids.',
+      runtime: 'edge',
+      remote: true,
+      local: true,
+      limits: {
+        inputBytes: 32768,
+        timeMs: 10000,
+        items: 256,
+      },
+      arguments: [
+        {
+          name: 'preset',
+          required: false,
+          description:
+            'minimal (a documented core: actions, form controls, text and status, containers, overlays and page layouts) or all (every catalog component). Ignored when components is set.',
+        },
+        {
+          name: 'components',
+          required: false,
+          description:
+            'Catalog component ids to allow, e.g. ["button", "card", "data-grid"] (find ids with catalog.search).',
+        },
+      ],
+      example: 'The minimal preset',
+    },
+    {
       name: 'ds.diff',
       title: 'Diff two design systems',
       summary:
@@ -718,7 +747,7 @@ export const MCP_SERVER_DATA = {
       name: 'ds.save',
       title: 'Save a design system to a file',
       summary:
-        'Validate a design-system document (as ds.validate does) and write it as two-space JSON to the explicit .json path you pass, inside the working directory: traversal, symlinks, dot directories and dotfiles, node_modules, package.json and an existing file without overwrite are refused. Local doors only. Returns saved, the relative path and bytes written, or errors with stable codes.',
+        'Validate a design-system document (as ds.validate does) and write it as two-space JSON to an explicit .json path inside the working directory (traversal, symlinks, dot paths, node_modules, package.json and existing files without overwrite are refused). Anything marked approved is refused (approval-human-only). Local doors only. Returns saved, the path and bytes, or errors with stable codes.',
       runtime: 'node',
       remote: false,
       local: true,
@@ -1162,7 +1191,7 @@ export const MCP_SERVER_DATA = {
       name: 'create-design-system',
       title: 'Create a design system from a brief',
       description:
-        'Turn a brand brief (colors, fonts, mood, an existing token file or a library theme) into a validated Texuli design-system document: start from an importer or a suggestion, write the sections, validate with ds.validate and fix every code until it passes, then report contrast and a preview. Returns the step-by-step loop with the brief filled in.',
+        'Turn a brand brief (colors, fonts, mood, an existing token file or a library theme) into a validated Texuli design-system document: start from an importer or a suggestion, write the sections, optionally lock it (an allow section from ds.allow, library entries, a draft approval), validate with ds.validate and fix every code until it passes, then report contrast and a preview. Approval stays human: the agent never marks it approved. Returns the step-by-step loop with the brief filled in.',
       arguments: [
         {
           name: 'brief',
@@ -1180,6 +1209,13 @@ export const MCP_SERVER_DATA = {
           required: false,
           description: 'The contrast target: AA (4.5:1 text, the default) or AAA (7:1 text).',
           enum: ['AA', 'AAA'],
+        },
+        {
+          name: 'locked',
+          required: false,
+          description:
+            'Lock the design system to the components it allows (ADR-032): minimal (a documented core), all (every catalog component) or custom (the components the brief names). Omit for an unlocked document.',
+          enum: ['minimal', 'all', 'custom'],
         },
       ],
     },

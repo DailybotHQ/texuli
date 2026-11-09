@@ -152,6 +152,7 @@ export function createOperationRegistry(
             signal: controller.signal,
             ...(options.site ? { site: options.site } : {}),
             ...(options.files ? { files: options.files } : {}),
+            ...(options.approve === true ? { approve: true } : {}),
           })
         ),
         timeout,
