@@ -1,7 +1,8 @@
 # Heading, Text, Prose, Box, Mark, Link and ColorSwatch
 
-**Package:** `texuli` · **Import:** `texuli/typography` (`Heading`, `Text`, `Prose` and `Box` are also on `texuli`) · **Status:** built for
-blueprint spec `0.13.0`, not published (planned for `0.15.0`)
+**Package:** `texuli` · **Import:** `texuli/typography` or `texuli` · **Status:** `Heading`, `Text`, `Prose` and
+`Box` are new in `0.15.0` (blueprint spec `0.13.0`); `Mark`, `Link`, `ColorSwatch` and the round-2 to round-5 options are
+in development for `0.16.0`
 
 Typography and surfaces from the design system, driven by `--tx-*` tokens only. A locked
 prototype ([DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md#locked-design-systems)) refuses

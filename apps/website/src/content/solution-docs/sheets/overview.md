@@ -1,6 +1,6 @@
 ## What Sheets is
 
-Sheets is an embeddable spreadsheet: `@texuli/sheets` holds an owned formula engine (a linear-time parser into the `@texuli/core/expression` AST, 54 documented functions, a dependency graph with incremental recalculation), a framework-free workbook model, CSV import and export, and an accessible Svelte 5 grid view. The package is published as `0.14.4` and is **in development** (pre-1.0). Pin the exact version or use `^0.14.0`.
+Sheets is an embeddable spreadsheet: `@texuli/sheets` holds an owned formula engine (a linear-time parser into the `@texuli/core/expression` AST, 54 documented functions, a dependency graph with incremental recalculation), a framework-free workbook model, CSV import and export, and an accessible Svelte 5 grid view. The package is published as `0.15.0` and is **in development** (pre-1.0). Pin the exact version or use `^0.15.0`.
 
 It is not a hosted spreadsheet service. Collaboration, localized formula display and native (Kotlin) evaluation are planned, not shipped. The host app stores the workbook.
 

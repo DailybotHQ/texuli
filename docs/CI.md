@@ -126,7 +126,7 @@ first time as `0.3.0`; `@texuli/deck` was first published in `0.4.0`, and
 `@texuli/editor` was first published in `0.5.0`, `@texuli/document`
 and `@texuli/pages` in `0.7.0`, and `@texuli/forms`, `@texuli/canvas` and
 `@texuli/sheets` in `0.8.0`, and `@texuli/mcp` in `0.9.0`; in `0.10.0`
-and the 0.11 to 0.14 lines all 26 packable packages move together. A pre-flight step refuses the run,
+and the 0.11 to 0.15 lines all 26 packable packages move together. A pre-flight step refuses the run,
 before the first `npm publish`, when any listed package is still `0.0.0`.
 The publish loop
 skips versions npm already has, so a package changed since its published

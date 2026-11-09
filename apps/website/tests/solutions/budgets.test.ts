@@ -22,9 +22,9 @@ describe('ecosystem route budgets', () => {
       jsGzipKb: 60,
       htmlGzipKb: 27,
     });
-    expect(budgetFor('/solutions/documents/').pageGzipKb).toBe(174);
+    expect(budgetFor('/solutions/documents/').pageGzipKb).toBe(182);
     expect(budgetFor('/solutions/workflows/')).toMatchObject({ pageGzipKb: 132, jsGzipKb: 96 });
-    expect(budgetFor('/solutions/canvas/').pageGzipKb).toBe(169);
+    expect(budgetFor('/solutions/canvas/').pageGzipKb).toBe(177);
     expect(budgetFor('/solutions/sheets/')).toMatchObject({
       pageGzipKb: 186,
       htmlRawKb: 236,
