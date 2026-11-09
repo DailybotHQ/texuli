@@ -1,7 +1,7 @@
 # Heading, Text, Prose and Box
 
 **Package:** `texuli` · **Import:** `texuli/typography` or `texuli` · **Status:** built for
-blueprint spec `0.13.0`, not published (planned for `0.15.0`)
+blueprint spec `0.13.0`, new in `0.15.0`
 
 Typography and surfaces from the design system, driven by `--tx-*` tokens only. A locked
 prototype ([DESIGN_SYSTEMS](../../../docs/DESIGN_SYSTEMS.md#locked-design-systems)) refuses

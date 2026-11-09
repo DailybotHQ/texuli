@@ -20,7 +20,7 @@
 > issue code and `components.card["font-size"]` (a type role, the card
 > content font size). Every 0.11.0 document stays valid; `formatVersion` stays `1`.
 
-> **Spec 0.13.0 (built, not published; planned for `0.15.0`).** Additive
+> **Spec 0.13.0 (new in `0.15.0`).** Additive
 > ([ADR-032](../../../docs/DECISIONS.md#adr-032-locked-design-systems)):
 > the optional `allow`, `library` and `approval` sections (a locked design
 > system, below), the `approval-invalid` code and the catalog-membership

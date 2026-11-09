@@ -2,8 +2,8 @@
  * The features /whats-new/ showcases, grouped by the release that carries
  * them, each with its honest status, its packages, the page that shows it
  * in full and the kind of demo or preview the hub paints. Plain data, so
- * the page and its tests share one source. Releases: 0.6.0 to 0.14.0 are
- * published on npm, and 0.14.4 is `latest` (the release line in
+ * the page and its tests share one source. Releases: 0.6.0 to 0.15.0 are
+ * published on npm, and 0.15.0 is `latest` (the release line in
  * docs/RELEASE.md).
  */
 
@@ -16,7 +16,8 @@ export type ReleaseId =
   | '0.11.0'
   | '0.12.0'
   | '0.13.0'
-  | '0.14.0';
+  | '0.14.0'
+  | '0.15.0';
 
 export interface Release {
   readonly id: ReleaseId;
@@ -28,10 +29,18 @@ export interface Release {
 
 export const RELEASES: readonly Release[] = [
   {
+    id: '0.15.0',
+    title: '0.15.0: locked design systems, typography and button tone',
+    status: 'Published on npm as 0.15.0, the current release (pre-1.0).',
+    published: true,
+    summary:
+      "Locked design systems for the consumers Protoyard and Dailybot, with no breaking API change. Blueprint spec 0.13.0 lets a design system name the components, variants, sizes and states a product may use (allow), its own components (library) and the approval of each version (approval, with a content hash); texuli ds init --locked, ds approve, ds hash and ds check keep it honest, and an approval records who approved but cannot prove it. The catalog lists each component's axes, states and imports, grows to 187 ids and merges host extensions (<ns>:<id>). Heading, Text, Prose and Box set type and surfaces from tokens, and Button takes a tone. The design-system kit, ds generate, the importers and the locked checkers are in development, completed in 0.16.0.",
+  },
+  {
     id: '0.14.0',
     title: '0.14.0: timeline groups, non-text contrast and looping motion',
     status:
-      'Published on npm as 0.14.0; 0.14.1 to 0.14.3 add calendar, overlay, control, nav and Spanish label options; 0.14.4, the current release (pre-1.0), keeps the timeline date.',
+      'Published on npm as 0.14.0; 0.14.1 to 0.14.3 add calendar, overlay, control, nav and Spanish label options; 0.14.4 keeps the timeline date; everything in the 0.14 line is also in 0.15.0.',
     published: true,
     summary:
       'Gaps from the consumers Protoyard and Dailybot, all additive. TimelineView groups rows under header bands with collapse, selection and markers, also in the agent catalog. Blueprint spec 0.12.0 adds a dark shadow alpha and the aa-non-text check (an invisible active sidebar item fails texuli ds check), and design-system compiler version 3 changes compiled hashes once while every 0.11.0 document stays valid. MotionLoop loops a pulse or a wave and stays still under reduced motion; icons load lazily; AlertDialog takes confirmDisabled and Breadcrumb items take ariaLabel and onSelect; dialog and sheet scrims are dark again in dark mode.',
@@ -40,7 +49,7 @@ export const RELEASES: readonly Release[] = [
     id: '0.13.0',
     title: '0.13.0: brand fields and one label dictionary',
     status:
-      'Published on npm as 0.13.0; its patch 0.13.1 adds icons registered by name, the CodeField block, a theme-aware dark image and a grid layout for avatar groups; everything in the 0.13 line is also in 0.14.0.',
+      'Published on npm as 0.13.0; its patch 0.13.1 adds icons registered by name, the CodeField block, a theme-aware dark image and a grid layout for avatar groups; everything in the 0.13 line is also in 0.14.0 and 0.15.0.',
     published: true,
     summary:
       'Gaps from the consumers Protoyard, Dailybot and Corag, all additive. Blueprint spec 0.11.0 extends the design-system document with shadow levels, product tokens (--tx-ext-<name>), a categorical palette of 1 to 8 colors and pinned soft inks, and design-system compiler version 2 changes compiled hashes while every 0.10.0 document stays valid. One label dictionary (LabelsProvider and setTexuliLabels in texuli/i18n) translates the built-in labels of texuli, primitives, blocks and pages. texuli ds check --render works in a consumer, chart titles rank by their section, and the timeline gains styling hooks.',
@@ -49,7 +58,7 @@ export const RELEASES: readonly Release[] = [
     id: '0.12.0',
     title: '0.12.0: pages core entries without the deck model',
     status:
-      'Published on npm as 0.12.0; its patch 0.12.1 adds coverHeadingLevel to the @texuli/slides stage, its patch 0.12.2 is the first published through npm trusted publishing, and its patch 0.12.3 has no package code change; everything in the 0.12 line is also in 0.13.0 and 0.14.0.',
+      'Published on npm as 0.12.0; its patch 0.12.1 adds coverHeadingLevel to the @texuli/slides stage, its patch 0.12.2 is the first published through npm trusted publishing, and its patch 0.12.3 has no package code change; everything in the 0.12 line is also in 0.13.0 to 0.15.0.',
     published: true,
     summary:
       'Protoyard G136 finished: the @texuli/pages core entries (PageEditorCore, CollabEditorCore, PagesEditor and createDocumentPlayerHostCore) validate documents without @texuli/deck/model, so @texuli/pages/editor-core and host-core are much smaller. Breaking for those core entries only: they take validateDeck with no default and refuse inline decks without it, a one-line migration (validateDeck: checkDeckPayload from @texuli/document/schema); PageEditor, CollabEditor and createDocumentPlayerHost behave as before. Blueprint spec stays 0.10.0.',
@@ -58,7 +67,7 @@ export const RELEASES: readonly Release[] = [
     id: '0.11.0',
     title: '0.11.0: lighter design-system hosts',
     status:
-      'Published on npm as 0.11.0; its patches 0.11.1 to 0.11.5 added fixes and additive Protoyard gaps (G128–G136), and everything in the 0.11 line is also in 0.12.0 to 0.14.0.',
+      'Published on npm as 0.11.0; its patches 0.11.1 to 0.11.5 added fixes and additive Protoyard gaps (G128–G136), and everything in the 0.11 line is also in 0.12.0 to 0.15.0.',
     published: true,
     summary:
       'The Protoyard gaps G125 to G127: the library theme ids without the library (@texuli/tokens/library-ids), complete expand theme descriptions, and core entries that compile and paint design systems with no theme library in any chunk (@texuli/tokens/design-system/compile-core, @texuli/player/design-system-core). The slides and pages core entries no longer load the theme library unless the host passes a loader, a one-line migration. Design systems with one mode never throw, and DesignSystemProvider reports a failed apply through onapplyerror. Blueprint spec stays 0.10.0.',
@@ -66,7 +75,7 @@ export const RELEASES: readonly Release[] = [
   {
     id: '0.10.0',
     title: '0.10.0: design systems',
-    status: 'Published on npm as 0.10.0; everything in it is also in 0.11.0 to 0.14.0.',
+    status: 'Published on npm as 0.10.0; everything in it is also in 0.11.0 to 0.15.0.',
     published: true,
     summary:
       'Design systems: one JSON document per brand, compiled with contrast, focus and target size enforced and followed by every surface; the Design System Studio; ds tools on the MCP and the CLI; texuli ds check; the Protoyard gaps G100 to G124; and the removal of the names deprecated in 0.9.0. Blueprint spec 0.10.0 adds the design-system document, a stamp-only migration from 0.9.0.',
@@ -74,7 +83,7 @@ export const RELEASES: readonly Release[] = [
   {
     id: '0.9.0',
     title: '0.9.0: MCP, an agent-ready site and design tokens',
-    status: 'Published on npm as 0.9.0; everything in it is also in 0.10.0 to 0.14.0.',
+    status: 'Published on npm as 0.9.0; everything in it is also in 0.10.0 to 0.15.0.',
     published: true,
     summary:
       'An MCP server for agents (remote and local), texuli.com readable by agents end to end, token contract v2 with a component tier, overlays that keep their scope, and the fixes Protoyard asked for. @texuli/mcp is a new package, first published in 0.9.0, and still in development.',
@@ -82,7 +91,7 @@ export const RELEASES: readonly Release[] = [
   {
     id: '0.8.0',
     title: '0.8.0: forms, canvas, sheets and output',
-    status: 'Published on npm as 0.8.0; everything in it is also in 0.9.0 to 0.14.0.',
+    status: 'Published on npm as 0.8.0; everything in it is also in 0.9.0 to 0.15.0.',
     published: true,
     summary:
       'Forms, data sources, the canvas, spreadsheets, dashboards, email and PDF output, and one message catalog for every label, with blueprint spec 0.8.0. @texuli/forms, @texuli/canvas and @texuli/sheets were published for the first time; all three are still in development.',
@@ -90,7 +99,7 @@ export const RELEASES: readonly Release[] = [
   {
     id: '0.7.0',
     title: '0.7.0: documents',
-    status: 'Published on npm as 0.7.0; everything in it is also in 0.8.0 to 0.14.0.',
+    status: 'Published on npm as 0.7.0; everything in it is also in 0.8.0 to 0.15.0.',
     published: true,
     summary:
       'A block document engine with collaboration, the Notion-like page editor, and documents as agent data in blueprint spec 0.7.0. @texuli/document and @texuli/pages were published for the first time; both are still in development.',
@@ -98,7 +107,7 @@ export const RELEASES: readonly Release[] = [
   {
     id: '0.6.0',
     title: '0.6.0: motion and live generation',
-    status: 'Published on npm as 0.6.0; everything in it is also in 0.7.0 to 0.14.0.',
+    status: 'Published on npm as 0.6.0; everything in it is also in 0.7.0 to 0.15.0.',
     published: true,
     summary:
       'One API contract for every component, a motion system with a closed vocabulary, and blueprints that paint while they stream, with blueprint spec 0.6.0.',

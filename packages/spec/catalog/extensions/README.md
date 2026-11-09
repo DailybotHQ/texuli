@@ -1,8 +1,8 @@
 # Host catalog extensions
 
 A host library adds its own components to the catalog with an **extension**, so a locked
-design system can allow or disable them like Texuli's own (ADR-032, spec 0.13.0, not
-published). Texuli ships no extension: hosts publish theirs (for example
+design system can allow or disable them like Texuli's own (ADR-032, spec 0.13.0, new in
+`0.15.0`). Texuli ships no extension: hosts publish theirs (for example
 `design-systems/catalog-extension.json`) and merge them at run or build time.
 
 ```json

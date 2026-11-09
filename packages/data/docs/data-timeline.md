@@ -70,10 +70,10 @@ New in `0.14.2`.
   opened with no bars in view. The opening day sits a quarter of the
   viewport in from the inline start, so earlier work stays in sight. The
   scroll is instant (no motion) and never moves focus. In RTL it scrolls
-  from the right edge (negative `scrollLeft`). Since `0.14.4` the view
+  from the right edge (negative `scrollLeft`). Since `0.15.0` the view
   holds that day in place: rows that arrive after mount (an asynchronous
   load) and `zoom` changes scroll it back to the same spot. Once the reader
-  scrolls, the day they scrolled to is held instead. Before `0.14.4` the
+  scrolls, the day they scrolled to is held instead. Before `0.15.0` the
   opening date was applied once, on mount, and zoom kept the pixel offset.
 - **`scrollToDate(date)`.** The component exports
   `scrollToDate(date: IsoDate | Date)`: bind the instance

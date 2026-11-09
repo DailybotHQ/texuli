@@ -6,10 +6,10 @@
 > line on npm; 0.9.0 had none of it (it has token contract v2, component
 > tokens, hooks and design defaults, the plumbing this builds on). Items
 > marked **planned** are not built yet. [Locked design systems](#locked-design-systems)
-> (blueprint spec `0.13.0`, ADR-032) are built on `main`'s next line and
-> are **not published yet**: they are planned for `0.15.0` (the document,
-> the catalog, the allow manifest and the CLI) and `0.16.0` (the kit page
-> and the checker core).
+> (blueprint spec `0.13.0`, ADR-032) are new in `0.15.0`: the document,
+> the catalog, the allow manifest and the CLI. The kit (`texuli/ds-kit`)
+> and the locked checkers ship in `0.15.0` as **in development** and are
+> completed in `0.16.0`.
 
 A design system describes a brand once, as **one closed JSON document**,
 and every Texuli surface follows it: styled components, layouts and domain
@@ -403,7 +403,7 @@ exports the document (and, optionally, its cached compiled form):
     "./design-system.json": "./design-system.json",
     "./design-system.compiled.json": "./design-system.compiled.json"
   },
-  "peerDependencies": { "@texuli/tokens": "^0.14.0" }
+  "peerDependencies": { "@texuli/tokens": "^0.15.0" }
 }
 ```
 
@@ -481,10 +481,10 @@ opened). Details: [ds-check.md](../packages/tools/docs/ds-check.md).
 
 ## Locked design systems
 
-> **Status: built, not published.** Blueprint spec `0.13.0`
-> ([ADR-032](DECISIONS.md#adr-032-locked-design-systems)). Every item below
-> marked built has tests on the plan branch; items marked **planned** do
-> not exist yet. Existing documents are unaffected: without `allow` a design
+> **Status: new in `0.15.0`.** Blueprint spec `0.13.0`
+> ([ADR-032](DECISIONS.md#adr-032-locked-design-systems)). Items marked
+> **in development** ship in `0.15.0` and are completed in `0.16.0`; items
+> marked **planned** do not exist yet. Existing documents are unaffected: without `allow` a design
 > system is not locked, and a `0.12.0` document compiles to the same CSS.
 
 A locked design system says which Texuli components, variants, sizes and
@@ -655,8 +655,12 @@ element back to its component without component internals.
 ### Locked-mode rules for consumers
 
 These are the owner's rules for locked prototypes. Texuli states them here
-as the contract; the checker that enforces them in Texuli is **planned**
-(`@texuli/tools/ds-check`, `0.16.0`).
+as the contract. The checker core is **in development** in
+`@texuli/tools/ds-check` (`0.15.0`, completed in `0.16.0`): the locked
+static checker (components, props and variants used, against the allow
+manifest and the catalog), the CSS policy (class lists and declarations),
+the interactive-element mapper and `checkDesignSystemFull` (one report for a
+design system and a prototype).
 
 - **Only allowed components.** UI is built from components in the allow
   set and the design system's own library; no local styled components, no
@@ -676,20 +680,22 @@ as the contract; the checker that enforces them in Texuli is **planned**
   component.
 - **Existing prototypes.** Only new prototypes are locked; existing ones
   migrate on demand, and a report mode lists violations without failing
-  (**planned** with the checker).
+  (**planned**, `0.16.0`).
 - **Render check.** Required in CI for locked prototypes, on demand
   locally. `texuli ds check --render` already paints the catalog under a
   design system (axe, painted contrast, colors that do not come from it);
-  the locked-mode runtime checks are **planned**.
+  the locked-mode runtime checks are **planned** (`0.16.0`).
 
 ### See the whole design system
 
 `texuli/ds-kit` renders a design system on one page from data: the
 foundations (every token, light and dark), voice and rules, the library
 with its approval badges, and the changes between two versions, with the
-approval record and its hash check in the header. It is **in
-development** (`0.16.0`); the component matrix and the texuli.com kit page
-are **planned**. The decision is recorded in ADR-032.
+approval record and its hash check in the header, and a component matrix
+of every enabled control in each variant, size and state. It ships in
+`0.15.0` as **in development** and is completed in `0.16.0`, with its
+texuli.com page (`/design-systems/kit/`). The decision is recorded in
+ADR-032.
 
 ## Outputs
 

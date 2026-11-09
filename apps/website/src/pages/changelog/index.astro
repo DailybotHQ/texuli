@@ -11,6 +11,19 @@ const current = texuliPackageVersion();
 
 const entries = [
   {
+    version: '0.15',
+    date: '2026-11',
+    items: [
+      "Blueprint spec 0.13.0, locked design systems: a design-system document gains allow (the catalog ids, Texuli's or a host extension's <ns>:<id>, with their enabled variants, sizes, tones, densities and states; up to 4096 ids), library (the design system's own components, each with its own approval) and approval (status, approvedBy, approvedAt, version and a SHA-256 contentHash). extends, variants and patches carry allow and library; approval is never inherited. Every 0.12.0 document stays valid.",
+      'designSystemContentHash, approveDesignSystem, initLockedDesignSystem and checkDesignSystemAllow in @texuli/spec/design-system, and the compiler emits an allow manifest beside the CSS. An approval records who approved; it cannot prove it: a reviewed commit through CODEOWNERS is the guarantee.',
+      "The agent catalog lists each component's styling axes, observable states and public imports, and grows from 170 to 187 ids (typography, display and app components, governed by allow; 75 stay agent-emittable). mergeCatalogs merges host catalog extensions with stable refusal codes, and every catalog component root carries data-tx-component and its axis attributes.",
+      'Heading, Text, Prose and Box in texuli/typography set type and surfaces from --tx-* tokens; Button and IconButton take tone (default, destructive, success, warning), independent of variant.',
+      'texuli ds init --locked, ds approve (the only door that writes an approved document), ds hash, and ds check reports the allowed set, the approval as declared and stale content hashes; ds.allow lists an allow section, and ds.save refuses an approved document. A fix before release: designSystemContentHash no longer mutates a document without approval, so library-hash-mismatch fires.',
+      'In development, completed in 0.16.0: the design-system kit (texuli/ds-kit, /design-systems/kit/), texuli ds generate and the importers, the locked checkers in @texuli/tools/ds-check, the contract schemas, the blueprint allow check and the Studio for locked systems.',
+      'No breaking API change; a 0.x minor because of the new spec.',
+    ],
+  },
+  {
     version: '0.14',
     date: '2026-11',
     items: [

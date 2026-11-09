@@ -22,10 +22,9 @@ texuli ds check acme.json --mode dark --variant compact
 texuli ds check brand.json --catalog components.json   # allow checked against another catalog
 ```
 
-> **Locked design systems (spec 0.13.0, built, not published; planned for
-> `0.15.0`).** The check also reports the allowed set, the approval and the
-> content hashes ([below](#locked-design-systems)); it cannot prove who
-> approved.
+> **Locked design systems (spec 0.13.0, new in `0.15.0`).** The check also
+> reports the allowed set, the approval and the content hashes
+> ([below](#locked-design-systems)); it cannot prove who approved.
 
 ## Flags
 
