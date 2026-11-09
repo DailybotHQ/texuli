@@ -11,6 +11,7 @@
  * parameter.
  */
 
+import { registryLlmsSections } from '../../lib/twins/solutions.ts';
 import { COMPONENT_FAMILIES } from '../foundation/nav-data.ts';
 import { DOCS_HOME, GET_STARTED, NAV_GROUPS, type NavLink } from '../foundation/site.ts';
 import { GUIDES_SECTIONS } from '../guides/nav.ts';
@@ -85,6 +86,7 @@ export function siteLlmsSections(siteUrl: string): SiteLlmsSection[] {
       description: 'The two-runtimes story: the architecture page and the native landing.',
       links: nav('platform'),
     },
+    ...registryLlmsSections(siteUrl).map((section) => ({ ...section, links: [...section.links] })),
     {
       name: 'Guides',
       description: 'Task-first guides, in reading order.',

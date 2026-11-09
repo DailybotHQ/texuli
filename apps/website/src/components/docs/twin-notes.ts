@@ -11,6 +11,8 @@
  * named here is one the remote MCP serves and every package README exists.
  */
 
+import { solutionTwinNotes } from '../../lib/twins/solutions.ts';
+
 /** Where an agent reads more. */
 export interface NoteLink {
   label: string;
@@ -210,6 +212,7 @@ export const TWIN_NOTES: readonly TwinNote[] = Object.freeze([
     operations: [...CATALOG_OPS, 'deck.run', 'document.run'],
     packages: ['texuli'],
   },
+  ...solutionTwinNotes(),
 ]);
 
 /** The note that covers `route`, if any. */

@@ -22,6 +22,23 @@ The two-runtimes story: the architecture page and the native landing.
 - [Web + native](https://texuli.com/web-and-native/)
 - [Native (Kotlin)](https://texuli.com/native/)
 
+## Solutions
+
+Embeddable open-source systems that complete a task end to end.
+
+- [Slides](https://texuli.com/solutions/slides/): Write decks as JSON or Markdown and present them in the browser. Status: in development.
+- [Slides docs](https://texuli.com/guides/solutions/slides/)
+- [Documents docs](https://texuli.com/guides/solutions/documents/)
+- [Workflows docs](https://texuli.com/guides/solutions/workflows/)
+- [Canvas docs](https://texuli.com/guides/solutions/canvas/)
+- [Sheets docs](https://texuli.com/guides/solutions/sheets/)
+
+## Built with Texuli
+
+Products built on Texuli, each with its own brand and domain.
+
+- [Protoyard](https://texuli.com/built-with/protoyard/): Open-source local prototyping for exploring and validating software prototypes. Status: available.
+
 ## Guides
 
 Task-first guides, in reading order.
@@ -33,6 +50,11 @@ Task-first guides, in reading order.
 - [Accessibility](https://texuli.com/guides/accessibility/)
 - [RTL and i18n](https://texuli.com/guides/rtl-i18n/)
 - [Forms](https://texuli.com/guides/forms/)
+- [Slides](https://texuli.com/guides/solutions/slides/)
+- [Documents](https://texuli.com/guides/solutions/documents/)
+- [Workflows](https://texuli.com/guides/solutions/workflows/)
+- [Canvas](https://texuli.com/guides/solutions/canvas/)
+- [Sheets](https://texuli.com/guides/solutions/sheets/)
 - [Performance](https://texuli.com/guides/performance/)
 
 ## Components
