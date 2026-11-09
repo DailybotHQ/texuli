@@ -13,12 +13,14 @@ const rootFiles = {
   heading: 'components/typography/Heading.svelte',
   prose: 'components/typography/Prose.svelte',
   text: 'components/typography/Text.svelte',
+  accordion: 'components/tabs-accordion/Accordion.svelte',
   'alert-dialog': 'components/dialog/AlertDialog.svelte',
   'analytics-grid': 'layouts/dashboard/AnalyticsGrid.svelte',
   'app-nav': 'components/sidebar/AppNav.svelte',
   'avatar-group-grid': 'components/avatar/AvatarGroupGrid.svelte',
   badge: 'components/badge/Badge.svelte',
   banner: 'components/alert/Banner.svelte',
+  'bottom-nav': 'layouts/mobile/BottomNav.svelte',
   breadcrumb: 'components/navigation/Breadcrumb.svelte',
   button: 'components/button/Button.svelte',
   'button-group': 'components/button/ButtonGroup.svelte',
@@ -71,6 +73,7 @@ const rootFiles = {
   'layout-wizard': 'layouts/auth-settings/WizardLayout.svelte',
   menubar: 'components/menus/MenubarRoot.svelte',
   'menubar-trigger': 'components/menus/MenubarTrigger.svelte',
+  'mobile-header': 'layouts/mobile/MobileHeader.svelte',
   'multi-select': 'components/combobox/MultiSelectRoot.svelte',
   'nav-icon': 'layouts/host/NavIcon.svelte',
   'navigation-menu': 'components/navigation/NavigationMenuRoot.svelte',
@@ -98,6 +101,7 @@ const rootFiles = {
   stepper: 'components/stepper/Stepper.svelte',
   switch: 'components/choice/Switch.svelte',
   table: 'components/table/Table.svelte',
+  tabs: 'components/tabs-accordion/Tabs.svelte',
   tag: 'components/badge/Tag.svelte',
   'text-counter': 'components/input/TextCounter.svelte',
   textarea: 'components/input/Textarea.svelte',
@@ -112,12 +116,14 @@ const axisFiles = {
   heading: 'components/typography/Heading.svelte',
   prose: 'components/typography/Prose.svelte',
   text: 'components/typography/Text.svelte',
+  accordion: 'components/tabs-accordion/Accordion.svelte',
   'alert-dialog': 'components/dialog/AlertDialog.svelte',
   'analytics-grid': 'layouts/dashboard/AnalyticsGrid.svelte',
   'app-nav': 'components/sidebar/AppNav.svelte',
   'avatar-group-grid': 'components/avatar/AvatarGroupGrid.svelte',
   badge: 'components/badge/Badge.svelte',
   banner: 'components/alert/AlertSurface.svelte',
+  'bottom-nav': 'layouts/mobile/BottomNav.svelte',
   breadcrumb: 'components/navigation/Breadcrumb.svelte',
   button: 'components/button/Button.svelte',
   'button-group': 'components/button/ButtonGroup.svelte',
@@ -170,6 +176,7 @@ const axisFiles = {
   'layout-wizard': 'layouts/auth-settings/WizardLayout.svelte',
   menubar: 'components/menus/MenubarRoot.svelte',
   'menubar-trigger': 'components/menus/MenubarTrigger.svelte',
+  'mobile-header': 'layouts/mobile/MobileHeader.svelte',
   'multi-select': 'components/combobox/ComboboxRoot.svelte',
   'nav-icon': 'layouts/host/NavIcon.svelte',
   'navigation-menu': 'components/navigation/NavigationMenuRoot.svelte',
@@ -197,6 +204,7 @@ const axisFiles = {
   stepper: 'components/stepper/Stepper.svelte',
   switch: 'components/choice/Switch.svelte',
   table: 'components/table/Table.svelte',
+  tabs: 'components/tabs-accordion/Tabs.svelte',
   tag: 'components/badge/Tag.svelte',
   'text-counter': 'components/input/TextCounter.svelte',
   textarea: 'components/input/Textarea.svelte',
@@ -214,8 +222,8 @@ const source = (file: string) =>
 
 describe('Texuli group A catalog root attributes', () => {
   it('covers every group A catalog id from the root audit', () => {
-    expect(groupA).toHaveLength(97);
-    expect(new Set(groupA.map((entry) => entry.id)).size).toBe(97);
+    expect(groupA).toHaveLength(101);
+    expect(new Set(groupA.map((entry) => entry.id)).size).toBe(101);
   });
 
   it.each(groupA)('$id root declares its component id and enum axes', (entry) => {

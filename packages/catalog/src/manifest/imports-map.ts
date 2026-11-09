@@ -6,6 +6,10 @@ import type { CatalogImport } from './types.ts';
  * manifest omits `imports`.
  */
 export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> = {
+  accordion: [
+    { module: 'texuli', exports: ['Accordion'] },
+    { module: 'texuli/tabs-accordion', exports: ['Accordion'] },
+  ],
   alert: [
     { module: 'texuli', exports: ['Alert', 'AlertSurface', 'ToneIcon'] },
     { module: 'texuli/alert', exports: ['Alert', 'AlertSurface', 'ToneIcon'] },
@@ -74,6 +78,10 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
   banner: [
     { module: 'texuli', exports: ['Banner'] },
     { module: 'texuli/alert', exports: ['Banner'] },
+  ],
+  'bottom-nav': [
+    { module: 'texuli', exports: ['BottomNav'] },
+    { module: 'texuli/layouts/mobile', exports: ['BottomNav'] },
   ],
   box: [
     {
@@ -211,7 +219,6 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
         'ChatStreamEvent',
         'ChatThread',
         'ChatThreadDisplay',
-        'Composer',
         'ComposerActionContext',
         'ComposerLabels',
         'DEFAULT_COMPOSER_LABELS',
@@ -284,6 +291,7 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
       ],
     },
   ],
+  composer: [{ module: '@texuli/chat', exports: ['Composer'] }],
   'command-palette': [
     {
       module: 'texuli',
@@ -870,6 +878,10 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
     },
   ],
   'menubar-trigger': [{ module: 'texuli/menus', exports: ['MenubarTrigger'] }],
+  'mobile-header': [
+    { module: 'texuli', exports: ['MobileHeader'] },
+    { module: 'texuli/layouts/mobile', exports: ['MobileHeader'] },
+  ],
   'multi-select': [
     { module: 'texuli', exports: ['MultiSelect', 'Select'] },
     { module: 'texuli/combobox', exports: ['MultiSelect', 'MultiSelectRoot'] },
@@ -1130,6 +1142,10 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
         'tableClass',
       ],
     },
+  ],
+  tabs: [
+    { module: 'texuli', exports: ['Tabs'] },
+    { module: 'texuli/tabs-accordion', exports: ['Tabs'] },
   ],
   tag: [
     { module: 'texuli', exports: ['Tag'] },
@@ -4292,7 +4308,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'AVATAR_PIXELS',
       'AVATAR_SIZES',
       'AVATAR_STATUSES',
-      'Accordion',
       'AccordionItemDef',
       'AccordionVariant',
       'AlertLayout',
@@ -4312,7 +4327,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'BUTTON_TONES',
       'BUTTON_VARIANTS',
       'BadgeVariant',
-      'BottomNav',
       'BottomNavItem',
       'BreadcrumbItem',
       'BuiltInIconName',
@@ -4421,7 +4435,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'MenuSize',
       'MenuVariant',
       'MobileAppFrame',
-      'MobileHeader',
       'MotionDurationName',
       'MotionLevel',
       'MotionPreset',
@@ -4536,7 +4549,6 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'TableDensity',
       'TableStack',
       'TableVariant',
-      'Tabs',
       'TabsOrientation',
       'TabsVariant',
       'TagsInput',
@@ -5227,14 +5239,12 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
   {
     module: 'texuli/layouts/mobile',
     exports: [
-      'BottomNav',
       'BottomNavItem',
       'DEFAULT_MOBILE_LABELS',
       'MOBILE_LAYOUTS',
       'MOBILE_LAYOUT_IDS',
       'MOBILE_TAB_LIMIT',
       'MobileAppFrame',
-      'MobileHeader',
       'MobileLabels',
       'StackHeader',
       'bottomNavCurrent',
@@ -5529,14 +5539,12 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
     module: 'texuli/tabs-accordion',
     exports: [
       'ACCORDION_VARIANTS',
-      'Accordion',
       'AccordionItemDef',
       'AccordionVariant',
       'Collapsible',
       'TABS_ORIENTATIONS',
       'TABS_VARIANTS',
       'TabItem',
-      'Tabs',
       'TabsOrientation',
       'TabsVariant',
       'accordionRootClass',

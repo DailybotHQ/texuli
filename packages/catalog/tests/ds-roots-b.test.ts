@@ -20,6 +20,7 @@ import {
   SunburstChart,
   TreemapChart,
 } from '../../charts/src/part-whole/index.ts';
+import { Composer } from '../../chat/src/composer/index.ts';
 import { ChatMessageDisplay, ChatThreadDisplay } from '../../chat/src/display/index.ts';
 import { NotificationInbox } from '../../data/src/activity/inbox/index.ts';
 import { Board } from '../../data/src/board/index.ts';
@@ -75,6 +76,7 @@ const GROUP_B_IDS = [
   'charts-treemap',
   'chat-message',
   'chat-thread',
+  'composer',
   'data-board',
   'data-calendar',
   'data-cohort-table',
@@ -126,6 +128,7 @@ const COMPONENTS = {
   'charts-treemap': TreemapChart,
   'chat-message': ChatMessageDisplay,
   'chat-thread': ChatThreadDisplay,
+  composer: Composer,
   'data-board': Board,
   'data-calendar': CalendarView,
   'data-cohort-table': CohortTable,
@@ -235,11 +238,18 @@ describe('Group B catalog component root attributes', () => {
                       density: node.props.density as 'compact' | 'default' | 'comfortable',
                     },
                   })
-                : render(COMPONENTS[entry.id as Exclude<GroupBId, 'data-dashboard-widget'>], {
-                    props: {
-                      ...(node.props as Record<string, unknown>),
-                    },
-                  });
+                : entry.id === 'composer'
+                  ? render(Composer, {
+                      props: {
+                        ...(node.props as Record<string, unknown>),
+                        onSubmit: () => {},
+                      },
+                    })
+                  : render(COMPONENTS[entry.id as Exclude<GroupBId, 'data-dashboard-widget'>], {
+                      props: {
+                        ...(node.props as Record<string, unknown>),
+                      },
+                    });
       const root =
         entry.id === 'data-dashboard-widget'
           ? view.container.querySelector(`[${DS_COMPONENT_ATTRIBUTE}="${entry.id}"]`)

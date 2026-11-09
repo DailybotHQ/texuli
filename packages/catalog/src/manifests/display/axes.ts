@@ -8,6 +8,10 @@ type Stamp = {
 
 /** Audited visual axes and observable states for display components (ADR-032). */
 export const DISPLAY_AXIS_STAMP: Readonly<Record<string, Stamp>> = {
+  accordion: {
+    axes: { variant: 'variant' },
+    states: ['hover', 'focus-visible', 'disabled', 'expanded'],
+  },
   alert: { axes: { tone: 'tone' }, states: ['hover', 'focus-visible'] },
   'avatar-group-grid': { axes: { size: 'size' } },
   badge: {
@@ -29,6 +33,10 @@ export const DISPLAY_AXIS_STAMP: Readonly<Record<string, Stamp>> = {
   kpi: { axes: { variant: 'variant' }, states: ['hover', 'focus-visible', 'loading'] },
   stat: { axes: { variant: 'variant' }, states: ['hover'] },
   stepper: { states: ['focus-visible', 'selected'] },
+  tabs: {
+    axes: { variant: 'variant' },
+    states: ['hover', 'focus-visible', 'disabled', 'selected'],
+  },
   table: {
     axes: { variant: 'variant', density: 'density' },
     states: ['focus-visible', 'loading'],

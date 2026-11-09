@@ -5,7 +5,7 @@ import { ALL_MANIFEST_GROUPS } from '../src/manifests/all.ts';
 
 const PART_B_GROUP_IDS = {
   canvas: ['canvas'],
-  chat: ['chat-message', 'chat-thread'],
+  chat: ['chat-message', 'chat-thread', 'composer'],
   content: [
     'blocks-code',
     'blocks-data',
@@ -44,6 +44,7 @@ const PART_B_GROUP_IDS = {
     'media-image',
   ],
   display: [
+    'accordion',
     'alert',
     'avatar-group-grid',
     'badge',
@@ -63,6 +64,7 @@ const PART_B_GROUP_IDS = {
     'stat',
     'stepper',
     'table',
+    'tabs',
     'tag',
     'text',
     'timeline',
@@ -89,7 +91,12 @@ const EXPECTED: Readonly<Record<string, Expected>> = {
       'readonly',
     ],
   },
+  accordion: {
+    axes: { variant: 'variant' },
+    states: ['hover', 'focus-visible', 'disabled', 'expanded'],
+  },
   'chat-thread': { states: ['disabled'] },
+  composer: { states: ['disabled', 'loading'] },
   'blocks-code': {
     states: ['hover', 'focus-visible', 'disabled', 'loading', 'invalid', 'selected', 'readonly'],
   },
@@ -125,6 +132,10 @@ const EXPECTED: Readonly<Record<string, Expected>> = {
   kpi: { axes: { variant: 'variant' }, states: ['hover', 'focus-visible', 'loading'] },
   stat: { axes: { variant: 'variant' }, states: ['hover'] },
   stepper: { states: ['focus-visible', 'selected'] },
+  tabs: {
+    axes: { variant: 'variant' },
+    states: ['hover', 'focus-visible', 'disabled', 'selected'],
+  },
   table: {
     axes: { variant: 'variant', density: 'density' },
     states: ['focus-visible', 'loading'],
@@ -146,8 +157,8 @@ describe('catalog axes part B (content, display, chat, documents, canvas)', () =
       'display',
       'documents',
     ]);
-    expect(manifests).toHaveLength(61);
-    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(61);
+    expect(manifests).toHaveLength(64);
+    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(64);
     for (const group of groups) {
       expect(group.manifests.map((manifest) => manifest.id).sort(), group.name).toEqual(
         [...PART_B_GROUP_IDS[group.name as keyof typeof PART_B_GROUP_IDS]].sort()

@@ -2,6 +2,7 @@ import { manifestData } from '../../manifest/data.ts';
 import type { CatalogManifest } from '../../manifest/types.ts';
 import { stampDisplayAxes } from './axes.ts';
 import {
+  accordionPropNames,
   alertPropNames,
   avatarGroupGridPropNames,
   badgePropNames,
@@ -21,6 +22,7 @@ import {
   statPropNames,
   stepperPropNames,
   tablePropNames,
+  tabsPropNames,
   tagPropNames,
   textPropNames,
   timelinePropNames,
@@ -77,6 +79,8 @@ const badgeVariants = [
 const alertTones = ['info', 'success', 'warning', 'error', 'brand', 'neutral'] as const;
 
 const headingSizes = ['display', 'xl', 'lg', 'md', 'sm'] as const;
+const tabsVariants = ['line', 'pills', 'enclosed'] as const;
+const accordionVariants = ['default', 'bordered'] as const;
 const textTones = [
   'default',
   'muted',
@@ -978,8 +982,108 @@ export const codeManifest = /* @__PURE__ */ defineDisplayManifest({
   related: ['kbd'],
 });
 
+/** Tabs (ADR-032): a tab list with panels. App chrome; agents never emit it. */
+export const tabsManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'tabs',
+  package: PKG,
+  label: 'Tabs',
+  summary: 'A tab list that shows one panel at a time.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['Switch between peer views of the same page'],
+  dontUseWhen: [
+    'A sequence of steps (use stepper or wizard)',
+    'Mobile app destinations (use bottom-nav)',
+  ],
+  a11y: [
+    'Tab list is labelled; arrow keys move among tabs; the selected tab is aria-selected',
+    'Each tab names its panel',
+  ],
+  props: propsFrom(tabsPropNames, {
+    items: {
+      kind: 'array',
+      required: true,
+      description: 'Tabs: value, label, optional badge and panel',
+    },
+    value: { kind: 'string', description: 'The selected tab value' },
+    onValueChange: { kind: 'event', description: 'Selected tab changed' },
+    label: { kind: 'string', description: 'Accessible name of the tab list' },
+    variant: { kind: 'enum', enumValues: [...tabsVariants], default: 'line' },
+    orientation: { kind: 'enum', enumValues: ['horizontal', 'vertical'], default: 'horizontal' },
+    activationMode: { kind: 'enum', enumValues: ['automatic', 'manual'], default: 'automatic' },
+    loop: { kind: 'boolean', default: false },
+    disabled: { kind: 'boolean', default: false },
+    class: { kind: 'string' },
+    content: { kind: 'slot', description: 'Panel body for each item' },
+  }),
+  examples: [
+    {
+      id: 'line',
+      title: 'Line tabs',
+      props: {
+        variant: 'line',
+        items: [
+          { value: 'overview', label: 'Overview' },
+          { value: 'activity', label: 'Activity' },
+        ],
+        value: 'overview',
+      },
+    },
+  ],
+  related: ['accordion', 'stepper'],
+  events: ['select'],
+});
+
+/** Accordion (ADR-032): stacked disclosure. App chrome; agents never emit it. */
+export const accordionManifest = /* @__PURE__ */ defineDisplayManifest({
+  id: 'accordion',
+  package: PKG,
+  label: 'Accordion',
+  summary: 'Stacked sections that expand and collapse one or more panels.',
+  tier: 'app',
+  agentEmittable: false,
+  useWhen: ['FAQs and grouped detail the reader opens on demand'],
+  dontUseWhen: ['Peer views of one page (use tabs)', 'A multi-step flow (use wizard)'],
+  a11y: [
+    'Each header is a button that names its panel; expanded state is exposed',
+    'Heading level is set so the outline stays valid',
+  ],
+  props: propsFrom(accordionPropNames, {
+    items: {
+      kind: 'array',
+      required: true,
+      description: 'Sections: value, title, optional content',
+    },
+    type: { kind: 'enum', enumValues: ['single', 'multiple'], default: 'single' },
+    value: { kind: 'unknown', description: 'Open value or values' },
+    onValueChange: { kind: 'event', description: 'Open value changed' },
+    collapsible: { kind: 'boolean', default: true },
+    headingLevel: { kind: 'number', default: 3 },
+    variant: { kind: 'enum', enumValues: [...accordionVariants], default: 'default' },
+    disabled: { kind: 'boolean', default: false },
+    class: { kind: 'string' },
+    content: { kind: 'slot', description: 'Panel body for each item' },
+  }),
+  examples: [
+    {
+      id: 'faq',
+      title: 'FAQ',
+      props: {
+        headingLevel: 3,
+        items: [
+          { value: 'hours', title: 'Hours', content: 'Weekdays 9–17.' },
+          { value: 'fees', title: 'Fees', content: 'No booking fee.' },
+        ],
+      },
+    },
+  ],
+  related: ['tabs', 'stepper'],
+  events: ['collapse'],
+});
+
 /** Every display/feedback manifest in stable id order. */
 export const DISPLAY_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Object.freeze([
+  accordionManifest,
   alertManifest,
   avatarGroupGridManifest,
   badgeManifest,
@@ -999,6 +1103,7 @@ export const DISPLAY_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Obj
   statManifest,
   stepperManifest,
   tableManifest,
+  tabsManifest,
   tagManifest,
   textManifest,
   timelineManifest,
@@ -1006,6 +1111,7 @@ export const DISPLAY_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Obj
 
 /** Map of component id → expected prop names for type/schema parity tests. */
 export const DISPLAY_PROP_NAMES = /* @__PURE__ */ Object.freeze({
+  accordion: accordionPropNames,
   alert: alertPropNames,
   'avatar-group-grid': avatarGroupGridPropNames,
   badge: badgePropNames,
@@ -1025,6 +1131,7 @@ export const DISPLAY_PROP_NAMES = /* @__PURE__ */ Object.freeze({
   stat: statPropNames,
   stepper: stepperPropNames,
   table: tablePropNames,
+  tabs: tabsPropNames,
   tag: tagPropNames,
   text: textPropNames,
   timeline: timelinePropNames,

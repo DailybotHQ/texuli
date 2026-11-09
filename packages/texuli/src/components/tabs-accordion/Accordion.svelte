@@ -126,6 +126,8 @@ const rootClass = $derived(
     {disabled}
     class={rootClass}
     data-tx-accordion=""
+    data-tx-component="accordion"
+    data-tx-variant={variant}
     data-variant={variant}
   >
     {@render body()}
@@ -145,6 +147,8 @@ const rootClass = $derived(
     {disabled}
     class={rootClass}
     data-tx-accordion=""
+    data-tx-component="accordion"
+    data-tx-variant={variant}
     data-variant={variant}
   >
     {@render body()}

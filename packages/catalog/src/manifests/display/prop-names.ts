@@ -181,3 +181,32 @@ export const boxPropNames = [
   'class',
   'children',
 ] as const;
+
+/** `texuli/tabs-accordion`: a tab list with panels. */
+export const tabsPropNames = [
+  'items',
+  'value',
+  'onValueChange',
+  'label',
+  'variant',
+  'orientation',
+  'activationMode',
+  'loop',
+  'disabled',
+  'class',
+  'content',
+] as const;
+
+/** `texuli/tabs-accordion`: stacked disclosure sections. */
+export const accordionPropNames = [
+  'items',
+  'type',
+  'value',
+  'onValueChange',
+  'collapsible',
+  'headingLevel',
+  'variant',
+  'disabled',
+  'class',
+  'content',
+] as const;

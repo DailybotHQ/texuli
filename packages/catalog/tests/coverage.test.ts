@@ -143,7 +143,7 @@ describe('catalog coverage gate', () => {
       'data-timeline',
       'data-tree-view',
     ]);
-    expect(groups.chat).toEqual(['chat-message', 'chat-thread']);
+    expect(groups.chat).toEqual(['chat-message', 'chat-thread', 'composer']);
     expect(groups.workflows).toEqual(['workflow-graph']);
     // The 14 ids the player painted without a catalog manifest are adopted.
     for (const id of [

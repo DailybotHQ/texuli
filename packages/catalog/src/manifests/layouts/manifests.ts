@@ -5,6 +5,7 @@ import {
   analyticsGridPropNames,
   authSplitLayoutPropNames,
   blogLayoutPropNames,
+  bottomNavPropNames,
   cardLayoutPropNames,
   contentLayoutPropNames,
   dashboardGridLayoutPropNames,
@@ -20,6 +21,7 @@ import {
   layoutDrawerPropNames,
   layoutHostPropNames,
   marketingLayoutPropNames,
+  mobileHeaderPropNames,
   navIconPropNames,
   pageLayoutPropNames,
   pricingLayoutPropNames,
@@ -229,6 +231,80 @@ export const navIconManifest = /* @__PURE__ */ stampLayoutsAxes(
     }),
     examples: [{ id: 'home', title: 'Home icon', props: { icon: 'home' } }],
     related: ['layout-chrome'],
+  })
+);
+
+export const bottomNavManifest = /* @__PURE__ */ stampLayoutsAxes(
+  manifestData({
+    id: 'bottom-nav',
+    package: PKG,
+    label: 'BottomNav',
+    summary: 'A mobile tab bar of destinations. Host chrome; agents never emit it.',
+    tier: 'app',
+    agentEmittable: false,
+    useWhen: ['Primary destinations on a phone-sized app shell'],
+    dontUseWhen: ['In-page tabs (use tabs)', 'Desktop sidebar navigation (use layout-sidebar)'],
+    a11y: 'A labelled nav landmark; the current destination uses aria-current, not color alone.',
+    props: propsFrom(bottomNavPropNames, {
+      items: {
+        kind: 'array',
+        required: true,
+        description: 'Destinations: href, label, optional icon and badge',
+      },
+      label: { kind: 'string', description: 'Accessible name of the landmark' },
+      fixed: { kind: 'boolean', default: false },
+      hrefTrust: { kind: 'enum', enumValues: ['developer', 'untrusted'], default: 'developer' },
+      onSelect: { kind: 'event', description: 'A destination was activated' },
+      class: { kind: 'string' },
+    }),
+    examples: [
+      {
+        id: 'primary',
+        title: 'Primary destinations',
+        props: {
+          items: [
+            { id: 'home', href: '/home', label: 'Home' },
+            { id: 'inbox', href: '/inbox', label: 'Inbox' },
+          ],
+        },
+      },
+    ],
+    related: ['mobile-header', 'tabs'],
+  })
+);
+
+export const mobileHeaderManifest = /* @__PURE__ */ stampLayoutsAxes(
+  manifestData({
+    id: 'mobile-header',
+    package: PKG,
+    label: 'MobileHeader',
+    summary:
+      'A mobile stack header with back, title and actions. Host chrome; agents never emit it.',
+    tier: 'app',
+    agentEmittable: false,
+    useWhen: ['The top of a phone-sized screen that can go back'],
+    dontUseWhen: ['Desktop app chrome (use layout-top-nav or layout-sidebar)'],
+    a11y: 'The title is a heading by default; Back and Close are named.',
+    props: propsFrom(mobileHeaderPropNames, {
+      title: { kind: 'string', required: true },
+      eyebrow: { kind: 'string' },
+      subtitle: { kind: 'string' },
+      titleAs: { kind: 'enum', enumValues: ['h1', 'h2', 'p', 'div'], default: 'h1' },
+      backHref: { kind: 'string', trust: 'developer' },
+      onBack: { kind: 'event' },
+      backLabel: { kind: 'string' },
+      backTarget: { kind: 'string' },
+      hrefTrust: { kind: 'enum', enumValues: ['developer', 'untrusted'], default: 'developer' },
+      closeHref: { kind: 'string', trust: 'developer' },
+      onClose: { kind: 'event' },
+      closeLabel: { kind: 'string' },
+      sticky: { kind: 'boolean', default: true },
+      class: { kind: 'string' },
+    }),
+    examples: [
+      { id: 'inbox', title: 'Inbox header', props: { title: 'Inbox', backHref: '/home' } },
+    ],
+    related: ['bottom-nav'],
   })
 );
 
@@ -835,6 +911,7 @@ export const gridLayoutManifest = /* @__PURE__ */ contentComposition(
 export const LAYOUTS_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Object.freeze(
   /* @__PURE__ */ [
     analyticsGridManifest,
+    bottomNavManifest,
     cardLayoutManifest,
     contentLayoutManifest,
     deckLayoutManifest,
@@ -857,6 +934,7 @@ export const LAYOUTS_MANIFESTS: readonly CatalogManifest[] = /* @__PURE__ */ Obj
     layoutSidebarManifest,
     layoutTopNavManifest,
     layoutWizardManifest,
+    mobileHeaderManifest,
     navIconManifest,
     pageLayoutManifest,
     screenOutletManifest,

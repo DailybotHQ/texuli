@@ -139,6 +139,8 @@ const triggerClass = $derived(tabsTriggerClass({ variant }));
   {disabled}
   class={rootClass}
   data-tx-tabs=""
+  data-tx-component="tabs"
+  data-tx-variant={variant}
   data-variant={variant}
   {@attach bindRef}
 >
