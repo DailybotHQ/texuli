@@ -18,6 +18,42 @@ const SITE_PAGES: readonly SearchEntry[] = [
     keywords: ['texuli', 'landing'],
   },
   {
+    id: 'page-solutions',
+    title: 'Solutions',
+    description:
+      'Embeddable open-source systems that complete a task end to end: Slides, Documents, Workflows, Canvas and Sheets, each with a live demo (in development).',
+    href: '/solutions/',
+    kind: 'page',
+    keywords: ['solutions', 'slides', 'documents', 'workflows', 'canvas', 'sheets', 'catalog'],
+  },
+  {
+    id: 'page-built-with',
+    title: 'Built with Texuli',
+    description:
+      'Products built on Texuli, each with its own brand and domain, starting with Protoyard.',
+    href: '/built-with/',
+    kind: 'page',
+    keywords: ['built with', 'products', 'protoyard', 'case study'],
+  },
+  {
+    id: 'page-built-with-protoyard',
+    title: 'Protoyard',
+    description:
+      'Open-source local prototyping built with Texuli; Protoyard Cloud is planned, not available.',
+    href: '/built-with/protoyard/',
+    kind: 'page',
+    keywords: ['protoyard', 'prototype', 'prototyping', 'case study'],
+  },
+  {
+    id: 'page-native-compatibility',
+    title: 'Native compatibility',
+    description:
+      'Per-component web and Compose Desktop status for the native renderer, from the parity data (in development).',
+    href: '/native/compatibility/',
+    kind: 'page',
+    keywords: ['native', 'compatibility', 'parity', 'compose', 'kotlin', 'matrix'],
+  },
+  {
     id: 'page-developers',
     title: 'Developers',
     description: 'The JSON API, OpenAPI, the MCP server, the CLI, limits and versioning.',
@@ -130,7 +166,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     title: 'Documents',
     description:
       'A block editor with a slash menu, drag, nested pages, columns and live embeds; reader, paged view, Markdown, DOCX and PDF export, collaboration, and documents as agent data (in development, on npm from 0.7.0).',
-    href: '/documents-page/',
+    href: '/solutions/documents/',
     kind: 'page',
     keywords: [
       'document',
@@ -168,7 +204,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     title: 'Canvas',
     description:
       'An infinite canvas: shapes, text, sticky notes, frames, connectors, snapping, zoom and pan, a full keyboard model, collaboration, SVG and PNG export (in development, on npm from 0.8.0).',
-    href: '/canvas-page/',
+    href: '/solutions/canvas/',
     kind: 'page',
     keywords: [
       'canvas',
@@ -185,7 +221,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     title: 'Sheets',
     description:
       'Spreadsheets: an owned formula engine with 54 functions, incremental recalculation, cycle and limit errors, CSV that neutralizes formula injection, and agent spreadsheets (in development, on npm from 0.8.0).',
-    href: '/sheets-page/',
+    href: '/solutions/sheets/',
     kind: 'page',
     keywords: ['sheets', 'spreadsheet', 'formula', 'functions', 'csv', 'recalculation', 'workbook'],
   },
@@ -252,7 +288,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     title: 'Workflow editor',
     description:
       'An accessible workflow graph editor and viewer: typed ports, auto-layout, outline and minimap.',
-    href: '/workflows-page/',
+    href: '/solutions/workflows/',
     kind: 'page',
     keywords: ['workflow', 'graph', 'nodes', 'editor', 'pipeline', 'automation'],
   },
@@ -270,7 +306,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     title: 'Slides',
     description:
       'Generate decks from JSON or Markdown: 21 layouts, contrast-safe backgrounds, any component on a slide, presenter, print and PPTX.',
-    href: '/slides-page/',
+    href: '/solutions/slides/',
     kind: 'page',
     keywords: ['slides', 'deck', 'presentation', 'markdown', 'json', 'presenter', 'pptx'],
   },
