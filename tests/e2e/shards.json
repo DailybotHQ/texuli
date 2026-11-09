@@ -39,6 +39,7 @@
       "a11y-site-2.spec.ts",
       "charts.spec.ts",
       "ds-conformance.spec.ts",
+      "ds-locked-render.spec.ts",
       "layouts-app.spec.ts",
       "pages-collab.spec.ts",
       "renderer-hostile.spec.ts",

@@ -1,9 +1,9 @@
 {
   "specVersion": "0.13.0",
   "totals": {
-    "catalog": 174,
+    "catalog": 194,
     "painted": 52,
-    "placeholder": 122,
+    "placeholder": 142,
     "agentEmittable": 75,
     "agentEmittablePainted": 52,
     "semanticRules": 49,
@@ -23,7 +23,7 @@
     },
     {
       "group": "chat",
-      "total": 2,
+      "total": 3,
       "painted": 0
     },
     {
@@ -43,7 +43,7 @@
     },
     {
       "group": "display",
-      "total": 22,
+      "total": 32,
       "painted": 0
     },
     {
@@ -53,12 +53,12 @@
     },
     {
       "group": "forms",
-      "total": 30,
+      "total": 36,
       "painted": 0
     },
     {
       "group": "layouts",
-      "total": 27,
+      "total": 30,
       "painted": 6
     },
     {
@@ -199,6 +199,18 @@
   ],
   "components": [
     {
+      "id": "accordion",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
       "id": "action-form",
       "group": "state",
       "capability": "web-only",
@@ -250,6 +262,18 @@
       "id": "app-nav",
       "group": "overlays",
       "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
+      "id": "avatar",
+      "group": "display",
+      "capability": "unknown",
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
@@ -403,6 +427,18 @@
       "parityTrace": true
     },
     {
+      "id": "bottom-nav",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
       "id": "box",
       "group": "display",
       "capability": "web-only",
@@ -478,6 +514,18 @@
       "id": "card",
       "group": "display",
       "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
+      "id": "carousel",
+      "group": "display",
+      "capability": "unknown",
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
@@ -849,6 +897,18 @@
     {
       "id": "command-palette",
       "group": "overlays",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
+      "id": "composer",
+      "group": "chat",
       "capability": "web-only",
       "agentEmittable": false,
       "web": "renders",
@@ -1255,6 +1315,18 @@
       "parityTrace": false
     },
     {
+      "id": "file-upload",
+      "group": "forms",
+      "capability": "unknown",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
       "id": "flow-action",
       "group": "state",
       "capability": "web-only",
@@ -1354,6 +1426,18 @@
       "id": "hover-card-content",
       "group": "overlays",
       "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
+      "id": "icon",
+      "group": "display",
+      "capability": "unknown",
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
@@ -1747,6 +1831,18 @@
       "parityTrace": false
     },
     {
+      "id": "list-item",
+      "group": "display",
+      "capability": "unknown",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
       "id": "media-composition-canvas",
       "group": "content",
       "capability": "web-only",
@@ -1807,6 +1903,30 @@
       "parityTrace": false
     },
     {
+      "id": "mobile-app-frame",
+      "group": "layouts",
+      "capability": "unknown",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
+      "id": "mobile-header",
+      "group": "layouts",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
       "id": "multi-select",
       "group": "forms",
       "capability": "web-only",
@@ -1843,9 +1963,33 @@
       "parityTrace": false
     },
     {
+      "id": "number-field",
+      "group": "forms",
+      "capability": "unknown",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
       "id": "pagination",
       "group": "overlays",
       "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
+      "id": "pin-input",
+      "group": "forms",
+      "capability": "unknown",
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
@@ -1870,6 +2014,18 @@
       "id": "popover-content",
       "group": "overlays",
       "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
+      "id": "progress",
+      "group": "display",
+      "capability": "unknown",
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
@@ -1906,6 +2062,18 @@
       "id": "radio-group",
       "group": "forms",
       "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
+      "id": "rating",
+      "group": "forms",
+      "capability": "unknown",
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
@@ -2071,6 +2239,18 @@
       "parityTrace": false
     },
     {
+      "id": "separator",
+      "group": "display",
+      "capability": "unknown",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
       "id": "sheet",
       "group": "overlays",
       "capability": "web-only",
@@ -2095,6 +2275,18 @@
       "parityTrace": false
     },
     {
+      "id": "skeleton",
+      "group": "display",
+      "capability": "unknown",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
       "id": "sortable-list",
       "group": "state",
       "capability": "web-only",
@@ -2104,6 +2296,18 @@
       "readOnly": false,
       "semanticRule": false,
       "golden": true,
+      "parityTrace": false
+    },
+    {
+      "id": "spinner",
+      "group": "display",
+      "capability": "unknown",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
       "parityTrace": false
     },
     {
@@ -2179,9 +2383,33 @@
       "parityTrace": false
     },
     {
+      "id": "tabs",
+      "group": "display",
+      "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
       "id": "tag",
       "group": "display",
       "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
+      "id": "tags-input",
+      "group": "forms",
+      "capability": "unknown",
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",
@@ -2254,6 +2482,18 @@
       "id": "toaster",
       "group": "overlays",
       "capability": "web-only",
+      "agentEmittable": false,
+      "web": "renders",
+      "native": "placeholder",
+      "readOnly": false,
+      "semanticRule": false,
+      "golden": false,
+      "parityTrace": false
+    },
+    {
+      "id": "toggle-group",
+      "group": "forms",
+      "capability": "unknown",
       "agentEmittable": false,
       "web": "renders",
       "native": "placeholder",

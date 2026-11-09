@@ -22,9 +22,9 @@ describe('catalog variants source (ADR-032)', () => {
   const byId = new Map(committed.components.map((component) => [component.id, component]));
 
   it('covers every catalog id once', () => {
-    expect(committed.components).toHaveLength(174);
-    expect(manifests).toHaveLength(174);
-    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(174);
+    expect(committed.components).toHaveLength(194);
+    expect(manifests).toHaveLength(194);
+    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(194);
     expect([...byId.keys()].sort()).toEqual(
       manifests
         .map((manifest) => manifest.id)
@@ -41,11 +41,12 @@ describe('catalog variants source (ADR-032)', () => {
       if (!component) continue;
 
       for (const axis of CATALOG_AXIS_NAMES) {
-        const propName =
-          manifest.axes?.[axis] ??
-          (manifest.props.some((entry) => entry.name === axis && entry.kind === 'enum')
-            ? axis
-            : undefined);
+        const named = manifest.props.find((entry) => entry.name === axis && entry.kind === 'enum');
+        const canBeAxis =
+          named !== undefined &&
+          typeof named.default === 'string' &&
+          (named.enumValues ?? []).includes(named.default);
+        const propName = manifest.axes?.[axis] ?? (canBeAxis ? axis : undefined);
         const declared = component.axes?.[axis];
         if (propName === undefined) {
           expect(declared, `${manifest.id}.${axis}`).toBeUndefined();

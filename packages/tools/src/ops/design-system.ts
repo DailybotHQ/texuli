@@ -215,7 +215,7 @@ export const dsValidate: Operation = defineOperation({
   },
   annotations: READ_ONLY,
   runtime: 'edge',
-  limits: { inputBytes: DS_INPUT_BYTES, timeMs: TIME_MS },
+  limits: { inputBytes: DS_INPUT_BYTES, items: 16, timeMs: TIME_MS },
   examples: [
     { title: 'The smallest document', input: { document: MINIMAL_DESIGN_SYSTEM } },
     {

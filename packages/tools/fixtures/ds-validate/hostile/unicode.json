@@ -3,13 +3,13 @@
   "document": {
     "format": "texuli/design-system",
     "formatVersion": 1,
-    "id": "harbor​line",
+    "id": "harbor\u200bline",
     "version": "1.0.0",
-    "name": "Harbor‮enil",
-    "allow": { "butto‍n": {}, "card": { "variants": ["fl\u0000at"] } },
+    "name": "Harbor\u202Eenil",
+    "allow": { "butto\u200dn": {}, "card": { "variants": ["fl\u0000at"] } },
     "approval": {
       "status": "approved",
-      "approvedBy": "Reviewer⁦\u0007",
+      "approvedBy": "Reviewer\u2066\u0007",
       "approvedAt": "2026-11-09T14:30:00Z",
       "version": "1.0.0",
       "contentHash": "0000000000000000000000000000000000000000000000000000000000000000"

@@ -345,7 +345,7 @@ Arguments (JSON object keys):
   extensions: array. Optional host catalog extensions to check and merge.
   prototype: object. Optional bounded prototype data: { files: { path: sourceText }, blueprints: { name: blueprint } }. Sources are scanned as text and never executed.
 
-Limits: input up to 1048576 bytes, 10000 ms budget.
+Limits: input up to 1048576 bytes, at most 16 items, 10000 ms budget.
 Example (The smallest document): texuli ds validate --json '{"document":{"format":"texuli/design-system","formatVersion":1,"id":"minimal","version":"1.0.0","name":"Minimal","color":{"brand":{"seed":"#4f46e5"}}}}'
 
 ----
@@ -425,13 +425,13 @@ Generate a design-system draft (ds.generate, runtime edge)
 Combine a brand brief, token JSON, site CSS, logo pixels and/or a Texuli theme into a validated design-system draft. Returns the document, every reported loss, automatic AA repairs and guarantee results; it never saves or approves the draft.
 
 Arguments (JSON object keys):
-  brief: string.
-  tokens: string | object.
-  css: string.
-  logoPixels: object.
-  theme: string | object.
+  brief: string. A short brand brief in plain language (at most 32768 characters).
+  tokens: string | object. Token JSON or a JSON string of tokens (at most 262144 characters).
+  css: string. Site CSS whose custom properties feed the draft (at most 262144 characters).
+  logoPixels: object. A logo as RGBA pixels; at most 65536 numbers in data.
+  theme: string | object. A Texuli theme id or theme JSON (at most 262144 characters).
 
-Limits: input up to 1048576 bytes, 10000 ms budget.
+Limits: input up to 1048576 bytes, at most 65536 items, 10000 ms budget.
 Example (A brand brief with CSS tokens): texuli ds generate --json '{"brief":"A calm fictional studio with teal, rounded cards and compact spacing","css":":root { --brand: #0e7490; --radius: 10px; --space: 4px; }"}'
 
 ----

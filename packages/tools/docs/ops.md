@@ -69,12 +69,12 @@ through the same registry. The design-system operations are described in
 | `theme.search` | 4,096 | 500 | 5 s | `query`, `category`, `collection`, `mood`, `tag`, `limit` |
 | `theme.get` | 1,024 | — | 5 s | `id` (required) |
 | `theme.preview` | 1,024 | — | 5 s | `id` (required), `mode` |
-| `ds.validate` | 1,048,576 | — | 10 s | `document` (required), `trust`, `variant`, `bases`, `full`, `report`, `strict`, `catalog`, `extensions`, `prototype` |
+| `ds.validate` | 1,048,576 | 16 | 10 s | `document` (required), `trust`, `variant`, `bases`, `full`, `report`, `strict`, `catalog`, `extensions`, `prototype` |
 | `ds.compile` | 1,048,576 | — | 10 s | `document` (required), `format`, `selector`, `dark`, `mode`, `trust`, `variant`, `bases` |
 | `ds.contrast` | 1,048,576 | — | 10 s | `document` (required), `mode`, `trust`, `variant`, `bases` |
 | `ds.suggest` | 1,048,576 | 65,536 | 10 s | `seed`, `colors`, `pixels`, `count`, `id`, `version`, `name`, `trust` |
 | `ds.import` | 1,048,576 | — | 10 s | `from` (required), `input` (required), `id`, `version`, `name`, `trust` |
-| `ds.generate` | 1,048,576 | — | 10 s | `brief`, `tokens`, `css`, `logoPixels`, `theme` |
+| `ds.generate` | 1,048,576 | 65,536 | 10 s | `brief`, `tokens`, `css`, `logoPixels`, `theme` |
 | `ds.allow` | 32,768 | 256 | 10 s | `preset`, `components` |
 | `ds.bundle` | 1,048,576 | 64 | 10 s | `bundle`, `document`, `librarySources`, `history` |
 | `ds.diff` | 1,048,576 | — | 10 s | `before` (required), `after` (required), `mode`, `trust`, `variant`, `bases` |

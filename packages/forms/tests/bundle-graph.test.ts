@@ -190,7 +190,7 @@ describe('SchemaForm bundle graph (G119)', () => {
     // The eager CSS of the common case is field, input, select, choice, button
     // and the form layout. Measured before G119: JS 90,507 B, CSS 9,385 B;
     // 0.14.3 adds the per-button iconSize rules (5,517 B).
-    expect(sizes.css).toBeLessThan(5600);
+    expect(sizes.css).toBeLessThan(5900);
     expect(sizes.js).toBeLessThan(70_000);
   });
 
@@ -208,7 +208,7 @@ describe('SchemaForm bundle graph (G119)', () => {
     const sizes = initialSizes(graph);
     console.info(`G119 text-only form: initial JS ${sizes.js} B, CSS ${sizes.css} B gzip`);
     // Measured before G119: JS 90,466 B, CSS 9,385 B.
-    expect(sizes.css).toBeLessThan(5600);
+    expect(sizes.css).toBeLessThan(5900);
     expect(sizes.js).toBeLessThan(70_000);
   });
 

@@ -20,6 +20,14 @@
   }
 
   .tx-card--interactive {
+    --tx-card-hover-border: color-mix(
+      in srgb,
+      var(--tx-ring, Highlight) 40%,
+      var(--tx-border, currentColor)
+    );
+    --tx-card-hover-elevation: var(--tx-elevation-3);
+    --tx-card-link-z: 1;
+    --tx-card-actions-z: 2;
     position: relative;
     isolation: isolate;
     cursor: pointer;
@@ -29,11 +37,8 @@
   }
 
   .tx-card--interactive:hover {
-    border-color: var(
-      --tx-card-hover-border,
-      color-mix(in srgb, var(--tx-ring, Highlight) 40%, var(--tx-border, currentColor))
-    );
-    box-shadow: var(--tx-card-hover-elevation, var(--tx-elevation-3));
+    border-color: var(--tx-card-hover-border);
+    box-shadow: var(--tx-card-hover-elevation);
   }
 
   .tx-card--interactive:has(.tx-card__link:focus-visible) {
@@ -50,12 +55,12 @@
     content: "";
     position: absolute;
     inset: 0;
-    z-index: var(--tx-card-link-z, 1);
+    z-index: var(--tx-card-link-z);
   }
 
   .tx-card__actions {
     position: relative;
-    z-index: var(--tx-card-actions-z, 2);
+    z-index: var(--tx-card-actions-z);
   }
 
   .tx-card--flat {
