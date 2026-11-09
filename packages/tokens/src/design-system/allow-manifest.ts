@@ -15,7 +15,7 @@ export const ALLOW_MANIFEST_SPEC_VERSION = '0.13.0';
 
 const RESERVED = new Set(['__proto__', 'constructor', 'prototype']);
 const AXIS = ['variants', 'sizes', 'tones', 'densities', 'states'] as const;
-const ALLOW_CAP = 256;
+const ALLOW_CAP = 4096;
 const AXIS_CAP = 32;
 const LIBRARY_CAP = 64;
 

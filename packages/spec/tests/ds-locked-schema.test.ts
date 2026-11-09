@@ -282,10 +282,9 @@ describe('locked design systems: malformed shapes', () => {
   it('caps the number of allowed components, axis values, library entries and composed ids', () => {
     const many = (n: number) =>
       Object.fromEntries(Array.from({ length: n }, (_, i) => [`c-${i}`, {}]));
-    expect(check(withDoc({ allow: many(DS_LOCKED_LIMITS.allowComponents) }))).toEqual([]);
-    expect(check(withDoc({ allow: many(DS_LOCKED_LIMITS.allowComponents + 1) }))).toEqual([
-      ['invalid-value', '$.allow'],
-    ]);
+    expect(DS_LOCKED_LIMITS.allowComponents).toBe(4096);
+    expect(check(withDoc({ allow: many(4096) }))).toEqual([]);
+    expect(check(withDoc({ allow: many(4097) }))).toEqual([['invalid-value', '$.allow']]);
     const values = (n: number) => Array.from({ length: n }, (_, i) => `v${i}`);
     expect(
       check(withDoc({ allow: { button: { variants: values(DS_LOCKED_LIMITS.axisValues + 1) } } }))
