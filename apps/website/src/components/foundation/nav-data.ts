@@ -1,10 +1,13 @@
 /**
- * Build-time navigation model (T-site-ia): `NAV_GROUPS` from `site.ts` with
- * the guides (reading order) and the component and primitive lists (from the
- * catalog, alphabetical) expanded, plus the sidebar sections, the pager and
- * the docs-page test. Imported only by `.astro` files, so islands never
- * bundle the catalog.
+ * Build-time navigation model (T-site-ia, ADR-031): `NAV_GROUPS` from `site.ts`
+ * with the guides (reading order) and the component and primitive lists (from
+ * the catalog, alphabetical) expanded, plus the sidebar sections, the pager,
+ * the docs-page test, and the landing global nav. Imported only by `.astro`
+ * files, so islands never bundle the catalog.
  */
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+import { SOLUTION_SLUGS, type SolutionSlug } from '../../data/solutions/schema.ts';
 import { COMPONENT_PAGES } from '../component-pages/load-manifests.ts';
 import { GUIDES_SECTIONS } from '../guides/nav.ts';
 import { PRIMITIVES } from '../primitives-page/primitives.ts';
@@ -14,13 +17,104 @@ import {
   type NavLink,
   navState,
   normalizePath,
+  REPOSITORY_URL,
   withBase,
 } from './site.ts';
+
+/** `apps/website/src/pages`, resolved from this module so Vitest and Astro agree. */
+const PAGES_DIR = join(import.meta.dirname, '../../pages');
+
+/**
+ * Whether a site-relative path has an Astro page today. Used so the header
+ * never ships a Solutions or Built-with href before its page exists (ADR-031).
+ */
+export function siteRouteExists(href: string): boolean {
+  const path = href.split('#')[0]?.split('?')[0] ?? '';
+  if (!path.startsWith('/') || path.startsWith('//')) return false;
+  const rel = path.replace(/^\/+|\/+$/g, '');
+  const folder = rel === '' ? PAGES_DIR : join(PAGES_DIR, rel);
+  return existsSync(join(folder, 'index.astro')) || existsSync(`${folder}.astro`);
+}
+
+/** One item of the ADR-031 landing header. */
+export interface LandingNavItem {
+  readonly label: string;
+  readonly href: string;
+  /** GitHub: an https URL, rendered through the URL policy. */
+  readonly external?: boolean;
+}
+
+/**
+ * The seven-item contract (ADR-031). `LANDING_NAV` drops any site path whose
+ * page is not in `src/pages/` yet, so `/solutions/` appears when that route ships.
+ */
+export const LANDING_NAV_CONTRACT: readonly LandingNavItem[] = [
+  { label: 'Solutions', href: '/solutions/' },
+  { label: 'Components', href: '/component-pages/' },
+  { label: 'Native', href: '/native/' },
+  { label: 'Themes', href: '/gallery-themes/' },
+  { label: 'Agents', href: '/agents-page/' },
+  { label: 'Docs', href: '/guides/' },
+  { label: 'GitHub', href: REPOSITORY_URL, external: true },
+];
+
+/** Landing header items whose routes exist (GitHub always). Desktop and phone share this list. */
+export const LANDING_NAV: readonly LandingNavItem[] = LANDING_NAV_CONTRACT.filter(
+  (item) => item.external === true || siteRouteExists(item.href)
+);
+
+const SOLUTION_NAV_LABELS: Readonly<Record<SolutionSlug, string>> = {
+  slides: 'Slides',
+  documents: 'Documents',
+  workflows: 'Workflows',
+  canvas: 'Canvas',
+  sheets: 'Sheets',
+};
+
+/**
+ * Sidebar Solutions links from the promoted slugs (schema.ts until
+ * `data/solutions/index.ts` merges). A slug is listed only when its landing page exists.
+ */
+export function solutionNavLinks(): NavLink[] {
+  const links: NavLink[] = [];
+  if (siteRouteExists('/solutions/')) links.push({ href: '/solutions/', label: 'Explore all' });
+  for (const slug of SOLUTION_SLUGS) {
+    const href = `/solutions/${slug}/`;
+    if (siteRouteExists(href)) links.push({ href, label: SOLUTION_NAV_LABELS[slug] });
+  }
+  return links;
+}
+
+function builtWithNavLinks(): NavLink[] {
+  const links: NavLink[] = [];
+  if (siteRouteExists('/built-with/')) {
+    links.push({ href: '/built-with/', label: 'Built with Texuli' });
+  }
+  if (siteRouteExists('/built-with/protoyard/')) {
+    links.push({ href: '/built-with/protoyard/', label: 'Protoyard' });
+  }
+  return links;
+}
 
 export interface ResolvedNavGroup {
   id: string;
   label: string;
   links: readonly NavLink[];
+}
+
+/**
+ * Groups ADR-031 adds to the docs sidebar once their pages exist. Not folded
+ * into `SITE_NAV_GROUPS` here: `docs-reading.test.ts` pins the current seven
+ * group labels, and `NAV_GROUPS` in `site.ts` is a shared file (patch in the
+ * lane result).
+ */
+export function ecosystemNavGroups(): ResolvedNavGroup[] {
+  const groups: ResolvedNavGroup[] = [];
+  const solutions = solutionNavLinks();
+  if (solutions.length > 0) groups.push({ id: 'solutions', label: 'Solutions', links: solutions });
+  const built = builtWithNavLinks();
+  if (built.length > 0) groups.push({ id: 'built-with', label: 'Built with Texuli', links: built });
+  return groups;
 }
 
 const byLabel = (a: NavLink, b: NavLink) => a.label.localeCompare(b.label, 'en');
