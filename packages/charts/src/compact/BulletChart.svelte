@@ -57,7 +57,7 @@ const description = $derived(
 );
 </script>
 
-<figure class="bullet-chart">
+<figure class="bullet-chart" data-tx-component="charts-bullet">
   <svg direction="ltr" role="img" aria-label={label} viewBox="0 0 100 24" preserveAspectRatio="none">
     <title>{label}</title><desc>{description}</desc>
     {#each segments as segment, index (index)}

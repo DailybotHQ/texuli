@@ -559,6 +559,7 @@ const interactionModules = $derived(
 
 <figure
   class="chart {className}"
+  data-tx-component="charts-cartesian"
   data-kind={kind}
   data-mode={mode}
   data-interactive={interactive ? 'true' : undefined}

@@ -5,7 +5,7 @@ let { label, children }: { label?: string; children?: Snippet } = $props();
 </script>
 
 <!-- A static transcript: no live region and no composer (that is host chrome). -->
-<section class="tx-chat-display" data-tx-chat-display aria-label={label?.trim() || 'Conversation'}>
+<section class="tx-chat-display" data-tx-component="chat-thread" data-tx-chat-display aria-label={label?.trim() || 'Conversation'}>
   {@render children?.()}
 </section>
 

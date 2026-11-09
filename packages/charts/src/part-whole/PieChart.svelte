@@ -77,7 +77,7 @@ const showCenterTotal = $derived(
 );
 </script>
 
-<figure class="part-whole">
+<figure class="part-whole" data-tx-component="charts-pie">
   <figcaption>
     <svelte:element this={`h${titleLevel()}`} id="{uid}-title">{title}</svelte:element>
     <p id="{uid}-description">{description}</p>

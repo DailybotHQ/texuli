@@ -662,6 +662,7 @@ const modeLabels = $derived.by(
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <section
   bind:this={root}
+  data-tx-component="data-calendar"
   class={`tx-calendar ${className ?? ''}`}
   aria-label={label}
   data-calendar

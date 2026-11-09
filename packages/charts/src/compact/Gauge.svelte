@@ -63,7 +63,7 @@ const description = $derived(
 const text = $derived(chartLabels(labels));
 </script>
 
-<figure class="compact-chart">
+<figure class="compact-chart" data-tx-component="charts-gauge">
   <svg direction="ltr" class="gauge" role="img" aria-label={label} viewBox="{-diameter / 2} {-diameter / 2} {diameter} {diameter}">
     <title>{label}</title><desc>{description}</desc>
     <path class="track" d={arcPath({ innerRadius: radius - ringWidth, outerRadius: radius, startAngle: layout.track.startAngle, endAngle: layout.track.endAngle })} />

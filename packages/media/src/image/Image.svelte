@@ -156,6 +156,7 @@ $effect(() => {
 {#snippet picture()}
   <span
     class={['tx-image', className]}
+    data-tx-component="media-image"
     data-tx-image=""
     data-status={status}
     data-fit={fill}
@@ -205,13 +206,14 @@ $effect(() => {
 {/snippet}
 
 {#if link}
-  <a class="tx-image-action" href={link} aria-label={actionLabel} data-sized={size ? '' : undefined} style:max-inline-size={cap}
+  <a class="tx-image-action" data-tx-component="media-image" href={link} aria-label={actionLabel} data-sized={size ? '' : undefined} style:max-inline-size={cap}
     >{@render picture()}</a
   >
 {:else if onactivate}
   <button
     type="button"
     class="tx-image-action"
+    data-tx-component="media-image"
     aria-label={actionLabel}
     data-sized={size ? '' : undefined}
     style:max-inline-size={cap}
