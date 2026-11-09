@@ -4,36 +4,40 @@
  * names capability ids from `entries/slides.ts`, and each claim cites a repository file
  * that contains the named marker (a README, a doc, a test or the demo fixture). The test
  * checks that every cited file exists and contains its marker.
+ *
+ * Art: the first three stories set no `art`, so the shared block paints their reserved
+ * plates (`solution-slides-story-<n>`, in order; see `shared/art/art-slots.ts`). The export
+ * story reuses the `page-slides` illustration.
  */
 import type { SolutionStoriesProps } from '../../shared/types.ts';
 
 export const SLIDES_STORIES: Omit<SolutionStoriesProps, 'entry'> = {
-  title: 'What a deck can do',
+  title: 'Write it once. Check it, present it, hand it out.',
   stories: [
     {
       id: 'decks-as-data',
-      title: 'A deck is data you can check',
-      body: 'Write slides as JSON or in a Markdown dialect, and both land in one validated model. Every issue comes back at once, with its path and a fix, so people and agents can correct a deck before anyone presents it.',
+      title: 'Catch deck errors before anyone presents',
+      body: 'Write slides as JSON or in a Markdown dialect, and both land in one validated model. Every issue comes back at once, with its path and a fix, so people and agents correct the deck first.',
       capabilities: ['deck-model'],
     },
     {
       id: 'present',
-      title: 'Present from any screen',
-      body: 'The stage scales a fixed canvas to the screen, gives every slide and step its own URL, and follows the keyboard and touch. An overview and a presenter window keep your notes and the next slide in view.',
+      title: 'Present on any screen, notes in view',
+      body: 'The stage scales a fixed canvas to the screen, gives every slide and step its own URL, and follows the keyboard and touch. An overview and a presenter window keep your notes and the next slide close.',
       capabilities: ['present'],
-      art: { slot: 'page-slides', variant: 'banner' },
     },
     {
       id: 'layouts',
-      title: 'Layouts that keep text readable',
-      body: 'Pick a catalog layout per slide, set backgrounds that keep text contrast, or start from a finished, fictional starter deck and change what you need.',
+      title: 'Good-looking slides that stay readable',
+      body: 'Pick a catalog layout per slide, set backgrounds that keep text contrast, or start from a finished, fictional starter deck and change only what you need.',
       capabilities: ['layouts'],
     },
     {
       id: 'export',
-      title: 'Print it or take it to PPTX',
-      body: 'The same deck prints to PDF through the browser, one page per visible slide, and exports to PPTX locally.',
+      title: 'Hand it out as PDF or PPTX',
+      body: 'The same deck prints to PDF through the browser, one page per visible slide, and exports to PPTX locally, so the deck you present is the deck you share.',
       capabilities: ['export'],
+      art: { slot: 'page-slides', variant: 'banner' },
     },
   ],
 };
