@@ -6,18 +6,18 @@
  *   sidebar as a drawer whose code loads on first press), the Texuli logo,
  *   site search (an input-like trigger with the Cmd/Ctrl+K hint) and the
  *   light/dark/system switch. Page links live in the sidebar.
- * - `landing` (the home): the logo, a Docs link, the platform doors (Web +
- *   native, Native), a GitHub door, search, the switch and a Get started
- *   button. Up to 64rem GitHub and Get started hide (the footer carries
- *   GitHub, the hero carries Start building) and up to 48rem the doors hide
- *   too: the page body carries the platform paths. Without that the header
- *   ran 152px past a 768px viewport (T-89, walks/responsive.md).
+ * - `landing` (`/`, `/native/`, later `/solutions/…` and `/built-with/…`,
+ *   ADR-031): logo, global nav (Solutions · Components · Native · Themes ·
+ *   Agents · Docs · GitHub; site items whose pages exist), search, the
+ *   switch and Get started. From 64rem the items are inline; below, one
+ *   keyboard-operable menu lists the same items (no hover-only).
  */
 import { safeHref } from '@texuli/core/url-policy';
 import { Button } from 'texuli/button';
 import BrandLogo from '../brand/BrandLogo.astro';
 import SiteSearch from '../search/SiteSearch.svelte';
-import { DOCS_HOME, GET_STARTED, REPOSITORY_URL, SITE_NAME, withBase } from './site.ts';
+import { LANDING_NAV } from './nav-data.ts';
+import { GET_STARTED, REPOSITORY_URL, SITE_NAME, withBase } from './site.ts';
 import ThemeSwitch from './ThemeSwitch.svelte';
 
 interface Props {
@@ -40,32 +40,49 @@ const repositoryHref = safeHref(REPOSITORY_URL, 'developer');
       </button>
     )
   }
+  {
+    variant === 'landing' && (
+      <button
+        type="button"
+        class="menu"
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-controls="tx-global-nav"
+        data-landing-menu=""
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <span class="menu__label">Menu</span>
+      </button>
+    )
+  }
   <a class="brand" href={withBase(base, '/')} aria-label={`${SITE_NAME} home`}>
     <BrandLogo height={24} />
   </a>
   {
     variant === 'landing' && (
-      <a class="docs-link" href={withBase(base, DOCS_HOME)}>
-        Docs
-      </a>
-    )
-  }
-  {
-    variant === 'landing' && (
-      <nav class="platform-links" aria-label="Platform">
-        <a class="docs-link" href={withBase(base, '/web-and-native/')}>
-          Web + native
-        </a>
-        <a class="docs-link" href={withBase(base, '/native/')}>
-          Native
-        </a>
+      <nav class="global-nav" id="tx-global-nav" aria-label="Global" data-global-nav="">
+        <ul class="global-nav__list">
+          {
+            LANDING_NAV.map((item) => {
+              const href = item.external ? repositoryHref : withBase(base, item.href);
+              if (!href) return null;
+              return (
+                <li>
+                  <a
+                    class="docs-link"
+                    href={href}
+                    rel={item.external ? 'noopener noreferrer' : undefined}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              );
+            })
+          }
+        </ul>
       </nav>
-    )
-  }
-  {
-    variant === 'landing' && repositoryHref && (
-      // Hides up to 64rem (data-repo-door), and with the doors up to 48rem.
-      <span class="platform-links" data-repo-door=""><a class="docs-link" href={repositoryHref}>GitHub</a></span>
     )
   }
   <div class="tools">
@@ -96,6 +113,17 @@ const repositoryHref = safeHref(REPOSITORY_URL, 'developer');
     background: color-mix(in srgb, var(--tx-background) 92%, transparent);
     backdrop-filter: blur(8px);
   }
+  .global-nav {
+    min-inline-size: 0;
+  }
+  .global-nav__list {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
   .brand {
     display: inline-flex;
     align-items: center;
@@ -117,15 +145,25 @@ const repositoryHref = safeHref(REPOSITORY_URL, 'developer');
   .docs-link:hover {
     background: color-mix(in srgb, var(--tx-foreground) 6%, transparent);
   }
-  .platform-links {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
   @media (max-width: 64rem) {
-    .tools :global(.get-started),
-    [data-repo-door] {
+    .tools :global(.get-started) {
       display: none;
+    }
+    .site-header[data-variant='landing'] .global-nav {
+      display: none;
+      position: absolute;
+      inset-block-start: var(--site-header-height);
+      inset-inline: 0;
+      padding: 0.5rem 1rem 0.75rem;
+      border-block-end: 1px solid var(--tx-border);
+      background: var(--tx-background);
+    }
+    .site-header[data-variant='landing'] .global-nav[data-open] {
+      display: block;
+    }
+    .site-header[data-variant='landing'] .global-nav__list {
+      flex-direction: column;
+      align-items: stretch;
     }
   }
   /* The search trigger keeps its label but stops claiming 16rem and drops
@@ -153,8 +191,8 @@ const repositoryHref = safeHref(REPOSITORY_URL, 'developer');
       min-inline-size: 10rem;
     }
   }
-  @media (max-width: 48rem) {
-    .platform-links {
+  @media (min-width: 64rem) {
+    .site-header[data-variant='landing'] .menu {
       display: none;
     }
   }
@@ -217,7 +255,7 @@ const repositoryHref = safeHref(REPOSITORY_URL, 'developer');
     .brand :global(.brand-logo) {
       block-size: 20px;
     }
-    /* Logo, Docs, search glyph and the three-way switch fit 360px only with
+    /* Logo, menu, search glyph and the three-way switch fit 360px only with
        tighter spacing: it ran 9px past the viewport before (T-89). */
     .site-header {
       gap: 0.5rem;
@@ -262,5 +300,20 @@ const repositoryHref = safeHref(REPOSITORY_URL, 'developer');
     } finally {
       button.removeAttribute('aria-busy');
     }
+  });
+
+  const landingMenu = document.querySelector<HTMLButtonElement>('[data-landing-menu]');
+  const globalNav = document.querySelector<HTMLElement>('[data-global-nav]');
+  const setLandingOpen = (open: boolean) => {
+    landingMenu?.setAttribute('aria-expanded', open ? 'true' : 'false');
+    globalNav?.toggleAttribute('data-open', open);
+  };
+  landingMenu?.addEventListener('click', () => {
+    setLandingOpen(landingMenu.getAttribute('aria-expanded') !== 'true');
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || landingMenu?.getAttribute('aria-expanded') !== 'true') return;
+    setLandingOpen(false);
+    landingMenu.focus();
   });
 </script>
