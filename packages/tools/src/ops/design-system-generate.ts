@@ -1,4 +1,4 @@
-import type { GenerateDesignSystemInput } from '@texuli/tokens/design-system/compile-core';
+import type { GenerateDesignSystemInput } from '@texuli/tokens/design-system/generate';
 import type { Operation } from './types.ts';
 
 const issue = {
@@ -38,16 +38,40 @@ export const designSystemGenerate: Operation = {
   input: {
     type: 'object',
     properties: {
-      brief: { type: 'string', maxLength: 32_768 },
-      tokens: { type: ['string', 'object'], maxLength: 262_144 },
-      css: { type: 'string', maxLength: 262_144 },
+      brief: {
+        type: 'string',
+        maxLength: 32_768,
+        description: 'A short brand brief in plain language (at most 32768 characters).',
+      },
+      tokens: {
+        type: ['string', 'object'],
+        maxLength: 262_144,
+        description: 'Token JSON or a JSON string of tokens (at most 262144 characters).',
+      },
+      css: {
+        type: 'string',
+        maxLength: 262_144,
+        description: 'Site CSS whose custom properties feed the draft (at most 262144 characters).',
+      },
       logoPixels: {
         type: 'object',
-        properties: { data: { type: 'array', items: { type: 'number' }, maxItems: 65_536 } },
+        description: 'A logo as RGBA pixels; at most 65536 numbers in data.',
+        properties: {
+          data: {
+            type: 'array',
+            items: { type: 'number' },
+            maxItems: 65_536,
+            description: 'RGBA samples packed as numbers, at most 65536 items.',
+          },
+        },
         required: ['data'],
         additionalProperties: false,
       },
-      theme: { type: ['string', 'object'], maxLength: 262_144 },
+      theme: {
+        type: ['string', 'object'],
+        maxLength: 262_144,
+        description: 'A Texuli theme id or theme JSON (at most 262144 characters).',
+      },
     },
     required: [],
     additionalProperties: false,
@@ -65,7 +89,7 @@ export const designSystemGenerate: Operation = {
   },
   annotations: { readOnly: true, destructive: false, idempotent: true, openWorld: false },
   runtime: 'edge',
-  limits: { inputBytes: 1_048_576, timeMs: 10_000 },
+  limits: { inputBytes: 1_048_576, items: 65_536, timeMs: 10_000 },
   examples: [
     {
       title: 'A brand brief with CSS tokens',
@@ -76,7 +100,7 @@ export const designSystemGenerate: Operation = {
     },
   ],
   async handler(input) {
-    const { generateDesignSystem } = await import('@texuli/tokens/design-system/compile-core');
+    const { generateDesignSystem } = await import('@texuli/tokens/design-system/generate');
     const generationInput = {
       ...(input.brief === undefined ? {} : { brief: input.brief }),
       ...(input.tokens === undefined ? {} : { tokens: input.tokens }),

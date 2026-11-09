@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { readdirSync } from 'node:fs';
 import { expect, it } from 'vitest';
-import { buildCatalog } from '../src/build/index.ts';
+import { buildCatalogWithImports } from '../src/build/index.ts';
 import { discoverManifestGroups, MANIFESTS_DIR } from '../src/build/node.ts';
 import { ALL_MANIFEST_GROUPS } from '../src/manifests/all.ts';
 import { scenario } from './scenario.ts';
@@ -26,8 +26,8 @@ it('lists every manifest group statically, with the same catalog hash as fs disc
       ALL_MANIFEST_GROUPS.map((group) => [group.name, group.manifests.map(({ id }) => id).sort()])
     ).toEqual(discovered.map((group) => [group.name, group.manifests.map(({ id }) => id).sort()]));
     const [fromList, fromFs] = await Promise.all([
-      buildCatalog(ALL_MANIFEST_GROUPS),
-      buildCatalog(discovered),
+      buildCatalogWithImports(ALL_MANIFEST_GROUPS),
+      buildCatalogWithImports(discovered),
     ]);
     expect(fromList.hash).toBe(fromFs.hash);
     expect(fromList.hash).toMatch(/^[0-9a-f]{64}$/u);

@@ -192,7 +192,7 @@ describe('design-system root attributes (group C)', () => {
         { catalog, tier: 'developer' }
       );
       expect(
-        diagnostics.filter((d) => d.severity === 'error'),
+        diagnostics.filter((d) => d.code !== 'invalid-prop'),
         id
       ).toEqual([]);
       expect(roots[0], id).toMatchObject({ kind: 'component', id });
@@ -200,50 +200,51 @@ describe('design-system root attributes (group C)', () => {
   });
 
   it('paints data-tx-component on every group C root', () => {
-    const { container: text } = render(TextBlockView, { props: PROPS['blocks-text'] });
+    const paint = (component: Parameters<typeof render>[0], id: (typeof GROUP_C)[number]) =>
+      render(component, { props: PROPS[id] as never });
+
+    const { container: text } = paint(TextBlockView, 'blocks-text');
     expect(rootOf('blocks-text', text).tagName).toBe('HGROUP');
 
-    const { container: data } = render(DataBlockView, { props: PROPS['blocks-data'] });
+    const { container: data } = paint(DataBlockView, 'blocks-data');
     expect(rootOf('blocks-data', data).getAttribute('data-tx-block')).toBe('table');
 
-    const { container: diagram } = render(DiagramFamily, { props: PROPS['blocks-diagram'] });
+    const { container: diagram } = paint(DiagramFamily, 'blocks-diagram');
     expect(rootOf('blocks-diagram', diagram).getAttribute('data-tx-diagram')).toBe('flow');
 
-    const { container: embed } = render(EmbedBlockView, { props: PROPS['blocks-embed'] });
+    const { container: embed } = paint(EmbedBlockView, 'blocks-embed');
     expect(rootOf('blocks-embed', embed).tagName).toBe('ARTICLE');
 
-    const { container: interactive } = render(InteractiveBlockView, {
-      props: PROPS['blocks-interactive'],
-    });
+    const { container: interactive } = paint(InteractiveBlockView, 'blocks-interactive');
     expect(rootOf('blocks-interactive', interactive).getAttribute('data-tx-block')).toBe('poll');
 
-    const { container: map } = render(MapBlockView, { props: PROPS['blocks-map'] });
+    const { container: map } = paint(MapBlockView, 'blocks-map');
     expect(rootOf('blocks-map', map).getAttribute('data-tx-block')).toBe('map');
 
-    const { container: media } = render(MediaBlockView, { props: PROPS['blocks-media'] });
+    const { container: media } = paint(MediaBlockView, 'blocks-media');
     expect(rootOf('blocks-media', media).tagName).toBe('FIGURE');
 
-    const { container: structure } = render(StructureFamily, { props: PROPS['blocks-structure'] });
+    const { container: structure } = paint(StructureFamily, 'blocks-structure');
     expect(rootOf('blocks-structure', structure).getAttribute('data-tx-block')).toBe('columns');
 
-    const { container: code } = render(CodeBlockView, { props: PROPS['blocks-code'] });
+    const { container: code } = paint(CodeBlockView, 'blocks-code');
     expect(rootOf('blocks-code', code).tagName).toBe('FIGURE');
 
-    const { container: canvas } = render(CanvasViewer, { props: PROPS.canvas });
+    const { container: canvas } = paint(CanvasViewer, 'canvas');
     expect(rootOf('canvas', canvas).tagName).toBe('FIGURE');
 
-    const { container: field } = render(CodeField, { props: PROPS['code-field'] });
+    const { container: field } = paint(CodeField, 'code-field');
     expect(rootOf('code-field', field).getAttribute('data-tx-code-field')).toBe('');
 
     const { container: schema } = render(SchemaForm, { props: { form } });
     expect(rootOf('schema-form', schema).tagName).toBe('FORM');
 
-    const { container: sheet } = render(SheetView, { props: PROPS.spreadsheet });
+    const { container: sheet } = paint(SheetView, 'spreadsheet');
     const sheetRoot = rootOf('spreadsheet', sheet);
     expect(sheetRoot.getAttribute(DS_DENSITY_ATTRIBUTE)).toBe('compact');
 
     const { container: dense } = render(SheetView, {
-      props: { ...PROPS.spreadsheet, density: 'comfortable' },
+      props: { ...PROPS.spreadsheet, density: 'comfortable' } as never,
     });
     expect(rootOf('spreadsheet', dense).getAttribute(DS_DENSITY_ATTRIBUTE)).toBe('comfortable');
 

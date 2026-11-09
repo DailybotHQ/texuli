@@ -59,6 +59,10 @@
     "./design-system": {
       "types": "./src/design-system/index.ts",
       "default": "./src/design-system/index.ts"
+    },
+    "./catalog-extensions": {
+      "types": "./src/catalog-extensions.ts",
+      "default": "./src/catalog-extensions.ts"
     }
   },
   "scripts": {

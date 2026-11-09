@@ -211,18 +211,18 @@
   }
 
   /* Sizes — touch target ≥ 44px below sm; logical min-block-size */
-  .tx-button--sm {
+  .tx-button--sm:not(.tx-button--link) {
     min-block-size: var(--tx-button-height-sm, var(--tx-size-control-sm));
     padding-inline: var(--tx-button-padding-inline-sm, var(--tx-space-3));
     font-size: var(--tx-button-font-size-sm, var(--tx-type-caption-size));
   }
 
-  .tx-button--md {
+  .tx-button--md:not(.tx-button--link) {
     min-block-size: var(--tx-button-height-md, var(--tx-size-control-md));
     padding-inline: var(--tx-button-padding-inline-md, var(--tx-space-4));
   }
 
-  .tx-button--lg {
+  .tx-button--lg:not(.tx-button--link) {
     min-block-size: var(--tx-button-height-lg, var(--tx-size-control-lg));
     padding-inline: var(--tx-button-padding-inline-lg, var(--tx-space-6));
     font-size: var(--tx-button-font-size-lg, var(--tx-type-body-size));
@@ -242,8 +242,8 @@
   }
 
   @media (max-width: 639px) {
-    .tx-button--sm,
-    .tx-button--md,
+    .tx-button--sm:not(.tx-button--link),
+    .tx-button--md:not(.tx-button--link),
     .tx-button--icon {
       min-block-size: var(--tx-button-height-touch, var(--tx-size-target-touch));
     }

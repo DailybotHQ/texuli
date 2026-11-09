@@ -8,14 +8,14 @@
  */
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { buildCatalog } from '@texuli/catalog/build';
+import { buildCatalogWithImports } from '@texuli/catalog/build';
 import { discoverManifestGroups } from '@texuli/catalog/build/node';
 import { type Capability, projectCatalog } from '../src/catalog.ts';
 import { formatJson } from '../src/format.ts';
 import { SPEC_ROOT } from './files.ts';
 
 export async function projectLiveCatalog(root = SPEC_ROOT) {
-  const build = await buildCatalog(await discoverManifestGroups());
+  const build = await buildCatalogWithImports(await discoverManifestGroups());
   const capabilities = JSON.parse(
     readFileSync(join(root, 'catalog/capabilities.json'), 'utf8')
   ) as Record<string, Capability>;

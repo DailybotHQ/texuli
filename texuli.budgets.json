@@ -76,8 +76,8 @@
     },
     "@texuli/forms": {
       "gzip": 58304,
-      "cssGzip": 5760,
-      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the root carries SchemaForm with every texuli field control it paints (input, select, date and time, slider, choice, tags, file upload, stepper), the model and the controller; consumers that only validate import ./model. Measured 79,802 B (CSS 8,472 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 8832 B before adoption): cssGzip 10368 -> 9792 B, measured + 4% (measured 9,403 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook. PLAN_011 T-gaps-113-121 (G119): tightened 83008 -> 58304 B and cssGzip 9792 -> 5504 B, measured + 4% (measured 56,004 B, CSS 5,267 B): the date, time, datetime, slider, tags, file, color and radio controls and the multi-step Stepper load per field type (lazy 49,503 B, CSS 5,382 B), so the root carries only the text, select and choice controls. 0.14.3 (owner-approved 2026-11-07): cssGzip 5504 -> 5760 (measured 5,517 B + 4%) for the per-button iconSize rules in button.css, which the forms root bundles."
+      "cssGzip": 5952,
+      "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the root carries SchemaForm with every texuli field control it paints (input, select, date and time, slider, choice, tags, file upload, stepper), the model and the controller; consumers that only validate import ./model. Measured 79,802 B (CSS 8,472 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 8832 B before adoption): cssGzip 10368 -> 9792 B, measured + 4% (measured 9,403 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook. PLAN_011 T-gaps-113-121 (G119): tightened 83008 -> 58304 B and cssGzip 9792 -> 5504 B, measured + 4% (measured 56,004 B, CSS 5,267 B): the date, time, datetime, slider, tags, file, color and radio controls and the multi-step Stepper load per field type (lazy 49,503 B, CSS 5,382 B), so the root carries only the text, select and choice controls. 0.14.3 (owner-approved 2026-11-07): cssGzip 5504 -> 5760 (measured 5,517 B + 4%) for the per-button iconSize rules in button.css, which the forms root bundles. PLAN_016 T-release-015 (2026-11-09, lead, standing grant): cssGzip 5760 -> 5952 B, measured 5,774 B + 2%; forms CSS for the inputs widening."
     },
     "@texuli/forms/controls": {
       "gzip": 52800,
@@ -98,20 +98,20 @@
       "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4% for the stylesheet only; measured 0 B, CSS 762 B. PLAN_011 T-gaps-113-121: cssGzip 832 -> 1152 B, measured + 4% (measured 1,066 B; 806 B before): the password, otp and datetime layouts, the custom-field notice and the same-size placeholders of per-type controls and the Stepper (G117, G119). Then 1152 -> 1280 B, measured + 4% (measured 1,201 B): each placeholder sized like its control per type and viewport, so mounting causes no layout shift (lead review of G119)."
     },
     "@texuli/catalog": {
-      "gzip": 59648,
-      "note": "Root barrel aggregate of every manifest group plus render (renderer, grammar, frame, limits) and build helpers; first-load cost is per subpath. Raised from 32 KiB at 37,933 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 49,152 B to measured 51,980 B + 4% headroom; already over at T-01. Trimming stays a follow-up. PLAN_009 (2026-10-28, owner-consented release plan): 54080 -> 57024 B, measured + 4% after four new manifests (time-field, data-cohort-table, data-notification-inbox, data-filter-builder) and the linear-time rich text parser and sink scan; measured 54,821 B. PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 57024 -> 59648 B, measured 58,440 B + 2%; the catalog now lists axes and states for every component (T2)."
+      "gzip": 69312,
+      "note": "Root barrel aggregate of every manifest group plus render (renderer, grammar, frame, limits) and build helpers; first-load cost is per subpath. Raised from 32 KiB at 37,933 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 49,152 B to measured 51,980 B + 4% headroom; already over at T-01. Trimming stays a follow-up. PLAN_009 (2026-10-28, owner-consented release plan): 54080 -> 57024 B, measured + 4% after four new manifests (time-field, data-cohort-table, data-notification-inbox, data-filter-builder) and the linear-time rich text parser and sink scan; measured 54,821 B. PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 57024 -> 59648 B, measured 58,440 B + 2%; the catalog now lists axes and states for every component (T2). PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip 59648 -> 69312 B, measured 67,947 B + 2%; the catalog widened from 170 to 194 ids with axes, states and imports (T2 widening, PLAN_016)."
     },
     "@texuli/catalog/manifests/all": {
-      "gzip": 48128,
-      "note": "PLAN_011 T-ops-core (ADR-017): the edge-safe static list of every manifest group, imported by the remote MCP and apps/agent instead of fs discovery; it bundles every group by design (the root barrel is 54 KiB). Measured 43,531 B gzip; cap = measured + 4% rounded up to 64 B. PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 45312 -> 48128 B, measured 47,177 B + 2%; the catalog now lists axes and states for every component (T2)."
+      "gzip": 56832,
+      "note": "PLAN_011 T-ops-core (ADR-017): the edge-safe static list of every manifest group, imported by the remote MCP and apps/agent instead of fs discovery; it bundles every group by design (the root barrel is 54 KiB). Measured 43,531 B gzip; cap = measured + 4% rounded up to 64 B. PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 45312 -> 48128 B, measured 47,177 B + 2%; the catalog now lists axes and states for every component (T2). PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip 48128 -> 56832 B, measured 55,677 B + 2%; the catalog widened from 170 to 194 ids with axes, states and imports (T2 widening, PLAN_016)."
     },
     "@texuli/catalog/*": {
       "gzip": 8192,
       "note": "Default per-subpath cap (lead decision 2026-10-23) so a new lazy entry is budgeted from its first commit; exact entries override it and `pnpm size --update` tightens."
     },
     "@texuli/catalog/manifest": {
-      "gzip": 6528,
-      "note": "Provisional cap for the catalog manifest subpath (measured 4,112 B gzip on 2026-10-23, when it landed). PLAN_010 T-release-060 (2026-10-29): 8192 -> 5888 B, tightened to measured + 4% (measured 5,643 B). PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 5888 -> 6528 B, measured 6,389 B + 2%; the catalog now lists axes and states for every component (T2)."
+      "gzip": 7296,
+      "note": "Provisional cap for the catalog manifest subpath (measured 4,112 B gzip on 2026-10-23, when it landed). PLAN_010 T-release-060 (2026-10-29): 8192 -> 5888 B, tightened to measured + 4% (measured 5,643 B). PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 5888 -> 6528 B, measured 6,389 B + 2%; the catalog now lists axes and states for every component (T2). PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip 6528 -> 7296 B, measured 7,109 B + 2%; the catalog widened from 170 to 194 ids with axes, states and imports (T2 widening, PLAN_016)."
     },
     "@texuli/catalog/manifests/*": {
       "gzip": 12288,
@@ -126,20 +126,20 @@
       "note": "Owner decision 2026-10-27 (PLAN_007 T-catalog-coverage): the state, action, flow and form surfaces adopted from the player, plus the sortable list with reorder; measured 8,622 B + 4% headroom. PLAN_010 T-release-060 (2026-10-29): 9024 -> 4032 B, tightened to measured + 4% (measured 3,865 B). PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 4032 -> 4224 B, measured 4,092 B + 2%; the catalog now lists axes and states for every component (T2)."
     },
     "@texuli/catalog/manifests/display": {
-      "gzip": 7040,
-      "note": "Authored manifest data (schemas, useWhen, examples) for display components; measured 8,989 B. Owner decision 2026-10-27 (PLAN_007): raised to measured 11,004 B + 4% headroom; manifests carry events, bindable and prop schemas. PLAN_010 T-release-060 (2026-10-29): 11456 -> 6592 B, tightened to measured + 4% (measured 6,307 B). PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 6592 -> 7040 B, measured 6,857 B + 2%; the catalog now lists axes and states for every component (T2)."
+      "gzip": 12800,
+      "note": "Authored manifest data (schemas, useWhen, examples) for display components; measured 8,989 B. Owner decision 2026-10-27 (PLAN_007): raised to measured 11,004 B + 4% headroom; manifests carry events, bindable and prop schemas. PLAN_010 T-release-060 (2026-10-29): 11456 -> 6592 B, tightened to measured + 4% (measured 6,307 B). PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 6592 -> 7040 B, measured 6,857 B + 2%; the catalog now lists axes and states for every component (T2). PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip 7040 -> 12800 B, measured 12,534 B + 2%; the catalog widened from 170 to 194 ids with axes, states and imports (T2 widening, PLAN_016)."
     },
     "@texuli/catalog/manifests/documents": {
       "gzip": 1792,
       "note": "PLAN_010 T-release-070 (2026-10-29, developer GO for the 0.7.0 release): new exact row at measured + 4% for the documents manifest group (the agent-emittable document id, spec 0.7.0), first published in 0.7.0; it was under the @texuli/catalog/* default cap; measured 1,566 B. PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 1664 -> 1792 B, measured 1,703 B + 2%; the catalog now lists axes and states for every component (T2)."
     },
     "@texuli/catalog/manifests/forms": {
-      "gzip": 9920,
-      "note": "Authored form manifests (26 components); measured 10,491 B (lead decision 2026-10-23). Owner decision 2026-10-27 (PLAN_007): raised to measured 13,115 B + 4% headroom; manifests carry events, bindable and prop schemas. PLAN_010 T-release-060 (2026-10-29): 13696 -> 9344 B, tightened to measured + 4% (measured 8,929 B). PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 9344 -> 9920 B, measured 9,687 B + 2%; the catalog now lists axes and states for every component (T2)."
+      "gzip": 11712,
+      "note": "Authored form manifests (26 components); measured 10,491 B (lead decision 2026-10-23). Owner decision 2026-10-27 (PLAN_007): raised to measured 13,115 B + 4% headroom; manifests carry events, bindable and prop schemas. PLAN_010 T-release-060 (2026-10-29): 13696 -> 9344 B, tightened to measured + 4% (measured 8,929 B). PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 9344 -> 9920 B, measured 9,687 B + 2%; the catalog now lists axes and states for every component (T2). PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip 9920 -> 11712 B, measured 11,428 B + 2%; the catalog widened from 170 to 194 ids with axes, states and imports (T2 widening, PLAN_016)."
     },
     "@texuli/catalog/manifests/layouts": {
-      "gzip": 7168,
-      "note": "Authored layouts manifests; measured 9,359 B (26 manifests) (lead decision 2026-10-23). Explicit entry: the manifests/* pattern does not take precedence over @texuli/catalog/*. PLAN_010 T-release-060 (2026-10-29): 12288 -> 7168 B, tightened to measured + 4% (measured 6,890 B)."
+      "gzip": 8192,
+      "note": "Authored layouts manifests; measured 9,359 B (26 manifests) (lead decision 2026-10-23). Explicit entry: the manifests/* pattern does not take precedence over @texuli/catalog/*. PLAN_010 T-release-060 (2026-10-29): 12288 -> 7168 B, tightened to measured + 4% (measured 6,890 B). PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip 7168 -> 8192 B, measured 8,017 B + 2%; the catalog widened from 170 to 194 ids with axes, states and imports (T2 widening, PLAN_016)."
     },
     "@texuli/catalog/manifests/overlays": {
       "gzip": 7872,
@@ -705,8 +705,8 @@
       "note": "Sidebar plus AppNav compose the Sheet (mobile drawer) and Tooltip (collapsed rail); measured 23,682 B (lead decision 2026-10-23). Loading the mobile drawer lazily is a follow-up in T-site-perf. PLAN_010 T-release-060 (2026-10-29): 24576 -> 21056 B, tightened to measured + 4% (measured 20,233 B)."
     },
     "texuli/tabs-accordion": {
-      "gzip": 14336,
-      "note": "PLAN_010 T-motion-adopt (ADR-013): new row over the 12,288 B texuli/* default; the Tabs indicator glide and Accordion height motion (texuli/motion seam; the runtime is a lazy chunk) over the accordion motion hooks, plus the T-gaps-53-69 badge names. Measured 13,731 B gzip (12,128 B at HEAD), cap = measured + 4% rounded up to 64 B."
+      "gzip": 14720,
+      "note": "PLAN_010 T-motion-adopt (ADR-013): new row over the 12,288 B texuli/* default; the Tabs indicator glide and Accordion height motion (texuli/motion seam; the runtime is a lazy chunk) over the accordion motion hooks, plus the T-gaps-53-69 badge names. Measured 13,731 B gzip (12,128 B at HEAD), cap = measured + 4% rounded up to 64 B. PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip 14336 -> 14720 B, measured 14,372 B + 2%; catalog roots and axes for tabs and accordion (T-widen-app)."
     },
     "texuli/motion": {
       "gzip": 1984,
@@ -1131,8 +1131,8 @@
       "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4%: the data-source binding shapes and their check against host descriptors (spec 0.8.0, ADR-015). Measured 2,964 B."
     },
     "@texuli/spec/design-system": {
-      "gzip": 13376,
-      "note": "PLAN_011 T-ds-spec (lead approval, 2026-10-30): new row at measured + 4% for the design-system document contract (ADR-021, spec 0.10.0): validateDesignSystem with JSON paths, the patch check and pure merge, migrate and the blueprint reference check, over the closed vocabulary table. Over the 4 KB architecture target: the table alone is about 4,029 B gzip (364 component token keys for 67 components, the defaults lists and the 50 semantic roles), and moving patch and migrate to a /patch subpath would save only about 470 B. Measured 7,072 B. PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 7360 -> 12672 B, measured 12,396 B + 2%; adds the content hash, allow check, approve and locked init library functions (T1, create-lib). PLAN_016 (2026-11-09, lead, standing grant): 12672 -> 13376 B, measured 13,074 B + 2%; checkBlueprintAllow (T-blueprint-allow)."
+      "gzip": 16064,
+      "note": "PLAN_011 T-ds-spec (lead approval, 2026-10-30): new row at measured + 4% for the design-system document contract (ADR-021, spec 0.10.0): validateDesignSystem with JSON paths, the patch check and pure merge, migrate and the blueprint reference check, over the closed vocabulary table. Over the 4 KB architecture target: the table alone is about 4,029 B gzip (364 component token keys for 67 components, the defaults lists and the 50 semantic roles), and moving patch and migrate to a /patch subpath would save only about 470 B. Measured 7,072 B. PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 7360 -> 12672 B, measured 12,396 B + 2%; adds the content hash, allow check, approve and locked init library functions (T1, create-lib). PLAN_016 (2026-11-09, lead, standing grant): 12672 -> 13376 B, measured 13,074 B + 2%; checkBlueprintAllow (T-blueprint-allow). PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip 13376 -> 16064 B, measured 15,697 B + 2%; bundle pack/unpack/validate and the hash fix (T-ds-bundle)."
     },
     "@texuli/charts/cartesian": {
       "gzip": 14656,
@@ -1140,12 +1140,32 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 12,228 B + 4% headroom so platform drift does not flip it. PLAN_010 T-release-060 (2026-10-29): CSS 2048 -> 832 B, tightened to measured + 4% (measured 784 B). PLAN_011 T-gaps-96-98 (2026-10-30, G97 time x-axis): gzip 12736 -> 14656 B, measured 14,039 B + 4% rounded up to the 64 B step; the time axis (UTC nice time ticks, locale date labels, the xKind, formatX and locale props) is eager because a static or server-rendered chart labels its axis synchronously. PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): cssGzip 832 -> 896 B, measured 868 B + 2%; chart roots carry the ds root marker class (T3)."
     },
     "functions/mcp": {
-      "gzip": 238400,
-      "note": "PLAN_011 T-mcp-remote (2026-10-30): the remote MCP Pages Function (functions/mcp.ts), a server bundle, not a browser entry: the stateless handler, the edge operations, the static catalog manifests and the deck and document engines. Measured 209,909 B gzip initial (46,398 B lazy, the theme loaders and conversion chunks); budget = measured + 4%, rounded up to 64 B. Cloudflare's bundler does not split, so the deployed worker is about initial + lazy. PLAN_011 T-ds-agent-tools (2026-10-30): 218368 -> 232576 B. The eight ds.* operations, blueprint.theme and the create-design-system prompt add their declarations (input and output schemas, descriptions, worked examples) to the initial chunk, because tools/list serves them; the compiler, importers, emitters, report and example documents load lazily (lazy 56.0 -> 99.5 KiB). Measured 223,613 B gzip initial (216,146 B before); budget = measured + 4%, rounded up to 64 B. PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 232576 -> 238400 B, measured 233,669 B + 2%; the remote MCP serves the larger catalog and design-system operations."
+      "gzip": 262400,
+      "note": "PLAN_011 T-mcp-remote (2026-10-30): the remote MCP Pages Function (functions/mcp.ts), a server bundle, not a browser entry: the stateless handler, the edge operations, the static catalog manifests and the deck and document engines. Measured 209,909 B gzip initial (46,398 B lazy, the theme loaders and conversion chunks); budget = measured + 4%, rounded up to 64 B. Cloudflare's bundler does not split, so the deployed worker is about initial + lazy. PLAN_011 T-ds-agent-tools (2026-10-30): 218368 -> 232576 B. The eight ds.* operations, blueprint.theme and the create-design-system prompt add their declarations (input and output schemas, descriptions, worked examples) to the initial chunk, because tools/list serves them; the compiler, importers, emitters, report and example documents load lazily (lazy 56.0 -> 99.5 KiB). Measured 223,613 B gzip initial (216,146 B before); budget = measured + 4%, rounded up to 64 B. PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 232576 -> 238400 B, measured 233,669 B + 2%; the remote MCP serves the larger catalog and design-system operations. PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip 238400 -> 262400 B, measured 257,197 B + 2%; the remote MCP serves the widened catalog and the ds.generate, ds.validate and ds.bundle operations."
     },
     "texuli/ds-kit": {
       "gzip": 27520,
       "note": "PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip new -> 21952 B, measured 21,505 B + 2%; new subpath: the design-system UI kit (T4 shell, foundations, voice, library, changes). PLAN_016 (2026-11-09, lead, standing grant): 21952 -> 27520 B, measured 26,936 B + 2%; the kit control matrix (T-t4-matrix)."
+    },
+    "@texuli/catalog/build": {
+      "gzip": 8768,
+      "note": "PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip new -> 8768 B, measured 8,551 B + 2%; the catalog widened from 170 to 194 ids with axes, states and imports (T2 widening, PLAN_016)."
+    },
+    "@texuli/catalog/build/node": {
+      "gzip": 8704,
+      "note": "PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip new -> 8704 B, measured 8,472 B + 2%; the catalog widened from 170 to 194 ids with axes, states and imports (T2 widening, PLAN_016)."
+    },
+    "@texuli/catalog/imports": {
+      "gzip": 27968,
+      "note": "PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip new -> 27968 B, measured 27,419 B + 2%; new subpath: the full catalog imports map for static allow checks, kept off the manifest entries (T-catalog-imports, T-size-regressions)."
+    },
+    "@texuli/spec/catalog-extensions": {
+      "gzip": 4544,
+      "note": "PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip new -> 4544 B, measured 4,403 B + 2%; new subpath: mergeCatalogs and the extension schema checks (T-catalog-extensions)."
+    },
+    "@texuli/tokens/design-system/generate": {
+      "gzip": 49664,
+      "note": "PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip new -> 49664 B, measured 48,636 B + 2%; new subpath: ds generate bundles the importers and the compiler on purpose; compile stays free of importers (T-gen-pipeline, T-size-regressions)."
     }
   }
 }

@@ -37,14 +37,6 @@ export {
   splitFontStack,
 } from './from-theme.ts';
 export { fromTheme, fromThemeWithReport } from './from-theme-compiled.ts';
-export type {
-  DesignSystemGenerationReport,
-  DesignSystemRepair,
-  GenerateDesignSystemInput,
-  GenerateDesignSystemOptions,
-  GenerateDesignSystemResult,
-} from './generate.ts';
-export { generateDesignSystem } from './generate.ts';
 export {
   checkDesignSystemGuarantees,
   checkDesignSystemIndicators,

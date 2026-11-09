@@ -1,4 +1,3 @@
-import { IMPORTS_BY_ID } from './imports-map.ts';
 import type {
   CatalogAxisName,
   CatalogDeprecation,
@@ -52,12 +51,9 @@ export function manifestData(input: CatalogManifest): Readonly<CatalogManifest> 
     ...(Array.isArray(input.states) && input.states.length > 0
       ? { states: [...input.states] as CatalogStateName[] }
       : {}),
-    ...(() => {
-      const listed = (input.imports ?? IMPORTS_BY_ID[input.id]) as
-        | readonly CatalogImport[]
-        | undefined;
-      return listed && listed.length > 0 ? { imports: listed } : {};
-    })(),
+    ...(Array.isArray(input.imports) && input.imports.length > 0
+      ? { imports: input.imports as readonly CatalogImport[] }
+      : {}),
     ...(input.deprecated !== null && typeof input.deprecated === 'object'
       ? { deprecated: input.deprecated as CatalogDeprecation }
       : {}),

@@ -5,31 +5,31 @@
  */
 @layer tx.components {
   .tx-ds-kit__matrix-component {
-    padding-block-end: var(--tx-space-4, 1rem);
-    border-block-end: var(--tx-border-width-thin, 1px) solid var(--tx-border, currentColor);
+    padding-block-end: var(--tx-space-4);
+    border-block-end: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
   }
   .tx-ds-kit__matrix-modes {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-    gap: var(--tx-space-4, 1rem);
+    gap: var(--tx-space-4);
   }
   .tx-ds-kit__matrix-mode {
     display: grid;
-    gap: var(--tx-space-3, 0.75rem);
+    gap: var(--tx-space-3);
     align-content: start;
     min-inline-size: 0;
   }
   .tx-ds-kit__strip {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--tx-space-3, 0.75rem);
+    gap: var(--tx-space-3);
   }
   .tx-ds-kit__cell {
     display: grid;
-    gap: var(--tx-space-1, 0.25rem);
+    gap: var(--tx-space-1);
     justify-items: start;
     margin: 0;
-    padding: var(--tx-space-2, 0.5rem);
+    padding: var(--tx-space-2);
     min-inline-size: 0;
   }
   .tx-ds-kit__cell figcaption {
@@ -39,14 +39,14 @@
   .tx-ds-kit__disallowed {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--tx-space-2, 0.5rem);
+    gap: var(--tx-space-2);
     align-items: center;
     margin: 0;
   }
   .tx-ds-kit__matrix-disallowed {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--tx-space-1, 0.25rem) var(--tx-space-3, 0.75rem);
+    gap: var(--tx-space-1) var(--tx-space-3);
     margin: 0;
     padding: 0;
     list-style: none;

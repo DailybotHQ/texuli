@@ -115,7 +115,9 @@ export const STAGE_MAP: Readonly<Record<string, StageEntry>> = Object.freeze({
   'media-image': e('media', '@texuli/media/image', 'Image', 'md'),
 
   // Display.
+  accordion: e('data', 'texuli/tabs-accordion', 'Accordion', 'md'),
   alert: e('feedback', 'texuli/alert', 'Alert', 'md'),
+  avatar: e('badge', 'texuli/avatar', 'Avatar', 'sm'),
   'avatar-group-grid': e('badge', 'texuli/avatar', 'AvatarGroupGrid', 'sm'),
   badge: e('badge', 'texuli/badge', 'Badge', 'sm', { children: 'Shipped' }),
   box: e('badge', 'texuli/typography', 'Box', 'md', { children: '…' }),
@@ -125,15 +127,23 @@ export const STAGE_MAP: Readonly<Record<string, StageEntry>> = Object.freeze({
   banner: e('feedback', 'texuli/alert', 'Banner', 'md'),
   callout: e('feedback', 'texuli/alert', 'Callout', 'md'),
   card: e('data', 'texuli/card', 'Card', 'md', { children: '…' }),
+  carousel: e('data', 'texuli/carousel', 'Carousel', 'md'),
   chip: e('badge', 'texuli/badge', 'Chip', 'sm'),
   code: e('badge', 'texuli/kbd-code', 'Code', 'sm'),
   'empty-state': e('feedback', 'texuli/empty', 'EmptyState', 'md'),
   'error-state': e('feedback', 'texuli/empty', 'ErrorState', 'md'),
+  icon: e('badge', 'texuli/icons', 'Icon', 'sm'),
   kbd: e('badge', 'texuli/kbd-code', 'Kbd', 'sm', { children: '⌘K' }),
+  'list-item': e('badge', 'texuli/list-item', 'ListItem', 'sm'),
   kpi: e('data', 'texuli/stat', 'Kpi', 'md'),
+  progress: e('feedback', 'texuli/feedback', 'Progress', 'sm'),
+  separator: e('badge', 'texuli/separator-aspect', 'Separator', 'sm'),
+  skeleton: e('feedback', 'texuli/feedback', 'Skeleton', 'sm'),
+  spinner: e('feedback', 'texuli/feedback', 'Spinner', 'sm'),
   stat: e('data', 'texuli/stat', 'Stat', 'md'),
   stepper: e('data', 'texuli/stepper', 'Stepper', 'md'),
   table: e('table', 'texuli/table', 'Table', 'lg', { children: '…' }),
+  tabs: e('data', 'texuli/tabs-accordion', 'Tabs', 'md'),
   tag: e('badge', 'texuli/badge', 'Tag', 'sm'),
   timeline: e('data', 'texuli/timeline', 'Timeline', 'lg'),
 
@@ -196,12 +206,23 @@ export const STAGE_MAP: Readonly<Record<string, StageEntry>> = Object.freeze({
   'text-counter': e('field', 'texuli/input', 'TextCounter', 'sm'),
   textarea: e('field', 'texuli/input', 'Textarea', 'md'),
   'code-field': e('field', '@texuli/blocks/code-field', 'CodeField', 'md'),
+  'file-upload': e('field', 'texuli/file-upload', 'FileUpload', 'md'),
+  'number-field': e('field', 'texuli/number-pin', 'NumberField', 'sm'),
+  'pin-input': e('field', 'texuli/number-pin', 'PinInput', 'sm'),
+  rating: e('choice', 'texuli/rating', 'Rating', 'sm'),
+  'tags-input': e('field', 'texuli/tags-color', 'TagsInput', 'sm'),
   'time-field': e('field', 'texuli/date', 'TimeField', 'sm'),
+  'toggle-group': e('choice', 'texuli/toggle', 'ToggleGroup', 'sm'),
 
   // Layouts.
   'analytics-grid': e('layout', 'texuli/layouts/dashboard', 'AnalyticsGrid', 'lg', {
     children: '…',
   }),
+  'bottom-nav': e('layout', 'texuli/layouts/mobile', 'BottomNav', 'sm'),
+  'mobile-app-frame': e('layout', 'texuli/layouts/mobile', 'MobileAppFrame', 'lg', {
+    isolate: true,
+  }),
+  'mobile-header': e('layout', 'texuli/layouts/mobile', 'MobileHeader', 'sm'),
   'content-layout': e('layout', 'texuli/layouts/host', 'LayoutHost', 'xl', {
     isolate: true,
     children: '…',

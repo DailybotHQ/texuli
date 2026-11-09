@@ -8,6 +8,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { emitTiers } from '../src/build/tiers.ts';
+import { IMPORTS_BY_ID } from '../src/manifest/imports-map.ts';
 import { ALL_MANIFEST_GROUPS } from '../src/manifests/all.ts';
 import { CATALOG_EXCLUSIONS } from './coverage-exclusions.ts';
 
@@ -45,7 +46,7 @@ describe('catalog widening: inputs set', () => {
       expect(manifest, id).toBeDefined();
       expect(manifest?.package, id).toBe('texuli');
       expect(manifest?.examples.length, id).toBeGreaterThan(0);
-      expect(manifest?.imports?.length, id).toBeGreaterThan(0);
+      expect(IMPORTS_BY_ID[id]?.length, id).toBeGreaterThan(0);
       expect(manifest?.agentEmittable, id).toBe(false);
     }
     expect(byId.get('toggle-group')?.axes).toEqual({ variant: 'variant', size: 'size' });

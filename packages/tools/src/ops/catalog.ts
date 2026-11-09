@@ -1,4 +1,4 @@
-import { buildCatalog, type CatalogBuild } from '@texuli/catalog/build';
+import { buildCatalogWithImports, type CatalogBuild } from '@texuli/catalog/build';
 import { validateCatalogManifest, validateCatalogManifests } from '@texuli/catalog/manifest';
 import { ALL_MANIFEST_GROUPS } from '@texuli/catalog/manifests/all';
 import type { SpecCatalog, SpecComponent } from '@texuli/spec';
@@ -25,7 +25,7 @@ let cached: Promise<CatalogBuild> | undefined;
  * discovery). Built once per process or isolate.
  */
 export function loadOpsCatalog(): Promise<CatalogBuild> {
-  cached ??= buildCatalog(ALL_MANIFEST_GROUPS);
+  cached ??= buildCatalogWithImports(ALL_MANIFEST_GROUPS);
   return cached;
 }
 

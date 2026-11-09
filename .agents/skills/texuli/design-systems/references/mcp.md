@@ -52,7 +52,11 @@ from a brief, token file, stylesheet, logo pixels or Texuli theme with
 check contrast and preview, deliver a draft. Reference screenshots are
 interpreted by the agent's own vision step and converted to proposed inputs;
 the tool never silently imports screenshots, fetches inputs or saves the
-generated document.
+generated document. With `locked` (`minimal`, `all` or `custom`) it adds the
+locked steps: `ds.allow`, library entries as drafts, full validation, and
+the hand-off to a person for `texuli ds approve` and a CODEOWNERS-reviewed
+commit; an agent never approves. `ds.allow` builds the allow section from
+the catalog, and `ds.bundle` packs or unpacks a portable bundle.
 
 ## Resources
 

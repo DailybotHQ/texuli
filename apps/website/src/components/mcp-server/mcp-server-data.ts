@@ -370,6 +370,7 @@ export const MCP_SERVER_DATA = {
       local: true,
       limits: {
         inputBytes: 1048576,
+        items: 16,
         timeMs: 10000,
       },
       arguments: [
@@ -655,33 +656,35 @@ export const MCP_SERVER_DATA = {
       local: true,
       limits: {
         inputBytes: 1048576,
+        items: 65536,
         timeMs: 10000,
       },
       arguments: [
         {
           name: 'brief',
           required: false,
-          description: '',
+          description: 'A short brand brief in plain language (at most 32768 characters).',
         },
         {
           name: 'tokens',
           required: false,
-          description: '',
+          description: 'Token JSON or a JSON string of tokens (at most 262144 characters).',
         },
         {
           name: 'css',
           required: false,
-          description: '',
+          description:
+            'Site CSS whose custom properties feed the draft (at most 262144 characters).',
         },
         {
           name: 'logoPixels',
           required: false,
-          description: '',
+          description: 'A logo as RGBA pixels; at most 65536 numbers in data.',
         },
         {
           name: 'theme',
           required: false,
-          description: '',
+          description: 'A Texuli theme id or theme JSON (at most 262144 characters).',
         },
       ],
       example: 'A brand brief with CSS tokens',

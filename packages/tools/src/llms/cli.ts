@@ -6,7 +6,7 @@
  *   pnpm exec tsx packages/tools/src/llms/cli.ts --out apps/website/public/llms --json
  */
 
-import { buildCatalog } from '@texuli/catalog/build';
+import { buildCatalogWithImports } from '@texuli/catalog/build';
 import { discoverManifestGroups } from '@texuli/catalog/build/node';
 import { isMainModule } from '../internal/is-main.ts';
 import { buildLlmsBundle } from './bundle.ts';
@@ -64,7 +64,7 @@ Generate llms.txt, llms-full.txt and components/<id>.md from catalog manifests.
     }
 
     const groups = await discoverManifestGroups();
-    const { catalog, hash } = await buildCatalog(groups);
+    const { catalog, hash } = await buildCatalogWithImports(groups);
     const bundle = buildLlmsBundle({
       catalog,
       baseUrl: args.baseUrl,

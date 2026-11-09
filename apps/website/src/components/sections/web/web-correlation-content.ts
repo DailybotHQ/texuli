@@ -90,7 +90,7 @@ export const WEB_CORR_PANELS: readonly CorrPanel[] = [
       {
         file: MANIFEST_FILE,
         code: [
-          'export const badgeManifest = /* @__PURE__ */ manifestData({',
+          'export const badgeManifest = /* @__PURE__ */ defineDisplayManifest({',
           "  id: 'badge',",
           '  package: PKG,',
           "  label: 'Badge',",

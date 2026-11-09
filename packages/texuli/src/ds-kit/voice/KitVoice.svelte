@@ -238,7 +238,7 @@ const gid = (item: string) => kitItemId(prefix, 'voice', item);
   .tx-ds-kit-voice__fields {
     display: grid;
     grid-template-columns: max-content 1fr;
-    gap: var(--tx-space-1, 0.25rem) var(--tx-space-3, 0.75rem);
+    gap: var(--tx-space-1) var(--tx-space-3);
     margin: 0;
   }
   .tx-ds-kit-voice__fields dd {
