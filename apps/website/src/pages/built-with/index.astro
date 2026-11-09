@@ -1,0 +1,17 @@
+---
+/**
+ * /built-with/ — products built with Texuli (ADR-027; ADR-031 landing header). A
+ * landing-shell page over `components/built-with/index/`: listed products only, grouped
+ * by who builds them, each with its status from `data/products`. The nav source lists the
+ * route once the page exists, so breadcrumbs, the footer and the Markdown twin follow.
+ */
+import BuiltWithIndex from '../../components/built-with/index/BuiltWithIndex.astro';
+import { BUILT_WITH_PAGE } from '../../components/built-with/index/index-content.ts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title={BUILT_WITH_PAGE.title} description={BUILT_WITH_PAGE.description} landing>
+  <div class="landing" data-tx-landing="">
+    <BuiltWithIndex />
+  </div>
+</BaseLayout>
