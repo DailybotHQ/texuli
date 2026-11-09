@@ -1,0 +1,13 @@
+{
+  "ok": false,
+  "codes": ["css-inline-style"],
+  "findings": [
+    {
+      "code": "css-inline-style",
+      "severity": "error",
+      "area": "prototype-css",
+      "path": "src/Page.svelte:85",
+      "value": "style"
+    }
+  ]
+}

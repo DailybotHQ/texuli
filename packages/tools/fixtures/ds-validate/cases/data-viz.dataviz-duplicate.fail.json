@@ -1,0 +1,22 @@
+{
+  "description": "Two categorical chart colors repeat.",
+  "code": "dataviz-duplicate",
+  "expect": "fail",
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "color": {
+      "brand": {
+        "seed": "#0e7490"
+      },
+      "dataViz": {
+        "light": {
+          "categorical": ["#0e7490", "#0e7490"]
+        }
+      }
+    }
+  }
+}

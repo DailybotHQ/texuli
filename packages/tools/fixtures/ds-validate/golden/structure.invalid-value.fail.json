@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "codes": ["invalid-value"],
+  "findings": [
+    {
+      "code": "invalid-value",
+      "severity": "error",
+      "area": "structure",
+      "path": "$.version"
+    }
+  ]
+}

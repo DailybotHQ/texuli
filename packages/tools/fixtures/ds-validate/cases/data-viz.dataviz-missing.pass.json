@@ -1,0 +1,6 @@
+{
+  "description": "A cached compiled map missing the chart colors. (fixed)",
+  "code": "dataviz-missing",
+  "expect": "pass",
+  "compiled": "reference"
+}

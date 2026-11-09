@@ -1,0 +1,36 @@
+{
+  "ok": false,
+  "codes": ["invalid-value", "unknown-key"],
+  "findings": [
+    {
+      "code": "unknown-key",
+      "severity": "error",
+      "area": "structure",
+      "path": "$.__proto__"
+    },
+    {
+      "code": "unknown-key",
+      "severity": "error",
+      "area": "structure",
+      "path": "$.constructor"
+    },
+    {
+      "code": "invalid-value",
+      "severity": "error",
+      "area": "structure",
+      "path": "$.allow.__proto__"
+    },
+    {
+      "code": "unknown-key",
+      "severity": "error",
+      "area": "structure",
+      "path": "$.allow.button.__proto__"
+    },
+    {
+      "code": "unknown-key",
+      "severity": "error",
+      "area": "structure",
+      "path": "$.library[0].__proto__"
+    }
+  ]
+}

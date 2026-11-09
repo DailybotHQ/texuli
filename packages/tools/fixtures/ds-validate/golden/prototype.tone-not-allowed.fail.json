@@ -1,0 +1,13 @@
+{
+  "ok": false,
+  "codes": ["tone-not-allowed"],
+  "findings": [
+    {
+      "code": "tone-not-allowed",
+      "severity": "error",
+      "area": "prototype-components",
+      "path": "src/Page.svelte:6:3",
+      "value": "destructive"
+    }
+  ]
+}

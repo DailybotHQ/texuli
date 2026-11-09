@@ -1,0 +1,24 @@
+{
+  "description": "The sidebar active fill pinned below 3:1 on a dark sidebar.",
+  "code": "aa-non-text",
+  "expect": "fail",
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "color": {
+      "brand": {
+        "seed": "#0e7490"
+      },
+      "roles": {
+        "light": {
+          "sidebar": "#1e293b",
+          "sidebarForeground": "#ffffff",
+          "sidebarPrimary": "#334155"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "ok": false,
+  "codes": ["css-literal-color"],
+  "findings": [
+    {
+      "code": "css-literal-color",
+      "severity": "error",
+      "area": "prototype-css",
+      "path": "src/Page.svelte:style@106:5",
+      "value": "#fff"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "description": "A cached compiled map missing the chart colors.",
+  "code": "dataviz-missing",
+  "expect": "fail",
+  "compiled": {
+    "light": {
+      "--tx-background": "#ffffff"
+    }
+  }
+}

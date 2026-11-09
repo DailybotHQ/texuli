@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "codes": ["url-refused"],
+  "findings": [
+    {
+      "code": "url-refused",
+      "severity": "error",
+      "area": "structure",
+      "path": "$.assets.logo.light"
+    }
+  ]
+}

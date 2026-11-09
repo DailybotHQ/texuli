@@ -1,0 +1,17 @@
+{
+  "description": "A future formatVersion.",
+  "code": "format-version",
+  "expect": "fail",
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 2,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "color": {
+      "brand": {
+        "seed": "#0e7490"
+      }
+    }
+  }
+}

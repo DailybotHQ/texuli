@@ -1,0 +1,13 @@
+{
+  "ok": false,
+  "codes": ["variant-not-allowed"],
+  "findings": [
+    {
+      "code": "variant-not-allowed",
+      "severity": "error",
+      "area": "prototype-components",
+      "path": "src/Page.svelte:6:3",
+      "value": "ghost"
+    }
+  ]
+}

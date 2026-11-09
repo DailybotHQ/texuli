@@ -1,0 +1,6 @@
+{
+  "description": "A cached compiled map missing a token. (fixed)",
+  "code": "token-missing",
+  "expect": "pass",
+  "compiled": "reference"
+}

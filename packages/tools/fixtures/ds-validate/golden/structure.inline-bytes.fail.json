@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "codes": ["inline-bytes"],
+  "findings": [
+    {
+      "code": "inline-bytes",
+      "severity": "error",
+      "area": "structure",
+      "path": "$.assets.favicon"
+    }
+  ]
+}

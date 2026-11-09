@@ -1,0 +1,34 @@
+{
+  "description": "A range instead of an exact version. (fixed)",
+  "code": "extends-range",
+  "expect": "pass",
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "color": {
+      "brand": {
+        "seed": "#0e7490"
+      }
+    },
+    "extends": "acme@1.0.0"
+  },
+  "options": {
+    "base": {
+      "acme@1.0.0": {
+        "format": "texuli/design-system",
+        "formatVersion": 1,
+        "id": "acme",
+        "version": "1.0.0",
+        "name": "acme",
+        "color": {
+          "brand": {
+            "seed": "#0e7490"
+          }
+        }
+      }
+    }
+  }
+}

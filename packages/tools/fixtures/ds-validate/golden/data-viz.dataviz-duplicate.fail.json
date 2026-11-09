@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "codes": [],
+  "findings": [
+    {
+      "code": "dataviz-duplicate",
+      "severity": "warning",
+      "area": "data-viz",
+      "path": "$.color.dataViz.light.categorical[1]",
+      "value": "#0e7490",
+      "mode": "light"
+    },
+    {
+      "code": "color-adjusted",
+      "severity": "info",
+      "area": "contrast",
+      "path": "$.color.dataViz.light.categorical",
+      "mode": "light"
+    },
+    {
+      "code": "color-adjusted",
+      "severity": "info",
+      "area": "contrast",
+      "path": "$.color.dataViz.light.categorical",
+      "mode": "light"
+    },
+    {
+      "code": "color-adjusted",
+      "severity": "info",
+      "area": "contrast",
+      "path": "$.color.dataViz.light.categorical",
+      "mode": "light"
+    },
+    {
+      "code": "color-adjusted",
+      "severity": "info",
+      "area": "contrast",
+      "path": "$.color.dataViz.light.categorical",
+      "mode": "light"
+    },
+    {
+      "code": "color-adjusted",
+      "severity": "info",
+      "area": "contrast",
+      "path": "$.color.dataViz.light.categorical",
+      "mode": "light"
+    },
+    {
+      "code": "color-adjusted",
+      "severity": "info",
+      "area": "contrast",
+      "path": "$.color.dataViz.light.categorical",
+      "mode": "light"
+    }
+  ]
+}

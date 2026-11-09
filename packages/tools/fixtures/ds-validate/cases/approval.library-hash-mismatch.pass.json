@@ -1,0 +1,46 @@
+{
+  "description": "A library entry edited after its approval. (fixed)",
+  "code": "library-hash-mismatch",
+  "expect": "pass",
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "color": {
+      "brand": {
+        "seed": "#0e7490"
+      }
+    },
+    "allow": {
+      "button": {
+        "variants": ["default", "outline"],
+        "sizes": ["sm", "md"],
+        "tones": ["default"],
+        "states": ["hover", "focus-visible", "disabled"]
+      },
+      "card": {},
+      "data-grid": {
+        "densities": ["compact"]
+      }
+    },
+    "library": [
+      {
+        "id": "pricing-card",
+        "name": "Pricing card",
+        "purpose": "One plan with its price.",
+        "version": "0.1.0",
+        "status": "approved",
+        "composes": ["card", "button"],
+        "approval": {
+          "status": "approved",
+          "approvedBy": "Design reviewer",
+          "approvedAt": "2026-11-09T14:30:00Z",
+          "version": "0.1.0",
+          "contentHash": "d25f33c3f45805cb2dc21d35aea2777bc35fb6221c32b33424a90063ce387d9f"
+        }
+      }
+    ]
+  }
+}

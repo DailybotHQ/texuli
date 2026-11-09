@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "codes": [],
+  "findings": [
+    {
+      "code": "color-adjusted",
+      "severity": "info",
+      "area": "contrast",
+      "path": "$.color.dataViz.light.categorical",
+      "mode": "light"
+    },
+    {
+      "code": "color-adjusted",
+      "severity": "info",
+      "area": "contrast",
+      "path": "$.color.dataViz.light.categorical",
+      "mode": "light"
+    },
+    {
+      "code": "color-adjusted",
+      "severity": "info",
+      "area": "contrast",
+      "path": "$.color.dataViz.light.categorical",
+      "mode": "light"
+    },
+    {
+      "code": "color-adjusted",
+      "severity": "info",
+      "area": "contrast",
+      "path": "$.color.dataViz.light.categorical",
+      "mode": "light"
+    },
+    {
+      "code": "color-adjusted",
+      "severity": "info",
+      "area": "contrast",
+      "path": "$.color.dataViz.light.categorical",
+      "mode": "light"
+    },
+    {
+      "code": "color-adjusted",
+      "severity": "info",
+      "area": "contrast",
+      "path": "$.color.dataViz.light.categorical",
+      "mode": "light"
+    }
+  ]
+}

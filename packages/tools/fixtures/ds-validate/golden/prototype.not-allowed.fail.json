@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "codes": ["not-allowed"],
+  "findings": [
+    {
+      "code": "not-allowed",
+      "severity": "error",
+      "area": "prototype-components",
+      "path": "src/Page.svelte:6:3"
+    }
+  ]
+}
