@@ -8,12 +8,18 @@
 import { manifestData } from '../../manifest/data.ts';
 import type { CatalogManifest } from '../../manifest/types.ts';
 import type { GrammarComponentMeta } from '../../render/grammar/types.ts';
+import { stampChatAxes } from './axes.ts';
 
 const PKG = '@texuli/chat';
 
+/* @__NO_SIDE_EFFECTS__ */
+function defineChatManifest(input: CatalogManifest): Readonly<CatalogManifest> {
+  return stampChatAxes(manifestData(input));
+}
+
 export const CHAT_MESSAGE_ROLES = ['user', 'agent', 'system'] as const;
 
-export const chatThreadManifest: CatalogManifest = /* @__PURE__ */ manifestData({
+export const chatThreadManifest: CatalogManifest = /* @__PURE__ */ defineChatManifest({
   id: 'chat-thread',
   package: PKG,
   label: 'Chat thread',
@@ -40,7 +46,7 @@ export const chatThreadManifest: CatalogManifest = /* @__PURE__ */ manifestData(
   related: ['chat-message'],
 });
 
-export const chatMessageManifest: CatalogManifest = /* @__PURE__ */ manifestData({
+export const chatMessageManifest: CatalogManifest = /* @__PURE__ */ defineChatManifest({
   id: 'chat-message',
   package: PKG,
   label: 'Chat message',

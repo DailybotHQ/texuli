@@ -11,11 +11,17 @@
 import { manifestData } from '../../manifest/data.ts';
 import type { CatalogManifest } from '../../manifest/types.ts';
 import type { GrammarComponentMeta } from '../../render/grammar/types.ts';
+import { stampCanvasAxes } from './axes.ts';
+
+/* @__NO_SIDE_EFFECTS__ */
+function defineCanvasManifest(input: CatalogManifest): Readonly<CatalogManifest> {
+  return stampCanvasAxes(manifestData(input));
+}
 
 /** The catalog id of a canvas (spec 0.8.0). */
 export const CANVAS_CATALOG_ID = 'canvas' as const;
 
-export const canvasManifest: CatalogManifest = /* @__PURE__ */ manifestData({
+export const canvasManifest: CatalogManifest = /* @__PURE__ */ defineCanvasManifest({
   id: CANVAS_CATALOG_ID,
   package: '@texuli/canvas',
   label: 'Canvas',

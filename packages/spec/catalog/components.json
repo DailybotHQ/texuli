@@ -1,5 +1,5 @@
 {
-  "catalogHash": "7148ffc74182e71602261c50b598b664e2d40b451825d39a06c467ad979f9b88",
+  "catalogHash": "61c140f2e2057ea5ed953e3771a1b128841ddeeb359fe0081e4851cbbaf0b762",
   "components": [
     {
       "capability": "web-only",
@@ -29,6 +29,13 @@
       "summary": "Groups fields whose submit proposes one named action intent to the host."
     },
     {
+      "axes": {
+        "tone": {
+          "default": "info",
+          "prop": "tone",
+          "values": ["info", "success", "warning", "error", "brand", "neutral"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
@@ -90,6 +97,7 @@
           "name": "tone"
         }
       ],
+      "states": ["hover", "focus-visible"],
       "summary": "Inline feedback for a page section (status or error)."
     },
     {
@@ -297,6 +305,13 @@
       "summary": "Desktop sidebar shell with mobile sheet drawer and main slot."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["xs", "sm", "md", "lg"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
@@ -331,6 +346,22 @@
       "summary": "Up to four faces in one avatar circle, +N past four."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": [
+            "default",
+            "secondary",
+            "outline",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
@@ -367,9 +398,17 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "selected"],
       "summary": "A compact status or category label."
     },
     {
+      "axes": {
+        "tone": {
+          "default": "info",
+          "prop": "tone",
+          "values": ["info", "success", "warning", "error", "brand", "neutral"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
@@ -476,6 +515,15 @@
           "name": "step"
         }
       ],
+      "states": [
+        "hover",
+        "focus-visible",
+        "disabled",
+        "loading",
+        "invalid",
+        "selected",
+        "readonly"
+      ],
       "summary": "Validated, highlighted code."
     },
     {
@@ -527,6 +575,7 @@
           "name": "oninvalid"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "Validated flow, tree, board and terminal diagrams."
     },
     {
@@ -557,6 +606,7 @@
           "name": "oninvalid"
         }
       ],
+      "states": ["focus-visible", "disabled", "loading"],
       "summary": "Validated link previews (URL policy) and embed-app shells. Texuli never runs app JSON; hosts mount via mountEmbed with a sandboxed iframe contract."
     },
     {
@@ -582,6 +632,7 @@
           "name": "oninvalid"
         }
       ],
+      "states": ["disabled", "checked"],
       "summary": "Validated polls, quizzes, calculators and checklists."
     },
     {
@@ -615,6 +666,7 @@
           "name": "oninvalid"
         }
       ],
+      "states": ["focus-visible", "active", "selected"],
       "summary": "Validated map points and routes."
     },
     {
@@ -645,6 +697,7 @@
           "name": "resolveAvatar"
         }
       ],
+      "states": ["invalid"],
       "summary": "Validated image, figure, video and gallery content blocks."
     },
     {
@@ -670,6 +723,7 @@
           "name": "oninvalid"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "Validated layouts and calls to action."
     },
     {
@@ -695,6 +749,7 @@
           "name": "oninvalid"
         }
       ],
+      "states": ["focus-visible", "invalid", "checked", "open"],
       "summary": "Validated heading, paragraph, list, quote and callout content."
     },
     {
@@ -872,6 +927,13 @@
       "summary": "Groups related buttons with shared borders and orientation."
     },
     {
+      "axes": {
+        "tone": {
+          "default": "info",
+          "prop": "tone",
+          "values": ["info", "success", "warning", "error", "brand", "neutral"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
@@ -956,9 +1018,27 @@
           "name": "label"
         }
       ],
+      "states": [
+        "hover",
+        "focus-visible",
+        "active",
+        "disabled",
+        "selected",
+        "expanded",
+        "checked",
+        "open",
+        "readonly"
+      ],
       "summary": "A whiteboard or diagram as data: shapes, sticky notes, text, frames, groups and connectors on an infinite canvas."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "elevated",
+          "prop": "variant",
+          "values": ["elevated", "flat"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
@@ -990,6 +1070,7 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible"],
       "summary": "A surface for grouping related content with optional link behavior."
     },
     {
@@ -1330,6 +1411,7 @@
           "name": "xKind"
         }
       ],
+      "states": ["open"],
       "summary": "The general line, area, bar, stacked bar or combo chart renderer."
     },
     {
@@ -1988,6 +2070,13 @@
       "summary": "A quantitative scatter plot with an accessible data table."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "line",
+          "prop": "variant",
+          "values": ["line", "area", "bar"]
+        }
+      },
       "capability": "unknown",
       "emit": ["developer", "untrusted"],
       "group": "content",
@@ -2035,6 +2124,7 @@
           "name": "variant"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "A compact line, area or bar trend chart."
     },
     {
@@ -2243,6 +2333,7 @@
           "name": "label"
         }
       ],
+      "states": ["disabled"],
       "summary": "Read-only conversation transcript of chat-message nodes, without a composer."
     },
     {
@@ -2329,6 +2420,22 @@
       "summary": "A binary or indeterminate checkbox with optional label."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "outline",
+          "prop": "variant",
+          "values": [
+            "default",
+            "secondary",
+            "outline",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
@@ -2374,9 +2481,17 @@
           "name": "variant"
         }
       ],
+      "states": ["active", "disabled", "selected"],
       "summary": "A toggleable filter chip (pressed state)."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "inline",
+          "prop": "variant",
+          "values": ["inline", "block"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
@@ -2403,6 +2518,7 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled"],
       "summary": "Inline or block code with escaped text (no HTML)."
     },
     {
@@ -4330,6 +4446,7 @@
           "name": "outline"
         }
       ],
+      "states": ["checked", "open"],
       "summary": "A block document (a brief, a report, notes or a page) as data: headings, paragraphs, lists, callouts, columns, content blocks and embedded components."
     },
     {
@@ -4559,6 +4676,13 @@
       "summary": "Styled button that opens a dropdown menu."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
@@ -5237,9 +5361,17 @@
           "name": "label"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled"],
       "summary": "Inline keyboard key affordance."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "elevated",
+          "prop": "variant",
+          "values": ["elevated", "flat"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
@@ -5312,6 +5444,7 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "loading"],
       "summary": "A formatted metric with unit, previous-period delta and optional link."
     },
     {
@@ -6555,6 +6688,7 @@
           "name": "trust"
         }
       ],
+      "states": ["focus-visible", "disabled"],
       "summary": "A validated layered composition rendered to a canvas."
     },
     {
@@ -6602,6 +6736,7 @@
           "name": "validate"
         }
       ],
+      "states": ["focus-visible", "invalid"],
       "summary": "A validated, structured vector composition."
     },
     {
@@ -6722,6 +6857,7 @@
           "name": "widths"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "A responsive image with URL validation, loading states and actions."
     },
     {
@@ -7945,6 +8081,13 @@
       "summary": "A spreadsheet as data: tabs of cells holding numbers, text, booleans and formulas that recalculate."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "elevated",
+          "prop": "variant",
+          "values": ["elevated", "flat"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
@@ -8001,6 +8144,7 @@
           "name": "variant"
         }
       ],
+      "states": ["hover"],
       "summary": "A single metric with optional delta, trend and sparkline slot."
     },
     {
@@ -8045,6 +8189,7 @@
           "required": true
         }
       ],
+      "states": ["focus-visible", "selected"],
       "summary": "Horizontal or vertical progress through ordered steps."
     },
     {
@@ -8118,6 +8263,18 @@
       "summary": "An immediate on/off setting control."
     },
     {
+      "axes": {
+        "density": {
+          "default": "default",
+          "prop": "density",
+          "values": ["compact", "default", "comfortable"]
+        },
+        "variant": {
+          "default": "plain",
+          "prop": "variant",
+          "values": ["plain", "striped", "grid"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
@@ -8166,9 +8323,26 @@
           "name": "wrapperClass"
         }
       ],
+      "states": ["focus-visible", "loading"],
       "summary": "A responsive data table with density, stacking and sticky header options."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "secondary",
+          "prop": "variant",
+          "values": [
+            "default",
+            "secondary",
+            "outline",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "display",
@@ -8214,6 +8388,7 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "loading"],
       "summary": "A labeled chip that can be removed."
     },
     {
@@ -8470,6 +8645,7 @@
           "name": "orientation"
         }
       ],
+      "states": ["focus-visible", "selected"],
       "summary": "Vertical or horizontal chronological list of events."
     },
     {

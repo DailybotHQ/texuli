@@ -1,0 +1,38 @@
+import { manifestData } from '../../manifest/data.ts';
+import type { CatalogAxisName, CatalogManifest, CatalogStateName } from '../../manifest/types.ts';
+
+type Stamp = {
+  readonly axes?: Readonly<Partial<Record<CatalogAxisName, string>>>;
+  readonly states?: readonly CatalogStateName[];
+};
+
+/** Audited visual axes and observable states for display components (ADR-032). */
+export const DISPLAY_AXIS_STAMP: Readonly<Record<string, Stamp>> = {
+  alert: { axes: { tone: 'tone' }, states: ['hover', 'focus-visible'] },
+  'avatar-group-grid': { axes: { size: 'size' } },
+  badge: {
+    axes: { variant: 'variant' },
+    states: ['hover', 'focus-visible', 'disabled', 'selected'],
+  },
+  banner: { axes: { tone: 'tone' } },
+  callout: { axes: { tone: 'tone' } },
+  card: { axes: { variant: 'variant' }, states: ['hover', 'focus-visible'] },
+  chip: { axes: { variant: 'variant' }, states: ['active', 'disabled', 'selected'] },
+  code: { axes: { variant: 'variant' }, states: ['hover', 'focus-visible', 'disabled'] },
+  'empty-state': { axes: { size: 'size' } },
+  kbd: { states: ['hover', 'focus-visible', 'disabled'] },
+  kpi: { axes: { variant: 'variant' }, states: ['hover', 'focus-visible', 'loading'] },
+  stat: { axes: { variant: 'variant' }, states: ['hover'] },
+  stepper: { states: ['focus-visible', 'selected'] },
+  table: {
+    axes: { variant: 'variant', density: 'density' },
+    states: ['focus-visible', 'loading'],
+  },
+  tag: { axes: { variant: 'variant' }, states: ['hover', 'focus-visible', 'disabled', 'loading'] },
+  timeline: { states: ['focus-visible', 'selected'] },
+};
+
+export function stampDisplayAxes(manifest: CatalogManifest): CatalogManifest {
+  const stamp = DISPLAY_AXIS_STAMP[manifest.id];
+  return stamp ? manifestData({ ...manifest, ...stamp }) : manifest;
+}

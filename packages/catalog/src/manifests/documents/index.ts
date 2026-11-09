@@ -14,11 +14,17 @@
 import { manifestData } from '../../manifest/data.ts';
 import type { CatalogManifest } from '../../manifest/types.ts';
 import type { GrammarComponentMeta } from '../../render/grammar/types.ts';
+import { stampDocumentsAxes } from './axes.ts';
+
+/* @__NO_SIDE_EFFECTS__ */
+function defineDocumentManifest(input: CatalogManifest): Readonly<CatalogManifest> {
+  return stampDocumentsAxes(manifestData(input));
+}
 
 /** The catalog id of a document root (spec 0.7.0). */
 export const DOCUMENT_CATALOG_ID = 'document' as const;
 
-export const documentManifest: CatalogManifest = /* @__PURE__ */ manifestData({
+export const documentManifest: CatalogManifest = /* @__PURE__ */ defineDocumentManifest({
   id: DOCUMENT_CATALOG_ID,
   package: '@texuli/pages',
   label: 'Document',
