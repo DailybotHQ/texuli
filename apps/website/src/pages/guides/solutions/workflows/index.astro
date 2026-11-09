@@ -1,58 +1,16 @@
 ---
 /**
- * `/guides/solutions/workflows/` — Workflows technical docs (ADR-028). Content lives
- * in `src/content/solution-docs/workflows/`. Back-to-overview is the landing route.
+ * `/guides/solutions/workflows/` — Workflows technical docs (ADR-028). Content lives in
+ * `src/content/solution-docs/workflows/`; `SolutionDocsPage` renders it.
  */
-import GuideCode from '../../../../components/guides/GuideCode.astro';
-import type { GuideLanguage } from '../../../../components/guides/highlight.ts';
-import { GUIDE_LANGUAGES } from '../../../../components/guides/highlight.ts';
-import SolutionDocsLayout from '../../../../components/solutions/docs-layout/SolutionDocsLayout.astro';
-import type { DocBlock } from '../../../../content/solution-docs/parse.ts';
+import SolutionDocsPage from '../../../../components/solutions/docs-layout/SolutionDocsPage.astro';
 import { loadWorkflowsDocs } from '../../../../content/solution-docs/workflows/index.ts';
 import { getSolution } from '../../../../data/solutions/index.ts';
-
-const entry = getSolution('workflows');
-const sections = loadWorkflowsDocs();
-
-const toc = sections.flatMap((section) =>
-  section.blocks
-    .filter((block): block is Extract<DocBlock, { type: 'h2' }> => block.type === 'h2')
-    .map((block) => ({ id: block.id, label: block.text, level: 2 as const }))
-);
-
-const asLang = (lang: string): GuideLanguage =>
-  (GUIDE_LANGUAGES as readonly string[]).includes(lang) ? (lang as GuideLanguage) : 'auto';
 ---
 
-<SolutionDocsLayout
-  {entry}
+<SolutionDocsPage
+  entry={getSolution('workflows')}
   title="Workflows docs"
   description="Install @texuli/workflows, build a typed graph, edit or view it. In development. Not a workflow runner."
-  {toc}
->
-  {
-    sections.map((section) => (
-      <section data-workflows-doc={section.id}>
-        {section.blocks.map((block) =>
-          block.type === 'h2' ? (
-            <h2 id={block.id}>{block.text}</h2>
-          ) : block.type === 'p' ? (
-            <p>
-              {block.parts.map((part) => (part.kind === 'code' ? <code>{part.text}</code> : part.text))}
-            </p>
-          ) : block.type === 'ul' ? (
-            <ul>
-              {block.items.map((item) => (
-                <li>
-                  {item.map((part) => (part.kind === 'code' ? <code>{part.text}</code> : part.text))}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <GuideCode code={block.code} lang={asLang(block.lang)} label={`${block.lang} sample`} />
-          )
-        )}
-      </section>
-    ))
-  }
-</SolutionDocsLayout>
+  sections={loadWorkflowsDocs()}
+/>

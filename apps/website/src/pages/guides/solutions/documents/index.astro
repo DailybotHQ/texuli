@@ -1,58 +1,16 @@
 ---
 /**
- * `/guides/solutions/documents/` — Documents technical docs (ADR-028). Content lives
- * in `src/content/solution-docs/documents/`. Back-to-overview is the landing route.
+ * `/guides/solutions/documents/` — Documents technical docs (ADR-028). Content lives in
+ * `src/content/solution-docs/documents/`; `SolutionDocsPage` renders it.
  */
-import GuideCode from '../../../../components/guides/GuideCode.astro';
-import type { GuideLanguage } from '../../../../components/guides/highlight.ts';
-import { GUIDE_LANGUAGES } from '../../../../components/guides/highlight.ts';
-import SolutionDocsLayout from '../../../../components/solutions/docs-layout/SolutionDocsLayout.astro';
+import SolutionDocsPage from '../../../../components/solutions/docs-layout/SolutionDocsPage.astro';
 import { loadDocumentsDocs } from '../../../../content/solution-docs/documents/index.ts';
-import type { DocBlock } from '../../../../content/solution-docs/parse.ts';
 import { getSolution } from '../../../../data/solutions/index.ts';
-
-const entry = getSolution('documents');
-const sections = loadDocumentsDocs();
-
-const toc = sections.flatMap((section) =>
-  section.blocks
-    .filter((block): block is Extract<DocBlock, { type: 'h2' }> => block.type === 'h2')
-    .map((block) => ({ id: block.id, label: block.text, level: 2 as const }))
-);
-
-const asLang = (lang: string): GuideLanguage =>
-  (GUIDE_LANGUAGES as readonly string[]).includes(lang) ? (lang as GuideLanguage) : 'auto';
 ---
 
-<SolutionDocsLayout
-  {entry}
+<SolutionDocsPage
+  entry={getSolution('documents')}
   title="Documents docs"
   description="Install @texuli/document, @texuli/pages and @texuli/editor, edit a document, export it. In development."
-  {toc}
->
-  {
-    sections.map((section) => (
-      <section data-documents-doc={section.id}>
-        {section.blocks.map((block) =>
-          block.type === 'h2' ? (
-            <h2 id={block.id}>{block.text}</h2>
-          ) : block.type === 'p' ? (
-            <p>
-              {block.parts.map((part) => (part.kind === 'code' ? <code>{part.text}</code> : part.text))}
-            </p>
-          ) : block.type === 'ul' ? (
-            <ul>
-              {block.items.map((item) => (
-                <li>
-                  {item.map((part) => (part.kind === 'code' ? <code>{part.text}</code> : part.text))}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <GuideCode code={block.code} lang={asLang(block.lang)} label={`${block.lang} sample`} />
-          )
-        )}
-      </section>
-    ))
-  }
-</SolutionDocsLayout>
+  sections={loadDocumentsDocs()}
+/>

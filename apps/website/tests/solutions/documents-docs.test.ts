@@ -39,11 +39,9 @@ describe('Documents solution docs', () => {
   it('links both ways with the landing: docs back-link and registry docs href', () => {
     expect(documents.route).toBe('/solutions/documents/');
     expect(documents.links.some((link) => link.href === documents.docs)).toBe(true);
-    expect(page).toContain('SolutionDocsLayout');
+    expect(page).toContain('SolutionDocsPage');
     expect(page).toContain("getSolution('documents')");
-    expect(page).toContain('{entry}');
     expect(page).toContain('loadDocumentsDocs');
-    expect(page).toContain('data-documents-doc');
     expect(page).toContain('../../../../components/');
     expect(corpus).not.toMatch(/documents-page/);
     expect(page).not.toMatch(/documents-page/);

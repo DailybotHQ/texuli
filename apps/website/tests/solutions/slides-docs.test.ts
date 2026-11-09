@@ -36,11 +36,9 @@ describe('Slides solution docs', () => {
   it('links both ways with the landing: docs back-link and registry docs href', () => {
     expect(slides.route).toBe('/solutions/slides/');
     expect(slides.links.some((link) => link.href === slides.docs)).toBe(true);
-    expect(page).toContain('SolutionDocsLayout');
+    expect(page).toContain('SolutionDocsPage');
     expect(page).toContain("getSolution('slides')");
-    expect(page).toContain('{entry}');
     expect(page).toContain('loadSlidesDocs');
-    expect(page).toContain('data-slides-doc');
   });
 
   it('loads real APIs, in-development status, and no HTML sink or plan name', () => {

@@ -39,11 +39,9 @@ describe('Workflows solution docs', () => {
   it('links both ways with the landing: docs back-link and registry docs href', () => {
     expect(workflows.route).toBe('/solutions/workflows/');
     expect(workflows.links.some((link) => link.href === workflows.docs)).toBe(true);
-    expect(page).toContain('SolutionDocsLayout');
+    expect(page).toContain('SolutionDocsPage');
     expect(page).toContain("getSolution('workflows')");
-    expect(page).toContain('{entry}');
     expect(page).toContain('loadWorkflowsDocs');
-    expect(page).toContain('data-workflows-doc');
   });
 
   it('loads real APIs, in-development status, kept JSON preview, and no HTML sink or plan name', () => {
