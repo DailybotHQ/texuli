@@ -1,0 +1,41 @@
+---
+/**
+ * SolutionRecipes (`SolutionRecipesProps`, ADR-030): the optional grid of recipes, one
+ * card per recipe with its title, summary and link. Static markup, no island, no HTML
+ * sinks; every href passes the URL policy (developer tier).
+ */
+import type { SolutionRecipesProps } from '../types.ts';
+import './resources.css';
+import { recipesView } from './resources-model.ts';
+
+type Props = SolutionRecipesProps;
+
+const view = recipesView(Astro.props, import.meta.env.BASE_URL);
+---
+
+<section
+  class="solution-res solution-recipes"
+  aria-labelledby={view.headingId}
+  data-tx-solution-recipes={Astro.props.entry.slug}
+>
+  <div class="solution-res__inner">
+    <div class="solution-res__head">
+      <h2 id={view.headingId}>{view.title}</h2>
+    </div>
+    <ul class="solution-res__grid" role="list">
+      {
+        view.recipes.map((recipe) => (
+          <li class="solution-res__card" data-tx-recipe="">
+            <h3>
+              <a href={recipe.href}>
+                {recipe.title}
+                {recipe.external && <span class="solution-res__sr"> (external site)</span>}
+              </a>
+            </h3>
+            <p>{recipe.summary}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
