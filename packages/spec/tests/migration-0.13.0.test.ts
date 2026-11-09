@@ -139,13 +139,20 @@ describe('generated Kotlin vocabulary (0.13.0)', () => {
   });
 
   it('leaves the vocabulary byte-stable for components without them', () => {
-    const text = vocabularyToKotlin(catalog, build.stamp);
+    const without: SpecCatalog = {
+      ...catalog,
+      components: catalog.components.filter(
+        (component) => component.axes === undefined && component.states === undefined
+      ),
+    };
+    expect(without.components.length).toBeGreaterThan(0);
+    const text = vocabularyToKotlin(without, build.stamp);
     expect(text).not.toContain('axes = ');
     expect(text).not.toContain('states = ');
     const committed = readFileSync(
       join(import.meta.dirname, '../generated/kotlin/com/texuli/spec/Vocabulary.kt'),
       'utf8'
     );
-    expect(committed).toBe(text);
+    expect(committed).toBe(vocabularyToKotlin(catalog, build.stamp));
   });
 });

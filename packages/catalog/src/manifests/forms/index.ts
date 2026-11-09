@@ -2,6 +2,7 @@
  * Catalog manifests for form components in `texuli`.
  * Build-time only — the sink-free renderer must not import this module.
  */
+export { FORMS_AXIS_STAMP, stampFormsAxes } from './axes.ts';
 export {
   buttonGroupManifest,
   buttonManifest,

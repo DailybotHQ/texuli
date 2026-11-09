@@ -1,5 +1,5 @@
 {
-  "catalogHash": "df09bb2bb6afef0a7c5349f8a4108c2d65065151078ac33264d15446f833f0d9",
+  "catalogHash": "7148ffc74182e71602261c50b598b664e2d40b451825d39a06c467ad979f9b88",
   "components": [
     {
       "capability": "web-only",
@@ -160,6 +160,7 @@
           "name": "trigger"
         }
       ],
+      "states": ["focus-visible", "open"],
       "summary": "Modal confirm/cancel dialog for consequential actions."
     },
     {
@@ -205,6 +206,13 @@
       "summary": "Auto-fit KPI and widget grid for dashboard screens."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "inset"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
@@ -285,6 +293,7 @@
           "name": "variant"
         }
       ],
+      "states": ["focus-visible", "expanded", "open"],
       "summary": "Desktop sidebar shell with mobile sheet drawer and main slot."
     },
     {
@@ -689,6 +698,13 @@
       "summary": "Validated heading, paragraph, list, quote and callout content."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
@@ -734,9 +750,22 @@
           "name": "size"
         }
       ],
+      "states": ["hover", "focus-visible", "selected"],
       "summary": "Hierarchy trail with URL-policy links."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg", "icon"]
+        },
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "secondary", "outline", "ghost", "destructive", "link"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
@@ -804,6 +833,7 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "loading"],
       "summary": "A pressable action control with loading and optional link rendering."
     },
     {
@@ -838,6 +868,7 @@
           "name": "orientation"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "Groups related buttons with shared borders and orientation."
     },
     {
@@ -2215,6 +2246,13 @@
       "summary": "Read-only conversation transcript of chat-message nodes, without a composer."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
@@ -2287,6 +2325,7 @@
           "name": "value"
         }
       ],
+      "states": ["focus-visible", "disabled", "invalid", "checked"],
       "summary": "A binary or indeterminate checkbox with optional label."
     },
     {
@@ -2446,9 +2485,22 @@
           "name": "wrap"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "invalid", "readonly"],
       "summary": "An editable, syntax-highlighted code textarea."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "outline",
+          "prop": "variant",
+          "values": ["outline", "soft"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
@@ -2552,9 +2604,22 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "invalid", "selected", "open"],
       "summary": "A text input that filters a list of options, for one value or several."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "outline",
+          "prop": "variant",
+          "values": ["outline", "soft"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
@@ -2645,6 +2710,7 @@
           "name": "variant"
         }
       ],
+      "states": ["focus-visible", "disabled", "selected", "open"],
       "summary": "Dialog-hosted command palette with search and recent items."
     },
     {
@@ -2719,6 +2785,7 @@
           "name": "open"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "selected", "checked", "open"],
       "summary": "Pointer-anchored menu (right-click, long-press, Menu key)."
     },
     {
@@ -2744,6 +2811,7 @@
           "name": "disabled"
         }
       ],
+      "states": ["disabled", "open"],
       "summary": "Region that opens the context menu."
     },
     {
@@ -4117,9 +4185,17 @@
           "name": "class"
         }
       ],
+      "states": ["disabled"],
       "summary": "Help text associated with a field control."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg", "xl"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
@@ -4156,9 +4232,17 @@
           "name": "size"
         }
       ],
+      "states": ["hover", "focus-visible"],
       "summary": "Non-modal detail panel alongside content."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg", "xl"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
@@ -4218,6 +4302,7 @@
           "name": "trigger"
         }
       ],
+      "states": ["hover", "focus-visible", "open"],
       "summary": "Modal dialog with title, optional description, body and footer."
     },
     {
@@ -4248,6 +4333,13 @@
       "summary": "A block document (a brief, a report, notes or a page) as data: headings, paragraphs, lists, callouts, columns, content blocks and embedded components."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg", "xl"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
@@ -4284,6 +4376,7 @@
           "name": "size"
         }
       ],
+      "states": ["hover", "focus-visible"],
       "summary": "Bottom or edge drawer with optional drag dismiss."
     },
     {
@@ -4309,9 +4402,22 @@
           "name": "open"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "selected", "checked", "open"],
       "summary": "Menu button pattern with items, checkboxes, radios and submenus."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "soft"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
@@ -4354,6 +4460,7 @@
           "name": "variant"
         }
       ],
+      "states": ["focus-visible"],
       "summary": "Floating menu surface for dropdown items."
     },
     {
@@ -4405,9 +4512,22 @@
           "name": "textValue"
         }
       ],
+      "states": ["disabled", "selected"],
       "summary": "Menu item with optional icon and shortcut chrome."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "soft"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
@@ -4570,6 +4690,7 @@
           "name": "required"
         }
       ],
+      "states": ["disabled", "invalid"],
       "summary": "Label, description and error wiring for a single control."
     },
     {
@@ -4836,9 +4957,22 @@
           "name": "open"
         }
       ],
+      "states": ["open"],
       "summary": "Preview panel that opens on hover or focus."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "elevated",
+          "prop": "variant",
+          "values": ["elevated", "flat"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
@@ -4874,6 +5008,13 @@
       "summary": "Styled hover-card surface."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "ghost",
+          "prop": "variant",
+          "values": ["default", "secondary", "outline", "ghost", "destructive", "link"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
@@ -4918,6 +5059,7 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "loading"],
       "summary": "An icon-only button that requires an accessible name."
     },
     {
@@ -4994,6 +5136,7 @@
           "name": "value"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "invalid", "readonly"],
       "summary": "A single-line text (or file) control with optional clear."
     },
     {
@@ -5068,6 +5211,7 @@
           "name": "value"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "invalid", "readonly"],
       "summary": "An input with start/end adornments and optional clear."
     },
     {
@@ -5171,6 +5315,13 @@
       "summary": "A formatted metric with unit, previous-period delta and optional link."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
@@ -5202,6 +5353,7 @@
           "name": "srOnly"
         }
       ],
+      "states": ["disabled", "invalid"],
       "summary": "A form label with optional required marker and sr-only mode."
     },
     {
@@ -6604,9 +6756,22 @@
           "name": "value"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "selected", "checked", "open"],
       "summary": "Application menubar with roving top-level items."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "soft"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
@@ -6639,9 +6804,22 @@
           "name": "variant"
         }
       ],
+      "states": ["disabled"],
       "summary": "Top-level menubar item that opens a menu."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "outline",
+          "prop": "variant",
+          "values": ["outline", "soft"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
@@ -6741,6 +6919,7 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "invalid", "selected", "open"],
       "summary": "A combobox for several values, shown as removable chips."
     },
     {
@@ -6810,9 +6989,22 @@
           "name": "value"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "selected", "open"],
       "summary": "Site or app navigation with expandable triggers and links."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "outline",
+          "prop": "variant",
+          "values": ["outline", "soft"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
@@ -6859,6 +7051,7 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "selected"],
       "summary": "Page controls for long lists."
     },
     {
@@ -6884,9 +7077,22 @@
           "name": "open"
         }
       ],
+      "states": ["open"],
       "summary": "Non-modal floating panel anchored to a trigger."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "elevated",
+          "prop": "variant",
+          "values": ["elevated", "flat"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
@@ -6941,6 +7147,13 @@
       "summary": "Styled popover surface with optional arrow."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
@@ -6989,9 +7202,22 @@
           "required": true
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "invalid", "checked"],
       "summary": "One option inside a RadioGroup."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md"]
+        },
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "card"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
@@ -7058,9 +7284,17 @@
           "name": "variant"
         }
       ],
+      "states": ["disabled", "readonly"],
       "summary": "A set of exclusive radio options with keyboard roving."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg", "xl"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
@@ -7089,6 +7323,7 @@
           "name": "size"
         }
       ],
+      "states": ["hover", "focus-visible"],
       "summary": "Dialog on large screens, drawer/sheet on small screens."
     },
     {
@@ -7143,6 +7378,18 @@
       "summary": "Stable screen mount point that survives layout switches."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "outline",
+          "prop": "variant",
+          "values": ["outline", "soft"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
@@ -7221,9 +7468,17 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "invalid", "selected", "open"],
       "summary": "A single-value select root with size and variant chrome."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
@@ -7311,6 +7566,7 @@
           "required": true
         }
       ],
+      "states": ["hover", "disabled", "selected"],
       "summary": "One selectable option inside Select.Content."
     },
     {
@@ -7367,6 +7623,18 @@
       "summary": "A visual divider between Select groups or items."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg"]
+        },
+        "variant": {
+          "default": "outline",
+          "prop": "variant",
+          "values": ["outline", "soft"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
@@ -7395,6 +7663,7 @@
           "name": "variant"
         }
       ],
+      "states": ["focus-visible", "disabled", "invalid", "open"],
       "summary": "The button that opens a Select listbox."
     },
     {
@@ -7444,6 +7713,13 @@
       "summary": "Scrollable viewport inside Select.Content."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md", "lg", "xl"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
@@ -7484,9 +7760,17 @@
           "name": "size"
         }
       ],
+      "states": ["hover", "focus-visible"],
       "summary": "Edge-anchored modal panel (drawer-like sheet)."
     },
     {
+      "axes": {
+        "variant": {
+          "default": "default",
+          "prop": "variant",
+          "values": ["default", "inset"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "overlays",
@@ -7557,6 +7841,7 @@
           "name": "variant"
         }
       ],
+      "states": ["hover", "focus-visible", "disabled", "selected", "expanded"],
       "summary": "Collapsible app rail with sections, badges and safe links."
     },
     {
@@ -7763,6 +8048,13 @@
       "summary": "Horizontal or vertical progress through ordered steps."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
@@ -7822,6 +8114,7 @@
           "name": "value"
         }
       ],
+      "states": ["disabled", "checked"],
       "summary": "An immediate on/off setting control."
     },
     {
@@ -8007,6 +8300,7 @@
           "name": "value"
         }
       ],
+      "states": ["disabled", "invalid", "readonly"],
       "summary": "An input or textarea that shows remaining characters near the limit."
     },
     {
@@ -8053,9 +8347,17 @@
           "name": "value"
         }
       ],
+      "states": ["disabled", "readonly"],
       "summary": "A multi-line text control with optional autosize."
     },
     {
+      "axes": {
+        "size": {
+          "default": "md",
+          "prop": "size",
+          "values": ["sm", "md"]
+        }
+      },
       "capability": "web-only",
       "emit": [],
       "group": "forms",
@@ -8124,6 +8426,7 @@
           "name": "value"
         }
       ],
+      "states": ["hover", "focus-visible", "active", "disabled", "invalid", "selected"],
       "summary": "A labelled time of day typed or stepped by segment (hour, minute, AM/PM), with a 24-hour HH:mm value."
     },
     {
@@ -8212,6 +8515,7 @@
           "name": "store"
         }
       ],
+      "states": ["hover", "focus-visible"],
       "summary": "Live region that renders toast notifications from the shared store."
     },
     {
@@ -8269,6 +8573,7 @@
           "name": "sideOffset"
         }
       ],
+      "states": ["disabled", "open"],
       "summary": "Short delayed hint on hover or focus."
     },
     {
