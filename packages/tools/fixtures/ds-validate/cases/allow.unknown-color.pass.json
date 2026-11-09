@@ -1,0 +1,28 @@
+{
+  "description": "An allowed color the catalog does not list. (fixed)",
+  "code": "unknown-color",
+  "expect": "pass",
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "color": {
+      "brand": {
+        "seed": "#0e7490"
+      }
+    },
+    "allow": {
+      "badge": {
+        "variants": ["default"],
+        "colors": ["none"],
+        "states": ["hover", "focus-visible", "disabled"]
+      },
+      "card": {},
+      "data-grid": {
+        "densities": ["compact"]
+      }
+    }
+  }
+}

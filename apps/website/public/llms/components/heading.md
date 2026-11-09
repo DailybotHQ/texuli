@@ -29,7 +29,7 @@
 | Name | Kind | Required | Trust | Default | Description |
 | --- | --- | --- | --- | --- | --- |
 | `level` | number | no | — | `2` | The semantic level, 1 to 6: renders <h1>…<h6> |
-| `size` | enum(display | 4xl | 3xl | 2xl | xl | lg | md | sm) | no | — | `"lg"` | Visual size, independent of the level (default from the level: 1 xl, 2 lg, 3 md, 4–6 sm); 2xl, 3xl and 4xl are hero and section titles between xl and display |
+| `size` | enum(display | 4xl | 3xl | 2xl | xl | lg | md | sm | xs) | no | — | `"lg"` | Visual size, independent of the level (default from the level: 1 xl, 2 lg, 3 md, 4–6 sm); xs is ~0.875rem for small card titles; 2xl–4xl sit between xl and display |
 | `responsive` | boolean | no | — | `false` | Scale the size down on narrow screens: fluid from two scale steps below up to the size |
 | `tracking` | enum(default | tight) | no | — | `"default"` | Letter spacing: the role's own, or tight (--tx-letter-spacing-tight) |
 | `tone` | enum(default | muted) | no | — | `"default"` | — |
@@ -70,6 +70,16 @@
   "responsive": true,
   "tracking": "tight",
   "label": "Plan the quarter"
+}
+```
+
+#### Small card title (`card-title`)
+
+```json
+{
+  "level": 3,
+  "size": "xs",
+  "label": "Open tasks"
 }
 ```
 

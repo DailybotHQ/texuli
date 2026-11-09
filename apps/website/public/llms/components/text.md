@@ -39,6 +39,8 @@
 | `tabular` | boolean | no | — | `false` | Tabular figures (font-variant-numeric: tabular-nums) for numbers that line up |
 | `transform` | enum(none | uppercase | lowercase | capitalize) | no | — | `"none"` | — |
 | `tracking` | enum(normal | wide) | no | — | `"normal"` | Letter spacing; wide is the eyebrow tracking (--tx-letter-spacing-wide) |
+| `italic` | boolean | no | — | `false` | — |
+| `strikethrough` | boolean | no | — | `false` | Line-through |
 | `for` | string | no | — | — | With as="label": the id of the labelled control |
 | `label` | string | no | — | — | Plain text, escaped; replaces children when both are given |
 | `class` | string | no | — | — | — |
@@ -103,11 +105,23 @@
 }
 ```
 
+#### Struck price (`struck`)
+
+```json
+{
+  "as": "span",
+  "strikethrough": true,
+  "tone": "muted",
+  "label": "$48"
+}
+```
+
 ### Related
 
 - [`heading`](heading.md)
 - [`prose`](prose.md)
 - [`inline-text`](inline-text.md)
+- [`mark`](mark.md)
 
 ---
 

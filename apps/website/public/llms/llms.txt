@@ -109,12 +109,14 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [Chip](components/chip.md): A toggleable filter chip (pressed state).
 - [Code](components/code.md): Inline or block code with escaped text (no HTML).
 - [CodeField](components/code-field.md): An editable, syntax-highlighted code textarea.
+- [Color swatch](components/color-swatch.md): A chip of a closed palette, role or data-viz color with contrast ink from tokens. Never free CSS.
 - [Combobox](components/combobox.md): A text input that filters a list of options, for one value or several.
 - [CommandPalette](components/command-palette.md): Dialog-hosted command palette with search and recent items.
 - [Composer](components/composer.md): The host reply box for a chat thread. Host chrome; agents never emit it.
 - [ContentLayout](components/content-layout.md): Shared docs/blog/editorial reading frame with optional TOC.
 - [ContextMenu](components/context-menu.md): Pointer-anchored menu (right-click, long-press, Menu key).
 - [ContextMenu.Trigger](components/context-menu-trigger.md): Region that opens the context menu.
+- [Virtual list view](components/data-virtual-list.md): A windowed list of any length: only the visible rows are in the page, measured as they render, and each is announced with its position.
 - [Description](components/description.md): Help text associated with a field control.
 - [DetailPanel](components/detail-panel.md): Non-modal detail panel alongside content.
 - [Dialog](components/dialog.md): Modal dialog with title, optional description, body and footer.
@@ -156,7 +158,10 @@ Developer-authored UI. Not agent-emittable by default (overlays, forms, display 
 - [Sidebar layout](components/layout-sidebar.md): App sidebar column with responsive drawer fallback.
 - [Top navigation layout](components/layout-top-nav.md): Horizontal top navigation with optional mobile menu.
 - [Wizard layout](components/layout-wizard.md): Centered onboarding wizard frame with steps.
+- [Link](components/link.md): An inline sentence link. Underline and color come from link tokens; href is filtered by the URL policy.
+- [List](components/list.md): A list of ListItem rows; divided draws a token hairline between them.
 - [ListItem](components/list-item.md): A list row with a title, optional description, icon and trailing meta.
+- [Mark](components/mark.md): An inline highlight for search results, from role soft tokens.
 - [Menubar](components/menubar.md): Application menubar with roving top-level items.
 - [Menubar.Trigger](components/menubar-trigger.md): Top-level menubar item that opens a menu.
 - [MobileAppFrame](components/mobile-app-frame.md): A phone-sized app frame: skip link, header, scrolling screen, optional footer and bottom nav. Host chrome; agents never emit it.

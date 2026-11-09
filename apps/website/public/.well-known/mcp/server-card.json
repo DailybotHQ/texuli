@@ -192,7 +192,7 @@
     {
       "name": "ds.allow",
       "title": "List allowed components for a locked design system",
-      "description": "Build the allow section of a locked design system from the catalog: a preset (minimal, a documented core; all, every component) or the ids you name, each with every variant, size, tone, density and state the catalog declares. Narrow it, put it under \"allow\" and run ds.validate. Returns allow, count, unknown ids and the minimal preset ids.",
+      "description": "Build the allow section of a locked design system from the catalog: a preset (minimal, a documented core; all, every component) or the ids you name, each with every variant, size, tone, density, color and state the catalog declares. Narrow it, put it under \"allow\" and run ds.validate. Returns allow, count, unknown ids and the minimal preset ids.",
       "runtime": "edge",
       "remote": true,
       "local": true,

@@ -34,6 +34,7 @@
 | `hrefTrust` | enum(developer | untrusted) | no | — | `"developer"` | — |
 | `current` | boolean | no | — | `false` | — |
 | `disabled` | boolean | no | — | `false` | — |
+| `divided` | boolean | no | — | `false` | Hairline under this row |
 | `class` | string | no | — | — | — |
 
 ### Examples
@@ -53,6 +54,7 @@
 
 - [`icon`](icon.md)
 - [`avatar`](avatar.md)
+- [`list`](list.md)
 
 ---
 
