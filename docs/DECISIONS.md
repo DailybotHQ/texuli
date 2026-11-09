@@ -2054,8 +2054,7 @@ reflect this decision.
 ## ADR-027: Solutions, capabilities, components and products
 
 - **Date:** 2026-11-08 · **Ratification:** proposed by the PLAN_015 lead from the
-  maturity audits (`.dwp/plans/PLAN_015_…/analysis_results/audit/sol-*.md`); pending
-  the developer's approval.
+  maturity audits (`.dwp/plans/PLAN_015_…/analysis_results/audit/sol-*.md`); approved by the developer on 2026-11-08.
 - **Context:** texuli.com presents full systems (slides, documents, workflows) and single
   pieces (buttons, charts) with the same `*-page` pattern. The ecosystem vision asks for a
   Solutions catalog with landings per complete system, without dressing a widget up as a
@@ -2087,8 +2086,7 @@ reflect this decision.
 ## ADR-028: URLs and canonicals for Solutions, docs and products
 
 - **Date:** 2026-11-08 · **Ratification:** proposed by the PLAN_015 lead from
-  `audit/routes.md`, `audit/url-migration-map.md` and `audit/nav-search.md`; pending the
-  developer's approval.
+  `audit/routes.md`, `audit/url-migration-map.md` and `audit/nav-search.md`; approved by the developer on 2026-11-08.
 - **Context:** the site has 463 sitemap URLs, `*-page` routes linked from package READMEs,
   the skill and search, docs under `/guides/` (`DOCS_HOME`, the skill's
   `documentation_url`), and no HTTP redirect mechanism (`Astro.redirect` answers 200).
@@ -2117,8 +2115,7 @@ reflect this decision.
 
 ## ADR-029: One typed Solutions registry
 
-- **Date:** 2026-11-08 · **Ratification:** proposed by the PLAN_015 lead; pending the
-  developer's approval.
+- **Date:** 2026-11-08 · **Ratification:** proposed by the PLAN_015 lead; approved by the developer on 2026-11-08.
 - **Context:** the catalog page, the home Solutions band, the nav group, `llms.txt`, the
   machine-readable index and each landing need the same facts (name, status, packages,
   docs, demo, platforms). Typed copy would drift.
@@ -2143,8 +2140,7 @@ reflect this decision.
 
 ## ADR-030: Interactive demo islands on Solution landings
 
-- **Date:** 2026-11-08 · **Ratification:** proposed by the PLAN_015 lead; pending the
-  developer's approval. Narrows the "Static by design" rule of
+- **Date:** 2026-11-08 · **Ratification:** proposed by the PLAN_015 lead; approved by the developer on 2026-11-08. Narrows the "Static by design" rule of
   `apps/website/docs/site-landing.md` for Solution landings only.
 - **Context:** a Solution landing must let a visitor touch the real system. The home stays
   static by design; the `*-page` routes already ship several `client:visible` islands
@@ -2176,7 +2172,7 @@ reflect this decision.
 ## ADR-031: Global navigation for the ecosystem
 
 - **Date:** 2026-11-08 · **Ratification:** proposed by the PLAN_015 lead from
-  `audit/nav-search.md`; pending the developer's approval.
+  `audit/nav-search.md`; approved by the developer on 2026-11-08.
 - **Context:** the landing header (on `/` and `/native/`) shows Docs, two platform doors,
   GitHub and Get started; docs pages rely on the sidebar built from `NAV_GROUPS`, and the
   phone drawer exists only on docs pages.
