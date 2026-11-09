@@ -1,0 +1,16 @@
+---
+/**
+ * `/guides/solutions/slides/` — Slides technical docs (ADR-028). Content lives in
+ * `src/content/solution-docs/slides/`; `SolutionDocsPage` renders it.
+ */
+import SolutionDocsPage from '../../../../components/solutions/docs-layout/SolutionDocsPage.astro';
+import { loadSlidesDocs } from '../../../../content/solution-docs/slides/index.ts';
+import { getSolution } from '../../../../data/solutions/index.ts';
+---
+
+<SolutionDocsPage
+  entry={getSolution('slides')}
+  title="Slides docs"
+  description="Install @texuli/slides and @texuli/deck, parse a deck, present it, print it. In development."
+  sections={loadSlidesDocs()}
+/>

@@ -1,0 +1,397 @@
+---
+/**
+ * The Protoyard case study (vision §40.3): hero with the product status and the external
+ * link, the job it does, what works today (verified capabilities of the open-source local
+ * version), the Texuli packages it is built with, the roadmap (planned only, under its own
+ * heading), and the developer pathway into Texuli. Copy and facts live in
+ * `protoyard-content.ts`. No screenshot is verified, so the hero paints a decorative texel
+ * mosaic instead of an invented render. Static markup, no island; every link passes the URL
+ * policy (developer tier).
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { siteRouteExists } from '../../foundation/nav-data.ts';
+import { withBase } from '../../foundation/site.ts';
+import { illustrationFor } from '../../landing/illustrations.ts';
+import SiteIllustration from '../../landing/SiteIllustration.astro';
+import TexelMark from '../../sections/home/TexelMark.astro';
+import StatusBadge from '../../solutions/shared/platforms/StatusBadge.astro';
+import {
+  PROTOYARD_PAGE,
+  PROTOYARD_PATHWAY_LINKS,
+  PROTOYARD_PRODUCT,
+  PROTOYARD_ROADMAP,
+  PROTOYARD_TEXULI_PACKAGES,
+  PROTOYARD_TODAY,
+} from './protoyard-content.ts';
+
+const base = import.meta.env.BASE_URL;
+const page = PROTOYARD_PAGE;
+const local = PROTOYARD_PRODUCT.offerings.find((offering) => offering.id === 'open-source-local');
+if (!local) throw new Error('Protoyard: the open-source local offering is missing');
+const external = safeHref(page.hero.cta.href, 'developer');
+const resolveHref = (href: string): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  return safe === undefined ? undefined : withBase(base, safe);
+};
+const pathway = PROTOYARD_PATHWAY_LINKS.filter((link) => siteRouteExists(link.href));
+const tiles = Array.from({ length: 30 }, (_, index) => ((index * 7 + 3) % 11) % 5);
+const artRegistered = illustrationFor(page.hero.art) !== undefined;
+---
+
+<article class="protoyard" data-tx-built-with="protoyard">
+  <header class="protoyard__hero" aria-labelledby={page.hero.id}>
+    <div class="protoyard__inner protoyard__hero-grid">
+      <div class="protoyard__hero-copy">
+        <p class="protoyard__eyebrow">
+          <TexelMark count={3} />
+          <span>{page.hero.eyebrow}</span>
+        </p>
+        <h1 id={page.hero.id}>{page.hero.title}</h1>
+        <p class="protoyard__lede">{page.hero.lede}</p>
+        <p class="protoyard__status">
+          <StatusBadge status={local.status} context={local.label} />
+          <span>{local.label}</span>
+        </p>
+        {
+          external && (
+            <a class="protoyard__cta" href={external} rel="noopener">
+              {page.hero.cta.label}
+              <span aria-hidden="true">&nbsp;↗</span>
+            </a>
+          )
+        }
+      </div>
+      <div class="protoyard__art">
+        {
+          artRegistered ? (
+            <SiteIllustration art={page.hero.art} />
+          ) : (
+            <div class="protoyard__mosaic" aria-hidden="true" data-art-fallback="built-with-protoyard">
+              {tiles.map((tone) => (tone === 0 ? <i /> : <i class={`t${tone}`} />))}
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </header>
+
+  <section class="protoyard__band" aria-labelledby={page.job.id}>
+    <div class="protoyard__inner protoyard__narrow">
+      <h2 id={page.job.id}>{page.job.title}</h2>
+      <p class="protoyard__text">{page.job.body}</p>
+    </div>
+  </section>
+
+  <section class="protoyard__band protoyard__band--raised" aria-labelledby={page.today.id}>
+    <div class="protoyard__inner">
+      <h2 id={page.today.id}>{page.today.title}</h2>
+      <p class="protoyard__text">{page.today.intro}</p>
+      <ul class="protoyard__cards" role="list">
+        {
+          PROTOYARD_TODAY.map((claim) => (
+            <li class="protoyard__card" data-audit={claim.audit} data-source={claim.source}>
+              <h3>{claim.title}</h3>
+              <p>{claim.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="protoyard__band" aria-labelledby={page.built.id}>
+    <div class="protoyard__inner">
+      <h2 id={page.built.id}>{page.built.title}</h2>
+      <p class="protoyard__text">{page.built.intro}</p>
+      <ul class="protoyard__packages" role="list">
+        {PROTOYARD_TEXULI_PACKAGES.map((name) => <li><code>{name}</code></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="protoyard__band protoyard__band--raised" aria-labelledby={page.roadmap.id} data-roadmap="">
+    <div class="protoyard__inner">
+      <h2 id={page.roadmap.id}>{page.roadmap.title}</h2>
+      <p class="protoyard__text">{page.roadmap.intro}</p>
+      <ul class="protoyard__cards" role="list">
+        {
+          PROTOYARD_ROADMAP.map((item) => (
+            <li class="protoyard__card protoyard__card--planned" data-status={item.status} data-source={item.source}>
+              <div class="protoyard__card-head">
+                <h3>{item.title}</h3>
+                <StatusBadge status={item.status} context={item.title} />
+              </div>
+              <p>{item.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="protoyard__band" aria-labelledby={page.pathway.id}>
+    <div class="protoyard__inner protoyard__narrow">
+      <h2 id={page.pathway.id}>{page.pathway.title}</h2>
+      <p class="protoyard__text">{page.pathway.body}</p>
+      <ul class="protoyard__links" role="list">
+        {
+          pathway.map((link) => (
+            <li>
+              <a href={resolveHref(link.href)}>
+                {link.label}
+                <span aria-hidden="true">&nbsp;→</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</article>
+
+<style>
+  .protoyard {
+    --home-accent: #6d4aff;
+    --home-accent-text: #5b3ae6;
+    --home-ground: linear-gradient(160deg, #f4f0ff 0%, #fbf8ff 45%, #fff4ee 100%);
+    --home-tint: color-mix(in oklab, #6d4aff 6%, var(--tx-background));
+    --py-accent: var(--home-accent-text);
+  }
+  :global(:root[data-tx-mode='dark']) .protoyard {
+    --home-accent-text: #b9a8ff;
+    --home-ground:
+      radial-gradient(120% 90% at 85% 0%, rgb(109 74 255 / 0.22), transparent 60%),
+      var(--tx-background);
+    --home-tint: color-mix(in oklab, #6d4aff 10%, var(--tx-background));
+  }
+  :global(:root[data-tx-mode='high-contrast']) .protoyard {
+    --home-accent: var(--tx-foreground);
+    --home-accent-text: var(--tx-foreground);
+    --home-ground: var(--tx-background);
+    --home-tint: var(--tx-background);
+  }
+  .protoyard__inner {
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  .protoyard__narrow {
+    max-inline-size: 52rem;
+  }
+  .protoyard__hero {
+    padding-block: clamp(2.5rem, 7vw, 5rem);
+    border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 60%, transparent);
+    background: var(--home-ground);
+  }
+  .protoyard__hero-grid {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: center;
+  }
+  @media (min-width: 56rem) {
+    .protoyard__hero-grid {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    }
+  }
+  .protoyard__hero-copy {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+  .protoyard__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0;
+    padding-block: 0.3rem;
+    padding-inline: 0.85rem;
+    border: 1px solid color-mix(in oklab, var(--home-accent) 35%, transparent);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--home-accent) 8%, var(--tx-background));
+    color: var(--tx-foreground);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .protoyard h1 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(2.75rem, 9vw, 5.25rem);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+  }
+  .protoyard__art {
+    position: relative;
+    isolation: isolate;
+    min-inline-size: 0;
+  }
+  .protoyard__art::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--home-accent) 22%, transparent),
+      transparent
+    );
+    pointer-events: none;
+  }
+  .protoyard__lede {
+    margin: 0;
+    max-inline-size: 36rem;
+    color: var(--tx-muted-foreground);
+    font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+    line-height: 1.5;
+  }
+  .protoyard__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    color: var(--tx-foreground);
+    font-weight: 650;
+  }
+  .protoyard__cta,
+  .protoyard__links a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.5rem;
+    color: var(--py-accent);
+    font-weight: 700;
+    text-underline-offset: 0.2em;
+  }
+  .protoyard__cta:focus-visible,
+  .protoyard__links a:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .protoyard__mosaic {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.4rem;
+    aspect-ratio: 6 / 5;
+    padding: clamp(0.75rem, 3vw, 1.5rem);
+    border: 1px solid color-mix(in oklab, var(--tx-border) 70%, transparent);
+    border-radius: 1rem;
+    background: var(--tx-background);
+  }
+  .protoyard__mosaic i {
+    border-radius: 0.35rem;
+    background: color-mix(in oklab, var(--py-accent) 6%, transparent);
+  }
+  .protoyard__mosaic i.t1 {
+    background: color-mix(in oklab, var(--py-accent) 18%, transparent);
+  }
+  .protoyard__mosaic i.t2 {
+    background: color-mix(in oklab, var(--py-accent) 35%, transparent);
+  }
+  .protoyard__mosaic i.t3 {
+    background: color-mix(in oklab, var(--py-accent) 60%, transparent);
+  }
+  .protoyard__mosaic i.t4 {
+    background: var(--py-accent);
+  }
+  .protoyard__band {
+    padding-block: clamp(3rem, 8vw, 6rem);
+  }
+  .protoyard__band--raised {
+    background: var(--home-tint);
+    border-block: 1px solid color-mix(in oklab, var(--tx-border) 55%, transparent);
+  }
+  .protoyard h2 {
+    margin: 0;
+    margin-block-end: 0.75rem;
+    color: var(--tx-foreground);
+    font-size: clamp(1.75rem, 4.5vw, 2.6rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+  .protoyard__text {
+    margin: 0;
+    margin-block-end: 1.25rem;
+    max-inline-size: 44rem;
+    color: var(--tx-muted-foreground);
+    font-size: clamp(1rem, 2.2vw, 1.125rem);
+    line-height: 1.55;
+  }
+  .protoyard__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .protoyard__card {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    padding: 1.1rem;
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    border-radius: 0.875rem;
+    background: var(--tx-background);
+  }
+  .protoyard__card--planned {
+    border-style: dashed;
+  }
+  .protoyard__card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .protoyard h3 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: 1.1rem;
+    font-weight: 750;
+  }
+  .protoyard__card p {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: 0.925rem;
+    line-height: 1.5;
+  }
+  .protoyard__packages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .protoyard__packages code {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2rem;
+    padding-inline: 0.75rem;
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    border-radius: 999px;
+    background: var(--tx-background);
+    color: var(--tx-foreground);
+    font-size: 0.85rem;
+  }
+  .protoyard__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (forced-colors: active) {
+    .protoyard__card,
+    .protoyard__packages code {
+      border-color: CanvasText;
+    }
+    .protoyard__mosaic,
+    .protoyard__art::before {
+      display: none;
+    }
+  }
+</style>

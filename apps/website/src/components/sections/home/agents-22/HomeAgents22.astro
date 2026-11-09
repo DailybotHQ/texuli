@@ -1,0 +1,182 @@
+---
+/**
+ * Home 2.2 "Built for humans and agents" band: kicker, h2 and body beside the
+ * `home-agents` plate, then four surface cards (catalog, MCP server, skill, validation),
+ * each listing what an agent or host calls with its status badge and a link to its page
+ * when that page exists. Static markup, no island; links resolve through the URL policy
+ * (developer tier). Wiring into the home page belongs to the home integration task.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../../foundation/site.ts';
+import SiteIllustration from '../../../landing/SiteIllustration.astro';
+import StatusBadge from '../../../solutions/shared/platforms/StatusBadge.astro';
+import { AGENTS_22_COPY, agentSurfaces } from './agents-content.ts';
+
+const base = import.meta.env.BASE_URL;
+const copy = AGENTS_22_COPY;
+const surfaces = agentSurfaces();
+const resolveHref = (href: string): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  return safe === undefined ? undefined : withBase(base, safe);
+};
+---
+
+<section class="home-agents22" aria-labelledby={copy.id} data-tx-home-agents="">
+  <div class="home-agents22__inner">
+    <div class="home-agents22__head">
+      <div class="home-agents22__copy">
+        <p class="home-agents22__kicker">{copy.kicker}</p>
+        <h2 id={copy.id}>{copy.title}</h2>
+        <p class="home-agents22__body">{copy.body}</p>
+      </div>
+      <div class="home-agents22__art">
+        <SiteIllustration art={copy.art} />
+      </div>
+    </div>
+    <ul class="home-agents22__cards" role="list">
+      {
+        surfaces.map((surface) => (
+          <li class="home-agents22__card" data-surface={surface.id}>
+            <h3>{surface.title}</h3>
+            <p class="home-agents22__card-body">{surface.body}</p>
+            <ul class="home-agents22__items" role="list">
+              {surface.items.map((item) => (
+                <li>
+                  <code>{item.label}</code>
+                  <StatusBadge status={item.status} context={item.label} />
+                </li>
+              ))}
+            </ul>
+            {surface.link && (
+              <a class="home-agents22__link" href={resolveHref(surface.link.href)}>
+                {surface.link.label}
+                <span aria-hidden="true">&nbsp;→</span>
+              </a>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .home-agents22 {
+    border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 60%, transparent);
+  }
+  .home-agents22__inner {
+    display: grid;
+    gap: clamp(1.75rem, 5vw, 3rem);
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-block: clamp(3rem, 8vw, 6rem);
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  .home-agents22__head {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    align-items: center;
+  }
+  @media (min-width: 56rem) {
+    .home-agents22__head {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    }
+  }
+  .home-agents22__copy {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+    max-inline-size: 34rem;
+  }
+  .home-agents22__kicker {
+    margin: 0;
+    color: var(--home-accent-text, var(--tx-primary));
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .home-agents22 h2 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(1.9rem, 5vw, 3rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+  .home-agents22__body {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: clamp(1rem, 2.2vw, 1.15rem);
+    line-height: 1.55;
+  }
+  .home-agents22__art {
+    min-inline-size: 0;
+  }
+  .home-agents22__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .home-agents22__card {
+    display: grid;
+    grid-template-rows: auto 1fr auto auto;
+    gap: 0.65rem;
+    padding: 1.1rem;
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    border-radius: 0.875rem;
+    background: var(--tx-background);
+  }
+  .home-agents22 h3 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: 1.1rem;
+    font-weight: 750;
+  }
+  .home-agents22__card-body {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: 0.925rem;
+    line-height: 1.5;
+  }
+  .home-agents22__items {
+    display: grid;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .home-agents22__items li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.35rem 0.5rem;
+  }
+  .home-agents22__items code {
+    color: var(--tx-foreground);
+    font-size: 0.8rem;
+    overflow-wrap: anywhere;
+  }
+  .home-agents22__link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.5rem;
+    color: var(--home-accent-text, var(--tx-primary));
+    font-weight: 650;
+    text-underline-offset: 0.2em;
+  }
+  .home-agents22__link:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  @media (forced-colors: active) {
+    .home-agents22__card {
+      border-color: CanvasText;
+    }
+  }
+</style>

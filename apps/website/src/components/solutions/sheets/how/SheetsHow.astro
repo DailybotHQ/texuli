@@ -1,0 +1,15 @@
+---
+/**
+ * The Sheets "How it works" section: the shared SolutionHow with the Sheets registry
+ * entry and the steps in `how-content.ts`. The "Built from Texuli" diagram is drawn from
+ * `entry.packages` and `PACKAGE_STACK`, so package and layer details stay registry-backed.
+ * Static markup.
+ */
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionHow from '../../shared/architecture/SolutionHow.astro';
+import { SHEETS_HOW } from './how-content.ts';
+
+const entry = getSolution('sheets');
+---
+
+<SolutionHow entry={entry} {...SHEETS_HOW} />

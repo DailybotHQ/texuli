@@ -1,0 +1,72 @@
+---
+/**
+ * The shared status badge: one word from the status vocabulary (available, in development,
+ * experimental, planned) as visible text, with a tone that never carries the meaning alone
+ * (the word is always printed). Static markup.
+ */
+import type { SolutionStatus } from '../../../../data/solutions/schema.ts';
+import { statusBadgeView } from './platforms-model.ts';
+
+interface Props {
+  status: SolutionStatus;
+  /** Optional prefix read before the word, for example "Web". Hidden visually, kept for AT. */
+  context?: string;
+}
+
+const { status, context } = Astro.props;
+const view = statusBadgeView(status);
+---
+
+<span class="status-badge" data-status={view.status} data-tone={view.tone}>
+  <span class="status-badge__dot" aria-hidden="true"></span>
+  {context && <span class="status-badge__context">{context}: </span>}
+  <span>{view.label}</span>
+</span>
+
+<style>
+  .status-badge {
+    --status-accent: var(--home-accent-text, var(--tx-primary));
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding-block: 0.15rem;
+    padding-inline: 0.6rem;
+    border: 1px solid color-mix(in oklab, var(--status-accent) 40%, var(--tx-border));
+    border-radius: 999px;
+    color: var(--tx-foreground);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .status-badge[data-tone='dashed'] {
+    border-style: dashed;
+    color: var(--tx-muted-foreground);
+  }
+  .status-badge__dot {
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    border: 2px solid var(--status-accent);
+    border-radius: 999px;
+  }
+  .status-badge[data-tone='solid'] .status-badge__dot {
+    background: var(--status-accent);
+  }
+  .status-badge[data-tone='dashed'] .status-badge__dot {
+    border-style: dotted;
+  }
+  .status-badge__context {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  @media (forced-colors: active) {
+    .status-badge,
+    .status-badge__dot {
+      border-color: CanvasText;
+    }
+  }
+</style>

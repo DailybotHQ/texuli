@@ -1,0 +1,192 @@
+---
+/**
+ * /native/ principles, agents and start-building bands. Static markup, no island.
+ * Copy and statuses live in `principles-content.ts`. The agents band reuses the
+ * `home-agents` plate. Links pass the URL policy (developer tier).
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../../foundation/site.ts';
+import SiteIllustration from '../../../landing/SiteIllustration.astro';
+import StatusBadge from '../../../solutions/shared/platforms/StatusBadge.astro';
+import { NATIVE_PRINCIPLES, nativePrinciplesView } from './principles-content.ts';
+
+const base = import.meta.env.BASE_URL;
+const copy = NATIVE_PRINCIPLES;
+const view = nativePrinciplesView();
+const resolveHref = (href: string): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  if (safe === undefined) return undefined;
+  return safe.startsWith('/') ? withBase(base, safe) : safe;
+};
+const actions = view.actions.map((action) => ({ ...action, href: resolveHref(action.href) }));
+---
+
+<div class="native-principles" data-tx-native-principles="">
+  <section class="native-principles__band" aria-labelledby={copy.ids.principles} data-band="feel">
+    <div class="native-principles__inner">
+      <h2 id={copy.ids.principles}>{copy.principles.title}</h2>
+      <p class="native-principles__lede">{copy.principles.lede}</p>
+      <ul class="native-principles__cards" role="list">
+        {
+          copy.principles.items.map((item) => (
+            <li data-principle={item.id}>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="native-principles__band" aria-labelledby={copy.ids.agents} data-band="agents">
+    <div class="native-principles__inner native-principles__inner--agents">
+      <div class="native-principles__copy">
+        <h2 id={copy.ids.agents}>{copy.agents.title}</h2>
+        <p class="native-principles__lede">{copy.agents.lede}</p>
+        <ol class="native-principles__steps">
+          {
+            view.steps.map((step) => (
+              <li data-step={step.id}>
+                <h3>{step.title}</h3>
+                <p>{step.body}</p>
+              </li>
+            ))
+          }
+        </ol>
+        <ul class="native-principles__surfaces" role="list">
+          {
+            view.surfaces.map((surface) => (
+              <li>
+                <code>{surface.label}</code>
+                <StatusBadge status={surface.status} context={surface.label} />
+                <span>{surface.detail}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <div class="native-principles__art">
+        <SiteIllustration art={copy.art} />
+      </div>
+    </div>
+  </section>
+
+  <section class="native-principles__band" aria-labelledby={copy.ids.start} data-band="start">
+    <div class="native-principles__inner">
+      <h2 id={copy.ids.start}>{copy.start.title}</h2>
+      <p class="native-principles__lede">{copy.start.lede}</p>
+      <div class="native-principles__actions">
+        {
+          actions.map((action) =>
+            action.href ? (
+              <a
+                href={action.href}
+                class={`native-principles__cta native-principles__cta--${action.role}`}
+                data-tx-native-start={action.role}
+              >
+                {action.label}
+              </a>
+            ) : null
+          )
+        }
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+  .native-principles__band {
+    padding-block: 3rem;
+    padding-inline: 1.25rem;
+    border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 60%, transparent);
+  }
+  .native-principles__inner {
+    display: grid;
+    gap: 1.25rem;
+    max-inline-size: 76rem;
+    margin-inline: auto;
+  }
+  .native-principles__lede {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    max-inline-size: 42rem;
+  }
+  .native-principles__cards,
+  .native-principles__steps,
+  .native-principles__surfaces {
+    display: grid;
+    gap: 0.85rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .native-principles__cards {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  }
+  .native-principles__cards li,
+  .native-principles__steps li,
+  .native-principles__surfaces li {
+    display: grid;
+    gap: 0.35rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    border-radius: calc(var(--tx-radius, 0.5rem) * 1.25);
+  }
+  .native-principles__cards h3,
+  .native-principles__steps h3 {
+    margin: 0;
+    font-size: 1rem;
+  }
+  .native-principles__cards p,
+  .native-principles__steps p {
+    margin: 0;
+  }
+  .native-principles__surfaces li {
+    grid-template-columns: auto auto 1fr;
+    align-items: center;
+    gap: 0.6rem 0.85rem;
+  }
+  @media (min-width: 60rem) {
+    .native-principles__inner--agents {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      align-items: center;
+    }
+  }
+  .native-principles__copy,
+  .native-principles__art {
+    min-inline-size: 0;
+  }
+  .native-principles__surfaces li {
+    overflow-wrap: anywhere;
+  }
+  @media (max-width: 30rem) {
+    .native-principles__surfaces li {
+      grid-template-columns: 1fr;
+    }
+  }
+  .native-principles__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+  }
+  .native-principles__cta {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    padding-inline: 1rem;
+    border-radius: var(--tx-radius, 0.5rem);
+    color: var(--tx-foreground);
+  }
+  .native-principles__cta--primary {
+    background: var(--tx-primary);
+    color: var(--tx-primary-foreground);
+  }
+  .native-principles__cta--secondary {
+    border: 1px solid var(--tx-border);
+  }
+  .native-principles__cta:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+</style>

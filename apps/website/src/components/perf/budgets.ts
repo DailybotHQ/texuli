@@ -76,6 +76,12 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
     budget: { pageGzipKb: 168, jsGzipKb: 60, htmlGzipKb: 27 },
   },
   {
+    route: '/solutions/slides/',
+    reason:
+      'ADR-030: this landing replaces /slides-page/ and inherits its current route caps: 168 KB page, 60 KB JavaScript and 27 KB HTML gzip.',
+    budget: { pageGzipKb: 168, jsGzipKb: 60, htmlGzipKb: 27 },
+  },
+  {
     route: '/drag-page/',
     reason:
       'PLAN_007: the first screen is the drag workbench, three sortable surfaces (list, board, tree) on one @texuli/drag engine; the other demos load on scroll. Measured 108.5 KB page, 71.9 KB JS at the ready signal (+4% headroom).',
@@ -94,6 +100,12 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
     budget: { pageGzipKb: 174 },
   },
   {
+    route: '/solutions/documents/',
+    reason:
+      'ADR-030: this landing replaces /documents-page/ and inherits its current 174 KB page cap.',
+    budget: { pageGzipKb: 174 },
+  },
+  {
     route: '/forms-page/',
     reason:
       'PLAN_010 T-site-features: seven lazy form islands (client:visible); the player loads only in the agent demo, after hydration, so JS at the ready signal is 59.2 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the islands can import (SchemaForm and every texuli control it paints, the player loaders), the same follow-up as /motion-page/. The HTML carries the field-type, rule and keyboard tables and the agent blueprint JSON. Measured 2026-10-29: 161.4 KB page, 27 KB gzip of HTML (+4% headroom; a proposal for the owner). PLAN_010 T-site-080: the field gallery and the flow server-render again (the Select.Value SSR fix in 0232cda5 removed the paint-after-mount workaround), and the nav gained four links: measured 30.4 KB gzip of HTML, limit 32 (+4% headroom). CI on Linux: the field gallery sits at the 720 px fold (system fonts), so it hydrates on open there: 267.5 KB page, 162 KB JS measured 2026-10-30 (+4% headroom). PLAN_011 T-gaps-113-121 (the gallery shows all 20 field types, including password, otp, color and datetime, with each lazy control loaded once visible): CI on Linux measured 293.4 KB page on 2026-10-31 (+4% headroom). JS measured 177.2 KB on CI Linux the same day (+4% headroom).',
@@ -106,9 +118,21 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
     budget: { pageGzipKb: 169 },
   },
   {
+    route: '/solutions/canvas/',
+    reason:
+      'ADR-030: this landing replaces /canvas-page/ and inherits its current 169 KB page cap.',
+    budget: { pageGzipKb: 169 },
+  },
+  {
     route: '/sheets-page/',
     reason:
       'PLAN_010 T-site-080: four lazy sheet islands (client:visible); the player and the sheet host load only in the agent demo, after hydration, so JS at the ready signal is 61.3 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk the islands can import (SheetView over the editable data grid, the player loaders), the same follow-up as /motion-page/. The HTML carries all 54 functions with their build-time results, the dependency graph, the safety cases and the agent blueprint. Measured 2026-10-29: 157.3 KB page, 226.8 KB raw and 29.3 KB gzip of HTML (+4% headroom; a proposal for the owner). PLAN_011 T-gaps-100-104 (FilterBuilder issues and grid styling on token v2): CI on Linux measured 164.2 KB page on 2026-10-30 (+4% headroom). PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (36.4 KB of WebP on open, logo included); measured 178.2 KB page, limit 186 (+4% headroom).',
+    budget: { pageGzipKb: 186, htmlRawKb: 236, htmlGzipKb: 31 },
+  },
+  {
+    route: '/solutions/sheets/',
+    reason:
+      'ADR-030: this landing replaces /sheets-page/ and inherits its current 186 KB page cap, 236 KB raw HTML cap and 31 KB HTML gzip cap.',
     budget: { pageGzipKb: 186, htmlRawKb: 236, htmlGzipKb: 31 },
   },
   {
@@ -169,6 +193,12 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
     route: '/workflows-page/',
     reason:
       'PLAN_007: the workflow editor is the subject of the page and sits in the first screen (editor plus the workflow model). Measured 126.5 KB page, 92.3 KB JS (+4% headroom).',
+    budget: { pageGzipKb: 132, jsGzipKb: 96 },
+  },
+  {
+    route: '/solutions/workflows/',
+    reason:
+      'ADR-030: this landing replaces /workflows-page/ and inherits its current 132 KB page and 96 KB JavaScript caps.',
     budget: { pageGzipKb: 132, jsGzipKb: 96 },
   },
   {
@@ -301,10 +331,28 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
     budget: { pageGzipKb: 140 },
   },
   {
+    route: '/solutions/',
+    reason:
+      'Static Solution catalog cap derived from the comparable static catalog at /design-systems/ (140 KB page).',
+    budget: { pageGzipKb: 140 },
+  },
+  {
+    route: '/built-with/',
+    reason:
+      'Static product catalog cap derived from the comparable static catalog at /design-systems/ (140 KB page).',
+    budget: { pageGzipKb: 140 },
+  },
+  {
     route: '/native/',
     reason:
       'PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (45.0 KB of WebP on open, logo included); measured 116.5 KB page, limit 122 (+4% headroom).',
     budget: { pageGzipKb: 122 },
+  },
+  {
+    route: '/native/compatibility/',
+    reason:
+      'The full native compatibility matrix moved off /native/ (decisions/native-budget.md): a static, server-rendered table with one compact row per catalog component, CSS-only filters and no island, inside the docs shell. Measured 2026-11-08: 247.5 KB raw and 17.9 KB gzip of HTML (+4% headroom on raw; gzip fits the default).',
+    budget: { htmlRawKb: 258 },
   },
   {
     route: '/guides/',
@@ -330,6 +378,19 @@ export interface PrefixBudgetOverride {
  */
 export const ROUTE_PREFIX_BUDGETS: readonly PrefixBudgetOverride[] = Object.freeze([
   {
+    prefix: '/built-with/',
+    label: '/built-with/<slug>/',
+    reason: 'Static product pages use the comparable /design-systems/ catalog cap (140 KB page).',
+    budget: { pageGzipKb: 140 },
+  },
+  {
+    prefix: '/guides/solutions/',
+    label: '/guides/solutions/<slug>/',
+    reason:
+      'Solution guides are static and use the existing /guides/ page cap (104 KB page); they ship no interactive islands.',
+    budget: { pageGzipKb: 104 },
+  },
+  {
     prefix: '/examples/',
     label: '/examples/<id>/',
     reason:
@@ -345,6 +406,59 @@ export function budgetFor(route: string): RouteBudget {
     ROUTE_BUDGET_OVERRIDES.find((entry) => entry.route === path) ??
     ROUTE_PREFIX_BUDGETS.find((entry) => path.startsWith(entry.prefix) && path !== entry.prefix);
   return { ...DEFAULT_BUDGET, ...override?.budget };
+}
+
+export type RouteIslandBudget = Readonly<
+  ({ route: string; prefix?: never } | { prefix: string; route?: never }) & {
+    /** Maximum number of Astro islands that hydrate on the route. */
+    maxIslands: number;
+    reason: string;
+  }
+>;
+
+/** Hydration limits for the ecosystem routes covered by ADR-030. */
+export const ROUTE_ISLAND_BUDGETS: readonly RouteIslandBudget[] = Object.freeze([
+  { route: '/', maxIslands: 0, reason: 'The home page stays static.' },
+  {
+    route: '/solutions/',
+    maxIslands: 0,
+    reason: 'The Solution catalog is a static index.',
+  },
+  {
+    prefix: '/solutions/',
+    maxIslands: 1,
+    reason: 'Each Solution landing has one visible, interactive demo island.',
+  },
+  {
+    route: '/built-with/',
+    maxIslands: 0,
+    reason: 'The product catalog is static.',
+  },
+  {
+    prefix: '/built-with/',
+    maxIslands: 0,
+    reason: 'Built-with product pages are static.',
+  },
+  {
+    prefix: '/guides/solutions/',
+    maxIslands: 0,
+    reason: 'Solution guide pages are static.',
+  },
+  {
+    route: '/native/',
+    maxIslands: 1,
+    reason: 'The native landing may contain one demo island within its route budget.',
+  },
+]);
+
+/** Returns the exact or longest-prefix island ceiling for a covered route. */
+export function islandBudgetFor(route: string): number | undefined {
+  const path = route.endsWith('/') ? route : `${route}/`;
+  const exact = ROUTE_ISLAND_BUDGETS.find((entry) => entry.route === path);
+  if (exact) return exact.maxIslands;
+  return ROUTE_ISLAND_BUDGETS.filter((entry) => entry.prefix && path.startsWith(entry.prefix)).sort(
+    (a, b) => (b.prefix?.length ?? 0) - (a.prefix?.length ?? 0)
+  )[0]?.maxIslands;
 }
 
 /** Elements that make an island worth hydrating: something a person can operate. */

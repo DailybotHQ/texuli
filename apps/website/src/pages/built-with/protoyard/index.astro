@@ -1,0 +1,18 @@
+---
+/**
+ * /built-with/protoyard/ — the Protoyard case study (ADR-027 products under Built with
+ * Texuli; ADR-031 landing header). A landing-shell page: the copy and facts come from
+ * `components/built-with/protoyard/protoyard-content.ts` and the `PROTOYARD` product
+ * record. The nav source lists this route once the page exists (`ecosystemNavGroups`), so
+ * the breadcrumb JSON-LD, the footer and the Markdown twin follow automatically.
+ */
+import ProtoyardCaseStudy from '../../../components/built-with/protoyard/ProtoyardCaseStudy.astro';
+import { PROTOYARD_PAGE } from '../../../components/built-with/protoyard/protoyard-content.ts';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title={PROTOYARD_PAGE.title} description={PROTOYARD_PAGE.description} landing>
+  <div class="landing" data-tx-landing="">
+    <ProtoyardCaseStudy />
+  </div>
+</BaseLayout>

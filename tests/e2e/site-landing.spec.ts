@@ -10,12 +10,14 @@ const builtDetails = (route: string): number =>
   ).length;
 
 /*
- * texuli.com home (PLAN_006 T-44), in the browser: the four blueprint
- * sections mount in order with no islands inside the landing, the hero calls
- * to action and proof links are reachable, the install copy announces its
- * outcome, and the scroll reveal is opt-in motion (none under reduced
- * motion, never the hero). The counts, release copy and motion rules are
- * unit-tested in apps/website/tests/landing.test.ts; axe runs in the page sweep.
+ * texuli.com home (Home 2.2), in the browser: the nine bands mount in the storyboard order
+ * (hero, pitch, Web & Native in the first half, Solutions, humans and agents, the brand
+ * story, Built with Texuli, the accessible story with its proof row, the close) with no
+ * islands inside the landing; the hero calls to action, status line and proof links are
+ * reachable; the install copy announces its outcome; and the scroll reveal is opt-in
+ * motion (none under reduced motion, never the hero). The order, counts, release copy and
+ * motion rules are unit-tested in apps/website/tests/landing.test.ts; axe runs in the page
+ * sweep.
  */
 
 const origin = serveDist();
@@ -35,9 +37,11 @@ test('sections in order, working calls to action, announced copy, motion only on
       (section) =>
         (section.hasAttribute('data-tx-home-hero') && 'hero') ||
         (section.hasAttribute('data-tx-home-pitch') && 'pitch') ||
+        (section.hasAttribute('data-tx-home-web-native') && 'web-native') ||
+        (section.hasAttribute('data-tx-home-solutions') && 'solutions') ||
+        (section.hasAttribute('data-tx-home-agents') && 'agents') ||
+        (section.hasAttribute('data-tx-home-built-with') && 'built-with') ||
         section.getAttribute('data-tx-home-story') ||
-        (section.hasAttribute('data-tx-home-proof') && 'proof') ||
-        (section.hasAttribute('data-tx-home-quickstart') && 'quickstart') ||
         (section.hasAttribute('data-tx-home-final') && 'final') ||
         'unknown'
     )
@@ -45,37 +49,52 @@ test('sections in order, working calls to action, announced copy, motion only on
   expect(order).toEqual([
     'hero',
     'pitch',
-    'universal',
     'web-native',
-    'brand',
+    'solutions',
     'agents',
+    'brand',
+    'built-with',
     'accessible',
-    'proof',
-    'quickstart',
     'final',
   ]);
-  // The stories alternate their art and grow their texel mark one cube per band.
+  // Web & Native sits in the first half of the page (§49.3).
+  expect(order.indexOf('web-native')).toBeLessThan(order.length / 2);
+  // The two kept stories alternate their art and grow their texel mark one cube per band.
   const stories = page.locator('[data-tx-home-story]');
   expect(
     await stories.evaluateAll((all) => all.map((story) => story.getAttribute('data-tx-art-side')))
-  ).toEqual(['end', 'start', 'end', 'start', 'end']);
+  ).toEqual(['end', 'start']);
   expect(
     await stories.evaluateAll((all) =>
       all.map((story) => story.querySelectorAll('[data-tx-texel-mark] > *').length)
     )
-  ).toEqual([1, 2, 3, 4, 5]);
+  ).toEqual([1, 2]);
+  // The accessible story carries the computed proof row (the merged proof band).
+  const own = page.locator('[data-tx-home-story="accessible"]');
+  for (const id of ['packages', 'blueprint', 'agent-safe'])
+    await expect(own.locator(`[data-tx-proof="${id}"] a`)).toHaveText(/^\s*\d+\s/);
   await expect(page.locator('[data-tx-landing] pre')).toHaveCount(0);
   await expect(page.locator('[data-tx-landing] [data-tx-illustration]')).toHaveCount(9);
   await expect(page.locator('[data-tx-hero-theme]')).toHaveCount(6);
   await expect(page.locator('[data-tx-landing] astro-island')).toHaveCount(0);
   const hero = page.locator('[data-tx-home-hero]');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
   await expect(hero.getByRole('heading', { level: 1 })).toHaveText('Build any interface.');
+  const platforms = hero.getByRole('list', { name: 'Platform status' });
+  await expect(platforms.locator('[data-tx-hero-status="web"]')).toContainText('available');
+  await expect(platforms.locator('[data-tx-hero-status="native"]')).toContainText('in development');
+  await expect(hero.locator('[data-tx-hero-news]')).toHaveAttribute('href', '/whats-new/');
   const art = hero.locator('[data-tx-illustration="home-hero"]');
   await expect(art).toBeVisible();
   const box = await art.boundingBox();
   expect(box?.height ?? 0).toBeGreaterThan(100);
-  for (const name of ['Start building', 'Browse components', 'Web + native']) {
+  for (const [name, href] of [
+    ['Explore solutions', '/solutions/'],
+    ['Explore native', '/native/'],
+    ['Get started', '/guides/getting-started/'],
+  ] as const) {
     const link = hero.getByRole('link', { name });
+    await expect(link).toHaveAttribute('href', href);
     await link.focus();
     await expect(link).toBeFocused();
   }
@@ -121,7 +140,7 @@ test('sections in order, working calls to action, announced copy, motion only on
 
   // On a phone the hero art drops below the copy and calls to action.
   await page.setViewportSize({ width: 360, height: 800 });
-  const cta = await hero.getByRole('link', { name: 'Start building' }).boundingBox();
+  const cta = await hero.getByRole('link', { name: 'Explore solutions' }).boundingBox();
   const artBox = await art.boundingBox();
   expect(artBox?.y ?? 0).toBeGreaterThan((cta?.y ?? 0) + (cta?.height ?? 0));
   expect(artBox?.width ?? 0).toBeLessThanOrEqual(360);

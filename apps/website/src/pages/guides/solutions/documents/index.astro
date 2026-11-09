@@ -1,0 +1,16 @@
+---
+/**
+ * `/guides/solutions/documents/` — Documents technical docs (ADR-028). Content lives in
+ * `src/content/solution-docs/documents/`; `SolutionDocsPage` renders it.
+ */
+import SolutionDocsPage from '../../../../components/solutions/docs-layout/SolutionDocsPage.astro';
+import { loadDocumentsDocs } from '../../../../content/solution-docs/documents/index.ts';
+import { getSolution } from '../../../../data/solutions/index.ts';
+---
+
+<SolutionDocsPage
+  entry={getSolution('documents')}
+  title="Documents docs"
+  description="Install @texuli/document, @texuli/pages and @texuli/editor, edit a document, export it. In development."
+  sections={loadDocumentsDocs()}
+/>

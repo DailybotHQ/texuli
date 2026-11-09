@@ -26,8 +26,9 @@ const section = (id: string) => {
 >
   <div class="drag-page" data-tx-drag-page="">
     <header class="drag-page__hero">
+      <p class="taxonomy">Capability · cross-cutting engine</p>
       <p class="eyebrow">@texuli/drag · in development</p>
-      <h1>One drag engine, every surface</h1>
+      <h1>Drag, drop, and build interactions</h1>
       <p class="lead">
         Lists, boards, trees, canvases and grid columns snap together from the same small pieces:
         a session, collision strategies, modifiers, a gesture tracker and localized messages. Every
@@ -45,6 +46,7 @@ const section = (id: string) => {
         }
       </ol>
     </header>
+
 
     <DragWorkbench client:visible />
 
@@ -90,6 +92,34 @@ const section = (id: string) => {
       <FileDropDemo client:visible />
     </section>
 
+    <section class="related" aria-labelledby="related-title">
+      <h2 id="related-title">A capability inside larger systems</h2>
+      <p>
+        <code>@texuli/drag</code> is an embeddable interaction engine, not a hosted drag-and-drop
+        product. Canvas and Workflows build on it; Slides can compose reorderable content. Their
+        Each one has a Solution landing with a live demo.
+        The engine returns validated moves as data; your application applies them and owns state,
+        history and permissions.
+      </p>
+      <ul class="related__list">
+        <li>
+          <strong>Canvas</strong>
+          <span>Solution landing with a live demo.</span>
+          <a href="/solutions/canvas/">Canvas Solution</a>
+        </li>
+        <li>
+          <strong>Workflows</strong>
+          <span>Solution landing with a live demo.</span>
+          <a href="/solutions/workflows/">Workflows Solution</a>
+        </li>
+        <li>
+          <strong>Slides</strong>
+          <span>Solution landing with a live demo.</span>
+          <a href="/solutions/slides/">Slides Solution</a>
+        </li>
+      </ul>
+    </section>
+
     <section class="demo" id="contract" aria-labelledby="contract-title">
       <h2 id="contract-title">{section('contract').title}</h2>
       <ul class="contract">
@@ -112,6 +142,12 @@ const section = (id: string) => {
   .drag-page__hero {
     display: grid;
     gap: 0.75rem;
+  }
+  .taxonomy {
+    margin: 0;
+    color: var(--tx-muted-foreground, CanvasText);
+    font-size: 0.8125rem;
+    font-weight: 600;
   }
   .eyebrow {
     margin: 0;
@@ -184,6 +220,47 @@ const section = (id: string) => {
     padding: 1rem;
     border: 1px dashed var(--tx-border, CanvasText);
     border-radius: 1rem;
+  }
+  .related {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 1rem;
+    background: var(--tx-surface, Canvas);
+  }
+  .related h2,
+  .related p {
+    margin: 0;
+  }
+  .related h2 {
+    font-size: 1.25rem;
+  }
+  .related > p {
+    max-inline-size: 52rem;
+  }
+  .related__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .related__list li {
+    display: grid;
+    align-content: start;
+    gap: 0.35rem;
+    padding: 0.75rem;
+    border: 1px solid var(--tx-border, CanvasText);
+    border-radius: 0.75rem;
+  }
+  .related__list span {
+    color: var(--tx-muted-foreground, CanvasText);
+    font-size: 0.8125rem;
+  }
+  .related__list a {
+    color: var(--tx-link, LinkText);
   }
   .contract {
     display: grid;

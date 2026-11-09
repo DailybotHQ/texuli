@@ -1,12 +1,9 @@
 // @vitest-environment node
 /**
- * The landing, header and footer contracts (T-79, T-84): the hero proof
- * counts are computed from the sources they link to; the home metadata sits
- * inside the SEO audit's length bands; the footer states the release truth
- * with no version number that could drift; repository links go through the
- * URL policy from one constant; and motion is opt-in under reduced motion.
- * Templates are read as source (the root config does not compile .astro);
- * the rendered pages are covered by tests/e2e/site-*.spec.ts with axe.
+ * texuli.com home (Home 2.2): the band order and the ten storyboard messages, the copy
+ * budgets of the bands kept from the first landing, the computed counts, the SEO bands,
+ * the footer truth and opt-in motion. Each Home 2.2 section has its own test beside it
+ * (tests/solutions/home-*.test.ts); this file checks the assembly.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -18,13 +15,13 @@ import { buildExampleCatalog } from '../src/components/examples/catalog.ts';
 import { REPOSITORY_URL } from '../src/components/foundation/site.ts';
 import { illustrationFor } from '../src/components/landing/illustrations.ts';
 import { PRIMITIVES } from '../src/components/primitives-page/primitives.ts';
+import { HERO_22 } from '../src/components/sections/home/hero-22/hero-content.ts';
 import {
   fillCopy,
-  HOME_FINAL,
-  HOME_HERO,
+  HOME_BANDS,
   HOME_INSTALL_COMMAND,
+  HOME_OWN,
   HOME_PITCH,
-  HOME_QUICKSTART,
   HOME_STORIES,
   loadHomeHeroProof,
   loadHomeProof,
@@ -46,9 +43,57 @@ const routeExists = (href: string): boolean => {
 const home = read('src/pages/index.astro');
 const footer = read('src/components/foundation/SiteFooter.astro');
 const header = read('src/components/foundation/SiteHeader.astro');
+/** The band components index.astro renders, in order (one per top-level line). */
+const renderedBands = [...home.matchAll(/^\s{4}<(Home\w+|LandingStory)\b/gm)].map((m) => m[1]);
 
 describe('landing', () => {
-  it('counts the real catalog, primitives, themes and examples, each linked to its listing through the URL policy', async () => {
+  it('renders the Home 2.2 bands in the HOME_BANDS order', () => {
+    expect(renderedBands).toEqual(HOME_BANDS.map((band) => band.component));
+    expect(renderedBands).toEqual([
+      'HomeHero22',
+      'HomePitch',
+      'HomeWebNative',
+      'HomeSolutions',
+      'HomeAgents22',
+      'HomeStories',
+      'HomeBuiltWith',
+      'LandingStory',
+      'HomeFinal22',
+    ]);
+    for (const retired of ['<HomeHero />', '<HomeProof />', '<HomeQuickstart />', '<HomeFinal />'])
+      expect(home, retired).not.toContain(retired);
+  });
+
+  it('covers the ten storyboard messages once each, in storyboard order', () => {
+    const targets = HOME_BANDS.flatMap((band) => [...band.targets]);
+    expect(new Set(targets).size).toBe(10);
+    expect([...targets].sort((a, b) => Number(a.slice(1)) - Number(b.slice(1)))).toEqual(
+      Array.from({ length: 10 }, (_, i) => `T${i + 1}`)
+    );
+    // T5 rides with T3 in the Web & Native band (storyboard decision); everything else is in order.
+    expect(targets).toEqual(['T1', 'T2', 'T3', 'T5', 'T4', 'T6', 'T7', 'T8', 'T9', 'T10']);
+    expect(HOME_BANDS.findIndex((band) => band.id === 'web-native')).toBeLessThan(
+      HOME_BANDS.length / 2
+    );
+  });
+
+  it('stays static: no client island and one hero h1', () => {
+    expect(home).not.toMatch(/client:[a-z]+/);
+    expect(home).not.toMatch(/<script\b/);
+    expect(read('src/components/sections/home/hero-22/HomeHero22.astro')).toMatch(/<h1\b/);
+    for (const file of [
+      'web-native/HomeWebNative.astro',
+      'solutions/HomeSolutions.astro',
+      'agents-22/HomeAgents22.astro',
+      'built-with/HomeBuiltWith.astro',
+      'final-22/HomeFinal22.astro',
+      'HomePitch.astro',
+      'LandingStory.astro',
+    ])
+      expect(read(`src/components/sections/home/${file}`), file).not.toMatch(/<h1\b|client:[a-z]+/);
+  });
+
+  it('counts the real catalog, primitives, themes and examples in the hero proof row', async () => {
     const proof = await loadHomeHeroProof();
     expect(proof.map((stat) => [stat.id, stat.value, stat.href])).toEqual([
       ['components', COMPONENT_PAGES.length, '/component-pages/'],
@@ -60,73 +105,71 @@ describe('landing', () => {
       expect(stat.value, stat.id).toBeGreaterThan(0);
       expect(routeExists(stat.href), stat.href).toBe(true);
     }
-    const hero = read('src/components/sections/home/HomeHero.astro');
-    expect(hero).toMatch(/href=\{resolveHref\(stat\.href\)\}/);
-    expect(hero).not.toMatch(/>\s*\d{2,}\s*</);
-  });
-
-  it('keeps the hero to one value proposition: badge, accent h1, a short sub, three real calls to action, one install line and the eager art', () => {
-    const hero = read('src/components/sections/home/HomeHero.astro');
-    expect(HOME_HERO.badge).toEqual(['Open source', 'MIT', 'Svelte 5', 'Kotlin Multiplatform']);
-    expect(`${HOME_HERO.title.lead} ${HOME_HERO.title.accent}`).toBe('Build any interface.');
-    expect(hero).toContain('<span class="home-hero__accent">{HOME_HERO.title.accent}</span>');
-    expect(wordCount(HOME_HERO.sub)).toBeLessThanOrEqual(25);
-    expect(HOME_HERO.sub).toMatch(/Svelte 5/);
-    expect(HOME_HERO.sub).toMatch(/Kotlin Multiplatform twin in development/);
-    expect(HOME_HERO.actions.map((link) => link.role)).toEqual(['primary', 'secondary', 'text']);
-    for (const link of HOME_HERO.actions) expect(routeExists(link.href), link.href).toBe(true);
-    expect(hero).toContain('href={resolveHref(link.href)}');
-    expect(HOME_INSTALL_COMMAND).toBe('pnpm add texuli @texuli/tokens');
+    const hero = read('src/components/sections/home/hero-22/HomeHero22.astro');
+    expect(hero).toContain('href={resolveHref(stat.href)}');
     expect(hero).toContain('<CopyCommand command={HOME_INSTALL_COMMAND} />');
-    expect(hero).toContain('<SiteIllustration art="home-hero" />');
-    expect(illustrationFor('home-hero')?.priority).toBe(true);
-    expect((hero.match(/<h1[\s>]/g) ?? []).length).toBe(1);
-    expect(hero).not.toMatch(/<pre\b/);
+    expect(HOME_INSTALL_COMMAND).toBe('pnpm add texuli @texuli/tokens');
+    expect(`${HERO_22.title.lead} ${HERO_22.title.accent}`).toBe('Build any interface.');
+    // One copy command on the page: the hero's.
+    expect(home).not.toContain('CopyCommand');
+    expect(read('src/components/sections/home/final-22/HomeFinal22.astro')).not.toContain(
+      'CopyCommand'
+    );
   });
 
-  it('tells five illustrated stories after the pitch, with topic kickers instead of numbered acts', () => {
-    expect(HOME_STORIES.map((story) => story.kicker)).toEqual([
-      'Universal',
-      'Web + native',
-      'Your brand',
-      'For agents',
-      'Accessible',
-    ]);
-    const slots = [HOME_PITCH.slot, ...HOME_STORIES.map((story) => story.slot)];
-    expect(new Set(slots).size).toBe(6);
-    for (const slot of slots) expect(illustrationFor(slot)?.variant, slot).toBe('plate');
+  it('keeps the pitch ladder ending in Solutions, with real routes and its budget', () => {
+    expect(HOME_PITCH.title).toBe('Small pieces. Infinite possibilities.');
     expect(wordCount(HOME_PITCH.body)).toBeLessThanOrEqual(40);
-    const links = HOME_PITCH.steps.map((step) => step.href);
-    for (const story of HOME_STORIES) {
-      expect(
-        wordCount(fillCopy(story.body, { themeCount: 210, painted: 21, total: 168 })),
-        story.id
-      ).toBeLessThanOrEqual(40);
-      expect(story.points?.length ?? 0, story.id).toBeLessThanOrEqual(3);
-      for (const item of [
-        ...(story.points ?? []),
-        ...(story.chips ?? []),
-        ...(story.actions ?? []),
-      ])
-        if (item.href) links.push(item.href);
-    }
-    for (const href of links) expect(routeExists(href), href).toBe(true);
-    const copy = JSON.stringify([HOME_PITCH, HOME_STORIES]);
-    expect(copy).not.toMatch(/\bAct\b|\bActo\b/);
+    expect(HOME_PITCH.steps.map((step) => step.label)).toEqual([
+      'Texels',
+      'Primitives',
+      'Components',
+      'Solutions',
+    ]);
+    for (const step of HOME_PITCH.steps) expect(routeExists(step.href), step.href).toBe(true);
+    expect(illustrationFor(HOME_PITCH.slot)?.variant).toBe('plate');
+  });
 
-    const stories = read('src/components/sections/home/HomeStories.astro');
-    expect(stories).toContain("side={index % 2 === 0 ? 'end' : 'start'}");
-    expect(stories).toContain('index={index + 1}');
-    for (const file of [
-      'HomePitch.astro',
-      'HomeStories.astro',
-      'LandingStory.astro',
-      'TexelMark.astro',
-    ]) {
-      const source = read(`src/components/sections/home/${file}`);
-      expect(source, file).not.toMatch(/<pre\b|<code\b/);
+  it('keeps the design-systems story and the accessible story within budget, with plates and real links', () => {
+    expect(HOME_STORIES.map((story) => story.id)).toEqual(['brand']);
+    const stories = [...HOME_STORIES, HOME_OWN];
+    for (const story of stories) {
+      expect(wordCount(fillCopy(story.body, { themeCount: 210 })), story.id).toBeLessThanOrEqual(
+        40
+      );
+      expect(story.points?.length ?? 0, story.id).toBeLessThanOrEqual(3);
+      expect(illustrationFor(story.slot)?.variant, story.slot).toBe('plate');
+      for (const item of [...(story.points ?? []), ...(story.actions ?? [])])
+        if (item.href) expect(routeExists(item.href), item.href).toBe(true);
     }
-    expect(read('src/components/sections/home/TexelMark.astro')).toContain('aria-hidden="true"');
+    expect(HOME_OWN.title).toBe('Accessible and owned.');
+    expect(home).toContain('<LandingStory story={HOME_OWN} index={2} side="start">');
+    const copy = JSON.stringify([HOME_PITCH, stories]);
+    expect(copy).not.toMatch(/\bAct\b|\bActo\b|PLAN_/);
+  });
+
+  it('puts the computed proof row inside the accessible story, through the URL policy', async () => {
+    const proof = await loadHomeProof();
+    const catalog = JSON.parse(read('../../packages/spec/catalog/components.json')) as {
+      components: { emit: string[] }[];
+    };
+    const manifests = readdirSync(resolve(WEBSITE, '../../packages'))
+      .map((dir) => resolve(WEBSITE, '../../packages', dir, 'package.json'))
+      .filter((path) => existsSync(path))
+      .map((path) => JSON.parse(readFileSync(path, 'utf8')) as { name: string });
+    expect(HOME_NEVER_PACKED).toEqual(NEVER_PACKED);
+    const published = manifests.filter((manifest) => !NEVER_PACKED.includes(manifest.name)).length;
+    expect(proof.map((stat) => [stat.id, stat.value])).toEqual([
+      ['packages', published],
+      ['blueprint', catalog.components.length],
+      ['agent-safe', catalog.components.filter((entry) => entry.emit.includes('untrusted')).length],
+    ]);
+    for (const stat of proof) expect(routeExists(stat.href), stat.href).toBe(true);
+    const own = home.slice(home.indexOf('<LandingStory'), home.indexOf('</LandingStory>'));
+    expect(own).toContain('class="home-own-proof" role="list" aria-label={HOME_PROOF.label}');
+    expect(own).toContain('href={resolveHref(stat.href)}');
+    expect(home).toContain("safeHref(href, 'developer')");
+    expect(home).not.toMatch(/>\s*\d{2,}\s*</);
   });
 
   it('states the native slice from the generated parity matrix, never typed in', () => {
@@ -139,76 +182,16 @@ describe('landing', () => {
       'private val compactCharts = setOf("charts-gauge")',
     ].join('\n');
     expect(parseNativeRegistry(fixture)).toEqual(['blocks-code', 'charts-gauge', 'layout-page']);
-    expect(parseNativeRegistry(fixture.replace(' + compactCharts', ''))).toEqual([
-      'blocks-code',
-      'layout-page',
-    ]);
-    const registry = read(
-      '../../native/texuli-compose/src/commonMain/kotlin/com/texuli/compose/Registry.kt'
-    );
-    const catalog = JSON.parse(read('../../packages/spec/catalog/components.json')) as {
-      components: { id: string }[];
-    };
-    const ids = new Set(catalog.components.map((entry) => entry.id));
-    const painted = parseNativeRegistry(registry).filter((id) => ids.has(id));
-    expect(painted).toContain('layout-stack');
-    expect(painted).toContain('charts-sparkline');
-    expect(loadNativeSlice()).toEqual({ painted: painted.length, total: ids.size });
     const report = loadParity(resolve(WEBSITE, '../..'));
     expect(loadNativeSlice()).toEqual({
       painted: report.totals.painted,
       total: report.totals.catalog,
     });
-    expect(HOME_STORIES.find((story) => story.id === 'web-native')?.points?.[1]?.label).toContain(
-      '{painted} of {total} components paint today'
-    );
     expect(() => fillCopy('{missing}', {})).toThrow('no value for {missing}');
   });
 
-  it('closes with computed proof, a three-step quickstart and the final call to action, and nothing else', async () => {
-    const proof = await loadHomeProof();
-    const catalog = JSON.parse(read('../../packages/spec/catalog/components.json')) as {
-      components: { emit: string[] }[];
-    };
-    const manifests = readdirSync(resolve(WEBSITE, '../../packages'))
-      .map((dir) => resolve(WEBSITE, '../../packages', dir, 'package.json'))
-      .filter((path) => existsSync(path))
-      .map((path) => JSON.parse(readFileSync(path, 'utf8')) as { name: string });
-    expect(HOME_NEVER_PACKED).toEqual(NEVER_PACKED);
-    const published = manifests.filter((manifest) => !NEVER_PACKED.includes(manifest.name)).length;
-    expect(published).toBe(26);
-    expect(proof.map((stat) => [stat.id, stat.value])).toEqual([
-      ['packages', published],
-      ['blueprint', catalog.components.length],
-      ['agent-safe', catalog.components.filter((entry) => entry.emit.includes('untrusted')).length],
-    ]);
-    for (const stat of proof) expect(routeExists(stat.href), stat.href).toBe(true);
-    expect(HOME_QUICKSTART.steps.map((step) => step.title)).toEqual([
-      'Install',
-      'Pick a theme',
-      'Compose',
-    ]);
-    for (const step of HOME_QUICKSTART.steps)
-      if (step.href) expect(routeExists(step.href), step.href).toBe(true);
-    expect(read('src/components/sections/home/HomeQuickstart.astro')).toContain(
-      '<CopyCommand command={HOME_INSTALL_COMMAND} />'
-    );
-    expect(illustrationFor(HOME_QUICKSTART.slot)?.variant).toBe('plate');
-    expect(illustrationFor(HOME_FINAL.slot)?.variant).toBe('band');
-    for (const link of HOME_FINAL.actions) expect(routeExists(link.href), link.href).toBe(true);
-
-    const bands = [...home.matchAll(/^\s{4}<(Home\w+) \/>$/gm)].map((match) => match[1]);
-    expect(bands).toEqual([
-      'HomeHero',
-      'HomePitch',
-      'HomeStories',
-      'HomeProof',
-      'HomeQuickstart',
-      'HomeFinal',
-    ]);
-    expect(home).not.toMatch(/sections\/web\//);
-    for (const gone of ['WebHero.astro', 'WebWhySvelte.astro', 'WebAgentsCta.astro'])
-      expect(existsSync(resolve(WEBSITE, 'src/components/sections/web', gone)), gone).toBe(false);
+  it('links every Home 2.2 call to action that is a site route to an existing page', () => {
+    for (const action of HERO_22.actions) expect(routeExists(action.href), action.href).toBe(true);
   });
 
   it('keeps the home title and description inside the SEO audit bands', () => {
@@ -283,5 +266,10 @@ describe('landing', () => {
     ]) {
       expect(reduced).toContain(rule);
     }
+  });
+
+  it('keeps the home styles logical', () => {
+    const css = read('src/components/sections/home/home.css');
+    expect(css).not.toMatch(/margin-(left|right)|padding-(left|right)|\b(left|right|top|bottom):/);
   });
 });

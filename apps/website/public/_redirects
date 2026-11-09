@@ -1,0 +1,16 @@
+# Cloudflare Pages redirects (ADR-028).
+# Generated from SOLUTION_REDIRECTS in functions/_middleware.ts: only enabled rules whose
+# target page exists, both slash forms, one hop, 301. The middleware also redirects the
+# Markdown twins (.md and Accept: text/markdown) of the same paths.
+# /workflows-page/json/ is kept and is never a source.
+
+/slides-page /solutions/slides/ 301
+/slides-page/ /solutions/slides/ 301
+/documents-page /solutions/documents/ 301
+/documents-page/ /solutions/documents/ 301
+/workflows-page /solutions/workflows/ 301
+/workflows-page/ /solutions/workflows/ 301
+/canvas-page /solutions/canvas/ 301
+/canvas-page/ /solutions/canvas/ 301
+/sheets-page /solutions/sheets/ 301
+/sheets-page/ /solutions/sheets/ 301

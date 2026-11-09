@@ -1,0 +1,110 @@
+---
+/**
+ * /native/ FAQ: verified answers behind native <details>/<summary> (no island, no script).
+ * Copy and counts live in `faq-content.ts`. Site links pass the URL policy (developer tier).
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../../foundation/site.ts';
+import { NATIVE_FAQ, nativeFaqItems } from './faq-content.ts';
+
+const base = import.meta.env.BASE_URL;
+const items = nativeFaqItems().map((item) => ({
+  ...item,
+  links: (item.links ?? [])
+    .map((link) => {
+      const safe = safeHref(link.href, 'developer');
+      if (safe === undefined) return undefined;
+      return { label: link.label, href: safe.startsWith('/') ? withBase(base, safe) : safe };
+    })
+    .filter((link): link is { label: string; href: string } => link !== undefined),
+}));
+---
+
+<section class="native-faq" aria-labelledby={NATIVE_FAQ.ids.heading} data-tx-native-faq="">
+  <div class="native-faq__inner">
+    <h2 id={NATIVE_FAQ.ids.heading}>{NATIVE_FAQ.title}</h2>
+    <p class="native-faq__lede">{NATIVE_FAQ.lede}</p>
+    <div class="native-faq__list">
+      {
+        items.map((item) => (
+          <details class="native-faq__item" data-tx-native-faq-item={item.id}>
+            <summary>{item.question}</summary>
+            <div class="native-faq__body">
+              <p>{item.answer}</p>
+              {
+                item.links.length > 0 && (
+                  <ul class="native-faq__links">
+                    {item.links.map((link) => (
+                      <li>
+                        <a href={link.href}>{link.label}</a>
+                      </li>
+                    ))}
+                  </ul>
+                )
+              }
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .native-faq {
+    padding-block: 3rem;
+    padding-inline: 1.25rem;
+  }
+  .native-faq__inner {
+    display: grid;
+    gap: 1rem;
+    max-inline-size: 48rem;
+    margin-inline: auto;
+  }
+  .native-faq__lede {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+  }
+  .native-faq__list {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .native-faq__item {
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    border-radius: calc(var(--tx-radius, 0.5rem) * 1.25);
+    background: var(--tx-background);
+  }
+  .native-faq__item summary {
+    padding: 0.9rem 1.1rem;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  .native-faq__item summary:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+    border-radius: inherit;
+  }
+  .native-faq__body {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0 1.1rem 1.1rem;
+  }
+  .native-faq__body p {
+    margin: 0;
+  }
+  .native-faq__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .native-faq__links a {
+    color: var(--tx-foreground);
+  }
+  .native-faq__links a:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+</style>

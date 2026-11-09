@@ -137,8 +137,10 @@ describe('whats-new hub', () => {
   it('is linked from the sidebar', () => {
     const links = NAV_GROUPS.flatMap((group) => group.links.map((link) => link.href));
     expect(links).toContain('/whats-new/');
-    for (const href of ['/sheets-page/', '/dashboards-page/', '/output-page/']) {
+    for (const href of ['/dashboards-page/', '/output-page/']) {
       expect(links).toContain(href);
     }
+    // /sheets-page/ redirects to its Solution landing (ADR-028); the Solutions group links it.
+    expect(links).not.toContain('/sheets-page/');
   });
 });

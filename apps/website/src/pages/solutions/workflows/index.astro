@@ -1,0 +1,51 @@
+---
+/**
+ * `/solutions/workflows/` — the Workflows Solution landing (ADR-027, ADR-028, ADR-030),
+ * built on the Slides pilot. `SolutionLayout` orders the sections and checks the content
+ * against the registry entry; the only island is the Workflows demo (client:visible),
+ * with a server-rendered viewer preview of the same fixture.
+ */
+
+import SolutionDemoFrame from '../../../components/solutions/shared/demo-frame/SolutionDemoFrame.astro';
+import SolutionAgents from '../../../components/solutions/shared/platforms/SolutionAgents.astro';
+import SolutionPlatforms from '../../../components/solutions/shared/platforms/SolutionPlatforms.astro';
+import SolutionNextSteps from '../../../components/solutions/shared/resources/SolutionNextSteps.astro';
+import SolutionRecipes from '../../../components/solutions/shared/resources/SolutionRecipes.astro';
+import SolutionRelated from '../../../components/solutions/shared/resources/SolutionRelated.astro';
+import SolutionLayout from '../../../components/solutions/shared/SolutionLayout.astro';
+import WorkflowPreview from '../../../components/solutions/workflows/demo/WorkflowPreview.svelte';
+import WorkflowsDemo from '../../../components/solutions/workflows/demo/WorkflowsDemo.svelte';
+import WorkflowsHero from '../../../components/solutions/workflows/hero/WorkflowsHero.astro';
+import WorkflowsHow from '../../../components/solutions/workflows/how/WorkflowsHow.astro';
+import WorkflowsQuickstart from '../../../components/solutions/workflows/quickstart/WorkflowsQuickstart.astro';
+import WorkflowsStories from '../../../components/solutions/workflows/stories/WorkflowsStories.astro';
+import { techArticleJsonLd } from '../../../lib/schema.ts';
+import { WORKFLOWS_LANDING as content, WORKFLOWS_ENTRY as entry } from './_content.ts';
+
+const title = 'Workflows — graphs you can draw, check and embed';
+const description = entry.tagline;
+---
+
+<SolutionLayout
+  {entry}
+  {content}
+  {title}
+  {description}
+  jsonLd={techArticleJsonLd(title, description, entry.route)}
+>
+  <WorkflowsHero slot="hero" />
+  <SolutionDemoFrame slot="demo" {entry} {...content.demo}>
+    <WorkflowPreview slot="preview" />
+    <WorkflowsDemo slot="demo" client:visible />
+  </SolutionDemoFrame>
+  <WorkflowsStories slot="stories" />
+  <WorkflowsHow slot="how" />
+  <WorkflowsQuickstart slot="quickstart" />
+  <SolutionRecipes slot="recipes" {entry} {...content.recipes!} />
+  <SolutionAgents slot="agents" {entry} {...content.agents} />
+  <SolutionPlatforms slot="platforms" {entry} {...content.platforms} />
+  <Fragment slot="next">
+    <SolutionRelated {entry} />
+    <SolutionNextSteps {entry} {...content.next} />
+  </Fragment>
+</SolutionLayout>

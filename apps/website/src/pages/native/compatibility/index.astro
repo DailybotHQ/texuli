@@ -1,0 +1,61 @@
+---
+/**
+ * /native/compatibility/ — the full native compatibility matrix, one compact row per catalog
+ * component, generated from `native/docs/parity.json` and the checked-in conformance traces
+ * (`data/native/compatibility.ts`). Static: the filters are CSS radio groups, no island.
+ * /native/ shows the platform rows and per-group counts and links here. It is a reference
+ * page, so it sits in the docs shell (sidebar, docs header) rather than the landing shell.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../../components/foundation/site.ts';
+import NativeCompatibilityMatrix from '../../../components/sections/native/matrix/NativeCompatibilityMatrix.astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+const base = import.meta.env.BASE_URL;
+const backHref = (() => {
+  const safe = safeHref('/native/', 'developer');
+  return safe === undefined ? undefined : withBase(base, safe);
+})();
+---
+
+<BaseLayout
+  title="Native compatibility — every component, web and Compose"
+  description="The generated compatibility matrix for Texuli Native: each catalog component's web, Compose Desktop and conformance status, with links to the parity catalog and traces."
+>
+  <div class="native-compat" data-tx-native-compatibility="">
+    <header class="native-compat__intro">
+      {backHref && <p class="native-compat__back"><a href={backHref}>Texuli Native</a></p>}
+      <h1>Native compatibility</h1>
+      <p>
+        Every catalog component, with its web, Compose Desktop and conformance status. The table is
+        generated from the parity catalog and the conformance traces in the repository; nothing on it is
+        typed by hand. Android and iOS renderers are planned, so they have no column yet.
+      </p>
+    </header>
+    <NativeCompatibilityMatrix />
+  </div>
+</BaseLayout>
+
+<style>
+  .native-compat__intro {
+    display: grid;
+    gap: 0.75rem;
+    max-inline-size: 78rem;
+    margin-inline: auto;
+    padding: clamp(2rem, 5vw, 3.5rem) clamp(1rem, 4vw, 1.5rem) 0;
+  }
+  .native-compat__intro h1 {
+    margin: 0;
+    font-size: clamp(2.25rem, 7vw, 3.75rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+  .native-compat__intro > p:last-child {
+    max-inline-size: 48rem;
+    margin: 0;
+    color: var(--tx-muted-foreground, GrayText);
+    line-height: 1.55;
+  }
+  .native-compat__back { margin: 0; font-size: 0.9rem; }
+</style>

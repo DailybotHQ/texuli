@@ -118,10 +118,10 @@ texuli/
 │   ├── mcp/             L9 @texuli/mcp: local MCP server bin, npx -y @texuli/mcp (in development, first on npm as 0.9.0) (README, docs/)
 │   └── examples/        @texuli/examples (private): the examples registry for tests, visuals and the site
 ├── apps/
-│   ├── website/         @texuli/website: texuli.com, Astro 7 + Svelte islands                  (README, docs/)
+│   ├── website/         @texuli/website: texuli.com, Astro 7 + Svelte islands; Solutions, Built with, Native (README, docs/)
 │   └── agent/           @texuli/agent: the agent service (fake replay provider; not deployed)   (README, docs/)
 ├── functions/           Cloudflare Pages Functions: _middleware.ts (Markdown twins, robots.txt variants,
-│                        problem+json 404s, bot events), api/umami (same-origin analytics proxy)
+│                        problem+json 404s, bot events, Solution twin redirects), api/umami (same-origin analytics proxy)
 │                        and mcp.ts (the remote MCP at /mcp, stateless, edge and site operations)
 ├── native/              Gradle Kotlin Multiplatform twin: texuli-spec, texuli-compose, conformance (README, docs/)
 ├── .github/workflows/   CI (checks, behavior, website, budget audits), the npm publish workflow and the skill release

@@ -1,0 +1,15 @@
+---
+/**
+ * The Slides "How it works" section: the shared SolutionHow with the slides registry entry
+ * and the steps in `how-content.ts`. The "Built from Texuli" diagram is drawn by the block
+ * from `entry.packages` and `PACKAGE_STACK`, so it lists only the registry's packages and
+ * their direct Texuli dependencies. Static markup.
+ */
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionHow from '../../shared/architecture/SolutionHow.astro';
+import { SLIDES_HOW } from './how-content.ts';
+
+const entry = getSolution('slides');
+---
+
+<SolutionHow entry={entry} {...SLIDES_HOW} />

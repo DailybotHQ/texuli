@@ -22,6 +22,37 @@ The two-runtimes story: the architecture page and the native landing.
 - [Web + native](https://texuli.com/web-and-native/)
 - [Native (Kotlin)](https://texuli.com/native/)
 
+## Native
+
+Kotlin Multiplatform and Compose: what exists, honestly.
+
+- [Texuli Native](https://texuli.com/native/): The same catalog, rendered by Compose through Kotlin Multiplatform. Status: in development.
+- [Native compatibility](https://texuli.com/native/compatibility/): What the Compose renderer paints today, from the parity matrix.
+
+## Solutions
+
+Embeddable open-source systems that complete a task end to end.
+
+- [All Solutions](https://texuli.com/solutions/): The catalog, with each Solution’s status and platforms.
+- [Solutions index (JSON)](https://texuli.com/solutions/index.json): The registry facts as JSON.
+- [Slides](https://texuli.com/solutions/slides/): Write decks as JSON or Markdown and present them in the browser. Status: in development.
+- [Slides docs](https://texuli.com/guides/solutions/slides/)
+- [Documents](https://texuli.com/solutions/documents/): Edit, read, paginate and export block documents. Status: in development.
+- [Documents docs](https://texuli.com/guides/solutions/documents/)
+- [Workflows](https://texuli.com/solutions/workflows/): Author and view workflow graphs inside your app. Status: in development.
+- [Workflows docs](https://texuli.com/guides/solutions/workflows/)
+- [Canvas](https://texuli.com/solutions/canvas/): An embeddable whiteboard with shapes, connectors and export. Status: in development.
+- [Canvas docs](https://texuli.com/guides/solutions/canvas/)
+- [Sheets](https://texuli.com/solutions/sheets/): An embeddable spreadsheet with formulas and CSV. Status: in development.
+- [Sheets docs](https://texuli.com/guides/solutions/sheets/)
+
+## Built with Texuli
+
+Products built on Texuli, each with its own brand and domain.
+
+- [Built with Texuli](https://texuli.com/built-with/)
+- [Protoyard](https://texuli.com/built-with/protoyard/): Open-source local prototyping for exploring and validating software prototypes. Status: available.
+
 ## Guides
 
 Task-first guides, in reading order.
@@ -33,6 +64,11 @@ Task-first guides, in reading order.
 - [Accessibility](https://texuli.com/guides/accessibility/)
 - [RTL and i18n](https://texuli.com/guides/rtl-i18n/)
 - [Forms](https://texuli.com/guides/forms/)
+- [Slides](https://texuli.com/guides/solutions/slides/)
+- [Documents](https://texuli.com/guides/solutions/documents/)
+- [Workflows](https://texuli.com/guides/solutions/workflows/)
+- [Canvas](https://texuli.com/guides/solutions/canvas/)
+- [Sheets](https://texuli.com/guides/solutions/sheets/)
 - [Performance](https://texuli.com/guides/performance/)
 
 ## Components
@@ -42,17 +78,12 @@ Every styled component with live examples; each page documents props, behavior a
 - [Overview](https://texuli.com/component-pages/)
 - [Gallery](https://texuli.com/gallery-components/)
 - [Examples](https://texuli.com/examples/)
-- [Slides](https://texuli.com/slides-page/)
 - [Editor](https://texuli.com/editor-page/)
 - [Drag and drop](https://texuli.com/drag-page/)
 - [Motion](https://texuli.com/motion-page/)
-- [Documents](https://texuli.com/documents-page/)
 - [Forms](https://texuli.com/forms-page/)
-- [Canvas](https://texuli.com/canvas-page/)
-- [Sheets](https://texuli.com/sheets-page/)
 - [Dashboards](https://texuli.com/dashboards-page/)
 - [Email, PDF and i18n](https://texuli.com/output-page/)
-- [Workflow editor](https://texuli.com/workflows-page/)
 - [JSON live preview](https://texuli.com/workflows-page/json/)
 - [Blocks](https://texuli.com/blocks-page/)
 - [Charts](https://texuli.com/charts-page/)

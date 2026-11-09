@@ -46,12 +46,12 @@ export const DOCS_SECTIONS: readonly DocsNavSection[] = [
     label: 'Slides',
     items: [
       {
-        href: '/slides-page/',
+        href: '/solutions/slides/',
         label: 'Slides overview',
         summary: 'A live deck stage, the starter templates and the slides examples',
       },
       {
-        href: '/slides-page/#package-docs',
+        href: '/guides/solutions/slides/',
         label: 'Slides package docs',
         summary: 'Where the @texuli/slides docs live in the repository',
       },

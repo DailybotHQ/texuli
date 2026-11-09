@@ -1,4 +1,6 @@
 ---
+import mediaPackage from '../../../../../packages/media/package.json';
+import { siteRouteExists } from '../../components/foundation/nav-data.ts';
 /**
  * /media-page/: media lab — image, video, audio, composition preview, and
  * in-browser PNG/WebM export. Static build; client island for players/export.
@@ -7,12 +9,70 @@
 import PageBanner from '../../components/landing/PageBanner.astro';
 import MediaLab from '../../components/media-page/MediaLab.svelte';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const related = [
+  {
+    label: 'Slides Solution',
+    href: '/solutions/slides/',
+    note: 'Presentations can combine media with slide content.',
+  },
+  {
+    label: 'Canvas Solution',
+    href: '/solutions/canvas/',
+    note: 'A whiteboard can place images alongside shapes, text, and connectors.',
+  },
+  {
+    label: 'All Solutions',
+    href: '/solutions/',
+    note: 'Explore the promoted end-to-end Solutions.',
+  },
+].filter((item) => siteRouteExists(item.href));
 ---
 
 <BaseLayout
-  title="Media lab"
-  description="Texuli media lab: image, video, audio, compositions, and browser export to PNG and WebM. Static, no foreign network."
+  title="Media components"
+  description="Explore Texuli media components for images, video, audio, compositions, animation, and export. Available on npm, pre-1.0."
 >
-  <PageBanner art="page-media" />
-  <MediaLab client:load />
+  <div class="media-page" data-tx-media-page="">
+    <header class="media-page__header">
+      <PageBanner art="page-media" />
+      <p class="taxonomy">Capability family</p>
+      <p class="package-status"><code>@texuli/media</code> · Available on npm · {mediaPackage.version} · pre-1.0</p>
+      <p class="lead">
+        Images, galleries, video, audio, editing, compositions, animation, timelines, and export are
+        reusable media pieces rather than one complete media-authoring product. The composition
+        generator slot expects a host-provided generator. The lab below uses synthetic fixtures and
+        browser-local export.
+      </p>
+    </header>
+
+    <MediaLab client:load />
+
+    <section class="related" aria-labelledby="media-related-title" data-tx-media-related="">
+      <h2 id="media-related-title">Media inside larger Solutions</h2>
+      <p>These live Solutions can use media pieces as part of a broader user task.</p>
+      <ul>
+        {related.map((item) => (
+          <li>
+            <a href={item.href}>{item.label}</a>
+            <span>{item.note}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </div>
 </BaseLayout>
+
+<style>
+  .media-page { display: grid; gap: 1.25rem; }
+  .media-page__header { display: grid; gap: 0.55rem; }
+  .taxonomy { margin: 0; color: var(--tx-muted-foreground, GrayText); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+  .package-status { margin: 0; color: var(--tx-muted-foreground, GrayText); font-size: 0.9rem; }
+  .lead { margin: 0; max-inline-size: 52rem; color: var(--tx-foreground, CanvasText); font-size: 1.0625rem; line-height: 1.55; }
+  .related { display: grid; gap: 0.6rem; padding: 1rem; border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-radius, 0.75rem); background: var(--tx-surface, Canvas); }
+  .related h2 { margin: 0; font-size: 1.25rem; }
+  .related > p { margin: 0; color: var(--tx-muted-foreground, GrayText); }
+  .related ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 0.65rem; margin: 0; padding: 0; list-style: none; }
+  .related li { display: grid; align-content: start; gap: 0.25rem; padding: 0.75rem; border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-radius, 0.5rem); }
+  .related span { color: var(--tx-muted-foreground, GrayText); font-size: 0.9rem; }
+</style>

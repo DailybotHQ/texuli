@@ -1,0 +1,441 @@
+---
+/**
+ * The `/solutions/` catalog: a hero (h1, lede, art or texel mosaic), the All / Web / Native
+ * filter links, and one card per registry Solution with its status, a badge per platform,
+ * and its landing and docs links when those pages exist. The filters need no JavaScript:
+ * each link targets an empty anchor placed before the filter bar and the list, and CSS
+ * `:target` hides the cards outside the chosen filter and marks the chosen link. With no
+ * fragment, every card shows (All). Static markup, no island; links pass the URL policy.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../foundation/site.ts';
+import { illustrationFor } from '../../landing/illustrations.ts';
+import SiteIllustration from '../../landing/SiteIllustration.astro';
+import TexelMark from '../../sections/home/TexelMark.astro';
+import StatusBadge from '../shared/platforms/StatusBadge.astro';
+import { CATALOG_PAGE, catalogCards, filterCounts } from './catalog-content.ts';
+
+const base = import.meta.env.BASE_URL;
+const page = CATALOG_PAGE;
+const cards = catalogCards();
+const counts = filterCounts(cards);
+const artRegistered = illustrationFor(page.hero.art) !== undefined;
+const resolveHref = (href: string): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  return safe === undefined ? undefined : withBase(base, safe);
+};
+const filters = [
+  { ...page.filters.all, count: counts.all },
+  { ...page.filters.web, count: counts.web },
+  { ...page.filters.native, count: counts.native },
+];
+const anchor = (id: string) => `solutions-${id}`;
+const tiles = Array.from({ length: 24 }, (_, i) => ((i * 3 + 4) % 8) % 5);
+---
+
+<div class="sol-catalog" data-tx-solutions-catalog="">
+  <header class="sol-catalog__hero" aria-labelledby={page.hero.id}>
+    <div class="sol-catalog__inner sol-catalog__hero-grid">
+      <div class="sol-catalog__hero-copy">
+        <p class="sol-catalog__eyebrow">
+          <TexelMark count={3} />
+          <span>{page.hero.eyebrow}</span>
+        </p>
+        <h1 id={page.hero.id}>{page.hero.title}</h1>
+        <p class="sol-catalog__lede">{page.hero.lede}</p>
+      </div>
+      <div class="sol-catalog__art">
+        <div class="sol-catalog__plate">
+          {
+            artRegistered ? (
+              <SiteIllustration art={page.hero.art} />
+            ) : (
+              <div class="sol-catalog__mosaic" aria-hidden="true" data-art-fallback={page.hero.art}>
+                {tiles.map((tone) => (tone === 0 ? <i /> : <i class={`t${tone}`} />))}
+              </div>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="sol-catalog__inner sol-catalog__body">
+    {filters.map((filter) => <span id={anchor(filter.id)} class="sol-catalog__anchor" />)}
+    <nav class="sol-catalog__filters" aria-label={page.filters.label}>
+      <ul role="list">
+        {
+          filters.map((filter) => (
+            <li>
+              <a
+                href={`#${anchor(filter.id)}`}
+                class="sol-catalog__filter"
+                data-filter={filter.id}
+              >
+                {filter.label}
+                <span class="sol-catalog__count">{filter.count}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    {counts.native === 0 && <p class="sol-catalog__native-empty">{page.nativeEmpty}</p>}
+    <ul class="sol-catalog__cards" id={page.listId} role="list">
+      {
+        cards.map((card) => (
+          <li
+            class="sol-catalog__card"
+            data-solution={card.slug}
+            data-status={card.status}
+            data-on-web={String(card.onWeb)}
+            data-on-native={String(card.onNative)}
+          >
+            <div class="sol-catalog__card-art">
+              <SiteIllustration art={card.art} />
+            </div>
+            <div class="sol-catalog__card-head">
+              <h2>{card.name}</h2>
+              <StatusBadge status={card.status} context={card.name} />
+            </div>
+            <p class="sol-catalog__tagline">{card.tagline}</p>
+            <p class="sol-catalog__summary">{card.summary}</p>
+            <ul class="sol-catalog__platforms" role="list" aria-label={`${card.name} platforms`}>
+              {card.platforms.map((row) => (
+                <li data-platform={row.platform}>
+                  <span>{row.name}</span>
+                  <StatusBadge status={row.badge.status} context={row.name} />
+                </li>
+              ))}
+            </ul>
+            {(card.landing || card.docs) && (
+              <div class="sol-catalog__links">
+                {card.landing && (
+                  <a href={resolveHref(card.landing)}>
+                    Explore {card.name}
+                    <span aria-hidden="true">&nbsp;→</span>
+                  </a>
+                )}
+                {card.docs && (
+                  <a href={resolveHref(card.docs)}>
+                    {card.name} docs
+                    <span aria-hidden="true">&nbsp;→</span>
+                  </a>
+                )}
+              </div>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</div>
+
+<style>
+  .sol-catalog {
+    --home-accent: #6d4aff;
+    --home-accent-text: #5b3ae6;
+    --home-accent-ink: #ffffff;
+    --home-warm: #ff8a4c;
+    --home-ground: linear-gradient(160deg, #f4f0ff 0%, #fbf8ff 45%, #fff4ee 100%);
+    --home-tint: color-mix(in oklab, #6d4aff 6%, var(--tx-background));
+    --sc-accent: var(--home-accent-text);
+  }
+  :global(:root[data-tx-mode='dark']) .sol-catalog {
+    --home-accent-text: #b9a8ff;
+    --home-ground:
+      radial-gradient(120% 90% at 85% 0%, rgb(109 74 255 / 0.22), transparent 60%),
+      var(--tx-background);
+    --home-tint: color-mix(in oklab, #6d4aff 10%, var(--tx-background));
+  }
+  :global(:root[data-tx-mode='high-contrast']) .sol-catalog {
+    --home-accent: var(--tx-foreground);
+    --home-accent-text: var(--tx-foreground);
+    --home-accent-ink: var(--tx-background);
+    --home-ground: var(--tx-background);
+    --home-tint: var(--tx-background);
+  }
+  .sol-catalog__inner {
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  .sol-catalog__hero {
+    padding-block: clamp(2.5rem, 7vw, 5rem);
+    border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 60%, transparent);
+    background: var(--home-ground);
+  }
+  .sol-catalog__hero-grid {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: center;
+  }
+  @media (min-width: 56rem) {
+    .sol-catalog__hero-grid {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    }
+  }
+  .sol-catalog__hero-copy {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+  .sol-catalog__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0;
+    padding-block: 0.3rem;
+    padding-inline: 0.85rem;
+    border: 1px solid color-mix(in oklab, var(--home-accent) 35%, transparent);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--home-accent) 8%, var(--tx-background));
+    color: var(--tx-foreground);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .sol-catalog h1 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(2.75rem, 9vw, 5.25rem);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+  .sol-catalog__lede {
+    margin: 0;
+    max-inline-size: 38rem;
+    color: var(--tx-muted-foreground);
+    font-size: clamp(1.05rem, 2.4vw, 1.2rem);
+    line-height: 1.5;
+  }
+  .sol-catalog__art {
+    position: relative;
+    isolation: isolate;
+    min-inline-size: 0;
+  }
+  .sol-catalog__art::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--home-accent) 22%, transparent),
+      transparent
+    );
+    pointer-events: none;
+  }
+  .sol-catalog__plate {
+    position: relative;
+    min-inline-size: 0;
+  }
+  .sol-catalog__mosaic {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.4rem;
+    aspect-ratio: 3 / 2;
+    padding: clamp(0.75rem, 3vw, 1.25rem);
+    border: 1px solid color-mix(in oklab, var(--tx-border) 70%, transparent);
+    border-radius: 1rem;
+    background: var(--tx-background);
+  }
+  .sol-catalog__mosaic i {
+    border-radius: 0.35rem;
+    background: color-mix(in oklab, var(--sc-accent) 6%, transparent);
+  }
+  .sol-catalog__mosaic i.t1 {
+    background: color-mix(in oklab, var(--sc-accent) 18%, transparent);
+  }
+  .sol-catalog__mosaic i.t2 {
+    background: color-mix(in oklab, var(--sc-accent) 35%, transparent);
+  }
+  .sol-catalog__mosaic i.t3 {
+    background: color-mix(in oklab, var(--sc-accent) 60%, transparent);
+  }
+  .sol-catalog__mosaic i.t4 {
+    background: var(--sc-accent);
+  }
+  .sol-catalog__body {
+    display: grid;
+    gap: 1.25rem;
+    padding-block: clamp(3rem, 8vw, 6rem);
+  }
+  .sol-catalog__anchor {
+    display: block;
+    block-size: 0;
+    scroll-margin-block-start: calc(var(--site-header-height, 56px) + 1rem);
+  }
+  .sol-catalog__filters ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sol-catalog__filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-block-size: 2.25rem;
+    padding-inline: 0.9rem;
+    border: 1px solid color-mix(in oklab, var(--tx-border) 85%, transparent);
+    border-radius: 999px;
+    color: var(--tx-foreground);
+    font-weight: 650;
+    text-decoration: none;
+  }
+  .sol-catalog__filter:hover {
+    border-color: var(--sc-accent);
+  }
+  .sol-catalog__filter:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .sol-catalog__count {
+    color: var(--tx-muted-foreground);
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+  }
+  /* The chosen filter: All by default, or the targeted one. */
+  .sol-catalog__filter[data-filter='all'],
+  #solutions-web:target ~ .sol-catalog__filters [data-filter='web'],
+  #solutions-native:target ~ .sol-catalog__filters [data-filter='native'] {
+    border-color: var(--sc-accent);
+    background: color-mix(in oklab, var(--sc-accent) 10%, var(--tx-background));
+  }
+  #solutions-web:target ~ .sol-catalog__filters [data-filter='all'],
+  #solutions-native:target ~ .sol-catalog__filters [data-filter='all'] {
+    border-color: color-mix(in oklab, var(--tx-border) 85%, transparent);
+    background: transparent;
+  }
+  #solutions-web:target ~ .sol-catalog__cards [data-on-web='false'],
+  #solutions-native:target ~ .sol-catalog__cards [data-on-native='false'] {
+    display: none;
+  }
+  .sol-catalog__native-empty {
+    display: none;
+    margin: 0;
+    padding: 1rem 1.1rem;
+    border: 1px dashed color-mix(in oklab, var(--tx-border) 90%, transparent);
+    border-radius: 0.75rem;
+    color: var(--tx-muted-foreground);
+  }
+  #solutions-native:target ~ .sol-catalog__native-empty {
+    display: block;
+  }
+  .sol-catalog__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sol-catalog__card {
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+    padding: 1.1rem 1.1rem 1.25rem;
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    border-radius: 1rem;
+    background: var(--tx-background);
+  }
+  .sol-catalog__card-art {
+    min-inline-size: 0;
+    margin-inline: -0.15rem;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    background: var(--home-tint);
+  }
+  .sol-catalog h2 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: 1.45rem;
+    font-weight: 750;
+  }
+  .sol-catalog__card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .sol-catalog__tagline {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-weight: 600;
+  }
+  .sol-catalog__summary {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: 0.925rem;
+    line-height: 1.5;
+  }
+  .sol-catalog__platforms {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.875rem;
+  }
+  .sol-catalog__platforms li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.35rem 0.5rem;
+    color: var(--tx-foreground);
+  }
+  .sol-catalog__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+  }
+  .sol-catalog__links a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.5rem;
+    color: var(--sc-accent);
+    font-weight: 700;
+    text-underline-offset: 0.2em;
+  }
+  .sol-catalog__links a:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .sol-catalog__card {
+        animation-name: sol-catalog-rise;
+        animation-timing-function: var(--site-motion-linked-easing);
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 60%;
+      }
+    }
+  }
+  @keyframes sol-catalog-rise {
+    from {
+      translate: 0 1.5rem;
+    }
+    to {
+      translate: 0 0;
+    }
+  }
+  @media (forced-colors: active) {
+    .sol-catalog__card,
+    .sol-catalog__filter {
+      border-color: CanvasText;
+    }
+    .sol-catalog__mosaic,
+    .sol-catalog__art::before {
+      display: none;
+    }
+  }
+</style>

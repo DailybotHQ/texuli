@@ -11,7 +11,8 @@
  * parameter.
  */
 
-import { COMPONENT_FAMILIES } from '../foundation/nav-data.ts';
+import { registryLlmsSections } from '../../lib/twins/solutions.ts';
+import { COMPONENT_FAMILIES, siteRouteExists } from '../foundation/nav-data.ts';
 import { DOCS_HOME, GET_STARTED, NAV_GROUPS, type NavLink } from '../foundation/site.ts';
 import { GUIDES_SECTIONS } from '../guides/nav.ts';
 
@@ -25,6 +26,41 @@ export interface SiteLlmsSection {
   name: string;
   description?: string;
   links: readonly SiteLlmsLink[];
+}
+
+/** Native landing and compatibility pages, included only when the route exists. */
+export const NATIVE_LLMS_ROUTES = [
+  {
+    route: '/native/',
+    title: 'Texuli Native',
+    description:
+      'The same catalog, rendered by Compose through Kotlin Multiplatform. Status: in development.',
+  },
+  {
+    route: '/native/compatibility/',
+    title: 'Native compatibility',
+    description: 'What the Compose renderer paints today, from the parity matrix.',
+  },
+] as const;
+
+/** The Native llms.txt section, or undefined when none of its pages exist. */
+export function nativeLlmsSection(
+  siteUrl: string,
+  exists: (route: string) => boolean = siteRouteExists
+): SiteLlmsSection | undefined {
+  const links: SiteLlmsLink[] = NATIVE_LLMS_ROUTES.filter((entry) => exists(entry.route)).map(
+    (entry) => ({
+      title: entry.title,
+      href: `${siteUrl}${entry.route}`,
+      description: entry.description,
+    })
+  );
+  if (links.length === 0) return undefined;
+  return {
+    name: 'Native',
+    description: 'Kotlin Multiplatform and Compose: what exists, honestly.',
+    links,
+  };
 }
 
 /** Site-absolute nav links with a title, in the given group's raw order. */
@@ -85,6 +121,10 @@ export function siteLlmsSections(siteUrl: string): SiteLlmsSection[] {
       description: 'The two-runtimes story: the architecture page and the native landing.',
       links: nav('platform'),
     },
+    ...[nativeLlmsSection(siteUrl)].filter((section): section is SiteLlmsSection =>
+      Boolean(section)
+    ),
+    ...registryLlmsSections(siteUrl).map((section) => ({ ...section, links: [...section.links] })),
     {
       name: 'Guides',
       description: 'Task-first guides, in reading order.',

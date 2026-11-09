@@ -1,0 +1,287 @@
+---
+/**
+ * /native/ hero, "Beyond the browser": eyebrow, the accent h1, a short subhead, the
+ * platform status line (web available; Compose Desktop, Android and iOS from the
+ * compatibility data), an honesty note, three calls to action and the `native-hero` plate.
+ * Static markup with no island, at the home hero's visual level. Copy and status live in
+ * `hero-content.ts`. Every link passes the URL policy (developer tier). Until `native-hero`
+ * is registered in `illustrations.json`, the plate paints the texel mosaic.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { withBase } from '../../../foundation/site.ts';
+import { illustrationFor } from '../../../landing/illustrations.ts';
+import SiteIllustration from '../../../landing/SiteIllustration.astro';
+import TexelMark from '../../../sections/home/TexelMark.astro';
+import HeroTexels from '../../../solutions/shared/hero/HeroTexels.astro';
+import StatusBadge from '../../../solutions/shared/platforms/StatusBadge.astro';
+import { NATIVE_HERO, nativeHeroStatus } from './hero-content.ts';
+
+const base = import.meta.env.BASE_URL;
+const status = nativeHeroStatus();
+const resolveHref = (href: string): string | undefined => {
+  const safe = safeHref(href, 'developer');
+  if (safe === undefined) return undefined;
+  return safe.startsWith('/') ? withBase(base, safe) : safe;
+};
+const actions = NATIVE_HERO.actions.map((action) => ({
+  ...action,
+  href: resolveHref(action.href),
+}));
+const registered = illustrationFor(NATIVE_HERO.art.slot) !== undefined;
+---
+
+<section class="native-hero22" aria-labelledby={NATIVE_HERO.ids.heading} data-tx-native-hero="">
+  <div class="native-hero22__inner">
+    <div class="native-hero22__copy">
+      <p class="native-hero22__eyebrow">
+        <TexelMark count={3} />
+        <span>{NATIVE_HERO.eyebrow}</span>
+      </p>
+      <h1 id={NATIVE_HERO.ids.heading}>
+        {NATIVE_HERO.title.lead}{' '}
+        <span class="native-hero22__accent">{NATIVE_HERO.title.accent}</span>
+      </h1>
+      <p class="native-hero22__sub">{NATIVE_HERO.sub}</p>
+      <ul
+        class="native-hero22__status"
+        role="list"
+        id={NATIVE_HERO.ids.status}
+        aria-label={NATIVE_HERO.statusLabel}
+      >
+        {
+          status.map((row) => (
+            <li class="native-hero22__row" data-tx-native-status={row.id} data-status={row.status}>
+              <span class="native-hero22__platform">{row.platform}</span>
+              <StatusBadge status={row.status} />
+              <span class="native-hero22__detail">{row.detail}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="native-hero22__note">{NATIVE_HERO.note}</p>
+      <div class="native-hero22__actions">
+        {
+          actions.map((action) => (
+            <a
+              href={action.href}
+              class={`native-hero22__cta native-hero22__cta--${action.role}`}
+              data-tx-native-action={action.role}
+            >
+              {action.label}
+              {action.role === 'text' && <span aria-hidden="true">&nbsp;→</span>}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+    <div class="native-hero22__art">
+      <div class="native-hero22__plate">
+        {
+          registered ? (
+            <SiteIllustration art={NATIVE_HERO.art.slot} />
+          ) : (
+            <HeroTexels art={NATIVE_HERO.art.slot} alt={NATIVE_HERO.art.alt} />
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .native-hero22 {
+    --nh-accent: var(--home-accent, #6d4aff);
+    --nh-accent-text: var(--home-accent-text, #5b3ae6);
+    --nh-accent-ink: var(--home-accent-ink, #ffffff);
+    background: var(
+      --home-ground,
+      linear-gradient(
+        160deg,
+        color-mix(in oklab, #6d4aff 7%, var(--tx-background)) 0%,
+        var(--tx-background) 50%,
+        color-mix(in oklab, #ff8a4c 6%, var(--tx-background)) 100%
+      )
+    );
+    border-block-end: 1px solid color-mix(in oklab, var(--tx-border) 60%, transparent);
+  }
+  :global(:root[data-tx-mode='dark']) .native-hero22 {
+    --nh-accent-text: var(--home-accent-text, #b9a8ff);
+  }
+  .native-hero22__inner {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-block: clamp(2rem, 6vw, 4.5rem);
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  @media (min-width: 60rem) {
+    .native-hero22__inner {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+      align-items: center;
+      min-block-size: min(46rem, calc(100svh - 4rem));
+    }
+  }
+  .native-hero22__copy {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+    max-inline-size: 36rem;
+    min-inline-size: 0;
+  }
+  .native-hero22__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0;
+    padding-block: 0.3rem;
+    padding-inline: 0.85rem;
+    border: 1px solid color-mix(in oklab, var(--nh-accent) 35%, transparent);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--nh-accent) 8%, var(--tx-background));
+    color: var(--tx-foreground);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .native-hero22 h1 {
+    margin: 0;
+    color: var(--tx-foreground);
+    font-size: clamp(2.75rem, 9vw, 5.25rem);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+  .native-hero22__accent {
+    color: var(--nh-accent-text);
+  }
+  .native-hero22__sub {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+    line-height: 1.5;
+  }
+  .native-hero22__status {
+    display: grid;
+    gap: 0.55rem;
+    inline-size: 100%;
+    margin: 0;
+    padding: 0;
+    padding-block-start: 1rem;
+    border-block-start: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    list-style: none;
+  }
+  .native-hero22__row {
+    display: grid;
+    grid-template-columns: 8.5rem auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.35rem 0.75rem;
+    font-size: 0.9rem;
+  }
+  .native-hero22__platform {
+    color: var(--tx-foreground);
+    font-weight: 700;
+  }
+  .native-hero22__detail {
+    color: var(--tx-muted-foreground);
+  }
+  @media (max-width: 40rem) {
+    .native-hero22__row {
+      grid-template-columns: auto auto;
+      justify-content: start;
+    }
+    .native-hero22__detail {
+      grid-column: 1 / -1;
+    }
+  }
+  .native-hero22__note {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: 0.85rem;
+    font-style: italic;
+  }
+  .native-hero22__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+  }
+  .native-hero22__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: 2.75rem;
+    padding-inline: 1.25rem;
+    border: 1px solid transparent;
+    border-radius: 0.65rem;
+    font-weight: 650;
+    text-decoration: none;
+  }
+  .native-hero22__cta--primary {
+    background: var(--nh-accent);
+    color: var(--nh-accent-ink);
+    box-shadow: 0 0.5rem 1.5rem -0.75rem var(--nh-accent);
+  }
+  .native-hero22__cta--primary:hover {
+    background: color-mix(in oklab, var(--nh-accent) 88%, black);
+  }
+  .native-hero22__cta--secondary {
+    border-color: var(--tx-border);
+    background: var(--tx-background);
+    color: var(--tx-foreground);
+  }
+  .native-hero22__cta--secondary:hover {
+    background: color-mix(in oklab, var(--tx-muted) 50%, var(--tx-background));
+  }
+  .native-hero22__cta--text {
+    min-block-size: 1.5rem;
+    padding-inline: 0;
+    color: var(--nh-accent-text);
+  }
+  .native-hero22__cta--text:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .native-hero22__cta:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 3px;
+  }
+  .native-hero22__art {
+    position: relative;
+    isolation: isolate;
+    min-inline-size: 0;
+    padding-block: clamp(0.75rem, 3vw, 1.5rem);
+  }
+  .native-hero22__art::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--nh-accent) 22%, transparent),
+      transparent
+    );
+    pointer-events: none;
+  }
+  .native-hero22__plate {
+    position: relative;
+    min-inline-size: 0;
+  }
+  @media (max-width: 30rem) {
+    .native-hero22__cta--primary,
+    .native-hero22__cta--secondary {
+      flex: 1 1 100%;
+    }
+  }
+  @media (forced-colors: active) {
+    .native-hero22__cta {
+      border-color: LinkText;
+    }
+    .native-hero22__art::before {
+      display: none;
+    }
+  }
+</style>

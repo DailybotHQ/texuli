@@ -443,16 +443,16 @@ describe('footer Dailybot credit (PLAN_007)', () => {
   });
 
   it('shows the black logo on light modes and the white one on dark, forced colors by scheme', () => {
-    const css = (footer.match(/<style>([\s\S]*?)<\/style>/)?.[1] ?? '').replace(
+    const css = (footer.match(/<style(?: is:global)?>([\s\S]*?)<\/style>/)?.[1] ?? '').replace(
       /\/\*[\s\S]*?\*\//g,
       ''
     );
     expect(css).toMatch(/\.site-footer__credit-dark \{\s*display: none;/);
     expect(css).toMatch(
-      /:root\[data-tx-mode='dark'\]\) \.site-footer__credit-light \{\s*display: none;/
+      /:root\[data-tx-mode='dark'\] \.site-footer \.site-footer__credit-light \{\s*display: none;/
     );
     expect(css).toMatch(
-      /:root\[data-tx-mode='dark'\]\) \.site-footer__credit-dark \{\s*display: block;/
+      /:root\[data-tx-mode='dark'\] \.site-footer \.site-footer__credit-dark \{\s*display: block;/
     );
     expect(css).toMatch(/@media \(forced-colors: active\) and \(prefers-color-scheme: dark\)/);
     expect(css).toMatch(/\.site-footer__credit \{[^}]*color: var\(--tx-muted-foreground\);/);

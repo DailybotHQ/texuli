@@ -1,0 +1,16 @@
+---
+/**
+ * `/guides/solutions/sheets/` — Sheets technical docs (ADR-028). Content lives in
+ * `src/content/solution-docs/sheets/`; `SolutionDocsPage` renders it.
+ */
+import SolutionDocsPage from '../../../../components/solutions/docs-layout/SolutionDocsPage.astro';
+import { loadSheetsDocs } from '../../../../content/solution-docs/sheets/index.ts';
+import { getSolution } from '../../../../data/solutions/index.ts';
+---
+
+<SolutionDocsPage
+  entry={getSolution('sheets')}
+  title="Sheets docs"
+  description="Install @texuli/sheets, load a workbook, evaluate formulas, show the grid. In development. Owned formula engine."
+  sections={loadSheetsDocs()}
+/>
