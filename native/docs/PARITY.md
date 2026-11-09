@@ -11,9 +11,9 @@ every other component paints a visible placeholder. Native is in development.
 
 | Measure | Count |
 | --- | --- |
-| Catalog components | 174 |
+| Catalog components | 187 |
 | Painted natively | 52 |
-| Placeholder natively | 122 |
+| Placeholder natively | 135 |
 | Agent-emittable components | 75 |
 | Agent-emittable and painted natively | 52 |
 | Painted read-only (interactive on the web) | 9 |
@@ -25,7 +25,7 @@ every other component paints a visible placeholder. Native is in development.
 
 So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes**
 (validation, label interpolation and the golden semantic traces match); **for painting, not yet**
-(52 of 174 components).
+(52 of 187 components).
 
 ## Capabilities
 
@@ -48,14 +48,14 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | Group | Components | Painted natively |
 | --- | --- | --- |
 | canvas | 1 | 0 |
-| chat | 2 | 0 |
+| chat | 3 | 0 |
 | composition | 4 | 4 |
 | content | 35 | 30 |
 | data | 12 | 12 |
-| display | 22 | 0 |
+| display | 32 | 0 |
 | documents | 1 | 0 |
 | forms | 30 | 0 |
-| layouts | 27 | 6 |
+| layouts | 29 | 6 |
 | overlays | 26 | 0 |
 | schema-forms | 1 | 0 |
 | sheets | 1 | 0 |
@@ -66,11 +66,13 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 
 | Id | Group | Agent-emittable | Web | Native | Semantic rule | Golden trace | Parity trace |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| `accordion` | display | — | renders | placeholder | — | — | — |
 | `action-form` | state | yes | renders | placeholder | — | yes | — |
 | `alert` | display | — | renders | placeholder | — | — | — |
 | `alert-dialog` | overlays | — | renders | placeholder | — | — | — |
 | `analytics-grid` | layouts | — | renders | placeholder | — | — | — |
 | `app-nav` | overlays | — | renders | placeholder | — | — | — |
+| `avatar` | display | — | renders | placeholder | — | — | — |
 | `avatar-group-grid` | display | — | renders | placeholder | — | — | — |
 | `badge` | display | — | renders | placeholder | — | — | — |
 | `banner` | display | — | renders | placeholder | — | — | — |
@@ -83,6 +85,7 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `blocks-media` | content | yes | renders | painted | — | — | yes |
 | `blocks-structure` | content | yes | renders | painted | — | — | yes |
 | `blocks-text` | content | yes | renders | painted | — | yes | yes |
+| `bottom-nav` | layouts | — | renders | placeholder | — | — | — |
 | `box` | display | — | renders | placeholder | — | — | — |
 | `breadcrumb` | overlays | — | renders | placeholder | — | — | — |
 | `button` | forms | — | renders | placeholder | — | — | — |
@@ -90,6 +93,7 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `callout` | display | — | renders | placeholder | — | — | — |
 | `canvas` | canvas | yes | renders | placeholder | yes | yes | — |
 | `card` | display | — | renders | placeholder | — | — | — |
+| `carousel` | display | — | renders | placeholder | — | — | — |
 | `charts-area` | content | yes | renders | painted | yes | — | yes |
 | `charts-bar` | content | yes | renders | painted | yes | yes | yes |
 | `charts-bubble` | content | yes | renders | painted | yes | — | yes |
@@ -121,6 +125,7 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `code-field` | forms | — | renders | placeholder | — | — | — |
 | `combobox` | forms | — | renders | placeholder | — | — | — |
 | `command-palette` | overlays | — | renders | placeholder | — | — | — |
+| `composer` | chat | — | renders | placeholder | — | — | — |
 | `content-layout` | layouts | — | renders | placeholder | — | — | — |
 | `context-menu` | overlays | — | renders | placeholder | — | — | — |
 | `context-menu-trigger` | overlays | — | renders | placeholder | — | — | — |
@@ -163,6 +168,7 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `host-region` | state | yes | renders | placeholder | — | — | — |
 | `hover-card` | overlays | — | renders | placeholder | — | — | — |
 | `hover-card-content` | overlays | — | renders | placeholder | — | — | — |
+| `icon` | display | — | renders | placeholder | — | — | — |
 | `icon-button` | forms | — | renders | placeholder | — | — | — |
 | `inline-text` | display | — | renders | placeholder | — | — | — |
 | `input` | forms | — | renders | placeholder | — | — | — |
@@ -195,17 +201,20 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `layout-tile` | composition | yes | renders | painted | yes | yes | — |
 | `layout-top-nav` | layouts | — | renders | placeholder | — | — | — |
 | `layout-wizard` | layouts | — | renders | placeholder | — | — | — |
+| `list-item` | display | — | renders | placeholder | — | — | — |
 | `media-composition-canvas` | content | yes | renders | placeholder | — | — | — |
 | `media-composition-svg` | content | yes | renders | placeholder | — | — | — |
 | `media-image` | content | yes | renders | painted | yes | yes | — |
 | `menubar` | overlays | — | renders | placeholder | — | — | — |
 | `menubar-trigger` | overlays | — | renders | placeholder | — | — | — |
+| `mobile-header` | layouts | — | renders | placeholder | — | — | — |
 | `multi-select` | forms | — | renders | placeholder | — | — | — |
 | `nav-icon` | layouts | — | renders | placeholder | — | — | — |
 | `navigation-menu` | overlays | — | renders | placeholder | — | — | — |
 | `pagination` | overlays | — | renders | placeholder | — | — | — |
 | `popover` | overlays | — | renders | placeholder | — | — | — |
 | `popover-content` | overlays | — | renders | placeholder | — | — | — |
+| `progress` | display | — | renders | placeholder | — | — | — |
 | `prose` | display | — | renders | placeholder | — | — | — |
 | `radio` | forms | — | renders | placeholder | — | — | — |
 | `radio-group` | forms | — | renders | placeholder | — | — | — |
@@ -222,15 +231,19 @@ So the answer to "is web and native at 1:1 parity?" is: **for the contract, yes*
 | `select-trigger` | forms | — | renders | placeholder | — | — | — |
 | `select-value` | forms | — | renders | placeholder | — | — | — |
 | `select-viewport` | forms | — | renders | placeholder | — | — | — |
+| `separator` | display | — | renders | placeholder | — | — | — |
 | `sheet` | overlays | — | renders | placeholder | — | — | — |
 | `sidebar` | overlays | — | renders | placeholder | — | — | — |
+| `skeleton` | display | — | renders | placeholder | — | — | — |
 | `sortable-list` | state | yes | renders | placeholder | — | yes | — |
+| `spinner` | display | — | renders | placeholder | — | — | — |
 | `split-view` | layouts | — | renders | placeholder | — | — | — |
 | `spreadsheet` | sheets | yes | renders | placeholder | — | — | — |
 | `stat` | display | — | renders | placeholder | — | — | — |
 | `stepper` | display | — | renders | placeholder | — | — | — |
 | `switch` | forms | — | renders | placeholder | — | — | — |
 | `table` | display | — | renders | placeholder | — | — | — |
+| `tabs` | display | — | renders | placeholder | — | — | — |
 | `tag` | display | — | renders | placeholder | — | — | — |
 | `text` | display | — | renders | placeholder | — | — | — |
 | `text-counter` | forms | — | renders | placeholder | — | — | — |
