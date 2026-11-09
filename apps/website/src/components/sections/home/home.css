@@ -83,3 +83,52 @@
     box-shadow: none;
   }
 }
+
+/*
+ * Home 2.2 "Accessible and owned" band: the computed proof row, rendered inside the story
+ * copy column (the former proof band merged into T9).
+ */
+.landing .home-own-proof {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr));
+  gap: 0.75rem;
+  inline-size: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.landing .home-own-proof a {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid color-mix(in oklab, var(--home-accent) 20%, var(--tx-border));
+  border-radius: 0.875rem;
+  background: var(--tx-background);
+  color: var(--tx-foreground);
+  text-decoration: none;
+}
+.landing .home-own-proof a:hover {
+  border-color: var(--home-accent);
+}
+.landing .home-own-proof a:focus-visible {
+  outline: 2px solid var(--tx-ring);
+  outline-offset: 2px;
+}
+.landing .home-own-proof__value {
+  color: var(--home-accent-text);
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.landing .home-own-proof__label {
+  color: var(--tx-muted-foreground);
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+@media (forced-colors: active) {
+  .landing .home-own-proof a {
+    border-color: LinkText;
+  }
+}
