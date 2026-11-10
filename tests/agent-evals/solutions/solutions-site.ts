@@ -8,7 +8,9 @@
  * - `/md-manifest.json` and one Markdown twin per Solution docs page
  *   (`/guides/solutions/<slug>/`), made from the docs content the page renders
  *   (`apps/website/src/content/solution-docs/<slug>/`), so `site.read` answers with the real
- *   docs text.
+ *   docs text. Design systems has no `solution-docs` content: its docs page is a short Astro
+ *   page (`apps/website/src/pages/guides/solutions/design-systems/index.astro`), so its twin
+ *   is that page's template text with the markup removed.
  *
  * `fetch` has the `env.ASSETS` shape the remote MCP door (`functions/mcp.ts`) reads.
  */
@@ -26,6 +28,28 @@ import { solutionsIndexDocument } from '../../../apps/website/src/lib/twins/solu
 export const SITE = 'https://texuli.com';
 const REPO = resolve(import.meta.dirname, '../../..');
 
+/**
+ * The design-systems docs page as text: each `<section>` of the committed Astro template,
+ * headings as `##`, list items as `-`, every other tag removed. Text only, never executed.
+ */
+export function loadDesignSystemsDocs(): readonly { id: string; source: string }[] {
+  const page = readFileSync(
+    resolve(REPO, 'apps/website/src/pages/guides/solutions/design-systems/index.astro'),
+    'utf8'
+  );
+  const template = page.slice(page.indexOf('---', 3) + 3);
+  return [...template.matchAll(/<section>([\s\S]*?)<\/section>/g)].map((match, index) => {
+    const source = (match[1] as string)
+      .replace(/<h2[^>]*>([\s\S]*?)<\/h2>/g, '## $1\n')
+      .replace(/<li>([\s\S]*?)<\/li>/g, '- $1\n')
+      .replace(/<[^>]+>/g, '')
+      .replace(/[ \t]+/g, ' ')
+      .replace(/\n\s+/g, '\n')
+      .trim();
+    return { id: `section-${index + 1}`, source };
+  });
+}
+
 /** The docs sections of each Solution, in reading order (the docs page renders these). */
 const DOCS: Readonly<Record<SolutionSlug, () => readonly { id: string; source: string }[]>> = {
   slides: loadSlidesDocs,
@@ -33,6 +57,7 @@ const DOCS: Readonly<Record<SolutionSlug, () => readonly { id: string; source: s
   workflows: loadWorkflowsDocs,
   canvas: loadCanvasDocs,
   sheets: loadSheetsDocs,
+  'design-systems': loadDesignSystemsDocs,
 };
 
 /** The twin of a Solution docs page: a header block, then every docs section. */
