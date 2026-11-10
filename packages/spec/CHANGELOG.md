@@ -97,7 +97,7 @@ allowing `acme:kpi-strip` passed the host's check and failed
   issue's `source`.
 - `loadMergedCatalog(extensions, { catalog? })` returns the same merge for
   your own code: `{ ok, catalog, extensions, issues }`
-  ([ds-check](../packages/tools/docs/ds-check.md)).
+  ([ds-check](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ds-check.md)).
 
 ## 0.16.0
 
@@ -211,7 +211,7 @@ has, and who approved that version.
   `unknown-variant`, `unknown-size`, `unknown-tone`, `unknown-density`,
   `unknown-state`). An approval records who approved; it cannot prove it: a
   reviewed commit through `CODEOWNERS` is the guarantee
-  ([DESIGN_SYSTEMS](DESIGN_SYSTEMS.md#locked-design-systems)).
+  ([DESIGN_SYSTEMS](https://github.com/DailybotHQ/texuli/blob/main/docs/DESIGN_SYSTEMS.md#locked-design-systems)).
 - `extends`, variants and patches carry `allow` and `library` (a child list
   replaces the base's, `null` removes an entry); `approval` is never
   inherited.
@@ -252,7 +252,7 @@ has, and who approved that version.
   stable refusal codes (`extension-collision`, `extension-composes` and
   seven more) over bounded input, and allow sets, the allow manifest and the
   kit read the merged catalog
-  ([catalog/extensions](../packages/spec/catalog/extensions/README.md)).
+  ([catalog/extensions](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/catalog/extensions/README.md)).
 - Every catalog component root carries `data-tx-component` and, where it
   has the axis, `data-tx-variant`, `data-tx-size`, `data-tx-tone` and
   `data-tx-density` (names and `dsRootAttributes` in
@@ -370,7 +370,7 @@ adapters onto `@texuli/data`:
   Move menu. With a snippet the chip has no `aria-label`; it is named by
   its visible content plus visually hidden details (time, date, "press
   Enter to open"), so the visible text always leads the name (WCAG 2.5.3)
-  ([data-calendar-reschedule](../packages/data/docs/data-calendar-reschedule.md)).
+  ([data-calendar-reschedule](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-calendar-reschedule.md)).
 - **P-T-02: month overflow.** `maxEventsPerDay` (default 3, the behavior
   before) and `onMoreEvents(date)`. With `onMoreEvents`, "N more events"
   is a button named like "3 more events on November 5" (the new
@@ -383,7 +383,7 @@ adapters onto `@texuli/data`:
   heading. A collapsed lane hides its cards behind the new `hiddenCards`
   label and still counts in column totals and WIP limits; a card held by
   keyboard that enters it opens it
-  ([data-board](../packages/data/docs/data-board.md)).
+  ([data-board](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-board.md)).
 - **P-T-04: `Board` `cellFooter(column, lane)`**, rendered at the end of
   each column-by-lane cell. Without lanes, `lane` is `DEFAULT_LANE`
   (`{ id: '', title: '' }`, exported).
@@ -417,24 +417,24 @@ It carries the gaps the consumer Dailybot found through Protoyard:
   path data by name in Svelte context (SSR-safe, no module global), and
   `<Icon icon="name">` draws them. Augment the `IconNames` interface to
   type the names. The built-in names keep their glyphs and cannot be
-  replaced ([ui-icons](../packages/texuli/docs/ui-icons.md)).
+  replaced ([ui-icons](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-icons.md)).
 - **D-G-022: `CodeField` in a new subpath, `@texuli/blocks/code-field`.**
   An editable, syntax-highlighted field: a transparent textarea over token
   elements, with no HTML sinks. Tab indents, Shift+Tab outdents, Enter
   keeps the indentation, and Escape then Tab leaves the field. Past 20,000
   characters it is a plain textarea. Its labels come from the label
-  dictionary ([code](../packages/blocks/docs/code.md)).
+  dictionary ([code](https://github.com/DailybotHQ/texuli/blob/main/packages/blocks/docs/code.md)).
 - **D-G-023: a light and dark image pair (`@texuli/media/image`).**
   `Image` takes `srcDark` and `darkMode` (`'theme'` by default, or
   `'system'`). In `theme` mode it follows Texuli's explicit color mode over
   the OS preference, and with the default lazy loading only the shown image
   downloads. `srcDark` passes the same URL policy, at the same tier, as
-  `src` ([image](../packages/media/docs/image.md)).
+  `src` ([image](https://github.com/DailybotHQ/texuli/blob/main/packages/media/docs/image.md)).
 - **D-G-024: `AvatarGroupGrid` (`texuli/avatar`).** A collage of up to four
   faces in one circle, with `+N` past four. It is a component of its own
   rather than an `AvatarGroup` layout, so the `texuli` root stays within its
   size ceiling (the Protoyard ui package it replaces)
-  ([ui-avatar](../packages/texuli/docs/ui-avatar.md)).
+  ([ui-avatar](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-avatar.md)).
 
 **Known gaps in 0.13.1 (planned, not done).**
 
@@ -464,7 +464,7 @@ unchanged), and `^0.12.0` installs pick it up.
 - **Published with tokens refused.** Every published package is set to
   "Require 2FA and disallow tokens" (`npm access set mfa=publish`,
   2026-11-03), so trusted publishing from `publish.yml` is the only way a
-  release reaches npm ([CI](CI.md#publishing-to-npm)). This release checks
+  release reaches npm ([CI](https://github.com/DailybotHQ/texuli/blob/main/docs/CI.md#publishing-to-npm)). This release checks
   that path end to end, including the workflow's verification of `latest`
   and provenance on npm.
 - **Site fixes since `0.12.2` (not in the packages).** The header light and
@@ -483,7 +483,7 @@ unchanged), and `^0.12.0` installs pick it up.
   `NPM_TOKEN`: npm exchanges the workflow's OIDC token for a short-lived
   publish right, and the tarballs keep their signed provenance. The
   workflow installs npm `11.20.0` first, and a tag push no longer starts a
-  publish ([CI](CI.md#publishing-to-npm)). The packages are republished
+  publish ([CI](https://github.com/DailybotHQ/texuli/blob/main/docs/CI.md#publishing-to-npm)). The packages are republished
   so the release goes out this way.
 - **`next` stays on `0.12.1`.** The workflow publishes with `--tag latest`
   only, so `latest` moves to `0.12.2` and `next` is no longer maintained
@@ -640,20 +640,20 @@ codes, compiled to `--tx-*` variables with enforced contrast, focus and
 target sizes, applied at runtime or on the server, imported from and
 emitted to the common token formats, carried by blueprints, documents,
 decks and every output writer, checked by `texuli ds check`, and served to
-agents by the `ds.*` operations ([DESIGN_SYSTEMS](DESIGN_SYSTEMS.md),
+agents by the `ds.*` operations ([DESIGN_SYSTEMS](https://github.com/DailybotHQ/texuli/blob/main/docs/DESIGN_SYSTEMS.md),
 ADR-021 to ADR-024). It also removes the 0.8 MCP tool names and the tree
 block's `style` key, closes the Protoyard gaps G100–G124, and ships blueprint
 spec `0.10.0`.
 
 **Design systems** (ADR-021 to ADR-024; the guide is
-[DESIGN_SYSTEMS](DESIGN_SYSTEMS.md), with three fictional example brands in
+[DESIGN_SYSTEMS](https://github.com/DailybotHQ/texuli/blob/main/docs/DESIGN_SYSTEMS.md), with three fictional example brands in
 `examples/design-systems/`).
 
 - **`@texuli/spec/design-system`** (new subpath): `validateDesignSystem`
   with stable codes and JSON paths, `DesignSystemPatch` with
   `validateDesignSystemPatch` and `applyDesignSystemPatch`,
   `migrateDesignSystem` and `checkDesignSystemReference`
-  ([design-system.md](../packages/spec/docs/design-system.md)).
+  ([design-system.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/design-system.md)).
 - **Design systems in blueprints and documents** (T-ds-blueprint,
   ADR-024): `validateDraft` (`@texuli/catalog`) checks the envelope's
   `designSystem` (a new `design-system` check; the host passes
@@ -931,7 +931,7 @@ the only verdict.
   advances, slides scale on a fixed canvas), and `@texuli/slides` moves to
   layer L8 with new dependencies on `@texuli/deck` and `@texuli/player`. The
   upgrade path is
-  [packages/slides/docs/migration.md](../packages/slides/docs/migration.md).
+  [packages/slides/docs/migration.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/migration.md).
 - **Blueprint spec 0.4.0** (ADR-009 addendum): additive. `layout-deck` and
   `deck-slide` gain optional deck model v2 props, and the
   `0.3.0 → 0.4.0` migration only stamps `spec`. The digest pin is in

@@ -107,7 +107,7 @@ allowing `acme:kpi-strip` passed the host's check and failed
   issue's `source`.
 - `loadMergedCatalog(extensions, { catalog? })` returns the same merge for
   your own code: `{ ok, catalog, extensions, issues }`
-  ([ds-check](../packages/tools/docs/ds-check.md)).
+  ([ds-check](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ds-check.md)).
 
 ## 0.16.0
 
@@ -261,7 +261,7 @@ has, and who approved that version.
   `unknown-variant`, `unknown-size`, `unknown-tone`, `unknown-density`,
   `unknown-state`). An approval records who approved; it cannot prove it: a
   reviewed commit through `CODEOWNERS` is the guarantee
-  ([DESIGN_SYSTEMS](DESIGN_SYSTEMS.md#locked-design-systems)).
+  ([DESIGN_SYSTEMS](https://github.com/DailybotHQ/texuli/blob/main/docs/DESIGN_SYSTEMS.md#locked-design-systems)).
 - `extends`, variants and patches carry `allow` and `library` (a child list
   replaces the base's, `null` removes an entry); `approval` is never
   inherited.
@@ -302,7 +302,7 @@ has, and who approved that version.
   stable refusal codes (`extension-collision`, `extension-composes` and
   seven more) over bounded input, and allow sets, the allow manifest and the
   kit read the merged catalog
-  ([catalog/extensions](../packages/spec/catalog/extensions/README.md)).
+  ([catalog/extensions](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/catalog/extensions/README.md)).
 - Every catalog component root carries `data-tx-component` and, where it
   has the axis, `data-tx-variant`, `data-tx-size`, `data-tx-tone` and
   `data-tx-density` (names and `dsRootAttributes` in
@@ -320,7 +320,7 @@ has, and who approved that version.
   transparency and in forced colors), all from `--tx-*` tokens; `Heading`
   sizes `4xl`, `3xl` and `2xl` with fluid `responsive` sizing and `tight`
   tracking, and `Text` size and tone `inherit`
-  ([ui-typography](../packages/texuli/docs/ui-typography.md)).
+  ([ui-typography](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-typography.md)).
 - A linked `Card` keeps one real anchor stretched over the surface; pin and
   menu actions inside it sit above it in tab order.
 - `Icon` takes `tone`; a design system's component defaults never set it.
@@ -440,23 +440,23 @@ it a component renders as before, and there is no breaking API change.
 - UG-28: `Checkbox`, `Radio` and `Switch` take a `labelContent` snippet,
   rendered inside the same `<label for>` as `label`, for a label with markup
   (pass untrusted URLs in it through `safeHref`)
-  ([ui-choice](../packages/texuli/docs/ui-choice.md)).
+  ([ui-choice](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-choice.md)).
 - UG-40: `Field` takes `counter={{ value, max }}` and appends `12/280` to
   the description, which the control already names in `aria-describedby`:
   read on focus, with no live region
-  ([ui-field](../packages/texuli/docs/ui-field.md)).
+  ([ui-field](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-field.md)).
 - UG-44: `NumberField.Root` `display="output"` shows the value as a
   read-only spinbutton (same formatting, same name and form value) without
   border, background or steppers
-  ([ui-number-pin](../packages/texuli/docs/ui-number-pin.md)).
+  ([ui-number-pin](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-number-pin.md)).
 - UG-29: `Avatar` `tone` (`AvatarTone`: `primary`, `success`, `warning`,
   `destructive`, `info`, `neutral`) fills the initials surface with a theme
   pair, and `shape` (`circle` | `square`) sets the radius of one avatar
-  ([ui-avatar](../packages/texuli/docs/ui-avatar.md)).
+  ([ui-avatar](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-avatar.md)).
 - UG-32: `iconSize` (`ButtonIconSize`: `xs` | `sm` | `md` | `lg`) on
   `Button` and `IconButton` sizes the icon box of one button, over the
   theme's `components.button["icon-size"]`
-  ([ui-button](../packages/texuli/docs/ui-button.md)).
+  ([ui-button](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-button.md)).
 
 **Navigation, layouts and display (`texuli`).**
 
@@ -464,37 +464,37 @@ it a component renders as before, and there is no breaking API change.
   primary action.
 - UG-24: `MobileHeader` takes `eyebrow`, a `leading` snippet, and
   `closeHref` or `onClose` with `closeLabel` (the href passes `safeHref`)
-  ([layouts-mobile](../packages/texuli/docs/layouts-mobile.md)).
+  ([layouts-mobile](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-mobile.md)).
 - UG-25: `SplitView` takes `listWidth`, `breakpoint` (`sm` | `md` | `lg`),
   and a `context` snippet with `contextLabel`, a third pane from 72rem
   container width
-  ([layouts-rail-master-detail](../packages/texuli/docs/layouts-rail-master-detail.md)).
+  ([layouts-rail-master-detail](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-rail-master-detail.md)).
 - UG-43: `Stat` `tone` (`StatTone`) adds an accent stripe and icon chip,
   and `Progress` reads `--tx-progress-track` for its track
-  ([ui-stat](../packages/texuli/docs/ui-stat.md),
-  [ui-feedback](../packages/texuli/docs/ui-feedback.md)).
+  ([ui-stat](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-stat.md),
+  [ui-feedback](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-feedback.md)).
 - UG-42: `ListItem`, one row of a list (leading media or icon, title,
   description, meta, trailing controls; a link, a button or text), at the
   new subpath `texuli/list-item`; the `texuli` root does not export it
-  ([ui-list-item](../packages/texuli/docs/ui-list-item.md)).
+  ([ui-list-item](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-list-item.md)).
 
 **Chat and slides.**
 
 - UG-41: `Composer` (`@texuli/chat`) takes `layout="row"` and
   `sendButton="icon"` (the icon button keeps `labels.send` as its name).
   Keeping the draft when a send fails already worked; a test now pins it
-  ([chat docs](../packages/chat/README.md)).
+  ([chat docs](https://github.com/DailybotHQ/texuli/blob/main/packages/chat/README.md)).
 - UG-38: the `three-column-cards` layout (`@texuli/slides`) draws card
   icons from the host's Texuli icon registry. `@texuli/slides` reads the
   registry through Svelte context and does not import `texuli`, so the
   built-in icon names draw only when the host registers them; an unknown
   name keeps the card number
-  ([slides layouts](../packages/slides/docs/layouts.md)).
+  ([slides layouts](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/layouts.md)).
 - UG-39: `DeckStage` `canvasFit="reflow"` gives a landscape or square deck
   a portrait canvas on a portrait box, so layouts reflow into one column;
   `@texuli/deck/engine` adds the `reflow` `DeckFitMode` and
   `DECK_REFLOW_WIDTH` (720)
-  ([slides stage](../packages/slides/docs/stage.md)).
+  ([slides stage](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/stage.md)).
 
 **Spanish labels (UG-37).** Three opt-in catalogs hold a Spanish value for
 every English id: `texuli/i18n/es` (`TEXULI_LABELS_ES`, 187 ids, the
@@ -502,7 +502,7 @@ primitives included), `@texuli/blocks/i18n/es` (`BLOCKS_LABELS_ES`, 92)
 and `@texuli/pages/i18n/es` (`PAGES_LABELS_ES`, 163). Nothing imports them
 by default; pass them to `LabelsProvider`. They have not had a
 native-speaker review yet
-([texuli i18n](../packages/texuli/docs/i18n.md#spanish-catalogs-es)).
+([texuli i18n](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/i18n.md#spanish-catalogs-es)).
 
 **Known gaps in 0.14.3 (planned, not done).**
 
@@ -535,7 +535,7 @@ the timeline (G-056) follow below.
   `false` keeps the pressed item pressed).
 - UG-20: `Select.Root` `block` (full width). G-059: the `Select` trigger
   variant `ghost`, set per instance; it is not a design-system default
-  ([ui-select](../packages/texuli/docs/ui-select.md)).
+  ([ui-select](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-select.md)).
 - UG-21: `Sidebar` draws `item.icon` when no `itemIcon` snippet is given.
   UG-23: `badgeLabel` on `SidebarItem` and `BottomNavItem`, and `badge` and
   `badgeLabel` on `IconButton` (the badge label joins the accessible name).
@@ -554,7 +554,7 @@ the timeline (G-056) follow below.
 - `--tx-icon-button-badge-bg` and `--tx-icon-button-badge-fg`.
 - UG-30: `--tx-scrim-blur`, a `backdrop-filter` value on the dialog and
   sheet scrims (default `none`)
-  ([ui-dialog](../packages/texuli/docs/ui-dialog.md)).
+  ([ui-dialog](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-dialog.md)).
 
 **Panels and CSS.**
 
@@ -562,13 +562,13 @@ the timeline (G-056) follow below.
   size** even with short content (the browser's popover style made them
   only as tall as their content). A contained `DetailPanel` fills its
   container, which needs `position: relative`
-  ([ui-sheet](../packages/texuli/docs/ui-sheet.md)).
+  ([ui-sheet](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-sheet.md)).
 - UG-36 D: one shared scrim rule paints the dialog and sheet overlays
   (rendered output unchanged).
 - G-060: the docs explain why a scoped class from the parent's `<style>`
   never reaches a component's root, and how to reach it with `:global()`
   under a local wrapper
-  ([using-with-your-css](../packages/texuli/docs/using-with-your-css.md)).
+  ([using-with-your-css](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/using-with-your-css.md)).
 - The `texuli` root entry is about 933 B smaller gzip (217,376 B to
   216,443 B, `pnpm size` on macOS) through layer-ordered emission: the root
   imports `@texuli/core` and `@texuli/primitives` first, and no code is
@@ -606,7 +606,7 @@ adapters onto `@texuli/data`:
   Move menu. With a snippet the chip has no `aria-label`; it is named by
   its visible content plus visually hidden details (time, date, "press
   Enter to open"), so the visible text always leads the name (WCAG 2.5.3)
-  ([data-calendar-reschedule](../packages/data/docs/data-calendar-reschedule.md)).
+  ([data-calendar-reschedule](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-calendar-reschedule.md)).
 - **P-T-02: month overflow.** `maxEventsPerDay` (default 3, the behavior
   before) and `onMoreEvents(date)`. With `onMoreEvents`, "N more events"
   is a button named like "3 more events on November 5" (the new
@@ -619,7 +619,7 @@ adapters onto `@texuli/data`:
   heading. A collapsed lane hides its cards behind the new `hiddenCards`
   label and still counts in column totals and WIP limits; a card held by
   keyboard that enters it opens it
-  ([data-board](../packages/data/docs/data-board.md)).
+  ([data-board](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-board.md)).
 - **P-T-04: `Board` `cellFooter(column, lane)`**, rendered at the end of
   each column-by-lane cell. Without lanes, `lane` is `DEFAULT_LANE`
   (`{ id: '', title: '' }`, exported).
@@ -657,8 +657,8 @@ additive:
   catalog's `data-timeline` lists `groups`, `markers` and the bindable
   `collapsed` and `selectedRow`, and the closed event vocabulary gains
   `collapse`; the player paints them
-  ([data-timeline](../packages/data/docs/data-timeline.md)).
-- **Design-system format, spec `0.12.0`** ([DESIGN_SYSTEMS](DESIGN_SYSTEMS.md)).
+  ([data-timeline](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-timeline.md)).
+- **Design-system format, spec `0.12.0`** ([DESIGN_SYSTEMS](https://github.com/DailybotHQ/texuli/blob/main/docs/DESIGN_SYSTEMS.md)).
   - D-G-028: an optional `darkOpacity` per `elevation.levels` layer.
   - D-G-027 (the Texuli part): `sidebarPrimary` is derived also under a
     `color.roles.<mode>.primary` pin; an explicit `sidebarPrimary` pin is
@@ -675,36 +675,36 @@ additive:
   `avatar-group-grid` catalog ids (app tier, not agent-emittable), and
   `media-image` `srcDark` and `darkMode`. `AvatarGroup` stays planned.
 - **D-G-031: `AlertDialog` `confirmDisabled`**, for typed confirmations
-  ([ui-dialog](../packages/texuli/docs/ui-dialog.md)).
+  ([ui-dialog](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-dialog.md)).
 - **D-G-032: `Breadcrumb` items take `ariaLabel` and
-  `onSelect(item, event)`** ([ui-navigation](../packages/texuli/docs/ui-navigation.md)).
+  `onSelect(item, event)`** ([ui-navigation](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-navigation.md)).
 - **D-G-041: tabs without a rendered panel omit `aria-controls`**, and an
   item's new `panelId` points it at a region the host renders.
   `TabsContext.contentId()` can now return `undefined`, a small type change
-  ([prim-tabs](../packages/primitives/docs/prim-tabs.md)).
+  ([prim-tabs](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-tabs.md)).
 - **D-G-042: a disabled `Tooltip` no longer disables its trigger**
-  ([ui-tooltip](../packages/texuli/docs/ui-tooltip.md)).
+  ([ui-tooltip](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-tooltip.md)).
 - **D-G-039: lazy icon loaders.** `registerIcons({ name: () => import(...) },
   { fallback })` and `IconsProvider` `fallback`, with the types
   `IconLoader` and `IconRegistryOptions`
-  ([ui-icons](../packages/texuli/docs/ui-icons.md)).
+  ([ui-icons](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-icons.md)).
 - **D-G-046: `MotionLoop`** in the new subpath `texuli/motion/loop`
   (presets `pulse` and `wave`), static under reduced motion. It is not in
   the blueprint motion vocabulary: a loop could not be stopped there (WCAG
-  2.2.2) ([ui-motion](../packages/texuli/docs/ui-motion.md)).
+  2.2.2) ([ui-motion](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-motion.md)).
 - **D-G-048: dialog and sheet scrims read `--tx-scrim`** (its color, with
   the existing opacity tokens), not the foreground, so dark scrims are dark
-  again ([ui-dialog](../packages/texuli/docs/ui-dialog.md),
-  [ui-sheet](../packages/texuli/docs/ui-sheet.md)).
+  again ([ui-dialog](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-dialog.md),
+  [ui-sheet](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-sheet.md)).
 - **D-G-049: a fixed y domain and a value format on cartesian charts.**
   `yDomain` (`[min, max]`, either end `'auto'`) and `formatValue` on
   `CartesianChart` and the five cartesian charts; marks outside a fixed
   domain are clipped, and the data table keeps the true values. App-level
   props, not in the agent catalog
-  ([charts-cartesian](../packages/charts/docs/charts-cartesian.md)).
+  ([charts-cartesian](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-cartesian.md)).
 - **D-G-050: `TabItem` `attributes`** put `data-*` attributes (for example
   `data-testid`) on each tab trigger
-  ([ui-tabs-accordion](../packages/texuli/docs/ui-tabs-accordion.md)).
+  ([ui-tabs-accordion](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-tabs-accordion.md)).
 - **D-G-031b** needs nothing more: `AlertDialog` `confirmDisabled` (D-G-031)
   keeps a typed confirmation an `alertdialog`.
 
@@ -729,24 +729,24 @@ It carries the gaps the consumer Dailybot found through Protoyard:
   path data by name in Svelte context (SSR-safe, no module global), and
   `<Icon icon="name">` draws them. Augment the `IconNames` interface to
   type the names. The built-in names keep their glyphs and cannot be
-  replaced ([ui-icons](../packages/texuli/docs/ui-icons.md)).
+  replaced ([ui-icons](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-icons.md)).
 - **D-G-022: `CodeField` in a new subpath, `@texuli/blocks/code-field`.**
   An editable, syntax-highlighted field: a transparent textarea over token
   elements, with no HTML sinks. Tab indents, Shift+Tab outdents, Enter
   keeps the indentation, and Escape then Tab leaves the field. Past 20,000
   characters it is a plain textarea. Its labels come from the label
-  dictionary ([code](../packages/blocks/docs/code.md)).
+  dictionary ([code](https://github.com/DailybotHQ/texuli/blob/main/packages/blocks/docs/code.md)).
 - **D-G-023: a light and dark image pair (`@texuli/media/image`).**
   `Image` takes `srcDark` and `darkMode` (`'theme'` by default, or
   `'system'`). In `theme` mode it follows Texuli's explicit color mode over
   the OS preference, and with the default lazy loading only the shown image
   downloads. `srcDark` passes the same URL policy, at the same tier, as
-  `src` ([image](../packages/media/docs/image.md)).
+  `src` ([image](https://github.com/DailybotHQ/texuli/blob/main/packages/media/docs/image.md)).
 - **D-G-024: `AvatarGroupGrid` (`texuli/avatar`).** A collage of up to four
   faces in one circle, with `+N` past four. It is a component of its own
   rather than an `AvatarGroup` layout, so the `texuli` root stays within its
   size ceiling (the Protoyard ui package it replaces)
-  ([ui-avatar](../packages/texuli/docs/ui-avatar.md)).
+  ([ui-avatar](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-avatar.md)).
 
 ## 0.13.0
 
@@ -780,7 +780,7 @@ It carries the gaps the consumers Protoyard, Dailybot and Corag found:
   - C-G-007: an `extensions` map of product tokens, compiled to
     `--tx-ext-<name>` and, with an `on` color, `--tx-ext-<name>-foreground`.
   - `DESIGN_SYSTEM_COMPILER_VERSION` `2`: compiled hashes change; old
-    documents stay valid ([DESIGN_SYSTEMS](DESIGN_SYSTEMS.md)).
+    documents stay valid ([DESIGN_SYSTEMS](https://github.com/DailybotHQ/texuli/blob/main/docs/DESIGN_SYSTEMS.md)).
 - **D-G-013: `texuli ds check --render` works in a consumer.** The
   conformance sheet and its third-party license notices ship in
   `@texuli/tools` (`--sheet builtin` is the default), and a missing
@@ -816,7 +816,7 @@ unchanged), and `^0.12.0` installs pick it up.
 - **Published with tokens refused.** Every published package is set to
   "Require 2FA and disallow tokens" (`npm access set mfa=publish`,
   2026-11-03), so trusted publishing from `publish.yml` is the only way a
-  release reaches npm ([CI](CI.md#publishing-to-npm)). This release checks
+  release reaches npm ([CI](https://github.com/DailybotHQ/texuli/blob/main/docs/CI.md#publishing-to-npm)). This release checks
   that path end to end, including the workflow's verification of `latest`
   and provenance on npm.
 - **Site fixes since `0.12.2` (not in the packages).** The header light and
@@ -835,7 +835,7 @@ unchanged), and `^0.12.0` installs pick it up.
   `NPM_TOKEN`: npm exchanges the workflow's OIDC token for a short-lived
   publish right, and the tarballs keep their signed provenance. The
   workflow installs npm `11.20.0` first, and a tag push no longer starts a
-  publish ([CI](CI.md#publishing-to-npm)). The packages are republished
+  publish ([CI](https://github.com/DailybotHQ/texuli/blob/main/docs/CI.md#publishing-to-npm)). The packages are republished
   so the release goes out this way.
 - **`next` stays on `0.12.1`.** The workflow publishes with `--tag latest`
   only, so `latest` moves to `0.12.2` and `next` is no longer maintained
@@ -1115,20 +1115,20 @@ codes, compiled to `--tx-*` variables with enforced contrast, focus and
 target sizes, applied at runtime or on the server, imported from and
 emitted to the common token formats, carried by blueprints, documents,
 decks and every output writer, checked by `texuli ds check`, and served to
-agents by the `ds.*` operations ([DESIGN_SYSTEMS](DESIGN_SYSTEMS.md),
+agents by the `ds.*` operations ([DESIGN_SYSTEMS](https://github.com/DailybotHQ/texuli/blob/main/docs/DESIGN_SYSTEMS.md),
 ADR-021 to ADR-024). It also removes the 0.8 MCP tool names and the tree
 block's `style` key, closes the Protoyard gaps G100–G124, and ships blueprint
 spec `0.10.0`.
 
 **Design systems** (ADR-021 to ADR-024; the guide is
-[DESIGN_SYSTEMS](DESIGN_SYSTEMS.md), with three fictional example brands in
+[DESIGN_SYSTEMS](https://github.com/DailybotHQ/texuli/blob/main/docs/DESIGN_SYSTEMS.md), with three fictional example brands in
 `examples/design-systems/`).
 
 - **`@texuli/spec/design-system`** (new subpath): `validateDesignSystem`
   with stable codes and JSON paths, `DesignSystemPatch` with
   `validateDesignSystemPatch` and `applyDesignSystemPatch`,
   `migrateDesignSystem` and `checkDesignSystemReference`
-  ([design-system.md](../packages/spec/docs/design-system.md)).
+  ([design-system.md](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/docs/design-system.md)).
 - **Design systems in blueprints and documents** (T-ds-blueprint,
   ADR-024): `validateDraft` (`@texuli/catalog`) checks the envelope's
   `designSystem` (a new `design-system` check; the host passes
@@ -1924,7 +1924,7 @@ when upgrading from `0.5.0`:
   group run a caller's handler first and then their own, unless the caller
   called `event.preventDefault()` (actions) or always (bookkeeping such as
   focus and blur). Before, some of them dropped or replaced it. The order is
-  in [STANDARDS](STANDARDS.md#component-api-contract).
+  in [STANDARDS](https://github.com/DailybotHQ/texuli/blob/main/docs/STANDARDS.md#component-api-contract).
 - **`texuli/avatar` (G58):** after an image error, `data-avatar` is
   `initials` (it stayed `image`). Host styles keyed on it change state.
 - **`@texuli/primitives/date-field` (G65):** `onValueChange` and
@@ -1985,7 +1985,7 @@ render nothing are listed as exclusions. Contract tests
 package exports, so a new export without a case fails. The rules (rest
 attributes and `ref`, the form-control split, the Field rule, handler order,
 callback naming, `onValueChange` payloads) are in
-[STANDARDS](STANDARDS.md#component-api-contract). The layouts
+[STANDARDS](https://github.com/DailybotHQ/texuli/blob/main/docs/STANDARDS.md#component-api-contract). The layouts
 (`texuli/layouts/*`) are not under the contract yet (planned). The catalog coverage gate lists the new `MarketingSectionHeader` (marketing chrome) and `MotionProvider` (a contentless utility) as exclusions, raising its ceiling from 208 to 210 under the same rule as 0.5.0: chrome and parts get exclusion rows, content gets a manifest.
 
 **Motion (ADR-013).** `@texuli/tokens/motion` holds 5 durations, 5 easings
@@ -2065,7 +2065,7 @@ data, media, chat, blocks, catalog, tools, astro, player, slides.
 | G28 | `texuli/menus` | `destructive` tone on menu `Item`s |
 | G29 | `texuli/tabs-accordion` | Tab item `icon` (`IconRef`, decorative) |
 | G30 | `texuli/navigation` | `Pagination` `stableCount` (constant token count, page buttons sized for the widest number) and `getStablePageTokens` |
-| G31 | docs | `--tx-app-height` documented for `AppShell`, the app layouts and `MobileAppFrame` ([layouts-shells](../packages/texuli/docs/layouts-shells.md)) |
+| G31 | docs | `--tx-app-height` documented for `AppShell`, the app layouts and `MobileAppFrame` ([layouts-shells](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/layouts-shells.md)) |
 | G34 | `texuli/card` | A link `Card` passes `target`, `rel` (always with `noopener` for `_blank`) and `download` |
 | G36 | `texuli/kbd-code` | `CopyButton` `onCopy(value)` and `onCopyError(value)` |
 | G37 | `texuli/badge` | `Tag` remove button named after the tag; `removeLabel` takes a template, a prefix or a function |
@@ -2149,7 +2149,7 @@ catalog, tools, astro, player, slides. `@texuli/editor` goes out after
   advances, slides scale on a fixed canvas), and `@texuli/slides` moves to
   layer L8 with new dependencies on `@texuli/deck` and `@texuli/player`. The
   upgrade path is
-  [packages/slides/docs/migration.md](../packages/slides/docs/migration.md).
+  [packages/slides/docs/migration.md](https://github.com/DailybotHQ/texuli/blob/main/packages/slides/docs/migration.md).
 - **Blueprint spec 0.4.0** (ADR-009 addendum): additive. `layout-deck` and
   `deck-slide` gain optional deck model v2 props, and the
   `0.3.0 → 0.4.0` migration only stamps `spec`. The digest pin is in

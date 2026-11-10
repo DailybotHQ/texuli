@@ -107,7 +107,7 @@ has, and who approved that version.
   stable refusal codes (`extension-collision`, `extension-composes` and
   seven more) over bounded input, and allow sets, the allow manifest and the
   kit read the merged catalog
-  ([catalog/extensions](../packages/spec/catalog/extensions/README.md)).
+  ([catalog/extensions](https://github.com/DailybotHQ/texuli/blob/main/packages/spec/catalog/extensions/README.md)).
 - Every catalog component root carries `data-tx-component` and, where it
   has the axis, `data-tx-variant`, `data-tx-size`, `data-tx-tone` and
   `data-tx-density` (names and `dsRootAttributes` in
@@ -145,20 +145,20 @@ the timeline (G-056) follow below.
   once, and the Portal's move then hid it without an event, so a dialog
   mounted open (a deep link) painted no backdrop. The Overlay now waits for
   the Portal's `placed` flag, as the panel already did
-  ([prim-dialog](../packages/primitives/docs/prim-dialog.md)).
+  ([prim-dialog](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-dialog.md)).
 - **A non-modal `Popover` or `Select` no longer pulls focus back to its
   trigger** when the close ends and focus already moved to another overlay
   (a menu, a second popover, opened in the same handler). Focus returns to
   the trigger only when it is lost (on `body`) or still inside the closing
   content. Only visible with exit motion, where `motion={{ exit: false }}`
-  was the workaround ([prim-popover](../packages/primitives/docs/prim-popover.md)).
+  was the workaround ([prim-popover](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-popover.md)).
 - **UG-27: a controlled `Toggle` renders its prop.** With `pressed` and
   `onPressedChange` the handler owns the state, and a handler that ignores
   the change keeps `aria-pressed` as it was; `ToggleGroup` follows the same
   rule for `value` and `onValueChange`. Behavior note: `bind:pressed`
   together with `onPressedChange` no longer writes the bound value by
   itself; set it in the handler, or use a function binding
-  ([prim-toggle](../packages/primitives/docs/prim-toggle.md)).
+  ([prim-toggle](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-toggle.md)).
 
 **Panels and CSS.**
 
@@ -166,13 +166,13 @@ the timeline (G-056) follow below.
   size** even with short content (the browser's popover style made them
   only as tall as their content). A contained `DetailPanel` fills its
   container, which needs `position: relative`
-  ([ui-sheet](../packages/texuli/docs/ui-sheet.md)).
+  ([ui-sheet](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-sheet.md)).
 - UG-36 D: one shared scrim rule paints the dialog and sheet overlays
   (rendered output unchanged).
 - G-060: the docs explain why a scoped class from the parent's `<style>`
   never reaches a component's root, and how to reach it with `:global()`
   under a local wrapper
-  ([using-with-your-css](../packages/texuli/docs/using-with-your-css.md)).
+  ([using-with-your-css](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/using-with-your-css.md)).
 - The `texuli` root entry is about 933 B smaller gzip (217,376 B to
   216,443 B, `pnpm size` on macOS) through layer-ordered emission: the root
   imports `@texuli/core` and `@texuli/primitives` first, and no code is
@@ -197,7 +197,7 @@ adapters onto `@texuli/data`:
   Move menu. With a snippet the chip has no `aria-label`; it is named by
   its visible content plus visually hidden details (time, date, "press
   Enter to open"), so the visible text always leads the name (WCAG 2.5.3)
-  ([data-calendar-reschedule](../packages/data/docs/data-calendar-reschedule.md)).
+  ([data-calendar-reschedule](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-calendar-reschedule.md)).
 - **P-T-02: month overflow.** `maxEventsPerDay` (default 3, the behavior
   before) and `onMoreEvents(date)`. With `onMoreEvents`, "N more events"
   is a button named like "3 more events on November 5" (the new
@@ -210,7 +210,7 @@ adapters onto `@texuli/data`:
   heading. A collapsed lane hides its cards behind the new `hiddenCards`
   label and still counts in column totals and WIP limits; a card held by
   keyboard that enters it opens it
-  ([data-board](../packages/data/docs/data-board.md)).
+  ([data-board](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-board.md)).
 - **P-T-04: `Board` `cellFooter(column, lane)`**, rendered at the end of
   each column-by-lane cell. Without lanes, `lane` is `DEFAULT_LANE`
   (`{ id: '', title: '' }`, exported).
@@ -244,24 +244,24 @@ It carries the gaps the consumer Dailybot found through Protoyard:
   path data by name in Svelte context (SSR-safe, no module global), and
   `<Icon icon="name">` draws them. Augment the `IconNames` interface to
   type the names. The built-in names keep their glyphs and cannot be
-  replaced ([ui-icons](../packages/texuli/docs/ui-icons.md)).
+  replaced ([ui-icons](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-icons.md)).
 - **D-G-022: `CodeField` in a new subpath, `@texuli/blocks/code-field`.**
   An editable, syntax-highlighted field: a transparent textarea over token
   elements, with no HTML sinks. Tab indents, Shift+Tab outdents, Enter
   keeps the indentation, and Escape then Tab leaves the field. Past 20,000
   characters it is a plain textarea. Its labels come from the label
-  dictionary ([code](../packages/blocks/docs/code.md)).
+  dictionary ([code](https://github.com/DailybotHQ/texuli/blob/main/packages/blocks/docs/code.md)).
 - **D-G-023: a light and dark image pair (`@texuli/media/image`).**
   `Image` takes `srcDark` and `darkMode` (`'theme'` by default, or
   `'system'`). In `theme` mode it follows Texuli's explicit color mode over
   the OS preference, and with the default lazy loading only the shown image
   downloads. `srcDark` passes the same URL policy, at the same tier, as
-  `src` ([image](../packages/media/docs/image.md)).
+  `src` ([image](https://github.com/DailybotHQ/texuli/blob/main/packages/media/docs/image.md)).
 - **D-G-024: `AvatarGroupGrid` (`texuli/avatar`).** A collage of up to four
   faces in one circle, with `+N` past four. It is a component of its own
   rather than an `AvatarGroup` layout, so the `texuli` root stays within its
   size ceiling (the Protoyard ui package it replaces)
-  ([ui-avatar](../packages/texuli/docs/ui-avatar.md)).
+  ([ui-avatar](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-avatar.md)).
 
 ## 0.13.0
 
@@ -295,7 +295,7 @@ It carries the gaps the consumers Protoyard, Dailybot and Corag found:
   - C-G-007: an `extensions` map of product tokens, compiled to
     `--tx-ext-<name>` and, with an `on` color, `--tx-ext-<name>-foreground`.
   - `DESIGN_SYSTEM_COMPILER_VERSION` `2`: compiled hashes change; old
-    documents stay valid ([DESIGN_SYSTEMS](DESIGN_SYSTEMS.md)).
+    documents stay valid ([DESIGN_SYSTEMS](https://github.com/DailybotHQ/texuli/blob/main/docs/DESIGN_SYSTEMS.md)).
 - **D-G-013: `texuli ds check --render` works in a consumer.** The
   conformance sheet and its third-party license notices ship in
   `@texuli/tools` (`--sheet builtin` is the default), and a missing
@@ -327,7 +327,7 @@ unchanged), and `^0.12.0` installs pick it up.
 - **Published with tokens refused.** Every published package is set to
   "Require 2FA and disallow tokens" (`npm access set mfa=publish`,
   2026-11-03), so trusted publishing from `publish.yml` is the only way a
-  release reaches npm ([CI](CI.md#publishing-to-npm)). This release checks
+  release reaches npm ([CI](https://github.com/DailybotHQ/texuli/blob/main/docs/CI.md#publishing-to-npm)). This release checks
   that path end to end, including the workflow's verification of `latest`
   and provenance on npm.
 - **Site fixes since `0.12.2` (not in the packages).** The header light and
@@ -346,7 +346,7 @@ unchanged), and `^0.12.0` installs pick it up.
   `NPM_TOKEN`: npm exchanges the workflow's OIDC token for a short-lived
   publish right, and the tarballs keep their signed provenance. The
   workflow installs npm `11.20.0` first, and a tag push no longer starts a
-  publish ([CI](CI.md#publishing-to-npm)). The packages are republished
+  publish ([CI](https://github.com/DailybotHQ/texuli/blob/main/docs/CI.md#publishing-to-npm)). The packages are republished
   so the release goes out this way.
 - **`next` stays on `0.12.1`.** The workflow publishes with `--tag latest`
   only, so `latest` moves to `0.12.2` and `next` is no longer maintained
@@ -503,7 +503,7 @@ codes, compiled to `--tx-*` variables with enforced contrast, focus and
 target sizes, applied at runtime or on the server, imported from and
 emitted to the common token formats, carried by blueprints, documents,
 decks and every output writer, checked by `texuli ds check`, and served to
-agents by the `ds.*` operations ([DESIGN_SYSTEMS](DESIGN_SYSTEMS.md),
+agents by the `ds.*` operations ([DESIGN_SYSTEMS](https://github.com/DailybotHQ/texuli/blob/main/docs/DESIGN_SYSTEMS.md),
 ADR-021 to ADR-024). It also removes the 0.8 MCP tool names and the tree
 block's `style` key, closes the Protoyard gaps G100–G124, and ships blueprint
 spec `0.10.0`.
@@ -857,7 +857,7 @@ when upgrading from `0.5.0`:
   group run a caller's handler first and then their own, unless the caller
   called `event.preventDefault()` (actions) or always (bookkeeping such as
   focus and blur). Before, some of them dropped or replaced it. The order is
-  in [STANDARDS](STANDARDS.md#component-api-contract).
+  in [STANDARDS](https://github.com/DailybotHQ/texuli/blob/main/docs/STANDARDS.md#component-api-contract).
 - **`texuli/avatar` (G58):** after an image error, `data-avatar` is
   `initials` (it stayed `image`). Host styles keyed on it change state.
 - **`@texuli/primitives/date-field` (G65):** `onValueChange` and
