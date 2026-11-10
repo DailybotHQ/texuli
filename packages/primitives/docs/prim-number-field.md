@@ -78,7 +78,7 @@ custom `<input>` registers itself for focus and the form bridge.
 | ArrowUp / ArrowDown | ± `step`. Off the grid, the first press lands on the grid in that direction (1.5 → 2 or 1). An empty field starts at `min` (or 0), within range. |
 | PageUp / PageDown | ± `largeStep` from the value, snapped to the `step` grid, clamped |
 | Home / End | `min` / `max`; left alone when the bound is undefined |
-| Enter | Commit the typed text (not with `commit="blur"`) |
+| Enter | Commit the typed text (with `commit="blur"`, only when the input is in a form, so the submitted value is the typed one) |
 | With Alt, Ctrl or Meta, or during IME composition | Ignored |
 
 **Typing.** Edits are a draft; Enter or blur commits (with `commit="blur"`

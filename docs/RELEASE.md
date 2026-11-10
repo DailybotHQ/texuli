@@ -101,7 +101,7 @@ Blueprint spec `0.14.0` (digest
 minor, so `^0.15.0` and `~0.15.0` never pick it up. Every `0.13.0` blueprint
 and design-system document stays valid (a stamp-only migration), and no
 package export was removed (the runtime export surface of the 26 packages
-grew from 7,854 to 7,898 names, measured from `main` at the `0.15.0` merge).
+grew from 7,854 to 7,911 names, measured from `main` at the `0.15.0` merge).
 It completes locked design systems (PLAN_016, ADR-032): what `0.15.0`
 shipped as in development is released, and the Protoyard and Dailybot
 rounds add the components a locked prototype needs.
@@ -125,9 +125,19 @@ rounds add the components a locked prototype needs.
   `checkDesignSystemFull` (with a conformance corpus of one failing and one
   fixed input per issue code), with `texuli ds check --locked` (the full
   validator; exit 1 on a finding) and `--locked --report` (every finding,
-  exit 0, a baseline for existing prototypes). The locked runtime check core
-  (catalog ownership of rendered controls plus the token-backed render
-  check) is in the source and is not exported yet.
+  exit 0, a baseline for existing prototypes).
+- The locked render check (`2c62f201`): `runLockedRenderChecks`,
+  `checkLockedRenderTree` and `DS_LOCKED_RENDER_EXEMPT_IDS` are exported from
+  `@texuli/tools/ds-check`, and `texuli ds check --locked --render` and
+  `texuli ds validate --locked --render` run it: on the conformance sheet
+  (`--sheet`) or on a page you serve (`--url`, built with
+  `installDsCheckHost`), it maps every rendered control to its catalog root
+  against the allow set (`unmapped`, `not-allowed`) and runs the
+  token-backed render checks (chart, map and canvas marks exempt from the
+  per-pixel literal check), merged into the full report; `--known <file>`
+  lists findings you track, reported as `known`. Texuli does not start your app. A symlinked
+  `--prototype` root is refused (`prototype-symlink`, `85d7c27d`), like
+  symlinked entries inside it.
 - Portable design-system bundles: `packBundle`, `unpackBundle` and
   `validateBundle` in `@texuli/spec/design-system` (a document, library
   sources as text, the allow manifest and release history in one JSON unit;
@@ -144,15 +154,19 @@ rounds add the components a locked prototype needs.
 
 **Blueprint spec `0.14.0` (`@texuli/spec`).**
 
-- A catalog component's `axes` gain `color`, the category color (`none` or
-  `chart-1` to `chart-8`, derived from an enum prop), on `avatar`, `badge`,
-  `color-swatch` and `tag`; the design-system `allow` section gains
+- A catalog component's `axes` gain `color`, the category color and label
+  palette (`none` or `chart-1` to `chart-8`, derived from an enum prop), on
+  `avatar`, `badge`, `color-swatch` and `tag`; the design-system `allow` section gains
   `colors`, checked with the new code `unknown-color`; the allow-manifest
   and bundle schemas carry the allowed colors.
 - The catalog grows from 194 to 199 ids: `color-swatch`, `data-virtual-list`
   (web-only), `link`, `list` and `mark`, each app-tier and governed by
   `allow` (75 ids stay agent-emittable), and the props of the typography,
-  surface and input rounds.
+  surface and input rounds. The five new ids have stages on the gallery
+  and slides pages of texuli.com.
+- Where things live: `mergeCatalogs` (host catalog extensions) is in
+  `@texuli/spec/catalog-extensions`, and the catalog's imports map (public
+  imports to catalog ids) is in `@texuli/catalog/imports`.
 - A stamp-only `0.13.0 → 0.14.0` migration; the blueprint envelope is
   unchanged.
 
@@ -164,7 +178,8 @@ rounds add the components a locked prototype needs.
 - `texuli/typography` gains `Mark` (an inline search highlight from a role's
   soft tokens, tone `warning`, `primary`, `success` or `info`), `Link` (an
   inline sentence link; `href` through `safeHref`) and `ColorSwatch` (a
-  palette, role or data-viz color chip with contrast ink). `Heading` takes
+  palette, role or data-viz color chip with contrast ink; `color` defaults
+  to `primary`, as the catalog says, `e0bdb8dd`). `Heading` takes
   size `xs`; `Text` takes `italic` and `strikethrough`; `Prose` styles
   lists.
 - `Box` gains `fill` (a token-only fill: `chart-1` to `chart-8` or a
@@ -174,13 +189,26 @@ rounds add the components a locked prototype needs.
   (a rail) and a `dashed` border.
 - `List` in `texuli/list-item` (also in the root): the `<ul>` for `ListItem`
   rows, with `divided`.
-- `Avatar`, `Badge` and `Tag` take `color`, the category color (`none`
-  keeps the variant look); `Badge` text uses tabular figures.
+- The label palette: `Avatar`, `Badge` and `Tag` take `color`, the category
+  color (`none` keeps the variant look), filled with `--tx-chart-N` and
+  inked with the new `--tx-chart-1-foreground` to `--tx-chart-8-foreground`,
+  derived to meet WCAG AA on each series color (`8e174133`); `Badge` text
+  uses tabular figures.
+- A linked `Card` (`href`) is one real anchor stretched over the surface,
+  with an `actions` snippet whose controls sit above it in tab order. A fix
+  for a `0.15.0` regression (`0218d48c`): without `linkLabel`, the card's
+  content names the link again (the body inside the anchor, or
+  `aria-labelledby` when actions sit outside it), and an `href` with no name
+  logs a warning.
 - `Input` and `Textarea` take `appearance` (`default`, or `plain`: no
   border, fill, shadow or inline padding, for inline-edit titles and bodies;
   focus stays an outline) and `textSize` (`control`, or the type scale `xs`
   to `display`); `NumberField.Root` (and the primitive) takes `commit`
-  (`enter`, the default and the behavior before, `blur` or `input`).
+  (`enter`, the default and the behavior before, `blur` or `input`); in a
+  form, Enter commits a `blur`-mode draft before the form serializes
+  (`b52278f3`).
+- `VirtualListView` calls `onRangeChange` only when the window moves, not
+  again while rows mount and resize (`2888d3ef`).
 - Layout widths: the `texuli` root exports `LAYOUT_WIDTH_UTILITIES` and
   loads the `.tx-w-content`, `.tx-w-wide`, `.tx-w-full`, `.tx-w-pane` and
   `.tx-w-column` utilities (rem and `--tx-layout-*`, independent of
@@ -189,8 +217,17 @@ rounds add the components a locked prototype needs.
   named tone, so a host-written `tx-button` link without `data-tx-tone`
   keeps its variant color.
 
-**Known gaps in 0.16.0 (planned, not done).** The locked runtime check
-core is not exported; the native painters for the catalog ids added since
+**Budgets (lead, under the developer's standing grant, measured + 2%;
+`texuli.budgets.json`).** `texuli` root 224,256 to 229,504 B (round 4, the
+Card link name and the category ink; still under the `@protoyard/ui`
+baseline of 261,005 B); `@texuli/tokens/css` 6,111 to 6,464 B (the AA ink
+tokens); `@texuli/forms` CSS 5,952 to 6,336 B; `@texuli/catalog` 69,312 to
+70,848 B, `manifests/all` 56,832 to 58,880 B, `manifests/display` 12,800 to
+14,272 B, `manifests/data` 8,768 to 9,536 B; `@texuli/chat` 17,792 to
+18,368 B; `@texuli/data/activity` 13,184 to 13,760 B;
+`texuli/layouts/dashboard` 12,800 to 13,120 B.
+
+**Known gaps in 0.16.0 (planned, not done).** The native painters for the catalog ids added since
 `0.15.0` paint a placeholder; the gaps listed under 0.14.3 that remain
 open.
 
