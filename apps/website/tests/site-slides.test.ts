@@ -71,7 +71,7 @@ describe('slides page: copy and safety', () => {
     expect(PAGE).toMatch(/@texuli\/slides · in development/);
     const status = read('components/slides-site/page.ts');
     expect(status).toMatch(
-      /in development and on npm \(@texuli\/slides 0\.17\.1, @texuli\/deck 0\.17\.1\), pre-1\.0 releases/
+      /in development and on npm \(@texuli\/slides 0\.17\.2, @texuli\/deck 0\.17\.2\), pre-1\.0 releases/
     );
     expect(status).toMatch(/releases before 0\.4\.0 use the previous deck model/);
   });

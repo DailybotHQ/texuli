@@ -13,7 +13,7 @@ persistence and sync share one history.
 **In the stack:** layer L8, on `@texuli/document` (L1), `@texuli/editor`, `@texuli/drag`, `@texuli/primitives`, the `texuli` components, `@texuli/blocks` and the player.
 
 > **Status: in development (pre-1.0).** `@texuli/pages` is published on npm
-> as `0.17.1`, with provenance (first published as `0.7.0`, with `@texuli/document`;
+> as `0.17.2`, with provenance (first published as `0.7.0`, with `@texuli/document`;
 > built in PLAN_010, ADR-011 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
 > Under 0.x a new minor (`0.17.0`) may contain breaking changes, so pin the
