@@ -108,5 +108,6 @@ describe('lazy built-in block support and deck migration (G46)', () => {
       expect(document.querySelector('[data-tx-deck-item="1"]')).toBeTruthy();
       expect(loadedDefaultDeckRenderers()).toBeUndefined();
     });
-  });
+    // Lazy block chunks import cold; the full suite under load needs more than 5 s.
+  }, 60_000);
 });

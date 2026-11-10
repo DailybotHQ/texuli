@@ -20,6 +20,7 @@ texuli ds check acme.json --render --sheet site/sheet.html   # a sheet page you 
 texuli ds check child.json --base base.json     # extends: "base@1.2.3" from a local file
 texuli ds check acme.json --mode dark --variant compact
 texuli ds check brand.json --catalog components.json   # allow checked against another catalog
+texuli ds check brand.json --extensions acme.catalog.json   # allow may name acme:<id> host components
 texuli ds check acme.json --locked                    # full locked checks; exit 1 on a finding
 texuli ds check acme.json --locked --report --json    # list every finding, exit 0
 texuli ds check acme.json --locked --render           # plus the locked render check on the catalog sheet
@@ -38,7 +39,7 @@ texuli ds validate acme.json --locked --render --url http://localhost:5173/  # y
 flags it validates the document and its compiled guarantees. `--locked`
 selects the full validator; `--prototype <dir>` supplies source text for
 component and CSS-policy checks. Flags specific to the full report
-(`--catalog`, `--json`, `--render`, `--strict`, or `--report`) also select
+(`--catalog`, `--extensions`, `--json`, `--render`, `--strict`, or `--report`) also select
 locked mode. `--report` requires `--locked`. `ds check` remains the
 lower-level conformance interface and accepts the same full-check flags.
 
@@ -66,6 +67,7 @@ texuli ds validate brand.json --locked --prototype ./src --render
 | `--known <file>` | With `--render`: a JSON array of findings you track, `[{ "component", "element", "property", "reason" }]` (at most 1 MB and 500 entries; `component` may be `*`, `element` and `property` are prefixes). They are reported as `known` and do not fail the run. A malformed list exits 2 |
 | `--strict` | With `--render`: known findings fail too |
 | `--catalog <components.json>` | The catalog `allow` is checked against (`{ components: [{ id, axes?, states? }] }`, for example `@texuli/spec`'s `catalog/components.json` or a stub). Default: the agent catalog `@texuli/tools` builds. A file without a `components` list exits 2 |
+| `--extensions <file>...` | Host catalog extension manifests (`texuli/catalog-extension`, ids `<ns>:<id>`, each at most 1 MB to read and at most 16 files), merged into the catalog by `mergeCatalogs` before `allow` is checked. Takes one or more files up to the next flag, and may repeat; put the document before it. A refused extension is left out whole and reported (below). An unreadable or non-JSON file exits 2 |
 | `--locked` | Run the full locked-design-system validator (`checkDesignSystemFull`): the static checks, data-viz, tokens, allow, approval and hashes, with findings counted by area, route and component |
 | `--prototype <dir>` | With `ds validate` or `ds check --locked`: read bounded Svelte, TypeScript, JavaScript, CSS and blueprint JSON files from a local directory. Source is scanned as text and never executed; symlinks are refused. JSON is included when it contains a blueprint `tree`. The report lists workspace packages and local modules that directory imported but the check did not read (`prototype.unchecked`, a count and the specifiers). |
 | `--scan-workspace` | With `--prototype`: also scan workspace packages those sources import (from `pnpm-workspace.yaml` or `package.json` workspaces). Files are keyed `workspace:<name>/…`. Without this flag those imports stay in `unchecked`. |
@@ -396,10 +398,27 @@ runs axe. Use it in CI for locked prototypes; locally, on demand.
 
 ## Catalog extensions
 
-`checkDesignSystemFull({ catalog, extensions })` merges host catalogs
-through `mergeCatalogs` (`@texuli/spec`). Ids are `<ns>:<id>`. A refused
-extension is left out whole; the finding code on the full report is
-`catalog-extension` (the merge's own codes, `extension-format`,
+A host that ships its own components publishes them as extension manifests and
+validates design systems against `mergeCatalogs(texuli, extensions)`
+(`@texuli/spec/catalog-extensions`). Pass the same files to the CLI and `allow`
+is checked the same way, so a document that allows `acme:kpi-strip` passes
+`texuli ds check` as it passes the host's own `checkDesignSystemAllow`:
+
+```bash
+texuli ds check brand.json --extensions acme.catalog.json globex.catalog.json
+texuli ds validate brand.json --locked --extensions acme.catalog.json --json
+```
+
+Without `--extensions` the same document is refused with `unknown-component`.
+In your own code, `loadMergedCatalog(extensions, { catalog? })`
+(`@texuli/tools/ds-check`) returns the merge over the agent catalog (or the
+catalog you pass): `{ ok, catalog, extensions, issues }`.
+`checkDesignSystemFull({ catalog, extensions })` merges the same way.
+
+Ids are `<ns>:<id>`. A refused
+extension is left out whole; the finding code on both reports is
+`catalog-extension` (on the `ds check` report the issue's `source` names the
+file; the merge's own codes, `extension-format`,
 `extension-oversize`, `extension-namespace`, `extension-id`,
 `extension-collision`, `extension-composes`, `extension-props`,
 `extension-axis`, `extension-state`, appear in the message). Allow keys
@@ -490,8 +509,8 @@ prototype sources, blueprints and a painted page. The consumer (Protoyard
 or any host) supplies:
 
 1. The locked document and the catalog (`packages/spec/catalog/components.json`
-   or `--catalog`). Optional host extensions (`extensions` on
-   `checkDesignSystemFull`).
+   or `--catalog`). Optional host extensions (`--extensions <file>...`, or
+   `extensions` on `checkDesignSystemFull`).
 2. Prototype files and blueprints (`prototype.files`,
    `prototype.blueprints`), or use `texuli ds validate --locked
    --prototype <dir>` to scan a local tree as bounded text.

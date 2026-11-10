@@ -1,7 +1,7 @@
 ---
 name: texuli
 description: Build accessible, themed interfaces with Texuli (Svelte 5 components, themes and design systems, charts, data, media, documents, forms, canvas, sheets, decks, workflows) and agent-written blueprints, by routing requests to local sub-skills; covers the Texuli MCP server, installation, upgrades and contributions.
-version: "0.4.0"
+version: "0.4.1"
 documentation_url: https://texuli.com/guides/
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob
