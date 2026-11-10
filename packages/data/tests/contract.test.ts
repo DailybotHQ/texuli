@@ -6,6 +6,8 @@ import DataContract from './contract/DataContract.svelte';
 // The uniform component API contract (docs/STANDARDS.md) on the data roots a
 // host composes (G93): rest attributes and `bind:ref` on the root element,
 // caller handlers composed with the component's own behavior.
+// VirtualListView's cases (listbox and feed, split shape) are in
+// virtual-list-contract.test.ts.
 
 const CASES: ContractCase[] = [{ key: 'Board', harness: DataContract }];
 const KEYS = CASES.map((c) => c.key);

@@ -5252,6 +5252,7 @@
         "Every row carries aria-setsize and aria-posinset, so its position in the full list is announced",
         "Listbox mode: Arrow keys, Home, End, Page Up and Page Down move; Enter, Space or a click selects (selectable false: no selection)",
         "Feed mode: a WAI-ARIA feed of focusable articles without selection; Page Down and Page Up move focus between articles",
+        "Feed mode: every article is named by aria-labelledby (the row label, or the row heading id) or, failing that, aria-label",
         "Keys pressed in a row control (an input, a button) stay with that control"
       ],
       "agentEmittable": false,
@@ -5346,6 +5347,13 @@
           "description": "Listbox mode: false never selects or paints a row (select still fires) and drops the option chrome.",
           "kind": "boolean",
           "name": "selectable"
+        },
+        {
+          "default": "box",
+          "description": "box: the viewport has a border, radius and surface. plain: none of them, so a feed of cards sits on the page.",
+          "enumValues": ["box", "plain"],
+          "kind": "enum",
+          "name": "surface"
         },
         {
           "default": 40,

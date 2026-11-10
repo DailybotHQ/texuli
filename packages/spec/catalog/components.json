@@ -1,5 +1,5 @@
 {
-  "catalogHash": "a395cfa7f0279e30c26065d5c618e49a0fe14c6bc45e8c26f3b5a6a918e509a5",
+  "catalogHash": "ff1f13434cff6d544ece1f000c4215d72772f42f7c01e20700b309e1012e9fb8",
   "components": [
     {
       "axes": {
@@ -6044,6 +6044,11 @@
           "enumValues": ["sm", "md", "lg", "fill"],
           "kind": "enum",
           "name": "size"
+        },
+        {
+          "enumValues": ["box", "plain"],
+          "kind": "enum",
+          "name": "surface"
         }
       ],
       "sourceable": ["items"],

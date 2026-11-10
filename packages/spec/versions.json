@@ -87,9 +87,9 @@
     },
     {
       "specVersion": "0.15.0",
-      "specDigest": "9efcb5d62ac4d58ee3645293f8c2d18ed1ad2bfde3394fe9fda585e541042f96",
+      "specDigest": "4c674bc59c8140ee2ff24e47f4de9c46689f48f07c8516128480db129f7a0a57",
       "change": "minor",
-      "summary": "Additive (ADR-032, Texuli 0.17.0; the open 0.15.0 pin, amended by each task until the release publishes): catalog projection refresh with props a patch release could not carry: data-virtual-list gains mode (listbox, the default, or feed: the APG feed pattern for rows with their own controls) and selectable (listbox only); every 0.14.0 blueprint and design-system document stays valid and the blueprint envelope is unchanged; stamp-only migration 0.14.0→0.15.0"
+      "summary": "Additive (ADR-032, Texuli 0.17.0; the open 0.15.0 pin, amended by each task until the release publishes): catalog projection refresh with props a patch release could not carry: data-virtual-list gains mode (listbox, the default, or feed: the APG feed pattern for rows with their own controls) and selectable (listbox only), and surface (box, the default, or plain: no viewport border, radius or surface); every 0.14.0 blueprint and design-system document stays valid and the blueprint envelope is unchanged; stamp-only migration 0.14.0→0.15.0"
     }
   ]
 }

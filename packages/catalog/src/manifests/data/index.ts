@@ -187,6 +187,8 @@ export const VIRTUAL_LIST_SIZES = ['sm', 'md', 'lg', 'fill'] as const;
 export const VIRTUAL_LIST_DENSITIES = ['compact', 'default', 'comfortable'] as const;
 /** `VirtualListView` patterns: an APG listbox (default) or an APG feed. */
 export const VIRTUAL_LIST_MODES = ['listbox', 'feed'] as const;
+/** `VirtualListView` viewport frames: a bordered box (default) or plain. */
+export const VIRTUAL_LIST_SURFACES = ['box', 'plain'] as const;
 
 export const dataVirtualListManifest: CatalogManifest = /* @__PURE__ */ stampDataAxes(
   manifestData({
@@ -212,6 +214,7 @@ export const dataVirtualListManifest: CatalogManifest = /* @__PURE__ */ stampDat
       'Every row carries aria-setsize and aria-posinset, so its position in the full list is announced',
       'Listbox mode: Arrow keys, Home, End, Page Up and Page Down move; Enter, Space or a click selects (selectable false: no selection)',
       'Feed mode: a WAI-ARIA feed of focusable articles without selection; Page Down and Page Up move focus between articles',
+      'Feed mode: every article is named by aria-labelledby (the row label, or the row heading id) or, failing that, aria-label',
       'Keys pressed in a row control (an input, a button) stay with that control',
     ],
     props: [
@@ -245,6 +248,14 @@ export const dataVirtualListManifest: CatalogManifest = /* @__PURE__ */ stampDat
         default: true,
         description:
           'Listbox mode: false never selects or paints a row (select still fires) and drops the option chrome.',
+      },
+      {
+        name: 'surface',
+        kind: 'enum',
+        enumValues: VIRTUAL_LIST_SURFACES,
+        default: 'box',
+        description:
+          'box: the viewport has a border, radius and surface. plain: none of them, so a feed of cards sits on the page.',
       },
       {
         name: 'estimateSize',

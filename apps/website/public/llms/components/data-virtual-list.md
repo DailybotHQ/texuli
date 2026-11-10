@@ -26,6 +26,7 @@
 - Every row carries aria-setsize and aria-posinset, so its position in the full list is announced
 - Listbox mode: Arrow keys, Home, End, Page Up and Page Down move; Enter, Space or a click selects (selectable false: no selection)
 - Feed mode: a WAI-ARIA feed of focusable articles without selection; Page Down and Page Up move focus between articles
+- Feed mode: every article is named by aria-labelledby (the row label, or the row heading id) or, failing that, aria-label
 - Keys pressed in a row control (an input, a button) stay with that control
 
 ### Props
@@ -38,6 +39,7 @@
 | `density` | enum(compact | default | comfortable) | no | — | `"default"` | — |
 | `mode` | enum(listbox | feed) | no | — | `"listbox"` | listbox: rows are options to pick. feed: an APG feed of articles that may hold their own controls; no selection. |
 | `selectable` | boolean | no | — | `true` | Listbox mode: false never selects or paints a row (select still fires) and drops the option chrome. |
+| `surface` | enum(box | plain) | no | — | `"box"` | box: the viewport has a border, radius and surface. plain: none of them, so a feed of cards sits on the page. |
 | `estimateSize` | number | no | — | `40` | Row height in px used until a row has been measured. |
 | `overscan` | number | no | — | `3` | Rows rendered before and after the viewport (at most 50). |
 | `selected` | string | no | — | — | The selected row id. |
