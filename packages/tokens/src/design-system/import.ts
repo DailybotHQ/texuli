@@ -70,11 +70,13 @@ const WORDS: Readonly<Record<string, readonly [string, Json]>> = {
   square: ['shape.radius', 0],
   'slightly rounded': ['shape.radius', 4],
   rounded: ['shape.radius', 12],
+  'rounded corners': ['shape.radius', 12],
   round: ['shape.radius', 12],
   'very rounded': ['shape.radius', 20],
   pill: ['shape.radius', 20],
   dense: ['space.density', 0.75],
   compact: ['space.density', 0.875],
+  'compact spacing': ['space.density', 0.875],
   comfortable: ['space.density', 1],
   cozy: ['space.density', 1],
   spacious: ['space.density', 1.125],
@@ -147,6 +149,87 @@ function blankRange(text: string, start: number, end: number): string {
   return `${text.slice(0, start)}${' '.repeat(end - start)}${text.slice(end)}`;
 }
 
+function consumeFonts(text: string, setFont: (name: string, family: string) => void): string {
+  const patterns: { family: string; pattern: RegExp }[] = [
+    {
+      family: 'heading',
+      pattern:
+        /\b(?:headings?|display)\s+in\s+("[^"]+"|'[^']+'|[A-Z][A-Za-z0-9-]*(?:\s+[A-Z][A-Za-z0-9-]*){0,2})/gi,
+    },
+    {
+      family: 'heading',
+      pattern:
+        /\b(?:heading|display)(?:\s+font)\s+("[^"]+"|'[^']+'|[A-Z][A-Za-z0-9-]*(?:\s+[A-Z][A-Za-z0-9-]*){0,2})/gi,
+    },
+    {
+      family: 'mono',
+      pattern:
+        /\b(?:mono|code)(?:\s+font)\s+("[^"]+"|'[^']+'|[A-Z][A-Za-z0-9-]*(?:\s+[A-Z][A-Za-z0-9-]*){0,2})/gi,
+    },
+    {
+      family: 'serif',
+      pattern:
+        /\bserif(?:\s+font)\s+("[^"]+"|'[^']+'|[A-Z][A-Za-z0-9-]*(?:\s+[A-Z][A-Za-z0-9-]*){0,2})/gi,
+    },
+    {
+      family: 'sans',
+      pattern: /\b([A-Z][A-Za-z0-9-]*(?:\s+[A-Z][A-Za-z0-9-]*){0,2})\s+font\b/g,
+    },
+    {
+      family: 'sans',
+      pattern:
+        /\b(?:body\s+font|font|sans|typeface)\s+("[^"]+"|'[^']+'|[A-Z][A-Za-z0-9-]*(?:\s+[A-Z][A-Za-z0-9-]*){0,2})/gi,
+    },
+  ];
+  let remainder = text;
+  for (const { family, pattern } of patterns) {
+    const matches = [...remainder.matchAll(pattern)];
+    for (const match of matches) {
+      const rawName = match[1]?.trim();
+      if (!rawName) continue;
+      const stopWord =
+        /\s+(?=(?:in|and|with|using|on|rounded|round|compact|dense|comfortable|spacious|calm|playful|sharp|square|pill|glow|flat|soft|crisp|layered|glass|solid)\b)/i.exec(
+          rawName
+        );
+      const name = rawName.slice(0, stopWord?.index ?? rawName.length).trim();
+      if (!name) continue;
+      const start = match.index ?? 0;
+      const end = match[0].trimEnd().toLowerCase().endsWith('font')
+        ? start + match[0].length
+        : start + match[0].lastIndexOf(rawName) + name.length;
+      // A higher-priority phrase may already have consumed these characters.
+      if (remainder.slice(start, end).trim().length === 0) continue;
+      setFont(name, family);
+      remainder = blankRange(remainder, start, end);
+    }
+  }
+  return remainder;
+}
+
+function consumeStyleWords(text: string, set: (path: string, value: Json) => void): string {
+  let remainder = text;
+  const phrases = Object.keys(WORDS).sort((a, b) => b.length - a.length);
+  for (const phrase of phrases) {
+    const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
+    const pattern = new RegExp(`\\b${escaped}\\b`, 'gi');
+    const matches = [...remainder.matchAll(pattern)];
+    for (const match of matches) {
+      const [path, value] = WORDS[phrase] as readonly [string, Json];
+      set(path, value);
+      const start = match.index ?? 0;
+      remainder = blankRange(remainder, start, start + match[0].length);
+    }
+  }
+  return remainder;
+}
+
+function unreadWords(text: string): string {
+  return text
+    .replace(/\b(?:and|is|uses?|using|the|brand|color|colour|in|with|on|a|an)\b/gi, ' ')
+    .replace(/[\s:=,.;-]+/g, ' ')
+    .trim();
+}
+
 function proseColor(text: string): string | undefined {
   const hex = /(?<![\w])#(?:[\da-f]{8}|[\da-f]{6}|[\da-f]{4}|[\da-f]{3})(?![\w])/gi.exec(text)?.[0];
   if (hex) {
@@ -196,7 +279,7 @@ export function importBrand(
     clauses.forEach((clause, i) => {
       const where = `$[${i}]`;
       const lower = clause.toLowerCase().replace(/\s+/g, ' ');
-      if (/(?:url\s*\(|expression\s*\(|[{}<>])/i.test(clause)) {
+      if (INVISIBLE.test(clause) || /(?:url\s*\(|expression\s*\(|[{}<>])/i.test(clause)) {
         warnings.add('unsafe-value', where, 'Refused CSS or markup syntax in a brand brief.');
         return;
       }
@@ -275,52 +358,29 @@ export function importBrand(
           previousEnd = end;
         }
 
-        const afterFont = /\b(?:font|sans|typeface|body\s+font)\s+(.+)$/i.exec(remainder);
-        const beforeFont = /\b([A-Za-z][A-Za-z0-9 _-]{0,32}?)\s+font\b/i.exec(remainder);
-        const fontMatch =
-          !beforeFont || (afterFont && (afterFont.index ?? 0) < (beforeFont.index ?? 0))
-            ? afterFont
-            : beforeFont;
-        if (fontMatch) {
-          const familyName = (fontMatch[1] as string)
-            .split(/\b(?:in|and|with|using|on)\b/i, 1)[0]
-            ?.trim();
-          if (familyName) font(familyName, 'sans');
-          const start = fontMatch.index ?? 0;
-          remainder = blankRange(remainder, start, start + fontMatch[0].length);
-        }
-
-        const unread = remainder
-          .replace(/\b(?:and|is|uses?|using|the|brand|color|colour|in|with|on|a|an)\b/gi, ' ')
-          .replace(/[\s:=,.;-]+/g, ' ')
-          .trim();
+        remainder = consumeFonts(remainder, font);
+        remainder = consumeStyleWords(remainder, set);
+        const unread = unreadWords(remainder);
         if (unread) {
           const suspicious = /(?:url\s*\(|expression\s*\(|[{};<>])/i.test(unread);
           warnings.add(
             suspicious ? 'unsafe-value' : 'unmapped',
             where,
-            `Unrecognized brand brief text: ${unread}`
+            `Unrecognized brand brief text in "${clause}": ${unread}`
           );
         }
         return;
       }
-      const proseFont =
-        /\b((?!(?:heading|display|mono|code|serif)\b)[A-Za-z][A-Za-z0-9 _-]{0,32}?)\s+font\b/i.exec(
-          clause
-        );
-      if (proseFont) {
-        const familyName = (proseFont[1] as string).trim();
-        font(familyName, 'sans');
-        const remainder = blankRange(
-          clause,
-          proseFont.index ?? 0,
-          (proseFont.index ?? 0) + proseFont[0].length
-        )
-          .replace(/\b(?:and|is|uses?|using|the|in|with|on|a|an)\b/gi, ' ')
-          .replace(/[\s:=,.;-]+/g, ' ')
-          .trim();
-        if (remainder)
-          warnings.add('unmapped', where, `Unrecognized brand brief text: ${remainder}`);
+      const fontRemainder = consumeFonts(clause, font);
+      const styleRemainder = consumeStyleWords(fontRemainder, set);
+      if (fontRemainder !== clause || styleRemainder !== fontRemainder) {
+        const unread = unreadWords(styleRemainder);
+        if (unread)
+          warnings.add(
+            'unmapped',
+            where,
+            `Unrecognized brand brief text in "${clause}": ${unread}`
+          );
         return;
       }
       /** Clause patterns, first match wins; a handler returning `false` passes the clause on. */

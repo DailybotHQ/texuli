@@ -104,18 +104,23 @@ export async function mapLockedRenderPage(
   await page.waitForFunction((name) => name in globalThis, DS_CHECK_GLOBAL, {
     timeout: options.timeoutMs ?? 60_000,
   });
+  // The whole manifest reaches host.map: `allow` and `composed` (library composes, host
+  // extensions), so the page is mapped exactly as mapDesignSystemTree maps it (0.17.2).
+  const input: { allow?: unknown; composed?: unknown } = {};
+  if (allowManifest.allow !== undefined) input.allow = allowManifest.allow;
+  if (allowManifest.composed !== undefined) input.composed = allowManifest.composed;
   return page.evaluate(
-    ([name, allow]) => {
+    ([name, manifest]) => {
       const host = (
         globalThis as unknown as Record<
           string,
-          { map?(input: { allow?: unknown }): DsMapReport } | undefined
+          { map?(input: { allow?: unknown; composed?: unknown }): DsMapReport } | undefined
         >
       )[name];
       if (!host?.map) throw new Error('The page has no ds-check host with map().');
-      return host.map(allow === undefined ? {} : { allow });
+      return host.map(manifest);
     },
-    [DS_CHECK_GLOBAL, allowManifest.allow] as const
+    [DS_CHECK_GLOBAL, input] as const
   );
 }
 

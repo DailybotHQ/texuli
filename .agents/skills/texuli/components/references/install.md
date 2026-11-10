@@ -4,7 +4,7 @@ Back to [`../SKILL.md`](../SKILL.md).
 
 ## A. Use the packages
 
-The packages are on npm in the 0.17 line, every one at `0.17.1`, a pre-1.0 line
+The packages are on npm in the 0.17 line, every one at `0.17.2`, a pre-1.0 line
 (`latest` points to the newest, and `next` is no longer maintained and stays on `0.12.1`; 1.0.0 will be the first stable release). An app outside a
 Texuli checkout installs them plainly, for example
 `pnpm add texuli @texuli/tokens`, and pins the exact version or `^0.17.0`
@@ -14,7 +14,7 @@ runs the install; it uses the network). `@texuli/drag`,
 in `0.5.0`), `@texuli/document` and `@texuli/pages` (both first published
 in `0.7.0`), `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (all
 three first published in `0.8.0`) and `@texuli/mcp` (first published in
-`0.9.0`) are in development and on npm as `0.17.1`.
+`0.9.0`) are in development and on npm as `0.17.2`.
 
 New in `0.13.1` (an additive patch): `@texuli/blocks/code-field` (`CodeField`),
 `registerIcons` and `IconsProvider` in `texuli/icons`, `srcDark` and
@@ -86,6 +86,22 @@ New in `0.14.2` (a patch; an app that uses these pins `^0.14.2`):
   the value; a controlled `pressed` with a handler renders the prop.
 - Not in the agent catalog yet: `initialDate`, `Select` `block` and
   `ghost`, the `IconButton` badge.
+
+New in `0.17.2` (a patch; blueprint spec stays `0.15.0`; `^0.17.0` picks it
+up; no export removed):
+
+- The runtime and static lock agree for every catalog id: part parents
+  come from declared catalog relations (`CATALOG_PART_PARENTS` in
+  `@texuli/catalog/manifest`), never a shared hyphen prefix, so
+  `alert-dialog`, `icon-button` and `form-field` are their own ids.
+  `mapLockedRenderPage` forwards `composed`, and an allow axis list is
+  read in any declared shape (a value, `{ values }` or a value map).
+- `importBrand` keeps fonts and style words apart (`Headings in Fraunces,
+  rounded corners, compact spacing`) and reports every word it did not
+  read.
+- `changesModel` compares every library approval field, `approvedAt`
+  included, at full length, and every library entry.
+- Every package ships a `CHANGELOG.md` generated from the release notes.
 
 New in `0.17.1` (a patch; blueprint spec stays `0.15.0`; `^0.17.0` picks it
 up; no export removed):

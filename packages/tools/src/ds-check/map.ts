@@ -19,35 +19,89 @@ export const DS_MAP_DISABLED_VALUE = 'render-disabled-value';
 export const DS_MAP_CODES = [DS_MAP_DISABLED_VALUE, DS_MAP_NOT_ALLOWED, DS_MAP_UNMAPPED] as const;
 
 /**
- * Catalog parents that own `id-part` roots when allowed. Complements
- * hyphen resolution against the allow set (list-item → list, button-group →
- * button, data-dashboard-widget → data-dashboard). The full map is
- * `partParentMap` in `@texuli/catalog/manifest`.
+ * Declared catalog part → parent ids (0.17.2): the same relation as `CATALOG_PART_PARENTS` in
+ * `@texuli/catalog/manifest` (a part ships in its parent's public module, the data the static
+ * locked check reads), kept here so the browser host imports no catalog. A shared hyphen
+ * prefix is not a relation: `alert-dialog`, `icon-button`, `avatar-group-grid`,
+ * `text-counter`, `code-field`, `form-field` and `form-submit` are their own ids.
  */
+export const DS_MAP_PART_PARENTS: Readonly<Record<string, string>> = Object.freeze({
+  'button-group': 'button',
+  'context-menu-trigger': 'context-menu',
+  'data-dashboard-widget': 'data-dashboard',
+  'dropdown-menu-content': 'dropdown-menu',
+  'dropdown-menu-item': 'dropdown-menu',
+  'dropdown-menu-trigger': 'dropdown-menu',
+  'field-error': 'field',
+  'hover-card-content': 'hover-card',
+  'input-group': 'input',
+  'list-item': 'list',
+  'menubar-trigger': 'menubar',
+  'popover-content': 'popover',
+  'radio-group': 'radio',
+  'select-content': 'select',
+  'select-group': 'select',
+  'select-item': 'select',
+  'select-label': 'select',
+  'select-portal': 'select',
+  'select-separator': 'select',
+  'select-trigger': 'select',
+  'select-value': 'select',
+  'select-viewport': 'select',
+});
+
+/** Catalog parents that own declared parts (the values of {@link DS_MAP_PART_PARENTS}). */
 export const DS_MAP_COMPOUND_PARENTS = [
-  'accordion',
-  'alert-dialog',
   'button',
-  'combobox',
-  'command',
   'context-menu',
   'data-dashboard',
-  'dialog',
   'dropdown-menu',
   'field',
   'hover-card',
   'input',
   'list',
   'menubar',
-  'multi-select',
-  'navigation-menu',
   'popover',
   'radio',
   'select',
-  'tabs',
 ] as const;
 
-const COMPOUND: ReadonlySet<string> = new Set(DS_MAP_COMPOUND_PARENTS);
+/**
+ * The declared parent of a catalog part (`select-trigger` → `select`), also across an
+ * extension namespace (`acme:select-trigger` → `acme:select`); `undefined` for any other id.
+ */
+export function dsCatalogPartParent(id: string): string | undefined {
+  const colon = id.lastIndexOf(':');
+  const local = colon > 0 ? id.slice(colon + 1) : id;
+  const parent = Object.hasOwn(DS_MAP_PART_PARENTS, local) ? DS_MAP_PART_PARENTS[local] : undefined;
+  if (!parent) return undefined;
+  return colon > 0 ? `${id.slice(0, colon)}:${parent}` : parent;
+}
+
+/** Most values one axis list is read for (`DS_LOCKED_LIMITS.axisValues`). */
+const AXIS_VALUES_CAP = 32;
+
+/**
+ * The values an allow entry's axis list enables, read in its declared shape (0.17.2): a list
+ * of values; a single value (`"ghost"`); or an object, either `{ values: [...] }` or a map of
+ * value → `true`. `undefined` (every catalog value) when the field is omitted or holds no
+ * readable shape; `[]` (none) only for an empty list or a map that enables nothing. The static
+ * and the render checks both read lists through this.
+ */
+export function dsAllowAxisValues(listed: unknown): readonly string[] | undefined {
+  const strings = (items: readonly unknown[]): string[] =>
+    items
+      .slice(0, AXIS_VALUES_CAP)
+      .filter((item): item is string => typeof item === 'string' && item.length > 0);
+  if (Array.isArray(listed)) return strings(listed);
+  if (typeof listed === 'string') return listed.length > 0 ? [listed] : undefined;
+  if (!isRecord(listed)) return undefined;
+  if (Array.isArray(listed.values)) return strings(listed.values);
+  if (typeof listed.values === 'string') return dsAllowAxisValues(listed.values);
+  const keys = Object.keys(listed).slice(0, AXIS_VALUES_CAP);
+  if (keys.length === 0) return undefined;
+  return keys.filter((key) => listed[key] === true);
+}
 
 /**
  * Cap per finding code (matches `DESIGN_SYSTEM_LIMITS.errors`): each of `render-disabled-value`,
@@ -129,6 +183,16 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 const localId = (id: string): string => (id.includes(':') ? id.slice(id.lastIndexOf(':') + 1) : id);
 
+/** The composed parent of `id`: an own string value only (page JSON may carry anything). */
+function composedParent(
+  composed: Readonly<Record<string, string>> | undefined,
+  id: string
+): string | undefined {
+  if (!isRecord(composed) || !Object.hasOwn(composed, id)) return undefined;
+  const parent = (composed as Record<string, unknown>)[id];
+  return typeof parent === 'string' && parent.length > 0 ? parent : undefined;
+}
+
 /**
  * Whether `id` is a declared part of `parent`: a compound part (`select-trigger` of
  * `select`, also across an extension namespace) or an id `composed` maps to it.
@@ -139,9 +203,9 @@ function isPartOf(
   composed: Readonly<Record<string, string>> | undefined
 ): boolean {
   const localParent = localId(parent);
-  const target = composed?.[id] ?? composed?.[localId(id)];
+  const target = composedParent(composed, id) ?? composedParent(composed, localId(id));
   if (target !== undefined && (target === parent || localId(target) === localParent)) return true;
-  return COMPOUND.has(localParent) && localId(id).startsWith(`${localParent}-`);
+  return dsCatalogPartParent(localId(id)) === localParent;
 }
 
 /**
@@ -158,7 +222,7 @@ export function resolveAllowedComponentId(
 ): string | undefined {
   if (!id) return undefined;
   if (allowed.has(id)) return id;
-  const composed = options.composed?.[id];
+  const composed = composedParent(options.composed, id);
   if (composed && allowed.has(composed)) return composed;
   if (
     options.ancestor &&
@@ -181,14 +245,12 @@ export function resolveAllowedComponentId(
       if (allowed.has(inner)) return inner;
     }
   }
-  let best: string | undefined;
-  for (const parent of allowed) {
-    const localParent = parent.includes(':') ? parent.slice(parent.lastIndexOf(':') + 1) : parent;
-    if (id.startsWith(`${parent}-`) || id.startsWith(`${localParent}-`)) {
-      if (!best || parent.length > best.length) best = parent;
-    }
-  }
-  return best;
+  // A declared part standing alone is covered by its allowed parent (0.17.1); a hyphen
+  // prefix alone covers nothing (0.17.2: alert-dialog is not a part of alert).
+  const parent = dsCatalogPartParent(id);
+  if (parent && allowed.has(parent)) return parent;
+  if (parent && colon > 0 && allowed.has(localId(parent))) return localId(parent);
+  return undefined;
 }
 
 function ancestorCatalogId(el: Element): string | undefined {
@@ -198,11 +260,7 @@ function ancestorCatalogId(el: Element): string | undefined {
 }
 
 function allowAxisValues(entry: unknown, field: string): readonly string[] | undefined {
-  if (!isRecord(entry)) return undefined;
-  const listed = entry[field];
-  if (listed === undefined) return undefined;
-  if (!Array.isArray(listed)) return [];
-  return listed.filter((item): item is string => typeof item === 'string');
+  return isRecord(entry) ? dsAllowAxisValues(entry[field]) : undefined;
 }
 
 function attrValue(value: string): string {

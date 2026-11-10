@@ -20,6 +20,7 @@
  * Disallowed variants are flagged, never removed at runtime (ADR-032). Extension ids
  * (`<ns>:<id>`) are plain catalog ids here.
  */
+import { dsAllowAxisValues, resolveAllowedComponentId } from './map.ts';
 import type { DsCheckIssue } from './types.ts';
 
 /** The axes a component can have, and the allow list each reads. */
@@ -381,8 +382,8 @@ export function usageFromBlueprint(blueprint: unknown): LockedUsage[] {
 
 // ─── Checking ─────────────────────────────────────────────────────────────
 
-const strings = (value: unknown): string[] | undefined =>
-  Array.isArray(value) ? value.filter((v): v is string => typeof v === 'string') : undefined;
+/** An axis or state list in its declared shape (list, single value or object; 0.17.2). */
+const strings = (value: unknown): readonly string[] | undefined => dsAllowAxisValues(value);
 
 /**
  * Check usages against the allow manifest and the catalog. Unlocked (no `allow`): only
@@ -428,11 +429,14 @@ export function checkLockedUsage(
       add(errors, 'unknown-component', usage, `${usage.component} is not a catalog component.`);
       continue;
     }
-    const entry = allow
+    // A declared catalog part (select-trigger) is governed by its allowed parent (select),
+    // exactly as the render check resolves it; a hyphen prefix alone governs nothing.
+    const key = allow
       ? Object.hasOwn(allow, component.id)
-        ? allow[component.id]
-        : undefined
-      : {};
+        ? component.id
+        : resolveAllowedComponentId(component.id, new Set(Object.keys(allow)))
+      : undefined;
+    const entry = allow ? (key === undefined ? undefined : allow[key]) : {};
     if (!entry) {
       add(errors, 'not-allowed', usage, `${component.id} is not in this design system.`, {
         hint: 'Use a component the allow set lists, or ask the design reviewer to allow it.',
