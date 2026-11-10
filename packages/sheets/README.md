@@ -13,7 +13,7 @@ grid editing layer.
 **In the stack:** layer L5, on the `@texuli/core` texels (the expression AST), `@texuli/date`, the `texuli` components and the `@texuli/data` grid (L4). The player paints it through its `sheetHost` seam.
 
 > **Status: in development (pre-1.0).** `@texuli/sheets` is published on
-> npm as `0.16.0`, with provenance (first released as `0.8.0`; built in PLAN_010).
+> npm as `0.16.1`, with provenance (first released as `0.8.0`; built in PLAN_010).
 > Under 0.x a new minor (`0.16.0`) may contain breaking changes, so pin the
 > exact version or use `^0.16.0`, which accepts only 0.16.x
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).

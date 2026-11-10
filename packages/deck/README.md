@@ -14,7 +14,7 @@ tools and agents can use it on its own.
 **In the stack:** layer L0: framework-free, with no dependencies. `@texuli/slides` (the stage), `@texuli/document` (inline decks), `@texuli/canvas` and `@texuli/tools` build on it.
 
 > **Status: in development (pre-1.0).** `@texuli/deck` is published on npm
-> as `0.16.0`, with provenance (first published as `0.4.0`). It was built in PLAN_008
+> as `0.16.1`, with provenance (first published as `0.4.0`). It was built in PLAN_008
 > (ADR-009 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
 > The `@texuli/slides` stage renders it from `0.4.0` (`@texuli/slides` `0.3.0`

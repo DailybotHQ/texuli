@@ -12,7 +12,7 @@ viewer; and SVG and PNG export with no HTML sinks.
 **In the stack:** layer L4, a domain package on the `@texuli/core` texels, `@texuli/drag`, `@texuli/document` (sync), `@texuli/deck` and the `texuli` components. The player paints it through its `canvasHost` seam.
 
 > **Status: in development (pre-1.0).** `@texuli/canvas` is published on
-> npm as `0.16.0`, with provenance (first published as `0.8.0`; built in PLAN_010).
+> npm as `0.16.1`, with provenance (first published as `0.8.0`; built in PLAN_010).
 > Under 0.x a new minor (`0.16.0`) may contain breaking changes, so pin the
 > exact version or use `^0.16.0`, which accepts only 0.16.x
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
