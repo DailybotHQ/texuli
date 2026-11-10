@@ -20,7 +20,7 @@
  * reported as `catalog-extension` with the merge's code in the message.
  */
 import { lstat, readdir, readFile, stat } from 'node:fs/promises';
-import { extname, relative, resolve } from 'node:path';
+import { extname, join, relative, resolve } from 'node:path';
 import type { SpecCatalog } from '@texuli/spec';
 import { CATALOG_EXTENSION_LIMITS } from '@texuli/spec/catalog-extensions';
 import { loadSpecCatalog } from '../ops/catalog.ts';
@@ -41,6 +41,7 @@ import {
   serializeDsCheckReport,
 } from './static.ts';
 import type { DsCheckMode, DsCheckReport } from './types.ts';
+import { listImportSpecifiers, packageNameOf } from './unscanned.ts';
 
 /** The largest design-system file the CLI reads. */
 export const DS_CHECK_MAX_BYTES = 1_000_000;
@@ -49,7 +50,7 @@ export const DS_CHECK_MAX_BYTES = 1_000_000;
 export const DS_CHECK_PROTOTYPE_SYMLINK = 'prototype-symlink';
 
 export const DS_CHECK_USAGE =
-  'Usage: texuli ds check <file> [--locked [--report]] [--prototype <dir>] [--json] [--render] [--mode light|dark|all] [--variant <name>]... [--trust developer|untrusted] [--base <file>]... [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict] [--catalog <components.json>] [--extensions <file>...]';
+  'Usage: texuli ds check <file> [--locked [--report]] [--prototype <dir> [--scan-workspace]] [--json] [--render] [--mode light|dark|all] [--variant <name>]... [--trust developer|untrusted] [--base <file>]... [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict] [--catalog <components.json>] [--extensions <file>...]';
 
 export interface DsCliArgs {
   command: 'check';
@@ -74,6 +75,8 @@ export interface DsCliArgs {
   extensions: string[];
   /** Source tree scanned as a locked prototype. */
   prototype?: string;
+  /** With `--prototype`: also scan workspace packages the prototype imports. */
+  scanWorkspace: boolean;
   help: boolean;
 }
 
@@ -89,6 +92,7 @@ export function parseDsCliArgs(argv: readonly string[]): DsCliArgs {
     bases: [],
     extensions: [],
     strict: false,
+    scanWorkspace: false,
     help: false,
   };
   if (command === undefined || command === '--help' || command === '-h')
@@ -127,6 +131,7 @@ export function parseDsCliArgs(argv: readonly string[]): DsCliArgs {
     else if (arg === '--known') args.known = value();
     else if (arg === '--catalog') args.catalog = value();
     else if (arg === '--prototype') args.prototype = value();
+    else if (arg === '--scan-workspace') args.scanWorkspace = true;
     else if (arg === '--extensions') {
       // One or more files, up to the next flag; the flag may also repeat.
       const before = args.extensions.length;
@@ -145,6 +150,8 @@ export function parseDsCliArgs(argv: readonly string[]): DsCliArgs {
   if (args.strict && !args.render) throw new TypeError('Flag --strict needs --render.');
   if (args.known !== undefined && !args.render) throw new TypeError('Flag --known needs --render.');
   if (args.report && !args.locked) throw new TypeError('Flag --report needs --locked.');
+  if (args.scanWorkspace && args.prototype === undefined)
+    throw new TypeError('Flag --scan-workspace needs --prototype.');
   if (args.extensions.length > CATALOG_EXTENSION_LIMITS.extensions)
     throw new RangeError(
       `extension-oversize: --extensions takes at most ${CATALOG_EXTENSION_LIMITS.extensions} files; got ${args.extensions.length}.`
@@ -276,6 +283,11 @@ export function formatDsFullReport(report: DsFullReport): string {
     a.localeCompare(b)
   ))
     lines.push(`  component ${component}: ${count} uses`);
+  const unchecked = report.prototype?.unchecked;
+  if (unchecked && unchecked.count > 0)
+    lines.push(
+      `  unchecked: ${unchecked.count} import(s) not scanned (${unchecked.imports.join(', ')})`
+    );
   for (const finding of report.findings)
     lines.push(
       `  ${finding.severity.toUpperCase()} ${finding.code} ${finding.path}: ${finding.message} Hint: ${finding.hint}`
@@ -314,20 +326,111 @@ function refusePrototypeSymlink(name: string): never {
   throw new TypeError(`${DS_CHECK_PROTOTYPE_SYMLINK}: Prototype symlinks are refused: ${name}.`);
 }
 
+function parseWorkspaceGlobs(yaml: string): string[] {
+  const globs: string[] = [];
+  let inPackages = false;
+  for (const line of yaml.split('\n')) {
+    if (/^packages:\s*$/.test(line)) {
+      inPackages = true;
+      continue;
+    }
+    if (!inPackages) continue;
+    const item = /^\s+-\s+['"]?([^'"#\n]+?)['"]?\s*(?:#.*)?$/.exec(line);
+    if (item) globs.push((item[1] as string).trim());
+    else if (/^\S/.test(line) && !line.startsWith('#')) break;
+  }
+  return globs;
+}
+
+async function packageNameAt(directory: string): Promise<string | undefined> {
+  try {
+    const info = await lstat(join(directory, 'package.json'));
+    if (info.isSymbolicLink() || !info.isFile()) return;
+    const raw = JSON.parse(await readFile(join(directory, 'package.json'), 'utf8')) as {
+      name?: unknown;
+    };
+    return typeof raw.name === 'string' ? raw.name : undefined;
+  } catch {
+    return;
+  }
+}
+
+/** Workspace package name → directory, walking up from `start` for pnpm-workspace.yaml or workspaces. */
+async function discoverWorkspacePackages(start: string): Promise<Map<string, string>> {
+  const found = new Map<string, string>();
+  let dir = resolve(start);
+  let root: string | undefined;
+  let globs: string[] = [];
+  for (let i = 0; i < 8; i++) {
+    try {
+      const yaml = await readFile(join(dir, 'pnpm-workspace.yaml'), 'utf8');
+      root = dir;
+      globs = parseWorkspaceGlobs(yaml);
+      break;
+    } catch {
+      // not this directory
+    }
+    try {
+      const pkg = JSON.parse(await readFile(join(dir, 'package.json'), 'utf8')) as {
+        workspaces?: unknown;
+      };
+      const listed = pkg.workspaces;
+      const names = Array.isArray(listed)
+        ? listed.filter((item): item is string => typeof item === 'string')
+        : Array.isArray((listed as { packages?: unknown } | undefined)?.packages)
+          ? ((listed as { packages: unknown[] }).packages.filter(
+              (item): item is string => typeof item === 'string'
+            ) as string[])
+          : [];
+      if (names.length > 0) {
+        root = dir;
+        globs = names;
+        break;
+      }
+    } catch {
+      // not this directory
+    }
+    const parent = resolve(dir, '..');
+    if (parent === dir) break;
+    dir = parent;
+  }
+  if (!root) return found;
+  for (const glob of globs) {
+    const star = glob.endsWith('/*') ? glob.slice(0, -2) : glob;
+    const parent = join(root, star);
+    try {
+      const entries = glob.endsWith('/*')
+        ? await readdir(parent, { withFileTypes: true })
+        : [{ name: '', isDirectory: () => true, isSymbolicLink: () => false }];
+      for (const entry of entries) {
+        if (entry.isSymbolicLink?.() || !entry.isDirectory()) continue;
+        const directory = glob.endsWith('/*') ? join(parent, entry.name) : parent;
+        const name = await packageNameAt(directory);
+        if (name && !found.has(name)) found.set(name, directory);
+      }
+    } catch {
+      // missing glob
+    }
+  }
+  return found;
+}
+
 /** Read a bounded prototype tree without following symlinks or executing source files. */
-async function readPrototypeDirectory(path: string) {
+async function readPrototypeDirectory(path: string, options: { scanWorkspace?: boolean } = {}) {
   const root = resolve(path);
   const files: Record<string, string> = {};
   const blueprints: Record<string, unknown> = {};
   let totalBytes = 0;
-  const walk = async (directory: string): Promise<void> => {
+  const walk = async (directory: string, keyRoot: string, keyPrefix: string): Promise<void> => {
     const entries = await readdir(directory, { withFileTypes: true });
     for (const entry of entries) {
       const absolute = resolve(directory, entry.name);
-      const name = relative(root, absolute).split('\\').join('/');
+      const rel = relative(keyRoot, absolute).split('\\').join('/');
+      const name = keyPrefix ? `${keyPrefix}${rel}` : rel;
       if (entry.isSymbolicLink()) refusePrototypeSymlink(name);
       if (entry.isDirectory()) {
-        await walk(absolute);
+        if (['node_modules', 'dist', '.git', 'coverage'].includes(entry.name)) continue;
+        await walk(absolute, keyRoot, keyPrefix);
         continue;
       }
       if (!entry.isFile()) continue;
@@ -370,8 +473,22 @@ async function readPrototypeDirectory(path: string) {
   const rootInfo = await lstat(root);
   if (rootInfo.isSymbolicLink()) refusePrototypeSymlink(path);
   if (!rootInfo.isDirectory()) throw new TypeError(`Prototype ${path} is not a directory.`);
-  await walk(root);
-  return { files, blueprints };
+  await walk(root, root, '');
+  const workspaces = await discoverWorkspacePackages(root);
+  if (options.scanWorkspace) {
+    const imported = new Set<string>();
+    for (const text of Object.values(files))
+      for (const spec of listImportSpecifiers(text)) {
+        const pkg = packageNameOf(spec);
+        if (pkg) imported.add(pkg);
+      }
+    for (const pkg of imported) {
+      const directory = workspaces.get(pkg);
+      if (!directory) continue;
+      await walk(directory, directory, `workspace:${pkg}/`);
+    }
+  }
+  return { files, blueprints, workspacePackages: [...workspaces.keys()] };
 }
 
 /** Run `texuli ds …`; sets `process.exitCode` (1 refusal, 2 could not run); never throws. */
@@ -418,14 +535,25 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
     const catalog = merged.catalog;
     if (args.locked || args.prototype !== undefined) {
       const prototype =
-        args.prototype === undefined ? undefined : await readPrototypeDirectory(args.prototype);
+        args.prototype === undefined
+          ? undefined
+          : await readPrototypeDirectory(args.prototype, { scanWorkspace: args.scanWorkspace });
       let full = await checkDesignSystemFull(doc, {
         catalog: texuli,
         ...(extensions.length > 0 ? { extensions } : {}),
         base: bases,
         file: args.file as string,
         hashes: true,
-        ...(prototype ? { prototype } : {}),
+        ...(prototype
+          ? {
+              prototype: {
+                files: prototype.files,
+                blueprints: prototype.blueprints,
+                workspacePackages: prototype.workspacePackages,
+                scanWorkspace: args.scanWorkspace,
+              },
+            }
+          : {}),
         ...(args.trust ? { trust: args.trust } : {}),
       });
       // The full report keeps a serialized check (no compiled variables), so the
