@@ -15,6 +15,14 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.4.1] — 2026-11-10
+
+### Changes
+
+- chore(skill): describe the category ink without a token pattern; refresh sums and mirror
+- chore(skill): the 0.16.0 install list names the render check and label palette
+- chore(skill): packages on npm at 0.16.0
+
 - The packages are on npm at `0.16.0`, a `0.x` minor with no breaking API
   change: blueprint spec `0.14.0` (the category `color` axis), and the
   design-system kit, `ds generate`, the locked checkers, bundles and the

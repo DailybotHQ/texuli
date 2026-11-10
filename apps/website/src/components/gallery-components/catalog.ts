@@ -39,14 +39,19 @@ export type GalleryComponentCard = {
 };
 
 function tagsFor(entry: ComponentPageEntry, variants: readonly string[]): string[] {
-  const tags = new Set<string>();
-  tags.add(entry.group);
-  tags.add(entry.tier);
-  tags.add(entry.package);
-  tags.add(entry.agentEmittable ? 'agent-emittable' : 'app-chrome');
-  for (const v of variants) tags.add(v);
-  for (const ex of entry.examples) tags.add(ex.id);
-  return [...tags].sort((a, b) => a.localeCompare(b, 'en'));
+  // The structural tags lead (a card shows its first five), then values and examples A to Z,
+  // so a component with many axis values (colors, sizes) keeps its group chip visible.
+  const lead = [
+    entry.group,
+    entry.tier,
+    entry.package,
+    entry.agentEmittable ? 'agent-emittable' : 'app-chrome',
+  ];
+  const rest = new Set<string>();
+  for (const v of variants) rest.add(v);
+  for (const ex of entry.examples) rest.add(ex.id);
+  for (const t of lead) rest.delete(t);
+  return [...new Set(lead), ...[...rest].sort((a, b) => a.localeCompare(b, 'en'))];
 }
 
 function variantsFor(entry: ComponentPageEntry): string[] {
