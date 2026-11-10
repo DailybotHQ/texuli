@@ -15,6 +15,11 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The packages are on npm at `0.16.1`, a patch: `--extensions` on
+  `texuli ds check` and `ds validate`, compound parts, the unscanned
+  imports of a locked prototype and the `VirtualListView` feed mode. The
+  components install reference marks them new in `0.16.1`.
+
 ## [0.4.1] — 2026-11-10
 
 ### Changes
