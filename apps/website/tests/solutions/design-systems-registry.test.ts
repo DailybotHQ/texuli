@@ -71,11 +71,12 @@ describe('Design systems Solution registry wiring (ADR-033)', () => {
     expect(twin?.demo).toContain('static example brand surfaces');
   });
 
-  it('links the existing reference hub to a clearly marked landing placeholder', () => {
+  it('links the existing reference hub to the finished landing', () => {
     expect(HUB).toContain("safeHref('/solutions/design-systems/', 'developer')");
     expect(HUB).toContain('Explore the Design Systems Solution');
     expect(HUB).toContain('ds-hub__solution-link');
-    expect(LANDING).toContain('<SolutionLayout {entry} {content}>');
-    expect(LANDING).toContain('This Solution landing is being completed.');
+    expect(LANDING).toContain('<SolutionLayout');
+    expect(LANDING).toContain('<DesignSystemsStories slot="stories" />');
+    expect(LANDING).not.toContain('This Solution landing is being completed.');
   });
 });
