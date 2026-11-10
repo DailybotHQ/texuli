@@ -46,7 +46,7 @@ function stubBrowser() {
     evaluate: (async (_fn: unknown, arg: unknown) => {
       if (!Array.isArray(arg)) return ['button', 'charts-bar'];
       if (arg.length === 2) {
-        // The host's map({ allow }) on a prototype page.
+        // The host's map({ allow, composed }) on a prototype page.
         mapped.push(arg[1]);
         return {
           ok: false,
@@ -155,8 +155,8 @@ describe('ds validate --locked --render', () => {
     expect(exitCode).toBe(1);
     const report = JSON.parse(stdout) as DsFullReport;
     expect(report.format).toBe('texuli/ds-validate');
-    // The page was mapped with the document's own allow set.
-    expect(browser.mapped).toEqual([ALLOW]);
+    // The page was mapped with the document's own allow set (the whole manifest reaches map).
+    expect(browser.mapped).toEqual([{ allow: ALLOW }]);
     const found = renderCodes(report);
     expect(found).toContainEqual(['not-allowed', '$.render["dialog"]']);
     expect(found).toContainEqual(['render-literal', '$.render["button"] button']);
