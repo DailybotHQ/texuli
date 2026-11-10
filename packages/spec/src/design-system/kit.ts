@@ -7,7 +7,6 @@
 import { designSystemContentHash } from './hash.ts';
 
 const COMPONENTS = 4096;
-const LIBRARY_ENTRIES = 64;
 const LIST_ITEMS = 100;
 const HASH = /^[0-9a-f]{64}$/;
 
@@ -28,6 +27,9 @@ const strings = (value: unknown): string[] | undefined =>
         return text !== undefined ? [text] : [];
       })
     : undefined;
+
+const text = (value: unknown): string | undefined =>
+  typeof value === 'string' ? value : undefined;
 
 /** The document's content hash (the ADR-032 rule: `designSystemContentHash`). */
 export function kitContentHash(doc: unknown): string {
@@ -192,12 +194,18 @@ function diffAllow(
 }
 
 const LIBRARY_FIELDS = ['name', 'purpose', 'version', 'status'] as const;
-const LIBRARY_APPROVAL_FIELDS = ['status', 'approvedBy', 'version', 'contentHash'] as const;
+const LIBRARY_APPROVAL_FIELDS = [
+  'status',
+  'approvedBy',
+  'approvedAt',
+  'version',
+  'contentHash',
+] as const;
 
 function libraryById(document: unknown): Map<string, Record<string, unknown>> {
   const out = new Map<string, Record<string, unknown>>();
   const list = isRecord(document) && Array.isArray(document.library) ? document.library : [];
-  for (const entry of list.slice(0, LIBRARY_ENTRIES))
+  for (const entry of list)
     if (isRecord(entry) && typeof entry.id === 'string' && !out.has(entry.id))
       out.set(entry.id, entry);
   return out;
@@ -216,10 +224,14 @@ function diffLibrary(before: unknown, after: unknown): KitLibraryChange[] {
     else {
       const fields: { field: string; before?: string; after?: string }[] = [];
       for (const field of LIBRARY_FIELDS) {
-        const l = clip(x[field], 200);
-        const r = clip(y[field], 200);
+        const l = text(x[field]);
+        const r = text(y[field]);
         if (l !== r)
-          fields.push({ field, ...(l ? { before: l } : {}), ...(r ? { after: r } : {}) });
+          fields.push({
+            field,
+            ...(l !== undefined ? { before: l } : {}),
+            ...(r !== undefined ? { after: r } : {}),
+          });
       }
       const lc = (strings(x.composes) ?? []).join(', ');
       const rc = (strings(y.composes) ?? []).join(', ');
@@ -227,13 +239,13 @@ function diffLibrary(before: unknown, after: unknown): KitLibraryChange[] {
       const xa = isRecord(x.approval) ? x.approval : {};
       const ya = isRecord(y.approval) ? y.approval : {};
       for (const field of LIBRARY_APPROVAL_FIELDS) {
-        const l = clip(xa[field], 200);
-        const r = clip(ya[field], 200);
+        const l = text(xa[field]);
+        const r = text(ya[field]);
         if (l !== r)
           fields.push({
             field: `approval.${field}`,
-            ...(l ? { before: l } : {}),
-            ...(r ? { after: r } : {}),
+            ...(l !== undefined ? { before: l } : {}),
+            ...(r !== undefined ? { after: r } : {}),
           });
       }
       if (fields.length > 0) changes.push({ kind: 'changed', id: shown, fields });
