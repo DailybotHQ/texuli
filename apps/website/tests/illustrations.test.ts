@@ -211,6 +211,44 @@ describe('slots awaiting their artwork', () => {
   });
 });
 
+describe('design-systems landing slots (PLAN_017 T-art, ADR-033)', () => {
+  const SLOTS = [
+    'solution-design-systems-hero',
+    'solution-design-systems-story-1',
+    'solution-design-systems-story-2',
+    'solution-design-systems-story-3',
+    'solution-design-systems-story-4',
+    'solution-design-systems-story-5',
+    'solution-design-systems-how',
+    'solution-design-systems-protoyard',
+  ];
+
+  it('registers the hero, five stories, the how band and Built with at their sizes', () => {
+    for (const slot of SLOTS) {
+      const entry = illustrationFor(slot);
+      expect(entry, slot).toBeDefined();
+      if (!entry) continue;
+      expect(entry.file).toBe(`${slot}.webp`);
+      expect(entry.fileDark).toBe(`${slot}-dark.webp`);
+      expect(entry.priority, slot).toBeUndefined();
+      expect(entry.prompt, slot).toContain('Background: true transparent alpha');
+      const expected = slot.endsWith('-hero')
+        ? { variant: 'plate', width: 1200, height: 1000 }
+        : slot.endsWith('-how')
+          ? { variant: 'band', width: 1600, height: 700 }
+          : { variant: 'plate', width: 1600, height: 1000 };
+      expect({ variant: entry.variant, width: entry.width, height: entry.height }, slot).toEqual(
+        expected
+      );
+    }
+  });
+
+  it('ships no file yet, so each slot paints the texel mosaic fallback', () => {
+    const files = new Set(readdirSync(resolve(WEBSITE, 'src/assets/illustrations')));
+    for (const slot of SLOTS) expect(files.has(`${slot}.webp`), slot).toBe(false);
+  });
+});
+
 describe('platform page banners', () => {
   it('gives every platform page an on-style banner slot', () => {
     const banners: Record<string, string> = {
