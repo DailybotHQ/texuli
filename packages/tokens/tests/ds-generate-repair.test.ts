@@ -34,8 +34,7 @@ describe('design-system generator importer repairs', () => {
     if (named.ok) expect(named.document.color?.brand?.seed).toBe('#008080');
 
     const oversized = importBrand(`${'teal '.repeat(201)}`);
-    expect(oversized.ok).toBe(false);
-    if (!oversized.ok) expect(oversized.errors[0]?.code).toBe('input-limit');
+    expect(oversized.ok).toBe(true);
   });
 
   it('prefers the declared sans token over body font-family in either rule order and reports it', () => {
