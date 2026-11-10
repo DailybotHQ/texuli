@@ -68,7 +68,11 @@ export async function loadKitPage(): Promise<KitPageData> {
   const catalog = JSON.parse(raw) as KitCatalog;
   const manifest = (
     brand.compiled as {
-      allowManifest?: { allow?: KitAllowManifest['allow']; contentHash?: string };
+      allowManifest?: {
+        allow?: KitAllowManifest['allow'];
+        library?: KitAllowManifest['library'];
+        contentHash?: string;
+      };
     }
   ).allowManifest;
   const allowSection = manifest?.allow;
@@ -76,6 +80,7 @@ export async function loadKitPage(): Promise<KitPageData> {
     version: brand.version,
     ...(manifest?.contentHash ? { contentHash: manifest.contentHash } : {}),
     ...(allowSection ? { allow: allowSection } : {}),
+    ...(manifest?.library ? { library: manifest.library } : {}),
   };
   const allowed = new Set(Object.keys(allowSection ?? {}));
   const { vars, modes, fontFaces, assets, accessibility, report, id, name, version } =
