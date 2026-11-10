@@ -110,6 +110,9 @@ for (const colorScheme of ['light', 'dark'] as const) {
     await page.emulateMedia({ colorScheme, reducedMotion: 'reduce' });
     await page.goto(`${origin()}${ROUTE}`);
     await hydrate(page);
+    // hydrate() leaves the matrix in view; at that offset the sticky site header can sit over a
+    // sample (axe target-size reads it as obscured, depending on font metrics). Audit from the top.
+    await page.evaluate(() => window.scrollTo(0, 0));
     expect(await axeViolations(page)).toEqual([]);
     await page.setViewportSize({ width: 390, height: 844 });
     await settle(page);
