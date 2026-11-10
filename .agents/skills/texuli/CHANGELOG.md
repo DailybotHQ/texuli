@@ -15,6 +15,11 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The packages are on npm at `0.17.3`, a patch (blueprint spec stays
+  `0.15.0`) with the prose importer fixes, render baselines keyed by
+  route, viewport and mode, and one `render-disabled-value` per root. The
+  components install reference marks them new in `0.17.3`.
+
 ## [0.4.5] — 2026-11-10
 
 ### Changes
