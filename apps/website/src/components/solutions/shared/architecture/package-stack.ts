@@ -32,7 +32,7 @@ export const PACKAGE_STACK: Readonly<Record<string, StackPackage>> = {
   texuli: {
     layer: 3,
     label: 'Styled components',
-    dependsOn: ['@texuli/core', '@texuli/primitives', '@texuli/tokens'],
+    dependsOn: ['@texuli/core', '@texuli/primitives', '@texuli/tokens', '@texuli/spec'],
   },
   '@texuli/charts': {
     layer: 4,
