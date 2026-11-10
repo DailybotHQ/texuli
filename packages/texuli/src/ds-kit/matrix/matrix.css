@@ -13,7 +13,7 @@
     flex-wrap: wrap;
     align-items: center;
     gap: var(--tx-space-2);
-    min-block-size: var(--tx-size-target-min, 2.75rem);
+    min-block-size: var(--tx-size-target-min);
     cursor: pointer;
     font-weight: var(--tx-font-weight-semibold, 600);
   }

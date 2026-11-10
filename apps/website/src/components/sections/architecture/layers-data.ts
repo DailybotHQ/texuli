@@ -101,7 +101,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       {
         name: 'texuli',
         role: 'Styled components (Button … Tree), the class helpers (cx, variants), icons, layouts and app shells',
-        dependsOn: ['core', 'primitives', 'tokens'],
+        dependsOn: ['core', 'primitives', 'tokens', 'spec'],
       },
     ],
   },
