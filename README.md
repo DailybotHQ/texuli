@@ -40,8 +40,8 @@ Multiplatform twin), an MCP server and an agent skill.
 
 > **Status: in development, pre-1.0.** The screenshot above is the
 > texuli.com website, which deploys from `main` to Cloudflare Pages. The 26
-> published packages are released on npm in the 0.16 line,
-> every one at `0.16.1` (published by CI through npm trusted publishing with
+> published packages are released on npm in the 0.17 line,
+> every one at `0.17.0` (published by CI through npm trusted publishing with
 > provenance; `latest` points to it, and `next` is no longer maintained and
 > stays on `0.12.1`); `0.10.0` added design systems, the 0.11 line added the Protoyard
 > gaps G125–G136 and the Final Review fixes (square theme radii, password
@@ -65,7 +65,10 @@ Multiplatform twin), an MCP server and an agent skill.
 > more typography, Box and input options, with no breaking API change, and
 > `0.16.1` is an additive patch (host catalog extensions in `texuli ds
 > check`, unscanned prototype imports in the locked report and a feed mode
-> for `VirtualListView`). It is not a stable release:
+> for `VirtualListView`), and `0.17.0` adds blueprint spec `0.15.0` and the
+> Protoyard adoption fixes to the generator, bundles, the locked render
+> check, the kit and `VirtualListView`, with no export removed. It is not a
+> stable release:
 > under 0.x a new minor may contain breaking changes, and 1.0.0 will be
 > the first stable release.
 > The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
@@ -222,10 +225,10 @@ every verified command.
 ## Honest boundaries
 
 - **No stable release yet.** The 26 published packages are on npm in the
-  0.16 line, a pre-1.0 release (`npm install texuli`; `latest` points to
-  `0.16.1`, and `next` is no longer maintained, see
-  [RELEASE](docs/RELEASE.md#dist-tags)). Under 0.x a new minor (`0.16.0`) may contain breaking
-  changes, so pin the exact version or use `^0.16.0`; 1.0.0 will be the
+  0.17 line, a pre-1.0 release (`npm install texuli`; `latest` points to
+  `0.17.0`, and `next` is no longer maintained, see
+  [RELEASE](docs/RELEASE.md#dist-tags)). Under 0.x a new minor (`0.17.0`) may contain breaking
+  changes, so pin the exact version or use `^0.17.0`; 1.0.0 will be the
   first stable release.
   The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
 - **texuli.com deploys from `main`** (Cloudflare Pages). Run it locally with

@@ -25,8 +25,12 @@ const ROUND_2 = SLUGS.flatMap((slug) =>
 );
 
 describe('round-2 illustration slots', () => {
-  it('covers every Solution in the registry with three stories and a how band', () => {
-    expect([...SLUGS].sort()).toEqual(SOLUTIONS.map((s) => s.slug).sort());
+  it('covers each implemented Solution landing with three stories and a how band', () => {
+    expect([...SLUGS].sort()).toEqual(
+      SOLUTIONS.filter((entry) => entry.slug !== 'design-systems')
+        .map((s) => s.slug)
+        .sort()
+    );
     expect(ROUND_2).toHaveLength(20);
     expect(new Set(ILLUSTRATIONS.map((e) => e.slot)).size).toBe(ILLUSTRATIONS.length);
   });

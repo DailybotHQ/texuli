@@ -247,7 +247,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     id: 'page-whats-new',
     title: 'What’s new',
     description:
-      'Every new package and capability of 0.6.0 to 0.16.1, with a demo or preview each and honest release status.',
+      'Every new package and capability of 0.6.0 to 0.17.0, with a demo or preview each and honest release status.',
     href: '/whats-new/',
     kind: 'page',
     keywords: [
@@ -255,6 +255,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
       'release',
       'features',
       'changelog',
+      '0.17.0',
       '0.16.0',
       '0.15.0',
       '0.14.0',
@@ -311,6 +312,24 @@ const SITE_PAGES: readonly SearchEntry[] = [
     href: '/solutions/slides/',
     kind: 'page',
     keywords: ['slides', 'deck', 'presentation', 'markdown', 'json', 'presenter', 'pptx'],
+  },
+  {
+    id: 'solution-design-systems',
+    title: 'Design systems (Solution)',
+    description:
+      'Create a design system from brand inputs, review it in the UI kit, approve it, keep prototypes locked to it and share it as a bundle.',
+    href: '/solutions/design-systems/',
+    kind: 'page',
+    keywords: [
+      'design system',
+      'locked',
+      'ui kit',
+      'approve',
+      'ds generate',
+      'allow',
+      'bundle',
+      'protoyard',
+    ],
   },
   {
     id: 'page-design-systems',

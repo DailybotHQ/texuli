@@ -12,6 +12,7 @@ import { SOLUTIONS } from '../../src/data/solutions/index.ts';
 import type { SolutionEntry } from '../../src/data/solutions/schema.ts';
 import { solutionsIndexDocument } from '../../src/lib/twins/solutions.ts';
 
+const STATUS_RANK = { planned: 0, experimental: 1, 'in development': 2, available: 3 } as const;
 const WEBSITE = resolve(import.meta.dirname, '../..');
 const read = (path: string) => readFileSync(resolve(WEBSITE, path), 'utf8');
 const component = read('src/components/solutions/catalog/SolutionsCatalog.astro');
@@ -34,15 +35,24 @@ describe('/solutions/ catalog content', () => {
     }
   });
 
-  it('never raises a native status: every card is native-planned today', () => {
+  it('never raises a native status above the registry entry', () => {
     for (const card of catalogCards()) {
-      expect(card.native, card.slug).toBe('planned');
-      expect(card.onNative).toBe(false);
+      const entry = SOLUTIONS.find((solution) => solution.slug === card.slug);
+      const expected =
+        entry?.platforms
+          .filter((platform) => platform.platform !== 'web')
+          .reduce(
+            (status, platform) =>
+              STATUS_RANK[platform.status] > STATUS_RANK[status] ? platform.status : status,
+            'planned' as keyof typeof STATUS_RANK
+          ) ?? 'planned';
+      expect(card.native, card.slug).toBe(expected);
+      expect(card.onNative, card.slug).toBe(expected !== 'planned');
     }
     expect(filterCounts(catalogCards())).toEqual({
       all: SOLUTIONS.length,
       web: SOLUTIONS.length,
-      native: 0,
+      native: 1,
     });
   });
 

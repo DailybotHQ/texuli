@@ -52,7 +52,7 @@ own chrome:
 
 Put the `labelId` the snippet receives on the card's heading: it names the
 article (below). `surface="plain"` drops the viewport's border, radius and
-surface, so the cards sit on the page (in development for `0.17.0`).
+surface, so the cards sit on the page (new in `0.17.0`).
 
 In a listbox you only want to activate rows, not select them. In that case,
 `selectable={false}` keeps the listbox pattern: no row is selected or painted
@@ -182,5 +182,4 @@ governs it (`size` and `density` are its axes; from spec `0.15.0`, `mode`,
 player has no painter for it yet, so blueprints do not emit it.
 
 `mode` and `selectable` are component props since `0.16.1`. The catalog entry
-lists them, and `surface`, from blueprint spec `0.15.0`, which is in development for `0.17.0` and not
-published. A patch release leaves the published spec `0.14.0` unchanged.
+lists them, and `surface`, from blueprint spec `0.15.0` (new in `0.17.0`).

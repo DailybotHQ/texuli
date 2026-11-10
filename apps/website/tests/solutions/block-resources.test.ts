@@ -66,7 +66,13 @@ describe('related Solutions', () => {
     ]);
     expect([...live]).toEqual(['/solutions/canvas/']);
     const related = relatedSolutions(slides, SOLUTIONS, live, '/');
-    expect(related.map((r) => r.slug)).toEqual(['documents', 'workflows', 'canvas', 'sheets']);
+    expect(related.map((r) => r.slug)).toEqual([
+      'documents',
+      'workflows',
+      'canvas',
+      'sheets',
+      'design-systems',
+    ]);
     expect(related.find((r) => r.slug === 'canvas')?.href).toBe('/solutions/canvas/');
     expect(related.filter((r) => r.href !== undefined)).toHaveLength(1);
     for (const r of related) {

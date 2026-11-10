@@ -1,0 +1,55 @@
+---
+/**
+ * `/solutions/design-systems/` — the Design systems Solution landing (ADR-027, ADR-030,
+ * ADR-033; PLAN_017 T-landing): hero, the loop in five steps (create, review, approve, lock,
+ * share), how it works, Built on it (Protoyard), quickstart, recipes, agents, platforms, the
+ * FAQ and next steps. `SolutionLayout` orders the sections and checks the content against
+ * the registry entry. The demo section (`DesignSystemsDemoSection`) mounts the page's one
+ * `client:visible` island at its `data-tx-ds-demo-mount` point.
+ */
+
+import DesignSystemsDemoSection from '../../../components/solutions/design-systems/demo/DesignSystemsDemoSection.astro';
+import DesignSystemsFaq from '../../../components/solutions/design-systems/extras/DesignSystemsFaq.astro';
+import DesignSystemsProtoyard from '../../../components/solutions/design-systems/extras/DesignSystemsProtoyard.astro';
+import DesignSystemsHero from '../../../components/solutions/design-systems/hero/DesignSystemsHero.astro';
+import DesignSystemsHow from '../../../components/solutions/design-systems/how/DesignSystemsHow.astro';
+import DesignSystemsQuickstart from '../../../components/solutions/design-systems/quickstart/DesignSystemsQuickstart.astro';
+import DesignSystemsStories from '../../../components/solutions/design-systems/stories/DesignSystemsStories.astro';
+import SolutionAgents from '../../../components/solutions/shared/platforms/SolutionAgents.astro';
+import SolutionPlatforms from '../../../components/solutions/shared/platforms/SolutionPlatforms.astro';
+import SolutionNextSteps from '../../../components/solutions/shared/resources/SolutionNextSteps.astro';
+import SolutionRecipes from '../../../components/solutions/shared/resources/SolutionRecipes.astro';
+import SolutionRelated from '../../../components/solutions/shared/resources/SolutionRelated.astro';
+import SolutionLayout from '../../../components/solutions/shared/SolutionLayout.astro';
+import { techArticleJsonLd } from '../../../lib/schema.ts';
+import { DESIGN_SYSTEMS_LANDING as content, DESIGN_SYSTEMS_ENTRY as entry } from './_content.ts';
+
+const title = 'Design systems — your brand, locked in one file';
+const description =
+  'Generate a design system from brand inputs, review it in the kit, approve it in a commit, and check every prototype against it.';
+---
+
+<SolutionLayout
+  {entry}
+  {content}
+  {title}
+  {description}
+  jsonLd={techArticleJsonLd(title, description, entry.route)}
+>
+  <DesignSystemsHero slot="hero" />
+  <DesignSystemsDemoSection slot="demo" />
+  <DesignSystemsStories slot="stories" />
+  <Fragment slot="how">
+    <DesignSystemsHow />
+    <DesignSystemsProtoyard />
+  </Fragment>
+  <DesignSystemsQuickstart slot="quickstart" />
+  <SolutionRecipes slot="recipes" {entry} {...content.recipes!} />
+  <SolutionAgents slot="agents" {entry} {...content.agents} />
+  <SolutionPlatforms slot="platforms" {entry} {...content.platforms} />
+  <Fragment slot="next">
+    <DesignSystemsFaq />
+    <SolutionRelated {entry} />
+    <SolutionNextSteps {entry} {...content.next} />
+  </Fragment>
+</SolutionLayout>

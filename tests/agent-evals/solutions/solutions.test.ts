@@ -14,6 +14,12 @@
  * Canvas and Sheets have no MCP validator: `blueprint.validate` refuses their nodes with a
  * stable code, and the scenario checks that the agent is pointed to the package that holds
  * the validator instead. That is the honest path today.
+ *
+ * Design systems (PLAN_017): `ds.generate` returns a draft from a brief (never saved or
+ * approved), `ds.validate` accepts it, and `ds.validate` in full mode reports a prototype
+ * blueprint that uses a component the locked allow set does not list. Its docs page is a
+ * short reference page that does not name the packages yet, so for it the package names
+ * come from the index only (`docsNamePackages: false`).
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -28,7 +34,7 @@ const REPO = resolve(import.meta.dirname, '../../..');
 const call = (name: string, args: Json) => ({ name, arguments: args });
 
 /** Steps 1–3: llms.txt → index.json → the docs page over the remote MCP. */
-async function discover(slug: SolutionSlug) {
+async function discover(slug: SolutionSlug, options: { docsNamePackages?: boolean } = {}) {
   const site = solutionsSite();
   const get = async (url: string) => {
     expect(url.startsWith(`${SITE}/`), url).toBe(true);
@@ -50,10 +56,20 @@ async function discover(slug: SolutionSlug) {
   expect(entry, `${slug} in the index`).toBeDefined();
   expect(links.map((link) => link.url)).toContain(entry.url);
   expect(entry.docs).toBe(`${SITE}/guides/solutions/${slug}/`);
-  // Honest status: in development, native planned.
+  // Honest status: native planned, or in development where the registry cites evidence
+  // (design systems on Compose Desktop; the registry validator caps native statuses).
   expect(['available', 'in development', 'experimental', 'planned']).toContain(entry.status);
-  for (const platform of entry.platforms)
-    if (platform.platform !== 'web') expect(platform.status).toBe('planned');
+  const registry = SOLUTIONS.find((s) => s.slug === slug);
+  for (const platform of entry.platforms) {
+    if (platform.platform === 'web') continue;
+    expect(['planned', 'in development'], `${slug} ${platform.platform}`).toContain(
+      platform.status
+    );
+    if (platform.status === 'in development') {
+      const cited = registry?.platforms.find((p) => p.platform === platform.platform)?.evidence;
+      expect(cited?.length ?? 0, `${slug} ${platform.platform} evidence`).toBeGreaterThan(0);
+    }
+  }
 
   // 3. The docs page, read the way a remote agent reads it.
   const docsPath = new URL(entry.docs).pathname;
@@ -79,8 +95,9 @@ async function discover(slug: SolutionSlug) {
   expect(rpc.result.isError ?? false, JSON.stringify(rpc.result).slice(0, 300)).toBe(false);
   const docs = rpc.result.structuredContent;
   expect(docs.path).toBe(docsPath);
-  // The docs name every package the index lists.
-  for (const pkg of entry.packages) expect(docs.markdown, pkg.name).toContain(pkg.name);
+  // The docs name every package the index lists (where the docs page does).
+  if (options.docsNamePackages !== false)
+    for (const pkg of entry.packages) expect(docs.markdown, pkg.name).toContain(pkg.name);
   expect(site.requested).toEqual(
     expect.arrayContaining([
       '/llms.txt',
@@ -133,7 +150,7 @@ const PIPELINE = JSON.parse(
 describe('agent builds each shipped Solution from llms.txt → index → docs → MCP', () => {
   it('covers every Solution in the registry', () => {
     expect(SOLUTIONS.map((s) => s.slug).sort()).toEqual(
-      ['canvas', 'documents', 'sheets', 'slides', 'workflows'].sort()
+      ['canvas', 'design-systems', 'documents', 'sheets', 'slides', 'workflows'].sort()
     );
   });
 
@@ -284,4 +301,72 @@ describe('agent builds each shipped Solution from llms.txt → index → docs �
       });
     });
   }
+  it('build a design system: ds.generate a draft → ds.validate → a locked check of a prototype', async () => {
+    const { entry, docs } = await discover('design-systems', { docsNamePackages: false });
+    expect(entry.packages.map((p: Json) => p.name)).toEqual([
+      '@texuli/spec',
+      '@texuli/tokens',
+      'texuli',
+      '@texuli/tools',
+    ]);
+    expect(docs).toMatch(/closed JSON document/);
+    expect(docs).toMatch(/allow set/);
+    await build({
+      name: 'design-systems draft',
+      steps: [
+        {
+          label: 'generate',
+          method: 'tools/call',
+          params: call('ds.generate', {
+            brief: 'name Harborline, brand #0e7490, rounded, calm, comfortable',
+          }),
+          expect(result) {
+            const out = result.structuredContent;
+            expect(out.ok).toBe(true);
+            expect(out.document.name).toBe('Harborline');
+            expect(out.report.guarantees.passed).toBe(true);
+            // A draft: the generator never approves.
+            expect(out.document.approval).toBeUndefined();
+          },
+        },
+        {
+          label: 'validate',
+          method: 'tools/call',
+          params: (ctx) => call('ds.validate', { document: ctx.data('generate').document }),
+        },
+        {
+          label: 'locked',
+          method: 'tools/call',
+          params: (ctx) =>
+            call('ds.validate', {
+              document: {
+                ...ctx.data('generate').document,
+                allow: { card: {}, button: { variants: ['default', 'outline'] } },
+              },
+              full: true,
+              report: true,
+              prototype: {
+                blueprints: {
+                  'signup.json': {
+                    tree: {
+                      id: 'card',
+                      children: [
+                        { id: 'button', props: { variant: 'ghost' } },
+                        { id: 'badge', props: {} },
+                      ],
+                    },
+                  },
+                },
+              },
+            }),
+        },
+      ],
+      final(ctx) {
+        expect(ctx.data('validate').valid).toBe(true);
+        const codes = JSON.stringify(ctx.data('locked'));
+        expect(codes).toContain('not-allowed');
+        expect(codes).toContain('variant-not-allowed');
+      },
+    });
+  });
 });

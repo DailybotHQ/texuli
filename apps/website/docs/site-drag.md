@@ -2,7 +2,7 @@
 
 **App:** `apps/website`
 **Path:** `/drag-page/`
-**Package:** `@texuli/drag` (in development, on npm in the 0.16 line), shown through
+**Package:** `@texuli/drag` (in development, on npm in the 0.17 line), shown through
 `@texuli/primitives/sortable`, `@texuli/data/grid-columns` and
 `@texuli/primitives/file-drop`
 **Tests:** `apps/website/tests/site-drag.test.ts`, `tests/e2e/site-drag-workflows.spec.ts`

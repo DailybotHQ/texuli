@@ -206,6 +206,7 @@ export const SOLUTION_OPERATIONS: Readonly<Record<SolutionSlug, readonly string[
   workflows: ['catalog.search', 'component.get', 'blueprint.validate'],
   canvas: ['catalog.search', 'component.get', 'blueprint.validate'],
   sheets: ['catalog.search', 'component.get', 'blueprint.validate'],
+  'design-systems': ['ds.validate', 'ds.generate', 'ds.compile'],
 };
 
 /** A "For agents" twin note, the shape of `TwinNote` in `components/docs/twin-notes.ts`. */

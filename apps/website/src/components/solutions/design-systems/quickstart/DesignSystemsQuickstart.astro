@@ -1,0 +1,9 @@
+---
+import { getSolution } from '../../../../data/solutions/index.ts';
+import Quickstart from '../../shared/quickstart/Quickstart.astro';
+import { designSystemsQuickstart } from './samples.ts';
+
+const entry = getSolution('design-systems');
+---
+
+<Quickstart {...designSystemsQuickstart(entry)} />

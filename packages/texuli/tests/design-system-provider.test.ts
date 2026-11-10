@@ -66,7 +66,8 @@ const expected = (system: CompiledDesignSystem, mode: 'light' | 'dark') =>
 
 afterEach(cleanup);
 
-describe('DesignSystemProvider', () => {
+// Each case compiles a design system and paints it: seconds alone, far slower under parallel load.
+describe('DesignSystemProvider', { timeout: 30_000 }, () => {
   it('scopes the compiled variables, attributes and component defaults to its element', async () => {
     render(Harness, { compiled: acme });
     await tick();

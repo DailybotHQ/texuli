@@ -16,7 +16,7 @@ export type RouteExists = (route: string) => boolean;
 export const CATALOG_PAGE = {
   title: 'Solutions',
   description:
-    'Embeddable open-source systems built from Texuli: slides, documents, workflows, canvases and sheets, each with its status on the web and on native targets.',
+    'Embeddable open-source systems built from Texuli: design systems, slides, documents, workflows, canvases and sheets, each with its status on the web and on native targets.',
   hero: {
     id: 'solutions-catalog-title',
     eyebrow: 'Texuli Solutions',

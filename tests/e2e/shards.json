@@ -95,6 +95,7 @@
       "a11y-forms.spec.ts",
       "print-isolation.spec.ts",
       "site-charts-page.spec.ts",
+      "site-design-systems.spec.ts",
       "site-landing.spec.ts",
       "site-live-gallery.spec.ts",
       "site-live-generation.spec.ts",
@@ -102,10 +103,10 @@
       "site-redirects.spec.ts",
       "site-responsive.spec.ts",
       "site-search.spec.ts",
+      "site-solution-design-systems.spec.ts",
       "site-theme-switcher.spec.ts",
       "site-twins.spec.ts",
-      "site-whats-new.spec.ts",
-      "site-design-systems.spec.ts"
+      "site-whats-new.spec.ts"
     ]
   ]
 }
