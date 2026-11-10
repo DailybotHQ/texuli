@@ -140,7 +140,10 @@ The component also exports `scrollToIndex(index)` (`bind:this`).
 ## Catalog
 
 `data-virtual-list` is a catalog id, so a locked design system's `allow` set
-governs it (`size` and `density` are its axes; `mode` and `selectable` are
-plain props) and `texuli ds validate
+governs it (`size` and `density` are its axes) and `texuli ds validate
 --locked --prototype` checks its use. It is `agentEmittable: false`: the
 player has no painter for it yet, so blueprints do not emit it.
+
+`mode` and `selectable` are component props only in `0.16.1`. The catalog
+entry does not list them yet, because a patch release leaves the published
+blueprint spec `0.14.0` unchanged. The catalog gains them in the next minor.
