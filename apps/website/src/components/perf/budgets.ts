@@ -339,8 +339,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/design-systems/kit/',
     reason:
-      "PLAN_016 T-t4-site: the design-system kit (texuli/ds-kit) for the example brand Ledgerline, server-rendered and hydrated when visible: the HTML carries the kit (foundations tables in light and dark, voice, matrix, library) and the island's build-time props (the compiled variables and report, the allow manifest and a trimmed catalog). Measured 2026-11-09: 414.0 KB raw and 35.5 KB gzip of HTML; after hydration and the matrix's lazy samples, 169.8 KB page and 106.8 KB JavaScript (+4% headroom). 0.16.0 (2026-11-09): the kit gained the 0.16.0 matrix values; htmlRawKb measured 433.2 KB, limit +4%.",
-    budget: { pageGzipKb: 177, jsGzipKb: 112, htmlGzipKb: 37, htmlRawKb: 451 },
+      "PLAN_016 T-t4-site: the design-system kit (texuli/ds-kit) for the example brand Ledgerline, server-rendered and hydrated when visible: the HTML carries the kit (foundations tables in light and dark, voice, matrix, library) and the island's build-time props (the compiled variables and report, the allow manifest and a trimmed catalog). Measured 2026-11-09: 414.0 KB raw and 35.5 KB gzip of HTML; after hydration and the matrix's lazy samples, 169.8 KB page and 106.8 KB JavaScript (+4% headroom). 0.16.0 (2026-11-09): the kit gained the 0.16.0 matrix values; htmlRawKb measured 433.2 KB, limit +4%. PLAN_017 (2026-11-10): the kit intro links the design-systems landing and 0.17.0 adds collapsible matrix groups; measured 37.1 KB gzip of HTML, limit +4%.",
+    budget: { pageGzipKb: 177, jsGzipKb: 112, htmlGzipKb: 39, htmlRawKb: 451 },
   },
   {
     route: '/solutions/',
