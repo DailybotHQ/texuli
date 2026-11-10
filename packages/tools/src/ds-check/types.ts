@@ -53,6 +53,10 @@ export interface DsCheckIssue {
   /** The variant being checked when the issue came from a variant run. */
   variant?: string;
   mode?: DsCheckMode;
+  /** The page route a render finding was found on (path and query of the checked URL; 0.17.3). */
+  route?: string;
+  /** The viewport a render finding was found at, `<width>x<height>` (0.17.3). */
+  viewport?: string;
   /** The failing contrast pairs of an `aa-text` or `aa-focus` refusal. */
   pairs?: DesignSystemPairResult[];
 }

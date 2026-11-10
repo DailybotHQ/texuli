@@ -69,6 +69,10 @@ export interface DsFullFinding {
   readonly hint: string;
   readonly variant?: string;
   readonly mode?: DsCheckMode;
+  /** The page route of a render finding (0.17.3); part of the baseline key. */
+  readonly route?: string;
+  /** The viewport of a render finding, `<width>x<height>` (0.17.3); part of the baseline key. */
+  readonly viewport?: string;
   /** The component of a prototype finding. */
   readonly component?: string;
   /** The value that failed (a variant, a class, a declaration). */
