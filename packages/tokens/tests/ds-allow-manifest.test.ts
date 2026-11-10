@@ -82,6 +82,20 @@ describe('compileAllowManifest', () => {
     );
     expect(compileAllowManifest(hostile).allow).toEqual({ button: { variants: ['default'] } });
   });
+
+  it('preserves the full document allow cap and all values within an axis cap', () => {
+    const variants = Array.from({ length: 32 }, (_, index) => `variant-${index}`);
+    const allow = Object.fromEntries(
+      Array.from({ length: 4096 }, (_, index) => [
+        `component-${index}`,
+        index === 4095 ? { variants } : {},
+      ])
+    );
+    const manifest = compileAllowManifest({ ...minimal, allow });
+
+    expect(Object.keys(manifest.allow ?? {})).toHaveLength(4096);
+    expect(manifest.allow?.['component-4095']?.variants).toEqual(variants);
+  });
 });
 
 describe('compileDesignSystem allow manifest', () => {
