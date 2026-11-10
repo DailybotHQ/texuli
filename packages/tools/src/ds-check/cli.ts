@@ -24,6 +24,7 @@ import { extname, join, relative, resolve } from 'node:path';
 import type { SpecCatalog } from '@texuli/spec';
 import { CATALOG_EXTENSION_LIMITS } from '@texuli/spec/catalog-extensions';
 import { loadSpecCatalog } from '../ops/catalog.ts';
+import { compareDsReport, dsReportFingerprint } from './baseline.ts';
 import { catalogExtensionIssues, loadMergedCatalog } from './extensions.ts';
 import { checkDesignSystemFull, type DsFullReport } from './full.ts';
 import { renderLockedDesignSystemCheck } from './locked-render.ts';
@@ -50,7 +51,7 @@ export const DS_CHECK_MAX_BYTES = 1_000_000;
 export const DS_CHECK_PROTOTYPE_SYMLINK = 'prototype-symlink';
 
 export const DS_CHECK_USAGE =
-  'Usage: texuli ds check <file> [--locked [--report]] [--prototype <dir> [--scan-workspace]] [--json] [--render] [--mode light|dark|all] [--variant <name>]... [--trust developer|untrusted] [--base <file>]... [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict] [--catalog <components.json>] [--extensions <file>...]';
+  'Usage: texuli ds check <file> [--locked [--report [--baseline <file>]]] [--prototype <dir> [--scan-workspace]] [--json] [--render] [--mode light|dark|all] [--variant <name>]... [--trust developer|untrusted] [--base <file>]... [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict] [--catalog <components.json>] [--extensions <file>...]';
 
 export interface DsCliArgs {
   command: 'check';
@@ -77,6 +78,8 @@ export interface DsCliArgs {
   prototype?: string;
   /** With `--prototype`: also scan workspace packages the prototype imports. */
   scanWorkspace: boolean;
+  /** With `--locked --report`: a previous JSON report to compare (exit 1 on new findings). */
+  baseline?: string;
   help: boolean;
 }
 
@@ -132,6 +135,7 @@ export function parseDsCliArgs(argv: readonly string[]): DsCliArgs {
     else if (arg === '--catalog') args.catalog = value();
     else if (arg === '--prototype') args.prototype = value();
     else if (arg === '--scan-workspace') args.scanWorkspace = true;
+    else if (arg === '--baseline') args.baseline = value();
     else if (arg === '--extensions') {
       // One or more files, up to the next flag; the flag may also repeat.
       const before = args.extensions.length;
@@ -150,6 +154,8 @@ export function parseDsCliArgs(argv: readonly string[]): DsCliArgs {
   if (args.strict && !args.render) throw new TypeError('Flag --strict needs --render.');
   if (args.known !== undefined && !args.render) throw new TypeError('Flag --known needs --render.');
   if (args.report && !args.locked) throw new TypeError('Flag --report needs --locked.');
+  if (args.baseline !== undefined && (!args.locked || !args.report))
+    throw new TypeError('Flag --baseline needs --locked --report.');
   if (args.scanWorkspace && args.prototype === undefined)
     throw new TypeError('Flag --scan-workspace needs --prototype.');
   if (args.extensions.length > CATALOG_EXTENSION_LIMITS.extensions)
@@ -673,10 +679,27 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
   const fullReport = args.locked;
   if (fullReport) {
     const lockedReport = report as DsFullReport;
-    const output = { ...lockedReport, counts: dsFullCounts(lockedReport) };
+    const compare =
+      args.baseline === undefined
+        ? undefined
+        : compareDsReport(await readJsonFile(args.baseline, 'The baseline'), lockedReport);
+    const output = {
+      ...lockedReport,
+      counts: dsFullCounts(lockedReport),
+      fingerprint: compare?.fingerprint ?? dsReportFingerprint(lockedReport),
+      ...(compare ? { compare } : {}),
+    };
     stdout.write(
       args.json ? `${JSON.stringify(output, null, 2)}\n` : formatDsFullReport(lockedReport)
     );
+    if (compare && !compare.ok) {
+      process.exitCode = 1;
+      return {
+        ok: false,
+        error: `Baseline regression: ${compare.added.map((item) => item.code).join(', ') || 'new findings'}`,
+        report,
+      };
+    }
   } else {
     const checkReport = report as DsCheckReport;
     stdout.write(
