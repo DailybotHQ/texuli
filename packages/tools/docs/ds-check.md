@@ -45,6 +45,7 @@ lower-level conformance interface and accepts the same full-check flags.
 ```bash
 texuli ds validate brand.json
 texuli ds validate brand.json --locked --prototype ./src --json
+texuli ds validate brand.json --locked --prototype ./src --scan-workspace --json
 texuli ds validate brand.json --locked --prototype ./src --report --json
 texuli ds validate brand.json --locked --prototype ./src --render
 ```
@@ -66,7 +67,8 @@ texuli ds validate brand.json --locked --prototype ./src --render
 | `--strict` | With `--render`: known findings fail too |
 | `--catalog <components.json>` | The catalog `allow` is checked against (`{ components: [{ id, axes?, states? }] }`, for example `@texuli/spec`'s `catalog/components.json` or a stub). Default: the agent catalog `@texuli/tools` builds. A file without a `components` list exits 2 |
 | `--locked` | Run the full locked-design-system validator (`checkDesignSystemFull`): the static checks, data-viz, tokens, allow, approval and hashes, with findings counted by area, route and component |
-| `--prototype <dir>` | With `ds validate` or `ds check --locked`: read bounded Svelte, TypeScript, JavaScript, CSS and blueprint JSON files from a local directory. Source is scanned as text and never executed; symlinks are refused. JSON is included when it contains a blueprint `tree`. |
+| `--prototype <dir>` | With `ds validate` or `ds check --locked`: read bounded Svelte, TypeScript, JavaScript, CSS and blueprint JSON files from a local directory. Source is scanned as text and never executed; symlinks are refused. JSON is included when it contains a blueprint `tree`. The report lists workspace packages and local modules that directory imported but the check did not read (`prototype.unchecked`, a count and the specifiers). |
+| `--scan-workspace` | With `--prototype`: also scan workspace packages those sources import (from `pnpm-workspace.yaml` or `package.json` workspaces). Files are keyed `workspace:<name>/…`. Without this flag those imports stay in `unchecked`. |
 | `--report` | With `--locked` only: print the complete findings (readable or `--json`) and exit 0, so a saved JSON file is a progress baseline. Without `--locked` the flag is refused |
 
 **Exit codes:** `0` every check passed, or `--locked --report` listed
@@ -162,7 +164,9 @@ the same report; without `hashes` a stale approval is reported in
   "render": { "ok": true, "url": "…", "runs": [/* with --render, below */] },
   "locked": { "locked": true, "allowed": ["button", "card"], "library": [], "catalogChecked": true,
               "approval": { "status": "draft", "version": "2.1.0", "contentHash": "…" },
-              "entries": [] }
+              "entries": [] },
+  "prototype": { "files": 1, "blueprints": 0, "components": { "button": 1 },
+                 "unchecked": { "count": 1, "imports": ["@acme/ui"] } }
 }
 ```
 
@@ -310,10 +314,13 @@ every other code with a failing and a passing fixture and a golden report.
 `texuli ds validate --locked --prototype <dir>` calls
 `checkDesignSystemFull` on the document, catalog and statically scanned
 prototype. The directory reader accepts source and blueprint file types
-listed above; it does not execute the consumer application. `--render`
-adds the locked render findings from the conformance sheet, or from the
-prototype page you serve with `--url` (mapped against `allow`). MCP full
-mode is static-only.
+listed above; it does not execute the consumer application. A prototype that
+only wires a workspace UI package therefore reports near-zero component
+findings; `prototype.unchecked` lists those packages (and missing local
+modules) so the gap is visible. `--scan-workspace` reads the imported
+workspace packages too. `--render` adds the locked render findings from the
+conformance sheet, or from the prototype page you serve with `--url` (mapped
+against `allow`). MCP full mode is static-only.
 
 `--locked --report` prints every finding with counts by area, route and
 component and exits 0. `--json` adds a `counts` object so a saved file is
