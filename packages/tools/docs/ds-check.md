@@ -250,8 +250,9 @@ with the repository's Vite instead.
 `dist/ds-check/host.iife.js` (`scripts/ds-check-host.ts`). A prototype page
 that cannot import ESM can load that script and call
 `TexuliDsCheckHost.installDsCheckHost(scope)`. The color check reads
-`data-tx-component` by default (and still accepts `data-ds-check-component`
-on the conformance sheet).
+`data-tx-component`. Only the caller can choose otherwise: the conformance
+sheet passes `{ componentAttribute: 'data-ds-check-component' }`, and markup
+on the page never changes which attribute is read (0.17.1).
 
 To paint your own components, build a page that renders them inside one
 element and installs the host, then pass it with `--sheet <page.html>`
@@ -386,9 +387,13 @@ any arbitrary value (`[…]` / `{…}`).
 must sit inside `[data-tx-component]`, and once `allow` exists every
 such root must be listed (`unmapped`, `not-allowed`). Part ids
 (`select-trigger`) and extension-composed ids resolve to their allowed
-parent (`select`, or a `composed` map). Rendered
+parent (`select`, or a `composed` map). A catalog root nested inside an
+allowed root is covered by it only when it is such a part or composed id
+of that parent: a `data-grid` inside an allowed `card` is `not-allowed`
+(0.17.1, as in 0.16.1). Rendered
 `data-tx-variant` / `size` / `tone` / `density` / `color` are checked
-against that allow entry (`render-disabled-value`). Literal
+against that allow entry (`render-disabled-value`). Each finding code
+keeps its own cap of 64, so one kind never crowds out another. Literal
 `render-literal` issue paths name the element (tag/selector).
 
 `runLockedRenderChecks` (`packages/tools/src/ds-check/locked-render.ts`)

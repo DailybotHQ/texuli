@@ -135,6 +135,18 @@ const CSS_COLOR_NAMES: Readonly<Record<string, string>> = Object.fromEntries(
     .map(([name, value]) => [name, `#${value}`])
 );
 
+const COLOR_WORD_PATTERN = Object.keys(CSS_COLOR_NAMES)
+  .sort((a, b) => b.length - a.length)
+  .join('|');
+const PROSE_COLOR_PATTERN = new RegExp(
+  `(?<![\\w])#(?:[\\da-f]{8}|[\\da-f]{6}|[\\da-f]{4}|[\\da-f]{3})(?![\\w])|\\b(?:${COLOR_WORD_PATTERN})\\b`,
+  'gi'
+);
+
+function blankRange(text: string, start: number, end: number): string {
+  return `${text.slice(0, start)}${' '.repeat(end - start)}${text.slice(end)}`;
+}
+
 function proseColor(text: string): string | undefined {
   const hex = /(?<![\w])#(?:[\da-f]{8}|[\da-f]{6}|[\da-f]{4}|[\da-f]{3})(?![\w])/gi.exec(text)?.[0];
   if (hex) {
@@ -180,9 +192,14 @@ export function importBrand(
     let name: string | undefined;
     let id: string | undefined;
     const bare: string[] = [];
+    let colorIndex = 0;
     clauses.forEach((clause, i) => {
       const where = `$[${i}]`;
       const lower = clause.toLowerCase().replace(/\s+/g, ' ');
+      if (/(?:url\s*\(|expression\s*\(|[{}<>])/i.test(clause)) {
+        warnings.add('unsafe-value', where, 'Refused CSS or markup syntax in a brand brief.');
+        return;
+      }
       const color = (value: string, path: string) => {
         const converted = toColor(value);
         if (converted.ok) set(path, converted.value);
@@ -198,6 +215,114 @@ export function importBrand(
         if (named) set(`typography.families.${family}.stack`, [named, ...(STACKS[family] ?? [])]);
         else warnings.add('unsafe-value', where, 'Refused: not a font family name.');
       };
+      // Read explicit color mentions throughout a clause so role words can
+      // precede or follow a value, and multiple assignments are not dropped.
+      // Any remaining prose is reported instead of being silently ignored.
+      const colorMatches = [...clause.matchAll(PROSE_COLOR_PATTERN)];
+      if (colorMatches.length > 0) {
+        if (/^color\s*:/i.test(clause)) {
+          warnings.add(
+            'invalid-value',
+            where,
+            'Use prose color assignments, not CSS declarations.'
+          );
+          return;
+        }
+        let remainder = clause;
+        let previousEnd = 0;
+        const firstHex = colorMatches.find((match) => (match[0] as string).startsWith('#'))?.index;
+        for (const match of colorMatches) {
+          const raw = match[0] as string;
+          const start = match.index ?? 0;
+          const end = start + raw.length;
+          const between = clause.slice(previousEnd, start);
+          const roleMatch =
+            /\b(brand|seed|primary|secondary|accent)\b(?!.*\b(?:brand|seed|primary|secondary|accent)\b)/i.exec(
+              between
+            );
+          const role = roleMatch?.[1]?.toLowerCase();
+          if (!raw.startsWith('#') && firstHex !== undefined && start < firstHex && !role) {
+            // Descriptive color words before an explicit hex seed (for
+            // example, “Deep teal #0f766e”) are prose, not a second value.
+            remainder = blankRange(remainder, start, end);
+            previousEnd = end;
+            continue;
+          }
+          const target =
+            role === 'secondary' || role === 'accent'
+              ? role
+              : role === 'brand' || role === 'seed' || role === 'primary'
+                ? 'seed'
+                : (['seed', 'secondary', 'accent'][Math.min(colorIndex, 2)] as string);
+          const converted = raw.startsWith('#')
+            ? toColor(raw)
+            : { ok: true as const, value: CSS_COLOR_NAMES[raw.toLowerCase()] as string };
+          if (converted.ok) {
+            set(`color.brand.${target}`, converted.value);
+            colorIndex += 1;
+            remainder = blankRange(remainder, start, end);
+            if (roleMatch?.index !== undefined) {
+              const roleStart = previousEnd + roleMatch.index;
+              remainder = blankRange(remainder, roleStart, roleStart + roleMatch[0].length);
+            }
+          } else {
+            warnings.add(
+              converted.unsafe ? 'unsafe-value' : 'invalid-value',
+              where,
+              converted.message
+            );
+          }
+          previousEnd = end;
+        }
+
+        const afterFont = /\b(?:font|sans|typeface|body\s+font)\s+(.+)$/i.exec(remainder);
+        const beforeFont = /\b([A-Za-z][A-Za-z0-9 _-]{0,32}?)\s+font\b/i.exec(remainder);
+        const fontMatch =
+          !beforeFont || (afterFont && (afterFont.index ?? 0) < (beforeFont.index ?? 0))
+            ? afterFont
+            : beforeFont;
+        if (fontMatch) {
+          const familyName = (fontMatch[1] as string)
+            .split(/\b(?:in|and|with|using|on)\b/i, 1)[0]
+            ?.trim();
+          if (familyName) font(familyName, 'sans');
+          const start = fontMatch.index ?? 0;
+          remainder = blankRange(remainder, start, start + fontMatch[0].length);
+        }
+
+        const unread = remainder
+          .replace(/\b(?:and|is|uses?|using|the|brand|color|colour|in|with|on|a|an)\b/gi, ' ')
+          .replace(/[\s:=,.;-]+/g, ' ')
+          .trim();
+        if (unread) {
+          const suspicious = /(?:url\s*\(|expression\s*\(|[{};<>])/i.test(unread);
+          warnings.add(
+            suspicious ? 'unsafe-value' : 'unmapped',
+            where,
+            `Unrecognized brand brief text: ${unread}`
+          );
+        }
+        return;
+      }
+      const proseFont =
+        /\b((?!(?:heading|display|mono|code|serif)\b)[A-Za-z][A-Za-z0-9 _-]{0,32}?)\s+font\b/i.exec(
+          clause
+        );
+      if (proseFont) {
+        const familyName = (proseFont[1] as string).trim();
+        font(familyName, 'sans');
+        const remainder = blankRange(
+          clause,
+          proseFont.index ?? 0,
+          (proseFont.index ?? 0) + proseFont[0].length
+        )
+          .replace(/\b(?:and|is|uses?|using|the|in|with|on|a|an)\b/gi, ' ')
+          .replace(/[\s:=,.;-]+/g, ' ')
+          .trim();
+        if (remainder)
+          warnings.add('unmapped', where, `Unrecognized brand brief text: ${remainder}`);
+        return;
+      }
       /** Clause patterns, first match wins; a handler returning `false` passes the clause on. */
       const rules: [RegExp, string, (m: RegExpExecArray) => boolean | undefined][] = [
         [
@@ -326,7 +451,7 @@ export function importBrand(
       else if (toColor(clause).ok && bare.length < 3) {
         bare.push(clause);
         color(clause, `color.brand.${['seed', 'secondary', 'accent'][bare.length - 1]}`);
-      } else warnings.add('unmapped', where, 'No design-system field takes this clause.');
+      } else warnings.add('unmapped', where, `No design-system field takes this clause: ${clause}`);
     });
     const doc = documentRoot(identity({ id, name }, options, warnings, 'Brand'));
     for (const key of Object.keys(sections)) doc[key] = sections[key] as Json;

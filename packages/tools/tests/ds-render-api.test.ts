@@ -45,10 +45,9 @@ describe('prebuilt host IIFE', () => {
 });
 
 describe('host color roots', () => {
-  it('defaults to data-tx-component and still matches the sheet attribute', () => {
+  it('defaults to data-tx-component; the sheet attribute only when the caller asks (0.17.1)', () => {
     expect(DS_TX_COMPONENT_ATTRIBUTE).toBe('data-tx-component');
-    expect(dsCheckComponentSelector()).toContain(`[${DS_TX_COMPONENT_ATTRIBUTE}]`);
-    expect(dsCheckComponentSelector()).toContain(`[${DS_CHECK_COMPONENT_ATTRIBUTE}]`);
+    expect(dsCheckComponentSelector()).toBe(`[${DS_TX_COMPONENT_ATTRIBUTE}]`);
     expect(dsCheckComponentSelector(DS_CHECK_COMPONENT_ATTRIBUTE)).toBe(
       `[${DS_CHECK_COMPONENT_ATTRIBUTE}]`
     );
@@ -76,7 +75,7 @@ const allow = (ids: readonly string[], extra?: Record<string, Record<string, unk
 describe('mapDesignSystemTree parts and composed ids', () => {
   it('resolves select-trigger to select and extension-composed ids to the parent', () => {
     expect(resolveAllowedComponentId('select-trigger', new Set(['select']))).toBe('select');
-    expect(resolveAllowedComponentId('button-group', new Set(['button']))).toBeUndefined();
+    expect(resolveAllowedComponentId('button-group', new Set(['button']))).toBe('button');
     expect(resolveAllowedComponentId('acme:select-trigger', new Set(['select']))).toBe('select');
     expect(resolveAllowedComponentId('acme:select-trigger', new Set(['acme:select']))).toBe(
       'acme:select'
@@ -96,9 +95,7 @@ describe('mapDesignSystemTree parts and composed ids', () => {
     expect(mapDesignSystemTree(portal, { allowManifest: allow(['select']) }).ok).toBe(true);
 
     const group = tree('<div data-tx-component="button-group"><button>A</button></div>');
-    expect(mapDesignSystemTree(group, { allowManifest: allow(['button']) }).codes).toContain(
-      'not-allowed'
-    );
+    expect(mapDesignSystemTree(group, { allowManifest: allow(['button']) }).ok).toBe(true);
   });
 
   it('flags a rendered axis the allow entry disables as render-disabled-value', () => {

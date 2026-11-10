@@ -3,7 +3,7 @@
  * `texuli ds check --render`. A page renders its components inside one
  * scope element, each wrapped in an element carrying
  * `data-tx-component="<catalog id>"` (or `data-ds-check-component` on the
- * conformance sheet), and calls
+ * conformance sheet, which passes `componentAttribute` for it), and calls
  * {@link installDsCheckHost}. The render driver then reaches the host as
  * `window.texuliDsCheck`:
  *
@@ -47,11 +47,14 @@ export {
   type DsInspectPair,
 };
 
-/** Selector the color check uses. Default includes `data-tx-component`. */
+/**
+ * Selector the color check uses: the one root attribute the caller chose (default
+ * `data-tx-component`). 0.17.1: a page's own markup never adds the other attribute.
+ */
 export function dsCheckComponentSelector(attribute?: string): string {
-  const attr = attribute ?? DS_TX_COMPONENT_ATTRIBUTE;
-  if (attr === DS_CHECK_COMPONENT_ATTRIBUTE) return `[${DS_CHECK_COMPONENT_ATTRIBUTE}]`;
-  return `[${DS_TX_COMPONENT_ATTRIBUTE}], [${DS_CHECK_COMPONENT_ATTRIBUTE}]`;
+  return attribute === DS_CHECK_COMPONENT_ATTRIBUTE
+    ? `[${DS_CHECK_COMPONENT_ATTRIBUTE}]`
+    : `[${DS_TX_COMPONENT_ATTRIBUTE}]`;
 }
 
 export interface DsCheckHost {
@@ -59,7 +62,10 @@ export interface DsCheckHost {
   ready(): Promise<string[]>;
   apply(compiled: ApplicableDesignSystem, mode: DsCheckMode): Promise<void>;
   inspect(input: { pairs: readonly DsInspectPair[] }): Promise<DsInspectResult>;
-  /** Maps the scope's controls through their catalog roots and the locked allow set. */
+  /**
+   * Maps the scope's controls through their catalog roots and the locked allow
+   * set. `composed` is a child → parent map (library `composes`, extensions).
+   */
   map(input: DsMapAllowManifest): DsMapReport;
 }
 
@@ -67,8 +73,10 @@ export interface DsCheckHostOptions {
   /** Resolves once the page painted every component (default: immediately). */
   ready?: () => Promise<unknown>;
   /**
-   * Root attribute the color check reads. Default: `data-ds-check-component` when the page
-   * has it (the conformance sheet), otherwise `data-tx-component` (a locked prototype).
+   * Root attribute the color check reads, chosen by the caller only: `data-tx-component`
+   * (default; a locked prototype) or `data-ds-check-component` (the conformance sheet, which
+   * passes it explicitly). Any other value reads `data-tx-component`. Page content never
+   * changes it (0.17.1).
    */
   componentAttribute?: string;
 }
@@ -231,21 +239,15 @@ export function installDsCheckHost(
   scope.setAttribute('data-ds-check-scope', '');
   let current: { compiled: ApplicableDesignSystem; mode: DsCheckMode } | undefined;
 
-  // A page that marks its samples with data-ds-check-component (the conformance sheet) is
-  // checked by those marks only: nested catalog roots inside a sample also carry
-  // data-tx-component and would be counted twice. A page without them (a locked prototype)
-  // is checked through data-tx-component.
+  // The caller chooses the root attribute; the page's own markup never does (0.17.1). The
+  // conformance sheet passes data-ds-check-component (its samples' nested catalog roots also
+  // carry data-tx-component and would be counted twice); a locked prototype keeps the default.
   const attr =
-    options.componentAttribute ??
-    (scope.querySelector(`[${DS_CHECK_COMPONENT_ATTRIBUTE}]`)
+    options.componentAttribute === DS_CHECK_COMPONENT_ATTRIBUTE
       ? DS_CHECK_COMPONENT_ATTRIBUTE
-      : DS_TX_COMPONENT_ATTRIBUTE);
+      : DS_TX_COMPONENT_ATTRIBUTE;
   const rootSelector = dsCheckComponentSelector(attr);
-  const componentId = (el: Element) =>
-    el.getAttribute(attr) ||
-    el.getAttribute(DS_TX_COMPONENT_ATTRIBUTE) ||
-    el.getAttribute(DS_CHECK_COMPONENT_ATTRIBUTE) ||
-    '';
+  const componentId = (el: Element) => el.getAttribute(attr) || '';
 
   const components = () =>
     [...scope.querySelectorAll(rootSelector)].map((el) => componentId(el)).filter(Boolean);
@@ -335,10 +337,12 @@ export function installDsCheckHost(
       await settle();
     },
     map(input) {
-      return mapDesignSystemTree(
-        scope,
-        input?.allow ? { allowManifest: { allow: input.allow } } : {}
-      );
+      return mapDesignSystemTree(scope, {
+        ...(input?.allow
+          ? { allowManifest: { allow: input.allow, composed: input.composed } }
+          : {}),
+        ...(input?.composed ? { composed: input.composed } : {}),
+      });
     },
     async inspect({ pairs }) {
       const literals: DsRenderLiteral[] = [];

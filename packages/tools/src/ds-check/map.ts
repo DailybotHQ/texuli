@@ -19,28 +19,41 @@ export const DS_MAP_DISABLED_VALUE = 'render-disabled-value';
 export const DS_MAP_CODES = [DS_MAP_DISABLED_VALUE, DS_MAP_NOT_ALLOWED, DS_MAP_UNMAPPED] as const;
 
 /**
- * Compound catalog parents whose `id-part` roots (select-trigger, …) resolve
- * to the parent when that parent is allowed. Independent ids such as
- * `button-group` are not in this list.
+ * Catalog parents that own `id-part` roots when allowed. Complements
+ * hyphen resolution against the allow set (list-item → list, button-group →
+ * button, data-dashboard-widget → data-dashboard). The full map is
+ * `partParentMap` in `@texuli/catalog/manifest`.
  */
 export const DS_MAP_COMPOUND_PARENTS = [
   'accordion',
   'alert-dialog',
+  'button',
   'combobox',
   'command',
   'context-menu',
+  'data-dashboard',
   'dialog',
   'dropdown-menu',
+  'field',
   'hover-card',
+  'input',
+  'list',
   'menubar',
   'multi-select',
   'navigation-menu',
   'popover',
+  'radio',
   'select',
   'tabs',
 ] as const;
 
-/** Cap matches `DESIGN_SYSTEM_LIMITS.errors`. */
+const COMPOUND: ReadonlySet<string> = new Set(DS_MAP_COMPOUND_PARENTS);
+
+/**
+ * Cap per finding code (matches `DESIGN_SYSTEM_LIMITS.errors`): each of `render-disabled-value`,
+ * `not-allowed` and `unmapped` keeps up to this many, so a page full of one kind never crowds
+ * out the others (0.17.1).
+ */
 export const DS_MAP_MAX_ISSUES = 64;
 
 const INTERACTIVE = [
@@ -74,6 +87,8 @@ const INTERACTIVE = [
 
 export interface DsMapAllowManifest {
   readonly allow?: Readonly<Record<string, unknown>>;
+  /** Child → parent catalog ids (library `composes`, host extensions). */
+  readonly composed?: Readonly<Record<string, string>>;
 }
 
 export interface DsMapOptions {
@@ -103,8 +118,6 @@ const AXIS_ATTRS = [
   ['color', 'data-tx-color', 'colors'],
 ] as const;
 
-const COMPOUND = new Set<string>(DS_MAP_COMPOUND_PARENTS);
-
 function allowedIds(manifest: DsMapAllowManifest | undefined): Set<string> | undefined {
   if (!manifest || manifest.allow === undefined) return undefined;
   return new Set(Object.keys(manifest.allow));
@@ -114,10 +127,29 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
+const localId = (id: string): string => (id.includes(':') ? id.slice(id.lastIndexOf(':') + 1) : id);
+
+/**
+ * Whether `id` is a declared part of `parent`: a compound part (`select-trigger` of
+ * `select`, also across an extension namespace) or an id `composed` maps to it.
+ */
+function isPartOf(
+  id: string,
+  parent: string,
+  composed: Readonly<Record<string, string>> | undefined
+): boolean {
+  const localParent = localId(parent);
+  const target = composed?.[id] ?? composed?.[localId(id)];
+  if (target !== undefined && (target === parent || localId(target) === localParent)) return true;
+  return COMPOUND.has(localParent) && localId(id).startsWith(`${localParent}-`);
+}
+
 /**
  * The allow key that covers `id`: itself, a compound parent (`select-trigger` →
  * `select`), an extension local id (`acme:select-trigger` → `acme:select` or
- * `select`), a composed parent, or a DOM ancestor catalog root.
+ * `select`), a composed parent, or the allowed DOM ancestor catalog root **when `id` is a
+ * declared part or composed id of it** (0.17.1: any other nested root, such as a data-grid
+ * inside an allowed card, is not covered, as in 0.16.1).
  */
 export function resolveAllowedComponentId(
   id: string,
@@ -128,7 +160,12 @@ export function resolveAllowedComponentId(
   if (allowed.has(id)) return id;
   const composed = options.composed?.[id];
   if (composed && allowed.has(composed)) return composed;
-  if (options.ancestor && allowed.has(options.ancestor)) return options.ancestor;
+  if (
+    options.ancestor &&
+    allowed.has(options.ancestor) &&
+    isPartOf(id, options.ancestor, options.composed)
+  )
+    return options.ancestor;
   const colon = id.lastIndexOf(':');
   if (colon > 0) {
     const ns = id.slice(0, colon);
@@ -147,7 +184,6 @@ export function resolveAllowedComponentId(
   let best: string | undefined;
   for (const parent of allowed) {
     const localParent = parent.includes(':') ? parent.slice(parent.lastIndexOf(':') + 1) : parent;
-    if (!COMPOUND.has(localParent)) continue;
     if (id.startsWith(`${parent}-`) || id.startsWith(`${localParent}-`)) {
       if (!best || parent.length > best.length) best = parent;
     }
@@ -218,7 +254,7 @@ function push(
   message: string,
   component?: string
 ): void {
-  if (errors.length >= DS_MAP_MAX_ISSUES) return;
+  if (errors.filter((issue) => issue.code === code).length >= DS_MAP_MAX_ISSUES) return;
   errors.push({
     code,
     path: dsMapSelector(el, scope),
@@ -242,7 +278,7 @@ export function mapDesignSystemTree(root: ParentNode, options: DsMapOptions = {}
     for (const el of root.querySelectorAll(ROOT_SELECTOR)) {
       const id = el.getAttribute(COMPONENT_ATTRIBUTE) ?? '';
       const covered = resolveAllowedComponentId(id, allowed, {
-        composed: options.composed,
+        composed: options.composed ?? options.allowManifest?.composed,
         ancestor: ancestorCatalogId(el),
       });
       if (!covered) {
@@ -278,7 +314,7 @@ export function mapDesignSystemTree(root: ParentNode, options: DsMapOptions = {}
   }
 
   for (const el of root.querySelectorAll(INTERACTIVE)) {
-    if (seen.has(el) || errors.length >= DS_MAP_MAX_ISSUES) continue;
+    if (seen.has(el)) continue;
     seen.add(el);
     const owner = el.closest(ROOT_SELECTOR);
     if (!owner) {
@@ -295,7 +331,7 @@ export function mapDesignSystemTree(root: ParentNode, options: DsMapOptions = {}
     const id = owner.getAttribute(COMPONENT_ATTRIBUTE) ?? '';
     if (
       resolveAllowedComponentId(id, allowed, {
-        composed: options.composed,
+        composed: options.composed ?? options.allowManifest?.composed,
         ancestor: ancestorCatalogId(owner),
       })
     )

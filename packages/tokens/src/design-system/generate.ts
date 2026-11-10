@@ -207,11 +207,17 @@ function roleFromVariable(variable: string): string | undefined {
   return SEMANTIC_ROLES.includes(role as (typeof SEMANTIC_ROLES)[number]) ? role : undefined;
 }
 
+function variableFromDocumentPath(path: string): string | undefined {
+  const role = /^\$\.color\.roles\.(?:light|dark)\.([A-Za-z][A-Za-z0-9]*)$/.exec(path)?.[1];
+  if (!role) return;
+  return `--tx-${role.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`;
+}
+
 function pinFailingForeground(
   document: JsonObject,
   issue: { pairs?: readonly { foreground: string }[]; mode?: 'light' | 'dark' },
   options: GenerateDesignSystemOptions
-): { path: string; value: string; reason: string } | undefined {
+): { path: string; value: string; reason: string; variable?: string } | undefined {
   const role = issue.pairs?.[0] ? roleFromVariable(issue.pairs[0].foreground) : undefined;
   const mode = issue.mode ?? 'light';
   if (!role) return;
@@ -229,7 +235,8 @@ function pinFailingForeground(
       return {
         path,
         value,
-        reason: `Pinned ${role} to preserve the brand seed while meeting the failing AA guarantee.`,
+        variable: issue.pairs?.[0]?.foreground,
+        reason: `Pinned ${role} for ${issue.pairs?.[0]?.foreground ?? 'the failing token'} to preserve the brand seed while meeting the failing AA guarantee.`,
       };
   }
 }
@@ -344,16 +351,20 @@ export function generateDesignSystem(
       setPath(document, repair.path.slice(2).split('.'), repair.value);
       report.repairs.push({
         path: repair.path,
+        variable: repair.variable,
         reason: repair.reason,
         to: repair.value,
       });
     } else {
       const removed = removeAt(document, path);
       if (removed === undefined) break;
+      const variable = variableFromDocumentPath(path);
       report.repairs.push({
         path,
-        reason:
-          'Removed a pinned value that prevented the compiler from meeting its AA guarantees.',
+        ...(variable ? { variable } : {}),
+        reason: variable
+          ? `Removed the pin for ${variable} because it prevented the compiler from meeting its AA guarantees.`
+          : 'Removed a pinned value that prevented the compiler from meeting its AA guarantees.',
         from: removed,
       });
     }

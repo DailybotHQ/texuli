@@ -21,6 +21,7 @@ const entries = [
       'Kit: changesModel and kitApproval are Svelte-free in @texuli/spec/design-system (texuli/ds-kit re-exports them, so texuli now depends on @texuli/spec); KitAllowManifest.library is { id, status, version }, the shape the compiler emits; large matrix groups are collapsible and mount when opened.',
       'VirtualListView follows the uniform component contract (bind:ref on the root; id, aria-*, data-* and handlers on the scroller), names every feed article (labelId, getRowLabelId, a heading, or the row label) and takes surface="plain".',
       'No export removed; a 0.x minor because of the new spec.',
+      '0.17.1 (patch): the lock is strict again: a catalog root nested in an allowed one passes only as a declared part or composed id of that parent, the render host reads only the component attribute its caller chose (data-tx-component by default; page markup cannot switch it), and render-disabled-value, not-allowed and unmapped keep separate caps. The host map() takes the full part-to-parent map (partParentMap in @texuli/catalog/manifest) and composed ids, and @texuli/tools/ds-check/host.iife.js is a package export. importBrand reads whole prose clauses (roles, fonts, several colors in order) and reports what it skipped; repair reports name the changed token. changesModel compares up to 4,096 allow keys with a warning past the cap and every approval field. Icon buttons keep the 24px target minimum.',
     ],
   },
   {

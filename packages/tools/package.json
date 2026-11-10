@@ -1,6 +1,6 @@
 {
   "name": "@texuli/tools",
-  "version": "0.17.0",
+  "version": "0.17.1",
   "private": true,
   "description": "Agent and developer tools: the copy-in CLI, the MCP server, custom elements, adapters and the golden set.",
   "keywords": [
@@ -81,6 +81,10 @@
       "types": "./src/ds-check/host.ts",
       "default": "./src/ds-check/host.ts"
     },
+    "./ds-check/host.iife.js": {
+      "types": "./src/ds-check/host.iife.ts",
+      "default": "./src/ds-check/host.iife.ts"
+    },
     "./mcp": {
       "types": "./src/mcp/index.ts",
       "default": "./src/mcp/index.ts"
@@ -98,15 +102,15 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@texuli/core": "0.17.0",
-    "@texuli/catalog": "0.17.0",
-    "@texuli/tokens": "0.17.0",
-    "@texuli/spec": "0.17.0",
-    "@texuli/blocks": "0.17.0",
-    "@texuli/charts": "0.17.0",
-    "@texuli/media": "0.17.0",
-    "@texuli/deck": "0.17.0",
-    "@texuli/document": "0.17.0"
+    "@texuli/core": "0.17.1",
+    "@texuli/catalog": "0.17.1",
+    "@texuli/tokens": "0.17.1",
+    "@texuli/spec": "0.17.1",
+    "@texuli/blocks": "0.17.1",
+    "@texuli/charts": "0.17.1",
+    "@texuli/media": "0.17.1",
+    "@texuli/deck": "0.17.1",
+    "@texuli/document": "0.17.1"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"
