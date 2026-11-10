@@ -298,8 +298,8 @@
       "note": "FIX-position-pixel-snap: device-pixel snapping, transform-free layout box (tooltips landed ~3.3px off-center) and inset placement fix blurry and shifted panel text (lead decision 2026-10-23). Measured 5,557 B."
     },
     "@texuli/data": {
-      "gzip": 91968,
-      "note": "Root barrel aggregate of every data view (13 views at plan end); first-load cost is per view subpath. Raised from 48 KiB at 60,860 B with 11 views (lead decision 2026-10-23). PLAN_010 T-motion-adopt (ADR-013): 81920 -> 88256 B, measured + 4% rounded up to 64 B after Board and DataGrid layout motion (texuli/motion createListMotion, data-tx-row-id); the barrel also carries T-gaps-48-52 and T-gaps-53-69 grid work in this checkout (82,680 B at HEAD, already over 81,920 B); measured 84,861 B (82,680 B at HEAD). G86 (Protoyard): list motion loads lazily (2026-10-30): 88256 -> 87680 B, measured + 4% rounded up to 64 B; measured 84,261 B (84,899 B before); the Board, DataGrid and Dashboard take list motion through a small local shim that loads texuli/motion with import() only once a mounted list could animate a change (never with motion={false}, level none or reduced motion). 0.14.0 (owner-approved 2026-11-05): 87680 -> 91968 B, measured + 4% (measured 88,376 B) for the TimelineView product features it re-exports (D-G-033)."
+      "gzip": 93888,
+      "note": "Root barrel aggregate of every data view (13 views at plan end); first-load cost is per view subpath. Raised from 48 KiB at 60,860 B with 11 views (lead decision 2026-10-23). PLAN_010 T-motion-adopt (ADR-013): 81920 -> 88256 B, measured + 4% rounded up to 64 B after Board and DataGrid layout motion (texuli/motion createListMotion, data-tx-row-id); the barrel also carries T-gaps-48-52 and T-gaps-53-69 grid work in this checkout (82,680 B at HEAD, already over 81,920 B); measured 84,861 B (82,680 B at HEAD). G86 (Protoyard): list motion loads lazily (2026-10-30): 88256 -> 87680 B, measured + 4% rounded up to 64 B; measured 84,261 B (84,899 B before); the Board, DataGrid and Dashboard take list motion through a small local shim that loads texuli/motion with import() only once a mounted list could animate a change (never with motion={false}, level none or reduced motion). 0.14.0 (owner-approved 2026-11-05): 87680 -> 91968 B, measured + 4% (measured 88,376 B) for the TimelineView product features it re-exports (D-G-033). 0.16.0 CI (Linux, 2026-11-09): 91968 -> 93888 B, CI measured 92,025 B + 2% (macOS measured slightly lower; spec 0.14.0, category ink and catalog growth)."
     },
     "@texuli/data/*": {
       "gzip": 12288,
@@ -553,8 +553,8 @@
       "note": "PLAN_011 T-gaps-125-127 (G125, trust mode): new row at measured + 4%, rounded up to 64 B: every library theme id (6 built-in, 64 port, 140 expand; 210) with no metadata, isLibraryThemeId and libraryThemeSet, generated from the library sources, so a host validates ids synchronously without the 6,408 B library-expand rows. Measured 1,730 B gzip (3,273 B raw)."
     },
     "@texuli/tokens/palette": {
-      "gzip": 4352,
-      "note": "FIX-tokens-palette-subpath: OKLCH/contrast/scale/chart derivation only; no library port/expand. Measured 4,283 B (pnpm size)."
+      "gzip": 4480,
+      "note": "FIX-tokens-palette-subpath: OKLCH/contrast/scale/chart derivation only; no library port/expand. Measured 4,283 B (pnpm size). 0.16.0 CI (Linux, 2026-11-09): 4352 -> 4480 B, CI measured 4,363 B + 2% (macOS measured slightly lower; spec 0.14.0, category ink and catalog growth)."
     },
     "@texuli/tokens/base.css": {
       "gzip": 64,
@@ -657,8 +657,8 @@
       "note": "Styled component over the floating primitive(s) dialog, alert-dialog: the primitive cap plus 4 KiB for styling (lead decision 2026-10-23). Shrinks with the per-feature overlay engine. PLAN_009 (2026-10-28, owner-consented release plan): 17408 -> 18176 B, measured + 4% after the overlay layer stack and focus-exempt regions (G4), ref and rest props (G5) and handler composition (G26); measured 17,431 B in CI on Linux (16.99 KiB locally). PLAN_010 T-motion-adopt (ADR-013): 18176 -> 19968 B, measured + 4% rounded up to 64 B after the motion prop on Dialog and AlertDialog (texuli/motion seam; the runtime is a lazy chunk) over the primitive motion hooks; measured 19,155 B (17,699 B at HEAD). PLAN_011 T-scope-portals (ADR-023): 19968 -> 20928 B, measured + 4% rounded up to 64 B; measured 20,110 B (18.97 KiB at HEAD): the dialog portal follows the nearest token scope ([data-tx-scope]) through @texuli/core/portal createScopedPortal (scope resolution, a scoped portal root that mirrors the scope's data-tx-* attributes and inline variables through a MutationObserver), placed again before each open."
     },
     "texuli/layouts/content": {
-      "gzip": 14336,
-      "note": "PLAN_009 T-content-layout (G39): new public subpath for direct (declarative) ContentLayout use; the same component the docs/blog/editorial subpaths already load lazily (lazy gzip 12.23 KiB there) with the layout chrome and the TOC helpers. Measured 12,537 B gzip, 3.75 KiB CSS, cap = measured + 4% headroom. PLAN_010 T-targets (ADR-016): 13056 -> 13760 B at measured + 4% (measured 13,213 B): its navigation landmark names resolve through the @texuli/core/i18n message catalog (useMessages and the English-path formatter). 0.13.0 (owner-approved 2026-11-04): 13760 -> 14336 B, Linux CI measured + 4% (measured 13,764 B; macOS measures a few bytes less) for the label dictionary in context (ADR-026)."
+      "gzip": 14720,
+      "note": "PLAN_009 T-content-layout (G39): new public subpath for direct (declarative) ContentLayout use; the same component the docs/blog/editorial subpaths already load lazily (lazy gzip 12.23 KiB there) with the layout chrome and the TOC helpers. Measured 12,537 B gzip, 3.75 KiB CSS, cap = measured + 4% headroom. PLAN_010 T-targets (ADR-016): 13056 -> 13760 B at measured + 4% (measured 13,213 B): its navigation landmark names resolve through the @texuli/core/i18n message catalog (useMessages and the English-path formatter). 0.13.0 (owner-approved 2026-11-04): 13760 -> 14336 B, Linux CI measured + 4% (measured 13,764 B; macOS measures a few bytes less) for the label dictionary in context (ADR-026). 0.16.0 CI (Linux, 2026-11-09): 14336 -> 14720 B, CI measured 14,410 B + 2% (macOS measured slightly lower; spec 0.14.0, category ink and catalog growth)."
     },
     "texuli/layouts/dashboard": {
       "gzip": 13120,
@@ -1064,8 +1064,8 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 36,221 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007, same decision as the catalog rows): the catalog it imports now carries events, bindable and prop schemas; raised to measured 38,303 B + 4% headroom. PLAN_009 (2026-10-28, owner-consented release plan): 39872 -> 42112 B, measured + 4% after the four new catalog manifests and the G21 block fields in the deck grammar; measured 40,474 B. PLAN_010 T-release-070 (2026-10-29, developer GO for the 0.7.0 release): 42112 -> 44352 B, measured + 4% (measured 42,629 B; over at HEAD) after the document check and node keys (spec 0.7.0) in @texuli/catalog/validate, which the grammar bundles. PLAN_010 0.8.0 integration (consented plan): 44352 -> 47424 B, measured + 4% after the spec 0.8.0 form, canvas and source checks in @texuli/catalog/validate and the canvas and schema-forms manifests in the catalog, which the grammar bundles; measured 45,592 B."
     },
     "@texuli/slides/components": {
-      "gzip": 63616,
-      "note": "Owner decision 2026-10-28 (PLAN_008, owner consent in analysis_results/owner-consent.md): new public subpath for hosts such as Protoyard (the component registry: the renderer table, the slide-component outline (53 ids, exclusions with reasons), the state host and capabilities; painters and player families load lazily); measured 53,473 B gzip, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): 55613 -> 58432 B, measured + 4% after ref, rest props and composed handlers on the texuli components it registers (T-std-contract); measured 56,146 B. PLAN_010 0.8.0 integration (consented plan): 58432 -> 63616 B, measured + 4% after the player's spec 0.8.0 seams (data sources, canvasHost, formHost) and the canvas and schema-form exclusions in the outline; measured 61,154 B."
+      "gzip": 64960,
+      "note": "Owner decision 2026-10-28 (PLAN_008, owner consent in analysis_results/owner-consent.md): new public subpath for hosts such as Protoyard (the component registry: the renderer table, the slide-component outline (53 ids, exclusions with reasons), the state host and capabilities; painters and player families load lazily); measured 53,473 B gzip, cap = measured + 4% headroom. PLAN_010 (2026-10-29, consented plan): 55613 -> 58432 B, measured + 4% after ref, rest props and composed handlers on the texuli components it registers (T-std-contract); measured 56,146 B. PLAN_010 0.8.0 integration (consented plan): 58432 -> 63616 B, measured + 4% after the player's spec 0.8.0 seams (data sources, canvasHost, formHost) and the canvas and schema-form exclusions in the outline; measured 61,154 B. 0.16.0 CI (Linux, 2026-11-09): 63616 -> 64960 B, CI measured 63,630 B + 2% (macOS measured slightly lower; spec 0.14.0, category ink and catalog growth)."
     },
     "@texuli/slides/layouts": {
       "gzip": 40575,
@@ -1119,8 +1119,8 @@
       "note": "Owner decision 2026-10-27 (PLAN_007 T-spec-standard): workflow graph validator, loaded only by hosts that render workflows; measured 3,460 B + 4% headroom."
     },
     "@texuli/spec/migrate": {
-      "gzip": 640,
-      "note": "Owner decision 2026-10-27 (PLAN_007 T-spec-standard): spec version migrations, loaded on demand; measured 503 B + 4% headroom. PLAN_010 0.8.0 integration (consented plan): 576 -> 640 B, measured + 4% after the 0.7.0 -> 0.8.0 migration (stamps spec only); measured 581 B."
+      "gzip": 704,
+      "note": "Owner decision 2026-10-27 (PLAN_007 T-spec-standard): spec version migrations, loaded on demand; measured 503 B + 4% headroom. PLAN_010 0.8.0 integration (consented plan): 576 -> 640 B, measured + 4% after the 0.7.0 -> 0.8.0 migration (stamps spec only); measured 581 B. 0.16.0 CI (Linux, 2026-11-09): 640 -> 704 B, CI measured 648 B + 2% (macOS measured slightly lower; spec 0.14.0, category ink and catalog growth)."
     },
     "@texuli/spec/codegen": {
       "gzip": 24256,
