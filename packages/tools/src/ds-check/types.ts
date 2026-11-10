@@ -19,8 +19,12 @@ export type DsCheckMode = 'light' | 'dark';
 
 /** The attribute that names the catalog component a subtree of the sheet renders. */
 export const DS_CHECK_COMPONENT_ATTRIBUTE = 'data-ds-check-component';
+/** Catalog root attribute painted by Texuli components (ADR-032). */
+export const DS_TX_COMPONENT_ATTRIBUTE = 'data-tx-component';
 /** The global the render driver reads (`window.texuliDsCheck`). */
 export const DS_CHECK_GLOBAL = 'texuliDsCheck';
+/** Packed IIFE filename (`dist/ds-check/host.iife.js` after `pnpm verify:packages`). */
+export const DS_CHECK_HOST_IIFE = 'host.iife.js';
 
 /** A pair the host measures: the compiler's report entry for it. */
 export interface DsInspectPair {

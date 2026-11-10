@@ -179,8 +179,9 @@ export function renderIssues(run: DsRenderRun): DsCheckIssue[] {
   for (const literal of run.literals)
     issues.push({
       code: 'render-literal',
-      path: `$.render[${JSON.stringify(literal.component)}]`,
+      path: `$.render[${JSON.stringify(literal.component)}] ${literal.element}`,
       message: `${literal.component}: ${literal.element} paints ${literal.property} ${literal.value}, which does not follow the design system's variables.`,
+      hint: literal.element,
       ...where,
     });
   return issues;
