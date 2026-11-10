@@ -1,6 +1,6 @@
 ## Status
 
-Canvas is **in development**. `@texuli/canvas` is on npm as `0.17.2`. Under 0.x a new minor may break. The Kotlin twin validates canvas nodes and does not paint them yet.
+Canvas is **in development**. `@texuli/canvas` is on npm as `0.17.3`. Under 0.x a new minor may break. The Kotlin twin validates canvas nodes and does not paint them yet.
 
 ## Not built
 
