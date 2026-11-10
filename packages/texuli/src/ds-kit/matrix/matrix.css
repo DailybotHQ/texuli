@@ -4,6 +4,19 @@
  * @layer tx.components so consumer utilities can override.
  */
 @layer tx.components {
+  .tx-ds-kit__matrix-group {
+    padding-block-end: var(--tx-space-3);
+    border-block-end: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+  }
+  .tx-ds-kit__matrix-group-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--tx-space-2);
+    min-block-size: var(--tx-size-target-min, 2.75rem);
+    cursor: pointer;
+    font-weight: var(--tx-font-weight-semibold, 600);
+  }
   .tx-ds-kit__matrix-component {
     padding-block-end: var(--tx-space-4);
     border-block-end: var(--tx-border-width-thin) solid var(--tx-border, currentColor);

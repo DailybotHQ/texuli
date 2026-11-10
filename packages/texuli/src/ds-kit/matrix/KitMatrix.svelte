@@ -26,8 +26,11 @@ import './matrix.css';
 import {
   type MatrixCell,
   type MatrixComponent,
+  type MatrixGroup,
   matrixAttributes,
   matrixCells,
+  matrixGroupOpenByDefault,
+  matrixGroups,
   matrixModel,
   matrixProps,
   PSEUDO_STATES,
@@ -72,6 +75,8 @@ let {
 }: Props = $props();
 
 const model = $derived(matrixModel(catalog, allow));
+const groups = $derived(matrixGroups(model));
+let mounted = $state(new Set<string>());
 const prefix = $derived(kitPrefix(idPrefix));
 const sid = $derived(kitSectionId(prefix, 'matrix'));
 const modes = $derived<KitMode[]>(modeView === 'both' ? ['light', 'dark'] : [modeView]);
@@ -93,6 +98,14 @@ const axisOf = (component: MatrixComponent, axis: KitAxis) =>
   component.axes.find((a) => a.axis === axis);
 const hasPseudo = (component: MatrixComponent) =>
   component.states.allowed.some((s) => PSEUDO_STATES.has(s));
+const groupOpen = (group: MatrixGroup, index: number) =>
+  matrixGroupOpenByDefault(model, index) || mounted.has(group.id);
+const onGroupToggle = (group: MatrixGroup, event: Event) => {
+  const el = event.currentTarget;
+  if (!(el instanceof HTMLDetailsElement) || !el.open) return;
+  if (mounted.has(group.id)) return;
+  mounted = new Set(mounted).add(group.id);
+};
 </script>
 
 {#snippet cellBody(component: MatrixComponent, cell: MatrixCell, mode: KitMode, live: boolean)}
@@ -166,7 +179,21 @@ const hasPseudo = (component: MatrixComponent) =>
     </section>
   {/if}
 
-  {#each model.enabled as component (component.id)}
+  {#each groups as group, groupIndex (`${group.id}-${groupIndex}`)}
+    {@const open = groupOpen(group, groupIndex)}
+    <details
+      class="tx-ds-kit__matrix-group"
+      data-tx-ds-kit-group={group.id}
+      data-tx-ds-kit-group-open={open ? 'true' : 'false'}
+      open={open ? true : undefined}
+      ontoggle={(event) => onGroupToggle(group, event)}
+    >
+      <summary class="tx-ds-kit__matrix-group-summary">
+        {group.label}
+        <span class="tx-ds-kit__count">({group.components.length})</span>
+      </summary>
+      {#if open}
+  {#each group.components as component (component.id)}
     {@const cid = kitItemId(prefix, 'matrix', component.id)}
     {@const layout = matrixCells(component, matrix)}
     {@const variants = axisOf(component, 'variant')?.allowed ?? []}
@@ -265,6 +292,9 @@ const hasPseudo = (component: MatrixComponent) =>
         {/each}
       </div>
     </section>
+  {/each}
+      {/if}
+    </details>
   {/each}
 
   {#if showDisallowed && model.disallowedComponents.length > 0}
