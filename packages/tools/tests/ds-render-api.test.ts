@@ -45,10 +45,9 @@ describe('prebuilt host IIFE', () => {
 });
 
 describe('host color roots', () => {
-  it('defaults to data-tx-component and still matches the sheet attribute', () => {
+  it('defaults to data-tx-component; the sheet attribute only when the caller asks (0.17.1)', () => {
     expect(DS_TX_COMPONENT_ATTRIBUTE).toBe('data-tx-component');
-    expect(dsCheckComponentSelector()).toContain(`[${DS_TX_COMPONENT_ATTRIBUTE}]`);
-    expect(dsCheckComponentSelector()).toContain(`[${DS_CHECK_COMPONENT_ATTRIBUTE}]`);
+    expect(dsCheckComponentSelector()).toBe(`[${DS_TX_COMPONENT_ATTRIBUTE}]`);
     expect(dsCheckComponentSelector(DS_CHECK_COMPONENT_ATTRIBUTE)).toBe(
       `[${DS_CHECK_COMPONENT_ATTRIBUTE}]`
     );
