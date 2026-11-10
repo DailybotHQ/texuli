@@ -115,7 +115,9 @@ changing this page, rewrite them with
 `pnpm exec tsx scripts/package-changelogs.ts --write`.
 `pnpm verify:packages` checks they match (so the publish workflow keeps them
 current) and packs them: the published `files` list is `dist` and
-`CHANGELOG.md`.
+`CHANGELOG.md`. Relative links in this page become
+`https://github.com/DailybotHQ/texuli/blob/main/…` URLs in those files
+(resolved from `docs/`); absolute URLs and in-page anchors stay as they are.
 
 ### Not on npm
 

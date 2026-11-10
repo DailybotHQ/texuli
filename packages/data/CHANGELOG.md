@@ -43,7 +43,7 @@ adopting locked design systems.
   `labelId` (or `getRowLabelId`), else the card's first heading with an id,
   else `aria-label` with the row label.
 - `surface="plain"` drops the viewport border, radius and surface
-  ([data-virtual-list](../packages/data/docs/data-virtual-list.md)).
+  ([data-virtual-list](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-virtual-list.md)).
 
 ## 0.16.1
 
@@ -75,7 +75,7 @@ names (`main` at `0.16.0`).
 - `mode` and `selectable` are component props only: the catalog entry
   `data-virtual-list` gains them in the next minor, since a patch leaves the
   published blueprint spec `0.14.0` unchanged
-  ([data-virtual-list](../packages/data/docs/data-virtual-list.md)).
+  ([data-virtual-list](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-virtual-list.md)).
 
 ## 0.16.0
 
@@ -184,7 +184,7 @@ zoom changes moved the view off it.
 - The component exports `scrollToDate(date: IsoDate | Date)`: bind the
   instance and call it to place a date where the opening day sits; it
   counts as the reader's choice. An invalid date does nothing
-  ([data-timeline](../packages/data/docs/data-timeline.md)).
+  ([data-timeline](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-timeline.md)).
 
 **Budget (owner-approved).** `@texuli/data/timeline` 12,992 to 13,504 B
 (measured + 4%, rounded to 64 B).
@@ -212,7 +212,7 @@ labels by default (the day of month, the short month where a month starts),
 and `initialDate`. Visible change: without `initialDate` it opens at today
 when today falls within the plan (before, always at its start). New exports:
 `formatTimelineTick`, `timelineAnchor` and the `TimelineTickContext` type
-([data-timeline](../packages/data/docs/data-timeline.md)).
+([data-timeline](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-timeline.md)).
 
 ## 0.14.1
 
@@ -233,7 +233,7 @@ adapters onto `@texuli/data`:
   Move menu. With a snippet the chip has no `aria-label`; it is named by
   its visible content plus visually hidden details (time, date, "press
   Enter to open"), so the visible text always leads the name (WCAG 2.5.3)
-  ([data-calendar-reschedule](../packages/data/docs/data-calendar-reschedule.md)).
+  ([data-calendar-reschedule](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-calendar-reschedule.md)).
 - **P-T-02: month overflow.** `maxEventsPerDay` (default 3, the behavior
   before) and `onMoreEvents(date)`. With `onMoreEvents`, "N more events"
   is a button named like "3 more events on November 5" (the new
@@ -246,7 +246,7 @@ adapters onto `@texuli/data`:
   heading. A collapsed lane hides its cards behind the new `hiddenCards`
   label and still counts in column totals and WIP limits; a card held by
   keyboard that enters it opens it
-  ([data-board](../packages/data/docs/data-board.md)).
+  ([data-board](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-board.md)).
 - **P-T-04: `Board` `cellFooter(column, lane)`**, rendered at the end of
   each column-by-lane cell. Without lanes, `lane` is `DEFAULT_LANE`
   (`{ id: '', title: '' }`, exported).
@@ -284,8 +284,8 @@ additive:
   catalog's `data-timeline` lists `groups`, `markers` and the bindable
   `collapsed` and `selectedRow`, and the closed event vocabulary gains
   `collapse`; the player paints them
-  ([data-timeline](../packages/data/docs/data-timeline.md)).
-- **Design-system format, spec `0.12.0`** ([DESIGN_SYSTEMS](DESIGN_SYSTEMS.md)).
+  ([data-timeline](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-timeline.md)).
+- **Design-system format, spec `0.12.0`** ([DESIGN_SYSTEMS](https://github.com/DailybotHQ/texuli/blob/main/docs/DESIGN_SYSTEMS.md)).
   - D-G-028: an optional `darkOpacity` per `elevation.levels` layer.
   - D-G-027 (the Texuli part): `sidebarPrimary` is derived also under a
     `color.roles.<mode>.primary` pin; an explicit `sidebarPrimary` pin is
@@ -302,36 +302,36 @@ additive:
   `avatar-group-grid` catalog ids (app tier, not agent-emittable), and
   `media-image` `srcDark` and `darkMode`. `AvatarGroup` stays planned.
 - **D-G-031: `AlertDialog` `confirmDisabled`**, for typed confirmations
-  ([ui-dialog](../packages/texuli/docs/ui-dialog.md)).
+  ([ui-dialog](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-dialog.md)).
 - **D-G-032: `Breadcrumb` items take `ariaLabel` and
-  `onSelect(item, event)`** ([ui-navigation](../packages/texuli/docs/ui-navigation.md)).
+  `onSelect(item, event)`** ([ui-navigation](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-navigation.md)).
 - **D-G-041: tabs without a rendered panel omit `aria-controls`**, and an
   item's new `panelId` points it at a region the host renders.
   `TabsContext.contentId()` can now return `undefined`, a small type change
-  ([prim-tabs](../packages/primitives/docs/prim-tabs.md)).
+  ([prim-tabs](https://github.com/DailybotHQ/texuli/blob/main/packages/primitives/docs/prim-tabs.md)).
 - **D-G-042: a disabled `Tooltip` no longer disables its trigger**
-  ([ui-tooltip](../packages/texuli/docs/ui-tooltip.md)).
+  ([ui-tooltip](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-tooltip.md)).
 - **D-G-039: lazy icon loaders.** `registerIcons({ name: () => import(...) },
   { fallback })` and `IconsProvider` `fallback`, with the types
   `IconLoader` and `IconRegistryOptions`
-  ([ui-icons](../packages/texuli/docs/ui-icons.md)).
+  ([ui-icons](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-icons.md)).
 - **D-G-046: `MotionLoop`** in the new subpath `texuli/motion/loop`
   (presets `pulse` and `wave`), static under reduced motion. It is not in
   the blueprint motion vocabulary: a loop could not be stopped there (WCAG
-  2.2.2) ([ui-motion](../packages/texuli/docs/ui-motion.md)).
+  2.2.2) ([ui-motion](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-motion.md)).
 - **D-G-048: dialog and sheet scrims read `--tx-scrim`** (its color, with
   the existing opacity tokens), not the foreground, so dark scrims are dark
-  again ([ui-dialog](../packages/texuli/docs/ui-dialog.md),
-  [ui-sheet](../packages/texuli/docs/ui-sheet.md)).
+  again ([ui-dialog](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-dialog.md),
+  [ui-sheet](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-sheet.md)).
 - **D-G-049: a fixed y domain and a value format on cartesian charts.**
   `yDomain` (`[min, max]`, either end `'auto'`) and `formatValue` on
   `CartesianChart` and the five cartesian charts; marks outside a fixed
   domain are clipped, and the data table keeps the true values. App-level
   props, not in the agent catalog
-  ([charts-cartesian](../packages/charts/docs/charts-cartesian.md)).
+  ([charts-cartesian](https://github.com/DailybotHQ/texuli/blob/main/packages/charts/docs/charts-cartesian.md)).
 - **D-G-050: `TabItem` `attributes`** put `data-*` attributes (for example
   `data-testid`) on each tab trigger
-  ([ui-tabs-accordion](../packages/texuli/docs/ui-tabs-accordion.md)).
+  ([ui-tabs-accordion](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-tabs-accordion.md)).
 - **D-G-031b** needs nothing more: `AlertDialog` `confirmDisabled` (D-G-031)
   keeps a typed confirmation an `alertdialog`.
 
@@ -366,24 +366,24 @@ It carries the gaps the consumer Dailybot found through Protoyard:
   path data by name in Svelte context (SSR-safe, no module global), and
   `<Icon icon="name">` draws them. Augment the `IconNames` interface to
   type the names. The built-in names keep their glyphs and cannot be
-  replaced ([ui-icons](../packages/texuli/docs/ui-icons.md)).
+  replaced ([ui-icons](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-icons.md)).
 - **D-G-022: `CodeField` in a new subpath, `@texuli/blocks/code-field`.**
   An editable, syntax-highlighted field: a transparent textarea over token
   elements, with no HTML sinks. Tab indents, Shift+Tab outdents, Enter
   keeps the indentation, and Escape then Tab leaves the field. Past 20,000
   characters it is a plain textarea. Its labels come from the label
-  dictionary ([code](../packages/blocks/docs/code.md)).
+  dictionary ([code](https://github.com/DailybotHQ/texuli/blob/main/packages/blocks/docs/code.md)).
 - **D-G-023: a light and dark image pair (`@texuli/media/image`).**
   `Image` takes `srcDark` and `darkMode` (`'theme'` by default, or
   `'system'`). In `theme` mode it follows Texuli's explicit color mode over
   the OS preference, and with the default lazy loading only the shown image
   downloads. `srcDark` passes the same URL policy, at the same tier, as
-  `src` ([image](../packages/media/docs/image.md)).
+  `src` ([image](https://github.com/DailybotHQ/texuli/blob/main/packages/media/docs/image.md)).
 - **D-G-024: `AvatarGroupGrid` (`texuli/avatar`).** A collage of up to four
   faces in one circle, with `+N` past four. It is a component of its own
   rather than an `AvatarGroup` layout, so the `texuli` root stays within its
   size ceiling (the Protoyard ui package it replaces)
-  ([ui-avatar](../packages/texuli/docs/ui-avatar.md)).
+  ([ui-avatar](https://github.com/DailybotHQ/texuli/blob/main/packages/texuli/docs/ui-avatar.md)).
 
 ## 0.13.0
 
@@ -416,7 +416,7 @@ unchanged), and `^0.12.0` installs pick it up.
 - **Published with tokens refused.** Every published package is set to
   "Require 2FA and disallow tokens" (`npm access set mfa=publish`,
   2026-11-03), so trusted publishing from `publish.yml` is the only way a
-  release reaches npm ([CI](CI.md#publishing-to-npm)). This release checks
+  release reaches npm ([CI](https://github.com/DailybotHQ/texuli/blob/main/docs/CI.md#publishing-to-npm)). This release checks
   that path end to end, including the workflow's verification of `latest`
   and provenance on npm.
 - **Site fixes since `0.12.2` (not in the packages).** The header light and
@@ -435,7 +435,7 @@ unchanged), and `^0.12.0` installs pick it up.
   `NPM_TOKEN`: npm exchanges the workflow's OIDC token for a short-lived
   publish right, and the tarballs keep their signed provenance. The
   workflow installs npm `11.20.0` first, and a tag push no longer starts a
-  publish ([CI](CI.md#publishing-to-npm)). The packages are republished
+  publish ([CI](https://github.com/DailybotHQ/texuli/blob/main/docs/CI.md#publishing-to-npm)). The packages are republished
   so the release goes out this way.
 - **`next` stays on `0.12.1`.** The workflow publishes with `--tag latest`
   only, so `latest` moves to `0.12.2` and `next` is no longer maintained
@@ -592,7 +592,7 @@ codes, compiled to `--tx-*` variables with enforced contrast, focus and
 target sizes, applied at runtime or on the server, imported from and
 emitted to the common token formats, carried by blueprints, documents,
 decks and every output writer, checked by `texuli ds check`, and served to
-agents by the `ds.*` operations ([DESIGN_SYSTEMS](DESIGN_SYSTEMS.md),
+agents by the `ds.*` operations ([DESIGN_SYSTEMS](https://github.com/DailybotHQ/texuli/blob/main/docs/DESIGN_SYSTEMS.md),
 ADR-021 to ADR-024). It also removes the 0.8 MCP tool names and the tree
 block's `style` key, closes the Protoyard gaps G100–G124, and ships blueprint
 spec `0.10.0`.
@@ -1027,7 +1027,7 @@ when upgrading from `0.5.0`:
   group run a caller's handler first and then their own, unless the caller
   called `event.preventDefault()` (actions) or always (bookkeeping such as
   focus and blur). Before, some of them dropped or replaced it. The order is
-  in [STANDARDS](STANDARDS.md#component-api-contract).
+  in [STANDARDS](https://github.com/DailybotHQ/texuli/blob/main/docs/STANDARDS.md#component-api-contract).
 - **`texuli/avatar` (G58):** after an image error, `data-avatar` is
   `initials` (it stayed `image`). Host styles keyed on it change state.
 - **`@texuli/primitives/date-field` (G65):** `onValueChange` and

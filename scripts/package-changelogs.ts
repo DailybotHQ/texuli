@@ -8,13 +8,15 @@
  *     pnpm exec tsx scripts/package-changelogs.ts --check
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, posix, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const RELEASE_DOC = 'docs/RELEASE.md';
 export const CHANGELOG_FILE = 'CHANGELOG.md';
 export const NEVER_PACKED = '@texuli/examples';
+/** Packed changelogs point here so relative docs/ links still resolve on npm. */
+export const CHANGELOG_BLOB = 'https://github.com/DailybotHQ/texuli/blob/main';
 
 const LINE_WIDE =
   /every published package|all \d+ published packages|all \d+ packages|every package moves to|every internal `@texuli\/\*`/i;
@@ -39,6 +41,62 @@ export interface PackageChangelog {
   name: string;
   path: string;
   text: string;
+}
+
+/**
+ * Rewrite a markdown href copied from docs/RELEASE.md. Relative paths become
+ * `https://github.com/DailybotHQ/texuli/blob/main/<repo path>` resolved from
+ * `docs/`. Absolute URLs, site routes and in-page anchors stay as they are.
+ */
+export function rewriteChangelogHref(href: string): string {
+  const trimmed = href.trim();
+  if (
+    trimmed === '' ||
+    trimmed.startsWith('#') ||
+    trimmed.startsWith('/') ||
+    trimmed.startsWith('//') ||
+    /^[a-z][a-z\d+.-]*:/i.test(trimmed)
+  ) {
+    return trimmed;
+  }
+  const hash = trimmed.indexOf('#');
+  const pathPart = hash >= 0 ? trimmed.slice(0, hash) : trimmed;
+  const fragment = hash >= 0 ? trimmed.slice(hash) : '';
+  const repoPath = posix.normalize(posix.join('docs', pathPart)).replace(/^\.\//, '');
+  return `${CHANGELOG_BLOB}/${repoPath}${fragment}`;
+}
+
+/** Rewrite every relative markdown link in generated changelog text. */
+export function rewriteChangelogLinks(markdown: string): string {
+  const replace = (
+    prefix: string,
+    angle: string | undefined,
+    bare: string | undefined,
+    suffix: string
+  ): string => {
+    const href = angle ?? bare ?? '';
+    const next = rewriteChangelogHref(href);
+    if (next === href) {
+      return `${prefix}${angle !== undefined ? `<${href}>` : href}${suffix}`;
+    }
+    return `${prefix}${next}${suffix}`;
+  };
+  return markdown
+    .replace(
+      /(!?\[[^\]\n]*\]\(\s*)(?:<([^>\n]*)>|([^\s)]+))((?:\s+[^)]*)?\s*\))/g,
+      (
+        _match,
+        prefix: string,
+        angle: string | undefined,
+        bare: string | undefined,
+        suffix: string
+      ) => replace(prefix, angle, bare, suffix)
+    )
+    .replace(
+      /^(\s*\[[^\]\n]+\]:\s*)(?:<([^>\n]*)>|([^\s]+))/gm,
+      (_match, prefix: string, angle: string | undefined, bare: string | undefined) =>
+        replace(prefix, angle, bare, '')
+    );
 }
 
 /** Banner every generated changelog starts with. */
@@ -250,7 +308,7 @@ export function changelogForPackage(packageName: string, markdown: string): stri
     if (!body) continue;
     parts.push('', `## ${version}`, '', body);
   }
-  return `${parts.join('\n')}\n`;
+  return rewriteChangelogLinks(`${parts.join('\n')}\n`);
 }
 
 interface WorkspacePkg {
