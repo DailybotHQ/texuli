@@ -107,6 +107,16 @@ manifests remain `private: true`, and every future version requires a
 fresh, explicit developer GO (since PR #17, the merge that bumps the
 versions into `main`). Publishing never overwrites a published version.
 
+### Package changelogs
+
+Each of the 26 published packages ships a `CHANGELOG.md` generated from this
+page by `scripts/package-changelogs.ts`. Do not edit those files. After
+changing this page, rewrite them with
+`pnpm exec tsx scripts/package-changelogs.ts --write`.
+`pnpm verify:packages` checks they match (so the publish workflow keeps them
+current) and packs them: the published `files` list is `dist` and
+`CHANGELOG.md`.
+
 ### Not on npm
 
 - `@texuli/examples` is never packed (`NEVER_PACKED` in
