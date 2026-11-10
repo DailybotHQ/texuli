@@ -1,0 +1,14 @@
+---
+/**
+ * The Design systems landing hero: the shared SolutionHero with the registry entry and the
+ * copy in `hero-content.ts`. The art is the entry's `solution-design-systems-hero` plate
+ * (slot 01); until its WebP lands, the slot paints the texel fallback.
+ */
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionHero from '../../shared/hero/SolutionHero.astro';
+import { DESIGN_SYSTEMS_HERO } from './hero-content.ts';
+
+const entry = getSolution('design-systems');
+---
+
+<SolutionHero entry={entry} {...DESIGN_SYSTEMS_HERO} />

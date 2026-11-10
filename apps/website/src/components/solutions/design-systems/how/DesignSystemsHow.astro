@@ -1,0 +1,13 @@
+---
+/**
+ * The Design systems "How it works" band: the shared SolutionHow with the registry entry
+ * and the steps in `how-content.ts`. Static markup.
+ */
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionHow from '../../shared/architecture/SolutionHow.astro';
+import { DESIGN_SYSTEMS_HOW } from './how-content.ts';
+
+const entry = getSolution('design-systems');
+---
+
+<SolutionHow entry={entry} {...DESIGN_SYSTEMS_HOW} />
