@@ -1,7 +1,8 @@
 /**
  * `@texuli/data/virtual-list`: the windowed list engine (`createVirtualList`,
  * `nextVirtualListIndex`, `createInfiniteLoader`) and `VirtualListView`, the
- * catalog component (`data-virtual-list`) that renders it as an APG listbox.
+ * catalog component (`data-virtual-list`) that renders it as an APG listbox
+ * or, with `mode="feed"`, as an APG feed of articles.
  */
 export {
   createInfiniteLoader,
@@ -12,12 +13,15 @@ export {
 export { default as VirtualListView } from './VirtualListView.svelte';
 export {
   normalizeVirtualListDensity,
+  normalizeVirtualListMode,
   normalizeVirtualListSize,
   VIRTUAL_LIST_DENSITIES,
+  VIRTUAL_LIST_MODES,
   VIRTUAL_LIST_SIZES,
   type VirtualListKeyValue,
   type VirtualListRowContext,
   type VirtualListViewDensity,
+  type VirtualListViewMode,
   type VirtualListViewSize,
   viewportFallback,
   virtualListDescriptionOf,
