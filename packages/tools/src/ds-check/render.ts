@@ -124,6 +124,8 @@ export interface DsCheckPage {
     arg: A,
     options?: { timeout?: number }
   ): Promise<unknown>;
+  /** The page viewport (Playwright's `page.viewportSize()`); optional, it labels findings. */
+  viewportSize?(): { width: number; height: number } | null;
 }
 
 /** Runs axe inside the scope; returns one line per violation. */

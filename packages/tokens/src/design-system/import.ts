@@ -63,6 +63,7 @@ const ELEVATIONS = ['flat', 'soft', 'crisp', 'glow', 'layered'];
 const SURFACES = ['solid', 'glass'];
 const FOCUS = ['ring', 'outline', 'glow', 'inset'];
 const MOTION = ['none', 'subtle', 'standard', 'expressive'];
+const BRAND_BRIEF_LIMITS = { characters: 16_000, clauses: 256 } as const;
 
 /** One-liner words with no argument → the document field they set. */
 const WORDS: Readonly<Record<string, readonly [string, Json]>> = {
@@ -90,10 +91,26 @@ const WORDS: Readonly<Record<string, readonly [string, Json]>> = {
   layered: ['elevation.style', 'layered'],
   'layered shadows': ['elevation.style', 'layered'],
   glass: ['surface.style', 'glass'],
+  'glass surfaces': ['surface.style', 'glass'],
   glassy: ['surface.style', 'glass'],
   frosted: ['surface.style', 'glass'],
   solid: ['surface.style', 'solid'],
+  'solid surfaces': ['surface.style', 'solid'],
   'no motion': ['motion.personality', 'none'],
+  'none motion': ['motion.personality', 'none'],
+  'subtle motion': ['motion.personality', 'subtle'],
+  'calm motion': ['motion.personality', 'subtle'],
+  'still motion': ['motion.personality', 'none'],
+  'standard motion': ['motion.personality', 'standard'],
+  'expressive motion': ['motion.personality', 'expressive'],
+  'playful motion': ['motion.personality', 'expressive'],
+  'lively motion': ['motion.personality', 'expressive'],
+  'motion none': ['motion.personality', 'none'],
+  'motion subtle': ['motion.personality', 'subtle'],
+  'motion calm': ['motion.personality', 'subtle'],
+  'motion standard': ['motion.personality', 'standard'],
+  'motion expressive': ['motion.personality', 'expressive'],
+  'motion playful': ['motion.personality', 'expressive'],
   still: ['motion.personality', 'none'],
   calm: ['motion.personality', 'subtle'],
   playful: ['motion.personality', 'expressive'],
@@ -154,22 +171,22 @@ function consumeFonts(text: string, setFont: (name: string, family: string) => v
     {
       family: 'heading',
       pattern:
-        /\b(?:headings?|display)\s+in\s+("[^"]+"|'[^']+'|[A-Z][A-Za-z0-9-]*(?:\s+[A-Z][A-Za-z0-9-]*){0,2})/gi,
+        /\b(?:[Hh]eadings?|[Dd]isplay)\s+(?:[Ii]n|[Uu]se|[Uu]ses)\s+("[^"]+"|'[^']+'|[A-Z][A-Za-z0-9-]*(?:\s+[A-Z][A-Za-z0-9-]*){0,2})/g,
     },
     {
       family: 'heading',
       pattern:
-        /\b(?:heading|display)(?:\s+font)\s+("[^"]+"|'[^']+'|[A-Z][A-Za-z0-9-]*(?:\s+[A-Z][A-Za-z0-9-]*){0,2})/gi,
+        /\b(?:[Hh]eading|[Dd]isplay)\s+[Ff]ont\s+(?:(?:[Ii]s|[Oo]f|[Uu]ses?)\s+)?("[^"]+"|'[^']+'|[A-Z][A-Za-z0-9-]*(?:\s+[A-Z][A-Za-z0-9-]*){0,2})/g,
     },
     {
       family: 'mono',
       pattern:
-        /\b(?:mono|code)(?:\s+font)\s+("[^"]+"|'[^']+'|[A-Z][A-Za-z0-9-]*(?:\s+[A-Z][A-Za-z0-9-]*){0,2})/gi,
+        /\b(?:[Mm]ono|[Cc]ode|[Mm]onospace)(?:\s+[Ff]ont)?\s+(?:(?:[Ii]s|[Oo]f|[Uu]ses?)\s+)?("[^"]+"|'[^']+'|[A-Z][A-Za-z0-9-]*(?:\s+[A-Z][A-Za-z0-9-]*){0,2})/g,
     },
     {
       family: 'serif',
       pattern:
-        /\bserif(?:\s+font)\s+("[^"]+"|'[^']+'|[A-Z][A-Za-z0-9-]*(?:\s+[A-Z][A-Za-z0-9-]*){0,2})/gi,
+        /\b[Ss]erif(?:\s+[Ff]ont)?\s+(?:(?:[Ii]s|[Oo]f|[Uu]ses?)\s+)?("[^"]+"|'[^']+'|[A-Z][A-Za-z0-9-]*(?:\s+[A-Z][A-Za-z0-9-]*){0,2})/g,
     },
     {
       family: 'sans',
@@ -178,7 +195,7 @@ function consumeFonts(text: string, setFont: (name: string, family: string) => v
     {
       family: 'sans',
       pattern:
-        /\b(?:body\s+font|font|sans|typeface)\s+("[^"]+"|'[^']+'|[A-Z][A-Za-z0-9-]*(?:\s+[A-Z][A-Za-z0-9-]*){0,2})/gi,
+        /\b(?:[Bb]ody\s+[Ff]ont|[Ff]ont|[Ss]ans|[Tt]ypeface)\s+(?:(?:[Ii]s|[Oo]f|[Uu]ses?)\s+)?("[^"]+"|'[^']+'|[A-Z][A-Za-z0-9-]*(?:\s+[A-Z][A-Za-z0-9-]*){0,2})/g,
     },
   ];
   let remainder = text;
@@ -243,7 +260,8 @@ function proseColor(text: string): string | undefined {
 }
 
 /**
- * A brand one-liner, clauses split by commas, semicolons or new lines:
+ * A bounded brand brief (16,000 characters and 256 clauses), clauses split
+ * by commas, semicolons or new lines. Longer input is truncated and reported:
  * `brand #4f46e5, font Inter, rounded, compact`. Reads `brand|seed|primary
  * <color>`, `secondary <color>`, `accent <color>`, bare colors (seed, then
  * secondary, then accent), `neutral <family>`, `font|sans <name>`,
@@ -261,15 +279,23 @@ export function importBrand(
 ): DesignSystemImportResultWithLosses {
   const warnings = new Warnings();
   const result = guard(warnings, () => {
-    if (typeof text !== 'string') return failInput(warnings, 'A brand one-liner is text.');
-    if (text.length > 1_000)
-      return failInput(warnings, 'A brand one-liner is at most 1,000 characters.', 'input-limit');
-    const clauses = text
+    if (typeof text !== 'string') return failInput(warnings, 'A brand brief is text.');
+    let boundedText = text;
+    if (boundedText.length > BRAND_BRIEF_LIMITS.characters) {
+      boundedText = boundedText.slice(0, BRAND_BRIEF_LIMITS.characters);
+      warnings.add(
+        'limit',
+        '$',
+        `Brand brief truncated at ${BRAND_BRIEF_LIMITS.characters} characters.`
+      );
+    }
+    const allClauses = boundedText
       .split(/[,;\n]/)
       .map((c) => c.trim())
       .filter(Boolean);
-    if (clauses.length > 32)
-      return failInput(warnings, 'A brand one-liner has at most 32 clauses.', 'input-limit');
+    const clauses = allClauses.slice(0, BRAND_BRIEF_LIMITS.clauses);
+    if (allClauses.length > BRAND_BRIEF_LIMITS.clauses)
+      warnings.add('limit', '$', `Brand brief truncated at ${BRAND_BRIEF_LIMITS.clauses} clauses.`);
     const sections: JsonObject = {};
     const set = (path: string, value: Json) => setPath(sections, path.split('.'), value);
     let name: string | undefined;

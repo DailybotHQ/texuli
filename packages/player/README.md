@@ -12,7 +12,7 @@ player never navigates, fetches or persists anything on its own.
 **In the stack:** layer L7: paints what the agent catalog (L6) validates against the `@texuli/spec` blueprint contract, with the `texuli` components and the domain packages. `@texuli/pages` and `@texuli/slides` embed it.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.17.2`, a pre-1.0 release (1.0.0 will be the first
+> published to npm as `0.17.3`, a pre-1.0 release (1.0.0 will be the first
 > stable release). Under 0.x, a new minor (`0.17.0`) may contain breaking
 > changes, so pin the exact version or use `^0.17.0`, which accepts only 0.17.x.
 

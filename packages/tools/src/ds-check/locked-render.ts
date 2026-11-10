@@ -89,6 +89,31 @@ export async function runLockedRenderChecks(
   };
 }
 
+/** The route (path and query of `url`, no origin or fragment) and viewport of a render page. */
+export function renderWhere(
+  url: string,
+  page: Pick<DsCheckPage, 'viewportSize'>
+): { route?: string; viewport?: string } {
+  let route: string | undefined;
+  try {
+    const parsed = new URL(url);
+    route = `${parsed.pathname}${parsed.search}`.slice(0, 512);
+  } catch {
+    route = undefined;
+  }
+  let size: { width: number; height: number } | null | undefined;
+  try {
+    size = page.viewportSize?.();
+  } catch {
+    size = undefined;
+  }
+  const viewport =
+    size && Number.isFinite(size.width) && Number.isFinite(size.height)
+      ? `${Math.round(size.width)}x${Math.round(size.height)}`
+      : undefined;
+  return { ...(route ? { route } : {}), ...(viewport ? { viewport } : {}) };
+}
+
 /** A mapping with nothing to report: the page was a conformance sheet, not a prototype. */
 const NOT_MAPPED: DsMapReport = { ok: true, codes: [], errors: [] };
 
@@ -151,7 +176,14 @@ export async function renderLockedDesignSystemCheck(
   const mapped = options.url !== undefined;
   return withDsCheckPage(options, async (page, { url, axe }) => {
     const mapping = mapped ? await mapLockedRenderPage(page, allowManifest, options) : NOT_MAPPED;
-    const locked = await runLockedRenderChecks(page, report.runs, mapping, { ...options, axe });
+    const checked = await runLockedRenderChecks(page, report.runs, mapping, { ...options, axe });
+    // Every render finding names the route and viewport it was found on, so baselines keep
+    // findings of different routes, viewports and modes apart (0.17.3).
+    const where = renderWhere(url, page);
+    const locked: LockedRenderReport = {
+      ...checked,
+      errors: checked.errors.map((issue) => ({ ...issue, ...where })),
+    };
     const errors = [...report.errors, ...locked.errors];
     return {
       report: {
