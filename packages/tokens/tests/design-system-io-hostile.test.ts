@@ -147,7 +147,12 @@ describe('huge inputs', () => {
       expect(result.ok).toBe(false);
       expect(!result.ok && result.errors[0]?.code).toBe('input-limit');
     }
-    expect(importBrand('brand #0f766e, '.repeat(500)).ok).toBe(false);
+    const brandBrief = importBrand('brand #0f766e, '.repeat(500));
+    expect(brandBrief.ok).toBe(true);
+    if (brandBrief.ok)
+      expect(brandBrief.losses.some((loss) => /truncated at 256 clauses/.test(loss.reason))).toBe(
+        true
+      );
     const wide: Record<string, unknown> = {};
     for (let i = 0; i < 60_000; i++) wide[`t${i}`] = { $value: '#000000', $type: 'color' };
     const result = importDtcg({ color: wide });
