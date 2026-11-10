@@ -352,22 +352,38 @@ export function mapDesignSystemTree(root: ParentNode, options: DsMapOptions = {}
         );
         continue;
       }
-      const entry = options.allowManifest?.allow?.[covered];
+      // The static rule (0.17.3): a root is checked against its own allow entry. A part or
+      // composed id without one is covered by its parent; when it sits inside that parent's
+      // root, the parent root carries the check, so a disabled value is reported once per
+      // root, not again on each of its parts.
+      const ancestor = ancestorCatalogId(el);
+      const entryKey = allowed.has(id)
+        ? id
+        : ancestor !== undefined &&
+            resolveAllowedComponentId(ancestor, allowed, {
+              composed: options.composed ?? options.allowManifest?.composed,
+            }) === covered
+          ? undefined
+          : covered;
+      if (entryKey === undefined) continue;
+      const entry = options.allowManifest?.allow?.[entryKey];
+      const disabled: string[] = [];
       for (const [axis, attr, field] of AXIS_ATTRS) {
         const painted = el.getAttribute(attr);
         if (!painted) continue;
         const listed = allowAxisValues(entry, field);
-        if (listed === undefined) continue;
-        if (listed.includes(painted)) continue;
+        if (listed === undefined || listed.includes(painted)) continue;
+        disabled.push(`${axis} "${painted.slice(0, 48)}"`);
+      }
+      if (disabled.length > 0)
         push(
           errors,
           DS_MAP_DISABLED_VALUE,
           el,
           root,
-          `Rendered ${axis} "${painted}" is not allowed for "${covered}".`,
-          covered
+          `Rendered ${disabled.join(', ')} ${disabled.length === 1 ? 'is' : 'are'} not allowed for "${entryKey}".`,
+          entryKey
         );
-      }
     }
   }
 

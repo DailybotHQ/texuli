@@ -618,6 +618,8 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
                 : 'Fix the browser finding, then rerun the render check.'),
           ...(issue.mode ? { mode: issue.mode } : {}),
           ...(issue.variant ? { variant: issue.variant } : {}),
+          ...(issue.route ? { route: issue.route } : {}),
+          ...(issue.viewport ? { viewport: issue.viewport } : {}),
         }));
         full = {
           ...full,
