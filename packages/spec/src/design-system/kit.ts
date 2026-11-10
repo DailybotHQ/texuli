@@ -6,7 +6,7 @@
  */
 import { designSystemContentHash } from './hash.ts';
 
-const COMPONENTS = 512;
+const COMPONENTS = 4096;
 const LIBRARY_ENTRIES = 64;
 const LIST_ITEMS = 100;
 const HASH = /^[0-9a-f]{64}$/;
@@ -127,6 +127,8 @@ export interface KitChangesModel {
   readonly allow: readonly KitAllowChange[];
   readonly library: readonly KitLibraryChange[];
   readonly approval: readonly KitApprovalChange[];
+  /** Inputs beyond a model cap that were omitted from its detail list. */
+  readonly warnings: readonly string[];
   readonly contentChanged: boolean;
   readonly identical: boolean;
 }
@@ -135,18 +137,30 @@ function allowSection(document: unknown): Record<string, unknown> | undefined {
   return isRecord(document) && isRecord(document.allow) ? document.allow : undefined;
 }
 
-function diffAllow(before: unknown, after: unknown): KitAllowChange[] {
+function diffAllow(
+  before: unknown,
+  after: unknown
+): { changes: KitAllowChange[]; warnings: string[] } {
   const a = allowSection(before);
   const b = allowSection(after);
-  if (!a && !b) return [];
-  if (!a)
-    return [
-      { kind: 'locked' },
-      ...diffAllow({ allow: {} }, after).filter((c) => c.kind !== 'locked'),
-    ];
-  if (!b) return [{ kind: 'unlocked' }];
+  if (!a && !b) return { changes: [], warnings: [] };
+  if (!a) {
+    const diff = diffAllow({ allow: {} }, after);
+    return {
+      changes: [{ kind: 'locked' }, ...diff.changes.filter((change) => change.kind !== 'locked')],
+      warnings: diff.warnings,
+    };
+  }
+  if (!b) return { changes: [{ kind: 'unlocked' }], warnings: [] };
   const changes: KitAllowChange[] = [];
   const ids = [...new Set([...Object.keys(a), ...Object.keys(b)])].sort(byText);
+  const omitted = Math.max(0, ids.length - COMPONENTS);
+  const warnings =
+    omitted === 0
+      ? []
+      : [
+          `Allow change details omit ${omitted} component${omitted === 1 ? '' : 's'} beyond the ${COMPONENTS}-component limit.`,
+        ];
   for (const id of ids.slice(0, COMPONENTS)) {
     const component = clip(id, 64) ?? id;
     if (!Object.hasOwn(a, id)) {
@@ -174,10 +188,11 @@ function diffAllow(before: unknown, after: unknown): KitAllowChange[] {
       });
     }
   }
-  return changes;
+  return { changes, warnings };
 }
 
 const LIBRARY_FIELDS = ['name', 'purpose', 'version', 'status'] as const;
+const LIBRARY_APPROVAL_FIELDS = ['status', 'approvedBy', 'version', 'contentHash'] as const;
 
 function libraryById(document: unknown): Map<string, Record<string, unknown>> {
   const out = new Map<string, Record<string, unknown>>();
@@ -209,14 +224,18 @@ function diffLibrary(before: unknown, after: unknown): KitLibraryChange[] {
       const lc = (strings(x.composes) ?? []).join(', ');
       const rc = (strings(y.composes) ?? []).join(', ');
       if (lc !== rc) fields.push({ field: 'composes', before: lc, after: rc });
-      const la = isRecord(x.approval) ? clip(x.approval.status, 32) : undefined;
-      const ra = isRecord(y.approval) ? clip(y.approval.status, 32) : undefined;
-      if (la !== ra)
-        fields.push({
-          field: 'approval',
-          ...(la ? { before: la } : {}),
-          ...(ra ? { after: ra } : {}),
-        });
+      const xa = isRecord(x.approval) ? x.approval : {};
+      const ya = isRecord(y.approval) ? y.approval : {};
+      for (const field of LIBRARY_APPROVAL_FIELDS) {
+        const l = clip(xa[field], 200);
+        const r = clip(ya[field], 200);
+        if (l !== r)
+          fields.push({
+            field: `approval.${field}`,
+            ...(l ? { before: l } : {}),
+            ...(r ? { after: r } : {}),
+          });
+      }
       if (fields.length > 0) changes.push({ kind: 'changed', id: shown, fields });
     }
   }
@@ -249,11 +268,15 @@ export function changesModel(previous: KitVersion, current: KitVersion): KitChan
   return {
     ...(from ? { from } : {}),
     ...(to ? { to } : {}),
-    allow,
+    allow: allow.changes,
     library,
     approval,
+    warnings: allow.warnings,
     contentChanged,
     identical:
-      !contentChanged && allow.length === 0 && library.length === 0 && approval.length === 0,
+      !contentChanged &&
+      allow.changes.length === 0 &&
+      library.length === 0 &&
+      approval.length === 0,
   };
 }

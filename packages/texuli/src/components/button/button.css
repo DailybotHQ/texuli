@@ -269,9 +269,18 @@
   }
 
   .tx-button--icon {
-    inline-size: var(--tx-button-height-md, var(--tx-size-control-md));
-    min-inline-size: var(--tx-button-height-md, var(--tx-size-control-md));
-    min-block-size: var(--tx-button-height-md, var(--tx-size-control-md));
+    inline-size: max(
+      var(--tx-button-height-md, var(--tx-size-control-md)),
+      var(--tx-size-target-min)
+    );
+    min-inline-size: max(
+      var(--tx-button-height-md, var(--tx-size-control-md)),
+      var(--tx-size-target-min)
+    );
+    min-block-size: max(
+      var(--tx-button-height-md, var(--tx-size-control-md)),
+      var(--tx-size-target-min)
+    );
     padding-inline: 0;
   }
 
@@ -285,11 +294,17 @@
     .tx-button--sm:not(.tx-button--link),
     .tx-button--md:not(.tx-button--link),
     .tx-button--icon {
-      min-block-size: var(--tx-button-height-touch, var(--tx-size-target-touch));
+      min-block-size: max(
+        var(--tx-button-height-touch, var(--tx-size-target-touch)),
+        var(--tx-size-target-min)
+      );
     }
 
     .tx-button--icon {
-      min-inline-size: var(--tx-button-height-touch, var(--tx-size-target-touch));
+      min-inline-size: max(
+        var(--tx-button-height-touch, var(--tx-size-target-touch)),
+        var(--tx-size-target-min)
+      );
     }
   }
 
