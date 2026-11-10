@@ -1,7 +1,6 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
 import { Button } from 'texuli/button';
-import { Checkbox, Switch } from 'texuli/choice';
 import { Description, Field, FieldError } from 'texuli/field';
 import { Input, Textarea } from 'texuli/input';
 import { Select } from 'texuli/select';
@@ -29,8 +28,8 @@ import type {
  * Every control takes the Field's props: texuli turns `aria-required` into
  * native `required` on the date and time segments and the slider input.
  *
- * Date, time, datetime, slider, tags, file, color and radio controls load
- * per type on first use (G119); until then a placeholder of about the same
+ * Checkbox, switch, multiselect, date, time, datetime, slider, tags, file, color and radio
+ * controls load per type on first use (G119); until then a placeholder of about the same
  * size holds their place. `controls` paints them at once (SSR).
  */
 
@@ -133,13 +132,6 @@ function numberFrom(event: Event): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-function toggleChoice(option: string, checked: boolean): void {
-  const next = checked
-    ? [...strings.filter((item) => item !== option), option]
-    : strings.filter((item) => item !== option);
-  onValue(field.options?.map((o) => o.value).filter((v) => next.includes(v)) ?? next);
-}
-
 function blurOutside(event: FocusEvent): void {
   const next = event.relatedTarget as Node | null;
   if (next && (event.currentTarget as HTMLElement).contains(next)) return;
@@ -218,30 +210,25 @@ function customContext(control: {
 
 {#if field.type === 'checkbox' || field.type === 'switch'}
   <div class="tx-forms__field tx-forms__field--toggle" data-tx-forms-field={field.name} data-type={field.type}>
-    {#if field.type === 'checkbox'}
-      <Checkbox
-        id={controlId}
-        label={field.label}
-        description={field.description}
-        checked={value === true}
+    {#if Control}
+      <Control
+        {field}
+        {value}
+        attrs={{
+          id: controlId,
+          'aria-invalid': error ? 'true' : undefined,
+          'aria-describedby': error ? errorId : undefined,
+        }}
         required={fieldState.required}
-        disabled={locked}
-        aria-invalid={error ? 'true' : undefined}
-        aria-describedby={error ? errorId : undefined}
-        onCheckedChange={(checked) => onValue(checked)}
+        {disabled}
+        {readOnly}
+        {labels}
+        {files}
+        {onValue}
+        {onFiles}
       />
     {:else}
-      <Switch
-        id={controlId}
-        label={field.label}
-        description={field.description}
-        checked={value === true}
-        required={fieldState.required}
-        disabled={locked}
-        aria-invalid={error ? 'true' : undefined}
-        aria-describedby={error ? errorId : undefined}
-        onCheckedChange={(checked) => onValue(checked)}
-      />
+      {@render placeholder(controlId, 1)}
     {/if}
     {@render extras()}
     <FieldError id={errorId} show={Boolean(error)}>{error}</FieldError>
@@ -285,20 +272,30 @@ function customContext(control: {
         )}
       {/if}
     {:else}
-      <div class="tx-forms__choices" id={controlId}>
-        {#each field.options ?? [] as option, index (option.value)}
-          <Checkbox
-            id={index === 0 ? `${controlId}-first` : undefined}
-            label={option.label}
-            description={option.description}
-            checked={strings.includes(option.value)}
-            disabled={locked}
-            aria-invalid={error ? 'true' : undefined}
-            aria-describedby={error ? errorId : undefined}
-            onCheckedChange={(checked) => toggleChoice(option.value, checked)}
-          />
-        {/each}
-      </div>
+      {#if Control}
+        <Control
+          {field}
+          {value}
+          attrs={{
+            id: controlId,
+            'aria-invalid': error ? 'true' : undefined,
+            'aria-describedby': describedBy,
+          }}
+          required={fieldState.required}
+          {disabled}
+          {readOnly}
+          {labels}
+          {files}
+          {onValue}
+          {onFiles}
+        />
+      {:else}
+        {@render placeholder(
+          controlId,
+          field.options?.length ?? 1,
+          field.options?.filter((option) => option.description).length ?? 0
+        )}
+      {/if}
     {/if}
     {@render extras()}
     <FieldError id={errorId} show={Boolean(error)}>{error}</FieldError>
