@@ -3,7 +3,7 @@
  * `texuli ds check <file> [--locked] [--report] [--json] [--render] [--mode light|dark|all]
  * [--variant <name>]… [--trust developer|untrusted] [--base <file>]…
  * [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict]
- * [--catalog <components.json>]`.
+ * [--catalog <components.json>] [--extensions <file>...]`.
  *
  * Exit codes: 0 when checks pass or `--locked --report` lists findings,
  * 1 on any refusal or render finding in enforce mode, 2 when the check could
@@ -15,11 +15,16 @@
  * `unknown-state`), and a recorded content hash that no longer matches
  * (`content-hash-mismatch`, `library-hash-mismatch`). It reports the allowed
  * set and the approval status as declared; it cannot prove who approved.
+ * `--extensions` merges host catalog extensions (`<ns>:<id>` ids, `mergeCatalogs`) into the
+ * catalog first, so `allow` is checked as the host checks it; a refused extension is
+ * reported as `catalog-extension` with the merge's code in the message.
  */
 import { lstat, readdir, readFile, stat } from 'node:fs/promises';
 import { extname, relative, resolve } from 'node:path';
 import type { SpecCatalog } from '@texuli/spec';
+import { CATALOG_EXTENSION_LIMITS } from '@texuli/spec/catalog-extensions';
 import { loadSpecCatalog } from '../ops/catalog.ts';
+import { catalogExtensionIssues, loadMergedCatalog } from './extensions.ts';
 import { checkDesignSystemFull, type DsFullReport } from './full.ts';
 import { renderLockedDesignSystemCheck } from './locked-render.ts';
 import {
@@ -44,7 +49,7 @@ export const DS_CHECK_MAX_BYTES = 1_000_000;
 export const DS_CHECK_PROTOTYPE_SYMLINK = 'prototype-symlink';
 
 export const DS_CHECK_USAGE =
-  'Usage: texuli ds check <file> [--locked [--report]] [--prototype <dir>] [--json] [--render] [--mode light|dark|all] [--variant <name>]... [--trust developer|untrusted] [--base <file>]... [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict] [--catalog <components.json>]';
+  'Usage: texuli ds check <file> [--locked [--report]] [--prototype <dir>] [--json] [--render] [--mode light|dark|all] [--variant <name>]... [--trust developer|untrusted] [--base <file>]... [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict] [--catalog <components.json>] [--extensions <file>...]';
 
 export interface DsCliArgs {
   command: 'check';
@@ -65,6 +70,8 @@ export interface DsCliArgs {
   strict: boolean;
   /** The catalog `allow` is checked against (default: the agent catalog `@texuli/tools` builds). */
   catalog?: string;
+  /** Host catalog extension manifests merged into the catalog (`--extensions a.json b.json`). */
+  extensions: string[];
   /** Source tree scanned as a locked prototype. */
   prototype?: string;
   help: boolean;
@@ -80,6 +87,7 @@ export function parseDsCliArgs(argv: readonly string[]): DsCliArgs {
     json: false,
     render: false,
     bases: [],
+    extensions: [],
     strict: false,
     help: false,
   };
@@ -119,7 +127,13 @@ export function parseDsCliArgs(argv: readonly string[]): DsCliArgs {
     else if (arg === '--known') args.known = value();
     else if (arg === '--catalog') args.catalog = value();
     else if (arg === '--prototype') args.prototype = value();
-    else if (arg.startsWith('-')) throw new TypeError(`Unknown ds check flag "${arg}".`);
+    else if (arg === '--extensions') {
+      // One or more files, up to the next flag; the flag may also repeat.
+      const before = args.extensions.length;
+      while (rest[index + 1] !== undefined && !(rest[index + 1] as string).startsWith('-'))
+        args.extensions.push(rest[++index] as string);
+      if (args.extensions.length === before) throw new TypeError('Flag --extensions needs a file.');
+    } else if (arg.startsWith('-')) throw new TypeError(`Unknown ds check flag "${arg}".`);
     else if (args.file === undefined) args.file = arg;
     else throw new TypeError(`ds check takes one file; got "${args.file}" and "${arg}".`);
   }
@@ -131,6 +145,10 @@ export function parseDsCliArgs(argv: readonly string[]): DsCliArgs {
   if (args.strict && !args.render) throw new TypeError('Flag --strict needs --render.');
   if (args.known !== undefined && !args.render) throw new TypeError('Flag --known needs --render.');
   if (args.report && !args.locked) throw new TypeError('Flag --report needs --locked.');
+  if (args.extensions.length > CATALOG_EXTENSION_LIMITS.extensions)
+    throw new RangeError(
+      `extension-oversize: --extensions takes at most ${CATALOG_EXTENSION_LIMITS.extensions} files; got ${args.extensions.length}.`
+    );
   return args;
 }
 
@@ -373,7 +391,7 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
   }
   if (args.help) {
     stdout.write(
-      `${DS_CHECK_USAGE}\n\nValidate, compile and check a design-system document: the spec's codes, the guarantees (aa-text, aa-focus, target-size) and the contrast report, for the base document and its high-contrast variant. --render also paints every agent-emittable catalog component under it in a headless browser and checks axe, the painted contrast and colors that do not follow the design system; known findings (none in the library; --known <file> adds your own) are listed and do not fail unless --strict.\n\n--locked runs the full locked-design-system checks and prints findings with counts by area, route and component. Add --report to keep the complete findings as a progress baseline while returning success; add --json for machine-readable output (including summary counts). Without --report, violations enforce exit 1. Exit 0 means clean or report-only, 1 means an enforced refusal/finding, 2 means the check could not run.\n\n--render paints the conformance sheet that ships inside @texuli/tools (--sheet ${DS_CHECK_BUILTIN_SHEET}, the default; no bundler needed). --sheet <page.html> serves a page you built that installs @texuli/tools/ds-check/host, and --url <page> checks a page you serve. It needs "playwright" (or "@playwright/test") and "@axe-core/playwright" as dev dependencies of your project, and chromium (npx playwright install chromium); the static checks need neither.\n\nLocked design systems (ADR-032): the allow section is checked against the agent catalog, or --catalog <components.json> (unknown-component, unknown-variant, unknown-size, unknown-tone, unknown-density, unknown-color, unknown-state); the report lists the allowed set and the approval as declared, and refuses a recorded content hash that no longer matches (content-hash-mismatch, library-hash-mismatch). texuli ds hash prints the hashes. The check cannot prove who approved: a reviewed commit is the guarantee.\n`
+      `${DS_CHECK_USAGE}\n\nValidate, compile and check a design-system document: the spec's codes, the guarantees (aa-text, aa-focus, target-size) and the contrast report, for the base document and its high-contrast variant. --render also paints every agent-emittable catalog component under it in a headless browser and checks axe, the painted contrast and colors that do not follow the design system; known findings (none in the library; --known <file> adds your own) are listed and do not fail unless --strict.\n\n--locked runs the full locked-design-system checks and prints findings with counts by area, route and component. Add --report to keep the complete findings as a progress baseline while returning success; add --json for machine-readable output (including summary counts). Without --report, violations enforce exit 1. Exit 0 means clean or report-only, 1 means an enforced refusal/finding, 2 means the check could not run.\n\n--render paints the conformance sheet that ships inside @texuli/tools (--sheet ${DS_CHECK_BUILTIN_SHEET}, the default; no bundler needed). --sheet <page.html> serves a page you built that installs @texuli/tools/ds-check/host, and --url <page> checks a page you serve. It needs "playwright" (or "@playwright/test") and "@axe-core/playwright" as dev dependencies of your project, and chromium (npx playwright install chromium); the static checks need neither.\n\nLocked design systems (ADR-032): the allow section is checked against the agent catalog, or --catalog <components.json> (unknown-component, unknown-variant, unknown-size, unknown-tone, unknown-density, unknown-color, unknown-state); the report lists the allowed set and the approval as declared, and refuses a recorded content hash that no longer matches (content-hash-mismatch, library-hash-mismatch). texuli ds hash prints the hashes. --extensions <file>... merges host catalog extension manifests (format texuli/catalog-extension, ids <ns>:<id>) into the catalog first, so allow keys such as acme:kpi-strip are checked as the host checks them; a refused extension is left out whole and reported as catalog-extension, with the merge's code (extension-format, extension-namespace, extension-collision, …) in the message. The check cannot prove who approved: a reviewed commit is the guarantee.\n`
     );
     return { ok: true };
   }
@@ -388,15 +406,22 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
         throw new TypeError(`The base ${path} has no id and version.`);
       bases[`${record.id}@${record.version}`] = base;
     }
-    const catalog =
+    const texuli =
       args.catalog === undefined
         ? await loadAllowCatalog()
         : catalogOf(await readJsonFile(args.catalog, 'The catalog'), args.catalog);
+    // Host extensions: read as JSON (never executed), checked and merged by mergeCatalogs.
+    const extensions: unknown[] = [];
+    for (const path of args.extensions)
+      extensions.push(await readJsonFile(path, 'The catalog extension'));
+    const merged = await loadMergedCatalog(extensions, { catalog: texuli });
+    const catalog = merged.catalog;
     if (args.locked || args.prototype !== undefined) {
       const prototype =
         args.prototype === undefined ? undefined : await readPrototypeDirectory(args.prototype);
       let full = await checkDesignSystemFull(doc, {
-        catalog,
+        catalog: texuli,
+        ...(extensions.length > 0 ? { extensions } : {}),
         base: bases,
         file: args.file as string,
         hashes: true,
@@ -488,6 +513,16 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
         ...(args.variants ? { variants: args.variants } : {}),
         ...(args.trust ? { trust: args.trust } : {}),
       });
+      const refused = catalogExtensionIssues(merged, args.extensions);
+      if (refused.length > 0) {
+        const errors = [...refused, ...report.errors];
+        report = {
+          ...report,
+          ok: false,
+          errors,
+          codes: [...new Set(errors.map((e) => e.code))].sort(),
+        };
+      }
       const known =
         args.known === undefined
           ? undefined

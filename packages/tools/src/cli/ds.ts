@@ -5,7 +5,7 @@
  * local MCP and the remote MCP give the same results:
  *
  *     texuli ds init <file> [--brand "<one-liner>"] [--id <id>] [--name <name>] [--locked [--preset all|minimal|<allow.json>]] [--overwrite]
- *     texuli ds validate <file> [--trust t] [--variant v] [--base <file>]... [--locked] [--prototype <dir>] [--catalog <file>] [--json] [--render [--url <page>] [--sheet <page.html>] [--known <file>] [--strict]] [--report]
+ *     texuli ds validate <file> [--trust t] [--variant v] [--base <file>]... [--locked] [--prototype <dir>] [--catalog <file>] [--extensions <file>...] [--json] [--render [--url <page>] [--sheet <page.html>] [--known <file>] [--strict]] [--report]
  *     texuli ds compile <file> [--format f] [--mode m] [--variant v] [--base <file>]... [--out <path> [--overwrite]]
  *     texuli ds export <file> --format css|tailwind|dtcg|tokens-studio --out <path> [--selector s] [--dark d] [--overwrite]
  *     texuli ds preview <file> [--format svg|html] [--mode m] [--variant v] [--out <path> [--overwrite]]
@@ -73,7 +73,7 @@ export type DsCommand = (typeof DS_COMMANDS)[number];
 
 export const DS_USAGE = [
   'Usage: texuli ds init <file> [--brand "<one-liner>"] [--id <id>] [--name <name>] [--locked [--preset all|minimal|<allow.json>]] [--overwrite]',
-  '       texuli ds validate <file> [--trust developer|untrusted] [--variant <name>] [--base <file>]... [--locked] [--prototype <dir>] [--catalog <components.json>] [--json] [--render [--url <page>] [--sheet builtin|<page.html>] [--known <file>] [--strict]] [--report]',
+  '       texuli ds validate <file> [--trust developer|untrusted] [--variant <name>] [--base <file>]... [--locked] [--prototype <dir>] [--catalog <components.json>] [--extensions <file>...] [--json] [--render [--url <page>] [--sheet builtin|<page.html>] [--known <file>] [--strict]] [--report]',
   '       texuli ds compile <file> [--format json|css|tailwind|dtcg|tokens-studio] [--mode light|dark] [--variant <name>] [--base <file>]... [--out <path> [--overwrite]]',
   '       texuli ds export <file> --format css|tailwind|dtcg|tokens-studio --out <path> [--selector <s>] [--dark class|attribute|media] [--overwrite]',
   '       texuli ds preview <file> [--format svg|html] [--mode light|dark] [--variant <name>] [--out <path> [--overwrite]]',
@@ -96,6 +96,8 @@ export interface DsCommandArgs {
   overwrite: boolean;
   /** `init --locked`: add an `allow` section (ADR-032). */
   locked: boolean;
+  /** `validate --extensions a.json b.json`: host catalog extension manifests. */
+  extensions: string[];
 }
 
 /** The value flags each command accepts (`--base` repeats and `--overwrite` takes none). */
@@ -175,6 +177,7 @@ export function parseDsArgs(
     bases: [],
     overwrite: false,
     locked: false,
+    extensions: [],
   };
   for (let index = 0; index < rest.length; index++) {
     const arg = rest[index] as string;
@@ -195,6 +198,16 @@ export function parseDsArgs(
       if (name !== 'init' && name !== 'validate')
         throw new TypeError('Flag --locked belongs to ds init or ds validate.');
       parsed.locked = true;
+      continue;
+    }
+    if (arg === '--extensions') {
+      if (name !== 'validate') throw new TypeError('Flag --extensions belongs to ds validate.');
+      // One or more files, up to the next flag; the flag may also repeat.
+      const before = parsed.extensions.length;
+      while (rest[index + 1] !== undefined && !(rest[index + 1] as string).startsWith('-'))
+        parsed.extensions.push(rest[++index] as string);
+      if (parsed.extensions.length === before)
+        throw new TypeError('Flag --extensions needs a file.');
       continue;
     }
     if (['--json', '--render', '--strict', '--report'].includes(arg)) {
@@ -410,7 +423,7 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
   }
   if (args.command === 'help') {
     stdout.write(
-      `${DS_USAGE}\n\nAuthor and check design-system documents. Import, validate, compile, preview and diff print their operation JSON; --out writes the result through the local file policy. generate composes the available inputs and writes the document plus <out>.report.json; -o is its output shorthand. check is the conformance check (texuli ds check --help). Locked validation accepts --prototype <dir>, --catalog <components.json>, --json, and --render; with --locked, --render runs the locked render check (chart, map and canvas marks are exempt from the per-pixel color check, and a page you serve with --url, your prototype with @texuli/tools/ds-check/host installed, is mapped against the allow set: unmapped, not-allowed); --report lists findings and exits 0 for migration tracking.\nExit 0 valid or report-only, 1 refused/finding, 2 could not run. The check cannot prove who approved a document.\n`
+      `${DS_USAGE}\n\nAuthor and check design-system documents. Import, validate, compile, preview and diff print their operation JSON; --out writes the result through the local file policy. generate composes the available inputs and writes the document plus <out>.report.json; -o is its output shorthand. check is the conformance check (texuli ds check --help). Locked validation accepts --prototype <dir>, --catalog <components.json>, --extensions <file>... (host catalog extension manifests merged into the catalog, so allow keys such as acme:kpi-strip pass as they pass the host's validation), --json, and --render; with --locked, --render runs the locked render check (chart, map and canvas marks are exempt from the per-pixel color check, and a page you serve with --url, your prototype with @texuli/tools/ds-check/host installed, is mapped against the allow set: unmapped, not-allowed); --report lists findings and exits 0 for migration tracking.\nExit 0 valid or report-only, 1 refused/finding, 2 could not run. The check cannot prove who approved a document.\n`
     );
     return { ok: true };
   }
@@ -421,6 +434,7 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
   if (
     args.command === 'validate' &&
     (args.locked ||
+      args.extensions.length > 0 ||
       ['catalog', 'json', 'render', 'strict', 'report', 'prototype', 'url', 'sheet', 'known'].some(
         (flag) => args.flags[flag] !== undefined
       ))
@@ -435,6 +449,9 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
         ...(args.flags.variant ? ['--variant', args.flags.variant] : []),
         ...args.bases.flatMap((base) => ['--base', resolve(cwd, base)]),
         ...(args.flags.catalog ? ['--catalog', resolve(cwd, args.flags.catalog)] : []),
+        ...(args.extensions.length > 0
+          ? ['--extensions', ...args.extensions.map((file) => resolve(cwd, file))]
+          : []),
         ...(args.flags.prototype ? ['--prototype', resolve(cwd, args.flags.prototype)] : []),
         ...(args.flags.json === 'true' ? ['--json'] : []),
         ...(args.flags.render === 'true' ? ['--render'] : []),
