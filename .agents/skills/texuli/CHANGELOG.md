@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The packages are on npm at `0.17.1`, a patch (blueprint spec stays
+  `0.15.0`) that restores the strict lock for nested catalog roots and the
+  render host's component attribute, with the host map and script export,
+  the prose importer, `changesModel` and icon button fixes. The components
+  install reference marks them new in `0.17.1`.
+
 ## [0.4.3] — 2026-11-10
 
 ### Changes

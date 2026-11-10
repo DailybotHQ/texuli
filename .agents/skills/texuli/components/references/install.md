@@ -4,7 +4,7 @@ Back to [`../SKILL.md`](../SKILL.md).
 
 ## A. Use the packages
 
-The packages are on npm in the 0.17 line, every one at `0.17.0`, a pre-1.0 line
+The packages are on npm in the 0.17 line, every one at `0.17.1`, a pre-1.0 line
 (`latest` points to the newest, and `next` is no longer maintained and stays on `0.12.1`; 1.0.0 will be the first stable release). An app outside a
 Texuli checkout installs them plainly, for example
 `pnpm add texuli @texuli/tokens`, and pins the exact version or `^0.17.0`
@@ -14,7 +14,7 @@ runs the install; it uses the network). `@texuli/drag`,
 in `0.5.0`), `@texuli/document` and `@texuli/pages` (both first published
 in `0.7.0`), `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (all
 three first published in `0.8.0`) and `@texuli/mcp` (first published in
-`0.9.0`) are in development and on npm as `0.17.0`.
+`0.9.0`) are in development and on npm as `0.17.1`.
 
 New in `0.13.1` (an additive patch): `@texuli/blocks/code-field` (`CodeField`),
 `registerIcons` and `IconsProvider` in `texuli/icons`, `srcDark` and
@@ -86,6 +86,24 @@ New in `0.14.2` (a patch; an app that uses these pins `^0.14.2`):
   the value; a controlled `pressed` with a handler renders the prop.
 - Not in the agent catalog yet: `initialDate`, `Select` `block` and
   `ghost`, the `IconButton` badge.
+
+New in `0.17.1` (a patch; blueprint spec stays `0.15.0`; `^0.17.0` picks it
+up; no export removed):
+
+- The locked render check is strict again: a catalog root nested in an
+  allowed root passes only as a declared part or composed id of that
+  parent, and the host reads only the component attribute its caller
+  chose (`data-tx-component` by default; pass `componentAttribute:
+  'data-ds-check-component'` for a conformance sheet). Each finding code
+  keeps its own cap.
+- The host `map()` takes the full part-to-parent map (`partParentMap` in
+  `@texuli/catalog/manifest`) and a `composed` map, and the prebuilt host
+  is a package export: `@texuli/tools/ds-check/host.iife.js`.
+- `importBrand` reads whole prose clauses (roles, fonts, several colors in
+  order) and reports what it skipped; a repair names the token it changed.
+- `changesModel` compares up to 4,096 allow keys (with `warnings` past the
+  cap) and every library approval field. Icon buttons keep the 24px target
+  minimum.
 
 New in `0.17.0` (a `0.x` minor with blueprint spec `0.15.0`; pin `^0.17.0`,
 since `^0.16.0` never picks it up; no export removed):
