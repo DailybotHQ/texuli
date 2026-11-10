@@ -62,10 +62,9 @@ export const BASE_SYSTEM_TOKEN_NAMES: readonly string[] = [
   ),
 ];
 
-/** Data-viz tokens every theme emits through `themeVariables` (not `base.css`). */
+/** Data-viz tokens emitted through `themeVariables` when a theme defines charts (not `base.css`). */
 export const DATA_VIZ_TOKEN_NAMES: readonly string[] = [
-  ...steps('chart', range(1, 8)),
-  ...steps('chart', range(1, 8)).map((name) => `${name}-foreground`),
+  ...range(1, 8).flatMap((i) => [`--tx-chart-${i}`, `--tx-chart-${i}-foreground`]),
   ...steps('chart-sequential', range(1, 9)),
   ...steps('chart-diverging', range(1, 9)),
   '--tx-chart-grid',
