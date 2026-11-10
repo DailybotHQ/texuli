@@ -67,8 +67,8 @@ export interface DsCheckHostOptions {
   /** Resolves once the page painted every component (default: immediately). */
   ready?: () => Promise<unknown>;
   /**
-   * Root attribute the color check reads. Default `data-tx-component`, with
-   * `data-ds-check-component` still accepted so the conformance sheet keeps working.
+   * Root attribute the color check reads. Default: `data-ds-check-component` when the page
+   * has it (the conformance sheet), otherwise `data-tx-component` (a locked prototype).
    */
   componentAttribute?: string;
 }
@@ -231,7 +231,15 @@ export function installDsCheckHost(
   scope.setAttribute('data-ds-check-scope', '');
   let current: { compiled: ApplicableDesignSystem; mode: DsCheckMode } | undefined;
 
-  const attr = options.componentAttribute ?? DS_TX_COMPONENT_ATTRIBUTE;
+  // A page that marks its samples with data-ds-check-component (the conformance sheet) is
+  // checked by those marks only: nested catalog roots inside a sample also carry
+  // data-tx-component and would be counted twice. A page without them (a locked prototype)
+  // is checked through data-tx-component.
+  const attr =
+    options.componentAttribute ??
+    (scope.querySelector(`[${DS_CHECK_COMPONENT_ATTRIBUTE}]`)
+      ? DS_CHECK_COMPONENT_ATTRIBUTE
+      : DS_TX_COMPONENT_ATTRIBUTE);
   const rootSelector = dsCheckComponentSelector(attr);
   const componentId = (el: Element) =>
     el.getAttribute(attr) ||
