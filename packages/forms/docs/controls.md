@@ -4,8 +4,8 @@
 > is on npm from `0.8.0`.
 
 The static control registry of `SchemaForm` (G119). `SchemaForm` loads the
-controls of date, time, datetime, slider, tags, file, color and radio
-fields, and the step navigation of multi-step forms, the first time a form
+controls of checkbox, switch, multiselect, date, time, datetime, slider, tags,
+file, color and radio fields, and the step navigation of multi-step forms, the first time a form
 uses them, so a form that never paints them never ships them or their CSS.
 On the server a lazy control renders as a placeholder of about its size.
 A host that wants every control in the server HTML passes this registry:
@@ -27,6 +27,7 @@ chunk; use it where server rendering matters more than the first-load size.
 | Export | What it is |
 | --- | --- |
 | `SCHEMA_FORM_CONTROLS` | Every per-type control and `progress` (the step navigation), as `SchemaFormControls` |
+| `CheckboxControl`, `SwitchControl`, `MultiselectControl` | `Checkbox`, `Switch`, and multiselect choices |
 | `DateControl`, `TimeControl`, `DateTimeControl` | `DatePicker`, `TimeField`, and both together for datetime |
 | `SliderControl`, `TagsControl`, `FileControl`, `ColorControl`, `RadioControl` | `Slider`, `TagsInput`, `FileUpload`, `ColorPicker` and `RadioGroup` |
 | `ProgressControl` | The texuli `Stepper` of a multi-step form (`SchemaFormProgressProps`) |

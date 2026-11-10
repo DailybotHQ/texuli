@@ -22,6 +22,10 @@ const SRC = resolve(dirname(fileURLToPath(import.meta.url)), '../src');
 
 /** Module id fragments of the per-type controls (component and stylesheet). */
 const LAZY_ONLY = [
+  '/texuli/src/components/choice/Checkbox.svelte',
+  '/texuli/src/components/choice/Switch.svelte',
+  '/texuli/src/components/choice/choice.css',
+  '/forms/src/view/controls/MultiselectControl.svelte',
   '/texuli/src/components/date/DatePicker.svelte',
   '/texuli/src/components/date/TimeField.svelte',
   '/texuli/src/components/date/date.css',
