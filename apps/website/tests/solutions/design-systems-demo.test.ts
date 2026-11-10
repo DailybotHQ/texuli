@@ -85,7 +85,11 @@ describe('design-systems demo island', () => {
 
     await fireEvent.click(screen.getByRole('radio', { name: /Quillmark/ }));
     expect(app.dataset.brand).toBe('quillmark');
-    expect(screen.getByLabelText('Quillmark input').textContent).toContain('"$value": "#9a3412"');
+    // The input is a figure captioned by the brand (no aria-label on the generic <pre>).
+    const figure = screen.getByText('Quillmark input').closest('figure');
+    expect(figure?.querySelector('pre')?.textContent).toContain('"$value": "#9a3412"');
+    expect(figure?.querySelector('pre')?.hasAttribute('aria-label')).toBe(false);
+    expect(figure?.querySelector('pre')?.getAttribute('tabindex')).toBe('0');
     expect(document.querySelector('[data-tx-ds-demo-report]')?.textContent).toContain(
       '1 dropped value'
     );

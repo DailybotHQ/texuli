@@ -81,15 +81,16 @@ export const designSystems: SolutionEntry = {
   ],
   demo: {
     id: 'design-systems',
-    title: 'Ledgerline reference kit',
-    scenarios: ['ledgerline'],
+    title: 'Lock a brand in a minute',
+    scenarios: ['harborline', 'quillmark', 'tumbletown'],
+    // Kept equal to DESIGN_SYSTEMS_DEMO_LIMITS (demo/demo-content.ts) by design-systems-registry.test.ts.
     limits: [
-      'The landing links static example brand surfaces (the fictional Ledgerline kit); it does not run interactive generation yet.',
+      'Fictional brands. The drafts were generated when this site was built, and the check runs on a sample prototype, not your app.',
     ],
   },
   art: { hero: { slot: 'solution-design-systems-hero', variant: 'plate' } },
   limits: [
-    'The design-system document and compiler are available in the 0.16.1 line, which is pre-1.0.',
+    'The design-system document and compiler are on npm, pre-1.0: under 0.x a new minor may break, so pin an exact version.',
     'Compose Desktop decodes documents and uses token sets compiled on the web side; it does not compile arbitrary brand documents in Kotlin yet.',
     'Android and iOS targets are planned.',
     'Generation produces a draft that needs review before approval.',

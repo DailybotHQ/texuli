@@ -4,7 +4,7 @@
  * operations that exist in `packages/tools/src/ops`), platforms, the Protoyard band, the
  * FAQ and next steps. Protoyard: no numbers without a public source (lead decision,
  * 2026-11-10); the band links Protoyard's own site and its Built with page. Every answer
- * describes Texuli 0.16.1 behavior; the CLI cannot prove who approved.
+ * describes behavior on npm since Texuli 0.16.1 and unchanged in 0.17.0; the CLI cannot prove who approved.
  */
 import { PROTOYARD_SITE } from '../../../built-with/protoyard/protoyard-content.ts';
 import type {
@@ -144,7 +144,7 @@ export const DESIGN_SYSTEMS_FAQ = {
       id: 'stable',
       question: 'Is it stable?',
       answer:
-        'It is pre-1.0 (Texuli 0.16). Under 0.x a new minor may break, so pin an exact version. On native, Compose Desktop support is in development and Android and iOS are planned.',
+        'It is pre-1.0. Under 0.x a new minor may break, so pin an exact version. On native, Compose Desktop support is in development and Android and iOS are planned.',
     },
   ] satisfies readonly DesignSystemsFaqItem[],
 };

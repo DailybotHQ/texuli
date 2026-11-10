@@ -1,6 +1,6 @@
 /**
  * Copy for the Design systems landing hero (PLAN_017 story.md §1). Every claim is published
- * in Texuli 0.16.1: one data-only JSON document per brand, `texuli ds generate`, the kit,
+ * on npm since Texuli 0.16.1 (and in 0.17.0): one data-only JSON document per brand, `texuli ds generate`, the kit,
  * `texuli ds approve` and the locked checks. The status line is printed by `SolutionHero`
  * from `entry.status`. Approval is a reviewed commit: the CLI cannot prove who approved.
  */

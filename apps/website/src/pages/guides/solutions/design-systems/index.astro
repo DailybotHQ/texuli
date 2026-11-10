@@ -1,9 +1,11 @@
 ---
 /** `/guides/solutions/design-systems/` — concise technical entry point for the design-system APIs. */
 import SolutionDocsLayout from '../../../../components/solutions/docs-layout/SolutionDocsLayout.astro';
+import { withBase } from '../../../../components/foundation/site.ts';
 import { getSolution } from '../../../../data/solutions/index.ts';
 
 const entry = getSolution('design-systems');
+const link = (path: string) => withBase(import.meta.env.BASE_URL, path);
 ---
 
 <SolutionDocsLayout
@@ -33,9 +35,9 @@ const entry = getSolution('design-systems');
   <section>
     <h2 id="reference">Reference pages</h2>
     <ul>
-      <li><a href="/design-systems/">Examples and conformance reference</a></li>
-      <li><a href="/design-systems/kit/">Ledgerline kit</a></li>
-      <li><a href="/theme-studio/">Design System Studio</a></li>
+      <li><a href={link('/design-systems/')}>Examples and conformance reference</a></li>
+      <li><a href={link('/design-systems/kit/')}>Ledgerline kit</a></li>
+      <li><a href={link('/theme-studio/')}>Design System Studio</a></li>
     </ul>
   </section>
 </SolutionDocsLayout>

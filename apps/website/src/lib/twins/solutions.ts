@@ -234,7 +234,7 @@ export function solutionTwinNotes(
       const limits = entry.demo.limits.join(' ');
       return {
         route: new RegExp(`^${escapeRegExp(entry.route)}$`),
-        demo: `${entry.demo.title}.${limits ? ` ${limits}` : ''}`,
+        demo: `${entry.demo.title}: the live ${entry.name} demo runs in the browser on fixture data.${limits ? ` ${limits}` : ''}`,
         operations: SOLUTION_OPERATIONS[entry.slug],
         packages: [...new Set(entry.packages.map((pkg) => packageDir(pkg.name)))],
         links: exists(entry.docs) ? [{ label: `${entry.name} docs`, href: entry.docs }] : [],

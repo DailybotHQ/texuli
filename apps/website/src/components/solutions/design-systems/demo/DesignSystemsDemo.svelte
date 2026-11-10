@@ -88,7 +88,11 @@ const plural = (count: number, word: string) => `${count} ${word}${count === 1 ?
     <div class="ds-demo-app__grid">
       <section class="ds-demo-app__panel" aria-labelledby="{uid}-input-title">
         <h3 id="{uid}-input-title">2. The input and its report</h3>
-        <pre class="ds-demo-app__code" aria-label="{brand.name} input"><code>{brand.source}</code></pre>
+        <figure class="ds-demo-app__figure">
+          <figcaption class="ds-demo-app__caption">{brand.name} input</figcaption>
+          <!-- svelte-ignore a11y_no_noninteractive_tabindex -- the block scrolls; a tab stop lets keyboard users scroll it. -->
+          <pre class="ds-demo-app__code" tabindex="0"><code>{brand.source}</code></pre>
+        </figure>
         <p class="ds-demo-app__command"><code>{brand.command}</code></p>
         <p class="ds-demo-app__report-summary" data-tx-ds-demo-report="">
           {plural(brand.losses.length, 'dropped value')} · {plural(brand.repairs.length, 'repair')} ·
@@ -287,6 +291,21 @@ const plural = (count: number, word: string) => `${count} ${word}${count === 1 ?
   }
   .ds-demo-app__panel h3 {
     margin: 0;
+  }
+  .ds-demo-app__figure {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0;
+    min-inline-size: 0;
+  }
+  .ds-demo-app__caption {
+    color: var(--tx-muted-foreground);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .ds-demo-app__code:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
   }
   .ds-demo-app__code {
     margin: 0;

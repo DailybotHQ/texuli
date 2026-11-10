@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest';
 import { SOLUTION_REDIRECTS } from '../../../../functions/_middleware.ts';
 import { ecosystemNavGroups, solutionNavLinks } from '../../src/components/foundation/nav-data.ts';
 import { GUIDES_SECTIONS } from '../../src/components/guides/nav.ts';
+import { DESIGN_SYSTEMS_DEMO_LIMITS } from '../../src/components/solutions/design-systems/demo/demo-content.ts';
+import { DEMO_BRAND_INPUTS } from '../../src/components/solutions/design-systems/demo/fixtures/brands.ts';
 import { getSolution, SOLUTIONS } from '../../src/data/solutions/index.ts';
 import { validateSolutionRegistry } from '../../src/data/solutions/validate.ts';
 import {
@@ -68,7 +70,20 @@ describe('Design systems Solution registry wiring (ADR-033)', () => {
     const twin = solutionTwinNotes().find((note) => note.route.test(entry.route));
     expect(twin?.operations).toEqual(['ds.validate', 'ds.generate', 'ds.compile']);
     expect(twin?.packages).toEqual(['spec', 'tokens', 'texuli', 'tools']);
-    expect(twin?.demo).toContain('static example brand surfaces');
+    // W-1: the twin and the index describe the shipped demo, in the island's own words.
+    expect(twin?.demo).toBe(
+      `Lock a brand in a minute: the live Design systems demo runs in the browser on fixture data. ${DESIGN_SYSTEMS_DEMO_LIMITS}`
+    );
+    expect(entry.demo.title).toBe('Lock a brand in a minute');
+    expect(entry.demo.scenarios).toEqual(['harborline', 'quillmark', 'tumbletown']);
+    expect(entry.demo.limits).toEqual([DESIGN_SYSTEMS_DEMO_LIMITS]);
+    expect(index.solutions.find((solution) => solution.slug === entry.slug)).toMatchObject({
+      demo: {
+        scenarios: ['harborline', 'quillmark', 'tumbletown'],
+        limits: [DESIGN_SYSTEMS_DEMO_LIMITS],
+      },
+    });
+    expect(DEMO_BRAND_INPUTS.map((brand) => brand.id)).toEqual(entry.demo.scenarios);
   });
 
   it('links the existing reference hub to the finished landing', () => {
