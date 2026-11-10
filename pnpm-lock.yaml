@@ -614,6 +614,9 @@ importers:
       '@texuli/primitives':
         specifier: 0.16.1
         version: link:../primitives
+      '@texuli/spec':
+        specifier: 0.16.1
+        version: link:../spec
       '@texuli/tokens':
         specifier: 0.16.1
         version: link:../tokens
