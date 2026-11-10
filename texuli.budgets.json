@@ -110,8 +110,8 @@
       "note": "Default per-subpath cap (lead decision 2026-10-23) so a new lazy entry is budgeted from its first commit; exact entries override it and `pnpm size --update` tightens."
     },
     "@texuli/catalog/manifest": {
-      "gzip": 7296,
-      "note": "Provisional cap for the catalog manifest subpath (measured 4,112 B gzip on 2026-10-23, when it landed). PLAN_010 T-release-060 (2026-10-29): 8192 -> 5888 B, tightened to measured + 4% (measured 5,643 B). PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 5888 -> 6528 B, measured 6,389 B + 2%; the catalog now lists axes and states for every component (T2). PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip 6528 -> 7296 B, measured 7,109 B + 2%; the catalog widened from 170 to 194 ids with axes, states and imports (T2 widening, PLAN_016)."
+      "gzip": 7552,
+      "note": "Provisional cap for the catalog manifest subpath (measured 4,112 B gzip on 2026-10-23, when it landed). PLAN_010 T-release-060 (2026-10-29): 8192 -> 5888 B, tightened to measured + 4% (measured 5,643 B). PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 5888 -> 6528 B, measured 6,389 B + 2%; the catalog now lists axes and states for every component (T2). PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip 6528 -> 7296 B, measured 7,109 B + 2%; the catalog widened from 170 to 194 ids with axes, states and imports (T2 widening, PLAN_016). 0.17.2 (2026-11-10, lead, standing grant): 7296 -> 7552 B, measured 7,343 B + 2%; partParentMap derives part parents from catalog relations (runtime/static lock parity)."
     },
     "@texuli/catalog/manifests/*": {
       "gzip": 12288,
