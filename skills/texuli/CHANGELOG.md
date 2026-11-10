@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.4.2] — 2026-11-10
+
+### Changes
+
+- chore(skill): packages on npm at 0.16.1
+
 - The packages are on npm at `0.16.1`, a patch: `--extensions` on
   `texuli ds check` and `ds validate`, compound parts, the unscanned
   imports of a locked prototype and the `VirtualListView` feed mode. The
