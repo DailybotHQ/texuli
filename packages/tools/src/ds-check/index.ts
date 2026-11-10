@@ -22,6 +22,13 @@
  *   literal check, and on a page you serve (`url`) {@link checkLockedRenderTree}
  *   against the allow set (`unmapped`, `not-allowed`).
  */
+
+export {
+  compareDsReport,
+  type DsFindingKey,
+  type DsReportCompare,
+  dsReportFingerprint,
+} from './baseline.ts';
 export {
   DS_CHECK_PROTOTYPE_SYMLINK,
   type DsCliArgs,
@@ -36,6 +43,8 @@ export * from './locked-render.ts';
 export * from './locked-static.ts';
 export {
   DS_MAP_CODES,
+  DS_MAP_COMPOUND_PARENTS,
+  DS_MAP_DISABLED_VALUE,
   DS_MAP_MAX_ISSUES,
   DS_MAP_NOT_ALLOWED,
   DS_MAP_UNMAPPED,
@@ -44,6 +53,7 @@ export {
   type DsMapReport,
   dsMapSelector,
   mapDesignSystemTree,
+  resolveAllowedComponentId,
 } from './map.ts';
 export {
   builtinSheetDir,

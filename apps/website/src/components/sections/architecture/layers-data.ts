@@ -101,7 +101,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       {
         name: 'texuli',
         role: 'Styled components (Button … Tree), the class helpers (cx, variants), icons, layouts and app shells',
-        dependsOn: ['core', 'primitives', 'tokens'],
+        dependsOn: ['core', 'primitives', 'tokens', 'spec'],
       },
     ],
   },
@@ -358,7 +358,7 @@ export const LADDER_STAGES: readonly LadderStage[] = [
     layer: 'L3',
     runtimes: {
       web: {
-        text: 'Ships: styled components are published on npm as 0.16.1.',
+        text: 'Ships: styled components are published on npm as 0.17.0.',
         sources: [],
       },
       native: {

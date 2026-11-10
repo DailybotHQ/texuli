@@ -34,8 +34,8 @@ describe('Native Demo A', () => {
         catalog: specCatalog as unknown as SpecCatalog,
       })
     ).toEqual({ ok: true, diagnostics: [] });
-    // Spec 0.14.0: NATIVE_DEMO_SPEC_VERSION tracks the regenerated parity matrix.
-    expect(NATIVE_DEMO_SPEC_VERSION).toBe('0.14.0');
+    // Spec 0.15.0: NATIVE_DEMO_SPEC_VERSION tracks the regenerated parity matrix.
+    expect(NATIVE_DEMO_SPEC_VERSION).toBe('0.15.0');
     expect(NATIVE_DEMO_FIXTURE.id).toBe('report-week-42');
     expect(NATIVE_DEMO_FIXTURE_JSON).toContain('Delivery report, week 42');
     expect(NATIVE_DEMO_FIXTURE_JSON).toContain('charts-stacked-bar');

@@ -11,7 +11,7 @@
  *    path and its imports are mapped into that tree. Any declaration diagnostic
  *    fails the package. {@link PACKAGE_ASSETS} then adds the built assets a
  *    package ships beside its code (`@texuli/tools`: the ds-check conformance
- *    sheet, `scripts/ds-check-sheet.ts`).
+ *    sheet and host IIFE, `scripts/ds-check-sheet.ts` and `scripts/ds-check-host.ts`).
  * 2. **Manifest**: derive the published `package.json` from the source one.
  *    Every `./src/**.ts` export target maps to `./dist/**.js` (`types` to
  *    `.d.ts`), `.svelte` and `.css` keep their names, `workspace:` ranges
@@ -40,6 +40,7 @@ import {
 } from 'node:fs';
 import { dirname, join, posix, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildDsCheckHost, DS_CHECK_HOST_DIST } from './ds-check-host.ts';
 import { buildDsCheckSheet, DS_CHECK_SHEET_DIST } from './ds-check-sheet.ts';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -53,12 +54,16 @@ export const NEVER_PACKED: readonly string[] = ['@texuli/examples'];
  * Built assets a package ships in its `dist/` beside the compiled source,
  * by directory: each builder writes into the staged `dist` and returns its
  * problems. `tools`: the conformance sheet `texuli ds check --render` serves
- * by default (D-G-013), at `dist/ds-check/sheet/`.
+ * by default (D-G-013), at `dist/ds-check/sheet/`, and the host IIFE at
+ * `dist/ds-check/host.iife.js`.
  */
 export const PACKAGE_ASSETS: Readonly<
   Record<string, (dist: string, root: string) => Promise<string[]>>
 > = {
-  tools: (dist, root) => buildDsCheckSheet(join(dist, DS_CHECK_SHEET_DIST), root),
+  tools: async (dist, root) => [
+    ...(await buildDsCheckSheet(join(dist, DS_CHECK_SHEET_DIST), root)),
+    ...(await buildDsCheckHost(join(dist, DS_CHECK_HOST_DIST), root)),
+  ],
 };
 
 /** attw resolution kinds outside the ESM-only support policy. */

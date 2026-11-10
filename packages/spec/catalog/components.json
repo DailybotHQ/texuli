@@ -1,5 +1,5 @@
 {
-  "catalogHash": "8904c831653a022b72fc64fcd6baa0ae019e3eb6c44639f5100a927a16afc966",
+  "catalogHash": "ff1f13434cff6d544ece1f000c4215d72772f42f7c01e20700b309e1012e9fb8",
   "components": [
     {
       "axes": {
@@ -6024,8 +6024,17 @@
           "required": true
         },
         {
+          "enumValues": ["listbox", "feed"],
+          "kind": "enum",
+          "name": "mode"
+        },
+        {
           "kind": "number",
           "name": "overscan"
+        },
+        {
+          "kind": "boolean",
+          "name": "selectable"
         },
         {
           "kind": "string",
@@ -6035,6 +6044,11 @@
           "enumValues": ["sm", "md", "lg", "fill"],
           "kind": "enum",
           "name": "size"
+        },
+        {
+          "enumValues": ["box", "plain"],
+          "kind": "enum",
+          "name": "surface"
         }
       ],
       "sourceable": ["items"],

@@ -71,7 +71,8 @@ texuli ds validate brand.json --locked --prototype ./src --render
 | `--locked` | Run the full locked-design-system validator (`checkDesignSystemFull`): the static checks, data-viz, tokens, allow, approval and hashes, with findings counted by area, route and component |
 | `--prototype <dir>` | With `ds validate` or `ds check --locked`: read bounded Svelte, TypeScript, JavaScript, CSS and blueprint JSON files from a local directory. Source is scanned as text and never executed; symlinks are refused. JSON is included when it contains a blueprint `tree`. The report lists workspace packages and local modules that directory imported but the check did not read (`prototype.unchecked`, a count and the specifiers). |
 | `--scan-workspace` | With `--prototype`: also scan workspace packages those sources import (from `pnpm-workspace.yaml` or `package.json` workspaces). Files are keyed `workspace:<name>/…`. Without this flag those imports stay in `unchecked`. |
-| `--report` | With `--locked` only: print the complete findings (readable or `--json`) and exit 0, so a saved JSON file is a progress baseline. Without `--locked` the flag is refused |
+| `--report` | With `--locked` only: print the complete findings (readable or `--json`) and exit 0, so a saved JSON file is a progress baseline. Without `--locked` the flag is refused. JSON includes a `fingerprint` of finding codes and paths. |
+| `--baseline <file>` | With `--locked --report`: compare the new report to a saved JSON file (`compareDsReport`). Exit 1 when the new run adds findings. |
 
 **Exit codes:** `0` every check passed, or `--locked --report` listed
 findings without enforcing them; `1` a refusal or a render finding in
@@ -245,6 +246,13 @@ so it is the page the repository's conformance spec drives. A source
 checkout has no built sheet; there `--sheet builtin` serves the fixture app
 with the repository's Vite instead.
 
+`pnpm verify:packages` also bundles the host as an IIFE at
+`dist/ds-check/host.iife.js` (`scripts/ds-check-host.ts`). A prototype page
+that cannot import ESM can load that script and call
+`TexuliDsCheckHost.installDsCheckHost(scope)`. The color check reads
+`data-tx-component` by default (and still accepts `data-ds-check-component`
+on the conformance sheet).
+
 To paint your own components, build a page that renders them inside one
 element and installs the host, then pass it with `--sheet <page.html>`
 (served with the files of its folder: GET only, nothing outside it) or
@@ -253,7 +261,7 @@ serve it yourself and pass `--url <page>`:
 ```ts
 import { installDsCheckHost } from '@texuli/tools/ds-check/host';
 
-// Each component sits in an element with data-ds-check-component="<id>".
+// Each component sits in an element with data-tx-component="<id>".
 installDsCheckHost(document.getElementById('sheet')!, { ready: () => allPainted() });
 ```
 
@@ -376,7 +384,12 @@ any arbitrary value (`[…]` / `{…}`).
 
 `mapDesignSystemTree` walks a painted tree: every interactive element
 must sit inside `[data-tx-component]`, and once `allow` exists every
-such root must be listed (`unmapped`, `not-allowed`).
+such root must be listed (`unmapped`, `not-allowed`). Part ids
+(`select-trigger`) and extension-composed ids resolve to their allowed
+parent (`select`, or a `composed` map). Rendered
+`data-tx-variant` / `size` / `tone` / `density` / `color` are checked
+against that allow entry (`render-disabled-value`). Literal
+`render-literal` issue paths name the element (tag/selector).
 
 `runLockedRenderChecks` (`packages/tools/src/ds-check/locked-render.ts`)
 runs the same axe, painted-contrast and literal-color checks as

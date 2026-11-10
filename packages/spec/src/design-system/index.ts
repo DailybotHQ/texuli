@@ -70,6 +70,21 @@ export {
   MINIMAL_LOCKED_COMPONENTS,
 } from './init.ts';
 export {
+  changesModel,
+  KIT_ALLOW_LISTS,
+  type KitAllowChange,
+  type KitAllowList,
+  type KitApprovalChange,
+  type KitApprovalView,
+  type KitChangeKind,
+  type KitChangesModel,
+  type KitHashCheck,
+  type KitLibraryChange,
+  type KitVersion,
+  kitApproval,
+  kitContentHash,
+} from './kit.ts';
+export {
   applyDesignSystemPatch,
   checkDesignSystemReference,
   DESIGN_SYSTEM_MIGRATIONS,

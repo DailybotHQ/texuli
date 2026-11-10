@@ -185,6 +185,10 @@ export const dataTreeViewManifest: CatalogManifest = /* @__PURE__ */ stampDataAx
 /** Viewport heights and row densities of `VirtualListView` (kept equal by a test). */
 export const VIRTUAL_LIST_SIZES = ['sm', 'md', 'lg', 'fill'] as const;
 export const VIRTUAL_LIST_DENSITIES = ['compact', 'default', 'comfortable'] as const;
+/** `VirtualListView` patterns: an APG listbox (default) or an APG feed. */
+export const VIRTUAL_LIST_MODES = ['listbox', 'feed'] as const;
+/** `VirtualListView` viewport frames: a bordered box (default) or plain. */
+export const VIRTUAL_LIST_SURFACES = ['box', 'plain'] as const;
 
 export const dataVirtualListManifest: CatalogManifest = /* @__PURE__ */ stampDataAxes(
   manifestData({
@@ -197,18 +201,21 @@ export const dataVirtualListManifest: CatalogManifest = /* @__PURE__ */ stampDat
     // Host code renders rows through a snippet; the player has no painter yet.
     agentEmittable: false,
     useWhen: [
-      'Show a long feed, log or result list (hundreds to tens of thousands of rows)',
-      'Let people pick one row from a long list by keyboard',
+      'Show a long feed whose rows hold their own buttons, links or inputs, with mode="feed" (hundreds to tens of thousands of rows)',
+      'Let people pick one row from a long log or result list by keyboard (the default listbox mode)',
     ],
     dontUseWhen: [
       'Rows with columns: use data-grid',
       'A short list: use list',
-      'Rows with their own buttons or links: a listbox option holds no controls',
+      'Rows with their own buttons, links or inputs in the default listbox mode: an option holds no controls, so use mode="feed"',
     ],
     a11y: [
-      'A WAI-ARIA listbox with one tab stop; aria-activedescendant names the active row',
+      'Listbox mode: a WAI-ARIA listbox with one tab stop; aria-activedescendant names the active row',
       'Every row carries aria-setsize and aria-posinset, so its position in the full list is announced',
-      'Arrow keys, Home, End, Page Up and Page Down move; Enter, Space or a click selects',
+      'Listbox mode: Arrow keys, Home, End, Page Up and Page Down move; Enter, Space or a click selects (selectable false: no selection)',
+      'Feed mode: a WAI-ARIA feed of focusable articles without selection; Page Down and Page Up move focus between articles',
+      'Feed mode: every article is named by aria-labelledby (the row label, or the row heading id) or, failing that, aria-label',
+      'Keys pressed in a row control (an input, a button) stay with that control',
     ],
     props: [
       labelProp,
@@ -227,6 +234,29 @@ export const dataVirtualListManifest: CatalogManifest = /* @__PURE__ */ stampDat
         description: 'Viewport height: sm, md or lg, or fill to take the parent height.',
       },
       densityProp(VIRTUAL_LIST_DENSITIES, 'default'),
+      {
+        name: 'mode',
+        kind: 'enum',
+        enumValues: VIRTUAL_LIST_MODES,
+        default: 'listbox',
+        description:
+          'listbox: rows are options to pick. feed: an APG feed of articles that may hold their own controls; no selection.',
+      },
+      {
+        name: 'selectable',
+        kind: 'boolean',
+        default: true,
+        description:
+          'Listbox mode: false never selects or paints a row (select still fires) and drops the option chrome.',
+      },
+      {
+        name: 'surface',
+        kind: 'enum',
+        enumValues: VIRTUAL_LIST_SURFACES,
+        default: 'box',
+        description:
+          'box: the viewport has a border, radius and surface. plain: none of them, so a feed of cards sits on the page.',
+      },
       {
         name: 'estimateSize',
         kind: 'number',

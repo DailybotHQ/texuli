@@ -14,7 +14,31 @@ const COMPONENT_ATTRIBUTE = 'data-tx-component';
 export const DS_MAP_UNMAPPED = 'unmapped';
 /** Catalog root whose id is not in `allow` (only when `allow` exists). */
 export const DS_MAP_NOT_ALLOWED = 'not-allowed';
-export const DS_MAP_CODES = [DS_MAP_NOT_ALLOWED, DS_MAP_UNMAPPED] as const;
+/** A rendered `data-tx-variant` / size / tone / density / color the allow entry disables. */
+export const DS_MAP_DISABLED_VALUE = 'render-disabled-value';
+export const DS_MAP_CODES = [DS_MAP_DISABLED_VALUE, DS_MAP_NOT_ALLOWED, DS_MAP_UNMAPPED] as const;
+
+/**
+ * Compound catalog parents whose `id-part` roots (select-trigger, …) resolve
+ * to the parent when that parent is allowed. Independent ids such as
+ * `button-group` are not in this list.
+ */
+export const DS_MAP_COMPOUND_PARENTS = [
+  'accordion',
+  'alert-dialog',
+  'combobox',
+  'command',
+  'context-menu',
+  'dialog',
+  'dropdown-menu',
+  'hover-card',
+  'menubar',
+  'multi-select',
+  'navigation-menu',
+  'popover',
+  'select',
+  'tabs',
+] as const;
 
 /** Cap matches `DESIGN_SYSTEM_LIMITS.errors`. */
 export const DS_MAP_MAX_ISSUES = 64;
@@ -58,6 +82,8 @@ export interface DsMapOptions {
    * the document is not locked: only unmapped interactive elements fail.
    */
   allowManifest?: DsMapAllowManifest;
+  /** Extra child → parent catalog ids (library `composes`, host extensions). */
+  composed?: Readonly<Record<string, string>>;
 }
 
 export interface DsMapReport {
@@ -69,9 +95,78 @@ export interface DsMapReport {
 
 const ROOT_SELECTOR = `[${COMPONENT_ATTRIBUTE}]`;
 
+const AXIS_ATTRS = [
+  ['variant', 'data-tx-variant', 'variants'],
+  ['size', 'data-tx-size', 'sizes'],
+  ['tone', 'data-tx-tone', 'tones'],
+  ['density', 'data-tx-density', 'densities'],
+  ['color', 'data-tx-color', 'colors'],
+] as const;
+
+const COMPOUND = new Set<string>(DS_MAP_COMPOUND_PARENTS);
+
 function allowedIds(manifest: DsMapAllowManifest | undefined): Set<string> | undefined {
   if (!manifest || manifest.allow === undefined) return undefined;
   return new Set(Object.keys(manifest.allow));
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+/**
+ * The allow key that covers `id`: itself, a compound parent (`select-trigger` →
+ * `select`), an extension local id (`acme:select-trigger` → `acme:select` or
+ * `select`), a composed parent, or a DOM ancestor catalog root.
+ */
+export function resolveAllowedComponentId(
+  id: string,
+  allowed: ReadonlySet<string>,
+  options: { composed?: Readonly<Record<string, string>>; ancestor?: string } = {}
+): string | undefined {
+  if (!id) return undefined;
+  if (allowed.has(id)) return id;
+  const composed = options.composed?.[id];
+  if (composed && allowed.has(composed)) return composed;
+  if (options.ancestor && allowed.has(options.ancestor)) return options.ancestor;
+  const colon = id.lastIndexOf(':');
+  if (colon > 0) {
+    const ns = id.slice(0, colon);
+    const local = id.slice(colon + 1);
+    const inner = resolveAllowedComponentId(local, allowed, {
+      composed: options.composed,
+      ancestor: options.ancestor?.includes(':')
+        ? options.ancestor.slice(options.ancestor.lastIndexOf(':') + 1)
+        : options.ancestor,
+    });
+    if (inner) {
+      if (allowed.has(`${ns}:${inner}`)) return `${ns}:${inner}`;
+      if (allowed.has(inner)) return inner;
+    }
+  }
+  let best: string | undefined;
+  for (const parent of allowed) {
+    const localParent = parent.includes(':') ? parent.slice(parent.lastIndexOf(':') + 1) : parent;
+    if (!COMPOUND.has(localParent)) continue;
+    if (id.startsWith(`${parent}-`) || id.startsWith(`${localParent}-`)) {
+      if (!best || parent.length > best.length) best = parent;
+    }
+  }
+  return best;
+}
+
+function ancestorCatalogId(el: Element): string | undefined {
+  const owner = el.parentElement?.closest(ROOT_SELECTOR);
+  const id = owner?.getAttribute(COMPONENT_ATTRIBUTE);
+  return id || undefined;
+}
+
+function allowAxisValues(entry: unknown, field: string): readonly string[] | undefined {
+  if (!isRecord(entry)) return undefined;
+  const listed = entry[field];
+  if (listed === undefined) return undefined;
+  if (!Array.isArray(listed)) return [];
+  return listed.filter((item): item is string => typeof item === 'string');
 }
 
 function attrValue(value: string): string {
@@ -146,17 +241,39 @@ export function mapDesignSystemTree(root: ParentNode, options: DsMapOptions = {}
   if (allowed) {
     for (const el of root.querySelectorAll(ROOT_SELECTOR)) {
       const id = el.getAttribute(COMPONENT_ATTRIBUTE) ?? '';
-      if (allowed.has(id)) continue;
-      push(
-        errors,
-        DS_MAP_NOT_ALLOWED,
-        el,
-        root,
-        id
-          ? `Component "${id}" is not in the allow manifest.`
-          : 'Component root has an empty data-tx-component.',
-        id || undefined
-      );
+      const covered = resolveAllowedComponentId(id, allowed, {
+        composed: options.composed,
+        ancestor: ancestorCatalogId(el),
+      });
+      if (!covered) {
+        push(
+          errors,
+          DS_MAP_NOT_ALLOWED,
+          el,
+          root,
+          id
+            ? `Component "${id}" is not in the allow manifest.`
+            : 'Component root has an empty data-tx-component.',
+          id || undefined
+        );
+        continue;
+      }
+      const entry = options.allowManifest?.allow?.[covered];
+      for (const [axis, attr, field] of AXIS_ATTRS) {
+        const painted = el.getAttribute(attr);
+        if (!painted) continue;
+        const listed = allowAxisValues(entry, field);
+        if (listed === undefined) continue;
+        if (listed.includes(painted)) continue;
+        push(
+          errors,
+          DS_MAP_DISABLED_VALUE,
+          el,
+          root,
+          `Rendered ${axis} "${painted}" is not allowed for "${covered}".`,
+          covered
+        );
+      }
     }
   }
 
@@ -176,7 +293,13 @@ export function mapDesignSystemTree(root: ParentNode, options: DsMapOptions = {}
     }
     if (!allowed) continue;
     const id = owner.getAttribute(COMPONENT_ATTRIBUTE) ?? '';
-    if (allowed.has(id)) continue;
+    if (
+      resolveAllowedComponentId(id, allowed, {
+        composed: options.composed,
+        ancestor: ancestorCatalogId(owner),
+      })
+    )
+      continue;
     // The root is already a `not-allowed` finding; do not also flag every
     // inner control as unmapped.
   }
