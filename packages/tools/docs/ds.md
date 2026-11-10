@@ -126,6 +126,7 @@ texuli ds diff brand.ds.json next.ds.json
 texuli ds import tokens/brand.tokens.json --from dtcg --out imported.ds.json
 texuli ds import ocean --from theme --out ocean.ds.json
 texuli ds check brand.ds.json --render                 # the conformance check (ds-check.md)
+texuli ds validate brand.ds.json --extensions acme.catalog.json   # allow checked against Texuli plus host extensions (ds-check.md)
 texuli ds validate brand.ds.json --locked --render --url http://localhost:5173/  # locked render check on your served prototype (ds-check.md)
 ```
 

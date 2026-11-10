@@ -3,7 +3,7 @@
  * `texuli ds check <file> [--locked] [--report] [--json] [--render] [--mode light|dark|all]
  * [--variant <name>]… [--trust developer|untrusted] [--base <file>]…
  * [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict]
- * [--catalog <components.json>]`.
+ * [--catalog <components.json>] [--extensions <file>...]`.
  *
  * Exit codes: 0 when checks pass or `--locked --report` lists findings,
  * 1 on any refusal or render finding in enforce mode, 2 when the check could
@@ -15,11 +15,16 @@
  * `unknown-state`), and a recorded content hash that no longer matches
  * (`content-hash-mismatch`, `library-hash-mismatch`). It reports the allowed
  * set and the approval status as declared; it cannot prove who approved.
+ * `--extensions` merges host catalog extensions (`<ns>:<id>` ids, `mergeCatalogs`) into the
+ * catalog first, so `allow` is checked as the host checks it; a refused extension is
+ * reported as `catalog-extension` with the merge's code in the message.
  */
 import { lstat, readdir, readFile, stat } from 'node:fs/promises';
-import { extname, relative, resolve } from 'node:path';
+import { extname, join, relative, resolve } from 'node:path';
 import type { SpecCatalog } from '@texuli/spec';
+import { CATALOG_EXTENSION_LIMITS } from '@texuli/spec/catalog-extensions';
 import { loadSpecCatalog } from '../ops/catalog.ts';
+import { catalogExtensionIssues, loadMergedCatalog } from './extensions.ts';
 import { checkDesignSystemFull, type DsFullReport } from './full.ts';
 import { renderLockedDesignSystemCheck } from './locked-render.ts';
 import {
@@ -36,6 +41,7 @@ import {
   serializeDsCheckReport,
 } from './static.ts';
 import type { DsCheckMode, DsCheckReport } from './types.ts';
+import { listImportSpecifiers, packageNameOf } from './unscanned.ts';
 
 /** The largest design-system file the CLI reads. */
 export const DS_CHECK_MAX_BYTES = 1_000_000;
@@ -44,7 +50,7 @@ export const DS_CHECK_MAX_BYTES = 1_000_000;
 export const DS_CHECK_PROTOTYPE_SYMLINK = 'prototype-symlink';
 
 export const DS_CHECK_USAGE =
-  'Usage: texuli ds check <file> [--locked [--report]] [--prototype <dir>] [--json] [--render] [--mode light|dark|all] [--variant <name>]... [--trust developer|untrusted] [--base <file>]... [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict] [--catalog <components.json>]';
+  'Usage: texuli ds check <file> [--locked [--report]] [--prototype <dir> [--scan-workspace]] [--json] [--render] [--mode light|dark|all] [--variant <name>]... [--trust developer|untrusted] [--base <file>]... [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict] [--catalog <components.json>] [--extensions <file>...]';
 
 export interface DsCliArgs {
   command: 'check';
@@ -65,8 +71,12 @@ export interface DsCliArgs {
   strict: boolean;
   /** The catalog `allow` is checked against (default: the agent catalog `@texuli/tools` builds). */
   catalog?: string;
+  /** Host catalog extension manifests merged into the catalog (`--extensions a.json b.json`). */
+  extensions: string[];
   /** Source tree scanned as a locked prototype. */
   prototype?: string;
+  /** With `--prototype`: also scan workspace packages the prototype imports. */
+  scanWorkspace: boolean;
   help: boolean;
 }
 
@@ -80,7 +90,9 @@ export function parseDsCliArgs(argv: readonly string[]): DsCliArgs {
     json: false,
     render: false,
     bases: [],
+    extensions: [],
     strict: false,
+    scanWorkspace: false,
     help: false,
   };
   if (command === undefined || command === '--help' || command === '-h')
@@ -119,7 +131,14 @@ export function parseDsCliArgs(argv: readonly string[]): DsCliArgs {
     else if (arg === '--known') args.known = value();
     else if (arg === '--catalog') args.catalog = value();
     else if (arg === '--prototype') args.prototype = value();
-    else if (arg.startsWith('-')) throw new TypeError(`Unknown ds check flag "${arg}".`);
+    else if (arg === '--scan-workspace') args.scanWorkspace = true;
+    else if (arg === '--extensions') {
+      // One or more files, up to the next flag; the flag may also repeat.
+      const before = args.extensions.length;
+      while (rest[index + 1] !== undefined && !(rest[index + 1] as string).startsWith('-'))
+        args.extensions.push(rest[++index] as string);
+      if (args.extensions.length === before) throw new TypeError('Flag --extensions needs a file.');
+    } else if (arg.startsWith('-')) throw new TypeError(`Unknown ds check flag "${arg}".`);
     else if (args.file === undefined) args.file = arg;
     else throw new TypeError(`ds check takes one file; got "${args.file}" and "${arg}".`);
   }
@@ -131,6 +150,12 @@ export function parseDsCliArgs(argv: readonly string[]): DsCliArgs {
   if (args.strict && !args.render) throw new TypeError('Flag --strict needs --render.');
   if (args.known !== undefined && !args.render) throw new TypeError('Flag --known needs --render.');
   if (args.report && !args.locked) throw new TypeError('Flag --report needs --locked.');
+  if (args.scanWorkspace && args.prototype === undefined)
+    throw new TypeError('Flag --scan-workspace needs --prototype.');
+  if (args.extensions.length > CATALOG_EXTENSION_LIMITS.extensions)
+    throw new RangeError(
+      `extension-oversize: --extensions takes at most ${CATALOG_EXTENSION_LIMITS.extensions} files; got ${args.extensions.length}.`
+    );
   return args;
 }
 
@@ -258,6 +283,11 @@ export function formatDsFullReport(report: DsFullReport): string {
     a.localeCompare(b)
   ))
     lines.push(`  component ${component}: ${count} uses`);
+  const unchecked = report.prototype?.unchecked;
+  if (unchecked && unchecked.count > 0)
+    lines.push(
+      `  unchecked: ${unchecked.count} import(s) not scanned (${unchecked.imports.join(', ')})`
+    );
   for (const finding of report.findings)
     lines.push(
       `  ${finding.severity.toUpperCase()} ${finding.code} ${finding.path}: ${finding.message} Hint: ${finding.hint}`
@@ -296,20 +326,111 @@ function refusePrototypeSymlink(name: string): never {
   throw new TypeError(`${DS_CHECK_PROTOTYPE_SYMLINK}: Prototype symlinks are refused: ${name}.`);
 }
 
+function parseWorkspaceGlobs(yaml: string): string[] {
+  const globs: string[] = [];
+  let inPackages = false;
+  for (const line of yaml.split('\n')) {
+    if (/^packages:\s*$/.test(line)) {
+      inPackages = true;
+      continue;
+    }
+    if (!inPackages) continue;
+    const item = /^\s+-\s+['"]?([^'"#\n]+?)['"]?\s*(?:#.*)?$/.exec(line);
+    if (item) globs.push((item[1] as string).trim());
+    else if (/^\S/.test(line) && !line.startsWith('#')) break;
+  }
+  return globs;
+}
+
+async function packageNameAt(directory: string): Promise<string | undefined> {
+  try {
+    const info = await lstat(join(directory, 'package.json'));
+    if (info.isSymbolicLink() || !info.isFile()) return;
+    const raw = JSON.parse(await readFile(join(directory, 'package.json'), 'utf8')) as {
+      name?: unknown;
+    };
+    return typeof raw.name === 'string' ? raw.name : undefined;
+  } catch {
+    return;
+  }
+}
+
+/** Workspace package name → directory, walking up from `start` for pnpm-workspace.yaml or workspaces. */
+async function discoverWorkspacePackages(start: string): Promise<Map<string, string>> {
+  const found = new Map<string, string>();
+  let dir = resolve(start);
+  let root: string | undefined;
+  let globs: string[] = [];
+  for (let i = 0; i < 8; i++) {
+    try {
+      const yaml = await readFile(join(dir, 'pnpm-workspace.yaml'), 'utf8');
+      root = dir;
+      globs = parseWorkspaceGlobs(yaml);
+      break;
+    } catch {
+      // not this directory
+    }
+    try {
+      const pkg = JSON.parse(await readFile(join(dir, 'package.json'), 'utf8')) as {
+        workspaces?: unknown;
+      };
+      const listed = pkg.workspaces;
+      const names = Array.isArray(listed)
+        ? listed.filter((item): item is string => typeof item === 'string')
+        : Array.isArray((listed as { packages?: unknown } | undefined)?.packages)
+          ? ((listed as { packages: unknown[] }).packages.filter(
+              (item): item is string => typeof item === 'string'
+            ) as string[])
+          : [];
+      if (names.length > 0) {
+        root = dir;
+        globs = names;
+        break;
+      }
+    } catch {
+      // not this directory
+    }
+    const parent = resolve(dir, '..');
+    if (parent === dir) break;
+    dir = parent;
+  }
+  if (!root) return found;
+  for (const glob of globs) {
+    const star = glob.endsWith('/*') ? glob.slice(0, -2) : glob;
+    const parent = join(root, star);
+    try {
+      const entries = glob.endsWith('/*')
+        ? await readdir(parent, { withFileTypes: true })
+        : [{ name: '', isDirectory: () => true, isSymbolicLink: () => false }];
+      for (const entry of entries) {
+        if (entry.isSymbolicLink?.() || !entry.isDirectory()) continue;
+        const directory = glob.endsWith('/*') ? join(parent, entry.name) : parent;
+        const name = await packageNameAt(directory);
+        if (name && !found.has(name)) found.set(name, directory);
+      }
+    } catch {
+      // missing glob
+    }
+  }
+  return found;
+}
+
 /** Read a bounded prototype tree without following symlinks or executing source files. */
-async function readPrototypeDirectory(path: string) {
+async function readPrototypeDirectory(path: string, options: { scanWorkspace?: boolean } = {}) {
   const root = resolve(path);
   const files: Record<string, string> = {};
   const blueprints: Record<string, unknown> = {};
   let totalBytes = 0;
-  const walk = async (directory: string): Promise<void> => {
+  const walk = async (directory: string, keyRoot: string, keyPrefix: string): Promise<void> => {
     const entries = await readdir(directory, { withFileTypes: true });
     for (const entry of entries) {
       const absolute = resolve(directory, entry.name);
-      const name = relative(root, absolute).split('\\').join('/');
+      const rel = relative(keyRoot, absolute).split('\\').join('/');
+      const name = keyPrefix ? `${keyPrefix}${rel}` : rel;
       if (entry.isSymbolicLink()) refusePrototypeSymlink(name);
       if (entry.isDirectory()) {
-        await walk(absolute);
+        if (['node_modules', 'dist', '.git', 'coverage'].includes(entry.name)) continue;
+        await walk(absolute, keyRoot, keyPrefix);
         continue;
       }
       if (!entry.isFile()) continue;
@@ -352,8 +473,22 @@ async function readPrototypeDirectory(path: string) {
   const rootInfo = await lstat(root);
   if (rootInfo.isSymbolicLink()) refusePrototypeSymlink(path);
   if (!rootInfo.isDirectory()) throw new TypeError(`Prototype ${path} is not a directory.`);
-  await walk(root);
-  return { files, blueprints };
+  await walk(root, root, '');
+  const workspaces = await discoverWorkspacePackages(root);
+  if (options.scanWorkspace) {
+    const imported = new Set<string>();
+    for (const text of Object.values(files))
+      for (const spec of listImportSpecifiers(text)) {
+        const pkg = packageNameOf(spec);
+        if (pkg) imported.add(pkg);
+      }
+    for (const pkg of imported) {
+      const directory = workspaces.get(pkg);
+      if (!directory) continue;
+      await walk(directory, directory, `workspace:${pkg}/`);
+    }
+  }
+  return { files, blueprints, workspacePackages: [...workspaces.keys()] };
 }
 
 /** Run `texuli ds …`; sets `process.exitCode` (1 refusal, 2 could not run); never throws. */
@@ -373,7 +508,7 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
   }
   if (args.help) {
     stdout.write(
-      `${DS_CHECK_USAGE}\n\nValidate, compile and check a design-system document: the spec's codes, the guarantees (aa-text, aa-focus, target-size) and the contrast report, for the base document and its high-contrast variant. --render also paints every agent-emittable catalog component under it in a headless browser and checks axe, the painted contrast and colors that do not follow the design system; known findings (none in the library; --known <file> adds your own) are listed and do not fail unless --strict.\n\n--locked runs the full locked-design-system checks and prints findings with counts by area, route and component. Add --report to keep the complete findings as a progress baseline while returning success; add --json for machine-readable output (including summary counts). Without --report, violations enforce exit 1. Exit 0 means clean or report-only, 1 means an enforced refusal/finding, 2 means the check could not run.\n\n--render paints the conformance sheet that ships inside @texuli/tools (--sheet ${DS_CHECK_BUILTIN_SHEET}, the default; no bundler needed). --sheet <page.html> serves a page you built that installs @texuli/tools/ds-check/host, and --url <page> checks a page you serve. It needs "playwright" (or "@playwright/test") and "@axe-core/playwright" as dev dependencies of your project, and chromium (npx playwright install chromium); the static checks need neither.\n\nLocked design systems (ADR-032): the allow section is checked against the agent catalog, or --catalog <components.json> (unknown-component, unknown-variant, unknown-size, unknown-tone, unknown-density, unknown-color, unknown-state); the report lists the allowed set and the approval as declared, and refuses a recorded content hash that no longer matches (content-hash-mismatch, library-hash-mismatch). texuli ds hash prints the hashes. The check cannot prove who approved: a reviewed commit is the guarantee.\n`
+      `${DS_CHECK_USAGE}\n\nValidate, compile and check a design-system document: the spec's codes, the guarantees (aa-text, aa-focus, target-size) and the contrast report, for the base document and its high-contrast variant. --render also paints every agent-emittable catalog component under it in a headless browser and checks axe, the painted contrast and colors that do not follow the design system; known findings (none in the library; --known <file> adds your own) are listed and do not fail unless --strict.\n\n--locked runs the full locked-design-system checks and prints findings with counts by area, route and component. Add --report to keep the complete findings as a progress baseline while returning success; add --json for machine-readable output (including summary counts). Without --report, violations enforce exit 1. Exit 0 means clean or report-only, 1 means an enforced refusal/finding, 2 means the check could not run.\n\n--render paints the conformance sheet that ships inside @texuli/tools (--sheet ${DS_CHECK_BUILTIN_SHEET}, the default; no bundler needed). --sheet <page.html> serves a page you built that installs @texuli/tools/ds-check/host, and --url <page> checks a page you serve. It needs "playwright" (or "@playwright/test") and "@axe-core/playwright" as dev dependencies of your project, and chromium (npx playwright install chromium); the static checks need neither.\n\nLocked design systems (ADR-032): the allow section is checked against the agent catalog, or --catalog <components.json> (unknown-component, unknown-variant, unknown-size, unknown-tone, unknown-density, unknown-color, unknown-state); the report lists the allowed set and the approval as declared, and refuses a recorded content hash that no longer matches (content-hash-mismatch, library-hash-mismatch). texuli ds hash prints the hashes. --extensions <file>... merges host catalog extension manifests (format texuli/catalog-extension, ids <ns>:<id>) into the catalog first, so allow keys such as acme:kpi-strip are checked as the host checks them; a refused extension is left out whole and reported as catalog-extension, with the merge's code (extension-format, extension-namespace, extension-collision, …) in the message. The check cannot prove who approved: a reviewed commit is the guarantee.\n`
     );
     return { ok: true };
   }
@@ -388,19 +523,37 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
         throw new TypeError(`The base ${path} has no id and version.`);
       bases[`${record.id}@${record.version}`] = base;
     }
-    const catalog =
+    const texuli =
       args.catalog === undefined
         ? await loadAllowCatalog()
         : catalogOf(await readJsonFile(args.catalog, 'The catalog'), args.catalog);
+    // Host extensions: read as JSON (never executed), checked and merged by mergeCatalogs.
+    const extensions: unknown[] = [];
+    for (const path of args.extensions)
+      extensions.push(await readJsonFile(path, 'The catalog extension'));
+    const merged = await loadMergedCatalog(extensions, { catalog: texuli });
+    const catalog = merged.catalog;
     if (args.locked || args.prototype !== undefined) {
       const prototype =
-        args.prototype === undefined ? undefined : await readPrototypeDirectory(args.prototype);
+        args.prototype === undefined
+          ? undefined
+          : await readPrototypeDirectory(args.prototype, { scanWorkspace: args.scanWorkspace });
       let full = await checkDesignSystemFull(doc, {
-        catalog,
+        catalog: texuli,
+        ...(extensions.length > 0 ? { extensions } : {}),
         base: bases,
         file: args.file as string,
         hashes: true,
-        ...(prototype ? { prototype } : {}),
+        ...(prototype
+          ? {
+              prototype: {
+                files: prototype.files,
+                blueprints: prototype.blueprints,
+                workspacePackages: prototype.workspacePackages,
+                scanWorkspace: args.scanWorkspace,
+              },
+            }
+          : {}),
         ...(args.trust ? { trust: args.trust } : {}),
       });
       // The full report keeps a serialized check (no compiled variables), so the
@@ -488,6 +641,16 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
         ...(args.variants ? { variants: args.variants } : {}),
         ...(args.trust ? { trust: args.trust } : {}),
       });
+      const refused = catalogExtensionIssues(merged, args.extensions);
+      if (refused.length > 0) {
+        const errors = [...refused, ...report.errors];
+        report = {
+          ...report,
+          ok: false,
+          errors,
+          codes: [...new Set(errors.map((e) => e.code))].sort(),
+        };
+      }
       const known =
         args.known === undefined
           ? undefined

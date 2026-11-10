@@ -47,7 +47,7 @@ describe('drag and workflows pages: copy and safety', () => {
       const copy = page.replace(/\s+/g, ' ');
       expect(copy).toContain(`@texuli/${name} · in development`);
       expect(copy).toContain(
-        `<code>@texuli/${name}</code> is in development and on npm as <code>0.16.0</code>, a pre-1.0 release.`
+        `<code>@texuli/${name}</code> is in development and on npm as <code>0.16.1</code>, a pre-1.0 release.`
       );
       expect(copy).not.toMatch(/not (?:yet )?on npm/);
     }

@@ -9,6 +9,14 @@
 export const VIRTUAL_LIST_SIZES = ['sm', 'md', 'lg', 'fill'] as const;
 export type VirtualListViewSize = (typeof VIRTUAL_LIST_SIZES)[number];
 
+/**
+ * The list's pattern: `listbox` (the default; one tab stop, rows are options
+ * to pick) or `feed` (the APG feed pattern; each row is an article that may
+ * hold its own buttons, links and inputs).
+ */
+export const VIRTUAL_LIST_MODES = ['listbox', 'feed'] as const;
+export type VirtualListViewMode = (typeof VIRTUAL_LIST_MODES)[number];
+
 /** Row padding steps. */
 export const VIRTUAL_LIST_DENSITIES = ['compact', 'default', 'comfortable'] as const;
 export type VirtualListViewDensity = (typeof VIRTUAL_LIST_DENSITIES)[number];
@@ -20,7 +28,7 @@ export type VirtualListKeyValue = string | number;
 export interface VirtualListRowContext<T> {
   item: T;
   index: number;
-  /** The keyboard's active row (`aria-activedescendant`). */
+  /** The keyboard's active row (`aria-activedescendant`; in a feed, the article that holds focus). */
   active: boolean;
   selected: boolean;
 }
@@ -41,6 +49,10 @@ export function normalizeVirtualListSize(value: unknown): VirtualListViewSize {
   return (VIRTUAL_LIST_SIZES as readonly unknown[]).includes(value)
     ? (value as VirtualListViewSize)
     : 'md';
+}
+
+export function normalizeVirtualListMode(value: unknown): VirtualListViewMode {
+  return value === 'feed' ? 'feed' : 'listbox';
 }
 
 export function normalizeVirtualListDensity(value: unknown): VirtualListViewDensity {

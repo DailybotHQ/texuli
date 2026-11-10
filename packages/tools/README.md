@@ -12,7 +12,7 @@ with an offline scorer measures how well an agent builds with the catalog.
 **In the stack:** layer L8, over the agent catalog, the `@texuli/tokens` token engine, `@texuli/blocks`, `@texuli/charts`, `@texuli/media`, `@texuli/deck` and `@texuli/document`. `@texuli/mcp` (L9) wraps its MCP server.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.16.0`, a pre-1.0 release (1.0.0 will be the first
+> published to npm as `0.16.1`, a pre-1.0 release (1.0.0 will be the first
 > stable release). Under 0.x, a new minor (`0.16.0`) may contain breaking
 > changes, so pin the exact version or use `^0.16.0`, which accepts only 0.16.x.
 

@@ -37,6 +37,7 @@ import {
   serializeDsCheckReport,
 } from './static.ts';
 import type { DsCheckIssue, DsCheckMode } from './types.ts';
+import { listUncheckedImports, type UncheckedImports } from './unscanned.ts';
 
 export const DS_FULL_FORMAT = 'texuli/ds-validate';
 export const DS_FULL_VERSION = 1;
@@ -80,6 +81,13 @@ export interface DsFullPrototype {
   readonly files?: Readonly<Record<string, string>>;
   /** Blueprints by name (`{ tree }` or a root node). */
   readonly blueprints?: Readonly<Record<string, unknown>>;
+  /** Workspace package names the prototype may import (from the host monorepo). */
+  readonly workspacePackages?: readonly string[];
+  /**
+   * When true, files under `workspace:<name>/` or `node_modules/<name>/` count as
+   * a scan of that package (CLI `--scan-workspace` loads them).
+   */
+  readonly scanWorkspace?: boolean;
 }
 
 export interface DsFullOptions {
@@ -119,6 +127,11 @@ export interface DsFullReport {
     readonly blueprints: number;
     /** Uses per catalog id. */
     readonly components: Readonly<Record<string, number>>;
+    /**
+     * Workspace packages and local modules imported from the prototype that
+     * this check did not read. Empty when every such import was scanned.
+     */
+    readonly unchecked: UncheckedImports;
   };
 }
 
@@ -621,6 +634,10 @@ export async function checkDesignSystemFull(
       files: Object.keys(files).length,
       blueprints: blueprintNames.length,
       components,
+      unchecked: listUncheckedImports(files, {
+        workspacePackages: options.prototype.workspacePackages,
+        scanWorkspace: options.prototype.scanWorkspace,
+      }),
     };
   }
 

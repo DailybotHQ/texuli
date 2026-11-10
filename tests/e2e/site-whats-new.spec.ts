@@ -11,7 +11,7 @@ import {
 
 /*
  * texuli.com /whats-new/ (PLAN_010 T-site-080, Amendment 8), in the
- * browser: the hub lists every feature of 0.6.0 to 0.16.0 under its
+ * browser: the hub lists every feature of 0.6.0 to 0.16.1 under its
  * release with an honest status, each with a demo or preview that works
  * (motion plays, a formula evaluates, a widget moves by keyboard, a form
  * validates, the locale switches, the canvas image and the email frame
@@ -108,9 +108,9 @@ test('every feature by release, each demo working, links that resolve; axe light
     'everything in it is also in 0.16.0'
   );
   await expect(page.locator('[data-hub-release="0.15.0"] [data-hub-feature]')).toHaveCount(0);
-  // The kit and the full locked checks: 0.16.0 is on the hub as the current release, with no cards of its own.
+  // The kit and the full locked checks: 0.16.0 is on the hub with its patch 0.16.1 as the current release, and no cards of its own.
   await expect(page.locator('[data-hub-release="0.16.0"] .hub__status')).toContainText(
-    'Published on npm as 0.16.0, the current release'
+    '0.16.1, the current release'
   );
   await expect(page.locator('[data-hub-release="0.16.0"] [data-hub-feature]')).toHaveCount(0);
   // PLAN_011 T-site-0100: design systems, the studio, the ds tools, conformance, the

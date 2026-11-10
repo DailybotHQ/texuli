@@ -5,6 +5,8 @@
  * - {@link checkDesignSystem}: the static checks (validate, `extends`,
  *   compile of the base and its variants, the guarantees re-checked), with
  *   the spec's stable codes and JSON paths. Pure; no browser.
+ * - {@link loadMergedCatalog}: the agent catalog with host extension manifests
+ *   (`<ns>:<id>`) merged in by `mergeCatalogs`, what `--extensions` checks `allow` against.
  * - {@link checkDesignSystemFull}: every check in one report (structure, extends, allow vs
  *   the merged catalog, approval and hash, contrast, data-viz palette, tokens, and with a
  *   prototype the locked static and CSS-policy findings), each with a severity and a hint.
@@ -28,6 +30,7 @@ export {
   runDsCli,
 } from './cli.ts';
 export * from './css-policy.ts';
+export * from './extensions.ts';
 export * from './full.ts';
 export * from './locked-render.ts';
 export * from './locked-static.ts';
@@ -82,3 +85,13 @@ export {
   serializeDsCheckReport,
 } from './static.ts';
 export * from './types.ts';
+export {
+  isCatalogSpecifier,
+  listImportSpecifiers,
+  listUncheckedImports,
+  packageNameOf,
+  resolveRelativeImport,
+  UNCHECKED_IMPORT_CAP,
+  type UncheckedImports,
+  type UnscannedOptions,
+} from './unscanned.ts';

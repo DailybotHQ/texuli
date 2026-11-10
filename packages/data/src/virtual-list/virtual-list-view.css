@@ -5,6 +5,9 @@
  * height. Rows are in normal flow, so their real height is what the
  * component measures. `overflow-anchor: none` leaves the scroll correction
  * for rows measured above the viewport to the component alone.
+ * Feeds and non-selectable lists use `__row`: no option padding, border,
+ * hover or cursor, so a card row snippet keeps its own chrome; only the
+ * focus ring is drawn.
  * @layer tx.components.
  */
 @layer tx.components {
@@ -81,6 +84,17 @@
     color: var(--tx-accent-foreground, HighlightText);
   }
 
+  .tx-virtual-list__row {
+    display: block;
+    min-inline-size: 0;
+  }
+
+  .tx-virtual-list__row:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: calc(-1 * var(--tx-focus-ring-width, 2px));
+  }
+
+  .tx-virtual-list__viewport:focus-visible .tx-virtual-list__row[data-active],
   .tx-virtual-list__viewport:focus-visible .tx-virtual-list__option[data-active] {
     outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
     outline-offset: calc(-1 * var(--tx-focus-ring-width, 2px));
