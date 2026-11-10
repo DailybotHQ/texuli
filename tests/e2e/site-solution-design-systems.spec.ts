@@ -11,8 +11,12 @@ import { axeViolations, polishProblems, serveDist, settle } from './support/site
  * 2. links: the kit, the Studio, the guide, the reference hub, Protoyard's own site and its
  *    Built with page, and honest copy (the CLI cannot prove who approved; no Protoyard
  *    numbers);
- * 3. the Markdown twin at /solutions/design-systems.md;
- * 4. at 390 px nothing overflows; axe finds no serious or critical violation in light or dark.
+ * 3. the demo island (T-demo): server-rendered before any script, hydrates when scrolled
+ *    into view; brand, mode and allow toggles work from the keyboard and the live region
+ *    reports the locked check with its stable codes; reset restores the start;
+ * 4. the Markdown twin at /solutions/design-systems.md;
+ * 5. at 390 px nothing overflows; axe finds no serious or critical violation in light or dark,
+ *    with the demo hydrated.
  */
 
 const origin = serveDist();
@@ -52,6 +56,10 @@ test('the landing renders the loop, its sections and status, with no errors', as
   const html = (await response?.text()) ?? '';
   expect(html).toContain('data-tx-solution-status="available"');
   expect(html).toContain('data-tx-ds-demo-mount');
+  // The island's server render is the preview: the brand scope and its CSS before any script.
+  expect(html).toContain('data-tx-ds-demo-scope');
+  expect(html).toMatch(/<astro-island[^>]+client="visible"/);
+  expect(html).toContain('[data-tx-ds="harborline"]{--tx-');
   await settle(page);
 
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
@@ -80,8 +88,7 @@ test('the landing renders the loop, its sections and status, with no errors', as
   await page.getByRole('link', { name: 'See it on a sample brand' }).click();
   await expect.poll(() => page.evaluate(() => window.location.hash)).toBe('#demo');
 
-  // Static for now: no island until T-demo mounts one.
-  await expect(page.locator('#demo astro-island')).toHaveCount(0);
+  await expect(page.locator('#demo astro-island')).toHaveCount(1);
   expect(await problems()).toEqual([]);
 });
 
@@ -124,6 +131,64 @@ test('links to the kit, Studio, guide, hub and Protoyard, and keeps the copy hon
   );
 });
 
+const demo = (page: Page) => page.locator('[data-tx-ds-demo]');
+
+async function startDemo(page: Page): Promise<void> {
+  await demo(page).scrollIntoViewIfNeeded();
+  await expect(page.locator('#demo astro-island:not([ssr]) [data-tx-ds-demo]')).toBeVisible({
+    timeout: 20_000,
+  });
+}
+
+test('the demo hydrates on scroll; brand, mode and allow toggles work from the keyboard', async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  const problems = await watchProblems(page);
+  await page.goto(`${origin()}${ROUTE}`);
+  await settle(page);
+  await startDemo(page);
+  const status = demo(page).getByRole('status');
+  await expect(status).toContainText('Locked check passed');
+
+  // Brand radios: arrow keys move the choice, as native radios do.
+  const harborline = demo(page).getByRole('radio', { name: /Harborline/ });
+  await harborline.focus();
+  await page.keyboard.press('ArrowDown');
+  await expect(demo(page).getByRole('radio', { name: /Quillmark/ })).toBeChecked();
+  await expect(demo(page)).toHaveAttribute('data-brand', 'quillmark');
+  const scope = demo(page).locator('[data-tx-ds-demo-scope]');
+  await expect(scope).toHaveAttribute('data-tx-ds', 'quillmark');
+  await expect(demo(page).locator('[data-tx-ds-demo-report]')).toContainText('dropped value');
+  // The compiled brand paints: the scope's primary color is the brand's, not the site's.
+  const primary = await scope.evaluate((el) =>
+    getComputedStyle(el).getPropertyValue('--tx-primary').trim()
+  );
+  expect(primary).not.toBe('');
+
+  await demo(page).getByRole('radio', { name: 'Dark' }).check();
+  await expect(scope).toHaveAttribute('data-tx-mode', 'dark');
+
+  const badge = demo(page).getByRole('checkbox', { name: /Badge/ });
+  await badge.focus();
+  await page.keyboard.press('Space');
+  await expect(status).toHaveText('Locked check failed: 1 finding (not-allowed).');
+  await expect(demo(page).locator('[data-tx-ds-demo-finding="not-allowed"]')).toBeVisible();
+  await demo(page)
+    .getByRole('checkbox', { name: /ghost variant/ })
+    .check();
+  await demo(page)
+    .getByRole('checkbox', { name: /ghost variant/ })
+    .uncheck();
+  await expect(status).toContainText('2 findings');
+  await expect(demo(page).locator('[data-tx-ds-demo-finding="variant-not-allowed"]')).toBeVisible();
+
+  await demo(page).getByRole('button', { name: 'Reset' }).click();
+  await expect(status).toContainText('Locked check passed');
+  await expect(demo(page)).toHaveAttribute('data-brand', 'harborline');
+  expect(await problems()).toEqual([]);
+});
+
 test('the Markdown twin carries the landing', async () => {
   const response = await fetch(`${origin()}/solutions/design-systems.md`);
   expect(response.status).toBe(200);
@@ -143,6 +208,7 @@ test('at 390 px nothing overflows; axe has no serious violations in light and da
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`${origin()}${ROUTE}`);
   await settle(page);
+  await startDemo(page);
   expect(await polishProblems(page)).toEqual([]);
   expect(
     await page.evaluate(

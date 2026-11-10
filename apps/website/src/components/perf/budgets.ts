@@ -162,8 +162,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/perf/',
     reason:
-      'PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (ADR-020, second amendment); measured 98.1 KB page (+4% headroom). Under the 96 KB default before. Trimming is a Final Review follow-up.',
-    budget: { pageGzipKb: 103 },
+      'PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (ADR-020, second amendment); measured 98.1 KB page (+4% headroom). Under the 96 KB default before. Trimming is a Final Review follow-up. PLAN_017 T-demo (2026-11-10): the page lists every override with its reason, so its HTML grows with each one; measured 24.2 KB gzip of HTML with the /solutions/design-systems/ row, limit 26 (+4% headroom, rounded up).',
+    budget: { pageGzipKb: 103, htmlGzipKb: 26 },
   },
   {
     route: '/dashboards-page/',
@@ -200,6 +200,12 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
     reason:
       'ADR-030: this landing replaces /workflows-page/ and inherits its current 132 KB page and 96 KB JavaScript caps.',
     budget: { pageGzipKb: 132, jsGzipKb: 96 },
+  },
+  {
+    route: '/solutions/design-systems/',
+    reason:
+      'PLAN_017 T-demo: the server-rendered demo island and its three build-time brands as one inline style (light and dark), so no compiler ships. Measured 2026-11-10: 27.0 KB gzip of HTML; page and JS fit the defaults. Limit 29 (+4%, Linux gzip drift).',
+    budget: { htmlGzipKb: 29 },
   },
   {
     route: '/workflows-page/json/',

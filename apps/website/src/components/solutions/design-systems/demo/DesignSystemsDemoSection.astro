@@ -1,13 +1,18 @@
 ---
 /**
- * The Design systems demo section (anchor `#demo`, owned by SolutionLayout). Static for now:
- * the try-this lines and a link to the Ledgerline kit. The island mount point below is
- * where T-demo (PLAN_017) mounts its `client:visible` island through the page's `island`
- * slot; until then the slot is empty and the page ships no script.
+ * The Design systems demo section (anchor `#demo`, owned by SolutionLayout; PLAN_017
+ * T-demo). At build time `buildDesignSystemsDemo` generates and compiles three fictional
+ * brands; their scoped variables go into one inline `<style>` (built here and sanitized by
+ * `designSystemStyle`, so the build-time CSP hashes it) and the island receives only the
+ * brand ids, inputs, report summaries and the locked check findings per toggle combination. The island is the landing's one `client:visible`
+ * island; its server render is the preview before hydration. The `island` slot stays for a
+ * page that wants to pass its own.
  */
 import { safeHref } from '@texuli/core/url-policy';
 import { getSolution } from '../../../../data/solutions/index.ts';
 import { withBase } from '../../../foundation/site.ts';
+import { buildDesignSystemsDemo } from './build.ts';
+import DesignSystemsDemo from './DesignSystemsDemo.svelte';
 import {
   DESIGN_SYSTEMS_DEMO_LIMITS,
   DESIGN_SYSTEMS_DEMO_LINK,
@@ -15,6 +20,7 @@ import {
 } from './demo-content.ts';
 
 const entry = getSolution('design-systems');
+const demoBuild = await buildDesignSystemsDemo();
 const headingId = `solution-demo-${entry.slug}-heading`;
 const kitHref = withBase(
   import.meta.env.BASE_URL,
@@ -22,6 +28,7 @@ const kitHref = withBase(
 );
 ---
 
+<style is:inline set:html={demoBuild.css}></style>
 <section class="ds-demo" aria-labelledby={headingId} data-tx-solution-demo={entry.slug}>
   <div class="ds-demo__inner">
     <h2 id={headingId}>{demo.title}</h2>
@@ -31,14 +38,14 @@ const kitHref = withBase(
         {demo.tryThis.map((line) => <li>{line}</li>)}
       </ol>
     </div>
+    <div class="ds-demo__island" data-tx-ds-demo-mount="" role="region" aria-label={demo.label}>
+      <DesignSystemsDemo client:visible brands={demoBuild.brands} checks={demoBuild.checks} />
+      <slot name="island" />
+    </div>
+    <p class="ds-demo__limits">{DESIGN_SYSTEMS_DEMO_LIMITS}</p>
     <p class="ds-demo__actions">
       <a class="ds-demo__cta" href={kitHref} data-tx-ds-demo-kit="">{DESIGN_SYSTEMS_DEMO_LINK.label}</a>
     </p>
-    <p class="ds-demo__limits">{DESIGN_SYSTEMS_DEMO_LIMITS}</p>
-    {/* ── T-demo island mount point (PLAN_017): the page passes the island in this slot. ── */}
-    <div class="ds-demo__island" data-tx-ds-demo-mount="">
-      <slot name="island" />
-    </div>
   </div>
 </section>
 
@@ -95,9 +102,6 @@ const kitHref = withBase(
     margin: 0;
     color: var(--tx-muted-foreground);
     font-size: 0.9375rem;
-  }
-  .ds-demo__island:empty {
-    display: none;
   }
   @media (forced-colors: active) {
     .ds-demo__cta {
