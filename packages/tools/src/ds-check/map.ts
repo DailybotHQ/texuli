@@ -19,23 +19,30 @@ export const DS_MAP_DISABLED_VALUE = 'render-disabled-value';
 export const DS_MAP_CODES = [DS_MAP_DISABLED_VALUE, DS_MAP_NOT_ALLOWED, DS_MAP_UNMAPPED] as const;
 
 /**
- * Compound catalog parents whose `id-part` roots (select-trigger, …) resolve
- * to the parent when that parent is allowed. Independent ids such as
- * `button-group` are not in this list.
+ * Catalog parents that own `id-part` roots when allowed. Complements
+ * hyphen resolution against the allow set (list-item → list, button-group →
+ * button, data-dashboard-widget → data-dashboard). The full map is
+ * `partParentMap` in `@texuli/catalog/manifest`.
  */
 export const DS_MAP_COMPOUND_PARENTS = [
   'accordion',
   'alert-dialog',
+  'button',
   'combobox',
   'command',
   'context-menu',
+  'data-dashboard',
   'dialog',
   'dropdown-menu',
+  'field',
   'hover-card',
+  'input',
+  'list',
   'menubar',
   'multi-select',
   'navigation-menu',
   'popover',
+  'radio',
   'select',
   'tabs',
 ] as const;
@@ -74,6 +81,8 @@ const INTERACTIVE = [
 
 export interface DsMapAllowManifest {
   readonly allow?: Readonly<Record<string, unknown>>;
+  /** Child → parent catalog ids (library `composes`, host extensions). */
+  readonly composed?: Readonly<Record<string, string>>;
 }
 
 export interface DsMapOptions {
@@ -102,8 +111,6 @@ const AXIS_ATTRS = [
   ['density', 'data-tx-density', 'densities'],
   ['color', 'data-tx-color', 'colors'],
 ] as const;
-
-const COMPOUND = new Set<string>(DS_MAP_COMPOUND_PARENTS);
 
 function allowedIds(manifest: DsMapAllowManifest | undefined): Set<string> | undefined {
   if (!manifest || manifest.allow === undefined) return undefined;
@@ -147,7 +154,6 @@ export function resolveAllowedComponentId(
   let best: string | undefined;
   for (const parent of allowed) {
     const localParent = parent.includes(':') ? parent.slice(parent.lastIndexOf(':') + 1) : parent;
-    if (!COMPOUND.has(localParent)) continue;
     if (id.startsWith(`${parent}-`) || id.startsWith(`${localParent}-`)) {
       if (!best || parent.length > best.length) best = parent;
     }
@@ -242,7 +248,7 @@ export function mapDesignSystemTree(root: ParentNode, options: DsMapOptions = {}
     for (const el of root.querySelectorAll(ROOT_SELECTOR)) {
       const id = el.getAttribute(COMPONENT_ATTRIBUTE) ?? '';
       const covered = resolveAllowedComponentId(id, allowed, {
-        composed: options.composed,
+        composed: options.composed ?? options.allowManifest?.composed,
         ancestor: ancestorCatalogId(el),
       });
       if (!covered) {
@@ -295,7 +301,7 @@ export function mapDesignSystemTree(root: ParentNode, options: DsMapOptions = {}
     const id = owner.getAttribute(COMPONENT_ATTRIBUTE) ?? '';
     if (
       resolveAllowedComponentId(id, allowed, {
-        composed: options.composed,
+        composed: options.composed ?? options.allowManifest?.composed,
         ancestor: ancestorCatalogId(owner),
       })
     )

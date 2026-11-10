@@ -59,7 +59,10 @@ export interface DsCheckHost {
   ready(): Promise<string[]>;
   apply(compiled: ApplicableDesignSystem, mode: DsCheckMode): Promise<void>;
   inspect(input: { pairs: readonly DsInspectPair[] }): Promise<DsInspectResult>;
-  /** Maps the scope's controls through their catalog roots and the locked allow set. */
+  /**
+   * Maps the scope's controls through their catalog roots and the locked allow
+   * set. `composed` is a child → parent map (library `composes`, extensions).
+   */
   map(input: DsMapAllowManifest): DsMapReport;
 }
 
@@ -335,10 +338,12 @@ export function installDsCheckHost(
       await settle();
     },
     map(input) {
-      return mapDesignSystemTree(
-        scope,
-        input?.allow ? { allowManifest: { allow: input.allow } } : {}
-      );
+      return mapDesignSystemTree(scope, {
+        ...(input?.allow
+          ? { allowManifest: { allow: input.allow, composed: input.composed } }
+          : {}),
+        ...(input?.composed ? { composed: input.composed } : {}),
+      });
     },
     async inspect({ pairs }) {
       const literals: DsRenderLiteral[] = [];

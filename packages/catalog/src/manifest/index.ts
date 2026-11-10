@@ -4,6 +4,7 @@
  */
 
 export { manifestData } from './data.ts';
+export { partParentMap } from './parts.ts';
 export type {
   CatalogAxisName,
   CatalogDeprecation,
