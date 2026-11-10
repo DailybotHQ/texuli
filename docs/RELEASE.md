@@ -195,7 +195,8 @@ rounds add the components a locked prototype needs.
   derived to meet WCAG AA on each series color (`8e174133`); `Badge` text
   uses tabular figures.
 - A linked `Card` (`href`) is one real anchor stretched over the surface,
-  with an `actions` snippet whose controls sit above it in tab order. A fix
+  with an `actions` snippet whose controls sit above it in tab order (since
+  `4f2a9d94` in `0.15.0`). A fix
   for a `0.15.0` regression (`0218d48c`): without `linkLabel`, the card's
   content names the link again (the body inside the anchor, or
   `aria-labelledby` when actions sit outside it), and an `href` with no name
