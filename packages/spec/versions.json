@@ -84,6 +84,12 @@
       "specDigest": "39b8e87b561ae37c3a3b3ef45b7cec29ad4b05fa9b01cd9032c1b9f05f383e24",
       "change": "minor",
       "summary": "Additive (ADR-032, locked design systems after the 0.15.0 release; the open 0.14.0 pin, amended by each task until the release publishes): a catalog component's axes gain color (the category color, { prop, values, default } derived from an enum prop) and the design-system allow section gains colors with the unknown-color code; the allow-manifest and design-system bundle schemas carry allowed colors; catalog projection refresh: the new ids color-swatch, data-virtual-list (VirtualListView, a windowed listbox, web-only), link, list and mark, the color axis on avatar, badge, color-swatch and tag, and the props the typography, surfaces and input rounds added (input and textarea gain appearance default or plain and textSize on the type scale, the variant and size axes; number-field gains commit enter, blur or input); every 0.13.0 blueprint and design-system document stays valid and the blueprint envelope is unchanged; stamp-only migration 0.13.0→0.14.0"
+    },
+    {
+      "specVersion": "0.15.0",
+      "specDigest": "9efcb5d62ac4d58ee3645293f8c2d18ed1ad2bfde3394fe9fda585e541042f96",
+      "change": "minor",
+      "summary": "Additive (ADR-032, Texuli 0.17.0; the open 0.15.0 pin, amended by each task until the release publishes): catalog projection refresh with props a patch release could not carry: data-virtual-list gains mode (listbox, the default, or feed: the APG feed pattern for rows with their own controls) and selectable (listbox only); every 0.14.0 blueprint and design-system document stays valid and the blueprint envelope is unchanged; stamp-only migration 0.14.0→0.15.0"
     }
   ]
 }

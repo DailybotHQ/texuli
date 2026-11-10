@@ -135,7 +135,7 @@ import {
   validateInstance,
 } from '@texuli/spec';
 
-SPEC_VERSION;                         // '0.14.0' in @texuli/spec@0.16.0
+SPEC_VERSION;                         // '0.14.0' in @texuli/spec@0.16.0; '0.15.0' in development
 SPEC_COMPONENT_IDS.includes('alert'); // true: the closed component vocabulary
 
 // The dialect validator: a closed subset of JSON Schema 2020-12.
@@ -167,7 +167,7 @@ import { type Schema, type SpecCatalog, validateBlueprint } from '@texuli/spec';
 import { migrateBlueprint } from '@texuli/spec/migrate';
 import { validateWorkflowGraph } from '@texuli/spec/workflow';
 
-const migrated = migrateBlueprint(blueprint); // 0.2.0 → … → 0.13.0 → 0.14.0; never throws
+const migrated = migrateBlueprint(blueprint); // 0.2.0 → … → 0.14.0 → 0.15.0; never throws
 const result = validateBlueprint(migrated.blueprint, {
   blueprintSchema: blueprintSchemaJson as Schema,
   catalog: componentsJson as SpecCatalog,
@@ -338,9 +338,11 @@ written for (`spec`; omitted means 0.2.0). `migrateBlueprint`
 envelope up to the current spec with pure, per-version steps
 (`src/migrations/`: `0.2.0 → 0.3.0`, `0.3.0 → 0.4.0`, `0.4.0 → 0.5.0`,
 `0.5.0 → 0.6.0`, `0.6.0 → 0.7.0`, `0.7.0 → 0.8.0`, `0.8.0 → 0.9.0`,
-`0.9.0 → 0.10.0`, `0.10.0 → 0.11.0`, `0.11.0 → 0.12.0`, `0.12.0 → 0.13.0` and `0.13.0 → 0.14.0`, each of which
+`0.9.0 → 0.10.0`, `0.10.0 → 0.11.0`, `0.11.0 → 0.12.0`, `0.12.0 → 0.13.0`, `0.13.0 → 0.14.0` and `0.14.0 → 0.15.0`, each of which
 only stamps `spec`); a compatible version
-range is planned, not built. `@texuli/spec@0.16.0` carries spec `0.14.0` (digest
+range is planned, not built. Spec `0.15.0` is in development for `0.17.0` and not
+published: catalog props a patch could not carry (the `data-virtual-list` `mode` and
+`selectable`). `@texuli/spec@0.16.0` carries spec `0.14.0` (digest
 `39b8e87b561ae37c3a3b3ef45b7cec29ad4b05fa9b01cd9032c1b9f05f383e24`): the category `color` axis, the `allow` colors and the catalog ids added after
 `0.15.0` (above). `@texuli/spec@0.15.0` carried spec `0.13.0` (digest
 `37897e1b4d669ca0f32ba49b4960c921e860c1bacb38a9f29a1072389708ffae`): locked

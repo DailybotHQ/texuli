@@ -39,8 +39,8 @@ describe('Native principles, agents and start building', () => {
   it('takes spec version and paint counts from the compatibility data', () => {
     expect(NATIVE_COMPATIBILITY.specVersion).toBe(parity.specVersion);
     expect(view.spec).toBe(parity.specVersion);
-    // Spec 0.14.0: view.spec tracks the regenerated parity matrix.
-    expect(view.spec).toBe('0.14.0');
+    // Spec 0.15.0: view.spec tracks the regenerated parity matrix.
+    expect(view.spec).toBe('0.15.0');
     expect(view.painted).toBe(parity.totals.painted);
     expect(view.catalog).toBe(parity.totals.catalog);
     const slice = `${parity.totals.painted} of ${parity.totals.catalog}`;

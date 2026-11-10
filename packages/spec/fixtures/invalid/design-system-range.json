@@ -15,7 +15,7 @@
     },
     "tier": "untrusted",
     "profile": "web",
-    "spec": "0.14.0",
+    "spec": "0.15.0",
     "id": "design-system-range",
     "designSystem": {
       "ref": "acme@^2"

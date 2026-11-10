@@ -11,20 +11,22 @@
 
 ### Use when
 
-- Show a long feed, log or result list (hundreds to tens of thousands of rows)
-- Let people pick one row from a long list by keyboard
+- Show a long feed whose rows hold their own buttons, links or inputs, with mode="feed" (hundreds to tens of thousands of rows)
+- Let people pick one row from a long log or result list by keyboard (the default listbox mode)
 
 ### Don't use when
 
 - Rows with columns: use data-grid
 - A short list: use list
-- Rows with their own buttons or links: a listbox option holds no controls
+- Rows with their own buttons, links or inputs in the default listbox mode: an option holds no controls, so use mode="feed"
 
 ### Accessibility
 
-- A WAI-ARIA listbox with one tab stop; aria-activedescendant names the active row
+- Listbox mode: a WAI-ARIA listbox with one tab stop; aria-activedescendant names the active row
 - Every row carries aria-setsize and aria-posinset, so its position in the full list is announced
-- Arrow keys, Home, End, Page Up and Page Down move; Enter, Space or a click selects
+- Listbox mode: Arrow keys, Home, End, Page Up and Page Down move; Enter, Space or a click selects (selectable false: no selection)
+- Feed mode: a WAI-ARIA feed of focusable articles without selection; Page Down and Page Up move focus between articles
+- Keys pressed in a row control (an input, a button) stay with that control
 
 ### Props
 
@@ -34,6 +36,8 @@
 | `items` | array | yes | — | — | The rows; a row snippet in host code may render any item shape. |
 | `size` | enum(sm | md | lg | fill) | no | — | `"md"` | Viewport height: sm, md or lg, or fill to take the parent height. |
 | `density` | enum(compact | default | comfortable) | no | — | `"default"` | — |
+| `mode` | enum(listbox | feed) | no | — | `"listbox"` | listbox: rows are options to pick. feed: an APG feed of articles that may hold their own controls; no selection. |
+| `selectable` | boolean | no | — | `true` | Listbox mode: false never selects or paints a row (select still fires) and drops the option chrome. |
 | `estimateSize` | number | no | — | `40` | Row height in px used until a row has been measured. |
 | `overscan` | number | no | — | `3` | Rows rendered before and after the viewport (at most 50). |
 | `selected` | string | no | — | — | The selected row id. |
