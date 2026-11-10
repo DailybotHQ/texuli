@@ -313,6 +313,24 @@ const SITE_PAGES: readonly SearchEntry[] = [
     keywords: ['slides', 'deck', 'presentation', 'markdown', 'json', 'presenter', 'pptx'],
   },
   {
+    id: 'solution-design-systems',
+    title: 'Design systems (Solution)',
+    description:
+      'Create a design system from brand inputs, review it in the UI kit, approve it, keep prototypes locked to it and share it as a bundle.',
+    href: '/solutions/design-systems/',
+    kind: 'page',
+    keywords: [
+      'design system',
+      'locked',
+      'ui kit',
+      'approve',
+      'ds generate',
+      'allow',
+      'bundle',
+      'protoyard',
+    ],
+  },
+  {
     id: 'page-design-systems',
     title: 'Design systems',
     description:
