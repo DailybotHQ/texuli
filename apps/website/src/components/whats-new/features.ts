@@ -2,8 +2,8 @@
  * The features /whats-new/ showcases, grouped by the release that carries
  * them, each with its honest status, its packages, the page that shows it
  * in full and the kind of demo or preview the hub paints. Plain data, so
- * the page and its tests share one source. Releases: 0.6.0 to 0.16.0 are
- * published on npm, and 0.16.0 is `latest` (the release line in
+ * the page and its tests share one source. Releases: 0.6.0 to 0.16.1 are
+ * published on npm, and 0.16.1 is `latest` (the release line in
  * docs/RELEASE.md).
  */
 
@@ -32,10 +32,11 @@ export const RELEASES: readonly Release[] = [
   {
     id: '0.16.0',
     title: '0.16.0: the design-system kit, the full locked checks and category colors',
-    status: 'Published on npm as 0.16.0, the current release (pre-1.0).',
+    status:
+      'Published on npm as 0.16.0; its patch 0.16.1, the current release (pre-1.0), adds host extensions to ds check and a VirtualListView feed.',
     published: true,
     summary:
-      'What 0.15.0 shipped as in development is released, with no breaking API change: the design-system kit (texuli/ds-kit, shown at /design-systems/kit/), texuli ds generate and the importers, the full locked validator in @texuli/tools/ds-check (ds check --locked and --report, and --render for the locked render check on a page you serve), portable bundles (ds pack, ds unpack, ds.bundle), the contract schemas, the blueprint allow check and the Studio locked editor. Blueprint spec 0.14.0 adds the category color axis, the label palette (none or chart-1 to chart-8, with AA ink), and allow colors. The catalog grows to 199 ids with VirtualListView, Mark, Link, ColorSwatch and List; Box gains fills, soft tones, dashed borders and the canvas surface; a linked Card is one stretched anchor named by its content; Input and Textarea gain a plain appearance and type-scale text sizes, and NumberField a commit mode.',
+      'What 0.15.0 shipped as in development is released, with no breaking API change: the design-system kit (texuli/ds-kit, shown at /design-systems/kit/), texuli ds generate and the importers, the full locked validator in @texuli/tools/ds-check (ds check --locked and --report, and --render for the locked render check on a page you serve), portable bundles (ds pack, ds unpack, ds.bundle), the contract schemas, the blueprint allow check and the Studio locked editor. Blueprint spec 0.14.0 adds the category color axis, the label palette (none or chart-1 to chart-8, with AA ink), and allow colors. The catalog grows to 199 ids with VirtualListView, Mark, Link, ColorSwatch and List; Box gains fills, soft tones, dashed borders and the canvas surface; a linked Card is one stretched anchor named by its content; Input and Textarea gain a plain appearance and type-scale text sizes, and NumberField a commit mode. 0.16.1 (patch): texuli ds check and ds validate take --extensions for host catalog extensions, compound parts such as Select.Content count as their parent id, the locked report lists the prototype imports it did not scan (--scan-workspace reads them), and VirtualListView takes mode="feed" for rows with their own controls and selectable={false}.',
   },
   {
     id: '0.15.0',

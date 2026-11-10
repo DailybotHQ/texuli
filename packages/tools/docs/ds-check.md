@@ -321,6 +321,12 @@ read. Inside one source, at most 10,000 component usages are read and at most 64
 corpus (`packages/tools/fixtures/ds-validate/`, `tests/ds-validate-corpus.test.ts`) covers
 every other code with a failing and a passing fixture and a golden report.
 
+A compound component is imported as one root and used through dotted tags
+(`<Select.Root>`, `<Select.Content>`). Every part counts as the parent's
+catalog id (`select`, `dropdown-menu`, `multi-select`, `tabs`), so the
+allow set governs the whole compound, also when the root is imported from
+its `@texuli/primitives/*` module (since `0.16.1`).
+
 `texuli ds validate --locked --prototype <dir>` calls
 `checkDesignSystemFull` on the document, catalog and statically scanned
 prototype. The directory reader accepts source and blueprint file types

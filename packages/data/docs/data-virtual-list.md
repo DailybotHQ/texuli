@@ -35,7 +35,7 @@ style of its own.
 Without a `row` snippet each row shows `item.label` (and `item.description`
 when present) as text.
 
-### A feed whose rows hold controls (`mode="feed"`, in development for `0.16.1`)
+### A feed whose rows hold controls (`mode="feed"`, new in `0.16.1`)
 
 When each row is a card with its own buttons, links or inputs, use the feed
 mode. Rows are articles, nothing is selected, and the row snippet brings its

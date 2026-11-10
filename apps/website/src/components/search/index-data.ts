@@ -247,7 +247,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     id: 'page-whats-new',
     title: 'What’s new',
     description:
-      'Every new package and capability of 0.6.0 to 0.16.0, with a demo or preview each and honest release status.',
+      'Every new package and capability of 0.6.0 to 0.16.1, with a demo or preview each and honest release status.',
     href: '/whats-new/',
     kind: 'page',
     keywords: [
