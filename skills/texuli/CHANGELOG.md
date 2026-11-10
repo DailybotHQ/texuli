@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.4.7] — 2026-11-10
+
+### Changes
+
+- chore(skill): packages on npm at 0.17.4
+
 - The packages are on npm at `0.17.4`, a patch (blueprint spec stays
   `0.15.0`) that adds an optional scope and component to render baseline
   keys. The components install reference marks it new in `0.17.4`.
