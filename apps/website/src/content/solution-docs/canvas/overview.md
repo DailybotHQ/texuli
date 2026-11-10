@@ -1,6 +1,6 @@
 ## What Canvas is
 
-Canvas is an embeddable whiteboard: `@texuli/canvas` holds a framework-free model of shapes, text, connectors, groups and frames, typed operations with an op log, CRDT collaboration on `@texuli/document/sync`, a Svelte 5 editor and viewer, and SVG or PNG export with no HTML sinks. The package is published as `0.17.1` and is **in development** (pre-1.0). Pin the exact version or use `^0.17.0`.
+Canvas is an embeddable whiteboard: `@texuli/canvas` holds a framework-free model of shapes, text, connectors, groups and frames, typed operations with an op log, CRDT collaboration on `@texuli/document/sync`, a Svelte 5 editor and viewer, and SVG or PNG export with no HTML sinks. The package is published as `0.17.2` and is **in development** (pre-1.0). Pin the exact version or use `^0.17.0`.
 
 It is a board you embed. It does not host canvases, persist them, or serve images. The host app stores the document and resolves image refs.
 

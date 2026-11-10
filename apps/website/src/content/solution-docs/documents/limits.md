@@ -1,6 +1,6 @@
 ## Status
 
-Documents is **in development**. `@texuli/document`, `@texuli/pages` and `@texuli/editor` are on npm as `0.17.1`. Under 0.x a new minor may break. Native rendering is planned, not built.
+Documents is **in development**. `@texuli/document`, `@texuli/pages` and `@texuli/editor` are on npm as `0.17.2`. Under 0.x a new minor may break. Native rendering is planned, not built.
 
 ## Not built
 

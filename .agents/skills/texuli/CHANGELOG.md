@@ -15,6 +15,18 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.4.5] — 2026-11-10
+
+### Changes
+
+- chore(skill): packages on npm at 0.17.2
+
+- The packages are on npm at `0.17.2`, a patch (blueprint spec stays
+  `0.15.0`) that makes the runtime lock resolve parts like the static
+  check, with the prose importer and `changesModel` fixes and a
+  `CHANGELOG.md` in every package. The components install reference marks
+  them new in `0.17.2`.
+
 ## [0.4.4] — 2026-11-10
 
 ### Changes

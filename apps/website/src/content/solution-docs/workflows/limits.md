@@ -1,6 +1,6 @@
 ## Status
 
-Workflows is **in development**. `@texuli/workflows` is on npm as `0.17.1`. Under 0.x a new minor may break. Native rendering is planned, not built.
+Workflows is **in development**. `@texuli/workflows` is on npm as `0.17.2`. Under 0.x a new minor may break. Native rendering is planned, not built.
 
 ## Not built
 
