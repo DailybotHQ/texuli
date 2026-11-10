@@ -2,7 +2,7 @@
   "dialect": "https://json-schema.org/draft/2020-12/schema",
   "files": {
     "catalog/capabilities.json": "b1c3e33fd2b2620bc4f9cfa1806ca49456c4b68fd6b483cf9070622e804db3c7",
-    "catalog/components.json": "ed15abd3474d831736ebe7771cf8c6f1df37643be4af62b446baceee9b531653",
+    "catalog/components.json": "331dd7ed27a79b5f84041929c53264aaf873a2476c6dd3462d3967a8ba44cfde",
     "fixtures/design-systems/acme.json": "07928b374d70ce2b7f08adaf855fdb9040b8305b10e463381843793d2174ca04",
     "fixtures/design-systems/invalid/approval-invalid.json": "3fcb59b0e54f13819be3244129604c4bf2c5cf99d578ba51580abeeba563b096",
     "fixtures/design-systems/invalid/extends-cycle.json": "64ed3a6f116ce9c8ce88890681828e4d482a3076773f1d60194194d42bae8775",

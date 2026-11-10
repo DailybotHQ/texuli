@@ -64,7 +64,11 @@ describe('locked design-system compound parts', () => {
   it('maps every exported namespace member to its parent catalog id', () => {
     const index = catalogImportIndex(catalog);
     for (const namespace of namespaces) {
-      expect(index.get(`${namespace.module}#${namespace.name}`)).toBe(namespace.id);
+      if (namespace.module.startsWith('@texuli/primitives/')) {
+        expect(index.get(`${namespace.module}#${namespace.name}`)).toBeUndefined();
+      } else {
+        expect(index.get(`${namespace.module}#${namespace.name}`)).toBe(namespace.id);
+      }
       const source = [
         `import { ${namespace.name} as Parts } from '${namespace.module}';`,
         ...members(namespace).map((member) => `<Parts.${member} />`),
