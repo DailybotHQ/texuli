@@ -7,7 +7,8 @@
  * for rows measured above the viewport to the component alone.
  * Feeds and non-selectable lists use `__row`: no option padding, border,
  * hover or cursor, so a card row snippet keeps its own chrome; only the
- * focus ring is drawn.
+ * focus ring is drawn. `--plain` drops the viewport's border, radius and
+ * surface, so a feed of cards sits on the page.
  * @layer tx.components.
  */
 @layer tx.components {
@@ -29,6 +30,13 @@
     border-radius: var(--tx-shape-radius-md);
     background: var(--tx-surface, Canvas);
     color: var(--tx-foreground, CanvasText);
+  }
+
+  .tx-virtual-list--plain .tx-virtual-list__viewport {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: inherit;
   }
 
   .tx-virtual-list--sm .tx-virtual-list__viewport {
