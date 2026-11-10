@@ -1,10 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { render } from '@testing-library/svelte';
-import { describe, expect, it } from 'vitest';
-import { contrastRatio } from '@texuli/tokens/palette';
 import { themeVariables } from '@texuli/tokens/css';
 import { loadAllFullLibraryThemes } from '@texuli/tokens/library-expand';
+import { contrastRatio } from '@texuli/tokens/palette';
+import { describe, expect, it } from 'vitest';
 import Avatar from '../src/components/avatar/Avatar.svelte';
 import Badge from '../src/components/badge/Badge.svelte';
 import Tag from '../src/components/badge/Tag.svelte';
@@ -71,9 +71,7 @@ describe('closed label color references', () => {
   it('resolves registered references to token variables and on-color tokens', () => {
     expect(colorRefVar('chart-1')).toBe('var(--tx-chart-1, #4f46e5)');
     expect(colorRefVar('chart-8')).toBe('var(--tx-chart-8, #0f766e)');
-    expect(colorRefInk('chart-1')).toBe(
-      'var(--tx-chart-1-foreground, #ffffff)'
-    );
+    expect(colorRefInk('chart-1')).toBe('var(--tx-chart-1-foreground, #ffffff)');
     expect(colorRefVar('destructive')).toBe('var(--tx-destructive)');
     expect(colorRefInk('destructive')).toBe('var(--tx-destructive-foreground)');
     expect(colorRefVar('neutral')).toBe('var(--tx-muted)');
@@ -99,7 +97,9 @@ describe('closed label color references', () => {
     const tag = render(Tag, { props: { label: 'Logistics', color: 'chart-2' } }).container
       .firstElementChild;
     expect(tag?.getAttribute('data-tx-color')).toBe('chart-2');
-    expect(tag?.getAttribute('style')).toContain('--tx-category-ink: var(--tx-background)');
+    expect(tag?.getAttribute('style')).toContain(
+      '--tx-category-ink: var(--tx-chart-2-foreground, #0a0a0a)'
+    );
 
     const unchanged = render(Badge, { props: { label: 'Default', variant: 'success' } }).container
       .firstElementChild;
@@ -133,12 +133,17 @@ describe('closed label color references', () => {
       for (const mode of ['light', 'dark'] as const) {
         const vars = themeVariables({ theme, mode });
         DATA_COLORS.forEach((color, index) => {
-          const [fallbackFill, fallbackInk] = fallbackPairs[index] as (typeof fallbackPairs)[number];
+          const [fallbackFill, fallbackInk] = fallbackPairs[
+            index
+          ] as (typeof fallbackPairs)[number];
           const fill = vars[`--tx-${color}`] ?? fallbackFill;
           const ink = vars[`--tx-${color}-foreground`] ?? fallbackInk;
           expect(fill, `${theme.id} ${mode} ${color} fill`).toMatch(/^#[0-9a-f]{6}$/i);
           expect(ink, `${theme.id} ${mode} ${color} foreground`).toMatch(/^#[0-9a-f]{6}$/i);
-          expect(contrastRatio(ink as string, fill as string), `${theme.id} ${mode} ${color}`).toBeGreaterThanOrEqual(4.5);
+          expect(
+            contrastRatio(ink as string, fill as string),
+            `${theme.id} ${mode} ${color}`
+          ).toBeGreaterThanOrEqual(4.5);
         });
       }
     }

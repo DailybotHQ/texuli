@@ -857,7 +857,7 @@ describe('token contract v2: system families', () => {
       layout: 14,
       icon: 2,
       status: 20,
-      'data-viz': 28,
+      'data-viz': 36,
     });
     const names = SYSTEM_TOKENS.map((t) => t.name);
     expect(new Set(names).size).toBe(names.length);
