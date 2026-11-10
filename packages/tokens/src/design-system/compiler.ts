@@ -45,12 +45,11 @@ import {
   extendCategoricalColors,
   validateChartTokens,
 } from '../palette/charts.ts';
-import { contrastRatio, relativeLuminance } from '../palette/contrast.ts';
+import { contrastInk, contrastRatio, relativeLuminance } from '../palette/contrast.ts';
 import { MOTION_PRESETS } from '../style-presets/presets.ts';
 import { BASE_SYSTEM_TOKENS, closingParen } from '../system/base.ts';
 import { compileAllowManifest, type DesignSystemAllowManifest } from './allow-manifest.ts';
 import { composite, onColor, parseDsColor } from './color.ts';
-import { contrastInk } from '../palette/contrast.ts';
 import { DEFAULT_DESIGN_SYSTEM_SEED, formatFontStack } from './from-theme.ts';
 import {
   DESIGN_SYSTEM_TARGETS,
