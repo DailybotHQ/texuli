@@ -172,7 +172,25 @@ export function importedComponents(
       const spec = part.trim();
       if (!spec || spec.startsWith('type ')) continue;
       const [imported, local] = spec.split(/\s+as\s+/).map((s) => s.trim());
-      const id = imported ? index.get(`${module}#${imported}`) : undefined;
+      let id = imported ? index.get(`${module}#${imported}`) : undefined;
+      // Primitive namespace parts are public building blocks, not catalog
+      // entries. If a compound import uses dotted tags, resolve its root to
+      // the unique catalog owner of the same public namespace name instead.
+      if (
+        !id &&
+        imported &&
+        module?.startsWith('@texuli/primitives/') &&
+        new RegExp(`<${(local ?? imported).replace(/[$]/gu, '\\$')}\\.[A-Z]`, 'u').test(source)
+      ) {
+        const owners = new Set(
+          [...index.entries()]
+            .filter(
+              ([key]) => key.endsWith(`#${imported}`) && !key.startsWith('@texuli/primitives/')
+            )
+            .map(([, owner]) => owner)
+        );
+        if (owners.size === 1) id = owners.values().next().value;
+      }
       if (id) locals.set(local ?? (imported as string), id);
     }
   }

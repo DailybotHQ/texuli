@@ -85,3 +85,13 @@ export {
   serializeDsCheckReport,
 } from './static.ts';
 export * from './types.ts';
+export {
+  isCatalogSpecifier,
+  listImportSpecifiers,
+  listUncheckedImports,
+  packageNameOf,
+  resolveRelativeImport,
+  UNCHECKED_IMPORT_CAP,
+  type UncheckedImports,
+  type UnscannedOptions,
+} from './unscanned.ts';

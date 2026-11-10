@@ -1,5 +1,5 @@
 {
-  "catalogHash": "54e9cdc2158918e967624e46b5ae1f2dff951d9064c2bb840e2c2c73b45a58d3",
+  "catalogHash": "8904c831653a022b72fc64fcd6baa0ae019e3eb6c44639f5100a927a16afc966",
   "components": [
     {
       "axes": {
@@ -6024,17 +6024,8 @@
           "required": true
         },
         {
-          "enumValues": ["listbox", "feed"],
-          "kind": "enum",
-          "name": "mode"
-        },
-        {
           "kind": "number",
           "name": "overscan"
-        },
-        {
-          "kind": "boolean",
-          "name": "selectable"
         },
         {
           "kind": "string",
@@ -12328,10 +12319,6 @@
         {
           "exports": ["Tabs"],
           "module": "texuli/tabs-accordion"
-        },
-        {
-          "exports": ["Content", "List", "Root", "Tabs", "Trigger"],
-          "module": "@texuli/primitives/tabs"
         }
       ],
       "label": "Tabs",

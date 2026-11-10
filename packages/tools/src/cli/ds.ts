@@ -73,7 +73,7 @@ export type DsCommand = (typeof DS_COMMANDS)[number];
 
 export const DS_USAGE = [
   'Usage: texuli ds init <file> [--brand "<one-liner>"] [--id <id>] [--name <name>] [--locked [--preset all|minimal|<allow.json>]] [--overwrite]',
-  '       texuli ds validate <file> [--trust developer|untrusted] [--variant <name>] [--base <file>]... [--locked] [--prototype <dir>] [--catalog <components.json>] [--extensions <file>...] [--json] [--render [--url <page>] [--sheet builtin|<page.html>] [--known <file>] [--strict]] [--report]',
+  '       texuli ds validate <file> [--trust developer|untrusted] [--variant <name>] [--base <file>]... [--locked] [--prototype <dir> [--scan-workspace]] [--catalog <components.json>] [--extensions <file>...] [--json] [--render [--url <page>] [--sheet builtin|<page.html>] [--known <file>] [--strict]] [--report]',
   '       texuli ds compile <file> [--format json|css|tailwind|dtcg|tokens-studio] [--mode light|dark] [--variant <name>] [--base <file>]... [--out <path> [--overwrite]]',
   '       texuli ds export <file> --format css|tailwind|dtcg|tokens-studio --out <path> [--selector <s>] [--dark class|attribute|media] [--overwrite]',
   '       texuli ds preview <file> [--format svg|html] [--mode light|dark] [--variant <name>] [--out <path> [--overwrite]]',
@@ -210,7 +210,7 @@ export function parseDsArgs(
         throw new TypeError('Flag --extensions needs a file.');
       continue;
     }
-    if (['--json', '--render', '--strict', '--report'].includes(arg)) {
+    if (['--json', '--render', '--strict', '--report', '--scan-workspace'].includes(arg)) {
       if (name !== 'validate') throw new TypeError(`Flag ${arg} belongs to ds validate.`);
       parsed.flags[arg.slice(2)] = 'true';
       continue;
@@ -243,6 +243,8 @@ export function parseDsArgs(
     throw new TypeError('ds approve needs --by <name>.');
   if (name === 'validate' && parsed.flags.report === 'true' && !parsed.locked)
     throw new TypeError('Flag --report needs --locked.');
+  if (name === 'validate' && parsed.flags['scan-workspace'] === 'true' && !parsed.flags.prototype)
+    throw new TypeError('Flag --scan-workspace needs --prototype.');
   if (name === 'validate' && parsed.flags.strict === 'true' && parsed.flags.render !== 'true')
     throw new TypeError('Flag --strict needs --render.');
   for (const flag of ['url', 'sheet', 'known'])
@@ -435,9 +437,18 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
     args.command === 'validate' &&
     (args.locked ||
       args.extensions.length > 0 ||
-      ['catalog', 'json', 'render', 'strict', 'report', 'prototype', 'url', 'sheet', 'known'].some(
-        (flag) => args.flags[flag] !== undefined
-      ))
+      [
+        'catalog',
+        'json',
+        'render',
+        'strict',
+        'report',
+        'prototype',
+        'url',
+        'sheet',
+        'known',
+        'scan-workspace',
+      ].some((flag) => args.flags[flag] !== undefined))
   ) {
     const cwd = io.cwd ?? process.cwd();
     const result = await runDsCli(
@@ -453,6 +464,7 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
           ? ['--extensions', ...args.extensions.map((file) => resolve(cwd, file))]
           : []),
         ...(args.flags.prototype ? ['--prototype', resolve(cwd, args.flags.prototype)] : []),
+        ...(args.flags['scan-workspace'] === 'true' ? ['--scan-workspace'] : []),
         ...(args.flags.json === 'true' ? ['--json'] : []),
         ...(args.flags.render === 'true' ? ['--render'] : []),
         ...(args.flags.url ? ['--url', args.flags.url] : []),
