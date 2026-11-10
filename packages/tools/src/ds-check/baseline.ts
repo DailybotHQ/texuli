@@ -13,6 +13,13 @@ export interface DsFindingKey {
   readonly viewport?: string;
   /** The color mode (`light`, `dark`) of the finding (0.17.3). */
   readonly mode?: string;
+  /**
+   * A host-chosen scope, such as a prototype id, when one run checks several prototypes
+   * (0.17.4): the same selector on the same route of two prototypes keys apart.
+   */
+  readonly scope?: string;
+  /** The catalog id of the component the finding is about (0.17.4). */
+  readonly component?: string;
 }
 
 export interface DsReportCompare {
@@ -24,8 +31,8 @@ export interface DsReportCompare {
   readonly removed: readonly DsFindingKey[];
 }
 
-/** The key fields besides code and path, in key order. */
-const WHERE = ['route', 'viewport', 'mode'] as const;
+/** The key fields besides code and path, in key order (new fields are only ever appended). */
+const WHERE = ['route', 'viewport', 'mode', 'scope', 'component'] as const;
 /** The longest key field read (a hostile report cannot grow the key without bound). */
 const MAX_FIELD = 512;
 /** The most findings read from one report. */
@@ -57,12 +64,16 @@ function keysOf(report: unknown): DsFindingKey[] {
     const route = text(item.route);
     const viewport = viewportText(item.viewport);
     const mode = text(item.mode);
+    const scope = text(item.scope);
+    const component = text(item.component);
     keys.push({
       code,
       path: text(item.path),
       ...(route ? { route } : {}),
       ...(viewport ? { viewport } : {}),
       ...(mode ? { mode } : {}),
+      ...(scope ? { scope } : {}),
+      ...(component ? { component } : {}),
     });
   }
   keys.sort((a, b) => keyLine(a).localeCompare(keyLine(b)));
@@ -70,9 +81,10 @@ function keysOf(report: unknown): DsFindingKey[] {
 }
 
 /**
- * One key line: `code<TAB>path`, then `route=`, `viewport=` and `mode=` for the fields a
- * finding has. A finding with none of them keys exactly as before 0.17.3, so the fingerprint
- * of a report without route, viewport or mode is unchanged.
+ * One key line: `code<TAB>path`, then `route=`, `viewport=`, `mode=`, `scope=` and
+ * `component=` for the fields a finding has. A finding with none of them keys exactly as
+ * before 0.17.3, so the fingerprint of a report without them is unchanged, and a finding
+ * without scope or component keys exactly as in 0.17.3.
  */
 function keyLine(item: DsFindingKey): string {
   let line = `${item.code}\t${item.path}`;
@@ -82,9 +94,10 @@ function keyLine(item: DsFindingKey): string {
 
 /**
  * Whether a baseline key covers a current key: the same code and path, and every route,
- * viewport and mode the baseline names is equal. A field the baseline does not name (a
- * baseline saved before 0.17.3, which recorded no route or viewport) matches any value, so
- * an older baseline stays readable: it never reports its own findings as added.
+ * viewport, mode, scope and component the baseline names is equal. A field the baseline
+ * does not name (a baseline saved before 0.17.3 recorded no route or viewport, one saved
+ * before 0.17.4 no scope) matches any value, so an older baseline stays readable: it never
+ * reports its own findings as added.
  */
 function covers(baseline: DsFindingKey, current: DsFindingKey): boolean {
   if (baseline.code !== current.code || baseline.path !== current.path) return false;
@@ -94,9 +107,9 @@ function covers(baseline: DsFindingKey, current: DsFindingKey): boolean {
 }
 
 /**
- * Stable SHA-256 of the sorted finding keys: code and path, plus route, viewport and mode
- * when the finding has them (0.17.3: findings on different routes, viewports or modes no
- * longer merge into one key).
+ * Stable SHA-256 of the sorted finding keys: code and path, plus route, viewport, mode,
+ * scope and component when the finding has them (0.17.3: findings on different routes,
+ * viewports or modes no longer merge into one key; 0.17.4: nor across scopes or components).
  */
 export function dsReportFingerprint(report: unknown): string {
   const body = keysOf(report).map(keyLine).join('\n');
@@ -106,7 +119,8 @@ export function dsReportFingerprint(report: unknown): string {
 /**
  * Compare a saved `--locked --report` JSON file to a new report. `ok` is true
  * when nothing new was added (removed findings are improvements). Keys are code, path,
- * route, viewport and mode; a field an older baseline does not record matches any value.
+ * route, viewport, mode, scope and component; a field an older baseline does not record
+ * matches any value.
  */
 export function compareDsReport(baseline: unknown, report: unknown): DsReportCompare {
   const previous = keysOf(baseline);

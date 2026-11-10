@@ -57,6 +57,8 @@ export interface DsCheckIssue {
   route?: string;
   /** The viewport a render finding was found at, `<width>x<height>` (0.17.3). */
   viewport?: string;
+  /** The host-chosen scope of a render finding, such as a prototype id (0.17.4). */
+  scope?: string;
   /** The failing contrast pairs of an `aa-text` or `aa-focus` refusal. */
   pairs?: DesignSystemPairResult[];
 }

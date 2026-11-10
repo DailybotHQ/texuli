@@ -161,6 +161,29 @@ export interface LockedRenderCheckResult {
   readonly mapped: boolean;
 }
 
+/** The longest scope kept on a finding (the baseline key caps every field at 512). */
+const MAX_SCOPE = 512;
+
+/**
+ * A host-chosen scope as kept on findings: a string, cut at 512 characters, with control
+ * characters refused (`undefined`). Empty means no scope.
+ */
+export function dsFindingScope(value: unknown): string | undefined {
+  if (typeof value !== 'string' || value.length === 0) return undefined;
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: refuses control characters.
+  if (/[\u0000-\u001f\u007f]/.test(value)) return undefined;
+  return value.slice(0, MAX_SCOPE);
+}
+
+export interface LockedRenderCheckOptions extends RenderDesignSystemCheckOptions {
+  /**
+   * A host-chosen scope, such as a prototype id, set on every locked render finding
+   * (0.17.4), so one run that checks several prototypes keeps the same selector on the same
+   * route of two prototypes apart in a baseline.
+   */
+  scope?: string;
+}
+
 /**
  * The locked render check behind `ds check --locked --render` and
  * `ds validate --locked --render`: open the sheet or `url` like
@@ -171,15 +194,17 @@ export interface LockedRenderCheckResult {
 export async function renderLockedDesignSystemCheck(
   report: DsCheckReport,
   allowManifest: DsMapAllowManifest | undefined,
-  options: RenderDesignSystemCheckOptions = {}
+  options: LockedRenderCheckOptions = {}
 ): Promise<LockedRenderCheckResult> {
   const mapped = options.url !== undefined;
   return withDsCheckPage(options, async (page, { url, axe }) => {
     const mapping = mapped ? await mapLockedRenderPage(page, allowManifest, options) : NOT_MAPPED;
     const checked = await runLockedRenderChecks(page, report.runs, mapping, { ...options, axe });
-    // Every render finding names the route and viewport it was found on, so baselines keep
-    // findings of different routes, viewports and modes apart (0.17.3).
-    const where = renderWhere(url, page);
+    // Every render finding names the route and viewport it was found on, and the host's
+    // scope when one is set, so baselines keep findings of different routes, viewports,
+    // modes and scopes apart (0.17.3, 0.17.4).
+    const scope = dsFindingScope(options.scope);
+    const where = { ...renderWhere(url, page), ...(scope ? { scope } : {}) };
     const locked: LockedRenderReport = {
       ...checked,
       errors: checked.errors.map((issue) => ({ ...issue, ...where })),

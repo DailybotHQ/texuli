@@ -14,12 +14,12 @@ tools and agents can use it on its own.
 **In the stack:** layer L0: framework-free, with no dependencies. `@texuli/slides` (the stage), `@texuli/document` (inline decks), `@texuli/canvas` and `@texuli/tools` build on it.
 
 > **Status: in development (pre-1.0).** `@texuli/deck` is published on npm
-> as `0.17.3`, with provenance (first published as `0.4.0`). It was built in PLAN_008
+> as `0.17.4`, with provenance (first published as `0.4.0`). It was built in PLAN_008
 > (ADR-009 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
 > The `@texuli/slides` stage renders it from `0.4.0` (`@texuli/slides` `0.3.0`
 > has the previous deck model), and `@texuli/spec` ships the blueprint spec
-> that encodes deck model v2 from `0.4.0` (spec `0.15.0` in `@texuli/spec@0.17.3`).
+> that encodes deck model v2 from `0.4.0` (spec `0.15.0` in `@texuli/spec@0.17.4`).
 > Under 0.x a new minor may contain breaking changes, so pin the exact
 > version or use `^0.17.0`
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).

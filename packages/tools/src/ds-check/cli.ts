@@ -27,7 +27,7 @@ import { loadSpecCatalog } from '../ops/catalog.ts';
 import { compareDsReport, dsReportFingerprint } from './baseline.ts';
 import { catalogExtensionIssues, loadMergedCatalog } from './extensions.ts';
 import { checkDesignSystemFull, type DsFullReport } from './full.ts';
-import { renderLockedDesignSystemCheck } from './locked-render.ts';
+import { dsFindingScope, renderLockedDesignSystemCheck } from './locked-render.ts';
 import {
   DS_CHECK_BUILTIN_SHEET,
   DsCheckRequirementError,
@@ -51,7 +51,7 @@ export const DS_CHECK_MAX_BYTES = 1_000_000;
 export const DS_CHECK_PROTOTYPE_SYMLINK = 'prototype-symlink';
 
 export const DS_CHECK_USAGE =
-  'Usage: texuli ds check <file> [--locked [--report [--baseline <file>]]] [--prototype <dir> [--scan-workspace]] [--json] [--render] [--mode light|dark|all] [--variant <name>]... [--trust developer|untrusted] [--base <file>]... [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict] [--catalog <components.json>] [--extensions <file>...]';
+  'Usage: texuli ds check <file> [--locked [--report [--baseline <file>]] [--scope <id>]] [--prototype <dir> [--scan-workspace]] [--json] [--render] [--mode light|dark|all] [--variant <name>]... [--trust developer|untrusted] [--base <file>]... [--sheet builtin|<page.html>] [--url <page>] [--known <file>] [--strict] [--catalog <components.json>] [--extensions <file>...]';
 
 export interface DsCliArgs {
   command: 'check';
@@ -80,6 +80,8 @@ export interface DsCliArgs {
   scanWorkspace: boolean;
   /** With `--locked --report`: a previous JSON report to compare (exit 1 on new findings). */
   baseline?: string;
+  /** With `--locked`: a host-chosen scope (such as a prototype id) set on every finding. */
+  scope?: string;
   help: boolean;
 }
 
@@ -136,7 +138,12 @@ export function parseDsCliArgs(argv: readonly string[]): DsCliArgs {
     else if (arg === '--prototype') args.prototype = value();
     else if (arg === '--scan-workspace') args.scanWorkspace = true;
     else if (arg === '--baseline') args.baseline = value();
-    else if (arg === '--extensions') {
+    else if (arg === '--scope') {
+      const scope = dsFindingScope(value());
+      if (scope === undefined)
+        throw new TypeError('Flag --scope needs a value without control characters.');
+      args.scope = scope;
+    } else if (arg === '--extensions') {
       // One or more files, up to the next flag; the flag may also repeat.
       const before = args.extensions.length;
       while (rest[index + 1] !== undefined && !(rest[index + 1] as string).startsWith('-'))
@@ -156,6 +163,7 @@ export function parseDsCliArgs(argv: readonly string[]): DsCliArgs {
   if (args.report && !args.locked) throw new TypeError('Flag --report needs --locked.');
   if (args.baseline !== undefined && (!args.locked || !args.report))
     throw new TypeError('Flag --baseline needs --locked --report.');
+  if (args.scope !== undefined && !args.locked) throw new TypeError('Flag --scope needs --locked.');
   if (args.scanWorkspace && args.prototype === undefined)
     throw new TypeError('Flag --scan-workspace needs --prototype.');
   if (args.extensions.length > CATALOG_EXTENSION_LIMITS.extensions)
@@ -514,7 +522,7 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
   }
   if (args.help) {
     stdout.write(
-      `${DS_CHECK_USAGE}\n\nValidate, compile and check a design-system document: the spec's codes, the guarantees (aa-text, aa-focus, target-size) and the contrast report, for the base document and its high-contrast variant. --render also paints every agent-emittable catalog component under it in a headless browser and checks axe, the painted contrast and colors that do not follow the design system; known findings (none in the library; --known <file> adds your own) are listed and do not fail unless --strict.\n\n--locked runs the full locked-design-system checks and prints findings with counts by area, route and component. Add --report to keep the complete findings as a progress baseline while returning success; add --json for machine-readable output (including summary counts). Without --report, violations enforce exit 1. Exit 0 means clean or report-only, 1 means an enforced refusal/finding, 2 means the check could not run.\n\n--render paints the conformance sheet that ships inside @texuli/tools (--sheet ${DS_CHECK_BUILTIN_SHEET}, the default; no bundler needed). --sheet <page.html> serves a page you built that installs @texuli/tools/ds-check/host, and --url <page> checks a page you serve. It needs "playwright" (or "@playwright/test") and "@axe-core/playwright" as dev dependencies of your project, and chromium (npx playwright install chromium); the static checks need neither.\n\nLocked design systems (ADR-032): the allow section is checked against the agent catalog, or --catalog <components.json> (unknown-component, unknown-variant, unknown-size, unknown-tone, unknown-density, unknown-color, unknown-state); the report lists the allowed set and the approval as declared, and refuses a recorded content hash that no longer matches (content-hash-mismatch, library-hash-mismatch). texuli ds hash prints the hashes. --extensions <file>... merges host catalog extension manifests (format texuli/catalog-extension, ids <ns>:<id>) into the catalog first, so allow keys such as acme:kpi-strip are checked as the host checks them; a refused extension is left out whole and reported as catalog-extension, with the merge's code (extension-format, extension-namespace, extension-collision, …) in the message. The check cannot prove who approved: a reviewed commit is the guarantee.\n`
+      `${DS_CHECK_USAGE}\n\nValidate, compile and check a design-system document: the spec's codes, the guarantees (aa-text, aa-focus, target-size) and the contrast report, for the base document and its high-contrast variant. --render also paints every agent-emittable catalog component under it in a headless browser and checks axe, the painted contrast and colors that do not follow the design system; known findings (none in the library; --known <file> adds your own) are listed and do not fail unless --strict.\n\n--locked runs the full locked-design-system checks and prints findings with counts by area, route and component. Add --report to keep the complete findings as a progress baseline while returning success; add --json for machine-readable output (including summary counts). --baseline <file> compares the report to a saved one; --scope <id> sets a host-chosen scope (such as a prototype id) on every finding, so one baseline keeps several prototypes apart. Without --report, violations enforce exit 1. Exit 0 means clean or report-only, 1 means an enforced refusal/finding, 2 means the check could not run.\n\n--render paints the conformance sheet that ships inside @texuli/tools (--sheet ${DS_CHECK_BUILTIN_SHEET}, the default; no bundler needed). --sheet <page.html> serves a page you built that installs @texuli/tools/ds-check/host, and --url <page> checks a page you serve. It needs "playwright" (or "@playwright/test") and "@axe-core/playwright" as dev dependencies of your project, and chromium (npx playwright install chromium); the static checks need neither.\n\nLocked design systems (ADR-032): the allow section is checked against the agent catalog, or --catalog <components.json> (unknown-component, unknown-variant, unknown-size, unknown-tone, unknown-density, unknown-color, unknown-state); the report lists the allowed set and the approval as declared, and refuses a recorded content hash that no longer matches (content-hash-mismatch, library-hash-mismatch). texuli ds hash prints the hashes. --extensions <file>... merges host catalog extension manifests (format texuli/catalog-extension, ids <ns>:<id>) into the catalog first, so allow keys such as acme:kpi-strip are checked as the host checks them; a refused extension is left out whole and reported as catalog-extension, with the merge's code (extension-format, extension-namespace, extension-collision, …) in the message. The check cannot prove who approved: a reviewed commit is the guarantee.\n`
     );
     return { ok: true };
   }
@@ -598,6 +606,7 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
             ...(args.modes ? { modes: args.modes } : {}),
             ...(io.cwd ? { cwd: io.cwd } : {}),
             ...(io.load ? { load: io.load } : {}),
+            ...(args.scope ? { scope: args.scope } : {}),
           }
         );
         const renderFindings = locked.errors.map((issue) => ({
@@ -620,6 +629,9 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
           ...(issue.variant ? { variant: issue.variant } : {}),
           ...(issue.route ? { route: issue.route } : {}),
           ...(issue.viewport ? { viewport: issue.viewport } : {}),
+          // The mapper names the catalog id a finding is about (not-allowed,
+          // render-disabled-value); it is part of the baseline key (0.17.4).
+          ...(issue.source ? { component: issue.source } : {}),
         }));
         full = {
           ...full,
@@ -680,7 +692,15 @@ export async function runDsCli(argv: readonly string[], io: DsCliIo = {}): Promi
   }
   const fullReport = args.locked;
   if (fullReport) {
-    const lockedReport = report as DsFullReport;
+    // --scope labels every finding (static and render), so one baseline file can hold the
+    // findings of several prototypes without merging their keys (0.17.4).
+    const scoped = report as DsFullReport;
+    const lockedReport: DsFullReport = args.scope
+      ? {
+          ...scoped,
+          findings: scoped.findings.map((finding) => ({ ...finding, scope: args.scope })),
+        }
+      : scoped;
     const compare =
       args.baseline === undefined
         ? undefined
