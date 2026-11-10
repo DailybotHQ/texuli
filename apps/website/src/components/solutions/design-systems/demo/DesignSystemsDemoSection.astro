@@ -28,6 +28,12 @@ const kitHref = withBase(
 );
 ---
 
+{/*
+  Safe by construction: a build-time constant, never data. buildDesignSystemsDemo() reads only
+  DEMO_BRAND_INPUTS (fictional fixtures) and designSystemStyle's default [data-tx-ds="<id>"]
+  selector (spec-name ids; it refuses <, braces and comments). Never pass a page prop, content or
+  agent output here. design-systems-demo.test.ts checks the CSS has no `<`.
+*/}
 <style is:inline set:html={demoBuild.css}></style>
 <section class="ds-demo" aria-labelledby={headingId} data-tx-solution-demo={entry.slug}>
   <div class="ds-demo__inner">

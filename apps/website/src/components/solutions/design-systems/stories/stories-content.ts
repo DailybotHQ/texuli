@@ -4,7 +4,7 @@
  * (`solution-design-systems-story-<n>`, slots 02–06) and names capability ids from
  * `entries/design-systems.ts`. `DESIGN_SYSTEMS_STORY_EVIDENCE` cites, per claim, a
  * repository file and a marker it contains; the site spec and the docs check keep them
- * honest. Only Texuli 0.16.1 features appear here; the CLI cannot prove who approved.
+ * honest. Every feature here is on npm since Texuli 0.16.1 and unchanged in 0.17.0; the CLI cannot prove who approved.
  */
 import type { SolutionStoriesProps } from '../../shared/types.ts';
 

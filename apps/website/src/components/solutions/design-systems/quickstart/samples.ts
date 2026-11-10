@@ -1,6 +1,6 @@
 /**
  * The Design systems quickstart: the install line and one command per step of the loop,
- * each with flags the published `texuli ds` CLI (Texuli 0.16.1) accepts. The CLI tests in
+ * each with flags the published `texuli ds` CLI accepts (since Texuli 0.16.1; unchanged in 0.17.0). The CLI tests in
  * `packages/tools/tests/ds-*-cli.test.ts` run these commands; the paths are examples for
  * a fictional brand, Harborline.
  */

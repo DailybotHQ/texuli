@@ -1,7 +1,8 @@
 /**
  * The Design systems demo section copy (PLAN_017 T-demo). The island
  * (`DesignSystemsDemo.svelte`) runs on build-time results of `generateDesignSystem` for
- * three fictional brands, and checks a sample prototype with `checkBlueprintAllow`.
+ * three fictional brands, and the locked check of a sample prototype that `checkLockedUsage`
+ * (`@texuli/tools/ds-check`) ran at build time.
  */
 import type { SolutionDemoFrameProps } from '../../shared/types.ts';
 import { LEDGERLINE_DEMO_FIXTURE } from './fixtures/ledgerline.ts';

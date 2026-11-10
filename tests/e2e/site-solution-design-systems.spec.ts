@@ -217,6 +217,9 @@ test('at 390 px nothing overflows; axe has no serious violations in light and da
   ).toBeLessThanOrEqual(1);
 
   await page.setViewportSize({ width: 1280, height: 900 });
+  // Start axe from the top: after the resize the scroll position can leave a link half under
+  // the sticky header, which axe's target-size rule reads as obscured (a position artifact).
+  await page.evaluate(() => window.scrollTo(0, 0));
   for (const scheme of ['light', 'dark'] as const) {
     await useScheme(page, scheme);
     const serious = (await axeViolations(page)).filter((v) => /\((serious|critical)\)/.test(v));

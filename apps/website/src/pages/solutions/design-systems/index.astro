@@ -4,8 +4,8 @@
  * ADR-033; PLAN_017 T-landing): hero, the loop in five steps (create, review, approve, lock,
  * share), how it works, Built on it (Protoyard), quickstart, recipes, agents, platforms, the
  * FAQ and next steps. `SolutionLayout` orders the sections and checks the content against
- * the registry entry. The page ships no island yet: the demo section has a marked mount
- * point (`data-tx-ds-demo-mount`) for T-demo's `client:visible` island.
+ * the registry entry. The demo section (`DesignSystemsDemoSection`) mounts the page's one
+ * `client:visible` island at its `data-tx-ds-demo-mount` point.
  */
 
 import DesignSystemsDemoSection from '../../../components/solutions/design-systems/demo/DesignSystemsDemoSection.astro';
@@ -37,9 +37,7 @@ const description =
   jsonLd={techArticleJsonLd(title, description, entry.route)}
 >
   <DesignSystemsHero slot="hero" />
-  <DesignSystemsDemoSection slot="demo">
-    {/* T-demo: mount the island here, e.g. <DesignSystemsDemo slot="island" client:visible /> */}
-  </DesignSystemsDemoSection>
+  <DesignSystemsDemoSection slot="demo" />
   <DesignSystemsStories slot="stories" />
   <Fragment slot="how">
     <DesignSystemsHow />
