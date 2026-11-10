@@ -2,7 +2,6 @@
 import { Window } from 'happy-dom';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
-  DS_MAP_CODES,
   DS_MAP_MAX_ISSUES,
   DS_MAP_NOT_ALLOWED,
   DS_MAP_UNMAPPED,
@@ -137,7 +136,7 @@ describe('mapDesignSystemTree', () => {
     const card = h('section', { [ATTR]: 'card', id: 'card' }, 'Body');
     const root = mount(stray, card);
     const report = mapDesignSystemTree(root, { allowManifest: allow(['button']) });
-    expect(report.codes).toEqual([...DS_MAP_CODES]);
+    expect(report.codes).toEqual([DS_MAP_NOT_ALLOWED, DS_MAP_UNMAPPED]);
     expect(report.errors.map((issue) => issue.code)).toEqual([DS_MAP_NOT_ALLOWED, DS_MAP_UNMAPPED]);
     expect(report.errors[0]?.path).toContain('#card');
     expect(report.errors[1]?.path).toContain('#stray');

@@ -240,20 +240,30 @@
     box-shadow: none;
   }
 
-  /* Sizes — touch target ≥ 44px below sm; logical min-block-size */
+  /* Sizes — never below the 24px target minimum (WCAG 2.5.8), whatever the density;
+     touch target ≥ 44px below sm; logical min-block-size */
   .tx-button--sm:not(.tx-button--link) {
-    min-block-size: var(--tx-button-height-sm, var(--tx-size-control-sm));
+    min-block-size: max(
+      var(--tx-button-height-sm, var(--tx-size-control-sm)),
+      var(--tx-size-target-min)
+    );
     padding-inline: var(--tx-button-padding-inline-sm, var(--tx-space-3));
     font-size: var(--tx-button-font-size-sm, var(--tx-type-caption-size));
   }
 
   .tx-button--md:not(.tx-button--link) {
-    min-block-size: var(--tx-button-height-md, var(--tx-size-control-md));
+    min-block-size: max(
+      var(--tx-button-height-md, var(--tx-size-control-md)),
+      var(--tx-size-target-min)
+    );
     padding-inline: var(--tx-button-padding-inline-md, var(--tx-space-4));
   }
 
   .tx-button--lg:not(.tx-button--link) {
-    min-block-size: var(--tx-button-height-lg, var(--tx-size-control-lg));
+    min-block-size: max(
+      var(--tx-button-height-lg, var(--tx-size-control-lg)),
+      var(--tx-size-target-min)
+    );
     padding-inline: var(--tx-button-padding-inline-lg, var(--tx-space-6));
     font-size: var(--tx-button-font-size-lg, var(--tx-type-body-size));
   }

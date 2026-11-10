@@ -576,7 +576,7 @@ describe('render findings', () => {
     expect(issues.map((issue) => [issue.code, issue.path])).toEqual([
       ['render-axe', '$'],
       ['render-contrast', '$.vars.light["--tx-foreground"]'],
-      ['render-literal', '$.render["chart-bar"]'],
+      ['render-literal', '$.render["chart-bar"] rect'],
     ]);
     expect(
       renderIssues({

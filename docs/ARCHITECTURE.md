@@ -32,7 +32,7 @@ packages in lower layers.
 | L1 | `@texuli/primitives` | 42 owned headless primitives, one subpath each (accordion … tree), held to the WAI-ARIA APG patterns | core, date, drag |
 | L1 | `@texuli/document` | In development (on npm from `0.7.0`): the framework-free, DOM-free document engine: the block document format with persisted ids, the validator on the deck schema kit, typed operations and bounded RFC 6902 patches with inverses and an op log, Markdown through the core codec, the pagination engine (`paged`), owned DOCX and PDF writers (`docx`, `pdf`), the CRDT sync core (`sync`) and the document binding for collaboration: comments, suggestions, versions and presence (`collab`) | core, deck |
 | L2 | `@texuli/tokens` | The OKLCH theme engine, the `--tx-*` token contract, 200+ themes, compiled CSS, forced colors, the AA gate, the Tailwind preset | spec |
-| L3 | `texuli` | Styled components (Button … Tree), the class helpers (`cx`, `variants`), icons, layouts and app shells | core, primitives, tokens |
+| L3 | `texuli` | Styled components (Button … Tree), the class helpers (`cx`, `variants`), icons, layouts and app shells | core, primitives, tokens, spec |
 | L4 | `@texuli/charts` | Chart math and every chart family, one lazy subpath per family | core, primitives, tokens, texuli |
 | L4 | `@texuli/data` | Data views: grid (core, columns, editing, virtual), tree, board, calendar, timeline, map, activity, files, virtual list | core, drag, primitives, tokens, texuli |
 | L4 | `@texuli/media` | Image, gallery, video, audio, captions, image editor, compositions, animation, export | core, primitives, tokens, texuli |
@@ -68,7 +68,7 @@ Not layers, because they consume the library:
 
 `@texuli/examples` is never packed (`NEVER_PACKED` in
 `scripts/packages.ts`); `pnpm verify:packages` packs the other 26, and all
-26 are released on npm in the 0.16 line, every one at `0.16.1`; `0.10.0` was the design-systems release and the 0.11 line added the Protoyard gaps G125–G136 and the Final Review fixes (among them `@texuli/document/schema-core`), `0.12.0` moves the `@texuli/pages` core entries off the deck model (G136; breaking for those core entries only), `0.13.0` adds blueprint spec `0.11.0` and one label dictionary (ADR-026), and `0.14.0` adds blueprint spec `0.12.0` and the Protoyard and Dailybot consumer gaps, with no breaking API change (`@texuli/mcp`
+26 are released on npm in the 0.17 line, every one at `0.17.0`; `0.10.0` was the design-systems release and the 0.11 line added the Protoyard gaps G125–G136 and the Final Review fixes (among them `@texuli/document/schema-core`), `0.12.0` moves the `@texuli/pages` core entries off the deck model (G136; breaking for those core entries only), `0.13.0` adds blueprint spec `0.11.0` and one label dictionary (ADR-026), and `0.14.0` adds blueprint spec `0.12.0` and the Protoyard and Dailybot consumer gaps, with no breaking API change (`@texuli/mcp`
 was first released in `0.9.0`; the 0.8 line had 25 packages);
 `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/slides`,
 `@texuli/editor`, `@texuli/document`, `@texuli/pages`, `@texuli/forms`,
@@ -248,7 +248,7 @@ after each deploy of `main`.
 
 ## Decks: engine and stage
 
-ADR-009 splits presentations in two packages (both on npm as `0.16.1`;
+ADR-009 splits presentations in two packages (both on npm as `0.17.0`;
 `@texuli/deck` was first released in `0.4.0`):
 
 - **`@texuli/deck` (L0)** owns everything that is data: deck model v2
@@ -397,7 +397,7 @@ The pure decisions live in `apps/website/src/lib/` and are tested in
     way npm would publish it: `dist/` via `@sveltejs/package`, a derived
     manifest, publint and attw. It publishes nothing.
   - Workspace packages stay `private: true`; the publish workflow publishes
-    the 26 packable packages, `@texuli/mcp` included, to npm as the `0.16.1` release (dist-tag `latest`, through npm trusted publishing), with
+    the 26 packable packages, `@texuli/mcp` included, to npm as the `0.17.0` release (dist-tag `latest`, through npm trusted publishing), with
     provenance; `next` is no longer maintained and stays on `0.12.1`
     ([RELEASE](RELEASE.md#dist-tags)).
 - **Tests:**

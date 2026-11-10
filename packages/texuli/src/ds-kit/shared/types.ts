@@ -71,7 +71,15 @@ export interface KitAllowManifest {
       }
     >
   >;
-  readonly library?: readonly string[];
+  /**
+   * Library entries the compiled allow manifest lists (`compileAllowManifest`):
+   * `{ id, status, version }` per entry, not bare ids.
+   */
+  readonly library?: readonly {
+    readonly id: string;
+    readonly status: string;
+    readonly version: string;
+  }[];
 }
 
 /** One library entry, as the document declares it. */

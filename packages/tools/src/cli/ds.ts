@@ -73,7 +73,7 @@ export type DsCommand = (typeof DS_COMMANDS)[number];
 
 export const DS_USAGE = [
   'Usage: texuli ds init <file> [--brand "<one-liner>"] [--id <id>] [--name <name>] [--locked [--preset all|minimal|<allow.json>]] [--overwrite]',
-  '       texuli ds validate <file> [--trust developer|untrusted] [--variant <name>] [--base <file>]... [--locked] [--prototype <dir> [--scan-workspace]] [--catalog <components.json>] [--extensions <file>...] [--json] [--render [--url <page>] [--sheet builtin|<page.html>] [--known <file>] [--strict]] [--report]',
+  '       texuli ds validate <file> [--trust developer|untrusted] [--variant <name>] [--base <file>]... [--locked] [--prototype <dir> [--scan-workspace]] [--catalog <components.json>] [--extensions <file>...] [--json] [--render [--url <page>] [--sheet builtin|<page.html>] [--known <file>] [--strict]] [--report [--baseline <file>]]',
   '       texuli ds compile <file> [--format json|css|tailwind|dtcg|tokens-studio] [--mode light|dark] [--variant <name>] [--base <file>]... [--out <path> [--overwrite]]',
   '       texuli ds export <file> --format css|tailwind|dtcg|tokens-studio --out <path> [--selector <s>] [--dark class|attribute|media] [--overwrite]',
   '       texuli ds preview <file> [--format svg|html] [--mode light|dark] [--variant <name>] [--out <path> [--overwrite]]',
@@ -103,7 +103,17 @@ export interface DsCommandArgs {
 /** The value flags each command accepts (`--base` repeats and `--overwrite` takes none). */
 const FLAGS: Record<DsCommandArgs['command'], readonly string[]> = {
   init: ['brand', 'id', 'name', 'preset'],
-  validate: ['trust', 'variant', 'base', 'prototype', 'catalog', 'url', 'sheet', 'known'],
+  validate: [
+    'trust',
+    'variant',
+    'base',
+    'prototype',
+    'catalog',
+    'url',
+    'sheet',
+    'known',
+    'baseline',
+  ],
   compile: ['format', 'mode', 'variant', 'trust', 'base', 'out', 'selector', 'dark'],
   export: ['format', 'mode', 'variant', 'trust', 'base', 'out', 'selector', 'dark'],
   preview: ['format', 'mode', 'variant', 'trust', 'base', 'out', 'title'],
@@ -243,6 +253,8 @@ export function parseDsArgs(
     throw new TypeError('ds approve needs --by <name>.');
   if (name === 'validate' && parsed.flags.report === 'true' && !parsed.locked)
     throw new TypeError('Flag --report needs --locked.');
+  if (name === 'validate' && parsed.flags.baseline && parsed.flags.report !== 'true')
+    throw new TypeError('Flag --baseline needs --locked --report.');
   if (name === 'validate' && parsed.flags['scan-workspace'] === 'true' && !parsed.flags.prototype)
     throw new TypeError('Flag --scan-workspace needs --prototype.');
   if (name === 'validate' && parsed.flags.strict === 'true' && parsed.flags.render !== 'true')
@@ -448,6 +460,7 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
         'sheet',
         'known',
         'scan-workspace',
+        'baseline',
       ].some((flag) => args.flags[flag] !== undefined))
   ) {
     const cwd = io.cwd ?? process.cwd();
@@ -474,6 +487,7 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
         ...(args.flags.known ? ['--known', resolve(cwd, args.flags.known)] : []),
         ...(args.flags.strict === 'true' ? ['--strict'] : []),
         ...(args.flags.report === 'true' ? ['--report'] : []),
+        ...(args.flags.baseline ? ['--baseline', resolve(cwd, args.flags.baseline)] : []),
       ],
       io
     );

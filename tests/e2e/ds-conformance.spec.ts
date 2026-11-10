@@ -236,7 +236,8 @@ test.describe('design-system conformance (texuli ds check --render)', () => {
     });
     expect(run?.literals.some((literal) => literal.element.includes('planted-hidden'))).toBe(false);
     const codes = renderIssues(run as DsRenderRun).map((issue) => `${issue.code} ${issue.path}`);
-    expect(codes).toContain('render-literal $.render["blocks-text"]');
+    // Since 0.17.0 a literal-path finding names the element after the component path.
+    expect(codes).toContain('render-literal $.render["blocks-text"] p.planted');
     expect(codes).toContain('render-contrast $.vars.light["--tx-muted-foreground"]');
     expect(run?.axe.some((line) => line.startsWith('color-contrast'))).toBe(true);
   });

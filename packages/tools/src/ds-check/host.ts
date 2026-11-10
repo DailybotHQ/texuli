@@ -2,7 +2,8 @@
  * `@texuli/tools/ds-check/host` (T-ds-conformance): the browser half of
  * `texuli ds check --render`. A page renders its components inside one
  * scope element, each wrapped in an element carrying
- * `data-ds-check-component="<catalog id>"`, and calls
+ * `data-tx-component="<catalog id>"` (or `data-ds-check-component` on the
+ * conformance sheet), and calls
  * {@link installDsCheckHost}. The render driver then reaches the host as
  * `window.texuliDsCheck`:
  *
@@ -31,6 +32,7 @@ import { type DsMapAllowManifest, type DsMapReport, mapDesignSystemTree } from '
 import {
   DS_CHECK_COMPONENT_ATTRIBUTE,
   DS_CHECK_GLOBAL,
+  DS_TX_COMPONENT_ATTRIBUTE,
   type DsCheckMode,
   type DsInspectPair,
   type DsInspectResult,
@@ -38,7 +40,19 @@ import {
   type DsRenderPair,
 } from './types.ts';
 
-export { DS_CHECK_COMPONENT_ATTRIBUTE, DS_CHECK_GLOBAL, type DsInspectPair };
+export {
+  DS_CHECK_COMPONENT_ATTRIBUTE,
+  DS_CHECK_GLOBAL,
+  DS_TX_COMPONENT_ATTRIBUTE,
+  type DsInspectPair,
+};
+
+/** Selector the color check uses. Default includes `data-tx-component`. */
+export function dsCheckComponentSelector(attribute?: string): string {
+  const attr = attribute ?? DS_TX_COMPONENT_ATTRIBUTE;
+  if (attr === DS_CHECK_COMPONENT_ATTRIBUTE) return `[${DS_CHECK_COMPONENT_ATTRIBUTE}]`;
+  return `[${DS_TX_COMPONENT_ATTRIBUTE}], [${DS_CHECK_COMPONENT_ATTRIBUTE}]`;
+}
 
 export interface DsCheckHost {
   /** Resolves when every component painted; the catalog ids painted. */
@@ -52,6 +66,11 @@ export interface DsCheckHost {
 export interface DsCheckHostOptions {
   /** Resolves once the page painted every component (default: immediately). */
   ready?: () => Promise<unknown>;
+  /**
+   * Root attribute the color check reads. Default: `data-ds-check-component` when the page
+   * has it (the conformance sheet), otherwise `data-tx-component` (a locked prototype).
+   */
+  componentAttribute?: string;
 }
 
 type Rgba = [number, number, number, number];
@@ -212,10 +231,24 @@ export function installDsCheckHost(
   scope.setAttribute('data-ds-check-scope', '');
   let current: { compiled: ApplicableDesignSystem; mode: DsCheckMode } | undefined;
 
+  // A page that marks its samples with data-ds-check-component (the conformance sheet) is
+  // checked by those marks only: nested catalog roots inside a sample also carry
+  // data-tx-component and would be counted twice. A page without them (a locked prototype)
+  // is checked through data-tx-component.
+  const attr =
+    options.componentAttribute ??
+    (scope.querySelector(`[${DS_CHECK_COMPONENT_ATTRIBUTE}]`)
+      ? DS_CHECK_COMPONENT_ATTRIBUTE
+      : DS_TX_COMPONENT_ATTRIBUTE);
+  const rootSelector = dsCheckComponentSelector(attr);
+  const componentId = (el: Element) =>
+    el.getAttribute(attr) ||
+    el.getAttribute(DS_TX_COMPONENT_ATTRIBUTE) ||
+    el.getAttribute(DS_CHECK_COMPONENT_ATTRIBUTE) ||
+    '';
+
   const components = () =>
-    [...scope.querySelectorAll(`[${DS_CHECK_COMPONENT_ATTRIBUTE}]`)].map(
-      (el) => el.getAttribute(DS_CHECK_COMPONENT_ATTRIBUTE) as string
-    );
+    [...scope.querySelectorAll(rootSelector)].map((el) => componentId(el)).filter(Boolean);
 
   const settle = async () => {
     await doc.fonts?.ready;
@@ -225,7 +258,7 @@ export function installDsCheckHost(
   const snapshot = () => {
     const map = new Map<Element, Record<string, string>>();
     const clipped = new Map<Element, boolean>();
-    for (const root of scope.querySelectorAll(`[${DS_CHECK_COMPONENT_ATTRIBUTE}]`))
+    for (const root of scope.querySelectorAll(rootSelector))
       for (const el of [root, ...root.querySelectorAll('*')])
         if (isRendered(el, root, clipped)) map.set(el, paintedColors(el));
     return map;
@@ -318,13 +351,13 @@ export function installDsCheckHost(
       for (const [el, colors] of real) {
         const other = moved.get(el);
         if (!other) continue;
-        const owner = el.closest(`[${DS_CHECK_COMPONENT_ATTRIBUTE}]`);
+        const owner = el.closest(rootSelector);
         for (const [property, value] of Object.entries(colors)) {
           if (other[property] !== value) continue;
           const rgba = read(value);
           if (!rgba || rgba[3] === 0) continue;
           literals.push({
-            component: owner?.getAttribute(DS_CHECK_COMPONENT_ATTRIBUTE) ?? '',
+            component: owner ? componentId(owner) : '',
             element: describe(el),
             property,
             value,

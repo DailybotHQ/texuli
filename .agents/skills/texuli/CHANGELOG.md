@@ -15,6 +15,11 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The packages are on npm at `0.17.0`, a `0.x` minor with blueprint spec
+  `0.15.0`: the generator, bundle, locked render check, kit and
+  `VirtualListView` fixes. The components install reference marks them new
+  in `0.17.0`.
+
 ## [0.4.2] — 2026-11-10
 
 ### Changes

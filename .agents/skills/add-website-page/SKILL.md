@@ -115,7 +115,7 @@ manifest entry or the `PRIMITIVES` row instead.
 12. **Content safety:** no `set:html` or `{@html}`; links built from data go
     through `safeHref` from `@texuli/core/url-policy`; fictional data only
     (`example.com`).
-13. **Honesty:** the packages are on npm at `0.16.1` (pre-1.0), not a
+13. **Honesty:** the packages are on npm at `0.17.0` (pre-1.0), not a
     stable release; the agent service is not deployed and Umami analytics
     are not provisioned in production (the remote MCP at
     `https://texuli.com/mcp` is live). Copy states what ships today

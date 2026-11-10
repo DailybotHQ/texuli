@@ -158,6 +158,39 @@ export function matrixModel(
   return { locked: section !== undefined, enabled, disallowedComponents, issues };
 }
 
+/**
+ * Groups stay open (and mounted) when the allow set is this size or smaller.
+ * A 251-key allow is above it: groups start closed and mount on open.
+ */
+export const MATRIX_LAZY_THRESHOLD = 32;
+/** When the allow is above the threshold, this many groups start open. */
+export const MATRIX_OPEN_GROUPS = 1;
+
+export interface MatrixGroup {
+  readonly id: string;
+  readonly label: string;
+  readonly components: readonly MatrixComponent[];
+}
+
+/** Consecutive catalog-group runs, so flattening the groups is catalog order. */
+export function matrixGroups(model: MatrixModel): readonly MatrixGroup[] {
+  const groups: MatrixGroup[] = [];
+  for (const component of model.enabled) {
+    const id = component.group || 'other';
+    const last = groups[groups.length - 1];
+    if (last && last.id === id)
+      groups[groups.length - 1] = { ...last, components: [...last.components, component] };
+    else groups.push({ id, label: id, components: [component] });
+  }
+  return groups;
+}
+
+/** Open (and SSR-mounted) when the allow is small, or for the first `MATRIX_OPEN_GROUPS`. */
+export function matrixGroupOpenByDefault(model: MatrixModel, groupIndex: number): boolean {
+  if (model.enabled.length <= MATRIX_LAZY_THRESHOLD) return true;
+  return groupIndex < MATRIX_OPEN_GROUPS;
+}
+
 /** Where a cell sits: the variant × size grid, a strip (state, tone, density, color), or the full product. */
 export type MatrixCellKind = 'grid' | 'state' | 'tone' | 'density' | 'color' | 'full';
 

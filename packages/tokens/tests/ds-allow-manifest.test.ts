@@ -65,7 +65,7 @@ describe('compileAllowManifest', () => {
       library: [{ id: 'pricing-card', version: '0.3.0', status: 'draft' }],
       version: '1.2.0',
       contentHash: designSystemContentHash(doc),
-      specVersion: '0.14.0',
+      specVersion: '0.15.0',
       catalogDigest: 'ab'.repeat(32),
     });
     expect(ALLOW_MANIFEST_SPEC_VERSION).toBe(SPEC_VERSION);
@@ -75,12 +75,26 @@ describe('compileAllowManifest', () => {
     expect(compileAllowManifest(minimal)).toEqual({
       version: '1.0.0',
       contentHash: designSystemContentHash(minimal),
-      specVersion: '0.14.0',
+      specVersion: '0.15.0',
     });
     const hostile = JSON.parse(
       `{"format":"texuli/design-system","formatVersion":1,"id":"a","version":"1.0.0","name":"A","allow":{"__proto__":{"variants":["x"]},"button":{"variants":["default"]}}}`
     );
     expect(compileAllowManifest(hostile).allow).toEqual({ button: { variants: ['default'] } });
+  });
+
+  it('preserves the full document allow cap and all values within an axis cap', () => {
+    const variants = Array.from({ length: 32 }, (_, index) => `variant-${index}`);
+    const allow = Object.fromEntries(
+      Array.from({ length: 4096 }, (_, index) => [
+        `component-${index}`,
+        index === 4095 ? { variants } : {},
+      ])
+    );
+    const manifest = compileAllowManifest({ ...minimal, allow });
+
+    expect(Object.keys(manifest.allow ?? {})).toHaveLength(4096);
+    expect(manifest.allow?.['component-4095']?.variants).toEqual(variants);
   });
 });
 

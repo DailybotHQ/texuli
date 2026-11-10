@@ -19,9 +19,9 @@ import { validateDesignSystem } from './validate.ts';
 export const DESIGN_SYSTEM_BUNDLE_FORMAT = 'texuli/design-system-bundle';
 export const DESIGN_SYSTEM_BUNDLE_VERSION = 1;
 
-/** Caps the published bundle schema expresses. */
+/** Caps accepted from the document and bundle fields. */
 export const DESIGN_SYSTEM_BUNDLE_LIMITS = Object.freeze({
-  allow: 256,
+  allow: 4096,
   axis: 32,
   library: 64,
   history: 32,
@@ -37,7 +37,7 @@ const SEMVER = /^[0-9]+\.[0-9]+\.[0-9]+$/;
 const SAFE_ID = /^(?=.{1,64}$)[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const LANGUAGE = /^[a-z][a-z0-9+-]{0,31}$/;
 const ISO_UTC =
-  /^\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])T(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d{1,3})?)?Z$/;
+  /^\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])T(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?Z$/;
 const NAMESPACE = /^[a-z][a-z0-9]{1,15}$/;
 
 export const DESIGN_SYSTEM_BUNDLE_CODES = [
@@ -130,10 +130,10 @@ function pathRefused(id: string): boolean {
   );
 }
 
-function strings(value: unknown, cap: number): string[] | undefined {
+function strings(value: unknown): string[] | undefined {
   if (!Array.isArray(value)) return;
   const out: string[] = [];
-  for (let i = 0; i < value.length && out.length < cap; i++) {
+  for (let i = 0; i < value.length; i++) {
     const item = value[i];
     if (typeof item === 'string') out.push(item);
   }
@@ -146,14 +146,12 @@ function copyAllow(value: unknown): DesignSystemBundleAllowManifest['allow'] | u
     .filter((id) => !RESERVED.has(id))
     .sort();
   const allow: Record<string, Record<string, readonly string[]>> = {};
-  const cap = Math.min(ids.length, DESIGN_SYSTEM_BUNDLE_LIMITS.allow);
-  for (let i = 0; i < cap; i++) {
-    const id = ids[i] as string;
+  for (const id of ids) {
     const raw = value[id];
     const entry: Record<string, readonly string[]> = {};
     if (isRecord(raw))
       for (const axis of AXIS) {
-        const listed = strings(raw[axis], DESIGN_SYSTEM_BUNDLE_LIMITS.axis);
+        const listed = strings(raw[axis]);
         if (listed) entry[axis] = listed;
       }
     allow[id] = entry;
@@ -256,14 +254,18 @@ function checkSource(
     collect(errors, 64, issue('required', at(path, 'source'), '"source" is required.'));
     return;
   }
-  if (value.source.length > DESIGN_SYSTEM_BUNDLE_LIMITS.source) {
+  const sourceBytes =
+    value.source.length > DESIGN_SYSTEM_BUNDLE_LIMITS.source
+      ? value.source.length
+      : new TextEncoder().encode(value.source).byteLength;
+  if (sourceBytes > DESIGN_SYSTEM_BUNDLE_LIMITS.source) {
     collect(
       errors,
       64,
       issue(
         'too-large',
         at(path, 'source'),
-        `Source is at most ${DESIGN_SYSTEM_BUNDLE_LIMITS.source} characters.`
+        `Source is at most ${DESIGN_SYSTEM_BUNDLE_LIMITS.source} UTF-8 bytes.`
       )
     );
     return;
@@ -300,6 +302,57 @@ function checkSource(
       ? { language: value.language }
       : {}),
   };
+}
+
+function checkDuplicateSourceIds(
+  value: readonly unknown[],
+  errors: DesignSystemBundleIssue[]
+): void {
+  const ids = new Set<string>();
+  for (let index = 0; index < value.length; index++) {
+    const entry = value[index];
+    if (!isRecord(entry) || typeof entry.id !== 'string') continue;
+    if (ids.has(entry.id)) {
+      collect(
+        errors,
+        64,
+        issue(
+          'invalid-value',
+          at(at('$.librarySources', index), 'id'),
+          'Library source ids must be unique.',
+          entry.id
+        )
+      );
+    } else ids.add(entry.id);
+  }
+}
+
+function checkCurrentVersionHistory(
+  document: unknown,
+  history: readonly unknown[],
+  errors: DesignSystemBundleIssue[]
+): void {
+  if (!isRecord(document) || typeof document.version !== 'string') return;
+  const current = designSystemContentHash(document);
+  for (let index = 0; index < history.length; index++) {
+    const entry = history[index];
+    if (
+      !isRecord(entry) ||
+      entry.version !== document.version ||
+      typeof entry.contentHash !== 'string' ||
+      entry.contentHash === current
+    )
+      continue;
+    collect(
+      errors,
+      64,
+      issue(
+        'content-hash-mismatch',
+        at(at('$.history', index), 'contentHash'),
+        'A history entry for the packed version does not match the document.'
+      )
+    );
+  }
 }
 
 function checkHistory(
@@ -391,6 +444,71 @@ function checkAllowManifest(
     collect(errors, 64, issue('required', at(path, 'version'), '"version" is required.'));
   if (typeof value.specVersion !== 'string' || !SEMVER.test(value.specVersion))
     collect(errors, 64, issue('invalid-value', at(path, 'specVersion'), 'specVersion is x.y.z.'));
+  if (value.allow !== undefined) {
+    if (!isRecord(value.allow)) {
+      collect(errors, 64, issue('invalid-type', at(path, 'allow'), 'allow must be an object.'));
+    } else {
+      const ids = Object.keys(value.allow);
+      if (ids.length > DESIGN_SYSTEM_BUNDLE_LIMITS.allow)
+        collect(
+          errors,
+          64,
+          issue(
+            'too-large',
+            at(path, 'allow'),
+            `At most ${DESIGN_SYSTEM_BUNDLE_LIMITS.allow} allowed components.`
+          )
+        );
+      for (const id of ids) {
+        if (RESERVED.has(id))
+          collect(errors, 64, issue('invalid-value', at(at(path, 'allow'), id), 'Reserved key.'));
+        const entry = value.allow[id];
+        if (!isRecord(entry)) {
+          collect(
+            errors,
+            64,
+            issue('invalid-type', at(at(path, 'allow'), id), 'An allow entry must be an object.')
+          );
+          continue;
+        }
+        for (const axis of AXIS) {
+          const values = entry[axis];
+          if (values === undefined) continue;
+          if (!Array.isArray(values)) {
+            collect(
+              errors,
+              64,
+              issue(
+                'invalid-type',
+                at(at(at(path, 'allow'), id), axis),
+                'Axis values must be an array.'
+              )
+            );
+          } else if (values.length > DESIGN_SYSTEM_BUNDLE_LIMITS.axis) {
+            collect(
+              errors,
+              64,
+              issue(
+                'too-large',
+                at(at(at(path, 'allow'), id), axis),
+                `At most ${DESIGN_SYSTEM_BUNDLE_LIMITS.axis} values for an axis.`
+              )
+            );
+          } else if (values.some((item) => typeof item !== 'string')) {
+            collect(
+              errors,
+              64,
+              issue(
+                'invalid-type',
+                at(at(at(path, 'allow'), id), axis),
+                'Axis values must be strings.'
+              )
+            );
+          }
+        }
+      }
+    }
+  }
   const hash = checkSha(value.contentHash, at(path, 'contentHash'), errors);
   const expected = designSystemContentHash(document);
   if (hash !== undefined && hash !== expected)
@@ -467,6 +585,7 @@ export function validateBundle(value: unknown): DesignSystemBundleValidation {
     value.librarySources.forEach((entry, index) => {
       checkSource(entry, at('$.librarySources', index), errors);
     });
+  if (Array.isArray(value.librarySources)) checkDuplicateSourceIds(value.librarySources, errors);
   if (!Array.isArray(value.history))
     collect(errors, 64, issue('required', '$.history', '"history" must be an array.'));
   else if (value.history.length > DESIGN_SYSTEM_BUNDLE_LIMITS.history)
@@ -483,31 +602,8 @@ export function validateBundle(value: unknown): DesignSystemBundleValidation {
     value.history.forEach((entry, index) => {
       checkHistory(entry, at('$.history', index), errors);
     });
-  if (
-    isRecord(value.document) &&
-    typeof value.document.version === 'string' &&
-    Array.isArray(value.history)
-  ) {
-    const current = designSystemContentHash(value.document);
-    for (let i = 0; i < value.history.length; i++) {
-      const entry = value.history[i];
-      if (
-        isRecord(entry) &&
-        entry.version === value.document.version &&
-        typeof entry.contentHash === 'string' &&
-        entry.contentHash !== current
-      )
-        collect(
-          errors,
-          64,
-          issue(
-            'content-hash-mismatch',
-            at(at('$.history', i), 'contentHash'),
-            'A history entry for the packed version does not match the document.'
-          )
-        );
-    }
-  }
+  if (Array.isArray(value.history))
+    checkCurrentVersionHistory(value.document, value.history, errors);
   return { ok: errors.length === 0, errors };
 }
 
@@ -557,6 +653,7 @@ export function packBundle(input: PackBundleInput): PackBundleResult {
     );
     if (built) librarySources.push(built);
   }
+  checkDuplicateSourceIds(librarySources, errors);
   const historyIn = input.history ?? [];
   if (historyIn.length > DESIGN_SYSTEM_BUNDLE_LIMITS.history)
     return fail([
@@ -571,6 +668,7 @@ export function packBundle(input: PackBundleInput): PackBundleResult {
     const built = checkHistory(historyIn[i], at('$.history', i), errors);
     if (built) history.push(built);
   }
+  checkCurrentVersionHistory(input.document, history, errors);
   if (typeof input.catalogDigest === 'string' && !SHA256.test(input.catalogDigest))
     collect(
       errors,

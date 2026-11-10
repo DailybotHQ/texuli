@@ -27,21 +27,37 @@
  * no selection. `selectable={false}` keeps a listbox from selecting rows.
  * Feeds and non-selectable lists use a plain row (no option padding, border,
  * hover or cursor), so a row snippet brings its own chrome.
+ *
+ * A feed article is named by `aria-labelledby`: the row's label when there is
+ * no row snippet; otherwise the element whose id the snippet receives as
+ * `labelId` (or `getRowLabelId` returns), else the row's first heading with an
+ * id, else `aria-label` with the row's label text. `surface="plain"` drops the
+ * viewport's border, radius and surface.
+ *
+ * Uniform component contract (docs/STANDARDS.md): `ref` binds the root, which
+ * takes `class`, `style` and `hidden`; `id`, `aria-*`, `data-*` and handlers
+ * go to the scroller (the listbox or the feed), as a split form control sends
+ * them to its control. A caller `onkeydown` runs first and skips the
+ * listbox's own keys when it calls `preventDefault()`; a caller `onscroll` and
+ * `onfocus` run alongside the scroll and focus bookkeeping, which always runs.
  */
 
 import { type Snippet, tick } from 'svelte';
 import type { Attachment } from 'svelte/attachments';
+import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from 'texuli/cx';
 import './virtual-list-view.css';
 import {
   normalizeVirtualListDensity,
   normalizeVirtualListMode,
   normalizeVirtualListSize,
+  normalizeVirtualListSurface,
   type VirtualListKeyValue,
   type VirtualListRowContext,
   type VirtualListViewDensity,
   type VirtualListViewMode,
   type VirtualListViewSize,
+  type VirtualListViewSurface,
   viewportFallback,
   virtualListDescriptionOf,
   virtualListKeyOf,
@@ -49,7 +65,7 @@ import {
 } from './view-model.ts';
 import { createVirtualList, nextVirtualListIndex } from './virtual-list.ts';
 
-interface Props {
+interface OwnProps {
   /** The rows. Any length: only a window is rendered. */
   items: readonly T[];
   /** Accessible name of the listbox or feed. */
@@ -69,8 +85,13 @@ interface Props {
   getKey?: (item: T, index: number) => VirtualListKeyValue;
   /** The row's text when no `row` snippet is given (default: `item.label`). */
   getLabel?: (item: T, index: number) => string;
-  /** Renders one row; it receives the item, its index and its state. */
+  /** Renders one row; it receives the item, its index, its state and the feed's `labelId`. */
   row?: Snippet<[VirtualListRowContext<T>]>;
+  /**
+   * Feed mode: the id of the element inside the row snippet that names the
+   * article (its heading). Default: the `labelId` the snippet receives.
+   */
+  getRowLabelId?: (item: T, index: number) => string | undefined;
   /** Height in px used for a row until it has been measured. Defaults to 40. */
   estimateSize?: number;
   /** Rows rendered before and after the viewport. Defaults to 3. */
@@ -79,6 +100,8 @@ interface Props {
   size?: VirtualListViewSize;
   /** Row padding. */
   density?: VirtualListViewDensity;
+  /** `box` (default): border, radius and surface. `plain`: none, for a feed of cards. */
+  surface?: VirtualListViewSurface;
   /** The selected row's key (bindable). */
   selected?: VirtualListKeyValue;
   /** Text shown when there are no rows. */
@@ -88,7 +111,11 @@ interface Props {
   /** Called when the rendered range changes (for an infinite loader). */
   onRangeChange?: (range: { start: number; end: number }) => void;
   class?: ClassValue;
+  /** The root element (bindable). */
+  ref?: HTMLElement | null;
 }
+
+type Props = OwnProps & Omit<HTMLAttributes<HTMLElement>, keyof OwnProps | 'children'>;
 
 let {
   items,
@@ -98,25 +125,37 @@ let {
   getKey,
   getLabel,
   row,
+  getRowLabelId,
   estimateSize = 40,
   overscan = 3,
   size = 'md',
   density = 'default',
+  surface = 'box',
   selected = $bindable(),
   emptyLabel = 'No items',
   onSelect,
   onRangeChange,
   class: className,
+  ref = $bindable(null),
+  id,
+  style,
+  hidden,
+  onkeydown: callerKeydown,
+  onscroll: callerScroll,
+  onfocus: callerFocus,
+  'aria-describedby': callerDescribedBy,
+  ...rest
 }: Props = $props();
 
 const uid = $props.id();
-const listId = `tx-virtual-list-${uid}`;
-const emptyId = `${listId}-empty`;
+const listId = $derived(id || `tx-virtual-list-${uid}`);
+const emptyId = $derived(`${listId}-empty`);
 const optionId = (index: number) => `${listId}-option-${index}`;
 
 const safeSize = $derived(normalizeVirtualListSize(size));
 const safeDensity = $derived(normalizeVirtualListDensity(density));
 const safeMode = $derived(normalizeVirtualListMode(mode));
+const safeSurface = $derived(normalizeVirtualListSurface(surface));
 const isFeed = $derived(safeMode === 'feed');
 const canSelect = $derived(!isFeed && selectable !== false);
 // Feeds and non-selectable lists drop the option chrome; the row snippet owns it.
@@ -151,6 +190,29 @@ const keyOf = (item: T, index: number) =>
   getKey ? getKey(item, index) : virtualListKeyOf(item, index);
 const labelOf = (item: T, index: number) =>
   getLabel ? getLabel(item, index) : virtualListLabelOf(item, index);
+const labelIdOf = (item: T, index: number) =>
+  (row && getRowLabelId?.(item, index)) || `${optionId(index)}-label`;
+
+const HEADING = 'h1[id], h2[id], h3[id], h4[id], h5[id], h6[id], [role="heading"][id]';
+
+/**
+ * Feed, row snippet: name the article by the element with `labelId` inside it,
+ * else its first heading with an id, else by `aria-label` with the row's text,
+ * so an article is never unnamed and never points at a missing id.
+ */
+function nameArticle(labelId: string, fallback: string): Attachment<HTMLElement> {
+  return (element) => {
+    const own = element.ownerDocument.getElementById(labelId);
+    const target = own && element.contains(own) ? own : element.querySelector(HEADING);
+    if (target?.id) {
+      element.setAttribute('aria-labelledby', target.id);
+      element.removeAttribute('aria-label');
+    } else {
+      element.removeAttribute('aria-labelledby');
+      element.setAttribute('aria-label', fallback);
+    }
+  };
+}
 
 $effect(() => {
   if (active >= items.length) active = items.length - 1;
@@ -201,8 +263,25 @@ function measureRow(index: number): Attachment<HTMLElement> {
   };
 }
 
-function onscroll(event: Event): void {
-  scrollTop = (event.currentTarget as HTMLElement).scrollTop;
+type ViewportEvent<E extends Event> = E & { currentTarget: EventTarget & HTMLDivElement };
+
+/** The caller's `onscroll` runs; the scroll position is always tracked. */
+function handleScroll(event: ViewportEvent<UIEvent>): void {
+  callerScroll?.(event);
+  scrollTop = event.currentTarget.scrollTop;
+}
+
+/** The caller's `onfocus` runs; the listbox always picks its active row. */
+function handleFocus(event: ViewportEvent<FocusEvent>): void {
+  callerFocus?.(event);
+  if (!isFeed) listboxFocus();
+}
+
+/** The caller's `onkeydown` runs first; `preventDefault()` skips the listbox keys. */
+function handleKeydown(event: ViewportEvent<KeyboardEvent>): void {
+  callerKeydown?.(event);
+  if (event.defaultPrevented || isFeed) return;
+  listboxKeydown(event);
 }
 
 /** Scrolls the list so the row at `index` is fully visible. */
@@ -227,7 +306,7 @@ function choose(index: number): void {
   onSelect?.(item, index);
 }
 
-function onfocus(): void {
+function listboxFocus(): void {
   if (active >= 0 || items.length === 0) return;
   const chosen =
     selected === undefined ? -1 : items.findIndex((item, index) => keyOf(item, index) === selected);
@@ -235,7 +314,7 @@ function onfocus(): void {
   scrollToIndex(active);
 }
 
-function onkeydown(event: KeyboardEvent): void {
+function listboxKeydown(event: KeyboardEvent): void {
   // A key in a row's own control (an input, a button) belongs to that control.
   if (event.target !== event.currentTarget) return;
   if (items.length === 0 || event.altKey || event.ctrlKey || event.metaKey) return;
@@ -281,13 +360,18 @@ function onArticleKeydown(event: KeyboardEvent, index: number): void {
 </script>
 
 <div
-  class={cx('tx-virtual-list', `tx-virtual-list--${safeSize}`, `tx-virtual-list--${safeDensity}`, isFeed && 'tx-virtual-list--feed', className)}
+  bind:this={ref}
+  class={cx('tx-virtual-list', `tx-virtual-list--${safeSize}`, `tx-virtual-list--${safeDensity}`, isFeed && 'tx-virtual-list--feed', safeSurface === 'plain' && 'tx-virtual-list--plain', className)}
+  {style}
+  {hidden}
   data-tx-component="data-virtual-list"
   data-tx-size={safeSize}
   data-tx-density={safeDensity}
+  data-tx-surface={safeSurface}
 >
   <!-- svelte-ignore a11y_no_noninteractive_tabindex -- the role is dynamic: a listbox (tab stop) or a feed (no tabindex; its articles take focus). -->
   <div
+    {...rest}
     {@attach trackViewport}
     id={listId}
     class="tx-virtual-list__viewport"
@@ -295,11 +379,11 @@ function onArticleKeydown(event: KeyboardEvent, index: number): void {
     tabindex={isFeed ? undefined : items.length === 0 ? -1 : 0}
     aria-label={label}
     aria-activedescendant={!isFeed && activeInWindow ? optionId(active) : undefined}
-    aria-describedby={items.length === 0 ? emptyId : undefined}
+    aria-describedby={[callerDescribedBy, items.length === 0 ? emptyId : undefined].filter(Boolean).join(' ') || undefined}
     data-tx-mode={safeMode}
-    {onscroll}
-    onfocus={isFeed ? undefined : onfocus}
-    onkeydown={isFeed ? undefined : onkeydown}
+    onscroll={handleScroll}
+    onfocus={handleFocus}
+    onkeydown={handleKeydown}
   >
     <div
       class="tx-virtual-list__spacer"
@@ -312,11 +396,12 @@ function onArticleKeydown(event: KeyboardEvent, index: number): void {
       {@const key = keyOf(item, entry.index)}
       {@const isSelected = canSelect && selected !== undefined && key === selected}
       {@const isActive = entry.index === active}
+      {@const labelId = labelIdOf(item, entry.index)}
       {#snippet content()}
         {#if row}
-          {@render row({ item, index: entry.index, active: isActive, selected: isSelected })}
+          {@render row({ item, index: entry.index, active: isActive, selected: isSelected, labelId })}
         {:else}
-          <span id="{optionId(entry.index)}-label" class="tx-virtual-list__label">{labelOf(item, entry.index)}</span>
+          <span id={labelId} class="tx-virtual-list__label">{labelOf(item, entry.index)}</span>
           {@const description = virtualListDescriptionOf(item)}
           {#if description}
             <span class="tx-virtual-list__description">{description}</span>
@@ -327,12 +412,13 @@ function onArticleKeydown(event: KeyboardEvent, index: number): void {
         <!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -- APG feed: each article is focusable and owns Page Up / Page Down. -->
         <article
           {@attach measureRow(entry.index)}
+          {@attach row ? nameArticle(labelId, labelOf(item, entry.index)) : undefined}
           id={optionId(entry.index)}
           class="tx-virtual-list__row"
           tabindex={entry.index === tabStop ? 0 : -1}
           aria-setsize={items.length}
           aria-posinset={entry.index + 1}
-          aria-labelledby={row ? undefined : `${optionId(entry.index)}-label`}
+          aria-labelledby={row ? undefined : labelId}
           data-index={entry.index}
           data-active={isActive ? '' : undefined}
           onfocusin={() => (active = entry.index)}

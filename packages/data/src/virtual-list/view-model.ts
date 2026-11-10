@@ -18,6 +18,13 @@ export const VIRTUAL_LIST_MODES = ['listbox', 'feed'] as const;
 export type VirtualListViewMode = (typeof VIRTUAL_LIST_MODES)[number];
 
 /** Row padding steps. */
+/**
+ * The viewport's frame: `box` (default) draws a border, a radius and the
+ * surface; `plain` draws none of them, so a feed of cards sits on the page.
+ */
+export const VIRTUAL_LIST_SURFACES = ['box', 'plain'] as const;
+export type VirtualListViewSurface = (typeof VIRTUAL_LIST_SURFACES)[number];
+
 export const VIRTUAL_LIST_DENSITIES = ['compact', 'default', 'comfortable'] as const;
 export type VirtualListViewDensity = (typeof VIRTUAL_LIST_DENSITIES)[number];
 
@@ -31,6 +38,12 @@ export interface VirtualListRowContext<T> {
   /** The keyboard's active row (`aria-activedescendant`; in a feed, the article that holds focus). */
   active: boolean;
   selected: boolean;
+  /**
+   * Feed mode: the id the article's `aria-labelledby` points at. Put it on the
+   * row's heading (`<h3 id={labelId}>`) to name the article, or return your
+   * own id from `getRowLabelId`.
+   */
+  labelId: string;
 }
 
 /**
@@ -53,6 +66,10 @@ export function normalizeVirtualListSize(value: unknown): VirtualListViewSize {
 
 export function normalizeVirtualListMode(value: unknown): VirtualListViewMode {
   return value === 'feed' ? 'feed' : 'listbox';
+}
+
+export function normalizeVirtualListSurface(value: unknown): VirtualListViewSurface {
+  return value === 'plain' ? 'plain' : 'box';
 }
 
 export function normalizeVirtualListDensity(value: unknown): VirtualListViewDensity {

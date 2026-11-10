@@ -54,12 +54,12 @@ agent config, or publish packages without explicit consent (see
    Installing the skill does **not** install Texuli packages or a CLI.
 2. Confirm the workspace has Texuli (workspace packages `texuli`,
    `@texuli/core`, `@texuli/tokens`, …) before promising package imports.
-   All 26 published packages are on npm in the 0.16 line, every one at
-   `0.16.1`, published by CI
+   All 26 published packages are on npm in the 0.17 line, every one at
+   `0.17.0`, published by CI
    through npm trusted publishing with provenance under the `latest`
    dist-tag (`next` is no longer maintained and stays on `0.12.1`). They
    are pre-1.0: a new minor may break, and 1.0.0 will be the first stable
-   release. Install them plainly (`pnpm add texuli`) and pin `^0.16.0`; the
+   release. Install them plainly (`pnpm add texuli`) and pin `^0.17.0`; the
    workspace packages stay `private: true`. `@texuli/drag`,
    `@texuli/workflows`, `@texuli/deck`, `@texuli/slides`,
    `@texuli/editor`, `@texuli/document`, `@texuli/pages`,
