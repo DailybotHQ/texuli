@@ -159,9 +159,9 @@ describe('ds validate --locked --render', () => {
     expect(browser.mapped).toEqual([ALLOW]);
     const found = renderCodes(report);
     expect(found).toContainEqual(['not-allowed', '$.render["dialog"]']);
-    expect(found).toContainEqual(['render-literal', '$.render["button"]']);
+    expect(found).toContainEqual(['render-literal', '$.render["button"] button']);
     // The chart mark is exempt: no literal finding names charts-bar.
-    expect(found).not.toContainEqual(['render-literal', '$.render["charts-bar"]']);
+    expect(found.some(([, path]) => path.includes('charts-bar'))).toBe(false);
     expect(report.codes).toEqual(expect.arrayContaining(['not-allowed', 'render-literal']));
     expect(report.check.render?.url).toBe('http://127.0.0.1:9/prototype.html');
     for (const run of report.check.render?.runs ?? [])
@@ -207,8 +207,8 @@ describe('ds check --locked --render', () => {
     // The sheet paints every catalog component by design; only a served page is mapped.
     expect(browser.mapped).toEqual([]);
     const found = renderCodes(JSON.parse(stdout) as DsFullReport);
-    expect(found).toContainEqual(['render-literal', '$.render["button"]']);
-    expect(found).not.toContainEqual(['render-literal', '$.render["charts-bar"]']);
+    expect(found).toContainEqual(['render-literal', '$.render["button"] button']);
+    expect(found.some(([, path]) => path.includes('charts-bar'))).toBe(false);
     expect(found.some(([code]) => code === 'not-allowed')).toBe(false);
   });
 
@@ -223,7 +223,7 @@ describe('ds check --locked --render', () => {
     const report = JSON.parse(stdout) as { errors: { code: string; path: string }[] };
     expect(report.errors.map((error) => [error.code, error.path])).toContainEqual([
       'render-literal',
-      '$.render["charts-bar"]',
+      '$.render["charts-bar"] rect',
     ]);
   });
 });
