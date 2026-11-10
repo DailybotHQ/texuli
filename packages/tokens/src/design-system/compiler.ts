@@ -50,6 +50,7 @@ import { MOTION_PRESETS } from '../style-presets/presets.ts';
 import { BASE_SYSTEM_TOKENS, closingParen } from '../system/base.ts';
 import { compileAllowManifest, type DesignSystemAllowManifest } from './allow-manifest.ts';
 import { composite, onColor, parseDsColor } from './color.ts';
+import { contrastInk } from '../palette/contrast.ts';
 import { DEFAULT_DESIGN_SYSTEM_SEED, formatFontStack } from './from-theme.ts';
 import {
   DESIGN_SYSTEM_TARGETS,
@@ -987,6 +988,9 @@ export function compileDesignSystem(
     }
     (charts.categorical as string[]).forEach((c, i) => {
       draft[`--tx-chart-${i + 1}`] = c;
+      const parsed = parseDsColor(c);
+      const solid = parsed ? composite(parsed, solved.hexOf('background')) : c;
+      draft[`--tx-chart-${i + 1}-foreground`] = contrastInk(solid);
     });
     (charts.sequential as string[]).forEach((c, i) => {
       draft[`--tx-chart-sequential-${i + 1}`] = c;

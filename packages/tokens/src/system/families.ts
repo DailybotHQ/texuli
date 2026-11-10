@@ -302,9 +302,14 @@ const STATUS: SystemToken[] = STATUS_NAMES.flatMap((status) => {
 });
 
 const DATA_VIZ: SystemToken[] = [
-  ...Array.from({ length: 8 }, (_, i) =>
-    token(`--tx-chart-${i + 1}`, 'theme.charts.categorical', `Categorical series color ${i + 1}.`)
-  ),
+  ...Array.from({ length: 8 }, (_, i) => [
+    token(`--tx-chart-${i + 1}`, 'theme.charts.categorical', `Categorical series color ${i + 1}.`),
+    token(
+      `--tx-chart-${i + 1}-foreground`,
+      'on-color(theme.charts.categorical)',
+      `AA foreground ink on categorical series color ${i + 1}.`
+    ),
+  ]).flat(),
   ...Array.from({ length: 9 }, (_, i) =>
     token(
       `--tx-chart-sequential-${i + 1}`,

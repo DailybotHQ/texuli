@@ -12,6 +12,7 @@ import {
 import { renderTokenRenamesJson, TOKEN_RENAMES } from '../src/renames/index.ts';
 import {
   BASE_SYSTEM_TOKENS,
+  DATA_VIZ_TOKEN_NAMES,
   GENERATED_END,
   GENERATED_START,
   renderSystemTokenDeclarations,
@@ -90,7 +91,9 @@ export function renderTokenTablesDoc(): string {
     `- **System tokens:** ${SYSTEM_TOKENS.length} in ${SYSTEM_TOKEN_FAMILIES.length} families`,
     `  (${SYSTEM_TOKEN_FAMILIES.map((f) => f.id).join(', ')}).`,
     `  ${BASE_SYSTEM_TOKENS.length} are declared in \`@texuli/tokens/base.css\`; the`,
-    '  28 data-viz tokens are emitted per theme.',
+    `  ${DATA_VIZ_TOKEN_NAMES.length} data-viz tokens are emitted by \`dataVizVariables\`, including`,
+    '  AA foregrounds derived for the eight categorical series colors; `themeVariables`',
+    '  emits chart palettes only for themes that define them.',
     `- **Component tokens:** ${COMPONENT_TOKENS.length} for ${COMPONENT_TOKEN_FAMILIES.length} components`,
     '  (`@texuli/tokens/components`), never declared.',
     `- **Renames:** ${TOKEN_RENAMES.length} (\`@texuli/tokens/renames.json\`, schema`,
