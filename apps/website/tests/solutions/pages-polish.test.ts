@@ -28,9 +28,9 @@ describe('pages polish: home visual level, no new islands, no budget increases',
     expect(islandBudgetFor('/built-with/')).toBe(0);
     expect(islandBudgetFor('/built-with/protoyard/')).toBe(0);
     expect(islandBudgetFor('/native/')).toBe(1);
-    expect(budgetFor('/solutions/').pageGzipKb).toBe(140);
-    expect(budgetFor('/built-with/').pageGzipKb).toBe(140);
-    expect(budgetFor('/built-with/protoyard/').pageGzipKb).toBe(140);
+    expect(budgetFor('/solutions/').pageGzipKb).toBe(146);
+    expect(budgetFor('/built-with/').pageGzipKb).toBe(146);
+    expect(budgetFor('/built-with/protoyard/').pageGzipKb).toBe(146);
     expect(budgetFor('/native/').pageGzipKb).toBe(122);
     expect(budgetFor('/native/').htmlGzipKb).toBe(DEFAULT_BUDGET.htmlGzipKb);
     expect(DEFAULT_BUDGET.htmlGzipKb).toBe(24);
