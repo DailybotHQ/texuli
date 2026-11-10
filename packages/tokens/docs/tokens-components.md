@@ -6,10 +6,12 @@ Token contract v2 ([ADR-020](../../../docs/DECISIONS.md#adr-020-token-contract-v
 adds system families and a component tier to the `--tx-*` contract. It is
 additive: nothing existing is renamed or removed.
 
-- **System tokens:** 151 in 11 families
+- **System tokens:** 159 in 11 families
   (space, size, type, elevation, shape, layer, opacity, layout, icon, status, data-viz).
   123 are declared in `@texuli/tokens/base.css`; the
-  28 data-viz tokens are emitted per theme.
+  36 data-viz tokens are emitted by `dataVizVariables`, including
+  AA foregrounds derived for the eight categorical series colors; `themeVariables`
+  emits chart palettes only for themes that define them.
 - **Component tokens:** 365 for 57 components
   (`@texuli/tokens/components`), never declared.
 - **Renames:** 0 (`@texuli/tokens/renames.json`, schema
@@ -223,7 +225,7 @@ Content widths, container breakpoints, grid columns and gutters. CSS cannot read
 
 | Token | Default | Meaning | Read as |
 | --- | --- | --- | --- |
-| `--tx-layout-content-max` | `72ch` | Readable prose width (content layouts). | `var(--tx-layout-content-max)` |
+| `--tx-layout-content-max` | `72ch` | Readable prose width (content layouts). Rem, ch and % layout widths do not multiply --tx-density; gutters still read the space scale. | `var(--tx-layout-content-max)` |
 | `--tx-layout-wide-max` | `80rem` | Wide page sections (marketing layouts). | `var(--tx-layout-wide-max)` |
 | `--tx-layout-full-max` | `100%` | Full-bleed sections. | `var(--tx-layout-full-max)` |
 | `--tx-layout-breakpoint-sm` | `36rem` | Small container breakpoint (2 grid columns). | `var(--tx-layout-breakpoint-sm)` |
@@ -281,13 +283,21 @@ Chart categorical, sequential and diverging colors with grid and axis, emitted p
 | Token | Source | Meaning |
 | --- | --- | --- |
 | `--tx-chart-1` | `theme.charts.categorical` | Categorical series color 1. |
+| `--tx-chart-1-foreground` | `on-color(theme.charts.categorical)` | AA foreground ink on categorical series color 1. |
 | `--tx-chart-2` | `theme.charts.categorical` | Categorical series color 2. |
+| `--tx-chart-2-foreground` | `on-color(theme.charts.categorical)` | AA foreground ink on categorical series color 2. |
 | `--tx-chart-3` | `theme.charts.categorical` | Categorical series color 3. |
+| `--tx-chart-3-foreground` | `on-color(theme.charts.categorical)` | AA foreground ink on categorical series color 3. |
 | `--tx-chart-4` | `theme.charts.categorical` | Categorical series color 4. |
+| `--tx-chart-4-foreground` | `on-color(theme.charts.categorical)` | AA foreground ink on categorical series color 4. |
 | `--tx-chart-5` | `theme.charts.categorical` | Categorical series color 5. |
+| `--tx-chart-5-foreground` | `on-color(theme.charts.categorical)` | AA foreground ink on categorical series color 5. |
 | `--tx-chart-6` | `theme.charts.categorical` | Categorical series color 6. |
+| `--tx-chart-6-foreground` | `on-color(theme.charts.categorical)` | AA foreground ink on categorical series color 6. |
 | `--tx-chart-7` | `theme.charts.categorical` | Categorical series color 7. |
+| `--tx-chart-7-foreground` | `on-color(theme.charts.categorical)` | AA foreground ink on categorical series color 7. |
 | `--tx-chart-8` | `theme.charts.categorical` | Categorical series color 8. |
+| `--tx-chart-8-foreground` | `on-color(theme.charts.categorical)` | AA foreground ink on categorical series color 8. |
 | `--tx-chart-sequential-1` | `theme.charts.sequential` | Sequential ramp step 1. |
 | `--tx-chart-sequential-2` | `theme.charts.sequential` | Sequential ramp step 2. |
 | `--tx-chart-sequential-3` | `theme.charts.sequential` | Sequential ramp step 3. |

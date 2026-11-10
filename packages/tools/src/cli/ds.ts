@@ -5,7 +5,7 @@
  * local MCP and the remote MCP give the same results:
  *
  *     texuli ds init <file> [--brand "<one-liner>"] [--id <id>] [--name <name>] [--locked [--preset all|minimal|<allow.json>]] [--overwrite]
- *     texuli ds validate <file> [--trust t] [--variant v] [--base <file>]... [--locked] [--prototype <dir>] [--catalog <file>] [--json] [--render] [--strict] [--report]
+ *     texuli ds validate <file> [--trust t] [--variant v] [--base <file>]... [--locked] [--prototype <dir>] [--catalog <file>] [--json] [--render [--url <page>] [--sheet <page.html>] [--known <file>] [--strict]] [--report]
  *     texuli ds compile <file> [--format f] [--mode m] [--variant v] [--base <file>]... [--out <path> [--overwrite]]
  *     texuli ds export <file> --format css|tailwind|dtcg|tokens-studio --out <path> [--selector s] [--dark d] [--overwrite]
  *     texuli ds preview <file> [--format svg|html] [--mode m] [--variant v] [--out <path> [--overwrite]]
@@ -73,7 +73,7 @@ export type DsCommand = (typeof DS_COMMANDS)[number];
 
 export const DS_USAGE = [
   'Usage: texuli ds init <file> [--brand "<one-liner>"] [--id <id>] [--name <name>] [--locked [--preset all|minimal|<allow.json>]] [--overwrite]',
-  '       texuli ds validate <file> [--trust developer|untrusted] [--variant <name>] [--base <file>]... [--locked] [--prototype <dir>] [--catalog <components.json>] [--json] [--render] [--strict] [--report]',
+  '       texuli ds validate <file> [--trust developer|untrusted] [--variant <name>] [--base <file>]... [--locked] [--prototype <dir>] [--catalog <components.json>] [--json] [--render [--url <page>] [--sheet builtin|<page.html>] [--known <file>] [--strict]] [--report]',
   '       texuli ds compile <file> [--format json|css|tailwind|dtcg|tokens-studio] [--mode light|dark] [--variant <name>] [--base <file>]... [--out <path> [--overwrite]]',
   '       texuli ds export <file> --format css|tailwind|dtcg|tokens-studio --out <path> [--selector <s>] [--dark class|attribute|media] [--overwrite]',
   '       texuli ds preview <file> [--format svg|html] [--mode light|dark] [--variant <name>] [--out <path> [--overwrite]]',
@@ -101,7 +101,7 @@ export interface DsCommandArgs {
 /** The value flags each command accepts (`--base` repeats and `--overwrite` takes none). */
 const FLAGS: Record<DsCommandArgs['command'], readonly string[]> = {
   init: ['brand', 'id', 'name', 'preset'],
-  validate: ['trust', 'variant', 'base', 'prototype', 'catalog'],
+  validate: ['trust', 'variant', 'base', 'prototype', 'catalog', 'url', 'sheet', 'known'],
   compile: ['format', 'mode', 'variant', 'trust', 'base', 'out', 'selector', 'dark'],
   export: ['format', 'mode', 'variant', 'trust', 'base', 'out', 'selector', 'dark'],
   preview: ['format', 'mode', 'variant', 'trust', 'base', 'out', 'title'],
@@ -232,6 +232,9 @@ export function parseDsArgs(
     throw new TypeError('Flag --report needs --locked.');
   if (name === 'validate' && parsed.flags.strict === 'true' && parsed.flags.render !== 'true')
     throw new TypeError('Flag --strict needs --render.');
+  for (const flag of ['url', 'sheet', 'known'])
+    if (name === 'validate' && parsed.flags[flag] !== undefined && parsed.flags.render !== 'true')
+      throw new TypeError(`Flag --${flag} needs --render.`);
   if (name === 'pack' && !parsed.flags.out) throw new TypeError('ds pack needs --out.');
   if (parsed.flags.preset !== undefined && !parsed.locked)
     throw new TypeError('Flag --preset needs --locked.');
@@ -245,6 +248,8 @@ export interface DsIo {
   stderr?: { write(chunk: string): unknown };
   /** Where files are read from relatively and written to (default the working directory). */
   cwd?: string;
+  /** How `--render` loads Playwright and axe (default: from the project in `cwd`); tests stub the browser here. */
+  load?: (specifier: string) => Promise<unknown>;
 }
 
 export type DsResult = { ok: true; out?: string } | { ok: false; error: string };
@@ -405,7 +410,7 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
   }
   if (args.command === 'help') {
     stdout.write(
-      `${DS_USAGE}\n\nAuthor and check design-system documents. Import, validate, compile, preview and diff print their operation JSON; --out writes the result through the local file policy. generate composes the available inputs and writes the document plus <out>.report.json; -o is its output shorthand. check is the conformance check (texuli ds check --help). Locked validation accepts --prototype <dir>, --catalog <components.json>, --json, and --render; --report lists findings and exits 0 for migration tracking.\nExit 0 valid or report-only, 1 refused/finding, 2 could not run. The check cannot prove who approved a document.\n`
+      `${DS_USAGE}\n\nAuthor and check design-system documents. Import, validate, compile, preview and diff print their operation JSON; --out writes the result through the local file policy. generate composes the available inputs and writes the document plus <out>.report.json; -o is its output shorthand. check is the conformance check (texuli ds check --help). Locked validation accepts --prototype <dir>, --catalog <components.json>, --json, and --render; with --locked, --render runs the locked render check (chart, map and canvas marks are exempt from the per-pixel color check, and a page you serve with --url, your prototype with @texuli/tools/ds-check/host installed, is mapped against the allow set: unmapped, not-allowed); --report lists findings and exits 0 for migration tracking.\nExit 0 valid or report-only, 1 refused/finding, 2 could not run. The check cannot prove who approved a document.\n`
     );
     return { ok: true };
   }
@@ -416,7 +421,7 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
   if (
     args.command === 'validate' &&
     (args.locked ||
-      ['catalog', 'json', 'render', 'strict', 'report', 'prototype'].some(
+      ['catalog', 'json', 'render', 'strict', 'report', 'prototype', 'url', 'sheet', 'known'].some(
         (flag) => args.flags[flag] !== undefined
       ))
   ) {
@@ -433,6 +438,11 @@ export async function runDs(argv: readonly string[], io: DsIo = {}): Promise<DsR
         ...(args.flags.prototype ? ['--prototype', resolve(cwd, args.flags.prototype)] : []),
         ...(args.flags.json === 'true' ? ['--json'] : []),
         ...(args.flags.render === 'true' ? ['--render'] : []),
+        ...(args.flags.url ? ['--url', args.flags.url] : []),
+        ...(args.flags.sheet
+          ? ['--sheet', args.flags.sheet === 'builtin' ? 'builtin' : resolve(cwd, args.flags.sheet)]
+          : []),
+        ...(args.flags.known ? ['--known', resolve(cwd, args.flags.known)] : []),
         ...(args.flags.strict === 'true' ? ['--strict'] : []),
         ...(args.flags.report === 'true' ? ['--report'] : []),
       ],

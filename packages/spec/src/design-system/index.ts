@@ -24,6 +24,7 @@ export {
 export {
   type DesignSystemRootAttributes,
   type DesignSystemRootAxes,
+  DS_COLOR_ATTRIBUTE,
   DS_COMPONENT_ATTRIBUTE,
   DS_DENSITY_ATTRIBUTE,
   DS_SIZE_ATTRIBUTE,

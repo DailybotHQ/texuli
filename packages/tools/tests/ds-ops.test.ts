@@ -116,6 +116,7 @@ describe('design-system operations', () => {
       const svg = await run('ds.preview', { document: MINIMAL_DESIGN_SYSTEM });
       await expect(svg.content).toMatchFileSnapshot('./__snapshots__/ds-preview-minimal.svg');
       const css = await run('ds.compile', { document: MINIMAL_DESIGN_SYSTEM, format: 'css' });
+      // The compiler now emits one contrast-checked foreground beside each categorical chart fill.
       await expect(css.content).toMatchFileSnapshot('./__snapshots__/ds-compile-minimal.css.txt');
       expect(svg.hash).toBe(css.hash);
       expect(svg.bytes).toBe(new TextEncoder().encode(svg.content).byteLength);
@@ -494,7 +495,7 @@ describe('blueprints and design systems', () => {
         format: 'texuli-blueprint',
         id: 'landing',
         status: 'draft',
-        spec: '0.13.0',
+        spec: '0.14.0',
         createdAt: '1970-01-01T00:00:00.000Z',
         designSystem: { ref: 'texuli:ocean' },
         tree: page,

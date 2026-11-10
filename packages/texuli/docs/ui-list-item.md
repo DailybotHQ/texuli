@@ -1,33 +1,34 @@
-# ListItem
+# List and ListItem
 
 **Package:** `texuli`  
-**Import:** `import { ListItem } from 'texuli/list-item'` (subpath only: the
-`texuli` root does not export it)  
+**Import:** `import { List, ListItem } from 'texuli/list-item'` (also from `texuli`)  
+**Catalog ids:** `list`, `list-item`  
 **Tests:** `packages/texuli/tests/display.test.ts` (`ListItem (UG-42)`),
+`packages/texuli/tests/protoyard-round3.test.ts`,
 `packages/texuli/tests/contract.test.ts`  
 **Example:** `texuli-list-item`  
-**Status:** new in `0.14.3`
+**Status:** ListItem since `0.14.3`; List and `divided` for locked prototypes since `0.16.0` (spec `0.14.0`)
 
 One row of a list: leading media or an icon, a title and a description,
 trailing meta text, and trailing controls. The row is a link (`href`), a
-button (`onSelect`) or plain text.
+button (`onSelect`) or plain text. `List` is the `<ul>` that holds the rows;
+`divided` draws a token hairline (`--tx-border`) between them.
 
 ## Markup
 
-`ListItem` renders an `li`, so it goes inside a list. Use
+`ListItem` renders an `li`, so it goes inside a list. `List` renders
 `<ul role="list" class="tx-list">`: `role="list"` keeps the list semantics
 that some browsers drop once `list-style: none` applies, and `tx-list`
-resets the list margin, padding and bullets (the class ships with the
-ListItem stylesheet).
+resets the list margin, padding and bullets.
 
 ```svelte
 <script lang="ts">
-  import { ListItem } from 'texuli/list-item';
+  import { List, ListItem } from 'texuli/list-item';
   import { Avatar } from 'texuli/avatar';
   import { IconButton } from 'texuli/button';
 </script>
 
-<ul role="list" class="tx-list" aria-label="Recent activity">
+<List divided aria-label="Recent activity">
   <ListItem
     title="Ada Example"
     description="Shared the launch checklist"
@@ -38,7 +39,7 @@ ListItem stylesheet).
     {#snippet trailing()}<IconButton label="More for Ada Example" size="sm">⋯</IconButton>{/snippet}
   </ListItem>
   <ListItem title="Mentions only" icon="check" onSelect={() => choose('mentions')} />
-</ul>
+</List>
 ```
 
 ## Props
@@ -58,7 +59,12 @@ ListItem stylesheet).
 | `current` | `boolean` | `false` | `aria-current="page"` on the link, with the hover fill. |
 | `onSelect` | `() => void` | — | Makes the row one `button type="button"` when there is no safe `href`. |
 | `disabled` | `boolean` | `false` | Disables the `onSelect` button. |
+| `divided` | `boolean` | `false` | Hairline under this row when it is not inside a divided `List`. |
 | `class`, `ref` | | | `ref` is the root `li` (bindable). |
+
+`List` takes `divided` (hairline between items; spacing still scales with
+`--tx-density`), `class`, `ref` (the `ul`) and `children` (the `ListItem`
+rows). Other attributes land on the `ul`.
 
 Other attributes (`id`, `aria-*`, `data-*`, `style`, handlers) land on the
 root `li`, as the component API contract requires.
@@ -74,5 +80,5 @@ root `li`, as the component API contract requires.
   (the layout uses logical properties).
 
 Not yet: no component tokens (`--tx-list-item-*`; planned with the next
-design-system spec minor) and no catalog manifest (planned; it waits for a
-spec minor because a catalog id changes the spec contract).
+design-system spec minor). Catalog ids `list` and `list-item` are in the
+0.13.0 catalog (`agentEmittable: false`).

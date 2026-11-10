@@ -4,17 +4,17 @@ Back to [`../SKILL.md`](../SKILL.md).
 
 ## A. Use the packages
 
-The packages are on npm in the 0.15 line, every one at `0.15.0`, a pre-1.0 line
+The packages are on npm in the 0.16 line, every one at `0.16.0`, a pre-1.0 line
 (`latest` points to the newest, and `next` is no longer maintained and stays on `0.12.1`; 1.0.0 will be the first stable release). An app outside a
 Texuli checkout installs them plainly, for example
-`pnpm add texuli @texuli/tokens`, and pins the exact version or `^0.15.0`
-(for 0.x it accepts only 0.15.x, since a new minor may break) (the developer
+`pnpm add texuli @texuli/tokens`, and pins the exact version or `^0.16.0`
+(for 0.x it accepts only 0.16.x, since a new minor may break) (the developer
 runs the install; it uses the network). `@texuli/drag`,
 `@texuli/workflows`, `@texuli/deck`, `@texuli/slides`, `@texuli/editor` (first published
 in `0.5.0`), `@texuli/document` and `@texuli/pages` (both first published
 in `0.7.0`), `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (all
 three first published in `0.8.0`) and `@texuli/mcp` (first published in
-`0.9.0`) are in development and on npm as `0.15.0`.
+`0.9.0`) are in development and on npm as `0.16.0`.
 
 New in `0.13.1` (an additive patch): `@texuli/blocks/code-field` (`CodeField`),
 `registerIcons` and `IconsProvider` in `texuli/icons`, `srcDark` and
@@ -87,6 +87,21 @@ New in `0.14.2` (a patch; an app that uses these pins `^0.14.2`):
 - Not in the agent catalog yet: `initialDate`, `Select` `block` and
   `ghost`, the `IconButton` badge.
 
+New in `0.16.0` (a `0.x` minor with no breaking API change; pin `^0.16.0`,
+since `^0.15.0` never picks it up):
+
+- Released: `texuli/ds-kit`, `texuli ds generate` and the importers,
+  `ds validate`, `ds check --locked` (`--report`, and `--render` with
+  `--url` for a page you serve), portable bundles
+  (`ds pack`, `ds unpack`), the contract schemas and `checkBlueprintAllow`.
+- Blueprint spec `0.14.0`: the label palette, a `color` axis (`none`,
+  `chart-1` to `chart-8`, each with an AA-gated ink from the theme) on `Avatar`,
+  `Badge` and `Tag`, and `allow` `colors`.
+- `VirtualListView` (`@texuli/data/virtual-list`); `Mark`, `Link` and
+  `ColorSwatch` (`texuli/typography`); `List` (`texuli/list-item`); `Box`
+  `fill`, soft tones, `canvas`, `dashed`; `Input` and `Textarea`
+  `appearance="plain"` and `textSize`; `NumberField` `commit`.
+
 New in `0.15.0` (a `0.x` minor with no breaking API change; pin `^0.15.0`,
 since `^0.14.0` never picks it up):
 
@@ -99,9 +114,8 @@ since `^0.14.0` never picks it up):
 - `texuli/typography`: `Heading`, `Text`, `Prose` and `Box`.
 - `Button` and `IconButton` take `tone` (`default`, `destructive`,
   `success`, `warning`), independent of `variant`.
-- In development (completed in `0.16.0`): `texuli/ds-kit`, `ds generate`
-  and the importers, the locked checkers, portable bundles (`ds pack`,
-  `ds unpack`) and the contract schemas.
+- In development then (released in `0.16.0`): the kit, `ds generate`, the
+  locked checkers, bundles and the contract schemas.
 
 New in `0.14.4` (a patch; pin `^0.14.4`): `TimelineView` holds its opening
 day as rows load after mount and as the zoom changes, until the reader

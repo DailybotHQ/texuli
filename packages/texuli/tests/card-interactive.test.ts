@@ -125,6 +125,30 @@ describe('interactive Card', () => {
     ).toBe(true);
   });
 
+  it('names the stretched link from card content when linkLabel is omitted', () => {
+    render(Card, {
+      props: { href: 'https://example.com/item', children: text('Harbor dock') },
+    });
+    expect(screen.getByRole('link', { name: 'Harbor dock' }).getAttribute('href')).toBe(
+      'https://example.com/item'
+    );
+  });
+
+  it('names the overlay link from card content when actions exist and linkLabel is omitted', () => {
+    const view = render(Card, {
+      props: {
+        href: 'https://example.com/item',
+        children: text('Harbor dock'),
+        actions,
+      },
+    });
+    const link = screen.getByRole('link', { name: 'Harbor dock' });
+    const pin = view.container.querySelector('[data-card-action="pin"]') as HTMLButtonElement;
+    expect(link.getAttribute('href')).toBe('https://example.com/item');
+    expect(link.contains(pin)).toBe(false);
+    expect(link.getAttribute('aria-labelledby')).toBeTruthy();
+  });
+
   it('announces one named primary link and named actions (axe)', async () => {
     const { container } = render(Card, {
       props: {

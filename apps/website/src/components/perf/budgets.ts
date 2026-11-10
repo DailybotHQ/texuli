@@ -246,8 +246,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/web-and-native/',
     reason:
-      'The architecture page mounts five sections — the layer diagrams, the correlation demo, the portability walk and the parity table (PLAN_006 T-52): measured 24.8 KB gzip, limit 26. PLAN_007: the layer diagrams gained @texuli/drag and @texuli/workflows and the nav three links, measured 96.4 KB page (+4% headroom). PLAN_010: the layer diagrams gained @texuli/document and @texuli/pages and the nav the motion link, measured 100.9 KB page, limit 105 (+4% headroom). PLAN_010 wave 6 (@texuli/sheets in the layer diagrams, the canvas and forms nav links): measured 26.4 KB HTML gzip, limit 27.5 (+4% headroom). PLAN_010 T-site-080 (the catalog and tools rows follow the f9809246 architecture table; the nav gained the sheets, dashboards, output and What’s new links): measured 106.4 KB page, limit 111 (+4% headroom). PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (base.css system defaults plus one-fallback reads); CI measured 27.6 KB HTML gzip; 109.6 KB page (+4% headroom). PLAN_013 T-ship (2026-11-01): the parity table gained the Data views row and the native rows their chart and data counts; CI on Linux measured 29 KB HTML gzip, limit 30.2 (+4% headroom). PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (34.8 KB of WebP on open, logo included); measured 123.6 KB page, limit 129 (+4% headroom).',
-    budget: { htmlGzipKb: 30.2, pageGzipKb: 129 },
+      'The architecture page mounts five sections — the layer diagrams, the correlation demo, the portability walk and the parity table (PLAN_006 T-52): measured 24.8 KB gzip, limit 26. PLAN_007: the layer diagrams gained @texuli/drag and @texuli/workflows and the nav three links, measured 96.4 KB page (+4% headroom). PLAN_010: the layer diagrams gained @texuli/document and @texuli/pages and the nav the motion link, measured 100.9 KB page, limit 105 (+4% headroom). PLAN_010 wave 6 (@texuli/sheets in the layer diagrams, the canvas and forms nav links): measured 26.4 KB HTML gzip, limit 27.5 (+4% headroom). PLAN_010 T-site-080 (the catalog and tools rows follow the f9809246 architecture table; the nav gained the sheets, dashboards, output and What’s new links): measured 106.4 KB page, limit 111 (+4% headroom). PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (base.css system defaults plus one-fallback reads); CI measured 27.6 KB HTML gzip; 109.6 KB page (+4% headroom). PLAN_013 T-ship (2026-11-01): the parity table gained the Data views row and the native rows their chart and data counts; CI on Linux measured 29 KB HTML gzip, limit 30.2 (+4% headroom). PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (34.8 KB of WebP on open, logo included); measured 123.6 KB page, limit 129 (+4% headroom). 0.16.0 (2026-11-09): pageGzipKb measured 129.2 KB, limit +4%.',
+    budget: { htmlGzipKb: 30.2, pageGzipKb: 135 },
   },
   {
     route: '/gallery-themes/',
@@ -327,26 +327,26 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/design-systems/',
     reason:
-      "PLAN_011 T-site-0100: the design systems hub, static (no island, only the site shell's JavaScript, 62.8 KB): twelve server-rendered brand scopes (three example brands on four surfaces) built from real Texuli components, so the page carries their CSS (26.9 KB gzip of CSS with the 4.7 KB build-time brands.css) and 17.9 KB gzip of HTML. Measured 2026-10-31: 108.7 KB page, limit 113.1 (measured + 4%). PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (48.4 KB of WebP on open, logo included); measured 134.4 KB page, limit 140 (+4% headroom).",
-    budget: { pageGzipKb: 140 },
+      "PLAN_011 T-site-0100: the design systems hub, static (no island, only the site shell's JavaScript, 62.8 KB): twelve server-rendered brand scopes (three example brands on four surfaces) built from real Texuli components, so the page carries their CSS (26.9 KB gzip of CSS with the 4.7 KB build-time brands.css) and 17.9 KB gzip of HTML. Measured 2026-10-31: 108.7 KB page, limit 113.1 (measured + 4%). PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (48.4 KB of WebP on open, logo included); measured 134.4 KB page, limit 140 (+4% headroom). 0.16.0 (2026-11-09): the shared component chunks grew with round 4 and the category ink; measured 140.1 KB page, limit 146 (+4%).",
+    budget: { pageGzipKb: 146 },
   },
   {
     route: '/design-systems/kit/',
     reason:
-      "PLAN_016 T-t4-site: the design-system kit (texuli/ds-kit) for the example brand Ledgerline, server-rendered and hydrated when visible: the HTML carries the kit (foundations tables in light and dark, voice, matrix, library) and the island's build-time props (the compiled variables and report, the allow manifest and a trimmed catalog). Measured 2026-11-09: 414.0 KB raw and 35.5 KB gzip of HTML; after hydration and the matrix's lazy samples, 169.8 KB page and 106.8 KB JavaScript (+4% headroom).",
-    budget: { pageGzipKb: 177, jsGzipKb: 112, htmlGzipKb: 37, htmlRawKb: 431 },
+      "PLAN_016 T-t4-site: the design-system kit (texuli/ds-kit) for the example brand Ledgerline, server-rendered and hydrated when visible: the HTML carries the kit (foundations tables in light and dark, voice, matrix, library) and the island's build-time props (the compiled variables and report, the allow manifest and a trimmed catalog). Measured 2026-11-09: 414.0 KB raw and 35.5 KB gzip of HTML; after hydration and the matrix's lazy samples, 169.8 KB page and 106.8 KB JavaScript (+4% headroom). 0.16.0 (2026-11-09): the kit gained the 0.16.0 matrix values; htmlRawKb measured 433.2 KB, limit +4%.",
+    budget: { pageGzipKb: 177, jsGzipKb: 112, htmlGzipKb: 37, htmlRawKb: 451 },
   },
   {
     route: '/solutions/',
     reason:
-      'Static Solution catalog cap derived from the comparable static catalog at /design-systems/ (140 KB page).',
-    budget: { pageGzipKb: 140 },
+      'Static Solution catalog cap derived from the comparable static catalog at /design-systems/ (146 KB page since 0.16.0).',
+    budget: { pageGzipKb: 146 },
   },
   {
     route: '/built-with/',
     reason:
-      'Static product catalog cap derived from the comparable static catalog at /design-systems/ (140 KB page).',
-    budget: { pageGzipKb: 140 },
+      'Static product catalog cap derived from the comparable static catalog at /design-systems/ (146 KB page since 0.16.0).',
+    budget: { pageGzipKb: 146 },
   },
   {
     route: '/native/',
@@ -386,8 +386,9 @@ export const ROUTE_PREFIX_BUDGETS: readonly PrefixBudgetOverride[] = Object.free
   {
     prefix: '/built-with/',
     label: '/built-with/<slug>/',
-    reason: 'Static product pages use the comparable /design-systems/ catalog cap (140 KB page).',
-    budget: { pageGzipKb: 140 },
+    reason:
+      'Static product pages use the comparable /design-systems/ catalog cap (146 KB page since 0.16.0).',
+    budget: { pageGzipKb: 146 },
   },
   {
     prefix: '/guides/solutions/',

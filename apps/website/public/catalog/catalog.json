@@ -301,7 +301,7 @@
         "Image URLs pass the untrusted image policy."
       ],
       "agentEmittable": false,
-      "axes": { "size": "size" },
+      "axes": { "color": "color", "size": "size" },
       "dontUseWhen": ["A group of faces in one circle (use avatar-group-grid)"],
       "emit": [],
       "examples": [
@@ -353,6 +353,22 @@
           "enumValues": ["primary", "success", "warning", "destructive", "info", "neutral"],
           "kind": "enum",
           "name": "tone"
+        },
+        {
+          "default": "none",
+          "enumValues": [
+            "none",
+            "chart-1",
+            "chart-2",
+            "chart-3",
+            "chart-4",
+            "chart-5",
+            "chart-6",
+            "chart-7",
+            "chart-8"
+          ],
+          "kind": "enum",
+          "name": "color"
         },
         { "enumValues": ["circle", "square"], "kind": "enum", "name": "shape" },
         { "enumValues": ["online", "away", "busy", "offline"], "kind": "enum", "name": "status" },
@@ -411,7 +427,7 @@
         "In a catalog tree, set label (or put the word in an inline-text child)."
       ],
       "agentEmittable": false,
-      "axes": { "variant": "variant" },
+      "axes": { "color": "color", "variant": "variant" },
       "dontUseWhen": ["A removable filter (use tag)", "A toggleable filter chip (use chip)"],
       "emit": [],
       "examples": [
@@ -445,6 +461,22 @@
           ],
           "kind": "enum",
           "name": "variant"
+        },
+        {
+          "default": "none",
+          "enumValues": [
+            "none",
+            "chart-1",
+            "chart-2",
+            "chart-3",
+            "chart-4",
+            "chart-5",
+            "chart-6",
+            "chart-7",
+            "chart-8"
+          ],
+          "kind": "enum",
+          "name": "color"
         },
         {
           "description": "Plain-text badge word, escaped; replaces children when both are given",
@@ -1063,7 +1095,7 @@
     {
       "a11y": "Not interactive. Use as=\"section\" or \"aside\" with a heading for a landmark-like region.",
       "agentEmittable": false,
-      "axes": { "variant": "surface" },
+      "axes": { "tone": "fill", "variant": "surface" },
       "dontUseWhen": ["A clickable surface (use card with href)", "Page layout (use a layout)"],
       "emit": [],
       "examples": [
@@ -1094,6 +1126,11 @@
           "title": "Brand logo tile"
         },
         {
+          "id": "page-canvas",
+          "props": { "as": "div", "padding": "lg", "radius": "none", "surface": "canvas" },
+          "title": "Page canvas"
+        },
+        {
           "id": "sticky-header",
           "props": {
             "as": "header",
@@ -1103,13 +1140,28 @@
             "surface": "translucent"
           },
           "title": "Translucent sticky header"
+        },
+        {
+          "id": "dashed",
+          "props": { "border": "dashed", "padding": "md", "surface": "default" },
+          "title": "Dashed panel"
         }
       ],
       "group": "display",
       "id": "box",
       "imports": [
         {
-          "exports": ["Box", "BoxBorder", "BoxElevation", "BoxPadding", "BoxRadius", "BoxSurface"],
+          "exports": [
+            "Box",
+            "BoxBorder",
+            "BoxElevation",
+            "BoxPadding",
+            "BoxRadius",
+            "BoxSurface",
+            "BOX_FILLS",
+            "BOX_SURFACES",
+            "ColorRef"
+          ],
           "module": "texuli"
         },
         {
@@ -1124,6 +1176,8 @@
             "BoxBorder",
             "BoxElement",
             "BoxElevation",
+            "BOX_FILLS",
+            "ColorRef",
             "BoxPadding",
             "BoxRadius",
             "BoxSurface",
@@ -1155,8 +1209,17 @@
         },
         {
           "default": "none",
-          "description": "All sides, or one logical side (block-start, block-end) for an app header or footer",
-          "enumValues": ["none", "default", "strong", "block-start", "block-end"],
+          "description": "All sides, one logical side (block-start, block-end, inline-start, inline-end), or dashed",
+          "enumValues": [
+            "none",
+            "default",
+            "strong",
+            "block-start",
+            "block-end",
+            "inline-start",
+            "inline-end",
+            "dashed"
+          ],
           "kind": "enum",
           "name": "border"
         },
@@ -1168,25 +1231,55 @@
         },
         {
           "default": "transparent",
-          "description": "The fill (the variant axis): primary is the solid primary with its on-color, brand the soft primary tint, translucent the glass opacity and blur for sticky headers",
+          "description": "The surface (the variant axis): primary is solid, the semantic tones and primary-soft use soft token fills with AA ink, and translucent is glass for sticky headers",
           "enumValues": [
             "transparent",
             "default",
             "muted",
             "subtle",
             "elevated",
+            "canvas",
             "primary",
             "brand",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "primary-soft",
             "translucent"
           ],
           "kind": "enum",
           "name": "surface"
         },
+        {
+          "default": "none",
+          "description": "Optional closed token reference (chart-1 through chart-8 or a semantic color role); never a CSS color or arbitrary value",
+          "enumValues": [
+            "none",
+            "chart-1",
+            "chart-2",
+            "chart-3",
+            "chart-4",
+            "chart-5",
+            "chart-6",
+            "chart-7",
+            "chart-8",
+            "primary",
+            "secondary",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ],
+          "kind": "enum",
+          "name": "fill"
+        },
         { "kind": "string", "name": "class" },
         { "description": "The panel content", "kind": "slot", "name": "children" }
       ],
       "related": ["card", "heading", "text"],
-      "summary": "A panel or region with padding, radius, border, elevation and surface from tokens.",
+      "summary": "A panel or region with layout options and token-based surface or color-reference fill.",
       "tier": "app",
       "useWhen": [
         "Frame a group of content as a bordered or filled panel",
@@ -3015,6 +3108,75 @@
       "summary": "An editable, syntax-highlighted code textarea.",
       "tier": "app",
       "useWhen": ["Edit a snippet or query"]
+    },
+    {
+      "a11y": "Pair the fill with a text label; never convey the color by fill alone.",
+      "agentEmittable": false,
+      "axes": { "color": "color", "size": "size" },
+      "dontUseWhen": [
+        "A status label (use badge)",
+        "A long-form color name in a sentence (use text)"
+      ],
+      "emit": [],
+      "examples": [
+        {
+          "id": "primary",
+          "props": { "color": "primary", "label": "Primary" },
+          "title": "Primary swatch"
+        },
+        {
+          "id": "series",
+          "props": { "color": "chart-1", "label": "North", "size": "md" },
+          "title": "Chart series"
+        }
+      ],
+      "group": "display",
+      "id": "color-swatch",
+      "imports": [
+        {
+          "exports": ["COLOR_SWATCH_SIZES", "ColorSwatch", "ColorSwatchSize"],
+          "module": "texuli/typography"
+        }
+      ],
+      "label": "Color swatch",
+      "package": "texuli",
+      "props": [
+        {
+          "default": "primary",
+          "description": "Closed color reference (chart-1…8 or a role token)",
+          "enumValues": [
+            "chart-1",
+            "chart-2",
+            "chart-3",
+            "chart-4",
+            "chart-5",
+            "chart-6",
+            "chart-7",
+            "chart-8",
+            "primary",
+            "secondary",
+            "success",
+            "warning",
+            "destructive",
+            "info",
+            "neutral"
+          ],
+          "kind": "enum",
+          "name": "color"
+        },
+        { "default": "md", "enumValues": ["sm", "md", "lg"], "kind": "enum", "name": "size" },
+        { "description": "Plain-text label, escaped", "kind": "string", "name": "label" },
+        { "kind": "string", "name": "class" },
+        {
+          "description": "Rich label content; replaced by a non-empty label",
+          "kind": "slot",
+          "name": "children"
+        }
+      ],
+      "related": ["badge", "box", "text"],
+      "summary": "A chip of a closed palette, role or data-viz color with contrast ink from tokens. Never free CSS.",
+      "tier": "app",
+      "useWhen": ["Show a named token or series color in a legend, key or palette"]
     },
     {
       "a11y": [
@@ -5086,6 +5248,117 @@
     },
     {
       "a11y": [
+        "A WAI-ARIA listbox with one tab stop; aria-activedescendant names the active row",
+        "Every row carries aria-setsize and aria-posinset, so its position in the full list is announced",
+        "Arrow keys, Home, End, Page Up and Page Down move; Enter, Space or a click selects"
+      ],
+      "agentEmittable": false,
+      "axes": { "density": "density", "size": "size" },
+      "bindable": ["selected"],
+      "dontUseWhen": [
+        "Rows with columns: use data-grid",
+        "A short list: use list",
+        "Rows with their own buttons or links: a listbox option holds no controls"
+      ],
+      "emit": [],
+      "events": ["select"],
+      "examples": [
+        {
+          "id": "feed",
+          "props": {
+            "items": [
+              {
+                "description": "Docs team, example.com",
+                "id": "u1",
+                "label": "Release notes drafted"
+              },
+              { "id": "u2", "label": "Onboarding flow reviewed" },
+              {
+                "description": "Planning, example.com",
+                "id": "u3",
+                "label": "Quarterly plan shared"
+              }
+            ],
+            "label": "Team feed"
+          },
+          "title": "Team feed"
+        }
+      ],
+      "group": "data",
+      "id": "data-virtual-list",
+      "imports": [
+        { "exports": ["VirtualListView"], "module": "@texuli/data" },
+        { "exports": ["VirtualListView"], "module": "@texuli/data/virtual-list" }
+      ],
+      "label": "Virtual list view",
+      "package": "@texuli/data",
+      "props": [
+        {
+          "description": "Accessible name of the view.",
+          "kind": "string",
+          "name": "label",
+          "required": true,
+          "trust": "untrusted"
+        },
+        {
+          "description": "The rows; a row snippet in host code may render any item shape.",
+          "kind": "array",
+          "name": "items",
+          "required": true,
+          "schema": {
+            "items": {
+              "properties": {
+                "description": { "maxLength": 400, "type": "string" },
+                "id": { "maxLength": 64, "minLength": 1, "type": "string" },
+                "label": { "maxLength": 200, "type": "string" }
+              },
+              "required": ["id", "label"],
+              "type": "object"
+            },
+            "maxItems": 500,
+            "type": "array"
+          }
+        },
+        {
+          "default": "md",
+          "description": "Viewport height: sm, md or lg, or fill to take the parent height.",
+          "enumValues": ["sm", "md", "lg", "fill"],
+          "kind": "enum",
+          "name": "size"
+        },
+        {
+          "default": "default",
+          "enumValues": ["compact", "default", "comfortable"],
+          "kind": "enum",
+          "name": "density"
+        },
+        {
+          "default": 40,
+          "description": "Row height in px used until a row has been measured.",
+          "kind": "number",
+          "name": "estimateSize"
+        },
+        {
+          "default": 3,
+          "description": "Rows rendered before and after the viewport (at most 50).",
+          "kind": "number",
+          "name": "overscan"
+        },
+        { "description": "The selected row id.", "kind": "string", "name": "selected" },
+        { "default": "No items", "kind": "string", "name": "emptyLabel", "trust": "untrusted" }
+      ],
+      "related": ["data-grid", "data-notification-inbox"],
+      "sourceable": ["items"],
+      "states": ["hover", "focus-visible", "active", "selected"],
+      "summary": "A windowed list of any length: only the visible rows are in the page, measured as they render, and each is announced with its position.",
+      "tier": "content",
+      "useWhen": [
+        "Show a long feed, log or result list (hundreds to tens of thousands of rows)",
+        "Let people pick one row from a long list by keyboard"
+      ]
+    },
+    {
+      "a11y": [
         "Structure is semantic regions the host maps to real layout components",
         "No HTML strings; children are nested catalog nodes"
       ],
@@ -6051,6 +6324,11 @@
             "tracking": "tight"
           },
           "title": "Responsive hero title"
+        },
+        {
+          "id": "card-title",
+          "props": { "label": "Open tasks", "level": 3, "size": "xs" },
+          "title": "Small card title"
         }
       ],
       "group": "display",
@@ -6088,8 +6366,8 @@
         },
         {
           "default": "lg",
-          "description": "Visual size, independent of the level (default from the level: 1 xl, 2 lg, 3 md, 4–6 sm); 2xl, 3xl and 4xl are hero and section titles between xl and display",
-          "enumValues": ["display", "4xl", "3xl", "2xl", "xl", "lg", "md", "sm"],
+          "description": "Visual size, independent of the level (default from the level: 1 xl, 2 lg, 3 md, 4–6 sm); xs is ~0.875rem for small card titles; 2xl–4xl sit between xl and display",
+          "enumValues": ["display", "4xl", "3xl", "2xl", "xl", "lg", "md", "sm", "xs"],
           "kind": "enum",
           "name": "size"
         },
@@ -6402,6 +6680,7 @@
         "Clear control has an accessible name when clearable"
       ],
       "agentEmittable": false,
+      "axes": { "size": "textSize", "variant": "appearance" },
       "dontUseWhen": [
         "Multi-line text (use textarea)",
         "A labeled field with description and error (wrap in field)"
@@ -6409,7 +6688,12 @@
       "emit": [],
       "examples": [
         { "id": "text", "props": { "clearable": true, "type": "text" }, "title": "Text input" },
-        { "id": "email", "props": { "type": "email" }, "title": "Email input" }
+        { "id": "email", "props": { "type": "email" }, "title": "Email input" },
+        {
+          "id": "inline-title",
+          "props": { "appearance": "plain", "textSize": "xl" },
+          "title": "Inline-edit title"
+        }
       ],
       "group": "forms",
       "id": "input",
@@ -6434,6 +6718,20 @@
         { "default": false, "kind": "boolean", "name": "readonly" },
         { "kind": "event", "name": "onValueChange" },
         { "kind": "event", "name": "onClear" },
+        {
+          "default": "default",
+          "description": "plain drops the control chrome for inline-edit text; focus stays visible",
+          "enumValues": ["default", "plain"],
+          "kind": "enum",
+          "name": "appearance"
+        },
+        {
+          "default": "control",
+          "description": "control (form-control size) or a type-scale size for inline-edit titles and bodies",
+          "enumValues": ["control", "xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl", "display"],
+          "kind": "enum",
+          "name": "textSize"
+        },
         { "kind": "string", "name": "class" }
       ],
       "related": ["input-group", "textarea", "field", "text-counter"],
@@ -7605,6 +7903,103 @@
       "useWhen": ["Multi-step setup and onboarding"]
     },
     {
+      "a11y": [
+        "Renders one real link that wraps in the line",
+        "http(s) destinations, external, and target=_blank add rel=noopener noreferrer",
+        "A refused href renders as text, never a dead link"
+      ],
+      "agentEmittable": false,
+      "dontUseWhen": [
+        "A button-shaped control (use button with href)",
+        "A whole card (use card with href)"
+      ],
+      "emit": [],
+      "examples": [
+        {
+          "id": "inline",
+          "props": { "href": "https://example.com/guide", "label": "the harbor guide" },
+          "title": "Inline sentence link"
+        },
+        {
+          "id": "external",
+          "props": { "external": true, "href": "https://example.com/docs", "label": "Docs" },
+          "title": "External link"
+        }
+      ],
+      "group": "display",
+      "id": "link",
+      "imports": [{ "exports": ["Link"], "module": "texuli/typography" }],
+      "label": "Link",
+      "package": "texuli",
+      "props": [
+        {
+          "description": "Destination (URL policy)",
+          "kind": "string",
+          "name": "href",
+          "required": true,
+          "trust": "developer"
+        },
+        {
+          "default": "developer",
+          "enumValues": ["developer", "untrusted"],
+          "kind": "enum",
+          "name": "hrefTrust"
+        },
+        {
+          "default": false,
+          "description": "Adds rel=noopener noreferrer (also added for http(s) and target=_blank)",
+          "kind": "boolean",
+          "name": "external"
+        },
+        {
+          "description": "Link target; _blank always adds noopener noreferrer",
+          "kind": "string",
+          "name": "target"
+        },
+        {
+          "description": "Extra rel tokens; noopener/noreferrer are merged when needed",
+          "kind": "string",
+          "name": "rel"
+        },
+        { "description": "Plain-text label, escaped", "kind": "string", "name": "label" },
+        { "kind": "string", "name": "class" },
+        {
+          "description": "Rich link text; replaced by a non-empty label",
+          "kind": "slot",
+          "name": "children"
+        }
+      ],
+      "related": ["button", "prose", "text"],
+      "states": ["hover", "focus-visible"],
+      "summary": "An inline sentence link. Underline and color come from link tokens; href is filtered by the URL policy.",
+      "tier": "app",
+      "useWhen": ["A word or phrase inside a sentence that navigates"]
+    },
+    {
+      "a11y": "A ul of listitems. Dividers are decorative.",
+      "agentEmittable": false,
+      "dontUseWhen": ["A data table (use table)", "Prose lists (use prose)"],
+      "emit": [],
+      "examples": [{ "id": "inbox", "props": { "divided": true }, "title": "Divided inbox" }],
+      "group": "display",
+      "id": "list",
+      "imports": [
+        { "exports": ["List"], "module": "texuli" },
+        { "exports": ["List"], "module": "texuli/list-item" }
+      ],
+      "label": "List",
+      "package": "texuli",
+      "props": [
+        { "default": false, "kind": "boolean", "name": "divided" },
+        { "kind": "string", "name": "class" },
+        { "description": "ListItem rows", "kind": "slot", "name": "children" }
+      ],
+      "related": ["list-item"],
+      "summary": "A list of ListItem rows; divided draws a token hairline between them.",
+      "tier": "app",
+      "useWhen": ["A stack of settings, inbox or navigation rows"]
+    },
+    {
       "a11y": "A listitem; with href it is a link, with onSelect a button. Trailing controls sit outside the main control.",
       "agentEmittable": false,
       "dontUseWhen": ["A data table (use table)", "A kanban card (use data-board)"],
@@ -7623,7 +8018,10 @@
       ],
       "group": "display",
       "id": "list-item",
-      "imports": [{ "exports": ["ListItem"], "module": "texuli/list-item" }],
+      "imports": [
+        { "exports": ["ListItem"], "module": "texuli" },
+        { "exports": ["ListItem"], "module": "texuli/list-item" }
+      ],
       "label": "ListItem",
       "package": "texuli",
       "props": [
@@ -7640,13 +8038,59 @@
         },
         { "default": false, "kind": "boolean", "name": "current" },
         { "default": false, "kind": "boolean", "name": "disabled" },
+        {
+          "default": false,
+          "description": "Hairline under this row",
+          "kind": "boolean",
+          "name": "divided"
+        },
         { "kind": "string", "name": "class" }
       ],
-      "related": ["icon", "avatar"],
+      "related": ["icon", "avatar", "list"],
       "states": ["hover", "focus-visible", "disabled", "selected"],
       "summary": "A list row with a title, optional description, icon and trailing meta.",
       "tier": "app",
       "useWhen": ["A settings row, an inbox row, or a navigation list of links"]
+    },
+    {
+      "a11y": "A real mark element; the words still say the match. Forced colors use Highlight.",
+      "agentEmittable": false,
+      "axes": { "tone": "tone" },
+      "dontUseWhen": ["A status badge (use badge)", "Struck text (use text strikethrough)"],
+      "emit": [],
+      "examples": [
+        {
+          "id": "search",
+          "props": { "label": "quarter", "tone": "warning" },
+          "title": "Search hit"
+        }
+      ],
+      "group": "display",
+      "id": "mark",
+      "imports": [
+        { "exports": ["Mark", "MarkTone"], "module": "texuli" },
+        {
+          "exports": ["MARK_TONES", "Mark", "MarkTone", "markClass"],
+          "module": "texuli/typography"
+        }
+      ],
+      "label": "Mark",
+      "package": "texuli",
+      "props": [
+        {
+          "default": "warning",
+          "enumValues": ["warning", "primary", "success", "info"],
+          "kind": "enum",
+          "name": "tone"
+        },
+        { "description": "Plain text, escaped", "kind": "string", "name": "label" },
+        { "kind": "string", "name": "class" },
+        { "kind": "slot", "name": "children" }
+      ],
+      "related": ["text", "heading"],
+      "summary": "An inline highlight for search results, from role soft tokens.",
+      "tier": "app",
+      "useWhen": ["Highlight a search match inside a title or body"]
     },
     {
       "a11y": [
@@ -8288,6 +8732,13 @@
           "enumValues": ["input", "output"],
           "kind": "enum",
           "name": "display"
+        },
+        {
+          "default": "enter",
+          "description": "When typed text commits: Enter and blur, blur only, or every keystroke",
+          "enumValues": ["enter", "blur", "input"],
+          "kind": "enum",
+          "name": "commit"
         },
         { "kind": "event", "name": "onValueChange" },
         { "kind": "string", "name": "class" }
@@ -9941,7 +10392,7 @@
     {
       "a11y": "Remove control has an accessible name; pending remove is disabled.",
       "agentEmittable": false,
-      "axes": { "variant": "variant" },
+      "axes": { "color": "color", "variant": "variant" },
       "dontUseWhen": ["Static status (use badge)", "A pressed filter control (use chip)"],
       "emit": [],
       "examples": [
@@ -9975,6 +10426,22 @@
           ],
           "kind": "enum",
           "name": "variant"
+        },
+        {
+          "default": "none",
+          "enumValues": [
+            "none",
+            "chart-1",
+            "chart-2",
+            "chart-3",
+            "chart-4",
+            "chart-5",
+            "chart-6",
+            "chart-7",
+            "chart-8"
+          ],
+          "kind": "enum",
+          "name": "color"
         },
         { "default": "Remove", "kind": "string", "name": "removeLabel" },
         { "description": "Called when remove is activated", "kind": "event", "name": "onRemove" },
@@ -10078,6 +10545,11 @@
             "weight": "semibold"
           },
           "title": "Nested text that inherits"
+        },
+        {
+          "id": "struck",
+          "props": { "as": "span", "label": "$48", "strikethrough": true, "tone": "muted" },
+          "title": "Struck price"
         }
       ],
       "group": "display",
@@ -10189,6 +10661,13 @@
           "kind": "enum",
           "name": "tracking"
         },
+        { "default": false, "kind": "boolean", "name": "italic" },
+        {
+          "default": false,
+          "description": "Line-through",
+          "kind": "boolean",
+          "name": "strikethrough"
+        },
         {
           "description": "With as=\"label\": the id of the labelled control",
           "kind": "string",
@@ -10202,7 +10681,7 @@
         { "kind": "string", "name": "class" },
         { "description": "The text", "kind": "slot", "name": "children" }
       ],
-      "related": ["heading", "prose", "inline-text"],
+      "related": ["heading", "prose", "inline-text", "mark"],
       "summary": "Body copy, labels and small print with a size, tone and weight from the design system.",
       "tier": "app",
       "useWhen": [
@@ -10264,6 +10743,7 @@
     {
       "a11y": "Pair with Field or an external label; autosize disables manual resize.",
       "agentEmittable": false,
+      "axes": { "size": "textSize", "variant": "appearance" },
       "dontUseWhen": ["A single-line value (use input)"],
       "emit": [],
       "examples": [
@@ -10285,6 +10765,20 @@
         { "default": false, "kind": "boolean", "name": "readonly" },
         { "default": 3, "kind": "number", "name": "rows" },
         { "kind": "event", "name": "onValueChange" },
+        {
+          "default": "default",
+          "description": "plain drops the control chrome for inline-edit text; focus stays visible",
+          "enumValues": ["default", "plain"],
+          "kind": "enum",
+          "name": "appearance"
+        },
+        {
+          "default": "control",
+          "description": "control (form-control size) or a type-scale size for inline-edit titles and bodies",
+          "enumValues": ["control", "xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl", "display"],
+          "kind": "enum",
+          "name": "textSize"
+        },
         { "kind": "string", "name": "class" }
       ],
       "related": ["input", "text-counter", "field"],
@@ -10825,7 +11319,8 @@
       "data-map",
       "data-notification-inbox",
       "data-timeline",
-      "data-tree-view"
+      "data-tree-view",
+      "data-virtual-list"
     ],
     "display": [
       "accordion",
@@ -10840,6 +11335,7 @@
       "carousel",
       "chip",
       "code",
+      "color-swatch",
       "empty-state",
       "error-state",
       "heading",
@@ -10847,7 +11343,10 @@
       "inline-text",
       "kbd",
       "kpi",
+      "link",
+      "list",
       "list-item",
+      "mark",
       "progress",
       "prose",
       "separator",

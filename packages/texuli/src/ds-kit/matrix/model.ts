@@ -12,12 +12,13 @@ import type { KitAllowManifest, KitAxis, KitCatalog, KitState } from '../shared/
 /** The axes in render order and the allow list each reads. */
 export const MATRIX_AXES: readonly (readonly [
   KitAxis,
-  'variants' | 'sizes' | 'tones' | 'densities',
+  'variants' | 'sizes' | 'tones' | 'densities' | 'colors',
 ])[] = [
   ['variant', 'variants'],
   ['size', 'sizes'],
   ['tone', 'tones'],
   ['density', 'densities'],
+  ['color', 'colors'],
 ];
 
 /** The catalog's closed state order. */
@@ -157,8 +158,8 @@ export function matrixModel(
   return { locked: section !== undefined, enabled, disallowedComponents, issues };
 }
 
-/** Where a cell sits: the variant × size grid, a strip (state, tone, density), or the full product. */
-export type MatrixCellKind = 'grid' | 'state' | 'tone' | 'density' | 'full';
+/** Where a cell sits: the variant × size grid, a strip (state, tone, density, color), or the full product. */
+export type MatrixCellKind = 'grid' | 'state' | 'tone' | 'density' | 'color' | 'full';
 
 export interface MatrixCell {
   /** Stable within the component: `variant=default,size=md,state=disabled`. */
@@ -194,8 +195,8 @@ export function staticStates(component: MatrixComponent): KitState[] {
 
 /**
  * The cells of one component. `grid`: allowed variants × allowed sizes at the default state,
- * then a strip per prop-backed state at the default combination, then a tone strip and a
- * density strip. `full`: every allowed combination of the four axes and each prop-backed
+ * then a strip per prop-backed state at the default combination, then a tone, density and
+ * color strip. `full`: every allowed combination of the five axes and each prop-backed
  * state (plus the default), capped by `KIT_LIMITS.cellsPerComponent` (over it: grid).
  */
 export function matrixCells(
@@ -236,7 +237,7 @@ export function matrixCells(
     }
   for (const state of states)
     cells.push({ key: keyOf(base, state), kind: 'state', values: base, state });
-  for (const axis of ['tone', 'density'] as const)
+  for (const axis of ['tone', 'density', 'color'] as const)
     for (const value of axisOf(component, axis)?.allowed ?? []) {
       const values = { ...base, [axis]: value };
       if (cells.some((c) => c.key === keyOf(values))) continue;
@@ -253,7 +254,8 @@ export function matrixAttributes(
   const out: Record<string, string> = { 'data-tx-component': component.id };
   for (const [axis] of MATRIX_AXES) {
     const value = values[axis];
-    if (value !== undefined && axisOf(component, axis)) out[`data-tx-${axis}`] = value;
+    if (value !== undefined && axisOf(component, axis) && !(axis === 'color' && value === 'none'))
+      out[`data-tx-${axis}`] = value;
   }
   return out;
 }

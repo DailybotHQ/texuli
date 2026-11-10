@@ -438,7 +438,7 @@ Example (A brand brief with CSS tokens): texuli ds generate --json '{"brief":"A 
 Usage: texuli ds allow [--json <object> | --file <path>] [--out <path>]
 
 List allowed components for a locked design system (ds.allow, runtime edge)
-Build the allow section of a locked design system from the catalog: a preset (minimal, a documented core; all, every component) or the ids you name, each with every variant, size, tone, density and state the catalog declares. Narrow it, put it under "allow" and run ds.validate. Returns allow, count, unknown ids and the minimal preset ids.
+Build the allow section of a locked design system from the catalog: a preset (minimal, a documented core; all, every component) or the ids you name, each with every variant, size, tone, density, color and state the catalog declares. Narrow it, put it under "allow" and run ds.validate. Returns allow, count, unknown ids and the minimal preset ids.
 
 Arguments (JSON object keys):
   preset: "all" | "minimal". minimal (a documented core: actions, form controls, text and status, containers, overlays and page layouts) or all (every catalog component). Ignored when components is set.

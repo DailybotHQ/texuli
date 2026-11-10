@@ -94,7 +94,7 @@ describe('schema-form in the player', () => {
     await fireEvent.input(screen.getByRole('textbox', { name: /Email/ }), {
       target: { value: 'ada@example.com' },
     });
-    await fireEvent.click(screen.getByRole('checkbox', { name: 'Access' }));
+    await fireEvent.click(await screen.findByRole('checkbox', { name: 'Access' }));
     await fireEvent.click(send);
     await waitFor(() => expect(onAction).toHaveBeenCalledOnce());
     expect(onAction.mock.calls[0]?.[0]).toMatchObject({

@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The packages are on npm at `0.16.0`, a `0.x` minor with no breaking API
+  change: blueprint spec `0.14.0` (the category `color` axis), and the
+  design-system kit, `ds generate`, the locked checkers, bundles and the
+  contract schemas are released. The components install reference lists
+  what is new in `0.16.0`.
+
 ## [0.4.0] — 2026-11-09
 
 ### Changes

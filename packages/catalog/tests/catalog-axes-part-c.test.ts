@@ -37,8 +37,8 @@ describe('catalog axes part C (layouts, data, state, composition, schema-forms, 
 
   it('covers every part C catalog id once', () => {
     expect(groups.map((group) => group.name).sort()).toEqual([...PART_C_GROUPS]);
-    expect(manifests).toHaveLength(60);
-    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(60);
+    expect(manifests).toHaveLength(61);
+    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(61);
   });
 
   it('lists the expected axes and states, with axis values equal to the prop enum', () => {

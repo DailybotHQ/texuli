@@ -73,6 +73,11 @@
     --tx-heading-min: var(--tx-font-size-base, 1rem);
     font-size: var(--tx-font-size-base, 1rem);
   }
+  .tx-heading--xs {
+    --tx-heading-size: var(--tx-font-size-sm, 0.875rem);
+    --tx-heading-min: var(--tx-font-size-sm, 0.875rem);
+    font-size: var(--tx-font-size-sm, 0.875rem);
+  }
   /* Responsive: fluid from about two scale steps below up to the size, never past either. */
   .tx-heading.tx-heading--responsive {
     font-size: clamp(
@@ -155,6 +160,12 @@
   .tx-text--tracking-wide {
     letter-spacing: var(--tx-letter-spacing-wide, 0.08em);
   }
+  .tx-text--italic {
+    font-style: italic;
+  }
+  .tx-text--strike {
+    text-decoration-line: line-through;
+  }
 
   /* Tones: role inks that hold the text contrast target on the page. */
   .tx-type-tone--default {
@@ -235,6 +246,19 @@
   }
   .tx-prose :where(ul, ol) {
     padding-inline-start: var(--tx-space-6);
+    list-style-position: outside;
+  }
+  .tx-prose :where(ul) {
+    list-style-type: disc;
+  }
+  .tx-prose :where(ol) {
+    list-style-type: decimal;
+  }
+  .tx-prose :where(ul ul) {
+    list-style-type: circle;
+  }
+  .tx-prose :where(li::marker) {
+    color: var(--tx-muted-foreground, GrayText);
   }
   .tx-prose :where(li + li) {
     margin-block-start: var(--tx-space-2);
@@ -250,6 +274,59 @@
   }
   .tx-prose :where(a) {
     color: var(--tx-link, LinkText);
+  }
+
+  /* Inline link: wraps in a sentence; underline and color from link tokens. */
+  .tx-link {
+    display: inline;
+    color: var(--tx-link, LinkText);
+    text-decoration-line: underline;
+    text-decoration-thickness: var(--tx-border-width-thin);
+    text-decoration-color: var(--tx-link, LinkText);
+    text-underline-offset: var(--tx-space-1);
+    overflow-wrap: anywhere;
+  }
+  .tx-link:hover {
+    color: var(--tx-link-hover, LinkText);
+    text-decoration-color: var(--tx-link-hover, LinkText);
+  }
+  .tx-link:focus-visible {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  /* Color swatch: a closed token or data-viz color with contrast ink. */
+  .tx-color-swatch {
+    --tx-swatch-fill: var(--tx-muted, Canvas);
+    --tx-swatch-ink: var(--tx-muted-foreground, GrayText);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    border-radius: var(--tx-shape-radius-sm);
+    border: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+    background-color: var(--tx-swatch-fill);
+    color: var(--tx-swatch-ink);
+    font-size: var(--tx-font-size-xs, 0.75rem);
+    line-height: 1;
+    overflow-wrap: anywhere;
+  }
+  .tx-color-swatch--sm {
+    inline-size: var(--tx-size-icon-sm);
+    block-size: var(--tx-size-icon-sm);
+  }
+  .tx-color-swatch--md {
+    inline-size: var(--tx-size-icon-md);
+    block-size: var(--tx-size-icon-md);
+  }
+  .tx-color-swatch--lg {
+    inline-size: var(--tx-size-icon-lg);
+    block-size: var(--tx-size-icon-lg);
+  }
+  .tx-color-swatch:not(:empty) {
+    inline-size: auto;
+    min-inline-size: var(--tx-size-icon-md);
+    padding-inline: var(--tx-space-2);
   }
 
   /* Box: padding, radius, border, elevation and surface from tokens. */
@@ -302,6 +379,15 @@
   .tx-box--border-block-end {
     border-block-end: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
   }
+  .tx-box--border-inline-start {
+    border-inline-start: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+  }
+  .tx-box--border-inline-end {
+    border-inline-end: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+  }
+  .tx-box--border-dashed {
+    border: var(--tx-border-width-thin) dashed var(--tx-border, currentColor);
+  }
   .tx-box--elevation-sm {
     box-shadow: var(--tx-elevation-1);
   }
@@ -327,6 +413,10 @@
     background-color: var(--tx-elevated, Canvas);
     color: var(--tx-elevated-foreground, CanvasText);
   }
+  .tx-box--surface-canvas {
+    background-color: var(--tx-background, Canvas);
+    color: var(--tx-foreground, CanvasText);
+  }
   .tx-box--surface-primary {
     background-color: var(--tx-primary, Canvas);
     color: var(--tx-primary-foreground, CanvasText);
@@ -334,6 +424,31 @@
   .tx-box--surface-brand {
     background-color: var(--tx-primary-soft, Canvas);
     color: var(--tx-primary-soft-foreground, CanvasText);
+  }
+  .tx-box--surface-success {
+    background-color: var(--tx-success-soft, Canvas);
+    color: var(--tx-success-soft-foreground, CanvasText);
+  }
+  .tx-box--surface-warning {
+    background-color: var(--tx-warning-soft, Canvas);
+    color: var(--tx-warning-soft-foreground, CanvasText);
+  }
+  .tx-box--surface-destructive {
+    background-color: var(--tx-destructive-soft, Canvas);
+    color: var(--tx-destructive-soft-foreground, CanvasText);
+  }
+  .tx-box--surface-info {
+    background-color: var(--tx-info-soft, Canvas);
+    color: var(--tx-info-soft-foreground, CanvasText);
+  }
+  .tx-box--surface-primary-soft {
+    background-color: var(--tx-primary-soft, Canvas);
+    color: var(--tx-primary-soft-foreground, CanvasText);
+  }
+  /* A checked ColorRef can override any surface without accepting raw CSS. */
+  .tx-box[data-tx-tone]:not([data-tx-tone="none"]) {
+    background-color: var(--tx-box-fill);
+    color: var(--tx-box-ink);
   }
   /* A sticky header over scrolling content: the page background at the glass opacity,
      blurred behind. Without backdrop-filter or with reduced transparency it is opaque. */
@@ -365,14 +480,60 @@
     .tx-box--border-none.tx-box--surface-muted,
     .tx-box--border-none.tx-box--surface-subtle,
     .tx-box--border-none.tx-box--surface-elevated,
+    .tx-box--border-none.tx-box--surface-canvas,
     .tx-box--border-none.tx-box--surface-primary,
     .tx-box--border-none.tx-box--surface-brand,
+    .tx-box--border-none.tx-box--surface-success,
+    .tx-box--border-none.tx-box--surface-warning,
+    .tx-box--border-none.tx-box--surface-destructive,
+    .tx-box--border-none.tx-box--surface-info,
+    .tx-box--border-none.tx-box--surface-primary-soft,
     .tx-box--border-none.tx-box--surface-translucent {
       outline: 1px solid CanvasText;
     }
     .tx-box--surface-translucent {
       background-color: Canvas;
       backdrop-filter: none;
+    }
+    .tx-link {
+      color: LinkText;
+      text-decoration-color: LinkText;
+    }
+    .tx-color-swatch {
+      background-color: Canvas;
+      color: CanvasText;
+      outline: 1px solid CanvasText;
+    }
+  }
+
+  /* Mark: inline highlight for search results, from role soft tokens. */
+  .tx-mark {
+    padding-inline: 0.15em;
+    border-radius: var(--tx-shape-radius-sm);
+    color: var(--tx-warning-soft-foreground, CanvasText);
+    background-color: var(--tx-warning-soft, Canvas);
+  }
+  .tx-mark--warning {
+    color: var(--tx-warning-soft-foreground, CanvasText);
+    background-color: var(--tx-warning-soft, Canvas);
+  }
+  .tx-mark--primary {
+    color: var(--tx-primary-soft-foreground, CanvasText);
+    background-color: var(--tx-primary-soft, Canvas);
+  }
+  .tx-mark--success {
+    color: var(--tx-success-soft-foreground, CanvasText);
+    background-color: var(--tx-success-soft, Canvas);
+  }
+  .tx-mark--info {
+    color: var(--tx-info-soft-foreground, CanvasText);
+    background-color: var(--tx-info-soft, Canvas);
+  }
+  @media (forced-colors: active) {
+    .tx-mark {
+      color: HighlightText;
+      background-color: Highlight;
+      forced-color-adjust: none;
     }
   }
 }

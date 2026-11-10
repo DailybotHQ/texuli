@@ -12,7 +12,7 @@
   },
   "tier": "untrusted",
   "profile": "web",
-  "spec": "0.13.0",
+  "spec": "0.14.0",
   "id": "brand-deck-2026-10-30",
   "designSystem": {
     "inline": {

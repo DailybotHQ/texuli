@@ -2322,6 +2322,53 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
     sourceable: ['items'],
   },
   {
+    id: 'data-virtual-list',
+    label: 'Virtual list view',
+    props: [
+      {
+        name: 'label',
+        kind: 'string',
+        required: true,
+      },
+      {
+        name: 'items',
+        kind: 'array',
+        required: true,
+      },
+      {
+        name: 'size',
+        kind: 'enum',
+        enumValues: ['sm', 'md', 'lg', 'fill'],
+      },
+      {
+        name: 'density',
+        kind: 'enum',
+        enumValues: ['compact', 'default', 'comfortable'],
+      },
+      {
+        name: 'estimateSize',
+        kind: 'number',
+      },
+      {
+        name: 'overscan',
+        kind: 'number',
+      },
+      {
+        name: 'selected',
+        kind: 'string',
+      },
+      {
+        name: 'emptyLabel',
+        kind: 'string',
+      },
+    ],
+    agentEmittable: false,
+    emit: ['developer'],
+    events: ['select'],
+    bindable: ['selected'],
+    sourceable: ['items'],
+  },
+  {
     id: 'data-calendar',
     label: 'Calendar',
     props: [

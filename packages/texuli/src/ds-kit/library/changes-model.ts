@@ -32,7 +32,14 @@ export interface KitVersion {
 }
 
 /** The allow lists of one component. */
-export const KIT_ALLOW_LISTS = ['variants', 'sizes', 'tones', 'densities', 'states'] as const;
+export const KIT_ALLOW_LISTS = [
+  'variants',
+  'sizes',
+  'tones',
+  'densities',
+  'colors',
+  'states',
+] as const;
 export type KitAllowList = (typeof KIT_ALLOW_LISTS)[number];
 
 export type KitAllowChange =

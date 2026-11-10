@@ -34,7 +34,7 @@ export async function loadSpecCatalog(): Promise<SpecCatalog> {
   const build = await loadOpsCatalog();
   const components = build.catalog.entries.map((entry) => {
     const axes: NonNullable<SpecComponent['axes']> = {};
-    for (const axis of ['variant', 'size', 'tone', 'density'] as const) {
+    for (const axis of ['variant', 'size', 'tone', 'density', 'color'] as const) {
       const propName = entry.axes?.[axis];
       const prop = entry.props.find((candidate) => candidate.name === propName);
       const values = prop?.enumValues;

@@ -1,3 +1,7 @@
+<script module lang="ts">
+let nameSeq = 0;
+</script>
+
 <script lang="ts">
 import { type HrefTrust, safeHref } from '@texuli/core/url-policy';
 import type { Snippet } from 'svelte';
@@ -53,12 +57,25 @@ let {
   ...rest
 }: Props = $props();
 
+const contentId = `tx-card-name-${(nameSeq += 1)}`;
+
 const safe = $derived(href === undefined ? undefined : safeHref(href, hrefTrust));
 const interactive = $derived(Boolean(safe));
+const hasActions = $derived(Boolean(actions));
+const namedByProp = $derived(typeof linkLabel === 'string' && linkLabel.trim().length > 0);
 const linkRel = $derived(cardLinkRel(rel, target));
 const linkDownload = $derived(
   download === true ? '' : download === false || download === undefined ? undefined : download
 );
+
+$effect(() => {
+  if (!interactive || namedByProp || children) return;
+  if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+    console.warn(
+      'texuli Card: href has no accessible name. Pass linkLabel or card title content.'
+    );
+  }
+});
 
 /**
  * Merge the caller's `rel` tokens with `noopener` for a new browsing context.
@@ -92,7 +109,7 @@ const classes = $derived(
   data-interactive={interactive ? 'true' : undefined}
   {...rest as HTMLAttributes<HTMLDivElement>}
 >
-  {#if safe}
+  {#if safe && hasActions}
     <a
       href={safe}
       {target}
@@ -100,11 +117,22 @@ const classes = $derived(
       download={linkDownload}
       class="tx-card__link"
       data-tx-card
-      aria-label={linkLabel}
+      aria-label={namedByProp ? linkLabel : undefined}
+      aria-labelledby={namedByProp ? undefined : contentId}
     ></a>
-  {/if}
-  {@render children?.()}
-  {#if actions}
-    <div class="tx-card__actions">{@render actions()}</div>
+    <div id={contentId} class="tx-card__body">{@render children?.()}</div>
+    <div class="tx-card__actions">{@render actions?.()}</div>
+  {:else if safe}
+    <a
+      href={safe}
+      {target}
+      rel={linkRel}
+      download={linkDownload}
+      class="tx-card__link tx-card__link--body"
+      data-tx-card
+      aria-label={namedByProp ? linkLabel : undefined}
+    >{@render children?.()}</a>
+  {:else}
+    {@render children?.()}
   {/if}
 </div>

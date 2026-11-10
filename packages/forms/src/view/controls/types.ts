@@ -7,6 +7,9 @@ import type { SchemaFormLabels } from '../labels.ts';
  * so a form that never paints them never downloads them or their CSS.
  */
 export const LAZY_CONTROL_TYPES = Object.freeze([
+  'checkbox',
+  'multiselect',
+  'switch',
   'date',
   'time',
   'datetime',

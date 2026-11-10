@@ -198,6 +198,17 @@ describe('checking against the allow manifest and the catalog', () => {
     ]);
   });
 
+  it('flags category colors excluded by the design-system allow list', () => {
+    const report = checkLockedSources(
+      {
+        'src/Labels.svelte':
+          '<script>import { Badge } from \'texuli\';</script>\n<Badge color="chart-1" />',
+      },
+      { catalog, allowManifest: { allow: { badge: { colors: ['none'] } } } }
+    );
+    expect(codes(report)).toEqual([['color-not-allowed', 'badge', 'src/Labels.svelte:2:1']]);
+  });
+
   it('caps the errors and stays total over hostile input', () => {
     const many = Array.from({ length: 200 }, (_, i) => ({
       component: 'dialog',

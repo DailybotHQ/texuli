@@ -1,6 +1,6 @@
 /**
  * The static checker core of locked design systems (ADR-032, PLAN_016 T-t5-static): which
- * catalog components a prototype uses, with which variants, sizes, tones, densities and
+ * catalog components a prototype uses, with which variants, sizes, tones, densities, colors and
  * states, checked against the allow manifest and the catalog. Pure functions, no browser
  * and no file system: the caller passes source text or a blueprint.
  *
@@ -13,8 +13,8 @@
  *
  * Codes: `not-allowed` (a component the allow set does not list, the mapper's code),
  * `variant-not-allowed`, `size-not-allowed`, `tone-not-allowed`, `density-not-allowed`,
- * `state-not-allowed` (a value the allow set disables), and `unknown-component`,
- * `unknown-variant`, `unknown-size`, `unknown-tone`, `unknown-density`, `unknown-state` (an id
+ * `color-not-allowed`, `state-not-allowed` (a value the allow set disables), and `unknown-component`,
+ * `unknown-variant`, `unknown-size`, `unknown-tone`, `unknown-density`, `unknown-color`, `unknown-state` (an id
  * or value the catalog does not list, as `checkDesignSystemAllow` names them). A value the
  * checker cannot read statically (`variant={x}`) is a `dynamic-value` warning, never an error.
  * Disallowed variants are flagged, never removed at runtime (ADR-032). Extension ids
@@ -28,6 +28,7 @@ export const LOCKED_AXES = [
   ['size', 'sizes'],
   ['tone', 'tones'],
   ['density', 'densities'],
+  ['color', 'colors'],
 ] as const;
 export type LockedAxis = (typeof LOCKED_AXES)[number][0];
 
@@ -49,12 +50,14 @@ export const LOCKED_STATIC_CODES = [
   'size-not-allowed',
   'tone-not-allowed',
   'density-not-allowed',
+  'color-not-allowed',
   'state-not-allowed',
   'unknown-component',
   'unknown-variant',
   'unknown-size',
   'unknown-tone',
   'unknown-density',
+  'unknown-color',
   'unknown-state',
 ] as const;
 export type LockedStaticCode = (typeof LOCKED_STATIC_CODES)[number];

@@ -15,6 +15,7 @@ export {
   inputModeFor,
   isPartialNumber,
   largeStepNumber,
+  type NumberFieldCommit,
   type NumberFormatOptions,
   numberFormatter,
   type ParseResult,

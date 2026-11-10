@@ -56,6 +56,7 @@ const PART_B_GROUP_IDS = {
     'carousel',
     'chip',
     'code',
+    'color-swatch',
     'empty-state',
     'error-state',
     'heading',
@@ -63,7 +64,10 @@ const PART_B_GROUP_IDS = {
     'inline-text',
     'kbd',
     'kpi',
+    'link',
+    'list',
     'list-item',
+    'mark',
     'progress',
     'prose',
     'separator',
@@ -121,22 +125,25 @@ const EXPECTED: Readonly<Record<string, Expected>> = {
   'media-composition-svg': { states: ['focus-visible', 'invalid'] },
   'media-image': { states: ['focus-visible'] },
   alert: { axes: { tone: 'tone' }, states: ['hover', 'focus-visible'] },
-  avatar: { axes: { size: 'size' } },
+  avatar: { axes: { size: 'size', color: 'color' } },
   'avatar-group-grid': { axes: { size: 'size' } },
   carousel: { states: ['hover', 'focus-visible', 'selected'] },
   icon: { axes: { size: 'size', tone: 'tone' } },
   'list-item': { states: ['hover', 'focus-visible', 'disabled', 'selected'] },
+  mark: { axes: { tone: 'tone' } },
   progress: { axes: { size: 'size', tone: 'tone' }, states: ['loading'] },
   separator: { axes: { variant: 'variant' } },
   skeleton: { axes: { size: 'size' }, states: ['loading'] },
   spinner: { axes: { size: 'size', tone: 'tone' }, states: ['loading'] },
   badge: {
-    axes: { variant: 'variant' },
+    axes: { variant: 'variant', color: 'color' },
     states: ['hover', 'focus-visible', 'disabled', 'selected'],
   },
   banner: { axes: { tone: 'tone' } },
-  box: { axes: { variant: 'surface' } },
+  box: { axes: { variant: 'surface', tone: 'fill' } },
+  'color-swatch': { axes: { color: 'color', size: 'size' } },
   heading: { axes: { size: 'size', tone: 'tone' } },
+  link: { states: ['hover', 'focus-visible'] },
   prose: { axes: { size: 'size' } },
   text: { axes: { size: 'size', tone: 'tone' } },
   callout: { axes: { tone: 'tone' } },
@@ -156,7 +163,10 @@ const EXPECTED: Readonly<Record<string, Expected>> = {
     axes: { variant: 'variant', density: 'density' },
     states: ['focus-visible', 'loading'],
   },
-  tag: { axes: { variant: 'variant' }, states: ['hover', 'focus-visible', 'disabled', 'loading'] },
+  tag: {
+    axes: { variant: 'variant', color: 'color' },
+    states: ['hover', 'focus-visible', 'disabled', 'loading'],
+  },
   timeline: { states: ['focus-visible', 'selected'] },
   document: { states: ['checked', 'open'] },
 };
@@ -173,8 +183,8 @@ describe('catalog axes part B (content, display, chat, documents, canvas)', () =
       'display',
       'documents',
     ]);
-    expect(manifests).toHaveLength(72);
-    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(72);
+    expect(manifests).toHaveLength(76);
+    expect(new Set(manifests.map((manifest) => manifest.id)).size).toBe(76);
     for (const group of groups) {
       expect(group.manifests.map((manifest) => manifest.id).sort(), group.name).toEqual(
         [...PART_B_GROUP_IDS[group.name as keyof typeof PART_B_GROUP_IDS]].sort()

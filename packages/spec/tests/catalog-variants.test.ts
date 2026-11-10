@@ -287,7 +287,7 @@ describe('catalog variants: states and source files', () => {
       codes([
         file('part-a', {
           'not-in-catalog': { states: [] },
-          'fixture-card': { axes: { color: 'x' } as never },
+          'fixture-card': { axes: { theme: 'x' } as never },
         }),
       ])
     ).toEqual(['variants-unknown-axis', 'variants-unknown-component']);
@@ -313,7 +313,7 @@ describe('catalog variants: states and source files', () => {
     const diag = (extra: Record<string, unknown>) =>
       validateCatalogManifest({ ...button, ...extra }).diagnostics.map((d) => d.code);
     expect(diag({ axes: { variant: 'variant' }, states: ['hover'] })).toEqual([]);
-    expect(diag({ axes: { color: 'variant' } })).toEqual(['invalid-axis']);
+    expect(diag({ axes: { theme: 'variant' } })).toEqual(['invalid-axis']);
     expect(diag({ axes: { variant: 'label' } })).toEqual(['axis-prop']);
     expect(diag({ states: ['hover', 'hover', 'pressed'] })).toEqual([
       'duplicate-state',

@@ -243,7 +243,11 @@ const OPACITY: SystemToken[] = [
 
 const BREAKPOINTS = ['base', 'sm', 'md', 'lg'] as const;
 const LAYOUT: SystemToken[] = [
-  token('--tx-layout-content-max', '72ch', 'Readable prose width (content layouts).'),
+  token(
+    '--tx-layout-content-max',
+    '72ch',
+    'Readable prose width (content layouts). Rem, ch and % layout widths do not multiply --tx-density; gutters still read the space scale.'
+  ),
   token('--tx-layout-wide-max', '80rem', 'Wide page sections (marketing layouts).'),
   token('--tx-layout-full-max', '100%', 'Full-bleed sections.'),
   token('--tx-layout-breakpoint-sm', '36rem', 'Small container breakpoint (2 grid columns).'),
@@ -298,9 +302,14 @@ const STATUS: SystemToken[] = STATUS_NAMES.flatMap((status) => {
 });
 
 const DATA_VIZ: SystemToken[] = [
-  ...Array.from({ length: 8 }, (_, i) =>
-    token(`--tx-chart-${i + 1}`, 'theme.charts.categorical', `Categorical series color ${i + 1}.`)
-  ),
+  ...Array.from({ length: 8 }, (_, i) => [
+    token(`--tx-chart-${i + 1}`, 'theme.charts.categorical', `Categorical series color ${i + 1}.`),
+    token(
+      `--tx-chart-${i + 1}-foreground`,
+      'on-color(theme.charts.categorical)',
+      `AA foreground ink on categorical series color ${i + 1}.`
+    ),
+  ]).flat(),
   ...Array.from({ length: 9 }, (_, i) =>
     token(
       `--tx-chart-sequential-${i + 1}`,

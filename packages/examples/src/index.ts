@@ -60,6 +60,7 @@ import './data-map/entry.ts';
 import './data-timeline/entry.ts';
 import './data-tree-view/entry.ts';
 import './data-virtual-list/entry.ts';
+import './data-virtual-list-view/entry.ts';
 import './date/entry.ts';
 import './dialog/entry.ts';
 import './editor/entries.ts';

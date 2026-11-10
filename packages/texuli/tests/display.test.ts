@@ -327,12 +327,19 @@ describe('avatar', () => {
       expect(surfaceRules.length).toBeGreaterThan(1);
       for (const body of surfaceRules) {
         for (const [, value] of body.matchAll(/(?<![-\w])background-color:\s*([^;]+);/g)) {
-          expect(['var(--tx-muted, Canvas)', 'var(--tx-avatar-fill)']).toContain(value?.trim());
+          // Category colors (data-tx-color) use the AA pair colorRefInk picks (T-label-palette).
+          expect([
+            'var(--tx-muted, Canvas)',
+            'var(--tx-avatar-fill)',
+            'var(--tx-category-fill)',
+          ]).toContain(value?.trim());
         }
         for (const [, value] of body.matchAll(/(?<![-\w])color:\s*([^;]+);/g)) {
-          expect(['var(--tx-foreground, CanvasText)', 'var(--tx-avatar-ink)']).toContain(
-            value?.trim()
-          );
+          expect([
+            'var(--tx-foreground, CanvasText)',
+            'var(--tx-avatar-ink)',
+            'var(--tx-category-ink)',
+          ]).toContain(value?.trim());
         }
       }
       // `tone` fills: each sets a background role and its own gated foreground.

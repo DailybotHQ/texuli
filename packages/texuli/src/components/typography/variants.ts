@@ -1,3 +1,4 @@
+import { DATA_COLORS, ROLE_COLORS } from '../../internal/color-ref.ts';
 import { variants } from '../../internal/variants.ts';
 // The recipes carry their styles: a consumer that uses these classes on its own
 // elements (without the components) still gets the CSS.
@@ -12,7 +13,17 @@ export type HeadingLevel = (typeof HEADING_LEVELS)[number];
  * `3xl` and `4xl` sit between the title (`xl`) and `display`: hero and section titles on the
  * font-size scale (`--tx-font-size-2xl`…`4xl`), with the display role's family and weight.
  */
-export const HEADING_SIZES = ['display', '4xl', '3xl', '2xl', 'xl', 'lg', 'md', 'sm'] as const;
+export const HEADING_SIZES = [
+  'display',
+  '4xl',
+  '3xl',
+  '2xl',
+  'xl',
+  'lg',
+  'md',
+  'sm',
+  'xs',
+] as const;
 export type HeadingSize = (typeof HEADING_SIZES)[number];
 
 /** Heading tracking: the role's own (`default`) or `tight` (`--tx-letter-spacing-tight`). */
@@ -70,6 +81,9 @@ export type ProseSize = (typeof PROSE_SIZES)[number];
 export const PROSE_ELEMENTS = ['div', 'article', 'section'] as const;
 export type ProseElement = (typeof PROSE_ELEMENTS)[number];
 
+export const COLOR_SWATCH_SIZES = ['sm', 'md', 'lg'] as const;
+export type ColorSwatchSize = (typeof COLOR_SWATCH_SIZES)[number];
+
 export const BOX_ELEMENTS = ['div', 'section', 'article', 'aside', 'header', 'footer'] as const;
 export type BoxElement = (typeof BOX_ELEMENTS)[number];
 
@@ -79,8 +93,17 @@ export type BoxPadding = (typeof BOX_PADDINGS)[number];
 export const BOX_RADII = ['none', 'sm', 'md', 'lg', 'xl', 'full'] as const;
 export type BoxRadius = (typeof BOX_RADII)[number];
 
-/** A full border, or one logical side only (`block-start`, `block-end`) for app headers and footers. */
-export const BOX_BORDERS = ['none', 'default', 'strong', 'block-start', 'block-end'] as const;
+/** A full border, one logical side (`block-*` for headers, `inline-*` for rails), or dashed. */
+export const BOX_BORDERS = [
+  'none',
+  'default',
+  'strong',
+  'block-start',
+  'block-end',
+  'inline-start',
+  'inline-end',
+  'dashed',
+] as const;
 export type BoxBorder = (typeof BOX_BORDERS)[number];
 
 export const BOX_ELEVATIONS = ['none', 'sm', 'md', 'lg'] as const;
@@ -98,11 +121,26 @@ export const BOX_SURFACES = [
   'muted',
   'subtle',
   'elevated',
+  'canvas',
   'primary',
   'brand',
+  'success',
+  'warning',
+  'destructive',
+  'info',
+  'primary-soft',
   'translucent',
 ] as const;
 export type BoxSurface = (typeof BOX_SURFACES)[number];
+
+/** A no-fill default plus the shared token-only palette and data-viz references. */
+export const BOX_FILLS = ['none', ...DATA_COLORS, ...ROLE_COLORS] as const;
+/** Mark (search highlight): fill from a role's soft token. */
+export const MARK_TONES = ['warning', 'primary', 'success', 'info'] as const;
+export type MarkTone = (typeof MARK_TONES)[number];
+const markToneClasses = Object.fromEntries(
+  MARK_TONES.map((tone) => [tone, `tx-mark--${tone}`])
+) as Record<MarkTone, string>;
 
 /** A value of a closed list, or the fallback (a hostile or stale prop never reaches a class). */
 export function oneOf<T extends string | number>(
@@ -115,6 +153,12 @@ export function oneOf<T extends string | number>(
 
 const map = <T extends string>(list: readonly T[], prefix: string) =>
   Object.fromEntries(list.map((value) => [value, `${prefix}${value}`])) as Record<T, string>;
+
+export const markClass = variants({
+  base: 'tx-mark',
+  variants: { tone: markToneClasses },
+  defaultVariants: { tone: 'warning' },
+});
 
 export const headingClass = variants({
   base: 'tx-heading',
@@ -175,7 +219,16 @@ export const boxClass = variants({
       xl: 'tx-box--radius-xl',
       full: 'tx-box--radius-full',
     },
-    border: map(BOX_BORDERS, 'tx-box--border-'),
+    border: {
+      none: 'tx-box--border-none',
+      default: 'tx-box--border-default',
+      strong: 'tx-box--border-strong',
+      'block-start': 'tx-box--border-block-start',
+      'block-end': 'tx-box--border-block-end',
+      'inline-start': 'tx-box--border-inline-start',
+      'inline-end': 'tx-box--border-inline-end',
+      dashed: 'tx-box--border-dashed',
+    },
     elevation: {
       none: 'tx-box--elevation-none',
       sm: 'tx-box--elevation-sm',

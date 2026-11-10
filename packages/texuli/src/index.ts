@@ -272,6 +272,7 @@ export {
   Kbd,
   kbdClass,
 } from './components/kbd-code/index.ts';
+export { List, ListItem } from './components/list-item/index.ts';
 export {
   ContextMenu,
   contextTriggerClass,
@@ -641,16 +642,21 @@ export {
 } from './components/tree/index.ts';
 // Typography and surfaces for locked prototypes (ADR-032); the subpath is `texuli/typography`.
 export {
+  BOX_FILLS,
+  BOX_SURFACES,
   Box,
   type BoxBorder,
   type BoxElevation,
   type BoxPadding,
   type BoxRadius,
   type BoxSurface,
+  type ColorRef,
   Heading,
   type HeadingLevel,
   type HeadingSize,
   type HeadingTone,
+  Mark,
+  type MarkTone,
   Prose,
   type ProseSize,
   Text,
@@ -788,3 +794,4 @@ export {
   MotionProvider,
   type MotionSettings,
 } from './motion/index.ts';
+export { LAYOUT_WIDTH_UTILITIES } from './styles/layout-widths.ts';

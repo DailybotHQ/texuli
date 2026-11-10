@@ -178,6 +178,7 @@ const ALLOW = new Set([
   'unknown-size',
   'unknown-tone',
   'unknown-density',
+  'unknown-color',
   'unknown-state',
 ]);
 
@@ -202,6 +203,7 @@ const HINTS: Readonly<Record<string, string>> = {
   'unknown-size': 'Use a size the catalog lists for this component.',
   'unknown-tone': 'Use a tone the catalog lists for this component.',
   'unknown-density': 'Use a density the catalog lists for this component.',
+  'unknown-color': 'Use a category color the catalog lists for this component.',
   'unknown-state': 'Use a state the catalog lists for this component.',
   'approval-invalid':
     'Keep status "draft" until a reviewer runs texuli ds approve, which records approvedBy, approvedAt and the content hash.',

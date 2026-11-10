@@ -1,0 +1,26 @@
+{
+  "description": "An allow category color the catalog component does not list.",
+  "expect": [["unknown-color", "$.allow.badge.colors[0]"]],
+  "catalog": {
+    "components": [
+      {
+        "id": "badge",
+        "axes": {
+          "color": { "values": ["none", "blue", "green"] }
+        }
+      }
+    ]
+  },
+  "document": {
+    "format": "texuli/design-system",
+    "formatVersion": 1,
+    "id": "harborline",
+    "version": "1.0.0",
+    "name": "Harborline",
+    "allow": {
+      "badge": {
+        "colors": ["chartreuse"]
+      }
+    }
+  }
+}

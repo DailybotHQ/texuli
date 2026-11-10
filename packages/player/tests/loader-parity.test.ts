@@ -24,6 +24,7 @@ export const NOT_PAINTED: Readonly<Record<string, string>> = Object.freeze({
   display:
     'Planned: app-tier display components (button, badge, alert…) become emittable once audited; blocks-* paint content today.',
   chat: 'The composer is host chrome (player design §8): a blueprint never supplies one. chat-thread and chat-message paint transcripts.',
+  data: 'data-virtual-list is content-tier but not agent-emittable: host code renders rows through a snippet; the player has no painter yet. The other data views paint.',
 });
 
 const build = await buildCatalog(await discoverManifestGroups());

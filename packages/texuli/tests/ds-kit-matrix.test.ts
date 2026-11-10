@@ -165,6 +165,27 @@ describe('matrix model', () => {
     ]);
   });
 
+  it('models category colors as their own allow axis and omits the none root attribute', () => {
+    const badge = matrixModel(catalog, {
+      version: '1.0.0',
+      allow: { badge: { colors: ['none', 'chart-3'] } },
+    }).enabled.find((entry) => entry.id === 'badge');
+    if (!badge) throw new Error('badge');
+    expect(badge.axes.find((axis) => axis.axis === 'color')).toMatchObject({
+      prop: 'color',
+      allowed: ['none', 'chart-3'],
+      default: 'none',
+    });
+    const colorCell = matrixCells(badge).cells.find((cell) => cell.values.color === 'chart-3');
+    if (!colorCell) throw new Error('chart-3 cell');
+    expect(matrixProps(badge, colorCell.values)).toMatchObject({ color: 'chart-3' });
+    expect(matrixAttributes(badge, { color: 'none' })).toEqual({ 'data-tx-component': 'badge' });
+    expect(matrixAttributes(badge, { color: 'chart-3' })).toEqual({
+      'data-tx-component': 'badge',
+      'data-tx-color': 'chart-3',
+    });
+  });
+
   it('builds the full product, and falls back to the grid over the cap', () => {
     const full = matrixCells(component('button'), 'full');
     expect(full).toMatchObject({ view: 'full', capped: false });

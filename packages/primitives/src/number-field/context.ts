@@ -1,5 +1,5 @@
 import { createPrimitiveContext } from '../internal/context.ts';
-import type { NumberFormatOptions } from './number.ts';
+import type { NumberFieldCommit, NumberFormatOptions } from './number.ts';
 
 export interface NumberFieldContextValue {
   readonly inputId: string;
@@ -24,6 +24,8 @@ export interface NumberFieldContextValue {
   readonly decrementLabel: string;
   /** The formatted value for `aria-valuetext`. */
   readonly valueText: string;
+  /** When typed text commits: `enter` (Enter and blur), `blur`, or `input` (every parsing keystroke). */
+  readonly commitMode: NumberFieldCommit;
   setDraft(text: string): void;
   /** Parse the draft and commit it (clamped, optionally snapped); revert when it does not parse. */
   commit(): void;

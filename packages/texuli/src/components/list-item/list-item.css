@@ -15,6 +15,11 @@
     list-style: none;
   }
 
+  .tx-list--divided > .tx-list-item:not(:last-child),
+  .tx-list-item--divided {
+    border-block-end: var(--tx-border-width-thin) solid var(--tx-border, currentColor);
+  }
+
   .tx-list-item {
     display: flex;
     align-items: center;

@@ -51,6 +51,14 @@
     text-decoration: none;
   }
 
+  .tx-card__link--body,
+  .tx-card__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-inline-size: 0;
+  }
+
   .tx-card__link::after {
     content: "";
     position: absolute;

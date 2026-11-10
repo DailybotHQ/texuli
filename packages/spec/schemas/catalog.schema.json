@@ -50,7 +50,7 @@
       "additionalProperties": false
     },
     "axes": {
-      "description": "The styling axes of a component (ADR-032, spec 0.13.0): each is derived from one of its enum props, so values equal that prop's enumValues and default is one of them. Omitted: the component has no styling axis.",
+      "description": "The styling axes of a component (ADR-032, spec 0.13.0; color since spec 0.14.0): variant, size, tone, density and category color. Each is derived from one of its enum props, so values equal that prop's enumValues and default is one of them. Omitted: the component has no styling axis.",
       "type": "object",
       "properties": {
         "variant": {
@@ -63,6 +63,9 @@
           "$ref": "#/$defs/axis"
         },
         "density": {
+          "$ref": "#/$defs/axis"
+        },
+        "color": {
           "$ref": "#/$defs/axis"
         }
       },

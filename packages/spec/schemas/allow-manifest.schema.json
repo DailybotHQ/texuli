@@ -69,6 +69,11 @@
           "maxItems": 32,
           "type": "array"
         },
+        "colors": {
+          "items": { "$ref": "#/$defs/axisValue" },
+          "maxItems": 32,
+          "type": "array"
+        },
         "sizes": {
           "items": {
             "$ref": "#/$defs/axisValue"

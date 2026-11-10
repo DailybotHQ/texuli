@@ -15,13 +15,15 @@ export const DISPLAY_AXIS_STAMP: Readonly<Record<string, Stamp>> = {
   alert: { axes: { tone: 'tone' }, states: ['hover', 'focus-visible'] },
   'avatar-group-grid': { axes: { size: 'size' } },
   badge: {
-    axes: { variant: 'variant' },
+    axes: { variant: 'variant', color: 'color' },
     states: ['hover', 'focus-visible', 'disabled', 'selected'],
   },
   banner: { axes: { tone: 'tone' } },
   // Typography and surfaces (ADR-032): static, no observable state.
-  box: { axes: { variant: 'surface' } },
+  box: { axes: { variant: 'surface', tone: 'fill' } },
+  'color-swatch': { axes: { color: 'color', size: 'size' } },
   heading: { axes: { size: 'size', tone: 'tone' } },
+  link: { states: ['hover', 'focus-visible'] },
   prose: { axes: { size: 'size' } },
   text: { axes: { size: 'size', tone: 'tone' } },
   callout: { axes: { tone: 'tone' } },
@@ -41,16 +43,21 @@ export const DISPLAY_AXIS_STAMP: Readonly<Record<string, Stamp>> = {
     axes: { variant: 'variant', density: 'density' },
     states: ['focus-visible', 'loading'],
   },
-  tag: { axes: { variant: 'variant' }, states: ['hover', 'focus-visible', 'disabled', 'loading'] },
+  tag: {
+    axes: { variant: 'variant', color: 'color' },
+    states: ['hover', 'focus-visible', 'disabled', 'loading'],
+  },
   timeline: { states: ['focus-visible', 'selected'] },
   icon: { axes: { size: 'size', tone: 'tone' } },
-  avatar: { axes: { size: 'size' } },
+  avatar: { axes: { size: 'size', color: 'color' } },
   skeleton: { axes: { size: 'size' }, states: ['loading'] },
   spinner: { axes: { size: 'size', tone: 'tone' }, states: ['loading'] },
   progress: { axes: { size: 'size', tone: 'tone' }, states: ['loading'] },
   carousel: { states: ['hover', 'focus-visible', 'selected'] },
   separator: { axes: { variant: 'variant' } },
+  list: {},
   'list-item': { states: ['hover', 'focus-visible', 'disabled', 'selected'] },
+  mark: { axes: { tone: 'tone' } },
 };
 
 export function stampDisplayAxes(manifest: CatalogManifest): CatalogManifest {

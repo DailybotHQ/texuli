@@ -1,0 +1,13 @@
+{
+  "ok": false,
+  "codes": ["color-not-allowed"],
+  "findings": [
+    {
+      "code": "color-not-allowed",
+      "severity": "error",
+      "area": "prototype-components",
+      "path": "src/Page.svelte:6:3",
+      "value": "chart-1"
+    }
+  ]
+}

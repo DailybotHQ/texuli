@@ -7,9 +7,11 @@
 > tokens, hooks and design defaults, the plumbing this builds on). Items
 > marked **planned** are not built yet. [Locked design systems](#locked-design-systems)
 > (blueprint spec `0.13.0`, ADR-032) are new in `0.15.0`: the document,
-> the catalog, the allow manifest and the CLI. The kit (`texuli/ds-kit`)
-> and the locked checkers ship in `0.15.0` as **in development** and are
-> completed in `0.16.0`.
+> the catalog, the allow manifest and the CLI. The kit (`texuli/ds-kit`),
+> `ds generate` and the importers, the locked checkers, portable bundles
+> and the contract schemas are released in `0.16.0` (they shipped in
+> `0.15.0` as in development), with blueprint spec `0.14.0` (the category
+> `color` axis and `allow.colors`).
 
 A design system describes a brand once, as **one closed JSON document**,
 and every Texuli surface follows it: styled components, layouts and domain
@@ -82,8 +84,8 @@ by path, so they live at the repository root, outside every package.
 This is the whole path from nothing to an approved, locked design system that a consumer
 such as Protoyard can pin. The brand here is fictional (Harborline, `example.com`). Each
 step names the CLI command, the MCP operation an agent uses, and the Studio control on
-texuli.com; every one of them exists today. Locked design systems are **in development**
-(spec 0.13.0, ADR-032).
+texuli.com; every one of them exists today. Locked design systems are released (spec 0.13.0 in `0.15.0`,
+the kit, the generator and the full checks in `0.16.0`; ADR-032).
 
 1. **Start from what you have.** A brief, a token file, CSS, a logo or a library theme:
 
@@ -105,7 +107,7 @@ texuli.com; every one of them exists today. Locked design systems are **in devel
    patches and variants ([Override](#override-patches-and-variants)). `texuli ds preview`
    and `ds.preview` show a static snapshot.
 3. **Lock it: the allowed set.** Decide which catalog components, variants, sizes, tones,
-   densities and states the brand allows:
+   densities, category colors and states the brand allows:
 
    ```bash
    texuli ds init design-systems/harborline.locked.ds.json --locked --preset minimal
@@ -411,7 +413,7 @@ accepts capped ones.
 | `aa-non-text` | From spec 0.12.0: the sidebar's active fill (`sidebarPrimary`) below 3:1 against the sidebar fill (WCAG 1.4.11), at `$.vars.<mode>["--tx-sidebar-primary"]`; raised by `texuli ds check` and `ds.validate` (`checkDesignSystemIndicators`), a warning in the compiler's report | Leave `color.roles.<mode>.sidebarPrimary` out so the compiler derives it, or pin a `sidebarPrimary` or `sidebar` that reaches 3:1 |
 | `target-size` | A pinned component size below `accessibility.targetMin` | Pick a size at or above the target |
 | `approval-invalid` | From spec 0.13.0: an `approved` document without `approvedBy` and `approvedAt`, or an `approved` library entry without its own approval | Approve with `texuli ds approve`, or set the status back to `draft` |
-| `unknown-component`, `unknown-variant`, `unknown-size`, `unknown-tone`, `unknown-density`, `unknown-state` | From spec 0.13.0: an `allow` id, or a value of one of its lists, that the catalog does not list; also a `library[].composes` id. Raised by `checkDesignSystemAllow` and `texuli ds check`, not by the bundled validator | Use a catalog id and the values its `axes` and `states` list (`ds.allow` lists them) |
+| `unknown-component`, `unknown-variant`, `unknown-size`, `unknown-tone`, `unknown-density`, `unknown-color`, `unknown-state` | From spec 0.13.0: an `allow` id, or a value of one of its lists, that the catalog does not list; also a `library[].composes` id. Raised by `checkDesignSystemAllow` and `texuli ds check`, not by the bundled validator | Use a catalog id and the values its `axes` and `states` list (`ds.allow` lists them) |
 | `content-hash-mismatch`, `library-hash-mismatch` | Raised by `texuli ds check` only: the `contentHash` an approval records no longer matches the document (or the library entry). It changed after approval | Review the change, then approve again with `texuli ds approve` |
 
 An agent repairs a refused document from the code and the path alone; the
@@ -510,7 +512,7 @@ exports the document (and, optionally, its cached compiled form):
     "./design-system.json": "./design-system.json",
     "./design-system.compiled.json": "./design-system.compiled.json"
   },
-  "peerDependencies": { "@texuli/tokens": "^0.15.0" }
+  "peerDependencies": { "@texuli/tokens": "^0.16.0" }
 }
 ```
 
@@ -602,9 +604,9 @@ opened). Details: [ds-check.md](../packages/tools/docs/ds-check.md).
 ## Locked design systems
 
 > **Status: new in `0.15.0`.** Blueprint spec `0.13.0`
-> ([ADR-032](DECISIONS.md#adr-032-locked-design-systems)). Items marked
-> **in development** ship in `0.15.0` and are completed in `0.16.0`; items
-> marked **planned** do not exist yet. Existing documents are unaffected: without `allow` a design
+> ([ADR-032](DECISIONS.md#adr-032-locked-design-systems)). The kit, `ds generate`, the full locked validator, bundles, the contract schemas and the
+> blueprint allow check, shipped in `0.15.0` as in development, are released in `0.16.0`
+> (with spec `0.14.0`); items marked **planned** do not exist yet. Existing documents are unaffected: without `allow` a design
 > system is not locked, and a `0.12.0` document compiles to the same CSS.
 
 A locked design system says which Texuli components, variants, sizes and
@@ -627,11 +629,11 @@ it, so one file and one hash cover the whole policy.
 - The keys are catalog component ids
   (`packages/spec/catalog/components.json`). Once `allow` exists, a
   component it does not list is **not allowed**.
-- Each entry may list `variants`, `sizes`, `tones`, `densities` and
+- Each entry may list `variants`, `sizes`, `tones`, `densities`, `colors` and
   `states`. An **omitted** list allows every value the catalog lists for
   that component; an **empty** list allows none.
-- The catalog says what exists: from spec `0.13.0` each component carries
-  its `axes` (`variant`, `size`, `tone`, `density`, each with the enum prop
+- The catalog says what exists: each component carries
+  its `axes` (`variant`, `size`, `tone`, `density`, `color`, each with the enum prop
   that drives it, its values and its default) and its `states`, from the
   closed list `hover`, `focus-visible`, `active`, `disabled`, `loading`,
   `invalid`, `selected`, `expanded`, `checked`, `open`, `readonly`
@@ -771,7 +773,7 @@ two versions (below).
 
 Every catalog component root carries `data-tx-component="<catalog id>"`
 and, where the component has the axis, `data-tx-variant`, `data-tx-size`,
-`data-tx-tone` and `data-tx-density`. The names and
+`data-tx-tone`, `data-tx-density` and `data-tx-color`. The names and
 `dsRootAttributes(id, axes)` come from `@texuli/spec/design-system`.
 Components with no element of their own (`inline-text`,
 `data-dashboard-widget`) are the documented exceptions. A checker maps any
@@ -780,8 +782,7 @@ element back to its component without component internals.
 ### Locked-mode rules for consumers
 
 These are the owner's rules for locked prototypes. `@texuli/tools/ds-check`
-enforces them (**in development**: in the `0.15.0` tarballs, completed in
-`0.16.0`). Every check, code and
+enforces them (released in `0.16.0`). Every check, code and
 exemption: [ds-check.md](../packages/tools/docs/ds-check.md).
 
 - **Only allowed components.** UI is built from components in the allow
@@ -859,8 +860,8 @@ component in each allowed variant, size and state (disallowed values are
 marked, never rendered), the library with its approval badges, and the
 changes between two versions, with the approval record and its hash check
 in the header. texuli.com shows a fictional example brand with it at
-`/design-systems/kit/`. Both ship in `0.15.0` as **in development** and
-are completed in `0.16.0`. The
+`/design-systems/kit/`. Both are released in `0.16.0` (they shipped in
+`0.15.0` as in development). The
 decision is recorded in ADR-032.
 
 ## Outputs

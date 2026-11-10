@@ -23,6 +23,7 @@
     padding-inline: var(--tx-badge-padding-inline, var(--tx-space-2));
     font-size: var(--tx-badge-font-size, var(--tx-type-caption-size));
     font-weight: var(--tx-badge-font-weight, var(--tx-type-label-weight));
+    font-variant-numeric: tabular-nums;
     line-height: var(--tx-badge-line-height, var(--tx-type-label-line));
     white-space: nowrap;
     vertical-align: middle;
@@ -68,6 +69,11 @@
   .tx-badge--neutral {
     background-color: var(--tx-muted, Canvas);
     color: var(--tx-muted-foreground, GrayText);
+  }
+
+  .tx-badge[data-tx-color] {
+    background-color: var(--tx-category-fill);
+    color: var(--tx-category-ink);
   }
 
   .tx-tag {

@@ -10,7 +10,7 @@ import type { Snippet } from 'svelte';
 export type KitMode = 'light' | 'dark';
 export type KitModeView = 'both' | KitMode;
 export type KitSectionId = 'foundations' | 'voice' | 'matrix' | 'library' | 'changes';
-export type KitAxis = 'variant' | 'size' | 'tone' | 'density';
+export type KitAxis = 'variant' | 'size' | 'tone' | 'density' | 'color';
 export type KitState =
   | 'hover'
   | 'focus-visible'
@@ -66,6 +66,7 @@ export interface KitAllowManifest {
         readonly sizes?: readonly string[];
         readonly tones?: readonly string[];
         readonly densities?: readonly string[];
+        readonly colors?: readonly string[];
         readonly states?: readonly KitState[];
       }
     >

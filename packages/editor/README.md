@@ -12,10 +12,9 @@ Infinite possibilities.": an MIT Svelte 5 component library by Dailybot, Inc.
 **In the stack:** layer L4, a domain package on the `@texuli/core` editor texels, `@texuli/primitives`, the `@texuli/tokens` token engine and the `texuli` components. `@texuli/pages` builds on it.
 
 > **Status: in development (pre-1.0).** `@texuli/editor` is published on
-> npm as `0.15.0`, with provenance (first published as `0.5.0`; the publish
-> workflow publishes it after `texuli`). Under 0.x a new minor (`0.15.0`) may contain
-> breaking changes, so pin the exact version or use `^0.15.0`, which accepts
-> only 0.15.x. The architecture
+> npm as `0.16.0`, with provenance (first published as `0.5.0`; the publish
+> workflow publishes it after `texuli`). Under 0.x a new minor (`0.16.0`) may contain
+> breaking changes, so pin the exact version or use `^0.16.0`, which accepts only 0.16.x. The architecture
 > contract is ADR-003 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)
 > and [EDITOR_ARCHITECTURE](https://github.com/DailybotHQ/texuli/blob/main/docs/EDITOR_ARCHITECTURE.md).
