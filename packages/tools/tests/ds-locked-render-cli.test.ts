@@ -161,7 +161,7 @@ describe('ds validate --locked --render', () => {
     expect(found).toContainEqual(['not-allowed', '$.render["dialog"]']);
     expect(found).toContainEqual(['render-literal', '$.render["button"] button']);
     // The chart mark is exempt: no literal finding names charts-bar.
-    expect(found.some(([, path]) => path.includes('charts-bar'))).toBe(false);
+    expect(found.some(([, path]) => (path ?? '').includes('charts-bar'))).toBe(false);
     expect(report.codes).toEqual(expect.arrayContaining(['not-allowed', 'render-literal']));
     expect(report.check.render?.url).toBe('http://127.0.0.1:9/prototype.html');
     for (const run of report.check.render?.runs ?? [])
@@ -208,7 +208,7 @@ describe('ds check --locked --render', () => {
     expect(browser.mapped).toEqual([]);
     const found = renderCodes(JSON.parse(stdout) as DsFullReport);
     expect(found).toContainEqual(['render-literal', '$.render["button"] button']);
-    expect(found.some(([, path]) => path.includes('charts-bar'))).toBe(false);
+    expect(found.some(([, path]) => (path ?? '').includes('charts-bar'))).toBe(false);
     expect(found.some(([code]) => code === 'not-allowed')).toBe(false);
   });
 
