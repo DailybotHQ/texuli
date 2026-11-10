@@ -15,6 +15,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.4.6] — 2026-11-10
+
+### Changes
+
+- chore(skill): packages on npm at 0.17.3
+
 - The packages are on npm at `0.17.3`, a patch (blueprint spec stays
   `0.15.0`) with the prose importer fixes, render baselines keyed by
   route, viewport and mode, and one `render-disabled-value` per root. The
