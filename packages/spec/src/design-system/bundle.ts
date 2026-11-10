@@ -304,7 +304,10 @@ function checkSource(
   };
 }
 
-function checkDuplicateSourceIds(value: readonly unknown[], errors: DesignSystemBundleIssue[]): void {
+function checkDuplicateSourceIds(
+  value: readonly unknown[],
+  errors: DesignSystemBundleIssue[]
+): void {
   const ids = new Set<string>();
   for (let index = 0; index < value.length; index++) {
     const entry = value[index];
@@ -475,7 +478,11 @@ function checkAllowManifest(
             collect(
               errors,
               64,
-              issue('invalid-type', at(at(at(path, 'allow'), id), axis), 'Axis values must be an array.')
+              issue(
+                'invalid-type',
+                at(at(at(path, 'allow'), id), axis),
+                'Axis values must be an array.'
+              )
             );
           } else if (values.length > DESIGN_SYSTEM_BUNDLE_LIMITS.axis) {
             collect(
@@ -491,7 +498,11 @@ function checkAllowManifest(
             collect(
               errors,
               64,
-              issue('invalid-type', at(at(at(path, 'allow'), id), axis), 'Axis values must be strings.')
+              issue(
+                'invalid-type',
+                at(at(at(path, 'allow'), id), axis),
+                'Axis values must be strings.'
+              )
             );
           }
         }

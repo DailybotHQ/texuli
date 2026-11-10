@@ -23,7 +23,10 @@ const codes = (value: unknown): string[] => validateBundle(value).errors.map((er
 
 describe('design-system bundle contract fixes', () => {
   it('keeps every valid allow entry and axis value up to the design-system caps', () => {
-    const values = Array.from({ length: DESIGN_SYSTEM_BUNDLE_LIMITS.axis }, (_, index) => `v${index}`);
+    const values = Array.from(
+      { length: DESIGN_SYSTEM_BUNDLE_LIMITS.axis },
+      (_, index) => `v${index}`
+    );
     const allow = Object.fromEntries(
       Array.from({ length: DESIGN_SYSTEM_BUNDLE_LIMITS.allow }, (_, index) => [
         `component-${index}`,
@@ -74,7 +77,10 @@ describe('design-system bundle contract fixes', () => {
 
   it('measures source limits in UTF-8 bytes', () => {
     const atLimit = 'é'.repeat(DESIGN_SYSTEM_BUNDLE_LIMITS.source / 2);
-    const accepted = packBundle({ document, librarySources: [{ id: 'copy', version: '1.0.0', source: atLimit }] });
+    const accepted = packBundle({
+      document,
+      librarySources: [{ id: 'copy', version: '1.0.0', source: atLimit }],
+    });
     expect(accepted.ok).toBe(true);
 
     const overLimit = `${atLimit}é`;
@@ -101,7 +107,13 @@ describe('design-system bundle contract fixes', () => {
     const timestamp = `2026-11-10T05:10:19.${'1234567890'.repeat(4)}Z`;
     const packed = packBundle({
       document,
-      history: [{ version: document.version, contentHash: designSystemContentHash(document), approvedAt: timestamp }],
+      history: [
+        {
+          version: document.version,
+          contentHash: designSystemContentHash(document),
+          approvedAt: timestamp,
+        },
+      ],
     });
     expect(packed.ok).toBe(true);
     if (!packed.ok) throw new Error(JSON.stringify(packed.errors));
