@@ -5,6 +5,7 @@
  */
 
 import type { DesignSystem } from '@texuli/spec/design-system';
+import { SEMANTIC_ROLES } from '../contract/semantic.ts';
 import { compileDesignSystem } from './compiler.ts';
 import { DEFAULT_DESIGN_SYSTEM_SEED } from './from-theme.ts';
 import {
@@ -22,6 +23,7 @@ import {
   isObject,
   type Json,
   type JsonObject,
+  setPath,
   Warnings,
 } from './io.ts';
 import type { DesignSystemImportLoss } from './token-formats.ts';
@@ -198,6 +200,40 @@ function failingIndicatorPath(
   )?.path;
 }
 
+function roleFromVariable(variable: string): string | undefined {
+  const role = variable
+    .replace(/^--tx-/, '')
+    .replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase());
+  return SEMANTIC_ROLES.includes(role as (typeof SEMANTIC_ROLES)[number]) ? role : undefined;
+}
+
+function pinFailingForeground(
+  document: JsonObject,
+  issue: { pairs?: readonly { foreground: string }[]; mode?: 'light' | 'dark' },
+  options: GenerateDesignSystemOptions
+): { path: string; value: string; reason: string } | undefined {
+  const role = issue.pairs?.[0] ? roleFromVariable(issue.pairs[0].foreground) : undefined;
+  const mode = issue.mode ?? 'light';
+  if (!role) return;
+  const path = `$.color.roles.${mode}.${role}`;
+  const roles =
+    isObject(document.color) && isObject(document.color.roles) ? document.color.roles : {};
+  const modeRoles = isObject(roles[mode]) ? roles[mode] : {};
+  if (Object.hasOwn(modeRoles, role)) return;
+
+  const candidates = mode === 'light' ? ['#000000', '#ffffff'] : ['#ffffff', '#000000'];
+  for (const value of candidates) {
+    const candidate = cloneObject(document);
+    setPath(candidate, ['color', 'roles', mode, role], value);
+    if (compileDesignSystem(candidate, { trust: options.trust ?? 'untrusted' }).ok)
+      return {
+        path,
+        value,
+        reason: `Pinned ${role} to preserve the brand seed while meeting the failing AA guarantee.`,
+      };
+  }
+}
+
 /**
  * Import, merge, validate and compile any combination of brand brief, token
  * file, stylesheet, logo pixels and Texuli theme. Later inputs take
@@ -297,14 +333,19 @@ export function generateDesignSystem(
       : compiled.errors.find((entry) => ['aa-text', 'aa-focus', 'target-size'].includes(entry.code))
           ?.path;
     if (!path) break;
-    if (path === '$.color.brand.seed' && brand.seed !== DEFAULT_DESIGN_SYSTEM_SEED) {
-      const previous = brand.seed as Json;
-      brand.seed = DEFAULT_DESIGN_SYSTEM_SEED;
+    if (path === '$.color.brand.seed') {
+      const issue = compiled.ok
+        ? undefined
+        : compiled.errors.find(
+            (entry) => entry.path === path && ['aa-text', 'aa-focus'].includes(entry.code)
+          );
+      const repair = issue ? pinFailingForeground(document, issue, options) : undefined;
+      if (!repair) break;
+      setPath(document, repair.path.slice(2).split('.'), repair.value);
       report.repairs.push({
-        path,
-        reason: 'Replaced the brand seed so the compiler can derive AA-safe role colors.',
-        from: previous,
-        to: DEFAULT_DESIGN_SYSTEM_SEED,
+        path: repair.path,
+        reason: repair.reason,
+        to: repair.value,
       });
     } else {
       const removed = removeAt(document, path);
