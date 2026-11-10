@@ -1473,6 +1473,7 @@ export const IMPORTS_BY_ID: Readonly<Record<string, readonly CatalogImport[]>> =
   tabs: [
     { module: 'texuli', exports: ['Tabs'] },
     { module: 'texuli/tabs-accordion', exports: ['Tabs'] },
+    { module: '@texuli/primitives/tabs', exports: ['Content', 'List', 'Root', 'Tabs', 'Trigger'] },
   ],
   tag: [
     { module: 'texuli', exports: ['Tag'] },
@@ -2439,17 +2440,7 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
   },
   {
     module: '@texuli/primitives/tabs',
-    exports: [
-      'Content',
-      'List',
-      'Root',
-      'Tabs',
-      'TabsActivationMode',
-      'TabsContext',
-      'TabsOrientation',
-      'Trigger',
-      'tabsContext',
-    ],
+    exports: ['TabsActivationMode', 'TabsContext', 'TabsOrientation', 'tabsContext'],
   },
   {
     module: '@texuli/primitives/tags-input',

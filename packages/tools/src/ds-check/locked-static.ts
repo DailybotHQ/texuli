@@ -304,9 +304,15 @@ export function usageFromSource(
   for (let match = tag.exec(markup); match; match = tag.exec(markup)) {
     if (usages.length >= LOCKED_STATIC_MAX_USAGES) break;
     const name = match[1] as string;
-    const id = locals.get(name);
+    // Compound namespaces are imported as one public root (`Select`) while
+    // Svelte uses their members as dotted tags (`<Select.Content>`). The
+    // catalog owns the namespace root, so every part inherits that same id
+    // and the design-system allow set governs the whole compound.
+    const namespace = name.indexOf('.');
+    const id =
+      locals.get(name) ?? (namespace === -1 ? undefined : locals.get(name.slice(0, namespace)));
     if (!id) continue;
-    used.add(name);
+    used.add(namespace === -1 ? name : name.slice(0, namespace));
     const { props, end } = readAttributes(markup, match.index + match[0].length);
     usages.push({ component: id, props, location: { file, ...position(match.index) } });
     tag.lastIndex = end;
