@@ -25,6 +25,18 @@ describe('design-system prose brief importer', () => {
     );
   });
 
+  it('keeps an unlabelled color list in the order it was supplied', () => {
+    const result = importBrand('#4f46e5, #0891b2, #f59e0b');
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.document.color?.brand).toMatchObject({
+      seed: '#4f46e5',
+      secondary: '#0891b2',
+      accent: '#f59e0b',
+    });
+  });
+
   it('names the changed token when automatic AA repair pins a role', () => {
     const result = generateDesignSystem({
       css: ':root { --brand: #e11d48; --sidebar-primary: #ffff00; }',

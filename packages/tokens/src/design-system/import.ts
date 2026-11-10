@@ -192,6 +192,7 @@ export function importBrand(
     let name: string | undefined;
     let id: string | undefined;
     const bare: string[] = [];
+    let colorIndex = 0;
     clauses.forEach((clause, i) => {
       const where = `$[${i}]`;
       const lower = clause.toLowerCase().replace(/\s+/g, ' ');
@@ -229,7 +230,6 @@ export function importBrand(
         }
         let remainder = clause;
         let previousEnd = 0;
-        let assigned = 0;
         const firstHex = colorMatches.find((match) => (match[0] as string).startsWith('#'))?.index;
         for (const match of colorMatches) {
           const raw = match[0] as string;
@@ -253,13 +253,13 @@ export function importBrand(
               ? role
               : role === 'brand' || role === 'seed' || role === 'primary'
                 ? 'seed'
-                : (['seed', 'secondary', 'accent'][Math.min(assigned, 2)] as string);
+                : (['seed', 'secondary', 'accent'][Math.min(colorIndex, 2)] as string);
           const converted = raw.startsWith('#')
             ? toColor(raw)
             : { ok: true as const, value: CSS_COLOR_NAMES[raw.toLowerCase()] as string };
           if (converted.ok) {
             set(`color.brand.${target}`, converted.value);
-            assigned += 1;
+            colorIndex += 1;
             remainder = blankRange(remainder, start, end);
             if (roleMatch?.index !== undefined) {
               const roleStart = previousEnd + roleMatch.index;
