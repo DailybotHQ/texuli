@@ -10,8 +10,8 @@
  */
 import { designSystemContentHash } from '@texuli/spec/design-system';
 
-/** Blueprint spec version this manifest names (ADR-032; spec 0.14.0 adds allowed colors). */
-export const ALLOW_MANIFEST_SPEC_VERSION = '0.14.0';
+/** Blueprint spec version this manifest names (ADR-032; spec 0.14.0 added allowed colors; the current spec). */
+export const ALLOW_MANIFEST_SPEC_VERSION = '0.15.0';
 
 const RESERVED = new Set(['__proto__', 'constructor', 'prototype']);
 const AXIS = ['variants', 'sizes', 'tones', 'densities', 'colors', 'states'] as const;

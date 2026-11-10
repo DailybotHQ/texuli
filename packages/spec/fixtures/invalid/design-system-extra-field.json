@@ -15,7 +15,7 @@
     },
     "tier": "untrusted",
     "profile": "web",
-    "spec": "0.14.0",
+    "spec": "0.15.0",
     "id": "design-system-extra-field",
     "designSystem": {
       "ref": "acme@2.1.0",

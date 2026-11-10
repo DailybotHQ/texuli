@@ -9,6 +9,7 @@
 import { cleanup, render } from '@testing-library/svelte';
 import { createRawSnippet, flushSync, tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { DATA_MANIFESTS } from '../../catalog/src/manifests/data/index.ts';
 import {
   normalizeVirtualListMode,
   VIRTUAL_LIST_MODES,
@@ -183,7 +184,19 @@ describe('feed mode (APG feed)', () => {
   });
 });
 
-describe('mode values', () => {
+describe('catalog: data-virtual-list mode and selectable (spec 0.15.0)', () => {
+  const manifest = DATA_MANIFESTS.find((entry) => entry.id === 'data-virtual-list');
+  const props = Object.fromEntries((manifest?.props ?? []).map((prop) => [prop.name, prop]));
+
+  it('lists mode and selectable, and recommends a long feed only in feed mode', () => {
+    expect(props.mode).toMatchObject({ kind: 'enum', default: 'listbox' });
+    expect(props.mode?.enumValues).toEqual([...VIRTUAL_LIST_MODES]);
+    expect(props.selectable).toMatchObject({ kind: 'boolean', default: true });
+    const feedLines = (manifest?.useWhen ?? []).filter((line) => /feed/i.test(line));
+    expect(feedLines.length).toBeGreaterThan(0);
+    for (const line of feedLines) expect(line).toMatch(/mode="feed"/);
+  });
+
   it('normalizes an unknown mode to listbox', () => {
     expect(normalizeVirtualListMode('feed')).toBe('feed');
     expect(normalizeVirtualListMode('grid')).toBe('listbox');
