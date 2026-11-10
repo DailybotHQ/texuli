@@ -84,7 +84,7 @@ Consumer classes compose through `cx` / `variants` and win by source order in
 
 ## Appearance and size (inline edit)
 
-New in `0.16.0` (in development). Input and Textarea take `appearance` and
+New in `0.16.0`. Input and Textarea take `appearance` and
 `textSize`, so an inline-edit title or body reads like the text around it:
 
 | Prop | Values | Default |

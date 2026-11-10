@@ -22,10 +22,11 @@ keyboard spinbutton behavior, bounds, optional wheel stepping and native form
 submission. Set translated `incrementLabel` and `decrementLabel` on the root
 when the default English labels are not appropriate.
 
-New in `0.16.0` (in development). `commit` on `NumberField.Root` picks when
+New in `0.16.0`. `commit` on `NumberField.Root` picks when
 typed text commits and `onValueChange` runs: `enter` (the default, the
-behavior before) on Enter and on blur, `blur` on blur only, `input` on every
-keystroke that parses (the text stays as typed until blur formats it).
+behavior before) on Enter and on blur, `blur` on blur only (inside a form, Enter also commits, so a submit
+sends the typed value), `input` on every keystroke that parses (the text
+stays as typed until blur formats it).
 Steppers, the arrow keys, PageUp/PageDown and Home/End commit at once in
 every mode.
 

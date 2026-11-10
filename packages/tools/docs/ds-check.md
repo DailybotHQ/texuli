@@ -28,7 +28,7 @@ texuli ds validate acme.json --locked --render --url http://localhost:5173/  # y
 
 > **Locked design systems (spec 0.13.0, new in `0.15.0`).** The check
 > reports the allowed set, the approval and the content hashes.
-> `--locked` (in development, completed in `0.16.0`) runs the full validator
+> `--locked` (released in `0.16.0`) runs the full validator
 > ([below](#locked-design-systems)): the allowed set, the approval, the
 > content hashes, data-viz and token completeness. `texuli ds validate`
 > exposes that validator and can scan a local prototype source directory.

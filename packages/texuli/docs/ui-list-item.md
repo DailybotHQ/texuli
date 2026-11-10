@@ -7,7 +7,7 @@
 `packages/texuli/tests/protoyard-round3.test.ts`,
 `packages/texuli/tests/contract.test.ts`  
 **Example:** `texuli-list-item`  
-**Status:** ListItem since `0.14.3`; List and `divided` for locked prototypes (spec `0.13.0`)
+**Status:** ListItem since `0.14.3`; List and `divided` for locked prototypes since `0.16.0` (spec `0.14.0`)
 
 One row of a list: leading media or an icon, a title and a description,
 trailing meta text, and trailing controls. The row is a link (`href`), a
