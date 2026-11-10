@@ -13,7 +13,7 @@ export {
   type VisionDeficiency,
   validateChartTokens,
 } from './charts.ts';
-export { contrastRatio, hoverFill, parseHex, relativeLuminance } from './contrast.ts';
+export { contrastInk, contrastRatio, hoverFill, parseHex, relativeLuminance } from './contrast.ts';
 export {
   type Oklch,
   oklabDistance,

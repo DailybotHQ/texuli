@@ -10,6 +10,7 @@ import {
   type Theme,
 } from '../contract/index.ts';
 import { slowerDuration } from '../motion/durations.ts';
+import { contrastInk } from '../palette/contrast.ts';
 
 export interface ThemeAppearanceInput {
   theme: Theme;
@@ -78,6 +79,7 @@ const STYLE_VARIABLES = [
   '--tx-chart-axis',
   ...FONT_SIZES.map(([step]) => `--tx-font-size-${step}`),
   ...Array.from({ length: 8 }, (_, i) => `--tx-chart-${i + 1}`),
+  ...Array.from({ length: 8 }, (_, i) => `--tx-chart-${i + 1}-foreground`),
   ...Array.from({ length: 9 }, (_, i) => `--tx-chart-sequential-${i + 1}`),
   ...Array.from({ length: 9 }, (_, i) => `--tx-chart-diverging-${i + 1}`),
 ] as const;
@@ -199,6 +201,7 @@ export function themeVariables(input: ThemeAppearanceInput): Record<string, stri
   vars['--tx-chart-axis'] = charts?.axis ?? palette.mutedForeground.default;
   charts?.categorical.forEach((color, index) => {
     vars[`--tx-chart-${index + 1}`] = color;
+    vars[`--tx-chart-${index + 1}-foreground`] = contrastInk(color);
   });
   charts?.sequential.forEach((color, index) => {
     vars[`--tx-chart-sequential-${index + 1}`] = color;

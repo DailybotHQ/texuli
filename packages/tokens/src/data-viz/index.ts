@@ -13,7 +13,7 @@
 
 import type { ColorModeName, Theme, ThemeChartTokens } from '../contract/types.ts';
 import { type ChartPaletteInput, deriveChartTokens } from '../palette/charts.ts';
-import { parseHex } from '../palette/contrast.ts';
+import { contrastInk, parseHex } from '../palette/contrast.ts';
 import { oklchToHex, rgbToOklch } from '../palette/oklch.ts';
 
 const FALLBACK = {
@@ -70,12 +70,13 @@ export function themeChartTokens(theme: Theme, mode: ColorModeName): ThemeChartT
   };
 }
 
-/** Every `--tx-chart-*` variable for one theme and mode, always complete (28 entries). */
+/** Every chart fill and derived on-color for one theme and mode (36 entries). */
 export function dataVizVariables(theme: Theme, mode: ColorModeName): Record<string, string> {
   const charts = themeChartTokens(theme, mode);
   const vars: Record<string, string> = {};
   charts.categorical.forEach((color, i) => {
     vars[`--tx-chart-${i + 1}`] = color;
+    vars[`--tx-chart-${i + 1}-foreground`] = contrastInk(color);
   });
   charts.sequential.forEach((color, i) => {
     vars[`--tx-chart-sequential-${i + 1}`] = color;

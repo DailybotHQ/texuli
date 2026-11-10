@@ -2,6 +2,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { render } from '@testing-library/svelte';
 import { describe, expect, it } from 'vitest';
+import { contrastRatio } from '@texuli/tokens/palette';
+import { themeVariables } from '@texuli/tokens/css';
+import { loadAllFullLibraryThemes } from '@texuli/tokens/library-expand';
 import Avatar from '../src/components/avatar/Avatar.svelte';
 import Badge from '../src/components/badge/Badge.svelte';
 import Tag from '../src/components/badge/Tag.svelte';
@@ -66,9 +69,11 @@ describe('closed label color references', () => {
   });
 
   it('resolves registered references to token variables and on-color tokens', () => {
-    expect(colorRefVar('chart-1')).toBe('var(--tx-chart-1, var(--tx-primary))');
-    expect(colorRefVar('chart-8')).toBe('var(--tx-chart-8, var(--tx-chart-3))');
-    expect(colorRefInk('chart-1')).toBe('var(--tx-background)');
+    expect(colorRefVar('chart-1')).toBe('var(--tx-chart-1, #4f46e5)');
+    expect(colorRefVar('chart-8')).toBe('var(--tx-chart-8, #0f766e)');
+    expect(colorRefInk('chart-1')).toBe(
+      'var(--tx-chart-1-foreground, #ffffff)'
+    );
     expect(colorRefVar('destructive')).toBe('var(--tx-destructive)');
     expect(colorRefInk('destructive')).toBe('var(--tx-destructive-foreground)');
     expect(colorRefVar('neutral')).toBe('var(--tx-muted)');
@@ -110,6 +115,34 @@ describe('closed label color references', () => {
     expect(badge?.hasAttribute('data-tx-color')).toBe(false);
     expect(badge?.getAttribute('style') ?? '').not.toContain('red');
   });
+
+  it('keeps category-color ink at AA for every library theme and mode', async () => {
+    const themes = await loadAllFullLibraryThemes();
+    const fallbackPairs = [
+      ['#4f46e5', '#ffffff'],
+      ['#0ea5e9', '#0a0a0a'],
+      ['#f59e0b', '#0a0a0a'],
+      ['#10b981', '#0a0a0a'],
+      ['#ec4899', '#0a0a0a'],
+      ['#7c3aed', '#ffffff'],
+      ['#64748b', '#ffffff'],
+      ['#0f766e', '#ffffff'],
+    ] as const;
+
+    for (const theme of themes) {
+      for (const mode of ['light', 'dark'] as const) {
+        const vars = themeVariables({ theme, mode });
+        DATA_COLORS.forEach((color, index) => {
+          const [fallbackFill, fallbackInk] = fallbackPairs[index] as (typeof fallbackPairs)[number];
+          const fill = vars[`--tx-${color}`] ?? fallbackFill;
+          const ink = vars[`--tx-${color}-foreground`] ?? fallbackInk;
+          expect(fill, `${theme.id} ${mode} ${color} fill`).toMatch(/^#[0-9a-f]{6}$/i);
+          expect(ink, `${theme.id} ${mode} ${color} foreground`).toMatch(/^#[0-9a-f]{6}$/i);
+          expect(contrastRatio(ink as string, fill as string), `${theme.id} ${mode} ${color}`).toBeGreaterThanOrEqual(4.5);
+        });
+      }
+    }
+  }, 60_000);
 
   it.each(colorAxisCases)(
     '$id renders the default declared by the catalog color axis',
