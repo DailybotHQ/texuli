@@ -5,9 +5,9 @@
 <script lang="ts">
 /**
  * Badge, Chip, Tag, Kbd, Code, the avatar grid, the inline-text catalog
- * node, and the typography and surface components (Heading, Text, Prose, Box,
- * ColorSwatch, Link, Mark, List, ListItem): the instance the props panel
- * drives, then every variant and state side by side.
+ * node, the typography and surface components (Heading, Text, Prose, Box, Mark, Link, ColorSwatch)
+ * and List with ListItem rows: the instance the props panel drives, then every variant and state
+ * side by side.
  */
 
 import { AvatarGroupGrid } from 'texuli/avatar';
@@ -60,12 +60,6 @@ const SWATCH_COLORS = [
   'info',
   'neutral',
 ] as const;
-const MARK_TONES = ['warning', 'primary', 'success', 'info'] as const;
-const INBOX = [
-  { title: 'Quarterly notes', description: 'Ada Example', meta: '2h', icon: 'info' as const },
-  { title: 'Berth schedule', description: 'Lin Example', meta: '5h', icon: 'search' as const },
-  { title: 'Harbor guide', description: 'Mina Placeholder', meta: '1d', icon: 'warning' as const },
-];
 
 let selected = $state(true);
 let tags = $state(['Design', 'Research', 'Logistics']);
@@ -184,6 +178,23 @@ $effect(() => {
     >
       <Text size="sm">A panel from tokens.</Text>
     </Box>
+  {:else if componentId === 'mark'}
+    <p class="row">
+      Results for
+      <Mark tone={pick('tone', ['warning', 'primary', 'success', 'info'] as const, 'warning')} label={str('label', 'quarter')} />
+      across every report.
+    </p>
+    <p class="row" aria-label="Every mark tone">
+      {#each ['warning', 'primary', 'success', 'info'] as const as tone (tone)}
+        <Mark {tone}>{tone}</Mark>
+      {/each}
+    </p>
+  {:else if componentId === 'link'}
+    <p class="row">
+      Read the
+      <Link href="https://example.com/handbook" external={bool('external', false)} label={str('label', 'team handbook')} />
+      before the review.
+    </p>
   {:else if componentId === 'color-swatch'}
     <p class="row">
       <ColorSwatch
@@ -192,50 +203,16 @@ $effect(() => {
         label={str('label', 'Primary')}
       />
     </p>
-    <p class="row" aria-label="Every swatch color">
-      {#each SWATCH_COLORS as color (color)}
+    <p class="row" aria-label="The eight chart series colors">
+      {#each ['chart-1', 'chart-2', 'chart-3', 'chart-4', 'chart-5', 'chart-6', 'chart-7', 'chart-8'] as const as color (color)}
         <ColorSwatch {color} size="sm" label={color} />
       {/each}
     </p>
-  {:else if componentId === 'link'}
-    <p>
-      Read
-      <Link
-        href={str('href', 'https://example.com/guide')}
-        hrefTrust={pick('hrefTrust', ['developer', 'untrusted'] as const, 'developer')}
-        external={bool('external', false)}
-        label={str('label', 'the harbor guide')}
-      />
-      before you ship.
-    </p>
-  {:else if componentId === 'mark'}
-    <p>
-      The
-      <Mark
-        tone={pick('tone', MARK_TONES, 'warning')}
-        label={str('label', 'quarter')}
-      />
-      closed ahead of plan.
-    </p>
-    <p class="row" aria-label="Every mark tone">
-      {#each MARK_TONES as tone (tone)}
-        <Mark {tone} label={tone} />
-      {/each}
-    </p>
-  {:else if componentId === 'list'}
-    <List divided={bool('divided', true)}>
-      {#each INBOX as row (row.title)}
-        <ListItem title={row.title} description={row.description} meta={row.meta} icon={row.icon} />
-      {/each}
-    </List>
-  {:else if componentId === 'list-item'}
-    <List>
-      <ListItem
-        title="Quarterly notes"
-        description="Ada Example"
-        meta="2h"
-        icon="info"
-      />
+  {:else if componentId === 'list' || componentId === 'list-item'}
+    <List divided={componentId === 'list' ? bool('divided', true) : true} aria-label="Inbox">
+      <ListItem title="Quarterly report" description="Shared by Ada Example" meta="2h" />
+      <ListItem title="Design review" description="Harbor team" meta="Mon" />
+      <ListItem title="Launch checklist" description="Three items left" meta="Tue" />
     </List>
   {:else if componentId === 'inline-text'}
     {@const text = str('text', 'Save changes')}

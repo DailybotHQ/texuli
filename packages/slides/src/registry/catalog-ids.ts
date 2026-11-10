@@ -169,6 +169,8 @@ export const SLIDE_COMPONENT_EXCLUSIONS: Readonly<Record<string, string>> = Obje
     'A dashboard (spec 0.8.0) is an application surface of widget child nodes with its own grid layout and edit mode: a component item has no children; lay out figures with a slide layout, `blocks-structure` or the chart components.',
   'data-dashboard-widget':
     'A dashboard widget frames catalog child nodes inside `data-dashboard` only: a component item has no children; use `blocks-structure` cards or `three-column-cards` on a slide.',
+  'data-virtual-list':
+    'A windowed listbox (spec 0.14.0) for long scrolling feeds: host code renders its rows through a snippet and the player has no painter for it; a slide shows a short list with `blocks-text` or a table with `blocks-data`.',
 });
 
 /** Whole catalog groups the player has no painter for, with their ids and the reason. */
@@ -191,6 +193,7 @@ export const SLIDE_EXCLUDED_GROUPS: Readonly<
       'carousel',
       'chip',
       'code',
+      'color-swatch',
       'empty-state',
       'error-state',
       'heading',
@@ -198,7 +201,10 @@ export const SLIDE_EXCLUDED_GROUPS: Readonly<
       'inline-text',
       'kbd',
       'kpi',
+      'link',
+      'list',
       'list-item',
+      'mark',
       'progress',
       'prose',
       'separator',
