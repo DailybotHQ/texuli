@@ -71,8 +71,9 @@ texuli ds validate brand.json --locked --prototype ./src --render
 | `--locked` | Run the full locked-design-system validator (`checkDesignSystemFull`): the static checks, data-viz, tokens, allow, approval and hashes, with findings counted by area, route and component |
 | `--prototype <dir>` | With `ds validate` or `ds check --locked`: read bounded Svelte, TypeScript, JavaScript, CSS and blueprint JSON files from a local directory. Source is scanned as text and never executed; symlinks are refused. JSON is included when it contains a blueprint `tree`. The report lists workspace packages and local modules that directory imported but the check did not read (`prototype.unchecked`, a count and the specifiers). |
 | `--scan-workspace` | With `--prototype`: also scan workspace packages those sources import (from `pnpm-workspace.yaml` or `package.json` workspaces). Files are keyed `workspace:<name>/…`. Without this flag those imports stay in `unchecked`. |
-| `--report` | With `--locked` only: print the complete findings (readable or `--json`) and exit 0, so a saved JSON file is a progress baseline. Without `--locked` the flag is refused. JSON includes a `fingerprint` of finding codes and paths. |
+| `--report` | With `--locked` only: print the complete findings (readable or `--json`) and exit 0, so a saved JSON file is a progress baseline. Without `--locked` the flag is refused. JSON includes a `fingerprint` of the finding keys (below). |
 | `--baseline <file>` | With `--locked --report`: compare the new report to a saved JSON file (`compareDsReport`). Exit 1 when the new run adds findings. |
+| `--scope <id>` | With `--locked`: a host-chosen scope, such as a prototype id, set on every finding (static and render) and part of the baseline key. Use it when one baseline file holds the findings of several prototypes. At most 512 characters are kept; a value with control characters is refused (exit 2) |
 
 **Exit codes:** `0` every check passed, or `--locked --report` listed
 findings without enforcing them; `1` a refusal or a render finding in
@@ -343,6 +344,35 @@ against `allow`). MCP full mode is static-only.
 component and exits 0. `--json` adds a `counts` object so a saved file is
 a progress baseline you compare later. Without `--report`, any error
 finding exits 1.
+
+### Baseline keys
+
+`dsReportFingerprint` and `compareDsReport` (`baseline.ts`) key each
+finding by its code and path, plus each of these fields the finding has:
+
+| Field | Set by | Since |
+| --- | --- | --- |
+| `route` | the locked render check: the checked URL's path and query | 0.17.3 |
+| `viewport` | the locked render check: the page's `<width>x<height>` | 0.17.3 |
+| `mode` | the check that found it (`light`, `dark`) | 0.17.3 |
+| `scope` | the host: `--scope <id>`, or the `scope` option of `renderLockedDesignSystemCheck` | 0.17.4 |
+| `component` | the finding's catalog id: prototype findings, and render findings the mapper names (`not-allowed`, `render-disabled-value`) | 0.17.4 |
+
+So when one run covers several prototypes, the same selector on the same
+route of two prototypes stays two keys once each run sets its scope. A
+host that merges several runs into one report sets `scope` (and
+`component`) on each finding itself; the fingerprint reads them from any
+finding.
+
+Older baselines stay readable: in `compareDsReport`, a field the baseline
+entry does not record matches any value. A baseline saved before 0.17.4
+(no scope) matches every scope, so it reports none of its own findings as
+added; save the new scoped report as the baseline to separate the scopes
+from then on. A report whose findings have none of these fields keeps its
+pre-0.17.3 fingerprint. The printed `fingerprint` changes for a report
+whose findings carry `component` (prototype findings, and render
+`not-allowed` findings) or `scope`; comparing against an older baseline
+file still works, because both sides are keyed from their findings.
 
 ## Prototype: static component checks
 

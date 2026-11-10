@@ -73,7 +73,9 @@ export interface DsFullFinding {
   readonly route?: string;
   /** The viewport of a render finding, `<width>x<height>` (0.17.3); part of the baseline key. */
   readonly viewport?: string;
-  /** The component of a prototype finding. */
+  /** The host-chosen scope, such as a prototype id (`--scope`, 0.17.4); part of the baseline key. */
+  readonly scope?: string;
+  /** The catalog id of the component a finding is about; part of the baseline key (0.17.4). */
   readonly component?: string;
   /** The value that failed (a variant, a class, a declaration). */
   readonly value?: string;
