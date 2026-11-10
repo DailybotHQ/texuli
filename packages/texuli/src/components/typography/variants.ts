@@ -138,6 +138,9 @@ export const BOX_FILLS = ['none', ...DATA_COLORS, ...ROLE_COLORS] as const;
 /** Mark (search highlight): fill from a role's soft token. */
 export const MARK_TONES = ['warning', 'primary', 'success', 'info'] as const;
 export type MarkTone = (typeof MARK_TONES)[number];
+const markToneClasses = Object.fromEntries(
+  MARK_TONES.map((tone) => [tone, `tx-mark--${tone}`])
+) as Record<MarkTone, string>;
 
 /** A value of a closed list, or the fallback (a hostile or stale prop never reaches a class). */
 export function oneOf<T extends string | number>(
@@ -153,7 +156,7 @@ const map = <T extends string>(list: readonly T[], prefix: string) =>
 
 export const markClass = variants({
   base: 'tx-mark',
-  variants: { tone: map(MARK_TONES, 'tx-mark--') },
+  variants: { tone: markToneClasses },
   defaultVariants: { tone: 'warning' },
 });
 
