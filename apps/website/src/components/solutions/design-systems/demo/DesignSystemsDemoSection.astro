@@ -1,0 +1,117 @@
+---
+/**
+ * The Design systems demo section (anchor `#demo`, owned by SolutionLayout; PLAN_017
+ * T-demo). At build time `buildDesignSystemsDemo` generates and compiles three fictional
+ * brands; their scoped variables go into one inline `<style>` (built here and sanitized by
+ * `designSystemStyle`, so the build-time CSP hashes it) and the island receives only the
+ * brand ids, inputs, report summaries and the locked check findings per toggle combination. The island is the landing's one `client:visible`
+ * island; its server render is the preview before hydration. The `island` slot stays for a
+ * page that wants to pass its own.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import { getSolution } from '../../../../data/solutions/index.ts';
+import { withBase } from '../../../foundation/site.ts';
+import { buildDesignSystemsDemo } from './build.ts';
+import DesignSystemsDemo from './DesignSystemsDemo.svelte';
+import {
+  DESIGN_SYSTEMS_DEMO_LIMITS,
+  DESIGN_SYSTEMS_DEMO_LINK,
+  DESIGN_SYSTEMS_DEMO as demo,
+} from './demo-content.ts';
+
+const entry = getSolution('design-systems');
+const demoBuild = await buildDesignSystemsDemo();
+const headingId = `solution-demo-${entry.slug}-heading`;
+const kitHref = withBase(
+  import.meta.env.BASE_URL,
+  safeHref(DESIGN_SYSTEMS_DEMO_LINK.href, 'developer') ?? '/design-systems/'
+);
+---
+
+{/*
+  Safe by construction: a build-time constant, never data. buildDesignSystemsDemo() reads only
+  DEMO_BRAND_INPUTS (fictional fixtures) and designSystemStyle's default [data-tx-ds="<id>"]
+  selector (spec-name ids; it refuses <, braces and comments). Never pass a page prop, content or
+  agent output here. design-systems-demo.test.ts checks the CSS has no `<`.
+*/}
+<style is:inline set:html={demoBuild.css}></style>
+<section class="ds-demo" aria-labelledby={headingId} data-tx-solution-demo={entry.slug}>
+  <div class="ds-demo__inner">
+    <h2 id={headingId}>{demo.title}</h2>
+    <div class="ds-demo__try" role="group" aria-label="Try this">
+      <p class="ds-demo__try-title">Try this</p>
+      <ol>
+        {demo.tryThis.map((line) => <li>{line}</li>)}
+      </ol>
+    </div>
+    <div class="ds-demo__island" data-tx-ds-demo-mount="" role="region" aria-label={demo.label}>
+      <DesignSystemsDemo client:visible brands={demoBuild.brands} checks={demoBuild.checks} />
+      <slot name="island" />
+    </div>
+    <p class="ds-demo__limits">{DESIGN_SYSTEMS_DEMO_LIMITS}</p>
+    <p class="ds-demo__actions">
+      <a class="ds-demo__cta" href={kitHref} data-tx-ds-demo-kit="">{DESIGN_SYSTEMS_DEMO_LINK.label}</a>
+    </p>
+  </div>
+</section>
+
+<style>
+  .ds-demo {
+    padding-inline: 1.25rem;
+  }
+  .ds-demo__inner {
+    display: grid;
+    gap: 1.25rem;
+    max-inline-size: 72rem;
+    margin-inline: auto;
+  }
+  .ds-demo h2 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    line-height: 1.15;
+  }
+  .ds-demo__try {
+    padding: 1rem 1.25rem;
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    border-radius: calc(var(--tx-radius, 0.5rem) * 1.5);
+    background: var(--tx-background);
+  }
+  .ds-demo__try-title {
+    margin: 0 0 0.5rem;
+    font-weight: 650;
+  }
+  .ds-demo__try ol {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0;
+    padding-inline-start: 1.25rem;
+  }
+  .ds-demo__actions {
+    margin: 0;
+  }
+  .ds-demo__cta {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    padding-inline: 1.25rem;
+    border-radius: 999px;
+    background: var(--home-accent, var(--tx-primary));
+    color: var(--home-accent-ink, var(--tx-primary-foreground));
+    font-weight: 650;
+    text-decoration: none;
+  }
+  .ds-demo__cta:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+  }
+  .ds-demo__limits {
+    margin: 0;
+    color: var(--tx-muted-foreground);
+    font-size: 0.9375rem;
+  }
+  @media (forced-colors: active) {
+    .ds-demo__cta {
+      border: 1px solid ButtonText;
+    }
+  }
+</style>

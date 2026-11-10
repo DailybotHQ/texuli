@@ -2262,3 +2262,25 @@ reflect this decision.
 - **Reverse when:** consumers enforce design systems through another mechanism (drop `allow` and the
   manifest; the attributes stay useful for analytics and tests), or the catalog widens past the agent
   catalog, which extends `axes`/`states` rather than replacing them.
+
+## ADR-033: A design-systems Solution landing beside the reference hub
+
+- **Date:** 2026-11-10 · **Ratification:** the developer asked for a landing focused on design systems;
+  lead decision under the developer's standing grant (PLAN_017 T-route).
+- **Context:** design systems (ADR-021 to ADR-024, ADR-032) have a reference hub at `/design-systems/`
+  and the UI kit at `/design-systems/kit/`, but no Solution-style page that tells the whole loop:
+  create a design system from brand inputs, review it in the kit, approve it, build locked prototypes,
+  share it.
+- **Options:** (A) a Solution landing at `/solutions/design-systems/` in the typed Solutions registry
+  (ADR-029), hub and kit unchanged; (B) promote `/design-systems/` itself to the landing and move the
+  reference elsewhere.
+- **Choice:** A. The landing is registered like the five PLAN_015 landings (slug `design-systems`, docs
+  `/guides/solutions/design-systems/`, no `replaces`), self-canonical; the hub and the kit stay
+  self-canonical reference pages; the hub hero links the landing and the landing links the hub, the
+  kit and the Studio.
+- **Why:** the registry invariants (route under `/solutions/`, the navigation group, catalog, home band,
+  llms section, `/solutions/index.json`, twins, the one-island budget) hold without special cases;
+  nothing redirects and no inbound link breaks. B would need registry exceptions and would push the
+  hub over its page cap with a demo island.
+- **How to reverse:** fold the hub's reference into the guide, then add a 301 from `/design-systems/` to
+  the landing through a registry rule that allows a non-`-page` source.

@@ -51,7 +51,14 @@ describe('ADR-031 landing nav contract', () => {
   });
 
   it('lists promoted Solutions only when their landings exist', () => {
-    expect(SOLUTION_SLUGS).toEqual(['slides', 'documents', 'workflows', 'canvas', 'sheets']);
+    expect(SOLUTION_SLUGS).toEqual([
+      'slides',
+      'documents',
+      'workflows',
+      'canvas',
+      'sheets',
+      'design-systems',
+    ]);
     const links = solutionNavLinks();
     for (const slug of SOLUTION_SLUGS) {
       const href = `/solutions/${slug}/`;

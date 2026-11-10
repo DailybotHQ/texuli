@@ -19,7 +19,8 @@ const active = REDIRECTS.split('\n')
 describe('the applied Solution redirect map (ADR-028, first wave)', () => {
   it('moves every replaced *-page route to its landing, both slash forms, as one 301 hop', () => {
     const expected = SOLUTIONS.flatMap((entry) => {
-      const from = entry.replaces ?? '';
+      if (!entry.replaces) return [];
+      const from = entry.replaces;
       return [
         [from.slice(0, -1), entry.route, '301'],
         [from, entry.route, '301'],
@@ -41,7 +42,8 @@ describe('the applied Solution redirect map (ADR-028, first wave)', () => {
 
   it('redirects the Markdown twin of each moved page to the landing twin, keeping the query', () => {
     for (const entry of SOLUTIONS) {
-      const from = entry.replaces ?? '';
+      if (!entry.replaces) continue;
+      const from = entry.replaces;
       const twin = `${entry.route.slice(0, -1)}.md`;
       expect(resolveSolutionRedirect(`${from.slice(0, -1)}.md`, '', {})).toMatchObject({
         location: twin,

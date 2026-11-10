@@ -45,6 +45,8 @@ Embeddable open-source systems that complete a task end to end.
 - [Canvas docs](https://texuli.com/guides/solutions/canvas/)
 - [Sheets](https://texuli.com/solutions/sheets/): An embeddable spreadsheet with formulas and CSV. Status: in development.
 - [Sheets docs](https://texuli.com/guides/solutions/sheets/)
+- [Design systems](https://texuli.com/solutions/design-systems/): Carry one brand document across Texuli surfaces. Status: available.
+- [Design systems docs](https://texuli.com/guides/solutions/design-systems/)
 
 ## Built with Texuli
 
@@ -69,6 +71,7 @@ Task-first guides, in reading order.
 - [Workflows](https://texuli.com/guides/solutions/workflows/)
 - [Canvas](https://texuli.com/guides/solutions/canvas/)
 - [Sheets](https://texuli.com/guides/solutions/sheets/)
+- [Design systems](https://texuli.com/guides/solutions/design-systems/)
 - [Performance](https://texuli.com/guides/performance/)
 
 ## Components

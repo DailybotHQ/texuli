@@ -17,6 +17,8 @@ import { serveDist, settle } from './support/site.ts';
 
 const origin = serveDist();
 const SLUGS = ['slides', 'documents', 'workflows', 'canvas', 'sheets'] as const;
+/** Every registry card in order: the five PLAN_015 landings plus design systems (ADR-033). */
+const CATALOG = [...SLUGS, 'design-systems'] as const;
 const SECTIONS = [
   'hero',
   'demo',
@@ -54,10 +56,15 @@ test('/solutions/ lists every card and the All, Web and Native filters work', as
   );
   const catalog = page.locator('[data-tx-solutions-catalog]');
   const cards = catalog.locator('[data-solution]');
-  await expect(cards).toHaveCount(SLUGS.length);
+  await expect(cards).toHaveCount(CATALOG.length);
   expect(
     await cards.evaluateAll((all) => all.map((el) => el.getAttribute('data-solution')))
-  ).toEqual([...SLUGS]);
+  ).toEqual([...CATALOG]);
+  // Design systems also paint natively (the Kotlin twin applies design-system tokens).
+  await expect(catalog.locator('[data-solution="design-systems"]')).toHaveAttribute(
+    'data-on-native',
+    'true'
+  );
   for (const slug of SLUGS) {
     const card = catalog.locator(`[data-solution="${slug}"]`);
     await expect(card).toBeVisible();
@@ -82,7 +89,7 @@ test('/solutions/ lists every card and the All, Web and Native filters work', as
   await filters.getByRole('link', { name: /Native/ }).click();
   await expect.poll(() => page.evaluate(() => window.location.hash)).toBe('#solutions-native');
   for (const slug of SLUGS) await expect(catalog.locator(`[data-solution="${slug}"]`)).toBeHidden();
-  await expect(catalog.getByText('No Solution renders natively yet')).toBeVisible();
+  await expect(catalog.locator('[data-solution="design-systems"]')).toBeVisible();
 
   await filters.getByRole('link', { name: /All/ }).click();
   await expect.poll(() => page.evaluate(() => window.location.hash)).toBe('#solutions-all');
@@ -102,9 +109,9 @@ test('/solutions/index.json is the registry document', async () => {
   };
   expect(doc.format).toBe('texuli/solutions-index-v1');
   expect(doc.catalog).toBe('https://texuli.com/solutions/');
-  expect(doc.solutions.map((row) => row.slug)).toEqual([...SLUGS]);
+  expect(doc.solutions.map((row) => row.slug)).toEqual([...CATALOG]);
   for (const row of doc.solutions) {
-    expect(row.status).toBe('in development');
+    expect(row.status).toBe(row.slug === 'design-systems' ? 'available' : 'in development');
     expect(row.url).toBe(`https://texuli.com/solutions/${row.slug}/`);
     expect(row.docs).toBe(`https://texuli.com/guides/solutions/${row.slug}/`);
   }

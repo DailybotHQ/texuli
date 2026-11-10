@@ -162,8 +162,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/perf/',
     reason:
-      'PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (ADR-020, second amendment); measured 98.1 KB page (+4% headroom). Under the 96 KB default before. Trimming is a Final Review follow-up.',
-    budget: { pageGzipKb: 103 },
+      'PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (ADR-020, second amendment); measured 98.1 KB page (+4% headroom). Under the 96 KB default before. Trimming is a Final Review follow-up. PLAN_017 T-demo (2026-11-10): the page lists every override with its reason, so its HTML grows with each one; measured 24.2 KB gzip of HTML with the /solutions/design-systems/ row, limit 26 (+4% headroom, rounded up).',
+    budget: { pageGzipKb: 103, htmlGzipKb: 26 },
   },
   {
     route: '/dashboards-page/',
@@ -200,6 +200,12 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
     reason:
       'ADR-030: this landing replaces /workflows-page/ and inherits its current 132 KB page and 96 KB JavaScript caps.',
     budget: { pageGzipKb: 132, jsGzipKb: 96 },
+  },
+  {
+    route: '/solutions/design-systems/',
+    reason:
+      'PLAN_017 T-demo: the server-rendered demo island and its three build-time brands as one inline style (light and dark), so no compiler ships. Measured 2026-11-10: 27.0 KB gzip of HTML; page and JS fit the defaults. Limit 29 (+4%, Linux gzip drift).',
+    budget: { htmlGzipKb: 29 },
   },
   {
     route: '/workflows-page/json/',
@@ -333,8 +339,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/design-systems/kit/',
     reason:
-      "PLAN_016 T-t4-site: the design-system kit (texuli/ds-kit) for the example brand Ledgerline, server-rendered and hydrated when visible: the HTML carries the kit (foundations tables in light and dark, voice, matrix, library) and the island's build-time props (the compiled variables and report, the allow manifest and a trimmed catalog). Measured 2026-11-09: 414.0 KB raw and 35.5 KB gzip of HTML; after hydration and the matrix's lazy samples, 169.8 KB page and 106.8 KB JavaScript (+4% headroom). 0.16.0 (2026-11-09): the kit gained the 0.16.0 matrix values; htmlRawKb measured 433.2 KB, limit +4%.",
-    budget: { pageGzipKb: 177, jsGzipKb: 112, htmlGzipKb: 37, htmlRawKb: 451 },
+      "PLAN_016 T-t4-site: the design-system kit (texuli/ds-kit) for the example brand Ledgerline, server-rendered and hydrated when visible: the HTML carries the kit (foundations tables in light and dark, voice, matrix, library) and the island's build-time props (the compiled variables and report, the allow manifest and a trimmed catalog). Measured 2026-11-09: 414.0 KB raw and 35.5 KB gzip of HTML; after hydration and the matrix's lazy samples, 169.8 KB page and 106.8 KB JavaScript (+4% headroom). 0.16.0 (2026-11-09): the kit gained the 0.16.0 matrix values; htmlRawKb measured 433.2 KB, limit +4%. PLAN_017 (2026-11-10): the kit intro links the design-systems landing and 0.17.0 adds collapsible matrix groups; measured 37.1 KB gzip of HTML, limit +4%.",
+    budget: { pageGzipKb: 177, jsGzipKb: 112, htmlGzipKb: 39, htmlRawKb: 451 },
   },
   {
     route: '/solutions/',

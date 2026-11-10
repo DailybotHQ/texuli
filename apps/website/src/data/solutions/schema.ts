@@ -17,7 +17,14 @@ export const SOLUTION_STATUSES = [
 export type SolutionStatus = (typeof SOLUTION_STATUSES)[number];
 
 /** The Solutions promoted by ADR-027. */
-export const SOLUTION_SLUGS = ['slides', 'documents', 'workflows', 'canvas', 'sheets'] as const;
+export const SOLUTION_SLUGS = [
+  'slides',
+  'documents',
+  'workflows',
+  'canvas',
+  'sheets',
+  'design-systems',
+] as const;
 export type SolutionSlug = (typeof SOLUTION_SLUGS)[number];
 
 /** Rendering targets a Solution can name. Native targets need evidence (ADR-029). */

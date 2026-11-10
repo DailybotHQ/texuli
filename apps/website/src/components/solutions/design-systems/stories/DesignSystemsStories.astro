@@ -1,0 +1,14 @@
+---
+/**
+ * The Design systems loop in five steps: the shared SolutionStories block with the registry
+ * entry and the copy in `stories-content.ts`. Bands paint the reserved slots
+ * `solution-design-systems-story-1` … `-5` (texel fallback until their files land).
+ */
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionStories from '../../shared/story/SolutionStories.astro';
+import { DESIGN_SYSTEMS_STORIES } from './stories-content.ts';
+
+const entry = getSolution('design-systems');
+---
+
+<SolutionStories entry={entry} {...DESIGN_SYSTEMS_STORIES} />
