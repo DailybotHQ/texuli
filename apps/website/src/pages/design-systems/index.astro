@@ -338,6 +338,20 @@ const runLabel = (variant: string | null) => (variant ? `${variant} variant` : '
           </p>
           <p><a href={guide}>The design systems guide</a></p>
         </section>
+        {
+          solutionHref && (
+            <section class="ds-hub__door" aria-labelledby="start-solution">
+              <h3 id="start-solution">See the whole loop</h3>
+              <p>
+                Generate a draft from brand inputs, review it in the kit, approve it in a commit,
+                lock prototypes to the allowed set and share it as a versioned bundle.
+              </p>
+              <p>
+                <a href={link(solutionHref)}>The Design Systems Solution</a>
+              </p>
+            </section>
+          )
+        }
       </div>
     </section>
   </div>

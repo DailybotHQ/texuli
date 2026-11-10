@@ -170,4 +170,5 @@ export const PROTOYARD_PATHWAY_LINKS = [
   { label: 'Browse components', href: '/component-pages/' },
   { label: 'Explore Solutions', href: '/solutions/' },
   { label: 'Design systems', href: '/design-systems/' },
+  { label: 'The Design Systems Solution', href: '/solutions/design-systems/' },
 ] as const;

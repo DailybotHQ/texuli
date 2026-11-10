@@ -898,3 +898,15 @@ Resources: `texuli://design-system/{id}` (the examples above and every
 library theme as a document). Prompt: `create-design-system`. Every edge
 operation answers byte-identically on the local server (`npx -y
 @texuli/mcp`) and the remote one (`https://texuli.com/mcp`, deployed from `main`). Details: [ds.md](../packages/tools/docs/ds.md).
+
+## See also
+
+- The Design Systems Solution on texuli.com
+  ([/solutions/design-systems/](https://texuli.com/solutions/design-systems/)): the whole
+  loop (generate, review, approve, lock, share) with a demo on fictional brands
+  ([ADR-033](DECISIONS.md#adr-033-a-design-systems-solution-landing-beside-the-reference-hub)).
+- The reference hub ([/design-systems/](https://texuli.com/design-systems/)): the example
+  brands on four surfaces, conformance and how to start; the kit
+  ([/design-systems/kit/](https://texuli.com/design-systems/kit/)); the technical entry point
+  ([/guides/solutions/design-systems/](https://texuli.com/guides/solutions/design-systems/)).
+- [ds-check.md](../packages/tools/docs/ds-check.md): every locked check, code and flag.
