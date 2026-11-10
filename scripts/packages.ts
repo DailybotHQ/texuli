@@ -15,8 +15,10 @@
  * 2. **Manifest**: derive the published `package.json` from the source one.
  *    Every `./src/**.ts` export target maps to `./dist/**.js` (`types` to
  *    `.d.ts`), `.svelte` and `.css` keep their names, `workspace:` ranges
- *    become the exact workspace version, and `files` is `["dist"]`. There is
- *    no hand-written publish map to drift from the source exports.
+ *    become the exact workspace version, and `files` is
+ *    `["dist", "CHANGELOG.md"]`. There is no hand-written publish map to
+ *    drift from the source exports. Each CHANGELOG.md is generated from
+ *    docs/RELEASE.md (`scripts/package-changelogs.ts`) and packed as-is.
  * 3. **Pack** with `npm pack` into `tmp/packages/tarballs/`, and record each
  *    tarball's SHA-256 in `tmp/packages/SHA256SUMS`.
  * 4. **Check** each tarball with publint (strict: warnings fail) and
@@ -42,6 +44,7 @@ import { dirname, join, posix, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildDsCheckHost, DS_CHECK_HOST_DIST } from './ds-check-host.ts';
 import { buildDsCheckSheet, DS_CHECK_SHEET_DIST } from './ds-check-sheet.ts';
+import { CHANGELOG_FILE, changelogForPackage } from './package-changelogs.ts';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -49,6 +52,9 @@ export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
  * code. (@texuli/editor left this list in PLAN_009 G17, publishable from 0.5.0;
  * @texuli/pages left it in 0.7.0, its first release with @texuli/document.) */
 export const NEVER_PACKED: readonly string[] = ['@texuli/examples'];
+
+/** Packed contents: compiled `dist/` plus the generated changelog. */
+export const PUBLISHED_FILES: readonly string[] = ['dist', CHANGELOG_FILE];
 
 /**
  * Built assets a package ships in its `dist/` beside the compiled source,
@@ -225,7 +231,7 @@ export function publishManifest(
     }
     manifest.bin = bin;
   }
-  manifest.files = ['dist'];
+  manifest.files = [...PUBLISHED_FILES];
   for (const field of ['dependencies', 'peerDependencies', 'optionalDependencies'] as const) {
     const pinned = pinWorkspace(source[field], versions, problems);
     if (pinned && Object.keys(pinned).length > 0) manifest[field] = pinned;
@@ -698,6 +704,9 @@ export async function verifyPackages(
   const tarballs = join(out, 'tarballs');
   mkdirSync(tarballs, { recursive: true });
   const license = join(root, 'LICENSE');
+  const releaseNotes = existsSync(join(root, 'docs', 'RELEASE.md'))
+    ? readFileSync(join(root, 'docs', 'RELEASE.md'), 'utf8')
+    : null;
 
   const reports: PackageReport[] = [];
   for (const pkg of selected) {
@@ -714,6 +723,22 @@ export async function verifyPackages(
     else problems.push('manifest: no README.md');
     const ownLicense = join(root, 'packages', pkg.dir, 'LICENSE');
     cpSync(existsSync(ownLicense) ? ownLicense : license, join(stage, 'LICENSE'));
+    if (releaseNotes === null) {
+      problems.push('changelog: docs/RELEASE.md is missing');
+    } else {
+      const expected = changelogForPackage(pkg.name, releaseNotes);
+      const changelog = join(root, 'packages', pkg.dir, CHANGELOG_FILE);
+      if (!existsSync(changelog)) {
+        problems.push(
+          `changelog: missing ${CHANGELOG_FILE} (run pnpm exec tsx scripts/package-changelogs.ts --write)`
+        );
+      } else if (readFileSync(changelog, 'utf8') !== expected) {
+        problems.push(
+          `changelog: ${CHANGELOG_FILE} does not match docs/RELEASE.md (run pnpm exec tsx scripts/package-changelogs.ts --write)`
+        );
+      }
+      writeFileSync(join(stage, CHANGELOG_FILE), expected);
+    }
 
     const report: PackageReport = {
       name: pkg.name,

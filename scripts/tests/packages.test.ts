@@ -93,7 +93,7 @@ describe('publishManifest', () => {
           './theme.css': { types: './dist/theme.css.d.ts', default: './dist/theme.css' },
         },
         bin: { 'demo-cli': './dist/cli.js' },
-        files: ['dist'],
+        files: ['dist', 'CHANGELOG.md'],
         dependencies: { '@texuli/core': '0.3.0', 'example-lib': '^1.2.3' },
         peerDependencies: { svelte: '^5.57.2' },
       });
