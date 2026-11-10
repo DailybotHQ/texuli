@@ -1,8 +1,6 @@
 {
   "ok": false,
-  "codes": [
-    "color-not-allowed"
-  ],
+  "codes": ["color-not-allowed"],
   "findings": [
     {
       "code": "color-not-allowed",

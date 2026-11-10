@@ -62,7 +62,12 @@ function onkeydown(event: KeyboardEvent) {
       field.toBound('max');
       break;
     case 'Enter':
-      if (field.commitMode !== 'blur') field.commit();
+      // Blur mode stays blur-only for a standalone widget. Inside an associated
+      // form, Enter also has to flush the draft before native submission reads
+      // the bridge input.
+      if (field.commitMode !== 'blur' || (event.currentTarget as HTMLInputElement).form) {
+        field.commit();
+      }
       return;
     default:
       return;

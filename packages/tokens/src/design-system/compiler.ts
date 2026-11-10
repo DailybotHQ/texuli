@@ -45,7 +45,7 @@ import {
   extendCategoricalColors,
   validateChartTokens,
 } from '../palette/charts.ts';
-import { contrastRatio, relativeLuminance } from '../palette/contrast.ts';
+import { contrastInk, contrastRatio, relativeLuminance } from '../palette/contrast.ts';
 import { MOTION_PRESETS } from '../style-presets/presets.ts';
 import { BASE_SYSTEM_TOKENS, closingParen } from '../system/base.ts';
 import { compileAllowManifest, type DesignSystemAllowManifest } from './allow-manifest.ts';
@@ -987,6 +987,9 @@ export function compileDesignSystem(
     }
     (charts.categorical as string[]).forEach((c, i) => {
       draft[`--tx-chart-${i + 1}`] = c;
+      const parsed = parseDsColor(c);
+      const solid = parsed ? composite(parsed, solved.hexOf('background')) : c;
+      draft[`--tx-chart-${i + 1}-foreground`] = contrastInk(solid);
     });
     (charts.sequential as string[]).forEach((c, i) => {
       draft[`--tx-chart-sequential-${i + 1}`] = c;

@@ -21,6 +21,17 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
   contract schemas are released. The components install reference lists
   what is new in `0.16.0`.
 
+## [0.4.0] — 2026-11-09
+
+### Changes
+
+- docs: create a locked design system end to end (ADR-032)
+- docs(tools): document full design-system validation
+- chore(skill): the router names the 0.15 line
+- chore(skill): packages on npm at 0.15.0
+- fix(tools): register design system generation operation
+- feat(tools): add draft-only design system MCP generation
+
 - The packages are on npm at `0.15.0`, a `0.x` minor with no breaking API
   change: locked design systems (blueprint spec `0.13.0`), the typography
   components and button tone. The components install reference marks them

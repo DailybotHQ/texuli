@@ -104,6 +104,7 @@ let inputElement = $state<HTMLInputElement | null>(null);
 
 const safeStep = $derived(step > 0 && Number.isFinite(step) ? step : 1);
 const valueText = $derived(formatNumber(current, locale, formatOptions));
+let bridge: FormBridge | null = null;
 
 function setValue(next: number | null, keepDraft = false): void {
   if (disabled || readOnly) return;
@@ -115,6 +116,7 @@ function setValue(next: number | null, keepDraft = false): void {
   if (Object.is(normalized, current)) return;
   localValue = normalized;
   value = normalized;
+  bridge?.setValue(normalized === null ? '' : String(normalized));
   onValueChange?.(normalized);
 }
 
@@ -224,7 +226,6 @@ numberFieldContext.set(context);
 
 // Native form participation: the number, not the formatted text. The
 // bridge input sits right after the visible input, inside the field.
-let bridge: FormBridge | null = null;
 $effect(() => {
   const input = inputElement;
   if (!input || !name) return;

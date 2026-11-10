@@ -2,10 +2,15 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { cleanup, render } from '@testing-library/svelte';
 import { afterEach, describe, expect, it } from 'vitest';
-import { boxManifest } from '../../catalog/src/manifests/display/index.ts';
 import { IMPORTS_BY_ID } from '../../catalog/src/manifest/imports-map.ts';
+import { boxManifest } from '../../catalog/src/manifests/display/index.ts';
+import {
+  BOX_FILLS,
+  BOX_SURFACES,
+  Box,
+  type BoxSurface,
+} from '../src/components/typography/index.ts';
 import { colorRefInk, colorRefVar, DATA_COLORS, ROLE_COLORS } from '../src/internal/color-ref.ts';
-import { BOX_FILLS, BOX_SURFACES, Box } from '../src/components/typography/index.ts';
 
 const css = readFileSync(
   resolve(process.cwd(), 'packages/texuli/src/components/typography/typography.css'),
@@ -33,7 +38,7 @@ describe('Protoyard round 4 Box data and soft-tone fills', () => {
     expect(boxManifest.props.find((prop) => prop.name === 'surface')?.enumValues).toEqual([
       ...BOX_SURFACES,
     ]);
-    const imports = IMPORTS_BY_ID.box.flatMap((entry) => entry.exports);
+    const imports = (IMPORTS_BY_ID.box ?? []).flatMap((entry) => entry.exports);
     expect(imports).toEqual(expect.arrayContaining(['BOX_FILLS', 'BOX_SURFACES', 'ColorRef']));
   });
 
@@ -53,7 +58,7 @@ describe('Protoyard round 4 Box data and soft-tone fills', () => {
   it.each(Object.entries(SOFT_SURFACES))(
     'renders the %s soft surface using its fill token and AA foreground token',
     (surface, [fillToken, inkToken]) => {
-      const { container } = render(Box, { props: { surface } });
+      const { container } = render(Box, { props: { surface: surface as BoxSurface } });
       const root = container.firstElementChild as HTMLElement;
 
       expect(root.dataset.txVariant).toBe(surface);

@@ -103,11 +103,10 @@ uploading is the host's (`onSubmit` receives the files).
 
 ## Loading controls per field type (G119)
 
-Text, textarea, number, email, url, password, otp, select, multiselect,
-checkbox and switch controls are in `SchemaForm`'s own bundle. The date,
-time, datetime, slider, tags, file, color and radio controls
-(`LAZY_CONTROL_TYPES`) and the step navigation of multi-step forms each
-load, with their CSS, the first time a form uses them; the form loads all
+Text, textarea, number, email, url, password, otp and select controls are in
+`SchemaForm`'s own bundle. Checkbox, switch, multiselect, date, time, datetime,
+slider, tags, file, color and radio controls (`LAZY_CONTROL_TYPES`) and the step
+navigation of multi-step forms each load, with their CSS, the first time a form uses them; the form loads all
 of its types when it mounts, and a loaded control is kept for every later
 form. Until a control arrives its place holds a
 `.tx-forms__control-loading` box sized like the control at the default
@@ -125,10 +124,10 @@ suite does this for every example.
 
 Measured with `packages/forms/tests/bundle-graph.test.ts` (Vite,
 minified, gzip -9, `svelte` external), a host with one text, select and
-checkbox form went from 90,507 B of initial JavaScript and 9,385 B of CSS
-to 60,048 B and 5,266 B, and a host with a text-only form from 90,466 B and
-9,385 B to 60,011 B and 5,266 B: neither has any slider, tags, color, date,
-time, file or radio code or CSS in its initial graph.
+checkbox form has 55,697 B of initial JavaScript and 5,289 B of CSS; a
+text-only host has 55,657 B and 5,289 B. Both initial graphs omit checkbox,
+switch, multiselect and the other per-type controls with their CSS; those
+chunks load when the form uses them.
 
 **Server rendering.** On the server a lazy control renders as its
 placeholder, and the browser loads it after hydration. To render every

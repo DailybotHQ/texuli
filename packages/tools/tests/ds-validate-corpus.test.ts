@@ -106,6 +106,8 @@ function golden(name: string, actual: Golden) {
   );
 }
 
+// New chart foreground tokens are required system entries and appear in missing-token reports.
+
 const files = readdirSync(CASES)
   .filter((f) => f.endsWith('.json'))
   .sort();

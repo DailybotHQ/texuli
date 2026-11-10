@@ -9,6 +9,9 @@ import type { LazyControlType, SchemaFormControl, SchemaFormProgressProps } from
 type Loader = () => Promise<{ default: SchemaFormControl }>;
 
 const LOADERS: Readonly<Record<LazyControlType, Loader>> = {
+  checkbox: () => import('./CheckboxControl.svelte'),
+  multiselect: () => import('./MultiselectControl.svelte'),
+  switch: () => import('./SwitchControl.svelte'),
   date: () => import('./DateControl.svelte'),
   time: () => import('./TimeControl.svelte'),
   datetime: () => import('./DateTimeControl.svelte'),

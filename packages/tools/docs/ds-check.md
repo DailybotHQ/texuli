@@ -22,7 +22,8 @@ texuli ds check acme.json --mode dark --variant compact
 texuli ds check brand.json --catalog components.json   # allow checked against another catalog
 texuli ds check acme.json --locked                    # full locked checks; exit 1 on a finding
 texuli ds check acme.json --locked --report --json    # list every finding, exit 0
-texuli ds check acme.json --locked --render           # plus the catalog sheet in chromium
+texuli ds check acme.json --locked --render           # plus the locked render check on the catalog sheet
+texuli ds validate acme.json --locked --render --url http://localhost:5173/  # your prototype page, mapped against allow
 ```
 
 > **Locked design systems (spec 0.13.0, new in `0.15.0`).** The check
@@ -268,15 +269,26 @@ has a stable `code`, a `severity` (`error`, `warning`, `info`), an `area`, a `pa
 `.tsx`, `.js`, `.jsx`, `.mjs`, `.cjs`, `.css` and `.json` files are read as
 text, and JSON files are scanned as blueprints when they contain a `tree`.
 No source code is executed. Symlinks are refused. Flags `--catalog`,
-`--json`, `--render`, `--strict` and `--report` on `ds validate` also select
-locked mode. `--report` requires `--locked`.
+`--json`, `--render`, `--strict`, `--report`, `--url`, `--sheet` and
+`--known` on `ds validate` also select locked mode. `--report` requires
+`--locked`; `--url`, `--sheet`, `--known` and `--strict` require `--render`.
 
-`--render` paints the catalog conformance sheet (or a page selected by
-`--sheet` / `--url`); it does not run the consumer's prototype application.
-Consumer CI passes prototype text and blueprints to
-`checkDesignSystemFull({ prototype: { files, blueprints } })` and wires its
-own browser page to `mapDesignSystemTree` and `runLockedRenderChecks`. The
-MCP `ds.validate` full mode performs static checks only.
+With `--locked`, `--render` runs the **locked render check**
+(`renderLockedDesignSystemCheck`, which calls `runLockedRenderChecks`):
+
+- The page is the catalog conformance sheet (`--sheet`, the built-in one by default) or a page
+  you serve (`--url`): your prototype, built with `installDsCheckHost` on its scope.
+- On a `--url` page, the host's `map()` runs `checkLockedRenderTree` on the live scope against
+  the document's `allow` (`unmapped`, `not-allowed`). The conformance sheet paints every catalog
+  component by design, so it is not mapped.
+- Axe, the painted contrast and the literal colors run as in `--render`. Fill and stroke on SVG
+  marks of `canvas`, `data-map` and `charts-*` are exempt (`DS_LOCKED_RENDER_EXEMPT_IDS`).
+- Every finding is merged into the full report: area `contrast` for `render-contrast`,
+  `prototype-components` otherwise. The `check.render` block carries the runs.
+
+Texuli does not start your app: `--url` checks a page you already serve. Without `--locked`,
+`--render` stays the plain render check, with no exemptions and no mapping. The MCP
+`ds.validate` full mode performs static checks only.
 
 A prototype is untrusted input, so the scan is bounded (`DS_FULL_PROTOTYPE_LIMITS`):
 
@@ -299,10 +311,9 @@ every other code with a failing and a passing fixture and a golden report.
 `checkDesignSystemFull` on the document, catalog and statically scanned
 prototype. The directory reader accepts source and blueprint file types
 listed above; it does not execute the consumer application. `--render`
-adds browser findings from the catalog conformance sheet or selected page,
-not from the prototype's live app. Consumers wire their own rendered page
-to `mapDesignSystemTree` and `runLockedRenderChecks`. MCP full mode is
-static-only.
+adds the locked render findings from the conformance sheet, or from the
+prototype page you serve with `--url` (mapped against `allow`). MCP full
+mode is static-only.
 
 `--locked --report` prints every finding with counts by area, route and
 component and exits 0. `--json` adds a `counts` object so a saved file is
@@ -360,11 +371,17 @@ whose nearest catalog root is `canvas`, `data-map`, or a `charts-*` id
 (`DS_LOCKED_RENDER_EXEMPT_IDS`). Text, HTML chrome, legends, axis labels,
 controls, token contrast and axe stay in the report. Those components
 must still be catalog ids fed by the design system's data-viz palette.
-The `@texuli/tools/ds-check` barrel exports `mapDesignSystemTree` and
-`runDsRenderChecks`; call `runLockedRenderChecks` from that module when
-you want the visualization-mark filter. `texuli ds check --locked --render`
-uses the catalog conformance sheet (`renderDesignSystemCheck`) and does
-not apply that filter.
+The `@texuli/tools/ds-check` barrel exports all of these:
+
+- `mapDesignSystemTree` and `checkLockedRenderTree` (the mapping);
+- `runDsRenderChecks`, `runLockedRenderChecks` and `mapLockedRenderPage` (on a Playwright page
+  you opened);
+- `renderLockedDesignSystemCheck`, which launches chromium and serves the sheet or opens `url`;
+- `DS_LOCKED_RENDER_EXEMPT_IDS`.
+
+`texuli ds check --locked --render` and `texuli ds validate --locked --render` run
+`renderLockedDesignSystemCheck`, so the CLI applies the visualization-mark filter, and with
+`--url` the mapping too.
 
 Render cost: each `--render` run launches Chromium, paints every
 agent-emittable catalog example under every checked mode and variant, and
@@ -472,16 +489,17 @@ or any host) supplies:
    `prototype.blueprints`), or use `texuli ds validate --locked
    --prototype <dir>` to scan a local tree as bounded text.
 3. A painted page for runtime: catalog roots carry `data-tx-component`
-   (and variant/size/tone/density where they apply). Install
-   `installDsCheckHost` on the sheet, then `mapDesignSystemTree` and
-   `runLockedRenderChecks` (or `runDsRenderChecks` plus your own filter).
-4. CI: run `texuli ds validate brand.json --locked --prototype ./src
-   --json` to enforce document and static source checks. Add `--render` to
-   check the bundled catalog conformance sheet; this does not render the
-   consumer app. In consumer browser tests, call `mapDesignSystemTree` and
-   `runLockedRenderChecks` on the app's painted page to check its controls,
-   chrome and axe results. Use `--report --json` during migration to save a
-   non-enforcing baseline.
+   (and variant/size/tone/density/color where they apply). Install
+   `installDsCheckHost` on the page's scope.
+4. CI:
+   - `texuli ds validate brand.json --locked --prototype ./src --json` enforces the document
+     and the static source checks.
+   - Add `--render --url <your served prototype page>` to map its controls against `allow` and
+     check its chrome, contrast and axe results (the locked render check).
+   - `--render` alone checks the bundled catalog conformance sheet.
+   - In your own browser tests, `mapLockedRenderPage` and `runLockedRenderChecks` do the same on
+     a Playwright page you opened.
+   - Use `--report --json` during migration to save a non-enforcing baseline.
 
 ```ts
 import {

@@ -87,10 +87,24 @@
       "mode": "light"
     },
     {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-chart-1-foreground\"]",
+      "mode": "light"
+    },
+    {
       "code": "dataviz-missing",
       "severity": "error",
       "area": "data-viz",
       "path": "$.compiled.vars.light[\"--tx-chart-2\"]",
+      "mode": "light"
+    },
+    {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-chart-2-foreground\"]",
       "mode": "light"
     },
     {
@@ -101,10 +115,24 @@
       "mode": "light"
     },
     {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-chart-3-foreground\"]",
+      "mode": "light"
+    },
+    {
       "code": "dataviz-missing",
       "severity": "error",
       "area": "data-viz",
       "path": "$.compiled.vars.light[\"--tx-chart-4\"]",
+      "mode": "light"
+    },
+    {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-chart-4-foreground\"]",
       "mode": "light"
     },
     {
@@ -115,10 +143,24 @@
       "mode": "light"
     },
     {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-chart-5-foreground\"]",
+      "mode": "light"
+    },
+    {
       "code": "dataviz-missing",
       "severity": "error",
       "area": "data-viz",
       "path": "$.compiled.vars.light[\"--tx-chart-6\"]",
+      "mode": "light"
+    },
+    {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-chart-6-foreground\"]",
       "mode": "light"
     },
     {
@@ -129,10 +171,24 @@
       "mode": "light"
     },
     {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-chart-7-foreground\"]",
+      "mode": "light"
+    },
+    {
       "code": "dataviz-missing",
       "severity": "error",
       "area": "data-viz",
       "path": "$.compiled.vars.light[\"--tx-chart-8\"]",
+      "mode": "light"
+    },
+    {
+      "code": "token-missing",
+      "severity": "error",
+      "area": "tokens",
+      "path": "$.compiled.vars.light[\"--tx-chart-8-foreground\"]",
       "mode": "light"
     },
     {
@@ -168,62 +224,6 @@
       "severity": "error",
       "area": "data-viz",
       "path": "$.compiled.vars.light[\"--tx-chart-diverging-4\"]",
-      "mode": "light"
-    },
-    {
-      "code": "dataviz-missing",
-      "severity": "error",
-      "area": "data-viz",
-      "path": "$.compiled.vars.light[\"--tx-chart-diverging-5\"]",
-      "mode": "light"
-    },
-    {
-      "code": "dataviz-missing",
-      "severity": "error",
-      "area": "data-viz",
-      "path": "$.compiled.vars.light[\"--tx-chart-diverging-6\"]",
-      "mode": "light"
-    },
-    {
-      "code": "dataviz-missing",
-      "severity": "error",
-      "area": "data-viz",
-      "path": "$.compiled.vars.light[\"--tx-chart-diverging-7\"]",
-      "mode": "light"
-    },
-    {
-      "code": "dataviz-missing",
-      "severity": "error",
-      "area": "data-viz",
-      "path": "$.compiled.vars.light[\"--tx-chart-diverging-8\"]",
-      "mode": "light"
-    },
-    {
-      "code": "dataviz-missing",
-      "severity": "error",
-      "area": "data-viz",
-      "path": "$.compiled.vars.light[\"--tx-chart-diverging-9\"]",
-      "mode": "light"
-    },
-    {
-      "code": "token-missing",
-      "severity": "error",
-      "area": "tokens",
-      "path": "$.compiled.vars.light[\"--tx-chart-grid\"]",
-      "mode": "light"
-    },
-    {
-      "code": "dataviz-missing",
-      "severity": "error",
-      "area": "data-viz",
-      "path": "$.compiled.vars.light[\"--tx-chart-sequential-1\"]",
-      "mode": "light"
-    },
-    {
-      "code": "dataviz-missing",
-      "severity": "error",
-      "area": "data-viz",
-      "path": "$.compiled.vars.light[\"--tx-chart-sequential-2\"]",
       "mode": "light"
     }
   ]

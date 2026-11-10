@@ -32,6 +32,13 @@ export function contrastRatio(foreground: string, background: string): number {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
+/** The higher-contrast black or white ink on a solid fill (WCAG 2.x AA for sRGB fills). */
+export function contrastInk(background: string): string {
+  const white = contrastRatio('#ffffff', background);
+  const black = contrastRatio('#0a0a0a', background);
+  return white >= black ? '#ffffff' : '#0a0a0a';
+}
+
 function mixHex(color: string, toward: string, amount: number): string | null {
   const source = parseHex(color);
   const target = parseHex(toward);
