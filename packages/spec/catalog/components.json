@@ -1,5 +1,5 @@
 {
-  "catalogHash": "8904c831653a022b72fc64fcd6baa0ae019e3eb6c44639f5100a927a16afc966",
+  "catalogHash": "a303a1f0def121f35a8332d570f283606f1fb5cfc454083ab85111328048ee3b",
   "components": [
     {
       "axes": {
@@ -12319,6 +12319,10 @@
         {
           "exports": ["Tabs"],
           "module": "texuli/tabs-accordion"
+        },
+        {
+          "exports": ["Content", "List", "Root", "Tabs", "Trigger"],
+          "module": "@texuli/primitives/tabs"
         }
       ],
       "label": "Tabs",
