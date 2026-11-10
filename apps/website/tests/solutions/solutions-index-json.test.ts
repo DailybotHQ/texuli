@@ -33,6 +33,7 @@ const PARITY_CAPABILITY: Readonly<Record<SolutionSlug, string>> = {
   workflows: 'Workflows',
   canvas: 'Documents, forms, canvas and sheets',
   sheets: 'Documents, forms, canvas and sheets',
+  'design-systems': 'Design systems and tokens',
 };
 
 interface IndexSolution {

@@ -124,6 +124,21 @@ export const PACKAGE_STACK: Readonly<Record<string, StackPackage>> = {
       '@texuli/tokens',
     ],
   },
+  '@texuli/tools': {
+    layer: 8,
+    label: 'CLI and agent tools',
+    dependsOn: [
+      '@texuli/blocks',
+      '@texuli/catalog',
+      '@texuli/charts',
+      '@texuli/core',
+      '@texuli/deck',
+      '@texuli/document',
+      '@texuli/media',
+      '@texuli/spec',
+      '@texuli/tokens',
+    ],
+  },
   '@texuli/pages': {
     layer: 8,
     label: 'Document editor and reader',

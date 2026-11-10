@@ -12,7 +12,10 @@ import { SOLUTIONS } from '../../src/data/solutions/index.ts';
 describe('ecosystem route budgets', () => {
   it('keeps each Solution landing within the current budget of its replaced route', () => {
     for (const solution of SOLUTIONS) {
-      if (!solution.replaces) throw new Error(`${solution.slug} must name its replaced route`);
+      if (!solution.replaces) {
+        expect(budgetFor(solution.route), solution.slug).toEqual(DEFAULT_BUDGET);
+        continue;
+      }
       const replaced = budgetFor(solution.replaces);
       expect(budgetFor(solution.route), solution.slug).toEqual(replaced);
     }

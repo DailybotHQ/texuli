@@ -1,0 +1,41 @@
+---
+/** `/guides/solutions/design-systems/` — concise technical entry point for the design-system APIs. */
+import SolutionDocsLayout from '../../../../components/solutions/docs-layout/SolutionDocsLayout.astro';
+import { getSolution } from '../../../../data/solutions/index.ts';
+
+const entry = getSolution('design-systems');
+---
+
+<SolutionDocsLayout
+  {entry}
+  title="Design systems docs"
+  description="Use a closed design-system document to define, validate, compile and apply a brand across Texuli."
+  toc={[
+    { id: 'document', label: 'The document', level: 2 },
+    { id: 'apply', label: 'Apply and govern', level: 2 },
+    { id: 'reference', label: 'Reference pages', level: 2 },
+  ]}
+>
+  <section>
+    <h2 id="document">The document</h2>
+    <p>
+      A design system is a closed JSON document. The spec defines its shape and validation rules.
+      The tokens package imports, generates, compiles and emits supported formats.
+    </p>
+  </section>
+  <section>
+    <h2 id="apply">Apply and govern</h2>
+    <p>
+      Apply compiled values with the Svelte provider or to a host element. Locked documents can
+      declare an allow set for catalog components and their axes.
+    </p>
+  </section>
+  <section>
+    <h2 id="reference">Reference pages</h2>
+    <ul>
+      <li><a href="/design-systems/">Examples and conformance reference</a></li>
+      <li><a href="/design-systems/kit/">Ledgerline kit</a></li>
+      <li><a href="/theme-studio/">Design System Studio</a></li>
+    </ul>
+  </section>
+</SolutionDocsLayout>

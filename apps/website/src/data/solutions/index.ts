@@ -3,13 +3,21 @@
  * Every page, the catalog, the home band and the nav read this list.
  */
 import { canvas } from './entries/canvas.ts';
+import { designSystems } from './entries/design-systems.ts';
 import { documents } from './entries/documents.ts';
 import { sheets } from './entries/sheets.ts';
 import { slides } from './entries/slides.ts';
 import { workflows } from './entries/workflows.ts';
 import type { SolutionEntry, SolutionSlug } from './schema.ts';
 
-export const SOLUTIONS: readonly SolutionEntry[] = [slides, documents, workflows, canvas, sheets];
+export const SOLUTIONS: readonly SolutionEntry[] = [
+  slides,
+  documents,
+  workflows,
+  canvas,
+  sheets,
+  designSystems,
+];
 
 /** Looks up one Solution by slug. */
 export function getSolution(slug: SolutionSlug): SolutionEntry {

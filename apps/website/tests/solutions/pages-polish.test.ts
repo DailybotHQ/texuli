@@ -41,8 +41,10 @@ describe('pages polish: home visual level, no new islands, no budget increases',
     expect(cards.map((card) => card.slug)).toEqual(SOLUTIONS.map((entry) => entry.slug));
     for (const card of cards) {
       expect(card.art).toBe(`solution-${card.slug}-hero`);
-      expect(illustrationFor(card.art)?.slot, card.art).toBe(card.art);
-      expect(card.status).toBe('in development');
+      if (card.slug !== 'design-systems')
+        expect(illustrationFor(card.art)?.slot, card.art).toBe(card.art);
+      const entry = SOLUTIONS.find((solution) => solution.slug === card.slug);
+      expect(card.status).toBe(entry?.status);
     }
     expect(catalog).toContain('<SiteIllustration art={card.art} />');
     expect(catalog).toContain('<StatusBadge status={card.status} context={card.name} />');

@@ -55,7 +55,11 @@ describe('home Solutions band content', () => {
         { platform: 'compose-desktop', status: 'experimental', evidence: ['x'] },
       ])
     ).toBe('experimental');
-    for (const entry of SOLUTIONS) expect(nativeStatus(entry), entry.slug).toBe('planned');
+    for (const entry of SOLUTIONS.filter((solution) => solution.slug !== 'design-systems'))
+      expect(nativeStatus(entry), entry.slug).toBe('planned');
+    expect(nativeStatus(SOLUTIONS.find((entry) => entry.slug === 'design-systems')!)).toBe(
+      'in development'
+    );
   });
 
   it('links the landing when it exists, else the current demo page, else nothing', () => {
@@ -63,8 +67,13 @@ describe('home Solutions band content', () => {
     for (const card of homeSolutionCards(none)) expect(card.link).toBeUndefined();
     const replacesOnly = (route: string) => SOLUTIONS.some((s) => s.replaces === route);
     for (const [i, card] of homeSolutionCards(replacesOnly).entries()) {
-      expect(card.link?.kind).toBe('demo');
-      expect(card.link?.href).toBe(SOLUTIONS[i]?.replaces);
+      const entry = SOLUTIONS[i];
+      if (entry?.replaces) {
+        expect(card.link?.kind).toBe('demo');
+        expect(card.link?.href).toBe(entry.replaces);
+      } else {
+        expect(card.link).toBeUndefined();
+      }
     }
     expect(homeSolutionsCatalog(none)).toBeUndefined();
     expect(homeSolutionsCatalog(all)?.href).toBe('/solutions/');

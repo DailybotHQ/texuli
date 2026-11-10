@@ -206,6 +206,7 @@ export const SOLUTION_OPERATIONS: Readonly<Record<SolutionSlug, readonly string[
   workflows: ['catalog.search', 'component.get', 'blueprint.validate'],
   canvas: ['catalog.search', 'component.get', 'blueprint.validate'],
   sheets: ['catalog.search', 'component.get', 'blueprint.validate'],
+  'design-systems': ['ds.validate', 'ds.generate', 'ds.compile'],
 };
 
 /** A "For agents" twin note, the shape of `TwinNote` in `components/docs/twin-notes.ts`. */
@@ -233,7 +234,7 @@ export function solutionTwinNotes(
       const limits = entry.demo.limits.join(' ');
       return {
         route: new RegExp(`^${escapeRegExp(entry.route)}$`),
-        demo: `${entry.demo.title}: the live ${entry.name} demo runs in the browser on fixture data.${limits ? ` ${limits}` : ''}`,
+        demo: `${entry.demo.title}.${limits ? ` ${limits}` : ''}`,
         operations: SOLUTION_OPERATIONS[entry.slug],
         packages: [...new Set(entry.packages.map((pkg) => packageDir(pkg.name)))],
         links: exists(entry.docs) ? [{ label: `${entry.name} docs`, href: entry.docs }] : [],
