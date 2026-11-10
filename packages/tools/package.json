@@ -81,6 +81,10 @@
       "types": "./src/ds-check/host.ts",
       "default": "./src/ds-check/host.ts"
     },
+    "./ds-check/host.iife.js": {
+      "types": "./src/ds-check/host.iife.ts",
+      "default": "./src/ds-check/host.iife.ts"
+    },
     "./mcp": {
       "types": "./src/mcp/index.ts",
       "default": "./src/mcp/index.ts"
