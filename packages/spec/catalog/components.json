@@ -1,5 +1,5 @@
 {
-  "catalogHash": "a303a1f0def121f35a8332d570f283606f1fb5cfc454083ab85111328048ee3b",
+  "catalogHash": "54e9cdc2158918e967624e46b5ae1f2dff951d9064c2bb840e2c2c73b45a58d3",
   "components": [
     {
       "axes": {
@@ -6024,8 +6024,17 @@
           "required": true
         },
         {
+          "enumValues": ["listbox", "feed"],
+          "kind": "enum",
+          "name": "mode"
+        },
+        {
           "kind": "number",
           "name": "overscan"
+        },
+        {
+          "kind": "boolean",
+          "name": "selectable"
         },
         {
           "kind": "string",

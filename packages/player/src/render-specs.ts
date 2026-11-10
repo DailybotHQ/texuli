@@ -2346,6 +2346,15 @@ export const PLAYER_RENDER_SPECS: readonly RenderComponentSpec[] = [
         enumValues: ['compact', 'default', 'comfortable'],
       },
       {
+        name: 'mode',
+        kind: 'enum',
+        enumValues: ['listbox', 'feed'],
+      },
+      {
+        name: 'selectable',
+        kind: 'boolean',
+      },
+      {
         name: 'estimateSize',
         kind: 'number',
       },

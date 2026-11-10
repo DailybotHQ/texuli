@@ -81,9 +81,9 @@
     },
     {
       "specVersion": "0.14.0",
-      "specDigest": "4b215a24ea3b2e22de64968374e4cebb3413baff124e392de77b0994ed6e7d97",
+      "specDigest": "91bac5fc8353c9ff7d35b3e5a241a7864bbd43678e7fcba54d58c04581280c28",
       "change": "minor",
-      "summary": "Additive (ADR-032, locked design systems after the 0.15.0 release; the open 0.14.0 pin, amended by each task until the release publishes): a catalog component's axes gain color (the category color, { prop, values, default } derived from an enum prop) and the design-system allow section gains colors with the unknown-color code; the allow-manifest and design-system bundle schemas carry allowed colors; catalog projection refresh: the new ids color-swatch, data-virtual-list (VirtualListView, a windowed listbox, web-only), link, list and mark, the color axis on avatar, badge, color-swatch and tag, and the props the typography, surfaces and input rounds added (input and textarea gain appearance default or plain and textSize on the type scale, the variant and size axes; number-field gains commit enter, blur or input); every 0.13.0 blueprint and design-system document stays valid and the blueprint envelope is unchanged; stamp-only migration 0.13.0→0.14.0"
+      "summary": "Additive (ADR-032, locked design systems after the 0.15.0 release; the open 0.14.0 pin, amended by each task until the release publishes): a catalog component's axes gain color (the category color, { prop, values, default } derived from an enum prop) and the design-system allow section gains colors with the unknown-color code; the allow-manifest and design-system bundle schemas carry allowed colors; catalog projection refresh: the new ids color-swatch, data-virtual-list (VirtualListView, a windowed listbox, web-only), link, list and mark, the color axis on avatar, badge, color-swatch and tag, and the props the typography, surfaces and input rounds added (input and textarea gain appearance default or plain and textSize on the type scale, the variant and size axes; number-field gains commit enter, blur or input; data-virtual-list gains mode listbox or feed and selectable); every 0.13.0 blueprint and design-system document stays valid and the blueprint envelope is unchanged; stamp-only migration 0.13.0→0.14.0"
     }
   ]
 }
