@@ -95,7 +95,7 @@ since `^0.15.0` never picks it up):
   `--url` for a page you serve), portable bundles
   (`ds pack`, `ds unpack`), the contract schemas and `checkBlueprintAllow`.
 - Blueprint spec `0.14.0`: the label palette, a `color` axis (`none`,
-  `chart-1` to `chart-8`, AA ink `--tx-chart-N-foreground`) on `Avatar`,
+  `chart-1` to `chart-8`, each with an AA-gated ink from the theme) on `Avatar`,
   `Badge` and `Tag`, and `allow` `colors`.
 - `VirtualListView` (`@texuli/data/virtual-list`); `Mark`, `Link` and
   `ColorSwatch` (`texuli/typography`); `List` (`texuli/list-item`); `Box`
