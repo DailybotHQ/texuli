@@ -386,7 +386,8 @@ export const ROUTE_PREFIX_BUDGETS: readonly PrefixBudgetOverride[] = Object.free
   {
     prefix: '/built-with/',
     label: '/built-with/<slug>/',
-    reason: 'Static product pages use the comparable /design-systems/ catalog cap (146 KB page since 0.16.0).',
+    reason:
+      'Static product pages use the comparable /design-systems/ catalog cap (146 KB page since 0.16.0).',
     budget: { pageGzipKb: 146 },
   },
   {
