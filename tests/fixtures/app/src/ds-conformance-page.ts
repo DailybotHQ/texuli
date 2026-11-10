@@ -160,6 +160,8 @@ async function painted(): Promise<void> {
   throw new Error('The sheet did not finish painting.');
 }
 
-installDsCheckHost(scope, { ready: painted });
+// The sheet marks each sample with data-ds-check-component and says so: the host never infers
+// the attribute from the page (0.17.1).
+installDsCheckHost(scope, { ready: painted, componentAttribute: DS_CHECK_COMPONENT_ATTRIBUTE });
 await painted();
 status.textContent = `Ready: ${manifests.length} components`;
