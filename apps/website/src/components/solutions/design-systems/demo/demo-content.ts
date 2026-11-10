@@ -1,25 +1,27 @@
 /**
- * The Design systems demo section. Until T-demo mounts its island (PLAN_017), the section
- * is static: what the visitor can do today is open the Ledgerline kit, a fictional brand
- * rendered by `texuli/ds-kit`. T-demo replaces `tryThis` with the island's own steps.
+ * The Design systems demo section copy (PLAN_017 T-demo). The island
+ * (`DesignSystemsDemo.svelte`) runs on build-time results of `generateDesignSystem` for
+ * three fictional brands, and checks a sample prototype with `checkBlueprintAllow`.
  */
 import type { SolutionDemoFrameProps } from '../../shared/types.ts';
 import { LEDGERLINE_DEMO_FIXTURE } from './fixtures/ledgerline.ts';
 
 export const DESIGN_SYSTEMS_DEMO: Omit<SolutionDemoFrameProps, 'entry'> = {
-  title: 'See a locked brand.',
+  title: 'Lock a brand in a minute.',
   label: 'Design systems demo',
   tryThis: [
-    'Open the Ledgerline kit: every component the fictional brand allows, in light and dark.',
-    'Compare the allowed variants with the ones the kit marks as not allowed.',
-    'Read the approval record and its content-hash check at the end of the kit.',
+    'Pick a brand input: a brief, a token file or a stylesheet. Read what was dropped or repaired.',
+    'Preview the generated brand on real components, in light and dark.',
+    'Switch Badge or the ghost button off, and watch the locked check report the finding.',
+    'Note the status: draft. Approval is a person and a reviewed commit, not a button here.',
   ],
 };
 
+/** The full kit of a finished example brand, for a deeper look. */
 export const DESIGN_SYSTEMS_DEMO_LINK = {
-  label: 'Open the Ledgerline kit',
+  label: 'See a full kit: Ledgerline',
   href: LEDGERLINE_DEMO_FIXTURE.reference,
 } as const;
 
 export const DESIGN_SYSTEMS_DEMO_LIMITS =
-  'Ledgerline is a fictional brand. The interactive demo is not on this page yet.';
+  'Fictional brands. The drafts were generated when this site was built, and the check runs on a sample prototype, not your app.';

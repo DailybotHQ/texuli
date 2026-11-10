@@ -13,7 +13,17 @@ describe('ecosystem route budgets', () => {
   it('keeps each Solution landing within the current budget of its replaced route', () => {
     for (const solution of SOLUTIONS) {
       if (!solution.replaces) {
-        expect(budgetFor(solution.route), solution.slug).toEqual(DEFAULT_BUDGET);
+        // A new landing keeps the defaults, except a measured override with a reason
+        // (PLAN_017 T-demo: the design-systems demo carries its brand CSS, HTML only).
+        const measured = ROUTE_BUDGET_OVERRIDES.find((entry) => entry.route === solution.route);
+        expect(budgetFor(solution.route), solution.slug).toEqual({
+          ...DEFAULT_BUDGET,
+          ...measured?.budget,
+        });
+        if (measured) {
+          expect(Object.keys(measured.budget), solution.slug).toEqual(['htmlGzipKb']);
+          expect(measured.reason, solution.slug).toMatch(/Measured \d{4}-\d{2}-\d{2}/);
+        }
         continue;
       }
       const replaced = budgetFor(solution.replaces);
