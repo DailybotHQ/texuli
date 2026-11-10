@@ -72,7 +72,7 @@ dependencies come with it. Import the token stylesheet once
 | `./view` | `SheetView`: the accessible spreadsheet with tabs and a formula bar | [view](https://github.com/DailybotHQ/texuli/blob/main/packages/sheets/docs/view.md) |
 | `./host` | `createSheetPlayerHost`: the sheet half of the player's `sheetHost` seam (pass it as `sheetHost` on `Player`) and its draft check | [host](https://github.com/DailybotHQ/texuli/blob/main/packages/sheets/docs/host.md) |
 
-`SHEETS_PACKAGE_VERSION` equals the package version (`0.16.0`).
+`SHEETS_PACKAGE_VERSION` equals the package version (`0.16.1`).
 
 ## Security
 

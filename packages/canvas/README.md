@@ -68,7 +68,7 @@ dependencies come with it. Import the token stylesheet once
 | `./viewer` | `CanvasViewer`: a read-only canvas with its structure as text | [viewer](https://github.com/DailybotHQ/texuli/blob/main/packages/canvas/docs/viewer.md) |
 | `./host` | `createCanvasPlayerHost`: the `canvasHost` of `@texuli/player` for agent canvases | [host](https://github.com/DailybotHQ/texuli/blob/main/packages/canvas/docs/host.md) |
 
-`CANVAS_PACKAGE_VERSION` equals the package version (`0.16.0`).
+`CANVAS_PACKAGE_VERSION` equals the package version (`0.16.1`).
 
 ## Security
 

@@ -19,7 +19,7 @@ tools and agents can use it on its own.
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
 > The `@texuli/slides` stage renders it from `0.4.0` (`@texuli/slides` `0.3.0`
 > has the previous deck model), and `@texuli/spec` ships the blueprint spec
-> that encodes deck model v2 from `0.4.0` (spec `0.14.0` in `@texuli/spec@0.16.0`).
+> that encodes deck model v2 from `0.4.0` (spec `0.14.0` in `@texuli/spec@0.16.1`).
 > Under 0.x a new minor may contain breaking changes, so pin the exact
 > version or use `^0.16.0`
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).

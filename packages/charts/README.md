@@ -11,7 +11,7 @@ for agents that render charts from validated data.
 
 **In the stack:** layer L4, a domain package on the `@texuli/core` texels, `@texuli/primitives`, the `@texuli/tokens` token engine and the `texuli` components. `@texuli/blocks`, the agent catalog, the player and `@texuli/tools` build on it.
 
-> **Status: 0.x release.** `@texuli/charts` is published on npm as `0.16.0`, a
+> **Status: 0.x release.** `@texuli/charts` is published on npm as `0.16.1`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
 > minor (`0.14.0`) may contain breaking changes, so pin the exact version or
 > use `^0.16.0`, which accepts only 0.16.x.

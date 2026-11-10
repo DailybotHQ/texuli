@@ -16,7 +16,7 @@ by Texuli's Kotlin Multiplatform twin. The package is framework-free: no
 DOM, no Svelte, no Node APIs and no runtime dependencies.
 
 > **Status: 0.x release.** Texuli is in development. The packages are
-> published to npm as `0.16.0`, a pre-1.0 release (1.0.0 will be the first
+> published to npm as `0.16.1`, a pre-1.0 release (1.0.0 will be the first
 > stable release). Under 0.x, a new minor (`0.16.0`) may contain breaking
 > changes, so pin the exact version or use `^0.16.0`, which accepts only 0.16.x.
 
@@ -135,7 +135,7 @@ import {
   validateInstance,
 } from '@texuli/spec';
 
-SPEC_VERSION;                         // '0.14.0' in @texuli/spec@0.16.0
+SPEC_VERSION;                         // '0.14.0' in @texuli/spec@0.16.1
 SPEC_COMPONENT_IDS.includes('alert'); // true: the closed component vocabulary
 
 // The dialect validator: a closed subset of JSON Schema 2020-12.
@@ -340,7 +340,7 @@ envelope up to the current spec with pure, per-version steps
 `0.5.0 → 0.6.0`, `0.6.0 → 0.7.0`, `0.7.0 → 0.8.0`, `0.8.0 → 0.9.0`,
 `0.9.0 → 0.10.0`, `0.10.0 → 0.11.0`, `0.11.0 → 0.12.0`, `0.12.0 → 0.13.0` and `0.13.0 → 0.14.0`, each of which
 only stamps `spec`); a compatible version
-range is planned, not built. `@texuli/spec@0.16.0` carries spec `0.14.0` (digest
+range is planned, not built. `@texuli/spec@0.16.1` carries spec `0.14.0` (digest
 `39b8e87b561ae37c3a3b3ef45b7cec29ad4b05fa9b01cd9032c1b9f05f383e24`): the category `color` axis, the `allow` colors and the catalog ids added after
 `0.15.0` (above). `@texuli/spec@0.15.0` carried spec `0.13.0` (digest
 `37897e1b4d669ca0f32ba49b4960c921e860c1bacb38a9f29a1072389708ffae`): locked

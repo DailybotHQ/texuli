@@ -11,7 +11,7 @@ data-heavy product screens.
 
 **In the stack:** layer L4, a domain package on the `@texuli/core` texels, `@texuli/primitives`, `@texuli/drag`, the `@texuli/tokens` token engine and the `texuli` components. `@texuli/blocks`, `@texuli/sheets`, the agent catalog and the player build on it.
 
-> **Status: 0.x release.** `@texuli/data` is published on npm as `0.16.0`, a
+> **Status: 0.x release.** `@texuli/data` is published on npm as `0.16.1`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
 > minor (`0.14.0`) may contain breaking changes, so pin the exact version or
 > use `^0.16.0`, which accepts only 0.16.x.
@@ -88,7 +88,7 @@ visible and announced string is translatable through `labels`.
 | `@texuli/data/activity/inbox` | `NotificationInbox`: unread state, mark read and unread, mark all, item actions and arrival announcements |
 | `@texuli/data/cohort` | `CohortTable`: a cohort retention table with row and period headers, readable numbers and heat cells |
 | `@texuli/data/files` | `FileBrowser`: grid or list browser with breadcrumbs, previews and multi-select |
-| `@texuli/data/virtual-list` | `createVirtualList` and `createInfiniteLoader` for windowed lists, and `VirtualListView` (catalog `data-virtual-list`, new in `0.16.0`): a windowed APG listbox that renders rows through a snippet, or with `mode="feed"` an APG feed of articles for rows with their own controls (in development for `0.16.1`) ([docs](docs/data-virtual-list.md)) |
+| `@texuli/data/virtual-list` | `createVirtualList` and `createInfiniteLoader` for windowed lists, and `VirtualListView` (catalog `data-virtual-list`, new in `0.16.0`): a windowed APG listbox that renders rows through a snippet, or with `mode="feed"` an APG feed of articles for rows with their own controls (new in `0.16.1`) ([docs](docs/data-virtual-list.md)) |
 
 **Engines** (framework-free TypeScript, no Svelte needed):
 
