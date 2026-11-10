@@ -91,10 +91,12 @@ New in `0.16.0` (a `0.x` minor with no breaking API change; pin `^0.16.0`,
 since `^0.15.0` never picks it up):
 
 - Released: `texuli/ds-kit`, `texuli ds generate` and the importers,
-  `ds validate`, `ds check --locked` (and `--report`), portable bundles
+  `ds validate`, `ds check --locked` (`--report`, and `--render` with
+  `--url` for a page you serve), portable bundles
   (`ds pack`, `ds unpack`), the contract schemas and `checkBlueprintAllow`.
-- Blueprint spec `0.14.0`: the category `color` axis (`none`, `chart-1` to
-  `chart-8`) on `Avatar`, `Badge` and `Tag`, and `allow` `colors`.
+- Blueprint spec `0.14.0`: the label palette, a `color` axis (`none`,
+  `chart-1` to `chart-8`, AA ink `--tx-chart-N-foreground`) on `Avatar`,
+  `Badge` and `Tag`, and `allow` `colors`.
 - `VirtualListView` (`@texuli/data/virtual-list`); `Mark`, `Link` and
   `ColorSwatch` (`texuli/typography`); `List` (`texuli/list-item`); `Box`
   `fill`, soft tones, `canvas`, `dashed`; `Input` and `Textarea`
