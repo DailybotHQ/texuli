@@ -158,7 +158,7 @@ function customColorName(name: string): { mode: 'light' | 'dark'; role: string }
 function fontRoleFor(value: string, selector = ''): string {
   const text = `${value} ${selector}`.toLowerCase();
   if (/\b(?:mono|monospace|code)\b/.test(text)) return 'mono';
-  if (/\bserif\b/.test(text)) return 'serif';
+  if (/\bserif\b/.test(text) && !/\bsans-serif\b/.test(text)) return 'serif';
   if (/\b(?:heading|display|title|h[1-6])\b/.test(text)) return 'heading';
   return 'sans';
 }
@@ -234,6 +234,16 @@ export function importSiteCss(
     };
     let declarationCount = 0;
     const fontStacks = new Map<string, string[]>();
+    let declaredSansToken: { property: string; stack: string[] } | undefined;
+    for (const rule of rules) {
+      for (const [property, value] of rule.declarations) {
+        if (!property.startsWith('--')) continue;
+        const name = property.slice(2).toLowerCase().replace(/_/g, '-');
+        if (!/^(?:tx-)?(?:font-family-?|font-)sans$/.test(name)) continue;
+        const stack = toStack(value);
+        if (stack.ok) declaredSansToken = { property, stack: stack.value };
+      }
+    }
 
     for (const rule of rules) {
       const isFace = /^@font-face$/i.test(rule.selector);
@@ -338,6 +348,18 @@ export function importSiteCss(
           if (stack.ok) {
             if (stack.dropped)
               lose(sourcePath, 'Some unsafe or unsupported font names were dropped.', value);
+            if (
+              role === 'sans' &&
+              declaredSansToken &&
+              JSON.stringify(stack.value) !== JSON.stringify(declaredSansToken.stack)
+            ) {
+              lose(
+                sourcePath,
+                `Kept ${declaredSansToken.property} over this body font-family stack.`,
+                value
+              );
+              continue;
+            }
             fontStacks.set(role, stack.value);
             set(`typography.families.${role}.stack`, stack.value, sourcePath, value);
           } else lose(sourcePath, stack.message, value);
