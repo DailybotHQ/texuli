@@ -34,6 +34,7 @@ const title = 'Design systems';
 const description =
   'One JSON document per brand, followed by every Texuli surface: three example brands on one dashboard, slide, document and email, their conformance, and how to start.';
 const jsonLd = techArticleJsonLd(title, description, '/design-systems/');
+const solutionHref = safeHref('/solutions/design-systems/', 'developer');
 
 const minimal = `{
   "format": "texuli/design-system",
@@ -85,6 +86,15 @@ const runLabel = (variant: string | null) => (variant ? `${variant} variant` : '
         and the compiler enforces contrast, focus and target-size guarantees instead of reporting
         them.
       </p>
+      {
+        solutionHref && (
+          <p>
+            <a class="ds-hub__solution-link" href={link(solutionHref)}>
+              Explore the Design Systems Solution
+            </a>
+          </p>
+        )
+      }
       <p class="ds-hub__status" data-ds-status="">
         <strong>Status:</strong>
         {DS_STATUS}
@@ -376,6 +386,22 @@ const runLabel = (variant: string | null) => (variant ? `${variant} variant` : '
   }
   .ds-hub__lead {
     font-size: 1.0625rem;
+  }
+  .ds-hub a.ds-hub__solution-link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    padding-inline: 1rem;
+    border: 1px solid var(--tx-primary);
+    border-radius: var(--tx-radius, 0.5rem);
+    background: var(--tx-primary);
+    color: var(--tx-primary-foreground, var(--tx-background));
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .ds-hub__solution-link:focus-visible {
+    outline: 2px solid var(--tx-ring, Highlight);
+    outline-offset: 3px;
   }
   .ds-hub__status {
     padding: 0.6rem 0.9rem;

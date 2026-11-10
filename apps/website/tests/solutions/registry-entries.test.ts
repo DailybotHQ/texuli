@@ -21,19 +21,34 @@ function packageExports(name: string): Set<string> | undefined {
 }
 
 describe('Solutions registry entries', () => {
-  it('lists the five promoted Solutions in catalog order and passes the contract', () => {
+  it('lists each promoted Solution in catalog order and passes the contract', () => {
     expect(SOLUTIONS.map((s) => s.slug)).toEqual([...SOLUTION_SLUGS]);
     expect(checkSolutionRegistry(SOLUTIONS)).toEqual([]);
     expect(getSolution('canvas').name).toBe('Canvas');
   });
 
-  it('marks every Solution in development and keeps native targets planned', () => {
+  it('records the available design-system web target and evidence-backed Compose status', () => {
     for (const entry of SOLUTIONS) {
-      expect(entry.status, entry.slug).toBe('in development');
-      for (const p of entry.platforms.filter((p) => p.platform !== 'web')) {
+      const web = entry.platforms.find((p) => p.platform === 'web');
+      expect(web?.status, entry.slug).toBe(entry.status);
+      for (const p of entry.platforms.filter(
+        (p) => p.platform === 'android' || p.platform === 'ios'
+      ))
         expect(p.status, `${entry.slug} ${p.platform}`).toBe('planned');
-      }
     }
+    const designSystems = getSolution('design-systems');
+    expect(designSystems.status).toBe('available');
+    expect(designSystems.platforms).toContainEqual({
+      platform: 'web',
+      status: 'available',
+      evidence: [],
+    });
+    expect(designSystems.platforms.find((p) => p.platform === 'compose-desktop')).toMatchObject({
+      status: 'in development',
+    });
+    expect(
+      designSystems.platforms.find((p) => p.platform === 'compose-desktop')?.evidence
+    ).toContain('native/docs/parity.json');
   });
 
   it('names real packages and subpath exports', () => {
@@ -56,11 +71,14 @@ describe('Solutions registry entries', () => {
     }
   });
 
-  it('uses the hero plate slot and replaces an existing page route', () => {
+  it('uses the hero plate slot and declares replacements only for replaced family pages', () => {
     for (const entry of SOLUTIONS) {
       expect(entry.art.hero).toEqual({ slot: `solution-${entry.slug}-hero`, variant: 'plate' });
-      expect(entry.replaces).toBe(`/${entry.slug}-page/`);
-      expect(existsSync(join(WEBSITE, `src/pages/${entry.slug}-page/index.astro`))).toBe(true);
+      if (entry.replaces) {
+        expect(entry.replaces).toBe(`/${entry.slug}-page/`);
+        expect(existsSync(join(WEBSITE, `src/pages/${entry.slug}-page/index.astro`))).toBe(true);
+      }
     }
+    expect(getSolution('design-systems').replaces).toBeUndefined();
   });
 });
