@@ -1164,8 +1164,8 @@
       "note": "PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip new -> 4544 B, measured 4,403 B + 2%; new subpath: mergeCatalogs and the extension schema checks (T-catalog-extensions)."
     },
     "@texuli/tokens/design-system/generate": {
-      "gzip": 51904,
-      "note": "PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip new -> 49664 B, measured 48,636 B + 2%; new subpath: ds generate bundles the importers and the compiler on purpose; compile stays free of importers (T-gen-pipeline, T-size-regressions). 0.17.0 (2026-11-10, lead, standing grant): 49664 -> 51904 B, measured 50,853 B + 2%; repair keeps the seed and pins the failing role; prose color reading (T-017-generator)."
+      "gzip": 53184,
+      "note": "PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip new -> 49664 B, measured 48,636 B + 2%; new subpath: ds generate bundles the importers and the compiler on purpose; compile stays free of importers (T-gen-pipeline, T-size-regressions). 0.17.0 (2026-11-10, lead, standing grant): 49664 -> 51904 B, measured 50,853 B + 2%; repair keeps the seed and pins the failing role; prose color reading (T-017-generator). 0.17.1 CI (Linux, 2026-11-10): 51904 -> 53184 B, CI measured 52,118 B + 2%; generate bundles the prose-aware importer."
     }
   }
 }
