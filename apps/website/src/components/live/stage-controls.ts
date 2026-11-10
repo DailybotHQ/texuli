@@ -16,7 +16,10 @@ export const STAGE_CONTROLS: Readonly<Record<string, readonly string[]>> = Objec
   'avatar-group-grid': ['size', 'label'],
   badge: ['variant'],
   box: ['padding', 'radius', 'border', 'elevation', 'surface'],
+  'color-swatch': ['color', 'size', 'label'],
   heading: ['level', 'size', 'tone', 'truncate', 'label'],
+  link: ['href', 'hrefTrust', 'external', 'label'],
+  mark: ['tone', 'label'],
   prose: ['size'],
   text: ['size', 'tone', 'weight', 'transform', 'tracking', 'tabular', 'mono', 'label'],
   banner: ['tone', 'title', 'text', 'hideIcon', 'actionLabel', 'dismissible', 'dismissLabel'],
@@ -92,6 +95,7 @@ export const STAGE_CONTROLS: Readonly<Record<string, readonly string[]>> = Objec
   kbd: [],
   kpi: ['label', 'value', 'unit', 'previous', 'comparisonLabel', 'positive', 'loading', 'variant'],
   label: ['required', 'size', 'srOnly'],
+  list: ['divided'],
   'list-item': [],
   'layout-auth-split': [
     'brandTitle',

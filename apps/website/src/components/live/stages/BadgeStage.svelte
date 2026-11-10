@@ -5,15 +5,17 @@
 <script lang="ts">
 /**
  * Badge, Chip, Tag, Kbd, Code, the avatar grid, the inline-text catalog
- * node, and the typography and surface components (Heading, Text, Prose, Box): the instance the props panel drives, then every variant and state
- * side by side.
+ * node, and the typography and surface components (Heading, Text, Prose, Box,
+ * ColorSwatch, Link, Mark, List, ListItem): the instance the props panel
+ * drives, then every variant and state side by side.
  */
 
 import { AvatarGroupGrid } from 'texuli/avatar';
 import { Badge, Chip, Tag } from 'texuli/badge';
 import { Button } from 'texuli/button';
 import { Code, CopyButton, Kbd } from 'texuli/kbd-code';
-import { Box, Heading, Prose, Text } from 'texuli/typography';
+import { List, ListItem } from 'texuli/list-item';
+import { Box, ColorSwatch, Heading, Link, Mark, Prose, Text } from 'texuli/typography';
 import { readers, type StageValues } from './values.ts';
 
 type Props = { componentId: string; values: StageValues };
@@ -41,6 +43,29 @@ const CREW = [
   { name: 'Omar Fixture' },
 ];
 const SIZES = ['xs', 'sm', 'md', 'lg'] as const;
+const SWATCH_COLORS = [
+  'chart-1',
+  'chart-2',
+  'chart-3',
+  'chart-4',
+  'chart-5',
+  'chart-6',
+  'chart-7',
+  'chart-8',
+  'primary',
+  'secondary',
+  'success',
+  'warning',
+  'destructive',
+  'info',
+  'neutral',
+] as const;
+const MARK_TONES = ['warning', 'primary', 'success', 'info'] as const;
+const INBOX = [
+  { title: 'Quarterly notes', description: 'Ada Example', meta: '2h', icon: 'info' as const },
+  { title: 'Berth schedule', description: 'Lin Example', meta: '5h', icon: 'search' as const },
+  { title: 'Harbor guide', description: 'Mina Placeholder', meta: '1d', icon: 'warning' as const },
+];
 
 let selected = $state(true);
 let tags = $state(['Design', 'Research', 'Logistics']);
@@ -159,6 +184,59 @@ $effect(() => {
     >
       <Text size="sm">A panel from tokens.</Text>
     </Box>
+  {:else if componentId === 'color-swatch'}
+    <p class="row">
+      <ColorSwatch
+        color={pick('color', SWATCH_COLORS, 'primary')}
+        size={pick('size', ['sm', 'md', 'lg'] as const, 'md')}
+        label={str('label', 'Primary')}
+      />
+    </p>
+    <p class="row" aria-label="Every swatch color">
+      {#each SWATCH_COLORS as color (color)}
+        <ColorSwatch {color} size="sm" label={color} />
+      {/each}
+    </p>
+  {:else if componentId === 'link'}
+    <p>
+      Read
+      <Link
+        href={str('href', 'https://example.com/guide')}
+        hrefTrust={pick('hrefTrust', ['developer', 'untrusted'] as const, 'developer')}
+        external={bool('external', false)}
+        label={str('label', 'the harbor guide')}
+      />
+      before you ship.
+    </p>
+  {:else if componentId === 'mark'}
+    <p>
+      The
+      <Mark
+        tone={pick('tone', MARK_TONES, 'warning')}
+        label={str('label', 'quarter')}
+      />
+      closed ahead of plan.
+    </p>
+    <p class="row" aria-label="Every mark tone">
+      {#each MARK_TONES as tone (tone)}
+        <Mark {tone} label={tone} />
+      {/each}
+    </p>
+  {:else if componentId === 'list'}
+    <List divided={bool('divided', true)}>
+      {#each INBOX as row (row.title)}
+        <ListItem title={row.title} description={row.description} meta={row.meta} icon={row.icon} />
+      {/each}
+    </List>
+  {:else if componentId === 'list-item'}
+    <List>
+      <ListItem
+        title="Quarterly notes"
+        description="Ada Example"
+        meta="2h"
+        icon="info"
+      />
+    </List>
   {:else if componentId === 'inline-text'}
     {@const text = str('text', 'Save changes')}
     <p class="row"><Button>{text}</Button></p>

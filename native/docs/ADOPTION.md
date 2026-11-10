@@ -44,9 +44,9 @@ The full table, generated from the registry and the catalog, is
 | Time-based data (ADR-025) | `data-calendar`, `data-timeline`, `data-notification-inbox`, all read-only. The calendar's week and day views list each day's events (the web draws an hour grid). A named `timeZone` other than UTC paints the placeholder, because native carries no tz data. Inbox links are https navigate intents |
 | Boards, maps and dashboards (ADR-025) | `data-board`, `data-map` (the web's bundled fictional Port Meridian basemap, generated into Kotlin), `data-filter-builder` (all read-only), `data-dashboard` and `data-dashboard-widget`, which lay out by the web's dashboard engine at the measured breakpoint, with the widgets' content painting through the same registry |
 
-Every other id paints a placeholder. Of the 194 spec vocabulary ids, 75 may be
+Every other id paints a placeholder. Of the 199 spec vocabulary ids, 75 may be
 emitted by a blueprint (their catalog `emit` list holds both `developer` and
-`untrusted`). The other 119 have an empty `emit` list: every form control, the
+`untrusted`). The other 124 have an empty `emit` list: every form control, the
 app-shell layouts and the standalone UI components. Those plan to
 `tier-denied` at any tier. Emittable ids without a painter, such as
 `chat-thread`, the state controls, `media-composition-svg` and
@@ -134,12 +134,12 @@ fun loadBlueprint(
   `PlanNode.Placeholder(id, "tier-denied")`, with its subtree dropped.
   Validation checks structure only and never reads `emit`, so this gate is a
   render-time policy on both targets (`RenderPlanTest`). Today the two tiers
-  plan the same: the 75 emittable ids allow both, and the other 119 (every
+  plan the same: the 75 emittable ids allow both, and the other 124 (every
   control, such as `button`, `input`, `textarea` and `form`) allow neither,
   so they are `tier-denied` at every tier.
 - **Profiles.** A `portable` envelope is refused with `unsupported-profile`
   for every id that is not portable core. No id is portable core yet: of the
-  194 vocabulary entries, 36 are `unknown` and 158 are `web-only`, so only
+  199 vocabulary entries, 40 are `unknown` and 159 are `web-only`, so only
   `web`-profile blueprints load.
 
 ### `BlueprintView` and intents
