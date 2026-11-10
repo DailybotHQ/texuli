@@ -43,6 +43,23 @@ const CREW = [
   { name: 'Omar Fixture' },
 ];
 const SIZES = ['xs', 'sm', 'md', 'lg'] as const;
+const SWATCH_COLORS = [
+  'chart-1',
+  'chart-2',
+  'chart-3',
+  'chart-4',
+  'chart-5',
+  'chart-6',
+  'chart-7',
+  'chart-8',
+  'primary',
+  'secondary',
+  'success',
+  'warning',
+  'destructive',
+  'info',
+  'neutral',
+] as const;
 
 let selected = $state(true);
 let tags = $state(['Design', 'Research', 'Logistics']);
@@ -181,7 +198,7 @@ $effect(() => {
   {:else if componentId === 'color-swatch'}
     <p class="row">
       <ColorSwatch
-        color={pick('color', ['chart-1', 'chart-2', 'chart-3', 'chart-4', 'chart-5', 'chart-6', 'chart-7', 'chart-8', 'primary', 'secondary', 'success', 'warning', 'destructive', 'info', 'neutral'] as const, 'primary')}
+        color={pick('color', SWATCH_COLORS, 'primary')}
         size={pick('size', ['sm', 'md', 'lg'] as const, 'md')}
         label={str('label', 'Primary')}
       />

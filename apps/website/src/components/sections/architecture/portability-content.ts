@@ -97,7 +97,7 @@ export const PORTABILITY_EXCERPTS: readonly PortabilityExcerpt[] = [
       { text: '  ' },
       { text: SHARED_ID, mark: true },
       {
-        text: ": {\n    label?: string;\n    variant?:\n      | 'default'\n      | 'secondary'\n      | 'outline'\n      | 'success'\n      | 'warning'\n      | 'destructive'\n      | 'info'\n      | 'neutral';\n  };",
+        text: ": {\n    color?:\n      | 'none'\n      | 'chart-1'\n      | 'chart-2'\n      | 'chart-3'\n      | 'chart-4'\n      | 'chart-5'\n      | 'chart-6'\n      | 'chart-7'\n      | 'chart-8';\n    label?: string;\n    variant?:\n      | 'default'\n      | 'secondary'\n      | 'outline'\n      | 'success'\n      | 'warning'\n      | 'destructive'\n      | 'info'\n      | 'neutral';\n  };",
       },
     ],
   },
