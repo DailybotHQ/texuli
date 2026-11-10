@@ -47,6 +47,8 @@ export const DS_MAP_COMPOUND_PARENTS = [
   'tabs',
 ] as const;
 
+const COMPOUND: ReadonlySet<string> = new Set(DS_MAP_COMPOUND_PARENTS);
+
 /**
  * Cap per finding code (matches `DESIGN_SYSTEM_LIMITS.errors`): each of `render-disabled-value`,
  * `not-allowed` and `unmapped` keeps up to this many, so a page full of one kind never crowds
