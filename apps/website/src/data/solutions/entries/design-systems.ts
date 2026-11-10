@@ -84,7 +84,7 @@ export const designSystems: SolutionEntry = {
     title: 'Ledgerline reference kit',
     scenarios: ['ledgerline'],
     limits: [
-      'The reference hub shows static example brand surfaces; this landing placeholder does not offer interactive generation.',
+      'The landing links static example brand surfaces (the fictional Ledgerline kit); it does not run interactive generation yet.',
     ],
   },
   art: { hero: { slot: 'solution-design-systems-hero', variant: 'plate' } },

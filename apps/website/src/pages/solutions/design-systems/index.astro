@@ -1,62 +1,57 @@
 ---
-/** Temporary route shell; T-landing replaces this with the finished Solution landing. */
-import SolutionLayout from '../../../components/solutions/shared/SolutionLayout.astro';
-import type { SolutionLandingContent } from '../../../components/solutions/shared/types.ts';
-import { getSolution } from '../../../data/solutions/index.ts';
+/**
+ * `/solutions/design-systems/` — the Design systems Solution landing (ADR-027, ADR-030,
+ * ADR-033; PLAN_017 T-landing): hero, the loop in five steps (create, review, approve, lock,
+ * share), how it works, Built on it (Protoyard), quickstart, recipes, agents, platforms, the
+ * FAQ and next steps. `SolutionLayout` orders the sections and checks the content against
+ * the registry entry. The page ships no island yet: the demo section has a marked mount
+ * point (`data-tx-ds-demo-mount`) for T-demo's `client:visible` island.
+ */
 
-const entry = getSolution('design-systems');
-const content: SolutionLandingContent = {
-  hero: {
-    eyebrow: 'Texuli Solution · Design systems',
-    title: 'One brand document, across Texuli.',
-    lede: 'Design systems ship today in Texuli 0.16.1. This landing is being completed; visit the reference hub for the current examples, conformance details and tools.',
-    ctas: [
-      { kind: 'primary', label: 'Open the design systems reference', href: '/design-systems/' },
-    ],
-  },
-  demo: {
-    title: 'A Ledgerline example',
-    tryThis: ['Explore the static Ledgerline kit and its documented design-system APIs.'],
-    label: 'Design systems landing placeholder',
-  },
-  stories: { title: 'What the document governs', stories: [] },
-  how: { title: 'How it works', steps: [] },
-  quickstart: {
-    title: 'Start with the reference',
-    install: { label: 'Design systems guide', language: 'md', code: 'docs/DESIGN_SYSTEMS.md' },
-    samples: [],
-    verifiedBy: 'The design-systems guide and the reference hub.',
-  },
-  agents: {
-    title: 'Agent surfaces',
-    body: 'The design-system CLI and MCP operations are documented in the reference hub.',
-    surfaces: [],
-  },
-  platforms: { title: 'Platforms' },
-  next: {
-    links: [
-      { label: 'Design systems docs', href: entry.docs },
-      { label: 'Design systems reference', href: '/design-systems/' },
-    ],
-  },
-};
+import DesignSystemsDemoSection from '../../../components/solutions/design-systems/demo/DesignSystemsDemoSection.astro';
+import DesignSystemsFaq from '../../../components/solutions/design-systems/extras/DesignSystemsFaq.astro';
+import DesignSystemsProtoyard from '../../../components/solutions/design-systems/extras/DesignSystemsProtoyard.astro';
+import DesignSystemsHero from '../../../components/solutions/design-systems/hero/DesignSystemsHero.astro';
+import DesignSystemsHow from '../../../components/solutions/design-systems/how/DesignSystemsHow.astro';
+import DesignSystemsQuickstart from '../../../components/solutions/design-systems/quickstart/DesignSystemsQuickstart.astro';
+import DesignSystemsStories from '../../../components/solutions/design-systems/stories/DesignSystemsStories.astro';
+import SolutionAgents from '../../../components/solutions/shared/platforms/SolutionAgents.astro';
+import SolutionPlatforms from '../../../components/solutions/shared/platforms/SolutionPlatforms.astro';
+import SolutionNextSteps from '../../../components/solutions/shared/resources/SolutionNextSteps.astro';
+import SolutionRecipes from '../../../components/solutions/shared/resources/SolutionRecipes.astro';
+import SolutionRelated from '../../../components/solutions/shared/resources/SolutionRelated.astro';
+import SolutionLayout from '../../../components/solutions/shared/SolutionLayout.astro';
+import { techArticleJsonLd } from '../../../lib/schema.ts';
+import { DESIGN_SYSTEMS_LANDING as content, DESIGN_SYSTEMS_ENTRY as entry } from './_content.ts';
+
+const title = 'Design systems — your brand, locked in one file';
+const description =
+  'Generate a design system from brand inputs, review it in the kit, approve it in a commit, and check every prototype against it.';
 ---
 
-<SolutionLayout {entry} {content}>
-  <section slot="hero" aria-labelledby="ds-placeholder-title">
-    <p>Design systems · web</p>
-    <h1 id="ds-placeholder-title">One brand document, across Texuli.</h1>
-    <p>This Solution landing is being completed. The design-system APIs are available today.</p>
-    <a href="/design-systems/">Open the design systems reference</a>
-  </section>
-  <section slot="demo" aria-labelledby="ds-placeholder-demo-title">
-    <h2 id="ds-placeholder-demo-title">A Ledgerline example</h2>
-    <p>Explore the static example in the <a href="/design-systems/kit/">Ledgerline kit</a>.</p>
-  </section>
-  <section slot="stories"><h2>What the document governs</h2><p>See the reference hub for current examples.</p></section>
-  <section slot="how"><h2>How it works</h2><p>Read the <a href={entry.docs}>technical docs</a>.</p></section>
-  <section slot="quickstart"><h2>Start with the reference</h2><a href="/design-systems/">Design systems reference</a></section>
-  <section slot="agents"><h2>Agent surfaces</h2><p>CLI and MCP tools are listed in the reference.</p></section>
-  <section slot="platforms"><h2>Platforms</h2><p>Web is available; Compose Desktop is in development.</p></section>
-  <section slot="next"><h2>Next steps</h2><a href={entry.docs}>Read the docs</a></section>
+<SolutionLayout
+  {entry}
+  {content}
+  {title}
+  {description}
+  jsonLd={techArticleJsonLd(title, description, entry.route)}
+>
+  <DesignSystemsHero slot="hero" />
+  <DesignSystemsDemoSection slot="demo">
+    {/* T-demo: mount the island here, e.g. <DesignSystemsDemo slot="island" client:visible /> */}
+  </DesignSystemsDemoSection>
+  <DesignSystemsStories slot="stories" />
+  <Fragment slot="how">
+    <DesignSystemsHow />
+    <DesignSystemsProtoyard />
+  </Fragment>
+  <DesignSystemsQuickstart slot="quickstart" />
+  <SolutionRecipes slot="recipes" {entry} {...content.recipes!} />
+  <SolutionAgents slot="agents" {entry} {...content.agents} />
+  <SolutionPlatforms slot="platforms" {entry} {...content.platforms} />
+  <Fragment slot="next">
+    <DesignSystemsFaq />
+    <SolutionRelated {entry} />
+    <SolutionNextSteps {entry} {...content.next} />
+  </Fragment>
 </SolutionLayout>

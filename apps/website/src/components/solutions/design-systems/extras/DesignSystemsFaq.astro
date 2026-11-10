@@ -1,0 +1,67 @@
+---
+/**
+ * Design systems FAQ: answers behind native <details>/<summary> (no island, no script),
+ * copy in `extras-content.ts`. Plain text only.
+ */
+import { DESIGN_SYSTEMS_FAQ as faq } from './extras-content.ts';
+
+const headingId = `ds-${faq.id}-heading`;
+---
+
+<section class="ds-faq" aria-labelledby={headingId} data-tx-ds-faq="">
+  <div class="ds-faq__inner">
+    <h2 id={headingId}>{faq.title}</h2>
+    <div class="ds-faq__list">
+      {
+        faq.items.map((item) => (
+          <details class="ds-faq__item" data-tx-ds-faq-item={item.id}>
+            <summary>{item.question}</summary>
+            <p>{item.answer}</p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .ds-faq {
+    padding-block: 0 clamp(3rem, 8vw, 5rem);
+    padding-inline: 1.25rem;
+  }
+  .ds-faq__inner {
+    display: grid;
+    gap: 1.25rem;
+    max-inline-size: 48rem;
+    margin-inline: auto;
+  }
+  .ds-faq h2 {
+    margin: 0;
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    line-height: 1.15;
+    text-align: center;
+  }
+  .ds-faq__list {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .ds-faq__item {
+    border: 1px solid color-mix(in oklab, var(--tx-border) 80%, transparent);
+    border-radius: calc(var(--tx-radius, 0.5rem) * 1.25);
+    background: var(--tx-background);
+  }
+  .ds-faq__item summary {
+    padding: 0.9rem 1.1rem;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  .ds-faq__item summary:focus-visible {
+    outline: 2px solid var(--tx-ring);
+    outline-offset: 2px;
+    border-radius: inherit;
+  }
+  .ds-faq__item p {
+    margin: 0;
+    padding: 0 1.1rem 1.1rem;
+  }
+</style>
