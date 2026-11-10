@@ -14,18 +14,33 @@
  * never from consumer inline style. Rows render through the `row` snippet
  * (or a plain label), are measured as they mount and resize, and keep the
  * scroll position steady when a row above the viewport changes height.
+ *
+ * Keys act only on the element that owns them (`event.target` is the
+ * listbox, or the article): a key typed in a row's own input or pressed on a
+ * row's button is never taken.
+ *
+ * `mode="feed"` follows the APG **feed** pattern instead, for rows that hold
+ * their own buttons, links or inputs: the scroller is `role="feed"`, each row
+ * an `<article>` with `aria-setsize` and `aria-posinset`, focusable without
+ * selection (one article is the tab stop, the others `tabindex="-1"`), and
+ * Page Down / Page Up move focus to the next or previous article. A feed has
+ * no selection. `selectable={false}` keeps a listbox from selecting rows.
+ * Feeds and non-selectable lists use a plain row (no option padding, border,
+ * hover or cursor), so a row snippet brings its own chrome.
  */
 
-import type { Snippet } from 'svelte';
+import { type Snippet, tick } from 'svelte';
 import type { Attachment } from 'svelte/attachments';
 import { type ClassValue, cx } from 'texuli/cx';
 import './virtual-list-view.css';
 import {
   normalizeVirtualListDensity,
+  normalizeVirtualListMode,
   normalizeVirtualListSize,
   type VirtualListKeyValue,
   type VirtualListRowContext,
   type VirtualListViewDensity,
+  type VirtualListViewMode,
   type VirtualListViewSize,
   viewportFallback,
   virtualListDescriptionOf,
@@ -37,8 +52,19 @@ import { createVirtualList, nextVirtualListIndex } from './virtual-list.ts';
 interface Props {
   /** The rows. Any length: only a window is rendered. */
   items: readonly T[];
-  /** Accessible name of the listbox. */
+  /** Accessible name of the listbox or feed. */
   label: string;
+  /**
+   * `listbox` (default): one tab stop, rows are options to pick. `feed`: the
+   * APG feed pattern; rows are articles that may hold their own controls.
+   */
+  mode?: VirtualListViewMode;
+  /**
+   * Listbox only. `false`: rows are never selected or painted as selected
+   * (`selected` is not written); Enter, Space and a click still call
+   * `onSelect`, so a row can open something. Defaults to true.
+   */
+  selectable?: boolean;
   /** A stable key per row (default: `item.id`, else the index). */
   getKey?: (item: T, index: number) => VirtualListKeyValue;
   /** The row's text when no `row` snippet is given (default: `item.label`). */
@@ -57,7 +83,7 @@ interface Props {
   selected?: VirtualListKeyValue;
   /** Text shown when there are no rows. */
   emptyLabel?: string;
-  /** Called when a row is chosen by click, Enter or Space. */
+  /** Listbox: called when a row is chosen by click, Enter or Space. A feed never calls it. */
   onSelect?: (item: T, index: number) => void;
   /** Called when the rendered range changes (for an infinite loader). */
   onRangeChange?: (range: { start: number; end: number }) => void;
@@ -67,6 +93,8 @@ interface Props {
 let {
   items,
   label,
+  mode = 'listbox',
+  selectable = true,
   getKey,
   getLabel,
   row,
@@ -88,6 +116,11 @@ const optionId = (index: number) => `${listId}-option-${index}`;
 
 const safeSize = $derived(normalizeVirtualListSize(size));
 const safeDensity = $derived(normalizeVirtualListDensity(density));
+const safeMode = $derived(normalizeVirtualListMode(mode));
+const isFeed = $derived(safeMode === 'feed');
+const canSelect = $derived(!isFeed && selectable !== false);
+// Feeds and non-selectable lists drop the option chrome; the row snippet owns it.
+const plain = $derived(isFeed || selectable === false);
 const estimate = $derived(Number.isFinite(estimateSize) && estimateSize > 0 ? estimateSize : 40);
 const extra = $derived(
   Number.isFinite(overscan) ? Math.min(50, Math.max(0, Math.floor(overscan))) : 3
@@ -111,6 +144,8 @@ const last = $derived(view.items.at(-1));
 const before = $derived(view.items[0]?.start ?? 0);
 const after = $derived(last ? Math.max(0, view.totalSize - (last.start + last.size)) : 0);
 const activeInWindow = $derived(active >= view.start && active < view.end);
+// A feed's one tab stop: the focused article, else the first rendered one.
+const tabStop = $derived(activeInWindow ? active : view.start);
 
 const keyOf = (item: T, index: number) =>
   getKey ? getKey(item, index) : virtualListKeyOf(item, index);
@@ -188,7 +223,7 @@ function choose(index: number): void {
   const item = items[index];
   if (item === undefined) return;
   active = index;
-  selected = keyOf(item, index);
+  if (canSelect) selected = keyOf(item, index);
   onSelect?.(item, index);
 }
 
@@ -201,6 +236,8 @@ function onfocus(): void {
 }
 
 function onkeydown(event: KeyboardEvent): void {
+  // A key in a row's own control (an input, a button) belongs to that control.
+  if (event.target !== event.currentTarget) return;
   if (items.length === 0 || event.altKey || event.ctrlKey || event.metaKey) return;
   if (event.key === 'Enter' || event.key === ' ') {
     if (active >= 0) {
@@ -222,26 +259,47 @@ function onkeydown(event: KeyboardEvent): void {
       : next;
   scrollToIndex(active);
 }
+/** Feed: scroll the article at `index` into the window, then move focus to it. */
+async function focusArticle(index: number): Promise<void> {
+  active = index;
+  scrollToIndex(index);
+  await tick();
+  viewport?.ownerDocument.getElementById(optionId(index))?.focus();
+}
+
+/** Feed: Page Down / Page Up on an article move focus to the next or previous one. */
+function onArticleKeydown(event: KeyboardEvent, index: number): void {
+  if (event.target !== event.currentTarget) return;
+  if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+  let next: number;
+  if (event.key === 'PageDown') next = Math.min(items.length - 1, index + 1);
+  else if (event.key === 'PageUp') next = Math.max(0, index - 1);
+  else return;
+  event.preventDefault();
+  if (next !== index) void focusArticle(next);
+}
 </script>
 
 <div
-  class={cx('tx-virtual-list', `tx-virtual-list--${safeSize}`, `tx-virtual-list--${safeDensity}`, className)}
+  class={cx('tx-virtual-list', `tx-virtual-list--${safeSize}`, `tx-virtual-list--${safeDensity}`, isFeed && 'tx-virtual-list--feed', className)}
   data-tx-component="data-virtual-list"
   data-tx-size={safeSize}
   data-tx-density={safeDensity}
 >
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex -- the role is dynamic: a listbox (tab stop) or a feed (no tabindex; its articles take focus). -->
   <div
     {@attach trackViewport}
     id={listId}
     class="tx-virtual-list__viewport"
-    role="listbox"
-    tabindex={items.length === 0 ? -1 : 0}
+    role={isFeed ? 'feed' : 'listbox'}
+    tabindex={isFeed ? undefined : items.length === 0 ? -1 : 0}
     aria-label={label}
-    aria-activedescendant={activeInWindow ? optionId(active) : undefined}
+    aria-activedescendant={!isFeed && activeInWindow ? optionId(active) : undefined}
     aria-describedby={items.length === 0 ? emptyId : undefined}
+    data-tx-mode={safeMode}
     {onscroll}
-    {onfocus}
-    {onkeydown}
+    onfocus={isFeed ? undefined : onfocus}
+    onkeydown={isFeed ? undefined : onkeydown}
   >
     <div
       class="tx-virtual-list__spacer"
@@ -252,31 +310,53 @@ function onkeydown(event: KeyboardEvent): void {
     {#each view.items as entry (entry.index)}
       {@const item = items[entry.index] as T}
       {@const key = keyOf(item, entry.index)}
-      {@const isSelected = selected !== undefined && key === selected}
+      {@const isSelected = canSelect && selected !== undefined && key === selected}
       {@const isActive = entry.index === active}
-      <!-- svelte-ignore a11y_click_events_have_key_events, a11y_interactive_supports_focus -- APG listbox with aria-activedescendant: the listbox holds focus and the keys. -->
-      <div
-        {@attach measureRow(entry.index)}
-        id={optionId(entry.index)}
-        class="tx-virtual-list__option"
-        role="option"
-        aria-selected={isSelected}
-        aria-setsize={items.length}
-        aria-posinset={entry.index + 1}
-        data-index={entry.index}
-        data-active={isActive ? '' : undefined}
-        onclick={() => choose(entry.index)}
-      >
+      {#snippet content()}
         {#if row}
           {@render row({ item, index: entry.index, active: isActive, selected: isSelected })}
         {:else}
-          <span class="tx-virtual-list__label">{labelOf(item, entry.index)}</span>
+          <span id="{optionId(entry.index)}-label" class="tx-virtual-list__label">{labelOf(item, entry.index)}</span>
           {@const description = virtualListDescriptionOf(item)}
           {#if description}
             <span class="tx-virtual-list__description">{description}</span>
           {/if}
         {/if}
-      </div>
+      {/snippet}
+      {#if isFeed}
+        <!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -- APG feed: each article is focusable and owns Page Up / Page Down. -->
+        <article
+          {@attach measureRow(entry.index)}
+          id={optionId(entry.index)}
+          class="tx-virtual-list__row"
+          tabindex={entry.index === tabStop ? 0 : -1}
+          aria-setsize={items.length}
+          aria-posinset={entry.index + 1}
+          aria-labelledby={row ? undefined : `${optionId(entry.index)}-label`}
+          data-index={entry.index}
+          data-active={isActive ? '' : undefined}
+          onfocusin={() => (active = entry.index)}
+          onkeydown={(event) => onArticleKeydown(event, entry.index)}
+        >
+          {@render content()}
+        </article>
+      {:else}
+        <!-- svelte-ignore a11y_click_events_have_key_events, a11y_interactive_supports_focus -- APG listbox with aria-activedescendant: the listbox holds focus and the keys. -->
+        <div
+          {@attach measureRow(entry.index)}
+          id={optionId(entry.index)}
+          class={plain ? 'tx-virtual-list__row' : 'tx-virtual-list__option'}
+          role="option"
+          aria-selected={canSelect ? isSelected : undefined}
+          aria-setsize={items.length}
+          aria-posinset={entry.index + 1}
+          data-index={entry.index}
+          data-active={isActive ? '' : undefined}
+          onclick={() => choose(entry.index)}
+        >
+          {@render content()}
+        </div>
+      {/if}
     {/each}
     <div
       class="tx-virtual-list__spacer"
