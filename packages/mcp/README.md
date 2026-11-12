@@ -5,8 +5,10 @@ for [Texuli](https://texuli.com), an MIT-licensed Svelte 5 component library
 by Dailybot, Inc. (*Small pieces. Infinite possibilities.*). An agent
 connected to it can search the component catalog, read manifests and worked
 examples, validate blueprint drafts, search and preview themes with their
-WCAG AA report, run the deck and document commands, and convert or render
-untrusted Markdown, HTML and chat dialects (`md.convert`, `md.render`).
+WCAG AA report, run the deck and document commands, convert or render
+untrusted Markdown, HTML and chat dialects (`md.convert`, `md.render`),
+and search, look up and convert Texuli emoji by closed catalog id
+(`emoji.search`, `emoji.get`, `emoji.convert`, `emoji.categories`, `emoji.variants`).
 
 **In the stack:** layer L9, the top: a thin bin over the stdio MCP server in `@texuli/tools` (L8), which reads the agent catalog (L6) and the `@texuli/tokens` themes.
 

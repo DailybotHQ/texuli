@@ -1089,6 +1089,139 @@ export const MCP_SERVER_DATA = {
       example: 'Bold text and a refused script link',
     },
     {
+      name: 'emoji.search',
+      title: 'Search the Texuli emoji catalog',
+      summary:
+        'Search the closed Unicode emoji catalog by name, shortcode or keyword. Returns { items }: approved ids with unicode, name, shortcode, category and score. Query at most 256 characters; at most 100 hits. Untrusted input; never throws.',
+      runtime: 'edge',
+      remote: true,
+      local: true,
+      limits: {
+        inputBytes: 8192,
+        items: 100,
+        timeMs: 5000,
+      },
+      arguments: [
+        {
+          name: 'query',
+          required: true,
+          description: 'Name, shortcode or keyword (at most 256 characters).',
+        },
+        {
+          name: 'locale',
+          required: false,
+          description: 'BCP 47 locale for matching (default en).',
+        },
+        {
+          name: 'category',
+          required: false,
+          description: 'Keep only this Unicode category.',
+        },
+        {
+          name: 'limit',
+          required: false,
+          description: 'How many hits to return (1 to 100, default 20).',
+        },
+      ],
+      example: 'Find a rocket',
+    },
+    {
+      name: 'emoji.get',
+      title: 'Read one emoji by id',
+      summary:
+        'Look up one closed catalog record by hyphenated id, Unicode sequence or :shortcode:. Returns { emoji } with unicode, name, shortcode, category and variant fields. Unknown ids are not-found. Untrusted input; never throws.',
+      runtime: 'edge',
+      remote: true,
+      local: true,
+      limits: {
+        inputBytes: 2048,
+        timeMs: 5000,
+      },
+      arguments: [
+        {
+          name: 'id',
+          required: true,
+          description: 'Hyphenated hex id, Unicode sequence, or :shortcode:.',
+        },
+      ],
+      example: 'Rocket by id',
+    },
+    {
+      name: 'emoji.convert',
+      title: 'Convert shortcodes and Unicode emoji',
+      summary:
+        'Convert untrusted plain text between Unicode sequences and shortcodes. dialect texuli is the lean catalog; legacy is the imported 3.0.2 aliases. mode strict keeps conflict aliases and reports them; permissive picks a candidate. Returns { value, diagnostics }. Never throws.',
+      runtime: 'edge',
+      remote: true,
+      local: true,
+      limits: {
+        inputBytes: 200000,
+        items: 200,
+        timeMs: 10000,
+      },
+      arguments: [
+        {
+          name: 'source',
+          required: true,
+          description: 'Untrusted plain text (at most 100000 characters).',
+        },
+        {
+          name: 'to',
+          required: true,
+          description: 'unicode (shortcodes → sequences) or shortcode (sequences → :shortcode:).',
+        },
+        {
+          name: 'dialect',
+          required: false,
+          description: 'texuli (canonical) or legacy (imported aliases). Default texuli.',
+        },
+        {
+          name: 'mode',
+          required: false,
+          description: 'strict keeps conflict aliases; permissive resolves them. Default strict.',
+        },
+      ],
+      example: 'Canonical shortcode to Unicode',
+    },
+    {
+      name: 'emoji.categories',
+      title: 'List emoji categories',
+      summary:
+        'List the closed Unicode emoji categories with how many catalog records each holds. Returns { categories: [{ id, count }] }. No input. Never throws.',
+      runtime: 'edge',
+      remote: true,
+      local: true,
+      limits: {
+        inputBytes: 1024,
+        items: 9,
+        timeMs: 5000,
+      },
+      arguments: [],
+      example: 'Every category',
+    },
+    {
+      name: 'emoji.variants',
+      title: 'List emoji variants',
+      summary:
+        'List tone and other variants for a closed catalog id (or a variant of it). Returns { base, variants }. Unknown ids are not-found. Untrusted input; never throws.',
+      runtime: 'edge',
+      remote: true,
+      local: true,
+      limits: {
+        inputBytes: 2048,
+        items: 100,
+        timeMs: 5000,
+      },
+      arguments: [
+        {
+          name: 'id',
+          required: true,
+          description: 'Hyphenated hex id, Unicode sequence, or :shortcode:.',
+        },
+      ],
+      example: 'Thumbs-up tones',
+    },
+    {
       name: 'site.pages',
       title: 'List texuli.com pages',
       summary:

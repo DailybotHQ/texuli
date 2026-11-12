@@ -39,8 +39,8 @@ are never overwritten.
 ## MCP
 
 The same operations are MCP tools (`catalog.search`, `component.get`,
-`blueprint.validate`, `md.convert`, `md.render`, `deck.run` …; the list is generated
-from the registry in `@texuli/tools/ops` and published in the server card
+`blueprint.validate`, `md.convert`, `md.render`, `emoji.search`, `deck.run` …; listed
+from `@texuli/tools/ops` and published in the server card
 at `https://texuli.com/.well-known/mcp/server-card.json`). Two servers, the
 same tools:
 

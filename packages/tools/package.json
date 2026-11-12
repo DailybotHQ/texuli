@@ -110,7 +110,8 @@
     "@texuli/charts": "0.17.4",
     "@texuli/media": "0.17.4",
     "@texuli/deck": "0.17.4",
-    "@texuli/document": "0.17.4"
+    "@texuli/document": "0.17.4",
+    "@texuli/emojis": "0.0.0"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"
