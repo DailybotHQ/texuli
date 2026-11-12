@@ -180,9 +180,11 @@ describe('htmlToMarkdownTree: mapping', () => {
 
   it('reads code blocks with their language, keeping text exactly', () => {
     expect(blocks('<pre><code class="lang-js">\n  a &lt; b\n\n</code></pre>')).toEqual([
-      { type: 'code', lang: 'js', value: '  a < b\n', fenced: true },
+      // The newline after `<code>` is content (browsers drop one only right after `<pre>`).
+      { type: 'code', lang: 'js', value: '\n  a < b\n', fenced: true },
     ]);
     expect(blocks('<pre>x<br>y</pre>')).toEqual([{ type: 'code', value: 'x\ny', fenced: true }]);
+    expect(blocks('<pre>\nx</pre>')).toEqual([{ type: 'code', value: 'x', fenced: true }]);
   });
 
   it('reads tables: the first row is the header, align from align or text-align', () => {
