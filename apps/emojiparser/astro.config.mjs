@@ -8,6 +8,6 @@ export default defineConfig({
   build: { format: 'directory' },
   integrations: [svelte()],
   vite: {
-    ssr: { noExternal: ['@texuli/core', /^@texuli\//] },
+    ssr: { noExternal: ['texuli', '@texuli/core', /^@texuli\//] },
   },
 });
