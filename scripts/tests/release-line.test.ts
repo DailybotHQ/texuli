@@ -8,7 +8,13 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { inPublishedLine, isLineVersion, parseReleaseLine, releaseLine } from '../release-line.ts';
+import {
+  inPublishedLine,
+  isLineVersion,
+  parseReleaseLine,
+  releaseLine,
+  UNRELEASED_PACKAGES,
+} from '../release-line.ts';
 
 const ROOT = join(import.meta.dirname, '..', '..');
 const read = (path: string) => readFileSync(join(ROOT, path), 'utf8');
@@ -23,7 +29,9 @@ interface Manifest {
 
 const manifests: Manifest[] = readdirSync(join(ROOT, 'packages'))
   .map((dir) => JSON.parse(read(`packages/${dir}/package.json`)) as Manifest)
-  .filter((manifest) => manifest.name !== '@texuli/examples');
+  .filter(
+    (manifest) => manifest.name !== '@texuli/examples' && !UNRELEASED_PACKAGES.has(manifest.name)
+  );
 const names = new Set(manifests.map((manifest) => manifest.name));
 const line = releaseLine();
 

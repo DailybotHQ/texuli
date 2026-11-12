@@ -69,6 +69,11 @@
       "svelte": "./src/filter-builder/index.ts",
       "default": "./src/filter-builder/index.ts"
     },
+    "./filter-bar": {
+      "types": "./src/filter-bar/index.ts",
+      "svelte": "./src/filter-bar/index.ts",
+      "default": "./src/filter-bar/index.ts"
+    },
     "./geo": "./src/engines/map/index.ts",
     "./grid": "./src/engines/grid/index.ts",
     "./grid-columns": {

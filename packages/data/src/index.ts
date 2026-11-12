@@ -30,6 +30,7 @@ export {
   type FileEntry,
   type FilePreviewModel,
 } from './files/index.ts';
+export { FilterBar } from './filter-bar/index.ts';
 export {
   applyFilter,
   FilterBuilder,

@@ -61,6 +61,11 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
         dependsOn: [],
       },
       {
+        name: '@texuli/emojis',
+        role: 'In development (private until its first release, ADR-035): the dependency-free Unicode emoji catalog generated from pinned Unicode and CLDR sources, with legacy shortcode aliases',
+        dependsOn: [],
+      },
+      {
         name: '@texuli/spec',
         role: 'Framework-free blueprint contract and code generation',
         dependsOn: [],
@@ -142,7 +147,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       {
         name: '@texuli/forms',
         role: 'In development (on npm from 0.8.0): schema-driven forms: the closed form schema and its validator, conditional logic and cross-field rules on @texuli/core/expression, named formats, drafts and autosave, and the form controller (model, framework-free); SchemaForm, which paints any schema with texuli controls (loading the heavier ones per field type), multi-step and keyboard-complete (.); the static control registry for server rendering (controls); the player form host (host)',
-        dependsOn: ['core', 'texuli'],
+        dependsOn: ['core', 'drag', 'texuli'],
       },
       {
         name: '@texuli/canvas',

@@ -17,6 +17,7 @@ import {
   writePackageChangelogs,
 } from '../package-changelogs.ts';
 import { NEVER_PACKED, PUBLISHED_FILES, publishManifest, readWorkspace } from '../packages.ts';
+import { UNRELEASED_PACKAGES } from '../release-line.ts';
 
 const FIXTURE = `# Release
 
@@ -190,7 +191,9 @@ describe('changelogForPackage', () => {
 
 describe('the 26 published packages', () => {
   const root = join(import.meta.dirname, '..', '..');
-  const packable = readWorkspace(root).filter((pkg) => !NEVER_PACKED.includes(pkg.name));
+  const packable = readWorkspace(root).filter(
+    (pkg) => !NEVER_PACKED.includes(pkg.name) && !UNRELEASED_PACKAGES.has(pkg.name)
+  );
 
   it('each ships a CHANGELOG.md that matches docs/RELEASE.md', () => {
     expect(packable).toHaveLength(26);
