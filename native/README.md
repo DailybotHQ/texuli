@@ -243,8 +243,9 @@ the web is not a target, because the web stays Svelte.
 `EmojiEngine` consumes the generated Kotlin catalog in place from
 `packages/emojis/generated/kotlin`; regenerate and check it with
 `pnpm exec tsx scripts/emojis/generate-catalog.ts` and `--check`. The Kotlin
-lookup, tokenizer, shortcode conversion and UTF-16 spans mirror the web
-engine. `tests/fixtures/emojis/conformance.json` is produced from the web
+catalog is loaded from lazy chunks of 64 records to stay within JVM method
+limits. Its lookup, tokenizer, shortcode conversion and UTF-16 spans mirror the web
+engine. `tests/fixtures/emojis/conformance.jsonl` is produced from the web
 engine by `scripts/emojis/generate-conformance.ts`; the native conformance
 test checks all fixtures, including supplementary code points and ZWJ
 sequences. Kotlin generated strings escape every UTF-16 unit so invisible
@@ -392,7 +393,7 @@ run on the JVM and (for `texuli-spec`) the iOS simulator as well.
 | `DocumentKeyTest` | `texuli-spec` | Spec 0.7.0 node keys (well formed and unique in the tree) and the `document` node's shape, judged as `validateBlueprint` judges them |
 | `RenderPlanTest` | `texuli-spec` | The render plan's tier gate: ids whose catalog `emit` list lacks the tier become `tier-denied` placeholders (default tier `untrusted`), checked for every catalog id |
 | `SourceTest` | `texuli-spec` | Spec 0.8.0 data-source bindings: a valid binding passes with the host's sources and fails closed without them, the TypeScript refusals (unknown source, a URL name, extra members, page size, fields, sort, operators, values, map, mixed keys, nested bindings), a 10,000-level filter, descriptor decoding and bound plan nodes |
-| `EmojiConformanceTest` | `conformance` | The generated Unicode 18 / CLDR 49 catalog lookup, tokenizer, conversions and UTF-16 spans agree with every web-generated case in `tests/fixtures/emojis/conformance.json` |
+| `EmojiConformanceTest` | `conformance` | The generated Unicode 18 / CLDR 49 catalog lookup, tokenizer, conversions and UTF-16 spans agree with every web-generated catalog, legacy and hostile case in `tests/fixtures/emojis/conformance.jsonl` |
 | `AccessibilityTest` | `texuli-compose` | Image alternatives (blank alt is decorative) and heading ranks clamped to 1-6 |
 | `ChartWidgetsTest` | `texuli-compose` | Compact chart props: gaps, variants, title-over-label naming, bounded scales, refusals |
 | `ChartMathParityTest` (jvmTest) | `texuli-compose` | Every case in `conformance/fixtures/chart-vectors.json` (written by `scripts/chart-vectors.ts` from the web's chart and data functions): numbers to 1e-9, SVG paths and labels exactly; a perturbed vector fails |
