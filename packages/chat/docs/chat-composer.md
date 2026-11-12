@@ -121,8 +121,14 @@ const suggestions = [
     options, synchronously or as a promise; a late answer for an old query is
     dropped;
   - `glyph` is decorative.
-- An emoji source (`:`) plugs in the same way. A ready-made emoji source from
-  `texuli/emoji` is planned (PLAN_023, after T-emo-web).
+- `emojiSuggestions(search)` uses the `:` trigger and opens after one
+  character (`:sm`).
+  - It takes the host's search, so `@texuli/chat` carries no emoji data:
+    `(query) => searchEmojis(query, { limit: 8 }).map((result) => result.emoji)`,
+    with `searchEmojis` from `@texuli/emojis/search`, the data `texuli/emoji`
+    renders.
+  - It inserts the emoji itself, or its `:shortcode:` with
+    `{ insert: 'shortcode' }`.
 - `ChatThread` forwards `suggestions` to its built-in composer.
 
 The trigger logic is the framework-free texel

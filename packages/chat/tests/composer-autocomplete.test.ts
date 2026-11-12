@@ -10,6 +10,7 @@ import {
   ChatAttachment,
   Composer,
   commandSuggestions,
+  emojiSuggestions,
   MessageList,
   mentionSuggestions,
   parseMessageText,
@@ -88,6 +89,37 @@ describe('composer autocomplete', () => {
     await waitFor(() => expect(field.value).toBe('/summarize '));
   });
 
+  it('offers emoji after one character and inserts the emoji or its shortcode', async () => {
+    const search = vi.fn((query: string) =>
+      [
+        {
+          id: 'smile',
+          unicode: '\u{1F604}',
+          name: 'grinning face with smiling eyes',
+          shortcode: ':smile:' as const,
+        },
+        { id: 'sun', unicode: '\u2600\uFE0F', name: 'sun', shortcode: ':sunny:' as const },
+      ].filter((emoji) => emoji.shortcode.includes(query))
+    );
+    render(Composer, { props: { onSubmit: vi.fn(), suggestions: [emojiSuggestions(search)] } });
+    const field = screen.getByRole('textbox', { name: 'Message' }) as HTMLTextAreaElement;
+    await type(field, 'Nice :');
+    expect(screen.queryByRole('listbox')).toBeNull();
+    await type(field, 'Nice :sm');
+    const list = await screen.findByRole('listbox', { name: 'Emoji' });
+    expect(list.textContent).toContain(':smile:');
+    await fireEvent.keyDown(field, { key: 'Enter' });
+    await waitFor(() => expect(field.value).toBe('Nice \u{1F604} '));
+    const shortcodes = emojiSuggestions(search, { insert: 'shortcode' });
+    expect((await shortcodes.search('sun'))[0]).toMatchObject({
+      insert: ':sunny:',
+      glyph: '\u2600\uFE0F',
+    });
+    expect(
+      await emojiSuggestions(() => [null as never, { unicode: '', name: 'x' }]).search('x')
+    ).toEqual([]);
+  });
+
   it('sends with Enter when no list is open', async () => {
     const onSubmit = vi.fn();
     render(Composer, { props: { onSubmit, suggestions: [mentionSuggestions(PEOPLE)] } });
@@ -113,6 +145,19 @@ describe('streaming stop', () => {
     render(MessageList, { props: { messages } });
     expect(screen.getByText('Half an answer')).toBeTruthy();
     expect(screen.getByText('Stopped before the end')).toBeTruthy();
+  });
+
+  it('renders plain-text runs with EmojiText by default', () => {
+    render(MessageList, {
+      props: {
+        messages: [
+          { id: 'm', author: { id: 'a', name: 'Ana' }, at: 0, body: 'Ship it \u{1F680} **now**' },
+        ],
+      },
+    });
+    const run = document.querySelector('[data-tx-emoji-text]');
+    expect(run?.textContent).toBe('Ship it \u{1F680} ');
+    expect(screen.getByText('now', { selector: 'strong' })).toBeTruthy();
   });
 
   it('renders plain-text runs through the text seam', () => {

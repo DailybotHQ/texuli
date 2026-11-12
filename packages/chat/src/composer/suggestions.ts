@@ -122,3 +122,51 @@ export function commandSuggestions(
       })),
   };
 }
+
+/** An emoji a host search returns (an `EmojiRecord` from `@texuli/emojis` fits). */
+export interface EmojiCandidate {
+  readonly unicode: string;
+  readonly name: string;
+  readonly shortcode?: string;
+  readonly id?: string;
+}
+
+/**
+ * `:` suggestions over a host emoji search, for example
+ * `(query) => searchEmojis(query, { limit: 8 }).map((result) => result.emoji)` from
+ * `@texuli/emojis/search` (the data `texuli/emoji` renders). The host passes the search so
+ * this package carries no emoji data. Opens after one character (`:sm`); choosing an option
+ * inserts the emoji itself, or its `:shortcode:` with `insert: 'shortcode'`.
+ */
+export function emojiSuggestions(
+  search: (query: string) => readonly EmojiCandidate[] | Promise<readonly EmojiCandidate[]>,
+  options: { readonly label?: string; readonly insert?: 'unicode' | 'shortcode' } = {}
+): ComposerSuggestionSource {
+  return {
+    trigger: ':',
+    label: options.label ?? 'Emoji',
+    minQuery: 1,
+    search: async (query) => {
+      const found = await search(query);
+      if (!Array.isArray(found)) return [];
+      return found
+        .filter(
+          (emoji): emoji is EmojiCandidate =>
+            typeof emoji?.unicode === 'string' &&
+            emoji.unicode !== '' &&
+            typeof emoji.name === 'string'
+        )
+        .slice(0, COMPOSER_MAX_SUGGESTIONS)
+        .map((emoji) => {
+          const shortcode = typeof emoji.shortcode === 'string' ? emoji.shortcode : undefined;
+          return {
+            id: emoji.id ?? emoji.unicode,
+            label: shortcode ?? emoji.name,
+            ...(shortcode ? { description: emoji.name } : {}),
+            glyph: emoji.unicode,
+            insert: options.insert === 'shortcode' && shortcode ? shortcode : emoji.unicode,
+          };
+        });
+    },
+  };
+}
