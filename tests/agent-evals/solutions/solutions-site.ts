@@ -17,6 +17,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { loadCanvasDocs } from '../../../apps/website/src/content/solution-docs/canvas/index.ts';
+import { loadDashboardsDocs } from '../../../apps/website/src/content/solution-docs/dashboards/index.ts';
 import { loadDocumentsDocs } from '../../../apps/website/src/content/solution-docs/documents/index.ts';
 import { loadFormsDocs } from '../../../apps/website/src/content/solution-docs/forms/index.ts';
 import { loadSheetsDocs } from '../../../apps/website/src/content/solution-docs/sheets/index.ts';
@@ -66,6 +67,7 @@ export const DOCS: Readonly<
   sheets: loadSheetsDocs,
   'design-systems': loadDesignSystemsDocs,
   forms: loadFormsDocs,
+  dashboards: loadDashboardsDocs,
 };
 
 /** The twin of a Solution docs page: a header block, then every docs section. */

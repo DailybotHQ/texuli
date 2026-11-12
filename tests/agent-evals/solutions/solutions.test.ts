@@ -155,7 +155,16 @@ describe('agent builds each shipped Solution from llms.txt → index → docs �
     ).map((s) => s.slug);
     expect(DOCUMENTED.map((s) => s.slug).sort()).toEqual(shipped.sort());
     expect(shipped.sort()).toEqual(
-      ['canvas', 'design-systems', 'documents', 'forms', 'sheets', 'slides', 'workflows'].sort()
+      [
+        'canvas',
+        'dashboards',
+        'design-systems',
+        'documents',
+        'forms',
+        'sheets',
+        'slides',
+        'workflows',
+      ].sort()
     );
   });
 

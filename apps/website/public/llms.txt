@@ -48,6 +48,7 @@ Embeddable open-source systems that complete a task end to end.
 - [Design systems](https://texuli.com/solutions/design-systems/): Carry one brand document across Texuli surfaces. Status: available.
 - [Design systems docs](https://texuli.com/guides/solutions/design-systems/)
 - [Dashboards](https://texuli.com/solutions/dashboards/): KPI boards people arrange, from the keyboard too. Status: in development.
+- [Dashboards docs](https://texuli.com/guides/solutions/dashboards/)
 - [Forms](https://texuli.com/solutions/forms/): Schema-driven forms with conditions, steps and drafts. Status: in development.
 - [Forms docs](https://texuli.com/guides/solutions/forms/)
 
@@ -75,6 +76,7 @@ Task-first guides, in reading order.
 - [Canvas](https://texuli.com/guides/solutions/canvas/)
 - [Sheets](https://texuli.com/guides/solutions/sheets/)
 - [Design systems](https://texuli.com/guides/solutions/design-systems/)
+- [Dashboards](https://texuli.com/guides/solutions/dashboards/)
 - [Forms](https://texuli.com/guides/solutions/forms/)
 - [Performance](https://texuli.com/guides/performance/)
 

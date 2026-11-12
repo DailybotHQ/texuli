@@ -296,6 +296,24 @@ const SITE_PAGES: readonly SearchEntry[] = [
     keywords: ['workflow', 'graph', 'nodes', 'editor', 'pipeline', 'automation'],
   },
   {
+    id: 'page-solution-dashboards',
+    title: 'Dashboards',
+    description:
+      'KPI boards people arrange from the keyboard too: metric cards, filters and a date range on @texuli/data.',
+    href: '/solutions/dashboards/',
+    kind: 'page',
+    keywords: ['dashboard', 'kpi', 'metrics', 'widgets', 'filters', 'date range', 'analytics'],
+  },
+  {
+    id: 'page-solution-forms',
+    title: 'Forms',
+    description:
+      'Schema forms with conditions, steps and drafts, and a visual builder in development, on @texuli/forms.',
+    href: '/solutions/forms/',
+    kind: 'page',
+    keywords: ['form', 'schema', 'builder', 'conditions', 'steps', 'drafts', 'validation'],
+  },
+  {
     id: 'page-json-preview',
     title: 'JSON live preview',
     description:
