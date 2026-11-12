@@ -24,7 +24,7 @@ tasks.withType<Test>().configureEach {
     // parity fixture or expected trace reruns them.
     val repo = rootDir.resolve("..")
     inputs.dir(repo.resolve("packages/spec/fixtures")).withPropertyName("specFixtures").withPathSensitivity(PathSensitivity.RELATIVE)
-    inputs.file(repo.resolve("tests/fixtures/emojis/conformance.json")).withPropertyName("emojiConformance").withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.file(repo.resolve("tests/fixtures/emojis/conformance.jsonl")).withPropertyName("emojiConformance").withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.dir(rootDir.resolve("conformance/fixtures")).withPropertyName("fixtures").withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.dir(rootDir.resolve("conformance/expected")).withPropertyName("expected").withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.file(rootDir.resolve("conformance/semantics.json")).withPropertyName("semantics").withPathSensitivity(PathSensitivity.RELATIVE)
