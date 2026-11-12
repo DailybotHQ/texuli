@@ -4086,6 +4086,7 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'FileBrowserLayout',
       'FileEntry',
       'FilePreviewModel',
+      'FilterBar',
       'FilterBuilderLabels',
       'FilterField',
       'FilterGroup',
@@ -4368,6 +4369,7 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'DashboardLabelOverrides',
       'DashboardLabels',
       'DashboardWidgetEntry',
+      'MetricCard',
       'addItem',
       'cellFromDelta',
       'clampColumns',
@@ -4462,6 +4464,10 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
       'sizeBounds',
       'sortLayout',
     ],
+  },
+  {
+    module: '@texuli/data/filter-bar',
+    exports: ['FilterBar'],
   },
   {
     module: '@texuli/data/files/engine',

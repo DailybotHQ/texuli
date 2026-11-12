@@ -293,6 +293,21 @@ add(
 add('@texuli/data', 'planned', 'Planned manifest: an activity feed with reactions and filters.', [
   'ActivityFeed',
 ]);
+// PLAN_023 T-md-adopt-followup: real manifests (data-metric-card, data-filter-bar) are new
+// catalog ids, a blueprint spec vocabulary change (packages/spec catalog, generated TS and
+// Kotlin vocabularies, a spec minor); until that lands they are tracked here.
+add(
+  '@texuli/data',
+  'planned',
+  'Planned manifest data-metric-card: a KPI tile with value, delta and trend (needs a spec catalog id).',
+  ['MetricCard']
+);
+add(
+  '@texuli/data',
+  'planned',
+  'Planned manifest data-filter-bar: an applied-filter toolbar over data-filter-builder (needs a spec catalog id).',
+  ['FilterBar']
+);
 
 // ── @texuli/chat ───────────────────────────────────────────────
 add('@texuli/chat', 'part', 'A part of the live chat thread.', ['MessageList', 'TypingIndicator']);
@@ -426,4 +441,5 @@ export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(row
 // again in PLAN_016 T-widen-display: Icon, Avatar, Skeleton, Progress, Spinner,
 // Carousel, Separator and ListItem became catalog ids (LucideIcon is a part of
 // icon). Combined ceiling is the live row count.
-export const EXCLUSION_CEILING = 204;
+// 206: raised by two for MetricCard and FilterBar (PLAN_023), pending their spec catalog ids.
+export const EXCLUSION_CEILING = 206;
