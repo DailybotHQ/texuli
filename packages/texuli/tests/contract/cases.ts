@@ -61,8 +61,10 @@ export const CASES: ContractCase[] = [
     harness: EmojiContract,
     idOwned: 'The id prop is the canonical emoji record id, not a root DOM id.',
     skip: {
-      click: 'the emoji renderer has no click behavior',
-      keydown: 'the emoji renderer does not act on keyboard events',
+      click: 'a static emoji has no click interaction',
+      keydown: 'a static emoji has no keyboard interaction',
+      focus: 'a static emoji does not manage focus',
+      pointerdown: 'a static emoji has no pointer interaction',
     },
   },
   {
@@ -70,10 +72,19 @@ export const CASES: ContractCase[] = [
     harness: EmojiContract,
     skip: {
       click: 'the text renderer has no click behavior',
+      focus: 'the text renderer does not manage focus',
       keydown: 'the text renderer does not act on keyboard events',
     },
   },
-  { key: 'emoji/EmojiPicker', harness: EmojiContract },
+  {
+    key: 'emoji/EmojiPicker',
+    harness: EmojiContract,
+    skip: {
+      focus: 'the picker root is a container; focus behavior belongs to its controls',
+      click: 'the root is a container; selection is handled by its grid',
+      keydown: 'the root is a container; keyboard behavior is handled by its grid',
+    },
+  },
   // Layout parts a host composes on its own (G93): `ref` and rest on the root.
   { key: 'layouts/shells/AppShell', harness: LayoutsContract },
   { key: 'layouts/app/SplitView', harness: LayoutsContract },

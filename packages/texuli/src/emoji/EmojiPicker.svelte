@@ -199,7 +199,7 @@ function handleCategoryKeydown(event: KeyboardEvent, index: number): void {
   event.preventDefault();
   category = categoryOrder[next] ?? 'all';
   active = 0;
-  document.getElementById(`tx-emoji-tab-${category}`)?.focus();
+  document.getElementById(`tx-${instanceId}-tab-${category}`)?.focus();
 }
 </script>
 
@@ -209,6 +209,7 @@ function handleCategoryKeydown(event: KeyboardEvent, index: number): void {
   class={['tx-emoji-picker', className]}
   aria-label={label ?? copy.picker}
   data-tx-emoji-picker
+  data-tx-pending={loading ? '' : undefined}
   {...rest as HTMLAttributes<HTMLElement>}
 >
   <label class="tx-emoji-picker__search-label">
@@ -237,7 +238,7 @@ function handleCategoryKeydown(event: KeyboardEvent, index: number): void {
       <button
         type="button"
         role="option"
-        id={`tx-emoji-tab-${item}`}
+        id={`tx-${instanceId}-tab-${item}`}
         aria-selected={category === item}
         aria-controls={gridId}
         tabindex={category === item ? 0 : -1}
@@ -250,7 +251,7 @@ function handleCategoryKeydown(event: KeyboardEvent, index: number): void {
     <legend>{copy.skinTone}</legend>
     {#each TONES as value (value)}
       <label>
-        <input type="radio" name="tx-emoji-tone" {value} bind:group={tone} />
+        <input type="radio" name={`tx-${instanceId}-emoji-tone`} {value} bind:group={tone} />
         <span>{copy.tones[value]}</span>
       </label>
     {/each}

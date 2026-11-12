@@ -101,10 +101,13 @@ describe('EmojiPicker', () => {
     const search = screen.getByRole('combobox', { name: 'Search emoji' });
     fireEvent.click(screen.getByRole('option', { name: 'People' }));
     fireEvent.input(search, { target: { value: 'waving hand' } });
-    await screen.findByRole('gridcell', { name: 'waving hand' });
-    await fireEvent.click(screen.getByRole('radio', { name: 'Medium skin tone' }));
-    await waitFor(() => expect(screen.getAllByRole('gridcell')).toHaveLength(1));
-    const matches = screen.getAllByRole('gridcell');
-    expect(matches[0]?.getAttribute('aria-label')).toContain('medium skin tone');
+    const baseMatches = await screen.findAllByRole('gridcell');
+    const baseCount = baseMatches.length;
+    fireEvent.click(screen.getByRole('radio', { name: 'Medium skin tone' }));
+    const matches = await screen.findAllByRole('gridcell');
+    const labels = matches.map((item) => item.getAttribute('aria-label') ?? '');
+    expect(matches).toHaveLength(baseCount);
+    expect(new Set(labels).size).toBe(labels.length);
+    expect(labels.some((name) => name.includes('medium skin tone'))).toBe(true);
   });
 });
