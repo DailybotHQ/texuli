@@ -24,14 +24,12 @@ export interface ReleaseLine {
 
 const ROOT = join(import.meta.dirname, '..');
 /**
- * Workspace packages that exist but have never been published (PLAN_023, ADR-035). They are
- * private, outside the publish workflow's package list, and left out of the published counts.
- * Remove a name here in the release that first publishes it (with the owner's GO).
+ * Workspace packages that exist but have never been published. They are private, outside the
+ * publish workflow's package list, and left out of the published counts. Remove a name here in
+ * the release that first publishes it (with the owner's GO). Empty since 0.18.0, which first
+ * publishes `@texuli/emojis` and `@texuli/emoji-assets` (PLAN_023, ADR-035).
  */
-export const UNRELEASED_PACKAGES: ReadonlySet<string> = new Set([
-  '@texuli/emojis',
-  '@texuli/emoji-assets',
-]);
+export const UNRELEASED_PACKAGES: ReadonlySet<string> = new Set<string>([]);
 
 export const RELEASE_DOC = join(ROOT, 'docs', 'RELEASE.md');
 

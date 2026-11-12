@@ -73,7 +73,7 @@ jobs:
         run: |
           set -euo pipefail
           refused=0
-          for dir in core date spec drag deck tokens primitives document texuli workflows editor forms canvas charts data media chat blocks sheets catalog tools mcp astro player pages slides; do
+          for dir in core date emojis emoji-assets spec drag deck tokens primitives document texuli workflows editor forms canvas charts data media chat blocks sheets catalog tools mcp astro player pages slides; do
             name=$(node -p "require('./packages/${dir}/package.json').name")
             version=$(node -p "require('./packages/${dir}/package.json').version")
             if [ "$version" = "0.0.0" ]; then
@@ -119,6 +119,11 @@ jobs:
           # Wave 174 — the L0 texels and the L2 token engine.
           publish packages/core
           publish packages/date
+          # L0: the dependency-free emoji catalog and engine (texuli and tools
+          # pin it) and the original emoji SVG assets; first published in 0.18.0
+          # (ADR-035).
+          publish packages/emojis
+          publish packages/emoji-assets
           # L0 packages that later waves depend on: catalog and player import the
           # spec; primitives, data and workflows import the drag engine.
           publish packages/spec
@@ -175,7 +180,7 @@ jobs:
           missing=()
           for attempt in $(seq 1 20); do
             missing=()
-            for dir in core date spec drag deck tokens primitives document texuli workflows editor forms canvas charts data media chat blocks sheets catalog tools mcp astro player pages slides; do
+            for dir in core date emojis emoji-assets spec drag deck tokens primitives document texuli workflows editor forms canvas charts data media chat blocks sheets catalog tools mcp astro player pages slides; do
               name=$(node -p "require('./packages/${dir}/package.json').name")
               version=$(node -p "require('./packages/${dir}/package.json').version")
               latest=$(npm view "${name}" dist-tags.latest --prefer-online 2>/dev/null || true)
