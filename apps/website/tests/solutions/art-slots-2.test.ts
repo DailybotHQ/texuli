@@ -2,8 +2,8 @@
 /**
  * Round-2 illustration slots: the three landing stories and the how-it-works band of each
  * Solution. Every slot is registered in the manifest with its size, variant, alt and a
- * self-contained prompt, is listed in the generated prompts doc, and paints the texel mosaic
- * until its WebP lands in `src/assets/illustrations/`.
+ * self-contained prompt, is listed in the generated prompts doc, and ships its light WebP in
+ * `src/assets/illustrations/` at the exact size with an alpha channel (dark variants optional).
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest';
 import { PROMPTS_DOC } from '../../scripts/illustration-prompts.ts';
 import { ILLUSTRATIONS, illustrationFor } from '../../src/components/landing/illustrations.ts';
 import { SOLUTIONS } from '../../src/data/solutions/index.ts';
+import { webpInfo } from '../webp-info.ts';
 
 const WEBSITE = resolve(import.meta.dirname, '../..');
 const SLUGS = ['slides', 'documents', 'workflows', 'canvas', 'sheets'] as const;
@@ -65,17 +66,13 @@ describe('round-2 illustration slots', () => {
     }
   });
 
-  it('ships no file yet, so each slot paints the texel mosaic fallback', () => {
-    const files = new Set(readdirSync(resolve(WEBSITE, 'src/assets/illustrations')));
-    for (const { slot } of ROUND_2) {
-      expect(files.has(`${slot}.webp`), slot).toBe(false);
+  it('ships each light WebP at its exact size with an alpha channel, and no dark file yet', () => {
+    const dir = resolve(WEBSITE, 'src/assets/illustrations');
+    const files = new Set(readdirSync(dir));
+    for (const { slot, width, height } of ROUND_2) {
+      const info = webpInfo(readFileSync(resolve(dir, `${slot}.webp`)));
+      expect(info, slot).toEqual({ width, height, alpha: true });
       expect(files.has(`${slot}-dark.webp`), slot).toBe(false);
     }
-    const source = readFileSync(
-      resolve(WEBSITE, 'src/components/landing/SiteIllustration.astro'),
-      'utf8'
-    );
-    expect(source).toContain("data-tx-illustration-ready={hasFile ? 'file' : 'fallback'}");
-    expect(source).toContain('class="site-illustration__texels"');
   });
 });

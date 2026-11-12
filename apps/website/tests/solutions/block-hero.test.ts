@@ -38,7 +38,7 @@ describe('SolutionHero view model', () => {
   });
 
   it('flags slots that illustrations.json registers and uses an art override', () => {
-    // solution-<slug>-hero is registered; with no file yet, SiteIllustration paints the mosaic.
+    // solution-<slug>-hero is registered and ships its WebP (PLAN_015 art).
     expect(solutionHeroView(props()).artRegistered).toBe(true);
     expect(
       solutionHeroView(props({ art: { slot: 'unregistered-slot', variant: 'plate' } }))

@@ -86,10 +86,9 @@ Solutions system is in [site-solutions.md](site-solutions.md).
 ## Illustrations
 
 Each band's art is a `SiteIllustration` slot from `src/data/illustrations.json`, filled
-by its WebP in `src/assets/illustrations/`. Every home slot has its file except
-`home-built-with`, which is registered but has no WebP yet, so it paints the texel
-mosaic. Across the site, 15 of the 43 slots are still waiting for their files (the
-Solution heroes, the Built-with and Solutions page art, and the new native slots). A
+by its WebP in `src/assets/illustrations/`. Every slot registered across the site has
+its light file (71 of 71, including `home-built-with`). The only dark variant is
+`home-final-dark.webp`; every other slot shows its light file in the dark theme. A
 slot whose file is missing paints a texel mosaic in the illustration palette with the
 same aspect ratio, so the layout never shifts. The style, sizes and drop-in steps are in
 [ILLUSTRATIONS.md](ILLUSTRATIONS.md); the generated prompts are in
