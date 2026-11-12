@@ -17,6 +17,8 @@ kotlin {
         commonMain {
             // The single source of truth: the spec generator's committed output.
             kotlin.srcDir(rootDir.resolve("../packages/spec/generated/kotlin"))
+            // Emoji catalog generated from the same pinned Unicode/CLDR data as the web package.
+            kotlin.srcDir(rootDir.resolve("../packages/emojis/generated/kotlin"))
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
