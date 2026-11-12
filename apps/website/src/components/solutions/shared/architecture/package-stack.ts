@@ -17,6 +17,7 @@ export const PACKAGE_STACK: Readonly<Record<string, StackPackage>> = {
   '@texuli/date': { layer: 0, label: 'Date arithmetic', dependsOn: [] },
   '@texuli/deck': { layer: 0, label: 'Deck model and engine', dependsOn: [] },
   '@texuli/drag': { layer: 0, label: 'Drag engine', dependsOn: [] },
+  '@texuli/emojis': { layer: 0, label: 'Unicode emoji catalog and engine', dependsOn: [] },
   '@texuli/spec': { layer: 0, label: 'Blueprint contract', dependsOn: [] },
   '@texuli/primitives': {
     layer: 1,
@@ -32,7 +33,13 @@ export const PACKAGE_STACK: Readonly<Record<string, StackPackage>> = {
   texuli: {
     layer: 3,
     label: 'Styled components',
-    dependsOn: ['@texuli/core', '@texuli/primitives', '@texuli/tokens', '@texuli/spec'],
+    dependsOn: [
+      '@texuli/core',
+      '@texuli/emojis',
+      '@texuli/primitives',
+      '@texuli/tokens',
+      '@texuli/spec',
+    ],
   },
   '@texuli/charts': {
     layer: 4,
@@ -144,6 +151,7 @@ export const PACKAGE_STACK: Readonly<Record<string, StackPackage>> = {
       '@texuli/core',
       '@texuli/deck',
       '@texuli/document',
+      '@texuli/emojis',
       '@texuli/media',
       '@texuli/spec',
       '@texuli/tokens',

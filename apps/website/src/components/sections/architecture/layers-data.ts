@@ -67,7 +67,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       },
       {
         name: '@texuli/emoji-assets',
-        role: 'In development (private until its first release, ADR-035): original SVG art candidates with an explicit manifest and measured coverage; proposed CC BY 4.0 license pending owner sign-off',
+        role: 'In development (private until its first release, ADR-035): original 64×64 SVG emoji art candidates, the approved-asset manifest and measured coverage report; proposed art license CC BY 4.0 pending owner sign-off',
         dependsOn: [],
       },
       {
@@ -110,8 +110,8 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
     packages: [
       {
         name: 'texuli',
-        role: 'Styled components (Button … Tree), the class helpers (cx, variants), icons, layouts and app shells',
-        dependsOn: ['core', 'primitives', 'tokens', 'spec'],
+        role: 'Styled components (Button … Tree), the class helpers (cx, variants), emoji, icons, layouts and app shells',
+        dependsOn: ['core', 'emojis', 'primitives', 'tokens', 'spec'],
       },
     ],
   },
@@ -218,7 +218,17 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       {
         name: '@texuli/tools',
         role: 'Copy-in CLI (texuli-add, texuli-init, texuli-update), texuli-llms, A2UI adapter, custom elements and the golden set',
-        dependsOn: ['core', 'tokens', 'catalog', 'blocks', 'charts', 'media', 'deck', 'document'],
+        dependsOn: [
+          'core',
+          'tokens',
+          'catalog',
+          'blocks',
+          'charts',
+          'media',
+          'deck',
+          'document',
+          'emojis',
+        ],
       },
       {
         name: '@texuli/astro',

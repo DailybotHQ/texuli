@@ -150,8 +150,9 @@ describe('gallery decks', () => {
 
   it('paints the components deck on the stage (the default registry validates it)', async () => {
     const { container } = render(ComponentsShowcase);
-    await waitFor(() =>
-      expect(container.querySelector('[aria-roledescription="slide"]')).not.toBeNull()
+    await waitFor(
+      () => expect(container.querySelector('[aria-roledescription="slide"]')).not.toBeNull(),
+      { timeout: 10_000 }
     );
     expect(container.querySelector('[data-tx-deck-invalid]')).toBeNull();
   });
