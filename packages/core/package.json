@@ -49,6 +49,7 @@
     "./markdown": "./src/markdown/index.ts",
     "./markdown-html": "./src/markdown-html/index.ts",
     "./markup": "./src/markup/index.ts",
+    "./markdown-dialects": "./src/markdown-dialects/index.ts",
     "./motion": "./src/motion/index.ts",
     "./motion/spring": "./src/motion/spring.ts",
     "./overlay": "./src/overlay/index.ts",
