@@ -1,4 +1,5 @@
 import type { EditorIssueCode } from '@texuli/core/editor-model';
+import type { EditorBlockKindChoice } from '@texuli/core/editor-transforms';
 
 /** Every visible and announced string of the editor. Pass a partial object to translate. */
 export interface EditorLabels {
@@ -44,6 +45,29 @@ export interface EditorLabels {
   redone: string;
   pasted: (blocks: number, linksRemoved: number) => string;
   refused: (code: EditorIssueCode) => string;
+  // Block-type menu
+  /** The block-type menu button's name; `current` is the kind at the caret. */
+  blockMenu: (current: string) => string;
+  // Paste as Markdown
+  /** Announced when "Paste as Markdown" could not read the clipboard and waits for a paste. */
+  pasteMarkdownNext: string;
+  /** Announced when a paste was read as Markdown. */
+  pastedMarkdown: (blocks: number, linksRemoved: number) => string;
+  // Emoji
+  /** The emoji button's name. */
+  emoji: string;
+  /** The emoji popover and picker. */
+  emojiPicker: string;
+  // Export to chat
+  exportTitle: string;
+  exportFormat: string;
+  exportOutput: (format: string) => string;
+  exportCopy: string;
+  exportCopied: string;
+  exportCopyFailed: string;
+  /** The heading over the losses a format reports. */
+  exportLosses: (count: number) => string;
+  exportNoLosses: string;
 }
 
 export const DEFAULT_EDITOR_LABELS: EditorLabels = {
@@ -87,6 +111,24 @@ export const DEFAULT_EDITOR_LABELS: EditorLabels = {
       ? `${pasted}; ${linksRemoved} ${linksRemoved === 1 ? 'link' : 'links'} removed`
       : pasted;
   },
+  blockMenu: (current) => `Text style: ${current}`,
+  pasteMarkdownNext: 'Paste now to insert the text as Markdown.',
+  pastedMarkdown: (blocks, linksRemoved) => {
+    const pasted = `Pasted ${blocks} ${blocks === 1 ? 'block' : 'blocks'} from Markdown`;
+    return linksRemoved > 0
+      ? `${pasted}; ${linksRemoved} ${linksRemoved === 1 ? 'link' : 'links'} removed`
+      : pasted;
+  },
+  emoji: 'Emoji',
+  emojiPicker: 'Insert emoji',
+  exportTitle: 'Export for chat',
+  exportFormat: 'Format',
+  exportOutput: (format) => `${format} text`,
+  exportCopy: 'Copy',
+  exportCopied: 'Copied',
+  exportCopyFailed: 'Copy failed: select the text and copy it.',
+  exportLosses: (count) => `${count} ${count === 1 ? 'change' : 'changes'} in this format`,
+  exportNoLosses: 'Nothing changes in this format.',
   refused: (code) => {
     switch (code) {
       case 'limit-reached':
@@ -100,3 +142,23 @@ export const DEFAULT_EDITOR_LABELS: EditorLabels = {
     }
   },
 };
+
+/** The visible name of a block-type menu choice. */
+export function blockKindLabel(labels: EditorLabels, kind: EditorBlockKindChoice): string {
+  switch (kind) {
+    case 'paragraph':
+      return labels.paragraph;
+    case 'bullet':
+      return labels.bulletList;
+    case 'ordered':
+      return labels.orderedList;
+    case 'todo':
+      return labels.todoList;
+    case 'quote':
+      return labels.quote;
+    case 'code':
+      return labels.codeBlock;
+    default:
+      return labels.heading(Number(kind.slice('heading-'.length)));
+  }
+}

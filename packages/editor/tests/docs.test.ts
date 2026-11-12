@@ -18,6 +18,9 @@ const SUBPATH_DOCS: Record<string, { doc: string; entry: string }> = {
   './controller': { doc: 'docs/editor-controller.md', entry: 'src/controller/index.ts' },
   './markdown': { doc: 'docs/editor-markdown.md', entry: 'src/markdown/index.ts' },
   './paste': { doc: 'docs/editor-paste.md', entry: 'src/paste/index.ts' },
+  './block-menu': { doc: 'docs/editor-block-menu.md', entry: 'src/block-menu/index.ts' },
+  './export': { doc: 'docs/editor-export.md', entry: 'src/export/index.ts' },
+  './emoji': { doc: 'docs/editor-emoji.md', entry: 'src/emoji/index.ts' },
 };
 
 /** Svelte components and the page that documents their props. */
@@ -26,6 +29,9 @@ const COMPONENT_DOCS: Record<string, string> = {
   'src/editor/EditorSurface.svelte': 'docs/editor-surface.md',
   'src/toolbar/EditorToolbar.svelte': 'docs/editor-toolbar.md',
   'src/link-dialog/LinkDialog.svelte': 'docs/editor-link-dialog.md',
+  'src/block-menu/BlockTypeMenu.svelte': 'docs/editor-block-menu.md',
+  'src/export/DialectExport.svelte': 'docs/editor-export.md',
+  'src/emoji/EditorEmojiButton.svelte': 'docs/editor-emoji.md',
 };
 
 /** Exported names of one module: `export { … }`, `export type { … }` and declarations. */

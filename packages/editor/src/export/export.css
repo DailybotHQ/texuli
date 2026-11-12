@@ -1,0 +1,69 @@
+/* @texuli/editor/export: the export-for-chat panel. --tx-* tokens only; logical properties. */
+/* Export for chat (PLAN_023 row 11). */
+.tx-editor-export {
+  display: grid;
+  gap: var(--tx-space-2);
+  color: var(--tx-foreground, CanvasText);
+  font-family: var(--tx-font-sans, system-ui, sans-serif);
+}
+
+.tx-editor-export__title {
+  margin: 0;
+  font-size: var(--tx-type-label-size, 0.875rem);
+  font-weight: 600;
+}
+
+.tx-editor-export__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--tx-space-2);
+}
+
+.tx-editor-export__label {
+  font-size: var(--tx-type-label-size, 0.875rem);
+  color: var(--tx-muted-foreground, GrayText);
+}
+
+.tx-editor-export__status {
+  font-size: var(--tx-type-label-size, 0.875rem);
+  color: var(--tx-muted-foreground, GrayText);
+}
+
+.tx-editor-export__output {
+  inline-size: 100%;
+  box-sizing: border-box;
+  padding-block: var(--tx-space-2);
+  padding-inline: var(--tx-space-3);
+  border: var(--tx-border-width-thin) solid var(--tx-input, var(--tx-border, ButtonBorder));
+  border-radius: var(--tx-shape-radius-lg);
+  background: var(--tx-surface, Canvas);
+  color: inherit;
+  font-family: var(--tx-font-mono, ui-monospace, monospace);
+  font-size: var(--tx-type-label-size, 0.875rem);
+  resize: vertical;
+}
+
+.tx-editor-export__output:focus-visible {
+  outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+  outline-offset: var(--tx-focus-ring-offset, 2px);
+}
+
+.tx-editor-export__losses {
+  font-size: var(--tx-type-label-size, 0.875rem);
+  color: var(--tx-muted-foreground, GrayText);
+}
+
+.tx-editor-export__losses p,
+.tx-editor-export__losses ul {
+  margin: 0;
+}
+
+.tx-editor-export__losses ul {
+  padding-inline-start: var(--tx-space-4);
+}
+
+.tx-editor-export__losses-title {
+  color: var(--tx-foreground, CanvasText);
+  font-weight: 600;
+}

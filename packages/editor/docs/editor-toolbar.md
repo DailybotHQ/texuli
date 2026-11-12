@@ -10,6 +10,9 @@ arrow keys move, Home and End jump).
 | `onCommand` | Called after a command (and on Escape), so the host returns focus to the text |
 | `onLinkRequest` | The Link button: open the link dialog |
 | `disabled` | Disable every button |
+| `blockMenu` | Replace the heading, list, quote and code buttons with the [block-type menu](editor-block-menu.md), loaded on demand. Default false |
+| `emoji` | Add the [emoji button](editor-emoji.md), loaded on demand. Default false |
+| `end` | A snippet of host items after the built-in groups, given `{ controller, onCommand }`; render `Toolbar.Button` from `@texuli/primitives/toolbar` so they join the roving focus (the place for an emoji picker button) |
 | `class` | Extra classes on the toolbar |
 
 Buttons, in three groups: bold, italic, strikethrough, inline code and link;
@@ -19,3 +22,4 @@ selection (`controller.active`); buttons with a chord expose
 `aria-keyshortcuts` and show it in `title`. Unavailable buttons are
 `aria-disabled` and stay focusable. Pressing a button with the pointer keeps
 the text selection.
+

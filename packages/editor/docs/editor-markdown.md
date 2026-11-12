@@ -23,6 +23,12 @@ const saved = documentToMarkdown(doc); // '# Plan\n\n- [ ] Draft\n- [x] Review'
 | `MarkdownToDocumentOptions` | `trust` (`'untrusted'` by default), `newId`, lower `limits`, `maxSource` (the source cap) and `extensions` (host inline extensions, below) |
 | `DocumentToMarkdownOptions` | `trust` (`'untrusted'` by default): the tier every link is checked at again before it is written; `extensions`: the host inline extensions written as tokens |
 | `MARKDOWN_CODEC_LIMITS` | `source` 100,000 characters, `inlineDepth` 6 |
+| `importMarkdown(text, options?)` | "Paste as Markdown": clipboard text read by the codec at the `untrusted` tier into a `PasteResult` (source `'markdown'`), the shape `@texuli/editor/paste` returns. The controller's `pasteMarkdown` loads it on demand |
+| `documentToDialect(doc, dialect, options?)` | Writes the document for a chat platform (below): `{ value, losses }`. Never throws |
+| `DocumentToDialectOptions` | `trust` (`'untrusted'` by default): the tier links are checked at again |
+| `DocumentToDialectResult`, `DialectLoss` | The text, and what the format lost or changed: `{ code, message, count }`, grouped by message |
+| `EDITOR_EXPORT_DIALECTS`, `EDITOR_DIALECT_NAMES` | The nine formats in menu order and their visible names |
+| `MarkdownDialect` | `'slack'`, `'discord'`, `'whatsapp'`, `'telegram-markdown-v2'`, `'telegram-html'`, `'teams'`, `'google-chat'`, `'mattermost'`, `'plain-text'` |
 
 ## What it reads and writes
 
@@ -126,3 +132,26 @@ Tests: `pnpm vitest run packages/editor/tests/markdown.test.ts` (round trip
 of every format, HTML and link policy, line endings, hostile inputs). The
 codec's own property tests (2,000 seeded documents) are in
 `packages/core/tests/editor-markdown.test.ts`.
+
+## Export to chat platforms
+
+`documentToDialect(doc, dialect)` writes the document's Markdown (the codec
+above, every link checked again at `trust`), reads it with the shared
+CommonMark parser (`@texuli/core/markdown`) and writes it with
+[`@texuli/core/markdown-dialects`](../../core/docs/core-markdown-dialects.md).
+
+```ts
+import { documentToDialect } from '@texuli/editor/markdown';
+
+const { value, losses } = documentToDialect(doc, 'slack');
+// value: '*Plan*…'; losses: [{ code: 'dialect-loss', message: 'Headings are unsupported by this dialect.', count: 1 }]
+```
+
+- Broadcast mentions are never written: `@everyone`, `@here` and `@channel`
+  in text stay text (`allowBroadcastMentions` is off).
+- No format has checklists: items keep their state as a ☑ or ☐ before their
+  text, reported as a loss.
+- Host extension marks (mentions, references) are written as their label
+  text.
+- `DialectExport` in [`@texuli/editor/export`](editor-export.md) shows the
+  text and the losses to the user.
