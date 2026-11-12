@@ -24,6 +24,7 @@ import { dsAllow } from './design-system-allow.ts';
 import { dsBundle } from './design-system-bundle.ts';
 import { designSystemGenerate } from './design-system-generate.ts';
 import { documentExport, documentRun } from './document.ts';
+import { mdConvert, mdRender } from './markdown.ts';
 import { createOperationRegistry } from './registry.ts';
 import { sitePages, siteRead, siteSearch } from './site.ts';
 import { themeGet, themePreview, themeSearch } from './themes.ts';
@@ -121,6 +122,8 @@ export const TEXULI_OPERATIONS: readonly Operation[] = Object.freeze([
   deckRun,
   documentRun,
   documentExport,
+  mdConvert,
+  mdRender,
   sitePages,
   siteRead,
   siteSearch,
