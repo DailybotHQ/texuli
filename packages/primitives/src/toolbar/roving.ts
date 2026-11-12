@@ -35,6 +35,9 @@ export function attachToolbarRovingFocus(
       if (index >= 0 && index !== active) setTabStop(index);
     };
     const onKeyDown = (event: KeyboardEvent) => {
+      // Only keys pressed on a toolbar item move along the toolbar: a menu, popover or grid
+      // that a toolbar item opens in place keeps its own arrows, Home and End (APG toolbar).
+      if (!items.includes(event.target as HTMLElement)) return;
       const intent = getNavigationIntent(event, { orientation, direction: directionOf(root) });
       if (!intent || items.length === 0) return;
       let next = active;
