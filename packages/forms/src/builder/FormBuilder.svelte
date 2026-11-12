@@ -134,7 +134,7 @@ function setOptions(field: FormField, value: string) {
   <div class="builder-grid">
     <nav aria-label="Field palette">
       <h2>Fields</h2>
-      <div aria-label="Add a field">
+      <div class="palette" role="group" aria-label="Add a field">
         {#each FORM_FIELD_TYPES.filter((type) => type !== 'password' && type !== 'otp' && type !== 'file' && type !== 'custom') as type}
           <button type="button" onclick={() => addField(type)}>{type}</button>
         {/each}
@@ -202,7 +202,7 @@ function setOptions(field: FormField, value: string) {
   input, select, textarea { inline-size: 100%; box-sizing: border-box; padding: .45rem; border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-radius-sm, .25rem); background: var(--tx-background, Canvas); }
   button { cursor: pointer; border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-radius-sm, .25rem); background: var(--tx-surface, Canvas); padding: .4rem .55rem; }
   button:focus-visible, li:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--tx-focus, Highlight); outline-offset: 2px; }
-  nav [role="listbox"] { display: flex; flex-wrap: wrap; gap: .35rem; }
+  .palette { display: flex; flex-wrap: wrap; gap: .35rem; }
   ol { list-style: none; display: grid; gap: .45rem; margin: 0; padding: 0; }
   li { display: flex; gap: .35rem; align-items: center; padding: .4rem; border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-radius-sm, .25rem); }
   li[aria-current="true"] { border-color: var(--tx-primary, Highlight); }
