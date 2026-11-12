@@ -1,61 +1,16 @@
 ---
-/** Technical docs for schema forms and the in-development visual builder. */
+/**
+ * `/guides/solutions/forms/` — Forms technical docs (ADR-028). Content lives in
+ * `src/content/solution-docs/forms/`; `SolutionDocsPage` renders it.
+ */
 import SolutionDocsPage from '../../../../components/solutions/docs-layout/SolutionDocsPage.astro';
-import { parseDocMarkdown } from '../../../../content/solution-docs/parse.ts';
+import { loadFormsDocs } from '../../../../content/solution-docs/forms/index.ts';
 import { getSolution } from '../../../../data/solutions/index.ts';
-
-const sections = [
-  {
-    id: 'install',
-    blocks: parseDocMarkdown(`## Install and status
-
-Install the published schema form package with \`pnpm add @texuli/forms\`. The package is in development (pre-1.0). The visual builder is branch-only while it is in development and is planned for the next release.
-
-Import the base theme stylesheet once in your application. \`SchemaForm\` renders the validated schema using Texuli controls.
-
-\`\`\`svelte
-<script lang="ts">
-import { SchemaForm, validateFormSchema } from '@texuli/forms';
-
-const result = validateFormSchema({
-  title: 'Workshop request',
-  fields: [{ name: 'email', type: 'email', label: 'Email address', required: true }],
-});
-</script>
-
-{#if result.ok}<SchemaForm form={result.form} />{/if}
-\`\`\``),
-  },
-  {
-    id: 'schemas',
-    blocks: parseDocMarkdown(`## Schemas, conditions and steps
-
-Schemas use closed field types, named formats, validation rules and expression data. Conditions use \`when.show\`, \`when.require\` and \`when.enable\`; expressions are evaluated by the bounded language from \`@texuli/core/expression\`. Multi-step schemas group fields into steps, and hidden or disabled fields are excluded from validation and submission.
-
-Validate the schema before rendering. The validator returns either a compiled form or issues that identify invalid members and relationships.`),
-  },
-  {
-    id: 'drafts',
-    blocks: parseDocMarkdown(`## Drafts and host storage
-
-Draft storage belongs to the application. Pass a storage adapter to keep draft behavior under host control. The demo uses fictional \`example.com\` data and keeps its draft in the page session; it sends nothing to a server.
-
-Restored values are checked against the current schema. Credential fields are excluded from drafts by default.`),
-  },
-  {
-    id: 'builder',
-    blocks: parseDocMarkdown(`## Visual builder
-
-The in-development \`@texuli/forms/builder\` subpath exports \`FormBuilder\`. It provides a field palette, a keyboard and pointer sortable canvas, a field inspector, a live schema form preview and a schema JSON view. The builder API is available in the repository branch and is planned for the next release.
-
-The builder edits a flat, single-page field list. It does not preserve a multi-step or section layout when editing; use it to author a flat schema and add advanced layout data in your application code.`),
-  },
-];
 ---
 
 <SolutionDocsPage
   entry={getSolution('forms')}
   title="Forms docs"
   description="Install and use @texuli/forms schemas, conditions, steps and drafts. The visual builder is in development and is planned for the next release."
-  {sections}
+  sections={loadFormsDocs()}
 />

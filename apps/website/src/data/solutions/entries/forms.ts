@@ -7,14 +7,14 @@ export const forms: SolutionEntry = {
   status: 'in development',
   tagline: 'Schema-driven forms with conditions, steps and drafts.',
   summary:
-    'A closed form schema rendered with Texuli components, multi-step flows, conditional logic, announced validation, drafts and autosave. The visual builder subpath is in development, branch-only and planned for the next release.',
+    'A closed form schema rendered with Texuli components, multi-step flows, conditional logic, announced validation, drafts and autosave. The visual builder subpath is in development: added after 0.17.4, not on npm yet, planned for the next release.',
   route: '/solutions/forms/',
   docs: '/guides/solutions/forms/',
   packages: [
     {
       name: '@texuli/forms',
       subpaths: ['.', './model', './controls', './builder', './host'],
-      role: 'Schema, model, controls and host rendering are in development and published on npm; the builder is branch-only.',
+      role: 'Schema, model, controls and host rendering are in development and published on npm; the builder (added after 0.17.4) is not on npm yet.',
     },
   ],
   capabilities: [
