@@ -518,6 +518,20 @@ describe('toolbar', () => {
       expect(unsafe.hasAttribute('href')).toBe(false);
       expect(unsafe.getAttribute('aria-disabled')).toBe('true');
     });
+
+    it('moves only on keys pressed on its items, so a popup opened inside keeps its keys', async () => {
+      const { toolbar, item } = await setup({ popup: true });
+      const grid = within(toolbar).getByRole('grid', { name: 'Picker' });
+      grid.focus();
+      for (const key of ['End', 'Home', 'ArrowRight', 'ArrowLeft']) {
+        await fireEvent.keyDown(grid, { key });
+        expect(document.activeElement).toBe(grid);
+      }
+      // On an item the toolbar still moves.
+      item('Bold').focus();
+      await fireEvent.keyDown(item('Bold'), { key: 'ArrowRight' });
+      expect(document.activeElement).toBe(item('Italic'));
+    });
   });
 });
 
