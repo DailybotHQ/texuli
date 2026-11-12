@@ -110,6 +110,7 @@ function reset(): void {
 <section
   class="workflow-demo"
   data-tx-workflows-demo=""
+  data-demo-live=""
   aria-label="Interactive expense approval workflow"
 >
   <div class="workflow-demo__toolbar" role="group" aria-label="Workflow actions">

@@ -157,7 +157,7 @@ onDestroy(() => {
   <span class="sr-only">Use the controls above to navigate this slide deck.</span>
 {/snippet}
 
-<div class="slides-demo" data-tx-slides-demo="">
+<div class="slides-demo" data-tx-slides-demo="" data-demo-live={started && snapshot ? '' : undefined}>
   {#if !started && !stageLoading && !stageFailed}
     <button type="button" class="slides-demo__start" onclick={startDemo}>
       Start interactive demo

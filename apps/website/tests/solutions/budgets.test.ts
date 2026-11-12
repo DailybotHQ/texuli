@@ -44,10 +44,10 @@ describe('ecosystem route budgets', () => {
       htmlGzipKb: 27,
     });
     expect(budgetFor('/solutions/documents/').pageGzipKb).toBe(527);
-    expect(budgetFor('/solutions/workflows/')).toMatchObject({ pageGzipKb: 324, jsGzipKb: 96 });
+    expect(budgetFor('/solutions/workflows/')).toMatchObject({ pageGzipKb: 400, jsGzipKb: 96 });
     expect(budgetFor('/solutions/canvas/').pageGzipKb).toBe(332);
     expect(budgetFor('/solutions/sheets/')).toMatchObject({
-      pageGzipKb: 323,
+      pageGzipKb: 400,
       htmlRawKb: 236,
       htmlGzipKb: 31,
     });

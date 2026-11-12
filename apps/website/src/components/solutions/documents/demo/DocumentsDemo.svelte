@@ -96,7 +96,12 @@ function toggleSource(): void {
 }
 </script>
 
-<section class="documents-demo" aria-label="Interactive product report example" data-tx-documents-demo="">
+<section
+  class="documents-demo"
+  aria-label="Interactive product report example"
+  data-tx-documents-demo=""
+  data-demo-live={started && state ? '' : undefined}
+>
   {#if !started && !loading && !failed}
     <button type="button" class="documents-demo__start" onclick={startDemo}>Start interactive demo</button>
     <p class="documents-demo__hint">The report preview is ready; editing tools load when you start.</p>

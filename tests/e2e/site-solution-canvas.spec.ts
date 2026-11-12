@@ -76,7 +76,10 @@ test('the landing renders its sections, status and server preview without errors
     'Give every idea room to connect.'
   );
   await expect(page.locator('[data-tx-solution-status]')).toHaveText(/Status: in development/);
-  await expect(page.getByRole('region', { name: 'Canvas demo static preview' })).toBeVisible();
+  // The server preview ships in the HTML; the island renders the same live view, so the frame
+  // shows one of them: the preview steps aside ([data-demo-live]).
+  await expect(page.getByRole('region', { name: 'Canvas demo static preview' })).toBeHidden();
+  await expect(page.locator('.canvas-demo[data-demo-live]')).toBeVisible();
   await expect(island(page)).toHaveAttribute('ssr', '');
 
   const subnav = page.getByRole('navigation', { name: 'Canvas page sections' });
@@ -160,6 +163,9 @@ test('at 390 px nothing overflows; axe has no serious violations in light and da
   ).toBeLessThanOrEqual(1);
 
   await page.setViewportSize({ width: 1280, height: 900 });
+  // Back to the top: the 390 px run leaves the demo toolbar under the sticky header, which axe
+  // reads as an obscured (too small) target. The page is checked at rest.
+  await page.evaluate(() => window.scrollTo(0, 0));
   for (const scheme of ['light', 'dark'] as const) {
     await useScheme(page, scheme);
     const serious = (await axeViolations(page)).filter((violation) =>

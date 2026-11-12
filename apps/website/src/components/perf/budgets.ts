@@ -132,8 +132,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/solutions/sheets/',
     reason:
-      'ADR-030: this landing replaces /sheets-page/ and inherits its current 186 KB page cap, 236 KB raw HTML cap and 31 KB HTML gzip cap. PLAN_015 and PLAN_017 art (2026-11-12): the page shows its hero, three story plates and the how band, lazy WebP at the srcset width it renders; the lazy-load distance of each browser fetches the plates within reach on open. Measured 310.3 KB page (chromium 259.3, webkit 192.1, mobile 310.3), limit 323 (+4% headroom on the largest).',
-    budget: { pageGzipKb: 323, htmlRawKb: 236, htmlGzipKb: 31 },
+      'ADR-030: this landing replaces /sheets-page/ and inherits its current 186 KB page cap, 236 KB raw HTML cap and 31 KB HTML gzip cap. PLAN_015 and PLAN_017 art (2026-11-12): the page shows its hero, three story plates and the how band, lazy WebP at the srcset width it renders; the lazy-load distance of each browser fetches the plates within reach on open. Measured 310.3 KB page (chromium 259.3, webkit 192.1, mobile 310.3), limit 323 (+4% headroom on the largest). 2026-11-12 review: the fourth story shows the page-sheets banner instead of the texel mosaic. Measured 384.0 KB page (chromium 294.8, webkit 192.3, mobile 384.0), limit 400 (+4% headroom on the largest).',
+    budget: { pageGzipKb: 400, htmlRawKb: 236, htmlGzipKb: 31 },
   },
   {
     route: '/showcase/dashboard/',
@@ -198,8 +198,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/solutions/workflows/',
     reason:
-      'ADR-030: this landing replaces /workflows-page/ and inherits its current 132 KB page and 96 KB JavaScript caps. PLAN_015 and PLAN_017 art (2026-11-12): the page shows its hero, three story plates and the how band, lazy WebP at the srcset width it renders; the lazy-load distance of each browser fetches the plates within reach on open. Measured 311.0 KB page (chromium 252.6, webkit 145.2, mobile 311.0), limit 324 (+4% headroom on the largest).',
-    budget: { pageGzipKb: 324, jsGzipKb: 96 },
+      'ADR-030: this landing replaces /workflows-page/ and inherits its current 132 KB page and 96 KB JavaScript caps. PLAN_015 and PLAN_017 art (2026-11-12): the page shows its hero, three story plates and the how band, lazy WebP at the srcset width it renders; the lazy-load distance of each browser fetches the plates within reach on open. Measured 311.0 KB page (chromium 252.6, webkit 145.2, mobile 311.0), limit 324 (+4% headroom on the largest). 2026-11-12 review: the static preview steps aside once the live demo shows, so the page is shorter and more plates fall within the lazy-load distance on open. Measured 384.6 KB page (chromium 253.2, webkit 145.8, mobile 384.6), limit 400 (+4% headroom on the largest).',
+    budget: { pageGzipKb: 400, jsGzipKb: 96 },
   },
   {
     route: '/solutions/design-systems/',
@@ -252,8 +252,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/web-and-native/',
     reason:
-      'The architecture page mounts five sections — the layer diagrams, the correlation demo, the portability walk and the parity table (PLAN_006 T-52): measured 24.8 KB gzip, limit 26. PLAN_007: the layer diagrams gained @texuli/drag and @texuli/workflows and the nav three links, measured 96.4 KB page (+4% headroom). PLAN_010: the layer diagrams gained @texuli/document and @texuli/pages and the nav the motion link, measured 100.9 KB page, limit 105 (+4% headroom). PLAN_010 wave 6 (@texuli/sheets in the layer diagrams, the canvas and forms nav links): measured 26.4 KB HTML gzip, limit 27.5 (+4% headroom). PLAN_010 T-site-080 (the catalog and tools rows follow the f9809246 architecture table; the nav gained the sheets, dashboards, output and What’s new links): measured 106.4 KB page, limit 111 (+4% headroom). PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (base.css system defaults plus one-fallback reads); CI measured 27.6 KB HTML gzip; 109.6 KB page (+4% headroom). PLAN_013 T-ship (2026-11-01): the parity table gained the Data views row and the native rows their chart and data counts; CI on Linux measured 29 KB HTML gzip, limit 30.2 (+4% headroom). PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (34.8 KB of WebP on open, logo included); measured 123.6 KB page, limit 129 (+4% headroom). 0.16.0 (2026-11-09): pageGzipKb measured 129.2 KB, limit +4%.',
-    budget: { htmlGzipKb: 30.2, pageGzipKb: 135 },
+      'The architecture page mounts five sections — the layer diagrams, the correlation demo, the portability walk and the parity table (PLAN_006 T-52): measured 24.8 KB gzip, limit 26. PLAN_007: the layer diagrams gained @texuli/drag and @texuli/workflows and the nav three links, measured 96.4 KB page (+4% headroom). PLAN_010: the layer diagrams gained @texuli/document and @texuli/pages and the nav the motion link, measured 100.9 KB page, limit 105 (+4% headroom). PLAN_010 wave 6 (@texuli/sheets in the layer diagrams, the canvas and forms nav links): measured 26.4 KB HTML gzip, limit 27.5 (+4% headroom). PLAN_010 T-site-080 (the catalog and tools rows follow the f9809246 architecture table; the nav gained the sheets, dashboards, output and What’s new links): measured 106.4 KB page, limit 111 (+4% headroom). PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (base.css system defaults plus one-fallback reads); CI measured 27.6 KB HTML gzip; 109.6 KB page (+4% headroom). PLAN_013 T-ship (2026-11-01): the parity table gained the Data views row and the native rows their chart and data counts; CI on Linux measured 29 KB HTML gzip, limit 30.2 (+4% headroom). PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (34.8 KB of WebP on open, logo included); measured 123.6 KB page, limit 129 (+4% headroom). 0.16.0 (2026-11-09): pageGzipKb measured 129.2 KB, limit +4%. 2026-11-12 review: the earlier cap was measured on chromium at 1x; the banner now also has a 1600 px width (2x screens took the full 1920 px file before). Measured 181.9 KB page (chromium 129.2, webkit 181.9, mobile 155.4), limit 190 (+4% headroom on the largest).',
+    budget: { htmlGzipKb: 30.2, pageGzipKb: 190 },
   },
   {
     route: '/gallery-themes/',

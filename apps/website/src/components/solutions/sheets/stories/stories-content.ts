@@ -36,6 +36,8 @@ export const SHEETS_STORIES: Omit<SolutionStoriesProps, 'entry'> = {
       title: 'Work on it together, later',
       body: 'Collaboration on the document sync core is planned, not shipped. Localized formula display and native evaluation are planned too.',
       capabilities: ['collaboration'],
+      // Three story plates exist; the fourth story shows the Sheets page banner (like Slides).
+      art: { slot: 'page-sheets', variant: 'banner' },
     },
   ],
 };

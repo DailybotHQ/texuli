@@ -51,7 +51,12 @@ function reset(): void {
 }
 </script>
 
-<section class="sheets-demo" aria-label="Interactive Project budget spreadsheet" data-tx-sheets-demo="">
+<section
+  class="sheets-demo"
+  aria-label="Interactive Project budget spreadsheet"
+  data-tx-sheets-demo=""
+  data-demo-live=""
+>
   <div class="sheets-demo__toolbar" role="group" aria-label="Spreadsheet actions">
     <button type="button" onclick={() => dispatch({ type: 'add-line-item' })}>Add line item</button>
     <button type="button" onclick={() => dispatch({ type: 'toggle-formulas' })}>
