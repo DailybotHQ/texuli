@@ -2284,3 +2284,80 @@ reflect this decision.
   hub over its page cap with a demo island.
 - **How to reverse:** fold the hub's reference into the guide, then add a 301 from `/design-systems/` to
   the landing through a registry rule that allows a non-`-page` source.
+
+## ADR-034: Universal Markdown and HTML in @texuli/core
+
+- **Date:** 2026-11-12 · **Ratification:** the developer asked for "una libreria full universal de
+  markdown" in the Texuli core, with Markdown to HTML, HTML to Markdown, every chat platform dialect and
+  strong security; lead decision under the developer's standing grant (PLAN_023 T-adr).
+- **Context:** Texuli has eight Markdown and HTML surfaces, each a closed subset with its own reader
+  (ADR-003 editor codec, blocks text, document, deck, editor paste, catalog rich text, chat tokens) and an
+  escaped HTML writer (`@texuli/core/markup`, ADR-016). None parses full CommonMark or GFM, none reads
+  untrusted HTML into a shared tree, and none speaks the chat platforms' dialects. The layer guard forbids
+  a dependency between two packages of the same layer.
+- **Options:** (A) a new `@texuli/markdown` package on `@texuli/core`, which the guard places at L1, so
+  the L0 editor codec in core could not adopt it; (B) framework-free subpaths of `@texuli/core`
+  (`markdown`, `markdown-html`, `html`, `markdown-dialects`) sharing one AST; (C) keep the codecs apart.
+- **Choice:** B. One CommonMark 0.31.2 parser with GFM extensions as options produces the versioned
+  `texuli-md/v1` AST. `core/markdown-html` writes it through `core/markup` only (allowlist, URL policy per
+  tier). `core/html` reads untrusted HTML with a DOM-free tolerant tokenizer and the same allowlist into
+  the AST. `core/markdown-dialects` reads and writes Slack mrkdwn, Discord, WhatsApp, Telegram MarkdownV2
+  and HTML, Microsoft Teams, Google Chat, Mattermost and plain text, with documented losses. Parsers
+  never throw, stay linear, and cap source size and nesting. The existing closed subsets stay product
+  contracts: they parse through the shared parser and project onto their own trees (deck keeps its
+  dialect, since L0 deck cannot import core).
+- **Why:** the guard lets every layer above core consume one parser; a subpath tree-shakes, so the core
+  root stays within its budget; one AST makes every conversion (Markdown, HTML, dialects) a pair of
+  readers and writers instead of n² translators; HTML output still has a single writer (ADR-016).
+- **How to reverse:** move the subpaths into a new L1 package and keep thin re-exports in core for one
+  minor; the editor codec then keeps its own reader.
+
+## ADR-036: The second Solutions batch: Dashboards, Forms, Agent chat, Rich text editor
+
+- **Date:** 2026-11-12 · **Ratification:** the developer chose all four candidates and the components
+  they need; lead decision under the developer's standing grant (PLAN_023 T-adr).
+- **Context:** PLAN_015 held Dashboards (capability), Forms (no visual builder), Chat (component family)
+  and Editor (inside Documents) back from promotion. The PLAN_023 audit maps each to published APIs and
+  lists thirteen gaps that keep them from being complete Solutions.
+- **Options:** (A) promote the four now with what exists; (B) build the components that close the gaps
+  (date range, filter bar, metric card; the form builder; chat Markdown and emoji, autocomplete,
+  streaming, blueprint attachments; editor emoji, Markdown paste, dialect export, block menu) and then
+  promote them; (C) keep them as capability pages.
+- **Choice:** B. Four landings under `/solutions/<slug>/` (`dashboards`, `forms`, `agent-chat`,
+  `editor`) in the typed registry (ADR-029), one demo island each (ADR-030), the global navigation
+  (ADR-031). Existing `/dashboards-page/`, `/forms-page/` and editor pages stay reachable as reference and
+  link their landing; nothing redirects until a later decision. The component list is fixed in
+  PLAN_023 `decisions/components.md`.
+- **Why:** each Solution then completes a task end to end, which is the registry's promotion bar; the
+  gaps become tested components that the whole library reuses.
+- **How to reverse:** remove the registry entries; the components and capability pages stay.
+
+## ADR-035: Texuli Emojis: an owned engine, original art and one catalog for web and native
+
+- **Date:** 2026-11-12 · **Ratification:** the developer's emoji specification (PLAN_023
+  `analysis_results/emoji-spec.md`): replace the Twemoji-backed universal-emoji-parser with a
+  Texuli-owned engine and an original artwork collection for web, native, agents and EmojiParser.com;
+  lead decision under the developer's standing grant (PLAN_023 T-adr).
+- **Context:** universal-emoji-parser 3.0.2 keeps 1,914 curated rows keyed by character, has no ZWJ,
+  tone or flag rows, drops tones when writing shortcodes, throws on non-string input, returns HTML
+  strings and loads an unpinned Twemoji CDN. Unicode Emoji 18.0 lists 3,966 fully-qualified sequences
+  (pinned with CLDR 49 and SHA-256 checksums in the PLAN_023 audit). Native receives contract data as
+  generated Kotlin read through a Gradle `srcDir`.
+- **Options:** (A) emoji support inside `@texuli/core`; (B) two new L0 packages, `@texuli/emojis`
+  (engine, dependency-free) and `@texuli/emoji-assets` (original SVGs and manifest), with web
+  components in `texuli/emoji`; (C) keep the legacy library.
+- **Choice:** B. A deterministic generator (`scripts/emojis/`) reads the pinned Unicode and CLDR files
+  (committed with their license) and the legacy aliases, and writes the `texuli-emoji/v1` catalog as JSON
+  and TypeScript indexes plus Kotlin under `packages/emojis/generated/kotlin` for native. Ids are the
+  hyphenated code-point sequence. The engine is a longest-match trie with a shortcode lexer per
+  dialect, UTF-16 offsets, no network, no HTML; the default entry carries no catalog or art. Art lives in
+  `@texuli/emoji-assets` (64×64 viewBox SVGs, validated and optimized, a coverage manifest that never
+  counts unapproved files); providers are `texuli`, `system` and host `custom`, falling back to system
+  glyphs then text, never to Twemoji by default. Proposed art license: CC BY 4.0, published only after the
+  owner signs it off. The migration is a bridge in the legacy repository behind parity fixtures; nothing
+  is deprecated or unpublished without the owner.
+- **Why:** core stays lean and every layer can use the engine (L0, no dependencies); engine and art ship
+  separately so a parser never carries images; one generated catalog keeps web and native semantically
+  equal under shared conformance fixtures.
+- **How to reverse:** fold the engine into core as a subpath (it has no dependencies) and keep the
+  package as a re-export for one minor.
