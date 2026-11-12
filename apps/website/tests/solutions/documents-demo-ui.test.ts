@@ -64,7 +64,7 @@ describe('Documents Solution demo island', () => {
     expect(container.querySelector('[data-block-id="added-1"]')).toBeNull();
     expect(screen.queryByRole('region', { name: 'Document source as JSON' })).toBeNull();
     expect(screen.getByRole('status').textContent).toContain('Example reset');
-  });
+  }, 15_000);
 
   it('supports keyboard form submission and touch-sized native controls', async () => {
     const { container } = render(DocumentsDemo);

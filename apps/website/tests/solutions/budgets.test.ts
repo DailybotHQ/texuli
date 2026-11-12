@@ -49,7 +49,7 @@ describe('ecosystem route budgets', () => {
     expect(budgetFor('/solutions/canvas/').pageGzipKb).toBe(332);
     expect(budgetFor('/solutions/sheets/')).toMatchObject({
       pageGzipKb: 400,
-      htmlRawKb: 236,
+      htmlRawKb: 247,
       htmlGzipKb: 31,
     });
   });

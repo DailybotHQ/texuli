@@ -104,8 +104,8 @@ describe('export to chat dialects', () => {
   });
 
   it('never writes a live broadcast mention', () => {
-    expect(documentToDialect(source, 'discord').value).toContain('@​everyone');
-    expect(documentToDialect(source, 'slack').value).toContain('@​here');
+    expect(documentToDialect(source, 'discord').value).toContain('@\u200beveryone');
+    expect(documentToDialect(source, 'slack').value).toContain('@\u200bhere');
   });
 
   it('keeps checklist state as marks and reports what each format loses, grouped', () => {
@@ -260,9 +260,12 @@ describe('editor emoji (row 9)', () => {
   it('the toolbar emoji button opens the picker in a popover and inserts the choice', async () => {
     const controller = new EditorController({ doc: doc('Hi') });
     render(EditorToolbar, { props: { controller, emoji: true } });
-    const button = await within(screen.getByRole('toolbar')).findByRole('button', {
-      name: 'Emoji',
-    });
+    // The emoji button is a lazy chunk: wait for it like the picker below (1 s missed it under load).
+    const button = await within(screen.getByRole('toolbar')).findByRole(
+      'button',
+      { name: 'Emoji' },
+      { timeout: 10_000 }
+    );
     expect(button.getAttribute('aria-haspopup')).toBe('dialog');
     await fireEvent.click(button);
     const picker = await screen.findByRole('grid', {}, { timeout: 10_000 });
