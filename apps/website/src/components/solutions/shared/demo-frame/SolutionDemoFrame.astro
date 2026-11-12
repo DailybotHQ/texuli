@@ -70,6 +70,22 @@ const hasSource = Astro.slots.has('source');
    * The band is full width (SolutionLayout); the frame sits in the landing's 76rem column
    * (73rem inside its 1.5rem gutters), centered, with the same side gutter on narrow screens.
    */
+  /*
+   * The site theme (enterprise-neutral) carries no categorical chart palette, so demo content
+   * that colors by it (canvas sticky notes: yellow, purple and pink read --tx-chart-4..6)
+   * fell back to the text color mixed into the surface: plain grey. The demos get one
+   * palette in the landing's colors instead.
+   */
+  .solution-demo {
+    --tx-chart-1: #6d4aff;
+    --tx-chart-2: #0f9d8f;
+    --tx-chart-3: #2f6fe0;
+    --tx-chart-4: #e0a100;
+    --tx-chart-5: #9b5de5;
+    --tx-chart-6: #e0529c;
+    --tx-chart-7: #ff8a4c;
+    --tx-chart-8: #2f9e44;
+  }
   .solution-demo {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -129,6 +145,17 @@ const hasSource = Astro.slots.has('source');
   .solution-demo__island {
     min-inline-size: 0;
     max-inline-size: 100%;
+  }
+
+  /*
+   * One view of the demo at a time. A demo marks its root [data-demo-live] once it shows the
+   * live view (canvas, sheets and workflows render it on the server; slides and documents
+   * after Start). The static preview, and the note that points to it, then step aside so the
+   * same deck, report, board or table never shows twice.
+   */
+  .solution-demo:has(.solution-demo__island [data-demo-live]) > .solution-demo__preview,
+  .solution-demo:has(.solution-demo__island [data-demo-live]) > .solution-demo__fallback {
+    display: none;
   }
 
   .solution-demo__try-title {

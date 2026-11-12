@@ -35,6 +35,8 @@ export const CANVAS_STORIES: Omit<SolutionStoriesProps, 'entry'> = {
       title: 'Carry the board into SVG or PNG',
       body: 'Export escaped SVG or render a PNG in the browser. Text stays text in the SVG output, and image URLs follow the URL policy.',
       capabilities: ['export'],
+      // Three story plates exist; the fourth story shows the Canvas page banner (like Slides).
+      art: { slot: 'page-canvas', variant: 'banner' },
     },
   ],
 };

@@ -42,7 +42,8 @@ export function illustrationFor(slot: string): IllustrationEntry | undefined {
 const SRCSET_STEPS: Readonly<Record<IllustrationVariant, readonly number[]>> = Object.freeze({
   plate: [400, 600, 800, 1200],
   band: [800, 1200],
-  banner: [400, 800, 1200],
+  // 1600: a 48rem banner on a 2x screen needs about 1536 px; without it the full 1920 file loads.
+  banner: [400, 800, 1200, 1600],
 });
 
 /**

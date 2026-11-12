@@ -127,7 +127,9 @@ describe('SiteIllustration', () => {
     ]);
     expect(illustrationWidths({ variant: 'plate', width: 1040 })).toEqual([400, 600, 800, 1040]);
     expect(illustrationWidths({ variant: 'band', width: 1600 })).toEqual([800, 1200, 1600]);
-    expect(illustrationWidths({ variant: 'banner', width: 1920 })).toEqual([400, 800, 1200, 1920]);
+    expect(illustrationWidths({ variant: 'banner', width: 1920 })).toEqual([
+      400, 800, 1200, 1600, 1920,
+    ]);
     for (const entry of ILLUSTRATIONS)
       expect(ILLUSTRATION_SIZES[entry.variant], entry.slot).toBeTruthy();
     expect(source).toContain('srcset={light.srcset}');

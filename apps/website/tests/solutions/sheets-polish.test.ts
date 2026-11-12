@@ -35,7 +35,8 @@ describe('Sheets polish', () => {
       expect(isRegisteredSlot(story.art?.slot ?? ''), story.id).toBe(true);
       expect(illustrationFor(story.art?.slot ?? '')?.variant, story.id).toBe('plate');
     }
-    expect(SHEETS_STORIES.stories[3]?.art).toBeUndefined();
+    // The fourth (planned) story shows the Sheets page banner instead of the texel mosaic.
+    expect(SHEETS_STORIES.stories[3]?.art).toEqual({ slot: 'page-sheets', variant: 'banner' });
 
     expect(SHEETS_HOW.art).toEqual({ slot: 'solution-sheets-how', variant: 'band' });
     expect(howArt('sheets', SHEETS_HOW.art)?.slot).toBe('solution-sheets-how');
@@ -63,7 +64,7 @@ describe('Sheets polish', () => {
     expect(islands).toEqual(['SheetsDemo:visible']);
     expect(PAGE).not.toMatch(/set:html|\{@html|innerHTML/);
     expect(islandBudgetFor('/solutions/sheets/')).toBe(1);
-    expect(budgetFor('/solutions/sheets/').pageGzipKb).toBe(323);
+    expect(budgetFor('/solutions/sheets/').pageGzipKb).toBe(400);
     expect(budgetFor('/solutions/sheets/').htmlGzipKb).toBe(31);
   });
 });

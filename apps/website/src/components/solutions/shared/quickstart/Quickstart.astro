@@ -127,8 +127,11 @@ const blocks = [install, ...samples];
     outline: 2px solid var(--tx-ring);
     outline-offset: 2px;
   }
+  /* Long samples (a full workflow registry) scroll inside their card instead of running for
+     screens; the pre is focusable (tabindex 0), so the keyboard scrolls it too. */
   .quickstart pre {
     overflow: auto;
+    max-block-size: min(28rem, 70vh);
     margin: 0;
     padding: 1rem;
     color: var(--tx-foreground);

@@ -100,7 +100,7 @@ function reset(): void {
 }
 </script>
 
-<section class="canvas-demo" aria-label="Interactive launch plan canvas">
+<section class="canvas-demo" aria-label="Interactive launch plan canvas" data-demo-live="">
   <div class="canvas-demo__toolbar" role="group" aria-label="Canvas actions">
     <button type="button" onclick={addNote}>Add priority note</button>
     <button type="button" onclick={() => moveSelected({ x: -16, y: 0 })}>Move left</button>
