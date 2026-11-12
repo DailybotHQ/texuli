@@ -4,4 +4,6 @@
  * enforces `MARKDOWN_LIMITS`.
  */
 export * from './ast.ts';
+export { GFM_OFF, type GfmFlags, type GfmOptions, gfmFlags } from './gfm/options.ts';
 export { type MarkdownLimits, type MarkdownParseOptions, parseMarkdown } from './parse.ts';
+export { type MarkdownWriteOptions, writeMarkdown } from './write.ts';
