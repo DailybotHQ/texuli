@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import type { SchedulerClock } from '@texuli/deck/engine';
 import { createDeckController } from '@texuli/deck/engine';
 import { parseDeck } from '@texuli/deck/model';
@@ -8,6 +10,8 @@ import {
   SLIDES_DEMO_SCENARIOS,
   type SlidesDemoModel,
 } from '../../src/components/solutions/slides/demo/model.ts';
+
+const WEBSITE_PUBLIC = resolve(import.meta.dirname, '../../public');
 
 class ManualClock implements SchedulerClock {
   private time = 0;
@@ -55,26 +59,43 @@ afterEach(() => {
 describe('slides demo fixtures', () => {
   it('provides deterministic model-v2 fixtures with the primary six-to-nine-slide story', () => {
     const primary = getSlidesDemoFixture('texuli-in-motion');
-    expect(primary.meta.title).toBe('Texuli in motion');
+    expect(primary.meta.title).toBe('Texuli launch keynote');
     expect(primary.slides).toHaveLength(7);
     expect(primary.slides.map((slide) => slide.id)).toEqual([
       'pieces',
       'compare',
-      'signal',
-      'picture',
-      'process',
-      'composable',
+      'packages',
+      'layers',
+      'history',
+      'agents',
       'close',
     ]);
     expect(primary.slides.map((slide) => slide.layout)).toEqual([
       'title-hero',
-      'two-column-split',
-      'chart',
-      'image-centered',
-      'process-steps',
+      'image-right',
+      'big-stat',
       'three-column-cards',
+      'timeline',
+      'image-left',
       'closing-cta',
     ]);
+  });
+
+  it('gives each scenario its own theme and real, relative images that ship with the site', () => {
+    const themes = new Set<string>();
+    for (const { id } of SLIDES_DEMO_SCENARIOS) {
+      const deck = getSlidesDemoFixture(id);
+      themes.add(String(deck.style?.theme));
+      for (const slide of deck.slides) {
+        const image = (slide as { props?: { image?: { src: string; alt: string } } }).props?.image;
+        if (!image) continue;
+        expect(image.src, `${id} ${slide.id}`).toMatch(/^demo-media\/[a-z-]+\.webp$/);
+        expect(image.alt.length, `${id} ${slide.id}`).toBeGreaterThan(20);
+        const file = resolve(WEBSITE_PUBLIC, 'solutions/slides', image.src);
+        expect(existsSync(file), file).toBe(true);
+      }
+    }
+    expect(themes.size).toBe(SLIDES_DEMO_SCENARIOS.length);
   });
 
   it('validates every scenario with the published deck model parser', () => {
@@ -118,7 +139,7 @@ describe('slides demo model actions', () => {
 
     const originalTheme = demo.getSnapshot().theme;
     expect(demo.dispatch({ type: 'theme' }).theme).toBe('graphite');
-    expect(demo.dispatch({ type: 'view-source' }).source).toContain('Texuli in motion');
+    expect(demo.dispatch({ type: 'view-source' }).source).toContain('Texuli launch keynote');
     const reset = demo.dispatch({ type: 'reset' });
     expect(reset).toMatchObject({
       slideNumber: 1,
@@ -146,7 +167,7 @@ describe('slides demo model actions', () => {
     expect(switched).toMatchObject({
       scenarioId: 'data-report',
       slideNumber: 1,
-      slideCount: 5,
+      slideCount: 7,
       location: { slideId: 'opening' },
     });
     expect(demo.dispatch({ type: 'next' }).location.slideId).toBe('trend');

@@ -29,12 +29,6 @@ const themeName = (theme: SlidesDemoSnapshot['theme']): string =>
     </select>
   </label>
 
-  <button type="button" onclick={() => onAction({ type: 'prev' })} disabled={snapshot.slideNumber <= 1}>
-    Previous slide
-  </button>
-  <button type="button" onclick={() => onAction({ type: 'next' })} disabled={snapshot.slideNumber >= snapshot.slideCount}>
-    Next slide
-  </button>
   <button type="button" aria-pressed={snapshot.playing} onclick={() => onAction({ type: 'play' })}>
     {snapshot.playing ? 'Pause slides' : 'Play slides'}
   </button>
