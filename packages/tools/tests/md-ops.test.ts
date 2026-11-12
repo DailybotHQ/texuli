@@ -1,7 +1,15 @@
 // @vitest-environment node
+import { MARKDOWN_LIMITS } from '@texuli/core/markdown';
+import { MARKDOWN_DIALECTS } from '@texuli/core/markdown-dialects';
 import { expect, it } from 'vitest';
 import { texuliOps } from '../src/ops/index.ts';
+import { MD_DIALECTS, MD_SOURCE_MAX } from '../src/ops/markdown.ts';
 import { scenario } from './scenario.ts';
+
+it('keeps md.* source and dialect constants equal to @texuli/core so the parser stays out of the Function initial chunk', () => {
+  expect(MD_SOURCE_MAX).toBe(MARKDOWN_LIMITS.source);
+  expect([...MD_DIALECTS]).toEqual([...MARKDOWN_DIALECTS]);
+});
 
 it('converts untrusted Markdown, HTML and chat dialects and refuses hostile URLs', async () => {
   await scenario('slack to discord keeps emphasis as Discord italic', async () => {

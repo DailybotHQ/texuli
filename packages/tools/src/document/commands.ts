@@ -1,4 +1,3 @@
-import { documentFromMarkdown, documentToMarkdown } from '@texuli/document/markdown';
 import {
   BLOCK_FAMILIES,
   countNodes,
@@ -126,6 +125,7 @@ async function run(command: DocumentCommandName, input: DocumentCommandInput): P
   if (command === 'from-markdown') {
     if (typeof input.markdown !== 'string') return { ok: false, error: 'Provide markdown text.' };
     const tier: DocumentTier = input.tier === 'developer' ? 'developer' : 'untrusted';
+    const { documentFromMarkdown } = await import('@texuli/document/markdown');
     const imported = documentFromMarkdown(input.markdown, { trust: tier });
     return imported.ok
       ? { ok: true, document: imported.document, diagnostics: imported.diagnostics }
@@ -175,8 +175,10 @@ async function run(command: DocumentCommandName, input: DocumentCommandInput): P
       ? { ok: true, document: result.document, inverse: result.inverse }
       : { ok: false, index: result.index, reason: result.reason, issues: issuesOf(result.issues) };
   }
-  if (command === 'to-markdown')
+  if (command === 'to-markdown') {
+    const { documentToMarkdown } = await import('@texuli/document/markdown');
     return { ok: true, markdown: documentToMarkdown(doc, { title: false }) };
+  }
   if (command === 'to-blueprint') {
     const key = input.key ?? 'document';
     const id = input.id ?? 'document';

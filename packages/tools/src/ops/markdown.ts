@@ -3,31 +3,38 @@
  * conversions through `@texuli/core` (ADR-034). URLs always use the
  * `untrusted` tier. `markdown` is GitHub Flavored Markdown (GFM 0.29); `commonmark` is strict
  * CommonMark 0.31.2.
+ *
+ * Declarations stay in the Function's initial chunk; the parser, HTML
+ * reader/writer and dialects load on demand (same pattern as ds.*).
  */
-import { htmlToMarkdownTree } from '@texuli/core/html';
-import {
-  MARKDOWN_LIMITS,
-  type MarkdownDiagnostic,
-  parseMarkdown,
-  writeMarkdown,
-} from '@texuli/core/markdown';
-import {
-  convertMarkdownDialect,
-  MARKDOWN_DIALECTS,
-  type MarkdownDialect,
-  readMarkdownDialect,
-  writeMarkdownDialect,
-} from '@texuli/core/markdown-dialects';
-import { markdownTreeToHtml } from '@texuli/core/markdown-html';
 import { defineOperation } from './registry.ts';
 import type { JsonSchema } from './schema.ts';
 import type { Operation } from './types.ts';
 
-const SOURCE_MAX = MARKDOWN_LIMITS.source;
-const INPUT_BYTES = SOURCE_MAX + 100_000;
+/**
+ * Longest source `md.convert` / `md.render` accept. Kept equal to
+ * `MARKDOWN_LIMITS.source` in `@texuli/core/markdown` so this module does
+ * not import the parser into the remote MCP Function's initial chunk.
+ */
+export const MD_SOURCE_MAX = 1_000_000;
+const INPUT_BYTES = MD_SOURCE_MAX + 100_000;
 const DIAGNOSTIC_MAX = 200;
 
-export const MARKDOWN_FORMATS = ['markdown', 'commonmark', 'html', ...MARKDOWN_DIALECTS] as const;
+/** Chat dialects, copied from `@texuli/core/markdown-dialects` (a test keeps them equal). */
+export const MD_DIALECTS = [
+  'slack',
+  'discord',
+  'whatsapp',
+  'telegram-markdown-v2',
+  'telegram-html',
+  'teams',
+  'google-chat',
+  'mattermost',
+  'plain-text',
+] as const;
+export type MarkdownDialect = (typeof MD_DIALECTS)[number];
+
+export const MARKDOWN_FORMATS = ['markdown', 'commonmark', 'html', ...MD_DIALECTS] as const;
 export type MarkdownFormat = (typeof MARKDOWN_FORMATS)[number];
 
 const formatSchema: JsonSchema = {
@@ -55,7 +62,7 @@ const diagnosticsSchema: JsonSchema = {
 };
 
 function isDialect(value: string): value is MarkdownDialect {
-  return (MARKDOWN_DIALECTS as readonly string[]).includes(value);
+  return (MD_DIALECTS as readonly string[]).includes(value);
 }
 
 function isFormat(value: unknown): value is MarkdownFormat {
@@ -63,35 +70,50 @@ function isFormat(value: unknown): value is MarkdownFormat {
 }
 
 function publicDiagnostics(
-  list: readonly MarkdownDiagnostic[]
+  list: readonly { code: string; message: string }[]
 ): { code: string; message: string }[] {
   return list.slice(0, DIAGNOSTIC_MAX).map((item) => ({ code: item.code, message: item.message }));
 }
 
-function readTree(source: string, from: MarkdownFormat) {
-  if (from === 'markdown') return parseMarkdown(source);
-  if (from === 'commonmark') return parseMarkdown(source, { gfm: false });
-  if (from === 'html') return htmlToMarkdownTree(source, { trust: 'untrusted' });
-  return readMarkdownDialect(source, from);
+const loadMarkdown = () => import('@texuli/core/markdown');
+const loadHtml = () => import('@texuli/core/html');
+const loadDialects = () => import('@texuli/core/markdown-dialects');
+const loadMarkdownHtml = () => import('@texuli/core/markdown-html');
+
+async function readTree(source: string, from: MarkdownFormat) {
+  if (from === 'markdown') return (await loadMarkdown()).parseMarkdown(source);
+  if (from === 'commonmark') return (await loadMarkdown()).parseMarkdown(source, { gfm: false });
+  if (from === 'html') return (await loadHtml()).htmlToMarkdownTree(source, { trust: 'untrusted' });
+  return (await loadDialects()).readMarkdownDialect(source, from);
 }
 
-function convert(source: string, from: MarkdownFormat, to: MarkdownFormat) {
+async function convert(source: string, from: MarkdownFormat, to: MarkdownFormat) {
   if (isDialect(from) && isDialect(to)) {
-    const result = convertMarkdownDialect(source, from, to, { trust: 'untrusted' });
+    const result = (await loadDialects()).convertMarkdownDialect(source, from, to, {
+      trust: 'untrusted',
+    });
     return { value: result.value, diagnostics: publicDiagnostics(result.diagnostics) };
   }
-  const read = readTree(source, from);
+  const read = await readTree(source, from);
   if (to === 'markdown' || to === 'commonmark') {
-    return { value: writeMarkdown(read.tree), diagnostics: publicDiagnostics(read.diagnostics) };
+    return {
+      value: (await loadMarkdown()).writeMarkdown(read.tree),
+      diagnostics: publicDiagnostics(read.diagnostics),
+    };
   }
   if (to === 'html') {
-    const written = markdownTreeToHtml(read.tree, { trust: 'untrusted', rawHtml: 'drop' });
+    const written = (await loadMarkdownHtml()).markdownTreeToHtml(read.tree, {
+      trust: 'untrusted',
+      rawHtml: 'drop',
+    });
     return {
       value: written.html,
       diagnostics: publicDiagnostics([...read.diagnostics, ...written.diagnostics]),
     };
   }
-  const written = writeMarkdownDialect(read.tree, to, { trust: 'untrusted' });
+  const written = (await loadDialects()).writeMarkdownDialect(read.tree, to, {
+    trust: 'untrusted',
+  });
   return {
     value: written.value,
     diagnostics: publicDiagnostics([...read.diagnostics, ...written.diagnostics]),
@@ -108,7 +130,7 @@ export const mdConvert: Operation = defineOperation({
     properties: {
       source: {
         type: 'string',
-        maxLength: SOURCE_MAX,
+        maxLength: MD_SOURCE_MAX,
         description: 'The untrusted source text to convert (at most 1000000 characters).',
       },
       from: formatSchema,
@@ -143,7 +165,7 @@ export const mdConvert: Operation = defineOperation({
       },
     },
   ],
-  handler(input) {
+  async handler(input) {
     const source = typeof input.source === 'string' ? input.source : '';
     const from = isFormat(input.from) ? input.from : 'markdown';
     const to = isFormat(input.to) ? input.to : 'plain-text';
@@ -161,7 +183,7 @@ export const mdRender: Operation = defineOperation({
     properties: {
       source: {
         type: 'string',
-        maxLength: SOURCE_MAX,
+        maxLength: MD_SOURCE_MAX,
         description: 'Untrusted Markdown source (at most 1000000 characters).',
       },
       gfm: {
@@ -191,10 +213,13 @@ export const mdRender: Operation = defineOperation({
       input: { source: 'See **docs** at [x](javascript:alert(1)).' },
     },
   ],
-  handler(input) {
+  async handler(input) {
     const source = typeof input.source === 'string' ? input.source : '';
-    const read = parseMarkdown(source, { gfm: input.gfm !== false });
-    const written = markdownTreeToHtml(read.tree, { trust: 'untrusted', rawHtml: 'drop' });
+    const read = (await loadMarkdown()).parseMarkdown(source, { gfm: input.gfm !== false });
+    const written = (await loadMarkdownHtml()).markdownTreeToHtml(read.tree, {
+      trust: 'untrusted',
+      rawHtml: 'drop',
+    });
     return {
       html: written.html,
       diagnostics: publicDiagnostics([...read.diagnostics, ...written.diagnostics]),
