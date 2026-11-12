@@ -13,6 +13,7 @@
       "responsive-sweep.spec.ts",
       "site-built-with.spec.ts",
       "site-docs-shell.spec.ts",
+      "site-emoji.spec.ts",
       "site-drag-workflows.spec.ts",
       "site-editor.spec.ts",
       "site-sheets.spec.ts",

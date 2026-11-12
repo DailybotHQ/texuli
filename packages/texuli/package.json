@@ -105,6 +105,11 @@
       "svelte": "./src/components/empty/index.ts",
       "default": "./src/components/empty/index.ts"
     },
+    "./emoji": {
+      "types": "./src/emoji/index.ts",
+      "svelte": "./src/emoji/index.ts",
+      "default": "./src/emoji/index.ts"
+    },
     "./feedback": {
       "types": "./src/components/feedback/index.ts",
       "svelte": "./src/components/feedback/index.ts",
@@ -420,6 +425,7 @@
   },
   "dependencies": {
     "@texuli/core": "0.17.4",
+    "@texuli/emojis": "0.0.0",
     "@texuli/primitives": "0.17.4",
     "@texuli/spec": "0.17.4",
     "@texuli/tokens": "0.17.4"

@@ -1,0 +1,112 @@
+---
+import ExamplePreviewMount from '../../components/examples/ExamplePreviewMount.svelte';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Emoji components"
+  description="Accessible emoji rendering, safe text tokenization and a keyboard-friendly emoji picker for Texuli."
+>
+  <div class="emoji-docs" data-tx-emoji-page>
+    <p class="crumb"><a href="/component-pages/">Components</a> / Emoji</p>
+    <header>
+      <p class="eyebrow">texuli/emoji</p>
+      <h1>Emoji components</h1>
+      <p class="lead">
+        Render system Unicode emoji by default, turn shortcode text into safe nodes, and let people
+        browse emoji with search, categories and keyboard controls. Texuli artwork can be added by a
+        host resolver when an approved asset source is available.
+      </p>
+    </header>
+
+    <section aria-labelledby="emoji-demo-heading">
+      <h2 id="emoji-demo-heading">Try the picker</h2>
+      <p>Choose a Unicode emoji; the selected id and recent list stay in this page's state.</p>
+      <div class="demo">
+        <ExamplePreviewMount client:load id="texuli-emoji-picker" />
+      </div>
+    </section>
+
+    <section aria-labelledby="emoji-api-heading">
+      <h2 id="emoji-api-heading">Components</h2>
+      <dl>
+        <div>
+          <dt><code>Emoji</code></dt>
+          <dd>Displays one catalog identity as system Unicode and uses its CLDR name as the accessible name.</dd>
+        </div>
+        <div>
+          <dt><code>EmojiText</code></dt>
+          <dd>Turns recognized Unicode sequences and shortcodes into text and emoji nodes without an HTML sink.</dd>
+        </div>
+        <div>
+          <dt><code>EmojiPicker</code></dt>
+          <dd>Loads the catalog when mounted; its search, categories, grid navigation, tones and recents are local or host controlled.</dd>
+        </div>
+      </dl>
+      <p>
+        The package is in development. The builder and web components are planned for the next release;
+        they are not available from npm yet.
+      </p>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .emoji-docs {
+    display: grid;
+    gap: var(--tx-space-6);
+  }
+
+  .crumb,
+  .eyebrow {
+    margin: 0;
+    color: var(--tx-muted-foreground, GrayText);
+    font-size: var(--tx-type-label-size);
+  }
+
+  h1 {
+    margin: var(--tx-space-2) 0;
+    font-size: var(--tx-type-display-size);
+  }
+
+  .lead {
+    max-inline-size: 48rem;
+    color: var(--tx-muted-foreground, GrayText);
+    font-size: var(--tx-type-body-size);
+  }
+
+  section {
+    display: grid;
+    gap: var(--tx-space-3);
+    max-inline-size: 56rem;
+  }
+
+  .demo {
+    border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-shape-radius-lg);
+    padding: var(--tx-space-4);
+  }
+
+  dl {
+    display: grid;
+    gap: var(--tx-space-3);
+    margin: 0;
+  }
+
+  dl div {
+    display: grid;
+    gap: var(--tx-space-1);
+  }
+
+  dt {
+    font-weight: var(--tx-type-label-weight);
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  a {
+    color: var(--tx-link, LinkText);
+  }
+</style>
