@@ -1,0 +1,101 @@
+---
+/**
+ * /markdown/ — the Markdown, HTML and chat-dialect stack in @texuli/core
+ * (ADR-034). In development: added after 0.17.4, not in a published release yet.
+ */
+import { safeHref } from '@texuli/core/url-policy';
+import DocsShell from '../../components/docs-shell/DocsShell.astro';
+import PageBanner from '../../components/landing/PageBanner.astro';
+
+const repo = (path: string) =>
+  safeHref(`https://github.com/DailybotHQ/texuli/blob/main/${path}`, 'developer');
+
+const SUBPATHS = [
+  {
+    id: 'markdown',
+    module: '@texuli/core/markdown',
+    role: 'Parse GitHub Flavored Markdown or strict CommonMark 0.31.2 into the texuli-md/v1 AST, and write it back.',
+    docs: 'packages/core/docs/core-markdown.md',
+  },
+  {
+    id: 'markdown-html',
+    module: '@texuli/core/markdown-html',
+    role: 'Write the AST as a safe HTML fragment through core/markup. Raw HTML is dropped; every href and src uses the URL policy.',
+    docs: 'packages/core/docs/core-markdown-html.md',
+  },
+  {
+    id: 'html',
+    module: '@texuli/core/html',
+    role: 'Read untrusted HTML into the AST with a DOM-free tokenizer and an element and attribute allowlist.',
+    docs: 'packages/core/docs/core-html.md',
+  },
+  {
+    id: 'markdown-dialects',
+    module: '@texuli/core/markdown-dialects',
+    role: 'Convert the AST to and from Slack, Discord, WhatsApp, Telegram, Teams, Google Chat, Mattermost and plain text, with loss diagnostics.',
+    docs: 'packages/core/docs/core-markdown-dialects.md',
+  },
+] as const;
+
+const toc = [
+  { id: 'status', label: 'Status', level: 2 as const },
+  { id: 'subpaths', label: 'Subpaths', level: 2 as const },
+  { id: 'agents', label: 'Agents', level: 2 as const },
+];
+---
+
+<DocsShell
+  title="Markdown, HTML and chat dialects"
+  description="Untrusted Markdown, HTML and nine chat dialects through @texuli/core. In development, not in a published release yet."
+  {toc}
+>
+  <PageBanner art="page-guides" />
+  <p>
+    Texuli reads untrusted Markdown and HTML into one AST, writes a safe HTML fragment, and
+    converts chat dialects without raising trust. The stack lives in <code>@texuli/core</code> (on npm as <code>0.17.4</code>). These subpaths were added after that
+    release and are not in a published release yet.
+  </p>
+
+  <h2 id="status">Status</h2>
+  <p>
+    In development on this branch, not in a published release yet. Agents should call <code>md.convert</code> and <code>md.render</code> rather than import the texels, unless they
+    are writing app code.
+  </p>
+  <p>
+    The overview for app authors is the <a href={repo('packages/core/docs/markdown.md')}>core Markdown README</a>.
+  </p>
+
+  <h2 id="subpaths">Subpaths</h2>
+  <ul class="subpaths">
+    {
+      SUBPATHS.map((entry) => (
+        <li>
+          <code>{entry.module}</code>
+          <span>{entry.role}</span>
+          <a href={repo(entry.docs)}>Package docs</a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <h2 id="agents">Agents</h2>
+  <p>
+    <code>md.convert</code> and <code>md.render</code> are edge operations on the local MCP (<code>npx -y @texuli/mcp</code>), the remote <a href="/mcp-server/">Texuli MCP</a>, and <code>texuli md convert</code> / <code>texuli md render</code>. Related Solutions: <a href="/solutions/agent-chat/">Agent chat</a> and <a href="/solutions/editor/">Rich text editor</a>.
+  </p>
+</DocsShell>
+
+<style>
+  .subpaths {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0;
+    list-style: none;
+  }
+  .subpaths li {
+    display: grid;
+    gap: 0.25rem;
+  }
+  .subpaths code {
+    font-weight: 600;
+  }
+</style>

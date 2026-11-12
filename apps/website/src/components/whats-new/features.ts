@@ -158,6 +158,7 @@ export type DemoKind =
   | 'ds-tools'
   | 'ds-conformance'
   | 'protoyard-0100'
+  | 'platform-expansion'
   | 'removals';
 
 export interface Feature {
@@ -433,6 +434,24 @@ export const FEATURES: readonly Feature[] = [
     href: '/changelog/',
     linkLabel: 'The changelog',
     demo: 'preview',
+  },
+  {
+    id: 'platform-expansion',
+    release: '0.17.0',
+    title: 'Markdown, emoji and four new Solutions',
+    packages: [
+      '@texuli/core/markdown',
+      '@texuli/emojis',
+      'texuli/emoji',
+      '@texuli/chat',
+      '@texuli/editor',
+    ],
+    summary:
+      'A CommonMark and GFM Markdown stack with safe HTML and nine chat dialects, Texuli Emojis, and Solutions for Dashboards, Forms, Agent chat and Rich text editor. In development on this branch, not in a published release yet.',
+    href: '/solutions/',
+    linkLabel: 'The Solutions catalog',
+    demo: 'preview',
+    note: 'In development; not in a published release yet. @texuli/emojis is still private to the workspace.',
   },
   {
     id: 'removals',

@@ -1,6 +1,10 @@
 ---
+import { safeHref } from '@texuli/core/url-policy';
 import ExamplePreviewMount from '../../components/examples/ExamplePreviewMount.svelte';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const repo = (path: string) =>
+  safeHref(`https://github.com/DailybotHQ/texuli/blob/main/${path}`, 'developer');
 ---
 
 <BaseLayout
@@ -44,8 +48,21 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         </div>
       </dl>
       <p>
-        The package is in development. The builder and web components are planned for the next release;
-        they are not available from npm yet.
+        <code>texuli/emoji</code> is a subpath of the published <code>texuli</code> package. The
+        emoji components were added after <code>0.17.4</code> and are not in a published release
+        yet. The catalog engine <code>@texuli/emojis</code> is private to the workspace until a
+        release publishes it.
+      </p>
+      <ul>
+        <li>
+          <a href={repo('packages/emojis/README.md')}>@texuli/emojis README</a>
+        </li>
+        <li>
+          <a href={repo('packages/texuli/src/emoji/index.ts')}>texuli/emoji source</a>
+        </li>
+      </ul>
+      <p>
+        Related: <a href="/markdown/">Markdown, HTML and chat dialects</a>, <a href="/solutions/editor/">Rich text editor</a>, <a href="/solutions/agent-chat/">Agent chat</a>.
       </p>
     </section>
   </div>

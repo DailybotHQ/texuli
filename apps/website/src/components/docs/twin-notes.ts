@@ -47,6 +47,8 @@ const CATALOG_LINKS: readonly NoteLink[] = [
 
 const THEME_OPS = ['theme.search', 'theme.get', 'theme.preview'] as const;
 const CATALOG_OPS = ['catalog.search', 'component.get', 'example.search'] as const;
+const MARKDOWN_OPS = ['md.convert', 'md.render'] as const;
+const EMOJI_OPS = ['emoji.search', 'emoji.get', 'emoji.convert'] as const;
 
 /** Every note, first match wins. */
 export const TWIN_NOTES: readonly TwinNote[] = Object.freeze([
@@ -88,6 +90,23 @@ export const TWIN_NOTES: readonly TwinNote[] = Object.freeze([
     operations: ['example.search', 'catalog.search'],
     packages: ['examples', 'texuli'],
     links: CATALOG_LINKS,
+  },
+  {
+    route: /^\/emoji\/$/,
+    demo: 'The emoji picker runs in the browser: search, categories, keyboard grid and recents stay on the page. Texuli emoji art is still landing, so glyphs are Unicode.',
+    operations: [...EMOJI_OPS],
+    packages: ['emojis', 'texuli'],
+    links: [
+      { label: '@texuli/emojis README', href: `${REPO}/packages/emojis/README.md` },
+      { label: 'Markdown, HTML and chat dialects', href: '/markdown/' },
+    ],
+  },
+  {
+    route: /^\/markdown\/$/,
+    demo: 'This page lists the Markdown, HTML and chat-dialect subpaths. Convert and render through the MCP rather than importing the texels unless you are writing app code.',
+    operations: [...MARKDOWN_OPS],
+    packages: ['core', 'tools'],
+    links: [{ label: 'core Markdown README', href: `${REPO}/packages/core/docs/markdown.md` }],
   },
   {
     route: /^\/theme-studio\/$/,

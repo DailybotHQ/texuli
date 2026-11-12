@@ -21,10 +21,22 @@ const SITE_PAGES: readonly SearchEntry[] = [
     id: 'page-solutions',
     title: 'Solutions',
     description:
-      'Embeddable open-source systems that complete a task end to end: Slides, Documents, Workflows, Canvas and Sheets, each with a live demo (in development).',
+      'Embeddable open-source systems that complete a task end to end: Slides, Documents, Workflows, Canvas, Sheets, Design systems, Dashboards, Forms, Agent chat and Rich text editor, each with a live demo (in development).',
     href: '/solutions/',
     kind: 'page',
-    keywords: ['solutions', 'slides', 'documents', 'workflows', 'canvas', 'sheets', 'catalog'],
+    keywords: [
+      'solutions',
+      'slides',
+      'documents',
+      'workflows',
+      'canvas',
+      'sheets',
+      'dashboards',
+      'forms',
+      'agent chat',
+      'editor',
+      'catalog',
+    ],
   },
   {
     id: 'page-built-with',
@@ -181,6 +193,25 @@ const SITE_PAGES: readonly SearchEntry[] = [
     ],
   },
   {
+    id: 'page-forms-solution',
+    title: 'Forms',
+    description:
+      'Schema-driven forms: every field type, named formats, validation with announced errors, multi-step flows, conditional logic, drafts and autosave, and a visual builder (in development; the builder is not in a published release yet).',
+    href: '/solutions/forms/',
+    kind: 'page',
+    keywords: [
+      'forms',
+      'schema form',
+      'validation',
+      'steps',
+      'wizard',
+      'conditional',
+      'drafts',
+      'autosave',
+      'builder',
+    ],
+  },
+  {
     id: 'page-forms',
     title: 'Forms',
     description:
@@ -253,6 +284,15 @@ const SITE_PAGES: readonly SearchEntry[] = [
     keywords: ['editor', 'rich text', 'markdown', 'paste', 'emoji', 'slack', 'discord', 'export'],
   },
   {
+    id: 'page-dashboards-solution',
+    title: 'Dashboards',
+    description:
+      'Dashboards: widgets moved and resized by pointer or keyboard with announcements, breakpoints, persisted layouts, host data sources and agent dashboards (in development).',
+    href: '/solutions/dashboards/',
+    kind: 'page',
+    keywords: ['dashboard', 'widgets', 'grid', 'layout', 'drag', 'resize', 'persistence'],
+  },
+  {
     id: 'page-dashboards',
     title: 'Dashboards',
     description:
@@ -269,6 +309,24 @@ const SITE_PAGES: readonly SearchEntry[] = [
     href: '/output-page/',
     kind: 'page',
     keywords: ['email', 'pdf', 'print', 'i18n', 'translation', 'locale', 'message catalog'],
+  },
+  {
+    id: 'page-markdown',
+    title: 'Markdown, HTML and chat dialects',
+    description:
+      'Untrusted Markdown, HTML and nine chat dialects through @texuli/core (in development, not in a published release yet).',
+    href: '/markdown/',
+    kind: 'page',
+    keywords: ['markdown', 'html', 'gfm', 'commonmark', 'slack', 'discord', 'dialects'],
+  },
+  {
+    id: 'page-emoji',
+    title: 'Emoji components',
+    description:
+      'Accessible emoji rendering, safe text tokenization and a keyboard picker (texuli/emoji; added after 0.17.4, not in a published release yet).',
+    href: '/emoji/',
+    kind: 'page',
+    keywords: ['emoji', 'picker', 'shortcode', 'unicode', 'texuli/emoji'],
   },
   {
     id: 'page-whats-new',
