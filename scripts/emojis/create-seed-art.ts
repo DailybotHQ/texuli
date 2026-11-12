@@ -343,7 +343,7 @@ function faceArt(index: number, shortcode: string): string {
 
 function handArt(tone: string): string {
   const skin = TONE_HEX[tone] ?? '#e9b88f';
-  return `<g>${path('M18 33 C18 27 22 23 28 24 L32 26 L32 15 C32 10 39 10 40 15 L41 26 L45 23 C49 21 53 25 52 29 L50 34 C55 36 56 41 53 45 L49 51 C46 55 42 57 36 57 L27 56 C21 55 18 50 18 44 Z', skin, { stroke: '#704938', 'stroke-width': 1.8, 'stroke-linejoin': 'round' })}${path('M23 35 Q29 39 35 35 M24 42 Q31 46 39 42 M25 49 Q32 52 40 49', 'none', { stroke: '#b98263', 'stroke-width': 1.2, 'stroke-linecap': 'round' })}</g>`;
+  return `<g>${path('M12 36 C11 31 14 26 19 24 L35 22 C39 22 42 24 44 27 C46 22 49 16 52 14 C56 12 59 15 57 19 L54 27 L59 24 C63 23 65 27 62 31 L53 39 L51 45 C50 50 46 53 40 54 L24 54 C17 53 13 49 11 43 Z', skin, { stroke: '#704938', 'stroke-width': 1.8, 'stroke-linejoin': 'round' })}${path('M18 31 Q27 34 39 31 M16 37 Q27 41 41 37 M17 43 Q28 47 40 43', 'none', { stroke: '#b98263', 'stroke-width': 1.3, 'stroke-linecap': 'round' })}</g>`;
 }
 
 function personArt(shortcode: string): string {
@@ -766,12 +766,6 @@ const DEFINING_FEATURES: Readonly<Record<string, string>> = {
   ':thinking_face:': 'Raised eyebrow and a hand resting at the chin.',
   ':crying_face:': 'One blue tear and a downturned mouth.',
   ':loudly_crying_face:': 'Wide open anguished mouth and two long blue tear streams.',
-  ':thumbs_up_light_skin_tone:': 'Closed fist with one upright thumb; light skin tone.',
-  ':thumbs_up_medium_light_skin_tone:':
-    'Closed fist with one upright thumb; medium-light skin tone.',
-  ':thumbs_up_medium_skin_tone:': 'Closed fist with one upright thumb; medium skin tone.',
-  ':thumbs_up_medium_dark_skin_tone:': 'Closed fist with one upright thumb; medium-dark skin tone.',
-  ':thumbs_up_dark_skin_tone:': 'Closed fist with one upright thumb; dark skin tone.',
   ':woman_technologist:': 'Exactly one woman seated at or working at a laptop.',
   ':man_technologist:': 'Exactly one man seated at or working at a laptop.',
   ':flag_canada:':
@@ -789,6 +783,8 @@ const DEFINING_FEATURES: Readonly<Record<string, string>> = {
 function requiredFeatures(shortcode: string, name: string): string {
   const explicit = DEFINING_FEATURES[shortcode];
   if (explicit) return explicit;
+  if (shortcode.startsWith(':thumbs_up_'))
+    return `Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the ${name} modifier.`;
   if (shortcode.includes('skin_tone'))
     return `Recognizable ${name} hand/person silhouette and the specified skin tone.`;
   if (shortcode.includes('heart'))
