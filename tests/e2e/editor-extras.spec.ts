@@ -140,7 +140,7 @@ test('export for chat shows each format and what it loses, and never pings', asy
   await expect(output).toHaveJSProperty('readOnly', true);
   const slack = await output.inputValue();
   expect(slack).toContain('<https://example.com/beta|beta>');
-  expect(slack).toContain('@​here');
+  expect(slack).toContain('@\u200bhere');
   await expect(
     region.getByText('Checklist items are written with ☑ and ☐ marks. (×2)')
   ).toBeVisible();

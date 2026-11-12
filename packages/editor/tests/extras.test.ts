@@ -104,8 +104,8 @@ describe('export to chat dialects', () => {
   });
 
   it('never writes a live broadcast mention', () => {
-    expect(documentToDialect(source, 'discord').value).toContain('@​everyone');
-    expect(documentToDialect(source, 'slack').value).toContain('@​here');
+    expect(documentToDialect(source, 'discord').value).toContain('@\u200beveryone');
+    expect(documentToDialect(source, 'slack').value).toContain('@\u200bhere');
   });
 
   it('keeps checklist state as marks and reports what each format loses, grouped', () => {
