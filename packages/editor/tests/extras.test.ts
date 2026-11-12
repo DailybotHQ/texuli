@@ -260,9 +260,12 @@ describe('editor emoji (row 9)', () => {
   it('the toolbar emoji button opens the picker in a popover and inserts the choice', async () => {
     const controller = new EditorController({ doc: doc('Hi') });
     render(EditorToolbar, { props: { controller, emoji: true } });
-    const button = await within(screen.getByRole('toolbar')).findByRole('button', {
-      name: 'Emoji',
-    });
+    // The emoji button is a lazy chunk: wait for it like the picker below (1 s missed it under load).
+    const button = await within(screen.getByRole('toolbar')).findByRole(
+      'button',
+      { name: 'Emoji' },
+      { timeout: 10_000 }
+    );
     expect(button.getAttribute('aria-haspopup')).toBe('dialog');
     await fireEvent.click(button);
     const picker = await screen.findByRole('grid', {}, { timeout: 10_000 });
