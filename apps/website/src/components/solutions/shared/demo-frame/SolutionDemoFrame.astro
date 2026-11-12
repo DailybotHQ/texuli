@@ -66,10 +66,17 @@ const hasSource = Astro.slots.has('source');
 </section>
 
 <style>
+  /*
+   * The band is full width (SolutionLayout); the frame sits in the landing's 76rem column
+   * (73rem inside its 1.5rem gutters), centered, with the same side gutter on narrow screens.
+   */
   .solution-demo {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
+    box-sizing: border-box;
+    inline-size: min(100% - 2 * clamp(1rem, 4vw, 1.5rem), 73rem);
+    margin-inline: auto;
     min-inline-size: 0;
     padding: clamp(1rem, 3vw, 1.5rem);
     border: 1px solid var(--tx-border, GrayText);
@@ -92,9 +99,13 @@ const hasSource = Astro.slots.has('source');
     margin: 0;
   }
 
+  /* The landing's section title scale (stories, how it works), so the demo reads as a band. */
   h2 {
-    font-size: clamp(1.25rem, 3vw, 1.6rem);
-    line-height: 1.2;
+    font-size: clamp(1.6rem, 3.6vw, 2.25rem);
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
   }
 
   .solution-demo__actions {

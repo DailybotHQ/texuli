@@ -31,9 +31,22 @@ const renderers = { ...layoutRenderers, validateBlock: validateDeckBlock };
 </div>
 
 <style>
+  /*
+   * The preview is server-rendered and never hydrates, so the stage never measures its box:
+   * its viewport stays `data-tx-deck-fit="pending"`, which hides the canvas until a fit. Fit
+   * it in CSS instead. The viewport is 16:9 at the preview's full width, like the canvas, so
+   * the scale is the container width over the canvas width; `tan(atan2(a, b))` divides two
+   * lengths into a plain number (trigonometric functions and container units).
+   */
   .slides-preview {
     min-inline-size: 0;
     max-inline-size: 100%;
+    container-type: inline-size;
+  }
+
+  .slides-preview :global(.tx-deck-stage__viewport[data-tx-deck-fit='pending'] .tx-deck-stage__canvas) {
+    --tx-deck-scale: tan(atan2(100cqi, var(--tx-deck-canvas-width, 1280px)));
+    visibility: visible;
   }
 
   .preview__note {
