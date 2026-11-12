@@ -72,6 +72,21 @@ Related detail: [CSP and Trusted Types](quality/csp.md),
 | **Tests** | `packages/core/tests/url-policy.test.ts` |
 | **Residual** | A host that binds raw attributes bypasses the door. Allowed HTTPS hosts can still track (privacy, not script). |
 
+**Check the value that is written (fixed in `0.17.5`).** A URL check is only
+sound when it runs on the exact value the sink receives. Before `0.17.5`,
+`linkUrl` and `imageUrl` in `@texuli/core/markup` checked the raw value,
+and `serializeHtml` and `serializeXml` then wrote it through
+`sanitizeMarkupChars`, which drops characters markup cannot carry
+(unpaired surrogates, the noncharacters U+FFFE and U+FFFF, C0 controls).
+A dropped surrogate or noncharacter could keep a value from parsing as a
+scheme during the check (the policy already strips controls itself), so a developer-tier value passed that was written with an executable
+scheme. The untrusted tier was not affected, because it accepts only
+`https:`, `mailto:` and fragments. Both functions now normalize with
+`sanitizeMarkupChars` first and check the result, so the checked and the
+written URL are one string; `packages/core/tests/markup.test.ts` covers
+both serializers at both tiers. Any new writer that transforms a URL after
+the policy check must check the transformed value instead.
+
 ### 2. Blocks untrusted-input guard (`@texuli/blocks`)
 
 | | |

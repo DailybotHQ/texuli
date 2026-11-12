@@ -1,6 +1,6 @@
 ## What Documents is
 
-Documents is a complete edit-read-export system: `@texuli/document` holds the framework-free block format, validator, operations with undo, Markdown, pagination, owned DOCX and PDF writers and CRDT sync; `@texuli/pages` is the Svelte 5 editor, reader, paged view, export and collaboration on top of it; `@texuli/editor` is the rich-text surface inside text blocks. All three packages are published as `0.17.4` and are **in development** (pre-1.0). Pin the exact version or use `^0.17.0`.
+Documents is a complete edit-read-export system: `@texuli/document` holds the framework-free block format, validator, operations with undo, Markdown, pagination, owned DOCX and PDF writers and CRDT sync; `@texuli/pages` is the Svelte 5 editor, reader, paged view, export and collaboration on top of it; `@texuli/editor` is the rich-text surface inside text blocks. All three packages are published as `0.17.5` and are **in development** (pre-1.0). Pin the exact version or use `^0.17.0`.
 
 Editor and Pages are subsolutions of Documents, not separate Solutions.
 
