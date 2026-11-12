@@ -1,10 +1,16 @@
 /**
  * `md.convert` and `md.render`: untrusted Markdown, HTML and chat-dialect
  * conversions through `@texuli/core` (ADR-034). URLs always use the
- * `untrusted` tier. GFM and a CommonMark text writer are planned (T-md-gfm).
+ * `untrusted` tier. `markdown` is GitHub Flavored Markdown (GFM 0.29); `commonmark` is strict
+ * CommonMark 0.31.2.
  */
 import { htmlToMarkdownTree } from '@texuli/core/html';
-import { MARKDOWN_LIMITS, type MarkdownDiagnostic, parseMarkdown } from '@texuli/core/markdown';
+import {
+  MARKDOWN_LIMITS,
+  type MarkdownDiagnostic,
+  parseMarkdown,
+  writeMarkdown,
+} from '@texuli/core/markdown';
 import {
   convertMarkdownDialect,
   MARKDOWN_DIALECTS,
@@ -21,14 +27,14 @@ const SOURCE_MAX = MARKDOWN_LIMITS.source;
 const INPUT_BYTES = SOURCE_MAX + 100_000;
 const DIAGNOSTIC_MAX = 200;
 
-export const MARKDOWN_FORMATS = ['commonmark', 'html', ...MARKDOWN_DIALECTS] as const;
+export const MARKDOWN_FORMATS = ['markdown', 'commonmark', 'html', ...MARKDOWN_DIALECTS] as const;
 export type MarkdownFormat = (typeof MARKDOWN_FORMATS)[number];
 
 const formatSchema: JsonSchema = {
   type: 'string',
   enum: MARKDOWN_FORMATS,
   description:
-    'commonmark (parser today; text writer planned), html, or a chat dialect (slack, discord, whatsapp, telegram-markdown-v2, telegram-html, teams, google-chat, mattermost, plain-text). GFM is planned.',
+    'markdown (GitHub Flavored Markdown: tables, task lists, strikethrough, autolinks, footnotes), commonmark (strict CommonMark 0.31.2), html, or a chat dialect (slack, discord, whatsapp, telegram-markdown-v2, telegram-html, teams, google-chat, mattermost, plain-text).',
 };
 
 const diagnosticItem: JsonSchema = {
@@ -62,14 +68,9 @@ function publicDiagnostics(
   return list.slice(0, DIAGNOSTIC_MAX).map((item) => ({ code: item.code, message: item.message }));
 }
 
-const PLANNED_WRITER: MarkdownDiagnostic = {
-  code: 'unsupported-construct',
-  message:
-    'The CommonMark text writer is planned (T-md-gfm). GFM is planned. Convert to html or a chat dialect instead.',
-};
-
 function readTree(source: string, from: MarkdownFormat) {
-  if (from === 'commonmark') return parseMarkdown(source);
+  if (from === 'markdown') return parseMarkdown(source);
+  if (from === 'commonmark') return parseMarkdown(source, { gfm: false });
   if (from === 'html') return htmlToMarkdownTree(source, { trust: 'untrusted' });
   return readMarkdownDialect(source, from);
 }
@@ -80,8 +81,8 @@ function convert(source: string, from: MarkdownFormat, to: MarkdownFormat) {
     return { value: result.value, diagnostics: publicDiagnostics(result.diagnostics) };
   }
   const read = readTree(source, from);
-  if (to === 'commonmark') {
-    return { value: '', diagnostics: publicDiagnostics([...read.diagnostics, PLANNED_WRITER]) };
+  if (to === 'markdown' || to === 'commonmark') {
+    return { value: writeMarkdown(read.tree), diagnostics: publicDiagnostics(read.diagnostics) };
   }
   if (to === 'html') {
     const written = markdownTreeToHtml(read.tree, { trust: 'untrusted', rawHtml: 'drop' });
@@ -101,7 +102,7 @@ export const mdConvert: Operation = defineOperation({
   name: 'md.convert',
   title: 'Convert Markdown, HTML or a chat dialect',
   summary:
-    'Convert untrusted Markdown, HTML or a chat dialect (Slack, Discord, WhatsApp, Telegram MarkdownV2 and HTML, Teams, Google Chat, Mattermost, plain text) through the texuli-md/v1 AST. URLs use the untrusted policy. Returns { value, diagnostics }. CommonMark text output and GFM are planned.',
+    'Convert untrusted Markdown, HTML or a chat dialect (Slack, Discord, WhatsApp, Telegram MarkdownV2 and HTML, Teams, Google Chat, Mattermost, plain text) through the texuli-md/v1 AST. URLs use the untrusted policy. Returns { value, diagnostics }.',
   input: {
     type: 'object',
     properties: {
@@ -144,7 +145,7 @@ export const mdConvert: Operation = defineOperation({
   ],
   handler(input) {
     const source = typeof input.source === 'string' ? input.source : '';
-    const from = isFormat(input.from) ? input.from : 'commonmark';
+    const from = isFormat(input.from) ? input.from : 'markdown';
     const to = isFormat(input.to) ? input.to : 'plain-text';
     return convert(source, from, to);
   },
@@ -152,16 +153,21 @@ export const mdConvert: Operation = defineOperation({
 
 export const mdRender: Operation = defineOperation({
   name: 'md.render',
-  title: 'Render CommonMark to safe HTML',
+  title: 'Render Markdown to safe HTML',
   summary:
-    'Parse untrusted CommonMark 0.31.2 and write a safe HTML fragment through the markup allowlist. Every href and src uses the untrusted URL policy; raw HTML is dropped. Returns { html, diagnostics }. GFM is planned.',
+    'Parse untrusted Markdown (GFM by default; gfm: false for strict CommonMark 0.31.2) and write a safe HTML fragment through the markup allowlist. Every href and src uses the untrusted URL policy; raw HTML is dropped. Returns { html, diagnostics }.',
   input: {
     type: 'object',
     properties: {
       source: {
         type: 'string',
         maxLength: SOURCE_MAX,
-        description: 'Untrusted CommonMark source (at most 1000000 characters).',
+        description: 'Untrusted Markdown source (at most 1000000 characters).',
+      },
+      gfm: {
+        type: 'boolean',
+        description:
+          'GitHub Flavored Markdown extensions (default true); false for strict CommonMark.',
       },
     },
     required: ['source'],
@@ -187,7 +193,7 @@ export const mdRender: Operation = defineOperation({
   ],
   handler(input) {
     const source = typeof input.source === 'string' ? input.source : '';
-    const read = parseMarkdown(source);
+    const read = parseMarkdown(source, { gfm: input.gfm !== false });
     const written = markdownTreeToHtml(read.tree, { trust: 'untrusted', rawHtml: 'drop' });
     return {
       html: written.html,

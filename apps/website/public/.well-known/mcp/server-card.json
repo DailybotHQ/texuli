@@ -264,7 +264,7 @@
     {
       "name": "md.convert",
       "title": "Convert Markdown, HTML or a chat dialect",
-      "description": "Convert untrusted Markdown, HTML or a chat dialect (Slack, Discord, WhatsApp, Telegram MarkdownV2 and HTML, Teams, Google Chat, Mattermost, plain text) through the texuli-md/v1 AST. URLs use the untrusted policy. Returns { value, diagnostics }. CommonMark text output and GFM are planned.",
+      "description": "Convert untrusted Markdown, HTML or a chat dialect (Slack, Discord, WhatsApp, Telegram MarkdownV2 and HTML, Teams, Google Chat, Mattermost, plain text) through the texuli-md/v1 AST. URLs use the untrusted policy. Returns { value, diagnostics }.",
       "runtime": "edge",
       "remote": true,
       "local": true,
@@ -272,8 +272,8 @@
     },
     {
       "name": "md.render",
-      "title": "Render CommonMark to safe HTML",
-      "description": "Parse untrusted CommonMark 0.31.2 and write a safe HTML fragment through the markup allowlist. Every href and src uses the untrusted URL policy; raw HTML is dropped. Returns { html, diagnostics }. GFM is planned.",
+      "title": "Render Markdown to safe HTML",
+      "description": "Parse untrusted Markdown (GFM by default; gfm: false for strict CommonMark 0.31.2) and write a safe HTML fragment through the markup allowlist. Every href and src uses the untrusted URL policy; raw HTML is dropped. Returns { html, diagnostics }.",
       "runtime": "edge",
       "remote": true,
       "local": true,

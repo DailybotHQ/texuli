@@ -1030,7 +1030,7 @@ export const MCP_SERVER_DATA = {
       name: 'md.convert',
       title: 'Convert Markdown, HTML or a chat dialect',
       summary:
-        'Convert untrusted Markdown, HTML or a chat dialect (Slack, Discord, WhatsApp, Telegram MarkdownV2 and HTML, Teams, Google Chat, Mattermost, plain text) through the texuli-md/v1 AST. URLs use the untrusted policy. Returns { value, diagnostics }. CommonMark text output and GFM are planned.',
+        'Convert untrusted Markdown, HTML or a chat dialect (Slack, Discord, WhatsApp, Telegram MarkdownV2 and HTML, Teams, Google Chat, Mattermost, plain text) through the texuli-md/v1 AST. URLs use the untrusted policy. Returns { value, diagnostics }.',
       runtime: 'edge',
       remote: true,
       local: true,
@@ -1049,22 +1049,22 @@ export const MCP_SERVER_DATA = {
           name: 'from',
           required: true,
           description:
-            'commonmark (parser today; text writer planned), html, or a chat dialect (slack, discord, whatsapp, telegram-markdown-v2, telegram-html, teams, google-chat, mattermost, plain-text). GFM is planned.',
+            'markdown (GitHub Flavored Markdown: tables, task lists, strikethrough, autolinks, footnotes), commonmark (strict CommonMark 0.31.2), html, or a chat dialect (slack, discord, whatsapp, telegram-markdown-v2, telegram-html, teams, google-chat, mattermost, plain-text).',
         },
         {
           name: 'to',
           required: true,
           description:
-            'commonmark (parser today; text writer planned), html, or a chat dialect (slack, discord, whatsapp, telegram-markdown-v2, telegram-html, teams, google-chat, mattermost, plain-text). GFM is planned.',
+            'markdown (GitHub Flavored Markdown: tables, task lists, strikethrough, autolinks, footnotes), commonmark (strict CommonMark 0.31.2), html, or a chat dialect (slack, discord, whatsapp, telegram-markdown-v2, telegram-html, teams, google-chat, mattermost, plain-text).',
         },
       ],
       example: 'Slack mrkdwn to Discord',
     },
     {
       name: 'md.render',
-      title: 'Render CommonMark to safe HTML',
+      title: 'Render Markdown to safe HTML',
       summary:
-        'Parse untrusted CommonMark 0.31.2 and write a safe HTML fragment through the markup allowlist. Every href and src uses the untrusted URL policy; raw HTML is dropped. Returns { html, diagnostics }. GFM is planned.',
+        'Parse untrusted Markdown (GFM by default; gfm: false for strict CommonMark 0.31.2) and write a safe HTML fragment through the markup allowlist. Every href and src uses the untrusted URL policy; raw HTML is dropped. Returns { html, diagnostics }.',
       runtime: 'edge',
       remote: true,
       local: true,
@@ -1077,7 +1077,13 @@ export const MCP_SERVER_DATA = {
         {
           name: 'source',
           required: true,
-          description: 'Untrusted CommonMark source (at most 1000000 characters).',
+          description: 'Untrusted Markdown source (at most 1000000 characters).',
+        },
+        {
+          name: 'gfm',
+          required: false,
+          description:
+            'GitHub Flavored Markdown extensions (default true); false for strict CommonMark.',
         },
       ],
       example: 'Bold text and a refused script link',

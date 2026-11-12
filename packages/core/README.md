@@ -165,7 +165,7 @@ Ships in `0.6.0`; the `0.5.0` release predates it:
 - Positioning: [core-position-math.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-position-math.md)
   and [core-position-dom.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-position-dom.md)
 - Rich text editor model: [core-editor.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-editor.md)
-- Markdown for agents (ADR-034, in development): [markdown.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/markdown.md) (`md.convert` and `md.render`; GFM and a CommonMark text writer are planned)
+- Markdown for agents (ADR-034, in development): [markdown.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/markdown.md) (`md.convert` and `md.render`)
 - Markdown and HTML (ADR-034, in development): [core-markdown-html.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-markdown-html.md) (the Markdown AST to safe HTML) and [core-html.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-html.md) (untrusted HTML to the Markdown AST)
 - Static outputs: [core-markup.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-markup.md) (escaped XML and HTML builders) and [core-zip.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-zip.md) (the ZIP writer)
 - Chat Markdown conversion: [core-markdown-dialects.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-markdown-dialects.md) (platform syntax, escaping, URL policy and conversion losses)

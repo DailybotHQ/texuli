@@ -41,20 +41,34 @@ it('converts untrusted Markdown, HTML and chat dialects and refuses hostile URLs
     expect(String(outcome.output.value)).not.toContain('alert(1)');
   });
 
-  await scenario('CommonMark text output is planned', async () => {
-    const outcome = await texuliOps.invoke('md.convert', {
-      source: '**hi**',
+  await scenario('HTML to GFM text, and a strict CommonMark round trip', async () => {
+    const fromHtml = await texuliOps.invoke('md.convert', {
+      source:
+        '<table><tr><th>a</th></tr><tr><td><s>b</s></td></tr></table><a href="javascript:alert(1)">x</a>',
+      from: 'html',
+      to: 'markdown',
+    });
+    expect(fromHtml.ok).toBe(true);
+    if (!fromHtml.ok) return;
+    expect(String(fromHtml.output.value)).toContain('| a |');
+    expect(String(fromHtml.output.value)).toContain('~~b~~');
+    expect(String(fromHtml.output.value)).not.toContain('javascript:');
+    const strict = await texuliOps.invoke('md.convert', {
+      source: '**hi** ~~not strike~~',
       from: 'commonmark',
       to: 'commonmark',
     });
-    expect(outcome.ok).toBe(true);
-    if (!outcome.ok) return;
-    expect(outcome.output.value).toBe('');
-    expect(
-      (outcome.output.diagnostics as { code: string; message: string }[]).some(
-        (item) => item.code === 'unsupported-construct' && /planned/i.test(item.message)
-      )
-    ).toBe(true);
+    expect(strict.ok).toBe(true);
+    if (!strict.ok) return;
+    // Strict CommonMark has no strikethrough: the tildes stay text, escaped by the writer.
+    expect(strict.output.value).toBe('**hi** \\~\\~not strike\\~\\~\n');
+    const table = await texuliOps.invoke('md.render', { source: '| a |\n| - |\n| b |' });
+    const plain = await texuliOps.invoke('md.render', {
+      source: '| a |\n| - |\n| b |',
+      gfm: false,
+    });
+    expect(table.ok && String(table.output.html)).toContain('<table>');
+    expect(plain.ok && String(plain.output.html)).not.toContain('<table>');
   });
 
   await scenario('trust cannot be raised: no developer argument', async () => {
