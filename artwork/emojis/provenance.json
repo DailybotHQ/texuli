@@ -6,10 +6,11 @@
       "shortcode": ":grinning_face:",
       "name": "grinning face",
       "source": "originals/1f600.svg",
-      "sha256": "bbdd012037800c09ef4e1be35f7fb039575a95815d7c5371bec937997b47b6cd",
+      "sha256": "7e5ea868574a3722f955568a86ffd509bc3837bf591f89cf6f32ef82009743c9",
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Open toothy grin; rounded eyes; no tears or blush.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -19,10 +20,11 @@
       "shortcode": ":grinning_face_with_big_eyes:",
       "name": "grinning face with big eyes",
       "source": "originals/1f603.svg",
-      "sha256": "d63cbbfcccf21c96637dfbc0ff658b1a571686ab6511141e9166d7f96f5594ed",
+      "sha256": "c5350184ecc11eb5efd4024da6030c374716dc6aee1631e89a713f45096dddf4",
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Open toothy grin and visibly larger round eyes than other smiles.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -36,6 +38,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable grinning face with smiling eyes silhouette with its defining subject and visible details.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -49,6 +52,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable grinning squinting face silhouette with its defining subject and visible details.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -62,6 +66,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable grinning face with sweat silhouette with its defining subject and visible details.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -71,10 +76,11 @@
       "shortcode": ":slightly_smiling_face:",
       "name": "slightly smiling face",
       "source": "originals/1f642.svg",
-      "sha256": "bbdd012037800c09ef4e1be35f7fb039575a95815d7c5371bec937997b47b6cd",
+      "sha256": "d555aa8bd80c45f2eac7f3dd1eea4b056eff974ed8be7d41e2ccee3334c8ec5d",
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Small restrained closed smile; neutral open eyes.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -84,10 +90,11 @@
       "shortcode": ":smiling_face_with_smiling_eyes:",
       "name": "smiling face with smiling eyes",
       "source": "originals/1f60a.svg",
-      "sha256": "6db9b661e185944a7e6021b56182a3f987d07e78d82597769d90225b0812acfc",
+      "sha256": "a2395d48c1a1775eb2d1323a3108ca48c7be6f037504fc542e8c93e8afcbaeb2",
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Both eyes closed in upward arcs, gentle smile and two blush marks.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -101,6 +108,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable smiling face with halo silhouette with its defining subject and visible details.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -114,6 +122,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -127,6 +136,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -140,6 +150,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Five-point star silhouette.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -149,10 +160,11 @@
       "shortcode": ":smiling_face:",
       "name": "smiling face",
       "source": "originals/263a-fe0f.svg",
-      "sha256": "6db9b661e185944a7e6021b56182a3f987d07e78d82597769d90225b0812acfc",
+      "sha256": "d7bcf1a5218d8271c94d145df7083acf3dfaab279f69591780b4f2b8a7831fe9",
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Closed smile with two blush marks; no open mouth or tears.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -166,6 +178,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable smiling face with tear silhouette with its defining subject and visible details.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -175,10 +188,11 @@
       "shortcode": ":smiling_face_with_open_hands:",
       "name": "smiling face with open hands",
       "source": "originals/1f917.svg",
-      "sha256": "28c85014331c2cdc18a7d76dd532d18bb92c4e1afdcafbd3e8bb861887e31722",
+      "sha256": "6d8e72dbcd676322653a2a7904fcff294d3803daaa9a06ad54dc5694ea2cf2e8",
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "One smiling face framed by two visible open hands reaching in to hug.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -192,6 +206,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Round sun disc with visible rays.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -201,10 +216,11 @@
       "shortcode": ":thinking_face:",
       "name": "thinking face",
       "source": "originals/1f914.svg",
-      "sha256": "acec57c0c87de07e520476b448463d0f9d7d71a39c6af9d13da8ee68b1596b70",
+      "sha256": "2bd8b045064f07be13925b5733b58743ad80c2c2f5c436bec8a95d3d08bc450a",
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Raised eyebrow and a hand resting at the chin.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -218,6 +234,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable face with raised eyebrow silhouette with its defining subject and visible details.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -227,10 +244,11 @@
       "shortcode": ":crying_face:",
       "name": "crying face",
       "source": "originals/1f622.svg",
-      "sha256": "d7eb58e653cb5beb1df1f346dbce2e028c729e4ecb48f6586c715254e576bd99",
+      "sha256": "26c6f4a3c2c2277e03b3fd35276e51ae665ee9c6827585adc96a4f094fa84e37",
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "One blue tear and a downturned mouth.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -240,10 +258,11 @@
       "shortcode": ":loudly_crying_face:",
       "name": "loudly crying face",
       "source": "originals/1f62d.svg",
-      "sha256": "22d7a1c1d672782c7306b377546208399bac2ba88de07feabf9732480212a100",
+      "sha256": "fb2d25d4203f99a7acfc9703540904b556da4f8265a8a6296fd26f901fe89ccb",
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Wide open anguished mouth and two long blue tear streams.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -257,6 +276,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable angry face silhouette with its defining subject and visible details.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -270,6 +290,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable face screaming in fear silhouette with its defining subject and visible details.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -283,6 +304,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Ghost silhouette with sheet-like lower edge and two eyes.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -296,6 +318,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -309,6 +332,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -322,6 +346,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -335,6 +360,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -348,6 +374,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -361,6 +388,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -374,6 +402,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -387,6 +416,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -400,6 +430,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Rocket body, porthole, fins and flame.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -413,6 +444,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable tulip flower, with distinct petals, center and stem.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -426,6 +458,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable sunflower flower, with distinct petals, center and stem.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -439,6 +472,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable hibiscus flower, with distinct petals, center and stem.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -452,6 +486,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable closed book book shape; preserve its open or closed state.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -465,6 +500,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable open book book shape; preserve its open or closed state.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -478,6 +514,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Steaming cup with a visible handle.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -491,6 +528,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Triangular pizza slice with crust and visible toppings.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -504,6 +542,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Round sun disc with visible rays.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -517,6 +556,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Crescent silhouette with an inward-facing hollow.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -530,6 +570,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Flame silhouette with a smaller inner flame.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -543,6 +584,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Five-point star silhouette.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -556,6 +598,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Gift box with lid, ribbon and bow.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -569,6 +612,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Bear head with round ears, muzzle and nose.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -582,6 +626,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Inflated balloon with a tied neck and string.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -595,6 +640,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Camera body with lens and viewfinder detail.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -608,6 +654,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Single musical note with note head and stem.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -617,10 +664,11 @@
       "shortcode": ":thumbs_up_light_skin_tone:",
       "name": "thumbs up: light skin tone",
       "source": "originals/1f44d-1f3fb.svg",
-      "sha256": "fe20e0546e2c7760723bcc5104a207f87d5b26682937ca863b9a31f53d469769",
+      "sha256": "4c9521b6e1f12271115fcf6a0784842edc15857156a189ef37a4f6b8a575bed3",
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Closed fist with one upright thumb; light skin tone.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -630,10 +678,11 @@
       "shortcode": ":thumbs_up_medium_light_skin_tone:",
       "name": "thumbs up: medium-light skin tone",
       "source": "originals/1f44d-1f3fc.svg",
-      "sha256": "fe20e0546e2c7760723bcc5104a207f87d5b26682937ca863b9a31f53d469769",
+      "sha256": "4c9521b6e1f12271115fcf6a0784842edc15857156a189ef37a4f6b8a575bed3",
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Closed fist with one upright thumb; medium-light skin tone.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -643,10 +692,11 @@
       "shortcode": ":thumbs_up_medium_skin_tone:",
       "name": "thumbs up: medium skin tone",
       "source": "originals/1f44d-1f3fd.svg",
-      "sha256": "9e77f9dc2b7eee1f7fc2aa6756fb265f8a9aea8a5177bd909c0371d1c20fc525",
+      "sha256": "eff44ad5e70ac85be692f34b4568a93133ac54ca3cdb8927223831515d63ec2f",
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Closed fist with one upright thumb; medium skin tone.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -656,10 +706,11 @@
       "shortcode": ":thumbs_up_medium_dark_skin_tone:",
       "name": "thumbs up: medium-dark skin tone",
       "source": "originals/1f44d-1f3fe.svg",
-      "sha256": "026588d1ae3153debb9d0efdb3ea3c3537ce2cc962a4499801d18b351af5e12f",
+      "sha256": "6fdc0686f1e370858f23e036d0771645ac670c2ff268574268ad6c2f0386b929",
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Closed fist with one upright thumb; medium-dark skin tone.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -669,10 +720,11 @@
       "shortcode": ":thumbs_up_dark_skin_tone:",
       "name": "thumbs up: dark skin tone",
       "source": "originals/1f44d-1f3ff.svg",
-      "sha256": "12ea6eab441fd13fb4b7b02c67a46d193afdc48e691c0d48761e76fcbff32151",
+      "sha256": "41225cd539893e1cf0ffb7aa85441fcdc967d08e37ae9fcdd21edb1682c6755b",
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Closed fist with one upright thumb; dark skin tone.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -686,6 +738,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable woman silhouette with its defining subject and visible details.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -699,6 +752,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable woman: light skin tone hand/person silhouette and the specified skin tone.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -712,6 +766,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable woman: medium-light skin tone hand/person silhouette and the specified skin tone.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -725,6 +780,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable woman: medium skin tone hand/person silhouette and the specified skin tone.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -738,6 +794,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable woman: medium-dark skin tone hand/person silhouette and the specified skin tone.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -751,6 +808,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable woman: dark skin tone hand/person silhouette and the specified skin tone.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -760,10 +818,11 @@
       "shortcode": ":woman_technologist:",
       "name": "woman technologist",
       "source": "originals/1f469-200d-1f4bb.svg",
-      "sha256": "22614629ea67f9a6dc7ba459250be9516fed06382f06d733d7a6b2b449ae2dad",
+      "sha256": "1f8f8f6415c30758bf71fed3445e3c37ca664fd44c58fd4e296d4b1487af6a03",
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Exactly one woman seated at or working at a laptop.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -773,10 +832,11 @@
       "shortcode": ":man_technologist:",
       "name": "man technologist",
       "source": "originals/1f468-200d-1f4bb.svg",
-      "sha256": "22614629ea67f9a6dc7ba459250be9516fed06382f06d733d7a6b2b449ae2dad",
+      "sha256": "5a7654bb89b215461a773788860d0a64f7c84751f522c4dafea4e15ed49e61c3",
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Exactly one man seated at or working at a laptop.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -790,6 +850,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -803,6 +864,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Three distinct people in the family grouping named family: man, woman, girl.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -812,10 +874,11 @@
       "shortcode": ":rainbow_flag:",
       "name": "rainbow flag",
       "source": "originals/1f3f3-fe0f-200d-1f308.svg",
-      "sha256": "69bd1fc0b48470b31bc5ec0af22807d25e50dada91681403671f3e9c019bdfea",
+      "sha256": "beaeab41985c2acc795266da683dfbde3634d8bb0df26d0022ccd05f52c48435",
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Horizontal rainbow bands attached to one vertical flagpole; no easel or legs.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -829,6 +892,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Two distinct people visibly holding hands.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -842,6 +906,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Red-white stripes and blue canton with white stars.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -851,10 +916,11 @@
       "shortcode": ":flag_canada:",
       "name": "flag: Canada",
       "source": "originals/1f1e8-1f1e6.svg",
-      "sha256": "ab4c824b971b0ce8e938e1a4be25d980e9320a8fb659cff206ab28f282594f99",
+      "sha256": "8dfd1544368d34b612676a7811060217aee52db4954f33350e8bc42217358edd",
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Red-white-red vertical bands with a recognizable red maple leaf centered on white.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -868,6 +934,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Blue field with layered white and red diagonal and central crosses.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -881,6 +948,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "White field with one centered red disc.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -894,6 +962,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Green field, yellow diamond and centered blue globe.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -907,6 +976,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Three horizontal black, red and gold bands.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -920,6 +990,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "Three vertical blue, white and red bands.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"
@@ -933,6 +1004,7 @@
       "author": "agent lane local:wH:p2R",
       "date": "2026-11-12",
       "method": "Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.",
+      "requiredFeatures": "White field with a centered red St George cross.",
       "review": "Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.",
       "status": "reviewed-candidate",
       "proposedLicense": "CC BY 4.0 (pending owner sign-off)"

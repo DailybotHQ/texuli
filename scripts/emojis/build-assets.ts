@@ -14,6 +14,7 @@ interface ProvenanceRow {
   date: string;
   method: string;
   review: string;
+  requiredFeatures: string;
   status: 'reviewed-candidate';
   proposedLicense: string;
 }
@@ -34,6 +35,8 @@ function main(): void {
   mkdirSync(SVG_OUT, { recursive: true });
   const expectedFiles = new Set<string>();
   const manifest = provenance.records.map((record) => {
+    if (!record.requiredFeatures.trim())
+      throw new Error(`missing meaning requirements for art candidate ${record.id}`);
     if (!/^[0-9a-f]+(?:-[0-9a-f]+)*$/.test(record.id))
       throw new Error(`invalid asset id: ${record.id}`);
     const filename = `${record.id}.svg`;

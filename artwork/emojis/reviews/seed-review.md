@@ -7,11 +7,17 @@ technical seed review, not license approval.
 ## Review method
 
 Reviewed the 72 source drawings against `docs/emojis/ART_DIRECTION.md`, then
-compared each source with its deterministic sanitized package SVG. The
-review checks transparent 64×64 canvas, readable outer silhouette, sensible
-palette, non-overlapping features, authored modifier layers, flag colors and
-absence of references to third-party art. The test harness checks the exact
-64 package files and their per-file provenance and hashes.
+compared each source with its deterministic sanitized package SVG. R2 also
+checks each CLDR name and its defining features against the rendered glyph.
+The 72-candidate sheets were reviewed at 64 px and 24 px on both light and
+dark grounds; the per-candidate results and required features are recorded in
+`meaning-checklist.md` and `meaning-review.json`. Plan-only contact sheets are
+under `analysis_results/emoji/seed-contact-sheet-r2-*.png`. The review also
+checks transparent 64×64 canvas, readable outer silhouette, sensible palette,
+non-overlapping features, authored modifier layers, accurate flag symbols and
+absence of references to third-party art. The validation harness checks exact
+source/package IDs, per-file provenance and hashes, and the meaning review's
+CLDR identity, requirements, reviewer and passing verdict.
 
 ## Representative before/after checks
 
@@ -26,13 +32,14 @@ absence of references to third-party art. The test harness checks the exact
 
 The package output is a deterministic allow-list serialization of the source;
 it does not perform a visual redesign. Both forms are linked above so later
-reviewers can compare exact source and packaged output. The available
-automated gate has not rendered an independent pixel contact sheet; approval
-for art quality and licensing remains open.
+reviewers can compare exact source and packaged output. The R2 contact sheets
+are review artifacts, not package inputs. This is an author self-review;
+independent owner art review and license approval remain open.
 
 ## Inventory
 
 - Source and package candidates: 72 SVGs, all in the manifest.
+- Meaning checklist: 72 CLDR-linked candidate results pass this lane's self-review.
 - Successfully sanitized/validated: recorded by `validate-art.ts` at run time.
 - Approved artwork: 0 pending owner license and independent review.
 - Unicode fully-qualified target: 3,963; missing approved art: 3,963.

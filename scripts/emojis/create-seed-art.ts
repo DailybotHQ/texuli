@@ -139,6 +139,28 @@ const path = (d: string, fill: string, extra: Record<string, string | number> = 
   shape('path', { d, fill, ...extra });
 
 function faceArt(index: number, shortcode: string): string {
+  if (shortcode === ':smiling_face_with_open_hands:') {
+    return [
+      path(
+        'M8 43 C2 34 8 24 15 28 L20 35 L21 26 C22 21 29 22 29 27 L28 39 C24 51 17 56 12 53 Z',
+        '#e6b28d',
+        { stroke: '#815a4a', 'stroke-width': 2 }
+      ),
+      path(
+        'M56 43 C62 34 56 24 49 28 L44 35 L43 26 C42 21 35 22 35 27 L36 39 C40 51 47 56 52 53 Z',
+        '#e6b28d',
+        { stroke: '#815a4a', 'stroke-width': 2 }
+      ),
+      circle(32, 32, 22, '#ffc94a', { stroke: '#b86631', 'stroke-width': 1.5 }),
+      circle(23, 28, 2.3, '#342f43'),
+      circle(41, 28, 2.3, '#342f43'),
+      path('M22 39 Q32 49 42 39', 'none', {
+        stroke: '#633d37',
+        'stroke-width': 3,
+        'stroke-linecap': 'round',
+      }),
+    ].join('');
+  }
   const parts = [
     circle(32, 33, 25, FACE_COLORS[index % FACE_COLORS.length], {
       stroke: '#b86631',
@@ -175,7 +197,7 @@ function faceArt(index: number, shortcode: string): string {
     );
   } else {
     const eyeY = shortcode === ':face_screaming_in_fear:' ? 26 : 29;
-    const eyeR = shortcode === ':grinning_face_with_big_eyes:' ? 3.7 : 2.4;
+    const eyeR = shortcode === ':grinning_face_with_big_eyes:' ? 4.6 : 2.4;
     if (
       shortcode === ':grinning_face_with_smiling_eyes:' ||
       shortcode === ':grinning_squinting_face:'
@@ -201,11 +223,21 @@ function faceArt(index: number, shortcode: string): string {
     );
   if (shortcode === ':thinking_face:')
     parts.push(
-      path('M41 42 Q48 40 49 47 L42 50', 'none', {
+      path('M15 22 Q22 16 29 21 M37 20 L49 16', 'none', {
         stroke: '#805c47',
-        'stroke-width': 3,
+        'stroke-width': 2.5,
         'stroke-linecap': 'round',
-      })
+      }),
+      path(
+        'M43 40 C49 38 53 42 51 47 L45 51 L40 48 L35 51 L31 47 L36 42 Z M40 43 L39 38 M45 43 L45 39',
+        'none',
+        {
+          stroke: '#805c47',
+          'stroke-width': 3,
+          'stroke-linecap': 'round',
+          'stroke-linejoin': 'round',
+        }
+      )
     );
   if (shortcode === ':angry_face:') {
     parts.push(
@@ -222,19 +254,64 @@ function faceArt(index: number, shortcode: string): string {
         'stroke-linecap': 'round',
       })
     );
-  } else if (shortcode === ':crying_face:' || shortcode === ':loudly_crying_face:') {
+  } else if (shortcode === ':crying_face:') {
     parts.push(
-      path('M22 34 Q32 40 42 34', 'none', {
+      path('M21 38 Q32 49 43 38', 'none', {
         stroke: '#55333b',
         'stroke-width': 3,
         'stroke-linecap': 'round',
-      })
+      }),
+      path('M22 32 C17 39 18 43 22 45 C26 43 27 39 22 32 Z', '#62aee7')
     );
+  } else if (shortcode === ':loudly_crying_face:') {
     parts.push(
-      path('M22 33 Q17 40 21 46 Q25 42 22 33 M42 33 Q37 40 41 46 Q45 42 42 33', '#62aee7')
+      path('M20 37 Q32 31 44 37 L42 47 Q32 55 22 47 Z', '#593748', {
+        stroke: '#55333b',
+        'stroke-width': 1.5,
+      }),
+      path(
+        'M18 31 C12 40 13 49 18 54 C23 49 24 40 18 31 Z M46 31 C40 40 41 49 46 54 C51 49 52 40 46 31 Z',
+        '#62aee7'
+      )
     );
   } else if (shortcode === ':face_screaming_in_fear:') {
     parts.push(circle(32, 43, 7, '#593748'));
+  } else if (shortcode === ':grinning_face:' || shortcode === ':grinning_face_with_big_eyes:') {
+    parts.push(
+      path('M19 36 Q32 31 45 36 L43 46 Q32 54 21 46 Z', '#633d37', {
+        stroke: '#633d37',
+        'stroke-width': 1.5,
+      }),
+      path('M23 38 L41 38 L39 42 L25 42 Z', '#fff8e8')
+    );
+  } else if (shortcode === ':slightly_smiling_face:') {
+    parts.push(
+      path('M23 39 Q32 45 41 39', 'none', {
+        stroke: '#633d37',
+        'stroke-width': 2,
+        'stroke-linecap': 'round',
+      })
+    );
+  } else if (shortcode === ':smiling_face:') {
+    parts.push(
+      circle(17, 35, 4, '#f08b86', { opacity: 0.65 }),
+      circle(47, 35, 4, '#f08b86', { opacity: 0.65 }),
+      path('M21 39 Q32 49 43 39', 'none', {
+        stroke: '#633d37',
+        'stroke-width': 2.7,
+        'stroke-linecap': 'round',
+      })
+    );
+  } else if (shortcode === ':smiling_face_with_smiling_eyes:') {
+    parts.push(
+      circle(17, 36, 4, '#f08b86', { opacity: 0.72 }),
+      circle(47, 36, 4, '#f08b86', { opacity: 0.72 }),
+      path('M22 40 Q32 47 42 40', 'none', {
+        stroke: '#633d37',
+        'stroke-width': 2.7,
+        'stroke-linecap': 'round',
+      })
+    );
   } else {
     parts.push(
       path('M20 38 Q32 52 44 38', 'none', {
@@ -266,7 +343,7 @@ function faceArt(index: number, shortcode: string): string {
 
 function handArt(tone: string): string {
   const skin = TONE_HEX[tone] ?? '#e9b88f';
-  return `<g>${path('M28 53 C24 51 22 47 22 40 L22 27 C22 23 28 23 29 27 L30 34 L31 16 C31 11 37 11 38 16 L38 33 L40 21 C41 17 46 18 46 22 L45 35 L48 28 C50 25 55 28 53 32 L51 44 C50 51 45 55 38 56 Z', skin, { stroke: '#704938', 'stroke-width': 1.7, 'stroke-linejoin': 'round' })}${path('M32 36 L32 42 M39 35 L39 42 M46 36 L45 41', 'none', { stroke: '#b98263', 'stroke-width': 1.2, 'stroke-linecap': 'round' })}</g>`;
+  return `<g>${path('M18 33 C18 27 22 23 28 24 L32 26 L32 15 C32 10 39 10 40 15 L41 26 L45 23 C49 21 53 25 52 29 L50 34 C55 36 56 41 53 45 L49 51 C46 55 42 57 36 57 L27 56 C21 55 18 50 18 44 Z', skin, { stroke: '#704938', 'stroke-width': 1.8, 'stroke-linejoin': 'round' })}${path('M23 35 Q29 39 35 35 M24 42 Q31 46 39 42 M25 49 Q32 52 40 49', 'none', { stroke: '#b98263', 'stroke-width': 1.2, 'stroke-linecap': 'round' })}</g>`;
 }
 
 function personArt(shortcode: string): string {
@@ -511,6 +588,31 @@ function objectArt(shortcode: string, index: number): string {
 }
 
 function compositionArt(shortcode: string): string {
+  if (shortcode === ':woman_technologist:' || shortcode === ':man_technologist:') {
+    const isWoman = shortcode === ':woman_technologist:';
+    return [
+      shape('ellipse', { cx: 25, cy: 20, rx: 12, ry: 14, fill: isWoman ? '#4b355a' : '#594754' }),
+      circle(25, 22, 9, '#f0c29c', { stroke: '#795a4a', 'stroke-width': 1 }),
+      ...(isWoman ? [path('M13 21 Q12 6 25 6 Q38 7 37 24 L33 17 L19 16 Z', '#4b355a')] : []),
+      circle(22, 21, 1, '#342f43'),
+      circle(28, 21, 1, '#342f43'),
+      path('M22 27 Q25 29 28 27', 'none', {
+        stroke: '#704938',
+        'stroke-width': 1.4,
+        'stroke-linecap': 'round',
+      }),
+      path('M14 39 Q25 32 36 39 L40 54 L12 54 Z', isWoman ? '#9474c9' : '#606ba9'),
+      path('M32 39 L45 45 L45 49 L34 47 M14 40 L9 48 L13 51 L21 45', 'none', {
+        stroke: '#f0c29c',
+        'stroke-width': 4,
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round',
+      }),
+      rect(39, 31, 19, 16, '#596178', 2),
+      rect(41, 33, 15, 12, '#88c8d7', 1),
+      path('M43 49 L55 49 L58 53 L40 53 Z', '#697089'),
+    ].join('');
+  }
   if (shortcode === ':heart_on_fire:')
     return [
       path(
@@ -523,17 +625,18 @@ function compositionArt(shortcode: string): string {
     ].join('');
   if (shortcode === ':rainbow_flag:')
     return [
-      rect(11, 14, 42, 30, '#fff9f1', 3, { stroke: '#81698e', 'stroke-width': 1.5 }),
-      rect(12, 15, 40, 5, '#ed6a6e'),
-      rect(12, 20, 40, 5, '#f2ad4e'),
-      rect(12, 25, 40, 5, '#f4d05e'),
-      rect(12, 30, 40, 5, '#69b98c'),
-      rect(12, 35, 40, 8, '#718ed2'),
-      path('M18 44 L14 61 M46 44 L50 61 M14 61 L50 61', 'none', {
+      path('M10 6 L10 59', 'none', {
         stroke: '#75618a',
-        'stroke-width': 2,
+        'stroke-width': 2.5,
         'stroke-linecap': 'round',
       }),
+      rect(12, 9, 42, 30, '#fff9f1', 1, { stroke: '#81698e', 'stroke-width': 1 }),
+      rect(12.5, 9.5, 41, 5, '#ed6a6e'),
+      rect(12.5, 14.5, 41, 5, '#f2ad4e'),
+      rect(12.5, 19.5, 41, 5, '#f4d05e'),
+      rect(12.5, 24.5, 41, 5, '#69b98c'),
+      rect(12.5, 29.5, 41, 5, '#718ed2'),
+      rect(12.5, 34.5, 41, 4, '#8065b0'),
     ].join('');
   if (shortcode === ':family_man_woman_girl:')
     return [
@@ -589,7 +692,7 @@ function flagArt(shortcode: string): string {
       );
       inside.push(
         path(
-          'M32 20 L35 26 L40 25 L37 31 L40 36 L34 35 L32 42 L29 35 L24 36 L27 31 L24 26 L30 27 Z',
+          'M32 18 L35 24 L39 22 L38 28 L43 30 L38 33 L40 39 L34 37 L33 44 L31 44 L30 37 L24 39 L26 33 L21 31 L26 28 L25 23 L30 25 Z',
           '#d85261'
         )
       );
@@ -650,6 +753,77 @@ function render(group: Design['group'], shortcode: string, index: number): strin
   return objectArt(shortcode, index);
 }
 
+const DEFINING_FEATURES: Readonly<Record<string, string>> = {
+  ':grinning_face:': 'Open toothy grin; rounded eyes; no tears or blush.',
+  ':grinning_face_with_big_eyes:':
+    'Open toothy grin and visibly larger round eyes than other smiles.',
+  ':smiling_face_with_smiling_eyes:':
+    'Both eyes closed in upward arcs, gentle smile and two blush marks.',
+  ':slightly_smiling_face:': 'Small restrained closed smile; neutral open eyes.',
+  ':smiling_face:': 'Closed smile with two blush marks; no open mouth or tears.',
+  ':smiling_face_with_open_hands:':
+    'One smiling face framed by two visible open hands reaching in to hug.',
+  ':thinking_face:': 'Raised eyebrow and a hand resting at the chin.',
+  ':crying_face:': 'One blue tear and a downturned mouth.',
+  ':loudly_crying_face:': 'Wide open anguished mouth and two long blue tear streams.',
+  ':thumbs_up_light_skin_tone:': 'Closed fist with one upright thumb; light skin tone.',
+  ':thumbs_up_medium_light_skin_tone:':
+    'Closed fist with one upright thumb; medium-light skin tone.',
+  ':thumbs_up_medium_skin_tone:': 'Closed fist with one upright thumb; medium skin tone.',
+  ':thumbs_up_medium_dark_skin_tone:': 'Closed fist with one upright thumb; medium-dark skin tone.',
+  ':thumbs_up_dark_skin_tone:': 'Closed fist with one upright thumb; dark skin tone.',
+  ':woman_technologist:': 'Exactly one woman seated at or working at a laptop.',
+  ':man_technologist:': 'Exactly one man seated at or working at a laptop.',
+  ':flag_canada:':
+    'Red-white-red vertical bands with a recognizable red maple leaf centered on white.',
+  ':rainbow_flag:': 'Horizontal rainbow bands attached to one vertical flagpole; no easel or legs.',
+  ':flag_united_states:': 'Red-white stripes and blue canton with white stars.',
+  ':flag_united_kingdom:': 'Blue field with layered white and red diagonal and central crosses.',
+  ':flag_england:': 'White field with a centered red St George cross.',
+  ':flag_japan:': 'White field with one centered red disc.',
+  ':flag_brazil:': 'Green field, yellow diamond and centered blue globe.',
+  ':flag_germany:': 'Three horizontal black, red and gold bands.',
+  ':flag_france:': 'Three vertical blue, white and red bands.',
+};
+
+function requiredFeatures(shortcode: string, name: string): string {
+  const explicit = DEFINING_FEATURES[shortcode];
+  if (explicit) return explicit;
+  if (shortcode.includes('skin_tone'))
+    return `Recognizable ${name} hand/person silhouette and the specified skin tone.`;
+  if (shortcode.includes('heart'))
+    return 'Recognizable heart silhouette and the color named by CLDR.';
+  if (
+    shortcode.includes('flower') ||
+    shortcode.includes('tulip') ||
+    shortcode.includes('sunflower') ||
+    shortcode.includes('hibiscus')
+  )
+    return `Recognizable ${name} flower, with distinct petals, center and stem.`;
+  if (shortcode.startsWith(':flag_'))
+    return `Accurate colors and the defining national or regional symbol of ${name}.`;
+  if (shortcode.includes('book'))
+    return `Recognizable ${name} book shape; preserve its open or closed state.`;
+  if (shortcode.includes('family'))
+    return `Three distinct people in the family grouping named ${name}.`;
+  if (shortcode.includes('holding_hands')) return 'Two distinct people visibly holding hands.';
+  if (shortcode.includes('ghost'))
+    return 'Ghost silhouette with sheet-like lower edge and two eyes.';
+  if (shortcode.includes('pizza')) return 'Triangular pizza slice with crust and visible toppings.';
+  if (shortcode.includes('rocket')) return 'Rocket body, porthole, fins and flame.';
+  if (shortcode.includes('bear')) return 'Bear head with round ears, muzzle and nose.';
+  if (shortcode.includes('camera')) return 'Camera body with lens and viewfinder detail.';
+  if (shortcode.includes('balloon')) return 'Inflated balloon with a tied neck and string.';
+  if (shortcode.includes('moon')) return 'Crescent silhouette with an inward-facing hollow.';
+  if (shortcode.includes('sun')) return 'Round sun disc with visible rays.';
+  if (shortcode.includes('fire')) return 'Flame silhouette with a smaller inner flame.';
+  if (shortcode.includes('star')) return 'Five-point star silhouette.';
+  if (shortcode.includes('gift')) return 'Gift box with lid, ribbon and bow.';
+  if (shortcode.includes('beverage')) return 'Steaming cup with a visible handle.';
+  if (shortcode.includes('musical_note')) return 'Single musical note with note head and stem.';
+  return `Recognizable ${name} silhouette with its defining subject and visible details.`;
+}
+
 function main(): void {
   mkdirSync(OUT, { recursive: true });
   mkdirSync(dirname(PROVENANCE), { recursive: true });
@@ -673,6 +847,7 @@ function main(): void {
       date: DATE,
       method:
         'Original vector geometry authored from the Unicode/CLDR semantic label; no vendor glyph or source artwork used.',
+      requiredFeatures: requiredFeatures(emoji.shortcode, emoji.name),
       review:
         'Reviewed against ART_DIRECTION.md for silhouette, palette, transparency, small-scale readability and cultural accuracy; pending independent owner approval.',
       status: 'reviewed-candidate',
