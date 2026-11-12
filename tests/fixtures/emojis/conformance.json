@@ -83,15 +83,15 @@
     },
     {
       "name": "zwj-longest-match",
-      "input": "family 👨‍👩‍👧‍👦 end",
+      "input": "family 👨\u200d👩\u200d👧\u200d👦 end",
       "matches": [
         {
           "id": "1f468-200d-1f469-200d-1f467-200d-1f466",
-          "unicode": "👨‍👩‍👧‍👦",
+          "unicode": "👨\u200d👩\u200d👧\u200d👦",
           "start": 7,
           "end": 18,
           "kind": "unicode",
-          "source": "👨‍👩‍👧‍👦"
+          "source": "👨\u200d👩\u200d👧\u200d👦"
         }
       ],
       "tokens": [
@@ -104,11 +104,11 @@
         {
           "type": "emoji",
           "id": "1f468-200d-1f469-200d-1f467-200d-1f466",
-          "unicode": "👨‍👩‍👧‍👦",
+          "unicode": "👨\u200d👩\u200d👧\u200d👦",
           "start": 7,
           "end": 18,
           "kind": "unicode",
-          "source": "👨‍👩‍👧‍👦"
+          "source": "👨\u200d👩\u200d👧\u200d👦"
         },
         {
           "type": "text",
@@ -117,7 +117,7 @@
           "end": 22
         }
       ],
-      "toUnicode": "family 👨‍👩‍👧‍👦 end",
+      "toUnicode": "family 👨\u200d👩\u200d👧\u200d👦 end",
       "toShortcodes": "family :family_man_woman_girl_boy: end"
     },
     {
@@ -176,56 +176,56 @@
     },
     {
       "name": "keycap-sequence",
-      "input": "1️⃣",
+      "input": "1\ufe0f\u20e3",
       "matches": [
         {
           "id": "31-fe0f-20e3",
-          "unicode": "1️⃣",
+          "unicode": "1\ufe0f\u20e3",
           "start": 0,
           "end": 3,
           "kind": "unicode",
-          "source": "1️⃣"
+          "source": "1\ufe0f\u20e3"
         }
       ],
       "tokens": [
         {
           "type": "emoji",
           "id": "31-fe0f-20e3",
-          "unicode": "1️⃣",
+          "unicode": "1\ufe0f\u20e3",
           "start": 0,
           "end": 3,
           "kind": "unicode",
-          "source": "1️⃣"
+          "source": "1\ufe0f\u20e3"
         }
       ],
-      "toUnicode": "1️⃣",
+      "toUnicode": "1\ufe0f\u20e3",
       "toShortcodes": ":keycap_1:"
     },
     {
       "name": "heart-presentation",
-      "input": "❤️",
+      "input": "❤\ufe0f",
       "matches": [
         {
           "id": "2764-fe0f",
-          "unicode": "❤️",
+          "unicode": "❤\ufe0f",
           "start": 0,
           "end": 2,
           "kind": "unicode",
-          "source": "❤️"
+          "source": "❤\ufe0f"
         }
       ],
       "tokens": [
         {
           "type": "emoji",
           "id": "2764-fe0f",
-          "unicode": "❤️",
+          "unicode": "❤\ufe0f",
           "start": 0,
           "end": 2,
           "kind": "unicode",
-          "source": "❤️"
+          "source": "❤\ufe0f"
         }
       ],
-      "toUnicode": "❤️",
+      "toUnicode": "❤\ufe0f",
       "toShortcodes": ":red_heart:"
     },
     {

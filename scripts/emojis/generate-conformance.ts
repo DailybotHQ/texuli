@@ -41,7 +41,16 @@ const document = `${JSON.stringify(
   },
   null,
   2
-)}\n`;
+)}\n`.replace(
+  // Invisible format characters as \u escapes (the Trojan Source gate); JSON reads them back.
+  /(?:[\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]|[\ufe00-\ufe0f]|\u20e3|[\u{e0020}-\u{e007f}])/gu,
+  (character) => {
+    const point = character.codePointAt(0) ?? 0;
+    if (point <= 0xffff) return `\\u${point.toString(16).padStart(4, '0')}`;
+    const adjusted = point - 0x10000;
+    return `\\u${(0xd800 + (adjusted >> 10)).toString(16)}\\u${(0xdc00 + (adjusted & 0x3ff)).toString(16)}`;
+  }
+);
 
 const check = process.argv.includes('--check');
 if (process.argv.slice(2).some((arg) => arg !== '--check'))

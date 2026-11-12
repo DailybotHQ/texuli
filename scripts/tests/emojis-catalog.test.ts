@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { EmojiAliasIndex, EmojiCatalog } from '../../packages/emojis/src/data/schema.ts';
-import { generateFiles } from '../emojis/generate-catalog.ts';
+import { generateFiles, outputPath } from '../emojis/generate-catalog.ts';
 
 const ROOT = resolve(import.meta.dirname, '../..');
 const DATA = resolve(ROOT, 'packages/emojis/src/data');
@@ -99,7 +99,7 @@ describe('Emoji 18.0 generated catalog', () => {
   it('produces byte-stable outputs from the SHA-256-locked local inputs', () => {
     const generated = generateFiles();
     for (const [name, expected] of Object.entries(generated)) {
-      expect(readFileSync(resolve(DATA, name), 'utf8')).toBe(expected);
+      expect(readFileSync(outputPath(name), 'utf8'), name).toBe(expected);
     }
   });
 });

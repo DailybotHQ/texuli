@@ -602,6 +602,11 @@ function schemaDocument(recordCount: number) {
   };
 }
 
+/** Where a generated file lives: the Kotlin catalog under `generated/kotlin`, the rest in `src/data`. */
+export function outputPath(name: string): string {
+  return name === 'kotlin/EmojiCatalogData.kt' ? KOTLIN_OUTPUT : resolve(DATA_DIR, name);
+}
+
 function serializeJson(value: unknown): string {
   const stringify = (item: unknown): string =>
     (JSON.stringify(item) ?? 'null').replace(
@@ -717,7 +722,7 @@ export function run(options: { check?: boolean } = {}): void {
   const files = generateFiles();
   let changed = false;
   for (const name of OUTPUTS) {
-    const path = name === 'kotlin/EmojiCatalogData.kt' ? KOTLIN_OUTPUT : resolve(DATA_DIR, name);
+    const path = outputPath(name);
     const expected = files[name];
     let actual = '';
     try {
