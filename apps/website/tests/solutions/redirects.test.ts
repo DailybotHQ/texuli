@@ -30,6 +30,16 @@ describe('the applied Solution redirect map (ADR-028, first wave)', () => {
     for (const [, to] of active) expect(siteRouteExists(to ?? ''), to).toBe(true);
   });
 
+  it('does not redirect ADR-036 capability pages (dashboards, forms, editor)', () => {
+    for (const kept of ['/dashboards-page/', '/forms-page/', '/editor-page/']) {
+      expect(
+        active.some(([from]) => from === kept || from === kept.slice(0, -1)),
+        kept
+      ).toBe(false);
+      expect(resolveSolutionRedirect(kept, '', {})).toBeNull();
+    }
+  });
+
   it('has no chains or loops and never moves a kept path', () => {
     expect(solutionRedirectGraphIssues(SOLUTION_REDIRECTS)).toEqual([]);
     const sources = new Set(active.map(([from]) => from));

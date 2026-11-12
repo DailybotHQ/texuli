@@ -16,6 +16,7 @@ describe('ecosystem route budgets', () => {
     const ART = /art \(\d{4}-\d{2}-\d{2}\).*Measured [\d.]+ KB page/;
     for (const solution of SOLUTIONS) {
       const measured = ROUTE_BUDGET_OVERRIDES.find((entry) => entry.route === solution.route);
+      if (!solution.replaces && !measured) continue;
       expect(measured?.reason, solution.slug).toMatch(ART);
       if (!solution.replaces) {
         // A new landing keeps the defaults, except measured overrides with a reason

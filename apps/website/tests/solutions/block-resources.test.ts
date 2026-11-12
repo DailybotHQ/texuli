@@ -72,6 +72,10 @@ describe('related Solutions', () => {
       'canvas',
       'sheets',
       'design-systems',
+      'dashboards',
+      'forms',
+      'agent-chat',
+      'editor',
     ]);
     expect(related.find((r) => r.slug === 'canvas')?.href).toBe('/solutions/canvas/');
     expect(related.filter((r) => r.href !== undefined)).toHaveLength(1);

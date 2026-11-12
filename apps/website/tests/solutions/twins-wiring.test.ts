@@ -137,7 +137,8 @@ describe('twin notes for demo landings', () => {
       expect(note.route.test(entry.route)).toBe(true);
       expect(note.route.test(`${entry.route}x/`)).toBe(false);
       expect(note.demo).toContain(entry.demo.title);
-      for (const op of note.operations) expect(served.has(op), `${entry.slug} ${op}`).toBe(true);
+      const operations = note.operations ?? [];
+      for (const op of operations) expect(served.has(op), `${entry.slug} ${op}`).toBe(true);
       for (const dir of note.packages)
         expect(existsSync(resolve(`packages/${dir}/README.md`)), dir).toBe(true);
       for (const link of note.links) expect(link.href).toBe(entry.docs);

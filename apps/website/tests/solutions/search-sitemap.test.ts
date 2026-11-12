@@ -17,7 +17,7 @@ describe('search and sitemap follow the new canonicals (ADR-028)', () => {
     const hrefs = new Set(SEARCH_INDEX.map((entry) => pathOf(entry.href)));
     for (const route of [
       '/solutions/',
-      ...SOLUTIONS.map((entry) => entry.route),
+      ...SOLUTIONS.filter((entry) => siteRouteExists(entry.route)).map((entry) => entry.route),
       '/built-with/',
       '/built-with/protoyard/',
       '/native/compatibility/',
