@@ -1,0 +1,74 @@
+---
+import { emojiCatalog } from '@texuli/emojis/catalog';
+import { emojiAliases } from '@texuli/emojis/legacy';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+
+const recordsById = new Map(emojiCatalog.records.map((record) => [record.id, record]));
+export function getStaticPaths() {
+  return emojiCatalog.records.map((emoji) => ({ params: { id: emoji.id }, props: { emoji } }));
+}
+
+const { emoji } = Astro.props;
+const codepoints = emoji.codepoints.map((point) => `U+${point}`).join(' ');
+const legacySlug = emojiAliases.slugs[emoji.id];
+const variants = (emoji.variants ?? []).flatMap((id) => {
+  const variant = recordsById.get(id);
+  return variant ? [variant] : [];
+});
+const baseEmoji = emoji.variantOf ? recordsById.get(emoji.variantOf) : undefined;
+---
+
+<SiteLayout
+  title={`${emoji.name} ${emoji.unicode}`}
+  description={`Unicode emoji ${emoji.name}: ${emoji.unicode}, canonical shortcode ${emoji.shortcode}, code points ${codepoints}.`}
+  canonical={`/emoji/${emoji.id}/`}
+>
+  <nav aria-label="Breadcrumb"><a href="/">Search</a> <span aria-hidden="true">/</span> <span aria-current="page">{emoji.name}</span></nav>
+  <article>
+    <header class="detail-hero">
+      <span class="detail-glyph" aria-hidden="true">{emoji.unicode}</span>
+      <div>
+        <p class="eyebrow">Unicode Emoji {emoji.emojiVersion}</p>
+        <h1>{emoji.name}</h1>
+        <p class="lead">This page displays the Unicode sequence using your platform's system emoji font.</p>
+      </div>
+    </header>
+    <section class="panel" aria-labelledby="details-title">
+      <h2 id="details-title">Emoji details</h2>
+      <dl class="facts">
+        <dt>Character</dt><dd><code>{emoji.unicode}</code> <button class="secondary" type="button" data-copy-value={emoji.unicode}>Copy Unicode</button></dd>
+        <dt>Canonical shortcode</dt><dd><code>{emoji.shortcode}</code> <button class="secondary" type="button" data-copy-value={emoji.shortcode}>Copy shortcode</button></dd>
+        <dt>Code points</dt><dd><code>{codepoints}</code> <button class="secondary" type="button" data-copy-value={codepoints}>Copy code points</button></dd>
+        <dt>Stable ID</dt><dd><code>{emoji.id}</code> <button class="secondary" type="button" data-copy-value={emoji.id}>Copy ID</button></dd>
+        <dt>Category</dt><dd>{emoji.category} · {emoji.subcategory}</dd>
+        {legacySlug && <><dt>Legacy shortcode</dt><dd><code>:{legacySlug}:</code></dd></>}
+        {baseEmoji && <><dt>Base emoji</dt><dd><a href={`/emoji/${baseEmoji.id}/`}>{baseEmoji.unicode} {baseEmoji.name}</a></dd></>}
+      </dl>
+      <p aria-live="polite" data-copy-status></p>
+    </section>
+    {emoji.aliases.length > 0 && (
+      <section aria-labelledby="aliases-title">
+        <h2 id="aliases-title">Recognized aliases</h2>
+        <ul class="tag-list">{emoji.aliases.map((alias) => <li><code>{alias}</code></li>)}</ul>
+      </section>
+    )}
+    {emoji.keywords.length > 0 && (
+      <section aria-labelledby="keywords-title">
+        <h2 id="keywords-title">Search keywords</h2>
+        <ul class="tag-list">{emoji.keywords.map((keyword) => <li>{keyword}</li>)}</ul>
+      </section>
+    )}
+    {variants.length > 0 && (
+      <section aria-labelledby="variants-title">
+        <h2 id="variants-title">Variants</h2>
+        <ul class="results">{variants.map((variant) => (
+          <li><a class="emoji-card" href={`/emoji/${variant.id}/`}><span class="emoji-glyph" aria-hidden="true">{variant.unicode}</span><span><span class="emoji-name">{variant.name}</span><span class="emoji-code">{variant.shortcode}</span></span></a></li>
+        ))}</ul>
+      </section>
+    )}
+    <p><a href="/convert/">Convert this emoji</a> · <a href="/licensing/">Read about emoji data and artwork licensing</a></p>
+  </article>
+  <script>
+    import '../../scripts/copy.ts';
+  </script>
+</SiteLayout>

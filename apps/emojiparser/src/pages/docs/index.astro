@@ -1,0 +1,39 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+---
+
+<SiteLayout
+  title="Developer docs"
+  description="Install and use the Texuli emoji catalog and engine. Includes API examples and migration notes for universal-emoji-parser."
+>
+  <p class="eyebrow">Developer docs</p>
+  <h1>Use Unicode emoji in your app</h1>
+  <p class="lead">EmojiParser.com is an independent product built on the Texuli Emojis catalog and engine.</p>
+  <section class="panel">
+    <h2>Install</h2>
+    <p><code>@texuli/emojis</code> is currently private and unpublished. Inside the Texuli workspace, depend on it with <code>"@texuli/emojis": "workspace:*"</code>. Public npm installation instructions will be added after an approved release.</p>
+    <pre><code>import {'{'} findEmojis, toShortcodes, toUnicode {'}'} from '@texuli/emojis';
+import {'{'} searchEmojis {'}'} from '@texuli/emojis/search';</code></pre>
+  </section>
+  <section class="panel">
+    <h2>API</h2>
+    <ul>
+      <li><code>findEmojis(text)</code> returns longest matches with stable IDs and UTF-16 offsets.</li>
+      <li><code>toShortcodes(text)</code> writes Texuli canonical shortcodes.</li>
+      <li><code>toUnicode(text)</code> reads Texuli canonical shortcodes.</li>
+      <li><code>searchEmojis(query)</code> searches CLDR names, aliases and keywords.</li>
+      <li><code>toUnicodeLegacy(text, {'{'} mode: 'strict' {'}'})</code> reads the separate legacy alias dialect and returns conflict and unknown diagnostics.</li>
+    </ul>
+    <p>Legacy chat aliases such as <code>:thumbsup:</code> and <code>:+1:</code> are opt-in. The default shortcode is <code>:thumbs_up:</code>.</p>
+  </section>
+  <section class="panel">
+    <h2>Migrate from universal-emoji-parser</h2>
+    <p>The migration guide explains canonical and legacy imports, escaped text handling, and intentional behavior differences.</p>
+    <p><a href="https://github.com/DailybotHQ/texuli/blob/main/docs/emojis/MIGRATION.md">Read the universal-emoji-parser migration guide</a>.</p>
+  </section>
+  <section class="panel">
+    <h2>Relationship to Texuli</h2>
+    <p>EmojiParser.com has its own product identity and roadmap. It uses the open-source Texuli Emojis package for catalog, search and conversion behavior; it does not keep a second emoji list or parsing engine.</p>
+    <p><a href="/licensing/">Artwork and data licensing</a></p>
+  </section>
+</SiteLayout>

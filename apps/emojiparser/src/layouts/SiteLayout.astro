@@ -1,0 +1,49 @@
+---
+import '../styles/site.css';
+
+interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+}
+
+const { title, description, canonical = Astro.url.pathname } = Astro.props;
+const pageTitle = title === 'EmojiParser.com' ? title : `${title} · EmojiParser.com`;
+const canonicalUrl = new URL(canonical, Astro.site ?? 'https://emojiparser.com');
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="description" content={description} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="canonical" href={canonicalUrl} />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="EmojiParser.com home">EmojiParser<span>.com</span></a>
+      <nav aria-label="Main navigation">
+        <a href="/">Search</a>
+        <a href="/convert/">Convert</a>
+        <a href="/picker/">Picker lab</a>
+        <a href="/docs/">Docs</a>
+      </nav>
+    </header>
+    <main id="main" tabindex="-1"><slot /></main>
+    <footer class="site-footer">
+      <p>EmojiParser.com is an independent Unicode emoji toolkit.</p>
+      <nav aria-label="Footer navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/licensing/">Licensing</a>
+        <a href="https://texuli.com/">Powered by Texuli Emojis</a>
+      </nav>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { emojiCatalog } from '@texuli/emojis/catalog';
+---
+
+<SiteLayout
+  title="Licensing and artwork status"
+  description="Licensing information for EmojiParser.com, Unicode emoji data, Texuli source code and future artwork."
+>
+  <p class="eyebrow">Licensing and provenance</p>
+  <h1>Clear licenses. Honest coverage.</h1>
+  <p class="lead">This app displays Unicode emoji through your platform's system emoji font. It does not bundle emoji artwork.</p>
+  <section class="panel">
+    <h2>Artwork status</h2>
+    <p><strong>Approved Texuli artwork: 0 of {emojiCatalog.records.length} catalog sequences.</strong> No original-art files are served by this app today. Every glyph shown here comes from the user's system emoji font.</p>
+    <p>CC BY 4.0 is a proposed license for future Texuli artwork. It is pending owner approval and does not grant a license to artwork that has not been approved or published.</p>
+  </section>
+  <section class="panel">
+    <h2>Code and data</h2>
+    <p>EmojiParser.com application code is licensed under MIT. The Texuli Emojis package is currently private and unpublished; its repository documents the pinned Unicode and CLDR inputs and their source terms.</p>
+    <p>Unicode emoji characters are standardized text. Names and keywords are generated from pinned CLDR data. Review the source package and its license notices before redistribution.</p>
+    <p><a href="https://github.com/DailybotHQ/texuli/tree/main/packages/emojis">Inspect the Texuli Emojis package</a></p>
+  </section>
+</SiteLayout>
