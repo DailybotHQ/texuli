@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Snippet } from 'svelte';
+import { EmojiText } from 'texuli/emoji';
 import { parseMessageText } from './rich-text.ts';
 
 let {
@@ -11,7 +12,7 @@ let {
   text: string;
   currentUserId?: string;
   locale?: string;
-  /** Renders a plain-text run (the emoji seam); plain text by default. */
+  /** Renders a plain-text run; by default `EmojiText` from `texuli/emoji` (Unicode emoji, never markup). */
   textRun?: Snippet<[string]>;
 } = $props();
 
@@ -38,7 +39,7 @@ function formatMoment(iso: string): string {
   {:else if part.type === 'mention'}<span class="tx-chat-mention" data-mention-id={part.id} data-self={part.id === currentUserId || undefined}>@{part.value}</span>
   {:else if part.type === 'date'}<time class="tx-chat-date" datetime={part.iso}>{formatMoment(part.iso)}</time>
   {:else if part.type === 'status'}<span class="tx-chat-status-chip" data-tone={part.tone}>{part.value}</span>
-  {:else if textRun}{@render textRun(part.value)}{:else}{part.value}{/if}
+  {:else if textRun}{@render textRun(part.value)}{:else}<EmojiText text={part.value} />{/if}
 {/each}
 
 <style>

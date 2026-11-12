@@ -10,6 +10,8 @@ export {
   type ComposerSuggestion,
   type ComposerSuggestionSource,
   commandSuggestions,
+  type EmojiCandidate,
+  emojiSuggestions,
   type MentionCandidate,
   mentionSuggestions,
   rankSuggestions,

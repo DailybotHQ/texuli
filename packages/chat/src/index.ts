@@ -18,6 +18,8 @@ export {
   type ComposerSuggestionSource,
   commandSuggestions,
   DEFAULT_COMPOSER_LABELS,
+  type EmojiCandidate,
+  emojiSuggestions,
   type MentionCandidate,
   mentionSuggestions,
   rankSuggestions,

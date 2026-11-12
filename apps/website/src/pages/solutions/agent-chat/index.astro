@@ -1,0 +1,51 @@
+---
+import AgentChatDemo from '../../../components/solutions/agent-chat/demo/AgentChatDemo.svelte';
+import {
+  AGENT_CHAT_AGENTS,
+  AGENT_CHAT_NEXT,
+  AGENT_CHAT_PLATFORMS,
+  AGENT_CHAT_RECIPES,
+} from '../../../components/solutions/agent-chat/extras/extras-content.ts';
+import AgentChatHero from '../../../components/solutions/agent-chat/hero/AgentChatHero.astro';
+import { AGENT_CHAT_HOW } from '../../../components/solutions/agent-chat/how/how-content.ts';
+import AgentChatQuickstart from '../../../components/solutions/agent-chat/quickstart/AgentChatQuickstart.astro';
+import AgentChatStories from '../../../components/solutions/agent-chat/stories/AgentChatStories.astro';
+import SolutionHow from '../../../components/solutions/shared/architecture/SolutionHow.astro';
+/**
+ * `/solutions/agent-chat/` — the Agent chat Solution landing. The shared layout keeps
+ * registry facts and the static sections aligned; only the fixture-driven chat demo hydrates.
+ */
+import SolutionDemoFrame from '../../../components/solutions/shared/demo-frame/SolutionDemoFrame.astro';
+import SolutionAgents from '../../../components/solutions/shared/platforms/SolutionAgents.astro';
+import SolutionPlatforms from '../../../components/solutions/shared/platforms/SolutionPlatforms.astro';
+import SolutionNextSteps from '../../../components/solutions/shared/resources/SolutionNextSteps.astro';
+import SolutionRecipes from '../../../components/solutions/shared/resources/SolutionRecipes.astro';
+import SolutionLayout from '../../../components/solutions/shared/SolutionLayout.astro';
+import { techArticleJsonLd } from '../../../lib/schema.ts';
+import { AGENT_CHAT_LANDING as content, AGENT_CHAT_ENTRY as entry } from './_content.ts';
+
+const title = 'Agent chat — replies that become interfaces';
+const description = entry.tagline;
+---
+
+<SolutionLayout
+  {entry}
+  {content}
+  {title}
+  {description}
+  jsonLd={techArticleJsonLd(title, description, entry.route)}
+>
+  <AgentChatHero slot="hero" />
+  <SolutionDemoFrame slot="demo" {entry} {...content.demo}>
+    <AgentChatDemo slot="demo" client:visible />
+  </SolutionDemoFrame>
+  <AgentChatStories slot="stories" />
+  <SolutionHow slot="how" {entry} {...AGENT_CHAT_HOW} />
+  <AgentChatQuickstart slot="quickstart" />
+  <SolutionRecipes slot="recipes" {entry} {...AGENT_CHAT_RECIPES} />
+  <SolutionAgents slot="agents" {entry} {...AGENT_CHAT_AGENTS} />
+  <SolutionPlatforms slot="platforms" {entry} {...AGENT_CHAT_PLATFORMS} />
+  <Fragment slot="next">
+    <SolutionNextSteps {entry} {...AGENT_CHAT_NEXT} />
+  </Fragment>
+</SolutionLayout>

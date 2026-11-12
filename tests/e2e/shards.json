@@ -17,6 +17,7 @@
       "site-drag-workflows.spec.ts",
       "site-editor.spec.ts",
       "site-sheets.spec.ts",
+      "site-solution-agent-chat.spec.ts",
       "site-solution-dashboards.spec.ts",
       "texuli-polish.spec.ts"
     ],

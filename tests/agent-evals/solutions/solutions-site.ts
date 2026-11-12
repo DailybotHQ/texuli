@@ -16,6 +16,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { loadAgentChatDocs } from '../../../apps/website/src/content/solution-docs/agent-chat/index.ts';
 import { loadCanvasDocs } from '../../../apps/website/src/content/solution-docs/canvas/index.ts';
 import { loadDashboardsDocs } from '../../../apps/website/src/content/solution-docs/dashboards/index.ts';
 import { loadDocumentsDocs } from '../../../apps/website/src/content/solution-docs/documents/index.ts';
@@ -68,6 +69,7 @@ export const DOCS: Readonly<
   'design-systems': loadDesignSystemsDocs,
   forms: loadFormsDocs,
   dashboards: loadDashboardsDocs,
+  'agent-chat': loadAgentChatDocs,
 };
 
 /** The twin of a Solution docs page: a header block, then every docs section. */

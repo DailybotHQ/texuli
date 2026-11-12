@@ -85,9 +85,9 @@ finished text is announced once, like any finished reply.
 `text` (on `MessageList`, forwarded by `ChatThread`) is a snippet for the
 plain-text runs of a message: strong, emphasis, code, links, mentions, dates
 and status chips keep their own nodes, and every other run reaches the snippet
-as a string. Without it the runs are written as text. It is the seam for emoji
-art (`EmojiText` from `texuli/emoji`, planned as the default after PLAN_023
-T-emo-web), and it never receives markup.
+as a string. Without it the runs render with `EmojiText` from `texuli/emoji`
+(Unicode emoji by default; pass your own snippet to add emoji art). The snippet
+never receives markup.
 
 Message text is read by the shared CommonMark inline parser
 (`@texuli/core/markdown`) and filtered down to the chat vocabulary
