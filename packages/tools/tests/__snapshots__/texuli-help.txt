@@ -30,6 +30,11 @@ Operations (the @texuli/tools registry; the same names are MCP tools):
   document export           Export a document as PDF or DOCX (node only)
   md convert                Convert Markdown, HTML or a chat dialect
   md render                 Render Markdown to safe HTML
+  emoji search              Search the Texuli emoji catalog
+  emoji get                 Read one emoji by id
+  emoji convert             Convert shortcodes and Unicode emoji
+  emoji categories          List emoji categories
+  emoji variants            List emoji variants
 
 Commands:
   deck <command>            The deck commands (capabilities, schema, layouts, lint, inspect, from-markdown, to-markdown)
@@ -187,6 +192,19 @@ Usage: texuli md <verb> [--json <object> | --file <path>] [--out <path>]
 Operations:
   md convert  Convert Markdown, HTML or a chat dialect [md.convert]
   md render   Render Markdown to safe HTML [md.render]
+
+Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
+Output: JSON on stdout (exit 1 on a refusal), or --out <path> to write it to a new file inside the working directory (--overwrite replaces one).
+
+----
+Usage: texuli emoji <verb> [--json <object> | --file <path>] [--out <path>]
+
+Operations:
+  emoji search      Search the Texuli emoji catalog [emoji.search]
+  emoji get         Read one emoji by id [emoji.get]
+  emoji convert     Convert shortcodes and Unicode emoji [emoji.convert]
+  emoji categories  List emoji categories [emoji.categories]
+  emoji variants    List emoji variants [emoji.variants]
 
 Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
 Output: JSON on stdout (exit 1 on a refusal), or --out <path> to write it to a new file inside the working directory (--overwrite replaces one).
@@ -595,3 +613,69 @@ Arguments (JSON object keys):
 
 Limits: input up to 1100000 bytes, at most 200 items, 10000 ms budget.
 Example (Bold text and a refused script link): texuli md render --json '{"source":"See **docs** at [x](javascript:alert(1))."}'
+
+----
+Usage: texuli emoji search [--json <object> | --file <path>] [--out <path>]
+
+Search the Texuli emoji catalog (emoji.search, runtime edge)
+Search the closed Unicode emoji catalog by name, shortcode or keyword. Returns { items }: approved ids with unicode, name, shortcode, category and score. Query at most 256 characters; at most 100 hits. Untrusted input; never throws.
+
+Arguments (JSON object keys):
+  query (required): string. Name, shortcode or keyword (at most 256 characters).
+  locale: string. BCP 47 locale for matching (default en).
+  category: "smileys-emotion" | "people-body" | "animals-nature" | "food-drink" | "travel-places" | "activities" | "objects" | "symbols" | "flags". Keep only this Unicode category.
+  limit: integer. How many hits to return (1 to 100, default 20).
+
+Limits: input up to 8192 bytes, at most 100 items, 5000 ms budget.
+Example (Find a rocket): texuli emoji search --json '{"query":"rocket","limit":3}'
+
+----
+Usage: texuli emoji get [--json <object> | --file <path>] [--out <path>]
+
+Read one emoji by id (emoji.get, runtime edge)
+Look up one closed catalog record by hyphenated id, Unicode sequence or :shortcode:. Returns { emoji } with unicode, name, shortcode, category and variant fields. Unknown ids are not-found. Untrusted input; never throws.
+
+Arguments (JSON object keys):
+  id (required): string. Hyphenated hex id, Unicode sequence, or :shortcode:.
+
+Limits: input up to 2048 bytes, 5000 ms budget.
+Example (Rocket by id): texuli emoji get --json '{"id":"1f680"}'
+
+----
+Usage: texuli emoji convert [--json <object> | --file <path>] [--out <path>]
+
+Convert shortcodes and Unicode emoji (emoji.convert, runtime edge)
+Convert untrusted plain text between Unicode sequences and shortcodes. dialect texuli is the lean catalog; legacy is the imported 3.0.2 aliases. mode strict keeps conflict aliases and reports them; permissive picks a candidate. Returns { value, diagnostics }. Never throws.
+
+Arguments (JSON object keys):
+  source (required): string. Untrusted plain text (at most 100000 characters).
+  to (required): "unicode" | "shortcode". unicode (shortcodes → sequences) or shortcode (sequences → :shortcode:).
+  dialect: "texuli" | "legacy". texuli (canonical) or legacy (imported aliases). Default texuli.
+  mode: "strict" | "permissive". strict keeps conflict aliases; permissive resolves them. Default strict.
+
+Limits: input up to 200000 bytes, at most 200 items, 10000 ms budget.
+Example (Canonical shortcode to Unicode): texuli emoji convert --json '{"source":"Ship it :rocket:!","to":"unicode"}'
+
+----
+Usage: texuli emoji categories [--json <object> | --file <path>] [--out <path>]
+
+List emoji categories (emoji.categories, runtime edge)
+List the closed Unicode emoji categories with how many catalog records each holds. Returns { categories: [{ id, count }] }. No input. Never throws.
+
+Arguments (JSON object keys):
+  (none)
+
+Limits: input up to 1024 bytes, at most 9 items, 5000 ms budget.
+Example (Every category): texuli emoji categories --json '{}'
+
+----
+Usage: texuli emoji variants [--json <object> | --file <path>] [--out <path>]
+
+List emoji variants (emoji.variants, runtime edge)
+List tone and other variants for a closed catalog id (or a variant of it). Returns { base, variants }. Unknown ids are not-found. Untrusted input; never throws.
+
+Arguments (JSON object keys):
+  id (required): string. Hyphenated hex id, Unicode sequence, or :shortcode:.
+
+Limits: input up to 2048 bytes, at most 100 items, 5000 ms budget.
+Example (Thumbs-up tones): texuli emoji variants --json '{"id":"1f44d"}'

@@ -324,6 +324,28 @@ add(
   'Planned manifest chat-attachment: a blueprint attachment card (validate, then paint with the player); needs a spec catalog id.',
   ['ChatAttachment']
 );
+// PLAN_023 T-emo-agents: a catalog id for Emoji is blueprint spec vocabulary
+// (packages/spec catalog, versions.json minor, TS and Kotlin codegen). The
+// owner has not decided that bump; ops ship without it. EmojiPicker and
+// EmojiText wait on their own catalog ids.
+add(
+  'texuli',
+  'planned',
+  'Planned manifest emoji: an id-based Unicode emoji (needs a spec catalog id).',
+  ['Emoji']
+);
+add(
+  'texuli',
+  'planned',
+  'Planned manifest emoji-picker: a searchable emoji picker (needs a spec catalog id).',
+  ['EmojiPicker']
+);
+add(
+  'texuli',
+  'planned',
+  'Planned manifest emoji-text: inline text with emoji shortcodes (needs a spec catalog id).',
+  ['EmojiText']
+);
 
 // ── @texuli/workflows ──────────────────────────────────────────
 add('@texuli/workflows', 'painted-by', 'Painted by workflow-graph (mode view).', [
@@ -449,4 +471,5 @@ export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(row
 // Carousel, Separator and ListItem became catalog ids (LucideIcon is a part of
 // icon). Combined ceiling is the live row count.
 // 207: raised for MetricCard, FilterBar and ChatAttachment (PLAN_023), pending their spec catalog ids.
-export const EXCLUSION_CEILING = 207;
+// 210: raised for Emoji, EmojiPicker and EmojiText (PLAN_023 T-emo-agents), pending their spec catalog ids.
+export const EXCLUSION_CEILING = 210;

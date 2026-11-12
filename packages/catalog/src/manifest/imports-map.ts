@@ -6231,6 +6231,21 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
     ],
   },
   {
+    module: 'texuli/emoji',
+    exports: [
+      'EMOJI_PICKER_MESSAGES_EN',
+      'EMOJI_PICKER_MESSAGES_ES',
+      'Emoji',
+      'EmojiArt',
+      'EmojiArtResolver',
+      'EmojiPicker',
+      'EmojiPickerMessages',
+      'EmojiText',
+      'SanitizedEmojiSvg',
+      'isSanitizedEmojiSvg',
+    ],
+  },
+  {
     module: 'texuli/field',
     exports: [
       'FIELD_ORIENTATIONS',
