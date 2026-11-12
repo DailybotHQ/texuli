@@ -1027,6 +1027,62 @@ export const MCP_SERVER_DATA = {
       example: 'A PDF of a short brief',
     },
     {
+      name: 'md.convert',
+      title: 'Convert Markdown, HTML or a chat dialect',
+      summary:
+        'Convert untrusted Markdown, HTML or a chat dialect (Slack, Discord, WhatsApp, Telegram MarkdownV2 and HTML, Teams, Google Chat, Mattermost, plain text) through the texuli-md/v1 AST. URLs use the untrusted policy. Returns { value, diagnostics }. CommonMark text output and GFM are planned.',
+      runtime: 'edge',
+      remote: true,
+      local: true,
+      limits: {
+        inputBytes: 1100000,
+        items: 200,
+        timeMs: 10000,
+      },
+      arguments: [
+        {
+          name: 'source',
+          required: true,
+          description: 'The untrusted source text to convert (at most 1000000 characters).',
+        },
+        {
+          name: 'from',
+          required: true,
+          description:
+            'commonmark (parser today; text writer planned), html, or a chat dialect (slack, discord, whatsapp, telegram-markdown-v2, telegram-html, teams, google-chat, mattermost, plain-text). GFM is planned.',
+        },
+        {
+          name: 'to',
+          required: true,
+          description:
+            'commonmark (parser today; text writer planned), html, or a chat dialect (slack, discord, whatsapp, telegram-markdown-v2, telegram-html, teams, google-chat, mattermost, plain-text). GFM is planned.',
+        },
+      ],
+      example: 'Slack mrkdwn to Discord',
+    },
+    {
+      name: 'md.render',
+      title: 'Render CommonMark to safe HTML',
+      summary:
+        'Parse untrusted CommonMark 0.31.2 and write a safe HTML fragment through the markup allowlist. Every href and src uses the untrusted URL policy; raw HTML is dropped. Returns { html, diagnostics }. GFM is planned.',
+      runtime: 'edge',
+      remote: true,
+      local: true,
+      limits: {
+        inputBytes: 1100000,
+        items: 200,
+        timeMs: 10000,
+      },
+      arguments: [
+        {
+          name: 'source',
+          required: true,
+          description: 'Untrusted CommonMark source (at most 1000000 characters).',
+        },
+      ],
+      example: 'Bold text and a refused script link',
+    },
+    {
       name: 'site.pages',
       title: 'List texuli.com pages',
       summary:

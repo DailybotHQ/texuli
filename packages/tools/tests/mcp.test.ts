@@ -108,6 +108,8 @@ it('negotiates MCP with read-only tools and serves the real catalog, manifests, 
         'deck.run',
         'document.run',
         'document.export',
+        'md.convert',
+        'md.render',
       ]);
       // ds.save is the one writer (an explicit path inside the working directory).
       const readOnly = tools.filter(({ name }) => name !== 'ds.save');
@@ -238,7 +240,7 @@ it('reports tool and protocol errors and speaks newline-delimited JSON-RPC on st
       ) as { version: string };
       expect(messages[0]?.result?.serverInfo).toEqual({ name: 'texuli', version });
       expect(version).not.toBe('0.0.0');
-      expect(messages[1]?.result?.tools).toHaveLength(25);
+      expect(messages[1]?.result?.tools).toHaveLength(27);
     }
   );
 });

@@ -55,6 +55,8 @@ const EXPECTED = [
   'deck.run',
   'document.run',
   'document.export',
+  'md.convert',
+  'md.render',
   'site.pages',
   'site.read',
   'site.search',

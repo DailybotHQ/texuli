@@ -28,6 +28,8 @@ Operations (the @texuli/tools registry; the same names are MCP tools):
   deck run                  Run a deck command
   document run              Run a document command
   document export           Export a document as PDF or DOCX (node only)
+  md convert                Convert Markdown, HTML or a chat dialect
+  md render                 Render CommonMark to safe HTML
 
 Commands:
   deck <command>            The deck commands (capabilities, schema, layouts, lint, inspect, from-markdown, to-markdown)
@@ -175,6 +177,16 @@ Operations:
 
 Commands:
   document <command>  The document commands (validate, patch, from-markdown, to-pdf … with --out)
+
+Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
+Output: JSON on stdout (exit 1 on a refusal), or --out <path> to write it to a new file inside the working directory (--overwrite replaces one).
+
+----
+Usage: texuli md <verb> [--json <object> | --file <path>] [--out <path>]
+
+Operations:
+  md convert  Convert Markdown, HTML or a chat dialect [md.convert]
+  md render   Render CommonMark to safe HTML [md.render]
 
 Input: one JSON object from stdin, --json <object> (--json - reads stdin) or --file <path>.
 Output: JSON on stdout (exit 1 on a refusal), or --out <path> to write it to a new file inside the working directory (--overwrite replaces one).
@@ -556,3 +568,29 @@ Arguments (JSON object keys):
   tier: "developer" | "untrusted". The URL policy tier links and media are checked at (default untrusted).
 
 Limits: input up to 2100000 bytes, 30000 ms budget.
+
+----
+Usage: texuli md convert [--json <object> | --file <path>] [--out <path>]
+
+Convert Markdown, HTML or a chat dialect (md.convert, runtime edge)
+Convert untrusted Markdown, HTML or a chat dialect (Slack, Discord, WhatsApp, Telegram MarkdownV2 and HTML, Teams, Google Chat, Mattermost, plain text) through the texuli-md/v1 AST. URLs use the untrusted policy. Returns { value, diagnostics }. CommonMark text output and GFM are planned.
+
+Arguments (JSON object keys):
+  source (required): string. The untrusted source text to convert (at most 1000000 characters).
+  from (required): "commonmark" | "html" | "slack" | "discord" | "whatsapp" | "telegram-markdown-v2" | "telegram-html" | "teams" | "google-chat" | "mattermost" | "plain-text". commonmark (parser today; text writer planned), html, or a chat dialect (slack, discord, whatsapp, telegram-markdown-v2, telegram-html, teams, google-chat, mattermost, plain-text). GFM is planned.
+  to (required): "commonmark" | "html" | "slack" | "discord" | "whatsapp" | "telegram-markdown-v2" | "telegram-html" | "teams" | "google-chat" | "mattermost" | "plain-text". commonmark (parser today; text writer planned), html, or a chat dialect (slack, discord, whatsapp, telegram-markdown-v2, telegram-html, teams, google-chat, mattermost, plain-text). GFM is planned.
+
+Limits: input up to 1100000 bytes, at most 200 items, 10000 ms budget.
+Example (Slack mrkdwn to Discord): texuli md convert --json '{"source":"*hello*","from":"slack","to":"discord"}'
+
+----
+Usage: texuli md render [--json <object> | --file <path>] [--out <path>]
+
+Render CommonMark to safe HTML (md.render, runtime edge)
+Parse untrusted CommonMark 0.31.2 and write a safe HTML fragment through the markup allowlist. Every href and src uses the untrusted URL policy; raw HTML is dropped. Returns { html, diagnostics }. GFM is planned.
+
+Arguments (JSON object keys):
+  source (required): string. Untrusted CommonMark source (at most 1000000 characters).
+
+Limits: input up to 1100000 bytes, at most 200 items, 10000 ms budget.
+Example (Bold text and a refused script link): texuli md render --json '{"source":"See **docs** at [x](javascript:alert(1))."}'

@@ -91,6 +91,10 @@ i18n texels, which are subpath-only. Import subpaths to keep bundles narrow.
 | Lazy chunks | `lazy` | `lazyChunk`, `hasLazyChunk` (subpath only) |
 | Rich text editor model | `editor-model`, `editor-transforms`, `editor-history`, `editor-keymap`, `editor-markdown` | Document model, transforms, undo history, keymap, Markdown import and export (subpath only) |
 | Markup builders | `markup` | `el`, `text`, `linkUrl`, `imageUrl`, `serializeXml`, `serializeHtml`: escaped XML and HTML with no raw-markup API (subpath only) |
+| Markdown AST and CommonMark parser | `markdown` | `parseMarkdown`, `MARKDOWN_LIMITS`: CommonMark 0.31.2 into `texuli-md/v1` (subpath only; GFM and a text writer are planned) |
+| Markdown → HTML | `markdown-html` | `markdownTreeToHtml`: safe HTML through the markup allowlist (subpath only) |
+| HTML → Markdown AST | `html` | `htmlToMarkdownTree`: untrusted HTML tokenizer, no DOM (subpath only) |
+| Chat Markdown dialects | `markdown-dialects` | `readMarkdownDialect`, `writeMarkdownDialect`, `convertMarkdownDialect` over nine chat dialects (subpath only) |
 | ZIP writer | `zip` | `writeZip`, `writeZipAsync`, `crc32`, `compressBytes`: deterministic archives, deflated where the platform can (subpath only) |
 | Expressions | `expression` | `parseExpression`, `parseExpressionText`, `analyzeExpression`, `evaluateExpression`, `CORE_FUNCTIONS`: the closed, bounded expression language of ADR-015 (subpath only; new in 0.8.0) |
 | Data sources | `data-source` | `defineSource`, `createSourceRegistry`, `checkSourceQuery`, `createSourceLoader`, `createSourceCollection`, `sourceError`: host-registered sources, the closed query, deduplicated, cancellable, retried and cached reads, optimistic writes with rollback, typed errors (ADR-015; subpath only; new in 0.8.0) |
@@ -161,6 +165,7 @@ Ships in `0.6.0`; the `0.5.0` release predates it:
 - Positioning: [core-position-math.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-position-math.md)
   and [core-position-dom.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-position-dom.md)
 - Rich text editor model: [core-editor.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-editor.md)
+- Markdown for agents (ADR-034, in development): [markdown.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/markdown.md) (`md.convert` and `md.render`; GFM and a CommonMark text writer are planned)
 - Markdown and HTML (ADR-034, in development): [core-markdown-html.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-markdown-html.md) (the Markdown AST to safe HTML) and [core-html.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-html.md) (untrusted HTML to the Markdown AST)
 - Static outputs: [core-markup.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-markup.md) (escaped XML and HTML builders) and [core-zip.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-zip.md) (the ZIP writer)
 - Chat Markdown conversion: [core-markdown-dialects.md](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-markdown-dialects.md) (platform syntax, escaping, URL policy and conversion losses)
