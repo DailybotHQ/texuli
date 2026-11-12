@@ -72,7 +72,7 @@ function clear(): void {
 </script>
 
 <section class={cx('tx-filter-bar', className)} aria-label={label} data-tx-component="data-filter-bar" data-tx-filter-bar>
-  <div class="tx-filter-bar__chips" aria-label="Applied filters">
+  <div class="tx-filter-bar__chips" role="group" aria-label="Applied filters">
     {#each applied as chip (chip.path.join('-'))}
       <span class="tx-filter-bar__chip">
         <span>{chip.text}</span>
@@ -84,10 +84,10 @@ function clear(): void {
   </div>
   <details class="tx-filter-bar__editor" inert={disabled}>
     <summary aria-disabled={disabled}>{addLabel}</summary>
-    <div class="tx-filter-bar__panel"><FilterBuilder {fields} bind:value {disabled} /></div>
+    <div class="tx-filter-bar__panel"><FilterBuilder {fields} {value} onValueChange={update} {disabled} /></div>
   </details>
   <button type="button" class="tx-filter-bar__clear" disabled={disabled || applied.length === 0} onclick={clear}>{clearLabel}</button>
-  <span class="tx-filter-bar__saved" data-saved={saved ? 'true' : 'false'}>{saved ? savedLabel : unsavedLabel}</span>
+  <span class="tx-filter-bar__saved" role="status" data-saved={saved ? 'true' : 'false'}>{saved ? savedLabel : unsavedLabel}</span>
 </section>
 
 <style>

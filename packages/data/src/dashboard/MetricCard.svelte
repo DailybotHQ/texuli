@@ -29,6 +29,7 @@ let {
 }: Props = $props();
 
 const trendGlyph = $derived(trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→');
+const trendText = $derived(trend === 'up' ? 'Up' : trend === 'down' ? 'Down' : 'Flat');
 </script>
 
 <article class={cx('tx-metric-card', className)} aria-busy={loading} data-tx-component="data-metric-card" data-trend={trend}>
@@ -41,7 +42,7 @@ const trendGlyph = $derived(trend === 'up' ? '↑' : trend === 'down' ? '↓' : 
     <p class="tx-metric-card__value">{value}</p>
     {#if comparison || trendLabel}
       <p class="tx-metric-card__comparison">
-        {#if trendLabel}<span aria-label={trend}>{trendGlyph}</span> {trendLabel}{/if}
+        {#if trendLabel}<span aria-hidden="true">{trendGlyph}</span><span class="tx-metric-card__sr">{trendText}:</span> {trendLabel}{/if}
         {#if comparison}<span>{comparison}</span>{/if}
       </p>
     {/if}
@@ -58,6 +59,7 @@ const trendGlyph = $derived(trend === 'up' ? '↑' : trend === 'down' ? '↓' : 
   .tx-metric-card__comparison { display: flex; flex-wrap: wrap; gap: 0.35rem; }
   .tx-metric-card__sparkline { margin: 0.25rem 0 0; max-inline-size: 12rem; }
   .tx-metric-card__loading { min-block-size: 2rem; }
+  .tx-metric-card__sr { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   @media (prefers-reduced-motion: no-preference) { .tx-metric-card__loading { animation: tx-metric-pulse 1.4s ease-in-out infinite alternate; } }
   @keyframes tx-metric-pulse { to { opacity: 0.5; } }
 </style>

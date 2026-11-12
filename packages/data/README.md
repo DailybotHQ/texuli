@@ -74,6 +74,7 @@ visible and announced string is translatable through `labels`.
 | Import | What it gives you |
 | --- | --- |
 | `@texuli/data/grid-core` | `DataGrid`: sorting, search, filtering, row selection, client paging, toolbar and bulk-action snippets, and grid keyboard navigation |
+| `@texuli/data/filter-bar` | `FilterBar`: applied-filter chips, add filter (opens `FilterBuilder`), clear and saved state ([data-filter-bar](https://github.com/DailybotHQ/texuli/blob/main/packages/data/docs/data-filter-bar.md)) |
 | `@texuli/data/filter-builder` | `FilterBuilder`: nested and/or filter groups with operators by field type, plus the pure `applyFilter` |
 | `@texuli/data/grid-columns` | `ColumnGrid`: resize, reorder, pin, hide, group headers and column menus |
 | `@texuli/data/grid-virtual` | `VirtualDataGrid`: independent row and column windows for large tables |

@@ -133,7 +133,7 @@ cap in `texuli.budgets.json` (`pnpm size`).
 | `@texuli/deck` (private, in development) | `.`, `model`, `schema`, `engine`, `markdown`, `math`, `authoring`, `templates` |
 | `@texuli/document` (private, in development) | `.`, `model`, `schema`, `schema-core`, `ops`, `ops-core`, `markdown`, `paged`, `docx`, `pdf`, `sync`, `collab` |
 | `@texuli/drag` (private, in development) | `.`, `sortable`, `collision`, `modifiers`, `auto-scroll`, `gesture`, `spatial`, `graph`, `messages`, `testing` |
-| `@texuli/data` (private) | `.`, `activity`, `activity/engine`, `activity/inbox`, `board`, `board/engine`, `calendar`, `cohort`, `files`, `files/engine`, `filter-builder`, `geo`, `grid`, `grid-columns`, `grid-core`, `grid-virtual`, `map`, `timeline`, `timeline/engine`, `tree`, `tree-view`, `virtual-list`, `calendar/view`, `grid-editing`, `dashboard`, `dashboard/engine` |
+| `@texuli/data` (private) | `.`, `activity`, `activity/engine`, `activity/inbox`, `board`, `board/engine`, `calendar`, `cohort`, `files`, `files/engine`, `filter-bar`, `filter-builder`, `geo`, `grid`, `grid-columns`, `grid-core`, `grid-virtual`, `map`, `timeline`, `timeline/engine`, `tree`, `tree-view`, `virtual-list`, `calendar/view`, `grid-editing`, `dashboard`, `dashboard/engine` |
 | `@texuli/canvas` (private, in development) | `.`, `model`, `sync`, `export`, `editor`, `viewer`, `host` |
 | `@texuli/sheets` (private, in development) | `.`, `formula`, `model`, `csv`, `view`, `host` |
 | `@texuli/examples` (private) | `.` |
