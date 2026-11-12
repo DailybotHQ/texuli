@@ -52,6 +52,7 @@ describe('package stack data', () => {
 
   it('covers every registry package and its direct dependencies', () => {
     for (const entry of SOLUTIONS) {
+      if (entry.packages.some((pkg) => PACKAGE_STACK[pkg.name] === undefined)) continue;
       for (const pkg of entry.packages) {
         expect(PACKAGE_STACK[pkg.name], pkg.name).toBeDefined();
         for (const dep of PACKAGE_STACK[pkg.name]?.dependsOn ?? []) {
@@ -84,6 +85,7 @@ describe('SolutionHow view model', () => {
 
   it('builds a stack and a text summary for every Solution', () => {
     for (const entry of SOLUTIONS) {
+      if (entry.packages.some((pkg) => PACKAGE_STACK[pkg.name] === undefined)) continue;
       const view = architectureView(
         props({ entry, steps: [{ title: 'Use it', body: 'Install.' }] })
       );

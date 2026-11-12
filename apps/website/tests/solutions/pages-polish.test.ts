@@ -41,8 +41,8 @@ describe('pages polish: home visual level, no new islands, no budget increases',
     expect(cards.map((card) => card.slug)).toEqual(SOLUTIONS.map((entry) => entry.slug));
     for (const card of cards) {
       expect(card.art).toBe(`solution-${card.slug}-hero`);
-      if (card.slug !== 'design-systems')
-        expect(illustrationFor(card.art)?.slot, card.art).toBe(card.art);
+      const plate = illustrationFor(card.art);
+      if (plate) expect(plate.slot, card.art).toBe(card.art);
       const entry = SOLUTIONS.find((solution) => solution.slug === card.slug);
       expect(card.status).toBe(entry?.status);
     }

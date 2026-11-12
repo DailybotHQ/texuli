@@ -34,6 +34,10 @@ const PARITY_CAPABILITY: Readonly<Record<SolutionSlug, string>> = {
   canvas: 'Documents, forms, canvas and sheets',
   sheets: 'Documents, forms, canvas and sheets',
   'design-systems': 'Design systems and tokens',
+  dashboards: 'Data views and dashboards',
+  forms: 'Documents, forms, canvas and sheets',
+  'agent-chat': 'Agent tools (MCP)',
+  editor: 'Documents, forms, canvas and sheets',
 };
 
 interface IndexSolution {
