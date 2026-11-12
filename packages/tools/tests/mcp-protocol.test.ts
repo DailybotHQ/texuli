@@ -72,7 +72,7 @@ async function ready(
   options: Parameters<typeof createMcpHandler>[0] = {},
   protocolVersion = MCP_PROTOCOL_VERSION
 ) {
-  const handle = createMcpHandler({ mode: 'stateful', ...options });
+  const handle = createMcpHandler({ registry: texuliOps, mode: 'stateful', ...options });
   const init = await rpc(handle, 'initialize', {
     protocolVersion,
     capabilities: {},
@@ -154,7 +154,7 @@ it('negotiates the four protocol versions and shapes every result to the negotia
   await scenario(
     'answers an unknown version with the latest and refuses a missing one',
     async () => {
-      const handle = createMcpHandler({ mode: 'stateful' });
+      const handle = createMcpHandler({ mode: 'stateful', registry: texuliOps });
       const unknown = await rpc(handle, 'initialize', { protocolVersion: '1999-01-01' });
       expect(unknown.result?.protocolVersion).toBe(MCP_PROTOCOL_VERSION);
       for (const params of [undefined, {}, { protocolVersion: 20251125 }, []]) {
@@ -169,7 +169,7 @@ it('keeps the initialization gate on stateful handlers and never requires it on 
   await scenario(
     'stateful: only initialize and ping before notifications/initialized',
     async () => {
-      const handle = createMcpHandler({ mode: 'stateful' });
+      const handle = createMcpHandler({ mode: 'stateful', registry: texuliOps });
       expect((await rpc(handle, 'ping')).result).toEqual({});
       for (const method of ['tools/list', 'resources/list', 'prompts/list', 'tools/call']) {
         const early = await rpc(handle, method, { name: 'catalog.search' });
@@ -185,7 +185,7 @@ it('keeps the initialization gate on stateful handlers and never requires it on 
   await scenario(
     'stateless: every method works without a handshake; initialize still answers',
     async () => {
-      const handle = createMcpHandler({ mode: 'stateless' });
+      const handle = createMcpHandler({ mode: 'stateless', registry: texuliOps });
       expect((await rpc(handle, 'tools/list')).result?.tools).toBeDefined();
       expect(
         (await rpc(handle, 'resources/templates/list')).result?.resourceTemplates
@@ -226,7 +226,7 @@ it('serves the 2026-07-28 revision per request from params._meta, with no initia
     expect(MCP_ERROR_CODES.unsupportedProtocolVersion).toBe(-32022);
   });
   await scenario('the Protoyard repro: server/discover answers before any initialize', async () => {
-    const handle = createMcpHandler({ mode: 'stateful' });
+    const handle = createMcpHandler({ mode: 'stateful', registry: texuliOps });
     const answer = (await handle({
       jsonrpc: '2.0',
       id: 4,
@@ -266,7 +266,7 @@ it('serves the 2026-07-28 revision per request from params._meta, with no initia
     );
   });
   await scenario('server/discover leaves out what a handler does not serve', async () => {
-    const handle = createMcpHandler({ resources: [], prompts: [] });
+    const handle = createMcpHandler({ resources: [], prompts: [], registry: texuliOps });
     const answer = await rpc(handle, 'server/discover', meta());
     expect(answer.result?.capabilities).toEqual({ tools: { listChanged: false } });
     expect(answer.result).not.toHaveProperty('prompts');
@@ -275,7 +275,7 @@ it('serves the 2026-07-28 revision per request from params._meta, with no initia
   await scenario('every list, read, get, call and completion answers statelessly', async () => {
     const { handle: initialized } = await ready();
     for (const mode of ['stateful', 'stateless'] as const) {
-      const handle = createMcpHandler({ mode });
+      const handle = createMcpHandler({ mode, registry: texuliOps });
       const calls: [string, Record<string, unknown>][] = [
         ['ping', {}],
         ['tools/list', {}],
@@ -311,7 +311,7 @@ it('serves the 2026-07-28 revision per request from params._meta, with no initia
   });
   await scenario('an unknown revision is -32022 with error.data.supported', async () => {
     for (const mode of ['stateful', 'stateless'] as const) {
-      const handle = createMcpHandler({ mode });
+      const handle = createMcpHandler({ mode, registry: texuliOps });
       for (const [version, method] of [
         ['2099-01-01', 'server/discover'],
         ['2099-01-01', 'tools/list'],
@@ -337,7 +337,7 @@ it('serves the 2026-07-28 revision per request from params._meta, with no initia
   await scenario(
     'a request without the 2026-07-28 _meta version keeps the behavior of today',
     async () => {
-      const stateful = createMcpHandler({ mode: 'stateful' });
+      const stateful = createMcpHandler({ mode: 'stateful', registry: texuliOps });
       // server/discover is a 2026-07-28 method: before initialize it is gated, after it is unknown.
       expect((await rpc(stateful, 'server/discover')).error?.code).toBe(
         MCP_ERROR_CODES.notInitialized
@@ -353,7 +353,7 @@ it('serves the 2026-07-28 revision per request from params._meta, with no initia
       const unknown = await rpc(handle, 'server/discover');
       expect(unknown.error?.code).toBe(MCP_ERROR_CODES.methodNotFound);
       expect(unknown.error?.message).toBe('Method not found: server/discover');
-      const stateless = createMcpHandler({ mode: 'stateless' });
+      const stateless = createMcpHandler({ mode: 'stateless', registry: texuliOps });
       expect((await rpc(stateless, 'server/discover')).error?.code).toBe(
         MCP_ERROR_CODES.methodNotFound
       );
@@ -365,7 +365,7 @@ it('serves the 2026-07-28 revision per request from params._meta, with no initia
     }
   );
   await scenario('on HTTP the MCP-Protocol-Version header must agree with _meta', async () => {
-    const handle = createMcpHandler({ mode: 'stateless' });
+    const handle = createMcpHandler({ mode: 'stateless', registry: texuliOps });
     const agreed = await rpc(handle, 'tools/list', meta(), { protocolVersion: STATELESS });
     expect(agreed.result?.tools).toBeDefined();
     const mismatch = await rpc(handle, 'tools/list', meta(), { protocolVersion: '2025-11-25' });
@@ -970,7 +970,7 @@ it('advertises only the capabilities that exist and answers the rest as unknown 
 });
 
 it('answers malformed JSON-RPC with the standard error codes', async () => {
-  const handle = createMcpHandler({ mode: 'stateless' });
+  const handle = createMcpHandler({ mode: 'stateless', registry: texuliOps });
   for (const message of [
     null,
     42,
@@ -999,7 +999,12 @@ it('answers malformed JSON-RPC with the standard error codes', async () => {
       throw new Error('secret detail');
     },
   };
-  const broken = createMcpHandler({ mode: 'stateless', resources: [throwing], prompts: [] });
+  const broken = createMcpHandler({
+    mode: 'stateless',
+    resources: [throwing],
+    prompts: [],
+    registry: texuliOps,
+  });
   for (const [method, params] of [
     ['resources/list', {}],
     ['resources/read', { uri: 'texuli://catalog' }],

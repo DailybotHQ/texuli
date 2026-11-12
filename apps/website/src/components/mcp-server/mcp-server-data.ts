@@ -1092,9 +1092,9 @@ export const MCP_SERVER_DATA = {
       name: 'emoji.search',
       title: 'Search the Texuli emoji catalog',
       summary:
-        'Search the closed Unicode emoji catalog by name, shortcode or keyword. Returns { items }: approved ids with unicode, name, shortcode, category and score. Query at most 256 characters; at most 100 hits. Untrusted input; never throws.',
-      runtime: 'edge',
-      remote: true,
+        'Search the closed Unicode emoji catalog by name, shortcode or keyword. Returns { items }: approved ids with unicode, name, shortcode, category and score. Query at most 256 characters; at most 100 hits. Untrusted input; never throws. Needs Node (local MCP and CLI; not on texuli.com/mcp).',
+      runtime: 'node',
+      remote: false,
       local: true,
       limits: {
         inputBytes: 8192,
@@ -1129,9 +1129,9 @@ export const MCP_SERVER_DATA = {
       name: 'emoji.get',
       title: 'Read one emoji by id',
       summary:
-        'Look up one closed catalog record by hyphenated id, Unicode sequence or :shortcode:. Returns { emoji } with unicode, name, shortcode, category and variant fields. Unknown ids are not-found. Untrusted input; never throws.',
-      runtime: 'edge',
-      remote: true,
+        'Look up one closed catalog record by hyphenated id, Unicode sequence or :shortcode:. Returns { emoji } with unicode, name, shortcode, category and variant fields. Unknown ids are not-found. Untrusted input; never throws. Needs Node (local MCP and CLI; not on texuli.com/mcp).',
+      runtime: 'node',
+      remote: false,
       local: true,
       limits: {
         inputBytes: 2048,
@@ -1150,7 +1150,7 @@ export const MCP_SERVER_DATA = {
       name: 'emoji.convert',
       title: 'Convert shortcodes and Unicode emoji',
       summary:
-        'Convert untrusted plain text between Unicode sequences and shortcodes. dialect texuli is the lean catalog; legacy is the imported 3.0.2 aliases. mode strict keeps conflict aliases and reports them; permissive picks a candidate. Returns { value, diagnostics }. Never throws.',
+        'Convert untrusted plain text between Unicode sequences and canonical Texuli shortcodes through the lean engine. dialect texuli is the default. dialect legacy is unsupported here and returns a diagnostic pointing at the local MCP. Returns { value, diagnostics }. Never throws.',
       runtime: 'edge',
       remote: true,
       local: true,
@@ -1187,9 +1187,9 @@ export const MCP_SERVER_DATA = {
       name: 'emoji.categories',
       title: 'List emoji categories',
       summary:
-        'List the closed Unicode emoji categories with how many catalog records each holds. Returns { categories: [{ id, count }] }. No input. Never throws.',
-      runtime: 'edge',
-      remote: true,
+        'List the closed Unicode emoji categories with how many catalog records each holds. Returns { categories: [{ id, count }] }. No input. Never throws. Needs Node (local MCP and CLI; not on texuli.com/mcp).',
+      runtime: 'node',
+      remote: false,
       local: true,
       limits: {
         inputBytes: 1024,
@@ -1203,9 +1203,9 @@ export const MCP_SERVER_DATA = {
       name: 'emoji.variants',
       title: 'List emoji variants',
       summary:
-        'List tone and other variants for a closed catalog id (or a variant of it). Returns { base, variants }. Unknown ids are not-found. Untrusted input; never throws.',
-      runtime: 'edge',
-      remote: true,
+        'List tone and other variants for a closed catalog id (or a variant of it). Returns { base, variants }. Unknown ids are not-found. Untrusted input; never throws. Needs Node (local MCP and CLI; not on texuli.com/mcp).',
+      runtime: 'node',
+      remote: false,
       local: true,
       limits: {
         inputBytes: 2048,

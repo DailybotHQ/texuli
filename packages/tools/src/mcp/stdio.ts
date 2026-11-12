@@ -3,6 +3,7 @@ import { createInterface } from 'node:readline';
 import type { Readable, Writable } from 'node:stream';
 import { pathToFileURL } from 'node:url';
 import { localFiles } from '../internal/local-write.ts';
+import { texuliOps } from '../ops/index.ts';
 import { createMcpHandler } from './handler.ts';
 
 /** The longest stdio message (one line) the server parses: 2 MiB. */
@@ -22,6 +23,7 @@ export async function runMcpStdio(
     mode: 'stateful',
     runtimes: ['edge', 'node'],
     files: localFiles(),
+    registry: texuliOps,
   });
   const lines = createInterface({ input, crlfDelay: Infinity });
   for await (const line of lines) {

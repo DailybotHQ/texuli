@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { expect, it } from 'vitest';
+import { texuliEdgeOps } from '../src/ops/edge.ts';
 import { texuliOps } from '../src/ops/index.ts';
 import { scenario } from './scenario.ts';
 
@@ -105,6 +106,26 @@ it('searches, reads, converts and lists untrusted emoji without throwing', async
     expect((variants.output.base as { id: string }).id).toBe('1f44d');
     expect((variants.output.variants as { id: string }[]).length).toBeGreaterThan(0);
   });
+
+  await scenario(
+    'the edge convert refuses the legacy dialect with a local-MCP diagnostic',
+    async () => {
+      expect(texuliEdgeOps.get('emoji.convert')?.runtime).toBe('edge');
+      const outcome = await texuliEdgeOps.invoke('emoji.convert', {
+        source: ':tada:',
+        to: 'unicode',
+        dialect: 'legacy',
+      });
+      expect(outcome.ok).toBe(true);
+      if (!outcome.ok) return;
+      expect(outcome.output.value).toBe(':tada:');
+      expect(
+        (outcome.output.diagnostics as { code: string; message: string }[]).some(
+          (item) => item.code === 'legacy-local-only' && item.message.includes('npx -y @texuli/mcp')
+        )
+      ).toBe(true);
+    }
+  );
 
   await scenario('markup and URLs in convert source stay plain text', async () => {
     const outcome = await texuliOps.invoke('emoji.convert', {

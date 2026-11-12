@@ -117,6 +117,7 @@ function stdioDoor(): Door {
     mode: 'stateful',
     runtimes: STDIO_RUNTIMES,
     files: localFiles(),
+    registry: texuliOps,
   });
   return {
     name: 'stdio',

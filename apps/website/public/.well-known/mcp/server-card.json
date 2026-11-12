@@ -282,25 +282,25 @@
     {
       "name": "emoji.search",
       "title": "Search the Texuli emoji catalog",
-      "description": "Search the closed Unicode emoji catalog by name, shortcode or keyword. Returns { items }: approved ids with unicode, name, shortcode, category and score. Query at most 256 characters; at most 100 hits. Untrusted input; never throws.",
-      "runtime": "edge",
-      "remote": true,
+      "description": "Search the closed Unicode emoji catalog by name, shortcode or keyword. Returns { items }: approved ids with unicode, name, shortcode, category and score. Query at most 256 characters; at most 100 hits. Untrusted input; never throws. Needs Node (local MCP and CLI; not on texuli.com/mcp).",
+      "runtime": "node",
+      "remote": false,
       "local": true,
       "readOnly": true
     },
     {
       "name": "emoji.get",
       "title": "Read one emoji by id",
-      "description": "Look up one closed catalog record by hyphenated id, Unicode sequence or :shortcode:. Returns { emoji } with unicode, name, shortcode, category and variant fields. Unknown ids are not-found. Untrusted input; never throws.",
-      "runtime": "edge",
-      "remote": true,
+      "description": "Look up one closed catalog record by hyphenated id, Unicode sequence or :shortcode:. Returns { emoji } with unicode, name, shortcode, category and variant fields. Unknown ids are not-found. Untrusted input; never throws. Needs Node (local MCP and CLI; not on texuli.com/mcp).",
+      "runtime": "node",
+      "remote": false,
       "local": true,
       "readOnly": true
     },
     {
       "name": "emoji.convert",
       "title": "Convert shortcodes and Unicode emoji",
-      "description": "Convert untrusted plain text between Unicode sequences and shortcodes. dialect texuli is the lean catalog; legacy is the imported 3.0.2 aliases. mode strict keeps conflict aliases and reports them; permissive picks a candidate. Returns { value, diagnostics }. Never throws.",
+      "description": "Convert untrusted plain text between Unicode sequences and canonical Texuli shortcodes through the lean engine. dialect texuli is the default. dialect legacy is unsupported here and returns a diagnostic pointing at the local MCP. Returns { value, diagnostics }. Never throws.",
       "runtime": "edge",
       "remote": true,
       "local": true,
@@ -309,18 +309,18 @@
     {
       "name": "emoji.categories",
       "title": "List emoji categories",
-      "description": "List the closed Unicode emoji categories with how many catalog records each holds. Returns { categories: [{ id, count }] }. No input. Never throws.",
-      "runtime": "edge",
-      "remote": true,
+      "description": "List the closed Unicode emoji categories with how many catalog records each holds. Returns { categories: [{ id, count }] }. No input. Never throws. Needs Node (local MCP and CLI; not on texuli.com/mcp).",
+      "runtime": "node",
+      "remote": false,
       "local": true,
       "readOnly": true
     },
     {
       "name": "emoji.variants",
       "title": "List emoji variants",
-      "description": "List tone and other variants for a closed catalog id (or a variant of it). Returns { base, variants }. Unknown ids are not-found. Untrusted input; never throws.",
-      "runtime": "edge",
-      "remote": true,
+      "description": "List tone and other variants for a closed catalog id (or a variant of it). Returns { base, variants }. Unknown ids are not-found. Untrusted input; never throws. Needs Node (local MCP and CLI; not on texuli.com/mcp).",
+      "runtime": "node",
+      "remote": false,
       "local": true,
       "readOnly": true
     },
