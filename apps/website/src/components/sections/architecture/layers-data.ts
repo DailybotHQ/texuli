@@ -66,6 +66,11 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
         dependsOn: [],
       },
       {
+        name: '@texuli/emoji-assets',
+        role: 'In development (private until its first release, ADR-035): original SVG art candidates with an explicit manifest and measured coverage; proposed CC BY 4.0 license pending owner sign-off',
+        dependsOn: [],
+      },
+      {
         name: '@texuli/spec',
         role: 'Framework-free blueprint contract and code generation',
         dependsOn: [],

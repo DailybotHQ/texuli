@@ -63,6 +63,8 @@ export const RUNTIME_EXTERNAL_ALLOWLIST: Readonly<Record<string, readonly string
   '@texuli/drag': [],
   // In development (PLAN_023, ADR-035): dependency-free; not published yet.
   '@texuli/emojis': [],
+  // In development (PLAN_023, ADR-035): bundled original SVG assets; no runtime deps.
+  '@texuli/emoji-assets': [],
   '@texuli/workflows': [],
   '@texuli/tokens': [],
   '@texuli/primitives': [],
