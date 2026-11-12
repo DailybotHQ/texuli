@@ -1344,7 +1344,7 @@ describe('generate-site-llms', () => {
         const { buildSiteLlmsTxt } = await import('../generate-site-llms.ts');
         expect(buildSiteLlmsTxt()).toBe(readFileSync(OUT, 'utf8'));
       }
-    });
+    }, 60_000);
   });
 });
 

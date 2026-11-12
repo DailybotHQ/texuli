@@ -45,8 +45,18 @@ test.describe('motion on the shared runtime', () => {
     await slowMotion(page);
     const trigger = page.getByRole('button', { name: 'Open settings' });
     await trigger.click();
+    // Sample the enter while it plays (polled every frame): reading it only after the visibility
+    // check missed the 0.9 s window on a loaded machine. A dialog that never animates still fails.
+    await page.waitForFunction(
+      () =>
+        (document
+          .querySelector('[data-tx-dialog]')
+          ?.getAnimations()
+          .filter((animation) => animation.playState === 'running').length ?? 0) > 0,
+      undefined,
+      { polling: 'raf', timeout: 5_000 }
+    );
     await expect(page.getByRole('dialog', { name: 'Workspace settings' })).toBeVisible();
-    expect(await running(page, '[data-tx-dialog]'), 'enter').toBeGreaterThan(0);
     // Let the enter end before closing.
     await page.waitForFunction(
       () => (document.querySelector('[data-tx-dialog]')?.getAnimations().length ?? 1) === 0

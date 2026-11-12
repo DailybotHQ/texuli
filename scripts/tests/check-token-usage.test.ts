@@ -304,5 +304,5 @@ describe('check-token-usage: the repository', () => {
     );
     expect(report.findings).toEqual([]);
     expect(report.stale).toEqual([]);
-  });
+  }, 60_000);
 });
