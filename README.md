@@ -41,7 +41,7 @@ Multiplatform twin), an MCP server and an agent skill.
 > **Status: in development, pre-1.0.** The screenshot above is the
 > texuli.com website, which deploys from `main` to Cloudflare Pages. The 26
 > published packages are released on npm in the 0.17 line,
-> every one at `0.17.4` (published by CI through npm trusted publishing with
+> every one at `0.17.5` (published by CI through npm trusted publishing with
 > provenance; `latest` points to it, and `next` is no longer maintained and
 > stays on `0.12.1`); `0.10.0` added design systems, the 0.11 line added the Protoyard
 > gaps G125–G136 and the Final Review fixes (square theme radii, password
@@ -72,9 +72,11 @@ Multiplatform twin), an MCP server and an agent skill.
 > render host's component attribute; `0.17.2` is a patch that makes the
 > runtime lock resolve parts like the static check and ships a
 > `CHANGELOG.md` in every package; `0.17.3` is a patch that keys render
-> baselines by route, viewport and mode and bounds a prose brief, and
+> baselines by route, viewport and mode and bounds a prose brief;
 > `0.17.4` is a patch that adds an optional scope and component to those
-> keys. It is not a stable release:
+> keys, and `0.17.5` is a security patch: the markup serializers check the
+> URL they will write, and toolbar arrow keys move only from toolbar
+> items. It is not a stable release:
 > under 0.x a new minor may contain breaking changes, and 1.0.0 will be
 > the first stable release.
 > The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
@@ -232,7 +234,7 @@ every verified command.
 
 - **No stable release yet.** The 26 published packages are on npm in the
   0.17 line, a pre-1.0 release (`npm install texuli`; `latest` points to
-  `0.17.4`, and `next` is no longer maintained, see
+  `0.17.5`, and `next` is no longer maintained, see
   [RELEASE](docs/RELEASE.md#dist-tags)). Under 0.x a new minor (`0.17.0`) may contain breaking
   changes, so pin the exact version or use `^0.17.0`; 1.0.0 will be the
   first stable release.

@@ -102,7 +102,7 @@ export function siteLlmsSections(siteUrl: string): SiteLlmsSection[] {
           title: 'What’s new',
           href: abs('/whats-new/'),
           description:
-            'Every package and capability of 0.6.0 to 0.17.4 (all on npm; 0.17.4 is current, and 0.10.0 added design systems), with demos.',
+            'Every package and capability of 0.6.0 to 0.17.5 (all on npm; 0.17.5 is current, and 0.10.0 added design systems), with demos.',
         },
         {
           title: 'Skill',
