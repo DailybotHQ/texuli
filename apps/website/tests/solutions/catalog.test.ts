@@ -155,7 +155,7 @@ describe('/solutions/ page and markup', () => {
 
   it('uses the page-solutions art when registered, else a decorative mosaic', () => {
     expect(CATALOG_PAGE.hero.art).toBe('page-solutions');
-    expect(markup).toContain('<SiteIllustration art={page.hero.art} />');
+    expect(markup).toContain('<SiteIllustration art={page.hero.art} sizes={HERO_ART_SIZES} />');
     expect(markup).toMatch(/class="sol-catalog__mosaic" aria-hidden="true"/);
   });
 });

@@ -37,6 +37,8 @@ const tiles = Array.from({ length: 24 }, (_, i) => ((i * 3 + 4) % 8) % 5);
  * 2.4 device pixels per CSS pixel, still sharp) instead of the full 1200 px file for each card.
  */
 const CARD_ART_SIZES = '(min-width: 64rem) 22rem, (min-width: 44rem) 46vw, 60vw';
+/** The hero banner spans the 76rem column (73rem inside the gutters) on wide screens. */
+const HERO_ART_SIZES = '(min-width: 76rem) 73rem, 94vw';
 ---
 
 <div class="sol-catalog" data-tx-solutions-catalog="">
@@ -54,7 +56,7 @@ const CARD_ART_SIZES = '(min-width: 64rem) 22rem, (min-width: 44rem) 46vw, 60vw'
         <div class="sol-catalog__plate">
           {
             artRegistered ? (
-              <SiteIllustration art={page.hero.art} />
+              <SiteIllustration art={page.hero.art} sizes={HERO_ART_SIZES} />
             ) : (
               <div class="sol-catalog__mosaic" aria-hidden="true" data-art-fallback={page.hero.art}>
                 {tiles.map((tone) => (tone === 0 ? <i /> : <i class={`t${tone}`} />))}
@@ -176,9 +178,24 @@ const CARD_ART_SIZES = '(min-width: 64rem) 22rem, (min-width: 44rem) 46vw, 60vw'
     gap: clamp(1.5rem, 4vw, 3rem);
     align-items: center;
   }
+  /*
+   * The hero art is the 3:1 page-solutions banner: beside the copy it could only be about
+   * 170 px tall. On wide screens the title and lede share the first row and the banner takes
+   * the full column below it (about 1150 x 383 px at 1440 px).
+   */
   @media (min-width: 56rem) {
-    .sol-catalog__hero-grid {
-      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    .sol-catalog__hero-copy {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      column-gap: clamp(1.5rem, 4vw, 3rem);
+      align-items: end;
+    }
+    .sol-catalog__hero-copy > .sol-catalog__eyebrow,
+    .sol-catalog__hero-copy > h1 {
+      grid-column: 1;
+    }
+    .sol-catalog__hero-copy > .sol-catalog__lede {
+      grid-column: 2;
+      grid-row: 2;
     }
   }
   .sol-catalog__hero-copy {
