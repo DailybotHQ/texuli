@@ -29,6 +29,7 @@ packages in lower layers.
 | L0 | `@texuli/deck` | In development (on npm from `0.4.0`): the framework-free, dependency-free deck engine: deck model v2 and its owned schema kit, migration, the untrusted loader, the Markdown dialect, TeX-subset math, the layout catalog, backgrounds and contrast, navigation, controls, canvas fit and the presenter protocol, lint, patch, the typed builder, brief outlines and templates | none |
 | L0 | `@texuli/drag` | In development: framework-free, general-purpose drag engine (sortable lists, boards, trees, spatial canvases, graph editing) | none |
 | L0 | `@texuli/emojis` | In development (private until its first release, ADR-035): the dependency-free Unicode emoji catalog generated from pinned Unicode and CLDR sources, with legacy shortcode aliases | none |
+| L0 | `@texuli/emoji-assets` | In development (private until its first release, ADR-035): original 64×64 SVG emoji art candidates, the approved-asset manifest and measured coverage report; proposed art license CC BY 4.0 pending owner sign-off | none |
 | L0 | `@texuli/spec` | Framework-free blueprint contract and code generation | none |
 | L1 | `@texuli/primitives` | 42 owned headless primitives, one subpath each (accordion … tree), held to the WAI-ARIA APG patterns | core, date, drag |
 | L1 | `@texuli/document` | In development (on npm from `0.7.0`): the framework-free, DOM-free document engine: the block document format with persisted ids, the validator on the deck schema kit, typed operations and bounded RFC 6902 patches with inverses and an op log, Markdown through the core codec, the pagination engine (`paged`), owned DOCX and PDF writers (`docx`, `pdf`), the CRDT sync core (`sync`) and the document binding for collaboration: comments, suggestions, versions and presence (`collab`) | core, deck |
@@ -87,7 +88,7 @@ L4  charts · data · media · chat · editor · workflows · forms · canvas
 L3  texuli (styled components, layouts, shells)
 L2  tokens (theme engine, CSS contract)
 L1  primitives (headless, APG) · document (framework-free engine)
-L0  core · date · deck · drag · spec (framework-free)
+L0  core · date · deck · drag · emojis · emoji-assets · spec (framework-free)
           ▲ dependencies point down only (scripts/check-layers.ts)
 ```
 

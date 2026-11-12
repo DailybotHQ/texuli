@@ -28,7 +28,10 @@ const ROOT = join(import.meta.dirname, '..');
  * private, outside the publish workflow's package list, and left out of the published counts.
  * Remove a name here in the release that first publishes it (with the owner's GO).
  */
-export const UNRELEASED_PACKAGES: ReadonlySet<string> = new Set(['@texuli/emojis']);
+export const UNRELEASED_PACKAGES: ReadonlySet<string> = new Set([
+  '@texuli/emojis',
+  '@texuli/emoji-assets',
+]);
 
 export const RELEASE_DOC = join(ROOT, 'docs', 'RELEASE.md');
 
