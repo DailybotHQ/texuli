@@ -1,0 +1,51 @@
+---
+import EditorDemo from '../../../components/solutions/editor/demo/EditorDemo.svelte';
+import {
+  EDITOR_AGENTS,
+  EDITOR_NEXT,
+  EDITOR_PLATFORMS,
+  EDITOR_RECIPES,
+} from '../../../components/solutions/editor/extras/extras-content.ts';
+import EditorHero from '../../../components/solutions/editor/hero/EditorHero.astro';
+import { EDITOR_HOW } from '../../../components/solutions/editor/how/how-content.ts';
+import EditorQuickstart from '../../../components/solutions/editor/quickstart/EditorQuickstart.astro';
+import EditorStories from '../../../components/solutions/editor/stories/EditorStories.astro';
+import SolutionHow from '../../../components/solutions/shared/architecture/SolutionHow.astro';
+/**
+ * `/solutions/editor/` — the Rich text editor Solution landing (ADR-036). `/editor-page/` stays
+ * as the capability reference and is not redirected. Only the editor demo hydrates.
+ */
+import SolutionDemoFrame from '../../../components/solutions/shared/demo-frame/SolutionDemoFrame.astro';
+import SolutionAgents from '../../../components/solutions/shared/platforms/SolutionAgents.astro';
+import SolutionPlatforms from '../../../components/solutions/shared/platforms/SolutionPlatforms.astro';
+import SolutionNextSteps from '../../../components/solutions/shared/resources/SolutionNextSteps.astro';
+import SolutionRecipes from '../../../components/solutions/shared/resources/SolutionRecipes.astro';
+import SolutionLayout from '../../../components/solutions/shared/SolutionLayout.astro';
+import { techArticleJsonLd } from '../../../lib/schema.ts';
+import { EDITOR_LANDING as content, EDITOR_ENTRY as entry } from './_content.ts';
+
+const title = 'Rich text editor — Markdown in, any chat out';
+const description = entry.tagline;
+---
+
+<SolutionLayout
+  {entry}
+  {content}
+  {title}
+  {description}
+  jsonLd={techArticleJsonLd(title, description, entry.route)}
+>
+  <EditorHero slot="hero" />
+  <SolutionDemoFrame slot="demo" {entry} {...content.demo}>
+    <EditorDemo slot="demo" client:visible />
+  </SolutionDemoFrame>
+  <EditorStories slot="stories" />
+  <SolutionHow slot="how" {entry} {...EDITOR_HOW} />
+  <EditorQuickstart slot="quickstart" />
+  <SolutionRecipes slot="recipes" {entry} {...EDITOR_RECIPES} />
+  <SolutionAgents slot="agents" {entry} {...EDITOR_AGENTS} />
+  <SolutionPlatforms slot="platforms" {entry} {...EDITOR_PLATFORMS} />
+  <Fragment slot="next">
+    <SolutionNextSteps {entry} {...EDITOR_NEXT} />
+  </Fragment>
+</SolutionLayout>

@@ -1,0 +1,9 @@
+---
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionStories from '../../shared/story/SolutionStories.astro';
+import { EDITOR_STORIES } from './stories-content.ts';
+
+const entry = getSolution('editor');
+---
+
+<SolutionStories entry={entry} {...EDITOR_STORIES} />

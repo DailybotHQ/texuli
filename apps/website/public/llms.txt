@@ -53,6 +53,8 @@ Embeddable open-source systems that complete a task end to end.
 - [Forms docs](https://texuli.com/guides/solutions/forms/)
 - [Agent chat](https://texuli.com/solutions/agent-chat/): A thread whose replies paint validated blueprints. Status: in development.
 - [Agent chat docs](https://texuli.com/guides/solutions/agent-chat/)
+- [Rich text editor](https://texuli.com/solutions/editor/): Owned rich text with Markdown in and out, safe paste and export to any chat. Status: in development.
+- [Rich text editor docs](https://texuli.com/guides/solutions/editor/)
 
 ## Built with Texuli
 
@@ -81,6 +83,7 @@ Task-first guides, in reading order.
 - [Dashboards](https://texuli.com/guides/solutions/dashboards/)
 - [Forms](https://texuli.com/guides/solutions/forms/)
 - [Agent chat](https://texuli.com/guides/solutions/agent-chat/)
+- [Rich text editor](https://texuli.com/guides/solutions/editor/)
 - [Performance](https://texuli.com/guides/performance/)
 
 ## Components
