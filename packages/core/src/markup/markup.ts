@@ -96,14 +96,22 @@ function makeUrl(value: string | undefined): MarkupUrl | null {
   return url;
 }
 
+/**
+ * The value the serializers will write, checked by the policy: `sanitizeMarkupChars` runs first,
+ * because it drops characters (unpaired surrogates, C0 controls) while writing, and a check on the
+ * raw value would pass `\ud83djavascript:` (no scheme) that is then written as `javascript:`.
+ */
+const writable = (value: unknown): unknown =>
+  typeof value === 'string' ? sanitizeMarkupChars(value) : value;
+
 /** A link URL through `safeHref` at `trust`, or `null` when the policy refuses it. */
 export function linkUrl(value: string, trust: HrefTrust): MarkupUrl | null {
-  return makeUrl(safeHref(value, trust));
+  return makeUrl(safeHref(writable(value), trust));
 }
 
 /** An image URL through `safeImageSrc` at `trust`, or `null` when the policy refuses it. */
 export function imageUrl(value: string, trust: HrefTrust): MarkupUrl | null {
-  return makeUrl(safeImageSrc(value, trust));
+  return makeUrl(safeImageSrc(writable(value), trust));
 }
 
 /** True only for a URL `linkUrl` or `imageUrl` made (a hand-built object is not one). */

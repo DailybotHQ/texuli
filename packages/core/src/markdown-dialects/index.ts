@@ -7,7 +7,9 @@ import type {
   MdRoot,
 } from '../markdown/ast.ts';
 import { MARKDOWN_AST_VERSION, MARKDOWN_LIMITS } from '../markdown/ast.ts';
+import { sanitizeMarkupChars } from '../markup/markup.ts';
 import { type HrefTrust, safeHref } from '../url/safe-href.ts';
+// URLs are cleaned before the policy check, so the checked value is the written one (F7).
 
 export const MARKDOWN_DIALECTS = [
   'slack',
@@ -68,10 +70,29 @@ function escaped(
   if (context === 'code') return value;
   if (dialect === 'slack' && context === 'url')
     return value.replace(/</g, '%3C').replace(/>/g, '%3E').replace(/\|/g, '%7C');
-  if ((dialect === 'teams' || dialect === 'google-chat') && context === 'url')
+  if (dialect === 'google-chat' && context === 'url')
     return value.replace(/</g, '%3C').replace(/>/g, '%3E').replace(/\|/g, '%7C');
+  // A Markdown link destination: percent-encode every character that could end it or open new
+  // syntax, so a policy-checked URL can never close the link and start another one
+  // (T-md-security F3: `https://example.com/a)[x](javascript:…)` in Teams).
+  if (
+    (dialect === 'teams' || dialect === 'discord' || dialect === 'mattermost') &&
+    context === 'url'
+  )
+    return value.replace(
+      /[\s()<>[\]\\`"'|*_~]/g,
+      (c) => `%${c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')}`
+    );
   if (dialect === 'slack')
-    return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return (
+      value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        // With `link_names`, Slack turns these words into broadcasts; only an MdMention may
+        // (T-md-security F2).
+        .replace(/@(?=(?:channel|here|everyone)\b)/gi, '@\u200b')
+    );
   if (dialect === 'plain-text')
     return value
       .replace(/@(?=everyone\b|here\b|channel\b|all\b)/gi, '@\u200b')
@@ -548,7 +569,94 @@ export function readMarkdownDialect(source: string, dialect: MarkdownDialect): M
   return { tree: root(blocks), diagnostics };
 }
 
+/**
+ * Nesting the dialect writers render; deeper content is written as escaped plain text with a
+ * `depth-limit` diagnostic, so a deep hand-built tree cannot overflow the stack
+ * (T-md-security F8). Writers are synchronous, so one counter is enough.
+ */
+const maxWriteDepth = MARKDOWN_LIMITS.blockDepth + MARKDOWN_LIMITS.inlineDepth;
+let writeDepth = 0;
+
+type AnyNode = MdBlock | MdInline | { type: string; children?: readonly unknown[] };
+
+/** The text of a subtree, collected without recursion. */
+function plainTextOf(nodes: readonly AnyNode[]): string {
+  const out: string[] = [];
+  const stack: AnyNode[] = [...nodes].reverse();
+  let seen = 0;
+  while (stack.length > 0 && seen < MARKDOWN_LIMITS.nodes) {
+    const node = stack.pop() as unknown as {
+      type?: unknown;
+      value?: unknown;
+      alt?: unknown;
+      label?: unknown;
+      children?: unknown;
+    };
+    seen++;
+    if (typeof node !== 'object' || node === null) continue;
+    if (typeof node.value === 'string' && node.type !== 'html') out.push(node.value);
+    else if (node.type === 'image' && typeof node.alt === 'string') out.push(node.alt);
+    else if (node.type === 'break') out.push('\n');
+    else if (node.type === 'mention' && typeof node.label === 'string') out.push(`@${node.label}`);
+    const children = Array.isArray(node.children) ? (node.children as AnyNode[]) : [];
+    for (let i = children.length - 1; i >= 0; i--) stack.push(children[i] as AnyNode);
+  }
+  return out.join('');
+}
+
+function bounded<T extends readonly AnyNode[]>(
+  nodes: T,
+  dialect: MarkdownDialect,
+  diagnostics: MarkdownDiagnostic[],
+  write: () => string
+): string {
+  if (writeDepth >= maxWriteDepth) {
+    diagnostics.push({
+      code: 'depth-limit',
+      message: `Content nested deeper than ${maxWriteDepth} levels is written as plain text.`,
+    });
+    return escaped(plainTextOf(nodes), dialect);
+  }
+  writeDepth++;
+  try {
+    return write();
+  } finally {
+    writeDepth--;
+  }
+}
+
 function writeInline(
+  nodes: readonly MdInline[],
+  dialect: MarkdownDialect,
+  diagnostics: MarkdownDiagnostic[],
+  trust: HrefTrust,
+  allowBroadcastMentions: boolean
+): string {
+  return bounded(nodes, dialect, diagnostics, () =>
+    writeInlineUnbounded(nodes, dialect, diagnostics, trust, allowBroadcastMentions)
+  );
+}
+
+function flattenPlainInline(
+  nodes: readonly MdInline[],
+  trust: HrefTrust,
+  diagnostics: MarkdownDiagnostic[]
+): string {
+  return bounded(nodes, 'plain-text', diagnostics, () =>
+    flattenPlainInlineUnbounded(nodes, trust, diagnostics)
+  );
+}
+
+/**
+ * Join written inline parts. Two backtick runs that touch merge into one longer run, which closes a
+ * code span early and lets its content become live markup (T-md-security F6): a zero-width space
+ * keeps them apart.
+ */
+function joinInline(written: string, part: string): string {
+  return written.endsWith('`') && part.startsWith('`') ? `${written}\u200b${part}` : written + part;
+}
+
+function writeInlineUnbounded(
   nodes: readonly MdInline[],
   dialect: MarkdownDialect,
   diagnostics: MarkdownDiagnostic[],
@@ -613,13 +721,15 @@ function writeInline(
             trust,
             allowBroadcastMentions
           );
-          const href = safeHref(node.url, trust);
+          const href = safeHref(sanitizeMarkupChars(node.url), trust);
           if (!href) {
             diagnostics.push({
               code: 'url-refused',
               message: 'A link URL was refused by the URL policy.',
             });
-            return flattenInline(node.children);
+            // The label as written for this dialect (escaped), never the raw text: a refused
+            // link must not turn its label into live markup, pings or links (T-md-security F1).
+            return label;
           }
           if (dialect === 'slack' || dialect === 'google-chat')
             return `<${escaped(href, dialect, 'url')}${href === label ? '' : `|${label}`}>`;
@@ -657,7 +767,7 @@ function writeInline(
           return '';
       }
     })
-    .join('');
+    .reduce(joinInline, '');
 }
 
 function wrap(value: string, marker: string): string {
@@ -676,11 +786,28 @@ function codeDelimiter(value: string, minimum: number): string {
   return '`'.repeat(Math.max(minimum, longest + 1));
 }
 
+/**
+ * Slack and Google Chat parse `&`, `<` and `>` as control characters everywhere, code included, so
+ * `<!everyone>` or `<https://evil.example|bank>` inside backticks would still ping or link
+ * (T-md-security F4). Both clients show the entities as the characters.
+ */
+function controlEscaped(value: string, dialect: MarkdownDialect): string {
+  return dialect === 'slack' || dialect === 'google-chat'
+    ? value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    : value;
+}
+
 function writeInlineCode(
   value: string,
   dialect: MarkdownDialect,
   diagnostics: MarkdownDiagnostic[]
 ): string {
+  if (value === '') {
+    // An empty code span cannot be written: two backticks are text and join the next run (F6).
+    diagnostics.push({ code: 'dialect-loss', message: 'An empty code span was dropped.' });
+    return '';
+  }
+  value = controlEscaped(value, dialect);
   if (dialect === 'telegram-html') return `<code>${escaped(value, dialect, 'code')}</code>`;
   if (dialect === 'telegram-markdown-v2') return `\`${escaped(value, dialect, 'code')}\``;
   if (dialect === 'slack' || dialect === 'whatsapp') {
@@ -692,7 +819,12 @@ function writeInlineCode(
     return `\`${value.replace(/`/g, '`\u200d')}\``;
   }
   const delimiter = codeDelimiter(value, 1);
-  return `${delimiter}${value}${delimiter}`;
+  // CommonMark: content that starts or ends with a backtick (or a space) is padded with one space
+  // on each side, which readers strip again; unpadded, the backtick joins the delimiter run and
+  // the span closes elsewhere (T-md-security F6).
+  return /^[` ]|[` ]$/.test(value)
+    ? `${delimiter} ${value} ${delimiter}`
+    : `${delimiter}${value}${delimiter}`;
 }
 
 function writeCodeBlock(
@@ -701,6 +833,7 @@ function writeCodeBlock(
   dialect: MarkdownDialect,
   diagnostics: MarkdownDiagnostic[]
 ): string {
+  value = controlEscaped(value, dialect);
   if (dialect === 'telegram-html') return `<pre>${escaped(value, dialect, 'code')}</pre>`;
   if (dialect === 'slack' || dialect === 'whatsapp') {
     if (value.includes('```')) {
@@ -723,40 +856,7 @@ function loss(value: string, message: string, diagnostics: MarkdownDiagnostic[])
   return value;
 }
 
-function flattenInline(nodes: readonly MdInline[]): string {
-  return nodes
-    .map((node) => {
-      switch (node.type) {
-        case 'text':
-          return node.value;
-        case 'emphasis':
-        case 'strong':
-        case 'delete':
-        case 'underline':
-        case 'spoiler':
-          return flattenInline(node.children);
-        case 'inlineCode':
-          return node.value;
-        case 'break':
-          return '\n';
-        case 'link':
-          return `${flattenInline(node.children)} (${node.url})`;
-        case 'mention':
-          return `@${node.label ?? node.id ?? node.kind}`;
-        case 'image':
-          return node.alt;
-        case 'footnoteReference':
-          return `[${node.label}]`;
-        case 'html':
-          return node.value;
-        default:
-          return '';
-      }
-    })
-    .join('');
-}
-
-function flattenPlainInline(
+function flattenPlainInlineUnbounded(
   nodes: readonly MdInline[],
   trust: HrefTrust,
   diagnostics: MarkdownDiagnostic[]
@@ -778,7 +878,7 @@ function flattenPlainInline(
           return '\n';
         case 'link': {
           const label = flattenPlainInline(node.children, trust, diagnostics);
-          const href = safeHref(node.url, trust);
+          const href = safeHref(sanitizeMarkupChars(node.url), trust);
           if (!href) {
             diagnostics.push({
               code: 'url-refused',
@@ -856,7 +956,7 @@ export function writeMarkdownDialect(
   const diagnostics: MarkdownDiagnostic[] = [];
   const trust = options.trust ?? 'untrusted';
   const allowBroadcastMentions = options.allowBroadcastMentions ?? false;
-  const writeBlock = (block: MdBlock): string => {
+  const writeBlockUnbounded = (block: MdBlock): string => {
     switch (block.type) {
       case 'paragraph':
         return dialect === 'plain-text'
@@ -955,6 +1055,8 @@ export function writeMarkdownDialect(
     }
     return '';
   };
+  const writeBlock = (block: MdBlock): string =>
+    bounded([block], dialect, diagnostics, () => writeBlockUnbounded(block));
   const separator = dialect === 'plain-text' ? '\n\n' : '\n\n';
   return { value: tree.children.map(writeBlock).join(separator), diagnostics };
 }

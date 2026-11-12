@@ -109,9 +109,29 @@ function plainText(node: unknown): string {
   return out.join('');
 }
 
+/** Whether rendered children hold no element and no non-empty text. */
+function isEmptyContent(children: readonly MarkupChild[]): boolean {
+  const stack: MarkupChild[] = [...children];
+  while (stack.length > 0) {
+    const child = stack.pop();
+    if (child === null || child === undefined || child === false || child === '') continue;
+    if (Array.isArray(child)) stack.push(...child);
+    else return false;
+  }
+  return true;
+}
+
 /** An id-safe form of a footnote label: percent-encoded, so `decodeURIComponent` reads it back. */
 export function footnoteIdPart(label: string): string {
-  return encodeURIComponent(label).replace(/[!'()*]/g, (c) => `%${c.charCodeAt(0).toString(16)}`);
+  // A lone surrogate makes encodeURIComponent throw; read it as U+FFFD first (T-md-security F5).
+  const wellFormed = label.replace(
+    /[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/g,
+    '\ufffd'
+  );
+  return encodeURIComponent(wellFormed).replace(
+    /[!'()*]/g,
+    (c) => `%${c.charCodeAt(0).toString(16)}`
+  );
 }
 
 function cleanPrefix(prefix: unknown): string {
@@ -260,8 +280,13 @@ class Writer {
     }
     const next = depth + 1;
     switch (node.type) {
-      case 'paragraph':
-        return tight ? this.inlines(kids(node), next) : el('p', {}, this.inlines(kids(node), next));
+      case 'paragraph': {
+        const content = this.inlines(kids(node), next);
+        // A paragraph whose content was all dropped (raw HTML, refused images without alt) writes
+        // nothing, not `<p></p>`, so the output reads back to the same layout (T-md-security).
+        if (isEmptyContent(content)) return null;
+        return tight ? content : el('p', {}, content);
+      }
       case 'heading': {
         const level = typeof node.depth === 'number' ? Math.trunc(node.depth) : 1;
         const clamped = Math.min(6, Math.max(1, Number.isFinite(level) ? level : 1));
@@ -319,8 +344,11 @@ class Writer {
       content.push(el('span', { class: 'task-list-marker' }, item.checked ? '☑' : '☐'), ' ');
     }
     const children = kids(item);
-    if (loose) content.push('\n', this.blocks(children, depth));
-    else content.push(this.blocks(children, depth, true));
+    if (loose) {
+      // An item whose blocks all wrote nothing reads back the same tight or loose: write it alike.
+      const blocks = this.blocks(children, depth);
+      if (blocks.length > 0) content.push('\n', blocks);
+    } else content.push(this.blocks(children, depth, true));
     return el('li', attributes, content);
   }
 

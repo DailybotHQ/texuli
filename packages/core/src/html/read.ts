@@ -434,10 +434,10 @@ class Reader {
         }
       }
     }
-    let value = textContent(
-      only !== undefined && isElement(only) && only.name === 'code' ? only : element
-    );
-    if (value.startsWith('\n')) value = value.slice(1);
+    const inCode = only !== undefined && isElement(only) && only.name === 'code';
+    let value = textContent(inCode ? only : element);
+    // Browsers drop one newline right after the `<pre>` start tag, never one inside `<code>`.
+    if (!inCode && value.startsWith('\n')) value = value.slice(1);
     if (value.endsWith('\n')) value = value.slice(0, -1);
     return lang === undefined
       ? { type: 'code', value, fenced: true }
@@ -607,8 +607,9 @@ class Reader {
       (['user', 'channel', 'role', 'everyone', 'here'] as const).find((k) => k === raw) ?? 'user';
     if (kind === 'everyone' || kind === 'here') return { type: 'mention', kind };
     const id = element.attributes['data-mention-id'];
-    const shown = collapse(textContent(element)).trim().replace(/^[@#]/, '');
-    const label = shown !== '' && shown !== id ? shown : undefined;
+    const shown = collapse(textContent(element)).trim().replace(/^[@#]/, '').trim();
+    // Compare as shown: the label text was whitespace-collapsed, so the id must be too.
+    const label = shown !== '' && shown !== collapse(id ?? '').trim() ? shown : undefined;
     const node: Rec = { type: 'mention', kind };
     if (id !== undefined && id !== '') node.id = id;
     if (label !== undefined) node.label = label;
@@ -645,9 +646,11 @@ const hasChildren = (node: MdInline): node is InlineParent =>
 function finishInlines(nodes: readonly MdInline[]): MdInline[] {
   const merged = mergeText(nodes);
   collapseAcross(merged, { space: true });
-  trimEdge(merged, 'start');
-  trimEdge(merged, 'end');
-  return dropEmpty(merged);
+  // Empty formatting first, so an empty `<del></del>` at an edge cannot shield the real edge.
+  const kept = dropEmpty(merged);
+  trimEdge(kept, 'start');
+  trimEdge(kept, 'end');
+  return dropEmpty(kept);
 }
 
 function mergeText(nodes: readonly MdInline[]): MdInline[] {
