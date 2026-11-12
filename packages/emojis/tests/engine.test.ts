@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { getBaseEmoji, getEmoji, getToneVariants, searchEmojis } from '../src/catalog.ts';
 import { findEmojis, parseEmojiTokens, toShortcodes, toUnicode } from '../src/index.ts';
-import { toUnicode as toUnicodeDialect, toUnicodeLegacy } from '../src/legacy-engine.ts';
+import {
+  toShortcodesLegacy,
+  toUnicode as toUnicodeDialect,
+  toUnicodeLegacy,
+} from '../src/legacy-engine.ts';
 
 describe('@texuli/emojis engine', () => {
   it('converts canonical Texuli shortcodes without loading catalog metadata', () => {
@@ -54,7 +58,25 @@ describe('@texuli/emojis engine', () => {
   it('keeps imported legacy aliases opt-in and reports strict conflicts', () => {
     expect(toUnicodeLegacy(':tada:').text).toBe('🎉');
     expect(toUnicodeDialect(':tada:', { dialect: 'legacy' })).toBe('🎉');
+    expect(toUnicodeLegacy(':thumbsup:').text).toBe('👍');
+    expect(toUnicodeLegacy(':+1:').text).toBe('👍');
+    expect(toUnicodeLegacy(':heart:').text).toBe('❤️');
+    expect(toUnicodeLegacy(':coffee:').text).toBe('☕');
+    expect(toUnicodeLegacy(':100:').text).toBe('💯');
     expect(toUnicodeLegacy(':pa:', { mode: 'strict' }).conflicts).toHaveLength(1);
     expect(toUnicodeLegacy(':pa:', { mode: 'permissive' }).text).not.toBe(':pa:');
+  });
+
+  it('writes the 3.0.2 slug, not a keyword, and names keycaps from CLDR', () => {
+    expect(toShortcodesLegacy('🚀')).toBe(':rocket:');
+    expect(toShortcodesLegacy('❤️')).toBe(':red_heart:');
+    expect(toShortcodesLegacy('😎')).toBe(':smiling_face_with_sunglasses:');
+    expect(toShortcodesLegacy('☕')).toBe(':hot_beverage:');
+    expect(toShortcodesLegacy('1️⃣')).toBe(':keycap_1:');
+    expect(toShortcodesLegacy('#️⃣')).toBe(':keycap_number_sign:');
+    expect(toShortcodes('#️⃣')).toBe(':keycap_number_sign:');
+    expect(toShortcodes('*️⃣')).toBe(':keycap_asterisk:');
+    expect(toUnicode(':keycap_number_sign:')).toBe('#️⃣');
+    expect(toUnicode(':keycap_asterisk:')).toBe('*️⃣');
   });
 });

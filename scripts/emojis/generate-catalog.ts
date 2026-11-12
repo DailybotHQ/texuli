@@ -283,6 +283,13 @@ function parseCldr(texts: readonly string[]): Map<string, { name?: string; keywo
 }
 
 function shortcodeStem(name: string): string {
+  const keycap = /^keycap:\s*(.+)$/i.exec(name.trim());
+  if (keycap) {
+    const rest = (keycap[1] ?? '').trim();
+    if (rest === '#') return 'keycap_number_sign';
+    if (rest === '*') return 'keycap_asterisk';
+    if (/^[0-9]{1,2}$/.test(rest)) return `keycap_${rest}`;
+  }
   return (
     name
       .normalize('NFKD')
@@ -336,6 +343,7 @@ function buildAliasData(records: EmojiRecord[], legacyRows: Map<string, LegacyRo
 
   const aliasesById = new Map<string, Set<string>>();
   const candidates = new Map<string, Set<string>>();
+  const slugs = new Map<string, string>();
   const unmappedLegacy: string[] = [];
   for (const [unicode, row] of legacyRows) {
     const record = getRecord(unicode);
@@ -343,6 +351,8 @@ function buildAliasData(records: EmojiRecord[], legacyRows: Map<string, LegacyRo
       unmappedLegacy.push(unicode);
       continue;
     }
+    const exactMatch = exact.get(unicode) === record;
+    if (exactMatch || !slugs.has(record.id)) slugs.set(record.id, row.slug);
     const aliases = [
       ...new Set(
         [row.slug, ...row.keywords]
@@ -397,6 +407,7 @@ function buildAliasData(records: EmojiRecord[], legacyRows: Map<string, LegacyRo
   }
   return {
     dialects: { texuli, legacy },
+    slugs: Object.fromEntries([...slugs].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))),
     conflicts,
     legacySourceRows: legacyRows.size,
     legacyMappedRows: legacyRows.size - unmappedLegacy.length,
@@ -638,7 +649,7 @@ export function generateFiles(): Record<(typeof OUTPUTS)[number], string> {
     policy: {
       canonical: 'Texuli canonical shortcode is unique and wins in the texuli dialect.',
       legacy:
-        'Unambiguous imported aliases resolve in legacy; conflicts are separated for strict refusal or deterministic permissive fallback.',
+        'Unambiguous imported aliases resolve in legacy; conflicts are separated for strict refusal or deterministic permissive fallback. The writer emits the 3.0.2 slug; keywords are read-only aliases.',
       permissiveConflict: 'earliest CLDR sortOrder, then canonical id',
       unknown: 'leave unchanged',
     },
@@ -649,6 +660,7 @@ export function generateFiles(): Record<(typeof OUTPUTS)[number], string> {
       unmappedUnicode: aliases.unmappedLegacy,
     },
     dialects: aliases.dialects,
+    slugs: aliases.slugs,
     conflicts: aliases.conflicts,
   });
   const schemaJson = serializeJson(schemaDocument(catalog.records.length));

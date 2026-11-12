@@ -60,5 +60,7 @@ export interface EmojiAliasIndex {
     unmappedUnicode: readonly string[];
   }>;
   readonly dialects: Readonly<Record<'texuli' | 'legacy', Readonly<Record<string, string>>>>;
+  /** 3.0.2 catalog slug per id; the legacy writer emits this, not a keyword. */
+  readonly slugs: Readonly<Record<string, string>>;
   readonly conflicts: readonly EmojiAliasConflict[];
 }

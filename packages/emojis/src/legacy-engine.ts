@@ -59,20 +59,17 @@ export function toUnicodeLegacy(
   return { text: output, conflicts, unknown };
 }
 
-/** Return canonical Texuli shortcodes; legacy has no single reverse alias for every record. */
+/** Return the 3.0.2 slug (`:rocket:`), not a keyword (`:launch:`). */
 export function toShortcodesLegacy(text: unknown): string {
   if (typeof text !== 'string') return '';
-  const reverse = new Map<string, string>();
-  for (const [alias, id] of Object.entries(emojiAliases.dialects.legacy)) {
-    if (!reverse.has(id)) reverse.set(id, alias);
-  }
   const matches = findEmojis(text, { source: 'unicode' });
   let output = '';
   let cursor = 0;
   for (const match of matches) {
     const record = recordById.get(match.id);
+    const slug = (record && emojiAliases.slugs[record.id]) ?? record?.shortcode.slice(1, -1);
     output += text.slice(cursor, match.start);
-    output += `:${(record && reverse.get(record.id)) ?? record?.shortcode.slice(1, -1) ?? match.source}:`;
+    output += slug ? `:${slug}:` : match.source;
     cursor = match.end;
   }
   return output + text.slice(cursor);
