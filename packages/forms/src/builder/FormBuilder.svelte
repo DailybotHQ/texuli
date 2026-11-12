@@ -14,6 +14,7 @@ import {
   builderFields,
   createBuilderField,
   reorderBuilderFields,
+  sortableDropIndex,
   withBuilderFields,
 } from './model.ts';
 
@@ -77,8 +78,13 @@ function pointerMove(event: PointerEvent) {
     const rect = row.getBoundingClientRect();
     return event.clientY < rect.top + rect.height / 2;
   });
-  const targetIndex = target ? rows.indexOf(target) : rows.length - 1;
-  controller.over({ containerId: 'fields', index: Math.max(0, targetIndex) });
+  const sourceId = controller.state.source.ids[0];
+  const sourceIndex = fields.findIndex((field) => field.name === sourceId);
+  const targetIndex = target ? rows.indexOf(target) : null;
+  controller.over({
+    containerId: 'fields',
+    index: sortableDropIndex(sourceIndex, targetIndex, false, rows.length),
+  });
 }
 function commitMove(moveResult = controller.drop()) {
   if (!moveResult?.changed) return;
@@ -143,10 +149,10 @@ function setOptions(field: FormField, value: string) {
     <section aria-label="Form canvas">
       <h2>Canvas</h2>
       {#if fields.length === 0}<p class="empty">Choose a field to start building your form.</p>{/if}
-      <ol bind:this={canvas} aria-label="Form fields" onpointermove={pointerMove} onpointerup={() => commitMove()} onpointercancel={() => controller.cancel()}>
+      <ol bind:this={canvas} aria-label="Form fields">
         {#each fields as field, index (field.name)}
           <li bind:this={rowNodes[field.name]} data-field-row aria-current={selected === field.name ? 'true' : undefined}>
-            <button class="handle" type="button" aria-label={`Reorder ${field.label}. Use Alt plus Arrow Up or Arrow Down to move.`} onpointerdown={(event) => pickUp(field.name, event)} onkeydown={(event) => keyboardReorder(field.name, event)}>⠿</button>
+            <button class="handle" type="button" aria-label={`Reorder ${field.label}. Use Alt plus Arrow Up or Arrow Down to move.`} onpointerdown={(event) => pickUp(field.name, event)} onpointermove={pointerMove} onpointerup={() => commitMove()} onpointercancel={() => controller.cancel()} onkeydown={(event) => keyboardReorder(field.name, event)}>⠿</button>
             <button class="field-select" type="button" onclick={() => { selected = field.name; }}>{field.label}<small>{field.type}</small></button>
             <button type="button" aria-label={`Move ${field.label} up`} disabled={index === 0} onclick={() => move(field.name, index - 1)}>↑</button>
             <button type="button" aria-label={`Move ${field.label} down`} disabled={index === fields.length - 1} onclick={() => move(field.name, index + 1)}>↓</button>
@@ -191,29 +197,29 @@ function setOptions(field: FormField, value: string) {
 </section>
 
 <style>
-  .builder { color: var(--tx-foreground, CanvasText); background: var(--tx-background, Canvas); display: grid; gap: 1rem; }
-  .builder-header, .builder-grid { display: grid; gap: 1rem; }
-  .builder-header { grid-template-columns: 1fr auto; align-items: end; padding: 1rem; border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-radius-md, .5rem); }
+  .builder { color: var(--tx-foreground, CanvasText); background: var(--tx-background, Canvas); display: grid; gap: var(--tx-space-4, 1rem); }
+  .builder-header, .builder-grid { display: grid; gap: var(--tx-space-4, 1rem); }
+  .builder-header { grid-template-columns: 1fr auto; align-items: end; padding: var(--tx-space-4, 1rem); border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-shape-radius-md, .5rem); }
   .builder-grid { grid-template-columns: minmax(9rem, .8fr) minmax(15rem, 1.4fr) minmax(13rem, 1fr); }
-  nav, .builder-grid > section, aside { padding: 1rem; border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-radius-md, .5rem); min-inline-size: 0; }
-  h2 { margin: 0 0 .75rem; font-size: 1rem; }
-  label { display: grid; gap: .35rem; margin-block: .6rem; font-weight: 600; }
+  nav, .builder-grid > section, aside { padding: var(--tx-space-4, 1rem); border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-shape-radius-md, .5rem); min-inline-size: 0; }
+  h2 { margin: 0 0 var(--tx-space-3, .75rem); font-size: var(--tx-font-size-base, 1rem); }
+  label { display: grid; gap: var(--tx-space-1, .35rem); margin-block: var(--tx-space-2, .6rem); font-weight: 600; }
   input, select, textarea, button { color: inherit; font: inherit; }
-  input, select, textarea { inline-size: 100%; box-sizing: border-box; padding: .45rem; border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-radius-sm, .25rem); background: var(--tx-background, Canvas); }
-  button { cursor: pointer; border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-radius-sm, .25rem); background: var(--tx-surface, Canvas); padding: .4rem .55rem; }
-  button:focus-visible, li:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--tx-focus, Highlight); outline-offset: 2px; }
-  .palette { display: flex; flex-wrap: wrap; gap: .35rem; }
-  ol { list-style: none; display: grid; gap: .45rem; margin: 0; padding: 0; }
-  li { display: flex; gap: .35rem; align-items: center; padding: .4rem; border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-radius-sm, .25rem); }
+  input, select, textarea { inline-size: 100%; box-sizing: border-box; padding: var(--tx-space-2, .45rem); border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-shape-radius-sm, .25rem); background: var(--tx-background, Canvas); }
+  button { cursor: pointer; border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-shape-radius-sm, .25rem); background: var(--tx-surface, Canvas); padding: var(--tx-space-2, .4rem) var(--tx-space-2, .55rem); }
+  button:focus-visible, li:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--tx-ring, Highlight); outline-offset: 2px; }
+  .palette { display: flex; flex-wrap: wrap; gap: var(--tx-space-1, .35rem); }
+  ol { list-style: none; display: grid; gap: var(--tx-space-2, .45rem); margin: 0; padding: 0; }
+  li { display: flex; gap: var(--tx-space-1, .35rem); align-items: center; padding: var(--tx-space-2, .4rem); border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-shape-radius-sm, .25rem); }
   li[aria-current="true"] { border-color: var(--tx-primary, Highlight); }
   .field-select { flex: 1; text-align: start; display: grid; }
-  small { display: block; opacity: .75; font-size: .75rem; }
+  small { display: block; opacity: .75; font-size: var(--tx-font-size-xs, .75rem); }
   .check { display: flex; align-items: center; }
   .check input { inline-size: auto; }
   .preview, .schema-view { grid-column: 2 / 4; }
-  .schema-view pre { max-block-size: 24rem; overflow: auto; padding: .75rem; background: var(--tx-surface, Canvas); }
-  .invalid { color: var(--tx-danger, #a11); }
-  .empty { padding: 1rem; border: 1px dashed var(--tx-border, GrayText); }
+  .schema-view pre { max-block-size: 24rem; overflow: auto; padding: var(--tx-space-3, .75rem); background: var(--tx-surface, Canvas); }
+  .invalid { font-weight: 700; }
+  .empty { padding: var(--tx-space-4, 1rem); border: 1px dashed var(--tx-border, GrayText); }
   .sr-only { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   @media (max-width: 48rem) { .builder-grid { grid-template-columns: 1fr; } .preview, .schema-view { grid-column: 1; } .builder-header { grid-template-columns: 1fr; } }
 </style>

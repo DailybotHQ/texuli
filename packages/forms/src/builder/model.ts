@@ -69,3 +69,19 @@ export function reorderBuilderFields<T extends { readonly name: string }>(
   next.splice(index, 0, field as T);
   return next;
 }
+
+/** Convert a pointer insertion slot into the moved item's final index. */
+export function sortableDropIndex(
+  sourceIndex: number,
+  targetIndex: number | null,
+  afterTarget: boolean,
+  itemCount: number
+): number {
+  if (itemCount <= 0) return 0;
+  const source = Math.min(itemCount - 1, Math.max(0, Math.trunc(sourceIndex)));
+  const insertion = Math.min(
+    itemCount,
+    Math.max(0, targetIndex === null ? itemCount : Math.trunc(targetIndex) + (afterTarget ? 1 : 0))
+  );
+  return Math.min(itemCount - 1, Math.max(0, insertion - (source < insertion ? 1 : 0)));
+}

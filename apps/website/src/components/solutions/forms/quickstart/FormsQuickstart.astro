@@ -1,0 +1,10 @@
+---
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionQuickstart from '../../shared/quickstart/Quickstart.astro';
+import { formsQuickstart } from './samples.ts';
+
+const entry = getSolution('forms');
+const { entry: _entry, ...quickstart } = formsQuickstart(entry);
+---
+
+<SolutionQuickstart entry={entry} {...quickstart} />

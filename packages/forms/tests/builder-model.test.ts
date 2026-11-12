@@ -3,6 +3,7 @@ import {
   builderFields,
   createBuilderField,
   reorderBuilderFields,
+  sortableDropIndex,
   withBuilderFields,
 } from '../src/builder/model.ts';
 import type { FormField, FormSchema } from '../src/model/types.ts';
@@ -49,6 +50,15 @@ describe('form builder model', () => {
     ]);
     expect(reorderBuilderFields(fields, 'missing', 0)).toBe(fields);
     expect(reorderBuilderFields(fields, 'first', 5)).toBe(fields);
+  });
+
+  it('converts pointer insertion slots to final drop indices around the source item', () => {
+    expect(sortableDropIndex(0, 2, false, 3)).toBe(1);
+    expect(sortableDropIndex(0, 2, true, 3)).toBe(2);
+    expect(sortableDropIndex(2, 0, false, 3)).toBe(0);
+    expect(sortableDropIndex(2, 0, true, 3)).toBe(1);
+    expect(sortableDropIndex(1, 1, true, 3)).toBe(1);
+    expect(sortableDropIndex(0, null, false, 3)).toBe(2);
   });
 
   it('normalizes an edited layout to the validator supported flat schema', () => {

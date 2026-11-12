@@ -1,0 +1,9 @@
+---
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionHero from '../../shared/hero/SolutionHero.astro';
+import { FORMS_HERO } from './hero-content.ts';
+
+const entry = getSolution('forms');
+---
+
+<SolutionHero entry={entry} {...FORMS_HERO} />
