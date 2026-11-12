@@ -51,13 +51,13 @@ const trendText = $derived(trend === 'up' ? 'Up' : trend === 'down' ? 'Down' : '
 </article>
 
 <style>
-  .tx-metric-card { display: grid; align-content: start; gap: 0.45rem; min-inline-size: 0; padding: 1rem; border: 1px solid var(--tx-border, #888); border-radius: 0.75rem; background: var(--tx-surface, Canvas); color: var(--tx-text, CanvasText); }
+  .tx-metric-card { display: grid; align-content: start; gap: var(--tx-space-2); min-inline-size: 0; padding: var(--tx-space-4); border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText); border-radius: var(--tx-shape-radius-lg); background: var(--tx-surface, Canvas); color: var(--tx-surface-foreground, CanvasText); }
   .tx-metric-card__title, .tx-metric-card__value, .tx-metric-card__comparison, .tx-metric-card__empty, .tx-metric-card__loading { margin: 0; }
-  .tx-metric-card__title { font-size: 0.875rem; font-weight: 600; }
-  .tx-metric-card__value { font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
-  .tx-metric-card__comparison, .tx-metric-card__empty, .tx-metric-card__loading { color: var(--tx-muted-foreground, #555); font-size: 0.875rem; }
-  .tx-metric-card__comparison { display: flex; flex-wrap: wrap; gap: 0.35rem; }
-  .tx-metric-card__sparkline { margin: 0.25rem 0 0; max-inline-size: 12rem; }
+  .tx-metric-card__title { font-size: var(--tx-type-label-size); font-weight: 600; }
+  .tx-metric-card__value { font-size: clamp(var(--tx-font-size-2xl), 4vw, var(--tx-type-display-size)); font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .tx-metric-card__comparison, .tx-metric-card__empty, .tx-metric-card__loading { color: var(--tx-muted-foreground, GrayText); font-size: var(--tx-type-label-size); }
+  .tx-metric-card__comparison { display: flex; flex-wrap: wrap; gap: var(--tx-space-1); }
+  .tx-metric-card__sparkline { margin-block-start: var(--tx-space-1); max-inline-size: 12rem; }
   .tx-metric-card__loading { min-block-size: 2rem; }
   .tx-metric-card__sr { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   @media (prefers-reduced-motion: no-preference) { .tx-metric-card__loading { animation: tx-metric-pulse 1.4s ease-in-out infinite alternate; } }
