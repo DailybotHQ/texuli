@@ -14,9 +14,14 @@ interface Props {
   class?: string;
   /** Override alt from the manifest when the surrounding context needs a different description. */
   alt?: string;
+  /**
+   * Override the variant's `sizes` hint where the slot renders narrower than usual (a card
+   * grid), so the browser picks a smaller derived width.
+   */
+  sizes?: string;
 }
 
-const { art: slot, class: className = '', alt: altOverride } = Astro.props;
+const { art: slot, class: className = '', alt: altOverride, sizes: sizesOverride } = Astro.props;
 const entry = illustrationFor(slot);
 if (!entry) {
   throw new Error(`Unknown illustration slot "${slot}". Add it to src/data/illustrations.json.`);
@@ -28,7 +33,7 @@ const files = import.meta.glob<{ default: ImageMetadata }>('../../assets/illustr
   eager: true,
 });
 const asset = (file: string) => files[`../../assets/illustrations/${file}`]?.default;
-const sizes = ILLUSTRATION_SIZES[entry.variant];
+const sizes = sizesOverride ?? ILLUSTRATION_SIZES[entry.variant];
 const widths = illustrationWidths(entry);
 /** The full file as `src`, plus smaller WebP widths derived at build time as `srcset`. */
 async function responsive(image: ImageMetadata | undefined) {

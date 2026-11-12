@@ -54,7 +54,7 @@ describe('Native principles, agents and start building', () => {
     ]);
   });
 
-  it('names real agent surfaces and reuses the home-agents plate', () => {
+  it('names real agent surfaces and shows the native agents and start plates', () => {
     expect(view.surfaces.map((s) => s.label)).toEqual([
       '@texuli/spec',
       'validateDraft',
@@ -62,9 +62,14 @@ describe('Native principles, agents and start building', () => {
     ]);
     expect(view.steps.find((step) => step.id === 'validate')?.body).toContain('validateDraft');
     expect(view.steps.find((step) => step.id === 'validate')?.body).toContain('blueprint.validate');
-    expect(NATIVE_PRINCIPLES.art).toBe('home-agents');
+    expect(NATIVE_PRINCIPLES.art).toBe('native-agents');
+    expect(NATIVE_PRINCIPLES.startArt).toBe('native-start');
     expect(COMPONENT).toContain('<SiteIllustration art={copy.art} />');
-    expect(existsSync(resolve(WEBSITE, 'src/assets/illustrations/home-agents.webp'))).toBe(true);
+    expect(COMPONENT).toContain('<SiteIllustration art={copy.startArt} />');
+    for (const slot of [NATIVE_PRINCIPLES.art, NATIVE_PRINCIPLES.startArt])
+      expect(existsSync(resolve(WEBSITE, `src/assets/illustrations/${slot}.webp`)), slot).toBe(
+        true
+      );
   });
 
   it('points start-building actions at real pages or the native directory', () => {

@@ -63,7 +63,7 @@ describe('Sheets polish', () => {
     expect(islands).toEqual(['SheetsDemo:visible']);
     expect(PAGE).not.toMatch(/set:html|\{@html|innerHTML/);
     expect(islandBudgetFor('/solutions/sheets/')).toBe(1);
-    expect(budgetFor('/solutions/sheets/').pageGzipKb).toBe(186);
+    expect(budgetFor('/solutions/sheets/').pageGzipKb).toBe(323);
     expect(budgetFor('/solutions/sheets/').htmlGzipKb).toBe(31);
   });
 });

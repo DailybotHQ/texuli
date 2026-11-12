@@ -8,6 +8,7 @@
  * URL policy (developer tier).
  */
 import { safeHref } from '@texuli/core/url-policy';
+import SiteIllustration from '../../../landing/SiteIllustration.astro';
 import StatusBadge from '../../../solutions/shared/platforms/StatusBadge.astro';
 import { blueprintDiagram } from './blueprint-content.ts';
 
@@ -17,9 +18,14 @@ const links = view.links.map((link) => ({ ...link, href: safeHref(link.href, 'de
 
 <section class="native-blueprint" aria-labelledby={view.headingId} data-tx-native-blueprint="">
   <div class="native-blueprint__inner">
-    <div class="native-blueprint__head">
-      <h2 id={view.headingId}>{view.title}</h2>
-      <p class="native-blueprint__lede">{view.lede}</p>
+    <div class="native-blueprint__intro">
+      <div class="native-blueprint__head">
+        <h2 id={view.headingId}>{view.title}</h2>
+        <p class="native-blueprint__lede">{view.lede}</p>
+      </div>
+      <div class="native-blueprint__art">
+        <SiteIllustration art="native-shared-blueprint" />
+      </div>
     </div>
     <figure class="native-blueprint__diagram" data-tx-blueprint-diagram="">
       <figcaption class="native-blueprint__caption">{view.summary}</figcaption>
@@ -104,6 +110,22 @@ const links = view.links.map((link) => ({ ...link, href: safeHref(link.href, 'de
     max-inline-size: 76rem;
     margin-inline: auto;
     padding-inline: clamp(1rem, 4vw, 1.5rem);
+  }
+  .native-blueprint__intro {
+    display: grid;
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+    align-items: center;
+  }
+  @media (min-width: 60rem) {
+    .native-blueprint__intro {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    }
+  }
+  .native-blueprint__art {
+    inline-size: 100%;
+    max-inline-size: 34rem;
+    min-inline-size: 0;
+    justify-self: center;
   }
   .native-blueprint__head {
     display: grid;

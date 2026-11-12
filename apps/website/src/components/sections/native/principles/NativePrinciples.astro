@@ -73,23 +73,28 @@ const actions = view.actions.map((action) => ({ ...action, href: resolveHref(act
   </section>
 
   <section class="native-principles__band" aria-labelledby={copy.ids.start} data-band="start">
-    <div class="native-principles__inner">
-      <h2 id={copy.ids.start}>{copy.start.title}</h2>
-      <p class="native-principles__lede">{copy.start.lede}</p>
-      <div class="native-principles__actions">
-        {
-          actions.map((action) =>
-            action.href ? (
-              <a
-                href={action.href}
-                class={`native-principles__cta native-principles__cta--${action.role}`}
-                data-tx-native-start={action.role}
-              >
-                {action.label}
-              </a>
-            ) : null
-          )
-        }
+    <div class="native-principles__inner native-principles__inner--agents">
+      <div class="native-principles__copy">
+        <h2 id={copy.ids.start}>{copy.start.title}</h2>
+        <p class="native-principles__lede">{copy.start.lede}</p>
+        <div class="native-principles__actions">
+          {
+            actions.map((action) =>
+              action.href ? (
+                <a
+                  href={action.href}
+                  class={`native-principles__cta native-principles__cta--${action.role}`}
+                  data-tx-native-start={action.role}
+                >
+                  {action.label}
+                </a>
+              ) : null
+            )
+          }
+        </div>
+      </div>
+      <div class="native-principles__art">
+        <SiteIllustration art={copy.startArt} />
       </div>
     </div>
   </section>
@@ -156,6 +161,11 @@ const actions = view.actions.map((action) => ({ ...action, href: resolveHref(act
   .native-principles__copy,
   .native-principles__art {
     min-inline-size: 0;
+  }
+  .native-principles__copy {
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
   }
   .native-principles__surfaces li {
     overflow-wrap: anywhere;

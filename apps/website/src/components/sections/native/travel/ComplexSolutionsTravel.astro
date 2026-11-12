@@ -1,20 +1,26 @@
 ---
 import { safeHref } from '@texuli/core/url-policy';
 import { REPOSITORY_URL } from '../../../foundation/site.ts';
+import SiteIllustration from '../../../landing/SiteIllustration.astro';
 import { NATIVE_SHARED_SOLUTIONS } from './travel-content.ts';
 
 const codeHref = (path: string) => safeHref(`${REPOSITORY_URL}/blob/main/${path}`, 'developer');
 ---
 
 <section class="native-solutions-travel" aria-labelledby="native-solutions-travel-title" data-tx-native-solutions-travel="">
-  <div class="native-solutions-travel__heading">
-    <p class="native-solutions-travel__eyebrow">Shared intent, adapted experience</p>
-    <h2 id="native-solutions-travel-title">Complex solutions share a model, not a screen</h2>
-    <p>
-      A presentation, document, workflow, canvas, or workbook can keep its domain data and intent
-      while each platform chooses an appropriate reading, editing, and navigation experience.
-      The current native evidence is component-level; it does not certify these complete solution editors.
-    </p>
+  <div class="native-solutions-travel__intro">
+    <div class="native-solutions-travel__heading">
+      <p class="native-solutions-travel__eyebrow">Shared intent, adapted experience</p>
+      <h2 id="native-solutions-travel-title">Complex solutions share a model, not a screen</h2>
+      <p>
+        A presentation, document, workflow, canvas, or workbook can keep its domain data and intent
+        while each platform chooses an appropriate reading, editing, and navigation experience.
+        The current native evidence is component-level; it does not certify these complete solution editors.
+      </p>
+    </div>
+    <div class="native-solutions-travel__art">
+      <SiteIllustration art="native-solutions" />
+    </div>
   </div>
 
   <ul class="native-solutions-travel__list">
@@ -34,6 +40,9 @@ const codeHref = (path: string) => safeHref(`${REPOSITORY_URL}/blob/main/${path}
 
 <style>
   .native-solutions-travel { display: grid; gap: 1rem; max-inline-size: 78rem; margin-inline: auto; padding: clamp(2.5rem, 7vw, 5rem) clamp(1rem, 4vw, 1.5rem); color: var(--tx-foreground, CanvasText); }
+  .native-solutions-travel__intro { display: grid; gap: clamp(1.25rem, 3vw, 2.5rem); align-items: center; }
+  @media (min-width: 60rem) { .native-solutions-travel__intro { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); } }
+  .native-solutions-travel__art { inline-size: 100%; max-inline-size: 34rem; min-inline-size: 0; justify-self: center; }
   .native-solutions-travel__heading { max-inline-size: 48rem; }
   .native-solutions-travel__eyebrow { margin: 0 0 0.45rem; color: var(--tx-muted-foreground, GrayText); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.05em; }
   .native-solutions-travel h2 { margin: 0; font-size: clamp(1.65rem, 4vw, 2.4rem); line-height: 1.15; }

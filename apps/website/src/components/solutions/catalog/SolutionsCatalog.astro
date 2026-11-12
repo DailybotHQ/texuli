@@ -31,6 +31,12 @@ const filters = [
 ];
 const anchor = (id: string) => `solutions-${id}`;
 const tiles = Array.from({ length: 24 }, (_, i) => ((i * 3 + 4) % 8) % 5);
+/**
+ * Cards sit three to a row (about 22rem) on wide screens and two between 44rem and 64rem. On a
+ * phone a card is about 85vw; asking for 60vw caps a 2.6x screen at the 800 px width (about
+ * 2.4 device pixels per CSS pixel, still sharp) instead of the full 1200 px file for each card.
+ */
+const CARD_ART_SIZES = '(min-width: 64rem) 22rem, (min-width: 44rem) 46vw, 60vw';
 ---
 
 <div class="sol-catalog" data-tx-solutions-catalog="">
@@ -92,7 +98,7 @@ const tiles = Array.from({ length: 24 }, (_, i) => ((i * 3 + 4) % 8) % 5);
             data-on-native={String(card.onNative)}
           >
             <div class="sol-catalog__card-art">
-              <SiteIllustration art={card.art} />
+              <SiteIllustration art={card.art} sizes={CARD_ART_SIZES} />
             </div>
             <div class="sol-catalog__card-head">
               <h2>{card.name}</h2>

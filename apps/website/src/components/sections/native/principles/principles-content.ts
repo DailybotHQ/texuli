@@ -35,8 +35,10 @@ export const NATIVE_PRINCIPLES = {
     agents: 'native-agents-title',
     start: 'native-start-title',
   },
-  art: 'home-agents',
-  artAlt: 'An agent orb emitting tiles through a validation gate into an interface.',
+  /** The agents band plate: the orb, the validation gate, then a web window and a phone. */
+  art: 'native-agents',
+  /** The start-building band plate: blueprint, platform adapter, browser card and phone card. */
+  startArt: 'native-start',
   principles: {
     title: 'Native should feel native.',
     lede: 'These are experience principles, not a checklist of what Compose already paints. Touch, IME, safe areas, haptics and live regions wait on a host that supports them.',
