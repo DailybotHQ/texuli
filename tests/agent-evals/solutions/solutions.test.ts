@@ -166,6 +166,7 @@ describe('agent builds each shipped Solution from llms.txt → index → docs �
         'dashboards',
         'design-systems',
         'documents',
+        'editor',
         'forms',
         'sheets',
         'slides',
@@ -317,6 +318,40 @@ describe('agent builds each shipped Solution from llms.txt → index → docs �
         expect(ctx.data('report').valid).toBe(true);
         expect(ctx.data('refused').valid).toBe(false);
         expect(JSON.stringify(ctx.data('refused').diagnostics)).toContain('unknown-id');
+      },
+    });
+  });
+
+  it('send an editor note to chat: md.convert writes Slack, refuses the javascript: link and keeps @everyone inert', async () => {
+    const { entry, docs } = await discover('editor');
+    expect(entry.packages.map((p: Json) => p.name)).toEqual([
+      '@texuli/editor',
+      '@texuli/core',
+      'texuli',
+    ]);
+    // The docs name the conversion an agent can run and the editor function that matches it.
+    expect(docs).toContain('documentToDialect');
+    expect(docs).toContain('md.convert');
+    await build({
+      name: 'editor note to chat',
+      steps: [
+        {
+          label: 'slack',
+          method: 'tools/call',
+          params: call('md.convert', {
+            source:
+              '**Password reset**: open [the page](https://example.com/reset), not [this](javascript:alert(1)). @everyone',
+            from: 'markdown',
+            to: 'slack',
+          }),
+        },
+      ],
+      final(ctx) {
+        const value = String(ctx.data('slack').value);
+        expect(value).toContain('*Password reset*');
+        expect(value).toContain('<https://example.com/reset|the page>');
+        expect(value).not.toContain('javascript');
+        expect(value).not.toMatch(/(?<!\u200b)@everyone/);
       },
     });
   });

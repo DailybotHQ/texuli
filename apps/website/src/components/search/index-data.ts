@@ -244,6 +244,15 @@ const SITE_PAGES: readonly SearchEntry[] = [
     ],
   },
   {
+    id: 'page-editor-solution',
+    title: 'Rich text editor',
+    description:
+      'Rich text editor: Markdown in and out, HTML paste without scripts or unsafe links, a block-type menu, emoji and export to Slack, Discord, Teams and other chat formats with the losses listed (in development; fixture documents, nothing sent).',
+    href: '/solutions/editor/',
+    kind: 'page',
+    keywords: ['editor', 'rich text', 'markdown', 'paste', 'emoji', 'slack', 'discord', 'export'],
+  },
+  {
     id: 'page-dashboards',
     title: 'Dashboards',
     description:

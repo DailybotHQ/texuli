@@ -94,6 +94,7 @@
       "site-native.spec.ts",
       "site-output.spec.ts",
       "site-slides.spec.ts",
+      "site-solution-editor.spec.ts",
       "site-visual.spec.ts"
     ],
     [

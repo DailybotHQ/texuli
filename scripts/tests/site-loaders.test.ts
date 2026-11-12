@@ -221,6 +221,7 @@ describe('guides nav', () => {
           '/guides/solutions/dashboards/',
           '/guides/solutions/forms/',
           '/guides/solutions/agent-chat/',
+          '/guides/solutions/editor/',
           '/guides/performance/',
         ]);
         expect(new Set(hrefs).size).toBe(hrefs.length);
@@ -232,9 +233,7 @@ describe('guides nav', () => {
         expect(guidesPager('/guides/').prev).toBeUndefined();
         expect(guidesPager('/guides/').next?.href).toBe('/guides/getting-started/');
         expect(guidesPager('/guides/performance/').next).toBeUndefined();
-        expect(guidesPager('/guides/performance/').prev?.href).toBe(
-          '/guides/solutions/agent-chat/'
-        );
+        expect(guidesPager('/guides/performance/').prev?.href).toBe('/guides/solutions/editor/');
         expect(guidesPager('/unknown/').current).toBeUndefined();
 
         const flatCount = flattenGuidesNav().length;
