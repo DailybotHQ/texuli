@@ -42,6 +42,7 @@ import './command/entry.ts';
 import './data-activity/entry.ts';
 import './data-board/entry.ts';
 import './data-dashboard/entry.ts';
+import './data-dashboard-metrics/entry.ts';
 import './data-board-footer/entry.ts';
 import './data-board-lanes/entry.ts';
 import './data-calendar/entry.ts';
