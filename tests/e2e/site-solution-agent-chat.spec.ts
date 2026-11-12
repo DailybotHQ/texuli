@@ -117,6 +117,18 @@ test('the composer autocompletes a command and a mention from the keyboard', asy
   await expect(people.getByRole('option', { selected: true })).toContainText('Avery Chen');
   await field.press('Enter');
   await expect(field).toHaveValue('/form for @[Avery Chen](mention:avery) ');
+  // `:` and a letter search the emoji data (loaded on first use) and insert the emoji itself.
+  await field.pressSequentially(':rocket');
+  const emoji = demo(page).getByRole('listbox', { name: 'Emoji' });
+  const rocket = emoji.getByRole('option', { name: /:rocket:/ });
+  await expect(rocket).toBeVisible({ timeout: 20_000 });
+  // Move the active option to :rocket: from the keyboard, then insert it with Enter.
+  const options = await emoji.getByRole('option').allTextContents();
+  const target = options.findIndex((text) => text.includes(':rocket:'));
+  for (let step = 0; step < target; step += 1) await field.press('ArrowDown');
+  await expect(rocket).toHaveAttribute('aria-selected', 'true');
+  await field.press('Enter');
+  await expect(field).toHaveValue('/form for @[Avery Chen](mention:avery) \u{1F680} ');
   await field.press('Enter');
 
   await expect(log(page).locator('[data-mention-id="avery"]')).toBeVisible();

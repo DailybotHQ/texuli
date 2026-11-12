@@ -22,7 +22,7 @@ export const AGENT_CHAT_DEMO: Omit<SolutionDemoFrameProps, 'entry'> = {
   tryThis: [
     'Run “Support triage” and press Stop before the reply ends: the text so far stays, marked as stopped.',
     'Run “Weekly report”, open the report preview, and read why the forecast attachment was refused.',
-    'Type @ or / in the composer, choose with the arrow keys and press Enter.',
+    'Type @, / or : and a letter in the composer, choose with the arrow keys and press Enter.',
     'Copy the last reply as Slack, Discord, Teams or WhatsApp text.',
   ],
 };

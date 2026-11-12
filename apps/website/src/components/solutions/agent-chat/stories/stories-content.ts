@@ -12,7 +12,7 @@ export const AGENT_CHAT_STORIES: Omit<SolutionStoriesProps, 'entry'> = {
     {
       id: 'compose',
       title: 'Mention people and run commands from the composer.',
-      body: 'Type @ to mention a teammate or / for a command. The list follows the combobox pattern: arrows choose, Enter inserts, Escape closes. Emoji autocomplete arrives with Texuli Emojis.',
+      body: 'Type @ to mention a teammate, / for a command or : for an emoji. The list follows the combobox pattern: arrows choose, Enter inserts, Escape closes.',
       capabilities: ['autocomplete'],
       status: 'in development',
     },

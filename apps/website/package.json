@@ -27,6 +27,7 @@
     "@texuli/document": "workspace:*",
     "@texuli/drag": "workspace:*",
     "@texuli/editor": "workspace:*",
+    "@texuli/emojis": "workspace:*",
     "@texuli/examples": "workspace:*",
     "@texuli/forms": "workspace:*",
     "@texuli/media": "workspace:*",
