@@ -18,6 +18,7 @@ editor.undo();
 | `doc` | Starting document (validated by the caller) |
 | `trust` | Tier for typed links. Default `untrusted` |
 | `limits`, `newId` | Passed to every transform |
+| `shortcodes` | The `:shortcode:` input rule's lookup: a typed `:name:` becomes the returned text (an emoji). The editor carries no emoji data; pass an emoji catalog's lookup. None by default |
 | `labels` | Partial `EditorLabels` |
 | `announce` | Where announcements go (the surface passes the core announcer) |
 | `onChange` | Every accepted document change, undo and redo included |
@@ -38,7 +39,15 @@ Commands: `runKey(intent)` and `runInput(intent, data)` for the keymap and
 `toggleMark`, `setBlock`, `toggleList`, `toggleQuote`, `indent`, `outdent`,
 `toggleTodo`, `toggleItem`, `insertDivider`, `setLink`, `removeLink`,
 `insertText` (input rules apply as their own undo step), `paste(clipboard)`,
-`select`, `replace`, `undo`, `redo`.
+`pasteMarkdown(text)` ("Paste as Markdown": async, it loads the Markdown codec
+on first use), `setBlockKind(kind)` (the block-type
+menu: one undo step, announced), `insertEmoji(text)` (a picker's choice: its
+own undo step, apart from typing), `setShortcodes(lookup)` (swap the
+`:shortcode:` lookup), `announce(message)`, `select`, `replace`,
+`undo`, `redo`. `blockKind` is the kind the block-type menu shows at the
+caret (an `EditorBlockKindChoice` from `@texuli/core/editor-transforms`, also
+re-exported here, or `null` on a void block); `blockKindLabel(labels, kind)`
+is its visible name.
 
 Composition guard: `compositionStart()` sets `composing`, and while it is
 set `runInput` changes nothing. `compositionEnd(blockId, domText)` applies

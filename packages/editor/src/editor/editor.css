@@ -222,6 +222,21 @@ h4.tx-editor-heading {
   flex-wrap: wrap;
 }
 
+/* A toolbar item that loads on demand keeps its place meanwhile. */
+.tx-editor-pending {
+  display: inline-block;
+  inline-size: 2rem;
+  block-size: 2rem;
+}
+
+.tx-editor-pending--menu {
+  inline-size: 8rem;
+}
+
+.tx-editor-glyph::before {
+  content: attr(data-glyph-text);
+}
+
 .tx-editor-glyph {
   min-inline-size: 1.25rem;
   font-weight: 600;

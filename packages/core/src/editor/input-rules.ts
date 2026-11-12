@@ -39,6 +39,9 @@ const INLINE_RULES: readonly { pattern: RegExp; size: number; mark: EditorMark }
 
 const AUTOLINK = /(?:^|\s)((?:https?:\/\/|mailto:)[^\s]+) $/i;
 
+/** `:name:` right before the caret, not glued to a word, a colon or a backslash (bounded: linear). */
+const SHORTCODE = /(?:^|[^A-Za-z0-9_:\\]):([a-z0-9_+-]{1,64}):$/i;
+
 /**
  * Markdown input rules, run by the binding after typed text (the result is
  * its own undo step, so undo restores the literal characters):
@@ -49,7 +52,9 @@ const AUTOLINK = /(?:^|\s)((?:https?:\/\/|mailto:)[^\s]+) $/i;
  *   backticks (and a language) and a space a code block; `---` a divider;
  * - inline: `**x**`, `*x*`, `~~x~~` and `` `x` `` mark `x`, and a typed URL
  *   followed by a space becomes a link when `safeHref` accepts it (always at
- *   the `untrusted` tier).
+ *   the `untrusted` tier);
+ * - `:name:` becomes the text `options.shortcodes(name)` returns (an emoji), when the host
+ *   passes a lookup; never inside code.
  *
  * Returns `null` when no rule applies.
  */
@@ -67,7 +72,7 @@ export function applyInputRules(
     const result = blockRule(state, block, location, before, options);
     if (result) return result;
   }
-  return inlineRule(state, block, before, offset);
+  return inlineRule(state, block, before, offset, options);
 }
 
 function blockRule(
@@ -139,7 +144,8 @@ function inlineRule(
   state: EditorState,
   block: EditorRichBlock,
   before: string,
-  offset: number
+  offset: number,
+  options?: EditorTransformOptions
 ): EditorTransformResult | null {
   const done = (content: EditorRichBlock['content'], at: number): EditorTransformResult => ({
     ok: true,
@@ -150,6 +156,31 @@ function inlineRule(
       storedMarks: null,
     },
   });
+  const shortcode = options?.shortcodes ? SHORTCODE.exec(before) : null;
+  if (shortcode) {
+    const name = shortcode[1] as string;
+    let value: string | undefined;
+    try {
+      value = options?.shortcodes?.(name.toLowerCase());
+    } catch {
+      value = undefined;
+    }
+    const start = offset - name.length - 2;
+    const runs = textRuns(block.content, start, offset);
+    if (
+      typeof value === 'string' &&
+      value.length > 0 &&
+      value.length <= 32 &&
+      !/[\n\r]/.test(value) &&
+      !runs.some((run) => hasMark(run.marks, 'code'))
+    ) {
+      const marks = runs[0]?.marks ?? [];
+      const content = spliceInline(block.content, start, offset, [
+        { type: 'text', text: value, marks: [...marks] },
+      ]);
+      return done(content, start + value.length);
+    }
+  }
   for (const { pattern, size, mark } of INLINE_RULES) {
     const match = pattern.exec(before);
     if (!match) continue;

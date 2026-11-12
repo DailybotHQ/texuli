@@ -10,6 +10,7 @@ let {
   styles = $bindable<string[]>([]),
   onSave,
   onValueChange,
+  popup = false,
 }: {
   orientation?: 'horizontal' | 'vertical';
   loop?: boolean;
@@ -18,6 +19,8 @@ let {
   styles?: string[];
   onSave?: () => void;
   onValueChange?: (value: string | string[]) => void;
+  /** A popup opened in place inside the toolbar (a menu or picker): not a toolbar item. */
+  popup?: boolean;
 } = $props();
 </script>
 
@@ -39,6 +42,9 @@ let {
     <Toolbar.Button disabled onclick={onSave}>Publish</Toolbar.Button>
     <Toolbar.Link href="https://example.com/help">Help</Toolbar.Link>
     <Toolbar.Link href="javascript:alert(1)">Unsafe</Toolbar.Link>
+    {#if popup}
+      <div role="grid" tabindex="-1" aria-label="Picker">grid</div>
+    {/if}
   </Toolbar.Root>
 </div>
 <button type="button">After</button>

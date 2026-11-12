@@ -56,10 +56,13 @@ held document in `$state.raw`, not `$state`, so it is not deep-proxied.
 | --- | --- | --- |
 | `@texuli/editor/editor` | `RichTextEditor` (toolbar, link dialog and surface), `EditorSurface`, the DOM selection mapping | [editor-surface](https://github.com/DailybotHQ/texuli/blob/main/packages/editor/docs/editor-surface.md) |
 | `@texuli/editor/toolbar` | `EditorToolbar`, the roving formatting toolbar | [editor-toolbar](https://github.com/DailybotHQ/texuli/blob/main/packages/editor/docs/editor-toolbar.md) |
+| `@texuli/editor/block-menu` | `BlockTypeMenu`, the block-type menu button (paragraph, headings, lists, quote, code; one undo step) | [editor-block-menu](https://github.com/DailybotHQ/texuli/blob/main/packages/editor/docs/editor-block-menu.md) |
+| `@texuli/editor/emoji` | `EditorEmojiButton`, the toolbar emoji button with `EmojiPicker` in a popover; the `:shortcode:` rule is the controller's `shortcodes` lookup | [editor-emoji](https://github.com/DailybotHQ/texuli/blob/main/packages/editor/docs/editor-emoji.md) |
+| `@texuli/editor/export` | `DialectExport`, the export-for-chat panel (Slack, Discord, WhatsApp, Telegram, Teams, Google Chat, Mattermost, plain text) with the losses shown | [editor-export](https://github.com/DailybotHQ/texuli/blob/main/packages/editor/docs/editor-export.md) |
 | `@texuli/editor/link-dialog` | `LinkDialog`, link editing through the URL policy | [editor-link-dialog](https://github.com/DailybotHQ/texuli/blob/main/packages/editor/docs/editor-link-dialog.md) |
 | `@texuli/editor/controller` | `EditorController`, the headless editor (history, commands, composition guard, announcements), and `DEFAULT_EDITOR_LABELS` | [editor-controller](https://github.com/DailybotHQ/texuli/blob/main/packages/editor/docs/editor-controller.md) |
-| `@texuli/editor/markdown` | `markdownToDocument` and `documentToMarkdown`: framework-free Markdown in and out | [editor-markdown](https://github.com/DailybotHQ/texuli/blob/main/packages/editor/docs/editor-markdown.md) |
-| `@texuli/editor/paste` | Framework-free clipboard import: the owned HTML tokenizer, plain text and the editor's JSON format | [editor-paste](https://github.com/DailybotHQ/texuli/blob/main/packages/editor/docs/editor-paste.md) |
+| `@texuli/editor/markdown` | `markdownToDocument` and `documentToMarkdown`: framework-free Markdown in and out; `importMarkdown` (Paste as Markdown) and `documentToDialect` (chat formats) | [editor-markdown](https://github.com/DailybotHQ/texuli/blob/main/packages/editor/docs/editor-markdown.md) |
+| `@texuli/editor/paste` | Framework-free clipboard import: HTML through the shared DOM-free reader (`@texuli/core/html`), plain text and the editor's JSON format | [editor-paste](https://github.com/DailybotHQ/texuli/blob/main/packages/editor/docs/editor-paste.md) |
 | `@texuli/editor` | The editor, toolbar, link dialog, controller and paste in one barrel (not the Markdown codec), plus `EDITOR_PACKAGE_VERSION` | — |
 
 Each subpath has its own gzip budget in `texuli.budgets.json`

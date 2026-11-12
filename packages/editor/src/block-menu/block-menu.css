@@ -1,0 +1,19 @@
+/* @texuli/editor/block-menu: the block-type menu button. --tx-* tokens only. */
+/* Block-type menu (PLAN_023 row 12): the trigger shows the current kind's name. */
+.tx-editor-block-menu {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tx-space-1);
+  inline-size: auto;
+  min-inline-size: 8rem;
+  justify-content: space-between;
+  padding-inline: var(--tx-space-2);
+}
+
+.tx-editor-block-menu__name {
+  white-space: nowrap;
+}
+
+.tx-editor-block-menu__chevron {
+  color: var(--tx-muted-foreground, GrayText);
+}

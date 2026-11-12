@@ -384,14 +384,21 @@ model or texel contract.
    passes the policy again.
 2. `text/html`, sanitized into the vocabulary (below).
 3. `text/plain`, inserted as text. Blank lines split paragraphs. Markdown is
-   not interpreted on paste. A separate “Paste as Markdown” command runs the
-   Markdown codec.
+   not interpreted on paste. A separate “Paste as Markdown” command
+   (Mod+Alt+Shift+V, `controller.pasteMarkdown(text)`, `importMarkdown` in
+   `@texuli/editor/markdown`) runs the Markdown codec at the `untrusted` tier; the
+   surface reads the clipboard text with the async Clipboard API, or, when
+   the browser refuses, announces that the next paste reads as Markdown.
 
 **HTML import:**
 
-- Clipboard HTML goes through an owned, framework-free tokenizer
-  (`@texuli/editor/paste`) that reads tags, attributes, text and character
-  references from the string. It never builds a DOM.
+- Clipboard HTML goes through the shared, framework-free HTML reader
+  (`htmlToMarkdownTree` from `@texuli/core/html`, ADR-034, at the `untrusted`
+  tier) and is projected onto the vocabulary by `fromMarkdownTree`
+  (`@texuli/core/editor-markdown`). It reads tags, a few attributes, text and
+  character references from the string and never builds a DOM. (Until
+  PLAN_023 the editor had its own tokenizer, still exported from
+  `@texuli/editor/paste` for compatibility.)
 - An allowlist maps elements to nodes and marks:
   - `p`, `div` and `br` → paragraph and break;
   - `h1`–`h6` → heading, clamped to level 4;
@@ -402,9 +409,12 @@ model or texel contract.
   - `b`/`strong` → strong; `i`/`em` → em; `s`/`del`/`strike` → strike;
     `code` → code;
   - `a[href]` → link.
-- Every other element is dropped and its text is kept. `script`, `style`,
-  `template` and the content of comments are dropped with their text.
-- No attribute other than `href` is read. Images become their `alt` text;
+- Every other element is dropped and its text is kept (table cells become
+  paragraphs). `script`, `style`, `template`, `iframe`, `svg`, `math`,
+  `textarea`, `noscript`, `xmp`, `plaintext` and the content of comments are
+  dropped with their text.
+- No attribute other than `href` and the few the reader maps (`alt`, a
+  code `language-` class, checkbox `checked`) is read. Images become their `alt` text;
   pasted media becomes a `media` block only when the host's `resolveMedia`
   callback accepts it.
 - Pasted HTML is never inserted into the live DOM and never rendered as HTML.

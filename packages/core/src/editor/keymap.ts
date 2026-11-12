@@ -29,7 +29,9 @@ export type EditorKeyIntent =
   | 'indent'
   | 'outdent'
   /** Leave the toolbar or dialog; in the text, let the next Tab leave the editor. */
-  | 'escape';
+  | 'escape'
+  /** "Paste as Markdown": the clipboard text is read as Markdown (a plain paste never is). */
+  | 'paste-markdown';
 
 /** The editor's key chords (ADR-003). `Mod` is ⌘ on Apple platforms, Ctrl elsewhere. */
 export const EDITOR_SHORTCUTS: readonly ShortcutBinding<EditorKeyIntent>[] = [
@@ -53,6 +55,7 @@ export const EDITOR_SHORTCUTS: readonly ShortcutBinding<EditorKeyIntent>[] = [
   { id: 'indent', keys: 'Tab' },
   { id: 'outdent', keys: 'Shift+Tab' },
   { id: 'escape', keys: 'Escape' },
+  { id: 'paste-markdown', keys: 'Mod+Alt+Shift+V' },
 ];
 
 export interface EditorKeymap {

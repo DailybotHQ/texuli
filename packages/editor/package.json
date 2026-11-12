@@ -31,6 +31,11 @@
       "svelte": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./block-menu": {
+      "types": "./src/block-menu/index.ts",
+      "svelte": "./src/block-menu/index.ts",
+      "default": "./src/block-menu/index.ts"
+    },
     "./controller": {
       "types": "./src/controller/index.ts",
       "svelte": "./src/controller/index.ts",
@@ -40,6 +45,16 @@
       "types": "./src/editor/index.ts",
       "svelte": "./src/editor/index.ts",
       "default": "./src/editor/index.ts"
+    },
+    "./emoji": {
+      "types": "./src/emoji/index.ts",
+      "svelte": "./src/emoji/index.ts",
+      "default": "./src/emoji/index.ts"
+    },
+    "./export": {
+      "types": "./src/export/index.ts",
+      "svelte": "./src/export/index.ts",
+      "default": "./src/export/index.ts"
     },
     "./link-dialog": {
       "types": "./src/link-dialog/index.ts",

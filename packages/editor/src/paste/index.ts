@@ -3,19 +3,29 @@
  * section 8). Paste is data: every format becomes a fragment of the closed
  * editor vocabulary through `loadEditorDocument` at the `untrusted` tier,
  * whatever trust the editor itself was given. Nothing here touches the DOM.
+ *
+ * Clipboard HTML is read by the shared DOM-free reader (`htmlToMarkdownTree` from
+ * `@texuli/core/html`, ADR-034) and projected onto the editor vocabulary; `text/plain` stays
+ * plain. "Paste as Markdown" is `importMarkdown` in `@texuli/editor/markdown`.
  */
+import { fromMarkdownTree } from '@texuli/core/editor-markdown';
+import { EDITOR_LIMITS, type EditorIssue, editorBlockCount } from '@texuli/core/editor-model';
+import { htmlToMarkdownTree } from '@texuli/core/html';
+import { PASTE_LIMITS, type RawBlock } from './html.ts';
 import {
-  EDITOR_LIMITS,
-  type EditorDocument,
-  type EditorIdSource,
-  type EditorIssue,
-  type EditorLimits,
-  editorBlockCount,
-  loadEditorDocument,
-} from '@texuli/core/editor-model';
-import { safeHref } from '@texuli/core/url-policy';
-import { htmlToBlocks, PASTE_LIMITS, type RawBlock } from './html.ts';
+  countRejected,
+  finish,
+  type PasteOptions,
+  type PasteResult,
+  type PasteSource,
+  TRUNCATED,
+} from './result.ts';
 
+/**
+ * The editor's previous clipboard-HTML tokenizer and block builder, kept exported for
+ * compatibility. `importHtml` no longer uses them (it reads through `@texuli/core/html`).
+ * @deprecated Use `importHtml`, or `htmlToMarkdownTree` from `@texuli/core/html`.
+ */
 export {
   decodeEntities,
   type HtmlImportStats,
@@ -25,89 +35,15 @@ export {
   type RawBlock,
   tokenizeHtml,
 } from './html.ts';
+export type { PasteOptions, PasteResult, PasteSource };
 
 /** The editor's own clipboard format (still untrusted on the way in). */
 export const EDITOR_CLIPBOARD_TYPE = 'application/x-texuli-editor+json';
-
-export type PasteSource = 'editor' | 'html' | 'text' | 'markdown' | 'empty';
-
-export interface PasteOptions {
-  newId?: EditorIdSource;
-  /** Lower document caps (the editor's own limits). */
-  limits?: Partial<EditorLimits>;
-}
-
-export interface PasteResult {
-  /** The fragment to insert with `replaceSelection`. */
-  doc: EditorDocument;
-  diagnostics: readonly EditorIssue[];
-  source: PasteSource;
-  /** Top-level blocks pasted (0 for an empty clipboard). */
-  blocks: number;
-  /** Links the URL policy refused (their text was kept). */
-  linksRemoved: number;
-}
 
 /** What `readClipboard` needs from a `DataTransfer`. */
 export interface ClipboardLike {
   getData(type: string): string;
   readonly types?: readonly string[];
-}
-
-const TRUNCATED: EditorIssue = {
-  code: 'text-truncated',
-  message: `Clipboard content after ${PASTE_LIMITS.source} characters was dropped.`,
-};
-
-function finish(
-  raw: unknown,
-  source: PasteSource,
-  options: PasteOptions,
-  extra: EditorIssue[] = [],
-  linksRemoved = 0
-): PasteResult {
-  const loaded = loadEditorDocument(raw, {
-    trust: 'untrusted',
-    ...(options.newId ? { newId: options.newId } : {}),
-    ...(options.limits ? { limits: options.limits } : {}),
-  });
-  const empty = loaded.doc.blocks.every(
-    (block) => block.type === 'paragraph' && block.content.length === 0
-  );
-  const rejected = loaded.diagnostics.some((issue) => issue.code === 'link-rejected');
-  return {
-    doc: empty ? { version: 1, blocks: [] } : loaded.doc,
-    diagnostics: [...extra, ...loaded.diagnostics],
-    source: empty ? 'empty' : source,
-    blocks: empty ? 0 : loaded.doc.blocks.length,
-    linksRemoved: rejected ? Math.max(1, linksRemoved) : 0,
-  };
-}
-
-/** Count `link` marks whose href the URL policy will refuse (for the announcement). */
-function countLinks(blocks: readonly RawBlock[]): number {
-  const accept = (href: string) =>
-    href.length <= EDITOR_LIMITS.href && safeHref(href, 'untrusted') !== undefined;
-  let count = 0;
-  const seen = new Set<unknown>();
-  const visit = (nodes: readonly RawBlock[], depth: number) => {
-    if (depth > PASTE_LIMITS.containers + 2) return;
-    for (const block of nodes) {
-      if (block.type === 'paragraph' || block.type === 'heading') {
-        for (const run of block.content) {
-          if (run.type !== 'text') continue;
-          const link = run.marks.find((mark) => mark.type === 'link');
-          if (link && link.type === 'link' && !seen.has(link) && !accept(link.href)) {
-            seen.add(link);
-            count += 1;
-          }
-        }
-      } else if (block.type === 'quote') visit(block.blocks, depth + 1);
-      else if (block.type === 'list') for (const item of block.items) visit(item.blocks, depth + 1);
-    }
-  };
-  visit(blocks, 0);
-  return count;
 }
 
 /**
@@ -128,17 +64,43 @@ export function importPlainText(text: string, options: PasteOptions = {}): Paste
   return finish({ version: 1, blocks }, 'text', options, truncated ? [TRUNCATED] : []);
 }
 
-/** Clipboard HTML through the owned tokenizer and the element allowlist. */
+/**
+ * Clipboard HTML through the shared DOM-free reader at the `untrusted` tier: the element
+ * allowlist of `@texuli/core/html` (script, style, iframe, svg and the other raw-text elements
+ * dropped with their content; every attribute but the few it maps dropped), then the editor
+ * vocabulary. Images become their alt text; refused links keep their text.
+ */
 export function importHtml(html: string, options: PasteOptions = {}): PasteResult {
-  const limit = (options.limits?.blocks ?? EDITOR_LIMITS.blocks) + 1;
-  const { blocks, stats } = htmlToBlocks(html, limit);
-  const removed = countLinks(blocks);
+  const read = htmlToMarkdownTree(typeof html === 'string' ? html : '', {
+    trust: 'untrusted',
+    maxSource: PASTE_LIMITS.source,
+  });
+  const truncated = read.diagnostics.some((d) => d.code === 'source-truncated');
+  const refused = read.diagnostics.filter((d) => d.code === 'url-refused').length;
+  const projected = fromMarkdownTree(read.tree, {
+    trust: 'untrusted',
+    images: 'text',
+    ...(options.newId ? { newId: options.newId } : {}),
+    ...(options.limits ? { limits: options.limits } : {}),
+  });
   return finish(
-    { version: 1, blocks },
+    projected.doc,
     'html',
     options,
-    stats.truncated ? [TRUNCATED] : [],
-    removed
+    [
+      ...(truncated ? [TRUNCATED] : []),
+      // The HTML reader refused these before the loader saw them: report them the same way.
+      ...(refused > 0
+        ? [
+            {
+              code: 'link-rejected',
+              message: `${refused} pasted link(s) failed the URL policy; their text was kept.`,
+            } as EditorIssue,
+          ]
+        : []),
+      ...projected.diagnostics,
+    ],
+    refused + countRejected(projected.diagnostics)
   );
 }
 
@@ -158,7 +120,8 @@ export function importEditorJson(json: string, options: PasteOptions = {}): Past
 /**
  * Read a clipboard in the documented order: the editor's own JSON, then
  * `text/html`, then `text/plain`. Never throws; a format that reads as empty
- * falls through to the next one.
+ * falls through to the next one. Plain text is never read as Markdown: "Paste as
+ * Markdown" is `importMarkdown` in `@texuli/editor/markdown`.
  */
 export function readClipboard(data: ClipboardLike, options: PasteOptions = {}): PasteResult {
   const get = (type: string): string => {

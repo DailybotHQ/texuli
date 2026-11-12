@@ -60,6 +60,12 @@ export interface EditorTransformOptions {
   newId?: EditorIdSource;
   /** Lower caps for this editor (a blocks `text` field holds 4,000 characters). */
   limits?: Partial<EditorLimits>;
+  /**
+   * The `:shortcode:` input rule's lookup (PLAN_023 row 9): the text a typed `:name:` becomes,
+   * or `undefined` to leave it. The editor has no emoji data of its own; a host passes
+   * `@texuli/emojis`' lookup. A result must be 1–32 characters without line breaks.
+   */
+  shortcodes?: (name: string) => string | undefined;
 }
 
 interface Context {
@@ -1174,3 +1180,99 @@ export function moveBlock(
 }
 
 export { textLeaf as editorTextBlock };
+
+/** What a block-type menu sets (PLAN_023 row 12). */
+export type EditorBlockKindChoice =
+  | 'paragraph'
+  | 'heading-1'
+  | 'heading-2'
+  | 'heading-3'
+  | 'heading-4'
+  | 'bullet'
+  | 'ordered'
+  | 'todo'
+  | 'quote'
+  | 'code';
+
+/** The kind a block-type menu shows for the caret: list first, then quote, then the block. */
+export function blockKindAt(state: EditorState): EditorBlockKindChoice | null {
+  if (state.selection.kind !== 'text') return null;
+  const location = locateBlock(state.doc, state.selection.focus.block);
+  if (!location) return null;
+  const item = location.ancestors.findLast((a) => a.kind === 'item');
+  if (item?.kind === 'item') return item.list.kind;
+  if (location.ancestors.some((a) => a.kind === 'quote')) return 'quote';
+  const block = location.block;
+  if (block.type === 'heading') return `heading-${block.level}` as EditorBlockKindChoice;
+  if (block.type === 'code') return 'code';
+  if (block.type === 'paragraph') return 'paragraph';
+  return null;
+}
+
+/**
+ * Set the caret's block kind in one step (one undo entry): leave every list around the caret
+ * and unwrap its quote when the choice is a plain block, change a list's kind in place, turn a
+ * code block into a paragraph before it becomes a list item. Each part runs an existing
+ * transform on the intermediate state; nothing changes when a part is refused.
+ */
+export function setBlockKind(
+  state: EditorState,
+  kind: EditorBlockKindChoice,
+  options?: EditorTransformOptions
+): EditorTransformResult {
+  if (blockKindAt(state) === kind) return fail('nothing-to-do', 'The block already has that kind.');
+  const c = context(options);
+  let current = state;
+  let changed = false;
+  const step = (result: EditorTransformResult): boolean => {
+    if (result.ok) {
+      current = result.state;
+      changed = true;
+      return true;
+    }
+    return result.errors.every((issue) => issue.code === 'nothing-to-do');
+  };
+  const leaveLists = (): boolean => {
+    // Bounded by the depth cap: each lift moves the item out one level.
+    for (let guard = 0; guard <= c.limits.depth && caretItem(current); guard += 1)
+      if (!step(liftListItem(current, options))) return false;
+    return true;
+  };
+  const leaveQuote = (): boolean => {
+    if (current.selection.kind !== 'text') return true;
+    const location = locateBlock(current.doc, current.selection.focus.block);
+    if (!location || parentOf(location)?.kind !== 'quote') return true;
+    return step(toggleQuote(current, options));
+  };
+  let ok: boolean;
+  switch (kind) {
+    case 'bullet':
+    case 'ordered':
+    case 'todo':
+      ok =
+        (caretItem(current) !== null || step(setBlockType(current, 'paragraph', 1, options))) &&
+        step(toggleList(current, kind, options));
+      break;
+    case 'quote':
+      ok = leaveLists() && step(toggleQuote(current, options));
+      break;
+    default: {
+      ok = leaveLists() && leaveQuote();
+      if (ok)
+        ok =
+          kind === 'paragraph' || kind === 'code'
+            ? step(setBlockType(current, kind, 1, options))
+            : step(
+                setBlockType(
+                  current,
+                  'heading',
+                  Number(kind.slice('heading-'.length)) as EditorHeadingLevel,
+                  options
+                )
+              );
+    }
+  }
+  if (!ok) return fail('not-allowed-here', 'That block kind cannot be set here.');
+  if (!changed) return fail('nothing-to-do', 'The block already has that kind.');
+  return done(current.doc, current.selection, c);
+}
