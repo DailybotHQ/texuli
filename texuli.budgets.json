@@ -36,12 +36,12 @@
       "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard. PLAN_010 T-release-060 (2026-10-29): 12288 -> 5440 B, tightened to measured + 4% (measured 5,223 B). 0.13.0 (owner-approved 2026-11-04): 5440 -> 5952 B, measured + 4% (measured 5,695 B) for the translatable defaults read from the label dictionary in context (ADR-026: message ids, named placeholders and the lookup)."
     },
     "@texuli/blocks/structure/renderers": {
-      "gzip": 38080,
-      "note": "Eager structure renderers include the styled Tabs, Accordion and Card components and the nested-block host; measured 32,051 B. Hosts that care about first load use the lazy @texuli/blocks/structure entry (lead decision 2026-10-23). PLAN_009 (2026-10-28, owner-consented release plan): 32768 -> 35840 B, measured + 4% after list, quote, callout, card and divider fields (G21), the linear-time Markdown parser and the avatar safeImageSrc re-check; measured 34,425 B. PLAN_010 T-release-060 (2026-10-29): 35840 -> 38080 B, measured + 4% (measured 36,556 B) after the 0.6.0 API contract (ref, rest attributes and composed handlers) and motion seams in the styled Tabs, Accordion and Card it bundles."
+      "gzip": 59968,
+      "note": "Eager structure renderers include the styled Tabs, Accordion and Card components and the nested-block host; measured 32,051 B. Hosts that care about first load use the lazy @texuli/blocks/structure entry (lead decision 2026-10-23). PLAN_009 (2026-10-28, owner-consented release plan): 32768 -> 35840 B, measured + 4% after list, quote, callout, card and divider fields (G21), the linear-time Markdown parser and the avatar safeImageSrc re-check; measured 34,425 B. PLAN_010 T-release-060 (2026-10-29): 35840 -> 38080 B, measured + 4% (measured 36,556 B) after the 0.6.0 API contract (ref, rest attributes and composed handlers) and motion seams in the styled Tabs, Accordion and Card it bundles. 38080 -> 59968 B. PLAN_023 (owner-approved 2026-11-12): the codec reads through @texuli/core/markdown (CommonMark 0.31.2 + GFM parser, compact HTML5 entity table; ADR-034, T-md-adopt); measured 57,612 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/blocks/text/renderers": {
-      "gzip": 12864,
-      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard. 0.13.0 (owner-approved 2026-11-04): 12288 -> 12864 B, measured + 4% (measured 12,364 B) for the translatable defaults read from the label dictionary in context (ADR-026: message ids, named placeholders and the lookup)."
+      "gzip": 33536,
+      "note": "Tightened after FIX-blocks-core-split (lead decision 2026-10-23): a family renderer now bundles only its own parser and the shared guard. 0.13.0 (owner-approved 2026-11-04): 12288 -> 12864 B, measured + 4% (measured 12,364 B) for the translatable defaults read from the label dictionary in context (ADR-026: message ids, named placeholders and the lookup). 12864 -> 33536 B. PLAN_023 (owner-approved 2026-11-12): the codec reads through @texuli/core/markdown (CommonMark 0.31.2 + GFM parser, compact HTML5 entity table; ADR-034, T-md-adopt); measured 32,212 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/canvas": {
       "gzip": 50496,
@@ -98,8 +98,8 @@
       "note": "PLAN_010 0.8.0 integration (consented plan): new row at measured + 4% for the stylesheet only; measured 0 B, CSS 762 B. PLAN_011 T-gaps-113-121: cssGzip 832 -> 1152 B, measured + 4% (measured 1,066 B; 806 B before): the password, otp and datetime layouts, the custom-field notice and the same-size placeholders of per-type controls and the Stepper (G117, G119). Then 1152 -> 1280 B, measured + 4% (measured 1,201 B): each placeholder sized like its control per type and viewport, so mounting causes no layout shift (lead review of G119)."
     },
     "@texuli/catalog": {
-      "gzip": 70848,
-      "note": "Root barrel aggregate of every manifest group plus render (renderer, grammar, frame, limits) and build helpers; first-load cost is per subpath. Raised from 32 KiB at 37,933 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 49,152 B to measured 51,980 B + 4% headroom; already over at T-01. Trimming stays a follow-up. PLAN_009 (2026-10-28, owner-consented release plan): 54080 -> 57024 B, measured + 4% after four new manifests (time-field, data-cohort-table, data-notification-inbox, data-filter-builder) and the linear-time rich text parser and sink scan; measured 54,821 B. PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 57024 -> 59648 B, measured 58,440 B + 2%; the catalog now lists axes and states for every component (T2). PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip 59648 -> 69312 B, measured 67,947 B + 2%; the catalog widened from 170 to 194 ids with axes, states and imports (T2 widening, PLAN_016). 0.16.0 (2026-11-09, lead, standing grant): 69312 -> 70848 B, measured 69,400 B + 2%; display/content manifests grew (ColorSwatch, Link, Mark, color axis) (no accidental import: lanes/T-016-drift-size.md)."
+      "gzip": 88896,
+      "note": "Root barrel aggregate of every manifest group plus render (renderer, grammar, frame, limits) and build helpers; first-load cost is per subpath. Raised from 32 KiB at 37,933 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 49,152 B to measured 51,980 B + 4% headroom; already over at T-01. Trimming stays a follow-up. PLAN_009 (2026-10-28, owner-consented release plan): 54080 -> 57024 B, measured + 4% after four new manifests (time-field, data-cohort-table, data-notification-inbox, data-filter-builder) and the linear-time rich text parser and sink scan; measured 54,821 B. PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 57024 -> 59648 B, measured 58,440 B + 2%; the catalog now lists axes and states for every component (T2). PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip 59648 -> 69312 B, measured 67,947 B + 2%; the catalog widened from 170 to 194 ids with axes, states and imports (T2 widening, PLAN_016). 0.16.0 (2026-11-09, lead, standing grant): 69312 -> 70848 B, measured 69,400 B + 2%; display/content manifests grew (ColorSwatch, Link, Mark, color axis) (no accidental import: lanes/T-016-drift-size.md). 70848 -> 88896 B. PLAN_023 (owner-approved 2026-11-12): the codec reads through @texuli/core/markdown (CommonMark 0.31.2 + GFM parser, compact HTML5 entity table; ADR-034, T-md-adopt); measured 85,465 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/catalog/manifests/all": {
       "gzip": 58880,
@@ -146,8 +146,8 @@
       "note": "Authored overlays manifests; measured 10,170 B (26 manifests) (lead decision 2026-10-23). Explicit entry: the manifests/* pattern does not take precedence over @texuli/catalog/*. PLAN_010 T-release-060 (2026-10-29): 12288 -> 7552 B, tightened to measured + 4% (measured 7,226 B). PLAN_016 T-release-015 (2026-11-09, lead under the developer's standing grant): gzip 7552 -> 7872 B, measured 7,671 B + 2%; the catalog now lists axes and states for every component (T2)."
     },
     "@texuli/catalog/render/hostile": {
-      "gzip": 16448,
-      "note": "Hostile test corpus (16 attack samples: script URLs, fake dialogs, bidi, giant trees, injection) plus hardenInertRoots; loaded only by tests and security tooling, never by a renderer. Measured 9,247 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 12,288 B to measured 12,927 B + 4% headroom; already over at T-01. Trimming stays a follow-up. Owner decision 2026-10-27 (PLAN_007): raised to measured 14,573 B + 4% headroom; the hostile corpus gained workflow, reorder, bidi and unknown-action attacks. PLAN_009 (2026-10-28, owner-consented release plan): 15168 -> 15744 B, measured + 4% after the linear-time looksExecutable and new hostile shapes; measured about 15,124 B; Linux CI measures about 0.2% above macOS. PLAN_010 T-release-070 (consented plan): 15744 -> 16448 B, measured + 4% after the hostile document shapes (spec 0.7.0); measured 15,757 B in CI on Linux."
+      "gzip": 33408,
+      "note": "Hostile test corpus (16 attack samples: script URLs, fake dialogs, bidi, giant trees, injection) plus hardenInertRoots; loaded only by tests and security tooling, never by a renderer. Measured 9,247 B (lead decision 2026-10-23). Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 12,288 B to measured 12,927 B + 4% headroom; already over at T-01. Trimming stays a follow-up. Owner decision 2026-10-27 (PLAN_007): raised to measured 14,573 B + 4% headroom; the hostile corpus gained workflow, reorder, bidi and unknown-action attacks. PLAN_009 (2026-10-28, owner-consented release plan): 15168 -> 15744 B, measured + 4% after the linear-time looksExecutable and new hostile shapes; measured about 15,124 B; Linux CI measures about 0.2% above macOS. PLAN_010 T-release-070 (consented plan): 15744 -> 16448 B, measured + 4% after the hostile document shapes (spec 0.7.0); measured 15,757 B in CI on Linux. 16448 -> 33408 B. PLAN_023 (owner-approved 2026-11-12): the codec reads through @texuli/core/markdown (CommonMark 0.31.2 + GFM parser, compact HTML5 entity table; ADR-034, T-md-adopt); measured 32,062 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/charts": {
       "gzip": 12864,
@@ -162,8 +162,8 @@
       "note": "Framework-free chart math (scales, shapes, layouts, LTTB) measured at 12,073 B; the Protoyard charts engine it ports had no separate baseline. Tighten with --update. Owner decision 2026-10-26 (PLAN_006 budget proposal): raised from 12,288 B to measured 12,357 B + 4% headroom; already over at T-01. Trimming stays a follow-up."
     },
     "@texuli/chat": {
-      "gzip": 18368,
-      "note": "Provisional cap for the chat barrel (Protoyard chat measured 5.9 KB gzip across 6 files). PLAN_010 T-gaps-53-69 (G59, G70, G71): avatarSrcset, the full-width day separator row and the MessageList reading-position API (bind:anchor, onAnchorChange, restore across the virtual window); measured 16,808 B gzip, cap = measured + 4% rounded up to 64 B. 0.14.3 (owner-approved 2026-11-07, UG-41): 17536 -> 17792 for the Composer row layout and icon send button; measured 17,474 B on macOS, raised ahead of the Linux CI drift. 0.16.0 (2026-11-09, lead, standing grant): 17792 -> 18368 B, measured 17,981 B + 2%; Avatar (imported by MessageList) gained the closed category color (no accidental import: lanes/T-016-drift-size.md)."
+      "gzip": 40576,
+      "note": "Provisional cap for the chat barrel (Protoyard chat measured 5.9 KB gzip across 6 files). PLAN_010 T-gaps-53-69 (G59, G70, G71): avatarSrcset, the full-width day separator row and the MessageList reading-position API (bind:anchor, onAnchorChange, restore across the virtual window); measured 16,808 B gzip, cap = measured + 4% rounded up to 64 B. 0.14.3 (owner-approved 2026-11-07, UG-41): 17536 -> 17792 for the Composer row layout and icon send button; measured 17,474 B on macOS, raised ahead of the Linux CI drift. 0.16.0 (2026-11-09, lead, standing grant): 17792 -> 18368 B, measured 17,981 B + 2%; Avatar (imported by MessageList) gained the closed category color (no accidental import: lanes/T-016-drift-size.md). 18368 -> 40576 B. PLAN_023 (owner-approved 2026-11-12): messages read through @texuli/core/markdown inline parsing (T-md-adopt), the composer autocomplete, stopped replies and ChatAttachment (T-cmp-chat); EmojiText loads lazily; measured 38,993 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/chat/*": {
       "gzip": 8192,
@@ -274,8 +274,8 @@
       "note": "The editor document model, loader with hostile-input caps and grapheme selection (measured 7,995 B). Owner consent 2026-10-25: exact rows for the new editor texels, no existing budget raised (PLAN_005 T-editor-texels/T-editor-package). PLAN_010 T-release-060 (2026-10-29): 8704 -> 9280 B, measured + 4% (measured 8,890 B) after host inline extensions (G48: the extension mark and the closed, bounded extension registry)."
     },
     "@texuli/core/editor-markdown": {
-      "gzip": 9408,
-      "note": "The owned Markdown codec with precomputed closers and bracket pairs (measured 7,203 B). Owner consent 2026-10-25: exact rows for the new editor texels, no existing budget raised (PLAN_005 T-editor-texels/T-editor-package). PLAN_009 (2026-10-28, owner-consented release plan): 7680 -> 8000 B, measured + 4% after the linear-time heading, fence, list, quote and link-target readers; measured about 7,660 B; Linux CI measures about 0.2% above macOS. PLAN_010 T-release-060 (2026-10-29): 8000 -> 9408 B, measured + 4% (measured 9,011 B) after host inline extensions (G48: the `<sigil>{id|label}` tokens, matched in linear time) and the linear-time reader on long plain text."
+      "gzip": 30592,
+      "note": "The owned Markdown codec with precomputed closers and bracket pairs (measured 7,203 B). Owner consent 2026-10-25: exact rows for the new editor texels, no existing budget raised (PLAN_005 T-editor-texels/T-editor-package). PLAN_009 (2026-10-28, owner-consented release plan): 7680 -> 8000 B, measured + 4% after the linear-time heading, fence, list, quote and link-target readers; measured about 7,660 B; Linux CI measures about 0.2% above macOS. PLAN_010 T-release-060 (2026-10-29): 8000 -> 9408 B, measured + 4% (measured 9,011 B) after host inline extensions (G48: the `<sigil>{id|label}` tokens, matched in linear time) and the linear-time reader on long plain text. 9408 -> 30592 B. PLAN_023 (owner-approved 2026-11-12): the codec reads through @texuli/core/markdown (CommonMark 0.31.2 + GFM parser, compact HTML5 entity table; ADR-034, T-md-adopt); measured 29,393 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/core/motion": {
       "gzip": 6858,
@@ -314,8 +314,8 @@
       "note": "PLAN_010 T-gaps-53-69 (G67, G69): column descriptions, the columnHeader snippet and column-only mode (no getRank); measured 12,833 B gzip (over the 12,288 B @texuli/data/* default), cap = measured + 4% rounded up to 64 B. G86 (Protoyard): list motion loads lazily (2026-10-30): 13376 -> 12864 B, measured + 4% rounded up to 64 B; measured 12,339 B (12,833 B before); the view takes list motion through a small local shim that loads texuli/motion with import() only once a mounted list could animate a change, so the seams, the contract and the provider context leave its initial graph (never loaded with motion={false}, level none or reduced motion)."
     },
     "@texuli/data/dashboard": {
-      "gzip": 11584,
-      "note": "PLAN_010 T-dashboard (0.8.0): the Dashboard and DashboardWidget views with the layout engine, @texuli/drag/gesture and texuli/motion list motion inlined by the size tool; measured 11,102 B gzip (under the 12,288 B @texuli/data/* default), cap = measured + 4% rounded up to 64 B."
+      "gzip": 12544,
+      "note": "PLAN_010 T-dashboard (0.8.0): the Dashboard and DashboardWidget views with the layout engine, @texuli/drag/gesture and texuli/motion list motion inlined by the size tool; measured 11,102 B gzip (under the 12,288 B @texuli/data/* default), cap = measured + 4% rounded up to 64 B. 11584 -> 12544 B. PLAN_023 (owner-approved 2026-11-12): MetricCard joins the dashboard entry (T-cmp-data); measured 12,059 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/data/dashboard/engine": {
       "gzip": 5760,
@@ -776,18 +776,18 @@
       "note": "FINAL-texuli-check: component chrome pair matrix split from aa-gate so the gate entry stays under budget after map marker pairs. Checking tool only. PLAN_010 T-release-060 (2026-10-29): 2048 -> 1408 B, tightened to measured + 4% (measured 1,335 B)."
     },
     "@texuli/editor": {
-      "gzip": 35456,
+      "gzip": 46656,
       "cssGzip": 2496,
-      "note": "The package barrel: editor, toolbar, link dialog, controller and paste, with the core editor texels bundled (measured 34,012 B). Grown from the 1,024 B skeleton row. PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 34,086 B (CSS 2,221 B); the Markdown codec is not in the barrel. PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2368 B before adoption): cssGzip 2624 -> 2496 B, measured + 4% (measured 2,376 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook."
+      "note": "The package barrel: editor, toolbar, link dialog, controller and paste, with the core editor texels bundled (measured 34,012 B). Grown from the 1,024 B skeleton row. PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 34,086 B (CSS 2,221 B); the Markdown codec is not in the barrel. PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2368 B before adoption): cssGzip 2624 -> 2496 B, measured + 4% (measured 2,376 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook. 35456 -> 46656 B. PLAN_023 (owner-approved 2026-11-12): the editor codec reads through @texuli/core/markdown (T-md-adopt) and the editor gained Markdown-aware paste, the block menu and emoji (T-cmp-editor); measured 44,851 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/editor/controller": {
-      "gzip": 19136,
-      "note": "The headless controller: history, commands, composition guard, paste; bundles the core editor model, transforms and history (measured 18,361 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 18,365 B + 4% headroom so platform drift does not flip it."
+      "gzip": 29440,
+      "note": "The headless controller: history, commands, composition guard, paste; bundles the core editor model, transforms and history (measured 18,361 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 18,365 B + 4% headroom so platform drift does not flip it. 19136 -> 29440 B. PLAN_023 (owner-approved 2026-11-12): the editor codec reads through @texuli/core/markdown (T-md-adopt) and the editor gained Markdown-aware paste, the block menu and emoji (T-cmp-editor); measured 28,265 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/editor/editor": {
-      "gzip": 36160,
+      "gzip": 47040,
       "cssGzip": 2496,
-      "note": "RichTextEditor and EditorSurface: the contenteditable surface, block and inline renderers, selection sync, toolbar and link dialog (measured 34,590 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 34,605 B + 4% headroom so platform drift does not flip it. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 34,737 B (CSS 2,221 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2368 B before adoption): cssGzip 2624 -> 2496 B, measured + 4% (measured 2,376 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook."
+      "note": "RichTextEditor and EditorSurface: the contenteditable surface, block and inline renderers, selection sync, toolbar and link dialog (measured 34,590 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-26 (PLAN_006 follow-up): CI on Linux measured this entry a few dozen bytes over the cap it met on macOS; raised to measured 34,605 B + 4% headroom so platform drift does not flip it. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 34,737 B (CSS 2,221 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2368 B before adoption): cssGzip 2624 -> 2496 B, measured + 4% (measured 2,376 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook. 36160 -> 47040 B. PLAN_023 (owner-approved 2026-11-12): the editor codec reads through @texuli/core/markdown (T-md-adopt) and the editor gained Markdown-aware paste, the block menu and emoji (T-cmp-editor); measured 45,185 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/editor/link-dialog": {
       "gzip": 1600,
@@ -795,17 +795,17 @@
       "note": "The link dialog; addresses go through the controller and the URL policy (measured 1,469 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 1,484 B + 4% headroom so platform drift does not flip it. PLAN_011 T-adopt-domain (2026-10-30): cssGzip 1600 -> 1728 B, measured + 4% (measured 1,608 B): the bundled editor.css reads token contract v2 system tokens (spaces, radii, type roles, border widths) instead of literals."
     },
     "@texuli/editor/markdown": {
-      "gzip": 10688,
-      "note": "Framework-free Markdown in and out of the editor document: the core editor-markdown codec plus the untrusted loader that re-checks links on write. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: new row, measured 8,690 B. PLAN_010 T-release-060 (2026-10-29): 9088 -> 10688 B, measured + 4% (measured 10,274 B) after host inline extensions (G48) in the core codec and model it bundles."
+      "gzip": 35392,
+      "note": "Framework-free Markdown in and out of the editor document: the core editor-markdown codec plus the untrusted loader that re-checks links on write. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: new row, measured 8,690 B. PLAN_010 T-release-060 (2026-10-29): 9088 -> 10688 B, measured + 4% (measured 10,274 B) after host inline extensions (G48) in the core codec and model it bundles. 10688 -> 35392 B. PLAN_023 (owner-approved 2026-11-12): the editor codec reads through @texuli/core/markdown (T-md-adopt) and the editor gained Markdown-aware paste, the block menu and emoji (T-cmp-editor); measured 34,023 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/editor/paste": {
-      "gzip": 8448,
-      "note": "Framework-free clipboard import: owned HTML tokenizer, allowlist and the untrusted loader (measured 7,429 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 7,452 B. PLAN_010 T-release-060 (2026-10-29): 7808 -> 8448 B, measured + 4% (measured 8,120 B) after the extension mark (G48) in the core editor model it bundles."
+      "gzip": 18176,
+      "note": "Framework-free clipboard import: owned HTML tokenizer, allowlist and the untrusted loader (measured 7,429 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 7,452 B. PLAN_010 T-release-060 (2026-10-29): 7808 -> 8448 B, measured + 4% (measured 8,120 B) after the extension mark (G48) in the core editor model it bundles. 8448 -> 18176 B. PLAN_023 (owner-approved 2026-11-12): the editor codec reads through @texuli/core/markdown (T-md-adopt) and the editor gained Markdown-aware paste, the block menu and emoji (T-cmp-editor); measured 17,439 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/editor/toolbar": {
-      "gzip": 7360,
+      "gzip": 8192,
       "cssGzip": 2496,
-      "note": "The roving formatting toolbar on the texuli toolbar (measured 6,904 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 6,928 B + 4% headroom so platform drift does not flip it. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 7,023 B (CSS 2,214 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2304 B before adoption): cssGzip 2624 -> 2496 B, measured + 4% (measured 2,356 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook."
+      "note": "The roving formatting toolbar on the texuli toolbar (measured 6,904 B). PLAN_005 T-editor-package: new @texuli/editor rows only, written with pnpm size --update --allow-grow --filter @texuli/editor; no other row changed. Owner decision 2026-10-27 (PLAN_006 follow-up): CI on Linux measured this entry a few bytes over the cap it met on macOS; raised to measured 6,928 B + 4% headroom so platform drift does not flip it. PLAN_009 T-editor-publish (G17, owner approval 2026-10-28 to publish the package): every @texuli/editor row re-measured and held to measured + 4% headroom: measured 7,023 B (CSS 2,214 B). PLAN_011 T-adopt-core (2026-10-30, lead decision: base.css plus one fallback level; 2304 B before adoption): cssGzip 2624 -> 2496 B, measured + 4% (measured 2,356 B): the bundled texuli components read component tokens with one fallback and system tokens plainly, and load the focus ring hook. 7360 -> 8192 B. PLAN_023 (owner-approved 2026-11-12): the editor codec reads through @texuli/core/markdown (T-md-adopt) and the editor gained Markdown-aware paste, the block menu and emoji (T-cmp-editor); measured 7,862 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/astro": {
       "gzip": 19520,
@@ -862,33 +862,33 @@
       "note": "Owner decision 2026-10-26 (PLAN_006 budget proposal): new row; measured 14,156 B gzip, cap = measured + 4% headroom. Owner decision 2026-10-27 (PLAN_007): raised to measured 16,236 B + 4% headroom; validation runs the spec 0.3.0 interaction checks and @texuli/spec/migrate. Owner decision 2026-10-27 (PLAN_007 AC-security-hostile): state surface and list text parity rules; raised to measured 17,480 B + 4% headroom. PLAN_008 T-catalog-player (2026-10-28): validateDeckDraft and the deck v2 tree mapping joined this entry; measured 19,857 B gzip, cap = measured + 4% (was 18,240 B). PLAN_010 (2026-10-29, consented plan): 20652 -> 22016 B, measured + 4% after validateStreamNode (ADR-014) and the node motion check (ADR-013); measured 21,115 B. PLAN_010 T-doc-agents (consented plan): 22016 -> 23552 B, measured + 4% after the document check (host validator, borrowed catalog ids) and node keys (spec 0.7.0); measured 22,644 B. PLAN_010 0.8.0 integration (consented plan): 23552 -> 27072 B, measured + 4% after the spec 0.8.0 checks: the injected form check (checkForm and host validator names), the injected canvas check and the data-source binding check against the host's descriptors (@texuli/spec/source); measured 26,007 B. PLAN_011 T-ds-blueprint: 27072 -> 28480 (measured 27,337 B + 4%) for the design-system check on blueprint envelopes (ref grammar, closed shape, host checkDesignSystem hook)."
     },
     "@texuli/pages": {
-      "gzip": 106368,
+      "gzip": 115520,
       "cssGzip": 3648,
-      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the root barrel (editor + reader); measured 94,277 B, CSS 3,455 B. 0.11.5 (Protoyard G136): 98048 -> 102208 (CI Linux 98,219 B + 4%) for the validateDeck wrappers of @texuli/document/ops. 0.13.0 (owner-approved 2026-11-04): 102208 -> 106368 B, Linux CI measured + 4% (measured 102,249 B; macOS measures a few bytes less) for the label dictionary in context (ADR-026)."
+      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the root barrel (editor + reader); measured 94,277 B, CSS 3,455 B. 0.11.5 (Protoyard G136): 98048 -> 102208 (CI Linux 98,219 B + 4%) for the validateDeck wrappers of @texuli/document/ops. 0.13.0 (owner-approved 2026-11-04): 102208 -> 106368 B, Linux CI measured + 4% (measured 102,249 B; macOS measures a few bytes less) for the label dictionary in context (ADR-026). 106368 -> 115520 B. PLAN_023 (owner-approved 2026-11-12): the editor codec reads through @texuli/core/markdown (T-md-adopt) and the editor gained Markdown-aware paste, the block menu and emoji (T-cmp-editor); measured 111,030 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/pages/i18n/es": {
       "gzip": 2688,
       "note": "0.14.3 UG-37 (owner-approved 2026-11-07): new row at measured + 4% for the opt-in Spanish label catalog (data only, every PagesMessageId); measured 2,538 B."
     },
     "@texuli/pages/collab": {
-      "gzip": 126080,
+      "gzip": 139072,
       "cssGzip": 4544,
-      "note": "PLAN_010 (ADR-010, ADR-011, ADR-016, consented plan): new row at measured + 4% for the lazy review UI (comments, suggestions, history, collaborators) with the collab binding; measured 121,200 B, CSS 4,343 B."
+      "note": "PLAN_010 (ADR-010, ADR-011, ADR-016, consented plan): new row at measured + 4% for the lazy review UI (comments, suggestions, history, collaborators) with the collab binding; measured 121,200 B, CSS 4,343 B. 126080 -> 139072 B. PLAN_023 (owner-approved 2026-11-12): the editor codec reads through @texuli/core/markdown (T-md-adopt) and the editor gained Markdown-aware paste, the block menu and emoji (T-cmp-editor); measured 133,714 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/pages/collab-core": {
-      "gzip": 126784,
+      "gzip": 138688,
       "cssGzip": 4608,
-      "note": "PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for CollabEditorCore on PageEditorCore (and every collab export) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 121,868 B, CSS 4,409 B; every lazy chunk 163,071 B gzip."
+      "note": "PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for CollabEditorCore on PageEditorCore (and every collab export) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 121,868 B, CSS 4,409 B; every lazy chunk 163,071 B gzip. 126784 -> 138688 B. PLAN_023 (owner-approved 2026-11-12): the editor codec reads through @texuli/core/markdown (T-md-adopt) and the editor gained Markdown-aware paste, the block menu and emoji (T-cmp-editor); measured 133,330 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/pages/editor": {
-      "gzip": 99712,
+      "gzip": 108992,
       "cssGzip": 3648,
-      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the the block editor: editor surface and the document validator that runs on every edit; the player and block renderers load lazily; measured 91,608 B, CSS 3,455 B. 0.13.0 (owner-approved 2026-11-04): 95296 -> 99712 B, measured + 4% (measured 95,852 B) for the translatable defaults read from the label dictionary in context (ADR-026: message ids, named placeholders and the lookup)."
+      "note": "PLAN_010 T-doc-editor (ADR-011, consented plan): new row at measured + 4% for the the block editor: editor surface and the document validator that runs on every edit; the player and block renderers load lazily; measured 91,608 B, CSS 3,455 B. 0.13.0 (owner-approved 2026-11-04): 95296 -> 99712 B, measured + 4% (measured 95,852 B) for the translatable defaults read from the label dictionary in context (ADR-026: message ids, named placeholders and the lookup). 99712 -> 108992 B. PLAN_023 (owner-approved 2026-11-12): the editor codec reads through @texuli/core/markdown (T-md-adopt) and the editor gained Markdown-aware paste, the block menu and emoji (T-cmp-editor); measured 104,781 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/pages/editor-core": {
-      "gzip": 79744,
+      "gzip": 89984,
       "cssGzip": 3712,
-      "note": "0.12.0 (Protoyard G136): 96512 -> 79744 (measured 76,670 B + 4%): PageEditorCore validates with @texuli/document/ops-core and no longer carries @texuli/deck/model. PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for PageEditorCore (and every editor export) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 92,783 B, CSS 3,515 B; every lazy chunk 163,090 B gzip."
+      "note": "0.12.0 (Protoyard G136): 96512 -> 79744 (measured 76,670 B + 4%): PageEditorCore validates with @texuli/document/ops-core and no longer carries @texuli/deck/model. PLAN_011 T-gap-123 (Protoyard G123, trust mode): new row at measured + 4% for PageEditorCore (and every editor export) with no default player loader: a host that passes no loadPlayer has no @texuli/player reference in its build, static or dynamic (packages/pages/tests/bundle-graph.test.ts); measured 92,783 B, CSS 3,515 B; every lazy chunk 163,090 B gzip. 79744 -> 89984 B. PLAN_023 (owner-approved 2026-11-12): the editor codec reads through @texuli/core/markdown (T-md-adopt) and the editor gained Markdown-aware paste, the block menu and emoji (T-cmp-editor); measured 86,516 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/pages/export": {
       "gzip": 1152,
@@ -978,8 +978,8 @@
       "note": "Owner decision 2026-10-28 (PLAN_008 T-perf-budgets, owner consent in analysis_results/owner-consent.md): measured 27,361 B gzip on the final PLAN_008 code, cap = measured + 4% headroom."
     },
     "@texuli/document": {
-      "gzip": 48576,
-      "note": "PLAN_010 T-doc-engine (2026-10-28): new row; measured 42,936 B gzip, cap = measured + 4% headroom. Includes @texuli/deck parseDeck for embedded decks (ADR-011). PLAN_011 T-ds-blueprint: 44654 -> 46464 (CI Linux 44,656 B + 4%) for the document designSystem field and its schema. 0.11.5 (Protoyard G133): 46464 -> 48576 (measured 46,662 B + 4%) for the injectable deck check that lets schema-core leave the deck model out."
+      "gzip": 69248,
+      "note": "PLAN_010 T-doc-engine (2026-10-28): new row; measured 42,936 B gzip, cap = measured + 4% headroom. Includes @texuli/deck parseDeck for embedded decks (ADR-011). PLAN_011 T-ds-blueprint: 44654 -> 46464 (CI Linux 44,656 B + 4%) for the document designSystem field and its schema. 0.11.5 (Protoyard G133): 46464 -> 48576 (measured 46,662 B + 4%) for the injectable deck check that lets schema-core leave the deck model out. 48576 -> 69248 B. PLAN_023 (owner-approved 2026-11-12): the codec reads through @texuli/core/markdown (CommonMark 0.31.2 + GFM parser, compact HTML5 entity table; ADR-034, T-md-adopt); measured 66,583 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/document/model": {
       "gzip": 1741,
@@ -1018,8 +1018,8 @@
       "note": "PLAN_010 (ADR-010, ADR-011, ADR-016, consented plan): new row at measured + 4% for the owned DOCX writer over @texuli/core/markup and zip; measured 11,708 B."
     },
     "@texuli/document/markdown": {
-      "gzip": 38912,
-      "note": "PLAN_010 T-doc-engine (2026-10-28): new row; measured 35,962 B gzip, cap = measured + 4% headroom. PLAN_010 (consented plan): 37401 -> 38912 B, measured + 4% after the paged page settings (custom size, header, footer, breaks) joined the schema it carries; measured about 37,396 B."
+      "gzip": 44288,
+      "note": "PLAN_010 T-doc-engine (2026-10-28): new row; measured 35,962 B gzip, cap = measured + 4% headroom. PLAN_010 (consented plan): 37401 -> 38912 B, measured + 4% after the paged page settings (custom size, header, footer, breaks) joined the schema it carries; measured about 37,396 B. 38912 -> 44288 B. PLAN_023 (owner-approved 2026-11-12): the codec reads through @texuli/core/markdown (CommonMark 0.31.2 + GFM parser, compact HTML5 entity table; ADR-034, T-md-adopt); measured 42,563 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     },
     "@texuli/document/sync": {
       "gzip": 10157,
@@ -1166,6 +1166,106 @@
     "@texuli/tokens/design-system/generate": {
       "gzip": 53184,
       "note": "PLAN_016 T-release-015 (2026-11-09, lead, standing grant): gzip new -> 49664 B, measured 48,636 B + 2%; new subpath: ds generate bundles the importers and the compiler on purpose; compile stays free of importers (T-gen-pipeline, T-size-regressions). 0.17.0 (2026-11-10, lead, standing grant): 49664 -> 51904 B, measured 50,853 B + 2%; repair keeps the seed and pins the failing role; prose color reading (T-017-generator). 0.17.1 CI (Linux, 2026-11-10): 51904 -> 53184 B, CI measured 52,118 B + 2%; generate bundles the prose-aware importer."
+    },
+    "@texuli/blocks/text/markdown": {
+      "gzip": 24064,
+      "cssGzip": 0,
+      "note": "PLAN_023 (owner-approved 2026-11-12): the codec reads through @texuli/core/markdown (CommonMark 0.31.2 + GFM parser, compact HTML5 entity table; ADR-034, T-md-adopt); measured 23,115 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/catalog/render/richtext": {
+      "gzip": 18816,
+      "cssGzip": 0,
+      "note": "PLAN_023 (owner-approved 2026-11-12): the codec reads through @texuli/core/markdown (CommonMark 0.31.2 + GFM parser, compact HTML5 entity table; ADR-034, T-md-adopt); measured 18,078 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/core/html": {
+      "gzip": 8832,
+      "cssGzip": 0,
+      "note": "PLAN_023 (owner-approved 2026-11-12): new @texuli/core Markdown/HTML subpath (ADR-034, T-md-core/T-md-html/T-md-dialects/T-md-gfm); measured 8,461 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/core/markdown": {
+      "gzip": 25664,
+      "cssGzip": 0,
+      "note": "PLAN_023 (owner-approved 2026-11-12): new @texuli/core Markdown/HTML subpath (ADR-034, T-md-core/T-md-html/T-md-dialects/T-md-gfm); measured 24,673 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/core/markdown-html": {
+      "gzip": 6208,
+      "cssGzip": 0,
+      "note": "PLAN_023 (owner-approved 2026-11-12): new @texuli/core Markdown/HTML subpath (ADR-034, T-md-core/T-md-html/T-md-dialects/T-md-gfm); measured 5,964 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/core/markdown-dialects": {
+      "gzip": 7040,
+      "cssGzip": 0,
+      "note": "PLAN_023 (owner-approved 2026-11-12): new @texuli/core Markdown/HTML subpath (ADR-034, T-md-core/T-md-html/T-md-dialects/T-md-gfm); measured 6,727 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/editor/block-menu": {
+      "gzip": 23872,
+      "cssGzip": 4032,
+      "note": "PLAN_023 (owner-approved 2026-11-12): new editor subpath (T-cmp-editor); measured 22,932 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/editor/emoji": {
+      "gzip": 22528,
+      "cssGzip": 5120,
+      "note": "PLAN_023 (owner-approved 2026-11-12): new editor subpath (T-cmp-editor); measured 21,641 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/editor/export": {
+      "gzip": 55104,
+      "cssGzip": 4416,
+      "note": "PLAN_023 (owner-approved 2026-11-12): new editor subpath (T-cmp-editor); measured 52,925 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/emoji-assets": {
+      "gzip": 5184,
+      "cssGzip": 0,
+      "note": "PLAN_023 (owner-approved 2026-11-12): new unreleased @texuli/emoji-assets manifest entry (ADR-035, T-emo-art-pipeline); SVGs are separate files; measured 4,947 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/emoji-assets/manifest": {
+      "gzip": 5184,
+      "cssGzip": 0,
+      "note": "PLAN_023 (owner-approved 2026-11-12): new unreleased @texuli/emoji-assets manifest entry (ADR-035, T-emo-art-pipeline); SVGs are separate files; measured 4,947 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/emoji-assets/coverage": {
+      "gzip": 448,
+      "cssGzip": 0,
+      "note": "PLAN_023 (owner-approved 2026-11-12): new unreleased @texuli/emoji-assets manifest entry (ADR-035, T-emo-art-pipeline); SVGs are separate files; measured 402 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/emojis": {
+      "gzip": 49792,
+      "cssGzip": 0,
+      "note": "PLAN_023 (owner-approved 2026-11-12): new unreleased @texuli/emojis entry (ADR-035, T-emo-catalog/T-emo-engine); data entries hold the generated catalog by design, the root is the lean sequence index; measured 47,832 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/emojis/catalog": {
+      "gzip": 199744,
+      "cssGzip": 0,
+      "note": "PLAN_023 (owner-approved 2026-11-12): new unreleased @texuli/emojis entry (ADR-035, T-emo-catalog/T-emo-engine); data entries hold the generated catalog by design, the root is the lean sequence index; measured 192,060 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/emojis/search": {
+      "gzip": 199552,
+      "cssGzip": 0,
+      "note": "PLAN_023 (owner-approved 2026-11-12): new unreleased @texuli/emojis entry (ADR-035, T-emo-catalog/T-emo-engine); data entries hold the generated catalog by design, the root is the lean sequence index; measured 191,868 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/emojis/legacy-engine": {
+      "gzip": 337728,
+      "cssGzip": 0,
+      "note": "PLAN_023 (owner-approved 2026-11-12): new unreleased @texuli/emojis entry (ADR-035, T-emo-catalog/T-emo-engine); data entries hold the generated catalog by design, the root is the lean sequence index; measured 324,694 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/emojis/legacy": {
+      "gzip": 87808,
+      "cssGzip": 0,
+      "note": "PLAN_023 (owner-approved 2026-11-12): new unreleased @texuli/emojis entry (ADR-035, T-emo-catalog/T-emo-engine); data entries hold the generated catalog by design, the root is the lean sequence index; measured 84,418 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/emojis/data": {
+      "gzip": 286720,
+      "cssGzip": 0,
+      "note": "PLAN_023 (owner-approved 2026-11-12): new unreleased @texuli/emojis entry (ADR-035, T-emo-catalog/T-emo-engine); data entries hold the generated catalog by design, the root is the lean sequence index; measured 275,640 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
+    },
+    "@texuli/forms/builder": {
+      "gzip": 64192,
+      "cssGzip": 6080,
+      "note": "PLAN_023 (owner-approved 2026-11-12): new visual form builder (T-cmp-forms) with SchemaForm preview and @texuli/drag/sortable; measured 61,699 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
+    },
+    "texuli/emoji": {
+      "gzip": 57216,
+      "cssGzip": 1024,
+      "note": "PLAN_023 (owner-approved 2026-11-12): new texuli/emoji components (T-emo-web): the lean @texuli/emojis index for EmojiText; names and the picker catalog load lazily; measured 54,955 B gzip (scoped pnpm size, macOS), cap = measured + 4% rounded up to 64 B."
     }
   }
 }
