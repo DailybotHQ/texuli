@@ -14,7 +14,7 @@
  */
 import { defineOperation } from './registry.ts';
 import type { JsonSchema } from './schema.ts';
-import { type Operation, OperationError } from './types.ts';
+import type { Operation } from './types.ts';
 
 const run = () => import('./design-system-run.ts');
 
@@ -26,7 +26,7 @@ const run = () => import('./design-system-run.ts');
 export const DS_INPUT_BYTES = 1_048_576;
 /** The most RGBA values `ds.suggest` takes as logo pixels (128 × 128 pixels). */
 export const DS_PIXEL_VALUES = 65_536;
-const TIME_MS = 10_000;
+export const TIME_MS = 10_000;
 
 /** The spec's smallest document (`packages/spec/fixtures/design-systems/minimal.json`). */
 export const MINIMAL_DESIGN_SYSTEM = Object.freeze({
@@ -58,7 +58,7 @@ const READ_ONLY = {
   openWorld: false,
 } as const;
 
-const DOCUMENT: JsonSchema = {
+export const DOCUMENT: JsonSchema = {
   type: 'object',
   description:
     'A design-system document: format "texuli/design-system", formatVersion 1, id, version, name, and optional sections (extends, color, typography, shape, space, elevation, surface, motion, layout, icons, components, assets, voice, accessibility, variants). texuli://design-system/acme is a full example.',
@@ -101,7 +101,7 @@ const ISSUE: JsonSchema = {
   },
   required: ['code', 'path', 'message'],
 };
-const ISSUES: JsonSchema = { type: 'array', items: ISSUE };
+export const ISSUES: JsonSchema = { type: 'array', items: ISSUE };
 const WARNINGS: JsonSchema = {
   type: 'array',
   items: {
@@ -142,7 +142,7 @@ const IDENTITY_INPUT: Record<string, JsonSchema> = {
   },
 };
 /** The common options of every operation that compiles a document. */
-const COMPILE_INPUT: Record<string, JsonSchema> = {
+export const COMPILE_INPUT: Record<string, JsonSchema> = {
   trust: TRUST,
   variant: VARIANT,
   bases: BASES,
@@ -574,70 +574,5 @@ export const dsPreview: Operation = defineOperation({
   examples: [{ title: 'An SVG snapshot', input: { document: MINIMAL_DESIGN_SYSTEM } }],
   async handler(input) {
     return (await run()).runPreview(input);
-  },
-});
-
-export const dsSave: Operation = defineOperation({
-  name: 'ds.save',
-  title: 'Save a design system to a file',
-  summary:
-    'Validate a design-system document (as ds.validate does) and write it as two-space JSON to an explicit .json path inside the working directory (traversal, symlinks, dot paths, node_modules, package.json and existing files without overwrite are refused). Anything marked approved is refused (approval-human-only). Local doors only. Returns saved, the path and bytes, or errors with stable codes.',
-  input: {
-    type: 'object',
-    properties: {
-      path: {
-        type: 'string',
-        minLength: 1,
-        maxLength: 1024,
-        description:
-          'Where to write, relative to the working directory (e.g. design-systems/harborline.ds.json): a .json file outside dot directories and node_modules, never package.json.',
-      },
-      document: DOCUMENT,
-      overwrite: {
-        type: 'boolean',
-        default: false,
-        description: 'Replace an existing file (default false: an existing file is refused).',
-      },
-      dryRun: {
-        type: 'boolean',
-        default: false,
-        description: 'Validate the document and the path, and write nothing.',
-      },
-      ...COMPILE_INPUT,
-    },
-    required: ['path', 'document'],
-    additionalProperties: false,
-  },
-  output: {
-    type: 'object',
-    properties: {
-      saved: { type: 'boolean' },
-      dryRun: { type: 'boolean' },
-      path: { type: 'string' },
-      bytes: { type: 'integer', minimum: 0 },
-      errors: ISSUES,
-    },
-    required: ['saved', 'errors'],
-  },
-  annotations: { readOnly: false, destructive: true, idempotent: true, openWorld: true },
-  runtime: 'node',
-  limits: { inputBytes: DS_INPUT_BYTES, timeMs: TIME_MS },
-  examples: [
-    {
-      title: 'Check where the minimal document would go',
-      input: {
-        path: 'design-systems/minimal.ds.json',
-        document: MINIMAL_DESIGN_SYSTEM,
-        dryRun: true,
-      },
-    },
-  ],
-  async handler(input, context) {
-    if (!context.files)
-      throw new OperationError(
-        'runtime-unavailable',
-        'ds.save needs a door that writes local files (texuli-mcp or the texuli CLI).'
-      );
-    return (await run()).runSave(input, context.files, context.approve === true);
   },
 });

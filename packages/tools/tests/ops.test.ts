@@ -124,6 +124,7 @@ it('declares every operation once, self-described for agents, in the supported s
         'document.export',
         'emoji.search',
         'emoji.get',
+        'emoji.convert',
         'emoji.categories',
         'emoji.variants',
       ]);
@@ -215,7 +216,13 @@ it('refuses invalid input, oversized input and unavailable runtimes with stable 
         (name) =>
           !['document.export', 'ds.save'].includes(name) &&
           !name.startsWith('site.') &&
-          !['emoji.search', 'emoji.get', 'emoji.categories', 'emoji.variants'].includes(name)
+          ![
+            'emoji.search',
+            'emoji.get',
+            'emoji.convert',
+            'emoji.categories',
+            'emoji.variants',
+          ].includes(name)
       )
     );
   });

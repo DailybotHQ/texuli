@@ -19,17 +19,17 @@ export const RUN_COMMANDS = DOCUMENT_COMMANDS.filter(
   (command) => !(EXPORT_COMMANDS as readonly string[]).includes(command)
 ) as Exclude<DocumentCommandName, (typeof EXPORT_COMMANDS)[number]>[];
 
-const documentSchema: JsonSchema = {
+export const documentSchema: JsonSchema = {
   type: 'object',
   description: 'A Texuli document (format texuli-document, formatVersion 1).',
 };
-const tierSchema: JsonSchema = {
+export const tierSchema: JsonSchema = {
   type: 'string',
   enum: ['developer', 'untrusted'],
   default: 'untrusted',
   description: 'The URL policy tier links and media are checked at (default untrusted).',
 };
-const EXAMPLE_DOCUMENT = {
+export const EXAMPLE_DOCUMENT = {
   format: 'texuli-document',
   formatVersion: 1,
   meta: { title: 'Fictional brief', locale: 'en' },
@@ -42,7 +42,7 @@ const EXAMPLE_DOCUMENT = {
   ],
 };
 
-const pick = (input: Record<string, unknown>): DocumentCommandInput => ({
+export const pickDocumentInput = (input: Record<string, unknown>): DocumentCommandInput => ({
   ...(Object.hasOwn(input, 'document') ? { document: input.document } : {}),
   ...(typeof input.markdown === 'string' ? { markdown: input.markdown } : {}),
   ...(Object.hasOwn(input, 'patch') ? { patch: input.patch } : {}),
@@ -104,34 +104,11 @@ export const documentRun: Operation = defineOperation({
     },
   ],
   async handler(input) {
-    return { result: await runDocumentCommand(input.command as DocumentCommandName, pick(input)) };
-  },
-});
-
-export const documentExport: Operation = defineOperation({
-  name: 'document.export',
-  title: 'Export a document as PDF or DOCX',
-  summary:
-    'Write a Texuli document as PDF or DOCX bytes with the owned writers, links and media checked at the tier. Returns { result } with ok, mime, byteLength, base64 bytes (no files are written), diagnostics and, for PDF, pageCount. Needs Node.',
-  input: {
-    type: 'object',
-    properties: {
-      format: { type: 'string', enum: ['pdf', 'docx'], description: 'The file format to write.' },
-      document: documentSchema,
-      tier: tierSchema,
-    },
-    required: ['format', 'document'],
-    additionalProperties: false,
-  },
-  output: { type: 'object', properties: { result: { type: 'object' } }, required: ['result'] },
-  annotations: { readOnly: true, destructive: false, idempotent: true, openWorld: false },
-  runtime: 'node',
-  limits: { inputBytes: MAX_SOURCE + 100_000, timeMs: 30_000 },
-  examples: [
-    { title: 'A PDF of a short brief', input: { format: 'pdf', document: EXAMPLE_DOCUMENT } },
-  ],
-  async handler(input) {
-    const command = input.format === 'docx' ? 'to-docx' : 'to-pdf';
-    return { result: await runDocumentCommand(command, pick(input)) };
+    return {
+      result: await runDocumentCommand(
+        input.command as DocumentCommandName,
+        pickDocumentInput(input)
+      ),
+    };
   },
 });

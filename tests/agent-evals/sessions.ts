@@ -5,6 +5,7 @@
  * server's validators. Data is fictional (example.com, Example Co.).
  */
 import { expect } from 'vitest';
+import { texuliEdgeOps } from '../../packages/tools/src/ops/edge.ts';
 import { texuliOps } from '../../packages/tools/src/ops/index.ts';
 import {
   backtickedTools,
@@ -25,8 +26,9 @@ function listedTools(ctx: SessionContext): string[] {
 
 /** The tools this door must serve: its operations, then the aliases whose targets it serves. */
 function expectedTools(ctx: SessionContext): string[] {
-  const served = texuliOps.list({ runtimes: ctx.runtimes }).map((operation) => operation.name);
-  const aliases = texuliOps
+  const registry = ctx.runtimes.includes('node') ? texuliOps : texuliEdgeOps;
+  const served = registry.list({ runtimes: ctx.runtimes }).map((operation) => operation.name);
+  const aliases = registry
     .aliases()
     .filter((alias) => alias.targets.every((target) => served.includes(target)))
     .map((alias) => alias.name);

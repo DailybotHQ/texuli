@@ -3,8 +3,8 @@
  * limiter and counters, shared by `functions/mcp.ts` (`/mcp`) and the
  * middleware route for `/.well-known/mcp`, so both URLs are the same
  * server. `edge` and `site` operations are served: `node` operations (file
- * writes, PDF and DOCX conversion) are not listed and answer
- * `runtime-unavailable`. The `site` operations (`site.pages`, `site.read`,
+ * writes, PDF and DOCX conversion, emoji catalog lookup) are not listed and
+ * answer `runtime-unavailable`. The `site` operations (`site.pages`, `site.read`,
  * `site.search`, T-ar-site-mcp) read the built site through this request's
  * `env.ASSETS` binding, never the network; without the binding they answer
  * `runtime-unavailable`.
@@ -17,7 +17,8 @@
 import { buildBotEventRequest, buildMcpEventBody } from '../../apps/website/src/lib/bot-events.ts';
 import { createMcpHandler, type McpHandler } from '../../packages/tools/src/mcp/handler.ts';
 import { MCP_PROTOCOL_REVISIONS } from '../../packages/tools/src/mcp/protocol.ts';
-import { REMOTE_RUNTIMES, type SiteAssets, texuliOps } from '../../packages/tools/src/ops/index.ts';
+import { texuliEdgeOps } from '../../packages/tools/src/ops/edge.ts';
+import { REMOTE_RUNTIMES, type SiteAssets } from '../../packages/tools/src/ops/types.ts';
 import {
   createTokenBucket,
   handleMcpHttp,
@@ -35,12 +36,16 @@ export interface McpContext {
 const RUNTIMES = REMOTE_RUNTIMES;
 
 /** Every tool name the remote handler serves: operations, then their 0.8 aliases. */
-const servedNames = new Set(texuliOps.list({ runtimes: RUNTIMES }).map((op) => op.name));
-for (const alias of texuliOps.aliases())
+const servedNames = new Set(texuliEdgeOps.list({ runtimes: RUNTIMES }).map((op) => op.name));
+for (const alias of texuliEdgeOps.aliases())
   if (alias.targets.every((target) => servedNames.has(target))) servedNames.add(alias.name);
 
 /** One handler and one bucket per isolate; nothing else lives between requests. */
-const handler: McpHandler = createMcpHandler({ mode: 'stateless', runtimes: RUNTIMES });
+const handler: McpHandler = createMcpHandler({
+  mode: 'stateless',
+  runtimes: RUNTIMES,
+  registry: texuliEdgeOps,
+});
 const deps: McpEndpointDeps = {
   handler,
   // Every revision, 2026-07-28 included: the handler checks that the header agrees with _meta.

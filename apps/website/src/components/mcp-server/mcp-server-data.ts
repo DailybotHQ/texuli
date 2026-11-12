@@ -1150,7 +1150,7 @@ export const MCP_SERVER_DATA = {
       name: 'emoji.convert',
       title: 'Convert shortcodes and Unicode emoji',
       summary:
-        'Convert untrusted plain text between Unicode sequences and shortcodes. dialect texuli is the lean catalog (edge); legacy is the imported 3.0.2 aliases (loaded on demand). mode strict keeps conflict aliases and reports them; permissive picks a candidate. Returns { value, diagnostics }. Never throws.',
+        'Convert untrusted plain text between Unicode sequences and canonical Texuli shortcodes through the lean engine. dialect texuli is the default. dialect legacy is unsupported here and returns a diagnostic pointing at the local MCP. Returns { value, diagnostics }. Never throws.',
       runtime: 'edge',
       remote: true,
       local: true,

@@ -16,15 +16,17 @@ import {
   dsDiff,
   dsImport,
   dsPreview,
-  dsSave,
   dsSuggest,
   dsValidate,
 } from './design-system.ts';
 import { dsAllow } from './design-system-allow.ts';
 import { dsBundle } from './design-system-bundle.ts';
 import { designSystemGenerate } from './design-system-generate.ts';
-import { documentExport, documentRun } from './document.ts';
-import { emojiCategories, emojiConvert, emojiGet, emojiSearch, emojiVariants } from './emoji.ts';
+import { dsSave } from './design-system-save.ts';
+import { documentRun } from './document.ts';
+import { documentExport } from './document-export.ts';
+import { emojiCategories, emojiGet, emojiSearch, emojiVariants } from './emoji-catalog.ts';
+import { emojiConvertLocal } from './emoji-convert-node.ts';
 import { mdConvert, mdRender } from './markdown.ts';
 import { createOperationRegistry } from './registry.ts';
 import { sitePages, siteRead, siteSearch } from './site.ts';
@@ -127,7 +129,7 @@ export const TEXULI_OPERATIONS: readonly Operation[] = Object.freeze([
   mdRender,
   emojiSearch,
   emojiGet,
-  emojiConvert,
+  emojiConvertLocal,
   emojiCategories,
   emojiVariants,
   sitePages,

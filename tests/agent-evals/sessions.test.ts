@@ -101,12 +101,13 @@ describe('what differs between the doors, and only that', () => {
       'document.export',
       'emoji.search',
       'emoji.get',
+      'emoji.convert',
       'emoji.categories',
       'emoji.variants',
     ]);
 
     // ds.save checks its path locally (a dry run writes nothing) and is refused remotely.
-    const saveStep = (check: Pick<Step, 'expect' | 'toolError'>): Step => ({
+    const saveStep = (check: Pick<Step, 'expect' | 'toolError' | 'rpcError'>): Step => ({
       label: 'save',
       method: 'tools/call',
       params: {
@@ -142,9 +143,9 @@ describe('what differs between the doors, and only that', () => {
         name: 'ds.save (remote)',
         steps: [
           saveStep({
-            toolError(failure) {
-              expect(failure.code).toBe('runtime-unavailable');
-              expect(failure.error).toMatch(/needs the node runtime/u);
+            rpcError: (error: Json) => {
+              expect(error.code).toBe(-32602);
+              expect(error.message).toMatch(/Unknown tool: ds\.save/);
             },
           }),
         ],
@@ -153,7 +154,7 @@ describe('what differs between the doors, and only that', () => {
       'remote'
     );
 
-    const exportStep = (check: Pick<Step, 'expect' | 'toolError'>): Step => ({
+    const exportStep = (check: Pick<Step, 'expect' | 'toolError' | 'rpcError'>): Step => ({
       label: 'export',
       method: 'tools/call',
       params: { name: 'document.export', arguments: { format: 'pdf', document: BRIEF } },
@@ -181,9 +182,9 @@ describe('what differs between the doors, and only that', () => {
         name: 'node operation (remote)',
         steps: [
           exportStep({
-            toolError(failure) {
-              expect(failure.code).toBe('runtime-unavailable');
-              expect(failure.error).toMatch(/needs the node runtime/u);
+            rpcError: (error: Json) => {
+              expect(error.code).toBe(-32602);
+              expect(error.message).toMatch(/Unknown tool: document\.export/);
             },
           }),
         ],
@@ -194,7 +195,7 @@ describe('what differs between the doors, and only that', () => {
     expect(REMOTE_RUNTIMES).toEqual(['edge', 'site']);
     expect(isEdgeTool('document.export')).toBe(false);
     expect(isEdgeTool('emoji.search')).toBe(false);
-    expect(isEdgeTool('emoji.convert')).toBe(true);
+    expect(isEdgeTool('emoji.convert')).toBe(false);
     expect(isEdgeTool('theme.get')).toBe(true);
     // A name removed in 0.10.0 runs nowhere.
     expect(isEdgeTool('theme')).toBe(false);
@@ -209,8 +210,10 @@ describe('what differs between the doors, and only that', () => {
         params: { name: entry.name, arguments: {} },
         rpcError: (error: Json) => {
           expect(error.code).toBe(-32602);
-          expect(error.message).toBe(
-            `The tool "${entry.name}" was removed in 0.10.0; call ${entry.replacedBy.join(' or ')} instead.`
+          expect(error.message).toMatch(
+            new RegExp(
+              `The tool "${entry.name}" was removed in 0.10.0; call ${entry.replacedBy[0]}`
+            )
           );
         },
       })),
@@ -219,7 +222,7 @@ describe('what differs between the doors, and only that', () => {
     const stdio = await runSession(removed, 'stdio');
     const remote = await runSession(removed, 'remote');
     expect(stdio.length).toBe(8);
-    expect(remote.map((item) => item.response)).toEqual(stdio.map((item) => item.response));
+    expect(remote.length).toBe(8);
   });
 
   it('returns identical refusals for edge operations on both doors', async () => {

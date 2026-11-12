@@ -32,7 +32,7 @@ Operations (the @texuli/tools registry; the same names are MCP tools):
   md render                 Render Markdown to safe HTML
   emoji search              Search the Texuli emoji catalog (node only)
   emoji get                 Read one emoji by id (node only)
-  emoji convert             Convert shortcodes and Unicode emoji
+  emoji convert             Convert shortcodes and Unicode emoji (node only)
   emoji categories          List emoji categories (node only)
   emoji variants            List emoji variants (node only)
 
@@ -644,8 +644,8 @@ Example (Rocket by id): texuli emoji get --json '{"id":"1f680"}'
 ----
 Usage: texuli emoji convert [--json <object> | --file <path>] [--out <path>]
 
-Convert shortcodes and Unicode emoji (emoji.convert, runtime edge)
-Convert untrusted plain text between Unicode sequences and shortcodes. dialect texuli is the lean catalog (edge); legacy is the imported 3.0.2 aliases (loaded on demand). mode strict keeps conflict aliases and reports them; permissive picks a candidate. Returns { value, diagnostics }. Never throws.
+Convert shortcodes and Unicode emoji (emoji.convert, runtime node)
+Convert untrusted plain text between Unicode sequences and shortcodes. dialect texuli is the lean catalog; legacy is the imported 3.0.2 aliases (local MCP and CLI). mode strict keeps conflict aliases and reports them; permissive picks a candidate. Returns { value, diagnostics }. Never throws.
 
 Arguments (JSON object keys):
   source (required): string. Untrusted plain text (at most 100000 characters).

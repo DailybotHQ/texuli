@@ -19,6 +19,7 @@
  */
 
 import { checkBlueprintAllow } from '@texuli/spec/design-system';
+import { texuliEdgeOps } from '../ops/edge.ts';
 import {
   type InvokeFailure,
   LOCAL_RUNTIMES,
@@ -28,9 +29,8 @@ import {
   type OperationRegistry,
   type OperationRuntime,
   type SiteContext,
-  TOOLS_VERSION,
-  texuliOps,
-} from '../ops/index.ts';
+} from '../ops/types.ts';
+import { TOOLS_VERSION } from '../ops/version.ts';
 import { TEXULI_PROMPTS } from './prompts.ts';
 import {
   type JsonObject,
@@ -58,7 +58,7 @@ export interface McpCapabilityOptions {
 }
 
 export interface McpHandlerOptions {
-  /** The operations served as tools (default: every Texuli operation). */
+  /** The operations served as tools (default: the edge registry, never node-only modules). */
   registry?: OperationRegistry;
   /** `stateful` (stdio, the default) keeps the initialization gate; `stateless` (HTTP) never requires it. */
   mode?: McpMode;
@@ -319,7 +319,7 @@ const variableOf = (template: McpResourceTemplate) =>
  * offered.
  */
 export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
-  const registry = options.registry ?? texuliOps;
+  const registry = options.registry ?? texuliEdgeOps;
   const mode = options.mode ?? 'stateful';
   const runtimes = options.runtimes ?? LOCAL_RUNTIMES;
   const pageSize = Math.max(1, Math.floor(options.pageSize ?? DEFAULT_PAGE_SIZE));
