@@ -2340,7 +2340,7 @@ reflect this decision.
   lead decision under the developer's standing grant (PLAN_023 T-adr).
 - **Context:** universal-emoji-parser 3.0.2 keeps 1,914 curated rows keyed by character, has no ZWJ,
   tone or flag rows, drops tones when writing shortcodes, throws on non-string input, returns HTML
-  strings and loads an unpinned Twemoji CDN. Unicode Emoji 18.0 lists 3,966 fully-qualified sequences
+  strings and loads an unpinned Twemoji CDN. Unicode Emoji 18.0 lists 3,963 fully-qualified sequences
   (pinned with CLDR 49 and SHA-256 checksums in the PLAN_023 audit). Native receives contract data as
   generated Kotlin read through a Gradle `srcDir`.
 - **Options:** (A) emoji support inside `@texuli/core`; (B) two new L0 packages, `@texuli/emojis`

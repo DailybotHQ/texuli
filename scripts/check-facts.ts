@@ -22,6 +22,7 @@ import { execFileSync } from 'node:child_process';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { UNRELEASED_PACKAGES } from './release-line.ts';
 
 const ROOT = join(import.meta.dirname, '..');
 
@@ -93,7 +94,9 @@ export async function deriveFacts(root = ROOT): Promise<Facts> {
     themesFull:
       ids.BUILTIN_THEME_IDS.length + ids.PORT_THEME_IDS.length + ids.EXPAND_THEME_IDS.length,
     themesCore: ids.PORT_THEME_IDS.length,
-    publishedPackages: manifests.filter((manifest) => manifest.name !== '@texuli/examples').length,
+    publishedPackages: manifests.filter(
+      (manifest) => manifest.name !== '@texuli/examples' && !UNRELEASED_PACKAGES.has(manifest.name)
+    ).length,
     release: byName.get('texuli')?.version ?? '',
   };
 }

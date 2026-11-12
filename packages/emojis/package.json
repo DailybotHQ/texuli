@@ -1,0 +1,25 @@
+{
+  "name": "@texuli/emojis",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Framework-free Unicode emoji catalog and compatibility data for Texuli.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    "./catalog": {
+      "types": "./src/data/catalog.ts",
+      "default": "./src/data/catalog.ts"
+    },
+    "./legacy": {
+      "types": "./src/data/legacy.ts",
+      "default": "./src/data/legacy.ts"
+    },
+    "./data": {
+      "types": "./src/data/index.ts",
+      "default": "./src/data/index.ts"
+    }
+  }
+}

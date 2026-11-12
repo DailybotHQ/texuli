@@ -32,7 +32,7 @@ const XSS_HTML = [
   '<a href="//evil.example/">x</a>',
   '<a href="\\\\evil.example/">x</a>',
   '<a href="https://bank.example@evil.example/">x</a>',
-  '<a href="https://ex​ample.com/">x</a>',
+  '<a href="https://ex\u200bample.com/">x</a>',
   '<a href="https://example.com" onclick="alert(1)" style="x:expression(alert(1))">ok</a>',
   '<svg onload=alert(1)>',
   '<svg><script>alert(1)</script></svg>',

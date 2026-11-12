@@ -28,6 +28,8 @@ export const LAYERS: Readonly<Record<string, number>> = Object.freeze({
   '@texuli/core': 0,
   '@texuli/date': 0,
   '@texuli/drag': 0,
+  // L0: the dependency-free emoji catalog and engine (ADR-035).
+  '@texuli/emojis': 0,
   // L0: the framework-free, dependency-free deck engine (ADR-009).
   '@texuli/deck': 0,
   // L0: the framework-free blueprint contract — the cross-language spine

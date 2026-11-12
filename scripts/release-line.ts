@@ -23,6 +23,13 @@ export interface ReleaseLine {
 }
 
 const ROOT = join(import.meta.dirname, '..');
+/**
+ * Workspace packages that exist but have never been published (PLAN_023, ADR-035). They are
+ * private, outside the publish workflow's package list, and left out of the published counts.
+ * Remove a name here in the release that first publishes it (with the owner's GO).
+ */
+export const UNRELEASED_PACKAGES: ReadonlySet<string> = new Set(['@texuli/emojis']);
+
 export const RELEASE_DOC = join(ROOT, 'docs', 'RELEASE.md');
 
 const LINE = /^Release line: published `(\d+\.\d+)`(?: · in development `(\d+\.\d+\.\d+)`)?\s*$/m;

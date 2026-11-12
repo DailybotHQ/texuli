@@ -61,6 +61,8 @@ export const RUNTIME_EXTERNAL_ALLOWLIST: Readonly<Record<string, readonly string
   // In development (PLAN_007): no runtime externals; first published in 0.4.0.
   '@texuli/deck': [],
   '@texuli/drag': [],
+  // In development (PLAN_023, ADR-035): dependency-free; not published yet.
+  '@texuli/emojis': [],
   '@texuli/workflows': [],
   '@texuli/tokens': [],
   '@texuli/primitives': [],
