@@ -78,6 +78,7 @@ const result = validateFormSchema({
 | `.` | `SchemaForm`, `DEFAULT_SCHEMA_FORM_LABELS`, the model's main entry points and `FORMS_PACKAGE_VERSION` | [SchemaForm](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/schema-form.md) |
 | `./model` | The framework-free runtime: `validateFormSchema`, named formats, `computeFormLogic`, `validateFormValues`, `createFormController`, drafts | [Model](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/model.md) |
 | `./controls` | The static control registry (`SCHEMA_FORM_CONTROLS`) for server rendering; without it SchemaForm loads per-type controls on first use | [Controls](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/controls.md) |
+| `./builder` | `FormBuilder`, a visual builder (palette, canvas with keyboard and pointer reorder, inspector, live preview, schema JSON), and its framework-free list helpers | [Builder](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/builder.md) |
 | `./host` | The `formHost` adapter for `@texuli/player` (`createFormPlayerHost`) and the draft check | [Host](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/host.md) |
 | `./styles.css` | The layout stylesheet and its hooks | [Styles](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/styles.md) |
 
@@ -120,6 +121,7 @@ Restored drafts are coerced field by field like any untrusted input.
 - [SchemaForm](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/schema-form.md)
 - [Model](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/model.md)
 - [Styles](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/styles.md)
+- [Builder](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/builder.md)
 - [Host](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/host.md)
 - [Controls](https://github.com/DailybotHQ/texuli/blob/main/packages/forms/docs/controls.md)
 - The expression language: [core-expression](https://github.com/DailybotHQ/texuli/blob/main/packages/core/docs/core-expression.md)

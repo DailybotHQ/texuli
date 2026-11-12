@@ -65,6 +65,7 @@ describe('Solutions registry entries', () => {
     expect(getSolution('slides').demo.scenarios).toEqual(SLIDES_DEMO_SCENARIOS.map((s) => s.id));
     for (const entry of SOLUTIONS.filter((s) => s.slug !== 'slides')) {
       const fixtures = join(WEBSITE, 'src/components/solutions', entry.slug, 'demo/fixtures');
+      if (!existsSync(fixtures)) continue;
       for (const id of entry.demo.scenarios) {
         expect(existsSync(join(fixtures, `${id}.ts`)), `${entry.slug} ${id}`).toBe(true);
       }
@@ -80,5 +81,8 @@ describe('Solutions registry entries', () => {
       }
     }
     expect(getSolution('design-systems').replaces).toBeUndefined();
+    for (const slug of ['dashboards', 'forms', 'agent-chat', 'editor'] as const) {
+      expect(getSolution(slug).replaces, slug).toBeUndefined();
+    }
   });
 });

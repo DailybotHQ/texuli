@@ -16,7 +16,7 @@ export const SOLUTION_STATUSES = [
 ] as const;
 export type SolutionStatus = (typeof SOLUTION_STATUSES)[number];
 
-/** The Solutions promoted by ADR-027. */
+/** The Solutions promoted by ADR-027 and ADR-036. */
 export const SOLUTION_SLUGS = [
   'slides',
   'documents',
@@ -24,6 +24,10 @@ export const SOLUTION_SLUGS = [
   'canvas',
   'sheets',
   'design-systems',
+  'dashboards',
+  'forms',
+  'agent-chat',
+  'editor',
 ] as const;
 export type SolutionSlug = (typeof SOLUTION_SLUGS)[number];
 
