@@ -1,0 +1,656 @@
+{
+  "schemaVersion": "texuli-emoji-meaning-review/v1",
+  "reviewContext": "Rendered and inspected at 64 px and 24 px on light and dark grounds.",
+  "reviewer": "agent lane local:wH:p2R (author self-review)",
+  "reviewedAt": "2026-11-12",
+  "records": [
+    {
+      "id": "1f600",
+      "shortcode": ":grinning_face:",
+      "cldrName": "grinning face",
+      "requiredFeatures": "Open toothy grin; rounded eyes; no tears or blush.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f603",
+      "shortcode": ":grinning_face_with_big_eyes:",
+      "cldrName": "grinning face with big eyes",
+      "requiredFeatures": "Open toothy grin and visibly larger round eyes than other smiles.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f604",
+      "shortcode": ":grinning_face_with_smiling_eyes:",
+      "cldrName": "grinning face with smiling eyes",
+      "requiredFeatures": "Recognizable grinning face with smiling eyes silhouette with its defining subject and visible details.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f606",
+      "shortcode": ":grinning_squinting_face:",
+      "cldrName": "grinning squinting face",
+      "requiredFeatures": "Recognizable grinning squinting face silhouette with its defining subject and visible details.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f605",
+      "shortcode": ":grinning_face_with_sweat:",
+      "cldrName": "grinning face with sweat",
+      "requiredFeatures": "Recognizable grinning face with sweat silhouette with its defining subject and visible details.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f642",
+      "shortcode": ":slightly_smiling_face:",
+      "cldrName": "slightly smiling face",
+      "requiredFeatures": "Small restrained closed smile; neutral open eyes.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f60a",
+      "shortcode": ":smiling_face_with_smiling_eyes:",
+      "cldrName": "smiling face with smiling eyes",
+      "requiredFeatures": "Both eyes closed in upward arcs, gentle smile and two blush marks.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f607",
+      "shortcode": ":smiling_face_with_halo:",
+      "cldrName": "smiling face with halo",
+      "requiredFeatures": "Recognizable smiling face with halo silhouette with its defining subject and visible details.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f970",
+      "shortcode": ":smiling_face_with_hearts:",
+      "cldrName": "smiling face with hearts",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f60d",
+      "shortcode": ":smiling_face_with_heart_eyes:",
+      "cldrName": "smiling face with heart-eyes",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f929",
+      "shortcode": ":star_struck:",
+      "cldrName": "star-struck",
+      "requiredFeatures": "Five-point star silhouette.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "263a-fe0f",
+      "shortcode": ":smiling_face:",
+      "cldrName": "smiling face",
+      "requiredFeatures": "Closed smile with two blush marks; no open mouth or tears.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f972",
+      "shortcode": ":smiling_face_with_tear:",
+      "cldrName": "smiling face with tear",
+      "requiredFeatures": "Recognizable smiling face with tear silhouette with its defining subject and visible details.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f917",
+      "shortcode": ":smiling_face_with_open_hands:",
+      "cldrName": "smiling face with open hands",
+      "requiredFeatures": "One smiling face framed by two visible open hands reaching in to hug.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f60e",
+      "shortcode": ":smiling_face_with_sunglasses:",
+      "cldrName": "smiling face with sunglasses",
+      "requiredFeatures": "Round sun disc with visible rays.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f914",
+      "shortcode": ":thinking_face:",
+      "cldrName": "thinking face",
+      "requiredFeatures": "Raised eyebrow and a hand resting at the chin.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f928",
+      "shortcode": ":face_with_raised_eyebrow:",
+      "cldrName": "face with raised eyebrow",
+      "requiredFeatures": "Recognizable face with raised eyebrow silhouette with its defining subject and visible details.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f622",
+      "shortcode": ":crying_face:",
+      "cldrName": "crying face",
+      "requiredFeatures": "One blue tear and a downturned mouth.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f62d",
+      "shortcode": ":loudly_crying_face:",
+      "cldrName": "loudly crying face",
+      "requiredFeatures": "Wide open anguished mouth and two long blue tear streams.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f620",
+      "shortcode": ":angry_face:",
+      "cldrName": "angry face",
+      "requiredFeatures": "Recognizable angry face silhouette with its defining subject and visible details.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f631",
+      "shortcode": ":face_screaming_in_fear:",
+      "cldrName": "face screaming in fear",
+      "requiredFeatures": "Recognizable face screaming in fear silhouette with its defining subject and visible details.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f47b",
+      "shortcode": ":ghost:",
+      "cldrName": "ghost",
+      "requiredFeatures": "Ghost silhouette with sheet-like lower edge and two eyes.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "2764-fe0f",
+      "shortcode": ":red_heart:",
+      "cldrName": "red heart",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1fa77",
+      "shortcode": ":pink_heart:",
+      "cldrName": "pink heart",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f9e1",
+      "shortcode": ":orange_heart:",
+      "cldrName": "orange heart",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f49b",
+      "shortcode": ":yellow_heart:",
+      "cldrName": "yellow heart",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f49a",
+      "shortcode": ":green_heart:",
+      "cldrName": "green heart",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f499",
+      "shortcode": ":blue_heart:",
+      "cldrName": "blue heart",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f49c",
+      "shortcode": ":purple_heart:",
+      "cldrName": "purple heart",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f90d",
+      "shortcode": ":white_heart:",
+      "cldrName": "white heart",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f680",
+      "shortcode": ":rocket:",
+      "cldrName": "rocket",
+      "requiredFeatures": "Rocket body, porthole, fins and flame.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f337",
+      "shortcode": ":tulip:",
+      "cldrName": "tulip",
+      "requiredFeatures": "Recognizable tulip flower, with distinct petals, center and stem.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f33b",
+      "shortcode": ":sunflower:",
+      "cldrName": "sunflower",
+      "requiredFeatures": "Recognizable sunflower flower, with distinct petals, center and stem.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f33a",
+      "shortcode": ":hibiscus:",
+      "cldrName": "hibiscus",
+      "requiredFeatures": "Recognizable hibiscus flower, with distinct petals, center and stem.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f4d5",
+      "shortcode": ":closed_book:",
+      "cldrName": "closed book",
+      "requiredFeatures": "Recognizable closed book book shape; preserve its open or closed state.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f4d6",
+      "shortcode": ":open_book:",
+      "cldrName": "open book",
+      "requiredFeatures": "Recognizable open book book shape; preserve its open or closed state.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "2615",
+      "shortcode": ":hot_beverage:",
+      "cldrName": "hot beverage",
+      "requiredFeatures": "Steaming cup with a visible handle.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f355",
+      "shortcode": ":pizza:",
+      "cldrName": "pizza",
+      "requiredFeatures": "Triangular pizza slice with crust and visible toppings.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "2600-fe0f",
+      "shortcode": ":sun:",
+      "cldrName": "sun",
+      "requiredFeatures": "Round sun disc with visible rays.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f319",
+      "shortcode": ":crescent_moon:",
+      "cldrName": "crescent moon",
+      "requiredFeatures": "Crescent silhouette with an inward-facing hollow.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f525",
+      "shortcode": ":fire:",
+      "cldrName": "fire",
+      "requiredFeatures": "Flame silhouette with a smaller inner flame.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "2b50",
+      "shortcode": ":star:",
+      "cldrName": "star",
+      "requiredFeatures": "Five-point star silhouette.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f381",
+      "shortcode": ":wrapped_gift:",
+      "cldrName": "wrapped gift",
+      "requiredFeatures": "Gift box with lid, ribbon and bow.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f9f8",
+      "shortcode": ":teddy_bear:",
+      "cldrName": "teddy bear",
+      "requiredFeatures": "Bear head with round ears, muzzle and nose.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f388",
+      "shortcode": ":balloon:",
+      "cldrName": "balloon",
+      "requiredFeatures": "Inflated balloon with a tied neck and string.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f4f7",
+      "shortcode": ":camera:",
+      "cldrName": "camera",
+      "requiredFeatures": "Camera body with lens and viewfinder detail.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f3b5",
+      "shortcode": ":musical_note:",
+      "cldrName": "musical note",
+      "requiredFeatures": "Single musical note with note head and stem.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f44d-1f3fb",
+      "shortcode": ":thumbs_up_light_skin_tone:",
+      "cldrName": "thumbs up: light skin tone",
+      "requiredFeatures": "Closed fist with one upright thumb; light skin tone.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f44d-1f3fc",
+      "shortcode": ":thumbs_up_medium_light_skin_tone:",
+      "cldrName": "thumbs up: medium-light skin tone",
+      "requiredFeatures": "Closed fist with one upright thumb; medium-light skin tone.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f44d-1f3fd",
+      "shortcode": ":thumbs_up_medium_skin_tone:",
+      "cldrName": "thumbs up: medium skin tone",
+      "requiredFeatures": "Closed fist with one upright thumb; medium skin tone.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f44d-1f3fe",
+      "shortcode": ":thumbs_up_medium_dark_skin_tone:",
+      "cldrName": "thumbs up: medium-dark skin tone",
+      "requiredFeatures": "Closed fist with one upright thumb; medium-dark skin tone.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f44d-1f3ff",
+      "shortcode": ":thumbs_up_dark_skin_tone:",
+      "cldrName": "thumbs up: dark skin tone",
+      "requiredFeatures": "Closed fist with one upright thumb; dark skin tone.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f469",
+      "shortcode": ":woman:",
+      "cldrName": "woman",
+      "requiredFeatures": "Recognizable woman silhouette with its defining subject and visible details.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f469-1f3fb",
+      "shortcode": ":woman_light_skin_tone:",
+      "cldrName": "woman: light skin tone",
+      "requiredFeatures": "Recognizable woman: light skin tone hand/person silhouette and the specified skin tone.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f469-1f3fc",
+      "shortcode": ":woman_medium_light_skin_tone:",
+      "cldrName": "woman: medium-light skin tone",
+      "requiredFeatures": "Recognizable woman: medium-light skin tone hand/person silhouette and the specified skin tone.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f469-1f3fd",
+      "shortcode": ":woman_medium_skin_tone:",
+      "cldrName": "woman: medium skin tone",
+      "requiredFeatures": "Recognizable woman: medium skin tone hand/person silhouette and the specified skin tone.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f469-1f3fe",
+      "shortcode": ":woman_medium_dark_skin_tone:",
+      "cldrName": "woman: medium-dark skin tone",
+      "requiredFeatures": "Recognizable woman: medium-dark skin tone hand/person silhouette and the specified skin tone.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f469-1f3ff",
+      "shortcode": ":woman_dark_skin_tone:",
+      "cldrName": "woman: dark skin tone",
+      "requiredFeatures": "Recognizable woman: dark skin tone hand/person silhouette and the specified skin tone.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f469-200d-1f4bb",
+      "shortcode": ":woman_technologist:",
+      "cldrName": "woman technologist",
+      "requiredFeatures": "Exactly one woman seated at or working at a laptop.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f468-200d-1f4bb",
+      "shortcode": ":man_technologist:",
+      "cldrName": "man technologist",
+      "requiredFeatures": "Exactly one man seated at or working at a laptop.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "2764-fe0f-200d-1f525",
+      "shortcode": ":heart_on_fire:",
+      "cldrName": "heart on fire",
+      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f468-200d-1f469-200d-1f467",
+      "shortcode": ":family_man_woman_girl:",
+      "cldrName": "family: man, woman, girl",
+      "requiredFeatures": "Three distinct people in the family grouping named family: man, woman, girl.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f3f3-fe0f-200d-1f308",
+      "shortcode": ":rainbow_flag:",
+      "cldrName": "rainbow flag",
+      "requiredFeatures": "Horizontal rainbow bands attached to one vertical flagpole; no easel or legs.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f46b",
+      "shortcode": ":woman_and_man_holding_hands:",
+      "cldrName": "woman and man holding hands",
+      "requiredFeatures": "Two distinct people visibly holding hands.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f1fa-1f1f8",
+      "shortcode": ":flag_united_states:",
+      "cldrName": "flag: United States",
+      "requiredFeatures": "Red-white stripes and blue canton with white stars.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f1e8-1f1e6",
+      "shortcode": ":flag_canada:",
+      "cldrName": "flag: Canada",
+      "requiredFeatures": "Red-white-red vertical bands with a recognizable red maple leaf centered on white.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f1ec-1f1e7",
+      "shortcode": ":flag_united_kingdom:",
+      "cldrName": "flag: United Kingdom",
+      "requiredFeatures": "Blue field with layered white and red diagonal and central crosses.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f1ef-1f1f5",
+      "shortcode": ":flag_japan:",
+      "cldrName": "flag: Japan",
+      "requiredFeatures": "White field with one centered red disc.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f1e7-1f1f7",
+      "shortcode": ":flag_brazil:",
+      "cldrName": "flag: Brazil",
+      "requiredFeatures": "Green field, yellow diamond and centered blue globe.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f1e9-1f1ea",
+      "shortcode": ":flag_germany:",
+      "cldrName": "flag: Germany",
+      "requiredFeatures": "Three horizontal black, red and gold bands.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f1eb-1f1f7",
+      "shortcode": ":flag_france:",
+      "cldrName": "flag: France",
+      "requiredFeatures": "Three vertical blue, white and red bands.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    },
+    {
+      "id": "1f3f4-e0067-e0062-e0065-e006e-e0067-e007f",
+      "shortcode": ":flag_england:",
+      "cldrName": "flag: England",
+      "requiredFeatures": "White field with a centered red St George cross.",
+      "reviewer": "agent lane local:wH:p2R (author self-review)",
+      "reviewedAt": "2026-11-12",
+      "verdict": "pass"
+    }
+  ]
+}
