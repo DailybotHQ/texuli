@@ -1,0 +1,20 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+---
+
+<SiteLayout
+  title="Picker lab"
+  description="A preview seam for the Texuli EmojiPicker web component integration."
+>
+  <p class="eyebrow">Picker lab</p>
+  <h1>Explore the picker</h1>
+  <p class="lead">The picker lab will demonstrate the Texuli EmojiPicker component when its web adapter is ready.</p>
+  <section class="panel picker-seam" data-emoji-picker-lab aria-labelledby="picker-status-title">
+    <div>
+      <span class="emoji-glyph" aria-hidden="true">🔎</span>
+      <h2 id="picker-status-title">Component integration in progress</h2>
+      <p>This reserved mount point will host the shared picker. It does not implement a second picker or catalog.</p>
+      <p><a href="/">Search the catalog</a> or <a href="/convert/">convert emoji text</a> in the meantime.</p>
+    </div>
+  </section>
+</SiteLayout>
