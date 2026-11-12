@@ -210,8 +210,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/solutions/agent-chat/',
     reason:
-      'PLAN_023 art (2026-11-12): the landing keeps the mosaic fallback; Astro hoists the CSS of the lazily imported player chunk into <head>, as on /slides-page/ (JavaScript stays at the shared baseline). Measured 145.0 KB page and 20.9 KB HTML gzip; Measured 2026-11-12 on Chromium at 1280 × 720 after the ready signal with gzip level 9. Limits are +4%, rounded up.',
-    budget: { pageGzipKb: 151, htmlGzipKb: 22 },
+      'PLAN_023 art (2026-11-12): the landing keeps the mosaic fallback; Astro hoists the CSS of the lazily imported player chunk into <head>, as on /slides-page/ (JavaScript stays at the shared baseline). Measured 146.1 KB page and 21.0 KB HTML gzip (emoji search and EmojiText load on use); Measured 2026-11-12 on Chromium at 1280 × 720 after the ready signal with gzip level 9. Limits are +4%, rounded up.',
+    budget: { pageGzipKb: 152, htmlGzipKb: 22 },
   },
   {
     route: '/solutions/design-systems/',

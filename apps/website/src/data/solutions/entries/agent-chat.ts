@@ -7,7 +7,7 @@ export const agentChat: SolutionEntry = {
   status: 'in development',
   tagline: 'A thread whose replies paint validated blueprints.',
   summary:
-    'Chat thread, message list and composer on @texuli/chat: replies stream with a Stop control, message Markdown is read by the shared CommonMark parser into safe nodes, the composer autocompletes mentions and slash commands, and replies attach blueprints that are validated before the player paints them. @texuli/chat is on npm; composer autocomplete, stopped replies and ChatAttachment were added after 0.17.4 and are not in a published release yet. Texuli emoji are still landing.',
+    'Chat thread, message list and composer on @texuli/chat: replies stream with a Stop control, message Markdown is read by the shared CommonMark parser into safe nodes, the composer autocompletes mentions and slash commands, and replies attach blueprints that are validated before the player paints them. @texuli/chat is on npm; composer autocomplete, stopped replies and ChatAttachment were added after 0.17.4 and are not in a published release yet. Emoji render with EmojiText (Unicode); Texuli emoji art is still landing.',
   route: '/solutions/agent-chat/',
   docs: '/guides/solutions/agent-chat/',
   packages: [
@@ -43,14 +43,14 @@ export const agentChat: SolutionEntry = {
       id: 'markdown',
       title: 'Markdown and emoji',
       summary:
-        'Message text is read by the shared CommonMark parser into safe nodes and can be written in chat dialects. Texuli emoji art is still landing.',
+        'Message text is read by the shared CommonMark parser into safe nodes, renders emoji with EmojiText (Unicode; Texuli emoji art is still landing) and can be written in chat dialects.',
       status: 'in development',
     },
     {
       id: 'autocomplete',
       title: 'Composer autocomplete',
       summary:
-        'Mention and slash-command autocomplete (added after 0.17.4, not in a published release yet). Emoji autocomplete is still landing.',
+        'Mention, slash-command and emoji autocomplete (added after 0.17.4, not in a published release yet).',
       status: 'in development',
     },
     {
@@ -80,12 +80,12 @@ export const agentChat: SolutionEntry = {
     limits: [
       'Fixture replies, no live model and no network: every reply is replayed from the page.',
       'Composer autocomplete, stopped replies and ChatAttachment were added after 0.17.4 and are not in a published release yet.',
-      'Texuli emoji art and emoji autocomplete are still landing.',
+      'Emoji render as Unicode: Texuli emoji art is still landing.',
     ],
   },
   art: { hero: { slot: 'solution-agent-chat-hero', variant: 'plate' } },
   limits: [
-    '@texuli/chat is on npm; composer autocomplete, stopped replies and ChatAttachment were added after 0.17.4 and are not in a published release yet, and Texuli emoji are still landing.',
+    '@texuli/chat is on npm; composer autocomplete, stopped replies and ChatAttachment were added after 0.17.4 and are not in a published release yet, and Texuli emoji art is still landing.',
     'The demo replays fixture replies: there is no live model.',
     'Pre-1.0: a new minor version may break the API.',
   ],

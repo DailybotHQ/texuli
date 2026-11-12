@@ -6,6 +6,7 @@ import {
   type ChatMessage,
   ChatThread,
   commandSuggestions,
+  emojiSuggestions,
   mentionSuggestions,
 } from '@texuli/chat';
 import { parseMarkdown } from '@texuli/core/markdown';
@@ -41,7 +42,7 @@ let messages = $state<ChatMessage[]>([
     id: 'welcome',
     author: AGENT,
     at: new Date(START).toISOString(),
-    body: 'Hi! I answer from fixtures, with no live model. Pick a scenario, or type `/` for a command and `@` to mention a teammate.',
+    body: 'Hi! 👋 I answer from fixtures, with no live model. Pick a scenario, or type `/` for a command, `@` to mention a teammate and `:` for an emoji.',
   },
 ]);
 let attachments = $state<Record<string, readonly ScenarioAttachment[]>>({});
@@ -51,7 +52,15 @@ let draft = $state('');
 let dialect = $state<MarkdownDialect>('slack');
 let timer: ReturnType<typeof setTimeout> | undefined;
 
-const suggestions = [mentionSuggestions(PEOPLE), commandSuggestions(COMMANDS)];
+// The emoji search and its data load the first time someone types `:` and a letter.
+const suggestions = [
+  mentionSuggestions(PEOPLE),
+  commandSuggestions(COMMANDS),
+  emojiSuggestions(async (query) => {
+    const { searchEmojis } = await import('@texuli/emojis/search');
+    return searchEmojis(query, { limit: 8 }).map((result) => result.emoji);
+  }),
+];
 const DIALECTS: readonly { id: MarkdownDialect; label: string }[] = [
   { id: 'slack', label: 'Slack' },
   { id: 'discord', label: 'Discord' },
