@@ -9,9 +9,21 @@
     "**/*.css"
   ],
   "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
     "./catalog": {
-      "types": "./src/data/catalog.ts",
-      "default": "./src/data/catalog.ts"
+      "types": "./src/catalog.ts",
+      "default": "./src/catalog.ts"
+    },
+    "./search": {
+      "types": "./src/search.ts",
+      "default": "./src/search.ts"
+    },
+    "./legacy-engine": {
+      "types": "./src/legacy-engine.ts",
+      "default": "./src/legacy-engine.ts"
     },
     "./legacy": {
       "types": "./src/data/legacy.ts",

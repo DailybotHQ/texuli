@@ -189,14 +189,14 @@
     "char": "😗",
     "keywords": ["kissing_face", "3", "whistling"]
   },
-  "☺️": {
+  "☺\u{fe0f}": {
     "name": "smiling face",
     "slug": "smiling_face",
     "group": "Smileys & Emotion",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "☺️",
+    "char": "☺\u{fe0f}",
     "keywords": ["smiling_face", "blush", "massage", "happiness", "outlined"]
   },
   "😚": {
@@ -447,14 +447,14 @@
       "introvert"
     ]
   },
-  "😶‍🌫️": {
+  "😶\u{200d}🌫\u{fe0f}": {
     "name": "face in clouds",
     "slug": "face_in_clouds",
     "group": "Smileys & Emotion",
     "emoji_version": "13.1",
     "unicode_version": "13.1",
     "skin_tone_support": false,
-    "char": "😶‍🌫️",
+    "char": "😶\u{200d}🌫\u{fe0f}",
     "keywords": [
       "face_in_clouds",
       "face in clouds",
@@ -518,14 +518,14 @@
     "char": "😬",
     "keywords": ["grimacing_face", "grimace", "awkward", "eek"]
   },
-  "😮‍💨": {
+  "😮\u{200d}💨": {
     "name": "face exhaling",
     "slug": "face_exhaling",
     "group": "Smileys & Emotion",
     "emoji_version": "13.1",
     "unicode_version": "13.1",
     "skin_tone_support": false,
-    "char": "😮‍💨",
+    "char": "😮\u{200d}💨",
     "keywords": ["face_exhaling", "face exhaling", "relieve", "sigh", "exhale", "groan", "whisper"]
   },
   "🤥": {
@@ -548,24 +548,24 @@
     "char": "🫨",
     "keywords": ["shaking_face", "shaking face", "blurry", "earthquake"]
   },
-  "🙂‍↔️": {
+  "🙂\u{200d}↔\u{fe0f}": {
     "name": "head shaking horizontally",
     "slug": "head_shaking_horizontally",
     "group": "Smileys & Emotion",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": false,
-    "char": "🙂‍↔️",
+    "char": "🙂\u{200d}↔\u{fe0f}",
     "keywords": ["head_shaking_horizontally", "head shaking horizontally", "disapprove", "indiffernt"]
   },
-  "🙂‍↕️": {
+  "🙂\u{200d}↕\u{fe0f}": {
     "name": "head shaking vertically",
     "slug": "head_shaking_vertically",
     "group": "Smileys & Emotion",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": false,
-    "char": "🙂‍↕️",
+    "char": "🙂\u{200d}↕\u{fe0f}",
     "keywords": ["head_shaking_vertically", "head shaking vertically", "down", "nod"]
   },
   "😌": {
@@ -736,14 +736,14 @@
       "spiral eyes"
     ]
   },
-  "😵‍💫": {
+  "😵\u{200d}💫": {
     "name": "face with spiral eyes",
     "slug": "face_with_spiral_eyes",
     "group": "Smileys & Emotion",
     "emoji_version": "13.1",
     "unicode_version": "13.1",
     "skin_tone_support": false,
-    "char": "😵‍💫",
+    "char": "😵\u{200d}💫",
     "keywords": ["face_with_spiral_eyes", "face with spiral eyes", "nauseous", "nausea", "hypnotized", "trouble"]
   },
   "🤯": {
@@ -856,14 +856,14 @@
     "char": "🙁",
     "keywords": ["slightly_frowning_face", "frowning", "frown"]
   },
-  "☹️": {
+  "☹\u{fe0f}": {
     "name": "frowning face",
     "slug": "frowning_face",
     "group": "Smileys & Emotion",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "☹️",
+    "char": "☹\u{fe0f}",
     "keywords": ["frowning_face", "upset", "megafrown", "unhappy"]
   },
   "😮": {
@@ -1166,14 +1166,14 @@
     "char": "💀",
     "keywords": ["skull", "dead", "creepy", "dead"]
   },
-  "☠️": {
+  "☠\u{fe0f}": {
     "name": "skull and crossbones",
     "slug": "skull_and_crossbones",
     "group": "Smileys & Emotion",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "☠️",
+    "char": "☠\u{fe0f}",
     "keywords": ["skull_and_crossbones", "poison", "deadly", "scary"]
   },
   "💩": {
@@ -1478,14 +1478,14 @@
     "char": "💟",
     "keywords": ["heart_decoration", "purple-square"]
   },
-  "❣️": {
+  "❣\u{fe0f}": {
     "name": "heart exclamation",
     "slug": "heart_exclamation",
     "group": "Smileys & Emotion",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "❣️",
+    "char": "❣\u{fe0f}",
     "keywords": ["heart_exclamation", "decoration", "above", "an", "as"]
   },
   "💔": {
@@ -1498,24 +1498,24 @@
     "char": "💔",
     "keywords": ["broken_heart", "sorry", "break", "heartbreak", "breaking", "brokenhearted"]
   },
-  "❤️‍🔥": {
+  "❤\u{fe0f}\u{200d}🔥": {
     "name": "heart on fire",
     "slug": "heart_on_fire",
     "group": "Smileys & Emotion",
     "emoji_version": "13.1",
     "unicode_version": "13.1",
     "skin_tone_support": false,
-    "char": "❤️‍🔥",
+    "char": "❤\u{fe0f}\u{200d}🔥",
     "keywords": ["heart_on_fire", "heart on fire", "passionate", "enthusiastic", "lust", "sacred"]
   },
-  "❤️‍🩹": {
+  "❤\u{fe0f}\u{200d}🩹": {
     "name": "mending heart",
     "slug": "mending_heart",
     "group": "Smileys & Emotion",
     "emoji_version": "13.1",
     "unicode_version": "13.1",
     "skin_tone_support": false,
-    "char": "❤️‍🩹",
+    "char": "❤\u{fe0f}\u{200d}🩹",
     "keywords": [
       "mending_heart",
       "mending heart",
@@ -1529,14 +1529,14 @@
       "unbroken"
     ]
   },
-  "❤️": {
+  "❤\u{fe0f}": {
     "name": "red heart",
     "slug": "red_heart",
     "group": "Smileys & Emotion",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "❤️",
+    "char": "❤\u{fe0f}",
     "keywords": ["heart", "red_heart", "black", "heavy"]
   },
   "🩷": {
@@ -1729,14 +1729,14 @@
     "char": "💨",
     "keywords": ["dashing_away", "wind", "air", "fast", "shoo", "fart", "puff", "dash", "vaping"]
   },
-  "🕳️": {
+  "🕳\u{fe0f}": {
     "name": "hole",
     "slug": "hole",
     "group": "Smileys & Emotion",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🕳️",
+    "char": "🕳\u{fe0f}",
     "keywords": ["hole", "embarrassing"]
   },
   "💬": {
@@ -1749,34 +1749,34 @@
     "char": "💬",
     "keywords": ["speech_balloon", "bubble", "message", "chatting", "chat", "comment", "literals"]
   },
-  "👁️‍🗨️": {
+  "👁\u{fe0f}\u{200d}🗨\u{fe0f}": {
     "name": "eye in speech bubble",
     "slug": "eye_in_speech_bubble",
     "group": "Smileys & Emotion",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": false,
-    "char": "👁️‍🗨️",
+    "char": "👁\u{fe0f}\u{200d}🗨\u{fe0f}",
     "keywords": ["eye_in_speech_bubble", "info", "i", "witness"]
   },
-  "🗨️": {
+  "🗨\u{fe0f}": {
     "name": "left speech bubble",
     "slug": "left_speech_bubble",
     "group": "Smileys & Emotion",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": false,
-    "char": "🗨️",
+    "char": "🗨\u{fe0f}",
     "keywords": ["left_speech_bubble", "words", "talk", "dialog"]
   },
-  "🗯️": {
+  "🗯\u{fe0f}": {
     "name": "right anger bubble",
     "slug": "right_anger_bubble",
     "group": "Smileys & Emotion",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🗯️",
+    "char": "🗯\u{fe0f}",
     "keywords": ["right_anger_bubble", "caption", "speech", "zag", "zig"]
   },
   "💭": {
@@ -1819,14 +1819,14 @@
     "char": "🤚",
     "keywords": ["raised_back_of_hand", "fingers", "raised", "backhand"]
   },
-  "🖐️": {
+  "🖐\u{fe0f}": {
     "name": "hand with fingers splayed",
     "slug": "hand_with_fingers_splayed",
     "group": "People & Body",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": true,
-    "char": "🖐️",
+    "char": "🖐\u{fe0f}",
     "keywords": ["hand_with_fingers_splayed", "hand", "five"]
   },
   "✋": {
@@ -1939,14 +1939,14 @@
     "char": "🤏",
     "keywords": ["pinching_hand", "tiny", "amount", "little"]
   },
-  "✌️": {
+  "✌\u{fe0f}": {
     "name": "victory hand",
     "slug": "victory_hand",
     "group": "People & Body",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "char": "✌️",
+    "char": "✌\u{fe0f}",
     "keywords": ["victory_hand", "ohyeah", "peace", "victory", "quotes", "v"]
   },
   "🤞": {
@@ -2054,14 +2054,14 @@
     "char": "👇",
     "keywords": ["backhand_index_pointing_down", "point"]
   },
-  "☝️": {
+  "☝\u{fe0f}": {
     "name": "index pointing up",
     "slug": "index_pointing_up",
     "group": "People & Body",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "char": "☝️",
+    "char": "☝\u{fe0f}",
     "keywords": ["index_pointing_up"]
   },
   "🫵": {
@@ -2215,14 +2215,14 @@
       "together"
     ]
   },
-  "✍️": {
+  "✍\u{fe0f}": {
     "name": "writing hand",
     "slug": "writing_hand",
     "group": "People & Body",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": true,
-    "char": "✍️",
+    "char": "✍\u{fe0f}",
     "keywords": ["writing_hand", "lower_left_ballpoint_pen", "compose"]
   },
   "💅": {
@@ -2397,14 +2397,14 @@
     "char": "👀",
     "keywords": ["eyes", "look", "stalk", "peek", "eyeballs", "shifty"]
   },
-  "👁️": {
+  "👁\u{fe0f}": {
     "name": "eye",
     "slug": "eye",
     "group": "People & Body",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "👁️",
+    "char": "👁\u{fe0f}",
     "keywords": ["eye", "see", "stare", "single"]
   },
   "👅": {
@@ -2517,64 +2517,64 @@
     "char": "🧔",
     "keywords": ["person_beard", "bewhiskered", "bearded"]
   },
-  "🧔‍♂️": {
+  "🧔\u{200d}♂\u{fe0f}": {
     "name": "man beard",
     "slug": "man_beard",
     "group": "People & Body",
     "emoji_version": "13.1",
     "unicode_version": "13.1",
     "skin_tone_support": true,
-    "char": "🧔‍♂️",
+    "char": "🧔\u{200d}♂\u{fe0f}",
     "keywords": ["man_beard", "man beard", "facial hair"]
   },
-  "🧔‍♀️": {
+  "🧔\u{200d}♀\u{fe0f}": {
     "name": "woman beard",
     "slug": "woman_beard",
     "group": "People & Body",
     "emoji_version": "13.1",
     "unicode_version": "13.1",
     "skin_tone_support": true,
-    "char": "🧔‍♀️",
+    "char": "🧔\u{200d}♀\u{fe0f}",
     "keywords": ["woman_beard", "woman beard"]
   },
-  "👨‍🦰": {
+  "👨\u{200d}🦰": {
     "name": "man red hair",
     "slug": "man_red_hair",
     "group": "People & Body",
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "char": "👨‍🦰",
+    "char": "👨\u{200d}🦰",
     "keywords": ["man_red_hair", "ginger"]
   },
-  "👨‍🦱": {
+  "👨\u{200d}🦱": {
     "name": "man curly hair",
     "slug": "man_curly_hair",
     "group": "People & Body",
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "char": "👨‍🦱",
+    "char": "👨\u{200d}🦱",
     "keywords": ["man_curly_hair", "haired"]
   },
-  "👨‍🦳": {
+  "👨\u{200d}🦳": {
     "name": "man white hair",
     "slug": "man_white_hair",
     "group": "People & Body",
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "char": "👨‍🦳",
+    "char": "👨\u{200d}🦳",
     "keywords": ["man_white_hair", "old"]
   },
-  "👨‍🦲": {
+  "👨\u{200d}🦲": {
     "name": "man bald",
     "slug": "man_bald",
     "group": "People & Body",
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "char": "👨‍🦲",
+    "char": "👨\u{200d}🦲",
     "keywords": ["man_bald", "hairless"]
   },
   "👩": {
@@ -2587,104 +2587,104 @@
     "char": "👩",
     "keywords": ["woman", "girls"]
   },
-  "👩‍🦰": {
+  "👩\u{200d}🦰": {
     "name": "woman red hair",
     "slug": "woman_red_hair",
     "group": "People & Body",
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "char": "👩‍🦰",
+    "char": "👩\u{200d}🦰",
     "keywords": ["woman_red_hair", "redhead"]
   },
-  "🧑‍🦰": {
+  "🧑\u{200d}🦰": {
     "name": "person red hair",
     "slug": "person_red_hair",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍🦰",
+    "char": "🧑\u{200d}🦰",
     "keywords": ["person_red_hair"]
   },
-  "👩‍🦱": {
+  "👩\u{200d}🦱": {
     "name": "woman curly hair",
     "slug": "woman_curly_hair",
     "group": "People & Body",
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "char": "👩‍🦱",
+    "char": "👩\u{200d}🦱",
     "keywords": ["woman_curly_hair"]
   },
-  "🧑‍🦱": {
+  "🧑\u{200d}🦱": {
     "name": "person curly hair",
     "slug": "person_curly_hair",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍🦱",
+    "char": "🧑\u{200d}🦱",
     "keywords": ["person_curly_hair"]
   },
-  "👩‍🦳": {
+  "👩\u{200d}🦳": {
     "name": "woman white hair",
     "slug": "woman_white_hair",
     "group": "People & Body",
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "char": "👩‍🦳",
+    "char": "👩\u{200d}🦳",
     "keywords": ["woman_white_hair", "elder"]
   },
-  "🧑‍🦳": {
+  "🧑\u{200d}🦳": {
     "name": "person white hair",
     "slug": "person_white_hair",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍🦳",
+    "char": "🧑\u{200d}🦳",
     "keywords": ["person_white_hair"]
   },
-  "👩‍🦲": {
+  "👩\u{200d}🦲": {
     "name": "woman bald",
     "slug": "woman_bald",
     "group": "People & Body",
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "char": "👩‍🦲",
+    "char": "👩\u{200d}🦲",
     "keywords": ["woman_bald", "hair"]
   },
-  "🧑‍🦲": {
+  "🧑\u{200d}🦲": {
     "name": "person bald",
     "slug": "person_bald",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍🦲",
+    "char": "🧑\u{200d}🦲",
     "keywords": ["person_bald"]
   },
-  "👱‍♀️": {
+  "👱\u{200d}♀\u{fe0f}": {
     "name": "woman blond hair",
     "slug": "woman_blond_hair",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👱‍♀️",
+    "char": "👱\u{200d}♀\u{fe0f}",
     "keywords": ["woman_blond_hair", "blonde"]
   },
-  "👱‍♂️": {
+  "👱\u{200d}♂\u{fe0f}": {
     "name": "man blond hair",
     "slug": "man_blond_hair",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👱‍♂️",
+    "char": "👱\u{200d}♂\u{fe0f}",
     "keywords": ["man_blond_hair"]
   },
   "🧓": {
@@ -2727,24 +2727,24 @@
     "char": "🙍",
     "keywords": ["person_frowning", "worried"]
   },
-  "🙍‍♂️": {
+  "🙍\u{200d}♂\u{fe0f}": {
     "name": "man frowning",
     "slug": "man_frowning",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🙍‍♂️",
+    "char": "🙍\u{200d}♂\u{fe0f}",
     "keywords": ["man_frowning", "discouraged"]
   },
-  "🙍‍♀️": {
+  "🙍\u{200d}♀\u{fe0f}": {
     "name": "woman frowning",
     "slug": "woman_frowning",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🙍‍♀️",
+    "char": "🙍\u{200d}♀\u{fe0f}",
     "keywords": ["woman_frowning"]
   },
   "🙎": {
@@ -2757,24 +2757,24 @@
     "char": "🙎",
     "keywords": ["person_pouting", "fed"]
   },
-  "🙎‍♂️": {
+  "🙎\u{200d}♂\u{fe0f}": {
     "name": "man pouting",
     "slug": "man_pouting",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🙎‍♂️",
+    "char": "🙎\u{200d}♂\u{fe0f}",
     "keywords": ["man_pouting", "men"]
   },
-  "🙎‍♀️": {
+  "🙎\u{200d}♀\u{fe0f}": {
     "name": "woman pouting",
     "slug": "woman_pouting",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🙎‍♀️",
+    "char": "🙎\u{200d}♀\u{fe0f}",
     "keywords": ["woman_pouting", "women"]
   },
   "🙅": {
@@ -2787,24 +2787,24 @@
     "char": "🙅",
     "keywords": ["person_gesturing_no", "decline", "arms"]
   },
-  "🙅‍♂️": {
+  "🙅\u{200d}♂\u{fe0f}": {
     "name": "man gesturing NO",
     "slug": "man_gesturing_no",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🙅‍♂️",
+    "char": "🙅\u{200d}♂\u{fe0f}",
     "keywords": ["man_gesturing_no", "nope", "denied"]
   },
-  "🙅‍♀️": {
+  "🙅\u{200d}♀\u{fe0f}": {
     "name": "woman gesturing NO",
     "slug": "woman_gesturing_no",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🙅‍♀️",
+    "char": "🙅\u{200d}♀\u{fe0f}",
     "keywords": ["woman_gesturing_no", "halt", "ng"]
   },
   "🙆": {
@@ -2817,24 +2817,24 @@
     "char": "🙆",
     "keywords": ["person_gesturing_ok", "agree", "ballerina"]
   },
-  "🙆‍♂️": {
+  "🙆\u{200d}♂\u{fe0f}": {
     "name": "man gesturing OK",
     "slug": "man_gesturing_ok",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🙆‍♂️",
+    "char": "🙆\u{200d}♂\u{fe0f}",
     "keywords": ["man_gesturing_ok"]
   },
-  "🙆‍♀️": {
+  "🙆\u{200d}♀\u{fe0f}": {
     "name": "woman gesturing OK",
     "slug": "woman_gesturing_ok",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🙆‍♀️",
+    "char": "🙆\u{200d}♀\u{fe0f}",
     "keywords": ["woman_gesturing_ok"]
   },
   "💁": {
@@ -2847,24 +2847,24 @@
     "char": "💁",
     "keywords": ["person_tipping_hand", "attendant", "bellhop", "concierge", "flick"]
   },
-  "💁‍♂️": {
+  "💁\u{200d}♂\u{fe0f}": {
     "name": "man tipping hand",
     "slug": "man_tipping_hand",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "💁‍♂️",
+    "char": "💁\u{200d}♂\u{fe0f}",
     "keywords": ["man_tipping_hand", "desk", "sassy"]
   },
-  "💁‍♀️": {
+  "💁\u{200d}♀\u{fe0f}": {
     "name": "woman tipping hand",
     "slug": "woman_tipping_hand",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "💁‍♀️",
+    "char": "💁\u{200d}♀\u{fe0f}",
     "keywords": ["woman_tipping_hand", "help"]
   },
   "🙋": {
@@ -2877,24 +2877,24 @@
     "char": "🙋",
     "keywords": ["person_raising_hand", "question", "answering"]
   },
-  "🙋‍♂️": {
+  "🙋\u{200d}♂\u{fe0f}": {
     "name": "man raising hand",
     "slug": "man_raising_hand",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🙋‍♂️",
+    "char": "🙋\u{200d}♂\u{fe0f}",
     "keywords": ["man_raising_hand"]
   },
-  "🙋‍♀️": {
+  "🙋\u{200d}♀\u{fe0f}": {
     "name": "woman raising hand",
     "slug": "woman_raising_hand",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🙋‍♀️",
+    "char": "🙋\u{200d}♀\u{fe0f}",
     "keywords": ["woman_raising_hand"]
   },
   "🧏": {
@@ -2907,24 +2907,24 @@
     "char": "🧏",
     "keywords": ["deaf_person"]
   },
-  "🧏‍♂️": {
+  "🧏\u{200d}♂\u{fe0f}": {
     "name": "deaf man",
     "slug": "deaf_man",
     "group": "People & Body",
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "char": "🧏‍♂️",
+    "char": "🧏\u{200d}♂\u{fe0f}",
     "keywords": ["deaf_man"]
   },
-  "🧏‍♀️": {
+  "🧏\u{200d}♀\u{fe0f}": {
     "name": "deaf woman",
     "slug": "deaf_woman",
     "group": "People & Body",
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "char": "🧏‍♀️",
+    "char": "🧏\u{200d}♀\u{fe0f}",
     "keywords": ["deaf_woman"]
   },
   "🙇": {
@@ -2937,24 +2937,24 @@
     "char": "🙇",
     "keywords": ["person_bowing", "respectiful", "bow", "cute", "dogeza"]
   },
-  "🙇‍♂️": {
+  "🙇\u{200d}♂\u{fe0f}": {
     "name": "man bowing",
     "slug": "man_bowing",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🙇‍♂️",
+    "char": "🙇\u{200d}♂\u{fe0f}",
     "keywords": ["man_bowing", "apology", "favor"]
   },
-  "🙇‍♀️": {
+  "🙇\u{200d}♀\u{fe0f}": {
     "name": "woman bowing",
     "slug": "woman_bowing",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🙇‍♀️",
+    "char": "🙇\u{200d}♀\u{fe0f}",
     "keywords": ["woman_bowing", "deeply"]
   },
   "🤦": {
@@ -2967,24 +2967,24 @@
     "char": "🤦",
     "keywords": ["person_facepalming", "disappointed", "disbelief", "hitting", "picard", "smh"]
   },
-  "🤦‍♂️": {
+  "🤦\u{200d}♂\u{fe0f}": {
     "name": "man facepalming",
     "slug": "man_facepalming",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🤦‍♂️",
+    "char": "🤦\u{200d}♂\u{fe0f}",
     "keywords": ["man_facepalming", "exasperation"]
   },
-  "🤦‍♀️": {
+  "🤦\u{200d}♀\u{fe0f}": {
     "name": "woman facepalming",
     "slug": "woman_facepalming",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🤦‍♀️",
+    "char": "🤦\u{200d}♀\u{fe0f}",
     "keywords": ["woman_facepalming", "facepalm"]
   },
   "🤷": {
@@ -2997,504 +2997,504 @@
     "char": "🤷",
     "keywords": ["person_shrugging", "regardless", "shrug", "shruggie", "¯\\"]
   },
-  "🤷‍♂️": {
+  "🤷\u{200d}♂\u{fe0f}": {
     "name": "man shrugging",
     "slug": "man_shrugging",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🤷‍♂️",
+    "char": "🤷\u{200d}♂\u{fe0f}",
     "keywords": ["man_shrugging", "doubt"]
   },
-  "🤷‍♀️": {
+  "🤷\u{200d}♀\u{fe0f}": {
     "name": "woman shrugging",
     "slug": "woman_shrugging",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🤷‍♀️",
+    "char": "🤷\u{200d}♀\u{fe0f}",
     "keywords": ["woman_shrugging", "ignorance"]
   },
-  "🧑‍⚕️": {
+  "🧑\u{200d}⚕\u{fe0f}": {
     "name": "health worker",
     "slug": "health_worker",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍⚕️",
+    "char": "🧑\u{200d}⚕\u{fe0f}",
     "keywords": ["health_worker", "healthcare", "md", "physician"]
   },
-  "👨‍⚕️": {
+  "👨\u{200d}⚕\u{fe0f}": {
     "name": "man health worker",
     "slug": "man_health_worker",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👨‍⚕️",
+    "char": "👨\u{200d}⚕\u{fe0f}",
     "keywords": ["man_health_worker", "doctor", "therapist", "professional"]
   },
-  "👩‍⚕️": {
+  "👩\u{200d}⚕\u{fe0f}": {
     "name": "woman health worker",
     "slug": "woman_health_worker",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👩‍⚕️",
+    "char": "👩\u{200d}⚕\u{fe0f}",
     "keywords": ["woman_health_worker", "nurse"]
   },
-  "🧑‍🎓": {
+  "🧑\u{200d}🎓": {
     "name": "student",
     "slug": "student",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍🎓",
+    "char": "🧑\u{200d}🎓",
     "keywords": ["student", "learn", "pupil"]
   },
-  "👨‍🎓": {
+  "👨\u{200d}🎓": {
     "name": "man student",
     "slug": "man_student",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👨‍🎓",
+    "char": "👨\u{200d}🎓",
     "keywords": ["man_student", "graduate"]
   },
-  "👩‍🎓": {
+  "👩\u{200d}🎓": {
     "name": "woman student",
     "slug": "woman_student",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👩‍🎓",
+    "char": "👩\u{200d}🎓",
     "keywords": ["woman_student", "graduation"]
   },
-  "🧑‍🏫": {
+  "🧑\u{200d}🏫": {
     "name": "teacher",
     "slug": "teacher",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍🏫",
+    "char": "🧑\u{200d}🏫",
     "keywords": ["teacher", "professor", "educator"]
   },
-  "👨‍🏫": {
+  "👨\u{200d}🏫": {
     "name": "man teacher",
     "slug": "man_teacher",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👨‍🏫",
+    "char": "👨\u{200d}🏫",
     "keywords": ["man_teacher", "instructor"]
   },
-  "👩‍🏫": {
+  "👩\u{200d}🏫": {
     "name": "woman teacher",
     "slug": "woman_teacher",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👩‍🏫",
+    "char": "👩\u{200d}🏫",
     "keywords": ["woman_teacher"]
   },
-  "🧑‍⚖️": {
+  "🧑\u{200d}⚖\u{fe0f}": {
     "name": "judge",
     "slug": "judge",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍⚖️",
+    "char": "🧑\u{200d}⚖\u{fe0f}",
     "keywords": ["judge", "law", "court"]
   },
-  "👨‍⚖️": {
+  "👨\u{200d}⚖\u{fe0f}": {
     "name": "man judge",
     "slug": "man_judge",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👨‍⚖️",
+    "char": "👨\u{200d}⚖\u{fe0f}",
     "keywords": ["man_judge", "justice"]
   },
-  "👩‍⚖️": {
+  "👩\u{200d}⚖\u{fe0f}": {
     "name": "woman judge",
     "slug": "woman_judge",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👩‍⚖️",
+    "char": "👩\u{200d}⚖\u{fe0f}",
     "keywords": ["woman_judge", "scales"]
   },
-  "🧑‍🌾": {
+  "🧑\u{200d}🌾": {
     "name": "farmer",
     "slug": "farmer",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍🌾",
+    "char": "🧑\u{200d}🌾",
     "keywords": ["farmer", "crops", "farm"]
   },
-  "👨‍🌾": {
+  "👨\u{200d}🌾": {
     "name": "man farmer",
     "slug": "man_farmer",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👨‍🌾",
+    "char": "👨\u{200d}🌾",
     "keywords": ["man_farmer", "rancher", "gardener"]
   },
-  "👩‍🌾": {
+  "👩\u{200d}🌾": {
     "name": "woman farmer",
     "slug": "woman_farmer",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👩‍🌾",
+    "char": "👩\u{200d}🌾",
     "keywords": ["woman_farmer", "worker"]
   },
-  "🧑‍🍳": {
+  "🧑\u{200d}🍳": {
     "name": "cook",
     "slug": "cook",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍🍳",
+    "char": "🧑\u{200d}🍳",
     "keywords": ["cook", "food", "kitchen", "culinary"]
   },
-  "👨‍🍳": {
+  "👨\u{200d}🍳": {
     "name": "man cook",
     "slug": "man_cook",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👨‍🍳",
+    "char": "👨\u{200d}🍳",
     "keywords": ["man_cook", "chef"]
   },
-  "👩‍🍳": {
+  "👩\u{200d}🍳": {
     "name": "woman cook",
     "slug": "woman_cook",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👩‍🍳",
+    "char": "👩\u{200d}🍳",
     "keywords": ["woman_cook", "service"]
   },
-  "🧑‍🔧": {
+  "🧑\u{200d}🔧": {
     "name": "mechanic",
     "slug": "mechanic",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍🔧",
+    "char": "🧑\u{200d}🔧",
     "keywords": ["mechanic", "technician", "electrician", "tradesperson"]
   },
-  "👨‍🔧": {
+  "👨\u{200d}🔧": {
     "name": "man mechanic",
     "slug": "man_mechanic",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👨‍🔧",
+    "char": "👨\u{200d}🔧",
     "keywords": ["man_mechanic", "plumber"]
   },
-  "👩‍🔧": {
+  "👩\u{200d}🔧": {
     "name": "woman mechanic",
     "slug": "woman_mechanic",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👩‍🔧",
+    "char": "👩\u{200d}🔧",
     "keywords": ["woman_mechanic", "repair"]
   },
-  "🧑‍🏭": {
+  "🧑\u{200d}🏭": {
     "name": "factory worker",
     "slug": "factory_worker",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍🏭",
+    "char": "🧑\u{200d}🏭",
     "keywords": ["factory_worker", "labor", "welder"]
   },
-  "👨‍🏭": {
+  "👨\u{200d}🏭": {
     "name": "man factory worker",
     "slug": "man_factory_worker",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👨‍🏭",
+    "char": "👨\u{200d}🏭",
     "keywords": ["man_factory_worker", "assembly"]
   },
-  "👩‍🏭": {
+  "👩\u{200d}🏭": {
     "name": "woman factory worker",
     "slug": "woman_factory_worker",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👩‍🏭",
+    "char": "👩\u{200d}🏭",
     "keywords": ["woman_factory_worker", "industrial"]
   },
-  "🧑‍💼": {
+  "🧑\u{200d}💼": {
     "name": "office worker",
     "slug": "office_worker",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍💼",
+    "char": "🧑\u{200d}💼",
     "keywords": ["office_worker", "business", "accountant", "banker", "clerk"]
   },
-  "👨‍💼": {
+  "👨\u{200d}💼": {
     "name": "man office worker",
     "slug": "man_office_worker",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👨‍💼",
+    "char": "👨\u{200d}💼",
     "keywords": ["man_office_worker", "manager", "adviser", "businessman"]
   },
-  "👩‍💼": {
+  "👩\u{200d}💼": {
     "name": "woman office worker",
     "slug": "woman_office_worker",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👩‍💼",
+    "char": "👩\u{200d}💼",
     "keywords": ["woman_office_worker", "analyst", "businesswoman", "ceo"]
   },
-  "🧑‍🔬": {
+  "🧑\u{200d}🔬": {
     "name": "scientist",
     "slug": "scientist",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍🔬",
+    "char": "🧑\u{200d}🔬",
     "keywords": ["scientist", "chemistry", "engineer", "mathematician"]
   },
-  "👨‍🔬": {
+  "👨\u{200d}🔬": {
     "name": "man scientist",
     "slug": "man_scientist",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👨‍🔬",
+    "char": "👨\u{200d}🔬",
     "keywords": ["man_scientist", "biologist", "physicist"]
   },
-  "👩‍🔬": {
+  "👩\u{200d}🔬": {
     "name": "woman scientist",
     "slug": "woman_scientist",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👩‍🔬",
+    "char": "👩\u{200d}🔬",
     "keywords": ["woman_scientist", "chemist", "research"]
   },
-  "🧑‍💻": {
+  "🧑\u{200d}💻": {
     "name": "technologist",
     "slug": "technologist",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍💻",
+    "char": "🧑\u{200d}💻",
     "keywords": ["technologist", "coder", "software"]
   },
-  "👨‍💻": {
+  "👨\u{200d}💻": {
     "name": "man technologist",
     "slug": "man_technologist",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👨‍💻",
+    "char": "👨\u{200d}💻",
     "keywords": ["man_technologist", "developer", "blogger"]
   },
-  "👩‍💻": {
+  "👩\u{200d}💻": {
     "name": "woman technologist",
     "slug": "woman_technologist",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👩‍💻",
+    "char": "👩\u{200d}💻",
     "keywords": ["woman_technologist", "programmer"]
   },
-  "🧑‍🎤": {
+  "🧑\u{200d}🎤": {
     "name": "singer",
     "slug": "singer",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍🎤",
+    "char": "🧑\u{200d}🎤",
     "keywords": ["singer", "song", "performer", "actor"]
   },
-  "👨‍🎤": {
+  "👨\u{200d}🎤": {
     "name": "man singer",
     "slug": "man_singer",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👨‍🎤",
+    "char": "👨\u{200d}🎤",
     "keywords": ["man_singer", "rockstar", "entertainer", "aladdin", "bowie", "sane"]
   },
-  "👩‍🎤": {
+  "👩\u{200d}🎤": {
     "name": "woman singer",
     "slug": "woman_singer",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👩‍🎤",
+    "char": "👩\u{200d}🎤",
     "keywords": ["woman_singer", "musician", "rocker"]
   },
-  "🧑‍🎨": {
+  "🧑\u{200d}🎨": {
     "name": "artist",
     "slug": "artist",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍🎨",
+    "char": "🧑\u{200d}🎨",
     "keywords": ["artist", "painting", "creativity"]
   },
-  "👨‍🎨": {
+  "👨\u{200d}🎨": {
     "name": "man artist",
     "slug": "man_artist",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👨‍🎨",
+    "char": "👨\u{200d}🎨",
     "keywords": ["man_artist", "painter", "paint"]
   },
-  "👩‍🎨": {
+  "👩\u{200d}🎨": {
     "name": "woman artist",
     "slug": "woman_artist",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👩‍🎨",
+    "char": "👩\u{200d}🎨",
     "keywords": ["woman_artist", "palette"]
   },
-  "🧑‍✈️": {
+  "🧑\u{200d}✈\u{fe0f}": {
     "name": "pilot",
     "slug": "pilot",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍✈️",
+    "char": "🧑\u{200d}✈\u{fe0f}",
     "keywords": ["pilot", "plane", "aviation"]
   },
-  "👨‍✈️": {
+  "👨\u{200d}✈\u{fe0f}": {
     "name": "man pilot",
     "slug": "man_pilot",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👨‍✈️",
+    "char": "👨\u{200d}✈\u{fe0f}",
     "keywords": ["man_pilot", "aviator"]
   },
-  "👩‍✈️": {
+  "👩\u{200d}✈\u{fe0f}": {
     "name": "woman pilot",
     "slug": "woman_pilot",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👩‍✈️",
+    "char": "👩\u{200d}✈\u{fe0f}",
     "keywords": ["woman_pilot"]
   },
-  "🧑‍🚀": {
+  "🧑\u{200d}🚀": {
     "name": "astronaut",
     "slug": "astronaut",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍🚀",
+    "char": "🧑\u{200d}🚀",
     "keywords": ["astronaut", "outerspace", "moon"]
   },
-  "👨‍🚀": {
+  "👨\u{200d}🚀": {
     "name": "man astronaut",
     "slug": "man_astronaut",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👨‍🚀",
+    "char": "👨\u{200d}🚀",
     "keywords": ["man_astronaut", "space"]
   },
-  "👩‍🚀": {
+  "👩\u{200d}🚀": {
     "name": "woman astronaut",
     "slug": "woman_astronaut",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👩‍🚀",
+    "char": "👩\u{200d}🚀",
     "keywords": ["woman_astronaut", "cosmonaut"]
   },
-  "🧑‍🚒": {
+  "🧑\u{200d}🚒": {
     "name": "firefighter",
     "slug": "firefighter",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍🚒",
+    "char": "🧑\u{200d}🚒",
     "keywords": ["firefighter", "firetruck"]
   },
-  "👨‍🚒": {
+  "👨\u{200d}🚒": {
     "name": "man firefighter",
     "slug": "man_firefighter",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👨‍🚒",
+    "char": "👨\u{200d}🚒",
     "keywords": ["man_firefighter", "fireman"]
   },
-  "👩‍🚒": {
+  "👩\u{200d}🚒": {
     "name": "woman firefighter",
     "slug": "woman_firefighter",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👩‍🚒",
+    "char": "👩\u{200d}🚒",
     "keywords": ["woman_firefighter"]
   },
   "👮": {
@@ -3507,54 +3507,54 @@
     "char": "👮",
     "keywords": ["police_officer", "cop", "policeman", "policewoman"]
   },
-  "👮‍♂️": {
+  "👮\u{200d}♂\u{fe0f}": {
     "name": "man police officer",
     "slug": "man_police_officer",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👮‍♂️",
+    "char": "👮\u{200d}♂\u{fe0f}",
     "keywords": ["man_police_officer", "police", "legal"]
   },
-  "👮‍♀️": {
+  "👮\u{200d}♀\u{fe0f}": {
     "name": "woman police officer",
     "slug": "woman_police_officer",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👮‍♀️",
+    "char": "👮\u{200d}♀\u{fe0f}",
     "keywords": ["female-police-officer", "woman_police_officer", "enforcement"]
   },
-  "🕵️": {
+  "🕵\u{fe0f}": {
     "name": "detective",
     "slug": "detective",
     "group": "People & Body",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": true,
-    "char": "🕵️",
+    "char": "🕵\u{fe0f}",
     "keywords": ["detective", "spy", "or", "private"]
   },
-  "🕵️‍♂️": {
+  "🕵\u{fe0f}\u{200d}♂\u{fe0f}": {
     "name": "man detective",
     "slug": "man_detective",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🕵️‍♂️",
+    "char": "🕵\u{fe0f}\u{200d}♂\u{fe0f}",
     "keywords": ["man_detective", "crime"]
   },
-  "🕵️‍♀️": {
+  "🕵\u{fe0f}\u{200d}♀\u{fe0f}": {
     "name": "woman detective",
     "slug": "woman_detective",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🕵️‍♀️",
+    "char": "🕵\u{fe0f}\u{200d}♀\u{fe0f}",
     "keywords": ["woman_detective", "sleuth"]
   },
   "💂": {
@@ -3567,24 +3567,24 @@
     "char": "💂",
     "keywords": ["guard", "protect", "guardsman"]
   },
-  "💂‍♂️": {
+  "💂\u{200d}♂\u{fe0f}": {
     "name": "man guard",
     "slug": "man_guard",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "💂‍♂️",
+    "char": "💂\u{200d}♂\u{fe0f}",
     "keywords": ["man_guard", "uk", "royal"]
   },
-  "💂‍♀️": {
+  "💂\u{200d}♀\u{fe0f}": {
     "name": "woman guard",
     "slug": "woman_guard",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "💂‍♀️",
+    "char": "💂\u{200d}♀\u{fe0f}",
     "keywords": ["woman_guard", "gb", "guardswoman"]
   },
   "🥷": {
@@ -3607,24 +3607,24 @@
     "char": "👷",
     "keywords": ["construction_worker", "build", "builder", "helmet", "add_ci", "update_ci"]
   },
-  "👷‍♂️": {
+  "👷\u{200d}♂\u{fe0f}": {
     "name": "man construction worker",
     "slug": "man_construction_worker",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👷‍♂️",
+    "char": "👷\u{200d}♂\u{fe0f}",
     "keywords": ["man_construction_worker", "wip"]
   },
-  "👷‍♀️": {
+  "👷\u{200d}♀\u{fe0f}": {
     "name": "woman construction worker",
     "slug": "woman_construction_worker",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👷‍♀️",
+    "char": "👷\u{200d}♀\u{fe0f}",
     "keywords": ["woman_construction_worker"]
   },
   "🫅": {
@@ -3667,24 +3667,24 @@
     "char": "👳",
     "keywords": ["person_wearing_turban", "headdress", "arab", "sikh"]
   },
-  "👳‍♂️": {
+  "👳\u{200d}♂\u{fe0f}": {
     "name": "man wearing turban",
     "slug": "man_wearing_turban",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👳‍♂️",
+    "char": "👳\u{200d}♂\u{fe0f}",
     "keywords": ["man_wearing_turban", "indian", "arabs"]
   },
-  "👳‍♀️": {
+  "👳\u{200d}♀\u{fe0f}": {
     "name": "woman wearing turban",
     "slug": "woman_wearing_turban",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👳‍♀️",
+    "char": "👳\u{200d}♀\u{fe0f}",
     "keywords": ["woman_wearing_turban", "hinduism"]
   },
   "👲": {
@@ -3717,24 +3717,24 @@
     "char": "🤵",
     "keywords": ["person_in_tuxedo", "couple", "groom"]
   },
-  "🤵‍♂️": {
+  "🤵\u{200d}♂\u{fe0f}": {
     "name": "man in tuxedo",
     "slug": "man_in_tuxedo",
     "group": "People & Body",
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": true,
-    "char": "🤵‍♂️",
+    "char": "🤵\u{200d}♂\u{fe0f}",
     "keywords": ["man_in_tuxedo", "man in tuxedo", "formal"]
   },
-  "🤵‍♀️": {
+  "🤵\u{200d}♀\u{fe0f}": {
     "name": "woman in tuxedo",
     "slug": "woman_in_tuxedo",
     "group": "People & Body",
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": true,
-    "char": "🤵‍♀️",
+    "char": "🤵\u{200d}♀\u{fe0f}",
     "keywords": ["woman_in_tuxedo", "woman in tuxedo"]
   },
   "👰": {
@@ -3747,24 +3747,24 @@
     "char": "👰",
     "keywords": ["person_with_veil", "bride_with_veil", "bride"]
   },
-  "👰‍♂️": {
+  "👰\u{200d}♂\u{fe0f}": {
     "name": "man with veil",
     "slug": "man_with_veil",
     "group": "People & Body",
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": true,
-    "char": "👰‍♂️",
+    "char": "👰\u{200d}♂\u{fe0f}",
     "keywords": ["man_with_veil", "man with veil"]
   },
-  "👰‍♀️": {
+  "👰\u{200d}♀\u{fe0f}": {
     "name": "woman with veil",
     "slug": "woman_with_veil",
     "group": "People & Body",
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": true,
-    "char": "👰‍♀️",
+    "char": "👰\u{200d}♀\u{fe0f}",
     "keywords": ["woman_with_veil", "woman with veil"]
   },
   "🤰": {
@@ -3807,34 +3807,34 @@
     "char": "🤱",
     "keywords": ["breast_feeding", "nursing", "breastfeeding", "infant"]
   },
-  "👩‍🍼": {
+  "👩\u{200d}🍼": {
     "name": "woman feeding baby",
     "slug": "woman_feeding_baby",
     "group": "People & Body",
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": true,
-    "char": "👩‍🍼",
+    "char": "👩\u{200d}🍼",
     "keywords": ["woman_feeding_baby", "woman feeding baby", "birth"]
   },
-  "👨‍🍼": {
+  "👨\u{200d}🍼": {
     "name": "man feeding baby",
     "slug": "man_feeding_baby",
     "group": "People & Body",
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": true,
-    "char": "👨‍🍼",
+    "char": "👨\u{200d}🍼",
     "keywords": ["man_feeding_baby", "man feeding baby", "bottle"]
   },
-  "🧑‍🍼": {
+  "🧑\u{200d}🍼": {
     "name": "person feeding baby",
     "slug": "person_feeding_baby",
     "group": "People & Body",
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": true,
-    "char": "🧑‍🍼",
+    "char": "🧑\u{200d}🍼",
     "keywords": ["person_feeding_baby", "person feeding baby"]
   },
   "👼": {
@@ -3867,14 +3867,14 @@
     "char": "🤶",
     "keywords": ["mrs_claus", "xmas", "mother christmas", "mrs.", "santa"]
   },
-  "🧑‍🎄": {
+  "🧑\u{200d}🎄": {
     "name": "Mx Claus",
     "slug": "mx_claus",
     "group": "People & Body",
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": true,
-    "char": "🧑‍🎄",
+    "char": "🧑\u{200d}🎄",
     "keywords": ["mx_claus", "mx claus", "mx."]
   },
   "🦸": {
@@ -3887,24 +3887,24 @@
     "char": "🦸",
     "keywords": ["superhero", "marvel", "fantasy", "superpower"]
   },
-  "🦸‍♂️": {
+  "🦸\u{200d}♂\u{fe0f}": {
     "name": "man superhero",
     "slug": "man_superhero",
     "group": "People & Body",
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "char": "🦸‍♂️",
+    "char": "🦸\u{200d}♂\u{fe0f}",
     "keywords": ["man_superhero", "hero", "superpowers"]
   },
-  "🦸‍♀️": {
+  "🦸\u{200d}♀\u{fe0f}": {
     "name": "woman superhero",
     "slug": "woman_superhero",
     "group": "People & Body",
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "char": "🦸‍♀️",
+    "char": "🦸\u{200d}♀\u{fe0f}",
     "keywords": ["woman_superhero", "heroine"]
   },
   "🦹": {
@@ -3917,24 +3917,24 @@
     "char": "🦹",
     "keywords": ["supervillain", "bad"]
   },
-  "🦹‍♂️": {
+  "🦹\u{200d}♂\u{fe0f}": {
     "name": "man supervillain",
     "slug": "man_supervillain",
     "group": "People & Body",
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "char": "🦹‍♂️",
+    "char": "🦹\u{200d}♂\u{fe0f}",
     "keywords": ["man_supervillain", "criminal"]
   },
-  "🦹‍♀️": {
+  "🦹\u{200d}♀\u{fe0f}": {
     "name": "woman supervillain",
     "slug": "woman_supervillain",
     "group": "People & Body",
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "char": "🦹‍♀️",
+    "char": "🦹\u{200d}♀\u{fe0f}",
     "keywords": ["woman_supervillain", "villain"]
   },
   "🧙": {
@@ -3947,24 +3947,24 @@
     "char": "🧙",
     "keywords": ["mage", "magic", "sorceress"]
   },
-  "🧙‍♂️": {
+  "🧙\u{200d}♂\u{fe0f}": {
     "name": "man mage",
     "slug": "man_mage",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "char": "🧙‍♂️",
+    "char": "🧙\u{200d}♂\u{fe0f}",
     "keywords": ["man_mage", "sorcerer", "wizard"]
   },
-  "🧙‍♀️": {
+  "🧙\u{200d}♀\u{fe0f}": {
     "name": "woman mage",
     "slug": "woman_mage",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "char": "🧙‍♀️",
+    "char": "🧙\u{200d}♀\u{fe0f}",
     "keywords": ["woman_mage", "witch"]
   },
   "🧚": {
@@ -3977,24 +3977,24 @@
     "char": "🧚",
     "keywords": ["fairy", "wings", "puck"]
   },
-  "🧚‍♂️": {
+  "🧚\u{200d}♂\u{fe0f}": {
     "name": "man fairy",
     "slug": "man_fairy",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "char": "🧚‍♂️",
+    "char": "🧚\u{200d}♂\u{fe0f}",
     "keywords": ["man_fairy", "oberon"]
   },
-  "🧚‍♀️": {
+  "🧚\u{200d}♀\u{fe0f}": {
     "name": "woman fairy",
     "slug": "woman_fairy",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "char": "🧚‍♀️",
+    "char": "🧚\u{200d}♀\u{fe0f}",
     "keywords": ["woman_fairy", "titania"]
   },
   "🧛": {
@@ -4007,24 +4007,24 @@
     "char": "🧛",
     "keywords": ["vampire", "blood"]
   },
-  "🧛‍♂️": {
+  "🧛\u{200d}♂\u{fe0f}": {
     "name": "man vampire",
     "slug": "man_vampire",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "char": "🧛‍♂️",
+    "char": "🧛\u{200d}♂\u{fe0f}",
     "keywords": ["man_vampire", "dracula"]
   },
-  "🧛‍♀️": {
+  "🧛\u{200d}♀\u{fe0f}": {
     "name": "woman vampire",
     "slug": "woman_vampire",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "char": "🧛‍♀️",
+    "char": "🧛\u{200d}♀\u{fe0f}",
     "keywords": ["woman_vampire", "undead", "unded"]
   },
   "🧜": {
@@ -4037,24 +4037,24 @@
     "char": "🧜",
     "keywords": ["merperson", "sea", "merboy", "mergirl"]
   },
-  "🧜‍♂️": {
+  "🧜\u{200d}♂\u{fe0f}": {
     "name": "merman",
     "slug": "merman",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "char": "🧜‍♂️",
+    "char": "🧜\u{200d}♂\u{fe0f}",
     "keywords": ["merman", "triton"]
   },
-  "🧜‍♀️": {
+  "🧜\u{200d}♀\u{fe0f}": {
     "name": "mermaid",
     "slug": "mermaid",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "char": "🧜‍♀️",
+    "char": "🧜\u{200d}♀\u{fe0f}",
     "keywords": ["mermaid", "merwoman", "ariel"]
   },
   "🧝": {
@@ -4067,24 +4067,24 @@
     "char": "🧝",
     "keywords": ["elf", "magical", "legolas"]
   },
-  "🧝‍♂️": {
+  "🧝\u{200d}♂\u{fe0f}": {
     "name": "man elf",
     "slug": "man_elf",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "char": "🧝‍♂️",
+    "char": "🧝\u{200d}♂\u{fe0f}",
     "keywords": ["man_elf", "pointed"]
   },
-  "🧝‍♀️": {
+  "🧝\u{200d}♀\u{fe0f}": {
     "name": "woman elf",
     "slug": "woman_elf",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "char": "🧝‍♀️",
+    "char": "🧝\u{200d}♀\u{fe0f}",
     "keywords": ["woman_elf"]
   },
   "🧞": {
@@ -4097,24 +4097,24 @@
     "char": "🧞",
     "keywords": ["genie", "wishes", "djinni", "jinni"]
   },
-  "🧞‍♂️": {
+  "🧞\u{200d}♂\u{fe0f}": {
     "name": "man genie",
     "slug": "man_genie",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": false,
-    "char": "🧞‍♂️",
+    "char": "🧞\u{200d}♂\u{fe0f}",
     "keywords": ["man_genie", "djinn"]
   },
-  "🧞‍♀️": {
+  "🧞\u{200d}♀\u{fe0f}": {
     "name": "woman genie",
     "slug": "woman_genie",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": false,
-    "char": "🧞‍♀️",
+    "char": "🧞\u{200d}♀\u{fe0f}",
     "keywords": ["woman_genie"]
   },
   "🧟": {
@@ -4127,24 +4127,24 @@
     "char": "🧟",
     "keywords": ["zombie", "walking"]
   },
-  "🧟‍♂️": {
+  "🧟\u{200d}♂\u{fe0f}": {
     "name": "man zombie",
     "slug": "man_zombie",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": false,
-    "char": "🧟‍♂️",
+    "char": "🧟\u{200d}♂\u{fe0f}",
     "keywords": ["man_zombie", "walking dead"]
   },
-  "🧟‍♀️": {
+  "🧟\u{200d}♀\u{fe0f}": {
     "name": "woman zombie",
     "slug": "woman_zombie",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": false,
-    "char": "🧟‍♀️",
+    "char": "🧟\u{200d}♀\u{fe0f}",
     "keywords": ["woman_zombie"]
   },
   "🧌": {
@@ -4177,24 +4177,24 @@
     "char": "💆",
     "keywords": ["person_getting_massage", "relax", "head", "massaging"]
   },
-  "💆‍♂️": {
+  "💆\u{200d}♂\u{fe0f}": {
     "name": "man getting massage",
     "slug": "man_getting_massage",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "💆‍♂️",
+    "char": "💆\u{200d}♂\u{fe0f}",
     "keywords": ["man_getting_massage", "salon"]
   },
-  "💆‍♀️": {
+  "💆\u{200d}♀\u{fe0f}": {
     "name": "woman getting massage",
     "slug": "woman_getting_massage",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "💆‍♀️",
+    "char": "💆\u{200d}♀\u{fe0f}",
     "keywords": ["woman_getting_massage", "spa"]
   },
   "💇": {
@@ -4207,24 +4207,24 @@
     "char": "💇",
     "keywords": ["person_getting_haircut", "barber", "cutting", "hairdresser"]
   },
-  "💇‍♂️": {
+  "💇\u{200d}♂\u{fe0f}": {
     "name": "man getting haircut",
     "slug": "man_getting_haircut",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "💇‍♂️",
+    "char": "💇\u{200d}♂\u{fe0f}",
     "keywords": ["man_getting_haircut", "parlor"]
   },
-  "💇‍♀️": {
+  "💇\u{200d}♀\u{fe0f}": {
     "name": "woman getting haircut",
     "slug": "woman_getting_haircut",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "💇‍♀️",
+    "char": "💇\u{200d}♀\u{fe0f}",
     "keywords": ["woman_getting_haircut"]
   },
   "🚶": {
@@ -4237,54 +4237,54 @@
     "char": "🚶",
     "keywords": ["person_walking", "move", "hike", "pedestrian", "walker"]
   },
-  "🚶‍♂️": {
+  "🚶\u{200d}♂\u{fe0f}": {
     "name": "man walking",
     "slug": "man_walking",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🚶‍♂️",
+    "char": "🚶\u{200d}♂\u{fe0f}",
     "keywords": ["man_walking", "feet"]
   },
-  "🚶‍♀️": {
+  "🚶\u{200d}♀\u{fe0f}": {
     "name": "woman walking",
     "slug": "woman_walking",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🚶‍♀️",
+    "char": "🚶\u{200d}♀\u{fe0f}",
     "keywords": ["woman_walking", "steps"]
   },
-  "🚶‍➡️": {
+  "🚶\u{200d}➡\u{fe0f}": {
     "name": "person walking facing right",
     "slug": "person_walking_facing_right",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "char": "🚶‍➡️",
+    "char": "🚶\u{200d}➡\u{fe0f}",
     "keywords": ["person_walking_facing_right", "person walking facing right", "peerson"]
   },
-  "🚶‍♀️‍➡️": {
+  "🚶\u{200d}♀\u{fe0f}\u{200d}➡\u{fe0f}": {
     "name": "woman walking facing right",
     "slug": "woman_walking_facing_right",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "char": "🚶‍♀️‍➡️",
+    "char": "🚶\u{200d}♀\u{fe0f}\u{200d}➡\u{fe0f}",
     "keywords": ["woman_walking_facing_right", "woman walking facing right"]
   },
-  "🚶‍♂️‍➡️": {
+  "🚶\u{200d}♂\u{fe0f}\u{200d}➡\u{fe0f}": {
     "name": "man walking facing right",
     "slug": "man_walking_facing_right",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "char": "🚶‍♂️‍➡️",
+    "char": "🚶\u{200d}♂\u{fe0f}\u{200d}➡\u{fe0f}",
     "keywords": ["man_walking_facing_right", "man walking facing right"]
   },
   "🧍": {
@@ -4297,24 +4297,24 @@
     "char": "🧍",
     "keywords": ["person_standing", "still"]
   },
-  "🧍‍♂️": {
+  "🧍\u{200d}♂\u{fe0f}": {
     "name": "man standing",
     "slug": "man_standing",
     "group": "People & Body",
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "char": "🧍‍♂️",
+    "char": "🧍\u{200d}♂\u{fe0f}",
     "keywords": ["man_standing", "stand"]
   },
-  "🧍‍♀️": {
+  "🧍\u{200d}♀\u{fe0f}": {
     "name": "woman standing",
     "slug": "woman_standing",
     "group": "People & Body",
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "char": "🧍‍♀️",
+    "char": "🧍\u{200d}♀\u{fe0f}",
     "keywords": ["woman_standing"]
   },
   "🧎": {
@@ -4327,234 +4327,234 @@
     "char": "🧎",
     "keywords": ["person_kneeling", "pray"]
   },
-  "🧎‍♂️": {
+  "🧎\u{200d}♂\u{fe0f}": {
     "name": "man kneeling",
     "slug": "man_kneeling",
     "group": "People & Body",
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "char": "🧎‍♂️",
+    "char": "🧎\u{200d}♂\u{fe0f}",
     "keywords": ["man_kneeling", "respectful"]
   },
-  "🧎‍♀️": {
+  "🧎\u{200d}♀\u{fe0f}": {
     "name": "woman kneeling",
     "slug": "woman_kneeling",
     "group": "People & Body",
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "char": "🧎‍♀️",
+    "char": "🧎\u{200d}♀\u{fe0f}",
     "keywords": ["woman_kneeling", "kneel"]
   },
-  "🧎‍➡️": {
+  "🧎\u{200d}➡\u{fe0f}": {
     "name": "person kneeling facing right",
     "slug": "person_kneeling_facing_right",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "char": "🧎‍➡️",
+    "char": "🧎\u{200d}➡\u{fe0f}",
     "keywords": ["person_kneeling_facing_right", "person kneeling facing right"]
   },
-  "🧎‍♀️‍➡️": {
+  "🧎\u{200d}♀\u{fe0f}\u{200d}➡\u{fe0f}": {
     "name": "woman kneeling facing right",
     "slug": "woman_kneeling_facing_right",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "char": "🧎‍♀️‍➡️",
+    "char": "🧎\u{200d}♀\u{fe0f}\u{200d}➡\u{fe0f}",
     "keywords": ["woman_kneeling_facing_right", "woman kneeling facing right", "worship"]
   },
-  "🧎‍♂️‍➡️": {
+  "🧎\u{200d}♂\u{fe0f}\u{200d}➡\u{fe0f}": {
     "name": "man kneeling facing right",
     "slug": "man_kneeling_facing_right",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "char": "🧎‍♂️‍➡️",
+    "char": "🧎\u{200d}♂\u{fe0f}\u{200d}➡\u{fe0f}",
     "keywords": ["man_kneeling_facing_right", "man kneeling facing right"]
   },
-  "🧑‍🦯": {
+  "🧑\u{200d}🦯": {
     "name": "person with white cane",
     "slug": "person_with_white_cane",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍🦯",
+    "char": "🧑\u{200d}🦯",
     "keywords": ["person_with_white_cane", "person_with_probing_cane"]
   },
-  "🧑‍🦯‍➡️": {
+  "🧑\u{200d}🦯\u{200d}➡\u{fe0f}": {
     "name": "person with white cane facing right",
     "slug": "person_with_white_cane_facing_right",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "char": "🧑‍🦯‍➡️",
+    "char": "🧑\u{200d}🦯\u{200d}➡\u{fe0f}",
     "keywords": ["person_with_white_cane_facing_right", "person with white cane facing right", "walk", "walk"]
   },
-  "👨‍🦯": {
+  "👨\u{200d}🦯": {
     "name": "man with white cane",
     "slug": "man_with_white_cane",
     "group": "People & Body",
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "char": "👨‍🦯",
+    "char": "👨\u{200d}🦯",
     "keywords": ["man_with_white_cane", "man_with_probing_cane"]
   },
-  "👨‍🦯‍➡️": {
+  "👨\u{200d}🦯\u{200d}➡\u{fe0f}": {
     "name": "man with white cane facing right",
     "slug": "man_with_white_cane_facing_right",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "char": "👨‍🦯‍➡️",
+    "char": "👨\u{200d}🦯\u{200d}➡\u{fe0f}",
     "keywords": ["man_with_white_cane_facing_right", "man with white cane facing right", "visually impaired"]
   },
-  "👩‍🦯": {
+  "👩\u{200d}🦯": {
     "name": "woman with white cane",
     "slug": "woman_with_white_cane",
     "group": "People & Body",
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "char": "👩‍🦯",
+    "char": "👩\u{200d}🦯",
     "keywords": ["woman_with_white_cane", "woman_with_probing_cane"]
   },
-  "👩‍🦯‍➡️": {
+  "👩\u{200d}🦯\u{200d}➡\u{fe0f}": {
     "name": "woman with white cane facing right",
     "slug": "woman_with_white_cane_facing_right",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "char": "👩‍🦯‍➡️",
+    "char": "👩\u{200d}🦯\u{200d}➡\u{fe0f}",
     "keywords": ["woman_with_white_cane_facing_right", "woman with white cane facing right", "stick"]
   },
-  "🧑‍🦼": {
+  "🧑\u{200d}🦼": {
     "name": "person in motorized wheelchair",
     "slug": "person_in_motorized_wheelchair",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍🦼",
+    "char": "🧑\u{200d}🦼",
     "keywords": ["person_in_motorized_wheelchair", "disability"]
   },
-  "🧑‍🦼‍➡️": {
+  "🧑\u{200d}🦼\u{200d}➡\u{fe0f}": {
     "name": "person in motorized wheelchair facing right",
     "slug": "person_in_motorized_wheelchair_facing_right",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "char": "🧑‍🦼‍➡️",
+    "char": "🧑\u{200d}🦼\u{200d}➡\u{fe0f}",
     "keywords": ["person_in_motorized_wheelchair_facing_right", "person in motorized wheelchair facing right"]
   },
-  "👨‍🦼": {
+  "👨\u{200d}🦼": {
     "name": "man in motorized wheelchair",
     "slug": "man_in_motorized_wheelchair",
     "group": "People & Body",
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "char": "👨‍🦼",
+    "char": "👨\u{200d}🦼",
     "keywords": ["man_in_motorized_wheelchair"]
   },
-  "👨‍🦼‍➡️": {
+  "👨\u{200d}🦼\u{200d}➡\u{fe0f}": {
     "name": "man in motorized wheelchair facing right",
     "slug": "man_in_motorized_wheelchair_facing_right",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "char": "👨‍🦼‍➡️",
+    "char": "👨\u{200d}🦼\u{200d}➡\u{fe0f}",
     "keywords": ["man_in_motorized_wheelchair_facing_right", "man in motorized wheelchair facing right", "mobility"]
   },
-  "👩‍🦼": {
+  "👩\u{200d}🦼": {
     "name": "woman in motorized wheelchair",
     "slug": "woman_in_motorized_wheelchair",
     "group": "People & Body",
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "char": "👩‍🦼",
+    "char": "👩\u{200d}🦼",
     "keywords": ["woman_in_motorized_wheelchair"]
   },
-  "👩‍🦼‍➡️": {
+  "👩\u{200d}🦼\u{200d}➡\u{fe0f}": {
     "name": "woman in motorized wheelchair facing right",
     "slug": "woman_in_motorized_wheelchair_facing_right",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "char": "👩‍🦼‍➡️",
+    "char": "👩\u{200d}🦼\u{200d}➡\u{fe0f}",
     "keywords": ["woman_in_motorized_wheelchair_facing_right", "woman in motorized wheelchair facing right"]
   },
-  "🧑‍🦽": {
+  "🧑\u{200d}🦽": {
     "name": "person in manual wheelchair",
     "slug": "person_in_manual_wheelchair",
     "group": "People & Body",
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "char": "🧑‍🦽",
+    "char": "🧑\u{200d}🦽",
     "keywords": ["person_in_manual_wheelchair"]
   },
-  "🧑‍🦽‍➡️": {
+  "🧑\u{200d}🦽\u{200d}➡\u{fe0f}": {
     "name": "person in manual wheelchair facing right",
     "slug": "person_in_manual_wheelchair_facing_right",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "char": "🧑‍🦽‍➡️",
+    "char": "🧑\u{200d}🦽\u{200d}➡\u{fe0f}",
     "keywords": ["person_in_manual_wheelchair_facing_right", "person in manual wheelchair facing right"]
   },
-  "👨‍🦽": {
+  "👨\u{200d}🦽": {
     "name": "man in manual wheelchair",
     "slug": "man_in_manual_wheelchair",
     "group": "People & Body",
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "char": "👨‍🦽",
+    "char": "👨\u{200d}🦽",
     "keywords": ["man_in_manual_wheelchair"]
   },
-  "👨‍🦽‍➡️": {
+  "👨\u{200d}🦽\u{200d}➡\u{fe0f}": {
     "name": "man in manual wheelchair facing right",
     "slug": "man_in_manual_wheelchair_facing_right",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "char": "👨‍🦽‍➡️",
+    "char": "👨\u{200d}🦽\u{200d}➡\u{fe0f}",
     "keywords": ["man_in_manual_wheelchair_facing_right", "man in manual wheelchair facing right"]
   },
-  "👩‍🦽": {
+  "👩\u{200d}🦽": {
     "name": "woman in manual wheelchair",
     "slug": "woman_in_manual_wheelchair",
     "group": "People & Body",
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "char": "👩‍🦽",
+    "char": "👩\u{200d}🦽",
     "keywords": ["woman_in_manual_wheelchair"]
   },
-  "👩‍🦽‍➡️": {
+  "👩\u{200d}🦽\u{200d}➡\u{fe0f}": {
     "name": "woman in manual wheelchair facing right",
     "slug": "woman_in_manual_wheelchair_facing_right",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "char": "👩‍🦽‍➡️",
+    "char": "👩\u{200d}🦽\u{200d}➡\u{fe0f}",
     "keywords": ["woman_in_manual_wheelchair_facing_right", "woman in manual wheelchair facing right"]
   },
   "🏃": {
@@ -4567,64 +4567,64 @@
     "char": "🏃",
     "keywords": ["person_running", "exercise", "jogging", "run", "runner"]
   },
-  "🏃‍♂️": {
+  "🏃\u{200d}♂\u{fe0f}": {
     "name": "man running",
     "slug": "man_running",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🏃‍♂️",
+    "char": "🏃\u{200d}♂\u{fe0f}",
     "keywords": ["man_running", "race", "running"]
   },
-  "🏃‍♀️": {
+  "🏃\u{200d}♀\u{fe0f}": {
     "name": "woman running",
     "slug": "woman_running",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🏃‍♀️",
+    "char": "🏃\u{200d}♀\u{fe0f}",
     "keywords": ["woman_running", "marathon", "racing"]
   },
-  "🏃‍➡️": {
+  "🏃\u{200d}➡\u{fe0f}": {
     "name": "person running facing right",
     "slug": "person_running_facing_right",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "char": "🏃‍➡️",
+    "char": "🏃\u{200d}➡\u{fe0f}",
     "keywords": ["person_running_facing_right", "person running facing right", "jog"]
   },
-  "🏃‍♀️‍➡️": {
+  "🏃\u{200d}♀\u{fe0f}\u{200d}➡\u{fe0f}": {
     "name": "woman running facing right",
     "slug": "woman_running_facing_right",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "char": "🏃‍♀️‍➡️",
+    "char": "🏃\u{200d}♀\u{fe0f}\u{200d}➡\u{fe0f}",
     "keywords": ["woman_running_facing_right", "woman running facing right"]
   },
-  "🏃‍♂️‍➡️": {
+  "🏃\u{200d}♂\u{fe0f}\u{200d}➡\u{fe0f}": {
     "name": "man running facing right",
     "slug": "man_running_facing_right",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "char": "🏃‍♂️‍➡️",
+    "char": "🏃\u{200d}♂\u{fe0f}\u{200d}➡\u{fe0f}",
     "keywords": ["man_running_facing_right", "man running facing right"]
   },
-  "🧑‍🩰": {
+  "🧑\u{200d}🩰": {
     "name": "ballet dancer",
     "slug": "ballet_dancer",
     "group": "People & Body",
     "emoji_version": "17.0",
     "unicode_version": "17.0",
     "skin_tone_support": true,
-    "char": "🧑‍🩰",
+    "char": "🧑\u{200d}🩰",
     "keywords": ["ballet_dancer", "ballet dancer"]
   },
   "💃": {
@@ -4647,14 +4647,14 @@
     "char": "🕺",
     "keywords": ["man_dancing", "dancer"]
   },
-  "🕴️": {
+  "🕴\u{fe0f}": {
     "name": "person in suit levitating",
     "slug": "person_in_suit_levitating",
     "group": "People & Body",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": true,
-    "char": "🕴️",
+    "char": "🕴\u{fe0f}",
     "keywords": [
       "person_in_suit_levitating",
       "man_in_suit_levitating",
@@ -4677,24 +4677,24 @@
     "char": "👯",
     "keywords": ["people_with_bunny_ears", "perform", "costume", "partying"]
   },
-  "👯‍♂️": {
+  "👯\u{200d}♂\u{fe0f}": {
     "name": "men with bunny ears",
     "slug": "men_with_bunny_ears",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👯‍♂️",
+    "char": "👯\u{200d}♂\u{fe0f}",
     "keywords": ["men_with_bunny_ears", "bunny", "boys", "wearing"]
   },
-  "👯‍♀️": {
+  "👯\u{200d}♀\u{fe0f}": {
     "name": "women with bunny ears",
     "slug": "women_with_bunny_ears",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "👯‍♀️",
+    "char": "👯\u{200d}♀\u{fe0f}",
     "keywords": ["women_with_bunny_ears", "dancing", "people"]
   },
   "🧖": {
@@ -4707,24 +4707,24 @@
     "char": "🧖",
     "keywords": ["person_in_steamy_room", "hamam", "sauna"]
   },
-  "🧖‍♂️": {
+  "🧖\u{200d}♂\u{fe0f}": {
     "name": "man in steamy room",
     "slug": "man_in_steamy_room",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "char": "🧖‍♂️",
+    "char": "🧖\u{200d}♂\u{fe0f}",
     "keywords": ["man_in_steamy_room", "steamroom", "steambath"]
   },
-  "🧖‍♀️": {
+  "🧖\u{200d}♀\u{fe0f}": {
     "name": "woman in steamy room",
     "slug": "woman_in_steamy_room",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "char": "🧖‍♀️",
+    "char": "🧖\u{200d}♀\u{fe0f}",
     "keywords": ["woman_in_steamy_room"]
   },
   "🧗": {
@@ -4737,24 +4737,24 @@
     "char": "🧗",
     "keywords": ["person_climbing", "sport", "bouldering", "climber"]
   },
-  "🧗‍♂️": {
+  "🧗\u{200d}♂\u{fe0f}": {
     "name": "man climbing",
     "slug": "man_climbing",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "char": "🧗‍♂️",
+    "char": "🧗\u{200d}♂\u{fe0f}",
     "keywords": ["man_climbing", "sports"]
   },
-  "🧗‍♀️": {
+  "🧗\u{200d}♀\u{fe0f}": {
     "name": "woman climbing",
     "slug": "woman_climbing",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "char": "🧗‍♀️",
+    "char": "🧗\u{200d}♀\u{fe0f}",
     "keywords": ["woman_climbing", "hobby"]
   },
   "🤺": {
@@ -4777,14 +4777,14 @@
     "char": "🏇",
     "keywords": ["horse_racing", "betting", "competition", "gambling", "jockey", "racehorse"]
   },
-  "⛷️": {
+  "⛷\u{fe0f}": {
     "name": "skier",
     "slug": "skier",
     "group": "People & Body",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "⛷️",
+    "char": "⛷\u{fe0f}",
     "keywords": ["skier", "winter"]
   },
   "🏂": {
@@ -4797,34 +4797,34 @@
     "char": "🏂",
     "keywords": ["snowboarder", "ski", "snowboard", "snowboarding"]
   },
-  "🏌️": {
+  "🏌\u{fe0f}": {
     "name": "person golfing",
     "slug": "person_golfing",
     "group": "People & Body",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": true,
-    "char": "🏌️",
+    "char": "🏌\u{fe0f}",
     "keywords": ["person_golfing", "ball", "club"]
   },
-  "🏌️‍♂️": {
+  "🏌\u{fe0f}\u{200d}♂\u{fe0f}": {
     "name": "man golfing",
     "slug": "man_golfing",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🏌️‍♂️",
+    "char": "🏌\u{fe0f}\u{200d}♂\u{fe0f}",
     "keywords": ["man_golfing", "golf"]
   },
-  "🏌️‍♀️": {
+  "🏌\u{fe0f}\u{200d}♀\u{fe0f}": {
     "name": "woman golfing",
     "slug": "woman_golfing",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🏌️‍♀️",
+    "char": "🏌\u{fe0f}\u{200d}♀\u{fe0f}",
     "keywords": ["woman_golfing", "golfer"]
   },
   "🏄": {
@@ -4837,24 +4837,24 @@
     "char": "🏄",
     "keywords": ["person_surfing", "surf", "surfer"]
   },
-  "🏄‍♂️": {
+  "🏄\u{200d}♂\u{fe0f}": {
     "name": "man surfing",
     "slug": "man_surfing",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🏄‍♂️",
+    "char": "🏄\u{200d}♂\u{fe0f}",
     "keywords": ["man_surfing", "ocean"]
   },
-  "🏄‍♀️": {
+  "🏄\u{200d}♀\u{fe0f}": {
     "name": "woman surfing",
     "slug": "woman_surfing",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🏄‍♀️",
+    "char": "🏄\u{200d}♀\u{fe0f}",
     "keywords": ["woman_surfing"]
   },
   "🚣": {
@@ -4867,24 +4867,24 @@
     "char": "🚣",
     "keywords": ["person_rowing_boat", "paddles", "rowboat"]
   },
-  "🚣‍♂️": {
+  "🚣\u{200d}♂\u{fe0f}": {
     "name": "man rowing boat",
     "slug": "man_rowing_boat",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🚣‍♂️",
+    "char": "🚣\u{200d}♂\u{fe0f}",
     "keywords": ["man_rowing_boat"]
   },
-  "🚣‍♀️": {
+  "🚣\u{200d}♀\u{fe0f}": {
     "name": "woman rowing boat",
     "slug": "woman_rowing_boat",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🚣‍♀️",
+    "char": "🚣\u{200d}♀\u{fe0f}",
     "keywords": ["woman_rowing_boat"]
   },
   "🏊": {
@@ -4897,84 +4897,84 @@
     "char": "🏊",
     "keywords": ["person_swimming", "pool", "swimmer"]
   },
-  "🏊‍♂️": {
+  "🏊\u{200d}♂\u{fe0f}": {
     "name": "man swimming",
     "slug": "man_swimming",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🏊‍♂️",
+    "char": "🏊\u{200d}♂\u{fe0f}",
     "keywords": ["man_swimming", "athlete"]
   },
-  "🏊‍♀️": {
+  "🏊\u{200d}♀\u{fe0f}": {
     "name": "woman swimming",
     "slug": "woman_swimming",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🏊‍♀️",
+    "char": "🏊\u{200d}♀\u{fe0f}",
     "keywords": ["woman_swimming"]
   },
-  "⛹️": {
+  "⛹\u{fe0f}": {
     "name": "person bouncing ball",
     "slug": "person_bouncing_ball",
     "group": "People & Body",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": true,
-    "char": "⛹️",
+    "char": "⛹\u{fe0f}",
     "keywords": ["person_bouncing_ball", "player"]
   },
-  "⛹️‍♂️": {
+  "⛹\u{fe0f}\u{200d}♂\u{fe0f}": {
     "name": "man bouncing ball",
     "slug": "man_bouncing_ball",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "⛹️‍♂️",
+    "char": "⛹\u{fe0f}\u{200d}♂\u{fe0f}",
     "keywords": ["man_bouncing_ball"]
   },
-  "⛹️‍♀️": {
+  "⛹\u{fe0f}\u{200d}♀\u{fe0f}": {
     "name": "woman bouncing ball",
     "slug": "woman_bouncing_ball",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "⛹️‍♀️",
+    "char": "⛹\u{fe0f}\u{200d}♀\u{fe0f}",
     "keywords": ["woman_bouncing_ball"]
   },
-  "🏋️": {
+  "🏋\u{fe0f}": {
     "name": "person lifting weights",
     "slug": "person_lifting_weights",
     "group": "People & Body",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": true,
-    "char": "🏋️",
+    "char": "🏋\u{fe0f}",
     "keywords": ["person_lifting_weights", "training", "bodybuilder"]
   },
-  "🏋️‍♂️": {
+  "🏋\u{fe0f}\u{200d}♂\u{fe0f}": {
     "name": "man lifting weights",
     "slug": "man_lifting_weights",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🏋️‍♂️",
+    "char": "🏋\u{fe0f}\u{200d}♂\u{fe0f}",
     "keywords": ["man_lifting_weights", "gym", "weight"]
   },
-  "🏋️‍♀️": {
+  "🏋\u{fe0f}\u{200d}♀\u{fe0f}": {
     "name": "woman lifting weights",
     "slug": "woman_lifting_weights",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🏋️‍♀️",
+    "char": "🏋\u{fe0f}\u{200d}♀\u{fe0f}",
     "keywords": ["woman_lifting_weights", "lifter", "weightlifter"]
   },
   "🚴": {
@@ -4987,24 +4987,24 @@
     "char": "🚴",
     "keywords": ["person_biking", "bike"]
   },
-  "🚴‍♂️": {
+  "🚴\u{200d}♂\u{fe0f}": {
     "name": "man biking",
     "slug": "man_biking",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🚴‍♂️",
+    "char": "🚴\u{200d}♂\u{fe0f}",
     "keywords": ["man_biking", "cyclist"]
   },
-  "🚴‍♀️": {
+  "🚴\u{200d}♀\u{fe0f}": {
     "name": "woman biking",
     "slug": "woman_biking",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🚴‍♀️",
+    "char": "🚴\u{200d}♀\u{fe0f}",
     "keywords": ["woman_biking", "hipster"]
   },
   "🚵": {
@@ -5017,24 +5017,24 @@
     "char": "🚵",
     "keywords": ["person_mountain_biking", "bicyclist", "biker"]
   },
-  "🚵‍♂️": {
+  "🚵\u{200d}♂\u{fe0f}": {
     "name": "man mountain biking",
     "slug": "man_mountain_biking",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🚵‍♂️",
+    "char": "🚵\u{200d}♂\u{fe0f}",
     "keywords": ["man_mountain_biking", "transportation"]
   },
-  "🚵‍♀️": {
+  "🚵\u{200d}♀\u{fe0f}": {
     "name": "woman mountain biking",
     "slug": "woman_mountain_biking",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🚵‍♀️",
+    "char": "🚵\u{200d}♀\u{fe0f}",
     "keywords": ["woman_mountain_biking"]
   },
   "🤸": {
@@ -5047,24 +5047,24 @@
     "char": "🤸",
     "keywords": ["person_cartwheeling", "gymnastic", "cartwheel", "gymnast"]
   },
-  "🤸‍♂️": {
+  "🤸\u{200d}♂\u{fe0f}": {
     "name": "man cartwheeling",
     "slug": "man_cartwheeling",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🤸‍♂️",
+    "char": "🤸\u{200d}♂\u{fe0f}",
     "keywords": ["man_cartwheeling", "gymnastics", "doing"]
   },
-  "🤸‍♀️": {
+  "🤸\u{200d}♀\u{fe0f}": {
     "name": "woman cartwheeling",
     "slug": "woman_cartwheeling",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🤸‍♀️",
+    "char": "🤸\u{200d}♀\u{fe0f}",
     "keywords": ["woman_cartwheeling"]
   },
   "🤼": {
@@ -5077,24 +5077,24 @@
     "char": "🤼",
     "keywords": ["people_wrestling", "wrestle", "wrestler"]
   },
-  "🤼‍♂️": {
+  "🤼\u{200d}♂\u{fe0f}": {
     "name": "men wrestling",
     "slug": "men_wrestling",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🤼‍♂️",
+    "char": "🤼\u{200d}♂\u{fe0f}",
     "keywords": ["men_wrestling", "wrestlers"]
   },
-  "🤼‍♀️": {
+  "🤼\u{200d}♀\u{fe0f}": {
     "name": "women wrestling",
     "slug": "women_wrestling",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🤼‍♀️",
+    "char": "🤼\u{200d}♀\u{fe0f}",
     "keywords": ["women_wrestling"]
   },
   "🤽": {
@@ -5107,24 +5107,24 @@
     "char": "🤽",
     "keywords": ["person_playing_water_polo"]
   },
-  "🤽‍♂️": {
+  "🤽\u{200d}♂\u{fe0f}": {
     "name": "man playing water polo",
     "slug": "man_playing_water_polo",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🤽‍♂️",
+    "char": "🤽\u{200d}♂\u{fe0f}",
     "keywords": ["man_playing_water_polo"]
   },
-  "🤽‍♀️": {
+  "🤽\u{200d}♀\u{fe0f}": {
     "name": "woman playing water polo",
     "slug": "woman_playing_water_polo",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🤽‍♀️",
+    "char": "🤽\u{200d}♀\u{fe0f}",
     "keywords": ["woman_playing_water_polo"]
   },
   "🤾": {
@@ -5137,24 +5137,24 @@
     "char": "🤾",
     "keywords": ["person_playing_handball"]
   },
-  "🤾‍♂️": {
+  "🤾\u{200d}♂\u{fe0f}": {
     "name": "man playing handball",
     "slug": "man_playing_handball",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🤾‍♂️",
+    "char": "🤾\u{200d}♂\u{fe0f}",
     "keywords": ["man_playing_handball"]
   },
-  "🤾‍♀️": {
+  "🤾\u{200d}♀\u{fe0f}": {
     "name": "woman playing handball",
     "slug": "woman_playing_handball",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🤾‍♀️",
+    "char": "🤾\u{200d}♀\u{fe0f}",
     "keywords": ["woman_playing_handball"]
   },
   "🤹": {
@@ -5167,24 +5167,24 @@
     "char": "🤹",
     "keywords": ["person_juggling", "performance", "juggler"]
   },
-  "🤹‍♂️": {
+  "🤹\u{200d}♂\u{fe0f}": {
     "name": "man juggling",
     "slug": "man_juggling",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🤹‍♂️",
+    "char": "🤹\u{200d}♂\u{fe0f}",
     "keywords": ["man_juggling", "juggle"]
   },
-  "🤹‍♀️": {
+  "🤹\u{200d}♀\u{fe0f}": {
     "name": "woman juggling",
     "slug": "woman_juggling",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "char": "🤹‍♀️",
+    "char": "🤹\u{200d}♀\u{fe0f}",
     "keywords": ["woman_juggling", "skill", "multitask"]
   },
   "🧘": {
@@ -5197,24 +5197,24 @@
     "char": "🧘",
     "keywords": ["person_in_lotus_position", "meditate", "serenity"]
   },
-  "🧘‍♂️": {
+  "🧘\u{200d}♂\u{fe0f}": {
     "name": "man in lotus position",
     "slug": "man_in_lotus_position",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "char": "🧘‍♂️",
+    "char": "🧘\u{200d}♂\u{fe0f}",
     "keywords": ["man_in_lotus_position", "meditation", "zen"]
   },
-  "🧘‍♀️": {
+  "🧘\u{200d}♀\u{fe0f}": {
     "name": "woman in lotus position",
     "slug": "woman_in_lotus_position",
     "group": "People & Body",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "char": "🧘‍♀️",
+    "char": "🧘\u{200d}♀\u{fe0f}",
     "keywords": ["woman_in_lotus_position", "yoga", "mindfulness"]
   },
   "🛀": {
@@ -5237,14 +5237,14 @@
     "char": "🛌",
     "keywords": ["person_in_bed", "accommodation"]
   },
-  "🧑‍🤝‍🧑": {
+  "🧑\u{200d}🤝\u{200d}🧑": {
     "name": "people holding hands",
     "slug": "people_holding_hands",
     "group": "People & Body",
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "char": "🧑‍🤝‍🧑",
+    "char": "🧑\u{200d}🤝\u{200d}🧑",
     "keywords": ["people_holding_hands", "friendship", "hold", "nonconforming"]
   },
   "👭": {
@@ -5287,34 +5287,34 @@
     "char": "💏",
     "keywords": ["kiss", "couplekiss"]
   },
-  "👩‍❤️‍💋‍👨": {
+  "👩\u{200d}❤\u{fe0f}\u{200d}💋\u{200d}👨": {
     "name": "kiss woman, man",
     "slug": "kiss_woman_man",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": true,
-    "char": "👩‍❤️‍💋‍👨",
+    "char": "👩\u{200d}❤\u{fe0f}\u{200d}💋\u{200d}👨",
     "keywords": ["kiss_woman_man"]
   },
-  "👨‍❤️‍💋‍👨": {
+  "👨\u{200d}❤\u{fe0f}\u{200d}💋\u{200d}👨": {
     "name": "kiss man, man",
     "slug": "kiss_man_man",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": true,
-    "char": "👨‍❤️‍💋‍👨",
+    "char": "👨\u{200d}❤\u{fe0f}\u{200d}💋\u{200d}👨",
     "keywords": ["kiss_man_man"]
   },
-  "👩‍❤️‍💋‍👩": {
+  "👩\u{200d}❤\u{fe0f}\u{200d}💋\u{200d}👩": {
     "name": "kiss woman, woman",
     "slug": "kiss_woman_woman",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": true,
-    "char": "👩‍❤️‍💋‍👩",
+    "char": "👩\u{200d}❤\u{fe0f}\u{200d}💋\u{200d}👩",
     "keywords": ["kiss_woman_woman"]
   },
   "💑": {
@@ -5327,294 +5327,294 @@
     "char": "💑",
     "keywords": ["couple_with_heart", "loving"]
   },
-  "👩‍❤️‍👨": {
+  "👩\u{200d}❤\u{fe0f}\u{200d}👨": {
     "name": "couple with heart woman, man",
     "slug": "couple_with_heart_woman_man",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": true,
-    "char": "👩‍❤️‍👨",
+    "char": "👩\u{200d}❤\u{fe0f}\u{200d}👨",
     "keywords": ["couple_with_heart_woman_man"]
   },
-  "👨‍❤️‍👨": {
+  "👨\u{200d}❤\u{fe0f}\u{200d}👨": {
     "name": "couple with heart man, man",
     "slug": "couple_with_heart_man_man",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": true,
-    "char": "👨‍❤️‍👨",
+    "char": "👨\u{200d}❤\u{fe0f}\u{200d}👨",
     "keywords": ["couple_with_heart_man_man", "gay"]
   },
-  "👩‍❤️‍👩": {
+  "👩\u{200d}❤\u{fe0f}\u{200d}👩": {
     "name": "couple with heart woman, woman",
     "slug": "couple_with_heart_woman_woman",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": true,
-    "char": "👩‍❤️‍👩",
+    "char": "👩\u{200d}❤\u{fe0f}\u{200d}👩",
     "keywords": ["couple_with_heart_woman_woman", "lgbt"]
   },
-  "👨‍👩‍👦": {
+  "👨\u{200d}👩\u{200d}👦": {
     "name": "family man, woman, boy",
     "slug": "family_man_woman_boy",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": false,
-    "char": "👨‍👩‍👦",
+    "char": "👨\u{200d}👩\u{200d}👦",
     "keywords": ["family_man_woman_boy", "father", "mother"]
   },
-  "👨‍👩‍👧": {
+  "👨\u{200d}👩\u{200d}👧": {
     "name": "family man, woman, girl",
     "slug": "family_man_woman_girl",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": false,
-    "char": "👨‍👩‍👧",
+    "char": "👨\u{200d}👩\u{200d}👧",
     "keywords": ["family_man_woman_girl", "home", "daughter"]
   },
-  "👨‍👩‍👧‍👦": {
+  "👨\u{200d}👩\u{200d}👧\u{200d}👦": {
     "name": "family man, woman, girl, boy",
     "slug": "family_man_woman_girl_boy",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": false,
-    "char": "👨‍👩‍👧‍👦",
+    "char": "👨\u{200d}👩\u{200d}👧\u{200d}👦",
     "keywords": ["family_man_woman_girl_boy", "parents"]
   },
-  "👨‍👩‍👦‍👦": {
+  "👨\u{200d}👩\u{200d}👦\u{200d}👦": {
     "name": "family man, woman, boy, boy",
     "slug": "family_man_woman_boy_boy",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": false,
-    "char": "👨‍👩‍👦‍👦",
+    "char": "👨\u{200d}👩\u{200d}👦\u{200d}👦",
     "keywords": ["family_man_woman_boy_boy", "children", "sons"]
   },
-  "👨‍👩‍👧‍👧": {
+  "👨\u{200d}👩\u{200d}👧\u{200d}👧": {
     "name": "family man, woman, girl, girl",
     "slug": "family_man_woman_girl_girl",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": false,
-    "char": "👨‍👩‍👧‍👧",
+    "char": "👨\u{200d}👩\u{200d}👧\u{200d}👧",
     "keywords": ["family_man_woman_girl_girl", "daughters"]
   },
-  "👨‍👨‍👦": {
+  "👨\u{200d}👨\u{200d}👦": {
     "name": "family man, man, boy",
     "slug": "family_man_man_boy",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": false,
-    "char": "👨‍👨‍👦",
+    "char": "👨\u{200d}👨\u{200d}👦",
     "keywords": ["family_man_man_boy", "fathers"]
   },
-  "👨‍👨‍👧": {
+  "👨\u{200d}👨\u{200d}👧": {
     "name": "family man, man, girl",
     "slug": "family_man_man_girl",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": false,
-    "char": "👨‍👨‍👧",
+    "char": "👨\u{200d}👨\u{200d}👧",
     "keywords": ["family_man_man_girl"]
   },
-  "👨‍👨‍👧‍👦": {
+  "👨\u{200d}👨\u{200d}👧\u{200d}👦": {
     "name": "family man, man, girl, boy",
     "slug": "family_man_man_girl_boy",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": false,
-    "char": "👨‍👨‍👧‍👦",
+    "char": "👨\u{200d}👨\u{200d}👧\u{200d}👦",
     "keywords": ["family_man_man_girl_boy"]
   },
-  "👨‍👨‍👦‍👦": {
+  "👨\u{200d}👨\u{200d}👦\u{200d}👦": {
     "name": "family man, man, boy, boy",
     "slug": "family_man_man_boy_boy",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": false,
-    "char": "👨‍👨‍👦‍👦",
+    "char": "👨\u{200d}👨\u{200d}👦\u{200d}👦",
     "keywords": ["family_man_man_boy_boy"]
   },
-  "👨‍👨‍👧‍👧": {
+  "👨\u{200d}👨\u{200d}👧\u{200d}👧": {
     "name": "family man, man, girl, girl",
     "slug": "family_man_man_girl_girl",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": false,
-    "char": "👨‍👨‍👧‍👧",
+    "char": "👨\u{200d}👨\u{200d}👧\u{200d}👧",
     "keywords": ["family_man_man_girl_girl"]
   },
-  "👩‍👩‍👦": {
+  "👩\u{200d}👩\u{200d}👦": {
     "name": "family woman, woman, boy",
     "slug": "family_woman_woman_boy",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": false,
-    "char": "👩‍👩‍👦",
+    "char": "👩\u{200d}👩\u{200d}👦",
     "keywords": ["family_woman_woman_boy", "mothers"]
   },
-  "👩‍👩‍👧": {
+  "👩\u{200d}👩\u{200d}👧": {
     "name": "family woman, woman, girl",
     "slug": "family_woman_woman_girl",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": false,
-    "char": "👩‍👩‍👧",
+    "char": "👩\u{200d}👩\u{200d}👧",
     "keywords": ["family_woman_woman_girl"]
   },
-  "👩‍👩‍👧‍👦": {
+  "👩\u{200d}👩\u{200d}👧\u{200d}👦": {
     "name": "family woman, woman, girl, boy",
     "slug": "family_woman_woman_girl_boy",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": false,
-    "char": "👩‍👩‍👧‍👦",
+    "char": "👩\u{200d}👩\u{200d}👧\u{200d}👦",
     "keywords": ["family_woman_woman_girl_boy"]
   },
-  "👩‍👩‍👦‍👦": {
+  "👩\u{200d}👩\u{200d}👦\u{200d}👦": {
     "name": "family woman, woman, boy, boy",
     "slug": "family_woman_woman_boy_boy",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": false,
-    "char": "👩‍👩‍👦‍👦",
+    "char": "👩\u{200d}👩\u{200d}👦\u{200d}👦",
     "keywords": ["family_woman_woman_boy_boy"]
   },
-  "👩‍👩‍👧‍👧": {
+  "👩\u{200d}👩\u{200d}👧\u{200d}👧": {
     "name": "family woman, woman, girl, girl",
     "slug": "family_woman_woman_girl_girl",
     "group": "People & Body",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": false,
-    "char": "👩‍👩‍👧‍👧",
+    "char": "👩\u{200d}👩\u{200d}👧\u{200d}👧",
     "keywords": ["family_woman_woman_girl_girl"]
   },
-  "👨‍👦": {
+  "👨\u{200d}👦": {
     "name": "family man, boy",
     "slug": "family_man_boy",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": false,
-    "char": "👨‍👦",
+    "char": "👨\u{200d}👦",
     "keywords": ["family_man_boy", "parent", "son"]
   },
-  "👨‍👦‍👦": {
+  "👨\u{200d}👦\u{200d}👦": {
     "name": "family man, boy, boy",
     "slug": "family_man_boy_boy",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": false,
-    "char": "👨‍👦‍👦",
+    "char": "👨\u{200d}👦\u{200d}👦",
     "keywords": ["family_man_boy_boy"]
   },
-  "👨‍👧": {
+  "👨\u{200d}👧": {
     "name": "family man, girl",
     "slug": "family_man_girl",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": false,
-    "char": "👨‍👧",
+    "char": "👨\u{200d}👧",
     "keywords": ["family_man_girl"]
   },
-  "👨‍👧‍👦": {
+  "👨\u{200d}👧\u{200d}👦": {
     "name": "family man, girl, boy",
     "slug": "family_man_girl_boy",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": false,
-    "char": "👨‍👧‍👦",
+    "char": "👨\u{200d}👧\u{200d}👦",
     "keywords": ["family_man_girl_boy"]
   },
-  "👨‍👧‍👧": {
+  "👨\u{200d}👧\u{200d}👧": {
     "name": "family man, girl, girl",
     "slug": "family_man_girl_girl",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": false,
-    "char": "👨‍👧‍👧",
+    "char": "👨\u{200d}👧\u{200d}👧",
     "keywords": ["family_man_girl_girl"]
   },
-  "👩‍👦": {
+  "👩\u{200d}👦": {
     "name": "family woman, boy",
     "slug": "family_woman_boy",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": false,
-    "char": "👩‍👦",
+    "char": "👩\u{200d}👦",
     "keywords": ["family_woman_boy"]
   },
-  "👩‍👦‍👦": {
+  "👩\u{200d}👦\u{200d}👦": {
     "name": "family woman, boy, boy",
     "slug": "family_woman_boy_boy",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": false,
-    "char": "👩‍👦‍👦",
+    "char": "👩\u{200d}👦\u{200d}👦",
     "keywords": ["family_woman_boy_boy"]
   },
-  "👩‍👧": {
+  "👩\u{200d}👧": {
     "name": "family woman, girl",
     "slug": "family_woman_girl",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": false,
-    "char": "👩‍👧",
+    "char": "👩\u{200d}👧",
     "keywords": ["family_woman_girl"]
   },
-  "👩‍👧‍👦": {
+  "👩\u{200d}👧\u{200d}👦": {
     "name": "family woman, girl, boy",
     "slug": "family_woman_girl_boy",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": false,
-    "char": "👩‍👧‍👦",
+    "char": "👩\u{200d}👧\u{200d}👦",
     "keywords": ["family_woman_girl_boy"]
   },
-  "👩‍👧‍👧": {
+  "👩\u{200d}👧\u{200d}👧": {
     "name": "family woman, girl, girl",
     "slug": "family_woman_girl_girl",
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": false,
-    "char": "👩‍👧‍👧",
+    "char": "👩\u{200d}👧\u{200d}👧",
     "keywords": ["family_woman_girl_girl"]
   },
-  "🗣️": {
+  "🗣\u{fe0f}": {
     "name": "speaking head",
     "slug": "speaking_head",
     "group": "People & Body",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🗣️",
+    "char": "🗣\u{fe0f}",
     "keywords": ["speaking_head", "user", "say", "mansplaining", "shout", "shouting", "speak"]
   },
   "👤": {
@@ -5657,44 +5657,44 @@
     "char": "👪",
     "keywords": ["family", "mom"]
   },
-  "🧑‍🧑‍🧒": {
+  "🧑\u{200d}🧑\u{200d}🧒": {
     "name": "family adult, adult, child",
     "slug": "family_adult_adult_child",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": false,
-    "char": "🧑‍🧑‍🧒",
+    "char": "🧑\u{200d}🧑\u{200d}🧒",
     "keywords": ["family_adult_adult_child", "family adult, adult, child", "kid"]
   },
-  "🧑‍🧑‍🧒‍🧒": {
+  "🧑\u{200d}🧑\u{200d}🧒\u{200d}🧒": {
     "name": "family adult, adult, child, child",
     "slug": "family_adult_adult_child_child",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": false,
-    "char": "🧑‍🧑‍🧒‍🧒",
+    "char": "🧑\u{200d}🧑\u{200d}🧒\u{200d}🧒",
     "keywords": ["family_adult_adult_child_child", "family adult, adult, child, child"]
   },
-  "🧑‍🧒": {
+  "🧑\u{200d}🧒": {
     "name": "family adult, child",
     "slug": "family_adult_child",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": false,
-    "char": "🧑‍🧒",
+    "char": "🧑\u{200d}🧒",
     "keywords": ["family_adult_child", "family adult, child"]
   },
-  "🧑‍🧒‍🧒": {
+  "🧑\u{200d}🧒\u{200d}🧒": {
     "name": "family adult, child, child",
     "slug": "family_adult_child_child",
     "group": "People & Body",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": false,
-    "char": "🧑‍🧒‍🧒",
+    "char": "🧑\u{200d}🧒\u{200d}🧒",
     "keywords": ["family_adult_child_child", "family adult, child, child"]
   },
   "👣": {
@@ -5787,14 +5787,14 @@
     "char": "🦮",
     "keywords": ["guide_dog", "blind", "seeing"]
   },
-  "🐕‍🦺": {
+  "🐕\u{200d}🦺": {
     "name": "service dog",
     "slug": "service_dog",
     "group": "Animals & Nature",
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": false,
-    "char": "🐕‍🦺",
+    "char": "🐕\u{200d}🦺",
     "keywords": ["service_dog", "assistance"]
   },
   "🐩": {
@@ -5857,14 +5857,14 @@
     "char": "🐈",
     "keywords": ["cat", "cat2", "domestic", "feline", "housecat"]
   },
-  "🐈‍⬛": {
+  "🐈\u{200d}⬛": {
     "name": "black cat",
     "slug": "black_cat",
     "group": "Animals & Nature",
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": false,
-    "char": "🐈‍⬛",
+    "char": "🐈\u{200d}⬛",
     "keywords": ["black_cat", "black cat", "superstition", "unlucky"]
   },
   "🦁": {
@@ -6237,14 +6237,14 @@
     "char": "🐇",
     "keywords": ["rabbit", "rabbit2"]
   },
-  "🐿️": {
+  "🐿\u{fe0f}": {
     "name": "chipmunk",
     "slug": "chipmunk",
     "group": "Animals & Nature",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🐿️",
+    "char": "🐿\u{fe0f}",
     "keywords": ["chipmunk", "squirrel"]
   },
   "🦫": {
@@ -6287,14 +6287,14 @@
     "char": "🐻",
     "keywords": ["bear", "teddy"]
   },
-  "🐻‍❄️": {
+  "🐻\u{200d}❄\u{fe0f}": {
     "name": "polar bear",
     "slug": "polar_bear",
     "group": "Animals & Nature",
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": false,
-    "char": "🐻‍❄️",
+    "char": "🐻\u{200d}❄\u{fe0f}",
     "keywords": ["polar_bear", "polar bear", "arctic"]
   },
   "🐨": {
@@ -6457,14 +6457,14 @@
     "char": "🐧",
     "keywords": ["penguin"]
   },
-  "🕊️": {
+  "🕊\u{fe0f}": {
     "name": "dove",
     "slug": "dove",
     "group": "Animals & Nature",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🕊️",
+    "char": "🕊\u{fe0f}",
     "keywords": ["dove"]
   },
   "🦅": {
@@ -6567,14 +6567,14 @@
     "char": "🪽",
     "keywords": ["wing", "birds", "flying"]
   },
-  "🐦‍⬛": {
+  "🐦\u{200d}⬛": {
     "name": "black bird",
     "slug": "black_bird",
     "group": "Animals & Nature",
     "emoji_version": "15.0",
     "unicode_version": "15.0",
     "skin_tone_support": false,
-    "char": "🐦‍⬛",
+    "char": "🐦\u{200d}⬛",
     "keywords": ["black_bird", "black bird", "crow"]
   },
   "🪿": {
@@ -6587,14 +6587,14 @@
     "char": "🪿",
     "keywords": ["goose", "silly", "jemima", "goosebumps", "honk"]
   },
-  "🐦‍🔥": {
+  "🐦\u{200d}🔥": {
     "name": "phoenix",
     "slug": "phoenix",
     "group": "Animals & Nature",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": false,
-    "char": "🐦‍🔥",
+    "char": "🐦\u{200d}🔥",
     "keywords": ["phoenix", "immortal", "mythtical", "reborn"]
   },
   "🐸": {
@@ -6957,24 +6957,24 @@
     "char": "🪳",
     "keywords": ["cockroach", "pests", "pest", "roach"]
   },
-  "🕷️": {
+  "🕷\u{fe0f}": {
     "name": "spider",
     "slug": "spider",
     "group": "Animals & Nature",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🕷️",
+    "char": "🕷\u{fe0f}",
     "keywords": ["spider", "arachnid"]
   },
-  "🕸️": {
+  "🕸\u{fe0f}": {
     "name": "spider web",
     "slug": "spider_web",
     "group": "Animals & Nature",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🕸️",
+    "char": "🕸\u{fe0f}",
     "keywords": ["spider_web", "silk", "cobweb", "spiderweb"]
   },
   "🦂": {
@@ -7067,14 +7067,14 @@
     "char": "🪷",
     "keywords": ["lotus", "flower", "calm", "india", "purity", "vietnam"]
   },
-  "🏵️": {
+  "🏵\u{fe0f}": {
     "name": "rosette",
     "slug": "rosette",
     "group": "Animals & Nature",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🏵️",
+    "char": "🏵\u{fe0f}",
     "keywords": ["rosette", "military"]
   },
   "🌹": {
@@ -7227,14 +7227,14 @@
     "char": "🌿",
     "keywords": ["herb", "weed", "leaf"]
   },
-  "☘️": {
+  "☘\u{fe0f}": {
     "name": "shamrock",
     "slug": "shamrock",
     "group": "Animals & Nature",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "☘️",
+    "char": "☘\u{fe0f}",
     "keywords": ["shamrock", "irish", "clover", "trefoil"]
   },
   "🍀": {
@@ -7367,14 +7367,14 @@
     "char": "🍋",
     "keywords": ["lemon", "citrus", "lemonade"]
   },
-  "🍋‍🟩": {
+  "🍋\u{200d}🟩": {
     "name": "lime",
     "slug": "lime",
     "group": "Food & Drink",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": false,
-    "char": "🍋‍🟩",
+    "char": "🍋\u{200d}🟩",
     "keywords": ["lime", "acidic", "citric"]
   },
   "🍌": {
@@ -7567,14 +7567,14 @@
     "char": "🌽",
     "keywords": ["ear_of_corn", "cob", "maize", "maze"]
   },
-  "🌶️": {
+  "🌶\u{fe0f}": {
     "name": "hot pepper",
     "slug": "hot_pepper",
     "group": "Food & Drink",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🌶️",
+    "char": "🌶\u{fe0f}",
     "keywords": ["hot_pepper", "spicy", "chilli", "chili"]
   },
   "🫑": {
@@ -7687,14 +7687,14 @@
     "char": "🫛",
     "keywords": ["pea_pod", "pea pod", "cozy"]
   },
-  "🍄‍🟫": {
+  "🍄\u{200d}🟫": {
     "name": "brown mushroom",
     "slug": "brown_mushroom",
     "group": "Food & Drink",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": false,
-    "char": "🍄‍🟫",
+    "char": "🍄\u{200d}🟫",
     "keywords": ["brown_mushroom", "brown mushroom", "toadstool"]
   },
   "🫜": {
@@ -8567,14 +8567,14 @@
     "char": "🥢",
     "keywords": ["chopsticks", "hashi", "jeotgarak", "kuaizi"]
   },
-  "🍽️": {
+  "🍽\u{fe0f}": {
     "name": "fork and knife with plate",
     "slug": "fork_and_knife_with_plate",
     "group": "Food & Drink",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🍽️",
+    "char": "🍽\u{fe0f}",
     "keywords": ["fork_and_knife_with_plate", "eat", "meal", "dinner", "restaurant", "dining"]
   },
   "🍴": {
@@ -8678,14 +8678,14 @@
       "localization"
     ]
   },
-  "🗺️": {
+  "🗺\u{fe0f}": {
     "name": "world map",
     "slug": "world_map",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🗺️",
+    "char": "🗺\u{fe0f}",
     "keywords": ["world_map", "location", "travel"]
   },
   "🗾": {
@@ -8708,24 +8708,24 @@
     "char": "🧭",
     "keywords": ["compass", "magnetic", "navigation", "orienteering"]
   },
-  "🏔️": {
+  "🏔\u{fe0f}": {
     "name": "snow-capped mountain",
     "slug": "snow_capped_mountain",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🏔️",
+    "char": "🏔\u{fe0f}",
     "keywords": ["snow_capped_mountain", "photo"]
   },
-  "⛰️": {
+  "⛰\u{fe0f}": {
     "name": "mountain",
     "slug": "mountain",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "⛰️",
+    "char": "⛰\u{fe0f}",
     "keywords": ["mountain", "environment"]
   },
   "🛘": {
@@ -8758,84 +8758,84 @@
     "char": "🗻",
     "keywords": ["mount_fuji", "capped"]
   },
-  "🏕️": {
+  "🏕\u{fe0f}": {
     "name": "camping",
     "slug": "camping",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🏕️",
+    "char": "🏕\u{fe0f}",
     "keywords": ["camping", "outdoors", "campsite"]
   },
-  "🏖️": {
+  "🏖\u{fe0f}": {
     "name": "beach with umbrella",
     "slug": "beach_with_umbrella",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🏖️",
+    "char": "🏖\u{fe0f}",
     "keywords": ["beach_with_umbrella", "weather", "sunny", "sand"]
   },
-  "🏜️": {
+  "🏜\u{fe0f}": {
     "name": "desert",
     "slug": "desert",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🏜️",
+    "char": "🏜\u{fe0f}",
     "keywords": ["desert", "warm", "saharah"]
   },
-  "🏝️": {
+  "🏝\u{fe0f}": {
     "name": "desert island",
     "slug": "desert_island",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🏝️",
+    "char": "🏝\u{fe0f}",
     "keywords": ["desert_island"]
   },
-  "🏞️": {
+  "🏞\u{fe0f}": {
     "name": "national park",
     "slug": "national_park",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🏞️",
+    "char": "🏞\u{fe0f}",
     "keywords": ["national_park"]
   },
-  "🏟️": {
+  "🏟\u{fe0f}": {
     "name": "stadium",
     "slug": "stadium",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🏟️",
+    "char": "🏟\u{fe0f}",
     "keywords": ["stadium", "place", "venue", "grandstand"]
   },
-  "🏛️": {
+  "🏛\u{fe0f}": {
     "name": "classical building",
     "slug": "classical_building",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🏛️",
+    "char": "🏛\u{fe0f}",
     "keywords": ["classical_building", "art", "culture"]
   },
-  "🏗️": {
+  "🏗\u{fe0f}": {
     "name": "building construction",
     "slug": "building_construction",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🏗️",
+    "char": "🏗\u{fe0f}",
     "keywords": ["building_construction", "working", "crane", "architectural"]
   },
   "🧱": {
@@ -8878,24 +8878,24 @@
     "char": "🛖",
     "keywords": ["hut", "structure", "roundhouse", "yurt"]
   },
-  "🏘️": {
+  "🏘\u{fe0f}": {
     "name": "houses",
     "slug": "houses",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🏘️",
+    "char": "🏘\u{fe0f}",
     "keywords": ["houses", "buildings"]
   },
-  "🏚️": {
+  "🏚\u{fe0f}": {
     "name": "derelict house",
     "slug": "derelict_house",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🏚️",
+    "char": "🏚\u{fe0f}",
     "keywords": ["derelict_house", "abandon", "evict", "broken", "abandoned", "haunted"]
   },
   "🏠": {
@@ -9118,14 +9118,14 @@
     "char": "🕍",
     "keywords": ["synagogue", "judaism", "synagog"]
   },
-  "⛩️": {
+  "⛩\u{fe0f}": {
     "name": "shinto shrine",
     "slug": "shinto_shrine",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "⛩️",
+    "char": "⛩\u{fe0f}",
     "keywords": ["shinto_shrine", "temple", "kyoto", "kami", "michi"]
   },
   "🕋": {
@@ -9178,14 +9178,14 @@
     "char": "🌃",
     "keywords": ["night_with_stars", "evening", "downtown"]
   },
-  "🏙️": {
+  "🏙\u{fe0f}": {
     "name": "cityscape",
     "slug": "cityscape",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🏙️",
+    "char": "🏙\u{fe0f}",
     "keywords": ["cityscape", "night life", "urban", "skyline"]
   },
   "🌄": {
@@ -9238,14 +9238,14 @@
     "char": "🌉",
     "keywords": ["bridge_at_night", "sanfrancisco", "gate"]
   },
-  "♨️": {
+  "♨\u{fe0f}": {
     "name": "hot springs",
     "slug": "hot_springs",
     "group": "Travel & Places",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "♨️",
+    "char": "♨\u{fe0f}",
     "keywords": ["hot_springs", "bath", "hotsprings", "onsen", "steaming"]
   },
   "🎠": {
@@ -9598,24 +9598,24 @@
     "char": "🚜",
     "keywords": ["tractor", "agriculture"]
   },
-  "🏎️": {
+  "🏎\u{fe0f}": {
     "name": "racing car",
     "slug": "racing_car",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🏎️",
+    "char": "🏎\u{fe0f}",
     "keywords": ["racing_car", "formula", "f1"]
   },
-  "🏍️": {
+  "🏍\u{fe0f}": {
     "name": "motorcycle",
     "slug": "motorcycle",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🏍️",
+    "char": "🏍\u{fe0f}",
     "keywords": ["motorcycle", "motorbike"]
   },
   "🛵": {
@@ -9708,34 +9708,34 @@
     "char": "🚏",
     "keywords": ["bus_stop", "wait", "busstop"]
   },
-  "🛣️": {
+  "🛣\u{fe0f}": {
     "name": "motorway",
     "slug": "motorway",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🛣️",
+    "char": "🛣\u{fe0f}",
     "keywords": ["motorway", "road", "cupertino", "interstate", "highway"]
   },
-  "🛤️": {
+  "🛤\u{fe0f}": {
     "name": "railway track",
     "slug": "railway_track",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🛤️",
+    "char": "🛤\u{fe0f}",
     "keywords": ["railway_track"]
   },
-  "🛢️": {
+  "🛢\u{fe0f}": {
     "name": "oil drum",
     "slug": "oil_drum",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🛢️",
+    "char": "🛢\u{fe0f}",
     "keywords": ["oil_drum", "barrell"]
   },
   "⛽": {
@@ -9870,34 +9870,34 @@
     "char": "🚤",
     "keywords": ["speedboat", "motorboat", "powerboat"]
   },
-  "🛳️": {
+  "🛳\u{fe0f}": {
     "name": "passenger ship",
     "slug": "passenger_ship",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🛳️",
+    "char": "🛳\u{fe0f}",
     "keywords": ["passenger_ship", "yacht", "cruise"]
   },
-  "⛴️": {
+  "⛴\u{fe0f}": {
     "name": "ferry",
     "slug": "ferry",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "⛴️",
+    "char": "⛴\u{fe0f}",
     "keywords": ["ferry"]
   },
-  "🛥️": {
+  "🛥\u{fe0f}": {
     "name": "motor boat",
     "slug": "motor_boat",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🛥️",
+    "char": "🛥\u{fe0f}",
     "keywords": ["motor_boat"]
   },
   "🚢": {
@@ -9910,24 +9910,24 @@
     "char": "🚢",
     "keywords": ["ship", "titanic", "deploy"]
   },
-  "✈️": {
+  "✈\u{fe0f}": {
     "name": "airplane",
     "slug": "airplane",
     "group": "Travel & Places",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "✈️",
+    "char": "✈\u{fe0f}",
     "keywords": ["airplane", "aeroplane"]
   },
-  "🛩️": {
+  "🛩\u{fe0f}": {
     "name": "small airplane",
     "slug": "small_airplane",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🛩️",
+    "char": "🛩\u{fe0f}",
     "keywords": ["small_airplane"]
   },
   "🛫": {
@@ -10010,14 +10010,14 @@
     "char": "🚡",
     "keywords": ["aerial_tramway", "gondola", "ropeway"]
   },
-  "🛰️": {
+  "🛰\u{fe0f}": {
     "name": "satellite",
     "slug": "satellite",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🛰️",
+    "char": "🛰\u{fe0f}",
     "keywords": ["satellite", "gps", "orbit", "spaceflight", "ISS", "artificial"]
   },
   "🚀": {
@@ -10040,14 +10040,14 @@
     "char": "🛸",
     "keywords": ["flying_saucer", "ufo"]
   },
-  "🛎️": {
+  "🛎\u{fe0f}": {
     "name": "bellhop bell",
     "slug": "bellhop_bell",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🛎️",
+    "char": "🛎\u{fe0f}",
     "keywords": ["bellhop_bell"]
   },
   "🧳": {
@@ -10100,34 +10100,34 @@
     "char": "⏰",
     "keywords": ["alarm_clock", "wake"]
   },
-  "⏱️": {
+  "⏱\u{fe0f}": {
     "name": "stopwatch",
     "slug": "stopwatch",
     "group": "Travel & Places",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "⏱️",
+    "char": "⏱\u{fe0f}",
     "keywords": ["stopwatch", "deadline"]
   },
-  "⏲️": {
+  "⏲\u{fe0f}": {
     "name": "timer clock",
     "slug": "timer_clock",
     "group": "Travel & Places",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "⏲️",
+    "char": "⏲\u{fe0f}",
     "keywords": ["timer_clock", "alarm"]
   },
-  "🕰️": {
+  "🕰\u{fe0f}": {
     "name": "mantelpiece clock",
     "slug": "mantelpiece_clock",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🕰️",
+    "char": "🕰\u{fe0f}",
     "keywords": ["mantelpiece_clock"]
   },
   "🕛": {
@@ -10490,24 +10490,24 @@
     "char": "🌜",
     "keywords": ["last_quarter_moon_face"]
   },
-  "🌡️": {
+  "🌡\u{fe0f}": {
     "name": "thermometer",
     "slug": "thermometer",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🌡️",
+    "char": "🌡\u{fe0f}",
     "keywords": ["thermometer"]
   },
-  "☀️": {
+  "☀\u{fe0f}": {
     "name": "sun",
     "slug": "sun",
     "group": "Travel & Places",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "☀️",
+    "char": "☀\u{fe0f}",
     "keywords": ["sun", "brightness", "rays", "sunshine"]
   },
   "🌝": {
@@ -10580,14 +10580,14 @@
     "char": "🌌",
     "keywords": ["milky_way", "galaxy", "universe"]
   },
-  "☁️": {
+  "☁\u{fe0f}": {
     "name": "cloud",
     "slug": "cloud",
     "group": "Travel & Places",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "☁️",
+    "char": "☁\u{fe0f}",
     "keywords": ["cloud", "cloudy", "overcast"]
   },
   "⛅": {
@@ -10600,104 +10600,104 @@
     "char": "⛅",
     "keywords": ["sun_behind_cloud", "partly"]
   },
-  "⛈️": {
+  "⛈\u{fe0f}": {
     "name": "cloud with lightning and rain",
     "slug": "cloud_with_lightning_and_rain",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "⛈️",
+    "char": "⛈\u{fe0f}",
     "keywords": ["cloud_with_lightning_and_rain", "lightning"]
   },
-  "🌤️": {
+  "🌤\u{fe0f}": {
     "name": "sun behind small cloud",
     "slug": "sun_behind_small_cloud",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🌤️",
+    "char": "🌤\u{fe0f}",
     "keywords": ["sun_behind_small_cloud", "white"]
   },
-  "🌥️": {
+  "🌥\u{fe0f}": {
     "name": "sun behind large cloud",
     "slug": "sun_behind_large_cloud",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🌥️",
+    "char": "🌥\u{fe0f}",
     "keywords": ["sun_behind_large_cloud"]
   },
-  "🌦️": {
+  "🌦\u{fe0f}": {
     "name": "sun behind rain cloud",
     "slug": "sun_behind_rain_cloud",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🌦️",
+    "char": "🌦\u{fe0f}",
     "keywords": ["sun_behind_rain_cloud"]
   },
-  "🌧️": {
+  "🌧\u{fe0f}": {
     "name": "cloud with rain",
     "slug": "cloud_with_rain",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🌧️",
+    "char": "🌧\u{fe0f}",
     "keywords": ["cloud_with_rain"]
   },
-  "🌨️": {
+  "🌨\u{fe0f}": {
     "name": "cloud with snow",
     "slug": "cloud_with_snow",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🌨️",
+    "char": "🌨\u{fe0f}",
     "keywords": ["cloud_with_snow"]
   },
-  "🌩️": {
+  "🌩\u{fe0f}": {
     "name": "cloud with lightning",
     "slug": "cloud_with_lightning",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🌩️",
+    "char": "🌩\u{fe0f}",
     "keywords": ["cloud_with_lightning", "thunder"]
   },
-  "🌪️": {
+  "🌪\u{fe0f}": {
     "name": "tornado",
     "slug": "tornado",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🌪️",
+    "char": "🌪\u{fe0f}",
     "keywords": ["tornado", "twister", "whirlwind"]
   },
-  "🌫️": {
+  "🌫\u{fe0f}": {
     "name": "fog",
     "slug": "fog",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🌫️",
+    "char": "🌫\u{fe0f}",
     "keywords": ["fog"]
   },
-  "🌬️": {
+  "🌬\u{fe0f}": {
     "name": "wind face",
     "slug": "wind_face",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🌬️",
+    "char": "🌬\u{fe0f}",
     "keywords": ["wind_face", "gust", "blowing"]
   },
   "🌀": {
@@ -10730,14 +10730,14 @@
     "char": "🌂",
     "keywords": ["closed_umbrella", "rain", "drizzle", "collapsed umbrella"]
   },
-  "☂️": {
+  "☂\u{fe0f}": {
     "name": "umbrella",
     "slug": "umbrella",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "☂️",
+    "char": "☂\u{fe0f}",
     "keywords": ["umbrella"]
   },
   "☔": {
@@ -10750,14 +10750,14 @@
     "char": "☔",
     "keywords": ["umbrella_with_rain_drops", "rainy", "raining"]
   },
-  "⛱️": {
+  "⛱\u{fe0f}": {
     "name": "umbrella on ground",
     "slug": "umbrella_on_ground",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "⛱️",
+    "char": "⛱\u{fe0f}",
     "keywords": ["umbrella_on_ground", "beach", "parasol"]
   },
   "⚡": {
@@ -10770,24 +10770,24 @@
     "char": "⚡",
     "keywords": ["high_voltage", "lightning bolt", "zap", "thunderbolt"]
   },
-  "❄️": {
+  "❄\u{fe0f}": {
     "name": "snowflake",
     "slug": "snowflake",
     "group": "Travel & Places",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "❄️",
+    "char": "❄\u{fe0f}",
     "keywords": ["snowflake", "season", "snowing"]
   },
-  "☃️": {
+  "☃\u{fe0f}": {
     "name": "snowman",
     "slug": "snowman",
     "group": "Travel & Places",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "☃️",
+    "char": "☃\u{fe0f}",
     "keywords": ["snowman", "snowflakes"]
   },
   "⛄": {
@@ -10800,14 +10800,14 @@
     "char": "⛄",
     "keywords": ["snowman_without_snow", "without_snow", "frosty", "olaf"]
   },
-  "☄️": {
+  "☄\u{fe0f}": {
     "name": "comet",
     "slug": "comet",
     "group": "Travel & Places",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "☄️",
+    "char": "☄\u{fe0f}",
     "keywords": ["comet"]
   },
   "🔥": {
@@ -11020,24 +11020,24 @@
     "char": "🎁",
     "keywords": ["wrapped_gift", "present"]
   },
-  "🎗️": {
+  "🎗\u{fe0f}": {
     "name": "reminder ribbon",
     "slug": "reminder_ribbon",
     "group": "Activities",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🎗️",
+    "char": "🎗\u{fe0f}",
     "keywords": ["reminder_ribbon", "cause", "awareness"]
   },
-  "🎟️": {
+  "🎟\u{fe0f}": {
     "name": "admission tickets",
     "slug": "admission_tickets",
     "group": "Activities",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🎟️",
+    "char": "🎟\u{fe0f}",
     "keywords": ["admission_tickets", "concert", "entrance"]
   },
   "🎫": {
@@ -11050,14 +11050,14 @@
     "char": "🎫",
     "keywords": ["ticket", "event", "pass", "admission", "stub", "tour"]
   },
-  "🎖️": {
+  "🎖\u{fe0f}": {
     "name": "military medal",
     "slug": "military_medal",
     "group": "Activities",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🎖️",
+    "char": "🎖\u{fe0f}",
     "keywords": ["military_medal", "award", "army", "medallion"]
   },
   "🏆": {
@@ -11310,14 +11310,14 @@
     "char": "⛳",
     "keywords": ["flag_in_hole", "flag"]
   },
-  "⛸️": {
+  "⛸\u{fe0f}": {
     "name": "ice skate",
     "slug": "ice_skate",
     "group": "Activities",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "⛸️",
+    "char": "⛸\u{fe0f}",
     "keywords": ["ice_skate", "skating"]
   },
   "🎣": {
@@ -11460,14 +11460,14 @@
     "char": "🎮",
     "keywords": ["video_game", "console", "PS4", "controller", "gamepad", "playstation", "u", "wii", "xbox"]
   },
-  "🕹️": {
+  "🕹\u{fe0f}": {
     "name": "joystick",
     "slug": "joystick",
     "group": "Activities",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🕹️",
+    "char": "🕹\u{fe0f}",
     "keywords": ["joystick"]
   },
   "🎰": {
@@ -11540,54 +11540,54 @@
     "char": "🪆",
     "keywords": ["nesting_dolls", "nesting dolls", "matryoshka", "russia"]
   },
-  "♠️": {
+  "♠\u{fe0f}": {
     "name": "spade suit",
     "slug": "spade_suit",
     "group": "Activities",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "♠️",
+    "char": "♠\u{fe0f}",
     "keywords": ["spade_suit", "poker", "spades"]
   },
-  "♥️": {
+  "♥\u{fe0f}": {
     "name": "heart suit",
     "slug": "heart_suit",
     "group": "Activities",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "♥️",
+    "char": "♥\u{fe0f}",
     "keywords": ["heart_suit", "cards"]
   },
-  "♦️": {
+  "♦\u{fe0f}": {
     "name": "diamond suit",
     "slug": "diamond_suit",
     "group": "Activities",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "♦️",
+    "char": "♦\u{fe0f}",
     "keywords": ["diamond_suit", "suits", "diamonds"]
   },
-  "♣️": {
+  "♣\u{fe0f}": {
     "name": "club suit",
     "slug": "club_suit",
     "group": "Activities",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "♣️",
+    "char": "♣\u{fe0f}",
     "keywords": ["club_suit", "card", "clubs"]
   },
-  "♟️": {
+  "♟\u{fe0f}": {
     "name": "chess pawn",
     "slug": "chess_pawn",
     "group": "Activities",
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": false,
-    "char": "♟️",
+    "char": "♟\u{fe0f}",
     "keywords": ["chess_pawn", "expendable", "dupe"]
   },
   "🃏": {
@@ -11640,14 +11640,14 @@
       "tragedy"
     ]
   },
-  "🖼️": {
+  "🖼\u{fe0f}": {
     "name": "framed picture",
     "slug": "framed_picture",
     "group": "Activities",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🖼️",
+    "char": "🖼\u{fe0f}",
     "keywords": ["framed_picture", "photography", "frame", "museum"]
   },
   "🎨": {
@@ -11710,14 +11710,14 @@
     "char": "👓",
     "keywords": ["glasses", "fashion", "eyesight", "eyeglasses"]
   },
-  "🕶️": {
+  "🕶\u{fe0f}": {
     "name": "sunglasses",
     "slug": "sunglasses",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🕶️",
+    "char": "🕶\u{fe0f}",
     "keywords": ["sunglasses", "eyewear"]
   },
   "🥽": {
@@ -11940,14 +11940,14 @@
     "char": "👝",
     "keywords": ["clutch_bag", "bag", "pouch"]
   },
-  "🛍️": {
+  "🛍\u{fe0f}": {
     "name": "shopping bags",
     "slug": "shopping_bags",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🛍️",
+    "char": "🛍\u{fe0f}",
     "keywords": ["shopping_bags", "buy", "purchase"]
   },
   "🎒": {
@@ -12120,14 +12120,14 @@
     "char": "🪖",
     "keywords": ["military_helmet", "military helmet", "soldier", "warrior"]
   },
-  "⛑️": {
+  "⛑\u{fe0f}": {
     "name": "rescue worker’s helmet",
     "slug": "rescue_worker_s_helmet",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "⛑️",
+    "char": "⛑\u{fe0f}",
     "keywords": ["rescue_worker_s_helmet", "aid", "worker’s"]
   },
   "📿": {
@@ -12290,34 +12290,34 @@
     "char": "🎶",
     "keywords": ["musical_notes", "music", "singing"]
   },
-  "🎙️": {
+  "🎙\u{fe0f}": {
     "name": "studio microphone",
     "slug": "studio_microphone",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🎙️",
+    "char": "🎙\u{fe0f}",
     "keywords": ["studio_microphone", "sing", "recording", "mic"]
   },
-  "🎚️": {
+  "🎚\u{fe0f}": {
     "name": "level slider",
     "slug": "level_slider",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🎚️",
+    "char": "🎚\u{fe0f}",
     "keywords": ["level_slider", "scale"]
   },
-  "🎛️": {
+  "🎛\u{fe0f}": {
     "name": "control knobs",
     "slug": "control_knobs",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🎛️",
+    "char": "🎛\u{fe0f}",
     "keywords": ["control_knobs", "dial"]
   },
   "🎤": {
@@ -12500,14 +12500,14 @@
     "char": "📲",
     "keywords": ["mobile_phone_with_arrow", "iphone", "incoming", "calling"]
   },
-  "☎️": {
+  "☎\u{fe0f}": {
     "name": "telephone",
     "slug": "telephone",
     "group": "Objects",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "☎️",
+    "char": "☎\u{fe0f}",
     "keywords": ["telephone", "rotary"]
   },
   "📞": {
@@ -12580,54 +12580,54 @@
     "char": "💻",
     "keywords": ["laptop", "screen", "display", "monitor", "desktop", "pc", "personal"]
   },
-  "🖥️": {
+  "🖥\u{fe0f}": {
     "name": "desktop computer",
     "slug": "desktop_computer",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🖥️",
+    "char": "🖥\u{fe0f}",
     "keywords": ["desktop_computer", "computing", "imac"]
   },
-  "🖨️": {
+  "🖨\u{fe0f}": {
     "name": "printer",
     "slug": "printer",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🖨️",
+    "char": "🖨\u{fe0f}",
     "keywords": ["printer", "paper", "ink"]
   },
-  "⌨️": {
+  "⌨\u{fe0f}": {
     "name": "keyboard",
     "slug": "keyboard",
     "group": "Objects",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "⌨️",
+    "char": "⌨\u{fe0f}",
     "keywords": ["keyboard", "type", "text"]
   },
-  "🖱️": {
+  "🖱\u{fe0f}": {
     "name": "computer mouse",
     "slug": "computer_mouse",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🖱️",
+    "char": "🖱\u{fe0f}",
     "keywords": ["computer_mouse", "click", "button", "three"]
   },
-  "🖲️": {
+  "🖲\u{fe0f}": {
     "name": "trackball",
     "slug": "trackball",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🖲️",
+    "char": "🖲\u{fe0f}",
     "keywords": ["trackball", "trackpad"]
   },
   "💽": {
@@ -12690,24 +12690,24 @@
     "char": "🎥",
     "keywords": ["movie_camera", "film", "hollywood"]
   },
-  "🎞️": {
+  "🎞\u{fe0f}": {
     "name": "film frames",
     "slug": "film_frames",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🎞️",
+    "char": "🎞\u{fe0f}",
     "keywords": ["film_frames", "movie", "strip"]
   },
-  "📽️": {
+  "📽\u{fe0f}": {
     "name": "film projector",
     "slug": "film_projector",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "📽️",
+    "char": "📽\u{fe0f}",
     "keywords": ["film_projector", "video"]
   },
   "🎬": {
@@ -12790,14 +12790,14 @@
     "char": "🔎",
     "keywords": ["magnifying_glass_tilted_right", "zoom", "mag", "seo"]
   },
-  "🕯️": {
+  "🕯\u{fe0f}": {
     "name": "candle",
     "slug": "candle",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🕯️",
+    "char": "🕯\u{fe0f}",
     "keywords": ["candle", "wax"]
   },
   "💡": {
@@ -12970,14 +12970,14 @@
     "char": "📰",
     "keywords": ["newspaper", "press", "news"]
   },
-  "🗞️": {
+  "🗞\u{fe0f}": {
     "name": "rolled-up newspaper",
     "slug": "rolled_up_newspaper",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🗞️",
+    "char": "🗞\u{fe0f}",
     "keywords": ["rolled_up_newspaper", "headline", "delivery"]
   },
   "📑": {
@@ -13000,14 +13000,14 @@
     "char": "🔖",
     "keywords": ["bookmark", "price", "tag"]
   },
-  "🏷️": {
+  "🏷\u{fe0f}": {
     "name": "label",
     "slug": "label",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🏷️",
+    "char": "🏷\u{fe0f}",
     "keywords": ["label", "sale"]
   },
   "🪙": {
@@ -13120,14 +13120,14 @@
     "char": "💹",
     "keywords": ["chart_increasing_with_yen", "green-square", "exchange", "growth", "market", "rate", "trend", "upward"]
   },
-  "✉️": {
+  "✉\u{fe0f}": {
     "name": "envelope",
     "slug": "envelope",
     "group": "Objects",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "✉️",
+    "char": "✉\u{fe0f}",
     "keywords": ["envelope", "letter", "✉ letter"]
   },
   "📧": {
@@ -13240,74 +13240,74 @@
     "char": "📮",
     "keywords": ["postbox", "mailbox"]
   },
-  "🗳️": {
+  "🗳\u{fe0f}": {
     "name": "ballot box with ballot",
     "slug": "ballot_box_with_ballot",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🗳️",
+    "char": "🗳\u{fe0f}",
     "keywords": ["ballot_box_with_ballot", "election", "vote", "voting"]
   },
-  "✏️": {
+  "✏\u{fe0f}": {
     "name": "pencil",
     "slug": "pencil",
     "group": "Objects",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "✏️",
+    "char": "✏\u{fe0f}",
     "keywords": ["pencil", "write", "lead", "pencil2", "typos"]
   },
-  "✒️": {
+  "✒\u{fe0f}": {
     "name": "black nib",
     "slug": "black_nib",
     "group": "Objects",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "✒️",
+    "char": "✒\u{fe0f}",
     "keywords": ["black_nib", "✒ fountain"]
   },
-  "🖋️": {
+  "🖋\u{fe0f}": {
     "name": "fountain pen",
     "slug": "fountain_pen",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🖋️",
+    "char": "🖋\u{fe0f}",
     "keywords": ["fountain_pen", "writing", "lower"]
   },
-  "🖊️": {
+  "🖊\u{fe0f}": {
     "name": "pen",
     "slug": "pen",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🖊️",
+    "char": "🖊\u{fe0f}",
     "keywords": ["pen", "ballpoint"]
   },
-  "🖌️": {
+  "🖌\u{fe0f}": {
     "name": "paintbrush",
     "slug": "paintbrush",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🖌️",
+    "char": "🖌\u{fe0f}",
     "keywords": ["paintbrush", "drawing", "brush"]
   },
-  "🖍️": {
+  "🖍\u{fe0f}": {
     "name": "crayon",
     "slug": "crayon",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🖍️",
+    "char": "🖍\u{fe0f}",
     "keywords": ["crayon"]
   },
   "📝": {
@@ -13350,14 +13350,14 @@
     "char": "📂",
     "keywords": ["open_file_folder", "load"]
   },
-  "🗂️": {
+  "🗂\u{fe0f}": {
     "name": "card index dividers",
     "slug": "card_index_dividers",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🗂️",
+    "char": "🗂\u{fe0f}",
     "keywords": ["card_index_dividers", "organizing"]
   },
   "📅": {
@@ -13380,24 +13380,24 @@
     "char": "📆",
     "keywords": ["tear_off_calendar", "planning"]
   },
-  "🗒️": {
+  "🗒\u{fe0f}": {
     "name": "spiral notepad",
     "slug": "spiral_notepad",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🗒️",
+    "char": "🗒\u{fe0f}",
     "keywords": ["spiral_notepad", "pad"]
   },
-  "🗓️": {
+  "🗓\u{fe0f}": {
     "name": "spiral calendar",
     "slug": "spiral_calendar",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🗓️",
+    "char": "🗓\u{fe0f}",
     "keywords": ["spiral_calendar", "date"]
   },
   "📇": {
@@ -13480,14 +13480,14 @@
     "char": "📎",
     "keywords": ["paperclip", "clippy"]
   },
-  "🖇️": {
+  "🖇\u{fe0f}": {
     "name": "linked paperclips",
     "slug": "linked_paperclips",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🖇️",
+    "char": "🖇\u{fe0f}",
     "keywords": ["linked_paperclips"]
   },
   "📏": {
@@ -13510,44 +13510,44 @@
     "char": "📐",
     "keywords": ["triangular_ruler", "math", "architect", "set"]
   },
-  "✂️": {
+  "✂\u{fe0f}": {
     "name": "scissors",
     "slug": "scissors",
     "group": "Objects",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "✂️",
+    "char": "✂\u{fe0f}",
     "keywords": ["scissors", "tool"]
   },
-  "🗃️": {
+  "🗃\u{fe0f}": {
     "name": "card file box",
     "slug": "card_file_box",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🗃️",
+    "char": "🗃\u{fe0f}",
     "keywords": ["card_file_box", "database"]
   },
-  "🗄️": {
+  "🗄\u{fe0f}": {
     "name": "file cabinet",
     "slug": "file_cabinet",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🗄️",
+    "char": "🗄\u{fe0f}",
     "keywords": ["file_cabinet", "filing"]
   },
-  "🗑️": {
+  "🗑\u{fe0f}": {
     "name": "wastebasket",
     "slug": "wastebasket",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🗑️",
+    "char": "🗑\u{fe0f}",
     "keywords": ["wastebasket", "bin", "rubbish", "toss", "litter", "wastepaper"]
   },
   "🔒": {
@@ -13600,14 +13600,14 @@
     "char": "🔑",
     "keywords": ["key"]
   },
-  "🗝️": {
+  "🗝\u{fe0f}": {
     "name": "old key",
     "slug": "old_key",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🗝️",
+    "char": "🗝\u{fe0f}",
     "keywords": ["old_key"]
   },
   "🔨": {
@@ -13630,54 +13630,54 @@
     "char": "🪓",
     "keywords": ["axe", "hatchet", "split"]
   },
-  "⛏️": {
+  "⛏\u{fe0f}": {
     "name": "pick",
     "slug": "pick",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "⛏️",
+    "char": "⛏\u{fe0f}",
     "keywords": ["pick", "dig", "mining", "pickaxe"]
   },
-  "⚒️": {
+  "⚒\u{fe0f}": {
     "name": "hammer and pick",
     "slug": "hammer_and_pick",
     "group": "Objects",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "⚒️",
+    "char": "⚒\u{fe0f}",
     "keywords": ["hammer_and_pick", "create"]
   },
-  "🛠️": {
+  "🛠\u{fe0f}": {
     "name": "hammer and wrench",
     "slug": "hammer_and_wrench",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🛠️",
+    "char": "🛠\u{fe0f}",
     "keywords": ["hammer_and_wrench", "spanner"]
   },
-  "🗡️": {
+  "🗡\u{fe0f}": {
     "name": "dagger",
     "slug": "dagger",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🗡️",
+    "char": "🗡\u{fe0f}",
     "keywords": ["dagger", "weapon"]
   },
-  "⚔️": {
+  "⚔\u{fe0f}": {
     "name": "crossed swords",
     "slug": "crossed_swords",
     "group": "Objects",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "⚔️",
+    "char": "⚔\u{fe0f}",
     "keywords": ["crossed_swords"]
   },
   "💣": {
@@ -13710,14 +13710,14 @@
     "char": "🏹",
     "keywords": ["bow_and_arrow", "archer", "archery"]
   },
-  "🛡️": {
+  "🛡\u{fe0f}": {
     "name": "shield",
     "slug": "shield",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🛡️",
+    "char": "🛡\u{fe0f}",
     "keywords": ["shield"]
   },
   "🪚": {
@@ -13760,34 +13760,34 @@
     "char": "🔩",
     "keywords": ["nut_and_bolt", "handy"]
   },
-  "⚙️": {
+  "⚙\u{fe0f}": {
     "name": "gear",
     "slug": "gear",
     "group": "Objects",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "⚙️",
+    "char": "⚙\u{fe0f}",
     "keywords": ["gear", "cog", "cogwheel"]
   },
-  "🗜️": {
+  "🗜\u{fe0f}": {
     "name": "clamp",
     "slug": "clamp",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🗜️",
+    "char": "🗜\u{fe0f}",
     "keywords": ["clamp", "compress", "compression", "vice", "winzip"]
   },
-  "⚖️": {
+  "⚖\u{fe0f}": {
     "name": "balance scale",
     "slug": "balance_scale",
     "group": "Objects",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "⚖️",
+    "char": "⚖\u{fe0f}",
     "keywords": ["balance_scale", "fairness"]
   },
   "🦯": {
@@ -13810,24 +13810,24 @@
     "char": "🔗",
     "keywords": ["link", "rings", "url", "hyperlink", "linked"]
   },
-  "⛓️‍💥": {
+  "⛓\u{fe0f}\u{200d}💥": {
     "name": "broken chain",
     "slug": "broken_chain",
     "group": "Objects",
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": false,
-    "char": "⛓️‍💥",
+    "char": "⛓\u{fe0f}\u{200d}💥",
     "keywords": ["broken_chain", "broken chain", "constraint"]
   },
-  "⛓️": {
+  "⛓\u{fe0f}": {
     "name": "chains",
     "slug": "chains",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "⛓️",
+    "char": "⛓\u{fe0f}",
     "keywords": ["chains", "arrest", "chain"]
   },
   "🪝": {
@@ -13880,14 +13880,14 @@
     "char": "🪏",
     "keywords": ["shovel"]
   },
-  "⚗️": {
+  "⚗\u{fe0f}": {
     "name": "alembic",
     "slug": "alembic",
     "group": "Objects",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "⚗️",
+    "char": "⚗\u{fe0f}",
     "keywords": ["alembic", "distilling"]
   },
   "🧪": {
@@ -14060,24 +14060,24 @@
     "char": "🪟",
     "keywords": ["window", "scenery", "opening", "transparent"]
   },
-  "🛏️": {
+  "🛏\u{fe0f}": {
     "name": "bed",
     "slug": "bed",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🛏️",
+    "char": "🛏\u{fe0f}",
     "keywords": ["bed", "sleep", "bedroom"]
   },
-  "🛋️": {
+  "🛋\u{fe0f}": {
     "name": "couch and lamp",
     "slug": "couch_and_lamp",
     "group": "Objects",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🛋️",
+    "char": "🛋\u{fe0f}",
     "keywords": ["couch_and_lamp", "chill", "lounge", "settee", "sofa"]
   },
   "🪑": {
@@ -14280,14 +14280,14 @@
     "char": "🚬",
     "keywords": ["cigarette", "kills", "tobacco", "joint", "smoking"]
   },
-  "⚰️": {
+  "⚰\u{fe0f}": {
     "name": "coffin",
     "slug": "coffin",
     "group": "Objects",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "⚰️",
+    "char": "⚰\u{fe0f}",
     "keywords": ["coffin", "die", "graveyard", "cemetery", "casket", "funeral"]
   },
   "🪦": {
@@ -14300,14 +14300,14 @@
     "char": "🪦",
     "keywords": ["headstone", "death", "grave", "tombstone"]
   },
-  "⚱️": {
+  "⚱\u{fe0f}": {
     "name": "funeral urn",
     "slug": "funeral_urn",
     "group": "Objects",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "⚱️",
+    "char": "⚱\u{fe0f}",
     "keywords": ["funeral_urn", "rip", "ashes"]
   },
   "🧿": {
@@ -14490,14 +14490,14 @@
     "char": "🛅",
     "keywords": ["left_luggage", "baggage", "bag with", "locker"]
   },
-  "⚠️": {
+  "⚠\u{fe0f}": {
     "name": "warning",
     "slug": "warning",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "⚠️",
+    "char": "⚠\u{fe0f}",
     "keywords": ["warning", "exclamation", "problem", "issue"]
   },
   "🚸": {
@@ -14600,164 +14600,164 @@
     "char": "🔞",
     "keywords": ["no_one_under_eighteen", "18", "minor", "age", "nsfw", "restriction", "underage"]
   },
-  "☢️": {
+  "☢\u{fe0f}": {
     "name": "radioactive",
     "slug": "radioactive",
     "group": "Symbols",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "☢️",
+    "char": "☢\u{fe0f}",
     "keywords": ["radioactive", "nuclear", "radiation"]
   },
-  "☣️": {
+  "☣\u{fe0f}": {
     "name": "biohazard",
     "slug": "biohazard",
     "group": "Symbols",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "☣️",
+    "char": "☣\u{fe0f}",
     "keywords": ["biohazard", "danger"]
   },
-  "⬆️": {
+  "⬆\u{fe0f}": {
     "name": "up arrow",
     "slug": "up_arrow",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "⬆️",
+    "char": "⬆\u{fe0f}",
     "keywords": ["up_arrow", "continue", "upgrade"]
   },
-  "↗️": {
+  "↗\u{fe0f}": {
     "name": "up-right arrow",
     "slug": "up_right_arrow",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "↗️",
+    "char": "↗\u{fe0f}",
     "keywords": ["up_right_arrow", "diagonal", "northeast", "upper"]
   },
-  "➡️": {
+  "➡\u{fe0f}": {
     "name": "right arrow",
     "slug": "right_arrow",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "➡️",
+    "char": "➡\u{fe0f}",
     "keywords": ["right_arrow", "next", "right arrow"]
   },
-  "↘️": {
+  "↘\u{fe0f}": {
     "name": "down-right arrow",
     "slug": "down_right_arrow",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "↘️",
+    "char": "↘\u{fe0f}",
     "keywords": ["down_right_arrow", "southeast", "intercardinal"]
   },
-  "⬇️": {
+  "⬇\u{fe0f}": {
     "name": "down arrow",
     "slug": "down_arrow",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "⬇️",
+    "char": "⬇\u{fe0f}",
     "keywords": ["down_arrow", "cardinal", "down arrow", "downgrade"]
   },
-  "↙️": {
+  "↙\u{fe0f}": {
     "name": "down-left arrow",
     "slug": "down_left_arrow",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "↙️",
+    "char": "↙\u{fe0f}",
     "keywords": ["down_left_arrow", "southwest", "left arrow"]
   },
-  "⬅️": {
+  "⬅\u{fe0f}": {
     "name": "left arrow",
     "slug": "left_arrow",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "⬅️",
+    "char": "⬅\u{fe0f}",
     "keywords": ["left_arrow", "previous"]
   },
-  "↖️": {
+  "↖\u{fe0f}": {
     "name": "up-left arrow",
     "slug": "up_left_arrow",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "↖️",
+    "char": "↖\u{fe0f}",
     "keywords": ["up_left_arrow", "northwest", "west"]
   },
-  "↕️": {
+  "↕\u{fe0f}": {
     "name": "up-down arrow",
     "slug": "up_down_arrow",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "↕️",
+    "char": "↕\u{fe0f}",
     "keywords": ["up_down_arrow", "way", "vertical", "arrows"]
   },
-  "↔️": {
+  "↔\u{fe0f}": {
     "name": "left-right arrow",
     "slug": "left_right_arrow",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "↔️",
+    "char": "↔\u{fe0f}",
     "keywords": ["left_right_arrow", "shape", "horizontal", "sideways", "horizontal arrows"]
   },
-  "↩️": {
+  "↩\u{fe0f}": {
     "name": "right arrow curving left",
     "slug": "right_arrow_curving_left",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "↩️",
+    "char": "↩\u{fe0f}",
     "keywords": ["right_arrow_curving_left", "back", "undo", "enter", "reply"]
   },
-  "↪️": {
+  "↪\u{fe0f}": {
     "name": "left arrow curving right",
     "slug": "left_arrow_curving_right",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "↪️",
+    "char": "↪\u{fe0f}",
     "keywords": ["left_arrow_curving_right", "return", "rotate", "right curved"]
   },
-  "⤴️": {
+  "⤴\u{fe0f}": {
     "name": "right arrow curving up",
     "slug": "right_arrow_curving_up",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "⤴️",
+    "char": "⤴\u{fe0f}",
     "keywords": ["right_arrow_curving_up", "heading", "pointing"]
   },
-  "⤵️": {
+  "⤵\u{fe0f}": {
     "name": "right arrow curving down",
     "slug": "right_arrow_curving_down",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "⤵️",
+    "char": "⤵\u{fe0f}",
     "keywords": ["right_arrow_curving_down", "curved", "then"]
   },
   "🔃": {
@@ -14840,94 +14840,94 @@
     "char": "🛐",
     "keywords": ["place_of_worship", "religious"]
   },
-  "⚛️": {
+  "⚛\u{fe0f}": {
     "name": "atom symbol",
     "slug": "atom_symbol",
     "group": "Symbols",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "⚛️",
+    "char": "⚛\u{fe0f}",
     "keywords": ["atom_symbol", "physics", "atheist"]
   },
-  "🕉️": {
+  "🕉\u{fe0f}": {
     "name": "om",
     "slug": "om",
     "group": "Symbols",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🕉️",
+    "char": "🕉\u{fe0f}",
     "keywords": ["om", "buddhism", "jainism", "aumkara", "hindu", "omkara", "pranava"]
   },
-  "✡️": {
+  "✡\u{fe0f}": {
     "name": "star of David",
     "slug": "star_of_david",
     "group": "Symbols",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "✡️",
+    "char": "✡\u{fe0f}",
     "keywords": ["star_of_david", "jew", "magen"]
   },
-  "☸️": {
+  "☸\u{fe0f}": {
     "name": "wheel of dharma",
     "slug": "wheel_of_dharma",
     "group": "Symbols",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "☸️",
+    "char": "☸\u{fe0f}",
     "keywords": ["wheel_of_dharma", "sikhism", "buddhist", "helm"]
   },
-  "☯️": {
+  "☯\u{fe0f}": {
     "name": "yin yang",
     "slug": "yin_yang",
     "group": "Symbols",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "☯️",
+    "char": "☯\u{fe0f}",
     "keywords": ["yin_yang", "balance", "tao", "taoist"]
   },
-  "✝️": {
+  "✝\u{fe0f}": {
     "name": "latin cross",
     "slug": "latin_cross",
     "group": "Symbols",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "✝️",
+    "char": "✝\u{fe0f}",
     "keywords": ["latin_cross", "christianity", "christian"]
   },
-  "☦️": {
+  "☦\u{fe0f}": {
     "name": "orthodox cross",
     "slug": "orthodox_cross",
     "group": "Symbols",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "☦️",
+    "char": "☦\u{fe0f}",
     "keywords": ["orthodox_cross", "suppedaneum"]
   },
-  "☪️": {
+  "☪\u{fe0f}": {
     "name": "star and crescent",
     "slug": "star_and_crescent",
     "group": "Symbols",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "☪️",
+    "char": "☪\u{fe0f}",
     "keywords": ["star_and_crescent", "muslim"]
   },
-  "☮️": {
+  "☮\u{fe0f}": {
     "name": "peace symbol",
     "slug": "peace_symbol",
     "group": "Symbols",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "☮️",
+    "char": "☮\u{fe0f}",
     "keywords": ["peace_symbol", "hippie"]
   },
   "🕎": {
@@ -15120,14 +15120,14 @@
     "char": "🔂",
     "keywords": ["repeat_single_button", "circled", "number", "once", "overlay", "track"]
   },
-  "▶️": {
+  "▶\u{fe0f}": {
     "name": "play button",
     "slug": "play_button",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "▶️",
+    "char": "▶\u{fe0f}",
     "keywords": ["play_button", "right triangle"]
   },
   "⏩": {
@@ -15140,34 +15140,34 @@
     "char": "⏩",
     "keywords": ["fast_forward_button"]
   },
-  "⏭️": {
+  "⏭\u{fe0f}": {
     "name": "next track button",
     "slug": "next_track_button",
     "group": "Symbols",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "⏭️",
+    "char": "⏭\u{fe0f}",
     "keywords": ["next_track_button", "forward", "skip"]
   },
-  "⏯️": {
+  "⏯\u{fe0f}": {
     "name": "play or pause button",
     "slug": "play_or_pause_button",
     "group": "Symbols",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "⏯️",
+    "char": "⏯\u{fe0f}",
     "keywords": ["play_or_pause_button", "pause", "play/pause"]
   },
-  "◀️": {
+  "◀\u{fe0f}": {
     "name": "reverse button",
     "slug": "reverse_button",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "◀️",
+    "char": "◀\u{fe0f}",
     "keywords": ["reverse_button", "left"]
   },
   "⏪": {
@@ -15180,14 +15180,14 @@
     "char": "⏪",
     "keywords": ["fast_reverse_button", "double", "rewind", "revert"]
   },
-  "⏮️": {
+  "⏮\u{fe0f}": {
     "name": "last track button",
     "slug": "last_track_button",
     "group": "Symbols",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "⏮️",
+    "char": "⏮\u{fe0f}",
     "keywords": ["last_track_button", "backward"]
   },
   "🔼": {
@@ -15230,44 +15230,44 @@
     "char": "⏬",
     "keywords": ["fast_down_button"]
   },
-  "⏸️": {
+  "⏸\u{fe0f}": {
     "name": "pause button",
     "slug": "pause_button",
     "group": "Symbols",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "⏸️",
+    "char": "⏸\u{fe0f}",
     "keywords": ["double_vertical_bar", "pause_button"]
   },
-  "⏹️": {
+  "⏹\u{fe0f}": {
     "name": "stop button",
     "slug": "stop_button",
     "group": "Symbols",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "⏹️",
+    "char": "⏹\u{fe0f}",
     "keywords": ["stop_button", "for"]
   },
-  "⏺️": {
+  "⏺\u{fe0f}": {
     "name": "record button",
     "slug": "record_button",
     "group": "Symbols",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "⏺️",
+    "char": "⏺\u{fe0f}",
     "keywords": ["record_button"]
   },
-  "⏏️": {
+  "⏏\u{fe0f}": {
     "name": "eject button",
     "slug": "eject_button",
     "group": "Symbols",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "⏏️",
+    "char": "⏏\u{fe0f}",
     "keywords": ["eject_button", "symbol"]
   },
   "🎦": {
@@ -15340,44 +15340,44 @@
     "char": "📴",
     "keywords": ["mobile_phone_off", "mute"]
   },
-  "♀️": {
+  "♀\u{fe0f}": {
     "name": "female sign",
     "slug": "female_sign",
     "group": "Symbols",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": false,
-    "char": "♀️",
+    "char": "♀\u{fe0f}",
     "keywords": ["female_sign", "lady", "venus"]
   },
-  "♂️": {
+  "♂\u{fe0f}": {
     "name": "male sign",
     "slug": "male_sign",
     "group": "Symbols",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": false,
-    "char": "♂️",
+    "char": "♂\u{fe0f}",
     "keywords": ["male_sign", "mars"]
   },
-  "⚧️": {
+  "⚧\u{fe0f}": {
     "name": "transgender symbol",
     "slug": "transgender_symbol",
     "group": "Symbols",
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": false,
-    "char": "⚧️",
+    "char": "⚧\u{fe0f}",
     "keywords": ["transgender_symbol", "transgender symbol", "transgender"]
   },
-  "✖️": {
+  "✖\u{fe0f}": {
     "name": "multiply",
     "slug": "multiply",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "✖️",
+    "char": "✖\u{fe0f}",
     "keywords": ["multiplication_sign", "cancel", "multiply"]
   },
   "➕": {
@@ -15420,34 +15420,34 @@
     "char": "🟰",
     "keywords": ["heavy_equals_sign", "heavy equals sign", "equality"]
   },
-  "♾️": {
+  "♾\u{fe0f}": {
     "name": "infinity",
     "slug": "infinity",
     "group": "Symbols",
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": false,
-    "char": "♾️",
+    "char": "♾\u{fe0f}",
     "keywords": ["infinity", "forever", "permanent", "unbounded"]
   },
-  "‼️": {
+  "‼\u{fe0f}": {
     "name": "double exclamation mark",
     "slug": "double_exclamation_mark",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "‼️",
+    "char": "‼\u{fe0f}",
     "keywords": ["double_exclamation_mark", "bangbang"]
   },
-  "⁉️": {
+  "⁉\u{fe0f}": {
     "name": "exclamation question mark",
     "slug": "exclamation_question_mark",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "⁉️",
+    "char": "⁉\u{fe0f}",
     "keywords": ["exclamation_question_mark", "wat", "interrobang"]
   },
   "❓": {
@@ -15490,14 +15490,14 @@
     "char": "❗",
     "keywords": ["red_exclamation_mark", "exclamation_mark", "heavy_exclamation_mark"]
   },
-  "〰️": {
+  "〰\u{fe0f}": {
     "name": "wavy dash",
     "slug": "wavy_dash",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "〰️",
+    "char": "〰\u{fe0f}",
     "keywords": ["wavy_dash", "draw", "line", "moustache"]
   },
   "💱": {
@@ -15520,34 +15520,34 @@
     "char": "💲",
     "keywords": ["heavy_dollar_sign", "payment"]
   },
-  "⚕️": {
+  "⚕\u{fe0f}": {
     "name": "medical symbol",
     "slug": "medical_symbol",
     "group": "Symbols",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": false,
-    "char": "⚕️",
+    "char": "⚕\u{fe0f}",
     "keywords": ["medical_symbol", "aesculapius", "asclepius", "asklepios", "staff"]
   },
-  "♻️": {
+  "♻\u{fe0f}": {
     "name": "recycling symbol",
     "slug": "recycling_symbol",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "♻️",
+    "char": "♻\u{fe0f}",
     "keywords": ["recycling_symbol", "recycle", "universal", "reuse"]
   },
-  "⚜️": {
+  "⚜\u{fe0f}": {
     "name": "fleur-de-lis",
     "slug": "fleur_de_lis",
     "group": "Symbols",
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": false,
-    "char": "⚜️",
+    "char": "⚜\u{fe0f}",
     "keywords": ["fleur_de_lis", "decorative", "orleans", "saints", "scouts"]
   },
   "🔱": {
@@ -15600,24 +15600,24 @@
     "char": "✅",
     "keywords": ["white_check_mark", "check_mark_button", "answer", "pass_tests"]
   },
-  "☑️": {
+  "☑\u{fe0f}": {
     "name": "check box with check",
     "slug": "check_box_with_check",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "☑️",
+    "char": "☑\u{fe0f}",
     "keywords": ["check_box_with_check", "ok", "confirm", "black-square", "ballot", "checkbox"]
   },
-  "✔️": {
+  "✔\u{fe0f}": {
     "name": "check mark",
     "slug": "check_mark",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "✔️",
+    "char": "✔\u{fe0f}",
     "keywords": ["check_mark", "nike", "tick"]
   },
   "❌": {
@@ -15660,74 +15660,74 @@
     "char": "➿",
     "keywords": ["double_curly_loop", "tape", "cassette", "curling", "voicemail"]
   },
-  "〽️": {
+  "〽\u{fe0f}": {
     "name": "part alternation mark",
     "slug": "part_alternation_mark",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "〽️",
+    "char": "〽\u{fe0f}",
     "keywords": ["part_alternation_mark", "economics", "m", "mcdonald’s"]
   },
-  "✳️": {
+  "✳\u{fe0f}": {
     "name": "eight-spoked asterisk",
     "slug": "eight_spoked_asterisk",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "✳️",
+    "char": "✳\u{fe0f}",
     "keywords": ["eight_spoked_asterisk"]
   },
-  "✴️": {
+  "✴\u{fe0f}": {
     "name": "eight-pointed star",
     "slug": "eight_pointed_star",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "✴️",
+    "char": "✴\u{fe0f}",
     "keywords": ["eight_pointed_star", "polygon"]
   },
-  "❇️": {
+  "❇\u{fe0f}": {
     "name": "sparkle",
     "slug": "sparkle",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "❇️",
+    "char": "❇\u{fe0f}",
     "keywords": ["sparkle"]
   },
-  "©️": {
+  "©\u{fe0f}": {
     "name": "copyright",
     "slug": "copyright",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "©️",
+    "char": "©\u{fe0f}",
     "keywords": ["copyright", "ip", "license", "c"]
   },
-  "®️": {
+  "®\u{fe0f}": {
     "name": "registered",
     "slug": "registered",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "®️",
+    "char": "®\u{fe0f}",
     "keywords": ["registered", "alphabet", "r"]
   },
-  "™️": {
+  "™\u{fe0f}": {
     "name": "trade mark",
     "slug": "trade_mark",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "™️",
+    "char": "™\u{fe0f}",
     "keywords": ["trade_mark", "trademark", "tm"]
   },
   "🫟": {
@@ -15740,124 +15740,124 @@
     "char": "🫟",
     "keywords": ["splatter"]
   },
-  "#️⃣": {
+  "#\u{fe0f}\u{20e3}": {
     "name": "keycap #",
     "slug": "keycap_number_sign",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "#️⃣",
+    "char": "#\u{fe0f}\u{20e3}",
     "keywords": ["keycap_number_sign", "keycap_", "twitter", "hash", "hashtag", "octothorpe", "pound"]
   },
-  "*️⃣": {
+  "*\u{fe0f}\u{20e3}": {
     "name": "keycap *",
     "slug": "keycap_asterisk",
     "group": "Symbols",
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": false,
-    "char": "*️⃣",
+    "char": "*\u{fe0f}\u{20e3}",
     "keywords": ["keycap_asterisk", "keycap", "asterisk"]
   },
-  "0️⃣": {
+  "0\u{fe0f}\u{20e3}": {
     "name": "keycap 0",
     "slug": "keycap_0",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "0️⃣",
+    "char": "0\u{fe0f}\u{20e3}",
     "keywords": ["keycap_0", "0", "null", "zero"]
   },
-  "1️⃣": {
+  "1\u{fe0f}\u{20e3}": {
     "name": "keycap 1",
     "slug": "keycap_1",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "1️⃣",
+    "char": "1\u{fe0f}\u{20e3}",
     "keywords": ["keycap_1", "digit"]
   },
-  "2️⃣": {
+  "2\u{fe0f}\u{20e3}": {
     "name": "keycap 2",
     "slug": "keycap_2",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "2️⃣",
+    "char": "2\u{fe0f}\u{20e3}",
     "keywords": ["keycap_2", "numbers"]
   },
-  "3️⃣": {
+  "3\u{fe0f}\u{20e3}": {
     "name": "keycap 3",
     "slug": "keycap_3",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "3️⃣",
+    "char": "3\u{fe0f}\u{20e3}",
     "keywords": ["keycap_3", "prime"]
   },
-  "4️⃣": {
+  "4\u{fe0f}\u{20e3}": {
     "name": "keycap 4",
     "slug": "keycap_4",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "4️⃣",
+    "char": "4\u{fe0f}\u{20e3}",
     "keywords": ["keycap_4", "four"]
   },
-  "5️⃣": {
+  "5\u{fe0f}\u{20e3}": {
     "name": "keycap 5",
     "slug": "keycap_5",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "5️⃣",
+    "char": "5\u{fe0f}\u{20e3}",
     "keywords": ["keycap_5"]
   },
-  "6️⃣": {
+  "6\u{fe0f}\u{20e3}": {
     "name": "keycap 6",
     "slug": "keycap_6",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "6️⃣",
+    "char": "6\u{fe0f}\u{20e3}",
     "keywords": ["keycap_6", "six"]
   },
-  "7️⃣": {
+  "7\u{fe0f}\u{20e3}": {
     "name": "keycap 7",
     "slug": "keycap_7",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "7️⃣",
+    "char": "7\u{fe0f}\u{20e3}",
     "keywords": ["keycap_7", "seven"]
   },
-  "8️⃣": {
+  "8\u{fe0f}\u{20e3}": {
     "name": "keycap 8",
     "slug": "keycap_8",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "8️⃣",
+    "char": "8\u{fe0f}\u{20e3}",
     "keywords": ["keycap_8", "eight"]
   },
-  "9️⃣": {
+  "9\u{fe0f}\u{20e3}": {
     "name": "keycap 9",
     "slug": "keycap_9",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "9️⃣",
+    "char": "9\u{fe0f}\u{20e3}",
     "keywords": ["keycap_9", "nine"]
   },
   "🔟": {
@@ -15920,14 +15920,14 @@
     "char": "🔤",
     "keywords": ["input_latin_letters", "abc"]
   },
-  "🅰️": {
+  "🅰\u{fe0f}": {
     "name": "A button (blood type)",
     "slug": "a_button",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "🅰️",
+    "char": "🅰\u{fe0f}",
     "keywords": ["a_button", "red-square"]
   },
   "🆎": {
@@ -15940,14 +15940,14 @@
     "char": "🆎",
     "keywords": ["ab_button"]
   },
-  "🅱️": {
+  "🅱\u{fe0f}": {
     "name": "B button (blood type)",
     "slug": "b_button",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "🅱️",
+    "char": "🅱\u{fe0f}",
     "keywords": ["b_button", "latin"]
   },
   "🆑": {
@@ -15980,14 +15980,14 @@
     "char": "🆓",
     "keywords": ["free_button", "squared"]
   },
-  "ℹ️": {
+  "ℹ\u{fe0f}": {
     "name": "information",
     "slug": "information",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "ℹ️",
+    "char": "ℹ\u{fe0f}",
     "keywords": ["information", "source", "tourist"]
   },
   "🆔": {
@@ -16000,14 +16000,14 @@
     "char": "🆔",
     "keywords": ["id_button", "identification", "identity"]
   },
-  "Ⓜ️": {
+  "Ⓜ\u{fe0f}": {
     "name": "circled M",
     "slug": "circled_m",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "Ⓜ️",
+    "char": "Ⓜ\u{fe0f}",
     "keywords": ["circled_m", "blue-circle"]
   },
   "🆕": {
@@ -16030,14 +16030,14 @@
     "char": "🆖",
     "keywords": ["ng_button", "blooper"]
   },
-  "🅾️": {
+  "🅾\u{fe0f}": {
     "name": "O button (blood type)",
     "slug": "o_button",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "🅾️",
+    "char": "🅾\u{fe0f}",
     "keywords": ["o_button", "o2"]
   },
   "🆗": {
@@ -16050,14 +16050,14 @@
     "char": "🆗",
     "keywords": ["ok_button"]
   },
-  "🅿️": {
+  "🅿\u{fe0f}": {
     "name": "P button",
     "slug": "p_button",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "🅿️",
+    "char": "🅿\u{fe0f}",
     "keywords": ["p_button", "capital", "parking"]
   },
   "🆘": {
@@ -16100,24 +16100,24 @@
     "char": "🈁",
     "keywords": ["japanese_here_button", "katakana", "destination", "koko", "word", "“here”"]
   },
-  "🈂️": {
+  "🈂\u{fe0f}": {
     "name": "Japanese “service charge” button",
     "slug": "japanese_service_charge_button",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "🈂️",
+    "char": "🈂\u{fe0f}",
     "keywords": ["japanese_service_charge_button", "charge”", "meaning", "sa", "“service", "“service”"]
   },
-  "🈷️": {
+  "🈷\u{fe0f}": {
     "name": "Japanese “monthly amount” button",
     "slug": "japanese_monthly_amount_button",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "🈷️",
+    "char": "🈷\u{fe0f}",
     "keywords": ["japanese_monthly_amount_button", "month", "amount”", "radical", "u6708", "“monthly"]
   },
   "🈶": {
@@ -16220,24 +16220,24 @@
     "char": "🈳",
     "keywords": ["japanese_vacancy_button", "7a7a", "available", "u7a7a", "“vacancy”"]
   },
-  "㊗️": {
+  "㊗\u{fe0f}": {
     "name": "Japanese “congratulations” button",
     "slug": "japanese_congratulations_button",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "㊗️",
+    "char": "㊗\u{fe0f}",
     "keywords": ["japanese_congratulations_button", "red-circle", "congratulate", "congratulation", "“congratulations”"]
   },
-  "㊙️": {
+  "㊙\u{fe0f}": {
     "name": "Japanese “secret” button",
     "slug": "japanese_secret_button",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "㊙️",
+    "char": "㊙\u{fe0f}",
     "keywords": ["japanese_secret_button", "sshh", "“secret”"]
   },
   "🈺": {
@@ -16448,24 +16448,24 @@
     "char": "⬜",
     "keywords": ["white_large_square"]
   },
-  "◼️": {
+  "◼\u{fe0f}": {
     "name": "black medium square",
     "slug": "black_medium_square",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "◼️",
+    "char": "◼\u{fe0f}",
     "keywords": ["black_medium_square"]
   },
-  "◻️": {
+  "◻\u{fe0f}": {
     "name": "white medium square",
     "slug": "white_medium_square",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "◻️",
+    "char": "◻\u{fe0f}",
     "keywords": ["white_medium_square"]
   },
   "◾": {
@@ -16488,24 +16488,24 @@
     "char": "◽",
     "keywords": ["white_medium_small_square"]
   },
-  "▪️": {
+  "▪\u{fe0f}": {
     "name": "black small square",
     "slug": "black_small_square",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "▪️",
+    "char": "▪\u{fe0f}",
     "keywords": ["black_small_square"]
   },
-  "▫️": {
+  "▫\u{fe0f}": {
     "name": "white small square",
     "slug": "white_small_square",
     "group": "Symbols",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": false,
-    "char": "▫️",
+    "char": "▫\u{fe0f}",
     "keywords": ["white_small_square"]
   },
   "🔶": {
@@ -16648,44 +16648,44 @@
     "char": "🏴",
     "keywords": ["black_flag", "pirate", "waving"]
   },
-  "🏳️": {
+  "🏳\u{fe0f}": {
     "name": "white flag",
     "slug": "white_flag",
     "group": "Flags",
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": false,
-    "char": "🏳️",
+    "char": "🏳\u{fe0f}",
     "keywords": ["white_flag", "losing", "loser", "lost", "surrender", "give up"]
   },
-  "🏳️‍🌈": {
+  "🏳\u{fe0f}\u{200d}🌈": {
     "name": "rainbow flag",
     "slug": "rainbow_flag",
     "group": "Flags",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": false,
-    "char": "🏳️‍🌈",
+    "char": "🏳\u{fe0f}\u{200d}🌈",
     "keywords": ["rainbow_flag", "queer", "homosexual", "bisexual"]
   },
-  "🏳️‍⚧️": {
+  "🏳\u{fe0f}\u{200d}⚧\u{fe0f}": {
     "name": "transgender flag",
     "slug": "transgender_flag",
     "group": "Flags",
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": false,
-    "char": "🏳️‍⚧️",
+    "char": "🏳\u{fe0f}\u{200d}⚧\u{fe0f}",
     "keywords": ["transgender_flag", "transgender flag", "lgbtq", "trans"]
   },
-  "🏴‍☠️": {
+  "🏴\u{200d}☠\u{fe0f}": {
     "name": "pirate flag",
     "slug": "pirate_flag",
     "group": "Flags",
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": false,
-    "char": "🏴‍☠️",
+    "char": "🏴\u{200d}☠\u{fe0f}",
     "keywords": ["pirate_flag", "crossbones", "jolly", "plunder", "roger"]
   },
   "🇦🇨": {
@@ -19303,34 +19303,34 @@
     "char": "🇿🇼",
     "keywords": ["flag_zimbabwe", "zw", "zimbabwe", "zim", "zimbabwean flag"]
   },
-  "🏴󠁧󠁢󠁥󠁮󠁧󠁿": {
+  "🏴\u{e0067}\u{e0062}\u{e0065}\u{e006e}\u{e0067}\u{e007f}": {
     "name": "flag England",
     "slug": "flag_england",
     "group": "Flags",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": false,
-    "char": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+    "char": "🏴\u{e0067}\u{e0062}\u{e0065}\u{e006e}\u{e0067}\u{e007f}",
     "keywords": ["flag_england", "english", "cross", "george's", "st"]
   },
-  "🏴󠁧󠁢󠁳󠁣󠁴󠁿": {
+  "🏴\u{e0067}\u{e0062}\u{e0073}\u{e0063}\u{e0074}\u{e007f}": {
     "name": "flag Scotland",
     "slug": "flag_scotland",
     "group": "Flags",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": false,
-    "char": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+    "char": "🏴\u{e0067}\u{e0062}\u{e0073}\u{e0063}\u{e0074}\u{e007f}",
     "keywords": ["flag_scotland", "scottish", "andrew's", "saltire"]
   },
-  "🏴󠁧󠁢󠁷󠁬󠁳󠁿": {
+  "🏴\u{e0067}\u{e0062}\u{e0077}\u{e006c}\u{e0073}\u{e007f}": {
     "name": "flag Wales",
     "slug": "flag_wales",
     "group": "Flags",
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": false,
-    "char": "🏴󠁧󠁢󠁷󠁬󠁳󠁿",
+    "char": "🏴\u{e0067}\u{e0062}\u{e0077}\u{e006c}\u{e0073}\u{e007f}",
     "keywords": ["flag_wales", "welsh", "baner", "cymru", "ddraig", "goch", "y"]
   }
 }
