@@ -11,7 +11,7 @@ describe('@texuli/emojis engine', () => {
   });
 
   it('longest-matches complex sequences and preserves UTF-16 offsets and intervening text', () => {
-    const text = 'A👩‍💻👍🏽🇺🇸1️⃣Z';
+    const text = 'A\u{1F469}\u200D\u{1F4BB}\u{1F44D}\u{1F3FD}\u{1F1FA}\u{1F1F8}1\uFE0F\u20E3Z';
     const matches = findEmojis(text);
     expect(matches.map((item) => item.id)).toEqual([
       '1f469-200d-1f4bb',
