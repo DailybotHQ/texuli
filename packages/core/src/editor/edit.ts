@@ -6,9 +6,11 @@
 export { applyInputRules } from './input-rules.ts';
 export {
   applyComposition,
+  blockKindAt,
   deleteBackward,
   deleteForward,
   deleteSelection,
+  type EditorBlockKindChoice,
   type EditorDeleteUnit,
   type EditorTransformOptions,
   type EditorVoidInsert,
@@ -21,6 +23,7 @@ export {
   removeLink,
   replaceSelection,
   type SetLinkOptions,
+  setBlockKind,
   setBlockType,
   setLink,
   sinkListItem,
