@@ -1,6 +1,6 @@
 {
   "schemaVersion": "texuli-emoji-meaning-review/v1",
-  "reviewContext": "Rendered candidates and throwaway gesture references at 64 px and 24 px on light and dark grounds.",
+  "reviewContext": "R4 thumbs-up candidates and throwaway gesture references rendered at 64 px and 24 px on light and dark grounds.",
   "reviewer": "agent lane local:wH:p2R (author self-review)",
   "reviewedAt": "2026-11-12",
   "records": [
@@ -432,7 +432,7 @@
       "shortcode": ":thumbs_up_light_skin_tone:",
       "cldrName": "thumbs up: light skin tone",
       "requiredFeatures": "Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: light skin tone modifier.",
-      "comparisonNotes": "Compared beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references at 64 px and 24 px on light and dark grounds. This thumb is shorter, broader, angled and attached to the fist side; both reference digits are long and upright.",
+      "comparisonNotes": "R4 compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
       "verdict": "pass"
@@ -442,7 +442,7 @@
       "shortcode": ":thumbs_up_medium_light_skin_tone:",
       "cldrName": "thumbs up: medium-light skin tone",
       "requiredFeatures": "Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: medium-light skin tone modifier.",
-      "comparisonNotes": "Compared beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references at 64 px and 24 px on light and dark grounds. This thumb is shorter, broader, angled and attached to the fist side; both reference digits are long and upright.",
+      "comparisonNotes": "R4 compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
       "verdict": "pass"
@@ -452,7 +452,7 @@
       "shortcode": ":thumbs_up_medium_skin_tone:",
       "cldrName": "thumbs up: medium skin tone",
       "requiredFeatures": "Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: medium skin tone modifier.",
-      "comparisonNotes": "Compared beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references at 64 px and 24 px on light and dark grounds. This thumb is shorter, broader, angled and attached to the fist side; both reference digits are long and upright.",
+      "comparisonNotes": "R4 compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
       "verdict": "pass"
@@ -462,7 +462,7 @@
       "shortcode": ":thumbs_up_medium_dark_skin_tone:",
       "cldrName": "thumbs up: medium-dark skin tone",
       "requiredFeatures": "Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: medium-dark skin tone modifier.",
-      "comparisonNotes": "Compared beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references at 64 px and 24 px on light and dark grounds. This thumb is shorter, broader, angled and attached to the fist side; both reference digits are long and upright.",
+      "comparisonNotes": "R4 compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
       "verdict": "pass"
@@ -472,7 +472,7 @@
       "shortcode": ":thumbs_up_dark_skin_tone:",
       "cldrName": "thumbs up: dark skin tone",
       "requiredFeatures": "Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: dark skin tone modifier.",
-      "comparisonNotes": "Compared beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references at 64 px and 24 px on light and dark grounds. This thumb is shorter, broader, angled and attached to the fist side; both reference digits are long and upright.",
+      "comparisonNotes": "R4 compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
       "verdict": "pass"

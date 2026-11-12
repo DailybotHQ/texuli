@@ -343,7 +343,7 @@ function faceArt(index: number, shortcode: string): string {
 
 function handArt(tone: string): string {
   const skin = TONE_HEX[tone] ?? '#e9b88f';
-  return `<g>${path('M12 36 C11 31 14 26 19 24 L35 22 C39 22 42 24 44 27 C46 22 49 16 52 14 C56 12 59 15 57 19 L54 27 L59 24 C63 23 65 27 62 31 L53 39 L51 45 C50 50 46 53 40 54 L24 54 C17 53 13 49 11 43 Z', skin, { stroke: '#704938', 'stroke-width': 1.8, 'stroke-linejoin': 'round' })}${path('M18 31 Q27 34 39 31 M16 37 Q27 41 41 37 M17 43 Q28 47 40 43', 'none', { stroke: '#b98263', 'stroke-width': 1.3, 'stroke-linecap': 'round' })}</g>`;
+  return `<g>${path('M12 37 C11 32 14 28 19 26 C24 24 30 24 36 23 C42 22 46 14 50 12 C54 10 58 13 57 18 C56 23 54 27 52 31 C51 34 53 38 52 43 C51 50 46 54 39 54 L24 54 C17 53 13 49 11 43 Z', skin, { stroke: '#704938', 'stroke-width': 1.8, 'stroke-linejoin': 'round' })}${path('M18 31 Q27 34 39 31 M16 37 Q27 41 41 37 M17 43 Q28 47 40 43', 'none', { stroke: '#b98263', 'stroke-width': 1.3, 'stroke-linecap': 'round' })}</g>`;
 }
 
 function personArt(shortcode: string): string {
