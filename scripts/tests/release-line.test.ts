@@ -59,8 +59,8 @@ describe('the release line', () => {
   });
 
   it('matches every published manifest and its exact internal pins', () => {
-    // 26 packages on npm, @texuli/mcp first published in 0.9.0.
-    expect(manifests).toHaveLength(26);
+    // 28 packages on npm: @texuli/mcp first published in 0.9.0, the emoji packages in 0.18.0.
+    expect(manifests).toHaveLength(28);
     const versions = new Map(manifests.map((manifest) => [manifest.name, manifest.version]));
     const wrong: string[] = [];
     for (const manifest of manifests) {

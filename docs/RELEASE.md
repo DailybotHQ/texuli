@@ -9,25 +9,33 @@ the intended process; it does not publish packages or grant release authority.
 "what the manifests are working toward". scripts/release-line.ts parses
 the next line; tests and honesty checks read it from there. Change it only
 when a publish lands (published) or a new version opens (in development). -->
-Release line: published `0.17`
+Release line: published `0.18`
 
-All 26 published packages are on npm in the 0.17 line, every one at
-`0.17.5`, every internal `@texuli/*` pin exactly `0.17.5`. The blueprint
-spec in `@texuli/spec@0.17.5` is `0.15.0` (the `data-virtual-list`
+All 28 published packages are on npm in the 0.18 line, every one at
+`0.18.0`, every internal `@texuli/*` pin exactly `0.18.0`. The blueprint
+spec in `@texuli/spec@0.18.0` is `0.15.0` (the `data-virtual-list`
 `mode`, `selectable` and `surface` props in the catalog),
 and the remote MCP server at `https://texuli.com/mcp` is live with the site.
-The publish workflow publishes from `main` after the merge of
-`release/0.17.5`, through npm trusted publishing (OIDC, no stored token),
+The publish workflow publishes from `main` after the merge of the
+`0.18.0` release, through npm trusted publishing (OIDC, no stored token),
 from the verified tarballs with signed provenance, and moves the `latest`
-dist-tag to `0.17.5`, so a bare `npm install texuli` or `pnpm add texuli`
+dist-tag to `0.18.0`, so a bare `npm install texuli` or `pnpm add texuli`
 gets it. `next` is no longer maintained and stays on `0.12.1` (see
 "Dist-tags" below). `@texuli/drag`,
 `@texuli/workflows`, `@texuli/deck`, `@texuli/slides`, `@texuli/editor`,
 `@texuli/document`, `@texuli/pages`, `@texuli/forms`, `@texuli/canvas`,
-`@texuli/sheets` and `@texuli/mcp` are still **in development** (pre-1.0). Nothing is in
-development beyond `0.17.5`; installs use the 0.17 line (`^0.17.0`).
+`@texuli/sheets`, `@texuli/mcp`, `@texuli/emojis` and `@texuli/emoji-assets` are still **in development** (pre-1.0). Nothing is in
+development beyond `0.18.0`; installs use the 0.18 line (`^0.18.0`).
 
-`0.17.5` is a security patch: `linkUrl` and `imageUrl` in
+`0.18.0` is a `0.x` minor from PLAN_023: Markdown and HTML in
+`@texuli/core` with writers for nine chat formats, Texuli Emojis (two new
+packages, `@texuli/emojis` and `@texuli/emoji-assets`, and emoji
+components in `texuli`), new editor, chat, forms and data components, and
+behavior changes on Markdown edge cases where the existing codecs now read
+through the shared CommonMark parser (see "0.18.0" below). Blueprint spec
+stays `0.15.0`. As a new minor, `^0.17.0` does not pick it up.
+
+`0.17.5` was a security patch: `linkUrl` and `imageUrl` in
 `@texuli/core/markup` check the URL the HTML and XML serializers will
 write, so characters the serializers drop can no longer hide a scheme from
 the URL policy, and toolbar arrows, Home and End move only from toolbar
@@ -141,7 +149,7 @@ versions into `main`). Publishing never overwrites a published version.
 
 ### Package changelogs
 
-Each of the 26 published packages ships a `CHANGELOG.md` generated from this
+Each of the 28 published packages ships a `CHANGELOG.md` generated from this
 page by `scripts/package-changelogs.ts`. Do not edit those files. After
 changing this page, rewrite them with
 `pnpm exec tsx scripts/package-changelogs.ts --write`.
@@ -157,6 +165,102 @@ current) and packs them: the published `files` list is `dist` and
   `scripts/packages.ts`).
 - The apps (`apps/website`, `apps/agent`) and the native twin (`native/`)
   publish nothing.
+
+### 0.18.0
+
+A `0.x` minor: every published package moves to `0.18.0` together, every
+internal `@texuli/*` pin is exactly `0.18.0`, and two new packages join
+the published set at `0.18.0`, `@texuli/emojis` and `@texuli/emoji-assets`
+(28 published packages; both in development, pre-1.0). The blueprint spec
+stays `0.15.0` (`@texuli/spec@0.18.0` ships it, digest
+`4c674bc59c8140ee2ff24e47f4de9c46689f48f07c8516128480db129f7a0a57`
+unchanged). As a new minor, `^0.17.0` and `~0.17.0` never pick it up:
+install `^0.18.0`. No package export was removed: the runtime export
+surface grows from 7,967 to 8,053 names (counted from the export
+statements of every published entry, `main` at `0.17.5`). `texuli` and
+`@texuli/tools` now depend on `@texuli/emojis` (exact pin). The new
+catalog ids for `MetricCard`, `FilterBar` and emoji (blueprint spec
+`0.16.0`) are deferred to a later release; those components stay planned
+catalog exclusions.
+
+**Markdown and HTML in `@texuli/core` (ADR-034).** Framework-free subpaths,
+bounded on hostile input:
+
+- `@texuli/core/markdown`: a CommonMark and GFM parser to a versioned tree
+  (`parseMarkdown`, `parseInlineMarkdown`) and a writer (`writeMarkdown`).
+- `@texuli/core/markdown-html`: Markdown to HTML through the escaped
+  `@texuli/core/markup` builders; every link and image goes through the URL
+  policy at the caller's tier, and raw HTML stays text.
+- `@texuli/core/html`: HTML to the Markdown tree through a DOM-free
+  tokenizer; scripts and event handlers are dropped and a refused link
+  keeps its text.
+- `@texuli/core/markdown-dialects`: writers for Slack mrkdwn, Discord,
+  WhatsApp, Telegram MarkdownV2 and HTML, Microsoft Teams, Google Chat,
+  Mattermost and plain text. Each reports what the format loses, and
+  broadcast mentions such as `@everyone` are written inert.
+- `@texuli/core/autocomplete-trigger`: the trigger detection behind
+  composer autocomplete.
+- The MCP tools `md.convert` and `md.render`, local and remote.
+
+**Behavior changes on Markdown edge cases.** The existing codecs keep their
+public APIs and closed vocabularies, but now read through the shared
+CommonMark parser, so some inputs read differently than in `0.17.x`. Each
+change is pinned by a test.
+
+- `@texuli/core/editor-markdown` (and `@texuli/document/markdown` and
+  `@texuli/editor/markdown`, which delegate to it): setext headings and
+  indented code read as headings and code; a fence with any info string
+  opens a code block; reference links resolve and their definition lines
+  are dropped; character references are decoded (`&amp;` reads as `&`);
+  `~one~` is strikethrough; a refused autolink keeps its text and now also
+  reports `link-rejected`. The writer escapes what CommonMark would read
+  back differently (adjacent lists alternate markers; a line of `=` or `-`
+  and `&` before a name are escaped; code-span padding follows CommonMark).
+- `@texuli/blocks/text/markdown`: the same block rules; images still keep
+  their alt text only.
+- `@texuli/catalog` rich text: every CommonMark escape and character
+  references are decoded, and `<https://…>` autolinks are links.
+- `@texuli/chat` message text: escapes and character references are
+  decoded, formatting nested inside a span is flattened, and a hard break
+  is a line break.
+- Entries that now bundle the parser grow by about 20 to 24 KB gzip.
+
+**Texuli Emojis (ADR-035).**
+
+- `@texuli/emojis` (new, L0, no runtime dependencies): the catalog
+  generated from pinned Unicode Emoji 18.0 and CLDR 49 sources (3,963
+  fully-qualified sequences with names, keywords, categories, shortcodes
+  and skin-tone variants), the tokenizer and shortcode conversion, search,
+  and a compatibility engine for `universal-emoji-parser` aliases
+  (`@texuli/emojis/legacy-engine`, `@texuli/emojis/legacy`).
+- `@texuli/emoji-assets` (new, L0): the manifest of original Texuli emoji
+  art. No artwork is approved yet (0 approved), so `getTexuliEmojiAsset`
+  returns nothing; the proposed art license is pending the owner's
+  sign-off.
+- `texuli/emoji`: `Emoji`, `EmojiText` and `EmojiPicker`. They show the
+  system emoji by default, with a host resolver seam for reviewed art.
+- The MCP tools `emoji.search`, `emoji.get`, `emoji.categories`,
+  `emoji.variants` and `emoji.convert`.
+
+**Components.**
+
+- `@texuli/editor`: `@texuli/editor/block-menu` (a block-type menu button,
+  one undo step), `@texuli/editor/emoji` (the emoji button and a
+  `:shortcode:` input rule with a host lookup), `@texuli/editor/export`
+  (`DialectExport`, the document in a chat format with its losses), HTML
+  paste through `@texuli/core/html`, and Paste as Markdown
+  (`Mod+Alt+Shift+V`).
+- `@texuli/chat`: composer autocomplete for mentions, slash commands and
+  emoji, stopped replies, `ChatAttachment`, and Markdown and emoji in
+  message text.
+- `@texuli/forms/builder`: `FormBuilder`, a visual form builder with a live
+  preview and the schema JSON.
+- `@texuli/data`: `FilterBar` (`@texuli/data/filter-bar`) and `MetricCard`
+  (`@texuli/data/dashboard`).
+
+**texuli.com.** Four new Solutions, Dashboards, Forms, Agent chat and Rich
+text editor, and the Markdown and emoji pages. The site deploys from
+`main` and publishes nothing to npm.
 
 ### 0.17.5
 
@@ -3558,7 +3662,13 @@ tools, astro, player, slides. `@texuli/deck` goes out before
 
 ### History
 
-- `0.17.5` (merged and published from `main` after the merge of
+- `0.18.0` (merged and published from `main` after the merge of the
+  `0.18.0` release): a `0.x` minor for 28 packages, with `@texuli/emojis`
+  and `@texuli/emoji-assets` published for the first time: Markdown and
+  HTML in `@texuli/core`, chat formats, Texuli Emojis and new editor,
+  chat, forms and data components (see "0.18.0" above). Its tarballs ship
+  blueprint spec `0.15.0`.
+- `0.17.5` (2026-11-12 UTC; merged and published from `main` after the merge of
   `release/0.17.5`): a security patch for 26 packages: the markup URL check
   runs on the value the serializers write, and toolbar keys move only from
   toolbar items (see "0.17.5" above). Its tarballs ship blueprint spec
@@ -3771,8 +3881,8 @@ default.
   and after 1.0.0 (owner decision 2026-10-27; before that, `latest` was
   reserved for 1.0.0 and stayed on the first upload, `0.1.0-next.0`). The
   publish workflow publishes every version with `--tag latest`. It names
-  `0.17.5` once the publish workflow runs after the merge of
-  `release/0.17.5` (`0.17.4` before that). Publishing a future
+  `0.18.0` once the publish workflow runs after the merge of the
+  `0.18.0` release (`0.17.5` before that). Publishing a future
   pre-release without moving `latest` needs a workflow change first.
 - **`next`** names `0.12.1`, and the workflow no longer moves it. npm
   trusted publishing, the workflow's only credential since 2026-11-02,
@@ -3792,7 +3902,7 @@ version.
 
 Task 172 made every published dependency an intentional semver range: the
 published package manifests pin internal `@texuli/*` dependencies to exact
-versions (for `0.17.5`, every internal pin is exactly `0.17.5`; compatibility
+versions (for `0.18.0`, every internal pin is exactly `0.18.0`; compatibility
 between Texuli packages is exact, per "Independent package versions" above), while the private development
 manifests (`apps/website`, `apps/agent`, `packages/examples`) keep the
 pnpm `workspace:` protocol. The release packer enforces that boundary
@@ -3812,14 +3922,15 @@ the package-to-package contract outside this repository.
 
 | Surface | Version | Where it is pinned |
 | --- | --- | --- |
-| 26 npm packages | `0.17.5` (dist-tag `latest`; `next` stays on `0.12.1`) | Each package manifest, with exact `0.17.5` internal pins; published by the publish workflow through npm trusted publishing after the merge of `release/0.17.5` (before it: `0.17.4` for 26 packages on 2026-11-10 UTC; `0.17.3` for 26 packages on 2026-11-10 UTC; `0.17.2` for 26 packages on 2026-11-10 UTC; `0.17.1` for 26 packages on 2026-11-10 UTC; `0.17.0` for 26 packages on 2026-11-10 UTC; `0.16.1` for 26 packages on 2026-11-10 UTC; `0.16.0` for 26 packages on 2026-11-09 UTC; `0.15.0` for 26 packages on 2026-11-09 UTC; `0.14.4` for 26 packages on 2026-11-08 UTC; `0.14.3` for 26 packages on 2026-11-07 UTC; `0.14.2` for 26 packages on 2026-11-07 UTC; `0.14.1` for 26 packages on 2026-11-05 UTC; `0.14.0` for 26 packages on 2026-11-05 UTC; `0.13.1` for 26 packages on 2026-11-05 UTC; `0.13.0` for 26 packages on 2026-11-05 UTC; `0.12.3` for 26 packages on 2026-11-03; `0.12.2` for 26 packages on 2026-11-02; `0.12.1` for 26 packages on 2026-11-02; `0.12.0` for 26 packages on 2026-11-01; `0.11.5` for 26 packages on 2026-11-01 UTC, the last of the 0.11 line; `0.11.4` for 26 packages on 2026-11-01 UTC; `0.11.3` for 26 packages on 2026-11-01 UTC; `0.11.2` for 26 packages on 2026-11-01 UTC; `0.11.1` for 26 packages on 2026-11-01 UTC; `0.11.0` for 26 packages on 2026-10-31 UTC; `0.10.0` for 26 packages on 2026-10-31 UTC; `0.9.0` for 26 packages on 2026-10-30 UTC; the 0.8 line for 25 packages, `0.8.0` on 2026-10-29 UTC plus the `0.8.x` patches in "0.8.x patch releases (G86)"; `0.7.0` for 22 packages on 2026-10-29 UTC; `0.6.0` for 20 packages on 2026-10-29 UTC; `0.5.0` for 20 packages on 2026-10-29 UTC; `0.4.0` for 19 packages on 2026-10-28; `0.3.0` for 16 packages on 2026-10-27 plus drag and workflows on 2026-10-28, run 40616266068; `0.2.0` for 15 packages on 2026-10-27; previews `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
-| `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets` | `0.17.5` (first published as `0.8.0`) | Each package manifest (and `FORMS_PACKAGE_VERSION`, `CANVAS_PACKAGE_VERSION`, `SHEETS_PACKAGE_VERSION`); `@texuli/forms` and `@texuli/canvas` are published after `@texuli/editor`, once `@texuli/core`, `@texuli/deck`, `@texuli/document`, `@texuli/drag` and `texuli` are out, and `@texuli/sheets` after `@texuli/blocks`, once `@texuli/date` and `@texuli/data` are out; no published package depends on them. In development (ADR-012, ADR-015), pre-1.0. |
-| `@texuli/document`, `@texuli/pages` | `0.17.5` (first published as `0.7.0`) | Each package manifest (and `PAGES_PACKAGE_VERSION`); `@texuli/document` is published after `@texuli/core` and `@texuli/deck` and before `@texuli/tools` and `@texuli/pages`, which depend on it; `@texuli/pages` after `@texuli/player`. In development (ADR-010, ADR-011), pre-1.0. |
-| `@texuli/editor` | `0.17.5` (first published as `0.5.0`) | `packages/editor/package.json` (and `EDITOR_PACKAGE_VERSION`); published after `texuli`, which it depends on. In development (ADR-003), pre-1.0. |
-| `@texuli/deck` | `0.17.5` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/document`, `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
-| `@texuli/drag`, `@texuli/workflows` | `0.17.5` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
-| `@texuli/mcp` | `0.17.5` (first published as `0.9.0`) | `packages/mcp/package.json`, with `@texuli/tools` pinned to exactly its own version; published right after `@texuli/tools`. In development (ADR-019), pre-1.0. |
-| Blueprint spec | `0.15.0`, digest `4c674bc59c8140ee2ff24e47f4de9c46689f48f07c8516128480db129f7a0a57` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.17.0`, `@texuli/spec@0.17.1`, `@texuli/spec@0.17.2`, `@texuli/spec@0.17.3`, `@texuli/spec@0.17.4` and `@texuli/spec@0.17.5`; the `data-virtual-list` catalog props `mode`, `selectable` and `surface`, a stamp-only migration from `0.14.0`. |
+| 28 npm packages | `0.18.0` (dist-tag `latest`; `next` stays on `0.12.1`) | Each package manifest, with exact `0.18.0` internal pins; published by the publish workflow through npm trusted publishing after the merge of the `0.18.0` release (before it: `0.17.5` for 26 packages on 2026-11-12 UTC; `0.17.4` for 26 packages on 2026-11-10 UTC; `0.17.3` for 26 packages on 2026-11-10 UTC; `0.17.2` for 26 packages on 2026-11-10 UTC; `0.17.1` for 26 packages on 2026-11-10 UTC; `0.17.0` for 26 packages on 2026-11-10 UTC; `0.16.1` for 26 packages on 2026-11-10 UTC; `0.16.0` for 26 packages on 2026-11-09 UTC; `0.15.0` for 26 packages on 2026-11-09 UTC; `0.14.4` for 26 packages on 2026-11-08 UTC; `0.14.3` for 26 packages on 2026-11-07 UTC; `0.14.2` for 26 packages on 2026-11-07 UTC; `0.14.1` for 26 packages on 2026-11-05 UTC; `0.14.0` for 26 packages on 2026-11-05 UTC; `0.13.1` for 26 packages on 2026-11-05 UTC; `0.13.0` for 26 packages on 2026-11-05 UTC; `0.12.3` for 26 packages on 2026-11-03; `0.12.2` for 26 packages on 2026-11-02; `0.12.1` for 26 packages on 2026-11-02; `0.12.0` for 26 packages on 2026-11-01; `0.11.5` for 26 packages on 2026-11-01 UTC, the last of the 0.11 line; `0.11.4` for 26 packages on 2026-11-01 UTC; `0.11.3` for 26 packages on 2026-11-01 UTC; `0.11.2` for 26 packages on 2026-11-01 UTC; `0.11.1` for 26 packages on 2026-11-01 UTC; `0.11.0` for 26 packages on 2026-10-31 UTC; `0.10.0` for 26 packages on 2026-10-31 UTC; `0.9.0` for 26 packages on 2026-10-30 UTC; the 0.8 line for 25 packages, `0.8.0` on 2026-10-29 UTC plus the `0.8.x` patches in "0.8.x patch releases (G86)"; `0.7.0` for 22 packages on 2026-10-29 UTC; `0.6.0` for 20 packages on 2026-10-29 UTC; `0.5.0` for 20 packages on 2026-10-29 UTC; `0.4.0` for 19 packages on 2026-10-28; `0.3.0` for 16 packages on 2026-10-27 plus drag and workflows on 2026-10-28, run 40616266068; `0.2.0` for 15 packages on 2026-10-27; previews `0.1.0-next.3` and `0.1.0-next.2` on 2026-10-27; `0.1.0-next.1`: 2026-10-25, run 40238083612). |
+| `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets` | `0.18.0` (first published as `0.8.0`) | Each package manifest (and `FORMS_PACKAGE_VERSION`, `CANVAS_PACKAGE_VERSION`, `SHEETS_PACKAGE_VERSION`); `@texuli/forms` and `@texuli/canvas` are published after `@texuli/editor`, once `@texuli/core`, `@texuli/deck`, `@texuli/document`, `@texuli/drag` and `texuli` are out, and `@texuli/sheets` after `@texuli/blocks`, once `@texuli/date` and `@texuli/data` are out; no published package depends on them. In development (ADR-012, ADR-015), pre-1.0. |
+| `@texuli/document`, `@texuli/pages` | `0.18.0` (first published as `0.7.0`) | Each package manifest (and `PAGES_PACKAGE_VERSION`); `@texuli/document` is published after `@texuli/core` and `@texuli/deck` and before `@texuli/tools` and `@texuli/pages`, which depend on it; `@texuli/pages` after `@texuli/player`. In development (ADR-010, ADR-011), pre-1.0. |
+| `@texuli/editor` | `0.18.0` (first published as `0.5.0`) | `packages/editor/package.json` (and `EDITOR_PACKAGE_VERSION`); published after `texuli`, which it depends on. In development (ADR-003), pre-1.0. |
+| `@texuli/deck` | `0.18.0` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/document`, `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
+| `@texuli/drag`, `@texuli/workflows` | `0.18.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
+| `@texuli/emojis`, `@texuli/emoji-assets` | `0.18.0` (first published as `0.18.0`) | Each package manifest; L0 with no runtime dependencies, published right after `@texuli/date` and before `texuli` and `@texuli/tools`, which pin `@texuli/emojis` exactly. In development (ADR-035), pre-1.0. |
+| `@texuli/mcp` | `0.18.0` (first published as `0.9.0`) | `packages/mcp/package.json`, with `@texuli/tools` pinned to exactly its own version; published right after `@texuli/tools`. In development (ADR-019), pre-1.0. |
+| Blueprint spec | `0.15.0`, digest `4c674bc59c8140ee2ff24e47f4de9c46689f48f07c8516128480db129f7a0a57` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.17.0`, `@texuli/spec@0.17.1`, `@texuli/spec@0.17.2`, `@texuli/spec@0.17.3`, `@texuli/spec@0.17.4`, `@texuli/spec@0.17.5` and `@texuli/spec@0.18.0`; the `data-virtual-list` catalog props `mode`, `selectable` and `surface`, a stamp-only migration from `0.14.0`. |
 | Blueprint spec in `@texuli/spec@0.16.0` and `@texuli/spec@0.16.1` | `0.14.0`, digest `39b8e87b561ae37c3a3b3ef45b7cec29ad4b05fa9b01cd9032c1b9f05f383e24` | The 0.16 line's generated sources carry the `0.14.0` stamp; the category `color` axis (`none`, `chart-1` to `chart-8`), `allow.colors` and `unknown-color`, the catalog ids `color-swatch`, `data-virtual-list`, `link`, `list` and `mark`, a stamp-only migration from `0.13.0`. |
 | Blueprint spec in `@texuli/spec@0.15.0` | `0.13.0`, digest `37897e1b4d669ca0f32ba49b4960c921e860c1bacb38a9f29a1072389708ffae` | The 0.15 line's generated sources carry the `0.13.0` stamp; locked design systems (the design-system `allow`, `library` and `approval` sections), catalog `axes`, `states` and `imports`, host catalog extensions (`$defs.extension`, `<ns>:<id>`), 17 new catalog ids, and the contract schemas (in development), a stamp-only migration from `0.12.0`. |
 | Blueprint spec in `@texuli/spec@0.14.0` to `@texuli/spec@0.14.4` | `0.12.0`, digest `049c93b4105fb765c2db5ff20272494f99fce52552aafaf85e00789fc1747a14` | The 0.14 line's generated sources carry the `0.12.0` stamp; additive catalog ids (`code-field`, `avatar-group-grid`), `media-image` `srcDark` and `darkMode`, the `data-timeline` groups, markers, selection and `collapse` event, and design-system fields (`darkOpacity`, `aa-non-text`, the card content font size), a stamp-only migration from `0.11.0`. |
@@ -3870,23 +3981,25 @@ the versions into `main` is that GO: once CI passes on the merge commit,
 | 0.8.0 | Forms and canvas | `@texuli/forms` and `@texuli/canvas`, after `@texuli/editor` (first published in `0.8.0`) | Fresh owner GO for each version; `@texuli/forms` must be published **after** `@texuli/core` and `texuli`, and `@texuli/canvas` **after** `@texuli/core`, `@texuli/deck`, `@texuli/document`, `@texuli/drag` and `texuli`, which they depend on. No published package depends on either. |
 | 0.9.0 | Local MCP server | `@texuli/mcp`, right after `@texuli/tools` (first published in `0.9.0`) | Fresh owner GO for each version (the merge of `release/0.9.0`); it must be published **after** `@texuli/tools`, which it pins exactly. No published package depends on it. |
 | 0.8.0 | Spreadsheets | `@texuli/sheets`, after `@texuli/blocks` and before `@texuli/catalog` (first published in `0.8.0`) | Fresh owner GO for each version; it must be published **after** `@texuli/core`, `@texuli/date`, `@texuli/data` and `texuli`, which it depends on. No published package depends on it. |
+| 0.18.0 | Emoji packages | `@texuli/emojis` and `@texuli/emoji-assets`, right after `@texuli/date` and before `texuli` (first published in `0.18.0`) | Fresh owner GO for each version (the merge of the `0.18.0` release); `@texuli/emojis` must be published **before** `texuli` and `@texuli/tools`, which pin it exactly. No published package depends on `@texuli/emoji-assets`. |
 | 177 | Domain packages | `@texuli/charts`, `@texuli/data`, `@texuli/media`, `@texuli/chat`, `@texuli/blocks` | Fresh owner GO for the exact ready set after dependency order, package checks, size, pack, and consumer gates pass. |
 | 178 | Catalog and integration tools | `@texuli/catalog`, `@texuli/tools`, `@texuli/astro`, `@texuli/player`, `@texuli/slides`, `@texuli/spec` (the order in `publish.yml`; all six went out in the 2026-10-25 `0.1.0-next.1` run) | Fresh owner GO for each exact release set after implementation, dependency, pack, consumer, and relevant website/build gates pass. |
 
 The date, drag, workflows, deck, editor, document, pages, forms, canvas,
-sheets and mcp rows are in `.github/workflows/publish.yml` (order: core, date,
-spec, drag, deck, tokens, primitives, document, texuli, workflows, editor,
+sheets, mcp and emoji rows are in `.github/workflows/publish.yml` (order: core, date,
+emojis, emoji-assets, spec, drag, deck, tokens, primitives, document, texuli, workflows, editor,
 forms, canvas, charts, data, media, chat, blocks, sheets, catalog, tools,
 mcp, astro, player, pages, slides; `@texuli/editor` goes out from `0.5.0`,
 after `texuli`, `@texuli/document` and `@texuli/pages` from `0.7.0`,
 `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` from `0.8.0`, and
-`@texuli/mcp` from `0.9.0`).
-Every published package is `0.17.5`, and every internal dependency between
-them is pinned to exactly `0.17.5`; the workflow refuses to start publishing while any listed
+`@texuli/mcp` from `0.9.0`, and `@texuli/emojis` and `@texuli/emoji-assets`
+from `0.18.0`).
+Every published package is `0.18.0`, and every internal dependency between
+them is pinned to exactly `0.18.0`; the workflow refuses to start publishing while any listed
 package is still `0.0.0`. `pnpm verify:packages` still refuses any
 `0.0.0` or `workspace:` range in a published manifest, the guard that keeps
 an unversioned dependency out. The publish loop skips versions npm already
-has, so a package changed after `0.17.5` needs a new version before its
+has, so a package changed after `0.18.0` needs a new version before its
 change reaches npm.
 
 Each outward wave must also pass its task's `pnpm verify:packages` gate and
@@ -3899,7 +4012,7 @@ new version rather than reusing a published version.
 ## Honesty in documentation
 
 The npm name reservation (`0.1.0-next.0`) was a prerelease publication by
-the owner, not a supported product release. `0.17.5` is a release but not a
+the owner, not a supported product release. `0.18.0` is a release but not a
 stable one: keep `private: true`, the pre-1.0 status, and the absence of a
 stable 1.0.0 clear until the corresponding approved stable release actually
 exists. A passing pack gate proves only that a tarball
@@ -3932,8 +4045,8 @@ released, `skill-v0.4.3` when the `0.17.0` packages were released,
 `skill-v0.4.4` when the `0.17.1` packages were released, `skill-v0.4.5`
 when the `0.17.2` packages were released, `skill-v0.4.6` when the `0.17.3`
 packages were released, `skill-v0.4.7` when the `0.17.4` packages were
-released, and the latest tag when the `0.17.5` release notes are written;
-the skill release after the merge folds the pack's 0.17.5 changes into its
+released, and the latest tag when the `0.18.0` release notes are written;
+the skill release after the merge folds the pack's 0.18.0 changes into its
 own section). A checkout install is described in
 [SKILL_INSTALLATION](SKILL_INSTALLATION.md).
 

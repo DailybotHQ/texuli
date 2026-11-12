@@ -38,7 +38,7 @@ export const EDITOR_AGENTS: Omit<SolutionAgentsProps, 'entry'> = {
     {
       label:
         'HTML paste through @texuli/core/html, Paste as Markdown, block menu, emoji and chat export',
-      detail: 'Added after 0.17.4; in this branch, not in a published release yet.',
+      detail: 'Released in 0.18.0 (pre-1.0).',
       status: 'planned',
     },
   ],

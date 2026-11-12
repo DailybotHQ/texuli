@@ -37,7 +37,7 @@ Every root script, verbatim.
 | `pnpm visual` | `tsx scripts/visual.ts` | Visual regression against `tests/visual/visual.spec.ts-snapshots` (light and dark, desktop and Pixel 7) |
 | `pnpm visual:update` | `tsx scripts/visual.ts --update` | Write new baselines (review the PNGs before committing) |
 | `pnpm test:perf` | `TEXULI_PERF=1 vitest run tests/perf packages/blocks/tests/code.test.ts packages/blocks/tests/text.test.ts` | Wall-clock and scale limits (opt-in; never in the default suite) |
-| `pnpm verify:packages` | `tsx scripts/packages.ts` | Build, pack and check the 26 packable packages as npm would publish them (publint, attw; `@texuli/examples` is never packed); publishes nothing |
+| `pnpm verify:packages` | `tsx scripts/packages.ts` | Build, pack and check the 28 packable packages as npm would publish them (publint, attw; `@texuli/examples` is never packed); publishes nothing |
 | `pnpm check:docs` | `tsx scripts/check-docs.ts` | Every relative Markdown link and documented command is real (see Other tools) |
 | `pnpm check:trojan-source` | `tsx scripts/check-trojan-source.ts` | Fail on literal bidi and zero-width control characters in tracked text files (part of `pnpm lint`); gate: `pnpm vitest run scripts/tests/trojan-source.test.ts` |
 
@@ -129,8 +129,8 @@ budget rows (2026-10-26).
 ## Not available
 
 There are no release, publish or deploy commands. Packages are
-`private: true`; npm carries the 26 packable packages as the CI-published
-`0.17.5` release (dist-tag `latest`; `next` is no longer maintained and
+`private: true`; npm carries the 28 packable packages as the CI-published
+`0.18.0` release (dist-tag `latest`; `next` is no longer maintained and
 stays on `0.12.1`; pre-1.0, not stable) — publishing runs through the
 publish workflow with npm trusted publishing (see [CI](CI.md)). See [RELEASE](RELEASE.md)
 for the version and owner-GO policy. texuli.com deploys from `main`

@@ -32,11 +32,11 @@ export function editorQuickstart(entry: SolutionEntry): SolutionQuickstartProps 
   return {
     entry,
     title: 'Start with the editor',
-    install: { label: 'Install', language: 'bash', code: 'pnpm add @texuli/editor@0.17.4' },
+    install: { label: 'Install', language: 'bash', code: 'pnpm add @texuli/editor@0.18.0' },
     samples: [
       { label: 'Markdown in and out', language: 'svelte', code: EDITOR_BASIC_SAMPLE },
       {
-        label: 'Block menu, emoji and chat export (in development, not in a published release yet)',
+        label: 'Block menu, emoji and chat export (in development, released in 0.18.0)',
         language: 'svelte',
         code: EDITOR_EXTRAS_SAMPLE,
       },

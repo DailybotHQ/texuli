@@ -1,6 +1,6 @@
 ## Emoji
 
-Pass `emoji` to `RichTextEditor` or `EditorToolbar` for an emoji button, or use `EditorEmojiButton` from `@texuli/editor/emoji`. In development: added after `0.17.4`, not in a published release yet.
+Pass `emoji` to `RichTextEditor` or `EditorToolbar` for an emoji button, or use `EditorEmojiButton` from `@texuli/editor/emoji`. In development: released in `0.18.0`.
 
 - The button opens `EmojiPicker` from `texuli/emoji` in a popover: search, a keyboard grid and skin tones, with recents kept by the host. The picker and its catalog load when the popover opens.
 - A chosen emoji is one undo step, apart from typing, and focus returns to the text.

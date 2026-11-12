@@ -1,6 +1,6 @@
 ## Install and status
 
-Install the published schema form package with `pnpm add @texuli/forms`. The package is in development (pre-1.0). The visual builder (`@texuli/forms/builder`) is in development: it was added after `0.17.4`, is not in a published release yet, and is planned for the next release.
+Install the published schema form package with `pnpm add @texuli/forms`. The package is in development (pre-1.0). The visual builder (`@texuli/forms/builder`) is in development: it was released in `0.18.0`.
 
 Import the base theme stylesheet once in your application. `SchemaForm` renders the validated schema using Texuli controls.
 

@@ -18,7 +18,7 @@ export const FORMS_STORIES: Omit<SolutionStoriesProps, 'entry'> = {
     {
       id: 'builder',
       title: 'Shape fields, then inspect the result.',
-      body: 'The visual builder is available in this development branch. It edits field order and settings, validates the schema, and shows a live preview; it is not in the npm release yet.',
+      body: 'The visual builder was released in 0.18.0 and is still in development. It edits field order and settings, validates the schema, and shows a live preview.',
       capabilities: ['builder'],
       status: 'in development',
     },

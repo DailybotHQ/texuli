@@ -25,7 +25,7 @@ export const FORMS_HOW: Omit<SolutionHowProps, 'entry'> = {
     },
     {
       title: 'Build and preview',
-      body: 'Use the in-development builder, not in a published release yet, to arrange fields, edit settings and inspect schema JSON before adoption.',
+      body: 'Use the in-development builder (released in 0.18.0) to arrange fields, edit settings and inspect schema JSON before adoption.',
       package: '@texuli/forms',
     },
   ],

@@ -6,7 +6,7 @@ The interactive page demo uses fictional data in the browser. It does not contac
 
 ## Components and release status
 
-`Dashboard` and `DashboardWidget` are in the published dashboard subpath. The `FilterBar` and `MetricCard` additions described here were added after `0.17.4`; they are in development and need a later `@texuli/data` release. Check the current package release before importing those two subpaths in an npm consumer.
+`Dashboard` and `DashboardWidget` are in the published dashboard subpath. The `FilterBar` and `MetricCard` additions described here were released in `0.18.0` and are in development; they need `@texuli/data@0.18.0` or later.
 
 ## What you get
 

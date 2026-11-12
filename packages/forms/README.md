@@ -13,11 +13,11 @@ expression or code.
 **In the stack:** layer L4, a domain package on the `@texuli/core` texels (the expression language) and the `texuli` components. The player paints it through its `formHost` seam.
 
 > **Status: in development (pre-1.0).** `@texuli/forms` is published on
-> npm as `0.17.5`, with provenance (first published as `0.8.0`; built in PLAN_010,
+> npm as `0.18.0`, with provenance (first published as `0.8.0`; built in PLAN_010,
 > ADR-015 in
 > [DECISIONS](https://github.com/DailybotHQ/texuli/blob/main/docs/DECISIONS.md)).
-> Under 0.x a new minor (`0.17.0`) may contain breaking changes, so pin the
-> exact version or use `^0.17.0`, which accepts only 0.17.x
+> Under 0.x a new minor (`0.18.0`) may contain breaking changes, so pin the
+> exact version or use `^0.18.0`, which accepts only 0.18.x
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 It sits on layer L4 and depends on `texuli` and `@texuli/core`; `svelte`

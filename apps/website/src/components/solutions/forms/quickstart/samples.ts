@@ -28,7 +28,7 @@ export function formsQuickstart(entry: SolutionEntry): SolutionQuickstartProps {
   return {
     entry,
     title: 'Start with a form schema',
-    install: { label: 'Install', language: 'bash', code: 'pnpm add @texuli/forms@0.17.4' },
+    install: { label: 'Install', language: 'bash', code: 'pnpm add @texuli/forms@0.18.0' },
     samples: [
       { label: 'Validate a schema', language: 'ts', code: FORMS_SCHEMA_SAMPLE },
       { label: 'Keep a local draft', language: 'ts', code: FORMS_DRAFTS_SAMPLE },

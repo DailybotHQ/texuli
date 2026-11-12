@@ -10,4 +10,4 @@ Parse stored layouts with `parseDashboard` and use the catalog validation path f
 
 ## Skill
 
-The Texuli skill's dashboard recipe covers the dashboard grid, widget composition, filters, metrics and visual validation. Use only the APIs available in the installed package version; `FilterBar` and `MetricCard` require a release newer than `0.17.4` and need a later `@texuli/data` release.
+The Texuli skill's dashboard recipe covers the dashboard grid, widget composition, filters, metrics and visual validation. Use only the APIs available in the installed package version; `FilterBar` and `MetricCard` need `@texuli/data@0.18.0` or later.

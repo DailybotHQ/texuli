@@ -1,6 +1,6 @@
 ## Safe paste
 
-Clipboard HTML is read without a DOM by `htmlToMarkdownTree` from `@texuli/core/html` at the untrusted tier, then mapped onto the editor vocabulary. In development: added after `0.17.4`, not in a published release yet.
+Clipboard HTML is read without a DOM by `htmlToMarkdownTree` from `@texuli/core/html` at the untrusted tier, then mapped onto the editor vocabulary. In development: released in `0.18.0`.
 
 - Scripts, styles, frames, SVG and other raw-text elements are dropped with their content, and every attribute but the few the editor maps is gone, event handlers included.
 - A link the URL policy refuses, such as `javascript:`, keeps its text and counts in `linksRemoved`.
