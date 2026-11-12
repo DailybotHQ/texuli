@@ -19,6 +19,7 @@ import { traceNode } from './trace-rules.ts';
 const NATIVE = join(import.meta.dirname, '../..');
 const REPO = join(NATIVE, '..');
 const SPEC_KT = join(REPO, 'packages/spec/generated/kotlin');
+const EMOJI_KT = join(REPO, 'packages/emojis/generated/kotlin');
 const failures: string[] = [];
 const check = (ok: boolean, message: string) => {
   if (!ok) failures.push(message);
@@ -86,6 +87,14 @@ check(
   'texuli-spec reads packages/spec/generated/kotlin'
 );
 check(existsSync(join(SPEC_KT, 'com/texuli/spec/Blueprint.kt')), 'the generated Kotlin exists');
+check(
+  specBuild.includes('../packages/emojis/generated/kotlin'),
+  'texuli-spec reads packages/emojis/generated/kotlin'
+);
+check(
+  existsSync(join(EMOJI_KT, 'com/texuli/emojis/generated/EmojiCatalogData.kt')),
+  'the generated emoji Kotlin exists'
+);
 const kotlinFiles = walk(NATIVE).filter((f) => f.endsWith('.kt'));
 check(
   !kotlinFiles.some((f) =>
@@ -97,7 +106,11 @@ check(
 );
 
 // 3. Every Kotlin file: package matches its path, brackets balance, no tabs.
-const allKotlin = [...kotlinFiles, ...walk(SPEC_KT).filter((f) => f.endsWith('.kt'))];
+const allKotlin = [
+  ...kotlinFiles,
+  ...walk(SPEC_KT).filter((f) => f.endsWith('.kt')),
+  ...walk(EMOJI_KT).filter((f) => f.endsWith('.kt')),
+];
 const declared = new Set<string>();
 for (const file of allKotlin) {
   const text = readFileSync(file, 'utf8');
@@ -106,6 +119,10 @@ for (const file of allKotlin) {
   const dir = /\/kotlin\/(.+)\/[^/]+\.kt$/.exec(file)?.[1]?.replaceAll('/', '.');
   check(pkg !== undefined && pkg === dir, `${rel}: package matches its directory`);
   check(!text.includes('\t'), `${rel}: no tabs`);
+  check(
+    !/(?:\u200B|\u200C|\u200D|\u200E|\u200F|[\uFE00-\uFE0F]|\uFEFF)/u.test(text),
+    `${rel}: no literal invisible Unicode characters`
+  );
   const code = kotlinCode(text);
   for (const [open, close] of [
     ['{', '}'],
@@ -259,5 +276,5 @@ if (failures.length > 0) {
   process.exit(1);
 }
 console.log(
-  `✓ native structure: ${kotlinFiles.length} Kotlin files, ${allKotlin.length - kotlinFiles.length} generated spec files consumed in place, traces target-independent`
+  `✓ native structure: ${kotlinFiles.length} Kotlin files, ${walk(SPEC_KT).filter((f) => f.endsWith('.kt')).length} generated spec files and ${walk(EMOJI_KT).filter((f) => f.endsWith('.kt')).length} generated emoji files consumed in place, traces target-independent`
 );

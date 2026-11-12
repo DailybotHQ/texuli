@@ -221,8 +221,8 @@ placeholder.
 
 | Module | What it holds | Targets |
 | --- | --- | --- |
-| `texuli-spec` | The generated models, enums and decoders from `packages/spec/generated/kotlin` (compiled in place through `srcDir`, never copied), the generated design tokens (`tokens/DesignTokens.kt`), plus a strict JSON reader, the spec validator (the twin of `validateBlueprint`), the render plan and the semantic trace | JVM, iOS (arm64 and simulator) |
-| `texuli-compose` | The token theme (`TexuliTheme`, Material colors from a generated token set), the native registry (translation dictionary, native side), typed host intents (no activate intent) and Compose components: page, doc, deck, card, deck-slide and bounded responsive grid layouts, text blocks and lists, static board diagrams, stat, KPI, accessible table data blocks, stack, row, split and tile layouts, code blocks, calls to action, dividers and columns, image, figure, video and gallery media frames, compact charts, every chart family and every data view (read-only where the web view is interactive), each with a visible placeholder for anything else | JVM (Compose Desktop) |
+| `texuli-spec` | The generated models, enums and decoders from `packages/spec/generated/kotlin` and the generated emoji catalog from `packages/emojis/generated/kotlin` (compiled in place through `srcDir`, never copied), the generated design tokens (`tokens/DesignTokens.kt`), plus a strict JSON reader, the spec validator (the twin of `validateBlueprint`), the render plan and semantic trace | JVM, iOS (arm64 and simulator) |
+| `texuli-compose` | The token theme (`TexuliTheme`, Material colors from a generated token set), native emoji glyph display using the platform system emoji font (no bundled artwork), the native registry, typed host intents and Compose components: page, doc, deck, card, deck-slide and bounded responsive grid layouts, text blocks and lists, static board diagrams, stat, KPI, accessible table data blocks, stack, row, split and tile layouts, code blocks, calls to action, dividers and columns, image, figure, video and gallery media frames, compact charts, every chart family and every data view (read-only where the web view is interactive), each with a visible placeholder for anything else | JVM (Compose Desktop) |
 | `conformance` | The native half of the dual-target golden gate, the validator parity test, design-token value parity and the six KMP app migration checks | JVM tests |
 
 The native flow follows design §4:
@@ -237,6 +237,22 @@ The native flow follows design §4:
 **Targets.** iOS is compiled for `texuli-spec` only, for a SwiftUI adapter
 (design decision 3). Android is pending the same decision, and Compose for
 the web is not a target, because the web stays Svelte.
+
+## Emoji catalog (ADR-035)
+
+`EmojiEngine` consumes the generated Kotlin catalog in place from
+`packages/emojis/generated/kotlin`; regenerate and check it with
+`pnpm exec tsx scripts/emojis/generate-catalog.ts` and `--check`. The Kotlin
+lookup, tokenizer, shortcode conversion and UTF-16 spans mirror the web
+engine. `tests/fixtures/emojis/conformance.json` is produced from the web
+engine by `scripts/emojis/generate-conformance.ts`; the native conformance
+test checks all fixtures, including supplementary code points and ZWJ
+sequences. Kotlin generated strings escape every UTF-16 unit so invisible
+joiners and variation selectors are not literal source characters.
+
+`EmojiGlyph` paints the canonical Unicode sequence using the platform's
+system emoji font. No Texuli emoji artwork is included; an unknown lookup
+uses its explicit fallback glyph and accessible description.
 
 ## Design tokens (ADR-024)
 
@@ -376,6 +392,7 @@ run on the JVM and (for `texuli-spec`) the iOS simulator as well.
 | `DocumentKeyTest` | `texuli-spec` | Spec 0.7.0 node keys (well formed and unique in the tree) and the `document` node's shape, judged as `validateBlueprint` judges them |
 | `RenderPlanTest` | `texuli-spec` | The render plan's tier gate: ids whose catalog `emit` list lacks the tier become `tier-denied` placeholders (default tier `untrusted`), checked for every catalog id |
 | `SourceTest` | `texuli-spec` | Spec 0.8.0 data-source bindings: a valid binding passes with the host's sources and fails closed without them, the TypeScript refusals (unknown source, a URL name, extra members, page size, fields, sort, operators, values, map, mixed keys, nested bindings), a 10,000-level filter, descriptor decoding and bound plan nodes |
+| `EmojiConformanceTest` | `conformance` | The generated Unicode 18 / CLDR 49 catalog lookup, tokenizer, conversions and UTF-16 spans agree with every web-generated case in `tests/fixtures/emojis/conformance.json` |
 | `AccessibilityTest` | `texuli-compose` | Image alternatives (blank alt is decorative) and heading ranks clamped to 1-6 |
 | `ChartWidgetsTest` | `texuli-compose` | Compact chart props: gaps, variants, title-over-label naming, bounded scales, refusals |
 | `ChartMathParityTest` (jvmTest) | `texuli-compose` | Every case in `conformance/fixtures/chart-vectors.json` (written by `scripts/chart-vectors.ts` from the web's chart and data functions): numbers to 1e-9, SVG paths and labels exactly; a perturbed vector fails |
