@@ -15,6 +15,11 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The packages are on npm at `0.17.5`, a security patch (blueprint spec
+  stays `0.15.0`): the markup URL check runs on the value the serializers
+  write, and toolbar keys move only from toolbar items. The components
+  install reference marks it new in `0.17.5`.
+
 ## [0.4.7] — 2026-11-10
 
 ### Changes

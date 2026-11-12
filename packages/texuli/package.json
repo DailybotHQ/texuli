@@ -1,6 +1,6 @@
 {
   "name": "texuli",
-  "version": "0.17.4",
+  "version": "0.17.5",
   "private": true,
   "description": "Styled Texuli components, layouts and shells.",
   "keywords": [
@@ -419,10 +419,10 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/core": "0.17.4",
-    "@texuli/primitives": "0.17.4",
-    "@texuli/spec": "0.17.4",
-    "@texuli/tokens": "0.17.4"
+    "@texuli/core": "0.17.5",
+    "@texuli/primitives": "0.17.5",
+    "@texuli/spec": "0.17.5",
+    "@texuli/tokens": "0.17.5"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

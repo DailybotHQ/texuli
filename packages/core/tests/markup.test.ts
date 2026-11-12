@@ -149,6 +149,49 @@ describe('core/markup: URLs through the policy', () => {
   });
 });
 
+describe('core/markup: the checked URL is the written URL (0.17.5)', () => {
+  // The serializers drop characters XML cannot carry (unpaired surrogates, U+FFFE, U+FFFF, C0
+  // controls) while writing. A policy check on the raw value saw no scheme in these, at the
+  // developer tier, and the written value then began with javascript:.
+  const hidden = [
+    '\ud83djavascript:alert(1)',
+    'java\ud800script:alert(1)',
+    '\ufffejavascript:alert(1)',
+    'java\uffffscript:alert(1)',
+  ];
+
+  it('refuses a URL that only becomes javascript: once the serializer cleans it', () => {
+    for (const value of hidden) {
+      for (const trust of ['developer', 'untrusted'] as const) {
+        expect(linkUrl(value, trust), `${JSON.stringify(value)} ${trust}`).toBeNull();
+        expect(imageUrl(value, trust), `${JSON.stringify(value)} ${trust}`).toBeNull();
+      }
+    }
+  });
+
+  it('never writes javascript: in HTML or XML for those values', () => {
+    for (const value of hidden) {
+      const href = linkUrl(value, 'developer');
+      const html = serializeHtml(el('p', {}, href ? el('a', { href }, 'x') : 'x'));
+      const xml = serializeXml(el('a', href ? { href: href.value } : {}, 'x'), {
+        declaration: false,
+      });
+      expect(html).not.toMatch(/javascript:/i);
+      expect(xml).not.toMatch(/javascript:/i);
+    }
+  });
+
+  it('keeps an ordinary URL exactly, and checks the cleaned form', () => {
+    expect(linkUrl('https://example.com/a?b=1', 'untrusted')?.value).toBe(
+      'https://example.com/a?b=1'
+    );
+    // A dropped character inside an otherwise safe URL: the value written is the cleaned one.
+    expect(linkUrl('https://example.com/\ud800a', 'developer')?.value).toBe(
+      'https://example.com/a'
+    );
+  });
+});
+
 describe('core/markup: bounded work on hostile input', () => {
   it('serializes a very deep tree without recursion', () => {
     let node = el('d', {}, 'leaf');
