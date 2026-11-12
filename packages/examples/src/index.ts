@@ -33,6 +33,7 @@ import './charts-part-whole/entries.ts';
 import './charts-rtl/entry.ts';
 import './charts-statistical/entry.ts';
 import './charts-windowed/entry.ts';
+import './chat-attachment/entry.ts';
 import './chat-composer/entry.ts';
 import './chat-display/entry.ts';
 import './chat-thread/entry.ts';

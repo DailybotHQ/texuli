@@ -1,5 +1,12 @@
 <script lang="ts">
-import type { Snippet } from 'svelte';
+import {
+  type AutocompleteMatch,
+  applyAutocomplete,
+  autocompleteKeyAction,
+  findAutocompleteTrigger,
+  moveAutocompleteActive,
+} from '@texuli/core/autocomplete-trigger';
+import { type Snippet, tick } from 'svelte';
 import type { HTMLFormAttributes } from 'svelte/elements';
 import { Button } from 'texuli/button';
 import { type ClassValue, chainHandlers, cx } from 'texuli/cx';
@@ -9,6 +16,11 @@ import {
   type ComposerLabels,
   DEFAULT_COMPOSER_LABELS,
 } from './labels.ts';
+import {
+  COMPOSER_MAX_SUGGESTIONS,
+  type ComposerSuggestion,
+  type ComposerSuggestionSource,
+} from './suggestions.ts';
 
 interface OwnProps {
   value?: string;
@@ -53,6 +65,13 @@ interface OwnProps {
   sendButton?: 'label' | 'icon';
   /** The composer's root `form` (bindable). */
   ref?: HTMLFormElement | null;
+  /**
+   * Inline autocomplete sources, one per trigger character (`@` people, `/`
+   * commands, `:` emoji): typing the trigger opens a listbox under the APG
+   * combobox list-autocomplete pattern (Up and Down choose, Enter or Tab
+   * inserts, Escape closes).
+   */
+  suggestions?: readonly ComposerSuggestionSource[];
 }
 /**
  * Other attributes (`id`, `aria-*`, `data-*`, `style`, handlers) land on the
@@ -80,6 +99,7 @@ let {
   sendButton,
   class: className,
   ref = $bindable(null),
+  suggestions = [],
   onsubmit: callerSubmit,
   ...rest
 }: Props = $props();
@@ -94,6 +114,92 @@ const iconOnly = $derived(sendButton === 'icon');
 const canSend = $derived(!disabled && !busy && !streaming && value.trim().length > 0);
 const hintId = `chat-composer-${id}-hint`;
 const errorId = `chat-composer-${id}-error`;
+const listId = `chat-composer-${id}-suggestions`;
+const optionId = (index: number) => `${listId}-${index}`;
+
+// Inline autocomplete: the trigger the caret is in, the options found for it,
+// and the active one. A late answer for an old query is dropped (`request`).
+let match = $state<AutocompleteMatch | null>(null);
+let source = $state<ComposerSuggestionSource | null>(null);
+let options = $state<readonly ComposerSuggestion[]>([]);
+let active = $state(-1);
+/** The trigger the reader closed with Escape: it stays closed until it is deleted. */
+let dismissed = $state<{ start: number; char: string } | null>(null);
+let request = 0;
+const open = $derived(match !== null && options.length > 0);
+const announcement = $derived(
+  open ? labels.suggestions.replace('{count}', String(options.length)) : ''
+);
+
+function closeSuggestions(): void {
+  request += 1;
+  match = null;
+  source = null;
+  options = [];
+  active = -1;
+}
+
+async function updateSuggestions(): Promise<void> {
+  const element = field;
+  const caret = element?.selectionStart ?? value.length;
+  if (!element || suggestions.length === 0 || composing || element.selectionEnd !== caret) {
+    closeSuggestions();
+    return;
+  }
+  const found = findAutocompleteTrigger(
+    value,
+    caret,
+    suggestions.map((entry) => ({
+      char: entry.trigger,
+      ...(entry.lineStart ? { lineStart: true } : {}),
+      ...(entry.minQuery !== undefined ? { minQuery: entry.minQuery } : {}),
+      ...(entry.maxQuery !== undefined ? { maxQuery: entry.maxQuery } : {}),
+    }))
+  );
+  const entry = found && suggestions.find((candidate) => candidate.trigger === found.trigger.char);
+  if (!found || !entry || found.start === dismissed?.start) {
+    closeSuggestions();
+    return;
+  }
+  const ticket = ++request;
+  let results: readonly ComposerSuggestion[] = [];
+  try {
+    results = await entry.search(found.query);
+  } catch {
+    results = [];
+  }
+  if (ticket !== request) return;
+  match = found;
+  source = entry;
+  options = (Array.isArray(results) ? results : []).slice(0, COMPOSER_MAX_SUGGESTIONS);
+  active = options.length > 0 ? 0 : -1;
+}
+
+async function accept(index: number): Promise<void> {
+  const option = options[index];
+  const current = match;
+  if (!option || !current) return;
+  const next = applyAutocomplete(value, current, option.insert);
+  value = next.text;
+  closeSuggestions();
+  await tick();
+  field?.focus();
+  field?.setSelectionRange(next.caret, next.caret);
+  resize();
+}
+
+function onSuggestionKey(event: KeyboardEvent): boolean {
+  if (!open || event.isComposing || composing) return false;
+  const action = autocompleteKeyAction(event.key, event);
+  if (!action) return false;
+  event.preventDefault();
+  if (action === 'accept') void accept(active < 0 ? 0 : active);
+  else if (action === 'close') {
+    dismissed = match ? { start: match.start, char: match.trigger.char } : null;
+    closeSuggestions();
+  } else active = moveAutocompleteActive(active, options.length, action);
+  return true;
+}
 
 function resize(): void {
   const element = field;
@@ -138,6 +244,7 @@ function stop(): void {
 }
 
 function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }): void {
+  if (onSuggestionKey(event)) return;
   onkeydown?.(event);
   if (event.defaultPrevented) return;
   if (event.key === 'Escape' && streaming && onStop) {
@@ -175,6 +282,9 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
     id={`chat-composer-${id}`}
     aria-describedby={error ? `${hintId} ${errorId}` : hintId}
     aria-invalid={error || undefined}
+    aria-autocomplete={suggestions.length > 0 ? 'list' : undefined}
+    aria-controls={open ? listId : undefined}
+    aria-activedescendant={open && active >= 0 ? optionId(active) : undefined}
     placeholder={labels.placeholder}
     disabled={disabled || busy}
     rows="1"
@@ -184,11 +294,45 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
       value = event.currentTarget.value;
       error = false;
       resize();
+      if (dismissed && value.charAt(dismissed.start) !== dismissed.char) dismissed = null;
+      void updateSuggestions();
     }}
     onkeydown={onKeydown}
+    onkeyup={(event) => {
+      if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) void updateSuggestions();
+    }}
+    onclick={() => void updateSuggestions()}
+    onblur={closeSuggestions}
     oncompositionstart={() => (composing = true)}
-    oncompositionend={() => (composing = false)}
+    oncompositionend={() => {
+      composing = false;
+      void updateSuggestions();
+    }}
   ></textarea>
+  {#if open && source}
+    <ul id={listId} class="tx-chat-composer__suggestions" role="listbox" aria-label={source.label} data-tx-chat-suggestions>
+      {#each options as option, index (option.id)}
+        <!-- Pointer choice keeps focus in the field: the field owns the keyboard (aria-activedescendant). -->
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <li
+          id={optionId(index)}
+          class="tx-chat-composer__suggestion"
+          role="option"
+          aria-selected={index === active}
+          onpointerdown={(event) => event.preventDefault()}
+          onclick={() => void accept(index)}
+        >
+          {#if option.glyph}<span class="tx-chat-composer__glyph" aria-hidden="true">{option.glyph}</span>{/if}
+          <span class="tx-chat-composer__suggestion-text">
+            <span class="tx-chat-composer__suggestion-label">{option.label}</span>
+            {#if option.description}<span class="tx-chat-composer__suggestion-description">{option.description}</span>{/if}
+          </span>
+        </li>
+      {/each}
+    </ul>
+  {/if}
+  <!-- A live region without role="status": the thread's typing indicator owns that role. -->
+  <span class="visually-hidden" aria-live="polite" aria-atomic="true" data-tx-chat-suggestions-status>{announcement}</span>
   <div class="tx-chat-composer__actions">
     <div class="tx-chat-composer__attachments">{@render attachments?.()}</div>
     <div class="tx-chat-composer__end">
@@ -219,6 +363,7 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
 <style>
   @layer tx.components {
     .tx-chat-composer {
+      position: relative;
       display: grid;
       gap: var(--tx-chat-composer-gap, var(--tx-space-2));
       border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
@@ -319,6 +464,62 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
       fill: none;
       stroke: currentColor;
       stroke-width: 2;
+    }
+
+    .tx-chat-composer__suggestions {
+      position: absolute;
+      z-index: 1;
+      inset-block-end: calc(100% + var(--tx-space-1));
+      inset-inline: 0;
+      display: grid;
+      gap: var(--tx-space-1);
+      margin: 0;
+      border: var(--tx-border-width-thin) solid var(--tx-border, CanvasText);
+      border-radius: var(--tx-shape-radius-md);
+      background: var(--tx-elevated, var(--tx-surface, Canvas));
+      color: var(--tx-elevated-foreground, var(--tx-surface-foreground, CanvasText));
+      box-shadow: var(--tx-elevation-3, none);
+      padding: var(--tx-space-1);
+      list-style: none;
+      max-block-size: 16rem;
+      overflow-y: auto;
+    }
+
+    .tx-chat-composer__suggestion {
+      display: flex;
+      align-items: center;
+      gap: var(--tx-space-2);
+      border-radius: var(--tx-shape-radius-sm);
+      padding: var(--tx-space-1) var(--tx-space-2);
+      cursor: pointer;
+    }
+
+    .tx-chat-composer__suggestion[aria-selected='true'] {
+      background: var(--tx-accent, Highlight);
+      color: var(--tx-accent-foreground, HighlightText);
+      outline: var(--tx-border-width-thin) solid var(--tx-ring, Highlight);
+    }
+
+    .tx-chat-composer__glyph {
+      display: inline-grid;
+      place-items: center;
+      inline-size: 1.5rem;
+      block-size: 1.5rem;
+      flex: none;
+    }
+
+    .tx-chat-composer__suggestion-text {
+      display: grid;
+      min-inline-size: 0;
+    }
+
+    .tx-chat-composer__suggestion-description {
+      color: var(--tx-muted-foreground, GrayText);
+      font-size: var(--tx-type-label-size);
+    }
+
+    .tx-chat-composer__suggestion[aria-selected='true'] .tx-chat-composer__suggestion-description {
+      color: inherit;
     }
 
     .tx-chat-composer__error {

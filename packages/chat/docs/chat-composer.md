@@ -79,7 +79,54 @@ A host composer that offers mentions, dates or status chips inserts the
 strings from `messageTokens.mention(name, id)`, `messageTokens.date(value)`
 and `messageTokens.status(tone, label)`. They drop characters that would end
 a token early, and they return `null` for input that would not parse back.
-The built-in composer has no mention picker yet (planned).
+The built-in composer reads them with inline autocomplete (below).
+
+## Inline autocomplete: mentions, commands and emoji (PLAN_023)
+
+`suggestions` takes one source per trigger character. Typing the trigger at a
+word start (or, for a `lineStart` source, at the start of a line) opens a
+listbox under the field. It follows the APG combobox list-autocomplete
+pattern on the field itself:
+
+- the field has `aria-autocomplete="list"`, and while the list is open it
+  points `aria-controls` at the listbox and `aria-activedescendant` at the
+  active option;
+- Up and Down move the active option (wrapping), Enter or Tab inserts it,
+  Escape closes the list and keeps it closed for that trigger;
+- a click inserts without moving focus out of the field;
+- a polite status announces how many options are open (`labels.suggestions`,
+  with `{count}`).
+
+Enter sends only when no list is open.
+
+```svelte
+<script lang="ts">
+import { Composer, commandSuggestions, mentionSuggestions } from '@texuli/chat';
+
+const suggestions = [
+  mentionSuggestions([{ id: 'jordan', name: 'Jordan Lee', description: 'Support lead' }]),
+  commandSuggestions([{ name: 'summarize', description: 'Summarize this thread' }]),
+];
+</script>
+
+<Composer onSubmit={send} {suggestions} />
+```
+
+- `mentionSuggestions(people)` uses the `@` trigger. It inserts the mention
+  token `@[Name](mention:id)`, which messages render as a mention.
+- `commandSuggestions(commands)` uses the `/` trigger, only at a line start,
+  and inserts `/name`.
+- Any other source is `{ trigger, label, search }`:
+  - `search(query)` returns at most 8 `{ id, label, description?, glyph?, insert }`
+    options, synchronously or as a promise; a late answer for an old query is
+    dropped;
+  - `glyph` is decorative.
+- An emoji source (`:`) plugs in the same way. A ready-made emoji source from
+  `texuli/emoji` is planned (PLAN_023, after T-emo-web).
+- `ChatThread` forwards `suggestions` to its built-in composer.
+
+The trigger logic is the framework-free texel
+[`@texuli/core/autocomplete-trigger`](../../core/docs/core-autocomplete-trigger.md).
 
 `TypingIndicator` accepts a readonly list of names. Its polite status region is
 empty when no one is typing and announces one, two, or several people otherwise.

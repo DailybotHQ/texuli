@@ -4064,6 +4064,25 @@ export const NON_COMPONENT_IMPORTS: readonly CatalogImport[] = [
     ],
   },
   {
+    module: '@texuli/chat',
+    exports: [
+      'CHAT_ATTACHMENT_LIMITS',
+      'COMPOSER_MAX_SUGGESTIONS',
+      'ChatAttachment',
+      'ChatAttachmentCheck',
+      'ChatAttachmentLabels',
+      'CommandCandidate',
+      'ComposerSuggestion',
+      'ComposerSuggestionSource',
+      'DEFAULT_CHAT_ATTACHMENT_LABELS',
+      'MentionCandidate',
+      'commandSuggestions',
+      'mentionSuggestions',
+      'rankSuggestions',
+      'runAttachmentCheck',
+    ],
+  },
+  {
     module: '@texuli/data',
     exports: [
       'ActivityFeed',

@@ -132,6 +132,51 @@ test('chat: thread and composer pass axe in light and dark; loading earlier mess
     }
   });
 
+  await test.step('the composer autocompletes mentions and commands from the keyboard (PLAN_023)', async () => {
+    await page.goto('/?fixture=chat-composer&mode=light');
+    const composer = page.locator('[data-example-host="chat-composer"]');
+    const field = composer.getByRole('textbox', { name: 'Message' });
+    await field.fill('Thanks @av');
+    const people = composer.getByRole('listbox', { name: 'People' });
+    await expect(people).toBeVisible();
+    await expect(field).toHaveAttribute('aria-activedescendant', /suggestions-0$/);
+    await expect(people.getByRole('option', { selected: true })).toContainText('Avery Chen');
+    await field.press('Enter');
+    await expect(people).toBeHidden();
+    await expect(field).toHaveValue('Thanks @[Avery Chen](mention:avery) ');
+    await field.fill('/s');
+    const commands = composer.getByRole('listbox', { name: 'Commands' });
+    await expect(commands.getByRole('option')).toHaveCount(2);
+    await field.press('ArrowDown');
+    await expect(commands.getByRole('option', { selected: true })).toContainText('/status');
+    await field.press('Escape');
+    await expect(commands).toBeHidden();
+    await expect(field).toHaveValue('/s');
+  });
+
+  await test.step('a blueprint attachment paints only after it validates, and passes axe in light and dark (PLAN_023)', async () => {
+    for (const mode of ['light', 'dark'] as const) {
+      await page.goto(`/?fixture=chat-attachment&mode=${mode}`);
+      const host = page.locator('[data-example-host="chat-attachment"]');
+      const ready = host.getByRole('figure', { name: 'Lighthouse weekly report' });
+      const refused = host.getByRole('figure', { name: 'Quarterly plan' });
+      // The player and the catalog validator load lazily with the example (cold in dev).
+      await expect(refused).toHaveAttribute('data-state', 'refused', { timeout: 60_000 });
+      await expect(refused.getByRole('button')).toHaveCount(0);
+      await expect(refused.getByRole('listitem').first()).toBeVisible();
+      const toggle = ready.getByRole('button', { name: 'Show preview' });
+      await toggle.click();
+      await expect(ready.getByRole('button', { name: 'Hide preview' })).toHaveAttribute(
+        'aria-expanded',
+        'true'
+      );
+      await expect(ready.getByRole('heading', { name: 'Summary' })).toBeVisible({
+        timeout: 30_000,
+      });
+      problems.push(...(await axeProblems(page, 'chat-attachment', mode)));
+    }
+  });
+
   await test.step('a long history is windowed and loading earlier messages scrolls to keep place', async () => {
     await openLongHistory(page);
     const host = page.locator('[data-example-host="chat-thread"]');

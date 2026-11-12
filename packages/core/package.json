@@ -26,6 +26,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./announcer": "./src/announcer/index.ts",
+    "./autocomplete-trigger": "./src/autocomplete-trigger/index.ts",
     "./controllable": "./src/controllable/controllable-state.ts",
     "./data-source": "./src/data-source/index.ts",
     "./dir-locale": "./src/dir-locale/dir-locale.ts",

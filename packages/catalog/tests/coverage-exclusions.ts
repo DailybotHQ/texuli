@@ -317,6 +317,13 @@ add(
   'Planned: the live thread with streaming; chat-thread is the display-only transcript.',
   ['ChatThread']
 );
+// PLAN_023 T-cmp-chat: a chat-attachment catalog id is a spec vocabulary change (owner decision).
+add(
+  '@texuli/chat',
+  'planned',
+  'Planned manifest chat-attachment: a blueprint attachment card (validate, then paint with the player); needs a spec catalog id.',
+  ['ChatAttachment']
+);
 
 // ── @texuli/workflows ──────────────────────────────────────────
 add('@texuli/workflows', 'painted-by', 'Painted by workflow-graph (mode view).', [
@@ -441,5 +448,5 @@ export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(row
 // again in PLAN_016 T-widen-display: Icon, Avatar, Skeleton, Progress, Spinner,
 // Carousel, Separator and ListItem became catalog ids (LucideIcon is a part of
 // icon). Combined ceiling is the live row count.
-// 206: raised by two for MetricCard and FilterBar (PLAN_023), pending their spec catalog ids.
-export const EXCLUSION_CEILING = 206;
+// 207: raised for MetricCard, FilterBar and ChatAttachment (PLAN_023), pending their spec catalog ids.
+export const EXCLUSION_CEILING = 207;
