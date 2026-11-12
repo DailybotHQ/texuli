@@ -56,13 +56,13 @@ export const forms: SolutionEntry = {
     scenarios: ['intake', 'builder'],
     limits: [
       'The intake draft stays in this page session and nothing is submitted.',
-      'The visual builder subpath is branch-only while in development and planned for the next release.',
+      'The visual builder subpath is in development: added after 0.17.4, not on npm yet, planned for the next release.',
     ],
   },
   art: { hero: { slot: 'solution-forms-hero', variant: 'plate' } },
   limits: [
     '@texuli/forms is in development (pre-1.0): a new minor version may break the API.',
-    'The visual builder subpath is branch-only while in development and planned for the next release.',
+    'The visual builder subpath is in development: added after 0.17.4, not on npm yet, planned for the next release.',
     '/forms-page/ stays as the capability reference; it is not redirected (ADR-036).',
   ],
   links: [
