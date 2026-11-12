@@ -13,3 +13,4 @@ export {
   type DashboardLabels,
   DEFAULT_DASHBOARD_LABELS,
 } from './labels.ts';
+export { default as MetricCard } from './MetricCard.svelte';

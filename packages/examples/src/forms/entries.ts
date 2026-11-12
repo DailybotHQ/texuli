@@ -21,3 +21,14 @@ export const formsFieldsExample = defineExample({
   props: ['form', 'values', 'labels'],
   load: () => import('./FormsFieldsDemo.svelte'),
 });
+
+export const formsBuilderExample = defineExample({
+  id: 'forms-builder',
+  title: 'Form builder: edit and preview a schema',
+  description:
+    'Add fields from a palette, reorder them with the keyboard or pointer, inspect field settings, and see the validated form preview and schema JSON update together.',
+  tags: ['forms', 'builder', 'schema', 'keyboard'],
+  component: 'forms/FormBuilder',
+  props: ['schema', 'onChange'],
+  load: () => import('./FormsBuilderDemo.svelte'),
+});

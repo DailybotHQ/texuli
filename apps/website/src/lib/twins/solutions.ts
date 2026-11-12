@@ -207,6 +207,10 @@ export const SOLUTION_OPERATIONS: Readonly<Record<SolutionSlug, readonly string[
   canvas: ['catalog.search', 'component.get', 'blueprint.validate'],
   sheets: ['catalog.search', 'component.get', 'blueprint.validate'],
   'design-systems': ['ds.validate', 'ds.generate', 'ds.compile'],
+  dashboards: ['catalog.search', 'component.get', 'blueprint.validate'],
+  forms: ['catalog.search', 'component.get', 'blueprint.validate'],
+  'agent-chat': ['catalog.search', 'component.get', 'blueprint.validate'],
+  editor: ['catalog.search', 'component.get', 'blueprint.validate'],
 };
 
 /** A "For agents" twin note, the shape of `TwinNote` in `components/docs/twin-notes.ts`. */

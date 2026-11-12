@@ -118,6 +118,30 @@ the enclosing dashboard through context (`DashboardContext`,
 `DashboardWidgetEntry`), which paints it. Outside a dashboard it paints its
 content in place.
 
+## `MetricCard` props
+
+A KPI card for a widget body: a value, a period comparison, a trend and an
+optional sparkline, with loading and empty states.
+
+```svelte
+<MetricCard title="Weekly active teams" value="1,284" trend="up" trendLabel="12%" comparison="vs. last week">
+  {#snippet sparkline()}<Sparkline values={[3, 5, 4, 7, 9]} label="Weekly active teams, last 5 weeks" />{/snippet}
+</MetricCard>
+```
+
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `title` | `string` | required | The card heading. |
+| `value` | `string \| number` | — | The metric, already formatted. Missing or empty shows the empty state. |
+| `comparison` | `string` | — | The period comparison text. |
+| `trend` | `'up' \| 'down' \| 'flat'` | `'flat'` | Direction; the arrow is decorative and the direction is also given as text. |
+| `trendLabel` | `string` | — | The change, such as `12%`. |
+| `loading` | `boolean` | `false` | Shows a status message and sets `aria-busy`. |
+| `empty` | `boolean` | `false` | Shows `emptyLabel` instead of the value. |
+| `emptyLabel` | `string` | `No data for this period` | The empty-state text. |
+| `sparkline` | `Snippet` | — | A small chart; give it its own text alternative. |
+| `class` | `ClassValue` | — | Extra classes on the card. |
+
 ## Accessibility
 
 - A named region; widgets are a list in reading order; each title is a

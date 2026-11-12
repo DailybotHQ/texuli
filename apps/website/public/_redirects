@@ -3,6 +3,8 @@
 # target page exists, both slash forms, one hop, 301. The middleware also redirects the
 # Markdown twins (.md and Accept: text/markdown) of the same paths.
 # /workflows-page/json/ is kept and is never a source.
+# ADR-036: /dashboards-page/, /forms-page/ and /editor-page/ stay as capability
+# reference pages. They are not redirected to /solutions/{dashboards,forms,editor}/.
 
 /slides-page /solutions/slides/ 301
 /slides-page/ /solutions/slides/ 301
