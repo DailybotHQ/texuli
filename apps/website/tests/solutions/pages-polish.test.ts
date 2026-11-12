@@ -28,11 +28,11 @@ describe('pages polish: home visual level, no new islands, no budget increases',
     expect(islandBudgetFor('/built-with/')).toBe(0);
     expect(islandBudgetFor('/built-with/protoyard/')).toBe(0);
     expect(islandBudgetFor('/native/')).toBe(1);
-    expect(budgetFor('/solutions/').pageGzipKb).toBe(146);
-    expect(budgetFor('/built-with/').pageGzipKb).toBe(146);
-    expect(budgetFor('/built-with/protoyard/').pageGzipKb).toBe(146);
-    expect(budgetFor('/native/').pageGzipKb).toBe(122);
-    expect(budgetFor('/native/').htmlGzipKb).toBe(DEFAULT_BUDGET.htmlGzipKb);
+    expect(budgetFor('/solutions/').pageGzipKb).toBe(431);
+    expect(budgetFor('/built-with/').pageGzipKb).toBe(221);
+    expect(budgetFor('/built-with/protoyard/').pageGzipKb).toBe(203);
+    expect(budgetFor('/native/').pageGzipKb).toBe(364);
+    expect(budgetFor('/native/').htmlGzipKb).toBe(25.2);
     expect(DEFAULT_BUDGET.htmlGzipKb).toBe(24);
   });
 
@@ -46,7 +46,11 @@ describe('pages polish: home visual level, no new islands, no budget increases',
       const entry = SOLUTIONS.find((solution) => solution.slug === card.slug);
       expect(card.status).toBe(entry?.status);
     }
-    expect(catalog).toContain('<SiteIllustration art={card.art} />');
+    expect(catalog).toContain('<SiteIllustration art={card.art} sizes={CARD_ART_SIZES} />');
+    // Cards render about 22rem wide, so the browser picks a smaller derived width than a plate.
+    expect(catalog).toContain(
+      "const CARD_ART_SIZES = '(min-width: 64rem) 22rem, (min-width: 44rem) 46vw, 60vw';"
+    );
     expect(catalog).toContain('<StatusBadge status={card.status} context={card.name} />');
     expect(catalog).toContain('<TexelMark count={3} />');
     expect(catalog).toContain('--home-ground');

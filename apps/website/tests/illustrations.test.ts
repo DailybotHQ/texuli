@@ -20,6 +20,7 @@ import {
   illustrationWidths,
   manifestProblems,
 } from '../src/components/landing/illustrations.ts';
+import { webpInfo } from './webp-info.ts';
 
 const WEBSITE = resolve(import.meta.dirname, '..');
 const read = (path: string): string => readFileSync(resolve(WEBSITE, path), 'utf8');
@@ -160,7 +161,7 @@ describe('illustration prompts', () => {
   });
 });
 
-describe('slots awaiting their artwork', () => {
+describe('PLAN_015 slots with their artwork', () => {
   const NEW_SLOTS = [
     'solution-slides-hero',
     'solution-documents-hero',
@@ -202,12 +203,19 @@ describe('slots awaiting their artwork', () => {
     }
   });
 
-  it('ships no file yet, so each slot paints the texel mosaic fallback', () => {
-    const files = new Set(readdirSync(resolve(WEBSITE, 'src/assets/illustrations')));
-    for (const slot of NEW_SLOTS) expect(files.has(`${slot}.webp`), slot).toBe(false);
+  it('ships each light WebP at its exact size with an alpha channel, and no dark file yet', () => {
+    const dir = resolve(WEBSITE, 'src/assets/illustrations');
+    const files = new Set(readdirSync(dir));
+    for (const slot of NEW_SLOTS) {
+      const entry = illustrationFor(slot);
+      if (!entry) continue;
+      const info = webpInfo(readFileSync(resolve(dir, entry.file)));
+      expect(info, slot).toEqual({ width: entry.width, height: entry.height, alpha: true });
+      // Dark variants are optional; until one lands the dark theme shows the light file.
+      if (entry.fileDark) expect(files.has(entry.fileDark), slot).toBe(false);
+    }
     const source = read('src/components/landing/SiteIllustration.astro');
     expect(source).toContain("data-tx-illustration-ready={hasFile ? 'file' : 'fallback'}");
-    expect(source).toContain('class="site-illustration__texels"');
   });
 });
 
@@ -243,9 +251,16 @@ describe('design-systems landing slots (PLAN_017 T-art, ADR-033)', () => {
     }
   });
 
-  it('ships no file yet, so each slot paints the texel mosaic fallback', () => {
-    const files = new Set(readdirSync(resolve(WEBSITE, 'src/assets/illustrations')));
-    for (const slot of SLOTS) expect(files.has(`${slot}.webp`), slot).toBe(false);
+  it('ships each light WebP at its exact size with an alpha channel, and no dark file yet', () => {
+    const dir = resolve(WEBSITE, 'src/assets/illustrations');
+    const files = new Set(readdirSync(dir));
+    for (const slot of SLOTS) {
+      const entry = illustrationFor(slot);
+      if (!entry) continue;
+      const info = webpInfo(readFileSync(resolve(dir, entry.file)));
+      expect(info, slot).toEqual({ width: entry.width, height: entry.height, alpha: true });
+      expect(files.has(`${slot}-dark.webp`), slot).toBe(false);
+    }
   });
 });
 

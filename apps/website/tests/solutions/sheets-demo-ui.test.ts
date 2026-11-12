@@ -95,7 +95,7 @@ describe('sheets solution demo island', () => {
     expect(source).toContain('{source}');
     expect(source).toContain("import { SheetView } from '@texuli/sheets/view'");
     expect(islandBudgetFor('/solutions/sheets/')).toBe(1);
-    expect(budgetFor('/solutions/sheets/').pageGzipKb).toBe(186);
+    expect(budgetFor('/solutions/sheets/').pageGzipKb).toBe(323);
     expect(budgetFor('/solutions/sheets/').htmlGzipKb).toBe(31);
     expect(budgetFor('/solutions/sheets/').jsGzipKb).toBe(64);
   });

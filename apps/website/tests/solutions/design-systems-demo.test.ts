@@ -150,10 +150,11 @@ describe('design-systems demo: source rules and budget', () => {
   it('stays within the /solutions/ island and route budgets', () => {
     expect(islandBudgetFor('/solutions/design-systems/')).toBe(1);
     const budget = budgetFor('/solutions/design-systems/');
-    // Only the HTML gets more room (the brand CSS and the server-rendered island); page and
-    // JavaScript keep the defaults.
+    // The HTML gets more room for the brand CSS and the server-rendered island, and the page
+    // for its measured WebP art (hero, five stories, the how band, Protoyard); JavaScript keeps
+    // the default.
     expect(budget.htmlGzipKb).toBe(29);
-    expect(budget.pageGzipKb).toBe(96);
+    expect(budget.pageGzipKb).toBe(281);
     expect(budget.jsGzipKb).toBe(64);
   });
 });

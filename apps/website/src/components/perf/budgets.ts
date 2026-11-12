@@ -60,8 +60,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/',
     reason:
-      'The unified landing (PLAN_006 T-44) ships zero islands; its module scripts wire the install copy command and the ready signal. The generous page and JS limits below are the old hero-widget floors, kept until T-93 right-sizes them. PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP plates (the eager hero and the lazy plates within the browser’s load-ahead distance load on open, each at the srcset width it renders), 362.9 KB of WebP on open; measured 435.5 KB page, limit 453 (+4% headroom). The transparent hero (2026-11-01) carries an alpha channel and weighs more: measured 491.4 KB page, limit 512 (+4% headroom).',
-    budget: { pageGzipKb: 512, jsGzipKb: 116, lcpMs: 3000 },
+      'The unified landing (PLAN_006 T-44) ships zero islands; its module scripts wire the install copy command and the ready signal. The generous page and JS limits below are the old hero-widget floors, kept until T-93 right-sizes them. PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP plates (the eager hero and the lazy plates within the browser’s load-ahead distance load on open, each at the srcset width it renders), 362.9 KB of WebP on open; measured 435.5 KB page, limit 453 (+4% headroom). The transparent hero (2026-11-01) carries an alpha channel and weighs more: measured 491.4 KB page, limit 512 (+4% headroom). PLAN_015 and PLAN_017 art (2026-11-12): the page shows its nine plates, now including home-built-with, lazy WebP at the srcset width it renders; the lazy-load distance of each browser fetches the plates within reach on open. Measured 607.6 KB page (chromium 438.2, webkit 414.0, mobile 607.6), limit 632 (+4% headroom on the largest).',
+    budget: { pageGzipKb: 632, jsGzipKb: 116, lcpMs: 3000 },
   },
   {
     route: '/component-pages/button/',
@@ -78,8 +78,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/solutions/slides/',
     reason:
-      'ADR-030: this landing replaces /slides-page/ and inherits its current route caps: 168 KB page, 60 KB JavaScript and 27 KB HTML gzip.',
-    budget: { pageGzipKb: 168, jsGzipKb: 60, htmlGzipKb: 27 },
+      'ADR-030: this landing replaces /slides-page/ and inherits its current route caps: 168 KB page, 60 KB JavaScript and 27 KB HTML gzip. PLAN_015 and PLAN_017 art (2026-11-12): the page shows its hero, three story plates and the how band, lazy WebP at the srcset width it renders; the lazy-load distance of each browser fetches the plates within reach on open. Measured 468.4 KB page (chromium 318.8, webkit 234.4, mobile 468.4), limit 488 (+4% headroom on the largest).',
+    budget: { pageGzipKb: 488, jsGzipKb: 60, htmlGzipKb: 27 },
   },
   {
     route: '/drag-page/',
@@ -102,8 +102,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/solutions/documents/',
     reason:
-      'ADR-030: this landing replaces /documents-page/ and inherits its current 182 KB page cap (174 KB until 0.15.0 widened the catalog).',
-    budget: { pageGzipKb: 182 },
+      'ADR-030: this landing replaces /documents-page/ and inherits its current 182 KB page cap (174 KB until 0.15.0 widened the catalog). PLAN_015 and PLAN_017 art (2026-11-12): the page shows its hero, three story plates and the how band, lazy WebP at the srcset width it renders; the lazy-load distance of each browser fetches the plates within reach on open. Measured 506.4 KB page (chromium 315.1, webkit 304.6, mobile 506.4), limit 527 (+4% headroom on the largest).',
+    budget: { pageGzipKb: 527 },
   },
   {
     route: '/forms-page/',
@@ -120,8 +120,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/solutions/canvas/',
     reason:
-      'ADR-030: this landing replaces /canvas-page/ and inherits its current 177 KB page cap (169 KB until 0.15.0 widened the catalog).',
-    budget: { pageGzipKb: 177 },
+      'ADR-030: this landing replaces /canvas-page/ and inherits its current 177 KB page cap (169 KB until 0.15.0 widened the catalog). PLAN_015 and PLAN_017 art (2026-11-12): the page shows its hero, three story plates and the how band, lazy WebP at the srcset width it renders; the lazy-load distance of each browser fetches the plates within reach on open. Measured 319.0 KB page (chromium 262.8, webkit 183.2, mobile 319.0), limit 332 (+4% headroom on the largest).',
+    budget: { pageGzipKb: 332 },
   },
   {
     route: '/sheets-page/',
@@ -132,8 +132,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/solutions/sheets/',
     reason:
-      'ADR-030: this landing replaces /sheets-page/ and inherits its current 186 KB page cap, 236 KB raw HTML cap and 31 KB HTML gzip cap.',
-    budget: { pageGzipKb: 186, htmlRawKb: 236, htmlGzipKb: 31 },
+      'ADR-030: this landing replaces /sheets-page/ and inherits its current 186 KB page cap, 236 KB raw HTML cap and 31 KB HTML gzip cap. PLAN_015 and PLAN_017 art (2026-11-12): the page shows its hero, three story plates and the how band, lazy WebP at the srcset width it renders; the lazy-load distance of each browser fetches the plates within reach on open. Measured 310.3 KB page (chromium 259.3, webkit 192.1, mobile 310.3), limit 323 (+4% headroom on the largest).',
+    budget: { pageGzipKb: 323, htmlRawKb: 236, htmlGzipKb: 31 },
   },
   {
     route: '/showcase/dashboard/',
@@ -198,14 +198,14 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/solutions/workflows/',
     reason:
-      'ADR-030: this landing replaces /workflows-page/ and inherits its current 132 KB page and 96 KB JavaScript caps.',
-    budget: { pageGzipKb: 132, jsGzipKb: 96 },
+      'ADR-030: this landing replaces /workflows-page/ and inherits its current 132 KB page and 96 KB JavaScript caps. PLAN_015 and PLAN_017 art (2026-11-12): the page shows its hero, three story plates and the how band, lazy WebP at the srcset width it renders; the lazy-load distance of each browser fetches the plates within reach on open. Measured 311.0 KB page (chromium 252.6, webkit 145.2, mobile 311.0), limit 324 (+4% headroom on the largest).',
+    budget: { pageGzipKb: 324, jsGzipKb: 96 },
   },
   {
     route: '/solutions/design-systems/',
     reason:
-      'PLAN_017 T-demo: the server-rendered demo island and its three build-time brands as one inline style (light and dark), so no compiler ships. Measured 2026-11-10: 27.0 KB gzip of HTML; page and JS fit the defaults. Limit 29 (+4%, Linux gzip drift).',
-    budget: { htmlGzipKb: 29 },
+      'PLAN_017 T-demo: the server-rendered demo island and its three build-time brands as one inline style (light and dark), so no compiler ships. Measured 2026-11-10: 27.0 KB gzip of HTML; page and JS fit the defaults. Limit 29 (+4%, Linux gzip drift). PLAN_015 and PLAN_017 art (2026-11-12): the page shows its hero, five story plates, the how band and the Protoyard plate, lazy WebP at the srcset width it renders; the lazy-load distance of each browser fetches the plates within reach on open. Measured 270.1 KB page (chromium 270.1, webkit 194.9, mobile 195.5), limit 281 (+4% headroom on the largest).',
+    budget: { pageGzipKb: 281, htmlGzipKb: 29 },
   },
   {
     route: '/workflows-page/json/',
@@ -345,20 +345,20 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/solutions/',
     reason:
-      'Static Solution catalog cap derived from the comparable static catalog at /design-systems/ (146 KB page since 0.16.0).',
-    budget: { pageGzipKb: 146 },
+      'Static Solution catalog cap derived from the comparable static catalog at /design-systems/ (146 KB page since 0.16.0). PLAN_015 and PLAN_017 art (2026-11-12): the page shows its banner and six hero plates; the cards ask for about 22rem on desktop and 60vw on phones (sizes), so a phone gets the 800 px width, lazy WebP at the srcset width it renders; the lazy-load distance of each browser fetches the plates within reach on open. Measured 413.8 KB page (chromium 230.3, webkit 357.9, mobile 413.8), limit 431 (+4% headroom on the largest).',
+    budget: { pageGzipKb: 431 },
   },
   {
     route: '/built-with/',
     reason:
-      'Static product catalog cap derived from the comparable static catalog at /design-systems/ (146 KB page since 0.16.0).',
-    budget: { pageGzipKb: 146 },
+      'Static product catalog cap derived from the comparable static catalog at /design-systems/ (146 KB page since 0.16.0). PLAN_015 and PLAN_017 art (2026-11-12): the page shows its page-built-with banner, lazy WebP at the srcset width it renders; the lazy-load distance of each browser fetches the plates within reach on open. Measured 212.4 KB page (chromium 114.4, webkit 212.4, mobile 144.9), limit 221 (+4% headroom on the largest).',
+    budget: { pageGzipKb: 221 },
   },
   {
     route: '/native/',
     reason:
-      'PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (45.0 KB of WebP on open, logo included); measured 116.5 KB page, limit 122 (+4% headroom).',
-    budget: { pageGzipKb: 122 },
+      'PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (45.0 KB of WebP on open, logo included); measured 116.5 KB page, limit 122 (+4% headroom). PLAN_015 and PLAN_017 art (2026-11-12): the page shows its hero plate and five section plates (shared blueprint, parity, solutions, agents, start), lazy WebP at the srcset width it renders; the lazy-load distance of each browser fetches the plates within reach on open. Measured 349.9 KB page (chromium 206.2, webkit 349.9, mobile 294.1), limit 364 (+4% headroom on the largest). The five plates add their srcset markup: measured 24.2 KB gzip of HTML, limit 25.2 (+4% headroom).',
+    budget: { pageGzipKb: 364, htmlGzipKb: 25.2 },
   },
   {
     route: '/native/compatibility/',
@@ -393,8 +393,8 @@ export const ROUTE_PREFIX_BUDGETS: readonly PrefixBudgetOverride[] = Object.free
     prefix: '/built-with/',
     label: '/built-with/<slug>/',
     reason:
-      'Static product pages use the comparable /design-systems/ catalog cap (146 KB page since 0.16.0).',
-    budget: { pageGzipKb: 146 },
+      'Static product pages use the comparable /design-systems/ catalog cap (146 KB page since 0.16.0). PLAN_015 and PLAN_017 art (2026-11-12): the page shows the built-with-protoyard plate (measured on /built-with/protoyard/), lazy WebP at the srcset width it renders; the lazy-load distance of each browser fetches the plates within reach on open. Measured 194.9 KB page (chromium 118.5, webkit 194.9, mobile 151.5), limit 203 (+4% headroom on the largest).',
+    budget: { pageGzipKb: 203 },
   },
   {
     prefix: '/guides/solutions/',

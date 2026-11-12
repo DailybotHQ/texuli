@@ -1,6 +1,7 @@
 ---
 import { safeHref } from '@texuli/core/url-policy';
 import { REPOSITORY_URL } from '../../../foundation/site.ts';
+import SiteIllustration from '../../../landing/SiteIllustration.astro';
 import {
   NATIVE_COMPONENT_SOURCE,
   NATIVE_COMPONENT_TRAVEL,
@@ -12,13 +13,18 @@ const codeHref = (path: string) => safeHref(`${REPOSITORY_URL}/blob/main/${path}
 ---
 
 <section class="native-travel" aria-labelledby="native-travel-title" data-tx-native-travel="">
-  <div class="native-travel__heading">
-    <p class="native-travel__eyebrow">Shared intent · target-specific rendering</p>
-    <h2 id="native-travel-title">How components travel</h2>
-    <p>
-      A catalog node keeps its validated meaning as a blueprint crosses the web and Kotlin toolchains.
-      The renderers can differ: semantic and functional equivalence matters more than matching pixels.
-    </p>
+  <div class="native-travel__intro">
+    <div class="native-travel__heading">
+      <p class="native-travel__eyebrow">Shared intent · target-specific rendering</p>
+      <h2 id="native-travel-title">How components travel</h2>
+      <p>
+        A catalog node keeps its validated meaning as a blueprint crosses the web and Kotlin toolchains.
+        The renderers can differ: semantic and functional equivalence matters more than matching pixels.
+      </p>
+    </div>
+    <div class="native-travel__art">
+      <SiteIllustration art="native-parity" />
+    </div>
   </div>
 
   <ol class="native-travel__steps" aria-label="Blueprint path from catalog to renderer">
@@ -67,6 +73,9 @@ const codeHref = (path: string) => safeHref(`${REPOSITORY_URL}/blob/main/${path}
 
 <style>
   .native-travel { display: grid; gap: 1.5rem; max-inline-size: 78rem; margin-inline: auto; padding: clamp(2.5rem, 7vw, 5rem) clamp(1rem, 4vw, 1.5rem); color: var(--tx-foreground, CanvasText); }
+  .native-travel__intro { display: grid; gap: clamp(1.25rem, 3vw, 2.5rem); align-items: center; }
+  @media (min-width: 60rem) { .native-travel__intro { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); } }
+  .native-travel__art { inline-size: 100%; max-inline-size: 34rem; min-inline-size: 0; justify-self: center; }
   .native-travel__heading { max-inline-size: 48rem; }
   .native-travel__eyebrow { margin: 0 0 0.45rem; color: var(--tx-muted-foreground, GrayText); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.05em; }
   .native-travel h2 { margin: 0; font-size: clamp(1.65rem, 4vw, 2.4rem); line-height: 1.15; }

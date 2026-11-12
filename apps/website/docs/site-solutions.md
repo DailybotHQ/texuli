@@ -31,7 +31,7 @@ pilot; the other four copy its structure.
 | Docs | `src/pages/guides/solutions/<slug>/`, content in `src/content/solution-docs/<slug>/`, `src/components/solutions/docs-layout/` | shipped for all five | `8ae0c731` (shared page) |
 | Agent surfaces | `src/lib/twins/solutions.ts` (index JSON, llms.txt sections, twin notes), `apps/website/scripts/solutions-surfaces.ts` | shipped | `3fe23da3` |
 | Built with Texuli | `src/pages/built-with/`, `src/components/built-with/`, `src/data/products/` | shipped: `/built-with/` and `/built-with/protoyard/` | `25531456`, `f20d53e3`, `247041ad` |
-| Art | `solution-<slug>-hero` slots in `src/data/illustrations.json` | slots registered; the WebP files are not in the repository yet, so each hero paints the texel mosaic | — |
+| Art | `solution-<slug>-hero` slots in `src/data/illustrations.json` | slots registered, each with its WebP in `src/assets/illustrations/` (dark variants optional, not yet added) | — |
 | Redirects (ADR-028) | `apps/website/public/_redirects`, `functions/_middleware.ts` | mechanism shipped (`5c4e8ac2`); the five `*-page` moves stay commented until the migration wave enables them | `5c4e8ac2` |
 | End-to-end specs | `tests/e2e/site-solution-<slug>.spec.ts` | Slides, Documents, Canvas and Sheets; Workflows planned | — |
 
