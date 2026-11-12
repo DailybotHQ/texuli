@@ -30,6 +30,12 @@ const markdown = writeMarkdown(tree);
   - `gfm`: the GFM extensions, on by default. `false` reads strict
     CommonMark; an object turns single extensions off, for example
     `{ footnote: false }`.
+- `parseInlineMarkdown(source, options)` returns `{ children, diagnostics }`:
+  inline content only, with no block structure (a leading `#`, `-` or `>`
+  stays text), for closed inline vocabularies such as chat messages and
+  catalog rich text. Links and images carry `position`, their offsets in
+  the source with line endings read as `\n`, so a filter can keep a
+  refused one exactly as written.
 - `writeMarkdown(tree, options)` returns Markdown text. It never throws: a
   value that is not a tree writes `''`. `MarkdownWriteOptions` sets the
   `bullet` (`-` by default).
