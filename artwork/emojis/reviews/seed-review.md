@@ -26,6 +26,13 @@ not a shipped input. The candidate thumb is shorter, broader, angled and
 side-mounted; the references show long upright digits. Comparison notes are
 stored per tone in `meaning-review.json` and `meaning-checklist.md`.
 
+R4 removes the notch between the fist and thumb so the outline is one thicker,
+rounded and slightly tapered lobe. Re-rendered all five tones beside both
+throwaway references at 64 px and 24 px on light and dark grounds; the R4
+single-lobe thumb remains separate from the references' long upright digits.
+Updated per-tone verdicts and comparison notes are in the same meaning-review
+artifacts.
+
 ## Representative before/after checks
 
 | Design | Before: authored source | After: deterministic package output | Review result |
