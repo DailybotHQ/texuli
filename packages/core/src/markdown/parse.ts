@@ -74,11 +74,19 @@ class Builder {
   private readonly limits: MarkdownLimits;
   private readonly inline: InlineParser;
   private readonly gfm: GfmFlags;
+  /** Inline-only reads: links and images carry their source position. */
+  positions = false;
 
   constructor(limits: MarkdownLimits, inline: InlineParser, gfm: GfmFlags) {
     this.limits = limits;
     this.inline = inline;
     this.gfm = gfm;
+  }
+
+  private where(node: InlineNode): { position?: { start: number; end: number } } {
+    return this.positions && node.start !== undefined && node.end !== undefined
+      ? { position: { start: node.start, end: node.end } }
+      : {};
   }
 
   /** Count one node; false once the tree is full. */
@@ -206,7 +214,7 @@ class Builder {
     return { type: 'tableRow', children: cells };
   }
 
-  private inlines(content: string): MdInline[] {
+  inlines(content: string): MdInline[] {
     const root = this.inline.parse(content);
     return this.convert(root.first, 0, false);
   }
@@ -241,6 +249,7 @@ class Builder {
               url: node.url ?? '',
               alt: plainText(node),
               ...(node.title ? { title: node.title } : {}),
+              ...this.where(node),
             });
           break;
         default:
@@ -256,6 +265,7 @@ class Builder {
               url: node.url ?? '',
               ...(node.title ? { title: node.title } : {}),
               children: this.convert(node.first, depth + 1, true),
+              ...this.where(node),
             });
           else
             out.push({
@@ -368,22 +378,69 @@ const emptyRoot = (): MdRoot => ({ type: 'root', version: MARKDOWN_AST_VERSION, 
  * Parse CommonMark 0.31.2 into the `texuli-md/v1` AST. Never throws: a non-string source reads as
  * empty, and every limit it hits is reported in `diagnostics`.
  */
+/** The source cut to the limit (never splitting a surrogate pair), with its diagnostic. */
+function boundedSource(
+  source: unknown,
+  limits: MarkdownLimits,
+  diagnostics: MarkdownDiagnostic[]
+): string {
+  const text = typeof source === 'string' ? source : '';
+  if (text.length <= limits.source) return text;
+  let cut = limits.source;
+  const before = text.charCodeAt(cut - 1);
+  if (before >= 0xd800 && before <= 0xdbff) cut--;
+  diagnostics.push({
+    code: 'source-truncated',
+    message: `The source is longer than ${limits.source} characters; the rest was dropped.`,
+    position: { start: cut, end: text.length },
+  });
+  return text.slice(0, cut);
+}
+
+export interface MarkdownInlineResult {
+  readonly children: readonly MdInline[];
+  readonly diagnostics: readonly MarkdownDiagnostic[];
+}
+
+/**
+ * Parse `source` as inline content only (no block structure: a leading `#`, `-` or `>` stays
+ * text), the way a paragraph's text is read. For closed inline vocabularies (chat messages,
+ * catalog rich text) that split blocks themselves. Line endings become soft or hard breaks;
+ * link reference definitions and footnotes have nothing to resolve against. Inline links and
+ * images carry `position` (offsets into `source` with line endings read as `\n`), so a filter
+ * can keep a refused one exactly as written. Never throws.
+ */
+export function parseInlineMarkdown(
+  source: unknown,
+  options?: MarkdownParseOptions
+): MarkdownInlineResult {
+  const limits = limitsOf(options);
+  const diagnostics: MarkdownDiagnostic[] = [];
+  const text = boundedSource(source, limits, diagnostics)
+    .replace(/\r\n?/g, '\n')
+    .split('\u0000')
+    .join('\uFFFD');
+  try {
+    const gfm = gfmFlags(options?.gfm);
+    const inline = new InlineParser(new Map(), { gfm, footnotes: new Map() });
+    const builder = new Builder(limits, inline, gfm);
+    builder.positions = true;
+    const children = builder.inlines(text);
+    diagnostics.push(...builder.diagnostics);
+    return { children, diagnostics };
+  } catch {
+    diagnostics.push({
+      code: 'unsupported-construct',
+      message: 'The Markdown reader stopped on an internal error; the text was dropped.',
+    });
+    return { children: [], diagnostics };
+  }
+}
+
 export function parseMarkdown(source: unknown, options?: MarkdownParseOptions): MarkdownReadResult {
   const limits = limitsOf(options);
   const diagnostics: MarkdownDiagnostic[] = [];
-  let text = typeof source === 'string' ? source : '';
-  if (text.length > limits.source) {
-    // Never split a surrogate pair.
-    let cut = limits.source;
-    const before = text.charCodeAt(cut - 1);
-    if (before >= 0xd800 && before <= 0xdbff) cut--;
-    diagnostics.push({
-      code: 'source-truncated',
-      message: `The source is longer than ${limits.source} characters; the rest was dropped.`,
-      position: { start: cut, end: text.length },
-    });
-    text = text.slice(0, cut);
-  }
+  const text = boundedSource(source, limits, diagnostics);
   try {
     const refmap: ReferenceMap = new Map();
     const gfm = gfmFlags(options?.gfm);

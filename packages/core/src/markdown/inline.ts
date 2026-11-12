@@ -41,6 +41,9 @@ export interface InlineNode {
   title?: string;
   /** Text from an escape or a character reference: never part of an extended autolink. */
   literal?: boolean;
+  /** Links and images: where they start and end in the subject. */
+  start?: number;
+  end?: number;
   parent: InlineNode | null;
   prev: InlineNode | null;
   next: InlineNode | null;
@@ -704,6 +707,8 @@ export class InlineParser {
     }
     const node = inlineNode(opener.image ? 'image' : 'link');
     node.url = url ?? '';
+    node.start = opener.image ? opener.index - 1 : opener.index;
+    node.end = this.pos;
     if (title) node.title = title;
     let tmp = opener.node.next;
     while (tmp) {

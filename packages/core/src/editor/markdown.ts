@@ -1,7 +1,14 @@
+import {
+  type MdBlock,
+  type MdInline,
+  parseInlineMarkdown,
+  parseMarkdown,
+} from '../markdown/index.ts';
 import { normalizeDocument, paragraph } from './document.ts';
 import {
   acceptsExtensionId,
   EDITOR_EXTENSION_LIMITS,
+  EDITOR_EXTENSION_SIGILS,
   type EditorInlineExtension,
   type EditorInlineExtensions,
   isExtensionIdChar,
@@ -58,12 +65,7 @@ const RULE = /^ {0,3}([-*_])(?:[ \t]*\1){2,}[ \t]*$/;
 const QUOTE = /^ {0,3}> ?(.*)$/s;
 const BULLET = /^( {0,3})([-*+])[ \t]+(.*)$/s;
 const ORDERED = /^( {0,3})(\d{1,9})[.)][ \t]+(.*)$/s;
-const TASK = /^\[([ xX])\][ \t]+/;
-const IMAGE_ONLY = /^!\[((?:[^\]\\\n]|\\.)*)\]\(\s*<?([^\s()<>]+)>?\s*\)$/;
-/** CommonMark 2.4: a backslash before any ASCII punctuation character is an escape. */
-const ESCAPABLE = /[!-/:-@[-`{-~]/;
 
-const isBlank = (line: string) => line.trim() === '';
 const isSpace = (char: string | undefined) => char === ' ' || char === '\t';
 
 /** A fence opening line: its marker and the optional language. */
@@ -114,11 +116,67 @@ const startsBlock = (line: string) =>
   QUOTE.test(line) ||
   listMarker(line) !== null;
 
+/** The GFM the editor reads: task items and strikethrough (tables, footnotes and bare autolinks are not in the subset). */
+const EDITOR_GFM = {
+  table: false,
+  footnote: false,
+  autolink: false,
+  strikethrough: true,
+  taskList: true,
+} as const;
+
+// An escaped `{`, `}` or extension sigil must not open or close an extension token: before the
+// shared parser reads the source, each becomes a private-use placeholder (U+E000 onwards),
+// restored afterwards (as the character in text, as the escape in code and raw HTML). A
+// placeholder character already in the source becomes U+FFFD.
+const SHIELDED = ['{', '}', ...EDITOR_EXTENSION_SIGILS] as const;
+const PLACEHOLDER_BASE = 0xe000;
+const PLACEHOLDERS = new RegExp(
+  `[\\uE000-\\u${(PLACEHOLDER_BASE + SHIELDED.length - 1).toString(16)}]`,
+  'g'
+);
+const placeholderOf = new Map<string, string>(
+  SHIELDED.map((char, index) => [char, String.fromCharCode(PLACEHOLDER_BASE + index)])
+);
+
+function shield(source: string): string {
+  PLACEHOLDERS.lastIndex = 0;
+  if (!source.includes('\\') && !PLACEHOLDERS.test(source)) return source;
+  let out = '';
+  for (let i = 0; i < source.length; i += 1) {
+    const c = source[i] as string;
+    const code = c.charCodeAt(0);
+    if (code >= PLACEHOLDER_BASE && code < PLACEHOLDER_BASE + SHIELDED.length) out += '\uFFFD';
+    else if (c === '\\' && i + 1 < source.length) {
+      const next = source[i + 1] as string;
+      out += placeholderOf.get(next) ?? c + next;
+      i += 1;
+    } else out += c;
+  }
+  return out;
+}
+
+const restore = (text: string, escaped: boolean) =>
+  text.replace(PLACEHOLDERS, (char) => {
+    const original = SHIELDED[char.charCodeAt(0) - PLACEHOLDER_BASE] as string;
+    return escaped ? `\\${original}` : original;
+  });
+/** Placeholders back to their characters (text, URLs, alt text). */
+const unshield = (text: string) => restore(text, false);
+/** Placeholders back to the escapes as written (code and raw HTML keep backslashes). */
+const unshieldRaw = (text: string) => restore(text, true);
+
 /**
  * Read Markdown (untrusted by default) into a valid document. Never throws:
  * nesting deeper than the depth cap and oversized input degrade to text,
  * refused links keep their text, headings deeper than 4 become level 4, and
  * each degradation is reported once in `diagnostics`.
+ *
+ * The source is read by the shared CommonMark parser (`@texuli/core/markdown`,
+ * ADR-034; GFM task items and strikethrough) and filtered down to the editor
+ * vocabulary: setext headings read as headings and indented code as code, raw
+ * HTML stays literal text, link reference definitions resolve their links and
+ * are not kept, and an image alone in a paragraph becomes a media block.
  */
 export function fromMarkdown(source: unknown, options: MarkdownReadOptions = {}): EditorLoadResult {
   const budget = new LoadBudget(options);
@@ -128,575 +186,251 @@ export function fromMarkdown(source: unknown, options: MarkdownReadOptions = {})
     budget.report('text-truncated', `Markdown after ${max} characters was dropped.`);
     text = text.slice(0, max);
   }
-  const reader = new Reader(budget);
-  const blocks = reader.blocks(text.split('\n'), 0);
+  const parsed = parseMarkdown(shield(text), {
+    gfm: EDITOR_GFM,
+    limits: { blockDepth: budget.limits.depth, inlineDepth: MARKDOWN_CODEC_LIMITS.inlineDepth },
+  });
+  const blocks = new Projector(budget).blocks(parsed.tree.children);
+  if (parsed.diagnostics.some((diagnostic) => diagnostic.code === 'depth-limit'))
+    budget.report('depth-capped', 'Lists and quotes nested past the depth cap became text.');
   return {
     doc: normalizeDocument({ version: 1, blocks }, budget.newId),
     diagnostics: budget.diagnostics,
   };
 }
 
-class Reader {
+/** The shared tree filtered down to editor blocks and runs. */
+class Projector {
   readonly budget: LoadBudget;
 
   constructor(budget: LoadBudget) {
     this.budget = budget;
   }
 
-  blocks(lines: readonly string[], depth: number): EditorBlock[] {
+  blocks(nodes: readonly MdBlock[]): EditorBlock[] {
     const out: EditorBlock[] = [];
-    const push = (make: () => EditorBlock | null) => {
-      if (!this.budget.block()) return;
-      const block = make();
-      if (block) out.push(block);
-    };
-    let i = 0;
-    while (i < lines.length) {
+    for (const node of nodes) {
       if (this.budget.blocks >= this.budget.limits.blocks) {
         this.budget.block();
         break;
       }
-      const line = lines[i] ?? '';
-      if (isBlank(line)) {
-        i += 1;
+      if (node.type === 'list') {
+        const list = this.list(node);
+        if (list) out.push(list);
         continue;
       }
-      const fence = readFence(line);
-      if (fence) {
-        const marker = fence.marker;
-        const body: string[] = [];
-        i += 1;
-        while (i < lines.length && !(lines[i] ?? '').trim().startsWith(marker)) {
-          body.push(lines[i] ?? '');
-          i += 1;
-        }
-        i += 1;
-        const lang = fence.lang;
-        push(() => {
-          const code = this.budget.text(this.budget.clean(body.join('\n'), '\n\t'));
-          return lang
-            ? { id: this.budget.newId(), type: 'code', lang, text: code }
-            : { id: this.budget.newId(), type: 'code', text: code };
-        });
-        continue;
-      }
-      const heading = readHeading(line);
-      if (heading) {
-        const level = heading.level;
-        if (level > 4)
-          this.budget.report('heading-clamped', 'Headings deeper than level 4 became level 4.');
-        push(() => ({
-          id: this.budget.newId(),
-          type: 'heading',
-          level: Math.min(level, 4) as 1 | 2 | 3 | 4,
-          content: trimEdges(this.inline(heading.text.trim())),
-        }));
-        i += 1;
-        continue;
-      }
-      if (RULE.test(line)) {
-        push(() => ({ id: this.budget.newId(), type: 'divider' }));
-        i += 1;
-        continue;
-      }
-      if (QUOTE.test(line)) {
-        const inner: string[] = [];
-        while (i < lines.length && QUOTE.test(lines[i] ?? '')) {
-          inner.push(QUOTE.exec(lines[i] ?? '')?.[1] ?? '');
-          i += 1;
-        }
-        if (depth < this.budget.limits.depth) {
-          push(() => {
-            const blocks = this.blocks(inner, depth + 1);
-            return blocks.length ? { id: this.budget.newId(), type: 'quote', blocks } : null;
-          });
-        } else {
-          this.budget.report(
-            'depth-capped',
-            'Lists and quotes nested past the depth cap became text.'
-          );
-          push(() => this.paragraph(inner.join('\n')));
-        }
-        continue;
-      }
-      const marker = listMarker(line);
-      if (marker) {
-        const parsed = this.list(lines, i, marker.ordered, marker.start, depth);
-        if (parsed.block) out.push(parsed.block);
-        i = parsed.next;
-        continue;
-      }
-      const lines_: string[] = [line];
-      i += 1;
-      while (i < lines.length && !isBlank(lines[i] ?? '') && !startsBlock(lines[i] ?? '')) {
-        lines_.push(lines[i] ?? '');
-        i += 1;
-      }
-      push(() => {
-        // An empty paragraph (a blank link label, say) cannot be written back: drop it.
-        const block = this.paragraph(lines_.join('\n'));
-        return block.type === 'paragraph' && block.content.length === 0 ? null : block;
-      });
+      if (node.type === 'definition') continue;
+      if (!this.budget.block()) continue;
+      const block = this.block(node);
+      if (block) out.push(block);
     }
     return out;
   }
 
-  paragraph(source: string): EditorBlock {
-    const trimmed = source.trim();
-    const image = IMAGE_ONLY.exec(trimmed);
-    if (image?.[2]) {
-      const alt = this.budget.text(this.budget.clean(unescapeMarkdown(image[1] ?? ''), ''));
-      return { id: this.budget.newId(), type: 'media', ref: image[2], alt };
+  private block(node: MdBlock): EditorBlock | null {
+    const { budget } = this;
+    switch (node.type) {
+      case 'paragraph': {
+        const only = node.children[0];
+        if (node.children.length === 1 && only?.type === 'image' && !only.title && only.url) {
+          const alt = budget.text(budget.clean(unshield(only.alt), ''));
+          return { id: budget.newId(), type: 'media', ref: unshield(only.url), alt };
+        }
+        // An empty paragraph (a blank link label, say) cannot be written back: drop it.
+        const content = trimEdges(this.inline(node.children));
+        return content.length === 0 ? null : paragraph(content, budget.newId());
+      }
+      case 'heading':
+        if (node.depth > 4)
+          budget.report('heading-clamped', 'Headings deeper than level 4 became level 4.');
+        return {
+          id: budget.newId(),
+          type: 'heading',
+          level: Math.min(node.depth, 4) as 1 | 2 | 3 | 4,
+          content: trimEdges(this.inline(node.children)),
+        };
+      case 'thematicBreak':
+        return { id: budget.newId(), type: 'divider' };
+      case 'code': {
+        const text = budget.text(budget.clean(unshieldRaw(node.value), '\n\t'));
+        const lang =
+          node.lang && !node.meta && FENCE_LANG.test(node.lang)
+            ? node.lang.toLowerCase()
+            : undefined;
+        return lang
+          ? { id: budget.newId(), type: 'code', lang, text }
+          : { id: budget.newId(), type: 'code', text };
+      }
+      case 'blockquote': {
+        const blocks = this.blocks(node.children);
+        return blocks.length ? { id: budget.newId(), type: 'quote', blocks } : null;
+      }
+      case 'html': {
+        // Raw HTML is never markup: the block reads as a paragraph whose tags stay literal text.
+        const { children } = parseInlineMarkdown(node.value, { gfm: EDITOR_GFM });
+        const content = trimEdges(this.inline(children));
+        return content.length === 0 ? null : paragraph(content, budget.newId());
+      }
+      default:
+        return null;
     }
-    return paragraph(trimEdges(this.inline(trimmed)), this.budget.newId());
   }
 
-  list(
-    lines: readonly string[],
-    from: number,
-    ordered: boolean,
-    start: number,
-    depth: number
-  ): { block: EditorBlock | null; next: number } {
-    const raw: { checked: boolean | null; body: string[] }[] = [];
-    let i = from;
-    while (i < lines.length) {
-      const marker = listMarker(lines[i] ?? '');
-      if (!marker || marker.ordered !== ordered) break;
-      const body: string[] = [marker.content];
-      i += 1;
-      while (i < lines.length) {
-        const next = lines[i] ?? '';
-        if (isBlank(next)) {
-          if (/^ {2,}\S/.test(lines[i + 1] ?? '')) {
-            body.push('');
-            i += 1;
-            continue;
-          }
-          break;
-        }
-        if (/^ {2,}\S/.test(next)) {
-          body.push(next.replace(/^ {2,4}/, ''));
-          i += 1;
-          continue;
-        }
-        if (startsBlock(next)) break;
-        body.push(next);
-        i += 1;
-      }
-      let checked: boolean | null = null;
-      const task = TASK.exec(body[0] ?? '');
-      if (task) {
-        checked = task[1] !== ' ';
-        body[0] = (body[0] ?? '').slice(task[0].length);
-      }
-      raw.push({ checked, body });
-    }
-    if (!this.budget.block()) return { block: null, next: i };
-    if (depth >= this.budget.limits.depth) {
-      this.budget.report('depth-capped', 'Lists and quotes nested past the depth cap became text.');
-      return { block: this.paragraph(raw.map((item) => item.body.join(' ')).join('\n')), next: i };
-    }
-    const todo = raw.some((item) => item.checked !== null);
-    const kind: EditorListKind = todo ? 'todo' : ordered ? 'ordered' : 'bullet';
+  private list(node: Extract<MdBlock, { type: 'list' }>): EditorBlock | null {
+    const { budget } = this;
+    if (!budget.block()) return null;
+    const todo = node.children.some((item) => item.checked !== undefined);
+    const kind: EditorListKind = todo ? 'todo' : node.ordered ? 'ordered' : 'bullet';
     const items: EditorListItem[] = [];
-    for (const item of raw) {
-      if (!this.budget.block()) break;
-      const read = this.blocks(item.body, depth + 1);
+    for (const item of node.children) {
+      if (!budget.block()) break;
+      const read = this.blocks(item.children);
       // An empty first block followed by others cannot be written back: the next block leads.
       while (read.length > 1 && isEmptyText(read[0] as EditorBlock)) read.shift();
-      const blocks = read.length ? read : [paragraph([], this.budget.newId())];
+      const blocks = read.length ? read : [paragraph([], budget.newId())];
       items.push(
         todo
-          ? { id: this.budget.newId(), checked: item.checked === true, blocks }
-          : { id: this.budget.newId(), blocks }
+          ? { id: budget.newId(), checked: item.checked === true, blocks }
+          : { id: budget.newId(), blocks }
       );
     }
-    const id = this.budget.newId();
-    const block: EditorBlock =
-      kind === 'ordered' && start !== 1
-        ? { id, type: 'list', kind, start, items }
-        : { id, type: 'list', kind, items };
-    return { block, next: i };
+    const id = budget.newId();
+    const start = node.ordered ? (node.start ?? 1) : 1;
+    return kind === 'ordered' && start !== 1
+      ? { id, type: 'list', kind, start, items }
+      : { id, type: 'list', kind, items };
   }
 
-  inline(source: string): readonly EditorInline[] {
+  inline(nodes: readonly MdInline[]): readonly EditorInline[] {
     const out: EditorInline[] = [];
-    parseInline(source, 0, [], false, out, this.budget);
+    this.walk(nodes, [], false, out);
     // Canonical like the writer: marks never start or end on whitespace.
     return prepareMarks(normalizeInline(out));
+  }
+
+  private walk(
+    nodes: readonly MdInline[],
+    marks: readonly EditorMark[],
+    inLink: boolean,
+    out: EditorInline[]
+  ): void {
+    const { budget } = this;
+    const add = (mark: EditorMark) => sortMarks([...marks, mark]);
+    for (const node of nodes) {
+      switch (node.type) {
+        case 'text':
+          this.text(node.value, marks, inLink, out);
+          break;
+        case 'break':
+          out.push({ type: 'break' });
+          budget.chars += 1;
+          break;
+        case 'inlineCode':
+          out.push(...budget.inline(unshieldRaw(node.value), add({ type: 'code' })));
+          break;
+        case 'html':
+          // Raw tags stay literal text.
+          out.push(...budget.inline(unshieldRaw(node.value).replace(/\n/g, ' '), marks));
+          break;
+        case 'image':
+          // An image inside text keeps its alt text.
+          out.push(...budget.inline(unshield(node.alt).replace(/\n/g, ' '), marks));
+          break;
+        case 'emphasis':
+          this.walk(node.children, add({ type: 'em' }), inLink, out);
+          break;
+        case 'strong':
+          this.walk(node.children, add({ type: 'strong' }), inLink, out);
+          break;
+        case 'delete':
+          this.walk(node.children, add({ type: 'strike' }), inLink, out);
+          break;
+        case 'link': {
+          const url = unshield(node.url);
+          const href = budget.href(url);
+          const only = node.children[0];
+          // A refused autolink (`<scheme:…>`) stays literal text, angle brackets included.
+          if (
+            !href &&
+            node.children.length === 1 &&
+            only?.type === 'text' &&
+            (only.value === node.url || `mailto:${only.value}` === node.url)
+          ) {
+            out.push(...budget.inline(`<${unshield(only.value)}>`, marks));
+            break;
+          }
+          this.walk(node.children, href ? add({ type: 'link', href }) : marks, true, out);
+          break;
+        }
+        default:
+          if ('children' in node) this.walk(node.children as MdInline[], marks, inLink, out);
+      }
+    }
+  }
+
+  /** Plain text, with host extension tokens `<sigil>{id|label}` read outside links. */
+  private text(
+    value: string,
+    marks: readonly EditorMark[],
+    inLink: boolean,
+    out: EditorInline[]
+  ): void {
+    const { budget } = this;
+    const plain = (text: string) => {
+      // A soft line break reads as a space.
+      if (text) out.push(...budget.inline(unshield(text).replace(/\n/g, ' '), marks));
+    };
+    const extensions = budget.extensions;
+    if (inLink || extensions.bySigil.size === 0) {
+      plain(value);
+      return;
+    }
+    // The next `}` before a line break, from each index (one pass, then constant time).
+    let close: Int32Array | null = null;
+    let cursor = 0;
+    for (let i = 0; i < value.length; i += 1) {
+      const extension = extensions.bySigil.get(value[i] as string);
+      if (!extension || value[i + 1] !== '{') continue;
+      let idEnd = i + 2;
+      while (
+        idEnd < value.length &&
+        idEnd - (i + 2) <= EDITOR_EXTENSION_LIMITS.id &&
+        isExtensionIdChar(value.charCodeAt(idEnd))
+      )
+        idEnd += 1;
+      if (value[idEnd] !== '|') continue;
+      const id = value.slice(i + 2, idEnd);
+      if (!close) {
+        close = new Int32Array(value.length + 1).fill(-1);
+        for (let j = value.length - 1; j >= 0; j -= 1)
+          close[j] = value[j] === '\n' ? -1 : value[j] === '}' ? j : (close[j + 1] as number);
+      }
+      const labelStart = idEnd + 1;
+      const labelEnd = close[labelStart] ?? -1;
+      if (labelEnd <= labelStart || labelEnd - labelStart > EDITOR_EXTENSION_LIMITS.label) continue;
+      if (!acceptsExtensionId(extensions, extension.name, id)) continue;
+      plain(value.slice(cursor, i));
+      out.push(
+        ...budget.inline(
+          unshield(value.slice(labelStart, labelEnd)),
+          sortMarks([...marks, { type: 'extension', name: extension.name, id }])
+        )
+      );
+      cursor = labelEnd + 1;
+      i = labelEnd;
+    }
+    plain(value.slice(cursor));
   }
 }
 
 const isEmptyText = (block: EditorBlock) =>
   (block.type === 'paragraph' || block.type === 'heading') && block.content.length === 0;
 
-const unescapeMarkdown = (text: string) => text.replace(/\\([!-/:-@[-`{-~])/g, '$1');
-
-/**
- * Closers and bracket pairs of one inline source, computed once so that each
- * lookup is constant time: hostile delimiter runs stay linear. The answers
- * equal a left-to-right search from each opener.
- */
-class Scan {
-  readonly source: string;
-  private readonly closers = new Map<string, { at: number[]; first: Int32Array }>();
-  private brackets: Int32Array | null = null;
-  private tokens: { idRun: Int32Array; close: Int32Array } | null = null;
-
-  constructor(source: string) {
-    this.source = source;
-  }
-
-  /**
-   * The extension token `<sigil>{id|label}` whose sigil is at `at`, or null.
-   * Two linear passes the first time (the id-character run from each index,
-   * and the next unescaped `}` before a newline), then constant time.
-   */
-  extension(
-    at: number
-  ): { idStart: number; idEnd: number; labelStart: number; labelEnd: number; end: number } | null {
-    const { source } = this;
-    if (source[at + 1] !== '{') return null;
-    if (!this.tokens) {
-      const n = source.length;
-      const idRun = new Int32Array(n + 1);
-      for (let j = n - 1; j >= 0; j -= 1)
-        idRun[j] = isExtensionIdChar(source.charCodeAt(j)) ? (idRun[j + 1] as number) + 1 : 0;
-      const escaped = new Uint8Array(n);
-      for (let j = 0; j < n; j += 1) {
-        if (source[j] === '\\') {
-          if (j + 1 < n) escaped[j + 1] = 1;
-          j += 1;
-        }
-      }
-      const close = new Int32Array(n + 1).fill(-1);
-      for (let j = n - 1; j >= 0; j -= 1) {
-        const c = source[j];
-        close[j] = c === '\n' ? -1 : c === '}' && !escaped[j] ? j : (close[j + 1] as number);
-      }
-      this.tokens = { idRun, close };
-    }
-    const idStart = at + 2;
-    const idEnd = idStart + (this.tokens.idRun[idStart] ?? 0);
-    if (idEnd === idStart || idEnd - idStart > EDITOR_EXTENSION_LIMITS.id) return null;
-    if (source[idEnd] !== '|') return null;
-    const labelStart = idEnd + 1;
-    const labelEnd = this.tokens.close[labelStart] ?? -1;
-    if (labelEnd <= labelStart || labelEnd - labelStart > EDITOR_EXTENSION_LIMITS.label)
-      return null;
-    return { idStart, idEnd, labelStart, labelEnd, end: labelEnd + 1 };
-  }
-
-  /** The first valid closer of `marker` at or after `from`, or -1. */
-  closer(marker: string, from: number): number {
-    let table = this.closers.get(marker);
-    if (!table) {
-      table = this.build(marker);
-      this.closers.set(marker, table);
-    }
-    const { at, first } = table;
-    let low = 0;
-    let high = at.length;
-    while (low < high) {
-      const mid = (low + high) >> 1;
-      if ((at[mid] as number) < from) low = mid + 1;
-      else high = mid;
-    }
-    return low < at.length ? (first[low] as number) : -1;
-  }
-
-  private build(marker: string): { at: number[]; first: Int32Array } {
-    const { source } = this;
-    const at: number[] = [];
-    for (let j = source.indexOf(marker); j !== -1; j = source.indexOf(marker, j + 1)) at.push(j);
-    const index = new Map(at.map((position, i) => [position, i]));
-    const first = new Int32Array(at.length).fill(-1);
-    for (let i = at.length - 1; i >= 0; i -= 1) {
-      const close = at[i] as number;
-      const before = source[close - 1] ?? '';
-      const after = source[close + marker.length] ?? '';
-      const doubled = marker.length === 1 && after === marker;
-      const midWord = marker[0] === '_' && /[\p{L}\p{N}]/u.test(after);
-      if (!/\s/.test(before) && before !== '\\' && !doubled && !midWord) {
-        first[i] = close;
-        continue;
-      }
-      // The search resumes one past this candidate (two past a doubled one).
-      const resume = close + (doubled ? 2 : 1);
-      let next = index.get(resume);
-      if (next === undefined) {
-        next = i + 1;
-        while (next < at.length && (at[next] as number) < resume) next += 1;
-      }
-      first[i] = next < at.length ? (first[next] as number) : -1;
-    }
-    return { at, first };
-  }
-
-  /** The `]` closing the `[` at `open` (nesting and escapes respected), or -1. */
-  bracket(open: number): number {
-    if (!this.brackets) {
-      const { source } = this;
-      const pairs = new Int32Array(source.length).fill(-1);
-      const stack: number[] = [];
-      for (let j = 0; j < source.length; j += 1) {
-        const c = source[j];
-        if (c === '\\') j += 1;
-        else if (c === '[') stack.push(j);
-        else if (c === ']' && stack.length) pairs[stack.pop() as number] = j;
-      }
-      this.brackets = pairs;
-    }
-    return this.brackets[open] ?? -1;
-  }
-}
-
-/** Inline Markdown into runs; `marks` are the marks open around `source`. */
-function parseInline(
-  source: string,
-  depth: number,
-  marks: readonly EditorMark[],
-  inLink: boolean,
-  out: EditorInline[],
-  budget: LoadBudget
-): void {
-  let buffer = '';
-  // Spaces at the end of `buffer`, kept as it grows: reading the buffer's
-  // last characters would flatten the string being built on every soft line
-  // break (quadratic in a long paragraph).
-  let spaces = 0;
-  const append = (text: string) => {
-    buffer += text;
-    let end = text.length;
-    while (end > 0 && text.charCodeAt(end - 1) === 32) end -= 1;
-    spaces = end === 0 ? spaces + text.length : text.length - end;
-  };
-  const flush = () => {
-    if (buffer) out.push(...budget.inline(buffer.replace(/\n/g, ' '), marks));
-    buffer = '';
-    spaces = 0;
-  };
-  const push = (text: string, extra: readonly EditorMark[]) => {
-    flush();
-    out.push(...budget.inline(text, sortMarks([...marks, ...extra])));
-  };
-  const scan = new Scan(source);
-  const extensions = budget.extensions;
-  // The characters that can start an inline construct, registered sigils included.
-  const special = extensions.special;
-  let i = 0;
-  while (i < source.length) {
-    const ch = source[i] ?? '';
-    if (ch === '\\') {
-      const next = source[i + 1] ?? '';
-      if (next === '\n') {
-        flush();
-        out.push({ type: 'break' });
-        budget.chars += 1;
-        i += 2;
-        continue;
-      }
-      if (ESCAPABLE.test(next)) {
-        append(next);
-        i += 2;
-        continue;
-      }
-    }
-    if (ch === '\n') {
-      // Two or more trailing spaces make a hard break.
-      if (spaces >= 2) {
-        buffer = buffer.slice(0, buffer.length - spaces);
-        flush();
-        out.push({ type: 'break' });
-        budget.chars += 1;
-      } else append('\n');
-      i += 1;
-      continue;
-    }
-    const extension = inLink ? undefined : extensions.bySigil.get(ch);
-    if (extension) {
-      const token = scan.extension(i);
-      const id = token ? source.slice(token.idStart, token.idEnd) : '';
-      if (token && acceptsExtensionId(extensions, extension.name, id)) {
-        push(unescapeMarkdown(source.slice(token.labelStart, token.labelEnd)), [
-          { type: 'extension', name: extension.name, id },
-        ]);
-        i = token.end;
-        continue;
-      }
-    }
-    if (ch === '`') {
-      const run = /^`+/.exec(source.slice(i, i + 64))?.[0] ?? '`';
-      const close = source.indexOf(run, i + run.length);
-      if (close !== -1) {
-        const code = source.slice(i + run.length, close).replace(/\n/g, ' ');
-        push(code.length > 2 && /^ .* $/.test(code) ? code.slice(1, -1) : code, [{ type: 'code' }]);
-        i = close + run.length;
-        continue;
-      }
-      append(run);
-      i += run.length;
-      continue;
-    }
-    if (depth < MARKDOWN_CODEC_LIMITS.inlineDepth) {
-      const emphasis = matchEmphasis(scan, i);
-      if (emphasis) {
-        flush();
-        const mark: EditorMark = { type: emphasis.type };
-        parseInline(
-          source.slice(emphasis.innerStart, emphasis.innerEnd),
-          depth + 1,
-          sortMarks([...marks, mark]),
-          inLink,
-          out,
-          budget
-        );
-        i = emphasis.end;
-        continue;
-      }
-      if (ch === '!' && source[i + 1] === '[') {
-        const image = matchLink(scan, i + 1);
-        if (image) {
-          append(unescapeMarkdown(source.slice(image.labelStart, image.labelEnd)));
-          i = image.end;
-          continue;
-        }
-      }
-      if (ch === '[' && !inLink) {
-        const link = matchLink(scan, i);
-        if (link) {
-          flush();
-          const href = budget.href(link.href);
-          const inner = href ? sortMarks([...marks, { type: 'link', href }]) : marks;
-          parseInline(
-            source.slice(link.labelStart, link.labelEnd),
-            depth + 1,
-            inner,
-            true,
-            out,
-            budget
-          );
-          i = link.end;
-          continue;
-        }
-      }
-      if (ch === '<' && !inLink) {
-        const auto = /^<((?:https?:\/\/|mailto:)[^\s<>]+)>/i.exec(source.slice(i, i + 2_100));
-        if (auto?.[1]) {
-          const href = budget.href(auto[1]);
-          push(auto[1], href ? [{ type: 'link', href }] : []);
-          i += auto[0].length;
-          continue;
-        }
-      }
-    }
-    // Plain text up to the next character that can open a construct is
-    // copied in one slice, not one character at a time.
-    special.lastIndex = i + 1;
-    const stop = special.test(source) ? special.lastIndex - 1 : source.length;
-    append(source.slice(i, stop));
-    i = stop;
-  }
-  flush();
-}
-
-function matchEmphasis(
-  scan: Scan,
-  at: number
-): { type: 'strong' | 'em' | 'strike'; innerStart: number; innerEnd: number; end: number } | null {
-  const { source } = scan;
-  const candidates = [
-    { marker: '**', type: 'strong' },
-    { marker: '__', type: 'strong' },
-    { marker: '~~', type: 'strike' },
-    { marker: '*', type: 'em' },
-    { marker: '_', type: 'em' },
-  ] as const;
-  for (const { marker, type } of candidates) {
-    if (!source.startsWith(marker, at)) continue;
-    const innerStart = at + marker.length;
-    const first = source[innerStart] ?? '';
-    if (first === '' || /\s/.test(first)) continue;
-    if (marker[0] === '_' && /[\p{L}\p{N}]/u.test(source[at - 1] ?? '')) continue;
-    const close = scan.closer(marker, innerStart + 1);
-    if (close === -1) continue;
-    return { type, innerStart, innerEnd: close, end: close + marker.length };
-  }
-  return null;
-}
-
-function matchLink(
-  scan: Scan,
-  at: number
-): { labelStart: number; labelEnd: number; href: string; end: number } | null {
-  const { source } = scan;
-  const labelEnd = scan.bracket(at);
-  if (labelEnd === -1 || source[labelEnd + 1] !== '(') return null;
-  // A target is read from at most 2,100 characters after the label.
-  const target = readLinkTarget(source.slice(labelEnd + 1, labelEnd + 1 + 2_100), 0);
-  if (!target) return null;
-  return { labelStart: at + 1, labelEnd, href: target.href, end: labelEnd + 1 + target.end };
-}
-
-const isWhitespace = (char: string | undefined) => char !== undefined && /\s/.test(char);
-/** A target character: not whitespace, a parenthesis or an angle bracket. */
-const isTargetChar = (char: string | undefined) => char !== undefined && !/[\s()<>]/.test(char);
-
-/**
- * Reads a link target `(<href> "title")` whose `(` is at `open`, by hand.
- * It returns what `/\(\s*<?((?:[^\s()<>]|\([^\s()<>]*\))*)>?(?:\s+"[^"\n]*")?\s*\)/y`
- * returned (the href and the index after `)`), but in linear time: in that
- * regex `\(\s*`, `\s+"` and `\s*\)` competed for one whitespace run, so
- * `[a](` + 3,990 spaces + `x` took about 250 ms.
- */
-function readLinkTarget(source: string, open: number): { href: string; end: number } | null {
-  // The optional title and the closing parenthesis from `from`: the index
-  // after `)`, or -1.
-  const close = (from: number) => {
-    let at = from;
-    while (isWhitespace(source[at])) at += 1;
-    if (source[at] === ')') return at + 1;
-    if (at === from || source[at] !== '"') return -1;
-    at += 1;
-    while (at < source.length && source[at] !== '"' && source[at] !== '\n') at += 1;
-    if (source[at] !== '"') return -1;
-    at += 1;
-    while (isWhitespace(source[at])) at += 1;
-    return source[at] === ')' ? at + 1 : -1;
-  };
-  let at = open + 1;
-  while (isWhitespace(source[at])) at += 1;
-  const afterSpace = at;
-  if (source[at] === '<') at += 1;
-  const hrefStart = at;
-  // Plain characters and balanced `(…)` groups without whitespace inside.
-  for (;;) {
-    if (isTargetChar(source[at])) at += 1;
-    else if (source[at] === '(') {
-      let inner = at + 1;
-      while (isTargetChar(source[inner])) inner += 1;
-      if (source[inner] !== ')') break;
-      at = inner + 1;
-    } else break;
-  }
-  const href = source.slice(hrefStart, at);
-  if (source[at] === '>') at += 1;
-  const end = close(at);
-  if (end !== -1) return { href, end };
-  // The regex backtracked into the leading whitespace: `( "title")` is an
-  // empty href with a title.
-  if (afterSpace > open + 1) {
-    const titled = close(open + 1);
-    if (titled !== -1) return { href: '', end: titled };
-  }
-  return null;
-}
-
 // ---------------------------------------------------------------------------
 // Writing
 
-const escapeText = (text: string) => text.replace(/[\\`*_[\]~<!]/g, '\\$&');
+// `&` before a name or `#` would read as a character reference.
+const escapeText = (text: string) => text.replace(/[\\`*_[\]~<!]|&(?=[A-Za-z0-9#])/g, '\\$&');
 
 /** Plain text: a registered sigil before `{` would read as a token, so `{` is escaped. */
 const escapePlain = (text: string, extensions: EditorInlineExtensions) =>
@@ -718,7 +452,8 @@ function escapeLineStart(line: string): string {
   const ordered = /^( {0,3}\d{1,9})([.)])([ \t]|$)/.exec(line);
   if (ordered)
     return `${ordered[1]}\\${ordered[2]}${line.slice((ordered[1] as string).length + 1)}`;
-  if (startsBlock(line)) {
+  // A run of `=` or `-` alone on a line would underline a setext heading.
+  if (startsBlock(line) || /^ {0,3}(?:=+|-+)[ \t]*$/.test(line)) {
     return line.replace(/^( {0,3})(\S)/, '$1\\$2');
   }
   return line;
@@ -733,7 +468,13 @@ const encodeRef = (href: string) =>
 function codeSpan(text: string): string {
   const longest = Math.max(0, ...[...text.matchAll(/`+/g)].map((m) => m[0].length));
   const fence = '`'.repeat(longest + 1);
-  const pad = text.startsWith('`') || text.endsWith('`') || /^ .* $/.test(text) ? ' ' : '';
+  // CommonMark strips one space from each side when both are spaces and not every character is.
+  const pad =
+    text.startsWith('`') ||
+    text.endsWith('`') ||
+    (text.length > 1 && text.startsWith(' ') && text.endsWith(' ') && /[^ ]/.test(text))
+      ? ' '
+      : '';
   return `${fence}${pad}${text}${pad}${fence}`;
 }
 
@@ -906,9 +647,8 @@ const sameInline = (a: readonly EditorInline[], b: readonly EditorInline[]) =>
 /** Read inline Markdown back without caps or policy changes (for the write check). */
 function reread(markdown: string, extensions: EditorInlineExtensions): readonly EditorInline[] {
   const budget = new LoadBudget({ trust: 'developer', extensions });
-  const out: EditorInline[] = [];
-  parseInline(markdown, 0, [], false, out, budget);
-  return normalizeInline(out);
+  const { children } = parseInlineMarkdown(shield(markdown), { gfm: EDITOR_GFM });
+  return normalizeInline([...new Projector(budget).inline(children)]);
 }
 
 /**
@@ -963,13 +703,27 @@ const indent = (text: string, by: string) =>
     .join('\n');
 
 function writeBlocks(blocks: readonly EditorBlock[], extensions: EditorInlineExtensions): string {
+  // Two adjacent lists would merge into one: the second switches its marker (`*`, `)`).
+  let alternate = false;
   return blocks
-    .map((block) => writeBlock(block, extensions))
+    .map((block, index) => {
+      const previous = blocks[index - 1];
+      const sameKind =
+        block.type === 'list' &&
+        previous?.type === 'list' &&
+        (previous.kind === 'ordered') === (block.kind === 'ordered');
+      alternate = sameKind ? !alternate : false;
+      return writeBlock(block, extensions, alternate);
+    })
     .filter((text) => text !== '')
     .join('\n\n');
 }
 
-function writeBlock(block: EditorBlock, extensions: EditorInlineExtensions): string {
+function writeBlock(
+  block: EditorBlock,
+  extensions: EditorInlineExtensions,
+  alternate = false
+): string {
   switch (block.type) {
     case 'paragraph':
       return inlineMarkdown(trimEdges(block.content), escapeLineStart, extensions);
@@ -991,15 +745,19 @@ function writeBlock(block: EditorBlock, extensions: EditorInlineExtensions): str
     case 'list':
       return block.items
         .map((item, i) => {
+          const bullet = alternate ? '*' : '-';
           const marker =
             block.kind === 'ordered'
-              ? `${(block.start ?? 1) + i}. `
+              ? `${(block.start ?? 1) + i}${alternate ? ')' : '.'} `
               : block.kind === 'todo'
-                ? `- [${item.checked ? 'x' : ' '}] `
-                : '- ';
+                ? `${bullet} [${item.checked ? 'x' : ' '}] `
+                : `${bullet} `;
           const [first, ...rest] = item.blocks;
           const head = first ? indent(writeBlock(first, extensions), '    ').trimStart() : '';
           const tail = writeBlocks(rest, extensions);
+          // An empty first line followed by a blank line would end the item (CommonMark): the
+          // rest then starts on the next line.
+          if (!head && tail) return `${marker.trimEnd()}\n${indent(tail, '    ')}`;
           return `${marker}${head}${tail ? `\n\n${indent(tail, '    ')}` : ''}`;
         })
         .join('\n');

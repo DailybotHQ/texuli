@@ -638,7 +638,14 @@ export class BlockParser {
       isBlankText(this.line.slice(this.nextNonspace + markerLength))
     )
       return null;
-    if (!this.roomFor(container)) return null;
+    // Only a new list nests deeper: an item joining the open list always has room.
+    const open = container.kind === 'list' ? container.list : null;
+    const joins =
+      open !== null &&
+      open.type === type &&
+      open.delimiter === delimiter &&
+      open.bulletChar === bulletChar;
+    if (!joins && !this.roomFor(container)) return null;
     const markerOffset = this.indent;
     this.advanceNextNonspace();
     this.advanceOffset(markerLength, true);
