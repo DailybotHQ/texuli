@@ -1,9 +1,18 @@
 /**
- * Test-only HTML writer in the CommonMark reference renderer's exact shape, so the spec suite
- * can compare the AST against the spec's expected HTML. Raw HTML passes through here because
- * the spec expects it; the product writer (`core/markdown-html`, ADR-016) escapes or drops it.
+ * Test-only HTML writer in the reference renderers' exact shape (commonmark.js, and cmark-gfm
+ * for the GFM extensions), so the spec suites can compare the AST against their expected HTML.
+ * Raw HTML passes through here because the specs expect it; the product writer
+ * (`core/markdown-html`, ADR-016) escapes or drops it.
  */
-import type { MdBlock, MdInline, MdList, MdNode, MdRoot } from '../../src/markdown/ast.ts';
+import type {
+  MdBlock,
+  MdFootnoteDefinition,
+  MdInline,
+  MdList,
+  MdNode,
+  MdRoot,
+  MdTable,
+} from '../../src/markdown/ast.ts';
 
 const escapeXml = (text: string) =>
   text.replace(/[&<>"]/g, (c) =>
@@ -34,14 +43,43 @@ export function encodeUrl(url: string): string {
   return out;
 }
 
+export interface SpecHtmlOptions {
+  /** Task checkbox markup: `spec` (GFM spec.txt) or `cmark` (cmark-gfm extensions.txt). */
+  readonly checkbox?: 'spec' | 'cmark';
+  /** Apply the GFM tag filter to raw HTML (`<title>`, `<script>`… become text). */
+  readonly tagFilter?: boolean;
+  /** cmark-gfm writes no `<strong>` directly inside another `<strong>` (a renderer rule). */
+  readonly flatStrong?: boolean;
+}
+
+const TAG_FILTER =
+  /<(?=\/?(?:title|textarea|style|xmp|iframe|noembed|noframes|script|plaintext)(?:[\s/>]|$))/gi;
+
+interface FootnoteState {
+  /** Definitions by label, in document order. */
+  readonly definitions: Map<string, MdFootnoteDefinition>;
+  /** Labels in order of first reference, with how many times each was referenced. */
+  readonly order: string[];
+  readonly counts: Map<string, number>;
+}
+
 class Writer {
   out = '';
+  readonly options: SpecHtmlOptions;
+  readonly footnotes: FootnoteState;
+  constructor(options: SpecHtmlOptions, footnotes: FootnoteState) {
+    this.options = options;
+    this.footnotes = footnotes;
+  }
   cr(): void {
     if (this.out !== '' && !this.out.endsWith('\n')) this.out += '\n';
   }
+  raw(html: string): void {
+    this.out += this.options.tagFilter ? html.replace(TAG_FILTER, '&lt;') : html;
+  }
 }
 
-function inlines(w: Writer, nodes: readonly MdInline[]): void {
+function inlines(w: Writer, nodes: readonly MdInline[], inStrong = false): void {
   for (const node of nodes) {
     switch (node.type) {
       case 'text':
@@ -56,16 +94,23 @@ function inlines(w: Writer, nodes: readonly MdInline[]): void {
         inlines(w, node.children);
         w.out += '</em>';
         break;
-      case 'strong':
-        w.out += '<strong>';
+      case 'strong': {
+        const tag = !(inStrong && w.options.flatStrong);
+        if (tag) w.out += '<strong>';
+        inlines(w, node.children, true);
+        if (tag) w.out += '</strong>';
+        break;
+      }
+      case 'delete':
+        w.out += '<del>';
         inlines(w, node.children);
-        w.out += '</strong>';
+        w.out += '</del>';
         break;
       case 'inlineCode':
         w.out += `<code>${escapeXml(node.value)}</code>`;
         break;
       case 'html':
-        w.out += node.value;
+        w.raw(node.value);
         break;
       case 'link':
         w.out += `<a href="${escapeXml(encodeUrl(node.url))}"${node.title ? ` title="${escapeXml(node.title)}"` : ''}>`;
@@ -75,6 +120,19 @@ function inlines(w: Writer, nodes: readonly MdInline[]): void {
       case 'image':
         w.out += `<img src="${escapeXml(encodeUrl(node.url))}" alt="${escapeXml(node.alt)}"${node.title ? ` title="${escapeXml(node.title)}"` : ''} />`;
         break;
+      case 'footnoteReference': {
+        const key = node.label.toUpperCase();
+        let index = w.footnotes.order.indexOf(key);
+        if (index < 0) {
+          w.footnotes.order.push(key);
+          index = w.footnotes.order.length - 1;
+        }
+        const count = (w.footnotes.counts.get(key) ?? 0) + 1;
+        w.footnotes.counts.set(key, count);
+        const id = encodeUrl(node.label);
+        w.out += `<sup class="footnote-ref"><a href="#fn-${id}" id="fnref-${id}${count > 1 ? `-${count}` : ''}" data-footnote-ref>${index + 1}</a></sup>`;
+        break;
+      }
       default:
         break;
     }
@@ -118,7 +176,7 @@ function block(w: Writer, node: MdBlock, tight: boolean): void {
       break;
     case 'html':
       w.cr();
-      w.out += node.value;
+      w.raw(node.value);
       w.cr();
       break;
     case 'blockquote':
@@ -133,9 +191,19 @@ function block(w: Writer, node: MdBlock, tight: boolean): void {
     case 'list':
       list(w, node);
       break;
+    case 'table':
+      table(w, node);
+      break;
     default:
+      // Definitions render nothing; footnote definitions move to the end.
       break;
   }
+}
+
+function checkbox(w: Writer, checked: boolean): string {
+  if (w.options.checkbox === 'spec')
+    return `<input${checked ? ' checked=""' : ''} disabled="" type="checkbox"> `;
+  return `<input type="checkbox"${checked ? ' checked=""' : ''} disabled="" /> `;
 }
 
 function list(w: Writer, node: MdList): void {
@@ -148,6 +216,7 @@ function list(w: Writer, node: MdList): void {
   w.cr();
   for (const item of node.children) {
     w.out += '<li>';
+    if (item.checked !== undefined) w.out += checkbox(w, item.checked);
     blocks(w, item.children, !node.spread);
     w.out += '</li>';
     w.cr();
@@ -157,9 +226,92 @@ function list(w: Writer, node: MdList): void {
   w.cr();
 }
 
+function table(w: Writer, node: MdTable): void {
+  w.cr();
+  w.out += '<table>\n<thead>\n';
+  node.children.forEach((row, index) => {
+    if (index === 1) w.out += '<tbody>\n';
+    const cell = index === 0 ? 'th' : 'td';
+    w.out += '<tr>\n';
+    row.children.forEach((child, column) => {
+      const align = node.align[column];
+      w.out += `<${cell}${align ? ` align="${align}"` : ''}>`;
+      inlines(w, child.children);
+      w.out += `</${cell}>\n`;
+    });
+    w.out += '</tr>\n';
+    if (index === 0) w.out += '</thead>\n';
+  });
+  if (node.children.length > 1) w.out += '</tbody>\n';
+  w.out += '</table>\n';
+}
+
+/** Footnote definitions anywhere in the tree, by upper-cased label (first one wins). */
+function collectFootnotes(tree: MdRoot): Map<string, MdFootnoteDefinition> {
+  const found = new Map<string, MdFootnoteDefinition>();
+  const stack: MdNode[] = [tree];
+  while (stack.length > 0) {
+    const node = stack.pop() as MdNode;
+    if (node.type === 'footnoteDefinition' && !found.has(node.label.toUpperCase()))
+      found.set(node.label.toUpperCase(), node);
+    if ('children' in node) stack.push(...[...(node.children as MdNode[])].reverse());
+  }
+  return found;
+}
+
+function backrefs(index: number, id: string, count: number): string {
+  const refs: string[] = [];
+  for (let n = 1; n <= count; n++) {
+    const suffix = n > 1 ? `-${n}` : '';
+    const idx = n > 1 ? `${index}-${n}` : `${index}`;
+    refs.push(
+      `<a href="#fnref-${id}${suffix}" class="footnote-backref" data-footnote-backref data-footnote-backref-idx="${idx}" aria-label="Back to reference ${idx}">↩${n > 1 ? `<sup class="footnote-ref">${n}</sup>` : ''}</a>`
+    );
+  }
+  return refs.join(' ');
+}
+
+function footnoteSection(w: Writer): void {
+  if (w.footnotes.order.length === 0) return;
+  w.cr();
+  w.out += '<section class="footnotes" data-footnotes>\n<ol>\n';
+  // Footnotes referenced only from inside other footnotes are numbered as they appear.
+  for (let i = 0; i < w.footnotes.order.length; i++) {
+    const key = w.footnotes.order[i] as string;
+    const definition = w.footnotes.definitions.get(key);
+    if (!definition) continue;
+    const id = encodeUrl(definition.label);
+    w.out += `<li id="fn-${id}">\n`;
+    const refs = backrefs(i + 1, id, w.footnotes.counts.get(key) ?? 1);
+    const children = definition.children;
+    const last = children[children.length - 1];
+    if (last?.type === 'paragraph') {
+      blocks(w, children.slice(0, -1), false);
+      w.cr();
+      w.out += '<p>';
+      inlines(w, last.children);
+      w.out += ` ${refs}</p>\n`;
+    } else {
+      blocks(w, children, false);
+      w.cr();
+      w.out += `${refs}\n`;
+    }
+    w.out += '</li>\n';
+  }
+  w.out += '</ol>\n</section>\n';
+}
+
 /** The reference renderer's HTML for a tree. */
-export function specHtml(tree: MdRoot | MdNode): string {
-  const w = new Writer();
-  if (tree.type === 'root') blocks(w, tree.children, false);
+export function specHtml(tree: MdRoot | MdNode, options: SpecHtmlOptions = {}): string {
+  const footnotes: FootnoteState = {
+    definitions: tree.type === 'root' ? collectFootnotes(tree) : new Map(),
+    order: [],
+    counts: new Map(),
+  };
+  const w = new Writer(options, footnotes);
+  if (tree.type === 'root') {
+    blocks(w, tree.children, false);
+    footnoteSection(w);
+  }
   return w.out;
 }

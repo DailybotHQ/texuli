@@ -14,10 +14,14 @@ import {
   type MdInline,
   type MdListItem,
   type MdRoot,
+  type MdTableCell,
+  type MdTableRow,
 } from './ast.ts';
 import { type BlockNode, BlockParser, type ListData } from './block.ts';
+import { splitTableRow, tableCellSource, taskMarker } from './gfm/blocks.ts';
+import { type GfmFlags, type GfmOptions, gfmFlags } from './gfm/options.ts';
 import { type InlineNode, InlineParser, type ReferenceMap } from './inline.ts';
-import { unescapeString } from './scan.ts';
+import { normalizeLabel, unescapeString } from './scan.ts';
 
 export interface MarkdownLimits {
   readonly source: number;
@@ -29,6 +33,11 @@ export interface MarkdownLimits {
 export interface MarkdownParseOptions {
   /** Lower limits for this parse; a value above `MARKDOWN_LIMITS` is clamped to it. */
   readonly limits?: Partial<MarkdownLimits>;
+  /**
+   * GFM 0.29 extensions: on by default (`true` or omitted); `false` reads strict CommonMark
+   * 0.31.2; an object turns single extensions off (`{ footnote: false }`).
+   */
+  readonly gfm?: boolean | GfmOptions;
 }
 
 function limitsOf(options: MarkdownParseOptions | undefined): MarkdownLimits {
@@ -64,10 +73,12 @@ class Builder {
 
   private readonly limits: MarkdownLimits;
   private readonly inline: InlineParser;
+  private readonly gfm: GfmFlags;
 
-  constructor(limits: MarkdownLimits, inline: InlineParser) {
+  constructor(limits: MarkdownLimits, inline: InlineParser, gfm: GfmFlags) {
     this.limits = limits;
     this.inline = inline;
+    this.gfm = gfm;
   }
 
   /** Count one node; false once the tree is full. */
@@ -115,7 +126,21 @@ class Builder {
         const items: MdListItem[] = [];
         for (const item of node.children) {
           if (!this.take()) break;
-          items.push({ type: 'listItem', spread: spread(item), children: this.blocks(item) });
+          // GFM task list item: `[ ]` or `[x]` opening the item's first paragraph.
+          const first = item.children[0];
+          const task =
+            this.gfm.taskList && first?.kind === 'paragraph' ? taskMarker(first.content) : null;
+          if (task && first) first.content = first.content.slice(task.length);
+          items.push(
+            task
+              ? {
+                  type: 'listItem',
+                  spread: spread(item),
+                  checked: task.checked,
+                  children: this.blocks(item),
+                }
+              : { type: 'listItem', spread: spread(item), children: this.blocks(item) }
+          );
         }
         return data.type === 'ordered'
           ? { type: 'list', ordered: true, start: data.start, spread: !node.tight, children: items }
@@ -138,6 +163,23 @@ class Builder {
       }
       case 'html':
         return { type: 'html', value: node.content };
+      case 'table': {
+        const align = node.align ?? [];
+        const rows: MdTableRow[] = [];
+        const header = this.tableRow(node.header, align.length);
+        if (header) rows.push(header);
+        let from = 0;
+        while (from < node.content.length && !this.full) {
+          let to = node.content.indexOf('\n', from);
+          if (to < 0) to = node.content.length;
+          const row = this.tableRow(node.content.slice(from, to), align.length);
+          if (row) rows.push(row);
+          from = to + 1;
+        }
+        return { type: 'table', align, children: rows };
+      }
+      case 'footnoteDefinition':
+        return { type: 'footnoteDefinition', label: node.label, children: this.blocks(node) };
       case 'definition': {
         const definition = node.definition as { label: string; url: string; title?: string };
         return {
@@ -152,12 +194,24 @@ class Builder {
     }
   }
 
-  private inlines(content: string): MdInline[] {
-    const root = this.inline.parse(content);
-    return this.convert(root.first, 0);
+  /** One table row: exactly `columns` cells (extra cells dropped, missing ones empty). */
+  private tableRow(line: string, columns: number): MdTableRow | null {
+    if (!this.take()) return null;
+    const raw = splitTableRow(line);
+    const cells: MdTableCell[] = [];
+    for (let i = 0; i < columns; i++) {
+      if (!this.take()) break;
+      cells.push({ type: 'tableCell', children: this.inlines(tableCellSource(raw[i] ?? '')) });
+    }
+    return { type: 'tableRow', children: cells };
   }
 
-  private convert(first: InlineNode | null, depth: number): MdInline[] {
+  private inlines(content: string): MdInline[] {
+    const root = this.inline.parse(content);
+    return this.convert(root.first, 0, false);
+  }
+
+  private convert(first: InlineNode | null, depth: number, inLink: boolean): MdInline[] {
     const out: MdInline[] = [];
     for (let node = first; node !== null; node = node.next) {
       if (this.full) break;
@@ -177,6 +231,9 @@ class Builder {
         case 'html':
           if (this.take()) out.push({ type: 'html', value: node.value });
           break;
+        case 'footnoteReference':
+          if (this.take()) out.push({ type: 'footnoteReference', label: node.value });
+          break;
         case 'image':
           if (this.take())
             out.push({
@@ -187,8 +244,9 @@ class Builder {
             });
           break;
         default:
-          if (depth >= this.limits.inlineDepth) {
-            this.flatten(out, node);
+          if (depth >= this.limits.inlineDepth || (inLink && node.kind === 'link')) {
+            // Past the depth limit, or a GFM autolink inside a link (no links in links).
+            this.flatten(out, node, !inLink || node.kind !== 'link');
             break;
           }
           if (!this.take()) break;
@@ -197,12 +255,13 @@ class Builder {
               type: 'link',
               url: node.url ?? '',
               ...(node.title ? { title: node.title } : {}),
-              children: this.convert(node.first, depth + 1),
+              children: this.convert(node.first, depth + 1, true),
             });
           else
             out.push({
-              type: node.kind === 'emph' ? 'emphasis' : 'strong',
-              children: this.convert(node.first, depth + 1),
+              type:
+                node.kind === 'emph' ? 'emphasis' : node.kind === 'delete' ? 'delete' : 'strong',
+              children: this.convert(node.first, depth + 1, inLink),
             });
       }
     }
@@ -210,8 +269,8 @@ class Builder {
   }
 
   /** Past the inline depth limit: keep the leaves of `node` in order, without recursion. */
-  private flatten(out: MdInline[], node: InlineNode): void {
-    if (!this.flattened) {
+  private flatten(out: MdInline[], node: InlineNode, report = true): void {
+    if (report && !this.flattened) {
       this.flattened = true;
       this.diagnostics.push({
         code: 'depth-limit',
@@ -221,7 +280,10 @@ class Builder {
     let current: InlineNode | null = node.first;
     while (current !== null && !this.full) {
       if (
-        (current.kind === 'emph' || current.kind === 'strong' || current.kind === 'link') &&
+        (current.kind === 'emph' ||
+          current.kind === 'strong' ||
+          current.kind === 'delete' ||
+          current.kind === 'link') &&
         current.first
       ) {
         current = current.first;
@@ -246,6 +308,8 @@ class Builder {
       if (this.take()) out.push({ type: 'inlineCode', value: node.value });
     } else if (node.kind === 'html') {
       if (this.take()) out.push({ type: 'html', value: node.value });
+    } else if (node.kind === 'footnoteReference') {
+      if (this.take()) out.push({ type: 'footnoteReference', label: node.value });
     } else if (node.kind === 'image') {
       if (this.take())
         out.push({
@@ -322,9 +386,14 @@ export function parseMarkdown(source: unknown, options?: MarkdownParseOptions): 
   }
   try {
     const refmap: ReferenceMap = new Map();
-    const inline = new InlineParser(refmap);
+    const gfm = gfmFlags(options?.gfm);
+    const footnotes = new Map<string, string>();
+    const inline = new InlineParser(refmap, { gfm, footnotes });
     let depthReported = false;
     const blocks = new BlockParser(inline, {
+      gfm,
+      footnotes,
+      normalizeLabel,
       blockDepth: limits.blockDepth,
       onDepthLimit: () => {
         if (depthReported) return;
@@ -336,7 +405,7 @@ export function parseMarkdown(source: unknown, options?: MarkdownParseOptions): 
       },
     });
     const doc = blocks.parse(text);
-    const builder = new Builder(limits, inline);
+    const builder = new Builder(limits, inline, gfm);
     const children = builder.blocks(doc);
     diagnostics.push(...builder.diagnostics);
     return { tree: { type: 'root', version: MARKDOWN_AST_VERSION, children }, diagnostics };

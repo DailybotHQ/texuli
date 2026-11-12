@@ -24,7 +24,7 @@ const examples = JSON.parse(
 /** Examples that do not pass yet, with the reason. */
 const KNOWN_FAILURES: Readonly<Record<number, string>> = {};
 
-const render = (markdown: string) => specHtml(parseMarkdown(markdown).tree);
+const render = (markdown: string) => specHtml(parseMarkdown(markdown, { gfm: false }).tree);
 
 describe('CommonMark 0.31.2 spec', () => {
   it('has every example of the suite', () => {

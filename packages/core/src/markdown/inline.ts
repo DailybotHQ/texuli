@@ -7,6 +7,8 @@
  * memoized, link labels are capped at 999 characters, and failed link destination scans draw on
  * a work budget proportional to the paragraph.
  */
+import { autolinkBoundary, emailAutolinks, urlAutolink, wwwAutolinkEnd } from './gfm/autolink.ts';
+import { GFM_OFF, type GfmFlags } from './gfm/options.ts';
 import {
   decodeEntity,
   entityLength,
@@ -28,13 +30,17 @@ export type InlineKind =
   | 'code'
   | 'html'
   | 'link'
-  | 'image';
+  | 'image'
+  | 'delete'
+  | 'footnoteReference';
 
 export interface InlineNode {
   kind: InlineKind;
   value: string;
   url?: string;
   title?: string;
+  /** Text from an escape or a character reference: never part of an extended autolink. */
+  literal?: boolean;
   parent: InlineNode | null;
   prev: InlineNode | null;
   next: InlineNode | null;
@@ -120,6 +126,8 @@ const C_AMPERSAND = 0x26;
 const C_OPEN_PAREN = 0x28;
 const C_CLOSE_PAREN = 0x29;
 const C_COLON = 0x3a;
+const C_TILDE = 0x7e;
+const C_W = 0x77;
 
 /** Characters that end a run of plain text. */
 function isSpecial(c: number): boolean {
@@ -146,6 +154,12 @@ const EMAIL_AUTOLINK =
 /** The longest link label (between the brackets), CommonMark §4.7. */
 const MAX_LABEL = 999;
 
+export interface InlineParseOptions {
+  readonly gfm: GfmFlags;
+  /** Footnote definition labels by normalized label (GFM footnotes). */
+  readonly footnotes: ReadonlyMap<string, string>;
+}
+
 export class InlineParser {
   private subject = '';
   private pos = 0;
@@ -158,9 +172,13 @@ export class InlineParser {
   private budget = 0;
 
   private readonly refmap: ReferenceMap;
+  private readonly gfm: GfmFlags;
+  private readonly footnotes: ReadonlyMap<string, string>;
 
-  constructor(refmap: ReferenceMap) {
+  constructor(refmap: ReferenceMap, options?: InlineParseOptions) {
     this.refmap = refmap;
+    this.gfm = options?.gfm ?? GFM_OFF;
+    this.footnotes = options?.footnotes ?? new Map();
   }
 
   /** Parse `subject` (a paragraph or heading's raw content) into the children of a new node. */
@@ -170,6 +188,7 @@ export class InlineParser {
     while (this.pos < this.subject.length) this.parseInline(root);
     this.processEmphasis(null);
     this.brackets = null;
+    if (this.gfm.autolink) linkEmails(root);
     return root;
   }
 
@@ -225,6 +244,15 @@ export class InlineParser {
       case C_AMPERSAND:
         handled = this.parseEntity(parent);
         break;
+      case C_TILDE:
+        handled = this.gfm.strikethrough && this.handleDelim(c, parent);
+        break;
+      case C_W:
+        handled = this.gfm.autolink && this.parseWww(parent);
+        break;
+      case C_COLON:
+        handled = this.gfm.autolink && this.parseUrl(parent);
+        break;
       default:
         handled = this.parseString(parent);
     }
@@ -234,10 +262,60 @@ export class InlineParser {
     }
   }
 
+  /** Whether `c` at `i` may start something other than plain text. */
+  private stopsText(c: number, i: number): boolean {
+    if (isSpecial(c)) return true;
+    if (c === C_TILDE) return this.gfm.strikethrough;
+    if (!this.gfm.autolink) return false;
+    if (c === C_W) return autolinkBoundary(this.subject, i) && this.subject.startsWith('www.', i);
+    if (c === C_COLON) return this.subject.startsWith('://', i);
+    return false;
+  }
+
+  /** A GFM `www.` autolink at `pos`. */
+  private parseWww(parent: InlineNode): boolean {
+    // Like cmark-gfm: no extended autolink while a link or image bracket is open.
+    if (this.brackets !== null || !autolinkBoundary(this.subject, this.pos)) return false;
+    const end = wwwAutolinkEnd(this.subject, this.pos);
+    if (end === 0) return false;
+    const text = this.subject.slice(this.pos, end);
+    const node = inlineNode('link');
+    node.url = `http://${text}`;
+    append(node, literalText(text));
+    append(parent, node);
+    this.pos = end;
+    return true;
+  }
+
+  /** A GFM `http://`, `https://` or `ftp://` autolink whose `:` is at `pos`. */
+  private parseUrl(parent: InlineNode): boolean {
+    if (this.brackets !== null) return false;
+    const found = urlAutolink(this.subject, this.pos);
+    if (!found) return false;
+    // The scheme was read as text just before: take it back from the last text node.
+    const scheme = this.pos - found.start;
+    const last = parent.last;
+    if (last?.kind !== 'text' || last.literal || last.value.length < scheme) return false;
+    if (
+      last.value.slice(-scheme).toLowerCase() !==
+      this.subject.slice(found.start, this.pos).toLowerCase()
+    )
+      return false;
+    last.value = last.value.slice(0, -scheme);
+    if (last.value === '') unlink(last);
+    const text = this.subject.slice(found.start, found.end);
+    const node = inlineNode('link');
+    node.url = text;
+    append(node, literalText(text));
+    append(parent, node);
+    this.pos = found.end;
+    return true;
+  }
+
   private parseString(parent: InlineNode): boolean {
     const start = this.pos;
     let i = start;
-    while (i < this.subject.length && !isSpecial(this.subject.charCodeAt(i))) i++;
+    while (i < this.subject.length && !this.stopsText(this.subject.charCodeAt(i), i)) i++;
     if (i === start) return false;
     this.pos = i;
     this.text(parent, this.subject.slice(start, i));
@@ -265,7 +343,7 @@ export class InlineParser {
       this.pos++;
       append(parent, inlineNode('linebreak'));
     } else if (c !== -1 && isAsciiPunctuation(c)) {
-      this.text(parent, this.subject.charAt(this.pos));
+      this.text(parent, this.subject.charAt(this.pos)).literal = true;
       this.pos++;
     } else this.text(parent, '\\');
     return true;
@@ -348,7 +426,8 @@ export class InlineParser {
     }
     this.pos = i;
     const node = this.text(parent, s.slice(start, i));
-    if (canOpen || canClose) {
+    // GFM strikethrough takes runs of one or two tildes.
+    if ((canOpen || canClose) && (cc !== C_TILDE || count <= 2)) {
       const delimiter: Delimiter = {
         cc,
         numdelims: count,
@@ -372,7 +451,7 @@ export class InlineParser {
   }
 
   private processEmphasis(bottom: Delimiter | null): void {
-    const openersBottom: (Delimiter | null)[] = new Array(12).fill(bottom);
+    const openersBottom: (Delimiter | null)[] = new Array(16).fill(bottom);
     let closer = this.delimiters;
     while (closer !== null && closer.previous !== bottom) closer = closer.previous;
     while (closer !== null) {
@@ -380,15 +459,18 @@ export class InlineParser {
         closer = closer.next;
         continue;
       }
-      const index =
-        (closer.cc === C_UNDERSCORE ? 0 : 6) + (closer.canOpen ? 3 : 0) + (closer.origdelims % 3);
+      const tilde = closer.cc === C_TILDE;
+      const index = tilde
+        ? 12 + (closer.canOpen ? 2 : 0) + (closer.origdelims - 1)
+        : (closer.cc === C_UNDERSCORE ? 0 : 6) + (closer.canOpen ? 3 : 0) + (closer.origdelims % 3);
       let opener = closer.previous;
       let found = false;
       while (opener !== null && opener !== bottom && opener !== openersBottom[index]) {
-        const odd =
-          (closer.canOpen || opener.canClose) &&
-          closer.origdelims % 3 !== 0 &&
-          (opener.origdelims + closer.origdelims) % 3 === 0;
+        const odd = tilde
+          ? opener.origdelims !== closer.origdelims
+          : (closer.canOpen || opener.canClose) &&
+            closer.origdelims % 3 !== 0 &&
+            (opener.origdelims + closer.origdelims) % 3 === 0;
         if (opener.cc === closer.cc && opener.canOpen && !odd) {
           found = true;
           break;
@@ -402,14 +484,14 @@ export class InlineParser {
         if (!oldCloser.canOpen) this.removeDelimiter(oldCloser);
         continue;
       }
-      const use = closer.numdelims >= 2 && opener.numdelims >= 2 ? 2 : 1;
+      const use = tilde ? closer.numdelims : closer.numdelims >= 2 && opener.numdelims >= 2 ? 2 : 1;
       const openerNode = opener.node;
       const closerNode = closer.node;
       opener.numdelims -= use;
       closer.numdelims -= use;
       openerNode.value = openerNode.value.slice(0, openerNode.value.length - use);
       closerNode.value = closerNode.value.slice(0, closerNode.value.length - use);
-      const emph = inlineNode(use === 1 ? 'emph' : 'strong');
+      const emph = inlineNode(tilde ? 'delete' : use === 1 ? 'emph' : 'strong');
       let tmp = openerNode.next;
       while (tmp && tmp !== closerNode) {
         const following: InlineNode | null = tmp.next;
@@ -613,6 +695,7 @@ export class InlineParser {
         }
       }
     }
+    if (!matched && this.gfm.footnote && this.footnoteReference(opener, start)) return true;
     if (!matched) {
       this.brackets = opener.previous;
       this.pos = start;
@@ -643,6 +726,33 @@ export class InlineParser {
         earlier = earlier.previous;
       }
     }
+    return true;
+  }
+
+  /**
+   * GFM footnote reference: `[^label]` whose label has a definition becomes a reference; what
+   * was parsed inside the brackets is dropped. After `!` the `!` stays text, as in cmark-gfm.
+   */
+  private footnoteReference(opener: Bracket, start: number): boolean {
+    if (this.subject.charCodeAt(opener.index + 1) !== 0x5e) return false;
+    const raw = this.subject.slice(opener.index + 2, start - 1);
+    if (raw === '' || raw.length > MAX_LABEL) return false;
+    const label = this.footnotes.get(normalizeLabel(raw));
+    if (label === undefined) return false;
+    // Drop the delimiters and nodes opened inside the brackets.
+    while (this.delimiters !== null && this.delimiters !== opener.previousDelimiter)
+      this.removeDelimiter(this.delimiters);
+    while (opener.node.next) unlink(opener.node.next);
+    const node = inlineNode('footnoteReference', label);
+    if (opener.image) {
+      opener.node.value = '!';
+      insertAfter(opener.node, node);
+    } else {
+      insertAfter(opener.node, node);
+      unlink(opener.node);
+    }
+    this.brackets = opener.previous;
+    this.pos = start;
     return true;
   }
 
@@ -683,7 +793,7 @@ export class InlineParser {
   private parseEntity(parent: InlineNode): boolean {
     const length = entityLength(this.subject, this.pos);
     if (length === 0) return false;
-    this.text(parent, decodeEntity(this.subject.slice(this.pos, this.pos + length)));
+    this.text(parent, decodeEntity(this.subject.slice(this.pos, this.pos + length))).literal = true;
     this.pos += length;
     return true;
   }
@@ -752,5 +862,72 @@ export class InlineParser {
     if (label === '') return null;
     if (!this.refmap.has(label)) this.refmap.set(label, title === null ? { url } : { url, title });
     return title === null ? { label, url } : { label, url, title };
+  }
+}
+
+function literalText(value: string): InlineNode {
+  const node = inlineNode('text', value);
+  node.literal = true;
+  return node;
+}
+
+/**
+ * GFM post-pass: link emails, `mailto:` and `xmpp:` addresses in runs of plain text (escaped and
+ * referenced characters break a run), outside links and images. Iterative.
+ */
+function linkEmails(root: InlineNode): void {
+  const stack: InlineNode[] = [root];
+  while (stack.length > 0) {
+    const parent = stack.pop() as InlineNode;
+    let node = parent.first;
+    while (node !== null) {
+      if (node.kind !== 'text' || node.literal) {
+        if (node.first && node.kind !== 'link' && node.kind !== 'image') stack.push(node);
+        node = node.next;
+        continue;
+      }
+      // A run of plain text nodes.
+      const first = node;
+      let value = '';
+      let last = node;
+      for (
+        let run: InlineNode | null = node;
+        run !== null && run.kind === 'text' && !run.literal;
+        run = run.next
+      ) {
+        value += run.value;
+        last = run;
+      }
+      const after = last.next;
+      const pieces = value.indexOf('@') < 0 ? null : emailAutolinks(value);
+      if (pieces) {
+        let anchor: InlineNode | null = first.prev;
+        for (let run: InlineNode | null = first; run !== after; ) {
+          const next: InlineNode | null = run?.next ?? null;
+          if (run) unlink(run);
+          run = next;
+        }
+        for (const piece of pieces) {
+          let created: InlineNode;
+          if (piece.kind === 'text') created = inlineNode('text', piece.value);
+          else {
+            created = inlineNode('link');
+            created.url = piece.url;
+            append(created, literalText(piece.value));
+          }
+          if (anchor) insertAfter(anchor, created);
+          else if (parent.first) {
+            // Insert before the first child.
+            const head = parent.first;
+            created.parent = parent;
+            created.next = head;
+            head.prev = created;
+            parent.first = created;
+          } else append(parent, created);
+          anchor = created;
+        }
+      }
+      node = after;
+    }
   }
 }

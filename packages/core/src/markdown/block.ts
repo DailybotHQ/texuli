@@ -5,6 +5,9 @@
  * raw content; inline content is parsed afterwards, once every link reference definition is
  * known. Container nesting stops at the block depth limit: a marker past it stays text.
  */
+import type { MdAlign } from './ast.ts';
+import { footnoteDefinitionStart, parseDelimiterRow, splitTableRow } from './gfm/blocks.ts';
+import { GFM_OFF, type GfmFlags } from './gfm/options.ts';
 import { type InlineParser } from './inline.ts';
 import { isHtmlBlock7Line, isSpaceOrTab } from './scan.ts';
 
@@ -18,7 +21,9 @@ export type BlockKind =
   | 'thematicBreak'
   | 'code'
   | 'html'
-  | 'definition';
+  | 'definition'
+  | 'table'
+  | 'footnoteDefinition';
 
 export interface ListData {
   readonly type: 'bullet' | 'ordered';
@@ -50,10 +55,16 @@ export interface BlockNode {
   /** Container depth: block quotes and lists from the root down to this node. */
   depth: number;
   definition: { label: string; url: string; title?: string } | null;
+  /** GFM: a footnote definition's label as written. */
+  label: string;
+  /** GFM: a table's column alignments and its header row (raw). */
+  align: MdAlign[] | null;
+  header: string;
 }
 
 function blockNode(kind: BlockKind, line: number, parent: BlockNode | null): BlockNode {
-  const containerStep = kind === 'blockquote' || kind === 'list' ? 1 : 0;
+  const containerStep =
+    kind === 'blockquote' || kind === 'list' || kind === 'footnoteDefinition' ? 1 : 0;
   return {
     kind,
     parent,
@@ -73,6 +84,9 @@ function blockNode(kind: BlockKind, line: number, parent: BlockNode | null): Blo
     tight: true,
     depth: (parent?.depth ?? 0) + containerStep,
     definition: null,
+    label: '',
+    align: null,
+    header: '',
   };
 }
 
@@ -107,13 +121,21 @@ const SETEXT_LINE = /^(?:=+|-+)[ \t]*$/;
 const THEMATIC_BREAK = /^(?:\*[ \t]*){3,}$|^(?:_[ \t]*){3,}$|^(?:-[ \t]*){3,}$/;
 const BULLET_MARKER = /^[*+-]/;
 const ORDERED_MARKER = /^(\d{1,9})([.)])/;
-const MAYBE_SPECIAL = /^[#`~*+_=<>0-9-]/;
+const MAYBE_SPECIAL = /^[#`~*+_=<>0-9\-|:[]/;
 
 const acceptsLines = (kind: BlockKind) =>
-  kind === 'paragraph' || kind === 'code' || kind === 'html';
+  kind === 'paragraph' || kind === 'code' || kind === 'html' || kind === 'table';
+
+/** A paragraph or a GFM table: open text that block starts may interrupt. */
+const isTextLeaf = (kind: BlockKind) => kind === 'paragraph' || kind === 'table';
 
 function canContain(parent: BlockKind, child: BlockKind): boolean {
-  if (parent === 'document' || parent === 'blockquote' || parent === 'item')
+  if (
+    parent === 'document' ||
+    parent === 'blockquote' ||
+    parent === 'item' ||
+    parent === 'footnoteDefinition'
+  )
     return child !== 'item';
   if (parent === 'list') return child === 'item';
   return false;
@@ -143,6 +165,10 @@ function isBlankText(text: string): boolean {
 export interface BlockParseOptions {
   readonly blockDepth: number;
   readonly onDepthLimit: (line: number) => void;
+  readonly gfm?: GfmFlags;
+  /** Filled with footnote definition labels (normalized label → label as written). */
+  readonly footnotes?: Map<string, string>;
+  readonly normalizeLabel?: (label: string) => string;
 }
 
 export class BlockParser {
@@ -164,10 +190,12 @@ export class BlockParser {
 
   private readonly inline: InlineParser;
   private readonly options: BlockParseOptions;
+  private readonly gfm: GfmFlags;
 
   constructor(inline: InlineParser, options: BlockParseOptions) {
     this.inline = inline;
     this.options = options;
+    this.gfm = options.gfm ?? GFM_OFF;
   }
 
   /** Parse `source` (already bounded) into the block tree. */
@@ -296,7 +324,7 @@ export class BlockParser {
     this.allClosed = container === this.oldtip;
     this.lastMatchedContainer = container;
 
-    let matchedLeaf = container.kind !== 'paragraph' && acceptsLines(container.kind);
+    let matchedLeaf = !isTextLeaf(container.kind) && acceptsLines(container.kind);
     while (!matchedLeaf) {
       this.findNextNonspace();
       if (
@@ -307,6 +335,7 @@ export class BlockParser {
         break;
       }
       const result = this.startBlock(container);
+      if (result === 3) return; // the line was consumed (a table's delimiter row)
       if (result === 1) {
         container = this.tip;
         continue;
@@ -400,14 +429,21 @@ export class BlockParser {
       case 'html':
         return this.blank && (container.htmlType === 6 || container.htmlType === 7) ? 1 : 0;
       case 'paragraph':
+      case 'table':
         return this.blank ? 1 : 0;
+      case 'footnoteDefinition':
+        if (this.indent >= CODE_INDENT) {
+          this.advanceOffset(CODE_INDENT, true);
+          return 0;
+        }
+        return this.blank ? 0 : 1;
       default:
         return 0;
     }
   }
 
-  /** 0: no block starts here, 1: a container started, 2: a leaf started. */
-  private startBlock(container: BlockNode): 0 | 1 | 2 {
+  /** 0: no block starts here, 1: a container started, 2: a leaf started, 3: the line is done. */
+  private startBlock(container: BlockNode): 0 | 1 | 2 | 3 {
     const rest = () => this.line.slice(this.nextNonspace);
     const c = this.peek(this.nextNonspace);
     // Block quote.
@@ -457,7 +493,7 @@ export class BlockParser {
         if (
           opens &&
           (type < 7 ||
-            (container.kind !== 'paragraph' &&
+            (!isTextLeaf(container.kind) &&
               !(!this.allClosed && !this.blank && this.tip.kind === 'paragraph')))
         ) {
           this.closeUnmatchedBlocks();
@@ -490,12 +526,36 @@ export class BlockParser {
         parent.children.push(...found.definitions, container);
       }
     }
+    // GFM table: the paragraph's last line is the header row when this line is a matching
+    // delimiter row.
+    if (
+      this.gfm.table &&
+      !this.indented &&
+      container.kind === 'paragraph' &&
+      this.startTable(container)
+    )
+      return 3;
     // Thematic break.
     if (!this.indented && (c === 0x2a || c === 0x5f || c === 0x2d) && THEMATIC_BREAK.test(rest())) {
       this.closeUnmatchedBlocks();
       this.addChild('thematicBreak');
       this.advanceOffset(this.line.length - this.offset, false);
       return 2;
+    }
+    // GFM footnote definition.
+    if (this.gfm.footnote && !this.indented && c === 0x5b) {
+      const found = footnoteDefinitionStart(this.line, this.nextNonspace);
+      if (found && this.roomFor(container)) {
+        this.closeUnmatchedBlocks();
+        const node = this.addChild('footnoteDefinition');
+        node.label = found.label;
+        const key = this.options.normalizeLabel?.(found.label) ?? found.label;
+        if (this.options.footnotes && !this.options.footnotes.has(key))
+          this.options.footnotes.set(key, found.label);
+        this.advanceNextNonspace();
+        this.advanceOffset(found.end - this.nextNonspace, false);
+        return 1;
+      }
     }
     // List item.
     if (!this.indented || container.kind === 'list') {
@@ -517,13 +577,38 @@ export class BlockParser {
       }
     }
     // Indented code.
-    if (this.indented && this.tip.kind !== 'paragraph' && !this.blank) {
+    if (this.indented && !isTextLeaf(this.tip.kind) && !this.blank) {
       this.advanceOffset(CODE_INDENT, true);
       this.closeUnmatchedBlocks();
       this.addChild('code');
       return 2;
     }
     return 0;
+  }
+
+  /** Turn the paragraph's last line into a table header when this line is a delimiter row. */
+  private startTable(paragraph: BlockNode): boolean {
+    const align = parseDelimiterRow(this.line.slice(this.nextNonspace));
+    if (!align) return false;
+    const content = paragraph.content;
+    const lastBreak = content.lastIndexOf('\n', content.length - 2);
+    const header = content.slice(lastBreak + 1, content.length - 1);
+    if (splitTableRow(header).length !== align.length) return false;
+    this.closeUnmatchedBlocks();
+    const parent = paragraph.parent as BlockNode;
+    const before = content.slice(0, lastBreak + 1);
+    if (isBlankText(before)) {
+      parent.children.pop();
+      this.tip = parent;
+    } else {
+      paragraph.content = before;
+      this.finalize(paragraph, this.lineNumber - 2);
+    }
+    const table = this.addChild('table');
+    table.startLine = this.lineNumber - 1;
+    table.align = align;
+    table.header = header;
+    return true;
   }
 
   private parseListMarker(container: BlockNode): ListData | null {
@@ -540,7 +625,7 @@ export class BlockParser {
       type = 'bullet';
       bulletChar = bullet[0];
       markerLength = 1;
-    } else if (ordered && (container.kind !== 'paragraph' || ordered[1] === '1')) {
+    } else if (ordered && (!isTextLeaf(container.kind) || ordered[1] === '1')) {
       type = 'ordered';
       start = Number.parseInt(ordered[1] as string, 10);
       delimiter = ordered[2] as string;
@@ -549,7 +634,7 @@ export class BlockParser {
     const after = this.peek(this.nextNonspace + markerLength);
     if (!(after === -1 || after === 0x09 || after === 0x20)) return null;
     if (
-      container.kind === 'paragraph' &&
+      isTextLeaf(container.kind) &&
       isBlankText(this.line.slice(this.nextNonspace + markerLength))
     )
       return null;
