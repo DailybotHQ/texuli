@@ -589,12 +589,14 @@ function layoutChanged(): void {
   </div>
 
   <p class="dashboards-demo__description">{selectedScenario.description}</p>
-  <FilterBar fields={fields} bind:value={filters} saved={filterSaved} onValueChange={changeFilters} />
+  <div class="dashboards-demo__filter-bar">
+    <FilterBar fields={fields} bind:value={filters} saved={filterSaved} onValueChange={changeFilters} />
+  </div>
   <p class="dashboards-demo__status" role="status" aria-live="polite" aria-atomic="true">{announcement}</p>
 
   <Dashboard label={`${selectedScenario.label} dashboard`} editable rowHeight={76} gap="medium" bind:layouts onLayoutChange={layoutChanged}>
-    {#each metricValues as item, index (item.metric.id)}
-      <DashboardWidget id={item.metric.id} title={item.metric.title} x={(index % 3) * 4} y={Math.floor(index / 3) * 2} w={4} h={2} minW={3} minH={2}>
+    {#each metricValues as item, index (index)}
+      <DashboardWidget id={`metric-${index + 1}`} title={item.metric.title} x={(index % 3) * 4} y={Math.floor(index / 3) * 2} w={4} h={2} minW={3} minH={2}>
         <MetricCard title={item.metric.title} value={item.value} comparison={`vs. previous period · ${periodDays} days`} trend={item.metric.trend} trendLabel={item.metric.change}>
           {#snippet sparkline()}
             <Sparkline values={item.values} label={`${item.metric.title} trend for ${selectedScenario.label}`} period={`${periodDays}-day reporting period`} />
@@ -621,5 +623,14 @@ function layoutChanged(): void {
   .dashboards-demo__status { min-block-size: 1.25em; }
   .dashboards-demo__source { max-inline-size: 100%; overflow: auto; border: 1px solid var(--tx-border, GrayText); border-radius: 0.6rem; background: var(--tx-background, Canvas); }
   .dashboards-demo__source pre { overflow: auto; max-block-size: 24rem; margin: 0; padding: 1rem; font: 0.875rem/1.5 var(--tx-font-mono, ui-monospace, monospace); }
+  .dashboards-demo__filter-bar { position: relative; min-inline-size: 0; }
+  @media (max-width: 42rem) {
+    :global(.dashboards-demo__filter-bar details.tx-filter-bar__editor) { position: static !important; }
+    :global(.dashboards-demo__filter-bar .tx-filter-bar__panel) {
+      inset-inline-start: 0 !important;
+      inset-inline-end: auto !important;
+      inline-size: min(34rem, 100%) !important;
+    }
+  }
   @media (forced-colors: active) { .dashboards-demo select, .dashboards-demo button, .dashboards-demo__source { border-color: CanvasText; } }
 </style>

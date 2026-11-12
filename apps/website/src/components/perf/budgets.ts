@@ -202,6 +202,12 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
     budget: { pageGzipKb: 400, jsGzipKb: 96 },
   },
   {
+    route: '/solutions/dashboards/',
+    reason:
+      'PLAN_023 art (2026-11-12): the landing keeps the mosaic fallback while WebP art is unavailable. Measured 92.0 KB page and 19.4 KB HTML gzip; Measured 2026-11-12 on Chromium at 1280 × 720 after the ready signal with gzip level 9. Limits are +4%, rounded up.',
+    budget: { pageGzipKb: 96, htmlGzipKb: 21 },
+  },
+  {
     route: '/solutions/design-systems/',
     reason:
       'PLAN_017 T-demo: the server-rendered demo island and its three build-time brands as one inline style (light and dark), so no compiler ships. Measured 2026-11-10: 27.0 KB gzip of HTML; page and JS fit the defaults. Limit 29 (+4%, Linux gzip drift). PLAN_015 and PLAN_017 art (2026-11-12): the page shows its hero, five story plates, the how band and the Protoyard plate, lazy WebP at the srcset width it renders; the lazy-load distance of each browser fetches the plates within reach on open. Measured 270.1 KB page (chromium 270.1, webkit 194.9, mobile 195.5), limit 281 (+4% headroom on the largest).',
