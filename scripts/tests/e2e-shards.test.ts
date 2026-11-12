@@ -5,12 +5,18 @@ import { expect, it } from 'vitest';
 
 const E2E = join(process.cwd(), 'tests/e2e');
 
+/**
+ * Specs that run against another app's preview, not the website shards (each runs with its own
+ * config). EmojiParser.com (apps/emojiparser, PLAN_023): its CI job is pending (tracked for T-qa).
+ */
+const NOT_WEBSITE_SPECS = new Set(['emojiparser.spec.ts']);
+
 it('assigns every website e2e spec to exactly one CI shard', () => {
   const { shards } = JSON.parse(readFileSync(join(E2E, 'shards.json'), 'utf8')) as {
     shards: string[][];
   };
   const specs = readdirSync(E2E)
-    .filter((name) => name.endsWith('.spec.ts'))
+    .filter((name) => name.endsWith('.spec.ts') && !NOT_WEBSITE_SPECS.has(name))
     .sort();
   const assigned = shards.flat();
   // A spec in no shard would silently never run in CI; one in two would run twice.

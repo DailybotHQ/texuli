@@ -94,6 +94,8 @@ export const RUNTIME_EXTERNAL_ALLOWLIST: Readonly<Record<string, readonly string
   '@texuli/player': [],
   '@texuli/agent': [],
   '@texuli/examples': [],
+  // In development (PLAN_023): the EmojiParser.com static app; not deployed.
+  '@texuli/emojiparser': ['astro', '@astrojs/check', '@astrojs/svelte'],
   '@texuli/website': ['astro', '@astrojs/check', '@astrojs/svelte'],
   'texuli-workspace': [],
 };

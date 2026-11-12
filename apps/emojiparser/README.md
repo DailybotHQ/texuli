@@ -44,3 +44,7 @@ meta policy to every generated page. `dist/_headers` carries the matching
 Cloudflare Pages response headers. `wrangler.toml` prepares the Pages project
 name and output directory; no Cloudflare project, domain, deployment or
 credentials were created or applied by this change.
+
+---
+
+Powered by [Dailybot](https://www.dailybot.com?utm_source=dailybotopensource&utm_medium=texuli-emojiparser).
