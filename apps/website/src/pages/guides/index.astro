@@ -2,10 +2,12 @@
 import GuideCode from '../../components/guides/GuideCode.astro';
 import GuidesShell from '../../components/guides/GuidesShell.astro';
 import PageBanner from '../../components/landing/PageBanner.astro';
+import { SOLUTIONS } from '../../data/solutions/index.ts';
 
 const toc = [
   { id: 'what-you-get', label: 'What you get', level: 2 as const },
   { id: 'how-to-read', label: 'How to read', level: 2 as const },
+  { id: 'solutions', label: 'Solutions', level: 2 as const },
   { id: 'static-and-local', label: 'Static and local', level: 2 as const },
 ];
 
@@ -37,9 +39,27 @@ const treeSnippet = `guides/
   <h2 id="how-to-read">How to read</h2>
   <p>
     Start with <a href="./getting-started/">Getting started</a>, then appearance
-    (theming and dark mode), then inclusive UI (accessibility, RTL, forms), and finish with
-    performance. Use the sidebar, the mobile menu, or previous / next at the bottom of each page.
+    (theming and dark mode), then inclusive UI (accessibility, RTL, forms), then
+    the <a href="#solutions">Solution guides</a>, and finish with performance. Use the sidebar, the
+    mobile menu, or previous / next at the bottom of each page.
   </p>
+
+  <h2 id="solutions">Solutions</h2>
+  <p>
+    Each Solution has a landing and a technical guide. The list is the Solutions registry, in
+    catalog order.
+  </p>
+  <ul>
+    {
+      SOLUTIONS.map((entry) => (
+        <li>
+          <a href={entry.docs}>{entry.name}</a>
+          {' — '}
+          {entry.tagline}
+        </li>
+      ))
+    }
+  </ul>
 
   <h2 id="static-and-local">Static and local</h2>
   <p>

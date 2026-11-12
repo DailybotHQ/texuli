@@ -66,6 +66,10 @@ const BANNED: readonly { phrase: RegExp; why: string }[] = [
     why: 'every published package is on npm as 0.17.4, and the site is deployed',
   },
   {
+    phrase: /not available from npm yet/i,
+    why: 'additions to published packages say "not in a published release yet"; private packages say they are not published on npm',
+  },
+  {
     phrase: /\b0\.1\.0\b/,
     why: 'the 0.1.0-next.N previews are superseded: name the current release, 0.17.4',
   },

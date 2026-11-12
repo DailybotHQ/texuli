@@ -42,7 +42,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
     packages: [
       {
         name: '@texuli/core',
-        role: 'Texels: ids, keyboard intents, roving focus and typeahead, focus scope, inert, dismissable layers, layer stack, overlay engine, portal, positioning (math + DOM), presence, scroll lock, tabbable, form bridge, announcer, direction and locale, the URL policy',
+        role: 'Texels: ids, keyboard intents, roving focus and typeahead, focus scope, inert, dismissable layers, layer stack, overlay engine, portal, positioning (math + DOM), presence, scroll lock, tabbable, form bridge, announcer, direction and locale, the URL policy; Markdown, HTML and chat dialects (in development, not in a published release yet)',
         dependsOn: [],
       },
       {

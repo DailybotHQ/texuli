@@ -234,6 +234,7 @@ export const DOC_SHELL_ROUTES: readonly string[] = [
   '/component-pages/',
   '/primitives-page/',
   '/web-and-native/',
+  '/markdown/',
   '/developers/',
   '/mcp-server/',
   '/tokens/',

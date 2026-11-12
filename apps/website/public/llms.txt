@@ -21,6 +21,7 @@ The two-runtimes story: the architecture page and the native landing.
 
 - [Web + native](https://texuli.com/web-and-native/)
 - [Native (Kotlin)](https://texuli.com/native/)
+- [Markdown](https://texuli.com/markdown/)
 
 ## Native
 
@@ -94,6 +95,7 @@ Every styled component with live examples; each page documents props, behavior a
 - [Gallery](https://texuli.com/gallery-components/)
 - [Examples](https://texuli.com/examples/)
 - [Editor](https://texuli.com/editor-page/)
+- [Emoji](https://texuli.com/emoji/)
 - [Drag and drop](https://texuli.com/drag-page/)
 - [Motion](https://texuli.com/motion-page/)
 - [Forms](https://texuli.com/forms-page/)

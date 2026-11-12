@@ -186,7 +186,7 @@ test('the export writes each chat format, lists its losses and never pings', asy
   // Typed broadcast words never become pings.
   await caretAtEnd(page);
   await page.keyboard.type(' @everyone');
-  await expect(discord).toHaveValue(/@​everyone/);
+  await expect(discord).toHaveValue(/@\u200beveryone/);
   expect(await problems()).toEqual([]);
 });
 

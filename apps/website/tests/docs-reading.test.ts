@@ -765,7 +765,11 @@ describe('site navigation model', () => {
       '/skill/',
     ]);
     const platform = SITE_NAV_GROUPS.find((group) => group.id === 'platform');
-    expect(platform?.links.map((link) => link.href)).toEqual(['/web-and-native/', '/native/']);
+    expect(platform?.links.map((link) => link.href)).toEqual([
+      '/web-and-native/',
+      '/native/',
+      '/markdown/',
+    ]);
     // The home is a landing outside the docs navigation.
     expect(SITE_NAV_ORDER.some((link) => link.href === '/')).toBe(false);
     expect(SITE_NAV_ORDER.some((link) => link.href.startsWith('/migration'))).toBe(false);
