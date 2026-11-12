@@ -3,6 +3,7 @@ import ComboboxContract from './ComboboxContract.svelte';
 import CommandContract from './CommandContract.svelte';
 import DesignSystemContract from './DesignSystemContract.svelte';
 import DisplayContract from './DisplayContract.svelte';
+import EmojiContract from './EmojiContract.svelte';
 import FormsContract from './FormsContract.svelte';
 import LayoutsContract from './LayoutsContract.svelte';
 import MenusContract from './MenusContract.svelte';
@@ -55,6 +56,24 @@ export const EXCLUDED_PREFIXES: Record<string, string> = {
 
 /** One case per exported rendering component, each mounted in its family harness. */
 export const CASES: ContractCase[] = [
+  {
+    key: 'emoji/Emoji',
+    harness: EmojiContract,
+    idOwned: 'The id prop is the canonical emoji record id, not a root DOM id.',
+    skip: {
+      click: 'the emoji renderer has no click behavior',
+      keydown: 'the emoji renderer does not act on keyboard events',
+    },
+  },
+  {
+    key: 'emoji/EmojiText',
+    harness: EmojiContract,
+    skip: {
+      click: 'the text renderer has no click behavior',
+      keydown: 'the text renderer does not act on keyboard events',
+    },
+  },
+  { key: 'emoji/EmojiPicker', harness: EmojiContract },
   // Layout parts a host composes on its own (G93): `ref` and rest on the root.
   { key: 'layouts/shells/AppShell', harness: LayoutsContract },
   { key: 'layouts/app/SplitView', harness: LayoutsContract },

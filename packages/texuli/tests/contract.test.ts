@@ -13,6 +13,9 @@ import {
 import { createContractRefs } from '../../primitives/tests/support/contract-refs.svelte.ts';
 import List from '../src/components/list-item/List.svelte';
 import Mark from '../src/components/typography/Mark.svelte';
+import Emoji from '../src/emoji/Emoji.svelte';
+import EmojiPicker from '../src/emoji/EmojiPicker.svelte';
+import EmojiText from '../src/emoji/EmojiText.svelte';
 import { CASES, EXCLUDED, EXCLUDED_PREFIXES } from './contract/cases.ts';
 import FieldRuleContract from './contract/FieldRuleContract.svelte';
 
@@ -42,6 +45,9 @@ for (const [path, module] of Object.entries(components)) {
 // them by identity with the barrel re-exports `exportedComponents` walks.
 sources.set(List, 'components/list-item/List');
 sources.set(Mark, 'components/typography/Mark');
+sources.set(Emoji, 'emoji/Emoji');
+sources.set(EmojiText, 'emoji/EmojiText');
+sources.set(EmojiPicker, 'emoji/EmojiPicker');
 
 function entryModule(file: string): Record<string, unknown> | undefined {
   const local = file.replace('./src/', '../src/');

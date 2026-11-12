@@ -57,7 +57,7 @@ test('converter separates canonical and legacy aliases and reports conflicts', a
   );
 });
 
-test('docs, art licensing and picker integration seam are explicit', async ({ page }) => {
+test('docs, licensing and shared picker work locally', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   for (const colorScheme of ['light', 'dark'] as const) {
     await page.emulateMedia({ colorScheme });
@@ -81,11 +81,22 @@ test('docs, art licensing and picker integration seam are explicit', async ({ pa
     page.getByText('Approved Texuli artwork: 0 of 3963 catalog sequences.')
   ).toBeVisible();
   await expect(page.getByText(/pending owner approval/)).toBeVisible();
+  const externalRequests: string[] = [];
+  page.on('request', (request) => {
+    if (new URL(request.url()).origin !== ORIGIN) externalRequests.push(request.url());
+  });
   await page.goto(`${ORIGIN}/picker/`);
   await expect(page.locator('[data-emoji-picker-lab]')).toBeVisible();
-  await expect(
-    page.getByRole('heading', { name: 'Component integration in progress' })
-  ).toBeVisible();
+  const grid = page.getByRole('grid');
+  await expect(grid).toHaveAttribute('aria-busy', 'false');
+  await page.getByRole('combobox', { name: 'Search emoji' }).fill('rocket');
+  const rocket = page.getByRole('gridcell', { name: 'rocket' });
+  await expect(rocket).toBeVisible();
+  await rocket.click();
+  await expect(page.locator('[data-selected-emoji]')).toContainText('🚀');
+  await expect(page.locator('[data-selected-emoji]')).toContainText(':rocket:');
+  await expect(page.getByText('Recent choices: 1')).toBeVisible();
+  expect(externalRequests).toEqual([]);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth

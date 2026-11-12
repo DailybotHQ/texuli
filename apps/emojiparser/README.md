@@ -13,7 +13,7 @@ from the repository root and run:
 ```sh
 pnpm --filter @texuli/emojiparser dev
 pnpm --filter @texuli/emojiparser build
-pnpm --filter @texuli/emojiparser preview -- --host 127.0.0.1 --port 4876 --strictPort
+pnpm --filter @texuli/emojiparser preview --host 127.0.0.1 --port 4876 --strictPort
 ```
 
 The app builds fully static pages. Search data and conversion engines are loaded
@@ -31,8 +31,9 @@ product yet; see `/licensing/`.
 - `/docs/` covers installation and API use and links to the
   [universal-emoji-parser migration guide](https://github.com/DailybotHQ/texuli/blob/main/docs/emojis/MIGRATION.md).
 - `/licensing/` records the current artwork status and proposed license.
-- `/picker/` reserves an integration seam for the `EmojiPicker` from
-  `texuli/emoji`; the component integration waits for T-emo-web.
+- `/picker/` demonstrates the shared `EmojiPicker` from `texuli/emoji`,
+  including search, category navigation, keyboard selection and host-controlled
+  recent selections.
 
 The footer, about and docs surfaces carry the “Powered by Texuli Emojis”
 attribution. The product has its own name and visual identity.
