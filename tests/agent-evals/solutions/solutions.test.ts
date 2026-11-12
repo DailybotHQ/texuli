@@ -21,14 +21,14 @@
  * short reference page that does not name the packages yet, so for it the package names
  * come from the index only (`docsNamePackages: false`).
  */
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { SOLUTIONS } from '../../../apps/website/src/data/solutions/index.ts';
 import type { SolutionSlug } from '../../../apps/website/src/data/solutions/schema.ts';
 import { onRequest } from '../../../functions/mcp.ts';
 import { assertEdgeParity, type Json, runSession, type Session } from '../harness.ts';
-import { llmsSection, SITE, solutionsSite } from './solutions-site.ts';
+import { DOCUMENTED, llmsSection, SITE, solutionsSite } from './solutions-site.ts';
 
 const REPO = resolve(import.meta.dirname, '../../..');
 const call = (name: string, args: Json) => ({ name, arguments: args });
@@ -148,8 +148,13 @@ const PIPELINE = JSON.parse(
 ) as Json;
 
 describe('agent builds each shipped Solution from llms.txt → index → docs → MCP', () => {
-  it('covers every Solution in the registry', () => {
-    expect(SOLUTIONS.map((s) => s.slug).sort()).toEqual(
+  it('covers every Solution whose docs page ships', () => {
+    // A Solution's docs page on disk must have its loader in DOCS (and an eval below).
+    const shipped = SOLUTIONS.filter((s) =>
+      existsSync(resolve(REPO, `apps/website/src/pages${s.docs}index.astro`))
+    ).map((s) => s.slug);
+    expect(DOCUMENTED.map((s) => s.slug).sort()).toEqual(shipped.sort());
+    expect(shipped.sort()).toEqual(
       ['canvas', 'design-systems', 'documents', 'sheets', 'slides', 'workflows'].sort()
     );
   });
