@@ -46,6 +46,7 @@
     "./keyboard": "./src/keyboard/index.ts",
     "./layer-stack": "./src/layer-stack/index.ts",
     "./lazy": "./src/lazy/index.ts",
+    "./markdown": "./src/markdown/index.ts",
     "./markdown-html": "./src/markdown-html/index.ts",
     "./markup": "./src/markup/index.ts",
     "./motion": "./src/motion/index.ts",
