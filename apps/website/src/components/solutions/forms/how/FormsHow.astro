@@ -1,0 +1,33 @@
+---
+import { FORMS_HOW } from './how-content.ts';
+---
+
+<section class="forms-how" aria-labelledby="forms-how-title" data-tx-solution-how="forms">
+  <div class="forms-how__inner">
+    <h2 id="forms-how-title">{FORMS_HOW.title}</h2>
+    <ol>
+      {FORMS_HOW.steps.map((step, index) => (
+        <li>
+          <span class="forms-how__number" aria-hidden="true">{index + 1}</span>
+          <div>
+            <h3>{step.title}</h3>
+            <p>{step.body}</p>
+            {step.package && <code>{step.package}</code>}
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .forms-how__inner { max-inline-size: 76rem; margin-inline: auto; padding-inline: clamp(1rem, 4vw, 1.5rem); }
+  .forms-how h2 { margin: 0 0 clamp(1.5rem, 4vw, 2.5rem); color: var(--tx-foreground); font-size: clamp(1.9rem, 5vw, 3rem); line-height: 1.05; letter-spacing: -.03em; }
+  .forms-how ol { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: .75rem; margin: 0; padding: 0; list-style: none; }
+  .forms-how li { display: flex; align-items: flex-start; gap: .8rem; min-inline-size: 0; padding: 1rem; border: 1px solid var(--tx-border); border-radius: .85rem; background: var(--tx-background); }
+  .forms-how__number { display: grid; flex: 0 0 2rem; place-items: center; inline-size: 2rem; block-size: 2rem; border-radius: 50%; background: color-mix(in oklab, var(--tx-primary) 13%, var(--tx-background)); color: var(--tx-foreground); font-weight: 750; }
+  .forms-how h3 { margin: 0; color: var(--tx-foreground); font-size: 1rem; }
+  .forms-how p { margin: .45rem 0; color: var(--tx-muted-foreground); line-height: 1.5; }
+  .forms-how code { color: var(--tx-muted-foreground); font-size: .8rem; }
+  @media (forced-colors: active) { .forms-how li { border-color: CanvasText; } }
+</style>

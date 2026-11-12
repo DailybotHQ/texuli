@@ -1,0 +1,50 @@
+---
+import FormsDemo from '../../../components/solutions/forms/demo/FormsDemo.svelte';
+import {
+  FORMS_AGENTS,
+  FORMS_NEXT,
+  FORMS_PLATFORMS,
+  FORMS_RECIPES,
+} from '../../../components/solutions/forms/extras/extras-content.ts';
+import FormsHero from '../../../components/solutions/forms/hero/FormsHero.astro';
+import FormsHow from '../../../components/solutions/forms/how/FormsHow.astro';
+import FormsQuickstart from '../../../components/solutions/forms/quickstart/FormsQuickstart.astro';
+import FormsStories from '../../../components/solutions/forms/stories/FormsStories.astro';
+/**
+ * `/solutions/forms/` — the Forms Solution landing. The shared layout keeps registry
+ * facts and the static sections aligned; only the SchemaForm and builder demo hydrates.
+ */
+import SolutionDemoFrame from '../../../components/solutions/shared/demo-frame/SolutionDemoFrame.astro';
+import SolutionAgents from '../../../components/solutions/shared/platforms/SolutionAgents.astro';
+import SolutionPlatforms from '../../../components/solutions/shared/platforms/SolutionPlatforms.astro';
+import SolutionNextSteps from '../../../components/solutions/shared/resources/SolutionNextSteps.astro';
+import SolutionRecipes from '../../../components/solutions/shared/resources/SolutionRecipes.astro';
+import SolutionLayout from '../../../components/solutions/shared/SolutionLayout.astro';
+import { techArticleJsonLd } from '../../../lib/schema.ts';
+import { FORMS_LANDING as content, FORMS_ENTRY as entry } from './_content.ts';
+
+const title = 'Forms — schemas for thoughtful workflows';
+const description = entry.tagline;
+---
+
+<SolutionLayout
+  {entry}
+  {content}
+  {title}
+  {description}
+  jsonLd={techArticleJsonLd(title, description, entry.route)}
+>
+  <FormsHero slot="hero" />
+  <SolutionDemoFrame slot="demo" {entry} {...content.demo}>
+    <FormsDemo slot="demo" client:visible />
+  </SolutionDemoFrame>
+  <FormsStories slot="stories" />
+  <FormsHow slot="how" />
+  <FormsQuickstart slot="quickstart" />
+  <SolutionRecipes slot="recipes" {entry} {...FORMS_RECIPES} />
+  <SolutionAgents slot="agents" {entry} {...FORMS_AGENTS} />
+  <SolutionPlatforms slot="platforms" {entry} {...FORMS_PLATFORMS} />
+  <Fragment slot="next">
+    <SolutionNextSteps {entry} {...FORMS_NEXT} />
+  </Fragment>
+</SolutionLayout>
