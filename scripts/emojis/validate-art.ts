@@ -22,6 +22,7 @@ interface MeaningReview {
   shortcode: string;
   cldrName: string;
   requiredFeatures: string;
+  comparisonNotes?: string;
   reviewer: string;
   reviewedAt: string;
   verdict: 'pass' | 'fail';
@@ -81,6 +82,8 @@ function main(): void {
       throw new Error(`meaning review does not match CLDR meaning requirements for ${row.id}`);
     if (!review.reviewer.trim() || !/^\d{4}-\d{2}-\d{2}$/.test(review.reviewedAt))
       throw new Error(`meaning review needs reviewer and review date for ${row.id}`);
+    if (row.shortcode.startsWith(':thumbs_up_') && !review.comparisonNotes?.trim())
+      throw new Error(`thumbs-up meaning review needs comparison notes for ${row.id}`);
     if (review.verdict !== 'pass') throw new Error(`meaning review failed for ${row.id}`);
     if (row.status !== source.status) throw new Error(`status mismatch for ${row.id}`);
     const filename = `${row.id}.svg`;

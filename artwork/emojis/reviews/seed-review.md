@@ -19,6 +19,13 @@ absence of references to third-party art. The validation harness checks exact
 source/package IDs, per-file provenance and hashes, and the meaning review's
 CLDR identity, requirements, reviewer and passing verdict.
 
+For the R3 thumbs-up correction, all five skin tones were also compared at
+64 px and 24 px on light and dark grounds beside throwaway U+1F595 and U+261D
+reference drawings under `tmp/emoji-art-r3-references/`. The reference art is
+not a shipped input. The candidate thumb is shorter, broader, angled and
+side-mounted; the references show long upright digits. Comparison notes are
+stored per tone in `meaning-review.json` and `meaning-checklist.md`.
+
 ## Representative before/after checks
 
 | Design | Before: authored source | After: deterministic package output | Review result |
