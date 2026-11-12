@@ -3,7 +3,7 @@ import { axeViolations, polishProblems, serveDist, settle } from './support/site
 
 /*
  * texuli.com /solutions/dashboards/ on the built site:
- * 1. server-rendered preview, sections and honest in-development copy;
+ * 1. server-rendered board, sections and honest in-development copy;
  * 2. one lazy island with three fictional scenarios, date range, filters and movable/resizable widgets;
  * 3. no horizontal overflow at phone width, and no serious or critical axe violations in either theme.
  */
@@ -48,7 +48,7 @@ test('the landing renders its sections, registry status and server preview witho
   const response = await page.goto(`${origin()}${ROUTE}`);
   expect(response?.status()).toBe(200);
   const html = (await response?.text()) ?? '';
-  expect(html).toContain('data-tx-dashboard-preview');
+  expect(html).toContain('data-tx-dashboards-demo');
   expect(html).toContain('data-tx-solution-status="in development"');
   expect(html).toContain('not on npm yet');
   expect(html).toMatch(/<astro-island[^>]+client="visible"/);
@@ -58,8 +58,12 @@ test('the landing renders its sections, registry status and server preview witho
     'A dashboard that fits the way you work.'
   );
   await expect(page.locator('[data-tx-solution-status]')).toHaveText(/Status: in development/);
-  await expect(page.locator('[data-tx-dashboard-preview]')).toBeVisible();
+  await expect(demo(page)).toBeVisible();
   await expect(island(page)).toHaveAttribute('ssr', '');
+  await expect(page.getByRole('link', { name: 'Build a dashboard', exact: true })).toHaveAttribute(
+    'href',
+    '/guides/solutions/dashboards/'
+  );
 
   const subnav = page.getByRole('navigation', { name: 'Dashboards page sections' });
   const links = subnav.locator('a[href^="#"]');
@@ -86,8 +90,10 @@ test('the dashboard island changes scenarios, filters and range, and supports ke
       .locator('[data-tx-component="data-metric-card"]')
       .filter({ has: page.getByRole('heading', { name }) })
       .first();
-  await expect(board.getByRole('heading', { name: 'Active users' })).toBeVisible();
-  await expect(demo(page).getByText('2 sample regions match the current filters.')).toBeVisible();
+  await expect(board.getByRole('heading', { name: 'Active users' }).first()).toBeVisible();
+  await expect(
+    demo(page).getByText('Product analytics loaded with the North region filter.')
+  ).toBeVisible();
 
   // FilterBar changes are sent back to the host. Clearing the North chip restores all six rows.
   await demo(page).getByRole('button', { name: 'Clear filters' }).click();
@@ -104,11 +110,11 @@ test('the dashboard island changes scenarios, filters and range, and supports ke
   await demo(page)
     .getByRole('combobox', { name: 'Dashboard scenario' })
     .selectOption('support-ops');
-  await expect(board.getByRole('heading', { name: 'Open tickets' })).toBeVisible();
+  await expect(board.getByRole('heading', { name: 'Open tickets' }).first()).toBeVisible();
   await demo(page)
     .getByRole('combobox', { name: 'Dashboard scenario' })
     .selectOption('sales-pipeline');
-  await expect(board.getByRole('heading', { name: 'Pipeline value' })).toBeVisible();
+  await expect(board.getByRole('heading', { name: 'Pipeline value' }).first()).toBeVisible();
 
   const move = board.getByRole('button', { name: 'Move Pipeline value' });
   await move.focus();
@@ -125,7 +131,7 @@ test('the dashboard island changes scenarios, filters and range, and supports ke
   await resizeGroup.getByRole('button', { name: 'Wider' }).click();
   await resizeGroup.getByRole('button', { name: 'Done' }).click();
 
-  const widget = board.locator('[data-widget-id="pipeline-value"]');
+  const widget = board.locator('[data-widget-id="metric-1"]');
   const handle = board.getByRole('button', { name: 'Move Pipeline value' });
   const box = await handle.boundingBox();
   expect(box).not.toBeNull();

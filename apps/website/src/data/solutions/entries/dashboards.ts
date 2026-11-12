@@ -7,14 +7,14 @@ export const dashboards: SolutionEntry = {
   status: 'in development',
   tagline: 'KPI boards people arrange, from the keyboard too.',
   summary:
-    'A widget grid with pointer and keyboard moves and resizes, filters and a date range, on @texuli/data/dashboard. Pre-1.0: the date-range, filter-bar and metric-card pieces the landing needs are still landing.',
+    'A responsive widget grid with pointer and keyboard layout controls. The dashboard grid is available in @texuli/data@0.17.4; FilterBar and MetricCard are in development; published-package consumers need a later @texuli/data release for them.',
   route: '/solutions/dashboards/',
   docs: '/guides/solutions/dashboards/',
   packages: [
     {
       name: '@texuli/data',
-      subpaths: ['./dashboard', './dashboard/engine', './filter-builder'],
-      role: 'Dashboard grid, layout engine and filter builder',
+      subpaths: ['./dashboard', './dashboard/engine', './filter-builder', './filter-bar'],
+      role: 'Dashboard grid, layout engine, filter builder and filter bar',
     },
   ],
   capabilities: [
@@ -27,13 +27,15 @@ export const dashboards: SolutionEntry = {
     {
       id: 'filters',
       title: 'Filters and date range',
-      summary: 'Filter the board and pick a date range. The dedicated controls are still landing.',
+      summary:
+        'Filter controls are in development; the FilterBar addition needs a later @texuli/data release.',
       status: 'in development',
     },
     {
       id: 'metrics',
       title: 'KPI widgets',
-      summary: 'Show metrics on the grid. A shared metric-card component is still landing.',
+      summary:
+        'The dashboard grid is published; the shared MetricCard addition is in development and needs a later @texuli/data release.',
       status: 'in development',
     },
   ],
@@ -46,13 +48,16 @@ export const dashboards: SolutionEntry = {
   demo: {
     id: 'dashboards',
     title: 'Arrange a KPI board',
-    scenarios: ['kpi-board'],
-    limits: ['Placeholder until the Dashboards landing demo ships. Nothing is saved.'],
+    scenarios: ['product-analytics', 'support-ops', 'sales-pipeline'],
+    limits: [
+      'Uses fictional browser-local sample data; it makes no network requests and saves no layout or filters.',
+      'FilterBar and MetricCard were added after 0.17.4; published-package consumers need a later @texuli/data release for them.',
+    ],
   },
   art: { hero: { slot: 'solution-dashboards-hero', variant: 'plate' } },
   limits: [
     'Pre-1.0 and in development: a new minor version may break the API.',
-    'The date-range, filter-bar and metric-card components the Solution needs are not complete yet.',
+    'FilterBar and MetricCard were added after 0.17.4; they are in development and need a later @texuli/data release.',
     '/dashboards-page/ stays as the capability reference; it is not redirected (ADR-036).',
   ],
   links: [
