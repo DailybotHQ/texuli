@@ -14,7 +14,7 @@ type StageProps = {
   deck: unknown;
   syncHash: boolean;
   fit: 'container';
-  tier: 'untrusted';
+  tier: 'developer';
   autofocus: boolean;
   clickToAdvance: boolean;
   autoSlideMs: number;
@@ -33,6 +33,7 @@ let model: SlidesDemoModel | null = null;
 let snapshot = $state.raw<SlidesDemoSnapshot | null>(null);
 let Stage = $state<Component<StageProps> | null>(null);
 let Controls = $state<Component | null>(null);
+let StageBar = $state<Component | null>(null);
 let renderers = $state.raw<DeckRenderers>({});
 let loadTheme = $state<DeckThemeLoader | null>(null);
 let stageController = $state.raw<DeckController | null>(null);
@@ -125,11 +126,12 @@ async function startDemo(): Promise<void> {
   if (started || stageLoading || stageFailed) return;
   stageLoading = true;
   try {
-    const [modelModule, stage, layouts, controls] = await Promise.all([
+    const [modelModule, stage, layouts, controls, stageBar] = await Promise.all([
       import('./model.ts'),
       import('@texuli/slides/stage-core'),
       import('@texuli/slides/layouts'),
       import('./ui/SlidesDemoControls.svelte'),
+      import('./ui/SlidesDemoStageBar.svelte'),
     ]);
     model = modelModule.createSlidesDemoModel();
     snapshot = model.getSnapshot();
@@ -137,6 +139,7 @@ async function startDemo(): Promise<void> {
     loadTheme = stage.loadDeckLibraryTheme;
     Stage = stage.DeckStageCore as unknown as Component<StageProps>;
     Controls = controls.default;
+    StageBar = stageBar.default;
     announcement = `${slideLabel(snapshot)} is ready.`;
     started = true;
   } catch {
@@ -153,8 +156,11 @@ onDestroy(() => {
 });
 </script>
 
-{#snippet quietChrome()}
-  <span class="sr-only">Use the controls above to navigate this slide deck.</span>
+{#snippet stageChrome()}
+  {#if StageBar}
+    {@const Bar = StageBar}
+    <Bar />
+  {/if}
 {/snippet}
 
 <div class="slides-demo" data-tx-slides-demo="" data-demo-live={started && snapshot ? '' : undefined}>
@@ -175,7 +181,7 @@ onDestroy(() => {
       <DemoControls {snapshot} {announcement} onAction={dispatch} />
     {/if}
     <p class="slides-demo__hint">
-      Focus the slide stage and use the arrow keys to navigate. On touch screens, swipe across the slide.
+      Click the slide or use the arrow keys to move on; swipe on touch screens. Open full screen from the bar under the slide.
     </p>
   {/if}
 
@@ -188,16 +194,16 @@ onDestroy(() => {
       {loadTheme}
       syncHash={false}
       fit="container"
-      tier="untrusted"
+      tier="developer"
       autofocus={false}
-      clickToAdvance={false}
+      clickToAdvance={true}
       autoSlideMs={0}
       initialSlideId={snapshot.location.slideId}
       coverHeadingLevel={2}
       namespace="slides-solution-demo"
       bind:controller={stageController}
       onSlideChange={handleStageChange}
-      chrome={quietChrome}
+      chrome={stageChrome}
     />
   {/if}
 
@@ -217,14 +223,6 @@ onDestroy(() => {
     max-inline-size: 100%;
   }
 
-  .sr-only {
-    position: absolute;
-    inline-size: 1px;
-    block-size: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
 
   .slides-demo__hint,
   .slides-demo__loading,

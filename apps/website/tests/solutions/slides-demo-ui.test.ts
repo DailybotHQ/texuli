@@ -28,8 +28,8 @@ describe('Slides Solution demo island', () => {
     expect(
       preview.container.querySelector('[data-tx-slides-demo-preview="texuli-in-motion"]')
     ).not.toBeNull();
-    expect(preview.container.textContent).toContain('Presentations, built from pieces');
-    expect(stage(preview.container)?.getAttribute('aria-label')).toContain('Texuli in motion');
+    expect(preview.container.textContent).toContain('Small pieces. Infinite possibilities.');
+    expect(stage(preview.container)?.getAttribute('aria-label')).toContain('Texuli launch keynote');
 
     const island = render(SlidesDemo);
     await startDemo(island.container);
@@ -55,18 +55,18 @@ describe('Slides Solution demo island', () => {
     );
     await fireEvent.click(screen.getByRole('button', { name: 'Pause slides' }));
 
-    await fireEvent.click(screen.getByRole('button', { name: /^Theme: ocean$/i }));
+    await fireEvent.click(screen.getByRole('button', { name: /^Theme: violet$/i }));
     expect(screen.getByRole('button', { name: /^Theme: graphite$/i })).toBeTruthy();
 
     await fireEvent.click(screen.getByRole('button', { name: 'View source' }));
     expect(screen.getByRole('region', { name: 'Deck source as JSON' }).textContent).toContain(
-      'Texuli in motion'
+      'Texuli launch keynote'
     );
     expect(container.querySelector('pre')?.textContent).toContain('formatVersion');
 
     await fireEvent.change(screen.getByLabelText('Scenario'), { target: { value: 'data-report' } });
     await waitFor(() => expect(activeSlideId(container)).toBe('opening'));
-    expect(container.querySelector('.controls__position')?.textContent).toContain('Slide 1 of 5');
+    expect(container.querySelector('.controls__position')?.textContent).toContain('Slide 1 of 7');
 
     await fireEvent.click(screen.getByRole('button', { name: 'Reset example' }));
     await waitFor(() => expect(activeSlideId(container)).toBe('opening'));
@@ -97,6 +97,6 @@ describe('Slides Solution demo island', () => {
       clientX: 280,
       clientY: 204,
     });
-    expect(activeSlideId(container)).toBe('signal');
+    expect(activeSlideId(container)).toBe('packages');
   });
 });

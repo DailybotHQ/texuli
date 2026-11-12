@@ -58,7 +58,13 @@ export const slides: SolutionEntry = {
   demo: {
     id: 'slides',
     title: 'Present a deck',
-    scenarios: ['texuli-in-motion', 'investor-pitch', 'data-report', 'product-walkthrough'],
+    scenarios: [
+      'texuli-in-motion',
+      'investor-pitch',
+      'data-report',
+      'product-walkthrough',
+      'engineering-deep-dive',
+    ],
     limits: ['Runs in the browser on fixture decks only; nothing is saved.'],
   },
   art: { hero: { slot: 'solution-slides-hero', variant: 'plate' } },

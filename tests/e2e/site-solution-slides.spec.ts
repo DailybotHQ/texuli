@@ -124,14 +124,25 @@ test('the demo hydrates on scroll; buttons, keys, scenarios, reset and source al
 
   const first = await activeSlide(page).getAttribute('data-slide-id');
   const controls = demo(page).getByRole('group', { name: 'Slide deck controls' });
+  // Previous, next and full screen live in the small bar under the slide.
+  const bar = demo(page).getByRole('group', { name: 'Slide navigation' });
+  await expect(bar.getByRole('button', { name: 'Full screen' })).toBeVisible();
 
   // Buttons, by keyboard.
-  await controls.getByRole('button', { name: 'Next slide' }).focus();
+  await bar.getByRole('button', { name: 'Next slide' }).focus();
   await page.keyboard.press('Enter');
   await expect(position(page)).toContainText('Slide 2 of');
   await expect(activeSlide(page)).not.toHaveAttribute('data-slide-id', first ?? '');
-  await controls.getByRole('button', { name: 'Previous slide' }).focus();
+  await bar.getByRole('button', { name: 'Previous slide' }).focus();
   await page.keyboard.press('Enter');
+  await expect(position(page)).toContainText('Slide 1 of');
+
+  // The first click on the slide advances it (no separate focus click).
+  const slideArea = demo(page).locator('.tx-deck-stage__viewport');
+  await slideArea.scrollIntoViewIfNeeded();
+  await slideArea.click();
+  await expect(position(page)).toContainText('Slide 2 of');
+  await bar.getByRole('button', { name: 'Previous slide' }).click();
   await expect(position(page)).toContainText('Slide 1 of');
 
   // Arrow keys on the stage (wait for the button move to settle first).
@@ -147,7 +158,7 @@ test('the demo hydrates on scroll; buttons, keys, scenarios, reset and source al
   const pitchFirst = await activeSlide(page).getAttribute('data-slide-id');
 
   // Reset returns to the first slide of the current deck, with its starting theme.
-  await controls.getByRole('button', { name: 'Next slide' }).click();
+  await bar.getByRole('button', { name: 'Next slide' }).click();
   await expect(position(page)).toContainText('Slide 2 of');
   await controls.getByRole('button', { name: 'Reset example' }).click();
   await expect(position(page)).toContainText('Slide 1 of');
@@ -191,6 +202,9 @@ test('at 390 px nothing overflows; axe has no serious violations in light and da
   ).toBeLessThanOrEqual(1);
 
   await page.setViewportSize({ width: 1280, height: 900 });
+  // Back to the top: the 390 px run leaves the demo controls under the sticky header, which axe
+  // reads as an obscured (too small) target. The page is checked at rest.
+  await page.evaluate(() => window.scrollTo(0, 0));
   for (const scheme of ['light', 'dark'] as const) {
     await useScheme(page, scheme);
     const serious = (await axeViolations(page)).filter((v) => /\((serious|critical)\)/.test(v));

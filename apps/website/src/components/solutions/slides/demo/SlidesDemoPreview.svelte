@@ -18,7 +18,7 @@ const renderers = { ...layoutRenderers, validateBlock: validateDeckBlock };
     {deck}
     syncHash={false}
     fit="container"
-    tier="untrusted"
+    tier="developer"
     defaultRenderers={false}
     {renderers}
     loadTheme={loadDeckLibraryTheme}
