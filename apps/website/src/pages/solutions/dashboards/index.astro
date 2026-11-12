@@ -1,0 +1,43 @@
+---
+import DashboardDemo from '../../../components/solutions/dashboards/demo/DashboardDemo.svelte';
+import DashboardDemoPreview from '../../../components/solutions/dashboards/demo/DashboardDemoPreview.svelte';
+import SolutionHow from '../../../components/solutions/shared/architecture/SolutionHow.astro';
+/** `/solutions/dashboards/` — one shared-layout landing with one lazy dashboard demo island. */
+import SolutionDemoFrame from '../../../components/solutions/shared/demo-frame/SolutionDemoFrame.astro';
+import SolutionHero from '../../../components/solutions/shared/hero/SolutionHero.astro';
+import SolutionAgents from '../../../components/solutions/shared/platforms/SolutionAgents.astro';
+import SolutionPlatforms from '../../../components/solutions/shared/platforms/SolutionPlatforms.astro';
+import SolutionQuickstart from '../../../components/solutions/shared/quickstart/Quickstart.astro';
+import SolutionNextSteps from '../../../components/solutions/shared/resources/SolutionNextSteps.astro';
+import SolutionRecipes from '../../../components/solutions/shared/resources/SolutionRecipes.astro';
+import SolutionRelated from '../../../components/solutions/shared/resources/SolutionRelated.astro';
+import SolutionLayout from '../../../components/solutions/shared/SolutionLayout.astro';
+import SolutionStories from '../../../components/solutions/shared/story/SolutionStories.astro';
+import { techArticleJsonLd } from '../../../lib/schema.ts';
+import {
+  DASHBOARDS_LANDING as content,
+  DASHBOARDS_DEMO,
+  DASHBOARDS_ENTRY as entry,
+} from './_content.ts';
+
+const title = 'Dashboards — KPI widgets you can arrange';
+const description = entry.tagline;
+---
+
+<SolutionLayout {entry} {content} {title} {description} jsonLd={techArticleJsonLd(title, description, entry.route)}>
+  <SolutionHero slot="hero" {entry} {...content.hero} />
+  <SolutionDemoFrame slot="demo" {entry} {...DASHBOARDS_DEMO}>
+    <DashboardDemoPreview slot="preview" />
+    <DashboardDemo slot="demo" client:visible />
+  </SolutionDemoFrame>
+  <SolutionStories slot="stories" {entry} {...content.stories} />
+  <SolutionHow slot="how" {entry} {...content.how} />
+  <SolutionQuickstart slot="quickstart" {entry} {...content.quickstart} />
+  <SolutionRecipes slot="recipes" {entry} {...content.recipes!} />
+  <SolutionAgents slot="agents" {entry} {...content.agents} />
+  <SolutionPlatforms slot="platforms" {entry} {...content.platforms} />
+  <Fragment slot="next">
+    <SolutionRelated {entry} />
+    <SolutionNextSteps {entry} {...content.next} />
+  </Fragment>
+</SolutionLayout>

@@ -11,7 +11,7 @@
       "variantOf": "1f44d",
       "tone": "medium"
     },
-    { "unicode": "👩‍💻", "id": "1f469-200d-1f4bb", "shortcode": ":woman_technologist:" },
+    { "unicode": "👩\u200d💻", "id": "1f469-200d-1f4bb", "shortcode": ":woman_technologist:" },
     { "unicode": "🇺🇸", "id": "1f1fa-1f1f8", "shortcode": ":flag_united_states:" },
     { "unicode": "1️⃣", "id": "31-fe0f-20e3", "shortcode": ":keycap_1:" }
   ],

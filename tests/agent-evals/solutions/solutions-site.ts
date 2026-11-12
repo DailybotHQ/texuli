@@ -50,8 +50,14 @@ export function loadDesignSystemsDocs(): readonly { id: string; source: string }
   });
 }
 
-/** The docs sections of each Solution, in reading order (the docs page renders these). */
-const DOCS: Readonly<Record<SolutionSlug, () => readonly { id: string; source: string }[]>> = {
+/**
+ * The docs sections of each Solution whose docs page ships, in reading order. A Solution joins
+ * here when its `/guides/solutions/<slug>/` page lands; `solutions.test.ts` checks the pages on
+ * disk against this map.
+ */
+export const DOCS: Readonly<
+  Partial<Record<SolutionSlug, () => readonly { id: string; source: string }[]>>
+> = {
   slides: loadSlidesDocs,
   documents: loadDocumentsDocs,
   workflows: loadWorkflowsDocs,
@@ -64,7 +70,9 @@ const DOCS: Readonly<Record<SolutionSlug, () => readonly { id: string; source: s
 export function docsTwin(slug: SolutionSlug): string {
   const entry = SOLUTIONS.find((s) => s.slug === slug);
   if (!entry) throw new Error(`no registry entry for ${slug}`);
-  const body = DOCS[slug]()
+  const load = DOCS[slug];
+  if (!load) throw new Error(`no docs for ${slug}`);
+  const body = load()
     .map((section) => section.source.trim())
     .join('\n\n');
   return `# ${entry.name} docs\n\n> ${entry.tagline}\n\nLanguage: en\nCanonical: ${SITE}${entry.docs}\n\n---\n\n${body}\n`;
@@ -76,12 +84,15 @@ export interface SolutionsSite {
   readonly requested: string[];
 }
 
+/** Registry entries whose docs page ships. */
+export const DOCUMENTED = SOLUTIONS.filter((entry) => DOCS[entry.slug] !== undefined);
+
 /** The fake site. */
 export function solutionsSite(): SolutionsSite {
   const files = new Map<string, string>();
   files.set('/llms.txt', readFileSync(resolve(REPO, 'apps/website/public/llms.txt'), 'utf8'));
   files.set('/solutions/index.json', JSON.stringify(solutionsIndexDocument(SITE)));
-  const pages = SOLUTIONS.map((entry) => ({
+  const pages = DOCUMENTED.map((entry) => ({
     path: entry.docs,
     twin: `${entry.docs.replace(/\/$/, '')}.md`,
     title: `${entry.name} docs`,
@@ -92,7 +103,7 @@ export function solutionsSite(): SolutionsSite {
     '/md-manifest.json',
     JSON.stringify({ twins: Object.fromEntries(pages.map((p) => [p.path, p.twin])), pages })
   );
-  for (const entry of SOLUTIONS)
+  for (const entry of DOCUMENTED)
     files.set(`${entry.docs.replace(/\/$/, '')}.md`, docsTwin(entry.slug));
   const requested: string[] = [];
   return {
