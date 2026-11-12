@@ -141,10 +141,10 @@ const PIECES = [
   'word',
   'tg://user?id=1',
   // Unicode
-  '​',
-  '‮',
+  '\u200b',
+  '\u202e',
   '\u0000',
-  '﻿',
+  '\ufeff',
   'é',
   '日本',
   '🙂',
