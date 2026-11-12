@@ -147,7 +147,7 @@ describe('streaming stop', () => {
     expect(screen.getByText('Stopped before the end')).toBeTruthy();
   });
 
-  it('renders plain-text runs with EmojiText by default', () => {
+  it('renders plain-text runs with EmojiText by default, loaded when a message holds an emoji', async () => {
     render(MessageList, {
       props: {
         messages: [
@@ -155,8 +155,11 @@ describe('streaming stop', () => {
         ],
       },
     });
-    const run = document.querySelector('[data-tx-emoji-text]');
-    expect(run?.textContent).toBe('Ship it \u{1F680} ');
+    // Text shows at once; EmojiText loads because the message holds an emoji.
+    expect(screen.getByText(/Ship it/)).toBeTruthy();
+    await waitFor(() =>
+      expect(document.querySelector('[data-tx-emoji-text]')?.textContent).toBe('Ship it \u{1F680} ')
+    );
     expect(screen.getByText('now', { selector: 'strong' })).toBeTruthy();
   });
 
