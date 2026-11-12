@@ -1,4 +1,29 @@
-# Chat dialect conversion matrix
+# Core Markdown chat dialects
+
+`@texuli/core/markdown-dialects` reads and writes the framework-free `texuli-md/v1` AST. It supports
+Slack mrkdwn, Discord, WhatsApp, Telegram MarkdownV2 and HTML, Teams bot Markdown, Google Chat
+Markdown, Mattermost and plain text. Readers keep unrecognized syntax as text. Writers return
+`dialect-loss` diagnostics when the target needs a fallback and apply `safeHref` at the `untrusted`
+tier by default.
+
+```ts
+import { convertMarkdownDialect, readMarkdownDialect, writeMarkdownDialect } from '@texuli/core/markdown-dialects';
+
+const parsed = readMarkdownDialect('*hello*', 'slack');
+const discord = writeMarkdownDialect(parsed.tree, 'discord');
+const plain = convertMarkdownDialect('*hello*', 'slack', 'plain-text');
+```
+
+`writeMarkdownDialect(tree, dialect, options?)` accepts `trust: 'developer' | 'untrusted'` and
+`allowBroadcastMentions`. Broadcast mention nodes are downgraded to text unless explicitly enabled.
+Literal text mention triggers are neutralized. `convertMarkdownDialect(source, from, to, options?)`
+returns the serialized `value` and combined reader/writer `diagnostics`.
+
+Exports: `MARKDOWN_DIALECTS`, `MarkdownDialect`, `MarkdownDialectWriteResult`,
+`MarkdownDialectWriteOptions`, `readMarkdownDialect`, `writeMarkdownDialect`,
+`convertMarkdownDialect`.
+
+## Conversion matrix
 
 Readers and writers share `texuli-md/v1`; conversions are `read(source, from)` followed by
 `write(tree, to)`. Writers return `dialect-loss` diagnostics whenever they flatten or approximate a
@@ -40,7 +65,7 @@ natively. Every conversion may also report **M** when the target cannot preserve
 - **Escaping:** Slack escapes literal `&<>` with entities. Telegram MarkdownV2 escapes all 18 reserved
   text characters, with separate code and URL contexts. Telegram HTML escapes `&<>`; supported tags
   are recognized without interpreting arbitrary markup. Other Markdown writers backslash-escape
-  syntax punctuation. Plain text writes literal characters.
+  syntax punctuation. Plain text neutralizes platform mention triggers with a zero-width separator.
 
 The dialect parsers intentionally implement the documented chat subset, not full platform API
 validation. Teams means bot extended Markdown; Google Chat means Markdown mode. WhatsApp list, quote and
