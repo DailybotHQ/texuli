@@ -44,6 +44,13 @@ describe('Emoji 18.0 generated catalog', () => {
     }
   });
 
+  it('does not fall back to hyphenated code-point shortcodes after keycap naming', () => {
+    const hexFallback = catalog.records.filter((record) =>
+      record.shortcode.slice(1, -1).endsWith(`_${record.id.replaceAll('-', '_')}`)
+    );
+    expect(hexFallback).toEqual([]);
+  });
+
   it('matches Unicode, qualification, tone, flag, ZWJ and keycap goldens', () => {
     for (const expected of golden.records) {
       const record = catalog.records.find((item) => item.unicode === expected.unicode);
@@ -54,6 +61,20 @@ describe('Emoji 18.0 generated catalog', () => {
         catalog.records.find((record) => record.id === expected.id)?.qualificationAliases
       ).toContain(expected.unicode);
     }
+  });
+
+  it('carries the 3.0.2 slug per mapped record for the legacy writer', () => {
+    expect(aliases.slugs['1f680']).toBe('rocket');
+    expect(aliases.slugs['2764-fe0f']).toBe('red_heart');
+    expect(aliases.slugs['1f60e']).toBe('smiling_face_with_sunglasses');
+    expect(aliases.slugs['2615']).toBe('hot_beverage');
+    expect(aliases.slugs['31-fe0f-20e3']).toBe('keycap_1');
+    expect(aliases.slugs['23-fe0f-20e3']).toBe('keycap_number_sign');
+    expect(aliases.dialects.legacy.thumbsup).toBe('1f44d');
+    expect(aliases.dialects.legacy['+1']).toBe('1f44d');
+    expect(aliases.dialects.legacy.heart).toBe('2764-fe0f');
+    expect(aliases.dialects.legacy.coffee).toBe('2615');
+    expect(aliases.dialects.legacy['100']).toBe('1f4af');
   });
 
   it('imports all audited legacy rows and separates alias conflicts', () => {

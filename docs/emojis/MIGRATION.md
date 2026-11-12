@@ -45,14 +45,18 @@ legacy catalog are **not** on the default entry.
 
 On the parser checkout, branch `texuli-bridge` (never pushed):
 
+The bridge lives in worktree `texuli-wt/uep-texuli-bridge` (branch `texuli-bridge`).
+The developer's `universal-emoji-parser` checkout stays on `main`.
+
 ```json
 "dependencies": {
-  "@texuli/emojis": "file:../texuli-wt/p023-l10-p2X/packages/emojis"
+  "@texuli/emojis": "file:../p023-l10-p2X/packages/emojis"
 }
 ```
 
-That path is a Texuli worktree. It will not resolve from a published tarball.
-Do not `npm publish` this branch.
+That `file:` path is from `texuli-wt/uep-texuli-bridge` to this lane's Texuli
+worktree. It will not resolve from a published tarball. Do not `npm publish`
+the bridge branch.
 
 Parity numbers and the DailyBot-style chat fixture:
 `.dwp/plans/PLAN_023_texuli_platform_expansion/analysis_results/emoji/migration-report.md`.
