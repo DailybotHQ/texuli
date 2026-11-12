@@ -59,6 +59,11 @@ export const PACKAGE_STACK: Readonly<Record<string, StackPackage>> = {
     label: 'Workflow graphs',
     dependsOn: ['@texuli/core', '@texuli/drag', '@texuli/primitives', '@texuli/tokens', 'texuli'],
   },
+  '@texuli/forms': {
+    layer: 4,
+    label: 'Schema forms',
+    dependsOn: ['@texuli/core', '@texuli/drag', 'texuli'],
+  },
   '@texuli/canvas': {
     layer: 4,
     label: 'Infinite canvas',

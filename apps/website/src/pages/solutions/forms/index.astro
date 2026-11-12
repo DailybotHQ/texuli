@@ -7,9 +7,10 @@ import {
   FORMS_RECIPES,
 } from '../../../components/solutions/forms/extras/extras-content.ts';
 import FormsHero from '../../../components/solutions/forms/hero/FormsHero.astro';
-import FormsHow from '../../../components/solutions/forms/how/FormsHow.astro';
+import { FORMS_HOW } from '../../../components/solutions/forms/how/how-content.ts';
 import FormsQuickstart from '../../../components/solutions/forms/quickstart/FormsQuickstart.astro';
 import FormsStories from '../../../components/solutions/forms/stories/FormsStories.astro';
+import SolutionHow from '../../../components/solutions/shared/architecture/SolutionHow.astro';
 /**
  * `/solutions/forms/` — the Forms Solution landing. The shared layout keeps registry
  * facts and the static sections aligned; only the SchemaForm and builder demo hydrates.
@@ -39,7 +40,7 @@ const description = entry.tagline;
     <FormsDemo slot="demo" client:visible />
   </SolutionDemoFrame>
   <FormsStories slot="stories" />
-  <FormsHow slot="how" />
+  <SolutionHow slot="how" {entry} {...FORMS_HOW} />
   <FormsQuickstart slot="quickstart" />
   <SolutionRecipes slot="recipes" {entry} {...FORMS_RECIPES} />
   <SolutionAgents slot="agents" {entry} {...FORMS_AGENTS} />

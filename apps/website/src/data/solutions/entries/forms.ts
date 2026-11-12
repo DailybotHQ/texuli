@@ -7,14 +7,14 @@ export const forms: SolutionEntry = {
   status: 'in development',
   tagline: 'Schema-driven forms with conditions, steps and drafts.',
   summary:
-    'A closed form schema rendered with Texuli components, multi-step flows, conditional logic, announced validation, drafts and autosave. The visual builder the landing needs is still landing.',
+    'A closed form schema rendered with Texuli components, multi-step flows, conditional logic, announced validation, drafts and autosave. The visual builder subpath is in development, branch-only and planned for the next release.',
   route: '/solutions/forms/',
   docs: '/guides/solutions/forms/',
   packages: [
     {
       name: '@texuli/forms',
-      subpaths: ['.', './model', './controls', './host'],
-      role: 'Schema, model, controls and host rendering — in development on npm',
+      subpaths: ['.', './model', './controls', './builder', './host'],
+      role: 'Schema, model, controls and host rendering are in development and published on npm; the builder is branch-only.',
     },
   ],
   capabilities: [
@@ -39,8 +39,9 @@ export const forms: SolutionEntry = {
     {
       id: 'builder',
       title: 'Visual builder',
-      summary: 'Author a schema on a canvas. Planned for this Solution; not shipped yet.',
-      status: 'planned',
+      summary:
+        'Author and reorder fields, edit settings, preview the form and inspect schema JSON. In development; planned for the next release.',
+      status: 'in development',
     },
   ],
   platforms: [
@@ -52,13 +53,16 @@ export const forms: SolutionEntry = {
   demo: {
     id: 'forms',
     title: 'Fill a multi-step intake',
-    scenarios: ['intake'],
-    limits: ['Placeholder until the Forms landing demo ships. Nothing is saved.'],
+    scenarios: ['intake', 'builder'],
+    limits: [
+      'The intake draft stays in this page session and nothing is submitted.',
+      'The visual builder subpath is branch-only while in development and planned for the next release.',
+    ],
   },
   art: { hero: { slot: 'solution-forms-hero', variant: 'plate' } },
   limits: [
     '@texuli/forms is in development (pre-1.0): a new minor version may break the API.',
-    'The visual form builder is planned, not shipped.',
+    'The visual builder subpath is branch-only while in development and planned for the next release.',
     '/forms-page/ stays as the capability reference; it is not redirected (ADR-036).',
   ],
   links: [

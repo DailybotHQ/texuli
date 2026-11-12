@@ -87,10 +87,27 @@ test('the demo reveals conditional steps, autosaves locally and edits the schema
   const jsonText = (await json.textContent()) ?? '';
   expect(() => JSON.parse(jsonText)).not.toThrow();
 
-  // Pointer-accessible move controls apply the same field order as the keyboard handle.
-  await canvas.getByRole('button', { name: 'Move Text up' }).click();
-  await canvas.getByRole('button', { name: 'Move Text up' }).click();
-  await expect(canvas.getByRole('listitem').first()).toContainText('Text');
+  const textHandle = canvas.getByRole('button', { name: /Reorder Text/ });
+  const firstRowHandle = canvas
+    .getByRole('listitem')
+    .first()
+    .getByRole('button', { name: /Reorder/ });
+  await textHandle.scrollIntoViewIfNeeded();
+  await firstRowHandle.scrollIntoViewIfNeeded();
+  const textBox = await textHandle.boundingBox();
+  const firstBox = await firstRowHandle.boundingBox();
+  expect(textBox).not.toBeNull();
+  expect(firstBox).not.toBeNull();
+  await page.mouse.move(textBox!.x + textBox!.width / 2, textBox!.y + textBox!.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(firstBox!.x + firstBox!.width / 2, firstBox!.y + 2, {
+    steps: 8,
+  });
+  await page.mouse.up();
+  const textPosition = await canvas
+    .getByRole('listitem')
+    .evaluateAll((rows) => rows.findIndex((row) => row.textContent?.includes('Text')));
+  expect(textPosition).toBe(0);
   expect(await problems()).toEqual([]);
 });
 
