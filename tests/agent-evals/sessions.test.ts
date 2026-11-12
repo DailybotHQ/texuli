@@ -96,7 +96,14 @@ describe('what differs between the doors, and only that', () => {
       'stdio'
     );
     const nodeOnly = texuliOps.list({ runtimes: ['node'] }).map((operation) => operation.name);
-    expect(nodeOnly).toEqual(['ds.save', 'document.export']);
+    expect(nodeOnly).toEqual([
+      'ds.save',
+      'document.export',
+      'emoji.search',
+      'emoji.get',
+      'emoji.categories',
+      'emoji.variants',
+    ]);
 
     // ds.save checks its path locally (a dry run writes nothing) and is refused remotely.
     const saveStep = (check: Pick<Step, 'expect' | 'toolError'>): Step => ({
@@ -186,6 +193,8 @@ describe('what differs between the doors, and only that', () => {
     );
     expect(REMOTE_RUNTIMES).toEqual(['edge', 'site']);
     expect(isEdgeTool('document.export')).toBe(false);
+    expect(isEdgeTool('emoji.search')).toBe(false);
+    expect(isEdgeTool('emoji.convert')).toBe(true);
     expect(isEdgeTool('theme.get')).toBe(true);
     // A name removed in 0.10.0 runs nowhere.
     expect(isEdgeTool('theme')).toBe(false);

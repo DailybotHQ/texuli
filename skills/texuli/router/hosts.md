@@ -47,7 +47,7 @@ same tools:
 | Server | How a host connects | Tools | Status |
 | --- | --- | --- | --- |
 | Local, stdio | `npx -y @texuli/mcp` (bin `texuli-mcp`); offline once installed | every operation | `@texuli/mcp` is on npm from `0.9.0` (in development; the `ds.*` design-system tools are new in `0.10.0`) |
-| Remote, Streamable HTTP | `https://texuli.com/mcp` (POST JSON-RPC, no key) | the edge operations (not `document.export` or `ds.save`) and the `site` tools | Live from `0.9.0` (the `ds.*` tools except `ds.save` from `0.10.0`); CI compares its tool list with the registry after every deploy |
+| Remote, Streamable HTTP | `https://texuli.com/mcp` (POST JSON-RPC, no key) | edge and site tools (not node ops) | Live from `0.9.0` (the `ds.*` tools except `ds.save` from `0.10.0`); CI compares its tool list with the registry after every deploy |
 
 Claude Code, for example:
 

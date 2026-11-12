@@ -85,6 +85,8 @@ describe('generated agent surfaces', () => {
     expect(remote).toEqual(await remoteToolNames());
     expect(toolNames(texuliOps, REMOTE_RUNTIMES)).toEqual(await remoteToolNames());
     expect(remote).not.toContain('document.export');
+    expect(remote).not.toContain('emoji.search');
+    expect(remote).toContain('emoji.convert');
     // The site operations are remote-only on the card (T-ar-site-mcp).
     const site = card.tools.filter((tool) => tool.runtime === 'site');
     expect(site.map((tool) => tool.name)).toEqual(['site.pages', 'site.read', 'site.search']);

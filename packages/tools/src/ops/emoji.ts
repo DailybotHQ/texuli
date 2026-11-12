@@ -2,19 +2,13 @@
  * `emoji.search`, `emoji.get`, `emoji.convert`, `emoji.categories` and
  * `emoji.variants`: untrusted lookup and conversion through `@texuli/emojis`
  * (ADR-035). Handlers never throw; input and result lists are capped.
+ *
+ * Catalog lookup (search, get, categories, variants) needs the closed
+ * catalog tables and is `node` (local MCP and CLI). `emoji.convert` stays
+ * `edge`; the lean engine and the imported 3.0.2 legacy dialect load on
+ * demand so the remote MCP Function does not ship the catalog tables.
  */
 
-import { toShortcodes as toTexuliShortcodes, toUnicode as toTexuliUnicode } from '@texuli/emojis';
-import {
-  type EmojiCategory,
-  type EmojiRecord,
-  emojiCatalog,
-  getBaseEmoji,
-  getEmoji,
-  getVariants,
-  searchEmojis,
-} from '@texuli/emojis/catalog';
-import { toShortcodes as toLegacyShortcodes, toUnicodeLegacy } from '@texuli/emojis/legacy-engine';
 import { defineOperation } from './registry.ts';
 import type { JsonSchema } from './schema.ts';
 import { type Operation, OperationError } from './types.ts';
@@ -35,7 +29,9 @@ const CATEGORY_VALUES = [
   'objects',
   'symbols',
   'flags',
-] as const satisfies readonly EmojiCategory[];
+] as const;
+
+type EmojiCategory = (typeof CATEGORY_VALUES)[number];
 
 export const EMOJI_DIALECTS = ['texuli', 'legacy'] as const;
 export type EmojiDialect = (typeof EMOJI_DIALECTS)[number];
@@ -96,6 +92,17 @@ const READ_ONLY = {
   openWorld: false,
 } as const;
 
+interface CatalogRecord {
+  id: string;
+  unicode: string;
+  name: string;
+  shortcode: string;
+  category: string;
+  variantOf?: string;
+  variants?: readonly string[];
+  tone?: string;
+}
+
 function isCategory(value: unknown): value is EmojiCategory {
   return typeof value === 'string' && (CATEGORY_VALUES as readonly string[]).includes(value);
 }
@@ -112,7 +119,7 @@ function isTarget(value: unknown): value is EmojiTarget {
   return typeof value === 'string' && (EMOJI_TARGETS as readonly string[]).includes(value);
 }
 
-function publicEmoji(record: EmojiRecord): Record<string, unknown> {
+function publicEmoji(record: CatalogRecord): Record<string, unknown> {
   return {
     id: record.id,
     unicode: record.unicode,
@@ -133,13 +140,20 @@ function publicDiagnostics(
   return list.slice(0, DIAGNOSTIC_MAX).map((item) => ({ code: item.code, message: item.message }));
 }
 
-function convertSource(
+async function loadCatalog() {
+  return import('@texuli/emojis/catalog');
+}
+
+async function convertSource(
   source: string,
   to: EmojiTarget,
   dialect: EmojiDialect,
   mode: EmojiMode
-): { value: string; diagnostics: { code: string; message: string }[] } {
+): Promise<{ value: string; diagnostics: { code: string; message: string }[] }> {
   if (dialect === 'legacy') {
+    const { toShortcodes: toLegacyShortcodes, toUnicodeLegacy } = await import(
+      '@texuli/emojis/legacy-engine'
+    );
     if (to === 'unicode') {
       const result = toUnicodeLegacy(source, { mode });
       const diagnostics: { code: string; message: string }[] = [];
@@ -159,15 +173,16 @@ function convertSource(
     }
     return { value: toLegacyShortcodes(source, { dialect: 'legacy' }), diagnostics: [] };
   }
-  if (to === 'unicode') return { value: toTexuliUnicode(source), diagnostics: [] };
-  return { value: toTexuliShortcodes(source), diagnostics: [] };
+  const { toShortcodes, toUnicode } = await import('@texuli/emojis');
+  if (to === 'unicode') return { value: toUnicode(source), diagnostics: [] };
+  return { value: toShortcodes(source), diagnostics: [] };
 }
 
 export const emojiSearch: Operation = defineOperation({
   name: 'emoji.search',
   title: 'Search the Texuli emoji catalog',
   summary:
-    'Search the closed Unicode emoji catalog by name, shortcode or keyword. Returns { items }: approved ids with unicode, name, shortcode, category and score. Query at most 256 characters; at most 100 hits. Untrusted input; never throws.',
+    'Search the closed Unicode emoji catalog by name, shortcode or keyword. Returns { items }: approved ids with unicode, name, shortcode, category and score. Query at most 256 characters; at most 100 hits. Untrusted input; never throws. Needs Node (local MCP and CLI; not on texuli.com/mcp).',
   input: {
     type: 'object',
     properties: {
@@ -222,13 +237,13 @@ export const emojiSearch: Operation = defineOperation({
     additionalProperties: false,
   },
   annotations: READ_ONLY,
-  runtime: 'edge',
+  runtime: 'node',
   limits: { inputBytes: 8_192, items: SEARCH_MAX, timeMs: 5_000 },
   examples: [
     { title: 'Find a rocket', input: { query: 'rocket', limit: 3 } },
     { title: 'Travel category', input: { query: 'launch', category: 'travel-places', limit: 5 } },
   ],
-  handler(input) {
+  async handler(input) {
     try {
       const query = typeof input.query === 'string' ? input.query : '';
       const locale = typeof input.locale === 'string' ? input.locale : undefined;
@@ -237,6 +252,7 @@ export const emojiSearch: Operation = defineOperation({
         typeof input.limit === 'number' && Number.isFinite(input.limit)
           ? input.limit
           : SEARCH_DEFAULT;
+      const { searchEmojis } = await loadCatalog();
       const hits = searchEmojis(query, { locale, category, limit });
       return {
         items: hits.map((hit) => ({
@@ -258,7 +274,7 @@ export const emojiGet: Operation = defineOperation({
   name: 'emoji.get',
   title: 'Read one emoji by id',
   summary:
-    'Look up one closed catalog record by hyphenated id, Unicode sequence or :shortcode:. Returns { emoji } with unicode, name, shortcode, category and variant fields. Unknown ids are not-found. Untrusted input; never throws.',
+    'Look up one closed catalog record by hyphenated id, Unicode sequence or :shortcode:. Returns { emoji } with unicode, name, shortcode, category and variant fields. Unknown ids are not-found. Untrusted input; never throws. Needs Node (local MCP and CLI; not on texuli.com/mcp).',
   input: {
     type: 'object',
     properties: {
@@ -278,17 +294,17 @@ export const emojiGet: Operation = defineOperation({
     additionalProperties: false,
   },
   annotations: READ_ONLY,
-  runtime: 'edge',
+  runtime: 'node',
   limits: { inputBytes: 2_048, timeMs: 5_000 },
   examples: [
     { title: 'Rocket by id', input: { id: '1f680' } },
     { title: 'Rocket by shortcode', input: { id: ':rocket:' } },
   ],
-  handler(input) {
+  async handler(input) {
     const id = typeof input.id === 'string' ? input.id : '';
-    let record: EmojiRecord | undefined;
+    let record: CatalogRecord | undefined;
     try {
-      record = getEmoji(id);
+      record = (await loadCatalog()).getEmoji(id);
     } catch {
       record = undefined;
     }
@@ -305,7 +321,7 @@ export const emojiConvert: Operation = defineOperation({
   name: 'emoji.convert',
   title: 'Convert shortcodes and Unicode emoji',
   summary:
-    'Convert untrusted plain text between Unicode sequences and shortcodes. dialect texuli is the lean catalog; legacy is the imported 3.0.2 aliases. mode strict keeps conflict aliases and reports them; permissive picks a candidate. Returns { value, diagnostics }. Never throws.',
+    'Convert untrusted plain text between Unicode sequences and shortcodes. dialect texuli is the lean catalog (edge); legacy is the imported 3.0.2 aliases (loaded on demand). mode strict keeps conflict aliases and reports them; permissive picks a candidate. Returns { value, diagnostics }. Never throws.',
   input: {
     type: 'object',
     properties: {
@@ -357,13 +373,13 @@ export const emojiConvert: Operation = defineOperation({
       input: { source: ':tada:', to: 'unicode', dialect: 'legacy' },
     },
   ],
-  handler(input) {
+  async handler(input) {
     const source = typeof input.source === 'string' ? input.source : '';
     const to = isTarget(input.to) ? input.to : 'unicode';
     const dialect = isDialect(input.dialect) ? input.dialect : 'texuli';
     const mode = isMode(input.mode) ? input.mode : 'strict';
     try {
-      return convertSource(source, to, dialect, mode);
+      return await convertSource(source, to, dialect, mode);
     } catch {
       return {
         value: source,
@@ -377,7 +393,7 @@ export const emojiCategories: Operation = defineOperation({
   name: 'emoji.categories',
   title: 'List emoji categories',
   summary:
-    'List the closed Unicode emoji categories with how many catalog records each holds. Returns { categories: [{ id, count }] }. No input. Never throws.',
+    'List the closed Unicode emoji categories with how many catalog records each holds. Returns { categories: [{ id, count }] }. No input. Never throws. Needs Node (local MCP and CLI; not on texuli.com/mcp).',
   input: { type: 'object', properties: {}, additionalProperties: false },
   output: {
     type: 'object',
@@ -400,15 +416,17 @@ export const emojiCategories: Operation = defineOperation({
     additionalProperties: false,
   },
   annotations: READ_ONLY,
-  runtime: 'edge',
+  runtime: 'node',
   limits: { inputBytes: 1_024, items: CATEGORY_VALUES.length, timeMs: 5_000 },
   examples: [{ title: 'Every category', input: {} }],
-  handler() {
+  async handler() {
     try {
+      const { emojiCatalog } = await loadCatalog();
       const counts = new Map<EmojiCategory, number>();
       for (const id of CATEGORY_VALUES) counts.set(id, 0);
       for (const record of emojiCatalog.records) {
-        counts.set(record.category, (counts.get(record.category) ?? 0) + 1);
+        const category = isCategory(record.category) ? record.category : undefined;
+        if (category) counts.set(category, (counts.get(category) ?? 0) + 1);
       }
       return {
         categories: CATEGORY_VALUES.map((id) => ({ id, count: counts.get(id) ?? 0 })),
@@ -423,7 +441,7 @@ export const emojiVariants: Operation = defineOperation({
   name: 'emoji.variants',
   title: 'List emoji variants',
   summary:
-    'List tone and other variants for a closed catalog id (or a variant of it). Returns { base, variants }. Unknown ids are not-found. Untrusted input; never throws.',
+    'List tone and other variants for a closed catalog id (or a variant of it). Returns { base, variants }. Unknown ids are not-found. Untrusted input; never throws. Needs Node (local MCP and CLI; not on texuli.com/mcp).',
   input: {
     type: 'object',
     properties: {
@@ -450,18 +468,19 @@ export const emojiVariants: Operation = defineOperation({
     additionalProperties: false,
   },
   annotations: READ_ONLY,
-  runtime: 'edge',
+  runtime: 'node',
   limits: { inputBytes: 2_048, items: SEARCH_MAX, timeMs: 5_000 },
   examples: [{ title: 'Thumbs-up tones', input: { id: '1f44d' } }],
-  handler(input) {
+  async handler(input) {
     const id = typeof input.id === 'string' ? input.id : '';
-    let record: EmojiRecord | undefined;
-    let base: EmojiRecord | undefined;
-    let variants: readonly EmojiRecord[] = [];
+    let record: CatalogRecord | undefined;
+    let base: CatalogRecord | undefined;
+    let variants: readonly CatalogRecord[] = [];
     try {
-      record = getEmoji(id);
-      base = record ? (getBaseEmoji(record.id) ?? record) : undefined;
-      variants = record ? getVariants(record.id) : [];
+      const catalog = await loadCatalog();
+      record = catalog.getEmoji(id);
+      base = record ? (catalog.getBaseEmoji(record.id) ?? record) : undefined;
+      variants = record ? catalog.getVariants(record.id) : [];
     } catch {
       record = undefined;
     }

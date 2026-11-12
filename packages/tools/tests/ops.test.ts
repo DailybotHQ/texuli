@@ -116,10 +116,17 @@ it('declares every operation once, self-described for agents, in the supported s
     }
   });
   await scenario(
-    'the file writer and the PDF and DOCX writers are node-only; the site readers are site-only; the rest run at the edge',
+    'the file writer, PDF and DOCX writers, and emoji catalog lookups are node-only; the site readers are site-only; the rest run at the edge',
     () => {
       const node = TEXULI_OPERATIONS.filter((operation) => operation.runtime === 'node');
-      expect(node.map((operation) => operation.name)).toEqual(['ds.save', 'document.export']);
+      expect(node.map((operation) => operation.name)).toEqual([
+        'ds.save',
+        'document.export',
+        'emoji.search',
+        'emoji.get',
+        'emoji.categories',
+        'emoji.variants',
+      ]);
       const site = TEXULI_OPERATIONS.filter((operation) => operation.runtime === 'site');
       expect(site.map((operation) => operation.name)).toEqual([
         'site.pages',
@@ -205,7 +212,10 @@ it('refuses invalid input, oversized input and unavailable runtimes with stable 
     expect(outcome).toMatchObject({ ok: false, error: { code: 'runtime-unavailable' } });
     expect(texuliOps.list({ runtimes: ['edge'] }).map((operation) => operation.name)).toEqual(
       EXPECTED.filter(
-        (name) => !['document.export', 'ds.save'].includes(name) && !name.startsWith('site.')
+        (name) =>
+          !['document.export', 'ds.save'].includes(name) &&
+          !name.startsWith('site.') &&
+          !['emoji.search', 'emoji.get', 'emoji.categories', 'emoji.variants'].includes(name)
       )
     );
   });

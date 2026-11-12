@@ -7,8 +7,9 @@ connected to it can search the component catalog, read manifests and worked
 examples, validate blueprint drafts, search and preview themes with their
 WCAG AA report, run the deck and document commands, convert or render
 untrusted Markdown, HTML and chat dialects (`md.convert`, `md.render`),
-and search, look up and convert Texuli emoji by closed catalog id
-(`emoji.search`, `emoji.get`, `emoji.convert`, `emoji.categories`, `emoji.variants`).
+and convert Texuli emoji shortcodes (`emoji.convert`). Search, look up and
+list the closed catalog (`emoji.search`, `emoji.get`, `emoji.categories`,
+`emoji.variants`) on this local server.
 
 **In the stack:** layer L9, the top: a thin bin over the stdio MCP server in `@texuli/tools` (L8), which reads the agent catalog (L6) and the `@texuli/tokens` themes.
 
