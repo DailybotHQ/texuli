@@ -7,39 +7,57 @@ export const agentChat: SolutionEntry = {
   status: 'in development',
   tagline: 'A thread whose replies paint validated blueprints.',
   summary:
-    'Chat thread, message list and composer on @texuli/chat, with Markdown, emoji and dialect export still landing. Replies attach validated blueprints painted by the player. @texuli/chat is on npm; this Solution is not complete until those extras ship.',
+    'Chat thread, message list and composer on @texuli/chat: replies stream with a Stop control, message Markdown is read by the shared CommonMark parser into safe nodes, the composer autocompletes mentions and slash commands, and replies attach blueprints that are validated before the player paints them. @texuli/chat is on npm; composer autocomplete, stopped replies and ChatAttachment were added after 0.17.4 and are not in a published release yet. Texuli emoji are still landing.',
   route: '/solutions/agent-chat/',
   docs: '/guides/solutions/agent-chat/',
   packages: [
     {
       name: '@texuli/chat',
       subpaths: ['.'],
-      role: 'Thread, message list, composer and typing indicator',
+      role: 'Thread, message list, composer, streaming events and the attachment card; on npm, with autocomplete, stopped replies and ChatAttachment added after 0.17.4 (not in a published release yet).',
+    },
+    {
+      name: '@texuli/player',
+      subpaths: ['.'],
+      role: 'Paints a validated blueprint attachment.',
+    },
+    {
+      name: '@texuli/catalog',
+      subpaths: ['./validate'],
+      role: 'Validates an attachment against the agent catalog before it paints.',
+    },
+    {
+      name: '@texuli/core',
+      subpaths: ['./markdown', './markdown-dialects'],
+      role: 'Reads message Markdown into safe nodes and writes a reply in chat dialects (subpaths added after 0.17.4, not in a published release yet).',
     },
   ],
   capabilities: [
     {
       id: 'thread',
       title: 'Thread',
-      summary: 'A message list and composer for people and agents.',
+      summary: 'A message list and composer for people and agents, with streamed replies and Stop.',
       status: 'in development',
     },
     {
       id: 'markdown',
       title: 'Markdown and emoji',
-      summary: 'Render messages through @texuli/markdown with Texuli emoji. Still landing.',
+      summary:
+        'Message text is read by the shared CommonMark parser into safe nodes and can be written in chat dialects. Texuli emoji art is still landing.',
       status: 'in development',
     },
     {
       id: 'autocomplete',
       title: 'Composer autocomplete',
-      summary: 'Emoji, mention and slash-command autocomplete. Still landing.',
+      summary:
+        'Mention and slash-command autocomplete (added after 0.17.4, not in a published release yet). Emoji autocomplete is still landing.',
       status: 'in development',
     },
     {
       id: 'blueprints',
       title: 'Blueprint attachments',
-      summary: 'Paint a validated blueprint in the thread via the player. Still landing.',
+      summary:
+        'Validate an attached blueprint and paint it with the player, or show why it was refused (added after 0.17.4, not in a published release yet).',
       status: 'in development',
     },
   ],
@@ -51,13 +69,24 @@ export const agentChat: SolutionEntry = {
   ],
   demo: {
     id: 'agent-chat',
-    title: 'Ask for a dashboard',
-    scenarios: ['blueprint-reply'],
-    limits: ['Placeholder until the Agent chat landing demo ships. Fixture-driven, no network.'],
+    title: 'Ask the demo agent',
+    scenarios: [
+      'support-triage',
+      'weekly-report',
+      'generated-form',
+      'refused-attachment',
+      'dialect-export',
+    ],
+    limits: [
+      'Fixture replies, no live model and no network: every reply is replayed from the page.',
+      'Composer autocomplete, stopped replies and ChatAttachment were added after 0.17.4 and are not in a published release yet.',
+      'Texuli emoji art and emoji autocomplete are still landing.',
+    ],
   },
   art: { hero: { slot: 'solution-agent-chat-hero', variant: 'plate' } },
   limits: [
-    '@texuli/chat is on npm; the Agent chat Solution is still in development (Markdown, emoji, autocomplete, streaming polish and blueprint attachments).',
+    '@texuli/chat is on npm; composer autocomplete, stopped replies and ChatAttachment were added after 0.17.4 and are not in a published release yet, and Texuli emoji are still landing.',
+    'The demo replays fixture replies: there is no live model.',
     'Pre-1.0: a new minor version may break the API.',
   ],
   links: [

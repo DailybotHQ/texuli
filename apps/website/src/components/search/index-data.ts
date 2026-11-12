@@ -226,6 +226,24 @@ const SITE_PAGES: readonly SearchEntry[] = [
     keywords: ['sheets', 'spreadsheet', 'formula', 'functions', 'csv', 'recalculation', 'workbook'],
   },
   {
+    id: 'page-agent-chat',
+    title: 'Agent chat',
+    description:
+      'Agent chat: streamed replies with Stop, safe Markdown, mention and slash-command autocomplete, blueprint attachments validated before the player paints them, and dialect export (in development; fixture replies, no live model).',
+    href: '/solutions/agent-chat/',
+    kind: 'page',
+    keywords: [
+      'chat',
+      'agent',
+      'thread',
+      'streaming',
+      'autocomplete',
+      'mention',
+      'blueprint',
+      'attachment',
+    ],
+  },
+  {
     id: 'page-dashboards',
     title: 'Dashboards',
     description:

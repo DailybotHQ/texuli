@@ -49,6 +49,11 @@ export const PACKAGE_STACK: Readonly<Record<string, StackPackage>> = {
     label: 'Media',
     dependsOn: ['@texuli/core', '@texuli/primitives', '@texuli/tokens', 'texuli'],
   },
+  '@texuli/chat': {
+    layer: 4,
+    label: 'Chat thread and composer',
+    dependsOn: ['@texuli/core', '@texuli/primitives', '@texuli/tokens', 'texuli'],
+  },
   '@texuli/editor': {
     layer: 4,
     label: 'Rich text editor',

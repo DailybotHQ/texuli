@@ -51,6 +51,8 @@ Embeddable open-source systems that complete a task end to end.
 - [Dashboards docs](https://texuli.com/guides/solutions/dashboards/)
 - [Forms](https://texuli.com/solutions/forms/): Schema-driven forms with conditions, steps and drafts. Status: in development.
 - [Forms docs](https://texuli.com/guides/solutions/forms/)
+- [Agent chat](https://texuli.com/solutions/agent-chat/): A thread whose replies paint validated blueprints. Status: in development.
+- [Agent chat docs](https://texuli.com/guides/solutions/agent-chat/)
 
 ## Built with Texuli
 
@@ -78,6 +80,7 @@ Task-first guides, in reading order.
 - [Design systems](https://texuli.com/guides/solutions/design-systems/)
 - [Dashboards](https://texuli.com/guides/solutions/dashboards/)
 - [Forms](https://texuli.com/guides/solutions/forms/)
+- [Agent chat](https://texuli.com/guides/solutions/agent-chat/)
 - [Performance](https://texuli.com/guides/performance/)
 
 ## Components

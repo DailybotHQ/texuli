@@ -1,0 +1,9 @@
+---
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionStories from '../../shared/story/SolutionStories.astro';
+import { AGENT_CHAT_STORIES } from './stories-content.ts';
+
+const entry = getSolution('agent-chat');
+---
+
+<SolutionStories entry={entry} {...AGENT_CHAT_STORIES} />
