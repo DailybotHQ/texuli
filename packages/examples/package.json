@@ -18,6 +18,7 @@
   "dependencies": {
     "@texuli/blocks": "workspace:*",
     "@texuli/canvas": "workspace:*",
+    "@texuli/catalog": "workspace:*",
     "@texuli/charts": "workspace:*",
     "@texuli/chat": "workspace:*",
     "@texuli/core": "workspace:*",

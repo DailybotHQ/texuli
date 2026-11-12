@@ -4,6 +4,7 @@ import type { HTMLAttributes } from 'svelte/elements';
 import { type ClassValue, cx } from 'texuli/cx';
 import Composer from '../composer/Composer.svelte';
 import type { ComposerLabels } from '../composer/labels.ts';
+import type { ComposerSuggestionSource } from '../composer/suggestions.ts';
 import TypingIndicator from '../composer/TypingIndicator.svelte';
 import type { MessageListLabels } from './labels.ts';
 import MessageList from './MessageList.svelte';
@@ -26,6 +27,10 @@ interface OwnProps {
    */
   composer?: Snippet;
   body?: Snippet<[ChatMessage]>;
+  /** Renders plain-text runs of messages (the emoji seam), forwarded to the list. */
+  text?: Snippet<[string]>;
+  /** Inline autocomplete sources for the built-in composer (`@`, `/`, `:`). */
+  suggestions?: readonly ComposerSuggestionSource[];
   header?: Snippet;
   emptyText?: string;
   locale?: string;
@@ -68,6 +73,8 @@ let {
   composerLabels,
   composer,
   body,
+  text,
+  suggestions,
   header,
   emptyText,
   locale,
@@ -94,6 +101,7 @@ let {
     {messages}
     {currentUserId}
     {body}
+    {text}
     {emptyText}
     {locale}
     {labels}
@@ -123,6 +131,7 @@ let {
         {disabled}
         {streaming}
         {onStop}
+        {suggestions}
         labels={placeholder ? { ...composerLabels, placeholder } : composerLabels}
       />
     </div>

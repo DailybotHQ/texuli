@@ -7,6 +7,6 @@ export const chatComposerExample = defineExample({
     'An autosizing, IME-safe message composer with attachment actions, pending and error feedback, and an announced typing indicator.',
   tags: ['chat', 'composer', 'keyboard', 'a11y'],
   component: 'chat/composer',
-  props: ['value', 'onSubmit', 'labels', 'sending', 'attachments', 'names'],
+  props: ['value', 'onSubmit', 'labels', 'sending', 'attachments', 'suggestions', 'names'],
   load: () => import('./ChatComposerDemo.svelte'),
 });

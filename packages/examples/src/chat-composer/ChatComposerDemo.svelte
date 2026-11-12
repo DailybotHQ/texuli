@@ -1,5 +1,19 @@
 <script lang="ts">
-import { Composer, TypingIndicator } from '@texuli/chat';
+import { Composer, commandSuggestions, mentionSuggestions, TypingIndicator } from '@texuli/chat';
+
+// Fictional teammates and commands for the inline autocomplete (@ and /).
+const suggestions = [
+  mentionSuggestions([
+    { id: 'jordan', name: 'Jordan Lee', description: 'Support lead' },
+    { id: 'avery', name: 'Avery Chen', description: 'Product designer' },
+    { id: 'sam', name: 'Sam Rivera', description: 'Engineer' },
+  ]),
+  commandSuggestions([
+    { name: 'summarize', description: 'Summarize this thread' },
+    { name: 'status', description: 'Post a status update' },
+    { name: 'remind', description: 'Set a reminder' },
+  ]),
+];
 
 let draft = $state('');
 let sent = $state<string[]>([]);
@@ -21,12 +35,12 @@ async function send(message: string): Promise<void> {
 
 <section class="demo" aria-labelledby="chat-composer-title">
   <h2 id="chat-composer-title">Message composer</h2>
-  <p>Enter sends. Shift+Enter adds a line. The send action preserves a draft after failure.</p>
+  <p>Enter sends. Shift+Enter adds a line. Type @ to mention a teammate or / at the start of a line for a command. The send action preserves a draft after failure.</p>
   <label class="failure-toggle">
     <input type="checkbox" bind:checked={failNext} />
     Simulate the next send failing
   </label>
-  <Composer bind:value={draft} onSubmit={send}>
+  <Composer bind:value={draft} onSubmit={send} {suggestions}>
     {#snippet attachments()}
       <button type="button" class="attachment" aria-label="Attach a file">＋ Attach</button>
     {/snippet}

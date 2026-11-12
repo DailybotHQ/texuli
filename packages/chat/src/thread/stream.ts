@@ -7,8 +7,11 @@ export const MAX_STREAM_BODY = 64_000;
 export type ChatStreamEvent =
   | { type: 'start'; id: string; author: ChatAuthor; at: ChatMessage['at']; body?: string }
   | { type: 'delta'; id: string; text: string }
-  /** `body`, when present, is the authoritative final text and replaces the streamed one. */
-  | { type: 'end'; id: string; body?: string; status?: ChatMessageStatus }
+  /**
+   * `body`, when present, is the authoritative final text and replaces the streamed one.
+   * `stopped` marks a reply the reader stopped (the Stop control): its partial text stays.
+   */
+  | { type: 'end'; id: string; body?: string; status?: ChatMessageStatus; stopped?: boolean }
   | { type: 'error'; id: string };
 
 const STATUSES: readonly ChatMessageStatus[] = ['sending', 'sent', 'delivered', 'read', 'failed'];
@@ -77,6 +80,7 @@ export function applyChatStreamEvent(
       body: typeof event.body === 'string' ? cap(event.body) : current.body,
       streaming: false,
       ...(status ? { status } : {}),
+      ...(event.stopped === true ? { stopped: true } : {}),
     };
   } else if (event.type === 'error') {
     next = { ...current, streaming: false, status: 'failed' };
