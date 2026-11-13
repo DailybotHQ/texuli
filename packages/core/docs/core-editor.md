@@ -120,7 +120,7 @@ input. Every accepted state is normalized and within the caps. Options:
 | `toggleMark` | Toggles over a range (removed when every eligible character has the mark), or the stored marks at a caret |
 | `setLink`, `removeLink` | `href` must pass `safeHref` at `trust` (`untrusted` by default), or the edit is refused |
 | `insertBlock` | Inserts a divider or a media reference |
-| `replaceSelection` | Paste of an already loaded fragment. Ids are fresh; nesting past the cap becomes paragraphs; blocks past the size caps are cut |
+| `replaceSelection` | Paste of an already loaded fragment, one step. One paragraph pastes inline; otherwise the caret block splits around the pasted blocks, a paragraph at either end joins the text there, and every other block keeps its type (a heading stays a heading at the end of a list item, in a quote or mid-paragraph). In code, paragraphs and code become text, and any other block splits the code block. Ids are fresh; nesting past the cap becomes paragraphs; blocks past the size caps are cut |
 | `applyComposition` | Applies an input method's composed text as one edit (prefix and suffix diff) |
 | `applyInputRules` | Markdown shortcuts at a paragraph's start (`#` to `####`, `-`, `1.`, `[ ]`, `>`, three backticks, `---`) and inline (`**x**`, `*x*`, `~~x~~`, `` `x` ``, autolinked URLs at the `untrusted` tier); with the `shortcodes` option (a host lookup, such as an emoji catalog's), a typed `:name:` becomes the returned text (1 to 32 characters, one line, never inside code) |
 

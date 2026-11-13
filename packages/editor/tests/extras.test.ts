@@ -5,7 +5,14 @@
  */
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/svelte';
 import { fromMarkdown, toMarkdown } from '@texuli/core/editor-markdown';
-import { createEditorIds, type EditorDocument } from '@texuli/core/editor-model';
+import {
+  blockText,
+  caret,
+  createEditorIds,
+  type EditorDocument,
+  editorLeaves,
+  isTextBlock,
+} from '@texuli/core/editor-model';
 import { tick } from 'svelte';
 import { afterEach, describe, expect, it } from 'vitest';
 import { BlockTypeMenu } from '../src/block-menu/index.ts';
@@ -86,6 +93,78 @@ describe('Paste as Markdown', () => {
     await controller.pasteMarkdown('- a\n- b');
     expect(text(controller.doc)).toBe('- a\n- b');
     expect(said.at(-1)).toBe('Pasted 1 block from Markdown');
+  });
+});
+
+describe('paste keeps each pasted block type (T-qa: Ctrl+End paste on Linux)', () => {
+  /** A controller over `source`, with the caret in the text block that contains `at`, after it (or at `offset`). */
+  const editorAt = (source: string, at: string, offset?: number) => {
+    const controller = new EditorController({ doc: doc(source) });
+    const leaf = editorLeaves(controller.doc)
+      .map(({ block }) => block)
+      .find((block) => isTextBlock(block) && blockText(block).includes(at));
+    if (!leaf || !isTextBlock(leaf)) throw new Error(`no block holds ${at}`);
+    const text = blockText(leaf);
+    controller.select(caret(leaf.id, offset ?? text.indexOf(at) + at.length));
+    return controller;
+  };
+  /** The text of the block that holds the caret, and the caret offset in it. */
+  const caretText = (controller: EditorController) => {
+    const selection = controller.state.selection;
+    if (selection.kind !== 'text') throw new Error('no caret');
+    const leaf = editorLeaves(controller.doc)
+      .map(({ block }) => block)
+      .find((block) => block.id === selection.focus.block);
+    return leaf && isTextBlock(leaf) ? blockText(leaf).slice(0, selection.focus.offset) : '';
+  };
+
+  it('a heading pasted at the end of a list item stays a heading after it, one undo step', async () => {
+    const controller = editorAt('# Notes\n\n- one\n- Raw <b>HTML</b> stays text', 'stays text');
+    const before = text(controller.doc);
+    await controller.pasteMarkdown('## Chord heading');
+    expect(text(controller.doc)).toBe(
+      '# Notes\n\n- one\n- Raw \\<b>HTML\\</b> stays text\n\n    ## Chord heading'
+    );
+    // The caret is after the heading, in the empty paragraph that follows it.
+    expect(caretText(controller)).toBe('');
+    expect(controller.undo()).toBe(true);
+    expect(text(controller.doc)).toBe(before);
+  });
+
+  it('a heading pasted inside a quote stays a heading in the quote', async () => {
+    const controller = editorAt('> quoted line', 'quoted line');
+    await controller.pasteMarkdown('### Inside');
+    expect(text(controller.doc)).toBe('> quoted line\n>\n> ### Inside');
+  });
+
+  it('a heading pasted in a code block splits the code around it; plain text stays code text', async () => {
+    const controller = editorAt('```\nfirst\nsecond\n```', 'first\n', 6);
+    await controller.pasteMarkdown('## Between');
+    expect(text(controller.doc)).toBe('```\nfirst\n```\n\n## Between\n\n```\nsecond\n```');
+    expect(caretText(controller)).toBe('');
+    const plain = editorAt('```\nab\n```', 'ab', 1);
+    plain.paste(clipboard({ 'text/plain': '## not a heading' }));
+    expect(text(plain.doc)).toBe('```\na## not a headingb\n```');
+  });
+
+  it('mid-paragraph, a heading splits the paragraph and the caret lands after it', async () => {
+    const controller = editorAt('alpha beta', 'alpha ');
+    await controller.pasteMarkdown('## Middle');
+    expect(text(controller.doc)).toBe('alpha\n\n## Middle\n\nbeta');
+    expect(caretText(controller)).toBe('');
+    // A paragraph still pastes inline, and a heading into a heading of its level too.
+    const inline = editorAt('alpha beta', 'alpha ');
+    await inline.pasteMarkdown('*new*');
+    expect(text(inline.doc)).toBe('alpha *new*beta');
+    const sameLevel = editorAt('## Title', 'Title');
+    await sameLevel.pasteMarkdown('## more');
+    expect(text(sameLevel.doc)).toBe('## Titlemore');
+  });
+
+  it('HTML paste keeps a heading the same way', () => {
+    const controller = editorAt('- item', 'item');
+    controller.paste(clipboard({ 'text/html': '<h2>From the web</h2>' }));
+    expect(text(controller.doc)).toBe('- item\n\n    ## From the web');
   });
 });
 
