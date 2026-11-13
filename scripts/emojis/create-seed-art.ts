@@ -119,6 +119,15 @@ function shape(tag: string, attrs: Record<string, string | number>): string {
     .map(([key, value]) => `${key}="${value}"`)
     .join(' ')} />`;
 }
+
+function xmlText(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&apos;');
+}
 const circle = (
   cx: number,
   cy: number,
@@ -830,7 +839,7 @@ function main(): void {
   const records = DESIGNS.map((design, index) => {
     const emoji = byShortcode.get(design.shortcode);
     if (!emoji) throw new Error(`seed design shortcode not found in catalog: ${design.shortcode}`);
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">${render(design.group, design.shortcode, index)}</svg>\n`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><title>${xmlText(emoji.name)}</title>${render(design.group, design.shortcode, index)}</svg>\n`;
     const file = `${emoji.id}.svg`;
     writeFileSync(resolve(OUT, file), svg);
     return {

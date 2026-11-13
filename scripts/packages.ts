@@ -15,9 +15,10 @@
  * 2. **Manifest**: derive the published `package.json` from the source one.
  *    Every `./src/**.ts` export target maps to `./dist/**.js` (`types` to
  *    `.d.ts`), `.svelte` and `.css` keep their names, `workspace:` ranges
- *    become the exact workspace version, and `files` is
- *    `["dist", "CHANGELOG.md"]`. There is no hand-written publish map to
- *    drift from the source exports. Each CHANGELOG.md is generated from
+ *    become the exact workspace version, and `files` starts with `dist` and
+ *    `CHANGELOG.md` plus package-specific trees from {@link PACKAGE_FILES}.
+ *    There is no hand-written export map to drift from the source exports.
+ *    Each CHANGELOG.md is generated from
  *    docs/RELEASE.md (`scripts/package-changelogs.ts`) and packed as-is.
  * 3. **Pack** with `npm pack` into `tmp/packages/tarballs/`, and record each
  *    tarball's SHA-256 in `tmp/packages/SHA256SUMS`.
@@ -45,6 +46,7 @@ import { fileURLToPath } from 'node:url';
 import { buildDsCheckHost, DS_CHECK_HOST_DIST } from './ds-check-host.ts';
 import { buildDsCheckSheet, DS_CHECK_SHEET_DIST } from './ds-check-sheet.ts';
 import { CHANGELOG_FILE, changelogForPackage } from './package-changelogs.ts';
+import { UNRELEASED_PACKAGES } from './release-line.ts';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -56,12 +58,74 @@ export const NEVER_PACKED: readonly string[] = ['@texuli/examples'];
 /** Packed contents: compiled `dist/` plus the generated changelog. */
 export const PUBLISHED_FILES: readonly string[] = ['dist', CHANGELOG_FILE];
 
+/** Additional package-root trees that must be included beside the compiled dist. */
+export const PACKAGE_FILES: Readonly<Record<string, readonly string[]>> = {
+  'emoji-assets': ['assets', 'data'],
+};
+
+/** Copy and verify the package-owned SVG files referenced by the public manifest. */
+export async function buildEmojiAssetFiles(dist: string, root: string): Promise<string[]> {
+  const packageDir = join(root, 'packages', 'emoji-assets');
+  const sourceManifest = readFileSync(join(packageDir, 'src', 'manifest.ts'), 'utf8');
+  const match = /const manifestJson = `([\s\S]*?)`;\nexport const emojiAssetManifest/.exec(
+    sourceManifest
+  );
+  if (!match?.[1]) return ['build: emoji-assets manifest is missing or malformed'];
+  let records: { id: string; path: string; sha256: string }[];
+  try {
+    records = JSON.parse(match[1]) as { id: string; path: string; sha256: string }[];
+  } catch {
+    return ['build: emoji-assets manifest JSON is invalid'];
+  }
+  const packageRoot = dirname(dist);
+  const problems: string[] = [];
+  const expected = new Set<string>();
+  for (const record of records) {
+    const expectedPath = `./assets/svg/${record.id}.svg`;
+    if (record.path !== expectedPath || !/^[0-9a-f]+(?:-[0-9a-f]+)*$/.test(record.id)) {
+      problems.push(`build: invalid emoji asset path for ${record.id}`);
+      continue;
+    }
+    expected.add(record.path.slice(2));
+    const source = join(packageDir, record.path.slice(2));
+    if (!existsSync(source)) {
+      problems.push(`build: manifest SVG is missing: ${record.path}`);
+      continue;
+    }
+    const digest = createHash('sha256').update(readFileSync(source)).digest('hex');
+    if (digest !== record.sha256) {
+      problems.push(`build: manifest SVG checksum mismatch: ${record.path}`);
+      continue;
+    }
+    const target = join(packageRoot, record.path.slice(2));
+    mkdirSync(dirname(target), { recursive: true });
+    cpSync(source, target);
+    if (!existsSync(target)) problems.push(`build: failed to stage ${record.path}`);
+  }
+  for (const file of readdirSync(join(packageDir, 'assets', 'svg'))) {
+    if (file.endsWith('.svg') && !expected.has(`assets/svg/${file}`))
+      problems.push(`build: unreferenced emoji SVG: ${file}`);
+  }
+  const coverageSource = join(packageDir, 'data', 'art-coverage.json');
+  const coverageTarget = join(packageRoot, 'data', 'art-coverage.json');
+  if (!existsSync(coverageSource)) {
+    problems.push('build: emoji art coverage report is missing');
+  } else {
+    mkdirSync(dirname(coverageTarget), { recursive: true });
+    cpSync(coverageSource, coverageTarget);
+    if (!existsSync(coverageTarget))
+      problems.push('build: failed to stage emoji art coverage report');
+  }
+  return problems;
+}
+
 /**
- * Built assets a package ships in its `dist/` beside the compiled source,
+ * Built assets a package ships beside the compiled source,
  * by directory: each builder writes into the staged `dist` and returns its
  * problems. `tools`: the conformance sheet `texuli ds check --render` serves
  * by default (D-G-013), at `dist/ds-check/sheet/`, and the host IIFE at
- * `dist/ds-check/host.iife.js`.
+ * `dist/ds-check/host.iife.js`. Emoji SVGs stay at their manifest-relative
+ * package paths under `assets/svg/`.
  */
 export const PACKAGE_ASSETS: Readonly<
   Record<string, (dist: string, root: string) => Promise<string[]>>
@@ -70,6 +134,7 @@ export const PACKAGE_ASSETS: Readonly<
     ...(await buildDsCheckSheet(join(dist, DS_CHECK_SHEET_DIST), root)),
     ...(await buildDsCheckHost(join(dist, DS_CHECK_HOST_DIST), root)),
   ],
+  'emoji-assets': async (dist, root) => buildEmojiAssetFiles(dist, root),
 };
 
 /** attw resolution kinds outside the ESM-only support policy. */
@@ -111,6 +176,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
  * error string for targets the build cannot produce.
  */
 export function distTarget(target: string, condition: string): string {
+  if (target === './package.json' && condition === 'subpath') return target;
   if (!target.startsWith('./src/')) {
     throw new Error(`export target outside src/: ${target}`);
   }
@@ -165,6 +231,9 @@ function pinWorkspace(deps: unknown, versions: ReadonlyMap<string, string>, prob
   const out: { [key: string]: Json } = {};
   for (const [name, range] of Object.entries(deps)) {
     if (typeof range !== 'string') continue;
+    // A first-release workspace package is intentionally absent from the
+    // publish-ready dependency graph until its owner opens that release.
+    if (UNRELEASED_PACKAGES.has(name)) continue;
     let pinned = range;
     if (range.startsWith('workspace:')) {
       const version = versions.get(name);
@@ -231,7 +300,7 @@ export function publishManifest(
     }
     manifest.bin = bin;
   }
-  manifest.files = [...PUBLISHED_FILES];
+  manifest.files = [...new Set([...PUBLISHED_FILES, ...(PACKAGE_FILES[pkg.dir] ?? [])])];
   for (const field of ['dependencies', 'peerDependencies', 'optionalDependencies'] as const) {
     const pinned = pinWorkspace(source[field], versions, problems);
     if (pinned && Object.keys(pinned).length > 0) manifest[field] = pinned;
@@ -728,7 +797,10 @@ export async function verifyPackages(
     } else {
       const expected = changelogForPackage(pkg.name, releaseNotes);
       const changelog = join(root, 'packages', pkg.dir, CHANGELOG_FILE);
-      if (!existsSync(changelog)) {
+      if (UNRELEASED_PACKAGES.has(pkg.name)) {
+        // The source generator intentionally omits first-release packages;
+        // still stage the derived changelog so the tarball is complete.
+      } else if (!existsSync(changelog)) {
         problems.push(
           `changelog: missing ${CHANGELOG_FILE} (run pnpm exec tsx scripts/package-changelogs.ts --write)`
         );

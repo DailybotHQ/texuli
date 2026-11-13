@@ -30,7 +30,10 @@
       "types": "./src/manifest.ts",
       "default": "./src/manifest.ts"
     },
-    "./coverage": "./data/art-coverage.json",
+    "./coverage": {
+      "types": "./src/coverage.ts",
+      "default": "./src/coverage.ts"
+    },
     "./package.json": "./package.json"
   }
 }
