@@ -8,7 +8,7 @@
  */
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { texuliOps } from '@texuli/tools/ops';
+import { texuliEdgeOps, texuliOps } from '@texuli/tools/ops';
 import { describe, expect, it } from 'vitest';
 import { htmlToMarkdown } from '../src/components/docs/markdown.ts';
 import { agentNoteMarkdown, TWIN_NOTES, twinNoteFor } from '../src/components/docs/twin-notes.ts';
@@ -29,7 +29,10 @@ import {
 } from '../src/components/docs/twins.ts';
 
 const ORIGIN = 'https://texuli.com';
-const EDGE_OPS = texuliOps.list({ runtimes: ['edge'] }).map(({ name, title }) => ({ name, title }));
+const EDGE_OPS = texuliEdgeOps
+  .list({ runtimes: ['edge'] })
+  .map(({ name, title }) => ({ name, title }));
+const ALL_OPS = texuliOps.list().map(({ name, title }) => ({ name, title }));
 
 describe('twin paths and the allowlist', () => {
   it('names a twin for every page route, the root included', () => {
@@ -232,9 +235,14 @@ describe('the page rendition', () => {
 describe('"For agents" notes', () => {
   it('name only operations the remote MCP serves and package READMEs that exist', () => {
     const served = new Set(EDGE_OPS.map((operation) => operation.name));
+    const known = new Set(ALL_OPS.map((operation) => operation.name));
     for (const note of TWIN_NOTES) {
       for (const name of note.operations)
         expect(served.has(name), `${note.route} ${name}`).toBe(true);
+      for (const name of note.localOperations ?? []) {
+        expect(known.has(name), `${note.route} local ${name}`).toBe(true);
+        expect(served.has(name), `${note.route} local ${name} is not remote`).toBe(false);
+      }
       for (const name of note.packages)
         expect(existsSync(resolve(`packages/${name}/README.md`)), name).toBe(true);
       for (const link of note.links ?? [])
@@ -265,16 +273,16 @@ describe('"For agents" notes', () => {
   });
 
   it('print the operations with their titles, the component id and the example page', () => {
-    const button = agentNoteMarkdown('/component-pages/button/', EDGE_OPS, ORIGIN) ?? '';
+    const button = agentNoteMarkdown('/component-pages/button/', ALL_OPS, ORIGIN) ?? '';
     expect(button).toMatch(/^## For agents\n/);
     expect(button).toContain(`${ORIGIN}/mcp`);
     expect(button).toContain(
       '- `component.get`: Read a component manifest with `{"id":"button"}`.'
     );
     expect(button).toContain('(/llms/components/button.md)');
-    const preview = agentNoteMarkdown('/examples/preview/blocks-code/', EDGE_OPS, ORIGIN) ?? '';
+    const preview = agentNoteMarkdown('/examples/preview/blocks-code/', ALL_OPS, ORIGIN) ?? '';
     expect(preview).toContain('(/examples/blocks-code.md)');
-    expect(agentNoteMarkdown('/guides/theming/', EDGE_OPS, ORIGIN)).toBeUndefined();
+    expect(agentNoteMarkdown('/guides/theming/', ALL_OPS, ORIGIN)).toBeUndefined();
     expect(() => agentNoteMarkdown('/builder/', [], ORIGIN)).toThrow(/unknown operation/);
   });
 });

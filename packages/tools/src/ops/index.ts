@@ -37,6 +37,8 @@ export { ALIASES_REMOVED_IN, TEXULI_ALIASES, TEXULI_REMOVED_NAMES } from './alia
 export { loadOpsCatalog } from './catalog.ts';
 export { DS_INPUT_BYTES, DS_PIXEL_VALUES, MINIMAL_DESIGN_SYSTEM } from './design-system.ts';
 export { EXPORT_COMMANDS, RUN_COMMANDS } from './document.ts';
+export { TEXULI_EDGE_OPERATIONS, texuliEdgeOps } from './edge.ts';
+export { TEXULI_NODE_OPERATION_NAMES } from './node-names.ts';
 export {
   createOperationRegistry,
   defineOperation,

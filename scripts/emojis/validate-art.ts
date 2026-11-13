@@ -29,6 +29,8 @@ interface MeaningReview {
 }
 interface Asset {
   id: string;
+  shortcode: string;
+  name: string;
   path: string;
   sha256: string;
   status: string;
@@ -93,13 +95,17 @@ function main(): void {
     if (createHash('sha256').update(svg).digest('hex') !== row.sha256)
       throw new Error(`package checksum mismatch for ${row.id}`);
     const info = validateSvg(svg);
+    if (info.title !== row.name)
+      throw new Error(`packaged SVG title does not match CLDR for ${row.id}`);
     totalBytes += info.bytes;
   }
   for (const row of provenance.records) {
     const sourceSvg = readFileSync(resolve(SOURCE, row.source), 'utf8');
     if (createHash('sha256').update(sourceSvg).digest('hex') !== row.sha256)
       throw new Error(`source checksum mismatch for ${row.id}`);
-    validateSvg(sourceSvg);
+    const info = validateSvg(sourceSvg);
+    if (info.title !== row.name)
+      throw new Error(`source SVG title does not match CLDR for ${row.id}`);
   }
   console.log(
     `validated ${assets.length} packaged SVGs and ${provenance.records.length} originals (${totalBytes} packaged bytes)`

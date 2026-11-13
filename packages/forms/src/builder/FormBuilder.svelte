@@ -197,29 +197,29 @@ function setOptions(field: FormField, value: string) {
 </section>
 
 <style>
-  .builder { color: var(--tx-foreground, CanvasText); background: var(--tx-background, Canvas); display: grid; gap: var(--tx-space-4, 1rem); }
-  .builder-header, .builder-grid { display: grid; gap: var(--tx-space-4, 1rem); }
-  .builder-header { grid-template-columns: 1fr auto; align-items: end; padding: var(--tx-space-4, 1rem); border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-shape-radius-md, .5rem); }
+  .builder { color: var(--tx-foreground, CanvasText); background: var(--tx-background, Canvas); display: grid; gap: var(--tx-space-4); }
+  .builder-header, .builder-grid { display: grid; gap: var(--tx-space-4); }
+  .builder-header { grid-template-columns: 1fr auto; align-items: end; padding: var(--tx-space-4); border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-shape-radius-md); }
   .builder-grid { grid-template-columns: minmax(9rem, .8fr) minmax(15rem, 1.4fr) minmax(13rem, 1fr); }
-  nav, .builder-grid > section, aside { padding: var(--tx-space-4, 1rem); border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-shape-radius-md, .5rem); min-inline-size: 0; }
-  h2 { margin: 0 0 var(--tx-space-3, .75rem); font-size: var(--tx-font-size-base, 1rem); }
-  label { display: grid; gap: var(--tx-space-1, .35rem); margin-block: var(--tx-space-2, .6rem); font-weight: 600; }
+  nav, .builder-grid > section, aside { padding: var(--tx-space-4); border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-shape-radius-md); min-inline-size: 0; }
+  h2 { margin: 0 0 var(--tx-space-3); font-size: var(--tx-font-size-base, 1rem); }
+  label { display: grid; gap: var(--tx-space-1); margin-block: var(--tx-space-2); font-weight: 600; }
   input, select, textarea, button { color: inherit; font: inherit; }
-  input, select, textarea { inline-size: 100%; box-sizing: border-box; padding: var(--tx-space-2, .45rem); border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-shape-radius-sm, .25rem); background: var(--tx-background, Canvas); }
-  button { cursor: pointer; border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-shape-radius-sm, .25rem); background: var(--tx-surface, Canvas); padding: var(--tx-space-2, .4rem) var(--tx-space-2, .55rem); }
+  input, select, textarea { inline-size: 100%; box-sizing: border-box; padding: var(--tx-space-2); border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-shape-radius-sm); background: var(--tx-background, Canvas); }
+  button { cursor: pointer; border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-shape-radius-sm); background: var(--tx-surface, Canvas); padding: var(--tx-space-2) var(--tx-space-2); }
   button:focus-visible, li:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--tx-ring, Highlight); outline-offset: 2px; }
-  .palette { display: flex; flex-wrap: wrap; gap: var(--tx-space-1, .35rem); }
-  ol { list-style: none; display: grid; gap: var(--tx-space-2, .45rem); margin: 0; padding: 0; }
-  li { display: flex; gap: var(--tx-space-1, .35rem); align-items: center; padding: var(--tx-space-2, .4rem); border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-shape-radius-sm, .25rem); }
+  .palette { display: flex; flex-wrap: wrap; gap: var(--tx-space-1); }
+  ol { list-style: none; display: grid; gap: var(--tx-space-2); margin: 0; padding: 0; }
+  li { display: flex; gap: var(--tx-space-1); align-items: center; padding: var(--tx-space-2); border: 1px solid var(--tx-border, GrayText); border-radius: var(--tx-shape-radius-sm); }
   li[aria-current="true"] { border-color: var(--tx-primary, Highlight); }
   .field-select { flex: 1; text-align: start; display: grid; }
   small { display: block; opacity: .75; font-size: var(--tx-font-size-xs, .75rem); }
   .check { display: flex; align-items: center; }
   .check input { inline-size: auto; }
   .preview, .schema-view { grid-column: 2 / 4; }
-  .schema-view pre { max-block-size: 24rem; overflow: auto; padding: var(--tx-space-3, .75rem); background: var(--tx-surface, Canvas); }
+  .schema-view pre { max-block-size: 24rem; overflow: auto; padding: var(--tx-space-3); background: var(--tx-surface, Canvas); }
   .invalid { font-weight: 700; }
-  .empty { padding: var(--tx-space-4, 1rem); border: 1px dashed var(--tx-border, GrayText); }
+  .empty { padding: var(--tx-space-4); border: 1px dashed var(--tx-border, GrayText); }
   .sr-only { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   @media (max-width: 48rem) { .builder-grid { grid-template-columns: 1fr; } .preview, .schema-view { grid-column: 1; } .builder-header { grid-template-columns: 1fr; } }
 </style>

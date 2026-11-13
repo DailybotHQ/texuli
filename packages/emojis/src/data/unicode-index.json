@@ -441,7 +441,11 @@
     "1faf1-1f3fb-200d-1faf2-1f3fc",
     ":handshake_light_skin_tone_medium_light_skin_tone:"
   ],
-  ["🫱🏻\u200d🫲🏽", "1faf1-1f3fb-200d-1faf2-1f3fd", ":handshake_light_skin_tone_medium_skin_tone:"],
+  [
+    "🫱🏻\u200d🫲🏽",
+    "1faf1-1f3fb-200d-1faf2-1f3fd",
+    ":handshake_light_skin_tone_medium_skin_tone:"
+  ],
   [
     "🫱🏻\u200d🫲🏾",
     "1faf1-1f3fb-200d-1faf2-1f3fe",
@@ -468,7 +472,11 @@
     "1faf1-1f3fc-200d-1faf2-1f3ff",
     ":handshake_medium_light_skin_tone_dark_skin_tone:"
   ],
-  ["🫱🏽\u200d🫲🏻", "1faf1-1f3fd-200d-1faf2-1f3fb", ":handshake_medium_skin_tone_light_skin_tone:"],
+  [
+    "🫱🏽\u200d🫲🏻",
+    "1faf1-1f3fd-200d-1faf2-1f3fb",
+    ":handshake_medium_skin_tone_light_skin_tone:"
+  ],
   [
     "🫱🏽\u200d🫲🏼",
     "1faf1-1f3fd-200d-1faf2-1f3fc",
@@ -860,7 +868,11 @@
   ["🙅\u200d♀", "1f645-200d-2640-fe0f", ":woman_gesturing_no:"],
   ["🙅🏻\u200d♀\ufe0f", "1f645-1f3fb-200d-2640-fe0f", ":woman_gesturing_no_light_skin_tone:"],
   ["🙅🏻\u200d♀", "1f645-1f3fb-200d-2640-fe0f", ":woman_gesturing_no_light_skin_tone:"],
-  ["🙅🏼\u200d♀\ufe0f", "1f645-1f3fc-200d-2640-fe0f", ":woman_gesturing_no_medium_light_skin_tone:"],
+  [
+    "🙅🏼\u200d♀\ufe0f",
+    "1f645-1f3fc-200d-2640-fe0f",
+    ":woman_gesturing_no_medium_light_skin_tone:"
+  ],
   ["🙅🏼\u200d♀", "1f645-1f3fc-200d-2640-fe0f", ":woman_gesturing_no_medium_light_skin_tone:"],
   ["🙅🏽\u200d♀\ufe0f", "1f645-1f3fd-200d-2640-fe0f", ":woman_gesturing_no_medium_skin_tone:"],
   ["🙅🏽\u200d♀", "1f645-1f3fd-200d-2640-fe0f", ":woman_gesturing_no_medium_skin_tone:"],
@@ -890,7 +902,11 @@
   ["🙆\u200d♀", "1f646-200d-2640-fe0f", ":woman_gesturing_ok:"],
   ["🙆🏻\u200d♀\ufe0f", "1f646-1f3fb-200d-2640-fe0f", ":woman_gesturing_ok_light_skin_tone:"],
   ["🙆🏻\u200d♀", "1f646-1f3fb-200d-2640-fe0f", ":woman_gesturing_ok_light_skin_tone:"],
-  ["🙆🏼\u200d♀\ufe0f", "1f646-1f3fc-200d-2640-fe0f", ":woman_gesturing_ok_medium_light_skin_tone:"],
+  [
+    "🙆🏼\u200d♀\ufe0f",
+    "1f646-1f3fc-200d-2640-fe0f",
+    ":woman_gesturing_ok_medium_light_skin_tone:"
+  ],
   ["🙆🏼\u200d♀", "1f646-1f3fc-200d-2640-fe0f", ":woman_gesturing_ok_medium_light_skin_tone:"],
   ["🙆🏽\u200d♀\ufe0f", "1f646-1f3fd-200d-2640-fe0f", ":woman_gesturing_ok_medium_skin_tone:"],
   ["🙆🏽\u200d♀", "1f646-1f3fd-200d-2640-fe0f", ":woman_gesturing_ok_medium_skin_tone:"],
@@ -920,7 +936,11 @@
   ["💁\u200d♀", "1f481-200d-2640-fe0f", ":woman_tipping_hand:"],
   ["💁🏻\u200d♀\ufe0f", "1f481-1f3fb-200d-2640-fe0f", ":woman_tipping_hand_light_skin_tone:"],
   ["💁🏻\u200d♀", "1f481-1f3fb-200d-2640-fe0f", ":woman_tipping_hand_light_skin_tone:"],
-  ["💁🏼\u200d♀\ufe0f", "1f481-1f3fc-200d-2640-fe0f", ":woman_tipping_hand_medium_light_skin_tone:"],
+  [
+    "💁🏼\u200d♀\ufe0f",
+    "1f481-1f3fc-200d-2640-fe0f",
+    ":woman_tipping_hand_medium_light_skin_tone:"
+  ],
   ["💁🏼\u200d♀", "1f481-1f3fc-200d-2640-fe0f", ":woman_tipping_hand_medium_light_skin_tone:"],
   ["💁🏽\u200d♀\ufe0f", "1f481-1f3fd-200d-2640-fe0f", ":woman_tipping_hand_medium_skin_tone:"],
   ["💁🏽\u200d♀", "1f481-1f3fd-200d-2640-fe0f", ":woman_tipping_hand_medium_skin_tone:"],
@@ -950,7 +970,11 @@
   ["🙋\u200d♀", "1f64b-200d-2640-fe0f", ":woman_raising_hand:"],
   ["🙋🏻\u200d♀\ufe0f", "1f64b-1f3fb-200d-2640-fe0f", ":woman_raising_hand_light_skin_tone:"],
   ["🙋🏻\u200d♀", "1f64b-1f3fb-200d-2640-fe0f", ":woman_raising_hand_light_skin_tone:"],
-  ["🙋🏼\u200d♀\ufe0f", "1f64b-1f3fc-200d-2640-fe0f", ":woman_raising_hand_medium_light_skin_tone:"],
+  [
+    "🙋🏼\u200d♀\ufe0f",
+    "1f64b-1f3fc-200d-2640-fe0f",
+    ":woman_raising_hand_medium_light_skin_tone:"
+  ],
   ["🙋🏼\u200d♀", "1f64b-1f3fc-200d-2640-fe0f", ":woman_raising_hand_medium_light_skin_tone:"],
   ["🙋🏽\u200d♀\ufe0f", "1f64b-1f3fd-200d-2640-fe0f", ":woman_raising_hand_medium_skin_tone:"],
   ["🙋🏽\u200d♀", "1f64b-1f3fd-200d-2640-fe0f", ":woman_raising_hand_medium_skin_tone:"],
@@ -1114,7 +1138,11 @@
   ["👩🏼\u200d⚕", "1f469-1f3fc-200d-2695-fe0f", ":woman_health_worker_medium_light_skin_tone:"],
   ["👩🏽\u200d⚕\ufe0f", "1f469-1f3fd-200d-2695-fe0f", ":woman_health_worker_medium_skin_tone:"],
   ["👩🏽\u200d⚕", "1f469-1f3fd-200d-2695-fe0f", ":woman_health_worker_medium_skin_tone:"],
-  ["👩🏾\u200d⚕\ufe0f", "1f469-1f3fe-200d-2695-fe0f", ":woman_health_worker_medium_dark_skin_tone:"],
+  [
+    "👩🏾\u200d⚕\ufe0f",
+    "1f469-1f3fe-200d-2695-fe0f",
+    ":woman_health_worker_medium_dark_skin_tone:"
+  ],
   ["👩🏾\u200d⚕", "1f469-1f3fe-200d-2695-fe0f", ":woman_health_worker_medium_dark_skin_tone:"],
   ["👩🏿\u200d⚕\ufe0f", "1f469-1f3ff-200d-2695-fe0f", ":woman_health_worker_dark_skin_tone:"],
   ["👩🏿\u200d⚕", "1f469-1f3ff-200d-2695-fe0f", ":woman_health_worker_dark_skin_tone:"],
@@ -1434,7 +1462,11 @@
   ["👮\u200d♂", "1f46e-200d-2642-fe0f", ":man_police_officer:"],
   ["👮🏻\u200d♂\ufe0f", "1f46e-1f3fb-200d-2642-fe0f", ":man_police_officer_light_skin_tone:"],
   ["👮🏻\u200d♂", "1f46e-1f3fb-200d-2642-fe0f", ":man_police_officer_light_skin_tone:"],
-  ["👮🏼\u200d♂\ufe0f", "1f46e-1f3fc-200d-2642-fe0f", ":man_police_officer_medium_light_skin_tone:"],
+  [
+    "👮🏼\u200d♂\ufe0f",
+    "1f46e-1f3fc-200d-2642-fe0f",
+    ":man_police_officer_medium_light_skin_tone:"
+  ],
   ["👮🏼\u200d♂", "1f46e-1f3fc-200d-2642-fe0f", ":man_police_officer_medium_light_skin_tone:"],
   ["👮🏽\u200d♂\ufe0f", "1f46e-1f3fd-200d-2642-fe0f", ":man_police_officer_medium_skin_tone:"],
   ["👮🏽\u200d♂", "1f46e-1f3fd-200d-2642-fe0f", ":man_police_officer_medium_skin_tone:"],
@@ -1561,7 +1593,11 @@
   ["👷🏿\u200d♂", "1f477-1f3ff-200d-2642-fe0f", ":man_construction_worker_dark_skin_tone:"],
   ["👷\u200d♀\ufe0f", "1f477-200d-2640-fe0f", ":woman_construction_worker:"],
   ["👷\u200d♀", "1f477-200d-2640-fe0f", ":woman_construction_worker:"],
-  ["👷🏻\u200d♀\ufe0f", "1f477-1f3fb-200d-2640-fe0f", ":woman_construction_worker_light_skin_tone:"],
+  [
+    "👷🏻\u200d♀\ufe0f",
+    "1f477-1f3fb-200d-2640-fe0f",
+    ":woman_construction_worker_light_skin_tone:"
+  ],
   ["👷🏻\u200d♀", "1f477-1f3fb-200d-2640-fe0f", ":woman_construction_worker_light_skin_tone:"],
   [
     "👷🏼\u200d♀\ufe0f",
@@ -1584,7 +1620,11 @@
     "1f477-1f3fe-200d-2640-fe0f",
     ":woman_construction_worker_medium_dark_skin_tone:"
   ],
-  ["👷🏾\u200d♀", "1f477-1f3fe-200d-2640-fe0f", ":woman_construction_worker_medium_dark_skin_tone:"],
+  [
+    "👷🏾\u200d♀",
+    "1f477-1f3fe-200d-2640-fe0f",
+    ":woman_construction_worker_medium_dark_skin_tone:"
+  ],
   ["👷🏿\u200d♀\ufe0f", "1f477-1f3ff-200d-2640-fe0f", ":woman_construction_worker_dark_skin_tone:"],
   ["👷🏿\u200d♀", "1f477-1f3ff-200d-2640-fe0f", ":woman_construction_worker_dark_skin_tone:"],
   ["🫅", "1fac5", ":person_with_crown:"],
@@ -1615,7 +1655,11 @@
   ["👳\u200d♂", "1f473-200d-2642-fe0f", ":man_wearing_turban:"],
   ["👳🏻\u200d♂\ufe0f", "1f473-1f3fb-200d-2642-fe0f", ":man_wearing_turban_light_skin_tone:"],
   ["👳🏻\u200d♂", "1f473-1f3fb-200d-2642-fe0f", ":man_wearing_turban_light_skin_tone:"],
-  ["👳🏼\u200d♂\ufe0f", "1f473-1f3fc-200d-2642-fe0f", ":man_wearing_turban_medium_light_skin_tone:"],
+  [
+    "👳🏼\u200d♂\ufe0f",
+    "1f473-1f3fc-200d-2642-fe0f",
+    ":man_wearing_turban_medium_light_skin_tone:"
+  ],
   ["👳🏼\u200d♂", "1f473-1f3fc-200d-2642-fe0f", ":man_wearing_turban_medium_light_skin_tone:"],
   ["👳🏽\u200d♂\ufe0f", "1f473-1f3fd-200d-2642-fe0f", ":man_wearing_turban_medium_skin_tone:"],
   ["👳🏽\u200d♂", "1f473-1f3fd-200d-2642-fe0f", ":man_wearing_turban_medium_skin_tone:"],
@@ -1833,7 +1877,11 @@
   ["🦹\u200d♀", "1f9b9-200d-2640-fe0f", ":woman_supervillain:"],
   ["🦹🏻\u200d♀\ufe0f", "1f9b9-1f3fb-200d-2640-fe0f", ":woman_supervillain_light_skin_tone:"],
   ["🦹🏻\u200d♀", "1f9b9-1f3fb-200d-2640-fe0f", ":woman_supervillain_light_skin_tone:"],
-  ["🦹🏼\u200d♀\ufe0f", "1f9b9-1f3fc-200d-2640-fe0f", ":woman_supervillain_medium_light_skin_tone:"],
+  [
+    "🦹🏼\u200d♀\ufe0f",
+    "1f9b9-1f3fc-200d-2640-fe0f",
+    ":woman_supervillain_medium_light_skin_tone:"
+  ],
   ["🦹🏼\u200d♀", "1f9b9-1f3fc-200d-2640-fe0f", ":woman_supervillain_medium_light_skin_tone:"],
   ["🦹🏽\u200d♀\ufe0f", "1f9b9-1f3fd-200d-2640-fe0f", ":woman_supervillain_medium_skin_tone:"],
   ["🦹🏽\u200d♀", "1f9b9-1f3fd-200d-2640-fe0f", ":woman_supervillain_medium_skin_tone:"],
@@ -2021,7 +2069,11 @@
   ["💆🏼\u200d♂", "1f486-1f3fc-200d-2642-fe0f", ":man_getting_massage_medium_light_skin_tone:"],
   ["💆🏽\u200d♂\ufe0f", "1f486-1f3fd-200d-2642-fe0f", ":man_getting_massage_medium_skin_tone:"],
   ["💆🏽\u200d♂", "1f486-1f3fd-200d-2642-fe0f", ":man_getting_massage_medium_skin_tone:"],
-  ["💆🏾\u200d♂\ufe0f", "1f486-1f3fe-200d-2642-fe0f", ":man_getting_massage_medium_dark_skin_tone:"],
+  [
+    "💆🏾\u200d♂\ufe0f",
+    "1f486-1f3fe-200d-2642-fe0f",
+    ":man_getting_massage_medium_dark_skin_tone:"
+  ],
   ["💆🏾\u200d♂", "1f486-1f3fe-200d-2642-fe0f", ":man_getting_massage_medium_dark_skin_tone:"],
   ["💆🏿\u200d♂\ufe0f", "1f486-1f3ff-200d-2642-fe0f", ":man_getting_massage_dark_skin_tone:"],
   ["💆🏿\u200d♂", "1f486-1f3ff-200d-2642-fe0f", ":man_getting_massage_dark_skin_tone:"],
@@ -2063,7 +2115,11 @@
   ["💇🏼\u200d♂", "1f487-1f3fc-200d-2642-fe0f", ":man_getting_haircut_medium_light_skin_tone:"],
   ["💇🏽\u200d♂\ufe0f", "1f487-1f3fd-200d-2642-fe0f", ":man_getting_haircut_medium_skin_tone:"],
   ["💇🏽\u200d♂", "1f487-1f3fd-200d-2642-fe0f", ":man_getting_haircut_medium_skin_tone:"],
-  ["💇🏾\u200d♂\ufe0f", "1f487-1f3fe-200d-2642-fe0f", ":man_getting_haircut_medium_dark_skin_tone:"],
+  [
+    "💇🏾\u200d♂\ufe0f",
+    "1f487-1f3fe-200d-2642-fe0f",
+    ":man_getting_haircut_medium_dark_skin_tone:"
+  ],
   ["💇🏾\u200d♂", "1f487-1f3fe-200d-2642-fe0f", ":man_getting_haircut_medium_dark_skin_tone:"],
   ["💇🏿\u200d♂\ufe0f", "1f487-1f3ff-200d-2642-fe0f", ":man_getting_haircut_dark_skin_tone:"],
   ["💇🏿\u200d♂", "1f487-1f3ff-200d-2642-fe0f", ":man_getting_haircut_dark_skin_tone:"],
@@ -2478,8 +2534,16 @@
     "1f9ce-200d-2640-fe0f-200d-27a1-fe0f",
     ":woman_kneeling_facing_right:"
   ],
-  ["🧎\u200d♀\u200d➡\ufe0f", "1f9ce-200d-2640-fe0f-200d-27a1-fe0f", ":woman_kneeling_facing_right:"],
-  ["🧎\u200d♀\ufe0f\u200d➡", "1f9ce-200d-2640-fe0f-200d-27a1-fe0f", ":woman_kneeling_facing_right:"],
+  [
+    "🧎\u200d♀\u200d➡\ufe0f",
+    "1f9ce-200d-2640-fe0f-200d-27a1-fe0f",
+    ":woman_kneeling_facing_right:"
+  ],
+  [
+    "🧎\u200d♀\ufe0f\u200d➡",
+    "1f9ce-200d-2640-fe0f-200d-27a1-fe0f",
+    ":woman_kneeling_facing_right:"
+  ],
   ["🧎\u200d♀\u200d➡", "1f9ce-200d-2640-fe0f-200d-27a1-fe0f", ":woman_kneeling_facing_right:"],
   [
     "🧎🏻\u200d♀\ufe0f\u200d➡\ufe0f",
@@ -2951,7 +3015,11 @@
   ],
   ["👨\u200d🦼", "1f468-200d-1f9bc", ":man_in_motorized_wheelchair:"],
   ["👨🏻\u200d🦼", "1f468-1f3fb-200d-1f9bc", ":man_in_motorized_wheelchair_light_skin_tone:"],
-  ["👨🏼\u200d🦼", "1f468-1f3fc-200d-1f9bc", ":man_in_motorized_wheelchair_medium_light_skin_tone:"],
+  [
+    "👨🏼\u200d🦼",
+    "1f468-1f3fc-200d-1f9bc",
+    ":man_in_motorized_wheelchair_medium_light_skin_tone:"
+  ],
   ["👨🏽\u200d🦼", "1f468-1f3fd-200d-1f9bc", ":man_in_motorized_wheelchair_medium_skin_tone:"],
   ["👨🏾\u200d🦼", "1f468-1f3fe-200d-1f9bc", ":man_in_motorized_wheelchair_medium_dark_skin_tone:"],
   ["👨🏿\u200d🦼", "1f468-1f3ff-200d-1f9bc", ":man_in_motorized_wheelchair_dark_skin_tone:"],
@@ -3091,7 +3159,11 @@
   ],
   ["🧑\u200d🦽", "1f9d1-200d-1f9bd", ":person_in_manual_wheelchair:"],
   ["🧑🏻\u200d🦽", "1f9d1-1f3fb-200d-1f9bd", ":person_in_manual_wheelchair_light_skin_tone:"],
-  ["🧑🏼\u200d🦽", "1f9d1-1f3fc-200d-1f9bd", ":person_in_manual_wheelchair_medium_light_skin_tone:"],
+  [
+    "🧑🏼\u200d🦽",
+    "1f9d1-1f3fc-200d-1f9bd",
+    ":person_in_manual_wheelchair_medium_light_skin_tone:"
+  ],
   ["🧑🏽\u200d🦽", "1f9d1-1f3fd-200d-1f9bd", ":person_in_manual_wheelchair_medium_skin_tone:"],
   ["🧑🏾\u200d🦽", "1f9d1-1f3fe-200d-1f9bd", ":person_in_manual_wheelchair_medium_dark_skin_tone:"],
   ["🧑🏿\u200d🦽", "1f9d1-1f3ff-200d-1f9bd", ":person_in_manual_wheelchair_dark_skin_tone:"],
@@ -3616,7 +3688,11 @@
   ["👯🏼\u200d♂", "1f46f-1f3fc-200d-2642-fe0f", ":men_with_bunny_ears_medium_light_skin_tone:"],
   ["👯🏽\u200d♂\ufe0f", "1f46f-1f3fd-200d-2642-fe0f", ":men_with_bunny_ears_medium_skin_tone:"],
   ["👯🏽\u200d♂", "1f46f-1f3fd-200d-2642-fe0f", ":men_with_bunny_ears_medium_skin_tone:"],
-  ["👯🏾\u200d♂\ufe0f", "1f46f-1f3fe-200d-2642-fe0f", ":men_with_bunny_ears_medium_dark_skin_tone:"],
+  [
+    "👯🏾\u200d♂\ufe0f",
+    "1f46f-1f3fe-200d-2642-fe0f",
+    ":men_with_bunny_ears_medium_dark_skin_tone:"
+  ],
   ["👯🏾\u200d♂", "1f46f-1f3fe-200d-2642-fe0f", ":men_with_bunny_ears_medium_dark_skin_tone:"],
   ["👯🏿\u200d♂\ufe0f", "1f46f-1f3ff-200d-2642-fe0f", ":men_with_bunny_ears_dark_skin_tone:"],
   ["👯🏿\u200d♂", "1f46f-1f3ff-200d-2642-fe0f", ":men_with_bunny_ears_dark_skin_tone:"],
@@ -3950,7 +4026,11 @@
   ["🧖\u200d♂", "1f9d6-200d-2642-fe0f", ":man_in_steamy_room:"],
   ["🧖🏻\u200d♂\ufe0f", "1f9d6-1f3fb-200d-2642-fe0f", ":man_in_steamy_room_light_skin_tone:"],
   ["🧖🏻\u200d♂", "1f9d6-1f3fb-200d-2642-fe0f", ":man_in_steamy_room_light_skin_tone:"],
-  ["🧖🏼\u200d♂\ufe0f", "1f9d6-1f3fc-200d-2642-fe0f", ":man_in_steamy_room_medium_light_skin_tone:"],
+  [
+    "🧖🏼\u200d♂\ufe0f",
+    "1f9d6-1f3fc-200d-2642-fe0f",
+    ":man_in_steamy_room_medium_light_skin_tone:"
+  ],
   ["🧖🏼\u200d♂", "1f9d6-1f3fc-200d-2642-fe0f", ":man_in_steamy_room_medium_light_skin_tone:"],
   ["🧖🏽\u200d♂\ufe0f", "1f9d6-1f3fd-200d-2642-fe0f", ":man_in_steamy_room_medium_skin_tone:"],
   ["🧖🏽\u200d♂", "1f9d6-1f3fd-200d-2642-fe0f", ":man_in_steamy_room_medium_skin_tone:"],
@@ -4278,7 +4358,11 @@
   ["🚵🏼\u200d♂", "1f6b5-1f3fc-200d-2642-fe0f", ":man_mountain_biking_medium_light_skin_tone:"],
   ["🚵🏽\u200d♂\ufe0f", "1f6b5-1f3fd-200d-2642-fe0f", ":man_mountain_biking_medium_skin_tone:"],
   ["🚵🏽\u200d♂", "1f6b5-1f3fd-200d-2642-fe0f", ":man_mountain_biking_medium_skin_tone:"],
-  ["🚵🏾\u200d♂\ufe0f", "1f6b5-1f3fe-200d-2642-fe0f", ":man_mountain_biking_medium_dark_skin_tone:"],
+  [
+    "🚵🏾\u200d♂\ufe0f",
+    "1f6b5-1f3fe-200d-2642-fe0f",
+    ":man_mountain_biking_medium_dark_skin_tone:"
+  ],
   ["🚵🏾\u200d♂", "1f6b5-1f3fe-200d-2642-fe0f", ":man_mountain_biking_medium_dark_skin_tone:"],
   ["🚵🏿\u200d♂\ufe0f", "1f6b5-1f3ff-200d-2642-fe0f", ":man_mountain_biking_dark_skin_tone:"],
   ["🚵🏿\u200d♂", "1f6b5-1f3ff-200d-2642-fe0f", ":man_mountain_biking_dark_skin_tone:"],
@@ -4324,7 +4408,11 @@
   ["🤸\u200d♀", "1f938-200d-2640-fe0f", ":woman_cartwheeling:"],
   ["🤸🏻\u200d♀\ufe0f", "1f938-1f3fb-200d-2640-fe0f", ":woman_cartwheeling_light_skin_tone:"],
   ["🤸🏻\u200d♀", "1f938-1f3fb-200d-2640-fe0f", ":woman_cartwheeling_light_skin_tone:"],
-  ["🤸🏼\u200d♀\ufe0f", "1f938-1f3fc-200d-2640-fe0f", ":woman_cartwheeling_medium_light_skin_tone:"],
+  [
+    "🤸🏼\u200d♀\ufe0f",
+    "1f938-1f3fc-200d-2640-fe0f",
+    ":woman_cartwheeling_medium_light_skin_tone:"
+  ],
   ["🤸🏼\u200d♀", "1f938-1f3fc-200d-2640-fe0f", ":woman_cartwheeling_medium_light_skin_tone:"],
   ["🤸🏽\u200d♀\ufe0f", "1f938-1f3fd-200d-2640-fe0f", ":woman_cartwheeling_medium_skin_tone:"],
   ["🤸🏽\u200d♀", "1f938-1f3fd-200d-2640-fe0f", ":woman_cartwheeling_medium_skin_tone:"],
@@ -4697,8 +4785,16 @@
     "1f93d-1f3fc-200d-2640-fe0f",
     ":woman_playing_water_polo_medium_light_skin_tone:"
   ],
-  ["🤽🏼\u200d♀", "1f93d-1f3fc-200d-2640-fe0f", ":woman_playing_water_polo_medium_light_skin_tone:"],
-  ["🤽🏽\u200d♀\ufe0f", "1f93d-1f3fd-200d-2640-fe0f", ":woman_playing_water_polo_medium_skin_tone:"],
+  [
+    "🤽🏼\u200d♀",
+    "1f93d-1f3fc-200d-2640-fe0f",
+    ":woman_playing_water_polo_medium_light_skin_tone:"
+  ],
+  [
+    "🤽🏽\u200d♀\ufe0f",
+    "1f93d-1f3fd-200d-2640-fe0f",
+    ":woman_playing_water_polo_medium_skin_tone:"
+  ],
   ["🤽🏽\u200d♀", "1f93d-1f3fd-200d-2640-fe0f", ":woman_playing_water_polo_medium_skin_tone:"],
   [
     "🤽🏾\u200d♀\ufe0f",

@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { texuliOps } from '@texuli/tools/ops';
+import { texuliEdgeOps } from '@texuli/tools/ops';
 import { afterAll, describe, expect, it } from 'vitest';
 import { checkDist } from '../../scripts/solutions-surfaces.ts';
 import { siteRouteExists } from '../../src/components/foundation/nav-data.ts';
@@ -125,7 +125,7 @@ describe('llms.txt sections', () => {
 });
 
 describe('twin notes for demo landings', () => {
-  const served = new Set(texuliOps.list({ runtimes: ['edge'] }).map((op) => op.name));
+  const served = new Set(texuliEdgeOps.list({ runtimes: ['edge'] }).map((op) => op.name));
 
   it('cover each existing landing, name served MCP operations and real package READMEs', () => {
     expect(solutionTwinNotes(none)).toEqual([]);

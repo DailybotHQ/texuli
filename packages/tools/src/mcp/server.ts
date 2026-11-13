@@ -1,5 +1,5 @@
 import { texuliOps } from '../ops/index.ts';
-import type { OperationRegistry } from '../ops/types.ts';
+import type { OperationRegistry } from '../ops/registry.ts';
 import { createMcpHandler, type McpHandler } from './handler.ts';
 import { MCP_PROTOCOL_VERSION } from './protocol.ts';
 

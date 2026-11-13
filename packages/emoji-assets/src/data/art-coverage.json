@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "texuli-emoji-art-coverage/v1",
+  "unicodeEmojiVersion": "18.0",
+  "catalogSequenceCount": 3963,
+  "unicodeSupportedCount": 3963,
+  "fullyQualifiedCount": 3963,
+  "requiredArtCount": 3963,
+  "compositeArtCount": 0,
+  "approvedArtCount": 0,
+  "reviewedCandidateCount": 72,
+  "missingArtCount": 3963,
+  "sourceDesignCount": 72,
+  "packagedSvgCount": 72,
+  "missingCoveragePercent": 100,
+  "approvalNote": "All seed designs are reviewed candidates. Approved count remains zero until the owner signs off the proposed CC BY 4.0 art license and independent art review."
+}

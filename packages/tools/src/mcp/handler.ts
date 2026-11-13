@@ -20,13 +20,14 @@
 
 import { checkBlueprintAllow } from '@texuli/spec/design-system';
 import { texuliEdgeOps } from '../ops/edge.ts';
+import { TEXULI_NODE_OPERATION_NAMES } from '../ops/node-names.ts';
+import type { OperationRegistry } from '../ops/registry.ts';
 import {
   type InvokeFailure,
   LOCAL_RUNTIMES,
   type LocalFiles,
   type Operation,
   type OperationAnnotations,
-  type OperationRegistry,
   type OperationRuntime,
   type SiteContext,
 } from '../ops/types.ts';
@@ -345,7 +346,7 @@ export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
   const tools: JsonObject[] = served.map((operation) => ({
     name: operation.name,
     title: operation.title,
-    description: registry.describe(operation.name),
+    description: registry.describe(operation.name) ?? operation.summary,
     inputSchema: operation.input,
     outputSchema: operation.output,
     annotations: hints(operation.annotations),
@@ -382,11 +383,30 @@ export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
     if (!isObject(params) || typeof params.name !== 'string')
       throw invalidParams('tools/call requires params.name, a tool name from tools/list.');
     const name = params.name;
-    if (name.length > MAX_NAME_LENGTH || registry.describe(name) === undefined)
+    if (name.length > MAX_NAME_LENGTH)
+      throw invalidParams(
+        `Unknown tool: ${name.slice(0, MAX_NAME_LENGTH)}. List tools with tools/list.`
+      );
+    if (registry.describe(name) === undefined) {
+      if (TEXULI_NODE_OPERATION_NAMES.includes(name)) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: `${name} needs the node runtime, which this server does not provide. Call it on the local MCP (npx -y @texuli/mcp).`,
+                code: 'runtime-unavailable',
+              }),
+            },
+          ],
+          isError: true,
+        };
+      }
       throw invalidParams(
         registry.removedMessage(name) ??
           `Unknown tool: ${name.slice(0, MAX_NAME_LENGTH)}. List tools with tools/list.`
       );
+    }
     const outcome = await registry.invoke(name, params.arguments ?? {}, {
       runtimes,
       ...(site ? { site } : {}),
