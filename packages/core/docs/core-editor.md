@@ -114,14 +114,15 @@ input. Every accepted state is normalized and within the caps. Options:
 | `deleteBackward`, `deleteForward` | By grapheme, word or line. At a block start: lift a heading, code block, list item or quote first, otherwise join the neighbor. A divider or media block is selected first and deleted on the next press |
 | `deleteSelection` | Deletes a range across blocks (emptied containers are pruned) or a selected void block |
 | `setBlockType` | Paragraph, heading level or code. A list item's first block stays a paragraph |
+| `setBlockKind`, `blockKindAt` | The block-type menu: set the caret's kind (`EditorBlockKindChoice`: `paragraph`, `heading-1` to `heading-4`, `bullet`, `ordered`, `todo`, `quote`, `code`) in one result, so one undo step; a plain block leaves every list and the quote around the caret, a list kind changes in place, code becomes a paragraph before it becomes an item. `blockKindAt` reads the kind to show (list, then quote, then the block) |
 | `toggleList`, `sinkListItem`, `liftListItem`, `toggleTodo` | Wrap, retype or unwrap lists; Tab and Shift+Tab; check a todo item |
 | `toggleQuote`, `moveBlock` | Wrap or unwrap a quote; move a block or list item up or down |
 | `toggleMark` | Toggles over a range (removed when every eligible character has the mark), or the stored marks at a caret |
 | `setLink`, `removeLink` | `href` must pass `safeHref` at `trust` (`untrusted` by default), or the edit is refused |
 | `insertBlock` | Inserts a divider or a media reference |
-| `replaceSelection` | Paste of an already loaded fragment. Ids are fresh; nesting past the cap becomes paragraphs; blocks past the size caps are cut |
+| `replaceSelection` | Paste of an already loaded fragment, one step. One paragraph pastes inline; otherwise the caret block splits around the pasted blocks, a paragraph at either end joins the text there, and every other block keeps its type (a heading stays a heading at the end of a list item, in a quote or mid-paragraph). In code, paragraphs and code become text, and any other block splits the code block. Ids are fresh; nesting past the cap becomes paragraphs; blocks past the size caps are cut |
 | `applyComposition` | Applies an input method's composed text as one edit (prefix and suffix diff) |
-| `applyInputRules` | Markdown shortcuts at a paragraph's start (`#` to `####`, `-`, `1.`, `[ ]`, `>`, three backticks, `---`) and inline (`**x**`, `*x*`, `~~x~~`, `` `x` ``, autolinked URLs at the `untrusted` tier) |
+| `applyInputRules` | Markdown shortcuts at a paragraph's start (`#` to `####`, `-`, `1.`, `[ ]`, `>`, three backticks, `---`) and inline (`**x**`, `*x*`, `~~x~~`, `` `x` ``, autolinked URLs at the `untrusted` tier); with the `shortcodes` option (a host lookup, such as an emoji catalog's), a typed `:name:` becomes the returned text (1 to 32 characters, one line, never inside code) |
 
 Every transform, and a seeded run of 1,500 random transforms, is checked
 against `validateEditorDocument`.
@@ -158,6 +159,7 @@ platforms and Ctrl elsewhere. Composing events never match.
 | `ordered-list`, `bullet-list`, `todo-list` | `Mod+Shift+7`, `Mod+Shift+8`, `Mod+Shift+9` |
 | `quote`, `toggle-todo` | `Mod+Shift+B`, `Mod+Enter` |
 | `indent`, `outdent`, `escape` | `Tab`, `Shift+Tab`, `Escape` |
+| `paste-markdown` | `Mod+Alt+Shift+V` ("Paste as Markdown") |
 
 The binding uses Tab only inside lists, so focus is never trapped.
 `intentFromInputType(inputType)` maps `beforeinput` input types to intents.
@@ -183,6 +185,14 @@ and plain text that spells a token is written with its `{` escaped.
   becomes a `media` block whose `ref` the host resolves.
 - Headings deeper than 4 become level 4.
 - Input is capped at 100,000 characters (`MARKDOWN_CODEC_LIMITS`).
+
+`fromMarkdownTree(tree, { trust, limits, images })` projects a
+`texuli-md/v1` tree read elsewhere (untrusted HTML through
+`htmlToMarkdownTree`, `@texuli/core/html`) onto the editor with the same
+rules. `images: 'text'` keeps a lone image as its alt text (the paste
+rule); table cells become paragraphs; mentions and footnote content keep
+their text; lists and quotes past the depth cap are unwrapped
+(`depth-capped`). `MarkdownTreeReadOptions` is its options type.
 - Delimiter closers and bracket pairs are computed once per span, so hostile
   delimiter runs stay linear. 100,000-character runs of `*a `, `_a `,
   `**a `, `[a`, `` `a `` and `~~a ` are in the tests, bounded at 3 s each.

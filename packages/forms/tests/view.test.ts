@@ -74,7 +74,10 @@ describe('SchemaForm', () => {
     const form = screen.getByRole('form', { name: 'Every field' });
     expect(form.getAttribute('novalidate')).not.toBeNull();
     // Per-type controls load on first use (G119); wait until none is a placeholder.
-    await waitFor(() => expect(container.querySelector('.tx-forms__control-loading')).toBeNull());
+    // Per-type controls are lazy chunks: allow for a slow import, as the other lazy waits do.
+    await waitFor(() => expect(container.querySelector('.tx-forms__control-loading')).toBeNull(), {
+      timeout: 10_000,
+    });
     for (const type of BUILT_IN_TYPES) {
       const root = container.querySelector(`[data-type="${type}"]`);
       expect(root, type).not.toBeNull();

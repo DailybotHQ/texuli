@@ -28,7 +28,11 @@ const ROUND_2 = SLUGS.flatMap((slug) =>
 describe('round-2 illustration slots', () => {
   it('covers each implemented Solution landing with three stories and a how band', () => {
     expect([...SLUGS].sort()).toEqual(
-      SOLUTIONS.filter((entry) => entry.slug !== 'design-systems')
+      SOLUTIONS.filter((entry) =>
+        (['slides', 'documents', 'workflows', 'canvas', 'sheets'] as const).includes(
+          entry.slug as (typeof SLUGS)[number]
+        )
+      )
         .map((s) => s.slug)
         .sort()
     );

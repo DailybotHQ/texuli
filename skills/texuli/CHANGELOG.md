@@ -15,6 +15,13 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+- The packages are on npm at `0.18.0`, a `0.x` minor (blueprint spec stays
+  `0.15.0`), 27 of them with `@texuli/emojis` published for the first
+  time (`@texuli/emoji-assets`, the art, is not published): Markdown and HTML in `@texuli/core`, chat
+  formats, Texuli Emojis and new editor, chat, forms and data components.
+  The router lists the new packages and entries, and the components
+  install reference marks them new in `0.18.0`.
+
 ## [0.4.8] — 2026-11-12
 
 ### Changes

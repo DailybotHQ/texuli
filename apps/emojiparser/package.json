@@ -1,0 +1,26 @@
+{
+  "name": "@texuli/emojiparser",
+  "version": "0.0.0",
+  "private": true,
+  "description": "EmojiParser.com: an independent Unicode emoji search and conversion product.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build && node scripts/write-csp.mjs",
+    "preview": "astro preview",
+    "typecheck": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@astrojs/svelte": "^9.1.0",
+    "@texuli/core": "workspace:*",
+    "@texuli/emojis": "workspace:*",
+    "astro": "^7.4.0",
+    "svelte": "^5.57.2",
+    "texuli": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3"
+  }
+}

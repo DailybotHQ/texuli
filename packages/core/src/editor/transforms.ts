@@ -60,6 +60,12 @@ export interface EditorTransformOptions {
   newId?: EditorIdSource;
   /** Lower caps for this editor (a blocks `text` field holds 4,000 characters). */
   limits?: Partial<EditorLimits>;
+  /**
+   * The `:shortcode:` input rule's lookup (PLAN_023 row 9): the text a typed `:name:` becomes,
+   * or `undefined` to leave it. The editor has no emoji data of its own; a host passes
+   * `@texuli/emojis`' lookup. A result must be 1–32 characters without line breaks.
+   */
+  shortcodes?: (name: string) => string | undefined;
 }
 
 interface Context {
@@ -1016,11 +1022,25 @@ function reid(blocks: readonly EditorBlock[], newId: EditorIdSource): EditorBloc
 }
 
 /**
+ * Whether a pasted rich block joins the text around the caret instead of standing as a block of
+ * its own: a paragraph always does, and a heading only into a heading of the same level. Any
+ * other block (a heading into a paragraph, a list, a quote, code) keeps its type.
+ */
+const mergesInto = (pasted: EditorBlock, target: EditorRichBlock): pasted is EditorRichBlock =>
+  pasted.type === 'paragraph' ||
+  (pasted.type === 'heading' && target.type === 'heading' && pasted.level === target.level);
+
+/**
  * Paste: replace the selection with `fragment` (a loaded document or blocks,
  * already sanitized by `loadEditorDocument`, `fromMarkdown` or the paste
- * import). One paragraph pastes inline; several blocks split the caret block
- * around them. Blocks that would nest too deep become plain paragraphs, and
- * blocks past the size caps are cut, each with a diagnostic.
+ * import). One paragraph pastes inline. Otherwise the caret block splits around
+ * the pasted blocks: a paragraph at either end joins the text before or after
+ * the caret, and every other block keeps its type (a heading stays a heading at
+ * the end of a list item, in a quote or mid-paragraph). In code, pasted
+ * paragraphs and code become text; any other block splits the code block. The
+ * caret lands after the pasted content, and it is one transform (one undo
+ * step). Blocks that would nest too deep become plain paragraphs, and blocks
+ * past the size caps are cut, each with a diagnostic.
  */
 export function replaceSelection(
   state: EditorState,
@@ -1039,14 +1059,14 @@ export function replaceSelection(
   const { doc, block, offset } = at;
   if (blocks.length === 0) return done(doc, caret(block.id, offset), c);
   const diagnostics: EditorIssue[] = [];
-  if (block.type === 'code') {
+  if (block.type === 'code' && blocks.every((b) => b.type === 'paragraph' || b.type === 'code')) {
     const text = editorLeaves({ version: 1, blocks })
       .map(({ block: leaf }) => (isTextBlock(leaf) ? asCode(leaf, 0) : ''))
       .join('\n');
     return insertText({ ...state, selection: caret(block.id, offset), doc }, text, options);
   }
   const first = blocks[0] as EditorBlock;
-  if (blocks.length === 1 && isRich(first)) {
+  if (block.type !== 'code' && blocks.length === 1 && mergesInto(first, block)) {
     const content = spliceInline(block.content, offset, offset, first.content);
     return done(
       replaceBlock(doc, block.id, () => [{ ...block, content }]),
@@ -1069,23 +1089,40 @@ export function replaceSelection(
         : [b]
     );
   }
-  let head: EditorRichBlock = { ...block, content: sliceInline(block.content, 0, offset) };
-  let tail: EditorRichBlock = paragraph(sliceInline(block.content, offset), c.newId());
+  let head: EditorTextBlock | null;
+  let tail: EditorTextBlock;
   let middle = blocks;
-  let target = caret(tail.id);
-  const firstBlock = middle[0];
-  if (firstBlock && isRich(firstBlock)) {
-    head = { ...head, content: concatInline(head.content, firstBlock.content) };
-    middle = middle.slice(1);
-  }
-  const lastBlock = middle.at(-1);
-  if (lastBlock && isRich(lastBlock)) {
-    target = caret(tail.id, inlineLength(lastBlock.content));
-    tail = { ...tail, content: concatInline(lastBlock.content, tail.content) };
-    middle = middle.slice(0, -1);
+  let target: EditorSelection;
+  if (block.type === 'code') {
+    // Split the code block at the caret, without the line break at the cut; an empty side is
+    // dropped, and an empty end leaves a paragraph for the caret after the pasted blocks.
+    const before = block.text.slice(0, offset).replace(/\n$/, '');
+    const rest = block.text.slice(offset).replace(/^\n/, '');
+    head = before ? { ...block, text: before } : null;
+    tail = rest
+      ? { id: c.newId(), type: 'code', ...(block.lang ? { lang: block.lang } : {}), text: rest }
+      : paragraph([], c.newId());
+    target = caret(tail.id);
+  } else {
+    let richHead: EditorRichBlock = { ...block, content: sliceInline(block.content, 0, offset) };
+    let richTail: EditorRichBlock = paragraph(sliceInline(block.content, offset), c.newId());
+    target = caret(richTail.id);
+    const firstBlock = middle[0];
+    if (firstBlock && mergesInto(firstBlock, richHead)) {
+      richHead = { ...richHead, content: concatInline(richHead.content, firstBlock.content) };
+      middle = middle.slice(1);
+    }
+    const lastBlock = middle.at(-1);
+    if (lastBlock && lastBlock.type === 'paragraph') {
+      target = caret(richTail.id, inlineLength(lastBlock.content));
+      richTail = { ...richTail, content: concatInline(lastBlock.content, richTail.content) };
+      middle = middle.slice(0, -1);
+    }
+    head = richHead;
+    tail = richTail;
   }
   const build = (kept: readonly EditorBlock[]) =>
-    replaceBlock(doc, block.id, () => [head, ...kept, tail]);
+    replaceBlock(doc, block.id, () => (head ? [head, ...kept, tail] : [...kept, tail]));
   let result = done(build(middle), target, c, diagnostics);
   while (!result.ok && middle.length > 0 && result.errors[0]?.code === 'limit-reached') {
     middle = middle.slice(0, -1);
@@ -1174,3 +1211,99 @@ export function moveBlock(
 }
 
 export { textLeaf as editorTextBlock };
+
+/** What a block-type menu sets (PLAN_023 row 12). */
+export type EditorBlockKindChoice =
+  | 'paragraph'
+  | 'heading-1'
+  | 'heading-2'
+  | 'heading-3'
+  | 'heading-4'
+  | 'bullet'
+  | 'ordered'
+  | 'todo'
+  | 'quote'
+  | 'code';
+
+/** The kind a block-type menu shows for the caret: list first, then quote, then the block. */
+export function blockKindAt(state: EditorState): EditorBlockKindChoice | null {
+  if (state.selection.kind !== 'text') return null;
+  const location = locateBlock(state.doc, state.selection.focus.block);
+  if (!location) return null;
+  const item = location.ancestors.findLast((a) => a.kind === 'item');
+  if (item?.kind === 'item') return item.list.kind;
+  if (location.ancestors.some((a) => a.kind === 'quote')) return 'quote';
+  const block = location.block;
+  if (block.type === 'heading') return `heading-${block.level}` as EditorBlockKindChoice;
+  if (block.type === 'code') return 'code';
+  if (block.type === 'paragraph') return 'paragraph';
+  return null;
+}
+
+/**
+ * Set the caret's block kind in one step (one undo entry): leave every list around the caret
+ * and unwrap its quote when the choice is a plain block, change a list's kind in place, turn a
+ * code block into a paragraph before it becomes a list item. Each part runs an existing
+ * transform on the intermediate state; nothing changes when a part is refused.
+ */
+export function setBlockKind(
+  state: EditorState,
+  kind: EditorBlockKindChoice,
+  options?: EditorTransformOptions
+): EditorTransformResult {
+  if (blockKindAt(state) === kind) return fail('nothing-to-do', 'The block already has that kind.');
+  const c = context(options);
+  let current = state;
+  let changed = false;
+  const step = (result: EditorTransformResult): boolean => {
+    if (result.ok) {
+      current = result.state;
+      changed = true;
+      return true;
+    }
+    return result.errors.every((issue) => issue.code === 'nothing-to-do');
+  };
+  const leaveLists = (): boolean => {
+    // Bounded by the depth cap: each lift moves the item out one level.
+    for (let guard = 0; guard <= c.limits.depth && caretItem(current); guard += 1)
+      if (!step(liftListItem(current, options))) return false;
+    return true;
+  };
+  const leaveQuote = (): boolean => {
+    if (current.selection.kind !== 'text') return true;
+    const location = locateBlock(current.doc, current.selection.focus.block);
+    if (!location || parentOf(location)?.kind !== 'quote') return true;
+    return step(toggleQuote(current, options));
+  };
+  let ok: boolean;
+  switch (kind) {
+    case 'bullet':
+    case 'ordered':
+    case 'todo':
+      ok =
+        (caretItem(current) !== null || step(setBlockType(current, 'paragraph', 1, options))) &&
+        step(toggleList(current, kind, options));
+      break;
+    case 'quote':
+      ok = leaveLists() && step(toggleQuote(current, options));
+      break;
+    default: {
+      ok = leaveLists() && leaveQuote();
+      if (ok)
+        ok =
+          kind === 'paragraph' || kind === 'code'
+            ? step(setBlockType(current, kind, 1, options))
+            : step(
+                setBlockType(
+                  current,
+                  'heading',
+                  Number(kind.slice('heading-'.length)) as EditorHeadingLevel,
+                  options
+                )
+              );
+    }
+  }
+  if (!ok) return fail('not-allowed-here', 'That block kind cannot be set here.');
+  if (!changed) return fail('nothing-to-do', 'The block already has that kind.');
+  return done(current.doc, current.selection, c);
+}

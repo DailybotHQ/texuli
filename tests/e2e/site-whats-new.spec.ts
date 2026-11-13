@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
+import { FEATURES, RELEASES } from '../../apps/website/src/components/whats-new/features.ts';
 import {
   AXE_TAGS,
   expectMode,
@@ -11,7 +12,7 @@ import {
 
 /*
  * texuli.com /whats-new/ (PLAN_010 T-site-080, Amendment 8), in the
- * browser: the hub lists every feature of 0.6.0 to 0.17.5 under its
+ * browser: the hub lists every feature of 0.6.0 to 0.18.0 under its
  * release with an honest status, each with a demo or preview that works
  * (motion plays, a formula evaluates, a widget moves by keyboard, a form
  * validates, the locale switches, the canvas image and the email frame
@@ -67,8 +68,9 @@ test('every feature by release, each demo working, links that resolve; axe light
   await page.goto(`${origin()}/whats-new/`);
   await settle(page);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('What’s new in Texuli');
-  await expect(page.locator('[data-hub-release]')).toHaveCount(12);
-  await expect(page.locator('[data-hub-feature]')).toHaveCount(24);
+  // One block per release and one card per feature, as features.ts lists them (0.6.0 to 0.18.0).
+  await expect(page.locator('[data-hub-release]')).toHaveCount(RELEASES.length);
+  await expect(page.locator('[data-hub-feature]')).toHaveCount(FEATURES.length);
   await expect(page.locator('[data-hub-release="0.8.0"] .hub__status')).toContainText(
     'Published on npm as 0.8.0'
   );
@@ -113,11 +115,16 @@ test('every feature by release, each demo working, links that resolve; axe light
     'everything in the 0.16 line is also in 0.17.0'
   );
   await expect(page.locator('[data-hub-release="0.16.0"] [data-hub-feature]')).toHaveCount(0);
-  // Protoyard adoption fixes: 0.17.0 is on the hub with its patches 0.17.1 to 0.17.5, the current release, and no cards of its own.
+  // Protoyard adoption fixes: 0.17.0 is on the hub with its patches 0.17.1 to 0.17.5, and no cards of its own.
   await expect(page.locator('[data-hub-release="0.17.0"] .hub__status')).toContainText(
-    'its patch 0.17.5, the current release'
+    'everything in the 0.17 line is also in 0.18.0'
   );
   await expect(page.locator('[data-hub-release="0.17.0"] [data-hub-feature]')).toHaveCount(0);
+  // PLAN_023: 0.18.0 is the current release, with the Markdown, emoji and Solutions card.
+  await expect(page.locator('[data-hub-release="0.18.0"] .hub__status')).toContainText(
+    'Published on npm as 0.18.0, the current release'
+  );
+  await expect(page.locator('[data-hub-release="0.18.0"] [data-hub-feature]')).toHaveCount(1);
   // PLAN_011 T-site-0100: design systems, the studio, the ds tools, conformance, the
   // Protoyard gaps and the removals.
   await expect(page.locator('[data-hub-release="0.10.0"] [data-hub-feature]')).toHaveCount(6);
@@ -127,7 +134,7 @@ test('every feature by release, each demo working, links that resolve; axe light
   const hrefs = await page
     .locator('[data-hub-feature] .hub__more a')
     .evaluateAll((links) => links.map((link) => link.getAttribute('href') ?? ''));
-  expect(hrefs).toHaveLength(24);
+  expect(hrefs).toHaveLength(FEATURES.length);
   for (const href of new Set(hrefs.map((href) => href.replace(/#.*$/, '')))) {
     const response = await page.request.get(`${origin()}${href}`);
     expect(response.status(), href).toBe(200);

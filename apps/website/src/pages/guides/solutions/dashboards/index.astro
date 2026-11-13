@@ -1,0 +1,16 @@
+---
+/**
+ * `/guides/solutions/dashboards/` — Dashboard technical docs.
+ * Content lives in `src/content/solution-docs/dashboards/`.
+ */
+import SolutionDocsPage from '../../../../components/solutions/docs-layout/SolutionDocsPage.astro';
+import { loadDashboardsDocs } from '../../../../content/solution-docs/dashboards/index.ts';
+import { getSolution } from '../../../../data/solutions/index.ts';
+---
+
+<SolutionDocsPage
+  entry={getSolution('dashboards')}
+  title="Dashboards docs"
+  description="Build responsive dashboard grids with @texuli/data. The grid, FilterBar and MetricCard are in 0.18.0, in development."
+  sections={loadDashboardsDocs()}
+/>

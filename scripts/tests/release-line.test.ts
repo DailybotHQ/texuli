@@ -8,7 +8,13 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { inPublishedLine, isLineVersion, parseReleaseLine, releaseLine } from '../release-line.ts';
+import {
+  inPublishedLine,
+  isLineVersion,
+  parseReleaseLine,
+  releaseLine,
+  UNRELEASED_PACKAGES,
+} from '../release-line.ts';
 
 const ROOT = join(import.meta.dirname, '..', '..');
 const read = (path: string) => readFileSync(join(ROOT, path), 'utf8');
@@ -23,7 +29,9 @@ interface Manifest {
 
 const manifests: Manifest[] = readdirSync(join(ROOT, 'packages'))
   .map((dir) => JSON.parse(read(`packages/${dir}/package.json`)) as Manifest)
-  .filter((manifest) => manifest.name !== '@texuli/examples');
+  .filter(
+    (manifest) => manifest.name !== '@texuli/examples' && !UNRELEASED_PACKAGES.has(manifest.name)
+  );
 const names = new Set(manifests.map((manifest) => manifest.name));
 const line = releaseLine();
 
@@ -51,8 +59,8 @@ describe('the release line', () => {
   });
 
   it('matches every published manifest and its exact internal pins', () => {
-    // 26 packages on npm, @texuli/mcp first published in 0.9.0.
-    expect(manifests).toHaveLength(26);
+    // 27 packages on npm: @texuli/mcp first published in 0.9.0, @texuli/emojis in 0.18.0.
+    expect(manifests).toHaveLength(27);
     const versions = new Map(manifests.map((manifest) => [manifest.name, manifest.version]));
     const wrong: string[] = [];
     for (const manifest of manifests) {

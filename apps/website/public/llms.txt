@@ -11,7 +11,7 @@ What Texuli is and where to begin.
 - [Texuli](https://texuli.com/): The product landing.
 - [Introduction](https://texuli.com/guides/): The docs home and reading order.
 - [Getting started](https://texuli.com/guides/getting-started/)
-- [What’s new](https://texuli.com/whats-new/): Every package and capability of 0.6.0 to 0.17.5 (all on npm; 0.17.5 is current, and 0.10.0 added design systems), with demos.
+- [What’s new](https://texuli.com/whats-new/): Every package and capability of 0.6.0 to 0.18.0 (all on npm; 0.18.0 is current, and 0.10.0 added design systems), with demos.
 - [Skill](https://texuli.com/skill/): The distributable agent skill for building with Texuli.
 - [Search](https://texuli.com/search/): Search every page, component, guide and example (?q= in the URL).
 
@@ -21,6 +21,7 @@ The two-runtimes story: the architecture page and the native landing.
 
 - [Web + native](https://texuli.com/web-and-native/)
 - [Native (Kotlin)](https://texuli.com/native/)
+- [Markdown](https://texuli.com/markdown/)
 
 ## Native
 
@@ -47,6 +48,14 @@ Embeddable open-source systems that complete a task end to end.
 - [Sheets docs](https://texuli.com/guides/solutions/sheets/)
 - [Design systems](https://texuli.com/solutions/design-systems/): Carry one brand document across Texuli surfaces. Status: available.
 - [Design systems docs](https://texuli.com/guides/solutions/design-systems/)
+- [Dashboards](https://texuli.com/solutions/dashboards/): KPI boards people arrange, from the keyboard too. Status: in development.
+- [Dashboards docs](https://texuli.com/guides/solutions/dashboards/)
+- [Forms](https://texuli.com/solutions/forms/): Schema-driven forms with conditions, steps and drafts. Status: in development.
+- [Forms docs](https://texuli.com/guides/solutions/forms/)
+- [Agent chat](https://texuli.com/solutions/agent-chat/): A thread whose replies paint validated blueprints. Status: in development.
+- [Agent chat docs](https://texuli.com/guides/solutions/agent-chat/)
+- [Rich text editor](https://texuli.com/solutions/editor/): Owned rich text with Markdown in and out, safe paste and export to any chat. Status: in development.
+- [Rich text editor docs](https://texuli.com/guides/solutions/editor/)
 
 ## Built with Texuli
 
@@ -72,6 +81,10 @@ Task-first guides, in reading order.
 - [Canvas](https://texuli.com/guides/solutions/canvas/)
 - [Sheets](https://texuli.com/guides/solutions/sheets/)
 - [Design systems](https://texuli.com/guides/solutions/design-systems/)
+- [Dashboards](https://texuli.com/guides/solutions/dashboards/)
+- [Forms](https://texuli.com/guides/solutions/forms/)
+- [Agent chat](https://texuli.com/guides/solutions/agent-chat/)
+- [Rich text editor](https://texuli.com/guides/solutions/editor/)
 - [Performance](https://texuli.com/guides/performance/)
 
 ## Components
@@ -82,6 +95,7 @@ Every styled component with live examples; each page documents props, behavior a
 - [Gallery](https://texuli.com/gallery-components/)
 - [Examples](https://texuli.com/examples/)
 - [Editor](https://texuli.com/editor-page/)
+- [Emoji](https://texuli.com/emoji/)
 - [Drag and drop](https://texuli.com/drag-page/)
 - [Motion](https://texuli.com/motion-page/)
 - [Forms](https://texuli.com/forms-page/)
@@ -175,6 +189,13 @@ Every Texuli operation is an MCP tool and a texuli CLI command (texuli <group> <
 - [deck.run](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Run a deck command. Inspect, lint and convert a Texuli deck on the shared v2 model: capabilities, the JSON Schema, layouts, lint, inspect, from-markdown and to-markdown. Pure compute; returns { result } with the command output (ok, issues, deck, markdown …). Local and remote.
 - [document.run](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Run a document command. Create, validate, inspect, patch and convert a Texuli document (spec 0.7.0): capabilities, the JSON Schema, validate, inspect, a bounded RFC 6902 patch (at most 1000 operations), from-markdown, to-markdown and to-blueprint. Returns { result } with the command output; PDF and DOCX are document.export. Local and remote.
 - [document.export](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Export a document as PDF or DOCX. Write a Texuli document as PDF or DOCX bytes with the owned writers, links and media checked at the tier. Returns { result } with ok, mime, byteLength, base64 bytes (no files are written), diagnostics and, for PDF, pageCount. Needs Node. Local only (needs Node).
+- [md.convert](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Convert Markdown, HTML or a chat dialect. Convert untrusted Markdown, HTML or a chat dialect (Slack, Discord, WhatsApp, Telegram MarkdownV2 and HTML, Teams, Google Chat, Mattermost, plain text) through the texuli-md/v1 AST. URLs use the untrusted policy. Returns { value, diagnostics }. Local and remote.
+- [md.render](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Render Markdown to safe HTML. Parse untrusted Markdown (GFM by default; gfm: false for strict CommonMark 0.31.2) and write a safe HTML fragment through the markup allowlist. Every href and src uses the untrusted URL policy; raw HTML is dropped. Returns { html, diagnostics }. Local and remote.
+- [emoji.search](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Search the Texuli emoji catalog. Search the closed Unicode emoji catalog by name, shortcode or keyword. Returns { items }: approved ids with unicode, name, shortcode, category and score. Query at most 256 characters; at most 100 hits. Untrusted input; never throws. Needs Node (local MCP and CLI; not on texuli.com/mcp). Local only (needs Node).
+- [emoji.get](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Read one emoji by id. Look up one closed catalog record by hyphenated id, Unicode sequence or :shortcode:. Returns { emoji } with unicode, name, shortcode, category and variant fields. Unknown ids are not-found. Untrusted input; never throws. Needs Node (local MCP and CLI; not on texuli.com/mcp). Local only (needs Node).
+- [emoji.convert](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Convert shortcodes and Unicode emoji. Convert untrusted plain text between Unicode sequences and shortcodes. dialect texuli is the lean catalog; legacy is the imported 3.0.2 aliases (local MCP and CLI). mode strict keeps conflict aliases and reports them; permissive picks a candidate. Returns { value, diagnostics }. Never throws. Local and remote.
+- [emoji.categories](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): List emoji categories. List the closed Unicode emoji categories with how many catalog records each holds. Returns { categories: [{ id, count }] }. No input. Never throws. Needs Node (local MCP and CLI; not on texuli.com/mcp). Local only (needs Node).
+- [emoji.variants](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): List emoji variants. List tone and other variants for a closed catalog id (or a variant of it). Returns { base, variants }. Unknown ids are not-found. Untrusted input; never throws. Needs Node (local MCP and CLI; not on texuli.com/mcp). Local only (needs Node).
 - [site.pages](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): List texuli.com pages. List the pages of texuli.com from its Markdown twin manifest, in path order, optionally under a path prefix, a page at a time. Returns the total, the offset, the next offset when more follow, and each page’s path, twin path, URL, title and description. Remote only (reads the built texuli.com).
 - [site.read](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Read a texuli.com page as Markdown. Read one texuli.com page as its Markdown twin: the page’s own content with a header block (title, description, canonical URL, last updated). Accepts a route, its .md twin path or a texuli.com URL. Returns the path, twin, URL, title, the Markdown, its size and whether it was cut at the size cap. Remote only (reads the built texuli.com).
 - [site.search](https://github.com/DailybotHQ/texuli/blob/main/packages/tools/docs/ops.md#operations): Search texuli.com pages. Search texuli.com pages by words in their titles, headings, descriptions and paths, ranked deterministically (more matched words first, then title over path over heading over description). Returns the total and, per hit, the path, twin, URL, title, description, score and up to three matching headings. Remote only (reads the built texuli.com).

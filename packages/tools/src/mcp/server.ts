@@ -1,4 +1,5 @@
-import type { OperationRegistry } from '../ops/index.ts';
+import { texuliOps } from '../ops/index.ts';
+import type { OperationRegistry } from '../ops/registry.ts';
 import { createMcpHandler, type McpHandler } from './handler.ts';
 import { MCP_PROTOCOL_VERSION } from './protocol.ts';
 
@@ -8,7 +9,7 @@ import { MCP_PROTOCOL_VERSION } from './protocol.ts';
  * operation, the Texuli resources and prompts) over `registry`.
  */
 export function createTexuliMcpServer(registry?: OperationRegistry): McpHandler {
-  return createMcpHandler({ ...(registry ? { registry } : {}), mode: 'stateful' });
+  return createMcpHandler({ registry: registry ?? texuliOps, mode: 'stateful' });
 }
 
 export { MCP_PROTOCOL_VERSION };

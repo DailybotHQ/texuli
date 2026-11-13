@@ -23,6 +23,14 @@ export interface ReleaseLine {
 }
 
 const ROOT = join(import.meta.dirname, '..');
+/**
+ * Workspace packages that exist but have never been published. They are private, outside the
+ * publish workflow's package list, and left out of the published counts. Remove a name here in
+ * the release that first publishes it (with the owner's GO). `@texuli/emojis` left it in 0.18.0;
+ * `@texuli/emoji-assets` stays until its art is approved and licensed (owner decision 2026-11-12).
+ */
+export const UNRELEASED_PACKAGES: ReadonlySet<string> = new Set(['@texuli/emoji-assets']);
+
 export const RELEASE_DOC = join(ROOT, 'docs', 'RELEASE.md');
 
 const LINE = /^Release line: published `(\d+\.\d+)`(?: · in development `(\d+\.\d+\.\d+)`)?\s*$/m;

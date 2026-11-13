@@ -4,6 +4,7 @@ export type MessageListLabels = Record<
   | ChatMessageStatus
   | 'you'
   | 'streaming'
+  | 'stopped'
   | 'jumpToLatest'
   | 'newBelow'
   | 'editInput'
@@ -20,6 +21,7 @@ export const DEFAULT_MESSAGE_LIST_LABELS: MessageListLabels = {
   read: 'Read',
   failed: 'Failed to send',
   streaming: 'Writing a reply…',
+  stopped: 'Stopped before the end',
   jumpToLatest: 'Jump to latest',
   newBelow: 'New messages below',
   editInput: 'Edit message',

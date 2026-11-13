@@ -1,0 +1,10 @@
+---
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionQuickstart from '../../shared/quickstart/Quickstart.astro';
+import { editorQuickstart } from './samples.ts';
+
+const entry = getSolution('editor');
+const { entry: _entry, ...quickstart } = editorQuickstart(entry);
+---
+
+<SolutionQuickstart entry={entry} {...quickstart} />

@@ -42,7 +42,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
     packages: [
       {
         name: '@texuli/core',
-        role: 'Texels: ids, keyboard intents, roving focus and typeahead, focus scope, inert, dismissable layers, layer stack, overlay engine, portal, positioning (math + DOM), presence, scroll lock, tabbable, form bridge, announcer, direction and locale, the URL policy',
+        role: 'Texels: ids, keyboard intents, roving focus and typeahead, focus scope, inert, dismissable layers, layer stack, overlay engine, portal, positioning (math + DOM), presence, scroll lock, tabbable, form bridge, announcer, direction and locale, the URL policy; Markdown, HTML and chat dialects (in development, not in a published release yet)',
         dependsOn: [],
       },
       {
@@ -58,6 +58,16 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       {
         name: '@texuli/drag',
         role: 'In development: framework-free, general-purpose drag engine (sortable lists, boards, trees, spatial canvases, graph editing)',
+        dependsOn: [],
+      },
+      {
+        name: '@texuli/emojis',
+        role: 'In development (private until its first release, ADR-035): the dependency-free Unicode emoji catalog generated from pinned Unicode and CLDR sources, with legacy shortcode aliases',
+        dependsOn: [],
+      },
+      {
+        name: '@texuli/emoji-assets',
+        role: 'In development (private until its first release, ADR-035): original 64×64 SVG emoji art candidates, the approved-asset manifest and measured coverage report; proposed art license CC BY 4.0 pending owner sign-off',
         dependsOn: [],
       },
       {
@@ -100,8 +110,8 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
     packages: [
       {
         name: 'texuli',
-        role: 'Styled components (Button … Tree), the class helpers (cx, variants), icons, layouts and app shells',
-        dependsOn: ['core', 'primitives', 'tokens', 'spec'],
+        role: 'Styled components (Button … Tree), the class helpers (cx, variants), emoji, icons, layouts and app shells',
+        dependsOn: ['core', 'emojis', 'primitives', 'tokens', 'spec'],
       },
     ],
   },
@@ -142,7 +152,7 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       {
         name: '@texuli/forms',
         role: 'In development (on npm from 0.8.0): schema-driven forms: the closed form schema and its validator, conditional logic and cross-field rules on @texuli/core/expression, named formats, drafts and autosave, and the form controller (model, framework-free); SchemaForm, which paints any schema with texuli controls (loading the heavier ones per field type), multi-step and keyboard-complete (.); the static control registry for server rendering (controls); the player form host (host)',
-        dependsOn: ['core', 'texuli'],
+        dependsOn: ['core', 'drag', 'texuli'],
       },
       {
         name: '@texuli/canvas',
@@ -208,7 +218,17 @@ export const ARCH_LAYERS: readonly ArchLayer[] = [
       {
         name: '@texuli/tools',
         role: 'Copy-in CLI (texuli-add, texuli-init, texuli-update), texuli-llms, A2UI adapter, custom elements and the golden set',
-        dependsOn: ['core', 'tokens', 'catalog', 'blocks', 'charts', 'media', 'deck', 'document'],
+        dependsOn: [
+          'core',
+          'tokens',
+          'catalog',
+          'blocks',
+          'charts',
+          'media',
+          'deck',
+          'document',
+          'emojis',
+        ],
       },
       {
         name: '@texuli/astro',
@@ -358,7 +378,7 @@ export const LADDER_STAGES: readonly LadderStage[] = [
     layer: 'L3',
     runtimes: {
       web: {
-        text: 'Ships: styled components are published on npm as 0.17.5.',
+        text: 'Ships: styled components are published on npm as 0.18.0.',
         sources: [],
       },
       native: {

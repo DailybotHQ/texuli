@@ -8,6 +8,7 @@ import {
   MCP_STATELESS_PROTOCOL_VERSIONS,
   MCP_SUPPORTED_PROTOCOL_VERSIONS,
 } from '../../packages/tools/src/mcp/protocol.ts';
+import { texuliEdgeOps } from '../../packages/tools/src/ops/edge.ts';
 import { REMOTE_RUNTIMES, TOOLS_VERSION, texuliOps } from '../../packages/tools/src/ops/index.ts';
 import {
   buildMcpPageData,
@@ -52,10 +53,11 @@ describe('generated agent surfaces', () => {
     expect(card.tools.map((tool) => tool.name)).toEqual(texuliOps.list().map((op) => op.name));
     for (const tool of card.tools) {
       const operation = texuliOps.get(tool.name);
+      const published = texuliEdgeOps.get(tool.name) ?? operation;
       expect(tool).toMatchObject({
-        title: operation?.title,
-        description: operation?.summary,
-        runtime: operation?.runtime,
+        title: published?.title,
+        description: published?.summary,
+        runtime: published?.runtime,
       });
     }
     expect(card.deprecatedTools.map((alias) => alias.name)).toEqual(
@@ -83,8 +85,10 @@ describe('generated agent surfaces', () => {
       ...card.deprecatedTools.filter((alias) => alias.remote).map((alias) => alias.name),
     ];
     expect(remote).toEqual(await remoteToolNames());
-    expect(toolNames(texuliOps, REMOTE_RUNTIMES)).toEqual(await remoteToolNames());
+    expect(toolNames(texuliEdgeOps, REMOTE_RUNTIMES)).toEqual(await remoteToolNames());
     expect(remote).not.toContain('document.export');
+    expect(remote).not.toContain('emoji.search');
+    expect(remote).toContain('emoji.convert');
     // The site operations are remote-only on the card (T-ar-site-mcp).
     const site = card.tools.filter((tool) => tool.runtime === 'site');
     expect(site.map((tool) => tool.name)).toEqual(['site.pages', 'site.read', 'site.search']);

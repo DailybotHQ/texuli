@@ -61,6 +61,10 @@ export const RUNTIME_EXTERNAL_ALLOWLIST: Readonly<Record<string, readonly string
   // In development (PLAN_007): no runtime externals; first published in 0.4.0.
   '@texuli/deck': [],
   '@texuli/drag': [],
+  // In development (PLAN_023, ADR-035): dependency-free; not published yet.
+  '@texuli/emojis': [],
+  // In development (PLAN_023, ADR-035): bundled original SVG assets; no runtime deps.
+  '@texuli/emoji-assets': [],
   '@texuli/workflows': [],
   '@texuli/tokens': [],
   '@texuli/primitives': [],
@@ -90,6 +94,8 @@ export const RUNTIME_EXTERNAL_ALLOWLIST: Readonly<Record<string, readonly string
   '@texuli/player': [],
   '@texuli/agent': [],
   '@texuli/examples': [],
+  // In development (PLAN_023): the EmojiParser.com static app; not deployed.
+  '@texuli/emojiparser': ['astro', '@astrojs/check', '@astrojs/svelte'],
   '@texuli/website': ['astro', '@astrojs/check', '@astrojs/svelte'],
   'texuli-workspace': [],
 };

@@ -3,6 +3,8 @@
  * composition guard and announcements) over the `@texuli/core` editor
  * texels. No DOM; bind it to any surface.
  */
+
+export type { EditorBlockKindChoice } from '@texuli/core/editor-transforms';
 export {
   createEditorController,
   type EditorActiveState,
@@ -11,4 +13,4 @@ export {
   type EditorControllerOptions,
   type EditorToggleMark,
 } from './controller.svelte.ts';
-export { DEFAULT_EDITOR_LABELS, type EditorLabels } from './labels.ts';
+export { blockKindLabel, DEFAULT_EDITOR_LABELS, type EditorLabels } from './labels.ts';

@@ -1,0 +1,60 @@
+---
+import { emojiCatalog } from '@texuli/emojis/catalog';
+import SiteLayout from '../layouts/SiteLayout.astro';
+
+const featured = emojiCatalog.records.slice(0, 16);
+---
+
+<SiteLayout
+  title="Search Unicode emoji"
+  description="Search 3,963 Unicode emoji by CLDR name or keyword, then copy their Unicode or canonical shortcode."
+>
+  <section class="hero">
+    <p class="eyebrow">Unicode emoji, made useful</p>
+    <h1>Find the right emoji. Get the exact text.</h1>
+    <p class="lead">
+      Search Unicode emoji by name or keyword. Copy the character, canonical shortcode, or code
+      point sequence without sending your text to a server.
+    </p>
+    <div class="panel">
+      <form class="search-form" role="search" data-emoji-search>
+        <label class="visually-hidden" for="emoji-query">Search emoji names and keywords</label>
+        <input id="emoji-query" name="q" type="search" placeholder="Try “party”, “rocket” or “smile”" autocomplete="off" />
+        <button type="submit">Search</button>
+      </form>
+      <p class="diagnostics" aria-live="polite" data-search-status>
+        Search the Unicode 18.0 catalog. Results use CLDR names and keywords.
+      </p>
+      <ol class="results" data-search-results aria-label="Emoji results">
+        {featured.map((emoji) => (
+          <li>
+            <a class="emoji-card" href={`/emoji/${emoji.id}/`}>
+              <span class="emoji-glyph" aria-hidden="true">{emoji.unicode}</span>
+              <span><span class="emoji-name">{emoji.name}</span><span class="emoji-code">{emoji.shortcode}</span></span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="grid-2" aria-label="Tools">
+    <article class="panel">
+      <h2>Convert text</h2>
+      <p>Convert between Unicode and Texuli canonical shortcodes. Legacy chat aliases are available with diagnostics.</p>
+      <a class="button" href="/convert/">Open the converter</a>
+    </article>
+    <article class="panel">
+      <h2>Browse the catalog</h2>
+      <p>Each Unicode sequence has a stable detail page with names, code points, aliases and variants.</p>
+      <a class="button secondary" href={`/emoji/${featured[0]?.id ?? '1f600'}/`}>View an emoji detail</a>
+    </article>
+  </section>
+  <script>
+    import '../scripts/search.ts';
+  </script>
+</SiteLayout>
+
+<style>
+  .visually-hidden { position: absolute; inline-size: 1px; block-size: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+</style>

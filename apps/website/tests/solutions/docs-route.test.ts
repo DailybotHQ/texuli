@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { siteRouteExists } from '../../src/components/foundation/nav-data.ts';
 import { GUIDES_SECTIONS } from '../../src/components/guides/nav.ts';
 import {
   solutionDocsBackLink,
@@ -27,6 +28,9 @@ describe('Solution docs route plumbing (ADR-028)', () => {
       expect(entry.docs).not.toMatch(/\/docs\/solutions\//);
       expect(entry.route).toBe(`/solutions/${entry.slug}/`);
     }
+    const dashboards = SOLUTIONS.find((entry) => entry.slug === 'dashboards');
+    expect(dashboards?.docs).toBe('/guides/solutions/dashboards/');
+    expect(siteRouteExists('/guides/solutions/dashboards/')).toBe(true);
   });
 
   it('builds the back-to-overview link from the landing route', () => {

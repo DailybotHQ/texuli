@@ -1,0 +1,10 @@
+---
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionQuickstart from '../../shared/quickstart/Quickstart.astro';
+import { agentChatQuickstart } from './samples.ts';
+
+const entry = getSolution('agent-chat');
+const { entry: _entry, ...quickstart } = agentChatQuickstart(entry);
+---
+
+<SolutionQuickstart entry={entry} {...quickstart} />

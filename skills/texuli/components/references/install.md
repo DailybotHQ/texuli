@@ -4,17 +4,17 @@ Back to [`../SKILL.md`](../SKILL.md).
 
 ## A. Use the packages
 
-The packages are on npm in the 0.17 line, every one at `0.17.5`, a pre-1.0 line
+The packages are on npm in the 0.18 line, every one at `0.18.0`, a pre-1.0 line
 (`latest` points to the newest, and `next` is no longer maintained and stays on `0.12.1`; 1.0.0 will be the first stable release). An app outside a
 Texuli checkout installs them plainly, for example
-`pnpm add texuli @texuli/tokens`, and pins the exact version or `^0.17.0`
-(for 0.x it accepts only 0.17.x, since a new minor may break) (the developer
+`pnpm add texuli @texuli/tokens`, and pins the exact version or `^0.18.0`
+(for 0.x it accepts only 0.18.x, since a new minor may break) (the developer
 runs the install; it uses the network). `@texuli/drag`,
 `@texuli/workflows`, `@texuli/deck`, `@texuli/slides`, `@texuli/editor` (first published
 in `0.5.0`), `@texuli/document` and `@texuli/pages` (both first published
 in `0.7.0`), `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (all
-three first published in `0.8.0`) and `@texuli/mcp` (first published in
-`0.9.0`) are in development and on npm as `0.17.5`.
+three first published in `0.8.0`), `@texuli/mcp` (first published in
+`0.9.0`), and `@texuli/emojis` (first published in `0.18.0`) are in development and on npm as `0.18.0`.
 
 New in `0.13.1` (an additive patch): `@texuli/blocks/code-field` (`CodeField`),
 `registerIcons` and `IconsProvider` in `texuli/icons`, `srcDark` and
@@ -86,6 +86,27 @@ New in `0.14.2` (a patch; an app that uses these pins `^0.14.2`):
   the value; a controlled `pressed` with a handler renders the prop.
 - Not in the agent catalog yet: `initialDate`, `Select` `block` and
   `ghost`, the `IconButton` badge.
+
+New in `0.18.0` (a `0.x` minor; blueprint spec stays `0.15.0`; pin
+`^0.18.0`, since `^0.17.0` never picks it up; no export removed):
+
+- Markdown and HTML in `@texuli/core`: `@texuli/core/markdown` (CommonMark
+  and GFM parser and writer), `@texuli/core/markdown-html` (safe HTML
+  through the URL policy), `@texuli/core/html` (HTML to Markdown, no DOM)
+  and `@texuli/core/markdown-dialects` (Slack, Discord, WhatsApp, Telegram,
+  Teams, Google Chat, Mattermost, plain text; losses reported, broadcast
+  mentions inert). MCP tools `md.convert` and `md.render`.
+- The existing Markdown codecs (editor, document, blocks, catalog rich
+  text, chat) read through the shared CommonMark parser, so edge cases
+  change: setext headings, indented code, reference links, character
+  references and escapes now read as CommonMark says.
+- Texuli Emojis: `@texuli/emojis` (new package), and `Emoji`, `EmojiText`
+  and `EmojiPicker` in `texuli/emoji`. They show system emoji;
+  `@texuli/emoji-assets` (the art) is not published yet.
+- Editor: `@texuli/editor/block-menu`, `@texuli/editor/emoji`,
+  `@texuli/editor/export`, HTML paste and Paste as Markdown. Chat: composer
+  autocomplete, `ChatAttachment`. Forms: `@texuli/forms/builder`. Data:
+  `FilterBar` (`@texuli/data/filter-bar`) and `MetricCard`.
 
 New in `0.17.5` (a security patch; blueprint spec stays `0.15.0`;
 `^0.17.0` picks it up; no export added or removed):

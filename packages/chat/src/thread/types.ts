@@ -20,6 +20,8 @@ export interface ChatMessage {
   status?: ChatMessageStatus;
   /** True while an agent is still writing this message (see `applyChatStreamEvent`). */
   streaming?: boolean;
+  /** The reader stopped this reply while it streamed: the text so far is kept and marked. */
+  stopped?: boolean;
 }
 
 export interface MessageGroup {

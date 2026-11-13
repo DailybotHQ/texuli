@@ -1,0 +1,39 @@
+{
+  "name": "@texuli/emoji-assets",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Original Texuli emoji SVG candidates and an explicit coverage manifest.",
+  "keywords": [
+    "emoji",
+    "svg",
+    "texuli"
+  ],
+  "homepage": "https://github.com/DailybotHQ/texuli#readme",
+  "bugs": "https://github.com/DailybotHQ/texuli/issues",
+  "license": "MIT",
+  "author": "Dailybot, Inc.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DailybotHQ/texuli.git",
+    "directory": "packages/emoji-assets"
+  },
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/manifest.ts",
+      "default": "./src/manifest.ts"
+    },
+    "./manifest": {
+      "types": "./src/manifest.ts",
+      "default": "./src/manifest.ts"
+    },
+    "./coverage": {
+      "types": "./src/coverage.ts",
+      "default": "./src/coverage.ts"
+    },
+    "./package.json": "./package.json"
+  }
+}

@@ -23,9 +23,9 @@ const groups = [...byGroup.keys()].sort((a, b) => a.localeCompare(b, 'en'));
 >
   <PageBanner art="page-components" />
   <h1>Components</h1>
-  <p class="lead">
-    {COMPONENT_PAGES.length} pages generated from the closed catalog. No runtime network; plain
-    text from manifests only.
+    <p class="lead">
+    {COMPONENT_PAGES.length} catalog pages generated from the closed manifests. The in-development
+    Emoji components have a separate page. No runtime network; plain text from manifests only.
   </p>
 
   {
@@ -57,6 +57,24 @@ const groups = [...byGroup.keys()].sort((a, b) => a.localeCompare(b, 'en'));
       </section>
     ))
   }
+  <section class="group" aria-labelledby="g-domain">
+    <h2 id="g-domain">Domain components</h2>
+    <ul class="grid">
+      <li>
+        <a class="tile" href="/emoji/">
+          <Card variant="flat">
+            <CardHeader>
+              <CardTitle level={3}>Emoji</CardTitle>
+              <CardDescription><code>texuli/emoji</code></CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Accessible emoji rendering, safe text tokenization and an interactive picker.</p>
+            </CardContent>
+          </Card>
+        </a>
+      </li>
+    </ul>
+  </section>
 </BaseLayout>
 
 <style>

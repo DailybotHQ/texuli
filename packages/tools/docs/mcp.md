@@ -332,8 +332,12 @@ MCP-Protocol-Version: 2025-11-25
 
 - **What it serves:** `createMcpHandler({ mode: 'stateless', runtimes:
   ['edge', 'site'] })`, so every tool, resource, prompt and completion above
-  except the `node` operations (`document.export`: PDF and DOCX), which are
-  not listed and answer `runtime-unavailable`, plus the site tools below. No handshake is required; send
+  except the `node` operations (`document.export`: PDF and DOCX; `emoji.search`,
+  `emoji.get`, `emoji.categories` and `emoji.variants`: the closed catalog
+  tables). `emoji.convert` stays on the remote door (canonical Texuli
+  shortcodes through the lean engine; dialect legacy returns a diagnostic
+  pointing at the local MCP). Plus the site tools below.
+  No handshake is required; send
   `initialize` if the host wants one. The protocol version comes from the
   `MCP-Protocol-Version` header (an unsupported one is `400`), or from
   `params._meta` under `2026-07-28` (see

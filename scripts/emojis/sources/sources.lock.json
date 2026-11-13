@@ -1,0 +1,55 @@
+{
+  "unicodeEmoji": "18.0",
+  "unicodeRelease": "18.0.0",
+  "cldr": "49",
+  "cldrTag": "release-49",
+  "capturedAt": "2026-11-12",
+  "license": "Unicode License v3",
+  "files": [
+    {
+      "url": "https://www.unicode.org/Public/18.0.0/emoji/emoji-test.txt",
+      "path": "unicode-18.0.0/emoji-test.txt",
+      "sha256": "8f3735cda1f92a779d78af67cf86066bb1f07143dc22f2ac29394d9bc57ab21a",
+      "header": "Version: 18.0; Date: 2026-04-30"
+    },
+    {
+      "url": "https://www.unicode.org/Public/18.0.0/emoji/emoji-sequences.txt",
+      "path": "unicode-18.0.0/emoji-sequences.txt",
+      "sha256": "1823dce71f3dd9cb0ad1976797baee4ffbdc1909756f43af8ce4c57f732843a4"
+    },
+    {
+      "url": "https://www.unicode.org/Public/18.0.0/emoji/emoji-zwj-sequences.txt",
+      "path": "unicode-18.0.0/emoji-zwj-sequences.txt",
+      "sha256": "f61b5213bdf85a57741a9f903cb38d0f39a3d13be6ff4aca3b39857e859a9191"
+    },
+    {
+      "url": "https://www.unicode.org/Public/18.0.0/ucd/emoji/emoji-data.txt",
+      "path": "unicode-18.0.0/emoji-data.txt",
+      "sha256": "80d00f8e616a0ef27fd6b8de3b758c06383b5d917e2977709578e68baf733bf1"
+    },
+    {
+      "url": "https://www.unicode.org/Public/18.0.0/ucd/emoji/emoji-variation-sequences.txt",
+      "path": "unicode-18.0.0/emoji-variation-sequences.txt",
+      "sha256": "ff1707564aa1f1b2fcf4ec92d609d4cb26940bc0d4dcf07f5328ad6879e84da3"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/unicode-org/cldr/release-49/common/annotations/en.xml",
+      "path": "cldr-49/en.xml",
+      "sha256": "14d0e9bb5003c085250df4ac7bd7ba1e26d92e74174d7a3a2f42dc16e07fb155",
+      "note": "CLDR 49 English annotations; SPDX-License-Identifier: Unicode-3.0"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/unicode-org/cldr/release-49/common/annotationsDerived/en.xml",
+      "path": "cldr-49/en-derived.xml",
+      "sha256": "a4a6c1a4c341d94179cb116623c5f44c47400a5bc55da483423ef7430ecf622e"
+    }
+  ],
+  "legacy": {
+    "name": "universal-emoji-parser",
+    "version": "3.0.2",
+    "path": "legacy/emoji-lib.json.txt",
+    "sha256": "62e9e88e7f2f323d79bb614b513dd04f965740d2ae423c22b67ff391665ed52e",
+    "license": "MIT",
+    "source": "https://github.com/DailyBotHQ/universal-emoji-parser/blob/main/src/lib/emoji-lib.json"
+  }
+}

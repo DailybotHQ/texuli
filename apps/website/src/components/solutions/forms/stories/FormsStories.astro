@@ -1,0 +1,9 @@
+---
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionStories from '../../shared/story/SolutionStories.astro';
+import { FORMS_STORIES } from './stories-content.ts';
+
+const entry = getSolution('forms');
+---
+
+<SolutionStories entry={entry} {...FORMS_STORIES} />

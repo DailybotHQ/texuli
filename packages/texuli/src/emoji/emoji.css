@@ -1,0 +1,156 @@
+@layer tx.components {
+  .tx-emoji {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: -0.12em;
+    line-height: 1;
+    font-size: inherit;
+    font-variant-emoji: emoji;
+  }
+
+  .tx-emoji__art {
+    display: block;
+    inline-size: 1em;
+    block-size: 1em;
+    object-fit: contain;
+  }
+
+  .tx-emoji-picker {
+    display: grid;
+    gap: var(--tx-space-3);
+    min-inline-size: 0;
+    color: var(--tx-foreground, CanvasText);
+    background: var(--tx-surface, Canvas);
+    font-family: var(--tx-type-body-family);
+  }
+
+  .tx-emoji-picker__search-label {
+    display: grid;
+    gap: var(--tx-space-1);
+    font-size: var(--tx-type-label-size);
+    font-weight: var(--tx-type-label-weight);
+  }
+
+  .tx-emoji-picker__search {
+    min-block-size: var(--tx-size-control-md);
+    border: var(--tx-border-width-thin) solid var(--tx-input, var(--tx-border, ButtonBorder));
+    border-radius: var(--tx-shape-radius-md);
+    padding-inline: var(--tx-space-3);
+    color: var(--tx-foreground, CanvasText);
+    background: var(--tx-surface, Canvas);
+    font: inherit;
+  }
+
+  .tx-emoji-picker__search:focus-visible,
+  .tx-emoji-picker__grid:focus-visible,
+  .tx-emoji-picker__categories button:focus-visible,
+  .tx-emoji-picker__tones input:focus-visible + span {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: var(--tx-focus-ring-offset, 2px);
+  }
+
+  .tx-emoji-picker__categories {
+    display: flex;
+    gap: var(--tx-space-1);
+    overflow-x: auto;
+    padding-block: var(--tx-space-1);
+  }
+
+  .tx-emoji-picker__categories button {
+    min-block-size: var(--tx-size-control-sm);
+    flex: 0 0 auto;
+    border: 0;
+    border-radius: var(--tx-shape-radius-md);
+    padding-inline: var(--tx-space-2);
+    color: var(--tx-foreground, CanvasText);
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .tx-emoji-picker__categories button[aria-selected="true"] {
+    color: var(--tx-primary-foreground, CanvasText);
+    background: var(--tx-primary, Highlight);
+  }
+
+  .tx-emoji-picker__tones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--tx-space-2);
+    margin: 0;
+    border: var(--tx-border-width-thin) solid var(--tx-border, ButtonBorder);
+    border-radius: var(--tx-shape-radius-md);
+    padding: var(--tx-space-2);
+  }
+
+  .tx-emoji-picker__tones legend {
+    padding-inline: var(--tx-space-1);
+    font-size: var(--tx-type-label-size);
+  }
+
+  .tx-emoji-picker__tones label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tx-space-1);
+    min-block-size: var(--tx-size-control-sm);
+    cursor: pointer;
+  }
+
+  .tx-emoji-picker__tones input {
+    accent-color: var(--tx-primary, Highlight);
+  }
+
+  .tx-emoji-picker__grid {
+    display: grid;
+    gap: var(--tx-space-1);
+    max-block-size: 20rem;
+    overflow: auto;
+    border-radius: var(--tx-shape-radius-md);
+    padding: var(--tx-space-1);
+    overscroll-behavior: contain;
+  }
+
+  .tx-emoji-picker__grid [role="row"] {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: var(--tx-space-1);
+  }
+
+  .tx-emoji-picker__grid [role="gridcell"] {
+    display: grid;
+    place-items: center;
+    min-inline-size: 0;
+    min-block-size: var(--tx-size-control-md);
+    border-radius: var(--tx-shape-radius-sm);
+    font-size: var(--tx-size-icon-lg);
+    cursor: pointer;
+  }
+
+  .tx-emoji-picker__grid [role="gridcell"][aria-selected="true"] {
+    outline: var(--tx-focus-ring-width, 2px) solid var(--tx-ring, Highlight);
+    outline-offset: calc(var(--tx-focus-ring-offset, 2px) * -1);
+    background: var(--tx-muted, color-mix(in srgb, CanvasText 8%, Canvas));
+  }
+
+  .tx-emoji-picker__empty {
+    grid-column: 1 / -1;
+    color: var(--tx-muted-foreground, GrayText);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tx-emoji-picker *,
+    .tx-emoji-picker *::before,
+    .tx-emoji-picker *::after {
+      scroll-behavior: auto;
+      transition-duration: 0ms;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .tx-emoji-picker__categories button[aria-selected="true"],
+    .tx-emoji-picker__grid [role="gridcell"][aria-selected="true"] {
+      outline-color: Highlight;
+    }
+  }
+}

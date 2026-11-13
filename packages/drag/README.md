@@ -11,7 +11,7 @@ by Dailybot, Inc.
 
 **In the stack:** layer L0: framework-free, with no dependencies. The `@texuli/primitives` sortable, `@texuli/data`, `@texuli/workflows`, `@texuli/canvas` and `@texuli/pages` build on it.
 
-> **Status: in development (pre-1.0).** `@texuli/drag` is on npm as `0.17.5`, with provenance (first published as `0.3.0` on 2026-10-28). It
+> **Status: in development (pre-1.0).** `@texuli/drag` is on npm as `0.18.0`, with provenance (first published as `0.3.0` on 2026-10-28). It
 > powers `@texuli/primitives/sortable`, the `@texuli/data` board, tree view,
 > calendar, timeline and column moves, and `@texuli/workflows`. Those
 > integrations ship from `0.4.0`; `@texuli/primitives` and `@texuli/data`

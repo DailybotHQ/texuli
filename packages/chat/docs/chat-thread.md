@@ -75,6 +75,25 @@ connection.
 This component does not provide message persistence, delivery, encryption, or
 network behavior.
 
+### Stopped replies and plain-text runs (PLAN_023)
+
+An `end` event with `stopped: true` (send it when the reader presses Stop)
+finishes the message with its text so far and sets `stopped`. The list marks
+it with `labels.stopped` ("Stopped before the end") under the message. The
+finished text is announced once, like any finished reply.
+
+`text` (on `MessageList`, forwarded by `ChatThread`) is a snippet for the
+plain-text runs of a message: strong, emphasis, code, links, mentions, dates
+and status chips keep their own nodes, and every other run reaches the snippet
+as a string. Without it the runs render with `EmojiText` from `texuli/emoji`
+(Unicode emoji by default; pass your own snippet to add emoji art). The snippet
+never receives markup.
+
+Message text is read by the shared CommonMark inline parser
+(`@texuli/core/markdown`) and filtered down to the chat vocabulary
+(PLAN_023 T-md-adopt). Links pass the untrusted URL policy, and a refused link
+or token stays as the text that was written.
+
 ## Message actions, inline edit and the scroll anchor (G33)
 
 - `actions` is a snippet rendered under each finished message (never

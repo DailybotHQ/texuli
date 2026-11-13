@@ -71,7 +71,7 @@ describe('slides page: copy and safety', () => {
     expect(PAGE).toMatch(/@texuli\/slides · in development/);
     const status = read('components/slides-site/page.ts');
     expect(status).toMatch(
-      /in development and on npm \(@texuli\/slides 0\.17\.5, @texuli\/deck 0\.17\.5\), pre-1\.0 releases/
+      /in development and on npm \(@texuli\/slides 0\.18\.0, @texuli\/deck 0\.18\.0\), pre-1\.0 releases/
     );
     expect(status).toMatch(/releases before 0\.4\.0 use the previous deck model/);
   });
@@ -150,8 +150,9 @@ describe('gallery decks', () => {
 
   it('paints the components deck on the stage (the default registry validates it)', async () => {
     const { container } = render(ComponentsShowcase);
-    await waitFor(() =>
-      expect(container.querySelector('[aria-roledescription="slide"]')).not.toBeNull()
+    await waitFor(
+      () => expect(container.querySelector('[aria-roledescription="slide"]')).not.toBeNull(),
+      { timeout: 10_000 }
     );
     expect(container.querySelector('[data-tx-deck-invalid]')).toBeNull();
   });

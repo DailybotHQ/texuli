@@ -205,8 +205,9 @@ describe('parseMarkdown: no super-linear backtracking (ReDoS)', () => {
       ['[a](https://example.com)', 'link https://example.com'],
       ['[a](  <https://example.com/x>  "Title" )', 'link https://example.com/x'],
       ['[a](https://example.com/a_(b))', 'link https://example.com/a_(b)'],
-      // A title alone is a link with an empty href, which the URL policy drops.
-      ['[a](  "only a title")', 'link (none)'],
+      // CommonMark (shared parser, PLAN_023 T-md-adopt): `"only` is the destination and the
+      // rest is no title, so this is text (before: a link with an empty href, then dropped).
+      ['[a](  "only a title")', 'text'],
       ['[a](https://example.com "open title)', 'text'],
       ['[a](b c)', 'text'],
     ];
@@ -222,18 +223,26 @@ describe('parseMarkdown: no super-linear backtracking (ReDoS)', () => {
       return block?.type === 'heading' ? [block.level, inlineText(block.children)] : block?.type;
     };
     expect(heading('# Title ##  ')).toEqual([1, 'Title']);
-    expect(heading('## Title#')).toEqual([2, 'Title']);
+    // CommonMark (PLAN_023 T-md-adopt): a closing `#` run needs a space before it.
+    expect(heading('## Title#')).toEqual([2, 'Title#']);
     expect(heading('   ###\tTabbed')).toEqual([3, 'Tabbed']);
     expect(heading('#Title')).toBe('paragraph');
     expect(heading('####### x')).toBe('paragraph');
-    expect(heading('    # code-indented')).toBe('paragraph');
+    // CommonMark (PLAN_023 T-md-adopt): four spaces of indentation make a code block.
+    expect(heading('    # code-indented')).toBe('code');
     expect(heading('```TS  ')).toBe('code');
     expect(parseMarkdown('```TS  \nx\n```').blocks[0]).toEqual({
       type: 'code',
       lang: 'ts',
       text: 'x',
     });
-    expect(parseMarkdown('``` not a lang\nx').blocks[0]?.type).toBe('paragraph');
+    // CommonMark (PLAN_023 T-md-adopt): any info string opens a fence; one that is not a
+    // language name gives no language.
+    expect(parseMarkdown('``` not a lang\nx').blocks[0]).toEqual({
+      type: 'code',
+      lang: undefined,
+      text: 'x',
+    });
     expect(parseMarkdown('* * *').blocks[0]?.type).toBe('rule');
     expect(stripLightMarkdown('see [docs](https://example.com/a_(b)) now')).toBe('see docs now');
   });

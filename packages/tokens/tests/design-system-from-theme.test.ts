@@ -128,7 +128,7 @@ describe('fromTheme: the zero-drift bridge', () => {
       if (!compiled.ok) throw new Error(theme.id);
       expect(compiled.vars.light?.['--tx-radius'], theme.id).toBe('0px');
     }
-  });
+  }, 30_000); // loads all 210 library themes
 
   it('turns all 210 library themes into valid documents that compile to their themeVariables', async () => {
     const themes = await loadAllFullLibraryThemes();

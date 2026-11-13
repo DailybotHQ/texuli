@@ -19,6 +19,9 @@ The toolbar, the link dialog and the editing surface, wired to one
 | `trust` | `'untrusted'` | URL policy tier for links typed in the link dialog. Pasted and autolinked URLs are always `untrusted` |
 | `limits` | `EDITOR_LIMITS` | Lower caps (a blocks `text` field holds 4,000 characters) |
 | `labels` | English | Partial `EditorLabels` to translate every string |
+| `shortcodes` | — | The `:shortcode:` lookup: a typed `:name:` becomes its text (an emoji). The editor ships no emoji data ([emoji](editor-emoji.md)) |
+| `emoji` | `false` | Add the [emoji button](editor-emoji.md) to the toolbar |
+| `blockMenu` | `false` | Use the block-type menu in the toolbar instead of the heading, list, quote and code buttons ([toolbar](editor-toolbar.md)) |
 | `label` / `aria-labelledby` | `'Rich text'` | The textbox name. A placeholder is never the name |
 | `placeholder` | — | Shown in an empty document |
 | `readonly` | `false` | `aria-readonly="true"`, no toolbar, every edit refused |
@@ -44,6 +47,10 @@ the model selection.
   Escape arms a one-shot “Tab leaves”.
 - `paste` reads the clipboard through `@texuli/editor/paste`. `drop` is
   refused for now.
+- Mod+Alt+Shift+V is "Paste as Markdown": the surface reads the clipboard
+  text with the async Clipboard API and pastes it as Markdown; when the
+  browser refuses, it announces that the next paste (Mod+V) reads as
+  Markdown. A plain paste never interprets Markdown.
 - Composition: the browser owns the composing block's DOM until
   `compositionend`; then the controller diffs it (`applyComposition`) and the
   block re-renders from the model (a per-block epoch key). Non-cancelable

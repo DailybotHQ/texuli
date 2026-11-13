@@ -21,14 +21,19 @@
  * short reference page that does not name the packages yet, so for it the package names
  * come from the index only (`docsNamePackages: false`).
  */
-import { readFileSync } from 'node:fs';
+
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import {
+  REFUSED_BLUEPRINT,
+  REPORT_BLUEPRINT,
+} from '../../../apps/website/src/components/solutions/agent-chat/demo/blueprints.ts';
 import { SOLUTIONS } from '../../../apps/website/src/data/solutions/index.ts';
 import type { SolutionSlug } from '../../../apps/website/src/data/solutions/schema.ts';
 import { onRequest } from '../../../functions/mcp.ts';
 import { assertEdgeParity, type Json, runSession, type Session } from '../harness.ts';
-import { llmsSection, SITE, solutionsSite } from './solutions-site.ts';
+import { DOCUMENTED, llmsSection, SITE, solutionsSite } from './solutions-site.ts';
 
 const REPO = resolve(import.meta.dirname, '../../..');
 const call = (name: string, args: Json) => ({ name, arguments: args });
@@ -148,9 +153,25 @@ const PIPELINE = JSON.parse(
 ) as Json;
 
 describe('agent builds each shipped Solution from llms.txt → index → docs → MCP', () => {
-  it('covers every Solution in the registry', () => {
-    expect(SOLUTIONS.map((s) => s.slug).sort()).toEqual(
-      ['canvas', 'design-systems', 'documents', 'sheets', 'slides', 'workflows'].sort()
+  it('covers every Solution whose docs page ships', () => {
+    // A Solution's docs page on disk must have its loader in DOCS (and an eval below).
+    const shipped = SOLUTIONS.filter((s) =>
+      existsSync(resolve(REPO, `apps/website/src/pages${s.docs}index.astro`))
+    ).map((s) => s.slug);
+    expect(DOCUMENTED.map((s) => s.slug).sort()).toEqual(shipped.sort());
+    expect(shipped.sort()).toEqual(
+      [
+        'agent-chat',
+        'canvas',
+        'dashboards',
+        'design-systems',
+        'documents',
+        'editor',
+        'forms',
+        'sheets',
+        'slides',
+        'workflows',
+      ].sort()
     );
   });
 
@@ -264,6 +285,73 @@ describe('agent builds each shipped Solution from llms.txt → index → docs �
       final(ctx) {
         expect(ctx.data('validate').valid).toBe(true);
         expect(ctx.data('validate').diagnostics).toEqual([]);
+      },
+    });
+  });
+
+  it('attach a blueprint in a chat reply: blueprint.validate accepts the report and refuses an unknown component', async () => {
+    const { entry, docs } = await discover('agent-chat');
+    expect(entry.packages.map((p: Json) => p.name)).toEqual([
+      '@texuli/chat',
+      '@texuli/player',
+      '@texuli/catalog',
+      '@texuli/core',
+    ]);
+    // The docs name the validator and the painter the attachment card is given.
+    expect(docs).toContain('@texuli/catalog/validate');
+    expect(docs).toContain('ChatAttachment');
+    await build({
+      name: 'agent chat attachments',
+      steps: [
+        {
+          label: 'report',
+          method: 'tools/call',
+          params: call('blueprint.validate', { draft: REPORT_BLUEPRINT }),
+        },
+        {
+          label: 'refused',
+          method: 'tools/call',
+          params: call('blueprint.validate', { draft: REFUSED_BLUEPRINT }),
+        },
+      ],
+      final(ctx) {
+        expect(ctx.data('report').valid).toBe(true);
+        expect(ctx.data('refused').valid).toBe(false);
+        expect(JSON.stringify(ctx.data('refused').diagnostics)).toContain('unknown-id');
+      },
+    });
+  });
+
+  it('send an editor note to chat: md.convert writes Slack, refuses the javascript: link and keeps @everyone inert', async () => {
+    const { entry, docs } = await discover('editor');
+    expect(entry.packages.map((p: Json) => p.name)).toEqual([
+      '@texuli/editor',
+      '@texuli/core',
+      'texuli',
+    ]);
+    // The docs name the conversion an agent can run and the editor function that matches it.
+    expect(docs).toContain('documentToDialect');
+    expect(docs).toContain('md.convert');
+    await build({
+      name: 'editor note to chat',
+      steps: [
+        {
+          label: 'slack',
+          method: 'tools/call',
+          params: call('md.convert', {
+            source:
+              '**Password reset**: open [the page](https://example.com/reset), not [this](javascript:alert(1)). @everyone',
+            from: 'markdown',
+            to: 'slack',
+          }),
+        },
+      ],
+      final(ctx) {
+        const value = String(ctx.data('slack').value);
+        expect(value).toContain('*Password reset*');
+        expect(value).toContain('<https://example.com/reset|the page>');
+        expect(value).not.toContain('javascript');
+        expect(value).not.toMatch(/(?<!\u200b)@everyone/);
       },
     });
   });

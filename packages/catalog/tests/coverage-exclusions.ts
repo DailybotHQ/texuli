@@ -293,6 +293,21 @@ add(
 add('@texuli/data', 'planned', 'Planned manifest: an activity feed with reactions and filters.', [
   'ActivityFeed',
 ]);
+// PLAN_023 T-md-adopt-followup: real manifests (data-metric-card, data-filter-bar) are new
+// catalog ids, a blueprint spec vocabulary change (packages/spec catalog, generated TS and
+// Kotlin vocabularies, a spec minor); until that lands they are tracked here.
+add(
+  '@texuli/data',
+  'planned',
+  'Planned manifest data-metric-card: a KPI tile with value, delta and trend (needs a spec catalog id).',
+  ['MetricCard']
+);
+add(
+  '@texuli/data',
+  'planned',
+  'Planned manifest data-filter-bar: an applied-filter toolbar over data-filter-builder (needs a spec catalog id).',
+  ['FilterBar']
+);
 
 // ── @texuli/chat ───────────────────────────────────────────────
 add('@texuli/chat', 'part', 'A part of the live chat thread.', ['MessageList', 'TypingIndicator']);
@@ -301,6 +316,35 @@ add(
   'planned',
   'Planned: the live thread with streaming; chat-thread is the display-only transcript.',
   ['ChatThread']
+);
+// PLAN_023 T-cmp-chat: a chat-attachment catalog id is a spec vocabulary change (owner decision).
+add(
+  '@texuli/chat',
+  'planned',
+  'Planned manifest chat-attachment: a blueprint attachment card (validate, then paint with the player); needs a spec catalog id.',
+  ['ChatAttachment']
+);
+// PLAN_023 T-emo-agents: a catalog id for Emoji is blueprint spec vocabulary
+// (packages/spec catalog, versions.json minor, TS and Kotlin codegen). The
+// owner has not decided that bump; ops ship without it. EmojiPicker and
+// EmojiText wait on their own catalog ids.
+add(
+  'texuli',
+  'planned',
+  'Planned manifest emoji: an id-based Unicode emoji (needs a spec catalog id).',
+  ['Emoji']
+);
+add(
+  'texuli',
+  'planned',
+  'Planned manifest emoji-picker: a searchable emoji picker (needs a spec catalog id).',
+  ['EmojiPicker']
+);
+add(
+  'texuli',
+  'planned',
+  'Planned manifest emoji-text: inline text with emoji shortcodes (needs a spec catalog id).',
+  ['EmojiText']
 );
 
 // ── @texuli/workflows ──────────────────────────────────────────
@@ -426,4 +470,6 @@ export const CATALOG_EXCLUSIONS: readonly CatalogExclusion[] = Object.freeze(row
 // again in PLAN_016 T-widen-display: Icon, Avatar, Skeleton, Progress, Spinner,
 // Carousel, Separator and ListItem became catalog ids (LucideIcon is a part of
 // icon). Combined ceiling is the live row count.
-export const EXCLUSION_CEILING = 204;
+// 207: raised for MetricCard, FilterBar and ChatAttachment (PLAN_023), pending their spec catalog ids.
+// 210: raised for Emoji, EmojiPicker and EmojiText (PLAN_023 T-emo-agents), pending their spec catalog ids.
+export const EXCLUSION_CEILING = 210;

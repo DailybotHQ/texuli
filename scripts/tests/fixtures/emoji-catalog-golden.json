@@ -1,0 +1,35 @@
+{
+  "records": [
+    { "unicode": "🚀", "id": "1f680", "shortcode": ":rocket:" },
+    { "unicode": "🎉", "id": "1f389", "shortcode": ":party_popper:" },
+    { "unicode": "❤️", "id": "2764-fe0f", "shortcode": ":red_heart:" },
+    { "unicode": "👍", "id": "1f44d", "shortcode": ":thumbs_up:" },
+    {
+      "unicode": "👍🏽",
+      "id": "1f44d-1f3fd",
+      "shortcode": ":thumbs_up_medium_skin_tone:",
+      "variantOf": "1f44d",
+      "tone": "medium"
+    },
+    { "unicode": "👩\u200d💻", "id": "1f469-200d-1f4bb", "shortcode": ":woman_technologist:" },
+    { "unicode": "🇺🇸", "id": "1f1fa-1f1f8", "shortcode": ":flag_united_states:" },
+    { "unicode": "1️⃣", "id": "31-fe0f-20e3", "shortcode": ":keycap_1:" },
+    { "unicode": "#️⃣", "id": "23-fe0f-20e3", "shortcode": ":keycap_number_sign:" },
+    { "unicode": "*️⃣", "id": "2a-fe0f-20e3", "shortcode": ":keycap_asterisk:" }
+  ],
+  "qualificationAliases": [
+    { "unicode": "❤", "id": "2764-fe0f" },
+    { "unicode": "1⃣", "id": "31-fe0f-20e3" }
+  ],
+  "legacyAliases": {
+    "rocket": "1f680",
+    "tada": "1f389",
+    "heart": "2764-fe0f",
+    "smiling_face_with_sunglasses": "1f60e",
+    "thumbsup": "1f44d",
+    "+1": "1f44d",
+    "coffee": "2615",
+    "100": "1f4af"
+  },
+  "legacyConflicts": ["pa", "sikhism", "ufo", "uk", "usa"]
+}

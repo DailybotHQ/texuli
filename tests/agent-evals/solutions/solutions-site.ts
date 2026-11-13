@@ -16,8 +16,12 @@
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { loadAgentChatDocs } from '../../../apps/website/src/content/solution-docs/agent-chat/index.ts';
 import { loadCanvasDocs } from '../../../apps/website/src/content/solution-docs/canvas/index.ts';
+import { loadDashboardsDocs } from '../../../apps/website/src/content/solution-docs/dashboards/index.ts';
 import { loadDocumentsDocs } from '../../../apps/website/src/content/solution-docs/documents/index.ts';
+import { loadEditorDocs } from '../../../apps/website/src/content/solution-docs/editor/index.ts';
+import { loadFormsDocs } from '../../../apps/website/src/content/solution-docs/forms/index.ts';
 import { loadSheetsDocs } from '../../../apps/website/src/content/solution-docs/sheets/index.ts';
 import { loadSlidesDocs } from '../../../apps/website/src/content/solution-docs/slides/index.ts';
 import { loadWorkflowsDocs } from '../../../apps/website/src/content/solution-docs/workflows/index.ts';
@@ -50,21 +54,33 @@ export function loadDesignSystemsDocs(): readonly { id: string; source: string }
   });
 }
 
-/** The docs sections of each Solution, in reading order (the docs page renders these). */
-const DOCS: Readonly<Record<SolutionSlug, () => readonly { id: string; source: string }[]>> = {
+/**
+ * The docs sections of each Solution whose docs page ships, in reading order. A Solution joins
+ * here when its `/guides/solutions/<slug>/` page lands; `solutions.test.ts` checks the pages on
+ * disk against this map.
+ */
+export const DOCS: Readonly<
+  Partial<Record<SolutionSlug, () => readonly { id: string; source: string }[]>>
+> = {
   slides: loadSlidesDocs,
   documents: loadDocumentsDocs,
   workflows: loadWorkflowsDocs,
   canvas: loadCanvasDocs,
   sheets: loadSheetsDocs,
   'design-systems': loadDesignSystemsDocs,
+  forms: loadFormsDocs,
+  dashboards: loadDashboardsDocs,
+  'agent-chat': loadAgentChatDocs,
+  editor: loadEditorDocs,
 };
 
 /** The twin of a Solution docs page: a header block, then every docs section. */
 export function docsTwin(slug: SolutionSlug): string {
   const entry = SOLUTIONS.find((s) => s.slug === slug);
   if (!entry) throw new Error(`no registry entry for ${slug}`);
-  const body = DOCS[slug]()
+  const load = DOCS[slug];
+  if (!load) throw new Error(`no docs for ${slug}`);
+  const body = load()
     .map((section) => section.source.trim())
     .join('\n\n');
   return `# ${entry.name} docs\n\n> ${entry.tagline}\n\nLanguage: en\nCanonical: ${SITE}${entry.docs}\n\n---\n\n${body}\n`;
@@ -76,12 +92,15 @@ export interface SolutionsSite {
   readonly requested: string[];
 }
 
+/** Registry entries whose docs page ships. */
+export const DOCUMENTED = SOLUTIONS.filter((entry) => DOCS[entry.slug] !== undefined);
+
 /** The fake site. */
 export function solutionsSite(): SolutionsSite {
   const files = new Map<string, string>();
   files.set('/llms.txt', readFileSync(resolve(REPO, 'apps/website/public/llms.txt'), 'utf8'));
   files.set('/solutions/index.json', JSON.stringify(solutionsIndexDocument(SITE)));
-  const pages = SOLUTIONS.map((entry) => ({
+  const pages = DOCUMENTED.map((entry) => ({
     path: entry.docs,
     twin: `${entry.docs.replace(/\/$/, '')}.md`,
     title: `${entry.name} docs`,
@@ -92,7 +111,7 @@ export function solutionsSite(): SolutionsSite {
     '/md-manifest.json',
     JSON.stringify({ twins: Object.fromEntries(pages.map((p) => [p.path, p.twin])), pages })
   );
-  for (const entry of SOLUTIONS)
+  for (const entry of DOCUMENTED)
     files.set(`${entry.docs.replace(/\/$/, '')}.md`, docsTwin(entry.slug));
   const requested: string[] = [];
   return {

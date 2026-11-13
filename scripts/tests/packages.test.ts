@@ -13,6 +13,7 @@ import {
   ensureCssTypeDeclarations,
   isSvelteComponentDeclarationProblem,
   NEVER_PACKED,
+  PACKAGE_FILES,
   parseArgs,
   parseNpmPackJson,
   publishManifest,
@@ -24,6 +25,7 @@ import {
   svelteToolManifest,
   type WorkspacePackage,
 } from '../packages.ts';
+import { UNRELEASED_PACKAGES } from '../release-line.ts';
 
 const pkg = (manifest: Record<string, unknown>): WorkspacePackage => ({
   dir: 'demo',
@@ -40,6 +42,7 @@ describe('distTarget', () => {
     expect(distTarget('./src/a/B.svelte', 'types')).toBe('./dist/a/B.svelte.d.ts');
     expect(distTarget('./src/x.svelte.ts', 'default')).toBe('./dist/x.svelte.js');
     expect(distTarget('./src/theme.css', 'default')).toBe('./dist/theme.css');
+    expect(distTarget('./package.json', 'subpath')).toBe('./package.json');
     expect(() => distTarget('./README.md', 'default')).toThrow('outside src/');
     expect(() => distTarget('./src/logo.png', 'default')).toThrow('unsupported');
   });
@@ -120,6 +123,31 @@ describe('publishManifest', () => {
         'manifest: no exports map',
       ]);
     }
+  });
+
+  it('preserves emoji-assets package metadata and ships its non-JS trees', () => {
+    const manifest = {
+      name: '@texuli/emoji-assets',
+      version: '0.18.0',
+      type: 'module',
+      exports: {
+        '.': { types: './src/index.ts', default: './src/index.ts' },
+        './coverage': { types: './src/coverage.ts', default: './src/coverage.ts' },
+        './package.json': './package.json',
+      },
+    };
+    const { manifest: packed, problems } = publishManifest(
+      { ...pkg(manifest), dir: 'emoji-assets' },
+      versions
+    );
+    expect(problems).toEqual([]);
+    expect(packed.exports).toEqual({
+      '.': { types: './dist/index.d.ts', default: './dist/index.js' },
+      './coverage': { types: './dist/coverage.d.ts', default: './dist/coverage.js' },
+      './package.json': './package.json',
+    });
+    expect(packed.files).toEqual(['dist', 'CHANGELOG.md', 'assets', 'data']);
+    expect(PACKAGE_FILES['emoji-assets']).toEqual(['assets', 'data']);
   });
 });
 
@@ -324,6 +352,12 @@ describe('workspace selection', () => {
       expect(names).toContain('texuli');
       expect(names).toContain('@texuli/core');
       for (const never of NEVER_PACKED) expect(names).not.toContain(never);
+      // An unreleased package is left out by default and packed only when a filter names it.
+      for (const unreleased of UNRELEASED_PACKAGES) {
+        expect(names).not.toContain(unreleased);
+        const pkg = all.find((p) => p.name === unreleased);
+        if (pkg) expect(selectPackages(all, [pkg.dir]).map((p) => p.name)).toEqual([unreleased]);
+      }
       expect(selectPackages(all, ['core', 'texuli']).map((p) => p.name)).toEqual([
         '@texuli/core',
         'texuli',

@@ -5,14 +5,18 @@ for [Texuli](https://texuli.com), an MIT-licensed Svelte 5 component library
 by Dailybot, Inc. (*Small pieces. Infinite possibilities.*). An agent
 connected to it can search the component catalog, read manifests and worked
 examples, validate blueprint drafts, search and preview themes with their
-WCAG AA report, and run the deck and document commands.
+WCAG AA report, run the deck and document commands, convert or render
+untrusted Markdown, HTML and chat dialects (`md.convert`, `md.render`),
+and convert Texuli emoji shortcodes (`emoji.convert`). Search, look up and
+list the closed catalog (`emoji.search`, `emoji.get`, `emoji.categories`,
+`emoji.variants`) on this local server.
 
 **In the stack:** layer L9, the top: a thin bin over the stdio MCP server in `@texuli/tools` (L8), which reads the agent catalog (L6) and the `@texuli/tokens` themes.
 
 > **Status: in development (pre-1.0).** `@texuli/mcp` is published on npm
-> as `0.17.5`, with provenance (first published as `0.9.0`). Under 0.x a new minor
+> as `0.18.0`, with provenance (first published as `0.9.0`). Under 0.x a new minor
 > (`0.14.0`) may contain breaking changes, so pin the exact version or use
-> `^0.17.0`, which accepts only 0.17.x
+> `^0.18.0`, which accepts only 0.18.x
 > (see [RELEASE](https://github.com/DailybotHQ/texuli/blob/main/docs/RELEASE.md)).
 
 ## Connect your agent

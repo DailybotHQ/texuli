@@ -26,8 +26,13 @@ export interface TwinNote {
   route: RegExp;
   /** What the live demo shows, one or two sentences. */
   demo: string;
-  /** MCP operation names (`theme.search`) that do the same thing. */
+  /** MCP operation names (`theme.search`) the remote server at texuli.com/mcp serves. */
   operations: readonly string[];
+  /**
+   * Operation names that do the same work on the local MCP only
+   * (`npx -y @texuli/mcp`); never advertised as remote.
+   */
+  localOperations?: readonly string[];
   /** Workspace packages whose README documents the feature (`tokens`). */
   packages: readonly string[];
   links?: readonly NoteLink[];
@@ -47,6 +52,9 @@ const CATALOG_LINKS: readonly NoteLink[] = [
 
 const THEME_OPS = ['theme.search', 'theme.get', 'theme.preview'] as const;
 const CATALOG_OPS = ['catalog.search', 'component.get', 'example.search'] as const;
+const MARKDOWN_OPS = ['md.convert', 'md.render'] as const;
+const EMOJI_REMOTE_OPS = ['emoji.convert'] as const;
+const EMOJI_LOCAL_OPS = ['emoji.search', 'emoji.get'] as const;
 
 /** Every note, first match wins. */
 export const TWIN_NOTES: readonly TwinNote[] = Object.freeze([
@@ -88,6 +96,24 @@ export const TWIN_NOTES: readonly TwinNote[] = Object.freeze([
     operations: ['example.search', 'catalog.search'],
     packages: ['examples', 'texuli'],
     links: CATALOG_LINKS,
+  },
+  {
+    route: /^\/emoji\/$/,
+    demo: 'The emoji picker runs in the browser: search, categories, keyboard grid and recents stay on the page. Texuli emoji art is still landing, so glyphs are Unicode.',
+    operations: [...EMOJI_REMOTE_OPS],
+    localOperations: [...EMOJI_LOCAL_OPS],
+    packages: ['emojis', 'texuli'],
+    links: [
+      { label: '@texuli/emojis README', href: `${REPO}/packages/emojis/README.md` },
+      { label: 'Markdown, HTML and chat dialects', href: '/markdown/' },
+    ],
+  },
+  {
+    route: /^\/markdown\/$/,
+    demo: 'This page lists the Markdown, HTML and chat-dialect subpaths. Convert and render through the MCP rather than importing the texels unless you are writing app code.',
+    operations: [...MARKDOWN_OPS],
+    packages: ['core', 'tools'],
+    links: [{ label: 'core Markdown README', href: `${REPO}/packages/core/docs/markdown.md` }],
   },
   {
     route: /^\/theme-studio\/$/,
@@ -257,6 +283,15 @@ export function agentNoteMarkdown(
     if (!operation) throw new Error(`twin note for ${route} names unknown operation ${name}`);
     const input = component && name === 'component.get' ? ` with \`{"id":"${component}"}\`` : '';
     lines.push(`- \`${name}\`: ${operation.title}${input}.`);
+  }
+  if (note.localOperations?.length) {
+    lines.push('', `Local MCP (\`npx -y @texuli/mcp\`; not on ${origin}/mcp):`, '');
+    for (const name of note.localOperations) {
+      const operation = byName.get(name);
+      if (!operation)
+        throw new Error(`twin note for ${route} names unknown local operation ${name}`);
+      lines.push(`- \`${name}\`: ${operation.title}.`);
+    }
   }
   lines.push('', 'Docs:', '');
   if (component)

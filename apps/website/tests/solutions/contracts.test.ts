@@ -70,7 +70,7 @@ const content: SolutionLandingContent = {
 };
 
 describe('Solutions registry contract', () => {
-  it('names the six promoted Solutions and the status vocabulary', () => {
+  it('names the promoted Solutions and the status vocabulary', () => {
     expect(SOLUTION_SLUGS).toEqual([
       'slides',
       'documents',
@@ -78,6 +78,10 @@ describe('Solutions registry contract', () => {
       'canvas',
       'sheets',
       'design-systems',
+      'dashboards',
+      'forms',
+      'agent-chat',
+      'editor',
     ]);
     expect(SOLUTION_STATUSES).toEqual(['available', 'in development', 'experimental', 'planned']);
   });

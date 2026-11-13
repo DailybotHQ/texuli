@@ -159,13 +159,45 @@ function onkeydown(event: KeyboardEvent) {
     onLinkRequest?.();
     return;
   }
+  if (intent === 'paste-markdown') {
+    event.preventDefault();
+    pasteAsMarkdown();
+    return;
+  }
   if (controller.runKey(intent)) event.preventDefault();
+}
+
+/** Set by "Paste as Markdown" when the clipboard could not be read: the next paste is Markdown. */
+let markdownNext = false;
+
+/**
+ * "Paste as Markdown" (EDITOR_ARCHITECTURE section 8): read the clipboard text with the async
+ * Clipboard API when the browser allows it; otherwise the next paste reads as Markdown.
+ */
+function pasteAsMarkdown() {
+  const arm = () => {
+    markdownNext = true;
+    controller.announce(controller.labels.pasteMarkdownNext);
+  };
+  const clipboard = typeof navigator === 'undefined' ? undefined : navigator.clipboard;
+  if (!clipboard?.readText) {
+    arm();
+    return;
+  }
+  clipboard.readText().then((text) => {
+    if (text) void controller.pasteMarkdown(text);
+    else arm();
+  }, arm);
 }
 
 function onpaste(event: ClipboardEvent) {
   event.preventDefault();
+  const asMarkdown = markdownNext;
+  markdownNext = false;
   if (readonly || !event.clipboardData) return;
-  controller.paste(event.clipboardData);
+  // The clipboard is only readable during the event: take the text now, parse it after.
+  if (asMarkdown) void controller.pasteMarkdown(event.clipboardData.getData('text/plain'));
+  else controller.paste(event.clipboardData);
 }
 
 function ondrop(event: DragEvent) {

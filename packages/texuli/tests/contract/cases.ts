@@ -3,6 +3,7 @@ import ComboboxContract from './ComboboxContract.svelte';
 import CommandContract from './CommandContract.svelte';
 import DesignSystemContract from './DesignSystemContract.svelte';
 import DisplayContract from './DisplayContract.svelte';
+import EmojiContract from './EmojiContract.svelte';
 import FormsContract from './FormsContract.svelte';
 import LayoutsContract from './LayoutsContract.svelte';
 import MenusContract from './MenusContract.svelte';
@@ -55,6 +56,41 @@ export const EXCLUDED_PREFIXES: Record<string, string> = {
 
 /** One case per exported rendering component, each mounted in its family harness. */
 export const CASES: ContractCase[] = [
+  {
+    key: 'emoji/Emoji',
+    harness: EmojiContract,
+    idOwned: 'The id prop is the canonical emoji record id, not a root DOM id.',
+    skip: {
+      click: 'a static emoji has no click interaction',
+      keydown: 'a static emoji has no keyboard interaction',
+      focus: 'a static emoji does not manage focus',
+      pointerdown: 'a static emoji has no pointer interaction',
+    },
+  },
+  {
+    key: 'emoji/EmojiText',
+    harness: EmojiContract,
+    skip: {
+      click: 'the text renderer has no click behavior',
+      focus: 'the text renderer does not manage focus',
+      keydown: 'the text renderer does not act on keyboard events',
+      // Like Emoji: no pointer behavior to protect. Without the skip the check only compared two
+      // snapshots, and the lazily loaded emoji names could land between them under load.
+      pointerdown: 'the text renderer has no pointer interaction',
+    },
+  },
+  {
+    key: 'emoji/EmojiPicker',
+    harness: EmojiContract,
+    skip: {
+      focus: 'the picker root is a container; focus behavior belongs to its controls',
+      click: 'the root is a container; selection is handled by its grid',
+      keydown: 'the root is a container; keyboard behavior is handled by its grid',
+      // Like click and keydown: pointer selection belongs to the grid, and the lazily loaded
+      // catalog could otherwise land between the two snapshots this check compares.
+      pointerdown: 'the root is a container; pointer selection is handled by its grid',
+    },
+  },
   // Layout parts a host composes on its own (G93): `ref` and rest on the root.
   { key: 'layouts/shells/AppShell', harness: LayoutsContract },
   { key: 'layouts/app/SplitView', harness: LayoutsContract },

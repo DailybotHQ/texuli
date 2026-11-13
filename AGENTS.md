@@ -26,9 +26,9 @@ end to end and native for agents:
   `https://texuli.com/mcp` remotely) and the **agent skill**
   (`skills/texuli`).
 
-**Status: in development, pre-1.0.** All 26 published packages (all of
-`packages/` except `@texuli/examples`) are released on npm in the 0.17 line,
-every one at `0.17.5`, which the publish workflow publishes from `main`
+**Status: in development, pre-1.0.** All 27 published packages (all of
+`packages/` except `@texuli/examples` and the unreleased `@texuli/emoji-assets`) are released on npm in the 0.18 line,
+every one at `0.18.0`, which the publish workflow publishes from `main`
 after the merge through npm trusted publishing and points `latest` to
 (`next` is no longer maintained and stays on `0.12.1`); `0.10.0` added design
 systems (one JSON document per brand, [DESIGN_SYSTEMS](docs/DESIGN_SYSTEMS.md))
@@ -78,10 +78,16 @@ mode, and one `render-disabled-value` per root; `0.17.4` is a patch that
 adds an optional host-chosen `scope` and the catalog `component` to those
 baseline keys; `0.17.5` is a security patch: `@texuli/core/markup` checks
 the URL the serializers will write (after `sanitizeMarkupChars`), and
-toolbar arrows, Home and End move only from toolbar items.
+toolbar arrows, Home and End move only from toolbar items; `0.18.0` is a
+`0.x` minor that adds Markdown and HTML in `@texuli/core` with nine chat
+formats, Texuli Emojis (`@texuli/emojis` is published for the first
+time; components show system emoji, and `@texuli/emoji-assets`, the art,
+is not published), new editor, chat, forms and data components, and
+behavior changes on Markdown edge cases (blueprint spec stays `0.15.0`).
 `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/slides`,
 `@texuli/editor`, `@texuli/document`, `@texuli/pages`, `@texuli/forms`,
-`@texuli/canvas`, `@texuli/sheets` and `@texuli/mcp` are still in development
+`@texuli/canvas`, `@texuli/sheets`, `@texuli/mcp` and `@texuli/emojis` are
+still in development, and `@texuli/emoji-assets` is not on npm yet
 ([RELEASE](docs/RELEASE.md)). Workspace packages stay
 `private: true`, and no stable release is out (1.0.0 will be the first; under
 0.x a new minor may break; see [RELEASE](docs/RELEASE.md)),
@@ -111,7 +117,7 @@ Functions in `functions/`. See
 | Onboarding | [AI_AGENT_ONBOARDING](docs/AI_AGENT_ONBOARDING.md) | First-session checklist |
 | Collaboration | [AI_AGENT_COLLAB](docs/AI_AGENT_COLLAB.md) | Path ownership, owner-held files, commits in a shared checkout, handoffs |
 | Index | [docs/README](docs/README.md) | Every guide: repository, package, website and quality docs |
-| Packages | [core](packages/core/README.md) · [date](packages/date/README.md) · [deck](packages/deck/README.md) · [drag](packages/drag/README.md) · [primitives](packages/primitives/README.md) · [tokens](packages/tokens/README.md) · [texuli](packages/texuli/README.md) · [charts](packages/charts/README.md) · [data](packages/data/README.md) · [media](packages/media/README.md) · [chat](packages/chat/README.md) · [workflows](packages/workflows/README.md) · [blocks](packages/blocks/README.md) · [catalog](packages/catalog/README.md) · [slides](packages/slides/README.md) · [player](packages/player/README.md) · [tools](packages/tools/README.md) · [mcp](packages/mcp/README.md) · [astro](packages/astro/README.md) · [spec](packages/spec/README.md) · [editor](packages/editor/README.md) · [document](packages/document/README.md) · [pages](packages/pages/README.md) · [forms](packages/forms/README.md) · [canvas](packages/canvas/README.md) · [sheets](packages/sheets/README.md) · [examples](packages/examples/README.md) | Each package's front page; its `docs/*.md` describe every subpath |
+| Packages | [core](packages/core/README.md) · [date](packages/date/README.md) · [deck](packages/deck/README.md) · [drag](packages/drag/README.md) · [primitives](packages/primitives/README.md) · [tokens](packages/tokens/README.md) · [texuli](packages/texuli/README.md) · [charts](packages/charts/README.md) · [data](packages/data/README.md) · [media](packages/media/README.md) · [chat](packages/chat/README.md) · [workflows](packages/workflows/README.md) · [blocks](packages/blocks/README.md) · [catalog](packages/catalog/README.md) · [slides](packages/slides/README.md) · [player](packages/player/README.md) · [tools](packages/tools/README.md) · [mcp](packages/mcp/README.md) · [astro](packages/astro/README.md) · [spec](packages/spec/README.md) · [editor](packages/editor/README.md) · [document](packages/document/README.md) · [pages](packages/pages/README.md) · [forms](packages/forms/README.md) · [canvas](packages/canvas/README.md) · [sheets](packages/sheets/README.md) · [emojis](packages/emojis/README.md) · [emoji-assets](packages/emoji-assets/README.md) · [examples](packages/examples/README.md) | Each package's front page; its `docs/*.md` describe every subpath |
 | Website | [apps/website](apps/website/README.md) | texuli.com (Astro 7 + Svelte islands); area designs in `apps/website/docs/` |
 | Agent service | [apps/agent](apps/agent/README.md) | The texuli.com agent service: prompt → validated blueprint draft, fake replay provider only, not deployed |
 | Native | [native](native/README.md) | The Gradle Kotlin Multiplatform twin (`texuli-spec`, `texuli-compose`, `conformance`); not a pnpm package |
@@ -127,8 +133,10 @@ texuli/
 ├── packages/            layers point down only (scripts/check-layers.ts)
 │   ├── core/            L0 @texuli/core: texels (overlay engine, roving, positioning, URL policy…)  (README, docs/)
 │   ├── date/            L0 @texuli/date: Gregorian date arithmetic and locale week starts      (README)
-│   ├── deck/            L0 @texuli/deck: deck model v2 from JSON or Markdown, engine, authoring (in development, on npm as 0.17.5) (README, docs/)
-│   ├── drag/            L0 @texuli/drag: framework-free drag engine (in development, on npm as 0.17.5) (README, docs/)
+│   ├── deck/            L0 @texuli/deck: deck model v2 from JSON or Markdown, engine, authoring (in development, on npm as 0.18.0) (README, docs/)
+│   ├── drag/            L0 @texuli/drag: framework-free drag engine (in development, on npm as 0.18.0) (README, docs/)
+│   ├── emojis/          L0 @texuli/emojis: Unicode emoji catalog, tokenizer, search, legacy aliases (in development, first on npm as 0.18.0) (README)
+│   ├── emoji-assets/    L0 @texuli/emoji-assets: original emoji art candidates, none approved (in development, private, not on npm) (README)
 │   ├── primitives/      L1 @texuli/primitives: 42 owned headless primitives, APG patterns      (README, docs/)
 │   ├── document/        L1 @texuli/document: block document engine, ops, Markdown, CRDT sync (in development, on npm since 0.7.0) (README, docs/)
 │   ├── tokens/          L2 @texuli/tokens: OKLCH theme engine, --tx-* contract, 200+ themes, CSS (README, docs/)
@@ -146,7 +154,7 @@ texuli/
 │   ├── sheets/          L5 @texuli/sheets: spreadsheets, owned formula engine, CSV, sheet view (in development, first on npm as 0.8.0) (README, docs/)
 │   ├── catalog/         L6 @texuli/catalog: agent catalog + sink-free renderer                 (README, docs/)
 │   ├── player/          L7 @texuli/player: paint runtime for validated blueprints              (README, docs/)
-│   ├── slides/          L8 @texuli/slides: presentation stage on @texuli/deck, print, PPTX (in development, on npm as 0.17.5) (README, docs/)
+│   ├── slides/          L8 @texuli/slides: presentation stage on @texuli/deck, print, PPTX (in development, on npm as 0.18.0) (README, docs/)
 │   ├── tools/           L8 @texuli/tools: CLI, llms, A2UI, custom elements, golden set, MCP     (README, docs/)
 │   ├── astro/           L8 @texuli/astro: Astro integration, content layouts, sections          (README, docs/)
 │   ├── pages/           L8 @texuli/pages: block document editor and reader (in development, on npm since 0.7.0) (README, docs/)
@@ -261,16 +269,17 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     Never real PII, secrets or tokens; never read `.env` files.
 12. **Honesty.** Docs describe what works today and mark everything planned
     as planned. Never invent benchmarks, deploy URLs, release status or
-    check results. The 26 published packages, including `@texuli/mcp`
-    (first published in `0.9.0`), are released on npm in the 0.17 line
+    check results. The 27 published packages, including `@texuli/mcp`
+    (first published in `0.9.0`), are released on npm in the 0.18 line
     (see docs/RELEASE.md; dist-tag `latest`, published by CI through npm
     trusted publishing with provenance; `next` is no longer maintained and
     stays on `0.12.1`); `@texuli/drag`, `@texuli/workflows`,
     `@texuli/deck`, `@texuli/slides`, `@texuli/editor`, `@texuli/document`, `@texuli/pages`,
-    `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets` and `@texuli/mcp`
-    are still in development, and the blueprint spec in
-    `@texuli/spec@0.17.5` is `0.15.0`. `@texuli/examples`, the apps and
-    `native/` publish nothing. 0.17.5 is a pre-1.0 release, not stable
+    `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets`, `@texuli/mcp` and
+    `@texuli/emojis` (first published in `0.18.0`) are still in
+    development, and the blueprint spec in `@texuli/spec@0.18.0` is
+    `0.15.0`. `@texuli/examples`, `@texuli/emoji-assets` (held until its
+    art is approved and licensed), the apps and `native/` publish nothing. 0.18.0 is a pre-1.0 release, not stable
     (1.0.0 will be the first stable release; `latest` tracks the newest
     release). texuli.com deploys from `main` (Cloudflare Pages), with the
     remote MCP at `https://texuli.com/mcp`; the agent service is not

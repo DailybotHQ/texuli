@@ -1,6 +1,6 @@
 {
   "name": "@texuli/forms",
-  "version": "0.17.5",
+  "version": "0.18.0",
   "private": true,
   "description": "Schema-driven forms for Texuli: a closed form schema rendered with texuli components, multi-step flows, conditional logic on @texuli/core/expression, announced validation, drafts and autosave.",
   "keywords": [
@@ -39,6 +39,11 @@
       "svelte": "./src/view/controls/index.ts",
       "default": "./src/view/controls/index.ts"
     },
+    "./builder": {
+      "types": "./src/builder/index.ts",
+      "svelte": "./src/builder/index.ts",
+      "default": "./src/builder/index.ts"
+    },
     "./host": {
       "types": "./src/host/index.ts",
       "default": "./src/host/index.ts"
@@ -49,8 +54,9 @@
     "typecheck": "node ../../scripts/typecheck-svelte.mjs"
   },
   "dependencies": {
-    "@texuli/core": "0.17.5",
-    "texuli": "0.17.5"
+    "@texuli/core": "0.18.0",
+    "@texuli/drag": "0.18.0",
+    "texuli": "0.18.0"
   },
   "peerDependencies": {
     "svelte": "^5.57.2"

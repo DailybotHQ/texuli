@@ -21,6 +21,11 @@ interface OwnProps {
   currentUserId?: string;
   /** Optional renderer for attachments or application-owned rich content. */
   body?: Snippet<[ChatMessage]>;
+  /**
+   * Renders the plain-text runs of a message (for example with emoji art,
+   * `EmojiText`); the default writes them as text. Never receives markup.
+   */
+  text?: Snippet<[string]>;
   footer?: Snippet;
   emptyText?: string;
   locale?: string;
@@ -65,6 +70,7 @@ let {
   messages,
   currentUserId,
   body,
+  text,
   footer,
   emptyText = 'No messages yet. Say hello!',
   locale,
@@ -545,7 +551,7 @@ $effect(() => {
   {#if body}
     {@render body(message)}
   {:else}
-    <MessageText text={message.body} {currentUserId} {locale} />
+    <MessageText text={message.body} {currentUserId} {locale} textRun={text} />
   {/if}
 {/snippet}
 
@@ -641,6 +647,9 @@ $effect(() => {
                   <div class={cx('tx-chat-message', own && 'tx-chat-message--own', message.status === 'failed' && 'tx-chat-message--failed')} data-message-id={message.id}>
                     {@render content(message)}
                   </div>
+                {/if}
+                {#if message.stopped && !message.streaming}
+                  <p class="tx-chat-message-group__status" data-message-stopped={message.id}>{labels.stopped}</p>
                 {/if}
                 {#if !message.streaming && (message.status === 'failed' || (own && message.status && message === group.messages[group.messages.length - 1]))}
                   <p class={cx('tx-chat-message-group__status', message.status === 'failed' && 'tx-chat-message-group__status--failed')}>

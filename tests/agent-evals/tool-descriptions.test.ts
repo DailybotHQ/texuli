@@ -160,7 +160,11 @@ describe('tool descriptions an agent chooses by', () => {
 
   it('serves exactly the registry text on tools/list, so the lint covers what agents read', async () => {
     // Every runtime class, so every operation's listed text is compared.
-    const handle = createMcpHandler({ mode: 'stateless', runtimes: ['edge', 'node', 'site'] });
+    const handle = createMcpHandler({
+      mode: 'stateless',
+      runtimes: ['edge', 'node', 'site'],
+      registry: texuliOps,
+    });
     const answer = (await handle({ jsonrpc: '2.0', id: 1, method: 'tools/list' })) as unknown as {
       result: {
         tools: { name: string; title?: string; description: string; inputSchema: unknown }[];

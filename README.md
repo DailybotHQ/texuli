@@ -39,9 +39,9 @@ Multiplatform twin), an MCP server and an agent skill.
 ![The Texuli website](docs/assets/screenshots/homepage.png)
 
 > **Status: in development, pre-1.0.** The screenshot above is the
-> texuli.com website, which deploys from `main` to Cloudflare Pages. The 26
-> published packages are released on npm in the 0.17 line,
-> every one at `0.17.5` (published by CI through npm trusted publishing with
+> texuli.com website, which deploys from `main` to Cloudflare Pages. The 27
+> published packages are released on npm in the 0.18 line,
+> every one at `0.18.0` (published by CI through npm trusted publishing with
 > provenance; `latest` points to it, and `next` is no longer maintained and
 > stays on `0.12.1`); `0.10.0` added design systems, the 0.11 line added the Protoyard
 > gaps G125–G136 and the Final Review fixes (square theme radii, password
@@ -76,7 +76,11 @@ Multiplatform twin), an MCP server and an agent skill.
 > `0.17.4` is a patch that adds an optional scope and component to those
 > keys, and `0.17.5` is a security patch: the markup serializers check the
 > URL they will write, and toolbar arrow keys move only from toolbar
-> items. It is not a stable release:
+> items; `0.18.0` is a `0.x` minor that adds Markdown and HTML in
+> `@texuli/core` with nine chat formats, Texuli Emojis (`@texuli/emojis`,
+> first published; components show system emoji, and the art package
+> `@texuli/emoji-assets` is not published), new editor, chat, forms and data
+> components, and behavior changes on Markdown edge cases. It is not a stable release:
 > under 0.x a new minor may contain breaking changes, and 1.0.0 will be
 > the first stable release.
 > The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
@@ -232,11 +236,11 @@ every verified command.
 
 ## Honest boundaries
 
-- **No stable release yet.** The 26 published packages are on npm in the
-  0.17 line, a pre-1.0 release (`npm install texuli`; `latest` points to
-  `0.17.5`, and `next` is no longer maintained, see
-  [RELEASE](docs/RELEASE.md#dist-tags)). Under 0.x a new minor (`0.17.0`) may contain breaking
-  changes, so pin the exact version or use `^0.17.0`; 1.0.0 will be the
+- **No stable release yet.** The 27 published packages are on npm in the
+  0.18 line, a pre-1.0 release (`npm install texuli`; `latest` points to
+  `0.18.0`, and `next` is no longer maintained, see
+  [RELEASE](docs/RELEASE.md#dist-tags)). Under 0.x a new minor (`0.18.0`) may contain breaking
+  changes, so pin the exact version or use `^0.18.0`; 1.0.0 will be the
   first stable release.
   The workspace packages stay `private: true` ([RELEASE](docs/RELEASE.md)).
 - **texuli.com deploys from `main`** (Cloudflare Pages). Run it locally with

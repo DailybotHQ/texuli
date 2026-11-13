@@ -1,6 +1,6 @@
 ## Status
 
-Sheets is **in development**. `@texuli/sheets` is on npm as `0.17.5`. Under 0.x a new minor may break. Native evaluation is planned, not built.
+Sheets is **in development**. `@texuli/sheets` is on npm as `0.18.0`. Under 0.x a new minor may break. Native evaluation is planned, not built.
 
 ## Not built
 

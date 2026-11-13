@@ -12,6 +12,7 @@ import {
   normalizeDocsPath,
   type TocEntry,
 } from '../docs-shell/nav.ts';
+import { siteRouteExists } from '../foundation/site-routes.ts';
 import { withSolutionDocsNav } from '../solutions/docs-layout/nav.ts';
 
 export type { DocsNavLink, DocsNavSection, TocEntry };
@@ -86,7 +87,8 @@ export const GUIDES_SECTIONS: readonly DocsNavSection[] = withSolutionDocsNav(
       ],
     },
   ],
-  SOLUTIONS
+  // A Solution's docs join the guides nav once its page ships, so the nav never links a 404.
+  SOLUTIONS.filter((entry) => siteRouteExists(entry.docs))
 );
 
 /** Previous / next for a guides path. */

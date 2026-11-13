@@ -62,6 +62,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     links: [
       { href: '/web-and-native/', label: 'Web + native' },
       { href: '/native/', label: 'Native (Kotlin)' },
+      { href: '/markdown/', label: 'Markdown' },
     ],
   },
   {
@@ -72,6 +73,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
       { href: '/gallery-components/', label: 'Gallery' },
       { href: '/examples/', label: 'Examples' },
       { href: '/editor-page/', label: 'Editor' },
+      { href: '/emoji/', label: 'Emoji' },
       { href: '/drag-page/', label: 'Drag and drop' },
       { href: '/motion-page/', label: 'Motion' },
       // The 0.8.0 feature pages (new in 0.8.0; the new packages are in development).

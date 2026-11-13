@@ -1,0 +1,17 @@
+---
+import PickerLab from '../../components/PickerLab.svelte';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+---
+
+<SiteLayout
+  title="Picker lab"
+  description="Try the accessible EmojiPicker component from texuli/emoji with local catalog search and selection."
+>
+  <p class="eyebrow">Picker lab</p>
+  <h1>Explore the picker</h1>
+  <p class="lead">Search, filter and choose from the same accessible picker used by Texuli components. Recent choices stay in this page's state.</p>
+  <section class="panel picker-lab" data-emoji-picker-lab aria-label="Emoji picker demo">
+    <PickerLab client:load />
+  </section>
+  <p><a href="/">Search the catalog</a> or <a href="/convert/">convert emoji text</a>.</p>
+</SiteLayout>

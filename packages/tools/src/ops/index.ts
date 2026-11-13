@@ -16,14 +16,18 @@ import {
   dsDiff,
   dsImport,
   dsPreview,
-  dsSave,
   dsSuggest,
   dsValidate,
 } from './design-system.ts';
 import { dsAllow } from './design-system-allow.ts';
 import { dsBundle } from './design-system-bundle.ts';
 import { designSystemGenerate } from './design-system-generate.ts';
-import { documentExport, documentRun } from './document.ts';
+import { dsSave } from './design-system-save.ts';
+import { documentRun } from './document.ts';
+import { documentExport } from './document-export.ts';
+import { emojiCategories, emojiGet, emojiSearch, emojiVariants } from './emoji-catalog.ts';
+import { emojiConvertLocal } from './emoji-convert-node.ts';
+import { mdConvert, mdRender } from './markdown.ts';
 import { createOperationRegistry } from './registry.ts';
 import { sitePages, siteRead, siteSearch } from './site.ts';
 import { themeGet, themePreview, themeSearch } from './themes.ts';
@@ -33,6 +37,8 @@ export { ALIASES_REMOVED_IN, TEXULI_ALIASES, TEXULI_REMOVED_NAMES } from './alia
 export { loadOpsCatalog } from './catalog.ts';
 export { DS_INPUT_BYTES, DS_PIXEL_VALUES, MINIMAL_DESIGN_SYSTEM } from './design-system.ts';
 export { EXPORT_COMMANDS, RUN_COMMANDS } from './document.ts';
+export { TEXULI_EDGE_OPERATIONS, texuliEdgeOps } from './edge.ts';
+export { TEXULI_NODE_OPERATION_NAMES } from './node-names.ts';
 export {
   createOperationRegistry,
   defineOperation,
@@ -121,6 +127,13 @@ export const TEXULI_OPERATIONS: readonly Operation[] = Object.freeze([
   deckRun,
   documentRun,
   documentExport,
+  mdConvert,
+  mdRender,
+  emojiSearch,
+  emojiGet,
+  emojiConvertLocal,
+  emojiCategories,
+  emojiVariants,
   sitePages,
   siteRead,
   siteSearch,

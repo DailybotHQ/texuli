@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { texuliOps } from '@texuli/tools/ops';
+import { texuliEdgeOps } from '@texuli/tools/ops';
 import { afterAll, describe, expect, it } from 'vitest';
 import { checkDist } from '../../scripts/solutions-surfaces.ts';
 import { siteRouteExists } from '../../src/components/foundation/nav-data.ts';
@@ -125,7 +125,7 @@ describe('llms.txt sections', () => {
 });
 
 describe('twin notes for demo landings', () => {
-  const served = new Set(texuliOps.list({ runtimes: ['edge'] }).map((op) => op.name));
+  const served = new Set(texuliEdgeOps.list({ runtimes: ['edge'] }).map((op) => op.name));
 
   it('cover each existing landing, name served MCP operations and real package READMEs', () => {
     expect(solutionTwinNotes(none)).toEqual([]);
@@ -137,7 +137,8 @@ describe('twin notes for demo landings', () => {
       expect(note.route.test(entry.route)).toBe(true);
       expect(note.route.test(`${entry.route}x/`)).toBe(false);
       expect(note.demo).toContain(entry.demo.title);
-      for (const op of note.operations) expect(served.has(op), `${entry.slug} ${op}`).toBe(true);
+      const operations = note.operations ?? [];
+      for (const op of operations) expect(served.has(op), `${entry.slug} ${op}`).toBe(true);
       for (const dir of note.packages)
         expect(existsSync(resolve(`packages/${dir}/README.md`)), dir).toBe(true);
       for (const link of note.links) expect(link.href).toBe(entry.docs);

@@ -26,6 +26,12 @@ type Props = {
   trust?: HrefTrust;
   limits?: Partial<EditorLimits>;
   labels?: Partial<EditorLabels>;
+  /** The `:shortcode:` lookup (an emoji catalog's): typed `:name:` becomes its text. None by default. */
+  shortcodes?: (name: string) => string | undefined;
+  /** Use the block-type menu in the toolbar instead of the block buttons. Default false. */
+  blockMenu?: boolean;
+  /** Add the emoji button to the toolbar (loaded on demand). Default false. */
+  emoji?: boolean;
   id?: string;
   label?: string;
   'aria-labelledby'?: string;
@@ -44,6 +50,9 @@ let {
   trust = 'untrusted',
   limits,
   labels,
+  shortcodes,
+  blockMenu = false,
+  emoji = false,
   id,
   label,
   'aria-labelledby': labelledby,
@@ -70,6 +79,7 @@ const editor = untrack(
       trust,
       ...(limits ? { limits } : {}),
       ...(labels ? { labels } : {}),
+      ...(shortcodes ? { shortcodes } : {}),
       announce: (message) => {
         if (typeof document !== 'undefined') getAnnouncer(document).announce(message, 'polite');
       },
@@ -126,7 +136,7 @@ function closeLink() {
 
 <div class={['tx-editor', className]} data-readonly={readonly ? '' : undefined}>
   {#if toolbar && !readonly}
-    <EditorToolbar controller={editor} onCommand={backToText} onLinkRequest={openLink} />
+    <EditorToolbar controller={editor} {blockMenu} {emoji} onCommand={backToText} onLinkRequest={openLink} />
   {/if}
   {#if linkOpen}
     <LinkDialog controller={editor} onClose={closeLink} />

@@ -1,0 +1,56 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+---
+
+<SiteLayout
+  title="Emoji converter"
+  description="Convert Unicode emoji and shortcodes with Texuli canonical or legacy chat aliases. Conflicts and unknown aliases are shown clearly."
+>
+  <p class="eyebrow">Text converter</p>
+  <h1>Convert Unicode and shortcodes</h1>
+  <p class="lead">Choose the shortcode dialect explicitly. Your text stays in this browser.</p>
+  <form class="panel form-stack" data-emoji-converter>
+    <div class="grid-2">
+      <div class="form-field">
+        <label for="direction">Conversion</label>
+        <select id="direction" name="direction">
+          <option value="shortcode-to-unicode">Shortcodes to Unicode</option>
+          <option value="unicode-to-shortcode">Unicode to shortcodes</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label for="dialect">Dialect</label>
+        <select id="dialect" name="dialect">
+          <option value="texuli">Texuli canonical</option>
+          <option value="legacy">Legacy chat aliases</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-field">
+      <label for="conflict-mode">Legacy alias conflicts</label>
+      <select id="conflict-mode" name="mode">
+        <option value="strict">Strict: keep conflicted aliases unchanged</option>
+        <option value="permissive">Permissive: use the documented fallback</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label for="source-text">Text to convert</label>
+      <textarea id="source-text" name="text" data-converter-input spellcheck="false">Ship it :rocket:! :thumbsup:</textarea>
+    </div>
+    <div class="toolbar">
+      <button type="submit">Convert</button>
+      <button class="secondary" type="button" data-copy-output>Copy result</button>
+    </div>
+    <div class="form-field">
+      <label for="converted-output">Result</label>
+      <pre id="converted-output" class="output" data-converter-output aria-live="polite"></pre>
+    </div>
+    <p class="diagnostics" role="status" data-converter-status></p>
+    <ul class="tag-list" aria-label="Conversion diagnostics" data-converter-diagnostics></ul>
+  </form>
+  <p class="note">Texuli canonical shortcodes use CLDR-derived names such as <code>:thumbs_up:</code>. Aliases such as <code>:thumbsup:</code> and <code>:+1:</code> are only enabled by the legacy dialect.</p>
+  <script>
+    import '../scripts/converter.ts';
+    import '../scripts/copy.ts';
+  </script>
+</SiteLayout>

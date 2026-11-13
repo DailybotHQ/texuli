@@ -1,0 +1,9 @@
+---
+import { getSolution } from '../../../../data/solutions/index.ts';
+import SolutionHero from '../../shared/hero/SolutionHero.astro';
+import { EDITOR_HERO } from './hero-content.ts';
+
+const entry = getSolution('editor');
+---
+
+<SolutionHero entry={entry} {...EDITOR_HERO} />

@@ -1,10 +1,28 @@
-// @texuli/chat: the thread, message list, composer and typing indicator exported from this package.
+// @texuli/chat: the thread, message list, composer, typing indicator and attachment card exported from this package.
 
 export {
+  CHAT_ATTACHMENT_LIMITS,
+  ChatAttachment,
+  type ChatAttachmentCheck,
+  type ChatAttachmentLabels,
+  DEFAULT_CHAT_ATTACHMENT_LABELS,
+  runAttachmentCheck,
+} from './attachment/index.ts';
+export {
+  COMPOSER_MAX_SUGGESTIONS,
+  type CommandCandidate,
   Composer,
   type ComposerActionContext,
   type ComposerLabels,
+  type ComposerSuggestion,
+  type ComposerSuggestionSource,
+  commandSuggestions,
   DEFAULT_COMPOSER_LABELS,
+  type EmojiCandidate,
+  emojiSuggestions,
+  type MentionCandidate,
+  mentionSuggestions,
+  rankSuggestions,
   TypingIndicator,
   type TypingLabels,
 } from './composer/index.ts';

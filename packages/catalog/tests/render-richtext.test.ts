@@ -239,12 +239,14 @@ describe('renderRichText', () => {
     ]);
   });
 
-  it('keeps the old line-terminator rule for padded code spans', () => {
-    // `/^ .* $/` never matched across U+2028 or U+2029, so the padding stays.
+  it('strips code span padding by the CommonMark rule (PLAN_023 T-md-adopt)', () => {
+    // Read by the shared parser (ADR-034): one space is stripped from each side whenever both
+    // sides are spaces and not every character is, U+2028 or U+2029 inside included. Before,
+    // `/^ .* $/` never matched across U+2028 or U+2029 and the padding stayed.
     for (const [source, value] of [
       ['` a `', 'a'],
-      ['` a\u2028b `', ' a\u2028b '],
-      ['` a\u2029b `', ' a\u2029b '],
+      ['` a\u2028b `', 'a\u2028b'],
+      ['` a\u2029b `', 'a\u2029b'],
       ['` a\nb `', 'a b'],
       ['`  `', '  '],
     ] as const) {

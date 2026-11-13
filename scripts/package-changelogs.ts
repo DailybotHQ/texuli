@@ -10,6 +10,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, posix, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { UNRELEASED_PACKAGES } from './release-line.ts';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const RELEASE_DOC = 'docs/RELEASE.md';
@@ -326,7 +327,7 @@ function publishedPackages(root: string): WorkspacePkg[] {
       };
       return { dir: entry.name, name: String(manifest.name ?? '') };
     })
-    .filter((pkg) => pkg.name !== NEVER_PACKED)
+    .filter((pkg) => pkg.name !== NEVER_PACKED && !UNRELEASED_PACKAGES.has(pkg.name))
     .sort((a, b) => a.dir.localeCompare(b.dir));
 }
 

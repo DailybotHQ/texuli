@@ -1,0 +1,6 @@
+name = "emojiparser-com"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-11-12"
+
+# Prepared for the owner checkpoint only. This file does not create a Pages
+# project, attach the domain, change DNS or deploy the site.

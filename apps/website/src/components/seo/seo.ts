@@ -243,6 +243,7 @@ export interface OgArea {
 const OG_AREAS: readonly (readonly [prefix: string, area: OgArea])[] = [
   ['/native/', { label: 'Native', accent: '#fb923c' }],
   ['/web-and-native/', { label: 'Architecture', accent: '#22d3ee' }],
+  ['/markdown/', { label: 'Architecture', accent: '#22d3ee' }],
   ['/architecture/', { label: 'Architecture', accent: '#22d3ee' }],
   ['/primitives-page/', { label: 'Primitives', accent: '#a78bfa' }],
   ['/guides/', { label: 'Guides', accent: '#34d399' }],
@@ -257,6 +258,7 @@ const OG_AREAS: readonly (readonly [prefix: string, area: OgArea])[] = [
   ['/examples/', { label: 'Components', accent: '#60a5fa' }],
   ['/slides-page/', { label: 'Components', accent: '#60a5fa' }],
   ['/editor-page/', { label: 'Components', accent: '#60a5fa' }],
+  ['/emoji/', { label: 'Components', accent: '#60a5fa' }],
   ['/motion-page/', { label: 'Components', accent: '#60a5fa' }],
   ['/documents-page/', { label: 'Components', accent: '#60a5fa' }],
   ['/forms-page/', { label: 'Components', accent: '#60a5fa' }],

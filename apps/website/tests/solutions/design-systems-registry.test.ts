@@ -6,7 +6,7 @@ import { ecosystemNavGroups, solutionNavLinks } from '../../src/components/found
 import { GUIDES_SECTIONS } from '../../src/components/guides/nav.ts';
 import { DESIGN_SYSTEMS_DEMO_LIMITS } from '../../src/components/solutions/design-systems/demo/demo-content.ts';
 import { DEMO_BRAND_INPUTS } from '../../src/components/solutions/design-systems/demo/fixtures/brands.ts';
-import { getSolution, SOLUTIONS } from '../../src/data/solutions/index.ts';
+import { getSolution } from '../../src/data/solutions/index.ts';
 import { validateSolutionRegistry } from '../../src/data/solutions/validate.ts';
 import {
   registryLlmsSections,
@@ -43,7 +43,7 @@ describe('Design systems Solution registry wiring (ADR-033)', () => {
   });
 
   it('flows into the catalog, footer navigation, JSON, llms and Markdown twin data', () => {
-    expect(SOLUTIONS.at(-1)).toEqual(entry);
+    expect(getSolution('design-systems')).toEqual(entry);
     expect(solutionNavLinks()).toContainEqual({ href: entry.route, label: entry.name });
     expect(GUIDES_SECTIONS.flatMap((section) => section.items).map((item) => item.href)).toContain(
       entry.docs

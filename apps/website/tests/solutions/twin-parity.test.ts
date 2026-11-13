@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { texuliOps } from '@texuli/tools/ops';
+import { texuliEdgeOps } from '@texuli/tools/ops';
 import { describe, expect, it } from 'vitest';
 import { agentNoteMarkdown } from '../../src/components/docs/twin-notes.ts';
 import { renderTwin } from '../../src/components/docs/twins.ts';
@@ -11,7 +11,7 @@ import { registryRoutes } from '../../src/lib/twins/solutions.ts';
 const ORIGIN = 'https://texuli.com';
 const REPOSITORY = 'https://github.com/DailybotHQ/texuli/blob/main';
 const WEBSITE = resolve(import.meta.dirname, '../..');
-const OPERATIONS = texuliOps
+const OPERATIONS = texuliEdgeOps
   .list({ runtimes: ['edge'] })
   .map(({ name, title }) => ({ name, title }));
 

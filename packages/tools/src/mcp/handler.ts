@@ -19,18 +19,19 @@
  */
 
 import { checkBlueprintAllow } from '@texuli/spec/design-system';
+import { texuliEdgeOps } from '../ops/edge.ts';
+import { TEXULI_NODE_OPERATION_NAMES } from '../ops/node-names.ts';
+import type { OperationRegistry } from '../ops/registry.ts';
 import {
   type InvokeFailure,
   LOCAL_RUNTIMES,
   type LocalFiles,
   type Operation,
   type OperationAnnotations,
-  type OperationRegistry,
   type OperationRuntime,
   type SiteContext,
-  TOOLS_VERSION,
-  texuliOps,
-} from '../ops/index.ts';
+} from '../ops/types.ts';
+import { TOOLS_VERSION } from '../ops/version.ts';
 import { TEXULI_PROMPTS } from './prompts.ts';
 import {
   type JsonObject,
@@ -58,7 +59,7 @@ export interface McpCapabilityOptions {
 }
 
 export interface McpHandlerOptions {
-  /** The operations served as tools (default: every Texuli operation). */
+  /** The operations served as tools (default: the edge registry, never node-only modules). */
   registry?: OperationRegistry;
   /** `stateful` (stdio, the default) keeps the initialization gate; `stateless` (HTTP) never requires it. */
   mode?: McpMode;
@@ -97,7 +98,7 @@ const MAX_VERSION_LENGTH = 64;
 const DEFAULT_ARGUMENT_LENGTH = 10_000;
 
 const INSTRUCTIONS =
-  "Texuli is a Svelte 5 component library with a closed agent catalog. Tools are group.verb operations: search the component catalog (catalog.search), read manifests (component.get) and worked examples (example.search), list content block types and read the shape and examples of each (block.list, block.schema), validate blueprint drafts (blueprint.validate) and catalog manifests, search, read and preview themes with their WCAG AA report, author design systems (ds.generate returns a draft and its loss, repair and guarantee report; ds.validate, ds.compile, ds.contrast, ds.suggest, ds.import, ds.diff, ds.preview, and blueprint.theme apply one to a blueprint), and run deck and document commands. Every tool states its limits and returns structured JSON; failures are isError results with a stable code (invalid-input, input-too-large, not-found, runtime-unavailable, timeout …), and a refused design system is a valid: false result with the spec's codes and JSON paths. Resources: texuli://catalog, texuli://llms/full, texuli://component/{id}, texuli://docs/{slug}, texuli://theme/{id}, texuli://design-system/{id} and texuli://schema/{name}. Prompts build-ui, theme-blueprint, create-design-system and convert-deck walk through the main jobs. The remote endpoint also lists site.pages, site.read and site.search, which list, read (as Markdown) and search the pages of texuli.com. The 0.8 tool names (catalog, component, validate, example, theme, deck, document) were removed in 0.10.0; a call names the operation to use instead. Nothing reaches the network; the only write is ds.save, on the local server, to an explicit path inside the working directory.";
+  "Texuli is a Svelte 5 component library with a closed agent catalog. Tools are group.verb operations: search the component catalog (catalog.search), read manifests (component.get) and worked examples (example.search), list content block types and read the shape and examples of each (block.list, block.schema), validate blueprint drafts (blueprint.validate) and catalog manifests, search, read and preview themes with their WCAG AA report, author design systems (ds.generate returns a draft and its loss, repair and guarantee report; ds.validate, ds.compile, ds.contrast, ds.suggest, ds.import, ds.diff, ds.preview, and blueprint.theme apply one to a blueprint), run deck and document commands, convert or render untrusted Markdown, HTML and chat dialects (md.convert, md.render), and convert Texuli emoji shortcodes (emoji.convert). Search, look up and list the closed emoji catalog (emoji.search, emoji.get, emoji.categories, emoji.variants) on the local MCP. Every tool states its limits and returns structured JSON; failures are isError results with a stable code (invalid-input, input-too-large, not-found, runtime-unavailable, timeout …), and a refused design system is a valid: false result with the spec's codes and JSON paths. Resources: texuli://catalog, texuli://llms/full, texuli://component/{id}, texuli://docs/{slug}, texuli://theme/{id}, texuli://design-system/{id} and texuli://schema/{name}. Prompts build-ui, theme-blueprint, create-design-system and convert-deck walk through the main jobs. The remote endpoint also lists site.pages, site.read and site.search, which list, read (as Markdown) and search the pages of texuli.com. The 0.8 tool names (catalog, component, validate, example, theme, deck, document) were removed in 0.10.0; a call names the operation to use instead. Nothing reaches the network; the only write is ds.save, on the local server, to an explicit path inside the working directory.";
 
 type Failure = { code: number; message: string; data?: unknown };
 class RpcFailure extends Error {
@@ -319,7 +320,7 @@ const variableOf = (template: McpResourceTemplate) =>
  * offered.
  */
 export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
-  const registry = options.registry ?? texuliOps;
+  const registry = options.registry ?? texuliEdgeOps;
   const mode = options.mode ?? 'stateful';
   const runtimes = options.runtimes ?? LOCAL_RUNTIMES;
   const pageSize = Math.max(1, Math.floor(options.pageSize ?? DEFAULT_PAGE_SIZE));
@@ -345,7 +346,7 @@ export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
   const tools: JsonObject[] = served.map((operation) => ({
     name: operation.name,
     title: operation.title,
-    description: registry.describe(operation.name),
+    description: registry.describe(operation.name) ?? operation.summary,
     inputSchema: operation.input,
     outputSchema: operation.output,
     annotations: hints(operation.annotations),
@@ -382,11 +383,30 @@ export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
     if (!isObject(params) || typeof params.name !== 'string')
       throw invalidParams('tools/call requires params.name, a tool name from tools/list.');
     const name = params.name;
-    if (name.length > MAX_NAME_LENGTH || registry.describe(name) === undefined)
+    if (name.length > MAX_NAME_LENGTH)
+      throw invalidParams(
+        `Unknown tool: ${name.slice(0, MAX_NAME_LENGTH)}. List tools with tools/list.`
+      );
+    if (registry.describe(name) === undefined) {
+      if (TEXULI_NODE_OPERATION_NAMES.includes(name)) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: `${name} needs the node runtime, which this server does not provide. Call it on the local MCP (npx -y @texuli/mcp).`,
+                code: 'runtime-unavailable',
+              }),
+            },
+          ],
+          isError: true,
+        };
+      }
       throw invalidParams(
         registry.removedMessage(name) ??
           `Unknown tool: ${name.slice(0, MAX_NAME_LENGTH)}. List tools with tools/list.`
       );
+    }
     const outcome = await registry.invoke(name, params.arguments ?? {}, {
       runtimes,
       ...(site ? { site } : {}),

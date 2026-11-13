@@ -58,6 +58,10 @@ describe('ADR-031 landing nav contract', () => {
       'canvas',
       'sheets',
       'design-systems',
+      'dashboards',
+      'forms',
+      'agent-chat',
+      'editor',
     ]);
     const links = solutionNavLinks();
     for (const slug of SOLUTION_SLUGS) {

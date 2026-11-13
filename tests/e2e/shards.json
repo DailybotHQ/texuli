@@ -13,9 +13,12 @@
       "responsive-sweep.spec.ts",
       "site-built-with.spec.ts",
       "site-docs-shell.spec.ts",
+      "site-emoji.spec.ts",
       "site-drag-workflows.spec.ts",
       "site-editor.spec.ts",
       "site-sheets.spec.ts",
+      "site-solution-agent-chat.spec.ts",
+      "site-solution-dashboards.spec.ts",
       "texuli-polish.spec.ts"
     ],
     [
@@ -32,6 +35,7 @@
       "site-forms.spec.ts",
       "site-perf.spec.ts",
       "site-seo.spec.ts",
+      "site-solution-forms.spec.ts",
       "theme-scopes.spec.ts",
       "toaster-viewport.spec.ts"
     ],
@@ -62,17 +66,18 @@
       "a11y-site-solutions.spec.ts",
       "a11y-slides.spec.ts",
       "data.spec.ts",
-      "slides-print.spec.ts",
+      "editor-extras.spec.ts",
       "site-agent-chat.spec.ts",
       "site-canvas.spec.ts",
       "site-color-explorer.spec.ts",
+      "site-csp.spec.ts",
+      "site-developers.spec.ts",
+      "site-ds-studio.spec.ts",
       "site-foundation.spec.ts",
       "site-theme-studio.spec.ts",
-      "site-ds-studio.spec.ts",
       "site-webmcp.spec.ts",
-      "ssr.spec.ts",
-      "site-developers.spec.ts",
-      "site-csp.spec.ts"
+      "slides-print.spec.ts",
+      "ssr.spec.ts"
     ],
     [
       "code-field.spec.ts",
@@ -89,6 +94,7 @@
       "site-native.spec.ts",
       "site-output.spec.ts",
       "site-slides.spec.ts",
+      "site-solution-editor.spec.ts",
       "site-visual.spec.ts"
     ],
     [

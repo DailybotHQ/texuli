@@ -1,0 +1,16 @@
+---
+/**
+ * `/guides/solutions/forms/` — Forms technical docs (ADR-028). Content lives in
+ * `src/content/solution-docs/forms/`; `SolutionDocsPage` renders it.
+ */
+import SolutionDocsPage from '../../../../components/solutions/docs-layout/SolutionDocsPage.astro';
+import { loadFormsDocs } from '../../../../content/solution-docs/forms/index.ts';
+import { getSolution } from '../../../../data/solutions/index.ts';
+---
+
+<SolutionDocsPage
+  entry={getSolution('forms')}
+  title="Forms docs"
+  description="Install and use @texuli/forms schemas, conditions, steps and drafts. The visual builder is in development and is planned for the next release."
+  sections={loadFormsDocs()}
+/>

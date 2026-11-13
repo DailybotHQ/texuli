@@ -43,9 +43,11 @@ import {
 import {
   applyComposition,
   applyInputRules,
+  blockKindAt,
   deleteBackward,
   deleteForward,
   deleteSelection,
+  type EditorBlockKindChoice,
   type EditorTransformOptions,
   insertBlock,
   insertBreak,
@@ -53,6 +55,7 @@ import {
   liftListItem,
   removeLink,
   replaceSelection,
+  setBlockKind,
   setBlockType,
   setLink,
   sinkListItem,
@@ -64,7 +67,7 @@ import {
 } from '@texuli/core/editor-transforms';
 import { type HrefTrust, resolveTrust } from '@texuli/core/url-policy';
 import { type ClipboardLike, type PasteResult, readClipboard } from '../paste/index.ts';
-import { DEFAULT_EDITOR_LABELS, type EditorLabels } from './labels.ts';
+import { blockKindLabel, DEFAULT_EDITOR_LABELS, type EditorLabels } from './labels.ts';
 
 export interface EditorControllerOptions {
   /** The starting document (validated by the caller: `loadEditorDocument` or `fromMarkdown`). */
@@ -78,6 +81,11 @@ export interface EditorControllerOptions {
   limits?: Partial<EditorLimits>;
   newId?: EditorIdSource;
   labels?: Partial<EditorLabels>;
+  /**
+   * The `:shortcode:` input rule's lookup: typed `:name:` becomes the returned text (an emoji).
+   * The editor carries no emoji data; pass an emoji catalog's lookup. None by default.
+   */
+  shortcodes?: (name: string) => string | undefined;
   /** Where announcements go (the surface passes the core announcer). */
   announce?: (message: string) => void;
   /** Every accepted change of the document. */
@@ -132,7 +140,11 @@ export class EditorController {
     this.labels = { ...DEFAULT_EDITOR_LABELS, ...options.labels };
     this.trust = resolveTrust(options.trust ?? 'untrusted');
     const newId = options.newId ?? nextEditorId;
-    this.transform = { newId, ...(options.limits ? { limits: options.limits } : {}) };
+    this.transform = {
+      newId,
+      ...(options.limits ? { limits: options.limits } : {}),
+      ...(options.shortcodes ? { shortcodes: options.shortcodes } : {}),
+    };
     this.now = options.now ?? (() => Date.now());
     const doc = normalizeDocument(options.doc ?? emptyEditorDocument(newId), newId);
     this.history = createEditorHistory({ doc, selection: startSelection(doc) });
@@ -318,6 +330,23 @@ export class EditorController {
     );
   }
 
+  /** The kind the block-type menu shows at the caret (list, then quote, then the block). */
+  get blockKind(): EditorBlockKindChoice | null {
+    return blockKindAt(this.state);
+  }
+
+  /**
+   * Set the caret's block kind from the block-type menu: one undoable step, announced with the
+   * kind's name. Lists and quotes around the caret are left when a plain block is chosen.
+   */
+  setBlockKind(kind: EditorBlockKindChoice): boolean {
+    return this.apply(
+      setBlockKind(this.state, kind, this.transform),
+      'other',
+      blockKindLabel(this.labels, kind)
+    );
+  }
+
   toggleQuote(): boolean {
     return this.apply(toggleQuote(this.state, this.transform), 'other', this.labels.quote);
   }
@@ -371,6 +400,25 @@ export class EditorController {
     return this.apply(removeLink(this.state, this.transform));
   }
 
+  /**
+   * Insert an emoji (or any short text) from a picker at the selection: its own undo step, not
+   * grouped with typing, and no input rules run on it.
+   */
+  insertEmoji(text: string): boolean {
+    if (typeof text !== 'string' || text === '' || text.length > 32 || /[\n\r]/.test(text))
+      return false;
+    return this.apply(insertText(this.state, text, this.transform), 'other');
+  }
+
+  /**
+   * Replace the `:shortcode:` lookup after construction (an emoji catalog that loads lazily).
+   * `undefined` turns the rule off.
+   */
+  setShortcodes(lookup: ((name: string) => string | undefined) | undefined): void {
+    if (lookup) this.transform.shortcodes = lookup;
+    else delete this.transform.shortcodes;
+  }
+
   /** Type text: one typing step, then any input rule as its own step. */
   insertText(text: string): boolean {
     if (!this.apply(insertText(this.state, text, this.transform), 'typing')) return false;
@@ -379,13 +427,36 @@ export class EditorController {
     return true;
   }
 
-  /** Paste clipboard data as untrusted content; announces what happened. */
+  /** Paste clipboard data as untrusted content; announces what happened. Plain text stays plain. */
   paste(data: ClipboardLike): PasteResult {
-    const pasted = readClipboard(data, this.transform);
+    return this.insertPasted(readClipboard(data, this.transform));
+  }
+
+  /**
+   * "Paste as Markdown" (EDITOR_ARCHITECTURE section 8): `text` read by the Markdown codec at the
+   * `untrusted` tier and inserted as one step. The codec loads on first use, so editors that
+   * never paste Markdown do not carry it.
+   */
+  async pasteMarkdown(text: string): Promise<PasteResult> {
+    const { importMarkdown } = await import('../markdown/index.ts');
+    return this.insertPasted(importMarkdown(text, this.transform));
+  }
+
+  private insertPasted(pasted: PasteResult): PasteResult {
     if (pasted.source === 'empty') return pasted;
     const ok = this.apply(replaceSelection(this.state, pasted.doc, this.transform));
-    if (ok) this.say(this.labels.pasted(pasted.blocks, pasted.linksRemoved));
+    if (ok)
+      this.say(
+        pasted.source === 'markdown'
+          ? this.labels.pastedMarkdown(pasted.blocks, pasted.linksRemoved)
+          : this.labels.pasted(pasted.blocks, pasted.linksRemoved)
+      );
     return pasted;
+  }
+
+  /** Announce through the editor's live region (for surfaces and hosts). */
+  announce(message: string): void {
+    this.say(message);
   }
 
   /** A key intent from `editor-keymap`. Returns whether it was handled (so the surface prevents the default). */
