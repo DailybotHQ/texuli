@@ -72,11 +72,7 @@ describe('publishManifest', () => {
             './theme.css': './src/theme.css',
           },
           bin: { 'demo-cli': './src/cli.ts' },
-          dependencies: {
-            '@texuli/core': 'workspace:*',
-            '@texuli/emojis': '0.0.0',
-            'example-lib': '^1.2.3',
-          },
+          dependencies: { '@texuli/core': 'workspace:*', 'example-lib': '^1.2.3' },
           peerDependencies: { svelte: '^5.57.2' },
         }),
         versions

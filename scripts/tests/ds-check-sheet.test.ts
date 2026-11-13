@@ -16,7 +16,7 @@ describe('the built-in ds-check sheet (D-G-013)', () => {
   it('packs into @texuli/tools beside render.js as one self-contained page with its license notices; a broken page is refused', async () => {
     expect(DS_CHECK_SHEET_PAGE).toBe(DS_CHECK_SHEET_PATH);
     expect(DS_CHECK_SHEET_DIST).toBe(join('ds-check', 'sheet'));
-    expect(PACKAGE_ASSETS.tools).toBeDefined();
+    expect(Object.keys(PACKAGE_ASSETS)).toEqual(['tools', 'emoji-assets']);
     const dist = mkdtempSync(join(tmpdir(), 'texuli-ds-sheet-'));
     try {
       expect(await PACKAGE_ASSETS.tools?.(dist, process.cwd())).toEqual([]);

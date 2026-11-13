@@ -46,7 +46,6 @@ import { fileURLToPath } from 'node:url';
 import { buildDsCheckHost, DS_CHECK_HOST_DIST } from './ds-check-host.ts';
 import { buildDsCheckSheet, DS_CHECK_SHEET_DIST } from './ds-check-sheet.ts';
 import { CHANGELOG_FILE, changelogForPackage } from './package-changelogs.ts';
-import { UNRELEASED_PACKAGES } from './release-line.ts';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -231,9 +230,6 @@ function pinWorkspace(deps: unknown, versions: ReadonlyMap<string, string>, prob
   const out: { [key: string]: Json } = {};
   for (const [name, range] of Object.entries(deps)) {
     if (typeof range !== 'string') continue;
-    // A first-release workspace package is intentionally absent from the
-    // publish-ready dependency graph until its owner opens that release.
-    if (UNRELEASED_PACKAGES.has(name)) continue;
     let pinned = range;
     if (range.startsWith('workspace:')) {
       const version = versions.get(name);
@@ -797,10 +793,7 @@ export async function verifyPackages(
     } else {
       const expected = changelogForPackage(pkg.name, releaseNotes);
       const changelog = join(root, 'packages', pkg.dir, CHANGELOG_FILE);
-      if (UNRELEASED_PACKAGES.has(pkg.name)) {
-        // The source generator intentionally omits first-release packages;
-        // still stage the derived changelog so the tarball is complete.
-      } else if (!existsSync(changelog)) {
+      if (!existsSync(changelog)) {
         problems.push(
           `changelog: missing ${CHANGELOG_FILE} (run pnpm exec tsx scripts/package-changelogs.ts --write)`
         );
