@@ -22,6 +22,12 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
   The router lists the new packages and entries, and the components
   install reference marks them new in `0.18.0`.
 
+## [0.4.8] — 2026-11-12
+
+### Changes
+
+- chore(skill): packages on npm at 0.17.5
+
 - The packages are on npm at `0.17.5`, a security patch (blueprint spec
   stays `0.15.0`): the markup URL check runs on the value the serializers
   write, and toolbar keys move only from toolbar items. The components
