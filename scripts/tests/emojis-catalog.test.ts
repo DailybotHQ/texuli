@@ -101,5 +101,5 @@ describe('Emoji 18.0 generated catalog', () => {
     for (const [name, expected] of Object.entries(generated)) {
       expect(readFileSync(outputPath(name), 'utf8'), name).toBe(expected);
     }
-  });
+  }, 60_000); // regenerates 3,963 records and formats the JSON with Biome
 });
