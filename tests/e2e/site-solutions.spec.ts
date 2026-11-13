@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test';
+import { SOLUTIONS } from '../../apps/website/src/data/solutions/index.ts';
 import { serveDist, settle } from './support/site.ts';
 
 /*
@@ -16,9 +17,15 @@ import { serveDist, settle } from './support/site.ts';
  */
 
 const origin = serveDist();
-const SLUGS = ['slides', 'documents', 'workflows', 'canvas', 'sheets'] as const;
-/** Every registry card in order: the five PLAN_015 landings plus design systems (ADR-033). */
-const CATALOG = [...SLUGS, 'design-systems'] as const;
+/** Every registry card in catalog order: the cards follow the registry, never a literal. */
+const CATALOG = SOLUTIONS.map((entry) => entry.slug);
+/** A Solution is in the Native filter when a native target is past planned (catalog-content.ts). */
+const onNative = (entry: (typeof SOLUTIONS)[number]) =>
+  entry.platforms.some((row) => row.platform !== 'web' && row.status !== 'planned');
+/** The web-only Solutions: their landings and the Web filter, hidden by the Native filter. */
+const WEB_ONLY = SOLUTIONS.filter((entry) => !onNative(entry));
+const SLUGS = WEB_ONLY.map((entry) => entry.slug);
+const NATIVE = SOLUTIONS.filter(onNative).map((entry) => entry.slug);
 const SECTIONS = [
   'hero',
   'demo',
@@ -61,10 +68,12 @@ test('/solutions/ lists every card and the All, Web and Native filters work', as
     await cards.evaluateAll((all) => all.map((el) => el.getAttribute('data-solution')))
   ).toEqual([...CATALOG]);
   // Design systems also paint natively (the Kotlin twin applies design-system tokens).
-  await expect(catalog.locator('[data-solution="design-systems"]')).toHaveAttribute(
-    'data-on-native',
-    'true'
-  );
+  expect(NATIVE).toContain('design-systems');
+  for (const slug of NATIVE)
+    await expect(catalog.locator(`[data-solution="${slug}"]`)).toHaveAttribute(
+      'data-on-native',
+      'true'
+    );
   for (const slug of SLUGS) {
     const card = catalog.locator(`[data-solution="${slug}"]`);
     await expect(card).toBeVisible();
@@ -89,7 +98,8 @@ test('/solutions/ lists every card and the All, Web and Native filters work', as
   await filters.getByRole('link', { name: /Native/ }).click();
   await expect.poll(() => page.evaluate(() => window.location.hash)).toBe('#solutions-native');
   for (const slug of SLUGS) await expect(catalog.locator(`[data-solution="${slug}"]`)).toBeHidden();
-  await expect(catalog.locator('[data-solution="design-systems"]')).toBeVisible();
+  for (const slug of NATIVE)
+    await expect(catalog.locator(`[data-solution="${slug}"]`)).toBeVisible();
 
   await filters.getByRole('link', { name: /All/ }).click();
   await expect.poll(() => page.evaluate(() => window.location.hash)).toBe('#solutions-all');
@@ -111,7 +121,7 @@ test('/solutions/index.json is the registry document', async () => {
   expect(doc.catalog).toBe('https://texuli.com/solutions/');
   expect(doc.solutions.map((row) => row.slug)).toEqual([...CATALOG]);
   for (const row of doc.solutions) {
-    expect(row.status).toBe(row.slug === 'design-systems' ? 'available' : 'in development');
+    expect(row.status).toBe(SOLUTIONS.find((entry) => entry.slug === row.slug)?.status);
     expect(row.url).toBe(`https://texuli.com/solutions/${row.slug}/`);
     expect(row.docs).toBe(`https://texuli.com/guides/solutions/${row.slug}/`);
   }
@@ -168,8 +178,7 @@ test('the footer Solutions and Built with columns link only existing routes', as
     'href',
     '/solutions/'
   );
-  for (const slug of SLUGS) {
-    const name = slug[0]?.toUpperCase() + slug.slice(1);
+  for (const { slug, name } of SOLUTIONS) {
     await expect(solutions.getByRole('link', { name, exact: true })).toHaveAttribute(
       'href',
       `/solutions/${slug}/`

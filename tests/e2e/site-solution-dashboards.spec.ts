@@ -50,7 +50,9 @@ test('the landing renders its sections, registry status and server preview witho
   const html = (await response?.text()) ?? '';
   expect(html).toContain('data-tx-dashboards-demo');
   expect(html).toContain('data-tx-solution-status="in development"');
-  expect(html).toContain('not on npm yet');
+  // 0.18.0 published FilterBar and MetricCard: the honest note names that release.
+  expect(html).toContain('were released in @texuli/data 0.18.0');
+  expect(html).not.toContain('not on npm yet');
   expect(html).toMatch(/<astro-island[^>]+client="visible"/);
   await settle(page);
 
