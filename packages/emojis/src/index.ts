@@ -1,4 +1,4 @@
-import sequenceRows from './data/unicode-index.json' with { type: 'json' };
+import { SEQUENCE_ROWS } from './data/unicode-index.ts';
 
 export type EmojiDialect = 'texuli' | 'legacy';
 export type EmojiParseMode = 'strict' | 'permissive';
@@ -30,7 +30,7 @@ interface TrieNode {
 const root: TrieNode = { children: new Map() };
 const canonicalById = new Map<string, { unicode: string; shortcode: string }>();
 const idByShortcode = new Map<string, string>();
-for (const row of sequenceRows as SequenceRow[]) {
+for (const row of SEQUENCE_ROWS as readonly SequenceRow[]) {
   const [unicode, id, shortcode] = row;
   if (!unicode || !id || !shortcode) continue;
   if (!canonicalById.has(id)) canonicalById.set(id, { unicode, shortcode });

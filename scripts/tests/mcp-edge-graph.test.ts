@@ -100,6 +100,16 @@ describe('functions/mcp import graph', () => {
     ).toBe(false);
   });
 
+  it('uses no import attributes, which the Cloudflare Pages Functions build cannot parse', () => {
+    // Cloudflare builds functions/ with its own Wrangler (3.x in November 2026), whose esbuild
+    // rejects `with { type: 'json' }`; the 0.18.0 deploy failed on exactly that.
+    const { files } = walk(ENTRY);
+    const withAttributes = files.filter((file) =>
+      /\bfrom\s+['"][^'"]+['"]\s+(?:with|assert)\s*\{/.test(readFileSync(file, 'utf8'))
+    );
+    expect(withAttributes.map((file) => relative(ROOT, file))).toEqual([]);
+  });
+
   it('starts at the Pages Function entry', () => {
     expect(isAbsolute(ENTRY)).toBe(true);
     expect(existsSync(ENTRY)).toBe(true);
