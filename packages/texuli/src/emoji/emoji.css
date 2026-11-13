@@ -22,7 +22,7 @@
     min-inline-size: 0;
     color: var(--tx-foreground, CanvasText);
     background: var(--tx-surface, Canvas);
-    font-family: var(--tx-type-body-family, inherit);
+    font-family: var(--tx-type-body-family);
   }
 
   .tx-emoji-picker__search-label {
