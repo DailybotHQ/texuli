@@ -74,7 +74,9 @@ test('the editor landing renders its registry status, honest copy and one island
   expect(response?.status()).toBe(200);
   const html = (await response?.text()) ?? '';
   expect(html).toContain('data-tx-solution-status="in development"');
-  expect(html).toContain('not in a published release yet');
+  // 0.18.0 published the editor extras: the package notes name that release.
+  expect(html).toContain('HTML paste through @texuli/core/html released in 0.18.0');
+  expect(html).not.toContain('not in a published release yet');
   expect(html).toMatch(/<astro-island[^>]+client="visible"/);
   await settle(page);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(

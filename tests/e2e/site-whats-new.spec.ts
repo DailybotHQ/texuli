@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
+import { FEATURES, RELEASES } from '../../apps/website/src/components/whats-new/features.ts';
 import {
   AXE_TAGS,
   expectMode,
@@ -67,8 +68,9 @@ test('every feature by release, each demo working, links that resolve; axe light
   await page.goto(`${origin()}/whats-new/`);
   await settle(page);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('What’s new in Texuli');
-  await expect(page.locator('[data-hub-release]')).toHaveCount(12);
-  await expect(page.locator('[data-hub-feature]')).toHaveCount(24);
+  // One block per release and one card per feature, as features.ts lists them (0.6.0 to 0.18.0).
+  await expect(page.locator('[data-hub-release]')).toHaveCount(RELEASES.length);
+  await expect(page.locator('[data-hub-feature]')).toHaveCount(FEATURES.length);
   await expect(page.locator('[data-hub-release="0.8.0"] .hub__status')).toContainText(
     'Published on npm as 0.8.0'
   );
@@ -132,7 +134,7 @@ test('every feature by release, each demo working, links that resolve; axe light
   const hrefs = await page
     .locator('[data-hub-feature] .hub__more a')
     .evaluateAll((links) => links.map((link) => link.getAttribute('href') ?? ''));
-  expect(hrefs).toHaveLength(24);
+  expect(hrefs).toHaveLength(FEATURES.length);
   for (const href of new Set(hrefs.map((href) => href.replace(/#.*$/, '')))) {
     const response = await page.request.get(`${origin()}${href}`);
     expect(response.status(), href).toBe(200);

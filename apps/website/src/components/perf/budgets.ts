@@ -96,8 +96,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/documents-page/',
     reason:
-      'PLAN_010 T-site-070: three lazy document islands (client:visible) that import the editor, the reader, the paged view, the collaboration layer, the writers and the player only after they hydrate, so JS at the ready signal is 57.6 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk those islands can import lazily (pages, editor, player loaders, charts): 69.5 KB of CSS, the same follow-up as /motion-page/ and /slides-page/. Measured 2026-10-29: 147.5 KB page (+4% headroom). PLAN_011 T-ar-discovery (2026-10-30): already at 154.2 KB on release/0.9.0 before this change, and every page now carries <link rel="ai-catalog"> (about 0.1 KB): measured 154.3 KB, limit 161 (+4% headroom). PLAN_011 (token-driven components and design-system wiring through 0.10.0): measured 161.2 KB page on 2026-10-31 (+4% headroom). PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (28.6 KB of WebP on open, logo included); measured 167.3 KB page, limit 174 (+4% headroom). 0.15.0 (2026-11-09): pageGzipKb measured 174.4 KB with the 194-id catalog, limit +4%.',
-    budget: { pageGzipKb: 182 },
+      'PLAN_010 T-site-070: three lazy document islands (client:visible) that import the editor, the reader, the paged view, the collaboration layer, the writers and the player only after they hydrate, so JS at the ready signal is 57.6 KB, inside the default. The page total is Astro hoisting into <head> the CSS of every chunk those islands can import lazily (pages, editor, player loaders, charts): 69.5 KB of CSS, the same follow-up as /motion-page/ and /slides-page/. Measured 2026-10-29: 147.5 KB page (+4% headroom). PLAN_011 T-ar-discovery (2026-10-30): already at 154.2 KB on release/0.9.0 before this change, and every page now carries <link rel="ai-catalog"> (about 0.1 KB): measured 154.3 KB, limit 161 (+4% headroom). PLAN_011 (token-driven components and design-system wiring through 0.10.0): measured 161.2 KB page on 2026-10-31 (+4% headroom). PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (28.6 KB of WebP on open, logo included); measured 167.3 KB page, limit 174 (+4% headroom). 0.15.0 (2026-11-09): pageGzipKb measured 174.4 KB with the 194-id catalog, limit +4%. PLAN_023 T-qa (2026-11-12): the header links the four new Solutions and the shared CSS carries the new emoji and editor styles; measured 180.4 KB page (chromium, gzip 9), within 1% of 182, limit 188 (+4%, rounded up).',
+    budget: { pageGzipKb: 188 },
   },
   {
     route: '/solutions/documents/',
@@ -150,8 +150,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/showcase/',
     reason:
-      'PLAN_011 T-adopt-core (ADR-020, second amendment): components read their design tokens so a design system can restyle every component (base.css system defaults plus one-fallback reads), which takes this route, under the 96 KB default before, to its edge. Measured 94.5 KB page on 2026-10-30 (+4% headroom). Trimming is a Final Review follow-up. PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (58.8 KB of WebP on open, logo included); measured 131.5 KB page, limit 137 (+4% headroom).',
-    budget: { pageGzipKb: 137 },
+      'PLAN_011 T-adopt-core (ADR-020, second amendment): components read their design tokens so a design system can restyle every component (base.css system defaults plus one-fallback reads), which takes this route, under the 96 KB default before, to its edge. Measured 94.5 KB page on 2026-10-30 (+4% headroom). Trimming is a Final Review follow-up. PLAN_012 illustrations (2026-11-01): the page now shows its generated WebP banner at the srcset width it renders (58.8 KB of WebP on open, logo included); measured 131.5 KB page, limit 137 (+4% headroom). PLAN_023 T-qa (2026-11-12): the site header now links the four new Solutions on every page; measured 137.0 KB here and 137.1 KB in the T-qa gate (chromium, gzip 9), limit 143 (+4% on 137.1, rounded up).',
+    budget: { pageGzipKb: 143 },
   },
   {
     route: '/agents-page/',
@@ -162,8 +162,8 @@ export const ROUTE_BUDGET_OVERRIDES: readonly RouteBudgetOverride[] = Object.fre
   {
     route: '/perf/',
     reason:
-      'PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (ADR-020, second amendment); measured 98.1 KB page (+4% headroom). Under the 96 KB default before. Trimming is a Final Review follow-up. PLAN_017 T-demo (2026-11-10): the page lists every override with its reason, so its HTML grows with each one; measured 24.2 KB gzip of HTML with the /solutions/design-systems/ row, limit 26 (+4% headroom, rounded up).',
-    budget: { pageGzipKb: 103, htmlGzipKb: 26 },
+      'PLAN_011 T-adopt-core (2026-10-30): components read their design tokens (ADR-020, second amendment); measured 98.1 KB page (+4% headroom). Under the 96 KB default before. Trimming is a Final Review follow-up. PLAN_017 T-demo (2026-11-10): the page lists every override with its reason, so its HTML grows with each one; measured 24.2 KB gzip of HTML with the /solutions/design-systems/ row, limit 26 (+4% headroom, rounded up). PLAN_023 T-qa (2026-11-12): the four new Solution rows, the new header links and these notes; measured 26.0 KB gzip of HTML at its cap, and 26.2 KB with these notes, limit 28 (+4% headroom, rounded up).',
+    budget: { pageGzipKb: 103, htmlGzipKb: 28 },
   },
   {
     route: '/dashboards-page/',
