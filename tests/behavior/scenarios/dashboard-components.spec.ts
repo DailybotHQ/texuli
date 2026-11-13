@@ -49,5 +49,74 @@ scenario(
         }
       },
     },
+    {
+      id: 'metric-card-loading-text-keeps-aa-contrast',
+      title: 'loading text keeps AA contrast at the pulse minimum in light and dark',
+      projects: ['chromium', 'webkit'],
+      isolate: true,
+      async run({ page }) {
+        const loading = page.getByText('Loading forecast');
+        await expect(loading).toBeVisible();
+        for (const scheme of ['light', 'dark'] as const) {
+          await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'no-preference' });
+          const result = await loading.evaluate((element) => {
+            const animation = element
+              .getAnimations()
+              .find((candidate) =>
+                candidate.effect?.getKeyframes().some((frame) => Number(frame.opacity) < 1)
+              );
+            let lowestOpacity = 1;
+            if (animation) {
+              const opacities =
+                animation.effect
+                  ?.getKeyframes()
+                  .map((frame) => Number(frame.opacity))
+                  .filter(Number.isFinite) ?? [];
+              if (opacities.length > 0) lowestOpacity = Math.min(...opacities);
+              // Apply the animation's lowest keyframe directly so sampling
+              // does not depend on where axe or the browser lands in the cycle.
+              (element as HTMLElement).style.animation = 'none';
+              (element as HTMLElement).style.opacity = String(lowestOpacity);
+            }
+
+            const rgb = (value: string) => {
+              const channels = value.match(/[\d.]+/g)?.map(Number);
+              if (!channels || channels.length < 3) throw new Error(`Unexpected color: ${value}`);
+              return [channels[0] ?? 0, channels[1] ?? 0, channels[2] ?? 0];
+            };
+            const color = getComputedStyle(element).color;
+            const background = getComputedStyle(element.parentElement!).backgroundColor;
+            const opacity = Number(getComputedStyle(element).opacity);
+            const fg = rgb(color);
+            const bg = rgb(background);
+            const colorChannels = color.match(/[\d.]+/g)?.map(Number) ?? [];
+            const alpha = colorChannels.length >= 4 ? (colorChannels[3] ?? 1) : 1;
+            const effective = fg.map((channel, index) => {
+              const under = bg[index] ?? 0;
+              return channel * alpha * opacity + under * (1 - alpha * opacity);
+            });
+            const luminance = (channels: number[]) => {
+              const linear = channels.map((channel) => {
+                const value = channel / 255;
+                return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+              });
+              return (
+                0.2126 * (linear[0] ?? 0) + 0.7152 * (linear[1] ?? 0) + 0.0722 * (linear[2] ?? 0)
+              );
+            };
+            const foreground = luminance(effective);
+            const backgroundLuminance = luminance(bg);
+            const ratio =
+              (Math.max(foreground, backgroundLuminance) + 0.05) /
+              (Math.min(foreground, backgroundLuminance) + 0.05);
+            return { ratio, opacity, color, background };
+          });
+          expect(
+            result.ratio,
+            `${scheme} loading text contrast at opacity ${result.opacity} (${result.color} on ${result.background})`
+          ).toBeGreaterThanOrEqual(4.5);
+        }
+      },
+    },
   ])
 );
