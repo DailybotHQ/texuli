@@ -33,6 +33,20 @@ single-lobe thumb remains separate from the references' long upright digits.
 Updated per-tone verdicts and comparison notes are in the same meaning-review
 artifacts.
 
+R5 inspected all 72 labeled candidates again at 64 px and 24 px on light and
+dark grounds. It replaces the tulip/hibiscus duplicate with a cup-shaped tulip
+and a distinct open hibiscus with a projecting stamen; changes smiling face
+with hearts to normal smiling eyes, blush and three floating hearts (distinct
+from heart-eyes); gives face screaming in fear a pale blue face, cheek-pressed
+hands and a tall oval mouth; and distinguishes grinning face with smiling eyes
+from grinning squinting face with different eye shapes and open toothy grins.
+The scan also corrected smiling face with smiling eyes to closed upward arcs.
+Per-glyph comparison notes and updated CLDR requirements are in
+`meaning-checklist.md` and `meaning-review.json`. No other same-reading pair or
+missing defining feature was found in this pass. The labeled four-way review
+sheet is at `analysis_results/emoji/seed-contact-sheet-r5.png` (plan artifact,
+not shipped).
+
 ## Representative before/after checks
 
 | Design | Before: authored source | After: deterministic package output | Review result |

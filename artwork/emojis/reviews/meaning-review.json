@@ -1,6 +1,6 @@
 {
   "schemaVersion": "texuli-emoji-meaning-review/v1",
-  "reviewContext": "R4 thumbs-up candidates and throwaway gesture references rendered at 64 px and 24 px on light and dark grounds.",
+  "reviewContext": "R5 whole-set visual meaning review: all 72 candidates inspected at 64 px and 24 px on light and dark grounds; revised duplicate and missing-feature candidates checked beside their closest lookalikes.",
   "reviewer": "agent lane local:wH:p2R (author self-review)",
   "reviewedAt": "2026-11-12",
   "records": [
@@ -26,19 +26,21 @@
       "id": "1f604",
       "shortcode": ":grinning_face_with_smiling_eyes:",
       "cldrName": "grinning face with smiling eyes",
-      "requiredFeatures": "Recognizable grinning face with smiling eyes silhouette with its defining subject and visible details.",
+      "requiredFeatures": "Gentle upward-arc smiling eyes and an open toothy grin.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
-      "verdict": "pass"
+      "verdict": "pass",
+      "comparisonNotes": "Compared beside 1f606, 1f60a and 1f600 at 64 px and 24 px on light/dark grounds: gentle upward-arc eyes and an open toothy grin distinguish it from a closed-mouth smile, squeezed eyes or round open eyes."
     },
     {
       "id": "1f606",
       "shortcode": ":grinning_squinting_face:",
       "cldrName": "grinning squinting face",
-      "requiredFeatures": "Recognizable grinning squinting face silhouette with its defining subject and visible details.",
+      "requiredFeatures": "Tightly squeezed eyes and a broad open toothy grin.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
-      "verdict": "pass"
+      "verdict": "pass",
+      "comparisonNotes": "Compared beside 1f604 and 1f600 at 64 px and 24 px on light/dark grounds: tight squeezed zigzag eyes and a broader open toothy grin are distinct from round eyes or gentle smiling arcs."
     },
     {
       "id": "1f605",
@@ -65,7 +67,8 @@
       "requiredFeatures": "Both eyes closed in upward arcs, gentle smile and two blush marks.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
-      "verdict": "pass"
+      "verdict": "pass",
+      "comparisonNotes": "Compared beside 1f604 and 1f970 at 64 px and 24 px on light/dark grounds: closed upward-arc eyes, blush and a closed gentle smile distinguish it from open teeth or floating hearts."
     },
     {
       "id": "1f607",
@@ -80,19 +83,21 @@
       "id": "1f970",
       "shortcode": ":smiling_face_with_hearts:",
       "cldrName": "smiling face with hearts",
-      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
+      "requiredFeatures": "Normal smiling eyes, a gentle smiling mouth, blush and three small hearts floating around the head.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
-      "verdict": "pass"
+      "verdict": "pass",
+      "comparisonNotes": "Compared beside 1f60d at 64 px and 24 px on light/dark grounds: eyes are normal smiling arcs with blush; three separate hearts float around the head, not in the eye sockets."
     },
     {
       "id": "1f60d",
       "shortcode": ":smiling_face_with_heart_eyes:",
       "cldrName": "smiling face with heart-eyes",
-      "requiredFeatures": "Recognizable heart silhouette and the color named by CLDR.",
+      "requiredFeatures": "Two red heart-shaped eyes and a smiling mouth; hearts are the eyes, not floating around the head.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
-      "verdict": "pass"
+      "verdict": "pass",
+      "comparisonNotes": "Compared beside 1f970 at 64 px and 24 px on light/dark grounds: two hearts occupy the eye positions; there are no floating hearts around the head."
     },
     {
       "id": "1f929",
@@ -134,7 +139,7 @@
       "id": "1f60e",
       "shortcode": ":smiling_face_with_sunglasses:",
       "cldrName": "smiling face with sunglasses",
-      "requiredFeatures": "Round sun disc with visible rays.",
+      "requiredFeatures": "Two dark sunglass lenses joined by a bridge above a smiling mouth.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
       "verdict": "pass"
@@ -152,7 +157,7 @@
       "id": "1f928",
       "shortcode": ":face_with_raised_eyebrow:",
       "cldrName": "face with raised eyebrow",
-      "requiredFeatures": "Recognizable face with raised eyebrow silhouette with its defining subject and visible details.",
+      "requiredFeatures": "One eyebrow raised above a skeptical, slightly tilted smile.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
       "verdict": "pass"
@@ -179,7 +184,7 @@
       "id": "1f620",
       "shortcode": ":angry_face:",
       "cldrName": "angry face",
-      "requiredFeatures": "Recognizable angry face silhouette with its defining subject and visible details.",
+      "requiredFeatures": "Brows slant down toward the center above a clear frown.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
       "verdict": "pass"
@@ -188,10 +193,11 @@
       "id": "1f631",
       "shortcode": ":face_screaming_in_fear:",
       "cldrName": "face screaming in fear",
-      "requiredFeatures": "Recognizable face screaming in fear silhouette with its defining subject and visible details.",
+      "requiredFeatures": "Pale blue upper face, both hands pressed to the cheeks, wide eyes and an open vertical oval mouth.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
-      "verdict": "pass"
+      "verdict": "pass",
+      "comparisonNotes": "Compared beside 1f62d at 64 px and 24 px on light/dark grounds: pale blue face, hands pressed to both cheeks and an open vertical oval mouth identify fear; it has no crying face tear streams."
     },
     {
       "id": "1f47b",
@@ -287,10 +293,11 @@
       "id": "1f337",
       "shortcode": ":tulip:",
       "cldrName": "tulip",
-      "requiredFeatures": "Recognizable tulip flower, with distinct petals, center and stem.",
+      "requiredFeatures": "Cup-shaped bloom of overlapping petals on a straight stem with leaves.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
-      "verdict": "pass"
+      "verdict": "pass",
+      "comparisonNotes": "Compared beside 1f33a at 64 px and 24 px on light/dark grounds: the tulip is a cup-shaped bloom of overlapping petals on a straight stem with leaves; it no longer uses the hibiscus radial bloom."
     },
     {
       "id": "1f33b",
@@ -305,10 +312,11 @@
       "id": "1f33a",
       "shortcode": ":hibiscus:",
       "cldrName": "hibiscus",
-      "requiredFeatures": "Recognizable hibiscus flower, with distinct petals, center and stem.",
+      "requiredFeatures": "Open five-petal hibiscus bloom with a long visible central stamen, stem and leaves.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
-      "verdict": "pass"
+      "verdict": "pass",
+      "comparisonNotes": "Compared beside 1f337 at 64 px and 24 px on light/dark grounds: the hibiscus is an open five-petal bloom with a visible projecting central stamen, distinct from the tulip cup."
     },
     {
       "id": "1f4d5",
@@ -432,50 +440,50 @@
       "shortcode": ":thumbs_up_light_skin_tone:",
       "cldrName": "thumbs up: light skin tone",
       "requiredFeatures": "Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: light skin tone modifier.",
-      "comparisonNotes": "R4 compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
-      "verdict": "pass"
+      "verdict": "pass",
+      "comparisonNotes": "Compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits."
     },
     {
       "id": "1f44d-1f3fc",
       "shortcode": ":thumbs_up_medium_light_skin_tone:",
       "cldrName": "thumbs up: medium-light skin tone",
       "requiredFeatures": "Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: medium-light skin tone modifier.",
-      "comparisonNotes": "R4 compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
-      "verdict": "pass"
+      "verdict": "pass",
+      "comparisonNotes": "Compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits."
     },
     {
       "id": "1f44d-1f3fd",
       "shortcode": ":thumbs_up_medium_skin_tone:",
       "cldrName": "thumbs up: medium skin tone",
       "requiredFeatures": "Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: medium skin tone modifier.",
-      "comparisonNotes": "R4 compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
-      "verdict": "pass"
+      "verdict": "pass",
+      "comparisonNotes": "Compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits."
     },
     {
       "id": "1f44d-1f3fe",
       "shortcode": ":thumbs_up_medium_dark_skin_tone:",
       "cldrName": "thumbs up: medium-dark skin tone",
       "requiredFeatures": "Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: medium-dark skin tone modifier.",
-      "comparisonNotes": "R4 compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
-      "verdict": "pass"
+      "verdict": "pass",
+      "comparisonNotes": "Compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits."
     },
     {
       "id": "1f44d-1f3ff",
       "shortcode": ":thumbs_up_dark_skin_tone:",
       "cldrName": "thumbs up: dark skin tone",
       "requiredFeatures": "Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: dark skin tone modifier.",
-      "comparisonNotes": "R4 compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits.",
       "reviewer": "agent lane local:wH:p2R (author self-review)",
       "reviewedAt": "2026-11-12",
-      "verdict": "pass"
+      "verdict": "pass",
+      "comparisonNotes": "Compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits."
     },
     {
       "id": "1f469",

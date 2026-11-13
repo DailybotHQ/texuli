@@ -171,10 +171,18 @@ function faceArt(index: number, shortcode: string): string {
     ].join('');
   }
   const parts = [
-    circle(32, 33, 25, FACE_COLORS[index % FACE_COLORS.length], {
-      stroke: '#b86631',
-      'stroke-width': 1.5,
-    }),
+    circle(
+      32,
+      33,
+      25,
+      shortcode === ':face_screaming_in_fear:'
+        ? '#dcecff'
+        : FACE_COLORS[index % FACE_COLORS.length],
+      {
+        stroke: '#b86631',
+        'stroke-width': 1.5,
+      }
+    ),
   ];
   if (shortcode === ':smiling_face_with_halo:')
     parts.push(
@@ -188,9 +196,17 @@ function faceArt(index: number, shortcode: string): string {
         'stroke-width': 3,
       })
     );
-  if (shortcode.includes('heart')) {
+  if (shortcode === ':smiling_face_with_heart_eyes:') {
     parts.push(path('M22 23 C18 17 9 20 12 27 L22 36 L32 27 C35 20 26 17 22 23 Z', '#f06a83'));
     parts.push(path('M42 23 C38 17 29 20 32 27 L42 36 L52 27 C55 20 46 17 42 23 Z', '#f06a83'));
+  } else if (shortcode === ':smiling_face_with_hearts:') {
+    parts.push(
+      path('M18 13 C15 9 9 11 11 16 L18 22 L25 16 C27 11 21 9 18 13 Z', '#f06a83'),
+      path('M45 13 C42 9 36 11 38 16 L45 22 L52 16 C54 11 48 9 45 13 Z', '#f06a83'),
+      path('M32 5 C30 2 26 4 27 7 L32 12 L37 7 C38 4 34 2 32 5 Z', '#f06a83'),
+      circle(17, 37, 4, '#f08b86', { opacity: 0.7 }),
+      circle(47, 37, 4, '#f08b86', { opacity: 0.7 })
+    );
   } else if (shortcode === ':star_struck:') {
     parts.push(
       path('M20 17 L22 23 L28 23 L23 27 L25 33 L20 29 L15 33 L17 27 L12 23 L18 23 Z', '#fff9e8')
@@ -207,15 +223,32 @@ function faceArt(index: number, shortcode: string): string {
   } else {
     const eyeY = shortcode === ':face_screaming_in_fear:' ? 26 : 29;
     const eyeR = shortcode === ':grinning_face_with_big_eyes:' ? 4.6 : 2.4;
-    if (
+    if (shortcode === ':smiling_face_with_hearts:') {
+      parts.push(
+        path('M17 29 Q23 35 29 29 M35 29 Q41 35 47 29', 'none', {
+          stroke: '#342f43',
+          'stroke-width': 2.5,
+          'stroke-linecap': 'round',
+        })
+      );
+    } else if (
       shortcode === ':grinning_face_with_smiling_eyes:' ||
-      shortcode === ':grinning_squinting_face:'
+      shortcode === ':smiling_face_with_smiling_eyes:'
     ) {
       parts.push(
         path('M17 29 Q23 35 29 29 M35 29 Q41 35 47 29', 'none', {
           stroke: '#342f43',
           'stroke-width': 2.5,
           'stroke-linecap': 'round',
+        })
+      );
+    } else if (shortcode === ':grinning_squinting_face:') {
+      parts.push(
+        path('M17 26 L21 31 L25 26 L29 31 M35 26 L39 31 L43 26 L47 31', 'none', {
+          stroke: '#342f43',
+          'stroke-width': 2.8,
+          'stroke-linecap': 'round',
+          'stroke-linejoin': 'round',
         })
       );
     } else {
@@ -247,6 +280,19 @@ function faceArt(index: number, shortcode: string): string {
           'stroke-linejoin': 'round',
         }
       )
+    );
+  if (shortcode === ':face_screaming_in_fear:')
+    parts.push(
+      path('M14 31 C11 27 10 21 13 19 C17 17 19 23 20 27 L21 35 C21 39 19 43 16 42 Z', '#dcecff', {
+        stroke: '#8aaac7',
+        'stroke-width': 1.5,
+        'stroke-linejoin': 'round',
+      }),
+      path('M50 31 C53 27 54 21 51 19 C47 17 45 23 44 27 L43 35 C43 39 45 43 48 42 Z', '#dcecff', {
+        stroke: '#8aaac7',
+        'stroke-width': 1.5,
+        'stroke-linejoin': 'round',
+      })
     );
   if (shortcode === ':angry_face:') {
     parts.push(
@@ -284,14 +330,27 @@ function faceArt(index: number, shortcode: string): string {
       )
     );
   } else if (shortcode === ':face_screaming_in_fear:') {
-    parts.push(circle(32, 43, 7, '#593748'));
-  } else if (shortcode === ':grinning_face:' || shortcode === ':grinning_face_with_big_eyes:') {
+    parts.push(shape('ellipse', { cx: 32, cy: 43, rx: 7, ry: 10, fill: '#593748' }));
+  } else if (
+    shortcode === ':grinning_face:' ||
+    shortcode === ':grinning_face_with_big_eyes:' ||
+    shortcode === ':grinning_face_with_smiling_eyes:' ||
+    shortcode === ':grinning_squinting_face:'
+  ) {
+    const mouth =
+      shortcode === ':grinning_squinting_face:'
+        ? 'M17 35 Q32 28 47 35 L45 47 Q32 57 19 47 Z'
+        : 'M19 36 Q32 31 45 36 L43 46 Q32 54 21 46 Z';
+    const teeth =
+      shortcode === ':grinning_squinting_face:'
+        ? 'M21 37 L43 37 L40 43 Q32 46 24 43 Z'
+        : 'M23 38 L41 38 L39 42 Q32 45 25 42 Z';
     parts.push(
-      path('M19 36 Q32 31 45 36 L43 46 Q32 54 21 46 Z', '#633d37', {
+      path(mouth, '#633d37', {
         stroke: '#633d37',
         'stroke-width': 1.5,
       }),
-      path('M23 38 L41 38 L39 42 L25 42 Z', '#fff8e8')
+      path(teeth, '#fff8e8')
     );
   } else if (shortcode === ':slightly_smiling_face:') {
     parts.push(
@@ -405,6 +464,30 @@ function objectArt(shortcode: string, index: number): string {
         path('M20 45 L16 56 L27 49 Z', '#f6bd4d'),
       ].join('');
     case ':tulip:':
+      return [
+        path('M30 33 Q28 44 29 61 L35 61 Q35 46 33 33', '#64aa77'),
+        path('M31 48 Q20 39 15 44 Q20 53 31 53 Z', '#76bd83'),
+        path('M33 53 Q42 43 49 46 Q46 55 34 58 Z', '#64aa77'),
+        path(
+          'M22 32 C18 26 18 16 22 11 Q28 12 32 23 Q36 12 42 11 C47 17 46 26 42 32 Z',
+          '#e979a5',
+          {
+            stroke: '#ad587c',
+            'stroke-width': 1.5,
+            'stroke-linejoin': 'round',
+          }
+        ),
+        path('M22 30 C21 21 24 14 29 12 Q32 14 32 25 L32 34 Z', '#f391b5', {
+          stroke: '#ad587c',
+          'stroke-width': 1.3,
+          'stroke-linejoin': 'round',
+        }),
+        path('M32 25 Q32 14 35 12 C41 14 44 21 42 30 L32 34 Z', '#df6e9d', {
+          stroke: '#ad587c',
+          'stroke-width': 1.3,
+          'stroke-linejoin': 'round',
+        }),
+      ].join('');
     case ':sunflower:':
     case ':hibiscus:': {
       const petals = Array.from({ length: shortcode === ':sunflower:' ? 10 : 5 }, (_, i) => {
@@ -420,7 +503,11 @@ function objectArt(shortcode: string, index: number): string {
           transform: `rotate(${((angle * 180) / Math.PI).toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)})`,
         });
       }).join('');
-      return `${path('M32 37 Q27 47 28 60 L36 60 Q35 47 32 37', '#64aa77')}${path('M31 48 Q21 40 16 46 Q22 53 31 52', '#76bd83')}${petals}${circle(32, 23, 7, shortcode === ':sunflower:' ? '#765036' : '#f6bd4d')}`;
+      const stamen =
+        shortcode === ':hibiscus:'
+          ? `${path('M32 23 Q38 18 43 13', 'none', { stroke: '#e8ad45', 'stroke-width': 2, 'stroke-linecap': 'round' })}${circle(44, 12, 2.4, '#f2c24f')}`
+          : '';
+      return `${path('M32 37 Q27 47 28 60 L36 60 Q35 47 32 37', '#64aa77')}${path('M31 48 Q21 40 16 46 Q22 53 31 52', '#76bd83')}${petals}${circle(32, 23, 7, shortcode === ':sunflower:' ? '#765036' : '#f6bd4d')}${stamen}`;
     }
     case ':closed_book:':
       return [
@@ -766,13 +853,28 @@ const DEFINING_FEATURES: Readonly<Record<string, string>> = {
   ':grinning_face:': 'Open toothy grin; rounded eyes; no tears or blush.',
   ':grinning_face_with_big_eyes:':
     'Open toothy grin and visibly larger round eyes than other smiles.',
+  ':grinning_face_with_smiling_eyes:': 'Gentle upward-arc smiling eyes and an open toothy grin.',
+  ':grinning_squinting_face:': 'Tightly squeezed eyes and a broad open toothy grin.',
   ':smiling_face_with_smiling_eyes:':
     'Both eyes closed in upward arcs, gentle smile and two blush marks.',
+  ':smiling_face_with_hearts:':
+    'Normal smiling eyes, a gentle smiling mouth, blush and three small hearts floating around the head.',
+  ':smiling_face_with_heart_eyes:':
+    'Two red heart-shaped eyes and a smiling mouth; hearts are the eyes, not floating around the head.',
+  ':smiling_face_with_sunglasses:':
+    'Two dark sunglass lenses joined by a bridge above a smiling mouth.',
   ':slightly_smiling_face:': 'Small restrained closed smile; neutral open eyes.',
   ':smiling_face:': 'Closed smile with two blush marks; no open mouth or tears.',
   ':smiling_face_with_open_hands:':
     'One smiling face framed by two visible open hands reaching in to hug.',
   ':thinking_face:': 'Raised eyebrow and a hand resting at the chin.',
+  ':face_with_raised_eyebrow:': 'One eyebrow raised above a skeptical, slightly tilted smile.',
+  ':angry_face:': 'Brows slant down toward the center above a clear frown.',
+  ':face_screaming_in_fear:':
+    'Pale blue upper face, both hands pressed to the cheeks, wide eyes and an open vertical oval mouth.',
+  ':tulip:': 'Cup-shaped bloom of overlapping petals on a straight stem with leaves.',
+  ':hibiscus:':
+    'Open five-petal hibiscus bloom with a long visible central stamen, stem and leaves.',
   ':crying_face:': 'One blue tear and a downturned mouth.',
   ':loudly_crying_face:': 'Wide open anguished mouth and two long blue tear streams.',
   ':woman_technologist:': 'Exactly one woman seated at or working at a laptop.',
