@@ -116,8 +116,22 @@ test('plain text stays plain unless pasted as Markdown, also from a real paste e
   await expect(editor).toContainText('Raw <b>HTML</b> stays text');
 
   // A real paste event after the "Paste as Markdown" chord, when the Clipboard API is refused.
-  await editor.click();
-  await page.keyboard.press('ControlOrMeta+End');
+  // The caret goes to the end of the last list item through the DOM selection (the editor
+  // follows selectionchange): Ctrl+End and Meta+End move it differently per platform.
+  const lastItem = editor.locator('li', { hasText: 'Raw <b>HTML</b> stays text' });
+  await lastItem.click();
+  await lastItem.evaluate((node) => {
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    range.collapse(false);
+    const selection = getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  });
+  await page.evaluate(
+    () =>
+      new Promise<void>((done) => requestAnimationFrame(() => requestAnimationFrame(() => done())))
+  );
   await page.evaluate(() => {
     Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true });
   });
@@ -130,7 +144,10 @@ test('plain text stays plain unless pasted as Markdown, also from a real paste e
       new ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true })
     );
   });
-  await expect(editor.getByRole('heading', { name: 'Chord heading' })).toBeVisible();
+  // The pasted heading keeps its level as a block of its own after the item's text, which is
+  // unchanged (before the fix it became a plain paragraph).
+  await expect(editor.getByRole('heading', { level: 2, name: 'Chord heading' })).toBeVisible();
+  await expect(lastItem.locator('p').first()).toHaveText('Raw <b>HTML</b> stays text');
 });
 
 test('export for chat shows each format and what it loses, and never pings', async ({ page }) => {

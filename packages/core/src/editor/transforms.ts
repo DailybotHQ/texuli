@@ -1022,11 +1022,25 @@ function reid(blocks: readonly EditorBlock[], newId: EditorIdSource): EditorBloc
 }
 
 /**
+ * Whether a pasted rich block joins the text around the caret instead of standing as a block of
+ * its own: a paragraph always does, and a heading only into a heading of the same level. Any
+ * other block (a heading into a paragraph, a list, a quote, code) keeps its type.
+ */
+const mergesInto = (pasted: EditorBlock, target: EditorRichBlock): pasted is EditorRichBlock =>
+  pasted.type === 'paragraph' ||
+  (pasted.type === 'heading' && target.type === 'heading' && pasted.level === target.level);
+
+/**
  * Paste: replace the selection with `fragment` (a loaded document or blocks,
  * already sanitized by `loadEditorDocument`, `fromMarkdown` or the paste
- * import). One paragraph pastes inline; several blocks split the caret block
- * around them. Blocks that would nest too deep become plain paragraphs, and
- * blocks past the size caps are cut, each with a diagnostic.
+ * import). One paragraph pastes inline. Otherwise the caret block splits around
+ * the pasted blocks: a paragraph at either end joins the text before or after
+ * the caret, and every other block keeps its type (a heading stays a heading at
+ * the end of a list item, in a quote or mid-paragraph). In code, pasted
+ * paragraphs and code become text; any other block splits the code block. The
+ * caret lands after the pasted content, and it is one transform (one undo
+ * step). Blocks that would nest too deep become plain paragraphs, and blocks
+ * past the size caps are cut, each with a diagnostic.
  */
 export function replaceSelection(
   state: EditorState,
@@ -1045,14 +1059,14 @@ export function replaceSelection(
   const { doc, block, offset } = at;
   if (blocks.length === 0) return done(doc, caret(block.id, offset), c);
   const diagnostics: EditorIssue[] = [];
-  if (block.type === 'code') {
+  if (block.type === 'code' && blocks.every((b) => b.type === 'paragraph' || b.type === 'code')) {
     const text = editorLeaves({ version: 1, blocks })
       .map(({ block: leaf }) => (isTextBlock(leaf) ? asCode(leaf, 0) : ''))
       .join('\n');
     return insertText({ ...state, selection: caret(block.id, offset), doc }, text, options);
   }
   const first = blocks[0] as EditorBlock;
-  if (blocks.length === 1 && isRich(first)) {
+  if (block.type !== 'code' && blocks.length === 1 && mergesInto(first, block)) {
     const content = spliceInline(block.content, offset, offset, first.content);
     return done(
       replaceBlock(doc, block.id, () => [{ ...block, content }]),
@@ -1075,23 +1089,40 @@ export function replaceSelection(
         : [b]
     );
   }
-  let head: EditorRichBlock = { ...block, content: sliceInline(block.content, 0, offset) };
-  let tail: EditorRichBlock = paragraph(sliceInline(block.content, offset), c.newId());
+  let head: EditorTextBlock | null;
+  let tail: EditorTextBlock;
   let middle = blocks;
-  let target = caret(tail.id);
-  const firstBlock = middle[0];
-  if (firstBlock && isRich(firstBlock)) {
-    head = { ...head, content: concatInline(head.content, firstBlock.content) };
-    middle = middle.slice(1);
-  }
-  const lastBlock = middle.at(-1);
-  if (lastBlock && isRich(lastBlock)) {
-    target = caret(tail.id, inlineLength(lastBlock.content));
-    tail = { ...tail, content: concatInline(lastBlock.content, tail.content) };
-    middle = middle.slice(0, -1);
+  let target: EditorSelection;
+  if (block.type === 'code') {
+    // Split the code block at the caret, without the line break at the cut; an empty side is
+    // dropped, and an empty end leaves a paragraph for the caret after the pasted blocks.
+    const before = block.text.slice(0, offset).replace(/\n$/, '');
+    const rest = block.text.slice(offset).replace(/^\n/, '');
+    head = before ? { ...block, text: before } : null;
+    tail = rest
+      ? { id: c.newId(), type: 'code', ...(block.lang ? { lang: block.lang } : {}), text: rest }
+      : paragraph([], c.newId());
+    target = caret(tail.id);
+  } else {
+    let richHead: EditorRichBlock = { ...block, content: sliceInline(block.content, 0, offset) };
+    let richTail: EditorRichBlock = paragraph(sliceInline(block.content, offset), c.newId());
+    target = caret(richTail.id);
+    const firstBlock = middle[0];
+    if (firstBlock && mergesInto(firstBlock, richHead)) {
+      richHead = { ...richHead, content: concatInline(richHead.content, firstBlock.content) };
+      middle = middle.slice(1);
+    }
+    const lastBlock = middle.at(-1);
+    if (lastBlock && lastBlock.type === 'paragraph') {
+      target = caret(richTail.id, inlineLength(lastBlock.content));
+      richTail = { ...richTail, content: concatInline(lastBlock.content, richTail.content) };
+      middle = middle.slice(0, -1);
+    }
+    head = richHead;
+    tail = richTail;
   }
   const build = (kept: readonly EditorBlock[]) =>
-    replaceBlock(doc, block.id, () => [head, ...kept, tail]);
+    replaceBlock(doc, block.id, () => (head ? [head, ...kept, tail] : [...kept, tail]));
   let result = done(build(middle), target, c, diagnostics);
   while (!result.ok && middle.length > 0 && result.errors[0]?.code === 'limit-reached') {
     middle = middle.slice(0, -1);
