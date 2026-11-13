@@ -8,7 +8,7 @@
  * guard, the token bucket), hostile JSON, Origin and Host checks, CORS, the
  * security headers and the counters-only events.
  */
-import { texuliOps } from '@texuli/tools/ops';
+import { texuliEdgeOps, texuliOps } from '@texuli/tools/ops';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   createTokenBucket,
@@ -27,8 +27,11 @@ import { fakeSiteAssets } from '../../../packages/tools/tests/fixtures/site-asse
 import { buildMcpEventBody, mcpDurationBucket } from '../src/lib/bot-events.ts';
 
 const ORIGIN = 'https://texuli.com';
-const EDGE_NAMES = texuliOps.list({ runtimes: ['edge'] }).map((operation) => operation.name);
-const NODE_NAMES = texuliOps.list({ runtimes: ['node'] }).map((operation) => operation.name);
+const EDGE_NAMES = texuliEdgeOps.list({ runtimes: ['edge'] }).map((operation) => operation.name);
+const NODE_ONLY_NAMES = texuliOps
+  .list({ runtimes: ['node'] })
+  .map((operation) => operation.name)
+  .filter((name) => !EDGE_NAMES.includes(name));
 const SITE_NAMES = texuliOps.list({ runtimes: ['site'] }).map((operation) => operation.name);
 
 // Every request gets its own client IP unless a test pins one, so the
@@ -127,8 +130,8 @@ describe('the protocol through POST /mcp (edge and site operations)', () => {
     for (const name of EDGE_NAMES) expect(names, name).toContain(name);
     expect(SITE_NAMES).toEqual(['site.pages', 'site.read', 'site.search']);
     for (const name of SITE_NAMES) expect(names, name).toContain(name);
-    expect(NODE_NAMES.length).toBeGreaterThan(0);
-    for (const name of NODE_NAMES) expect(names, name).not.toContain(name);
+    expect(NODE_ONLY_NAMES.length).toBeGreaterThan(0);
+    for (const name of NODE_ONLY_NAMES) expect(names, name).not.toContain(name);
   });
 
   it('runs catalog.search and blueprint.validate through tools/call', async () => {
@@ -162,16 +165,17 @@ describe('the protocol through POST /mcp (edge and site operations)', () => {
     expect(verdicts).toEqual([true, false]);
   });
 
-  it('refuses a node operation as runtime-unavailable and keeps each operation limit', async () => {
-    for (const name of NODE_NAMES) {
+  it('refuses a node-only operation as an unknown tool and keeps each operation limit', async () => {
+    for (const name of NODE_ONLY_NAMES) {
       const response = await rpc({
         jsonrpc: '2.0',
         id: 1,
         method: 'tools/call',
         params: { name, arguments: {} },
       });
-      const text = (await response.json()).result.content[0].text;
-      expect(JSON.parse(text).code, name).toBe('runtime-unavailable');
+      const body = await response.json();
+      expect(body.error?.code, name).toBe(-32602);
+      expect(body.error?.message, name).toMatch(`Unknown tool: ${name}`);
     }
     // catalog.search declares 4,096 input bytes and at most 100 results.
     const tooLarge = await rpc({

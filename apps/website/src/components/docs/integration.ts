@@ -99,9 +99,7 @@ export function copyPageIntegration(): AstroIntegration {
         let exempt = 0;
         const twins: Record<string, string> = {};
         const pages: TwinIndexEntry[] = [];
-        const operations = texuliOps
-          .list({ runtimes: ['edge'] })
-          .map(({ name, title }) => ({ name, title }));
+        const operations = texuliOps.list().map(({ name, title }) => ({ name, title }));
         for (const file of (await htmlFiles(out)).sort()) {
           const route = pageRoute(out, file);
           const html = await readFile(file, 'utf8');

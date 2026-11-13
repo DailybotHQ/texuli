@@ -4,12 +4,16 @@ import { texuliEdgeOps } from '../src/ops/edge.ts';
 import { texuliOps } from '../src/ops/index.ts';
 import { scenario } from './scenario.ts';
 
+function payload(outcome: { ok: true; output: unknown }): Record<string, unknown> {
+  return outcome.output as Record<string, unknown>;
+}
+
 it('searches, reads, converts and lists untrusted emoji without throwing', async () => {
   await scenario('search finds rocket by keyword', async () => {
     const outcome = await texuliOps.invoke('emoji.search', { query: 'launch', limit: 3 });
     expect(outcome.ok).toBe(true);
     if (!outcome.ok) return;
-    const items = outcome.output.items as { id: string; shortcode: string; score: number }[];
+    const items = payload(outcome).items as { id: string; shortcode: string; score: number }[];
     expect(items[0]?.id).toBe('1f680');
     expect(items[0]?.shortcode).toBe(':rocket:');
   });
@@ -19,14 +23,14 @@ it('searches, reads, converts and lists untrusted emoji without throwing', async
     const byShortcode = await texuliOps.invoke('emoji.get', { id: ':rocket:' });
     expect(byId.ok && byShortcode.ok).toBe(true);
     if (!byId.ok || !byShortcode.ok) return;
-    expect(byId.output.emoji).toMatchObject({
+    expect(payload(byId).emoji).toMatchObject({
       id: '1f680',
       shortcode: ':rocket:',
       category: 'travel-places',
     });
-    expect(byShortcode.output.emoji).toMatchObject({ id: '1f680' });
+    expect(payload(byShortcode).emoji).toMatchObject({ id: '1f680' });
     expect(
-      Object.keys(byId.output.emoji as Record<string, unknown>).some((key) =>
+      Object.keys(payload(byId).emoji as Record<string, unknown>).some((key) =>
         ['keywords', 'aliases', 'artResolver'].includes(key)
       )
     ).toBe(false);
@@ -53,13 +57,13 @@ it('searches, reads, converts and lists untrusted emoji without throwing', async
     });
     expect(rocket.ok).toBe(true);
     if (!rocket.ok) return;
-    expect(rocket.output.value).toBe('Ship it 🚀!');
+    expect(payload(rocket).value).toBe('Ship it 🚀!');
     const party = await texuliOps.invoke('emoji.convert', {
       source: ':tada:',
       to: 'unicode',
       dialect: 'legacy',
     });
-    expect(party.ok && party.output.value).toBe('🎉');
+    expect(party.ok && payload(party).value).toBe('🎉');
     const conflict = await texuliOps.invoke('emoji.convert', {
       source: ':pa:',
       to: 'unicode',
@@ -68,9 +72,9 @@ it('searches, reads, converts and lists untrusted emoji without throwing', async
     });
     expect(conflict.ok).toBe(true);
     if (!conflict.ok) return;
-    expect(conflict.output.value).toBe(':pa:');
+    expect(payload(conflict).value).toBe(':pa:');
     expect(
-      (conflict.output.diagnostics as { code: string }[]).some(
+      (payload(conflict).diagnostics as { code: string }[]).some(
         (item) => item.code === 'conflict-alias'
       )
     ).toBe(true);
@@ -80,14 +84,14 @@ it('searches, reads, converts and lists untrusted emoji without throwing', async
       dialect: 'legacy',
       mode: 'permissive',
     });
-    expect(permissive.ok && String(permissive.output.value)).not.toBe(':pa:');
+    expect(permissive.ok && String(payload(permissive).value)).not.toBe(':pa:');
   });
 
   await scenario('categories and variants stay closed and capped', async () => {
     const categories = await texuliOps.invoke('emoji.categories', {});
     expect(categories.ok).toBe(true);
     if (!categories.ok) return;
-    const list = categories.output.categories as { id: string; count: number }[];
+    const list = payload(categories).categories as { id: string; count: number }[];
     expect(list.map((item) => item.id)).toEqual([
       'smileys-emotion',
       'people-body',
@@ -103,8 +107,8 @@ it('searches, reads, converts and lists untrusted emoji without throwing', async
     const variants = await texuliOps.invoke('emoji.variants', { id: '1f44d' });
     expect(variants.ok).toBe(true);
     if (!variants.ok) return;
-    expect((variants.output.base as { id: string }).id).toBe('1f44d');
-    expect((variants.output.variants as { id: string }[]).length).toBeGreaterThan(0);
+    expect((payload(variants).base as { id: string }).id).toBe('1f44d');
+    expect((payload(variants).variants as { id: string }[]).length).toBeGreaterThan(0);
   });
 
   await scenario(
@@ -118,9 +122,10 @@ it('searches, reads, converts and lists untrusted emoji without throwing', async
       });
       expect(outcome.ok).toBe(true);
       if (!outcome.ok) return;
-      expect(outcome.output.value).toBe(':tada:');
+      const output = payload(outcome);
+      expect(output.value).toBe(':tada:');
       expect(
-        (outcome.output.diagnostics as { code: string; message: string }[]).some(
+        (output.diagnostics as { code: string; message: string }[]).some(
           (item) => item.code === 'legacy-local-only' && item.message.includes('npx -y @texuli/mcp')
         )
       ).toBe(true);
@@ -134,8 +139,8 @@ it('searches, reads, converts and lists untrusted emoji without throwing', async
     });
     expect(outcome.ok).toBe(true);
     if (!outcome.ok) return;
-    expect(String(outcome.output.value)).toContain('<script>alert(1)</script>');
-    expect(String(outcome.output.value)).toContain('javascript:alert(1)');
-    expect(String(outcome.output.value)).toContain('🚀');
+    expect(String(payload(outcome).value)).toContain('<script>alert(1)</script>');
+    expect(String(payload(outcome).value)).toContain('javascript:alert(1)');
+    expect(String(payload(outcome).value)).toContain('🚀');
   });
 });

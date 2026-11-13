@@ -20,13 +20,13 @@
 
 import { checkBlueprintAllow } from '@texuli/spec/design-system';
 import { texuliEdgeOps } from '../ops/edge.ts';
+import type { OperationRegistry } from '../ops/registry.ts';
 import {
   type InvokeFailure,
   LOCAL_RUNTIMES,
   type LocalFiles,
   type Operation,
   type OperationAnnotations,
-  type OperationRegistry,
   type OperationRuntime,
   type SiteContext,
 } from '../ops/types.ts';
@@ -345,7 +345,7 @@ export function createMcpHandler(options: McpHandlerOptions = {}): McpHandler {
   const tools: JsonObject[] = served.map((operation) => ({
     name: operation.name,
     title: operation.title,
-    description: registry.describe(operation.name),
+    description: registry.describe(operation.name) ?? operation.summary,
     inputSchema: operation.input,
     outputSchema: operation.output,
     annotations: hints(operation.annotations),

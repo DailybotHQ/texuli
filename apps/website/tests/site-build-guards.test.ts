@@ -41,6 +41,7 @@ import {
 import {
   REMOTE_RUNTIMES,
   TOOLS_VERSION,
+  texuliEdgeOps,
   texuliOps,
 } from '../../../packages/tools/src/ops/index.ts';
 import {
@@ -528,8 +529,9 @@ describe('agent discovery files (public/.well-known, the generated API and ARD c
     expect(card.protocolVersions).toEqual([...MCP_SUPPORTED_PROTOCOL_VERSIONS]);
     expect(card.tools.map((tool) => tool.name)).toEqual(texuliOps.list().map((op) => op.name));
     for (const tool of card.tools) {
-      expect(tool.title, tool.name).toBe(texuliOps.get(tool.name)?.title);
-      expect(tool.description, tool.name).toBe(texuliOps.get(tool.name)?.summary);
+      const published = texuliEdgeOps.get(tool.name) ?? texuliOps.get(tool.name);
+      expect(tool.title, tool.name).toBe(published?.title);
+      expect(tool.description, tool.name).toBe(published?.summary);
     }
     expect(card.deprecatedTools.map((alias) => alias.name)).toEqual(
       texuliOps.aliases().map((alias) => alias.name)
