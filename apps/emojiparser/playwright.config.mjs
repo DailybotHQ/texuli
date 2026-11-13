@@ -8,8 +8,9 @@ const PORT = 4876;
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 
 export default defineConfig({
-  testDir: resolve(REPO_DIR, 'tests'),
-  testMatch: ['e2e/emojiparser.spec.ts'],
+  // The app's own specs; the root config (the website server) never collects them.
+  testDir: resolve(APP_DIR, 'tests/e2e'),
+  testMatch: ['**/*.spec.ts'],
   outputDir: resolve(REPO_DIR, 'test-results/emojiparser-preview-4876'),
   fullyParallel: false,
   reporter: [['list']],

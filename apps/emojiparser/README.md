@@ -14,7 +14,7 @@ from the repository root and run:
 pnpm --filter @texuli/emojiparser dev
 pnpm --filter @texuli/emojiparser build
 pnpm --filter @texuli/emojiparser preview --host 127.0.0.1 --port 4876 --strictPort
-pnpm exec playwright test tests/e2e/emojiparser.spec.ts --project chromium --config apps/emojiparser/playwright.config.mjs
+pnpm exec playwright test --config apps/emojiparser/playwright.config.mjs --project chromium
 ```
 
 The app builds fully static pages. Search data and conversion engines are loaded
