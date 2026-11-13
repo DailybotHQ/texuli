@@ -25,6 +25,7 @@ import {
   svelteToolManifest,
   type WorkspacePackage,
 } from '../packages.ts';
+import { UNRELEASED_PACKAGES } from '../release-line.ts';
 
 const pkg = (manifest: Record<string, unknown>): WorkspacePackage => ({
   dir: 'demo',
@@ -351,6 +352,12 @@ describe('workspace selection', () => {
       expect(names).toContain('texuli');
       expect(names).toContain('@texuli/core');
       for (const never of NEVER_PACKED) expect(names).not.toContain(never);
+      // An unreleased package is left out by default and packed only when a filter names it.
+      for (const unreleased of UNRELEASED_PACKAGES) {
+        expect(names).not.toContain(unreleased);
+        const pkg = all.find((p) => p.name === unreleased);
+        if (pkg) expect(selectPackages(all, [pkg.dir]).map((p) => p.name)).toEqual([unreleased]);
+      }
       expect(selectPackages(all, ['core', 'texuli']).map((p) => p.name)).toEqual([
         '@texuli/core',
         'texuli',
