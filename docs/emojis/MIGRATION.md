@@ -41,22 +41,14 @@ legacy catalog are **not** on the default entry.
    emoji; 3.0.2 often split them or dropped the tone.
 4. **HTML is escaped.** `<script>` in the input cannot become markup.
 
-## Local bridge (unpublished)
+## Compatibility bridge (planned)
 
-On the parser checkout, branch `texuli-bridge` (never pushed):
+A compatibility release of `universal-emoji-parser` that keeps its public API and forwards to
+`@texuli/emojis` is prepared and checked against recorded 3.0.2 outputs, but it is **not
+published**. It will depend on the published `@texuli/emojis` by version, and it ships only when
+the parser's owner releases it; until then, keep using 3.0.2 or move to `@texuli/emojis`
+directly with the mapping above.
 
-The bridge lives in worktree `texuli-wt/uep-texuli-bridge` (branch `texuli-bridge`).
-The developer's `universal-emoji-parser` checkout stays on `main`.
-
-```json
-"dependencies": {
-  "@texuli/emojis": "file:../p023-l10-p2X/packages/emojis"
-}
-```
-
-That `file:` path is from `texuli-wt/uep-texuli-bridge` to this lane's Texuli
-worktree. It will not resolve from a published tarball. Do not `npm publish`
-the bridge branch.
-
-Parity numbers and the DailyBot-style chat fixture:
-`.dwp/plans/PLAN_023_texuli_platform_expansion/analysis_results/emoji/migration-report.md`.
+Measured parity against 3.0.2 (196 comparisons over 28 inputs, including a DailyBot-style chat
+fixture): 140 identical, 56 intended changes (no default Twemoji CDN, escaped HTML, kept skin
+tones, longest-match sequences, readable keycap names), 0 unexpected.
