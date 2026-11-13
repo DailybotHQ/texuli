@@ -60,6 +60,4 @@ const trendText = $derived(trend === 'up' ? 'Up' : trend === 'down' ? 'Down' : '
   .tx-metric-card__sparkline { margin-block-start: var(--tx-space-1); max-inline-size: 12rem; }
   .tx-metric-card__loading { min-block-size: 2rem; }
   .tx-metric-card__sr { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  @media (prefers-reduced-motion: no-preference) { .tx-metric-card__loading { animation: tx-metric-pulse 1.4s ease-in-out infinite alternate; } }
-  @keyframes tx-metric-pulse { to { opacity: 0.5; } }
 </style>
