@@ -11,7 +11,7 @@ the next line; tests and honesty checks read it from there. Change it only
 when a publish lands (published) or a new version opens (in development). -->
 Release line: published `0.18`
 
-All 28 published packages are on npm in the 0.18 line, every one at
+All 27 published packages are on npm in the 0.18 line, every one at
 `0.18.0`, every internal `@texuli/*` pin exactly `0.18.0`. The blueprint
 spec in `@texuli/spec@0.18.0` is `0.15.0` (the `data-virtual-list`
 `mode`, `selectable` and `surface` props in the catalog),
@@ -24,13 +24,13 @@ gets it. `next` is no longer maintained and stays on `0.12.1` (see
 "Dist-tags" below). `@texuli/drag`,
 `@texuli/workflows`, `@texuli/deck`, `@texuli/slides`, `@texuli/editor`,
 `@texuli/document`, `@texuli/pages`, `@texuli/forms`, `@texuli/canvas`,
-`@texuli/sheets`, `@texuli/mcp`, `@texuli/emojis` and `@texuli/emoji-assets` are still **in development** (pre-1.0). Nothing is in
+`@texuli/sheets`, `@texuli/mcp` and `@texuli/emojis` are still **in development** (pre-1.0). `@texuli/emoji-assets`, the emoji art, is held back: private, `0.0.0` and not on npm until its art is approved and licensed (owner decision 2026-11-12). Nothing is in
 development beyond `0.18.0`; installs use the 0.18 line (`^0.18.0`).
 
 `0.18.0` is a `0.x` minor from PLAN_023: Markdown and HTML in
-`@texuli/core` with writers for nine chat formats, Texuli Emojis (two new
-packages, `@texuli/emojis` and `@texuli/emoji-assets`, and emoji
-components in `texuli`), new editor, chat, forms and data components, and
+`@texuli/core` with writers for nine chat formats, Texuli Emojis (the new
+package `@texuli/emojis` and emoji components in `texuli`, which show
+system emoji; the art package `@texuli/emoji-assets` is not published), new editor, chat, forms and data components, and
 behavior changes on Markdown edge cases where the existing codecs now read
 through the shared CommonMark parser (see "0.18.0" below). Blueprint spec
 stays `0.15.0`. As a new minor, `^0.17.0` does not pick it up.
@@ -149,7 +149,7 @@ versions into `main`). Publishing never overwrites a published version.
 
 ### Package changelogs
 
-Each of the 28 published packages ships a `CHANGELOG.md` generated from this
+Each of the 27 published packages ships a `CHANGELOG.md` generated from this
 page by `scripts/package-changelogs.ts`. Do not edit those files. After
 changing this page, rewrite them with
 `pnpm exec tsx scripts/package-changelogs.ts --write`.
@@ -169,9 +169,11 @@ current) and packs them: the published `files` list is `dist` and
 ### 0.18.0
 
 A `0.x` minor: every published package moves to `0.18.0` together, every
-internal `@texuli/*` pin is exactly `0.18.0`, and two new packages join
-the published set at `0.18.0`, `@texuli/emojis` and `@texuli/emoji-assets`
-(28 published packages; both in development, pre-1.0). The blueprint spec
+internal `@texuli/*` pin is exactly `0.18.0`, and `@texuli/emojis` joins
+the published set at `0.18.0` (27 published packages; in development,
+pre-1.0). `@texuli/emoji-assets` is held back: it stays private at `0.0.0`
+and is not published (owner decision 2026-11-12: no unlicensed art leaves
+the repository). The blueprint spec
 stays `0.15.0` (`@texuli/spec@0.18.0` ships it, digest
 `4c674bc59c8140ee2ff24e47f4de9c46689f48f07c8516128480db129f7a0a57`
 unchanged). As a new minor, `^0.17.0` and `~0.17.0` never pick it up:
@@ -233,12 +235,12 @@ change is pinned by a test.
   and skin-tone variants), the tokenizer and shortcode conversion, search,
   and a compatibility engine for `universal-emoji-parser` aliases
   (`@texuli/emojis/legacy-engine`, `@texuli/emojis/legacy`).
-- `@texuli/emoji-assets` (new, L0): the manifest of original Texuli emoji
-  art, the coverage report (`@texuli/emoji-assets/coverage`) and 72
-  candidate SVGs (`assets/`, checksums in the manifest). No artwork is
-  approved yet (0 approved), so `getTexuliEmojiAsset` returns nothing; the
-  proposed art license (CC BY 4.0) is pending the owner's sign-off, and the
-  package's MIT license covers its code, not the art.
+- `@texuli/emoji-assets` (L0, in development, **not published**): the
+  original Texuli emoji art, 72 candidate SVGs with a manifest and a
+  coverage report. None is approved (0 approved) and the proposed art
+  license (CC BY 4.0) is pending the owner's sign-off, so the package stays
+  private at `0.0.0`, outside the publish workflow, until the art is
+  approved and licensed.
 - `texuli/emoji`: `Emoji`, `EmojiText` and `EmojiPicker`. They show the
   system emoji by default, with a host resolver seam for reviewed art.
 - The MCP tools `emoji.search`, `emoji.get`, `emoji.categories`,
@@ -3665,8 +3667,8 @@ tools, astro, player, slides. `@texuli/deck` goes out before
 ### History
 
 - `0.18.0` (merged and published from `main` after the merge of the
-  `0.18.0` release): a `0.x` minor for 28 packages, with `@texuli/emojis`
-  and `@texuli/emoji-assets` published for the first time: Markdown and
+  `0.18.0` release): a `0.x` minor for 27 packages, with `@texuli/emojis`
+  published for the first time (`@texuli/emoji-assets` held back): Markdown and
   HTML in `@texuli/core`, chat formats, Texuli Emojis and new editor,
   chat, forms and data components (see "0.18.0" above). Its tarballs ship
   blueprint spec `0.15.0`.
@@ -3930,7 +3932,8 @@ the package-to-package contract outside this repository.
 | `@texuli/editor` | `0.18.0` (first published as `0.5.0`) | `packages/editor/package.json` (and `EDITOR_PACKAGE_VERSION`); published after `texuli`, which it depends on. In development (ADR-003), pre-1.0. |
 | `@texuli/deck` | `0.18.0` (first published as `0.4.0`) | `packages/deck/package.json`; published after `@texuli/drag` and before `@texuli/document`, `@texuli/tools` and `@texuli/slides`, which depend on it. In development (PLAN_008, ADR-009), pre-1.0. |
 | `@texuli/drag`, `@texuli/workflows` | `0.18.0` (first published as `0.3.0` on 2026-10-28) | Each package manifest. In development, pre-1.0. |
-| `@texuli/emojis`, `@texuli/emoji-assets` | `0.18.0` (first published as `0.18.0`) | Each package manifest; L0 with no runtime dependencies, published right after `@texuli/date` and before `texuli` and `@texuli/tools`, which pin `@texuli/emojis` exactly. In development (ADR-035), pre-1.0. |
+| `@texuli/emojis` | `0.18.0` (first published as `0.18.0`) | `packages/emojis/package.json`; L0 with no runtime dependencies, published right after `@texuli/date` and before `texuli` and `@texuli/tools`, which pin it exactly. In development (ADR-035), pre-1.0. |
+| `@texuli/emoji-assets` | `0.0.0`, private, not published | `packages/emoji-assets/package.json`; in `UNRELEASED_PACKAGES` (`scripts/release-line.ts`) and outside `publish.yml` until its art is approved and licensed (owner decision 2026-11-12). |
 | `@texuli/mcp` | `0.18.0` (first published as `0.9.0`) | `packages/mcp/package.json`, with `@texuli/tools` pinned to exactly its own version; published right after `@texuli/tools`. In development (ADR-019), pre-1.0. |
 | Blueprint spec | `0.15.0`, digest `4c674bc59c8140ee2ff24e47f4de9c46689f48f07c8516128480db129f7a0a57` | `packages/spec/versions.json`; every generated file carries the spec version and digest in its stamp. Shipped by `@texuli/spec@0.17.0`, `@texuli/spec@0.17.1`, `@texuli/spec@0.17.2`, `@texuli/spec@0.17.3`, `@texuli/spec@0.17.4`, `@texuli/spec@0.17.5` and `@texuli/spec@0.18.0`; the `data-virtual-list` catalog props `mode`, `selectable` and `surface`, a stamp-only migration from `0.14.0`. |
 | Blueprint spec in `@texuli/spec@0.16.0` and `@texuli/spec@0.16.1` | `0.14.0`, digest `39b8e87b561ae37c3a3b3ef45b7cec29ad4b05fa9b01cd9032c1b9f05f383e24` | The 0.16 line's generated sources carry the `0.14.0` stamp; the category `color` axis (`none`, `chart-1` to `chart-8`), `allow.colors` and `unknown-color`, the catalog ids `color-swatch`, `data-virtual-list`, `link`, `list` and `mark`, a stamp-only migration from `0.13.0`. |
@@ -3983,19 +3986,18 @@ the versions into `main` is that GO: once CI passes on the merge commit,
 | 0.8.0 | Forms and canvas | `@texuli/forms` and `@texuli/canvas`, after `@texuli/editor` (first published in `0.8.0`) | Fresh owner GO for each version; `@texuli/forms` must be published **after** `@texuli/core` and `texuli`, and `@texuli/canvas` **after** `@texuli/core`, `@texuli/deck`, `@texuli/document`, `@texuli/drag` and `texuli`, which they depend on. No published package depends on either. |
 | 0.9.0 | Local MCP server | `@texuli/mcp`, right after `@texuli/tools` (first published in `0.9.0`) | Fresh owner GO for each version (the merge of `release/0.9.0`); it must be published **after** `@texuli/tools`, which it pins exactly. No published package depends on it. |
 | 0.8.0 | Spreadsheets | `@texuli/sheets`, after `@texuli/blocks` and before `@texuli/catalog` (first published in `0.8.0`) | Fresh owner GO for each version; it must be published **after** `@texuli/core`, `@texuli/date`, `@texuli/data` and `texuli`, which it depends on. No published package depends on it. |
-| 0.18.0 | Emoji packages | `@texuli/emojis` and `@texuli/emoji-assets`, right after `@texuli/date` and before `texuli` (first published in `0.18.0`) | Fresh owner GO for each version (the merge of the `0.18.0` release); `@texuli/emojis` must be published **before** `texuli` and `@texuli/tools`, which pin it exactly. No published package depends on `@texuli/emoji-assets`. |
+| 0.18.0 | Emoji catalog | `@texuli/emojis`, right after `@texuli/date` and before `texuli` (first published in `0.18.0`) | Fresh owner GO for each version (the merge of the `0.18.0` release); it must be published **before** `texuli` and `@texuli/tools`, which pin it exactly. `@texuli/emoji-assets` is not in the waves until its art is approved and licensed. |
 | 177 | Domain packages | `@texuli/charts`, `@texuli/data`, `@texuli/media`, `@texuli/chat`, `@texuli/blocks` | Fresh owner GO for the exact ready set after dependency order, package checks, size, pack, and consumer gates pass. |
 | 178 | Catalog and integration tools | `@texuli/catalog`, `@texuli/tools`, `@texuli/astro`, `@texuli/player`, `@texuli/slides`, `@texuli/spec` (the order in `publish.yml`; all six went out in the 2026-10-25 `0.1.0-next.1` run) | Fresh owner GO for each exact release set after implementation, dependency, pack, consumer, and relevant website/build gates pass. |
 
 The date, drag, workflows, deck, editor, document, pages, forms, canvas,
 sheets, mcp and emoji rows are in `.github/workflows/publish.yml` (order: core, date,
-emojis, emoji-assets, spec, drag, deck, tokens, primitives, document, texuli, workflows, editor,
+emojis, spec, drag, deck, tokens, primitives, document, texuli, workflows, editor,
 forms, canvas, charts, data, media, chat, blocks, sheets, catalog, tools,
 mcp, astro, player, pages, slides; `@texuli/editor` goes out from `0.5.0`,
 after `texuli`, `@texuli/document` and `@texuli/pages` from `0.7.0`,
 `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` from `0.8.0`, and
-`@texuli/mcp` from `0.9.0`, and `@texuli/emojis` and `@texuli/emoji-assets`
-from `0.18.0`).
+`@texuli/mcp` from `0.9.0`, and `@texuli/emojis` from `0.18.0`).
 Every published package is `0.18.0`, and every internal dependency between
 them is pinned to exactly `0.18.0`; the workflow refuses to start publishing while any listed
 package is still `0.0.0`. `pnpm verify:packages` still refuses any

@@ -5,9 +5,11 @@ Generated from `docs/RELEASE.md` by `scripts/package-changelogs.ts`. Do not edit
 ## 0.18.0
 
 A `0.x` minor: every published package moves to `0.18.0` together, every
-internal `@texuli/*` pin is exactly `0.18.0`, and two new packages join
-the published set at `0.18.0`, `@texuli/emojis` and `@texuli/emoji-assets`
-(28 published packages; both in development, pre-1.0). The blueprint spec
+internal `@texuli/*` pin is exactly `0.18.0`, and `@texuli/emojis` joins
+the published set at `0.18.0` (27 published packages; in development,
+pre-1.0). `@texuli/emoji-assets` is held back: it stays private at `0.0.0`
+and is not published (owner decision 2026-11-12: no unlicensed art leaves
+the repository). The blueprint spec
 stays `0.15.0` (`@texuli/spec@0.18.0` ships it, digest
 `4c674bc59c8140ee2ff24e47f4de9c46689f48f07c8516128480db129f7a0a57`
 unchanged). As a new minor, `^0.17.0` and `~0.17.0` never pick it up:
@@ -27,12 +29,12 @@ catalog exclusions.
   and skin-tone variants), the tokenizer and shortcode conversion, search,
   and a compatibility engine for `universal-emoji-parser` aliases
   (`@texuli/emojis/legacy-engine`, `@texuli/emojis/legacy`).
-- `@texuli/emoji-assets` (new, L0): the manifest of original Texuli emoji
-  art, the coverage report (`@texuli/emoji-assets/coverage`) and 72
-  candidate SVGs (`assets/`, checksums in the manifest). No artwork is
-  approved yet (0 approved), so `getTexuliEmojiAsset` returns nothing; the
-  proposed art license (CC BY 4.0) is pending the owner's sign-off, and the
-  package's MIT license covers its code, not the art.
+- `@texuli/emoji-assets` (L0, in development, **not published**): the
+  original Texuli emoji art, 72 candidate SVGs with a manifest and a
+  coverage report. None is approved (0 approved) and the proposed art
+  license (CC BY 4.0) is pending the owner's sign-off, so the package stays
+  private at `0.0.0`, outside the publish workflow, until the art is
+  approved and licensed.
 - `texuli/emoji`: `Emoji`, `EmojiText` and `EmojiPicker`. They show the
   system emoji by default, with a host resolver seam for reviewed art.
 - The MCP tools `emoji.search`, `emoji.get`, `emoji.categories`,

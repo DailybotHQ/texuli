@@ -125,7 +125,7 @@ describe('site copy honesty', () => {
   });
 
   it('never calls a published package unpublished', () => {
-    // All 28 packages are on npm in the published line of docs/RELEASE.md,
+    // All 27 packages are on npm in the published line of docs/RELEASE.md,
     // @texuli/forms, @texuli/canvas and @texuli/sheets (first published in
     // 0.8.0) and @texuli/mcp (first published in 0.9.0, ADR-019) included.
     // Their manifests carry that line or the version in development. Not on
@@ -141,7 +141,7 @@ describe('site copy honesty', () => {
         return false;
       }
     });
-    expect(published).toHaveLength(28);
+    expect(published).toHaveLength(27);
     for (const dir of [
       'canvas',
       'date',

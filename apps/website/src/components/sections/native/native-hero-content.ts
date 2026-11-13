@@ -61,7 +61,7 @@ export const nativeHeroContent = {
       kind: 'shipped',
       statusLabel: 'Shipped',
       detail:
-        'All 28 packages are published to npm in the 0.18 line (see docs/RELEASE.md), pre-1.0, and ' +
+        'All 27 packages are published to npm in the 0.18 line (see docs/RELEASE.md), pre-1.0, and ' +
         'texuli.com builds from this repository.',
     },
     {

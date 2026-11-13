@@ -35,7 +35,7 @@ export const RELEASES: readonly Release[] = [
     id: '0.18.0',
     title: '0.18.0: Markdown and HTML, Texuli Emojis and four new Solutions',
     status:
-      'Published on npm as 0.18.0, the current release (pre-1.0), with @texuli/emojis and @texuli/emoji-assets published for the first time.',
+      'Published on npm as 0.18.0, the current release (pre-1.0), with @texuli/emojis published for the first time; the emoji art package @texuli/emoji-assets is in development and not published.',
     published: true,
     summary:
       'A CommonMark and GFM stack in @texuli/core with safe HTML, HTML to Markdown without a DOM and writers for nine chat formats; Texuli Emojis (no art is approved yet, so system emoji show by default); a block-type menu, emoji, paste and chat export in the editor; chat autocomplete and attachments; a form builder; FilterBar and MetricCard. The existing Markdown codecs read through the shared parser, which changes some edge cases. No export removed; blueprint spec stays 0.15.0.',
@@ -461,7 +461,7 @@ export const FEATURES: readonly Feature[] = [
     href: '/solutions/',
     linkLabel: 'The Solutions catalog',
     demo: 'preview',
-    note: 'Released in 0.18.0, in development (pre-1.0). @texuli/emojis and @texuli/emoji-assets are on npm; no Texuli emoji art is approved yet, so components show system emoji.',
+    note: 'Released in 0.18.0, in development (pre-1.0). @texuli/emojis is on npm; @texuli/emoji-assets is in development and not published (72 art candidates, 0 approved, license pending), so no Texuli emoji art is approved yet and components show system emoji.',
   },
   {
     id: 'removals',

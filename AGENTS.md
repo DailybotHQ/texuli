@@ -26,8 +26,8 @@ end to end and native for agents:
   `https://texuli.com/mcp` remotely) and the **agent skill**
   (`skills/texuli`).
 
-**Status: in development, pre-1.0.** All 28 published packages (all of
-`packages/` except `@texuli/examples`) are released on npm in the 0.18 line,
+**Status: in development, pre-1.0.** All 27 published packages (all of
+`packages/` except `@texuli/examples` and the unreleased `@texuli/emoji-assets`) are released on npm in the 0.18 line,
 every one at `0.18.0`, which the publish workflow publishes from `main`
 after the merge through npm trusted publishing and points `latest` to
 (`next` is no longer maintained and stays on `0.12.1`); `0.10.0` added design
@@ -80,14 +80,15 @@ baseline keys; `0.17.5` is a security patch: `@texuli/core/markup` checks
 the URL the serializers will write (after `sanitizeMarkupChars`), and
 toolbar arrows, Home and End move only from toolbar items; `0.18.0` is a
 `0.x` minor that adds Markdown and HTML in `@texuli/core` with nine chat
-formats, Texuli Emojis (`@texuli/emojis` and `@texuli/emoji-assets` are
-published for the first time; no emoji art is approved yet, so components
-show system emoji), new editor, chat, forms and data components, and
+formats, Texuli Emojis (`@texuli/emojis` is published for the first
+time; components show system emoji, and `@texuli/emoji-assets`, the art,
+is not published), new editor, chat, forms and data components, and
 behavior changes on Markdown edge cases (blueprint spec stays `0.15.0`).
 `@texuli/drag`, `@texuli/workflows`, `@texuli/deck`, `@texuli/slides`,
 `@texuli/editor`, `@texuli/document`, `@texuli/pages`, `@texuli/forms`,
-`@texuli/canvas`, `@texuli/sheets`, `@texuli/mcp`, `@texuli/emojis` and
-`@texuli/emoji-assets` are still in development ([RELEASE](docs/RELEASE.md)). Workspace packages stay
+`@texuli/canvas`, `@texuli/sheets`, `@texuli/mcp` and `@texuli/emojis` are
+still in development, and `@texuli/emoji-assets` is not on npm yet
+([RELEASE](docs/RELEASE.md)). Workspace packages stay
 `private: true`, and no stable release is out (1.0.0 will be the first; under
 0.x a new minor may break; see [RELEASE](docs/RELEASE.md)),
 and texuli.com deploys from `main` to Cloudflare Pages, with the Pages
@@ -135,7 +136,7 @@ texuli/
 │   ├── deck/            L0 @texuli/deck: deck model v2 from JSON or Markdown, engine, authoring (in development, on npm as 0.18.0) (README, docs/)
 │   ├── drag/            L0 @texuli/drag: framework-free drag engine (in development, on npm as 0.18.0) (README, docs/)
 │   ├── emojis/          L0 @texuli/emojis: Unicode emoji catalog, tokenizer, search, legacy aliases (in development, first on npm as 0.18.0) (README)
-│   ├── emoji-assets/    L0 @texuli/emoji-assets: original emoji art manifest; no art approved yet (in development, first on npm as 0.18.0) (README)
+│   ├── emoji-assets/    L0 @texuli/emoji-assets: original emoji art candidates, none approved (in development, private, not on npm) (README)
 │   ├── primitives/      L1 @texuli/primitives: 42 owned headless primitives, APG patterns      (README, docs/)
 │   ├── document/        L1 @texuli/document: block document engine, ops, Markdown, CRDT sync (in development, on npm since 0.7.0) (README, docs/)
 │   ├── tokens/          L2 @texuli/tokens: OKLCH theme engine, --tx-* contract, 200+ themes, CSS (README, docs/)
@@ -268,17 +269,17 @@ confirm a non-zero `passed` count. Verified results and the source→test map:
     Never real PII, secrets or tokens; never read `.env` files.
 12. **Honesty.** Docs describe what works today and mark everything planned
     as planned. Never invent benchmarks, deploy URLs, release status or
-    check results. The 28 published packages, including `@texuli/mcp`
+    check results. The 27 published packages, including `@texuli/mcp`
     (first published in `0.9.0`), are released on npm in the 0.18 line
     (see docs/RELEASE.md; dist-tag `latest`, published by CI through npm
     trusted publishing with provenance; `next` is no longer maintained and
     stays on `0.12.1`); `@texuli/drag`, `@texuli/workflows`,
     `@texuli/deck`, `@texuli/slides`, `@texuli/editor`, `@texuli/document`, `@texuli/pages`,
-    `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets`, `@texuli/mcp`,
-    `@texuli/emojis` and `@texuli/emoji-assets` (both first published in
-    `0.18.0`) are still in development, and the blueprint spec in
-    `@texuli/spec@0.18.0` is `0.15.0`. `@texuli/examples`, the apps and
-    `native/` publish nothing. 0.18.0 is a pre-1.0 release, not stable
+    `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets`, `@texuli/mcp` and
+    `@texuli/emojis` (first published in `0.18.0`) are still in
+    development, and the blueprint spec in `@texuli/spec@0.18.0` is
+    `0.15.0`. `@texuli/examples`, `@texuli/emoji-assets` (held until its
+    art is approved and licensed), the apps and `native/` publish nothing. 0.18.0 is a pre-1.0 release, not stable
     (1.0.0 will be the first stable release; `latest` tracks the newest
     release). texuli.com deploys from `main` (Cloudflare Pages), with the
     remote MCP at `https://texuli.com/mcp`; the agent service is not

@@ -170,7 +170,7 @@ export const PARITY_ROWS: readonly ParityRow[] = [
     capability: 'Distribution',
     web: {
       status: 'exists',
-      detail: 'All 28 packages are on npm in the 0.18 line (see docs/RELEASE.md), pre-1.0.',
+      detail: 'All 27 packages are on npm in the 0.18 line (see docs/RELEASE.md), pre-1.0.',
       surface: 'packages/texuli/package.json',
     },
     native: {

@@ -5,9 +5,11 @@ Generated from `docs/RELEASE.md` by `scripts/package-changelogs.ts`. Do not edit
 ## 0.18.0
 
 A `0.x` minor: every published package moves to `0.18.0` together, every
-internal `@texuli/*` pin is exactly `0.18.0`, and two new packages join
-the published set at `0.18.0`, `@texuli/emojis` and `@texuli/emoji-assets`
-(28 published packages; both in development, pre-1.0). The blueprint spec
+internal `@texuli/*` pin is exactly `0.18.0`, and `@texuli/emojis` joins
+the published set at `0.18.0` (27 published packages; in development,
+pre-1.0). `@texuli/emoji-assets` is held back: it stays private at `0.0.0`
+and is not published (owner decision 2026-11-12: no unlicensed art leaves
+the repository). The blueprint spec
 stays `0.15.0` (`@texuli/spec@0.18.0` ships it, digest
 `4c674bc59c8140ee2ff24e47f4de9c46689f48f07c8516128480db129f7a0a57`
 unchanged). As a new minor, `^0.17.0` and `~0.17.0` never pick it up:

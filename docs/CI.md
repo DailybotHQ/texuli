@@ -127,7 +127,7 @@ first time as `0.3.0`; `@texuli/deck` was first published in `0.4.0`, and
 and `@texuli/pages` in `0.7.0`, and `@texuli/forms`, `@texuli/canvas` and
 `@texuli/sheets` in `0.8.0`, and `@texuli/mcp` in `0.9.0`; in `0.10.0`
 and from the 0.11 line on every packable package moves together
-(`@texuli/emojis` and `@texuli/emoji-assets` join in `0.18.0`). A pre-flight step refuses the run,
+(`@texuli/emojis` joins in `0.18.0`; `@texuli/emoji-assets` is not published yet). A pre-flight step refuses the run,
 before the first `npm publish`, when any listed package is still `0.0.0`.
 The publish loop
 skips versions npm already has, so a package changed since its published
@@ -135,7 +135,7 @@ version needs a new version first
 ([RELEASE](RELEASE.md#publication-waves)).
 
 **Authentication: npm trusted publishing (OIDC), no stored token.** Each of
-the 28 published packages trusts `publish.yml` of `DailybotHQ/texuli` in
+the 27 published packages trusts `publish.yml` of `DailybotHQ/texuli` in
 the `npm` environment (`npm trust github <package> --file publish.yml
 --repo DailybotHQ/texuli --env npm --allow-publish`, run by the publishing
 account, which confirms with its 2FA; npm keeps one trusted publisher per

@@ -1,7 +1,6 @@
 # @texuli/emoji-assets
 
-> **Status: in development (pre-1.0).** On npm as `0.18.0`, first published in
-> `0.18.0`, with provenance; no artwork is approved for publication yet.
+> **Status: in development.** Private and unreleased (not on npm); no artwork is approved for publication yet.
 
 This package contains 72 original 64×64 Texuli SVG design candidates, their
 manifest, and the measured Unicode-versus-art coverage report. Candidates are
