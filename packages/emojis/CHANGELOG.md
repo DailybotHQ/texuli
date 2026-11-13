@@ -28,9 +28,11 @@ catalog exclusions.
   and a compatibility engine for `universal-emoji-parser` aliases
   (`@texuli/emojis/legacy-engine`, `@texuli/emojis/legacy`).
 - `@texuli/emoji-assets` (new, L0): the manifest of original Texuli emoji
-  art. No artwork is approved yet (0 approved), so `getTexuliEmojiAsset`
-  returns nothing; the proposed art license is pending the owner's
-  sign-off.
+  art, the coverage report (`@texuli/emoji-assets/coverage`) and 72
+  candidate SVGs (`assets/`, checksums in the manifest). No artwork is
+  approved yet (0 approved), so `getTexuliEmojiAsset` returns nothing; the
+  proposed art license (CC BY 4.0) is pending the owner's sign-off, and the
+  package's MIT license covers its code, not the art.
 - `texuli/emoji`: `Emoji`, `EmojiText` and `EmojiPicker`. They show the
   system emoji by default, with a host resolver seam for reviewed art.
 - The MCP tools `emoji.search`, `emoji.get`, `emoji.categories`,
