@@ -159,14 +159,18 @@ describe('the gfm option', () => {
 });
 
 /** Median of three runs, in milliseconds. */
+/**
+ * Fastest of five runs: the least-disturbed sample (a busy machine only ever adds time), so a
+ * scaling ratio reflects the algorithm rather than scheduler noise.
+ */
 function median(run: () => void): number {
-  const times: number[] = [];
-  for (let i = 0; i < 3; i++) {
+  let best = Number.POSITIVE_INFINITY;
+  for (let i = 0; i < 5; i++) {
     const started = performance.now();
     run();
-    times.push(performance.now() - started);
+    best = Math.min(best, performance.now() - started);
   }
-  return times.sort((a, b) => a - b)[1] as number;
+  return best;
 }
 
 describe('pathological GFM input stays linear', () => {

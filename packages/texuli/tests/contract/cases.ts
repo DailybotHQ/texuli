@@ -86,6 +86,9 @@ export const CASES: ContractCase[] = [
       focus: 'the picker root is a container; focus behavior belongs to its controls',
       click: 'the root is a container; selection is handled by its grid',
       keydown: 'the root is a container; keyboard behavior is handled by its grid',
+      // Like click and keydown: pointer selection belongs to the grid, and the lazily loaded
+      // catalog could otherwise land between the two snapshots this check compares.
+      pointerdown: 'the root is a container; pointer selection is handled by its grid',
     },
   },
   // Layout parts a host composes on its own (G93): `ref` and rest on the root.
