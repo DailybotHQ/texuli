@@ -74,6 +74,9 @@ export const CASES: ContractCase[] = [
       click: 'the text renderer has no click behavior',
       focus: 'the text renderer does not manage focus',
       keydown: 'the text renderer does not act on keyboard events',
+      // Like Emoji: no pointer behavior to protect. Without the skip the check only compared two
+      // snapshots, and the lazily loaded emoji names could land between them under load.
+      pointerdown: 'the text renderer has no pointer interaction',
     },
   },
   {
