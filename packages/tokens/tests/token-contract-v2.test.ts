@@ -961,6 +961,9 @@ describe('token contract v2: component registry', () => {
             // The design-system kit (ADR-032) is a page of sections, not a styled control:
             // it reads system tokens only and owns no component tokens.
             'ds-kit',
+            // Emoji exports accessible renderers, not a token family; they read shared system
+            // tokens and intentionally do not extend the design-system component-token contract.
+            'emoji',
             'i18n',
             'i18n/es',
             'motion',

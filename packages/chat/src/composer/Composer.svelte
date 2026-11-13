@@ -478,7 +478,7 @@ function onKeydown(event: KeyboardEvent & { currentTarget: HTMLTextAreaElement }
       border-radius: var(--tx-shape-radius-md);
       background: var(--tx-elevated, var(--tx-surface, Canvas));
       color: var(--tx-elevated-foreground, var(--tx-surface-foreground, CanvasText));
-      box-shadow: var(--tx-elevation-3, none);
+      box-shadow: var(--tx-elevation-3);
       padding: var(--tx-space-1);
       list-style: none;
       max-block-size: 16rem;

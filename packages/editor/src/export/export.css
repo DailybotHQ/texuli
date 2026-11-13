@@ -9,7 +9,7 @@
 
 .tx-editor-export__title {
   margin: 0;
-  font-size: var(--tx-type-label-size, 0.875rem);
+  font-size: var(--tx-type-label-size);
   font-weight: 600;
 }
 
@@ -21,12 +21,12 @@
 }
 
 .tx-editor-export__label {
-  font-size: var(--tx-type-label-size, 0.875rem);
+  font-size: var(--tx-type-label-size);
   color: var(--tx-muted-foreground, GrayText);
 }
 
 .tx-editor-export__status {
-  font-size: var(--tx-type-label-size, 0.875rem);
+  font-size: var(--tx-type-label-size);
   color: var(--tx-muted-foreground, GrayText);
 }
 
@@ -40,7 +40,7 @@
   background: var(--tx-surface, Canvas);
   color: inherit;
   font-family: var(--tx-font-mono, ui-monospace, monospace);
-  font-size: var(--tx-type-label-size, 0.875rem);
+  font-size: var(--tx-type-label-size);
   resize: vertical;
 }
 
@@ -50,7 +50,7 @@
 }
 
 .tx-editor-export__losses {
-  font-size: var(--tx-type-label-size, 0.875rem);
+  font-size: var(--tx-type-label-size);
   color: var(--tx-muted-foreground, GrayText);
 }
 

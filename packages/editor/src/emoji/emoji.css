@@ -1,5 +1,5 @@
 /* @texuli/editor/emoji: the emoji popover. --tx-* tokens only; logical properties. */
 .tx-editor-emoji {
-  inline-size: min(22rem, calc(100vw - 2 * var(--tx-space-4, 1rem)));
+  inline-size: min(22rem, calc(100vw - 2 * var(--tx-space-4)));
   padding: var(--tx-space-2);
 }

@@ -20,7 +20,7 @@ const controller = new EditorController({
 <style>
   .demo {
     display: grid;
-    gap: var(--tx-space-3, 0.75rem);
+    gap: var(--tx-space-3);
     inline-size: min(100%, 44rem);
     color: var(--tx-foreground, CanvasText);
   }

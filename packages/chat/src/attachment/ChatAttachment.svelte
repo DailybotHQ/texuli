@@ -126,7 +126,7 @@ const regionId = `chat-attachment-${id}-preview`;
     .tx-chat-attachment__refused {
       display: grid;
       gap: var(--tx-space-1);
-      border-inline-start: var(--tx-border-width-thick, 3px) solid var(--tx-destructive, Mark);
+      border-inline-start: var(--tx-border-width-thick) solid var(--tx-destructive, Mark);
       padding-inline-start: var(--tx-space-3);
     }
 

@@ -53,7 +53,7 @@ async function pasteMarkdown(text: string) {
 <style>
   .demo {
     display: grid;
-    gap: var(--tx-space-3, 0.75rem);
+    gap: var(--tx-space-3);
     inline-size: min(100%, 44rem);
     color: var(--tx-foreground, CanvasText);
   }
@@ -70,6 +70,6 @@ async function pasteMarkdown(text: string) {
   .actions {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--tx-space-2, 0.5rem);
+    gap: var(--tx-space-2);
   }
 </style>

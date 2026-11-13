@@ -26,7 +26,7 @@ const markdown = $derived(toMarkdown(saved));
 <style>
   .demo {
     display: grid;
-    gap: var(--tx-space-3, 0.75rem);
+    gap: var(--tx-space-3);
     inline-size: min(100%, 44rem);
     color: var(--tx-foreground, CanvasText);
   }
@@ -44,8 +44,8 @@ const markdown = $derived(toMarkdown(saved));
 
   .markdown {
     margin: 0;
-    padding: var(--tx-space-3, 0.75rem);
-    border-radius: var(--tx-shape-radius-lg, 0.5rem);
+    padding: var(--tx-space-3);
+    border-radius: var(--tx-shape-radius-lg);
     background: var(--tx-muted, color-mix(in oklab, CanvasText 6%, Canvas));
     font-family: var(--tx-font-mono, ui-monospace, monospace);
     white-space: pre-wrap;
