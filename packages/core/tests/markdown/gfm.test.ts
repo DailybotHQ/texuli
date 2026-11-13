@@ -163,7 +163,7 @@ describe('the gfm option', () => {
  * Fastest of five runs: the least-disturbed sample (a busy machine only ever adds time), so a
  * scaling ratio reflects the algorithm rather than scheduler noise.
  */
-function median(run: () => void): number {
+function fastest(run: () => void): number {
   let best = Number.POSITIVE_INFINITY;
   for (let i = 0; i < 5; i++) {
     const started = performance.now();
@@ -203,10 +203,10 @@ describe('pathological GFM input stays linear', () => {
     const large = lists(20_000);
     parseMarkdown(small);
     const ratio =
-      median(() => parseMarkdown(large)) /
+      fastest(() => parseMarkdown(large)) /
       Math.max(
         1,
-        median(() => parseMarkdown(small))
+        fastest(() => parseMarkdown(small))
       );
     // Four times the input: linear is about 4, quadratic about 16.
     expect(ratio).toBeLessThan(10);
