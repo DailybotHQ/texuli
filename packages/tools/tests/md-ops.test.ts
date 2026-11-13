@@ -20,8 +20,9 @@ it('converts untrusted Markdown, HTML and chat dialects and refuses hostile URLs
     });
     expect(outcome.ok).toBe(true);
     if (!outcome.ok) return;
-    expect(outcome.output.value).toContain('hello');
-    expect(Array.isArray(outcome.output.diagnostics)).toBe(true);
+    const converted = outcome.output as { value: string; diagnostics: unknown };
+    expect(converted.value).toContain('hello');
+    expect(Array.isArray(converted.diagnostics)).toBe(true);
   });
 
   await scenario('javascript links are refused in HTML output', async () => {
@@ -30,12 +31,11 @@ it('converts untrusted Markdown, HTML and chat dialects and refuses hostile URLs
     });
     expect(outcome.ok).toBe(true);
     if (!outcome.ok) return;
-    const html = String(outcome.output.html);
+    const rendered = outcome.output as { html: string; diagnostics: { code: string }[] };
+    const html = String(rendered.html);
     expect(html.toLowerCase()).not.toContain('javascript:');
     expect(html).not.toContain('<script');
-    expect(
-      (outcome.output.diagnostics as { code: string }[]).some((item) => item.code === 'url-refused')
-    ).toBe(true);
+    expect(rendered.diagnostics.some((item) => item.code === 'url-refused')).toBe(true);
   });
 
   await scenario('HTML script tags do not survive conversion', async () => {
@@ -46,7 +46,7 @@ it('converts untrusted Markdown, HTML and chat dialects and refuses hostile URLs
     });
     expect(outcome.ok).toBe(true);
     if (!outcome.ok) return;
-    expect(String(outcome.output.value)).not.toContain('alert(1)');
+    expect(String((outcome.output as { value: string }).value)).not.toContain('alert(1)');
   });
 
   await scenario('HTML to GFM text, and a strict CommonMark round trip', async () => {
@@ -58,9 +58,10 @@ it('converts untrusted Markdown, HTML and chat dialects and refuses hostile URLs
     });
     expect(fromHtml.ok).toBe(true);
     if (!fromHtml.ok) return;
-    expect(String(fromHtml.output.value)).toContain('| a |');
-    expect(String(fromHtml.output.value)).toContain('~~b~~');
-    expect(String(fromHtml.output.value)).not.toContain('javascript:');
+    const htmlOut = fromHtml.output as { value: string };
+    expect(String(htmlOut.value)).toContain('| a |');
+    expect(String(htmlOut.value)).toContain('~~b~~');
+    expect(String(htmlOut.value)).not.toContain('javascript:');
     const strict = await texuliOps.invoke('md.convert', {
       source: '**hi** ~~not strike~~',
       from: 'commonmark',
@@ -69,14 +70,14 @@ it('converts untrusted Markdown, HTML and chat dialects and refuses hostile URLs
     expect(strict.ok).toBe(true);
     if (!strict.ok) return;
     // Strict CommonMark has no strikethrough: the tildes stay text, escaped by the writer.
-    expect(strict.output.value).toBe('**hi** \\~\\~not strike\\~\\~\n');
+    expect((strict.output as { value: string }).value).toBe('**hi** \\~\\~not strike\\~\\~\n');
     const table = await texuliOps.invoke('md.render', { source: '| a |\n| - |\n| b |' });
     const plain = await texuliOps.invoke('md.render', {
       source: '| a |\n| - |\n| b |',
       gfm: false,
     });
-    expect(table.ok && String(table.output.html)).toContain('<table>');
-    expect(plain.ok && String(plain.output.html)).not.toContain('<table>');
+    expect(table.ok && String((table.output as { html: string }).html)).toContain('<table>');
+    expect(plain.ok && String((plain.output as { html: string }).html)).not.toContain('<table>');
   });
 
   await scenario('trust cannot be raised: no developer argument', async () => {
