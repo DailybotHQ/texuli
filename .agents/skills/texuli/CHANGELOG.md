@@ -15,6 +15,16 @@ the pack, and leaves an empty `## [Unreleased]` block on top.
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-11-13
+
+### Changes
+
+- chore(skill): 27 packages at 0.18.0; the emoji art package is not on npm
+- chore(skill): packages on npm at 0.18.0, with the emoji packages
+- fix(tools): keep emoji catalog ops off the remote MCP Function
+- feat(tools): add emoji.search get convert categories variants operations
+- feat(tools): add md.convert and md.render agent operations
+
 - The packages are on npm at `0.18.0`, a `0.x` minor (blueprint spec stays
   `0.15.0`), 27 of them with `@texuli/emojis` published for the first
   time (`@texuli/emoji-assets`, the art, is not published): Markdown and HTML in `@texuli/core`, chat
