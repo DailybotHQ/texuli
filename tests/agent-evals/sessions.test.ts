@@ -143,9 +143,10 @@ describe('what differs between the doors, and only that', () => {
         name: 'ds.save (remote)',
         steps: [
           saveStep({
-            rpcError: (error: Json) => {
-              expect(error.code).toBe(-32602);
-              expect(error.message).toMatch(/Unknown tool: ds\.save/);
+            toolError(failure) {
+              expect(failure.code).toBe('runtime-unavailable');
+              expect(failure.error).toMatch(/needs the node runtime/u);
+              expect(failure.error).toContain('npx -y @texuli/mcp');
             },
           }),
         ],
@@ -182,9 +183,10 @@ describe('what differs between the doors, and only that', () => {
         name: 'node operation (remote)',
         steps: [
           exportStep({
-            rpcError: (error: Json) => {
-              expect(error.code).toBe(-32602);
-              expect(error.message).toMatch(/Unknown tool: document\.export/);
+            toolError(failure) {
+              expect(failure.code).toBe('runtime-unavailable');
+              expect(failure.error).toMatch(/needs the node runtime/u);
+              expect(failure.error).toContain('npx -y @texuli/mcp');
             },
           }),
         ],

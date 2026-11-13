@@ -14,6 +14,7 @@ import {
   SUPPORTED_SCHEMA_KEYWORDS,
   schemaKeywordIssues,
   TEXULI_ALIASES,
+  TEXULI_NODE_OPERATION_NAMES,
   TEXULI_OPERATIONS,
   TEXULI_REMOVED_NAMES,
   TOOLS_VERSION,
@@ -128,6 +129,9 @@ it('declares every operation once, self-described for agents, in the supported s
         'emoji.categories',
         'emoji.variants',
       ]);
+      expect([...TEXULI_NODE_OPERATION_NAMES]).toEqual(
+        texuliOps.list({ runtimes: ['node'] }).map((operation) => operation.name)
+      );
       const site = TEXULI_OPERATIONS.filter((operation) => operation.runtime === 'site');
       expect(site.map((operation) => operation.name)).toEqual([
         'site.pages',

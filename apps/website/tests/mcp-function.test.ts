@@ -165,7 +165,7 @@ describe('the protocol through POST /mcp (edge and site operations)', () => {
     expect(verdicts).toEqual([true, false]);
   });
 
-  it('refuses a node-only operation as an unknown tool and keeps each operation limit', async () => {
+  it('refuses a node-only operation as runtime-unavailable and keeps each operation limit', async () => {
     for (const name of NODE_ONLY_NAMES) {
       const response = await rpc({
         jsonrpc: '2.0',
@@ -173,9 +173,11 @@ describe('the protocol through POST /mcp (edge and site operations)', () => {
         method: 'tools/call',
         params: { name, arguments: {} },
       });
-      const body = await response.json();
-      expect(body.error?.code, name).toBe(-32602);
-      expect(body.error?.message, name).toMatch(`Unknown tool: ${name}`);
+      const text = (await response.json()).result.content[0].text;
+      const body = JSON.parse(text) as { code: string; error: string };
+      expect(body.code, name).toBe('runtime-unavailable');
+      expect(body.error, name).toMatch(/needs the node runtime/);
+      expect(body.error, name).toContain('npx -y @texuli/mcp');
     }
     // catalog.search declares 4,096 input bytes and at most 100 results.
     const tooLarge = await rpc({
