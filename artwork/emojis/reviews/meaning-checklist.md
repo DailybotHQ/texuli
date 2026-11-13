@@ -1,32 +1,32 @@
-# Emoji seed meaning checklist — R4
+# Emoji seed meaning checklist — R5
 
 Reviewer: agent lane `local:wH:p2R` (author self-review). Date: 2026-11-12.
-Review method: inspect candidates at 64 px and 24 px on light and dark grounds against their CLDR names and defining features. The JSON checklist is enforced by `scripts/emojis/validate-art.ts`.
+Review method: inspect all 72 candidates at 64 px and 24 px on light and dark grounds, comparing each rendered silhouette and its CLDR-defining features; the JSON checklist is enforced by `scripts/emojis/validate-art.ts`.
 Status: all listed glyphs pass this lane review; independent owner review and CC BY 4.0 sign-off remain pending.
 
 | ID | CLDR name | Defining features required | Comparison notes | Result — reviewer |
 | --- | --- | --- | --- | --- |
 | `1f600` | grinning face | Open toothy grin; rounded eyes; no tears or blush. | — | PASS — `local:wH:p2R` |
 | `1f603` | grinning face with big eyes | Open toothy grin and visibly larger round eyes than other smiles. | — | PASS — `local:wH:p2R` |
-| `1f604` | grinning face with smiling eyes | Recognizable grinning face with smiling eyes silhouette with its defining subject and visible details. | — | PASS — `local:wH:p2R` |
-| `1f606` | grinning squinting face | Recognizable grinning squinting face silhouette with its defining subject and visible details. | — | PASS — `local:wH:p2R` |
+| `1f604` | grinning face with smiling eyes | Gentle upward-arc smiling eyes and an open toothy grin. | Compared beside 1f606, 1f60a and 1f600 at 64 px and 24 px on light/dark grounds: gentle upward-arc eyes and an open toothy grin distinguish it from a closed-mouth smile, squeezed eyes or round open eyes. | PASS — `local:wH:p2R` |
+| `1f606` | grinning squinting face | Tightly squeezed eyes and a broad open toothy grin. | Compared beside 1f604 and 1f600 at 64 px and 24 px on light/dark grounds: tight squeezed zigzag eyes and a broader open toothy grin are distinct from round eyes or gentle smiling arcs. | PASS — `local:wH:p2R` |
 | `1f605` | grinning face with sweat | Recognizable grinning face with sweat silhouette with its defining subject and visible details. | — | PASS — `local:wH:p2R` |
 | `1f642` | slightly smiling face | Small restrained closed smile; neutral open eyes. | — | PASS — `local:wH:p2R` |
-| `1f60a` | smiling face with smiling eyes | Both eyes closed in upward arcs, gentle smile and two blush marks. | — | PASS — `local:wH:p2R` |
+| `1f60a` | smiling face with smiling eyes | Both eyes closed in upward arcs, gentle smile and two blush marks. | Compared beside 1f604 and 1f970 at 64 px and 24 px on light/dark grounds: closed upward-arc eyes, blush and a closed gentle smile distinguish it from open teeth or floating hearts. | PASS — `local:wH:p2R` |
 | `1f607` | smiling face with halo | Recognizable smiling face with halo silhouette with its defining subject and visible details. | — | PASS — `local:wH:p2R` |
-| `1f970` | smiling face with hearts | Recognizable heart silhouette and the color named by CLDR. | — | PASS — `local:wH:p2R` |
-| `1f60d` | smiling face with heart-eyes | Recognizable heart silhouette and the color named by CLDR. | — | PASS — `local:wH:p2R` |
+| `1f970` | smiling face with hearts | Normal smiling eyes, a gentle smiling mouth, blush and three small hearts floating around the head. | Compared beside 1f60d at 64 px and 24 px on light/dark grounds: eyes are normal smiling arcs with blush; three separate hearts float around the head, not in the eye sockets. | PASS — `local:wH:p2R` |
+| `1f60d` | smiling face with heart-eyes | Two red heart-shaped eyes and a smiling mouth; hearts are the eyes, not floating around the head. | Compared beside 1f970 at 64 px and 24 px on light/dark grounds: two hearts occupy the eye positions; there are no floating hearts around the head. | PASS — `local:wH:p2R` |
 | `1f929` | star-struck | Five-point star silhouette. | — | PASS — `local:wH:p2R` |
 | `263a-fe0f` | smiling face | Closed smile with two blush marks; no open mouth or tears. | — | PASS — `local:wH:p2R` |
 | `1f972` | smiling face with tear | Recognizable smiling face with tear silhouette with its defining subject and visible details. | — | PASS — `local:wH:p2R` |
 | `1f917` | smiling face with open hands | One smiling face framed by two visible open hands reaching in to hug. | — | PASS — `local:wH:p2R` |
-| `1f60e` | smiling face with sunglasses | Round sun disc with visible rays. | — | PASS — `local:wH:p2R` |
+| `1f60e` | smiling face with sunglasses | Two dark sunglass lenses joined by a bridge above a smiling mouth. | — | PASS — `local:wH:p2R` |
 | `1f914` | thinking face | Raised eyebrow and a hand resting at the chin. | — | PASS — `local:wH:p2R` |
-| `1f928` | face with raised eyebrow | Recognizable face with raised eyebrow silhouette with its defining subject and visible details. | — | PASS — `local:wH:p2R` |
+| `1f928` | face with raised eyebrow | One eyebrow raised above a skeptical, slightly tilted smile. | — | PASS — `local:wH:p2R` |
 | `1f622` | crying face | One blue tear and a downturned mouth. | — | PASS — `local:wH:p2R` |
 | `1f62d` | loudly crying face | Wide open anguished mouth and two long blue tear streams. | — | PASS — `local:wH:p2R` |
-| `1f620` | angry face | Recognizable angry face silhouette with its defining subject and visible details. | — | PASS — `local:wH:p2R` |
-| `1f631` | face screaming in fear | Recognizable face screaming in fear silhouette with its defining subject and visible details. | — | PASS — `local:wH:p2R` |
+| `1f620` | angry face | Brows slant down toward the center above a clear frown. | — | PASS — `local:wH:p2R` |
+| `1f631` | face screaming in fear | Pale blue upper face, both hands pressed to the cheeks, wide eyes and an open vertical oval mouth. | Compared beside 1f62d at 64 px and 24 px on light/dark grounds: pale blue face, hands pressed to both cheeks and an open vertical oval mouth identify fear; it has no crying face tear streams. | PASS — `local:wH:p2R` |
 | `1f47b` | ghost | Ghost silhouette with sheet-like lower edge and two eyes. | — | PASS — `local:wH:p2R` |
 | `2764-fe0f` | red heart | Recognizable heart silhouette and the color named by CLDR. | — | PASS — `local:wH:p2R` |
 | `1fa77` | pink heart | Recognizable heart silhouette and the color named by CLDR. | — | PASS — `local:wH:p2R` |
@@ -37,9 +37,9 @@ Status: all listed glyphs pass this lane review; independent owner review and CC
 | `1f49c` | purple heart | Recognizable heart silhouette and the color named by CLDR. | — | PASS — `local:wH:p2R` |
 | `1f90d` | white heart | Recognizable heart silhouette and the color named by CLDR. | — | PASS — `local:wH:p2R` |
 | `1f680` | rocket | Rocket body, porthole, fins and flame. | — | PASS — `local:wH:p2R` |
-| `1f337` | tulip | Recognizable tulip flower, with distinct petals, center and stem. | — | PASS — `local:wH:p2R` |
+| `1f337` | tulip | Cup-shaped bloom of overlapping petals on a straight stem with leaves. | Compared beside 1f33a at 64 px and 24 px on light/dark grounds: the tulip is a cup-shaped bloom of overlapping petals on a straight stem with leaves; it no longer uses the hibiscus radial bloom. | PASS — `local:wH:p2R` |
 | `1f33b` | sunflower | Recognizable sunflower flower, with distinct petals, center and stem. | — | PASS — `local:wH:p2R` |
-| `1f33a` | hibiscus | Recognizable hibiscus flower, with distinct petals, center and stem. | — | PASS — `local:wH:p2R` |
+| `1f33a` | hibiscus | Open five-petal hibiscus bloom with a long visible central stamen, stem and leaves. | Compared beside 1f337 at 64 px and 24 px on light/dark grounds: the hibiscus is an open five-petal bloom with a visible projecting central stamen, distinct from the tulip cup. | PASS — `local:wH:p2R` |
 | `1f4d5` | closed book | Recognizable closed book book shape; preserve its open or closed state. | — | PASS — `local:wH:p2R` |
 | `1f4d6` | open book | Recognizable open book book shape; preserve its open or closed state. | — | PASS — `local:wH:p2R` |
 | `2615` | hot beverage | Steaming cup with a visible handle. | — | PASS — `local:wH:p2R` |
@@ -53,11 +53,11 @@ Status: all listed glyphs pass this lane review; independent owner review and CC
 | `1f388` | balloon | Inflated balloon with a tied neck and string. | — | PASS — `local:wH:p2R` |
 | `1f4f7` | camera | Camera body with lens and viewfinder detail. | — | PASS — `local:wH:p2R` |
 | `1f3b5` | musical note | Single musical note with note head and stem. | — | PASS — `local:wH:p2R` |
-| `1f44d-1f3fb` | thumbs up: light skin tone | Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: light skin tone modifier. | R4 compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits. | PASS — `local:wH:p2R` |
-| `1f44d-1f3fc` | thumbs up: medium-light skin tone | Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: medium-light skin tone modifier. | R4 compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits. | PASS — `local:wH:p2R` |
-| `1f44d-1f3fd` | thumbs up: medium skin tone | Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: medium skin tone modifier. | R4 compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits. | PASS — `local:wH:p2R` |
-| `1f44d-1f3fe` | thumbs up: medium-dark skin tone | Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: medium-dark skin tone modifier. | R4 compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits. | PASS — `local:wH:p2R` |
-| `1f44d-1f3ff` | thumbs up: dark skin tone | Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: dark skin tone modifier. | R4 compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits. | PASS — `local:wH:p2R` |
+| `1f44d-1f3fb` | thumbs up: light skin tone | Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: light skin tone modifier. | Compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits. | PASS — `local:wH:p2R` |
+| `1f44d-1f3fc` | thumbs up: medium-light skin tone | Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: medium-light skin tone modifier. | Compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits. | PASS — `local:wH:p2R` |
+| `1f44d-1f3fd` | thumbs up: medium skin tone | Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: medium skin tone modifier. | Compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits. | PASS — `local:wH:p2R` |
+| `1f44d-1f3fe` | thumbs up: medium-dark skin tone | Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: medium-dark skin tone modifier. | Compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits. | PASS — `local:wH:p2R` |
+| `1f44d-1f3ff` | thumbs up: dark skin tone | Sideways closed fist with curled fingers visible as stacked bands; short, broad thumb rises from the side at a slight angle; preserve the thumbs up: dark skin tone modifier. | Compared at 64 px and 24 px on light and dark grounds beside throwaway U+1F595 middle-finger and U+261D index-pointing-up references. This contour is one continuous rounded, slightly tapered and thicker side-mounted thumb lobe with no notch; both references retain long upright digits. | PASS — `local:wH:p2R` |
 | `1f469` | woman | Recognizable woman silhouette with its defining subject and visible details. | — | PASS — `local:wH:p2R` |
 | `1f469-1f3fb` | woman: light skin tone | Recognizable woman: light skin tone hand/person silhouette and the specified skin tone. | — | PASS — `local:wH:p2R` |
 | `1f469-1f3fc` | woman: medium-light skin tone | Recognizable woman: medium-light skin tone hand/person silhouette and the specified skin tone. | — | PASS — `local:wH:p2R` |
