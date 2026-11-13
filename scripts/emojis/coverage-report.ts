@@ -1,9 +1,10 @@
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const REPORT = resolve(ROOT, 'packages/emoji-assets/data/art-coverage.json');
+const COVERAGE_SOURCE = resolve(ROOT, 'packages/emoji-assets/src/data/art-coverage.json');
 const CATALOG = resolve(ROOT, 'packages/emojis/src/data/catalog.json');
 const MANIFEST = resolve(ROOT, 'packages/emoji-assets/src/manifest.ts');
 
@@ -50,13 +51,19 @@ function report(): object {
   };
 }
 
-const expected = `${JSON.stringify(report(), null, 2)}\n`;
+const measured = report();
+const expected = `${JSON.stringify(measured, null, 2)}\n`;
 if (process.argv.includes('--check')) {
   const actual = readFileSync(REPORT, 'utf8');
   if (actual !== expected)
     throw new Error('art coverage report is stale; run scripts/emojis/coverage-report.ts');
+  const sourceActual = readFileSync(COVERAGE_SOURCE, 'utf8');
+  if (sourceActual !== expected)
+    throw new Error('coverage source is stale; run scripts/emojis/coverage-report.ts');
   console.log('checked art coverage report');
 } else {
+  mkdirSync(dirname(COVERAGE_SOURCE), { recursive: true });
   writeFileSync(REPORT, expected);
+  writeFileSync(COVERAGE_SOURCE, expected);
   console.log('wrote measured art coverage report');
 }

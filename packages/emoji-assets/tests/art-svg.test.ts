@@ -3,13 +3,30 @@ import { optimizeSvg, sanitizeSvg, validateSvg } from '../../../scripts/emojis/a
 import { emojiAssetManifest, getTexuliEmojiAsset } from '../src/manifest.ts';
 
 const SAFE =
-  '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" fill="#f4c94f" /></svg>';
+  '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><title>smile &amp; joy</title><circle cx="32" cy="32" r="20" fill="#f4c94f" /></svg>';
 
 describe('emoji SVG boundary', () => {
   it('validates and deterministically optimizes the allowed vector subset', () => {
-    expect(validateSvg(SAFE)).toMatchObject({ nodeCount: 2, viewBox: '0 0 64 64' });
+    expect(validateSvg(SAFE)).toMatchObject({
+      nodeCount: 3,
+      title: 'smile & joy',
+      viewBox: '0 0 64 64',
+    });
     expect(optimizeSvg(SAFE)).toBe(optimizeSvg(SAFE));
+    expect(optimizeSvg(SAFE)).toContain('<title>smile &amp; joy</title>');
     expect(sanitizeSvg(SAFE)).toContain('<circle cx="32" cy="32" fill="#f4c94f" r="20" />');
+  });
+
+  it('requires one safe, direct-child title and canonically escapes its text', () => {
+    expect(() => validateSvg(SAFE.replace('<title>smile &amp; joy</title>', ''))).toThrow(/title/);
+    expect(() => validateSvg(SAFE.replace('smile &amp; joy', 'smile &unknown; joy'))).toThrow(
+      /entity/
+    );
+    expect(() =>
+      validateSvg(
+        SAFE.replace('<title>smile &amp; joy</title>', '<title><script>x</script></title>')
+      )
+    ).toThrow();
   });
 
   it.each([
