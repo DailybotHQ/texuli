@@ -15,7 +15,7 @@ consume the packages, or copy a styled component's source into the app and
 own it, then theme it, adjust it and keep it updatable.
 
 The copy path is **local**: its commands run from a Texuli monorepo checkout
-against folders on disk. All 28 published packages are on npm in
+against folders on disk. All 27 published packages are on npm in
 the 0.18 line (see docs/RELEASE.md), a pre-1.0 line (`latest` points to the newest, and `next` is no longer maintained; 1.0.0 will
 be the first stable release). Install them plainly (`pnpm add texuli`), pin
 the exact version or `^0.18.0` (for 0.x it accepts only 0.18.x, since a new
@@ -24,8 +24,7 @@ minor may break), and never suggest a download URL. `@texuli/drag`,
 in `0.5.0`), `@texuli/document` and `@texuli/pages` (both first published
 in `0.7.0`), `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (all
 three first published in `0.8.0`), `@texuli/mcp` (first published in
-`0.9.0`), and `@texuli/emojis` and `@texuli/emoji-assets` (both first
-published in `0.18.0`) are in development and on npm as `0.18.0`. Features such as
+`0.9.0`), and `@texuli/emojis` (first published in `0.18.0`) are in development and on npm as `0.18.0`. Features such as
 `@texuli/primitives/sortable` and spec 0.3.0 and 0.4.0 need `0.4.0` or
 later (they are not in `0.3.0`); the `0.12.0`, `0.11.0`, `0.10.0`, `0.9.0`, `0.8.0`, `0.7.0`, `0.6.0` and `0.5.0` breaking changes
 are in [`../upgrade/SKILL.md`](../upgrade/SKILL.md).

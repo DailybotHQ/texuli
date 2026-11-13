@@ -14,8 +14,7 @@ runs the install; it uses the network). `@texuli/drag`,
 in `0.5.0`), `@texuli/document` and `@texuli/pages` (both first published
 in `0.7.0`), `@texuli/forms`, `@texuli/canvas` and `@texuli/sheets` (all
 three first published in `0.8.0`), `@texuli/mcp` (first published in
-`0.9.0`), and `@texuli/emojis` and `@texuli/emoji-assets` (both first
-published in `0.18.0`) are in development and on npm as `0.18.0`.
+`0.9.0`), and `@texuli/emojis` (first published in `0.18.0`) are in development and on npm as `0.18.0`.
 
 New in `0.13.1` (an additive patch): `@texuli/blocks/code-field` (`CodeField`),
 `registerIcons` and `IconsProvider` in `texuli/icons`, `srcDark` and
@@ -101,9 +100,9 @@ New in `0.18.0` (a `0.x` minor; blueprint spec stays `0.15.0`; pin
   text, chat) read through the shared CommonMark parser, so edge cases
   change: setext headings, indented code, reference links, character
   references and escapes now read as CommonMark says.
-- Texuli Emojis: `@texuli/emojis` and `@texuli/emoji-assets` (new
-  packages), and `Emoji`, `EmojiText` and `EmojiPicker` in `texuli/emoji`.
-  No Texuli art is approved yet, so they show system emoji.
+- Texuli Emojis: `@texuli/emojis` (new package), and `Emoji`, `EmojiText`
+  and `EmojiPicker` in `texuli/emoji`. They show system emoji;
+  `@texuli/emoji-assets` (the art) is not published yet.
 - Editor: `@texuli/editor/block-menu`, `@texuli/editor/emoji`,
   `@texuli/editor/export`, HTML paste and Paste as Markdown. Chat: composer
   autocomplete, `ChatAttachment`. Forms: `@texuli/forms/builder`. Data:

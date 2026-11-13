@@ -54,7 +54,7 @@ agent config, or publish packages without explicit consent (see
    Installing the skill does **not** install Texuli packages or a CLI.
 2. Confirm the workspace has Texuli (workspace packages `texuli`,
    `@texuli/core`, `@texuli/tokens`, …) before promising package imports.
-   All 28 published packages are on npm in the 0.18 line, every one at
+   All 27 published packages are on npm in the 0.18 line, every one at
    `0.18.0`, published by CI
    through npm trusted publishing with provenance under the `latest`
    dist-tag (`next` is no longer maintained and stays on `0.12.1`). They
@@ -63,8 +63,8 @@ agent config, or publish packages without explicit consent (see
    workspace packages stay `private: true`. `@texuli/drag`,
    `@texuli/workflows`, `@texuli/deck`, `@texuli/slides`,
    `@texuli/editor`, `@texuli/document`, `@texuli/pages`,
-   `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets`, `@texuli/mcp`,
-   `@texuli/emojis` and `@texuli/emoji-assets`
+   `@texuli/forms`, `@texuli/canvas`, `@texuli/sheets`, `@texuli/mcp` and
+   `@texuli/emojis`
    are in development, though on npm at the same version. `0.12.0` moved
    the `@texuli/pages` core entries off the deck model: `PageEditorCore`,
    `CollabEditorCore` and `createDocumentPlayerHostCore` need
