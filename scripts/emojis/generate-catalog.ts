@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -662,6 +663,20 @@ function serializeJson(value: unknown): string {
   return `${print(value, 0)}\n`;
 }
 
+/**
+ * Biome-formatted JSON for the files lint checks: Biome's formatter is the source of truth for line
+ * width (it measures emoji and escapes differently from string length). Files of 1 MiB or more are
+ * skipped by Biome (files.maxSize), so they keep the generator's own layout.
+ */
+function biomeJson(name: string, json: string): string {
+  if (Buffer.byteLength(json) >= 1024 * 1024) return json;
+  return execFileSync(
+    resolve(ROOT, 'node_modules/.bin/biome'),
+    ['format', `--stdin-file-path=packages/emojis/src/data/${name}`],
+    { cwd: ROOT, input: json, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 }
+  );
+}
+
 export function generateFiles(): Record<string, string> {
   const { catalog, aliases } = buildCatalog();
   const catalogJson = serializeJson(catalog);
@@ -723,10 +738,10 @@ export function generateFiles(): Record<string, string> {
     '',
   ].join('\n');
   return {
-    'catalog.json': catalogJson,
-    'aliases.json': aliasesJson,
-    'schema.json': schemaJson,
-    'unicode-index.json': unicodeIndexJson,
+    'catalog.json': biomeJson('catalog.json', catalogJson),
+    'aliases.json': biomeJson('aliases.json', aliasesJson),
+    'schema.json': biomeJson('schema.json', schemaJson),
+    'unicode-index.json': biomeJson('unicode-index.json', unicodeIndexJson),
     'catalog.ts': catalogTs,
     'legacy.ts': legacyTs,
     'index.ts': indexTs,
