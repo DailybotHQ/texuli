@@ -196,7 +196,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     id: 'page-forms-solution',
     title: 'Forms',
     description:
-      'Schema-driven forms: every field type, named formats, validation with announced errors, multi-step flows, conditional logic, drafts and autosave, and a visual builder (in development; the builder is not in a published release yet).',
+      'Schema-driven forms: every field type, named formats, validation with announced errors, multi-step flows, conditional logic, drafts and autosave, and a visual builder (in development; the builder was released in 0.18.0).',
     href: '/solutions/forms/',
     kind: 'page',
     keywords: [
@@ -314,7 +314,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     id: 'page-markdown',
     title: 'Markdown, HTML and chat dialects',
     description:
-      'Untrusted Markdown, HTML and nine chat dialects through @texuli/core (in development, not in a published release yet).',
+      'Untrusted Markdown, HTML and nine chat dialects through @texuli/core (in development, released in 0.18.0).',
     href: '/markdown/',
     kind: 'page',
     keywords: ['markdown', 'html', 'gfm', 'commonmark', 'slack', 'discord', 'dialects'],
@@ -323,7 +323,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     id: 'page-emoji',
     title: 'Emoji components',
     description:
-      'Accessible emoji rendering, safe text tokenization and a keyboard picker (texuli/emoji; added after 0.17.4, not in a published release yet).',
+      'Accessible emoji rendering, safe text tokenization and a keyboard picker (texuli/emoji; released in 0.18.0).',
     href: '/emoji/',
     kind: 'page',
     keywords: ['emoji', 'picker', 'shortcode', 'unicode', 'texuli/emoji'],
@@ -332,7 +332,7 @@ const SITE_PAGES: readonly SearchEntry[] = [
     id: 'page-whats-new',
     title: 'What’s new',
     description:
-      'Every new package and capability of 0.6.0 to 0.17.5, with a demo or preview each and honest release status.',
+      'Every new package and capability of 0.6.0 to 0.18.0, with a demo or preview each and honest release status.',
     href: '/whats-new/',
     kind: 'page',
     keywords: [

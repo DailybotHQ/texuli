@@ -11,10 +11,10 @@ Svelte 5 component library by Dailybot, Inc.
 
 **In the stack:** layer L5, on the `@texuli/core` texels, the `@texuli/tokens` token engine, the `texuli` components and the `@texuli/charts`, `@texuli/data` and `@texuli/media` domain packages. The agent catalog, the player, `@texuli/pages`, `@texuli/slides`, `@texuli/astro` and `@texuli/tools` build on it.
 
-> **Status: 0.x release.** `@texuli/blocks` is published on npm as `0.17.5`, a
+> **Status: 0.x release.** `@texuli/blocks` is published on npm as `0.18.0`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
 > minor (`0.14.0`) may contain breaking changes, so pin the exact version or
-> use `^0.17.0`, which accepts only 0.17.x.
+> use `^0.18.0`, which accepts only 0.18.x.
 
 ## Install
 

@@ -32,7 +32,7 @@ export const AGENT_CHAT_AGENTS: Omit<SolutionAgentsProps, 'entry'> = {
     },
     {
       label: 'Composer autocomplete, stopped replies and ChatAttachment',
-      detail: 'Added after 0.17.4; in this branch, not in a published release yet.',
+      detail: 'Released in 0.18.0 (pre-1.0).',
       status: 'planned',
     },
   ],

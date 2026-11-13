@@ -11,6 +11,19 @@ const current = texuliPackageVersion();
 
 const entries = [
   {
+    version: '0.18',
+    date: '2026-11',
+    items: [
+      'Markdown and HTML in @texuli/core (ADR-034): a CommonMark and GFM parser and writer (@texuli/core/markdown), Markdown to safe HTML through the escaped markup builders and the URL policy (@texuli/core/markdown-html), HTML to Markdown without a DOM (@texuli/core/html), and writers for Slack, Discord, WhatsApp, Telegram MarkdownV2 and HTML, Teams, Google Chat, Mattermost and plain text that list what each format loses and keep broadcast mentions inert (@texuli/core/markdown-dialects). The MCP tools md.convert and md.render.',
+      'Behavior changes on Markdown edge cases: the editor, document, blocks, catalog rich text and chat codecs keep their APIs but read through the shared CommonMark parser, so setext headings, indented code, reference links, character references and backslash escapes read as CommonMark says; see docs/RELEASE.md for each codec.',
+      'Texuli Emojis (ADR-035): a new package, @texuli/emojis (the Unicode Emoji 18.0 and CLDR 49 catalog, tokenizer, search and legacy aliases), and Emoji, EmojiText and EmojiPicker in texuli/emoji, which show system emoji by default. The art package @texuli/emoji-assets is in development and not published (72 candidates, 0 approved, license pending). The MCP tools emoji.search, emoji.get, emoji.categories, emoji.variants and emoji.convert.',
+      'Editor: a block-type menu (@texuli/editor/block-menu), the emoji button and :shortcode: input rule (@texuli/editor/emoji), the export to chat formats (@texuli/editor/export), HTML paste through @texuli/core/html and Paste as Markdown.',
+      'Chat: composer autocomplete for mentions, commands and emoji, stopped replies, ChatAttachment, and Markdown and emoji in message text. Forms: the visual FormBuilder (@texuli/forms/builder). Data: FilterBar and MetricCard.',
+      'texuli.com: four new Solutions (Dashboards, Forms, Agent chat, Rich text editor) and the Markdown and emoji pages.',
+      'No export removed; blueprint spec stays 0.15.0; a 0.x minor for the new packages and the Markdown behavior changes.',
+    ],
+  },
+  {
     version: '0.17',
     date: '2026-11',
     items: [

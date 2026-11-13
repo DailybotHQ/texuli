@@ -122,7 +122,7 @@ function finishPreview(): { ok: true } {
 
   <details class="forms-demo__builder">
     <summary>Open the visual builder</summary>
-    <p class="forms-demo__builder-note">This branch includes the builder. It is planned for the next package release and is not on npm yet.</p>
+    <p class="forms-demo__builder-note">The builder was released in @texuli/forms 0.18.0 (in development, pre-1.0).</p>
     <FormBuilder schema={builderSchema} onChange={(schema) => { builderSchema = schema; }} />
     <p class="forms-demo__json-note" aria-live="polite">{builderSchema.fields?.length ?? 0} fields in the authored schema.</p>
     <p class="forms-demo__json-note">Builder output updates its validated preview and schema JSON as you edit.</p>

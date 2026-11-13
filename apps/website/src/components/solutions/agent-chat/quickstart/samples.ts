@@ -43,11 +43,11 @@ export function agentChatQuickstart(entry: SolutionEntry): SolutionQuickstartPro
   return {
     entry,
     title: 'Start with a thread',
-    install: { label: 'Install', language: 'bash', code: 'pnpm add @texuli/chat@0.17.4' },
+    install: { label: 'Install', language: 'bash', code: 'pnpm add @texuli/chat@0.18.0' },
     samples: [
       { label: 'Stream a reply', language: 'svelte', code: AGENT_CHAT_THREAD_SAMPLE },
       {
-        label: 'Attach a blueprint (in development, not in a published release yet)',
+        label: 'Attach a blueprint (in development, released in 0.18.0)',
         language: 'svelte',
         code: AGENT_CHAT_ATTACHMENT_SAMPLE,
       },

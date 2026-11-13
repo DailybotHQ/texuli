@@ -1,9 +1,23 @@
 {
   "name": "@texuli/emojis",
-  "version": "0.0.0",
+  "version": "0.18.0",
   "private": true,
   "description": "Framework-free Unicode emoji catalog and compatibility data for Texuli.",
+  "keywords": [
+    "emoji",
+    "unicode",
+    "cldr",
+    "texuli"
+  ],
+  "homepage": "https://github.com/DailybotHQ/texuli#readme",
+  "bugs": "https://github.com/DailybotHQ/texuli/issues",
   "license": "MIT",
+  "author": "Dailybot, Inc.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DailybotHQ/texuli.git",
+    "directory": "packages/emojis"
+  },
   "type": "module",
   "sideEffects": [
     "**/*.css"

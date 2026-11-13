@@ -7,7 +7,7 @@ export const dashboards: SolutionEntry = {
   status: 'in development',
   tagline: 'KPI boards people arrange, from the keyboard too.',
   summary:
-    'A responsive widget grid with pointer and keyboard layout controls. The dashboard grid is available in @texuli/data@0.17.4; FilterBar and MetricCard are in development; published-package consumers need a later @texuli/data release for them.',
+    'A responsive widget grid with pointer and keyboard layout controls. The dashboard grid, FilterBar and MetricCard are in @texuli/data@0.18.0 (FilterBar and MetricCard since 0.18.0), in development.',
   route: '/solutions/dashboards/',
   docs: '/guides/solutions/dashboards/',
   packages: [
@@ -51,13 +51,13 @@ export const dashboards: SolutionEntry = {
     scenarios: ['product-analytics', 'support-ops', 'sales-pipeline'],
     limits: [
       'Uses fictional browser-local sample data; it makes no network requests and saves no layout or filters.',
-      'FilterBar and MetricCard were added after 0.17.4; published-package consumers need a later @texuli/data release for them.',
+      'FilterBar and MetricCard were released in @texuli/data 0.18.0; earlier releases do not have them.',
     ],
   },
   art: { hero: { slot: 'solution-dashboards-hero', variant: 'plate' } },
   limits: [
     'Pre-1.0 and in development: a new minor version may break the API.',
-    'FilterBar and MetricCard were added after 0.17.4; they are in development and need a later @texuli/data release.',
+    'FilterBar and MetricCard were released in 0.18.0 and are in development.',
     '/dashboards-page/ stays as the capability reference; it is not redirected (ADR-036).',
   ],
   links: [

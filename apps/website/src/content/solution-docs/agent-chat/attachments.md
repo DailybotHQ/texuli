@@ -1,6 +1,6 @@
 ## Blueprint attachments
 
-`ChatAttachment` shows a blueprint an agent attached. In development: added after `0.17.4`, not in a published release yet.
+`ChatAttachment` shows a blueprint an agent attached. In development: released in `0.18.0`.
 
 The host passes `check` and `preview`, because `@texuli/chat` sits below the catalog and the player:
 

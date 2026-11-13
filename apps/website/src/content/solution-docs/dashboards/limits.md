@@ -1,6 +1,6 @@
 ## Status and release
 
-The dashboard grid and engine are available in `@texuli/data@0.17.4`, a pre-1.0 release that is still in development. The `FilterBar` and `MetricCard` additions were made after `0.17.4`; they need a later `@texuli/data` release. A new minor release under 0.x may introduce breaking changes.
+The dashboard grid and engine are available in `@texuli/data@0.18.0`, a pre-1.0 release that is still in development; `FilterBar` and `MetricCard` were added in `0.18.0`. A new minor release under 0.x may introduce breaking changes.
 
 ## Host responsibilities
 

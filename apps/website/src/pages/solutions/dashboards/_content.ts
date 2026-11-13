@@ -47,7 +47,7 @@ export const DASHBOARDS_LANDING: SolutionLandingContent = {
   hero: {
     eyebrow: 'Solution · Dashboards',
     title: 'A dashboard that fits the way you work.',
-    lede: 'Arrange KPI widgets, compare a reporting period and explore the data with filters. The live board runs on fictional data, entirely in your browser. The metric-card and filter-bar components shown here were added after 0.17.4 and are not on npm yet.',
+    lede: 'Arrange KPI widgets, compare a reporting period and explore the data with filters. The live board runs on fictional data, entirely in your browser. The metric-card and filter-bar components shown here were released in @texuli/data 0.18.0.',
     ctas: [
       { kind: 'primary', label: 'Explore the dashboard', href: `#${SOLUTION_SECTION_IDS.demo}` },
       { kind: 'secondary', label: 'Start building', href: `#${SOLUTION_SECTION_IDS.quickstart}` },

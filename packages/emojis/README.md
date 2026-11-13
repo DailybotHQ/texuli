@@ -1,7 +1,9 @@
 # @texuli/emojis
 
-> **Status: in development.** Not published on npm yet; it is private to the
-> Texuli workspace until a release publishes it (ADR-035).
+> **Status: in development (pre-1.0).** On npm as `0.18.0`, first published in
+> `0.18.0`, with provenance (ADR-035). Under 0.x a new minor (`0.18.0`) may
+> contain breaking changes, so pin the exact version or use `^0.18.0`,
+> which accepts only 0.18.x.
 
 The framework-free, dependency-free emoji catalog for Texuli, generated
 from pinned Unicode Emoji 18.0 and CLDR 49 sources (SHA-256 locked in
@@ -27,8 +29,9 @@ pnpm exec tsx scripts/emojis/generate-catalog.ts          # regenerate
 pnpm exec tsx scripts/emojis/generate-catalog.ts --check  # verify byte-identical output
 ```
 
-Planned (PLAN_023, in development): original Texuli artwork, web components
-in `texuli/emoji`, and native output.
+The web components are `Emoji`, `EmojiText` and `EmojiPicker` in
+`texuli/emoji` (released in `0.18.0`). Planned: original Texuli artwork
+(see `@texuli/emoji-assets`) and native output.
 No artwork ships yet: every record has `artAvailable: false`.
 
 Licenses: Unicode data under the Unicode License v3 and the legacy alias

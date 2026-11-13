@@ -1,6 +1,6 @@
 ## Composer autocomplete
 
-Pass `suggestions` to the composer or the thread. In development: added after `0.17.4`, not in a published release yet.
+Pass `suggestions` to the composer or the thread. In development: released in `0.18.0`.
 
 - `mentionSuggestions(people)` uses the `@` trigger and inserts a mention token.
 - `commandSuggestions(commands)` uses the `/` trigger at the start of a line.

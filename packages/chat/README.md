@@ -10,10 +10,10 @@ possibilities.": an MIT Svelte 5 component library by Dailybot, Inc.
 
 **In the stack:** layer L4, a domain package on the `@texuli/core` texels, `@texuli/primitives`, the `@texuli/tokens` token engine and the `texuli` components. The player paints it for agent blueprints.
 
-> **Status: 0.x release.** `@texuli/chat` is published on npm as `0.17.5`, a
+> **Status: 0.x release.** `@texuli/chat` is published on npm as `0.18.0`, a
 > pre-1.0 release (1.0.0 will be the first stable release). Under 0.x, a new
 > minor (`0.14.0`) may contain breaking changes, so pin the exact version or
-> use `^0.17.0`, which accepts only 0.17.x.
+> use `^0.18.0`, which accepts only 0.18.x.
 
 ## Install
 

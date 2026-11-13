@@ -2,8 +2,8 @@
  * The features /whats-new/ showcases, grouped by the release that carries
  * them, each with its honest status, its packages, the page that shows it
  * in full and the kind of demo or preview the hub paints. Plain data, so
- * the page and its tests share one source. Releases: 0.6.0 to 0.17.5 are
- * published on npm, and 0.17.5 is `latest` (the release line in
+ * the page and its tests share one source. Releases: 0.6.0 to 0.18.0 are
+ * published on npm, and 0.18.0 is `latest` (the release line in
  * docs/RELEASE.md).
  */
 
@@ -19,7 +19,8 @@ export type ReleaseId =
   | '0.14.0'
   | '0.15.0'
   | '0.16.0'
-  | '0.17.0';
+  | '0.17.0'
+  | '0.18.0';
 
 export interface Release {
   readonly id: ReleaseId;
@@ -31,10 +32,19 @@ export interface Release {
 
 export const RELEASES: readonly Release[] = [
   {
+    id: '0.18.0',
+    title: '0.18.0: Markdown and HTML, Texuli Emojis and four new Solutions',
+    status:
+      'Published on npm as 0.18.0, the current release (pre-1.0), with @texuli/emojis published for the first time; the emoji art package @texuli/emoji-assets is in development and not published.',
+    published: true,
+    summary:
+      'A CommonMark and GFM stack in @texuli/core with safe HTML, HTML to Markdown without a DOM and writers for nine chat formats; Texuli Emojis (no art is approved yet, so system emoji show by default); a block-type menu, emoji, paste and chat export in the editor; chat autocomplete and attachments; a form builder; FilterBar and MetricCard. The existing Markdown codecs read through the shared parser, which changes some edge cases. No export removed; blueprint spec stays 0.15.0.',
+  },
+  {
     id: '0.17.0',
     title: '0.17.0: Protoyard adoption fixes for the generator, bundles, render check and kit',
     status:
-      'Published on npm as 0.17.0; its patch 0.17.1 restores the strict lock for nested components and the host attribute, its patch 0.17.2 makes the runtime lock resolve parts like the static check, its patch 0.17.3 keys render baselines by route, viewport and mode, its patch 0.17.4 adds an optional scope and component to those keys, and its patch 0.17.5, the current release (pre-1.0), is a security patch for the markup URL check and toolbar keys.',
+      'Published on npm as 0.17.0; its patch 0.17.1 restores the strict lock for nested components and the host attribute, its patch 0.17.2 makes the runtime lock resolve parts like the static check, its patch 0.17.3 keys render baselines by route, viewport and mode, its patch 0.17.4 adds an optional scope and component to those keys, and its patch 0.17.5 is a security patch for the markup URL check and toolbar keys; everything in the 0.17 line is also in 0.18.0.',
     published: true,
     summary:
       'Fixes from Protoyard adopting locked design systems, with no export removed. Blueprint spec 0.15.0 lists the data-virtual-list mode, selectable and surface props in the catalog. ds generate keeps the brand seed when it repairs contrast and pins the failing role instead, reads colors in a prose brief and prefers the --font-sans token. Bundles keep every allow entry up to the 4,096-key cap, refuse duplicate library sources and a current-version history that disagrees with the document, and measure source limits in bytes. The locked render check ships a prebuilt host script, reads data-tx-component, maps compound parts and extension ids to their allowed parent, flags disabled rendered values (render-disabled-value), and saves a baseline to compare with --baseline. The kit models (changesModel, kitApproval) are Svelte-free in @texuli/spec/design-system, and the kit matrix opens large groups lazily. VirtualListView follows the uniform component contract, names every feed article and gains surface="plain". 0.17.1 (patch) restores the lock: a catalog root nested in an allowed one passes only as a declared part or composed id of that parent, the render host reads only the component attribute its caller chose (data-tx-component by default, never one the page picks), and each finding code keeps its own cap. The host map() carries the full part-to-parent and composed maps, and @texuli/tools/ds-check/host.iife.js is a package export. ds generate reads whole prose clauses in a brief (roles, fonts, several colors in order) and reports what it dropped, and each repair names the token it changed. changesModel compares up to 4,096 allow keys with a warning past the cap and compares every approval field. Icon buttons keep the 24px target minimum. 0.17.2 (patch): part parents come from declared catalog relations, never a shared hyphen prefix, so the runtime and static lock agree for every catalog id; the render page forwards composed maps, and allow axis lists are read in any declared shape. importBrand keeps fonts and style words apart (Headings in Fraunces, rounded corners, compact spacing) and reports every word it did not read. changesModel compares every approval field, approvedAt included, at full length and every library entry. Every package ships a CHANGELOG.md generated from the release notes. 0.17.3 (patch): importBrand reads font names case-sensitively (font is Inter gives Inter), finds calm motion, Headings use X and monospace X inside longer clauses, and truncates a brief past 16,000 characters or 256 clauses with a loss instead of refusing it. dsReportFingerprint keys a finding by code, path, route, viewport and mode, and older baselines still match. render-disabled-value checks each root against its own allow entry, once per root. 0.17.4 (patch): a baseline key takes an optional host-chosen scope (texuli ds check --locked --scope <id>, or the scope option of renderLockedDesignSystemCheck, such as a prototype id) and the catalog component of the finding, both in dsReportFingerprint when present, so one run over several prototypes keeps their findings apart; a baseline entry without a scope still matches any scope. 0.17.5 (security patch): linkUrl and imageUrl in @texuli/core/markup check the URL the serializers will write, after sanitizeMarkupChars, so characters the writers drop can no longer hide a scheme from the URL policy; toolbar arrows, Home and End move only from toolbar items, so a menu or grid opened inside a toolbar keeps its keys.',
@@ -437,7 +447,7 @@ export const FEATURES: readonly Feature[] = [
   },
   {
     id: 'platform-expansion',
-    release: '0.17.0',
+    release: '0.18.0',
     title: 'Markdown, emoji and four new Solutions',
     packages: [
       '@texuli/core/markdown',
@@ -447,11 +457,11 @@ export const FEATURES: readonly Feature[] = [
       '@texuli/editor',
     ],
     summary:
-      'A CommonMark and GFM Markdown stack with safe HTML and nine chat dialects, Texuli Emojis, and Solutions for Dashboards, Forms, Agent chat and Rich text editor. In development on this branch, not in a published release yet.',
+      'A CommonMark and GFM Markdown stack with safe HTML and nine chat dialects, Texuli Emojis, and Solutions for Dashboards, Forms, Agent chat and Rich text editor. Released in 0.18.0 (pre-1.0).',
     href: '/solutions/',
     linkLabel: 'The Solutions catalog',
     demo: 'preview',
-    note: 'In development; not in a published release yet. @texuli/emojis is still private to the workspace.',
+    note: 'Released in 0.18.0, in development (pre-1.0). @texuli/emojis is on npm; @texuli/emoji-assets is in development and not published (72 art candidates, 0 approved, license pending), so no Texuli emoji art is approved yet and components show system emoji.',
   },
   {
     id: 'removals',

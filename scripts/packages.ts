@@ -46,6 +46,7 @@ import { fileURLToPath } from 'node:url';
 import { buildDsCheckHost, DS_CHECK_HOST_DIST } from './ds-check-host.ts';
 import { buildDsCheckSheet, DS_CHECK_SHEET_DIST } from './ds-check-sheet.ts';
 import { CHANGELOG_FILE, changelogForPackage } from './package-changelogs.ts';
+import { UNRELEASED_PACKAGES } from './release-line.ts';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -452,13 +453,17 @@ export function readWorkspace(root = ROOT): WorkspacePackage[] {
   });
 }
 
-/** The packages to pack: not {@link NEVER_PACKED}, and matching `filters` when given. */
+/**
+ * The packages to pack: not {@link NEVER_PACKED}, and matching `filters` when given. Without
+ * filters, the unreleased packages (`UNRELEASED_PACKAGES`, outside the publish workflow and
+ * without a generated changelog) are left out too; a filter that names one still packs it.
+ */
 export function selectPackages(
   all: readonly WorkspacePackage[],
   filters: readonly string[]
 ): WorkspacePackage[] {
   const packable = all.filter((pkg) => !NEVER_PACKED.includes(pkg.name));
-  if (filters.length === 0) return packable;
+  if (filters.length === 0) return packable.filter((pkg) => !UNRELEASED_PACKAGES.has(pkg.name));
   const unknown = filters.filter((f) => !packable.some((p) => p.dir === f || p.name === f));
   if (unknown.length > 0) throw new Error(`Unknown package: ${unknown.join(', ')}`);
   return packable.filter((pkg) => filters.includes(pkg.dir) || filters.includes(pkg.name));

@@ -114,8 +114,8 @@ describe('whats-new hub', () => {
     const service = FEATURES.find((feature) => feature.id === 'agent-service');
     expect(service?.note).toContain('not deployed');
     const expansion = FEATURES.find((feature) => feature.id === 'platform-expansion');
-    expect(expansion?.summary).toContain('not in a published release yet');
-    expect(expansion?.note).toContain('not in a published release yet');
+    expect(expansion?.summary).toContain('Released in 0.18.0');
+    expect(expansion?.note).toContain('no Texuli emoji art is approved yet');
     // i18n says translations beyond English are planned.
     expect(FEATURES.find((feature) => feature.id === 'i18n')?.summary).toContain(
       'translations beyond English are planned'

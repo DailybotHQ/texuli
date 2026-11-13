@@ -7,14 +7,14 @@ export const forms: SolutionEntry = {
   status: 'in development',
   tagline: 'Schema-driven forms with conditions, steps and drafts.',
   summary:
-    'A closed form schema rendered with Texuli components, multi-step flows, conditional logic, announced validation, drafts and autosave. The visual builder subpath is in development: added after 0.17.4, not in a published release yet, planned for the next release.',
+    'A closed form schema rendered with Texuli components, multi-step flows, conditional logic, announced validation, drafts and autosave. The visual builder subpath is in development: released in 0.18.0.',
   route: '/solutions/forms/',
   docs: '/guides/solutions/forms/',
   packages: [
     {
       name: '@texuli/forms',
       subpaths: ['.', './model', './controls', './builder', './host'],
-      role: 'Schema, model, controls and host rendering are in development and published on npm; the builder (added after 0.17.4) is not in a published release yet.',
+      role: 'Schema, model, controls and host rendering are in development and published on npm; the builder was released in 0.18.0.',
     },
   ],
   capabilities: [
@@ -56,13 +56,13 @@ export const forms: SolutionEntry = {
     scenarios: ['intake', 'builder'],
     limits: [
       'The intake draft stays in this page session and nothing is submitted.',
-      'The visual builder subpath is in development: added after 0.17.4, not in a published release yet, planned for the next release.',
+      'The visual builder subpath is in development: released in 0.18.0.',
     ],
   },
   art: { hero: { slot: 'solution-forms-hero', variant: 'plate' } },
   limits: [
     '@texuli/forms is in development (pre-1.0): a new minor version may break the API.',
-    'The visual builder subpath is in development: added after 0.17.4, not in a published release yet, planned for the next release.',
+    'The visual builder subpath is in development: released in 0.18.0.',
     '/forms-page/ stays as the capability reference; it is not redirected (ADR-036).',
   ],
   links: [

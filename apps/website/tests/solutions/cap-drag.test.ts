@@ -24,7 +24,7 @@ describe('Drag capability page', () => {
   });
 
   it('states the package status honestly and keeps the real demo sections', () => {
-    expect(DRAG_PACKAGE).toMatchObject({ name: '@texuli/drag', version: '0.17.5' });
+    expect(DRAG_PACKAGE).toMatchObject({ name: '@texuli/drag', version: '0.18.0' });
     expect(PAGE).toContain('@texuli/drag · in development');
     expect(PAGE).toContain('a pre-1.0 release');
     expect(DRAG_SECTIONS.map(({ id }) => id)).toEqual([

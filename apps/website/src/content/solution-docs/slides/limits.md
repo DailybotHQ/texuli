@@ -1,6 +1,6 @@
 ## Status
 
-Slides is **in development**. `@texuli/slides` and `@texuli/deck` are on npm as `0.17.5`. Under 0.x a new minor may break. Native rendering is planned, not built.
+Slides is **in development**. `@texuli/slides` and `@texuli/deck` are on npm as `0.18.0`. Under 0.x a new minor may break. Native rendering is planned, not built.
 
 ## Not built
 

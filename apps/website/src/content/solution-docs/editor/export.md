@@ -1,6 +1,6 @@
 ## Export to chat
 
-`documentToDialect` in `@texuli/editor/markdown` writes the document for Slack, Discord, WhatsApp, Telegram (MarkdownV2 or HTML), Microsoft Teams, Google Chat, Mattermost or plain text. `DialectExport` from `@texuli/editor/export` shows the text, a Copy button and the losses. In development: added after `0.17.4`, not in a published release yet.
+`documentToDialect` in `@texuli/editor/markdown` writes the document for Slack, Discord, WhatsApp, Telegram (MarkdownV2 or HTML), Microsoft Teams, Google Chat, Mattermost or plain text. `DialectExport` from `@texuli/editor/export` shows the text, a Copy button and the losses. In development: released in `0.18.0`.
 
 - Every link is checked again by the URL policy, untrusted by default.
 - Broadcast mentions are never written: `@everyone`, `@here` and `@channel` stay text.
